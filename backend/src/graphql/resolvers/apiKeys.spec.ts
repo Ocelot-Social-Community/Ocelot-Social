@@ -118,6 +118,22 @@ describe('createApiKey', () => {
       expect(errors?.[0].message).toContain('Maximum of 3 active API keys reached')
     })
 
+    it('rejects expiresInDays of 0', async () => {
+      const { errors } = await mutate({
+        mutation: createApiKey,
+        variables: { name: 'Zero Expiry', expiresInDays: 0 },
+      })
+      expect(errors?.[0].message).toContain('expiresInDays must be a positive integer')
+    })
+
+    it('rejects negative expiresInDays', async () => {
+      const { errors } = await mutate({
+        mutation: createApiKey,
+        variables: { name: 'Negative Expiry', expiresInDays: -5 },
+      })
+      expect(errors?.[0].message).toContain('expiresInDays must be a positive integer')
+    })
+
     it('does not count revoked keys towards the limit', async () => {
       const { data: k1 } = await mutate({ mutation: createApiKey, variables: { name: 'Key 1' } })
       await mutate({ mutation: createApiKey, variables: { name: 'Key 2' } })
@@ -261,6 +277,60 @@ describe('revokeApiKey', () => {
     const { data } = await mutate({ mutation: revokeApiKey, variables: { id: 'nonexistent' } })
     expect(data.revokeApiKey).toBe(false)
   })
+
+  it('returns false when revoking an already revoked key', async () => {
+    await mutate({ mutation: revokeApiKey, variables: { id: keyId } })
+    const { data } = await mutate({ mutation: revokeApiKey, variables: { id: keyId } })
+    expect(data.revokeApiKey).toBe(false)
+  })
+
+  it('preserves original disabledAt on double revoke', async () => {
+    await mutate({ mutation: revokeApiKey, variables: { id: keyId } })
+    const { data: before } = await query({ query: myApiKeys })
+    const originalDisabledAt = before.myApiKeys.find((k) => k.id === keyId).disabledAt
+    await mutate({ mutation: revokeApiKey, variables: { id: keyId } })
+    const { data: after } = await query({ query: myApiKeys })
+    expect(after.myApiKeys.find((k) => k.id === keyId).disabledAt).toBe(originalDisabledAt)
+  })
+
+  it('returns false for another user\'s key', async () => {
+    const otherUser = await database.neode.create('User', {
+      id: 'u4-other',
+      name: 'Other',
+      slug: 'other',
+      role: 'user',
+    })
+    authenticatedUser = (await otherUser.toJson()) as Context['user']
+    const { data } = await mutate({ mutation: revokeApiKey, variables: { id: keyId } })
+    expect(data.revokeApiKey).toBe(false)
+  })
+})
+
+describe('updateApiKey', () => {
+  it('throws error for another user\'s key', async () => {
+    const user1 = await database.neode.create('User', {
+      id: 'u-owner',
+      name: 'Owner',
+      slug: 'owner',
+      role: 'user',
+    })
+    authenticatedUser = (await user1.toJson()) as Context['user']
+    const { data } = await mutate({ mutation: createApiKey, variables: { name: 'Owned Key' } })
+    const ownedKeyId = data.createApiKey.apiKey.id
+
+    const user2 = await database.neode.create('User', {
+      id: 'u-stranger',
+      name: 'Stranger',
+      slug: 'stranger',
+      role: 'user',
+    })
+    authenticatedUser = (await user2.toJson()) as Context['user']
+    const { errors } = await mutate({
+      mutation: updateApiKey,
+      variables: { id: ownedKeyId, name: 'Stolen' },
+    })
+    expect(errors?.[0].message).toContain('API key not found')
+  })
 })
 
 describe('admin operations', () => {
@@ -300,6 +370,13 @@ describe('admin operations', () => {
       })
       expect(errors).toBeUndefined()
       expect(data.adminRevokeApiKey).toBe(true)
+    })
+
+    it('returns false when admin revokes an already revoked key', async () => {
+      authenticatedUser = (await adminUser.toJson()) as Context['user']
+      await mutate({ mutation: adminRevokeApiKey, variables: { id: keyId } })
+      const { data } = await mutate({ mutation: adminRevokeApiKey, variables: { id: keyId } })
+      expect(data.adminRevokeApiKey).toBe(false)
     })
   })
 

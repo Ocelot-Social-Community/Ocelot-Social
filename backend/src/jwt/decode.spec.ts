@@ -168,6 +168,72 @@ describe('decode', () => {
 
       it('returns null', returnsNull)
     })
+
+    describe('and API key belonging to disabled user', () => {
+      beforeEach(async () => {
+        await Factory.build('user', {
+          id: 'disabled-user',
+          name: 'Disabled User',
+          slug: 'disabled-user',
+          role: 'user',
+          disabled: true,
+        })
+        const crypto = await import('node:crypto')
+        const keyHash = crypto.createHash('sha256').update('oak_disableduser').digest('hex')
+        const session = driver.session()
+        await session.writeTransaction(async (tx) => {
+          await tx.run(
+            `MATCH (u:User { id: $userId })
+             CREATE (u)-[:HAS_API_KEY]->(k:ApiKey {
+               id: 'ak-disabled-user',
+               name: 'Key of Disabled User',
+               keyHash: $keyHash,
+               keyPrefix: 'oak_disabl',
+               createdAt: toString(datetime()),
+               disabled: false
+             })`,
+            { userId: 'disabled-user', keyHash },
+          )
+        })
+        await session.close()
+        authorizationHeader = 'Bearer oak_disableduser'
+      })
+
+      it('returns null', returnsNull)
+    })
+
+    describe('and API key belonging to deleted user', () => {
+      beforeEach(async () => {
+        await Factory.build('user', {
+          id: 'deleted-user',
+          name: 'Deleted User',
+          slug: 'deleted-user',
+          role: 'user',
+          deleted: true,
+        })
+        const crypto = await import('node:crypto')
+        const keyHash = crypto.createHash('sha256').update('oak_deleteduser').digest('hex')
+        const session = driver.session()
+        await session.writeTransaction(async (tx) => {
+          await tx.run(
+            `MATCH (u:User { id: $userId })
+             CREATE (u)-[:HAS_API_KEY]->(k:ApiKey {
+               id: 'ak-deleted-user',
+               name: 'Key of Deleted User',
+               keyHash: $keyHash,
+               keyPrefix: 'oak_delete',
+               createdAt: toString(datetime()),
+               disabled: false
+             })`,
+            { userId: 'deleted-user', keyHash },
+          )
+        })
+        await session.close()
+        authorizationHeader = 'Bearer oak_deleteduser'
+      })
+
+      it('returns null', returnsNull)
+    })
   })
 
   describe('given `null` as JWT Bearer token', () => {

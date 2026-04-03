@@ -209,6 +209,44 @@ describe('admin/api-keys.vue', () => {
       await flushPromises()
       expect(mocks.$toast.error).toHaveBeenCalledWith('Query failed')
     })
+
+    it('discards stale response when user switches during load', async () => {
+      let resolveFirst
+      queryMock
+        .mockReturnValueOnce(new Promise((resolve) => { resolveFirst = resolve }))
+        .mockResolvedValueOnce({
+          data: { apiKeysForUser: [activeKeyDetail({ id: 'ak-second', name: 'Second' })] },
+        })
+      wrapper = Wrapper({ apiKeyUsers: [userEntry(), userEntry({ user: { id: 'u2', name: 'Bob', slug: 'bob' } })] })
+      // Start loading user u1
+      const firstToggle = wrapper.vm.toggleUser('u1')
+      await wrapper.vm.$nextTick()
+      // Switch to u2 before u1 finishes
+      await wrapper.vm.toggleUser('u2')
+      await flushPromises()
+      // Now resolve u1's stale response
+      resolveFirst({
+        data: { apiKeysForUser: [activeKeyDetail({ id: 'ak-first', name: 'Stale' })] },
+      })
+      await firstToggle
+      await flushPromises()
+      // Should show u2's keys, not u1's stale response
+      expect(wrapper.vm.expandedUserId).toBe('u2')
+      expect(wrapper.vm.userKeys[0].name).toBe('Second')
+    })
+
+    it('sets detailLoading on the expand button', async () => {
+      let resolveQuery
+      queryMock.mockReturnValue(new Promise((resolve) => { resolveQuery = resolve }))
+      wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
+      const togglePromise = wrapper.vm.toggleUser('u1')
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.detailLoading).toBe(true)
+      resolveQuery({ data: { apiKeysForUser: [activeKeyDetail()] } })
+      await togglePromise
+      await flushPromises()
+      expect(wrapper.vm.detailLoading).toBe(false)
+    })
   })
 
   describe('revoke single key', () => {
@@ -320,6 +358,26 @@ describe('admin/api-keys.vue', () => {
       wrapper = Wrapper()
       wrapper.setData({ offset: 20 })
       expect(wrapper.vm.hasPrevious).toBe(true)
+    })
+
+    it('sets hasNext to true when more results than pageSize', () => {
+      wrapper = Wrapper()
+      const entries = Array.from({ length: 21 }, (_, i) =>
+        userEntry({ user: { id: `u${i}`, name: `User ${i}`, slug: `user-${i}` } }),
+      )
+      const updateFn = wrapper.vm.$options.apollo.apiKeyUsers.update.bind(wrapper.vm)
+      const result = updateFn({ apiKeyUsers: entries })
+      expect(wrapper.vm.hasNext).toBe(true)
+      expect(result).toHaveLength(20)
+    })
+
+    it('sets hasNext to false when results fit in page', () => {
+      wrapper = Wrapper()
+      const entries = [userEntry()]
+      const updateFn = wrapper.vm.$options.apollo.apiKeyUsers.update.bind(wrapper.vm)
+      const result = updateFn({ apiKeyUsers: entries })
+      expect(wrapper.vm.hasNext).toBe(false)
+      expect(result).toHaveLength(1)
     })
   })
 })

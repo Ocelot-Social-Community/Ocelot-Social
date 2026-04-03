@@ -299,6 +299,58 @@ describe('settings/api-keys.vue', () => {
       await flushPromises()
       expect(mocks.$toast.error).toHaveBeenCalledWith('Maximum of 5 active API keys reached')
     })
+
+    it('does not submit when name is empty', async () => {
+      wrapper = Wrapper()
+      await wrapper.setData({ name: '   ' })
+      await wrapper.find('form').trigger('submit')
+      await flushPromises()
+      expect(mutateMock).not.toHaveBeenCalled()
+    })
+
+    it('sets creating to true during mutation', async () => {
+      let resolveMutate
+      mutateMock.mockReturnValue(new Promise((resolve) => { resolveMutate = resolve }))
+      wrapper = Wrapper()
+      await wrapper.setData({ name: 'Loading Test' })
+      const submitPromise = wrapper.find('form').trigger('submit')
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.creating).toBe(true)
+      resolveMutate({
+        data: {
+          createApiKey: {
+            apiKey: activeKey({ id: 'new', name: 'Loading Test' }),
+            secret: 'oak_secret',
+          },
+        },
+      })
+      await submitPromise
+      await flushPromises()
+      expect(wrapper.vm.creating).toBe(false)
+    })
+  })
+
+  describe('copy secret', () => {
+    it('copies secret to clipboard on success', async () => {
+      Object.assign(navigator, {
+        clipboard: { writeText: jest.fn().mockResolvedValue(undefined) },
+      })
+      wrapper = Wrapper()
+      await wrapper.setData({ newSecret: 'oak_mysecret123' })
+      await wrapper.vm.copySecret()
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('oak_mysecret123')
+      expect(mocks.$toast.success).toHaveBeenCalledWith('settings.api-keys.secret.copied')
+    })
+
+    it('shows error toast when clipboard fails', async () => {
+      Object.assign(navigator, {
+        clipboard: { writeText: jest.fn().mockRejectedValue(new Error('denied')) },
+      })
+      wrapper = Wrapper()
+      await wrapper.setData({ newSecret: 'oak_mysecret123' })
+      await wrapper.vm.copySecret()
+      expect(mocks.$toast.error).toHaveBeenCalledWith('settings.api-keys.secret.copy-failed')
+    })
   })
 
   describe('revoke key', () => {
@@ -317,6 +369,19 @@ describe('settings/api-keys.vue', () => {
       expect(mutateMock).toHaveBeenCalledWith(expect.objectContaining({ variables: { id: 'k1' } }))
       expect(refetchMock).toHaveBeenCalled()
       expect(mocks.$toast.success).toHaveBeenCalled()
+    })
+
+    it('sets revokingKeyId during mutation', async () => {
+      let resolveMutate
+      mutateMock.mockReturnValue(new Promise((resolve) => { resolveMutate = resolve }))
+      wrapper = Wrapper({ myApiKeys: [activeKey()] })
+      const revokePromise = wrapper.vm.revokeKey({ id: 'k1', name: 'CI Bot' })
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.revokingKeyId).toBe('k1')
+      resolveMutate({ data: { revokeApiKey: true } })
+      await revokePromise
+      await flushPromises()
+      expect(wrapper.vm.revokingKeyId).toBeNull()
     })
 
     it('shows error toast on revoke failure', async () => {
