@@ -41,15 +41,16 @@ export default {
       const result = await context.database.query({
         query: `
           MATCH (u:User)-[:HAS_API_KEY]->(k:ApiKey)
-          OPTIONAL MATCH (p:Post { createdByApiKey: k.id })
-          OPTIONAL MATCH (c:Comment { createdByApiKey: k.id })
+          WITH u, collect(k) AS keys
           WITH u,
-            sum(CASE WHEN NOT k.disabled THEN 1 ELSE 0 END) AS activeCount,
-            sum(CASE WHEN k.disabled THEN 1 ELSE 0 END) AS revokedCount,
-            count(DISTINCT p) AS postsCount,
-            count(DISTINCT c) AS commentsCount,
-            max(k.lastUsedAt) AS lastActivity
-          RETURN u {.*} AS user, activeCount, revokedCount, postsCount, commentsCount, lastActivity
+            size([k IN keys WHERE NOT k.disabled]) AS activeCount,
+            size([k IN keys WHERE k.disabled]) AS revokedCount,
+            reduce(m = null, k IN keys | CASE WHEN k.lastUsedAt IS NOT NULL AND (m IS NULL OR k.lastUsedAt > m) THEN k.lastUsedAt ELSE m END) AS lastActivity,
+            [k IN keys | k.id] AS keyIds
+          OPTIONAL MATCH (p:Post) WHERE p.createdByApiKey IN keyIds
+          WITH u, activeCount, revokedCount, lastActivity, keyIds, count(p) AS postsCount
+          OPTIONAL MATCH (c:Comment) WHERE c.createdByApiKey IN keyIds
+          RETURN u {.*} AS user, activeCount, revokedCount, postsCount, count(c) AS commentsCount, lastActivity
           ORDER BY lastActivity IS NULL, lastActivity DESC
           SKIP toInteger($offset) LIMIT toInteger($first)
         `,
