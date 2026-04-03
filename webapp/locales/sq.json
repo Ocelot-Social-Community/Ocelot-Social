@@ -88,45 +88,45 @@
     },
     "api-keys": {
       "name": "API Keys",
-      "sort-by": "Sort by",
-      "empty": "No users with API keys found.",
-      "never": "never",
-      "show-keys": "Show keys",
-      "revoke-key": "Revoke key",
-      "revoke-all": "Revoke all keys of this user",
-      "revoke-all-short": "Revoke all",
-      "revoked-at": "Revoked at",
+      "sort-by": "Rendit sipas",
+      "empty": "Nuk u gjetën përdorues me API Keys.",
+      "never": "kurrë",
+      "show-keys": "Shfaq keys",
+      "revoke-key": "Revoko key",
+      "revoke-all": "Revoko të gjitha keys e këtij përdoruesi",
+      "revoke-all-short": "Revoko të gjitha",
+      "revoked-at": "Revokuar më",
       "order": {
-        "last-used": "Last activity",
-        "active-keys": "Active keys",
-        "posts": "Posts count",
-        "comments": "Comments count"
+        "last-used": "Aktiviteti i fundit",
+        "active-keys": "Keys aktive",
+        "posts": "Numri i postimeve",
+        "comments": "Numri i komenteve"
       },
       "table": {
         "prefix": "Key",
-        "name": "Name",
-        "user": "User",
-        "active": "Active",
-        "revoked-count": "Revoked",
-        "posts": "Posts",
-        "comments": "Comments",
-        "last-activity": "Last activity",
-        "actions": "Actions"
+        "name": "Emri",
+        "user": "Përdoruesi",
+        "active": "Aktive",
+        "revoked-count": "Revokuara",
+        "posts": "Postime",
+        "comments": "Komente",
+        "last-activity": "Aktiviteti i fundit",
+        "actions": "Veprime"
       },
       "detail": {
-        "active": "Active keys ({count})",
-        "revoked": "Revoked keys ({count})"
+        "active": "Keys aktive ({count})",
+        "revoked": "Keys të revokuara ({count})"
       },
       "revoke": {
-        "title": "Revoke API Key",
-        "message": "Are you sure you want to revoke the API key \"{name}\" of {user}?",
-        "confirm": "Revoke",
-        "success": "API key revoked successfully"
+        "title": "Revoko API Key",
+        "message": "A je i sigurt që dëshiron të revokosh API Key \"{name}\" të {user}?",
+        "confirm": "Revoko",
+        "success": "API Key u revokua me sukses"
       },
-      "revoke-all-title": "Revoke all API Keys",
-      "revoke-all-message": "Are you sure you want to revoke ALL API keys of {user}? This action cannot be undone.",
-      "revoke-all-confirm": "Revoke all",
-      "revoke-all-success": "{count} API keys of {user} have been revoked"
+      "revoke-all-title": "Revoko të gjitha API Keys",
+      "revoke-all-message": "A je i sigurt që dëshiron të revokosh TË GJITHA API Keys e {user}? Ky veprim nuk mund të zhbëhet.",
+      "revoke-all-confirm": "Revoko të gjitha",
+      "revoke-all-success": "{count} API Keys të {user} u revokuan"
     },
     "name": "Admin",
     "notifications": {
@@ -1221,46 +1221,46 @@
     "api-keys": {
       "name": "API Keys",
       "create": {
-        "title": "Create new API Key",
-        "name-label": "Name",
-        "expiry-label": "Expiry",
-        "expiry-never": "No expiry",
-        "expiry-days": "{days} days",
-        "submit": "Create key",
-        "success": "API key created successfully",
-        "limit-reached": "You have reached the maximum of {max} active API keys. Revoke an existing key to create a new one."
+        "title": "Krijo API Key të ri",
+        "name-label": "Emri",
+        "expiry-label": "Vlefshmëria",
+        "expiry-never": "Pa datë skadimi",
+        "expiry-days": "{days} ditë",
+        "submit": "Krijo key",
+        "success": "API Key u krijua me sukses",
+        "limit-reached": "Ke arritur maksimumin e {max} API Keys aktive. Revoko një key ekzistues për të krijuar një të ri."
       },
       "secret": {
-        "title": "Your new API Key (visible only once!)",
-        "copy": "Copy",
-        "copied": "API key copied to clipboard",
-        "copy-failed": "Failed to copy to clipboard",
-        "warning": "Save this key now. You will not be able to see it again after closing this page."
+        "title": "API Key yt i ri (i dukshëm vetëm një herë!)",
+        "copy": "Kopjo",
+        "copied": "API Key u kopjua në clipboard",
+        "copy-failed": "Kopjimi në clipboard dështoi",
+        "warning": "Ruaje këtë key tani. Nuk do të mundesh ta shohësh përsëri pasi të mbyllësh këtë faqe."
       },
       "list": {
-        "title": "My API Keys",
-        "name": "Name",
+        "title": "API Keys e mia",
+        "name": "Emri",
         "prefix": "Key",
-        "created-at": "Created at",
-        "expires": "Expires",
-        "never-expires": "never",
-        "last-used": "Last used",
-        "actions": "Actions",
-        "never": "never",
-        "revoked": "revoked",
-        "expired": "expired",
-        "revoke": "Revoke key",
-        "empty": "You have no API keys yet."
+        "created-at": "Krijuar më",
+        "expires": "Skadon",
+        "never-expires": "kurrë",
+        "last-used": "Përdorimi i fundit",
+        "actions": "Veprime",
+        "never": "kurrë",
+        "revoked": "revokuar",
+        "expired": "skaduar",
+        "revoke": "Revoko key",
+        "empty": "Nuk ke ende API Keys."
       },
       "revoke": {
-        "title": "Revoke API Key",
-        "message": "Are you sure you want to revoke the API key \"{name}\"? This action cannot be undone.",
-        "confirm": "Revoke",
-        "success": "API key \"{name}\" has been revoked"
+        "title": "Revoko API Key",
+        "message": "A je i sigurt që dëshiron të revokosh API Key \"{name}\"? Ky veprim nuk mund të zhbëhet.",
+        "confirm": "Revoko",
+        "success": "API Key \"{name}\" u revokua"
       },
       "revoked-list": {
-        "title": "Revoked keys ({count})",
-        "revoked-at": "Revoked at"
+        "title": "Keys të revokuara ({count})",
+        "revoked-at": "Revokuar më"
       }
     },
     "languages": {

@@ -88,45 +88,45 @@
     },
     "api-keys": {
       "name": "API Keys",
-      "sort-by": "Sort by",
-      "empty": "No users with API keys found.",
-      "never": "never",
-      "show-keys": "Show keys",
-      "revoke-key": "Revoke key",
-      "revoke-all": "Revoke all keys of this user",
-      "revoke-all-short": "Revoke all",
-      "revoked-at": "Revoked at",
+      "sort-by": "Сортувати за",
+      "empty": "Користувачів з API Keys не знайдено.",
+      "never": "ніколи",
+      "show-keys": "Показати keys",
+      "revoke-key": "Відкликати key",
+      "revoke-all": "Відкликати всі keys цього користувача",
+      "revoke-all-short": "Відкликати всі",
+      "revoked-at": "Відкликано",
       "order": {
-        "last-used": "Last activity",
-        "active-keys": "Active keys",
-        "posts": "Posts count",
-        "comments": "Comments count"
+        "last-used": "Остання активність",
+        "active-keys": "Активні keys",
+        "posts": "Кількість постів",
+        "comments": "Кількість коментарів"
       },
       "table": {
         "prefix": "Key",
-        "name": "Name",
-        "user": "User",
-        "active": "Active",
-        "revoked-count": "Revoked",
-        "posts": "Posts",
-        "comments": "Comments",
-        "last-activity": "Last activity",
-        "actions": "Actions"
+        "name": "Ім'я",
+        "user": "Користувач",
+        "active": "Активні",
+        "revoked-count": "Відкликані",
+        "posts": "Пости",
+        "comments": "Коментарі",
+        "last-activity": "Остання активність",
+        "actions": "Дії"
       },
       "detail": {
-        "active": "Active keys ({count})",
-        "revoked": "Revoked keys ({count})"
+        "active": "Активні keys ({count})",
+        "revoked": "Відкликані keys ({count})"
       },
       "revoke": {
-        "title": "Revoke API Key",
-        "message": "Are you sure you want to revoke the API key \"{name}\" of {user}?",
-        "confirm": "Revoke",
-        "success": "API key revoked successfully"
+        "title": "Відкликати API Key",
+        "message": "Ти впевнений, що хочеш відкликати API Key \"{name}\" користувача {user}?",
+        "confirm": "Відкликати",
+        "success": "API Key успішно відкликано"
       },
-      "revoke-all-title": "Revoke all API Keys",
-      "revoke-all-message": "Are you sure you want to revoke ALL API keys of {user}? This action cannot be undone.",
-      "revoke-all-confirm": "Revoke all",
-      "revoke-all-success": "{count} API keys of {user} have been revoked"
+      "revoke-all-title": "Відкликати всі API Keys",
+      "revoke-all-message": "Ти впевнений, що хочеш відкликати ВСІ API Keys користувача {user}? Цю дію не можна скасувати.",
+      "revoke-all-confirm": "Відкликати всі",
+      "revoke-all-success": "{count} API Keys користувача {user} було відкликано"
     },
     "name": "Адміністрування",
     "notifications": {
@@ -1221,46 +1221,46 @@
     "api-keys": {
       "name": "API Keys",
       "create": {
-        "title": "Create new API Key",
-        "name-label": "Name",
-        "expiry-label": "Expiry",
-        "expiry-never": "No expiry",
-        "expiry-days": "{days} days",
-        "submit": "Create key",
-        "success": "API key created successfully",
-        "limit-reached": "You have reached the maximum of {max} active API keys. Revoke an existing key to create a new one."
+        "title": "Створити новий API Key",
+        "name-label": "Ім'я",
+        "expiry-label": "Термін дії",
+        "expiry-never": "Без терміну дії",
+        "expiry-days": "{days} днів",
+        "submit": "Створити key",
+        "success": "API Key успішно створено",
+        "limit-reached": "Ти досяг максимуму в {max} активних API Keys. Відклич існуючий key, щоб створити новий."
       },
       "secret": {
-        "title": "Your new API Key (visible only once!)",
-        "copy": "Copy",
-        "copied": "API key copied to clipboard",
-        "copy-failed": "Failed to copy to clipboard",
-        "warning": "Save this key now. You will not be able to see it again after closing this page."
+        "title": "Твій новий API Key (видимий лише один раз!)",
+        "copy": "Копіювати",
+        "copied": "API Key скопійовано до буфера обміну",
+        "copy-failed": "Не вдалося скопіювати до буфера обміну",
+        "warning": "Збережи цей key зараз. Ти не зможеш побачити його знову після закриття цієї сторінки."
       },
       "list": {
-        "title": "My API Keys",
-        "name": "Name",
+        "title": "Мої API Keys",
+        "name": "Ім'я",
         "prefix": "Key",
-        "created-at": "Created at",
-        "expires": "Expires",
-        "never-expires": "never",
-        "last-used": "Last used",
-        "actions": "Actions",
-        "never": "never",
-        "revoked": "revoked",
-        "expired": "expired",
-        "revoke": "Revoke key",
-        "empty": "You have no API keys yet."
+        "created-at": "Створено",
+        "expires": "Закінчується",
+        "never-expires": "ніколи",
+        "last-used": "Останнє використання",
+        "actions": "Дії",
+        "never": "ніколи",
+        "revoked": "відкликано",
+        "expired": "закінчився",
+        "revoke": "Відкликати key",
+        "empty": "У тебе ще немає API Keys."
       },
       "revoke": {
-        "title": "Revoke API Key",
-        "message": "Are you sure you want to revoke the API key \"{name}\"? This action cannot be undone.",
-        "confirm": "Revoke",
-        "success": "API key \"{name}\" has been revoked"
+        "title": "Відкликати API Key",
+        "message": "Ти впевнений, що хочеш відкликати API Key \"{name}\"? Цю дію не можна скасувати.",
+        "confirm": "Відкликати",
+        "success": "API Key \"{name}\" було відкликано"
       },
       "revoked-list": {
-        "title": "Revoked keys ({count})",
-        "revoked-at": "Revoked at"
+        "title": "Відкликані keys ({count})",
+        "revoked-at": "Відкликано"
       }
     },
     "languages": {

@@ -88,45 +88,45 @@
     },
     "api-keys": {
       "name": "API Keys",
-      "sort-by": "Sort by",
-      "empty": "No users with API keys found.",
-      "never": "never",
-      "show-keys": "Show keys",
-      "revoke-key": "Revoke key",
-      "revoke-all": "Revoke all keys of this user",
-      "revoke-all-short": "Revoke all",
-      "revoked-at": "Revoked at",
+      "sort-by": "Ordenar por",
+      "empty": "Nenhum utilizador com API Keys encontrado.",
+      "never": "nunca",
+      "show-keys": "Mostrar keys",
+      "revoke-key": "Revogar key",
+      "revoke-all": "Revogar todas as keys deste utilizador",
+      "revoke-all-short": "Revogar todas",
+      "revoked-at": "Revogada em",
       "order": {
-        "last-used": "Last activity",
-        "active-keys": "Active keys",
-        "posts": "Posts count",
-        "comments": "Comments count"
+        "last-used": "Última atividade",
+        "active-keys": "Keys ativas",
+        "posts": "Número de publicações",
+        "comments": "Número de comentários"
       },
       "table": {
         "prefix": "Key",
-        "name": "Name",
-        "user": "User",
-        "active": "Active",
-        "revoked-count": "Revoked",
-        "posts": "Posts",
-        "comments": "Comments",
-        "last-activity": "Last activity",
-        "actions": "Actions"
+        "name": "Nome",
+        "user": "Utilizador",
+        "active": "Ativas",
+        "revoked-count": "Revogadas",
+        "posts": "Publicações",
+        "comments": "Comentários",
+        "last-activity": "Última atividade",
+        "actions": "Ações"
       },
       "detail": {
-        "active": "Active keys ({count})",
-        "revoked": "Revoked keys ({count})"
+        "active": "Keys ativas ({count})",
+        "revoked": "Keys revogadas ({count})"
       },
       "revoke": {
-        "title": "Revoke API Key",
-        "message": "Are you sure you want to revoke the API key \"{name}\" of {user}?",
-        "confirm": "Revoke",
-        "success": "API key revoked successfully"
+        "title": "Revogar API Key",
+        "message": "Tens a certeza de que queres revogar o API Key \"{name}\" de {user}?",
+        "confirm": "Revogar",
+        "success": "API Key revogada com sucesso"
       },
-      "revoke-all-title": "Revoke all API Keys",
-      "revoke-all-message": "Are you sure you want to revoke ALL API keys of {user}? This action cannot be undone.",
-      "revoke-all-confirm": "Revoke all",
-      "revoke-all-success": "{count} API keys of {user} have been revoked"
+      "revoke-all-title": "Revogar todas as API Keys",
+      "revoke-all-message": "Tens a certeza de que queres revogar TODAS as API Keys de {user}? Esta ação não pode ser desfeita.",
+      "revoke-all-confirm": "Revogar todas",
+      "revoke-all-success": "{count} API Keys de {user} foram revogadas"
     },
     "name": "Administração",
     "notifications": {
@@ -1221,46 +1221,46 @@
     "api-keys": {
       "name": "API Keys",
       "create": {
-        "title": "Create new API Key",
-        "name-label": "Name",
-        "expiry-label": "Expiry",
-        "expiry-never": "No expiry",
-        "expiry-days": "{days} days",
-        "submit": "Create key",
-        "success": "API key created successfully",
-        "limit-reached": "You have reached the maximum of {max} active API keys. Revoke an existing key to create a new one."
+        "title": "Criar novo API Key",
+        "name-label": "Nome",
+        "expiry-label": "Validade",
+        "expiry-never": "Sem data de expiração",
+        "expiry-days": "{days} dias",
+        "submit": "Criar key",
+        "success": "API Key criada com sucesso",
+        "limit-reached": "Atingiste o máximo de {max} API Keys ativas. Revoga uma key existente para criar uma nova."
       },
       "secret": {
-        "title": "Your new API Key (visible only once!)",
-        "copy": "Copy",
-        "copied": "API key copied to clipboard",
-        "copy-failed": "Failed to copy to clipboard",
-        "warning": "Save this key now. You will not be able to see it again after closing this page."
+        "title": "O teu novo API Key (visível apenas uma vez!)",
+        "copy": "Copiar",
+        "copied": "API Key copiada para a área de transferência",
+        "copy-failed": "Falha ao copiar para a área de transferência",
+        "warning": "Guarda esta key agora. Não a poderás ver novamente depois de fechar esta página."
       },
       "list": {
-        "title": "My API Keys",
-        "name": "Name",
+        "title": "As minhas API Keys",
+        "name": "Nome",
         "prefix": "Key",
-        "created-at": "Created at",
-        "expires": "Expires",
-        "never-expires": "never",
-        "last-used": "Last used",
-        "actions": "Actions",
-        "never": "never",
-        "revoked": "revoked",
-        "expired": "expired",
-        "revoke": "Revoke key",
-        "empty": "You have no API keys yet."
+        "created-at": "Criada em",
+        "expires": "Expira",
+        "never-expires": "nunca",
+        "last-used": "Última utilização",
+        "actions": "Ações",
+        "never": "nunca",
+        "revoked": "revogada",
+        "expired": "expirada",
+        "revoke": "Revogar key",
+        "empty": "Ainda não tens API Keys."
       },
       "revoke": {
-        "title": "Revoke API Key",
-        "message": "Are you sure you want to revoke the API key \"{name}\"? This action cannot be undone.",
-        "confirm": "Revoke",
-        "success": "API key \"{name}\" has been revoked"
+        "title": "Revogar API Key",
+        "message": "Tens a certeza de que queres revogar o API Key \"{name}\"? Esta ação não pode ser desfeita.",
+        "confirm": "Revogar",
+        "success": "API Key \"{name}\" foi revogada"
       },
       "revoked-list": {
-        "title": "Revoked keys ({count})",
-        "revoked-at": "Revoked at"
+        "title": "Keys revogadas ({count})",
+        "revoked-at": "Revogada em"
       }
     },
     "languages": {

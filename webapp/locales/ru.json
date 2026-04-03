@@ -88,45 +88,45 @@
     },
     "api-keys": {
       "name": "API Keys",
-      "sort-by": "Sort by",
-      "empty": "No users with API keys found.",
-      "never": "never",
-      "show-keys": "Show keys",
-      "revoke-key": "Revoke key",
-      "revoke-all": "Revoke all keys of this user",
-      "revoke-all-short": "Revoke all",
-      "revoked-at": "Revoked at",
+      "sort-by": "Сортировать по",
+      "empty": "Пользователи с API Keys не найдены.",
+      "never": "никогда",
+      "show-keys": "Показать keys",
+      "revoke-key": "Отозвать key",
+      "revoke-all": "Отозвать все keys этого пользователя",
+      "revoke-all-short": "Отозвать все",
+      "revoked-at": "Отозван",
       "order": {
-        "last-used": "Last activity",
-        "active-keys": "Active keys",
-        "posts": "Posts count",
-        "comments": "Comments count"
+        "last-used": "Последняя активность",
+        "active-keys": "Активные keys",
+        "posts": "Количество постов",
+        "comments": "Количество комментариев"
       },
       "table": {
         "prefix": "Key",
-        "name": "Name",
-        "user": "User",
-        "active": "Active",
-        "revoked-count": "Revoked",
-        "posts": "Posts",
-        "comments": "Comments",
-        "last-activity": "Last activity",
-        "actions": "Actions"
+        "name": "Имя",
+        "user": "Пользователь",
+        "active": "Активные",
+        "revoked-count": "Отозванные",
+        "posts": "Посты",
+        "comments": "Комментарии",
+        "last-activity": "Последняя активность",
+        "actions": "Действия"
       },
       "detail": {
-        "active": "Active keys ({count})",
-        "revoked": "Revoked keys ({count})"
+        "active": "Активные keys ({count})",
+        "revoked": "Отозванные keys ({count})"
       },
       "revoke": {
-        "title": "Revoke API Key",
-        "message": "Are you sure you want to revoke the API key \"{name}\" of {user}?",
-        "confirm": "Revoke",
-        "success": "API key revoked successfully"
+        "title": "Отозвать API Key",
+        "message": "Ты уверен, что хочешь отозвать API Key \"{name}\" пользователя {user}?",
+        "confirm": "Отозвать",
+        "success": "API Key успешно отозван"
       },
-      "revoke-all-title": "Revoke all API Keys",
-      "revoke-all-message": "Are you sure you want to revoke ALL API keys of {user}? This action cannot be undone.",
-      "revoke-all-confirm": "Revoke all",
-      "revoke-all-success": "{count} API keys of {user} have been revoked"
+      "revoke-all-title": "Отозвать все API Keys",
+      "revoke-all-message": "Ты уверен, что хочешь отозвать ВСЕ API Keys пользователя {user}? Это действие нельзя отменить.",
+      "revoke-all-confirm": "Отозвать все",
+      "revoke-all-success": "{count} API Keys пользователя {user} были отозваны"
     },
     "name": "Администрирование",
     "notifications": {
@@ -1221,46 +1221,46 @@
     "api-keys": {
       "name": "API Keys",
       "create": {
-        "title": "Create new API Key",
-        "name-label": "Name",
-        "expiry-label": "Expiry",
-        "expiry-never": "No expiry",
-        "expiry-days": "{days} days",
-        "submit": "Create key",
-        "success": "API key created successfully",
-        "limit-reached": "You have reached the maximum of {max} active API keys. Revoke an existing key to create a new one."
+        "title": "Создать новый API Key",
+        "name-label": "Имя",
+        "expiry-label": "Срок действия",
+        "expiry-never": "Без срока действия",
+        "expiry-days": "{days} дней",
+        "submit": "Создать key",
+        "success": "API Key успешно создан",
+        "limit-reached": "Ты достиг максимума в {max} активных API Keys. Отзови существующий key, чтобы создать новый."
       },
       "secret": {
-        "title": "Your new API Key (visible only once!)",
-        "copy": "Copy",
-        "copied": "API key copied to clipboard",
-        "copy-failed": "Failed to copy to clipboard",
-        "warning": "Save this key now. You will not be able to see it again after closing this page."
+        "title": "Твой новый API Key (виден только один раз!)",
+        "copy": "Копировать",
+        "copied": "API Key скопирован в буфер обмена",
+        "copy-failed": "Не удалось скопировать в буфер обмена",
+        "warning": "Сохрани этот key сейчас. Ты не сможешь увидеть его снова после закрытия этой страницы."
       },
       "list": {
-        "title": "My API Keys",
-        "name": "Name",
+        "title": "Мои API Keys",
+        "name": "Имя",
         "prefix": "Key",
-        "created-at": "Created at",
-        "expires": "Expires",
-        "never-expires": "never",
-        "last-used": "Last used",
-        "actions": "Actions",
-        "never": "never",
-        "revoked": "revoked",
-        "expired": "expired",
-        "revoke": "Revoke key",
-        "empty": "You have no API keys yet."
+        "created-at": "Создан",
+        "expires": "Истекает",
+        "never-expires": "никогда",
+        "last-used": "Последнее использование",
+        "actions": "Действия",
+        "never": "никогда",
+        "revoked": "отозван",
+        "expired": "истёк",
+        "revoke": "Отозвать key",
+        "empty": "У тебя ещё нет API Keys."
       },
       "revoke": {
-        "title": "Revoke API Key",
-        "message": "Are you sure you want to revoke the API key \"{name}\"? This action cannot be undone.",
-        "confirm": "Revoke",
-        "success": "API key \"{name}\" has been revoked"
+        "title": "Отозвать API Key",
+        "message": "Ты уверен, что хочешь отозвать API Key \"{name}\"? Это действие нельзя отменить.",
+        "confirm": "Отозвать",
+        "success": "API Key \"{name}\" был отозван"
       },
       "revoked-list": {
-        "title": "Revoked keys ({count})",
-        "revoked-at": "Revoked at"
+        "title": "Отозванные keys ({count})",
+        "revoked-at": "Отозван"
       }
     },
     "languages": {
