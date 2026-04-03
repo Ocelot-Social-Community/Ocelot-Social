@@ -753,6 +753,17 @@ export default {
   overflow: hidden;
 }
 
+.mapboxgl-ctrl-attrib.mapboxgl-compact {
+  display: flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0;
+}
+
+.mapboxgl-ctrl-attrib-button {
+  position: static;
+}
+
 .mapboxgl-popup-content {
   max-height: 40vh;
   overflow: hidden;
