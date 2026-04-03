@@ -727,6 +727,7 @@ export default {
   max-height: 40vh;
   overflow: hidden;
   padding: 10px;
+  border-radius: $border-radius-x-large;
 }
 
 .map-popup-container {
@@ -794,7 +795,7 @@ export default {
     height: 29px;
     min-width: 29px;
     background-color: white;
-    border-radius: 4px;
+    border-radius: $border-radius-x-large;
     box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 
@@ -822,7 +823,7 @@ export default {
   left: 10px;
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(4px);
-  border-radius: 4px;
+  border-radius: $border-radius-x-large;
   z-index: 1;
   font-size: 0.8rem;
   color: $color-neutral-10;
@@ -835,7 +836,7 @@ export default {
   border: none;
   background: rgba(0, 0, 0, 0.05);
   color: $color-neutral-10;
-  border-radius: 4px;
+  border-radius: $border-radius-x-large;
   cursor: pointer;
   font-size: 0.8rem;
   text-align: left;
@@ -884,7 +885,7 @@ export default {
 .map-style-switcher {
   position: relative;
   background: white;
-  border-radius: 4px;
+  border-radius: $border-radius-x-large;
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
 }
 
@@ -912,7 +913,7 @@ export default {
   right: 100%;
   margin-right: 6px;
   background: white;
-  border-radius: 4px;
+  border-radius: $border-radius-x-large;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
   white-space: nowrap;
   overflow: hidden;
