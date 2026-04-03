@@ -10,9 +10,15 @@ Vue.filter('dateTime', (value) => value || '')
 
 describe('settings/api-keys.vue', () => {
   let wrapper, mocks
+  const originalClipboard = navigator.clipboard
 
   const mutateMock = jest.fn()
   const refetchMock = jest.fn()
+
+  afterEach(() => {
+    if (wrapper) wrapper.destroy()
+    Object.assign(navigator, { clipboard: originalClipboard })
+  })
 
   beforeEach(() => {
     mutateMock.mockReset()
