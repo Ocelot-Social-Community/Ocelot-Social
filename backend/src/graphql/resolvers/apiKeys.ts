@@ -105,21 +105,6 @@ export default {
         throw new Error('API keys are not enabled')
       }
 
-      const countResult = await context.database.query({
-        query: `
-          MATCH (u:User { id: $userId })-[:HAS_API_KEY]->(k:ApiKey)
-          WHERE NOT k.disabled
-          RETURN count(k) AS count
-        `,
-        variables: { userId: context.user?.id },
-      })
-      const count = toNumber(countResult.records[0].get('count') as Integer)
-      if (count >= context.config.API_KEYS_MAX_PER_USER) {
-        throw new Error(
-          `Maximum of ${String(context.config.API_KEYS_MAX_PER_USER)} active API keys reached`,
-        )
-      }
-
       let expiresAt: string | null = null
       if (args.expiresInDays) {
         expiresAt = new Date(Date.now() + args.expiresInDays * 86400000).toISOString()
@@ -131,6 +116,10 @@ export default {
       const result = await context.database.write({
         query: `
           MATCH (u:User { id: $userId })
+          OPTIONAL MATCH (u)-[:HAS_API_KEY]->(existing:ApiKey)
+          WHERE NOT existing.disabled
+          WITH u, count(existing) AS activeCount
+          WHERE activeCount < toInteger($maxKeys)
           CREATE (u)-[:HAS_API_KEY]->(k:ApiKey {
             id: $id,
             name: $name,
@@ -149,8 +138,15 @@ export default {
           keyHash: hash,
           keyPrefix: prefix,
           expiresAt,
+          maxKeys: context.config.API_KEYS_MAX_PER_USER,
         },
       })
+
+      if (result.records.length === 0) {
+        throw new Error(
+          `Maximum of ${String(context.config.API_KEYS_MAX_PER_USER)} active API keys reached`,
+        )
+      }
 
       return {
         apiKey: normalizeApiKey(getRecord(result.records[0], 'k')),
