@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import gql from 'graphql-tag'
+
 import { cleanDatabase } from '@db/factories'
 import { createApolloTestSetup } from '@root/test/helpers'
-import gql from 'graphql-tag'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -22,32 +22,70 @@ let server: ApolloTestSetup['server']
 const CREATE_API_KEY = gql`
   mutation ($name: String!, $expiresInDays: Int) {
     createApiKey(name: $name, expiresInDays: $expiresInDays) {
-      apiKey { id name keyPrefix createdAt expiresAt disabled disabledAt lastUsedAt }
+      apiKey {
+        id
+        name
+        keyPrefix
+        createdAt
+        expiresAt
+        disabled
+        disabledAt
+        lastUsedAt
+      }
       secret
     }
   }
 `
 const MY_API_KEYS = gql`
-  query { myApiKeys { id name keyPrefix createdAt lastUsedAt expiresAt disabled disabledAt } }
+  query {
+    myApiKeys {
+      id
+      name
+      keyPrefix
+      createdAt
+      lastUsedAt
+      expiresAt
+      disabled
+      disabledAt
+    }
+  }
 `
 const REVOKE_API_KEY = gql`
-  mutation ($id: ID!) { revokeApiKey(id: $id) }
+  mutation ($id: ID!) {
+    revokeApiKey(id: $id)
+  }
 `
 const UPDATE_API_KEY = gql`
   mutation ($id: ID!, $name: String!) {
-    updateApiKey(id: $id, name: $name) { id name keyPrefix lastUsedAt expiresAt disabled disabledAt }
+    updateApiKey(id: $id, name: $name) {
+      id
+      name
+      keyPrefix
+      lastUsedAt
+      expiresAt
+      disabled
+      disabledAt
+    }
   }
 `
 const ADMIN_REVOKE_API_KEY = gql`
-  mutation ($id: ID!) { adminRevokeApiKey(id: $id) }
+  mutation ($id: ID!) {
+    adminRevokeApiKey(id: $id)
+  }
 `
 const ADMIN_REVOKE_USER_API_KEYS = gql`
-  mutation ($userId: ID!) { adminRevokeUserApiKeys(userId: $userId) }
+  mutation ($userId: ID!) {
+    adminRevokeUserApiKeys(userId: $userId)
+  }
 `
 const API_KEY_USERS = gql`
   query ($first: Int, $offset: Int) {
     apiKeyUsers(first: $first, offset: $offset) {
-      user { id name slug }
+      user {
+        id
+        name
+        slug
+      }
       activeCount
       revokedCount
       postsCount
@@ -59,7 +97,14 @@ const API_KEY_USERS = gql`
 const API_KEYS_FOR_USER = gql`
   query ($userId: ID!) {
     apiKeysForUser(userId: $userId) {
-      id name keyPrefix createdAt lastUsedAt expiresAt disabled disabledAt
+      id
+      name
+      keyPrefix
+      createdAt
+      lastUsedAt
+      expiresAt
+      disabled
+      disabledAt
     }
   }
 `
@@ -102,7 +147,10 @@ describe('createApiKey', () => {
   describe('authenticated', () => {
     beforeEach(async () => {
       const user = await database.neode.create('User', {
-        id: 'u1', name: 'Test User', slug: 'test-user', role: 'user',
+        id: 'u1',
+        name: 'Test User',
+        slug: 'test-user',
+        role: 'user',
       })
       authenticatedUser = (await user.toJson()) as Context['user']
     })
@@ -169,7 +217,10 @@ describe('createApiKey', () => {
   describe('API keys disabled', () => {
     it('throws error when feature is disabled', async () => {
       const user = await database.neode.create('User', {
-        id: 'u-disabled', name: 'Disabled User', slug: 'disabled-user', role: 'user',
+        id: 'u-disabled',
+        name: 'Disabled User',
+        slug: 'disabled-user',
+        role: 'user',
       })
       authenticatedUser = (await user.toJson()) as Context['user']
       const contextDisabled = () => ({
@@ -192,7 +243,10 @@ describe('createApiKey', () => {
 describe('myApiKeys', () => {
   beforeEach(async () => {
     const user = await database.neode.create('User', {
-      id: 'u2', name: 'Key Owner', slug: 'key-owner', role: 'user',
+      id: 'u2',
+      name: 'Key Owner',
+      slug: 'key-owner',
+      role: 'user',
     })
     authenticatedUser = (await user.toJson()) as Context['user']
   })
@@ -215,7 +269,10 @@ describe('myApiKeys', () => {
   })
 
   it('includes revoked keys', async () => {
-    const { data: created } = await mutate({ mutation: CREATE_API_KEY, variables: { name: 'To Revoke' } })
+    const { data: created } = await mutate({
+      mutation: CREATE_API_KEY,
+      variables: { name: 'To Revoke' },
+    })
     await mutate({ mutation: REVOKE_API_KEY, variables: { id: created.createApiKey.apiKey.id } })
     const { data } = await query({ query: MY_API_KEYS })
     expect(data.myApiKeys).toHaveLength(1)
@@ -229,7 +286,10 @@ describe('updateApiKey', () => {
 
   beforeEach(async () => {
     const user = await database.neode.create('User', {
-      id: 'u3', name: 'Updater', slug: 'updater', role: 'user',
+      id: 'u3',
+      name: 'Updater',
+      slug: 'updater',
+      role: 'user',
     })
     authenticatedUser = (await user.toJson()) as Context['user']
     const { data } = await mutate({ mutation: CREATE_API_KEY, variables: { name: 'Original' } })
@@ -259,7 +319,10 @@ describe('revokeApiKey', () => {
 
   beforeEach(async () => {
     const user = await database.neode.create('User', {
-      id: 'u4', name: 'Revoker', slug: 'revoker', role: 'user',
+      id: 'u4',
+      name: 'Revoker',
+      slug: 'revoker',
+      role: 'user',
     })
     authenticatedUser = (await user.toJson()) as Context['user']
     const { data } = await mutate({ mutation: CREATE_API_KEY, variables: { name: 'To Revoke' } })
@@ -292,10 +355,16 @@ describe('admin operations', () => {
 
   beforeEach(async () => {
     regularUser = await database.neode.create('User', {
-      id: 'u-regular', name: 'Regular', slug: 'regular', role: 'user',
+      id: 'u-regular',
+      name: 'Regular',
+      slug: 'regular',
+      role: 'user',
     })
     adminUser = await database.neode.create('User', {
-      id: 'u-admin', name: 'Admin', slug: 'admin', role: 'admin',
+      id: 'u-admin',
+      name: 'Admin',
+      slug: 'admin',
+      role: 'admin',
     })
     authenticatedUser = (await regularUser.toJson()) as Context['user']
     const { data } = await mutate({ mutation: CREATE_API_KEY, variables: { name: 'Regular Key' } })
@@ -311,7 +380,10 @@ describe('admin operations', () => {
 
     it('admin can revoke any key', async () => {
       authenticatedUser = (await adminUser.toJson()) as Context['user']
-      const { data, errors } = await mutate({ mutation: ADMIN_REVOKE_API_KEY, variables: { id: keyId } })
+      const { data, errors } = await mutate({
+        mutation: ADMIN_REVOKE_API_KEY,
+        variables: { id: keyId },
+      })
       expect(errors).toBeUndefined()
       expect(data.adminRevokeApiKey).toBe(true)
     })
@@ -325,20 +397,29 @@ describe('admin operations', () => {
 
     it('non-admin cannot bulk revoke', async () => {
       authenticatedUser = (await regularUser.toJson()) as Context['user']
-      const { errors } = await mutate({ mutation: ADMIN_REVOKE_USER_API_KEYS, variables: { userId: 'u-regular' } })
+      const { errors } = await mutate({
+        mutation: ADMIN_REVOKE_USER_API_KEYS,
+        variables: { userId: 'u-regular' },
+      })
       expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
 
     it('admin can revoke all keys of a user', async () => {
       authenticatedUser = (await adminUser.toJson()) as Context['user']
-      const { data, errors } = await mutate({ mutation: ADMIN_REVOKE_USER_API_KEYS, variables: { userId: 'u-regular' } })
+      const { data, errors } = await mutate({
+        mutation: ADMIN_REVOKE_USER_API_KEYS,
+        variables: { userId: 'u-regular' },
+      })
       expect(errors).toBeUndefined()
       expect(data.adminRevokeUserApiKeys).toBe(2)
     })
 
     it('returns 0 when user has no active keys', async () => {
       authenticatedUser = (await adminUser.toJson()) as Context['user']
-      const { data } = await mutate({ mutation: ADMIN_REVOKE_USER_API_KEYS, variables: { userId: 'u-admin' } })
+      const { data } = await mutate({
+        mutation: ADMIN_REVOKE_USER_API_KEYS,
+        variables: { userId: 'u-admin' },
+      })
       expect(data.adminRevokeUserApiKeys).toBe(0)
     })
   })
@@ -352,7 +433,10 @@ describe('admin operations', () => {
 
     it('admin sees users with key stats', async () => {
       authenticatedUser = (await adminUser.toJson()) as Context['user']
-      const { data, errors } = await query({ query: API_KEY_USERS, variables: { first: 10, offset: 0 } })
+      const { data, errors } = await query({
+        query: API_KEY_USERS,
+        variables: { first: 10, offset: 0 },
+      })
       expect(errors).toBeUndefined()
       expect(data.apiKeyUsers.length).toBeGreaterThanOrEqual(1)
       const entry = data.apiKeyUsers.find((e) => e.user.id === 'u-regular')
@@ -383,13 +467,19 @@ describe('admin operations', () => {
   describe('apiKeysForUser', () => {
     it('non-admin cannot access', async () => {
       authenticatedUser = (await regularUser.toJson()) as Context['user']
-      const { errors } = await query({ query: API_KEYS_FOR_USER, variables: { userId: 'u-regular' } })
+      const { errors } = await query({
+        query: API_KEYS_FOR_USER,
+        variables: { userId: 'u-regular' },
+      })
       expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
 
     it('admin sees all keys for a user', async () => {
       authenticatedUser = (await adminUser.toJson()) as Context['user']
-      const { data, errors } = await query({ query: API_KEYS_FOR_USER, variables: { userId: 'u-regular' } })
+      const { data, errors } = await query({
+        query: API_KEYS_FOR_USER,
+        variables: { userId: 'u-regular' },
+      })
       expect(errors).toBeUndefined()
       expect(data.apiKeysForUser).toHaveLength(2)
       data.apiKeysForUser.forEach((k) => {

@@ -34,11 +34,13 @@ const isAdmin = rule()(async (_parent, _args, { user }: Context, _info) => {
   return !!(user?.role === 'admin')
 })
 
-const apiKeysEnabled = rule({ cache: 'contextual' })(
-  async (_parent, _args, { config }: Context) => {
-    return config.API_KEYS_ENABLED
-  },
-)
+const apiKeysEnabled = rule({ cache: 'contextual' })(async (
+  _parent,
+  _args,
+  { config }: Context,
+) => {
+  return config.API_KEYS_ENABLED
+})
 
 const onlyYourself = rule({
   cache: 'no_cache',

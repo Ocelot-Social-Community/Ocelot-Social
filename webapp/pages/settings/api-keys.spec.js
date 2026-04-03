@@ -295,9 +295,7 @@ describe('settings/api-keys.vue', () => {
       wrapper = Wrapper({ myApiKeys: [activeKey()] })
       await wrapper.vm.revokeKey({ id: 'k1', name: 'CI Bot' })
       await flushPromises()
-      expect(mutateMock).toHaveBeenCalledWith(
-        expect.objectContaining({ variables: { id: 'k1' } }),
-      )
+      expect(mutateMock).toHaveBeenCalledWith(expect.objectContaining({ variables: { id: 'k1' } }))
       expect(refetchMock).toHaveBeenCalled()
       expect(mocks.$toast.success).toHaveBeenCalled()
     })

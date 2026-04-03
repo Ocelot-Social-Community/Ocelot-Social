@@ -122,9 +122,7 @@ describe('admin/api-keys.vue', () => {
 
     it('shows revoke-all button only when active keys exist', () => {
       wrapper = Wrapper({
-        apiKeyUsers: [
-          userEntry({ activeCount: 0, revokedCount: 3 }),
-        ],
+        apiKeyUsers: [userEntry({ activeCount: 0, revokedCount: 3 })],
       })
       expect(wrapper.find('button[aria-label="admin.api-keys.revoke-all"]').exists()).toBe(false)
     })
@@ -223,9 +221,7 @@ describe('admin/api-keys.vue', () => {
       wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
       await wrapper.vm.revokeKey('ak1', 'u1')
       await flushPromises()
-      expect(mutateMock).toHaveBeenCalledWith(
-        expect.objectContaining({ variables: { id: 'ak1' } }),
-      )
+      expect(mutateMock).toHaveBeenCalledWith(expect.objectContaining({ variables: { id: 'ak1' } }))
       expect(refetchMock).toHaveBeenCalled()
       expect(mocks.$toast.success).toHaveBeenCalled()
     })

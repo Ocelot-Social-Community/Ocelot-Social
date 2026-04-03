@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
-import { createHash } from 'crypto'
+import { createHash } from 'node:crypto'
+
 import { verify } from 'jsonwebtoken'
 
 import type CONFIG from '@src/config'

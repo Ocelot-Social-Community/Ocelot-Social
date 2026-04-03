@@ -19,10 +19,18 @@
           </label>
           <select id="api-key-expiry" v-model="expiresInDays" class="settings-select">
             <option :value="null">{{ $t('settings.api-keys.create.expiry-never') }}</option>
-            <option :value="30">{{ $t('settings.api-keys.create.expiry-days', { days: 30 }) }}</option>
-            <option :value="90">{{ $t('settings.api-keys.create.expiry-days', { days: 90 }) }}</option>
-            <option :value="180">{{ $t('settings.api-keys.create.expiry-days', { days: 180 }) }}</option>
-            <option :value="365">{{ $t('settings.api-keys.create.expiry-days', { days: 365 }) }}</option>
+            <option :value="30">
+              {{ $t('settings.api-keys.create.expiry-days', { days: 30 }) }}
+            </option>
+            <option :value="90">
+              {{ $t('settings.api-keys.create.expiry-days', { days: 90 }) }}
+            </option>
+            <option :value="180">
+              {{ $t('settings.api-keys.create.expiry-days', { days: 180 }) }}
+            </option>
+            <option :value="365">
+              {{ $t('settings.api-keys.create.expiry-days', { days: 365 }) }}
+            </option>
           </select>
         </div>
         <p v-if="activeKeys.length >= maxKeys" class="ds-text ds-text-small limit-warning">
@@ -89,10 +97,24 @@
           </thead>
           <tbody>
             <tr v-for="key in activeKeys" :key="key.id">
-              <td class="ds-table-col" :title="$t('settings.api-keys.list.created-at') + ': ' + $options.filters.dateTime(key.createdAt)">
+              <td
+                class="ds-table-col"
+                :title="
+                  $t('settings.api-keys.list.created-at') +
+                  ': ' +
+                  $options.filters.dateTime(key.createdAt)
+                "
+              >
                 {{ key.name }}
               </td>
-              <td class="ds-table-col" :title="$t('settings.api-keys.list.created-at') + ': ' + $options.filters.dateTime(key.createdAt)">
+              <td
+                class="ds-table-col"
+                :title="
+                  $t('settings.api-keys.list.created-at') +
+                  ': ' +
+                  $options.filters.dateTime(key.createdAt)
+                "
+              >
                 <code>{{ key.keyPrefix }}...</code>
               </td>
               <td class="ds-table-col">
@@ -168,10 +190,24 @@
             </thead>
             <tbody>
               <tr v-for="key in revokedKeys" :key="key.id">
-                <td class="ds-table-col" :title="$t('settings.api-keys.list.created-at') + ': ' + $options.filters.dateTime(key.createdAt)">
+                <td
+                  class="ds-table-col"
+                  :title="
+                    $t('settings.api-keys.list.created-at') +
+                    ': ' +
+                    $options.filters.dateTime(key.createdAt)
+                  "
+                >
                   {{ key.name }}
                 </td>
-                <td class="ds-table-col" :title="$t('settings.api-keys.list.created-at') + ': ' + $options.filters.dateTime(key.createdAt)">
+                <td
+                  class="ds-table-col"
+                  :title="
+                    $t('settings.api-keys.list.created-at') +
+                    ': ' +
+                    $options.filters.dateTime(key.createdAt)
+                  "
+                >
                   <code>{{ key.keyPrefix }}...</code>
                 </td>
                 <td class="ds-table-col">
@@ -207,7 +243,11 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import OcelotInput from '~/components/OcelotInput/OcelotInput'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
 import DateTime from '~/components/DateTime'
-import { myApiKeysQuery, createApiKeyMutation, revokeApiKeyMutation } from '~/graphql/settings/ApiKeys'
+import {
+  myApiKeysQuery,
+  createApiKeyMutation,
+  revokeApiKeyMutation,
+} from '~/graphql/settings/ApiKeys'
 import scrollToContent from './scroll-to-content.js'
 
 export default {

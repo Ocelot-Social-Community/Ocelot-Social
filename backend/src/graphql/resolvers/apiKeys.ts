@@ -1,4 +1,5 @@
-import { createHash, randomBytes } from 'crypto'
+import { createHash, randomBytes } from 'node:crypto'
+
 import { v4 as uuid } from 'uuid'
 
 import type { Context } from '@src/context'
@@ -102,9 +103,7 @@ export default {
 
       let expiresAt: string | null = null
       if (args.expiresInDays) {
-        expiresAt = new Date(
-          Date.now() + (args.expiresInDays as number) * 86400000,
-        ).toISOString()
+        expiresAt = new Date(Date.now() + (args.expiresInDays as number) * 86400000).toISOString()
       }
 
       const { key, hash, prefix } = generateApiKey()

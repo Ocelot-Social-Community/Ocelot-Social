@@ -67,7 +67,9 @@
                       @click="toggleUser(entry.user.id)"
                     >
                       <template #icon>
-                        <os-icon :icon="expandedUserId === entry.user.id ? icons.angleUp : icons.angleDown" />
+                        <os-icon
+                          :icon="expandedUserId === entry.user.id ? icons.angleUp : icons.angleDown"
+                        />
                       </template>
                     </os-button>
                   </div>
@@ -89,17 +91,32 @@
                         <thead>
                           <tr>
                             <th class="ds-table-head-col">{{ $t('admin.api-keys.table.name') }}</th>
-                            <th class="ds-table-head-col">{{ $t('admin.api-keys.table.prefix') }}</th>
-                            <th class="ds-table-head-col">{{ $t('admin.api-keys.table.last-activity') }}</th>
-                            <th class="ds-table-head-col">{{ $t('admin.api-keys.table.actions') }}</th>
+                            <th class="ds-table-head-col">
+                              {{ $t('admin.api-keys.table.prefix') }}
+                            </th>
+                            <th class="ds-table-head-col">
+                              {{ $t('admin.api-keys.table.last-activity') }}
+                            </th>
+                            <th class="ds-table-head-col">
+                              {{ $t('admin.api-keys.table.actions') }}
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
                           <tr v-for="key in activeUserKeys" :key="key.id">
-                            <td class="ds-table-col" :title="$t('settings.api-keys.list.created-at') + ': ' + $options.filters.dateTime(key.createdAt)">
+                            <td
+                              class="ds-table-col"
+                              :title="
+                                $t('settings.api-keys.list.created-at') +
+                                ': ' +
+                                $options.filters.dateTime(key.createdAt)
+                              "
+                            >
                               {{ key.name }}
                             </td>
-                            <td class="ds-table-col"><code>{{ key.keyPrefix }}...</code></td>
+                            <td class="ds-table-col">
+                              <code>{{ key.keyPrefix }}...</code>
+                            </td>
                             <td class="ds-table-col">
                               <date-time v-if="key.lastUsedAt" :date-time="key.lastUsedAt" />
                               <template v-else>{{ $t('admin.api-keys.never') }}</template>
@@ -129,15 +146,21 @@
                         <thead>
                           <tr>
                             <th class="ds-table-head-col">{{ $t('admin.api-keys.table.name') }}</th>
-                            <th class="ds-table-head-col">{{ $t('admin.api-keys.table.prefix') }}</th>
+                            <th class="ds-table-head-col">
+                              {{ $t('admin.api-keys.table.prefix') }}
+                            </th>
                             <th class="ds-table-head-col">{{ $t('admin.api-keys.revoked-at') }}</th>
-                            <th class="ds-table-head-col">{{ $t('admin.api-keys.table.last-activity') }}</th>
+                            <th class="ds-table-head-col">
+                              {{ $t('admin.api-keys.table.last-activity') }}
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
                           <tr v-for="key in revokedUserKeys" :key="key.id">
                             <td class="ds-table-col">{{ key.name }}</td>
-                            <td class="ds-table-col"><code>{{ key.keyPrefix }}...</code></td>
+                            <td class="ds-table-col">
+                              <code>{{ key.keyPrefix }}...</code>
+                            </td>
                             <td class="ds-table-col">
                               <date-time v-if="key.disabledAt" :date-time="key.disabledAt" />
                               <template v-else>–</template>
@@ -163,11 +186,7 @@
       <div class="ds-placeholder">{{ $t('admin.api-keys.empty') }}</div>
     </os-card>
 
-    <confirm-modal
-      v-if="showModal"
-      :modalData="modalData"
-      @close="showModal = false"
-    />
+    <confirm-modal v-if="showModal" :modalData="modalData" @close="showModal = false" />
   </div>
 </template>
 

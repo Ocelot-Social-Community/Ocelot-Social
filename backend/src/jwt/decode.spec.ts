@@ -54,7 +54,7 @@ describe('decode', () => {
         })
         // Create API key node with known hash
         // SHA-256 of 'oak_testkey123' = known hash
-        const crypto = await import('crypto')
+        const crypto = await import('node:crypto')
         const keyHash = crypto.createHash('sha256').update('oak_testkey123').digest('hex')
         const session = driver.session()
         await session.writeTransaction(async (tx) => {
@@ -75,9 +75,7 @@ describe('decode', () => {
       })
 
       it('returns user object with authMethod apiKey', async () => {
-        await expect(
-          decode(context)('Bearer oak_testkey123'),
-        ).resolves.toMatchObject({
+        await expect(decode(context)('Bearer oak_testkey123')).resolves.toMatchObject({
           id: 'api-user',
           name: 'API User',
           authMethod: 'apiKey',
@@ -100,8 +98,13 @@ describe('decode', () => {
 
     describe('and disabled API key', () => {
       beforeEach(async () => {
-        await Factory.build('user', { id: 'disabled-key-user', name: 'DK User', slug: 'dk-user', role: 'user' })
-        const crypto = await import('crypto')
+        await Factory.build('user', {
+          id: 'disabled-key-user',
+          name: 'DK User',
+          slug: 'dk-user',
+          role: 'user',
+        })
+        const crypto = await import('node:crypto')
         const keyHash = crypto.createHash('sha256').update('oak_disabledkey').digest('hex')
         const session = driver.session()
         await session.writeTransaction(async (tx) => {
@@ -127,8 +130,13 @@ describe('decode', () => {
 
     describe('and expired API key', () => {
       beforeEach(async () => {
-        await Factory.build('user', { id: 'expired-key-user', name: 'EK User', slug: 'ek-user', role: 'user' })
-        const crypto = await import('crypto')
+        await Factory.build('user', {
+          id: 'expired-key-user',
+          name: 'EK User',
+          slug: 'ek-user',
+          role: 'user',
+        })
+        const crypto = await import('node:crypto')
         const keyHash = crypto.createHash('sha256').update('oak_expiredkey').digest('hex')
         const session = driver.session()
         await session.writeTransaction(async (tx) => {
