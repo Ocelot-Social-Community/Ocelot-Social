@@ -59,6 +59,16 @@
                 <td class="ds-table-col actions-cell">
                   <div class="action-buttons">
                     <os-button
+                      v-if="entry.activeCount > 0"
+                      variant="danger"
+                      appearance="outline"
+                      size="sm"
+                      :aria-label="$t('admin.api-keys.revoke-all')"
+                      @click="confirmRevokeAll(entry)"
+                    >
+                      {{ $t('admin.api-keys.revoke-all-short') }}
+                    </os-button>
+                    <os-button
                       variant="primary"
                       appearance="outline"
                       circle
@@ -69,16 +79,6 @@
                       <template #icon>
                         <os-icon :icon="expandedUserId === entry.user.id ? icons.angleUp : icons.angleDown" />
                       </template>
-                    </os-button>
-                    <os-button
-                      v-if="entry.activeCount > 0"
-                      variant="danger"
-                      appearance="outline"
-                      size="sm"
-                      :aria-label="$t('admin.api-keys.revoke-all')"
-                      @click="confirmRevokeAll(entry)"
-                    >
-                      {{ $t('admin.api-keys.revoke-all-short') }}
                     </os-button>
                   </div>
                 </td>
@@ -372,6 +372,7 @@ export default {
   display: flex;
   gap: $space-xx-small;
   align-items: center;
+  justify-content: flex-end;
 }
 
 .detail-cell {
