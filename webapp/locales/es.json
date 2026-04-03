@@ -30,7 +30,7 @@
       },
       "revoke": {
         "confirm": "Revocar",
-        "message": "¿Estás seguro de que quieres revocar el API Key \"{name}\" de {user}?",
+        "message": "¿Estás seguro de que quieres revocar la API Key \"{name}\" de {user}?",
         "success": "API Key revocada con éxito",
         "title": "Revocar API Key"
       },
@@ -1115,7 +1115,7 @@
         "name-label": "Nombre",
         "submit": "Crear key",
         "success": "API Key creada con éxito",
-        "title": "Crear nuevo API Key"
+        "title": "Crear nueva API Key"
       },
       "list": {
         "actions": "Acciones",
@@ -1135,7 +1135,7 @@
       "name": "API Keys",
       "revoke": {
         "confirm": "Revocar",
-        "message": "¿Estás seguro de que quieres revocar el API Key \"{name}\"? Esta acción no se puede deshacer.",
+        "message": "¿Estás seguro de que quieres revocar la API Key \"{name}\"? Esta acción no se puede deshacer.",
         "success": "API Key \"{name}\" ha sido revocada",
         "title": "Revocar API Key"
       },
@@ -1147,7 +1147,7 @@
         "copied": "API Key copiada al portapapeles",
         "copy": "Copiar",
         "copy-failed": "Error al copiar al portapapeles",
-        "title": "Tu nuevo API Key (¡visible solo una vez!)",
+        "title": "Tu nueva API Key (¡visible solo una vez!)",
         "warning": "Guarda esta key ahora. No podrás verla de nuevo después de cerrar esta página."
       }
     },
