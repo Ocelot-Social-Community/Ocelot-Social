@@ -42,7 +42,9 @@
           <div class="chat-search-result-item">
             <profile-avatar :profile="option" size="small" />
             <div class="chat-search-result-info">
-              <span class="chat-search-result-name">{{ option.name }}</span>
+              <span class="chat-search-result-name">
+                <os-icon v-if="option.__typename === 'Group'" :icon="icons.group" class="chat-search-group-icon" />{{ option.name }}
+              </span>
               <span class="chat-search-result-detail">
                 {{ option.__typename === 'Group' ? `&${option.slug}` : `@${option.slug}` }}
               </span>
@@ -202,6 +204,10 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.chat-search-group-icon {
+  vertical-align: middle !important;
+  margin-right: 0;
 }
 .chat-search-result-detail {
   font-size: $font-size-small;

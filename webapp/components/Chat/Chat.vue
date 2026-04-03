@@ -88,9 +88,20 @@
     <div slot="room-header-info">
       <div class="vac-room-name vac-text-ellipsis">
         <nuxt-link v-if="roomHeaderLink" :to="roomHeaderLink" class="chat-header-profile-link">
+          <os-icon v-if="selectedRoom && selectedRoom.isGroupRoom" :icon="icons.group" class="room-group-icon" />
           {{ selectedRoom ? selectedRoom.roomName : '' }}
         </nuxt-link>
-        <span v-else>{{ selectedRoom ? selectedRoom.roomName : '' }}</span>
+        <span v-else>
+          <os-icon v-if="selectedRoom && selectedRoom.isGroupRoom" :icon="icons.group" class="room-group-icon" />
+          {{ selectedRoom ? selectedRoom.roomName : '' }}
+        </span>
+      </div>
+    </div>
+
+    <div v-for="room in rooms" v-if="room.isGroupRoom" :slot="'room-list-info_' + room.roomId" :key="'info-' + room.id">
+      <div class="vac-room-name vac-text-ellipsis room-name-with-icon">
+        <os-icon :icon="icons.group" class="room-group-icon" />
+        {{ room.roomName }}
       </div>
     </div>
 
@@ -108,7 +119,8 @@
         :key="'avatar-' + msg._id"
         :profile="messageUserProfile(msg.senderId)"
         class="vac-message-avatar"
-        style="align-self: flex-end; margin: 0 0 2px;"
+        style="align-self: flex-end; margin: 0 0 2px; cursor: pointer;"
+        @click.native="navigateToProfile(msg.senderId, messageUserProfile(msg.senderId).name)"
       />
     </template>
   </vue-advanced-chat>
@@ -1104,11 +1116,13 @@ export default {
       document.body.removeChild(downloadLink)
     },
 
+    navigateToProfile(userId, name) {
+      const slug = (name || '').toLowerCase().replaceAll(' ', '-')
+      this.$router.push({ path: `/profile/${userId}/${slug}` })
+    },
+
     redirectToUserProfile({ user }) {
-      const userID = user.id
-      const userName = user.name.toLowerCase().replaceAll(' ', '-')
-      const url = `/profile/${userID}/${userName}`
-      this.$router.push({ path: url })
+      this.navigateToProfile(user.id, user.name)
     },
   },
 }
@@ -1116,6 +1130,18 @@ export default {
 <style lang="scss" scoped>
 .vac-avatar-profile {
   margin-right: 15px;
+}
+
+.room-group-icon {
+  vertical-align: middle !important;
+  margin-right: 0;
+}
+
+.room-name-with-icon {
+  color: var(--chat-room-color-username);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 22px;
 }
 
 .vac-message-avatar {
