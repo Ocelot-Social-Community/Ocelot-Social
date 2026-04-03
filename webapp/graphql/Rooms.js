@@ -66,6 +66,12 @@ export const roomQuery = () => gql`
         saved
         distributed
         seen
+        files {
+          url
+          name
+          type
+          duration
+        }
       }
       users {
         _id

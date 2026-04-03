@@ -29,12 +29,14 @@ export interface FileInput {
   upload?: Promise<FileUpload>
   name: string
   type: string
+  duration?: number | null
 }
 
 export interface File {
   url: string
   name: string
   type: string
+  duration?: number | null
 }
 
 export interface Attachments {
@@ -143,8 +145,8 @@ export const attachments = (config: S3Config) => {
       uniqueFilename,
     })
 
-    const { name, type } = fileInput
-    const file = { url, name, type, ...fileAttributes }
+    const { name, type, duration } = fileInput
+    const file = { url, name, type, ...(duration != null && { duration }), ...fileAttributes }
     // const mimeType = uploadFile.mimetype.split('/')[0]
     // const nodeType = `Mime${mimeType.replace(/^./, mimeType[0].toUpperCase())}`
     // CREATE (file:${['File', nodeType].filter(Boolean).join(':')})

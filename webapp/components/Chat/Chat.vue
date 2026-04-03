@@ -314,6 +314,17 @@ export default {
       commitUnreadRoomCount: 'chat/UPDATE_ROOM_COUNT',
     }),
 
+    lastMessageFiles(files) {
+      if (!files?.length) return undefined
+      return files.map((f) => {
+        if (f.extension) return f
+        const dotIndex = f.name?.lastIndexOf('.')
+        const ext = dotIndex > 0 ? f.name.substring(dotIndex + 1) : f.type?.split('/').pop()
+        const name = dotIndex > 0 ? f.name.substring(0, dotIndex) : f.name
+        return { ...f, name, extension: ext }
+      })
+    },
+
     markAsSeen(messageIds) {
       if (!messageIds.length || !this.selectedRoom) return
       const room = this.selectedRoom
@@ -635,6 +646,7 @@ export default {
       changedRoom.lastMessage = {
         ...msg,
         content: (msg.content || '').trim().substring(0, 30),
+        files: this.lastMessageFiles(msg.files),
       }
       changedRoom.lastMessageAt = msg.date
       changedRoom.index = new Date().toISOString()
@@ -713,6 +725,7 @@ export default {
             ),
             name: file.name,
             type: file.type,
+            ...(file.duration != null && { duration: file.duration }),
           }))
         : null
 
@@ -742,6 +755,7 @@ export default {
       if (roomIndex !== -1) {
         const changedRoom = { ...this.rooms[roomIndex] }
         changedRoom.lastMessage.content = (content || '').trim().substring(0, 30)
+        changedRoom.lastMessage.files = this.lastMessageFiles(files)
         changedRoom.index = new Date().toISOString()
         this.rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== roomId)]
         this.$nextTick(() => {
@@ -827,6 +841,7 @@ export default {
           ? {
               ...room.lastMessage,
               content: (room.lastMessage?.content || '').trim().substring(0, 30),
+              files: this.lastMessageFiles(room.lastMessage?.files),
             }
           : { content: '' },
         users: room.users.map((u) => {

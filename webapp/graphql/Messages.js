@@ -26,6 +26,7 @@ export const createMessageMutation = () => {
           name
           #size
           type
+          duration
           #preview
         }
       }
@@ -66,7 +67,7 @@ export const messageQuery = () => {
           #size
           type
           #audio
-          #duration
+          duration
           #preview
         }
       }
@@ -101,7 +102,7 @@ export const chatMessageAdded = () => {
           #size
           type
           #audio
-          #duration
+          duration
           #preview
         }
       }
