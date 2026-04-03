@@ -50,7 +50,6 @@ const decodeJwt = async (
     const [currentUser] = await writeTxResultPromise
     if (!currentUser) return null
     return {
-      token,
       ...currentUser,
       authMethod: 'jwt' as const,
     }
