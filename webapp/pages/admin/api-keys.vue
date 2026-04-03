@@ -1,10 +1,8 @@
 <template>
-  <div class="admin-api-keys">
-    <os-card>
-      <h2 class="title">{{ $t('admin.api-keys.name') }}</h2>
-    </os-card>
+  <os-card class="admin-api-keys">
+    <h2 class="title">{{ $t('admin.api-keys.name') }}</h2>
 
-    <os-card v-if="apiKeyUsers && apiKeyUsers.length">
+    <template v-if="apiKeyUsers && apiKeyUsers.length">
       <div class="ds-table-wrap table-no-clip">
         <table class="ds-table ds-table-condensed ds-table-bordered">
           <thead>
@@ -182,13 +180,11 @@
         </table>
       </div>
       <pagination-buttons :hasNext="hasNext" :hasPrevious="hasPrevious" @next="next" @back="back" />
-    </os-card>
-    <os-card v-else>
-      <div class="ds-placeholder">{{ $t('admin.api-keys.empty') }}</div>
-    </os-card>
+    </template>
+    <div v-else class="ds-placeholder">{{ $t('admin.api-keys.empty') }}</div>
 
     <confirm-modal v-if="showModal" :modalData="modalData" @close="showModal = false" />
-  </div>
+  </os-card>
 </template>
 
 <script>
