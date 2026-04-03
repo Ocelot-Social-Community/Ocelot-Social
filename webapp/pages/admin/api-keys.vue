@@ -63,6 +63,7 @@
                       appearance="outline"
                       circle
                       size="sm"
+                      :loading="detailLoading && expandedUserId === entry.user.id"
                       :aria-label="$t('admin.api-keys.show-keys')"
                       @click="toggleUser(entry.user.id)"
                     >
@@ -282,11 +283,15 @@ export default {
           variables: { userId },
           fetchPolicy: 'network-only',
         })
+        if (this.expandedUserId !== userId) return
         this.userKeys = result.data.apiKeysForUser
       } catch (error) {
+        if (this.expandedUserId !== userId) return
         this.$toast.error(error.message)
       } finally {
-        this.detailLoading = false
+        if (this.expandedUserId === userId) {
+          this.detailLoading = false
+        }
       }
     },
     confirmRevokeKey(key, entry) {
