@@ -1,8 +1,8 @@
-// Global mock for matchMedia (used by touchDevice mixin)
+// Global mock for matchMedia (used by touchDevice mixin, drag detection, etc.)
 window.matchMedia =
   window.matchMedia ||
-  jest.fn().mockImplementation(() => ({
-    matches: false,
+  jest.fn().mockImplementation((query) => ({
+    matches: query === '(pointer: fine)' || query === '(min-width: 640px)',
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
   }))
