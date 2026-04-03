@@ -39,11 +39,13 @@
             :aria-label="$t('map.legend.title')"
           >
             <div v-for="type in markers.types" :key="type.id" class="map-legend-item">
-              <img
-                :alt="$t('map.legend.' + type.id)"
-                :src="'/img/mapbox/marker-icons/' + type.icon.legendName"
-                width="15"
-              />
+              <span :style="{ color: type.color }">
+                <os-icon
+                  :icon="icons.mapPinFilled"
+                  size="lg"
+                  :aria-label="$t('map.legend.' + type.id)"
+                />
+              </span>
               {{ $t('map.legend.' + type.id) }}
             </div>
           </div>
@@ -61,6 +63,8 @@ import mapboxgl from 'mapbox-gl'
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
 import { mapGetters } from 'vuex'
+import { OsIcon } from '@ocelot-social/ui'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { profileUserQuery } from '~/graphql/User'
 import { mapQuery } from '~/graphql/MapQuery'
 import mobile from '~/mixins/mobile'
@@ -73,6 +77,7 @@ export default {
   mixins: [mobile(maxMobileWidth)],
   components: {
     Empty,
+    OsIcon,
   },
   head() {
     return {
@@ -96,33 +101,33 @@ export default {
         types: [
           {
             id: 'theUser',
+            color: '#f79640',
             icon: {
               id: 'marker-orange',
-              legendName: 'mapbox-marker-icon-orange.svg',
               mapName: 'mapbox-marker-icon-20px-orange.png',
             },
           },
           {
             id: 'user',
+            color: '#33c377',
             icon: {
               id: 'marker-green',
-              legendName: 'mapbox-marker-icon-green.svg',
               mapName: 'mapbox-marker-icon-20px-green.png',
             },
           },
           {
             id: 'group',
+            color: '#f84d4d',
             icon: {
               id: 'marker-red',
-              legendName: 'mapbox-marker-icon-red.svg',
               mapName: 'mapbox-marker-icon-20px-red.png',
             },
           },
           {
             id: 'event',
+            color: '#7753eb',
             icon: {
               id: 'marker-purple',
-              legendName: 'mapbox-marker-icon-purple.svg',
               mapName: 'mapbox-marker-icon-20px-purple.png',
             },
           },
@@ -135,6 +140,9 @@ export default {
         popup: null,
       },
     }
+  },
+  created() {
+    this.icons = iconRegistry
   },
   async mounted() {
     this.updateMapPosition()
