@@ -118,6 +118,7 @@
                   size="sm"
                   :loading="revokingKeyId === key.id"
                   :aria-label="$t('settings.api-keys.list.revoke')"
+                  data-test="revoke-api-key"
                   @click="confirmRevoke(key)"
                 >
                   <template #icon><os-icon :icon="icons.trash" /></template>
