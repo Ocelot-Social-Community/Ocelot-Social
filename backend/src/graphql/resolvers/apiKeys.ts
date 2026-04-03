@@ -34,15 +34,14 @@ export default {
       return result.records.map((r) => normalizeApiKey(r.get('k')))
     },
 
-    allApiKeys: async (_parent, args, context: Context) => {
+    apiKeyUsers: async (_parent, args, context: Context) => {
       const orderClauses: Record<string, string> = {
-        LAST_USED: 'k.lastUsedAt DESC',
-        LAST_CONTENT: 'lastContentAt DESC',
-        CREATED_AT: 'k.createdAt DESC',
+        LAST_ACTIVITY: 'lastActivity DESC',
+        ACTIVE_KEYS: 'activeCount DESC',
         POSTS_COUNT: 'postsCount DESC',
         COMMENTS_COUNT: 'commentsCount DESC',
       }
-      const order = orderClauses[args.orderBy as string] || 'k.lastUsedAt DESC'
+      const order = orderClauses[args.orderBy as string] || 'lastActivity DESC'
       const first = (args.first as number) || 50
       const offset = (args.offset as number) || 0
 
@@ -51,45 +50,38 @@ export default {
           MATCH (u:User)-[:HAS_API_KEY]->(k:ApiKey)
           OPTIONAL MATCH (p:Post { createdByApiKey: k.id })
           OPTIONAL MATCH (c:Comment { createdByApiKey: k.id })
-          WITH u, k,
+          WITH u,
+            sum(CASE WHEN NOT k.disabled THEN 1 ELSE 0 END) AS activeCount,
+            sum(CASE WHEN k.disabled THEN 1 ELSE 0 END) AS revokedCount,
             count(DISTINCT p) AS postsCount,
             count(DISTINCT c) AS commentsCount,
-            max(p.createdAt) AS lastPostAt,
-            max(c.createdAt) AS lastCommentAt
-          WITH u, k, postsCount, commentsCount,
-            CASE WHEN lastPostAt > lastCommentAt
-              THEN lastPostAt ELSE lastCommentAt
-            END AS lastContentAt
-          RETURN k {.*} AS apiKey, u {.*} AS owner, postsCount, commentsCount, lastContentAt
+            max(k.lastUsedAt) AS lastActivity
+          RETURN u {.*} AS user, activeCount, revokedCount, postsCount, commentsCount, lastActivity
           ORDER BY ${order}
           SKIP toInteger($offset) LIMIT toInteger($first)
         `,
         variables: { offset, first },
       })
       return result.records.map((r) => ({
-        apiKey: normalizeApiKey(r.get('apiKey')),
-        owner: r.get('owner'),
+        user: r.get('user'),
+        activeCount: r.get('activeCount').toNumber(),
+        revokedCount: r.get('revokedCount').toNumber(),
         postsCount: r.get('postsCount').toNumber(),
         commentsCount: r.get('commentsCount').toNumber(),
-        lastContentAt: r.get('lastContentAt'),
+        lastActivity: r.get('lastActivity') ?? null,
       }))
     },
 
-    contentByApiKey: async (_parent, args, context: Context) => {
+    apiKeysForUser: async (_parent, args, context: Context) => {
       const result = await context.database.query({
         query: `
-          OPTIONAL MATCH (p:Post { createdByApiKey: $apiKeyId })
-          WITH collect(DISTINCT p {.*}) AS posts
-          OPTIONAL MATCH (c:Comment { createdByApiKey: $apiKeyId })
-          RETURN posts, collect(DISTINCT c {.*}) AS comments
+          MATCH (u:User { id: $userId })-[:HAS_API_KEY]->(k:ApiKey)
+          RETURN k {.*}
+          ORDER BY k.disabled ASC, k.createdAt DESC
         `,
-        variables: { apiKeyId: args.apiKeyId },
+        variables: { userId: args.userId },
       })
-      const record = result.records[0]
-      return {
-        posts: record.get('posts'),
-        comments: record.get('comments'),
-      }
+      return result.records.map((r) => normalizeApiKey(r.get('k')))
     },
   },
 

@@ -15,31 +15,26 @@ type ApiKeyWithSecret {
   secret: String!
 }
 
-type ApiKeyWithActivity {
-  apiKey: ApiKey!
-  owner: User!
+type ApiKeyUserSummary {
+  user: User!
+  activeCount: Int!
+  revokedCount: Int!
   postsCount: Int!
   commentsCount: Int!
-  lastContentAt: String
+  lastActivity: String
 }
 
-type ApiKeyContent {
-  posts: [Post!]!
-  comments: [Comment!]!
-}
-
-enum ApiKeyOrder {
-  LAST_USED
-  LAST_CONTENT
-  CREATED_AT
+enum ApiKeyUserOrder {
+  LAST_ACTIVITY
+  ACTIVE_KEYS
   POSTS_COUNT
   COMMENTS_COUNT
 }
 
 type Query {
   myApiKeys: [ApiKey!]!
-  allApiKeys(orderBy: ApiKeyOrder, first: Int, offset: Int): [ApiKeyWithActivity!]!
-  contentByApiKey(apiKeyId: ID!): ApiKeyContent!
+  apiKeyUsers(orderBy: ApiKeyUserOrder, first: Int, offset: Int): [ApiKeyUserSummary!]!
+  apiKeysForUser(userId: ID!): [ApiKey!]!
 }
 
 type Mutation {

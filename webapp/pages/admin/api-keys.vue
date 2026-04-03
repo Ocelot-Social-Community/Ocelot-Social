@@ -7,31 +7,27 @@
           {{ $t('admin.api-keys.sort-by') }}
         </label>
         <select id="api-key-order" v-model="orderBy" class="admin-select" @change="resetPagination">
-          <option value="LAST_USED">{{ $t('admin.api-keys.order.last-used') }}</option>
-          <option value="LAST_CONTENT">{{ $t('admin.api-keys.order.last-content') }}</option>
-          <option value="CREATED_AT">{{ $t('admin.api-keys.order.created') }}</option>
+          <option value="LAST_ACTIVITY">{{ $t('admin.api-keys.order.last-used') }}</option>
+          <option value="ACTIVE_KEYS">{{ $t('admin.api-keys.order.active-keys') }}</option>
           <option value="POSTS_COUNT">{{ $t('admin.api-keys.order.posts') }}</option>
           <option value="COMMENTS_COUNT">{{ $t('admin.api-keys.order.comments') }}</option>
         </select>
       </div>
     </os-card>
 
-    <os-card v-if="allApiKeys && allApiKeys.length">
+    <os-card v-if="apiKeyUsers && apiKeyUsers.length">
       <div class="ds-table-wrap">
         <table class="ds-table ds-table-condensed ds-table-bordered">
           <thead>
             <tr>
               <th scope="col" class="ds-table-head-col">
-                {{ $t('admin.api-keys.table.prefix') }}
-              </th>
-              <th scope="col" class="ds-table-head-col">
-                {{ $t('admin.api-keys.table.name') }}
-              </th>
-              <th scope="col" class="ds-table-head-col">
                 {{ $t('admin.api-keys.table.user') }}
               </th>
-              <th scope="col" class="ds-table-head-col">
-                {{ $t('admin.api-keys.table.last-used') }}
+              <th scope="col" class="ds-table-head-col ds-table-head-col-right">
+                {{ $t('admin.api-keys.table.active') }}
+              </th>
+              <th scope="col" class="ds-table-head-col ds-table-head-col-right">
+                {{ $t('admin.api-keys.table.revoked-count') }}
               </th>
               <th scope="col" class="ds-table-head-col ds-table-head-col-right">
                 {{ $t('admin.api-keys.table.posts') }}
@@ -40,60 +36,46 @@
                 {{ $t('admin.api-keys.table.comments') }}
               </th>
               <th scope="col" class="ds-table-head-col">
+                {{ $t('admin.api-keys.table.last-activity') }}
+              </th>
+              <th scope="col" class="ds-table-head-col">
                 {{ $t('admin.api-keys.table.actions') }}
               </th>
             </tr>
           </thead>
           <tbody>
-            <template v-for="entry in allApiKeys">
-              <tr
-                :key="entry.apiKey.id"
-                :class="{ 'disabled-row': entry.apiKey.disabled }"
-              >
-                <td class="ds-table-col">
-                  <code>{{ entry.apiKey.keyPrefix }}...</code>
-                </td>
-                <td class="ds-table-col">{{ entry.apiKey.name }}</td>
+            <template v-for="entry in apiKeyUsers">
+              <tr :key="entry.user.id">
                 <td class="ds-table-col">
                   <nuxt-link
-                    :to="{ name: 'profile-id-slug', params: { id: entry.owner.id, slug: entry.owner.slug } }"
+                    :to="{ name: 'profile-id-slug', params: { id: entry.user.id, slug: entry.user.slug } }"
                   >
-                    @{{ entry.owner.slug }}
+                    <b>@{{ entry.user.slug }}</b>
                   </nuxt-link>
                 </td>
-                <td class="ds-table-col">
-                  {{ entry.apiKey.lastUsedAt ? $options.filters.dateTime(entry.apiKey.lastUsedAt) : $t('admin.api-keys.never') }}
-                </td>
+                <td class="ds-table-col ds-table-col-right">{{ entry.activeCount }}</td>
+                <td class="ds-table-col ds-table-col-right">{{ entry.revokedCount }}</td>
                 <td class="ds-table-col ds-table-col-right">{{ entry.postsCount }}</td>
                 <td class="ds-table-col ds-table-col-right">{{ entry.commentsCount }}</td>
                 <td class="ds-table-col">
+                  {{ entry.lastActivity ? $options.filters.dateTime(entry.lastActivity) : $t('admin.api-keys.never') }}
+                </td>
+                <td class="ds-table-col">
                   <div class="action-buttons">
                     <os-button
-                      v-if="entry.postsCount > 0 || entry.commentsCount > 0"
                       variant="primary"
                       appearance="outline"
                       circle
                       size="sm"
-                      :aria-label="$t('admin.api-keys.show-content')"
-                      @click="toggleDetail(entry.apiKey.id)"
+                      :aria-label="$t('admin.api-keys.show-keys')"
+                      @click="toggleUser(entry.user.id)"
                     >
                       <template #icon>
-                        <os-icon :icon="expandedKeyId === entry.apiKey.id ? icons.chevronUp : icons.chevronDown" />
+                        <span class="expand-chevron" :class="{ open: expandedUserId === entry.user.id }">&#9660;</span>
                       </template>
                     </os-button>
                     <os-button
-                      v-if="!entry.apiKey.disabled"
-                      variant="danger"
-                      appearance="outline"
-                      circle
-                      size="sm"
-                      :aria-label="$t('admin.api-keys.revoke-key')"
-                      @click="confirmRevokeKey(entry)"
-                    >
-                      <template #icon><os-icon :icon="icons.trash" /></template>
-                    </os-button>
-                    <os-button
-                      v-if="!entry.apiKey.disabled"
+                      v-if="entry.activeCount > 0"
                       variant="danger"
                       appearance="outline"
                       size="sm"
@@ -102,44 +84,84 @@
                     >
                       {{ $t('admin.api-keys.revoke-all-short') }}
                     </os-button>
-                    <span v-if="entry.apiKey.disabled" class="status-label">
-                      {{ $t('admin.api-keys.revoked') }}
-                    </span>
                   </div>
                 </td>
               </tr>
-              <!-- Expanded detail row -->
-              <tr v-if="expandedKeyId === entry.apiKey.id" :key="entry.apiKey.id + '-detail'">
+              <!-- Expanded: keys for this user -->
+              <tr v-if="expandedUserId === entry.user.id" :key="entry.user.id + '-detail'">
                 <td :colspan="7" class="detail-cell">
                   <div v-if="detailLoading" class="ds-placeholder">
                     <os-spinner />
                   </div>
-                  <div v-else-if="detailContent">
-                    <h4 class="ds-mb-small">
-                      {{ $t('admin.api-keys.content-title', {
-                        posts: detailContent.posts.length,
-                        comments: detailContent.comments.length,
-                      }) }}
-                    </h4>
-                    <table class="ds-table ds-table-condensed" v-if="detailContent.posts.length">
-                      <tbody>
-                        <tr v-for="post in detailContent.posts.slice(0, 20)" :key="post.id">
-                          <td class="ds-table-col"><b>Post</b></td>
-                          <td class="ds-table-col">{{ post.title | truncate(60) }}</td>
-                          <td class="ds-table-col">{{ post.createdAt | dateTime }}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <table class="ds-table ds-table-condensed" v-if="detailContent.comments.length">
-                      <tbody>
-                        <tr v-for="comment in detailContent.comments.slice(0, 20)" :key="comment.id">
-                          <td class="ds-table-col"><b>Comment</b></td>
-                          <td class="ds-table-col">{{ comment.contentExcerpt | truncate(60) }}</td>
-                          <td class="ds-table-col">{{ comment.createdAt | dateTime }}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
+                  <template v-else-if="userKeys">
+                    <!-- Active keys -->
+                    <div v-if="activeUserKeys.length" class="ds-mb-small">
+                      <h4 class="ds-mb-small">
+                        {{ $t('admin.api-keys.detail.active', { count: activeUserKeys.length }) }}
+                      </h4>
+                      <table class="ds-table ds-table-condensed">
+                        <thead>
+                          <tr>
+                            <th class="ds-table-head-col">{{ $t('admin.api-keys.table.name') }}</th>
+                            <th class="ds-table-head-col">{{ $t('admin.api-keys.table.prefix') }}</th>
+                            <th class="ds-table-head-col">{{ $t('admin.api-keys.table.last-activity') }}</th>
+                            <th class="ds-table-head-col">{{ $t('admin.api-keys.table.actions') }}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="key in activeUserKeys" :key="key.id">
+                            <td class="ds-table-col" :title="$t('settings.api-keys.list.created-at') + ': ' + $options.filters.dateTime(key.createdAt)">
+                              {{ key.name }}
+                            </td>
+                            <td class="ds-table-col"><code>{{ key.keyPrefix }}...</code></td>
+                            <td class="ds-table-col">
+                              {{ key.lastUsedAt ? $options.filters.dateTime(key.lastUsedAt) : $t('admin.api-keys.never') }}
+                            </td>
+                            <td class="ds-table-col">
+                              <os-button
+                                variant="danger"
+                                appearance="outline"
+                                circle
+                                size="sm"
+                                :aria-label="$t('admin.api-keys.revoke-key')"
+                                @click="confirmRevokeKey(key, entry)"
+                              >
+                                <template #icon><os-icon :icon="icons.trash" /></template>
+                              </os-button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <!-- Revoked keys -->
+                    <div v-if="revokedUserKeys.length">
+                      <h4 class="ds-mb-small revoked-heading">
+                        {{ $t('admin.api-keys.detail.revoked', { count: revokedUserKeys.length }) }}
+                      </h4>
+                      <table class="ds-table ds-table-condensed revoked-table">
+                        <thead>
+                          <tr>
+                            <th class="ds-table-head-col">{{ $t('admin.api-keys.table.name') }}</th>
+                            <th class="ds-table-head-col">{{ $t('admin.api-keys.table.prefix') }}</th>
+                            <th class="ds-table-head-col">{{ $t('admin.api-keys.revoked-at') }}</th>
+                            <th class="ds-table-head-col">{{ $t('admin.api-keys.table.last-activity') }}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="key in revokedUserKeys" :key="key.id">
+                            <td class="ds-table-col">{{ key.name }}</td>
+                            <td class="ds-table-col"><code>{{ key.keyPrefix }}...</code></td>
+                            <td class="ds-table-col">
+                              {{ key.disabledAt ? $options.filters.dateTime(key.disabledAt) : '–' }}
+                            </td>
+                            <td class="ds-table-col">
+                              {{ key.lastUsedAt ? $options.filters.dateTime(key.lastUsedAt) : $t('admin.api-keys.never') }}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </template>
                 </td>
               </tr>
             </template>
@@ -166,8 +188,8 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
 import {
-  allApiKeysQuery,
-  contentByApiKeyQuery,
+  apiKeyUsersQuery,
+  apiKeysForUserQuery,
   adminRevokeApiKeyMutation,
   adminRevokeUserApiKeysMutation,
 } from '~/graphql/admin/ApiKeys'
@@ -187,22 +209,22 @@ export default {
   data() {
     const pageSize = 20
     return {
-      allApiKeys: [],
-      orderBy: 'LAST_USED',
+      apiKeyUsers: [],
+      orderBy: 'LAST_ACTIVITY',
       offset: 0,
       pageSize,
       first: pageSize,
       hasNext: false,
-      expandedKeyId: null,
-      detailContent: null,
+      expandedUserId: null,
+      userKeys: null,
       detailLoading: false,
       showModal: false,
       modalData: null,
     }
   },
   apollo: {
-    allApiKeys: {
-      query: allApiKeysQuery(),
+    apiKeyUsers: {
+      query: apiKeyUsersQuery(),
       variables() {
         return {
           orderBy: this.orderBy,
@@ -210,9 +232,9 @@ export default {
           offset: this.offset,
         }
       },
-      update({ allApiKeys }) {
-        this.hasNext = allApiKeys.length > this.pageSize
-        return allApiKeys.slice(0, this.pageSize)
+      update({ apiKeyUsers }) {
+        this.hasNext = apiKeyUsers.length > this.pageSize
+        return apiKeyUsers.slice(0, this.pageSize)
       },
       fetchPolicy: 'cache-and-network',
     },
@@ -220,6 +242,12 @@ export default {
   computed: {
     hasPrevious() {
       return this.offset > 0
+    },
+    activeUserKeys() {
+      return (this.userKeys || []).filter((k) => !k.disabled)
+    },
+    revokedUserKeys() {
+      return (this.userKeys || []).filter((k) => k.disabled)
     },
   },
   methods: {
@@ -232,39 +260,39 @@ export default {
     back() {
       this.offset = Math.max(0, this.offset - this.pageSize)
     },
-    async toggleDetail(keyId) {
-      if (this.expandedKeyId === keyId) {
-        this.expandedKeyId = null
-        this.detailContent = null
+    async toggleUser(userId) {
+      if (this.expandedUserId === userId) {
+        this.expandedUserId = null
+        this.userKeys = null
         return
       }
-      this.expandedKeyId = keyId
+      this.expandedUserId = userId
       this.detailLoading = true
-      this.detailContent = null
+      this.userKeys = null
       try {
         const result = await this.$apollo.query({
-          query: contentByApiKeyQuery(),
-          variables: { apiKeyId: keyId },
+          query: apiKeysForUserQuery(),
+          variables: { userId },
           fetchPolicy: 'network-only',
         })
-        this.detailContent = result.data.contentByApiKey
+        this.userKeys = result.data.apiKeysForUser
       } catch (error) {
         this.$toast.error(error.message)
       } finally {
         this.detailLoading = false
       }
     },
-    confirmRevokeKey(entry) {
+    confirmRevokeKey(key, entry) {
       this.modalData = {
         titleIdent: 'admin.api-keys.revoke.title',
         messageIdent: 'admin.api-keys.revoke.message',
-        messageParams: { name: entry.apiKey.name, user: entry.owner.name },
+        messageParams: { name: key.name, user: entry.user.name },
         buttons: {
           confirm: {
             danger: true,
             icon: this.icons.trash,
             textIdent: 'admin.api-keys.revoke.confirm',
-            callback: () => this.revokeKey(entry.apiKey.id),
+            callback: () => this.revokeKey(key.id, entry.user.id),
           },
           cancel: {
             icon: this.icons.close,
@@ -279,13 +307,13 @@ export default {
       this.modalData = {
         titleIdent: 'admin.api-keys.revoke-all-title',
         messageIdent: 'admin.api-keys.revoke-all-message',
-        messageParams: { user: entry.owner.name },
+        messageParams: { user: entry.user.name },
         buttons: {
           confirm: {
             danger: true,
             icon: this.icons.trash,
             textIdent: 'admin.api-keys.revoke-all-confirm',
-            callback: () => this.revokeAllKeys(entry.owner.id, entry.owner.name),
+            callback: () => this.revokeAllKeys(entry.user.id, entry.user.name),
           },
           cancel: {
             icon: this.icons.close,
@@ -296,13 +324,14 @@ export default {
       }
       this.showModal = true
     },
-    async revokeKey(keyId) {
+    async revokeKey(keyId, userId) {
       try {
         await this.$apollo.mutate({
           mutation: adminRevokeApiKeyMutation(),
           variables: { id: keyId },
         })
-        this.$apollo.queries.allApiKeys.refetch()
+        this.$apollo.queries.apiKeyUsers.refetch()
+        await this.toggleUser(null) // collapse
         this.$toast.success(this.$t('admin.api-keys.revoke.success'))
       } catch (error) {
         this.$toast.error(error.message)
@@ -315,7 +344,9 @@ export default {
           variables: { userId },
         })
         const count = result.data.adminRevokeUserApiKeys
-        this.$apollo.queries.allApiKeys.refetch()
+        this.$apollo.queries.apiKeyUsers.refetch()
+        this.expandedUserId = null
+        this.userKeys = null
         this.$toast.success(this.$t('admin.api-keys.revoke-all-success', { count, user: userName }))
       } catch (error) {
         this.$toast.error(error.message)
@@ -335,16 +366,6 @@ export default {
   background-color: $background-color-base;
 }
 
-.disabled-row {
-  opacity: 0.5;
-}
-
-.status-label {
-  font-size: $font-size-small;
-  color: $color-neutral-60;
-  font-style: italic;
-}
-
 .action-buttons {
   display: flex;
   gap: $space-xx-small;
@@ -354,5 +375,23 @@ export default {
 .detail-cell {
   background-color: $color-neutral-90;
   padding: $space-small;
+}
+
+.revoked-table {
+  opacity: 0.6;
+}
+
+.revoked-heading {
+  color: $text-color-soft;
+}
+
+.expand-chevron {
+  display: inline-block;
+  font-size: $font-size-small;
+  transition: transform 0.2s;
+
+  &.open {
+    transform: rotate(180deg);
+  }
 }
 </style>

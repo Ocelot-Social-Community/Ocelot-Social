@@ -14,8 +14,7 @@ export default makeAugmentedSchema({
       exclude: [
         'ApiKey',
         'ApiKeyWithSecret',
-        'ApiKeyWithActivity',
-        'ApiKeyContent',
+        'ApiKeyUserSummary',
         'Badge',
         'Embed',
         'EmailNotificationSettings',

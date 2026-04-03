@@ -471,8 +471,8 @@ export default shield(
 
       // API Keys
       myApiKeys: and(isAuthenticated, apiKeysEnabled),
-      allApiKeys: isAdmin,
-      contentByApiKey: isAdmin,
+      apiKeyUsers: isAdmin,
+      apiKeysForUser: isAdmin,
     },
     Mutation: {
       '*': deny,

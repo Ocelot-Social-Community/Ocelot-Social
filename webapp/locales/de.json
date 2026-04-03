@@ -89,18 +89,16 @@
     "api-keys": {
       "name": "API Keys",
       "sort-by": "Sortieren nach",
-      "empty": "Keine API Keys gefunden.",
+      "empty": "Keine Nutzer mit API Keys gefunden.",
       "never": "nie",
-      "revoked": "widerrufen",
-      "show-content": "Inhalte anzeigen",
+      "show-keys": "Keys anzeigen",
       "revoke-key": "Key widerrufen",
       "revoke-all": "Alle Keys dieses Nutzers widerrufen",
       "revoke-all-short": "Alle widerrufen",
-      "content-title": "{posts} Beiträge, {comments} Kommentare",
+      "revoked-at": "Widerrufen am",
       "order": {
-        "last-used": "Letzte Nutzung",
-        "last-content": "Letzter Inhalt",
-        "created": "Erstellt am",
+        "last-used": "Letzte Aktivität",
+        "active-keys": "Aktive Keys",
         "posts": "Anzahl Beiträge",
         "comments": "Anzahl Kommentare"
       },
@@ -108,10 +106,16 @@
         "prefix": "Key",
         "name": "Name",
         "user": "Nutzer",
-        "last-used": "Letzte Nutzung",
+        "active": "Aktiv",
+        "revoked-count": "Widerrufen",
         "posts": "Beiträge",
         "comments": "Kommentare",
+        "last-activity": "Letzte Aktivität",
         "actions": "Aktionen"
+      },
+      "detail": {
+        "active": "Aktive Keys ({count})",
+        "revoked": "Widerrufene Keys ({count})"
       },
       "revoke": {
         "title": "API Key widerrufen",

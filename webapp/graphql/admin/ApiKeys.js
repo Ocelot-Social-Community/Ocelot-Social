@@ -1,46 +1,36 @@
 import gql from 'graphql-tag'
 
-export const allApiKeysQuery = () => {
+export const apiKeyUsersQuery = () => {
   return gql`
-    query ($orderBy: ApiKeyOrder, $first: Int, $offset: Int) {
-      allApiKeys(orderBy: $orderBy, first: $first, offset: $offset) {
-        apiKey {
-          id
-          name
-          keyPrefix
-          createdAt
-          lastUsedAt
-          expiresAt
-          disabled
-        }
-        owner {
+    query ($orderBy: ApiKeyUserOrder, $first: Int, $offset: Int) {
+      apiKeyUsers(orderBy: $orderBy, first: $first, offset: $offset) {
+        user {
           id
           name
           slug
         }
+        activeCount
+        revokedCount
         postsCount
         commentsCount
-        lastContentAt
+        lastActivity
       }
     }
   `
 }
 
-export const contentByApiKeyQuery = () => {
+export const apiKeysForUserQuery = () => {
   return gql`
-    query ($apiKeyId: ID!) {
-      contentByApiKey(apiKeyId: $apiKeyId) {
-        posts {
-          id
-          title
-          slug
-          createdAt
-        }
-        comments {
-          id
-          contentExcerpt
-          createdAt
-        }
+    query ($userId: ID!) {
+      apiKeysForUser(userId: $userId) {
+        id
+        name
+        keyPrefix
+        createdAt
+        lastUsedAt
+        expiresAt
+        disabled
+        disabledAt
       }
     }
   `
