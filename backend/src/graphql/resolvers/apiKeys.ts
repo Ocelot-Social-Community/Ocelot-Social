@@ -177,6 +177,7 @@ export default {
       const result = await context.database.write({
         query: `
           MATCH (u:User { id: $userId })-[:HAS_API_KEY]->(k:ApiKey { id: $keyId })
+          WHERE NOT k.disabled
           SET k.disabled = true, k.disabledAt = toString(datetime())
           RETURN k
         `,
@@ -189,6 +190,7 @@ export default {
       const result = await context.database.write({
         query: `
           MATCH (k:ApiKey { id: $keyId })
+          WHERE NOT k.disabled
           SET k.disabled = true, k.disabledAt = toString(datetime())
           RETURN k
         `,
