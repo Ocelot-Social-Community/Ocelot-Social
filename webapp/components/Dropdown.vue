@@ -121,9 +121,8 @@ export default {
     },
     addOverlayClickHandler() {
       this.overlayClickHandler = (e) => {
-        // Allow clicks inside the popover content
-        const popover = this.$el.querySelector('.tooltip-inner, [slot="popover"]')
-        if (popover && popover.contains(e.target)) return
+        // Allow clicks inside the popover content (rendered under <body> by v-tooltip)
+        if (e.target.closest('.tooltip-inner, .popover-inner')) return
         // Allow clicks on the trigger itself
         if (this.$el.contains(e.target)) return
         e.stopPropagation()
