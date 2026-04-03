@@ -314,9 +314,7 @@ export default {
       if (text) return text.substring(0, 30)
       if (!files?.length) return ''
       if (files[0].type?.startsWith('audio/') || files[0].audio) return ''
-      const f = files[0]
-      const name = f.extension ? `${f.name}.${f.extension}` : f.name || ''
-      return `\uD83D\uDCCE ${name}`
+      return `\uD83D\uDCCE ${files[0].name || ''}`
     },
 
     markAsSeen(messageIds) {
