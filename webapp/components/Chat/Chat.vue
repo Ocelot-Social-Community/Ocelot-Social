@@ -247,10 +247,7 @@ export default {
     }),
     chatHeight() {
       if (this.singleRoom) return 'calc(100dvh - 190px)'
-      if (typeof window !== 'undefined' && window.innerWidth <= 768) {
-        return '100%'
-      }
-      return 'calc(100dvh - 190px)'
+      return '100%'
     },
     computedChatStyle() {
       return chatStyle.STYLE.light
