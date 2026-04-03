@@ -100,6 +100,17 @@
         class="vac-avatar-profile"
       />
     </div>
+
+    <template v-for="msg in messages">
+      <profile-avatar
+        v-if="msg.avatar"
+        :slot="'message-avatar_' + msg._id"
+        :key="'avatar-' + msg._id"
+        :profile="messageUserProfile(msg.senderId)"
+        class="vac-message-avatar"
+        style="align-self: flex-end; margin: 0 0 2px;"
+      />
+    </template>
   </vue-advanced-chat>
 </template>
 
@@ -404,12 +415,22 @@ export default {
       this.messages = filtered
     },
 
+    messageUserProfile(senderId) {
+      const room = this.rooms.find((r) => r.id === this.selectedRoom?.id)
+      const profile = room?._userProfiles?.[senderId]
+      if (profile) return profile
+      const user = this.selectedRoom?.users?.find((u) => u._id === senderId || u.id === senderId)
+      return user ? { id: user.id, name: user.username || user.name } : { name: senderId }
+    },
+
     prepareMessage(msg) {
       const m = { ...msg }
       m.content = m.content || ''
       if (!m._rawDate) m._rawDate = m.date
       this.formatMessageDate(m)
-      m.avatar = m.avatar?.w320 || m.avatar || null
+      // Always set a truthy avatar so the library renders our message-avatar slot.
+      // ProfileAvatar handles the actual display (image or initials).
+      m.avatar = m.avatar || 'initials'
       if (!m._originalAvatar) m._originalAvatar = m.avatar
       return m
     },
@@ -775,7 +796,7 @@ export default {
         saved: true,
         _rawDate: new Date().toISOString(),
         _originalAvatar:
-          this.selectedRoom?.users?.find((u) => u.id === this.currentUser.id)?.avatar || null,
+          this.selectedRoom?.users?.find((u) => u.id === this.currentUser.id)?.avatar || 'initials',
         senderId: this.currentUser.id,
         files:
           messageDetails.files?.map((file) => ({
@@ -882,11 +903,16 @@ export default {
           return { ...u, username: u.name, avatar: u.avatar?.w320 }
         }),
       }
+      // Build user profiles from original room.users (before avatar was flattened to string)
+      const userProfiles = {}
+      for (const u of room.users) {
+        userProfiles[u.id] = { id: u.id, name: u.name, avatar: u.avatar }
+      }
+      fixedRoom._userProfiles = userProfiles
       if (!isGroupRoom) {
-        // Build userProfile from original room.users (before avatar was flattened to string)
         const otherUser = room.users.find((u) => u.id !== this.currentUser.id)
         fixedRoom.userProfile = otherUser
-          ? { id: otherUser.id, name: otherUser.name, avatar: otherUser.avatar }
+          ? userProfiles[otherUser.id]
           : { name: fixedRoom.roomName }
       }
       if (!fixedRoom.avatar) {
@@ -979,13 +1005,19 @@ export default {
       }
 
       // Create a virtual room (no backend call — room is created on first message)
+      const currentUserProfile = { id: this.currentUser.id, name: this.currentUser.name, avatar: this.currentUser.avatar }
+      const otherUserProfile = { id: userId, name: userName, avatar: userAvatarObj }
       const virtualRoom = {
         id: `temp-${userId}`,
         roomId: `temp-${userId}`,
         roomName: userName,
         isGroupRoom: false,
         groupProfile: null,
-        userProfile: { id: userId, name: userName, avatar: userAvatarObj },
+        userProfile: otherUserProfile,
+        _userProfiles: {
+          [this.currentUser.id]: currentUserProfile,
+          [userId]: otherUserProfile,
+        },
         avatar: userAvatar,
         lastMessageAt: null,
         createdAt: new Date().toISOString(),
@@ -1084,6 +1116,16 @@ export default {
 <style lang="scss" scoped>
 .vac-avatar-profile {
   margin-right: 15px;
+}
+
+.vac-message-avatar {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  font-size: 11px;
+  align-self: flex-end;
+  margin: 0 0 2px;
 }
 
 .ds-flex-item.single-chat-bubble {

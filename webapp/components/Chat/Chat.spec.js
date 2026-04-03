@@ -185,17 +185,18 @@ describe('Chat.vue', () => {
       expect(prepared.date).toBeDefined()
     })
 
-    it('normalizes avatar', () => {
-      const msg = mockMessage({ avatar: { w320: 'http://img.jpg' } })
+    it('keeps avatar object as-is', () => {
+      const avatarObj = { w320: 'http://img.jpg' }
+      const msg = mockMessage({ avatar: avatarObj })
       const prepared = wrapper.vm.prepareMessage(msg)
-      expect(prepared.avatar).toBe('http://img.jpg')
-      expect(prepared._originalAvatar).toBe('http://img.jpg')
+      expect(prepared.avatar).toEqual(avatarObj)
+      expect(prepared._originalAvatar).toEqual(avatarObj)
     })
 
-    it('handles null avatar', () => {
+    it('sets placeholder avatar when avatar is null', () => {
       const msg = mockMessage({ avatar: null })
       const prepared = wrapper.vm.prepareMessage(msg)
-      expect(prepared.avatar).toBeNull()
+      expect(prepared.avatar).toBe('initials')
     })
   })
 
