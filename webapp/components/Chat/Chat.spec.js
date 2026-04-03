@@ -185,18 +185,18 @@ describe('Chat.vue', () => {
       expect(prepared.date).toBeDefined()
     })
 
-    it('keeps avatar object as-is', () => {
-      const avatarObj = { w320: 'http://img.jpg' }
-      const msg = mockMessage({ avatar: avatarObj })
+    it('extracts w320 from avatar object', () => {
+      const msg = mockMessage({ avatar: { w320: 'http://img.jpg' } })
       const prepared = wrapper.vm.prepareMessage(msg)
-      expect(prepared.avatar).toEqual(avatarObj)
-      expect(prepared._originalAvatar).toEqual(avatarObj)
+      expect(prepared.avatar).toBe('http://img.jpg')
+      expect(prepared._originalAvatar).toBe('http://img.jpg')
     })
 
-    it('sets placeholder avatar when avatar is null', () => {
-      const msg = mockMessage({ avatar: null })
+    it('generates initials avatar when avatar is null', () => {
+      const msg = mockMessage({ avatar: null, username: 'Otto Normal' })
       const prepared = wrapper.vm.prepareMessage(msg)
-      expect(prepared.avatar).toBe('initials')
+      expect(prepared.avatar).toContain('data:image/svg+xml')
+      expect(prepared.avatar).toContain('ON')
     })
   })
 

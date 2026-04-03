@@ -432,14 +432,18 @@ export default {
       return user ? { id: user.id, name: user.username || user.name } : { name: senderId }
     },
 
+    initialsAvatarUrl(name) {
+      const initials = (name || '?').match(/\b\w/g)?.join('').substring(0, 2).toUpperCase() || '?'
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56"><circle cx="28" cy="28" r="28" fill="rgb(25,122,49)"/><text x="50%25" y="50%25" dominant-baseline="central" text-anchor="middle" fill="white" font-family="sans-serif" font-size="22" font-weight="500">${initials}</text></svg>`
+      return `data:image/svg+xml,${svg}`
+    },
+
     prepareMessage(msg) {
       const m = { ...msg }
       m.content = m.content || ''
       if (!m._rawDate) m._rawDate = m.date
       this.formatMessageDate(m)
-      // Always set a truthy avatar so the library renders our message-avatar slot.
-      // ProfileAvatar handles the actual display (image or initials).
-      m.avatar = m.avatar || 'initials'
+      m.avatar = m.avatar?.w320 || m.avatar || this.initialsAvatarUrl(m.username)
       if (!m._originalAvatar) m._originalAvatar = m.avatar
       return m
     },
@@ -805,7 +809,7 @@ export default {
         saved: true,
         _rawDate: new Date().toISOString(),
         _originalAvatar:
-          this.selectedRoom?.users?.find((u) => u.id === this.currentUser.id)?.avatar || 'initials',
+          this.selectedRoom?.users?.find((u) => u.id === this.currentUser.id)?.avatar || this.initialsAvatarUrl(this.currentUser.name),
         senderId: this.currentUser.id,
         files:
           messageDetails.files?.map((file) => ({
