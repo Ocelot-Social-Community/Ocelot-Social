@@ -133,7 +133,6 @@ export default {
         isSourceAndLayerAdded: false,
         isFlyToCenter: false,
         popup: null,
-        popupOnLeaveTimeoutId: null,
       },
     }
   },
@@ -335,10 +334,6 @@ export default {
 
       // show popup for given features at coordinates
       const showPopup = (features, lngLat) => {
-        if (this.popupOnLeaveTimeoutId) {
-          clearTimeout(this.popupOnLeaveTimeoutId)
-          this.popupOnLeaveTimeoutId = null
-        }
         if (this.markers.popup.isOpen()) {
           this.markers.popup.remove()
         }
@@ -441,12 +436,7 @@ export default {
       })
 
       this.map.on('mouseleave', 'markers', () => {
-        if (this.markers.popup.isOpen()) {
-          this.popupOnLeaveTimeoutId = setTimeout(() => {
-            this.map.getCanvas().style.cursor = ''
-            this.markers.popup.remove()
-          }, 3000)
-        }
+        this.map.getCanvas().style.cursor = ''
       })
 
       // Mobile: show popup on click/tap
