@@ -355,7 +355,7 @@ describe('admin operations', () => {
       expect(data.apiKeyUsers.length).toBeGreaterThanOrEqual(1)
       const entry = data.apiKeyUsers.find((e) => e.user.id === 'u-regular')
       expect(entry).toBeTruthy()
-      expect(entry.activeCount).toBe(2)
+      expect(entry.activeCount).toBe(1)
       expect(entry.revokedCount).toBe(0)
       expect(entry).toHaveProperty('postsCount')
       expect(entry).toHaveProperty('commentsCount')
@@ -367,7 +367,7 @@ describe('admin operations', () => {
       await mutate({ mutation: adminRevokeApiKey, variables: { id: keyId } })
       const { data } = await query({ query: apiKeyUsers, variables: { first: 10, offset: 0 } })
       const entry = data.apiKeyUsers.find((e) => e.user.id === 'u-regular')
-      expect(entry.activeCount).toBe(1)
+      expect(entry.activeCount).toBe(0)
       expect(entry.revokedCount).toBe(1)
     })
 
@@ -395,7 +395,7 @@ describe('admin operations', () => {
         variables: { userId: 'u-regular' },
       })
       expect(errors).toBeUndefined()
-      expect(data.apiKeysForUser).toHaveLength(2)
+      expect(data.apiKeysForUser).toHaveLength(1)
       data.apiKeysForUser.forEach((k) => {
         expect(k).toHaveProperty('id')
         expect(k).toHaveProperty('name')
@@ -408,9 +408,13 @@ describe('admin operations', () => {
     })
 
     it('returns active keys before revoked keys', async () => {
+      // Create a second key so we have one active + one revoked
+      authenticatedUser = (await regularUser.toJson()) as Context['user']
+      await mutate({ mutation: createApiKey, variables: { name: 'Key 2' } })
       authenticatedUser = (await adminUser.toJson()) as Context['user']
       await mutate({ mutation: adminRevokeApiKey, variables: { id: keyId } })
       const { data } = await query({ query: apiKeysForUser, variables: { userId: 'u-regular' } })
+      expect(data.apiKeysForUser).toHaveLength(2)
       expect(data.apiKeysForUser[0].disabled).toBe(false)
       expect(data.apiKeysForUser[1].disabled).toBe(true)
     })
