@@ -6,7 +6,12 @@ import Map from './map'
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
 
 jest.mock('@mapbox/mapbox-gl-geocoder', () => {
-  return jest.fn().mockImplementation(jest.fn())
+  return jest.fn().mockImplementation(() => {
+    const mockParent = global.document.createElement('div')
+    const container = global.document.createElement('div')
+    mockParent.appendChild(container)
+    return { container, clear: jest.fn() }
+  })
 })
 
 jest.mock('mapbox-gl', () => {
@@ -574,18 +579,6 @@ describe('map', () => {
           expect(links[1].getAttribute('href')).toBe('/groups/g1/journalism')
         })
 
-        it('clears pending leave timeout', () => {
-          jest.useFakeTimers()
-          wrapper.vm.popupOnLeaveTimeoutId = setTimeout(() => {}, 3000)
-          mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
-          onEventMocks.mouseenter({
-            point: { x: 100, y: 200 },
-            lngLat: { lng: 10.0, lat: 53.55 },
-          })
-          expect(wrapper.vm.popupOnLeaveTimeoutId).toBeNull()
-          jest.useRealTimers()
-        })
-
         it('removes existing popup before showing new one', () => {
           mapboxgl.__popupInstance.isOpen.mockReturnValueOnce(true)
           mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
@@ -621,20 +614,9 @@ describe('map', () => {
       })
 
       describe('mouseleave event', () => {
-        it('sets timeout to remove popup when open', () => {
-          jest.useFakeTimers()
-          mapboxgl.__popupInstance.isOpen.mockReturnValueOnce(true)
+        it('resets cursor style', () => {
           onEventMocks.mouseleave()
-          expect(wrapper.vm.popupOnLeaveTimeoutId).toBeTruthy()
-          jest.advanceTimersByTime(3000)
-          expect(mapboxgl.__popupInstance.remove).toHaveBeenCalled()
-          jest.useRealTimers()
-        })
-
-        it('does nothing when popup is not open', () => {
-          mapboxgl.__popupInstance.isOpen.mockReturnValueOnce(false)
-          onEventMocks.mouseleave()
-          expect(wrapper.vm.popupOnLeaveTimeoutId).toBeFalsy()
+          expect(mapMock.getCanvas().style.cursor).toBe('')
         })
       })
 

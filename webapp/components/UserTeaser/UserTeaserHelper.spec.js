@@ -2,6 +2,12 @@ import { render, waitFor, fireEvent } from '@testing-library/vue'
 import { RouterLinkStub } from '@vue/test-utils'
 import UserTeaserHelper from './UserTeaserHelper.vue'
 
+const mockMatchMediaListeners = []
+window.matchMedia = jest.fn().mockImplementation(() => ({
+  addEventListener: jest.fn((event, handler) => mockMatchMediaListeners.push(handler)),
+  removeEventListener: jest.fn(),
+}))
+
 const localVue = global.localVue
 
 const userLink = {
