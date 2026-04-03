@@ -23,9 +23,11 @@
     :responsive-breakpoint="responsiveBreakpoint"
     :single-room="singleRoom"
     show-reaction-emojis="false"
+    custom-search-room-enabled="true"
     @send-message="sendMessage($event.detail[0])"
     @fetch-messages="fetchMessages($event.detail[0])"
-    @fetch-more-rooms="fetchRooms"
+    @fetch-more-rooms="fetchMoreRooms"
+    @search-room="searchRooms($event.detail[0])"
     @add-room="toggleUserSearch"
     @open-user-tag="redirectToUserProfile($event.detail[0])"
     @open-file="openFile($event.detail[0].file.file)"
@@ -180,6 +182,7 @@ export default {
       roomsLoaded: false,
       roomCursor: null,
       roomPageSize: 10,
+      roomSearch: '',
       selectedRoom: null,
       activeRoomId: null,
       loadingRooms: true,
@@ -519,12 +522,12 @@ export default {
       })
     },
 
-    async fetchRooms({ room } = {}) {
+    async fetchRooms({ room, search } = {}) {
       this.roomsLoaded = false
       try {
         const variables = room?.id
           ? { id: room.id }
-          : { first: this.roomPageSize, before: this.roomCursor }
+          : { first: this.roomPageSize, before: this.roomCursor, ...(search && { search }) }
 
         const {
           data: { Room },
@@ -541,7 +544,6 @@ export default {
         this.rooms = [...this.rooms, ...newRooms]
 
         if (!room?.id && Room.length > 0) {
-          // Update cursor to the oldest room's sort date
           const lastRoom = Room[Room.length - 1]
           this.roomCursor = lastRoom.lastMessageAt || lastRoom.createdAt
         }
@@ -557,8 +559,19 @@ export default {
         this.rooms = []
         this.$toast.error(error.message)
       }
-      // must be set false after initial rooms are loaded and never changed again
       this.loadingRooms = false
+    },
+
+    async searchRooms(event) {
+      const value = typeof event === 'string' ? event : event?.value
+      this.roomSearch = value || ''
+      this.rooms = []
+      this.roomCursor = null
+      await this.fetchRooms({ search: this.roomSearch || undefined })
+    },
+
+    fetchMoreRooms() {
+      this.fetchRooms({ search: this.roomSearch || undefined })
     },
 
     async fetchMessages({ room, options = {} }) {
