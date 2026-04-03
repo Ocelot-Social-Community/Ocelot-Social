@@ -54,7 +54,8 @@
                 <td class="ds-table-col ds-table-col-right">{{ entry.postsCount }}</td>
                 <td class="ds-table-col ds-table-col-right">{{ entry.commentsCount }}</td>
                 <td class="ds-table-col">
-                  {{ entry.lastActivity ? $options.filters.dateTime(entry.lastActivity) : $t('admin.api-keys.never') }}
+                  <date-time v-if="entry.lastActivity" :date-time="entry.lastActivity" />
+                  <template v-else>{{ $t('admin.api-keys.never') }}</template>
                 </td>
                 <td class="ds-table-col actions-cell">
                   <div class="action-buttons">
@@ -111,7 +112,8 @@
                             </td>
                             <td class="ds-table-col"><code>{{ key.keyPrefix }}...</code></td>
                             <td class="ds-table-col">
-                              {{ key.lastUsedAt ? $options.filters.dateTime(key.lastUsedAt) : $t('admin.api-keys.never') }}
+                              <date-time v-if="key.lastUsedAt" :date-time="key.lastUsedAt" />
+                              <template v-else>{{ $t('admin.api-keys.never') }}</template>
                             </td>
                             <td class="ds-table-col">
                               <os-button
@@ -148,10 +150,12 @@
                             <td class="ds-table-col">{{ key.name }}</td>
                             <td class="ds-table-col"><code>{{ key.keyPrefix }}...</code></td>
                             <td class="ds-table-col">
-                              {{ key.disabledAt ? $options.filters.dateTime(key.disabledAt) : '–' }}
+                              <date-time v-if="key.disabledAt" :date-time="key.disabledAt" />
+                              <template v-else>–</template>
                             </td>
                             <td class="ds-table-col">
-                              {{ key.lastUsedAt ? $options.filters.dateTime(key.lastUsedAt) : $t('admin.api-keys.never') }}
+                              <date-time v-if="key.lastUsedAt" :date-time="key.lastUsedAt" />
+                              <template v-else>{{ $t('admin.api-keys.never') }}</template>
                             </td>
                           </tr>
                         </tbody>
@@ -183,6 +187,7 @@ import { OsButton, OsCard, OsIcon, OsSpinner } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
+import DateTime from '~/components/DateTime'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import {
   apiKeyUsersQuery,
@@ -199,6 +204,7 @@ export default {
     OsSpinner,
     PaginationButtons,
     ConfirmModal,
+    DateTime,
     UserTeaser,
   },
   created() {

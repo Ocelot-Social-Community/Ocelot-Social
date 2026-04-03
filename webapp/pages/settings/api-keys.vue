@@ -100,14 +100,15 @@
                   <span class="status-label">{{ $t('settings.api-keys.list.expired') }}</span>
                 </template>
                 <template v-else-if="key.expiresAt">
-                  {{ key.expiresAt | dateTime }}
+                  <date-time :date-time="key.expiresAt" />
                 </template>
                 <template v-else>
                   {{ $t('settings.api-keys.list.never-expires') }}
                 </template>
               </td>
               <td class="ds-table-col">
-                {{ key.lastUsedAt ? $options.filters.dateTime(key.lastUsedAt) : $t('settings.api-keys.list.never') }}
+                <date-time v-if="key.lastUsedAt" :date-time="key.lastUsedAt" />
+                <template v-else>{{ $t('settings.api-keys.list.never') }}</template>
               </td>
               <td class="ds-table-col">
                 <os-button
@@ -173,10 +174,12 @@
                   <code>{{ key.keyPrefix }}...</code>
                 </td>
                 <td class="ds-table-col">
-                  {{ key.disabledAt ? $options.filters.dateTime(key.disabledAt) : '–' }}
+                  <date-time v-if="key.disabledAt" :date-time="key.disabledAt" />
+                  <template v-else>–</template>
                 </td>
                 <td class="ds-table-col">
-                  {{ key.lastUsedAt ? $options.filters.dateTime(key.lastUsedAt) : $t('settings.api-keys.list.never') }}
+                  <date-time v-if="key.lastUsedAt" :date-time="key.lastUsedAt" />
+                  <template v-else>{{ $t('settings.api-keys.list.never') }}</template>
                 </td>
                 <td class="ds-table-col">
                   <span class="status-label">{{ $t('settings.api-keys.list.revoked') }}</span>
@@ -202,6 +205,7 @@ import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import OcelotInput from '~/components/OcelotInput/OcelotInput'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
+import DateTime from '~/components/DateTime'
 import { myApiKeysQuery, createApiKeyMutation, revokeApiKeyMutation } from '~/graphql/settings/ApiKeys'
 import scrollToContent from './scroll-to-content.js'
 
@@ -213,6 +217,7 @@ export default {
     OsIcon,
     OcelotInput,
     ConfirmModal,
+    DateTime,
   },
   created() {
     this.icons = iconRegistry
