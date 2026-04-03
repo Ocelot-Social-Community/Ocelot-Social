@@ -1,0 +1,3 @@
+mutation adminRevokeApiKey($id: ID!) {
+  adminRevokeApiKey(id: $id)
+}

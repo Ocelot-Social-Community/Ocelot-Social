@@ -44,9 +44,8 @@ describe('decode', () => {
 
   describe('given API key with oak_ prefix', () => {
     describe('and valid API key in database', () => {
-      let user
       beforeEach(async () => {
-        user = await Factory.build('user', {
+        await Factory.build('user', {
           id: 'api-user',
           name: 'API User',
           slug: 'api-user',
@@ -86,7 +85,7 @@ describe('decode', () => {
       it('updates lastUsedAt on the API key', async () => {
         await decode(context)('Bearer oak_testkey123')
         // Give fire-and-forget time to complete
-        await new Promise((r) => setTimeout(r, 500))
+        await new Promise((resolve) => setTimeout(resolve, 500))
         const session = driver.session()
         const result = await session.readTransaction(async (tx) => {
           return tx.run(`MATCH (k:ApiKey { id: 'ak1' }) RETURN k.lastUsedAt AS lastUsedAt`)

@@ -1,0 +1,15 @@
+mutation createApiKey($name: String!, $expiresInDays: Int) {
+  createApiKey(name: $name, expiresInDays: $expiresInDays) {
+    apiKey {
+      id
+      name
+      keyPrefix
+      createdAt
+      expiresAt
+      disabled
+      disabledAt
+      lastUsedAt
+    }
+    secret
+  }
+}

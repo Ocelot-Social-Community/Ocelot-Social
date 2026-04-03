@@ -1,0 +1,14 @@
+query apiKeyUsers($first: Int, $offset: Int) {
+  apiKeyUsers(first: $first, offset: $offset) {
+    user {
+      id
+      name
+      slug
+    }
+    activeCount
+    revokedCount
+    postsCount
+    commentsCount
+    lastActivity
+  }
+}

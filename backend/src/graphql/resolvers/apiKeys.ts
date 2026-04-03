@@ -3,6 +3,16 @@ import { createHash, randomBytes } from 'node:crypto'
 import { v4 as uuid } from 'uuid'
 
 import type { Context } from '@src/context'
+import type { Integer, Record as Neo4jRecord } from 'neo4j-driver'
+
+interface ApiKeyArgs {
+  id?: string
+  name?: string
+  expiresInDays?: number
+  userId?: string
+  first?: number
+  offset?: number
+}
 
 function normalizeApiKey(raw: Record<string, unknown>) {
   return {
@@ -21,9 +31,17 @@ function generateApiKey(): { key: string; hash: string; prefix: string } {
   return { key, hash, prefix }
 }
 
+function toNumber(value: Integer | number): number {
+  return typeof value === 'number' ? value : value.toNumber()
+}
+
+function getRecord(record: Neo4jRecord, field: string): Record<string, unknown> {
+  return record.get(field) as Record<string, unknown>
+}
+
 export default {
   Query: {
-    myApiKeys: async (_parent, _args, context: Context) => {
+    myApiKeys: async (_parent: unknown, _args: unknown, context: Context) => {
       const result = await context.database.query({
         query: `
           MATCH (u:User { id: $userId })-[:HAS_API_KEY]->(k:ApiKey)
@@ -32,12 +50,12 @@ export default {
         `,
         variables: { userId: context.user?.id },
       })
-      return result.records.map((r) => normalizeApiKey(r.get('k')))
+      return result.records.map((r: Neo4jRecord) => normalizeApiKey(getRecord(r, 'k')))
     },
 
-    apiKeyUsers: async (_parent, args, context: Context) => {
-      const first = (args.first as number) || 50
-      const offset = (args.offset as number) || 0
+    apiKeyUsers: async (_parent: unknown, args: ApiKeyArgs, context: Context) => {
+      const first = args.first || 50
+      const offset = args.offset || 0
 
       const result = await context.database.query({
         query: `
@@ -57,17 +75,17 @@ export default {
         `,
         variables: { offset, first },
       })
-      return result.records.map((r) => ({
-        user: r.get('user'),
-        activeCount: r.get('activeCount').toNumber(),
-        revokedCount: r.get('revokedCount').toNumber(),
-        postsCount: r.get('postsCount').toNumber(),
-        commentsCount: r.get('commentsCount').toNumber(),
-        lastActivity: r.get('lastActivity') ?? null,
+      return result.records.map((r: Neo4jRecord) => ({
+        user: r.get('user') as Record<string, unknown>,
+        activeCount: toNumber(r.get('activeCount') as Integer),
+        revokedCount: toNumber(r.get('revokedCount') as Integer),
+        postsCount: toNumber(r.get('postsCount') as Integer),
+        commentsCount: toNumber(r.get('commentsCount') as Integer),
+        lastActivity: (r.get('lastActivity') as string | null) ?? null,
       }))
     },
 
-    apiKeysForUser: async (_parent, args, context: Context) => {
+    apiKeysForUser: async (_parent: unknown, args: ApiKeyArgs, context: Context) => {
       const result = await context.database.query({
         query: `
           MATCH (u:User { id: $userId })-[:HAS_API_KEY]->(k:ApiKey)
@@ -76,12 +94,12 @@ export default {
         `,
         variables: { userId: args.userId },
       })
-      return result.records.map((r) => normalizeApiKey(r.get('k')))
+      return result.records.map((r: Neo4jRecord) => normalizeApiKey(getRecord(r, 'k')))
     },
   },
 
   Mutation: {
-    createApiKey: async (_parent, args, context: Context) => {
+    createApiKey: async (_parent: unknown, args: ApiKeyArgs, context: Context) => {
       if (!context.config.API_KEYS_ENABLED) {
         throw new Error('API keys are not enabled')
       }
@@ -94,16 +112,16 @@ export default {
         `,
         variables: { userId: context.user?.id },
       })
-      const count = countResult.records[0].get('count').toNumber()
+      const count = toNumber(countResult.records[0].get('count') as Integer)
       if (count >= context.config.API_KEYS_MAX_PER_USER) {
         throw new Error(
-          `Maximum of ${context.config.API_KEYS_MAX_PER_USER} active API keys reached`,
+          `Maximum of ${String(context.config.API_KEYS_MAX_PER_USER)} active API keys reached`,
         )
       }
 
       let expiresAt: string | null = null
       if (args.expiresInDays) {
-        expiresAt = new Date(Date.now() + (args.expiresInDays as number) * 86400000).toISOString()
+        expiresAt = new Date(Date.now() + args.expiresInDays * 86400000).toISOString()
       }
 
       const { key, hash, prefix } = generateApiKey()
@@ -134,12 +152,12 @@ export default {
       })
 
       return {
-        apiKey: normalizeApiKey(result.records[0].get('k')),
+        apiKey: normalizeApiKey(getRecord(result.records[0], 'k')),
         secret: key,
       }
     },
 
-    updateApiKey: async (_parent, args, context: Context) => {
+    updateApiKey: async (_parent: unknown, args: ApiKeyArgs, context: Context) => {
       const result = await context.database.write({
         query: `
           MATCH (u:User { id: $userId })-[:HAS_API_KEY]->(k:ApiKey { id: $keyId })
@@ -151,10 +169,10 @@ export default {
       if (result.records.length === 0) {
         throw new Error('API key not found')
       }
-      return normalizeApiKey(result.records[0].get('k'))
+      return normalizeApiKey(getRecord(result.records[0], 'k'))
     },
 
-    revokeApiKey: async (_parent, args, context: Context) => {
+    revokeApiKey: async (_parent: unknown, args: ApiKeyArgs, context: Context) => {
       const result = await context.database.write({
         query: `
           MATCH (u:User { id: $userId })-[:HAS_API_KEY]->(k:ApiKey { id: $keyId })
@@ -166,7 +184,7 @@ export default {
       return result.records.length > 0
     },
 
-    adminRevokeApiKey: async (_parent, args, context: Context) => {
+    adminRevokeApiKey: async (_parent: unknown, args: ApiKeyArgs, context: Context) => {
       const result = await context.database.write({
         query: `
           MATCH (k:ApiKey { id: $keyId })
@@ -178,7 +196,7 @@ export default {
       return result.records.length > 0
     },
 
-    adminRevokeUserApiKeys: async (_parent, args, context: Context) => {
+    adminRevokeUserApiKeys: async (_parent: unknown, args: ApiKeyArgs, context: Context) => {
       const result = await context.database.write({
         query: `
           MATCH (u:User { id: $userId })-[:HAS_API_KEY]->(k:ApiKey)
@@ -188,7 +206,7 @@ export default {
         `,
         variables: { userId: args.userId },
       })
-      return result.records[0].get('count').toNumber()
+      return toNumber(result.records[0].get('count') as Integer)
     },
   },
 }

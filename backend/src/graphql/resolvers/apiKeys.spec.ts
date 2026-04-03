@@ -1,9 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import gql from 'graphql-tag'
-
 import { cleanDatabase } from '@db/factories'
+import adminRevokeApiKey from '@graphql/queries/apiKeys/adminRevokeApiKey.gql'
+import adminRevokeUserApiKeys from '@graphql/queries/apiKeys/adminRevokeUserApiKeys.gql'
+import apiKeysForUser from '@graphql/queries/apiKeys/apiKeysForUser.gql'
+import apiKeyUsers from '@graphql/queries/apiKeys/apiKeyUsers.gql'
+import createApiKey from '@graphql/queries/apiKeys/createApiKey.gql'
+import myApiKeys from '@graphql/queries/apiKeys/myApiKeys.gql'
+import revokeApiKey from '@graphql/queries/apiKeys/revokeApiKey.gql'
+import updateApiKey from '@graphql/queries/apiKeys/updateApiKey.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
@@ -18,96 +23,6 @@ let query: ApolloTestSetup['query']
 let mutate: ApolloTestSetup['mutate']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
-
-const CREATE_API_KEY = gql`
-  mutation ($name: String!, $expiresInDays: Int) {
-    createApiKey(name: $name, expiresInDays: $expiresInDays) {
-      apiKey {
-        id
-        name
-        keyPrefix
-        createdAt
-        expiresAt
-        disabled
-        disabledAt
-        lastUsedAt
-      }
-      secret
-    }
-  }
-`
-const MY_API_KEYS = gql`
-  query {
-    myApiKeys {
-      id
-      name
-      keyPrefix
-      createdAt
-      lastUsedAt
-      expiresAt
-      disabled
-      disabledAt
-    }
-  }
-`
-const REVOKE_API_KEY = gql`
-  mutation ($id: ID!) {
-    revokeApiKey(id: $id)
-  }
-`
-const UPDATE_API_KEY = gql`
-  mutation ($id: ID!, $name: String!) {
-    updateApiKey(id: $id, name: $name) {
-      id
-      name
-      keyPrefix
-      lastUsedAt
-      expiresAt
-      disabled
-      disabledAt
-    }
-  }
-`
-const ADMIN_REVOKE_API_KEY = gql`
-  mutation ($id: ID!) {
-    adminRevokeApiKey(id: $id)
-  }
-`
-const ADMIN_REVOKE_USER_API_KEYS = gql`
-  mutation ($userId: ID!) {
-    adminRevokeUserApiKeys(userId: $userId)
-  }
-`
-const API_KEY_USERS = gql`
-  query ($first: Int, $offset: Int) {
-    apiKeyUsers(first: $first, offset: $offset) {
-      user {
-        id
-        name
-        slug
-      }
-      activeCount
-      revokedCount
-      postsCount
-      commentsCount
-      lastActivity
-    }
-  }
-`
-const API_KEYS_FOR_USER = gql`
-  query ($userId: ID!) {
-    apiKeysForUser(userId: $userId) {
-      id
-      name
-      keyPrefix
-      createdAt
-      lastUsedAt
-      expiresAt
-      disabled
-      disabledAt
-    }
-  }
-`
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -137,7 +52,7 @@ describe('createApiKey', () => {
 
     it('throws authorization error', async () => {
       const { errors } = await mutate({
-        mutation: CREATE_API_KEY,
+        mutation: createApiKey,
         variables: { name: 'Test Key' },
       })
       expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -157,7 +72,7 @@ describe('createApiKey', () => {
 
     it('creates an API key and returns secret with oak_ prefix', async () => {
       const { data, errors } = await mutate({
-        mutation: CREATE_API_KEY,
+        mutation: createApiKey,
         variables: { name: 'My CI Key' },
       })
       expect(errors).toBeUndefined()
@@ -175,7 +90,7 @@ describe('createApiKey', () => {
 
     it('creates a key with expiry', async () => {
       const { data, errors } = await mutate({
-        mutation: CREATE_API_KEY,
+        mutation: createApiKey,
         variables: { name: 'Expiring Key', expiresInDays: 30 },
       })
       expect(errors).toBeUndefined()
@@ -184,7 +99,7 @@ describe('createApiKey', () => {
 
     it('creates a key without expiry', async () => {
       const { data, errors } = await mutate({
-        mutation: CREATE_API_KEY,
+        mutation: createApiKey,
         variables: { name: 'Permanent Key' },
       })
       expect(errors).toBeUndefined()
@@ -192,24 +107,24 @@ describe('createApiKey', () => {
     })
 
     it('enforces max keys per user', async () => {
-      await mutate({ mutation: CREATE_API_KEY, variables: { name: 'Key 1' } })
-      await mutate({ mutation: CREATE_API_KEY, variables: { name: 'Key 2' } })
-      await mutate({ mutation: CREATE_API_KEY, variables: { name: 'Key 3' } })
+      await mutate({ mutation: createApiKey, variables: { name: 'Key 1' } })
+      await mutate({ mutation: createApiKey, variables: { name: 'Key 2' } })
+      await mutate({ mutation: createApiKey, variables: { name: 'Key 3' } })
       const { errors } = await mutate({
-        mutation: CREATE_API_KEY,
+        mutation: createApiKey,
         variables: { name: 'Key 4' },
       })
       expect(errors?.[0].message).toContain('Maximum of 3 active API keys reached')
     })
 
     it('does not count revoked keys towards the limit', async () => {
-      const { data: k1 } = await mutate({ mutation: CREATE_API_KEY, variables: { name: 'Key 1' } })
-      await mutate({ mutation: CREATE_API_KEY, variables: { name: 'Key 2' } })
-      await mutate({ mutation: CREATE_API_KEY, variables: { name: 'Key 3' } })
+      const { data: k1 } = await mutate({ mutation: createApiKey, variables: { name: 'Key 1' } })
+      await mutate({ mutation: createApiKey, variables: { name: 'Key 2' } })
+      await mutate({ mutation: createApiKey, variables: { name: 'Key 3' } })
       // Revoke one
-      await mutate({ mutation: REVOKE_API_KEY, variables: { id: k1.createApiKey.apiKey.id } })
+      await mutate({ mutation: revokeApiKey, variables: { id: k1.createApiKey.apiKey.id } })
       // Should succeed now
-      const { errors } = await mutate({ mutation: CREATE_API_KEY, variables: { name: 'Key 4' } })
+      const { errors } = await mutate({ mutation: createApiKey, variables: { name: 'Key 4' } })
       expect(errors).toBeUndefined()
     })
   })
@@ -229,7 +144,7 @@ describe('createApiKey', () => {
       })
       const setup = await createApolloTestSetup({ context: contextDisabled })
       const { errors } = await setup.mutate({
-        mutation: CREATE_API_KEY,
+        mutation: createApiKey,
         variables: { name: 'Should Fail' },
       })
       expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -252,15 +167,15 @@ describe('myApiKeys', () => {
   })
 
   it('returns empty list when no keys exist', async () => {
-    const { data, errors } = await query({ query: MY_API_KEYS })
+    const { data, errors } = await query({ query: myApiKeys })
     expect(errors).toBeUndefined()
     expect(data.myApiKeys).toEqual([])
   })
 
   it('returns created keys ordered by createdAt desc', async () => {
-    await mutate({ mutation: CREATE_API_KEY, variables: { name: 'Key A' } })
-    await mutate({ mutation: CREATE_API_KEY, variables: { name: 'Key B' } })
-    const { data, errors } = await query({ query: MY_API_KEYS })
+    await mutate({ mutation: createApiKey, variables: { name: 'Key A' } })
+    await mutate({ mutation: createApiKey, variables: { name: 'Key B' } })
+    const { data, errors } = await query({ query: myApiKeys })
     expect(errors).toBeUndefined()
     expect(data.myApiKeys).toHaveLength(2)
     // Most recent first
@@ -270,11 +185,11 @@ describe('myApiKeys', () => {
 
   it('includes revoked keys', async () => {
     const { data: created } = await mutate({
-      mutation: CREATE_API_KEY,
+      mutation: createApiKey,
       variables: { name: 'To Revoke' },
     })
-    await mutate({ mutation: REVOKE_API_KEY, variables: { id: created.createApiKey.apiKey.id } })
-    const { data } = await query({ query: MY_API_KEYS })
+    await mutate({ mutation: revokeApiKey, variables: { id: created.createApiKey.apiKey.id } })
+    const { data } = await query({ query: myApiKeys })
     expect(data.myApiKeys).toHaveLength(1)
     expect(data.myApiKeys[0].disabled).toBe(true)
     expect(data.myApiKeys[0].disabledAt).toBeTruthy()
@@ -292,13 +207,13 @@ describe('updateApiKey', () => {
       role: 'user',
     })
     authenticatedUser = (await user.toJson()) as Context['user']
-    const { data } = await mutate({ mutation: CREATE_API_KEY, variables: { name: 'Original' } })
+    const { data } = await mutate({ mutation: createApiKey, variables: { name: 'Original' } })
     keyId = data.createApiKey.apiKey.id
   })
 
   it('renames a key', async () => {
     const { data, errors } = await mutate({
-      mutation: UPDATE_API_KEY,
+      mutation: updateApiKey,
       variables: { id: keyId, name: 'Renamed' },
     })
     expect(errors).toBeUndefined()
@@ -307,7 +222,7 @@ describe('updateApiKey', () => {
 
   it('throws error for nonexistent key', async () => {
     const { errors } = await mutate({
-      mutation: UPDATE_API_KEY,
+      mutation: updateApiKey,
       variables: { id: 'nonexistent', name: 'Fail' },
     })
     expect(errors?.[0].message).toContain('API key not found')
@@ -325,26 +240,26 @@ describe('revokeApiKey', () => {
       role: 'user',
     })
     authenticatedUser = (await user.toJson()) as Context['user']
-    const { data } = await mutate({ mutation: CREATE_API_KEY, variables: { name: 'To Revoke' } })
+    const { data } = await mutate({ mutation: createApiKey, variables: { name: 'To Revoke' } })
     keyId = data.createApiKey.apiKey.id
   })
 
   it('revokes own key', async () => {
-    const { data, errors } = await mutate({ mutation: REVOKE_API_KEY, variables: { id: keyId } })
+    const { data, errors } = await mutate({ mutation: revokeApiKey, variables: { id: keyId } })
     expect(errors).toBeUndefined()
     expect(data.revokeApiKey).toBe(true)
   })
 
   it('sets disabledAt on revoked key', async () => {
-    await mutate({ mutation: REVOKE_API_KEY, variables: { id: keyId } })
-    const { data } = await query({ query: MY_API_KEYS })
+    await mutate({ mutation: revokeApiKey, variables: { id: keyId } })
+    const { data } = await query({ query: myApiKeys })
     const revoked = data.myApiKeys.find((k) => k.id === keyId)
     expect(revoked.disabled).toBe(true)
     expect(revoked.disabledAt).toBeTruthy()
   })
 
   it('returns false for nonexistent key', async () => {
-    const { data } = await mutate({ mutation: REVOKE_API_KEY, variables: { id: 'nonexistent' } })
+    const { data } = await mutate({ mutation: revokeApiKey, variables: { id: 'nonexistent' } })
     expect(data.revokeApiKey).toBe(false)
   })
 })
@@ -367,21 +282,21 @@ describe('admin operations', () => {
       role: 'admin',
     })
     authenticatedUser = (await regularUser.toJson()) as Context['user']
-    const { data } = await mutate({ mutation: CREATE_API_KEY, variables: { name: 'Regular Key' } })
+    const { data } = await mutate({ mutation: createApiKey, variables: { name: 'Regular Key' } })
     keyId = data.createApiKey.apiKey.id
   })
 
   describe('adminRevokeApiKey', () => {
     it('non-admin cannot revoke', async () => {
       authenticatedUser = (await regularUser.toJson()) as Context['user']
-      const { errors } = await mutate({ mutation: ADMIN_REVOKE_API_KEY, variables: { id: keyId } })
+      const { errors } = await mutate({ mutation: adminRevokeApiKey, variables: { id: keyId } })
       expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
 
     it('admin can revoke any key', async () => {
       authenticatedUser = (await adminUser.toJson()) as Context['user']
       const { data, errors } = await mutate({
-        mutation: ADMIN_REVOKE_API_KEY,
+        mutation: adminRevokeApiKey,
         variables: { id: keyId },
       })
       expect(errors).toBeUndefined()
@@ -392,13 +307,13 @@ describe('admin operations', () => {
   describe('adminRevokeUserApiKeys', () => {
     beforeEach(async () => {
       authenticatedUser = (await regularUser.toJson()) as Context['user']
-      await mutate({ mutation: CREATE_API_KEY, variables: { name: 'Key 2' } })
+      await mutate({ mutation: createApiKey, variables: { name: 'Key 2' } })
     })
 
     it('non-admin cannot bulk revoke', async () => {
       authenticatedUser = (await regularUser.toJson()) as Context['user']
       const { errors } = await mutate({
-        mutation: ADMIN_REVOKE_USER_API_KEYS,
+        mutation: adminRevokeUserApiKeys,
         variables: { userId: 'u-regular' },
       })
       expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -407,7 +322,7 @@ describe('admin operations', () => {
     it('admin can revoke all keys of a user', async () => {
       authenticatedUser = (await adminUser.toJson()) as Context['user']
       const { data, errors } = await mutate({
-        mutation: ADMIN_REVOKE_USER_API_KEYS,
+        mutation: adminRevokeUserApiKeys,
         variables: { userId: 'u-regular' },
       })
       expect(errors).toBeUndefined()
@@ -417,7 +332,7 @@ describe('admin operations', () => {
     it('returns 0 when user has no active keys', async () => {
       authenticatedUser = (await adminUser.toJson()) as Context['user']
       const { data } = await mutate({
-        mutation: ADMIN_REVOKE_USER_API_KEYS,
+        mutation: adminRevokeUserApiKeys,
         variables: { userId: 'u-admin' },
       })
       expect(data.adminRevokeUserApiKeys).toBe(0)
@@ -427,14 +342,14 @@ describe('admin operations', () => {
   describe('apiKeyUsers', () => {
     it('non-admin cannot access', async () => {
       authenticatedUser = (await regularUser.toJson()) as Context['user']
-      const { errors } = await query({ query: API_KEY_USERS, variables: { first: 10, offset: 0 } })
+      const { errors } = await query({ query: apiKeyUsers, variables: { first: 10, offset: 0 } })
       expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
 
     it('admin sees users with key stats', async () => {
       authenticatedUser = (await adminUser.toJson()) as Context['user']
       const { data, errors } = await query({
-        query: API_KEY_USERS,
+        query: apiKeyUsers,
         variables: { first: 10, offset: 0 },
       })
       expect(errors).toBeUndefined()
@@ -450,8 +365,8 @@ describe('admin operations', () => {
     it('counts active and revoked keys correctly', async () => {
       // Revoke one of regular's keys
       authenticatedUser = (await adminUser.toJson()) as Context['user']
-      await mutate({ mutation: ADMIN_REVOKE_API_KEY, variables: { id: keyId } })
-      const { data } = await query({ query: API_KEY_USERS, variables: { first: 10, offset: 0 } })
+      await mutate({ mutation: adminRevokeApiKey, variables: { id: keyId } })
+      const { data } = await query({ query: apiKeyUsers, variables: { first: 10, offset: 0 } })
       const entry = data.apiKeyUsers.find((e) => e.user.id === 'u-regular')
       expect(entry.activeCount).toBe(1)
       expect(entry.revokedCount).toBe(1)
@@ -459,7 +374,7 @@ describe('admin operations', () => {
 
     it('supports pagination', async () => {
       authenticatedUser = (await adminUser.toJson()) as Context['user']
-      const { data } = await query({ query: API_KEY_USERS, variables: { first: 1, offset: 0 } })
+      const { data } = await query({ query: apiKeyUsers, variables: { first: 1, offset: 0 } })
       expect(data.apiKeyUsers).toHaveLength(1)
     })
   })
@@ -468,7 +383,7 @@ describe('admin operations', () => {
     it('non-admin cannot access', async () => {
       authenticatedUser = (await regularUser.toJson()) as Context['user']
       const { errors } = await query({
-        query: API_KEYS_FOR_USER,
+        query: apiKeysForUser,
         variables: { userId: 'u-regular' },
       })
       expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -477,7 +392,7 @@ describe('admin operations', () => {
     it('admin sees all keys for a user', async () => {
       authenticatedUser = (await adminUser.toJson()) as Context['user']
       const { data, errors } = await query({
-        query: API_KEYS_FOR_USER,
+        query: apiKeysForUser,
         variables: { userId: 'u-regular' },
       })
       expect(errors).toBeUndefined()
@@ -495,15 +410,15 @@ describe('admin operations', () => {
 
     it('returns active keys before revoked keys', async () => {
       authenticatedUser = (await adminUser.toJson()) as Context['user']
-      await mutate({ mutation: ADMIN_REVOKE_API_KEY, variables: { id: keyId } })
-      const { data } = await query({ query: API_KEYS_FOR_USER, variables: { userId: 'u-regular' } })
+      await mutate({ mutation: adminRevokeApiKey, variables: { id: keyId } })
+      const { data } = await query({ query: apiKeysForUser, variables: { userId: 'u-regular' } })
       expect(data.apiKeysForUser[0].disabled).toBe(false)
       expect(data.apiKeysForUser[1].disabled).toBe(true)
     })
 
     it('returns empty array for user without keys', async () => {
       authenticatedUser = (await adminUser.toJson()) as Context['user']
-      const { data } = await query({ query: API_KEYS_FOR_USER, variables: { userId: 'u-admin' } })
+      const { data } = await query({ query: apiKeysForUser, variables: { userId: 'u-admin' } })
       expect(data.apiKeysForUser).toEqual([])
     })
   })

@@ -80,7 +80,7 @@ const decodeApiKey = async (driver: Driver, key: string): Promise<DecodedUser | 
     if (result.records.length === 0) return null
 
     const record = result.records[0]
-    const user = record.get('user')
+    const user = record.get('user') as DecodedUser
     const keyId = record.get('keyId') as string
 
     // Update lastUsedAt asynchronously (non-blocking, separate session)

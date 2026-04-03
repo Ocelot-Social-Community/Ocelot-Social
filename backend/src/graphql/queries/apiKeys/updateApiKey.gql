@@ -1,0 +1,11 @@
+mutation updateApiKey($id: ID!, $name: String!) {
+  updateApiKey(id: $id, name: $name) {
+    id
+    name
+    keyPrefix
+    lastUsedAt
+    expiresAt
+    disabled
+    disabledAt
+  }
+}
