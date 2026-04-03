@@ -42,7 +42,7 @@
               <span :style="{ color: type.color }">
                 <os-icon
                   :icon="icons.mapPinFilled"
-                  size="lg"
+                  size="xl"
                   :aria-label="$t('map.legend.' + type.id)"
                 />
               </span>
@@ -740,6 +740,8 @@ export default {
   flex-direction: column;
   overflow: hidden;
   z-index: 1;
+  font-family: $font-family-text;
+  font-size: $font-size-base;
 }
 
 .mgl-map-wrapper {
@@ -766,14 +768,14 @@ export default {
 }
 
 .mapboxgl-popup-close-button {
-  font-size: 1.2rem;
+  font-size: $font-size-large;
   padding: 2px 6px;
   z-index: 1;
 }
 
 .map-popup-header {
   font-weight: bold;
-  font-size: 1.1em;
+  font-size: $font-size-large;
   margin-bottom: 4px;
   padding-right: 16px;
   flex-shrink: 0;
@@ -853,7 +855,7 @@ export default {
   backdrop-filter: blur(4px);
   border-radius: $border-radius-x-large;
   z-index: 1;
-  font-size: 0.8rem;
+  font-size: $font-size-base;
   color: $color-neutral-10;
 }
 
@@ -866,7 +868,7 @@ export default {
   color: $color-neutral-10;
   border-radius: $border-radius-x-large;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: $font-size-base;
   text-align: left;
   order: 1;
 
@@ -878,7 +880,7 @@ export default {
 
 .map-legend-arrow {
   float: right;
-  font-size: 0.7rem;
+  font-size: $font-size-small;
 }
 
 .map-legend-content {
@@ -958,7 +960,7 @@ export default {
   border: none;
   background: none;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: $font-size-base;
   text-align: left;
 
   &:not(:last-child) {
