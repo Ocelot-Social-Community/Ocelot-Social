@@ -16,7 +16,7 @@
     </os-card>
 
     <os-card v-if="apiKeyUsers && apiKeyUsers.length">
-      <div class="ds-table-wrap">
+      <div class="ds-table-wrap table-no-clip">
         <table class="ds-table ds-table-condensed ds-table-bordered">
           <thead>
             <tr>
@@ -56,7 +56,7 @@
                 <td class="ds-table-col">
                   {{ entry.lastActivity ? $options.filters.dateTime(entry.lastActivity) : $t('admin.api-keys.never') }}
                 </td>
-                <td class="ds-table-col">
+                <td class="ds-table-col actions-cell">
                   <div class="action-buttons">
                     <os-button
                       variant="primary"
@@ -364,19 +364,14 @@ export default {
   background-color: $background-color-base;
 }
 
+.table-no-clip {
+  overflow: visible;
+}
+
 .action-buttons {
   display: flex;
   gap: $space-xx-small;
   align-items: center;
-}
-
-.ds-table-wrap {
-  overflow: visible;
-}
-
-.ds-table {
-  width: auto;
-  min-width: 100%;
 }
 
 .detail-cell {
@@ -391,5 +386,4 @@ export default {
 .revoked-heading {
   color: $text-color-soft;
 }
-
 </style>
