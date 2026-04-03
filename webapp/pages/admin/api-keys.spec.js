@@ -294,7 +294,7 @@ describe('admin/api-keys.vue', () => {
     it('shows error toast on failure', async () => {
       mutateMock.mockRejectedValue(new Error('Revoke failed'))
       wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
-      await wrapper.vm.revokeKey('ak1', 'u1')
+      await expect(wrapper.vm.revokeKey('ak1', 'u1')).rejects.toThrow('Revoke failed')
       await flushPromises()
       expect(mocks.$toast.error).toHaveBeenCalledWith('Revoke failed')
     })
@@ -333,7 +333,7 @@ describe('admin/api-keys.vue', () => {
     it('shows error toast on failure', async () => {
       mutateMock.mockRejectedValue(new Error('Bulk revoke failed'))
       wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
-      await wrapper.vm.revokeAllKeys('u1', 'Peter')
+      await expect(wrapper.vm.revokeAllKeys('u1', 'Peter')).rejects.toThrow('Bulk revoke failed')
       await flushPromises()
       expect(mocks.$toast.error).toHaveBeenCalledWith('Bulk revoke failed')
     })
