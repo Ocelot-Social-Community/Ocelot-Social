@@ -1138,9 +1138,7 @@ export default {
 
 .room-name-with-icon {
   color: var(--chat-room-color-username);
-  font-size: 14px;
   font-weight: 500;
-  line-height: 22px;
 }
 
 .vac-message-avatar {
