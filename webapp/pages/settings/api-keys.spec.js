@@ -187,10 +187,10 @@ describe('settings/api-keys.vue', () => {
       expect(submitBtn.attributes('disabled')).toBeDefined()
     })
 
-    it('submit button is disabled when limit reached', () => {
+    it('submit button is disabled when limit reached', async () => {
       const keys = Array.from({ length: 5 }, (_, i) => activeKey({ id: `k${i}`, name: `Key ${i}` }))
       wrapper = Wrapper({ myApiKeys: keys })
-      wrapper.setData({ name: 'New Key' })
+      await wrapper.setData({ name: 'New Key' })
       const submitBtn = wrapper.find('button[type="submit"]')
       expect(submitBtn.attributes('disabled')).toBeDefined()
     })
@@ -206,13 +206,13 @@ describe('settings/api-keys.vue', () => {
       expect(wrapper.text()).not.toContain('settings.api-keys.create.limit-reached')
     })
 
-    it('does not count revoked keys toward the limit', () => {
+    it('does not count revoked keys toward the limit', async () => {
       const keys = [
         ...Array.from({ length: 4 }, (_, i) => activeKey({ id: `k${i}`, name: `Key ${i}` })),
         revokedKey(),
       ]
       wrapper = Wrapper({ myApiKeys: keys })
-      wrapper.setData({ name: 'New Key' })
+      await wrapper.setData({ name: 'New Key' })
       const submitBtn = wrapper.find('button[type="submit"]')
       expect(submitBtn.attributes('disabled')).toBeUndefined()
       expect(wrapper.text()).not.toContain('settings.api-keys.create.limit-reached')
@@ -220,7 +220,7 @@ describe('settings/api-keys.vue', () => {
 
     it('calls createApiKey mutation on submit', async () => {
       wrapper = Wrapper()
-      wrapper.setData({ name: 'My Key' })
+      await wrapper.setData({ name: 'My Key' })
       await wrapper.find('form').trigger('submit')
       await flushPromises()
       expect(mutateMock).toHaveBeenCalledTimes(1)
@@ -233,7 +233,7 @@ describe('settings/api-keys.vue', () => {
 
     it('sends expiresInDays as number when selected', async () => {
       wrapper = Wrapper()
-      wrapper.setData({ name: 'Expiring', expiresInDays: 30 })
+      await wrapper.setData({ name: 'Expiring', expiresInDays: 30 })
       await wrapper.find('form').trigger('submit')
       await flushPromises()
       expect(mutateMock).toHaveBeenCalledWith(
@@ -245,7 +245,7 @@ describe('settings/api-keys.vue', () => {
 
     it('does not send expiresInDays when null', async () => {
       wrapper = Wrapper()
-      wrapper.setData({ name: 'No Expiry', expiresInDays: null })
+      await wrapper.setData({ name: 'No Expiry', expiresInDays: null })
       await wrapper.find('form').trigger('submit')
       await flushPromises()
       expect(mutateMock).toHaveBeenCalledWith(
@@ -257,7 +257,7 @@ describe('settings/api-keys.vue', () => {
 
     it('shows secret banner after creation', async () => {
       wrapper = Wrapper()
-      wrapper.setData({ name: 'My Key' })
+      await wrapper.setData({ name: 'My Key' })
       await wrapper.find('form').trigger('submit')
       await flushPromises()
       expect(wrapper.vm.newSecret).toBe('oak_fullsecretkey123')
@@ -268,7 +268,7 @@ describe('settings/api-keys.vue', () => {
 
     it('refetches key list after creation', async () => {
       wrapper = Wrapper()
-      wrapper.setData({ name: 'My Key' })
+      await wrapper.setData({ name: 'My Key' })
       await wrapper.find('form').trigger('submit')
       await flushPromises()
       expect(refetchMock).toHaveBeenCalled()
@@ -276,7 +276,7 @@ describe('settings/api-keys.vue', () => {
 
     it('shows success toast', async () => {
       wrapper = Wrapper()
-      wrapper.setData({ name: 'My Key' })
+      await wrapper.setData({ name: 'My Key' })
       await wrapper.find('form').trigger('submit')
       await flushPromises()
       expect(mocks.$toast.success).toHaveBeenCalledWith('settings.api-keys.create.success')
@@ -284,7 +284,7 @@ describe('settings/api-keys.vue', () => {
 
     it('resets form after creation', async () => {
       wrapper = Wrapper()
-      wrapper.setData({ name: 'My Key', expiresInDays: 90 })
+      await wrapper.setData({ name: 'My Key', expiresInDays: 90 })
       await wrapper.find('form').trigger('submit')
       await flushPromises()
       expect(wrapper.vm.name).toBe('')
@@ -294,7 +294,7 @@ describe('settings/api-keys.vue', () => {
     it('shows error toast on failure', async () => {
       mutateMock.mockRejectedValue(new Error('Maximum of 5 active API keys reached'))
       wrapper = Wrapper()
-      wrapper.setData({ name: 'Too Many' })
+      await wrapper.setData({ name: 'Too Many' })
       await wrapper.find('form').trigger('submit')
       await flushPromises()
       expect(mocks.$toast.error).toHaveBeenCalledWith('Maximum of 5 active API keys reached')
