@@ -873,6 +873,23 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       variables: {},
     })
 
+    // API Key for Huey (user) — active, all his posts created via this key
+    await database.write({
+      query: `MATCH (u:User { id: 'u4' })
+              CREATE (u)-[:HAS_API_KEY]->(k:ApiKey {
+                id: 'ak-huey-auto', name: 'Auto Publisher', keyPrefix: 'oak_hueyAUT',
+                keyHash: 'seed-hash-huey-auto', createdAt: toString(datetime()),
+                lastUsedAt: toString(datetime()), disabled: false
+              })`,
+      variables: {},
+    })
+    // Mark all Huey's posts as created via API key
+    await database.write({
+      query: `MATCH (u:User { id: 'u4' })-[:WROTE]->(p:Post)
+              SET p.createdByApiKey = 'ak-huey-auto'`,
+      variables: {},
+    })
+
     // API Key for Bob (moderator) — active
     await database.write({
       query: `MATCH (u:User { id: 'u2' })
