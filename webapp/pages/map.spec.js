@@ -84,9 +84,9 @@ const mapMock = {
   getContainer: mapGetContainerMock,
   queryRenderedFeatures: mapQueryRenderedFeaturesMock,
   getStyle: mapGetStyleMock,
-  getCanvas: jest.fn(() => ({
+  getCanvas: jest.fn().mockReturnValue({
     style: { cursor: '' },
-  })),
+  }),
 }
 
 const stubs = {
@@ -615,6 +615,7 @@ describe('map', () => {
 
       describe('mouseleave event', () => {
         it('resets cursor style', () => {
+          mapMock.getCanvas().style.cursor = 'pointer'
           onEventMocks.mouseleave()
           expect(mapMock.getCanvas().style.cursor).toBe('')
         })
