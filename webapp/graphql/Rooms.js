@@ -69,6 +69,7 @@ export const roomQuery = () => gql`
         files {
           url
           name
+          extension
           type
           duration
         }

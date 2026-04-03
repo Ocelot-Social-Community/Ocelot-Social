@@ -712,7 +712,7 @@ describe('Chat.vue', () => {
         expect.objectContaining({
           variables: expect.objectContaining({
             files: expect.arrayContaining([
-              expect.objectContaining({ name: 'test', type: 'text/plain' }),
+              expect.objectContaining({ name: 'test', extension: 'txt', type: 'text/plain' }),
             ]),
           }),
         }),

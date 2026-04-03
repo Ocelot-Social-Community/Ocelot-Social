@@ -24,6 +24,7 @@ export const createMessageMutation = () => {
         files {
           url
           name
+          extension
           #size
           type
           duration
@@ -64,6 +65,7 @@ export const messageQuery = () => {
         files {
           url
           name
+          extension
           #size
           type
           #audio
@@ -99,6 +101,7 @@ export const chatMessageAdded = () => {
         files {
           url
           name
+          extension
           #size
           type
           #audio

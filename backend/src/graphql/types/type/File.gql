@@ -1,6 +1,7 @@
 type File {
   url: ID!
   name: String
+  extension: String
   type: String
   duration: Float
   # size: Int
@@ -12,6 +13,7 @@ type File {
 input FileInput {
   upload: Upload
   name: String
+  extension: String
   type: String
   duration: Float
 }

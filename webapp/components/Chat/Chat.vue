@@ -314,24 +314,12 @@ export default {
       commitUnreadRoomCount: 'chat/UPDATE_ROOM_COUNT',
     }),
 
-    lastMessageFiles(files) {
-      if (!files?.length) return undefined
-      return files.map((f) => {
-        if (f.extension) return f
-        const dotIndex = f.name?.lastIndexOf('.')
-        const ext = dotIndex > 0 ? f.name.substring(dotIndex + 1) : f.type?.split('/').pop()
-        const name = dotIndex > 0 ? f.name.substring(0, dotIndex) : f.name
-        return { ...f, name, extension: ext }
-      })
-    },
-
     lastMessageContent(content, files) {
       const text = (content || '').trim()
       if (text) return text.substring(0, 30)
       if (!files?.length) return ''
+      if (files[0].type?.startsWith('audio/') || files[0].audio) return ''
       const f = files[0]
-      const isAudio = f.type?.startsWith('audio/') || f.audio
-      if (isAudio) return ''
       const name = f.extension ? `${f.name}.${f.extension}` : f.name || ''
       return `\uD83D\uDCCE ${name}`
     },
@@ -657,7 +645,7 @@ export default {
       changedRoom.lastMessage = {
         ...msg,
         content: this.lastMessageContent(msg.content, msg.files),
-        files: this.lastMessageFiles(msg.files),
+        files: msg.files,
       }
       changedRoom.lastMessageAt = msg.date
       changedRoom.index = new Date().toISOString()
@@ -730,11 +718,11 @@ export default {
         ? files.map((file) => ({
             upload: new File(
               [file.blob],
-              // Captured audio already has the right extension in the name
               file.extension ? `${file.name}.${file.extension}` : file.name,
               { type: file.type },
             ),
             name: file.name,
+            extension: file.extension || undefined,
             type: file.type,
             ...(file.duration != null && { duration: file.duration }),
           }))
@@ -766,7 +754,7 @@ export default {
       if (roomIndex !== -1) {
         const changedRoom = { ...this.rooms[roomIndex] }
         changedRoom.lastMessage.content = this.lastMessageContent(content, files)
-        changedRoom.lastMessage.files = this.lastMessageFiles(files)
+        changedRoom.lastMessage.files = files
         changedRoom.index = new Date().toISOString()
         this.rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== roomId)]
         this.$nextTick(() => {
@@ -852,7 +840,7 @@ export default {
           ? {
               ...room.lastMessage,
               content: this.lastMessageContent(room.lastMessage?.content, room.lastMessage?.files),
-              files: this.lastMessageFiles(room.lastMessage?.files),
+              files: room.lastMessage?.files,
             }
           : { content: '' },
         users: room.users.map((u) => {
