@@ -1,3 +1,12 @@
+// Global mock for matchMedia (used by touchDevice mixin)
+window.matchMedia =
+  window.matchMedia ||
+  jest.fn().mockImplementation(() => ({
+    matches: false,
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+  }))
+
 import Vue from 'vue'
 import { createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
