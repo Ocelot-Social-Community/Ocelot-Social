@@ -105,6 +105,10 @@ export default {
         throw new Error('API keys are not enabled')
       }
 
+      if (args.expiresInDays != null && args.expiresInDays < 1) {
+        throw new Error('expiresInDays must be a positive integer')
+      }
+
       let expiresAt: string | null = null
       if (args.expiresInDays) {
         expiresAt = new Date(Date.now() + args.expiresInDays * 86400000).toISOString()
