@@ -73,36 +73,16 @@
     <div slot="room-header-avatar">
       <nuxt-link v-if="roomHeaderLink" :to="roomHeaderLink" class="chat-header-profile-link">
         <profile-avatar
-          v-if="selectedRoom && selectedRoom.isGroupRoom"
-          :profile="selectedRoom.groupProfile"
+          v-if="selectedRoom"
+          :profile="selectedRoom.isGroupRoom ? selectedRoom.groupProfile : selectedRoom.userProfile"
           class="vac-avatar-profile"
-          size="small"
         />
-        <div
-          v-else-if="selectedRoom && selectedRoom.avatar"
-          class="vac-avatar"
-          :style="{ 'background-image': `url('${selectedRoom.avatar}')` }"
-        />
-        <div v-else-if="selectedRoom" class="vac-avatar">
-          <span class="initials">{{ getInitialsName(selectedRoom.roomName) }}</span>
-        </div>
       </nuxt-link>
-      <template v-else>
-        <profile-avatar
-          v-if="selectedRoom && selectedRoom.isGroupRoom"
-          :profile="selectedRoom.groupProfile"
-          class="vac-avatar-profile"
-          size="small"
-        />
-        <div
-          v-else-if="selectedRoom && selectedRoom.avatar"
-          class="vac-avatar"
-          :style="{ 'background-image': `url('${selectedRoom.avatar}')` }"
-        />
-        <div v-else-if="selectedRoom" class="vac-avatar">
-          <span class="initials">{{ getInitialsName(selectedRoom.roomName) }}</span>
-        </div>
-      </template>
+      <profile-avatar
+        v-else-if="selectedRoom"
+        :profile="selectedRoom.isGroupRoom ? selectedRoom.groupProfile : selectedRoom.userProfile"
+        class="vac-avatar-profile"
+      />
     </div>
 
     <div slot="room-header-info">
@@ -116,19 +96,9 @@
 
     <div v-for="room in rooms" :slot="'room-list-avatar_' + room.id" :key="room.id">
       <profile-avatar
-        v-if="room.isGroupRoom"
-        :profile="room.groupProfile"
+        :profile="room.isGroupRoom ? room.groupProfile : room.userProfile"
         class="vac-avatar-profile"
-        size="small"
       />
-      <div
-        v-else-if="room.avatar"
-        class="vac-avatar"
-        :style="{ 'background-image': `url('${room.avatar}')` }"
-      />
-      <div v-else class="vac-avatar">
-        <span class="initials">{{ getInitialsName(room.roomName) }}</span>
-      </div>
     </div>
   </vue-advanced-chat>
 </template>
@@ -879,11 +849,6 @@ export default {
       }
     },
 
-    getInitialsName(fullname) {
-      if (!fullname) return
-      return fullname.match(/\b\w/g).join('').substring(0, 3).toUpperCase()
-    },
-
     toggleUserSearch() {
       this.$emit('toggle-user-search')
     },
@@ -894,7 +859,7 @@ export default {
       const fixedRoom = {
         ...room,
         isGroupRoom,
-        // For group rooms: provide group profile data for ProfileAvatar component
+        // Profile data for ProfileAvatar component
         groupProfile: isGroupRoom
           ? {
               id: room.group?.id,
@@ -903,6 +868,7 @@ export default {
               avatar: room.group?.avatar,
             }
           : null,
+        userProfile: null,
         index: room.lastMessage ? room.lastMessage.date : room.createdAt,
         avatar: room.avatar?.w320 || room.avatar,
         lastMessage: room.lastMessage
@@ -916,11 +882,17 @@ export default {
           return { ...u, username: u.name, avatar: u.avatar?.w320 }
         }),
       }
+      if (!isGroupRoom) {
+        // Build userProfile from original room.users (before avatar was flattened to string)
+        const otherUser = room.users.find((u) => u.id !== this.currentUser.id)
+        fixedRoom.userProfile = otherUser
+          ? { id: otherUser.id, name: otherUser.name, avatar: otherUser.avatar }
+          : { name: fixedRoom.roomName }
+      }
       if (!fixedRoom.avatar) {
         if (isGroupRoom) {
           fixedRoom.avatar = room.group?.avatar?.w320 || room.group?.avatar || null
         } else {
-          // as long as we cannot query avatar on CreateRoom
           const otherUser = fixedRoom.users.find((u) => u.id !== this.currentUser.id)
           fixedRoom.avatar = otherUser?.avatar
         }
@@ -942,8 +914,8 @@ export default {
       // Accept either a user object { id, name } or just a userId string
       const userId = typeof userOrId === 'string' ? userOrId : userOrId.id
       let userName = typeof userOrId === 'string' ? null : userOrId.name
-      let userAvatar =
-        typeof userOrId === 'string' ? null : userOrId.avatar?.w320 || userOrId.avatar?.url || null
+      let userAvatarObj = typeof userOrId === 'string' ? null : userOrId.avatar
+      let userAvatar = userAvatarObj?.w320 || userAvatarObj?.url || null
 
       // When called with just an ID (e.g. from query params), fetch user profile
       if (typeof userOrId === 'string') {
@@ -956,6 +928,9 @@ export default {
                   name
                   avatar {
                     url
+                    w320
+                    w640
+                    w1024
                   }
                 }
               }
@@ -966,7 +941,8 @@ export default {
           const user = data.User?.[0]
           if (user) {
             userName = user.name
-            userAvatar = user.avatar?.url || null
+            userAvatarObj = user.avatar
+            userAvatar = user.avatar?.w320 || user.avatar?.url || null
           }
         } catch {
           // Fall through with userId as display name
@@ -1009,6 +985,7 @@ export default {
         roomName: userName,
         isGroupRoom: false,
         groupProfile: null,
+        userProfile: { id: userId, name: userName, avatar: userAvatarObj },
         avatar: userAvatar,
         lastMessageAt: null,
         createdAt: new Date().toISOString(),
@@ -1105,28 +1082,6 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.vac-avatar {
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-color: $color-primary-dark;
-  color: $text-color-primary-inverse;
-  height: 42px;
-  width: 42px;
-  min-height: 42px;
-  min-width: 42px;
-  margin-right: 15px;
-  border-radius: 50%;
-  position: relative;
-
-  > .initials {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-}
-
 .vac-avatar-profile {
   margin-right: 15px;
 }
