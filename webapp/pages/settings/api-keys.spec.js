@@ -395,7 +395,9 @@ describe('settings/api-keys.vue', () => {
     it('shows error toast on revoke failure', async () => {
       mutateMock.mockRejectedValue(new Error('Network error'))
       wrapper = Wrapper({ myApiKeys: [activeKey()] })
-      await expect(wrapper.vm.revokeKey({ id: 'k1', name: 'CI Bot' })).rejects.toThrow('Network error')
+      await expect(wrapper.vm.revokeKey({ id: 'k1', name: 'CI Bot' })).rejects.toThrow(
+        'Network error',
+      )
       await flushPromises()
       expect(mocks.$toast.error).toHaveBeenCalledWith('Network error')
     })
