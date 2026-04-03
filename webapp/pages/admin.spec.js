@@ -14,6 +14,7 @@ describe('admin.vue', () => {
   beforeEach(() => {
     mocks = {
       $t: jest.fn(),
+      $env: { API_KEYS_ENABLED: false },
     }
   })
 

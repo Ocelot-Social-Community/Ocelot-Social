@@ -62,6 +62,7 @@ describe('admin/api-keys.vue', () => {
 
     mocks = {
       $t: jest.fn((key) => key),
+      $i18n: { locale: 'en' },
       $toast: {
         success: jest.fn(),
         error: jest.fn(),
@@ -180,6 +181,7 @@ describe('admin/api-keys.vue', () => {
       wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
       await wrapper.vm.toggleUser('u1')
       await flushPromises()
+      await wrapper.vm.$nextTick()
       expect(wrapper.text()).toContain('admin.api-keys.detail.active')
       expect(wrapper.text()).toContain('CI Bot')
     })
@@ -191,6 +193,7 @@ describe('admin/api-keys.vue', () => {
       wrapper = Wrapper({ apiKeyUsers: [userEntry({ activeCount: 0, revokedCount: 1 })] })
       await wrapper.vm.toggleUser('u1')
       await flushPromises()
+      await wrapper.vm.$nextTick()
       expect(wrapper.text()).toContain('admin.api-keys.detail.revoked')
     })
 

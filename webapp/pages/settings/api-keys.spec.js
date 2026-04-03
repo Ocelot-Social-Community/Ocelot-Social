@@ -16,6 +16,7 @@ describe('settings/api-keys.vue', () => {
 
     mocks = {
       $t: jest.fn((key) => key),
+      $i18n: { locale: 'en' },
       $env: { API_KEYS_MAX_PER_USER: 5 },
       $toast: {
         success: jest.fn(),
@@ -133,6 +134,7 @@ describe('settings/api-keys.vue', () => {
     it('expands on toggle click', async () => {
       wrapper = Wrapper({ myApiKeys: [revokedKey()] })
       await wrapper.find('.revoked-toggle').trigger('click')
+      await wrapper.vm.$nextTick()
       expect(wrapper.find('#revoked-keys-list').exists()).toBe(true)
       expect(wrapper.text()).toContain('Old Key')
     })
@@ -140,6 +142,7 @@ describe('settings/api-keys.vue', () => {
     it('shows revoked status label', async () => {
       wrapper = Wrapper({ myApiKeys: [revokedKey()] })
       await wrapper.find('.revoked-toggle').trigger('click')
+      await wrapper.vm.$nextTick()
       expect(wrapper.text()).toContain('settings.api-keys.list.revoked')
     })
   })
@@ -243,6 +246,7 @@ describe('settings/api-keys.vue', () => {
       await wrapper.find('form').trigger('submit')
       await flushPromises()
       expect(wrapper.vm.newSecret).toBe('oak_fullsecretkey123')
+      await wrapper.vm.$nextTick()
       expect(wrapper.text()).toContain('settings.api-keys.secret.title')
       expect(wrapper.text()).toContain('oak_fullsecretkey123')
     })
