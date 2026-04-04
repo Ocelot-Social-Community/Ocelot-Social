@@ -1,10 +1,11 @@
 import CONFIG from './config'
+import { closeDriver } from './db/neo4j'
 import { loggerPlugin } from './plugins/apolloLogger'
 import createProxy from './proxy'
 import createServer from './server'
 
 async function main() {
-  const { httpServer } = await createServer({
+  const { server, httpServer } = await createServer({
     plugins: [loggerPlugin],
   })
   const url = new URL(CONFIG.GRAPHQL_URI)
@@ -31,6 +32,20 @@ async function main() {
       console.log(`Proxying requests to ${target}`)
     })
   }
+
+  // Graceful shutdown: close Neo4j driver and Apollo server on process signals.
+  // This prevents connection pool leaks during nodemon restarts in development
+  // and ensures clean shutdown in production.
+  const shutdown = async () => {
+    /* eslint-disable-next-line no-console */
+    console.log('Shutting down...')
+    await server.stop()
+    httpServer.close()
+    await closeDriver()
+    process.exit(0)
+  }
+  process.on('SIGTERM', shutdown)
+  process.on('SIGINT', shutdown)
 }
 
 // eslint-disable-next-line promise/prefer-await-to-callbacks, @typescript-eslint/use-unknown-in-catch-callback-variable

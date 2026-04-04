@@ -17,9 +17,23 @@ const defaultOptions = {
 export function getDriver(options = {}) {
   const { uri, username, password } = { ...defaultOptions, ...options }
   if (!driver) {
-    driver = neo4j.driver(uri, neo4j.auth.basic(username, password))
+    driver = neo4j.driver(uri, neo4j.auth.basic(username, password), {
+      maxConnectionPoolSize: 50,
+      connectionAcquisitionTimeout: 30000,
+    })
   }
   return driver
+}
+
+export async function closeDriver() {
+  if (driver) {
+    await driver.close()
+    driver = undefined as unknown as Driver
+  }
+  if (neodeInstance) {
+    await neodeInstance.close()
+    neodeInstance = undefined as unknown as Neode
+  }
 }
 
 let neodeInstance: Neode
