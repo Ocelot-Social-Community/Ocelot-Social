@@ -997,6 +997,7 @@ export default {
         _virtualUserId: userId,
       }
       this.rooms = [virtualRoom, ...this.rooms]
+      this.roomsLoaded = true
       this.loadingRooms = false
       this.$nextTick(() => this.selectRoom(virtualRoom))
     },
