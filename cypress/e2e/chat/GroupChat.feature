@@ -35,3 +35,11 @@ Feature: Group Chat
     And I see no unread chat messages in the header
     When "alice" sends a group chat message "Hello everyone!" to "test-group"
     Then I see 1 unread chat message in the header
+
+  Scenario: Group room shows group icon before name in room list
+    Given "bob" is a member of group "test-group"
+    And "alice" opens the group chat for "test-group"
+    And "alice" sends a group chat message "Hello group" to "test-group"
+    And I am logged in as "bob"
+    And I navigate to page "/chat"
+    Then I see a group icon before "Test Group" in the room list
