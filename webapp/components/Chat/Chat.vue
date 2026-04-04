@@ -606,7 +606,15 @@ export default {
     },
 
     async fetchMessages({ room, options = {} }) {
-      this.activeRoomId = room.roomId
+      if (!room?.roomId) return
+      // When an external socket message added a new room, the library may try to
+      // auto-select it. Lock activeRoomId to the current room to prevent focus steal.
+      if (this._externalRoomIds?.has(room.roomId)) {
+        this._externalRoomIds.delete(room.roomId)
+        if (this.selectedRoom) {
+          this.activeRoomId = this.selectedRoom.roomId
+        }
+      }
       if (this.selectedRoom?.id !== room.id) {
         this.messages = []
         this.oldestLoadedIndexId = null
@@ -678,6 +686,8 @@ export default {
           })
           if (Room?.length) {
             const newRoom = this.fixRoomObject(Room[0])
+            if (!this._externalRoomIds) this._externalRoomIds = new Set()
+            this._externalRoomIds.add(newRoom.roomId)
             this.rooms = [newRoom, ...this.rooms]
             roomIndex = 0
             freshlyFetched = true
