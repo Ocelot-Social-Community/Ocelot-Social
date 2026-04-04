@@ -201,6 +201,50 @@ describe('AddChatRoomByUserSearch.vue', () => {
     })
   })
 
+  describe('apollo searchChatTargets config', () => {
+    it('query returns the searchChatTargets query', () => {
+      wrapper = Wrapper()
+      const apolloConfig = wrapper.vm.$options.apollo.searchChatTargets
+      expect(apolloConfig.query.call(wrapper.vm)).toBeDefined()
+    })
+
+    it('variables returns query and limit', () => {
+      wrapper = Wrapper()
+      wrapper.vm.query = 'test'
+      const apolloConfig = wrapper.vm.$options.apollo.searchChatTargets
+      expect(apolloConfig.variables.call(wrapper.vm)).toEqual({ query: 'test', limit: 10 })
+    })
+
+    it('skip returns true when search is not started', () => {
+      wrapper = Wrapper()
+      wrapper.vm.query = 'ab'
+      const apolloConfig = wrapper.vm.$options.apollo.searchChatTargets
+      expect(apolloConfig.skip.call(wrapper.vm)).toBe(true)
+    })
+
+    it('skip returns false when search is started', () => {
+      wrapper = Wrapper()
+      wrapper.vm.query = 'abc'
+      const apolloConfig = wrapper.vm.$options.apollo.searchChatTargets
+      expect(apolloConfig.skip.call(wrapper.vm)).toBe(false)
+    })
+
+    it('update normalizes results with groupName fallback', () => {
+      wrapper = Wrapper()
+      const apolloConfig = wrapper.vm.$options.apollo.searchChatTargets
+      apolloConfig.update.call(wrapper.vm, {
+        searchChatTargets: [
+          { id: '1', name: 'User', __typename: 'User' },
+          { id: '2', groupName: 'Group', __typename: 'Group' },
+        ],
+      })
+      expect(wrapper.vm.results).toEqual([
+        { id: '1', name: 'User', __typename: 'User' },
+        { id: '2', name: 'Group', groupName: 'Group', __typename: 'Group' },
+      ])
+    })
+  })
+
   describe('beforeDestroy', () => {
     it('clears blur timeout', () => {
       jest.useFakeTimers()

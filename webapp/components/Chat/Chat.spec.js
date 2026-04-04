@@ -1017,4 +1017,277 @@ describe('Chat.vue', () => {
       })
     })
   })
+
+  describe('currentLocaleIso watcher', () => {
+    it('reformats message dates when locale changes', async () => {
+      wrapper = Wrapper()
+      wrapper.vm.messages = [mockMessage({ _rawDate: '2026-06-15T14:30:00Z' })]
+      mocks.$i18n.locale = () => 'de'
+      wrapper.vm.$options.watch.currentLocaleIso.call(wrapper.vm)
+      expect(wrapper.vm.messages[0].timestamp).toBeDefined()
+    })
+  })
+
+  describe('expandChatLink', () => {
+    it('returns chat route with no query when no room selected', () => {
+      wrapper = Wrapper()
+      expect(wrapper.vm.expandChatLink).toEqual({ name: 'chat' })
+    })
+
+    it('returns groupId query for group rooms', () => {
+      wrapper = Wrapper()
+      wrapper.vm.selectedRoom = mockRoom({
+        isGroupRoom: true,
+        groupProfile: { id: 'g1' },
+        users: [{ id: 'current-user' }],
+      })
+      expect(wrapper.vm.expandChatLink).toEqual({ name: 'chat', query: { groupId: 'g1' } })
+    })
+
+    it('returns userId query for DM rooms', () => {
+      wrapper = Wrapper()
+      wrapper.vm.selectedRoom = mockRoom()
+      expect(wrapper.vm.expandChatLink).toEqual({ name: 'chat', query: { userId: 'other-user' } })
+    })
+  })
+
+  describe('roomHeaderLink', () => {
+    it('returns null when no other user found in DM', () => {
+      wrapper = Wrapper()
+      wrapper.vm.selectedRoom = mockRoom({ users: [{ id: 'current-user', name: 'Me' }] })
+      expect(wrapper.vm.roomHeaderLink).toBeNull()
+    })
+  })
+
+  describe('buildLastMessage', () => {
+    it('returns file name for non-audio files', () => {
+      wrapper = Wrapper()
+      const result = wrapper.vm.buildLastMessage({
+        content: '',
+        files: [{ name: 'photo', type: 'image/jpeg' }],
+      })
+      expect(result.content).toBe('\uD83D\uDCCE photo')
+    })
+
+    it('returns empty for audio files', () => {
+      wrapper = Wrapper()
+      const result = wrapper.vm.buildLastMessage({
+        content: '',
+        files: [{ name: 'audio', type: 'audio/mpeg' }],
+      })
+      expect(result.content).toBe('')
+    })
+  })
+
+  describe('searchRooms', () => {
+    it('fetches rooms with search term', async () => {
+      wrapper = Wrapper()
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [] } })
+      await wrapper.vm.searchRooms({ value: 'test' })
+      expect(wrapper.vm.roomSearch).toBe('test')
+    })
+
+    it('clears search and resets cursor', async () => {
+      wrapper = Wrapper()
+      wrapper.vm.roomSearch = 'old'
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [mockRoom()] } })
+      await wrapper.vm.searchRooms({ value: '' })
+      expect(wrapper.vm.roomSearch).toBe('')
+      expect(wrapper.vm.roomCursor).toBeDefined()
+    })
+
+    it('increments generation to handle concurrent searches', async () => {
+      wrapper = Wrapper()
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [] } })
+      await wrapper.vm.searchRooms({ value: 'a' })
+      expect(wrapper.vm.roomSearchGeneration).toBe(1)
+      await wrapper.vm.searchRooms({ value: 'ab' })
+      expect(wrapper.vm.roomSearchGeneration).toBe(2)
+    })
+
+    it('sets roomObserverDirty when roomsLoaded was true', async () => {
+      wrapper = Wrapper()
+      wrapper.vm.roomsLoaded = true
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [] } })
+      await wrapper.vm.searchRooms({ value: 'x' })
+      // roomObserverDirty was set, roomsLoaded is true (< pageSize), so no reinit
+      expect(wrapper.vm.roomObserverDirty).toBe(true)
+    })
+  })
+
+  describe('fetchMoreRooms', () => {
+    it('delegates to fetchRooms with current search', () => {
+      wrapper = Wrapper()
+      wrapper.vm.fetchRooms = jest.fn()
+      wrapper.vm.roomSearch = 'test'
+      wrapper.vm.fetchMoreRooms()
+      expect(wrapper.vm.fetchRooms).toHaveBeenCalledWith({ search: 'test' })
+    })
+  })
+
+  describe('fetchRooms replace mode', () => {
+    it('replaces rooms instead of appending', async () => {
+      wrapper = Wrapper()
+      wrapper.vm.rooms = [mockRoom({ id: 'old', roomId: 'old' })]
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [mockRoom({ id: 'new', roomId: 'new' })] } })
+      await wrapper.vm.fetchRooms({ replace: true })
+      expect(wrapper.vm.rooms).toHaveLength(1)
+      expect(wrapper.vm.rooms[0].id).toBe('new')
+    })
+
+    it('selects first room in singleRoom mode', async () => {
+      wrapper = Wrapper({ singleRoom: true })
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [mockRoom()] } })
+      await wrapper.vm.fetchRooms({})
+      expect(wrapper.vm.activeRoomId).toBe('room-1')
+    })
+
+    it('fetches by room id', async () => {
+      wrapper = Wrapper()
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [mockRoom()] } })
+      await wrapper.vm.fetchRooms({ room: { id: 'room-1' } })
+      expect(mocks.$apollo.query).toHaveBeenCalledWith(
+        expect.objectContaining({ variables: expect.objectContaining({ id: 'room-1' }) }),
+      )
+    })
+  })
+
+  describe('fetchMessages edge cases', () => {
+    it('skips when room has no roomId', async () => {
+      wrapper = Wrapper()
+      await wrapper.vm.fetchMessages({ room: {} })
+      expect(wrapper.vm.activeRoomId).toBeNull()
+    })
+
+    it('blocks external room auto-select', async () => {
+      wrapper = Wrapper()
+      wrapper.vm.selectedRoom = mockRoom({ id: 'current', roomId: 'current' })
+      wrapper.vm.activeRoomId = 'current'
+      wrapper.vm._externalRoomIds = new Set(['ext-room'])
+      await wrapper.vm.fetchMessages({ room: { id: 'ext', roomId: 'ext-room' } })
+      expect(wrapper.vm.activeRoomId).toBe('current')
+    })
+
+    it('handles virtual rooms with early return', async () => {
+      wrapper = Wrapper()
+      wrapper.vm.selectedRoom = null
+      await wrapper.vm.fetchMessages({ room: { id: 'temp-123', roomId: 'temp-123' } })
+      // Virtual rooms toggle messagesLoaded and return early
+      expect(wrapper.vm.selectedRoom).toEqual({ id: 'temp-123', roomId: 'temp-123' })
+    })
+
+    it('handles fetch error', async () => {
+      wrapper = Wrapper()
+      mocks.$apollo.query.mockRejectedValue(new Error('Network error'))
+      await wrapper.vm.fetchMessages({ room: mockRoom(), options: {} })
+      expect(mocks.$toast.error).toHaveBeenCalledWith('Network error')
+      expect(wrapper.vm.messages).toEqual([])
+    })
+  })
+
+  describe('chatMessageAdded with new room', () => {
+    it('returns early when server returns empty rooms', async () => {
+      wrapper = Wrapper()
+      wrapper.vm.rooms = []
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [] } })
+      await subscriptionHandlers.chatMessageAdded.next({
+        data: { chatMessageAdded: mockMessage({ room: { id: 'unknown' } }) },
+      })
+      expect(wrapper.vm.rooms).toHaveLength(0)
+    })
+
+    it('returns early when room fetch fails', async () => {
+      wrapper = Wrapper()
+      wrapper.vm.rooms = []
+      mocks.$apollo.query.mockRejectedValue(new Error('fail'))
+      await subscriptionHandlers.chatMessageAdded.next({
+        data: { chatMessageAdded: mockMessage({ room: { id: 'unknown' } }) },
+      })
+      expect(wrapper.vm.rooms).toHaveLength(0)
+    })
+
+    it('fetches and inserts new room without auto-select', async () => {
+      wrapper = Wrapper()
+      wrapper.vm.rooms = [mockRoom()]
+      wrapper.vm.selectedRoom = mockRoom()
+      wrapper.vm.activeRoomId = 'room-1'
+      const newRoomData = mockRoom({
+        id: 'new-room',
+        roomId: 'new-room',
+        users: [
+          { _id: 'current-user', id: 'current-user', name: 'Me', avatar: null },
+          { _id: 'sender', id: 'sender', name: 'Sender', avatar: null },
+        ],
+      })
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [newRoomData] } })
+      await subscriptionHandlers.chatMessageAdded.next({
+        data: {
+          chatMessageAdded: mockMessage({
+            room: { id: 'new-room' },
+            senderId: 'sender',
+          }),
+        },
+      })
+      expect(wrapper.vm.rooms[0].id).toBe('new-room')
+      expect(wrapper.vm._externalRoomIds.has('new-room')).toBe(true)
+    })
+  })
+
+  describe('toggleUserSearch', () => {
+    it('emits toggle-user-search', () => {
+      wrapper = Wrapper()
+      wrapper.vm.toggleUserSearch()
+      expect(wrapper.emitted('toggle-user-search')).toHaveLength(1)
+    })
+  })
+
+  describe('navigateToUserProfile', () => {
+    it('navigates using messageUserProfile', () => {
+      wrapper = Wrapper()
+      wrapper.vm.selectedRoom = mockRoom()
+      wrapper.vm.rooms = [mockRoom()]
+      wrapper.vm.navigateToUserProfile('other-user')
+      expect(mocks.$router.push).toHaveBeenCalledWith({
+        path: '/profile/other-user/other',
+      })
+    })
+  })
+
+  describe('newRoom with string userId', () => {
+    it('fetches user profile and creates virtual room', async () => {
+      wrapper = Wrapper()
+      mocks.$apollo.query
+        .mockResolvedValueOnce({ data: { User: [{ id: 'u1', name: 'Test User', avatar: null }] } })
+        .mockResolvedValueOnce({ data: { Room: [] } })
+      await wrapper.vm.newRoom('u1')
+      expect(wrapper.vm.rooms[0].roomName).toBe('Test User')
+      expect(wrapper.vm.rooms[0].id).toBe('temp-u1')
+    })
+
+    it('falls back to userId as name on profile fetch error', async () => {
+      wrapper = Wrapper()
+      mocks.$apollo.query
+        .mockRejectedValueOnce(new Error('fail'))
+        .mockResolvedValueOnce({ data: { Room: [] } })
+      await wrapper.vm.newRoom('u1')
+      expect(wrapper.vm.rooms[0].roomName).toBe('u1')
+    })
+  })
+
+  describe('sendMessage virtual room replacement', () => {
+    it('replaces virtual room with real room after send', async () => {
+      wrapper = Wrapper()
+      const virtualRoom = mockRoom({ id: 'temp-u1', roomId: 'temp-u1', _virtualUserId: 'u1' })
+      wrapper.vm.rooms = [virtualRoom]
+      wrapper.vm.selectedRoom = virtualRoom
+      wrapper.vm.activeRoomId = 'temp-u1'
+      const realRoom = mockRoom({ id: 'real-1', roomId: 'real-1' })
+      mocks.$apollo.mutate.mockResolvedValue({
+        data: { CreateMessage: { id: 'm1', room: { id: 'real-1' } } },
+      })
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [realRoom] } })
+      await wrapper.vm.sendMessage({ roomId: 'temp-u1', content: 'hi', files: [] })
+      expect(wrapper.vm.rooms.some((r) => r.id === 'real-1')).toBe(true)
+    })
+  })
 })
