@@ -590,7 +590,7 @@ describe('Chat.vue', () => {
       const messageCall = mocks.$apollo.query.mock.calls.find(
         ([arg]) => arg.variables?.roomId === 'r-default',
       )
-      expect(messageCall[0].variables.first).toBe(wrapper.vm.messagePageSize)
+      expect(messageCall[0].variables.first).toBe(20)
     })
 
     it('uses beforeIndex cursor for subsequent loads', async () => {

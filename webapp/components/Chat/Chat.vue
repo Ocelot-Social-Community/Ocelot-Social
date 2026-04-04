@@ -20,7 +20,7 @@
     :height="chatHeight"
     :styles="JSON.stringify(computedChatStyle)"
     :show-footer="true"
-    :responsive-breakpoint="responsiveBreakpoint"
+    :responsive-breakpoint="600"
     :single-room="singleRoom"
     show-reaction-emojis="false"
     custom-search-room-enabled="true"
@@ -134,6 +134,9 @@ import chatStyle from '~/constants/chat.js'
 import { mapGetters, mapMutations } from 'vuex'
 
 const EMPTY_ACTIONS = JSON.stringify([])
+const ROOM_PAGE_SIZE = 10
+const MESSAGE_PAGE_SIZE = 20
+const RESPONSIVE_BREAKPOINT = 600
 
 export default {
   name: 'Chat',
@@ -158,19 +161,16 @@ export default {
   },
   data() {
     return {
-      responsiveBreakpoint: 600,
       EMPTY_ACTIONS,
       rooms: [],
       roomsLoaded: false,
       roomCursor: null,
-      roomPageSize: 10,
       roomSearch: '',
       roomObserverDirty: false,
       selectedRoom: null,
       activeRoomId: null,
       loadingRooms: true,
       messagesLoaded: false,
-      messagePageSize: 20,
       oldestLoadedIndexId: null,
       messages: [],
       unseenMessageIds: new Set(),
@@ -525,7 +525,7 @@ export default {
       try {
         const variables = room?.id
           ? { id: room.id }
-          : { first: this.roomPageSize, before: this.roomCursor, ...(search && { search }) }
+          : { first: ROOM_PAGE_SIZE, before: this.roomCursor, ...(search && { search }) }
 
         const {
           data: { Room },
@@ -550,7 +550,7 @@ export default {
           this.roomCursor = lastRoom.lastMessageAt || lastRoom.createdAt
         }
 
-        if (Room.length < this.roomPageSize) {
+        if (Room.length < ROOM_PAGE_SIZE) {
           this.roomsLoaded = true
         }
 
@@ -633,7 +633,7 @@ export default {
       this.messagesLoaded = options.refetch ? this.messagesLoaded : false
       const variables = {
         roomId: room.id,
-        first: this.messagePageSize,
+        first: MESSAGE_PAGE_SIZE,
       }
       if (!options.refetch && this.oldestLoadedIndexId !== null) {
         variables.beforeIndex = this.oldestLoadedIndexId
@@ -659,7 +659,7 @@ export default {
             this.oldestLoadedIndexId = oldestMsg.indexId
           }
         }
-        if (Message.length < this.messagePageSize) {
+        if (Message.length < MESSAGE_PAGE_SIZE) {
           this.messagesLoaded = true
         }
         // Ensure visibility tracking is running
