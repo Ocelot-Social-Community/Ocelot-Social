@@ -610,6 +610,7 @@ export default {
     },
 
     async fetchMessages({ room, options = {} }) {
+      this.activeRoomId = room.roomId
       if (this.selectedRoom?.id !== room.id) {
         this.messages = []
         this.oldestLoadedIndexId = null
