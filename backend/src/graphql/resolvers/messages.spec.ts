@@ -17,8 +17,7 @@ import Message from '@graphql/queries/messaging/Message.gql'
 import Room from '@graphql/queries/messaging/Room.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-import { chatMessageAddedFilter, chatMessageStatusUpdatedFilter } from './messages'
-import resolvers from './messages'
+import resolvers, { chatMessageAddedFilter, chatMessageStatusUpdatedFilter } from './messages'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
