@@ -102,8 +102,7 @@
     </div>
 
     <div
-      v-for="room in rooms"
-      v-if="room.isGroupRoom"
+      v-for="room in groupRooms"
       :slot="'room-list-info_' + room.roomId"
       :key="'info-' + room.id"
     >
@@ -153,7 +152,6 @@ import { mapGetters, mapMutations } from 'vuex'
 const EMPTY_ACTIONS = JSON.stringify([])
 const ROOM_PAGE_SIZE = 10
 const MESSAGE_PAGE_SIZE = 20
-const RESPONSIVE_BREAKPOINT = 600
 
 export default {
   name: 'Chat',
@@ -276,6 +274,9 @@ export default {
         if (otherUser) query.userId = otherUser.id
       }
       return { name: 'chat', query }
+    },
+    groupRooms() {
+      return this.rooms.filter((r) => r.isGroupRoom)
     },
     selectedRoomProfile() {
       if (!this.selectedRoom) return null
