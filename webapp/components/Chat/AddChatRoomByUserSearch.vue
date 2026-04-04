@@ -43,7 +43,12 @@
             <profile-avatar :profile="option" size="small" />
             <div class="chat-search-result-info">
               <span class="chat-search-result-name">
-                <os-icon v-if="option.__typename === 'Group'" :icon="icons.group" class="chat-search-group-icon" />{{ option.name }}
+                <os-icon
+                  v-if="option.__typename === 'Group'"
+                  :icon="icons.group"
+                  class="chat-search-group-icon"
+                />
+                {{ option.name }}
               </span>
               <span class="chat-search-result-detail">
                 {{ option.__typename === 'Group' ? `&${option.slug}` : `@${option.slug}` }}

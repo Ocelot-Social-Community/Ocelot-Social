@@ -71,7 +71,11 @@
     </div>
 
     <div slot="room-header-avatar">
-      <component :is="roomHeaderLink ? 'nuxt-link' : 'span'" :to="roomHeaderLink" class="chat-header-profile-link">
+      <component
+        :is="roomHeaderLink ? 'nuxt-link' : 'span'"
+        :to="roomHeaderLink"
+        class="chat-header-profile-link"
+      >
         <profile-avatar
           v-if="selectedRoom"
           :profile="selectedRoomProfile"
@@ -82,14 +86,27 @@
 
     <div slot="room-header-info">
       <div class="vac-room-name vac-text-ellipsis">
-        <component :is="roomHeaderLink ? 'nuxt-link' : 'span'" :to="roomHeaderLink" class="chat-header-profile-link">
-          <os-icon v-if="selectedRoom && selectedRoom.isGroupRoom" :icon="icons.group" class="room-group-icon" />
+        <component
+          :is="roomHeaderLink ? 'nuxt-link' : 'span'"
+          :to="roomHeaderLink"
+          class="chat-header-profile-link"
+        >
+          <os-icon
+            v-if="selectedRoom && selectedRoom.isGroupRoom"
+            :icon="icons.group"
+            class="room-group-icon"
+          />
           {{ selectedRoom ? selectedRoom.roomName : '' }}
         </component>
       </div>
     </div>
 
-    <div v-for="room in rooms" v-if="room.isGroupRoom" :slot="'room-list-info_' + room.roomId" :key="'info-' + room.id">
+    <div
+      v-for="room in rooms"
+      v-if="room.isGroupRoom"
+      :slot="'room-list-info_' + room.roomId"
+      :key="'info-' + room.id"
+    >
       <div class="vac-room-name vac-text-ellipsis room-name-with-icon">
         <os-icon :icon="icons.group" class="room-group-icon" />
         {{ room.roomName }}
@@ -110,7 +127,7 @@
         :key="'avatar-' + msg._id"
         :profile="messageUserProfile(msg.senderId)"
         class="vac-message-avatar"
-        style="align-self: flex-end; margin: 0 0 2px; cursor: pointer;"
+        style="align-self: flex-end; margin: 0 0 2px; cursor: pointer"
         @click.native="navigateToUserProfile(msg.senderId)"
       />
     </template>
@@ -262,7 +279,9 @@ export default {
     },
     selectedRoomProfile() {
       if (!this.selectedRoom) return null
-      return this.selectedRoom.isGroupRoom ? this.selectedRoom.groupProfile : this.selectedRoom.userProfile
+      return this.selectedRoom.isGroupRoom
+        ? this.selectedRoom.groupProfile
+        : this.selectedRoom.userProfile
     },
     roomHeaderLink() {
       if (!this.selectedRoom) return null
@@ -785,7 +804,8 @@ export default {
         saved: true,
         _rawDate: new Date().toISOString(),
         _originalAvatar:
-          this.selectedRoom?.users?.find((u) => u.id === this.currentUser.id)?.avatar || this.initialsAvatarUrl(this.currentUser.name),
+          this.selectedRoom?.users?.find((u) => u.id === this.currentUser.id)?.avatar ||
+          this.initialsAvatarUrl(this.currentUser.name),
         senderId: this.currentUser.id,
         files:
           messageDetails.files?.map((file) => ({
@@ -926,7 +946,9 @@ export default {
 
     async fetchServerRoom(variables) {
       try {
-        const { data: { Room } } = await this.$apollo.query({
+        const {
+          data: { Room },
+        } = await this.$apollo.query({
           query: roomQuery(),
           variables,
           fetchPolicy: 'no-cache',
@@ -971,7 +993,11 @@ export default {
       if (await this.fetchServerRoom({ userId })) return
 
       // Create a virtual room (no backend call — room is created on first message)
-      const currentUserProfile = { id: this.currentUser.id, name: this.currentUser.name, avatar: this.currentUser.avatar }
+      const currentUserProfile = {
+        id: this.currentUser.id,
+        name: this.currentUser.name,
+        avatar: this.currentUser.avatar,
+      }
       const otherUserProfile = { id: userId, name: userName, avatar: userAvatarObj }
       const virtualRoom = {
         id: `temp-${userId}`,
@@ -1009,7 +1035,9 @@ export default {
       if (await this.fetchServerRoom({ groupId })) return
 
       try {
-        const { data: { CreateGroupRoom } } = await this.$apollo.mutate({
+        const {
+          data: { CreateGroupRoom },
+        } = await this.$apollo.mutate({
           mutation: createGroupRoom(),
           variables: { groupId },
         })

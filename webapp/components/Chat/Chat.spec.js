@@ -1129,7 +1129,9 @@ describe('Chat.vue', () => {
     it('replaces rooms instead of appending', async () => {
       wrapper = Wrapper()
       wrapper.vm.rooms = [mockRoom({ id: 'old', roomId: 'old' })]
-      mocks.$apollo.query.mockResolvedValue({ data: { Room: [mockRoom({ id: 'new', roomId: 'new' })] } })
+      mocks.$apollo.query.mockResolvedValue({
+        data: { Room: [mockRoom({ id: 'new', roomId: 'new' })] },
+      })
       await wrapper.vm.fetchRooms({ replace: true })
       expect(wrapper.vm.rooms).toHaveLength(1)
       expect(wrapper.vm.rooms[0].id).toBe('new')
