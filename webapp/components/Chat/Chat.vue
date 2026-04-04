@@ -2,15 +2,15 @@
   <vue-advanced-chat
     :theme="theme"
     :current-user-id="currentUser.id"
-    :room-id="computedRoomId"
-    :template-actions="JSON.stringify(templatesText)"
-    :menu-actions="JSON.stringify(menuActions)"
+    :room-id="activeRoomId"
+    :template-actions="EMPTY_ACTIONS"
+    :menu-actions="EMPTY_ACTIONS"
     :text-messages="JSON.stringify(textMessages)"
-    :message-actions="messageActions"
+    :message-actions="EMPTY_ACTIONS"
     :messages="JSON.stringify(messages)"
     :messages-loaded="messagesLoaded"
     :rooms="JSON.stringify(rooms)"
-    :room-actions="JSON.stringify(roomActions)"
+    :room-actions="EMPTY_ACTIONS"
     :rooms-loaded="roomsLoaded"
     :loading-rooms="loadingRooms"
     :media-preview-enabled="isSafari ? 'false' : 'true'"
@@ -111,7 +111,7 @@
         :profile="messageUserProfile(msg.senderId)"
         class="vac-message-avatar"
         style="align-self: flex-end; margin: 0 0 2px; cursor: pointer;"
-        @click.native="navigateToProfile(msg.senderId, messageUserProfile(msg.senderId).name)"
+        @click.native="navigateToUserProfile(msg.senderId)"
       />
     </template>
   </vue-advanced-chat>
@@ -132,6 +132,8 @@ import {
 } from '~/graphql/Messages'
 import chatStyle from '~/constants/chat.js'
 import { mapGetters, mapMutations } from 'vuex'
+
+const EMPTY_ACTIONS = JSON.stringify([])
 
 export default {
   name: 'Chat',
@@ -156,11 +158,8 @@ export default {
   },
   data() {
     return {
-      menuActions: [],
-      messageActions: [],
-      templatesText: [],
-      roomActions: [],
       responsiveBreakpoint: 600,
+      EMPTY_ACTIONS,
       rooms: [],
       roomsLoaded: false,
       roomCursor: null,
@@ -241,9 +240,6 @@ export default {
     },
     computedChatStyle() {
       return chatStyle.STYLE.light
-    },
-    computedRoomId() {
-      return this.activeRoomId || null
     },
     isSafari() {
       return /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
@@ -559,7 +555,7 @@ export default {
         }
 
         if (this.singleRoom && this.rooms.length > 0) {
-          this.selectRoom(this.rooms[0])
+          this.activeRoomId = this.rooms[0].roomId
         }
       } catch (error) {
         this.rooms = []
@@ -746,11 +742,7 @@ export default {
             ...room,
             lastMessage: { ...room.lastMessage, ...statusUpdate },
           }
-          this.rooms = [
-            ...this.rooms.slice(0, roomIndex),
-            changedRoom,
-            ...this.rooms.slice(roomIndex + 1),
-          ]
+          this.$set(this.rooms, roomIndex, changedRoom)
         }
       }
     },
@@ -909,24 +901,44 @@ export default {
       this.rooms = [room, ...this.rooms.filter((r) => r.id !== id)]
     },
 
-    selectRoom(room) {
-      this.activeRoomId = room.roomId
-    },
-
     bringRoomToTopAndSelect(room) {
       room.index = new Date().toISOString()
       this.moveRoomToTop(room)
-      this.$nextTick(() => this.selectRoom(room))
+      this.$nextTick(() => {
+        this.activeRoomId = room.roomId
+      })
+    },
+
+    findLocalRoom(predicate) {
+      const room = this.rooms.find(predicate)
+      if (room) this.bringRoomToTopAndSelect(room)
+      return room
+    },
+
+    async fetchServerRoom(variables) {
+      try {
+        const { data: { Room } } = await this.$apollo.query({
+          query: roomQuery(),
+          variables,
+          fetchPolicy: 'no-cache',
+        })
+        if (Room?.length) {
+          const room = this.fixRoomObject(Room[0])
+          this.bringRoomToTopAndSelect(room)
+          return room
+        }
+      } catch {
+        // Fall through
+      }
+      return null
     },
 
     async newRoom(userOrId) {
-      // Accept either a user object { id, name } or just a userId string
       const userId = typeof userOrId === 'string' ? userOrId : userOrId.id
       let userName = typeof userOrId === 'string' ? null : userOrId.name
       let userAvatarObj = typeof userOrId === 'string' ? null : userOrId.avatar
       let userAvatar = userAvatarObj?.w320 || userAvatarObj?.url || null
 
-      // When called with just an ID (e.g. from query params), fetch user profile
       if (typeof userOrId === 'string') {
         try {
           const { data } = await this.$apollo.query({
@@ -941,38 +953,13 @@ export default {
             userAvatar = user.avatar?.w320 || user.avatar?.url || null
           }
         } catch {
-          // Fall through with userId as display name
+          // Fall through
         }
         if (!userName) userName = userId
       }
 
-      // Check if a DM room with this user already exists locally
-      const existingRoom = this.rooms.find(
-        (r) => !r.isGroupRoom && r.users.some((u) => u.id === userId),
-      )
-      if (existingRoom) {
-        this.bringRoomToTopAndSelect(existingRoom)
-        return
-      }
-
-      // Check if a DM room with this user exists on the server (not yet loaded locally)
-      try {
-        const {
-          data: { Room },
-        } = await this.$apollo.query({
-          query: roomQuery(),
-          variables: { userId },
-          fetchPolicy: 'no-cache',
-        })
-        const serverRoom = Room?.[0]
-        if (serverRoom) {
-          const room = this.fixRoomObject(serverRoom)
-          this.bringRoomToTopAndSelect(room)
-          return
-        }
-      } catch {
-        // Fall through to virtual room creation
-      }
+      if (this.findLocalRoom((r) => !r.isGroupRoom && r.users.some((u) => u.id === userId))) return
+      if (await this.fetchServerRoom({ userId })) return
 
       // Create a virtual room (no backend call — room is created on first message)
       const currentUserProfile = { id: this.currentUser.id, name: this.currentUser.name, avatar: this.currentUser.avatar }
@@ -1003,40 +990,17 @@ export default {
       this.rooms = [virtualRoom, ...this.rooms]
       this.roomsLoaded = true
       this.loadingRooms = false
-      this.$nextTick(() => this.selectRoom(virtualRoom))
+      this.$nextTick(() => {
+        this.activeRoomId = virtualRoom.roomId
+      })
     },
 
     async newGroupRoom(groupId) {
-      // Check if the group room already exists locally
-      const existingRoom = this.rooms.find((r) => r.isGroupRoom && r.groupProfile?.id === groupId)
-      if (existingRoom) {
-        this.bringRoomToTopAndSelect(existingRoom)
-        return
-      }
+      if (this.findLocalRoom((r) => r.isGroupRoom && r.groupProfile?.id === groupId)) return
+      if (await this.fetchServerRoom({ groupId })) return
 
-      // Check if the group room exists on the server (not yet loaded locally)
       try {
-        const {
-          data: { Room },
-        } = await this.$apollo.query({
-          query: roomQuery(),
-          variables: { groupId },
-          fetchPolicy: 'no-cache',
-        })
-        if (Room?.length) {
-          const room = this.fixRoomObject(Room[0])
-          this.bringRoomToTopAndSelect(room)
-          return
-        }
-      } catch {
-        // Fall through to creation
-      }
-
-      // Room doesn't exist yet — create it
-      try {
-        const {
-          data: { CreateGroupRoom },
-        } = await this.$apollo.mutate({
+        const { data: { CreateGroupRoom } } = await this.$apollo.mutate({
           mutation: createGroupRoom(),
           variables: { groupId },
         })
@@ -1075,13 +1039,15 @@ export default {
       document.body.removeChild(downloadLink)
     },
 
-    navigateToProfile(userId, name) {
-      const slug = (name || '').toLowerCase().replaceAll(' ', '-')
+    navigateToUserProfile(userId) {
+      const profile = this.messageUserProfile(userId)
+      const slug = (profile.name || '').toLowerCase().replaceAll(' ', '-')
       this.$router.push({ path: `/profile/${userId}/${slug}` })
     },
 
     redirectToUserProfile({ user }) {
-      this.navigateToProfile(user.id, user.name)
+      const slug = (user.name || '').toLowerCase().replaceAll(' ', '-')
+      this.$router.push({ path: `/profile/${user.id}/${slug}` })
     },
   },
 }
