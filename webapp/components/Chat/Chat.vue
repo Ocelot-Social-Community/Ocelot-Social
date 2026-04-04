@@ -331,7 +331,7 @@ export default {
       if (roomIndex !== -1) {
         const changedRoom = { ...this.rooms[roomIndex] }
         changedRoom.unreadCount = Math.max(0, changedRoom.unreadCount - messageIds.length)
-        this.rooms[roomIndex] = changedRoom
+        this.$set(this.rooms, roomIndex, changedRoom)
       }
       // Persist to server
       this.$apollo
@@ -668,6 +668,7 @@ export default {
     async chatMessageAdded({ data }) {
       const msg = data.chatMessageAdded
       let roomIndex = this.rooms.findIndex((r) => r.id === msg.room.id)
+      let freshlyFetched = false
       if (roomIndex === -1) {
         // Room not in list yet — fetch it specifically
         try {
@@ -682,6 +683,7 @@ export default {
             const newRoom = this.fixRoomObject(Room[0])
             this.rooms = [newRoom, ...this.rooms]
             roomIndex = 0
+            freshlyFetched = true
           } else {
             return
           }
@@ -695,7 +697,8 @@ export default {
       changedRoom.index = new Date().toISOString()
       const isCurrentRoom = msg.room.id === this.selectedRoom?.id
       const isOwnMessage = msg.senderId === this.currentUser.id
-      if (!isCurrentRoom && !isOwnMessage) {
+      // Don't increment unreadCount for freshly fetched rooms — server count already includes this message
+      if (!freshlyFetched && !isCurrentRoom && !isOwnMessage) {
         changedRoom.unreadCount++
       }
       this.moveRoomToTop(changedRoom, msg.room.id)
