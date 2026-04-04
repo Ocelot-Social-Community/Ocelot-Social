@@ -889,18 +889,17 @@ export default {
         userProfiles[u.id] = { id: u.id, name: u.name, avatar: u.avatar }
       }
       fixedRoom._userProfiles = userProfiles
-      if (!isGroupRoom) {
+      if (isGroupRoom) {
+        if (!fixedRoom.avatar) {
+          fixedRoom.avatar = room.group?.avatar?.w320 || room.group?.avatar || null
+        }
+      } else {
         const otherUser = room.users.find((u) => u.id !== this.currentUser.id)
         fixedRoom.userProfile = otherUser
           ? userProfiles[otherUser.id]
           : { name: fixedRoom.roomName }
-      }
-      if (!fixedRoom.avatar) {
-        if (isGroupRoom) {
-          fixedRoom.avatar = room.group?.avatar?.w320 || room.group?.avatar || null
-        } else {
-          const otherUser = fixedRoom.users.find((u) => u.id !== this.currentUser.id)
-          fixedRoom.avatar = otherUser?.avatar
+        if (!fixedRoom.avatar) {
+          fixedRoom.avatar = otherUser?.avatar?.w320 || null
         }
       }
       return fixedRoom
