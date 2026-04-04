@@ -71,30 +71,21 @@
     </div>
 
     <div slot="room-header-avatar">
-      <nuxt-link v-if="roomHeaderLink" :to="roomHeaderLink" class="chat-header-profile-link">
+      <component :is="roomHeaderLink ? 'nuxt-link' : 'span'" :to="roomHeaderLink" class="chat-header-profile-link">
         <profile-avatar
           v-if="selectedRoom"
-          :profile="selectedRoom.isGroupRoom ? selectedRoom.groupProfile : selectedRoom.userProfile"
+          :profile="selectedRoomProfile"
           class="vac-avatar-profile"
         />
-      </nuxt-link>
-      <profile-avatar
-        v-else-if="selectedRoom"
-        :profile="selectedRoom.isGroupRoom ? selectedRoom.groupProfile : selectedRoom.userProfile"
-        class="vac-avatar-profile"
-      />
+      </component>
     </div>
 
     <div slot="room-header-info">
       <div class="vac-room-name vac-text-ellipsis">
-        <nuxt-link v-if="roomHeaderLink" :to="roomHeaderLink" class="chat-header-profile-link">
+        <component :is="roomHeaderLink ? 'nuxt-link' : 'span'" :to="roomHeaderLink" class="chat-header-profile-link">
           <os-icon v-if="selectedRoom && selectedRoom.isGroupRoom" :icon="icons.group" class="room-group-icon" />
           {{ selectedRoom ? selectedRoom.roomName : '' }}
-        </nuxt-link>
-        <span v-else>
-          <os-icon v-if="selectedRoom && selectedRoom.isGroupRoom" :icon="icons.group" class="room-group-icon" />
-          {{ selectedRoom ? selectedRoom.roomName : '' }}
-        </span>
+        </component>
       </div>
     </div>
 
@@ -131,8 +122,7 @@ import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import locales from '~/locales/index.js'
-import gql from 'graphql-tag'
-import { roomQuery, createGroupRoom, unreadRoomsQuery } from '~/graphql/Rooms'
+import { roomQuery, createGroupRoom, unreadRoomsQuery, userProfileQuery } from '~/graphql/Rooms'
 import {
   messageQuery,
   createMessageMutation,
@@ -274,6 +264,10 @@ export default {
       }
       return { name: 'chat', query }
     },
+    selectedRoomProfile() {
+      if (!this.selectedRoom) return null
+      return this.selectedRoom.isGroupRoom ? this.selectedRoom.groupProfile : this.selectedRoom.userProfile
+    },
     roomHeaderLink() {
       if (!this.selectedRoom) return null
       if (this.selectedRoom.isGroupRoom && this.selectedRoom.groupProfile?.id) {
@@ -309,12 +303,16 @@ export default {
       commitUnreadRoomCount: 'chat/UPDATE_ROOM_COUNT',
     }),
 
-    lastMessageContent(content, files) {
-      const text = (content || '').trim()
-      if (text) return text.substring(0, 30)
-      if (!files?.length) return ''
-      if (files[0].type?.startsWith('audio/') || files[0].audio) return ''
-      return `\uD83D\uDCCE ${files[0].name || ''}`
+    buildLastMessage(msg) {
+      const content = (msg.content || '').trim()
+      let preview = content ? content.substring(0, 30) : ''
+      if (!preview && msg.files?.length) {
+        const f = msg.files[0]
+        if (!f.type?.startsWith('audio/') && !f.audio) {
+          preview = `\uD83D\uDCCE ${f.name || ''}`
+        }
+      }
+      return { ...msg, content: preview, files: msg.files }
     },
 
     markAsSeen(messageIds) {
@@ -526,7 +524,7 @@ export default {
       })
     },
 
-    async fetchRooms({ room, search } = {}) {
+    async fetchRooms({ room, search, replace } = {}) {
       this.roomsLoaded = false
       try {
         const variables = room?.id
@@ -541,11 +539,15 @@ export default {
           fetchPolicy: 'no-cache',
         })
 
-        const existingIds = new Set(this.rooms.map((r) => r.id))
-        const newRooms = Room.filter((r) => !existingIds.has(r.id)).map((r) =>
-          this.fixRoomObject(r),
-        )
-        this.rooms = [...this.rooms, ...newRooms]
+        if (replace) {
+          this.rooms = Room.map((r) => this.fixRoomObject(r))
+        } else {
+          const existingIds = new Set(this.rooms.map((r) => r.id))
+          const newRooms = Room.filter((r) => !existingIds.has(r.id)).map((r) =>
+            this.fixRoomObject(r),
+          )
+          this.rooms = [...this.rooms, ...newRooms]
+        }
 
         if (!room?.id && Room.length > 0) {
           const lastRoom = Room[Room.length - 1]
@@ -571,39 +573,14 @@ export default {
       this.roomSearch = value || ''
       this.roomCursor = null
       if (this.roomsLoaded) this.roomObserverDirty = true
-      this.roomsLoaded = false
       this.roomSearchGeneration = (this.roomSearchGeneration || 0) + 1
       const generation = this.roomSearchGeneration
-      try {
-        const variables = { first: this.roomPageSize, ...(this.roomSearch && { search: this.roomSearch }) }
-        const { data: { Room } } = await this.$apollo.query({
-          query: roomQuery(),
-          variables,
-          fetchPolicy: 'no-cache',
-        })
-        if (generation !== this.roomSearchGeneration) return
-        this.rooms = Room.map((r) => this.fixRoomObject(r))
-        if (Room.length > 0) {
-          const lastRoom = Room[Room.length - 1]
-          this.roomCursor = lastRoom.lastMessageAt || lastRoom.createdAt
-        }
-        if (Room.length < this.roomPageSize) {
-          this.roomsLoaded = true
-        }
-      } catch (error) {
-        if (generation !== this.roomSearchGeneration) return
-        this.rooms = []
-        this.$toast.error(error.message)
-      }
-      // Re-init IntersectionObserver after it was disabled by roomsLoaded=true.
-      // The library only calls initIntersectionObserver on loadingRooms true→false,
-      // but toggling loadingRooms destroys the search input. Instead, we directly
-      // access the web component's shadow DOM to re-enable the loader and observer.
+      await this.fetchRooms({ search: this.roomSearch || undefined, replace: true })
+      if (generation !== this.roomSearchGeneration) return
+      // Re-init IntersectionObserver after it was disabled by roomsLoaded=true
       if (this.roomObserverDirty && !this.roomsLoaded) {
         this.roomObserverDirty = false
-        this.$nextTick(() => {
-          this.reinitRoomLoader()
-        })
+        this.$nextTick(() => this.reinitRoomLoader())
       }
     },
 
@@ -713,11 +690,7 @@ export default {
         }
       }
       const changedRoom = { ...this.rooms[roomIndex] }
-      changedRoom.lastMessage = {
-        ...msg,
-        content: this.lastMessageContent(msg.content, msg.files),
-        files: msg.files,
-      }
+      changedRoom.lastMessage = this.buildLastMessage(msg)
       changedRoom.lastMessageAt = msg.date
       changedRoom.index = new Date().toISOString()
       const isCurrentRoom = msg.room.id === this.selectedRoom?.id
@@ -725,8 +698,7 @@ export default {
       if (!isCurrentRoom && !isOwnMessage) {
         changedRoom.unreadCount++
       }
-      // Reassign array to trigger Vue reactivity and vue-advanced-chat re-sort
-      this.rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== msg.room.id)]
+      this.moveRoomToTop(changedRoom, msg.room.id)
       // Only add incoming messages to the chat — own messages are handled via mutation response
       if (isCurrentRoom && !isOwnMessage) {
         this.addSocketMessage(msg)
@@ -824,13 +796,10 @@ export default {
       const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
       if (roomIndex !== -1) {
         const changedRoom = { ...this.rooms[roomIndex] }
-        changedRoom.lastMessage.content = this.lastMessageContent(content, files)
-        changedRoom.lastMessage.files = files
+        changedRoom.lastMessage = this.buildLastMessage({ content, files })
         changedRoom.index = new Date().toISOString()
-        this.rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== roomId)]
-        this.$nextTick(() => {
-          this.scrollRoomsListToTop()
-        })
+        this.moveRoomToTop(changedRoom, roomId)
+        this.$nextTick(() => this.scrollRoomsListToTop())
       }
 
       try {
@@ -903,13 +872,7 @@ export default {
         userProfile: null,
         index: room.lastMessage ? room.lastMessage.date : room.createdAt,
         avatar: room.avatar?.w320 || room.avatar,
-        lastMessage: room.lastMessage
-          ? {
-              ...room.lastMessage,
-              content: this.lastMessageContent(room.lastMessage?.content, room.lastMessage?.files),
-              files: room.lastMessage?.files,
-            }
-          : { content: '' },
+        lastMessage: room.lastMessage ? this.buildLastMessage(room.lastMessage) : { content: '' },
         users: room.users.map((u) => {
           return { ...u, username: u.name, avatar: u.avatar?.w320 }
         }),
@@ -937,13 +900,18 @@ export default {
       return fixedRoom
     },
 
+    moveRoomToTop(room, roomId) {
+      const id = roomId || room.id
+      this.rooms = [room, ...this.rooms.filter((r) => r.id !== id)]
+    },
+
     selectRoom(room) {
       this.activeRoomId = room.roomId
     },
 
     bringRoomToTopAndSelect(room) {
       room.index = new Date().toISOString()
-      this.rooms = [room, ...this.rooms.filter((r) => r.id !== room.id)]
+      this.moveRoomToTop(room)
       this.$nextTick(() => this.selectRoom(room))
     },
 
@@ -958,20 +926,7 @@ export default {
       if (typeof userOrId === 'string') {
         try {
           const { data } = await this.$apollo.query({
-            query: gql`
-              query ($id: ID!) {
-                User(id: $id) {
-                  id
-                  name
-                  avatar {
-                    url
-                    w320
-                    w640
-                    w1024
-                  }
-                }
-              }
-            `,
+            query: userProfileQuery(),
             variables: { id: userId },
             fetchPolicy: 'no-cache',
           })

@@ -86,6 +86,20 @@ export const roomQuery = () => gql`
   }
 `
 
+export const userProfileQuery = () => gql`
+  ${imageUrls}
+
+  query ($id: ID!) {
+    User(id: $id) {
+      id
+      name
+      avatar {
+        ...imageUrls
+      }
+    }
+  }
+`
+
 export const unreadRoomsQuery = () => {
   return gql`
     query {
