@@ -280,4 +280,8 @@ export default {
       },
     }),
   },
+  File: {
+    extension: (parent: { extension?: string | null }) => parent.extension ?? null,
+    duration: (parent: { duration?: number | null }) => parent.duration ?? null,
+  },
 }

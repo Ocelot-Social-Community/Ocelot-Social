@@ -17,7 +17,7 @@ import Message from '@graphql/queries/messaging/Message.gql'
 import Room from '@graphql/queries/messaging/Room.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-import { chatMessageAddedFilter, chatMessageStatusUpdatedFilter } from './messages'
+import resolvers, { chatMessageAddedFilter, chatMessageStatusUpdatedFilter } from './messages'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -850,6 +850,36 @@ describe('Message', () => {
       })
       expect(result.errors).toBeDefined()
       expect(result.errors?.[0].message).toContain('Message must have content or files')
+    })
+  })
+
+  describe('File field resolvers', () => {
+    it('returns extension when present', () => {
+      expect(resolvers.File.extension({ extension: 'jpg' })).toBe('jpg')
+    })
+
+    it('returns null when extension is undefined', () => {
+      expect(resolvers.File.extension({})).toBeNull()
+    })
+
+    it('returns null when extension is null', () => {
+      expect(resolvers.File.extension({ extension: null })).toBeNull()
+    })
+
+    it('returns duration when present', () => {
+      expect(resolvers.File.duration({ duration: 5.3 })).toBe(5.3)
+    })
+
+    it('returns null when duration is undefined', () => {
+      expect(resolvers.File.duration({})).toBeNull()
+    })
+
+    it('returns null when duration is null', () => {
+      expect(resolvers.File.duration({ duration: null })).toBeNull()
+    })
+
+    it('returns duration 0 as valid', () => {
+      expect(resolvers.File.duration({ duration: 0 })).toBe(0)
     })
   })
 })

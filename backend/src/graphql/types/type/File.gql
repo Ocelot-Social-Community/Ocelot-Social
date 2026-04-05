@@ -1,10 +1,11 @@
 type File {
   url: ID!
   name: String
+  extension: String
   type: String
+  duration: Float
   # size: Int
   # audio: Boolean
-  # duration: Float
   # preview: String
   # progress: Int
 }
@@ -12,5 +13,7 @@ type File {
 input FileInput {
   upload: Upload
   name: String
+  extension: String
   type: String
+  duration: Float
 }
