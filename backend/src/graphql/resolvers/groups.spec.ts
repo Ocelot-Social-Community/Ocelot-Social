@@ -10,10 +10,13 @@ import Factory, { cleanDatabase } from '@db/factories'
 import ChangeGroupMemberRole from '@graphql/queries/groups/ChangeGroupMemberRole.gql'
 import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
 import groupQuery from '@graphql/queries/groups/Group.gql'
+import GroupCount from '@graphql/queries/groups/GroupCount.gql'
 import groupMembersQuery from '@graphql/queries/groups/GroupMembers.gql'
 import JoinGroup from '@graphql/queries/groups/JoinGroup.gql'
 import LeaveGroup from '@graphql/queries/groups/LeaveGroup.gql'
+import muteGroupMutation from '@graphql/queries/groups/muteGroup.gql'
 import RemoveUserFromGroup from '@graphql/queries/groups/RemoveUserFromGroup.gql'
+import unmuteGroupMutation from '@graphql/queries/groups/unmuteGroup.gql'
 import UpdateGroup from '@graphql/queries/groups/UpdateGroup.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
@@ -3313,6 +3316,232 @@ describe('in mode', () => {
           })
         })
         */
+      })
+    })
+  })
+
+  describe('clean db after each – additional coverage', () => {
+    beforeEach(async () => {
+      await seedBasicsAndClearAuthentication()
+    })
+
+    afterEach(async () => {
+      await cleanDatabase()
+    })
+
+    describe('GroupCount', () => {
+      beforeEach(async () => {
+        authenticatedUser = await user.toJson()
+        await mutate({
+          mutation: CreateGroup,
+          variables: {
+            name: 'Count Test Group',
+            about: 'A group for counting',
+            description:
+              'This is a test group for counting purposes, with enough description length to pass validation',
+            groupType: 'public',
+            actionRadius: 'national',
+            categoryIds: ['cat9'],
+          },
+        })
+      })
+
+      it('returns count of all visible groups when isMember is not set', async () => {
+        const result = await query({ query: GroupCount })
+        expect(result).toMatchObject({
+          data: { GroupCount: 1 },
+          errors: undefined,
+        })
+      })
+
+      it('returns count of groups the user is a member of', async () => {
+        const result = await query({ query: GroupCount, variables: { isMember: true } })
+        expect(result).toMatchObject({
+          data: { GroupCount: 1 },
+          errors: undefined,
+        })
+      })
+    })
+
+    describe('muteGroup and unmuteGroup', () => {
+      let groupId: string
+
+      beforeEach(async () => {
+        authenticatedUser = await user.toJson()
+        const result = await mutate({
+          mutation: CreateGroup,
+          variables: {
+            name: 'Mute Test Group',
+            about: 'A group for muting',
+            description:
+              'This is a test group for muting purposes, with enough description length to pass validation',
+            groupType: 'public',
+            actionRadius: 'national',
+            categoryIds: ['cat9'],
+          },
+        })
+        groupId = result.data.CreateGroup.id
+      })
+
+      it('mutes a group', async () => {
+        await expect(
+          mutate({ mutation: muteGroupMutation, variables: { groupId } }),
+        ).resolves.toMatchObject({
+          data: {
+            muteGroup: {
+              id: groupId,
+              isMutedByMe: true,
+            },
+          },
+          errors: undefined,
+        })
+      })
+
+      it('unmutes a group', async () => {
+        await mutate({ mutation: muteGroupMutation, variables: { groupId } })
+        await expect(
+          mutate({ mutation: unmuteGroupMutation, variables: { groupId } }),
+        ).resolves.toMatchObject({
+          data: {
+            unmuteGroup: {
+              id: groupId,
+              isMutedByMe: false,
+            },
+          },
+          errors: undefined,
+        })
+      })
+
+      it('muteGroup throws for unauthenticated user', async () => {
+        authenticatedUser = null
+        await expect(
+          mutate({ mutation: muteGroupMutation, variables: { groupId } }),
+        ).resolves.toMatchObject({
+          errors: [expect.objectContaining({ message: 'Not Authorized!' })],
+        })
+      })
+
+      it('unmuteGroup throws for unauthenticated user', async () => {
+        authenticatedUser = null
+        await expect(
+          mutate({ mutation: unmuteGroupMutation, variables: { groupId } }),
+        ).resolves.toMatchObject({
+          errors: [expect.objectContaining({ message: 'Not Authorized!' })],
+        })
+      })
+    })
+
+    describe('UpdateGroup slug conflict', () => {
+      beforeEach(async () => {
+        authenticatedUser = await user.toJson()
+        await mutate({
+          mutation: CreateGroup,
+          variables: {
+            id: 'group-a',
+            name: 'Group A',
+            slug: 'group-a',
+            about: 'About A',
+            description:
+              'A test group with enough description length to pass the validation requirement check',
+            groupType: 'public',
+            actionRadius: 'national',
+            categoryIds: ['cat9'],
+          },
+        })
+        await mutate({
+          mutation: CreateGroup,
+          variables: {
+            id: 'group-b',
+            name: 'Group B',
+            slug: 'group-b',
+            about: 'About B',
+            description:
+              'A test group with enough description length to pass the validation requirement check',
+            groupType: 'public',
+            actionRadius: 'national',
+            categoryIds: ['cat9'],
+          },
+        })
+      })
+
+      it('throws error when updating slug to conflict with existing group', async () => {
+        await expect(
+          mutate({
+            mutation: UpdateGroup,
+            variables: { id: 'group-b', slug: 'group-a' },
+          }),
+        ).resolves.toMatchObject({
+          errors: [expect.objectContaining({ message: 'Group with this slug already exists!' })],
+        })
+      })
+    })
+
+    describe('CreateGroup slug conflict', () => {
+      beforeEach(async () => {
+        authenticatedUser = await user.toJson()
+        await mutate({
+          mutation: CreateGroup,
+          variables: {
+            name: 'Existing Group',
+            slug: 'existing-group',
+            about: 'About',
+            description:
+              'A test group with enough description length to pass the validation requirement check',
+            groupType: 'public',
+            actionRadius: 'national',
+            categoryIds: ['cat9'],
+          },
+        })
+      })
+
+      it('throws error when creating group with duplicate slug', async () => {
+        await expect(
+          mutate({
+            mutation: CreateGroup,
+            variables: {
+              name: 'Another Group',
+              slug: 'existing-group',
+              about: 'About',
+              description:
+                'A test group with enough description length to pass the validation requirement check',
+              groupType: 'public',
+              actionRadius: 'national',
+              categoryIds: ['cat9'],
+            },
+          }),
+        ).resolves.toMatchObject({
+          errors: [expect.objectContaining({ message: 'Group with this slug already exists!' })],
+        })
+      })
+    })
+
+    describe('RemoveUserFromGroup for non-member', () => {
+      beforeEach(async () => {
+        authenticatedUser = await user.toJson()
+        await mutate({
+          mutation: CreateGroup,
+          variables: {
+            id: 'remove-test-group',
+            name: 'Remove Test Group',
+            about: 'About',
+            description:
+              'A test group with enough description length to pass the validation requirement check',
+            groupType: 'public',
+            actionRadius: 'national',
+            categoryIds: ['cat9'],
+          },
+        })
+      })
+
+      it('throws error when removing a user who is not a member', async () => {
+        await expect(
+          mutate({
+            mutation: RemoveUserFromGroup,
+            variables: { groupId: 'remove-test-group', userId: 'non-existent-user' },
+          }),
+        ).resolves.toMatchObject({
+          errors: expect.arrayContaining([expect.objectContaining({ message: expect.any(String) })]),
+        })
       })
     })
   })
