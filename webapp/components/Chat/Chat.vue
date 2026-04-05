@@ -635,6 +635,7 @@ export default {
         this._externalRoomIds.delete(room.roomId)
         if (this.selectedRoom) {
           this.activeRoomId = this.selectedRoom.roomId
+          return
         }
       }
       if (this.selectedRoom?.id !== room.id) {
