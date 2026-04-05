@@ -1163,11 +1163,15 @@ describe('Chat.vue', () => {
 
     it('blocks external room auto-select', async () => {
       wrapper = Wrapper()
-      wrapper.vm.selectedRoom = mockRoom({ id: 'current', roomId: 'current' })
+      const currentRoom = mockRoom({ id: 'current', roomId: 'current' })
+      wrapper.vm.selectedRoom = currentRoom
       wrapper.vm.activeRoomId = 'current'
+      wrapper.vm.messages = [{ id: 'msg1', content: 'existing' }]
       wrapper.vm._externalRoomIds = new Set(['ext-room'])
       await wrapper.vm.fetchMessages({ room: { id: 'ext', roomId: 'ext-room' } })
       expect(wrapper.vm.activeRoomId).toBe('current')
+      expect(wrapper.vm.selectedRoom).toBe(currentRoom)
+      expect(wrapper.vm.messages).toEqual([{ id: 'msg1', content: 'existing' }])
     })
 
     it('handles virtual rooms with early return', async () => {
