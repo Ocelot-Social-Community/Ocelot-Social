@@ -3541,7 +3541,11 @@ describe('in mode', () => {
             variables: { groupId: 'remove-test-group', userId: 'non-existent-user' },
           }),
         ).resolves.toMatchObject({
-          errors: expect.arrayContaining([expect.objectContaining({ message: expect.any(String) })]),
+          errors: expect.arrayContaining([
+            expect.objectContaining({
+              message: 'User is not a member of this group',
+            }),
+          ]),
         })
       })
     })
