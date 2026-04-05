@@ -20,7 +20,6 @@ import unpushPost from '@graphql/queries/posts/unpushPost.gql'
 import UpdatePost from '@graphql/queries/posts/UpdatePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-import type Image from '@db/models/Image'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
@@ -885,7 +884,6 @@ describe('UpdatePost', () => {
         })
       })
     })
-
   })
 })
 

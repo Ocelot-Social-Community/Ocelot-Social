@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable jest/expect-expect */
 
 import Factory, { cleanDatabase } from '@db/factories'
 import currentUser from '@graphql/queries/auth/currentUser.gql'
@@ -234,7 +233,6 @@ describe('validateInviteCode', () => {
         }),
       )
     })
-
   })
 
   describe('as authenticated user', () => {
@@ -291,7 +289,6 @@ describe('validateInviteCode', () => {
         errors: undefined,
       })
     })
-
   })
 })
 
@@ -458,7 +455,6 @@ describe('generatePersonalInviteCode', () => {
         errors: undefined,
       })
     })
-
   })
 })
 
@@ -724,7 +720,6 @@ describe('generateGroupInviteCode', () => {
         errors: undefined,
       })
     })
-
   })
 
   describe('as authenticated not-member', () => {
