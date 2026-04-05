@@ -219,7 +219,7 @@ export default {
       } catch (e) {
         if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
           throw new UserInputError('Post with this slug already exists!')
-        throw new Error(e)
+        throw e
       } finally {
         await session.close()
       }
@@ -286,6 +286,10 @@ export default {
           await createOrUpdateLocations('Post', post.id, locationName, session, context)
         }
         return post
+      } catch (e) {
+        if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
+          throw new UserInputError('Post with this slug already exists!')
+        throw e
       } finally {
         await session.close()
       }

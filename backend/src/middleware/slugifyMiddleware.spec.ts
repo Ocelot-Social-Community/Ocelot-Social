@@ -495,7 +495,7 @@ describe('slugifyMiddleware', () => {
             ).resolves.toMatchObject({
               errors: [
                 {
-                  message: expect.stringContaining('pre-existing-post'),
+                  message: 'Post with this slug already exists!',
                 },
               ],
             })
