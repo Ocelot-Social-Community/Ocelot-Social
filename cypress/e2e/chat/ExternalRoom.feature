@@ -18,7 +18,7 @@ Feature: External Room Creation
     And I see the message "Hi Bob!" in the chat
     When "charlie" sends a chat message "Surprise!" to "bob"
     Then I see "Charlie" in the room list
-    And I still see the message "Hi Bob!" in the chat
+    And I see the message "Hi Bob!" in the chat
 
   Scenario: New room from external message shows unread badge
     Given "alice" sends a chat message "Hi Bob!" to "bob"
