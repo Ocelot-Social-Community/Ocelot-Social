@@ -7,6 +7,7 @@ import SignupVerification from '@graphql/queries/auth/SignupVerification.gql'
 import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
 import UpdateGroup from '@graphql/queries/groups/UpdateGroup.gql'
 import CreatePost from '@graphql/queries/posts/CreatePost.gql'
+import UpdatePost from '@graphql/queries/posts/UpdatePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
@@ -424,7 +425,100 @@ describe('slugifyMiddleware', () => {
     })
   })
 
-  it.todo('UpdatePost')
+  describe('UpdatePost', () => {
+    let createPostResult
+
+    beforeEach(async () => {
+      createPostResult = await mutate({
+        mutation: CreatePost,
+        variables: {
+          title: 'I am a brand new post',
+          content: 'Some content',
+          categoryIds,
+        },
+      })
+    })
+
+    describe('if new slug not exists', () => {
+      describe('setting slug explicitly', () => {
+        it('has the new slug', async () => {
+          await expect(
+            mutate({
+              mutation: UpdatePost,
+              variables: {
+                id: createPostResult.data.CreatePost.id,
+                title: 'I am a brand new post',
+                content: 'Some content',
+                slug: 'my-brand-new-post',
+              },
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              UpdatePost: {
+                slug: 'my-brand-new-post',
+              },
+            },
+            errors: undefined,
+          })
+        })
+      })
+    })
+
+    describe('if new slug exists in another post', () => {
+      beforeEach(async () => {
+        await Factory.build(
+          'post',
+          {
+            title: 'Pre-existing post',
+            slug: 'pre-existing-post',
+            content: 'Someone else content',
+          },
+          {
+            categoryIds,
+          },
+        )
+      })
+
+      describe('setting slug explicitly', () => {
+        it('rejects UpdatePost', async () => {
+          try {
+            await expect(
+              mutate({
+                mutation: UpdatePost,
+                variables: {
+                  id: createPostResult.data.CreatePost.id,
+                  title: 'I am a brand new post',
+                  content: 'Some content',
+                  slug: 'pre-existing-post',
+                },
+              }),
+            ).resolves.toMatchObject({
+              errors: [
+                {
+                  message: expect.stringContaining('pre-existing-post'),
+                },
+              ],
+            })
+          } catch (error) {
+            throw new Error(`
+              ${error}
+
+              Probably your database has no unique constraints!
+
+              To see all constraints go to http://localhost:7474/browser/ and
+              paste the following:
+              \`\`\`
+                CALL db.constraints();
+              \`\`\`
+
+              Learn how to setup the database here:
+              https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/backend/README.md#database-indices-and-constraints
+            `)
+          }
+        })
+      })
+    })
+  })
 
   describe('SignupVerification', () => {
     beforeEach(() => {

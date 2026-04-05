@@ -235,22 +235,6 @@ describe('validateInviteCode', () => {
       )
     })
 
-    // eslint-disable-next-line jest/no-disabled-tests
-    it.skip('throws authorization error when querying extended fields', async () => {
-      await expect(
-        query({ query: authenticatedValidateInviteCode, variables: { code: 'PERSNL' } }),
-      ).resolves.toMatchObject({
-        data: {
-          validateInviteCode: {
-            code: 'PERSNL',
-            generatedBy: null,
-            invitedTo: null,
-            isValid: true,
-          },
-        },
-        errors: [{ message: 'Not Authorized!' }],
-      })
-    })
   })
 
   describe('as authenticated user', () => {
@@ -308,26 +292,6 @@ describe('validateInviteCode', () => {
       })
     })
 
-    // This doesn't work because group permissions are fucked
-    // eslint-disable-next-line jest/no-disabled-tests
-    it.skip('throws authorization error when querying extended hidden group fields', async () => {
-      await expect(
-        query({ query: authenticatedValidateInviteCode, variables: { code: 'GRPHDN' } }),
-      ).resolves.toMatchObject({
-        data: {
-          validateInviteCode: {
-            code: 'GRPHDN',
-            generatedBy: null,
-            invitedTo: null,
-            isValid: true,
-          },
-        },
-        errors: [{ message: 'Not Authorized!' }],
-      })
-    })
-
-    // eslint-disable-next-line jest/no-disabled-tests
-    it.skip('throws no authorization error when querying extended hidden group fields as member', async () => {})
   })
 })
 
@@ -495,8 +459,6 @@ describe('generatePersonalInviteCode', () => {
       })
     })
 
-    // eslint-disable-next-line jest/no-disabled-tests
-    it.skip('returns a new invite code when colliding with an existing one', () => {})
   })
 })
 
@@ -763,8 +725,6 @@ describe('generateGroupInviteCode', () => {
       })
     })
 
-    // eslint-disable-next-line jest/no-disabled-tests
-    it.skip('returns a new group invite code when colliding with an existing one', () => {})
   })
 
   describe('as authenticated not-member', () => {

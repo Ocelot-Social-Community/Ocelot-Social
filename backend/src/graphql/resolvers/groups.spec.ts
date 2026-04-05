@@ -1740,8 +1740,16 @@ describe('in mode', () => {
                     })
                   })
 
-                  // the GQL mutation needs this fields in the result for testing
-                  it.todo('has "updatedAt" newer as "createdAt"')
+                  it('has "updatedAt" newer than or equal to "createdAt"', async () => {
+                    const result = await mutate({
+                      mutation: ChangeGroupMemberRole,
+                      variables,
+                    })
+                    const { createdAt, updatedAt } = result.data.ChangeGroupMemberRole.membership
+                    expect(new Date(updatedAt).getTime()).toBeGreaterThanOrEqual(
+                      new Date(createdAt).getTime(),
+                    )
+                  })
                 })
               })
 
