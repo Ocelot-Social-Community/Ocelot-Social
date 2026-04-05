@@ -239,7 +239,30 @@ describe('reports', () => {
             })
           })
 
-          it.todo('creates multiple filed reports')
+          it('creates separate reports for different resources', async () => {
+            await Factory.build(
+              'user',
+              {
+                id: 'second-abusive-user-id',
+                role: 'user',
+                name: 'second-abusive-user',
+              },
+              {
+                email: 'second-abusive@example.org',
+              },
+            )
+            const firstReport = await mutate({
+              mutation: fileReport,
+              variables: { ...variables, resourceId: 'abusive-user-id' },
+            })
+            const secondReport = await mutate({
+              mutation: fileReport,
+              variables: { ...variables, resourceId: 'second-abusive-user-id' },
+            })
+            expect(firstReport.data.fileReport.reportId).not.toEqual(
+              secondReport.data.fileReport.reportId,
+            )
+          })
         })
 
         describe('reported resource is a user', () => {

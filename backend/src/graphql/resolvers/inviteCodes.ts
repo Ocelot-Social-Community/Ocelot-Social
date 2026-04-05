@@ -118,7 +118,7 @@ export const redeemInviteCode = async (context: Context, code, newUser = false) 
       MERGE (user)-[membership:MEMBER_OF]->(group) 
         ON CREATE SET
           membership.createdAt = toString(datetime()),
-          membership.updatedAt = null,
+          membership.updatedAt = toString(datetime()),
           membership.role = $role
       `,
       variables: { user: context.user, code, role },

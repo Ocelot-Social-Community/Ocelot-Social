@@ -7,6 +7,8 @@ mutation ChangeGroupMemberRole($groupId: ID!, $userId: ID!, $roleInGroup: GroupM
     }
     membership {
       role
+      createdAt
+      updatedAt
     }
   }
 }

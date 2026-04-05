@@ -20,7 +20,6 @@ import unpushPost from '@graphql/queries/posts/unpushPost.gql'
 import UpdatePost from '@graphql/queries/posts/UpdatePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-import type Image from '@db/models/Image'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
@@ -882,50 +881,6 @@ describe('UpdatePost', () => {
             },
             errors: undefined,
           })
-        })
-      })
-    })
-
-    // eslint-disable-next-line jest/no-disabled-tests
-    describe.skip('params.image', () => {
-      describe('is object', () => {
-        beforeEach(() => {
-          variables = { ...variables, image: { sensitive: true } }
-        })
-        it('updates the image', async () => {
-          await expect(
-            database.neode.first<typeof Image>('Image', { sensitive: true }, undefined),
-          ).resolves.toBeFalsy()
-          await mutate({ mutation: UpdatePost, variables })
-          await expect(
-            database.neode.first<typeof Image>('Image', { sensitive: true }, undefined),
-          ).resolves.toBeTruthy()
-        })
-      })
-
-      describe('is null', () => {
-        beforeEach(() => {
-          variables = { ...variables, image: null }
-        })
-        it('deletes the image', async () => {
-          await expect(database.neode.all('Image')).resolves.toHaveLength(6)
-          await mutate({ mutation: UpdatePost, variables })
-          await expect(database.neode.all('Image')).resolves.toHaveLength(5)
-        })
-      })
-
-      describe('is undefined', () => {
-        beforeEach(() => {
-          delete variables.image
-        })
-        it('keeps the image unchanged', async () => {
-          await expect(
-            database.neode.first<typeof Image>('Image', { sensitive: true }, undefined),
-          ).resolves.toBeFalsy()
-          await mutate({ mutation: UpdatePost, variables })
-          await expect(
-            database.neode.first<typeof Image>('Image', { sensitive: true }, undefined),
-          ).resolves.toBeFalsy()
         })
       })
     })
