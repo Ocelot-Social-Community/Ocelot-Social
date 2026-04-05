@@ -1020,13 +1020,12 @@ export default {
         index: new Date().toISOString(),
         lastMessage: { content: '' },
         users: [
-          { _id: this.currentUser.id, id: this.currentUser.id, username: this.currentUser.name },
-          { _id: userId, id: userId, username: userName, avatar: userAvatar },
+          { _id: this.currentUser.id, id: this.currentUser.id, name: this.currentUser.name, username: this.currentUser.name },
+          { _id: userId, id: userId, name: userName, username: userName, avatar: userAvatar },
         ],
         _virtualUserId: userId,
       }
       this.rooms = [virtualRoom, ...this.rooms]
-      this.roomsLoaded = true
       this.loadingRooms = false
       this.$nextTick(() => {
         this.activeRoomId = virtualRoom.roomId
