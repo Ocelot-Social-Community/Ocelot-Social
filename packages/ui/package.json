@@ -88,7 +88,7 @@
     "@fontsource-variable/inter": "^5.2.8",
     "@playwright/test": "^1.59.1",
     "@size-limit/file": "^12.0.1",
-    "@storybook/vue3-vite": "^10.3.3",
+    "@storybook/vue3-vite": "^10.3.4",
     "@tailwindcss/cli": "^4.2.2",
     "@tailwindcss/vite": "^4.2.2",
     "@types/node": "^25.5.0",
