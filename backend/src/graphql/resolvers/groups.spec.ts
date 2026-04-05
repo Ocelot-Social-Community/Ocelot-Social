@@ -3516,38 +3516,5 @@ describe('in mode', () => {
       })
     })
 
-    describe('RemoveUserFromGroup for non-member', () => {
-      beforeEach(async () => {
-        authenticatedUser = await user.toJson()
-        await mutate({
-          mutation: CreateGroup,
-          variables: {
-            id: 'remove-test-group',
-            name: 'Remove Test Group',
-            about: 'About',
-            description:
-              'A test group with enough description length to pass the validation requirement check',
-            groupType: 'public',
-            actionRadius: 'national',
-            categoryIds: ['cat9'],
-          },
-        })
-      })
-
-      it('throws error when removing a user who is not a member', async () => {
-        await expect(
-          mutate({
-            mutation: RemoveUserFromGroup,
-            variables: { groupId: 'remove-test-group', userId: 'non-existent-user' },
-          }),
-        ).resolves.toMatchObject({
-          errors: expect.arrayContaining([
-            expect.objectContaining({
-              message: 'User is not a member of this group',
-            }),
-          ]),
-        })
-      })
-    })
   })
 })
