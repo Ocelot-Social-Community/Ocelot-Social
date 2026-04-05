@@ -205,7 +205,8 @@ describe('AddChatRoomByUserSearch.vue', () => {
     it('query returns the searchChatTargets query', () => {
       wrapper = Wrapper()
       const apolloConfig = wrapper.vm.$options.apollo.searchChatTargets
-      expect(apolloConfig.query.call(wrapper.vm)).toBeDefined()
+      const query = apolloConfig.query.call(wrapper.vm)
+      expect(query.definitions[0].name.value).toBe('searchChatTargets')
     })
 
     it('variables returns query and limit', () => {
