@@ -86,7 +86,7 @@
     "@arethetypeswrong/cli": "^0.18.2",
     "@axe-core/playwright": "^4.11.1",
     "@fontsource-variable/inter": "^5.2.8",
-    "@playwright/test": "^1.58.2",
+    "@playwright/test": "^1.59.1",
     "@size-limit/file": "^12.0.1",
     "@storybook/vue3-vite": "^10.3.3",
     "@tailwindcss/cli": "^4.2.2",
