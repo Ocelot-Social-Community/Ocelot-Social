@@ -141,7 +141,7 @@ export const searchHashtags = gql`
 export const searchChatTargets = gql`
   ${imageUrls}
 
-  query ($query: String!, $limit: Int) {
+  query searchChatTargets($query: String!, $limit: Int) {
     searchChatTargets(query: $query, limit: $limit) {
       __typename
       ... on User {
