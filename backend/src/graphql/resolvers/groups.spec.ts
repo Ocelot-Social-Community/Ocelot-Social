@@ -1748,7 +1748,8 @@ describe('in mode', () => {
                       mutation: ChangeGroupMemberRole,
                       variables,
                     })
-                    const { createdAt, updatedAt } = result.data.ChangeGroupMemberRole.membership
+                    const { createdAt, updatedAt }: { createdAt: string; updatedAt: string } =
+                      result.data.ChangeGroupMemberRole.membership
                     expect(new Date(updatedAt).getTime()).toBeGreaterThanOrEqual(
                       new Date(createdAt).getTime(),
                     )
