@@ -88,11 +88,20 @@ export default {
       try {
         const first = params.first || 10
         const before = params.before || null
+        const search = params.search || null
         const result = await session.readTransaction(async (transaction) => {
+          const conditions: string[] = []
+          if (before) conditions.push('sortDate < $before')
+          if (search) conditions.push('toLower(roomName) CONTAINS toLower($search)')
+          const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''
           const cypher = `
             MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)
-            WITH room, COALESCE(room.lastMessageAt, room.createdAt) AS sortDate
-            ${before ? 'WHERE sortDate < $before' : ''}
+            OPTIONAL MATCH (room)-[:ROOM_FOR]->(g:Group)
+            OPTIONAL MATCH (room)<-[:CHATS_IN]-(otherUser:User)
+              WHERE g IS NULL AND otherUser.id <> $currentUserId
+            WITH room, COALESCE(room.lastMessageAt, room.createdAt) AS sortDate,
+                 COALESCE(g.name, otherUser.name) AS roomName
+            ${whereClause}
             RETURN room.id AS id
             ORDER BY sortDate DESC
             LIMIT toInteger($first)
@@ -101,6 +110,7 @@ export default {
             currentUserId: context.user.id,
             first,
             before,
+            search,
           })
         })
         const roomIds: string[] = result.records.map((record) => record.get('id') as string)

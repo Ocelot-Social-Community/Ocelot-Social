@@ -90,8 +90,33 @@ export default {
 </script>
 
 <style lang="scss">
-.layout-default:has(.chat-page) .main-container {
-  padding-bottom: 0 !important;
+.layout-default:has(.chat-page) {
+  > .ds-container {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .main-container {
+    padding-top: var(--header-height, 66px) !important;
+    padding-bottom: 0 !important;
+  }
+}
+
+.chat-page {
+  --footer-height: 40px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - var(--header-height, 66px) - var(--footer-height));
+  overflow: hidden;
+
+  > * {
+    flex-shrink: 0;
+  }
+
+  > :last-child {
+    flex: 1;
+    min-height: 0;
+  }
 }
 
 @media (max-width: 768px) {
@@ -101,26 +126,10 @@ export default {
       padding-left: 0 !important;
       padding-right: 0 !important;
     }
-    .main-container {
-      padding-top: 0 !important;
-      padding-bottom: 0 !important;
-    }
-    .chat-page {
-      padding-top: var(--header-height, 66px);
-      height: 100dvh;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
+  }
 
-      > * {
-        flex-shrink: 0;
-      }
-
-      > :last-child {
-        flex: 1;
-        min-height: 0;
-      }
-    }
+  .chat-page {
+    --footer-height: 0px;
   }
 }
 </style>

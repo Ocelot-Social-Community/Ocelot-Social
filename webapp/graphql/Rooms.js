@@ -37,8 +37,15 @@ export const createGroupRoom = () => gql`
 export const roomQuery = () => gql`
   ${imageUrls}
 
-  query Room($first: Int, $before: String, $id: ID, $userId: ID, $groupId: ID) {
-    Room(first: $first, before: $before, id: $id, userId: $userId, groupId: $groupId) {
+  query Room($first: Int, $before: String, $id: ID, $userId: ID, $groupId: ID, $search: String) {
+    Room(
+      first: $first
+      before: $before
+      id: $id
+      userId: $userId
+      groupId: $groupId
+      search: $search
+    ) {
       id
       roomId
       roomName
@@ -66,6 +73,13 @@ export const roomQuery = () => gql`
         saved
         distributed
         seen
+        files {
+          url
+          name
+          extension
+          type
+          duration
+        }
       }
       users {
         _id
@@ -74,6 +88,20 @@ export const roomQuery = () => gql`
         avatar {
           ...imageUrls
         }
+      }
+    }
+  }
+`
+
+export const userProfileQuery = () => gql`
+  ${imageUrls}
+
+  query ($id: ID!) {
+    User(id: $id) {
+      id
+      name
+      avatar {
+        ...imageUrls
       }
     }
   }

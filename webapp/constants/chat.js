@@ -20,8 +20,8 @@ const STYLE = {
 
     container: {
       border: 'none',
-      borderRadius: styleData.borderRadiusBase,
-      boxShadow: styleData.boxShadowBase,
+      borderRadius: '0',
+      boxShadow: 'none',
     },
 
     header: {
