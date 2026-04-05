@@ -540,7 +540,7 @@ export default {
       })
     },
 
-    async fetchRooms({ room, search, replace } = {}) {
+    async fetchRooms({ room, search, replace, generation } = {}) {
       this.roomsLoaded = false
       try {
         const variables = room?.id
@@ -554,6 +554,8 @@ export default {
           variables,
           fetchPolicy: 'no-cache',
         })
+
+        if (generation != null && generation !== this.roomSearchGeneration) return
 
         if (replace) {
           this.rooms = Room.map((r) => this.fixRoomObject(r))
@@ -591,7 +593,7 @@ export default {
       if (this.roomsLoaded) this.roomObserverDirty = true
       this.roomSearchGeneration = (this.roomSearchGeneration || 0) + 1
       const generation = this.roomSearchGeneration
-      await this.fetchRooms({ search: this.roomSearch || undefined, replace: true })
+      await this.fetchRooms({ search: this.roomSearch || undefined, replace: true, generation })
       if (generation !== this.roomSearchGeneration) return
       // Re-init IntersectionObserver after it was disabled by roomsLoaded=true
       if (this.roomObserverDirty && !this.roomsLoaded) {
