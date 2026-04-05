@@ -1020,7 +1020,12 @@ export default {
         index: new Date().toISOString(),
         lastMessage: { content: '' },
         users: [
-          { _id: this.currentUser.id, id: this.currentUser.id, name: this.currentUser.name, username: this.currentUser.name },
+          {
+            _id: this.currentUser.id,
+            id: this.currentUser.id,
+            name: this.currentUser.name,
+            username: this.currentUser.name,
+          },
           { _id: userId, id: userId, name: userName, username: userName, avatar: userAvatar },
         ],
         _virtualUserId: userId,
