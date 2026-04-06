@@ -27,6 +27,7 @@ query Group($isMember: Boolean, $id: ID, $slug: String) {
       name
     }
     myRole
+    currentlyPinnedPostsCount
     inviteCodes {
       code
       redeemedByCount

@@ -2,15 +2,15 @@
   <vue-advanced-chat
     :theme="theme"
     :current-user-id="currentUser.id"
-    :room-id="computedRoomId"
-    :template-actions="JSON.stringify(templatesText)"
-    :menu-actions="JSON.stringify(menuActions)"
+    :room-id="activeRoomId"
+    :template-actions="EMPTY_ACTIONS"
+    :menu-actions="EMPTY_ACTIONS"
     :text-messages="JSON.stringify(textMessages)"
-    :message-actions="messageActions"
+    :message-actions="EMPTY_ACTIONS"
     :messages="JSON.stringify(messages)"
     :messages-loaded="messagesLoaded"
-    :rooms="JSON.stringify(rooms)"
-    :room-actions="JSON.stringify(roomActions)"
+    :rooms="JSON.stringify(displayedRooms)"
+    :room-actions="EMPTY_ACTIONS"
     :rooms-loaded="roomsLoaded"
     :loading-rooms="loadingRooms"
     :media-preview-enabled="isSafari ? 'false' : 'true'"
@@ -20,12 +20,14 @@
     :height="chatHeight"
     :styles="JSON.stringify(computedChatStyle)"
     :show-footer="true"
-    :responsive-breakpoint="responsiveBreakpoint"
+    :responsive-breakpoint="600"
     :single-room="singleRoom"
     show-reaction-emojis="false"
+    custom-search-room-enabled="true"
     @send-message="sendMessage($event.detail[0])"
     @fetch-messages="fetchMessages($event.detail[0])"
-    @fetch-more-rooms="fetchRooms"
+    @fetch-more-rooms="fetchMoreRooms"
+    @search-room="searchRooms($event.detail[0])"
     @add-room="toggleUserSearch"
     @open-user-tag="redirectToUserProfile($event.detail[0])"
     @open-file="openFile($event.detail[0].file.file)"
@@ -69,65 +71,65 @@
     </div>
 
     <div slot="room-header-avatar">
-      <nuxt-link v-if="roomHeaderLink" :to="roomHeaderLink" class="chat-header-profile-link">
+      <component
+        :is="roomHeaderLink ? 'nuxt-link' : 'span'"
+        :to="roomHeaderLink"
+        class="chat-header-profile-link"
+      >
         <profile-avatar
-          v-if="selectedRoom && selectedRoom.isGroupRoom"
-          :profile="selectedRoom.groupProfile"
+          v-if="selectedRoom"
+          :profile="selectedRoomProfile"
           class="vac-avatar-profile"
-          size="small"
         />
-        <div
-          v-else-if="selectedRoom && selectedRoom.avatar"
-          class="vac-avatar"
-          :style="{ 'background-image': `url('${selectedRoom.avatar}')` }"
-        />
-        <div v-else-if="selectedRoom" class="vac-avatar">
-          <span class="initials">{{ getInitialsName(selectedRoom.roomName) }}</span>
-        </div>
-      </nuxt-link>
-      <template v-else>
-        <profile-avatar
-          v-if="selectedRoom && selectedRoom.isGroupRoom"
-          :profile="selectedRoom.groupProfile"
-          class="vac-avatar-profile"
-          size="small"
-        />
-        <div
-          v-else-if="selectedRoom && selectedRoom.avatar"
-          class="vac-avatar"
-          :style="{ 'background-image': `url('${selectedRoom.avatar}')` }"
-        />
-        <div v-else-if="selectedRoom" class="vac-avatar">
-          <span class="initials">{{ getInitialsName(selectedRoom.roomName) }}</span>
-        </div>
-      </template>
+      </component>
     </div>
 
     <div slot="room-header-info">
       <div class="vac-room-name vac-text-ellipsis">
-        <nuxt-link v-if="roomHeaderLink" :to="roomHeaderLink" class="chat-header-profile-link">
+        <component
+          :is="roomHeaderLink ? 'nuxt-link' : 'span'"
+          :to="roomHeaderLink"
+          class="chat-header-profile-link"
+        >
+          <os-icon
+            v-if="selectedRoom && selectedRoom.isGroupRoom"
+            :icon="icons.group"
+            class="room-group-icon"
+          />
           {{ selectedRoom ? selectedRoom.roomName : '' }}
-        </nuxt-link>
-        <span v-else>{{ selectedRoom ? selectedRoom.roomName : '' }}</span>
+        </component>
+      </div>
+    </div>
+
+    <div
+      v-for="room in groupRooms"
+      :slot="'room-list-info_' + room.roomId"
+      :key="'info-' + room.id"
+    >
+      <div class="vac-room-name vac-text-ellipsis room-name-with-icon">
+        <os-icon :icon="icons.group" class="room-group-icon" />
+        {{ room.roomName }}
       </div>
     </div>
 
     <div v-for="room in rooms" :slot="'room-list-avatar_' + room.id" :key="room.id">
       <profile-avatar
-        v-if="room.isGroupRoom"
-        :profile="room.groupProfile"
+        :profile="room.isGroupRoom ? room.groupProfile : room.userProfile"
         class="vac-avatar-profile"
-        size="small"
       />
-      <div
-        v-else-if="room.avatar"
-        class="vac-avatar"
-        :style="{ 'background-image': `url('${room.avatar}')` }"
-      />
-      <div v-else class="vac-avatar">
-        <span class="initials">{{ getInitialsName(room.roomName) }}</span>
-      </div>
     </div>
+
+    <template v-for="msg in messages">
+      <profile-avatar
+        v-if="msg.avatar"
+        :slot="'message-avatar_' + msg._id"
+        :key="'avatar-' + msg._id"
+        :profile="messageUserProfile(msg.senderId)"
+        class="vac-message-avatar"
+        style="align-self: flex-end; margin: 0 0 2px; cursor: pointer"
+        @click.native="navigateToUserProfile(msg.senderId)"
+      />
+    </template>
   </vue-advanced-chat>
 </template>
 
@@ -136,8 +138,7 @@ import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import locales from '~/locales/index.js'
-import gql from 'graphql-tag'
-import { roomQuery, createGroupRoom, unreadRoomsQuery } from '~/graphql/Rooms'
+import { roomQuery, createGroupRoom, unreadRoomsQuery, userProfileQuery } from '~/graphql/Rooms'
 import {
   messageQuery,
   createMessageMutation,
@@ -147,6 +148,10 @@ import {
 } from '~/graphql/Messages'
 import chatStyle from '~/constants/chat.js'
 import { mapGetters, mapMutations } from 'vuex'
+
+const EMPTY_ACTIONS = JSON.stringify([])
+const ROOM_PAGE_SIZE = 10
+const MESSAGE_PAGE_SIZE = 20
 
 export default {
   name: 'Chat',
@@ -171,20 +176,16 @@ export default {
   },
   data() {
     return {
-      menuActions: [],
-      messageActions: [],
-      templatesText: [],
-      roomActions: [],
-      responsiveBreakpoint: 600,
+      EMPTY_ACTIONS,
       rooms: [],
       roomsLoaded: false,
       roomCursor: null,
-      roomPageSize: 10,
+      roomSearch: '',
+      roomObserverDirty: false,
       selectedRoom: null,
       activeRoomId: null,
       loadingRooms: true,
       messagesLoaded: false,
-      messagePageSize: 20,
       oldestLoadedIndexId: null,
       messages: [],
       unseenMessageIds: new Set(),
@@ -240,6 +241,7 @@ export default {
   beforeDestroy() {
     this._subscriptions?.forEach((s) => s.unsubscribe())
     if (this._intersectionObserver) this._intersectionObserver.disconnect()
+    if (this._roomLoaderObserver) this._roomLoaderObserver.disconnect()
     if (this._mutationObserver) this._mutationObserver.disconnect()
     if (this._seenFlushTimer) clearTimeout(this._seenFlushTimer)
   },
@@ -249,16 +251,10 @@ export default {
     }),
     chatHeight() {
       if (this.singleRoom) return 'calc(100dvh - 190px)'
-      if (typeof window !== 'undefined' && window.innerWidth <= 768) {
-        return '100%'
-      }
-      return 'calc(100dvh - 190px)'
+      return '100%'
     },
     computedChatStyle() {
       return chatStyle.STYLE.light
-    },
-    computedRoomId() {
-      return this.activeRoomId || null
     },
     isSafari() {
       return /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
@@ -278,6 +274,21 @@ export default {
         if (otherUser) query.userId = otherUser.id
       }
       return { name: 'chat', query }
+    },
+    groupRooms() {
+      return this.rooms.filter((r) => r.isGroupRoom)
+    },
+    displayedRooms() {
+      // Cap unreadCount at "99+" for display; internal state stays numeric for arithmetic
+      return this.rooms.map((r) =>
+        typeof r.unreadCount === 'number' && r.unreadCount > 99 ? { ...r, unreadCount: '99+' } : r,
+      )
+    },
+    selectedRoomProfile() {
+      if (!this.selectedRoom) return null
+      return this.selectedRoom.isGroupRoom
+        ? this.selectedRoom.groupProfile
+        : this.selectedRoom.userProfile
     },
     roomHeaderLink() {
       if (!this.selectedRoom) return null
@@ -314,6 +325,18 @@ export default {
       commitUnreadRoomCount: 'chat/UPDATE_ROOM_COUNT',
     }),
 
+    buildLastMessage(msg) {
+      const content = (msg.content || '').trim()
+      let preview = content ? content.substring(0, 30) : ''
+      if (!preview && msg.files?.length) {
+        const f = msg.files[0]
+        if (!f.type?.startsWith('audio/') && !f.audio) {
+          preview = `\uD83D\uDCCE ${f.name || ''}`
+        }
+      }
+      return { ...msg, content: preview, files: msg.files }
+    },
+
     markAsSeen(messageIds) {
       if (!messageIds.length || !this.selectedRoom) return
       const room = this.selectedRoom
@@ -330,7 +353,7 @@ export default {
       if (roomIndex !== -1) {
         const changedRoom = { ...this.rooms[roomIndex] }
         changedRoom.unreadCount = Math.max(0, changedRoom.unreadCount - messageIds.length)
-        this.rooms[roomIndex] = changedRoom
+        this.$set(this.rooms, roomIndex, changedRoom)
       }
       // Persist to server
       this.$apollo
@@ -347,7 +370,27 @@ export default {
         })
     },
 
+    injectShadowStyles() {
+      // vue-advanced-chat renders inside a Web Component shadow DOM, so
+      // normal CSS can't reach its layout. The library also hard-codes
+      //   .vac-player-progress { width: 190px }
+      // which overflows the message box in our narrow side-panel variant
+      // (the library's 50%/80% box breakpoint is tied to window width, not
+      // the container width). Make the waveform flex-based so it scales to
+      // whatever room the message box gives it.
+      const shadowRoot = this.$el?.shadowRoot
+      if (!shadowRoot || this._shadowStylesInjected) return
+      if (typeof shadowRoot.appendChild !== 'function') return
+      const style = document.createElement('style')
+      style.textContent = `
+        .vac-player-bar { min-width: 0; }
+        .vac-player-progress { width: auto; flex: 1 1 auto; min-width: 0; }
+      `
+      shadowRoot.appendChild(style)
+      this._shadowStylesInjected = true
+    },
     setupMessageVisibilityTracking() {
+      this.injectShadowStyles()
       const shadowRoot = this.$el?.shadowRoot
       if (!shadowRoot || this._mutationObserver) return
       const scrollContainer = shadowRoot.querySelector('.vac-container-scroll')
@@ -419,12 +462,26 @@ export default {
       this.messages = filtered
     },
 
+    messageUserProfile(senderId) {
+      const room = this.rooms.find((r) => r.id === this.selectedRoom?.id)
+      const profile = room?._userProfiles?.[senderId]
+      if (profile) return profile
+      const user = this.selectedRoom?.users?.find((u) => u._id === senderId || u.id === senderId)
+      return user ? { id: user.id, name: user.username || user.name } : { name: senderId }
+    },
+
+    initialsAvatarUrl(name) {
+      const initials = (name || '?').match(/\b\w/g)?.join('').substring(0, 2).toUpperCase() || '?'
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56"><circle cx="28" cy="28" r="28" fill="rgb(25,122,49)"/><text x="50%25" y="50%25" dominant-baseline="central" text-anchor="middle" fill="white" font-family="sans-serif" font-size="22" font-weight="500">${initials}</text></svg>`
+      return `data:image/svg+xml,${svg}`
+    },
+
     prepareMessage(msg) {
       const m = { ...msg }
       m.content = m.content || ''
       if (!m._rawDate) m._rawDate = m.date
       this.formatMessageDate(m)
-      m.avatar = m.avatar?.w320 || m.avatar || null
+      m.avatar = m.avatar?.w320 || m.avatar || this.initialsAvatarUrl(m.username)
       if (!m._originalAvatar) m._originalAvatar = m.avatar
       return m
     },
@@ -509,12 +566,12 @@ export default {
       })
     },
 
-    async fetchRooms({ room } = {}) {
+    async fetchRooms({ room, search, replace, generation } = {}) {
       this.roomsLoaded = false
       try {
         const variables = room?.id
           ? { id: room.id }
-          : { first: this.roomPageSize, before: this.roomCursor }
+          : { first: ROOM_PAGE_SIZE, before: this.roomCursor, ...(search && { search }) }
 
         const {
           data: { Room },
@@ -524,34 +581,89 @@ export default {
           fetchPolicy: 'no-cache',
         })
 
-        const existingIds = new Set(this.rooms.map((r) => r.id))
-        const newRooms = Room.filter((r) => !existingIds.has(r.id)).map((r) =>
-          this.fixRoomObject(r),
-        )
-        this.rooms = [...this.rooms, ...newRooms]
+        if (generation != null && generation !== this.roomSearchGeneration) return
+
+        if (replace) {
+          this.rooms = Room.map((r) => this.fixRoomObject(r))
+        } else {
+          const existingIds = new Set(this.rooms.map((r) => r.id))
+          const newRooms = Room.filter((r) => !existingIds.has(r.id)).map((r) =>
+            this.fixRoomObject(r),
+          )
+          this.rooms = [...this.rooms, ...newRooms]
+        }
 
         if (!room?.id && Room.length > 0) {
-          // Update cursor to the oldest room's sort date
           const lastRoom = Room[Room.length - 1]
           this.roomCursor = lastRoom.lastMessageAt || lastRoom.createdAt
         }
 
-        if (Room.length < this.roomPageSize) {
+        if (Room.length < ROOM_PAGE_SIZE) {
           this.roomsLoaded = true
         }
 
         if (this.singleRoom && this.rooms.length > 0) {
-          this.selectRoom(this.rooms[0])
+          this.activeRoomId = this.rooms[0].roomId
         }
       } catch (error) {
         this.rooms = []
         this.$toast.error(error.message)
       }
-      // must be set false after initial rooms are loaded and never changed again
       this.loadingRooms = false
     },
 
+    async searchRooms(event) {
+      const value = typeof event === 'string' ? event : event?.value
+      this.roomSearch = value || ''
+      this.roomCursor = null
+      if (this.roomsLoaded) this.roomObserverDirty = true
+      this.roomSearchGeneration = (this.roomSearchGeneration || 0) + 1
+      const generation = this.roomSearchGeneration
+      await this.fetchRooms({ search: this.roomSearch || undefined, replace: true, generation })
+      if (generation !== this.roomSearchGeneration) return
+      // Re-init IntersectionObserver after it was disabled by roomsLoaded=true
+      if (this.roomObserverDirty && !this.roomsLoaded) {
+        this.roomObserverDirty = false
+        this.$nextTick(() => this.reinitRoomLoader())
+      }
+    },
+
+    reinitRoomLoader() {
+      const shadow = this.$el?.shadowRoot
+      if (!shadow) return
+      const loader = shadow.querySelector('#infinite-loader-rooms')
+      const roomsList = shadow.querySelector('#rooms-list')
+      if (!loader || !roomsList) return
+      // Make loader visible (library hides it via v-show when showLoader=false)
+      loader.style.display = ''
+      // Create a new IntersectionObserver to trigger pagination on scroll
+      if (this._roomLoaderObserver) this._roomLoaderObserver.disconnect()
+      this._roomLoaderObserver = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && !this.roomsLoaded) {
+            this.fetchMoreRooms()
+          }
+        },
+        { root: roomsList, threshold: 0 },
+      )
+      this._roomLoaderObserver.observe(loader)
+    },
+
+    fetchMoreRooms() {
+      this.fetchRooms({ search: this.roomSearch || undefined })
+    },
+
     async fetchMessages({ room, options = {} }) {
+      if (!room?.roomId) return
+      // When an external socket message added a new room, the library may try to
+      // auto-select it. Lock activeRoomId to the current room to prevent focus steal.
+      if (this._externalRoomIds?.has(room.roomId)) {
+        this._externalRoomIds.delete(room.roomId)
+        if (this.selectedRoom) {
+          this.activeRoomId = this.selectedRoom.roomId
+          return
+        }
+      }
       if (this.selectedRoom?.id !== room.id) {
         this.messages = []
         this.oldestLoadedIndexId = null
@@ -570,7 +682,7 @@ export default {
       this.messagesLoaded = options.refetch ? this.messagesLoaded : false
       const variables = {
         roomId: room.id,
-        first: this.messagePageSize,
+        first: MESSAGE_PAGE_SIZE,
       }
       if (!options.refetch && this.oldestLoadedIndexId !== null) {
         variables.beforeIndex = this.oldestLoadedIndexId
@@ -596,7 +708,7 @@ export default {
             this.oldestLoadedIndexId = oldestMsg.indexId
           }
         }
-        if (Message.length < this.messagePageSize) {
+        if (Message.length < MESSAGE_PAGE_SIZE) {
           this.messagesLoaded = true
         }
         // Ensure visibility tracking is running
@@ -610,6 +722,7 @@ export default {
     async chatMessageAdded({ data }) {
       const msg = data.chatMessageAdded
       let roomIndex = this.rooms.findIndex((r) => r.id === msg.room.id)
+      let freshlyFetched = false
       if (roomIndex === -1) {
         // Room not in list yet — fetch it specifically
         try {
@@ -622,8 +735,11 @@ export default {
           })
           if (Room?.length) {
             const newRoom = this.fixRoomObject(Room[0])
+            if (!this._externalRoomIds) this._externalRoomIds = new Set()
+            this._externalRoomIds.add(newRoom.roomId)
             this.rooms = [newRoom, ...this.rooms]
             roomIndex = 0
+            freshlyFetched = true
           } else {
             return
           }
@@ -632,19 +748,16 @@ export default {
         }
       }
       const changedRoom = { ...this.rooms[roomIndex] }
-      changedRoom.lastMessage = {
-        ...msg,
-        content: (msg.content || '').trim().substring(0, 30),
-      }
+      changedRoom.lastMessage = this.buildLastMessage(msg)
       changedRoom.lastMessageAt = msg.date
       changedRoom.index = new Date().toISOString()
       const isCurrentRoom = msg.room.id === this.selectedRoom?.id
       const isOwnMessage = msg.senderId === this.currentUser.id
-      if (!isCurrentRoom && !isOwnMessage) {
+      // Don't increment unreadCount for freshly fetched rooms — server count already includes this message
+      if (!freshlyFetched && !isCurrentRoom && !isOwnMessage) {
         changedRoom.unreadCount++
       }
-      // Reassign array to trigger Vue reactivity and vue-advanced-chat re-sort
-      this.rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== msg.room.id)]
+      this.moveRoomToTop(changedRoom, msg.room.id)
       // Only add incoming messages to the chat — own messages are handled via mutation response
       if (isCurrentRoom && !isOwnMessage) {
         this.addSocketMessage(msg)
@@ -688,11 +801,7 @@ export default {
             ...room,
             lastMessage: { ...room.lastMessage, ...statusUpdate },
           }
-          this.rooms = [
-            ...this.rooms.slice(0, roomIndex),
-            changedRoom,
-            ...this.rooms.slice(roomIndex + 1),
-          ]
+          this.$set(this.rooms, roomIndex, changedRoom)
         }
       }
     },
@@ -707,12 +816,13 @@ export default {
         ? files.map((file) => ({
             upload: new File(
               [file.blob],
-              // Captured audio already has the right extension in the name
               file.extension ? `${file.name}.${file.extension}` : file.name,
               { type: file.type },
             ),
             name: file.name,
+            extension: file.extension || undefined,
             type: file.type,
+            ...(file.duration != null && { duration: file.duration }),
           }))
         : null
 
@@ -724,7 +834,8 @@ export default {
         saved: true,
         _rawDate: new Date().toISOString(),
         _originalAvatar:
-          this.selectedRoom?.users?.find((u) => u.id === this.currentUser.id)?.avatar || null,
+          this.selectedRoom?.users?.find((u) => u.id === this.currentUser.id)?.avatar ||
+          this.initialsAvatarUrl(this.currentUser.name),
         senderId: this.currentUser.id,
         files:
           messageDetails.files?.map((file) => ({
@@ -741,12 +852,10 @@ export default {
       const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
       if (roomIndex !== -1) {
         const changedRoom = { ...this.rooms[roomIndex] }
-        changedRoom.lastMessage.content = (content || '').trim().substring(0, 30)
+        changedRoom.lastMessage = this.buildLastMessage({ content, files })
         changedRoom.index = new Date().toISOString()
-        this.rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== roomId)]
-        this.$nextTick(() => {
-          this.scrollRoomsListToTop()
-        })
+        this.moveRoomToTop(changedRoom, roomId)
+        this.$nextTick(() => this.scrollRoomsListToTop())
       }
 
       try {
@@ -797,11 +906,6 @@ export default {
       }
     },
 
-    getInitialsName(fullname) {
-      if (!fullname) return
-      return fullname.match(/\b\w/g).join('').substring(0, 3).toUpperCase()
-    },
-
     toggleUserSearch() {
       this.$emit('toggle-user-search')
     },
@@ -812,7 +916,7 @@ export default {
       const fixedRoom = {
         ...room,
         isGroupRoom,
-        // For group rooms: provide group profile data for ProfileAvatar component
+        // Profile data for ProfileAvatar component
         groupProfile: isGroupRoom
           ? {
               id: room.group?.id,
@@ -821,111 +925,121 @@ export default {
               avatar: room.group?.avatar,
             }
           : null,
+        userProfile: null,
         index: room.lastMessage ? room.lastMessage.date : room.createdAt,
         avatar: room.avatar?.w320 || room.avatar,
-        lastMessage: room.lastMessage
-          ? {
-              ...room.lastMessage,
-              content: (room.lastMessage?.content || '').trim().substring(0, 30),
-            }
-          : { content: '' },
+        lastMessage: room.lastMessage ? this.buildLastMessage(room.lastMessage) : { content: '' },
         users: room.users.map((u) => {
           return { ...u, username: u.name, avatar: u.avatar?.w320 }
         }),
       }
-      if (!fixedRoom.avatar) {
-        if (isGroupRoom) {
+      // Build user profiles from original room.users (before avatar was flattened to string)
+      const userProfiles = {}
+      for (const u of room.users) {
+        userProfiles[u.id] = { id: u.id, name: u.name, avatar: u.avatar }
+      }
+      fixedRoom._userProfiles = userProfiles
+      if (isGroupRoom) {
+        if (!fixedRoom.avatar) {
           fixedRoom.avatar = room.group?.avatar?.w320 || room.group?.avatar || null
-        } else {
-          // as long as we cannot query avatar on CreateRoom
-          const otherUser = fixedRoom.users.find((u) => u.id !== this.currentUser.id)
-          fixedRoom.avatar = otherUser?.avatar
+        }
+      } else {
+        const otherUser = room.users.find((u) => u.id !== this.currentUser.id)
+        fixedRoom.userProfile = otherUser
+          ? userProfiles[otherUser.id]
+          : { name: fixedRoom.roomName }
+        if (!fixedRoom.avatar) {
+          fixedRoom.avatar = otherUser?.avatar?.w320 || null
         }
       }
       return fixedRoom
     },
 
-    selectRoom(room) {
-      this.activeRoomId = room.roomId
+    moveRoomToTop(room, roomId) {
+      const id = roomId || room.id
+      this.rooms = [room, ...this.rooms.filter((r) => r.id !== id)]
     },
 
     bringRoomToTopAndSelect(room) {
       room.index = new Date().toISOString()
-      this.rooms = [room, ...this.rooms.filter((r) => r.id !== room.id)]
-      this.$nextTick(() => this.selectRoom(room))
+      this.moveRoomToTop(room)
+      this.$nextTick(() => {
+        this.activeRoomId = room.roomId
+      })
+    },
+
+    findLocalRoom(predicate) {
+      const room = this.rooms.find(predicate)
+      if (room) this.bringRoomToTopAndSelect(room)
+      return room
+    },
+
+    async fetchServerRoom(variables) {
+      try {
+        const {
+          data: { Room },
+        } = await this.$apollo.query({
+          query: roomQuery(),
+          variables,
+          fetchPolicy: 'no-cache',
+        })
+        if (Room?.length) {
+          const room = this.fixRoomObject(Room[0])
+          this.bringRoomToTopAndSelect(room)
+          return room
+        }
+      } catch {
+        // Fall through
+      }
+      return null
     },
 
     async newRoom(userOrId) {
-      // Accept either a user object { id, name } or just a userId string
       const userId = typeof userOrId === 'string' ? userOrId : userOrId.id
       let userName = typeof userOrId === 'string' ? null : userOrId.name
-      let userAvatar =
-        typeof userOrId === 'string' ? null : userOrId.avatar?.w320 || userOrId.avatar?.url || null
+      let userAvatarObj = typeof userOrId === 'string' ? null : userOrId.avatar
+      let userAvatar = userAvatarObj?.w320 || userAvatarObj?.url || null
 
-      // When called with just an ID (e.g. from query params), fetch user profile
       if (typeof userOrId === 'string') {
         try {
           const { data } = await this.$apollo.query({
-            query: gql`
-              query ($id: ID!) {
-                User(id: $id) {
-                  id
-                  name
-                  avatar {
-                    url
-                  }
-                }
-              }
-            `,
+            query: userProfileQuery(),
             variables: { id: userId },
             fetchPolicy: 'no-cache',
           })
           const user = data.User?.[0]
           if (user) {
             userName = user.name
-            userAvatar = user.avatar?.url || null
+            userAvatarObj = user.avatar
+            userAvatar = user.avatar?.w320 || user.avatar?.url || null
           }
         } catch {
-          // Fall through with userId as display name
+          // Fall through
         }
         if (!userName) userName = userId
       }
 
-      // Check if a DM room with this user already exists locally
-      const existingRoom = this.rooms.find(
-        (r) => !r.isGroupRoom && r.users.some((u) => u.id === userId),
-      )
-      if (existingRoom) {
-        this.bringRoomToTopAndSelect(existingRoom)
-        return
-      }
-
-      // Check if a DM room with this user exists on the server (not yet loaded locally)
-      try {
-        const {
-          data: { Room },
-        } = await this.$apollo.query({
-          query: roomQuery(),
-          variables: { userId },
-          fetchPolicy: 'no-cache',
-        })
-        const serverRoom = Room?.[0]
-        if (serverRoom) {
-          const room = this.fixRoomObject(serverRoom)
-          this.bringRoomToTopAndSelect(room)
-          return
-        }
-      } catch {
-        // Fall through to virtual room creation
-      }
+      if (this.findLocalRoom((r) => !r.isGroupRoom && r.users.some((u) => u.id === userId))) return
+      if (await this.fetchServerRoom({ userId })) return
 
       // Create a virtual room (no backend call — room is created on first message)
+      const currentUserProfile = {
+        id: this.currentUser.id,
+        name: this.currentUser.name,
+        avatar: this.currentUser.avatar,
+      }
+      const otherUserProfile = { id: userId, name: userName, avatar: userAvatarObj }
       const virtualRoom = {
         id: `temp-${userId}`,
         roomId: `temp-${userId}`,
         roomName: userName,
         isGroupRoom: false,
         groupProfile: null,
+        userProfile: otherUserProfile,
+        _userProfiles: {
+          [this.currentUser.id]: currentUserProfile,
+          [userId]: otherUserProfile,
+        },
         avatar: userAvatar,
         lastMessageAt: null,
         createdAt: new Date().toISOString(),
@@ -933,43 +1047,27 @@ export default {
         index: new Date().toISOString(),
         lastMessage: { content: '' },
         users: [
-          { _id: this.currentUser.id, id: this.currentUser.id, username: this.currentUser.name },
-          { _id: userId, id: userId, username: userName, avatar: userAvatar },
+          {
+            _id: this.currentUser.id,
+            id: this.currentUser.id,
+            name: this.currentUser.name,
+            username: this.currentUser.name,
+          },
+          { _id: userId, id: userId, name: userName, username: userName, avatar: userAvatar },
         ],
         _virtualUserId: userId,
       }
       this.rooms = [virtualRoom, ...this.rooms]
       this.loadingRooms = false
-      this.$nextTick(() => this.selectRoom(virtualRoom))
+      this.$nextTick(() => {
+        this.activeRoomId = virtualRoom.roomId
+      })
     },
 
     async newGroupRoom(groupId) {
-      // Check if the group room already exists locally
-      const existingRoom = this.rooms.find((r) => r.isGroupRoom && r.groupProfile?.id === groupId)
-      if (existingRoom) {
-        this.bringRoomToTopAndSelect(existingRoom)
-        return
-      }
+      if (this.findLocalRoom((r) => r.isGroupRoom && r.groupProfile?.id === groupId)) return
+      if (await this.fetchServerRoom({ groupId })) return
 
-      // Check if the group room exists on the server (not yet loaded locally)
-      try {
-        const {
-          data: { Room },
-        } = await this.$apollo.query({
-          query: roomQuery(),
-          variables: { groupId },
-          fetchPolicy: 'no-cache',
-        })
-        if (Room?.length) {
-          const room = this.fixRoomObject(Room[0])
-          this.bringRoomToTopAndSelect(room)
-          return
-        }
-      } catch {
-        // Fall through to creation
-      }
-
-      // Room doesn't exist yet — create it
       try {
         const {
           data: { CreateGroupRoom },
@@ -1012,40 +1110,42 @@ export default {
       document.body.removeChild(downloadLink)
     },
 
+    navigateToUserProfile(userId) {
+      const profile = this.messageUserProfile(userId)
+      const slug = (profile.name || '').toLowerCase().replaceAll(' ', '-')
+      this.$router.push({ path: `/profile/${userId}/${slug}` })
+    },
+
     redirectToUserProfile({ user }) {
-      const userID = user.id
-      const userName = user.name.toLowerCase().replaceAll(' ', '-')
-      const url = `/profile/${userID}/${userName}`
-      this.$router.push({ path: url })
+      const slug = (user.name || '').toLowerCase().replaceAll(' ', '-')
+      this.$router.push({ path: `/profile/${user.id}/${slug}` })
     },
   },
 }
 </script>
 <style lang="scss" scoped>
-.vac-avatar {
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-color: $color-primary-dark;
-  color: $text-color-primary-inverse;
-  height: 42px;
-  width: 42px;
-  min-height: 42px;
-  min-width: 42px;
-  margin-right: 15px;
-  border-radius: 50%;
-  position: relative;
-
-  > .initials {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-}
-
 .vac-avatar-profile {
   margin-right: 15px;
+}
+
+.room-group-icon {
+  vertical-align: middle !important;
+  margin-right: 0;
+}
+
+.room-name-with-icon {
+  color: var(--chat-room-color-username);
+  font-weight: 500;
+}
+
+.vac-message-avatar {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  font-size: 11px;
+  align-self: flex-end;
+  margin: 0 0 2px;
 }
 
 .ds-flex-item.single-chat-bubble {

@@ -1,6 +1,7 @@
 mutation UpdatePost(
   $id: ID!
   $title: String!
+  $slug: String
   $content: String!
   $image: ImageInput
   $categoryIds: [ID]
@@ -10,6 +11,7 @@ mutation UpdatePost(
   UpdatePost(
     id: $id
     title: $title
+    slug: $slug
     content: $content
     image: $image
     categoryIds: $categoryIds
@@ -18,6 +20,7 @@ mutation UpdatePost(
   ) {
     id
     title
+    slug
     content
     author {
       id

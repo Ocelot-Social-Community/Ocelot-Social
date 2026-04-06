@@ -120,6 +120,31 @@ describe('Chat.vue', () => {
     })
   }
 
+  describe('displayedRooms', () => {
+    beforeEach(() => {
+      wrapper = Wrapper()
+    })
+
+    it('passes through unreadCount <= 99 unchanged', () => {
+      wrapper.vm.rooms = [mockRoom({ unreadCount: 0 }), mockRoom({ id: 'r2', unreadCount: 99 })]
+      expect(wrapper.vm.displayedRooms[0].unreadCount).toBe(0)
+      expect(wrapper.vm.displayedRooms[1].unreadCount).toBe(99)
+    })
+
+    it('caps unreadCount > 99 to "99+"', () => {
+      wrapper.vm.rooms = [mockRoom({ unreadCount: 100 }), mockRoom({ id: 'r2', unreadCount: 9999 })]
+      expect(wrapper.vm.displayedRooms[0].unreadCount).toBe('99+')
+      expect(wrapper.vm.displayedRooms[1].unreadCount).toBe('99+')
+    })
+
+    it('leaves the underlying rooms array unmodified', () => {
+      wrapper.vm.rooms = [mockRoom({ unreadCount: 150 })]
+      // Trigger the computed getter to ensure it doesn't mutate `rooms`
+      expect(wrapper.vm.displayedRooms).toBeDefined()
+      expect(wrapper.vm.rooms[0].unreadCount).toBe(150)
+    })
+  })
+
   describe('mount', () => {
     it('renders without errors', () => {
       wrapper = Wrapper()
@@ -185,17 +210,18 @@ describe('Chat.vue', () => {
       expect(prepared.date).toBeDefined()
     })
 
-    it('normalizes avatar', () => {
+    it('extracts w320 from avatar object', () => {
       const msg = mockMessage({ avatar: { w320: 'http://img.jpg' } })
       const prepared = wrapper.vm.prepareMessage(msg)
       expect(prepared.avatar).toBe('http://img.jpg')
       expect(prepared._originalAvatar).toBe('http://img.jpg')
     })
 
-    it('handles null avatar', () => {
-      const msg = mockMessage({ avatar: null })
+    it('generates initials avatar when avatar is null', () => {
+      const msg = mockMessage({ avatar: null, username: 'Otto Normal' })
       const prepared = wrapper.vm.prepareMessage(msg)
-      expect(prepared.avatar).toBeNull()
+      expect(prepared.avatar).toContain('data:image/svg+xml')
+      expect(prepared.avatar).toContain('ON')
     })
   })
 
@@ -589,7 +615,7 @@ describe('Chat.vue', () => {
       const messageCall = mocks.$apollo.query.mock.calls.find(
         ([arg]) => arg.variables?.roomId === 'r-default',
       )
-      expect(messageCall[0].variables.first).toBe(wrapper.vm.messagePageSize)
+      expect(messageCall[0].variables.first).toBe(20)
     })
 
     it('uses beforeIndex cursor for subsequent loads', async () => {
@@ -712,7 +738,7 @@ describe('Chat.vue', () => {
         expect.objectContaining({
           variables: expect.objectContaining({
             files: expect.arrayContaining([
-              expect.objectContaining({ name: 'test', type: 'text/plain' }),
+              expect.objectContaining({ name: 'test', extension: 'txt', type: 'text/plain' }),
             ]),
           }),
         }),
@@ -1013,6 +1039,525 @@ describe('Chat.vue', () => {
       wrapper.destroy()
       subs.forEach((s) => {
         expect(s.unsubscribe).toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('currentLocaleIso watcher', () => {
+    it('reformats message dates when locale changes', async () => {
+      wrapper = Wrapper()
+      wrapper.vm.messages = [mockMessage({ _rawDate: '2026-06-15T14:30:00Z' })]
+      mocks.$i18n.locale = () => 'de'
+      wrapper.vm.$options.watch.currentLocaleIso.call(wrapper.vm)
+      expect(wrapper.vm.messages[0].timestamp).toBeDefined()
+    })
+  })
+
+  describe('expandChatLink', () => {
+    it('returns chat route with no query when no room selected', () => {
+      wrapper = Wrapper()
+      expect(wrapper.vm.expandChatLink).toEqual({ name: 'chat' })
+    })
+
+    it('returns groupId query for group rooms', () => {
+      wrapper = Wrapper()
+      wrapper.vm.selectedRoom = mockRoom({
+        isGroupRoom: true,
+        groupProfile: { id: 'g1' },
+        users: [{ id: 'current-user' }],
+      })
+      expect(wrapper.vm.expandChatLink).toEqual({ name: 'chat', query: { groupId: 'g1' } })
+    })
+
+    it('returns userId query for DM rooms', () => {
+      wrapper = Wrapper()
+      wrapper.vm.selectedRoom = mockRoom()
+      expect(wrapper.vm.expandChatLink).toEqual({ name: 'chat', query: { userId: 'other-user' } })
+    })
+  })
+
+  describe('roomHeaderLink', () => {
+    it('returns null when no other user found in DM', () => {
+      wrapper = Wrapper()
+      wrapper.vm.selectedRoom = mockRoom({ users: [{ id: 'current-user', name: 'Me' }] })
+      expect(wrapper.vm.roomHeaderLink).toBeNull()
+    })
+  })
+
+  describe('buildLastMessage', () => {
+    it('returns file name for non-audio files', () => {
+      wrapper = Wrapper()
+      const result = wrapper.vm.buildLastMessage({
+        content: '',
+        files: [{ name: 'photo', type: 'image/jpeg' }],
+      })
+      expect(result.content).toBe('\uD83D\uDCCE photo')
+    })
+
+    it('returns empty for audio files', () => {
+      wrapper = Wrapper()
+      const result = wrapper.vm.buildLastMessage({
+        content: '',
+        files: [{ name: 'audio', type: 'audio/mpeg' }],
+      })
+      expect(result.content).toBe('')
+    })
+  })
+
+  describe('searchRooms', () => {
+    it('fetches rooms with search term', async () => {
+      wrapper = Wrapper()
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [] } })
+      await wrapper.vm.searchRooms({ value: 'test' })
+      expect(wrapper.vm.roomSearch).toBe('test')
+    })
+
+    it('clears search and resets cursor', async () => {
+      wrapper = Wrapper()
+      wrapper.vm.roomSearch = 'old'
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [mockRoom()] } })
+      await wrapper.vm.searchRooms({ value: '' })
+      expect(wrapper.vm.roomSearch).toBe('')
+      expect(wrapper.vm.roomCursor).toBeDefined()
+    })
+
+    it('increments generation to handle concurrent searches', async () => {
+      wrapper = Wrapper()
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [] } })
+      await wrapper.vm.searchRooms({ value: 'a' })
+      expect(wrapper.vm.roomSearchGeneration).toBe(1)
+      await wrapper.vm.searchRooms({ value: 'ab' })
+      expect(wrapper.vm.roomSearchGeneration).toBe(2)
+    })
+
+    it('sets roomObserverDirty when roomsLoaded was true', async () => {
+      wrapper = Wrapper()
+      wrapper.vm.roomsLoaded = true
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [] } })
+      await wrapper.vm.searchRooms({ value: 'x' })
+      // roomObserverDirty was set, roomsLoaded is true (< pageSize), so no reinit
+      expect(wrapper.vm.roomObserverDirty).toBe(true)
+    })
+  })
+
+  describe('fetchMoreRooms', () => {
+    it('delegates to fetchRooms with current search', () => {
+      wrapper = Wrapper()
+      wrapper.vm.fetchRooms = jest.fn()
+      wrapper.vm.roomSearch = 'test'
+      wrapper.vm.fetchMoreRooms()
+      expect(wrapper.vm.fetchRooms).toHaveBeenCalledWith({ search: 'test' })
+    })
+  })
+
+  describe('fetchRooms replace mode', () => {
+    it('replaces rooms instead of appending', async () => {
+      wrapper = Wrapper()
+      wrapper.vm.rooms = [mockRoom({ id: 'old', roomId: 'old' })]
+      mocks.$apollo.query.mockResolvedValue({
+        data: { Room: [mockRoom({ id: 'new', roomId: 'new' })] },
+      })
+      await wrapper.vm.fetchRooms({ replace: true })
+      expect(wrapper.vm.rooms).toHaveLength(1)
+      expect(wrapper.vm.rooms[0].id).toBe('new')
+    })
+
+    it('selects first room in singleRoom mode', async () => {
+      wrapper = Wrapper({ singleRoom: true })
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [mockRoom()] } })
+      await wrapper.vm.fetchRooms({})
+      expect(wrapper.vm.activeRoomId).toBe('room-1')
+    })
+
+    it('fetches by room id', async () => {
+      wrapper = Wrapper()
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [mockRoom()] } })
+      await wrapper.vm.fetchRooms({ room: { id: 'room-1' } })
+      expect(mocks.$apollo.query).toHaveBeenCalledWith(
+        expect.objectContaining({ variables: expect.objectContaining({ id: 'room-1' }) }),
+      )
+    })
+  })
+
+  describe('fetchMessages edge cases', () => {
+    it('skips when room has no roomId', async () => {
+      wrapper = Wrapper()
+      await wrapper.vm.fetchMessages({ room: {} })
+      expect(wrapper.vm.activeRoomId).toBeNull()
+    })
+
+    it('blocks external room auto-select', async () => {
+      wrapper = Wrapper()
+      const currentRoom = mockRoom({ id: 'current', roomId: 'current' })
+      wrapper.vm.selectedRoom = currentRoom
+      wrapper.vm.activeRoomId = 'current'
+      wrapper.vm.messages = [{ id: 'msg1', content: 'existing' }]
+      wrapper.vm._externalRoomIds = new Set(['ext-room'])
+      await wrapper.vm.fetchMessages({ room: { id: 'ext', roomId: 'ext-room' } })
+      expect(wrapper.vm.activeRoomId).toBe('current')
+      expect(wrapper.vm.selectedRoom).toBe(currentRoom)
+      expect(wrapper.vm.messages).toEqual([{ id: 'msg1', content: 'existing' }])
+    })
+
+    it('handles virtual rooms with early return', async () => {
+      wrapper = Wrapper()
+      wrapper.vm.selectedRoom = null
+      await wrapper.vm.fetchMessages({ room: { id: 'temp-123', roomId: 'temp-123' } })
+      // Virtual rooms toggle messagesLoaded and return early
+      expect(wrapper.vm.selectedRoom).toEqual({ id: 'temp-123', roomId: 'temp-123' })
+    })
+
+    it('handles fetch error', async () => {
+      wrapper = Wrapper()
+      mocks.$apollo.query.mockRejectedValue(new Error('Network error'))
+      await wrapper.vm.fetchMessages({ room: mockRoom(), options: {} })
+      expect(mocks.$toast.error).toHaveBeenCalledWith('Network error')
+      expect(wrapper.vm.messages).toEqual([])
+    })
+  })
+
+  describe('chatMessageAdded with new room', () => {
+    it('returns early when server returns empty rooms', async () => {
+      wrapper = Wrapper()
+      wrapper.vm.rooms = []
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [] } })
+      await subscriptionHandlers.chatMessageAdded.next({
+        data: { chatMessageAdded: mockMessage({ room: { id: 'unknown' } }) },
+      })
+      expect(wrapper.vm.rooms).toHaveLength(0)
+    })
+
+    it('returns early when room fetch fails', async () => {
+      wrapper = Wrapper()
+      wrapper.vm.rooms = []
+      mocks.$apollo.query.mockRejectedValue(new Error('fail'))
+      await subscriptionHandlers.chatMessageAdded.next({
+        data: { chatMessageAdded: mockMessage({ room: { id: 'unknown' } }) },
+      })
+      expect(wrapper.vm.rooms).toHaveLength(0)
+    })
+
+    it('fetches and inserts new room without auto-select', async () => {
+      wrapper = Wrapper()
+      wrapper.vm.rooms = [mockRoom()]
+      wrapper.vm.selectedRoom = mockRoom()
+      wrapper.vm.activeRoomId = 'room-1'
+      const newRoomData = mockRoom({
+        id: 'new-room',
+        roomId: 'new-room',
+        users: [
+          { _id: 'current-user', id: 'current-user', name: 'Me', avatar: null },
+          { _id: 'sender', id: 'sender', name: 'Sender', avatar: null },
+        ],
+      })
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [newRoomData] } })
+      await subscriptionHandlers.chatMessageAdded.next({
+        data: {
+          chatMessageAdded: mockMessage({
+            room: { id: 'new-room' },
+            senderId: 'sender',
+          }),
+        },
+      })
+      expect(wrapper.vm.rooms[0].id).toBe('new-room')
+      expect(wrapper.vm._externalRoomIds.has('new-room')).toBe(true)
+    })
+  })
+
+  describe('toggleUserSearch', () => {
+    it('emits toggle-user-search', () => {
+      wrapper = Wrapper()
+      wrapper.vm.toggleUserSearch()
+      expect(wrapper.emitted('toggle-user-search')).toHaveLength(1)
+    })
+  })
+
+  describe('navigateToUserProfile', () => {
+    it('navigates using messageUserProfile', () => {
+      wrapper = Wrapper()
+      wrapper.vm.selectedRoom = mockRoom()
+      wrapper.vm.rooms = [mockRoom()]
+      wrapper.vm.navigateToUserProfile('other-user')
+      expect(mocks.$router.push).toHaveBeenCalledWith({
+        path: '/profile/other-user/other',
+      })
+    })
+  })
+
+  describe('newRoom with string userId', () => {
+    it('fetches user profile and creates virtual room', async () => {
+      wrapper = Wrapper()
+      mocks.$apollo.query
+        .mockResolvedValueOnce({ data: { User: [{ id: 'u1', name: 'Test User', avatar: null }] } })
+        .mockResolvedValueOnce({ data: { Room: [] } })
+      await wrapper.vm.newRoom('u1')
+      expect(wrapper.vm.rooms[0].roomName).toBe('Test User')
+      expect(wrapper.vm.rooms[0].id).toBe('temp-u1')
+    })
+
+    it('falls back to userId as name on profile fetch error', async () => {
+      wrapper = Wrapper()
+      mocks.$apollo.query
+        .mockRejectedValueOnce(new Error('fail'))
+        .mockResolvedValueOnce({ data: { Room: [] } })
+      await wrapper.vm.newRoom('u1')
+      expect(wrapper.vm.rooms[0].roomName).toBe('u1')
+    })
+  })
+
+  describe('sendMessage virtual room replacement', () => {
+    it('replaces virtual room with real room after send', async () => {
+      wrapper = Wrapper()
+      const virtualRoom = mockRoom({ id: 'temp-u1', roomId: 'temp-u1', _virtualUserId: 'u1' })
+      wrapper.vm.rooms = [virtualRoom]
+      wrapper.vm.selectedRoom = virtualRoom
+      wrapper.vm.activeRoomId = 'temp-u1'
+      const realRoom = mockRoom({ id: 'real-1', roomId: 'real-1' })
+      mocks.$apollo.mutate.mockResolvedValue({
+        data: { CreateMessage: { id: 'm1', room: { id: 'real-1' } } },
+      })
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [realRoom] } })
+      await wrapper.vm.sendMessage({ roomId: 'temp-u1', content: 'hi', files: [] })
+      expect(wrapper.vm.rooms.some((r) => r.id === 'real-1')).toBe(true)
+    })
+  })
+
+  describe('shadow-DOM observers', () => {
+    let intersectionInstances, mutationInstances, OriginalIO, OriginalMO
+
+    const fakeEl = () => ({ dataset: {}, style: {} })
+    const setShadowRoot = (shadowRoot) => {
+      Object.defineProperty(wrapper.vm.$el, 'shadowRoot', {
+        configurable: true,
+        get: () => shadowRoot,
+      })
+    }
+
+    beforeEach(() => {
+      intersectionInstances = []
+      mutationInstances = []
+      OriginalIO = global.IntersectionObserver
+      OriginalMO = global.MutationObserver
+      global.IntersectionObserver = jest.fn(function (callback, options) {
+        this.callback = callback
+        this.options = options
+        this.observe = jest.fn()
+        this.unobserve = jest.fn()
+        this.disconnect = jest.fn()
+        intersectionInstances.push(this)
+      })
+      global.MutationObserver = jest.fn(function (callback) {
+        this.callback = callback
+        this.observe = jest.fn()
+        this.disconnect = jest.fn()
+        mutationInstances.push(this)
+      })
+    })
+
+    afterEach(() => {
+      global.IntersectionObserver = OriginalIO
+      global.MutationObserver = OriginalMO
+    })
+
+    describe('setupMessageVisibilityTracking', () => {
+      it('is a no-op when no shadowRoot is attached', () => {
+        wrapper = Wrapper()
+        setShadowRoot(null)
+        wrapper.vm.setupMessageVisibilityTracking()
+        expect(intersectionInstances).toHaveLength(0)
+        expect(mutationInstances).toHaveLength(0)
+      })
+
+      it('is a no-op when observers are already wired up', () => {
+        wrapper = Wrapper()
+        setShadowRoot({ querySelector: jest.fn() })
+        wrapper.vm._mutationObserver = { existing: true }
+        wrapper.vm.setupMessageVisibilityTracking()
+        expect(intersectionInstances).toHaveLength(0)
+      })
+
+      it('is a no-op when the scroll container is missing', () => {
+        wrapper = Wrapper()
+        setShadowRoot({ querySelector: jest.fn().mockReturnValue(null) })
+        wrapper.vm.setupMessageVisibilityTracking()
+        expect(intersectionInstances).toHaveLength(0)
+        expect(mutationInstances).toHaveLength(0)
+      })
+
+      it('wires up IntersectionObserver and MutationObserver when the scroll container exists', () => {
+        wrapper = Wrapper()
+        const scrollContainer = { foo: 'bar' }
+        setShadowRoot({ querySelector: jest.fn().mockReturnValue(scrollContainer) })
+        wrapper.vm.setupMessageVisibilityTracking()
+        expect(intersectionInstances).toHaveLength(1)
+        expect(intersectionInstances[0].options).toMatchObject({ root: scrollContainer })
+        expect(mutationInstances).toHaveLength(1)
+        expect(mutationInstances[0].observe).toHaveBeenCalledWith(scrollContainer, {
+          childList: true,
+          subtree: true,
+        })
+      })
+
+      it('batches intersecting unseen messages and flushes them via markAsSeen', () => {
+        jest.useFakeTimers()
+        try {
+          wrapper = Wrapper()
+          wrapper.vm.selectedRoom = mockRoom()
+          wrapper.vm.messages = [{ _id: 'a', id: 'a', seen: false }]
+          wrapper.vm.rooms = [mockRoom()]
+          wrapper.vm.unseenMessageIds.add('a')
+          setShadowRoot({ querySelector: jest.fn().mockReturnValue({}) })
+          mocks.$apollo.mutate.mockResolvedValue({ data: { MarkMessagesAsSeen: true } })
+          mocks.$apollo.query.mockResolvedValue({ data: { UnreadRooms: 0 } })
+          wrapper.vm.setupMessageVisibilityTracking()
+          const io = intersectionInstances[0]
+          const target = { dataset: { unseenId: 'a' } }
+          io.callback([
+            { isIntersecting: true, target },
+            { isIntersecting: false, target: { dataset: { unseenId: 'skip' } } },
+          ])
+          expect(io.unobserve).toHaveBeenCalledWith(target)
+          expect(wrapper.vm.unseenMessageIds.has('a')).toBe(false)
+          jest.advanceTimersByTime(500)
+          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+            expect.objectContaining({ variables: { messageIds: ['a'] } }),
+          )
+        } finally {
+          jest.useRealTimers()
+        }
+      })
+
+      it('relays MutationObserver fires to observeNewUnseenElements', () => {
+        wrapper = Wrapper()
+        setShadowRoot({ querySelector: jest.fn().mockReturnValue({}) })
+        wrapper.vm.setupMessageVisibilityTracking()
+        const spy = jest.spyOn(wrapper.vm, 'observeNewUnseenElements').mockImplementation()
+        mutationInstances[0].callback()
+        expect(spy).toHaveBeenCalled()
+      })
+    })
+
+    describe('observeNewUnseenElements', () => {
+      it('is a no-op when there are no unseen messages', () => {
+        wrapper = Wrapper()
+        wrapper.vm._intersectionObserver = { observe: jest.fn() }
+        wrapper.vm.observeNewUnseenElements()
+        expect(wrapper.vm._intersectionObserver.observe).not.toHaveBeenCalled()
+      })
+
+      it('is a no-op when no IntersectionObserver is attached', () => {
+        wrapper = Wrapper()
+        wrapper.vm.unseenMessageIds.add('x')
+        setShadowRoot({ querySelector: jest.fn() })
+        expect(() => wrapper.vm.observeNewUnseenElements()).not.toThrow()
+      })
+
+      it('is a no-op when shadowRoot is missing', () => {
+        wrapper = Wrapper()
+        wrapper.vm._intersectionObserver = { observe: jest.fn() }
+        wrapper.vm.unseenMessageIds.add('x')
+        setShadowRoot(null)
+        wrapper.vm.observeNewUnseenElements()
+        expect(wrapper.vm._intersectionObserver.observe).not.toHaveBeenCalled()
+      })
+
+      it('tags and observes DOM elements for known unseen messages', () => {
+        wrapper = Wrapper()
+        const observe = jest.fn()
+        wrapper.vm._intersectionObserver = { observe }
+        wrapper.vm.messages = [{ _id: 'dom-1', id: 'srv-1' }]
+        wrapper.vm.unseenMessageIds.add('srv-1')
+        wrapper.vm.unseenMessageIds.add('srv-missing')
+        const el = fakeEl()
+        setShadowRoot({
+          querySelector: jest.fn((sel) => (sel === '[id="dom-1"]' ? el : null)),
+        })
+        wrapper.vm.observeNewUnseenElements()
+        expect(el.dataset.unseenId).toBe('srv-1')
+        expect(observe).toHaveBeenCalledWith(el)
+      })
+
+      it('skips elements that are already tagged', () => {
+        wrapper = Wrapper()
+        const observe = jest.fn()
+        wrapper.vm._intersectionObserver = { observe }
+        wrapper.vm.messages = [{ _id: 'dom-1', id: 'srv-1' }]
+        wrapper.vm.unseenMessageIds.add('srv-1')
+        const el = { dataset: { unseenId: 'already' } }
+        setShadowRoot({ querySelector: jest.fn().mockReturnValue(el) })
+        wrapper.vm.observeNewUnseenElements()
+        expect(observe).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('searchRooms', () => {
+      it('reinitializes the room loader after a search clears a previously exhausted list', async () => {
+        wrapper = Wrapper()
+        await wrapper.vm.$nextTick()
+        // Search result must be a full page so fetchRooms keeps roomsLoaded=false,
+        // which is the precondition for the reinit branch in searchRooms.
+        const fullPage = Array.from({ length: 10 }, (_, i) =>
+          mockRoom({ id: `r-${i}`, roomId: `r-${i}` }),
+        )
+        mocks.$apollo.query.mockResolvedValue({ data: { Room: fullPage } })
+        wrapper.vm.roomsLoaded = true
+        const reinit = jest.fn()
+        wrapper.vm.reinitRoomLoader = reinit
+        await wrapper.vm.searchRooms({ value: 'hello' })
+        await wrapper.vm.$nextTick()
+        expect(reinit).toHaveBeenCalled()
+        expect(wrapper.vm.roomObserverDirty).toBe(false)
+      })
+    })
+
+    describe('reinitRoomLoader', () => {
+      it('is a no-op when no shadowRoot is attached', () => {
+        wrapper = Wrapper()
+        setShadowRoot(null)
+        wrapper.vm.reinitRoomLoader()
+        expect(intersectionInstances).toHaveLength(0)
+      })
+
+      it('is a no-op when loader or rooms list are missing', () => {
+        wrapper = Wrapper()
+        setShadowRoot({ querySelector: jest.fn().mockReturnValue(null) })
+        wrapper.vm.reinitRoomLoader()
+        expect(intersectionInstances).toHaveLength(0)
+      })
+
+      it('disconnects the previous observer and wires a fresh one that paginates on intersect', () => {
+        wrapper = Wrapper()
+        const loader = fakeEl()
+        const roomsList = {}
+        setShadowRoot({
+          querySelector: jest.fn((sel) =>
+            sel === '#infinite-loader-rooms' ? loader : sel === '#rooms-list' ? roomsList : null,
+          ),
+        })
+        const previous = { disconnect: jest.fn() }
+        wrapper.vm._roomLoaderObserver = previous
+        const fetchMoreSpy = jest.spyOn(wrapper.vm, 'fetchMoreRooms').mockImplementation()
+
+        wrapper.vm.reinitRoomLoader()
+
+        expect(previous.disconnect).toHaveBeenCalled()
+        expect(loader.style.display).toBe('')
+        expect(intersectionInstances).toHaveLength(1)
+        expect(intersectionInstances[0].observe).toHaveBeenCalledWith(loader)
+        expect(intersectionInstances[0].options).toMatchObject({ root: roomsList })
+
+        wrapper.vm.roomsLoaded = false
+        intersectionInstances[0].callback([{ isIntersecting: true }])
+        expect(fetchMoreSpy).toHaveBeenCalled()
+
+        fetchMoreSpy.mockClear()
+        wrapper.vm.roomsLoaded = true
+        intersectionInstances[0].callback([{ isIntersecting: true }])
+        expect(fetchMoreSpy).not.toHaveBeenCalled()
+
+        fetchMoreSpy.mockClear()
+        intersectionInstances[0].callback([{ isIntersecting: false }])
+        expect(fetchMoreSpy).not.toHaveBeenCalled()
       })
     })
   })

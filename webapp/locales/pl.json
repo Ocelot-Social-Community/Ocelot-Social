@@ -433,6 +433,9 @@
     "languageSelectText": "Wybierz język",
     "newEvent": "Utwórz nowe wydarzenie",
     "newPost": "Utwórz nowy wpis",
+    "postIn": "Publikuj w",
+    "postInGroupOption": "Grupa: {name}",
+    "postInPersonalProfile": "Profil osobisty",
     "success": "Zapisano!",
     "teaserImage": {
       "cropImage": "Przytnij obraz",
@@ -785,11 +788,6 @@
     "register": "Zarejestruj się",
     "success": "Jesteś zalogowany/a!"
   },
-  "maintenance": {
-    "explanation": "W tej chwili przeprowadzamy planowaną konserwację. Spróbuj ponownie później.",
-    "questions": "Pytania lub wątpliwości? Wyślij e-mail na adres",
-    "title": "{APPLICATION_NAME} jest w trakcie konserwacji"
-  },
   "map": {
     "alertMessage": "Nie można uzyskać dostępu do mapy: token Mapbox nie jest ustawiony na serwerze!",
     "legend": {
@@ -898,6 +896,8 @@
     },
     "group": "Opis",
     "markAllAsRead": "Oznacz wszystkie jako przeczytane",
+    "markAsRead": "Oznacz jako przeczytane",
+    "markAsUnread": "Oznacz jako nieprzeczytane",
     "pageLink": "Wszystkie powiadomienia",
     "post": "Wpis lub grupa",
     "reason": {

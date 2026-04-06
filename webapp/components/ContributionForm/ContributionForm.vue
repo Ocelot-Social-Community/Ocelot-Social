@@ -262,47 +262,21 @@ export default {
       type: Boolean,
       default: false,
     },
+    // When provided, the form uses this object as its source of truth (by reference).
+    // Lets callers hoist form state so it survives remounts (e.g. type switch).
+    externalFormData: {
+      type: Object,
+      default: null,
+    },
   },
 
   data() {
-    const {
-      title,
-      content,
-      image,
-      categories,
-      eventStart,
-      eventEnd,
-      eventLocationName,
-      eventVenue,
-      eventIsOnline,
-      eventLocation,
-    } = this.contribution
-    const {
-      sensitive: imageBlurred = false,
-      aspectRatio: imageAspectRatio = null,
-      type: imageType = null,
-    } = image || {}
     return {
       links,
-      formData: {
-        title: title || '',
-        content: content || '',
-        image: image || null,
-        imageAspectRatio,
-        imageType,
-        imageBlurred,
-        categoryIds: categories ? categories.map((category) => category.id) : [],
-        eventStart: eventStart || null,
-        eventEnd: eventEnd || null,
-        eventLocation: eventLocation || '',
-        eventLocationName: eventLocationName || '',
-        eventVenue: eventVenue || '',
-        eventIsOnline: eventIsOnline || false,
-      },
+      formData: this.externalFormData || this.buildInitialFormData(),
       loading: false,
       users: [],
       hashtags: [],
-      imageUpload: null,
     }
   },
   async mounted() {
@@ -387,10 +361,14 @@ export default {
       return this.$filters.removeHtml(this.formData.content).length
     },
     groupId() {
-      return this.group && this.group.id
+      // formData.groupId (from the create-flow draft) is the authoritative
+      // source: it is set synchronously from ?groupId=… while `group` only
+      // populates once Apollo resolves. Fall through to `group.id` for the
+      // edit flow, which passes group directly without external formData.
+      return (this.formData && this.formData.groupId) || (this.group && this.group.id) || null
     },
     showGroupHint() {
-      return this.groupId && ['closed', 'hidden'].includes(this.group.groupType)
+      return this.groupId && this.group && ['closed', 'hidden'].includes(this.group.groupType)
     },
     groupName() {
       return this.group && this.group.name
@@ -407,11 +385,55 @@ export default {
       if (!this.formData.categoryIds.length && this.groupCategories)
         this.formData.categoryIds = this.groupCategories.map((cat) => cat.id)
     },
+    // Re-validate when the schema-shaping inputs change so newly-required
+    // fields (e.g. eventStart when switching to "event") surface errors
+    // immediately rather than hiding behind a stale "green" state.
+    createEvent() {
+      this.$validateForm()
+    },
+    groupId() {
+      this.$validateForm()
+    },
   },
   created() {
     this.icons = iconRegistry
   },
   methods: {
+    buildInitialFormData() {
+      const {
+        title,
+        content,
+        image,
+        categories,
+        eventStart,
+        eventEnd,
+        eventLocationName,
+        eventVenue,
+        eventIsOnline,
+        eventLocation,
+      } = this.contribution
+      const {
+        sensitive: imageBlurred = false,
+        aspectRatio: imageAspectRatio = null,
+        type: imageType = null,
+      } = image || {}
+      return {
+        title: title || '',
+        content: content || '',
+        image: image || null,
+        imageAspectRatio,
+        imageType,
+        imageBlurred,
+        imageUpload: null,
+        categoryIds: categories ? categories.map((category) => category.id) : [],
+        eventStart: eventStart || null,
+        eventEnd: eventEnd || null,
+        eventLocation: eventLocation || '',
+        eventLocationName: eventLocationName || '',
+        eventVenue: eventVenue || '',
+        eventIsOnline: eventIsOnline || false,
+      }
+    },
     notBeforeToday(date) {
       return date < new Date().setHours(0, 0, 0, 0)
     },
@@ -435,8 +457,8 @@ export default {
         image = {
           sensitive: this.formData.imageBlurred,
         }
-        if (this.imageUpload) {
-          image.upload = this.imageUpload
+        if (this.formData.imageUpload) {
+          image.upload = this.formData.imageUpload
           image.aspectRatio = this.formData.imageAspectRatio
           image.type = this.formData.imageType
         }
@@ -486,6 +508,7 @@ export default {
     },
     addHeroImage(file) {
       this.formData.image = null
+      this.formData.imageUpload = null
       if (file) {
         const reader = new FileReader()
         reader.onload = ({ target }) => {
@@ -495,7 +518,7 @@ export default {
           }
         }
         reader.readAsDataURL(file)
-        this.imageUpload = file
+        this.formData.imageUpload = file
       }
     },
     addImageAspectRatio(aspectRatio) {

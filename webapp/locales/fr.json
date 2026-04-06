@@ -433,6 +433,9 @@
     "languageSelectText": "Sélectionner une langue",
     "newEvent": "Créer un nouvel événement",
     "newPost": "Créer un nouveau Post",
+    "postIn": "Publier dans",
+    "postInGroupOption": "Groupe : {name}",
+    "postInPersonalProfile": "Profil personnel",
     "success": "Enregistré!",
     "teaserImage": {
       "cropImage": "Rogner l'image",
@@ -785,11 +788,6 @@
     "register": "S'inscrire",
     "success": "Vous êtes connecté!"
   },
-  "maintenance": {
-    "explanation": "Pour l'instant, nous faisons de la maintenance programmée, veuillez réessayer plus tard.",
-    "questions": "Des questions ou des préoccupations, envoyez un mail à",
-    "title": "{APPLICATION_NAME} est en maintenance"
-  },
   "map": {
     "alertMessage": "La carte n'est pas accessible : Le token Mapbox n'est pas configuré sur le serveur !",
     "legend": {
@@ -898,6 +896,8 @@
     },
     "group": "Description",
     "markAllAsRead": "Tout marquer comme lu",
+    "markAsRead": "Marquer comme lu",
+    "markAsUnread": "Marquer comme non lu",
     "pageLink": "Toutes les notifications",
     "post": "Post",
     "reason": {

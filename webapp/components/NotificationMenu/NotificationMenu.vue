@@ -72,8 +72,10 @@
       <div class="notifications-menu-popover">
         <notifications-table
           @markNotificationAsRead="markAsReadAndCloseMenu($event, closeMenu)"
+          @toggleNotificationRead="toggleNotificationRead"
           :notifications="notifications"
           :show-popover="false"
+          :show-read-toggle="true"
         />
       </div>
     </template>
@@ -88,11 +90,16 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import {
   notificationQuery,
   markAsReadMutation,
+  markAsUnreadMutation,
   notificationAdded,
   markAllAsReadMutation,
 } from '~/graphql/User'
 import Dropdown from '~/components/Dropdown'
 import NotificationsTable from '../NotificationsTable/NotificationsTable.vue'
+
+// Grace period between a toggle click and the dropdown refetch. Gives the user
+// time to undo their action before the row disappears from the filtered list.
+const NOTIFICATIONS_REFETCH_DELAY_MS = 3000
 
 export default {
   name: 'NotificationMenu',
@@ -120,6 +127,7 @@ export default {
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.handleResize)
+    clearTimeout(this._notificationsRefetchTimer)
   },
   methods: {
     handleResize() {
@@ -137,6 +145,27 @@ export default {
       } catch (error) {
         this.$toast.error(error.message)
       }
+    },
+    async toggleNotificationRead({ resourceId, read }) {
+      try {
+        await this.$apollo.mutate({
+          mutation: read ? markAsUnreadMutation(this.$i18n) : markAsReadMutation(this.$i18n),
+          variables: { id: resourceId },
+        })
+        // Delay the list refetch so the user can revise their decision. The toggle
+        // icon flips instantly (entity normalization), the counter also updates
+        // instantly because its reducer reads the updated NOTIFIED.read field, but
+        // the row stays visible in the filtered dropdown list until this refetch.
+        this.scheduleNotificationsRefetch()
+      } catch (error) {
+        this.$toast.error(error.message)
+      }
+    },
+    scheduleNotificationsRefetch() {
+      clearTimeout(this._notificationsRefetchTimer)
+      this._notificationsRefetchTimer = setTimeout(() => {
+        this.$apollo.queries.notifications.refetch()
+      }, NOTIFICATIONS_REFETCH_DELAY_MS)
     },
     async markAllAsRead() {
       if (!this.hasNotifications) {

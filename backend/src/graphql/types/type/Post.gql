@@ -93,6 +93,7 @@ input _PostFilter {
   eventStart_gte: String
   eventEnd_gte: String
   hasLocation: Boolean
+  skipPinnedFilter: Boolean
 }
 
 enum _PostOrdering {
@@ -174,6 +175,12 @@ type Post {
     @cypher(
       statement: "MATCH (this)<-[:SHOUTED]-(u:User {id: $cypherParams.currentUserId}) RETURN COUNT(u) >= 1"
     )
+
+  "Unread notification for this post targeting the currently logged in user, or null."
+  unreadNotificationByCurrentUser: NOTIFIED @neo4j_ignore
+
+  "Unread notifications for comments in this post targeting the currently logged in user."
+  unreadCommentNotificationsByCurrentUser: [NOTIFIED!]! @neo4j_ignore
 
   clickedCount: Int!
 

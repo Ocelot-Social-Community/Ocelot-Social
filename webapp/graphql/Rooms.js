@@ -37,8 +37,15 @@ export const createGroupRoom = () => gql`
 export const roomQuery = () => gql`
   ${imageUrls}
 
-  query Room($first: Int, $before: String, $id: ID, $userId: ID, $groupId: ID) {
-    Room(first: $first, before: $before, id: $id, userId: $userId, groupId: $groupId) {
+  query Room($first: Int, $before: String, $id: ID, $userId: ID, $groupId: ID, $search: String) {
+    Room(
+      first: $first
+      before: $before
+      id: $id
+      userId: $userId
+      groupId: $groupId
+      search: $search
+    ) {
       id
       roomId
       roomName
@@ -66,6 +73,13 @@ export const roomQuery = () => gql`
         saved
         distributed
         seen
+        files {
+          url
+          name
+          extension
+          type
+          duration
+        }
       }
       users {
         _id
@@ -79,6 +93,20 @@ export const roomQuery = () => gql`
   }
 `
 
+export const userProfileQuery = () => gql`
+  ${imageUrls}
+
+  query ($id: ID!) {
+    User(id: $id) {
+      id
+      name
+      avatar {
+        ...imageUrls
+      }
+    }
+  }
+`
+
 export const unreadRoomsQuery = () => {
   return gql`
     query {
@@ -87,10 +115,30 @@ export const unreadRoomsQuery = () => {
   `
 }
 
-export const roomCountUpdated = () => {
+export const roomUnreadQuery = () => gql`
+  query Room($userId: ID, $groupId: ID) {
+    Room(userId: $userId, groupId: $groupId) {
+      id
+      unreadCount
+    }
+  }
+`
+
+export const roomUpdated = () => {
   return gql`
-    subscription roomCountUpdated {
-      roomCountUpdated
+    subscription roomUpdated {
+      roomUpdated {
+        id
+        unreadCount
+        lastMessageAt
+      }
     }
   `
 }
+
+export const roomUnreadFragment = gql`
+  fragment RoomUnreadFragment on Room {
+    id
+    unreadCount
+  }
+`

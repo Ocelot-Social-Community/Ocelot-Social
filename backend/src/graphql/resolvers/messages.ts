@@ -9,10 +9,15 @@ import { withFilter } from 'graphql-subscriptions'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import CONFIG from '@config/index'
-import { CHAT_MESSAGE_ADDED, CHAT_MESSAGE_STATUS_UPDATED } from '@constants/subscriptions'
+import {
+  CHAT_MESSAGE_ADDED,
+  CHAT_MESSAGE_STATUS_UPDATED,
+  ROOM_UPDATED,
+} from '@constants/subscriptions'
 
 import { attachments } from './attachments/attachments'
 import Resolver from './helpers/Resolver'
+import { getRoomProperties } from './rooms'
 
 import type { File } from './attachments/attachments'
 
@@ -254,14 +259,32 @@ export default {
             currentUserId,
           })
         })
+        const roomIds = new Set<string>()
         // Notify message authors that their messages have been seen
         for (const record of result.records) {
           const roomId = record.get('roomId')
           const authorId = record.get('authorId')
+          roomIds.add(roomId)
           void context.pubsub.publish(CHAT_MESSAGE_STATUS_UPDATED, {
             authorId,
             chatMessageStatusUpdated: { roomId, messageIds, status: 'seen' },
           })
+        }
+        // Notify the reader that their per-room unread count has changed.
+        // Best-effort: the write is already committed and MarkMessagesAsSeen retries
+        // are idempotent, so we swallow both read and publish errors here — the next
+        // subscription event will self-heal client state. publish() is awaited (not
+        // voided) so async broker rejections (e.g. Redis outage) land in the catch
+        // instead of escaping as unhandled rejections.
+        for (const roomId of roomIds) {
+          try {
+            const roomProperties = await getRoomProperties(roomId, session)
+            await context.pubsub.publish(ROOM_UPDATED, {
+              roomUpdated: roomProperties,
+              userId: currentUserId,
+            })
+            // eslint-disable-next-line no-catch-all/no-catch-all -- see block comment above
+          } catch {}
         }
         return true
       } finally {
@@ -279,5 +302,9 @@ export default {
         files: '-[:ATTACHMENT]-(related:File)',
       },
     }),
+  },
+  File: {
+    extension: (parent: { extension?: string | null }) => parent.extension ?? null,
+    duration: (parent: { duration?: number | null }) => parent.duration ?? null,
   },
 }

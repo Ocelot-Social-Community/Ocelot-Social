@@ -1,0 +1,3 @@
+query GroupCount($isMember: Boolean) {
+  GroupCount(isMember: $isMember)
+}

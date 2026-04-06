@@ -167,7 +167,7 @@ export default {
               MERGE (owner)-[membership:MEMBER_OF]->(group)
               SET
                 membership.createdAt = toString(datetime()),
-                membership.updatedAt = null,
+                membership.updatedAt = toString(datetime()),
                 membership.role = 'owner'
               ${categoriesCypher}
               RETURN group {.*, myRole: membership.role}
@@ -280,7 +280,7 @@ export default {
             MERGE (user)-[membership:MEMBER_OF]->(group)
             ON CREATE SET
               membership.createdAt = toString(datetime()),
-              membership.updatedAt = null,
+              membership.updatedAt = toString(datetime()),
               membership.role =
                 CASE WHEN group.groupType = 'public'
                   THEN 'usual'
@@ -339,7 +339,7 @@ export default {
             MERGE (member)-[membership:MEMBER_OF]->(group)
             ON CREATE SET
               membership.createdAt = toString(datetime()),
-              membership.updatedAt = null,
+              membership.updatedAt = toString(datetime()),
               membership.role = $roleInGroup
             ON MATCH SET
               membership.updatedAt = toString(datetime()),

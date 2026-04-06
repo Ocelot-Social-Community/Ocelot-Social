@@ -177,6 +177,21 @@ export const removeUserFromGroupMutation = () => {
 
 // ------ queries
 
+export const myGroupsForPostCreation = () => gql`
+  query {
+    Group(isMember: true) {
+      id
+      name
+      slug
+      groupType
+      categories {
+        id
+        slug
+      }
+    }
+  }
+`
+
 export const groupQuery = (i18n) => {
   const lang = i18n ? i18n.locale().toUpperCase() : 'EN'
   return gql`
@@ -207,7 +222,7 @@ export const groupQuery = (i18n) => {
         avatar {
           ...imageUrls
         }
-        ...location
+        ...locationOnGroup
         membersCount
         myRole
         inviteCodes {

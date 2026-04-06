@@ -1,5 +1,7 @@
 import GroupProfileSlug from './_slug.vue'
 import { render, screen, fireEvent } from '@testing-library/vue'
+import { mount } from '@vue/test-utils'
+import Vue from 'vue'
 import Vuex from 'vuex'
 
 const localVue = global.localVue
@@ -81,6 +83,9 @@ describe('GroupProfileSlug', () => {
       $apollo: {
         loading: false,
         mutate: jest.fn().mockResolvedValue(),
+        subscribe: jest.fn().mockReturnValue({
+          subscribe: jest.fn().mockReturnValue({ unsubscribe: jest.fn() }),
+        }),
       },
     }
     yogaPractice = {
@@ -571,6 +576,89 @@ describe('GroupProfileSlug', () => {
           })
         })
       })
+    })
+  })
+
+  describe('roomUpdated subscription setup', () => {
+    let subscribeMock
+    let subscriptionMocks
+    let savedErrorHandler
+    let savedWarnHandler
+
+    beforeEach(() => {
+      // vue-test-utils refuses to install its own error handler if one is present
+      savedErrorHandler = Vue.config.errorHandler
+      savedWarnHandler = Vue.config.warnHandler
+      Vue.config.errorHandler = null
+      Vue.config.warnHandler = null
+    })
+
+    afterEach(() => {
+      Vue.config.errorHandler = savedErrorHandler
+      Vue.config.warnHandler = savedWarnHandler
+    })
+
+    const mountWithGroup = (group) => {
+      subscriptionMocks = { unsubscribe: jest.fn() }
+      subscribeMock = jest.fn().mockReturnValue({
+        subscribe: jest.fn().mockReturnValue(subscriptionMocks),
+      })
+      currentUserMock.mockReturnValue(peterLustig)
+      return mount(GroupProfileSlug, {
+        localVue,
+        store,
+        stubs: {
+          ...stubs,
+          'infinite-loading': true,
+          'masonry-grid': true,
+          'masonry-grid-item': true,
+          'post-teaser': true,
+          'content-viewer': true,
+        },
+        mocks: {
+          ...mocks,
+          $apollo: {
+            loading: false,
+            mutate: jest.fn().mockResolvedValue(),
+            subscribe: subscribeMock,
+            queries: { chatRoom: { refetch: jest.fn() } },
+          },
+        },
+        data: () => ({ group, GroupMembers: [] }),
+      })
+    }
+
+    it('does not subscribe when group membership is unknown at mount', () => {
+      mountWithGroup({})
+      expect(subscribeMock).not.toHaveBeenCalled()
+    })
+
+    it('does not subscribe for non-members', () => {
+      mountWithGroup({ ...yogaPractice, myRole: null })
+      expect(subscribeMock).not.toHaveBeenCalled()
+    })
+
+    it('subscribes when group membership is already known at mount', () => {
+      mountWithGroup({ ...yogaPractice, myRole: 'usual' })
+      expect(subscribeMock).toHaveBeenCalledWith(
+        expect.objectContaining({ fetchPolicy: 'no-cache' }),
+      )
+    })
+
+    it('subscribes reactively when membership becomes known after mount', async () => {
+      const wrapper = mountWithGroup({})
+      expect(subscribeMock).not.toHaveBeenCalled()
+      wrapper.setData({ group: { ...yogaPractice, myRole: 'usual' } })
+      await wrapper.vm.$nextTick()
+      expect(subscribeMock).toHaveBeenCalled()
+    })
+
+    it('does not double-subscribe if membership signal fires multiple times', async () => {
+      const wrapper = mountWithGroup({ ...yogaPractice, myRole: 'usual' })
+      expect(subscribeMock).toHaveBeenCalledTimes(1)
+      wrapper.setData({ group: { ...yogaPractice, myRole: 'admin' } })
+      await wrapper.vm.$nextTick()
+      expect(subscribeMock).toHaveBeenCalledTimes(1)
     })
   })
 })

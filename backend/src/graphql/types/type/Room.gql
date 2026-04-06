@@ -55,14 +55,6 @@ type Room {
 
   "Count unread messages, excluding those from blocked/muted senders"
   unreadCount: Int
-    @cypher(
-      statement: """
-      MATCH (u:User { id: $cypherParams.currentUserId })-[:HAS_NOT_SEEN]->(message:Message)-[:INSIDE]->(this)
-      MATCH (message)<-[:CREATED]-(sender:User)
-      WHERE NOT (u)-[:BLOCKED]->(sender) AND NOT (u)-[:MUTED]->(sender)
-      RETURN count(message)
-      """
-    )
 }
 
 type Mutation {
@@ -70,10 +62,10 @@ type Mutation {
 }
 
 type Query {
-  Room(id: ID, userId: ID, groupId: ID, first: Int, before: String, orderBy: [_RoomOrdering]): [Room]
+  Room(id: ID, userId: ID, groupId: ID, first: Int, before: String, search: String, orderBy: [_RoomOrdering]): [Room]
   UnreadRooms: Int
 }
 
 type Subscription {
-  roomCountUpdated: Int
+  roomUpdated: Room
 }

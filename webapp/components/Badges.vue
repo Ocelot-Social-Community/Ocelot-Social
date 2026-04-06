@@ -4,7 +4,7 @@
       :is="selectionMode && index > 0 ? 'button' : 'div'"
       class="hc-badge-container"
       v-for="(badge, index) in badges"
-      :key="index"
+      :key="`${index}-${badge.id}`"
       :class="{
         selectable: selectionMode && index > 0,
         selected: selectedIndex === index,

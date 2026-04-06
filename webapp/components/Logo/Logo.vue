@@ -99,11 +99,6 @@ export default {
         alt: 'Reset Your Password',
         widthDefault: '200px',
       },
-      maintenance: {
-        path: logos.LOGO_MAINTENACE_RESET_PATH,
-        alt: 'Under Maintenance',
-        widthDefault: '200px',
-      },
     }
     return {
       logo: logosObject[this.logoType],

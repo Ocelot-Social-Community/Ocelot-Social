@@ -36,6 +36,7 @@ type Query {
 
 type Mutation {
   markAsRead(id: ID!): NOTIFIED
+  markAsUnread(id: ID!): NOTIFIED
   markAllAsRead: [NOTIFIED]
 }
 

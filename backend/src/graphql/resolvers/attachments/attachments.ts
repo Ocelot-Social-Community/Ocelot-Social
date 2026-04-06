@@ -28,13 +28,17 @@ export interface AddAttachmentOpts {
 export interface FileInput {
   upload?: Promise<FileUpload>
   name: string
+  extension?: string | null
   type: string
+  duration?: number | null
 }
 
 export interface File {
   url: string
   name: string
+  extension?: string | null
   type: string
+  duration?: number | null
 }
 
 export interface Attachments {
@@ -143,8 +147,15 @@ export const attachments = (config: S3Config) => {
       uniqueFilename,
     })
 
-    const { name, type } = fileInput
-    const file = { url, name, type, ...fileAttributes }
+    const { name, extension, type, duration } = fileInput
+    const file = {
+      url,
+      name,
+      ...(extension && { extension }),
+      type,
+      ...(duration != null && { duration }),
+      ...fileAttributes,
+    }
     // const mimeType = uploadFile.mimetype.split('/')[0]
     // const nodeType = `Mime${mimeType.replace(/^./, mimeType[0].toUpperCase())}`
     // CREATE (file:${['File', nodeType].filter(Boolean).join(':')})

@@ -7,7 +7,9 @@
 import Factory, { cleanDatabase } from '@db/factories'
 import markAllAsRead from '@graphql/queries/notifications/markAllAsRead.gql'
 import markAsRead from '@graphql/queries/notifications/markAsRead.gql'
+import markAsUnread from '@graphql/queries/notifications/markAsUnread.gql'
 import notifications from '@graphql/queries/notifications/notifications.gql'
+import notificationsPaginated from '@graphql/queries/notifications/notificationsPaginated.gql'
 import DeletePost from '@graphql/queries/posts/DeletePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
@@ -272,6 +274,65 @@ describe('given some notifications', () => {
           })
         })
       })
+
+      describe('filter for read: true', () => {
+        it('returns only already-read notifications', async () => {
+          const response = await query({
+            query: notifications,
+            variables: { ...variables, read: true },
+          })
+          expect(response.errors).toBeUndefined()
+          expect(response.data?.notifications).toHaveLength(2)
+          expect(response.data?.notifications.every((n) => n.read === true)).toBe(true)
+        })
+      })
+
+      describe('orderBy updatedAt_asc / updatedAt_desc', () => {
+        // The fixtures don't set notification.updatedAt, so we can't assert a stable
+        // ordering — just exercise the ORDER BY branch and verify the query succeeds.
+        it('accepts updatedAt_asc and returns the full set', async () => {
+          const response = await query({
+            query: notifications,
+            variables: { orderBy: 'updatedAt_asc' },
+          })
+          expect(response.errors).toBeUndefined()
+          expect(response.data?.notifications).toHaveLength(4)
+        })
+
+        it('accepts updatedAt_desc and returns the full set', async () => {
+          const response = await query({
+            query: notifications,
+            variables: { orderBy: 'updatedAt_desc' },
+          })
+          expect(response.errors).toBeUndefined()
+          expect(response.data?.notifications).toHaveLength(4)
+        })
+      })
+
+      describe('pagination with first/offset', () => {
+        it('applies LIMIT when first is set', async () => {
+          const response = await query({
+            query: notificationsPaginated,
+            variables: { first: 1 },
+          })
+          expect(response.errors).toBeUndefined()
+          expect(response.data?.notifications).toHaveLength(1)
+        })
+
+        it('applies SKIP when offset is set', async () => {
+          const withoutOffset = await query({
+            query: notificationsPaginated,
+            variables: {},
+          })
+          const withOffset = await query({
+            query: notificationsPaginated,
+            variables: { offset: 1 },
+          })
+          expect(withOffset.data?.notifications).toHaveLength(
+            withoutOffset.data.notifications.length - 1,
+          )
+        })
+      })
     })
   })
 
@@ -368,6 +429,88 @@ describe('given some notifications', () => {
                 createdAt: '2019-08-30T19:33:48.651Z',
               },
             })
+          })
+        })
+      })
+    })
+  })
+
+  describe('markAsUnread', () => {
+    describe('unauthenticated', () => {
+      it('throws authorization error', async () => {
+        const result = await mutate({
+          mutation: markAsUnread,
+          variables: { id: 'p2' },
+        })
+        expect(result.errors?.[0]).toHaveProperty('message', 'Not Authorized!')
+      })
+    })
+
+    describe('authenticated', () => {
+      beforeEach(async () => {
+        authenticatedUser = await user.toJson()
+      })
+
+      describe('not being notified at all', () => {
+        it('returns null', async () => {
+          const response = await mutate({
+            mutation: markAsUnread,
+            variables: { id: 'p1' },
+          })
+          expect(response.data?.markAsUnread).toEqual(null)
+          expect(response.errors).toBeUndefined()
+        })
+      })
+
+      describe('being notified with read=true', () => {
+        it('flips `read` to false and returns NOTIFIED relationship', async () => {
+          const { data } = await mutate({
+            mutation: markAsUnread,
+            variables: { id: 'p2' },
+          })
+          expect(data).toEqual({
+            markAsUnread: {
+              id: expect.any(String),
+              from: {
+                __typename: 'Post',
+                id: 'p2',
+                content: 'Already seen post mention',
+              },
+              read: false,
+              createdAt: '2019-08-30T17:33:48.651Z',
+            },
+          })
+        })
+      })
+
+      describe('notification already unread', () => {
+        it('returns null (no-op)', async () => {
+          const response = await mutate({
+            mutation: markAsUnread,
+            variables: { id: 'p3' },
+          })
+          expect(response.data?.markAsUnread).toEqual(null)
+          expect(response.errors).toBeUndefined()
+        })
+      })
+
+      describe('being notified on a comment', () => {
+        it('flips `read` to false on a comment notification', async () => {
+          const { data } = await mutate({
+            mutation: markAsUnread,
+            variables: { id: 'c1' },
+          })
+          expect(data).toEqual({
+            markAsUnread: {
+              id: expect.any(String),
+              from: {
+                __typename: 'Comment',
+                id: 'c1',
+                content: 'You have seen this comment mentioning already',
+              },
+              read: false,
+              createdAt: '2019-08-30T15:33:48.651Z',
+            },
           })
         })
       })

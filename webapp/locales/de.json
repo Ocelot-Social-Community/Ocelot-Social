@@ -433,6 +433,9 @@
     "languageSelectText": "Sprache wählen",
     "newEvent": "Erstelle eine neue Veranstaltung",
     "newPost": "Erstelle einen neuen Beitrag",
+    "postIn": "Veröffentlichen in",
+    "postInGroupOption": "Gruppe: {name}",
+    "postInPersonalProfile": "Persönliches Profil",
     "success": "Gespeichert!",
     "teaserImage": {
       "cropImage": "Bild zuschneiden",
@@ -785,11 +788,6 @@
     "register": "Nutzerkonto erstellen",
     "success": "Du bist eingeloggt!"
   },
-  "maintenance": {
-    "explanation": "Derzeit führen wir einige geplante Wartungsarbeiten durch, bitte versuche es später erneut.",
-    "questions": "Bei Fragen oder Problemen erreichst du uns per E-Mail an",
-    "title": "{APPLICATION_NAME} befindet sich in der Wartung"
-  },
   "map": {
     "alertMessage": "Es kann nicht auf die Karte zugegriffen werden: Der Mapbox-Token ist auf dem Server nicht gesetzt!",
     "legend": {
@@ -898,6 +896,8 @@
     },
     "group": "Beschreibung",
     "markAllAsRead": "Markiere alle als gelesen",
+    "markAsRead": "Als gelesen markieren",
+    "markAsUnread": "Als ungelesen markieren",
     "pageLink": "Alle Benachrichtigungen",
     "post": "Beitrag oder Gruppe",
     "reason": {

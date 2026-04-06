@@ -433,6 +433,9 @@
     "languageSelectText": "Selecteer taal",
     "newEvent": "Maak een nieuw evenement aan",
     "newPost": "Maak een nieuw bericht aan",
+    "postIn": "Publiceren in",
+    "postInGroupOption": "Groep: {name}",
+    "postInPersonalProfile": "Persoonlijk profiel",
     "success": "Opgeslagen!",
     "teaserImage": {
       "cropImage": "Afbeelding bijsnijden",
@@ -785,11 +788,6 @@
     "register": "Registreren",
     "success": "Je bent ingelogd!"
   },
-  "maintenance": {
-    "explanation": "Op dit moment zijn we bezig met gepland onderhoud. Probeer het later opnieuw.",
-    "questions": "Vragen of opmerkingen? Stuur een e-mail naar",
-    "title": "{APPLICATION_NAME} is in onderhoud"
-  },
   "map": {
     "alertMessage": "De kaart is niet toegankelijk: het Mapbox-token is niet ingesteld op de server!",
     "legend": {
@@ -898,6 +896,8 @@
     },
     "group": "Beschrijving",
     "markAllAsRead": "Markeer alles als gelezen",
+    "markAsRead": "Markeer als gelezen",
+    "markAsUnread": "Markeer als ongelezen",
     "pageLink": "Alle notificaties",
     "post": "Bericht of groep",
     "reason": {

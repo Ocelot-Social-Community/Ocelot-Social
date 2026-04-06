@@ -25,7 +25,11 @@ ONBUILD COPY ./branding/constants/ src/config/tmp
 # copy categories to brand them (use yarn prod:db:data:categories)
 ONBUILD COPY ./branding/constants/ src/constants/
 ONBUILD RUN tools/replace-constants.sh
-ONBUILD COPY ./branding/email/ src/middleware/helpers/email/
+# Email templates: optionally overlay branding pug templates onto src/emails/templates/
+ONBUILD COPY brandin[g]/emails/templates/ src/emails/templates/
+# Email locales: optionally deep-merge branding translations into src/emails/locales/*.json
+ONBUILD COPY brandin[g]/emails/locales/*.jso[n] src/emails/locales/tmp/
+ONBUILD RUN if [ -d src/emails/locales/tmp ]; then apk add --no-cache jq bash && tools/merge-email-locales.sh; fi
 ONBUILD COPY ./branding/middlewares/ src/middleware/branding/
 ONBUILD COPY ./branding/data/ src/db/data
 ONBUILD COPY ./branding/public/ public/

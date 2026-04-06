@@ -433,6 +433,9 @@
     "languageSelectText": "Select Language",
     "newEvent": "Create a new Event",
     "newPost": "Create a new Post",
+    "postIn": "Post in",
+    "postInGroupOption": "Group: {name}",
+    "postInPersonalProfile": "Personal profile",
     "success": "Saved!",
     "teaserImage": {
       "cropImage": "Crop image",
@@ -785,11 +788,6 @@
     "register": "Sign up",
     "success": "You are logged in!"
   },
-  "maintenance": {
-    "explanation": "At the moment we are doing some scheduled maintenance, please try again later.",
-    "questions": "Any Questions or concerns, send an e-mail to",
-    "title": "{APPLICATION_NAME} is under maintenance"
-  },
   "map": {
     "alertMessage": "The map cannot be accessed: The Mapbox token is not set on the server!",
     "legend": {
@@ -898,6 +896,8 @@
     },
     "group": "Description",
     "markAllAsRead": "Mark all as read",
+    "markAsRead": "Mark as read",
+    "markAsUnread": "Mark as unread",
     "pageLink": "All notifications",
     "post": "Post or Group",
     "reason": {

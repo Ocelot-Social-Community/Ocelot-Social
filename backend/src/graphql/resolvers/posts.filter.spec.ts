@@ -69,7 +69,7 @@ describe('Filter Posts', () => {
         content: 'Elli wird fünf. Wir feiern ihren Geburtstag.',
         postType: 'Event',
         eventInput: {
-          eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+          eventStart: new Date(now.getFullYear(), now.getMonth() + 1, 15).toISOString(),
           eventVenue: 'Garten der Familie Maier',
         },
       },
@@ -174,7 +174,7 @@ describe('Filter Posts', () => {
       expect(result).toEqual([
         expect.objectContaining({
           id: 'e1',
-          eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+          eventStart: new Date(now.getFullYear(), now.getMonth() + 1, 15).toISOString(),
         }),
         expect.objectContaining({
           id: 'e2',
@@ -184,9 +184,7 @@ describe('Filter Posts', () => {
     })
   })
 
-  // Does not work on months end
-  // eslint-disable-next-line jest/no-disabled-tests
-  describe.skip('order events by event start ascending', () => {
+  describe('order events by event start ascending', () => {
     it('finds the events ordered accordingly', async () => {
       const {
         data: { Post: result },
@@ -202,15 +200,13 @@ describe('Filter Posts', () => {
         }),
         expect.objectContaining({
           id: 'e1',
-          eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+          eventStart: new Date(now.getFullYear(), now.getMonth() + 1, 15).toISOString(),
         }),
       ])
     })
   })
 
-  // Does not work on months end
-  // eslint-disable-next-line jest/no-disabled-tests
-  describe.skip('filter events by event start date', () => {
+  describe('filter events by event start date', () => {
     it('finds only events after given date', async () => {
       const {
         data: { Post: result },
@@ -231,7 +227,7 @@ describe('Filter Posts', () => {
       expect(result).toEqual([
         expect.objectContaining({
           id: 'e1',
-          eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+          eventStart: new Date(now.getFullYear(), now.getMonth() + 1, 15).toISOString(),
         }),
       ])
     })

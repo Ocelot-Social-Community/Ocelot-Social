@@ -517,6 +517,7 @@ export default shield(
       blockUser: isAuthenticated,
       unblockUser: isAuthenticated,
       markAsRead: isAuthenticated,
+      markAsUnread: isAuthenticated,
       markAllAsRead: isAuthenticated,
       AddEmailAddress: isAuthenticated,
       VerifyEmailAddress: isAuthenticated,

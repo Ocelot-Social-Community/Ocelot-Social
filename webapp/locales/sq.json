@@ -433,6 +433,9 @@
     "languageSelectText": "Zgjidh gjuhën",
     "newEvent": "Krijo një ngjarje të re",
     "newPost": "Krijo një postim të ri",
+    "postIn": "Postoni në",
+    "postInGroupOption": "Grupi: {name}",
+    "postInPersonalProfile": "Profili personal",
     "success": "U ruajt!",
     "teaserImage": {
       "cropImage": "Prit imazhin",
@@ -785,11 +788,6 @@
     "register": "Regjistrohu",
     "success": "Je kyçur me sukses!"
   },
-  "maintenance": {
-    "explanation": "Aktualisht po bëjmë mirëmbajtje të planifikuar. Ju lutem provoni përsëri më vonë.",
-    "questions": "Pyetje ose shqetësime? Dërgo një e-mail në",
-    "title": "{APPLICATION_NAME} është në mirëmbajtje"
-  },
   "map": {
     "alertMessage": "Harta nuk mund të aksesohet: Tokeni i Mapbox nuk është vendosur në server!",
     "legend": {
@@ -898,6 +896,8 @@
     },
     "group": "Përshkrimi",
     "markAllAsRead": "Shëno të gjitha si të lexuara",
+    "markAsRead": "Shëno si të lexuar",
+    "markAsUnread": "Shëno si të palexuar",
     "pageLink": "Të gjitha njoftimet",
     "post": "Postim ose grup",
     "reason": {

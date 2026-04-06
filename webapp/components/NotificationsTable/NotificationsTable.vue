@@ -77,6 +77,25 @@
                   }}
                 </p>
               </div>
+              <os-button
+                v-if="showReadToggle"
+                variant="primary"
+                appearance="ghost"
+                circle
+                size="sm"
+                class="notification-read-toggle"
+                :aria-label="
+                  notification.read
+                    ? $t('notifications.markAsUnread')
+                    : $t('notifications.markAsRead')
+                "
+                :data-test="notification.read ? 'toggle-mark-as-unread' : 'toggle-mark-as-read'"
+                @click="toggleReadState(notification)"
+              >
+                <template #icon>
+                  <os-icon :icon="notification.read ? icons.check : icons.envelope" />
+                </template>
+              </os-button>
             </div>
           </div>
         </div>
@@ -86,7 +105,7 @@
   <hc-empty v-else icon="alert" :message="$t('notifications.empty')" />
 </template>
 <script>
-import { OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import HcEmpty from '~/components/Empty/Empty'
@@ -97,6 +116,7 @@ const maxMobileWidth = 768 // at this point the table breaks down
 export default {
   mixins: [mobile(maxMobileWidth)],
   components: {
+    OsButton,
     OsIcon,
     UserTeaser,
     HcEmpty,
@@ -104,6 +124,7 @@ export default {
   props: {
     notifications: { type: Array, default: () => [] },
     showPopover: { type: Boolean, default: true },
+    showReadToggle: { type: Boolean, default: false },
   },
   computed: {
     fields() {
@@ -145,6 +166,12 @@ export default {
       return new Promise((resolve) => {
         this.$emit('markNotificationAsRead', notificationSourceId)
         resolve()
+      })
+    },
+    toggleReadState(notification) {
+      this.$emit('toggleNotificationRead', {
+        resourceId: notification.from.id,
+        read: notification.read,
       })
     },
     async handleNotificationClick(notification) {
@@ -209,6 +236,15 @@ export default {
 
   .notification-icon {
     flex-shrink: 0;
+  }
+
+  .notification-read-toggle {
+    flex-shrink: 0;
+    align-self: flex-start;
+
+    .os-icon {
+      padding-right: 0;
+    }
   }
 }
 

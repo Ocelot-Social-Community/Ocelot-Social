@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 import { Readable } from 'node:stream'
@@ -17,7 +18,7 @@ import Message from '@graphql/queries/messaging/Message.gql'
 import Room from '@graphql/queries/messaging/Room.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-import { chatMessageAddedFilter, chatMessageStatusUpdatedFilter } from './messages'
+import resolvers, { chatMessageAddedFilter, chatMessageStatusUpdatedFilter } from './messages'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -730,6 +731,40 @@ describe('Message', () => {
           },
         })
       })
+
+      it('publishes ROOM_UPDATED to the reader per affected room', async () => {
+        pubsubSpy.mockClear()
+        await mutate({
+          mutation: MarkMessagesAsSeen,
+          variables: { messageIds },
+        })
+        const roomUpdatedCalls = pubsubSpy.mock.calls.filter(([event]) => event === 'ROOM_UPDATED')
+        expect(roomUpdatedCalls).toHaveLength(1)
+        expect(roomUpdatedCalls[0][1]).toMatchObject({
+          userId: 'other-chatting-user',
+          roomUpdated: expect.objectContaining({ id: roomId }),
+        })
+      })
+
+      it('publishes CHAT_MESSAGE_STATUS_UPDATED seen to the message authors', async () => {
+        pubsubSpy.mockClear()
+        await mutate({
+          mutation: MarkMessagesAsSeen,
+          variables: { messageIds },
+        })
+        const seenPayloads = pubsubSpy.mock.calls
+          .filter(
+            ([event, payload]) =>
+              event === 'CHAT_MESSAGE_STATUS_UPDATED' &&
+              payload?.chatMessageStatusUpdated?.status === 'seen',
+          )
+          .map(([, payload]) => payload)
+        expect(seenPayloads).toHaveLength(1)
+        expect(seenPayloads[0]).toMatchObject({
+          authorId: 'chatting-user',
+          chatMessageStatusUpdated: expect.objectContaining({ roomId, status: 'seen' }),
+        })
+      })
     })
   })
 
@@ -850,6 +885,36 @@ describe('Message', () => {
       })
       expect(result.errors).toBeDefined()
       expect(result.errors?.[0].message).toContain('Message must have content or files')
+    })
+  })
+
+  describe('File field resolvers', () => {
+    it('returns extension when present', () => {
+      expect(resolvers.File.extension({ extension: 'jpg' })).toBe('jpg')
+    })
+
+    it('returns null when extension is undefined', () => {
+      expect(resolvers.File.extension({})).toBeNull()
+    })
+
+    it('returns null when extension is null', () => {
+      expect(resolvers.File.extension({ extension: null })).toBeNull()
+    })
+
+    it('returns duration when present', () => {
+      expect(resolvers.File.duration({ duration: 5.3 })).toBe(5.3)
+    })
+
+    it('returns null when duration is undefined', () => {
+      expect(resolvers.File.duration({})).toBeNull()
+    })
+
+    it('returns null when duration is null', () => {
+      expect(resolvers.File.duration({ duration: null })).toBeNull()
+    })
+
+    it('returns duration 0 as valid', () => {
+      expect(resolvers.File.duration({ duration: 0 })).toBe(0)
     })
   })
 })

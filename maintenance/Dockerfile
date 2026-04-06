@@ -3,7 +3,7 @@
 # ==============================================================================
 # Stage 1: Build UI library
 # ==============================================================================
-FROM node:25.8.2-alpine AS ui-library
+FROM node:25.9.0-alpine AS ui-library
 RUN apk --no-cache add git python3 make g++
 WORKDIR /packages/ui
 COPY packages/ui/ .
@@ -13,7 +13,7 @@ RUN npm run build
 # ==============================================================================
 # Stage 2: Install dependencies and copy sources
 # ==============================================================================
-FROM node:25.8.2-alpine AS base
+FROM node:25.9.0-alpine AS base
 RUN apk --no-cache add git python3 make g++
 WORKDIR /app
 COPY --from=ui-library /packages/ui/ /packages/ui/
@@ -48,7 +48,7 @@ RUN npx nuxt generate
 # ==============================================================================
 # Stage 5: Production (static site served by nginx)
 # ==============================================================================
-FROM nginx:1.29.7-alpine AS production
+FROM nginx:1.29.8-alpine AS production
 LABEL org.label-schema.name="ocelot.social:maintenance"
 LABEL org.label-schema.description="Maintenance page of the Social Network Software ocelot.social"
 LABEL org.label-schema.usage="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md"
