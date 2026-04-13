@@ -164,6 +164,12 @@
       }
     }
   },
+  "changemediaRebranding": {
+    "header": {
+      "about": "Club",
+      "newsFeed": "News Feed"
+    }
+  },
   "chat": {
     "addGroupRoomHeadline": "Search group for new chat",
     "addRoomHeadline": "Search User for new Chat",
