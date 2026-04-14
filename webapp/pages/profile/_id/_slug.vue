@@ -381,7 +381,6 @@ export default {
   computed: {
     ...mapGetters({
       getShowChat: 'chat/showChat',
-      unreadRoomCount: 'chat/unreadRoomCount',
     }),
     chatRoomUnreadCount() {
       return (this.chatRoom && this.chatRoom.unreadCount) || 0
@@ -646,13 +645,6 @@ export default {
         return this.myProfile || !this.$route.params.id
       },
       fetchPolicy: 'cache-and-network',
-    },
-  },
-  watch: {
-    unreadRoomCount() {
-      if (this.$apollo.queries.chatRoom && !this.myProfile) {
-        this.$apollo.queries.chatRoom.refetch()
-      }
     },
   },
 }

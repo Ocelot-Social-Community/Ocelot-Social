@@ -9,10 +9,10 @@
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 import {
   NOTIFICATION_ADDED,
-  ROOM_COUNT_UPDATED,
+  ROOM_UPDATED,
   CHAT_MESSAGE_ADDED,
 } from '@constants/subscriptions'
-import { getUnreadRoomsCount } from '@graphql/resolvers/rooms'
+import { getRoomSnapshotForUser } from '@graphql/resolvers/rooms'
 import { isUserOnline } from '@middleware/helpers/isUserOnline'
 import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
 import { sendNotificationMail, sendChatMessageMail } from '@src/emails/sendEmail'
@@ -508,10 +508,9 @@ const handleCreateMessage: IMiddlewareResolver = async (
       const { email } = recipient
 
       // send subscriptions
-      const roomCountUpdated = await getUnreadRoomsCount(recipientUser.id, session)
-
-      void context.pubsub.publish(ROOM_COUNT_UPDATED, {
-        roomCountUpdated,
+      const roomSnapshot = await getRoomSnapshotForUser(resolvedRoomId, recipientUser.id, session)
+      void context.pubsub.publish(ROOM_UPDATED, {
+        roomUpdated: roomSnapshot,
         userId: recipientUser.id,
       })
       void context.pubsub.publish(CHAT_MESSAGE_ADDED, {

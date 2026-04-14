@@ -9,9 +9,14 @@ import { withFilter } from 'graphql-subscriptions'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import CONFIG from '@config/index'
-import { CHAT_MESSAGE_ADDED, CHAT_MESSAGE_STATUS_UPDATED } from '@constants/subscriptions'
+import {
+  CHAT_MESSAGE_ADDED,
+  CHAT_MESSAGE_STATUS_UPDATED,
+  ROOM_UPDATED,
+} from '@constants/subscriptions'
 
 import { attachments } from './attachments/attachments'
+import { getRoomSnapshotForUser } from './rooms'
 import Resolver from './helpers/Resolver'
 
 import type { File } from './attachments/attachments'
@@ -254,13 +259,23 @@ export default {
             currentUserId,
           })
         })
+        const roomIds = new Set<string>()
         // Notify message authors that their messages have been seen
         for (const record of result.records) {
           const roomId = record.get('roomId')
           const authorId = record.get('authorId')
+          roomIds.add(roomId)
           void context.pubsub.publish(CHAT_MESSAGE_STATUS_UPDATED, {
             authorId,
             chatMessageStatusUpdated: { roomId, messageIds, status: 'seen' },
+          })
+        }
+        // Notify the reader that their per-room unread count has changed
+        for (const roomId of roomIds) {
+          const roomSnapshot = await getRoomSnapshotForUser(roomId, currentUserId, session)
+          void context.pubsub.publish(ROOM_UPDATED, {
+            roomUpdated: roomSnapshot,
+            userId: currentUserId,
           })
         }
         return true

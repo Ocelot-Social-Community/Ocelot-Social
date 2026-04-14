@@ -403,7 +403,6 @@ export default {
     ...mapGetters({
       currentUser: 'auth/user',
       getShowChat: 'chat/showChat',
-      unreadRoomCount: 'chat/unreadRoomCount',
     }),
     chatRoomUnreadCount() {
       return (this.chatRoom && this.chatRoom.unreadCount) || 0
@@ -470,11 +469,6 @@ export default {
   watch: {
     isAllowedSeeingGroupMembers(to, _from) {
       this.loadGroupMembers = to
-    },
-    unreadRoomCount() {
-      if (this.$apollo.queries.chatRoom && this.isGroupMemberNonePending) {
-        this.$apollo.queries.chatRoom.refetch()
-      }
     },
   },
   methods: {
