@@ -28,7 +28,6 @@ const defaultLogos = {
   LOGO_WELCOME_PATH: '/img/custom/logo-squared.svg',
   LOGO_LOGOUT_PATH: '/img/custom/logo-squared.svg',
   LOGO_PASSWORD_RESET_PATH: '/img/custom/logo-squared.svg',
-  LOGO_MAINTENACE_RESET_PATH: '/img/custom/logo-squared.svg',
 }
 
 export default merge(defaultLogos, logos)
