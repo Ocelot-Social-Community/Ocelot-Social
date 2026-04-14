@@ -114,7 +114,9 @@
               }"
               @click="showOrChangeChat(user.id)"
             >
-              <template #icon><os-icon :icon="icons.chatBubble" /></template>
+              <template #icon>
+                <os-counter-icon :icon="icons.chatBubble" :count="chatRoomUnreadCount" danger />
+              </template>
               {{ $t('chat.userProfileButton.label') }}
             </os-button>
           </div>
@@ -272,7 +274,15 @@
 </template>
 
 <script>
-import { OsButton, OsCard, OsIcon, OsModal, OsNumber, OsSpinner } from '@ocelot-social/ui'
+import {
+  OsButton,
+  OsCard,
+  OsCounterIcon,
+  OsIcon,
+  OsModal,
+  OsNumber,
+  OsSpinner,
+} from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import gql from 'graphql-tag'
 import uniqBy from 'lodash/uniqBy'
@@ -290,6 +300,7 @@ import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 import { profilePagePosts } from '~/graphql/PostQuery'
+import { roomQuery } from '~/graphql/Rooms'
 import { profileUserQuery, updateUserMutation } from '~/graphql/User'
 import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
 import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
@@ -311,6 +322,7 @@ export default {
   components: {
     OsCard,
     OsButton,
+    OsCounterIcon,
     OsIcon,
     OsModal,
     OsNumber,
@@ -363,12 +375,17 @@ export default {
       deleteLoading: false,
       followHovered: false,
       followLoading: false,
+      chatRoom: null,
     }
   },
   computed: {
     ...mapGetters({
       getShowChat: 'chat/showChat',
+      unreadRoomCount: 'chat/unreadRoomCount',
     }),
+    chatRoomUnreadCount() {
+      return (this.chatRoom && this.chatRoom.unreadCount) || 0
+    },
     myProfile() {
       return this.$route.params.id === this.$store.getters['auth/user'].id
     },
@@ -614,6 +631,28 @@ export default {
         }
       },
       fetchPolicy: 'cache-and-network',
+    },
+    chatRoom: {
+      query() {
+        return roomQuery()
+      },
+      variables() {
+        return { userId: this.$route.params.id }
+      },
+      update({ Room }) {
+        return Room && Room.length > 0 ? Room[0] : null
+      },
+      skip() {
+        return this.myProfile || !this.$route.params.id
+      },
+      fetchPolicy: 'cache-and-network',
+    },
+  },
+  watch: {
+    unreadRoomCount() {
+      if (this.$apollo.queries.chatRoom && !this.myProfile) {
+        this.$apollo.queries.chatRoom.refetch()
+      }
     },
   },
 }

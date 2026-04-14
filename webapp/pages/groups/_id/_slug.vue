@@ -92,7 +92,9 @@
               }"
               @click="showOrChangeGroupChat(group.id)"
             >
-              <template #icon><os-icon :icon="icons.chatBubble" /></template>
+              <template #icon>
+                <os-counter-icon :icon="icons.chatBubble" :count="chatRoomUnreadCount" danger />
+              </template>
               {{ $t('chat.groupChatButton.label') }}
             </os-button>
           </div>
@@ -302,11 +304,20 @@
 </template>
 
 <script>
-import { OsBadge, OsButton, OsCard, OsIcon, OsNumber, OsSpinner } from '@ocelot-social/ui'
+import {
+  OsBadge,
+  OsButton,
+  OsCard,
+  OsCounterIcon,
+  OsIcon,
+  OsNumber,
+  OsSpinner,
+} from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import uniqBy from 'lodash/uniqBy'
 import { profilePagePosts } from '~/graphql/PostQuery'
 import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/groups'
+import { roomQuery } from '~/graphql/Rooms'
 import { muteGroup, unmuteGroup } from '~/graphql/settings/MutedGroups'
 import UpdateQuery from '~/components/utils/UpdateQuery'
 import postListActions from '~/mixins/postListActions'
@@ -341,6 +352,7 @@ export default {
     OsBadge,
     OsCard,
     OsButton,
+    OsCounterIcon,
     OsIcon,
     OsNumber,
     OsSpinner,
@@ -384,13 +396,18 @@ export default {
       updateGroupMutation,
       isDescriptionCollapsed: true,
       group: {},
+      chatRoom: null,
     }
   },
   computed: {
     ...mapGetters({
       currentUser: 'auth/user',
       getShowChat: 'chat/showChat',
+      unreadRoomCount: 'chat/unreadRoomCount',
     }),
+    chatRoomUnreadCount() {
+      return (this.chatRoom && this.chatRoom.unreadCount) || 0
+    },
     groupName() {
       const { name } = this.group || {}
       return name || this.$t('profile.userAnonym')
@@ -453,6 +470,11 @@ export default {
   watch: {
     isAllowedSeeingGroupMembers(to, _from) {
       this.loadGroupMembers = to
+    },
+    unreadRoomCount() {
+      if (this.$apollo.queries.chatRoom && this.isGroupMemberNonePending) {
+        this.$apollo.queries.chatRoom.refetch()
+      }
     },
   },
   methods: {
@@ -658,6 +680,21 @@ export default {
       },
       error(error) {
         this.$toast.error(error.message)
+      },
+      fetchPolicy: 'cache-and-network',
+    },
+    chatRoom: {
+      query() {
+        return roomQuery()
+      },
+      variables() {
+        return { groupId: this.$route.params.id }
+      },
+      update({ Room }) {
+        return Room && Room.length > 0 ? Room[0] : null
+      },
+      skip() {
+        return !this.isGroupMemberNonePending || !this.$route.params.id
       },
       fetchPolicy: 'cache-and-network',
     },
