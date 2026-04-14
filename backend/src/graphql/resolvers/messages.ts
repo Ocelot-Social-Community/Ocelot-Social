@@ -16,7 +16,7 @@ import {
 } from '@constants/subscriptions'
 
 import { attachments } from './attachments/attachments'
-import { getRoomSnapshotForUser } from './rooms'
+import { getRoomProperties } from './rooms'
 import Resolver from './helpers/Resolver'
 
 import type { File } from './attachments/attachments'
@@ -272,9 +272,9 @@ export default {
         }
         // Notify the reader that their per-room unread count has changed
         for (const roomId of roomIds) {
-          const roomSnapshot = await getRoomSnapshotForUser(roomId, currentUserId, session)
+          const roomProperties = await getRoomProperties(roomId, session)
           void context.pubsub.publish(ROOM_UPDATED, {
-            roomUpdated: roomSnapshot,
+            roomUpdated: roomProperties,
             userId: currentUserId,
           })
         }

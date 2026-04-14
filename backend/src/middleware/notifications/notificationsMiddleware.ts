@@ -12,7 +12,7 @@ import {
   ROOM_UPDATED,
   CHAT_MESSAGE_ADDED,
 } from '@constants/subscriptions'
-import { getRoomSnapshotForUser } from '@graphql/resolvers/rooms'
+import { getRoomProperties } from '@graphql/resolvers/rooms'
 import { isUserOnline } from '@middleware/helpers/isUserOnline'
 import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
 import { sendNotificationMail, sendChatMessageMail } from '@src/emails/sendEmail'
@@ -502,15 +502,16 @@ const handleCreateMessage: IMiddlewareResolver = async (
       }
     })
 
+    const roomProperties = await getRoomProperties(resolvedRoomId, session)
+
     // Send subscriptions and emails to all recipients
     for (const recipient of recipients) {
       const recipientUser = recipient.user
       const { email } = recipient
 
       // send subscriptions
-      const roomSnapshot = await getRoomSnapshotForUser(resolvedRoomId, recipientUser.id, session)
       void context.pubsub.publish(ROOM_UPDATED, {
-        roomUpdated: roomSnapshot,
+        roomUpdated: roomProperties,
         userId: recipientUser.id,
       })
       void context.pubsub.publish(CHAT_MESSAGE_ADDED, {

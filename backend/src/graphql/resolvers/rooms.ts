@@ -27,6 +27,16 @@ export const getUnreadRoomsCount = async (userId, session) => {
   })
 }
 
+export const getRoomProperties = async (roomId, session) => {
+  return session.readTransaction(async (transaction) => {
+    const result = await transaction.run(
+      'MATCH (room:Room { id: $roomId }) RETURN properties(room) AS room',
+      { roomId },
+    )
+    return result.records[0]?.get('room') ?? null
+  })
+}
+
 const toJsNumber = (value) => {
   if (value == null) return 0
   if (typeof value === 'number') return value
@@ -34,31 +44,18 @@ const toJsNumber = (value) => {
   return Number(value) || 0
 }
 
-const unreadCountCypher = `
-  MATCH (u:User { id: $userId })-[:HAS_NOT_SEEN]->(message:Message)-[:INSIDE]->(room:Room { id: $roomId })
-  MATCH (message)<-[:CREATED]-(sender:User)
-  WHERE NOT (u)-[:BLOCKED]->(sender) AND NOT (u)-[:MUTED]->(sender)
-  RETURN count(DISTINCT message) AS cnt
-`
-
 export const getRoomUnreadCountForUser = async (roomId, userId, session) => {
   return session.readTransaction(async (transaction) => {
-    const result = await transaction.run(unreadCountCypher, { userId, roomId })
-    return toJsNumber(result.records[0]?.get('cnt'))
-  })
-}
-
-export const getRoomSnapshotForUser = async (roomId, userId, session) => {
-  return session.readTransaction(async (transaction) => {
-    const propsResult = await transaction.run(
-      'MATCH (room:Room { id: $roomId }) RETURN properties(room) AS room',
-      { roomId },
+    const result = await transaction.run(
+      `
+        MATCH (u:User { id: $userId })-[:HAS_NOT_SEEN]->(message:Message)-[:INSIDE]->(room:Room { id: $roomId })
+        MATCH (message)<-[:CREATED]-(sender:User)
+        WHERE NOT (u)-[:BLOCKED]->(sender) AND NOT (u)-[:MUTED]->(sender)
+        RETURN count(DISTINCT message) AS cnt
+      `,
+      { userId, roomId },
     )
-    const roomProps = propsResult.records[0]?.get('room')
-    if (!roomProps) return null
-    const countResult = await transaction.run(unreadCountCypher, { userId, roomId })
-    const unreadCount = toJsNumber(countResult.records[0]?.get('cnt'))
-    return { ...roomProps, unreadCount }
+    return toJsNumber(result.records[0]?.get('cnt'))
   })
 }
 
@@ -244,7 +241,6 @@ export default {
       },
     }),
     unreadCount: async (parent, _args, context) => {
-      if (typeof parent?.unreadCount === 'number') return parent.unreadCount
       const currentUserId = context.cypherParams?.currentUserId
       if (!currentUserId || !parent?.id) return 0
       const session = context.driver.session()
