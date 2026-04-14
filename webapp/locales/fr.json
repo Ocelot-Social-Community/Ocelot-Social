@@ -786,7 +786,7 @@
     "success": "Vous êtes connecté!"
   },
   "maintenance": {
-    "explanation": "Pour l'instant, nous faisons de la maintenance programmée, veuillez réessayer plus tard.",
+    "explanation": "Pour l'instant, nous faisons de la maintenance programmée. Veuillez réessayer plus tard.",
     "questions": "Des questions ou des préoccupations, envoyez un mail à",
     "title": "{APPLICATION_NAME} est en maintenance"
   },

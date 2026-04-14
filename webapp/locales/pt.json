@@ -786,7 +786,7 @@
     "success": "Você está logado!"
   },
   "maintenance": {
-    "explanation": "No momento estamos fazendo uma manutenção programada, por favor tente novamente mais tarde.",
+    "explanation": "No momento estamos fazendo uma manutenção programada. Por favor, tente novamente mais tarde.",
     "questions": "Dúvidas ou preocupações, envie um e-mail para",
     "title": "{APPLICATION_NAME} está em manutenção"
   },
