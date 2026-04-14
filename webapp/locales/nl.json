@@ -785,11 +785,6 @@
     "register": "Registreren",
     "success": "Je bent ingelogd!"
   },
-  "maintenance": {
-    "explanation": "Op dit moment zijn we bezig met gepland onderhoud. Probeer het later opnieuw.",
-    "questions": "Vragen of opmerkingen? Stuur een e-mail naar",
-    "title": "{APPLICATION_NAME} is in onderhoud"
-  },
   "map": {
     "alertMessage": "De kaart is niet toegankelijk: het Mapbox-token is niet ingesteld op de server!",
     "legend": {

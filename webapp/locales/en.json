@@ -785,11 +785,6 @@
     "register": "Sign up",
     "success": "You are logged in!"
   },
-  "maintenance": {
-    "explanation": "At the moment we are doing some scheduled maintenance. Please try again later.",
-    "questions": "Any Questions or concerns, send an e-mail to",
-    "title": "{APPLICATION_NAME} is under maintenance"
-  },
   "map": {
     "alertMessage": "The map cannot be accessed: The Mapbox token is not set on the server!",
     "legend": {
