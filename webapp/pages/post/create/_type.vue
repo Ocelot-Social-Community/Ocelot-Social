@@ -304,14 +304,13 @@ export default {
   font: inherit;
   // Firefox needs a color so options inherit something readable when opened
   color: $text-color-base;
-
-  &:focus-visible + .post-in-trigger,
-  &:focus + .post-in-trigger {
-    color: $color-primary-active;
-  }
 }
 
-.post-in-select-wrapper:hover .post-in-trigger {
+// Hover + keyboard focus both highlight the trigger via the wrapper.
+// :focus-within (not `+ .post-in-trigger`) because the trigger sits before
+// the select in DOM order — a sibling combinator would never match.
+.post-in-select-wrapper:hover .post-in-trigger,
+.post-in-select-wrapper:focus-within .post-in-trigger {
   color: $color-primary-active;
 }
 
