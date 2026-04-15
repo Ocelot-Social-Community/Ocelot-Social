@@ -427,6 +427,9 @@
       "onlyArticles": "Articoli",
       "onlyEvents": "Eventi"
     },
+    "clearGroupContext": "Do not post in this group",
+    "postIn": "Post in",
+    "postInPersonalProfile": "Personal profile",
     "filterMyGroups": "I miei gruppi",
     "inappropriatePicture": "Questa immagine potrebbe essere inappropriata per alcune persone.",
     "languageSelectLabel": "Lingua del tuo contributo",

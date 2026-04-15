@@ -427,6 +427,9 @@
       "onlyArticles": "Статті",
       "onlyEvents": "Події"
     },
+    "clearGroupContext": "Do not post in this group",
+    "postIn": "Post in",
+    "postInPersonalProfile": "Personal profile",
     "filterMyGroups": "Мої групи",
     "inappropriatePicture": "Це зображення може бути неприйнятним для деяких людей.",
     "languageSelectLabel": "Мова вашого допису",

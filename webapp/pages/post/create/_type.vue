@@ -4,11 +4,57 @@
       <h1 class="ds-heading ds-heading-h1">
         {{ heading }}
       </h1>
-      <h2 v-if="group && group.id && group.slug" class="ds-heading ds-heading-h2">
-        {{ $t('post.viewPost.forGroup.title') }}
-        <nuxt-link :to="{ name: 'groups-id-slug', params: { slug: group.slug, id: group.id } }">
-          {{ group.name }}
-        </nuxt-link>
+      <h2 class="ds-heading ds-heading-h2 post-in-line">
+        {{ $t('contribution.postIn') }}
+        <dropdown placement="bottom-start" :offset="4">
+          <template #default="{ toggleMenu }">
+            <button
+              type="button"
+              class="post-in-trigger"
+              data-test="post-in-trigger"
+              :aria-label="$t('contribution.postIn')"
+              @click.prevent="toggleMenu()"
+            >
+              <os-icon
+                v-if="selectedGroup"
+                class="post-in-trigger-icon"
+                data-test="post-in-trigger-icon"
+                :icon="icons.group"
+              />
+              <span class="post-in-link" data-test="post-in-link">{{ contextName }}</span>
+              <span class="post-in-caret-icon" aria-hidden="true">▾</span>
+            </button>
+          </template>
+          <template #popover="{ closeMenu }">
+            <ul class="post-in-menu" role="menu">
+              <li role="none">
+                <button
+                  type="button"
+                  role="menuitem"
+                  class="post-in-menu-item"
+                  :class="{ 'is-selected': !draft.groupId }"
+                  data-test="post-in-option-personal"
+                  @click="selectContext(null, closeMenu)"
+                >
+                  {{ $t('contribution.postInPersonalProfile') }}
+                </button>
+              </li>
+              <li v-for="g in myGroups" :key="g.id" role="none">
+                <button
+                  type="button"
+                  role="menuitem"
+                  class="post-in-menu-item"
+                  :class="{ 'is-selected': draft.groupId === g.id }"
+                  :data-test="`post-in-option-${g.id}`"
+                  @click="selectContext(g.id, closeMenu)"
+                >
+                  <os-icon class="post-in-menu-item-icon" :icon="icons.group" />
+                  {{ g.name }}
+                </button>
+              </li>
+            </ul>
+          </template>
+        </dropdown>
       </h2>
     </div>
     <div class="ds-my-large"></div>
@@ -27,7 +73,11 @@
       </div>
       <div class="post-create-layout__main">
         <transition name="slide-up" appear>
-          <contribution-form :group="group" :createEvent="createEvent" />
+          <contribution-form
+            :group="selectedGroup"
+            :createEvent="createEvent"
+            :externalFormData="draft"
+          />
         </transition>
       </div>
     </div>
@@ -35,28 +85,68 @@
 </template>
 
 <script>
-import { OsMenu, OsMenuItem } from '@ocelot-social/ui'
-import { groupQuery } from '~/graphql/groups'
+import { OsIcon, OsMenu, OsMenuItem } from '@ocelot-social/ui'
+import { mapGetters } from 'vuex'
+import { iconRegistry } from '~/utils/iconRegistry'
+import { myGroupsForPostCreation } from '~/graphql/groups'
 import ContributionForm from '~/components/ContributionForm/ContributionForm'
+import Dropdown from '~/components/Dropdown'
+
+const buildEmptyDraft = () => ({
+  title: '',
+  content: '',
+  image: null,
+  imageAspectRatio: null,
+  imageType: null,
+  imageBlurred: false,
+  categoryIds: [],
+  eventStart: null,
+  eventEnd: null,
+  eventLocation: '',
+  eventLocationName: '',
+  eventVenue: '',
+  eventIsOnline: false,
+  groupId: null,
+})
+
+// Module-level draft cache. Nuxt remounts this page when the :type param
+// changes, which would normally wipe the draft. Hoisting it to module scope
+// lets the same object survive the remount. It is reset in beforeRouteLeave
+// when the user navigates out of /post/create/*.
+let sharedDraft = null
+
+const acquireDraft = () => {
+  if (!sharedDraft) sharedDraft = buildEmptyDraft()
+  return sharedDraft
+}
+
+export const __resetSharedDraftForTests = () => {
+  sharedDraft = null
+}
 
 export default {
   components: {
     ContributionForm,
+    Dropdown,
+    OsIcon,
     OsMenu,
     OsMenuItem,
   },
   data() {
-    const { groupId = null } = this.$route.query
-    const { type } = this.$route.params
-    if (groupId) this.$router.replace(`/post/create/${type}`) // remove query so that the route hits one of the menu paths
+    const draft = acquireDraft()
+    // First-time arrival via /post/create/:type?groupId=x — seed the draft.
+    // A non-null draft.groupId (from a prior remount) wins to avoid clobbering
+    // a user choice with a stale URL parameter.
+    if (!draft.groupId && this.$route.query.groupId) {
+      draft.groupId = this.$route.query.groupId
+    }
     return {
-      groupId,
-      type,
+      type: this.$route.params.type,
+      draft,
+      myGroups: [],
     }
   },
   async asyncData({ route, redirect }) {
-    // http://localhost:3000/post/create/type
-    // http://localhost:3000/post/create/type?groupId=id
     const {
       params: { type },
       query: { groupId },
@@ -68,9 +158,26 @@ export default {
       redirect(path)
     }
   },
+  beforeRouteLeave(to, _from, next) {
+    if (!to.path || !to.path.startsWith('/post/create/')) {
+      sharedDraft = null
+    }
+    next()
+  },
+  created() {
+    this.icons = iconRegistry
+  },
   computed: {
-    group() {
-      return this.Group && this.Group[0] ? this.Group[0] : null
+    ...mapGetters({
+      currentUser: 'auth/user',
+    }),
+    selectedGroup() {
+      if (!this.draft.groupId) return null
+      return this.myGroups.find((g) => g.id === this.draft.groupId) || null
+    },
+    contextName() {
+      if (this.selectedGroup) return this.selectedGroup.name
+      return (this.currentUser && this.currentUser.name) || this.$t('contribution.postInPersonalProfile')
     },
     heading() {
       return !this.createEvent
@@ -96,17 +203,12 @@ export default {
     },
   },
   apollo: {
-    Group: {
+    myGroups: {
       query() {
-        return groupQuery(this.$i18n)
+        return myGroupsForPostCreation()
       },
-      variables() {
-        return {
-          id: this.groupId,
-        }
-      },
-      skip() {
-        return !this.groupId
+      update({ Group }) {
+        return Group || []
       },
       error(error) {
         this.$toast.error(error.message)
@@ -115,17 +217,23 @@ export default {
     },
   },
   methods: {
+    selectContext(groupId, closeMenu) {
+      this.draft.groupId = groupId
+      this.syncUrlQuery()
+      if (typeof closeMenu === 'function') closeMenu()
+    },
+    syncUrlQuery() {
+      const query = this.draft.groupId ? { groupId: this.draft.groupId } : {}
+      if ((this.$route.query.groupId || null) === (this.draft.groupId || null)) return
+      this.$router.replace({ path: this.$route.path, query })
+    },
     switchPostType(_event, route) {
       const { type: oldType } = this.$route.params
       const newType = route.route.type.toLowerCase()
-      if (newType !== oldType) {
-        this.type = newType
-        if (this.groupId) {
-          this.$router.replace(`/post/create/${this.type}/?groupId=${this.groupId}`)
-        } else {
-          this.$router.replace(`/post/create/${this.type}`)
-        }
-      }
+      if (newType === oldType) return
+      this.type = newType
+      const query = this.draft.groupId ? { groupId: this.draft.groupId } : {}
+      this.$router.replace({ path: `/post/create/${this.type}`, query })
     },
   },
 }
@@ -134,6 +242,85 @@ export default {
 <style lang="scss" scoped>
 .ds-heading {
   margin-top: 0;
+}
+
+.post-in-line {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: $space-xx-small;
+}
+
+.post-in-trigger {
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  color: $color-primary;
+  display: inline-flex;
+  align-items: baseline;
+  gap: $space-xxx-small;
+
+  &:hover .post-in-caret-icon,
+  &:focus .post-in-caret-icon {
+    color: $color-primary-active;
+  }
+}
+
+.post-in-trigger-icon {
+  flex-shrink: 0;
+  font-size: 0.9em;
+}
+
+.post-in-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.post-in-caret-icon {
+  display: inline-block;
+  line-height: 1;
+  font-size: 0.8em;
+  transform: translateY(-1px);
+  transition: color 0.15s ease;
+}
+
+.post-in-menu {
+  list-style: none;
+  padding: $space-xx-small 0;
+  margin: 0;
+  min-width: 200px;
+}
+
+.post-in-menu-item {
+  display: flex;
+  align-items: center;
+  gap: $space-xx-small;
+  width: 100%;
+  padding: $space-xx-small $space-small;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    background-color: $background-color-soft;
+  }
+
+  &.is-selected {
+    color: $color-primary;
+    font-weight: bold;
+  }
+}
+
+.post-in-menu-item-icon {
+  flex-shrink: 0;
+  font-size: 0.9em;
 }
 
 .post-create-layout__sidebar,

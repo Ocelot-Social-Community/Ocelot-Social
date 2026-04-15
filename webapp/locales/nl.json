@@ -427,6 +427,9 @@
       "onlyArticles": "Artikelen",
       "onlyEvents": "Evenementen"
     },
+    "clearGroupContext": "Do not post in this group",
+    "postIn": "Post in",
+    "postInPersonalProfile": "Personal profile",
     "filterMyGroups": "Mijn groepen",
     "inappropriatePicture": "Deze afbeelding kan voor sommige mensen ongepast zijn.",
     "languageSelectLabel": "Taal van je bijdrage",

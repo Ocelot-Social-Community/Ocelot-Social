@@ -1,45 +1,320 @@
 import { mount } from '@vue/test-utils'
-import create from './_type.vue'
+import create, { __resetSharedDraftForTests } from './_type.vue'
 import Vuex from 'vuex'
 
 const localVue = global.localVue
 
 describe('create.vue', () => {
   let wrapper
+  let routerReplace
+  let mocks
 
-  const mocks = {
-    $t: jest.fn(),
+  const makeMocks = ({ type = 'article', query = {} } = {}) => ({
+    $t: jest.fn((key) => key),
     $route: {
-      params: {
-        type: 'article',
-      },
-      query: {
-        groupId: null,
+      path: `/post/create/${type}`,
+      params: { type },
+      query,
+    },
+    $router: {
+      replace: routerReplace,
+    },
+    $i18n: { locale: () => 'en' },
+    $toast: { error: jest.fn(), success: jest.fn() },
+  })
+
+  const stubs = {
+    ContributionForm: true,
+    'os-menu': true,
+    'os-menu-item': true,
+    'nuxt-link': true,
+    'os-button': true,
+    'os-icon': true,
+    // Render Dropdown's default trigger slot and expose the popover slot via
+    // a scoped slot helper so tests can open the menu and click items.
+    Dropdown: {
+      render(h) {
+        return h('div', { class: 'dropdown-stub' }, [
+          this.$scopedSlots.default({ toggleMenu: () => {}, closeMenu: () => {} }),
+          this.$scopedSlots.popover({ toggleMenu: () => {}, closeMenu: () => {} }),
+        ])
       },
     },
   }
 
-  const stubs = {
-    ContributionForm: true,
+  const currentUser = { id: 'u1', name: 'Current User', slug: 'current-user' }
+
+  const store = new Vuex.Store({
+    getters: {
+      'auth/user': () => currentUser,
+      'categories/categoriesActive': () => false,
+    },
+  })
+
+  const Wrapper = (customMocks = mocks) => {
+    return mount(create, { mocks: customMocks, localVue, stubs, store })
   }
 
+  beforeEach(() => {
+    routerReplace = jest.fn()
+    mocks = makeMocks()
+    __resetSharedDraftForTests()
+  })
+
   describe('mount', () => {
-    const store = new Vuex.Store({
-      getters: {
-        'categories/categoriesActive': () => false,
-      },
-    })
-
-    const Wrapper = () => {
-      return mount(create, { mocks, localVue, stubs, store })
-    }
-
-    beforeEach(() => {
-      wrapper = Wrapper()
-    })
-
     it('renders', () => {
+      wrapper = Wrapper()
       expect(wrapper.findComponent({ name: 'ContributionForm' }).exists()).toBe(true)
+    })
+
+    it('does not strip a preserved groupId from the URL on mount', () => {
+      mocks = makeMocks({ query: { groupId: 'g1' } })
+      wrapper = Wrapper()
+      expect(routerReplace).not.toHaveBeenCalled()
+    })
+
+    it('seeds draft.groupId from the URL query on first-time arrival', () => {
+      mocks = makeMocks({ query: { groupId: 'g1' } })
+      wrapper = Wrapper()
+      expect(wrapper.vm.draft.groupId).toBe('g1')
+    })
+
+    it('does not overwrite an existing draft.groupId with a stale URL query', () => {
+      mocks = makeMocks()
+      const first = Wrapper()
+      first.vm.draft.groupId = 'g2'
+      first.destroy()
+      mocks = makeMocks({ query: { groupId: 'g1' } })
+      const second = Wrapper()
+      expect(second.vm.draft.groupId).toBe('g2')
+    })
+  })
+
+  describe('post-in selector UI', () => {
+    it('renders the personal profile link when no group is selected', () => {
+      wrapper = Wrapper()
+      const link = wrapper.find('[data-test="post-in-link"]')
+      expect(link.exists()).toBe(true)
+      expect(link.text()).toBe('Current User')
+    })
+
+    it('shows the selected group name when a group is chosen', async () => {
+      wrapper = Wrapper()
+      wrapper.setData({
+        myGroups: [{ id: 'g1', name: 'Some Group', slug: 'some-group' }],
+      })
+      wrapper.vm.draft.groupId = 'g1'
+      await wrapper.vm.$nextTick()
+      const link = wrapper.find('[data-test="post-in-link"]')
+      expect(link.text()).toBe('Some Group')
+    })
+
+    it('shows the group icon in the trigger when a group is selected', async () => {
+      wrapper = Wrapper()
+      expect(wrapper.find('[data-test="post-in-trigger-icon"]').exists()).toBe(false)
+      wrapper.setData({
+        myGroups: [{ id: 'g1', name: 'Some Group', slug: 'some-group' }],
+      })
+      wrapper.vm.draft.groupId = 'g1'
+      await wrapper.vm.$nextTick()
+      expect(wrapper.find('[data-test="post-in-trigger-icon"]').exists()).toBe(true)
+    })
+
+    it('renders a single trigger button wrapping the name and the caret', () => {
+      wrapper = Wrapper()
+      const trigger = wrapper.find('[data-test="post-in-trigger"]')
+      expect(trigger.exists()).toBe(true)
+      // The link text lives inside the trigger, not as a separate nuxt-link
+      expect(trigger.find('[data-test="post-in-link"]').exists()).toBe(true)
+    })
+
+    it('does not render a nuxt-link to the profile — the name is only a dropdown trigger', () => {
+      wrapper = Wrapper()
+      expect(wrapper.findComponent({ name: 'NuxtLink' }).exists()).toBe(false)
+    })
+
+    it('renders a Personal profile option and one option per group', async () => {
+      wrapper = Wrapper()
+      wrapper.setData({
+        myGroups: [
+          { id: 'g1', name: 'One', slug: 'one' },
+          { id: 'g2', name: 'Two', slug: 'two' },
+        ],
+      })
+      await wrapper.vm.$nextTick()
+      expect(wrapper.find('[data-test="post-in-option-personal"]').exists()).toBe(true)
+      expect(wrapper.find('[data-test="post-in-option-g1"]').exists()).toBe(true)
+      expect(wrapper.find('[data-test="post-in-option-g2"]').exists()).toBe(true)
+    })
+  })
+
+  describe('switchPostType', () => {
+    it('navigates to the new type while preserving draft.groupId', () => {
+      mocks = makeMocks({ type: 'article', query: { groupId: 'g1' } })
+      wrapper = Wrapper()
+      wrapper.vm.switchPostType(null, { route: { type: 'event' } })
+      expect(routerReplace).toHaveBeenCalledWith({
+        path: '/post/create/event',
+        query: { groupId: 'g1' },
+      })
+    })
+
+    it('navigates without groupId when none is selected', () => {
+      wrapper = Wrapper()
+      wrapper.vm.switchPostType(null, { route: { type: 'event' } })
+      expect(routerReplace).toHaveBeenCalledWith({
+        path: '/post/create/event',
+        query: {},
+      })
+    })
+
+    it('is a no-op when the new type matches the current one', () => {
+      wrapper = Wrapper()
+      wrapper.vm.switchPostType(null, { route: { type: 'article' } })
+      expect(routerReplace).not.toHaveBeenCalled()
+    })
+
+    it('passes the draft into ContributionForm via externalFormData', () => {
+      wrapper = Wrapper()
+      const form = wrapper.findComponent({ name: 'ContributionForm' })
+      expect(form.props('externalFormData')).toBe(wrapper.vm.draft)
+    })
+  })
+
+  describe('draft persistence across page remount', () => {
+    it('shares full draft (content + selected group) between two page instances', () => {
+      mocks = makeMocks({ type: 'article', query: { groupId: 'g1' } })
+      const first = Wrapper()
+      first.vm.draft.title = 'Half-written draft'
+      first.vm.draft.eventVenue = 'Some venue'
+      first.vm.draft.categoryIds = ['cat-1', 'cat-2']
+      first.destroy()
+
+      mocks = makeMocks({ type: 'event', query: { groupId: 'g1' } })
+      const second = Wrapper()
+      expect(second.vm.draft.title).toBe('Half-written draft')
+      expect(second.vm.draft.eventVenue).toBe('Some venue')
+      expect(second.vm.draft.categoryIds).toEqual(['cat-1', 'cat-2'])
+      expect(second.vm.draft.groupId).toBe('g1')
+    })
+
+    it('resets the shared draft when leaving the post-create flow', () => {
+      wrapper = Wrapper()
+      wrapper.vm.draft.title = 'Abandoned draft'
+      wrapper.vm.draft.groupId = 'g1'
+      const next = jest.fn()
+      const leave = create.beforeRouteLeave
+      leave.call(wrapper.vm, { path: '/some/other/page' }, {}, next)
+      expect(next).toHaveBeenCalled()
+
+      const fresh = Wrapper()
+      expect(fresh.vm.draft.title).toBe('')
+      expect(fresh.vm.draft.groupId).toBeNull()
+    })
+
+    it('keeps the shared draft when navigating within the post-create flow', () => {
+      wrapper = Wrapper()
+      wrapper.vm.draft.title = 'Still editing'
+      wrapper.vm.draft.groupId = 'g1'
+      const next = jest.fn()
+      const leave = create.beforeRouteLeave
+      leave.call(wrapper.vm, { path: '/post/create/event' }, {}, next)
+      expect(next).toHaveBeenCalled()
+
+      const fresh = Wrapper()
+      expect(fresh.vm.draft.title).toBe('Still editing')
+      expect(fresh.vm.draft.groupId).toBe('g1')
+    })
+
+    it('preserves event-only fields when switching from article to event and back', () => {
+      mocks = makeMocks({ type: 'article' })
+      const articleBeforeSwitch = Wrapper()
+      articleBeforeSwitch.vm.draft.title = 'Keep me'
+      articleBeforeSwitch.vm.draft.eventVenue = 'Berlin HQ'
+      articleBeforeSwitch.vm.draft.eventIsOnline = true
+      articleBeforeSwitch.destroy()
+
+      mocks = makeMocks({ type: 'event' })
+      const asEvent = Wrapper()
+      expect(asEvent.vm.draft.eventVenue).toBe('Berlin HQ')
+      expect(asEvent.vm.draft.eventIsOnline).toBe(true)
+      asEvent.vm.draft.eventStart = '2026-06-01T12:00:00'
+      asEvent.destroy()
+
+      mocks = makeMocks({ type: 'article' })
+      const backToArticle = Wrapper()
+      expect(backToArticle.vm.draft.title).toBe('Keep me')
+      expect(backToArticle.vm.draft.eventStart).toBe('2026-06-01T12:00:00')
+    })
+  })
+
+  describe('selectContext', () => {
+    it('sets draft.groupId and syncs the URL query when a group is picked', () => {
+      wrapper = Wrapper()
+      const closeMenu = jest.fn()
+      wrapper.vm.selectContext('g1', closeMenu)
+      expect(wrapper.vm.draft.groupId).toBe('g1')
+      expect(routerReplace).toHaveBeenCalledWith({
+        path: '/post/create/article',
+        query: { groupId: 'g1' },
+      })
+      expect(closeMenu).toHaveBeenCalled()
+    })
+
+    it('clears draft.groupId and strips the URL query when Personal profile is picked', () => {
+      mocks = makeMocks({ type: 'article', query: { groupId: 'g1' } })
+      wrapper = Wrapper()
+      const closeMenu = jest.fn()
+      wrapper.vm.selectContext(null, closeMenu)
+      expect(wrapper.vm.draft.groupId).toBeNull()
+      expect(routerReplace).toHaveBeenCalledWith({
+        path: '/post/create/article',
+        query: {},
+      })
+      expect(closeMenu).toHaveBeenCalled()
+    })
+
+    it('skips the router replace when the URL already matches', () => {
+      mocks = makeMocks({ type: 'article', query: { groupId: 'g1' } })
+      wrapper = Wrapper()
+      wrapper.vm.selectContext('g1', jest.fn())
+      expect(routerReplace).not.toHaveBeenCalled()
+    })
+
+    it('tolerates being called without a closeMenu callback', () => {
+      wrapper = Wrapper()
+      expect(() => wrapper.vm.selectContext('g1')).not.toThrow()
+      expect(wrapper.vm.draft.groupId).toBe('g1')
+    })
+  })
+
+  describe('selectedGroup', () => {
+    it('resolves to the matching group from myGroups', async () => {
+      wrapper = Wrapper()
+      wrapper.setData({
+        myGroups: [
+          { id: 'g1', name: 'Group One' },
+          { id: 'g2', name: 'Group Two' },
+        ],
+        draft: { ...wrapper.vm.draft, groupId: 'g2' },
+      })
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.selectedGroup).toEqual({ id: 'g2', name: 'Group Two' })
+    })
+
+    it('is null when draft.groupId is not set', () => {
+      wrapper = Wrapper()
+      expect(wrapper.vm.selectedGroup).toBeNull()
+    })
+
+    it('is null when draft.groupId does not match any known group', async () => {
+      wrapper = Wrapper()
+      wrapper.setData({
+        myGroups: [{ id: 'g1', name: 'Group One' }],
+        draft: { ...wrapper.vm.draft, groupId: 'g-unknown' },
+      })
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.selectedGroup).toBeNull()
     })
   })
 })

@@ -262,43 +262,18 @@ export default {
       type: Boolean,
       default: false,
     },
+    // When provided, the form uses this object as its source of truth (by reference).
+    // Lets callers hoist form state so it survives remounts (e.g. type switch).
+    externalFormData: {
+      type: Object,
+      default: null,
+    },
   },
 
   data() {
-    const {
-      title,
-      content,
-      image,
-      categories,
-      eventStart,
-      eventEnd,
-      eventLocationName,
-      eventVenue,
-      eventIsOnline,
-      eventLocation,
-    } = this.contribution
-    const {
-      sensitive: imageBlurred = false,
-      aspectRatio: imageAspectRatio = null,
-      type: imageType = null,
-    } = image || {}
     return {
       links,
-      formData: {
-        title: title || '',
-        content: content || '',
-        image: image || null,
-        imageAspectRatio,
-        imageType,
-        imageBlurred,
-        categoryIds: categories ? categories.map((category) => category.id) : [],
-        eventStart: eventStart || null,
-        eventEnd: eventEnd || null,
-        eventLocation: eventLocation || '',
-        eventLocationName: eventLocationName || '',
-        eventVenue: eventVenue || '',
-        eventIsOnline: eventIsOnline || false,
-      },
+      formData: this.externalFormData || this.buildInitialFormData(),
       loading: false,
       users: [],
       hashtags: [],
@@ -412,6 +387,40 @@ export default {
     this.icons = iconRegistry
   },
   methods: {
+    buildInitialFormData() {
+      const {
+        title,
+        content,
+        image,
+        categories,
+        eventStart,
+        eventEnd,
+        eventLocationName,
+        eventVenue,
+        eventIsOnline,
+        eventLocation,
+      } = this.contribution
+      const {
+        sensitive: imageBlurred = false,
+        aspectRatio: imageAspectRatio = null,
+        type: imageType = null,
+      } = image || {}
+      return {
+        title: title || '',
+        content: content || '',
+        image: image || null,
+        imageAspectRatio,
+        imageType,
+        imageBlurred,
+        categoryIds: categories ? categories.map((category) => category.id) : [],
+        eventStart: eventStart || null,
+        eventEnd: eventEnd || null,
+        eventLocation: eventLocation || '',
+        eventLocationName: eventLocationName || '',
+        eventVenue: eventVenue || '',
+        eventIsOnline: eventIsOnline || false,
+      }
+    },
     notBeforeToday(date) {
       return date < new Date().setHours(0, 0, 0, 0)
     },

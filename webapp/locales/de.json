@@ -427,7 +427,10 @@
       "onlyArticles": "Beiträge",
       "onlyEvents": "Veranstaltungen"
     },
+    "clearGroupContext": "Nicht in dieser Gruppe posten",
     "filterMyGroups": "Meine Gruppen",
+    "postIn": "Veröffentlichen in",
+    "postInPersonalProfile": "Persönliches Profil",
     "inappropriatePicture": "Dieses Bild kann für einige Menschen unangemessen sein.",
     "languageSelectLabel": "Sprache deines Beitrags",
     "languageSelectText": "Sprache wählen",
