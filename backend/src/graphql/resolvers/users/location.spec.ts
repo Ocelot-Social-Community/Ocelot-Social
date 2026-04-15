@@ -161,8 +161,7 @@ beforeEach(() => {
   variables = {}
   authenticatedUser = null
   fetchSpy = jest.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
-    const url =
-      typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
     const path = decodeURIComponent(url)
     if (path.includes('/Berlin.json')) {
       if (path.includes('language=de')) return Promise.resolve(mockJsonResponse(berlinFeaturesDe))

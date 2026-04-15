@@ -52,8 +52,7 @@ const makeStore = (initialCount = 0, commitSpy = jest.fn()) =>
 describe('ChatNotificationMenu.vue', () => {
   let wrapper, mocks, store, commitSpy
 
-  const Wrapper = () =>
-    mount(ChatNotificationMenu, { localVue, store, mocks, stubs })
+  const Wrapper = () => mount(ChatNotificationMenu, { localVue, store, mocks, stubs })
 
   beforeEach(() => {
     commitSpy = jest.fn()
@@ -120,9 +119,7 @@ describe('ChatNotificationMenu.vue', () => {
 
     it('logs subscription errors via console.error', () => {
       wrapper = Wrapper()
-      const consoleError = jest
-        .spyOn(console, 'error')
-        .mockImplementation(() => undefined)
+      const consoleError = jest.spyOn(console, 'error').mockImplementation(() => undefined)
       subscriptionHandlers.error(new Error('boom'))
       expect(consoleError).toHaveBeenCalledWith(
         'roomUpdated subscription error:',
