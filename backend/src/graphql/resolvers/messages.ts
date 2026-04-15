@@ -270,13 +270,19 @@ export default {
             chatMessageStatusUpdated: { roomId, messageIds, status: 'seen' },
           })
         }
-        // Notify the reader that their per-room unread count has changed
+        // Notify the reader that their per-room unread count has changed.
+        // Best-effort: the write is already committed, so a failed read here
+        // must not propagate and fail the mutation for the client.
         for (const roomId of roomIds) {
-          const roomProperties = await getRoomProperties(roomId, session)
-          void context.pubsub.publish(ROOM_UPDATED, {
-            roomUpdated: roomProperties,
-            userId: currentUserId,
-          })
+          try {
+            const roomProperties = await getRoomProperties(roomId, session)
+            void context.pubsub.publish(ROOM_UPDATED, {
+              roomUpdated: roomProperties,
+              userId: currentUserId,
+            })
+          } catch {
+            // swallow — retrying MarkMessagesAsSeen is idempotent
+          }
         }
         return true
       } finally {
