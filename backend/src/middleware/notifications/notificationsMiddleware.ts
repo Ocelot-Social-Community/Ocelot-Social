@@ -506,10 +506,12 @@ const handleCreateMessage: IMiddlewareResolver = async (
       const { email } = recipient
 
       // send subscriptions
-      void context.pubsub.publish(ROOM_UPDATED, {
-        roomUpdated: roomProperties,
-        userId: recipientUser.id,
-      })
+      if (roomProperties) {
+        void context.pubsub.publish(ROOM_UPDATED, {
+          roomUpdated: roomProperties,
+          userId: recipientUser.id,
+        })
+      }
       void context.pubsub.publish(CHAT_MESSAGE_ADDED, {
         chatMessageAdded: { ...message, seen: false },
         userId: recipientUser.id,
