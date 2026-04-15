@@ -1296,4 +1296,244 @@ describe('Chat.vue', () => {
       expect(wrapper.vm.rooms.some((r) => r.id === 'real-1')).toBe(true)
     })
   })
+
+  describe('shadow-DOM observers', () => {
+    let intersectionInstances, mutationInstances, OriginalIO, OriginalMO
+
+    const fakeEl = () => ({ dataset: {}, style: {} })
+    const setShadowRoot = (shadowRoot) => {
+      Object.defineProperty(wrapper.vm.$el, 'shadowRoot', {
+        configurable: true,
+        get: () => shadowRoot,
+      })
+    }
+
+    beforeEach(() => {
+      intersectionInstances = []
+      mutationInstances = []
+      OriginalIO = global.IntersectionObserver
+      OriginalMO = global.MutationObserver
+      global.IntersectionObserver = jest.fn(function (callback, options) {
+        this.callback = callback
+        this.options = options
+        this.observe = jest.fn()
+        this.unobserve = jest.fn()
+        this.disconnect = jest.fn()
+        intersectionInstances.push(this)
+      })
+      global.MutationObserver = jest.fn(function (callback) {
+        this.callback = callback
+        this.observe = jest.fn()
+        this.disconnect = jest.fn()
+        mutationInstances.push(this)
+      })
+    })
+
+    afterEach(() => {
+      global.IntersectionObserver = OriginalIO
+      global.MutationObserver = OriginalMO
+    })
+
+    describe('setupMessageVisibilityTracking', () => {
+      it('is a no-op when no shadowRoot is attached', () => {
+        wrapper = Wrapper()
+        setShadowRoot(null)
+        wrapper.vm.setupMessageVisibilityTracking()
+        expect(intersectionInstances).toHaveLength(0)
+        expect(mutationInstances).toHaveLength(0)
+      })
+
+      it('is a no-op when observers are already wired up', () => {
+        wrapper = Wrapper()
+        setShadowRoot({ querySelector: jest.fn() })
+        wrapper.vm._mutationObserver = { existing: true }
+        wrapper.vm.setupMessageVisibilityTracking()
+        expect(intersectionInstances).toHaveLength(0)
+      })
+
+      it('is a no-op when the scroll container is missing', () => {
+        wrapper = Wrapper()
+        setShadowRoot({ querySelector: jest.fn().mockReturnValue(null) })
+        wrapper.vm.setupMessageVisibilityTracking()
+        expect(intersectionInstances).toHaveLength(0)
+        expect(mutationInstances).toHaveLength(0)
+      })
+
+      it('wires up IntersectionObserver and MutationObserver when the scroll container exists', () => {
+        wrapper = Wrapper()
+        const scrollContainer = { foo: 'bar' }
+        setShadowRoot({ querySelector: jest.fn().mockReturnValue(scrollContainer) })
+        wrapper.vm.setupMessageVisibilityTracking()
+        expect(intersectionInstances).toHaveLength(1)
+        expect(intersectionInstances[0].options).toMatchObject({ root: scrollContainer })
+        expect(mutationInstances).toHaveLength(1)
+        expect(mutationInstances[0].observe).toHaveBeenCalledWith(scrollContainer, {
+          childList: true,
+          subtree: true,
+        })
+      })
+
+      it('batches intersecting unseen messages and flushes them via markAsSeen', () => {
+        jest.useFakeTimers()
+        try {
+          wrapper = Wrapper()
+          wrapper.vm.selectedRoom = mockRoom()
+          wrapper.vm.messages = [{ _id: 'a', id: 'a', seen: false }]
+          wrapper.vm.rooms = [mockRoom()]
+          wrapper.vm.unseenMessageIds.add('a')
+          setShadowRoot({ querySelector: jest.fn().mockReturnValue({}) })
+          mocks.$apollo.mutate.mockResolvedValue({ data: { MarkMessagesAsSeen: true } })
+          mocks.$apollo.query.mockResolvedValue({ data: { UnreadRooms: 0 } })
+          wrapper.vm.setupMessageVisibilityTracking()
+          const io = intersectionInstances[0]
+          const target = { dataset: { unseenId: 'a' } }
+          io.callback([
+            { isIntersecting: true, target },
+            { isIntersecting: false, target: { dataset: { unseenId: 'skip' } } },
+          ])
+          expect(io.unobserve).toHaveBeenCalledWith(target)
+          expect(wrapper.vm.unseenMessageIds.has('a')).toBe(false)
+          jest.advanceTimersByTime(500)
+          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+            expect.objectContaining({ variables: { messageIds: ['a'] } }),
+          )
+        } finally {
+          jest.useRealTimers()
+        }
+      })
+
+      it('relays MutationObserver fires to observeNewUnseenElements', () => {
+        wrapper = Wrapper()
+        setShadowRoot({ querySelector: jest.fn().mockReturnValue({}) })
+        wrapper.vm.setupMessageVisibilityTracking()
+        const spy = jest.spyOn(wrapper.vm, 'observeNewUnseenElements').mockImplementation()
+        mutationInstances[0].callback()
+        expect(spy).toHaveBeenCalled()
+      })
+    })
+
+    describe('observeNewUnseenElements', () => {
+      it('is a no-op when there are no unseen messages', () => {
+        wrapper = Wrapper()
+        wrapper.vm._intersectionObserver = { observe: jest.fn() }
+        wrapper.vm.observeNewUnseenElements()
+        expect(wrapper.vm._intersectionObserver.observe).not.toHaveBeenCalled()
+      })
+
+      it('is a no-op when no IntersectionObserver is attached', () => {
+        wrapper = Wrapper()
+        wrapper.vm.unseenMessageIds.add('x')
+        setShadowRoot({ querySelector: jest.fn() })
+        expect(() => wrapper.vm.observeNewUnseenElements()).not.toThrow()
+      })
+
+      it('is a no-op when shadowRoot is missing', () => {
+        wrapper = Wrapper()
+        wrapper.vm._intersectionObserver = { observe: jest.fn() }
+        wrapper.vm.unseenMessageIds.add('x')
+        setShadowRoot(null)
+        wrapper.vm.observeNewUnseenElements()
+        expect(wrapper.vm._intersectionObserver.observe).not.toHaveBeenCalled()
+      })
+
+      it('tags and observes DOM elements for known unseen messages', () => {
+        wrapper = Wrapper()
+        const observe = jest.fn()
+        wrapper.vm._intersectionObserver = { observe }
+        wrapper.vm.messages = [{ _id: 'dom-1', id: 'srv-1' }]
+        wrapper.vm.unseenMessageIds.add('srv-1')
+        wrapper.vm.unseenMessageIds.add('srv-missing')
+        const el = fakeEl()
+        setShadowRoot({
+          querySelector: jest.fn((sel) => (sel === '[id="dom-1"]' ? el : null)),
+        })
+        wrapper.vm.observeNewUnseenElements()
+        expect(el.dataset.unseenId).toBe('srv-1')
+        expect(observe).toHaveBeenCalledWith(el)
+      })
+
+      it('skips elements that are already tagged', () => {
+        wrapper = Wrapper()
+        const observe = jest.fn()
+        wrapper.vm._intersectionObserver = { observe }
+        wrapper.vm.messages = [{ _id: 'dom-1', id: 'srv-1' }]
+        wrapper.vm.unseenMessageIds.add('srv-1')
+        const el = { dataset: { unseenId: 'already' } }
+        setShadowRoot({ querySelector: jest.fn().mockReturnValue(el) })
+        wrapper.vm.observeNewUnseenElements()
+        expect(observe).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('searchRooms', () => {
+      it('reinitializes the room loader after a search clears a previously exhausted list', async () => {
+        wrapper = Wrapper()
+        await wrapper.vm.$nextTick()
+        // Search result must be a full page so fetchRooms keeps roomsLoaded=false,
+        // which is the precondition for the reinit branch in searchRooms.
+        const fullPage = Array.from({ length: 10 }, (_, i) =>
+          mockRoom({ id: `r-${i}`, roomId: `r-${i}` }),
+        )
+        mocks.$apollo.query.mockResolvedValue({ data: { Room: fullPage } })
+        wrapper.vm.roomsLoaded = true
+        const reinit = jest.fn()
+        wrapper.vm.reinitRoomLoader = reinit
+        await wrapper.vm.searchRooms('hello')
+        await wrapper.vm.$nextTick()
+        expect(reinit).toHaveBeenCalled()
+        expect(wrapper.vm.roomObserverDirty).toBe(false)
+      })
+    })
+
+    describe('reinitRoomLoader', () => {
+      it('is a no-op when no shadowRoot is attached', () => {
+        wrapper = Wrapper()
+        setShadowRoot(null)
+        wrapper.vm.reinitRoomLoader()
+        expect(intersectionInstances).toHaveLength(0)
+      })
+
+      it('is a no-op when loader or rooms list are missing', () => {
+        wrapper = Wrapper()
+        setShadowRoot({ querySelector: jest.fn().mockReturnValue(null) })
+        wrapper.vm.reinitRoomLoader()
+        expect(intersectionInstances).toHaveLength(0)
+      })
+
+      it('disconnects the previous observer and wires a fresh one that paginates on intersect', () => {
+        wrapper = Wrapper()
+        const loader = fakeEl()
+        const roomsList = {}
+        setShadowRoot({
+          querySelector: jest.fn((sel) =>
+            sel === '#infinite-loader-rooms' ? loader : sel === '#rooms-list' ? roomsList : null,
+          ),
+        })
+        const previous = { disconnect: jest.fn() }
+        wrapper.vm._roomLoaderObserver = previous
+        const fetchMoreSpy = jest.spyOn(wrapper.vm, 'fetchMoreRooms').mockImplementation()
+
+        wrapper.vm.reinitRoomLoader()
+
+        expect(previous.disconnect).toHaveBeenCalled()
+        expect(loader.style.display).toBe('')
+        expect(intersectionInstances).toHaveLength(1)
+        expect(intersectionInstances[0].observe).toHaveBeenCalledWith(loader)
+        expect(intersectionInstances[0].options).toMatchObject({ root: roomsList })
+
+        wrapper.vm.roomsLoaded = false
+        intersectionInstances[0].callback([{ isIntersecting: true }])
+        expect(fetchMoreSpy).toHaveBeenCalled()
+
+        fetchMoreSpy.mockClear()
+        wrapper.vm.roomsLoaded = true
+        intersectionInstances[0].callback([{ isIntersecting: true }])
+        expect(fetchMoreSpy).not.toHaveBeenCalled()
+
+        fetchMoreSpy.mockClear()
+        intersectionInstances[0].callback([{ isIntersecting: false }])
+        expect(fetchMoreSpy).not.toHaveBeenCalled()
+      })
+    })
+  })
 })
