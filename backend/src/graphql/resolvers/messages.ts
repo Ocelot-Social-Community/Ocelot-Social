@@ -271,19 +271,20 @@ export default {
           })
         }
         // Notify the reader that their per-room unread count has changed.
-        // Best-effort: the write is already committed, so a failed read here
-        // must not propagate and fail the mutation for the client.
+        // Best-effort: the write is already committed and MarkMessagesAsSeen retries
+        // are idempotent, so we swallow both read and publish errors here — the next
+        // subscription event will self-heal client state. publish() is awaited (not
+        // voided) so async broker rejections (e.g. Redis outage) land in the catch
+        // instead of escaping as unhandled rejections.
         for (const roomId of roomIds) {
           try {
             const roomProperties = await getRoomProperties(roomId, session)
-            void context.pubsub.publish(ROOM_UPDATED, {
+            await context.pubsub.publish(ROOM_UPDATED, {
               roomUpdated: roomProperties,
               userId: currentUserId,
             })
-            // eslint-disable-next-line no-catch-all/no-catch-all -- intentional: post-commit notifications are best-effort; swallowing here is safe because MarkMessagesAsSeen retries are idempotent and the subscription will self-heal on the next event
-          } catch {
-            // swallow — see disable-comment above
-          }
+            // eslint-disable-next-line no-catch-all/no-catch-all -- see block comment above
+          } catch {}
         }
         return true
       } finally {
