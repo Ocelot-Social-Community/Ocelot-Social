@@ -381,5 +381,78 @@ describe('ContributionForm.vue', () => {
         })
       })
     })
+
+    describe('validation watchers', () => {
+      // A previous describe block enables fake timers (line 215) without
+      // restoring real ones — isolate this suite to be timer-independent.
+      beforeEach(() => {
+        jest.useRealTimers()
+      })
+
+      it('re-runs validation when createEvent flips from false to true', async () => {
+        wrapper = Wrapper()
+        wrapper.find('.ds-input').setValue(postTitle)
+        await wrapper.vm.updateEditorContent(postContent)
+        expect(wrapper.vm.formErrors).toBeNull()
+
+        wrapper.setProps({ createEvent: true })
+        // async-validator resolves via microtasks; flush Vue's reactive tick
+        // and the validator promise queue.
+        await wrapper.vm.$nextTick()
+        await Promise.resolve()
+
+        expect(wrapper.vm.formErrors).not.toBeNull()
+        expect(wrapper.vm.formErrors).toEqual(
+          expect.objectContaining({
+            eventStart: expect.any(String),
+            eventVenue: expect.any(String),
+          }),
+        )
+      })
+
+      it('re-runs validation when group prop changes', async () => {
+        wrapper = Wrapper()
+        const spy = jest.spyOn(wrapper.vm, '$validateForm')
+        wrapper.setProps({ group: { id: 'g1', groupType: 'public' } })
+        await wrapper.vm.$nextTick()
+        expect(spy).toHaveBeenCalled()
+      })
+    })
+
+    describe('image upload lives on formData', () => {
+      it('stores the raw File on formData.imageUpload (not on component data)', () => {
+        const spy = jest.spyOn(FileReader.prototype, 'readAsDataURL').mockImplementation(
+          function () {
+            this.onload({ target: { result: 'someUrlToImage' } })
+          },
+        )
+        wrapper = Wrapper()
+        wrapper.findComponent(ImageUploader).vm.$emit('addHeroImage', imageUpload)
+        expect(wrapper.vm.formData.imageUpload).toBe(imageUpload)
+        expect(wrapper.vm.imageUpload).toBeUndefined()
+        spy.mockReset()
+      })
+
+      it('uses formData.imageUpload (not a stale local ref) as the mutation upload', async () => {
+        const spy = jest.spyOn(FileReader.prototype, 'readAsDataURL').mockImplementation(
+          function () {
+            this.onload({ target: { result: 'someUrlToImage' } })
+          },
+        )
+        wrapper = Wrapper()
+        wrapper.find('.ds-input').setValue(postTitle)
+        await wrapper.vm.updateEditorContent(postContent)
+        wrapper.findComponent(ImageUploader).vm.$emit('addHeroImage', imageUpload)
+        await wrapper.find('form').trigger('submit')
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            variables: expect.objectContaining({
+              image: expect.objectContaining({ upload: imageUpload }),
+            }),
+          }),
+        )
+        spy.mockReset()
+      })
+    })
   })
 })

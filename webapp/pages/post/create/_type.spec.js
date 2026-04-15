@@ -142,6 +142,23 @@ describe('create.vue', () => {
       await wrapper.vm.$nextTick()
       expect(wrapper.find('[data-test="post-in-select"]').element.value).toBe('g1')
     })
+
+    it('re-syncs the native select value once async myGroups arrive (URL ?groupId=g1 case)', async () => {
+      // Simulate arriving with ?groupId=g1 while Apollo has not yet resolved.
+      // Initially the <option value="g1"> does not exist, so the native select
+      // silently defaults to the first option ("") — we verify the watcher
+      // corrects the DOM value once the group option appears.
+      mocks = makeMocks({ type: 'article', query: { groupId: 'g1' } })
+      wrapper = Wrapper()
+      const select = wrapper.find('[data-test="post-in-select"]').element
+      expect(select.value).toBe('')
+      wrapper.setData({
+        myGroups: [{ id: 'g1', name: 'Group One' }],
+      })
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+      expect(select.value).toBe('g1')
+    })
   })
 
   describe('switchPostType', () => {
