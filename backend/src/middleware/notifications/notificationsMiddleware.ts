@@ -7,11 +7,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
-import {
-  NOTIFICATION_ADDED,
-  ROOM_UPDATED,
-  CHAT_MESSAGE_ADDED,
-} from '@constants/subscriptions'
+import { NOTIFICATION_ADDED, ROOM_UPDATED, CHAT_MESSAGE_ADDED } from '@constants/subscriptions'
 import { getRoomProperties } from '@graphql/resolvers/rooms'
 import { isUserOnline } from '@middleware/helpers/isUserOnline'
 import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'

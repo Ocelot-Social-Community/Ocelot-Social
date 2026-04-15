@@ -16,8 +16,8 @@ import {
 } from '@constants/subscriptions'
 
 import { attachments } from './attachments/attachments'
-import { getRoomProperties } from './rooms'
 import Resolver from './helpers/Resolver'
+import { getRoomProperties } from './rooms'
 
 import type { File } from './attachments/attachments'
 
