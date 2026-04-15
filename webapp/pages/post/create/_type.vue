@@ -18,6 +18,7 @@
             <span class="post-in-caret-icon">▾</span>
           </span>
           <select
+            ref="postInSelect"
             class="post-in-select-overlay"
             data-test="post-in-select"
             :value="draft.groupId || ''"
@@ -73,6 +74,7 @@ const buildEmptyDraft = () => ({
   imageAspectRatio: null,
   imageType: null,
   imageBlurred: false,
+  imageUpload: null,
   categoryIds: [],
   eventStart: null,
   eventEnd: null,
@@ -191,6 +193,21 @@ export default {
         this.$toast.error(error.message)
       },
       fetchPolicy: 'cache-and-network',
+    },
+  },
+  watch: {
+    myGroups() {
+      // Native <select> silently falls back to the first option when the
+      // initially bound value has no matching <option> — which happens for
+      // ?groupId=x until Apollo populates myGroups. Re-sync the DOM value
+      // once the options are available so draft.groupId and the select UI
+      // match and @change fires on every subsequent user pick.
+      this.$nextTick(() => {
+        const el = this.$refs.postInSelect
+        if (!el) return
+        const expected = this.draft.groupId || ''
+        if (el.value !== expected) el.value = expected
+      })
     },
   },
   methods: {

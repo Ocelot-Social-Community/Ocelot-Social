@@ -277,7 +277,6 @@ export default {
       loading: false,
       users: [],
       hashtags: [],
-      imageUpload: null,
     }
   },
   async mounted() {
@@ -412,6 +411,7 @@ export default {
         imageAspectRatio,
         imageType,
         imageBlurred,
+        imageUpload: null,
         categoryIds: categories ? categories.map((category) => category.id) : [],
         eventStart: eventStart || null,
         eventEnd: eventEnd || null,
@@ -444,8 +444,8 @@ export default {
         image = {
           sensitive: this.formData.imageBlurred,
         }
-        if (this.imageUpload) {
-          image.upload = this.imageUpload
+        if (this.formData.imageUpload) {
+          image.upload = this.formData.imageUpload
           image.aspectRatio = this.formData.imageAspectRatio
           image.type = this.formData.imageType
         }
@@ -495,6 +495,7 @@ export default {
     },
     addHeroImage(file) {
       this.formData.image = null
+      this.formData.imageUpload = null
       if (file) {
         const reader = new FileReader()
         reader.onload = ({ target }) => {
@@ -504,7 +505,7 @@ export default {
           }
         }
         reader.readAsDataURL(file)
-        this.imageUpload = file
+        this.formData.imageUpload = file
       }
     },
     addImageAspectRatio(aspectRatio) {
