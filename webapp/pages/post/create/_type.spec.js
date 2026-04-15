@@ -78,6 +78,12 @@ describe('create.vue', () => {
       const second = Wrapper()
       expect(second.vm.draft.groupId).toBe('g2')
     })
+
+    it('passes the draft into ContributionForm via externalFormData', () => {
+      wrapper = Wrapper()
+      const form = wrapper.findComponent({ name: 'ContributionForm' })
+      expect(form.props('externalFormData')).toBe(wrapper.vm.draft)
+    })
   })
 
   describe('post-in selector UI', () => {
@@ -185,12 +191,6 @@ describe('create.vue', () => {
       wrapper = Wrapper()
       wrapper.vm.switchPostType(null, { route: { type: 'article' } })
       expect(routerReplace).not.toHaveBeenCalled()
-    })
-
-    it('passes the draft into ContributionForm via externalFormData', () => {
-      wrapper = Wrapper()
-      const form = wrapper.findComponent({ name: 'ContributionForm' })
-      expect(form.props('externalFormData')).toBe(wrapper.vm.draft)
     })
   })
 
