@@ -185,15 +185,19 @@ export default {
         : this.$t('post.createNewEvent.title')
     },
     routes() {
+      // Include the current groupId in the target path so router-link's
+      // exact-active match (which compares path + query) keeps the sidebar
+      // item highlighted when the URL carries ?groupId=…
+      const query = this.draft.groupId ? `?groupId=${this.draft.groupId}` : ''
       return [
         {
           name: this.$t('post.name'),
-          path: `/post/create/article`,
+          path: `/post/create/article${query}`,
           type: 'article',
         },
         {
           name: this.$t('post.event'),
-          path: `/post/create/event`,
+          path: `/post/create/event${query}`,
           type: 'event',
         },
       ]
@@ -248,7 +252,7 @@ export default {
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
-  gap: $space-xx-small;
+  gap: $space-x-small;
 }
 
 .post-in-trigger {
@@ -260,13 +264,21 @@ export default {
   cursor: pointer;
   color: $color-primary;
   display: inline-flex;
+  // Text (.post-in-link) aligns on the text baseline with the surrounding
+  // "Veröffentlichen in" prefix; icons use align-self: center so they are
+  // vertically centered next to the text instead of floating above it.
   align-items: baseline;
-  gap: $space-xxx-small;
+  gap: $space-xx-small;
 
-  &:hover .post-in-caret-icon,
-  &:focus .post-in-caret-icon {
+  &:hover,
+  &:focus {
     color: $color-primary-active;
   }
+}
+
+.post-in-trigger-icon,
+.post-in-caret-icon {
+  align-self: center;
 }
 
 .post-in-trigger-icon {
