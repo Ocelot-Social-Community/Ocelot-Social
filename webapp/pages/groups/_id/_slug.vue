@@ -473,14 +473,7 @@ export default {
       this.hydrated = true
     })
     this._roomUpdatedSub = null
-    if (!this.isGroupMemberNonePending) return
-    const observer = this.$apollo.subscribe({
-      query: roomUpdated(),
-      fetchPolicy: 'no-cache',
-    })
-    this._roomUpdatedSub = observer.subscribe({
-      next: ({ data }) => this.handleRoomUpdated(data?.roomUpdated),
-    })
+    if (this.isGroupMemberNonePending) this.setupRoomUpdatedSubscription()
   },
   beforeDestroy() {
     this._roomUpdatedSub?.unsubscribe()
@@ -489,11 +482,27 @@ export default {
     isAllowedSeeingGroupMembers(to, _from) {
       this.loadGroupMembers = to
     },
+    isGroupMemberNonePending(isMember) {
+      // Group membership is derived from the Apollo-populated group.myRole, which
+      // isn't available synchronously on first visits (no SSR cache). Set up the
+      // subscription reactively when membership becomes known.
+      if (isMember) this.setupRoomUpdatedSubscription()
+    },
   },
   methods: {
     ...mapMutations({
       showChat: 'chat/SET_OPEN_CHAT',
     }),
+    setupRoomUpdatedSubscription() {
+      if (this._roomUpdatedSub) return
+      const observer = this.$apollo.subscribe({
+        query: roomUpdated(),
+        fetchPolicy: 'no-cache',
+      })
+      this._roomUpdatedSub = observer.subscribe({
+        next: ({ data }) => this.handleRoomUpdated(data?.roomUpdated),
+      })
+    },
     handleRoomUpdated(room) {
       if (!room || !room.id) return
       if (this.chatRoom && this.chatRoom.id === room.id) {
