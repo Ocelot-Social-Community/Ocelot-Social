@@ -178,7 +178,7 @@ describe('ContributionForm.vue', () => {
           await wrapper.find('form').trigger('submit')
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining(expectedParams))
           expect(spy).toHaveBeenCalledWith(imageUpload)
-          spy.mockReset()
+          spy.mockRestore()
         })
 
         it('content is valid with just a link', async () => {
@@ -430,7 +430,7 @@ describe('ContributionForm.vue', () => {
         wrapper.findComponent(ImageUploader).vm.$emit('addHeroImage', imageUpload)
         expect(wrapper.vm.formData.imageUpload).toBe(imageUpload)
         expect(wrapper.vm.imageUpload).toBeUndefined()
-        spy.mockReset()
+        spy.mockRestore()
       })
 
       it('uses formData.imageUpload (not a stale local ref) as the mutation upload', async () => {
@@ -451,7 +451,7 @@ describe('ContributionForm.vue', () => {
             }),
           }),
         )
-        spy.mockReset()
+        spy.mockRestore()
       })
     })
   })
