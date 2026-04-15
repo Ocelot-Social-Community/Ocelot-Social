@@ -785,11 +785,6 @@
     "register": "S'inscrire",
     "success": "Vous êtes connecté!"
   },
-  "maintenance": {
-    "explanation": "Pour l'instant, nous faisons de la maintenance programmée, veuillez réessayer plus tard.",
-    "questions": "Des questions ou des préoccupations, envoyez un mail à",
-    "title": "{APPLICATION_NAME} est en maintenance"
-  },
   "map": {
     "alertMessage": "La carte n'est pas accessible : Le token Mapbox n'est pas configuré sur le serveur !",
     "legend": {

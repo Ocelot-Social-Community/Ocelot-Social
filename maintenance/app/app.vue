@@ -18,7 +18,8 @@
             <p class="text">{{ t("maintenance.explanation") }}</p>
             <p class="text">
               {{ t("maintenance.questions") }}
-              <a :href="'mailto:' + supportEmail">{{ supportEmail }}</a>
+              <a :href="'mailto:' + supportEmail">{{ supportEmail }}</a
+              >.
             </p>
           </div>
         </div>

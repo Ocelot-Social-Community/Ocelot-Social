@@ -785,11 +785,6 @@
     "register": "Regjistrohu",
     "success": "Je kyçur me sukses!"
   },
-  "maintenance": {
-    "explanation": "Aktualisht po bëjmë mirëmbajtje të planifikuar. Ju lutem provoni përsëri më vonë.",
-    "questions": "Pyetje ose shqetësime? Dërgo një e-mail në",
-    "title": "{APPLICATION_NAME} është në mirëmbajtje"
-  },
   "map": {
     "alertMessage": "Harta nuk mund të aksesohet: Tokeni i Mapbox nuk është vendosur në server!",
     "legend": {

@@ -785,11 +785,6 @@
     "register": "Cadastre-se",
     "success": "Você está logado!"
   },
-  "maintenance": {
-    "explanation": "No momento estamos fazendo uma manutenção programada, por favor tente novamente mais tarde.",
-    "questions": "Dúvidas ou preocupações, envie um e-mail para",
-    "title": "{APPLICATION_NAME} está em manutenção"
-  },
   "map": {
     "alertMessage": "O mapa não pode ser acessado: O token do Mapbox não está configurado no servidor!",
     "legend": {
