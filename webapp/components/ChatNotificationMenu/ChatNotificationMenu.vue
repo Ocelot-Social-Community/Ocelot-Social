@@ -65,14 +65,15 @@ export default {
       if (!room || !room.id) return
       const client = this.$apollo.provider.defaultClient
       const cacheId = `Room:${room.id}`
+      const newUnread = room.unreadCount || 0
       let prev = null
+      let cacheMiss = false
       try {
         prev = client.cache.readFragment({ id: cacheId, fragment: roomUnreadFragment })
+        if (!prev) cacheMiss = true
       } catch (_e) {
-        prev = null
+        cacheMiss = true
       }
-      const prevUnread = (prev && prev.unreadCount) || 0
-      const newUnread = room.unreadCount || 0
       try {
         client.cache.writeFragment({
           id: cacheId,
@@ -80,8 +81,16 @@ export default {
           data: { __typename: 'Room', id: room.id, unreadCount: newUnread },
         })
       } catch (_e) {
-        // entity not in cache yet — subscription result normalization will create it
+        // entity not in cache yet — writeFragment can fail before first normalization
       }
+      if (cacheMiss) {
+        // Previous state unknown — guessing a delta can over- or under-count
+        // (UnreadRooms query does not populate Room:<id> fragments).
+        // Fall back to the authoritative server count.
+        this.$apollo.queries.UnreadRooms.refetch()
+        return
+      }
+      const prevUnread = prev.unreadCount || 0
       let delta = 0
       if (prevUnread === 0 && newUnread > 0) delta = 1
       else if (prevUnread > 0 && newUnread === 0) delta = -1

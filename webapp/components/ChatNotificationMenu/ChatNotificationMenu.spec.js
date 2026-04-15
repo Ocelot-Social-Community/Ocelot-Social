@@ -15,6 +15,11 @@ const makeMocks = (overrides = {}) => ({
     subscribe: jest.fn().mockReturnValue({
       subscribe: jest.fn().mockReturnValue({ unsubscribe: jest.fn() }),
     }),
+    queries: {
+      UnreadRooms: {
+        refetch: jest.fn(),
+      },
+    },
     provider: {
       defaultClient: {
         cache: {
@@ -175,13 +180,22 @@ describe('ChatNotificationMenu.vue', () => {
       expect(commitSpy).not.toHaveBeenCalled()
     })
 
-    it('treats readFragment throwing as no previous value', () => {
+    it('refetches UnreadRooms when readFragment throws (cache miss)', () => {
       mocks.$apollo.provider.defaultClient.cache.readFragment.mockImplementation(() => {
         throw new Error('not in cache')
       })
       wrapper = Wrapper()
       wrapper.vm.applyRoomUpdate({ id: 'r1', unreadCount: 2 })
-      expect(commitSpy).toHaveBeenLastCalledWith(1)
+      expect(mocks.$apollo.queries.UnreadRooms.refetch).toHaveBeenCalled()
+      expect(commitSpy).not.toHaveBeenCalled()
+    })
+
+    it('refetches UnreadRooms when readFragment returns null (cache miss)', () => {
+      mocks.$apollo.provider.defaultClient.cache.readFragment.mockReturnValue(null)
+      wrapper = Wrapper()
+      wrapper.vm.applyRoomUpdate({ id: 'r1', unreadCount: 2 })
+      expect(mocks.$apollo.queries.UnreadRooms.refetch).toHaveBeenCalled()
+      expect(commitSpy).not.toHaveBeenCalled()
     })
 
     it('swallows writeFragment errors when the entity is missing from cache', () => {
@@ -208,11 +222,15 @@ describe('ChatNotificationMenu.vue', () => {
       expect(commitSpy).toHaveBeenLastCalledWith(0)
     })
 
-    it('treats missing unreadCount values on payloads as zero', () => {
-      mocks.$apollo.provider.defaultClient.cache.readFragment.mockReturnValue(null)
+    it('treats missing unreadCount on payload as zero (no delta when prev is also zero)', () => {
+      mocks.$apollo.provider.defaultClient.cache.readFragment.mockReturnValue({
+        id: 'r1',
+        unreadCount: 0,
+      })
       wrapper = Wrapper()
       wrapper.vm.applyRoomUpdate({ id: 'r1' })
       expect(commitSpy).not.toHaveBeenCalled()
+      expect(mocks.$apollo.queries.UnreadRooms.refetch).not.toHaveBeenCalled()
     })
   })
 
