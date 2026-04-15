@@ -239,6 +239,27 @@ describe('create.vue', () => {
       expect(fresh.vm.draft.groupId).toBe('g1')
     })
 
+    it('does not leak draft state across server-side renders', () => {
+      // On the server a single Node.js process serves many requests; a
+      // module-scoped sharedDraft would leak user A's typed data into user
+      // B's initial HTML. acquireDraft() gates on process.server to hand out
+      // fresh drafts server-side.
+      const first = Wrapper()
+      first.vm.draft.title = 'User A was drafting this'
+      first.vm.draft.groupId = 'users-a-group'
+      first.destroy()
+
+      const original = process.server
+      process.server = true
+      try {
+        const serverRender = Wrapper()
+        expect(serverRender.vm.draft.title).toBe('')
+        expect(serverRender.vm.draft.groupId).toBeNull()
+      } finally {
+        process.server = original
+      }
+    })
+
     it('preserves event-only fields when switching from article to event and back', () => {
       mocks = makeMocks({ type: 'article' })
       const articleBeforeSwitch = Wrapper()

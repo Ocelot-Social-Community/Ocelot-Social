@@ -89,9 +89,16 @@ const buildEmptyDraft = () => ({
 // changes, which would normally wipe the draft. Hoisting it to module scope
 // lets the same object survive the remount. It is reset in beforeRouteLeave
 // when the user navigates out of /post/create/*.
+//
+// SSR NOTE: this module lives inside the Node.js process that serves all
+// requests. Caching across requests on the server would leak draft state
+// between users — so on the server we always hand out a fresh draft.
+// The client-side shared instance only gets populated the first time
+// acquireDraft() runs in the browser.
 let sharedDraft = null
 
 const acquireDraft = () => {
+  if (process.server) return buildEmptyDraft()
   if (!sharedDraft) sharedDraft = buildEmptyDraft()
   return sharedDraft
 }
