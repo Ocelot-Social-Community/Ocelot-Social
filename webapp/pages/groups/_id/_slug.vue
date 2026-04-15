@@ -77,7 +77,7 @@
               :isMember="isGroupMember"
               :isNonePendingMember="isGroupMemberNonePending"
               :disabled="isGroupOwner"
-              :loading="$apollo.loading"
+              :loading="hydrated && $apollo.loading"
               @update="updateJoinLeave"
             />
             <!-- Group chat -->
@@ -204,7 +204,7 @@
             isAllowedSeeingGroupMembers && group.membersCount ? group.membersCount : 0
           "
           :profiles="isAllowedSeeingGroupMembers ? groupMembers.map((d) => d.user) : []"
-          :loading="$apollo.loading"
+          :loading="hydrated && $apollo.loading"
           @fetchAllProfiles="fetchAllMembers"
         />
         <!-- <social-media :user-name="groupName" :user="user" /> -->
@@ -397,6 +397,7 @@ export default {
       isDescriptionCollapsed: true,
       group: {},
       chatRoom: null,
+      hydrated: false,
     }
   },
   computed: {
@@ -467,6 +468,9 @@ export default {
     this.icons = iconRegistry
   },
   mounted() {
+    this.$nextTick(() => {
+      this.hydrated = true
+    })
     this._roomUpdatedSub = null
     if (!this.isGroupMemberNonePending) return
     const observer = this.$apollo.subscribe({
