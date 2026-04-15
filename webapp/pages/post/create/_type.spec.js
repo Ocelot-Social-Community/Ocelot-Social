@@ -149,6 +149,34 @@ describe('create.vue', () => {
       expect(wrapper.find('[data-test="post-in-select"]').element.value).toBe('g1')
     })
 
+    it('clears a stale/unauthorized draft.groupId once myGroups resolves without a match', async () => {
+      // Simulates ?groupId=secret — the URL-seeded id, but the user isn't
+      // actually a member of that group. When myGroups resolves without
+      // the id, the draft must be cleared so the submit can't smuggle it.
+      mocks = makeMocks({ type: 'article', query: { groupId: 'secret' } })
+      wrapper = Wrapper()
+      expect(wrapper.vm.draft.groupId).toBe('secret')
+      wrapper.setData({
+        myGroups: [{ id: 'g1', name: 'Legit Group One' }],
+      })
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.draft.groupId).toBeNull()
+      expect(routerReplace).toHaveBeenCalledWith({
+        path: '/post/create/article',
+        query: {},
+      })
+    })
+
+    it('keeps draft.groupId when myGroups contains a matching entry', async () => {
+      mocks = makeMocks({ type: 'article', query: { groupId: 'g1' } })
+      wrapper = Wrapper()
+      wrapper.setData({
+        myGroups: [{ id: 'g1', name: 'Legit Group One' }],
+      })
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.draft.groupId).toBe('g1')
+    })
+
     it('re-syncs the native select value once async myGroups arrive (URL ?groupId=g1 case)', async () => {
       // Simulate arriving with ?groupId=g1 while Apollo has not yet resolved.
       // Initially the <option value="g1"> does not exist, so the native select

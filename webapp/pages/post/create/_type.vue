@@ -205,12 +205,21 @@ export default {
     },
   },
   watch: {
-    myGroups() {
-      // Native <select> silently falls back to the first option when the
-      // initially bound value has no matching <option> — which happens for
-      // ?groupId=x until Apollo populates myGroups. Re-sync the DOM value
-      // once the options are available so draft.groupId and the select UI
-      // match and @change fires on every subsequent user pick.
+    myGroups(groups) {
+      // 1) Drop stale/unauthorized groupIds. ?groupId=… is accepted blindly
+      //    in data() — if the server's list of groups the user is a member
+      //    of doesn't include it, clear it so the submit can't smuggle a
+      //    foreign group id to the backend. Only acts once the list is
+      //    known (length > 0 OR a cached empty response has arrived).
+      if (this.draft.groupId && !groups.some((g) => g.id === this.draft.groupId)) {
+        this.draft.groupId = null
+        this.syncUrlQuery()
+      }
+      // 2) Native <select> silently falls back to the first option when the
+      //    initially bound value has no matching <option> — which happens
+      //    for ?groupId=x until Apollo populates myGroups. Re-sync the DOM
+      //    value once the options are available so draft.groupId and the
+      //    select UI match and @change fires on every subsequent user pick.
       this.$nextTick(() => {
         const el = this.$refs.postInSelect
         if (!el) return
