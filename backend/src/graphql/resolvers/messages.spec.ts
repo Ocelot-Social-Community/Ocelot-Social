@@ -730,6 +730,38 @@ describe('Message', () => {
           },
         })
       })
+
+      it('publishes ROOM_UPDATED to the reader per affected room', async () => {
+        pubsubSpy.mockClear()
+        await mutate({
+          mutation: MarkMessagesAsSeen,
+          variables: { messageIds },
+        })
+        const roomUpdatedCalls = pubsubSpy.mock.calls.filter(([event]) => event === 'ROOM_UPDATED')
+        expect(roomUpdatedCalls).toHaveLength(1)
+        expect(roomUpdatedCalls[0][1]).toMatchObject({
+          userId: 'other-chatting-user',
+          roomUpdated: expect.objectContaining({ id: roomId }),
+        })
+      })
+
+      it('publishes CHAT_MESSAGE_STATUS_UPDATED seen to the message authors', async () => {
+        pubsubSpy.mockClear()
+        await mutate({
+          mutation: MarkMessagesAsSeen,
+          variables: { messageIds },
+        })
+        const seenCalls = pubsubSpy.mock.calls.filter(
+          ([event, payload]) =>
+            event === 'CHAT_MESSAGE_STATUS_UPDATED' &&
+            payload?.chatMessageStatusUpdated?.status === 'seen',
+        )
+        expect(seenCalls.length).toBeGreaterThan(0)
+        expect(seenCalls[0][1]).toMatchObject({
+          authorId: 'chatting-user',
+          chatMessageStatusUpdated: expect.objectContaining({ roomId, status: 'seen' }),
+        })
+      })
     })
   })
 
