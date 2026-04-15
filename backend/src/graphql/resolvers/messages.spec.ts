@@ -751,13 +751,15 @@ describe('Message', () => {
           mutation: MarkMessagesAsSeen,
           variables: { messageIds },
         })
-        const seenCalls = pubsubSpy.mock.calls.filter(
-          ([event, payload]) =>
-            event === 'CHAT_MESSAGE_STATUS_UPDATED' &&
-            payload?.chatMessageStatusUpdated?.status === 'seen',
-        )
-        expect(seenCalls.length).toBeGreaterThan(0)
-        expect(seenCalls[0][1]).toMatchObject({
+        const seenPayloads = pubsubSpy.mock.calls
+          .filter(
+            ([event, payload]) =>
+              event === 'CHAT_MESSAGE_STATUS_UPDATED' &&
+              payload?.chatMessageStatusUpdated?.status === 'seen',
+          )
+          .map(([, payload]) => payload)
+        expect(seenPayloads).toHaveLength(1)
+        expect(seenPayloads[0]).toMatchObject({
           authorId: 'chatting-user',
           chatMessageStatusUpdated: expect.objectContaining({ roomId, status: 'seen' }),
         })
