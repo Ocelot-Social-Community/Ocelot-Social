@@ -8,5 +8,5 @@ defineStep('I see no unread chat messages on the profile', () => {
 })
 
 defineStep('I see {int} unread chat message on the profile', (count) => {
-  cy.get(badgeSelector, { timeout: 15000 }).should('contain', count)
+  cy.get(badgeSelector, { timeout: 15000 }).should('have.text', String(count))
 })
