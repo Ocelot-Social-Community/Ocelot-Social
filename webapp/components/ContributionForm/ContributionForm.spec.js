@@ -454,5 +454,41 @@ describe('ContributionForm.vue', () => {
         spy.mockRestore()
       })
     })
+
+    describe('groupId sourcing', () => {
+      it('submits with formData.groupId even before the group prop has loaded', async () => {
+        // Simulates the race where ?groupId=g1 has already seeded the draft
+        // but Apollo has not yet resolved the full group object.
+        propsData = {
+          externalFormData: {
+            title: '',
+            content: '',
+            image: null,
+            imageAspectRatio: null,
+            imageType: null,
+            imageBlurred: false,
+            imageUpload: null,
+            categoryIds: [],
+            eventStart: null,
+            eventEnd: null,
+            eventLocation: '',
+            eventLocationName: '',
+            eventVenue: '',
+            eventIsOnline: false,
+            groupId: 'g1',
+          },
+          group: null,
+        }
+        wrapper = Wrapper()
+        wrapper.find('.ds-input').setValue(postTitle)
+        await wrapper.vm.updateEditorContent(postContent)
+        await wrapper.find('form').trigger('submit')
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            variables: expect.objectContaining({ groupId: 'g1' }),
+          }),
+        )
+      })
+    })
   })
 })

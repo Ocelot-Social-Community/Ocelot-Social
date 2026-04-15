@@ -361,10 +361,16 @@ export default {
       return this.$filters.removeHtml(this.formData.content).length
     },
     groupId() {
-      return this.group && this.group.id
+      // formData.groupId (from the create-flow draft) is the authoritative
+      // source: it is set synchronously from ?groupId=… while `group` only
+      // populates once Apollo resolves. Fall through to `group.id` for the
+      // edit flow, which passes group directly without external formData.
+      return (this.formData && this.formData.groupId) || (this.group && this.group.id) || null
     },
     showGroupHint() {
-      return this.groupId && ['closed', 'hidden'].includes(this.group.groupType)
+      return (
+        this.groupId && this.group && ['closed', 'hidden'].includes(this.group.groupType)
+      )
     },
     groupName() {
       return this.group && this.group.name
