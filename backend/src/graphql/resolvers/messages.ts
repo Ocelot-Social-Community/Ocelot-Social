@@ -280,8 +280,9 @@ export default {
               roomUpdated: roomProperties,
               userId: currentUserId,
             })
+            // eslint-disable-next-line no-catch-all/no-catch-all -- intentional: post-commit notifications are best-effort; swallowing here is safe because MarkMessagesAsSeen retries are idempotent and the subscription will self-heal on the next event
           } catch {
-            // swallow — retrying MarkMessagesAsSeen is idempotent
+            // swallow — see disable-comment above
           }
         }
         return true
