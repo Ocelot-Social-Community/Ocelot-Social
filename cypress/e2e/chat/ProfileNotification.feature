@@ -26,6 +26,7 @@ Feature: Chat notification badge on profile pages
     Then I see 1 unread chat message on the profile
     When I navigate to page "/chat"
     And I click on the room "Alice"
+    And I see the message "Hey Bob!" in the chat
     And I navigate to page "/profile/alice/alice"
     Then I see no unread chat messages on the profile
 
