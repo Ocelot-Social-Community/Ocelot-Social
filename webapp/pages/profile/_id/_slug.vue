@@ -105,6 +105,7 @@
               {{ followLabel }}
             </os-button>
             <os-button
+              data-test="chat-btn"
               variant="primary"
               appearance="outline"
               full-width

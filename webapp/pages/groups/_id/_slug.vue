@@ -83,6 +83,7 @@
             <!-- Group chat -->
             <os-button
               v-if="isGroupMemberNonePending"
+              data-test="chat-btn"
               variant="primary"
               appearance="outline"
               full-width
