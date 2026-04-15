@@ -428,14 +428,14 @@
       "onlyEvents": "Events"
     },
     "filterMyGroups": "My groups",
-    "postIn": "Post in",
-    "postInGroupOption": "Group: {name}",
-    "postInPersonalProfile": "Personal profile",
     "inappropriatePicture": "This image may be inappropriate for some people.",
     "languageSelectLabel": "Language of your contribution",
     "languageSelectText": "Select Language",
     "newEvent": "Create a new Event",
     "newPost": "Create a new Post",
+    "postIn": "Post in",
+    "postInGroupOption": "Group: {name}",
+    "postInPersonalProfile": "Personal profile",
     "success": "Saved!",
     "teaserImage": {
       "cropImage": "Crop image",

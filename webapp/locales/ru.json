@@ -427,15 +427,15 @@
       "onlyArticles": "Статьи",
       "onlyEvents": "События"
     },
-    "postIn": "Опубликовать в",
-    "postInGroupOption": "Группа: {name}",
-    "postInPersonalProfile": "Личный профиль",
     "filterMyGroups": "Мои группы",
     "inappropriatePicture": "Эта картинка может быть неуместным для некоторых людей.",
     "languageSelectLabel": "Язык",
     "languageSelectText": "Выберите язык",
     "newEvent": "Создать новое событие",
     "newPost": "Создать пост",
+    "postIn": "Опубликовать в",
+    "postInGroupOption": "Группа: {name}",
+    "postInPersonalProfile": "Личный профиль",
     "success": "Сохранено!",
     "teaserImage": {
       "cropImage": "Обрезать изображение",

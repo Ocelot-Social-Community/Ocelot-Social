@@ -427,15 +427,15 @@
       "onlyArticles": "Artigos",
       "onlyEvents": "Eventos"
     },
-    "postIn": "Publicar em",
-    "postInGroupOption": "Grupo: {name}",
-    "postInPersonalProfile": "Perfil pessoal",
     "filterMyGroups": "Meus grupos",
     "inappropriatePicture": "Esta imagem pode ser inapropriada para algumas pessoas.",
     "languageSelectLabel": "Idioma",
     "languageSelectText": "Selecionar idioma",
     "newEvent": "Criar um novo evento",
     "newPost": "Criar uma nova publicação",
+    "postIn": "Publicar em",
+    "postInGroupOption": "Grupo: {name}",
+    "postInPersonalProfile": "Perfil pessoal",
     "success": "Salvo!",
     "teaserImage": {
       "cropImage": "Cortar imagem",

@@ -427,15 +427,15 @@
       "onlyArticles": "Artikelen",
       "onlyEvents": "Evenementen"
     },
-    "postIn": "Publiceren in",
-    "postInGroupOption": "Groep: {name}",
-    "postInPersonalProfile": "Persoonlijk profiel",
     "filterMyGroups": "Mijn groepen",
     "inappropriatePicture": "Deze afbeelding kan voor sommige mensen ongepast zijn.",
     "languageSelectLabel": "Taal van je bijdrage",
     "languageSelectText": "Selecteer taal",
     "newEvent": "Maak een nieuw evenement aan",
     "newPost": "Maak een nieuw bericht aan",
+    "postIn": "Publiceren in",
+    "postInGroupOption": "Groep: {name}",
+    "postInPersonalProfile": "Persoonlijk profiel",
     "success": "Opgeslagen!",
     "teaserImage": {
       "cropImage": "Afbeelding bijsnijden",

@@ -427,15 +427,15 @@
       "onlyArticles": "Artikuj",
       "onlyEvents": "Ngjarje"
     },
-    "postIn": "Postoni në",
-    "postInGroupOption": "Grupi: {name}",
-    "postInPersonalProfile": "Profili personal",
     "filterMyGroups": "Grupet e mia",
     "inappropriatePicture": "Kjo imazh mund të jetë e papërshtatshme për disa njerëz.",
     "languageSelectLabel": "Gjuha e kontributit tënd",
     "languageSelectText": "Zgjidh gjuhën",
     "newEvent": "Krijo një ngjarje të re",
     "newPost": "Krijo një postim të ri",
+    "postIn": "Postoni në",
+    "postInGroupOption": "Grupi: {name}",
+    "postInPersonalProfile": "Profili personal",
     "success": "U ruajt!",
     "teaserImage": {
       "cropImage": "Prit imazhin",
