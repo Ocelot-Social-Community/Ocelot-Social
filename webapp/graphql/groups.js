@@ -207,7 +207,7 @@ export const groupQuery = (i18n) => {
         avatar {
           ...imageUrls
         }
-        ...location
+        ...locationOnGroup
         membersCount
         myRole
         inviteCodes {
