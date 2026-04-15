@@ -421,11 +421,11 @@ describe('ContributionForm.vue', () => {
 
     describe('image upload lives on formData', () => {
       it('stores the raw File on formData.imageUpload (not on component data)', () => {
-        const spy = jest.spyOn(FileReader.prototype, 'readAsDataURL').mockImplementation(
-          function () {
+        const spy = jest
+          .spyOn(FileReader.prototype, 'readAsDataURL')
+          .mockImplementation(function () {
             this.onload({ target: { result: 'someUrlToImage' } })
-          },
-        )
+          })
         wrapper = Wrapper()
         wrapper.findComponent(ImageUploader).vm.$emit('addHeroImage', imageUpload)
         expect(wrapper.vm.formData.imageUpload).toBe(imageUpload)
@@ -434,11 +434,11 @@ describe('ContributionForm.vue', () => {
       })
 
       it('uses formData.imageUpload (not a stale local ref) as the mutation upload', async () => {
-        const spy = jest.spyOn(FileReader.prototype, 'readAsDataURL').mockImplementation(
-          function () {
+        const spy = jest
+          .spyOn(FileReader.prototype, 'readAsDataURL')
+          .mockImplementation(function () {
             this.onload({ target: { result: 'someUrlToImage' } })
-          },
-        )
+          })
         wrapper = Wrapper()
         wrapper.find('.ds-input').setValue(postTitle)
         await wrapper.vm.updateEditorContent(postContent)

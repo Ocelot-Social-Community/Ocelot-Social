@@ -152,7 +152,9 @@ export default {
     },
     contextName() {
       if (this.selectedGroup) return this.selectedGroup.name
-      return (this.currentUser && this.currentUser.name) || this.$t('contribution.postInPersonalProfile')
+      return (
+        (this.currentUser && this.currentUser.name) || this.$t('contribution.postInPersonalProfile')
+      )
     },
     heading() {
       return !this.createEvent
