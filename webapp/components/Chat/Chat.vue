@@ -364,7 +364,27 @@ export default {
         })
     },
 
+    injectShadowStyles() {
+      // vue-advanced-chat renders inside a Web Component shadow DOM, so
+      // normal CSS can't reach its layout. The library also hard-codes
+      //   .vac-player-progress { width: 190px }
+      // which overflows the message box in our narrow side-panel variant
+      // (the library's 50%/80% box breakpoint is tied to window width, not
+      // the container width). Make the waveform flex-based so it scales to
+      // whatever room the message box gives it.
+      const shadowRoot = this.$el?.shadowRoot
+      if (!shadowRoot || this._shadowStylesInjected) return
+      if (typeof shadowRoot.appendChild !== 'function') return
+      const style = document.createElement('style')
+      style.textContent = `
+        .vac-player-bar { min-width: 0; }
+        .vac-player-progress { width: auto; flex: 1 1 auto; min-width: 0; }
+      `
+      shadowRoot.appendChild(style)
+      this._shadowStylesInjected = true
+    },
     setupMessageVisibilityTracking() {
+      this.injectShadowStyles()
       const shadowRoot = this.$el?.shadowRoot
       if (!shadowRoot || this._mutationObserver) return
       const scrollContainer = shadowRoot.querySelector('.vac-container-scroll')
