@@ -8,7 +8,7 @@
 import { withFilter } from 'graphql-subscriptions'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
-import { ROOM_COUNT_UPDATED } from '@constants/subscriptions'
+import { ROOM_UPDATED } from '@constants/subscriptions'
 
 import Resolver from './helpers/Resolver'
 
@@ -27,16 +27,48 @@ export const getUnreadRoomsCount = async (userId, session) => {
   })
 }
 
-export const roomCountUpdatedFilter = (payload, variables, context) => {
+export const getRoomProperties = async (roomId, session) => {
+  return session.readTransaction(async (transaction) => {
+    const result = await transaction.run(
+      'MATCH (room:Room { id: $roomId }) RETURN properties(room) AS room',
+      { roomId },
+    )
+    return result.records[0]?.get('room') ?? null
+  })
+}
+
+const toJsNumber = (value) => {
+  if (value == null) return 0
+  if (typeof value === 'number') return value
+  if (typeof value.toNumber === 'function') return value.toNumber()
+  return Number(value) || 0
+}
+
+export const getRoomUnreadCountForUser = async (roomId, userId, session) => {
+  return session.readTransaction(async (transaction) => {
+    const result = await transaction.run(
+      `
+        MATCH (u:User { id: $userId })-[:HAS_NOT_SEEN]->(message:Message)-[:INSIDE]->(room:Room { id: $roomId })
+        MATCH (message)<-[:CREATED]-(sender:User)
+        WHERE NOT (u)-[:BLOCKED]->(sender) AND NOT (u)-[:MUTED]->(sender)
+        RETURN count(DISTINCT message) AS cnt
+      `,
+      { userId, roomId },
+    )
+    return toJsNumber(result.records[0]?.get('cnt'))
+  })
+}
+
+export const roomUpdatedFilter = (payload, variables, context) => {
   return payload.userId === context.user?.id
 }
 
 export default {
   Subscription: {
-    roomCountUpdated: {
+    roomUpdated: {
       subscribe: withFilter(
-        (_, __, context) => context.pubsub.asyncIterator(ROOM_COUNT_UPDATED),
-        roomCountUpdatedFilter,
+        (_, __, context) => context.pubsub.asyncIterator(ROOM_UPDATED),
+        roomUpdatedFilter,
       ),
     },
   },
@@ -208,5 +240,15 @@ export default {
         group: '-[:ROOM_FOR]->(related:Group)',
       },
     }),
+    unreadCount: async (parent, _args, context) => {
+      const currentUserId = context.cypherParams?.currentUserId
+      if (!currentUserId || !parent?.id) return 0
+      const session = context.driver.session()
+      try {
+        return await getRoomUnreadCountForUser(parent.id, currentUserId, session)
+      } finally {
+        await session.close()
+      }
+    },
   },
 }

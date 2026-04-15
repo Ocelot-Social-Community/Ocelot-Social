@@ -115,10 +115,30 @@ export const unreadRoomsQuery = () => {
   `
 }
 
-export const roomCountUpdated = () => {
+export const roomUnreadQuery = () => gql`
+  query Room($userId: ID, $groupId: ID) {
+    Room(userId: $userId, groupId: $groupId) {
+      id
+      unreadCount
+    }
+  }
+`
+
+export const roomUpdated = () => {
   return gql`
-    subscription roomCountUpdated {
-      roomCountUpdated
+    subscription roomUpdated {
+      roomUpdated {
+        id
+        unreadCount
+        lastMessageAt
+      }
     }
   `
 }
+
+export const roomUnreadFragment = gql`
+  fragment RoomUnreadFragment on Room {
+    id
+    unreadCount
+  }
+`

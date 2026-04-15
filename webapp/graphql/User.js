@@ -20,7 +20,7 @@ export const profileUserQuery = (i18n) => {
       User(id: $id) {
         ...user
         ...userCounts
-        ...location
+        ...locationOnUser
         ...badges
         about
         createdAt
@@ -31,13 +31,13 @@ export const profileUserQuery = (i18n) => {
         following(first: $followingCount) {
           ...user
           ...userCounts
-          ...location
+          ...locationOnUser
           ...badges
         }
         followedBy(first: $followedByCount) {
           ...user
           ...userCounts
-          ...location
+          ...locationOnUser
           ...badges
         }
         socialMedia {
@@ -119,7 +119,7 @@ export const mapUserQuery = (i18n) => {
       User {
         ...user
         about
-        ...location
+        ...locationOnUser
         ...badges
       }
     }
@@ -520,7 +520,7 @@ export const userTeaserQuery = (i18n) => {
         contributionsCount
         commentedCount
         ...badges
-        ...location
+        ...locationOnUser
       }
     }
   `

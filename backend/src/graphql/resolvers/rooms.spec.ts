@@ -9,7 +9,7 @@ import Room from '@graphql/queries/messaging/Room.gql'
 import UnreadRooms from '@graphql/queries/messaging/UnreadRooms.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-import { roomCountUpdatedFilter } from './rooms'
+import { roomUpdatedFilter } from './rooms'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -733,16 +733,16 @@ describe('Room', () => {
   })
 })
 
-describe('roomCountUpdatedFilter', () => {
+describe('roomUpdatedFilter', () => {
   it('returns true when payload userId matches context user', () => {
-    expect(roomCountUpdatedFilter({ userId: 'u1' }, {}, { user: { id: 'u1' } })).toBe(true)
+    expect(roomUpdatedFilter({ userId: 'u1' }, {}, { user: { id: 'u1' } })).toBe(true)
   })
 
   it('returns false when userId does not match', () => {
-    expect(roomCountUpdatedFilter({ userId: 'u1' }, {}, { user: { id: 'u2' } })).toBe(false)
+    expect(roomUpdatedFilter({ userId: 'u1' }, {}, { user: { id: 'u2' } })).toBe(false)
   })
 
   it('returns false when context user is null', () => {
-    expect(roomCountUpdatedFilter({ userId: 'u1' }, {}, { user: null })).toBe(false)
+    expect(roomUpdatedFilter({ userId: 'u1' }, {}, { user: null })).toBe(false)
   })
 })
