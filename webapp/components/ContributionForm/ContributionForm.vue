@@ -381,6 +381,15 @@ export default {
       if (!this.formData.categoryIds.length && this.groupCategories)
         this.formData.categoryIds = this.groupCategories.map((cat) => cat.id)
     },
+    // Re-validate when the schema-shaping inputs change so newly-required
+    // fields (e.g. eventStart when switching to "event") surface errors
+    // immediately rather than hiding behind a stale "green" state.
+    createEvent() {
+      this.$validateForm()
+    },
+    groupId() {
+      this.$validateForm()
+    },
   },
   created() {
     this.icons = iconRegistry
