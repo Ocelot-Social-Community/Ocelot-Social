@@ -912,8 +912,8 @@ describe('notifications', () => {
           },
         })
 
-        expect(pubsubSpy).toHaveBeenCalledWith('ROOM_COUNT_UPDATED', {
-          roomCountUpdated: '1',
+        expect(pubsubSpy).toHaveBeenCalledWith('ROOM_UPDATED', {
+          roomUpdated: expect.objectContaining({ id: expect.any(String) }),
           userId: 'chatReceiver',
         })
         expect(pubsubSpy).toHaveBeenCalledWith('CHAT_MESSAGE_ADDED', {
@@ -947,8 +947,8 @@ describe('notifications', () => {
           },
         })
 
-        expect(pubsubSpy).toHaveBeenCalledWith('ROOM_COUNT_UPDATED', {
-          roomCountUpdated: '1',
+        expect(pubsubSpy).toHaveBeenCalledWith('ROOM_UPDATED', {
+          roomUpdated: expect.objectContaining({ id: expect.any(String) }),
           userId: 'chatReceiver',
         })
         expect(pubsubSpy).toHaveBeenCalledWith('CHAT_MESSAGE_ADDED', {
@@ -1036,8 +1036,8 @@ describe('notifications', () => {
           },
         })
 
-        expect(pubsubSpy).toHaveBeenCalledWith('ROOM_COUNT_UPDATED', {
-          roomCountUpdated: '1',
+        expect(pubsubSpy).toHaveBeenCalledWith('ROOM_UPDATED', {
+          roomUpdated: expect.objectContaining({ id: expect.any(String) }),
           userId: 'chatReceiver',
         })
         expect(pubsubSpy).toHaveBeenCalledWith('CHAT_MESSAGE_ADDED', {

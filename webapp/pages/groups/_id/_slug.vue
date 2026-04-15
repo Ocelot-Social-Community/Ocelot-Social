@@ -77,12 +77,13 @@
               :isMember="isGroupMember"
               :isNonePendingMember="isGroupMemberNonePending"
               :disabled="isGroupOwner"
-              :loading="$apollo.loading"
+              :loading="hydrated && $apollo.loading"
               @update="updateJoinLeave"
             />
             <!-- Group chat -->
             <os-button
               v-if="isGroupMemberNonePending"
+              data-test="chat-btn"
               variant="primary"
               appearance="outline"
               full-width
@@ -92,7 +93,9 @@
               }"
               @click="showOrChangeGroupChat(group.id)"
             >
-              <template #icon><os-icon :icon="icons.chatBubble" /></template>
+              <template #icon>
+                <os-counter-icon :icon="icons.chatBubble" :count="chatRoomUnreadCount" danger />
+              </template>
               {{ $t('chat.groupChatButton.label') }}
             </os-button>
           </div>
@@ -202,7 +205,7 @@
             isAllowedSeeingGroupMembers && group.membersCount ? group.membersCount : 0
           "
           :profiles="isAllowedSeeingGroupMembers ? groupMembers.map((d) => d.user) : []"
-          :loading="$apollo.loading"
+          :loading="hydrated && $apollo.loading"
           @fetchAllProfiles="fetchAllMembers"
         />
         <!-- <social-media :user-name="groupName" :user="user" /> -->
@@ -302,11 +305,20 @@
 </template>
 
 <script>
-import { OsBadge, OsButton, OsCard, OsIcon, OsNumber, OsSpinner } from '@ocelot-social/ui'
+import {
+  OsBadge,
+  OsButton,
+  OsCard,
+  OsCounterIcon,
+  OsIcon,
+  OsNumber,
+  OsSpinner,
+} from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import uniqBy from 'lodash/uniqBy'
 import { profilePagePosts } from '~/graphql/PostQuery'
 import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/groups'
+import { roomUnreadQuery, roomUpdated } from '~/graphql/Rooms'
 import { muteGroup, unmuteGroup } from '~/graphql/settings/MutedGroups'
 import UpdateQuery from '~/components/utils/UpdateQuery'
 import postListActions from '~/mixins/postListActions'
@@ -341,6 +353,7 @@ export default {
     OsBadge,
     OsCard,
     OsButton,
+    OsCounterIcon,
     OsIcon,
     OsNumber,
     OsSpinner,
@@ -384,6 +397,8 @@ export default {
       updateGroupMutation,
       isDescriptionCollapsed: true,
       group: {},
+      chatRoom: null,
+      hydrated: false,
     }
   },
   computed: {
@@ -391,6 +406,9 @@ export default {
       currentUser: 'auth/user',
       getShowChat: 'chat/showChat',
     }),
+    chatRoomUnreadCount() {
+      return (this.chatRoom && this.chatRoom.unreadCount) || 0
+    },
     groupName() {
       const { name } = this.group || {}
       return name || this.$t('profile.userAnonym')
@@ -450,15 +468,49 @@ export default {
   created() {
     this.icons = iconRegistry
   },
+  mounted() {
+    this.$nextTick(() => {
+      this.hydrated = true
+    })
+    this._roomUpdatedSub = null
+    if (this.isGroupMemberNonePending) this.setupRoomUpdatedSubscription()
+  },
+  beforeDestroy() {
+    this._roomUpdatedSub?.unsubscribe()
+  },
   watch: {
     isAllowedSeeingGroupMembers(to, _from) {
       this.loadGroupMembers = to
+    },
+    isGroupMemberNonePending(isMember) {
+      // Group membership is derived from the Apollo-populated group.myRole, which
+      // isn't available synchronously on first visits (no SSR cache). Set up the
+      // subscription reactively when membership becomes known.
+      if (isMember) this.setupRoomUpdatedSubscription()
     },
   },
   methods: {
     ...mapMutations({
       showChat: 'chat/SET_OPEN_CHAT',
     }),
+    setupRoomUpdatedSubscription() {
+      if (this._roomUpdatedSub) return
+      const observer = this.$apollo.subscribe({
+        query: roomUpdated(),
+        fetchPolicy: 'no-cache',
+      })
+      this._roomUpdatedSub = observer.subscribe({
+        next: ({ data }) => this.handleRoomUpdated(data?.roomUpdated),
+      })
+    },
+    handleRoomUpdated(room) {
+      if (!room || !room.id) return
+      if (this.chatRoom && this.chatRoom.id === room.id) {
+        this.chatRoom = { ...this.chatRoom, ...room }
+      } else if (!this.chatRoom) {
+        this.$apollo.queries.chatRoom.refetch()
+      }
+    },
     showOrChangeGroupChat(groupId) {
       if (this.getShowChat.showChat) {
         this.showChat({ showChat: false, chatUserId: null, groupId: null })
@@ -660,6 +712,21 @@ export default {
         this.$toast.error(error.message)
       },
       fetchPolicy: 'cache-and-network',
+    },
+    chatRoom: {
+      query() {
+        return roomUnreadQuery()
+      },
+      variables() {
+        return { groupId: this.$route.params.id }
+      },
+      update({ Room }) {
+        return Room && Room.length > 0 ? Room[0] : null
+      },
+      skip() {
+        return !this.isGroupMemberNonePending || !this.$route.params.id
+      },
+      fetchPolicy: 'cache-first',
     },
   },
 }

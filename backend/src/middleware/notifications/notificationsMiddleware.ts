@@ -7,12 +7,8 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
-import {
-  NOTIFICATION_ADDED,
-  ROOM_COUNT_UPDATED,
-  CHAT_MESSAGE_ADDED,
-} from '@constants/subscriptions'
-import { getUnreadRoomsCount } from '@graphql/resolvers/rooms'
+import { NOTIFICATION_ADDED, ROOM_UPDATED, CHAT_MESSAGE_ADDED } from '@constants/subscriptions'
+import { getRoomProperties } from '@graphql/resolvers/rooms'
 import { isUserOnline } from '@middleware/helpers/isUserOnline'
 import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
 import { sendNotificationMail, sendChatMessageMail } from '@src/emails/sendEmail'
@@ -502,18 +498,20 @@ const handleCreateMessage: IMiddlewareResolver = async (
       }
     })
 
+    const roomProperties = await getRoomProperties(resolvedRoomId, session)
+
     // Send subscriptions and emails to all recipients
     for (const recipient of recipients) {
       const recipientUser = recipient.user
       const { email } = recipient
 
       // send subscriptions
-      const roomCountUpdated = await getUnreadRoomsCount(recipientUser.id, session)
-
-      void context.pubsub.publish(ROOM_COUNT_UPDATED, {
-        roomCountUpdated,
-        userId: recipientUser.id,
-      })
+      if (roomProperties) {
+        void context.pubsub.publish(ROOM_UPDATED, {
+          roomUpdated: roomProperties,
+          userId: recipientUser.id,
+        })
+      }
       void context.pubsub.publish(CHAT_MESSAGE_ADDED, {
         chatMessageAdded: { ...message, seen: false },
         userId: recipientUser.id,

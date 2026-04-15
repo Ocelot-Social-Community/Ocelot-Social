@@ -34,7 +34,7 @@ export default (i18n) => {
         author {
           ...user
           ...userCounts
-          ...location
+          ...locationOnUser
           ...badges
           blocked
         }
@@ -43,7 +43,7 @@ export default (i18n) => {
           author {
             ...user
             ...userCounts
-            ...location
+            ...locationOnUser
             ...badges
           }
         }
@@ -104,7 +104,7 @@ export const filterMapPosts = (i18n) => {
         author {
           ...user
           ...userCounts
-          ...location
+          ...locationOnUser
           ...badges
         }
       }
@@ -140,7 +140,7 @@ export const profilePagePosts = (i18n) => {
         author {
           ...user
           ...userCounts
-          ...location
+          ...locationOnUser
           ...badges
         }
       }
@@ -175,7 +175,7 @@ export const relatedContributions = (i18n) => {
         author {
           ...user
           ...userCounts
-          ...location
+          ...locationOnUser
           ...badges
         }
         relatedContributions(first: 2) {
@@ -185,7 +185,7 @@ export const relatedContributions = (i18n) => {
           author {
             ...user
             ...userCounts
-            ...location
+            ...locationOnUser
             ...badges
           }
         }

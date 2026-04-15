@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 import { Readable } from 'node:stream'
@@ -728,6 +729,40 @@ describe('Message', () => {
               expect.objectContaining({ seen: true }),
             ],
           },
+        })
+      })
+
+      it('publishes ROOM_UPDATED to the reader per affected room', async () => {
+        pubsubSpy.mockClear()
+        await mutate({
+          mutation: MarkMessagesAsSeen,
+          variables: { messageIds },
+        })
+        const roomUpdatedCalls = pubsubSpy.mock.calls.filter(([event]) => event === 'ROOM_UPDATED')
+        expect(roomUpdatedCalls).toHaveLength(1)
+        expect(roomUpdatedCalls[0][1]).toMatchObject({
+          userId: 'other-chatting-user',
+          roomUpdated: expect.objectContaining({ id: roomId }),
+        })
+      })
+
+      it('publishes CHAT_MESSAGE_STATUS_UPDATED seen to the message authors', async () => {
+        pubsubSpy.mockClear()
+        await mutate({
+          mutation: MarkMessagesAsSeen,
+          variables: { messageIds },
+        })
+        const seenPayloads = pubsubSpy.mock.calls
+          .filter(
+            ([event, payload]) =>
+              event === 'CHAT_MESSAGE_STATUS_UPDATED' &&
+              payload?.chatMessageStatusUpdated?.status === 'seen',
+          )
+          .map(([, payload]) => payload)
+        expect(seenPayloads).toHaveLength(1)
+        expect(seenPayloads[0]).toMatchObject({
+          authorId: 'chatting-user',
+          chatMessageStatusUpdated: expect.objectContaining({ roomId, status: 'seen' }),
         })
       })
     })

@@ -105,6 +105,7 @@
               {{ followLabel }}
             </os-button>
             <os-button
+              data-test="chat-btn"
               variant="primary"
               appearance="outline"
               full-width
@@ -114,7 +115,9 @@
               }"
               @click="showOrChangeChat(user.id)"
             >
-              <template #icon><os-icon :icon="icons.chatBubble" /></template>
+              <template #icon>
+                <os-counter-icon :icon="icons.chatBubble" :count="chatRoomUnreadCount" danger />
+              </template>
               {{ $t('chat.userProfileButton.label') }}
             </os-button>
           </div>
@@ -272,7 +275,15 @@
 </template>
 
 <script>
-import { OsButton, OsCard, OsIcon, OsModal, OsNumber, OsSpinner } from '@ocelot-social/ui'
+import {
+  OsButton,
+  OsCard,
+  OsCounterIcon,
+  OsIcon,
+  OsModal,
+  OsNumber,
+  OsSpinner,
+} from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import gql from 'graphql-tag'
 import uniqBy from 'lodash/uniqBy'
@@ -290,6 +301,7 @@ import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 import { profilePagePosts } from '~/graphql/PostQuery'
+import { roomUnreadQuery, roomUpdated } from '~/graphql/Rooms'
 import { profileUserQuery, updateUserMutation } from '~/graphql/User'
 import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
 import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
@@ -311,6 +323,7 @@ export default {
   components: {
     OsCard,
     OsButton,
+    OsCounterIcon,
     OsIcon,
     OsModal,
     OsNumber,
@@ -334,6 +347,20 @@ export default {
     this.icons = iconRegistry
     const { toggleFollow } = useFollowUser({ apollo: this.$apollo, i18n: this.$i18n })
     this._toggleFollow = toggleFollow
+  },
+  mounted() {
+    this._roomUpdatedSub = null
+    if (this.myProfile) return
+    const observer = this.$apollo.subscribe({
+      query: roomUpdated(),
+      fetchPolicy: 'no-cache',
+    })
+    this._roomUpdatedSub = observer.subscribe({
+      next: ({ data }) => this.handleRoomUpdated(data?.roomUpdated),
+    })
+  },
+  beforeDestroy() {
+    this._roomUpdatedSub?.unsubscribe()
   },
   mixins: [postListActions],
   transition: {
@@ -363,12 +390,16 @@ export default {
       deleteLoading: false,
       followHovered: false,
       followLoading: false,
+      chatRoom: null,
     }
   },
   computed: {
     ...mapGetters({
       getShowChat: 'chat/showChat',
     }),
+    chatRoomUnreadCount() {
+      return (this.chatRoom && this.chatRoom.unreadCount) || 0
+    },
     myProfile() {
       return this.$route.params.id === this.$store.getters['auth/user'].id
     },
@@ -426,6 +457,14 @@ export default {
     ...mapMutations({
       showChat: 'chat/SET_OPEN_CHAT',
     }),
+    handleRoomUpdated(room) {
+      if (!room || !room.id) return
+      if (this.chatRoom && this.chatRoom.id === room.id) {
+        this.chatRoom = { ...this.chatRoom, ...room }
+      } else if (!this.chatRoom) {
+        this.$apollo.queries.chatRoom.refetch()
+      }
+    },
     handleTab(tab) {
       if (this.tabActive !== tab) {
         this.tabActive = tab
@@ -614,6 +653,21 @@ export default {
         }
       },
       fetchPolicy: 'cache-and-network',
+    },
+    chatRoom: {
+      query() {
+        return roomUnreadQuery()
+      },
+      variables() {
+        return { userId: this.$route.params.id }
+      },
+      update({ Room }) {
+        return Room && Room.length > 0 ? Room[0] : null
+      },
+      skip() {
+        return this.myProfile || !this.$route.params.id
+      },
+      fetchPolicy: 'cache-first',
     },
   },
 }
