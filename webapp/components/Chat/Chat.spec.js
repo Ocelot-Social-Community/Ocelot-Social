@@ -1478,7 +1478,7 @@ describe('Chat.vue', () => {
         wrapper.vm.roomsLoaded = true
         const reinit = jest.fn()
         wrapper.vm.reinitRoomLoader = reinit
-        await wrapper.vm.searchRooms('hello')
+        await wrapper.vm.searchRooms({ value: 'hello' })
         await wrapper.vm.$nextTick()
         expect(reinit).toHaveBeenCalled()
         expect(wrapper.vm.roomObserverDirty).toBe(false)
