@@ -427,10 +427,9 @@
       "onlyArticles": "Artikelen",
       "onlyEvents": "Evenementen"
     },
-    "clearGroupContext": "Do not post in this group",
-    "postIn": "Post in",
-    "postInGroupOption": "Group: {name}",
-    "postInPersonalProfile": "Personal profile",
+    "postIn": "Publiceren in",
+    "postInGroupOption": "Groep: {name}",
+    "postInPersonalProfile": "Persoonlijk profiel",
     "filterMyGroups": "Mijn groepen",
     "inappropriatePicture": "Deze afbeelding kan voor sommige mensen ongepast zijn.",
     "languageSelectLabel": "Taal van je bijdrage",

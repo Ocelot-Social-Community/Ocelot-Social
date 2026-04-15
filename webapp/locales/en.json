@@ -427,7 +427,6 @@
       "onlyArticles": "Articles",
       "onlyEvents": "Events"
     },
-    "clearGroupContext": "Do not post in this group",
     "filterMyGroups": "My groups",
     "postIn": "Post in",
     "postInGroupOption": "Group: {name}",

@@ -427,10 +427,9 @@
       "onlyArticles": "Artykuły",
       "onlyEvents": "Wydarzenia"
     },
-    "clearGroupContext": "Do not post in this group",
-    "postIn": "Post in",
-    "postInGroupOption": "Group: {name}",
-    "postInPersonalProfile": "Personal profile",
+    "postIn": "Publikuj w",
+    "postInGroupOption": "Grupa: {name}",
+    "postInPersonalProfile": "Profil osobisty",
     "filterMyGroups": "Moje grupy",
     "inappropriatePicture": "Ten obraz może być nieodpowiedni dla niektórych osób.",
     "languageSelectLabel": "Język",

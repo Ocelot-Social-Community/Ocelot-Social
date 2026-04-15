@@ -427,10 +427,9 @@
       "onlyArticles": "Статьи",
       "onlyEvents": "События"
     },
-    "clearGroupContext": "Do not post in this group",
-    "postIn": "Post in",
-    "postInGroupOption": "Group: {name}",
-    "postInPersonalProfile": "Personal profile",
+    "postIn": "Опубликовать в",
+    "postInGroupOption": "Группа: {name}",
+    "postInPersonalProfile": "Личный профиль",
     "filterMyGroups": "Мои группы",
     "inappropriatePicture": "Эта картинка может быть неуместным для некоторых людей.",
     "languageSelectLabel": "Язык",

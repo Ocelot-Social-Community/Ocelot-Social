@@ -427,7 +427,6 @@
       "onlyArticles": "Beiträge",
       "onlyEvents": "Veranstaltungen"
     },
-    "clearGroupContext": "Nicht in dieser Gruppe posten",
     "filterMyGroups": "Meine Gruppen",
     "postIn": "Veröffentlichen in",
     "postInGroupOption": "Gruppe: {name}",
