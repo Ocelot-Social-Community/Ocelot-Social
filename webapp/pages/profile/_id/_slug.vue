@@ -301,7 +301,7 @@ import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 import { profilePagePosts } from '~/graphql/PostQuery'
-import { roomQuery, roomUpdated } from '~/graphql/Rooms'
+import { roomUnreadQuery, roomUpdated } from '~/graphql/Rooms'
 import { profileUserQuery, updateUserMutation } from '~/graphql/User'
 import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
 import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
@@ -656,7 +656,7 @@ export default {
     },
     chatRoom: {
       query() {
-        return roomQuery()
+        return roomUnreadQuery()
       },
       variables() {
         return { userId: this.$route.params.id }

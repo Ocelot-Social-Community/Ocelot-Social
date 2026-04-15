@@ -115,6 +115,15 @@ export const unreadRoomsQuery = () => {
   `
 }
 
+export const roomUnreadQuery = () => gql`
+  query Room($userId: ID, $groupId: ID) {
+    Room(userId: $userId, groupId: $groupId) {
+      id
+      unreadCount
+    }
+  }
+`
+
 export const roomUpdated = () => {
   return gql`
     subscription roomUpdated {

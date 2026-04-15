@@ -318,7 +318,7 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import uniqBy from 'lodash/uniqBy'
 import { profilePagePosts } from '~/graphql/PostQuery'
 import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/groups'
-import { roomQuery, roomUpdated } from '~/graphql/Rooms'
+import { roomUnreadQuery, roomUpdated } from '~/graphql/Rooms'
 import { muteGroup, unmuteGroup } from '~/graphql/settings/MutedGroups'
 import UpdateQuery from '~/components/utils/UpdateQuery'
 import postListActions from '~/mixins/postListActions'
@@ -706,7 +706,7 @@ export default {
     },
     chatRoom: {
       query() {
-        return roomQuery()
+        return roomUnreadQuery()
       },
       variables() {
         return { groupId: this.$route.params.id }
