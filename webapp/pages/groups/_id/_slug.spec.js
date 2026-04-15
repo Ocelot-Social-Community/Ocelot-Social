@@ -81,6 +81,9 @@ describe('GroupProfileSlug', () => {
       $apollo: {
         loading: false,
         mutate: jest.fn().mockResolvedValue(),
+        subscribe: jest.fn().mockReturnValue({
+          subscribe: jest.fn().mockReturnValue({ unsubscribe: jest.fn() }),
+        }),
       },
     }
     yogaPractice = {

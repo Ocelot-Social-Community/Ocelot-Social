@@ -317,7 +317,7 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import uniqBy from 'lodash/uniqBy'
 import { profilePagePosts } from '~/graphql/PostQuery'
 import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/groups'
-import { roomQuery } from '~/graphql/Rooms'
+import { roomQuery, roomUpdated } from '~/graphql/Rooms'
 import { muteGroup, unmuteGroup } from '~/graphql/settings/MutedGroups'
 import UpdateQuery from '~/components/utils/UpdateQuery'
 import postListActions from '~/mixins/postListActions'
@@ -466,6 +466,20 @@ export default {
   created() {
     this.icons = iconRegistry
   },
+  mounted() {
+    this._roomUpdatedSub = null
+    if (!this.isGroupMemberNonePending) return
+    const observer = this.$apollo.subscribe({
+      query: roomUpdated(),
+      fetchPolicy: 'no-cache',
+    })
+    this._roomUpdatedSub = observer.subscribe({
+      next: ({ data }) => this.handleRoomUpdated(data?.roomUpdated),
+    })
+  },
+  beforeDestroy() {
+    this._roomUpdatedSub?.unsubscribe()
+  },
   watch: {
     isAllowedSeeingGroupMembers(to, _from) {
       this.loadGroupMembers = to
@@ -475,6 +489,14 @@ export default {
     ...mapMutations({
       showChat: 'chat/SET_OPEN_CHAT',
     }),
+    handleRoomUpdated(room) {
+      if (!room || !room.id) return
+      if (this.chatRoom && this.chatRoom.id === room.id) {
+        this.chatRoom = { ...this.chatRoom, ...room }
+      } else if (!this.chatRoom) {
+        this.$apollo.queries.chatRoom.refetch()
+      }
+    },
     showOrChangeGroupChat(groupId) {
       if (this.getShowChat.showChat) {
         this.showChat({ showChat: false, chatUserId: null, groupId: null })
@@ -690,7 +712,7 @@ export default {
       skip() {
         return !this.isGroupMemberNonePending || !this.$route.params.id
       },
-      fetchPolicy: 'cache-and-network',
+      fetchPolicy: 'cache-first',
     },
   },
 }

@@ -300,7 +300,7 @@ import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 import { profilePagePosts } from '~/graphql/PostQuery'
-import { roomQuery } from '~/graphql/Rooms'
+import { roomQuery, roomUpdated } from '~/graphql/Rooms'
 import { profileUserQuery, updateUserMutation } from '~/graphql/User'
 import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
 import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
@@ -346,6 +346,20 @@ export default {
     this.icons = iconRegistry
     const { toggleFollow } = useFollowUser({ apollo: this.$apollo, i18n: this.$i18n })
     this._toggleFollow = toggleFollow
+  },
+  mounted() {
+    this._roomUpdatedSub = null
+    if (this.myProfile) return
+    const observer = this.$apollo.subscribe({
+      query: roomUpdated(),
+      fetchPolicy: 'no-cache',
+    })
+    this._roomUpdatedSub = observer.subscribe({
+      next: ({ data }) => this.handleRoomUpdated(data?.roomUpdated),
+    })
+  },
+  beforeDestroy() {
+    this._roomUpdatedSub?.unsubscribe()
   },
   mixins: [postListActions],
   transition: {
@@ -442,6 +456,14 @@ export default {
     ...mapMutations({
       showChat: 'chat/SET_OPEN_CHAT',
     }),
+    handleRoomUpdated(room) {
+      if (!room || !room.id) return
+      if (this.chatRoom && this.chatRoom.id === room.id) {
+        this.chatRoom = { ...this.chatRoom, ...room }
+      } else if (!this.chatRoom) {
+        this.$apollo.queries.chatRoom.refetch()
+      }
+    },
     handleTab(tab) {
       if (this.tabActive !== tab) {
         this.tabActive = tab
@@ -644,7 +666,7 @@ export default {
       skip() {
         return this.myProfile || !this.$route.params.id
       },
-      fetchPolicy: 'cache-and-network',
+      fetchPolicy: 'cache-first',
     },
   },
 }
