@@ -29,6 +29,9 @@ Feature: Create a post in a group
     And the post-in selector shows "Test Group"
     When I switch the post type to "article"
     Then the title input still contains "Group Post Draft"
+    And the post-in selector shows "Test Group"
     When I click on "save button"
     Then I am on page "/post/.*/group-post-draft"
     And the post was saved successfully
+    When I navigate to page "/groups/test-group/test-group"
+    Then I see the post "Group Post Draft" in the group feed
