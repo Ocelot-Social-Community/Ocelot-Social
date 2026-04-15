@@ -430,6 +430,7 @@
     "clearGroupContext": "Nicht in dieser Gruppe posten",
     "filterMyGroups": "Meine Gruppen",
     "postIn": "Veröffentlichen in",
+    "postInGroupOption": "Gruppe: {name}",
     "postInPersonalProfile": "Persönliches Profil",
     "inappropriatePicture": "Dieses Bild kann für einige Menschen unangemessen sein.",
     "languageSelectLabel": "Sprache deines Beitrags",

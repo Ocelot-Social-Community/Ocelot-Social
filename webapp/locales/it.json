@@ -429,6 +429,7 @@
     },
     "clearGroupContext": "Do not post in this group",
     "postIn": "Post in",
+    "postInGroupOption": "Group: {name}",
     "postInPersonalProfile": "Personal profile",
     "filterMyGroups": "I miei gruppi",
     "inappropriatePicture": "Questa immagine potrebbe essere inappropriata per alcune persone.",

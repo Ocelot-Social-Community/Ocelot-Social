@@ -30,16 +30,6 @@ describe('create.vue', () => {
     'nuxt-link': true,
     'os-button': true,
     'os-icon': true,
-    // Render Dropdown's default trigger slot and expose the popover slot via
-    // a scoped slot helper so tests can open the menu and click items.
-    Dropdown: {
-      render(h) {
-        return h('div', { class: 'dropdown-stub' }, [
-          this.$scopedSlots.default({ toggleMenu: () => {}, closeMenu: () => {} }),
-          this.$scopedSlots.popover({ toggleMenu: () => {}, closeMenu: () => {} }),
-        ])
-      },
-    },
   }
 
   const currentUser = { id: 'u1', name: 'Current User', slug: 'current-user' }
@@ -120,20 +110,7 @@ describe('create.vue', () => {
       expect(wrapper.find('[data-test="post-in-trigger-icon"]').exists()).toBe(true)
     })
 
-    it('renders a single trigger button wrapping the name and the caret', () => {
-      wrapper = Wrapper()
-      const trigger = wrapper.find('[data-test="post-in-trigger"]')
-      expect(trigger.exists()).toBe(true)
-      // The link text lives inside the trigger, not as a separate nuxt-link
-      expect(trigger.find('[data-test="post-in-link"]').exists()).toBe(true)
-    })
-
-    it('does not render a nuxt-link to the profile — the name is only a dropdown trigger', () => {
-      wrapper = Wrapper()
-      expect(wrapper.findComponent({ name: 'NuxtLink' }).exists()).toBe(false)
-    })
-
-    it('renders a Personal profile option and one option per group', async () => {
+    it('renders a native select overlay with all context options', async () => {
       wrapper = Wrapper()
       wrapper.setData({
         myGroups: [
@@ -142,9 +119,28 @@ describe('create.vue', () => {
         ],
       })
       await wrapper.vm.$nextTick()
-      expect(wrapper.find('[data-test="post-in-option-personal"]').exists()).toBe(true)
-      expect(wrapper.find('[data-test="post-in-option-g1"]').exists()).toBe(true)
-      expect(wrapper.find('[data-test="post-in-option-g2"]').exists()).toBe(true)
+      const select = wrapper.find('[data-test="post-in-select"]')
+      expect(select.exists()).toBe(true)
+      const options = select.findAll('option')
+      expect(options).toHaveLength(3)
+      expect(options.at(0).attributes('value')).toBe('')
+      expect(options.at(1).attributes('value')).toBe('g1')
+      expect(options.at(2).attributes('value')).toBe('g2')
+    })
+
+    it('does not render a nuxt-link to the profile — the selector is the only entry point', () => {
+      wrapper = Wrapper()
+      expect(wrapper.findComponent({ name: 'NuxtLink' }).exists()).toBe(false)
+    })
+
+    it('reflects the current draft.groupId as the select value', async () => {
+      wrapper = Wrapper()
+      wrapper.setData({
+        myGroups: [{ id: 'g1', name: 'One' }],
+      })
+      wrapper.vm.draft.groupId = 'g1'
+      await wrapper.vm.$nextTick()
+      expect(wrapper.find('[data-test="post-in-select"]').element.value).toBe('g1')
     })
   })
 
@@ -248,43 +244,33 @@ describe('create.vue', () => {
     })
   })
 
-  describe('selectContext', () => {
+  describe('onSelectChange', () => {
     it('sets draft.groupId and syncs the URL query when a group is picked', () => {
       wrapper = Wrapper()
-      const closeMenu = jest.fn()
-      wrapper.vm.selectContext('g1', closeMenu)
+      wrapper.vm.onSelectChange({ target: { value: 'g1' } })
       expect(wrapper.vm.draft.groupId).toBe('g1')
       expect(routerReplace).toHaveBeenCalledWith({
         path: '/post/create/article',
         query: { groupId: 'g1' },
       })
-      expect(closeMenu).toHaveBeenCalled()
     })
 
     it('clears draft.groupId and strips the URL query when Personal profile is picked', () => {
       mocks = makeMocks({ type: 'article', query: { groupId: 'g1' } })
       wrapper = Wrapper()
-      const closeMenu = jest.fn()
-      wrapper.vm.selectContext(null, closeMenu)
+      wrapper.vm.onSelectChange({ target: { value: '' } })
       expect(wrapper.vm.draft.groupId).toBeNull()
       expect(routerReplace).toHaveBeenCalledWith({
         path: '/post/create/article',
         query: {},
       })
-      expect(closeMenu).toHaveBeenCalled()
     })
 
     it('skips the router replace when the URL already matches', () => {
       mocks = makeMocks({ type: 'article', query: { groupId: 'g1' } })
       wrapper = Wrapper()
-      wrapper.vm.selectContext('g1', jest.fn())
+      wrapper.vm.onSelectChange({ target: { value: 'g1' } })
       expect(routerReplace).not.toHaveBeenCalled()
-    })
-
-    it('tolerates being called without a closeMenu callback', () => {
-      wrapper = Wrapper()
-      expect(() => wrapper.vm.selectContext('g1')).not.toThrow()
-      expect(wrapper.vm.draft.groupId).toBe('g1')
     })
   })
 

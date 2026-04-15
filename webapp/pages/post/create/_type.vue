@@ -6,55 +6,30 @@
       </h1>
       <h2 class="ds-heading ds-heading-h2 post-in-line">
         {{ $t('contribution.postIn') }}
-        <dropdown placement="bottom-start" :offset="4">
-          <template #default="{ toggleMenu }">
-            <button
-              type="button"
-              class="post-in-trigger"
-              data-test="post-in-trigger"
-              :aria-label="$t('contribution.postIn')"
-              @click.prevent="toggleMenu()"
-            >
-              <os-icon
-                v-if="selectedGroup"
-                class="post-in-trigger-icon"
-                data-test="post-in-trigger-icon"
-                :icon="icons.group"
-              />
-              <span class="post-in-link" data-test="post-in-link">{{ contextName }}</span>
-              <span class="post-in-caret-icon" aria-hidden="true">▾</span>
-            </button>
-          </template>
-          <template #popover="{ closeMenu }">
-            <ul class="post-in-menu" role="menu">
-              <li role="none">
-                <button
-                  type="button"
-                  role="menuitem"
-                  class="post-in-menu-item"
-                  :class="{ 'is-selected': !draft.groupId }"
-                  data-test="post-in-option-personal"
-                  @click="selectContext(null, closeMenu)"
-                >
-                  {{ $t('contribution.postInPersonalProfile') }}
-                </button>
-              </li>
-              <li v-for="g in myGroups" :key="g.id" role="none">
-                <button
-                  type="button"
-                  role="menuitem"
-                  class="post-in-menu-item"
-                  :class="{ 'is-selected': draft.groupId === g.id }"
-                  :data-test="`post-in-option-${g.id}`"
-                  @click="selectContext(g.id, closeMenu)"
-                >
-                  <os-icon class="post-in-menu-item-icon" :icon="icons.group" />
-                  {{ g.name }}
-                </button>
-              </li>
-            </ul>
-          </template>
-        </dropdown>
+        <span class="post-in-select-wrapper">
+          <span class="post-in-trigger" aria-hidden="true">
+            <os-icon
+              v-if="selectedGroup"
+              class="post-in-trigger-icon"
+              data-test="post-in-trigger-icon"
+              :icon="icons.group"
+            />
+            <span class="post-in-link" data-test="post-in-link">{{ contextName }}</span>
+            <span class="post-in-caret-icon">▾</span>
+          </span>
+          <select
+            class="post-in-select-overlay"
+            data-test="post-in-select"
+            :value="draft.groupId || ''"
+            :aria-label="$t('contribution.postIn')"
+            @change="onSelectChange($event)"
+          >
+            <option value="">{{ $t('contribution.postInPersonalProfile') }}</option>
+            <option v-for="g in myGroups" :key="g.id" :value="g.id">
+              {{ $t('contribution.postInGroupOption', { name: g.name }) }}
+            </option>
+          </select>
+        </span>
       </h2>
     </div>
     <div class="ds-my-large"></div>
@@ -90,7 +65,6 @@ import { mapGetters } from 'vuex'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { myGroupsForPostCreation } from '~/graphql/groups'
 import ContributionForm from '~/components/ContributionForm/ContributionForm'
-import Dropdown from '~/components/Dropdown'
 
 const buildEmptyDraft = () => ({
   title: '',
@@ -127,7 +101,6 @@ export const __resetSharedDraftForTests = () => {
 export default {
   components: {
     ContributionForm,
-    Dropdown,
     OsIcon,
     OsMenu,
     OsMenuItem,
@@ -221,10 +194,12 @@ export default {
     },
   },
   methods: {
-    selectContext(groupId, closeMenu) {
+    selectContext(groupId) {
       this.draft.groupId = groupId
       this.syncUrlQuery()
-      if (typeof closeMenu === 'function') closeMenu()
+    },
+    onSelectChange(event) {
+      this.selectContext(event.target.value || null)
     },
     syncUrlQuery() {
       const query = this.draft.groupId ? { groupId: this.draft.groupId } : {}
@@ -256,12 +231,7 @@ export default {
 }
 
 .post-in-trigger {
-  appearance: none;
-  background: transparent;
-  border: none;
-  padding: 0;
   font: inherit;
-  cursor: pointer;
   color: $color-primary;
   display: inline-flex;
   // Text (.post-in-link) aligns on the text baseline with the surrounding
@@ -269,11 +239,8 @@ export default {
   // vertically centered next to the text instead of floating above it.
   align-items: baseline;
   gap: $space-xx-small;
-
-  &:hover,
-  &:focus {
-    color: $color-primary-active;
-  }
+  pointer-events: none;
+  transition: color 0.15s ease;
 }
 
 .post-in-trigger-icon,
@@ -299,40 +266,34 @@ export default {
   transition: color 0.15s ease;
 }
 
-.post-in-menu {
-  list-style: none;
-  padding: $space-xx-small 0;
-  margin: 0;
-  min-width: 200px;
+.post-in-select-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
 }
 
-.post-in-menu-item {
-  display: flex;
-  align-items: center;
-  gap: $space-xx-small;
+.post-in-select-overlay {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  padding: $space-xx-small $space-small;
-  background: transparent;
-  border: none;
-  text-align: left;
-  font: inherit;
-  color: inherit;
+  height: 100%;
+  opacity: 0;
   cursor: pointer;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  // Firefox needs a color so options inherit something readable when opened
+  color: $text-color-base;
 
-  &:hover,
-  &:focus {
-    background-color: $background-color-soft;
-  }
-
-  &.is-selected {
-    color: $color-primary;
-    font-weight: bold;
+  &:focus-visible + .post-in-trigger,
+  &:focus + .post-in-trigger {
+    color: $color-primary-active;
   }
 }
 
-.post-in-menu-item-icon {
-  flex-shrink: 0;
-  font-size: 0.9em;
+.post-in-select-wrapper:hover .post-in-trigger {
+  color: $color-primary-active;
 }
 
 .post-create-layout__sidebar,
