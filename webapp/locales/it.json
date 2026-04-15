@@ -433,6 +433,9 @@
     "languageSelectText": "Seleziona lingua",
     "newEvent": "Crea un nuovo evento",
     "newPost": "Crea una nuova pubblicazione",
+    "postIn": "Pubblica in",
+    "postInGroupOption": "Gruppo: {name}",
+    "postInPersonalProfile": "Profilo personale",
     "success": "Salvato!",
     "teaserImage": {
       "cropImage": "Ritaglia immagine",

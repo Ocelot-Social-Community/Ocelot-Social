@@ -433,6 +433,9 @@
     "languageSelectText": "Selecteer taal",
     "newEvent": "Maak een nieuw evenement aan",
     "newPost": "Maak een nieuw bericht aan",
+    "postIn": "Publiceren in",
+    "postInGroupOption": "Groep: {name}",
+    "postInPersonalProfile": "Persoonlijk profiel",
     "success": "Opgeslagen!",
     "teaserImage": {
       "cropImage": "Afbeelding bijsnijden",

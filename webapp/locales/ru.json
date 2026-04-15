@@ -433,6 +433,9 @@
     "languageSelectText": "Выберите язык",
     "newEvent": "Создать новое событие",
     "newPost": "Создать пост",
+    "postIn": "Опубликовать в",
+    "postInGroupOption": "Группа: {name}",
+    "postInPersonalProfile": "Личный профиль",
     "success": "Сохранено!",
     "teaserImage": {
       "cropImage": "Обрезать изображение",

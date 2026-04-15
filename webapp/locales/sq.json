@@ -433,6 +433,9 @@
     "languageSelectText": "Zgjidh gjuhën",
     "newEvent": "Krijo një ngjarje të re",
     "newPost": "Krijo një postim të ri",
+    "postIn": "Postoni në",
+    "postInGroupOption": "Grupi: {name}",
+    "postInPersonalProfile": "Profili personal",
     "success": "U ruajt!",
     "teaserImage": {
       "cropImage": "Prit imazhin",

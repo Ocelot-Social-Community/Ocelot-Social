@@ -433,6 +433,9 @@
     "languageSelectText": "Вибрати мову",
     "newEvent": "Створити нову подію",
     "newPost": "Створити новий допис",
+    "postIn": "Опублікувати в",
+    "postInGroupOption": "Група: {name}",
+    "postInPersonalProfile": "Особистий профіль",
     "success": "Збережено!",
     "teaserImage": {
       "cropImage": "Обрізати зображення",

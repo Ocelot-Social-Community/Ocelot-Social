@@ -433,6 +433,9 @@
     "languageSelectText": "Wybierz język",
     "newEvent": "Utwórz nowe wydarzenie",
     "newPost": "Utwórz nowy wpis",
+    "postIn": "Publikuj w",
+    "postInGroupOption": "Grupa: {name}",
+    "postInPersonalProfile": "Profil osobisty",
     "success": "Zapisano!",
     "teaserImage": {
       "cropImage": "Przytnij obraz",
