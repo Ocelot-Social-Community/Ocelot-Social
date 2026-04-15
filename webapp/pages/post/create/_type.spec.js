@@ -292,6 +292,9 @@ describe('create.vue', () => {
   })
 
   describe('selectedGroup', () => {
+    // Mutate draft.groupId directly instead of spreading into a new object:
+    // the page relies on the module-scoped `sharedDraft` staying the same
+    // reference across remounts. A spread would break that contract silently.
     it('resolves to the matching group from myGroups', async () => {
       wrapper = Wrapper()
       wrapper.setData({
@@ -299,8 +302,8 @@ describe('create.vue', () => {
           { id: 'g1', name: 'Group One' },
           { id: 'g2', name: 'Group Two' },
         ],
-        draft: { ...wrapper.vm.draft, groupId: 'g2' },
       })
+      wrapper.vm.draft.groupId = 'g2'
       await wrapper.vm.$nextTick()
       expect(wrapper.vm.selectedGroup).toEqual({ id: 'g2', name: 'Group Two' })
     })
@@ -314,8 +317,8 @@ describe('create.vue', () => {
       wrapper = Wrapper()
       wrapper.setData({
         myGroups: [{ id: 'g1', name: 'Group One' }],
-        draft: { ...wrapper.vm.draft, groupId: 'g-unknown' },
       })
+      wrapper.vm.draft.groupId = 'g-unknown'
       await wrapper.vm.$nextTick()
       expect(wrapper.vm.selectedGroup).toBeNull()
     })
