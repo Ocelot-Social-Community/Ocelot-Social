@@ -27,7 +27,7 @@
   "devDependencies": {
     "@intlify/eslint-plugin-vue-i18n": "^4.3.0",
     "@nuxt/eslint": "^1.15.2",
-    "@nuxt/test-utils": "^4.0.0",
+    "@nuxt/test-utils": "^4.0.2",
     "@tailwindcss/vite": "^4.2.2",
     "@vitest/coverage-v8": "^4.1.2",
     "@vue/test-utils": "^2.4.6",
