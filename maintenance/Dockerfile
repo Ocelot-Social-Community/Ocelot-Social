@@ -48,7 +48,7 @@ RUN npx nuxt generate
 # ==============================================================================
 # Stage 5: Production (static site served by nginx)
 # ==============================================================================
-FROM nginx:1.29.7-alpine AS production
+FROM nginx:1.29.8-alpine AS production
 LABEL org.label-schema.name="ocelot.social:maintenance"
 LABEL org.label-schema.description="Maintenance page of the Social Network Software ocelot.social"
 LABEL org.label-schema.usage="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md"
