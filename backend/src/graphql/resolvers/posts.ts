@@ -58,12 +58,16 @@ const filterEventDates = (params) => {
 export default {
   Query: {
     Post: async (object, params, context: Context, resolveInfo) => {
+      const skipPinnedFilter = !!params.filter?.skipPinnedFilter
+      if (params.filter) delete params.filter.skipPinnedFilter
       params = await filterPostsOfMyGroups(params, context)
       params = await filterInvisiblePosts(params, context)
       params = await filterForMutedUsers(params, context)
       params = filterEventDates(params)
       params = await filterPostsHasLocation(params, context)
-      params = await maintainPinnedPosts(params)
+      if (!skipPinnedFilter) {
+        params = await maintainPinnedPosts(params)
+      }
       return neo4jgraphql(object, params, context, resolveInfo)
     },
     profilePagePosts: async (object, params, context, resolveInfo) => {

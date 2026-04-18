@@ -93,6 +93,7 @@ input _PostFilter {
   eventStart_gte: String
   eventEnd_gte: String
   hasLocation: Boolean
+  skipPinnedFilter: Boolean
 }
 
 enum _PostOrdering {
