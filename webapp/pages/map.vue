@@ -581,6 +581,7 @@ export default {
         })
         // add markers for "posts", post type "Event" with location coordinates
         this.posts.forEach((post) => {
+          if (!post.eventLocation) return
           this.markers.geoJSON.push({
             type: 'Feature',
             properties: {
@@ -708,6 +709,7 @@ export default {
             postType_in: ['Event'],
             eventStart_gte: new Date(),
             hasLocation: true,
+            skipPinnedFilter: true,
           },
         }
       },
