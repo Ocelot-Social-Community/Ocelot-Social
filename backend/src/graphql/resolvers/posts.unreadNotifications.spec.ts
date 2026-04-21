@@ -154,7 +154,9 @@ describe('Post.unreadNotificationByCurrentUser / unreadCommentNotificationsByCur
         query: postWithUnreadNotifications,
         variables: { id: 'p-target' },
       })
-      const list = response.data?.Post[0].unreadCommentNotificationsByCurrentUser
+      const list = response.data?.Post[0].unreadCommentNotificationsByCurrentUser as Array<{
+        from: { id: string }
+      }>
       expect(list.map((n) => n.from.id)).not.toContain('c-neighbor')
     })
   })

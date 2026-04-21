@@ -2,6 +2,7 @@ query PostUnreadNotifications($id: ID!) {
   Post(filter: { id: $id }) {
     id
     unreadNotificationByCurrentUser {
+      id
       reason
       read
       from {
@@ -12,6 +13,7 @@ query PostUnreadNotifications($id: ID!) {
       }
     }
     unreadCommentNotificationsByCurrentUser {
+      id
       reason
       read
       from {
