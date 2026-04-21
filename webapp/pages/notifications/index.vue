@@ -115,9 +115,7 @@ export default {
     async toggleNotificationRead({ resourceId, read }) {
       try {
         await this.$apollo.mutate({
-          mutation: read
-            ? markAsUnreadMutation(this.$i18n)
-            : markAsReadMutation(this.$i18n),
+          mutation: read ? markAsUnreadMutation(this.$i18n) : markAsReadMutation(this.$i18n),
           variables: { id: resourceId },
           // Refetch all active `Notifications` queries: this list (respects its
           // current filter) and the header dropdown (read:false, drives the counter).

@@ -86,9 +86,7 @@
                     ? $t('notifications.markAsUnread')
                     : $t('notifications.markAsRead')
                 "
-                :data-test="
-                  notification.read ? 'toggle-mark-as-unread' : 'toggle-mark-as-read'
-                "
+                :data-test="notification.read ? 'toggle-mark-as-unread' : 'toggle-mark-as-read'"
                 v-tooltip="{
                   content: notification.read
                     ? $t('notifications.markAsUnread')

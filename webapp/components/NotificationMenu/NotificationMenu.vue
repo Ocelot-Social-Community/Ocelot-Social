@@ -149,9 +149,7 @@ export default {
     async toggleNotificationRead({ resourceId, read }) {
       try {
         await this.$apollo.mutate({
-          mutation: read
-            ? markAsUnreadMutation(this.$i18n)
-            : markAsReadMutation(this.$i18n),
+          mutation: read ? markAsUnreadMutation(this.$i18n) : markAsReadMutation(this.$i18n),
           variables: { id: resourceId },
         })
         // Delay the list refetch so the user can revise their decision. The toggle

@@ -1,11 +1,7 @@
 import { mount, RouterLinkStub } from '@vue/test-utils'
 import NotificationMenu from './NotificationMenu'
 import NotificationsTable from '~/components/NotificationsTable/NotificationsTable'
-import {
-  markAsReadMutation,
-  markAsUnreadMutation,
-  markAllAsReadMutation,
-} from '~/graphql/User'
+import { markAsReadMutation, markAsUnreadMutation, markAllAsReadMutation } from '~/graphql/User'
 
 const localVue = global.localVue
 
