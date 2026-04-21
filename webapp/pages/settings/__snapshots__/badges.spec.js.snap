@@ -442,13 +442,7 @@ exports[`badge settings without badges renders 1`] = `
         </div>
       </div>
        
-      <p
-        class="drag-instruction"
-      >
-        
-      settings.badges.drag-instruction
-    
-      </p>
+      <!---->
        
       <!---->
        
