@@ -5,7 +5,11 @@ import DropdownFilter from '~/components/DropdownFilter/DropdownFilter'
 import NotificationsTable from '~/components/NotificationsTable/NotificationsTable'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
 
-import { markAsReadMutation, markAllAsReadMutation } from '~/graphql/User'
+import {
+  markAsReadMutation,
+  markAsUnreadMutation,
+  markAllAsReadMutation,
+} from '~/graphql/User'
 const localVue = global.localVue
 
 const stubs = {
@@ -134,6 +138,51 @@ describe('PostIndex', () => {
         it('shows an error message if there is an error', () => {
           expect(mocks.$toast.error).toHaveBeenCalledWith('Some error message')
         })
+      })
+    })
+
+    describe('toggleNotificationRead', () => {
+      it('fires markAsRead when toggling an unread notification', () => {
+        wrapper.findComponent(NotificationsTable).vm.$emit('toggleNotificationRead', {
+          resourceId: 'r1',
+          read: false,
+        })
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
+          mutation: markAsReadMutation(),
+          variables: { id: 'r1' },
+        })
+      })
+
+      it('fires markAsUnread when toggling a read notification', () => {
+        wrapper.findComponent(NotificationsTable).vm.$emit('toggleNotificationRead', {
+          resourceId: 'r1',
+          read: true,
+        })
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
+          mutation: markAsUnreadMutation(),
+          variables: { id: 'r1' },
+        })
+      })
+
+      it('refreshes the notifications list after toggling', async () => {
+        wrapper.findComponent(NotificationsTable).vm.$emit('toggleNotificationRead', {
+          resourceId: 'r1',
+          read: false,
+        })
+        await wrapper.vm.$nextTick()
+        await wrapper.vm.$nextTick()
+        expect(mocks.$apollo.queries.notifications.refresh).toHaveBeenCalled()
+      })
+
+      it('shows an error toast on mutation failure', async () => {
+        mocks.$apollo.mutate = jest.fn().mockRejectedValueOnce({ message: 'boom' })
+        wrapper.findComponent(NotificationsTable).vm.$emit('toggleNotificationRead', {
+          resourceId: 'r1',
+          read: false,
+        })
+        await wrapper.vm.$nextTick()
+        await wrapper.vm.$nextTick()
+        expect(mocks.$toast.error).toHaveBeenCalledWith('boom')
       })
     })
 

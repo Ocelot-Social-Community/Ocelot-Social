@@ -25,6 +25,7 @@
     <div class="ds-mb-large"></div>
     <notifications-table
       @markNotificationAsRead="markNotificationAsRead"
+      @toggleNotificationRead="toggleNotificationRead"
       :notifications="notifications"
     />
 
@@ -46,7 +47,12 @@ import { OsButton, OsCard } from '@ocelot-social/ui'
 import NotificationsTable from '~/components/NotificationsTable/NotificationsTable'
 import DropdownFilter from '~/components/DropdownFilter/DropdownFilter'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
-import { notificationQuery, markAsReadMutation, markAllAsReadMutation } from '~/graphql/User'
+import {
+  notificationQuery,
+  markAsReadMutation,
+  markAsUnreadMutation,
+  markAllAsReadMutation,
+} from '~/graphql/User'
 
 export default {
   components: {
@@ -101,6 +107,20 @@ export default {
           mutation: markAsReadMutation(this.$i18n),
           variables: { id: notificationSourceId },
         })
+      } catch (error) {
+        this.$toast.error(error.message)
+      }
+    },
+    async toggleNotificationRead({ resourceId, read }) {
+      try {
+        await this.$apollo.mutate({
+          mutation: read
+            ? markAsUnreadMutation(this.$i18n)
+            : markAsReadMutation(this.$i18n),
+          variables: { id: resourceId },
+        })
+        // Refresh so the current filter (all / read / unread) reflects the new state
+        this.$apollo.queries.notifications.refresh()
       } catch (error) {
         this.$toast.error(error.message)
       }

@@ -215,6 +215,46 @@ export const markAsReadMutation = (_i18n) => {
   `
 }
 
+export const markAsUnreadMutation = (_i18n) => {
+  return gql`
+    ${user}
+    ${comment}
+    ${post}
+    ${group}
+
+    mutation ($id: ID!) {
+      markAsUnread(id: $id) {
+        id
+        read
+        reason
+        createdAt
+        updatedAt
+        from {
+          __typename
+          ... on Post {
+            ...post
+            author {
+              ...user
+            }
+          }
+          ... on Comment {
+            ...comment
+            post {
+              ...post
+              author {
+                ...user
+              }
+            }
+          }
+          ... on Group {
+            ...group
+          }
+        }
+      }
+    }
+  `
+}
+
 export const markAllAsReadMutation = (_i18n) => {
   return gql`
     ${user}

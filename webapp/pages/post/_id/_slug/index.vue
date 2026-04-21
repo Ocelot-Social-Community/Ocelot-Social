@@ -212,6 +212,7 @@ import {
 import PostQuery from '~/graphql/PostQuery'
 import { groupQuery } from '~/graphql/groups'
 import PostMutations from '~/graphql/PostMutations'
+import { markAsReadMutation } from '~/graphql/User'
 import links from '~/constants/links.js'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 import postListActions from '~/mixins/postListActions'
@@ -277,6 +278,12 @@ export default {
       // will be fixed in a future update of the styleguide
       this.ready = true
     }, 50)
+    this._autoMarkedForPostId = null
+    this._unreadCommentObserver = null
+    this._unreadCommentIds = new Set()
+  },
+  beforeDestroy() {
+    this._unreadCommentObserver?.disconnect()
   },
   computed: {
     routes() {
@@ -408,6 +415,61 @@ export default {
       this.$apollo.queries.Group.refetch()
       this.$toast.success(this.$t('post.comment.joinGroup', { name: this.post.group.name }))
     },
+    handleUnreadNotifications(post) {
+      // Run once per post visit: post.id is the key
+      if (!post?.id || this._autoMarkedForPostId === post.id) return
+      this._autoMarkedForPostId = post.id
+
+      // Post-level notification → the post is visible by being on this page
+      if (post.unreadNotificationByCurrentUser) {
+        this.markNotificationAsRead(post.id)
+      }
+
+      // Collect comment IDs with unread notifications
+      const commentIds = (post.unreadCommentNotificationsByCurrentUser || [])
+        .map((n) => n.from?.id)
+        .filter(Boolean)
+      this._unreadCommentIds = new Set(commentIds)
+      if (this._unreadCommentIds.size === 0) return
+
+      this.$nextTick(() => this.setupUnreadCommentObserver())
+    },
+    setupUnreadCommentObserver() {
+      if (this._unreadCommentObserver || this._unreadCommentIds.size === 0) return
+      if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return
+
+      this._unreadCommentObserver = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue
+            const commentId = entry.target.dataset.unreadCommentId
+            if (!commentId || !this._unreadCommentIds.has(commentId)) continue
+            this._unreadCommentIds.delete(commentId)
+            this._unreadCommentObserver.unobserve(entry.target)
+            this.markNotificationAsRead(commentId)
+          }
+        },
+        { threshold: 0.5 },
+      )
+
+      for (const id of this._unreadCommentIds) {
+        const el = document.getElementById(`commentId-${id}`)
+        if (el) {
+          el.dataset.unreadCommentId = id
+          this._unreadCommentObserver.observe(el)
+        }
+      }
+    },
+    async markNotificationAsRead(resourceId) {
+      try {
+        await this.$apollo.mutate({
+          mutation: markAsReadMutation(this.$i18n),
+          variables: { id: resourceId },
+        })
+      } catch (error) {
+        // Silent: auto-mark is best-effort. User can still navigate notifications manually.
+      }
+    },
   },
   apollo: {
     Post: {
@@ -427,6 +489,7 @@ export default {
         this.blurred = image && image.sensitive
         this.shouted = !!this.post.shoutedByCurrentUser
         this.shoutedCount = this.post.shoutedCount || 0
+        this.handleUnreadNotifications(this.post)
       },
       fetchPolicy: 'cache-and-network',
     },

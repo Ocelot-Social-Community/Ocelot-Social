@@ -77,6 +77,27 @@
                   }}
                 </p>
               </div>
+              <button
+                type="button"
+                class="notification-read-toggle"
+                :aria-label="
+                  notification.read
+                    ? $t('notifications.markAsUnread')
+                    : $t('notifications.markAsRead')
+                "
+                :data-test="
+                  notification.read ? 'toggle-mark-as-unread' : 'toggle-mark-as-read'
+                "
+                v-tooltip="{
+                  content: notification.read
+                    ? $t('notifications.markAsUnread')
+                    : $t('notifications.markAsRead'),
+                  placement: 'left',
+                }"
+                @click="toggleReadState(notification)"
+              >
+                <os-icon :icon="notification.read ? icons.check : icons.envelope" />
+              </button>
             </div>
           </div>
         </div>
@@ -147,6 +168,12 @@ export default {
         resolve()
       })
     },
+    toggleReadState(notification) {
+      this.$emit('toggleNotificationRead', {
+        resourceId: notification.from.id,
+        read: notification.read,
+      })
+    },
     async handleNotificationClick(notification) {
       const route = {
         name: this.isGroup(notification.from) ? 'groups-id-slug' : 'post-id-slug',
@@ -209,6 +236,24 @@ export default {
 
   .notification-icon {
     flex-shrink: 0;
+  }
+
+  .notification-read-toggle {
+    flex-shrink: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: $text-color-soft;
+    align-self: flex-start;
+
+    &:hover,
+    &:focus-visible {
+      color: $color-primary;
+      background-color: rgba(0, 0, 0, 0.04);
+      outline: none;
+    }
   }
 }
 

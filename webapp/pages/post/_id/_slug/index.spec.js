@@ -210,5 +210,110 @@ describe('PostSlug', () => {
         expect(ids).toStrictEqual(idsAlphabetically)
       })
     })
+
+    describe('auto-mark unread notifications', () => {
+      let observe, unobserve, disconnect
+      const makeIOStub = () => {
+        observe = jest.fn()
+        unobserve = jest.fn()
+        disconnect = jest.fn()
+        return jest.fn().mockImplementation((callback) => {
+          makeIOStub.lastCallback = callback
+          return { observe, unobserve, disconnect }
+        })
+      }
+
+      let originalIO
+      beforeEach(() => {
+        originalIO = global.IntersectionObserver
+        global.IntersectionObserver = makeIOStub()
+      })
+      afterEach(() => {
+        global.IntersectionObserver = originalIO
+      })
+
+      it('fires markAsRead for the post when it has an unread post-level notification', async () => {
+        wrapper = await Wrapper()
+        await wrapper.vm.handleUnreadNotifications({
+          id: 'post-42',
+          unreadNotificationByCurrentUser: { id: 'mentioned_in_post/post-42/u1' },
+          unreadCommentNotificationsByCurrentUser: [],
+        })
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({ variables: { id: 'post-42' } }),
+        )
+      })
+
+      it('does nothing when there are no unread notifications', async () => {
+        wrapper = await Wrapper()
+        mocks.$apollo.mutate.mockClear()
+        await wrapper.vm.handleUnreadNotifications({
+          id: 'post-42',
+          unreadNotificationByCurrentUser: null,
+          unreadCommentNotificationsByCurrentUser: [],
+        })
+        expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+      })
+
+      it('is idempotent across multiple Apollo update() calls for the same post', async () => {
+        wrapper = await Wrapper()
+        const post = {
+          id: 'post-42',
+          unreadNotificationByCurrentUser: { id: 'mentioned_in_post/post-42/u1' },
+          unreadCommentNotificationsByCurrentUser: [],
+        }
+        await wrapper.vm.handleUnreadNotifications(post)
+        mocks.$apollo.mutate.mockClear()
+        await wrapper.vm.handleUnreadNotifications(post)
+        expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+      })
+
+      it('sets up an IntersectionObserver when there are unread comment notifications', async () => {
+        wrapper = await Wrapper()
+        // Render a DOM element matching one of the unread comment ids
+        const el = document.createElement('div')
+        el.id = 'commentId-c1'
+        document.body.appendChild(el)
+        await wrapper.vm.handleUnreadNotifications({
+          id: 'post-42',
+          unreadNotificationByCurrentUser: null,
+          unreadCommentNotificationsByCurrentUser: [
+            {
+              id: 'mentioned_in_comment/c1/u1',
+              from: { __typename: 'Comment', id: 'c1' },
+            },
+          ],
+        })
+        await Vue.nextTick()
+        expect(observe).toHaveBeenCalledWith(el)
+        document.body.removeChild(el)
+      })
+
+      it('fires markAsRead(commentId) when a comment enters the viewport', async () => {
+        wrapper = await Wrapper()
+        const el = document.createElement('div')
+        el.id = 'commentId-c1'
+        document.body.appendChild(el)
+        await wrapper.vm.handleUnreadNotifications({
+          id: 'post-42',
+          unreadNotificationByCurrentUser: null,
+          unreadCommentNotificationsByCurrentUser: [
+            {
+              id: 'mentioned_in_comment/c1/u1',
+              from: { __typename: 'Comment', id: 'c1' },
+            },
+          ],
+        })
+        await Vue.nextTick()
+        mocks.$apollo.mutate.mockClear()
+        // Simulate the comment entering the viewport
+        makeIOStub.lastCallback([{ isIntersecting: true, target: el }])
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({ variables: { id: 'c1' } }),
+        )
+        expect(unobserve).toHaveBeenCalledWith(el)
+        document.body.removeChild(el)
+      })
+    })
   })
 })

@@ -177,6 +177,55 @@ describe('NotificationsTable.vue', () => {
           expect(wrapper.find('.notification-status').exists()).toBe(true)
         })
       })
+
+      describe('read/unread toggle button', () => {
+        it('shows the "mark as read" variant for unread notifications', () => {
+          postNotification.read = false
+          wrapper = Wrapper()
+          const row = wrapper.findAll('.notification-grid-row').at(0)
+          expect(row.find('[data-test="toggle-mark-as-read"]').exists()).toBe(true)
+          expect(row.find('[data-test="toggle-mark-as-unread"]').exists()).toBe(false)
+        })
+
+        it('shows the "mark as unread" variant for read notifications', () => {
+          postNotification.read = true
+          wrapper = Wrapper()
+          const row = wrapper.findAll('.notification-grid-row').at(0)
+          expect(row.find('[data-test="toggle-mark-as-unread"]').exists()).toBe(true)
+          expect(row.find('[data-test="toggle-mark-as-read"]').exists()).toBe(false)
+        })
+
+        it('emits `toggleNotificationRead` with the resource id and current read state', () => {
+          postNotification.read = false
+          wrapper = Wrapper()
+          const row = wrapper.findAll('.notification-grid-row').at(0)
+          row.find('[data-test="toggle-mark-as-read"]').trigger('click')
+          expect(wrapper.emitted().toggleNotificationRead[0][0]).toEqual({
+            resourceId: postNotification.from.id,
+            read: false,
+          })
+        })
+
+        it('emits with read=true when toggling a read notification', () => {
+          postNotification.read = true
+          wrapper = Wrapper()
+          const row = wrapper.findAll('.notification-grid-row').at(0)
+          row.find('[data-test="toggle-mark-as-unread"]').trigger('click')
+          expect(wrapper.emitted().toggleNotificationRead[0][0]).toEqual({
+            resourceId: postNotification.from.id,
+            read: true,
+          })
+        })
+
+        it('does not navigate when toggle is clicked', () => {
+          postNotification.read = false
+          wrapper = Wrapper()
+          const row = wrapper.findAll('.notification-grid-row').at(0)
+          row.find('[data-test="toggle-mark-as-read"]').trigger('click')
+          // Toggle should not emit the navigation-coupled markNotificationAsRead event
+          expect(wrapper.emitted().markNotificationAsRead).toBeUndefined()
+        })
+      })
     })
   })
 })
