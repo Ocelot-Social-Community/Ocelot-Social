@@ -141,5 +141,29 @@ describe('SocialMedia.vue', () => {
         expect(link.text()).not.toContain('www.')
       })
     })
+
+    describe('when a favicon fails to load', () => {
+      let wrapper
+
+      beforeEach(async () => {
+        propsData.userName = 'Jenny Rostock'
+        propsData.user = {
+          socialMedia: [
+            {
+              id: 'ee1e8ed6-fbef-4bcf-b411-a12926f2ea1e',
+              url: 'https://broken.example.com/user',
+              __typename: 'SocialMedia',
+            },
+          ],
+        }
+        wrapper = Wrapper()
+        await wrapper.find('img').trigger('error')
+      })
+
+      it('replaces the broken favicon with a fallback icon', () => {
+        expect(wrapper.find('img').exists()).toBe(false)
+        expect(wrapper.find('.favicon-fallback').exists()).toBe(true)
+      })
+    })
   })
 })

@@ -8,7 +8,7 @@
         <template>
           <div v-for="link in socialMediaLinks()" :key="link.url" class="ds-my-x-small">
             <a :href="link.url" target="_blank">
-              <img :src="link.favicon" alt="Link:" height="22" width="22" />
+              <favicon :src="link.favicon" :size="22" />
               {{ link.username }}
             </a>
           </div>
@@ -20,10 +20,11 @@
 
 <script>
 import { OsCard } from '@ocelot-social/ui'
+import Favicon from './Favicon.vue'
 
 export default {
   name: 'social-media',
-  components: { OsCard },
+  components: { OsCard, Favicon },
   props: {
     userName: { type: String, required: true },
     user: { type: Object, required: true },
