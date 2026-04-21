@@ -78,6 +78,7 @@
                 </p>
               </div>
               <button
+                v-if="showReadToggle"
                 type="button"
                 class="notification-read-toggle"
                 :aria-label="
@@ -125,6 +126,7 @@ export default {
   props: {
     notifications: { type: Array, default: () => [] },
     showPopover: { type: Boolean, default: true },
+    showReadToggle: { type: Boolean, default: false },
   },
   computed: {
     fields() {

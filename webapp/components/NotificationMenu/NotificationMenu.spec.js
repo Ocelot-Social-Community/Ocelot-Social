@@ -1,5 +1,7 @@
 import { mount, RouterLinkStub } from '@vue/test-utils'
 import NotificationMenu from './NotificationMenu'
+import NotificationsTable from '~/components/NotificationsTable/NotificationsTable'
+import { markAsReadMutation, markAsUnreadMutation } from '~/graphql/User'
 
 const localVue = global.localVue
 
@@ -169,6 +171,64 @@ describe('NotificationMenu.vue', () => {
         expect(wrapper.find('.os-counter-icon__count').classes()).toContain(
           'os-counter-icon__count--danger',
         )
+      })
+
+      describe('toggleNotificationRead wiring', () => {
+        beforeEach(() => {
+          mocks.$i18n = { locale: () => 'en' }
+          mocks.$toast = { error: jest.fn() }
+          mocks.$apollo = {
+            mutate: jest.fn().mockResolvedValue({}),
+            queries: { notifications: { refetch: jest.fn() } },
+          }
+        })
+
+        it('fires markAsRead when the toggle emits with read=false', async () => {
+          wrapper = Wrapper()
+          wrapper.findComponent(NotificationsTable).vm.$emit('toggleNotificationRead', {
+            resourceId: 'post-1',
+            read: false,
+          })
+          expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
+            mutation: markAsReadMutation(mocks.$i18n),
+            variables: { id: 'post-1' },
+          })
+        })
+
+        it('fires markAsUnread when the toggle emits with read=true', async () => {
+          wrapper = Wrapper()
+          wrapper.findComponent(NotificationsTable).vm.$emit('toggleNotificationRead', {
+            resourceId: 'post-3',
+            read: true,
+          })
+          expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
+            mutation: markAsUnreadMutation(mocks.$i18n),
+            variables: { id: 'post-3' },
+          })
+        })
+
+        it('refetches notifications so the read=false dropdown stays in sync', async () => {
+          wrapper = Wrapper()
+          wrapper.findComponent(NotificationsTable).vm.$emit('toggleNotificationRead', {
+            resourceId: 'post-1',
+            read: false,
+          })
+          await wrapper.vm.$nextTick()
+          await wrapper.vm.$nextTick()
+          expect(mocks.$apollo.queries.notifications.refetch).toHaveBeenCalled()
+        })
+
+        it('shows an error toast when the mutation fails', async () => {
+          mocks.$apollo.mutate = jest.fn().mockRejectedValueOnce({ message: 'boom' })
+          wrapper = Wrapper()
+          wrapper.findComponent(NotificationsTable).vm.$emit('toggleNotificationRead', {
+            resourceId: 'post-1',
+            read: false,
+          })
+          await wrapper.vm.$nextTick()
+          await wrapper.vm.$nextTick()
+          expect(mocks.$toast.error).toHaveBeenCalledWith('boom')
+        })
       })
     })
   })

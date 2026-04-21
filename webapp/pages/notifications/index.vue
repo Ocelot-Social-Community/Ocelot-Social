@@ -27,6 +27,7 @@
       @markNotificationAsRead="markNotificationAsRead"
       @toggleNotificationRead="toggleNotificationRead"
       :notifications="notifications"
+      :show-read-toggle="true"
     />
 
     <div class="ds-flex notifications-footer">

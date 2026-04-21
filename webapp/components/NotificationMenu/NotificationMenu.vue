@@ -72,8 +72,10 @@
       <div class="notifications-menu-popover">
         <notifications-table
           @markNotificationAsRead="markAsReadAndCloseMenu($event, closeMenu)"
+          @toggleNotificationRead="toggleNotificationRead"
           :notifications="notifications"
           :show-popover="false"
+          :show-read-toggle="true"
         />
       </div>
     </template>
@@ -88,6 +90,7 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import {
   notificationQuery,
   markAsReadMutation,
+  markAsUnreadMutation,
   notificationAdded,
   markAllAsReadMutation,
 } from '~/graphql/User'
@@ -134,6 +137,22 @@ export default {
         })
 
         closeMenu?.()
+      } catch (error) {
+        this.$toast.error(error.message)
+      }
+    },
+    async toggleNotificationRead({ resourceId, read }) {
+      try {
+        await this.$apollo.mutate({
+          mutation: read
+            ? markAsUnreadMutation(this.$i18n)
+            : markAsReadMutation(this.$i18n),
+          variables: { id: resourceId },
+        })
+        // Dropdown is filtered to read=false. Apollo updates the NOTIFIED cache entry
+        // but doesn't re-evaluate filters on already-cached lists, so the row would
+        // linger with the new state instead of disappearing. Refetch to sync.
+        this.$apollo.queries.notifications.refetch()
       } catch (error) {
         this.$toast.error(error.message)
       }
