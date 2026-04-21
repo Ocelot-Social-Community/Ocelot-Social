@@ -97,6 +97,10 @@ import {
 import Dropdown from '~/components/Dropdown'
 import NotificationsTable from '../NotificationsTable/NotificationsTable.vue'
 
+// Grace period between a toggle click and the dropdown refetch. Gives the user
+// time to undo their action before the row disappears from the filtered list.
+const NOTIFICATIONS_REFETCH_DELAY_MS = 3000
+
 export default {
   name: 'NotificationMenu',
   components: {
@@ -123,6 +127,7 @@ export default {
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.handleResize)
+    clearTimeout(this._notificationsRefetchTimer)
   },
   methods: {
     handleResize() {
@@ -148,15 +153,21 @@ export default {
             ? markAsUnreadMutation(this.$i18n)
             : markAsReadMutation(this.$i18n),
           variables: { id: resourceId },
-          // Apollo updates the normalized NOTIFIED entity but doesn't re-filter
-          // cached lists. Refetch every active `Notifications` query so both the
-          // dropdown (read:false) and any full-page filter stay in sync, including
-          // the header counter derived from the dropdown's list.
-          refetchQueries: ['Notifications'],
         })
+        // Delay the list refetch so the user can revise their decision. The toggle
+        // icon flips instantly (entity normalization), the counter also updates
+        // instantly because its reducer reads the updated NOTIFIED.read field, but
+        // the row stays visible in the filtered dropdown list until this refetch.
+        this.scheduleNotificationsRefetch()
       } catch (error) {
         this.$toast.error(error.message)
       }
+    },
+    scheduleNotificationsRefetch() {
+      clearTimeout(this._notificationsRefetchTimer)
+      this._notificationsRefetchTimer = setTimeout(() => {
+        this.$apollo.queries.notifications.refetch()
+      }, NOTIFICATIONS_REFETCH_DELAY_MS)
     },
     async markAllAsRead() {
       if (!this.hasNotifications) {

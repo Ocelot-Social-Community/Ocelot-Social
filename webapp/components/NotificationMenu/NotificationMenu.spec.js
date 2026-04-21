@@ -211,15 +211,47 @@ describe('NotificationMenu.vue', () => {
           )
         })
 
-        it('refetches all active Notifications queries so the counter updates', async () => {
+        it('does not refetch immediately (grace period for undo)', async () => {
           wrapper = Wrapper()
           wrapper.findComponent(NotificationsTable).vm.$emit('toggleNotificationRead', {
             resourceId: 'post-1',
             read: false,
           })
-          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
-            expect.objectContaining({ refetchQueries: ['Notifications'] }),
-          )
+          await wrapper.vm.$nextTick()
+          await wrapper.vm.$nextTick()
+          expect(mocks.$apollo.queries.notifications.refetch).not.toHaveBeenCalled()
+        })
+
+        it('refetches after the grace period', async () => {
+          jest.useFakeTimers()
+          wrapper = Wrapper()
+          wrapper.findComponent(NotificationsTable).vm.$emit('toggleNotificationRead', {
+            resourceId: 'post-1',
+            read: false,
+          })
+          await wrapper.vm.$nextTick()
+          await wrapper.vm.$nextTick()
+          jest.advanceTimersByTime(3000)
+          expect(mocks.$apollo.queries.notifications.refetch).toHaveBeenCalled()
+          jest.useRealTimers()
+        })
+
+        it('debounces rapid toggles into a single refetch', async () => {
+          jest.useFakeTimers()
+          wrapper = Wrapper()
+          const table = wrapper.findComponent(NotificationsTable)
+          table.vm.$emit('toggleNotificationRead', { resourceId: 'post-1', read: false })
+          await wrapper.vm.$nextTick()
+          await wrapper.vm.$nextTick()
+          jest.advanceTimersByTime(1500)
+          table.vm.$emit('toggleNotificationRead', { resourceId: 'post-1', read: true })
+          await wrapper.vm.$nextTick()
+          await wrapper.vm.$nextTick()
+          jest.advanceTimersByTime(1500)
+          expect(mocks.$apollo.queries.notifications.refetch).not.toHaveBeenCalled()
+          jest.advanceTimersByTime(1500)
+          expect(mocks.$apollo.queries.notifications.refetch).toHaveBeenCalledTimes(1)
+          jest.useRealTimers()
         })
 
         it('shows an error toast when the mutation fails', async () => {
