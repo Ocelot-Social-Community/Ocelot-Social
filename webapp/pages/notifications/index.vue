@@ -119,9 +119,10 @@ export default {
             ? markAsUnreadMutation(this.$i18n)
             : markAsReadMutation(this.$i18n),
           variables: { id: resourceId },
+          // Refetch all active `Notifications` queries: this list (respects its
+          // current filter) and the header dropdown (read:false, drives the counter).
+          refetchQueries: ['Notifications'],
         })
-        // Refresh so the current filter (all / read / unread) reflects the new state
-        this.$apollo.queries.notifications.refresh()
       } catch (error) {
         this.$toast.error(error.message)
       }

@@ -147,10 +147,12 @@ describe('PostIndex', () => {
           resourceId: 'r1',
           read: false,
         })
-        expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
-          mutation: markAsReadMutation(),
-          variables: { id: 'r1' },
-        })
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            mutation: markAsReadMutation(),
+            variables: { id: 'r1' },
+          }),
+        )
       })
 
       it('fires markAsUnread when toggling a read notification', () => {
@@ -158,20 +160,22 @@ describe('PostIndex', () => {
           resourceId: 'r1',
           read: true,
         })
-        expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
-          mutation: markAsUnreadMutation(),
-          variables: { id: 'r1' },
-        })
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            mutation: markAsUnreadMutation(),
+            variables: { id: 'r1' },
+          }),
+        )
       })
 
-      it('refreshes the notifications list after toggling', async () => {
+      it('refetches active Notifications queries so the counter stays in sync', async () => {
         wrapper.findComponent(NotificationsTable).vm.$emit('toggleNotificationRead', {
           resourceId: 'r1',
           read: false,
         })
-        await wrapper.vm.$nextTick()
-        await wrapper.vm.$nextTick()
-        expect(mocks.$apollo.queries.notifications.refresh).toHaveBeenCalled()
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({ refetchQueries: ['Notifications'] }),
+        )
       })
 
       it('shows an error toast on mutation failure', async () => {

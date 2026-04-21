@@ -133,7 +133,7 @@ export const notificationQuery = () => {
     ${post}
     ${group}
 
-    query ($read: Boolean, $orderBy: NotificationOrdering, $first: Int, $offset: Int) {
+    query Notifications($read: Boolean, $orderBy: NotificationOrdering, $first: Int, $offset: Int) {
       notifications(read: $read, orderBy: $orderBy, first: $first, offset: $offset) {
         id
         read

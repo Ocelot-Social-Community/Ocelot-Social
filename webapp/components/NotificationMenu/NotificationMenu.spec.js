@@ -189,10 +189,12 @@ describe('NotificationMenu.vue', () => {
             resourceId: 'post-1',
             read: false,
           })
-          expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
-            mutation: markAsReadMutation(mocks.$i18n),
-            variables: { id: 'post-1' },
-          })
+          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+            expect.objectContaining({
+              mutation: markAsReadMutation(mocks.$i18n),
+              variables: { id: 'post-1' },
+            }),
+          )
         })
 
         it('fires markAsUnread when the toggle emits with read=true', async () => {
@@ -201,21 +203,23 @@ describe('NotificationMenu.vue', () => {
             resourceId: 'post-3',
             read: true,
           })
-          expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
-            mutation: markAsUnreadMutation(mocks.$i18n),
-            variables: { id: 'post-3' },
-          })
+          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+            expect.objectContaining({
+              mutation: markAsUnreadMutation(mocks.$i18n),
+              variables: { id: 'post-3' },
+            }),
+          )
         })
 
-        it('refetches notifications so the read=false dropdown stays in sync', async () => {
+        it('refetches all active Notifications queries so the counter updates', async () => {
           wrapper = Wrapper()
           wrapper.findComponent(NotificationsTable).vm.$emit('toggleNotificationRead', {
             resourceId: 'post-1',
             read: false,
           })
-          await wrapper.vm.$nextTick()
-          await wrapper.vm.$nextTick()
-          expect(mocks.$apollo.queries.notifications.refetch).toHaveBeenCalled()
+          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+            expect.objectContaining({ refetchQueries: ['Notifications'] }),
+          )
         })
 
         it('shows an error toast when the mutation fails', async () => {

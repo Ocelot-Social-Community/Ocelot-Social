@@ -148,11 +148,12 @@ export default {
             ? markAsUnreadMutation(this.$i18n)
             : markAsReadMutation(this.$i18n),
           variables: { id: resourceId },
+          // Apollo updates the normalized NOTIFIED entity but doesn't re-filter
+          // cached lists. Refetch every active `Notifications` query so both the
+          // dropdown (read:false) and any full-page filter stay in sync, including
+          // the header counter derived from the dropdown's list.
+          refetchQueries: ['Notifications'],
         })
-        // Dropdown is filtered to read=false. Apollo updates the NOTIFIED cache entry
-        // but doesn't re-evaluate filters on already-cached lists, so the row would
-        // linger with the new state instead of disappearing. Refetch to sync.
-        this.$apollo.queries.notifications.refetch()
       } catch (error) {
         this.$toast.error(error.message)
       }
