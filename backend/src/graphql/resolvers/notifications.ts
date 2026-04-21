@@ -114,6 +114,33 @@ export default {
         await session.close()
       }
     },
+    markAsUnread: async (_parent, args, context, _resolveInfo) => {
+      const { user: currentUser } = context
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const response = await transaction.run(
+          `
+            MATCH (resource {id: $resourceId})-[notification:NOTIFIED {read: TRUE}]->(user:User {id:$id})
+            SET notification.read = FALSE
+            WITH user, notification, resource,
+            [(resource)<-[:WROTE]-(author:User) | author {.*}] AS authors,
+            [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post{.*, author: properties(author), postType: [l IN labels(post) WHERE NOT l = 'Post']} ] AS posts
+            OPTIONAL MATCH (resource)<-[membership:MEMBER_OF]-(user)
+            WITH resource, user, notification, authors, posts, membership,
+            resource {.*, __typename: [l IN labels(resource) WHERE l IN ['Post', 'Comment', 'Group']][0], author: authors[0], post: posts[0], myRole: membership.role } AS finalResource
+            RETURN notification {.*, from: finalResource, to: properties(user)}
+          `,
+          { resourceId: args.id, id: currentUser.id },
+        )
+        return response.records.map((record) => record.get('notification'))
+      })
+      try {
+        const [notifications] = await writeTxResultPromise
+        return notifications
+      } finally {
+        await session.close()
+      }
+    },
     markAllAsRead: async (parent, args, context, _resolveInfo) => {
       const { user: currentUser } = context
       const session = context.driver.session()
