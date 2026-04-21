@@ -92,6 +92,7 @@ export default {
       isDraggingFromHex: false,
       isProcessingDrop: false,
       emptyReserveDragOver: false,
+      dragSupported: false,
     }
   },
   computed: {
@@ -108,8 +109,8 @@ export default {
       return this.selectedBadges[this.selectedBadgeIndex]?.isDefault ?? false
     },
   },
-  created() {
-    this.userBadges = [...(this.currentUser.badgeTrophiesSelected || [])]
+  mounted() {
+    // Client-only: must not run during SSR to avoid hydration mismatch on drag-related v-ifs
     this.dragSupported = this.detectDragSupport()
   },
   methods: {
