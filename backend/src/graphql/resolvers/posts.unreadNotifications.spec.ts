@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/await-thenable */
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-confusing-void-expression */
+
 import Factory, { cleanDatabase } from '@db/factories'
 import postWithUnreadNotifications from '@graphql/queries/posts/PostUnreadNotifications.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -162,9 +161,7 @@ describe('Post.unreadNotificationByCurrentUser / unreadCommentNotificationsByCur
 
   describe('authenticated as unrelated user', () => {
     beforeEach(async () => {
-      authenticatedUser = await (
-        await Factory.build('user', { id: 'stranger' })
-      ).toJson()
+      authenticatedUser = await (await Factory.build('user', { id: 'stranger' })).toJson()
     })
 
     it('returns null for the post-level notification', async () => {

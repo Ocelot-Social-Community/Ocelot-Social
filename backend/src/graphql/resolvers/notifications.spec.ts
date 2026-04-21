@@ -283,9 +283,7 @@ describe('given some notifications', () => {
           })
           expect(response.errors).toBeUndefined()
           expect(response.data?.notifications).toHaveLength(2)
-          expect(
-            response.data?.notifications.every((n) => n.read === true),
-          ).toBe(true)
+          expect(response.data?.notifications.every((n) => n.read === true)).toBe(true)
         })
       })
 
