@@ -94,5 +94,52 @@ describe('SocialMedia.vue', () => {
         expect(favicon.attributes('src')).toEqual('https://www.youtube.com/favicon.ico')
       })
     })
+
+    describe('social media links with trailing slash', () => {
+      let wrapper
+
+      beforeEach(() => {
+        propsData.userName = 'Jenny Rostock'
+        propsData.user = {
+          socialMedia: [
+            {
+              id: 'ee1e8ed6-fbef-4bcf-b411-a12926f2ea1e',
+              url: 'https://www.instagram.com/nimitbhargava/',
+              __typename: 'SocialMedia',
+            },
+          ],
+        }
+        wrapper = Wrapper()
+      })
+
+      it('strips trailing slash and shows the username', () => {
+        const link = wrapper.findAll('a').at(0)
+        expect(link.text()).toContain('nimitbhargava')
+      })
+    })
+
+    describe('social media link that is just a domain with www', () => {
+      let wrapper
+
+      beforeEach(() => {
+        propsData.userName = 'Jenny Rostock'
+        propsData.user = {
+          socialMedia: [
+            {
+              id: 'ee1e8ed6-fbef-4bcf-b411-a12926f2ea1e',
+              url: 'https://www.example.com/',
+              __typename: 'SocialMedia',
+            },
+          ],
+        }
+        wrapper = Wrapper()
+      })
+
+      it('strips leading www. from the displayed label', () => {
+        const link = wrapper.findAll('a').at(0)
+        expect(link.text()).toContain('example.com')
+        expect(link.text()).not.toContain('www.')
+      })
+    })
   })
 })
