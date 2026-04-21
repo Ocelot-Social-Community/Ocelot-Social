@@ -92,6 +92,7 @@ export default {
       isDraggingFromHex: false,
       isProcessingDrop: false,
       emptyReserveDragOver: false,
+      dragSupported: false,
     }
   },
   computed: {
@@ -108,8 +109,8 @@ export default {
       return this.selectedBadges[this.selectedBadgeIndex]?.isDefault ?? false
     },
   },
-  created() {
-    this.userBadges = [...(this.currentUser.badgeTrophiesSelected || [])]
+  mounted() {
+    // Client-only: must not run during SSR to avoid hydration mismatch on drag-related v-ifs
     this.dragSupported = this.detectDragSupport()
   },
   methods: {
@@ -217,11 +218,15 @@ export default {
           slot,
         },
         update: (_, { data: { setTrophyBadgeSelected } }) => {
+          if (!setTrophyBadgeSelected) return
           const { badgeTrophiesSelected, badgeTrophiesUnused } = setTrophyBadgeSelected
-          this.setCurrentUser({
-            ...this.currentUser,
-            badgeTrophiesSelected,
-            badgeTrophiesUnused,
+          // Defer commit so re-render does not collide with the active native drag event cycle
+          this.$nextTick(() => {
+            this.setCurrentUser({
+              ...this.currentUser,
+              badgeTrophiesSelected,
+              badgeTrophiesUnused,
+            })
           })
         },
       })
