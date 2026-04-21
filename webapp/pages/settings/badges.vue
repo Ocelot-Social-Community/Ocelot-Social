@@ -217,11 +217,19 @@ export default {
           slot,
         },
         update: (_, { data: { setTrophyBadgeSelected } }) => {
+          if (!setTrophyBadgeSelected) return
           const { badgeTrophiesSelected, badgeTrophiesUnused } = setTrophyBadgeSelected
-          this.setCurrentUser({
-            ...this.currentUser,
-            badgeTrophiesSelected,
-            badgeTrophiesUnused,
+          // Defer Vuex commit to next tick so the re-render does not collide
+          // with the still-active native drag/drop event cycle — otherwise
+          // Vue patches the vDOM against a DOM that the browser is still
+          // holding for the drag source, which corrupts the patch tree and
+          // causes HierarchyRequestError on subsequent updates.
+          this.$nextTick(() => {
+            this.setCurrentUser({
+              ...this.currentUser,
+              badgeTrophiesSelected,
+              badgeTrophiesUnused,
+            })
           })
         },
       })
