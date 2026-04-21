@@ -9,6 +9,7 @@ import markAllAsRead from '@graphql/queries/notifications/markAllAsRead.gql'
 import markAsRead from '@graphql/queries/notifications/markAsRead.gql'
 import markAsUnread from '@graphql/queries/notifications/markAsUnread.gql'
 import notifications from '@graphql/queries/notifications/notifications.gql'
+import notificationsPaginated from '@graphql/queries/notifications/notificationsPaginated.gql'
 import DeletePost from '@graphql/queries/posts/DeletePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
@@ -271,6 +272,67 @@ describe('given some notifications', () => {
               query({ query: notifications, variables: { ...variables, read: false } }),
             ).resolves.toMatchObject({ data: { notifications: [] }, errors: undefined })
           })
+        })
+      })
+
+      describe('filter for read: true', () => {
+        it('returns only already-read notifications', async () => {
+          const response = await query({
+            query: notifications,
+            variables: { ...variables, read: true },
+          })
+          expect(response.errors).toBeUndefined()
+          expect(response.data?.notifications).toHaveLength(2)
+          expect(
+            response.data?.notifications.every((n) => n.read === true),
+          ).toBe(true)
+        })
+      })
+
+      describe('orderBy updatedAt_asc / updatedAt_desc', () => {
+        // The fixtures don't set notification.updatedAt, so we can't assert a stable
+        // ordering — just exercise the ORDER BY branch and verify the query succeeds.
+        it('accepts updatedAt_asc and returns the full set', async () => {
+          const response = await query({
+            query: notifications,
+            variables: { orderBy: 'updatedAt_asc' },
+          })
+          expect(response.errors).toBeUndefined()
+          expect(response.data?.notifications).toHaveLength(4)
+        })
+
+        it('accepts updatedAt_desc and returns the full set', async () => {
+          const response = await query({
+            query: notifications,
+            variables: { orderBy: 'updatedAt_desc' },
+          })
+          expect(response.errors).toBeUndefined()
+          expect(response.data?.notifications).toHaveLength(4)
+        })
+      })
+
+      describe('pagination with first/offset', () => {
+        it('applies LIMIT when first is set', async () => {
+          const response = await query({
+            query: notificationsPaginated,
+            variables: { first: 1 },
+          })
+          expect(response.errors).toBeUndefined()
+          expect(response.data?.notifications).toHaveLength(1)
+        })
+
+        it('applies SKIP when offset is set', async () => {
+          const withoutOffset = await query({
+            query: notificationsPaginated,
+            variables: {},
+          })
+          const withOffset = await query({
+            query: notificationsPaginated,
+            variables: { offset: 1 },
+          })
+          expect(withOffset.data?.notifications).toHaveLength(
+            withoutOffset.data.notifications.length - 1,
+          )
         })
       })
     })
