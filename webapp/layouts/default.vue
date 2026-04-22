@@ -105,7 +105,9 @@ export default {
   position: fixed;
   bottom: 45px;
   right: 0;
-  z-index: 10000;
+  // Below the global tooltip/popover stack ($z-index-modal - 2 = 9997) so header
+  // dropdowns (avatar menu, notifications) remain clickable on top of the chat.
+  z-index: $z-index-overlay;
   .close {
     padding: 10px;
     color: blue;
