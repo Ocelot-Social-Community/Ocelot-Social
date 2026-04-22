@@ -268,6 +268,64 @@ describe('PostSlug', () => {
         expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
       })
 
+      it('still processes unread data when a prior cache-only update had none', async () => {
+        // Simulates Apollo `cache-and-network`: first update from cache is missing
+        // the unread fields; the subsequent network response carries them and MUST
+        // still trigger markAsRead.
+        wrapper = await Wrapper()
+        await wrapper.vm.handleUnreadNotifications({
+          id: 'post-42',
+          unreadNotificationByCurrentUser: null,
+          unreadCommentNotificationsByCurrentUser: [],
+        })
+        mocks.$apollo.mutate.mockClear()
+        await wrapper.vm.handleUnreadNotifications({
+          id: 'post-42',
+          unreadNotificationByCurrentUser: { id: 'mentioned_in_post/post-42/u1' },
+          unreadCommentNotificationsByCurrentUser: [],
+        })
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({ variables: { id: 'post-42' } }),
+        )
+      })
+
+      it('merges new unread comment ids across successive updates', async () => {
+        wrapper = await Wrapper()
+        const c1 = document.createElement('div')
+        c1.id = 'commentId-c1'
+        const c2 = document.createElement('div')
+        c2.id = 'commentId-c2'
+        document.body.appendChild(c1)
+        document.body.appendChild(c2)
+
+        await wrapper.vm.handleUnreadNotifications({
+          id: 'post-42',
+          unreadNotificationByCurrentUser: null,
+          unreadCommentNotificationsByCurrentUser: [
+            { id: 'n1', from: { __typename: 'Comment', id: 'c1' } },
+          ],
+        })
+        await Vue.nextTick()
+        expect(observe).toHaveBeenCalledWith(c1)
+        observe.mockClear()
+
+        // Second update (e.g. network after cache, or subscription) surfaces c2
+        await wrapper.vm.handleUnreadNotifications({
+          id: 'post-42',
+          unreadNotificationByCurrentUser: null,
+          unreadCommentNotificationsByCurrentUser: [
+            { id: 'n1', from: { __typename: 'Comment', id: 'c1' } },
+            { id: 'n2', from: { __typename: 'Comment', id: 'c2' } },
+          ],
+        })
+        await Vue.nextTick()
+        expect(observe).toHaveBeenCalledTimes(1)
+        expect(observe).toHaveBeenCalledWith(c2)
+
+        document.body.removeChild(c1)
+        document.body.removeChild(c2)
+      })
+
       it('sets up an IntersectionObserver when there are unread comment notifications', async () => {
         wrapper = await Wrapper()
         // Render a DOM element matching one of the unread comment ids

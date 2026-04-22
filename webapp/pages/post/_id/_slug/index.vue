@@ -416,45 +416,49 @@ export default {
       this.$toast.success(this.$t('post.comment.joinGroup', { name: this.post.group.name }))
     },
     handleUnreadNotifications(post) {
-      // Run once per post visit: post.id is the key
-      if (!post?.id || this._autoMarkedForPostId === post.id) return
-      this._autoMarkedForPostId = post.id
+      if (!post?.id) return
 
-      // Post-level notification → the post is visible by being on this page
-      if (post.unreadNotificationByCurrentUser) {
+      // Post-level: mark once per post visit, only when unread data is actually present.
+      // Guarding on the data (not just post.id) prevents an early cache-only update()
+      // from locking the handler before the network response with real unread data arrives.
+      if (post.unreadNotificationByCurrentUser && this._autoMarkedForPostId !== post.id) {
+        this._autoMarkedForPostId = post.id
         this.markNotificationAsRead(post.id)
       }
 
-      // Collect comment IDs with unread notifications
-      const commentIds = (post.unreadCommentNotificationsByCurrentUser || [])
+      // Comments: merge new IDs across updates. Later responses (cache → network,
+      // subscription, refetch) may surface comments the earlier response missed.
+      const incomingIds = (post.unreadCommentNotificationsByCurrentUser || [])
         .map((n) => n.from?.id)
         .filter(Boolean)
-      this._unreadCommentIds = new Set(commentIds)
-      if (this._unreadCommentIds.size === 0) return
+      const newIds = incomingIds.filter((id) => !this._unreadCommentIds.has(id))
+      if (newIds.length === 0) return
+      newIds.forEach((id) => this._unreadCommentIds.add(id))
 
-      this.$nextTick(() => this.setupUnreadCommentObserver())
+      this.$nextTick(() => this.setupUnreadCommentObserver(newIds))
     },
-    setupUnreadCommentObserver() {
-      if (this._unreadCommentObserver || this._unreadCommentIds.size === 0) return
+    setupUnreadCommentObserver(idsToObserve) {
       if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return
 
-      this._unreadCommentObserver = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (!entry.isIntersecting) continue
-            const commentId = entry.target.dataset.unreadCommentId
-            if (!commentId || !this._unreadCommentIds.has(commentId)) continue
-            this._unreadCommentIds.delete(commentId)
-            this._unreadCommentObserver.unobserve(entry.target)
-            this.markNotificationAsRead(commentId)
-          }
-        },
-        { threshold: 0.5 },
-      )
+      if (!this._unreadCommentObserver) {
+        this._unreadCommentObserver = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (!entry.isIntersecting) continue
+              const commentId = entry.target.dataset.unreadCommentId
+              if (!commentId || !this._unreadCommentIds.has(commentId)) continue
+              this._unreadCommentIds.delete(commentId)
+              this._unreadCommentObserver.unobserve(entry.target)
+              this.markNotificationAsRead(commentId)
+            }
+          },
+          { threshold: 0.5 },
+        )
+      }
 
-      for (const id of this._unreadCommentIds) {
+      for (const id of idsToObserve || this._unreadCommentIds) {
         const el = document.getElementById(`commentId-${id}`)
-        if (el) {
+        if (el && !el.dataset.unreadCommentId) {
           el.dataset.unreadCommentId = id
           this._unreadCommentObserver.observe(el)
         }
