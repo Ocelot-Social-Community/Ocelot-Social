@@ -22,14 +22,11 @@ import { createOrUpdateLocations } from './users/location'
 
 import type { Context } from '@src/context'
 
-// Builds the same NOTIFIED shape that the top-level `notifications` query returns.
-// Used by the Post.unreadNotificationByCurrentUser and
-// Post.unreadCommentNotificationsByCurrentUser field resolvers.
-const NOTIFIED_FOR_RESOURCE_CYPHER = `
-  MATCH (resource)-[notification:NOTIFIED {read: FALSE}]->(user:User {id: $userId})
-  WHERE resource.id IN $resourceIds
-    AND NOT coalesce(resource.deleted, false)
-    AND NOT coalesce(resource.disabled, false)
+// Shared projection that builds the same NOTIFIED shape the top-level `notifications`
+// query returns. Used by the Post.unreadNotificationByCurrentUser and
+// Post.unreadCommentNotificationsByCurrentUser field resolvers. Consumers must bind
+// `resource`, `notification` and `user` before embedding this suffix.
+const NOTIFICATION_PROJECTION_SUFFIX = `
   OPTIONAL MATCH (relatedUser:User { id: notification.relatedUserId })
   OPTIONAL MATCH (resource)<-[membership:MEMBER_OF]-(user)
   WITH user, notification, resource, membership, relatedUser,
@@ -51,6 +48,21 @@ const NOTIFIED_FOR_RESOURCE_CYPHER = `
     relatedUser: properties(relatedUser)
   } AS notification
   ORDER BY notification.createdAt DESC
+`
+
+const NOTIFIED_FOR_RESOURCE_CYPHER = `
+  MATCH (resource)-[notification:NOTIFIED {read: FALSE}]->(user:User {id: $userId})
+  WHERE resource.id IN $resourceIds
+    AND NOT coalesce(resource.deleted, false)
+    AND NOT coalesce(resource.disabled, false)
+  ${NOTIFICATION_PROJECTION_SUFFIX}
+`
+
+const NOTIFIED_COMMENTS_FOR_POST_CYPHER = `
+  MATCH (:Post {id: $postId})<-[:COMMENTS]-(resource:Comment)-[notification:NOTIFIED {read: FALSE}]->(user:User {id: $userId})
+  WHERE NOT coalesce(resource.deleted, false)
+    AND NOT coalesce(resource.disabled, false)
+  ${NOTIFICATION_PROJECTION_SUFFIX}
 `
 
 const maintainPinnedPosts = (params) => {
@@ -753,21 +765,10 @@ export default {
       if (!currentUserId || !parent?.id) return []
       const session = context.driver.session()
       try {
-        // Collect comment IDs for this post first, then reuse the shared NOTIFIED-building cypher
-        const commentIds = await session.readTransaction(async (transaction) => {
-          const r = await transaction.run(
-            `MATCH (:Post {id: $postId})<-[:COMMENTS]-(c:Comment)
-             WHERE NOT c.deleted = true AND NOT c.disabled = true
-             RETURN collect(c.id) AS ids`,
-            { postId: parent.id },
-          )
-          return (r.records[0]?.get('ids') as string[]) ?? []
-        })
-        if (commentIds.length === 0) return []
         const result = await session.readTransaction((transaction) =>
-          transaction.run(NOTIFIED_FOR_RESOURCE_CYPHER, {
+          transaction.run(NOTIFIED_COMMENTS_FOR_POST_CYPHER, {
             userId: currentUserId,
-            resourceIds: commentIds,
+            postId: parent.id,
           }),
         )
         return result.records.map((record) => record.get('notification'))
