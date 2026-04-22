@@ -390,13 +390,21 @@ describe('PostSlug', () => {
         global.IntersectionObserver = saved
       })
 
-      it('skips setup when the observer is already initialised', async () => {
+      it('reuses an existing observer instead of creating a new one', async () => {
         wrapper = await Wrapper()
-        wrapper.vm._unreadCommentObserver = { observe: jest.fn() }
+        const existingObserver = { observe: jest.fn() }
+        wrapper.vm._unreadCommentObserver = existingObserver
         wrapper.vm._unreadCommentIds = new Set(['c1'])
-        wrapper.vm.setupUnreadCommentObserver()
-        // The guard returns early; the mock observer instance is untouched
-        expect(wrapper.vm._unreadCommentObserver.observe).not.toHaveBeenCalled()
+        const el = document.createElement('div')
+        el.id = 'commentId-c1'
+        document.body.appendChild(el)
+
+        wrapper.vm.setupUnreadCommentObserver(['c1'])
+
+        // Same observer instance, observe called on THAT mock (not a freshly-created one)
+        expect(wrapper.vm._unreadCommentObserver).toBe(existingObserver)
+        expect(existingObserver.observe).toHaveBeenCalledWith(el)
+        document.body.removeChild(el)
       })
 
       it('ignores entries whose element was not registered as unread', async () => {
