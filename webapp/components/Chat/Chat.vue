@@ -9,7 +9,7 @@
     :message-actions="EMPTY_ACTIONS"
     :messages="JSON.stringify(messages)"
     :messages-loaded="messagesLoaded"
-    :rooms="JSON.stringify(rooms)"
+    :rooms="JSON.stringify(displayedRooms)"
     :room-actions="EMPTY_ACTIONS"
     :rooms-loaded="roomsLoaded"
     :loading-rooms="loadingRooms"
@@ -277,6 +277,12 @@ export default {
     },
     groupRooms() {
       return this.rooms.filter((r) => r.isGroupRoom)
+    },
+    displayedRooms() {
+      // Cap unreadCount at "99+" for display; internal state stays numeric for arithmetic
+      return this.rooms.map((r) =>
+        typeof r.unreadCount === 'number' && r.unreadCount > 99 ? { ...r, unreadCount: '99+' } : r,
+      )
     },
     selectedRoomProfile() {
       if (!this.selectedRoom) return null

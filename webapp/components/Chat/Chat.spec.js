@@ -120,6 +120,31 @@ describe('Chat.vue', () => {
     })
   }
 
+  describe('displayedRooms', () => {
+    beforeEach(() => {
+      wrapper = Wrapper()
+    })
+
+    it('passes through unreadCount <= 99 unchanged', () => {
+      wrapper.vm.rooms = [mockRoom({ unreadCount: 0 }), mockRoom({ id: 'r2', unreadCount: 99 })]
+      expect(wrapper.vm.displayedRooms[0].unreadCount).toBe(0)
+      expect(wrapper.vm.displayedRooms[1].unreadCount).toBe(99)
+    })
+
+    it('caps unreadCount > 99 to "99+"', () => {
+      wrapper.vm.rooms = [mockRoom({ unreadCount: 100 }), mockRoom({ id: 'r2', unreadCount: 9999 })]
+      expect(wrapper.vm.displayedRooms[0].unreadCount).toBe('99+')
+      expect(wrapper.vm.displayedRooms[1].unreadCount).toBe('99+')
+    })
+
+    it('leaves the underlying rooms array unmodified', () => {
+      wrapper.vm.rooms = [mockRoom({ unreadCount: 150 })]
+      // Trigger the computed getter to ensure it doesn't mutate `rooms`
+      expect(wrapper.vm.displayedRooms).toBeDefined()
+      expect(wrapper.vm.rooms[0].unreadCount).toBe(150)
+    })
+  })
+
   describe('mount', () => {
     it('renders without errors', () => {
       wrapper = Wrapper()
