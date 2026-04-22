@@ -22,6 +22,8 @@ describe('NotificationsTable.vue', () => {
       'client-only': true,
     }
     propsData = {}
+    postNotification.read = false
+    commentNotification.read = false
   })
 
   describe('mount', () => {
