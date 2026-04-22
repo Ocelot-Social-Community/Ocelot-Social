@@ -7,6 +7,7 @@ import { post } from './fragments/post'
 import { comment } from './fragments/comment'
 import { group } from './fragments/group'
 import { imageUrls } from './fragments/imageUrls'
+import { notificationMutationResponse } from './fragments/notification'
 
 export const profileUserQuery = (i18n) => {
   const lang = i18n.locale().toUpperCase()
@@ -177,39 +178,11 @@ export const notificationQuery = () => {
 
 export const markAsReadMutation = (_i18n) => {
   return gql`
-    ${user}
-    ${comment}
-    ${post}
-    ${group}
+    ${notificationMutationResponse}
 
     mutation ($id: ID!) {
       markAsRead(id: $id) {
-        id
-        read
-        reason
-        createdAt
-        updatedAt
-        from {
-          __typename
-          ... on Post {
-            ...post
-            author {
-              ...user
-            }
-          }
-          ... on Comment {
-            ...comment
-            post {
-              ...post
-              author {
-                ...user
-              }
-            }
-          }
-          ... on Group {
-            ...group
-          }
-        }
+        ...notificationMutationResponse
       }
     }
   `
@@ -217,39 +190,11 @@ export const markAsReadMutation = (_i18n) => {
 
 export const markAsUnreadMutation = (_i18n) => {
   return gql`
-    ${user}
-    ${comment}
-    ${post}
-    ${group}
+    ${notificationMutationResponse}
 
     mutation ($id: ID!) {
       markAsUnread(id: $id) {
-        id
-        read
-        reason
-        createdAt
-        updatedAt
-        from {
-          __typename
-          ... on Post {
-            ...post
-            author {
-              ...user
-            }
-          }
-          ... on Comment {
-            ...comment
-            post {
-              ...post
-              author {
-                ...user
-              }
-            }
-          }
-          ... on Group {
-            ...group
-          }
-        }
+        ...notificationMutationResponse
       }
     }
   `
@@ -257,39 +202,11 @@ export const markAsUnreadMutation = (_i18n) => {
 
 export const markAllAsReadMutation = (_i18n) => {
   return gql`
-    ${user}
-    ${comment}
-    ${post}
-    ${group}
+    ${notificationMutationResponse}
 
     mutation {
       markAllAsRead {
-        id
-        read
-        reason
-        createdAt
-        updatedAt
-        from {
-          __typename
-          ... on Post {
-            ...post
-            author {
-              ...user
-            }
-          }
-          ... on Comment {
-            ...comment
-            post {
-              ...post
-              author {
-                ...user
-              }
-            }
-          }
-          ... on Group {
-            ...group
-          }
-        }
+        ...notificationMutationResponse
       }
     }
   `
