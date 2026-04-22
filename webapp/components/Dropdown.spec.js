@@ -334,19 +334,6 @@ describe('Dropdown.vue', () => {
   })
 
   describe('popperOptions', () => {
-    it('uses viewport as the overflow boundary', () => {
-      wrapper = Wrapper()
-      expect(wrapper.vm.popperOptions.modifiers.preventOverflow.boundariesElement).toBe('viewport')
-    })
-
-    it('derives padding from the current scrollbar width', () => {
-      wrapper = Wrapper()
-      // jsdom reports innerWidth and clientWidth identically (no scrollbar), so width is 0
-      expect(wrapper.vm.popperOptions.modifiers.preventOverflow.padding).toBe(
-        wrapper.vm.scrollbarPadding,
-      )
-    })
-
     const mockWidths = ({ inner, client }) => {
       const innerDesc = Object.getOwnPropertyDescriptor(window, 'innerWidth')
       const clientDesc = Object.getOwnPropertyDescriptor(
@@ -372,18 +359,49 @@ describe('Dropdown.vue', () => {
       }
     }
 
-    it('clamps negative differences to 0', () => {
-      const restore = mockWidths({ inner: 100, client: 120 })
+    it('uses viewport as the overflow boundary', () => {
       wrapper = Wrapper()
-      expect(wrapper.vm.scrollbarPadding).toBe(0)
+      expect(wrapper.vm.popperOptions.modifiers.preventOverflow.boundariesElement).toBe('viewport')
+    })
+
+    it('derives padding from the current scrollbar width', () => {
+      wrapper = Wrapper()
+      expect(wrapper.vm.popperOptions.modifiers.preventOverflow.padding).toBe(
+        wrapper.vm.scrollbarWidth,
+      )
+    })
+
+    it('measures the scrollbar width on mount', () => {
+      const restore = mockWidths({ inner: 1024, client: 1007 })
+      wrapper = Wrapper()
+      expect(wrapper.vm.scrollbarWidth).toBe(17)
       restore()
     })
 
-    it('reports the scrollbar width when innerWidth exceeds clientWidth', () => {
-      const restore = mockWidths({ inner: 1024, client: 1007 })
+    it('clamps negative differences to 0', () => {
+      const restore = mockWidths({ inner: 100, client: 120 })
       wrapper = Wrapper()
-      expect(wrapper.vm.scrollbarPadding).toBe(17)
+      expect(wrapper.vm.scrollbarWidth).toBe(0)
       restore()
+    })
+
+    it('re-measures the scrollbar width on window resize and invalidates popperOptions', async () => {
+      wrapper = Wrapper()
+      const restore = mockWidths({ inner: 1024, client: 1007 })
+      window.dispatchEvent(new Event('resize'))
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.scrollbarWidth).toBe(17)
+      expect(wrapper.vm.popperOptions.modifiers.preventOverflow.padding).toBe(17)
+      restore()
+    })
+
+    it('removes the resize listener on destroy', () => {
+      wrapper = Wrapper()
+      const removeSpy = jest.spyOn(window, 'removeEventListener')
+      wrapper.destroy()
+      wrapper = null
+      expect(removeSpy).toHaveBeenCalledWith('resize', expect.any(Function))
+      removeSpy.mockRestore()
     })
   })
 })
