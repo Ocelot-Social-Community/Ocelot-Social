@@ -431,13 +431,15 @@ export default {
       const incomingIds = (post.unreadCommentNotificationsByCurrentUser || [])
         .map((n) => n.from?.id)
         .filter(Boolean)
-      const newIds = incomingIds.filter((id) => !this._unreadCommentIds.has(id))
-      if (newIds.length === 0) return
-      newIds.forEach((id) => this._unreadCommentIds.add(id))
+      incomingIds.forEach((id) => this._unreadCommentIds.add(id))
+      if (this._unreadCommentIds.size === 0) return
 
-      this.$nextTick(() => this.setupUnreadCommentObserver(newIds))
+      // Always sweep on every update: the comment DOM may render on a later tick
+      // than the unread data arrives (child-component cycles, cache → network etc.),
+      // so we can't rely on `newIds` alone to trigger observation.
+      this.$nextTick(() => this.setupUnreadCommentObserver())
     },
-    setupUnreadCommentObserver(idsToObserve) {
+    setupUnreadCommentObserver() {
       if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return
 
       if (!this._unreadCommentObserver) {
@@ -456,7 +458,9 @@ export default {
         )
       }
 
-      for (const id of idsToObserve || this._unreadCommentIds) {
+      // Idempotent sweep: observe any element whose DOM has appeared since last call.
+      // The dataset.unreadCommentId marker prevents double-observation.
+      for (const id of this._unreadCommentIds) {
         const el = document.getElementById(`commentId-${id}`)
         if (el && !el.dataset.unreadCommentId) {
           el.dataset.unreadCommentId = id

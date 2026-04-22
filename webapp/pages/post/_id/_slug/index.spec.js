@@ -326,6 +326,42 @@ describe('PostSlug', () => {
         document.body.removeChild(c2)
       })
 
+      it('observes elements that render after the unread data arrived', async () => {
+        // Regression: if the comment DOM is not yet rendered when
+        // handleUnreadNotifications runs, the id must still get observed on a
+        // later sweep (e.g. when the same ids reappear in a follow-up update).
+        wrapper = await Wrapper()
+        await wrapper.vm.handleUnreadNotifications({
+          id: 'post-42',
+          unreadNotificationByCurrentUser: null,
+          unreadCommentNotificationsByCurrentUser: [
+            { id: 'n1', from: { __typename: 'Comment', id: 'c1' } },
+          ],
+        })
+        await Vue.nextTick()
+        // First sweep: no DOM element yet → observe not called
+        expect(observe).not.toHaveBeenCalled()
+
+        // DOM element appears later (child component finishes rendering, network
+        // response lands, etc.)
+        const el = document.createElement('div')
+        el.id = 'commentId-c1'
+        document.body.appendChild(el)
+
+        // Subsequent update with the same ids — must trigger a fresh DOM sweep
+        // that picks up the now-rendered element.
+        await wrapper.vm.handleUnreadNotifications({
+          id: 'post-42',
+          unreadNotificationByCurrentUser: null,
+          unreadCommentNotificationsByCurrentUser: [
+            { id: 'n1', from: { __typename: 'Comment', id: 'c1' } },
+          ],
+        })
+        await Vue.nextTick()
+        expect(observe).toHaveBeenCalledWith(el)
+        document.body.removeChild(el)
+      })
+
       it('sets up an IntersectionObserver when there are unread comment notifications', async () => {
         wrapper = await Wrapper()
         // Render a DOM element matching one of the unread comment ids
@@ -399,7 +435,7 @@ describe('PostSlug', () => {
         el.id = 'commentId-c1'
         document.body.appendChild(el)
 
-        wrapper.vm.setupUnreadCommentObserver(['c1'])
+        wrapper.vm.setupUnreadCommentObserver()
 
         // Same observer instance, observe called on THAT mock (not a freshly-created one)
         expect(wrapper.vm._unreadCommentObserver).toBe(existingObserver)
