@@ -10,8 +10,7 @@ localVue.filter('truncate', (string) => string)
 
 describe('NotificationsTable.vue', () => {
   let wrapper, mocks, propsData, stubs
-  const postNotification = notifications[0]
-  const commentNotification = notifications[1]
+  let postNotification, commentNotification
 
   beforeEach(() => {
     mocks = {
@@ -22,8 +21,10 @@ describe('NotificationsTable.vue', () => {
       'client-only': true,
     }
     propsData = {}
-    postNotification.read = false
-    commentNotification.read = false
+    // Deep-clone per test so in-test mutations (`postNotification.read = ...`)
+    // never leak into the shared module-level fixture.
+    postNotification = JSON.parse(JSON.stringify(notifications[0]))
+    commentNotification = JSON.parse(JSON.stringify(notifications[1]))
   })
 
   describe('mount', () => {
@@ -57,7 +58,7 @@ describe('NotificationsTable.vue', () => {
 
     describe('given notifications', () => {
       beforeEach(() => {
-        propsData.notifications = notifications
+        propsData.notifications = [postNotification, commentNotification]
         wrapper = Wrapper()
       })
 
