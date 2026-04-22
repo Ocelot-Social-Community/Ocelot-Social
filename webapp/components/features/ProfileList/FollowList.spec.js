@@ -155,7 +155,8 @@ describe('FollowList.vue', () => {
       describe('with duplicate connections', () => {
         it('deduplicates by id so Vue does not warn about duplicate keys', () => {
           const [a, b] = helpers.fakeUser(2)
-          const dupUser = { ...user, followedBy: [a, b, a], followedByCount: 3 }
+          const aClone = { ...a }
+          const dupUser = { ...user, followedBy: [a, b, aClone], followedByCount: 3 }
           const wrapper = Wrapper({ user: dupUser, type: 'followedBy' })
           expect(wrapper.findAll('.user-teaser')).toHaveLength(2)
         })
