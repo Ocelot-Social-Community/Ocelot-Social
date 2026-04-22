@@ -896,6 +896,8 @@
     },
     "group": "Opis",
     "markAllAsRead": "Oznacz wszystkie jako przeczytane",
+    "markAsRead": "Oznacz jako przeczytane",
+    "markAsUnread": "Oznacz jako nieprzeczytane",
     "pageLink": "Wszystkie powiadomienia",
     "post": "Wpis lub grupa",
     "reason": {

@@ -896,6 +896,8 @@
     },
     "group": "Beschrijving",
     "markAllAsRead": "Markeer alles als gelezen",
+    "markAsRead": "Markeer als gelezen",
+    "markAsUnread": "Markeer als ongelezen",
     "pageLink": "Alle notificaties",
     "post": "Bericht of groep",
     "reason": {

@@ -896,6 +896,8 @@
     },
     "group": "Përshkrimi",
     "markAllAsRead": "Shëno të gjitha si të lexuara",
+    "markAsRead": "Shëno si të lexuar",
+    "markAsUnread": "Shëno si të palexuar",
     "pageLink": "Të gjitha njoftimet",
     "post": "Postim ose grup",
     "reason": {
