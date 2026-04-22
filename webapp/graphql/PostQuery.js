@@ -47,6 +47,18 @@ export default (i18n) => {
             ...badges
           }
         }
+        unreadNotificationByCurrentUser {
+          id
+        }
+        unreadCommentNotificationsByCurrentUser {
+          id
+          from {
+            __typename
+            ... on Comment {
+              id
+            }
+          }
+        }
       }
     }
   `

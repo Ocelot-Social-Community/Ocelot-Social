@@ -6,6 +6,8 @@
     :disabled="disabled"
     trigger="manual"
     :offset="offset"
+    boundaries-element="viewport"
+    :popper-options="popperOptions"
     @auto-hide="isPopoverOpen = false"
   >
     <slot :toggleMenu="toggleMenu" :openMenu="openMenu" :closeMenu="closeMenu" :isOpen="isOpen" />
@@ -35,11 +37,24 @@ export default {
   data() {
     return {
       isPopoverOpen: false,
+      // Reactive so Vue invalidates `popperOptions` when the scrollbar width
+      // actually changes (resize, content-driven scrollbar appear/disappear).
+      scrollbarWidth: 0,
     }
   },
   computed: {
     isOpen() {
       return this.isPopoverOpen
+    },
+    popperOptions() {
+      return {
+        modifiers: {
+          preventOverflow: {
+            boundariesElement: 'viewport',
+            padding: this.scrollbarWidth,
+          },
+        },
+      }
     },
   },
   watch: {
@@ -56,10 +71,17 @@ export default {
       },
     },
   },
+  mounted() {
+    this.measureScrollbar()
+    window.addEventListener('resize', this.measureScrollbar)
+  },
   beforeDestroy() {
     clearTimeout(mouseEnterTimer)
     clearTimeout(mouseLeaveTimer)
     this.removeOverlayClickHandler()
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('resize', this.measureScrollbar)
+    }
     if (this.isPopoverOpen) {
       this.isPopoverOpen = false
       if (typeof document !== 'undefined') {
@@ -68,6 +90,13 @@ export default {
     }
   },
   methods: {
+    measureScrollbar() {
+      if (typeof window === 'undefined') return
+      // window.innerWidth includes the scrollbar, clientWidth excludes it.
+      // The difference is the actual scrollbar width for the user's device/browser.
+      const width = window.innerWidth - document.documentElement.clientWidth
+      this.scrollbarWidth = width > 0 ? width : 0
+    },
     toggleMenu() {
       this.isPopoverOpen ? this.closeMenu(false) : this.openMenu(false)
     },

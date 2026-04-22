@@ -1,0 +1,27 @@
+query PostUnreadNotifications($id: ID!) {
+  Post(id: $id) {
+    id
+    unreadNotificationByCurrentUser {
+      id
+      reason
+      read
+      from {
+        __typename
+        ... on Post {
+          id
+        }
+      }
+    }
+    unreadCommentNotificationsByCurrentUser {
+      id
+      reason
+      read
+      from {
+        __typename
+        ... on Comment {
+          id
+        }
+      }
+    }
+  }
+}

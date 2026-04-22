@@ -22,6 +22,49 @@ import { createOrUpdateLocations } from './users/location'
 
 import type { Context } from '@src/context'
 
+// Shared projection that builds the same NOTIFIED shape the top-level `notifications`
+// query returns. Used by the Post.unreadNotificationByCurrentUser and
+// Post.unreadCommentNotificationsByCurrentUser field resolvers. Consumers must bind
+// `resource`, `notification` and `user` before embedding this suffix.
+const NOTIFICATION_PROJECTION_SUFFIX = `
+  OPTIONAL MATCH (relatedUser:User { id: notification.relatedUserId })
+  OPTIONAL MATCH (resource)<-[membership:MEMBER_OF]-(user)
+  WITH user, notification, resource, membership, relatedUser,
+    [(resource)<-[:WROTE]-(author:User) | author {.*}] AS authors,
+    [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User)
+      | post {.*, author: properties(author),
+              postType: [l IN labels(post) WHERE NOT l = 'Post']}
+    ] AS posts
+  WITH user, notification, relatedUser,
+    resource {.*,
+      __typename: [l IN labels(resource) WHERE l IN ['Post', 'Comment', 'Group']][0],
+      author: authors[0],
+      post: posts[0],
+      myRole: membership.role
+    } AS finalResource
+  RETURN notification {.*,
+    from: finalResource,
+    to: properties(user),
+    relatedUser: properties(relatedUser)
+  } AS notification
+  ORDER BY notification.createdAt DESC
+`
+
+const NOTIFIED_FOR_RESOURCE_CYPHER = `
+  MATCH (resource)-[notification:NOTIFIED {read: FALSE}]->(user:User {id: $userId})
+  WHERE resource.id IN $resourceIds
+    AND NOT coalesce(resource.deleted, false)
+    AND NOT coalesce(resource.disabled, false)
+  ${NOTIFICATION_PROJECTION_SUFFIX}
+`
+
+const NOTIFIED_COMMENTS_FOR_POST_CYPHER = `
+  MATCH (:Post {id: $postId})<-[:COMMENTS]-(resource:Comment)-[notification:NOTIFIED {read: FALSE}]->(user:User {id: $userId})
+  WHERE NOT coalesce(resource.deleted, false)
+    AND NOT coalesce(resource.disabled, false)
+  ${NOTIFICATION_PROJECTION_SUFFIX}
+`
+
 const maintainPinnedPosts = (params) => {
   const pinnedPostFilter = { pinned: true }
   if (isEmpty(params.filter)) {
@@ -695,6 +738,44 @@ export default {
         ).records.length === 1
       )
     }, */
+    unreadNotificationByCurrentUser: async (parent, _params, context: Context, _resolveInfo) => {
+      const currentUserId = context.user?.id
+      if (!currentUserId || !parent?.id) return null
+      const session = context.driver.session()
+      try {
+        const result = await session.readTransaction((transaction) =>
+          transaction.run(NOTIFIED_FOR_RESOURCE_CYPHER, {
+            userId: currentUserId,
+            resourceIds: [parent.id],
+          }),
+        )
+        const notifications = result.records.map((record) => record.get('notification'))
+        return notifications[0] ?? null
+      } finally {
+        await session.close()
+      }
+    },
+    unreadCommentNotificationsByCurrentUser: async (
+      parent,
+      _params,
+      context: Context,
+      _resolveInfo,
+    ) => {
+      const currentUserId = context.user?.id
+      if (!currentUserId || !parent?.id) return []
+      const session = context.driver.session()
+      try {
+        const result = await session.readTransaction((transaction) =>
+          transaction.run(NOTIFIED_COMMENTS_FOR_POST_CYPHER, {
+            userId: currentUserId,
+            postId: parent.id,
+          }),
+        )
+        return result.records.map((record) => record.get('notification'))
+      } finally {
+        await session.close()
+      }
+    },
     relatedContributions: async (parent, _params, context, _resolveInfo) => {
       if (typeof parent.relatedContributions !== 'undefined') return parent.relatedContributions
       const { id } = parent

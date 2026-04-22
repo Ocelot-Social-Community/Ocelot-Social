@@ -10,8 +10,7 @@ localVue.filter('truncate', (string) => string)
 
 describe('NotificationsTable.vue', () => {
   let wrapper, mocks, propsData, stubs
-  const postNotification = notifications[0]
-  const commentNotification = notifications[1]
+  let postNotification, commentNotification
 
   beforeEach(() => {
     mocks = {
@@ -22,6 +21,10 @@ describe('NotificationsTable.vue', () => {
       'client-only': true,
     }
     propsData = {}
+    // Deep-clone per test so in-test mutations (`postNotification.read = ...`)
+    // never leak into the shared module-level fixture.
+    postNotification = JSON.parse(JSON.stringify(notifications[0]))
+    commentNotification = JSON.parse(JSON.stringify(notifications[1]))
   })
 
   describe('mount', () => {
@@ -55,7 +58,7 @@ describe('NotificationsTable.vue', () => {
 
     describe('given notifications', () => {
       beforeEach(() => {
-        propsData.notifications = notifications
+        propsData.notifications = [postNotification, commentNotification]
         wrapper = Wrapper()
       })
 
@@ -175,6 +178,68 @@ describe('NotificationsTable.vue', () => {
           postNotification.read = true
           wrapper = Wrapper()
           expect(wrapper.find('.notification-status').exists()).toBe(true)
+        })
+      })
+
+      describe('read/unread toggle button', () => {
+        it('is hidden by default (prop-gated)', () => {
+          postNotification.read = false
+          wrapper = Wrapper()
+          const row = wrapper.findAll('.notification-grid-row').at(0)
+          expect(row.find('[data-test="toggle-mark-as-read"]').exists()).toBe(false)
+          expect(row.find('[data-test="toggle-mark-as-unread"]').exists()).toBe(false)
+        })
+
+        describe('with show-read-toggle enabled (full-page list)', () => {
+          beforeEach(() => {
+            propsData.showReadToggle = true
+          })
+
+          it('shows the "mark as read" variant for unread notifications', () => {
+            postNotification.read = false
+            wrapper = Wrapper()
+            const row = wrapper.findAll('.notification-grid-row').at(0)
+            expect(row.find('[data-test="toggle-mark-as-read"]').exists()).toBe(true)
+            expect(row.find('[data-test="toggle-mark-as-unread"]').exists()).toBe(false)
+          })
+
+          it('shows the "mark as unread" variant for read notifications', () => {
+            postNotification.read = true
+            wrapper = Wrapper()
+            const row = wrapper.findAll('.notification-grid-row').at(0)
+            expect(row.find('[data-test="toggle-mark-as-unread"]').exists()).toBe(true)
+            expect(row.find('[data-test="toggle-mark-as-read"]').exists()).toBe(false)
+          })
+
+          it('emits `toggleNotificationRead` with the resource id and current read state', () => {
+            postNotification.read = false
+            wrapper = Wrapper()
+            const row = wrapper.findAll('.notification-grid-row').at(0)
+            row.find('[data-test="toggle-mark-as-read"]').trigger('click')
+            expect(wrapper.emitted().toggleNotificationRead[0][0]).toEqual({
+              resourceId: postNotification.from.id,
+              read: false,
+            })
+          })
+
+          it('emits with read=true when toggling a read notification', () => {
+            postNotification.read = true
+            wrapper = Wrapper()
+            const row = wrapper.findAll('.notification-grid-row').at(0)
+            row.find('[data-test="toggle-mark-as-unread"]').trigger('click')
+            expect(wrapper.emitted().toggleNotificationRead[0][0]).toEqual({
+              resourceId: postNotification.from.id,
+              read: true,
+            })
+          })
+
+          it('does not navigate when toggle is clicked', () => {
+            postNotification.read = false
+            wrapper = Wrapper()
+            const row = wrapper.findAll('.notification-grid-row').at(0)
+            row.find('[data-test="toggle-mark-as-read"]').trigger('click')
+            expect(wrapper.emitted().markNotificationAsRead).toBeUndefined()
+          })
         })
       })
     })

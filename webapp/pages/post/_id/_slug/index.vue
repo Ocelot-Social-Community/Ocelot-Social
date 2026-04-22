@@ -212,6 +212,7 @@ import {
 import PostQuery from '~/graphql/PostQuery'
 import { groupQuery } from '~/graphql/groups'
 import PostMutations from '~/graphql/PostMutations'
+import { markAsReadMutation } from '~/graphql/User'
 import links from '~/constants/links.js'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 import postListActions from '~/mixins/postListActions'
@@ -244,6 +245,15 @@ export default {
     UserTeaser,
   },
   mixins: [GetCategories, postListActions, SortCategories],
+  beforeCreate() {
+    // Initialised before `created()` because Apollo `cache-and-network` can fire
+    // update() synchronously during SmartQuery launch, which runs before our
+    // `created()` hook. Accessing an uninitialised `_unreadCommentIds` would crash
+    // inside `handleUnreadNotifications()`.
+    this._autoMarkedForPostId = null
+    this._unreadCommentObserver = null
+    this._unreadCommentIds = new Set()
+  },
   created() {
     this.icons = iconRegistry
     const { toggleShout } = useShout({ apollo: this.$apollo })
@@ -277,6 +287,9 @@ export default {
       // will be fixed in a future update of the styleguide
       this.ready = true
     }, 50)
+  },
+  beforeDestroy() {
+    this._unreadCommentObserver?.disconnect()
   },
   computed: {
     routes() {
@@ -408,6 +421,72 @@ export default {
       this.$apollo.queries.Group.refetch()
       this.$toast.success(this.$t('post.comment.joinGroup', { name: this.post.group.name }))
     },
+    handleUnreadNotifications(post) {
+      if (!post?.id) return
+      // Lazy-init: Apollo `cache-and-network` can synchronously fire update() from
+      // SmartQuery launch before any Vue lifecycle hook runs for this component.
+      if (!this._unreadCommentIds) this._unreadCommentIds = new Set()
+
+      // Post-level: mark once per post visit, only when unread data is actually present.
+      // Guarding on the data (not just post.id) prevents an early cache-only update()
+      // from locking the handler before the network response with real unread data arrives.
+      if (post.unreadNotificationByCurrentUser && this._autoMarkedForPostId !== post.id) {
+        this._autoMarkedForPostId = post.id
+        this.markNotificationAsRead(post.id)
+      }
+
+      // Comments: merge new IDs across updates. Later responses (cache → network,
+      // subscription, refetch) may surface comments the earlier response missed.
+      const incomingIds = (post.unreadCommentNotificationsByCurrentUser || [])
+        .map((n) => n.from?.id)
+        .filter(Boolean)
+      incomingIds.forEach((id) => this._unreadCommentIds.add(id))
+      if (this._unreadCommentIds.size === 0) return
+
+      // Always sweep on every update: the comment DOM may render on a later tick
+      // than the unread data arrives (child-component cycles, cache → network etc.),
+      // so we can't rely on `newIds` alone to trigger observation.
+      this.$nextTick(() => this.setupUnreadCommentObserver())
+    },
+    setupUnreadCommentObserver() {
+      if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return
+
+      if (!this._unreadCommentObserver) {
+        this._unreadCommentObserver = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (!entry.isIntersecting) continue
+              const commentId = entry.target.dataset.unreadCommentId
+              if (!commentId || !this._unreadCommentIds.has(commentId)) continue
+              this._unreadCommentIds.delete(commentId)
+              this._unreadCommentObserver.unobserve(entry.target)
+              this.markNotificationAsRead(commentId)
+            }
+          },
+          { threshold: 0.5 },
+        )
+      }
+
+      // Idempotent sweep: observe any element whose DOM has appeared since last call.
+      // The dataset.unreadCommentId marker prevents double-observation.
+      for (const id of this._unreadCommentIds) {
+        const el = document.getElementById(`commentId-${id}`)
+        if (el && !el.dataset.unreadCommentId) {
+          el.dataset.unreadCommentId = id
+          this._unreadCommentObserver.observe(el)
+        }
+      }
+    },
+    async markNotificationAsRead(resourceId) {
+      try {
+        await this.$apollo.mutate({
+          mutation: markAsReadMutation(this.$i18n),
+          variables: { id: resourceId },
+        })
+      } catch (error) {
+        // Silent: auto-mark is best-effort. User can still navigate notifications manually.
+      }
+    },
   },
   apollo: {
     Post: {
@@ -427,6 +506,7 @@ export default {
         this.blurred = image && image.sensitive
         this.shouted = !!this.post.shoutedByCurrentUser
         this.shoutedCount = this.post.shoutedCount || 0
+        this.handleUnreadNotifications(this.post)
       },
       fetchPolicy: 'cache-and-network',
     },

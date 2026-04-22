@@ -34,7 +34,13 @@ export default {
       return this.user[`${this.type}Count`]
     },
     connections() {
-      return this.user[this.type]
+      const list = this.user[this.type] || []
+      const seen = new Set()
+      return list.filter((u) => {
+        if (!u || !u.id || seen.has(u.id)) return false
+        seen.add(u.id)
+        return true
+      })
     },
   },
 }
