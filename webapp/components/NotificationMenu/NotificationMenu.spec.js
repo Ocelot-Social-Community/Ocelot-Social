@@ -183,6 +183,11 @@ describe('NotificationMenu.vue', () => {
           }
         })
 
+        afterEach(() => {
+          if (wrapper) wrapper.destroy()
+          jest.useRealTimers()
+        })
+
         it('fires markAsRead when the toggle emits with read=false', async () => {
           wrapper = Wrapper()
           wrapper.findComponent(NotificationsTable).vm.$emit('toggleNotificationRead', {
