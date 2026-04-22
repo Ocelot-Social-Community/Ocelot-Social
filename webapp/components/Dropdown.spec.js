@@ -385,6 +385,5 @@ describe('Dropdown.vue', () => {
       expect(wrapper.vm.scrollbarPadding).toBe(17)
       restore()
     })
-
   })
 })
