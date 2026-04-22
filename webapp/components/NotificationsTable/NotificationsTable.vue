@@ -247,6 +247,10 @@ export default {
   .notification-read-toggle {
     flex-shrink: 0;
     align-self: flex-start;
+
+    .os-icon {
+      padding-right: 0;
+    }
   }
 }
 
