@@ -27,3 +27,25 @@ Feature: Notification for a mention
     Then I am on page "/post/.*/hey-matt"
     And the unread counter is removed
     And the notification menu button links to the all notifications page
+
+  Scenario: Visiting the post URL directly (email-link flow) clears the notification
+    # Arrange: wolle mentions matt in a post, which creates a NOTIFIED edge to matt
+    Given I am logged in as "wolle-aus-hamburg"
+    And I navigate to page "/post/create"
+    And I start to write a new post with the title "Hey Matt" beginning with:
+      """
+      Big shout to our fellow contributor
+      """
+    And mention "@matt-rider" in the text
+    And I click on "save button"
+    And I am on page "/post/.*/hey-matt"
+    And I remember the current post URL
+    # Act: matt logs in, sees the counter, and navigates DIRECTLY to the post URL —
+    # not via the dropdown, mirroring an email link click.
+    And I am logged in as "matt-rider"
+    And I navigate to page "/"
+    And see 1 unread notifications in the top menu
+    When I navigate directly to the remembered post URL
+    And I wait for 750 milliseconds
+    # Assert: the auto-mark-on-visit wiring cleared the notification
+    Then the unread counter is removed

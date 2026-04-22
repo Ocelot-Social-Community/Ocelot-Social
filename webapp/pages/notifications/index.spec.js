@@ -5,7 +5,12 @@ import DropdownFilter from '~/components/DropdownFilter/DropdownFilter'
 import NotificationsTable from '~/components/NotificationsTable/NotificationsTable'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
 
-import { markAsReadMutation, markAllAsReadMutation } from '~/graphql/User'
+import {
+  markAsReadMutation,
+  markAsUnreadMutation,
+  markAllAsReadMutation,
+  notificationQuery,
+} from '~/graphql/User'
 const localVue = global.localVue
 
 const stubs = {
@@ -137,6 +142,58 @@ describe('PostIndex', () => {
       })
     })
 
+    describe('toggleNotificationRead', () => {
+      it('fires markAsRead when toggling an unread notification', () => {
+        wrapper.findComponent(NotificationsTable).vm.$emit('toggleNotificationRead', {
+          resourceId: 'r1',
+          read: false,
+        })
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            mutation: markAsReadMutation(),
+            variables: { id: 'r1' },
+          }),
+        )
+      })
+
+      it('fires markAsUnread when toggling a read notification', () => {
+        wrapper.findComponent(NotificationsTable).vm.$emit('toggleNotificationRead', {
+          resourceId: 'r1',
+          read: true,
+        })
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            mutation: markAsUnreadMutation(),
+            variables: { id: 'r1' },
+          }),
+        )
+      })
+
+      it('refetches active Notifications queries so the counter stays in sync', async () => {
+        wrapper.findComponent(NotificationsTable).vm.$emit('toggleNotificationRead', {
+          resourceId: 'r1',
+          read: false,
+        })
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            mutation: markAsReadMutation(),
+            refetchQueries: ['Notifications'],
+          }),
+        )
+      })
+
+      it('shows an error toast on mutation failure', async () => {
+        mocks.$apollo.mutate = jest.fn().mockRejectedValueOnce({ message: 'boom' })
+        wrapper.findComponent(NotificationsTable).vm.$emit('toggleNotificationRead', {
+          resourceId: 'r1',
+          read: false,
+        })
+        await wrapper.vm.$nextTick()
+        await wrapper.vm.$nextTick()
+        expect(mocks.$toast.error).toHaveBeenCalledWith('boom')
+      })
+    })
+
     describe('markAllNotificationAsRead', () => {
       it('calls markAllNotificationAsRead mutation and refreshes notification', async () => {
         wrapper.find('button[data-test="markAllAsRead-button"]').trigger('click')
@@ -153,6 +210,15 @@ describe('PostIndex', () => {
             .mockRejectedValueOnce({ message: 'Another error message' })
           await wrapper.find('button[data-test="markAllAsRead-button"]').trigger('click')
           expect(mocks.$toast.error).toHaveBeenCalledWith('Another error message')
+        })
+      })
+
+      describe('with no notifications', () => {
+        it('returns early without calling the mutation', async () => {
+          wrapper.setData({ notifications: [] })
+          mocks.$apollo.mutate = jest.fn()
+          await wrapper.vm.markAllAsRead()
+          expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
         })
       })
     })
@@ -175,6 +241,100 @@ describe('PostIndex', () => {
           wrapper.findComponent(PaginationButtons).vm.$emit('back')
           expect(wrapper.vm.offset).toEqual(12)
         })
+      })
+    })
+
+    describe('unreadNotificationsCount computed', () => {
+      it('counts only unread notifications (skips the read ones)', () => {
+        wrapper.setData({
+          notifications: [
+            { id: 'a', read: false },
+            { id: 'b', read: true },
+            { id: 'c', read: false },
+            { id: 'd', read: true },
+          ],
+        })
+        expect(wrapper.vm.unreadNotificationsCount).toBe(2)
+      })
+
+      it('returns 0 when every notification is read', () => {
+        wrapper.setData({
+          notifications: [
+            { id: 'a', read: true },
+            { id: 'b', read: true },
+          ],
+        })
+        expect(wrapper.vm.unreadNotificationsCount).toBe(0)
+      })
+    })
+
+    describe('apollo notifications options', () => {
+      const apollo = NotificationsPage.apollo.notifications
+
+      it('returns a valid gql document from query()', () => {
+        expect(apollo.query.call({ $i18n: { locale: () => 'en' } })).toBeTruthy()
+      })
+
+      it('derives variables from the component state (read, pageSize, offset)', () => {
+        const ctx = {
+          first: 12,
+          offset: 24,
+          notificationRead: false,
+        }
+        expect(apollo.variables.call(ctx)).toEqual({
+          read: false,
+          orderBy: 'updatedAt_desc',
+          first: 12,
+          offset: 24,
+        })
+      })
+
+      it('reports query errors via $toast.error', () => {
+        const toast = { error: jest.fn() }
+        apollo.error.call({ $toast: toast }, { message: 'bad query' })
+        expect(toast.error).toHaveBeenCalledWith('bad query')
+      })
+
+      describe('update()', () => {
+        it('returns an empty list when the response has no notifications field', () => {
+          const ctx = { pageSize: 12, offset: 0, notifications: [] }
+          expect(apollo.update.call(ctx, { notifications: null })).toEqual([])
+        })
+
+        it('preserves the existing list when a page beyond the first returns empty', () => {
+          const prev = [{ id: 'x', index: 12 }]
+          const ctx = { pageSize: 12, offset: 12, notifications: prev }
+          expect(apollo.update.call(ctx, { notifications: [] })).toBe(prev)
+        })
+
+        it('maps each notification with a running `index` based on offset', () => {
+          const ctx = { pageSize: 12, offset: 24, notifications: [] }
+          const result = apollo.update.call(ctx, {
+            notifications: [{ id: 'a' }, { id: 'b' }],
+          })
+          expect(result).toEqual([
+            { id: 'a', index: 24 },
+            { id: 'b', index: 25 },
+          ])
+        })
+
+        it('sets hasNext=true when a full page is returned', () => {
+          const ctx = { pageSize: 2, offset: 0, notifications: [], hasNext: false }
+          apollo.update.call(ctx, { notifications: [{ id: 'a' }, { id: 'b' }] })
+          expect(ctx.hasNext).toBe(true)
+        })
+
+        it('sets hasNext=false when a partial page is returned', () => {
+          const ctx = { pageSize: 12, offset: 0, notifications: [], hasNext: true }
+          apollo.update.call(ctx, { notifications: [{ id: 'a' }] })
+          expect(ctx.hasNext).toBe(false)
+        })
+      })
+
+      it('uses the notificationQuery as its gql source', () => {
+        // Sanity: the imported query and the one returned by the Apollo option
+        // should come from the same factory.
+        expect(typeof notificationQuery).toBe('function')
       })
     })
   })

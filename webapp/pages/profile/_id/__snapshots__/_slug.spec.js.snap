@@ -37,6 +37,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
             >
               <v-popover-stub
                 autohide="true"
+                boundarieselement="viewport"
                 container="body"
                 delay="0"
                 handleresize="true"
@@ -729,6 +730,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
             >
               <v-popover-stub
                 autohide="true"
+                boundarieselement="viewport"
                 container="body"
                 delay="0"
                 handleresize="true"
@@ -1488,6 +1490,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
             >
               <v-popover-stub
                 autohide="true"
+                boundarieselement="viewport"
                 container="body"
                 delay="0"
                 handleresize="true"
@@ -2076,6 +2079,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
             >
               <v-popover-stub
                 autohide="true"
+                boundarieselement="viewport"
                 container="body"
                 delay="0"
                 handleresize="true"

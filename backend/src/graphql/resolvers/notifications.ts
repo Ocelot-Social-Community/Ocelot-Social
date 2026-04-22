@@ -8,6 +8,48 @@ import { withFilter } from 'graphql-subscriptions'
 
 import { NOTIFICATION_ADDED } from '@constants/subscriptions'
 
+const NOTIFICATION_PROJECTION = `
+  WITH user, notification, resource
+  OPTIONAL MATCH (relatedUser:User { id: notification.relatedUserId })
+  WITH user, notification, resource, relatedUser,
+  [(resource)<-[:WROTE]-(author:User) | author {.*}] AS authors,
+  [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post{.*, author: properties(author), postType: [l IN labels(post) WHERE NOT l = 'Post']} ] AS posts
+  OPTIONAL MATCH (resource)<-[membership:MEMBER_OF]-(user)
+  WITH resource, user, notification, authors, posts, membership, relatedUser,
+  resource {.*, __typename: [l IN labels(resource) WHERE l IN ['Post', 'Comment', 'Group']][0], author: authors[0], post: posts[0], myRole: membership.role} AS finalResource
+  RETURN notification {.*, from: finalResource, to: properties(user), relatedUser: properties(relatedUser)}
+`
+
+const setNotificationReadState = async (
+  context,
+  { resourceId, targetRead }: { resourceId?: string; targetRead: boolean },
+) => {
+  const { user: currentUser } = context
+  const session = context.driver.session()
+  const resourceFilter = resourceId ? '{id: $resourceId}' : ''
+  const fromState = targetRead ? 'FALSE' : 'TRUE'
+  const toState = targetRead ? 'TRUE' : 'FALSE'
+  const params: Record<string, string> = { id: currentUser.id }
+  if (resourceId) params.resourceId = resourceId
+
+  const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+    const response = await transaction.run(
+      `
+        MATCH (resource ${resourceFilter})-[notification:NOTIFIED {read: ${fromState}}]->(user:User {id:$id})
+        SET notification.read = ${toState}
+        ${NOTIFICATION_PROJECTION}
+      `,
+      params,
+    )
+    return response.records.map((record) => record.get('notification'))
+  })
+  try {
+    return await writeTxResultPromise
+  } finally {
+    await session.close()
+  }
+}
+
 export default {
   Subscription: {
     notificationAdded: {
@@ -86,62 +128,21 @@ export default {
   },
   Mutation: {
     markAsRead: async (_parent, args, context, _resolveInfo) => {
-      const { user: currentUser } = context
-      const session = context.driver.session()
-      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-        const markNotificationAsReadTransactionResponse = await transaction.run(
-          ` 
-            MATCH (resource {id: $resourceId})-[notification:NOTIFIED {read: FALSE}]->(user:User {id:$id})
-            SET notification.read = TRUE
-            WITH user, notification, resource,
-            [(resource)<-[:WROTE]-(author:User) | author {.*}] AS authors,
-            [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post{.*, author: properties(author), postType: [l IN labels(post) WHERE NOT l = 'Post']} ] AS posts
-            OPTIONAL MATCH (resource)<-[membership:MEMBER_OF]-(user)
-            WITH resource, user, notification, authors, posts, membership,
-            resource {.*, __typename: [l IN labels(resource) WHERE l IN ['Post', 'Comment', 'Group']][0], author: authors[0], post: posts[0], myRole: membership.role } AS finalResource
-            RETURN notification {.*, from: finalResource, to: properties(user)}
-          `,
-          { resourceId: args.id, id: currentUser.id },
-        )
-        return markNotificationAsReadTransactionResponse.records.map((record) =>
-          record.get('notification'),
-        )
+      const [notification] = await setNotificationReadState(context, {
+        resourceId: args.id,
+        targetRead: true,
       })
-      try {
-        const [notifications] = await writeTxResultPromise
-        return notifications
-      } finally {
-        await session.close()
-      }
+      return notification
     },
-    markAllAsRead: async (parent, args, context, _resolveInfo) => {
-      const { user: currentUser } = context
-      const session = context.driver.session()
-      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-        const markAllNotificationAsReadTransactionResponse = await transaction.run(
-          ` 
-            MATCH (resource)-[notification:NOTIFIED {read: FALSE}]->(user:User {id:$id})
-            SET notification.read = TRUE
-            WITH user, notification, resource,
-            [(resource)<-[:WROTE]-(author:User) | author {.*}] AS authors,
-            [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post{.*, author: properties(author), postType: [l IN labels(post) WHERE NOT l = 'Post']} ] AS posts
-            OPTIONAL MATCH (resource)<-[membership:MEMBER_OF]-(user)
-            WITH resource, user, notification, authors, posts, membership,
-            resource {.*, __typename: [l IN labels(resource) WHERE l IN ['Post', 'Comment', 'Group']][0], author: authors[0], post: posts[0], myRole: membership.role} AS finalResource
-            RETURN notification {.*, from: finalResource, to: properties(user)}
-          `,
-          { id: currentUser.id },
-        )
-        return markAllNotificationAsReadTransactionResponse.records.map((record) =>
-          record.get('notification'),
-        )
+    markAsUnread: async (_parent, args, context, _resolveInfo) => {
+      const [notification] = await setNotificationReadState(context, {
+        resourceId: args.id,
+        targetRead: false,
       })
-      try {
-        const notifications = await writeTxResultPromise
-        return notifications
-      } finally {
-        await session.close()
-      }
+      return notification
+    },
+    markAllAsRead: async (_parent, _args, context, _resolveInfo) => {
+      return setNotificationReadState(context, { targetRead: true })
     },
   },
   NOTIFIED: {
