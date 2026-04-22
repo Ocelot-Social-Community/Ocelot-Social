@@ -90,12 +90,6 @@
                     : $t('notifications.markAsRead')
                 "
                 :data-test="notification.read ? 'toggle-mark-as-unread' : 'toggle-mark-as-read'"
-                v-tooltip="{
-                  content: notification.read
-                    ? $t('notifications.markAsUnread')
-                    : $t('notifications.markAsRead'),
-                  placement: 'left',
-                }"
                 @click="toggleReadState(notification)"
               >
                 <template #icon>
