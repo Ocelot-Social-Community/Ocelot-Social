@@ -6,6 +6,8 @@
     :disabled="disabled"
     trigger="manual"
     :offset="offset"
+    boundaries-element="viewport"
+    :popper-options="popperOptions"
     @auto-hide="isPopoverOpen = false"
   >
     <slot :toggleMenu="toggleMenu" :openMenu="openMenu" :closeMenu="closeMenu" :isOpen="isOpen" />
@@ -40,6 +42,23 @@ export default {
   computed: {
     isOpen() {
       return this.isPopoverOpen
+    },
+    popperOptions() {
+      return {
+        modifiers: {
+          preventOverflow: {
+            boundariesElement: 'viewport',
+            padding: this.scrollbarPadding,
+          },
+        },
+      }
+    },
+    scrollbarPadding() {
+      if (typeof window === 'undefined') return 0
+      // window.innerWidth includes the scrollbar, clientWidth excludes it.
+      // The difference is the actual scrollbar width for the user's device/browser.
+      const width = window.innerWidth - document.documentElement.clientWidth
+      return width > 0 ? width : 0
     },
   },
   watch: {
