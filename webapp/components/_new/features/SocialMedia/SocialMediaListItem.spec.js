@@ -23,8 +23,8 @@ describe('SocialMediaListItem.vue', () => {
       })
 
       describe('for each link item it', () => {
-        it('displays the favicon', () => {
-          expect(wrapper.find(`img[src="${faviconUrl}"]`).exists()).toBe(true)
+        it('passes the favicon src to the Favicon child', () => {
+          expect(wrapper.findComponent({ name: 'Favicon' }).props('src')).toBe(faviconUrl)
         })
 
         it('displays the url', () => {
