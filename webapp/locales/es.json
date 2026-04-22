@@ -896,6 +896,8 @@
     },
     "group": "Descripción",
     "markAllAsRead": "Marcar todas como leido",
+    "markAsRead": "Marcar como leído",
+    "markAsUnread": "Marcar como no leído",
     "pageLink": "Todas las notificaciones",
     "post": "Contribución",
     "reason": {
