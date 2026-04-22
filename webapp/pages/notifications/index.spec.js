@@ -175,7 +175,10 @@ describe('PostIndex', () => {
           read: false,
         })
         expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
-          expect.objectContaining({ refetchQueries: ['Notifications'] }),
+          expect.objectContaining({
+            mutation: markAsReadMutation(),
+            refetchQueries: ['Notifications'],
+          }),
         )
       })
 
