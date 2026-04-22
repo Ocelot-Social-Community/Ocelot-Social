@@ -1,5 +1,5 @@
 query PostUnreadNotifications($id: ID!) {
-  Post(filter: { id: $id }) {
+  Post(id: $id) {
     id
     unreadNotificationByCurrentUser {
       id
