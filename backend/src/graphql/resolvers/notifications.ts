@@ -9,13 +9,15 @@ import { withFilter } from 'graphql-subscriptions'
 import { NOTIFICATION_ADDED } from '@constants/subscriptions'
 
 const NOTIFICATION_PROJECTION = `
-  WITH user, notification, resource,
+  WITH user, notification, resource
+  OPTIONAL MATCH (relatedUser:User { id: notification.relatedUserId })
+  WITH user, notification, resource, relatedUser,
   [(resource)<-[:WROTE]-(author:User) | author {.*}] AS authors,
   [(resource)-[:COMMENTS]->(post:Post)<-[:WROTE]-(author:User) | post{.*, author: properties(author), postType: [l IN labels(post) WHERE NOT l = 'Post']} ] AS posts
   OPTIONAL MATCH (resource)<-[membership:MEMBER_OF]-(user)
-  WITH resource, user, notification, authors, posts, membership,
+  WITH resource, user, notification, authors, posts, membership, relatedUser,
   resource {.*, __typename: [l IN labels(resource) WHERE l IN ['Post', 'Comment', 'Group']][0], author: authors[0], post: posts[0], myRole: membership.role} AS finalResource
-  RETURN notification {.*, from: finalResource, to: properties(user)}
+  RETURN notification {.*, from: finalResource, to: properties(user), relatedUser: properties(relatedUser)}
 `
 
 const setNotificationReadState = async (
