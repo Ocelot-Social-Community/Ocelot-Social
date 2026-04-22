@@ -37,11 +37,12 @@ export default {
         const matches = url.match(/^(?:https?:\/\/)?(?:[^@\n])?(?:www\.)?([^:/\n?]+)/g)
         const [domain] = matches || []
         const favicon = domain ? `${domain}/favicon.ico` : null
-        const username = url
+        const parts = url
+          .replace(/^https?:\/\//, '')
           .replace(/\/+$/, '')
           .split('/')
-          .pop()
-          .replace(/^www\./i, '')
+        const username =
+          parts.length > 1 ? parts[parts.length - 1] : parts[0].replace(/^www\./i, '')
         return { url, username, favicon }
       })
     },

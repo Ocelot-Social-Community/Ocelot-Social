@@ -142,6 +142,29 @@ describe('SocialMedia.vue', () => {
       })
     })
 
+    describe('social media link with a username that starts with www.', () => {
+      let wrapper
+
+      beforeEach(() => {
+        propsData.userName = 'Jenny Rostock'
+        propsData.user = {
+          socialMedia: [
+            {
+              id: 'ee1e8ed6-fbef-4bcf-b411-a12926f2ea1e',
+              url: 'https://www.instagram.com/www.example',
+              __typename: 'SocialMedia',
+            },
+          ],
+        }
+        wrapper = Wrapper()
+      })
+
+      it('keeps the leading www. in the username path segment', () => {
+        const link = wrapper.findAll('a').at(0)
+        expect(link.text()).toContain('www.example')
+      })
+    })
+
     describe('when a favicon fails to load', () => {
       let wrapper
 
