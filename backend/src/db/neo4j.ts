@@ -8,6 +8,7 @@ import models from '@db/models/index'
 import type { Driver } from 'neo4j-driver'
 
 let driver: Driver
+let neodeInstance: Neode
 const defaultOptions = {
   uri: CONFIG.NEO4J_URI,
   username: CONFIG.NEO4J_USERNAME,
@@ -31,12 +32,13 @@ export async function closeDriver() {
     driver = undefined as unknown as Driver
   }
   if (neodeInstance) {
-    await neodeInstance.close()
+    // Neode's close() is typed as returning void; the rest of the codebase
+    // (see *.spec.ts teardowns) calls it without await.
+    neodeInstance.close()
     neodeInstance = undefined as unknown as Neode
   }
 }
 
-let neodeInstance: Neode
 export function getNeode(options = {}) {
   if (!neodeInstance) {
     const { uri, username, password } = { ...defaultOptions, ...options }

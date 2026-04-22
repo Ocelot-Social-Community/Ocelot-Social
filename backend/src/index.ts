@@ -44,8 +44,16 @@ async function main() {
     await closeDriver()
     process.exit(0)
   }
-  process.on('SIGTERM', shutdown)
-  process.on('SIGINT', shutdown)
+  const onSignal = () => {
+    // eslint-disable-next-line promise/prefer-await-to-callbacks, @typescript-eslint/use-unknown-in-catch-callback-variable
+    shutdown().catch((err) => {
+      /* eslint-disable-next-line no-console */
+      console.error('Shutdown failed:', err)
+      process.exit(1)
+    })
+  }
+  process.on('SIGTERM', onSignal)
+  process.on('SIGINT', onSignal)
 }
 
 // eslint-disable-next-line promise/prefer-await-to-callbacks, @typescript-eslint/use-unknown-in-catch-callback-variable
