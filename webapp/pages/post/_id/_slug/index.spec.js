@@ -499,6 +499,22 @@ describe('PostSlug', () => {
         document.body.removeChild(el)
       })
 
+      it('lazy-initialises state when update() fires before lifecycle hooks ran', async () => {
+        // Regression: Apollo cache-and-network can fire SmartQuery update() during
+        // launch, which may precede beforeCreate/created in plugin-mixin ordering.
+        // In that case _unreadCommentIds is undefined and accessing `.size` crashes.
+        wrapper = await Wrapper()
+        wrapper.vm._unreadCommentIds = undefined
+        expect(() =>
+          wrapper.vm.handleUnreadNotifications({
+            id: 'post-42',
+            unreadNotificationByCurrentUser: null,
+            unreadCommentNotificationsByCurrentUser: [],
+          }),
+        ).not.toThrow()
+        expect(wrapper.vm._unreadCommentIds).toBeInstanceOf(Set)
+      })
+
       it('guards handleUnreadNotifications against a null post', async () => {
         wrapper = await Wrapper()
         mocks.$apollo.mutate.mockClear()

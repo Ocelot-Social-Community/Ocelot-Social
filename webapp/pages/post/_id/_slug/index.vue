@@ -245,13 +245,19 @@ export default {
     UserTeaser,
   },
   mixins: [GetCategories, postListActions, SortCategories],
+  beforeCreate() {
+    // Initialised before `created()` because Apollo `cache-and-network` can fire
+    // update() synchronously during SmartQuery launch, which runs before our
+    // `created()` hook. Accessing an uninitialised `_unreadCommentIds` would crash
+    // inside `handleUnreadNotifications()`.
+    this._autoMarkedForPostId = null
+    this._unreadCommentObserver = null
+    this._unreadCommentIds = new Set()
+  },
   created() {
     this.icons = iconRegistry
     const { toggleShout } = useShout({ apollo: this.$apollo })
     this._toggleShout = toggleShout
-    this._autoMarkedForPostId = null
-    this._unreadCommentObserver = null
-    this._unreadCommentIds = new Set()
   },
   head() {
     return {
@@ -417,6 +423,9 @@ export default {
     },
     handleUnreadNotifications(post) {
       if (!post?.id) return
+      // Lazy-init: Apollo `cache-and-network` can synchronously fire update() from
+      // SmartQuery launch before any Vue lifecycle hook runs for this component.
+      if (!this._unreadCommentIds) this._unreadCommentIds = new Set()
 
       // Post-level: mark once per post visit, only when unread data is actually present.
       // Guarding on the data (not just post.id) prevents an early cache-only update()
