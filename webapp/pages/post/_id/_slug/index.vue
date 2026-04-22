@@ -249,6 +249,9 @@ export default {
     this.icons = iconRegistry
     const { toggleShout } = useShout({ apollo: this.$apollo })
     this._toggleShout = toggleShout
+    this._autoMarkedForPostId = null
+    this._unreadCommentObserver = null
+    this._unreadCommentIds = new Set()
   },
   head() {
     return {
@@ -278,9 +281,6 @@ export default {
       // will be fixed in a future update of the styleguide
       this.ready = true
     }, 50)
-    this._autoMarkedForPostId = null
-    this._unreadCommentObserver = null
-    this._unreadCommentIds = new Set()
   },
   beforeDestroy() {
     this._unreadCommentObserver?.disconnect()
