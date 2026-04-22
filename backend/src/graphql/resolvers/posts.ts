@@ -50,6 +50,7 @@ const NOTIFIED_FOR_RESOURCE_CYPHER = `
     to: properties(user),
     relatedUser: properties(relatedUser)
   } AS notification
+  ORDER BY notification.createdAt DESC
 `
 
 const maintainPinnedPosts = (params) => {
