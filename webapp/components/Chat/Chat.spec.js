@@ -139,7 +139,8 @@ describe('Chat.vue', () => {
 
     it('leaves the underlying rooms array unmodified', () => {
       wrapper.vm.rooms = [mockRoom({ unreadCount: 150 })]
-      void wrapper.vm.displayedRooms
+      // Trigger the computed getter to ensure it doesn't mutate `rooms`
+      expect(wrapper.vm.displayedRooms).toBeDefined()
       expect(wrapper.vm.rooms[0].unreadCount).toBe(150)
     })
   })

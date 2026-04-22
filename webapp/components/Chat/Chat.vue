@@ -281,9 +281,7 @@ export default {
     displayedRooms() {
       // Cap unreadCount at "99+" for display; internal state stays numeric for arithmetic
       return this.rooms.map((r) =>
-        typeof r.unreadCount === 'number' && r.unreadCount > 99
-          ? { ...r, unreadCount: '99+' }
-          : r,
+        typeof r.unreadCount === 'number' && r.unreadCount > 99 ? { ...r, unreadCount: '99+' } : r,
       )
     },
     selectedRoomProfile() {
