@@ -77,9 +77,12 @@
                   }}
                 </p>
               </div>
-              <button
+              <os-button
                 v-if="showReadToggle"
-                type="button"
+                variant="primary"
+                appearance="ghost"
+                circle
+                size="sm"
                 class="notification-read-toggle"
                 :aria-label="
                   notification.read
@@ -95,8 +98,10 @@
                 }"
                 @click="toggleReadState(notification)"
               >
-                <os-icon :icon="notification.read ? icons.check : icons.envelope" />
-              </button>
+                <template #icon>
+                  <os-icon :icon="notification.read ? icons.check : icons.envelope" />
+                </template>
+              </os-button>
             </div>
           </div>
         </div>
@@ -106,7 +111,7 @@
   <hc-empty v-else icon="alert" :message="$t('notifications.empty')" />
 </template>
 <script>
-import { OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import HcEmpty from '~/components/Empty/Empty'
@@ -117,6 +122,7 @@ const maxMobileWidth = 768 // at this point the table breaks down
 export default {
   mixins: [mobile(maxMobileWidth)],
   components: {
+    OsButton,
     OsIcon,
     UserTeaser,
     HcEmpty,
@@ -240,20 +246,7 @@ export default {
 
   .notification-read-toggle {
     flex-shrink: 0;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 4px;
-    color: $text-color-soft;
     align-self: flex-start;
-
-    &:hover,
-    &:focus-visible {
-      color: $color-primary;
-      background-color: rgba(0, 0, 0, 0.04);
-      outline: none;
-    }
   }
 }
 
