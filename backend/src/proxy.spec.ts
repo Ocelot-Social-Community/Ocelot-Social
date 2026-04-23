@@ -1,58 +1,48 @@
+import { once } from 'node:events'
 import http from 'node:http'
-import type { AddressInfo } from 'node:net'
 
 import createProxy from './proxy'
 
-function listen(server: http.Server): Promise<number> {
-  return new Promise((resolve) => {
-    server.listen(0, () => {
-      resolve((server.address() as AddressInfo).port)
-    })
-  })
+import type { AddressInfo } from 'node:net'
+
+async function listen(server: http.Server): Promise<number> {
+  server.listen(0)
+  await once(server, 'listening')
+  return (server.address() as AddressInfo).port
 }
 
-function close(server: http.Server): Promise<void> {
-  return new Promise((resolve, reject) => {
-    // eslint-disable-next-line promise/prefer-await-to-callbacks
-    server.close((err) => (err ? reject(err) : resolve()))
-  })
+async function close(server: http.Server): Promise<void> {
+  server.close()
+  await once(server, 'close')
 }
 
 interface ProxyResponse {
   status: number
   body: string
-  headers: http.IncomingHttpHeaders
+  headers: Record<string, string>
 }
 
-function request(
+async function request(
   port: number,
-  options: { method?: string; path?: string; body?: string; headers?: Record<string, string> } = {},
+  options: {
+    method?: string
+    path?: string
+    body?: string
+    headers?: Record<string, string>
+  } = {},
 ): Promise<ProxyResponse> {
-  return new Promise((resolve, reject) => {
-    const req = http.request(
-      {
-        hostname: '127.0.0.1',
-        port,
-        method: options.method ?? 'GET',
-        path: options.path ?? '/',
-        headers: options.headers,
-      },
-      (res) => {
-        const chunks: Buffer[] = []
-        res.on('data', (c: Buffer) => chunks.push(c))
-        res.on('end', () =>
-          resolve({
-            status: res.statusCode ?? 0,
-            body: Buffer.concat(chunks).toString('utf8'),
-            headers: res.headers,
-          }),
-        )
-      },
-    )
-    req.on('error', reject)
-    if (options.body !== undefined) req.write(options.body)
-    req.end()
+  const res = await fetch(`http://127.0.0.1:${String(port)}${options.path ?? '/'}`, {
+    method: options.method ?? 'GET',
+    // `Connection: close` prevents undici from keeping the socket alive, which
+    // would otherwise block `server.close()` in afterEach until its idle timeout.
+    headers: { connection: 'close', ...options.headers },
+    body: options.body,
   })
+  return {
+    status: res.status,
+    body: await res.text(),
+    headers: Object.fromEntries(res.headers.entries()) as Record<string, string>,
+  }
 }
 
 describe('createProxy', () => {
@@ -60,7 +50,12 @@ describe('createProxy', () => {
   let targetPort: number
   let proxy: http.Server
   let proxyPort: number
-  let lastRequest: { method?: string; url?: string; headers: http.IncomingHttpHeaders; body: string }
+  let lastRequest: {
+    method?: string
+    url?: string
+    headers: http.IncomingHttpHeaders
+    body: string
+  }
   let nextResponse: { status: number; headers: Record<string, string>; body: string }
 
   beforeEach(async () => {
@@ -83,7 +78,7 @@ describe('createProxy', () => {
     })
     targetPort = await listen(target)
 
-    proxy = createProxy(new URL(`http://127.0.0.1:${targetPort}`))
+    proxy = createProxy(new URL(`http://127.0.0.1:${String(targetPort)}`))
     proxyPort = await listen(proxy)
   })
 
@@ -126,7 +121,7 @@ describe('createProxy', () => {
     const closedPort = await listen(closedTarget)
     await close(closedTarget)
 
-    const brokenProxy = createProxy(new URL(`http://127.0.0.1:${closedPort}`))
+    const brokenProxy = createProxy(new URL(`http://127.0.0.1:${String(closedPort)}`))
     const brokenPort = await listen(brokenProxy)
 
     try {

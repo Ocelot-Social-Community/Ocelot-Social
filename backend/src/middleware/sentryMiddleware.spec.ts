@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/node'
+import { init, withScope, captureException } from '@sentry/node'
 
 import { createSentryMiddleware } from './sentryMiddleware'
 
@@ -8,9 +8,9 @@ jest.mock('@sentry/node', () => ({
   captureException: jest.fn(),
 }))
 
-const initMock = Sentry.init as jest.Mock
-const withScopeMock = Sentry.withScope as jest.Mock
-const captureExceptionMock = Sentry.captureException as jest.Mock
+const initMock = init as jest.Mock
+const withScopeMock = withScope as jest.Mock
+const captureExceptionMock = captureException as jest.Mock
 
 beforeEach(() => {
   initMock.mockReset()
@@ -33,9 +33,7 @@ describe('createSentryMiddleware', () => {
       const context = { c: 1 }
       const info = { i: 1 }
 
-      const result = await middleware(resolve, root, args, context, info)
-
-      expect(result).toBe('result')
+      await expect(middleware(resolve, root, args, context, info)).resolves.toBe('result')
       expect(resolve).toHaveBeenCalledWith(root, args, context, info)
       expect(withScopeMock).not.toHaveBeenCalled()
     })
@@ -90,7 +88,9 @@ describe('createSentryMiddleware', () => {
         setUser: jest.fn(),
         setExtra: jest.fn(),
       }
-      withScopeMock.mockImplementation((cb: (s: typeof scope) => void) => cb(scope))
+      withScopeMock.mockImplementation((run: (s: typeof scope) => void) => {
+        run(scope)
+      })
 
       await expect(middleware(resolve, {}, {}, context, {})).rejects.toBe(error)
 
@@ -110,7 +110,9 @@ describe('createSentryMiddleware', () => {
         setUser: jest.fn(),
         setExtra: jest.fn(),
       }
-      withScopeMock.mockImplementation((cb: (s: typeof scope) => void) => cb(scope))
+      withScopeMock.mockImplementation((run: (s: typeof scope) => void) => {
+        run(scope)
+      })
 
       await expect(middleware(resolve, {}, {}, {}, {})).rejects.toBe(error)
 
