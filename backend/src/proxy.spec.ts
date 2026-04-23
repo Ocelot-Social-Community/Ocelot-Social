@@ -129,7 +129,10 @@ describe('createProxy', () => {
       expect(res.status).toBe(500)
       expect(res.body).toBe('Proxy error')
       expect(res.headers['content-type']).toBe('text/plain')
-      expect(errorSpy).toHaveBeenCalledWith('Proxy request error:', expect.any(Error))
+      expect(errorSpy).toHaveBeenCalledTimes(1)
+      const [prefix, err] = errorSpy.mock.calls[0] as [unknown, unknown]
+      expect(prefix).toBe('Proxy request error:')
+      expect((err as Error).message).toContain('ECONNREFUSED')
     } finally {
       await close(brokenProxy)
       errorSpy.mockRestore()
