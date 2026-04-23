@@ -238,6 +238,7 @@ const seedComplexScenarioAndClearAuthentication = async () => {
 }
 
 beforeAll(async () => {
+  await cleanDatabase()
   const apolloSetup = await createApolloTestSetup({ context })
   mutate = apolloSetup.mutate
   query = apolloSetup.query

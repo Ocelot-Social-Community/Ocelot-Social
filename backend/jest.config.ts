@@ -21,13 +21,14 @@ export default {
     '!**/build/**',
     '!**/src/**/?(*.)+(spec|test).ts?(x)',
     '!**/src/db/**',
+    '!**/src/index.ts',
     '!*.config.ts',
     '!**/*.d.ts',
     '!**/gql-register.ts',
   ],
   coverageThreshold: {
     global: {
-      lines: 94,
+      lines: 95,
     },
   },
   testMatch: ['**/src/**/?(*.)+(spec|test).ts?(x)'],
