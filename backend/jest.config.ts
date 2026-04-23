@@ -21,6 +21,7 @@ export default {
     '!**/build/**',
     '!**/src/**/?(*.)+(spec|test).ts?(x)',
     '!**/src/db/**',
+    '!**/src/index.ts',
     '!*.config.ts',
     '!**/*.d.ts',
     '!**/gql-register.ts',
