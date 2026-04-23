@@ -24,6 +24,7 @@
     :single-room="singleRoom"
     show-reaction-emojis="false"
     custom-search-room-enabled="true"
+    textarea-auto-focus="false"
     @send-message="sendMessage($event.detail[0])"
     @fetch-messages="fetchMessages($event.detail[0])"
     @fetch-more-rooms="fetchMoreRooms"
@@ -669,6 +670,18 @@ export default {
         this.oldestLoadedIndexId = null
         this.unseenMessageIds = new Set()
         this.selectedRoom = room
+      }
+      // We disabled `textarea-auto-focus` on vue-advanced-chat to prevent the
+      // library from stealing focus from the room filter when filter-driven
+      // room-list updates cause its internal `roomId` watcher to fire. Restore
+      // the "focus message textarea on room switch" UX here, but skip it while
+      // the user is actively typing in the filter.
+      const shadowRoot = this.$el?.shadowRoot
+      const userIsFiltering = shadowRoot?.activeElement?.matches?.('input[type="search"].vac-input')
+      if (!userIsFiltering) {
+        this.$nextTick(() => {
+          this.$el?.shadowRoot?.querySelector('textarea#roomTextarea')?.focus()
+        })
       }
       // Virtual rooms have no messages on the server yet
       if (!room.id || room.id.startsWith('temp-')) {
