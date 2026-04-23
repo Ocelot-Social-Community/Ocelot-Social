@@ -46,7 +46,7 @@ export default {
         query: `
           MATCH (u:User { id: $userId })-[:HAS_API_KEY]->(k:ApiKey)
           RETURN k {.*}
-          ORDER BY k.createdAt DESC
+          ORDER BY k.createdAt DESC, k.id DESC
         `,
         variables: { userId: context.user?.id },
       })
@@ -91,7 +91,7 @@ export default {
         query: `
           MATCH (u:User { id: $userId })-[:HAS_API_KEY]->(k:ApiKey)
           RETURN k {.*}
-          ORDER BY k.disabled ASC, k.createdAt DESC
+          ORDER BY k.disabled ASC, k.createdAt DESC, k.id DESC
         `,
         variables: { userId: args.userId },
       })
