@@ -21,6 +21,7 @@
       :isMember="isGroupMember"
       :isNonePendingMember="isGroupMemberNonePending"
       :filled="true"
+      :full-width="false"
       @update="updateJoinLeave"
     />
   </div>
