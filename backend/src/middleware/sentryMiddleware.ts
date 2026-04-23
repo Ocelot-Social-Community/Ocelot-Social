@@ -6,19 +6,29 @@ import { init, withScope, captureException } from '@sentry/node'
 
 import CONFIG from '@config/index'
 
-// eslint-disable-next-line import-x/no-mutable-exports, @typescript-eslint/no-explicit-any
-let sentryMiddleware: any = (resolve, root, args, context, resolveInfo) =>
-  resolve(root, args, context, resolveInfo)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SentryMiddleware = (resolve: any, root: any, args: any, context: any, resolveInfo: any) => any
 
-if (CONFIG.SENTRY_DSN_BACKEND) {
+export interface SentryMiddlewareOptions {
+  dsn?: string
+  release?: string
+  environment?: string
+}
+
+export const createSentryMiddleware = (options: SentryMiddlewareOptions): SentryMiddleware => {
+  const passthrough: SentryMiddleware = (resolve, root, args, context, resolveInfo) =>
+    resolve(root, args, context, resolveInfo)
+
+  if (!options.dsn) return passthrough
+
   init({
-    dsn: CONFIG.SENTRY_DSN_BACKEND,
-    release: CONFIG.COMMIT,
-    environment: CONFIG.NODE_ENV,
+    dsn: options.dsn,
+    release: options.release,
+    environment: options.environment,
   })
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  sentryMiddleware = async (resolve, root, args, context: any, resolveInfo) => {
+  return async (resolve, root, args, context: any, resolveInfo) => {
     try {
       return await resolve(root, args, context, resolveInfo)
     } catch (error) {
@@ -34,9 +44,17 @@ if (CONFIG.SENTRY_DSN_BACKEND) {
       throw error
     }
   }
-} else {
+}
+
+const sentryMiddleware = createSentryMiddleware({
+  dsn: CONFIG.SENTRY_DSN_BACKEND,
+  release: CONFIG.COMMIT,
+  environment: CONFIG.NODE_ENV,
+})
+
+if (!CONFIG.SENTRY_DSN_BACKEND && !CONFIG.TEST) {
   // eslint-disable-next-line no-console
-  if (!CONFIG.TEST) console.log('Warning: Sentry middleware inactive.')
+  console.log('Warning: Sentry middleware inactive.')
 }
 
 export default sentryMiddleware
