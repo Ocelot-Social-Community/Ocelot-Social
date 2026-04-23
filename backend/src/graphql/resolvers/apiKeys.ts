@@ -46,7 +46,7 @@ export default {
         query: `
           MATCH (u:User { id: $userId })-[:HAS_API_KEY]->(k:ApiKey)
           RETURN k {.*}
-          ORDER BY k.createdAt DESC
+          ORDER BY k.createdAt DESC, k.id DESC
         `,
         variables: { userId: context.user?.id },
       })
@@ -91,7 +91,7 @@ export default {
         query: `
           MATCH (u:User { id: $userId })-[:HAS_API_KEY]->(k:ApiKey)
           RETURN k {.*}
-          ORDER BY k.disabled ASC, k.createdAt DESC
+          ORDER BY k.disabled ASC, k.createdAt DESC, k.id DESC
         `,
         variables: { userId: args.userId },
       })
@@ -116,6 +116,14 @@ export default {
 
       const { key, hash, prefix } = generateApiKey()
       const id = uuid()
+      // Generate the ISO timestamp in Node rather than via Cypher's
+      // `toString(datetime())`: Neo4j omits the fractional-seconds part when
+      // it is zero (e.g. "2026-04-23T14:05:32Z" instead of
+      // "2026-04-23T14:05:32.000Z"). That variable width breaks lexicographic
+      // `ORDER BY k.createdAt DESC`, because "Z" > "." in ASCII. JS's
+      // `Date#toISOString()` always emits 3 fractional digits, so string sort
+      // remains in chronological order.
+      const createdAt = new Date().toISOString()
 
       const result = await context.database.write({
         query: `
@@ -129,7 +137,7 @@ export default {
             name: $name,
             keyHash: $keyHash,
             keyPrefix: $keyPrefix,
-            createdAt: toString(datetime()),
+            createdAt: $createdAt,
             disabled: false
           })
           ${expiresAt ? 'SET k.expiresAt = $expiresAt' : ''}
@@ -141,6 +149,7 @@ export default {
           name: args.name,
           keyHash: hash,
           keyPrefix: prefix,
+          createdAt,
           expiresAt,
           maxKeys: context.config.API_KEYS_MAX_PER_USER,
         },
@@ -178,10 +187,14 @@ export default {
         query: `
           MATCH (u:User { id: $userId })-[:HAS_API_KEY]->(k:ApiKey { id: $keyId })
           WHERE NOT k.disabled
-          SET k.disabled = true, k.disabledAt = toString(datetime())
+          SET k.disabled = true, k.disabledAt = $disabledAt
           RETURN k
         `,
-        variables: { userId: context.user?.id, keyId: args.id },
+        variables: {
+          userId: context.user?.id,
+          keyId: args.id,
+          disabledAt: new Date().toISOString(),
+        },
       })
       return result.records.length > 0
     },
@@ -191,10 +204,10 @@ export default {
         query: `
           MATCH (k:ApiKey { id: $keyId })
           WHERE NOT k.disabled
-          SET k.disabled = true, k.disabledAt = toString(datetime())
+          SET k.disabled = true, k.disabledAt = $disabledAt
           RETURN k
         `,
-        variables: { keyId: args.id },
+        variables: { keyId: args.id, disabledAt: new Date().toISOString() },
       })
       return result.records.length > 0
     },
@@ -204,10 +217,10 @@ export default {
         query: `
           MATCH (u:User { id: $userId })-[:HAS_API_KEY]->(k:ApiKey)
           WHERE NOT k.disabled
-          SET k.disabled = true, k.disabledAt = toString(datetime())
+          SET k.disabled = true, k.disabledAt = $disabledAt
           RETURN count(k) AS count
         `,
-        variables: { userId: args.userId },
+        variables: { userId: args.userId, disabledAt: new Date().toISOString() },
       })
       return toNumber(result.records[0].get('count') as Integer)
     },

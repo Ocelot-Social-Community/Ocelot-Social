@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { setTimeout } from 'node:timers/promises'
+
 import { cleanDatabase } from '@db/factories'
 import adminRevokeApiKey from '@graphql/queries/apiKeys/adminRevokeApiKey.gql'
 import adminRevokeUserApiKeys from '@graphql/queries/apiKeys/adminRevokeUserApiKeys.gql'
@@ -189,6 +191,10 @@ describe('myApiKeys', () => {
 
   it('returns created keys ordered by createdAt desc', async () => {
     await mutate({ mutation: createApiKey, variables: { name: 'Key A' } })
+    // Ensure Key B lands in a different millisecond than Key A; createdAt is
+    // stored via `toString(datetime())` (ms precision) and ties would let
+    // Neo4j return either key first.
+    await setTimeout(2)
     await mutate({ mutation: createApiKey, variables: { name: 'Key B' } })
     const { data, errors } = await query({ query: myApiKeys })
     expect(errors).toBeUndefined()
