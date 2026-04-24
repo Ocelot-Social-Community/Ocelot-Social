@@ -5,6 +5,7 @@
 import Factory, { cleanDatabase } from '@db/factories'
 import SignupVerification from '@graphql/queries/auth/SignupVerification.gql'
 import CreateComment from '@graphql/queries/comments/CreateComment.gql'
+import shout from '@graphql/queries/emotions/shout.gql'
 import ChangeGroupMemberRole from '@graphql/queries/groups/ChangeGroupMemberRole.gql'
 import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
 import LeaveGroup from '@graphql/queries/groups/LeaveGroup.gql'
@@ -1102,6 +1103,140 @@ describe('Posts in Groups', () => {
                   content: 'I am posting into a hidden group as a member of the group',
                 }),
               ]),
+            },
+            errors: undefined,
+          })
+        })
+      })
+    })
+
+    describe('profile page counts', () => {
+      const userProfileCounts = `
+        query UserProfileCounts($id: ID) {
+          User(id: $id) {
+            id
+            contributionsCount
+            commentedCount
+            shoutedCount
+          }
+        }
+      `
+
+      beforeAll(async () => {
+        authenticatedUser = await publicUser.toJson()
+        await mutate({ mutation: shout, variables: { id: 'post-to-public-group' } })
+        await mutate({ mutation: shout, variables: { id: 'post-to-closed-group' } })
+        await mutate({ mutation: shout, variables: { id: 'post-to-hidden-group' } })
+      })
+
+      describe('without membership of group', () => {
+        beforeAll(async () => {
+          authenticatedUser = await anyUser.toJson()
+        })
+
+        it("counts only posts the viewer can see on the author's profile", async () => {
+          const authorResult = await query({
+            query: userProfileCounts,
+            variables: { id: 'all-groups-user' },
+          })
+          expect(authorResult).toMatchObject({
+            data: {
+              User: [
+                {
+                  id: 'all-groups-user',
+                  contributionsCount: 1,
+                  commentedCount: 1,
+                  shoutedCount: 0,
+                },
+              ],
+            },
+            errors: undefined,
+          })
+          const shouterResult = await query({
+            query: userProfileCounts,
+            variables: { id: 'public-user' },
+          })
+          expect(shouterResult).toMatchObject({
+            data: {
+              User: [
+                { id: 'public-user', contributionsCount: 0, commentedCount: 0, shoutedCount: 1 },
+              ],
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('with pending membership of group', () => {
+        beforeAll(async () => {
+          authenticatedUser = await pendingUser.toJson()
+        })
+
+        it("counts only posts the viewer can see on the author's profile", async () => {
+          const authorResult = await query({
+            query: userProfileCounts,
+            variables: { id: 'all-groups-user' },
+          })
+          expect(authorResult).toMatchObject({
+            data: {
+              User: [
+                {
+                  id: 'all-groups-user',
+                  contributionsCount: 1,
+                  commentedCount: 1,
+                  shoutedCount: 0,
+                },
+              ],
+            },
+            errors: undefined,
+          })
+          const shouterResult = await query({
+            query: userProfileCounts,
+            variables: { id: 'public-user' },
+          })
+          expect(shouterResult).toMatchObject({
+            data: {
+              User: [
+                { id: 'public-user', contributionsCount: 0, commentedCount: 0, shoutedCount: 1 },
+              ],
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('as member of group', () => {
+        beforeAll(async () => {
+          authenticatedUser = await allGroupsUser.toJson()
+        })
+
+        it('counts all posts on the own profile', async () => {
+          const authorResult = await query({
+            query: userProfileCounts,
+            variables: { id: 'all-groups-user' },
+          })
+          expect(authorResult).toMatchObject({
+            data: {
+              User: [
+                {
+                  id: 'all-groups-user',
+                  contributionsCount: 3,
+                  commentedCount: 3,
+                  shoutedCount: 0,
+                },
+              ],
+            },
+            errors: undefined,
+          })
+          const shouterResult = await query({
+            query: userProfileCounts,
+            variables: { id: 'public-user' },
+          })
+          expect(shouterResult).toMatchObject({
+            data: {
+              User: [
+                { id: 'public-user', contributionsCount: 0, commentedCount: 0, shoutedCount: 3 },
+              ],
             },
             errors: undefined,
           })
