@@ -618,14 +618,14 @@ export default {
       },
       count: {
         contributionsCount:
-          '-[:WROTE]->(related:Post) WHERE NOT related.disabled = true AND NOT related.deleted = true',
+          '-[:WROTE]->(related:Post) WHERE NOT related.disabled = true AND NOT related.deleted = true AND NOT (related)<-[:CANNOT_SEE]-(:User {id: $cypherParams.currentUserId})',
         friendsCount: '<-[:FRIENDS]->(related:User)',
         followingCount: '-[:FOLLOWS]->(related:User)',
         followedByCount: '<-[:FOLLOWS]-(related:User)',
         commentedCount:
-          '-[:WROTE]->(c:Comment)-[:COMMENTS]->(related:Post) WHERE NOT related.disabled = true AND NOT related.deleted = true',
+          '-[:WROTE]->(c:Comment)-[:COMMENTS]->(related:Post) WHERE NOT related.disabled = true AND NOT related.deleted = true AND NOT (related)<-[:CANNOT_SEE]-(:User {id: $cypherParams.currentUserId})',
         shoutedCount:
-          '-[:SHOUTED]->(related:Post) WHERE NOT related.disabled = true AND NOT related.deleted = true',
+          '-[:SHOUTED]->(related:Post) WHERE NOT related.disabled = true AND NOT related.deleted = true AND NOT (related)<-[:CANNOT_SEE]-(:User {id: $cypherParams.currentUserId})',
         badgeTrophiesCount: '<-[:REWARDED]-(related:Badge)',
       },
       hasOne: {

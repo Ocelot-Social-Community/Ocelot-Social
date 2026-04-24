@@ -1109,6 +1109,75 @@ describe('Posts in Groups', () => {
       })
     })
 
+    describe('profile page counts', () => {
+      const userProfileCounts = `
+        query UserProfileCounts($id: ID) {
+          User(id: $id) {
+            id
+            contributionsCount
+            commentedCount
+          }
+        }
+      `
+
+      describe('without membership of group', () => {
+        beforeAll(async () => {
+          authenticatedUser = await anyUser.toJson()
+        })
+
+        it("counts only posts the viewer can see on the author's profile", async () => {
+          const result = await query({
+            query: userProfileCounts,
+            variables: { id: 'all-groups-user' },
+          })
+          expect(result).toMatchObject({
+            data: {
+              User: [{ id: 'all-groups-user', contributionsCount: 1, commentedCount: 1 }],
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('with pending membership of group', () => {
+        beforeAll(async () => {
+          authenticatedUser = await pendingUser.toJson()
+        })
+
+        it("counts only posts the viewer can see on the author's profile", async () => {
+          const result = await query({
+            query: userProfileCounts,
+            variables: { id: 'all-groups-user' },
+          })
+          expect(result).toMatchObject({
+            data: {
+              User: [{ id: 'all-groups-user', contributionsCount: 1, commentedCount: 1 }],
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('as member of group', () => {
+        beforeAll(async () => {
+          authenticatedUser = await allGroupsUser.toJson()
+        })
+
+        it('counts all posts on the own profile', async () => {
+          const result = await query({
+            query: userProfileCounts,
+            variables: { id: 'all-groups-user' },
+          })
+          expect(result).toMatchObject({
+            data: {
+              User: [{ id: 'all-groups-user', contributionsCount: 3, commentedCount: 3 }],
+            },
+            errors: undefined,
+          })
+        })
+      })
+    })
+
     describe('searchPosts', () => {
       describe('without authentication', () => {
         beforeEach(() => {
