@@ -6,7 +6,7 @@
       :appearance="filled || (isMember && !hovered) ? 'filled' : 'outline'"
       :disabled="disabled"
       :loading="localLoading"
-      full-width
+      :full-width="fullWidth"
       v-tooltip="tooltip"
       @mouseenter="onHover"
       @mouseleave="hovered = false"
@@ -42,6 +42,7 @@ export default {
     filled: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
+    fullWidth: { type: Boolean, default: true },
   },
   data() {
     return {

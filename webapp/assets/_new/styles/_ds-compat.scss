@@ -35,13 +35,15 @@
 .ds-my-xx-large  { margin-top: $space-xx-large; margin-bottom: $space-xx-large; }
 
 // ds-space centered
+// The original styleguide only set `text-align: center`. Its Space.vue ALSO
+// had a flex branch in the script, but that branch was guarded by `this.center`
+// while the actual prop was named `centered` – a typo that kept the flex code
+// dead. The migration in PR #9247 accidentally revived it here, which turned
+// CTA blocks like CtaJoinLeaveGroup / CtaUnblockAuthor into single-row flex
+// containers (heading / paragraph / button side-by-side). Reverting to the
+// original semantics: text-centered block flow.
 .ds-space-centered {
-  display: flex;
-  flex: 1;
   text-align: center;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
 }
 
 // ds-list-item bullet icon (replaces DsListItem Vue component's angle-right prefix)
@@ -143,11 +145,21 @@
   padding: $space-large 0;
 }
 
+// Restored to the original styleguide definition (soft-grey block with dashed
+// border, used as a visual frame around "empty-state" card sections like the
+// comments placeholder). Earlier during the styleguide removal this was
+// rewritten to just italic text-center, losing the frame.
 .ds-placeholder {
-  color: $text-color-disabled;
-  font-style: italic;
-  text-align: center;
   padding: $space-base;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $background-color-softer;
+  border: $border-size-base dashed $border-color-base;
+
+  @media #{$media-query-medium} {
+    padding: $space-x-large 0;
+  }
 }
 
 // ==========================================================
