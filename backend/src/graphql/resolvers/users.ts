@@ -22,6 +22,9 @@ import type { Context } from '@src/context'
 
 const neode = getNeode()
 
+const visiblePostFilter =
+  'WHERE NOT related.disabled = true AND NOT related.deleted = true AND NOT (related)<-[:CANNOT_SEE]-(:User {id: $cypherParams.currentUserId})'
+
 export const getMutedUsers = async (context) => {
   const { neode } = context
   const userModel = neode.model('User')
@@ -617,15 +620,12 @@ export default {
           'MATCH (this)<-[:MUTED]-(u:User {id: $cypherParams.currentUserId}) RETURN COUNT(u) >= 1',
       },
       count: {
-        contributionsCount:
-          '-[:WROTE]->(related:Post) WHERE NOT related.disabled = true AND NOT related.deleted = true AND NOT (related)<-[:CANNOT_SEE]-(:User {id: $cypherParams.currentUserId})',
+        contributionsCount: `-[:WROTE]->(related:Post) ${visiblePostFilter}`,
         friendsCount: '<-[:FRIENDS]->(related:User)',
         followingCount: '-[:FOLLOWS]->(related:User)',
         followedByCount: '<-[:FOLLOWS]-(related:User)',
-        commentedCount:
-          '-[:WROTE]->(c:Comment)-[:COMMENTS]->(related:Post) WHERE NOT related.disabled = true AND NOT related.deleted = true AND NOT (related)<-[:CANNOT_SEE]-(:User {id: $cypherParams.currentUserId})',
-        shoutedCount:
-          '-[:SHOUTED]->(related:Post) WHERE NOT related.disabled = true AND NOT related.deleted = true AND NOT (related)<-[:CANNOT_SEE]-(:User {id: $cypherParams.currentUserId})',
+        commentedCount: `-[:WROTE]->(c:Comment)-[:COMMENTS]->(related:Post) ${visiblePostFilter}`,
+        shoutedCount: `-[:SHOUTED]->(related:Post) ${visiblePostFilter}`,
         badgeTrophiesCount: '<-[:REWARDED]-(related:Badge)',
       },
       hasOne: {
