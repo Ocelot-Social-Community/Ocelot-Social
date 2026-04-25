@@ -22,7 +22,7 @@
     "tailwind-merge": "^3.5.0",
     "vue": "^3.5.30",
     "vue-demi": "^0.14.10",
-    "vue-router": "^5.0.4"
+    "vue-router": "^5.0.6"
   },
   "devDependencies": {
     "@intlify/eslint-plugin-vue-i18n": "^4.3.0",
