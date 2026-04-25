@@ -14,7 +14,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@nuxtjs/i18n": "^10.2.4",
+    "@nuxtjs/i18n": "^10.3.0",
     "@ocelot-social/ui": "file:../packages/ui",
     "clsx": "^2.1.1",
     "floating-vue": "^5.2.2",
