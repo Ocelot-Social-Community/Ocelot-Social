@@ -89,7 +89,7 @@
     "@playwright/test": "^1.59.1",
     "@size-limit/file": "^12.0.1",
     "@storybook/vue3-vite": "^10.3.5",
-    "@tailwindcss/cli": "^4.2.2",
+    "@tailwindcss/cli": "^4.2.4",
     "@tailwindcss/vite": "^4.2.4",
     "@types/node": "^25.6.0",
     "@vitejs/plugin-vue": "^6.0.4",
