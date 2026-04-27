@@ -55,7 +55,7 @@ jobs:
           docker save "maildev/maildev:latest" > /tmp/mailserver.tar
 
       - name: Cache docker images
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v4.0.2
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v4.0.2
         with:
           path: |
             /tmp/backend.tar
@@ -90,7 +90,7 @@ jobs:
         run: docker save "ghcr.io/ocelot-social-community/ocelot-social/webapp:test" > /tmp/webapp.tar
 
       - name: Cache docker image
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v4.0.2
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v4.0.2
         with:
           path: /tmp/webapp.tar
           key: ${{ github.run_id }}-e2e-webapp-cache
@@ -129,7 +129,7 @@ jobs:
       
       - name: Cache docker image
         
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v4.0.2
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v4.0.2
         with:
           path: |
             /opt/cucumber-json-formatter
@@ -175,7 +175,7 @@ jobs:
           cache: 'yarn'
 
       - name: Restore cypress cache
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v4.0.2
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v4.0.2
         with:
           path: |
             /opt/cucumber-json-formatter
@@ -185,7 +185,7 @@ jobs:
           restore-keys: ${{ github.run_id }}-e2e-cypress
 
       - name: Restore backend environment cache
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v4.0.2
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v4.0.2
         with:
           path: |
             /tmp/backend.tar
@@ -196,7 +196,7 @@ jobs:
           key: ${{ github.run_id }}-e2e-backend-environment-cache
 
       - name: Restore webapp cache
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v4.0.2
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v4.0.2
         with:
           path: /tmp/webapp.tar
           key: ${{ github.run_id }}-e2e-webapp-cache
