@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM node:25.8.2-alpine AS ui-library
+FROM node:25.9.0-alpine AS ui-library
 RUN apk --no-cache add git python3 make g++
 RUN mkdir -p /app
 WORKDIR /app
@@ -9,7 +9,7 @@ RUN --mount=type=cache,target=/root/.npm,sharing=locked \
 COPY packages/ui/. .
 RUN npm run build
 
-FROM node:25.8.2-alpine AS base
+FROM node:25.9.0-alpine AS base
 LABEL org.label-schema.name="ocelot.social:webapp"
 LABEL org.label-schema.description="Web Frontend of the Social Network Software ocelot.social"
 LABEL org.label-schema.usage="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md"
