@@ -171,7 +171,11 @@ describe('NotificationsTable.vue', () => {
         const longContent = 'word '.repeat(60).trim()
 
         const descriptionTextAt = (rowIndex) =>
-          wrapper.findAll('.notification-grid-row').at(rowIndex).find('.notification-description').text()
+          wrapper
+            .findAll('.notification-grid-row')
+            .at(rowIndex)
+            .find('.notification-description')
+            .text()
 
         it('truncates long Post content to ~120 characters', () => {
           postNotification.from.content = longContent
