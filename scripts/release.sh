@@ -21,6 +21,8 @@ npm version --no-git-tag-version $VERSION_NEW
 ## helm
 sed -i -e 's/appVersion: ".*"/appVersion: "'"$VERSION_NEW"'"/g' $ROOT_DIR/deployment/helm/charts/ocelot-neo4j/Chart.yaml
 sed -i -e 's/appVersion: ".*"/appVersion: "'"$VERSION_NEW"'"/g' $ROOT_DIR/deployment/helm/charts/ocelot-social/Chart.yaml
+sed -i -e 's/^version: .*/version: '"$VERSION_NEW"'/' $ROOT_DIR/deployment/helm/charts/ocelot-neo4j/Chart.yaml
+sed -i -e 's/^version: .*/version: '"$VERSION_NEW"'/' $ROOT_DIR/deployment/helm/charts/ocelot-social/Chart.yaml
 
 # generate changelog
 cd $ROOT_DIR
