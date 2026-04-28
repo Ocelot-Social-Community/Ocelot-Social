@@ -165,22 +165,31 @@ describe('NotificationsTable.vue', () => {
       })
 
       describe('description truncation', () => {
-        const longContent = 'a'.repeat(500)
+        // word-based content so trunc-html cuts at a word boundary near the
+        // configured limit (120 for posts, 180 for comments). A single long
+        // token would collapse to "…" and hide the limit difference.
+        const longContent = 'word '.repeat(60).trim()
 
-        it('truncates long Post content', () => {
+        const descriptionTextAt = (rowIndex) =>
+          wrapper.findAll('.notification-grid-row').at(rowIndex).find('.notification-description').text()
+
+        it('truncates long Post content to ~120 characters', () => {
           postNotification.from.content = longContent
           propsData.notifications = [postNotification]
           wrapper = Wrapper()
-          const description = wrapper.findAll('.notification-grid-row').at(0).find('p')
-          expect(description.text().length).toBeLessThan(longContent.length)
+          const text = descriptionTextAt(0)
+          expect(text.length).toBeLessThan(longContent.length)
+          expect(text.length).toBeLessThanOrEqual(125)
         })
 
-        it('truncates long Comment content', () => {
+        it('truncates long Comment content to ~180 characters', () => {
           commentNotification.from.content = longContent
           propsData.notifications = [commentNotification]
           wrapper = Wrapper()
-          const description = wrapper.findAll('.notification-grid-row').at(0).find('p')
-          expect(description.text().length).toBeLessThan(longContent.length)
+          const text = descriptionTextAt(0)
+          expect(text.length).toBeLessThan(longContent.length)
+          expect(text.length).toBeGreaterThan(125)
+          expect(text.length).toBeLessThanOrEqual(185)
         })
       })
 
