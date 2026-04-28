@@ -164,6 +164,26 @@ describe('NotificationsTable.vue', () => {
         })
       })
 
+      describe('description truncation', () => {
+        const longContent = 'a'.repeat(500)
+
+        it('truncates long Post content', () => {
+          postNotification.from.content = longContent
+          propsData.notifications = [postNotification]
+          wrapper = Wrapper()
+          const description = wrapper.findAll('.notification-grid-row').at(0).find('p')
+          expect(description.text().length).toBeLessThan(longContent.length)
+        })
+
+        it('truncates long Comment content', () => {
+          commentNotification.from.content = longContent
+          propsData.notifications = [commentNotification]
+          wrapper = Wrapper()
+          const description = wrapper.findAll('.notification-grid-row').at(0).find('p')
+          expect(description.text().length).toBeLessThan(longContent.length)
+        })
+      })
+
       describe('unread status', () => {
         it('does not have class `notification-status`', () => {
           expect(wrapper.find('.notification-status').exists()).toBe(false)
