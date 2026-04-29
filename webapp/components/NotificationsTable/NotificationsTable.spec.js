@@ -164,6 +164,39 @@ describe('NotificationsTable.vue', () => {
         })
       })
 
+      describe('description truncation', () => {
+        // word-based content so trunc-html cuts at a word boundary near the
+        // configured limit (120 for posts, 180 for comments). A single long
+        // token would collapse to "…" and hide the limit difference.
+        const longContent = 'word '.repeat(60).trim()
+
+        const descriptionTextAt = (rowIndex) =>
+          wrapper
+            .findAll('.notification-grid-row')
+            .at(rowIndex)
+            .find('.notification-description')
+            .text()
+
+        it('truncates long Post content to ~120 characters', () => {
+          postNotification.from.content = longContent
+          propsData.notifications = [postNotification]
+          wrapper = Wrapper()
+          const text = descriptionTextAt(0)
+          expect(text.length).toBeLessThan(longContent.length)
+          expect(text.length).toBeLessThanOrEqual(125)
+        })
+
+        it('truncates long Comment content to ~180 characters', () => {
+          commentNotification.from.content = longContent
+          propsData.notifications = [commentNotification]
+          wrapper = Wrapper()
+          const text = descriptionTextAt(0)
+          expect(text.length).toBeLessThan(longContent.length)
+          expect(text.length).toBeGreaterThan(125)
+          expect(text.length).toBeLessThanOrEqual(185)
+        })
+      })
+
       describe('unread status', () => {
         it('does not have class `notification-status`', () => {
           expect(wrapper.find('.notification-status').exists()).toBe(false)

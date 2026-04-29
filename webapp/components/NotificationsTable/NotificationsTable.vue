@@ -72,8 +72,11 @@
                   :class="{ 'notification-status': notification.read }"
                 >
                   {{
-                    $filters.removeHtml(notification.from.content) ||
-                    $filters.removeHtml(notification.from.descriptionExcerpt)
+                    $filters.truncate(
+                      $filters.removeHtml(notification.from.content) ||
+                        $filters.removeHtml(notification.from.descriptionExcerpt),
+                      isComment(notification.from) ? 180 : 120,
+                    )
                   }}
                 </p>
               </div>
