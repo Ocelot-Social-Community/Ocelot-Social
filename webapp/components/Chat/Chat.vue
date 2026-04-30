@@ -386,6 +386,14 @@ export default {
       style.textContent = `
         .vac-player-bar { min-width: 0; }
         .vac-player-progress { width: auto; flex: 1 1 auto; min-width: 0; }
+        ${
+          this.singleRoom
+            ? `
+        .vac-message-wrapper .vac-message-box { flex: 0 0 80%; max-width: 80%; }
+        .vac-message-wrapper .vac-offset-current { margin-left: 20%; }
+        `
+            : ''
+        }
       `
       shadowRoot.appendChild(style)
       this._shadowStylesInjected = true
