@@ -805,7 +805,7 @@ export default {
   }
 }
 .word-break-all {
-  word-break: break-all;
+  overflow-wrap: anywhere;
 }
 .collaps-button {
   align-self: flex-end;
