@@ -85,7 +85,7 @@
       </component>
     </div>
 
-    <div slot="room-header-info">
+    <div slot="room-header-info" class="chat-room-header-info">
       <div class="vac-room-name vac-text-ellipsis">
         <component
           :is="roomHeaderLink ? 'nuxt-link' : 'span'"
@@ -386,6 +386,8 @@ export default {
       style.textContent = `
         .vac-player-bar { min-width: 0; }
         .vac-player-progress { width: auto; flex: 1 1 auto; min-width: 0; }
+        .vac-room-header .vac-info-wrapper { flex: 1 1 0; min-width: 0; width: auto; }
+        .vac-room-header .vac-room-name { min-width: 0; }
         ${
           this.singleRoom
             ? `
@@ -1171,6 +1173,16 @@ export default {
 
 .ds-flex-item.single-chat-bubble {
   margin-right: 1em;
+}
+
+.chat-room-options {
+  flex-shrink: 0;
+}
+
+.chat-room-header-info {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .chat-header-profile-link {
