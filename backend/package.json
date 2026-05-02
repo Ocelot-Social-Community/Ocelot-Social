@@ -113,7 +113,7 @@
     "prettier": "^3.8.1",
     "rosie": "^2.1.1",
     "ts-jest": "^29.4.6",
-    "tsc-alias": "^1.8.16",
+    "tsc-alias": "^1.8.17",
     "tsx": "^4.21.0",
     "typescript": "^5.8.3"
   },
