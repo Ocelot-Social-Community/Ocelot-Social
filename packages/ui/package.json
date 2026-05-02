@@ -93,7 +93,7 @@
     "@tailwindcss/vite": "^4.2.4",
     "@types/node": "^25.6.0",
     "@vitejs/plugin-vue": "^6.0.4",
-    "@vitest/coverage-v8": "^4.1.4",
+    "@vitest/coverage-v8": "^4.1.5",
     "@vue/test-utils": "^2.4.8",
     "eslint": "^9.39.2",
     "eslint-config-it4c": "^0.12.0",
