@@ -11,7 +11,9 @@ import ChangeGroupMemberRole from '@graphql/queries/groups/ChangeGroupMemberRole
 import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
 import JoinGroup from '@graphql/queries/groups/JoinGroup.gql'
 import LeaveGroup from '@graphql/queries/groups/LeaveGroup.gql'
+import muteGroup from '@graphql/queries/groups/muteGroup.gql'
 import RemoveUserFromGroup from '@graphql/queries/groups/RemoveUserFromGroup.gql'
+import CreateGroupRoom from '@graphql/queries/messaging/CreateGroupRoom.gql'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
 import markAsRead from '@graphql/queries/notifications/markAsRead.gql'
 import notifications from '@graphql/queries/notifications/notifications.gql'
@@ -1056,6 +1058,89 @@ describe('notifications', () => {
         })
 
         expect(sendChatMessageMailMock).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('group chat', () => {
+      let groupRoomId
+
+      beforeEach(async () => {
+        authenticatedUser = await chatSender.toJson()
+        await mutate({
+          mutation: CreateGroup,
+          variables: {
+            id: 'chat-group',
+            name: 'Chat Group',
+            about: 'Group with chat',
+            description: 'A group chat for testing' + Array(50).join('_'),
+            groupType: 'public',
+            actionRadius: 'regional',
+            categoryIds,
+          },
+        })
+        await mutate({
+          mutation: JoinGroup,
+          variables: { groupId: 'chat-group', userId: 'chatReceiver' },
+        })
+
+        const createRoomResult = await mutate({
+          mutation: CreateGroupRoom,
+          variables: { groupId: 'chat-group' },
+        })
+        groupRoomId = createRoomResult.data.CreateGroupRoom.id
+
+        pubsubSpy.mockClear()
+        ;(sendChatMessageMailMock as jest.Mock).mockClear()
+      })
+
+      describe('if the chatReceiver has muted the group', () => {
+        it('publishes subscriptions but sends no email', async () => {
+          isUserOnlineMock = jest.fn().mockReturnValue(false)
+          authenticatedUser = await chatReceiver.toJson()
+          await mutate({
+            mutation: muteGroup,
+            variables: { groupId: 'chat-group' },
+          })
+          authenticatedUser = await chatSender.toJson()
+
+          await mutate({
+            mutation: CreateMessage,
+            variables: {
+              roomId: groupRoomId,
+              content: 'Some message in the muted group',
+            },
+          })
+
+          expect(pubsubSpy).toHaveBeenCalledWith('CHAT_MESSAGE_ADDED', {
+            chatMessageAdded: expect.objectContaining({
+              content: 'Some message in the muted group',
+              senderId: 'chatSender',
+            }),
+            userId: 'chatReceiver',
+          })
+          expect(sendChatMessageMailMock).not.toHaveBeenCalled()
+        })
+      })
+
+      describe('if the chatReceiver has not muted the group', () => {
+        it('publishes subscriptions and sends an email', async () => {
+          isUserOnlineMock = jest.fn().mockReturnValue(false)
+
+          await mutate({
+            mutation: CreateMessage,
+            variables: {
+              roomId: groupRoomId,
+              content: 'Some message in the unmuted group',
+            },
+          })
+
+          expect(sendChatMessageMailMock).toHaveBeenCalledTimes(1)
+          expect(sendChatMessageMailMock).toHaveBeenCalledWith({
+            email: 'user@example.org',
+            senderUser: expect.objectContaining({ id: 'chatSender' }),
+            recipientUser: expect.objectContaining({ id: 'chatReceiver' }),
+          })
+        })
       })
     })
   })

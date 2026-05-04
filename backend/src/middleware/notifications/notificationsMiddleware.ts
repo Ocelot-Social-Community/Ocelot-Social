@@ -482,7 +482,9 @@ const handleCreateMessage: IMiddlewareResolver = async (
             WHERE NOT recipientUser.id = $currentUserId
             AND NOT (recipientUser)-[:BLOCKED]-(senderUser)
             AND NOT (recipientUser)-[:MUTED]->(senderUser)
-          RETURN senderUser {.*}, recipientUser {.*}, emailAddress {.email}
+          OPTIONAL MATCH (room)-[:ROOM_FOR]->(group:Group)<-[mutedGroup:MUTED]-(recipientUser)
+          RETURN senderUser {.*}, recipientUser {.*}, emailAddress {.email},
+            mutedGroup IS NOT NULL AS isGroupMuted
         `
       const txResponse = await transaction.run(messageRecipientsCypher, {
         currentUserId,
@@ -494,6 +496,7 @@ const handleCreateMessage: IMiddlewareResolver = async (
         recipients: txResponse.records.map((record) => ({
           user: record.get('recipientUser'),
           email: record.get('emailAddress')?.email,
+          isGroupMuted: record.get('isGroupMuted'),
         })),
       }
     })
@@ -521,7 +524,8 @@ const handleCreateMessage: IMiddlewareResolver = async (
       if (
         email &&
         recipientUser.emailNotificationsChatMessage !== false &&
-        !isUserOnline(recipientUser)
+        !isUserOnline(recipientUser) &&
+        !recipient.isGroupMuted
       ) {
         void sendChatMessageMail({ email, senderUser, recipientUser })
       }
