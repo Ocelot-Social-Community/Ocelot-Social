@@ -292,17 +292,15 @@ describe('decode', () => {
         })
       })
 
-      it('sets `lastActiveAt`', async () => {
+      it('does not set `lastActiveAt`', async () => {
         let user = await neode.first<typeof User>('User', { id: 'u3' }, undefined)
         await expect(user.toJson()).resolves.not.toHaveProperty('lastActiveAt')
         await decode(context)(validAuthorizationHeader)
         user = await neode.first<typeof User>('User', { id: 'u3' }, undefined)
-        await expect(user.toJson()).resolves.toMatchObject({
-          lastActiveAt: expect.any(String),
-        })
+        await expect(user.toJson()).resolves.not.toHaveProperty('lastActiveAt')
       })
 
-      it('updates `lastActiveAt` for every authenticated request', async () => {
+      it('does not touch `lastActiveAt` on authenticated requests', async () => {
         let user = await neode.first('User', { id: 'u3' }, undefined)
         await user.update({
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -316,8 +314,7 @@ describe('decode', () => {
         await decode(context)(validAuthorizationHeader)
         user = await neode.first<typeof User>('User', { id: 'u3' }, undefined)
         await expect(user.toJson()).resolves.toMatchObject({
-          // should be a different time by now ;)
-          lastActiveAt: expect.not.stringContaining('2019-10-03T23:33'),
+          lastActiveAt: '2019-10-03T23:33:08.598Z',
         })
       })
 

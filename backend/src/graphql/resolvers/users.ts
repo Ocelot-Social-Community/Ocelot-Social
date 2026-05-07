@@ -358,6 +358,7 @@ export default {
           MATCH (user:User {id: $user.id})
             SET user.awaySince = null
             SET user.lastOnlineStatus = $status
+            SET user.lastActiveAt = toString(datetime())
         `
 
       await context.database.write({
