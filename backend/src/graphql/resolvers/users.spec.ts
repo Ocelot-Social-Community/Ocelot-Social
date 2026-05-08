@@ -901,6 +901,7 @@ describe('updateOnlineStatus', () => {
         const dbUser = database.neode.hydrateFirst(result, 'u', database.neode.model('User'))
         await expect(dbUser.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'online',
+          lastActiveAt: expect.any(String),
         })
         await expect(dbUser.toJson()).resolves.not.toMatchObject({
           awaySince: expect.any(String),

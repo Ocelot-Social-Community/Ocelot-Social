@@ -34,20 +34,19 @@ const decodeJwt = async (
   }
   const session = context.driver.session()
 
-  const writeTxResultPromise = session.writeTransaction<DecodedUser[]>(async (transaction) => {
-    const updateUserLastActiveTransactionResponse = await transaction.run(
+  const readTxResultPromise = session.readTransaction<DecodedUser[]>(async (transaction) => {
+    const fetchUserTransactionResponse = await transaction.run(
       `
       MATCH (user:User {id: $id, deleted: false, disabled: false })
-      SET user.lastActiveAt = toString(datetime())
       RETURN user {.id, .slug, .name, .role, .disabled, .actorId}
       LIMIT 1
     `,
       { id },
     )
-    return updateUserLastActiveTransactionResponse.records.map((record) => record.get('user'))
+    return fetchUserTransactionResponse.records.map((record) => record.get('user'))
   })
   try {
-    const [currentUser] = await writeTxResultPromise
+    const [currentUser] = await readTxResultPromise
     if (!currentUser) return null
     return {
       ...currentUser,
