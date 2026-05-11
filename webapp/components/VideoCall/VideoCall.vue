@@ -117,6 +117,7 @@
             :sink-id="speakerDeviceId"
             :is-active-speaker="activeSpeakerSet.has(tile.identity)"
             :is-spotlighted="!!(spotlightTile && tile.key === spotlightTile.key)"
+            :avatar-size="tileAvatarSize(tile)"
             :clickable="isFullscreen"
             :class="{
               'video-tile--hidden':
@@ -459,6 +460,12 @@ export default {
     },
     closeInCallChat() {
       this.setShowChat({ showChat: false, chatUserId: null, groupId: null })
+    },
+    tileAvatarSize(tile) {
+      // Spotlight thumbnails are too short for the large avatar — it gets
+      // visually squished into an oval. Use the small avatar there instead.
+      if (this.spotlightTile && tile.key !== this.spotlightTile.key) return 'small'
+      return 'large'
     },
     onTileSelect(tile) {
       if (!tile) return

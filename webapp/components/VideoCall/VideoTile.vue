@@ -36,8 +36,8 @@
       </span>
     </div>
     <div v-else-if="!hasVideo && !tile.isScreen" class="video-tile__fallback">
-      <profile-avatar :profile="tile.profile" size="large" />
-      <span v-if="tile.isLocal" class="video-tile__fallback-text">
+      <profile-avatar :profile="tile.profile" :size="avatarSize" />
+      <span v-if="tile.isLocal && avatarSize !== 'small'" class="video-tile__fallback-text">
         {{ $t('videoCall.prejoin.cameraDisabled') }}
       </span>
     </div>
@@ -88,6 +88,14 @@ export default {
     isSpotlighted: {
       type: Boolean,
       default: false,
+    },
+    avatarSize: {
+      // Forwarded to ProfileAvatar. 'small' renders the round avatar at the
+      // round 40-ish px size, 'large' at the much larger one. Pass 'small'
+      // for tightly-packed thumbnails so the avatar doesn't get squished.
+      type: String,
+      default: 'large',
+      validator: (value) => !value || /^(small|large)$/.test(value),
     },
   },
   emits: ['select'],
@@ -315,6 +323,12 @@ export default {
   color: $text-color-inverse;
   pointer-events: none;
   padding: $space-small;
+
+  // Don't let the flex column squish the avatar into an oval when the tile is
+  // narrower than the avatar's intrinsic size (thumbnail strip in spotlight).
+  > .profile-avatar {
+    flex-shrink: 0;
+  }
 }
 
 .video-tile__fallback--own-screen {
