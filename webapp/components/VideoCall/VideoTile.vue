@@ -1,6 +1,7 @@
 <template>
   <div :class="['video-tile', { 'video-tile--screen': tile.isScreen }]">
     <video
+      v-show="hasVideo"
       ref="videoEl"
       autoplay
       playsinline
@@ -11,6 +12,21 @@
       ref="audioEl"
       autoplay
     />
+    <div
+      v-if="showOwnScreenPlaceholder"
+      class="video-tile__fallback video-tile__fallback--own-screen"
+    >
+      <os-icon :icon="icons.desktop" class="video-tile__fallback-icon" />
+      <span class="video-tile__fallback-text">
+        {{ $t('videoCall.youAreSharingScreen') }}
+      </span>
+    </div>
+    <div v-else-if="!hasVideo && !tile.isScreen" class="video-tile__fallback">
+      <profile-avatar :profile="tile.profile" size="large" />
+      <span v-if="tile.isLocal" class="video-tile__fallback-text">
+        {{ $t('videoCall.prejoin.cameraDisabled') }}
+      </span>
+    </div>
     <div class="video-tile__label">
       {{ tile.name }}
       <span v-if="tile.isLocal" class="video-tile__local-tag">
@@ -24,8 +40,13 @@
 </template>
 
 <script>
+import { OsIcon } from '@ocelot-social/ui'
+import { iconRegistry } from '~/utils/iconRegistry'
+import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+
 export default {
   name: 'VideoTile',
+  components: { ProfileAvatar, OsIcon },
   props: {
     tile: {
       type: Object,
@@ -41,6 +62,22 @@ export default {
       attachedVideo: null,
       attachedAudio: null,
     }
+  },
+  created() {
+    this.icons = iconRegistry
+  },
+  computed: {
+    showOwnScreenPlaceholder() {
+      // Rendering the local screen share back to the user creates an infinite
+      // mirror (the tab being captured shows the captured tab…). Show a
+      // static placeholder instead. Remote participants still see the actual
+      // shared screen.
+      return this.tile.isScreen && this.tile.isLocal
+    },
+    hasVideo() {
+      if (this.showOwnScreenPlaceholder) return false
+      return !!this.tile.videoTrack
+    },
   },
   watch: {
     'tile.videoTrack': {
@@ -86,7 +123,8 @@ export default {
           /* noop */
         }
       }
-      if (this.tile.videoTrack) {
+      // Local screen share is never attached locally to avoid the mirror loop.
+      if (this.tile.videoTrack && !this.showOwnScreenPlaceholder) {
         try {
           this.tile.videoTrack.attach(el)
           this.attachedVideo = this.tile.videoTrack
@@ -183,6 +221,35 @@ export default {
 .video-tile__screen-tag {
   opacity: 0.85;
   margin-left: $space-xxx-small;
+}
+
+.video-tile__fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $space-x-small;
+  color: $text-color-inverse;
+  pointer-events: none;
+  padding: $space-small;
+}
+
+.video-tile__fallback--own-screen {
+  background: $color-neutral-10;
+  color: $color-neutral-70;
+}
+
+.video-tile__fallback-icon {
+  width: 48px;
+  height: 48px;
+  opacity: 0.7;
+}
+
+.video-tile__fallback-text {
+  font-size: $font-size-small;
+  opacity: 0.85;
 }
 
 .video-tile__label {

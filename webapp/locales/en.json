@@ -1463,6 +1463,7 @@
     "screenShare": "Screen",
     "startScreenShare": "Share screen",
     "stopScreenShare": "Stop sharing",
+    "youAreSharingScreen": "You are sharing your screen",
     "title": "Group video call",
     "unmuteMic": "Unmute microphone",
     "you": "you"

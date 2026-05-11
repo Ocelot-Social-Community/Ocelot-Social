@@ -2,6 +2,7 @@
   <div class="prejoin">
     <div class="prejoin__preview">
       <video
+        v-show="hasVideo"
         ref="previewEl"
         autoplay
         muted
@@ -9,11 +10,14 @@
         class="prejoin__video"
       />
       <div v-if="!hasVideo" class="prejoin__placeholder">
-        {{
-          cameraActive
-            ? $t('videoCall.prejoin.noCamera')
-            : $t('videoCall.prejoin.cameraDisabled')
-        }}
+        <profile-avatar :profile="currentUser" size="large" class="prejoin__avatar" />
+        <span class="prejoin__placeholder-text">
+          {{
+            cameraActive
+              ? $t('videoCall.prejoin.noCamera')
+              : $t('videoCall.prejoin.cameraDisabled')
+          }}
+        </span>
       </div>
     </div>
 
@@ -182,12 +186,14 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
+import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 
 export default {
   name: 'PreJoin',
-  components: { OsButton, OsIcon },
+  components: { OsButton, OsIcon, ProfileAvatar },
   data() {
     return {
       cameras: [],
@@ -209,6 +215,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      currentUser: 'auth/user',
+    }),
     hasVideo() {
       return !!(this.stream && this.stream.getVideoTracks().length > 0)
     },
@@ -674,12 +683,22 @@ export default {
   position: absolute;
   inset: 0;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: $space-small;
   color: $color-neutral-70;
   padding: $space-small;
   text-align: center;
   pointer-events: none;
+}
+
+.prejoin__avatar {
+  pointer-events: auto;
+}
+
+.prejoin__placeholder-text {
+  font-size: $font-size-small;
 }
 
 .prejoin__panel {

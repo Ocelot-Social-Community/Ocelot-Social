@@ -221,6 +221,7 @@ export default {
       groupName: 'videoCall/groupName',
       groupSlug: 'videoCall/groupSlug',
       getShowChat: 'chat/showChat',
+      currentUser: 'auth/user',
     }),
     chatOpenForThisGroup() {
       return !!(
@@ -435,6 +436,10 @@ export default {
         room.on(RoomEvent.ParticipantDisconnected, onAny)
         room.on(RoomEvent.TrackSubscribed, onAny)
         room.on(RoomEvent.TrackUnsubscribed, onAny)
+        // LiveKit's setCameraEnabled(false) mutes the track instead of
+        // unpublishing it. Re-render so the avatar fallback kicks in.
+        room.on(RoomEvent.TrackMuted, onAny)
+        room.on(RoomEvent.TrackUnmuted, onAny)
         room.on(RoomEvent.LocalTrackPublished, () => {
           this.screenShareEnabled = !!room.localParticipant.isScreenShareEnabled
           onAny()
@@ -470,14 +475,34 @@ export default {
         }
         return null
       }
+      const profileFor = (participant, isLocal) => {
+        if (isLocal && this.currentUser) {
+          return {
+            id: this.currentUser.id,
+            name: this.currentUser.name,
+            avatar: this.currentUser.avatar,
+          }
+        }
+        return {
+          id: participant.identity,
+          name: participant.name || participant.identity,
+        }
+      }
       const collect = (participant, isLocal) => {
         const audioTrack = collectAudio(participant)
-        const videoPubs = Array.from(participant.videoTrackPublications.values())
+        const profile = profileFor(participant, isLocal)
+        // Muted publications still appear in the map (LiveKit doesn't unpublish
+        // on setCameraEnabled(false)) but their track renders black — treat
+        // them as no video so the avatar fallback kicks in.
+        const videoPubs = Array.from(participant.videoTrackPublications.values()).filter(
+          (pub) => pub.track && !pub.isMuted,
+        )
         if (videoPubs.length === 0) {
           tiles.push({
             key: `${participant.identity}/audio`,
             identity: participant.identity,
             name: participant.name || participant.identity,
+            profile,
             videoTrack: null,
             audioTrack,
             isLocal,
@@ -491,7 +516,8 @@ export default {
             key: `${participant.identity}/${isScreen ? 'screen' : 'cam'}`,
             identity: participant.identity,
             name: participant.name || participant.identity,
-            videoTrack: pub.track || null,
+            profile,
+            videoTrack: pub.track,
             audioTrack: isScreen ? null : audioTrack,
             isLocal,
             isScreen,
