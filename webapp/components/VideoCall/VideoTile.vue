@@ -5,8 +5,14 @@
       {
         'video-tile--screen': tile.isScreen,
         'video-tile--speaking': isActiveSpeaker && !tile.isScreen,
+        'video-tile--clickable': clickable,
       },
     ]"
+    :role="clickable ? 'button' : null"
+    :tabindex="clickable ? 0 : null"
+    @click="onSelect"
+    @keydown.enter="onSelect"
+    @keydown.space.prevent="onSelect"
   >
     <video
       v-show="hasVideo"
@@ -44,6 +50,13 @@
         — {{ $t('videoCall.screenShare') }}
       </span>
     </div>
+    <div
+      v-if="isSpotlighted"
+      class="video-tile__pin"
+      :aria-label="$t('videoCall.spotlightExit')"
+    >
+      <os-icon :icon="icons.expand" />
+    </div>
   </div>
 </template>
 
@@ -68,7 +81,16 @@ export default {
       type: Boolean,
       default: false,
     },
+    clickable: {
+      type: Boolean,
+      default: false,
+    },
+    isSpotlighted: {
+      type: Boolean,
+      default: false,
+    },
   },
+  emits: ['select'],
   data() {
     return {
       attachedVideo: null,
@@ -116,6 +138,10 @@ export default {
     this.detachAll()
   },
   methods: {
+    onSelect() {
+      if (!this.clickable) return
+      this.$emit('select', this.tile)
+    },
     async applySinkId() {
       const el = this.$refs.audioEl
       if (!el || !this.sinkId || typeof el.setSinkId !== 'function') return
@@ -235,6 +261,36 @@ export default {
   border-radius: inherit;
   pointer-events: none;
   z-index: 2;
+}
+
+.video-tile--clickable {
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid $color-primary;
+    outline-offset: -2px;
+  }
+}
+
+.video-tile__pin {
+  position: absolute;
+  top: $space-xxx-small;
+  right: $space-xxx-small;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $color-primary;
+  color: $color-primary-inverse;
+  border-radius: 50%;
+  z-index: 3;
+  pointer-events: none;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
 }
 
 // Hidden tiles stay in the DOM so their <audio> element keeps playing the

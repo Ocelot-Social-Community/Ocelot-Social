@@ -97,14 +97,18 @@
           </span>
         </div>
         <div
-          :class="['video-call__stage', isFullscreen ? 'video-call__grid' : 'video-call__single']"
-          :style="isFullscreen ? gridStyle : null"
+          :class="[
+            'video-call__stage',
+            stageLayoutClass,
+          ]"
+          :style="gridStyleConditional"
         >
           <!--
             All tiles are always mounted so every participant's audio track stays
-            attached to a DOM <audio> element. In the minimized view, only the
-            primary tile is visible; the rest are hidden via CSS while their
-            audio keeps playing.
+            attached to a DOM <audio> element. CSS Grid (in spotlight mode)
+            places the spotlight tile into the wide left cell and lets the
+            others auto-flow into a narrow right column — instances stay stable
+            on toggle so audio doesn't re-attach.
           -->
           <video-tile
             v-for="tile in tiles"
@@ -112,10 +116,15 @@
             :tile="tile"
             :sink-id="speakerDeviceId"
             :is-active-speaker="activeSpeakerSet.has(tile.identity)"
+            :is-spotlighted="!!(spotlightTile && tile.key === spotlightTile.key)"
+            :clickable="isFullscreen"
             :class="{
               'video-tile--hidden':
                 !isFullscreen && primaryTile && tile.key !== primaryTile.key,
+              'video-tile--spotlighted':
+                !!(spotlightTile && tile.key === spotlightTile.key),
             }"
+            @select="onTileSelect"
           />
         </div>
         <aside
@@ -257,6 +266,7 @@ export default {
       speakerDeviceId: null,
       Track: null,
       activeSpeakerIds: [],
+      spotlightKey: null,
     }
   },
   computed: {
@@ -345,6 +355,20 @@ export default {
     activeSpeakerSet() {
       return new Set(this.activeSpeakerIds)
     },
+    spotlightTile() {
+      if (!this.spotlightKey) return null
+      return this.tiles.find((t) => t.key === this.spotlightKey) || null
+    },
+    stageLayoutClass() {
+      if (this.spotlightTile && this.isFullscreen) return 'video-call__stage--spotlight'
+      return this.isFullscreen ? 'video-call__grid' : 'video-call__single'
+    },
+    gridStyleConditional() {
+      // The grid template only applies for the regular grid view. Spotlight
+      // and single (minimized) modes have their own static layouts.
+      if (this.spotlightTile || !this.isFullscreen) return null
+      return this.gridStyle
+    },
     screenShareSupported() {
       return (
         typeof navigator !== 'undefined' &&
@@ -392,6 +416,13 @@ export default {
         this.setStorePhase(next || 'idle')
       },
     },
+    tiles(newTiles) {
+      // Clear the spotlight if the pinned tile no longer exists (participant
+      // left, camera toggled and the key changed from cam→audio etc.).
+      if (this.spotlightKey && !newTiles.some((t) => t.key === this.spotlightKey)) {
+        this.spotlightKey = null
+      }
+    },
     $route(to) {
       // Keep the minimized/maximized state in sync with the URL when the user
       // navigates via links, browser back/forward, or our own routing helpers.
@@ -428,6 +459,12 @@ export default {
     },
     closeInCallChat() {
       this.setShowChat({ showChat: false, chatUserId: null, groupId: null })
+    },
+    onTileSelect(tile) {
+      if (!tile) return
+      // Only spotlight in fullscreen — minimized window already shows one tile.
+      if (!this.isFullscreen) return
+      this.spotlightKey = this.spotlightKey === tile.key ? null : tile.key
     },
     toggleMinimize() {
       const next = !this.minimized
@@ -697,6 +734,7 @@ export default {
       }
       this.tiles = []
       this.activeSpeakerIds = []
+      this.spotlightKey = null
       this.micEnabled = true
       this.cameraEnabled = true
       this.screenShareEnabled = false
@@ -854,6 +892,34 @@ export default {
 
 .video-call__single {
   display: flex;
+}
+
+// Spotlight: big tile fills the left column, the others auto-flow as a
+// narrow column of thumbnails on the right. All tiles stay in the same
+// container so audio tracks stay attached when toggling spotlight.
+//
+// `repeat(auto-fill, minmax(90px, 1fr))` creates as many explicit rows as
+// fit in the container at ~90 px each. The spotlight tile then spans every
+// row via `grid-row: 1 / -1`, while the thumbnails auto-place into the
+// narrow right column, one per row.
+.video-call__stage--spotlight {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 160px;
+  grid-template-rows: repeat(auto-fill, minmax(90px, 1fr));
+  gap: $space-xxx-small;
+  padding: $space-xxx-small;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.video-call__stage--spotlight .video-tile--spotlighted {
+  grid-column: 1;
+  grid-row: 1 / -1;
+}
+
+.video-call__stage--spotlight .video-tile:not(.video-tile--spotlighted) {
+  grid-column: 2;
 }
 
 .video-call__speakers {
