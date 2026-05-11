@@ -149,6 +149,14 @@ export default {
   background: $color-neutral-0;
   overflow: hidden;
   display: flex;
+  // Fill the flex/grid parent so a single tile occupies the full body in the
+  // minimized window. In a grid container, `flex` is ignored — width: 100% +
+  // height: 100% would not cascade reliably, so we use flex sizing here.
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
   border-radius: $border-radius-base;
 
   video {

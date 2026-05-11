@@ -17,7 +17,7 @@
         class="video-call__count"
         data-test="video-call-participants"
       >
-        {{ tiles.length }}
+        {{ uniqueParticipantCount }}
       </span>
       <div class="video-call__header-actions">
         <os-button
@@ -179,6 +179,11 @@ export default {
       // Compact icon-only buttons when the call is parked in the corner.
       return !this.isFullscreen
     },
+    uniqueParticipantCount() {
+      // A single participant publishing both camera and screen share still counts
+      // as one — count distinct identities, not tiles.
+      return new Set(this.tiles.map((t) => t.identity)).size
+    },
     screenShareSupported() {
       return (
         typeof navigator !== 'undefined' &&
@@ -188,10 +193,17 @@ export default {
     },
     primaryTile() {
       if (this.tiles.length === 0) return null
-      const screen = this.tiles.find((t) => t.isScreen && !t.isLocal)
-      if (screen) return screen
-      const remoteCam = this.tiles.find((t) => !t.isLocal && !t.isScreen)
-      return remoteCam || this.tiles[0]
+      // Active screen-share takes priority (own or remote) — that's the most
+      // important content to surface in the minimized window.
+      const anyScreen = this.tiles.find((t) => t.isScreen && t.videoTrack)
+      if (anyScreen) return anyScreen
+      // Then prefer a remote camera with an active video track.
+      const remoteCamWithVideo = this.tiles.find(
+        (t) => !t.isLocal && !t.isScreen && t.videoTrack,
+      )
+      if (remoteCamWithVideo) return remoteCamWithVideo
+      const anyRemote = this.tiles.find((t) => !t.isLocal)
+      return anyRemote || this.tiles[0]
     },
     gridStyle() {
       const n = Math.max(1, this.tiles.length)

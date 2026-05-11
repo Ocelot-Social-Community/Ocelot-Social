@@ -9,7 +9,11 @@
         class="prejoin__video"
       />
       <div v-if="!hasVideo" class="prejoin__placeholder">
-        {{ $t('videoCall.prejoin.noCamera') }}
+        {{
+          cameraActive
+            ? $t('videoCall.prejoin.noCamera')
+            : $t('videoCall.prejoin.cameraDisabled')
+        }}
       </div>
     </div>
 
@@ -68,7 +72,11 @@
             {{ d.label || $t('videoCall.prejoin.unnamedMic') }}
           </option>
         </select>
-        <div class="prejoin__meter" :aria-label="$t('videoCall.prejoin.micLevel')">
+        <div
+          v-if="micActive"
+          class="prejoin__meter"
+          :aria-label="$t('videoCall.prejoin.micLevel')"
+        >
           <div class="prejoin__meter-fill" :style="{ width: micLevelPercent + '%' }" />
         </div>
       </div>
@@ -115,6 +123,35 @@
         {{ permissionError }}
       </div>
 
+      <div class="prejoin__device-toggles">
+        <os-button
+          :variant="micActive ? 'primary' : 'default'"
+          appearance="outline"
+          :disabled="micStatus === 'denied' || micStatus === 'unsupported'"
+          :aria-pressed="(!micActive).toString()"
+          @click="toggleMicActive"
+        >
+          <template #icon>
+            <os-icon :icon="micActive ? icons.microphone : icons.microphoneSlash" />
+          </template>
+          {{ micActive ? $t('videoCall.prejoin.micOn') : $t('videoCall.prejoin.micOff') }}
+        </os-button>
+        <os-button
+          :variant="cameraActive ? 'primary' : 'default'"
+          appearance="outline"
+          :disabled="cameraStatus === 'denied' || cameraStatus === 'unsupported'"
+          :aria-pressed="(!cameraActive).toString()"
+          @click="toggleCameraActive"
+        >
+          <template #icon><os-icon :icon="icons.videoCamera" /></template>
+          {{ cameraActive ? $t('videoCall.prejoin.cameraOn') : $t('videoCall.prejoin.cameraOff') }}
+        </os-button>
+      </div>
+
+      <p class="prejoin__hint">
+        {{ joinHint }}
+      </p>
+
       <div class="prejoin__actions">
         <os-button
           appearance="ghost"
@@ -125,7 +162,6 @@
         </os-button>
         <os-button
           variant="primary"
-          :disabled="!canJoin"
           @click="emitJoin"
         >
           <template #icon><os-icon :icon="icons.phone" /></template>
@@ -153,6 +189,10 @@ export default {
       selectedSpeaker: '',
       cameraStatus: 'prompt', // granted | prompt | denied | unsupported
       micStatus: 'prompt',
+      // User intent — independent from permission. Initially mirrors permission,
+      // but the user can opt out before joining (silent observer is valid).
+      cameraActive: true,
+      micActive: true,
       micLevelPercent: 0,
       testingTone: false,
       permissionError: null,
@@ -170,10 +210,13 @@ export default {
         typeof HTMLMediaElement.prototype.setSinkId === 'function'
       )
     },
-    canJoin() {
-      // Require at least one of mic/camera to be granted so the user can be heard or seen.
-      const ok = (s) => s === 'granted'
-      return ok(this.cameraStatus) || ok(this.micStatus)
+    joinHint() {
+      if (!this.micActive && !this.cameraActive) {
+        return this.$t('videoCall.prejoin.hintBoth')
+      }
+      if (!this.micActive) return this.$t('videoCall.prejoin.hintMic')
+      if (!this.cameraActive) return this.$t('videoCall.prejoin.hintCamera')
+      return ''
     },
   },
   created() {
@@ -191,19 +234,25 @@ export default {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         this.cameraStatus = 'unsupported'
         this.micStatus = 'unsupported'
+        this.cameraActive = false
+        this.micActive = false
         this.permissionError = this.$t('videoCall.prejoin.unsupportedBrowser')
         return
       }
       await this.refreshPermissionStatus()
-      // Trigger getUserMedia to surface a permission prompt if needed
+      // Default intent: opt in if permission is granted or still pending, opt
+      // out if permission is denied (toggle is disabled in that case too).
+      this.cameraActive = this.cameraStatus !== 'denied'
+      this.micActive = this.micStatus !== 'denied'
       try {
         await this.acquireStream()
       } catch (err) {
         this.permissionError = this.permissionMessage(err)
       }
       await this.refreshPermissionStatus()
+      if (this.cameraStatus === 'denied') this.cameraActive = false
+      if (this.micStatus === 'denied') this.micActive = false
       await this.enumerate()
-      // Listen for device changes
       navigator.mediaDevices.addEventListener('devicechange', this.onDeviceChange)
     },
     onDeviceChange() {
@@ -250,20 +299,41 @@ export default {
     },
     async acquireStream() {
       this.stopStream()
+      const wantVideo = this.cameraActive && this.cameraStatus !== 'denied'
+      const wantAudio = this.micActive && this.micStatus !== 'denied'
+      if (!wantVideo && !wantAudio) {
+        // Nothing to preview — explicitly opted out of both.
+        this.stream = null
+        return
+      }
       const constraints = {
-        video: this.selectedCamera ? { deviceId: { exact: this.selectedCamera } } : true,
-        audio: this.selectedMic ? { deviceId: { exact: this.selectedMic } } : true,
+        video: wantVideo
+          ? this.selectedCamera
+            ? { deviceId: { exact: this.selectedCamera } }
+            : true
+          : false,
+        audio: wantAudio
+          ? this.selectedMic
+            ? { deviceId: { exact: this.selectedMic } }
+            : true
+          : false,
       }
       let stream
       try {
         stream = await navigator.mediaDevices.getUserMedia(constraints)
       } catch (videoErr) {
-        // Try audio-only as a fallback so the user can still participate by voice.
-        try {
-          stream = await navigator.mediaDevices.getUserMedia({
-            audio: this.selectedMic ? { deviceId: { exact: this.selectedMic } } : true,
-          })
-        } catch (_audioErr) {
+        // If video failed but audio was wanted, try audio-only as fallback.
+        if (wantAudio && wantVideo) {
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({
+              audio: this.selectedMic
+                ? { deviceId: { exact: this.selectedMic } }
+                : true,
+            })
+          } catch (_audioErr) {
+            throw videoErr
+          }
+        } else {
           throw videoErr
         }
       }
@@ -272,7 +342,7 @@ export default {
       this.$nextTick(() => {
         const v = this.$refs.previewEl
         if (v) v.srcObject = stream
-        this.startMeter(stream)
+        if (wantAudio) this.startMeter(stream)
       })
     },
     stopStream() {
@@ -341,6 +411,34 @@ export default {
         this.permissionError = this.permissionMessage(err)
       }
     },
+    async toggleMicActive() {
+      if (this.micStatus === 'denied' || this.micStatus === 'unsupported') return
+      const next = !this.micActive
+      this.micActive = next
+      this.permissionError = null
+      try {
+        await this.acquireStream()
+        if (next) await this.refreshPermissionStatus()
+        if (this.micStatus === 'denied') this.micActive = false
+      } catch (err) {
+        this.permissionError = this.permissionMessage(err)
+        this.micActive = false
+      }
+    },
+    async toggleCameraActive() {
+      if (this.cameraStatus === 'denied' || this.cameraStatus === 'unsupported') return
+      const next = !this.cameraActive
+      this.cameraActive = next
+      this.permissionError = null
+      try {
+        await this.acquireStream()
+        if (next) await this.refreshPermissionStatus()
+        if (this.cameraStatus === 'denied') this.cameraActive = false
+      } catch (err) {
+        this.permissionError = this.permissionMessage(err)
+        this.cameraActive = false
+      }
+    },
     async onSpeakerChange(e) {
       this.selectedSpeaker = e.target.value
       const audio = this.$refs.speakerTestEl
@@ -362,7 +460,6 @@ export default {
           return
         }
         const ctx = new AC()
-        // Some browsers start the context suspended; resume on user gesture.
         if (ctx.state === 'suspended') {
           try {
             await ctx.resume()
@@ -373,14 +470,24 @@ export default {
         const oscillator = ctx.createOscillator()
         const gain = ctx.createGain()
         oscillator.type = 'sine'
-        oscillator.frequency.value = 440
-        // Soft attack/release to avoid clicks.
+
+        // Small ascending arpeggio: C4 — E4 — G4 — C5 (major chord).
+        const NOTES = [261.63, 329.63, 392.0, 523.25]
+        const NOTE_LEN = 0.18
+        const GAP = 0.02
+        const PEAK = 0.25
         const now = ctx.currentTime
-        const duration = 0.6
+        const totalDuration = NOTES.length * (NOTE_LEN + GAP)
+
         gain.gain.setValueAtTime(0, now)
-        gain.gain.linearRampToValueAtTime(0.25, now + 0.04)
-        gain.gain.setValueAtTime(0.25, now + duration - 0.05)
-        gain.gain.linearRampToValueAtTime(0, now + duration)
+        NOTES.forEach((freq, i) => {
+          const start = now + i * (NOTE_LEN + GAP)
+          oscillator.frequency.setValueAtTime(freq, start)
+          gain.gain.setValueAtTime(0, start)
+          gain.gain.linearRampToValueAtTime(PEAK, start + 0.03)
+          gain.gain.setValueAtTime(PEAK, start + NOTE_LEN - 0.04)
+          gain.gain.linearRampToValueAtTime(0, start + NOTE_LEN)
+        })
 
         const audio = this.$refs.speakerTestEl
         const canRouteToSink =
@@ -390,7 +497,6 @@ export default {
           typeof ctx.createMediaStreamDestination === 'function'
 
         if (canRouteToSink) {
-          // Route via MediaStreamAudioDestinationNode → <audio> so setSinkId applies.
           const dest = ctx.createMediaStreamDestination()
           oscillator.connect(gain).connect(dest)
           audio.srcObject = dest.stream
@@ -402,14 +508,14 @@ export default {
           try {
             await audio.play()
           } catch (_e) {
-            /* user-gesture missing — keep going, oscillator still runs */
+            /* noop */
           }
         } else {
           oscillator.connect(gain).connect(ctx.destination)
         }
 
         oscillator.start(now)
-        oscillator.stop(now + duration)
+        oscillator.stop(now + totalDuration)
         oscillator.onended = () => {
           if (audio) {
             try {
@@ -431,13 +537,14 @@ export default {
       }
     },
     emitJoin() {
-      // Stop the preview stream so LiveKit can grab the devices itself.
+      const micEnabled = this.micActive && this.micStatus === 'granted'
+      const cameraEnabled = this.cameraActive && this.cameraStatus === 'granted'
       const payload = {
-        cameraDeviceId: this.cameraStatus === 'granted' ? this.selectedCamera : null,
-        micDeviceId: this.micStatus === 'granted' ? this.selectedMic : null,
+        cameraDeviceId: cameraEnabled ? this.selectedCamera : null,
+        micDeviceId: micEnabled ? this.selectedMic : null,
         speakerDeviceId: this.speakerSupported ? this.selectedSpeaker : null,
-        cameraEnabled: this.cameraStatus === 'granted',
-        micEnabled: this.micStatus === 'granted',
+        cameraEnabled,
+        micEnabled,
       }
       this.stopStream()
       this.$emit('join', payload)
@@ -577,6 +684,24 @@ export default {
   select {
     flex: 1;
   }
+}
+
+.prejoin__device-toggles {
+  display: flex;
+  gap: $space-x-small;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: $space-x-small 0;
+  border-top: 1px solid $color-neutral-85;
+  border-bottom: 1px solid $color-neutral-85;
+}
+
+.prejoin__hint {
+  margin: 0;
+  font-size: $font-size-small;
+  color: $text-color-soft;
+  min-height: 1.2em;
+  text-align: center;
 }
 
 .prejoin__error {
