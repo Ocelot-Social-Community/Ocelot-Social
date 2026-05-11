@@ -1,13 +1,20 @@
 <template>
-  <div
-    v-if="show"
-    :class="[
-      'video-call',
-      isFullscreen ? 'video-call--maximized' : 'video-call--minimized',
-    ]"
-    role="dialog"
-    :aria-label="$t('videoCall.dialogLabel')"
-  >
+  <div v-if="show" class="video-call-root">
+    <div
+      v-if="isPreJoinModal"
+      class="video-call__backdrop"
+      @click="leave"
+    />
+    <div
+      :class="[
+        'video-call',
+        modeClass,
+      ]"
+      role="dialog"
+      :aria-modal="isPreJoinModal ? 'true' : null"
+      :aria-label="$t('videoCall.dialogLabel')"
+      @click.stop
+    >
     <div class="video-call__header">
       <nuxt-link
         v-if="!iconOnly && groupRoute"
@@ -70,28 +77,43 @@
       <div v-if="phase === 'connecting'" class="video-call__status">
         {{ $t('videoCall.connecting') }}
       </div>
-      <div
-        v-else
-        :class="['video-call__stage', isFullscreen ? 'video-call__grid' : 'video-call__single']"
-        :style="isFullscreen ? gridStyle : null"
-      >
-        <!--
-          All tiles are always mounted so every participant's audio track stays
-          attached to a DOM <audio> element. In the minimized view, only the
-          primary tile is visible; the rest are hidden via CSS while their
-          audio keeps playing.
-        -->
-        <video-tile
-          v-for="tile in tiles"
-          :key="tile.key"
-          :tile="tile"
-          :sink-id="speakerDeviceId"
-          :class="{
-            'video-tile--hidden':
-              !isFullscreen && primaryTile && tile.key !== primaryTile.key,
-          }"
-        />
-      </div>
+      <template v-else>
+        <div
+          :class="['video-call__stage', isFullscreen ? 'video-call__grid' : 'video-call__single']"
+          :style="isFullscreen ? gridStyle : null"
+        >
+          <!--
+            All tiles are always mounted so every participant's audio track stays
+            attached to a DOM <audio> element. In the minimized view, only the
+            primary tile is visible; the rest are hidden via CSS while their
+            audio keeps playing.
+          -->
+          <video-tile
+            v-for="tile in tiles"
+            :key="tile.key"
+            :tile="tile"
+            :sink-id="speakerDeviceId"
+            :class="{
+              'video-tile--hidden':
+                !isFullscreen && primaryTile && tile.key !== primaryTile.key,
+            }"
+          />
+        </div>
+        <aside
+          v-if="showChatSidebar"
+          class="video-call__sidebar"
+          :aria-label="$t('videoCall.openChat')"
+        >
+          <client-only>
+            <chat
+              singleRoom
+              fitParent
+              :groupId="groupId"
+              @close-single-room="closeInCallChat"
+            />
+          </client-only>
+        </aside>
+      </template>
     </div>
 
     <div v-if="phase === 'in-call' && !error" class="video-call__controls">
@@ -158,6 +180,7 @@
         </template>
       </os-button>
     </div>
+    </div>
   </div>
 </template>
 
@@ -167,12 +190,13 @@ import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import mobile from '~/mixins/mobile'
 import { joinGroupVideoCallMutation } from '~/graphql/VideoCalls'
+import Chat from '~/components/Chat/Chat.vue'
 import VideoTile from './VideoTile.vue'
 import PreJoin from './PreJoin.vue'
 
 export default {
   name: 'VideoCall',
-  components: { VideoTile, PreJoin, OsButton, OsIcon },
+  components: { VideoTile, PreJoin, OsButton, OsIcon, Chat },
   mixins: [mobile()],
   data() {
     return {
@@ -205,6 +229,16 @@ export default {
         this.getShowChat.groupId === this.groupId
       )
     },
+    showChatSidebar() {
+      // Embedded in the maximized call view. In the minimized/parked state the
+      // chat continues to live in the chat-modul (layouts/default.vue).
+      return (
+        this.phase === 'in-call' &&
+        this.chatOpenForThisGroup &&
+        !this.iconOnly &&
+        !this.isMobile
+      )
+    },
     titleLabel() {
       return this.groupName || this.$t('videoCall.title')
     },
@@ -215,12 +249,25 @@ export default {
     canMinimize() {
       return !this.isMobile
     },
+    isPreJoinModal() {
+      return this.phase === 'prejoin'
+    },
     isFullscreen() {
+      // During prejoin we render as a centered modal — not full screen.
+      if (this.isPreJoinModal) return false
       return this.isMobile || !this.minimized || this.phase !== 'in-call'
     },
+    modeClass() {
+      if (this.isPreJoinModal) return 'video-call--modal'
+      return this.isFullscreen ? 'video-call--maximized' : 'video-call--minimized'
+    },
+    onCallRoute() {
+      return this.$route.name === 'call-id-slug'
+    },
     iconOnly() {
-      // Compact icon-only buttons when the call is parked in the corner.
-      return !this.isFullscreen
+      // Compact icon-only buttons only when the call is parked in the corner
+      // during an active call — not during the prejoin modal.
+      return this.phase === 'in-call' && this.minimized && !this.isMobile
     },
     uniqueParticipantCount() {
       // A single participant publishing both camera and screen share still counts
@@ -266,6 +313,15 @@ export default {
         }
       },
     },
+    $route(to) {
+      // Keep the minimized/maximized state in sync with the URL when the user
+      // navigates via links, browser back/forward, or our own routing helpers.
+      if (!this.show) return
+      if (this.phase !== 'connecting' && this.phase !== 'in-call') return
+      const onCall = to.name === 'call-id-slug'
+      if (onCall && this.minimized) this.setMinimized(false)
+      else if (!onCall && !this.minimized) this.setMinimized(true)
+    },
   },
   created() {
     this.icons = iconRegistry
@@ -286,19 +342,36 @@ export default {
         return
       }
       this.setShowChat({ showChat: true, chatUserId: null, groupId: this.groupId })
-      // The chat-modul lives in default.vue and only fits when the video isn't
-      // covering the screen. Park the call in the corner so both are visible.
-      if (!this.minimized) this.setMinimized(true)
+      // Chat renders inside the call sidebar when maximized, or in the
+      // chat-modul (layouts/default.vue) when the call is parked. Either
+      // way no navigation is needed.
+    },
+    closeInCallChat() {
+      this.setShowChat({ showChat: false, chatUserId: null, groupId: null })
     },
     toggleMinimize() {
-      this.setMinimized(!this.minimized)
+      const next = !this.minimized
+      this.setMinimized(next)
+      // URL follows the visual state: maximized → /call/..., minimized → /groups/...
+      const targetRoute = next ? 'groups-id-slug' : 'call-id-slug'
+      if (
+        this.groupId &&
+        this.groupSlug &&
+        this.$route.name !== targetRoute
+      ) {
+        this.$router
+          .push({
+            name: targetRoute,
+            params: { id: this.groupId, slug: this.groupSlug },
+          })
+          .catch(() => {
+            /* ignore navigation duplicates / aborts */
+          })
+      }
     },
     onGroupLinkClick() {
-      // Navigating happens via nuxt-link; minimize so the user can interact
-      // with the destination page while the call keeps running in the corner.
-      if (!this.isMobile && !this.minimized) {
-        this.setMinimized(true)
-      }
+      // The nuxt-link navigates; the route watcher above will minimize the
+      // call automatically. Nothing else to do here.
     },
     async onPreJoinReady(payload) {
       this.cameraDeviceId = payload.cameraDeviceId
@@ -306,6 +379,30 @@ export default {
       this.speakerDeviceId = payload.speakerDeviceId
       this.micEnabled = payload.micEnabled
       this.cameraEnabled = payload.cameraEnabled
+      // Close the modal synchronously *before* triggering navigation so the
+      // popup actually disappears on the first click. If we let connect() set
+      // phase='connecting' instead, the route transition that runs in parallel
+      // can clobber the reactivity update and the modal stays visible.
+      this.phase = 'connecting'
+      this.error = null
+      this.tiles = []
+      // Take the user to the call's own URL — the page exists so the in-call
+      // view is bookmarkable / shareable / browser-back aware. Await the push
+      // so the URL change finishes before we start the LiveKit handshake.
+      if (
+        this.groupId &&
+        this.groupSlug &&
+        this.$route.name !== 'call-id-slug'
+      ) {
+        try {
+          await this.$router.push({
+            name: 'call-id-slug',
+            params: { id: this.groupId, slug: this.groupSlug },
+          })
+        } catch (_e) {
+          /* navigation duplicates / aborts — fine */
+        }
+      }
       await this.connect()
     },
     async connect() {
@@ -462,8 +559,18 @@ export default {
       }
     },
     async leave() {
+      // Capture before close() clears the store.
+      const groupId = this.groupId
+      const groupSlug = this.groupSlug
       await this.cleanup()
       this.close()
+      if (this.$route.name === 'call-id-slug' && groupId && groupSlug) {
+        this.$router
+          .replace({ name: 'groups-id-slug', params: { id: groupId, slug: groupSlug } })
+          .catch(() => {
+            /* ignore navigation duplicates / aborts */
+          })
+      }
     },
     async cleanup() {
       if (this.room) {
@@ -485,6 +592,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.video-call__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: $z-index-overlay;
+}
+
 .video-call {
   position: fixed;
   background: $background-color-base;
@@ -511,6 +625,33 @@ export default {
   border-top-left-radius: $border-radius-base;
   border-top-right-radius: $border-radius-base;
   overflow: hidden;
+}
+
+.video-call--modal {
+  // Centered popover over the underlying page — the user can still see the
+  // group context behind the dimmed backdrop.
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(900px, calc(100vw - #{$space-base * 2}));
+  height: min(560px, calc(100vh - #{$space-large * 2}));
+  border-radius: $border-radius-base;
+  overflow: hidden;
+  z-index: $z-index-overlay + 1;
+}
+
+@media (max-width: 810px) {
+  .video-call--modal {
+    // Use the full viewport on mobile — the split layout already collapses
+    // vertically inside PreJoin.vue at this breakpoint.
+    inset: 0;
+    top: 0;
+    left: 0;
+    transform: none;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
 }
 
 .video-call__header {
@@ -566,20 +707,38 @@ export default {
   overflow: hidden;
   background: $color-neutral-10;
   position: relative;
+  min-height: 0;
+}
+
+.video-call__stage {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
 }
 
 .video-call__grid {
-  flex: 1;
   display: grid;
   gap: $space-xxx-small;
   padding: $space-xxx-small;
-  width: 100%;
-  height: 100%;
 }
 
 .video-call__single {
-  flex: 1;
   display: flex;
+}
+
+.video-call__sidebar {
+  flex: 0 0 360px;
+  max-width: 40%;
+  display: flex;
+  flex-direction: column;
+  background: $background-color-base;
+  border-left: 1px solid $color-neutral-85;
+  overflow: hidden;
+}
+
+.video-call__sidebar > * {
+  flex: 1;
+  min-height: 0;
 }
 
 .video-call__status,

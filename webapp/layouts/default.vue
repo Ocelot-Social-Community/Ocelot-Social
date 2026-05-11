@@ -11,7 +11,7 @@
     <page-footer class="desktop-footer" />
     <div id="overlay" />
     <div
-      v-if="getShowChat.showChat && !isMobile"
+      v-if="getShowChat.showChat && !isMobile && !chatLivesInVideoSidebar"
       :class="['chat-modul', { 'chat-modul--with-video': showVideoCall && videoCallMinimized }]"
     >
       <client-only>
@@ -53,6 +53,15 @@ export default {
       showVideoCall: 'videoCall/showVideoCall',
       videoCallMinimized: 'videoCall/minimized',
     }),
+    chatLivesInVideoSidebar() {
+      // While the call is on its dedicated route (maximized), the chat is
+      // rendered inside the call's sidebar instead of the floating chat-modul.
+      return (
+        this.showVideoCall &&
+        !this.videoCallMinimized &&
+        this.$route.name === 'call-id-slug'
+      )
+    },
   },
   watch: {
     'getShowChat.showChat'(open) {

@@ -643,13 +643,14 @@ export default {
 
 <style lang="scss" scoped>
 .prejoin {
-  position: absolute;
-  inset: 0;
+  // Flex into whatever vertical space the parent leaves after the header.
+  flex: 1;
   display: flex;
   background: $background-color-base;
   color: $text-color-base;
   overflow: auto;
   font-family: $font-family-text;
+  min-height: 0;
 }
 
 .prejoin__preview {

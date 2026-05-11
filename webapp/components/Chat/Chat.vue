@@ -174,6 +174,12 @@ export default {
       type: String,
       default: null,
     },
+    // When true the chat fills its parent container instead of using the
+    // chat-modul's viewport-based height calc. Used by the in-call sidebar.
+    fitParent: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -249,9 +255,23 @@ export default {
   computed: {
     ...mapGetters({
       currentUser: 'auth/user',
+      videoCallShown: 'videoCall/showVideoCall',
+      videoCallMinimized: 'videoCall/minimized',
     }),
     chatHeight() {
-      if (this.singleRoom) return 'calc(100dvh - 190px)'
+      // When embedded in another container (e.g. video-call sidebar), let the
+      // parent dictate the size.
+      if (this.fitParent) return '100%'
+      if (this.singleRoom) {
+        // The chat-modul sits at bottom: 45px normally. When a minimized
+        // video call is parked above the footer, the chat-modul shifts up to
+        // bottom: 333px (45 + 280 + 8) — clamp the chat height so it stays
+        // below the page header instead of running off the top of the viewport.
+        if (this.videoCallShown && this.videoCallMinimized) {
+          return 'calc(100dvh - 420px)'
+        }
+        return 'calc(100dvh - 190px)'
+      }
       return '100%'
     },
     computedChatStyle() {
