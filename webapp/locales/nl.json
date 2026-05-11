@@ -1385,5 +1385,89 @@
     "popover": {
       "open-profile": "Profiel openen"
     }
+  },
+  "videoCall": {
+    "activeSpeakers": "Actieve sprekers",
+    "closeChat": "Chat sluiten",
+    "connecting": "Verbinden…",
+    "dialogLabel": "Groepsvideogesprek",
+    "disableCamera": "Camera uitschakelen",
+    "enableCamera": "Camera inschakelen",
+    "errors": {
+      "camera": {
+        "busy": "De camera wordt gebruikt door een andere toepassing.",
+        "denied": "Toegang tot de camera geweigerd. Schakel de toestemming in via de browserinstellingen (slotpictogram in de adresbalk).",
+        "generic": "Kon de camera niet inschakelen.",
+        "noDevice": "Geen camera gevonden."
+      },
+      "mic": {
+        "busy": "De microfoon wordt gebruikt door een andere toepassing.",
+        "denied": "Toegang tot de microfoon geweigerd. Schakel de toestemming in via de browserinstellingen (slotpictogram in de adresbalk).",
+        "generic": "Kon de microfoon niet inschakelen.",
+        "noDevice": "Geen microfoon gevonden."
+      },
+      "screen": {
+        "busy": "Scherm delen is nu niet beschikbaar.",
+        "denied": "Scherm delen werd geweigerd.",
+        "generic": "Kon het scherm niet delen.",
+        "noDevice": "Geen scherm beschikbaar om te delen."
+      }
+    },
+    "gotoGroup": "Naar groep „{name}”",
+    "groupVideoCallButton": {
+      "label": "Groepsvideo",
+      "tooltip": "Videogesprek in groep „{name}”"
+    },
+    "leave": "Gesprek verlaten",
+    "maximize": "Maximaliseren",
+    "minimize": "Minimaliseren",
+    "muteMic": "Microfoon dempen",
+    "openChat": "Chat openen",
+    "participants": "Deelnemers",
+    "prejoin": {
+      "camera": "Camera",
+      "cameraDisabled": "De camera is uitgeschakeld.",
+      "cameraOff": "Camera: Uit",
+      "cameraOn": "Camera: Aan",
+      "cancel": "Annuleren",
+      "errorBusy": "Het apparaat wordt gebruikt door een andere toepassing.",
+      "errorDenied": "Toegang geweigerd. Sta camera- en microfoontoegang toe in de browserinstellingen.",
+      "errorNoDevice": "Geen overeenkomend apparaat gevonden.",
+      "errorUnknown": "Kon geen toegang krijgen tot je apparaten.",
+      "hintBoth": "Je neemt deel zonder camera en microfoon — je ziet en hoort anderen alleen.",
+      "hintCamera": "Je neemt deel zonder camera — anderen horen je maar zien je niet.",
+      "hintMic": "Je neemt deel zonder microfoon — anderen zien je maar horen je niet.",
+      "join": "Deelnemen aan gesprek",
+      "micLevel": "Microfoonniveau",
+      "micOff": "Mic: Uit",
+      "micOn": "Mic: Aan",
+      "microphone": "Microfoon",
+      "noCamera": "Camera-voorvertoning is niet beschikbaar.",
+      "noDevices": "Geen apparaat gedetecteerd",
+      "permission": {
+        "denied": "Geblokkeerd",
+        "granted": "OK",
+        "prompt": "In afwachting",
+        "unsupported": "Niet ondersteund"
+      },
+      "retry": "Opnieuw proberen",
+      "speaker": "Luidspreker",
+      "speakerUnsupported": "Selectie van uitvoerapparaat wordt niet ondersteund in deze browser.",
+      "testingSound": "Wordt afgespeeld…",
+      "testSound": "Geluid testen",
+      "title": "Stel je apparaten in",
+      "unnamedCamera": "Camera",
+      "unnamedMic": "Microfoon",
+      "unnamedSpeaker": "Luidspreker",
+      "unsupportedBrowser": "Je browser ondersteunt geen audio/video."
+    },
+    "screenShare": "Scherm",
+    "spotlightExit": "Spotlight verlaten",
+    "startScreenShare": "Scherm delen",
+    "stopScreenShare": "Stoppen met delen",
+    "title": "Groepsvideogesprek",
+    "unmuteMic": "Microfoon inschakelen",
+    "you": "jij",
+    "youAreSharingScreen": "Je deelt je scherm"
   }
 }

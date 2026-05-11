@@ -1385,5 +1385,89 @@
     "popover": {
       "open-profile": "Ouvrir le profil"
     }
+  },
+  "videoCall": {
+    "activeSpeakers": "Intervenants actifs",
+    "closeChat": "Fermer le chat",
+    "connecting": "Connexion…",
+    "dialogLabel": "Appel vidéo de groupe",
+    "disableCamera": "Désactiver la caméra",
+    "enableCamera": "Activer la caméra",
+    "errors": {
+      "camera": {
+        "busy": "La caméra est utilisée par une autre application.",
+        "denied": "Accès à la caméra refusé. Activez l'autorisation dans les paramètres du navigateur (icône cadenas dans la barre d'adresse).",
+        "generic": "Impossible d'activer la caméra.",
+        "noDevice": "Aucune caméra trouvée."
+      },
+      "mic": {
+        "busy": "Le microphone est utilisé par une autre application.",
+        "denied": "Accès au microphone refusé. Activez l'autorisation dans les paramètres du navigateur (icône cadenas dans la barre d'adresse).",
+        "generic": "Impossible d'activer le microphone.",
+        "noDevice": "Aucun microphone trouvé."
+      },
+      "screen": {
+        "busy": "Le partage d'écran n'est pas disponible actuellement.",
+        "denied": "Le partage d'écran a été refusé.",
+        "generic": "Impossible de partager l'écran.",
+        "noDevice": "Aucun écran disponible à partager."
+      }
+    },
+    "gotoGroup": "Aller au groupe « {name} »",
+    "groupVideoCallButton": {
+      "label": "Vidéo de groupe",
+      "tooltip": "Appel vidéo dans le groupe « {name} »"
+    },
+    "leave": "Quitter l'appel",
+    "maximize": "Agrandir",
+    "minimize": "Réduire",
+    "muteMic": "Couper le microphone",
+    "openChat": "Ouvrir le chat",
+    "participants": "Participants",
+    "prejoin": {
+      "camera": "Caméra",
+      "cameraDisabled": "La caméra est désactivée.",
+      "cameraOff": "Caméra : Désactivée",
+      "cameraOn": "Caméra : Activée",
+      "cancel": "Annuler",
+      "errorBusy": "Le périphérique est utilisé par une autre application.",
+      "errorDenied": "Accès refusé. Veuillez autoriser l'accès à la caméra et au microphone dans les paramètres du navigateur.",
+      "errorNoDevice": "Aucun périphérique correspondant trouvé.",
+      "errorUnknown": "Impossible d'accéder à vos périphériques.",
+      "hintBoth": "Vous rejoignez sans caméra ni microphone — vous ne ferez que voir et entendre les autres.",
+      "hintCamera": "Vous rejoignez sans caméra — les autres vous entendront mais ne vous verront pas.",
+      "hintMic": "Vous rejoignez sans microphone — les autres vous verront mais ne vous entendront pas.",
+      "join": "Rejoindre l'appel",
+      "micLevel": "Niveau du microphone",
+      "micOff": "Micro : Désactivé",
+      "micOn": "Micro : Activé",
+      "microphone": "Microphone",
+      "noCamera": "L'aperçu de la caméra n'est pas disponible.",
+      "noDevices": "Aucun périphérique détecté",
+      "permission": {
+        "denied": "Bloqué",
+        "granted": "OK",
+        "prompt": "En attente",
+        "unsupported": "Non pris en charge"
+      },
+      "retry": "Réessayer",
+      "speaker": "Haut-parleur",
+      "speakerUnsupported": "La sélection du périphérique de sortie n'est pas prise en charge par ce navigateur.",
+      "testingSound": "Lecture en cours…",
+      "testSound": "Tester le son",
+      "title": "Configurer vos périphériques",
+      "unnamedCamera": "Caméra",
+      "unnamedMic": "Microphone",
+      "unnamedSpeaker": "Haut-parleur",
+      "unsupportedBrowser": "Votre navigateur ne prend pas en charge l'audio/vidéo."
+    },
+    "screenShare": "Écran",
+    "spotlightExit": "Quitter le focus",
+    "startScreenShare": "Partager l'écran",
+    "stopScreenShare": "Arrêter le partage",
+    "title": "Appel vidéo de groupe",
+    "unmuteMic": "Réactiver le microphone",
+    "you": "vous",
+    "youAreSharingScreen": "Vous partagez votre écran"
   }
 }

@@ -1387,6 +1387,8 @@
     }
   },
   "videoCall": {
+    "activeSpeakers": "Aktive Sprecher",
+    "closeChat": "Chat schließen",
     "connecting": "Verbinde…",
     "dialogLabel": "Gruppen-Videoanruf",
     "disableCamera": "Kamera ausschalten",
@@ -1411,17 +1413,16 @@
         "noDevice": "Kein Bildschirm zum Teilen gefunden."
       }
     },
+    "gotoGroup": "Zur Gruppe „{name}“",
     "groupVideoCallButton": {
       "label": "Gruppen-Video",
       "tooltip": "Videoanruf in der Gruppe „{name}“"
     },
-    "closeChat": "Chat schließen",
-    "gotoGroup": "Zur Gruppe „{name}“",
     "leave": "Anruf verlassen",
-    "openChat": "Chat öffnen",
     "maximize": "Maximieren",
     "minimize": "Minimieren",
     "muteMic": "Mikrofon stummschalten",
+    "openChat": "Chat öffnen",
     "participants": "Teilnehmer",
     "prejoin": {
       "camera": "Kamera",
@@ -1437,10 +1438,10 @@
       "hintCamera": "Du trittst ohne Kamera bei — andere können dich hören, aber nicht sehen.",
       "hintMic": "Du trittst ohne Mikrofon bei — andere können dich sehen, aber nicht hören.",
       "join": "Anruf beitreten",
+      "micLevel": "Mikrofon-Pegel",
       "micOff": "Mikro: Aus",
       "micOn": "Mikro: An",
       "microphone": "Mikrofon",
-      "micLevel": "Mikrofon-Pegel",
       "noCamera": "Kamera-Vorschau nicht verfügbar.",
       "noDevices": "Kein Gerät erkannt",
       "permission": {
@@ -1460,14 +1461,13 @@
       "unnamedSpeaker": "Lautsprecher",
       "unsupportedBrowser": "Dein Browser unterstützt Audio/Video nicht."
     },
-    "activeSpeakers": "Aktive Sprecher",
     "screenShare": "Bildschirm",
     "spotlightExit": "Spotlight beenden",
     "startScreenShare": "Bildschirm teilen",
     "stopScreenShare": "Teilen beenden",
-    "youAreSharingScreen": "Du teilst gerade Deinen Bildschirm",
     "title": "Gruppen-Videoanruf",
     "unmuteMic": "Stummschaltung aufheben",
-    "you": "du"
+    "you": "du",
+    "youAreSharingScreen": "Du teilst gerade Deinen Bildschirm"
   }
 }

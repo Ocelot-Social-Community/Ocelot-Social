@@ -1385,5 +1385,89 @@
     "popover": {
       "open-profile": "Hap profilin"
     }
+  },
+  "videoCall": {
+    "activeSpeakers": "Folësit aktivë",
+    "closeChat": "Mbylle bisedën",
+    "connecting": "Po lidhet…",
+    "dialogLabel": "Telefonatë me video në grup",
+    "disableCamera": "Fik kamerën",
+    "enableCamera": "Ndiz kamerën",
+    "errors": {
+      "camera": {
+        "busy": "Kamera është në përdorim nga një aplikacion tjetër.",
+        "denied": "Qasja te kamera u refuzua. Aktivizo lejen në cilësimet e shfletuesit (ikona e dryrit në shiritin e adresës).",
+        "generic": "Nuk u arrit të ndizet kamera.",
+        "noDevice": "Nuk u gjet kamerë."
+      },
+      "mic": {
+        "busy": "Mikrofoni është në përdorim nga një aplikacion tjetër.",
+        "denied": "Qasja te mikrofoni u refuzua. Aktivizo lejen në cilësimet e shfletuesit (ikona e dryrit në shiritin e adresës).",
+        "generic": "Nuk u arrit të ndizet mikrofoni.",
+        "noDevice": "Nuk u gjet mikrofon."
+      },
+      "screen": {
+        "busy": "Ndarja e ekranit nuk është e disponueshme tani.",
+        "denied": "Ndarja e ekranit u refuzua.",
+        "generic": "Nuk u arrit të ndahet ekrani.",
+        "noDevice": "Nuk ka ekran të disponueshëm për t'u ndarë."
+      }
+    },
+    "gotoGroup": "Shko te grupi «{name}»",
+    "groupVideoCallButton": {
+      "label": "Video grupi",
+      "tooltip": "Telefonatë me video në grupin «{name}»"
+    },
+    "leave": "Largohu nga telefonata",
+    "maximize": "Maksimizo",
+    "minimize": "Minimizo",
+    "muteMic": "Heshtëzo mikrofonin",
+    "openChat": "Hap bisedën",
+    "participants": "Pjesëmarrësit",
+    "prejoin": {
+      "camera": "Kamera",
+      "cameraDisabled": "Kamera është e fikur.",
+      "cameraOff": "Kamera: E fikur",
+      "cameraOn": "Kamera: E ndezur",
+      "cancel": "Anulo",
+      "errorBusy": "Pajisja është në përdorim nga një aplikacion tjetër.",
+      "errorDenied": "Qasja u refuzua. Lejo qasjen te kamera dhe mikrofoni në cilësimet e shfletuesit.",
+      "errorNoDevice": "Nuk u gjet pajisje që përputhet.",
+      "errorUnknown": "Nuk u arrit të kontaktohen pajisjet e tua.",
+      "hintBoth": "Po bashkohesh pa kamerë dhe mikrofon — do t'i shohësh dhe dëgjosh vetëm të tjerët.",
+      "hintCamera": "Po bashkohesh pa kamerë — të tjerët do të dëgjojnë por nuk do të shohin.",
+      "hintMic": "Po bashkohesh pa mikrofon — të tjerët do të shohin por nuk do të dëgjojnë.",
+      "join": "Bashkohu telefonatës",
+      "micLevel": "Niveli i mikrofonit",
+      "micOff": "Mikrofoni: I fikur",
+      "micOn": "Mikrofoni: I ndezur",
+      "microphone": "Mikrofoni",
+      "noCamera": "Pamja paraprake e kamerës nuk është e disponueshme.",
+      "noDevices": "Nuk u zbulua pajisje",
+      "permission": {
+        "denied": "I bllokuar",
+        "granted": "OK",
+        "prompt": "Në pritje",
+        "unsupported": "I pambështetur"
+      },
+      "retry": "Provo përsëri",
+      "speaker": "Altoparlanti",
+      "speakerUnsupported": "Përzgjedhja e pajisjes së daljes nuk mbështetet në këtë shfletues.",
+      "testingSound": "Po luan…",
+      "testSound": "Provo zërin",
+      "title": "Konfiguro pajisjet e tua",
+      "unnamedCamera": "Kamera",
+      "unnamedMic": "Mikrofoni",
+      "unnamedSpeaker": "Altoparlanti",
+      "unsupportedBrowser": "Shfletuesi yt nuk mbështet audio/video."
+    },
+    "screenShare": "Ekrani",
+    "spotlightExit": "Dil nga spotlight",
+    "startScreenShare": "Ndaj ekranin",
+    "stopScreenShare": "Ndalo ndarjen",
+    "title": "Telefonatë me video në grup",
+    "unmuteMic": "Aktivizo mikrofonin",
+    "you": "ti",
+    "youAreSharingScreen": "Po ndan ekranin tënd"
   }
 }

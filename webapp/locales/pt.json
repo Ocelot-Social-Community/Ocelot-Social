@@ -1385,5 +1385,89 @@
     "popover": {
       "open-profile": "Abrir perfil"
     }
+  },
+  "videoCall": {
+    "activeSpeakers": "Oradores ativos",
+    "closeChat": "Fechar chat",
+    "connecting": "A ligar…",
+    "dialogLabel": "Videochamada de grupo",
+    "disableCamera": "Desligar a câmara",
+    "enableCamera": "Ligar a câmara",
+    "errors": {
+      "camera": {
+        "busy": "A câmara está a ser usada por outra aplicação.",
+        "denied": "Acesso à câmara negado. Ative a permissão nas definições do navegador (ícone de cadeado na barra de endereço).",
+        "generic": "Não foi possível ligar a câmara.",
+        "noDevice": "Nenhuma câmara encontrada."
+      },
+      "mic": {
+        "busy": "O microfone está a ser usado por outra aplicação.",
+        "denied": "Acesso ao microfone negado. Ative a permissão nas definições do navegador (ícone de cadeado na barra de endereço).",
+        "generic": "Não foi possível ligar o microfone.",
+        "noDevice": "Nenhum microfone encontrado."
+      },
+      "screen": {
+        "busy": "A partilha de ecrã não está disponível agora.",
+        "denied": "A partilha de ecrã foi recusada.",
+        "generic": "Não foi possível partilhar o ecrã.",
+        "noDevice": "Nenhum ecrã disponível para partilhar."
+      }
+    },
+    "gotoGroup": "Ir para o grupo «{name}»",
+    "groupVideoCallButton": {
+      "label": "Vídeo de grupo",
+      "tooltip": "Videochamada no grupo «{name}»"
+    },
+    "leave": "Sair da chamada",
+    "maximize": "Maximizar",
+    "minimize": "Minimizar",
+    "muteMic": "Silenciar microfone",
+    "openChat": "Abrir chat",
+    "participants": "Participantes",
+    "prejoin": {
+      "camera": "Câmara",
+      "cameraDisabled": "A câmara está desativada.",
+      "cameraOff": "Câmara: Desligada",
+      "cameraOn": "Câmara: Ligada",
+      "cancel": "Cancelar",
+      "errorBusy": "O dispositivo está a ser usado por outra aplicação.",
+      "errorDenied": "Acesso negado. Permita o acesso à câmara e ao microfone nas definições do navegador.",
+      "errorNoDevice": "Nenhum dispositivo correspondente encontrado.",
+      "errorUnknown": "Não foi possível aceder aos seus dispositivos.",
+      "hintBoth": "Estás a entrar sem câmara nem microfone — vais só ver e ouvir os outros.",
+      "hintCamera": "Estás a entrar sem câmara — os outros ouvem-te mas não te veem.",
+      "hintMic": "Estás a entrar sem microfone — os outros veem-te mas não te ouvem.",
+      "join": "Entrar na chamada",
+      "micLevel": "Nível do microfone",
+      "micOff": "Microfone: Desligado",
+      "micOn": "Microfone: Ligado",
+      "microphone": "Microfone",
+      "noCamera": "Pré-visualização da câmara não disponível.",
+      "noDevices": "Nenhum dispositivo detetado",
+      "permission": {
+        "denied": "Bloqueado",
+        "granted": "OK",
+        "prompt": "Pendente",
+        "unsupported": "Não suportado"
+      },
+      "retry": "Tentar de novo",
+      "speaker": "Coluna",
+      "speakerUnsupported": "A seleção do dispositivo de saída não é suportada neste navegador.",
+      "testingSound": "A reproduzir…",
+      "testSound": "Testar som",
+      "title": "Configura os teus dispositivos",
+      "unnamedCamera": "Câmara",
+      "unnamedMic": "Microfone",
+      "unnamedSpeaker": "Coluna",
+      "unsupportedBrowser": "O teu navegador não suporta áudio/vídeo."
+    },
+    "screenShare": "Ecrã",
+    "spotlightExit": "Sair do destaque",
+    "startScreenShare": "Partilhar ecrã",
+    "stopScreenShare": "Parar partilha",
+    "title": "Videochamada de grupo",
+    "unmuteMic": "Reativar microfone",
+    "you": "tu",
+    "youAreSharingScreen": "Estás a partilhar o teu ecrã"
   }
 }
