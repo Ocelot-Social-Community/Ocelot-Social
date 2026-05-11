@@ -119,8 +119,17 @@
         <audio ref="speakerTestEl" preload="auto" />
       </div>
 
-      <div v-if="permissionError" class="prejoin__error">
-        {{ permissionError }}
+      <div v-if="permissionError" class="prejoin__error" role="alert">
+        <span class="prejoin__error-text">{{ permissionError }}</span>
+        <os-button
+          appearance="outline"
+          variant="danger"
+          size="sm"
+          @click="retry"
+        >
+          <template #icon><os-icon :icon="icons.refresh" /></template>
+          {{ $t('videoCall.prejoin.retry') }}
+        </os-button>
       </div>
 
       <div class="prejoin__device-toggles">
@@ -228,6 +237,10 @@ export default {
   beforeDestroy() {
     this.stopMeter()
     this.stopStream()
+    this.detachPermissionListeners()
+    if (navigator.mediaDevices && navigator.mediaDevices.removeEventListener) {
+      navigator.mediaDevices.removeEventListener('devicechange', this.onDeviceChange)
+    }
   },
   methods: {
     async initDevices() {
@@ -260,16 +273,91 @@ export default {
     },
     async refreshPermissionStatus() {
       const probe = async (name) => {
-        if (!navigator.permissions || !navigator.permissions.query) return 'prompt'
+        if (!navigator.permissions || !navigator.permissions.query) {
+          return { state: 'prompt', status: null }
+        }
         try {
           const res = await navigator.permissions.query({ name })
-          return res.state
+          return { state: res.state, status: res }
         } catch {
-          return 'prompt'
+          return { state: 'prompt', status: null }
         }
       }
-      this.cameraStatus = await probe('camera')
-      this.micStatus = await probe('microphone')
+      const cam = await probe('camera')
+      const mic = await probe('microphone')
+      this.cameraStatus = cam.state
+      this.micStatus = mic.state
+      this.attachPermissionListener('camera', cam.status)
+      this.attachPermissionListener('microphone', mic.status)
+    },
+    attachPermissionListener(kind, status) {
+      if (!status) return
+      if (!this._permListeners) this._permListeners = {}
+      // Already listening on this PermissionStatus — nothing to do.
+      if (this._permListeners[kind] && this._permListeners[kind].status === status) return
+      // Detach previous listener (PermissionStatus instance may change on query).
+      this.detachPermissionListener(kind)
+      const handler = () => this.onPermissionChange(kind, status.state)
+      try {
+        status.addEventListener('change', handler)
+      } catch (_e) {
+        return
+      }
+      this._permListeners[kind] = { status, handler }
+    },
+    detachPermissionListener(kind) {
+      const entry = this._permListeners && this._permListeners[kind]
+      if (!entry) return
+      try {
+        entry.status.removeEventListener('change', entry.handler)
+      } catch (_e) {
+        /* noop */
+      }
+      delete this._permListeners[kind]
+    },
+    detachPermissionListeners() {
+      if (!this._permListeners) return
+      for (const kind of Object.keys(this._permListeners)) {
+        this.detachPermissionListener(kind)
+      }
+      this._permListeners = null
+    },
+    async onPermissionChange(kind, newState) {
+      if (kind === 'camera') this.cameraStatus = newState
+      if (kind === 'microphone') this.micStatus = newState
+      // The user just granted the permission in the browser UI (lock icon /
+      // settings) — re-acquire the stream and clear the error in place.
+      if (newState === 'granted') {
+        if (kind === 'camera') this.cameraActive = true
+        if (kind === 'microphone') this.micActive = true
+        try {
+          await this.acquireStream()
+          this.permissionError = null
+        } catch (err) {
+          this.permissionError = this.permissionMessage(err)
+        }
+        await this.enumerate()
+      } else if (newState === 'denied') {
+        if (kind === 'camera') this.cameraActive = false
+        if (kind === 'microphone') this.micActive = false
+        try {
+          await this.acquireStream()
+        } catch (_e) {
+          /* noop */
+        }
+      }
+    },
+    async retry() {
+      this.permissionError = null
+      try {
+        await this.acquireStream()
+        await this.refreshPermissionStatus()
+        if (this.cameraStatus === 'denied') this.cameraActive = false
+        if (this.micStatus === 'denied') this.micActive = false
+        await this.enumerate()
+      } catch (err) {
+        this.permissionError = this.permissionMessage(err)
+      }
     },
     permissionMessage(err) {
       const name = err && err.name
@@ -582,9 +670,15 @@ export default {
 }
 
 .prejoin__placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: $color-neutral-70;
   padding: $space-small;
   text-align: center;
+  pointer-events: none;
 }
 
 .prejoin__panel {
@@ -705,12 +799,19 @@ export default {
 }
 
 .prejoin__error {
+  display: flex;
+  align-items: center;
+  gap: $space-x-small;
   color: $text-color-danger;
   background: $color-danger-inverse;
   border: 1px solid $color-danger-light;
   padding: $space-x-small $space-small;
   border-radius: $border-radius-base;
   font-size: $font-size-small;
+}
+
+.prejoin__error-text {
+  flex: 1;
 }
 
 .prejoin__actions {

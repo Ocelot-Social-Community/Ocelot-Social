@@ -1391,6 +1391,26 @@
     "dialogLabel": "Gruppen-Videoanruf",
     "disableCamera": "Kamera ausschalten",
     "enableCamera": "Kamera einschalten",
+    "errors": {
+      "camera": {
+        "busy": "Die Kamera wird von einer anderen Anwendung verwendet.",
+        "denied": "Kamera-Zugriff verweigert. Bitte aktiviere die Berechtigung in den Browser-Einstellungen (Schloss-Symbol in der Adressleiste).",
+        "generic": "Kamera konnte nicht aktiviert werden.",
+        "noDevice": "Keine Kamera gefunden."
+      },
+      "mic": {
+        "busy": "Das Mikrofon wird von einer anderen Anwendung verwendet.",
+        "denied": "Mikrofon-Zugriff verweigert. Bitte aktiviere die Berechtigung in den Browser-Einstellungen (Schloss-Symbol in der Adressleiste).",
+        "generic": "Mikrofon konnte nicht aktiviert werden.",
+        "noDevice": "Kein Mikrofon gefunden."
+      },
+      "screen": {
+        "busy": "Bildschirm-Teilen ist gerade nicht möglich.",
+        "denied": "Bildschirm-Teilen wurde verweigert.",
+        "generic": "Bildschirm konnte nicht geteilt werden.",
+        "noDevice": "Kein Bildschirm zum Teilen gefunden."
+      }
+    },
     "groupVideoCallButton": {
       "label": "Gruppen-Video",
       "tooltip": "Videoanruf in der Gruppe „{name}“"
@@ -1426,6 +1446,7 @@
         "prompt": "Ausstehend",
         "unsupported": "Nicht unterstützt"
       },
+      "retry": "Erneut versuchen",
       "speaker": "Lautsprecher",
       "speakerUnsupported": "Lautsprecher-Auswahl wird in diesem Browser nicht unterstützt.",
       "testingSound": "Spielt…",

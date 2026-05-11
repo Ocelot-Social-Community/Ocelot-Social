@@ -347,30 +347,56 @@ export default {
         new Set(tiles.map((t) => t.identity)).size,
       )
     },
+    showDeviceErrorToast(kind, err) {
+      const name = err && err.name
+      let key
+      if (name === 'NotAllowedError' || name === 'SecurityError') {
+        key = 'denied'
+      } else if (name === 'NotFoundError' || name === 'OverconstrainedError') {
+        key = 'noDevice'
+      } else if (name === 'NotReadableError') {
+        key = 'busy'
+      } else {
+        key = 'generic'
+      }
+      const message = this.$t(`videoCall.errors.${kind}.${key}`)
+      if (this.$toast && typeof this.$toast.error === 'function') {
+        this.$toast.error(message)
+      }
+    },
     async toggleMic() {
       if (!this.room) return
       const next = !this.micEnabled
-      await this.room.localParticipant.setMicrophoneEnabled(next)
-      this.micEnabled = next
+      try {
+        await this.room.localParticipant.setMicrophoneEnabled(next)
+        this.micEnabled = next
+      } catch (err) {
+        this.showDeviceErrorToast('mic', err)
+      }
     },
     async toggleCamera() {
       if (!this.room) return
       const next = !this.cameraEnabled
-      await this.room.localParticipant.setCameraEnabled(next)
-      this.cameraEnabled = next
-      this.refreshTiles()
+      try {
+        await this.room.localParticipant.setCameraEnabled(next)
+        this.cameraEnabled = next
+        this.refreshTiles()
+      } catch (err) {
+        this.showDeviceErrorToast('camera', err)
+      }
     },
     async toggleScreenShare() {
       if (!this.room || !this.screenShareSupported) return
+      const next = !this.screenShareEnabled
       try {
-        const next = !this.screenShareEnabled
         await this.room.localParticipant.setScreenShareEnabled(next, { audio: true })
         this.screenShareEnabled = next
         this.refreshTiles()
       } catch (err) {
-        // User cancelled the browser picker or screen capture failed — leave state untouched.
+        // NotAllowedError on screen-share usually means the user dismissed the
+        // OS picker — that's not worth a toast. Surface anything else.
         if (err && err.name !== 'NotAllowedError') {
-          this.error = err.message || String(err)
+          this.showDeviceErrorToast('screen', err)
         }
       }
     },

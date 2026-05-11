@@ -1391,6 +1391,26 @@
     "dialogLabel": "Group video call",
     "disableCamera": "Turn camera off",
     "enableCamera": "Turn camera on",
+    "errors": {
+      "camera": {
+        "busy": "The camera is in use by another application.",
+        "denied": "Camera access denied. Please enable the permission in your browser settings (lock icon in the address bar).",
+        "generic": "Could not turn the camera on.",
+        "noDevice": "No camera found."
+      },
+      "mic": {
+        "busy": "The microphone is in use by another application.",
+        "denied": "Microphone access denied. Please enable the permission in your browser settings (lock icon in the address bar).",
+        "generic": "Could not turn the microphone on.",
+        "noDevice": "No microphone found."
+      },
+      "screen": {
+        "busy": "Screen sharing is not available right now.",
+        "denied": "Screen sharing was denied.",
+        "generic": "Could not share the screen.",
+        "noDevice": "No screen available to share."
+      }
+    },
     "groupVideoCallButton": {
       "label": "Group Video",
       "tooltip": "Video call in group “{name}”"
@@ -1426,6 +1446,7 @@
         "prompt": "Pending",
         "unsupported": "Not supported"
       },
+      "retry": "Retry",
       "speaker": "Speaker",
       "speakerUnsupported": "Output device selection is not supported in this browser.",
       "testingSound": "Playing…",
