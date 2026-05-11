@@ -182,6 +182,22 @@
           {{ chatOpenForThisGroup ? $t('videoCall.closeChat') : $t('videoCall.openChat') }}
         </template>
       </os-button>
+      <os-button
+        variant="danger"
+        appearance="filled"
+        :size="iconOnly ? 'sm' : 'md'"
+        :circle="iconOnly"
+        class="video-call__leave"
+        :aria-label="$t('videoCall.leave')"
+        @click="leave"
+      >
+        <template #icon>
+          <os-icon :icon="icons.phone" />
+        </template>
+        <template v-if="!iconOnly">
+          {{ $t('videoCall.leave') }}
+        </template>
+      </os-button>
     </div>
     </div>
   </div>
