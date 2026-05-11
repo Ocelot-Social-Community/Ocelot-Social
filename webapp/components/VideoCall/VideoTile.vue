@@ -14,18 +14,8 @@
     @keydown.enter="onSelect"
     @keydown.space.prevent="onSelect"
   >
-    <video
-      v-show="hasVideo"
-      ref="videoEl"
-      autoplay
-      playsinline
-      :muted="tile.isLocal"
-    />
-    <audio
-      v-if="!tile.isLocal"
-      ref="audioEl"
-      autoplay
-    />
+    <video v-show="hasVideo" ref="videoEl" autoplay playsinline :muted="tile.isLocal" />
+    <audio v-if="!tile.isLocal" ref="audioEl" autoplay />
     <div
       v-if="showOwnScreenPlaceholder"
       class="video-tile__fallback video-tile__fallback--own-screen"
@@ -43,18 +33,12 @@
     </div>
     <div class="video-tile__label">
       {{ tile.name }}
-      <span v-if="tile.isLocal" class="video-tile__local-tag">
-        ({{ $t('videoCall.you') }})
-      </span>
+      <span v-if="tile.isLocal" class="video-tile__local-tag">({{ $t('videoCall.you') }})</span>
       <span v-if="tile.isScreen" class="video-tile__screen-tag">
         — {{ $t('videoCall.screenShare') }}
       </span>
     </div>
-    <div
-      v-if="isSpotlighted"
-      class="video-tile__pin"
-      :aria-label="$t('videoCall.spotlightExit')"
-    >
+    <div v-if="isSpotlighted" class="video-tile__pin" :aria-label="$t('videoCall.spotlightExit')">
       <os-icon :icon="icons.expand" />
     </div>
   </div>

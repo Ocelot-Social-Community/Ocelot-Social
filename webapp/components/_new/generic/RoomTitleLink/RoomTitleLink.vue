@@ -6,11 +6,7 @@
     class="room-title-link"
     @click.native="$emit('click', $event)"
   >
-    <os-icon
-      v-if="showGroupIcon"
-      :icon="icons.group"
-      class="room-title-link__icon"
-    />
+    <os-icon v-if="showGroupIcon" :icon="icons.group" class="room-title-link__icon" />
     <span class="room-title-link__text">{{ name }}</span>
   </component>
 </template>

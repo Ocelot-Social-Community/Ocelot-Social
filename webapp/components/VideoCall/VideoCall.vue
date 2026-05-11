@@ -1,230 +1,212 @@
 <template>
   <div v-if="show" class="video-call-root">
+    <div v-if="isPreJoinModal" class="video-call__backdrop" @click="leave" />
     <div
-      v-if="isPreJoinModal"
-      class="video-call__backdrop"
-      @click="leave"
-    />
-    <div
-      :class="[
-        'video-call',
-        modeClass,
-      ]"
+      :class="['video-call', modeClass]"
       role="dialog"
       :aria-modal="isPreJoinModal ? 'true' : null"
       :aria-label="$t('videoCall.dialogLabel')"
       @click.stop
     >
-    <div class="video-call__header">
-      <div class="video-call__header-info">
-        <profile-avatar
-          :profile="groupProfile"
-          class="video-call__avatar"
-        />
-        <room-title-link
-          :name="titleLabel"
-          :to="groupRoute"
-          :show-group-icon="!!groupId"
-          :aria-label="$t('videoCall.gotoGroup', { name: titleLabel })"
-          @click="onGroupLinkClick"
-        />
-      </div>
-      <div class="video-call__header-right">
-        <span
-          v-if="phase === 'in-call'"
-          class="video-call__count"
-          data-test="video-call-participants"
-        >
-          {{ uniqueParticipantCount }}
-        </span>
-        <div class="video-call__header-actions">
-          <os-button
-            v-if="canMinimize && phase === 'in-call'"
-            appearance="ghost"
-            size="sm"
-            circle
-            :aria-label="minimized ? $t('videoCall.maximize') : $t('videoCall.minimize')"
-            @click="toggleMinimize"
-          >
-            <template #icon>
-              <os-icon :icon="minimized ? icons.expand : icons.minus" />
-            </template>
-          </os-button>
-          <os-button
-            variant="danger"
-            appearance="ghost"
-            size="sm"
-            circle
-            :aria-label="phase === 'in-call' ? $t('videoCall.leave') : $t('videoCall.prejoin.cancel')"
-            @click="leave"
-          >
-            <template #icon>
-              <os-icon :icon="icons.close" />
-            </template>
-          </os-button>
+      <div class="video-call__header">
+        <div class="video-call__header-info">
+          <profile-avatar :profile="groupProfile" class="video-call__avatar" />
+          <room-title-link
+            :name="titleLabel"
+            :to="groupRoute"
+            :show-group-icon="!!groupId"
+            :aria-label="$t('videoCall.gotoGroup', { name: titleLabel })"
+            @click="onGroupLinkClick"
+          />
         </div>
-      </div>
-    </div>
-
-    <pre-join
-      v-if="phase === 'prejoin'"
-      @join="onPreJoinReady"
-      @cancel="leave"
-    />
-
-    <div v-else-if="error" class="video-call__error" role="alert">
-      {{ error }}
-    </div>
-
-    <div v-else class="video-call__body">
-      <div v-if="phase === 'connecting'" class="video-call__status">
-        {{ $t('videoCall.connecting') }}
-      </div>
-      <template v-else>
-        <div
-          v-if="isFullscreen && activeSpeakers.length"
-          class="video-call__speakers"
-          :aria-label="$t('videoCall.activeSpeakers')"
-        >
+        <div class="video-call__header-right">
           <span
-            v-for="speaker in activeSpeakers"
-            :key="speaker.identity"
-            class="video-call__speaker-chip"
+            v-if="phase === 'in-call'"
+            class="video-call__count"
+            data-test="video-call-participants"
           >
-            {{ speaker.name }}<span v-if="speaker.isLocal" class="video-call__speaker-chip-self">
-              ({{ $t('videoCall.you') }})
-            </span>
+            {{ uniqueParticipantCount }}
           </span>
+          <div class="video-call__header-actions">
+            <os-button
+              v-if="canMinimize && phase === 'in-call'"
+              appearance="ghost"
+              size="sm"
+              circle
+              :aria-label="minimized ? $t('videoCall.maximize') : $t('videoCall.minimize')"
+              @click="toggleMinimize"
+            >
+              <template #icon>
+                <os-icon :icon="minimized ? icons.expand : icons.minus" />
+              </template>
+            </os-button>
+            <os-button
+              variant="danger"
+              appearance="ghost"
+              size="sm"
+              circle
+              :aria-label="
+                phase === 'in-call' ? $t('videoCall.leave') : $t('videoCall.prejoin.cancel')
+              "
+              @click="leave"
+            >
+              <template #icon>
+                <os-icon :icon="icons.close" />
+              </template>
+            </os-button>
+          </div>
         </div>
-        <div
-          :class="[
-            'video-call__stage',
-            stageLayoutClass,
-          ]"
-          :style="gridStyleConditional"
-        >
-          <!--
+      </div>
+
+      <pre-join v-if="phase === 'prejoin'" @join="onPreJoinReady" @cancel="leave" />
+
+      <div v-else-if="error" class="video-call__error" role="alert">
+        {{ error }}
+      </div>
+
+      <div v-else class="video-call__body">
+        <div v-if="phase === 'connecting'" class="video-call__status">
+          {{ $t('videoCall.connecting') }}
+        </div>
+        <template v-else>
+          <div
+            v-if="isFullscreen && activeSpeakers.length"
+            class="video-call__speakers"
+            :aria-label="$t('videoCall.activeSpeakers')"
+          >
+            <span
+              v-for="speaker in activeSpeakers"
+              :key="speaker.identity"
+              class="video-call__speaker-chip"
+            >
+              {{ speaker.name }}
+              <span v-if="speaker.isLocal" class="video-call__speaker-chip-self">
+                ({{ $t('videoCall.you') }})
+              </span>
+            </span>
+          </div>
+          <div :class="['video-call__stage', stageLayoutClass]" :style="gridStyleConditional">
+            <!--
             All tiles are always mounted so every participant's audio track stays
             attached to a DOM <audio> element. CSS Grid (in spotlight mode)
             places the spotlight tile into the wide left cell and lets the
             others auto-flow into a narrow right column — instances stay stable
             on toggle so audio doesn't re-attach.
           -->
-          <video-tile
-            v-for="tile in tiles"
-            :key="tile.key"
-            :tile="tile"
-            :sink-id="speakerDeviceId"
-            :is-active-speaker="activeSpeakerSet.has(tile.identity)"
-            :is-spotlighted="!!(spotlightTile && tile.key === spotlightTile.key)"
-            :avatar-size="tileAvatarSize(tile)"
-            :clickable="isFullscreen"
-            :class="{
-              'video-tile--hidden':
-                !isFullscreen && primaryTile && tile.key !== primaryTile.key,
-              'video-tile--spotlighted':
-                !!(spotlightTile && tile.key === spotlightTile.key),
-            }"
-            @select="onTileSelect"
-          />
-        </div>
-        <aside
-          v-if="showChatSidebar"
-          class="video-call__sidebar"
-          :aria-label="$t('videoCall.openChat')"
-        >
-          <client-only>
-            <chat
-              singleRoom
-              fitParent
-              :groupId="groupId"
-              @close-single-room="closeInCallChat"
+            <video-tile
+              v-for="tile in tiles"
+              :key="tile.key"
+              :tile="tile"
+              :sink-id="speakerDeviceId"
+              :is-active-speaker="activeSpeakerSet.has(tile.identity)"
+              :is-spotlighted="!!(spotlightTile && tile.key === spotlightTile.key)"
+              :avatar-size="tileAvatarSize(tile)"
+              :clickable="isFullscreen"
+              :class="{
+                'video-tile--hidden': !isFullscreen && primaryTile && tile.key !== primaryTile.key,
+                'video-tile--spotlighted': !!(spotlightTile && tile.key === spotlightTile.key),
+              }"
+              @select="onTileSelect"
             />
-          </client-only>
-        </aside>
-      </template>
-    </div>
+          </div>
+          <aside
+            v-if="showChatSidebar"
+            class="video-call__sidebar"
+            :aria-label="$t('videoCall.openChat')"
+          >
+            <client-only>
+              <chat singleRoom fitParent :groupId="groupId" @close-single-room="closeInCallChat" />
+            </client-only>
+          </aside>
+        </template>
+      </div>
 
-    <div v-if="phase === 'in-call' && !error" class="video-call__controls">
-      <os-button
-        :variant="micEnabled ? 'default' : 'danger'"
-        appearance="outline"
-        :size="iconOnly ? 'sm' : 'md'"
-        :circle="iconOnly"
-        :aria-label="micEnabled ? $t('videoCall.muteMic') : $t('videoCall.unmuteMic')"
-        @click="toggleMic"
-      >
-        <template #icon>
-          <os-icon :icon="micEnabled ? icons.microphone : icons.microphoneSlash" />
-        </template>
-        <template v-if="!iconOnly">
-          {{ micEnabled ? $t('videoCall.muteMic') : $t('videoCall.unmuteMic') }}
-        </template>
-      </os-button>
-      <os-button
-        :variant="cameraEnabled ? 'default' : 'danger'"
-        appearance="outline"
-        :size="iconOnly ? 'sm' : 'md'"
-        :circle="iconOnly"
-        :aria-label="cameraEnabled ? $t('videoCall.disableCamera') : $t('videoCall.enableCamera')"
-        @click="toggleCamera"
-      >
-        <template #icon>
-          <os-icon :icon="icons.videoCamera" />
-        </template>
-        <template v-if="!iconOnly">
-          {{ cameraEnabled ? $t('videoCall.disableCamera') : $t('videoCall.enableCamera') }}
-        </template>
-      </os-button>
-      <os-button
-        v-if="screenShareSupported"
-        :variant="screenShareEnabled ? 'primary' : 'default'"
-        appearance="outline"
-        :size="iconOnly ? 'sm' : 'md'"
-        :circle="iconOnly"
-        :aria-label="screenShareEnabled ? $t('videoCall.stopScreenShare') : $t('videoCall.startScreenShare')"
-        @click="toggleScreenShare"
-      >
-        <template #icon>
-          <os-icon :icon="icons.desktop" />
-        </template>
-        <template v-if="!iconOnly">
-          {{ screenShareEnabled ? $t('videoCall.stopScreenShare') : $t('videoCall.startScreenShare') }}
-        </template>
-      </os-button>
-      <os-button
-        v-if="!isMobile"
-        :variant="chatOpenForThisGroup ? 'primary' : 'default'"
-        appearance="outline"
-        :size="iconOnly ? 'sm' : 'md'"
-        :circle="iconOnly"
-        :aria-label="chatOpenForThisGroup ? $t('videoCall.closeChat') : $t('videoCall.openChat')"
-        @click="toggleChat"
-      >
-        <template #icon>
-          <os-icon :icon="icons.chatBubble" />
-        </template>
-        <template v-if="!iconOnly">
-          {{ chatOpenForThisGroup ? $t('videoCall.closeChat') : $t('videoCall.openChat') }}
-        </template>
-      </os-button>
-      <os-button
-        variant="danger"
-        appearance="filled"
-        :size="iconOnly ? 'sm' : 'md'"
-        :circle="iconOnly"
-        class="video-call__leave"
-        :aria-label="$t('videoCall.leave')"
-        @click="leave"
-      >
-        <template #icon>
-          <os-icon :icon="icons.phone" />
-        </template>
-        <template v-if="!iconOnly">
-          {{ $t('videoCall.leave') }}
-        </template>
-      </os-button>
-    </div>
+      <div v-if="phase === 'in-call' && !error" class="video-call__controls">
+        <os-button
+          :variant="micEnabled ? 'default' : 'danger'"
+          appearance="outline"
+          :size="iconOnly ? 'sm' : 'md'"
+          :circle="iconOnly"
+          :aria-label="micEnabled ? $t('videoCall.muteMic') : $t('videoCall.unmuteMic')"
+          @click="toggleMic"
+        >
+          <template #icon>
+            <os-icon :icon="micEnabled ? icons.microphone : icons.microphoneSlash" />
+          </template>
+          <template v-if="!iconOnly">
+            {{ micEnabled ? $t('videoCall.muteMic') : $t('videoCall.unmuteMic') }}
+          </template>
+        </os-button>
+        <os-button
+          :variant="cameraEnabled ? 'default' : 'danger'"
+          appearance="outline"
+          :size="iconOnly ? 'sm' : 'md'"
+          :circle="iconOnly"
+          :aria-label="cameraEnabled ? $t('videoCall.disableCamera') : $t('videoCall.enableCamera')"
+          @click="toggleCamera"
+        >
+          <template #icon>
+            <os-icon :icon="icons.videoCamera" />
+          </template>
+          <template v-if="!iconOnly">
+            {{ cameraEnabled ? $t('videoCall.disableCamera') : $t('videoCall.enableCamera') }}
+          </template>
+        </os-button>
+        <os-button
+          v-if="screenShareSupported"
+          :variant="screenShareEnabled ? 'primary' : 'default'"
+          appearance="outline"
+          :size="iconOnly ? 'sm' : 'md'"
+          :circle="iconOnly"
+          :aria-label="
+            screenShareEnabled ? $t('videoCall.stopScreenShare') : $t('videoCall.startScreenShare')
+          "
+          @click="toggleScreenShare"
+        >
+          <template #icon>
+            <os-icon :icon="icons.desktop" />
+          </template>
+          <template v-if="!iconOnly">
+            {{
+              screenShareEnabled
+                ? $t('videoCall.stopScreenShare')
+                : $t('videoCall.startScreenShare')
+            }}
+          </template>
+        </os-button>
+        <os-button
+          v-if="!isMobile"
+          :variant="chatOpenForThisGroup ? 'primary' : 'default'"
+          appearance="outline"
+          :size="iconOnly ? 'sm' : 'md'"
+          :circle="iconOnly"
+          :aria-label="chatOpenForThisGroup ? $t('videoCall.closeChat') : $t('videoCall.openChat')"
+          @click="toggleChat"
+        >
+          <template #icon>
+            <os-icon :icon="icons.chatBubble" />
+          </template>
+          <template v-if="!iconOnly">
+            {{ chatOpenForThisGroup ? $t('videoCall.closeChat') : $t('videoCall.openChat') }}
+          </template>
+        </os-button>
+        <os-button
+          variant="danger"
+          appearance="filled"
+          :size="iconOnly ? 'sm' : 'md'"
+          :circle="iconOnly"
+          class="video-call__leave"
+          :aria-label="$t('videoCall.leave')"
+          @click="leave"
+        >
+          <template #icon>
+            <os-icon :icon="icons.phone" />
+          </template>
+          <template v-if="!iconOnly">
+            {{ $t('videoCall.leave') }}
+          </template>
+        </os-button>
+      </div>
     </div>
   </div>
 </template>
@@ -299,10 +281,7 @@ export default {
       // Embedded in the maximized call view. In the minimized/parked state the
       // chat continues to live in the chat-modul (layouts/default.vue).
       return (
-        this.phase === 'in-call' &&
-        this.chatOpenForThisGroup &&
-        !this.iconOnly &&
-        !this.isMobile
+        this.phase === 'in-call' && this.chatOpenForThisGroup && !this.iconOnly && !this.isMobile
       )
     },
     titleLabel() {
@@ -384,9 +363,7 @@ export default {
       const anyScreen = this.tiles.find((t) => t.isScreen && t.videoTrack)
       if (anyScreen) return anyScreen
       // Then prefer a remote camera with an active video track.
-      const remoteCamWithVideo = this.tiles.find(
-        (t) => !t.isLocal && !t.isScreen && t.videoTrack,
-      )
+      const remoteCamWithVideo = this.tiles.find((t) => !t.isLocal && !t.isScreen && t.videoTrack)
       if (remoteCamWithVideo) return remoteCamWithVideo
       const anyRemote = this.tiles.find((t) => !t.isLocal)
       return anyRemote || this.tiles[0]
@@ -478,11 +455,7 @@ export default {
       this.setMinimized(next)
       // URL follows the visual state: maximized → /call/..., minimized → /groups/...
       const targetRoute = next ? 'groups-id-slug' : 'call-id-slug'
-      if (
-        this.groupId &&
-        this.groupSlug &&
-        this.$route.name !== targetRoute
-      ) {
+      if (this.groupId && this.groupSlug && this.$route.name !== targetRoute) {
         this.$router
           .push({
             name: targetRoute,
@@ -513,11 +486,7 @@ export default {
       // Take the user to the call's own URL — the page exists so the in-call
       // view is bookmarkable / shareable / browser-back aware. Await the push
       // so the URL change finishes before we start the LiveKit handshake.
-      if (
-        this.groupId &&
-        this.groupSlug &&
-        this.$route.name !== 'call-id-slug'
-      ) {
+      if (this.groupId && this.groupSlug && this.$route.name !== 'call-id-slug') {
         try {
           await this.$router.push({
             name: 'call-id-slug',
@@ -674,9 +643,7 @@ export default {
       collect(room.localParticipant, true)
       for (const p of room.remoteParticipants.values()) collect(p, false)
       this.tiles = tiles
-      this.setParticipantCount(
-        new Set(tiles.map((t) => t.identity)).size,
-      )
+      this.setParticipantCount(new Set(tiles.map((t) => t.identity)).size)
     },
     showDeviceErrorToast(kind, err) {
       const name = err && err.name

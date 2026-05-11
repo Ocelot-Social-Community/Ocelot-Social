@@ -1,21 +1,12 @@
 <template>
   <div class="prejoin">
     <div class="prejoin__preview">
-      <video
-        v-show="hasVideo"
-        ref="previewEl"
-        autoplay
-        muted
-        playsinline
-        class="prejoin__video"
-      />
+      <video v-show="hasVideo" ref="previewEl" autoplay muted playsinline class="prejoin__video" />
       <div v-if="!hasVideo" class="prejoin__placeholder">
         <profile-avatar :profile="currentUser" size="large" class="prejoin__avatar" />
         <span class="prejoin__placeholder-text">
           {{
-            cameraActive
-              ? $t('videoCall.prejoin.noCamera')
-              : $t('videoCall.prejoin.cameraDisabled')
+            cameraActive ? $t('videoCall.prejoin.noCamera') : $t('videoCall.prejoin.cameraDisabled')
           }}
         </span>
       </div>
@@ -42,11 +33,7 @@
           <option v-if="cameras.length === 0" value="">
             {{ $t('videoCall.prejoin.noDevices') }}
           </option>
-          <option
-            v-for="d in cameras"
-            :key="d.deviceId"
-            :value="d.deviceId"
-          >
+          <option v-for="d in cameras" :key="d.deviceId" :value="d.deviceId">
             {{ d.label || $t('videoCall.prejoin.unnamedCamera') }}
           </option>
         </select>
@@ -68,19 +55,11 @@
           <option v-if="mics.length === 0" value="">
             {{ $t('videoCall.prejoin.noDevices') }}
           </option>
-          <option
-            v-for="d in mics"
-            :key="d.deviceId"
-            :value="d.deviceId"
-          >
+          <option v-for="d in mics" :key="d.deviceId" :value="d.deviceId">
             {{ d.label || $t('videoCall.prejoin.unnamedMic') }}
           </option>
         </select>
-        <div
-          v-if="micActive"
-          class="prejoin__meter"
-          :aria-label="$t('videoCall.prejoin.micLevel')"
-        >
+        <div v-if="micActive" class="prejoin__meter" :aria-label="$t('videoCall.prejoin.micLevel')">
           <div class="prejoin__meter-fill" :style="{ width: micLevelPercent + '%' }" />
         </div>
       </div>
@@ -102,22 +81,15 @@
             <option v-if="speakers.length === 0" value="">
               {{ $t('videoCall.prejoin.noDevices') }}
             </option>
-            <option
-              v-for="d in speakers"
-              :key="d.deviceId"
-              :value="d.deviceId"
-            >
+            <option v-for="d in speakers" :key="d.deviceId" :value="d.deviceId">
               {{ d.label || $t('videoCall.prejoin.unnamedSpeaker') }}
             </option>
           </select>
-          <os-button
-            appearance="outline"
-            size="sm"
-            :disabled="testingTone"
-            @click="playTestTone"
-          >
+          <os-button appearance="outline" size="sm" :disabled="testingTone" @click="playTestTone">
             <template #icon><os-icon :icon="icons.headphones" /></template>
-            {{ testingTone ? $t('videoCall.prejoin.testingSound') : $t('videoCall.prejoin.testSound') }}
+            {{
+              testingTone ? $t('videoCall.prejoin.testingSound') : $t('videoCall.prejoin.testSound')
+            }}
           </os-button>
         </div>
         <audio ref="speakerTestEl" preload="auto" />
@@ -125,12 +97,7 @@
 
       <div v-if="permissionError" class="prejoin__error" role="alert">
         <span class="prejoin__error-text">{{ permissionError }}</span>
-        <os-button
-          appearance="outline"
-          variant="danger"
-          size="sm"
-          @click="retry"
-        >
+        <os-button appearance="outline" variant="danger" size="sm" @click="retry">
           <template #icon><os-icon :icon="icons.refresh" /></template>
           {{ $t('videoCall.prejoin.retry') }}
         </os-button>
@@ -166,17 +133,11 @@
       </p>
 
       <div class="prejoin__actions">
-        <os-button
-          appearance="ghost"
-          @click="$emit('cancel')"
-        >
+        <os-button appearance="ghost" @click="$emit('cancel')">
           <template #icon><os-icon :icon="icons.close" /></template>
           {{ $t('videoCall.prejoin.cancel') }}
         </os-button>
-        <os-button
-          variant="primary"
-          @click="emitJoin"
-        >
+        <os-button variant="primary" @click="emitJoin">
           <template #icon><os-icon :icon="icons.phone" /></template>
           {{ $t('videoCall.prejoin.join') }}
         </os-button>
@@ -389,7 +350,8 @@ export default {
         this.speakers = devices.filter((d) => d.kind === 'audiooutput')
         if (!this.selectedCamera && this.cameras[0]) this.selectedCamera = this.cameras[0].deviceId
         if (!this.selectedMic && this.mics[0]) this.selectedMic = this.mics[0].deviceId
-        if (!this.selectedSpeaker && this.speakers[0]) this.selectedSpeaker = this.speakers[0].deviceId
+        if (!this.selectedSpeaker && this.speakers[0])
+          this.selectedSpeaker = this.speakers[0].deviceId
       } catch (_e) {
         /* noop */
       }
@@ -423,9 +385,7 @@ export default {
         if (wantAudio && wantVideo) {
           try {
             stream = await navigator.mediaDevices.getUserMedia({
-              audio: this.selectedMic
-                ? { deviceId: { exact: this.selectedMic } }
-                : true,
+              audio: this.selectedMic ? { deviceId: { exact: this.selectedMic } } : true,
             })
           } catch (_audioErr) {
             throw videoErr
@@ -781,12 +741,7 @@ export default {
 
 .prejoin__meter-fill {
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    $color-primary 0%,
-    $color-warning 70%,
-    $color-danger 100%
-  );
+  background: linear-gradient(90deg, $color-primary 0%, $color-warning 70%, $color-danger 100%);
   transition: width 80ms linear;
 }
 

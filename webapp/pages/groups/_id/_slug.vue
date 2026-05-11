@@ -112,10 +112,7 @@
               @click="openGroupVideoCall(group.id)"
             >
               <template #icon>
-                <os-counter-icon
-                  :icon="icons.videoCamera"
-                  :count="videoCallParticipantCountLive"
-                />
+                <os-counter-icon :icon="icons.videoCamera" :count="videoCallParticipantCountLive" />
               </template>
               {{ $t('videoCall.groupVideoCallButton.label') }}
             </os-button>
