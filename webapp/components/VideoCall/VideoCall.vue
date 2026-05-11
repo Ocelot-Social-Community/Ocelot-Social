@@ -556,6 +556,9 @@ export default {
         // unpublishing it. Re-render so the avatar fallback kicks in.
         room.on(RoomEvent.TrackMuted, onAny)
         room.on(RoomEvent.TrackUnmuted, onAny)
+        // Token metadata carries the avatar URL — re-render tiles when it
+        // changes so the avatar updates without a reconnect.
+        room.on(RoomEvent.ParticipantMetadataChanged, onAny)
         room.on(RoomEvent.ActiveSpeakersChanged, (speakers) => {
           this.activeSpeakerIds = (speakers || []).map((p) => p.identity)
         })
@@ -602,9 +605,27 @@ export default {
             avatar: this.currentUser.avatar,
           }
         }
+        // Remote: read the token metadata that the backend put on the
+        // participant so we can render the real avatar instead of initials.
+        let meta = null
+        if (participant.metadata) {
+          try {
+            meta = JSON.parse(participant.metadata)
+          } catch (_e) {
+            /* ignore malformed metadata */
+          }
+        }
+        const avatarUrl = meta && meta.avatarUrl
         return {
-          id: participant.identity,
+          id: (meta && meta.userId) || participant.identity,
           name: participant.name || participant.identity,
+          // ResponsiveImage (used by ProfileAvatar) expects url + responsive
+          // variants. We only have one URL from the metadata — reuse it for
+          // every variant so the srcset stays valid; the browser will load
+          // the available image regardless of the requested size.
+          avatar: avatarUrl
+            ? { url: avatarUrl, w320: avatarUrl, w640: avatarUrl, w1024: avatarUrl }
+            : null,
         }
       }
       const collect = (participant, isLocal) => {

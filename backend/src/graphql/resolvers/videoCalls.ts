@@ -3,6 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+import { randomBytes } from 'node:crypto'
+
 import { withFilter } from 'graphql-subscriptions'
 import { AccessToken, RoomServiceClient } from 'livekit-server-sdk'
 
@@ -53,6 +55,26 @@ const assertGroupMemberOfPublicGroup = async (
     if (groupType !== 'public') {
       throw new Error('Video calls are only available for public groups.')
     }
+  } finally {
+    await session.close()
+  }
+}
+
+const getUserAvatarUrl = async (driver: Driver, userId: string): Promise<string | null> => {
+  const session = driver.session()
+  try {
+    const result = await session.readTransaction(async (tx) =>
+      tx.run(
+        `
+          MATCH (u:User { id: $userId })-[:AVATAR_IMAGE]->(img:Image)
+          RETURN img.url AS url
+          LIMIT 1
+        `,
+        { userId },
+      ),
+    )
+    const url = result.records[0]?.get('url') as string | undefined
+    return url || null
   } finally {
     await session.close()
   }
@@ -115,10 +137,22 @@ export default {
       ensureEnabled(context.config)
       await assertGroupMemberOfPublicGroup(context.driver, params.groupId, context.user.id)
       const roomName = roomNameForGroup(params.groupId)
+      // LiveKit treats `identity` as a unique key in a room; two connections
+      // with the same identity kick each other out. Append a random suffix
+      // so the same user can be present from multiple tabs / devices.
+      const identity = `${context.user.id}#${randomBytes(4).toString('hex')}`
+      const avatarUrl = await getUserAvatarUrl(context.driver, context.user.id)
       const at = new AccessToken(context.config.LIVEKIT_API_KEY, context.config.LIVEKIT_API_SECRET, {
-        identity: context.user.id,
+        identity,
         name: context.user.name,
         ttl: '2h',
+        // Token metadata is forwarded to every other participant in the room
+        // (as `participant.metadata` on the client). The frontend uses it to
+        // render the real avatar instead of just initials for remote tiles.
+        metadata: JSON.stringify({
+          userId: context.user.id,
+          avatarUrl,
+        }),
       })
       at.addGrant({
         roomJoin: true,
