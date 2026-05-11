@@ -80,6 +80,16 @@ const getUserAvatarUrl = async (driver: Driver, userId: string): Promise<string 
   }
 }
 
+const LIVEKIT_API_TIMEOUT_MS = 4000
+
+const withTimeout = <T>(promise: Promise<T>, ms: number, label: string): Promise<T> =>
+  Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms),
+    ),
+  ])
+
 export const getLiveParticipantCount = async (
   config: { LIVEKIT_URL: string; LIVEKIT_API_KEY: string; LIVEKIT_API_SECRET: string },
   roomName: string,
@@ -90,10 +100,16 @@ export const getLiveParticipantCount = async (
     config.LIVEKIT_API_SECRET,
   )
   try {
-    const participants = await client.listParticipants(roomName)
+    const participants = await withTimeout(
+      client.listParticipants(roomName),
+      LIVEKIT_API_TIMEOUT_MS,
+      'listParticipants',
+    )
     return participants.length
   } catch {
-    // Room does not exist yet → 0 participants
+    // Room does not exist yet, LiveKit unreachable, or API timed out — the
+    // caller treats this as "no participants" so the frontend never blocks
+    // on a flaky LiveKit instance.
     return 0
   }
 }

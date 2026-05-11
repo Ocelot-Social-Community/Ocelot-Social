@@ -22,6 +22,7 @@ import { WebSocketServer } from 'ws'
 import CONFIG from './config'
 import { getContext } from './context'
 import schema from './graphql/schema'
+import { startLiveKitPoller } from './livekit/poller'
 import { registerLiveKitWebhook } from './livekit/webhook'
 import logger from './logger'
 import middleware from './middleware'
@@ -129,6 +130,9 @@ const createServer = async (options?: CreateServerOptions) => {
   // LiveKit webhook must be registered before the global JSON body parser so
   // the raw payload is preserved for HMAC signature verification.
   registerLiveKitWebhook(app)
+  // Polling fallback for environments without (or with broken) webhooks —
+  // publishes participant-count updates through the same pubsub channel.
+  startLiveKitPoller()
   app.use(bodyParser.json({ limit: '10mb' }) as any)
   app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }) as any)
   app.use(graphqlUploadExpress())
