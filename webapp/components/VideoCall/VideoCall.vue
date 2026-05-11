@@ -82,6 +82,21 @@
       </div>
       <template v-else>
         <div
+          v-if="isFullscreen && activeSpeakers.length"
+          class="video-call__speakers"
+          :aria-label="$t('videoCall.activeSpeakers')"
+        >
+          <span
+            v-for="speaker in activeSpeakers"
+            :key="speaker.identity"
+            class="video-call__speaker-chip"
+          >
+            {{ speaker.name }}<span v-if="speaker.isLocal" class="video-call__speaker-chip-self">
+              ({{ $t('videoCall.you') }})
+            </span>
+          </span>
+        </div>
+        <div
           :class="['video-call__stage', isFullscreen ? 'video-call__grid' : 'video-call__single']"
           :style="isFullscreen ? gridStyle : null"
         >
@@ -96,6 +111,7 @@
             :key="tile.key"
             :tile="tile"
             :sink-id="speakerDeviceId"
+            :is-active-speaker="activeSpeakerSet.has(tile.identity)"
             :class="{
               'video-tile--hidden':
                 !isFullscreen && primaryTile && tile.key !== primaryTile.key,
@@ -240,6 +256,7 @@ export default {
       micDeviceId: null,
       speakerDeviceId: null,
       Track: null,
+      activeSpeakerIds: [],
     }
   },
   computed: {
@@ -311,6 +328,22 @@ export default {
       // A single participant publishing both camera and screen share still counts
       // as one — count distinct identities, not tiles.
       return new Set(this.tiles.map((t) => t.identity)).size
+    },
+    activeSpeakers() {
+      // Deduplicate identities and resolve display names from the tile list.
+      const seen = new Set()
+      const out = []
+      for (const id of this.activeSpeakerIds) {
+        if (seen.has(id)) continue
+        seen.add(id)
+        const tile = this.tiles.find((t) => t.identity === id)
+        if (!tile) continue
+        out.push({ identity: id, name: tile.name, isLocal: tile.isLocal })
+      }
+      return out
+    },
+    activeSpeakerSet() {
+      return new Set(this.activeSpeakerIds)
     },
     screenShareSupported() {
       return (
@@ -486,6 +519,9 @@ export default {
         // unpublishing it. Re-render so the avatar fallback kicks in.
         room.on(RoomEvent.TrackMuted, onAny)
         room.on(RoomEvent.TrackUnmuted, onAny)
+        room.on(RoomEvent.ActiveSpeakersChanged, (speakers) => {
+          this.activeSpeakerIds = (speakers || []).map((p) => p.identity)
+        })
         room.on(RoomEvent.LocalTrackPublished, () => {
           this.screenShareEnabled = !!room.localParticipant.isScreenShareEnabled
           onAny()
@@ -660,6 +696,7 @@ export default {
         this.room = null
       }
       this.tiles = []
+      this.activeSpeakerIds = []
       this.micEnabled = true
       this.cameraEnabled = true
       this.screenShareEnabled = false
@@ -817,6 +854,37 @@ export default {
 
 .video-call__single {
   display: flex;
+}
+
+.video-call__speakers {
+  position: absolute;
+  top: $space-x-small;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-xx-small;
+  justify-content: center;
+  max-width: calc(100% - #{$space-base});
+  pointer-events: none;
+  z-index: 2;
+}
+
+.video-call__speaker-chip {
+  background: rgba(0, 0, 0, 0.65);
+  color: $text-color-inverse;
+  padding: 2px $space-x-small;
+  border-radius: $border-radius-rounded;
+  font-size: $font-size-small;
+  font-weight: $font-weight-bold;
+  display: inline-flex;
+  align-items: center;
+}
+
+.video-call__speaker-chip-self {
+  font-weight: $font-weight-regular;
+  margin-left: $space-xxx-small;
+  opacity: 0.85;
 }
 
 .video-call__sidebar {

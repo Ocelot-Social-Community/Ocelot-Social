@@ -1460,6 +1460,7 @@
       "unnamedSpeaker": "Lautsprecher",
       "unsupportedBrowser": "Dein Browser unterstützt Audio/Video nicht."
     },
+    "activeSpeakers": "Aktive Sprecher",
     "screenShare": "Bildschirm",
     "startScreenShare": "Bildschirm teilen",
     "stopScreenShare": "Teilen beenden",

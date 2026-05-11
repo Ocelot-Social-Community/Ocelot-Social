@@ -1,5 +1,13 @@
 <template>
-  <div :class="['video-tile', { 'video-tile--screen': tile.isScreen }]">
+  <div
+    :class="[
+      'video-tile',
+      {
+        'video-tile--screen': tile.isScreen,
+        'video-tile--speaking': isActiveSpeaker && !tile.isScreen,
+      },
+    ]"
+  >
     <video
       v-show="hasVideo"
       ref="videoEl"
@@ -55,6 +63,10 @@ export default {
     sinkId: {
       type: String,
       default: null,
+    },
+    isActiveSpeaker: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -210,6 +222,19 @@ export default {
   video {
     object-fit: contain;
   }
+}
+
+// Overlay sits above the video element (which has object-fit: cover and would
+// otherwise clip an inset box-shadow). Works for both the camera-on case and
+// the avatar fallback when the camera is off.
+.video-tile--speaking::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 3px solid $color-primary;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 2;
 }
 
 // Hidden tiles stay in the DOM so their <audio> element keeps playing the

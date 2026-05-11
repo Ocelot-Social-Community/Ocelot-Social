@@ -1460,6 +1460,7 @@
       "unnamedSpeaker": "Speaker",
       "unsupportedBrowser": "Your browser does not support audio/video."
     },
+    "activeSpeakers": "Active speakers",
     "screenShare": "Screen",
     "startScreenShare": "Share screen",
     "stopScreenShare": "Stop sharing",
