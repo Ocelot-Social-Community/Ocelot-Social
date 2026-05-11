@@ -604,16 +604,31 @@ export default {
             : null,
         }
       }
+      const findVideoPub = (participant, source) => {
+        for (const pub of participant.videoTrackPublications.values()) {
+          if (Track && pub.source === source && pub.track) return pub
+        }
+        return null
+      }
       const collect = (participant, isLocal) => {
         const audioTrack = collectAudio(participant)
         const profile = profileFor(participant, isLocal)
-        // Muted publications still appear in the map (LiveKit doesn't unpublish
-        // on setCameraEnabled(false)) but their track renders black — treat
-        // them as no video so the avatar fallback kicks in.
-        const videoPubs = Array.from(participant.videoTrackPublications.values()).filter(
-          (pub) => pub.track && !pub.isMuted,
-        )
-        if (videoPubs.length === 0) {
+        // Use the participant-level getters (isCameraEnabled / isScreenShareEnabled)
+        // as the source of truth — they reflect mute AND publication state more
+        // reliably than iterating the publication map (where mute flags can lag
+        // behind the high-level toggle by a tick on some livekit-client versions).
+        const cameraPub =
+          Track && participant.isCameraEnabled
+            ? findVideoPub(participant, Track.Source.Camera)
+            : null
+        const screenPub =
+          Track && participant.isScreenShareEnabled
+            ? findVideoPub(participant, Track.Source.ScreenShare)
+            : null
+        if (!cameraPub && !screenPub) {
+          // No active video — always render an audio-only tile so the avatar
+          // fallback shows, even when the user is alone in the room with
+          // camera and mic both turned off.
           tiles.push({
             key: `${participant.identity}/audio`,
             identity: participant.identity,
@@ -626,17 +641,28 @@ export default {
           })
           return
         }
-        for (const pub of videoPubs) {
-          const isScreen = Track ? pub.source === Track.Source.ScreenShare : false
+        if (cameraPub) {
           tiles.push({
-            key: `${participant.identity}/${isScreen ? 'screen' : 'cam'}`,
+            key: `${participant.identity}/cam`,
             identity: participant.identity,
             name: participant.name || participant.identity,
             profile,
-            videoTrack: pub.track,
-            audioTrack: isScreen ? null : audioTrack,
+            videoTrack: cameraPub.track,
+            audioTrack,
             isLocal,
-            isScreen,
+            isScreen: false,
+          })
+        }
+        if (screenPub) {
+          tiles.push({
+            key: `${participant.identity}/screen`,
+            identity: participant.identity,
+            name: participant.name || participant.identity,
+            profile,
+            videoTrack: screenPub.track,
+            audioTrack: null,
+            isLocal,
+            isScreen: true,
           })
         }
       }
