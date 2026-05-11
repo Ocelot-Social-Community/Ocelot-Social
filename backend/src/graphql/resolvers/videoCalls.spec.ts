@@ -2,9 +2,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import gql from 'graphql-tag'
-
 import Factory, { cleanDatabase } from '@db/factories'
+import JoinGroupVideoCall from '@graphql/queries/videoCalls/JoinGroupVideoCall.gql'
+import VideoCallConfig from '@graphql/queries/videoCalls/VideoCallConfig.gql'
+import VideoCallParticipantCount from '@graphql/queries/videoCalls/VideoCallParticipantCount.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import { groupIdFromRoomName, roomNameForGroup } from './videoCalls'
@@ -32,30 +33,6 @@ jest.mock('livekit-server-sdk', () => {
     WebhookReceiver: jest.fn(),
   }
 })
-
-const VIDEO_CALL_CONFIG = gql`
-  query {
-    videoCallConfig {
-      enabled
-    }
-  }
-`
-
-const VIDEO_CALL_PARTICIPANT_COUNT = gql`
-  query ($groupId: ID!) {
-    videoCallParticipantCount(groupId: $groupId)
-  }
-`
-
-const JOIN_GROUP_VIDEO_CALL = gql`
-  mutation ($groupId: ID!) {
-    joinGroupVideoCall(groupId: $groupId) {
-      token
-      url
-      roomName
-    }
-  }
-`
 
 const ENABLED_LIVEKIT = {
   LIVEKIT_URL: 'wss://livekit.example.test',
@@ -114,14 +91,14 @@ describe('roomNameForGroup / groupIdFromRoomName', () => {
 describe('videoCallConfig', () => {
   it('reports enabled=false when LiveKit is not configured', async () => {
     livekitConfig = {}
-    const { data, errors } = await query({ query: VIDEO_CALL_CONFIG })
+    const { data, errors } = await query({ query: VideoCallConfig })
     expect(errors).toBeUndefined()
     expect(data.videoCallConfig.enabled).toBe(false)
   })
 
   it('reports enabled=true when LiveKit is configured', async () => {
     livekitConfig = ENABLED_LIVEKIT
-    const { data, errors } = await query({ query: VIDEO_CALL_CONFIG })
+    const { data, errors } = await query({ query: VideoCallConfig })
     expect(errors).toBeUndefined()
     expect(data.videoCallConfig.enabled).toBe(true)
   })
@@ -132,7 +109,7 @@ describe('videoCallParticipantCount', () => {
     authenticatedUser = memberJson
     await Factory.build('group', { id: 'pub-1', groupType: 'public' }, { ownerId: 'member-1' })
     const { errors } = await query({
-      query: VIDEO_CALL_PARTICIPANT_COUNT,
+      query: VideoCallParticipantCount,
       variables: { groupId: 'pub-1' },
     })
     expect(errors?.[0].message).toMatch(/disabled/i)
@@ -143,7 +120,7 @@ describe('videoCallParticipantCount', () => {
     authenticatedUser = outsiderJson
     await Factory.build('group', { id: 'pub-1', groupType: 'public' }, { ownerId: 'member-1' })
     const { errors } = await query({
-      query: VIDEO_CALL_PARTICIPANT_COUNT,
+      query: VideoCallParticipantCount,
       variables: { groupId: 'pub-1' },
     })
     expect(errors?.[0].message).toMatch(/not a member/i)
@@ -154,7 +131,7 @@ describe('videoCallParticipantCount', () => {
     authenticatedUser = memberJson
     await Factory.build('group', { id: 'cl-1', groupType: 'closed' }, { ownerId: 'member-1' })
     const { errors } = await query({
-      query: VIDEO_CALL_PARTICIPANT_COUNT,
+      query: VideoCallParticipantCount,
       variables: { groupId: 'cl-1' },
     })
     expect(errors?.[0].message).toMatch(/only available for public groups/i)
@@ -166,7 +143,7 @@ describe('videoCallParticipantCount', () => {
     await Factory.build('group', { id: 'pub-1', groupType: 'public' }, { ownerId: 'member-1' })
     listParticipantsMock.mockResolvedValueOnce([{}, {}, {}])
     const { data, errors } = await query({
-      query: VIDEO_CALL_PARTICIPANT_COUNT,
+      query: VideoCallParticipantCount,
       variables: { groupId: 'pub-1' },
     })
     expect(errors).toBeUndefined()
@@ -180,7 +157,7 @@ describe('videoCallParticipantCount', () => {
     await Factory.build('group', { id: 'pub-1', groupType: 'public' }, { ownerId: 'member-1' })
     listParticipantsMock.mockRejectedValueOnce(new Error('room not found'))
     const { data, errors } = await query({
-      query: VIDEO_CALL_PARTICIPANT_COUNT,
+      query: VideoCallParticipantCount,
       variables: { groupId: 'pub-1' },
     })
     expect(errors).toBeUndefined()
@@ -193,7 +170,7 @@ describe('joinGroupVideoCall', () => {
     authenticatedUser = memberJson
     await Factory.build('group', { id: 'pub-1', groupType: 'public' }, { ownerId: 'member-1' })
     const { errors } = await mutate({
-      mutation: JOIN_GROUP_VIDEO_CALL,
+      mutation: JoinGroupVideoCall,
       variables: { groupId: 'pub-1' },
     })
     expect(errors?.[0].message).toMatch(/disabled/i)
@@ -204,7 +181,7 @@ describe('joinGroupVideoCall', () => {
     authenticatedUser = outsiderJson
     await Factory.build('group', { id: 'pub-1', groupType: 'public' }, { ownerId: 'member-1' })
     const { errors } = await mutate({
-      mutation: JOIN_GROUP_VIDEO_CALL,
+      mutation: JoinGroupVideoCall,
       variables: { groupId: 'pub-1' },
     })
     expect(errors?.[0].message).toMatch(/not a member/i)
@@ -215,7 +192,7 @@ describe('joinGroupVideoCall', () => {
     authenticatedUser = memberJson
     await Factory.build('group', { id: 'h-1', groupType: 'hidden' }, { ownerId: 'member-1' })
     const { errors } = await mutate({
-      mutation: JOIN_GROUP_VIDEO_CALL,
+      mutation: JoinGroupVideoCall,
       variables: { groupId: 'h-1' },
     })
     expect(errors?.[0].message).toMatch(/only available for public groups/i)
@@ -226,7 +203,7 @@ describe('joinGroupVideoCall', () => {
     authenticatedUser = memberJson
     await Factory.build('group', { id: 'pub-1', groupType: 'public' }, { ownerId: 'member-1' })
     const { data, errors } = await mutate({
-      mutation: JOIN_GROUP_VIDEO_CALL,
+      mutation: JoinGroupVideoCall,
       variables: { groupId: 'pub-1' },
     })
     expect(errors).toBeUndefined()
