@@ -10,7 +10,10 @@
     </div>
     <page-footer class="desktop-footer" />
     <div id="overlay" />
-    <div v-if="getShowChat.showChat && !isMobile" class="chat-modul">
+    <div
+      v-if="getShowChat.showChat && !isMobile"
+      :class="['chat-modul', { 'chat-modul--with-video': showVideoCall && videoCallMinimized }]"
+    >
       <client-only>
         <chat
           singleRoom
@@ -20,6 +23,9 @@
         />
       </client-only>
     </div>
+    <client-only>
+      <video-call v-if="showVideoCall" />
+    </client-only>
   </div>
 </template>
 
@@ -30,17 +36,22 @@ import mobile from '~/mixins/mobile'
 import HeaderMenu from '~/components/HeaderMenu/HeaderMenu'
 import PageFooter from '~/components/PageFooter/PageFooter'
 import Chat from '~/components/Chat/Chat.vue'
+import VideoCall from '~/components/VideoCall/VideoCall.vue'
+import { videoCallConfigQuery } from '~/graphql/VideoCalls'
 
 export default {
   components: {
     HeaderMenu,
     PageFooter,
     Chat,
+    VideoCall,
   },
   mixins: [seo, mobile()],
   computed: {
     ...mapGetters({
       getShowChat: 'chat/showChat',
+      showVideoCall: 'videoCall/showVideoCall',
+      videoCallMinimized: 'videoCall/minimized',
     }),
   },
   watch: {
@@ -63,6 +74,7 @@ export default {
   methods: {
     ...mapMutations({
       showChat: 'chat/SET_OPEN_CHAT',
+      setVideoCallEnabled: 'videoCall/SET_ENABLED',
     }),
     closeSingleRoom() {
       this.showChat({ showChat: false, chatUserId: null, groupId: null })
@@ -70,6 +82,19 @@ export default {
   },
   beforeCreate() {
     this.$store.commit('chat/SET_OPEN_CHAT', { showChat: false, chatUserId: null, groupId: null })
+  },
+  apollo: {
+    videoCallConfig: {
+      query() {
+        return videoCallConfigQuery()
+      },
+      result({ data }) {
+        if (data && data.videoCallConfig) {
+          this.setVideoCallEnabled(data.videoCallConfig.enabled)
+        }
+      },
+      fetchPolicy: 'cache-first',
+    },
   },
 }
 </script>
@@ -113,5 +138,14 @@ export default {
     color: blue;
     cursor: pointer;
   }
+}
+
+// When a minimized video call is anchored at the bottom-right, lift the chat
+// above it so both fit without overlap. The minimized video call is 280px tall
+// and sits at bottom: 0 — push the chat to clear it with a small gap.
+.chat-modul--with-video {
+  bottom: 288px;
+  max-height: calc(100dvh - 360px);
+  overflow: hidden;
 }
 </style>

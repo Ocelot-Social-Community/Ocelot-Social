@@ -1385,5 +1385,54 @@
     "popover": {
       "open-profile": "Open profile"
     }
+  },
+  "videoCall": {
+    "connecting": "Connecting…",
+    "dialogLabel": "Group video call",
+    "disableCamera": "Turn camera off",
+    "enableCamera": "Turn camera on",
+    "groupVideoCallButton": {
+      "label": "Group Video",
+      "tooltip": "Video call in group “{name}”"
+    },
+    "leave": "Leave call",
+    "maximize": "Maximize",
+    "minimize": "Minimize",
+    "muteMic": "Mute microphone",
+    "participants": "Participants",
+    "prejoin": {
+      "camera": "Camera",
+      "cancel": "Cancel",
+      "errorBusy": "The device is in use by another application.",
+      "errorDenied": "Access denied. Please allow camera and microphone access in your browser settings.",
+      "errorNoDevice": "No matching device found.",
+      "errorUnknown": "Could not access your devices.",
+      "join": "Join call",
+      "microphone": "Microphone",
+      "micLevel": "Microphone level",
+      "noCamera": "Camera preview is not available.",
+      "noDevices": "No device detected",
+      "permission": {
+        "denied": "Blocked",
+        "granted": "OK",
+        "prompt": "Pending",
+        "unsupported": "Not supported"
+      },
+      "speaker": "Speaker",
+      "speakerUnsupported": "Output device selection is not supported in this browser.",
+      "testingSound": "Playing…",
+      "testSound": "Test sound",
+      "title": "Set up your devices",
+      "unnamedCamera": "Camera",
+      "unnamedMic": "Microphone",
+      "unnamedSpeaker": "Speaker",
+      "unsupportedBrowser": "Your browser does not support audio/video."
+    },
+    "screenShare": "Screen",
+    "startScreenShare": "Share screen",
+    "stopScreenShare": "Stop sharing",
+    "title": "Group video call",
+    "unmuteMic": "Unmute microphone",
+    "you": "you"
   }
 }

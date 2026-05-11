@@ -1385,5 +1385,54 @@
     "popover": {
       "open-profile": "Profil öffnen"
     }
+  },
+  "videoCall": {
+    "connecting": "Verbinde…",
+    "dialogLabel": "Gruppen-Videoanruf",
+    "disableCamera": "Kamera ausschalten",
+    "enableCamera": "Kamera einschalten",
+    "groupVideoCallButton": {
+      "label": "Gruppen-Video",
+      "tooltip": "Videoanruf in der Gruppe „{name}“"
+    },
+    "leave": "Anruf verlassen",
+    "maximize": "Maximieren",
+    "minimize": "Minimieren",
+    "muteMic": "Mikrofon stummschalten",
+    "participants": "Teilnehmer",
+    "prejoin": {
+      "camera": "Kamera",
+      "cancel": "Abbrechen",
+      "errorBusy": "Das Gerät wird bereits von einer anderen Anwendung verwendet.",
+      "errorDenied": "Zugriff verweigert. Bitte erlaube Kamera- und Mikrofonzugriff in den Browser-Einstellungen.",
+      "errorNoDevice": "Kein passendes Gerät gefunden.",
+      "errorUnknown": "Auf die Geräte konnte nicht zugegriffen werden.",
+      "join": "Anruf beitreten",
+      "microphone": "Mikrofon",
+      "micLevel": "Mikrofon-Pegel",
+      "noCamera": "Kamera-Vorschau nicht verfügbar.",
+      "noDevices": "Kein Gerät erkannt",
+      "permission": {
+        "denied": "Blockiert",
+        "granted": "OK",
+        "prompt": "Ausstehend",
+        "unsupported": "Nicht unterstützt"
+      },
+      "speaker": "Lautsprecher",
+      "speakerUnsupported": "Lautsprecher-Auswahl wird in diesem Browser nicht unterstützt.",
+      "testingSound": "Spielt…",
+      "testSound": "Sound testen",
+      "title": "Geräte einrichten",
+      "unnamedCamera": "Kamera",
+      "unnamedMic": "Mikrofon",
+      "unnamedSpeaker": "Lautsprecher",
+      "unsupportedBrowser": "Dein Browser unterstützt Audio/Video nicht."
+    },
+    "screenShare": "Bildschirm",
+    "startScreenShare": "Bildschirm teilen",
+    "stopScreenShare": "Teilen beenden",
+    "title": "Gruppen-Videoanruf",
+    "unmuteMic": "Stummschaltung aufheben",
+    "you": "du"
   }
 }

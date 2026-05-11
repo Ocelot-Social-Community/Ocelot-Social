@@ -22,6 +22,7 @@ import { WebSocketServer } from 'ws'
 import CONFIG from './config'
 import { getContext } from './context'
 import schema from './graphql/schema'
+import { registerLiveKitWebhook } from './livekit/webhook'
 import logger from './logger'
 import middleware from './middleware'
 
@@ -125,6 +126,9 @@ const createServer = async (options?: CreateServerOptions) => {
     ) as any,
   )
   app.use(express.static('public'))
+  // LiveKit webhook must be registered before the global JSON body parser so
+  // the raw payload is preserved for HMAC signature verification.
+  registerLiveKitWebhook(app)
   app.use(bodyParser.json({ limit: '10mb' }) as any)
   app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }) as any)
   app.use(graphqlUploadExpress())

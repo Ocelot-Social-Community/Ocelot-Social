@@ -466,6 +466,8 @@ export default shield(
       Room: isAuthenticated,
       Message: isAuthenticated,
       UnreadRooms: isAuthenticated,
+      videoCallConfig: allow,
+      videoCallParticipantCount: isAuthenticated,
       PostsPinnedCounts: isAdmin,
 
       // Invite Code
@@ -548,6 +550,7 @@ export default shield(
       updateOnlineStatus: isAuthenticated,
       CreateGroupRoom: isAuthenticated,
       CreateMessage: isAuthenticated,
+      joinGroupVideoCall: isAuthenticated,
       MarkMessagesAsSeen: isAuthenticated,
       toggleObservePost: isAuthenticated,
       muteGroup: and(isAuthenticated, isMemberOfGroup),

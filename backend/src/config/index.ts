@@ -99,6 +99,16 @@ const redis = {
   REDIS_PASSWORD: env.REDIS_PASSWORD,
 }
 
+const LIVEKIT_URL = env.LIVEKIT_URL
+const LIVEKIT_API_KEY = env.LIVEKIT_API_KEY
+const LIVEKIT_API_SECRET = env.LIVEKIT_API_SECRET
+const livekit = {
+  LIVEKIT_URL,
+  LIVEKIT_API_KEY,
+  LIVEKIT_API_SECRET,
+  LIVEKIT_ENABLED: !!(LIVEKIT_URL && LIVEKIT_API_KEY && LIVEKIT_API_SECRET),
+}
+
 const required = {
   EMAIL_DEFAULT_SENDER: env.EMAIL_DEFAULT_SENDER,
 
@@ -163,6 +173,7 @@ const CONFIG = {
   ...neo4j,
   ...sentry,
   ...redis,
+  ...livekit,
   ...options,
   ...language,
 }
