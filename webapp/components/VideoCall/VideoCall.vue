@@ -85,40 +85,60 @@
     </div>
 
     <div v-if="phase === 'in-call' && !error" class="video-call__controls">
-      <button
-        type="button"
-        class="video-call__control"
-        :aria-pressed="!micEnabled"
+      <os-button
+        :variant="micEnabled ? 'default' : 'danger'"
+        appearance="outline"
+        :size="iconOnly ? 'sm' : 'md'"
+        :circle="iconOnly"
         :aria-label="micEnabled ? $t('videoCall.muteMic') : $t('videoCall.unmuteMic')"
         @click="toggleMic"
       >
-        {{ micEnabled ? $t('videoCall.muteMic') : $t('videoCall.unmuteMic') }}
-      </button>
-      <button
-        type="button"
-        class="video-call__control"
-        :aria-pressed="!cameraEnabled"
+        <template #icon>
+          <os-icon :icon="micEnabled ? icons.microphone : icons.microphoneSlash" />
+        </template>
+        <template v-if="!iconOnly">
+          {{ micEnabled ? $t('videoCall.muteMic') : $t('videoCall.unmuteMic') }}
+        </template>
+      </os-button>
+      <os-button
+        :variant="cameraEnabled ? 'default' : 'danger'"
+        appearance="outline"
+        :size="iconOnly ? 'sm' : 'md'"
+        :circle="iconOnly"
         :aria-label="cameraEnabled ? $t('videoCall.disableCamera') : $t('videoCall.enableCamera')"
         @click="toggleCamera"
       >
-        {{ cameraEnabled ? $t('videoCall.disableCamera') : $t('videoCall.enableCamera') }}
-      </button>
-      <button
+        <template #icon>
+          <os-icon :icon="icons.videoCamera" />
+        </template>
+        <template v-if="!iconOnly">
+          {{ cameraEnabled ? $t('videoCall.disableCamera') : $t('videoCall.enableCamera') }}
+        </template>
+      </os-button>
+      <os-button
         v-if="screenShareSupported"
-        type="button"
-        class="video-call__control"
-        :aria-pressed="screenShareEnabled"
+        :variant="screenShareEnabled ? 'primary' : 'default'"
+        appearance="outline"
+        :size="iconOnly ? 'sm' : 'md'"
+        :circle="iconOnly"
         :aria-label="screenShareEnabled ? $t('videoCall.stopScreenShare') : $t('videoCall.startScreenShare')"
         @click="toggleScreenShare"
       >
-        {{ screenShareEnabled ? $t('videoCall.stopScreenShare') : $t('videoCall.startScreenShare') }}
-      </button>
+        <template #icon>
+          <os-icon :icon="icons.desktop" />
+        </template>
+        <template v-if="!iconOnly">
+          {{ screenShareEnabled ? $t('videoCall.stopScreenShare') : $t('videoCall.startScreenShare') }}
+        </template>
+      </os-button>
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { iconRegistry } from '~/utils/iconRegistry'
 import mobile from '~/mixins/mobile'
 import { joinGroupVideoCallMutation } from '~/graphql/VideoCalls'
 import VideoTile from './VideoTile.vue'
@@ -126,7 +146,7 @@ import PreJoin from './PreJoin.vue'
 
 export default {
   name: 'VideoCall',
-  components: { VideoTile, PreJoin },
+  components: { VideoTile, PreJoin, OsButton, OsIcon },
   mixins: [mobile()],
   data() {
     return {
@@ -154,6 +174,10 @@ export default {
     },
     isFullscreen() {
       return this.isMobile || !this.minimized || this.phase !== 'in-call'
+    },
+    iconOnly() {
+      // Compact icon-only buttons when the call is parked in the corner.
+      return !this.isFullscreen
     },
     screenShareSupported() {
       return (
@@ -187,6 +211,9 @@ export default {
         }
       },
     },
+  },
+  created() {
+    this.icons = iconRegistry
   },
   beforeDestroy() {
     this.cleanup()
@@ -376,7 +403,9 @@ export default {
 }
 
 .video-call--minimized {
-  bottom: 0;
+  // Match the chat's footer offset so the minimized window sits above the
+  // desktop footer instead of flush with the viewport edge.
+  bottom: 45px;
   right: 0;
   width: 355px;
   height: 280px;
@@ -413,29 +442,7 @@ export default {
 .video-call__header-actions {
   display: flex;
   gap: $space-xxx-small;
-}
-
-.video-call__icon-btn {
-  background: transparent;
-  border: none;
-  color: $text-color-soft;
-  cursor: pointer;
-  font-size: 1.2em;
-  padding: $space-xxx-small $space-x-small;
-  border-radius: $border-radius-base;
-  line-height: 1;
-
-  &:hover {
-    background: $background-color-softer;
-    color: $text-color-base;
-  }
-}
-
-.video-call__icon-btn--danger {
-  &:hover {
-    background: $color-danger;
-    color: $color-danger-inverse;
-  }
+  align-items: center;
 }
 
 .video-call__body {
@@ -483,32 +490,13 @@ export default {
   background: $background-color-soft;
   border-top: 1px solid $color-neutral-85;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
-.video-call__control {
-  background: $background-color-base;
-  color: $text-color-base;
-  border: 1px solid $color-neutral-70;
-  padding: $space-xx-small $space-small;
-  border-radius: $border-radius-base;
-  font-family: $font-family-text;
-  font-size: $font-size-small;
-  cursor: pointer;
-  transition: background-color $duration-short ease;
-
-  &:hover {
-    background: $background-color-softer;
-  }
-
-  &[aria-pressed='true'] {
-    background: $color-danger;
-    border-color: $color-danger;
-    color: $color-danger-inverse;
-
-    &:hover {
-      background: $color-danger-active;
-    }
-  }
+.video-call--minimized .video-call__controls {
+  // Tighter spacing for the icon-only row in the parked window.
+  padding: $space-xxx-small $space-x-small;
+  gap: $space-xxx-small;
 }
 
 @media (max-width: 810px) {

@@ -140,12 +140,13 @@ export default {
   }
 }
 
-// When a minimized video call is anchored at the bottom-right, lift the chat
-// above it so both fit without overlap. The minimized video call is 280px tall
-// and sits at bottom: 0 — push the chat to clear it with a small gap.
+// When a minimized video call is anchored above the footer, lift the chat
+// above the video so both fit without overlap. Minimized video sits at
+// bottom: 45px (matching the chat's footer offset) and is 280px tall.
+// The inner chat content keeps its own height; whatever extends above the
+// viewport gets clipped by the browser, leaving the message input and the
+// latest messages visible — which is what the user interacts with.
 .chat-modul--with-video {
-  bottom: 288px;
-  max-height: calc(100dvh - 360px);
-  overflow: hidden;
+  bottom: 333px; // 45 (video bottom) + 280 (video height) + 8 (gap)
 }
 </style>

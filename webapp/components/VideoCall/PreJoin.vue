@@ -98,14 +98,15 @@
               {{ d.label || $t('videoCall.prejoin.unnamedSpeaker') }}
             </option>
           </select>
-          <button
-            type="button"
-            class="prejoin__btn"
-            @click="playTestTone"
+          <os-button
+            appearance="outline"
+            size="sm"
             :disabled="testingTone"
+            @click="playTestTone"
           >
+            <template #icon><os-icon :icon="icons.headphones" /></template>
             {{ testingTone ? $t('videoCall.prejoin.testingSound') : $t('videoCall.prejoin.testSound') }}
-          </button>
+          </os-button>
         </div>
         <audio ref="speakerTestEl" preload="auto" />
       </div>
@@ -115,29 +116,33 @@
       </div>
 
       <div class="prejoin__actions">
-        <button
-          type="button"
-          class="prejoin__btn prejoin__btn--ghost"
+        <os-button
+          appearance="ghost"
           @click="$emit('cancel')"
         >
+          <template #icon><os-icon :icon="icons.close" /></template>
           {{ $t('videoCall.prejoin.cancel') }}
-        </button>
-        <button
-          type="button"
-          class="prejoin__btn prejoin__btn--primary"
+        </os-button>
+        <os-button
+          variant="primary"
           :disabled="!canJoin"
           @click="emitJoin"
         >
+          <template #icon><os-icon :icon="icons.phone" /></template>
           {{ $t('videoCall.prejoin.join') }}
-        </button>
+        </os-button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { iconRegistry } from '~/utils/iconRegistry'
+
 export default {
   name: 'PreJoin',
+  components: { OsButton, OsIcon },
   data() {
     return {
       cameras: [],
@@ -170,6 +175,9 @@ export default {
       const ok = (s) => s === 'granted'
       return ok(this.cameraStatus) || ok(this.micStatus)
     },
+  },
+  created() {
+    this.icons = iconRegistry
   },
   async mounted() {
     await this.initDevices()
@@ -568,43 +576,6 @@ export default {
 
   select {
     flex: 1;
-  }
-}
-
-.prejoin__btn {
-  background: $background-color-base;
-  color: $text-color-base;
-  border: 1px solid $color-neutral-70;
-  padding: $space-xx-small $space-base;
-  border-radius: $border-radius-base;
-  font-family: $font-family-text;
-  font-size: $font-size-base;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color $duration-short ease;
-
-  &:hover:not(:disabled) {
-    background: $background-color-softer;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  &--primary {
-    background: $color-primary;
-    border-color: $color-primary;
-    color: $color-primary-inverse;
-
-    &:hover:not(:disabled) {
-      background: $color-primary-active;
-      border-color: $color-primary-active;
-    }
-  }
-
-  &--ghost {
-    background: transparent;
   }
 }
 
