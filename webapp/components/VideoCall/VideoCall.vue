@@ -16,50 +16,53 @@
       @click.stop
     >
     <div class="video-call__header">
-      <nuxt-link
-        v-if="!iconOnly && groupRoute"
-        :to="groupRoute"
-        class="video-call__title video-call__title--link"
-        :aria-label="$t('videoCall.gotoGroup', { name: titleLabel })"
-        @click.native="onGroupLinkClick"
-      >
-        {{ titleLabel }}
-      </nuxt-link>
-      <span v-else-if="!iconOnly" class="video-call__title">
-        {{ titleLabel }}
-      </span>
-      <span
-        v-if="phase === 'in-call'"
-        class="video-call__count"
-        data-test="video-call-participants"
-      >
-        {{ uniqueParticipantCount }}
-      </span>
-      <div class="video-call__header-actions">
-        <os-button
-          v-if="canMinimize && phase === 'in-call'"
-          appearance="ghost"
-          size="sm"
-          circle
-          :aria-label="minimized ? $t('videoCall.maximize') : $t('videoCall.minimize')"
-          @click="toggleMinimize"
+      <div class="video-call__header-info">
+        <profile-avatar
+          :profile="groupProfile"
+          class="video-call__avatar"
+        />
+        <room-title-link
+          :name="titleLabel"
+          :to="groupRoute"
+          :show-group-icon="!!groupId"
+          :aria-label="$t('videoCall.gotoGroup', { name: titleLabel })"
+          @click="onGroupLinkClick"
+        />
+      </div>
+      <div class="video-call__header-right">
+        <span
+          v-if="phase === 'in-call'"
+          class="video-call__count"
+          data-test="video-call-participants"
         >
-          <template #icon>
-            <os-icon :icon="minimized ? icons.expand : icons.minus" />
-          </template>
-        </os-button>
-        <os-button
-          variant="danger"
-          appearance="ghost"
-          size="sm"
-          circle
-          :aria-label="phase === 'in-call' ? $t('videoCall.leave') : $t('videoCall.prejoin.cancel')"
-          @click="leave"
-        >
-          <template #icon>
-            <os-icon :icon="icons.close" />
-          </template>
-        </os-button>
+          {{ uniqueParticipantCount }}
+        </span>
+        <div class="video-call__header-actions">
+          <os-button
+            v-if="canMinimize && phase === 'in-call'"
+            appearance="ghost"
+            size="sm"
+            circle
+            :aria-label="minimized ? $t('videoCall.maximize') : $t('videoCall.minimize')"
+            @click="toggleMinimize"
+          >
+            <template #icon>
+              <os-icon :icon="minimized ? icons.expand : icons.minus" />
+            </template>
+          </os-button>
+          <os-button
+            variant="danger"
+            appearance="ghost"
+            size="sm"
+            circle
+            :aria-label="phase === 'in-call' ? $t('videoCall.leave') : $t('videoCall.prejoin.cancel')"
+            @click="leave"
+          >
+            <template #icon>
+              <os-icon :icon="icons.close" />
+            </template>
+          </os-button>
+        </div>
       </div>
     </div>
 
@@ -191,12 +194,22 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import mobile from '~/mixins/mobile'
 import { joinGroupVideoCallMutation } from '~/graphql/VideoCalls'
 import Chat from '~/components/Chat/Chat.vue'
+import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import RoomTitleLink from '~/components/_new/generic/RoomTitleLink/RoomTitleLink'
 import VideoTile from './VideoTile.vue'
 import PreJoin from './PreJoin.vue'
 
 export default {
   name: 'VideoCall',
-  components: { VideoTile, PreJoin, OsButton, OsIcon, Chat },
+  components: {
+    VideoTile,
+    PreJoin,
+    OsButton,
+    OsIcon,
+    Chat,
+    ProfileAvatar,
+    RoomTitleLink,
+  },
   mixins: [mobile()],
   data() {
     return {
@@ -220,9 +233,17 @@ export default {
       groupId: 'videoCall/groupId',
       groupName: 'videoCall/groupName',
       groupSlug: 'videoCall/groupSlug',
+      groupAvatar: 'videoCall/groupAvatar',
       getShowChat: 'chat/showChat',
       currentUser: 'auth/user',
     }),
+    groupProfile() {
+      return {
+        id: this.groupId,
+        name: this.groupName || this.groupSlug || '',
+        avatar: this.groupAvatar,
+      }
+    },
     chatOpenForThisGroup() {
       return !!(
         this.getShowChat &&
@@ -314,6 +335,14 @@ export default {
         }
       },
     },
+    phase: {
+      immediate: true,
+      handler(next) {
+        // Sync to the store so layouts (chat-modul vs sidebar) can switch in
+        // the same reactive tick as the local phase change.
+        this.setStorePhase(next || 'idle')
+      },
+    },
     $route(to) {
       // Keep the minimized/maximized state in sync with the URL when the user
       // navigates via links, browser back/forward, or our own routing helpers.
@@ -335,6 +364,7 @@ export default {
       setMinimized: 'videoCall/SET_MINIMIZED',
       close: 'videoCall/CLOSE',
       setParticipantCount: 'videoCall/SET_PARTICIPANT_COUNT',
+      setStorePhase: 'videoCall/SET_PHASE',
       setShowChat: 'chat/SET_OPEN_CHAT',
     }),
     toggleChat() {
@@ -643,7 +673,15 @@ export default {
 }
 
 .video-call--maximized {
-  inset: 0;
+  // Anchor exactly to the measured header/footer heights so the maximized call
+  // butts seamlessly against both bars — no gap. HeaderMenu sets
+  // --header-height; PageFooter sets --footer-height (0 on mobile where the
+  // footer is hidden). The clicks on the bars trigger the $route watcher in
+  // this component, which auto-parks the call.
+  top: var(--header-height, 6rem);
+  right: 0;
+  bottom: var(--footer-height, 0px);
+  left: 0;
   z-index: $z-index-overlay + 1;
 }
 
@@ -697,24 +735,25 @@ export default {
   color: $text-color-base;
 }
 
-.video-call__title {
-  flex: 1;
+.video-call__header-info {
+  display: flex;
+  align-items: center;
+  gap: $space-x-small;
+  flex: 1 1 0;
   min-width: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.video-call__title--link {
-  color: $text-color-link;
-  text-decoration: none;
-  cursor: pointer;
+.video-call__avatar {
+  flex-shrink: 0;
+}
 
-  &:hover,
-  &:focus-visible {
-    text-decoration: underline;
-    color: $text-color-link-active;
-  }
+.video-call__header-right {
+  display: flex;
+  align-items: center;
+  gap: $space-xx-small;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .video-call__count {
@@ -731,6 +770,12 @@ export default {
   display: flex;
   gap: $space-xxx-small;
   align-items: center;
+}
+
+.video-call--minimized .video-call__header {
+  // Compact padding so avatar + title + count + buttons all fit in 355px.
+  padding: $space-xxx-small $space-x-small;
+  gap: $space-xx-small;
 }
 
 .video-call__body {

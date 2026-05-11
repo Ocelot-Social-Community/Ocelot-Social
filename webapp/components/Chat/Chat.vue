@@ -34,40 +34,32 @@
     @open-file="openFile($event.detail[0].file.file)"
   >
     <div v-if="selectedRoom && selectedRoom.roomId" slot="room-options" class="chat-room-options">
-      <div v-if="singleRoom" class="ds-flex">
-        <div class="ds-flex-item single-chat-bubble" style="align-self: center">
-          <os-button
-            as="nuxt-link"
-            :to="expandChatLink"
-            variant="primary"
-            appearance="ghost"
-            circle
-            size="sm"
-            :aria-label="$t('chat.expandChat')"
-          >
-            <template #icon>
-              <os-icon :icon="icons.expand" />
-            </template>
-          </os-button>
-        </div>
-        <div class="ds-flex-item" style="align-self: center">
-          <div class="vac-svg-button vac-room-options">
-            <slot name="menu-icon">
-              <os-button
-                variant="primary"
-                appearance="ghost"
-                circle
-                size="sm"
-                :aria-label="$t('chat.closeChat')"
-                @click="$emit('close-single-room', true)"
-              >
-                <template #icon>
-                  <os-icon :icon="icons.close" />
-                </template>
-              </os-button>
-            </slot>
-          </div>
-        </div>
+      <div v-if="singleRoom" class="chat-room-options__buttons">
+        <os-button
+          as="nuxt-link"
+          :to="expandChatLink"
+          variant="primary"
+          appearance="ghost"
+          circle
+          size="sm"
+          :aria-label="$t('chat.expandChat')"
+        >
+          <template #icon>
+            <os-icon :icon="icons.expand" />
+          </template>
+        </os-button>
+        <os-button
+          variant="primary"
+          appearance="ghost"
+          circle
+          size="sm"
+          :aria-label="$t('chat.closeChat')"
+          @click="$emit('close-single-room', true)"
+        >
+          <template #icon>
+            <os-icon :icon="icons.close" />
+          </template>
+        </os-button>
       </div>
     </div>
 
@@ -87,18 +79,11 @@
 
     <div slot="room-header-info" class="chat-room-header-info">
       <div class="vac-room-name vac-text-ellipsis">
-        <component
-          :is="roomHeaderLink ? 'nuxt-link' : 'span'"
+        <room-title-link
+          :name="selectedRoom ? selectedRoom.roomName : ''"
           :to="roomHeaderLink"
-          class="chat-header-profile-link"
-        >
-          <os-icon
-            v-if="selectedRoom && selectedRoom.isGroupRoom"
-            :icon="icons.group"
-            class="room-group-icon"
-          />
-          {{ selectedRoom ? selectedRoom.roomName : '' }}
-        </component>
+          :show-group-icon="!!(selectedRoom && selectedRoom.isGroupRoom)"
+        />
       </div>
     </div>
 
@@ -138,6 +123,7 @@
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import RoomTitleLink from '~/components/_new/generic/RoomTitleLink/RoomTitleLink'
 import locales from '~/locales/index.js'
 import { roomQuery, createGroupRoom, unreadRoomsQuery, userProfileQuery } from '~/graphql/Rooms'
 import {
@@ -156,7 +142,7 @@ const MESSAGE_PAGE_SIZE = 20
 
 export default {
   name: 'Chat',
-  components: { OsButton, OsIcon, ProfileAvatar },
+  components: { OsButton, OsIcon, ProfileAvatar, RoomTitleLink },
   props: {
     theme: {
       type: String,
@@ -1197,6 +1183,14 @@ export default {
 
 .chat-room-options {
   flex-shrink: 0;
+  margin-left: auto;
+}
+
+.chat-room-options__buttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
 }
 
 .chat-room-header-info {

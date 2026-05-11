@@ -10,6 +10,7 @@
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
+import { groupQuery } from '~/graphql/groups'
 
 export default {
   name: 'CallPage',
@@ -68,7 +69,32 @@ export default {
     ...mapMutations({
       setMinimized: 'videoCall/SET_MINIMIZED',
       openVideoCall: 'videoCall/OPEN',
+      setGroupInfo: 'videoCall/SET_GROUP_INFO',
     }),
+  },
+  apollo: {
+    Group: {
+      query() {
+        return groupQuery(this.$i18n)
+      },
+      variables() {
+        return { id: this.$route.params.id }
+      },
+      result({ data }) {
+        const group = data && data.Group && data.Group[0]
+        if (!group) return
+        this.setGroupInfo({
+          groupId: group.id,
+          groupName: group.name,
+          groupSlug: group.slug,
+          groupAvatar: group.avatar,
+        })
+      },
+      skip() {
+        return !this.$route.params.id
+      },
+      fetchPolicy: 'cache-first',
+    },
   },
 }
 </script>

@@ -34,7 +34,18 @@ export default {
     }
   },
   mounted() {
-    this.showChat({ showChat: false, chatUserId: null, groupId: null })
+    // Adopt the URL's room context (if any) into the Vuex state. Without this,
+    // returning from /chat to /call/<group> would find showChat=false and the
+    // call's chat sidebar would not re-appear after the user maximised the
+    // chat away from the sidebar and then re-maximised the video.
+    const { userId, groupId } = this.$route.query
+    if (groupId) {
+      this.showChat({ showChat: true, chatUserId: null, groupId })
+    } else if (userId) {
+      this.showChat({ showChat: true, chatUserId: userId, groupId: null })
+    } else {
+      this.showChat({ showChat: false, chatUserId: null, groupId: null })
+    }
     this.openFromQuery()
   },
   watch: {

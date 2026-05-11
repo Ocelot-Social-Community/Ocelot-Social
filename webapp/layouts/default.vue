@@ -11,7 +11,7 @@
     <page-footer class="desktop-footer" />
     <div id="overlay" />
     <div
-      v-if="getShowChat.showChat && !isMobile && !chatLivesInVideoSidebar"
+      v-if="getShowChat.showChat && !isMobile && !chatRenderedElsewhere"
       :class="['chat-modul', { 'chat-modul--with-video': showVideoCall && videoCallMinimized }]"
     >
       <client-only>
@@ -52,15 +52,30 @@ export default {
       getShowChat: 'chat/showChat',
       showVideoCall: 'videoCall/showVideoCall',
       videoCallMinimized: 'videoCall/minimized',
+      videoCallGroupId: 'videoCall/groupId',
+      videoCallPhase: 'videoCall/phase',
     }),
     chatLivesInVideoSidebar() {
-      // While the call is on its dedicated route (maximized), the chat is
-      // rendered inside the call's sidebar instead of the floating chat-modul.
+      // Move the chat into the call's sidebar **only when the chat is for the
+      // very same group as the video call**. Otherwise (different group or no
+      // group, e.g. user chat) keep the floating chat-modul so the user
+      // doesn't lose their conversation when the video gets maximized.
+      // The phase check (instead of a route check) lets the modul → sidebar
+      // hand-off happen in the same reactive tick as the maximize click,
+      // avoiding a brief moment with two chats visible side by side.
       return (
         this.showVideoCall &&
         !this.videoCallMinimized &&
-        this.$route.name === 'call-id-slug'
+        (this.videoCallPhase === 'in-call' || this.videoCallPhase === 'connecting') &&
+        !!this.getShowChat.groupId &&
+        this.getShowChat.groupId === this.videoCallGroupId
       )
+    },
+    chatRenderedElsewhere() {
+      // Don't draw the floating chat-modul when the chat is already shown by
+      // some other surface: the maximized chat page (/chat) or the video
+      // call's sidebar.
+      return this.chatLivesInVideoSidebar || this.$route.name === 'chat'
     },
   },
   watch: {

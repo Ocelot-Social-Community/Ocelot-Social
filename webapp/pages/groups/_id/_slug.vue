@@ -561,6 +561,7 @@ export default {
         groupId,
         groupName: this.groupName,
         groupSlug: this.groupSlug,
+        groupAvatar: this.group && this.group.avatar,
       })
     },
     setupRoomUpdatedSubscription() {
