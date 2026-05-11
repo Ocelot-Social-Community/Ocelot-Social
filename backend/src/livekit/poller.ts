@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
 /**
  * Fallback for environments where LiveKit webhooks can't reach the backend
  * (firewall, missing config, ad-hoc dev setup). Periodically lists rooms via
@@ -12,8 +13,8 @@
 import { RoomServiceClient } from 'livekit-server-sdk'
 
 import CONFIG from '@src/config'
-import { serverPubsub } from '@src/context'
 import { VIDEO_CALL_PARTICIPANT_COUNT_CHANGED } from '@src/constants/subscriptions'
+import { serverPubsub } from '@src/context'
 import { groupIdFromRoomName } from '@src/graphql/resolvers/videoCalls'
 import logger from '@src/logger'
 
@@ -27,17 +28,21 @@ const httpUrlFor = (livekitUrl: string) =>
       ? livekitUrl.replace(/^ws:\/\//, 'http://')
       : livekitUrl
 
-let pollTimer: NodeJS.Timeout | null = null
+let pollTimer: ReturnType<typeof setInterval> | null = null
 let polling = false
 let consecutiveFailures = 0
 const lastSeenCounts = new Map<string, number>()
 
-const withTimeout = <T>(promise: Promise<T>, ms: number, label: string): Promise<T> =>
+const withTimeout = async <T>(promise: Promise<T>, ms: number, label: string): Promise<T> =>
   Promise.race([
     promise,
-    new Promise<T>((_, reject) =>
-      setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms),
-    ),
+    // eslint-disable-next-line promise/avoid-new
+    new Promise<T>((_resolve, reject) => {
+      const timer = setTimeout(() => {
+        reject(new Error(`${label} timed out after ${ms.toString()}ms`))
+      }, ms)
+      if (typeof timer.unref === 'function') timer.unref()
+    }),
   ])
 
 const pollOnce = async () => {
@@ -45,31 +50,32 @@ const pollOnce = async () => {
   // Skip if the previous tick is still in flight — prevents pile-up of
   // pending HTTP requests when LiveKit is slow or unreachable.
   if (polling) return
+  // Narrow the optional config values into locals — we already checked
+  // LIVEKIT_ENABLED above which guarantees they are defined.
+  const livekitUrl = CONFIG.LIVEKIT_URL
+  const apiKey = CONFIG.LIVEKIT_API_KEY
+  const apiSecret = CONFIG.LIVEKIT_API_SECRET
+  if (!livekitUrl || !apiKey || !apiSecret) return
   polling = true
   try {
-    const client = new RoomServiceClient(
-      httpUrlFor(CONFIG.LIVEKIT_URL!),
-      CONFIG.LIVEKIT_API_KEY!,
-      CONFIG.LIVEKIT_API_SECRET!,
-    )
+    const client = new RoomServiceClient(httpUrlFor(livekitUrl), apiKey, apiSecret)
     let rooms
     try {
       rooms = await withTimeout(client.listRooms(), POLL_TIMEOUT_MS, 'listRooms')
       consecutiveFailures = 0
-    } catch (err) {
+      // eslint-disable-next-line no-catch-all/no-catch-all
+    } catch (err: unknown) {
       consecutiveFailures += 1
       // Only log first few failures to avoid log spam if LiveKit is down.
       if (consecutiveFailures <= 3) {
-        logger.warn(
-          `LiveKit poll failed (#${consecutiveFailures}):`,
-          err instanceof Error ? err.message : err,
-        )
+        const message = err instanceof Error ? err.message : String(err)
+        logger.warn(`LiveKit poll failed (#${consecutiveFailures.toString()}):`, message)
       }
       return
     }
     const seen = new Set<string>()
     for (const room of rooms) {
-      if (!room.name || !room.name.startsWith('group-')) continue
+      if (!room.name?.startsWith('group-')) continue
       seen.add(room.name)
       const groupId = groupIdFromRoomName(room.name)
       if (!groupId) continue
@@ -97,22 +103,30 @@ const pollOnce = async () => {
   }
 }
 
+const runTick = async () => {
+  try {
+    await pollOnce()
+    // eslint-disable-next-line no-catch-all/no-catch-all
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    logger.warn('LiveKit poll tick failed:', message)
+  }
+}
+
 export const startLiveKitPoller = () => {
   if (!CONFIG.LIVEKIT_ENABLED) {
     logger.info('LiveKit disabled — poller not started.')
     return
   }
   if (pollTimer) return
-  logger.info(`LiveKit poller starting (every ${POLL_INTERVAL_MS / 1000}s).`)
-  // Fire-and-forget; never let polling errors crash the process.
-  const tick = () => {
-    pollOnce().catch((err) => {
-      logger.warn('LiveKit poll tick failed:', err)
-    })
-  }
+  logger.info(`LiveKit poller starting (every ${(POLL_INTERVAL_MS / 1000).toString()}s).`)
   // First run a bit later so server startup isn't blocked.
-  setTimeout(tick, 5_000)
-  pollTimer = setInterval(tick, POLL_INTERVAL_MS)
+  setTimeout(() => {
+    void runTick()
+  }, 5_000)
+  pollTimer = setInterval(() => {
+    void runTick()
+  }, POLL_INTERVAL_MS)
   if (typeof pollTimer.unref === 'function') pollTimer.unref()
 }
 

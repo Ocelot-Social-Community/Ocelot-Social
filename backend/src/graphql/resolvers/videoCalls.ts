@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { randomBytes } from 'node:crypto'
 
@@ -16,7 +17,7 @@ const ROOM_PREFIX = 'group-'
 
 export const roomNameForGroup = (groupId: string) => `${ROOM_PREFIX}${groupId}`
 export const groupIdFromRoomName = (roomName: string | null | undefined): string | null =>
-  roomName && roomName.startsWith(ROOM_PREFIX) ? roomName.slice(ROOM_PREFIX.length) : null
+  roomName?.startsWith(ROOM_PREFIX) ? roomName.slice(ROOM_PREFIX.length) : null
 
 const httpUrlFor = (livekitUrl: string) =>
   livekitUrl.startsWith('wss://')
@@ -82,12 +83,16 @@ const getUserAvatarUrl = async (driver: Driver, userId: string): Promise<string 
 
 const LIVEKIT_API_TIMEOUT_MS = 4000
 
-const withTimeout = <T>(promise: Promise<T>, ms: number, label: string): Promise<T> =>
+const withTimeout = async <T>(promise: Promise<T>, ms: number, label: string): Promise<T> =>
   Promise.race([
     promise,
-    new Promise<T>((_, reject) =>
-      setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms),
-    ),
+    // eslint-disable-next-line promise/avoid-new
+    new Promise<T>((_resolve, reject) => {
+      const timer = setTimeout(() => {
+        reject(new Error(`${label} timed out after ${ms.toString()}ms`))
+      }, ms)
+      if (typeof timer.unref === 'function') timer.unref()
+    }),
   ])
 
 export const getLiveParticipantCount = async (
@@ -106,6 +111,7 @@ export const getLiveParticipantCount = async (
       'listParticipants',
     )
     return participants.length
+    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch {
     // Room does not exist yet, LiveKit unreachable, or API timed out — the
     // caller treats this as "no participants" so the frontend never blocks
@@ -131,6 +137,7 @@ export default {
           try {
             await assertGroupMemberOfPublicGroup(context.driver, payload.groupId, context.user.id)
             return true
+            // eslint-disable-next-line no-catch-all/no-catch-all
           } catch {
             return false
           }
@@ -156,20 +163,24 @@ export default {
       // LiveKit treats `identity` as a unique key in a room; two connections
       // with the same identity kick each other out. Append a random suffix
       // so the same user can be present from multiple tabs / devices.
-      const identity = `${context.user.id}#${randomBytes(4).toString('hex')}`
+      const identity = `${String(context.user.id)}#${randomBytes(4).toString('hex')}`
       const avatarUrl = await getUserAvatarUrl(context.driver, context.user.id)
-      const at = new AccessToken(context.config.LIVEKIT_API_KEY, context.config.LIVEKIT_API_SECRET, {
-        identity,
-        name: context.user.name,
-        ttl: '2h',
-        // Token metadata is forwarded to every other participant in the room
-        // (as `participant.metadata` on the client). The frontend uses it to
-        // render the real avatar instead of just initials for remote tiles.
-        metadata: JSON.stringify({
-          userId: context.user.id,
-          avatarUrl,
-        }),
-      })
+      const at = new AccessToken(
+        context.config.LIVEKIT_API_KEY,
+        context.config.LIVEKIT_API_SECRET,
+        {
+          identity,
+          name: context.user.name,
+          ttl: '2h',
+          // Token metadata is forwarded to every other participant in the room
+          // (as `participant.metadata` on the client). The frontend uses it to
+          // render the real avatar instead of just initials for remote tiles.
+          metadata: JSON.stringify({
+            userId: context.user.id,
+            avatarUrl,
+          }),
+        },
+      )
       at.addGrant({
         roomJoin: true,
         room: roomName,

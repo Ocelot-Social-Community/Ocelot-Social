@@ -21,7 +21,7 @@ jest.mock('livekit-server-sdk', () => {
       const grants: Record<string, unknown> = {}
       return {
         addGrant: (g: Record<string, unknown>) => Object.assign(grants, g),
-        toJwt: () =>
+        toJwt: async () =>
           Promise.resolve(
             `mocked-jwt.${apiKey}.${(opts as { identity: string }).identity}.${(grants as { room?: string }).room ?? ''}`,
           ),
