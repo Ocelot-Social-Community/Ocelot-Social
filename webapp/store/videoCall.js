@@ -4,6 +4,8 @@ export const state = () => {
     showVideoCall: false,
     minimized: false,
     groupId: null,
+    groupName: null,
+    groupSlug: null,
     participantCount: 0,
   }
 }
@@ -12,15 +14,19 @@ export const mutations = {
   SET_ENABLED(state, enabled) {
     state.enabled = !!enabled
   },
-  OPEN(state, { groupId }) {
+  OPEN(state, { groupId, groupName, groupSlug }) {
     state.showVideoCall = true
     state.minimized = false
     state.groupId = groupId
+    state.groupName = groupName || null
+    state.groupSlug = groupSlug || null
   },
   CLOSE(state) {
     state.showVideoCall = false
     state.minimized = false
     state.groupId = null
+    state.groupName = null
+    state.groupSlug = null
   },
   SET_MINIMIZED(state, minimized) {
     state.minimized = !!minimized
@@ -42,6 +48,12 @@ export const getters = {
   },
   groupId(state) {
     return state.groupId
+  },
+  groupName(state) {
+    return state.groupName
+  },
+  groupSlug(state) {
+    return state.groupSlug
   },
   participantCount(state) {
     return state.participantCount

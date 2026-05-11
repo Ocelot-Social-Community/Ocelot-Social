@@ -174,6 +174,12 @@ export default {
   }
 }
 
+// Hidden tiles stay in the DOM so their <audio> element keeps playing the
+// participant's voice while the user is in the minimized view.
+.video-tile--hidden {
+  display: none;
+}
+
 .video-tile__screen-tag {
   opacity: 0.85;
   margin-left: $space-xxx-small;

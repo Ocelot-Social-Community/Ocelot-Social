@@ -9,8 +9,17 @@
     :aria-label="$t('videoCall.dialogLabel')"
   >
     <div class="video-call__header">
-      <span v-if="!iconOnly" class="video-call__title">
-        {{ $t('videoCall.title') }}
+      <nuxt-link
+        v-if="!iconOnly && groupRoute"
+        :to="groupRoute"
+        class="video-call__title video-call__title--link"
+        :aria-label="$t('videoCall.gotoGroup', { name: titleLabel })"
+        @click.native="onGroupLinkClick"
+      >
+        {{ titleLabel }}
+      </nuxt-link>
+      <span v-else-if="!iconOnly" class="video-call__title">
+        {{ titleLabel }}
       </span>
       <span
         v-if="phase === 'in-call'"
@@ -61,27 +70,28 @@
       <div v-if="phase === 'connecting'" class="video-call__status">
         {{ $t('videoCall.connecting') }}
       </div>
-      <template v-else>
-        <div
-          v-if="isFullscreen"
-          class="video-call__grid"
-          :style="gridStyle"
-        >
-          <video-tile
-            v-for="tile in tiles"
-            :key="tile.key"
-            :tile="tile"
-            :sink-id="speakerDeviceId"
-          />
-        </div>
-        <div v-else class="video-call__single">
-          <video-tile
-            v-if="primaryTile"
-            :tile="primaryTile"
-            :sink-id="speakerDeviceId"
-          />
-        </div>
-      </template>
+      <div
+        v-else
+        :class="['video-call__stage', isFullscreen ? 'video-call__grid' : 'video-call__single']"
+        :style="isFullscreen ? gridStyle : null"
+      >
+        <!--
+          All tiles are always mounted so every participant's audio track stays
+          attached to a DOM <audio> element. In the minimized view, only the
+          primary tile is visible; the rest are hidden via CSS while their
+          audio keeps playing.
+        -->
+        <video-tile
+          v-for="tile in tiles"
+          :key="tile.key"
+          :tile="tile"
+          :sink-id="speakerDeviceId"
+          :class="{
+            'video-tile--hidden':
+              !isFullscreen && primaryTile && tile.key !== primaryTile.key,
+          }"
+        />
+      </div>
     </div>
 
     <div v-if="phase === 'in-call' && !error" class="video-call__controls">
@@ -131,6 +141,22 @@
           {{ screenShareEnabled ? $t('videoCall.stopScreenShare') : $t('videoCall.startScreenShare') }}
         </template>
       </os-button>
+      <os-button
+        v-if="!isMobile"
+        :variant="chatOpenForThisGroup ? 'primary' : 'default'"
+        appearance="outline"
+        :size="iconOnly ? 'sm' : 'md'"
+        :circle="iconOnly"
+        :aria-label="chatOpenForThisGroup ? $t('videoCall.closeChat') : $t('videoCall.openChat')"
+        @click="toggleChat"
+      >
+        <template #icon>
+          <os-icon :icon="icons.chatBubble" />
+        </template>
+        <template v-if="!iconOnly">
+          {{ chatOpenForThisGroup ? $t('videoCall.closeChat') : $t('videoCall.openChat') }}
+        </template>
+      </os-button>
     </div>
   </div>
 </template>
@@ -168,7 +194,24 @@ export default {
       show: 'videoCall/showVideoCall',
       minimized: 'videoCall/minimized',
       groupId: 'videoCall/groupId',
+      groupName: 'videoCall/groupName',
+      groupSlug: 'videoCall/groupSlug',
+      getShowChat: 'chat/showChat',
     }),
+    chatOpenForThisGroup() {
+      return !!(
+        this.getShowChat &&
+        this.getShowChat.showChat &&
+        this.getShowChat.groupId === this.groupId
+      )
+    },
+    titleLabel() {
+      return this.groupName || this.$t('videoCall.title')
+    },
+    groupRoute() {
+      if (!this.groupId || !this.groupSlug) return null
+      return { name: 'groups-id-slug', params: { id: this.groupId, slug: this.groupSlug } }
+    },
     canMinimize() {
       return !this.isMobile
     },
@@ -235,9 +278,27 @@ export default {
       setMinimized: 'videoCall/SET_MINIMIZED',
       close: 'videoCall/CLOSE',
       setParticipantCount: 'videoCall/SET_PARTICIPANT_COUNT',
+      setShowChat: 'chat/SET_OPEN_CHAT',
     }),
+    toggleChat() {
+      if (this.chatOpenForThisGroup) {
+        this.setShowChat({ showChat: false, chatUserId: null, groupId: null })
+        return
+      }
+      this.setShowChat({ showChat: true, chatUserId: null, groupId: this.groupId })
+      // The chat-modul lives in default.vue and only fits when the video isn't
+      // covering the screen. Park the call in the corner so both are visible.
+      if (!this.minimized) this.setMinimized(true)
+    },
     toggleMinimize() {
       this.setMinimized(!this.minimized)
+    },
+    onGroupLinkClick() {
+      // Navigating happens via nuxt-link; minimize so the user can interact
+      // with the destination page while the call keeps running in the corner.
+      if (!this.isMobile && !this.minimized) {
+        this.setMinimized(true)
+      }
     },
     async onPreJoinReady(payload) {
       this.cameraDeviceId = payload.cameraDeviceId
@@ -465,6 +526,22 @@ export default {
 
 .video-call__title {
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.video-call__title--link {
+  color: $text-color-link;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: underline;
+    color: $text-color-link-active;
+  }
 }
 
 .video-call__count {

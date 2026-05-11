@@ -1415,7 +1415,10 @@
       "label": "Group Video",
       "tooltip": "Video call in group “{name}”"
     },
+    "closeChat": "Close chat",
+    "gotoGroup": "Go to group “{name}”",
     "leave": "Leave call",
+    "openChat": "Open chat",
     "maximize": "Maximize",
     "minimize": "Minimize",
     "muteMic": "Mute microphone",

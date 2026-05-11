@@ -557,7 +557,11 @@ export default {
       })
     },
     openGroupVideoCall(groupId) {
-      this.openVideoCall({ groupId })
+      this.openVideoCall({
+        groupId,
+        groupName: this.groupName,
+        groupSlug: this.groupSlug,
+      })
     },
     setupRoomUpdatedSubscription() {
       if (this._roomUpdatedSub) return
