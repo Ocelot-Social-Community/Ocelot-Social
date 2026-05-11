@@ -21,6 +21,7 @@ export default {
   computed: {
     ...mapGetters({
       showVideoCall: 'videoCall/showVideoCall',
+      activeGroupId: 'videoCall/groupId',
       groupName: 'videoCall/groupName',
     }),
     callTitle() {
@@ -33,23 +34,40 @@ export default {
     showVideoCall: {
       immediate: true,
       handler(active) {
-        // If a user opens the call URL directly (refresh, bookmark) without an
-        // active session, send them to the group page where they can join.
-        if (!active && process.client) {
-          const { id, slug } = this.$route.params
-          if (id && slug) {
-            this.$router.replace({ name: 'groups-id-slug', params: { id, slug } })
-          }
-        } else if (active) {
+        if (!process.client) return
+        if (active) {
           // We're back on the call route — make sure the call is shown maximized.
           this.setMinimized(false)
+          return
+        }
+        // Direct visit (refresh, bookmark, shared link): pop up the device
+        // setup so the user can join from here. If the user cancels, leave()
+        // in VideoCall.vue navigates back to the group page.
+        const { id, slug } = this.$route.params
+        if (id && slug) {
+          this.openVideoCall({ groupId: id, groupSlug: slug, groupName: null })
         }
       },
+    },
+    $route(to, from) {
+      // Handle navigating from one call URL to another (different group) while
+      // already on the call page — Vue Router reuses the component, so the
+      // immediate-watcher above does not refire.
+      if (to.name !== 'call-id-slug') return
+      if (from && from.name === 'call-id-slug' && to.params.id === from.params.id) return
+      const { id, slug } = to.params
+      if (!id || !slug) return
+      if (this.showVideoCall && this.activeGroupId === id) {
+        this.setMinimized(false)
+      } else if (!this.showVideoCall) {
+        this.openVideoCall({ groupId: id, groupSlug: slug, groupName: null })
+      }
     },
   },
   methods: {
     ...mapMutations({
       setMinimized: 'videoCall/SET_MINIMIZED',
+      openVideoCall: 'videoCall/OPEN',
     }),
   },
 }

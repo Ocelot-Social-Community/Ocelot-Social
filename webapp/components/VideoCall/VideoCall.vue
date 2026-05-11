@@ -562,15 +562,21 @@ export default {
       // Capture before close() clears the store.
       const groupId = this.groupId
       const groupSlug = this.groupSlug
+      // Navigate away from the call URL *before* clearing the store, otherwise
+      // the call page's watcher sees showVideoCall flip to false while it's
+      // still mounted and re-opens the prejoin popover for the same group.
+      if (this.$route.name === 'call-id-slug' && groupId && groupSlug) {
+        try {
+          await this.$router.replace({
+            name: 'groups-id-slug',
+            params: { id: groupId, slug: groupSlug },
+          })
+        } catch (_e) {
+          /* ignore navigation duplicates / aborts */
+        }
+      }
       await this.cleanup()
       this.close()
-      if (this.$route.name === 'call-id-slug' && groupId && groupSlug) {
-        this.$router
-          .replace({ name: 'groups-id-slug', params: { id: groupId, slug: groupSlug } })
-          .catch(() => {
-            /* ignore navigation duplicates / aborts */
-          })
-      }
     },
     async cleanup() {
       if (this.room) {
