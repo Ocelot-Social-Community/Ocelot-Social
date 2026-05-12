@@ -1435,6 +1435,7 @@
       "errorDenied": "Access denied. Please allow camera and microphone access in your browser settings.",
       "errorNoDevice": "No matching device found.",
       "errorUnknown": "Could not access your devices.",
+      "headerTitle": "{name} – Join video call",
       "hintBoth": "Joining without camera and microphone — you'll only see and hear others.",
       "hintCamera": "Joining without camera — others will hear you but not see you.",
       "hintMic": "Joining without microphone — others will see you but not hear you.",

@@ -1435,6 +1435,7 @@
       "errorDenied": "Acceso denegado. Permite el acceso a la cámara y al micrófono en la configuración del navegador.",
       "errorNoDevice": "No se encontró ningún dispositivo coincidente.",
       "errorUnknown": "No se pudo acceder a tus dispositivos.",
+      "headerTitle": "{name} – Unirse a la videollamada",
       "hintBoth": "Te unirás sin cámara ni micrófono — solo verás y escucharás a los demás.",
       "hintCamera": "Te unirás sin cámara — los demás te escucharán pero no te verán.",
       "hintMic": "Te unirás sin micrófono — los demás te verán pero no te escucharán.",

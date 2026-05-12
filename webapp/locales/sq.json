@@ -1435,6 +1435,7 @@
       "errorDenied": "Qasja u refuzua. Lejo qasjen te kamera dhe mikrofoni në cilësimet e shfletuesit.",
       "errorNoDevice": "Nuk u gjet pajisje që përputhet.",
       "errorUnknown": "Nuk u arrit të kontaktohen pajisjet e tua.",
+      "headerTitle": "{name} – Bashkohu me thirrjen video",
       "hintBoth": "Po bashkohesh pa kamerë dhe mikrofon — do t'i shohësh dhe dëgjosh vetëm të tjerët.",
       "hintCamera": "Po bashkohesh pa kamerë — të tjerët do të dëgjojnë por nuk do të shohin.",
       "hintMic": "Po bashkohesh pa mikrofon — të tjerët do të shohin por nuk do të dëgjojnë.",

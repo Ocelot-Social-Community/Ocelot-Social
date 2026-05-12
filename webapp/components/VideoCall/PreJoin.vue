@@ -136,7 +136,7 @@
       </p>
 
       <div class="prejoin__actions">
-        <os-button appearance="outline" @click="$emit('cancel')">
+        <os-button variant="primary" appearance="outline" @click="$emit('cancel')">
           <template #icon><os-icon :icon="icons.close" /></template>
           {{ $t('videoCall.prejoin.cancel') }}
         </os-button>

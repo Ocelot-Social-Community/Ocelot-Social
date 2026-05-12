@@ -1435,6 +1435,7 @@
       "errorDenied": "Zugriff verweigert. Bitte erlaube Kamera- und Mikrofonzugriff in den Browser-Einstellungen.",
       "errorNoDevice": "Kein passendes Gerät gefunden.",
       "errorUnknown": "Auf die Geräte konnte nicht zugegriffen werden.",
+      "headerTitle": "{name} – Video-Konferenz betreten",
       "hintBoth": "Du trittst ohne Kamera und Mikrofon bei — du wirst nur zuhören und zuschauen.",
       "hintCamera": "Du trittst ohne Kamera bei — andere können dich hören, aber nicht sehen.",
       "hintMic": "Du trittst ohne Mikrofon bei — andere können dich sehen, aber nicht hören.",

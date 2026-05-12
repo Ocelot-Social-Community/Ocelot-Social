@@ -1435,6 +1435,7 @@
       "errorDenied": "Accès refusé. Veuillez autoriser l'accès à la caméra et au microphone dans les paramètres du navigateur.",
       "errorNoDevice": "Aucun périphérique correspondant trouvé.",
       "errorUnknown": "Impossible d'accéder à vos périphériques.",
+      "headerTitle": "{name} – Rejoindre l'appel vidéo",
       "hintBoth": "Vous rejoignez sans caméra ni microphone — vous ne ferez que voir et entendre les autres.",
       "hintCamera": "Vous rejoignez sans caméra — les autres vous entendront mais ne vous verront pas.",
       "hintMic": "Vous rejoignez sans microphone — les autres vous verront mais ne vous entendront pas.",

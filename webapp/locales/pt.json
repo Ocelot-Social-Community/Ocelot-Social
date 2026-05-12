@@ -1435,6 +1435,7 @@
       "errorDenied": "Acesso negado. Permita o acesso à câmara e ao microfone nas definições do navegador.",
       "errorNoDevice": "Nenhum dispositivo correspondente encontrado.",
       "errorUnknown": "Não foi possível aceder aos seus dispositivos.",
+      "headerTitle": "{name} – Juntar-se à chamada de vídeo",
       "hintBoth": "Estás a entrar sem câmara nem microfone — vais só ver e ouvir os outros.",
       "hintCamera": "Estás a entrar sem câmara — os outros ouvem-te mas não te veem.",
       "hintMic": "Estás a entrar sem microfone — os outros veem-te mas não te ouvem.",

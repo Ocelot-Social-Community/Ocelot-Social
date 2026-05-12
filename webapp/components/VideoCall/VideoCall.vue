@@ -15,7 +15,7 @@
             :name="titleLabel"
             :to="groupRoute"
             :show-group-icon="!!groupId"
-            :aria-label="$t('videoCall.gotoGroup', { name: titleLabel })"
+            :aria-label="$t('videoCall.gotoGroup', { name: groupName || $t('videoCall.title') })"
             @click="onGroupLinkClick"
           />
         </div>
@@ -286,7 +286,14 @@ export default {
       )
     },
     titleLabel() {
-      return this.groupName || this.$t('videoCall.title')
+      const name = this.groupName || this.$t('videoCall.title')
+      // Spell out what the dialog is for while the user is still in the
+      // device-setup step — once they're connected the room name alone is
+      // enough context.
+      if (this.phase === 'prejoin') {
+        return this.$t('videoCall.prejoin.headerTitle', { name })
+      }
+      return name
     },
     groupRoute() {
       if (!this.groupId || !this.groupSlug) return null

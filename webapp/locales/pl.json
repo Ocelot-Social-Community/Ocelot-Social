@@ -1435,6 +1435,7 @@
       "errorDenied": "Odmowa dostępu. Zezwól na dostęp do kamery i mikrofonu w ustawieniach przeglądarki.",
       "errorNoDevice": "Nie znaleziono pasującego urządzenia.",
       "errorUnknown": "Nie można uzyskać dostępu do urządzeń.",
+      "headerTitle": "{name} – Dołącz do rozmowy wideo",
       "hintBoth": "Dołączasz bez kamery i mikrofonu — będziesz tylko widzieć i słyszeć innych.",
       "hintCamera": "Dołączasz bez kamery — inni cię usłyszą, ale nie zobaczą.",
       "hintMic": "Dołączasz bez mikrofonu — inni cię zobaczą, ale nie usłyszą.",

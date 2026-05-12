@@ -1435,6 +1435,7 @@
       "errorDenied": "Accesso negato. Consenti l'accesso a fotocamera e microfono nelle impostazioni del browser.",
       "errorNoDevice": "Nessun dispositivo corrispondente trovato.",
       "errorUnknown": "Impossibile accedere ai tuoi dispositivi.",
+      "headerTitle": "{name} – Partecipa alla videochiamata",
       "hintBoth": "Stai entrando senza fotocamera e microfono — vedrai e ascolterai solo gli altri.",
       "hintCamera": "Stai entrando senza fotocamera — gli altri ti sentiranno ma non ti vedranno.",
       "hintMic": "Stai entrando senza microfono — gli altri ti vedranno ma non ti sentiranno.",
