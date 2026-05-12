@@ -10,7 +10,7 @@
     >
       <div class="video-call__header">
         <div class="video-call__header-info">
-          <profile-avatar :profile="groupProfile" class="video-call__avatar" />
+          <profile-avatar :profile="groupProfile" size="small" class="video-call__avatar" />
           <room-title-link
             :name="titleLabel"
             :to="groupRoute"
@@ -842,6 +842,9 @@ export default {
   align-items: center;
   gap: $space-x-small;
   padding: $space-x-small $space-small;
+  // Keep the header field at its pre-existing visual height even though the
+  // avatar shrank from base (44px) to small (34px) — matches the chat header.
+  min-height: $size-avatar-base + 2 * $space-x-small;
   background: $color-header-background;
   border-bottom: 1px solid $color-neutral-85;
   font-weight: $font-weight-bold;

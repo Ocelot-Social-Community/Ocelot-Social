@@ -72,7 +72,8 @@
         <profile-avatar
           v-if="selectedRoom"
           :profile="selectedRoomProfile"
-          class="vac-avatar-profile"
+          size="small"
+          class="vac-avatar-profile vac-avatar-profile--header"
         />
       </component>
     </div>
@@ -394,6 +395,13 @@ export default {
         .vac-player-progress { width: auto; flex: 1 1 auto; min-width: 0; }
         .vac-room-header .vac-info-wrapper { flex: 1 1 0; min-width: 0; width: auto; }
         .vac-room-header .vac-room-name { min-width: 0; }
+        /* Align the chat room header with the video call header. The library
+           ships .vac-room-header at height: 64px with an inner .vac-room-wrapper
+           providing 0 16px padding — override the height only so the two
+           overlays line up when stacked. The wrapper's 16px horizontal padding
+           already matches the video header's $space-small (16px). */
+        .vac-room-header { height: 60px !important; }
+        .vac-room-header .vac-avatar-profile--header { margin-right: 8px; }
         ${
           this.singleRoom
             ? `
@@ -1197,6 +1205,13 @@ export default {
   flex: 1 1 0;
   min-width: 0;
   overflow: hidden;
+
+  // Match the video call header — RoomTitleLink defaults to font-weight: 500
+  // for in-chat usage, but the room header is a dialog-level heading and
+  // should read bold to mirror the call modal.
+  ::v-deep .room-title-link {
+    font-weight: $font-weight-bold;
+  }
 }
 
 .chat-header-profile-link {
