@@ -1430,6 +1430,7 @@
       "cameraOff": "Kamera: E fikur",
       "cameraOn": "Kamera: E ndezur",
       "cancel": "Anulo",
+      "description": "Po bashkohesh me thirrjen video të këtij grupi. Kontrollo kamerën, mikrofonin dhe altoparlantin, pastaj bashkohu me thirrjen.",
       "errorBusy": "Pajisja është në përdorim nga një aplikacion tjetër.",
       "errorDenied": "Qasja u refuzua. Lejo qasjen te kamera dhe mikrofoni në cilësimet e shfletuesit.",
       "errorNoDevice": "Nuk u gjet pajisje që përputhet.",

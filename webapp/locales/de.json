@@ -1430,6 +1430,7 @@
       "cameraOff": "Kamera: Aus",
       "cameraOn": "Kamera: An",
       "cancel": "Abbrechen",
+      "description": "Du trittst gleich der Videokonferenz dieser Gruppe bei. Prüfe Kamera, Mikrofon und Lautsprecher, bevor du dem Anruf beitrittst.",
       "errorBusy": "Das Gerät wird bereits von einer anderen Anwendung verwendet.",
       "errorDenied": "Zugriff verweigert. Bitte erlaube Kamera- und Mikrofonzugriff in den Browser-Einstellungen.",
       "errorNoDevice": "Kein passendes Gerät gefunden.",

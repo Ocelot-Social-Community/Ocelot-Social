@@ -1430,6 +1430,7 @@
       "cameraOff": "Camera: Uit",
       "cameraOn": "Camera: Aan",
       "cancel": "Annuleren",
+      "description": "Je staat op het punt deel te nemen aan de videogesprek van deze groep. Controleer je camera, microfoon en luidspreker en neem dan deel aan het gesprek.",
       "errorBusy": "Het apparaat wordt gebruikt door een andere toepassing.",
       "errorDenied": "Toegang geweigerd. Sta camera- en microfoontoegang toe in de browserinstellingen.",
       "errorNoDevice": "Geen overeenkomend apparaat gevonden.",

@@ -1430,6 +1430,7 @@
       "cameraOff": "Camera: Off",
       "cameraOn": "Camera: On",
       "cancel": "Cancel",
+      "description": "You're about to join this group's video call. Check your camera, microphone and speaker, then join the call.",
       "errorBusy": "The device is in use by another application.",
       "errorDenied": "Access denied. Please allow camera and microphone access in your browser settings.",
       "errorNoDevice": "No matching device found.",

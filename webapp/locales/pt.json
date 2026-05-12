@@ -1430,6 +1430,7 @@
       "cameraOff": "Câmara: Desligada",
       "cameraOn": "Câmara: Ligada",
       "cancel": "Cancelar",
+      "description": "Estás prestes a juntar-te à chamada de vídeo deste grupo. Verifica a câmara, o microfone e o altifalante e depois entra na chamada.",
       "errorBusy": "O dispositivo está a ser usado por outra aplicação.",
       "errorDenied": "Acesso negado. Permita o acesso à câmara e ao microfone nas definições do navegador.",
       "errorNoDevice": "Nenhum dispositivo correspondente encontrado.",

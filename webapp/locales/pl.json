@@ -1430,6 +1430,7 @@
       "cameraOff": "Kamera: Wyłączona",
       "cameraOn": "Kamera: Włączona",
       "cancel": "Anuluj",
+      "description": "Za chwilę dołączysz do rozmowy wideo tej grupy. Sprawdź kamerę, mikrofon i głośnik, a następnie dołącz do połączenia.",
       "errorBusy": "Urządzenie jest używane przez inną aplikację.",
       "errorDenied": "Odmowa dostępu. Zezwól na dostęp do kamery i mikrofonu w ustawieniach przeglądarki.",
       "errorNoDevice": "Nie znaleziono pasującego urządzenia.",

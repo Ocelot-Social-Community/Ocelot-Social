@@ -1430,6 +1430,7 @@
       "cameraOff": "Caméra : Désactivée",
       "cameraOn": "Caméra : Activée",
       "cancel": "Annuler",
+      "description": "Vous êtes sur le point de rejoindre l'appel vidéo de ce groupe. Vérifiez votre caméra, votre microphone et votre haut-parleur, puis rejoignez l'appel.",
       "errorBusy": "Le périphérique est utilisé par une autre application.",
       "errorDenied": "Accès refusé. Veuillez autoriser l'accès à la caméra et au microphone dans les paramètres du navigateur.",
       "errorNoDevice": "Aucun périphérique correspondant trouvé.",

@@ -39,7 +39,7 @@
           as="nuxt-link"
           :to="expandChatLink"
           variant="primary"
-          appearance="ghost"
+          appearance="outline"
           circle
           size="sm"
           :aria-label="$t('chat.expandChat')"
@@ -50,7 +50,7 @@
         </os-button>
         <os-button
           variant="primary"
-          appearance="ghost"
+          appearance="outline"
           circle
           size="sm"
           :aria-label="$t('chat.closeChat')"

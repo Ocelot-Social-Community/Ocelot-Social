@@ -16,6 +16,9 @@
       <h2 class="prejoin__title">
         {{ $t('videoCall.prejoin.title') }}
       </h2>
+      <p class="prejoin__description">
+        {{ $t('videoCall.prejoin.description') }}
+      </p>
 
       <div class="prejoin__row">
         <label class="prejoin__label" for="prejoin-camera">
@@ -133,7 +136,7 @@
       </p>
 
       <div class="prejoin__actions">
-        <os-button appearance="ghost" @click="$emit('cancel')">
+        <os-button appearance="outline" @click="$emit('cancel')">
           <template #icon><os-icon :icon="icons.close" /></template>
           {{ $t('videoCall.prejoin.cancel') }}
         </os-button>
@@ -673,10 +676,18 @@ export default {
 }
 
 .prejoin__title {
-  margin: 0 0 $space-x-small;
+  margin: 0 0 $space-xxx-small;
   font-size: $font-size-large;
   font-family: $font-family-heading;
+  font-weight: $font-weight-bold;
   color: $text-color-base;
+}
+
+.prejoin__description {
+  margin: 0 0 $space-x-small;
+  font-size: $font-size-small;
+  color: $text-color-soft;
+  line-height: 1.4;
 }
 
 .prejoin__row {

@@ -1430,6 +1430,7 @@
       "cameraOff": "Fotocamera: Disattivata",
       "cameraOn": "Fotocamera: Attivata",
       "cancel": "Annulla",
+      "description": "Stai per partecipare alla videochiamata di questo gruppo. Controlla fotocamera, microfono e altoparlante, poi entra nella chiamata.",
       "errorBusy": "Il dispositivo è in uso da un'altra applicazione.",
       "errorDenied": "Accesso negato. Consenti l'accesso a fotocamera e microfono nelle impostazioni del browser.",
       "errorNoDevice": "Nessun dispositivo corrispondente trovato.",

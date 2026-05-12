@@ -30,7 +30,8 @@
           <div class="video-call__header-actions">
             <os-button
               v-if="canMinimize && phase === 'in-call'"
-              appearance="ghost"
+              variant="primary"
+              appearance="outline"
               size="sm"
               circle
               :aria-label="minimized ? $t('videoCall.maximize') : $t('videoCall.minimize')"
@@ -41,8 +42,8 @@
               </template>
             </os-button>
             <os-button
-              variant="danger"
-              appearance="ghost"
+              variant="primary"
+              appearance="outline"
               size="sm"
               circle
               :aria-label="
@@ -845,6 +846,13 @@ export default {
   border-bottom: 1px solid $color-neutral-85;
   font-weight: $font-weight-bold;
   color: $text-color-base;
+
+  // The RoomTitleLink ships with font-weight: 500 (medium) for its in-chat
+  // usage; inside the call modal we want the group name to read as a proper
+  // dialog heading, so override with the heading bold weight.
+  ::v-deep .room-title-link {
+    font-weight: $font-weight-bold;
+  }
 }
 
 .video-call__header-info {

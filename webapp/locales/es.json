@@ -1430,6 +1430,7 @@
       "cameraOff": "Cámara: Apagada",
       "cameraOn": "Cámara: Encendida",
       "cancel": "Cancelar",
+      "description": "Estás a punto de unirte a la videollamada de este grupo. Comprueba tu cámara, micrófono y altavoz, y luego únete a la llamada.",
       "errorBusy": "El dispositivo está siendo utilizado por otra aplicación.",
       "errorDenied": "Acceso denegado. Permite el acceso a la cámara y al micrófono en la configuración del navegador.",
       "errorNoDevice": "No se encontró ningún dispositivo coincidente.",
