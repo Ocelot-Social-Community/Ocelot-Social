@@ -793,16 +793,27 @@ export default {
 }
 
 .video-call--maximized {
-  // Anchor exactly to the measured header/footer heights so the maximized call
-  // butts seamlessly against both bars — no gap. HeaderMenu sets
-  // --header-height; PageFooter sets --footer-height (0 on mobile where the
-  // footer is hidden). The clicks on the bars trigger the $route watcher in
-  // this component, which auto-parks the call.
-  top: var(--header-height, 6rem);
+  // Match the map page's layering pattern (see pages/map.vue): cover the full
+  // viewport (top: 0, bottom: 0) and sit at $z-index-surface so the page
+  // header (.main-navigation, z-index: $z-index-page-submenu = 2500) and the
+  // sticky footer (.ds-footer, z-index: 10) both stack on top — their own
+  // box-shadows then naturally fall onto the call surface from above and
+  // below. Padding (not offset) keeps the call's internal header and
+  // controls below the page header / above the page footer.
+  // HeaderMenu sets --header-height; PageFooter sets --footer-height (0 on
+  // mobile where the footer is hidden).
+  top: 0;
   right: 0;
-  bottom: var(--footer-height, 0px);
+  bottom: 0;
   left: 0;
-  z-index: $z-index-overlay + 1;
+  padding-top: var(--header-height, 6rem);
+  padding-bottom: var(--footer-height, 0px);
+  z-index: $z-index-surface;
+  // The base .video-call rule paints a $box-shadow-large around the panel.
+  // When the panel covers the full viewport that shadow has nowhere to land
+  // — and worse, the panel's own shadow competes with the header/footer
+  // shadows along the top and bottom seams. Drop it in the maximized state.
+  box-shadow: none;
 }
 
 .video-call--minimized {
