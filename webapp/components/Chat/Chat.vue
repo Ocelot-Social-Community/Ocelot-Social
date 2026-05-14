@@ -295,12 +295,12 @@ export default {
       if (!this.selectedRoom) return null
       if (this.selectedRoom.isGroupRoom && this.selectedRoom.groupProfile?.id) {
         const { id, slug } = this.selectedRoom.groupProfile
-        return `/groups/${id}/${slug}`
+        return `/groups/${encodeURIComponent(id)}/${encodeURIComponent(slug)}`
       }
       const otherUser = this.selectedRoom.users?.find((u) => u.id !== this.currentUser.id)
       if (otherUser) {
         const slug = otherUser.name?.toLowerCase().replaceAll(' ', '-')
-        return `/profile/${otherUser.id}/${slug}`
+        return `/profile/${encodeURIComponent(otherUser.id)}/${encodeURIComponent(slug)}`
       }
       return null
     },

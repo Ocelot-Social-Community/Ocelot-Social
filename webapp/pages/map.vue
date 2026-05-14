@@ -396,22 +396,24 @@ export default {
           }
 
           const markerTypeLabel = this.$t(`map.markerTypes.${feature.properties.type}`)
+          const encodedId = encodeURIComponent(feature.properties.id)
+          const encodedSlug = encodeURIComponent(feature.properties.slug)
           const markerProfile = {
             theUser: {
               linkTitle: '@' + feature.properties.slug,
-              link: `/profile/${feature.properties.id}/${feature.properties.slug}`,
+              link: `/profile/${encodedId}/${encodedSlug}`,
             },
             user: {
               linkTitle: '@' + feature.properties.slug,
-              link: `/profile/${feature.properties.id}/${feature.properties.slug}`,
+              link: `/profile/${encodedId}/${encodedSlug}`,
             },
             group: {
               linkTitle: '&' + feature.properties.slug,
-              link: `/groups/${feature.properties.id}/${feature.properties.slug}`,
+              link: `/groups/${encodedId}/${encodedSlug}`,
             },
             event: {
               linkTitle: feature.properties.slug,
-              link: `/post/${feature.properties.id}/${feature.properties.slug}`,
+              link: `/post/${encodedId}/${encodedSlug}`,
             },
           }
           const profile = markerProfile[feature.properties.type]
