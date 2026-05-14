@@ -295,12 +295,12 @@ export default {
       if (!this.selectedRoom) return null
       if (this.selectedRoom.isGroupRoom && this.selectedRoom.groupProfile?.id) {
         const { id, slug } = this.selectedRoom.groupProfile
-        return `/groups/${id}/${slug}`
+        return `/groups/${encodeURIComponent(id)}/${encodeURIComponent(slug)}`
       }
       const otherUser = this.selectedRoom.users?.find((u) => u.id !== this.currentUser.id)
       if (otherUser) {
         const slug = otherUser.name?.toLowerCase().replaceAll(' ', '-')
-        return `/profile/${otherUser.id}/${slug}`
+        return `/profile/${encodeURIComponent(otherUser.id)}/${encodeURIComponent(slug)}`
       }
       return null
     },
@@ -478,7 +478,9 @@ export default {
       const profile = room?._userProfiles?.[senderId]
       if (profile) return profile
       const user = this.selectedRoom?.users?.find((u) => u._id === senderId || u.id === senderId)
-      return user ? { id: user.id, name: user.username || user.name } : { name: senderId }
+      return user
+        ? { id: user.id, slug: user.slug, name: user.username || user.name }
+        : { name: senderId }
     },
 
     initialsAvatarUrl(name) {
@@ -959,7 +961,7 @@ export default {
       // Build user profiles from original room.users (before avatar was flattened to string)
       const userProfiles = {}
       for (const u of room.users) {
-        userProfiles[u.id] = { id: u.id, name: u.name, avatar: u.avatar }
+        userProfiles[u.id] = { id: u.id, slug: u.slug, name: u.name, avatar: u.avatar }
       }
       fixedRoom._userProfiles = userProfiles
       if (isGroupRoom) {
@@ -1020,6 +1022,7 @@ export default {
     async newRoom(userOrId) {
       const userId = typeof userOrId === 'string' ? userOrId : userOrId.id
       let userName = typeof userOrId === 'string' ? null : userOrId.name
+      let userSlug = typeof userOrId === 'string' ? null : userOrId.slug
       let userAvatarObj = typeof userOrId === 'string' ? null : userOrId.avatar
       let userAvatar = userAvatarObj?.w320 || userAvatarObj?.url || null
 
@@ -1033,6 +1036,7 @@ export default {
           const user = data.User?.[0]
           if (user) {
             userName = user.name
+            userSlug = user.slug
             userAvatarObj = user.avatar
             userAvatar = user.avatar?.w320 || user.avatar?.url || null
           }
@@ -1048,10 +1052,11 @@ export default {
       // Create a virtual room (no backend call — room is created on first message)
       const currentUserProfile = {
         id: this.currentUser.id,
+        slug: this.currentUser.slug,
         name: this.currentUser.name,
         avatar: this.currentUser.avatar,
       }
-      const otherUserProfile = { id: userId, name: userName, avatar: userAvatarObj }
+      const otherUserProfile = { id: userId, slug: userSlug, name: userName, avatar: userAvatarObj }
       const virtualRoom = {
         id: `temp-${userId}`,
         roomId: `temp-${userId}`,
@@ -1073,10 +1078,18 @@ export default {
           {
             _id: this.currentUser.id,
             id: this.currentUser.id,
+            slug: this.currentUser.slug,
             name: this.currentUser.name,
             username: this.currentUser.name,
           },
-          { _id: userId, id: userId, name: userName, username: userName, avatar: userAvatar },
+          {
+            _id: userId,
+            id: userId,
+            slug: userSlug,
+            name: userName,
+            username: userName,
+            avatar: userAvatar,
+          },
         ],
         _virtualUserId: userId,
       }
@@ -1135,13 +1148,19 @@ export default {
 
     navigateToUserProfile(userId) {
       const profile = this.messageUserProfile(userId)
-      const slug = (profile.name || '').toLowerCase().replaceAll(' ', '-')
-      this.$router.push({ path: `/profile/${userId}/${slug}` })
+      if (!profile?.slug) return
+      this.$router.push({
+        name: 'profile-id-slug',
+        params: { id: userId, slug: profile.slug },
+      })
     },
 
     redirectToUserProfile({ user }) {
-      const slug = (user.name || '').toLowerCase().replaceAll(' ', '-')
-      this.$router.push({ path: `/profile/${user.id}/${slug}` })
+      if (!user?.slug) return
+      this.$router.push({
+        name: 'profile-id-slug',
+        params: { id: user.id, slug: user.slug },
+      })
     },
   },
 }

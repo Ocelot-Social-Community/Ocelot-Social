@@ -61,7 +61,7 @@ export default {
               variables: { code },
             })
             if (mutationResult.data.redeemInviteCode && group.groupType === 'public') {
-              redirect(`/groups/${group.id}/${group.slug}`)
+              redirect(`/groups/${encodeURIComponent(group.id)}/${encodeURIComponent(group.slug)}`)
               return
             }
           }
