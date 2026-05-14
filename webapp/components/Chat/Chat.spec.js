@@ -40,8 +40,8 @@ const mockRoom = (overrides = {}) => ({
   index: '2026-01-01T00:00:00Z',
   lastMessage: { content: 'hello' },
   users: [
-    { _id: 'current-user', id: 'current-user', username: 'Me', avatar: null },
-    { _id: 'other-user', id: 'other-user', username: 'Other', avatar: null },
+    { _id: 'current-user', id: 'current-user', slug: 'me', username: 'Me', avatar: null },
+    { _id: 'other-user', id: 'other-user', slug: 'other', username: 'Other', avatar: null },
   ],
   ...overrides,
 })
@@ -964,12 +964,19 @@ describe('Chat.vue', () => {
   })
 
   describe('redirectToUserProfile', () => {
-    it('navigates to user profile', () => {
+    it('navigates to user profile using the DB slug', () => {
+      wrapper = Wrapper()
+      wrapper.vm.redirectToUserProfile({ user: { id: 'u1', slug: 'john-doe', name: 'John Doe' } })
+      expect(mocks.$router.push).toHaveBeenCalledWith({
+        name: 'profile-id-slug',
+        params: { id: 'u1', slug: 'john-doe' },
+      })
+    })
+
+    it('does not navigate when slug is missing', () => {
       wrapper = Wrapper()
       wrapper.vm.redirectToUserProfile({ user: { id: 'u1', name: 'John Doe' } })
-      expect(mocks.$router.push).toHaveBeenCalledWith({
-        path: '/profile/u1/john-doe',
-      })
+      expect(mocks.$router.push).not.toHaveBeenCalled()
     })
   })
 
@@ -1273,14 +1280,26 @@ describe('Chat.vue', () => {
   })
 
   describe('navigateToUserProfile', () => {
-    it('navigates using messageUserProfile', () => {
+    it('navigates using messageUserProfile and the DB slug', () => {
       wrapper = Wrapper()
       wrapper.vm.selectedRoom = mockRoom()
       wrapper.vm.rooms = [mockRoom()]
       wrapper.vm.navigateToUserProfile('other-user')
       expect(mocks.$router.push).toHaveBeenCalledWith({
-        path: '/profile/other-user/other',
+        name: 'profile-id-slug',
+        params: { id: 'other-user', slug: 'other' },
       })
+    })
+
+    it('does not navigate when the profile has no slug', () => {
+      wrapper = Wrapper()
+      const room = mockRoom({
+        users: [{ _id: 'unknown', id: 'unknown', username: 'No Slug', avatar: null }],
+      })
+      wrapper.vm.selectedRoom = room
+      wrapper.vm.rooms = [room]
+      wrapper.vm.navigateToUserProfile('unknown')
+      expect(mocks.$router.push).not.toHaveBeenCalled()
     })
   })
 
