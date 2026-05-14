@@ -1136,12 +1136,16 @@ export default {
     navigateToUserProfile(userId) {
       const profile = this.messageUserProfile(userId)
       const slug = (profile.name || '').toLowerCase().replaceAll(' ', '-')
-      this.$router.push({ path: `/profile/${userId}/${slug}` })
+      this.$router.push({
+        path: `/profile/${encodeURIComponent(userId)}/${encodeURIComponent(slug)}`,
+      })
     },
 
     redirectToUserProfile({ user }) {
       const slug = (user.name || '').toLowerCase().replaceAll(' ', '-')
-      this.$router.push({ path: `/profile/${user.id}/${slug}` })
+      this.$router.push({
+        path: `/profile/${encodeURIComponent(user.id)}/${encodeURIComponent(slug)}`,
+      })
     },
   },
 }
