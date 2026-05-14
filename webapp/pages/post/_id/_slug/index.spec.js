@@ -563,6 +563,17 @@ describe('PostSlug', () => {
         expect(PostSlug.computed.routes.call(ctx)[0].name).toBe('post.viewEvent.title')
       })
 
+      it('routes re-encode params with reserved characters', () => {
+        const ctx = {
+          post: { postType: ['Article'] },
+          $t: (k) => k,
+          $route: { params: { id: 'abc', slug: 'foo/bar' } },
+        }
+        const [top] = PostSlug.computed.routes.call(ctx)
+        expect(top.path).toBe('/post/abc/foo%2Fbar')
+        expect(top.children[0].path).toBe('/post/abc/foo%2Fbar#comments')
+      })
+
       it('heroImageStyle returns a CSS variable object when image.aspectRatio is numeric', () => {
         // Tested in isolation — rendering the hero image requires a full ResponsiveImage object.
         const ctx = { post: { image: { aspectRatio: 2 } } }
