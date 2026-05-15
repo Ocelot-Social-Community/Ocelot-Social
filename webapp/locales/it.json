@@ -1385,5 +1385,91 @@
     "popover": {
       "open-profile": "Apri profilo"
     }
+  },
+  "videoCall": {
+    "activeSpeakers": "Oratori attivi",
+    "closeChat": "Chiudi chat",
+    "connecting": "Connessione in corso…",
+    "dialogLabel": "Videochiamata di gruppo",
+    "disableCamera": "Disattiva la fotocamera",
+    "enableCamera": "Attiva la fotocamera",
+    "errors": {
+      "camera": {
+        "busy": "La fotocamera è in uso da un'altra applicazione.",
+        "denied": "Accesso alla fotocamera negato. Abilita l'autorizzazione nelle impostazioni del browser (icona del lucchetto nella barra degli indirizzi).",
+        "generic": "Impossibile attivare la fotocamera.",
+        "noDevice": "Nessuna fotocamera trovata."
+      },
+      "mic": {
+        "busy": "Il microfono è in uso da un'altra applicazione.",
+        "denied": "Accesso al microfono negato. Abilita l'autorizzazione nelle impostazioni del browser (icona del lucchetto nella barra degli indirizzi).",
+        "generic": "Impossibile attivare il microfono.",
+        "noDevice": "Nessun microfono trovato."
+      },
+      "screen": {
+        "busy": "La condivisione dello schermo non è disponibile al momento.",
+        "denied": "Condivisione schermo negata.",
+        "generic": "Impossibile condividere lo schermo.",
+        "noDevice": "Nessuno schermo disponibile da condividere."
+      }
+    },
+    "gotoGroup": "Vai al gruppo «{name}»",
+    "groupVideoCallButton": {
+      "label": "Video del gruppo",
+      "tooltip": "Videochiamata nel gruppo «{name}»"
+    },
+    "leave": "Lascia la chiamata",
+    "maximize": "Ingrandisci",
+    "minimize": "Riduci",
+    "muteMic": "Disattiva microfono",
+    "openChat": "Apri chat",
+    "participants": "Partecipanti",
+    "prejoin": {
+      "camera": "Fotocamera",
+      "cameraDisabled": "La fotocamera è disattivata.",
+      "cameraOff": "Fotocamera: Disattivata",
+      "cameraOn": "Fotocamera: Attivata",
+      "cancel": "Annulla",
+      "description": "Stai per partecipare alla videochiamata di questo gruppo. Controlla fotocamera, microfono e altoparlante, poi entra nella chiamata.",
+      "errorBusy": "Il dispositivo è in uso da un'altra applicazione.",
+      "errorDenied": "Accesso negato. Consenti l'accesso a fotocamera e microfono nelle impostazioni del browser.",
+      "errorNoDevice": "Nessun dispositivo corrispondente trovato.",
+      "errorUnknown": "Impossibile accedere ai tuoi dispositivi.",
+      "headerTitle": "{name} – Partecipa alla videochiamata",
+      "hintBoth": "Stai entrando senza fotocamera e microfono — vedrai e ascolterai solo gli altri.",
+      "hintCamera": "Stai entrando senza fotocamera — gli altri ti sentiranno ma non ti vedranno.",
+      "hintMic": "Stai entrando senza microfono — gli altri ti vedranno ma non ti sentiranno.",
+      "join": "Entra nella chiamata",
+      "micLevel": "Livello del microfono",
+      "micOff": "Microfono: Disattivato",
+      "micOn": "Microfono: Attivato",
+      "microphone": "Microfono",
+      "noCamera": "Anteprima della fotocamera non disponibile.",
+      "noDevices": "Nessun dispositivo rilevato",
+      "permission": {
+        "denied": "Bloccato",
+        "granted": "OK",
+        "prompt": "In attesa",
+        "unsupported": "Non supportato"
+      },
+      "retry": "Riprova",
+      "speaker": "Altoparlante",
+      "speakerUnsupported": "La selezione del dispositivo di uscita non è supportata in questo browser.",
+      "testingSound": "In riproduzione…",
+      "testSound": "Test audio",
+      "title": "Configura i tuoi dispositivi",
+      "unnamedCamera": "Fotocamera",
+      "unnamedMic": "Microfono",
+      "unnamedSpeaker": "Altoparlante",
+      "unsupportedBrowser": "Il tuo browser non supporta audio/video."
+    },
+    "screenShare": "Schermo",
+    "spotlightExit": "Esci dallo spotlight",
+    "startScreenShare": "Condividi schermo",
+    "stopScreenShare": "Interrompi condivisione",
+    "title": "Videochiamata di gruppo",
+    "unmuteMic": "Riattiva microfono",
+    "you": "tu",
+    "youAreSharingScreen": "Stai condividendo il tuo schermo"
   }
 }

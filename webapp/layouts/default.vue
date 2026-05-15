@@ -10,7 +10,10 @@
     </div>
     <page-footer class="desktop-footer" />
     <div id="overlay" />
-    <div v-if="getShowChat.showChat && !isMobile" class="chat-modul">
+    <div
+      v-if="getShowChat.showChat && !isMobile && !chatRenderedElsewhere"
+      :class="['chat-modul', { 'chat-modul--with-video': showVideoCall && videoCallMinimized }]"
+    >
       <client-only>
         <chat
           singleRoom
@@ -20,6 +23,9 @@
         />
       </client-only>
     </div>
+    <client-only>
+      <video-call v-if="showVideoCall" />
+    </client-only>
   </div>
 </template>
 
@@ -30,18 +36,47 @@ import mobile from '~/mixins/mobile'
 import HeaderMenu from '~/components/HeaderMenu/HeaderMenu'
 import PageFooter from '~/components/PageFooter/PageFooter'
 import Chat from '~/components/Chat/Chat.vue'
+import VideoCall from '~/components/VideoCall/VideoCall.vue'
+import { videoCallConfigQuery } from '~/graphql/VideoCalls'
 
 export default {
   components: {
     HeaderMenu,
     PageFooter,
     Chat,
+    VideoCall,
   },
   mixins: [seo, mobile()],
   computed: {
     ...mapGetters({
       getShowChat: 'chat/showChat',
+      showVideoCall: 'videoCall/showVideoCall',
+      videoCallMinimized: 'videoCall/minimized',
+      videoCallGroupId: 'videoCall/groupId',
+      videoCallPhase: 'videoCall/phase',
     }),
+    chatLivesInVideoSidebar() {
+      // Move the chat into the call's sidebar **only when the chat is for the
+      // very same group as the video call**. Otherwise (different group or no
+      // group, e.g. user chat) keep the floating chat-modul so the user
+      // doesn't lose their conversation when the video gets maximized.
+      // The phase check (instead of a route check) lets the modul → sidebar
+      // hand-off happen in the same reactive tick as the maximize click,
+      // avoiding a brief moment with two chats visible side by side.
+      return (
+        this.showVideoCall &&
+        !this.videoCallMinimized &&
+        (this.videoCallPhase === 'in-call' || this.videoCallPhase === 'connecting') &&
+        !!this.getShowChat.groupId &&
+        this.getShowChat.groupId === this.videoCallGroupId
+      )
+    },
+    chatRenderedElsewhere() {
+      // Don't draw the floating chat-modul when the chat is already shown by
+      // some other surface: the maximized chat page (/chat) or the video
+      // call's sidebar.
+      return this.chatLivesInVideoSidebar || this.$route.name === 'chat'
+    },
   },
   watch: {
     'getShowChat.showChat'(open) {
@@ -63,6 +98,7 @@ export default {
   methods: {
     ...mapMutations({
       showChat: 'chat/SET_OPEN_CHAT',
+      setVideoCallEnabled: 'videoCall/SET_ENABLED',
     }),
     closeSingleRoom() {
       this.showChat({ showChat: false, chatUserId: null, groupId: null })
@@ -70,6 +106,19 @@ export default {
   },
   beforeCreate() {
     this.$store.commit('chat/SET_OPEN_CHAT', { showChat: false, chatUserId: null, groupId: null })
+  },
+  apollo: {
+    videoCallConfig: {
+      query() {
+        return videoCallConfigQuery()
+      },
+      result({ data }) {
+        if (data && data.videoCallConfig) {
+          this.setVideoCallEnabled(data.videoCallConfig.enabled)
+        }
+      },
+      fetchPolicy: 'cache-first',
+    },
   },
 }
 </script>
@@ -113,5 +162,15 @@ export default {
     color: blue;
     cursor: pointer;
   }
+}
+
+// When a minimized video call is anchored above the footer, lift the chat
+// above the video so both fit without overlap. Minimized video sits at
+// bottom: 45px (matching the chat's footer offset) and is 280px tall.
+// The inner chat content keeps its own height; whatever extends above the
+// viewport gets clipped by the browser, leaving the message input and the
+// latest messages visible — which is what the user interacts with.
+.chat-modul--with-video {
+  bottom: 333px; // 45 (video bottom) + 280 (video height) + 8 (gap)
 }
 </style>

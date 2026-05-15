@@ -99,6 +99,26 @@ const redis = {
   REDIS_PASSWORD: env.REDIS_PASSWORD,
 }
 
+// Normalise the LiveKit URL so the rest of the codebase can rely on it
+// having a protocol prefix. The frontend uses wss:// for the realtime
+// connection; the backend later converts to https:// for the RoomService
+// REST calls. If the user supplies bare host (`livekit.example.com`) we
+// default to wss://.
+const LIVEKIT_URL = (() => {
+  const raw = env.LIVEKIT_URL
+  if (!raw) return undefined
+  if (/^(wss?:|https?:)\/\//.test(raw)) return raw
+  return `wss://${raw}`
+})()
+const LIVEKIT_API_KEY = env.LIVEKIT_API_KEY
+const LIVEKIT_API_SECRET = env.LIVEKIT_API_SECRET
+const livekit = {
+  LIVEKIT_URL,
+  LIVEKIT_API_KEY,
+  LIVEKIT_API_SECRET,
+  LIVEKIT_ENABLED: !!(LIVEKIT_URL && LIVEKIT_API_KEY && LIVEKIT_API_SECRET),
+}
+
 const required = {
   EMAIL_DEFAULT_SENDER: env.EMAIL_DEFAULT_SENDER,
 
@@ -163,6 +183,7 @@ const CONFIG = {
   ...neo4j,
   ...sentry,
   ...redis,
+  ...livekit,
   ...options,
   ...language,
 }

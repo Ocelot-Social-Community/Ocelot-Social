@@ -1385,5 +1385,91 @@
     "popover": {
       "open-profile": "Otwórz profil"
     }
+  },
+  "videoCall": {
+    "activeSpeakers": "Aktywni mówcy",
+    "closeChat": "Zamknij czat",
+    "connecting": "Łączenie…",
+    "dialogLabel": "Rozmowa wideo grupowa",
+    "disableCamera": "Wyłącz kamerę",
+    "enableCamera": "Włącz kamerę",
+    "errors": {
+      "camera": {
+        "busy": "Kamera jest używana przez inną aplikację.",
+        "denied": "Odmowa dostępu do kamery. Włącz uprawnienia w ustawieniach przeglądarki (ikona kłódki na pasku adresu).",
+        "generic": "Nie można włączyć kamery.",
+        "noDevice": "Nie znaleziono kamery."
+      },
+      "mic": {
+        "busy": "Mikrofon jest używany przez inną aplikację.",
+        "denied": "Odmowa dostępu do mikrofonu. Włącz uprawnienia w ustawieniach przeglądarki (ikona kłódki na pasku adresu).",
+        "generic": "Nie można włączyć mikrofonu.",
+        "noDevice": "Nie znaleziono mikrofonu."
+      },
+      "screen": {
+        "busy": "Udostępnianie ekranu jest obecnie niedostępne.",
+        "denied": "Odmowa udostępnienia ekranu.",
+        "generic": "Nie można udostępnić ekranu.",
+        "noDevice": "Brak ekranu do udostępnienia."
+      }
+    },
+    "gotoGroup": "Przejdź do grupy „{name}”",
+    "groupVideoCallButton": {
+      "label": "Wideo grupowe",
+      "tooltip": "Rozmowa wideo w grupie „{name}”"
+    },
+    "leave": "Opuść rozmowę",
+    "maximize": "Maksymalizuj",
+    "minimize": "Minimalizuj",
+    "muteMic": "Wycisz mikrofon",
+    "openChat": "Otwórz czat",
+    "participants": "Uczestnicy",
+    "prejoin": {
+      "camera": "Kamera",
+      "cameraDisabled": "Kamera jest wyłączona.",
+      "cameraOff": "Kamera: Wyłączona",
+      "cameraOn": "Kamera: Włączona",
+      "cancel": "Anuluj",
+      "description": "Za chwilę dołączysz do rozmowy wideo tej grupy. Sprawdź kamerę, mikrofon i głośnik, a następnie dołącz do połączenia.",
+      "errorBusy": "Urządzenie jest używane przez inną aplikację.",
+      "errorDenied": "Odmowa dostępu. Zezwól na dostęp do kamery i mikrofonu w ustawieniach przeglądarki.",
+      "errorNoDevice": "Nie znaleziono pasującego urządzenia.",
+      "errorUnknown": "Nie można uzyskać dostępu do urządzeń.",
+      "headerTitle": "{name} – Dołącz do rozmowy wideo",
+      "hintBoth": "Dołączasz bez kamery i mikrofonu — będziesz tylko widzieć i słyszeć innych.",
+      "hintCamera": "Dołączasz bez kamery — inni cię usłyszą, ale nie zobaczą.",
+      "hintMic": "Dołączasz bez mikrofonu — inni cię zobaczą, ale nie usłyszą.",
+      "join": "Dołącz do rozmowy",
+      "micLevel": "Poziom mikrofonu",
+      "micOff": "Mikrofon: Wyłączony",
+      "micOn": "Mikrofon: Włączony",
+      "microphone": "Mikrofon",
+      "noCamera": "Podgląd kamery niedostępny.",
+      "noDevices": "Brak urządzenia",
+      "permission": {
+        "denied": "Zablokowane",
+        "granted": "OK",
+        "prompt": "Oczekuje",
+        "unsupported": "Nieobsługiwane"
+      },
+      "retry": "Spróbuj ponownie",
+      "speaker": "Głośnik",
+      "speakerUnsupported": "Wybór urządzenia wyjściowego nie jest obsługiwany w tej przeglądarce.",
+      "testingSound": "Odtwarzanie…",
+      "testSound": "Test dźwięku",
+      "title": "Skonfiguruj urządzenia",
+      "unnamedCamera": "Kamera",
+      "unnamedMic": "Mikrofon",
+      "unnamedSpeaker": "Głośnik",
+      "unsupportedBrowser": "Twoja przeglądarka nie obsługuje audio/wideo."
+    },
+    "screenShare": "Ekran",
+    "spotlightExit": "Wyjdź z trybu spotlight",
+    "startScreenShare": "Udostępnij ekran",
+    "stopScreenShare": "Zakończ udostępnianie",
+    "title": "Rozmowa wideo grupowa",
+    "unmuteMic": "Włącz mikrofon",
+    "you": "ty",
+    "youAreSharingScreen": "Udostępniasz swój ekran"
   }
 }

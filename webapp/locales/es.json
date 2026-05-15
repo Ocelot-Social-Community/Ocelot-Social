@@ -1385,5 +1385,91 @@
     "popover": {
       "open-profile": "Abrir perfil"
     }
+  },
+  "videoCall": {
+    "activeSpeakers": "Hablantes activos",
+    "closeChat": "Cerrar chat",
+    "connecting": "Conectando…",
+    "dialogLabel": "Videollamada de grupo",
+    "disableCamera": "Apagar la cámara",
+    "enableCamera": "Encender la cámara",
+    "errors": {
+      "camera": {
+        "busy": "La cámara está siendo utilizada por otra aplicación.",
+        "denied": "Acceso a la cámara denegado. Habilita el permiso en la configuración del navegador (ícono de candado en la barra de direcciones).",
+        "generic": "No se pudo encender la cámara.",
+        "noDevice": "No se encontró cámara."
+      },
+      "mic": {
+        "busy": "El micrófono está siendo utilizado por otra aplicación.",
+        "denied": "Acceso al micrófono denegado. Habilita el permiso en la configuración del navegador (ícono de candado en la barra de direcciones).",
+        "generic": "No se pudo encender el micrófono.",
+        "noDevice": "No se encontró micrófono."
+      },
+      "screen": {
+        "busy": "Compartir pantalla no está disponible en este momento.",
+        "denied": "Se denegó compartir pantalla.",
+        "generic": "No se pudo compartir la pantalla.",
+        "noDevice": "No hay pantalla disponible para compartir."
+      }
+    },
+    "gotoGroup": "Ir al grupo «{name}»",
+    "groupVideoCallButton": {
+      "label": "Vídeo del grupo",
+      "tooltip": "Videollamada en el grupo «{name}»"
+    },
+    "leave": "Salir de la llamada",
+    "maximize": "Maximizar",
+    "minimize": "Minimizar",
+    "muteMic": "Silenciar micrófono",
+    "openChat": "Abrir chat",
+    "participants": "Participantes",
+    "prejoin": {
+      "camera": "Cámara",
+      "cameraDisabled": "La cámara está desactivada.",
+      "cameraOff": "Cámara: Apagada",
+      "cameraOn": "Cámara: Encendida",
+      "cancel": "Cancelar",
+      "description": "Estás a punto de unirte a la videollamada de este grupo. Comprueba tu cámara, micrófono y altavoz, y luego únete a la llamada.",
+      "errorBusy": "El dispositivo está siendo utilizado por otra aplicación.",
+      "errorDenied": "Acceso denegado. Permite el acceso a la cámara y al micrófono en la configuración del navegador.",
+      "errorNoDevice": "No se encontró ningún dispositivo coincidente.",
+      "errorUnknown": "No se pudo acceder a tus dispositivos.",
+      "headerTitle": "{name} – Unirse a la videollamada",
+      "hintBoth": "Te unirás sin cámara ni micrófono — solo verás y escucharás a los demás.",
+      "hintCamera": "Te unirás sin cámara — los demás te escucharán pero no te verán.",
+      "hintMic": "Te unirás sin micrófono — los demás te verán pero no te escucharán.",
+      "join": "Unirse a la llamada",
+      "micLevel": "Nivel del micrófono",
+      "micOff": "Micro: Apagado",
+      "micOn": "Micro: Encendido",
+      "microphone": "Micrófono",
+      "noCamera": "La vista previa de la cámara no está disponible.",
+      "noDevices": "Ningún dispositivo detectado",
+      "permission": {
+        "denied": "Bloqueado",
+        "granted": "OK",
+        "prompt": "Pendiente",
+        "unsupported": "No compatible"
+      },
+      "retry": "Reintentar",
+      "speaker": "Altavoz",
+      "speakerUnsupported": "La selección del dispositivo de salida no es compatible con este navegador.",
+      "testingSound": "Reproduciendo…",
+      "testSound": "Probar sonido",
+      "title": "Configura tus dispositivos",
+      "unnamedCamera": "Cámara",
+      "unnamedMic": "Micrófono",
+      "unnamedSpeaker": "Altavoz",
+      "unsupportedBrowser": "Tu navegador no admite audio/vídeo."
+    },
+    "screenShare": "Pantalla",
+    "spotlightExit": "Salir del foco",
+    "startScreenShare": "Compartir pantalla",
+    "stopScreenShare": "Detener uso compartido",
+    "title": "Videollamada de grupo",
+    "unmuteMic": "Activar micrófono",
+    "you": "tú",
+    "youAreSharingScreen": "Estás compartiendo tu pantalla"
   }
 }

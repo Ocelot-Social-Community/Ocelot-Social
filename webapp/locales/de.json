@@ -1385,5 +1385,91 @@
     "popover": {
       "open-profile": "Profil öffnen"
     }
+  },
+  "videoCall": {
+    "activeSpeakers": "Aktive Sprecher",
+    "closeChat": "Chat schließen",
+    "connecting": "Verbinde…",
+    "dialogLabel": "Gruppen-Videoanruf",
+    "disableCamera": "Kamera ausschalten",
+    "enableCamera": "Kamera einschalten",
+    "errors": {
+      "camera": {
+        "busy": "Die Kamera wird von einer anderen Anwendung verwendet.",
+        "denied": "Kamera-Zugriff verweigert. Bitte aktiviere die Berechtigung in den Browser-Einstellungen (Schloss-Symbol in der Adressleiste).",
+        "generic": "Kamera konnte nicht aktiviert werden.",
+        "noDevice": "Keine Kamera gefunden."
+      },
+      "mic": {
+        "busy": "Das Mikrofon wird von einer anderen Anwendung verwendet.",
+        "denied": "Mikrofon-Zugriff verweigert. Bitte aktiviere die Berechtigung in den Browser-Einstellungen (Schloss-Symbol in der Adressleiste).",
+        "generic": "Mikrofon konnte nicht aktiviert werden.",
+        "noDevice": "Kein Mikrofon gefunden."
+      },
+      "screen": {
+        "busy": "Bildschirm-Teilen ist gerade nicht möglich.",
+        "denied": "Bildschirm-Teilen wurde verweigert.",
+        "generic": "Bildschirm konnte nicht geteilt werden.",
+        "noDevice": "Kein Bildschirm zum Teilen gefunden."
+      }
+    },
+    "gotoGroup": "Zur Gruppe „{name}“",
+    "groupVideoCallButton": {
+      "label": "Gruppen-Video",
+      "tooltip": "Videoanruf in der Gruppe „{name}“"
+    },
+    "leave": "Anruf verlassen",
+    "maximize": "Maximieren",
+    "minimize": "Minimieren",
+    "muteMic": "Mikrofon stummschalten",
+    "openChat": "Chat öffnen",
+    "participants": "Teilnehmer",
+    "prejoin": {
+      "camera": "Kamera",
+      "cameraDisabled": "Kamera ist deaktiviert.",
+      "cameraOff": "Kamera: Aus",
+      "cameraOn": "Kamera: An",
+      "cancel": "Abbrechen",
+      "description": "Du trittst gleich der Videokonferenz dieser Gruppe bei. Prüfe Kamera, Mikrofon und Lautsprecher, bevor du dem Anruf beitrittst.",
+      "errorBusy": "Das Gerät wird bereits von einer anderen Anwendung verwendet.",
+      "errorDenied": "Zugriff verweigert. Bitte erlaube Kamera- und Mikrofonzugriff in den Browser-Einstellungen.",
+      "errorNoDevice": "Kein passendes Gerät gefunden.",
+      "errorUnknown": "Auf die Geräte konnte nicht zugegriffen werden.",
+      "headerTitle": "{name} – Video-Konferenz betreten",
+      "hintBoth": "Du trittst ohne Kamera und Mikrofon bei — du wirst nur zuhören und zuschauen.",
+      "hintCamera": "Du trittst ohne Kamera bei — andere können dich hören, aber nicht sehen.",
+      "hintMic": "Du trittst ohne Mikrofon bei — andere können dich sehen, aber nicht hören.",
+      "join": "Anruf beitreten",
+      "micLevel": "Mikrofon-Pegel",
+      "micOff": "Mikro: Aus",
+      "micOn": "Mikro: An",
+      "microphone": "Mikrofon",
+      "noCamera": "Kamera-Vorschau nicht verfügbar.",
+      "noDevices": "Kein Gerät erkannt",
+      "permission": {
+        "denied": "Blockiert",
+        "granted": "OK",
+        "prompt": "Ausstehend",
+        "unsupported": "Nicht unterstützt"
+      },
+      "retry": "Erneut versuchen",
+      "speaker": "Lautsprecher",
+      "speakerUnsupported": "Lautsprecher-Auswahl wird in diesem Browser nicht unterstützt.",
+      "testingSound": "Spielt…",
+      "testSound": "Sound testen",
+      "title": "Geräte einrichten",
+      "unnamedCamera": "Kamera",
+      "unnamedMic": "Mikrofon",
+      "unnamedSpeaker": "Lautsprecher",
+      "unsupportedBrowser": "Dein Browser unterstützt Audio/Video nicht."
+    },
+    "screenShare": "Bildschirm",
+    "spotlightExit": "Spotlight beenden",
+    "startScreenShare": "Bildschirm teilen",
+    "stopScreenShare": "Teilen beenden",
+    "title": "Gruppen-Videoanruf",
+    "unmuteMic": "Stummschaltung aufheben",
+    "you": "du",
+    "youAreSharingScreen": "Du teilst gerade Deinen Bildschirm"
   }
 }

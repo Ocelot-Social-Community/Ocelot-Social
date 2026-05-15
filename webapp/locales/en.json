@@ -1385,5 +1385,91 @@
     "popover": {
       "open-profile": "Open profile"
     }
+  },
+  "videoCall": {
+    "activeSpeakers": "Active speakers",
+    "closeChat": "Close chat",
+    "connecting": "Connecting…",
+    "dialogLabel": "Group video call",
+    "disableCamera": "Turn camera off",
+    "enableCamera": "Turn camera on",
+    "errors": {
+      "camera": {
+        "busy": "The camera is in use by another application.",
+        "denied": "Camera access denied. Please enable the permission in your browser settings (lock icon in the address bar).",
+        "generic": "Could not turn the camera on.",
+        "noDevice": "No camera found."
+      },
+      "mic": {
+        "busy": "The microphone is in use by another application.",
+        "denied": "Microphone access denied. Please enable the permission in your browser settings (lock icon in the address bar).",
+        "generic": "Could not turn the microphone on.",
+        "noDevice": "No microphone found."
+      },
+      "screen": {
+        "busy": "Screen sharing is not available right now.",
+        "denied": "Screen sharing was denied.",
+        "generic": "Could not share the screen.",
+        "noDevice": "No screen available to share."
+      }
+    },
+    "gotoGroup": "Go to group “{name}”",
+    "groupVideoCallButton": {
+      "label": "Group Video",
+      "tooltip": "Video call in group “{name}”"
+    },
+    "leave": "Leave call",
+    "maximize": "Maximize",
+    "minimize": "Minimize",
+    "muteMic": "Mute microphone",
+    "openChat": "Open chat",
+    "participants": "Participants",
+    "prejoin": {
+      "camera": "Camera",
+      "cameraDisabled": "Camera is disabled.",
+      "cameraOff": "Camera: Off",
+      "cameraOn": "Camera: On",
+      "cancel": "Cancel",
+      "description": "You're about to join this group's video call. Check your camera, microphone and speaker, then join the call.",
+      "errorBusy": "The device is in use by another application.",
+      "errorDenied": "Access denied. Please allow camera and microphone access in your browser settings.",
+      "errorNoDevice": "No matching device found.",
+      "errorUnknown": "Could not access your devices.",
+      "headerTitle": "{name} – Join video call",
+      "hintBoth": "Joining without camera and microphone — you'll only see and hear others.",
+      "hintCamera": "Joining without camera — others will hear you but not see you.",
+      "hintMic": "Joining without microphone — others will see you but not hear you.",
+      "join": "Join call",
+      "micLevel": "Microphone level",
+      "micOff": "Mic: Off",
+      "micOn": "Mic: On",
+      "microphone": "Microphone",
+      "noCamera": "Camera preview is not available.",
+      "noDevices": "No device detected",
+      "permission": {
+        "denied": "Blocked",
+        "granted": "OK",
+        "prompt": "Pending",
+        "unsupported": "Not supported"
+      },
+      "retry": "Retry",
+      "speaker": "Speaker",
+      "speakerUnsupported": "Output device selection is not supported in this browser.",
+      "testingSound": "Playing…",
+      "testSound": "Test sound",
+      "title": "Set up your devices",
+      "unnamedCamera": "Camera",
+      "unnamedMic": "Microphone",
+      "unnamedSpeaker": "Speaker",
+      "unsupportedBrowser": "Your browser does not support audio/video."
+    },
+    "screenShare": "Screen",
+    "spotlightExit": "Exit spotlight",
+    "startScreenShare": "Share screen",
+    "stopScreenShare": "Stop sharing",
+    "title": "Group video call",
+    "unmuteMic": "Unmute microphone",
+    "you": "you",
+    "youAreSharingScreen": "You are sharing your screen"
   }
 }

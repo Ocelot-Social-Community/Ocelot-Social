@@ -34,40 +34,32 @@
     @open-file="openFile($event.detail[0].file.file)"
   >
     <div v-if="selectedRoom && selectedRoom.roomId" slot="room-options" class="chat-room-options">
-      <div v-if="singleRoom" class="ds-flex">
-        <div class="ds-flex-item single-chat-bubble" style="align-self: center">
-          <os-button
-            as="nuxt-link"
-            :to="expandChatLink"
-            variant="primary"
-            appearance="ghost"
-            circle
-            size="sm"
-            :aria-label="$t('chat.expandChat')"
-          >
-            <template #icon>
-              <os-icon :icon="icons.expand" />
-            </template>
-          </os-button>
-        </div>
-        <div class="ds-flex-item" style="align-self: center">
-          <div class="vac-svg-button vac-room-options">
-            <slot name="menu-icon">
-              <os-button
-                variant="primary"
-                appearance="ghost"
-                circle
-                size="sm"
-                :aria-label="$t('chat.closeChat')"
-                @click="$emit('close-single-room', true)"
-              >
-                <template #icon>
-                  <os-icon :icon="icons.close" />
-                </template>
-              </os-button>
-            </slot>
-          </div>
-        </div>
+      <div v-if="singleRoom" class="chat-room-options__buttons">
+        <os-button
+          as="nuxt-link"
+          :to="expandChatLink"
+          variant="primary"
+          appearance="outline"
+          circle
+          size="sm"
+          :aria-label="$t('chat.expandChat')"
+        >
+          <template #icon>
+            <os-icon :icon="icons.expand" />
+          </template>
+        </os-button>
+        <os-button
+          variant="primary"
+          appearance="outline"
+          circle
+          size="sm"
+          :aria-label="$t('chat.closeChat')"
+          @click="$emit('close-single-room', true)"
+        >
+          <template #icon>
+            <os-icon :icon="icons.close" />
+          </template>
+        </os-button>
       </div>
     </div>
 
@@ -80,25 +72,19 @@
         <profile-avatar
           v-if="selectedRoom"
           :profile="selectedRoomProfile"
-          class="vac-avatar-profile"
+          size="small"
+          class="vac-avatar-profile vac-avatar-profile--header"
         />
       </component>
     </div>
 
     <div slot="room-header-info" class="chat-room-header-info">
       <div class="vac-room-name vac-text-ellipsis">
-        <component
-          :is="roomHeaderLink ? 'nuxt-link' : 'span'"
+        <room-title-link
+          :name="selectedRoom ? selectedRoom.roomName : ''"
           :to="roomHeaderLink"
-          class="chat-header-profile-link"
-        >
-          <os-icon
-            v-if="selectedRoom && selectedRoom.isGroupRoom"
-            :icon="icons.group"
-            class="room-group-icon"
-          />
-          {{ selectedRoom ? selectedRoom.roomName : '' }}
-        </component>
+          :show-group-icon="!!(selectedRoom && selectedRoom.isGroupRoom)"
+        />
       </div>
     </div>
 
@@ -138,6 +124,7 @@
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import RoomTitleLink from '~/components/_new/generic/RoomTitleLink/RoomTitleLink'
 import locales from '~/locales/index.js'
 import { roomQuery, createGroupRoom, unreadRoomsQuery, userProfileQuery } from '~/graphql/Rooms'
 import {
@@ -156,7 +143,7 @@ const MESSAGE_PAGE_SIZE = 20
 
 export default {
   name: 'Chat',
-  components: { OsButton, OsIcon, ProfileAvatar },
+  components: { OsButton, OsIcon, ProfileAvatar, RoomTitleLink },
   props: {
     theme: {
       type: String,
@@ -173,6 +160,12 @@ export default {
     groupId: {
       type: String,
       default: null,
+    },
+    // When true the chat fills its parent container instead of using the
+    // chat-modul's viewport-based height calc. Used by the in-call sidebar.
+    fitParent: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -249,9 +242,23 @@ export default {
   computed: {
     ...mapGetters({
       currentUser: 'auth/user',
+      videoCallShown: 'videoCall/showVideoCall',
+      videoCallMinimized: 'videoCall/minimized',
     }),
     chatHeight() {
-      if (this.singleRoom) return 'calc(100dvh - 190px)'
+      // When embedded in another container (e.g. video-call sidebar), let the
+      // parent dictate the size.
+      if (this.fitParent) return '100%'
+      if (this.singleRoom) {
+        // The chat-modul sits at bottom: 45px normally. When a minimized
+        // video call is parked above the footer, the chat-modul shifts up to
+        // bottom: 333px (45 + 280 + 8) — clamp the chat height so it stays
+        // below the page header instead of running off the top of the viewport.
+        if (this.videoCallShown && this.videoCallMinimized) {
+          return 'calc(100dvh - 420px)'
+        }
+        return 'calc(100dvh - 190px)'
+      }
       return '100%'
     },
     computedChatStyle() {
@@ -388,6 +395,13 @@ export default {
         .vac-player-progress { width: auto; flex: 1 1 auto; min-width: 0; }
         .vac-room-header .vac-info-wrapper { flex: 1 1 0; min-width: 0; width: auto; }
         .vac-room-header .vac-room-name { min-width: 0; }
+        /* Align the chat room header with the video call header. The library
+           ships .vac-room-header at height: 64px with an inner .vac-room-wrapper
+           providing 0 16px padding — override the height only so the two
+           overlays line up when stacked. The wrapper's 16px horizontal padding
+           already matches the video header's $space-small (16px). */
+        .vac-room-header { height: 60px !important; }
+        .vac-room-header .vac-avatar-profile--header { margin-right: 8px; }
         ${
           this.singleRoom
             ? `
@@ -1196,12 +1210,27 @@ export default {
 
 .chat-room-options {
   flex-shrink: 0;
+  margin-left: auto;
+}
+
+.chat-room-options__buttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
 }
 
 .chat-room-header-info {
   flex: 1 1 0;
   min-width: 0;
   overflow: hidden;
+
+  // Match the video call header — RoomTitleLink defaults to font-weight: 500
+  // for in-chat usage, but the room header is a dialog-level heading and
+  // should read bold to mirror the call modal.
+  ::v-deep .room-title-link {
+    font-weight: $font-weight-bold;
+  }
 }
 
 .chat-header-profile-link {

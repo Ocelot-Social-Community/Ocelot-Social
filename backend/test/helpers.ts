@@ -38,6 +38,11 @@ export const TEST_CONFIG = {
   REDIS_PORT: undefined,
   REDIS_PASSWORD: undefined,
 
+  LIVEKIT_URL: undefined,
+  LIVEKIT_API_KEY: undefined,
+  LIVEKIT_API_SECRET: undefined,
+  LIVEKIT_ENABLED: false,
+
   AWS_ACCESS_KEY_ID: 'minio',
   AWS_SECRET_ACCESS_KEY: '12341234',
   AWS_ENDPOINT: 'http:/localhost:9000',
