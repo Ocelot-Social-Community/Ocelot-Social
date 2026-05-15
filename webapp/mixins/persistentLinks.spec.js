@@ -86,6 +86,15 @@ describe('persistentLinks', () => {
     expect(redirect).toHaveBeenCalledWith('/groups/g1/foo%2Fbar')
   })
 
+  it('encodes reserved characters in the id', async () => {
+    const { context, redirect } = setup({
+      params: { id: 'g/1', slug: 'stale' },
+      idLookup: [{ id: 'g/1', slug: 'my-group' }],
+    })
+    await mixin.asyncData(context)
+    expect(redirect).toHaveBeenCalledWith('/groups/g%2F1/my-group')
+  })
+
   it('encodes reserved characters in slug-only lookups', async () => {
     const { context, redirect } = setup({
       params: { id: 'foo/bar', slug: undefined },
