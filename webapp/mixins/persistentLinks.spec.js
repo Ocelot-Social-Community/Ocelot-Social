@@ -108,7 +108,7 @@ describe('persistentLinks', () => {
     })
   })
 
-  it('is a no-op when no id/slug is provided', async () => {
+  it('returns 404 without querying when no id/slug is provided', async () => {
     const { context, redirect, error, client } = setup({ params: {} })
     await mixin.asyncData(context)
     expect(client.query).not.toHaveBeenCalled()
