@@ -1,6 +1,6 @@
 {
   "name": "@ocelot-social/ui",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Vue component library for ocelot.social - works with Vue 2.7+ and Vue 3",
   "license": "Apache-2.0",
   "type": "module",
