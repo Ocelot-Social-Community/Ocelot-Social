@@ -25,7 +25,7 @@
     "vue-router": "^5.0.6"
   },
   "devDependencies": {
-    "@intlify/eslint-plugin-vue-i18n": "^4.3.0",
+    "@intlify/eslint-plugin-vue-i18n": "^4.4.0",
     "@nuxt/eslint": "^1.15.2",
     "@nuxt/test-utils": "^4.0.2",
     "@tailwindcss/vite": "^4.2.2",
