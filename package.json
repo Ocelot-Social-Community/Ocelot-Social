@@ -42,7 +42,7 @@
     "@badeball/cypress-cucumber-preprocessor": "^24.0.1",
     "@cucumber/cucumber": "12.7.0",
     "@cypress/webpack-preprocessor": "^7.0.2",
-    "auto-changelog": "^2.5.0",
+    "auto-changelog": "^2.5.1",
     "cypress": "^15.11.0",
     "cypress-network-idle": "^1.15.0",
     "date-fns": "^3.6.0",
