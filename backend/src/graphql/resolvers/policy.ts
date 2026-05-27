@@ -52,10 +52,16 @@ export default {
   },
   Subscription: {
     policyChanged: {
-      subscribe: (_parent: unknown, _args: unknown, { pubsub }: Context) =>
-        pubsub.asyncIterator(POLICY_CHANGED_CHANNEL),
-      resolve: (payload: { policyChanged: { key: string; value: unknown; actor: string; timestamp: string } }) =>
-        serializeEvent(payload.policyChanged),
+      subscribe: (_parent: unknown, _args: unknown, { pubsub }: Context) => {
+        // eslint-disable-next-line no-console
+        console.log('[policy] subscriber attached to', POLICY_CHANGED_CHANNEL)
+        return pubsub.asyncIterator(POLICY_CHANGED_CHANNEL)
+      },
+      resolve: (payload: { policyChanged: { key: string; value: unknown; actor: string; timestamp: string } }) => {
+        // eslint-disable-next-line no-console
+        console.log('[policy] resolve fired', JSON.stringify(payload.policyChanged))
+        return serializeEvent(payload.policyChanged)
+      },
     },
   },
 }

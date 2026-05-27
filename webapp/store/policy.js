@@ -102,19 +102,32 @@ export const actions = {
   // are no-ops. Updates the local snapshot when any backend instance publishes
   // a change (including this client's own mutation).
   subscribe({ commit, state }) {
-    if (state.subscriptionActive) return
+    if (state.subscriptionActive) {
+      // eslint-disable-next-line no-console
+      console.log('[policy] subscribe(): already active, skipping')
+      return
+    }
+    // eslint-disable-next-line no-console
+    console.log('[policy] subscribe(): opening GraphQL subscription')
     const observable = apolloClient(this).subscribe({ query: PolicySubscription() })
     observable.subscribe({
       next({ data }) {
+        // eslint-disable-next-line no-console
+        console.log('[policy] subscription next:', JSON.stringify(data))
         const event = data?.policyChanged
         if (!event) return
         try {
           commit('PATCH_KEY', { key: event.key, value: JSON.parse(event.value) })
-        } catch {
-          /* malformed payload — ignore */
+          // eslint-disable-next-line no-console
+          console.log('[policy] PATCH_KEY committed:', event.key, '=', event.value)
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.warn('[policy] PATCH_KEY failed:', err)
         }
       },
-      error() {
+      error(err) {
+        // eslint-disable-next-line no-console
+        console.warn('[policy] subscription error:', err)
         commit('SET_SUBSCRIPTION_ACTIVE', false)
       },
     })

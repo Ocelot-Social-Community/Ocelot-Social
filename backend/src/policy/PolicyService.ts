@@ -154,6 +154,13 @@ export class PolicyService {
       actor,
       timestamp: new Date().toISOString(),
     }
+    // eslint-disable-next-line no-console
+    console.log(
+      `[policy] publish ${POLICY_CHANGED_CHANNEL}`,
+      JSON.stringify(event),
+      'pubsub?',
+      !!this.pubsub,
+    )
     void this.pubsub?.publish(POLICY_CHANGED_CHANNEL, { policyChanged: event })
     return event
   }

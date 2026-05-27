@@ -41,12 +41,24 @@ const createServer = async (options?: CreateServerOptions) => {
   const wsServer = new WebSocketServer({ noServer: true })
   const legacyWsServer = new WebSocketServer({ noServer: true })
 
+  // Extract { headers: { authorization } } shape from arbitrary connectionParams.
+  // Authenticated clients send { headers: { authorization: 'Bearer ...' } };
+  // anonymous clients may send undefined / {} — both must yield a context with
+  // user = null instead of crashing inside getContext on req.headers undefined.
+  const normaliseWsHeaders = (
+    connectionParams: Record<string, unknown> | null | undefined,
+  ): { headers: { authorization?: string } } => {
+    const headers = (connectionParams as { headers?: { authorization?: string } } | undefined)
+      ?.headers
+    return { headers: headers ?? {} }
+  }
+
   // New protocol: graphql-ws (subprotocol: graphql-transport-ws)
   const serverCleanup = useServer(
     {
       schema: appliedSchema,
       context: async (ctx) =>
-        getContext()(ctx.connectionParams as { headers: { authorization?: string } }),
+        getContext()(normaliseWsHeaders(ctx.connectionParams as Record<string, unknown>)),
       onDisconnect: () => {
         logger.debug('WebSocket client disconnected')
       },
@@ -61,7 +73,7 @@ const createServer = async (options?: CreateServerOptions) => {
       execute,
       subscribe,
       onConnect: async (connectionParams: Record<string, unknown>) => {
-        return getContext()(connectionParams as { headers: { authorization?: string } })
+        return getContext()(normaliseWsHeaders(connectionParams))
       },
       onDisconnect: () => {
         logger.debug('Legacy WebSocket client disconnected')

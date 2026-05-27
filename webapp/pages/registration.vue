@@ -31,8 +31,6 @@ export default {
           nonce,
         },
       },
-      publicRegistration: this.$policy.get('publicRegistration') === true,
-      inviteRegistration: this.$policy.get('inviteRegistration') === true,
     }
   },
   async asyncData({ store, route, app, redirect }) {
@@ -74,6 +72,12 @@ export default {
     }
   },
   computed: {
+    publicRegistration() {
+      return this.$policy.get('publicRegistration') === true
+    },
+    inviteRegistration() {
+      return this.$policy.get('inviteRegistration') === true
+    },
     registrationType() {
       if (!this.method) {
         return (

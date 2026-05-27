@@ -619,7 +619,6 @@ export default {
       mobileMoreMenuToggled: null,
       mobileFilterMenuOpen: false,
       mobileLocaleMenuOpen: false,
-      inviteRegistration: this.$policy.get('inviteRegistration') === true,
     }
   },
   computed: {
@@ -630,6 +629,9 @@ export default {
       isAdmin: 'auth/isAdmin',
       filterActive: 'posts/isActive',
     }),
+    inviteRegistration() {
+      return this.$policy.get('inviteRegistration') === true
+    },
     showFilterMenuDropdown() {
       const [firstRoute] = this.$route.matched
       return firstRoute && firstRoute.name === 'index'
