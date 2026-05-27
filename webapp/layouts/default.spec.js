@@ -29,8 +29,8 @@ describe('default.vue', () => {
       },
       $scrollTo: jest.fn(),
       $t: jest.fn(),
-      $env: {
-        INVITE_REGISTRATION: true,
+      $policy: {
+        get: (key) => key === 'inviteRegistration',
       },
     }
     store = new Vuex.Store({

@@ -138,6 +138,7 @@ export default {
    ** Plugins to load before mounting the App
    */
   plugins: [
+    { src: '~/plugins/policy.js', ssr: true },
     { src: '~/plugins/i18n.js', ssr: true },
     { src: '~/plugins/axios.js', ssr: false },
     { src: '~/plugins/keep-alive.js', ssr: false },

@@ -37,9 +37,9 @@ const isAdmin = rule()(async (_parent, _args, { user }: Context, _info) => {
 const apiKeysEnabled = rule({ cache: 'contextual' })(async (
   _parent,
   _args,
-  { config }: Context,
+  { policy }: Context,
 ) => {
-  return config.API_KEYS_ENABLED
+  return policy.get('apiKeysEnabled')
 })
 
 const onlyYourself = rule({
@@ -381,11 +381,11 @@ const noEmailFilter = rule({
 })
 
 const publicRegistration = rule()(
-  async (_parent, _args, context: Context) => context.config.PUBLIC_REGISTRATION,
+  async (_parent, _args, context: Context) => context.policy.get('publicRegistration'),
 )
 
 const inviteRegistration = rule()(async (_parent, args, context: Context) => {
-  if (!context.config.INVITE_REGISTRATION) return false
+  if (!context.policy.get('inviteRegistration')) return false
   const { inviteCode } = args
   return validateInviteCode(context, inviteCode)
 })
@@ -475,6 +475,9 @@ export default shield(
       myApiKeys: and(isAuthenticated, apiKeysEnabled),
       apiKeyUsers: isAdmin,
       apiKeysForUser: isAdmin,
+
+      // Network Policy (anonymous; needed by login screen)
+      publicPolicy: allow,
     },
     Mutation: {
       '*': deny,

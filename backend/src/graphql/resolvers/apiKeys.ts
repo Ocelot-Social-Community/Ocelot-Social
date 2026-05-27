@@ -101,7 +101,7 @@ export default {
 
   Mutation: {
     createApiKey: async (_parent: unknown, args: ApiKeyArgs, context: Context) => {
-      if (!context.config.API_KEYS_ENABLED) {
+      if (!context.policy.get('apiKeysEnabled')) {
         throw new Error('API keys are not enabled')
       }
 

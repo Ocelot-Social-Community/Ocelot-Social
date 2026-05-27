@@ -1,10 +1,15 @@
 import CONFIG from './config'
 import { closeDriver } from './db/neo4j'
 import { loggerPlugin } from './plugins/apolloLogger'
+import { getPolicyService } from './policy'
 import createProxy from './proxy'
 import createServer from './server'
 
 async function main() {
+  // Initialize network policy (seeds DB from ENV if values are missing).
+  // Must complete before the server accepts requests.
+  await getPolicyService().init()
+
   const { server, httpServer } = await createServer({
     plugins: [loggerPlugin],
   })

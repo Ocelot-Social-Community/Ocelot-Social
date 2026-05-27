@@ -3,8 +3,10 @@ import pubsubContext from '@context/pubsub'
 import CONFIG from '@src/config'
 import { decode } from '@src/jwt/decode'
 import ocelotLogger from '@src/logger'
+import { getPolicyService } from '@src/policy'
 
 import type { DecodedUser } from '@src/jwt/decode'
+import type { PolicyService } from '@src/policy'
 
 const serverDatabase = databaseContext()
 const serverPubsub = pubsubContext()
@@ -16,6 +18,7 @@ export const getContext =
     authenticatedUser: DecodedUser | null | undefined
     logger?: typeof ocelotLogger
     config: typeof CONFIG
+    policy?: PolicyService
   }) =>
   async (req: { headers: { authorization?: string } }) => {
     const {
@@ -24,6 +27,7 @@ export const getContext =
       authenticatedUser,
       logger = ocelotLogger,
       config = CONFIG,
+      policy = getPolicyService(),
     } = opts ?? {}
     const { driver } = database
     const user =
@@ -43,6 +47,7 @@ export const getContext =
         languageDefault: config.LANGUAGE_DEFAULT.toUpperCase(),
       },
       config,
+      policy,
     }
     return result
   }

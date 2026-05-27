@@ -64,7 +64,7 @@ export default {
           name: this.$t('admin.donations.name'),
           path: '/admin/donations',
         },
-        ...(this.$env.API_KEYS_ENABLED
+        ...(this.$policy.get('apiKeysEnabled')
           ? [{ name: this.$t('admin.api-keys.name'), path: `/admin/api-keys` }]
           : []),
         // TODO implement

@@ -31,8 +31,8 @@ export default {
           nonce,
         },
       },
-      publicRegistration: this.$env.PUBLIC_REGISTRATION === true, // for 'false' in .env PUBLIC_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling
-      inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling
+      publicRegistration: this.$policy.get('publicRegistration') === true,
+      inviteRegistration: this.$policy.get('inviteRegistration') === true,
     }
   },
   async asyncData({ store, route, app, redirect }) {

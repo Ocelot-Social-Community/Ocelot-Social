@@ -619,7 +619,7 @@ export default {
       mobileMoreMenuToggled: null,
       mobileFilterMenuOpen: false,
       mobileLocaleMenuOpen: false,
-      inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
+      inviteRegistration: this.$policy.get('inviteRegistration') === true,
     }
   },
   computed: {

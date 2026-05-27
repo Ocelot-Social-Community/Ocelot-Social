@@ -16,6 +16,7 @@ describe('settings.vue', () => {
       $t: jest.fn((key) => key),
       $route: { path: '/settings' },
       $router: { push: jest.fn() },
+      $policy: { get: () => false },
     }
   })
 

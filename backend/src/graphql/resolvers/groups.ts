@@ -122,14 +122,14 @@ export default {
   },
   Mutation: {
     CreateGroup: async (_parent, params, context: Context, _resolveInfo) => {
-      const { config } = context
+      const { policy } = context
       const { categoryIds } = params
       delete params.categoryIds
       params.locationName = params.locationName === '' ? null : params.locationName
-      if (config.CATEGORIES_ACTIVE && (!categoryIds || categoryIds.length < CATEGORIES_MIN)) {
+      if (policy.get('categoriesActive') && (!categoryIds || categoryIds.length < CATEGORIES_MIN)) {
         throw new UserInputError('Too few categories!')
       }
-      if (config.CATEGORIES_ACTIVE && categoryIds && categoryIds.length > CATEGORIES_MAX) {
+      if (policy.get('categoriesActive') && categoryIds && categoryIds.length > CATEGORIES_MAX) {
         throw new UserInputError('Too many categories!')
       }
       if (
@@ -147,7 +147,7 @@ export default {
             throw new Error('Missing authenticated user.')
           }
           const categoriesCypher =
-            config.CATEGORIES_ACTIVE && categoryIds
+            policy.get('categoriesActive') && categoryIds
               ? `
                   WITH group, membership
                   UNWIND $categoryIds AS categoryId
@@ -191,14 +191,14 @@ export default {
       }
     },
     UpdateGroup: async (_parent, params, context: Context, _resolveInfo) => {
-      const { config } = context
+      const { policy } = context
       const { categoryIds } = params
       delete params.categoryIds
       const { id: groupId, avatar: avatarInput } = params
       delete params.avatar
       params.locationName = params.locationName === '' ? null : params.locationName
 
-      if (config.CATEGORIES_ACTIVE && categoryIds) {
+      if (policy.get('categoriesActive') && categoryIds) {
         if (categoryIds.length < CATEGORIES_MIN) {
           throw new UserInputError('Too few categories!')
         }
@@ -218,7 +218,7 @@ export default {
           if (!context.user) {
             throw new Error('Missing authenticated user.')
           }
-          if (config.CATEGORIES_ACTIVE && categoryIds?.length) {
+          if (policy.get('categoriesActive') && categoryIds?.length) {
             await transaction.run(
               `
                 MATCH (group:Group {id: $groupId})-[previousRelations:CATEGORIZED]->(:Category)
@@ -233,7 +233,7 @@ export default {
             SET group.updatedAt = toString(datetime())
             WITH group
           `
-          if (config.CATEGORIES_ACTIVE && categoryIds?.length) {
+          if (policy.get('categoriesActive') && categoryIds?.length) {
             updateGroupCypher += `
               UNWIND $categoryIds AS categoryId
               MATCH (category:Category {id: categoryId})

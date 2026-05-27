@@ -44,7 +44,7 @@ describe('Registration', () => {
       $route: {
         query: {},
       },
-      $env: {},
+      $policy: { get: () => false },
       $toast: {
         error: jest.fn(),
         success: jest.fn(),
@@ -98,11 +98,10 @@ describe('Registration', () => {
       })
     }
 
-    describe('no "PUBLIC_REGISTRATION" and no "INVITE_REGISTRATION"', () => {
+    describe('no "publicRegistration" and no "inviteRegistration"', () => {
       beforeEach(() => {
-        mocks.$env = {
-          PUBLIC_REGISTRATION: false,
-          INVITE_REGISTRATION: false,
+        mocks.$policy = {
+          get: (key) => ({ publicRegistration: false, inviteRegistration: false })[key],
         }
       })
 
@@ -157,11 +156,10 @@ describe('Registration', () => {
       })
     })
 
-    describe('no "PUBLIC_REGISTRATION" but "INVITE_REGISTRATION"', () => {
+    describe('no "publicRegistration" but "inviteRegistration"', () => {
       beforeEach(() => {
-        mocks.$env = {
-          PUBLIC_REGISTRATION: false,
-          INVITE_REGISTRATION: true,
+        mocks.$policy = {
+          get: (key) => ({ publicRegistration: false, inviteRegistration: true })[key],
         }
       })
 
@@ -217,11 +215,10 @@ describe('Registration', () => {
       })
     })
 
-    describe('"PUBLIC_REGISTRATION" but no "INVITE_REGISTRATION"', () => {
+    describe('"publicRegistration" but no "inviteRegistration"', () => {
       beforeEach(() => {
-        mocks.$env = {
-          PUBLIC_REGISTRATION: true,
-          INVITE_REGISTRATION: false,
+        mocks.$policy = {
+          get: (key) => ({ publicRegistration: true, inviteRegistration: false })[key],
         }
       })
 
@@ -270,11 +267,10 @@ describe('Registration', () => {
       })
     })
 
-    describe('"PUBLIC_REGISTRATION" and  "INVITE_REGISTRATION"', () => {
+    describe('"publicRegistration" and  "inviteRegistration"', () => {
       beforeEach(() => {
-        mocks.$env = {
-          PUBLIC_REGISTRATION: true,
-          INVITE_REGISTRATION: true,
+        mocks.$policy = {
+          get: (key) => ({ publicRegistration: true, inviteRegistration: true })[key],
         }
       })
 

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ocelot.social/schemas/policy.json",
+  "title": "NetworkPolicy",
+  "description": "Netzwerk-Policy-Konfiguration (Bucket B) — laufzeit-dynamisch, persistent in Neo4j.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "publicRegistration": {
+      "type": "boolean",
+      "default": false,
+      "x-visibility": "public",
+      "x-envSeed": "PUBLIC_REGISTRATION",
+      "description": "Ob sich neue Nutzer ohne Einladungs-Code registrieren können."
+    },
+    "inviteRegistration": {
+      "type": "boolean",
+      "default": true,
+      "x-visibility": "public",
+      "x-envSeed": "INVITE_REGISTRATION",
+      "description": "Ob Registrierung via Einladungs-Code möglich ist."
+    },
+    "categoriesActive": {
+      "type": "boolean",
+      "default": false,
+      "x-visibility": "public",
+      "x-envSeed": "CATEGORIES_ACTIVE",
+      "description": "Ob das Kategorien-Feature für Posts/Gruppen aktiv ist."
+    },
+    "apiKeysEnabled": {
+      "type": "boolean",
+      "default": false,
+      "x-visibility": "public",
+      "x-envSeed": "API_KEYS_ENABLED",
+      "description": "Ob API-Keys-Funktionalität (eigene Schlüssel zur Backend-Nutzung) aktiviert ist."
+    }
+  },
+  "required": ["publicRegistration", "inviteRegistration", "categoriesActive", "apiKeysEnabled"]
+}

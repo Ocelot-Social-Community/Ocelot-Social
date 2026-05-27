@@ -1,0 +1,10 @@
+type Query {
+  publicPolicy: PublicPolicy!
+}
+
+type PublicPolicy {
+  publicRegistration: Boolean!
+  inviteRegistration: Boolean!
+  categoriesActive: Boolean!
+  apiKeysEnabled: Boolean!
+}
