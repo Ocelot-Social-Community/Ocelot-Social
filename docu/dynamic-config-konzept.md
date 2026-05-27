@@ -44,14 +44,17 @@ Dieses Dokument betrifft ausschließlich **Bucket B**. Die anderen Buckets folge
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  packages/config-schema/                                        │
-│  └── policy.schema.json     ← single source of truth            │
+│  backend/src/policy/                                            │
+│  ├── policy.schema.json     ← canonical schema                  │
+│  ├── types.ts               ← hand-written, mirrors the schema  │
+│  ├── schema.ts              ← accessors (defaults, x-envSeed,   │
+│  │                            x-visibility) read JSON at runtime│
+│  ├── repository.ts          ← Neo4j read/write                  │
+│  └── PolicyService.ts       ← in-memory + DB resolver           │
 │                                                                 │
-│  Build-Step generiert:                                          │
-│   • backend/src/config/policy.types.ts    (TS-Interfaces)       │
-│   • backend/src/config/policy.validator.ts (Ajv-Validator)      │
-│   • webapp/types/policy.ts                (TS-Interfaces)       │
-│   • backend/src/graphql/policy.gql        (GraphQL-Typen)       │
+│  (Codegen-Pipeline kann ergänzt werden, sobald das Schema       │
+│  wächst oder ein zweiter Consumer dazukommt — z.B. Branding.    │
+│  Für die aktuelle Größe sind Hand-Typen pragmatischer.)         │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -101,7 +104,7 @@ Das Schema ist die einzige Wahrheit. Daraus wird alles Andere generiert.
 
 ### Schema-Beispiel
 
-`packages/config-schema/policy.schema.json`:
+`backend/src/policy/policy.schema.json`:
 
 ```jsonc
 {
@@ -160,23 +163,16 @@ Das Schema ist die einzige Wahrheit. Daraus wird alles Andere generiert.
 | `x-envSeed` | Name der ENV-Variable, die als Seed dient, wenn DB-Wert fehlt. |
 | `x-licenseRequired` | Phase 3: Tier-Liste, die das Setzen erlaubt. Lower bound: `default` ist immer zulässig. |
 
-### Was wird generiert
+### Was wird (heute) generiert / gepflegt
 
-| Artefakt | Tool | Zweck |
+| Artefakt | Quelle | Status |
 |---|---|---|
-| `policy.types.ts` (Backend + Webapp) | `json-schema-to-typescript` | Type-safe `PolicyService.get('publicRegistration'): boolean` |
-| `policy.validator.ts` | `ajv` (precompile) | Runtime-Validation bei `setPolicy()` |
-| `policy.gql` (GraphQL-Typen) | `json-schema-to-graphql` (custom-script) | `PublicPolicy`/`AdminPolicy`-Typen für Apollo |
-| `policy.json` (Form-Schema) | direkt aus JSON-Schema | Admin-UI via `@rjsf/vue` o.ä. |
-| Doku-Markdown | custom script aus `description`-Feldern | `docu/policy-reference.md` (generiert) |
+| `types.ts` (TS-Interfaces im Backend) | hand-geschrieben | aktiv, sync mit Schema |
+| GraphQL-Typen (`Policy.gql`) | hand-geschrieben | aktiv, sync mit Schema |
+| Ajv-Validator | — | später (mit `setPolicy`-Mutation in B6/B8) |
+| Form-Schema für Admin-UI | direkt das JSON-Schema | später (B6) |
 
-Build-Step in `package.json` (Workspace-Root):
-
-```json
-"scripts": {
-  "build:schema": "node scripts/generate-from-schema.mjs"
-}
-```
+**Warum nicht jetzt schon Codegen?** Bei 4 Keys ist Drift visuell erkennbar und Hand-Pflege trivial. Sobald >10 Keys oder komplexe Strukturen (Branding, Feature-Toggles) dazukommen, lohnt sich `json-schema-to-typescript` + ein Build-Step.
 
 ---
 

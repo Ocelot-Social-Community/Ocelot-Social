@@ -1,5 +1,6 @@
-// Schema accessors. The canonical schema lives in packages/config-schema/policy.schema.json;
-// the local copy at ./policy.schema.json must be kept in sync (see bootstrap test).
+// Schema accessors. The canonical schema lives at ./policy.schema.json — keep
+// ./types.ts in sync with it (defaults are read from the JSON at runtime, so
+// type-level drift is the only concern).
 
 /* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
 import type { NetworkPolicy, PolicyKey, Visibility } from './types'
