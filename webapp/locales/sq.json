@@ -132,6 +132,22 @@
     "notifications": {
       "name": "Njoftimet"
     },
+    "policy": {
+      "name": "Politika e rrjetit",
+      "title": "Cilësimet e politikës së rrjetit",
+      "description": "Konfigurim në kohë reale. Ndryshimet aplikohen menjëherë për të gjithë klientët e lidhur.",
+      "keys": {
+        "publicRegistration": "Regjistrim publik pa kod ftese",
+        "inviteRegistration": "Regjistrim me kod ftese",
+        "categoriesActive": "Funksioni i kategorive për postimet dhe grupet",
+        "apiKeysEnabled": "Funksioni i çelësave API"
+      },
+      "save": "Ruaj ndryshimet",
+      "reset": "Rikthe te paracaktimi",
+      "saveSuccess": "Politika u përditësua.",
+      "saveError": "Nuk mund të përditësohet politika: {message}",
+      "lastUpdated": "Ndryshuar së fundi: {timestamp} nga {actor}"
+    },
     "organizations": {
       "name": "Organizatat"
     },

@@ -1,23 +1,29 @@
 // PolicyService — in-memory + Neo4j-backed network policy resolution.
 //
-// Phase B5 scope (read-only):
-//   • init() seeds DB from ENV / schema-default if value is missing
-//   • get() / getSnapshot() read from in-memory cache
-//   • No setPolicy mutation yet (comes with B6) → no Ajv validation needed here
+// Lifecycle:
+//   • init() seeds DB from ENV / schema-default if a value is missing, populates
+//     the in-memory cache, and (if a pubsub is provided) subscribes to
+//     POLICY_CHANGED_CHANNEL so other backend instances stay in sync.
+//   • get() / getSnapshot() read from the cache.
+//   • set() / reset() persist, update the local cache, and publish a change
+//     event. All listening instances (including the publisher itself) apply the
+//     change via applyExternalChange().
 //
-// Resolution-Order at init() time:
-//   1. DB-Value (kept if present)
-//   2. ENV-Seed via x-envSeed → write to DB once
-//   3. Schema-Default → write to DB once
+// Resolution order at init() time:
+//   1. DB value (kept if present)
+//   2. ENV seed via x-envSeed → written to DB once
+//   3. Schema default → written to DB once
 //
-// After init(), get() always returns from cache. Cache is per process; multiple
-// backend instances will diverge until B7 (Pub/Sub Invalidation) is implemented.
+// Single-instance: no special concern. Multi-instance: eventual consistency via
+// Redis pubsub; same-key concurrent writes resolve to last-writer-wins (Cypher
+// MERGE is atomic per query, but ordering across instances is not enforced).
 
 import databaseContext from '@context/database'
 
 import { allKeys, defaultFor, envSeedFor, keysByVisibility, typeFor } from './schema'
 import {
   POLICY_NAMESPACE,
+  deleteSetting,
   ensureConstraint,
   readAllSettings,
   writeSetting,
@@ -26,6 +32,26 @@ import {
 import type { NetworkPolicy, PolicyKey, Visibility } from './types'
 
 type DbContext = ReturnType<typeof databaseContext>
+
+export const POLICY_CHANGED_CHANNEL = 'policy.changed'
+
+export interface PolicyChangeEvent {
+  key: string
+  value: unknown
+  actor: string
+  timestamp: string
+}
+
+// Minimal pubsub shape — compatible with both `graphql-subscriptions` PubSub
+// and `graphql-redis-subscriptions` RedisPubSub.
+export interface PolicyPubSub {
+  publish(triggerName: string, payload: unknown): void | Promise<void>
+  subscribe(
+    triggerName: string,
+    onMessage: (payload: { policyChanged: PolicyChangeEvent }) => void,
+  ): Promise<number>
+  unsubscribe(subId: number): void
+}
 
 function parseEnvValue(envName: string, env: NodeJS.ProcessEnv, typeName: string): unknown {
   const raw = env[envName]
@@ -47,10 +73,19 @@ function parseEnvValue(envName: string, env: NodeJS.ProcessEnv, typeName: string
 export class PolicyService {
   private cache: Partial<NetworkPolicy> = {}
   private initialised = false
+  private pubsub: PolicyPubSub | undefined
+  private env: NodeJS.ProcessEnv = process.env
+  private subscriptionId: number | undefined
 
   constructor(private readonly db: DbContext = databaseContext()) {}
 
-  async init(env: NodeJS.ProcessEnv = process.env): Promise<void> {
+  async init(
+    env: NodeJS.ProcessEnv = process.env,
+    pubsub?: PolicyPubSub,
+  ): Promise<void> {
+    this.env = env
+    this.pubsub = pubsub
+
     await ensureConstraint(this.db)
     const dbValues = await readAllSettings(this.db, POLICY_NAMESPACE)
 
@@ -69,7 +104,20 @@ export class PolicyService {
       this.cache[key] = seedValue as NetworkPolicy[PolicyKey]
     }
 
+    if (pubsub) {
+      this.subscriptionId = await pubsub.subscribe(POLICY_CHANGED_CHANNEL, (payload) => {
+        this.applyExternalChange(payload.policyChanged)
+      })
+    }
+
     this.initialised = true
+  }
+
+  async shutdown(): Promise<void> {
+    if (this.subscriptionId !== undefined && this.pubsub) {
+      this.pubsub.unsubscribe(this.subscriptionId)
+      this.subscriptionId = undefined
+    }
   }
 
   get<K extends PolicyKey>(key: K): NetworkPolicy[K] {
@@ -87,6 +135,79 @@ export class PolicyService {
       out[key] = this.get(key)
     }
     return out as Partial<NetworkPolicy>
+  }
+
+  async set<K extends PolicyKey>(
+    key: K,
+    value: NetworkPolicy[K],
+    actor: string,
+  ): Promise<PolicyChangeEvent> {
+    this.assertKnownKey(key)
+    this.assertTypeMatches(key, value)
+
+    await writeSetting(this.db, POLICY_NAMESPACE, key, value, actor)
+    this.cache[key] = value
+
+    const event: PolicyChangeEvent = {
+      key: String(key),
+      value,
+      actor,
+      timestamp: new Date().toISOString(),
+    }
+    void this.pubsub?.publish(POLICY_CHANGED_CHANNEL, { policyChanged: event })
+    return event
+  }
+
+  async reset<K extends PolicyKey>(key: K, actor: string): Promise<PolicyChangeEvent> {
+    this.assertKnownKey(key)
+
+    await deleteSetting(this.db, POLICY_NAMESPACE, key)
+
+    const envName = envSeedFor(key)
+    const envValue = envName ? parseEnvValue(envName, this.env, typeFor(key)) : undefined
+    const newValue = (envValue !== undefined ? envValue : defaultFor(key)) as NetworkPolicy[K]
+    this.cache[key] = newValue
+
+    const event: PolicyChangeEvent = {
+      key: String(key),
+      value: newValue,
+      actor,
+      timestamp: new Date().toISOString(),
+    }
+    void this.pubsub?.publish(POLICY_CHANGED_CHANNEL, { policyChanged: event })
+    return event
+  }
+
+  // Called by the pubsub subscription when any backend instance publishes a
+  // change. Idempotent when invoked locally after our own set() updated the
+  // cache (same value written twice).
+  applyExternalChange(event: PolicyChangeEvent): void {
+    if (!this.isKnownKey(event.key)) return
+    this.cache[event.key as PolicyKey] = event.value as never
+  }
+
+  private isKnownKey(key: string): key is PolicyKey {
+    return (allKeys() as string[]).includes(key)
+  }
+
+  private assertKnownKey(key: string): void {
+    if (!this.isKnownKey(key)) {
+      throw new Error(`Unknown policy key: ${key}`)
+    }
+  }
+
+  private assertTypeMatches(key: PolicyKey, value: unknown): void {
+    const expected = typeFor(key)
+    const actual = typeof value
+    const ok =
+      (expected === 'boolean' && actual === 'boolean') ||
+      (expected === 'integer' && actual === 'number' && Number.isInteger(value)) ||
+      (expected === 'string' && actual === 'string')
+    if (!ok) {
+      throw new Error(
+        `Type mismatch for policy key '${key}': expected ${expected}, got ${actual}`,
+      )
+    }
   }
 }
 

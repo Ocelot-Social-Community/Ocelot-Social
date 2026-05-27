@@ -132,6 +132,22 @@
     "notifications": {
       "name": "Notifications"
     },
+    "policy": {
+      "name": "Network policy",
+      "title": "Network policy settings",
+      "description": "Runtime configuration. Changes apply immediately for all connected clients.",
+      "keys": {
+        "publicRegistration": "Public registration without invite code",
+        "inviteRegistration": "Registration via invite code",
+        "categoriesActive": "Categories feature for posts and groups",
+        "apiKeysEnabled": "API keys functionality"
+      },
+      "save": "Save changes",
+      "reset": "Reset to default",
+      "saveSuccess": "Policy updated.",
+      "saveError": "Could not update policy: {message}",
+      "lastUpdated": "Last changed: {timestamp} by {actor}"
+    },
     "organizations": {
       "name": "Organizations"
     },

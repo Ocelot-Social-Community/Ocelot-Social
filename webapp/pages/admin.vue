@@ -64,6 +64,10 @@ export default {
           name: this.$t('admin.donations.name'),
           path: '/admin/donations',
         },
+        {
+          name: this.$t('admin.policy.name'),
+          path: '/admin/policy',
+        },
         ...(this.$policy.get('apiKeysEnabled')
           ? [{ name: this.$t('admin.api-keys.name'), path: `/admin/api-keys` }]
           : []),

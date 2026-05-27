@@ -132,6 +132,22 @@
     "notifications": {
       "name": "Notifications"
     },
+    "policy": {
+      "name": "Politique réseau",
+      "title": "Paramètres de la politique réseau",
+      "description": "Configuration en exécution. Les modifications s'appliquent immédiatement à tous les clients connectés.",
+      "keys": {
+        "publicRegistration": "Inscription publique sans code d'invitation",
+        "inviteRegistration": "Inscription via un code d'invitation",
+        "categoriesActive": "Fonctionnalité de catégories pour publications et groupes",
+        "apiKeysEnabled": "Fonctionnalité des clés API"
+      },
+      "save": "Enregistrer les modifications",
+      "reset": "Réinitialiser par défaut",
+      "saveSuccess": "Politique mise à jour.",
+      "saveError": "Impossible de mettre à jour la politique : {message}",
+      "lastUpdated": "Dernière modification : {timestamp} par {actor}"
+    },
     "organizations": {
       "name": "Organisations"
     },

@@ -132,6 +132,22 @@
     "notifications": {
       "name": "Powiadomienia"
     },
+    "policy": {
+      "name": "Zasady sieci",
+      "title": "Ustawienia zasad sieci",
+      "description": "Konfiguracja czasu wykonywania. Zmiany są stosowane natychmiast dla wszystkich połączonych klientów.",
+      "keys": {
+        "publicRegistration": "Publiczna rejestracja bez kodu zaproszenia",
+        "inviteRegistration": "Rejestracja przez kod zaproszenia",
+        "categoriesActive": "Funkcja kategorii dla postów i grup",
+        "apiKeysEnabled": "Funkcjonalność kluczy API"
+      },
+      "save": "Zapisz zmiany",
+      "reset": "Przywróć domyślne",
+      "saveSuccess": "Zasady zaktualizowane.",
+      "saveError": "Nie można zaktualizować zasad: {message}",
+      "lastUpdated": "Ostatnia zmiana: {timestamp} przez {actor}"
+    },
     "organizations": {
       "name": "Organizacje"
     },

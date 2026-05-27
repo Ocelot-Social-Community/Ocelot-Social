@@ -1,14 +1,19 @@
 import CONFIG from './config'
+import pubsubContext from './context/pubsub'
 import { closeDriver } from './db/neo4j'
 import { loggerPlugin } from './plugins/apolloLogger'
 import { getPolicyService } from './policy'
 import createProxy from './proxy'
 import createServer from './server'
 
+import type { PolicyPubSub } from './policy'
+
 async function main() {
-  // Initialize network policy (seeds DB from ENV if values are missing).
+  // Initialize network policy (seeds DB from ENV if values are missing) and
+  // subscribe to policy.changed events for cross-instance cache sync.
   // Must complete before the server accepts requests.
-  await getPolicyService().init()
+  const pubsub = pubsubContext() as unknown as PolicyPubSub
+  await getPolicyService().init(process.env, pubsub)
 
   const { server, httpServer } = await createServer({
     plugins: [loggerPlugin],

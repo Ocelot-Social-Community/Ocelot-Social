@@ -58,3 +58,14 @@ export async function writeSetting(
     },
   })
 }
+
+export async function deleteSetting(
+  db: DbContext,
+  namespace: string,
+  key: string,
+): Promise<void> {
+  await db.write({
+    query: `MATCH (s:Setting {namespace: $namespace, key: $key}) DELETE s`,
+    variables: { namespace, key },
+  })
+}

@@ -132,6 +132,22 @@
     "notifications": {
       "name": "Notifiche"
     },
+    "policy": {
+      "name": "Criteri di rete",
+      "title": "Impostazioni dei criteri di rete",
+      "description": "Configurazione runtime. Le modifiche si applicano immediatamente a tutti i client connessi.",
+      "keys": {
+        "publicRegistration": "Registrazione pubblica senza codice di invito",
+        "inviteRegistration": "Registrazione tramite codice di invito",
+        "categoriesActive": "Funzione categorie per post e gruppi",
+        "apiKeysEnabled": "Funzionalità chiavi API"
+      },
+      "save": "Salva modifiche",
+      "reset": "Ripristina predefinito",
+      "saveSuccess": "Criteri aggiornati.",
+      "saveError": "Impossibile aggiornare i criteri: {message}",
+      "lastUpdated": "Ultima modifica: {timestamp} da {actor}"
+    },
     "organizations": {
       "name": "Organizzazioni"
     },

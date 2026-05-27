@@ -132,6 +132,22 @@
     "notifications": {
       "name": "Meldingen"
     },
+    "policy": {
+      "name": "Netwerkbeleid",
+      "title": "Netwerkbeleid-instellingen",
+      "description": "Runtime-configuratie. Wijzigingen worden onmiddellijk toegepast voor alle verbonden clients.",
+      "keys": {
+        "publicRegistration": "Openbare registratie zonder uitnodigingscode",
+        "inviteRegistration": "Registratie via uitnodigingscode",
+        "categoriesActive": "Categorieënfunctie voor berichten en groepen",
+        "apiKeysEnabled": "API-sleutelfunctionaliteit"
+      },
+      "save": "Wijzigingen opslaan",
+      "reset": "Standaardwaarde herstellen",
+      "saveSuccess": "Beleid bijgewerkt.",
+      "saveError": "Beleid kon niet worden bijgewerkt: {message}",
+      "lastUpdated": "Laatst gewijzigd: {timestamp} door {actor}"
+    },
     "organizations": {
       "name": "Organisaties"
     },

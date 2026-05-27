@@ -476,8 +476,9 @@ export default shield(
       apiKeyUsers: isAdmin,
       apiKeysForUser: isAdmin,
 
-      // Network Policy (anonymous; needed by login screen)
-      publicPolicy: allow,
+      // Network Policy
+      publicPolicy: allow, // anonymous; needed by login screen
+      adminPolicy: isAdmin,
     },
     Mutation: {
       '*': deny,
@@ -547,6 +548,11 @@ export default shield(
 
       switchUserRole: isAdmin,
       markTeaserAsViewed: allow,
+
+      // Network Policy
+      setPolicy: isAdmin,
+      resetPolicy: isAdmin,
+
       saveCategorySettings: isAuthenticated,
       updateOnlineStatus: isAuthenticated,
       CreateGroupRoom: isAuthenticated,

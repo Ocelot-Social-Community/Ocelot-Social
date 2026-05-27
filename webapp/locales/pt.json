@@ -132,6 +132,22 @@
     "notifications": {
       "name": "Notificações"
     },
+    "policy": {
+      "name": "Política de rede",
+      "title": "Configurações da política de rede",
+      "description": "Configuração em tempo de execução. As alterações são aplicadas imediatamente a todos os clientes conectados.",
+      "keys": {
+        "publicRegistration": "Registro público sem código de convite",
+        "inviteRegistration": "Registro por código de convite",
+        "categoriesActive": "Recurso de categorias para publicações e grupos",
+        "apiKeysEnabled": "Funcionalidade de chaves API"
+      },
+      "save": "Salvar alterações",
+      "reset": "Restaurar padrão",
+      "saveSuccess": "Política atualizada.",
+      "saveError": "Não foi possível atualizar a política: {message}",
+      "lastUpdated": "Última alteração: {timestamp} por {actor}"
+    },
     "organizations": {
       "name": "Organizações"
     },

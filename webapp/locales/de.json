@@ -132,6 +132,22 @@
     "notifications": {
       "name": "Benachrichtigungen"
     },
+    "policy": {
+      "name": "Netzwerk-Konfiguration",
+      "title": "Einstellungen der Netzwerk-Konfiguration",
+      "description": "Laufzeit-Konfiguration. Änderungen wirken sofort für alle verbundenen Clients.",
+      "keys": {
+        "publicRegistration": "Öffentliche Registrierung ohne Einladungs-Code",
+        "inviteRegistration": "Registrierung über Einladungs-Code",
+        "categoriesActive": "Kategorien-Feature für Beiträge und Gruppen",
+        "apiKeysEnabled": "API-Schlüssel-Funktionalität"
+      },
+      "save": "Änderungen speichern",
+      "reset": "Auf Standard zurücksetzen",
+      "saveSuccess": "Konfiguration aktualisiert.",
+      "saveError": "Konfiguration konnte nicht aktualisiert werden: {message}",
+      "lastUpdated": "Zuletzt geändert: {timestamp} von {actor}"
+    },
     "organizations": {
       "name": "Organisationen"
     },

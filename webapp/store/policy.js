@@ -1,7 +1,10 @@
 import PolicyQuery from '~/graphql/PolicyQuery'
+import AdminPolicyQuery from '~/graphql/AdminPolicyQuery'
+import PolicySubscription from '~/graphql/PolicySubscription'
+import { setPolicyMutation, resetPolicyMutation } from '~/graphql/PolicyMutations'
 
-// Mirrors backend NetworkPolicy schema (packages/config-schema/policy.schema.json).
-// Defaults match schema defaults — used until the backend snapshot is loaded.
+// Mirrors backend NetworkPolicy schema. Defaults match the schema's "default"
+// fields — used until the backend snapshot is loaded.
 const DEFAULTS = Object.freeze({
   publicRegistration: false,
   inviteRegistration: true,
@@ -12,14 +15,21 @@ const DEFAULTS = Object.freeze({
 export const state = () => ({
   snapshot: { ...DEFAULTS },
   isInitialized: false,
+  subscriptionActive: false,
 })
 
 export const mutations = {
   SET_SNAPSHOT(state, snapshot) {
     state.snapshot = { ...DEFAULTS, ...snapshot }
   },
+  PATCH_KEY(state, { key, value }) {
+    state.snapshot = { ...state.snapshot, [key]: value }
+  },
   SET_INITIALIZED(state, value = true) {
     state.isInitialized = value
+  },
+  SET_SUBSCRIPTION_ACTIVE(state, value) {
+    state.subscriptionActive = value
   },
 }
 
@@ -33,13 +43,17 @@ export const getters = {
   },
 }
 
+const apolloClient = (ctx) => ctx.app.apolloProvider.defaultClient
+
 export const actions = {
   async init({ commit }) {
     try {
-      const client = this.app.apolloProvider.defaultClient
       const {
         data: { publicPolicy },
-      } = await client.query({ query: PolicyQuery(), fetchPolicy: 'network-only' })
+      } = await apolloClient(this).query({
+        query: PolicyQuery(),
+        fetchPolicy: 'network-only',
+      })
       commit('SET_SNAPSHOT', publicPolicy)
       commit('SET_INITIALIZED')
     } catch (err) {
@@ -48,5 +62,62 @@ export const actions = {
       commit('SET_SNAPSHOT', DEFAULTS)
       commit('SET_INITIALIZED', false)
     }
+  },
+
+  async fetchAdmin({ commit }) {
+    const {
+      data: { adminPolicy },
+    } = await apolloClient(this).query({
+      query: AdminPolicyQuery(),
+      fetchPolicy: 'network-only',
+    })
+    commit('SET_SNAPSHOT', adminPolicy)
+    return adminPolicy
+  },
+
+  async setKey({ commit }, { key, value }) {
+    const {
+      data: { setPolicy },
+    } = await apolloClient(this).mutate({
+      mutation: setPolicyMutation(),
+      variables: { key, value: JSON.stringify(value) },
+    })
+    // Local optimistic update — backend pubsub will broadcast to other tabs.
+    commit('PATCH_KEY', { key: setPolicy.key, value: JSON.parse(setPolicy.value) })
+    return setPolicy
+  },
+
+  async resetKey({ commit }, { key }) {
+    const {
+      data: { resetPolicy },
+    } = await apolloClient(this).mutate({
+      mutation: resetPolicyMutation(),
+      variables: { key },
+    })
+    commit('PATCH_KEY', { key: resetPolicy.key, value: JSON.parse(resetPolicy.value) })
+    return resetPolicy
+  },
+
+  // Subscribes once per client to policyChanged. Idempotent — repeated calls
+  // are no-ops. Updates the local snapshot when any backend instance publishes
+  // a change (including this client's own mutation).
+  subscribe({ commit, state }) {
+    if (state.subscriptionActive) return
+    const observable = apolloClient(this).subscribe({ query: PolicySubscription() })
+    observable.subscribe({
+      next({ data }) {
+        const event = data?.policyChanged
+        if (!event) return
+        try {
+          commit('PATCH_KEY', { key: event.key, value: JSON.parse(event.value) })
+        } catch {
+          /* malformed payload — ignore */
+        }
+      },
+      error() {
+        commit('SET_SUBSCRIPTION_ACTIVE', false)
+      },
+    })
+    commit('SET_SUBSCRIPTION_ACTIVE', true)
   },
 }
