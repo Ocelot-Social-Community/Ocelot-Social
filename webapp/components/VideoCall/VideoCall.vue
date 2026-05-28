@@ -567,7 +567,10 @@ export default {
         this.phase = 'in-call'
       } catch (err) {
         this.error = (err && err.message) || String(err)
-        this.phase = 'in-call'
+        // Distinct phase so the header stops pretending there's a live room
+        // (no participant counter, no minimize button, no in-call controls)
+        // while the error block is shown.
+        this.phase = 'error'
       }
     },
     refreshTiles() {
