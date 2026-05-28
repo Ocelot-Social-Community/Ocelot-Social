@@ -1393,6 +1393,8 @@
     "dialogLabel": "Group video call",
     "disableCamera": "Turn camera off",
     "enableCamera": "Turn camera on",
+    "errorBackToPrejoin": "Change settings",
+    "errorRetry": "Retry",
     "errors": {
       "camera": {
         "busy": "The camera is in use by another application.",

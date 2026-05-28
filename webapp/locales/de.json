@@ -1393,6 +1393,8 @@
     "dialogLabel": "Gruppen-Videoanruf",
     "disableCamera": "Kamera ausschalten",
     "enableCamera": "Kamera einschalten",
+    "errorBackToPrejoin": "Einstellungen ändern",
+    "errorRetry": "Erneut versuchen",
     "errors": {
       "camera": {
         "busy": "Die Kamera wird von einer anderen Anwendung verwendet.",

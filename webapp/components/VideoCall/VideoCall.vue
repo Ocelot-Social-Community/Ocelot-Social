@@ -62,7 +62,15 @@
       <pre-join v-if="phase === 'prejoin'" @join="onPreJoinReady" @cancel="leave" />
 
       <div v-else-if="error" class="video-call__error" role="alert">
-        {{ error }}
+        <p class="video-call__error-message">{{ error }}</p>
+        <div class="video-call__error-actions">
+          <os-button variant="primary" appearance="outline" @click="backToPrejoin">
+            {{ $t('videoCall.errorBackToPrejoin') }}
+          </os-button>
+          <os-button variant="primary" @click="retryConnect">
+            {{ $t('videoCall.errorRetry') }}
+          </os-button>
+        </div>
       </div>
 
       <div v-else class="video-call__body">
@@ -735,6 +743,27 @@ export default {
         }
       }
     },
+    async retryConnect() {
+      // Tear down whatever half-initialized room may exist from the failed
+      // attempt so listeners and tracks from the previous try don't leak.
+      if (this.room) {
+        try {
+          await this.room.disconnect()
+        } catch (_e) {
+          /* ignore */
+        }
+        this.room = null
+      }
+      this.tiles = []
+      this.activeSpeakerIds = []
+      this.spotlightKey = null
+      this.error = null
+      await this.connect()
+    },
+    backToPrejoin() {
+      this.error = null
+      this.phase = 'prejoin'
+    },
     async leave() {
       // Capture before close() clears the store.
       const groupId = this.groupId
@@ -1035,6 +1064,19 @@ export default {
 .video-call__error {
   color: $color-danger-inverse;
   background: $color-danger;
+  flex-direction: column;
+  gap: $space-small;
+}
+
+.video-call__error-message {
+  margin: 0;
+}
+
+.video-call__error-actions {
+  display: flex;
+  gap: $space-x-small;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .video-call__controls {
