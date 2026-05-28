@@ -70,5 +70,9 @@ Feature: Video call pre-join
     And I navigate to page "/groups/call-group/call-group"
     When I click on the video-call button
     And I confirm the video-call pre-join dialog
+    # The LiveKit connect call against the synthetic URL takes a moment to
+    # time out; explicitly wait for the error block before interacting with
+    # its buttons so this scenario doesn't race the connect attempt.
+    And I see the video-call error block
     And I click back-to-pre-join from the error block
     Then I see the video-call pre-join dialog
