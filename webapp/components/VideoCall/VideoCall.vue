@@ -842,8 +842,44 @@ export default {
     },
     async cleanup() {
       if (this.room) {
+        // Belt-and-braces: stop every local track ourselves before asking
+        // LiveKit to disconnect. LiveKit's room.disconnect(stopTracks=true)
+        // misses tracks under several real-world conditions (muted at
+        // disconnect time, replaced sources, screen-share remnants), which
+        // leaves the browser's camera / mic recording indicator stuck on
+        // until the user reloads the tab.
         try {
-          await this.room.disconnect()
+          const lp = this.room.localParticipant
+          if (lp) {
+            const pubs = [
+              ...(lp.audioTrackPublications?.values?.() ?? []),
+              ...(lp.videoTrackPublications?.values?.() ?? []),
+            ]
+            for (const pub of pubs) {
+              const track = pub && pub.track
+              if (!track) continue
+              try {
+                track.stop()
+              } catch (_e) {
+                /* noop */
+              }
+              // Some LiveKit versions keep the underlying MediaStreamTrack
+              // around even after track.stop(); stop it directly too.
+              const mediaTrack = track.mediaStreamTrack
+              if (mediaTrack && typeof mediaTrack.stop === 'function') {
+                try {
+                  mediaTrack.stop()
+                } catch (_e) {
+                  /* noop */
+                }
+              }
+            }
+          }
+        } catch (_e) {
+          /* noop */
+        }
+        try {
+          await this.room.disconnect(true)
         } catch (_e) {
           /* ignore */
         }
