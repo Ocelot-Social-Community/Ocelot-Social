@@ -25,6 +25,9 @@ export const mutations = {
     state.groupName = groupName || null
     state.groupSlug = groupSlug || null
     state.groupAvatar = groupAvatar || null
+    // Reset stale count from a previous call so the badge doesn't briefly show
+    // another group's participant number before the query/subscription updates.
+    state.participantCount = 0
   },
   // Update group info post-hoc (e.g. after fetching by ID for a direct URL).
   SET_GROUP_INFO(state, { groupId, groupName, groupSlug, groupAvatar }) {
@@ -41,6 +44,7 @@ export const mutations = {
     state.groupSlug = null
     state.groupAvatar = null
     state.phase = 'idle'
+    state.participantCount = 0
   },
   SET_MINIMIZED(state, minimized) {
     state.minimized = !!minimized
