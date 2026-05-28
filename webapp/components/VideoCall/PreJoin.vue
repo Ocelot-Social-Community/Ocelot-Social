@@ -597,8 +597,14 @@ export default {
       }
     },
     emitJoin() {
-      const micEnabled = this.micActive && this.micStatus === 'granted'
-      const cameraEnabled = this.cameraActive && this.cameraStatus === 'granted'
+      // Browsers without navigator.permissions report 'prompt' as a fallback
+      // even when getUserMedia already worked for the preview. Treat anything
+      // that isn't a hard 'denied'/'unsupported' as usable — matches the
+      // disabled state of the toggle buttons.
+      const micEnabled =
+        this.micActive && this.micStatus !== 'denied' && this.micStatus !== 'unsupported'
+      const cameraEnabled =
+        this.cameraActive && this.cameraStatus !== 'denied' && this.cameraStatus !== 'unsupported'
       const payload = {
         cameraDeviceId: cameraEnabled ? this.selectedCamera : null,
         micDeviceId: micEnabled ? this.selectedMic : null,
