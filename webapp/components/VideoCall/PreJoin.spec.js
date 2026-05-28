@@ -289,14 +289,21 @@ describe('PreJoin', () => {
 
   describe('refreshPermissionStatus', () => {
     it('falls back to prompt when permissions API is missing', async () => {
+      // mountWith() installs a rejecting permissions mock; override it AFTER
+      // mount so refreshPermissionStatus actually sees the missing API.
+      const { wrapper } = mountWith()
+      const original = Object.getOwnPropertyDescriptor(global.navigator, 'permissions')
       Object.defineProperty(global.navigator, 'permissions', {
         value: undefined,
         configurable: true,
       })
-      const { wrapper } = mountWith()
-      await wrapper.vm.refreshPermissionStatus()
-      expect(wrapper.vm.cameraStatus).toBe('prompt')
-      expect(wrapper.vm.micStatus).toBe('prompt')
+      try {
+        await wrapper.vm.refreshPermissionStatus()
+        expect(wrapper.vm.cameraStatus).toBe('prompt')
+        expect(wrapper.vm.micStatus).toBe('prompt')
+      } finally {
+        if (original) Object.defineProperty(global.navigator, 'permissions', original)
+      }
     })
 
     it('reads granted status when the Permissions API is available', async () => {
