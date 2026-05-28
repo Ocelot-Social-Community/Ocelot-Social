@@ -351,10 +351,14 @@ export default {
         this.cameras = devices.filter((d) => d.kind === 'videoinput')
         this.mics = devices.filter((d) => d.kind === 'audioinput')
         this.speakers = devices.filter((d) => d.kind === 'audiooutput')
-        if (!this.selectedCamera && this.cameras[0]) this.selectedCamera = this.cameras[0].deviceId
-        if (!this.selectedMic && this.mics[0]) this.selectedMic = this.mics[0].deviceId
-        if (!this.selectedSpeaker && this.speakers[0])
-          this.selectedSpeaker = this.speakers[0].deviceId
+        // Drop selections that point at devices that have been unplugged —
+        // otherwise getUserMedia({ deviceId: { exact: staleId } }) raises
+        // OverconstrainedError on the next acquireStream().
+        const pick = (list, current) =>
+          list.some((d) => d.deviceId === current) ? current : list[0]?.deviceId || ''
+        this.selectedCamera = pick(this.cameras, this.selectedCamera)
+        this.selectedMic = pick(this.mics, this.selectedMic)
+        this.selectedSpeaker = pick(this.speakers, this.selectedSpeaker)
       } catch (_e) {
         /* noop */
       }
