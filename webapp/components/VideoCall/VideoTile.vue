@@ -122,10 +122,6 @@ export default {
       this.applySinkId()
     },
   },
-  mounted() {
-    this.attachVideo()
-    this.attachAudio()
-  },
   beforeDestroy() {
     this.detachAll()
   },
