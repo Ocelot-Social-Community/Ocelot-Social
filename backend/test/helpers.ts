@@ -98,6 +98,7 @@ export const createApolloTestSetup = async (opts?: CreateTestServerOptions) => {
   const { server } = await createServer({
     context: contextFn,
     plugins,
+    skipLiveKitBoot: true,
   })
 
   const query = async (queryOpts: { query: DocumentNode | string; variables?: any }) => {

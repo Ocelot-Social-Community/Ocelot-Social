@@ -29,17 +29,11 @@ const publishCount = async (
 }
 
 export const registerLiveKitWebhook = (app: Express) => {
-  if (!CONFIG.LIVEKIT_ENABLED) {
-    logger.info('LiveKit disabled — webhook endpoint not registered.')
-    return
-  }
+  if (!CONFIG.LIVEKIT_ENABLED) return
   const livekitUrl = CONFIG.LIVEKIT_URL
   const apiKey = CONFIG.LIVEKIT_API_KEY
   const apiSecret = CONFIG.LIVEKIT_API_SECRET
-  if (!livekitUrl || !apiKey || !apiSecret) {
-    logger.info('LiveKit env vars incomplete — webhook endpoint not registered.')
-    return
-  }
+  if (!livekitUrl || !apiKey || !apiSecret) return
 
   const receiver = new WebhookReceiver(apiKey, apiSecret)
 

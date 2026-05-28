@@ -103,18 +103,12 @@ const runTick = async () => {
 }
 
 export const startLiveKitPoller = () => {
-  if (!CONFIG.LIVEKIT_ENABLED) {
-    logger.info('LiveKit disabled — poller not started.')
-    return
-  }
+  if (!CONFIG.LIVEKIT_ENABLED) return
   if (pollTimer) return
   const livekitUrl = CONFIG.LIVEKIT_URL
   const apiKey = CONFIG.LIVEKIT_API_KEY
   const apiSecret = CONFIG.LIVEKIT_API_SECRET
-  if (!livekitUrl || !apiKey || !apiSecret) {
-    logger.info('LiveKit env vars incomplete — poller not started.')
-    return
-  }
+  if (!livekitUrl || !apiKey || !apiSecret) return
   client = new RoomServiceClient(httpUrlFor(livekitUrl), apiKey, apiSecret)
   logger.info(`LiveKit poller starting (every ${(POLL_INTERVAL_MS / 1000).toString()}s).`)
   // First run a bit later so server startup isn't blocked. Tracked so a
