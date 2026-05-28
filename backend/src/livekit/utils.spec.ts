@@ -23,7 +23,9 @@ describe('withTimeout', () => {
     try {
       const value = await withTimeout(Promise.resolve('done'), 60_000, 'fast')
       expect(value).toBe('done')
-      const ourTimer = setSpy.mock.results[setSpy.mock.results.length - 1].value
+      const ourTimer = setSpy.mock.results[setSpy.mock.results.length - 1].value as ReturnType<
+        typeof setTimeout
+      >
       expect(clearSpy).toHaveBeenCalledWith(ourTimer)
     } finally {
       setSpy.mockRestore()
@@ -38,7 +40,9 @@ describe('withTimeout', () => {
       await expect(withTimeout(Promise.reject(new Error('boom')), 60_000, 'fast')).rejects.toThrow(
         'boom',
       )
-      const ourTimer = setSpy.mock.results[setSpy.mock.results.length - 1].value
+      const ourTimer = setSpy.mock.results[setSpy.mock.results.length - 1].value as ReturnType<
+        typeof setTimeout
+      >
       expect(clearSpy).toHaveBeenCalledWith(ourTimer)
     } finally {
       setSpy.mockRestore()
