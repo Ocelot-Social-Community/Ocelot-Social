@@ -50,7 +50,7 @@ export default {
         }
       },
     },
-    $route(to, from) {
+    async $route(to, from) {
       // Handle navigating from one call URL to another (different group) while
       // already on the call page — Vue Router reuses the component, so the
       // immediate-watcher above does not refire.
@@ -60,7 +60,14 @@ export default {
       if (!id || !slug) return
       if (this.showVideoCall && this.activeGroupId === id) {
         this.setMinimized(false)
-      } else if (!this.showVideoCall) {
+      } else if (this.showVideoCall && this.activeGroupId !== id) {
+        // Switching to a different group's call: tear the old call down so
+        // VideoCall's `show` watcher disconnects the LiveKit room, then open
+        // the new one on the next tick so the open transition is observed.
+        this.closeVideoCall()
+        await this.$nextTick()
+        this.openVideoCall({ groupId: id, groupSlug: slug, groupName: null })
+      } else {
         this.openVideoCall({ groupId: id, groupSlug: slug, groupName: null })
       }
     },
@@ -69,6 +76,7 @@ export default {
     ...mapMutations({
       setMinimized: 'videoCall/SET_MINIMIZED',
       openVideoCall: 'videoCall/OPEN',
+      closeVideoCall: 'videoCall/CLOSE',
       setGroupInfo: 'videoCall/SET_GROUP_INFO',
     }),
   },
