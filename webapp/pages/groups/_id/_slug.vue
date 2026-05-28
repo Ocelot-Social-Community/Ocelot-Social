@@ -112,7 +112,7 @@
               @click="openGroupVideoCall(group.id)"
             >
               <template #icon>
-                <os-counter-icon :icon="icons.videoCamera" :count="videoCallParticipantCountLive" />
+                <os-counter-icon :icon="icons.videoCamera" :count="videoCallParticipantCount" />
               </template>
               {{ $t('videoCall.groupVideoCallButton.label') }}
             </os-button>
@@ -440,9 +440,6 @@ export default {
         this.group &&
         this.group.groupType === 'public'
       )
-    },
-    videoCallParticipantCountLive() {
-      return this.videoCallParticipantCount || 0
     },
     groupName() {
       const { name } = this.group || {}
