@@ -406,7 +406,10 @@ export default {
       this.$nextTick(() => {
         const v = this.$refs.previewEl
         if (v) v.srcObject = stream
-        if (wantAudio) this.startMeter(stream)
+        // Drive the meter from the actual track shape, not the initial intent —
+        // covers the audio-only fallback above and any future code path that
+        // produces a different stream than what was requested.
+        if (stream.getAudioTracks().length) this.startMeter(stream)
       })
     },
     stopStream() {
