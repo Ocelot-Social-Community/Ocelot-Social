@@ -11,6 +11,7 @@ import { AccessToken, RoomServiceClient, TwirpError } from 'livekit-server-sdk'
 
 import { VIDEO_CALL_PARTICIPANT_COUNT_CHANGED } from '@constants/subscriptions'
 import { ForbiddenError } from '@graphql/errors'
+import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
 
 import type { Driver } from 'neo4j-driver'
@@ -113,18 +114,6 @@ const getUserAvatarUrl = async (driver: Driver, userId: string): Promise<string 
 }
 
 const LIVEKIT_API_TIMEOUT_MS = 4000
-
-const withTimeout = async <T>(promise: Promise<T>, ms: number, label: string): Promise<T> =>
-  Promise.race([
-    promise,
-    // eslint-disable-next-line promise/avoid-new
-    new Promise<T>((_resolve, reject) => {
-      const timer = setTimeout(() => {
-        reject(new Error(`${label} timed out after ${ms.toString()}ms`))
-      }, ms)
-      if (typeof timer.unref === 'function') timer.unref()
-    }),
-  ])
 
 export const getLiveParticipantCount = async (
   config: { LIVEKIT_URL: string; LIVEKIT_API_KEY: string; LIVEKIT_API_SECRET: string },

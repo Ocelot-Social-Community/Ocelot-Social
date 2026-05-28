@@ -16,6 +16,7 @@ import CONFIG from '@src/config'
 import { VIDEO_CALL_PARTICIPANT_COUNT_CHANGED } from '@src/constants/subscriptions'
 import { serverPubsub } from '@src/context'
 import { groupIdFromRoomName } from '@src/graphql/resolvers/videoCalls'
+import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
 
 const POLL_INTERVAL_MS = 15_000
@@ -34,18 +35,6 @@ let polling = false
 let consecutiveFailures = 0
 let client: RoomServiceClient | null = null
 const lastSeenCounts = new Map<string, number>()
-
-const withTimeout = async <T>(promise: Promise<T>, ms: number, label: string): Promise<T> =>
-  Promise.race([
-    promise,
-    // eslint-disable-next-line promise/avoid-new
-    new Promise<T>((_resolve, reject) => {
-      const timer = setTimeout(() => {
-        reject(new Error(`${label} timed out after ${ms.toString()}ms`))
-      }, ms)
-      if (typeof timer.unref === 'function') timer.unref()
-    }),
-  ])
 
 const pollOnce = async () => {
   if (!CONFIG.LIVEKIT_ENABLED) return
