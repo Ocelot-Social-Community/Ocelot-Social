@@ -583,7 +583,7 @@ export default {
         // store — otherwise the call page's watcher would immediately re-open
         // the prejoin popover for the same group.
         room.on(RoomEvent.Disconnected, () => {
-          void this.leave()
+          this.leave()
         })
 
         await room.connect(payload.url, payload.token)
