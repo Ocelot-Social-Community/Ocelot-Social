@@ -517,13 +517,17 @@ export default {
     async playTestTone() {
       if (this.testingTone) return
       this.testingTone = true
+      const AC = window.AudioContext || window.webkitAudioContext
+      if (!AC) {
+        this.testingTone = false
+        return
+      }
+      // Declared outside the try so the outer catch can close it on any
+      // failure between creation and oscillator.onended — otherwise each
+      // failed test tone leaks an AudioContext (browsers cap at ~6).
+      let ctx = null
       try {
-        const AC = window.AudioContext || window.webkitAudioContext
-        if (!AC) {
-          this.testingTone = false
-          return
-        }
-        const ctx = new AC()
+        ctx = new AC()
         if (ctx.state === 'suspended') {
           try {
             await ctx.resume()
@@ -597,6 +601,13 @@ export default {
           this.testingTone = false
         }
       } catch (_e) {
+        if (ctx) {
+          try {
+            await ctx.close()
+          } catch (_closeErr) {
+            /* noop */
+          }
+        }
         this.testingTone = false
       }
     },
