@@ -221,11 +221,20 @@ describe('videoCallParticipantCount', () => {
     listParticipantsMock.mockRejectedValueOnce(
       new TwirpError('Internal', 'upstream boom', 500, 'internal'),
     )
-    const { errors } = await query({
+    const { data, errors } = await query({
       query: VideoCallParticipantCount,
       variables: { groupId: 'pub-1' },
     })
-    expect(errors).toBeDefined()
+    // The error must originate from our LiveKit listParticipants call, not
+    // from an unrelated path (auth/feature-flag/group-type). Assert on the
+    // underlying TwirpError message + an empty data payload so we never
+    // accept a different error class as a passing test.
+    expect(errors).toHaveLength(1)
+    expect(errors?.[0].message).toMatch(/upstream boom/i)
+    // No participant count was returned — the field failed instead of
+    // silently degrading to 0.
+    expect(data?.videoCallParticipantCount).toBeFalsy()
+    expect(listParticipantsMock).toHaveBeenCalledWith('group-pub-1')
   })
 })
 
