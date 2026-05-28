@@ -12,7 +12,7 @@
     :tabindex="clickable ? 0 : null"
     @click="onSelect"
     @keydown.enter="onSelect"
-    @keydown.space.prevent="onSelect"
+    @keydown.space="onSpaceKey"
   >
     <video v-show="hasVideo" ref="videoEl" autoplay playsinline :muted="tile.isLocal" />
     <audio v-if="!tile.isLocal" ref="audioEl" autoplay />
@@ -129,6 +129,14 @@ export default {
     onSelect() {
       if (!this.clickable) return
       this.$emit('select', this.tile)
+    },
+    onSpaceKey(event) {
+      // Only swallow Space (preventing page scroll) when the tile is actually
+      // acting as a button — otherwise Space should behave normally for a
+      // focused but non-interactive element.
+      if (!this.clickable) return
+      event.preventDefault()
+      this.onSelect()
     },
     async applySinkId() {
       const el = this.$refs.audioEl
