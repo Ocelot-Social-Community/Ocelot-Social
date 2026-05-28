@@ -393,11 +393,14 @@ export default {
   watch: {
     show: {
       immediate: true,
-      handler(open) {
+      handler(open, wasOpen) {
         if (open) {
           this.phase = 'prejoin'
           this.error = null
-        } else {
+        } else if (wasOpen) {
+          // Only tear down if we were actually open before — on the initial
+          // mount with show=false there is nothing to clean up, and the
+          // resulting phase='prejoin' would clobber the store's 'idle' default.
           this.cleanup()
         }
       },
