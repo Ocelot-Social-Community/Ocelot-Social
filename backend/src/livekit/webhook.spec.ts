@@ -38,9 +38,25 @@ jest.mock('@src/graphql/resolvers/videoCalls', () => ({
 }))
 
 const mockLogger = { info: jest.fn(), warn: jest.fn(), error: jest.fn() }
-jest.mock('@src/logger', () => ({ __esModule: true, default: mockLogger }))
+// jest.mock factories are hoisted above the const/let declarations they
+// reference, so `default: mockLogger` / `default: mockConfig` would read a
+// TDZ-locked binding when webhook.ts is required. Expose them through
+// getters so the binding is only read when the consuming code actually
+// touches the imported default — by which time the test file has finished
+// initializing.
+jest.mock('@src/logger', () => ({
+  __esModule: true,
+  get default() {
+    return mockLogger
+  },
+}))
 
-jest.mock('@src/config', () => ({ __esModule: true, default: mockConfig }))
+jest.mock('@src/config', () => ({
+  __esModule: true,
+  get default() {
+    return mockConfig
+  },
+}))
 
 type CapturedHandler = (req: any, res: any) => void
 
