@@ -597,7 +597,17 @@ export default {
           this.leave()
         })
 
-        await room.connect(payload.url, payload.token)
+        // LiveKit defaults to a 15 s WebSocket + 15 s peer-connection timeout
+        // plus retries — that's a long time to leave the user staring at
+        // "Connecting…" when the URL is unreachable, and it explodes the
+        // Cypress error-path scenario well beyond the per-step wait budget.
+        // Cap both at 5 s so a misconfigured / unreachable LiveKit instance
+        // surfaces the error block quickly.
+        await room.connect(payload.url, payload.token, {
+          websocketTimeout: 5000,
+          peerConnectionTimeout: 5000,
+          maxRetries: 0,
+        })
         if (this.micEnabled) {
           await room.localParticipant.setMicrophoneEnabled(true)
         }

@@ -68,10 +68,16 @@ async function setupNodeEvents(on, config) {
   // outright in headless mode. Tier B (Fake-Devices) of the video-call e2e
   // strategy depends on this; without it PreJoin lands in the
   // "errorDenied"/"errorNoDevice" branch and we can't exercise the happy path.
+  //
+  // Note: Electron (Cypress' default browser) **does not honor
+  // launchOptions.args** and prints "browser launch options ... not
+  // supported by electron". The chrome/chromium browsers do honor them —
+  // so this hook still earns its keep when the spec is run with
+  // `--browser chrome` locally or in CI. For the bundled Electron run,
+  // permissions are auto-granted by Cypress, so we tolerate the case
+  // where the test gracefully falls into the "prompt" status path.
   on('before:browser:launch', (browser = {}, launchOptions) => {
-    if (browser.family === 'chromium') {
-      // Works for both `chrome`/`chromium` AND the bundled Electron runner —
-      // Cypress threads these args through to Electron's command line.
+    if (browser.family === 'chromium' && browser.name !== 'electron') {
       launchOptions.args.push('--use-fake-ui-for-media-stream')
       launchOptions.args.push('--use-fake-device-for-media-stream')
       // Headless Chromium needs --autoplay-policy=no-user-gesture-required so
