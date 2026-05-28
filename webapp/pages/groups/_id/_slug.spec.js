@@ -42,15 +42,22 @@ describe('GroupProfileSlug', () => {
     'auth/isModerator': () => false,
     'categories/categoriesActive': () => true,
     'categories/categories': () => [{ id: 'cat1' }],
+    'videoCall/enabled': () => false,
   }
 
   const actions = {
     'categories/init': jest.fn(),
   }
 
+  const mutations = {
+    'chat/SET_OPEN_CHAT': jest.fn(),
+    'videoCall/OPEN': jest.fn(),
+  }
+
   const store = new Vuex.Store({
     getters,
     actions,
+    mutations,
   })
 
   beforeEach(() => {
