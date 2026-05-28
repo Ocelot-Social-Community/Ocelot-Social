@@ -525,6 +525,7 @@ export default {
     },
     canShowVideoCallButton(can) {
       if (can) this.setupVideoCallCountSubscription()
+      else this.teardownVideoCallCountSubscription()
     },
   },
   methods: {
@@ -553,6 +554,11 @@ export default {
           console.error('videoCallParticipantCountChanged subscription error:', err)
         },
       })
+    },
+    teardownVideoCallCountSubscription() {
+      this._videoCallCountSub?.unsubscribe()
+      this._videoCallCountSub = null
+      this.videoCallParticipantCount = 0
     },
     openGroupVideoCall(groupId) {
       this.openVideoCall({
