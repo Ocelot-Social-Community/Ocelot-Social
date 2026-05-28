@@ -717,6 +717,10 @@ export default {
         await this.room.localParticipant.setMicrophoneEnabled(next)
         this.micEnabled = next
       } catch (err) {
+        // Re-sync from LiveKit — a partial failure (track published, then
+        // permission revoked) can leave the real state out of sync with what
+        // we'd otherwise leave in `this.micEnabled`.
+        this.micEnabled = !!this.room.localParticipant.isMicrophoneEnabled
         this.showDeviceErrorToast('mic', err)
       }
     },
@@ -728,6 +732,8 @@ export default {
         this.cameraEnabled = next
         this.refreshTiles()
       } catch (err) {
+        this.cameraEnabled = !!this.room.localParticipant.isCameraEnabled
+        this.refreshTiles()
         this.showDeviceErrorToast('camera', err)
       }
     },
@@ -739,6 +745,8 @@ export default {
         this.screenShareEnabled = next
         this.refreshTiles()
       } catch (err) {
+        this.screenShareEnabled = !!this.room.localParticipant.isScreenShareEnabled
+        this.refreshTiles()
         // NotAllowedError on screen-share usually means the user dismissed the
         // OS picker — that's not worth a toast. Surface anything else.
         if (err && err.name !== 'NotAllowedError') {
