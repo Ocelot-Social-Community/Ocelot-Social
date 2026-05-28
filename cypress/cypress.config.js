@@ -62,7 +62,25 @@ async function setupNodeEvents(on, config) {
       return testStore[name]
     },
   });
-  
+
+  // Chromium-family browser flags so PreJoin's getUserMedia/enumerateDevices
+  // resolve against synthetic fake devices instead of prompting or failing
+  // outright in headless mode. Tier B (Fake-Devices) of the video-call e2e
+  // strategy depends on this; without it PreJoin lands in the
+  // "errorDenied"/"errorNoDevice" branch and we can't exercise the happy path.
+  on('before:browser:launch', (browser = {}, launchOptions) => {
+    if (browser.family === 'chromium') {
+      // Works for both `chrome`/`chromium` AND the bundled Electron runner —
+      // Cypress threads these args through to Electron's command line.
+      launchOptions.args.push('--use-fake-ui-for-media-stream')
+      launchOptions.args.push('--use-fake-device-for-media-stream')
+      // Headless Chromium needs --autoplay-policy=no-user-gesture-required so
+      // PreJoin's AudioContext can resume without a synthetic user gesture.
+      launchOptions.args.push('--autoplay-policy=no-user-gesture-required')
+    }
+    return launchOptions
+  })
+
   return config;
 }
 

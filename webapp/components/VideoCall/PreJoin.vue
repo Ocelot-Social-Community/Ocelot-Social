@@ -108,6 +108,7 @@
 
       <div class="prejoin__device-toggles">
         <os-button
+          data-test="prejoin-mic-toggle"
           :variant="micActive ? 'primary' : 'default'"
           appearance="outline"
           :disabled="micStatus === 'denied' || micStatus === 'unsupported'"
@@ -120,6 +121,7 @@
           {{ micActive ? $t('videoCall.prejoin.micOn') : $t('videoCall.prejoin.micOff') }}
         </os-button>
         <os-button
+          data-test="prejoin-camera-toggle"
           :variant="cameraActive ? 'primary' : 'default'"
           appearance="outline"
           :disabled="cameraStatus === 'denied' || cameraStatus === 'unsupported'"
@@ -136,11 +138,16 @@
       </p>
 
       <div class="prejoin__actions">
-        <os-button variant="primary" appearance="outline" @click="$emit('cancel')">
+        <os-button
+          data-test="prejoin-cancel"
+          variant="primary"
+          appearance="outline"
+          @click="$emit('cancel')"
+        >
           <template #icon><os-icon :icon="icons.close" /></template>
           {{ $t('videoCall.prejoin.cancel') }}
         </os-button>
-        <os-button variant="primary" @click="emitJoin">
+        <os-button data-test="prejoin-join" variant="primary" @click="emitJoin">
           <template #icon><os-icon :icon="icons.phone" /></template>
           {{ $t('videoCall.prejoin.join') }}
         </os-button>

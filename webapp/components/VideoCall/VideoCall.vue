@@ -61,13 +61,18 @@
 
       <pre-join v-if="phase === 'prejoin'" @join="onPreJoinReady" @cancel="leave" />
 
-      <div v-else-if="error" class="video-call__error" role="alert">
+      <div v-else-if="error" data-test="video-call-error" class="video-call__error" role="alert">
         <p class="video-call__error-message">{{ error }}</p>
         <div class="video-call__error-actions">
-          <os-button variant="primary" appearance="outline" @click="backToPrejoin">
+          <os-button
+            data-test="video-call-back-to-prejoin"
+            variant="primary"
+            appearance="outline"
+            @click="backToPrejoin"
+          >
             {{ $t('videoCall.errorBackToPrejoin') }}
           </os-button>
-          <os-button variant="primary" @click="retryConnect">
+          <os-button data-test="video-call-retry" variant="primary" @click="retryConnect">
             {{ $t('videoCall.errorRetry') }}
           </os-button>
         </div>
