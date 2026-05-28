@@ -536,7 +536,7 @@ export default {
         if (!payload) throw new Error('No token returned')
 
         const livekit = await import('livekit-client')
-        const { Room, RoomEvent, Track } = livekit
+        const { Room, RoomEvent, Track, DisconnectReason } = livekit
         this.Track = Track
 
         const room = new Room({
@@ -587,7 +587,13 @@ export default {
         // Leave button so we navigate away from /call/... before clearing the
         // store — otherwise the call page's watcher would immediately re-open
         // the prejoin popover for the same group.
-        room.on(RoomEvent.Disconnected, () => {
+        //
+        // LiveKit also fires Disconnected when WE call room.disconnect()
+        // (e.g. retryConnect()'s teardown, leave()'s cleanup). Skip those —
+        // the caller already drives the next step and a re-entrant leave()
+        // would clobber the retry/leave flow.
+        room.on(RoomEvent.Disconnected, (reason) => {
+          if (reason === DisconnectReason.CLIENT_INITIATED) return
           this.leave()
         })
 
