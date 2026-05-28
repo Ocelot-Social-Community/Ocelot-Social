@@ -31,6 +31,7 @@ const httpUrlFor = (livekitUrl: string) =>
 let pollTimer: ReturnType<typeof setInterval> | null = null
 let polling = false
 let consecutiveFailures = 0
+let client: RoomServiceClient | null = null
 const lastSeenCounts = new Map<string, number>()
 
 const withTimeout = async <T>(promise: Promise<T>, ms: number, label: string): Promise<T> =>
@@ -50,15 +51,11 @@ const pollOnce = async () => {
   // Skip if the previous tick is still in flight — prevents pile-up of
   // pending HTTP requests when LiveKit is slow or unreachable.
   if (polling) return
-  // Narrow the optional config values into locals — we already checked
-  // LIVEKIT_ENABLED above which guarantees they are defined.
-  const livekitUrl = CONFIG.LIVEKIT_URL
-  const apiKey = CONFIG.LIVEKIT_API_KEY
-  const apiSecret = CONFIG.LIVEKIT_API_SECRET
-  if (!livekitUrl || !apiKey || !apiSecret) return
+  // Client is created once in startLiveKitPoller() — bail out cleanly if the
+  // poller wasn't started (e.g. direct unit-test invocation).
+  if (!client) return
   polling = true
   try {
-    const client = new RoomServiceClient(httpUrlFor(livekitUrl), apiKey, apiSecret)
     let rooms
     try {
       rooms = await withTimeout(client.listRooms(), POLL_TIMEOUT_MS, 'listRooms')
@@ -119,6 +116,14 @@ export const startLiveKitPoller = () => {
     return
   }
   if (pollTimer) return
+  const livekitUrl = CONFIG.LIVEKIT_URL
+  const apiKey = CONFIG.LIVEKIT_API_KEY
+  const apiSecret = CONFIG.LIVEKIT_API_SECRET
+  if (!livekitUrl || !apiKey || !apiSecret) {
+    logger.info('LiveKit env vars incomplete — poller not started.')
+    return
+  }
+  client = new RoomServiceClient(httpUrlFor(livekitUrl), apiKey, apiSecret)
   logger.info(`LiveKit poller starting (every ${(POLL_INTERVAL_MS / 1000).toString()}s).`)
   // First run a bit later so server startup isn't blocked.
   setTimeout(() => {
@@ -135,5 +140,6 @@ export const stopLiveKitPoller = () => {
     clearInterval(pollTimer)
     pollTimer = null
   }
+  client = null
   lastSeenCounts.clear()
 }
