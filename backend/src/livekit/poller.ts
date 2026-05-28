@@ -85,15 +85,17 @@ const pollOnce = async () => {
     }
     // Rooms that disappeared from LiveKit's list since the last poll — emit a
     // final count: 0 so the badge clears even if the webhook room_finished
-    // event never made it to us.
+    // event never made it to us, then drop the entry so the map doesn't grow
+    // unbounded across long-lived servers with many short-lived rooms.
     for (const [roomName, lastCount] of lastSeenCounts) {
-      if (!seen.has(roomName) && lastCount > 0) {
-        lastSeenCounts.set(roomName, 0)
+      if (seen.has(roomName)) continue
+      if (lastCount > 0) {
         const groupId = groupIdFromRoomName(roomName)
         if (groupId) {
           await serverPubsub.publish(VIDEO_CALL_PARTICIPANT_COUNT_CHANGED, { groupId, count: 0 })
         }
       }
+      lastSeenCounts.delete(roomName)
     }
   } finally {
     polling = false
