@@ -11,6 +11,7 @@
     <a
       :href="`https://github.com/Ocelot-Social-Community/Ocelot-Social/releases/tag/${releaseTag}`"
       target="_blank"
+      rel="noopener noreferrer"
       data-test="version-link"
     >
       {{ version }}
