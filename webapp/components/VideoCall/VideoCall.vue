@@ -896,7 +896,16 @@ export default {
       this.micEnabled = true
       this.cameraEnabled = true
       this.screenShareEnabled = false
-      this.phase = 'prejoin'
+      // CRITICAL: do NOT set phase = 'prejoin' here. leave() runs cleanup()
+      // BEFORE close(), so the Vuex `show` flag is still true when cleanup
+      // finishes. A prejoin phase would make the template re-mount <pre-join>
+      // in the lingering window — and PreJoin's mounted() immediately calls
+      // initDevices() → getUserMedia(), turning the camera back on right
+      // after we just stopped it. Reset to 'idle' so nothing renders during
+      // the brief gap between cleanup() and close(); the `show` watcher will
+      // set phase back to 'prejoin' the next time the dialog opens.
+      this.phase = 'idle'
+      this.error = null
     },
   },
 }

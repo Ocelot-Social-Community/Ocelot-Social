@@ -420,6 +420,7 @@ describe('VideoCall', () => {
         cameraEnabled: false,
         screenShareEnabled: true,
       })
+      wrapper.setData({ error: 'old error' })
       await wrapper.vm.cleanup()
       expect(room.disconnect).toHaveBeenCalled()
       expect(wrapper.vm.room).toBeNull()
@@ -429,7 +430,12 @@ describe('VideoCall', () => {
       expect(wrapper.vm.micEnabled).toBe(true)
       expect(wrapper.vm.cameraEnabled).toBe(true)
       expect(wrapper.vm.screenShareEnabled).toBe(false)
-      expect(wrapper.vm.phase).toBe('prejoin')
+      // cleanup() now parks the dialog in 'idle' instead of 'prejoin' so the
+      // template can't briefly re-mount <pre-join> (which would re-acquire
+      // camera/mic via initDevices() right after we just stopped them).
+      // The show watcher sets phase back to 'prejoin' on the next open.
+      expect(wrapper.vm.phase).toBe('idle')
+      expect(wrapper.vm.error).toBeNull()
     })
 
     it('is safe when no room exists', async () => {
