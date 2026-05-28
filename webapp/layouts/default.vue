@@ -117,6 +117,10 @@ export default {
           this.setVideoCallEnabled(data.videoCallConfig.enabled)
         }
       },
+      error(err) {
+        // eslint-disable-next-line no-console
+        console.warn('videoCallConfig query failed:', err)
+      },
       fetchPolicy: 'cache-first',
     },
   },
