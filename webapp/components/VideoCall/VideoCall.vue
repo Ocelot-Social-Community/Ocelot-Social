@@ -555,7 +555,20 @@ export default {
         // changes so the avatar updates without a reconnect.
         room.on(RoomEvent.ParticipantMetadataChanged, onAny)
         room.on(RoomEvent.ActiveSpeakersChanged, (speakers) => {
-          this.activeSpeakerIds = (speakers || []).map((p) => p.identity)
+          // LiveKit fires this potentially many times per second; throttle so
+          // we don't re-render every tile on every micro-change. Trailing-only
+          // is fine — the latest array always wins.
+          this._pendingActiveSpeakers = (speakers || []).map((p) => p.identity)
+          if (this._activeSpeakersTimer) return
+          this._activeSpeakersTimer = setTimeout(() => {
+            this._activeSpeakersTimer = null
+            const next = this._pendingActiveSpeakers
+            if (!next) return
+            this._pendingActiveSpeakers = null
+            const prev = this.activeSpeakerIds
+            if (prev.length === next.length && prev.every((id, i) => id === next[i])) return
+            this.activeSpeakerIds = next
+          }, 200)
         })
         room.on(RoomEvent.LocalTrackPublished, () => {
           this.screenShareEnabled = !!room.localParticipant.isScreenShareEnabled
@@ -804,6 +817,11 @@ export default {
         }
         this.room = null
       }
+      if (this._activeSpeakersTimer) {
+        clearTimeout(this._activeSpeakersTimer)
+        this._activeSpeakersTimer = null
+      }
+      this._pendingActiveSpeakers = null
       this.tiles = []
       this.activeSpeakerIds = []
       this.spotlightKey = null
