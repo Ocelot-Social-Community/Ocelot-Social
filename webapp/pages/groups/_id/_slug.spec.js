@@ -768,5 +768,54 @@ describe('GroupProfileSlug', () => {
         groupAvatar: group.avatar,
       })
     })
+
+    // Regression guard: even with the "happy" combination (public group,
+    // confirmed member, peter-lustig logged in) the button must stay hidden
+    // when the feature flag is off. The other test scenarios in this file
+    // (e.g. snapshot tests for various roles) all run with the default
+    // store where videoCall/enabled is false; this case asserts the gate
+    // explicitly so it can't be silently removed.
+    it('hides the video-call button when videoCall/enabled is false (feature-flag off)', () => {
+      openVideoCallMock = jest.fn()
+      currentUserMock.mockReturnValue(peterLustig)
+      const disabledStore = new Vuex.Store({
+        getters: {
+          ...getters,
+          'videoCall/enabled': () => false,
+        },
+        actions,
+        mutations: {
+          ...mutations,
+          'videoCall/OPEN': openVideoCallMock,
+        },
+      })
+      const wrapper = mount(GroupProfileSlug, {
+        localVue,
+        store: disabledStore,
+        stubs: {
+          ...stubs,
+          'infinite-loading': true,
+          'masonry-grid': true,
+          'masonry-grid-item': true,
+          'post-teaser': true,
+          'content-viewer': true,
+          OsCounterIcon: { props: ['icon', 'count'], template: '<i class="stub-counter-icon" />' },
+          OsIcon: { props: ['icon'], template: '<i class="stub-icon" />' },
+        },
+        mocks: {
+          ...mocks,
+          $apollo: {
+            loading: false,
+            mutate: jest.fn().mockResolvedValue(),
+            subscribe: jest.fn().mockReturnValue({
+              subscribe: jest.fn().mockReturnValue({ unsubscribe: jest.fn() }),
+            }),
+            queries: { chatRoom: { refetch: jest.fn() } },
+          },
+        },
+        data: () => ({ group: { ...yogaPractice, myRole: 'usual' }, GroupMembers: [] }),
+      })
+      expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(false)
+    })
   })
 })
