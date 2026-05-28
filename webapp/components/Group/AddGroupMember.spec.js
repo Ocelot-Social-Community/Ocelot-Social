@@ -36,7 +36,10 @@ const OsModalStub = {
 }
 
 const baseStubs = {
-  OsButton: Stub('OsButton', { template: '<button class="stub-button" @click="$emit(\'click\')"><slot name="icon" /><slot /></button>' }),
+  OsButton: Stub('OsButton', {
+    template:
+      '<button class="stub-button" @click="$emit(\'click\')"><slot name="icon" /><slot /></button>',
+  }),
   OsIcon: Stub('OsIcon'),
   OsModal: OsModalStub,
   SelectUserSearch: SelectUserSearchStub,
