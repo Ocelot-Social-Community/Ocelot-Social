@@ -203,6 +203,12 @@ export default {
   },
   created() {
     this.icons = iconRegistry
+    // Non-reactive scratch state. Vue 2 reserves `_`/`$` prefixed properties
+    // and doesn't proxy them onto the instance, so initialize them here under
+    // plain names to follow the project's convention (see `this.icons`).
+    this.permListeners = null
+    this.audioCtx = null
+    this.meterRaf = null
   },
   async mounted() {
     await this.initDevices()
@@ -265,9 +271,9 @@ export default {
     },
     attachPermissionListener(kind, status) {
       if (!status) return
-      if (!this._permListeners) this._permListeners = {}
+      if (!this.permListeners) this.permListeners = {}
       // Already listening on this PermissionStatus — nothing to do.
-      if (this._permListeners[kind] && this._permListeners[kind].status === status) return
+      if (this.permListeners[kind] && this.permListeners[kind].status === status) return
       // Detach previous listener (PermissionStatus instance may change on query).
       this.detachPermissionListener(kind)
       const handler = () => this.onPermissionChange(kind, status.state)
@@ -276,24 +282,24 @@ export default {
       } catch (_e) {
         return
       }
-      this._permListeners[kind] = { status, handler }
+      this.permListeners[kind] = { status, handler }
     },
     detachPermissionListener(kind) {
-      const entry = this._permListeners && this._permListeners[kind]
+      const entry = this.permListeners && this.permListeners[kind]
       if (!entry) return
       try {
         entry.status.removeEventListener('change', entry.handler)
       } catch (_e) {
         /* noop */
       }
-      delete this._permListeners[kind]
+      delete this.permListeners[kind]
     },
     detachPermissionListeners() {
-      if (!this._permListeners) return
-      for (const kind of Object.keys(this._permListeners)) {
+      if (!this.permListeners) return
+      for (const kind of Object.keys(this.permListeners)) {
         this.detachPermissionListener(kind)
       }
-      this._permListeners = null
+      this.permListeners = null
     },
     async onPermissionChange(kind, newState) {
       if (kind === 'camera') this.cameraStatus = newState
@@ -433,7 +439,7 @@ export default {
       analyser.fftSize = 512
       source.connect(analyser)
       const buffer = new Uint8Array(analyser.frequencyBinCount)
-      this._audioCtx = ctx
+      this.audioCtx = ctx
       const tick = () => {
         analyser.getByteTimeDomainData(buffer)
         let sumSq = 0
@@ -443,22 +449,22 @@ export default {
         }
         const rms = Math.sqrt(sumSq / buffer.length)
         this.micLevelPercent = Math.min(100, Math.round(rms * 200))
-        this._meterRaf = requestAnimationFrame(tick)
+        this.meterRaf = requestAnimationFrame(tick)
       }
       tick()
     },
     stopMeter() {
-      if (this._meterRaf) {
-        cancelAnimationFrame(this._meterRaf)
-        this._meterRaf = null
+      if (this.meterRaf) {
+        cancelAnimationFrame(this.meterRaf)
+        this.meterRaf = null
       }
-      if (this._audioCtx) {
+      if (this.audioCtx) {
         try {
-          this._audioCtx.close()
+          this.audioCtx.close()
         } catch (_e) {
           /* noop */
         }
-        this._audioCtx = null
+        this.audioCtx = null
       }
       this.micLevelPercent = 0
     },
