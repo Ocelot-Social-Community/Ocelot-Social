@@ -55,6 +55,15 @@ const ENABLED_LIVEKIT = {
   LIVEKIT_ENABLED: true,
 }
 
+// Group has a Joi `min: 100` constraint on `description`; faker.lorem.paragraphs
+// can fall under that under unlucky seeds, which surfaces as ERROR_VALIDATION.
+// Pass an explicit, comfortably-over-100-chars description for every Group we
+// build so the spec is deterministic regardless of faker output.
+const DESCRIPTION_OVERRIDE = {
+  description:
+    'A descriptive paragraph for video-call test groups that is comfortably longer than the 100 character minimum required by the Group model schema.',
+}
+
 let authenticatedUser: Context['user']
 let livekitConfig: Record<string, unknown> = {}
 const context = () => ({ authenticatedUser, config: livekitConfig })
@@ -122,7 +131,11 @@ describe('videoCallConfig', () => {
 describe('videoCallParticipantCount', () => {
   it('throws when LiveKit is disabled', async () => {
     authenticatedUser = memberJson
-    await Factory.build('group', { id: 'pub-1', groupType: 'public' }, { ownerId: 'member-1' })
+    await Factory.build(
+      'group',
+      { id: 'pub-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { ownerId: 'member-1' },
+    )
     const { errors } = await query({
       query: VideoCallParticipantCount,
       variables: { groupId: 'pub-1' },
@@ -133,7 +146,11 @@ describe('videoCallParticipantCount', () => {
   it('throws when user is not a member of the group', async () => {
     livekitConfig = ENABLED_LIVEKIT
     authenticatedUser = outsiderJson
-    await Factory.build('group', { id: 'pub-1', groupType: 'public' }, { ownerId: 'member-1' })
+    await Factory.build(
+      'group',
+      { id: 'pub-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { ownerId: 'member-1' },
+    )
     const { errors } = await query({
       query: VideoCallParticipantCount,
       variables: { groupId: 'pub-1' },
@@ -144,7 +161,11 @@ describe('videoCallParticipantCount', () => {
   it('throws when group is closed (not public)', async () => {
     livekitConfig = ENABLED_LIVEKIT
     authenticatedUser = memberJson
-    await Factory.build('group', { id: 'cl-1', groupType: 'closed' }, { ownerId: 'member-1' })
+    await Factory.build(
+      'group',
+      { id: 'cl-1', groupType: 'closed', ...DESCRIPTION_OVERRIDE },
+      { ownerId: 'member-1' },
+    )
     const { errors } = await query({
       query: VideoCallParticipantCount,
       variables: { groupId: 'cl-1' },
@@ -155,7 +176,11 @@ describe('videoCallParticipantCount', () => {
   it('returns the participant count for a public group member', async () => {
     livekitConfig = ENABLED_LIVEKIT
     authenticatedUser = memberJson
-    await Factory.build('group', { id: 'pub-1', groupType: 'public' }, { ownerId: 'member-1' })
+    await Factory.build(
+      'group',
+      { id: 'pub-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { ownerId: 'member-1' },
+    )
     listParticipantsMock.mockResolvedValueOnce([{}, {}, {}])
     const { data, errors } = await query({
       query: VideoCallParticipantCount,
@@ -169,7 +194,11 @@ describe('videoCallParticipantCount', () => {
   it('returns 0 if LiveKit reports the room does not exist', async () => {
     livekitConfig = ENABLED_LIVEKIT
     authenticatedUser = memberJson
-    await Factory.build('group', { id: 'pub-1', groupType: 'public' }, { ownerId: 'member-1' })
+    await Factory.build(
+      'group',
+      { id: 'pub-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { ownerId: 'member-1' },
+    )
     listParticipantsMock.mockRejectedValueOnce(
       new TwirpError('Not Found', 'room not found', 404, 'not_found'),
     )
@@ -184,7 +213,11 @@ describe('videoCallParticipantCount', () => {
   it('surfaces non-404 LiveKit errors instead of silently returning 0', async () => {
     livekitConfig = ENABLED_LIVEKIT
     authenticatedUser = memberJson
-    await Factory.build('group', { id: 'pub-1', groupType: 'public' }, { ownerId: 'member-1' })
+    await Factory.build(
+      'group',
+      { id: 'pub-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { ownerId: 'member-1' },
+    )
     listParticipantsMock.mockRejectedValueOnce(
       new TwirpError('Internal', 'upstream boom', 500, 'internal'),
     )
@@ -199,7 +232,11 @@ describe('videoCallParticipantCount', () => {
 describe('joinGroupVideoCall', () => {
   it('throws when disabled', async () => {
     authenticatedUser = memberJson
-    await Factory.build('group', { id: 'pub-1', groupType: 'public' }, { ownerId: 'member-1' })
+    await Factory.build(
+      'group',
+      { id: 'pub-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { ownerId: 'member-1' },
+    )
     const { errors } = await mutate({
       mutation: JoinGroupVideoCall,
       variables: { groupId: 'pub-1' },
@@ -210,7 +247,11 @@ describe('joinGroupVideoCall', () => {
   it('throws for non-members', async () => {
     livekitConfig = ENABLED_LIVEKIT
     authenticatedUser = outsiderJson
-    await Factory.build('group', { id: 'pub-1', groupType: 'public' }, { ownerId: 'member-1' })
+    await Factory.build(
+      'group',
+      { id: 'pub-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { ownerId: 'member-1' },
+    )
     const { errors } = await mutate({
       mutation: JoinGroupVideoCall,
       variables: { groupId: 'pub-1' },
@@ -221,7 +262,11 @@ describe('joinGroupVideoCall', () => {
   it('throws for non-public groups', async () => {
     livekitConfig = ENABLED_LIVEKIT
     authenticatedUser = memberJson
-    await Factory.build('group', { id: 'h-1', groupType: 'hidden' }, { ownerId: 'member-1' })
+    await Factory.build(
+      'group',
+      { id: 'h-1', groupType: 'hidden', ...DESCRIPTION_OVERRIDE },
+      { ownerId: 'member-1' },
+    )
     const { errors } = await mutate({
       mutation: JoinGroupVideoCall,
       variables: { groupId: 'h-1' },
@@ -232,7 +277,11 @@ describe('joinGroupVideoCall', () => {
   it('returns token, url and deterministic room name for a public-group member', async () => {
     livekitConfig = ENABLED_LIVEKIT
     authenticatedUser = memberJson
-    await Factory.build('group', { id: 'pub-1', groupType: 'public' }, { ownerId: 'member-1' })
+    await Factory.build(
+      'group',
+      { id: 'pub-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { ownerId: 'member-1' },
+    )
     const { data, errors } = await mutate({
       mutation: JoinGroupVideoCall,
       variables: { groupId: 'pub-1' },
