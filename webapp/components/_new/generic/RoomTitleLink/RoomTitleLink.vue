@@ -1,6 +1,6 @@
 <template>
-  <component
-    :is="to ? 'nuxt-link' : 'span'"
+  <nuxt-link
+    v-if="to"
     :to="to"
     :aria-label="ariaLabel"
     class="room-title-link"
@@ -8,7 +8,11 @@
   >
     <os-icon v-if="showGroupIcon" :icon="icons.group" class="room-title-link__icon" />
     <span class="room-title-link__text">{{ name }}</span>
-  </component>
+  </nuxt-link>
+  <span v-else :aria-label="ariaLabel" class="room-title-link" @click="$emit('click', $event)">
+    <os-icon v-if="showGroupIcon" :icon="icons.group" class="room-title-link__icon" />
+    <span class="room-title-link__text">{{ name }}</span>
+  </span>
 </template>
 
 <script>
