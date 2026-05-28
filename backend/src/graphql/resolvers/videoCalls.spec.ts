@@ -32,9 +32,7 @@ jest.mock('livekit-server-sdk', () => {
       return {
         addGrant: (g: Record<string, unknown>) => Object.assign(grants, g),
         toJwt: async () =>
-          Promise.resolve(
-            `mocked-jwt.${apiKey}.${(opts as { identity: string }).identity}.${(grants as { room?: string }).room ?? ''}`,
-          ),
+          `mocked-jwt.${apiKey}.${(opts as { identity: string }).identity}.${(grants as { room?: string }).room ?? ''}`,
       }
     }),
     RoomServiceClient: jest.fn().mockImplementation(() => ({
