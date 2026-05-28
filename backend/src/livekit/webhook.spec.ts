@@ -1,9 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { registerLiveKitWebhook } from './webhook'
 
 const mockConfig: {
   LIVEKIT_ENABLED: boolean
@@ -41,18 +42,13 @@ jest.mock('@src/logger', () => ({ __esModule: true, default: mockLogger }))
 
 jest.mock('@src/config', () => ({ __esModule: true, default: mockConfig }))
 
-// eslint-disable-next-line import/first
-import { registerLiveKitWebhook } from './webhook'
-
 type CapturedHandler = (req: any, res: any) => void
 
 function makeApp() {
   const handlers: { path: string; handler: CapturedHandler }[] = []
-  const post = jest.fn(
-    (path: string, _parser: unknown, handler: CapturedHandler) => {
-      handlers.push({ path, handler })
-    },
-  )
+  const post = jest.fn((path: string, _parser: unknown, handler: CapturedHandler) => {
+    handlers.push({ path, handler })
+  })
   return { post, handlers } as unknown as {
     post: jest.Mock
     handlers: { path: string; handler: CapturedHandler }[]
@@ -69,16 +65,13 @@ function makeRes() {
 
 function makeReq(opts: { authHeader?: string; body?: Buffer | string }) {
   return {
-    get: jest.fn((name: string) =>
-      name === 'Authorization' ? opts.authHeader : undefined,
-    ),
+    get: jest.fn((name: string) => (name === 'Authorization' ? opts.authHeader : undefined)),
     body: opts.body,
   }
 }
 
 const flushPromises = async () => {
   for (let i = 0; i < 10; i++) {
-    // eslint-disable-next-line no-await-in-loop
     await Promise.resolve()
   }
 }
@@ -131,9 +124,7 @@ describe('registerLiveKitWebhook', () => {
     expect(app.post).toHaveBeenCalledTimes(1)
     expect(app.post.mock.calls[0][0]).toBe('/livekit/webhook')
     expect(mockWebhookReceiverCtor).toHaveBeenCalledWith('key', 'secret')
-    expect(mockLogger.info).toHaveBeenCalledWith(
-      expect.stringContaining('/livekit/webhook'),
-    )
+    expect(mockLogger.info).toHaveBeenCalledWith(expect.stringContaining('/livekit/webhook'))
   })
 
   describe('webhook handler', () => {
@@ -208,34 +199,38 @@ describe('registerLiveKitWebhook', () => {
       handler(req, res)
       await flushPromises()
       expect(mockGetCount).toHaveBeenCalledWith(
-        { LIVEKIT_URL: 'wss://lk.example.test', LIVEKIT_API_KEY: 'key', LIVEKIT_API_SECRET: 'secret' },
+        {
+          LIVEKIT_URL: 'wss://lk.example.test',
+          LIVEKIT_API_KEY: 'key',
+          LIVEKIT_API_SECRET: 'secret',
+        },
         'group-abc',
       )
-      expect(mockPublish).toHaveBeenCalledWith(
-        'VIDEO_CALL_PARTICIPANT_COUNT_CHANGED',
-        { groupId: 'abc', count: 3 },
-      )
+      expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+        groupId: 'abc',
+        count: 3,
+      })
       expect(res.status).toHaveBeenCalledWith(204)
     })
 
-    it.each([
-      ['participant_left'],
-      ['room_started'],
-    ])('publishes live count for %s', async (eventName) => {
-      mockReceive.mockResolvedValueOnce({
-        event: eventName,
-        room: { name: 'group-xyz' },
-      })
-      mockGetCount.mockResolvedValueOnce(1)
-      const req = makeReq({ authHeader: 'sig', body: Buffer.from('p') })
-      const res = makeRes()
-      handler(req, res)
-      await flushPromises()
-      expect(mockPublish).toHaveBeenCalledWith(
-        'VIDEO_CALL_PARTICIPANT_COUNT_CHANGED',
-        { groupId: 'xyz', count: 1 },
-      )
-    })
+    it.each([['participant_left'], ['room_started']])(
+      'publishes live count for %s',
+      async (eventName) => {
+        mockReceive.mockResolvedValueOnce({
+          event: eventName,
+          room: { name: 'group-xyz' },
+        })
+        mockGetCount.mockResolvedValueOnce(1)
+        const req = makeReq({ authHeader: 'sig', body: Buffer.from('p') })
+        const res = makeRes()
+        handler(req, res)
+        await flushPromises()
+        expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+          groupId: 'xyz',
+          count: 1,
+        })
+      },
+    )
 
     it('publishes count 0 for room_finished without calling LiveKit API', async () => {
       mockReceive.mockResolvedValueOnce({
@@ -247,10 +242,10 @@ describe('registerLiveKitWebhook', () => {
       handler(req, res)
       await flushPromises()
       expect(mockGetCount).not.toHaveBeenCalled()
-      expect(mockPublish).toHaveBeenCalledWith(
-        'VIDEO_CALL_PARTICIPANT_COUNT_CHANGED',
-        { groupId: 'finished', count: 0 },
-      )
+      expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+        groupId: 'finished',
+        count: 0,
+      })
       expect(res.status).toHaveBeenCalledWith(204)
     })
 

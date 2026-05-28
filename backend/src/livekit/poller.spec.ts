@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { startLiveKitPoller, stopLiveKitPoller } from './poller'
 
 const mockConfig: {
   LIVEKIT_ENABLED: boolean
@@ -17,14 +16,18 @@ const mockRoomServiceCtor = jest.fn()
 jest.mock('livekit-server-sdk', () => ({
   RoomServiceClient: jest.fn().mockImplementation((...args: unknown[]) => {
     mockRoomServiceCtor(...args)
-    return { listRooms: (...inner: unknown[]) => mockListRooms(...inner) }
+    return {
+      listRooms: (...inner: unknown[]): unknown => mockListRooms(...inner) as unknown,
+    }
   }),
 }))
 
 const mockPublish = jest.fn()
 jest.mock('@src/context', () => ({
   __esModule: true,
-  serverPubsub: { publish: (...args: unknown[]) => mockPublish(...args) },
+  serverPubsub: {
+    publish: (...args: unknown[]): unknown => mockPublish(...args) as unknown,
+  },
 }))
 
 jest.mock('@src/graphql/resolvers/videoCalls', () => ({
@@ -37,9 +40,6 @@ const mockLogger = { info: jest.fn(), warn: jest.fn(), error: jest.fn() }
 jest.mock('@src/logger', () => ({ __esModule: true, default: mockLogger }))
 
 jest.mock('@src/config', () => ({ __esModule: true, default: mockConfig }))
-
-// eslint-disable-next-line import/first
-import { startLiveKitPoller, stopLiveKitPoller } from './poller'
 
 const setEnabled = () => {
   mockConfig.LIVEKIT_ENABLED = true
@@ -85,14 +85,8 @@ describe('startLiveKitPoller', () => {
   it('creates a RoomServiceClient with http url and starts the timers', () => {
     setEnabled()
     startLiveKitPoller()
-    expect(mockRoomServiceCtor).toHaveBeenCalledWith(
-      'https://lk.example.test',
-      'key',
-      'secret',
-    )
-    expect(mockLogger.info).toHaveBeenCalledWith(
-      expect.stringContaining('LiveKit poller starting'),
-    )
+    expect(mockRoomServiceCtor).toHaveBeenCalledWith('https://lk.example.test', 'key', 'secret')
+    expect(mockLogger.info).toHaveBeenCalledWith(expect.stringContaining('LiveKit poller starting'))
   })
 
   it('is idempotent — calling start twice does not create a second client', () => {
@@ -108,11 +102,7 @@ describe('startLiveKitPoller', () => {
     mockConfig.LIVEKIT_API_KEY = 'k'
     mockConfig.LIVEKIT_API_SECRET = 's'
     startLiveKitPoller()
-    expect(mockRoomServiceCtor).toHaveBeenCalledWith(
-      'http://plain.test',
-      'k',
-      's',
-    )
+    expect(mockRoomServiceCtor).toHaveBeenCalledWith('http://plain.test', 'k', 's')
   })
 
   it('leaves https:// and http:// urls untouched', () => {
@@ -121,11 +111,7 @@ describe('startLiveKitPoller', () => {
     mockConfig.LIVEKIT_API_KEY = 'k'
     mockConfig.LIVEKIT_API_SECRET = 's'
     startLiveKitPoller()
-    expect(mockRoomServiceCtor).toHaveBeenCalledWith(
-      'https://already.test',
-      'k',
-      's',
-    )
+    expect(mockRoomServiceCtor).toHaveBeenCalledWith('https://already.test', 'k', 's')
   })
 })
 
@@ -144,14 +130,14 @@ describe('poll tick', () => {
     await jest.advanceTimersByTimeAsync(5_000)
 
     expect(mockListRooms).toHaveBeenCalledTimes(1)
-    expect(mockPublish).toHaveBeenCalledWith(
-      'VIDEO_CALL_PARTICIPANT_COUNT_CHANGED',
-      { groupId: 'a', count: 2 },
-    )
-    expect(mockPublish).toHaveBeenCalledWith(
-      'VIDEO_CALL_PARTICIPANT_COUNT_CHANGED',
-      { groupId: 'b', count: 0 },
-    )
+    expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+      groupId: 'a',
+      count: 2,
+    })
+    expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+      groupId: 'b',
+      count: 0,
+    })
     expect(mockPublish).not.toHaveBeenCalledWith(
       'VIDEO_CALL_PARTICIPANT_COUNT_CHANGED',
       expect.objectContaining({ groupId: expect.stringContaining('other') }),
@@ -168,19 +154,17 @@ describe('poll tick', () => {
   })
 
   it('publishes count: 0 for rooms that disappeared from the list', async () => {
-    mockListRooms.mockResolvedValueOnce([
-      { name: 'group-a', numParticipants: 3 },
-    ])
+    mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 3 }])
     startLiveKitPoller()
     await jest.advanceTimersByTimeAsync(5_000)
     mockPublish.mockClear()
 
     mockListRooms.mockResolvedValueOnce([])
     await jest.advanceTimersByTimeAsync(15_000)
-    expect(mockPublish).toHaveBeenCalledWith(
-      'VIDEO_CALL_PARTICIPANT_COUNT_CHANGED',
-      { groupId: 'a', count: 0 },
-    )
+    expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+      groupId: 'a',
+      count: 0,
+    })
 
     // Third tick: the disappeared entry has been pruned, no further publish
     mockPublish.mockClear()
@@ -190,9 +174,7 @@ describe('poll tick', () => {
   })
 
   it('does not emit a duplicate zero when the disappeared room was already at 0', async () => {
-    mockListRooms.mockResolvedValueOnce([
-      { name: 'group-a', numParticipants: 0 },
-    ])
+    mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 0 }])
     startLiveKitPoller()
     await jest.advanceTimersByTimeAsync(5_000)
     mockPublish.mockClear()
@@ -206,10 +188,10 @@ describe('poll tick', () => {
     mockListRooms.mockResolvedValueOnce([{ name: 'group-a' }])
     startLiveKitPoller()
     await jest.advanceTimersByTimeAsync(5_000)
-    expect(mockPublish).toHaveBeenCalledWith(
-      'VIDEO_CALL_PARTICIPANT_COUNT_CHANGED',
-      { groupId: 'a', count: 0 },
-    )
+    expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+      groupId: 'a',
+      count: 0,
+    })
   })
 
   it('warns on listRooms failures and goes quiet after 3 consecutive errors', async () => {
@@ -244,16 +226,11 @@ describe('poll tick', () => {
 
   it('catches errors thrown synchronously in pollOnce inside runTick', async () => {
     // Force a publish error so the outer runTick try/catch kicks in
-    mockListRooms.mockResolvedValueOnce([
-      { name: 'group-a', numParticipants: 1 },
-    ])
+    mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 1 }])
     mockPublish.mockRejectedValueOnce(new Error('pubsub down'))
     startLiveKitPoller()
     await jest.advanceTimersByTimeAsync(5_000)
-    expect(mockLogger.warn).toHaveBeenCalledWith(
-      'LiveKit poll tick failed:',
-      'pubsub down',
-    )
+    expect(mockLogger.warn).toHaveBeenCalledWith('LiveKit poll tick failed:', 'pubsub down')
   })
 })
 
