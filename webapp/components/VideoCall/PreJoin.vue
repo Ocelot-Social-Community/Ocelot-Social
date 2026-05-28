@@ -111,7 +111,7 @@
           :variant="micActive ? 'primary' : 'default'"
           appearance="outline"
           :disabled="micStatus === 'denied' || micStatus === 'unsupported'"
-          :aria-pressed="(!micActive).toString()"
+          :aria-pressed="micActive.toString()"
           @click="toggleMicActive"
         >
           <template #icon>
@@ -123,7 +123,7 @@
           :variant="cameraActive ? 'primary' : 'default'"
           appearance="outline"
           :disabled="cameraStatus === 'denied' || cameraStatus === 'unsupported'"
-          :aria-pressed="(!cameraActive).toString()"
+          :aria-pressed="cameraActive.toString()"
           @click="toggleCameraActive"
         >
           <template #icon><os-icon :icon="icons.videoCamera" /></template>
