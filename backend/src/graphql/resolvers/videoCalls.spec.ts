@@ -48,7 +48,8 @@ let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
-let memberJson, outsiderJson
+let memberJson: Context['user']
+let outsiderJson: Context['user']
 
 beforeAll(async () => {
   await cleanDatabase()
