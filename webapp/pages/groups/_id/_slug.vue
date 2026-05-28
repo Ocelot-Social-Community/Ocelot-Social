@@ -548,6 +548,10 @@ export default {
             this.videoCallParticipantCount = update.count
           }
         },
+        error: (err) => {
+          // eslint-disable-next-line no-console
+          console.error('videoCallParticipantCountChanged subscription error:', err)
+        },
       })
     },
     openGroupVideoCall(groupId) {
