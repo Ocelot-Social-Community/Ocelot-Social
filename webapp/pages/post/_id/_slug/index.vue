@@ -293,28 +293,32 @@ export default {
   },
   computed: {
     routes() {
-      const { slug, id } = this.$route.params
+      // $route.params are decoded — re-encode each segment so slugs with
+      // reserved characters (e.g. "foo/bar") rebuild to a routable path.
+      const encodedId = encodeURIComponent(this.$route.params.id)
+      const encodedSlug = encodeURIComponent(this.$route.params.slug)
+      const postPath = `/post/${encodedId}/${encodedSlug}`
       return [
         {
           name:
             this.post?.postType[0] === 'Event'
               ? this.$t('post.viewEvent.title')
               : this.$t('post.viewPost.title'),
-          path: `/post/${id}/${slug}`,
+          path: postPath,
           children: [
             {
               name: this.$t('common.comment', null, 2),
-              path: `/post/${id}/${slug}#comments`,
+              path: `${postPath}#comments`,
             },
             // TODO implement
             /* {
                 name: this.$t('common.letsTalk'),
-                path: `/post/${id}/${slug}#lets-talk`
+                path: `${postPath}#lets-talk`
                 }, */
             // TODO implement
             /* {
                 name: this.$t('common.versus'),
-                path: `/post/${id}/${slug}#versus`
+                path: `${postPath}#versus`
                 } */
           ],
         },

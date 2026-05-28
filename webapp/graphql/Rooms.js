@@ -25,6 +25,7 @@ export const createGroupRoom = () => gql`
       users {
         _id
         id
+        slug
         name
         avatar {
           ...imageUrls
@@ -84,6 +85,7 @@ export const roomQuery = () => gql`
       users {
         _id
         id
+        slug
         name
         avatar {
           ...imageUrls
@@ -99,6 +101,7 @@ export const userProfileQuery = () => gql`
   query ($id: ID!) {
     User(id: $id) {
       id
+      slug
       name
       avatar {
         ...imageUrls
