@@ -1,6 +1,11 @@
 import { mount, createLocalVue } from '@vue/test-utils'
 import AddGroupMember from './AddGroupMember.vue'
 
+// Drain the microtask queue so we can deterministically await fire-and-forget
+// async chains like the one inside confirmModal() (which calls
+// addMemberToGroup() without awaiting it).
+const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0))
+
 const localVue = createLocalVue()
 
 const Stub = (name, opts = {}) => ({
@@ -116,8 +121,9 @@ describe('AddGroupMember', () => {
       wrapper.vm.isOpen = true
       await wrapper.vm.$nextTick()
       wrapper.vm.confirmModal()
-      await wrapper.vm.$nextTick()
-      await wrapper.vm.$nextTick()
+      // confirmModal kicks off addMemberToGroup() without awaiting it;
+      // drain the queue so the mutation, toast, and emit all settle.
+      await flushPromises()
       expect(mutate).toHaveBeenCalledWith(
         expect.objectContaining({
           variables: { groupId: 'g1', userId: 'u1', roleInGroup: 'usual' },
