@@ -76,6 +76,15 @@ describe('RoomTitleLink', () => {
       })
       expect(wrapper.find('.stub-icon').exists()).toBe(true)
     })
+
+    it('forwards ariaLabel onto the rendered nuxt-link', () => {
+      const wrapper = factory({
+        name: 'General',
+        to: { name: 'groups-id-slug' },
+        ariaLabel: 'Go to general',
+      })
+      expect(wrapper.find('.stub-nuxt-link').attributes('aria-label')).toBe('Go to general')
+    })
   })
 
   describe('name edge cases', () => {
