@@ -578,7 +578,13 @@ export default {
           this.screenShareEnabled = !!room.localParticipant.isScreenShareEnabled
           onAny()
         })
-        room.on(RoomEvent.Disconnected, () => this.close())
+        // Server-side disconnect: take the same path as the user-initiated
+        // Leave button so we navigate away from /call/... before clearing the
+        // store — otherwise the call page's watcher would immediately re-open
+        // the prejoin popover for the same group.
+        room.on(RoomEvent.Disconnected, () => {
+          void this.leave()
+        })
 
         await room.connect(payload.url, payload.token)
         if (this.micEnabled) {
