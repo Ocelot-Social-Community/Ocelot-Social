@@ -16,6 +16,16 @@ import type { Context } from '@src/context'
 let listParticipantsMock = jest.fn()
 
 jest.mock('livekit-server-sdk', () => {
+  class TwirpError extends Error {
+    status: number
+    code?: string
+    constructor(name: string, message: string, status: number, code?: string) {
+      super(message)
+      this.name = name
+      this.status = status
+      this.code = code
+    }
+  }
   return {
     AccessToken: jest.fn().mockImplementation((apiKey: string, _apiSecret: string, opts) => {
       const grants: Record<string, unknown> = {}
@@ -30,9 +40,13 @@ jest.mock('livekit-server-sdk', () => {
     RoomServiceClient: jest.fn().mockImplementation(() => ({
       listParticipants: (roomName: string) => listParticipantsMock(roomName),
     })),
+    TwirpError,
     WebhookReceiver: jest.fn(),
   }
 })
+
+// eslint-disable-next-line import/order, import/first
+import { TwirpError } from 'livekit-server-sdk'
 
 const ENABLED_LIVEKIT = {
   LIVEKIT_URL: 'wss://livekit.example.test',
@@ -156,13 +170,29 @@ describe('videoCallParticipantCount', () => {
     livekitConfig = ENABLED_LIVEKIT
     authenticatedUser = memberJson
     await Factory.build('group', { id: 'pub-1', groupType: 'public' }, { ownerId: 'member-1' })
-    listParticipantsMock.mockRejectedValueOnce(new Error('room not found'))
+    listParticipantsMock.mockRejectedValueOnce(
+      new TwirpError('Not Found', 'room not found', 404, 'not_found'),
+    )
     const { data, errors } = await query({
       query: VideoCallParticipantCount,
       variables: { groupId: 'pub-1' },
     })
     expect(errors).toBeUndefined()
     expect(data.videoCallParticipantCount).toBe(0)
+  })
+
+  it('surfaces non-404 LiveKit errors instead of silently returning 0', async () => {
+    livekitConfig = ENABLED_LIVEKIT
+    authenticatedUser = memberJson
+    await Factory.build('group', { id: 'pub-1', groupType: 'public' }, { ownerId: 'member-1' })
+    listParticipantsMock.mockRejectedValueOnce(
+      new TwirpError('Internal', 'upstream boom', 500, 'internal'),
+    )
+    const { errors } = await query({
+      query: VideoCallParticipantCount,
+      variables: { groupId: 'pub-1' },
+    })
+    expect(errors).toBeDefined()
   })
 })
 

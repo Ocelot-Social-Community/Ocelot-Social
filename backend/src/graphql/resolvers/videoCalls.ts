@@ -7,9 +7,10 @@
 import { randomBytes } from 'node:crypto'
 
 import { withFilter } from 'graphql-subscriptions'
-import { AccessToken, RoomServiceClient } from 'livekit-server-sdk'
+import { AccessToken, RoomServiceClient, TwirpError } from 'livekit-server-sdk'
 
 import { VIDEO_CALL_PARTICIPANT_COUNT_CHANGED } from '@constants/subscriptions'
+import logger from '@src/logger'
 
 import type { Driver } from 'neo4j-driver'
 
@@ -112,11 +113,16 @@ export const getLiveParticipantCount = async (
     )
     return participants.length
     // eslint-disable-next-line no-catch-all/no-catch-all
-  } catch {
-    // Room does not exist yet, LiveKit unreachable, or API timed out — the
-    // caller treats this as "no participants" so the frontend never blocks
-    // on a flaky LiveKit instance.
-    return 0
+  } catch (err) {
+    // Only "room not found" is a legitimate zero — the room hasn't been
+    // created yet because no participant has joined. Every other error
+    // (network, credentials, throttling, timeout) is a real failure that
+    // would silently masquerade as "empty room" if swallowed.
+    if (err instanceof TwirpError && (err.status === 404 || err.code === 'not_found')) {
+      return 0
+    }
+    logger.warn(`listParticipants failed for ${roomName}:`, err)
+    throw err
   }
 }
 
