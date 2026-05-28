@@ -77,4 +77,30 @@ describe('RoomTitleLink', () => {
       expect(wrapper.find('.stub-icon').exists()).toBe(true)
     })
   })
+
+  describe('name edge cases', () => {
+    it('falls back to the empty-string default when no name prop is provided', () => {
+      const wrapper = factory()
+      // The element still renders — just with no visible label inside .__text.
+      expect(wrapper.element.tagName).toBe('SPAN')
+      expect(wrapper.find('.room-title-link__text').text()).toBe('')
+    })
+
+    it('renders an empty string when name="" is passed explicitly', () => {
+      const wrapper = factory({ name: '' })
+      expect(wrapper.find('.room-title-link__text').text()).toBe('')
+    })
+
+    it('still shows the group icon when name is empty but showGroupIcon is true', () => {
+      const wrapper = factory({ name: '', showGroupIcon: true })
+      expect(wrapper.find('.stub-icon').exists()).toBe(true)
+      expect(wrapper.find('.room-title-link__text').text()).toBe('')
+    })
+
+    it('renders an empty nuxt-link label when to is set but name is empty', () => {
+      const wrapper = factory({ name: '', to: { name: 'groups-id-slug' } })
+      expect(wrapper.find('.stub-nuxt-link').exists()).toBe(true)
+      expect(wrapper.find('.room-title-link__text').text()).toBe('')
+    })
+  })
 })
