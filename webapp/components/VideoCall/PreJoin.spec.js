@@ -533,14 +533,51 @@ describe('PreJoin', () => {
     })
 
     it('onSpeakerChange forwards setSinkId when supported', async () => {
-      const { wrapper } = mountWith()
-      const audioEl = { setSinkId: jest.fn().mockResolvedValue() }
-      wrapper.vm.$refs.speakerTestEl = audioEl
-      wrapper.setData({ selectedSpeaker: '' })
-      await wrapper.vm.onSpeakerChange({ target: { value: 'spk-1' } })
-      expect(wrapper.vm.selectedSpeaker).toBe('spk-1')
-      // speakerSupported depends on the runtime; just verify no throw.
-      expect(true).toBe(true)
+      // Stub the prototype BEFORE mount so the speakerSupported computed
+      // sees the function on its first (cached) evaluation.
+      const originalSetSinkId = HTMLMediaElement.prototype.setSinkId
+      HTMLMediaElement.prototype.setSinkId = function () {
+        return Promise.resolve()
+      }
+      try {
+        const { wrapper } = mountWith()
+        const setSinkId = jest.fn().mockResolvedValue()
+        wrapper.vm.$refs.speakerTestEl = { setSinkId }
+        wrapper.setData({ selectedSpeaker: '' })
+        await wrapper.vm.onSpeakerChange({ target: { value: 'spk-1' } })
+        expect(wrapper.vm.selectedSpeaker).toBe('spk-1')
+        expect(setSinkId).toHaveBeenCalledWith('spk-1')
+      } finally {
+        if (originalSetSinkId === undefined) {
+          delete HTMLMediaElement.prototype.setSinkId
+        } else {
+          HTMLMediaElement.prototype.setSinkId = originalSetSinkId
+        }
+      }
+    })
+
+    it('onSpeakerChange swallows setSinkId rejection', async () => {
+      const originalSetSinkId = HTMLMediaElement.prototype.setSinkId
+      HTMLMediaElement.prototype.setSinkId = function () {
+        return Promise.resolve()
+      }
+      try {
+        const { wrapper } = mountWith()
+        wrapper.vm.$refs.speakerTestEl = {
+          setSinkId: jest.fn().mockRejectedValue(new Error('boom')),
+        }
+        wrapper.setData({ selectedSpeaker: '' })
+        await expect(
+          wrapper.vm.onSpeakerChange({ target: { value: 'spk-1' } }),
+        ).resolves.toBeUndefined()
+        expect(wrapper.vm.selectedSpeaker).toBe('spk-1')
+      } finally {
+        if (originalSetSinkId === undefined) {
+          delete HTMLMediaElement.prototype.setSinkId
+        } else {
+          HTMLMediaElement.prototype.setSinkId = originalSetSinkId
+        }
+      }
     })
   })
 
@@ -647,10 +684,18 @@ describe('PreJoin', () => {
   describe('playTestTone', () => {
     it('exits early on a re-entry', async () => {
       const { wrapper } = mountWith()
-      wrapper.setData({ testingTone: true })
-      await wrapper.vm.playTestTone()
-      // Nothing observable to assert — just make sure no throw.
-      expect(true).toBe(true)
+      const ACSpy = jest.fn()
+      const originalAC = window.AudioContext
+      window.AudioContext = ACSpy
+      try {
+        wrapper.setData({ testingTone: true })
+        await wrapper.vm.playTestTone()
+        // testingTone should remain true (no reset) and no AudioContext built.
+        expect(wrapper.vm.testingTone).toBe(true)
+        expect(ACSpy).not.toHaveBeenCalled()
+      } finally {
+        window.AudioContext = originalAC
+      }
     })
 
     it('exits when AudioContext is unavailable', async () => {
