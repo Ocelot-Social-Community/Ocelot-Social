@@ -632,7 +632,22 @@ export default {
             /* ignore malformed metadata */
           }
         }
-        const avatarUrl = meta && meta.avatarUrl
+        // Only trust http(s) URLs — even though the backend currently writes
+        // metadata server-side, a future canUpdateOwnMetadata grant or a
+        // misconfigured deployment could let participants inject e.g.
+        // "javascript:..." which would land in <img src> via ResponsiveImage.
+        const rawAvatarUrl = meta && typeof meta.avatarUrl === 'string' ? meta.avatarUrl : null
+        let avatarUrl = null
+        if (rawAvatarUrl) {
+          try {
+            const parsed = new URL(rawAvatarUrl, window.location.origin)
+            if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+              avatarUrl = rawAvatarUrl
+            }
+          } catch (_e) {
+            /* malformed URL — fall through to null */
+          }
+        }
         return {
           id: (meta && meta.userId) || participant.identity,
           name: participant.name || participant.identity,
