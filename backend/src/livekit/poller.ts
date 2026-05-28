@@ -29,6 +29,7 @@ const httpUrlFor = (livekitUrl: string) =>
       : livekitUrl
 
 let pollTimer: ReturnType<typeof setInterval> | null = null
+let initialTimer: ReturnType<typeof setTimeout> | null = null
 let polling = false
 let consecutiveFailures = 0
 let client: RoomServiceClient | null = null
@@ -127,10 +128,13 @@ export const startLiveKitPoller = () => {
   }
   client = new RoomServiceClient(httpUrlFor(livekitUrl), apiKey, apiSecret)
   logger.info(`LiveKit poller starting (every ${(POLL_INTERVAL_MS / 1000).toString()}s).`)
-  // First run a bit later so server startup isn't blocked.
-  setTimeout(() => {
+  // First run a bit later so server startup isn't blocked. Tracked so a
+  // shutdown within the first 5s can cancel it before it fires.
+  initialTimer = setTimeout(() => {
+    initialTimer = null
     void runTick()
   }, 5_000)
+  if (typeof initialTimer.unref === 'function') initialTimer.unref()
   pollTimer = setInterval(() => {
     void runTick()
   }, POLL_INTERVAL_MS)
@@ -138,10 +142,15 @@ export const startLiveKitPoller = () => {
 }
 
 export const stopLiveKitPoller = () => {
+  if (initialTimer) {
+    clearTimeout(initialTimer)
+    initialTimer = null
+  }
   if (pollTimer) {
     clearInterval(pollTimer)
     pollTimer = null
   }
   client = null
+  consecutiveFailures = 0
   lastSeenCounts.clear()
 }
