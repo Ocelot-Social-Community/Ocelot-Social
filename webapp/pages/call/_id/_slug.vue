@@ -99,7 +99,10 @@ export default {
         })
       },
       skip() {
-        return !this.$route.params.id
+        if (!this.$route.params.id) return true
+        // The group page already populated the store before navigating here —
+        // skip the redundant query when we already have the info for this id.
+        return this.activeGroupId === this.$route.params.id && !!this.groupName
       },
       fetchPolicy: 'cache-first',
     },
