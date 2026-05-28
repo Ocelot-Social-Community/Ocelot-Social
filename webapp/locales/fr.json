@@ -1393,6 +1393,8 @@
     "dialogLabel": "Appel vidéo de groupe",
     "disableCamera": "Désactiver la caméra",
     "enableCamera": "Activer la caméra",
+    "errorBackToPrejoin": "Modifier les paramètres",
+    "errorRetry": "Réessayer",
     "errors": {
       "camera": {
         "busy": "La caméra est utilisée par une autre application.",

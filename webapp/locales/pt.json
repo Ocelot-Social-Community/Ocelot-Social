@@ -1393,6 +1393,8 @@
     "dialogLabel": "Videochamada de grupo",
     "disableCamera": "Desligar a câmara",
     "enableCamera": "Ligar a câmara",
+    "errorBackToPrejoin": "Alterar configurações",
+    "errorRetry": "Tentar novamente",
     "errors": {
       "camera": {
         "busy": "A câmara está a ser usada por outra aplicação.",

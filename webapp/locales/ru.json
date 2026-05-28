@@ -1393,6 +1393,8 @@
     "dialogLabel": "Групповой видеозвонок",
     "disableCamera": "Выключить камеру",
     "enableCamera": "Включить камеру",
+    "errorBackToPrejoin": "Изменить настройки",
+    "errorRetry": "Повторить",
     "errors": {
       "camera": {
         "busy": "Камера используется другим приложением.",

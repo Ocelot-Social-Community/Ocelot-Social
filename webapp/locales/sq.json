@@ -1393,6 +1393,8 @@
     "dialogLabel": "Telefonatë me video në grup",
     "disableCamera": "Fik kamerën",
     "enableCamera": "Ndiz kamerën",
+    "errorBackToPrejoin": "Ndrysho cilësimet",
+    "errorRetry": "Riprovo",
     "errors": {
       "camera": {
         "busy": "Kamera është në përdorim nga një aplikacion tjetër.",

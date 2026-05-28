@@ -1393,6 +1393,8 @@
     "dialogLabel": "Груповий відеовиклик",
     "disableCamera": "Вимкнути камеру",
     "enableCamera": "Увімкнути камеру",
+    "errorBackToPrejoin": "Змінити налаштування",
+    "errorRetry": "Повторити",
     "errors": {
       "camera": {
         "busy": "Камеру використовує інший застосунок.",

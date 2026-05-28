@@ -1393,6 +1393,8 @@
     "dialogLabel": "Rozmowa wideo grupowa",
     "disableCamera": "Wyłącz kamerę",
     "enableCamera": "Włącz kamerę",
+    "errorBackToPrejoin": "Zmień ustawienia",
+    "errorRetry": "Spróbuj ponownie",
     "errors": {
       "camera": {
         "busy": "Kamera jest używana przez inną aplikację.",

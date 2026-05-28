@@ -1393,6 +1393,8 @@
     "dialogLabel": "Groepsvideogesprek",
     "disableCamera": "Camera uitschakelen",
     "enableCamera": "Camera inschakelen",
+    "errorBackToPrejoin": "Instellingen wijzigen",
+    "errorRetry": "Opnieuw proberen",
     "errors": {
       "camera": {
         "busy": "De camera wordt gebruikt door een andere toepassing.",
