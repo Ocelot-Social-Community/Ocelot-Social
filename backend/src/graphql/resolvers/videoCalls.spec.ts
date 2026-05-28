@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
+import { TwirpError } from 'livekit-server-sdk'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import JoinGroupVideoCall from '@graphql/queries/videoCalls/JoinGroupVideoCall.gql'
 import VideoCallConfig from '@graphql/queries/videoCalls/VideoCallConfig.gql'
@@ -16,7 +18,7 @@ import type { Context } from '@src/context'
 let listParticipantsMock = jest.fn()
 
 jest.mock('livekit-server-sdk', () => {
-  class TwirpError extends Error {
+  class MockTwirpError extends Error {
     status: number
     code?: string
     constructor(name: string, message: string, status: number, code?: string) {
@@ -31,20 +33,20 @@ jest.mock('livekit-server-sdk', () => {
       const grants: Record<string, unknown> = {}
       return {
         addGrant: (g: Record<string, unknown>) => Object.assign(grants, g),
-        toJwt: async () =>
-          `mocked-jwt.${apiKey}.${(opts as { identity: string }).identity}.${(grants as { room?: string }).room ?? ''}`,
+        // eslint-disable-next-line @typescript-eslint/promise-function-async
+        toJwt: () =>
+          Promise.resolve(
+            `mocked-jwt.${apiKey}.${(opts as { identity: string }).identity}.${(grants as { room?: string }).room ?? ''}`,
+          ),
       }
     }),
     RoomServiceClient: jest.fn().mockImplementation(() => ({
       listParticipants: (roomName: string) => listParticipantsMock(roomName),
     })),
-    TwirpError,
+    TwirpError: MockTwirpError,
     WebhookReceiver: jest.fn(),
   }
 })
-
-// eslint-disable-next-line import/order, import/first
-import { TwirpError } from 'livekit-server-sdk'
 
 const ENABLED_LIVEKIT = {
   LIVEKIT_URL: 'wss://livekit.example.test',

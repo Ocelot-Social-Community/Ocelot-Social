@@ -35,35 +35,6 @@ const ensureEnabled = (config: { LIVEKIT_ENABLED: boolean }) => {
   }
 }
 
-// Cache positive membership results for a short window so the subscription
-// filter doesn't fire a Neo4j read for every published event × subscriber —
-// otherwise the poll-driven traffic grows O(N²) with the participant count.
-// Memberships rarely change mid-call, so a 30s TTL is a safe trade-off.
-const MEMBERSHIP_CACHE_TTL_MS = 30_000
-const membershipCache = new Map<string, number>()
-
-export const assertGroupMembershipCached = async (
-  driver: Driver,
-  groupId: string,
-  userId: string,
-): Promise<boolean> => {
-  const key = `${userId}|${groupId}`
-  const now = Date.now()
-  const expiresAt = membershipCache.get(key)
-  if (expiresAt !== undefined) {
-    if (expiresAt > now) return true
-    membershipCache.delete(key)
-  }
-  try {
-    await assertGroupMemberOfPublicGroup(driver, groupId, userId)
-    membershipCache.set(key, now + MEMBERSHIP_CACHE_TTL_MS)
-    return true
-    // eslint-disable-next-line no-catch-all/no-catch-all
-  } catch {
-    return false
-  }
-}
-
 const assertGroupMemberOfPublicGroup = async (
   driver: Driver,
   groupId: string,
@@ -90,6 +61,35 @@ const assertGroupMemberOfPublicGroup = async (
     }
   } finally {
     await session.close()
+  }
+}
+
+// Cache positive membership results for a short window so the subscription
+// filter doesn't fire a Neo4j read for every published event × subscriber —
+// otherwise the poll-driven traffic grows O(N²) with the participant count.
+// Memberships rarely change mid-call, so a 30s TTL is a safe trade-off.
+const MEMBERSHIP_CACHE_TTL_MS = 30_000
+const membershipCache = new Map<string, number>()
+
+export const assertGroupMembershipCached = async (
+  driver: Driver,
+  groupId: string,
+  userId: string,
+): Promise<boolean> => {
+  const key = `${userId}|${groupId}`
+  const now = Date.now()
+  const expiresAt = membershipCache.get(key)
+  if (expiresAt !== undefined) {
+    if (expiresAt > now) return true
+    membershipCache.delete(key)
+  }
+  try {
+    await assertGroupMemberOfPublicGroup(driver, groupId, userId)
+    membershipCache.set(key, now + MEMBERSHIP_CACHE_TTL_MS)
+    return true
+    // eslint-disable-next-line no-catch-all/no-catch-all
+  } catch {
+    return false
   }
 }
 
@@ -131,7 +131,6 @@ export const getLiveParticipantCount = async (
       'listParticipants',
     )
     return participants.length
-    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (err) {
     // Only "room not found" is a legitimate zero — the room hasn't been
     // created yet because no participant has joined. Every other error
@@ -159,11 +158,7 @@ export default {
         ) => {
           if (!context.user) return false
           if (payload.groupId !== variables.groupId) return false
-          return assertGroupMembershipCached(
-            context.driver,
-            payload.groupId,
-            context.user.id,
-          )
+          return assertGroupMembershipCached(context.driver, payload.groupId, context.user.id)
         },
       ),
     },
