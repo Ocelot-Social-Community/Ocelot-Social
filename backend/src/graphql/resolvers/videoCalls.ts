@@ -10,6 +10,7 @@ import { withFilter } from 'graphql-subscriptions'
 import { AccessToken, RoomServiceClient, TwirpError } from 'livekit-server-sdk'
 
 import { VIDEO_CALL_PARTICIPANT_COUNT_CHANGED } from '@constants/subscriptions'
+import { ForbiddenError } from '@graphql/errors'
 import logger from '@src/logger'
 
 import type { Driver } from 'neo4j-driver'
@@ -80,11 +81,11 @@ const assertGroupMemberOfPublicGroup = async (
       ),
     )
     if (result.records.length === 0) {
-      throw new Error('Not a member of this group.')
+      throw new ForbiddenError('Not a member of this group.')
     }
     const groupType = result.records[0].get('groupType') as string
     if (groupType !== 'public') {
-      throw new Error('Video calls are only available for public groups.')
+      throw new ForbiddenError('Video calls are only available for public groups.')
     }
   } finally {
     await session.close()
