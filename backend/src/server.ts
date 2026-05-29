@@ -22,6 +22,8 @@ import { WebSocketServer } from 'ws'
 import CONFIG from './config'
 import { getContext } from './context'
 import schema from './graphql/schema'
+import { startLiveKitPoller } from './livekit/poller'
+import { registerLiveKitWebhook } from './livekit/webhook'
 import logger from './logger'
 import middleware from './middleware'
 
@@ -30,6 +32,11 @@ import type { ApolloServerPlugin } from '@apollo/server'
 interface CreateServerOptions {
   context?: (req: { headers: { authorization?: string } }) => Promise<any>
   plugins?: ApolloServerPlugin[]
+  // Test helpers spin up many ApolloServer instances per run; skipping the
+  // webhook + poller boot avoids both their startup logs (which clutter
+  // logger spec assertions) and the in-flight timers that would otherwise
+  // log "Cannot log after tests are done" warnings on teardown.
+  skipLiveKitBoot?: boolean
 }
 
 const createServer = async (options?: CreateServerOptions) => {
@@ -125,6 +132,14 @@ const createServer = async (options?: CreateServerOptions) => {
     ) as any,
   )
   app.use(express.static('public'))
+  if (!options?.skipLiveKitBoot) {
+    // LiveKit webhook must be registered before the global JSON body parser so
+    // the raw payload is preserved for HMAC signature verification.
+    registerLiveKitWebhook(app)
+    // Polling fallback for environments without (or with broken) webhooks —
+    // publishes participant-count updates through the same pubsub channel.
+    startLiveKitPoller()
+  }
   app.use(bodyParser.json({ limit: '10mb' }) as any)
   app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }) as any)
   app.use(graphqlUploadExpress())

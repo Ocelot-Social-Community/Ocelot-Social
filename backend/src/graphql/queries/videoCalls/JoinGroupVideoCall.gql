@@ -1,0 +1,7 @@
+mutation JoinGroupVideoCall($groupId: ID!) {
+  joinGroupVideoCall(groupId: $groupId) {
+    token
+    url
+    roomName
+  }
+}

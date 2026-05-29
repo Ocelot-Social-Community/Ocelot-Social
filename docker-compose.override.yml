@@ -53,6 +53,11 @@ services:
   minio:
     image: quay.io/minio/minio
     ports:
+      # 9000 = S3 API, 9001 = web console. The backend test suite hits the S3
+      # API at http://localhost:9000 (see backend/test/helpers.ts), so without
+      # this port mapping image/file-touching tests fail with
+      # "AWS SDK error wrapper for AggregateError".
+      - 9000:9000
       - 9001:9001
     volumes:
       - minio_data:/data

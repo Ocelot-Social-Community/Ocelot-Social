@@ -1,0 +1,27 @@
+type VideoCallConfig {
+  enabled: Boolean!
+}
+
+type VideoCallJoinPayload {
+  token: String!
+  url: String!
+  roomName: String!
+}
+
+type VideoCallParticipantCount {
+  groupId: ID!
+  count: Int!
+}
+
+type Query {
+  videoCallConfig: VideoCallConfig!
+  videoCallParticipantCount(groupId: ID!): Int!
+}
+
+type Mutation {
+  joinGroupVideoCall(groupId: ID!): VideoCallJoinPayload!
+}
+
+type Subscription {
+  videoCallParticipantCountChanged(groupId: ID!): VideoCallParticipantCount!
+}

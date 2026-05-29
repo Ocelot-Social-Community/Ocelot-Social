@@ -1,0 +1,3 @@
+query VideoCallParticipantCount($groupId: ID!) {
+  videoCallParticipantCount(groupId: $groupId)
+}
