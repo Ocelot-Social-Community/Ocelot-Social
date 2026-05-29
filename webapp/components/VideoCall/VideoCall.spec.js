@@ -327,17 +327,27 @@ describe('VideoCall', () => {
       expect(wrapper.vm.$router.push).not.toHaveBeenCalled()
     })
 
-    it('swallows navigation rejection', async () => {
-      const { wrapper } = factory({
+    it('swallows navigation rejection without breaking the store update', async () => {
+      const { wrapper, setMinimized } = factory({
         show: true,
         groupId: 'g1',
         groupSlug: 'yoga',
+        routeName: 'call-id-slug',
       })
-      wrapper.vm.$router.push = jest.fn().mockRejectedValue(new Error('aborted'))
-      wrapper.vm.toggleMinimize()
+      const push = jest.fn().mockRejectedValue(new Error('aborted'))
+      wrapper.vm.$router.push = push
+      // Trigger the toggle and let the rejected push promise settle.
+      const result = wrapper.vm.toggleMinimize()
       await wrapper.vm.$nextTick()
-      // Should not crash.
-      expect(true).toBe(true)
+      await wrapper.vm.$nextTick()
+      // 1. Store mutation ran — minimize state is updated despite the
+      //    failed route push (so the UI doesn't lock up).
+      expect(setMinimized).toHaveBeenCalled()
+      // 2. The router.push was actually attempted.
+      expect(push).toHaveBeenCalled()
+      // 3. toggleMinimize is sync but kicks off an async .catch; the
+      //    method itself returns undefined and must not reject.
+      expect(result).toBeUndefined()
     })
   })
 
@@ -589,21 +599,42 @@ describe('VideoCall', () => {
       if (originalDD) Object.defineProperty(global.navigator, 'mediaDevices', originalDD)
     })
 
-    it('toggleScreenShare swallows NotAllowedError silently', async () => {
+    it('toggleScreenShare swallows NotAllowedError silently and re-syncs state', async () => {
       const { wrapper } = factory({ show: true })
-      const room = buildRoom()
-      room.localParticipant.setScreenShareEnabled = jest
+      const room = buildRoom({ isScreenShareEnabled: false })
+      const setScreenShareEnabled = jest
         .fn()
         .mockRejectedValue(Object.assign(new Error(), { name: 'NotAllowedError' }))
+      room.localParticipant.setScreenShareEnabled = setScreenShareEnabled
+      const $toast = { error: jest.fn() }
+      // Pin a $toast on the instance so we can assert it was *not* called
+      // for the user-dismissed-picker case. The factory's default mocks
+      // don't include $toast.
+      wrapper.vm.$toast = $toast
+      // Force the `screenShareSupported` computed to truthy via the env probe.
+      const originalDD = Object.getOwnPropertyDescriptor(global.navigator, 'mediaDevices')
       Object.defineProperty(global.navigator, 'mediaDevices', {
         value: { getDisplayMedia: jest.fn() },
         configurable: true,
       })
-      wrapper.setData({ room })
-      wrapper.vm.refreshTiles = jest.fn()
-      await wrapper.vm.toggleScreenShare()
-      // Should not throw.
-      expect(true).toBe(true)
+      wrapper.setData({ room, screenShareEnabled: false })
+      const refreshTiles = jest.fn()
+      wrapper.vm.refreshTiles = refreshTiles
+      try {
+        await wrapper.vm.toggleScreenShare()
+        // 1. The toggle attempt was actually issued against LiveKit.
+        expect(setScreenShareEnabled).toHaveBeenCalledWith(true, { audio: true })
+        // 2. NotAllowedError means the user dismissed the OS picker —
+        //    no toast should fire.
+        expect($toast.error).not.toHaveBeenCalled()
+        // 3. State is re-synced from the participant (still false) instead
+        //    of the optimistic `next=true`.
+        expect(wrapper.vm.screenShareEnabled).toBe(false)
+        // 4. Tiles are refreshed so the avatar fallback can re-render.
+        expect(refreshTiles).toHaveBeenCalled()
+      } finally {
+        if (originalDD) Object.defineProperty(global.navigator, 'mediaDevices', originalDD)
+      }
     })
   })
 
