@@ -1,30 +1,35 @@
-# Video-call e2e (Tier B: fake devices, no LiveKit server)
+# Video-call e2e (PreJoin only, no LiveKit connect)
 
 What these specs cover:
 - The video-call button only renders for public-group members with
   `videoCallConfig.enabled === true`.
-- The PreJoin dialog opens/cancels correctly and the mic / camera toggles
-  flip the UI state.
-- Joining against the synthetic LiveKit URL configured in
-  `docker-compose.test.yml` lands in the error phase, and the error block's
-  "back to settings" button restores PreJoin.
+- The PreJoin dialog opens / cancels correctly.
+- The mic and camera toggles flip the UI state.
 
 What they do **not** cover:
-- A real LiveKit room.connect() / WebRTC media exchange. There is no LiveKit
-  server in the CI compose stack — that's tier C and would require shipping
-  a `livekit/livekit-server` container plus multi-browser coordination.
+- A real LiveKit `room.connect()` / WebRTC media exchange.
+- The error-block / Retry / Back-to-PreJoin paths. Those used to live here
+  but depended on the backend returning an *unreachable* LiveKit URL.
+  Locally the URL comes from `backend/.env` and may point at a real LiveKit
+  instance, so the connect call succeeds and the error block never renders.
+  Reintroduce these scenarios only when we can stub the
+  `joinGroupVideoCall` GraphQL response (e.g. via `cy.intercept`) so the
+  test fully owns the failure condition.
 
 How the browser plays along:
 - `cypress.config.js` adds `--use-fake-ui-for-media-stream`,
   `--use-fake-device-for-media-stream`, and
-  `--autoplay-policy=no-user-gesture-required` for the Chromium family
-  (including the bundled Electron). That gives `getUserMedia` /
-  `enumerateDevices` synthetic devices to enumerate, lets the AudioContext
-  resume without a user gesture, and silences the permission prompt.
+  `--autoplay-policy=no-user-gesture-required` for the chrome / chromium
+  browsers. Electron is the Cypress default and **does not honour
+  launchOptions.args** (you'll see a "browser launch options not supported
+  by electron" warning if you accidentally re-enable that branch). Cypress
+  auto-grants media permissions in Electron, so the toggle steps still hit
+  the regular code paths via the `permissionStatus === 'prompt'` fallback.
 
 How the backend plays along:
-- `docker-compose.test.yml` injects fake `LIVEKIT_URL` /
-  `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET` so that `CONFIG.LIVEKIT_ENABLED`
-  is true and `videoCallConfig.enabled` is reported as true.
-- The synthetic URL is never reachable, which is intentional: it drives the
-  client into the error-phase test scenarios.
+- `docker-compose.test.yml` injects synthetic `LIVEKIT_URL` /
+  `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET` so that
+  `videoCallConfig.enabled` is reported as `true` and the video-call button
+  can be exercised. Note that, since we no longer exercise the connect
+  path, the actual reachability of `LIVEKIT_URL` no longer matters for
+  this spec.

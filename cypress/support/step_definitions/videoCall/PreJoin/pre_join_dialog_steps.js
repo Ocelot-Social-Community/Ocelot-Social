@@ -14,10 +14,6 @@ defineStep('I cancel the video-call pre-join dialog', () => {
   cy.get('[data-test="prejoin-cancel"]').click()
 })
 
-defineStep('I confirm the video-call pre-join dialog', () => {
-  cy.get('[data-test="prejoin-join"]').click()
-})
-
 defineStep('I toggle the pre-join microphone', () => {
   cy.get('[data-test="prejoin-mic-toggle"]').click()
 })
