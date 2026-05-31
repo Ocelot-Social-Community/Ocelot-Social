@@ -42,15 +42,22 @@ describe('GroupProfileSlug', () => {
     'auth/isModerator': () => false,
     'categories/categoriesActive': () => true,
     'categories/categories': () => [{ id: 'cat1' }],
+    'videoCall/enabled': () => false,
   }
 
   const actions = {
     'categories/init': jest.fn(),
   }
 
+  const mutations = {
+    'chat/SET_OPEN_CHAT': jest.fn(),
+    'videoCall/OPEN': jest.fn(),
+  }
+
   const store = new Vuex.Store({
     getters,
     actions,
+    mutations,
   })
 
   beforeEach(() => {
@@ -659,6 +666,156 @@ describe('GroupProfileSlug', () => {
       wrapper.setData({ group: { ...yogaPractice, myRole: 'admin' } })
       await wrapper.vm.$nextTick()
       expect(subscribeMock).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('video call button (videoCall/enabled = true)', () => {
+    let openVideoCallMock
+    let savedErrorHandler
+    let savedWarnHandler
+
+    beforeEach(() => {
+      savedErrorHandler = Vue.config.errorHandler
+      savedWarnHandler = Vue.config.warnHandler
+      Vue.config.errorHandler = null
+      Vue.config.warnHandler = null
+    })
+
+    afterEach(() => {
+      Vue.config.errorHandler = savedErrorHandler
+      Vue.config.warnHandler = savedWarnHandler
+    })
+
+    const mountWithGroup = (group) => {
+      openVideoCallMock = jest.fn()
+      currentUserMock.mockReturnValue(peterLustig)
+      const enabledStore = new Vuex.Store({
+        getters: {
+          ...getters,
+          'videoCall/enabled': () => true,
+        },
+        actions,
+        mutations: {
+          ...mutations,
+          'videoCall/OPEN': openVideoCallMock,
+        },
+      })
+      return mount(GroupProfileSlug, {
+        localVue,
+        store: enabledStore,
+        stubs: {
+          ...stubs,
+          'infinite-loading': true,
+          'masonry-grid': true,
+          'masonry-grid-item': true,
+          'post-teaser': true,
+          'content-viewer': true,
+          // OsCounterIcon validates an `icon` prop that we don't need to
+          // exercise here; stub it so the prop-type warning doesn't blow up
+          // the test via the global Vue.config.warnHandler. The component
+          // is registered locally as PascalCase, so the stub key matches.
+          OsCounterIcon: { props: ['icon', 'count'], template: '<i class="stub-counter-icon" />' },
+          OsIcon: { props: ['icon'], template: '<i class="stub-icon" />' },
+        },
+        mocks: {
+          ...mocks,
+          $apollo: {
+            loading: false,
+            mutate: jest.fn().mockResolvedValue(),
+            subscribe: jest.fn().mockReturnValue({
+              subscribe: jest.fn().mockReturnValue({ unsubscribe: jest.fn() }),
+            }),
+            queries: { chatRoom: { refetch: jest.fn() } },
+          },
+        },
+        data: () => ({ group, GroupMembers: [] }),
+      })
+    }
+
+    it('renders the video-call button for a public group member', () => {
+      const wrapper = mountWithGroup({ ...yogaPractice, myRole: 'usual' })
+      expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(true)
+    })
+
+    it('hides the video-call button for a non-public group', () => {
+      const wrapper = mountWithGroup({ ...yogaPractice, groupType: 'closed', myRole: 'usual' })
+      expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(false)
+    })
+
+    it('hides the video-call button for non-members', () => {
+      const wrapper = mountWithGroup({ ...yogaPractice, myRole: null })
+      expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(false)
+    })
+
+    it('hides the video-call button for pending members', () => {
+      const wrapper = mountWithGroup({ ...yogaPractice, myRole: 'pending' })
+      expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(false)
+    })
+
+    it('dispatches videoCall/OPEN with the group payload when clicked', async () => {
+      const group = {
+        ...yogaPractice,
+        myRole: 'usual',
+        avatar: { url: 'http://example.test/avatar.png' },
+      }
+      const wrapper = mountWithGroup(group)
+      await wrapper.find('[data-test="video-call-btn"]').trigger('click')
+      expect(openVideoCallMock).toHaveBeenCalledTimes(1)
+      expect(openVideoCallMock.mock.calls[0][1]).toEqual({
+        groupId: group.id,
+        groupName: group.name,
+        groupSlug: group.slug,
+        groupAvatar: group.avatar,
+      })
+    })
+
+    // Regression guard: even with the "happy" combination (public group,
+    // confirmed member, peter-lustig logged in) the button must stay hidden
+    // when the feature flag is off. The other test scenarios in this file
+    // (e.g. snapshot tests for various roles) all run with the default
+    // store where videoCall/enabled is false; this case asserts the gate
+    // explicitly so it can't be silently removed.
+    it('hides the video-call button when videoCall/enabled is false (feature-flag off)', () => {
+      openVideoCallMock = jest.fn()
+      currentUserMock.mockReturnValue(peterLustig)
+      const disabledStore = new Vuex.Store({
+        getters: {
+          ...getters,
+          'videoCall/enabled': () => false,
+        },
+        actions,
+        mutations: {
+          ...mutations,
+          'videoCall/OPEN': openVideoCallMock,
+        },
+      })
+      const wrapper = mount(GroupProfileSlug, {
+        localVue,
+        store: disabledStore,
+        stubs: {
+          ...stubs,
+          'infinite-loading': true,
+          'masonry-grid': true,
+          'masonry-grid-item': true,
+          'post-teaser': true,
+          'content-viewer': true,
+          OsCounterIcon: { props: ['icon', 'count'], template: '<i class="stub-counter-icon" />' },
+          OsIcon: { props: ['icon'], template: '<i class="stub-icon" />' },
+        },
+        mocks: {
+          ...mocks,
+          $apollo: {
+            loading: false,
+            mutate: jest.fn().mockResolvedValue(),
+            subscribe: jest.fn().mockReturnValue({
+              subscribe: jest.fn().mockReturnValue({ unsubscribe: jest.fn() }),
+            }),
+            queries: { chatRoom: { refetch: jest.fn() } },
+          },
+        },
+        data: () => ({ group: { ...yogaPractice, myRole: 'usual' }, GroupMembers: [] }),
+      })
+      expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(false)
     })
   })
 })

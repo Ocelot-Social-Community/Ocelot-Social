@@ -32,6 +32,14 @@ services:
       - IMAGOR_PUBLIC_URL=http://localhost:8000
       - IMAGOR_SECRET=mysecret
       - PROXY_S3=http://minio:9000
+      # Synthetic LiveKit config so videoCallConfig.enabled returns true and the
+      # video-call e2e tests exercise the PreJoin UI. There is no real LiveKit
+      # server in the CI compose stack — when the front end attempts to connect
+      # against this fake URL it lands in the "error" phase, which is exactly
+      # the path we want to exercise. See cypress/e2e/videoCall/PreJoin.feature.
+      - LIVEKIT_URL=wss://livekit.example.test
+      - LIVEKIT_API_KEY=test-key
+      - LIVEKIT_API_SECRET=test-secret
     volumes:
       - ./coverage:/app/coverage
 

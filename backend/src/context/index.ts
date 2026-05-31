@@ -9,6 +9,8 @@ import type { DecodedUser } from '@src/jwt/decode'
 const serverDatabase = databaseContext()
 const serverPubsub = pubsubContext()
 
+export { serverDatabase, serverPubsub }
+
 export const getContext =
   (opts?: {
     database?: ReturnType<typeof databaseContext>
