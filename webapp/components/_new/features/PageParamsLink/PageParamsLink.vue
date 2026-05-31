@@ -6,7 +6,7 @@
   >
     <slot />
   </nuxt-link>
-  <a v-else :href="href" :target="target" :data-test="pageParams.name + '-link'">
+  <a v-else :href="href" :target="target" :rel="externalRel" :data-test="pageParams.name + '-link'">
     <slot />
   </a>
 </template>
@@ -33,6 +33,12 @@ export default {
     },
     isInternalLink() {
       return !this.forceTargetBlank && this.pageParams.isInternalPage
+    },
+    externalRel() {
+      // Only set rel when the link actually opens in a new tab — prevents
+      // reverse-tabnabbing through window.opener and strips the Referer
+      // header for the navigated origin.
+      return this.target === '_blank' ? 'noopener noreferrer' : null
     },
   },
 }

@@ -7,7 +7,7 @@
         </h5>
         <template>
           <div v-for="link in socialMediaLinks()" :key="link.url" class="ds-my-x-small">
-            <a :href="link.url" target="_blank">
+            <a :href="link.url" target="_blank" rel="noopener noreferrer">
               <favicon :src="link.favicon" :size="22" />
               {{ link.username }}
             </a>
