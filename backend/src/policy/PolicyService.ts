@@ -20,7 +20,7 @@
 
 import databaseContext from '@context/database'
 
-import { allKeys, defaultFor, envSeedFor, typeFor, visibleKeys } from './schema'
+import { allKeys, canView, defaultFor, envSeedFor, typeFor } from './schema'
 import {
   POLICY_NAMESPACE,
   deleteSetting,
@@ -130,16 +130,17 @@ export class PolicyService {
     return (value !== undefined ? value : defaultFor(key)) as NetworkPolicy[K]
   }
 
-  // The snapshot as visible to a given viewer. Keys the viewer may not see are
-  // omitted (the GraphQL layer renders them as null). Visibility is decided by
-  // canView() via visibleKeys() — the single source of truth shared with the
-  // subscription filter.
-  getVisibleSnapshot(user: PolicyViewer | null | undefined): Partial<NetworkPolicy> {
-    const out: Record<string, unknown> = {}
-    for (const key of visibleKeys(user)) {
-      out[key] = this.get(key)
+  // The snapshot as visible to a given viewer. Every key is present so the
+  // GraphQL default field resolver never returns `undefined` (which the schema
+  // middleware rejects); keys the viewer may not see are explicitly `null`.
+  // Visibility is decided by canView() — the single source of truth shared with
+  // the subscription filter.
+  getVisibleSnapshot(user: PolicyViewer | null | undefined): Record<PolicyKey, boolean | null> {
+    const out = {} as Record<PolicyKey, boolean | null>
+    for (const key of allKeys()) {
+      out[key] = canView(key, user) ? this.get(key) : null
     }
-    return out as Partial<NetworkPolicy>
+    return out
   }
 
   async set<K extends PolicyKey>(
@@ -159,13 +160,6 @@ export class PolicyService {
       actor,
       timestamp: new Date().toISOString(),
     }
-    // eslint-disable-next-line no-console
-    console.log(
-      `[policy] publish ${POLICY_CHANGED_CHANNEL}`,
-      JSON.stringify(event),
-      'pubsub?',
-      !!this.pubsub,
-    )
     void this.pubsub?.publish(POLICY_CHANGED_CHANNEL, { policyChanged: event })
     return event
   }

@@ -107,8 +107,12 @@ describe('PolicyService', () => {
   })
 
   describe('getVisibleSnapshot()', () => {
-    const PUBLIC_KEYS = ['categoriesActive', 'inviteRegistration', 'publicRegistration']
-    const ALL_KEYS = ['apiKeysEnabled', ...PUBLIC_KEYS].sort()
+    const ALL_KEYS = [
+      'apiKeysEnabled',
+      'categoriesActive',
+      'inviteRegistration',
+      'publicRegistration',
+    ]
 
     const initService = async () => {
       readAllSettings.mockResolvedValue({})
@@ -117,23 +121,28 @@ describe('PolicyService', () => {
       return svc
     }
 
-    it('hides authenticated-only keys from an anonymous viewer (apiKeysEnabled omitted)', async () => {
+    // Every key is always present (so the GraphQL default resolver never sees
+    // undefined); a key the viewer may not see is null, not omitted.
+    it('returns authenticated-only keys as null to an anonymous viewer', async () => {
       const svc = await initService()
       const snap = svc.getVisibleSnapshot(null)
-      expect(Object.keys(snap).sort()).toEqual(PUBLIC_KEYS)
-      expect(snap).not.toHaveProperty('apiKeysEnabled')
+      expect(Object.keys(snap).sort()).toEqual(ALL_KEYS)
+      expect(snap.apiKeysEnabled).toBeNull()
+      expect(snap.publicRegistration).toBe(false) // public key still has its value
     })
 
-    it('exposes authenticated keys to a logged-in (non-admin) viewer', async () => {
+    it('exposes authenticated key values to a logged-in (non-admin) viewer', async () => {
       const svc = await initService()
       const snap = svc.getVisibleSnapshot({ role: 'user' })
       expect(Object.keys(snap).sort()).toEqual(ALL_KEYS)
+      expect(snap.apiKeysEnabled).toBe(false) // value, not null
     })
 
     it('exposes everything to an admin (superuser short-circuit)', async () => {
       const svc = await initService()
       const snap = svc.getVisibleSnapshot({ role: 'admin' })
       expect(Object.keys(snap).sort()).toEqual(ALL_KEYS)
+      expect(snap.apiKeysEnabled).toBe(false)
     })
   })
 
