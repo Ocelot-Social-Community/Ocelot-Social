@@ -1,4 +1,6 @@
-import { POLICY_CHANGED_CHANNEL } from '@src/policy'
+import { withFilter } from 'graphql-subscriptions'
+
+import { POLICY_CHANGED_CHANNEL, canView } from '@src/policy'
 
 import type { Context } from '@src/context'
 import type { NetworkPolicy, PolicyKey } from '@src/policy'
@@ -17,10 +19,11 @@ const serializeEvent = (event: {
 
 export default {
   Query: {
-    publicPolicy: (_parent: unknown, _args: unknown, { policy }: Context) =>
-      policy.getSnapshot('public'),
-    adminPolicy: (_parent: unknown, _args: unknown, { policy }: Context) =>
-      policy.getSnapshot('admin'),
+    // Single resolver: returns the snapshot scoped to the viewer's audiences.
+    // Keys the viewer may not see are omitted → null in the (nullable) GraphQL
+    // fields. Public keys are always present.
+    policy: (_parent: unknown, _args: unknown, { policy, user }: Context) =>
+      policy.getVisibleSnapshot(user),
   },
   Mutation: {
     setPolicy: async (
@@ -52,16 +55,17 @@ export default {
   },
   Subscription: {
     policyChanged: {
-      subscribe: (_parent: unknown, _args: unknown, { pubsub }: Context) => {
-        // eslint-disable-next-line no-console
-        console.log('[policy] subscriber attached to', POLICY_CHANGED_CHANNEL)
-        return pubsub.asyncIterator(POLICY_CHANGED_CHANNEL)
-      },
-      resolve: (payload: { policyChanged: { key: string; value: unknown; actor: string; timestamp: string } }) => {
-        // eslint-disable-next-line no-console
-        console.log('[policy] resolve fired', JSON.stringify(payload.policyChanged))
-        return serializeEvent(payload.policyChanged)
-      },
+      // Same visibility mechanism as the query: a change event is only
+      // delivered to a subscriber if canView() grants them the changed key.
+      // The viewer's context (user) is fixed at WebSocket connect time.
+      subscribe: withFilter(
+        (_parent: unknown, _args: unknown, { pubsub }: Context) =>
+          pubsub.asyncIterator(POLICY_CHANGED_CHANNEL),
+        (payload: { policyChanged: { key: string } }, _args: unknown, { user }: Context) =>
+          canView(payload.policyChanged.key as PolicyKey, user),
+      ),
+      resolve: (payload: { policyChanged: { key: string; value: unknown; actor: string; timestamp: string } }) =>
+        serializeEvent(payload.policyChanged),
     },
   },
 }

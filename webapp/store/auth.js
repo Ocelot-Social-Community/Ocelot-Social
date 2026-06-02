@@ -107,6 +107,10 @@ export const actions = {
       commit('SET_TOKEN', login)
       await dispatch('fetchCurrentUser')
       await dispatch('categories/init', null, { root: true })
+      // Refetch the policy now that we're authenticated: the same query now
+      // returns the viewer-scoped keys (e.g. apiKeysEnabled) that were null
+      // while anonymous — no full page reload needed.
+      await dispatch('policy/init', null, { root: true })
       if (cookies.get(metadata.COOKIE_NAME) === undefined) {
         throw new Error('no-cookie')
       }
@@ -117,9 +121,12 @@ export const actions = {
     }
   },
 
-  async logout({ commit }) {
+  async logout({ commit, dispatch }) {
     commit('SET_USER', null)
     commit('SET_TOKEN', null)
-    return this.app.$apolloHelpers.onLogout()
+    await this.app.$apolloHelpers.onLogout()
+    // Refetch as anonymous so authenticated-only keys (e.g. apiKeysEnabled)
+    // reset to their defaults instead of lingering from the logged-in session.
+    await dispatch('policy/init', null, { root: true })
   },
 }

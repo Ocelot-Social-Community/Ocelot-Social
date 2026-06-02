@@ -1,22 +1,20 @@
 type Query {
-  publicPolicy: PublicPolicy!
-  adminPolicy: AdminPolicy!
+  policy: Policy!
 }
 
-type PublicPolicy {
+# Network policy as visible to the requesting viewer. A single resolver fills
+# this based on user context (see resolvers/policy.ts → canView). Keys an
+# audience may always see are non-null; keys gated to a narrower audience are
+# nullable and come back null when the viewer may not see them.
+#   • public        → Boolean!  (every viewer, incl. anonymous)
+#   • authenticated → Boolean   (null unless the viewer is logged in / admin)
+# Field nullability mirrors policy.schema.json "x-visibility". When adding a key,
+# make it non-null only if its audiences include "public".
+type Policy {
   publicRegistration: Boolean!
   inviteRegistration: Boolean!
   categoriesActive: Boolean!
-  apiKeysEnabled: Boolean!
-}
-
-# Currently identical to PublicPolicy because all four B5 keys are public.
-# Diverges once admin-only keys (x-visibility: "admin") are added.
-type AdminPolicy {
-  publicRegistration: Boolean!
-  inviteRegistration: Boolean!
-  categoriesActive: Boolean!
-  apiKeysEnabled: Boolean!
+  apiKeysEnabled: Boolean
 }
 
 # The "value" field carries the new value as JSON-stringified payload to keep

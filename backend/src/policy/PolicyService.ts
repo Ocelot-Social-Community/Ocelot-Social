@@ -20,7 +20,7 @@
 
 import databaseContext from '@context/database'
 
-import { allKeys, defaultFor, envSeedFor, keysByVisibility, typeFor } from './schema'
+import { allKeys, defaultFor, envSeedFor, typeFor, visibleKeys } from './schema'
 import {
   POLICY_NAMESPACE,
   deleteSetting,
@@ -29,7 +29,8 @@ import {
   writeSetting,
 } from './repository'
 
-import type { NetworkPolicy, PolicyKey, Visibility } from './types'
+import type { PolicyViewer } from './schema'
+import type { NetworkPolicy, PolicyKey } from './types'
 
 type DbContext = ReturnType<typeof databaseContext>
 
@@ -129,9 +130,13 @@ export class PolicyService {
     return (value !== undefined ? value : defaultFor(key)) as NetworkPolicy[K]
   }
 
-  getSnapshot(visibility: Visibility = 'public'): Partial<NetworkPolicy> {
+  // The snapshot as visible to a given viewer. Keys the viewer may not see are
+  // omitted (the GraphQL layer renders them as null). Visibility is decided by
+  // canView() via visibleKeys() — the single source of truth shared with the
+  // subscription filter.
+  getVisibleSnapshot(user: PolicyViewer | null | undefined): Partial<NetworkPolicy> {
     const out: Record<string, unknown> = {}
-    for (const key of keysByVisibility(visibility)) {
+    for (const key of visibleKeys(user)) {
       out[key] = this.get(key)
     }
     return out as Partial<NetworkPolicy>

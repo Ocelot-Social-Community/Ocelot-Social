@@ -1,10 +1,10 @@
 import PolicyQuery from '~/graphql/PolicyQuery'
-import AdminPolicyQuery from '~/graphql/AdminPolicyQuery'
 import PolicySubscription from '~/graphql/PolicySubscription'
 import { setPolicyMutation, resetPolicyMutation } from '~/graphql/PolicyMutations'
 
 // Mirrors backend NetworkPolicy schema. Defaults match the schema's "default"
-// fields — used until the backend snapshot is loaded.
+// fields — used until the backend snapshot is loaded, and for any key the
+// backend returns as null (= not visible to the current viewer).
 const DEFAULTS = Object.freeze({
   publicRegistration: false,
   inviteRegistration: true,
@@ -20,7 +20,15 @@ export const state = () => ({
 
 export const mutations = {
   SET_SNAPSHOT(state, snapshot) {
-    state.snapshot = { ...DEFAULTS, ...snapshot }
+    // Normalise null/undefined (a key the viewer may not see, e.g. after
+    // logout) back to its default, so a stale authenticated value can never
+    // linger once the viewer loses visibility.
+    const normalized = {}
+    for (const key of Object.keys(DEFAULTS)) {
+      const value = snapshot ? snapshot[key] : undefined
+      normalized[key] = value === undefined || value === null ? DEFAULTS[key] : value
+    }
+    state.snapshot = normalized
   },
   PATCH_KEY(state, { key, value }) {
     state.snapshot = { ...state.snapshot, [key]: value }
@@ -46,15 +54,19 @@ export const getters = {
 const apolloClient = (ctx) => ctx.app.apolloProvider.defaultClient
 
 export const actions = {
+  // Fetches the viewer-scoped snapshot. Re-dispatched whenever the auth state
+  // changes (after login / logout) so authenticated keys appear / reset without
+  // a full page reload — the single query returns exactly what the current
+  // viewer may see.
   async init({ commit }) {
     try {
       const {
-        data: { publicPolicy },
+        data: { policy },
       } = await apolloClient(this).query({
         query: PolicyQuery(),
         fetchPolicy: 'network-only',
       })
-      commit('SET_SNAPSHOT', publicPolicy)
+      commit('SET_SNAPSHOT', policy)
       commit('SET_INITIALIZED')
     } catch (err) {
       // Fall back to defaults; non-fatal so SSR can still render
@@ -62,17 +74,6 @@ export const actions = {
       commit('SET_SNAPSHOT', DEFAULTS)
       commit('SET_INITIALIZED', false)
     }
-  },
-
-  async fetchAdmin({ commit }) {
-    const {
-      data: { adminPolicy },
-    } = await apolloClient(this).query({
-      query: AdminPolicyQuery(),
-      fetchPolicy: 'network-only',
-    })
-    commit('SET_SNAPSHOT', adminPolicy)
-    return adminPolicy
   },
 
   async setKey({ commit }, { key, value }) {

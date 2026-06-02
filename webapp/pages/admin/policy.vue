@@ -71,7 +71,7 @@ export default {
   },
   methods: {
     ...mapActions({
-      fetchAdmin: 'policy/fetchAdmin',
+      fetchPolicy: 'policy/init',
       setKey: 'policy/setKey',
       resetKey: 'policy/resetKey',
     }),
@@ -120,7 +120,7 @@ export default {
     },
   },
   async mounted() {
-    await this.fetchAdmin()
+    await this.fetchPolicy()
     this.syncFormFromSnapshot()
   },
 }

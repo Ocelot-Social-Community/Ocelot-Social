@@ -3,13 +3,15 @@
 // type-level drift is the only concern).
 
 /* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
-import type { NetworkPolicy, PolicyKey, Visibility } from './types'
+import { ADMIN_AUDIENCE, AUTHENTICATED_AUDIENCE, PUBLIC_AUDIENCE } from './types'
+
+import type { Audience, NetworkPolicy, PolicyKey } from './types'
 
 interface RawProperty {
   type: string
   default: unknown
   description?: string
-  'x-visibility'?: Visibility
+  'x-visibility'?: Audience[]
   'x-envSeed'?: string
 }
 
@@ -32,17 +34,48 @@ export function envSeedFor(key: PolicyKey): string | undefined {
   return rawSchema.properties[key]['x-envSeed']
 }
 
-export function visibilityFor(key: PolicyKey): Visibility {
-  return rawSchema.properties[key]['x-visibility'] ?? 'admin'
-}
-
-export function keysByVisibility(visibility: Visibility): PolicyKey[] {
-  return allKeys().filter((key) => {
-    if (visibility === 'admin') return true
-    return visibilityFor(key) === 'public'
-  })
-}
-
 export function typeFor(key: PolicyKey): string {
   return rawSchema.properties[key].type
+}
+
+// --- Visibility: membership-based, not rank-based -------------------------
+// The whole "who may see what" mechanism is three small functions. Both the
+// `policy` query resolver and the policyChanged subscription filter go through
+// canView() — it is the single source of truth for visibility.
+
+// Minimal viewer shape — just the role for now; widen to roles[] when dynamic
+// multi-role assignment lands (only audiencesOf() needs to change).
+export interface PolicyViewer {
+  role?: string | null
+}
+
+// The audiences a key is visible to. Empty/missing ⇒ admin-only (admin still
+// sees it via canView's superuser short-circuit).
+export function audiencesFor(key: PolicyKey): Audience[] {
+  return rawSchema.properties[key]['x-visibility'] ?? []
+}
+
+// The audiences a viewer belongs to. 'public' is universal (every viewer,
+// including anonymous); logged-in viewers additionally carry 'authenticated'
+// and their role name(s).
+export function audiencesOf(user: PolicyViewer | null | undefined): Set<Audience> {
+  const audiences = new Set<Audience>([PUBLIC_AUDIENCE])
+  if (user) {
+    audiences.add(AUTHENTICATED_AUDIENCE)
+    if (user.role) audiences.add(user.role)
+  }
+  return audiences
+}
+
+// The single visibility primitive. Admin sees everything; everyone else sees a
+// key iff they share at least one audience with it.
+export function canView(key: PolicyKey, user: PolicyViewer | null | undefined): boolean {
+  const viewer = audiencesOf(user)
+  if (viewer.has(ADMIN_AUDIENCE)) return true
+  return audiencesFor(key).some((audience) => viewer.has(audience))
+}
+
+// All keys a viewer may see.
+export function visibleKeys(user: PolicyViewer | null | undefined): PolicyKey[] {
+  return allKeys().filter((key) => canView(key, user))
 }

@@ -20,8 +20,12 @@ export const getters = {
   categories(state) {
     return state.categories
   },
-  categoriesActive(state) {
-    return !!state.categories.length
+  // Whether the categories feature is enabled. The network policy is the single
+  // source of truth (admins toggle it at runtime); the actual category list
+  // (loaded via init) is orthogonal and still guarded with `.length` at the
+  // usage sites that render chips.
+  categoriesActive(state, _getters, _rootState, rootGetters) {
+    return !!rootGetters['policy/get']('categoriesActive')
   },
   isInitialized(state) {
     return state.isInitialized

@@ -106,19 +106,34 @@ describe('PolicyService', () => {
     })
   })
 
-  describe('getSnapshot()', () => {
-    it('returns all public-visibility keys (all 4 are public for B5)', async () => {
+  describe('getVisibleSnapshot()', () => {
+    const PUBLIC_KEYS = ['categoriesActive', 'inviteRegistration', 'publicRegistration']
+    const ALL_KEYS = ['apiKeysEnabled', ...PUBLIC_KEYS].sort()
+
+    const initService = async () => {
       readAllSettings.mockResolvedValue({})
       const svc = new PolicyService(dbStub as never)
       await svc.init({})
+      return svc
+    }
 
-      const snap = svc.getSnapshot('public')
-      expect(Object.keys(snap).sort()).toEqual([
-        'apiKeysEnabled',
-        'categoriesActive',
-        'inviteRegistration',
-        'publicRegistration',
-      ])
+    it('hides authenticated-only keys from an anonymous viewer (apiKeysEnabled omitted)', async () => {
+      const svc = await initService()
+      const snap = svc.getVisibleSnapshot(null)
+      expect(Object.keys(snap).sort()).toEqual(PUBLIC_KEYS)
+      expect(snap).not.toHaveProperty('apiKeysEnabled')
+    })
+
+    it('exposes authenticated keys to a logged-in (non-admin) viewer', async () => {
+      const svc = await initService()
+      const snap = svc.getVisibleSnapshot({ role: 'user' })
+      expect(Object.keys(snap).sort()).toEqual(ALL_KEYS)
+    })
+
+    it('exposes everything to an admin (superuser short-circuit)', async () => {
+      const svc = await initService()
+      const snap = svc.getVisibleSnapshot({ role: 'admin' })
+      expect(Object.keys(snap).sort()).toEqual(ALL_KEYS)
     })
   })
 

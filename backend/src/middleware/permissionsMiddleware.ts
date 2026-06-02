@@ -476,9 +476,10 @@ export default shield(
       apiKeyUsers: isAdmin,
       apiKeysForUser: isAdmin,
 
-      // Network Policy
-      publicPolicy: allow, // anonymous; needed by login screen
-      adminPolicy: isAdmin,
+      // Network Policy — one query for everyone; per-field visibility (which
+      // keys a viewer actually receives) is enforced inside the resolver via
+      // canView(). Anonymous viewers still need it (login/register screen).
+      policy: allow,
     },
     Mutation: {
       '*': deny,
