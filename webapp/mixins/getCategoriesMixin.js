@@ -6,11 +6,14 @@ export default {
       categories: 'categories/categories',
       isInitialized: 'categories/isInitialized',
     }),
-    // Whether the categories feature is enabled — read straight from the network
-    // policy (single source of truth, admin-toggleable at runtime), consistent
-    // with how other policy flags (e.g. apiKeysEnabled) are gated.
+    // Whether the categories feature is usable. The network policy is the
+    // single source of truth for the toggle (admin-controlled at runtime), but
+    // we also require at least one category to exist — otherwise the feature
+    // would surface unfillable "category required" fields and empty selectors
+    // when the DB has no categories. Restores the previous `!!categories.length`
+    // safety net on top of the policy flag.
     categoriesActive() {
-      return !!this.$policy.get('categoriesActive')
+      return !!this.$policy.get('categoriesActive') && this.categories?.length > 0
     },
   },
   methods: {

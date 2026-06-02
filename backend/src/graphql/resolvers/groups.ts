@@ -20,6 +20,23 @@ import { createOrUpdateLocations } from './users/location'
 
 import type { Context } from '@src/context'
 
+// Whether any Category nodes exist. Keeps CreateGroup graceful: the "categories
+// required" rule only applies when the policy is on AND there is at least one
+// category to choose from (mirrors the frontend gating in getCategoriesMixin).
+const categoriesExist = async (context: Context): Promise<boolean> => {
+  const session = context.driver.session()
+  try {
+    return await session.readTransaction(async (txc) => {
+      const result = await txc.run(
+        'MATCH (category:Category) RETURN count(category) > 0 AS hasCategories',
+      )
+      return Boolean(result.records[0]?.get('hasCategories'))
+    })
+  } finally {
+    await session.close()
+  }
+}
+
 export default {
   Query: {
     Group: async (_object, params, context: Context, _resolveInfo) => {
@@ -126,7 +143,11 @@ export default {
       const { categoryIds } = params
       delete params.categoryIds
       params.locationName = params.locationName === '' ? null : params.locationName
-      if (policy.get('categoriesActive') && (!categoryIds || categoryIds.length < CATEGORIES_MIN)) {
+      // Only require categories when the feature is on AND at least one category
+      // exists — otherwise group creation would be impossible on an empty
+      // category DB (mirrors the frontend gating in getCategoriesMixin).
+      const enforceCategories = policy.get('categoriesActive') && (await categoriesExist(context))
+      if (enforceCategories && (!categoryIds || categoryIds.length < CATEGORIES_MIN)) {
         throw new UserInputError('Too few categories!')
       }
       if (policy.get('categoriesActive') && categoryIds && categoryIds.length > CATEGORIES_MAX) {

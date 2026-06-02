@@ -407,6 +407,26 @@ describe('in mode', () => {
               expect(errors?.[0]).toHaveProperty('message', 'Too many categories!')
             })
           })
+
+          describe('but no categories exist in the database (empty category DB)', () => {
+            beforeEach(async () => {
+              const session = database.driver.session()
+              try {
+                await session.run('MATCH (category:Category) DETACH DELETE category')
+              } finally {
+                await session.close()
+              }
+            })
+
+            it('creates the group without categories instead of throwing "Too few categories!"', async () => {
+              await expect(
+                mutate({ mutation: CreateGroup, variables: { ...variables, categoryIds: null } }),
+              ).resolves.toMatchObject({
+                data: { CreateGroup: { name: 'The Best Group', myRole: 'owner' } },
+                errors: undefined,
+              })
+            })
+          })
         })
       })
     })
