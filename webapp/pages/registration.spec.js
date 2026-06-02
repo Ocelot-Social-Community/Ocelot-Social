@@ -76,8 +76,10 @@ describe('Registration', () => {
               nonce: null,
             },
           },
-          publicRegistration: false,
-          inviteRegistration: false,
+          // publicRegistration / inviteRegistration are computeds (read from
+          // $policy) on the component — do NOT inject them as data here, that
+          // triggers Vue's "computed already defined in data" warning. Their
+          // values come from the $policy mock (see beforeEach).
         }
         const aData = await Registration.asyncData({
           store,
