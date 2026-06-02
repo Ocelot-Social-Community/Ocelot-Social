@@ -20,13 +20,9 @@ export const getters = {
   categories(state) {
     return state.categories
   },
-  // Whether the categories feature is enabled. The network policy is the single
-  // source of truth (admins toggle it at runtime); the actual category list
-  // (loaded via init) is orthogonal and still guarded with `.length` at the
-  // usage sites that render chips.
-  categoriesActive(state, _getters, _rootState, rootGetters) {
-    return !!rootGetters['policy/get']('categoriesActive')
-  },
+  // NOTE: "categories feature enabled" is no longer a categories-store concern.
+  // It is read straight from the network policy via $policy.get('categoriesActive')
+  // (see getCategoriesMixin) — the policy is the single source of truth.
   isInitialized(state) {
     return state.isInitialized
   },

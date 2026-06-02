@@ -40,7 +40,6 @@ describe('GroupProfileSlug', () => {
   const getters = {
     'auth/user': currentUserMock,
     'auth/isModerator': () => false,
-    'categories/categoriesActive': () => true,
     'categories/categories': () => [{ id: 'cat1' }],
   }
 
@@ -59,6 +58,8 @@ describe('GroupProfileSlug', () => {
       //   id: 'p23',
       //   name: 'It is a post',
       // },
+      // categories feature enabled — read via $policy by getCategoriesMixin
+      $policy: { get: () => true },
       $t: jest.fn((a) => a),
       $filters: {
         removeLinks: (c) => c,

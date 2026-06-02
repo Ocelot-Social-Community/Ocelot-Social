@@ -79,7 +79,6 @@ describe('ContributionForm.vue', () => {
           slug: 'you-yourself',
         }
       },
-      'categories/categoriesActive': jest.fn(() => false),
     }
     const store = new Vuex.Store({
       getters,

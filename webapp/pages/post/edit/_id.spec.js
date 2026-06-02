@@ -46,7 +46,6 @@ describe('post/_id.vue', () => {
             return { id: userId }
           },
           'categories/categories': jest.fn(() => []),
-          'categories/categoriesActive': () => false,
         },
         actions: {
           'categories/init': jest.fn(),

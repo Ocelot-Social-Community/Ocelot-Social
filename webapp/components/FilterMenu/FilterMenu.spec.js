@@ -14,7 +14,6 @@ describe('FilterMenu.vue', () => {
     'posts/isActive': () => false,
     'posts/filteredPostTypes': () => [],
     'posts/orderBy': () => 'sortDate_desc',
-    'categories/categoriesActive': () => false,
   }
   const actions = {
     'categories/init': jest.fn(),

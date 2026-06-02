@@ -46,7 +46,6 @@ describe('PostSlug', () => {
             return { id: '1stUser' }
           },
           'auth/isModerator': () => false,
-          'categories/categoriesActive': () => false,
         },
         actions: {
           'categories/init': jest.fn(),

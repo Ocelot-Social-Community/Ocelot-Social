@@ -11,21 +11,6 @@ describe('categories store', () => {
     })
   })
 
-  describe('getters', () => {
-    describe('categoriesActive', () => {
-      const callGetter = (categoriesActive) =>
-        getters.categoriesActive({}, {}, {}, { 'policy/get': (key) => ({ categoriesActive }[key]) })
-
-      it('returns true when the policy flag is enabled', () => {
-        expect(callGetter(true)).toBe(true)
-      })
-
-      it('returns false when the policy flag is disabled', () => {
-        expect(callGetter(false)).toBe(false)
-      })
-    })
-  })
-
   describe('mutations', () => {
     let testMutation
 
