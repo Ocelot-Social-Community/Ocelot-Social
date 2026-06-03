@@ -185,7 +185,7 @@ export default {
       if (!user) {
         throw new Error('Missing authenticated user.')
       }
-      const { config, policy } = context
+      const { policy } = context
       const { categoryIds, groupId } = params
       const { image: imageInput } = params
 
@@ -272,7 +272,7 @@ export default {
       }
     },
     UpdatePost: async (_parent, params, context: Context, _resolveInfo) => {
-      const { config, policy } = context
+      const { policy } = context
       const { categoryIds } = params
       const { image: imageInput } = params
 

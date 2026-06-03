@@ -13,6 +13,8 @@ async function main() {
   // subscribe to policy.changed events for cross-instance cache sync.
   // Must complete before the server accepts requests.
   const pubsub = pubsubContext() as unknown as PolicyPubSub
+  // App entry point: read the deployment environment to seed the policy.
+  // eslint-disable-next-line n/no-process-env
   await getPolicyService().init(process.env, pubsub)
 
   const { server, httpServer } = await createServer({

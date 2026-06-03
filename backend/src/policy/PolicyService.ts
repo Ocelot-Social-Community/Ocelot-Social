@@ -18,9 +18,9 @@
 // Redis pubsub; same-key concurrent writes resolve to last-writer-wins (Cypher
 // MERGE is atomic per query, but ordering across instances is not enforced).
 
+/* eslint-disable security/detect-object-injection */ // keys are PolicyKeys from the schema, never user input
 import databaseContext from '@context/database'
 
-import { allKeys, canView, defaultFor, envSeedFor, typeFor } from './schema'
 import {
   POLICY_NAMESPACE,
   deleteSetting,
@@ -29,6 +29,7 @@ import {
   readLastChange,
   writeSetting,
 } from './repository'
+import { allKeys, canView, defaultFor, envSeedFor, typeFor } from './schema'
 
 import type { PolicyViewer } from './schema'
 import type { NetworkPolicy, PolicyKey } from './types'
@@ -47,15 +48,19 @@ export interface PolicyChangeEvent {
 // Minimal pubsub shape — compatible with both `graphql-subscriptions` PubSub
 // and `graphql-redis-subscriptions` RedisPubSub.
 export interface PolicyPubSub {
-  publish(triggerName: string, payload: unknown): void | Promise<void>
-  subscribe(
+  publish: (triggerName: string, payload: unknown) => void | Promise<void>
+  subscribe: (
     triggerName: string,
     onMessage: (payload: { policyChanged: PolicyChangeEvent }) => void,
-  ): Promise<number>
-  unsubscribe(subId: number): void
+  ) => Promise<number>
+  unsubscribe: (subId: number) => void
 }
 
-function parseEnvValue(envName: string, env: NodeJS.ProcessEnv, typeName: string): unknown {
+// The deployment environment map (a subset of process.env), passed in from the
+// app entry — PolicyService never reads process.env itself.
+type Env = Record<string, string | undefined>
+
+function parseEnvValue(envName: string, env: Env, typeName: string): unknown {
   const raw = env[envName]
   if (raw === undefined) return undefined
 
@@ -76,16 +81,13 @@ export class PolicyService {
   private cache: Partial<NetworkPolicy> = {}
   private initialised = false
   private pubsub: PolicyPubSub | undefined
-  private env: NodeJS.ProcessEnv = process.env
+  private env: Env = {}
   private subscriptionId: number | undefined
   private lastChange: { actor: string; timestamp: string } | undefined
 
   constructor(private readonly db: DbContext = databaseContext()) {}
 
-  async init(
-    env: NodeJS.ProcessEnv = process.env,
-    pubsub?: PolicyPubSub,
-  ): Promise<void> {
+  async init(env: Env, pubsub?: PolicyPubSub): Promise<void> {
     this.env = env
     this.pubsub = pubsub
 
@@ -120,7 +122,7 @@ export class PolicyService {
     this.initialised = true
   }
 
-  async shutdown(): Promise<void> {
+  shutdown(): void {
     if (this.subscriptionId !== undefined && this.pubsub) {
       this.pubsub.unsubscribe(this.subscriptionId)
       this.subscriptionId = undefined
@@ -133,7 +135,7 @@ export class PolicyService {
       return defaultFor(key)
     }
     const value = this.cache[key]
-    return (value !== undefined ? value : defaultFor(key)) as NetworkPolicy[K]
+    return value ?? defaultFor(key)
   }
 
   // The snapshot as visible to a given viewer. Every key is present so the
@@ -153,9 +155,8 @@ export class PolicyService {
   // deployment if set, otherwise the schema default. Single source of truth for
   // "the configured default" — the frontend has none of its own.
   getDefault<K extends PolicyKey>(key: K): NetworkPolicy[K] {
-    const env = this.env ?? process.env
     const envName = envSeedFor(key)
-    const envValue = envName ? parseEnvValue(envName, env, typeFor(key)) : undefined
+    const envValue = envName ? parseEnvValue(envName, this.env, typeFor(key)) : undefined
     return (envValue !== undefined ? envValue : defaultFor(key)) as NetworkPolicy[K]
   }
 
@@ -187,7 +188,7 @@ export class PolicyService {
     this.cache[key] = value
 
     const event: PolicyChangeEvent = {
-      key: String(key),
+      key,
       value,
       actor,
       timestamp: new Date().toISOString(),
@@ -197,7 +198,7 @@ export class PolicyService {
     return event
   }
 
-  async reset<K extends PolicyKey>(key: K, actor: string): Promise<PolicyChangeEvent> {
+  async reset(key: PolicyKey, actor: string): Promise<PolicyChangeEvent> {
     this.assertKnownKey(key)
 
     await deleteSetting(this.db, POLICY_NAMESPACE, key)
@@ -206,7 +207,7 @@ export class PolicyService {
     this.cache[key] = newValue
 
     const event: PolicyChangeEvent = {
-      key: String(key),
+      key,
       value: newValue,
       actor,
       timestamp: new Date().toISOString(),
@@ -221,7 +222,7 @@ export class PolicyService {
   // cache (same value written twice).
   applyExternalChange(event: PolicyChangeEvent): void {
     if (!this.isKnownKey(event.key)) return
-    this.cache[event.key as PolicyKey] = event.value as never
+    this.cache[event.key] = event.value as never
     this.lastChange = { actor: event.actor, timestamp: event.timestamp }
   }
 
@@ -243,9 +244,7 @@ export class PolicyService {
       (expected === 'integer' && actual === 'number' && Number.isInteger(value)) ||
       (expected === 'string' && actual === 'string')
     if (!ok) {
-      throw new Error(
-        `Type mismatch for policy key '${key}': expected ${expected}, got ${actual}`,
-      )
+      throw new Error(`Type mismatch for policy key '${key}': expected ${expected}, got ${actual}`)
     }
   }
 }
@@ -254,9 +253,7 @@ export class PolicyService {
 let instance: PolicyService | undefined
 
 export function getPolicyService(): PolicyService {
-  if (!instance) {
-    instance = new PolicyService()
-  }
+  instance ??= new PolicyService()
   return instance
 }
 
@@ -269,12 +266,12 @@ export function setPolicyServiceForTesting(svc: PolicyService | undefined): void
 interface PolicyServiceInternal {
   cache: Partial<NetworkPolicy>
   initialised: boolean
-  env: NodeJS.ProcessEnv
+  env: Env
 }
 
 export function createInMemoryPolicyService(
   values: Partial<NetworkPolicy> = {},
-  env: NodeJS.ProcessEnv = process.env,
+  env: Env = {},
 ): PolicyService {
   const svc = Object.create(PolicyService.prototype) as unknown as PolicyServiceInternal
   svc.cache = { ...values }

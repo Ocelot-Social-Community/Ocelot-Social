@@ -1,0 +1,6 @@
+query policyLastChange {
+  policyLastChange {
+    actor
+    timestamp
+  }
+}

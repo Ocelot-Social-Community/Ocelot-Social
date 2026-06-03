@@ -2,7 +2,11 @@
 // ./types.ts in sync with it (defaults are read from the JSON at runtime, so
 // type-level drift is the only concern).
 
-/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
+// Loading the canonical JSON schema synchronously at module init is intentional
+// (resolveJsonModule is off project-wide; the build copies the .json next to this
+// file). require() is the established pattern for static config in this codebase.
+/* eslint-disable @typescript-eslint/no-require-imports, import-x/no-commonjs, n/global-require */
+/* eslint-disable security/detect-object-injection */ // keys come from the fixed schema, never user input
 import { ADMIN_AUDIENCE, AUTHENTICATED_AUDIENCE, PUBLIC_AUDIENCE } from './types'
 
 import type { Audience, NetworkPolicy, PolicyKey } from './types'

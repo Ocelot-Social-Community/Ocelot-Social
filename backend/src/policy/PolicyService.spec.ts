@@ -1,5 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 // Unit tests for PolicyService — no DB dependency. The repository is mocked
 // so we can verify resolution-order (DB > ENV > Schema-Default) deterministically.
+// (no-unsafe-assignment disabled: jest matchers like expect.objectContaining are `any`.)
+
+import { PolicyService, createInMemoryPolicyService, POLICY_CHANGED_CHANNEL } from './PolicyService'
+import {
+  readAllSettings as readAllSettingsImpl,
+  readLastChange as readLastChangeImpl,
+  writeSetting as writeSettingImpl,
+  deleteSetting as deleteSettingImpl,
+} from './repository'
+
+import type { PolicyPubSub } from './PolicyService'
 
 jest.mock('./repository', () => ({
   POLICY_NAMESPACE: 'policy',
@@ -10,21 +22,14 @@ jest.mock('./repository', () => ({
   deleteSetting: jest.fn(),
 }))
 
-import { PolicyService, createInMemoryPolicyService, POLICY_CHANGED_CHANNEL } from './PolicyService'
-import * as repo from './repository'
-
-import type { PolicyPubSub } from './PolicyService'
-
-const readAllSettings = repo.readAllSettings as jest.MockedFunction<typeof repo.readAllSettings>
-const readLastChange = repo.readLastChange as jest.MockedFunction<typeof repo.readLastChange>
-const writeSetting = repo.writeSetting as jest.MockedFunction<typeof repo.writeSetting>
-const deleteSetting = repo.deleteSetting as jest.MockedFunction<typeof repo.deleteSetting>
+const readAllSettings = readAllSettingsImpl as jest.MockedFunction<typeof readAllSettingsImpl>
+const readLastChange = readLastChangeImpl as jest.MockedFunction<typeof readLastChangeImpl>
+const writeSetting = writeSettingImpl as jest.MockedFunction<typeof writeSettingImpl>
+const deleteSetting = deleteSettingImpl as jest.MockedFunction<typeof deleteSettingImpl>
 
 // A minimal stub for the database-context shape that PolicyService passes through.
 // The repository is mocked above, so this object is never actually consulted.
-const dbStub = {} as Parameters<typeof PolicyService.prototype.init>[0] extends NodeJS.ProcessEnv
-  ? unknown
-  : never
+const dbStub = {} as never
 
 describe('PolicyService', () => {
   beforeEach(() => {
@@ -35,7 +40,7 @@ describe('PolicyService', () => {
     it('uses DB value when present (DB wins over ENV and default)', async () => {
       readAllSettings.mockResolvedValue({ publicRegistration: true })
 
-      const svc = new PolicyService(dbStub as never)
+      const svc = new PolicyService(dbStub)
       await svc.init({ PUBLIC_REGISTRATION: 'false' })
 
       expect(svc.get('publicRegistration')).toBe(true)
@@ -51,7 +56,7 @@ describe('PolicyService', () => {
     it('seeds DB from ENV when DB is empty', async () => {
       readAllSettings.mockResolvedValue({})
 
-      const svc = new PolicyService(dbStub as never)
+      const svc = new PolicyService(dbStub)
       await svc.init({ PUBLIC_REGISTRATION: 'true' })
 
       expect(svc.get('publicRegistration')).toBe(true)
@@ -67,7 +72,7 @@ describe('PolicyService', () => {
     it('falls back to schema default when neither DB nor ENV provide a value', async () => {
       readAllSettings.mockResolvedValue({})
 
-      const svc = new PolicyService(dbStub as never)
+      const svc = new PolicyService(dbStub)
       await svc.init({}) // no env
 
       // Defaults from packages/config-schema/policy.schema.json
@@ -80,7 +85,7 @@ describe('PolicyService', () => {
     it('treats garbage ENV values as undefined (falls through to default)', async () => {
       readAllSettings.mockResolvedValue({})
 
-      const svc = new PolicyService(dbStub as never)
+      const svc = new PolicyService(dbStub)
       await svc.init({
         PUBLIC_REGISTRATION: 'yes', // not 'true' or 'false'
         INVITE_REGISTRATION: 'no',
@@ -93,7 +98,7 @@ describe('PolicyService', () => {
     it('parses "true" and "false" symmetrically', async () => {
       readAllSettings.mockResolvedValue({})
 
-      const svc = new PolicyService(dbStub as never)
+      const svc = new PolicyService(dbStub)
       await svc.init({
         PUBLIC_REGISTRATION: 'true',
         INVITE_REGISTRATION: 'false',
@@ -118,7 +123,7 @@ describe('PolicyService', () => {
 
     const initService = async () => {
       readAllSettings.mockResolvedValue({})
-      const svc = new PolicyService(dbStub as never)
+      const svc = new PolicyService(dbStub)
       await svc.init({})
       return svc
     }
@@ -152,7 +157,7 @@ describe('PolicyService', () => {
     it('returns the schema default, independent of the current (DB) value', async () => {
       // DB has apiKeysEnabled=true, but its configured default is false.
       readAllSettings.mockResolvedValue({ apiKeysEnabled: true })
-      const svc = new PolicyService(dbStub as never)
+      const svc = new PolicyService(dbStub)
       await svc.init({})
 
       expect(svc.get('apiKeysEnabled')).toBe(true) // current value
@@ -162,7 +167,7 @@ describe('PolicyService', () => {
 
     it('returns the ENV-seeded value as the default when configured', async () => {
       readAllSettings.mockResolvedValue({})
-      const svc = new PolicyService(dbStub as never)
+      const svc = new PolicyService(dbStub)
       await svc.init({ API_KEYS_ENABLED: 'true', PUBLIC_REGISTRATION: 'true' })
 
       expect(svc.getDefault('apiKeysEnabled')).toBe(true)
@@ -171,7 +176,7 @@ describe('PolicyService', () => {
 
     it('scopes getVisibleDefaults by canView (anon hides apiKeysEnabled, admin sees all)', async () => {
       readAllSettings.mockResolvedValue({})
-      const svc = new PolicyService(dbStub as never)
+      const svc = new PolicyService(dbStub)
       await svc.init({})
 
       expect(svc.getVisibleDefaults(null).apiKeysEnabled).toBeNull()
@@ -184,7 +189,7 @@ describe('PolicyService', () => {
     it('is null before anything changed', async () => {
       readAllSettings.mockResolvedValue({})
       readLastChange.mockResolvedValue(null)
-      const svc = new PolicyService(dbStub as never)
+      const svc = new PolicyService(dbStub)
       await svc.init({})
       expect(svc.getLastChange()).toBeNull()
     })
@@ -192,15 +197,18 @@ describe('PolicyService', () => {
     it('is read from the repository at init', async () => {
       readAllSettings.mockResolvedValue({})
       readLastChange.mockResolvedValue({ actor: 'someone', timestamp: '2020-01-01T00:00:00.000Z' })
-      const svc = new PolicyService(dbStub as never)
+      const svc = new PolicyService(dbStub)
       await svc.init({})
-      expect(svc.getLastChange()).toEqual({ actor: 'someone', timestamp: '2020-01-01T00:00:00.000Z' })
+      expect(svc.getLastChange()).toEqual({
+        actor: 'someone',
+        timestamp: '2020-01-01T00:00:00.000Z',
+      })
     })
 
     it('reflects the actor/timestamp after a set()', async () => {
       readAllSettings.mockResolvedValue({})
       readLastChange.mockResolvedValue(null)
-      const svc = new PolicyService(dbStub as never)
+      const svc = new PolicyService(dbStub)
       await svc.init({})
       const event = await svc.set('publicRegistration', true, 'admin-id-1')
       expect(svc.getLastChange()).toEqual({ actor: 'admin-id-1', timestamp: event.timestamp })
@@ -209,7 +217,7 @@ describe('PolicyService', () => {
     it('updates on a remote change (applyExternalChange)', async () => {
       readAllSettings.mockResolvedValue({})
       readLastChange.mockResolvedValue(null)
-      const svc = new PolicyService(dbStub as never)
+      const svc = new PolicyService(dbStub)
       await svc.init({})
       svc.applyExternalChange({
         key: 'publicRegistration',
@@ -249,7 +257,7 @@ describe('PolicyService', () => {
         unsubscribe: jest.fn(),
       }
 
-      const svc = new PolicyService(dbStub as never)
+      const svc = new PolicyService(dbStub)
       await svc.init({}, pubsub)
 
       const event = await svc.set('publicRegistration', true, 'admin-id-1')
@@ -278,27 +286,27 @@ describe('PolicyService', () => {
 
     it('rejects unknown keys', async () => {
       readAllSettings.mockResolvedValue({})
-      const svc = new PolicyService(dbStub as never)
+      const svc = new PolicyService(dbStub)
       await svc.init({})
 
-      await expect(
-        svc.set('nonsense' as never, true as never, 'actor'),
-      ).rejects.toThrow(/Unknown policy key/)
+      await expect(svc.set('nonsense' as never, true as never, 'actor')).rejects.toThrow(
+        /Unknown policy key/,
+      )
     })
 
     it('rejects type mismatches (string for boolean key)', async () => {
       readAllSettings.mockResolvedValue({})
-      const svc = new PolicyService(dbStub as never)
+      const svc = new PolicyService(dbStub)
       await svc.init({})
 
-      await expect(
-        svc.set('publicRegistration', 'true' as never, 'actor'),
-      ).rejects.toThrow(/Type mismatch/)
+      await expect(svc.set('publicRegistration', 'true' as never, 'actor')).rejects.toThrow(
+        /Type mismatch/,
+      )
     })
 
     it('does not throw when no pubsub is configured', async () => {
       readAllSettings.mockResolvedValue({})
-      const svc = new PolicyService(dbStub as never)
+      const svc = new PolicyService(dbStub)
       await svc.init({}) // no pubsub
 
       await expect(svc.set('publicRegistration', true, 'actor')).resolves.toBeDefined()
@@ -309,7 +317,7 @@ describe('PolicyService', () => {
   describe('reset()', () => {
     it('deletes the DB entry and falls back to ENV seed', async () => {
       readAllSettings.mockResolvedValue({ publicRegistration: true })
-      const svc = new PolicyService(dbStub as never)
+      const svc = new PolicyService(dbStub)
       await svc.init({ PUBLIC_REGISTRATION: 'false' })
 
       // Initially DB wins
@@ -324,7 +332,7 @@ describe('PolicyService', () => {
 
     it('falls back to schema default when no ENV is set', async () => {
       readAllSettings.mockResolvedValue({ publicRegistration: true })
-      const svc = new PolicyService(dbStub as never)
+      const svc = new PolicyService(dbStub)
       await svc.init({}) // no ENV
 
       await svc.reset('publicRegistration', 'actor')
@@ -341,7 +349,7 @@ describe('PolicyService', () => {
         unsubscribe: jest.fn(),
       }
 
-      const svc = new PolicyService(dbStub as never)
+      const svc = new PolicyService(dbStub)
       await svc.init({}, pubsub)
       publish.mockClear() // ignore init-time publishes (none expected, but defensive)
 
@@ -359,7 +367,7 @@ describe('PolicyService', () => {
   describe('applyExternalChange()', () => {
     it('updates the cache when a remote instance publishes a change', async () => {
       readAllSettings.mockResolvedValue({})
-      const svc = new PolicyService(dbStub as never)
+      const svc = new PolicyService(dbStub)
       await svc.init({})
 
       expect(svc.get('publicRegistration')).toBe(false)
@@ -376,17 +384,17 @@ describe('PolicyService', () => {
 
     it('ignores unknown keys gracefully', async () => {
       readAllSettings.mockResolvedValue({})
-      const svc = new PolicyService(dbStub as never)
+      const svc = new PolicyService(dbStub)
       await svc.init({})
 
-      expect(() =>
+      expect(() => {
         svc.applyExternalChange({
           key: 'nonsense',
           value: true,
           actor: 'remote',
           timestamp: '',
-        }),
-      ).not.toThrow()
+        })
+      }).not.toThrow()
     })
   })
 
@@ -400,7 +408,7 @@ describe('PolicyService', () => {
         unsubscribe: jest.fn(),
       }
 
-      const svc = new PolicyService(dbStub as never)
+      const svc = new PolicyService(dbStub)
       await svc.init({}, pubsub)
 
       expect(subscribe).toHaveBeenCalledWith(POLICY_CHANGED_CHANNEL, expect.any(Function))

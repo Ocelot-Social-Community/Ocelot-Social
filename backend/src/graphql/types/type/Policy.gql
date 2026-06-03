@@ -1,10 +1,6 @@
 type Query {
   policy: Policy!
-  # The configured defaults (ENV seed or schema default) each key resets to.
-  # Admin-only; reuses the Policy shape. Lets the admin UI show the deployment
-  # default without the frontend hardcoding any config.
   policyDefaults: Policy!
-  # Who last changed any policy key, and when (null if never changed). Admin-only.
   policyLastChange: PolicyLastChange
 }
 
@@ -13,14 +9,6 @@ type PolicyLastChange {
   timestamp: String!
 }
 
-# Network policy as visible to the requesting viewer. A single resolver fills
-# this based on user context (see resolvers/policy.ts → canView). Keys an
-# audience may always see are non-null; keys gated to a narrower audience are
-# nullable and come back null when the viewer may not see them.
-#   • public        → Boolean!  (every viewer, incl. anonymous)
-#   • authenticated → Boolean   (null unless the viewer is logged in / admin)
-# Field nullability mirrors policy.schema.json "x-visibility". When adding a key,
-# make it non-null only if its audiences include "public".
 type Policy {
   publicRegistration: Boolean!
   inviteRegistration: Boolean!
@@ -28,8 +16,6 @@ type Policy {
   apiKeysEnabled: Boolean
 }
 
-# The "value" field carries the new value as JSON-stringified payload to keep
-# the GraphQL signature scalar-stable across heterogeneous policy types.
 type PolicyChangeEvent {
   key: String!
   value: String!
@@ -38,7 +24,6 @@ type PolicyChangeEvent {
 }
 
 type Mutation {
-  # value is a JSON-encoded string: "true" / "false" for booleans, "42" for integers, etc.
   setPolicy(key: String!, value: String!): PolicyChangeEvent!
   resetPolicy(key: String!): PolicyChangeEvent!
 }

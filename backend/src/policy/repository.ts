@@ -1,7 +1,7 @@
 // Neo4j-Repository for (:Setting) nodes.
 // Generic over namespaces — policy is the first, branding/etc. will reuse this.
 
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
+/* eslint-disable security/detect-object-injection */ // keys come from DB Setting nodes, not request input
 import type databaseContext from '@context/database'
 
 type DbContext = ReturnType<typeof databaseContext>
@@ -31,8 +31,9 @@ export async function readAllSettings(
     const rawValue = record.get('value') as string
     try {
       out[key] = JSON.parse(rawValue)
-    } catch {
-      // Skip malformed entries — bootstrap will reseed
+    } catch (error) {
+      // Skip malformed JSON (bootstrap will reseed); rethrow anything unexpected.
+      if (!(error instanceof SyntaxError)) throw error
     }
   }
   return out
@@ -82,11 +83,7 @@ export async function writeSetting(
   })
 }
 
-export async function deleteSetting(
-  db: DbContext,
-  namespace: string,
-  key: string,
-): Promise<void> {
+export async function deleteSetting(db: DbContext, namespace: string, key: string): Promise<void> {
   await db.write({
     query: `MATCH (s:Setting {namespace: $namespace, key: $key}) DELETE s`,
     variables: { namespace, key },

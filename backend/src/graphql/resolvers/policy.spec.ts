@@ -1,8 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, security/detect-object-injection */
 // Integration test for the `policy` query — runs through the real schema +
 // permissions middleware (the layer that rejects a resolver returning
 // `undefined`). Guards the viewer-scoped visibility: anonymous viewers get
 // `null` for authenticated-only keys (NOT the value, and NOT an error).
+import policyQuery from '@graphql/queries/policy/policy.gql'
+import policyDefaultsQuery from '@graphql/queries/policy/policyDefaults.gql'
+import policyLastChangeQuery from '@graphql/queries/policy/policyLastChange.gql'
+import resetPolicyMutation from '@graphql/queries/policy/resetPolicy.gql'
+import setPolicyMutation from '@graphql/queries/policy/setPolicy.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import policyResolvers from './policy'
@@ -17,37 +22,6 @@ const context = () => ({ authenticatedUser, config })
 let query: ApolloTestSetup['query']
 let server: ApolloTestSetup['server']
 let database: ApolloTestSetup['database']
-
-const POLICY_QUERY = `
-  query {
-    policy {
-      publicRegistration
-      inviteRegistration
-      categoriesActive
-      apiKeysEnabled
-    }
-  }
-`
-
-const POLICY_DEFAULTS_QUERY = `
-  query {
-    policyDefaults {
-      publicRegistration
-      inviteRegistration
-      categoriesActive
-      apiKeysEnabled
-    }
-  }
-`
-
-const POLICY_LAST_CHANGE_QUERY = `
-  query {
-    policyLastChange {
-      actor
-      timestamp
-    }
-  }
-`
 
 const asUser = (role: string) => ({ id: `${role}-1`, role }) as unknown as Context['user']
 
@@ -79,7 +53,7 @@ describe('Query.policy', () => {
     it('returns public keys but null for the authenticated-only apiKeysEnabled, without error', async () => {
       authenticatedUser = null
 
-      const { data, errors } = await query({ query: POLICY_QUERY })
+      const { data, errors } = await query({ query: policyQuery })
 
       expect(errors).toBeUndefined()
       expect(data.policy).toEqual({
@@ -95,7 +69,7 @@ describe('Query.policy', () => {
     it('exposes the apiKeysEnabled value', async () => {
       authenticatedUser = asUser('user')
 
-      const { data, errors } = await query({ query: POLICY_QUERY })
+      const { data, errors } = await query({ query: policyQuery })
 
       expect(errors).toBeUndefined()
       expect(data.policy.apiKeysEnabled).toBe(true)
@@ -105,7 +79,7 @@ describe('Query.policy', () => {
       authenticatedUser = asUser('user')
       config = { API_KEYS_ENABLED: false }
 
-      const { data } = await query({ query: POLICY_QUERY })
+      const { data } = await query({ query: policyQuery })
 
       expect(data.policy.apiKeysEnabled).toBe(false)
     })
@@ -115,7 +89,7 @@ describe('Query.policy', () => {
     it('exposes the apiKeysEnabled value (superuser sees everything)', async () => {
       authenticatedUser = asUser('admin')
 
-      const { data, errors } = await query({ query: POLICY_QUERY })
+      const { data, errors } = await query({ query: policyQuery })
 
       expect(errors).toBeUndefined()
       expect(data.policy.apiKeysEnabled).toBe(true)
@@ -127,7 +101,7 @@ describe('Query.policyDefaults', () => {
   it('is forbidden for anonymous viewers', async () => {
     authenticatedUser = null
 
-    const { errors } = await query({ query: POLICY_DEFAULTS_QUERY })
+    const { errors } = await query({ query: policyDefaultsQuery })
 
     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
   })
@@ -135,7 +109,7 @@ describe('Query.policyDefaults', () => {
   it('is forbidden for logged-in non-admin users', async () => {
     authenticatedUser = asUser('user')
 
-    const { errors } = await query({ query: POLICY_DEFAULTS_QUERY })
+    const { errors } = await query({ query: policyDefaultsQuery })
 
     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
   })
@@ -143,7 +117,7 @@ describe('Query.policyDefaults', () => {
   it('grants access to admins and returns every key (admin sees all, none null)', async () => {
     authenticatedUser = asUser('admin')
 
-    const { data, errors } = await query({ query: POLICY_DEFAULTS_QUERY })
+    const { data, errors } = await query({ query: policyDefaultsQuery })
 
     expect(errors).toBeUndefined()
     // Admin sees all keys; the exact default value (schema vs ENV seed) is
@@ -163,7 +137,7 @@ describe('Query.policyLastChange', () => {
   it('is forbidden for anonymous viewers', async () => {
     authenticatedUser = null
 
-    const { errors } = await query({ query: POLICY_LAST_CHANGE_QUERY })
+    const { errors } = await query({ query: policyLastChangeQuery })
 
     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
   })
@@ -171,7 +145,7 @@ describe('Query.policyLastChange', () => {
   it('is forbidden for logged-in non-admin users', async () => {
     authenticatedUser = asUser('user')
 
-    const { errors } = await query({ query: POLICY_LAST_CHANGE_QUERY })
+    const { errors } = await query({ query: policyLastChangeQuery })
 
     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
   })
@@ -179,7 +153,7 @@ describe('Query.policyLastChange', () => {
   it('returns null for admins when nothing has changed (fresh in-memory policy)', async () => {
     authenticatedUser = asUser('admin')
 
-    const { data, errors } = await query({ query: POLICY_LAST_CHANGE_QUERY })
+    const { data, errors } = await query({ query: policyLastChangeQuery })
 
     expect(errors).toBeUndefined()
     expect(data.policyLastChange).toBeNull()
@@ -187,13 +161,13 @@ describe('Query.policyLastChange', () => {
 })
 
 describe('Mutation.setPolicy / resetPolicy authorization', () => {
-  const SET = 'mutation { setPolicy(key: "apiKeysEnabled", value: "true") { key } }'
-  const RESET = 'mutation { resetPolicy(key: "apiKeysEnabled") { key } }'
-
   it('forbids setPolicy for non-admins', async () => {
     authenticatedUser = asUser('user')
 
-    const { errors } = await query({ query: SET })
+    const { errors } = await query({
+      query: setPolicyMutation,
+      variables: { key: 'apiKeysEnabled', value: 'true' },
+    })
 
     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
   })
@@ -201,7 +175,10 @@ describe('Mutation.setPolicy / resetPolicy authorization', () => {
   it('forbids resetPolicy for anonymous viewers', async () => {
     authenticatedUser = null
 
-    const { errors } = await query({ query: RESET })
+    const { errors } = await query({
+      query: resetPolicyMutation,
+      variables: { key: 'apiKeysEnabled' },
+    })
 
     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
   })

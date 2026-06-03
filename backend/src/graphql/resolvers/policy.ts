@@ -51,11 +51,7 @@ export default {
       )
       return serializeEvent(event)
     },
-    resetPolicy: async (
-      _parent: unknown,
-      { key }: { key: string },
-      { policy, user }: Context,
-    ) => {
+    resetPolicy: async (_parent: unknown, { key }: { key: string }, { policy, user }: Context) => {
       const event = await policy.reset(key as PolicyKey, user?.id ?? 'unknown')
       return serializeEvent(event)
     },
@@ -71,8 +67,9 @@ export default {
         (payload: { policyChanged: { key: string } }, _args: unknown, { user }: Context) =>
           canView(payload.policyChanged.key as PolicyKey, user),
       ),
-      resolve: (payload: { policyChanged: { key: string; value: unknown; actor: string; timestamp: string } }) =>
-        serializeEvent(payload.policyChanged),
+      resolve: (payload: {
+        policyChanged: { key: string; value: unknown; actor: string; timestamp: string }
+      }) => serializeEvent(payload.policyChanged),
     },
   },
 }

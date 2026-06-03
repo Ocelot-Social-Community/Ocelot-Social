@@ -380,8 +380,8 @@ const noEmailFilter = rule({
   return !('email' in args)
 })
 
-const publicRegistration = rule()(
-  async (_parent, _args, context: Context) => context.policy.get('publicRegistration'),
+const publicRegistration = rule()(async (_parent, _args, context: Context) =>
+  context.policy.get('publicRegistration'),
 )
 
 const inviteRegistration = rule()(async (_parent, args, context: Context) => {
