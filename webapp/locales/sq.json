@@ -138,6 +138,37 @@
     "pages": {
       "name": "Faqet"
     },
+    "policy": {
+      "defaultValue": "parazgjedhur: {value}",
+      "description": "Konfigurim në kohë reale. Ndryshimet aplikohen menjëherë për të gjithë klientët e lidhur.",
+      "descriptions": {
+        "apiKeysEnabled": "Lejon përdoruesit të krijojnë çelësa API personalë për qasje programatike në backend. Prek seksionin e çelësave API te cilësimet e përdoruesit.",
+        "categoriesActive": "Aktivizon kategoritë tematike për postimet dhe grupet, për të klasifikuar dhe filtruar përmbajtjen. Kërkon të paktën një kategori.",
+        "inviteRegistration": "Lejon anëtarët ekzistues të ftojnë përdorues të rinj me kode ftese. Kur është joaktive, kodet e ftesës nuk mund të përdoren për regjistrim.",
+        "publicRegistration": "Lejon këdo të krijojë një llogari drejtpërdrejt, pa kod ftese. Kur është joaktive, përdoruesit e rinj mund të bashkohen vetëm me ftesë."
+      },
+      "groups": {
+        "features": {
+          "title": "Veçoritë"
+        },
+        "registration": {
+          "title": "Regjistrimi"
+        }
+      },
+      "keys": {
+        "apiKeysEnabled": "Çelësat API",
+        "categoriesActive": "Kategoritë",
+        "inviteRegistration": "Regjistrim me ftesë",
+        "publicRegistration": "Regjistrim i hapur"
+      },
+      "lastUpdated": "Ndryshuar së fundi: {timestamp} nga {actor}",
+      "name": "Politika e rrjetit",
+      "reset": "Rikthe te paracaktimi",
+      "save": "Ruaj ndryshimet",
+      "saveError": "Nuk mund të përditësohet politika: {message}",
+      "saveSuccess": "Politika u përditësua.",
+      "title": "Cilësimet e politikës së rrjetit"
+    },
     "settings": {
       "name": "Cilësimet"
     },

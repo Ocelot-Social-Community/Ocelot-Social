@@ -175,10 +175,11 @@ describe('actions', () => {
         expect(commit.mock.calls).toEqual(expect.arrayContaining([['SET_TOKEN', token]]))
       })
 
-      it('fetches the user and initializes categories', () => {
+      it('fetches the user, initializes categories, and refetches the policy', () => {
         expect(dispatch.mock.calls).toEqual([
           ['fetchCurrentUser'],
           ['categories/init', null, { root: true }],
+          ['policy/init', null, { root: true }],
         ])
       })
 
@@ -231,6 +232,34 @@ describe('actions', () => {
           ]),
         )
       })
+    })
+  })
+
+  describe('logout', () => {
+    let onLogout
+
+    beforeEach(async () => {
+      onLogout = jest.fn(() => Promise.resolve())
+      const module = { app: { $apolloHelpers: { onLogout } } }
+      const action = actions.logout.bind(module)
+      await action({ commit, dispatch })
+    })
+
+    it('clears the user and token', () => {
+      expect(commit.mock.calls).toEqual(
+        expect.arrayContaining([
+          ['SET_USER', null],
+          ['SET_TOKEN', null],
+        ]),
+      )
+    })
+
+    it('calls onLogout', () => {
+      expect(onLogout).toHaveBeenCalled()
+    })
+
+    it('refetches the policy as anonymous so authenticated-only keys reset', () => {
+      expect(dispatch).toHaveBeenCalledWith('policy/init', null, { root: true })
     })
   })
 })

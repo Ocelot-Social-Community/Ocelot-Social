@@ -185,7 +185,7 @@ export default {
       if (!user) {
         throw new Error('Missing authenticated user.')
       }
-      const { config } = context
+      const { policy } = context
       const { categoryIds, groupId } = params
       const { image: imageInput } = params
 
@@ -221,7 +221,7 @@ export default {
              )`
         }
         const categoriesCypher =
-          config.CATEGORIES_ACTIVE && categoryIds && categoryIds.length > 0
+          policy.get('categoriesActive') && categoryIds && categoryIds.length > 0
             ? `WITH post
               UNWIND $categoryIds AS categoryId
               MATCH (category:Category {id: categoryId})
@@ -272,7 +272,7 @@ export default {
       }
     },
     UpdatePost: async (_parent, params, context: Context, _resolveInfo) => {
-      const { config } = context
+      const { policy } = context
       const { categoryIds } = params
       const { image: imageInput } = params
 
@@ -288,7 +288,7 @@ export default {
         WITH post
       `
 
-      if (config.CATEGORIES_ACTIVE && categoryIds?.length) {
+      if (policy.get('categoriesActive') && categoryIds?.length) {
         const cypherDeletePreviousRelations = `
           MATCH (post:Post { id: $params.id })-[previousRelations:CATEGORIZED]->(category:Category)
           DELETE previousRelations

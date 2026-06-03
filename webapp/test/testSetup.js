@@ -1,6 +1,6 @@
 // Global mock for matchMedia (used by touchDevice mixin, drag detection, etc.)
 import Vue from 'vue'
-import { createLocalVue } from '@vue/test-utils'
+import { config, createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
 import VTooltip from 'v-tooltip'
 import Filters from '~/plugins/vue-filters'
@@ -30,6 +30,12 @@ console.error = (...args) => {
   originalConsoleError.apply(console, args)
   throw new Error(`console.error was called: ${args.join(' ')}`)
 }
+
+// Default $policy injection for components that read the network policy via the
+// $policy plugin (e.g. categoriesActive in getCategoriesMixin). Returns false for
+// every key; tests that need a specific value override it per-mount with
+// `mocks: { $policy: { get: () => true } }`.
+config.mocks.$policy = { get: () => false }
 
 global.localVue = createLocalVue()
 

@@ -58,10 +58,10 @@ export default {
           name: this.$t('settings.social-media.name'),
           path: `/settings/my-social-media`,
         },
-        ...(this.$env.INVITE_REGISTRATION === true
+        ...(this.$policy.get('inviteRegistration') === true
           ? [{ name: this.$t('settings.invites.name'), path: `/settings/invites` }]
           : []),
-        ...(this.$env.API_KEYS_ENABLED
+        ...(this.$policy.get('apiKeysEnabled')
           ? [{ name: this.$t('settings.api-keys.name'), path: `/settings/api-keys` }]
           : []),
         {

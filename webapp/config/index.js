@@ -48,8 +48,6 @@ const options = {
     (metadata.default || metadata).APPLICATION_DESCRIPTION ||
     pkg.description,
   MAPBOX_TOKEN: process.env.MAPBOX_TOKEN,
-  PUBLIC_REGISTRATION: process.env.PUBLIC_REGISTRATION === 'true' || false,
-  INVITE_REGISTRATION: process.env.INVITE_REGISTRATION !== 'false', // default = true
   // Cookies
   COOKIE_EXPIRE_TIME: process.env.COOKIE_EXPIRE_TIME || 730, // Two years by default
   COOKIE_HTTPS_ONLY: process.env.COOKIE_HTTPS_ONLY || process.env.NODE_ENV === 'production', // ensure true in production if not set explicitly
@@ -61,7 +59,6 @@ const options = {
   MAX_GROUP_PINNED_POSTS: Number.isNaN(Number(process.env.MAX_GROUP_PINNED_POSTS))
     ? 1
     : Number(process.env.MAX_GROUP_PINNED_POSTS),
-  API_KEYS_ENABLED: process.env.API_KEYS_ENABLED === 'true' || false,
   API_KEYS_MAX_PER_USER: Number(process.env.API_KEYS_MAX_PER_USER) || 5,
 }
 

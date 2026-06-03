@@ -407,6 +407,39 @@ describe('in mode', () => {
               expect(errors?.[0]).toHaveProperty('message', 'Too many categories!')
             })
           })
+
+          describe('but no categories exist in the database (empty category DB)', () => {
+            beforeEach(async () => {
+              const session = database.driver.session()
+              try {
+                await session.run('MATCH (category:Category) DETACH DELETE category')
+              } finally {
+                await session.close()
+              }
+            })
+
+            it('creates the group without categories instead of throwing "Too few categories!"', async () => {
+              await expect(
+                mutate({ mutation: CreateGroup, variables: { ...variables, categoryIds: null } }),
+              ).resolves.toMatchObject({
+                // Assert the core effect: created AND with no categories attached.
+                data: { CreateGroup: { name: 'The Best Group', myRole: 'owner', categories: [] } },
+                errors: undefined,
+              })
+            })
+
+            // Empty array (not null) is what a frontend with an empty multi-select
+            // sends. It must not generate the categories sub-query — `UNWIND []`
+            // would zero the row stream and return no group.
+            it('creates the group when categoryIds is an empty array', async () => {
+              await expect(
+                mutate({ mutation: CreateGroup, variables: { ...variables, categoryIds: [] } }),
+              ).resolves.toMatchObject({
+                data: { CreateGroup: { name: 'The Best Group', myRole: 'owner', categories: [] } },
+                errors: undefined,
+              })
+            })
+          })
         })
       })
     })

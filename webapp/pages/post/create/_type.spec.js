@@ -37,7 +37,6 @@ describe('create.vue', () => {
   const store = new Vuex.Store({
     getters: {
       'auth/user': () => currentUser,
-      'categories/categoriesActive': () => false,
     },
   })
 

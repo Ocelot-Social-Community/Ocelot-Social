@@ -138,6 +138,37 @@
     "pages": {
       "name": "Pages"
     },
+    "policy": {
+      "defaultValue": "standaard: {value}",
+      "description": "Runtime-configuratie. Wijzigingen worden onmiddellijk toegepast voor alle verbonden clients.",
+      "descriptions": {
+        "apiKeysEnabled": "Laat gebruikers persoonlijke API-sleutels aanmaken voor programmatische toegang tot de backend. Heeft invloed op het API-sleutelgedeelte in de gebruikersinstellingen.",
+        "categoriesActive": "Schakelt themacategorieën voor berichten en groepen in, om inhoud te classificeren en te filteren. Vereist ten minste één categorie.",
+        "inviteRegistration": "Laat bestaande leden nieuwe gebruikers uitnodigen via uitnodigingscodes. Uitgeschakeld kunnen uitnodigingscodes niet worden gebruikt om te registreren.",
+        "publicRegistration": "Laat iedereen direct een account aanmaken, zonder uitnodigingscode. Uitgeschakeld kunnen nieuwe gebruikers alleen via een uitnodiging deelnemen."
+      },
+      "groups": {
+        "features": {
+          "title": "Functies"
+        },
+        "registration": {
+          "title": "Registratie"
+        }
+      },
+      "keys": {
+        "apiKeysEnabled": "API-sleutels",
+        "categoriesActive": "Categorieën",
+        "inviteRegistration": "Registratie via uitnodiging",
+        "publicRegistration": "Open registratie"
+      },
+      "lastUpdated": "Laatst gewijzigd: {timestamp} door {actor}",
+      "name": "Netwerkbeleid",
+      "reset": "Standaardwaarde herstellen",
+      "save": "Wijzigingen opslaan",
+      "saveError": "Beleid kon niet worden bijgewerkt: {message}",
+      "saveSuccess": "Beleid bijgewerkt.",
+      "title": "Netwerkbeleid-instellingen"
+    },
     "settings": {
       "name": "Instellingen"
     },

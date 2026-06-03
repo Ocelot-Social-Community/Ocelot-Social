@@ -14,7 +14,7 @@ const checkCategoriesActive = async (
   context: Context,
   resolveInfo: GraphQLResolveInfo,
 ): Promise<unknown> => {
-  if (context.config.CATEGORIES_ACTIVE) {
+  if (context.policy.get('categoriesActive')) {
     return resolve(root, args, context, resolveInfo)
   }
   return []

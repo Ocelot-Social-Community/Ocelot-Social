@@ -20,6 +20,23 @@ import { createOrUpdateLocations } from './users/location'
 
 import type { Context } from '@src/context'
 
+// Whether any Category nodes exist. Keeps CreateGroup graceful: the "categories
+// required" rule only applies when the policy is on AND there is at least one
+// category to choose from (mirrors the frontend gating in getCategoriesMixin).
+const categoriesExist = async (context: Context): Promise<boolean> => {
+  const session = context.driver.session()
+  try {
+    return await session.readTransaction(async (txc) => {
+      const result = await txc.run(
+        'MATCH (category:Category) RETURN count(category) > 0 AS hasCategories',
+      )
+      return Boolean(result.records[0]?.get('hasCategories'))
+    })
+  } finally {
+    await session.close()
+  }
+}
+
 export default {
   Query: {
     Group: async (_object, params, context: Context, _resolveInfo) => {
@@ -122,14 +139,18 @@ export default {
   },
   Mutation: {
     CreateGroup: async (_parent, params, context: Context, _resolveInfo) => {
-      const { config } = context
+      const { policy } = context
       const { categoryIds } = params
       delete params.categoryIds
       params.locationName = params.locationName === '' ? null : params.locationName
-      if (config.CATEGORIES_ACTIVE && (!categoryIds || categoryIds.length < CATEGORIES_MIN)) {
+      // Only require categories when the feature is on AND at least one category
+      // exists — otherwise group creation would be impossible on an empty
+      // category DB (mirrors the frontend gating in getCategoriesMixin).
+      const enforceCategories = policy.get('categoriesActive') && (await categoriesExist(context))
+      if (enforceCategories && (!categoryIds || categoryIds.length < CATEGORIES_MIN)) {
         throw new UserInputError('Too few categories!')
       }
-      if (config.CATEGORIES_ACTIVE && categoryIds && categoryIds.length > CATEGORIES_MAX) {
+      if (policy.get('categoriesActive') && categoryIds && categoryIds.length > CATEGORIES_MAX) {
         throw new UserInputError('Too many categories!')
       }
       if (
@@ -146,8 +167,12 @@ export default {
           if (!context.user) {
             throw new Error('Missing authenticated user.')
           }
+          // Only emit the categories sub-query for a NON-EMPTY list. With an empty
+          // `categoryIds: []` (valid on the no-category graceful path), `UNWIND []`
+          // would zero the row stream and the final `RETURN group` would yield
+          // nothing — silently breaking group creation.
           const categoriesCypher =
-            config.CATEGORIES_ACTIVE && categoryIds
+            policy.get('categoriesActive') && categoryIds && categoryIds.length > 0
               ? `
                   WITH group, membership
                   UNWIND $categoryIds AS categoryId
@@ -191,14 +216,14 @@ export default {
       }
     },
     UpdateGroup: async (_parent, params, context: Context, _resolveInfo) => {
-      const { config } = context
+      const { policy } = context
       const { categoryIds } = params
       delete params.categoryIds
       const { id: groupId, avatar: avatarInput } = params
       delete params.avatar
       params.locationName = params.locationName === '' ? null : params.locationName
 
-      if (config.CATEGORIES_ACTIVE && categoryIds) {
+      if (policy.get('categoriesActive') && categoryIds) {
         if (categoryIds.length < CATEGORIES_MIN) {
           throw new UserInputError('Too few categories!')
         }
@@ -218,7 +243,7 @@ export default {
           if (!context.user) {
             throw new Error('Missing authenticated user.')
           }
-          if (config.CATEGORIES_ACTIVE && categoryIds?.length) {
+          if (policy.get('categoriesActive') && categoryIds?.length) {
             await transaction.run(
               `
                 MATCH (group:Group {id: $groupId})-[previousRelations:CATEGORIZED]->(:Category)
@@ -233,7 +258,7 @@ export default {
             SET group.updatedAt = toString(datetime())
             WITH group
           `
-          if (config.CATEGORIES_ACTIVE && categoryIds?.length) {
+          if (policy.get('categoriesActive') && categoryIds?.length) {
             updateGroupCypher += `
               UNWIND $categoryIds AS categoryId
               MATCH (category:Category {id: categoryId})

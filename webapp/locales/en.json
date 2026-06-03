@@ -138,6 +138,37 @@
     "pages": {
       "name": "Pages"
     },
+    "policy": {
+      "defaultValue": "default: {value}",
+      "description": "Runtime configuration. Changes apply immediately for all connected clients.",
+      "descriptions": {
+        "apiKeysEnabled": "Let users create personal API keys for programmatic backend access. Affects the API keys section in user settings.",
+        "categoriesActive": "Enable topic categories for posts and groups so content can be classified and filtered. Requires at least one category to exist.",
+        "inviteRegistration": "Let existing members invite new users via invite codes. When off, invite codes cannot be redeemed to sign up.",
+        "publicRegistration": "Allow anyone to create an account directly, without an invite code. When off, new users can only join via an invitation."
+      },
+      "groups": {
+        "features": {
+          "title": "Features"
+        },
+        "registration": {
+          "title": "Registration"
+        }
+      },
+      "keys": {
+        "apiKeysEnabled": "API keys",
+        "categoriesActive": "Categories",
+        "inviteRegistration": "Invite registration",
+        "publicRegistration": "Open registration"
+      },
+      "lastUpdated": "Last changed: {timestamp} by {actor}",
+      "name": "Network policy",
+      "reset": "Reset to default",
+      "save": "Save changes",
+      "saveError": "Could not update policy: {message}",
+      "saveSuccess": "Policy updated.",
+      "title": "Network policy settings"
+    },
     "settings": {
       "name": "Settings"
     },

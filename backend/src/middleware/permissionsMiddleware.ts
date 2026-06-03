@@ -37,9 +37,9 @@ const isAdmin = rule()(async (_parent, _args, { user }: Context, _info) => {
 const apiKeysEnabled = rule({ cache: 'contextual' })(async (
   _parent,
   _args,
-  { config }: Context,
+  { policy }: Context,
 ) => {
-  return config.API_KEYS_ENABLED
+  return policy.get('apiKeysEnabled')
 })
 
 const onlyYourself = rule({
@@ -380,12 +380,12 @@ const noEmailFilter = rule({
   return !('email' in args)
 })
 
-const publicRegistration = rule()(
-  async (_parent, _args, context: Context) => context.config.PUBLIC_REGISTRATION,
+const publicRegistration = rule()(async (_parent, _args, context: Context) =>
+  context.policy.get('publicRegistration'),
 )
 
 const inviteRegistration = rule()(async (_parent, args, context: Context) => {
-  if (!context.config.INVITE_REGISTRATION) return false
+  if (!context.policy.get('inviteRegistration')) return false
   const { inviteCode } = args
   return validateInviteCode(context, inviteCode)
 })
@@ -477,6 +477,14 @@ export default shield(
       myApiKeys: and(isAuthenticated, apiKeysEnabled),
       apiKeyUsers: isAdmin,
       apiKeysForUser: isAdmin,
+
+      // Network Policy — one query for everyone; per-field visibility (which
+      // keys a viewer actually receives) is enforced inside the resolver via
+      // canView(). Anonymous viewers still need it (login/register screen).
+      policy: allow,
+      // Configured defaults + last-change audit info are admin-only (deployment
+      // config); bundled in the single policyDefaults query.
+      policyDefaults: isAdmin,
     },
     Mutation: {
       '*': deny,
@@ -546,6 +554,11 @@ export default shield(
 
       switchUserRole: isAdmin,
       markTeaserAsViewed: allow,
+
+      // Network Policy
+      setPolicy: isAdmin,
+      resetPolicy: isAdmin,
+
       saveCategorySettings: isAuthenticated,
       updateOnlineStatus: isAuthenticated,
       CreateGroupRoom: isAuthenticated,

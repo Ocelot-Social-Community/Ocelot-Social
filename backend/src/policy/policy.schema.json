@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ocelot.social/schemas/policy.json",
+  "title": "NetworkPolicy",
+  "description": "Network policy configuration (bucket B) — runtime-dynamic, persisted in Neo4j.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "publicRegistration": {
+      "type": "boolean",
+      "default": false,
+      "x-visibility": ["public"],
+      "x-envSeed": "PUBLIC_REGISTRATION",
+      "description": "Whether new users can register without an invite code."
+    },
+    "inviteRegistration": {
+      "type": "boolean",
+      "default": true,
+      "x-visibility": ["public"],
+      "x-envSeed": "INVITE_REGISTRATION",
+      "description": "Whether registration via invite code is enabled."
+    },
+    "categoriesActive": {
+      "type": "boolean",
+      "default": false,
+      "x-visibility": ["public"],
+      "x-envSeed": "CATEGORIES_ACTIVE",
+      "description": "Whether the categories feature for posts and groups is active."
+    },
+    "apiKeysEnabled": {
+      "type": "boolean",
+      "default": false,
+      "x-visibility": ["authenticated"],
+      "x-envSeed": "API_KEYS_ENABLED",
+      "description": "Whether API keys functionality (personal keys for backend access) is enabled. Only relevant to logged-in users (Settings / Admin), so visible to 'authenticated' (and admin)."
+    }
+  },
+  "required": ["publicRegistration", "inviteRegistration", "categoriesActive", "apiKeysEnabled"]
+}

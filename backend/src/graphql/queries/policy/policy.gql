@@ -1,0 +1,8 @@
+query policy {
+  policy {
+    publicRegistration
+    inviteRegistration
+    categoriesActive
+    apiKeysEnabled
+  }
+}

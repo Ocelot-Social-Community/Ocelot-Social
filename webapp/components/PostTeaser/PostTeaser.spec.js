@@ -55,7 +55,6 @@ describe('PostTeaser', () => {
       'auth/user': () => {
         return {}
       },
-      'categories/categoriesActive': () => false,
       'pinnedPosts/maxPinnedPosts': () => 0,
       'pinnedPosts/currentlyPinnedPosts': () => 0,
     }

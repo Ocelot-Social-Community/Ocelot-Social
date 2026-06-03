@@ -20,9 +20,9 @@ export const getters = {
   categories(state) {
     return state.categories
   },
-  categoriesActive(state) {
-    return !!state.categories.length
-  },
+  // NOTE: "categories feature enabled" is no longer a categories-store concern.
+  // It is read straight from the network policy via $policy.get('categoriesActive')
+  // (see getCategoriesMixin) — the policy is the single source of truth.
   isInitialized(state) {
     return state.isInitialized
   },

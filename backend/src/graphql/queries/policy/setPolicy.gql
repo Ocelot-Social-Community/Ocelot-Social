@@ -1,0 +1,5 @@
+mutation setPolicy($key: PolicyKey!, $value: String!) {
+  setPolicy(key: $key, value: $value) {
+    key
+  }
+}

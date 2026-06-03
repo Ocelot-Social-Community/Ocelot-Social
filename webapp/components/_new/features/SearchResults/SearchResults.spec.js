@@ -37,7 +37,6 @@ describe('SearchResults', () => {
         return { id: 'u343', name: 'Matt' }
       },
       'auth/isModerator': () => false,
-      'categories/categoriesActive': () => false,
     }
     propsData = {
       pageSize: 12,

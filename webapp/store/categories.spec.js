@@ -11,20 +11,6 @@ describe('categories store', () => {
     })
   })
 
-  describe('getters', () => {
-    describe('categoriesActive', () => {
-      it('returns true if there are categories', () => {
-        const state = { categories: ['cat1', 'cat2'] }
-        expect(getters.categoriesActive(state)).toBe(true)
-      })
-
-      it('returns false if there are no categories', () => {
-        const state = { categories: [] }
-        expect(getters.categoriesActive(state)).toBe(false)
-      })
-    })
-  })
-
   describe('mutations', () => {
     let testMutation
 

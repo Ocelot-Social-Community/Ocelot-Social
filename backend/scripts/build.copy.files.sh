@@ -22,3 +22,7 @@ cp -r src/graphql/types/scalar/*.gql build/src/graphql/types/scalar/
 
 mkdir -p build/src/graphql/types/type/
 cp -r src/graphql/types/type/*.gql build/src/graphql/types/type/
+
+# policy schema
+mkdir -p build/src/policy/
+cp src/policy/policy.schema.json build/src/policy/

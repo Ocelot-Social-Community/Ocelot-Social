@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import databaseContext from '@context/database'
 import { getContext } from '@src/context'
+import { createInMemoryPolicyService } from '@src/policy'
 import createServer from '@src/server'
 
 import type { ApolloServerPlugin } from '@apollo/server'
@@ -87,11 +88,20 @@ export const createApolloTestSetup = async (opts?: CreateTestServerOptions) => {
   const database = databaseContext()
   const contextFn = async (req: { headers: { authorization?: string } }) => {
     const { authenticatedUser, config = {}, pubsub } = await testContext()
+    const merged = { ...TEST_CONFIG, ...config }
+    // Build a per-request policy mirror so existing tests that toggle config.X keep working.
+    const policy = createInMemoryPolicyService({
+      publicRegistration: merged.PUBLIC_REGISTRATION,
+      inviteRegistration: merged.INVITE_REGISTRATION,
+      categoriesActive: merged.CATEGORIES_ACTIVE,
+      apiKeysEnabled: merged.API_KEYS_ENABLED,
+    })
     return getContext({
       authenticatedUser,
       database,
       pubsub,
-      config: { ...TEST_CONFIG, ...config },
+      config: merged,
+      policy,
     })(req)
   }
 

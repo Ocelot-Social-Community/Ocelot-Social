@@ -138,6 +138,37 @@
     "pages": {
       "name": "Seiten"
     },
+    "policy": {
+      "defaultValue": "Standard: {value}",
+      "description": "Laufzeit-Konfiguration. Änderungen wirken sofort für alle verbundenen Clients.",
+      "descriptions": {
+        "apiKeysEnabled": "Ermöglicht Nutzern, persönliche API-Schlüssel für den programmatischen Zugriff aufs Backend zu erstellen. Betrifft den API-Schlüssel-Bereich in den Nutzereinstellungen.",
+        "categoriesActive": "Aktiviert Themen-Kategorien für Beiträge und Gruppen, damit Inhalte eingeordnet und gefiltert werden können. Erfordert mindestens eine angelegte Kategorie.",
+        "inviteRegistration": "Erlaubt bestehenden Mitgliedern, neue Nutzer per Einladungscode einzuladen. Ist dies aus, können Codes nicht zur Registrierung eingelöst werden.",
+        "publicRegistration": "Erlaubt es jedem, direkt ein Konto zu erstellen – ohne Einladungscode. Ist dies aus, können neue Nutzer nur per Einladung beitreten."
+      },
+      "groups": {
+        "features": {
+          "title": "Funktionen"
+        },
+        "registration": {
+          "title": "Registrierung"
+        }
+      },
+      "keys": {
+        "apiKeysEnabled": "API-Schlüssel",
+        "categoriesActive": "Kategorien",
+        "inviteRegistration": "Registrierung per Einladung",
+        "publicRegistration": "Offene Registrierung"
+      },
+      "lastUpdated": "Zuletzt geändert: {timestamp} von {actor}",
+      "name": "Netzwerk-Konfiguration",
+      "reset": "Auf Standard zurücksetzen",
+      "save": "Änderungen speichern",
+      "saveError": "Konfiguration konnte nicht aktualisiert werden: {message}",
+      "saveSuccess": "Konfiguration aktualisiert.",
+      "title": "Einstellungen der Netzwerk-Konfiguration"
+    },
     "settings": {
       "name": "Einstellungen"
     },

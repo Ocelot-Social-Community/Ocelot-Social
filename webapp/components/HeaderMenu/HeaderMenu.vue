@@ -635,7 +635,6 @@ export default {
       mobileMoreMenuToggled: null,
       mobileFilterMenuOpen: false,
       mobileLocaleMenuOpen: false,
-      inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
     }
   },
   computed: {
@@ -646,6 +645,9 @@ export default {
       isAdmin: 'auth/isAdmin',
       filterActive: 'posts/isActive',
     }),
+    inviteRegistration() {
+      return this.$policy.get('inviteRegistration') === true
+    },
     showFilterMenuDropdown() {
       const [firstRoute] = this.$route.matched
       return firstRoute && firstRoute.name === 'index'

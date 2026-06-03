@@ -1,0 +1,42 @@
+type Query {
+  policy: Policy!
+  policyDefaults: PolicyDefaults!
+}
+
+type PolicyDefaults {
+  defaults: Policy!
+  lastChange: PolicyLastChange
+}
+
+type PolicyLastChange {
+  actor: String!
+  timestamp: String!
+}
+
+type Policy {
+  publicRegistration: Boolean!
+  inviteRegistration: Boolean!
+  categoriesActive: Boolean!
+  apiKeysEnabled: Boolean
+}
+
+type PolicyChangeEvent {
+  key: PolicyKey!
+  value: String!
+  actor: String!
+  timestamp: String!
+}
+
+type PolicyValueChanged {
+  key: PolicyKey!
+  value: String!
+}
+
+type Mutation {
+  setPolicy(key: PolicyKey!, value: String!): PolicyChangeEvent!
+  resetPolicy(key: PolicyKey!): PolicyChangeEvent!
+}
+
+type Subscription {
+  policyChanged: PolicyValueChanged!
+}
