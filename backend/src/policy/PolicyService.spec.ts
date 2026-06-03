@@ -116,6 +116,29 @@ describe('PolicyService', () => {
       expect(svc.get('categoriesActive')).toBe(true)
       expect(svc.get('apiKeysEnabled')).toBe(false)
     })
+
+    it('reseeds (does not adopt) a stored value whose type no longer matches the schema', async () => {
+      // A corrupt / un-migrated DB value: a number for a boolean key. It must be
+      // treated like a missing value (reseed from ENV/default), not adopted, and
+      // must not throw (a bad row may not crash startup).
+      readAllSettings.mockResolvedValue({ publicRegistration: 42 })
+      const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+
+      const svc = new PolicyService(dbStub)
+      await svc.init({ PUBLIC_REGISTRATION: 'true' })
+
+      expect(svc.get('publicRegistration')).toBe(true) // ENV seed, not the stale 42
+      expect(writeSetting).toHaveBeenCalledWith(
+        expect.anything(),
+        'policy',
+        'publicRegistration',
+        true,
+        'system:seed',
+      )
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('publicRegistration'))
+
+      warn.mockRestore()
+    })
   })
 
   describe('getVisibleSnapshot()', () => {

@@ -94,9 +94,19 @@ export class PolicyService {
 
     for (const key of allKeys()) {
       const existing = dbValues[key]
-      if (existing !== undefined) {
+      // Adopt a stored value only if it still matches the schema type. A
+      // type-mismatched value can only come from out-of-band DB editing or an
+      // un-migrated key type change; treat it like a missing value and reseed
+      // (never throw — a corrupt row must not crash startup).
+      if (existing !== undefined && this.typeMatches(key, existing)) {
         this.cache[key] = existing as NetworkPolicy[PolicyKey]
         continue
+      }
+      if (existing !== undefined) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          `[policy] DB value for '${key}' has wrong type (${typeof existing}); reseeding from ENV/default.`,
+        )
       }
 
       const envName = envSeedFor(key)
@@ -234,15 +244,24 @@ export class PolicyService {
     }
   }
 
-  private assertTypeMatches(key: PolicyKey, value: unknown): void {
+  // Non-throwing type check, shared by init() (reseed on mismatch) and
+  // assertTypeMatches() (throw on mismatch).
+  private typeMatches(key: PolicyKey, value: unknown): boolean {
     const expected = typeFor(key)
     const actual = typeof value
-    const ok =
+    return (
       (expected === 'boolean' && actual === 'boolean') ||
       (expected === 'integer' && actual === 'number' && Number.isInteger(value)) ||
       (expected === 'string' && actual === 'string')
-    if (!ok) {
-      throw new Error(`Type mismatch for policy key '${key}': expected ${expected}, got ${actual}`)
+    )
+  }
+
+  private assertTypeMatches(key: PolicyKey, value: unknown): void {
+    if (!this.typeMatches(key, value)) {
+      const expected = typeFor(key)
+      throw new Error(
+        `Type mismatch for policy key '${key}': expected ${expected}, got ${typeof value}`,
+      )
     }
   }
 }
