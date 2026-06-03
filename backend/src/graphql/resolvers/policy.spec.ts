@@ -204,6 +204,23 @@ describe('PolicyKey enum (schema-derived contract)', () => {
   })
 })
 
+describe('setPolicy value validation (integration)', () => {
+  it('classifies a valid-JSON value of the wrong type as BAD_USER_INPUT', async () => {
+    authenticatedUser = asUser('admin')
+
+    // "123" is valid JSON (number) but apiKeysEnabled is boolean → type mismatch.
+    // It reaches policy.set() and must come back as a client input error, not as
+    // a generic/internal error.
+    const { errors } = await query({
+      query: setPolicyMutation,
+      variables: { key: 'apiKeysEnabled', value: '123' },
+    })
+
+    expect(errors?.[0]?.extensions?.code).toBe('BAD_USER_INPUT')
+    expect(errors?.[0]?.message).toMatch(/Type mismatch/)
+  })
+})
+
 describe('Mutation resolvers (unit)', () => {
   describe('setPolicy', () => {
     it('parses the JSON value, calls policy.set, and serializes the event', async () => {

@@ -38,6 +38,12 @@ type DbContext = ReturnType<typeof databaseContext>
 
 export const POLICY_CHANGED_CHANNEL = 'policy.changed'
 
+// Domain-level validation error (unknown key / wrong value type). Kept free of
+// any GraphQL dependency — the resolver translates it to a UserInputError at the
+// transport boundary, so a bad client input is classified as BAD_USER_INPUT
+// rather than a generic/internal error.
+export class PolicyValidationError extends Error {}
+
 export interface PolicyChangeEvent {
   key: string
   value: unknown
@@ -285,7 +291,7 @@ export class PolicyService {
 
   private assertKnownKey(key: string): void {
     if (!this.isKnownKey(key)) {
-      throw new Error(`Unknown policy key: ${key}`)
+      throw new PolicyValidationError(`Unknown policy key: ${key}`)
     }
   }
 
@@ -304,7 +310,7 @@ export class PolicyService {
   private assertTypeMatches(key: PolicyKey, value: unknown): void {
     if (!this.typeMatches(key, value)) {
       const expected = typeFor(key)
-      throw new Error(
+      throw new PolicyValidationError(
         `Type mismatch for policy key '${key}': expected ${expected}, got ${typeof value}`,
       )
     }

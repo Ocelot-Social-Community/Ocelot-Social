@@ -1,7 +1,7 @@
 import { withFilter } from 'graphql-subscriptions'
 
 import { UserInputError } from '@graphql/errors'
-import { POLICY_CHANGED_CHANNEL, canView } from '@src/policy'
+import { POLICY_CHANGED_CHANNEL, PolicyValidationError, canView } from '@src/policy'
 
 import type { Context } from '@src/context'
 import type { NetworkPolicy, PolicyKey } from '@src/policy'
@@ -48,16 +48,28 @@ export default {
       } catch {
         throw new UserInputError('Value must be a JSON-encoded string')
       }
-      const event = await policy.set(
-        key as PolicyKey,
-        parsed as NetworkPolicy[PolicyKey],
-        user?.id ?? 'unknown',
-      )
-      return serializeEvent(event)
+      try {
+        const event = await policy.set(
+          key as PolicyKey,
+          parsed as NetworkPolicy[PolicyKey],
+          user?.id ?? 'unknown',
+        )
+        return serializeEvent(event)
+      } catch (err) {
+        // A domain validation error (e.g. a valid-JSON value of the wrong type,
+        // "123" for a boolean key) is a client input error, not an internal one.
+        if (err instanceof PolicyValidationError) throw new UserInputError(err.message)
+        throw err
+      }
     },
     resetPolicy: async (_parent: unknown, { key }: { key: string }, { policy, user }: Context) => {
-      const event = await policy.reset(key as PolicyKey, user?.id ?? 'unknown')
-      return serializeEvent(event)
+      try {
+        const event = await policy.reset(key as PolicyKey, user?.id ?? 'unknown')
+        return serializeEvent(event)
+      } catch (err) {
+        if (err instanceof PolicyValidationError) throw new UserInputError(err.message)
+        throw err
+      }
     },
   },
   Subscription: {

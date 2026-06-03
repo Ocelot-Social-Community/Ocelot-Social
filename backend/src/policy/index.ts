@@ -1,5 +1,6 @@
 export {
   PolicyService,
+  PolicyValidationError,
   getPolicyService,
   setPolicyServiceForTesting,
   createInMemoryPolicyService,
