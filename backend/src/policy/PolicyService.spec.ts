@@ -273,6 +273,14 @@ describe('PolicyService', () => {
       expect(svc.get('apiKeysEnabled')).toBe(false) // default
       expect(readAllSettings).not.toHaveBeenCalled()
     })
+
+    it('has a no-op init() that touches no DB (the double has none)', async () => {
+      const svc = createInMemoryPolicyService({ publicRegistration: true })
+      // Must resolve without hitting the repository / undefined this.db.
+      await expect(svc.init({})).resolves.toBeUndefined()
+      expect(readAllSettings).not.toHaveBeenCalled()
+      expect(svc.get('publicRegistration')).toBe(true) // cache preserved
+    })
   })
 
   describe('set()', () => {

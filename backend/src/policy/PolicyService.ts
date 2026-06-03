@@ -323,6 +323,7 @@ interface PolicyServiceInternal {
   cache: Partial<NetworkPolicy>
   initialised: boolean
   env: Env
+  init: PolicyService['init']
 }
 
 export function createInMemoryPolicyService(
@@ -333,5 +334,11 @@ export function createInMemoryPolicyService(
   svc.cache = { ...values }
   svc.initialised = true
   svc.env = env // so getDefault() can read x-envSeed values
+  // The double has no DB (built via Object.create, no constructor). Make init()
+  // a genuine no-op so a test that calls it lands here instead of the real DB
+  // path with an undefined this.db (matches the "init() is a no-op" contract).
+  svc.init = async () => {
+    await Promise.resolve()
+  }
   return svc as unknown as PolicyService
 }
