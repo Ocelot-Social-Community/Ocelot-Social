@@ -178,14 +178,19 @@ export default {
   margin-bottom: $space-xx-small;
 }
 .description {
-  margin-bottom: $space-xx-small;
+  margin-bottom: 0;
   color: $text-color-soft;
 }
 .last-changed {
-  margin: 0 0 $space-base;
+  margin: $space-xxx-small 0 0;
   color: $text-color-soft;
   font-size: 0.85em;
   font-style: italic;
+}
+// Consistent gap before the first heading, whether or not the "last changed"
+// line is present.
+form {
+  margin-top: $space-base;
 }
 .policy-group {
   border: none;
