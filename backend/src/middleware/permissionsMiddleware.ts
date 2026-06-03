@@ -482,6 +482,8 @@ export default shield(
       policy: allow,
       // Configured defaults are admin-only (deployment config info).
       policyDefaults: isAdmin,
+      // Last-change audit info is admin-only.
+      policyLastChange: isAdmin,
     },
     Mutation: {
       '*': deny,

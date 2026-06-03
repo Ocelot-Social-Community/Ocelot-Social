@@ -1,7 +1,12 @@
 import PolicyQuery from '~/graphql/PolicyQuery'
 import PolicyDefaultsQuery from '~/graphql/PolicyDefaultsQuery'
+import PolicyLastChangeQuery from '~/graphql/PolicyLastChangeQuery'
 import PolicySubscription from '~/graphql/PolicySubscription'
 import { setPolicyMutation, resetPolicyMutation } from '~/graphql/PolicyMutations'
+
+// Extract { actor, timestamp } from a policy change event / mutation result.
+const toLastChange = (event) =>
+  event ? { actor: event.actor, timestamp: event.timestamp } : null
 
 // Build a key→value map from a backend policy response. The frontend keeps NO
 // config defaults of its own (single source of truth is the backend): we just
@@ -20,6 +25,7 @@ const normalize = (data) => {
 export const state = () => ({
   snapshot: {},
   defaults: {},
+  lastChange: null,
   isInitialized: false,
   subscriptionActive: false,
 })
@@ -30,6 +36,9 @@ export const mutations = {
   },
   SET_DEFAULTS(state, defaults) {
     state.defaults = normalize(defaults)
+  },
+  SET_LAST_CHANGE(state, lastChange) {
+    state.lastChange = lastChange || null
   },
   PATCH_KEY(state, { key, value }) {
     state.snapshot = { ...state.snapshot, [key]: value }
@@ -51,6 +60,9 @@ export const getters = {
     return state.defaults
   },
   getDefault: (state) => (key) => state.defaults[key],
+  lastChange(state) {
+    return state.lastChange
+  },
   isInitialized(state) {
     return state.isInitialized
   },
@@ -94,6 +106,18 @@ export const actions = {
     return policyDefaults
   },
 
+  // Admin-only: who last changed a policy key, and when (shown in the admin UI).
+  async fetchLastChange({ commit }) {
+    const {
+      data: { policyLastChange },
+    } = await apolloClient(this).query({
+      query: PolicyLastChangeQuery(),
+      fetchPolicy: 'network-only',
+    })
+    commit('SET_LAST_CHANGE', policyLastChange)
+    return policyLastChange
+  },
+
   async setKey({ commit }, { key, value }) {
     const {
       data: { setPolicy },
@@ -103,6 +127,7 @@ export const actions = {
     })
     // Local optimistic update — backend pubsub will broadcast to other tabs.
     commit('PATCH_KEY', { key: setPolicy.key, value: JSON.parse(setPolicy.value) })
+    commit('SET_LAST_CHANGE', toLastChange(setPolicy))
     return setPolicy
   },
 
@@ -114,6 +139,7 @@ export const actions = {
       variables: { key },
     })
     commit('PATCH_KEY', { key: resetPolicy.key, value: JSON.parse(resetPolicy.value) })
+    commit('SET_LAST_CHANGE', toLastChange(resetPolicy))
     return resetPolicy
   },
 
@@ -131,6 +157,7 @@ export const actions = {
         if (!event) return
         try {
           commit('PATCH_KEY', { key: event.key, value: JSON.parse(event.value) })
+          commit('SET_LAST_CHANGE', toLastChange(event))
         } catch (err) {
           // Ignore malformed event payloads.
         }

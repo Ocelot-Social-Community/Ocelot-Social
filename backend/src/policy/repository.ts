@@ -38,6 +38,29 @@ export async function readAllSettings(
   return out
 }
 
+// The most recent *human* change across all settings in a namespace (who +
+// when), or null if only system seeds exist / nothing has been written yet.
+// System writes (actor "system:*", e.g. the init seed) are excluded so the
+// admin UI shows "never changed" until a real admin edits something.
+export async function readLastChange(
+  db: DbContext,
+  namespace: string,
+): Promise<{ actor: string; timestamp: string } | null> {
+  const result = await db.query({
+    query: `MATCH (s:Setting {namespace: $namespace})
+            WHERE s.updatedAt IS NOT NULL AND NOT s.updatedBy STARTS WITH 'system:'
+            RETURN s.updatedBy AS actor, s.updatedAt AS timestamp
+            ORDER BY s.updatedAt DESC LIMIT 1`,
+    variables: { namespace },
+  })
+  const record = result.records[0]
+  if (!record) return null
+  return {
+    actor: record.get('actor') as string,
+    timestamp: record.get('timestamp') as string,
+  }
+}
+
 export async function writeSetting(
   db: DbContext,
   namespace: string,

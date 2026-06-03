@@ -11,6 +11,7 @@ describe('admin/policy.vue', () => {
   let store
   let init
   let fetchDefaults
+  let fetchLastChange
   let setKey
   let resetKey
 
@@ -28,25 +29,29 @@ describe('admin/policy.vue', () => {
     categoriesActive: true,
     apiKeysEnabled: false,
   }
+  const lastChange = { actor: 'jenny-rostock', timestamp: '2026-01-02T03:04:05.000Z' }
 
   beforeEach(() => {
     init = jest.fn().mockResolvedValue()
     fetchDefaults = jest.fn().mockResolvedValue()
+    fetchLastChange = jest.fn().mockResolvedValue()
     setKey = jest.fn().mockResolvedValue()
     resetKey = jest.fn().mockResolvedValue()
     store = new Vuex.Store({
       modules: {
         policy: {
           namespaced: true,
-          getters: { snapshot: () => snapshot, defaults: () => defaults },
-          actions: { init, fetchDefaults, setKey, resetKey },
+          getters: {
+            snapshot: () => snapshot,
+            defaults: () => defaults,
+            lastChange: () => lastChange,
+          },
+          actions: { init, fetchDefaults, fetchLastChange, setKey, resetKey },
         },
       },
     })
     mocks = {
-      $t: jest.fn((key, params) =>
-        params && params.value !== undefined ? `${key}:${params.value}` : key,
-      ),
+      $t: jest.fn((key, params) => (params ? `${key} ${JSON.stringify(params)}` : key)),
       $toast: { success: jest.fn(), error: jest.fn() },
     }
   })
@@ -87,5 +92,14 @@ describe('admin/policy.vue', () => {
     const defaultEl = wrapper.find('[data-test="policy-default-categoriesActive"]')
     expect(defaultEl.exists()).toBe(true)
     expect(defaultEl.text()).toContain('true')
+  })
+
+  it('fetches and shows who last changed the policy and when', async () => {
+    wrapper = Wrapper()
+    await flushPromises()
+    expect(fetchLastChange).toHaveBeenCalled()
+    const el = wrapper.find('[data-test="policy-last-changed"]')
+    expect(el.exists()).toBe(true)
+    expect(el.text()).toContain('jenny-rostock')
   })
 })

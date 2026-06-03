@@ -2,6 +2,14 @@
   <os-card>
     <h2 class="title">{{ $t('admin.policy.title') }}</h2>
     <p class="description">{{ $t('admin.policy.description') }}</p>
+    <p v-if="lastChange" class="last-changed" data-test="policy-last-changed">
+      {{
+        $t('admin.policy.lastUpdated', {
+          timestamp: formatTimestamp(lastChange.timestamp),
+          actor: lastChange.actor,
+        })
+      }}
+    </p>
 
     <form @submit.prevent="save" novalidate>
       <fieldset
@@ -89,7 +97,11 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({ snapshot: 'policy/snapshot', defaults: 'policy/defaults' }),
+    ...mapGetters({
+      snapshot: 'policy/snapshot',
+      defaults: 'policy/defaults',
+      lastChange: 'policy/lastChange',
+    }),
     // Flat list of all keys across groups — used by the form logic below.
     keys() {
       return this.groups.flatMap((group) => group.keys)
@@ -102,9 +114,14 @@ export default {
     ...mapActions({
       fetchPolicy: 'policy/init',
       fetchDefaults: 'policy/fetchDefaults',
+      fetchLastChange: 'policy/fetchLastChange',
       setKey: 'policy/setKey',
       resetKey: 'policy/resetKey',
     }),
+    formatTimestamp(timestamp) {
+      const date = new Date(timestamp)
+      return Number.isNaN(date.getTime()) ? timestamp : date.toLocaleString()
+    },
     syncFormFromSnapshot() {
       this.keys.forEach((k) => {
         this.form[k] = this.snapshot[k]
@@ -150,7 +167,7 @@ export default {
     },
   },
   async mounted() {
-    await Promise.all([this.fetchPolicy(), this.fetchDefaults()])
+    await Promise.all([this.fetchPolicy(), this.fetchDefaults(), this.fetchLastChange()])
     this.syncFormFromSnapshot()
   },
 }
@@ -161,8 +178,14 @@ export default {
   margin-bottom: $space-xx-small;
 }
 .description {
-  margin-bottom: $space-base;
+  margin-bottom: $space-xx-small;
   color: $text-color-soft;
+}
+.last-changed {
+  margin: 0 0 $space-base;
+  color: $text-color-soft;
+  font-size: 0.85em;
+  font-style: italic;
 }
 .policy-group {
   border: none;

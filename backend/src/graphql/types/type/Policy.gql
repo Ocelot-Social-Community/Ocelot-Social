@@ -4,6 +4,13 @@ type Query {
   # Admin-only; reuses the Policy shape. Lets the admin UI show the deployment
   # default without the frontend hardcoding any config.
   policyDefaults: Policy!
+  # Who last changed any policy key, and when (null if never changed). Admin-only.
+  policyLastChange: PolicyLastChange
+}
+
+type PolicyLastChange {
+  actor: String!
+  timestamp: String!
 }
 
 # Network policy as visible to the requesting viewer. A single resolver fills

@@ -5,6 +5,7 @@ jest.mock('./repository', () => ({
   POLICY_NAMESPACE: 'policy',
   ensureConstraint: jest.fn().mockResolvedValue(undefined),
   readAllSettings: jest.fn(),
+  readLastChange: jest.fn().mockResolvedValue(null),
   writeSetting: jest.fn(),
   deleteSetting: jest.fn(),
 }))
@@ -15,6 +16,7 @@ import * as repo from './repository'
 import type { PolicyPubSub } from './PolicyService'
 
 const readAllSettings = repo.readAllSettings as jest.MockedFunction<typeof repo.readAllSettings>
+const readLastChange = repo.readLastChange as jest.MockedFunction<typeof repo.readLastChange>
 const writeSetting = repo.writeSetting as jest.MockedFunction<typeof repo.writeSetting>
 const deleteSetting = repo.deleteSetting as jest.MockedFunction<typeof repo.deleteSetting>
 
@@ -175,6 +177,50 @@ describe('PolicyService', () => {
       expect(svc.getVisibleDefaults(null).apiKeysEnabled).toBeNull()
       expect(svc.getVisibleDefaults(null).inviteRegistration).toBe(true)
       expect(svc.getVisibleDefaults({ role: 'admin' }).apiKeysEnabled).toBe(false)
+    })
+  })
+
+  describe('getLastChange()', () => {
+    it('is null before anything changed', async () => {
+      readAllSettings.mockResolvedValue({})
+      readLastChange.mockResolvedValue(null)
+      const svc = new PolicyService(dbStub as never)
+      await svc.init({})
+      expect(svc.getLastChange()).toBeNull()
+    })
+
+    it('is read from the repository at init', async () => {
+      readAllSettings.mockResolvedValue({})
+      readLastChange.mockResolvedValue({ actor: 'someone', timestamp: '2020-01-01T00:00:00.000Z' })
+      const svc = new PolicyService(dbStub as never)
+      await svc.init({})
+      expect(svc.getLastChange()).toEqual({ actor: 'someone', timestamp: '2020-01-01T00:00:00.000Z' })
+    })
+
+    it('reflects the actor/timestamp after a set()', async () => {
+      readAllSettings.mockResolvedValue({})
+      readLastChange.mockResolvedValue(null)
+      const svc = new PolicyService(dbStub as never)
+      await svc.init({})
+      const event = await svc.set('publicRegistration', true, 'admin-id-1')
+      expect(svc.getLastChange()).toEqual({ actor: 'admin-id-1', timestamp: event.timestamp })
+    })
+
+    it('updates on a remote change (applyExternalChange)', async () => {
+      readAllSettings.mockResolvedValue({})
+      readLastChange.mockResolvedValue(null)
+      const svc = new PolicyService(dbStub as never)
+      await svc.init({})
+      svc.applyExternalChange({
+        key: 'publicRegistration',
+        value: true,
+        actor: 'remote-admin',
+        timestamp: '2021-02-03T04:05:06.000Z',
+      })
+      expect(svc.getLastChange()).toEqual({
+        actor: 'remote-admin',
+        timestamp: '2021-02-03T04:05:06.000Z',
+      })
     })
   })
 

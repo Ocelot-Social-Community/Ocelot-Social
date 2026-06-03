@@ -6,6 +6,7 @@ describe('policy store', () => {
       expect(state()).toEqual({
         snapshot: {},
         defaults: {},
+        lastChange: null,
         isInitialized: false,
         subscriptionActive: false,
       })
@@ -48,6 +49,16 @@ describe('policy store', () => {
           __typename: 'Policy',
         })
         expect(s.defaults).toEqual({ inviteRegistration: true, apiKeysEnabled: false })
+      })
+    })
+
+    describe('SET_LAST_CHANGE', () => {
+      it('stores the actor/timestamp, or null when cleared', () => {
+        const s = { lastChange: null }
+        mutations.SET_LAST_CHANGE(s, { actor: 'admin-1', timestamp: 'ts' })
+        expect(s.lastChange).toEqual({ actor: 'admin-1', timestamp: 'ts' })
+        mutations.SET_LAST_CHANGE(s, null)
+        expect(s.lastChange).toBeNull()
       })
     })
 
@@ -100,6 +111,11 @@ describe('policy store', () => {
       expect(getters.getDefault({ defaults })('apiKeysEnabled')).toBe(false)
       expect(getters.defaults({ defaults })).toBe(defaults)
     })
+
+    it('lastChange returns the stored last change', () => {
+      const lastChange = { actor: 'admin-1', timestamp: 'ts' }
+      expect(getters.lastChange({ lastChange })).toBe(lastChange)
+    })
   })
 
   describe('actions', () => {
@@ -143,25 +159,36 @@ describe('policy store', () => {
       })
     })
 
+    describe('fetchLastChange', () => {
+      it('queries the last change and commits it', async () => {
+        const policyLastChange = { actor: 'admin-1', timestamp: 'ts' }
+        const query = jest.fn().mockResolvedValue({ data: { policyLastChange } })
+        await bindAction(actions.fetchLastChange, { query })({ commit })
+
+        expect(query).toHaveBeenCalled()
+        expect(commit).toHaveBeenCalledWith('SET_LAST_CHANGE', policyLastChange)
+      })
+    })
+
     describe('setKey', () => {
-      it('mutates and optimistically patches the JSON-parsed value', async () => {
-        const mutate = jest
-          .fn()
-          .mockResolvedValue({ data: { setPolicy: { key: 'apiKeysEnabled', value: 'true' } } })
+      it('mutates, patches the value, and records the last change', async () => {
+        const setPolicy = { key: 'apiKeysEnabled', value: 'true', actor: 'admin-1', timestamp: 'ts' }
+        const mutate = jest.fn().mockResolvedValue({ data: { setPolicy } })
         await bindAction(actions.setKey, { mutate })({ commit }, { key: 'apiKeysEnabled', value: true })
 
         expect(commit).toHaveBeenCalledWith('PATCH_KEY', { key: 'apiKeysEnabled', value: true })
+        expect(commit).toHaveBeenCalledWith('SET_LAST_CHANGE', { actor: 'admin-1', timestamp: 'ts' })
       })
     })
 
     describe('resetKey', () => {
-      it('mutates and patches the reset value', async () => {
-        const mutate = jest
-          .fn()
-          .mockResolvedValue({ data: { resetPolicy: { key: 'categoriesActive', value: 'false' } } })
+      it('mutates, patches the reset value, and records the last change', async () => {
+        const resetPolicy = { key: 'categoriesActive', value: 'false', actor: 'admin-1', timestamp: 'ts' }
+        const mutate = jest.fn().mockResolvedValue({ data: { resetPolicy } })
         await bindAction(actions.resetKey, { mutate })({ commit }, { key: 'categoriesActive' })
 
         expect(commit).toHaveBeenCalledWith('PATCH_KEY', { key: 'categoriesActive', value: false })
+        expect(commit).toHaveBeenCalledWith('SET_LAST_CHANGE', { actor: 'admin-1', timestamp: 'ts' })
       })
     })
 
@@ -189,8 +216,13 @@ describe('policy store', () => {
 
         expect(commit).toHaveBeenCalledWith('SET_SUBSCRIPTION_ACTIVE', true)
 
-        observer.next({ data: { policyChanged: { key: 'apiKeysEnabled', value: 'true' } } })
+        observer.next({
+          data: {
+            policyChanged: { key: 'apiKeysEnabled', value: 'true', actor: 'admin-1', timestamp: 'ts' },
+          },
+        })
         expect(commit).toHaveBeenCalledWith('PATCH_KEY', { key: 'apiKeysEnabled', value: true })
+        expect(commit).toHaveBeenCalledWith('SET_LAST_CHANGE', { actor: 'admin-1', timestamp: 'ts' })
 
         observer.error(new Error('socket dropped'))
         expect(commit).toHaveBeenCalledWith('SET_SUBSCRIPTION_ACTIVE', false)

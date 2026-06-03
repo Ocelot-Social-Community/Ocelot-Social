@@ -26,6 +26,7 @@ import {
   deleteSetting,
   ensureConstraint,
   readAllSettings,
+  readLastChange,
   writeSetting,
 } from './repository'
 
@@ -77,6 +78,7 @@ export class PolicyService {
   private pubsub: PolicyPubSub | undefined
   private env: NodeJS.ProcessEnv = process.env
   private subscriptionId: number | undefined
+  private lastChange: { actor: string; timestamp: string } | undefined
 
   constructor(private readonly db: DbContext = databaseContext()) {}
 
@@ -104,6 +106,10 @@ export class PolicyService {
       await writeSetting(this.db, POLICY_NAMESPACE, key, seedValue, 'system:seed')
       this.cache[key] = seedValue as NetworkPolicy[PolicyKey]
     }
+
+    // Most recent change (who + when) for the admin UI; cached in memory and
+    // kept current by set()/reset()/applyExternalChange() afterwards.
+    this.lastChange = (await readLastChange(this.db, POLICY_NAMESPACE)) ?? undefined
 
     if (pubsub) {
       this.subscriptionId = await pubsub.subscribe(POLICY_CHANGED_CHANNEL, (payload) => {
@@ -163,6 +169,12 @@ export class PolicyService {
     return out
   }
 
+  // Who last changed any policy key, and when (null if never changed). Cached in
+  // memory: read at init, then updated on every set/reset/remote change.
+  getLastChange(): { actor: string; timestamp: string } | null {
+    return this.lastChange ?? null
+  }
+
   async set<K extends PolicyKey>(
     key: K,
     value: NetworkPolicy[K],
@@ -180,6 +192,7 @@ export class PolicyService {
       actor,
       timestamp: new Date().toISOString(),
     }
+    this.lastChange = { actor: event.actor, timestamp: event.timestamp }
     void this.pubsub?.publish(POLICY_CHANGED_CHANNEL, { policyChanged: event })
     return event
   }
@@ -198,6 +211,7 @@ export class PolicyService {
       actor,
       timestamp: new Date().toISOString(),
     }
+    this.lastChange = { actor: event.actor, timestamp: event.timestamp }
     void this.pubsub?.publish(POLICY_CHANGED_CHANNEL, { policyChanged: event })
     return event
   }
@@ -208,6 +222,7 @@ export class PolicyService {
   applyExternalChange(event: PolicyChangeEvent): void {
     if (!this.isKnownKey(event.key)) return
     this.cache[event.key as PolicyKey] = event.value as never
+    this.lastChange = { actor: event.actor, timestamp: event.timestamp }
   }
 
   private isKnownKey(key: string): key is PolicyKey {

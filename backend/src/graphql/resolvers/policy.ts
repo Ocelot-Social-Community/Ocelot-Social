@@ -28,6 +28,9 @@ export default {
     // scoping, so an admin sees every key's default.
     policyDefaults: (_parent: unknown, _args: unknown, { policy, user }: Context) =>
       policy.getVisibleDefaults(user),
+    // Admin-only (see permissionsMiddleware). Null if nothing has changed yet.
+    policyLastChange: (_parent: unknown, _args: unknown, { policy }: Context) =>
+      policy.getLastChange(),
   },
   Mutation: {
     setPolicy: async (
