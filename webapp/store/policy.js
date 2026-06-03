@@ -114,7 +114,14 @@ export const actions = {
       variables: { key, value: JSON.stringify(value) },
     })
     // Local optimistic update — backend pubsub will broadcast to other tabs.
-    commit('PATCH_KEY', { key: setPolicy.key, value: JSON.parse(setPolicy.value) })
+    // Guard the parse so a single unexpected value can't crash the action; the
+    // subscription still delivers the authoritative value (same defensiveness as
+    // the subscribe handler below).
+    try {
+      commit('PATCH_KEY', { key: setPolicy.key, value: JSON.parse(setPolicy.value) })
+    } catch (err) {
+      // Ignore an unparseable value.
+    }
     commit('SET_LAST_CHANGE', toLastChange(setPolicy))
     return setPolicy
   },
@@ -126,7 +133,11 @@ export const actions = {
       mutation: resetPolicyMutation(),
       variables: { key },
     })
-    commit('PATCH_KEY', { key: resetPolicy.key, value: JSON.parse(resetPolicy.value) })
+    try {
+      commit('PATCH_KEY', { key: resetPolicy.key, value: JSON.parse(resetPolicy.value) })
+    } catch (err) {
+      // Ignore an unparseable value; the subscription delivers the authoritative one.
+    }
     commit('SET_LAST_CHANGE', toLastChange(resetPolicy))
     return resetPolicy
   },

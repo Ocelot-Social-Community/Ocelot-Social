@@ -197,6 +197,29 @@ describe('policy store', () => {
           timestamp: 'ts',
         })
       })
+
+      it('does not crash on an unparseable value; skips the patch, still records the change', async () => {
+        const setPolicy = {
+          key: 'apiKeysEnabled',
+          value: 'not-json',
+          actor: 'admin-1',
+          timestamp: 'ts',
+        }
+        const mutate = jest.fn().mockResolvedValue({ data: { setPolicy } })
+
+        await expect(
+          bindAction(actions.setKey, { mutate })(
+            { commit },
+            { key: 'apiKeysEnabled', value: true },
+          ),
+        ).resolves.toBeDefined()
+
+        expect(commit).not.toHaveBeenCalledWith('PATCH_KEY', expect.anything())
+        expect(commit).toHaveBeenCalledWith('SET_LAST_CHANGE', {
+          actor: 'admin-1',
+          timestamp: 'ts',
+        })
+      })
     })
 
     describe('resetKey', () => {
@@ -211,6 +234,26 @@ describe('policy store', () => {
         await bindAction(actions.resetKey, { mutate })({ commit }, { key: 'categoriesActive' })
 
         expect(commit).toHaveBeenCalledWith('PATCH_KEY', { key: 'categoriesActive', value: false })
+        expect(commit).toHaveBeenCalledWith('SET_LAST_CHANGE', {
+          actor: 'admin-1',
+          timestamp: 'ts',
+        })
+      })
+
+      it('does not crash on an unparseable value; skips the patch, still records the change', async () => {
+        const resetPolicy = {
+          key: 'categoriesActive',
+          value: '{bad',
+          actor: 'admin-1',
+          timestamp: 'ts',
+        }
+        const mutate = jest.fn().mockResolvedValue({ data: { resetPolicy } })
+
+        await expect(
+          bindAction(actions.resetKey, { mutate })({ commit }, { key: 'categoriesActive' }),
+        ).resolves.toBeDefined()
+
+        expect(commit).not.toHaveBeenCalledWith('PATCH_KEY', expect.anything())
         expect(commit).toHaveBeenCalledWith('SET_LAST_CHANGE', {
           actor: 'admin-1',
           timestamp: 'ts',
