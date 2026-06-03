@@ -24,7 +24,9 @@ const makeWrapper = ({ policyActive, categories }) => {
   return mount(Component, {
     localVue,
     store,
-    mocks: { $policy: { get: () => policyActive } },
+    // Key-specific so the test fails if the mixin ever queries the wrong policy
+    // key (any key other than 'categoriesActive' resolves to undefined → off).
+    mocks: { $policy: { get: (key) => (key === 'categoriesActive' ? policyActive : undefined) } },
   })
 }
 
