@@ -23,8 +23,13 @@ type Policy {
 type PolicyChangeEvent {
   key: String!
   value: String!
-  actor: String
-  timestamp: String
+  actor: String!
+  timestamp: String!
+}
+
+type PolicyValueChanged {
+  key: String!
+  value: String!
 }
 
 type Mutation {
@@ -33,5 +38,5 @@ type Mutation {
 }
 
 type Subscription {
-  policyChanged: PolicyChangeEvent!
+  policyChanged: PolicyValueChanged!
 }

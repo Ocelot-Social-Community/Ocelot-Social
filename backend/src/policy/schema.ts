@@ -71,9 +71,8 @@ export function audiencesOf(user: PolicyViewer | null | undefined): Set<Audience
   return audiences
 }
 
-// Whether a viewer is an admin (superuser). Shared by canView's short-circuit
-// and the subscription's last-change redaction.
-export function isAdminViewer(user: PolicyViewer | null | undefined): boolean {
+// Whether a viewer is an admin (superuser) — canView's short-circuit.
+function isAdminViewer(user: PolicyViewer | null | undefined): boolean {
   return audiencesOf(user).has(ADMIN_AUDIENCE)
 }
 

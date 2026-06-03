@@ -233,24 +233,7 @@ describe('Subscription.policyChanged', () => {
       policyChanged: { key, value: true, actor: 'admin-1', timestamp: 'ts' },
     })
 
-  it('delivers a visible key to an admin with the full last-change metadata', async () => {
-    const ctx = subscriptionContext(asUser('admin'))
-    const iterator = policyResolvers.Subscription.policyChanged.subscribe(null, null, ctx, null)
-    const next = iterator.next()
-
-    await publish(ctx.pubsub as unknown as PubSub, 'publicRegistration')
-
-    const { value } = await next
-    const resolved = policyResolvers.Subscription.policyChanged.resolve(value, null, ctx)
-    expect(resolved).toEqual({
-      key: 'publicRegistration',
-      value: 'true',
-      actor: 'admin-1',
-      timestamp: 'ts',
-    })
-  })
-
-  it('redacts actor/timestamp for a non-admin subscriber (keeps key/value)', async () => {
+  it('delivers a visible key as a lean value-change event (key + value only)', async () => {
     const ctx = subscriptionContext(asUser('user'))
     const iterator = policyResolvers.Subscription.policyChanged.subscribe(null, null, ctx, null)
     const next = iterator.next()
@@ -258,13 +241,9 @@ describe('Subscription.policyChanged', () => {
     await publish(ctx.pubsub as unknown as PubSub, 'publicRegistration')
 
     const { value } = await next
-    const resolved = policyResolvers.Subscription.policyChanged.resolve(value, null, ctx)
-    expect(resolved).toEqual({
-      key: 'publicRegistration',
-      value: 'true',
-      actor: null,
-      timestamp: null,
-    })
+    const resolved = policyResolvers.Subscription.policyChanged.resolve(value)
+    // No actor/timestamp on the wire — last-change audit lives in policyDefaults.
+    expect(resolved).toEqual({ key: 'publicRegistration', value: 'true' })
   })
 
   it('skips a key the viewer may not see and delivers the next visible one', async () => {
@@ -278,7 +257,7 @@ describe('Subscription.policyChanged', () => {
     await publish(ctx.pubsub as unknown as PubSub, 'publicRegistration')
 
     const { value } = await next
-    const resolved = policyResolvers.Subscription.policyChanged.resolve(value, null, ctx)
+    const resolved = policyResolvers.Subscription.policyChanged.resolve(value)
     expect(resolved.key).toBe('publicRegistration')
   })
 })

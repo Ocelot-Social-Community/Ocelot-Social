@@ -1,10 +1,12 @@
 import { withFilter } from 'graphql-subscriptions'
 
-import { POLICY_CHANGED_CHANNEL, canView, isAdminViewer } from '@src/policy'
+import { POLICY_CHANGED_CHANNEL, canView } from '@src/policy'
 
 import type { Context } from '@src/context'
 import type { NetworkPolicy, PolicyKey } from '@src/policy'
 
+// Full event for the admin-only mutations (the admin sees who/when of their own
+// change). actor = the acting admin's id; always present here.
 const serializeEvent = (event: {
   key: string
   value: unknown
@@ -68,21 +70,16 @@ export default {
         (payload: { policyChanged: { key: string } }, _args: unknown, { user }: Context) =>
           canView(payload.policyChanged.key as PolicyKey, user),
       ),
-      // actor/timestamp are admin-only last-change metadata (the policyDefaults
-      // query gates them behind isAdmin). Redact them for non-admin subscribers
-      // so they never travel to e.g. an anonymous socket on a public-key change;
-      // admins keep them for the live "last changed by …" line.
-      resolve: (
-        payload: {
-          policyChanged: { key: string; value: unknown; actor: string; timestamp: string }
-        },
-        _args: unknown,
-        { user }: Context,
-      ) => {
-        const event = serializeEvent(payload.policyChanged)
-        if (isAdminViewer(user)) return event
-        return { ...event, actor: null, timestamp: null }
-      },
+      // The broadcast is a lean value-change notification only: key + value, no
+      // actor/timestamp. The admin-only last-change audit (who/when) lives solely
+      // in the policyDefaults query — so the acting admin's id never travels over
+      // the subscription to other subscribers (Datensparsamkeit). The internal
+      // Redis payload still carries actor/timestamp (for cross-instance lastChange
+      // sync via applyExternalChange); this resolve drops them before the client.
+      resolve: (payload: { policyChanged: { key: string; value: unknown } }) => ({
+        key: payload.policyChanged.key,
+        value: JSON.stringify(payload.policyChanged.value),
+      }),
     },
   },
 }

@@ -3,11 +3,8 @@ import PolicyDefaultsQuery from '~/graphql/PolicyDefaultsQuery'
 import PolicySubscription from '~/graphql/PolicySubscription'
 import { setPolicyMutation, resetPolicyMutation } from '~/graphql/PolicyMutations'
 
-// Extract { actor, timestamp } from a policy change event / mutation result.
-// A redacted event (non-admin subscriber → actor null) carries no last-change
-// metadata, so it maps to null rather than { actor: null, … }.
-const toLastChange = (event) =>
-  event && event.actor ? { actor: event.actor, timestamp: event.timestamp } : null
+// Extract { actor, timestamp } from a mutation result / policyDefaults.lastChange.
+const toLastChange = (event) => (event ? { actor: event.actor, timestamp: event.timestamp } : null)
 
 // Build a key→value map from a backend policy response. The frontend keeps NO
 // config defaults of its own (single source of truth is the backend): we just
@@ -147,8 +144,10 @@ export const actions = {
         const event = data?.policyChanged
         if (!event) return
         try {
+          // Value-only notification: update the live snapshot. The last-change
+          // line is not updated live (it refreshes from policyDefaults on the
+          // next fetch) — the broadcast carries no actor/timestamp.
           commit('PATCH_KEY', { key: event.key, value: JSON.parse(event.value) })
-          commit('SET_LAST_CHANGE', toLastChange(event))
         } catch (err) {
           // Ignore malformed event payloads.
         }

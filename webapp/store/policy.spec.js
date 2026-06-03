@@ -228,7 +228,7 @@ describe('policy store', () => {
         expect(clientSubscribe).not.toHaveBeenCalled()
       })
 
-      it('opens the subscription and patches the snapshot on each event', () => {
+      it('opens the subscription and patches the snapshot live on each event', () => {
         let observer
         const clientSubscribe = jest.fn(() => ({
           subscribe: (obs) => {
@@ -242,52 +242,18 @@ describe('policy store', () => {
 
         expect(commit).toHaveBeenCalledWith('SET_SUBSCRIPTION_ACTIVE', true)
 
+        // Lean value-change event: key + value only (no actor/timestamp).
         observer.next({
           data: {
-            policyChanged: {
-              key: 'apiKeysEnabled',
-              value: 'true',
-              actor: 'admin-1',
-              timestamp: 'ts',
-            },
+            policyChanged: { key: 'apiKeysEnabled', value: 'true' },
           },
         })
         expect(commit).toHaveBeenCalledWith('PATCH_KEY', { key: 'apiKeysEnabled', value: true })
-        expect(commit).toHaveBeenCalledWith('SET_LAST_CHANGE', {
-          actor: 'admin-1',
-          timestamp: 'ts',
-        })
+        // The broadcast carries no last-change metadata, so none is committed.
+        expect(commit).not.toHaveBeenCalledWith('SET_LAST_CHANGE', expect.anything())
 
         observer.error(new Error('socket dropped'))
         expect(commit).toHaveBeenCalledWith('SET_SUBSCRIPTION_ACTIVE', false)
-      })
-
-      it('patches the value but records no last change for a redacted event', () => {
-        let observer
-        const clientSubscribe = jest.fn(() => ({
-          subscribe: (obs) => {
-            observer = obs
-          },
-        }))
-        bindAction(actions.subscribe, { subscribe: clientSubscribe })({
-          commit,
-          state: { subscriptionActive: false },
-        })
-
-        // A non-admin subscriber receives key/value but actor/timestamp redacted
-        // (null) by the backend; the value still updates, last-change stays null.
-        observer.next({
-          data: {
-            policyChanged: {
-              key: 'publicRegistration',
-              value: 'true',
-              actor: null,
-              timestamp: null,
-            },
-          },
-        })
-        expect(commit).toHaveBeenCalledWith('PATCH_KEY', { key: 'publicRegistration', value: true })
-        expect(commit).toHaveBeenCalledWith('SET_LAST_CHANGE', null)
       })
     })
   })
