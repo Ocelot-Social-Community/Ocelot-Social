@@ -128,12 +128,26 @@ describe('admin/policy.vue', () => {
     expect(fetchDefaults).toHaveBeenCalledTimes(2)
   })
 
-  it('does not refetch the defaults during the initial mount sync', async () => {
+  it('does not double-fetch the defaults during the initial mount sync', async () => {
     wrapper = Wrapper()
-    // Before the mount fetch resolves / loaded flips, the watcher must not refetch.
-    expect(fetchDefaults).toHaveBeenCalledTimes(1) // only the explicit mount call
     await flushPromises()
+    // The mount-time snapshot sync must not trigger an extra watcher refetch
+    // (loaded is still false during the initial load) — exactly one fetch.
     expect(fetchDefaults).toHaveBeenCalledTimes(1)
+  })
+
+  it('still initializes the page when fetchDefaults fails (optional metadata)', async () => {
+    fetchDefaults.mockRejectedValueOnce(new Error('network'))
+    wrapper = Wrapper()
+    await flushPromises()
+
+    // Required snapshot still drives the form despite the optional-metadata failure.
+    expect(wrapper.find('#policy-inviteRegistration').element.checked).toBe(true)
+
+    // And `loaded` is still armed, so a later remote change refreshes the bundle.
+    store.commit('policy/SET_SNAP', { ...snapshot, publicRegistration: true })
+    await flushPromises()
+    expect(fetchDefaults).toHaveBeenCalledTimes(2) // failed mount fetch + watcher refetch
   })
 
   // Vuex calls an action as (context, payload), so the asserted call has the

@@ -168,14 +168,25 @@ export default {
         // remote admin, via the subscription) changed a policy. The broadcast
         // carries no actor/timestamp (Datensparsamkeit), so refetch the admin
         // bundle to keep the "last changed by … at …" line correct. Cheap and
-        // page-scoped: only runs while this admin page is open.
-        if (this.loaded) this.fetchDefaults()
+        // page-scoped: only runs while this admin page is open. Fault-tolerant:
+        // a failed refresh just leaves the last-changed line stale, never throws.
+        if (this.loaded) this.fetchDefaults().catch(() => undefined)
       },
       deep: true,
     },
   },
   async mounted() {
-    await Promise.all([this.fetchPolicy(), this.fetchDefaults()])
+    // Required: the viewer-scoped snapshot drives the form/checkboxes. policy/init
+    // swallows its own errors, so this won't reject — the page is usable from it.
+    await this.fetchPolicy()
+    // Optional admin metadata (configured defaults + last-changed line). A failure
+    // here must NOT break the page: degrade gracefully (grey defaults / last-changed
+    // line simply won't render) rather than aborting the whole init.
+    try {
+      await this.fetchDefaults()
+    } catch (err) {
+      // ignore — snapshot alone is enough to work with
+    }
     this.syncFormFromSnapshot()
     this.loaded = true
   },
