@@ -58,8 +58,10 @@ describe('GroupProfileSlug', () => {
       //   id: 'p23',
       //   name: 'It is a post',
       // },
-      // categories feature enabled — read via $policy by getCategoriesMixin
-      $policy: { get: () => true },
+      // categories feature enabled — read via $policy by getCategoriesMixin.
+      // Key-specific so a wrong/typo'd policy key in the code resolves to false
+      // (off) and the test catches it, rather than passing on a blanket `true`.
+      $policy: { get: (key) => key === 'categoriesActive' },
       $t: jest.fn((a) => a),
       $filters: {
         removeLinks: (c) => c,
