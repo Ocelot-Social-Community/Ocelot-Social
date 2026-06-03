@@ -94,6 +94,9 @@ export default {
         apiKeysEnabled: false,
       },
       saving: false,
+      // Becomes true after the initial mount fetch so the snapshot watcher only
+      // refetches the last-change info for *subsequent* (e.g. remote) changes.
+      loaded: false,
     }
   },
   computed: {
@@ -161,6 +164,12 @@ export default {
     snapshot: {
       handler() {
         this.syncFormFromSnapshot()
+        // After the initial load, a snapshot change means someone (possibly a
+        // remote admin, via the subscription) changed a policy. The broadcast
+        // carries no actor/timestamp (Datensparsamkeit), so refetch the admin
+        // bundle to keep the "last changed by … at …" line correct. Cheap and
+        // page-scoped: only runs while this admin page is open.
+        if (this.loaded) this.fetchDefaults()
       },
       deep: true,
     },
@@ -168,6 +177,7 @@ export default {
   async mounted() {
     await Promise.all([this.fetchPolicy(), this.fetchDefaults()])
     this.syncFormFromSnapshot()
+    this.loaded = true
   },
 }
 </script>

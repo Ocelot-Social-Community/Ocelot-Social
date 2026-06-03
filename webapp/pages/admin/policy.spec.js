@@ -39,10 +39,18 @@ describe('admin/policy.vue', () => {
       modules: {
         policy: {
           namespaced: true,
+          // snapshot lives in state so a test can mutate it and trigger the
+          // component's reactive snapshot watcher (remote-change simulation).
+          state: () => ({ snap: { ...snapshot } }),
           getters: {
-            snapshot: () => snapshot,
+            snapshot: (state) => state.snap,
             defaults: () => defaults,
             lastChange: () => lastChange,
+          },
+          mutations: {
+            SET_SNAP: (state, value) => {
+              state.snap = value
+            },
           },
           actions: { init, fetchDefaults, setKey, resetKey },
         },
@@ -105,5 +113,26 @@ describe('admin/policy.vue', () => {
     const el = wrapper.find('[data-test="policy-last-changed"]')
     expect(el.exists()).toBe(true)
     expect(el.text()).toContain('jenny-rostock')
+  })
+
+  it('refetches the defaults bundle when the snapshot changes after load (remote change)', async () => {
+    wrapper = Wrapper()
+    await flushPromises()
+    // One fetch from mount; the subscription broadcast carries no actor/timestamp,
+    // so a remote-change snapshot update must refresh the last-change line.
+    expect(fetchDefaults).toHaveBeenCalledTimes(1)
+
+    store.commit('policy/SET_SNAP', { ...snapshot, publicRegistration: true })
+    await flushPromises()
+
+    expect(fetchDefaults).toHaveBeenCalledTimes(2)
+  })
+
+  it('does not refetch the defaults during the initial mount sync', async () => {
+    wrapper = Wrapper()
+    // Before the mount fetch resolves / loaded flips, the watcher must not refetch.
+    expect(fetchDefaults).toHaveBeenCalledTimes(1) // only the explicit mount call
+    await flushPromises()
+    expect(fetchDefaults).toHaveBeenCalledTimes(1)
   })
 })
