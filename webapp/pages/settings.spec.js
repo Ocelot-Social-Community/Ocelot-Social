@@ -10,13 +10,17 @@ const stubs = {
 describe('settings.vue', () => {
   let wrapper
   let mocks
+  let policyValues
 
   beforeEach(() => {
+    // Key-specific policy mock so the policy-gated tabs (invites, api-keys) can
+    // be toggled per scenario; defaults to everything off.
+    policyValues = {}
     mocks = {
       $t: jest.fn((key) => key),
       $route: { path: '/settings' },
       $router: { push: jest.fn() },
-      $policy: { get: () => false },
+      $policy: { get: (key) => policyValues[key] ?? false },
     }
   })
 
@@ -51,6 +55,25 @@ describe('settings.vue', () => {
 
     it('renders', () => {
       expect(wrapper.container).toMatchSnapshot()
+    })
+  })
+
+  describe('policy-gated tabs', () => {
+    beforeEach(() => {
+      mocks.$env = { BADGES_ENABLED: false }
+    })
+
+    it('hides the invites and api-keys tabs when the policy disables them', () => {
+      wrapper = Wrapper() // policyValues empty ⇒ both off
+      expect(wrapper.queryAllByText('settings.invites.name')).toHaveLength(0)
+      expect(wrapper.queryAllByText('settings.api-keys.name')).toHaveLength(0)
+    })
+
+    it('shows the invites and api-keys tabs when the policy enables them', () => {
+      policyValues = { inviteRegistration: true, apiKeysEnabled: true }
+      wrapper = Wrapper()
+      expect(wrapper.queryAllByText('settings.invites.name').length).toBeGreaterThan(0)
+      expect(wrapper.queryAllByText('settings.api-keys.name').length).toBeGreaterThan(0)
     })
   })
 })
