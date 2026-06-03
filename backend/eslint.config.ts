@@ -6,6 +6,14 @@ import config from 'eslint-config-it4c'
 import graphql from 'eslint-config-it4c/modules/graphql'
 import jest from 'eslint-config-it4c/modules/jest'
 
+import policySchema from './src/policy/policy.schema.json'
+
+// PolicyKey enum is derived from policy.schema.json (the single source of truth),
+// the same way src/graphql/types/index.ts injects it into the runtime schema.
+// graphql-eslint loads the static .gql files, so it needs the enum supplied here
+// too — otherwise Policy.gql's `key: PolicyKey!` would be an unknown type.
+const policyKeyEnumSDL = `enum PolicyKey { ${Object.keys(policySchema.properties).join(' ')} }`
+
 export default [
   {
     ignores: ['node_modules/', 'build/', 'coverage/'],
@@ -26,7 +34,7 @@ export default [
       parser: graphql[0].plugins['@graphql-eslint'].parser,
       parserOptions: {
         graphQLConfig: {
-          schema: './src/graphql/types/**/*.gql',
+          schema: ['./src/graphql/types/**/*.gql', policyKeyEnumSDL],
           documents: './src/graphql/queries/**/*.gql',
         },
       },

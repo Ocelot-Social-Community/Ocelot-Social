@@ -3,6 +3,7 @@
 // permissions middleware (the layer that rejects a resolver returning
 // `undefined`). Guards the viewer-scoped visibility: anonymous viewers get
 // `null` for authenticated-only keys (NOT the value, and NOT an error).
+import { parse } from 'graphql'
 import { PubSub } from 'graphql-subscriptions'
 
 import policyQuery from '@graphql/queries/policy/policy.gql'
@@ -10,7 +11,7 @@ import policyDefaultsQuery from '@graphql/queries/policy/policyDefaults.gql'
 import resetPolicyMutation from '@graphql/queries/policy/resetPolicy.gql'
 import setPolicyMutation from '@graphql/queries/policy/setPolicy.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
-import { POLICY_CHANGED_CHANNEL } from '@src/policy'
+import { POLICY_CHANGED_CHANNEL, allKeys } from '@src/policy'
 
 import policyResolvers from './policy'
 
@@ -159,6 +160,30 @@ describe('Mutation.setPolicy / resetPolicy authorization', () => {
     })
 
     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
+  })
+})
+
+describe('PolicyKey enum (schema-derived contract)', () => {
+  it('is derived from the schema keys — the single source of truth', async () => {
+    const { data, errors } = await query({
+      query: parse('{ __type(name: "PolicyKey") { enumValues { name } } }'),
+    })
+    expect(errors).toBeUndefined()
+    const enumValues = data.__type.enumValues as Array<{ name: string }>
+    const names = enumValues.map((v) => v.name).sort()
+    expect(names).toEqual([...allKeys()].sort())
+  })
+
+  it('rejects an unknown key at the GraphQL layer (before the resolver)', async () => {
+    authenticatedUser = asUser('admin')
+
+    const { errors } = await query({
+      query: setPolicyMutation,
+      variables: { key: 'totallyMadeUpKey', value: 'true' },
+    })
+
+    // Enum coercion fails during variable validation — never reaches policy.set().
+    expect(errors?.[0]?.message).toMatch(/PolicyKey/)
   })
 })
 

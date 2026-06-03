@@ -21,20 +21,20 @@ type Policy {
 }
 
 type PolicyChangeEvent {
-  key: String!
+  key: PolicyKey!
   value: String!
   actor: String!
   timestamp: String!
 }
 
 type PolicyValueChanged {
-  key: String!
+  key: PolicyKey!
   value: String!
 }
 
 type Mutation {
-  setPolicy(key: String!, value: String!): PolicyChangeEvent!
-  resetPolicy(key: String!): PolicyChangeEvent!
+  setPolicy(key: PolicyKey!, value: String!): PolicyChangeEvent!
+  resetPolicy(key: PolicyKey!): PolicyChangeEvent!
 }
 
 type Subscription {

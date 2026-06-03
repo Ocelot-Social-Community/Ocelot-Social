@@ -1,4 +1,4 @@
-mutation setPolicy($key: String!, $value: String!) {
+mutation setPolicy($key: PolicyKey!, $value: String!) {
   setPolicy(key: $key, value: $value) {
     key
   }

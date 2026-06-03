@@ -1,7 +1,7 @@
 import gql from 'graphql-tag'
 
 export const setPolicyMutation = () => gql`
-  mutation setPolicy($key: String!, $value: String!) {
+  mutation setPolicy($key: PolicyKey!, $value: String!) {
     setPolicy(key: $key, value: $value) {
       key
       value
@@ -12,7 +12,7 @@ export const setPolicyMutation = () => gql`
 `
 
 export const resetPolicyMutation = () => gql`
-  mutation resetPolicy($key: String!) {
+  mutation resetPolicy($key: PolicyKey!) {
     resetPolicy(key: $key) {
       key
       value
