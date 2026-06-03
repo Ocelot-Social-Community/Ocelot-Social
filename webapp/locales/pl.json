@@ -132,27 +132,42 @@
     "notifications": {
       "name": "Powiadomienia"
     },
-    "policy": {
-      "name": "Zasady sieci",
-      "title": "Ustawienia zasad sieci",
-      "description": "Konfiguracja czasu wykonywania. Zmiany są stosowane natychmiast dla wszystkich połączonych klientów.",
-      "keys": {
-        "publicRegistration": "Publiczna rejestracja bez kodu zaproszenia",
-        "inviteRegistration": "Rejestracja przez kod zaproszenia",
-        "categoriesActive": "Funkcja kategorii dla postów i grup",
-        "apiKeysEnabled": "Funkcjonalność kluczy API"
-      },
-      "save": "Zapisz zmiany",
-      "reset": "Przywróć domyślne",
-      "saveSuccess": "Zasady zaktualizowane.",
-      "saveError": "Nie można zaktualizować zasad: {message}",
-      "lastUpdated": "Ostatnia zmiana: {timestamp} przez {actor}"
-    },
     "organizations": {
       "name": "Organizacje"
     },
     "pages": {
       "name": "Strony"
+    },
+    "policy": {
+      "defaultValue": "domyślnie: {value}",
+      "description": "Konfiguracja czasu wykonywania. Zmiany są stosowane natychmiast dla wszystkich połączonych klientów.",
+      "descriptions": {
+        "apiKeysEnabled": "Pozwala użytkownikom tworzyć osobiste klucze API do programowego dostępu do backendu. Dotyczy sekcji kluczy API w ustawieniach użytkownika.",
+        "categoriesActive": "Włącza kategorie tematyczne dla wpisów i grup, aby klasyfikować i filtrować treści. Wymaga istnienia co najmniej jednej kategorii.",
+        "inviteRegistration": "Pozwala obecnym członkom zapraszać nowych użytkowników za pomocą kodów zaproszeń. Po wyłączeniu kodów zaproszeń nie można użyć do rejestracji.",
+        "publicRegistration": "Pozwala każdemu utworzyć konto bezpośrednio, bez kodu zaproszenia. Po wyłączeniu nowi użytkownicy mogą dołączyć tylko przez zaproszenie."
+      },
+      "groups": {
+        "features": {
+          "title": "Funkcje"
+        },
+        "registration": {
+          "title": "Rejestracja"
+        }
+      },
+      "keys": {
+        "apiKeysEnabled": "Klucze API",
+        "categoriesActive": "Kategorie",
+        "inviteRegistration": "Rejestracja z zaproszeniem",
+        "publicRegistration": "Otwarta rejestracja"
+      },
+      "lastUpdated": "Ostatnia zmiana: {timestamp} przez {actor}",
+      "name": "Zasady sieci",
+      "reset": "Przywróć domyślne",
+      "save": "Zapisz zmiany",
+      "saveError": "Nie można zaktualizować zasad: {message}",
+      "saveSuccess": "Zasady zaktualizowane.",
+      "title": "Ustawienia zasad sieci"
     },
     "settings": {
       "name": "Ustawienia"

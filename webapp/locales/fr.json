@@ -132,27 +132,42 @@
     "notifications": {
       "name": "Notifications"
     },
-    "policy": {
-      "name": "Politique réseau",
-      "title": "Paramètres de la politique réseau",
-      "description": "Configuration en exécution. Les modifications s'appliquent immédiatement à tous les clients connectés.",
-      "keys": {
-        "publicRegistration": "Inscription publique sans code d'invitation",
-        "inviteRegistration": "Inscription via un code d'invitation",
-        "categoriesActive": "Fonctionnalité de catégories pour publications et groupes",
-        "apiKeysEnabled": "Fonctionnalité des clés API"
-      },
-      "save": "Enregistrer les modifications",
-      "reset": "Réinitialiser par défaut",
-      "saveSuccess": "Politique mise à jour.",
-      "saveError": "Impossible de mettre à jour la politique : {message}",
-      "lastUpdated": "Dernière modification : {timestamp} par {actor}"
-    },
     "organizations": {
       "name": "Organisations"
     },
     "pages": {
       "name": "Pages"
+    },
+    "policy": {
+      "defaultValue": "par défaut : {value}",
+      "description": "Configuration en exécution. Les modifications s'appliquent immédiatement à tous les clients connectés.",
+      "descriptions": {
+        "apiKeysEnabled": "Permet aux utilisateurs de créer des clés API personnelles pour un accès programmatique au backend. Affecte la section des clés API dans les paramètres utilisateur.",
+        "categoriesActive": "Active les catégories thématiques pour les publications et les groupes, afin de classer et filtrer le contenu. Nécessite au moins une catégorie.",
+        "inviteRegistration": "Permet aux membres existants d'inviter de nouveaux utilisateurs via des codes d'invitation. Désactivé, les codes d'invitation ne peuvent pas être utilisés pour s'inscrire.",
+        "publicRegistration": "Permet à n'importe qui de créer un compte directement, sans code d'invitation. Désactivé, les nouveaux utilisateurs ne peuvent rejoindre que sur invitation."
+      },
+      "groups": {
+        "features": {
+          "title": "Fonctionnalités"
+        },
+        "registration": {
+          "title": "Inscription"
+        }
+      },
+      "keys": {
+        "apiKeysEnabled": "Clés API",
+        "categoriesActive": "Catégories",
+        "inviteRegistration": "Inscription sur invitation",
+        "publicRegistration": "Inscription ouverte"
+      },
+      "lastUpdated": "Dernière modification : {timestamp} par {actor}",
+      "name": "Politique réseau",
+      "reset": "Réinitialiser par défaut",
+      "save": "Enregistrer les modifications",
+      "saveError": "Impossible de mettre à jour la politique : {message}",
+      "saveSuccess": "Politique mise à jour.",
+      "title": "Paramètres de la politique réseau"
     },
     "settings": {
       "name": "Paramètres"

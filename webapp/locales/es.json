@@ -132,27 +132,42 @@
     "notifications": {
       "name": "Notificaciones"
     },
-    "policy": {
-      "name": "Política de red",
-      "title": "Configuración de política de red",
-      "description": "Configuración en tiempo de ejecución. Los cambios se aplican inmediatamente a todos los clientes conectados.",
-      "keys": {
-        "publicRegistration": "Registro público sin código de invitación",
-        "inviteRegistration": "Registro mediante código de invitación",
-        "categoriesActive": "Función de categorías para publicaciones y grupos",
-        "apiKeysEnabled": "Funcionalidad de claves API"
-      },
-      "save": "Guardar cambios",
-      "reset": "Restablecer al valor predeterminado",
-      "saveSuccess": "Política actualizada.",
-      "saveError": "No se pudo actualizar la política: {message}",
-      "lastUpdated": "Última modificación: {timestamp} por {actor}"
-    },
     "organizations": {
       "name": "Organizaciones"
     },
     "pages": {
       "name": "Páginas"
+    },
+    "policy": {
+      "defaultValue": "predeterminado: {value}",
+      "description": "Configuración en tiempo de ejecución. Los cambios se aplican inmediatamente a todos los clientes conectados.",
+      "descriptions": {
+        "apiKeysEnabled": "Permite a los usuarios crear claves API personales para acceder al backend mediante programación. Afecta a la sección de claves API en los ajustes de usuario.",
+        "categoriesActive": "Activa las categorías temáticas para publicaciones y grupos, para clasificar y filtrar el contenido. Requiere que exista al menos una categoría.",
+        "inviteRegistration": "Permite que los miembros existentes inviten a nuevos usuarios mediante códigos de invitación. Si está desactivado, los códigos de invitación no pueden canjearse para registrarse.",
+        "publicRegistration": "Permite que cualquiera cree una cuenta directamente, sin código de invitación. Si está desactivado, los nuevos usuarios solo pueden unirse mediante una invitación."
+      },
+      "groups": {
+        "features": {
+          "title": "Funciones"
+        },
+        "registration": {
+          "title": "Registro"
+        }
+      },
+      "keys": {
+        "apiKeysEnabled": "Claves API",
+        "categoriesActive": "Categorías",
+        "inviteRegistration": "Registro por invitación",
+        "publicRegistration": "Registro abierto"
+      },
+      "lastUpdated": "Última modificación: {timestamp} por {actor}",
+      "name": "Política de red",
+      "reset": "Restablecer al valor predeterminado",
+      "save": "Guardar cambios",
+      "saveError": "No se pudo actualizar la política: {message}",
+      "saveSuccess": "Política actualizada.",
+      "title": "Configuración de política de red"
     },
     "settings": {
       "name": "Configuración"

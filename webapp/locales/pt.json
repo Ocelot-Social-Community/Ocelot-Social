@@ -132,27 +132,42 @@
     "notifications": {
       "name": "Notificações"
     },
-    "policy": {
-      "name": "Política de rede",
-      "title": "Configurações da política de rede",
-      "description": "Configuração em tempo de execução. As alterações são aplicadas imediatamente a todos os clientes conectados.",
-      "keys": {
-        "publicRegistration": "Registro público sem código de convite",
-        "inviteRegistration": "Registro por código de convite",
-        "categoriesActive": "Recurso de categorias para publicações e grupos",
-        "apiKeysEnabled": "Funcionalidade de chaves API"
-      },
-      "save": "Salvar alterações",
-      "reset": "Restaurar padrão",
-      "saveSuccess": "Política atualizada.",
-      "saveError": "Não foi possível atualizar a política: {message}",
-      "lastUpdated": "Última alteração: {timestamp} por {actor}"
-    },
     "organizations": {
       "name": "Organizações"
     },
     "pages": {
       "name": "Páginas"
+    },
+    "policy": {
+      "defaultValue": "padrão: {value}",
+      "description": "Configuração em tempo de execução. As alterações são aplicadas imediatamente a todos os clientes conectados.",
+      "descriptions": {
+        "apiKeysEnabled": "Permite que os utilizadores criem chaves de API pessoais para acesso programático ao backend. Afeta a secção de chaves de API nas definições do utilizador.",
+        "categoriesActive": "Ativa as categorias temáticas para publicações e grupos, para classificar e filtrar conteúdo. Requer que exista pelo menos uma categoria.",
+        "inviteRegistration": "Permite que membros existentes convidem novos utilizadores através de códigos de convite. Quando desativado, os códigos de convite não podem ser usados para registo.",
+        "publicRegistration": "Permite que qualquer pessoa crie uma conta diretamente, sem código de convite. Quando desativado, novos utilizadores só podem entrar por convite."
+      },
+      "groups": {
+        "features": {
+          "title": "Funcionalidades"
+        },
+        "registration": {
+          "title": "Registo"
+        }
+      },
+      "keys": {
+        "apiKeysEnabled": "Chaves de API",
+        "categoriesActive": "Categorias",
+        "inviteRegistration": "Registo por convite",
+        "publicRegistration": "Registo aberto"
+      },
+      "lastUpdated": "Última alteração: {timestamp} por {actor}",
+      "name": "Política de rede",
+      "reset": "Restaurar padrão",
+      "save": "Salvar alterações",
+      "saveError": "Não foi possível atualizar a política: {message}",
+      "saveSuccess": "Política atualizada.",
+      "title": "Configurações da política de rede"
     },
     "settings": {
       "name": "Configurações"
