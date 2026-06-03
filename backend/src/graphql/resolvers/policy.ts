@@ -1,5 +1,6 @@
 import { withFilter } from 'graphql-subscriptions'
 
+import { UserInputError } from '@graphql/errors'
 import { POLICY_CHANGED_CHANNEL, canView } from '@src/policy'
 
 import type { Context } from '@src/context'
@@ -45,7 +46,7 @@ export default {
       try {
         parsed = JSON.parse(value)
       } catch {
-        throw new Error('Value must be a JSON-encoded string')
+        throw new UserInputError('Value must be a JSON-encoded string')
       }
       const event = await policy.set(
         key as PolicyKey,

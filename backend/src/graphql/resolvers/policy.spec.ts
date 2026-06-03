@@ -187,16 +187,17 @@ describe('Mutation resolvers (unit)', () => {
       })
     })
 
-    it('rejects a value that is not valid JSON', async () => {
+    it('rejects a value that is not valid JSON as a BAD_USER_INPUT error', async () => {
       const set = jest.fn()
 
-      await expect(
-        policyResolvers.Mutation.setPolicy(
-          null,
-          { key: 'apiKeysEnabled', value: 'not json' },
-          mutationContext({ set }),
-        ),
-      ).rejects.toThrow(/JSON-encoded string/)
+      const promise = policyResolvers.Mutation.setPolicy(
+        null,
+        { key: 'apiKeysEnabled', value: 'not json' },
+        mutationContext({ set }),
+      )
+      await expect(promise).rejects.toThrow(/JSON-encoded string/)
+      // Classified as a client input error, not a generic/internal error.
+      await expect(promise).rejects.toMatchObject({ extensions: { code: 'BAD_USER_INPUT' } })
       expect(set).not.toHaveBeenCalled()
     })
   })
