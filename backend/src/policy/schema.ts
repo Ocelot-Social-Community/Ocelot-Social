@@ -71,11 +71,17 @@ export function audiencesOf(user: PolicyViewer | null | undefined): Set<Audience
   return audiences
 }
 
+// Whether a viewer is an admin (superuser). Shared by canView's short-circuit
+// and the subscription's last-change redaction.
+export function isAdminViewer(user: PolicyViewer | null | undefined): boolean {
+  return audiencesOf(user).has(ADMIN_AUDIENCE)
+}
+
 // The single visibility primitive. Admin sees everything; everyone else sees a
 // key iff they share at least one audience with it.
 export function canView(key: PolicyKey, user: PolicyViewer | null | undefined): boolean {
+  if (isAdminViewer(user)) return true
   const viewer = audiencesOf(user)
-  if (viewer.has(ADMIN_AUDIENCE)) return true
   return audiencesFor(key).some((audience) => viewer.has(audience))
 }
 

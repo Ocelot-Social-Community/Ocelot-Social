@@ -1,7 +1,11 @@
 type Query {
   policy: Policy!
-  policyDefaults: Policy!
-  policyLastChange: PolicyLastChange
+  policyDefaults: PolicyDefaults!
+}
+
+type PolicyDefaults {
+  defaults: Policy!
+  lastChange: PolicyLastChange
 }
 
 type PolicyLastChange {
@@ -19,8 +23,8 @@ type Policy {
 type PolicyChangeEvent {
   key: String!
   value: String!
-  actor: String!
-  timestamp: String!
+  actor: String
+  timestamp: String
 }
 
 type Mutation {

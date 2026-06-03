@@ -11,7 +11,6 @@ describe('admin/policy.vue', () => {
   let store
   let init
   let fetchDefaults
-  let fetchLastChange
   let setKey
   let resetKey
 
@@ -34,7 +33,6 @@ describe('admin/policy.vue', () => {
   beforeEach(() => {
     init = jest.fn().mockResolvedValue()
     fetchDefaults = jest.fn().mockResolvedValue()
-    fetchLastChange = jest.fn().mockResolvedValue()
     setKey = jest.fn().mockResolvedValue()
     resetKey = jest.fn().mockResolvedValue()
     store = new Vuex.Store({
@@ -46,7 +44,7 @@ describe('admin/policy.vue', () => {
             defaults: () => defaults,
             lastChange: () => lastChange,
           },
-          actions: { init, fetchDefaults, fetchLastChange, setKey, resetKey },
+          actions: { init, fetchDefaults, setKey, resetKey },
         },
       },
     })
@@ -99,10 +97,11 @@ describe('admin/policy.vue', () => {
     expect(defaultEl.text()).toContain('true')
   })
 
-  it('fetches and shows who last changed the policy and when', async () => {
+  it('shows who last changed the policy and when (delivered via fetchDefaults)', async () => {
     wrapper = Wrapper()
     await flushPromises()
-    expect(fetchLastChange).toHaveBeenCalled()
+    // last change is now bundled into the admin defaults round-trip
+    expect(fetchDefaults).toHaveBeenCalled()
     const el = wrapper.find('[data-test="policy-last-changed"]')
     expect(el.exists()).toBe(true)
     expect(el.text()).toContain('jenny-rostock')

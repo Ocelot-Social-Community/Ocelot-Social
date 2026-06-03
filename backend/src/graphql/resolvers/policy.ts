@@ -1,6 +1,6 @@
 import { withFilter } from 'graphql-subscriptions'
 
-import { POLICY_CHANGED_CHANNEL, canView } from '@src/policy'
+import { POLICY_CHANGED_CHANNEL, canView, isAdminViewer } from '@src/policy'
 
 import type { Context } from '@src/context'
 import type { NetworkPolicy, PolicyKey } from '@src/policy'
@@ -24,13 +24,14 @@ export default {
     // fields. Public keys are always present.
     policy: (_parent: unknown, _args: unknown, { policy, user }: Context) =>
       policy.getVisibleSnapshot(user),
-    // Admin-only (see permissionsMiddleware). Routed through the same canView
-    // scoping, so an admin sees every key's default.
-    policyDefaults: (_parent: unknown, _args: unknown, { policy, user }: Context) =>
-      policy.getVisibleDefaults(user),
-    // Admin-only (see permissionsMiddleware). Null if nothing has changed yet.
-    policyLastChange: (_parent: unknown, _args: unknown, { policy }: Context) =>
-      policy.getLastChange(),
+    // Admin-only (see permissionsMiddleware). One round-trip carrying both
+    // admin-only pieces: the configured defaults (canView-scoped, admin sees
+    // all) and the most recent change (null until a real change). Replaces the
+    // former separate policyLastChange query.
+    policyDefaults: (_parent: unknown, _args: unknown, { policy, user }: Context) => ({
+      defaults: policy.getVisibleDefaults(user),
+      lastChange: policy.getLastChange(),
+    }),
   },
   Mutation: {
     setPolicy: async (
@@ -67,9 +68,21 @@ export default {
         (payload: { policyChanged: { key: string } }, _args: unknown, { user }: Context) =>
           canView(payload.policyChanged.key as PolicyKey, user),
       ),
-      resolve: (payload: {
-        policyChanged: { key: string; value: unknown; actor: string; timestamp: string }
-      }) => serializeEvent(payload.policyChanged),
+      // actor/timestamp are admin-only last-change metadata (the policyDefaults
+      // query gates them behind isAdmin). Redact them for non-admin subscribers
+      // so they never travel to e.g. an anonymous socket on a public-key change;
+      // admins keep them for the live "last changed by …" line.
+      resolve: (
+        payload: {
+          policyChanged: { key: string; value: unknown; actor: string; timestamp: string }
+        },
+        _args: unknown,
+        { user }: Context,
+      ) => {
+        const event = serializeEvent(payload.policyChanged)
+        if (isAdminViewer(user)) return event
+        return { ...event, actor: null, timestamp: null }
+      },
     },
   },
 }

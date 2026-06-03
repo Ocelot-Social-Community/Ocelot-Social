@@ -114,7 +114,6 @@ export default {
     ...mapActions({
       fetchPolicy: 'policy/init',
       fetchDefaults: 'policy/fetchDefaults',
-      fetchLastChange: 'policy/fetchLastChange',
       setKey: 'policy/setKey',
       resetKey: 'policy/resetKey',
     }),
@@ -167,7 +166,7 @@ export default {
     },
   },
   async mounted() {
-    await Promise.all([this.fetchPolicy(), this.fetchDefaults(), this.fetchLastChange()])
+    await Promise.all([this.fetchPolicy(), this.fetchDefaults()])
     this.syncFormFromSnapshot()
   },
 }

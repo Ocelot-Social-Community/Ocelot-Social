@@ -149,24 +149,31 @@ describe('policy store', () => {
     })
 
     describe('fetchDefaults', () => {
-      it('queries the configured defaults and commits them', async () => {
-        const policyDefaults = { publicRegistration: false, apiKeysEnabled: false }
+      it('queries the admin bundle and commits both defaults and last change', async () => {
+        const policyDefaults = {
+          defaults: { publicRegistration: false, apiKeysEnabled: false },
+          lastChange: { actor: 'admin-1', timestamp: 'ts' },
+        }
         const query = jest.fn().mockResolvedValue({ data: { policyDefaults } })
         await bindAction(actions.fetchDefaults, { query })({ commit })
 
         expect(query).toHaveBeenCalled()
-        expect(commit).toHaveBeenCalledWith('SET_DEFAULTS', policyDefaults)
+        expect(commit).toHaveBeenCalledWith('SET_DEFAULTS', policyDefaults.defaults)
+        expect(commit).toHaveBeenCalledWith('SET_LAST_CHANGE', {
+          actor: 'admin-1',
+          timestamp: 'ts',
+        })
       })
-    })
 
-    describe('fetchLastChange', () => {
-      it('queries the last change and commits it', async () => {
-        const policyLastChange = { actor: 'admin-1', timestamp: 'ts' }
-        const query = jest.fn().mockResolvedValue({ data: { policyLastChange } })
-        await bindAction(actions.fetchLastChange, { query })({ commit })
+      it('commits a null last change when nothing has changed yet', async () => {
+        const policyDefaults = {
+          defaults: { publicRegistration: false },
+          lastChange: null,
+        }
+        const query = jest.fn().mockResolvedValue({ data: { policyDefaults } })
+        await bindAction(actions.fetchDefaults, { query })({ commit })
 
-        expect(query).toHaveBeenCalled()
-        expect(commit).toHaveBeenCalledWith('SET_LAST_CHANGE', policyLastChange)
+        expect(commit).toHaveBeenCalledWith('SET_LAST_CHANGE', null)
       })
     })
 
@@ -253,6 +260,34 @@ describe('policy store', () => {
 
         observer.error(new Error('socket dropped'))
         expect(commit).toHaveBeenCalledWith('SET_SUBSCRIPTION_ACTIVE', false)
+      })
+
+      it('patches the value but records no last change for a redacted event', () => {
+        let observer
+        const clientSubscribe = jest.fn(() => ({
+          subscribe: (obs) => {
+            observer = obs
+          },
+        }))
+        bindAction(actions.subscribe, { subscribe: clientSubscribe })({
+          commit,
+          state: { subscriptionActive: false },
+        })
+
+        // A non-admin subscriber receives key/value but actor/timestamp redacted
+        // (null) by the backend; the value still updates, last-change stays null.
+        observer.next({
+          data: {
+            policyChanged: {
+              key: 'publicRegistration',
+              value: 'true',
+              actor: null,
+              timestamp: null,
+            },
+          },
+        })
+        expect(commit).toHaveBeenCalledWith('PATCH_KEY', { key: 'publicRegistration', value: true })
+        expect(commit).toHaveBeenCalledWith('SET_LAST_CHANGE', null)
       })
     })
   })

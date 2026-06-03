@@ -1,8 +1,14 @@
 query policyDefaults {
   policyDefaults {
-    publicRegistration
-    inviteRegistration
-    categoriesActive
-    apiKeysEnabled
+    defaults {
+      publicRegistration
+      inviteRegistration
+      categoriesActive
+      apiKeysEnabled
+    }
+    lastChange {
+      actor
+      timestamp
+    }
   }
 }

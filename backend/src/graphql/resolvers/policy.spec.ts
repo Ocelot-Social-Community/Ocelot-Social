@@ -7,7 +7,6 @@ import { PubSub } from 'graphql-subscriptions'
 
 import policyQuery from '@graphql/queries/policy/policy.gql'
 import policyDefaultsQuery from '@graphql/queries/policy/policyDefaults.gql'
-import policyLastChangeQuery from '@graphql/queries/policy/policyLastChange.gql'
 import resetPolicyMutation from '@graphql/queries/policy/resetPolicy.gql'
 import setPolicyMutation from '@graphql/queries/policy/setPolicy.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -117,7 +116,7 @@ describe('Query.policyDefaults', () => {
     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
   })
 
-  it('grants access to admins and returns every key (admin sees all, none null)', async () => {
+  it('grants access to admins, returning every default and the last change', async () => {
     authenticatedUser = asUser('admin')
 
     const { data, errors } = await query({ query: policyDefaultsQuery })
@@ -131,35 +130,11 @@ describe('Query.policyDefaults', () => {
       'categoriesActive',
       'apiKeysEnabled',
     ]) {
-      expect(typeof data.policyDefaults[key]).toBe('boolean')
+      expect(typeof data.policyDefaults.defaults[key]).toBe('boolean')
     }
-  })
-})
-
-describe('Query.policyLastChange', () => {
-  it('is forbidden for anonymous viewers', async () => {
-    authenticatedUser = null
-
-    const { errors } = await query({ query: policyLastChangeQuery })
-
-    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
-  })
-
-  it('is forbidden for logged-in non-admin users', async () => {
-    authenticatedUser = asUser('user')
-
-    const { errors } = await query({ query: policyLastChangeQuery })
-
-    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
-  })
-
-  it('returns null for admins when nothing has changed (fresh in-memory policy)', async () => {
-    authenticatedUser = asUser('admin')
-
-    const { data, errors } = await query({ query: policyLastChangeQuery })
-
-    expect(errors).toBeUndefined()
-    expect(data.policyLastChange).toBeNull()
+    // lastChange is bundled here (replaces the former policyLastChange query);
+    // null on a fresh in-memory policy with no human change yet.
+    expect(data.policyDefaults.lastChange).toBeNull()
   })
 })
 
@@ -258,7 +233,24 @@ describe('Subscription.policyChanged', () => {
       policyChanged: { key, value: true, actor: 'admin-1', timestamp: 'ts' },
     })
 
-  it('delivers a visible key and serializes it via resolve()', async () => {
+  it('delivers a visible key to an admin with the full last-change metadata', async () => {
+    const ctx = subscriptionContext(asUser('admin'))
+    const iterator = policyResolvers.Subscription.policyChanged.subscribe(null, null, ctx, null)
+    const next = iterator.next()
+
+    await publish(ctx.pubsub as unknown as PubSub, 'publicRegistration')
+
+    const { value } = await next
+    const resolved = policyResolvers.Subscription.policyChanged.resolve(value, null, ctx)
+    expect(resolved).toEqual({
+      key: 'publicRegistration',
+      value: 'true',
+      actor: 'admin-1',
+      timestamp: 'ts',
+    })
+  })
+
+  it('redacts actor/timestamp for a non-admin subscriber (keeps key/value)', async () => {
     const ctx = subscriptionContext(asUser('user'))
     const iterator = policyResolvers.Subscription.policyChanged.subscribe(null, null, ctx, null)
     const next = iterator.next()
@@ -266,12 +258,12 @@ describe('Subscription.policyChanged', () => {
     await publish(ctx.pubsub as unknown as PubSub, 'publicRegistration')
 
     const { value } = await next
-    const resolved = policyResolvers.Subscription.policyChanged.resolve(value)
+    const resolved = policyResolvers.Subscription.policyChanged.resolve(value, null, ctx)
     expect(resolved).toEqual({
       key: 'publicRegistration',
       value: 'true',
-      actor: 'admin-1',
-      timestamp: 'ts',
+      actor: null,
+      timestamp: null,
     })
   })
 
@@ -286,7 +278,7 @@ describe('Subscription.policyChanged', () => {
     await publish(ctx.pubsub as unknown as PubSub, 'publicRegistration')
 
     const { value } = await next
-    const resolved = policyResolvers.Subscription.policyChanged.resolve(value)
+    const resolved = policyResolvers.Subscription.policyChanged.resolve(value, null, ctx)
     expect(resolved.key).toBe('publicRegistration')
   })
 })

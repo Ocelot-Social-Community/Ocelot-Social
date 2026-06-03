@@ -1,11 +1,13 @@
 import PolicyQuery from '~/graphql/PolicyQuery'
 import PolicyDefaultsQuery from '~/graphql/PolicyDefaultsQuery'
-import PolicyLastChangeQuery from '~/graphql/PolicyLastChangeQuery'
 import PolicySubscription from '~/graphql/PolicySubscription'
 import { setPolicyMutation, resetPolicyMutation } from '~/graphql/PolicyMutations'
 
 // Extract { actor, timestamp } from a policy change event / mutation result.
-const toLastChange = (event) => (event ? { actor: event.actor, timestamp: event.timestamp } : null)
+// A redacted event (non-admin subscriber → actor null) carries no last-change
+// metadata, so it maps to null rather than { actor: null, … }.
+const toLastChange = (event) =>
+  event && event.actor ? { actor: event.actor, timestamp: event.timestamp } : null
 
 // Build a key→value map from a backend policy response. The frontend keeps NO
 // config defaults of its own (single source of truth is the backend): we just
@@ -92,8 +94,9 @@ export const actions = {
     }
   },
 
-  // Admin-only: the configured defaults (ENV/schema) each key resets to. The
-  // backend gates access (isAdmin); used by the admin policy UI.
+  // Admin-only: the configured defaults (ENV/schema) each key resets to, plus
+  // the most recent change (who + when). One admin round-trip; the backend gates
+  // access (isAdmin). Used by the admin policy UI.
   async fetchDefaults({ commit }) {
     const {
       data: { policyDefaults },
@@ -101,20 +104,9 @@ export const actions = {
       query: PolicyDefaultsQuery(),
       fetchPolicy: 'network-only',
     })
-    commit('SET_DEFAULTS', policyDefaults)
+    commit('SET_DEFAULTS', policyDefaults.defaults)
+    commit('SET_LAST_CHANGE', toLastChange(policyDefaults.lastChange))
     return policyDefaults
-  },
-
-  // Admin-only: who last changed a policy key, and when (shown in the admin UI).
-  async fetchLastChange({ commit }) {
-    const {
-      data: { policyLastChange },
-    } = await apolloClient(this).query({
-      query: PolicyLastChangeQuery(),
-      fetchPolicy: 'network-only',
-    })
-    commit('SET_LAST_CHANGE', policyLastChange)
-    return policyLastChange
   },
 
   async setKey({ commit }, { key, value }) {

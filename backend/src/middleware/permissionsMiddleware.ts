@@ -480,10 +480,9 @@ export default shield(
       // keys a viewer actually receives) is enforced inside the resolver via
       // canView(). Anonymous viewers still need it (login/register screen).
       policy: allow,
-      // Configured defaults are admin-only (deployment config info).
+      // Configured defaults + last-change audit info are admin-only (deployment
+      // config); bundled in the single policyDefaults query.
       policyDefaults: isAdmin,
-      // Last-change audit info is admin-only.
-      policyLastChange: isAdmin,
     },
     Mutation: {
       '*': deny,
