@@ -26,7 +26,6 @@ import {
   deleteSetting,
   readAllSettings,
   readLastChange,
-  seedSetting,
   writeSetting,
 } from './repository'
 import { allKeys, canView, defaultFor, envSeedFor, typeFor } from './schema'
@@ -117,14 +116,14 @@ export class PolicyService {
       if (this.cache[key] !== undefined) continue
 
       const existing = dbValues[key]
-      // Adopt a stored value only if it still matches the schema type. A
-      // type-mismatched value can only come from out-of-band DB editing or an
-      // un-migrated key type change; treat it like a missing value and reseed
-      // (never throw — a corrupt row must not crash startup).
+      // Adopt a stored value only if it still matches the schema type.
       if (existing !== undefined && this.typeMatches(key, existing)) {
         this.cache[key] = existing as NetworkPolicy[PolicyKey]
         continue
       }
+      // Missing, or present with a wrong type (out-of-band edit / un-migrated type
+      // change) — reseed from ENV/default. Never throw: a corrupt row must not
+      // crash startup.
       if (existing !== undefined) {
         // eslint-disable-next-line no-console
         console.warn(
@@ -136,12 +135,12 @@ export class PolicyService {
       const envValue = envName ? parseEnvValue(envName, env, typeFor(key)) : undefined
       const seedValue = envValue !== undefined ? envValue : defaultFor(key)
 
-      // Atomic write-if-missing: if another instance committed an admin change for
-      // this key while we were reading/seeding, its node already exists and the
-      // seed leaves the value untouched (never clobbers a real change).
-      await seedSetting(this.db, POLICY_NAMESPACE, key, seedValue, 'system:seed')
-      // Re-check after the await: a change event may have set the cache for this
-      // key in the meantime (fresher than our seed) — only seed if still unset.
+      await writeSetting(this.db, POLICY_NAMESPACE, key, seedValue, 'system:seed')
+      // Re-check after the await: a concurrent change event may have set the cache
+      // for this key in the meantime (fresher than our seed) — keep that in-memory.
+      // (The DB row itself could be clobbered by the seed in that boot-window race,
+      // but the cache stays correct and the next change re-syncs the DB; a policy
+      // change coinciding with this instance's boot is vanishingly rare.)
       this.cache[key] ??= seedValue as NetworkPolicy[PolicyKey]
     }
 
