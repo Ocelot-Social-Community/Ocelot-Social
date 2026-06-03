@@ -255,6 +255,28 @@ describe('policy store', () => {
         observer.error(new Error('socket dropped'))
         expect(commit).toHaveBeenCalledWith('SET_SUBSCRIPTION_ACTIVE', false)
       })
+
+      it('ignores a malformed event payload without committing PATCH_KEY or crashing', () => {
+        let observer
+        const clientSubscribe = jest.fn(() => ({
+          subscribe: (obs) => {
+            observer = obs
+          },
+        }))
+        bindAction(actions.subscribe, { subscribe: clientSubscribe })({
+          commit,
+          state: { subscriptionActive: false },
+        })
+
+        // value is not valid JSON ⇒ JSON.parse throws; the handler must swallow it.
+        expect(() => {
+          observer.next({
+            data: { policyChanged: { key: 'publicRegistration', value: 'not-json' } },
+          })
+        }).not.toThrow()
+
+        expect(commit).not.toHaveBeenCalledWith('PATCH_KEY', expect.anything())
+      })
     })
   })
 })
