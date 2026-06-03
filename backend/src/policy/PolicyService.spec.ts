@@ -424,9 +424,10 @@ describe('PolicyService', () => {
       let onMessage: ((payload: { policyChanged: PolicyChangeEvent }) => void) | undefined
       const pubsub: PolicyPubSub = {
         publish: jest.fn(),
-        subscribe: jest.fn().mockImplementation((_channel, cb) => {
-          onMessage = cb as typeof onMessage
-          return Promise.resolve(7)
+        subscribe: jest.fn().mockImplementation(async (_channel, handler) => {
+          onMessage = handler as typeof onMessage
+          await Promise.resolve()
+          return 7
         }),
         unsubscribe: jest.fn(),
       }

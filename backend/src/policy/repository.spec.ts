@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
+// (neo4j-driver record.get() is typed `any`; same disable the DB-backed specs use.)
+//
 // Integration tests for the (:Setting) repository — exercised against the real
 // Neo4j so the raw Cypher (MERGE, JSON (de)serialisation, last-change filtering,
 // the id-uniqueness encoding) is verified end-to-end. PolicyService.spec.ts

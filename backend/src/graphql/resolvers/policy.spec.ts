@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, security/detect-object-injection */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, security/detect-object-injection */
 // Integration test for the `policy` query — runs through the real schema +
 // permissions middleware (the layer that rejects a resolver returning
 // `undefined`). Guards the viewer-scoped visibility: anonymous viewers get
@@ -253,7 +253,7 @@ describe('Subscription.policyChanged', () => {
   const subscriptionContext = (user: Context['user']) =>
     ({ pubsub: new PubSub(), user }) as unknown as Context
 
-  const publish = (pubsub: PubSub, key: string) =>
+  const publish = async (pubsub: PubSub, key: string) =>
     pubsub.publish(POLICY_CHANGED_CHANNEL, {
       policyChanged: { key, value: true, actor: 'admin-1', timestamp: 'ts' },
     })
