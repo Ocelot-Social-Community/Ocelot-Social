@@ -426,6 +426,18 @@ describe('in mode', () => {
                 errors: undefined,
               })
             })
+
+            // Empty array (not null) is what a frontend with an empty multi-select
+            // sends. It must not generate the categories sub-query — `UNWIND []`
+            // would zero the row stream and return no group.
+            it('creates the group when categoryIds is an empty array', async () => {
+              await expect(
+                mutate({ mutation: CreateGroup, variables: { ...variables, categoryIds: [] } }),
+              ).resolves.toMatchObject({
+                data: { CreateGroup: { name: 'The Best Group', myRole: 'owner' } },
+                errors: undefined,
+              })
+            })
           })
         })
       })

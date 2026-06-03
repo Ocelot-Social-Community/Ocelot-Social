@@ -167,8 +167,12 @@ export default {
           if (!context.user) {
             throw new Error('Missing authenticated user.')
           }
+          // Only emit the categories sub-query for a NON-EMPTY list. With an empty
+          // `categoryIds: []` (valid on the no-category graceful path), `UNWIND []`
+          // would zero the row stream and the final `RETURN group` would yield
+          // nothing — silently breaking group creation.
           const categoriesCypher =
-            policy.get('categoriesActive') && categoryIds
+            policy.get('categoriesActive') && categoryIds && categoryIds.length > 0
               ? `
                   WITH group, membership
                   UNWIND $categoryIds AS categoryId
