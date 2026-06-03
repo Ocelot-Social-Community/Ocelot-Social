@@ -39,9 +39,14 @@ describe('default.vue', () => {
         'chat/showChat': () => {
           return { showChat: false, chatUserId: null, groupId: null }
         },
+        'videoCall/showVideoCall': () => false,
+        'videoCall/minimized': () => false,
+        'videoCall/groupId': () => null,
+        'videoCall/phase': () => 'idle',
       },
       mutations: {
         'chat/SET_OPEN_CHAT': jest.fn(),
+        'videoCall/SET_ENABLED': jest.fn(),
       },
     })
   })

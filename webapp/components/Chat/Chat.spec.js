@@ -106,6 +106,13 @@ describe('Chat.vue', () => {
             UPDATE_ROOM_COUNT: jest.fn(),
           },
         },
+        videoCall: {
+          namespaced: true,
+          getters: {
+            showVideoCall: () => false,
+            minimized: () => false,
+          },
+        },
       },
     })
   })

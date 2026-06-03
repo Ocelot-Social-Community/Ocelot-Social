@@ -13,6 +13,11 @@
             v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
             :href="LOGOS.LOGO_HEADER_CLICK.externalLink.url"
             :target="LOGOS.LOGO_HEADER_CLICK.externalLink.target"
+            :rel="
+              LOGOS.LOGO_HEADER_CLICK.externalLink.target === '_blank'
+                ? 'noopener noreferrer'
+                : null
+            "
           >
             <logo logoType="header" />
           </a>
@@ -31,7 +36,12 @@
           class="ds-flex-item branding-menu"
           style="flex: 0 0 auto; margin-right: 20px"
         >
-          <a v-if="item.url" :href="item.url" :target="item.target">
+          <a
+            v-if="item.url"
+            :href="item.url"
+            :target="item.target"
+            :rel="item.target === '_blank' ? 'noopener noreferrer' : null"
+          >
             <p class="ds-text ds-text-size-large ds-text-bold">
               {{ $t(item.nameIdent) }}
             </p>
@@ -175,6 +185,11 @@
               v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
               :href="LOGOS.LOGO_HEADER_CLICK.externalLink.url"
               :target="LOGOS.LOGO_HEADER_CLICK.externalLink.target"
+              :rel="
+                LOGOS.LOGO_HEADER_CLICK.externalLink.target === '_blank'
+                  ? 'noopener noreferrer'
+                  : null
+              "
             >
               <logo logoType="header" />
             </a>
@@ -493,6 +508,7 @@
                     :key="item.name"
                     :href="item.url"
                     :target="item.target"
+                    :rel="item.target === '_blank' ? 'noopener noreferrer' : null"
                     class="mobile-more-item"
                     @click="toggleMobileMenuView"
                   >

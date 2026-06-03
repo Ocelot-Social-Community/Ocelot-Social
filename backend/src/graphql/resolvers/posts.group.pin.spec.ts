@@ -135,6 +135,30 @@ beforeEach(async () => {
       groupId: 'public-group',
     },
   })
+
+  // The three posts above are created in rapid succession, so CreatePost may
+  // stamp them with the same millisecond `sortDate`. The ordering assertions
+  // below rely on a deterministic `sortDate_desc` order (post-3 newest), which
+  // is undefined when sortDates tie. Pin/unpin do not touch `sortDate`, so we
+  // can give each post a distinct, ascending sortDate here to make the order
+  // deterministic without weakening the assertions.
+  const session = database.driver.session()
+  try {
+    await session.run(
+      `UNWIND $rows AS row
+       MATCH (post:Post { id: row.id })
+       SET post.sortDate = row.sortDate`,
+      {
+        rows: [
+          { id: 'post-1-to-public-group', sortDate: '2020-01-01T00:00:01.000Z' },
+          { id: 'post-2-to-public-group', sortDate: '2020-01-01T00:00:02.000Z' },
+          { id: 'post-3-to-public-group', sortDate: '2020-01-01T00:00:03.000Z' },
+        ],
+      },
+    )
+  } finally {
+    await session.close()
+  }
 })
 
 afterEach(async () => {

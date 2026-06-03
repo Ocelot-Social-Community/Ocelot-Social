@@ -1,5 +1,5 @@
 <template>
-  <a :href="item.url" target="_blank">
+  <a :href="item.url" target="_blank" rel="noopener noreferrer">
     <favicon :src="item.favicon" :size="16" />
     {{ item.url }}
   </a>

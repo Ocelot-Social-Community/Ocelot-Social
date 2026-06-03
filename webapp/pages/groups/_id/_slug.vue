@@ -98,6 +98,24 @@
               </template>
               {{ $t('chat.groupChatButton.label') }}
             </os-button>
+            <!-- Group video call -->
+            <os-button
+              v-if="canShowVideoCallButton"
+              data-test="video-call-btn"
+              variant="primary"
+              appearance="outline"
+              full-width
+              v-tooltip="{
+                content: $t('videoCall.groupVideoCallButton.tooltip', { name: groupName }),
+                placement: 'bottom-start',
+              }"
+              @click="openGroupVideoCall(group.id)"
+            >
+              <template #icon>
+                <os-counter-icon :icon="icons.videoCamera" :count="videoCallParticipantCount" />
+              </template>
+              {{ $t('videoCall.groupVideoCallButton.label') }}
+            </os-button>
           </div>
           <hr />
           <div class="ds-mt-small ds-mb-small">
@@ -319,6 +337,10 @@ import uniqBy from 'lodash/uniqBy'
 import { profilePagePosts } from '~/graphql/PostQuery'
 import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/groups'
 import { roomUnreadQuery, roomUpdated } from '~/graphql/Rooms'
+import {
+  videoCallParticipantCountQuery,
+  videoCallParticipantCountChangedSubscription,
+} from '~/graphql/VideoCalls'
 import { muteGroup, unmuteGroup } from '~/graphql/settings/MutedGroups'
 import UpdateQuery from '~/components/utils/UpdateQuery'
 import postListActions from '~/mixins/postListActions'
@@ -399,15 +421,25 @@ export default {
       group: {},
       chatRoom: null,
       hydrated: false,
+      videoCallParticipantCount: 0,
     }
   },
   computed: {
     ...mapGetters({
       currentUser: 'auth/user',
       getShowChat: 'chat/showChat',
+      videoCallEnabled: 'videoCall/enabled',
     }),
     chatRoomUnreadCount() {
       return (this.chatRoom && this.chatRoom.unreadCount) || 0
+    },
+    canShowVideoCallButton() {
+      return (
+        this.videoCallEnabled &&
+        this.isGroupMemberNonePending &&
+        this.group &&
+        this.group.groupType === 'public'
+      )
     },
     groupName() {
       const { name } = this.group || {}
@@ -473,10 +505,13 @@ export default {
       this.hydrated = true
     })
     this._roomUpdatedSub = null
+    this._videoCallCountSub = null
     if (this.isGroupMemberNonePending) this.setupRoomUpdatedSubscription()
+    if (this.canShowVideoCallButton) this.setupVideoCallCountSubscription()
   },
   beforeDestroy() {
     this._roomUpdatedSub?.unsubscribe()
+    this._videoCallCountSub?.unsubscribe()
   },
   watch: {
     isAllowedSeeingGroupMembers(to, _from) {
@@ -488,11 +523,51 @@ export default {
       // subscription reactively when membership becomes known.
       if (isMember) this.setupRoomUpdatedSubscription()
     },
+    canShowVideoCallButton(can) {
+      if (can) this.setupVideoCallCountSubscription()
+      else this.teardownVideoCallCountSubscription()
+    },
   },
   methods: {
     ...mapMutations({
       showChat: 'chat/SET_OPEN_CHAT',
+      openVideoCall: 'videoCall/OPEN',
     }),
+    setupVideoCallCountSubscription() {
+      if (this._videoCallCountSub) return
+      const groupId = this.$route.params.id
+      if (!groupId) return
+      const observer = this.$apollo.subscribe({
+        query: videoCallParticipantCountChangedSubscription(),
+        variables: { groupId },
+        fetchPolicy: 'no-cache',
+      })
+      this._videoCallCountSub = observer.subscribe({
+        next: ({ data }) => {
+          const update = data?.videoCallParticipantCountChanged
+          if (update && update.groupId === groupId) {
+            this.videoCallParticipantCount = update.count
+          }
+        },
+        error: (err) => {
+          // eslint-disable-next-line no-console
+          console.error('videoCallParticipantCountChanged subscription error:', err)
+        },
+      })
+    },
+    teardownVideoCallCountSubscription() {
+      this._videoCallCountSub?.unsubscribe()
+      this._videoCallCountSub = null
+      this.videoCallParticipantCount = 0
+    },
+    openGroupVideoCall(groupId) {
+      this.openVideoCall({
+        groupId,
+        groupName: this.groupName,
+        groupSlug: this.groupSlug,
+        groupAvatar: this.group && this.group.avatar,
+      })
+    },
     setupRoomUpdatedSubscription() {
       if (this._roomUpdatedSub) return
       const observer = this.$apollo.subscribe({
@@ -727,6 +802,21 @@ export default {
         return !this.isGroupMemberNonePending || !this.$route.params.id
       },
       fetchPolicy: 'cache-first',
+    },
+    videoCallParticipantCount: {
+      query() {
+        return videoCallParticipantCountQuery()
+      },
+      variables() {
+        return { groupId: this.$route.params.id }
+      },
+      update({ videoCallParticipantCount }) {
+        return videoCallParticipantCount || 0
+      },
+      skip() {
+        return !this.canShowVideoCallButton || !this.$route.params.id
+      },
+      fetchPolicy: 'network-only',
     },
   },
 }

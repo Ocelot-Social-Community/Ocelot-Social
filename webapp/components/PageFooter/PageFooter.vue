@@ -11,6 +11,7 @@
     <a
       :href="`https://github.com/Ocelot-Social-Community/Ocelot-Social/releases/tag/${releaseTag}`"
       target="_blank"
+      rel="noopener noreferrer"
       data-test="version-link"
     >
       {{ version }}
@@ -39,6 +40,28 @@ export default {
       version: `v${version}`,
       releaseTag: version.split('+')[0],
     }
+  },
+  mounted() {
+    this.publishHeight()
+    window.addEventListener('resize', this.publishHeight)
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.publishHeight)
+    if (typeof document !== 'undefined' && document.documentElement) {
+      document.documentElement.style.removeProperty('--footer-height')
+    }
+  },
+  methods: {
+    publishHeight() {
+      this.$nextTick(() => {
+        const el = this.$el
+        if (!el || typeof document === 'undefined' || !document.documentElement) return
+        // offsetHeight is 0 when the footer is display:none (mobile breakpoint),
+        // which is exactly what callers want as the CSS value.
+        const height = el.offsetHeight || 0
+        document.documentElement.style.setProperty('--footer-height', `${height}px`)
+      })
+    },
   },
 }
 </script>

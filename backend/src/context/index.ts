@@ -11,6 +11,8 @@ import type { PolicyService } from '@src/policy'
 const serverDatabase = databaseContext()
 const serverPubsub = pubsubContext()
 
+export { serverDatabase, serverPubsub }
+
 export const getContext =
   (opts?: {
     database?: ReturnType<typeof databaseContext>
