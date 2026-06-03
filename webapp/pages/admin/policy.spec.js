@@ -135,4 +135,54 @@ describe('admin/policy.vue', () => {
     await flushPromises()
     expect(fetchDefaults).toHaveBeenCalledTimes(1)
   })
+
+  // Vuex calls an action as (context, payload), so the asserted call has the
+  // store context as the first arg and the component's payload as the second.
+  describe('write path', () => {
+    it('saves only the changed keys via setKey on submit', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+
+      // publicRegistration is false in the snapshot → toggle it on (dirties the form).
+      await wrapper.find('#policy-publicRegistration').setChecked(true)
+      await wrapper.find('form').trigger('submit')
+      await flushPromises()
+
+      expect(setKey).toHaveBeenCalledTimes(1) // only the changed key is written
+      expect(setKey).toHaveBeenCalledWith(expect.anything(), {
+        key: 'publicRegistration',
+        value: true,
+      })
+      expect(mocks.$toast.success).toHaveBeenCalled()
+    })
+
+    it('does not call setKey when nothing changed', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+
+      await wrapper.find('form').trigger('submit')
+      await flushPromises()
+
+      expect(setKey).not.toHaveBeenCalled()
+    })
+
+    it('resets every key to its default via resetKey', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+
+      await wrapper.find('[data-test="policy-reset"]').trigger('click')
+      await flushPromises()
+
+      expect(resetKey).toHaveBeenCalledTimes(4) // one per policy key
+      for (const key of [
+        'publicRegistration',
+        'inviteRegistration',
+        'categoriesActive',
+        'apiKeysEnabled',
+      ]) {
+        expect(resetKey).toHaveBeenCalledWith(expect.anything(), { key })
+      }
+      expect(mocks.$toast.success).toHaveBeenCalled()
+    })
+  })
 })
