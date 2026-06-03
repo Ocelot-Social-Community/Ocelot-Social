@@ -247,6 +247,17 @@ export class PolicyService {
   // cache (same value written twice).
   applyExternalChange(event: PolicyChangeEvent): void {
     if (!this.isKnownKey(event.key)) return
+    // Discard a malformed cross-instance event (e.g. a different / older backend
+    // version publishing a wrong-typed value) instead of corrupting the cache —
+    // symmetric with init()'s reseed-on-mismatch. Never throws: this runs inside
+    // the pubsub handler, and lastChange must not move for a rejected event.
+    if (!this.typeMatches(event.key, event.value)) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[policy] ignoring external change for '${event.key}' with wrong type (${typeof event.value}).`,
+      )
+      return
+    }
     this.cache[event.key] = event.value as never
     this.lastChange = { actor: event.actor, timestamp: event.timestamp }
   }

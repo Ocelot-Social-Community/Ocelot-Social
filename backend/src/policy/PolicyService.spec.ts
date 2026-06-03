@@ -451,6 +451,29 @@ describe('PolicyService', () => {
         })
       }).not.toThrow()
     })
+
+    it('discards a change whose value type does not match the schema', async () => {
+      readAllSettings.mockResolvedValue({})
+      readLastChange.mockResolvedValue(null)
+      const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+      const svc = new PolicyService(dbStub)
+      await svc.init({})
+
+      // A wrong-typed cross-instance event (string for a boolean key) must be
+      // dropped, not adopted — and must not move lastChange.
+      svc.applyExternalChange({
+        key: 'publicRegistration',
+        value: 'not-a-bool',
+        actor: 'remote',
+        timestamp: '2021-02-03T04:05:06.000Z',
+      })
+
+      expect(svc.get('publicRegistration')).toBe(false) // unchanged default
+      expect(svc.getLastChange()).toBeNull() // not moved by the rejected event
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('publicRegistration'))
+
+      warn.mockRestore()
+    })
   })
 
   describe('init() with pubsub', () => {
