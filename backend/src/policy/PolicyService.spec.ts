@@ -3,7 +3,13 @@
 // so we can verify resolution-order (DB > ENV > Schema-Default) deterministically.
 // (no-unsafe-assignment disabled: jest matchers like expect.objectContaining are `any`.)
 
-import { PolicyService, createInMemoryPolicyService, POLICY_CHANGED_CHANNEL } from './PolicyService'
+import {
+  PolicyService,
+  createInMemoryPolicyService,
+  getPolicyService,
+  setPolicyServiceForTesting,
+  POLICY_CHANGED_CHANNEL,
+} from './PolicyService'
 import {
   readAllSettings as readAllSettingsImpl,
   readLastChange as readLastChangeImpl,
@@ -11,7 +17,7 @@ import {
   deleteSetting as deleteSettingImpl,
 } from './repository'
 
-import type { PolicyPubSub } from './PolicyService'
+import type { PolicyPubSub, PolicyChangeEvent } from './PolicyService'
 
 jest.mock('./repository', () => ({
   POLICY_NAMESPACE: 'policy',
@@ -411,6 +417,96 @@ describe('PolicyService', () => {
       await svc.init({}, pubsub)
 
       expect(subscribe).toHaveBeenCalledWith(POLICY_CHANGED_CHANNEL, expect.any(Function))
+    })
+
+    it('applies a remote change delivered through the subscription callback', async () => {
+      readAllSettings.mockResolvedValue({})
+      let onMessage: ((payload: { policyChanged: PolicyChangeEvent }) => void) | undefined
+      const pubsub: PolicyPubSub = {
+        publish: jest.fn(),
+        subscribe: jest.fn().mockImplementation((_channel, cb) => {
+          onMessage = cb as typeof onMessage
+          return Promise.resolve(7)
+        }),
+        unsubscribe: jest.fn(),
+      }
+
+      const svc = new PolicyService(dbStub)
+      await svc.init({}, pubsub)
+      expect(svc.get('publicRegistration')).toBe(false)
+
+      onMessage?.({
+        policyChanged: {
+          key: 'publicRegistration',
+          value: true,
+          actor: 'remote-admin',
+          timestamp: '2022-01-01T00:00:00.000Z',
+        },
+      })
+
+      expect(svc.get('publicRegistration')).toBe(true)
+      expect(svc.getLastChange()).toEqual({
+        actor: 'remote-admin',
+        timestamp: '2022-01-01T00:00:00.000Z',
+      })
+    })
+  })
+
+  describe('shutdown()', () => {
+    it('unsubscribes from the pubsub channel', async () => {
+      readAllSettings.mockResolvedValue({})
+      const unsubscribe = jest.fn()
+      const pubsub: PolicyPubSub = {
+        publish: jest.fn(),
+        subscribe: jest.fn().mockResolvedValue(99),
+        unsubscribe,
+      }
+
+      const svc = new PolicyService(dbStub)
+      await svc.init({}, pubsub)
+      svc.shutdown()
+
+      expect(unsubscribe).toHaveBeenCalledWith(99)
+      // Idempotent: a second shutdown does not unsubscribe again.
+      svc.shutdown()
+      expect(unsubscribe).toHaveBeenCalledTimes(1)
+    })
+
+    it('is a no-op when no pubsub was configured', async () => {
+      readAllSettings.mockResolvedValue({})
+      const svc = new PolicyService(dbStub)
+      await svc.init({}) // no pubsub
+      expect(() => {
+        svc.shutdown()
+      }).not.toThrow()
+    })
+  })
+
+  describe('get() before init()', () => {
+    it('falls back to the schema default', () => {
+      const svc = new PolicyService(dbStub)
+      expect(svc.get('inviteRegistration')).toBe(true) // schema default, no DB access
+      expect(svc.get('publicRegistration')).toBe(false)
+      expect(readAllSettings).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('getPolicyService() singleton', () => {
+    afterEach(() => {
+      setPolicyServiceForTesting(undefined)
+    })
+
+    it('returns the same lazily-constructed instance', () => {
+      setPolicyServiceForTesting(undefined)
+      const a = getPolicyService()
+      const b = getPolicyService()
+      expect(a).toBe(b)
+    })
+
+    it('can be swapped out for testing', () => {
+      const fake = createInMemoryPolicyService({ publicRegistration: true })
+      setPolicyServiceForTesting(fake)
+      expect(getPolicyService()).toBe(fake)
     })
   })
 })

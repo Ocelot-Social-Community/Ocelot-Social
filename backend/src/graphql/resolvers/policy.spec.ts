@@ -3,12 +3,15 @@
 // permissions middleware (the layer that rejects a resolver returning
 // `undefined`). Guards the viewer-scoped visibility: anonymous viewers get
 // `null` for authenticated-only keys (NOT the value, and NOT an error).
+import { PubSub } from 'graphql-subscriptions'
+
 import policyQuery from '@graphql/queries/policy/policy.gql'
 import policyDefaultsQuery from '@graphql/queries/policy/policyDefaults.gql'
 import policyLastChangeQuery from '@graphql/queries/policy/policyLastChange.gql'
 import resetPolicyMutation from '@graphql/queries/policy/resetPolicy.gql'
 import setPolicyMutation from '@graphql/queries/policy/setPolicy.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+import { POLICY_CHANGED_CHANNEL } from '@src/policy'
 
 import policyResolvers from './policy'
 
@@ -241,5 +244,49 @@ describe('Mutation resolvers (unit)', () => {
       expect(reset).toHaveBeenCalledWith('categoriesActive', 'admin-1')
       expect(result.value).toBe('false')
     })
+  })
+})
+
+describe('Subscription.policyChanged', () => {
+  // The subscription shares its visibility mechanism (canView) with the query:
+  // a change event is only delivered to a subscriber who may see the changed key.
+  const subscriptionContext = (user: Context['user']) =>
+    ({ pubsub: new PubSub(), user }) as unknown as Context
+
+  const publish = (pubsub: PubSub, key: string) =>
+    pubsub.publish(POLICY_CHANGED_CHANNEL, {
+      policyChanged: { key, value: true, actor: 'admin-1', timestamp: 'ts' },
+    })
+
+  it('delivers a visible key and serializes it via resolve()', async () => {
+    const ctx = subscriptionContext(asUser('user'))
+    const iterator = policyResolvers.Subscription.policyChanged.subscribe(null, null, ctx, null)
+    const next = iterator.next()
+
+    await publish(ctx.pubsub as unknown as PubSub, 'publicRegistration')
+
+    const { value } = await next
+    const resolved = policyResolvers.Subscription.policyChanged.resolve(value)
+    expect(resolved).toEqual({
+      key: 'publicRegistration',
+      value: 'true',
+      actor: 'admin-1',
+      timestamp: 'ts',
+    })
+  })
+
+  it('skips a key the viewer may not see and delivers the next visible one', async () => {
+    const ctx = subscriptionContext(null) // anonymous
+    const iterator = policyResolvers.Subscription.policyChanged.subscribe(null, null, ctx, null)
+    const next = iterator.next()
+
+    // apiKeysEnabled is authenticated-only → filtered out for an anonymous viewer.
+    await publish(ctx.pubsub as unknown as PubSub, 'apiKeysEnabled')
+    // publicRegistration is public → delivered.
+    await publish(ctx.pubsub as unknown as PubSub, 'publicRegistration')
+
+    const { value } = await next
+    const resolved = policyResolvers.Subscription.policyChanged.resolve(value)
+    expect(resolved.key).toBe('publicRegistration')
   })
 })
