@@ -9,6 +9,14 @@ describe('policy visibility', () => {
       expect(audiencesFor('publicRegistration')).toEqual(['public'])
       expect(audiencesFor('apiKeysEnabled')).toEqual(['authenticated'])
     })
+
+    it('returns a copy — mutating it does not alter the shared schema', () => {
+      const audiences = audiencesFor('apiKeysEnabled')
+      audiences.push('public') // would widen visibility if it were the shared ref
+      expect(audiencesFor('apiKeysEnabled')).toEqual(['authenticated'])
+      // canView must stay unaffected: an anonymous viewer still cannot see it.
+      expect(canView('apiKeysEnabled', null)).toBe(false)
+    })
   })
 
   describe('audiencesOf()', () => {

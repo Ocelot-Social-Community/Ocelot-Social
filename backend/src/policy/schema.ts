@@ -54,9 +54,12 @@ export interface PolicyViewer {
 }
 
 // The audiences a key is visible to. Empty/missing ⇒ admin-only (admin still
-// sees it via canView's superuser short-circuit).
+// sees it via canView's superuser short-circuit). Returns a COPY: the value is
+// a shared reference into the loaded schema singleton, so a caller mutating it
+// (push/splice) would otherwise silently alter the effective visibility
+// process-wide and could weaken canView().
 export function audiencesFor(key: PolicyKey): Audience[] {
-  return rawSchema.properties[key]['x-visibility'] ?? []
+  return [...(rawSchema.properties[key]['x-visibility'] ?? [])]
 }
 
 // The audiences a viewer belongs to. 'public' is universal (every viewer,
