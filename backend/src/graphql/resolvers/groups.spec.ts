@@ -422,7 +422,8 @@ describe('in mode', () => {
               await expect(
                 mutate({ mutation: CreateGroup, variables: { ...variables, categoryIds: null } }),
               ).resolves.toMatchObject({
-                data: { CreateGroup: { name: 'The Best Group', myRole: 'owner' } },
+                // Assert the core effect: created AND with no categories attached.
+                data: { CreateGroup: { name: 'The Best Group', myRole: 'owner', categories: [] } },
                 errors: undefined,
               })
             })
@@ -434,7 +435,7 @@ describe('in mode', () => {
               await expect(
                 mutate({ mutation: CreateGroup, variables: { ...variables, categoryIds: [] } }),
               ).resolves.toMatchObject({
-                data: { CreateGroup: { name: 'The Best Group', myRole: 'owner' } },
+                data: { CreateGroup: { name: 'The Best Group', myRole: 'owner', categories: [] } },
                 errors: undefined,
               })
             })
