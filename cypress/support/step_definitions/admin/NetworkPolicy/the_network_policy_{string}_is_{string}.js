@@ -13,7 +13,7 @@ defineStep('the network policy {string} is {string}', (key, value) => {
   cy.authenticateAs({ email: 'admin@example.org', password: '1234' }).then((client) =>
     client
       .request(
-        `mutation ($key: String!, $value: String!) {
+        `mutation ($key: PolicyKey!, $value: String!) {
           setPolicy(key: $key, value: $value) {
             key
             value
