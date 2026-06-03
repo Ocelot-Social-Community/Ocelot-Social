@@ -68,7 +68,12 @@ describe('admin/policy.vue', () => {
 
   it('renders every policy with a name and a detailed description', () => {
     wrapper = Wrapper()
-    for (const key of ['publicRegistration', 'inviteRegistration', 'categoriesActive', 'apiKeysEnabled']) {
+    for (const key of [
+      'publicRegistration',
+      'inviteRegistration',
+      'categoriesActive',
+      'apiKeysEnabled',
+    ]) {
       expect(wrapper.find(`[data-test="policy-${key}"]`).exists()).toBe(true)
       expect(wrapper.text()).toContain(`admin.policy.keys.${key}`)
       expect(wrapper.text()).toContain(`admin.policy.descriptions.${key}`)

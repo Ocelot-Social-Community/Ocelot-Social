@@ -172,23 +172,42 @@ describe('policy store', () => {
 
     describe('setKey', () => {
       it('mutates, patches the value, and records the last change', async () => {
-        const setPolicy = { key: 'apiKeysEnabled', value: 'true', actor: 'admin-1', timestamp: 'ts' }
+        const setPolicy = {
+          key: 'apiKeysEnabled',
+          value: 'true',
+          actor: 'admin-1',
+          timestamp: 'ts',
+        }
         const mutate = jest.fn().mockResolvedValue({ data: { setPolicy } })
-        await bindAction(actions.setKey, { mutate })({ commit }, { key: 'apiKeysEnabled', value: true })
+        await bindAction(actions.setKey, { mutate })(
+          { commit },
+          { key: 'apiKeysEnabled', value: true },
+        )
 
         expect(commit).toHaveBeenCalledWith('PATCH_KEY', { key: 'apiKeysEnabled', value: true })
-        expect(commit).toHaveBeenCalledWith('SET_LAST_CHANGE', { actor: 'admin-1', timestamp: 'ts' })
+        expect(commit).toHaveBeenCalledWith('SET_LAST_CHANGE', {
+          actor: 'admin-1',
+          timestamp: 'ts',
+        })
       })
     })
 
     describe('resetKey', () => {
       it('mutates, patches the reset value, and records the last change', async () => {
-        const resetPolicy = { key: 'categoriesActive', value: 'false', actor: 'admin-1', timestamp: 'ts' }
+        const resetPolicy = {
+          key: 'categoriesActive',
+          value: 'false',
+          actor: 'admin-1',
+          timestamp: 'ts',
+        }
         const mutate = jest.fn().mockResolvedValue({ data: { resetPolicy } })
         await bindAction(actions.resetKey, { mutate })({ commit }, { key: 'categoriesActive' })
 
         expect(commit).toHaveBeenCalledWith('PATCH_KEY', { key: 'categoriesActive', value: false })
-        expect(commit).toHaveBeenCalledWith('SET_LAST_CHANGE', { actor: 'admin-1', timestamp: 'ts' })
+        expect(commit).toHaveBeenCalledWith('SET_LAST_CHANGE', {
+          actor: 'admin-1',
+          timestamp: 'ts',
+        })
       })
     })
 
@@ -218,11 +237,19 @@ describe('policy store', () => {
 
         observer.next({
           data: {
-            policyChanged: { key: 'apiKeysEnabled', value: 'true', actor: 'admin-1', timestamp: 'ts' },
+            policyChanged: {
+              key: 'apiKeysEnabled',
+              value: 'true',
+              actor: 'admin-1',
+              timestamp: 'ts',
+            },
           },
         })
         expect(commit).toHaveBeenCalledWith('PATCH_KEY', { key: 'apiKeysEnabled', value: true })
-        expect(commit).toHaveBeenCalledWith('SET_LAST_CHANGE', { actor: 'admin-1', timestamp: 'ts' })
+        expect(commit).toHaveBeenCalledWith('SET_LAST_CHANGE', {
+          actor: 'admin-1',
+          timestamp: 'ts',
+        })
 
         observer.error(new Error('socket dropped'))
         expect(commit).toHaveBeenCalledWith('SET_SUBSCRIPTION_ACTIVE', false)

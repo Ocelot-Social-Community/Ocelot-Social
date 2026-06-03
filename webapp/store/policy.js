@@ -5,8 +5,7 @@ import PolicySubscription from '~/graphql/PolicySubscription'
 import { setPolicyMutation, resetPolicyMutation } from '~/graphql/PolicyMutations'
 
 // Extract { actor, timestamp } from a policy change event / mutation result.
-const toLastChange = (event) =>
-  event ? { actor: event.actor, timestamp: event.timestamp } : null
+const toLastChange = (event) => (event ? { actor: event.actor, timestamp: event.timestamp } : null)
 
 // Build a key→value map from a backend policy response. The frontend keeps NO
 // config defaults of its own (single source of truth is the backend): we just

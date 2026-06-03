@@ -24,8 +24,7 @@ describe('GroupForm', () => {
       $t: jest.fn(),
     }
     storeMocks = {
-      getters: {
-      },
+      getters: {},
       actions: {
         'categories/init': jest.fn(),
       },
