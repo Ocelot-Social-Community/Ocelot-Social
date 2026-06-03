@@ -524,6 +524,40 @@ describe('PolicyService', () => {
         timestamp: '2022-01-01T00:00:00.000Z',
       })
     })
+
+    it('does not lose a change that arrives during init (subscribe-first; snapshot does not clobber)', async () => {
+      let onMessage: ((payload: { policyChanged: PolicyChangeEvent }) => void) | undefined
+      const pubsub: PolicyPubSub = {
+        publish: jest.fn(),
+        subscribe: jest.fn().mockImplementation(async (_channel, handler) => {
+          onMessage = handler as typeof onMessage
+          await Promise.resolve()
+          return 1
+        }),
+        unsubscribe: jest.fn(),
+      }
+      // Another instance publishes a change while we read the (now stale) snapshot.
+      // Because we subscribe BEFORE reading, the callback is already live; the
+      // snapshot loop must not overwrite the value the event delivered.
+      readAllSettings.mockImplementation(async () => {
+        onMessage?.({
+          policyChanged: {
+            key: 'publicRegistration',
+            value: true,
+            actor: 'remote',
+            timestamp: '2022-01-01T00:00:00.000Z',
+          },
+        })
+        await Promise.resolve()
+        return { publicRegistration: false } // stale snapshot value
+      })
+
+      const svc = new PolicyService(dbStub)
+      await svc.init({}, pubsub)
+
+      // The concurrent event (true) wins over the stale snapshot (false).
+      expect(svc.get('publicRegistration')).toBe(true)
+    })
   })
 
   describe('shutdown()', () => {

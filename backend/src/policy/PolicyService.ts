@@ -90,9 +90,25 @@ export class PolicyService {
     this.env = env
     this.pubsub = pubsub
 
+    // Subscribe BEFORE reading the snapshot. Otherwise a change published by
+    // another instance in the gap between read and subscribe would be missed
+    // (the read already happened, the subscription wasn't live yet), leaving
+    // this instance stale until the next change. Events apply via
+    // applyExternalChange (full values, last-writer-wins); the snapshot loop
+    // below won't clobber a key such an event already set.
+    if (pubsub) {
+      this.subscriptionId = await pubsub.subscribe(POLICY_CHANGED_CHANNEL, (payload) => {
+        this.applyExternalChange(payload.policyChanged)
+      })
+    }
+
     const dbValues = await readAllSettings(this.db, POLICY_NAMESPACE)
 
     for (const key of allKeys()) {
+      // A concurrent change event during init already set this key to a value
+      // at least as fresh as the snapshot — don't overwrite it with the read.
+      if (this.cache[key] !== undefined) continue
+
       const existing = dbValues[key]
       // Adopt a stored value only if it still matches the schema type. A
       // type-mismatched value can only come from out-of-band DB editing or an
@@ -117,15 +133,10 @@ export class PolicyService {
       this.cache[key] = seedValue as NetworkPolicy[PolicyKey]
     }
 
-    // Most recent change (who + when) for the admin UI; cached in memory and
-    // kept current by set()/reset()/applyExternalChange() afterwards.
+    // Most recent change (who + when) for the admin UI. Read from the DB after
+    // the snapshot; a change-event during init may have set it too — readLastChange
+    // reflects the committed DB truth, so it is the authoritative final value.
     this.lastChange = (await readLastChange(this.db, POLICY_NAMESPACE)) ?? undefined
-
-    if (pubsub) {
-      this.subscriptionId = await pubsub.subscribe(POLICY_CHANGED_CHANNEL, (payload) => {
-        this.applyExternalChange(payload.policyChanged)
-      })
-    }
 
     this.initialised = true
   }
