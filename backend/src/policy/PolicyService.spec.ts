@@ -378,6 +378,33 @@ describe('PolicyService', () => {
 
       warn.mockRestore()
     })
+
+    it('still commits and does not throw when publish fails SYNCHRONOUSLY', async () => {
+      readAllSettings.mockResolvedValue({})
+      const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+      const pubsub: PolicyPubSub = {
+        // Synchronous throw (not a rejected promise) — the non-blocking guarantee
+        // must still hold: set() resolves, the change is committed, it is logged.
+        publish: jest.fn(() => {
+          throw new Error('redis sync error')
+        }),
+        subscribe: jest.fn().mockResolvedValue(1),
+        unsubscribe: jest.fn(),
+      }
+
+      const svc = new PolicyService(dbStub)
+      await svc.init({}, pubsub)
+
+      await expect(svc.set('publicRegistration', true, 'actor')).resolves.toBeDefined()
+      expect(svc.get('publicRegistration')).toBe(true) // commit applied despite sync throw
+      // The sync-throw path logs synchronously inside set(), so no flush needed.
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining('failed to publish'),
+        expect.any(Error),
+      )
+
+      warn.mockRestore()
+    })
   })
 
   describe('reset()', () => {

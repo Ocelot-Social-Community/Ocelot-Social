@@ -250,19 +250,29 @@ export class PolicyService {
 
   // Broadcast a change to other instances. Intentionally non-blocking: the DB
   // write is the commit point and the local cache is already updated, so a
-  // broadcast failure must NOT fail the caller's set()/reset(). But we attach a
-  // catch so a rejected publish (e.g. Redis down) is logged, never a silent drop
-  // or an unhandled rejection. publish() may be sync (void) or async — normalise
-  // with Promise.resolve.
+  // broadcast failure must NOT fail the caller's set()/reset(). We log both
+  // failure modes — a SYNCHRONOUS throw from publish() (try/catch) and a rejected
+  // async publish, e.g. Redis down (.catch) — but never propagate either, and
+  // never leave an unhandled rejection. publish() may return void (sync) or a
+  // promise; we call it synchronously and normalise the result with Promise.resolve.
   private publishChange(event: PolicyChangeEvent): void {
-    const result = this.pubsub?.publish(POLICY_CHANGED_CHANNEL, { policyChanged: event })
-    // Fire-and-forget with a logging catch — same convention as index.ts's
-    // top-level .catch handlers (await/async is intentionally not used here).
-    // eslint-disable-next-line promise/prefer-await-to-callbacks, @typescript-eslint/use-unknown-in-catch-callback-variable
-    void Promise.resolve(result).catch((err) => {
-      // eslint-disable-next-line no-console
-      console.warn(`[policy] failed to publish ${POLICY_CHANGED_CHANNEL}:`, err)
-    })
+    try {
+      const result = this.pubsub?.publish(POLICY_CHANGED_CHANNEL, { policyChanged: event })
+      // eslint-disable-next-line promise/prefer-await-to-callbacks, @typescript-eslint/use-unknown-in-catch-callback-variable
+      void Promise.resolve(result).catch((err) => {
+        this.warnPublishFailed(err)
+      })
+      // publish() threw synchronously — deliberately swallowed (a broadcast
+      // failure never fails set()/reset()), hence no rethrow.
+      // eslint-disable-next-line no-catch-all/no-catch-all
+    } catch (err) {
+      this.warnPublishFailed(err)
+    }
+  }
+
+  private warnPublishFailed(err: unknown): void {
+    // eslint-disable-next-line no-console
+    console.warn(`[policy] failed to publish ${POLICY_CHANGED_CHANNEL}:`, err)
   }
 
   // Called by the pubsub subscription when any backend instance publishes a
