@@ -15,7 +15,6 @@ import type { PolicyPubSub } from './PolicyService'
 
 jest.mock('./repository', () => ({
   POLICY_NAMESPACE: 'policy',
-  ensureConstraint: jest.fn().mockResolvedValue(undefined),
   readAllSettings: jest.fn(),
   readLastChange: jest.fn().mockResolvedValue(null),
   writeSetting: jest.fn(),

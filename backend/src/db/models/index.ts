@@ -18,6 +18,7 @@ import Location from './Location'
 import Migration from './Migration'
 import Post from './Post'
 import Report from './Report'
+import Setting from './Setting'
 import SocialMedia from './SocialMedia'
 import Tag from './Tag'
 import UnverifiedEmailAddress from './UnverifiedEmailAddress'
@@ -44,6 +45,7 @@ export default {
   Migration,
   Post,
   Report,
+  Setting,
   SocialMedia,
   Tag,
   UnverifiedEmailAddress,

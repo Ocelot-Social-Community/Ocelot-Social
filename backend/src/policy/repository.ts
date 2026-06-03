@@ -8,12 +8,11 @@ type DbContext = ReturnType<typeof databaseContext>
 
 export const POLICY_NAMESPACE = 'policy'
 
-// Uniqueness on (namespace, key) is enforced application-side via MERGE on both
-// properties. A proper composite-uniqueness constraint should be added via a
-// db-migration once we know the deployed Neo4j version (4.x vs 5.x syntax differ).
-export async function ensureConstraint(_db: DbContext): Promise<void> {
-  // No-op for B5. Migration ticket: add (:Setting {namespace, key}) IS UNIQUE.
-}
+// Uniqueness of (namespace, key) is encoded in the Setting node's `id`
+// (`<namespace>.<key>`, set by writeSetting below). The constraint itself is
+// owned by the neode Setting model (primary: true → uniqueness constraint) and
+// installed centrally by the db-migration init (src/db/migrate/store.ts →
+// getNeode().schema.install()), so nothing extra is needed here.
 
 export async function readAllSettings(
   db: DbContext,
@@ -71,12 +70,14 @@ export async function writeSetting(
 ): Promise<void> {
   await db.write({
     query: `MERGE (s:Setting {namespace: $namespace, key: $key})
-            SET s.value = $value,
+            SET s.id = $id,
+                s.value = $value,
                 s.updatedAt = toString(datetime()),
                 s.updatedBy = $actor`,
     variables: {
       namespace,
       key,
+      id: `${namespace}.${key}`,
       value: JSON.stringify(value),
       actor,
     },

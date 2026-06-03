@@ -24,7 +24,6 @@ import databaseContext from '@context/database'
 import {
   POLICY_NAMESPACE,
   deleteSetting,
-  ensureConstraint,
   readAllSettings,
   readLastChange,
   writeSetting,
@@ -91,7 +90,6 @@ export class PolicyService {
     this.env = env
     this.pubsub = pubsub
 
-    await ensureConstraint(this.db)
     const dbValues = await readAllSettings(this.db, POLICY_NAMESPACE)
 
     for (const key of allKeys()) {
