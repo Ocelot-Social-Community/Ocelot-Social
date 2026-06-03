@@ -185,6 +185,23 @@ describe('PolicyKey enum (schema-derived contract)', () => {
     // Enum coercion fails during variable validation — never reaches policy.set().
     expect(errors?.[0]?.message).toMatch(/PolicyKey/)
   })
+
+  // The Policy type fields are hand-written SDL (kept explicit for readability,
+  // unlike the generated enum). This guard fails if a key is added to
+  // policy.schema.json but its Policy field is forgotten (or vice versa).
+  it('keeps the hand-written Policy type fields in sync with the schema keys', async () => {
+    const { data, errors } = await query({
+      query: parse('{ __type(name: "Policy") { fields { name } } }'),
+    })
+    expect(errors).toBeUndefined()
+    const fields = data.__type.fields as Array<{ name: string }>
+    // neo4j-graphql-js injects an `_id` field at runtime; ignore such additions.
+    const names = fields
+      .map((f) => f.name)
+      .filter((name) => !name.startsWith('_'))
+      .sort()
+    expect(names).toEqual([...allKeys()].sort())
+  })
 })
 
 describe('Mutation resolvers (unit)', () => {
