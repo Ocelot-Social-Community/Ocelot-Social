@@ -26,6 +26,7 @@ import {
   deleteSetting,
   readAllSettings,
   readLastChange,
+  seedSetting,
   writeSetting,
 } from './repository'
 import { allKeys, canView, defaultFor, envSeedFor, typeFor } from './schema'
@@ -129,8 +130,13 @@ export class PolicyService {
       const envValue = envName ? parseEnvValue(envName, env, typeFor(key)) : undefined
       const seedValue = envValue !== undefined ? envValue : defaultFor(key)
 
-      await writeSetting(this.db, POLICY_NAMESPACE, key, seedValue, 'system:seed')
-      this.cache[key] = seedValue as NetworkPolicy[PolicyKey]
+      // Atomic write-if-missing: if another instance committed an admin change for
+      // this key while we were reading/seeding, its node already exists and the
+      // seed leaves the value untouched (never clobbers a real change).
+      await seedSetting(this.db, POLICY_NAMESPACE, key, seedValue, 'system:seed')
+      // Re-check after the await: a change event may have set the cache for this
+      // key in the meantime (fresher than our seed) — only seed if still unset.
+      this.cache[key] ??= seedValue as NetworkPolicy[PolicyKey]
     }
 
     // Most recent change (who + when) for the admin UI. Read from the DB after

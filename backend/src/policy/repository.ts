@@ -84,6 +84,33 @@ export async function writeSetting(
   })
 }
 
+// Seed a key only if it does not exist yet — `ON CREATE SET` makes this an
+// atomic write-if-missing (a single MERGE query). Used by init() so a concurrent
+// admin set() that committed first (multi-instance, mid-boot) is NOT clobbered:
+// if the node already exists, the seed is a no-op on its value.
+export async function seedSetting(
+  db: DbContext,
+  namespace: string,
+  key: string,
+  value: unknown,
+  actor: string,
+): Promise<void> {
+  await db.write({
+    query: `MERGE (s:Setting {namespace: $namespace, key: $key})
+            ON CREATE SET s.id = $id,
+                          s.value = $value,
+                          s.updatedAt = toString(datetime()),
+                          s.updatedBy = $actor`,
+    variables: {
+      namespace,
+      key,
+      id: `${namespace}.${key}`,
+      value: JSON.stringify(value),
+      actor,
+    },
+  })
+}
+
 export async function deleteSetting(db: DbContext, namespace: string, key: string): Promise<void> {
   await db.write({
     query: `MATCH (s:Setting {namespace: $namespace, key: $key}) DELETE s`,

@@ -13,6 +13,7 @@ import {
 import {
   readAllSettings as readAllSettingsImpl,
   readLastChange as readLastChangeImpl,
+  seedSetting as seedSettingImpl,
   writeSetting as writeSettingImpl,
   deleteSetting as deleteSettingImpl,
 } from './repository'
@@ -23,12 +24,14 @@ jest.mock('./repository', () => ({
   POLICY_NAMESPACE: 'policy',
   readAllSettings: jest.fn(),
   readLastChange: jest.fn().mockResolvedValue(null),
+  seedSetting: jest.fn(),
   writeSetting: jest.fn(),
   deleteSetting: jest.fn(),
 }))
 
 const readAllSettings = readAllSettingsImpl as jest.MockedFunction<typeof readAllSettingsImpl>
 const readLastChange = readLastChangeImpl as jest.MockedFunction<typeof readLastChangeImpl>
+const seedSetting = seedSettingImpl as jest.MockedFunction<typeof seedSettingImpl>
 const writeSetting = writeSettingImpl as jest.MockedFunction<typeof writeSettingImpl>
 const deleteSetting = deleteSettingImpl as jest.MockedFunction<typeof deleteSettingImpl>
 
@@ -49,7 +52,7 @@ describe('PolicyService', () => {
       await svc.init({ PUBLIC_REGISTRATION: 'false' })
 
       expect(svc.get('publicRegistration')).toBe(true)
-      expect(writeSetting).not.toHaveBeenCalledWith(
+      expect(seedSetting).not.toHaveBeenCalledWith(
         expect.anything(),
         'policy',
         'publicRegistration',
@@ -65,7 +68,7 @@ describe('PolicyService', () => {
       await svc.init({ PUBLIC_REGISTRATION: 'true' })
 
       expect(svc.get('publicRegistration')).toBe(true)
-      expect(writeSetting).toHaveBeenCalledWith(
+      expect(seedSetting).toHaveBeenCalledWith(
         expect.anything(),
         'policy',
         'publicRegistration',
@@ -128,7 +131,7 @@ describe('PolicyService', () => {
       await svc.init({ PUBLIC_REGISTRATION: 'true' })
 
       expect(svc.get('publicRegistration')).toBe(true) // ENV seed, not the stale 42
-      expect(writeSetting).toHaveBeenCalledWith(
+      expect(seedSetting).toHaveBeenCalledWith(
         expect.anything(),
         'policy',
         'publicRegistration',
@@ -565,6 +568,42 @@ describe('PolicyService', () => {
 
       // The concurrent event (true) wins over the stale snapshot (false).
       expect(svc.get('publicRegistration')).toBe(true)
+    })
+
+    it('does not clobber an admin change that arrives while the init seed is writing', async () => {
+      readAllSettings.mockResolvedValue({}) // key missing → seed path runs
+      let onMessage: ((payload: { policyChanged: PolicyChangeEvent }) => void) | undefined
+      const pubsub: PolicyPubSub = {
+        publish: jest.fn(),
+        subscribe: jest.fn().mockImplementation(async (_channel, handler) => {
+          onMessage = handler as typeof onMessage
+          await Promise.resolve()
+          return 1
+        }),
+        unsubscribe: jest.fn(),
+      }
+      // While we seed 'publicRegistration' (default false), a concurrent admin
+      // set() on another instance commits and its change event arrives mid-write.
+      // (seedSetting is write-if-missing in the repo; here we assert the in-memory
+      // cache re-check after the await keeps the fresher event value.)
+      seedSetting.mockImplementation(async (_db, _ns, key) => {
+        if (key === 'publicRegistration') {
+          onMessage?.({
+            policyChanged: {
+              key: 'publicRegistration',
+              value: true,
+              actor: 'remote',
+              timestamp: '2022-01-01T00:00:00.000Z',
+            },
+          })
+        }
+        await Promise.resolve()
+      })
+
+      const svc = new PolicyService(dbStub)
+      await svc.init({}, pubsub) // ENV/default would be false
+
+      expect(svc.get('publicRegistration')).toBe(true) // admin change survived
     })
   })
 

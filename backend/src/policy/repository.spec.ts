@@ -13,6 +13,7 @@ import {
   POLICY_NAMESPACE,
   readAllSettings,
   readLastChange,
+  seedSetting,
   writeSetting,
   deleteSetting,
 } from './repository'
@@ -109,6 +110,24 @@ describe('readLastChange', () => {
     const last = await readLastChange(db, POLICY_NAMESPACE)
     expect(last?.actor).toBe('admin-7')
     expect(typeof last?.timestamp).toBe('string')
+  })
+})
+
+describe('seedSetting (write-if-missing)', () => {
+  it('creates the setting when the key does not exist yet', async () => {
+    await seedSetting(db, POLICY_NAMESPACE, 'publicRegistration', false, 'system:seed')
+    expect(await readAllSettings(db, POLICY_NAMESPACE)).toEqual({ publicRegistration: false })
+  })
+
+  it('does NOT overwrite an existing value (no clobber of a concurrent admin change)', async () => {
+    // Simulate an admin change that committed first.
+    await writeSetting(db, POLICY_NAMESPACE, 'publicRegistration', true, 'admin-1')
+    // A racing init seed for the same key must leave the existing value intact.
+    await seedSetting(db, POLICY_NAMESPACE, 'publicRegistration', false, 'system:seed')
+
+    expect(await readAllSettings(db, POLICY_NAMESPACE)).toEqual({ publicRegistration: true })
+    const last = await readLastChange(db, POLICY_NAMESPACE)
+    expect(last?.actor).toBe('admin-1') // the admin write, not a system:seed overwrite
   })
 })
 
