@@ -264,6 +264,33 @@ describe('in mode', () => {
       await cleanDatabase()
     })
 
+    describe('group factory', () => {
+      // Regression guard for a CI flake: faker.company.name() occasionally
+      // produces names with apostrophes ("O'Conner Group") or commas
+      // ("Erdman, Gutmann and Hand"); the factory's slug must strip them or
+      // neode's slug regex validation rejects the create with an opaque
+      // ERROR_VALIDATION.
+      it('builds a group whose name contains an apostrophe', async () => {
+        await expect(
+          Factory.build(
+            'group',
+            { id: 'apo-1', name: "O'Conner Group" },
+            { ownerId: 'current-user' },
+          ),
+        ).resolves.toBeDefined()
+      })
+
+      it('builds a group whose name contains a comma', async () => {
+        await expect(
+          Factory.build(
+            'group',
+            { id: 'comma-1', name: 'Erdman, Gutmann and Hand' },
+            { ownerId: 'current-user' },
+          ),
+        ).resolves.toBeDefined()
+      })
+    })
+
     describe('CreateGroup', () => {
       beforeEach(() => {
         variables = {

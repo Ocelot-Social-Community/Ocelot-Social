@@ -9,12 +9,11 @@
 import { faker } from '@faker-js/faker'
 import { hashSync } from 'bcryptjs'
 import { Factory } from 'rosie'
-import slugify from 'slugify'
 import { v4 as uuid } from 'uuid'
 
 import { generateInviteCode } from '@graphql/resolvers/inviteCodes'
 import { isUniqueFor } from '@middleware/sluggifyMiddleware'
-import uniqueSlug from '@middleware/slugify/uniqueSlug'
+import uniqueSlug, { toSlug } from '@middleware/slugify/uniqueSlug'
 
 import { getDriver, getNeode } from './neo4j'
 
@@ -200,7 +199,10 @@ Factory.define('post')
     return pinned || null
   })
   .attr('slug', ['slug', 'title'], (slug, title) => {
-    return slug || slugify(title, { lower: true })
+    // Production slug builder: guarantees the models' slug regex /^[a-z0-9_-]+$/
+    // for faker titles (apostrophes/commas would otherwise flake the CI with an
+    // opaque neode ERROR_VALIDATION).
+    return slug || toSlug(title)
   })
   .attr('language', ['language'], (language) => {
     return language || 'en'
@@ -244,7 +246,11 @@ Factory.define('group')
     disabled: false,
   })
   .attr('slug', ['slug', 'name'], (slug, name) => {
-    return slug || slugify(name, { lower: true })
+    // Production slug builder: guarantees the Group model's slug regex
+    // /^[a-z0-9_-]+$/ for faker company names like "O'Conner Group" or
+    // "Erdman, Gutmann and Hand" (which otherwise flake the CI with an opaque
+    // neode ERROR_VALIDATION).
+    return slug || toSlug(name)
   })
   .attr(
     'descriptionExcerpt',
