@@ -340,6 +340,33 @@ describe('PolicyService', () => {
       await expect(svc.set('publicRegistration', true, 'actor')).resolves.toBeDefined()
       expect(svc.get('publicRegistration')).toBe(true)
     })
+
+    it('still commits and logs (no throw / no unhandled rejection) when publish fails', async () => {
+      readAllSettings.mockResolvedValue({})
+      const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+      const pubsub: PolicyPubSub = {
+        publish: jest.fn().mockRejectedValue(new Error('redis down')),
+        subscribe: jest.fn().mockResolvedValue(1),
+        unsubscribe: jest.fn(),
+      }
+
+      const svc = new PolicyService(dbStub)
+      await svc.init({}, pubsub)
+
+      // The broadcast is fire-and-forget: a publish failure must not fail set().
+      await expect(svc.set('publicRegistration', true, 'actor')).resolves.toBeDefined()
+      expect(svc.get('publicRegistration')).toBe(true) // commit applied regardless
+
+      // Let the catch on the floating publish promise run, then assert it logged.
+      await Promise.resolve()
+      await Promise.resolve()
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining('failed to publish'),
+        expect.any(Error),
+      )
+
+      warn.mockRestore()
+    })
   })
 
   describe('reset()', () => {
