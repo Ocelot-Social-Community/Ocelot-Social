@@ -136,12 +136,23 @@
       "name": "Netzwerk-Konfiguration",
       "title": "Einstellungen der Netzwerk-Konfiguration",
       "description": "Laufzeit-Konfiguration. Änderungen wirken sofort für alle verbundenen Clients.",
-      "keys": {
-        "publicRegistration": "Öffentliche Registrierung ohne Einladungs-Code",
-        "inviteRegistration": "Registrierung über Einladungs-Code",
-        "categoriesActive": "Kategorien-Feature für Beiträge und Gruppen",
-        "apiKeysEnabled": "API-Schlüssel-Funktionalität"
+      "groups": {
+        "registration": { "title": "Registrierung" },
+        "features": { "title": "Funktionen" }
       },
+      "keys": {
+        "publicRegistration": "Offene Registrierung",
+        "inviteRegistration": "Registrierung per Einladung",
+        "categoriesActive": "Kategorien",
+        "apiKeysEnabled": "API-Schlüssel"
+      },
+      "descriptions": {
+        "publicRegistration": "Erlaubt es jedem, direkt ein Konto zu erstellen – ohne Einladungscode. Ist dies aus, können neue Nutzer nur per Einladung beitreten.",
+        "inviteRegistration": "Erlaubt bestehenden Mitgliedern, neue Nutzer per Einladungscode einzuladen. Ist dies aus, können Codes nicht zur Registrierung eingelöst werden.",
+        "categoriesActive": "Aktiviert Themen-Kategorien für Beiträge und Gruppen, damit Inhalte eingeordnet und gefiltert werden können. Erfordert mindestens eine angelegte Kategorie.",
+        "apiKeysEnabled": "Ermöglicht Nutzern, persönliche API-Schlüssel für den programmatischen Zugriff aufs Backend zu erstellen. Betrifft den API-Schlüssel-Bereich in den Nutzereinstellungen."
+      },
+      "defaultValue": "Standard: {value}",
       "save": "Änderungen speichern",
       "reset": "Auf Standard zurücksetzen",
       "saveSuccess": "Konfiguration aktualisiert.",

@@ -1,34 +1,35 @@
 import PolicyQuery from '~/graphql/PolicyQuery'
+import PolicyDefaultsQuery from '~/graphql/PolicyDefaultsQuery'
 import PolicySubscription from '~/graphql/PolicySubscription'
 import { setPolicyMutation, resetPolicyMutation } from '~/graphql/PolicyMutations'
 
-// Mirrors backend NetworkPolicy schema. Defaults match the schema's "default"
-// fields — used until the backend snapshot is loaded, and for any key the
-// backend returns as null (= not visible to the current viewer).
-const DEFAULTS = Object.freeze({
-  publicRegistration: false,
-  inviteRegistration: true,
-  categoriesActive: false,
-  apiKeysEnabled: false,
-})
+// Build a key→value map from a backend policy response. The frontend keeps NO
+// config defaults of its own (single source of truth is the backend): we just
+// strip Apollo's __typename and treat any key the viewer may not see (null) as
+// "off" (false), so a stale authenticated value can never linger.
+const normalize = (data) => {
+  const out = {}
+  for (const key of Object.keys(data || {})) {
+    if (key === '__typename') continue
+    const value = data[key]
+    out[key] = value === null || value === undefined ? false : value
+  }
+  return out
+}
 
 export const state = () => ({
-  snapshot: { ...DEFAULTS },
+  snapshot: {},
+  defaults: {},
   isInitialized: false,
   subscriptionActive: false,
 })
 
 export const mutations = {
   SET_SNAPSHOT(state, snapshot) {
-    // Normalise null/undefined (a key the viewer may not see, e.g. after
-    // logout) back to its default, so a stale authenticated value can never
-    // linger once the viewer loses visibility.
-    const normalized = {}
-    for (const key of Object.keys(DEFAULTS)) {
-      const value = snapshot ? snapshot[key] : undefined
-      normalized[key] = value === undefined || value === null ? DEFAULTS[key] : value
-    }
-    state.snapshot = normalized
+    state.snapshot = normalize(snapshot)
+  },
+  SET_DEFAULTS(state, defaults) {
+    state.defaults = normalize(defaults)
   },
   PATCH_KEY(state, { key, value }) {
     state.snapshot = { ...state.snapshot, [key]: value }
@@ -46,6 +47,10 @@ export const getters = {
     return state.snapshot
   },
   get: (state) => (key) => state.snapshot[key],
+  defaults(state) {
+    return state.defaults
+  },
+  getDefault: (state) => (key) => state.defaults[key],
   isInitialized(state) {
     return state.isInitialized
   },
@@ -69,11 +74,24 @@ export const actions = {
       commit('SET_SNAPSHOT', policy)
       commit('SET_INITIALIZED')
     } catch (err) {
-      // Fall back to defaults; non-fatal so SSR can still render
+      // Non-fatal: render with everything off until the backend answers
       // (login/register screens degrade gracefully).
-      commit('SET_SNAPSHOT', DEFAULTS)
+      commit('SET_SNAPSHOT', {})
       commit('SET_INITIALIZED', false)
     }
+  },
+
+  // Admin-only: the configured defaults (ENV/schema) each key resets to. The
+  // backend gates access (isAdmin); used by the admin policy UI.
+  async fetchDefaults({ commit }) {
+    const {
+      data: { policyDefaults },
+    } = await apolloClient(this).query({
+      query: PolicyDefaultsQuery(),
+      fetchPolicy: 'network-only',
+    })
+    commit('SET_DEFAULTS', policyDefaults)
+    return policyDefaults
   },
 
   async setKey({ commit }, { key, value }) {

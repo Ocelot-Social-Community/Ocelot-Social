@@ -1,17 +1,11 @@
 import { state, mutations, getters, actions } from './policy'
 
-const DEFAULT_SNAPSHOT = {
-  publicRegistration: false,
-  inviteRegistration: true,
-  categoriesActive: false,
-  apiKeysEnabled: false,
-}
-
 describe('policy store', () => {
   describe('initial state', () => {
-    it('starts with schema defaults, uninitialized, no subscription', () => {
+    it('starts empty (no frontend defaults), uninitialized, no subscription', () => {
       expect(state()).toEqual({
-        snapshot: DEFAULT_SNAPSHOT,
+        snapshot: {},
+        defaults: {},
         isInitialized: false,
         subscriptionActive: false,
       })
@@ -20,33 +14,40 @@ describe('policy store', () => {
 
   describe('mutations', () => {
     describe('SET_SNAPSHOT', () => {
-      it('keeps provided values and fills missing keys from defaults', () => {
+      it('keeps the values the backend returned (no frontend-side defaults added)', () => {
         const s = { snapshot: {} }
         mutations.SET_SNAPSHOT(s, { publicRegistration: true, categoriesActive: true })
-        expect(s.snapshot).toEqual({
-          publicRegistration: true,
-          inviteRegistration: true, // default
-          categoriesActive: true,
-          apiKeysEnabled: false, // default
-        })
+        expect(s.snapshot).toEqual({ publicRegistration: true, categoriesActive: true })
       })
 
-      it('normalises null (key not visible to the viewer) back to its default', () => {
+      it('treats a non-visible key (null) as off (false)', () => {
         const s = { snapshot: {} }
-        mutations.SET_SNAPSHOT(s, { ...DEFAULT_SNAPSHOT, apiKeysEnabled: null })
+        mutations.SET_SNAPSHOT(s, { apiKeysEnabled: null })
         expect(s.snapshot.apiKeysEnabled).toBe(false)
       })
 
-      it('ignores unknown keys such as __typename', () => {
+      it('strips Apollo __typename', () => {
         const s = { snapshot: {} }
         mutations.SET_SNAPSHOT(s, { publicRegistration: true, __typename: 'Policy' })
         expect(s.snapshot).not.toHaveProperty('__typename')
       })
 
-      it('falls back to all defaults when given null', () => {
-        const s = { snapshot: {} }
+      it('results in an empty snapshot when given null', () => {
+        const s = { snapshot: { apiKeysEnabled: true } }
         mutations.SET_SNAPSHOT(s, null)
-        expect(s.snapshot).toEqual(DEFAULT_SNAPSHOT)
+        expect(s.snapshot).toEqual({})
+      })
+    })
+
+    describe('SET_DEFAULTS', () => {
+      it('stores backend defaults (null → false, __typename stripped)', () => {
+        const s = { defaults: {} }
+        mutations.SET_DEFAULTS(s, {
+          inviteRegistration: true,
+          apiKeysEnabled: null,
+          __typename: 'Policy',
+        })
+        expect(s.defaults).toEqual({ inviteRegistration: true, apiKeysEnabled: false })
       })
     })
 
@@ -93,6 +94,12 @@ describe('policy store', () => {
       expect(getters.isInitialized({ isInitialized: true })).toBe(true)
       expect(getters.isInitialized({ isInitialized: false })).toBe(false)
     })
+
+    it('getDefault(key) and defaults read from the defaults map', () => {
+      const defaults = { apiKeysEnabled: false, inviteRegistration: true }
+      expect(getters.getDefault({ defaults })('apiKeysEnabled')).toBe(false)
+      expect(getters.defaults({ defaults })).toBe(defaults)
+    })
   })
 
   describe('actions', () => {
@@ -116,12 +123,23 @@ describe('policy store', () => {
         expect(commit).toHaveBeenCalledWith('SET_INITIALIZED')
       })
 
-      it('falls back to defaults and stays uninitialized when the query fails', async () => {
+      it('falls back to an empty snapshot (everything off) and stays uninitialized on failure', async () => {
         const query = jest.fn().mockRejectedValue(new Error('network'))
         await bindAction(actions.init, { query })({ commit })
 
-        expect(commit).toHaveBeenCalledWith('SET_SNAPSHOT', expect.objectContaining(DEFAULT_SNAPSHOT))
+        expect(commit).toHaveBeenCalledWith('SET_SNAPSHOT', {})
         expect(commit).toHaveBeenCalledWith('SET_INITIALIZED', false)
+      })
+    })
+
+    describe('fetchDefaults', () => {
+      it('queries the configured defaults and commits them', async () => {
+        const policyDefaults = { publicRegistration: false, apiKeysEnabled: false }
+        const query = jest.fn().mockResolvedValue({ data: { policyDefaults } })
+        await bindAction(actions.fetchDefaults, { query })({ commit })
+
+        expect(query).toHaveBeenCalled()
+        expect(commit).toHaveBeenCalledWith('SET_DEFAULTS', policyDefaults)
       })
     })
 

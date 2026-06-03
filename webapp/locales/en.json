@@ -136,12 +136,23 @@
       "name": "Network policy",
       "title": "Network policy settings",
       "description": "Runtime configuration. Changes apply immediately for all connected clients.",
-      "keys": {
-        "publicRegistration": "Public registration without invite code",
-        "inviteRegistration": "Registration via invite code",
-        "categoriesActive": "Categories feature for posts and groups",
-        "apiKeysEnabled": "API keys functionality"
+      "groups": {
+        "registration": { "title": "Registration" },
+        "features": { "title": "Features" }
       },
+      "keys": {
+        "publicRegistration": "Open registration",
+        "inviteRegistration": "Invite registration",
+        "categoriesActive": "Categories",
+        "apiKeysEnabled": "API keys"
+      },
+      "descriptions": {
+        "publicRegistration": "Allow anyone to create an account directly, without an invite code. When off, new users can only join via an invitation.",
+        "inviteRegistration": "Let existing members invite new users via invite codes. When off, invite codes cannot be redeemed to sign up.",
+        "categoriesActive": "Enable topic categories for posts and groups so content can be classified and filtered. Requires at least one category to exist.",
+        "apiKeysEnabled": "Let users create personal API keys for programmatic backend access. Affects the API keys section in user settings."
+      },
+      "defaultValue": "default: {value}",
       "save": "Save changes",
       "reset": "Reset to default",
       "saveSuccess": "Policy updated.",

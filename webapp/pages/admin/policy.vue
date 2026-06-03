@@ -4,20 +4,41 @@
     <p class="description">{{ $t('admin.policy.description') }}</p>
 
     <form @submit.prevent="save" novalidate>
-      <p v-for="key in keys" :key="key" class="ds-text policy-row">
-        <input
-          :id="`policy-${key}`"
-          type="checkbox"
-          v-model="form[key]"
-          :data-test="`policy-${key}`"
-        />
-        <label :for="`policy-${key}`">
-          {{ $t(`admin.policy.keys.${key}`) }}
-        </label>
-        <span class="policy-row__current">
-          ({{ String(snapshot[key]) }})
-        </span>
-      </p>
+      <fieldset
+        v-for="group in groups"
+        :key="group.id"
+        class="policy-group"
+        :data-test="`policy-group-${group.id}`"
+      >
+        <legend class="policy-group__title">
+          {{ $t(`admin.policy.groups.${group.id}.title`) }}
+        </legend>
+
+        <div v-for="key in group.keys" :key="key" class="policy-row">
+          <input
+            :id="`policy-${key}`"
+            type="checkbox"
+            class="policy-row__checkbox"
+            v-model="form[key]"
+            :data-test="`policy-${key}`"
+          />
+          <label :for="`policy-${key}`" class="policy-row__label">
+            <span class="policy-row__name">
+              {{ $t(`admin.policy.keys.${key}`) }}
+              <span
+                v-if="defaults[key] !== undefined"
+                class="policy-row__current"
+                :data-test="`policy-default-${key}`"
+              >
+                {{ $t('admin.policy.defaultValue', { value: String(defaults[key]) }) }}
+              </span>
+            </span>
+            <span class="policy-row__description">
+              {{ $t(`admin.policy.descriptions.${key}`) }}
+            </span>
+          </label>
+        </div>
+      </fieldset>
 
       <div class="actions">
         <os-button
@@ -53,7 +74,11 @@ export default {
   middleware: ['isAdmin'],
   data() {
     return {
-      keys: ['publicRegistration', 'inviteRegistration', 'categoriesActive', 'apiKeysEnabled'],
+      // Policies grouped under headings; related settings share a group.
+      groups: [
+        { id: 'registration', keys: ['publicRegistration', 'inviteRegistration'] },
+        { id: 'features', keys: ['categoriesActive', 'apiKeysEnabled'] },
+      ],
       form: {
         publicRegistration: false,
         inviteRegistration: false,
@@ -64,7 +89,11 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({ snapshot: 'policy/snapshot' }),
+    ...mapGetters({ snapshot: 'policy/snapshot', defaults: 'policy/defaults' }),
+    // Flat list of all keys across groups — used by the form logic below.
+    keys() {
+      return this.groups.flatMap((group) => group.keys)
+    },
     isDirty() {
       return this.keys.some((k) => this.form[k] !== this.snapshot[k])
     },
@@ -72,6 +101,7 @@ export default {
   methods: {
     ...mapActions({
       fetchPolicy: 'policy/init',
+      fetchDefaults: 'policy/fetchDefaults',
       setKey: 'policy/setKey',
       resetKey: 'policy/resetKey',
     }),
@@ -120,7 +150,7 @@ export default {
     },
   },
   async mounted() {
-    await this.fetchPolicy()
+    await Promise.all([this.fetchPolicy(), this.fetchDefaults()])
     this.syncFormFromSnapshot()
   },
 }
@@ -134,21 +164,57 @@ export default {
   margin-bottom: $space-base;
   color: $text-color-soft;
 }
+.policy-group {
+  border: none;
+  padding: 0;
+  margin: 0 0 $space-small 0;
+
+  // Set the heading off with an underline only as wide as the text itself.
+  &__title {
+    padding: 0 0 $space-xxx-small 0;
+    margin-bottom: $space-xx-small;
+    border-bottom: 1px solid $border-color-softer;
+    color: $text-color-soft;
+    font-weight: bold;
+    font-size: 0.9em;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+}
 .policy-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: $space-x-small;
-  margin: $space-x-small 0;
+  margin: $space-xx-small 0;
+  line-height: 1.3;
 
+  &__checkbox {
+    margin-top: 0.15em;
+    flex-shrink: 0;
+  }
+  &__label {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+  }
+  &__name {
+    font-weight: 600;
+  }
   &__current {
-    margin-left: auto;
+    margin-left: $space-xx-small;
     color: $text-color-soft;
     font-family: monospace;
+    font-size: 0.8em;
+    font-weight: normal;
+  }
+  &__description {
+    color: $text-color-soft;
     font-size: 0.85em;
+    line-height: 1.25;
   }
 }
 .actions {
-  margin-top: $space-base;
+  margin-top: $space-small;
   display: flex;
   gap: $space-small;
 }
