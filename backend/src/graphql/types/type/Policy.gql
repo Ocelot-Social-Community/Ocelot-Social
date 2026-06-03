@@ -1,5 +1,9 @@
 type Query {
   policy: Policy!
+  # The configured defaults (ENV seed or schema default) each key resets to.
+  # Admin-only; reuses the Policy shape. Lets the admin UI show the deployment
+  # default without the frontend hardcoding any config.
+  policyDefaults: Policy!
 }
 
 # Network policy as visible to the requesting viewer. A single resolver fills

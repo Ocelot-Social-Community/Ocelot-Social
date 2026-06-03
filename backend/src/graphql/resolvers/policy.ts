@@ -24,6 +24,10 @@ export default {
     // fields. Public keys are always present.
     policy: (_parent: unknown, _args: unknown, { policy, user }: Context) =>
       policy.getVisibleSnapshot(user),
+    // Admin-only (see permissionsMiddleware). Routed through the same canView
+    // scoping, so an admin sees every key's default.
+    policyDefaults: (_parent: unknown, _args: unknown, { policy, user }: Context) =>
+      policy.getVisibleDefaults(user),
   },
   Mutation: {
     setPolicy: async (

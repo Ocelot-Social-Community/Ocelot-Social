@@ -146,6 +146,38 @@ describe('PolicyService', () => {
     })
   })
 
+  describe('getDefault() / getVisibleDefaults()', () => {
+    it('returns the schema default, independent of the current (DB) value', async () => {
+      // DB has apiKeysEnabled=true, but its configured default is false.
+      readAllSettings.mockResolvedValue({ apiKeysEnabled: true })
+      const svc = new PolicyService(dbStub as never)
+      await svc.init({})
+
+      expect(svc.get('apiKeysEnabled')).toBe(true) // current value
+      expect(svc.getDefault('apiKeysEnabled')).toBe(false) // configured default
+      expect(svc.getDefault('inviteRegistration')).toBe(true) // schema default
+    })
+
+    it('returns the ENV-seeded value as the default when configured', async () => {
+      readAllSettings.mockResolvedValue({})
+      const svc = new PolicyService(dbStub as never)
+      await svc.init({ API_KEYS_ENABLED: 'true', PUBLIC_REGISTRATION: 'true' })
+
+      expect(svc.getDefault('apiKeysEnabled')).toBe(true)
+      expect(svc.getDefault('publicRegistration')).toBe(true)
+    })
+
+    it('scopes getVisibleDefaults by canView (anon hides apiKeysEnabled, admin sees all)', async () => {
+      readAllSettings.mockResolvedValue({})
+      const svc = new PolicyService(dbStub as never)
+      await svc.init({})
+
+      expect(svc.getVisibleDefaults(null).apiKeysEnabled).toBeNull()
+      expect(svc.getVisibleDefaults(null).inviteRegistration).toBe(true)
+      expect(svc.getVisibleDefaults({ role: 'admin' }).apiKeysEnabled).toBe(false)
+    })
+  })
+
   describe('createInMemoryPolicyService (test factory)', () => {
     it('returns provided values without touching the repository', () => {
       const svc = createInMemoryPolicyService({

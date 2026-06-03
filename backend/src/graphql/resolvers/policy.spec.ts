@@ -27,6 +27,17 @@ const POLICY_QUERY = `
   }
 `
 
+const POLICY_DEFAULTS_QUERY = `
+  query {
+    policyDefaults {
+      publicRegistration
+      inviteRegistration
+      categoriesActive
+      apiKeysEnabled
+    }
+  }
+`
+
 const asUser = (role: string) => ({ id: `${role}-1`, role }) as unknown as Context['user']
 
 beforeAll(async () => {
@@ -95,5 +106,41 @@ describe('Query.policy', () => {
       expect(errors).toBeUndefined()
       expect(data.policy.apiKeysEnabled).toBe(true)
     })
+  })
+})
+
+describe('Query.policyDefaults', () => {
+  it('is forbidden for anonymous viewers', async () => {
+    authenticatedUser = null
+
+    const { errors } = await query({ query: POLICY_DEFAULTS_QUERY })
+
+    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
+  })
+
+  it('is forbidden for logged-in non-admin users', async () => {
+    authenticatedUser = asUser('user')
+
+    const { errors } = await query({ query: POLICY_DEFAULTS_QUERY })
+
+    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
+  })
+
+  it('grants access to admins and returns every key (admin sees all, none null)', async () => {
+    authenticatedUser = asUser('admin')
+
+    const { data, errors } = await query({ query: POLICY_DEFAULTS_QUERY })
+
+    expect(errors).toBeUndefined()
+    // Admin sees all keys; the exact default value (schema vs ENV seed) is
+    // covered deterministically in PolicyService.spec.ts → getDefault().
+    for (const key of [
+      'publicRegistration',
+      'inviteRegistration',
+      'categoriesActive',
+      'apiKeysEnabled',
+    ]) {
+      expect(typeof data.policyDefaults[key]).toBe('boolean')
+    }
   })
 })

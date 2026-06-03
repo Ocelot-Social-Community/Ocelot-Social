@@ -143,6 +143,26 @@ export class PolicyService {
     return out
   }
 
+  // The default a key resets to: the ENV seed (x-envSeed) configured for this
+  // deployment if set, otherwise the schema default. Single source of truth for
+  // "the configured default" — the frontend has none of its own.
+  getDefault<K extends PolicyKey>(key: K): NetworkPolicy[K] {
+    const env = this.env ?? process.env
+    const envName = envSeedFor(key)
+    const envValue = envName ? parseEnvValue(envName, env, typeFor(key)) : undefined
+    return (envValue !== undefined ? envValue : defaultFor(key)) as NetworkPolicy[K]
+  }
+
+  // Defaults as visible to a viewer — same canView scoping as getVisibleSnapshot
+  // (admins see every key; non-visible keys are null).
+  getVisibleDefaults(user: PolicyViewer | null | undefined): Record<PolicyKey, boolean | null> {
+    const out = {} as Record<PolicyKey, boolean | null>
+    for (const key of allKeys()) {
+      out[key] = canView(key, user) ? this.getDefault(key) : null
+    }
+    return out
+  }
+
   async set<K extends PolicyKey>(
     key: K,
     value: NetworkPolicy[K],
@@ -169,9 +189,7 @@ export class PolicyService {
 
     await deleteSetting(this.db, POLICY_NAMESPACE, key)
 
-    const envName = envSeedFor(key)
-    const envValue = envName ? parseEnvValue(envName, this.env, typeFor(key)) : undefined
-    const newValue = (envValue !== undefined ? envValue : defaultFor(key)) as NetworkPolicy[K]
+    const newValue = this.getDefault(key)
     this.cache[key] = newValue
 
     const event: PolicyChangeEvent = {
@@ -236,11 +254,16 @@ export function setPolicyServiceForTesting(svc: PolicyService | undefined): void
 interface PolicyServiceInternal {
   cache: Partial<NetworkPolicy>
   initialised: boolean
+  env: NodeJS.ProcessEnv
 }
 
-export function createInMemoryPolicyService(values: Partial<NetworkPolicy> = {}): PolicyService {
+export function createInMemoryPolicyService(
+  values: Partial<NetworkPolicy> = {},
+  env: NodeJS.ProcessEnv = process.env,
+): PolicyService {
   const svc = Object.create(PolicyService.prototype) as unknown as PolicyServiceInternal
   svc.cache = { ...values }
   svc.initialised = true
+  svc.env = env // so getDefault() can read x-envSeed values
   return svc as unknown as PolicyService
 }
