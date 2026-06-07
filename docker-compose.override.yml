@@ -15,8 +15,11 @@ services:
 
   backend:
     image: ghcr.io/ocelot-social-community/ocelot-social/backend:local-development
-    ports:
-      - 9000:9000
+    # No host port for the backend's in-container S3 proxy (it binds 9000 inside
+    # the container for its own uploads): host port 9000 is owned by minio below
+    # — it serves both the browser-facing file URLs (anonymous-read bucket) and
+    # the host-run backend test suite. Publishing it here too collides
+    # ("Bind for 0.0.0.0:9000 failed: port is already allocated").
     depends_on:
       - minio
       - minio-mc
