@@ -4,7 +4,11 @@ import localeUpdate from './localeUpdate.js'
 
 Vue.use(Vuex)
 
-const makeVm = ({ user = { id: 'u1' }, mutate = jest.fn().mockResolvedValue() } = {}) => {
+const makeVm = ({
+  user = { id: 'u1' },
+  mutate = jest.fn().mockResolvedValue(),
+  uiLocale = 'en',
+} = {}) => {
   const setCurrentUserMutation = jest.fn()
   const store = new Vuex.Store({
     getters: { 'auth/user': () => user },
@@ -20,7 +24,7 @@ const makeVm = ({ user = { id: 'u1' }, mutate = jest.fn().mockResolvedValue() } 
     },
   }).$mount()
   vm.$apollo = { mutate }
-  vm.$i18n = { locale: () => 'en' }
+  vm.$i18n = { locale: () => uiLocale }
   vm.$t = (k) => k
   vm.$toast = { success: successFn, error: errorFn }
   return { vm, mutate, setCurrentUserMutation, success: successFn, error: errorFn }
@@ -45,20 +49,27 @@ describe('localeUpdate mixin', () => {
       expect(mutate).not.toHaveBeenCalled()
     })
 
-    it('mutates with id+locale, runs update() to refresh the store, then toasts success', async () => {
+    it('mutates with id + UI locale (not the stored user locale), runs update() to refresh the store, then toasts success', async () => {
       const mutate = jest.fn().mockImplementation(({ update }) => {
-        update(null, { data: { UpdateUser: { locale: 'de' } } })
+        update(null, { data: { UpdateUser: { locale: 'en' } } })
         return Promise.resolve()
       })
+      // Stored user locale ('de') deliberately differs from the active UI locale
+      // ('en') so the test fails if the mutation reads from the user instead of $i18n.
       const { vm, success, setCurrentUserMutation } = makeVm({
-        user: { id: 'u1', name: 'A', locale: 'en' },
+        user: { id: 'u1', name: 'A', locale: 'de' },
+        uiLocale: 'en',
         mutate,
       })
       await vm.updateUserLocale()
       expect(mutate).toHaveBeenCalledWith(
         expect.objectContaining({ variables: { id: 'u1', locale: 'en' } }),
       )
-      expect(setCurrentUserMutation).toHaveBeenCalled()
+      // update() must write the locale from the mutation response back into the store.
+      expect(setCurrentUserMutation).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ id: 'u1', locale: 'en' }),
+      )
       expect(success).toHaveBeenCalledWith('contribution.success')
     })
 
