@@ -189,4 +189,21 @@ describe('PostIndex', () => {
       expect(ctx.posts).toEqual([])
     })
   })
+
+  describe('finalFilters computed (feeds the Post query variables)', () => {
+    const { finalFilters } = PostIndex.computed
+
+    it('passes the store filter through unchanged when no hashtag is active', () => {
+      const ctx = { postsFilter: { categories_some: { id: 'cat1' } }, hashtag: null }
+      expect(finalFilters.call(ctx)).toEqual({ categories_some: { id: 'cat1' } })
+    })
+
+    it('merges a tags_some filter for the active hashtag', () => {
+      const ctx = { postsFilter: { categories_some: { id: 'cat1' } }, hashtag: 'h1' }
+      expect(finalFilters.call(ctx)).toEqual({
+        categories_some: { id: 'cat1' },
+        tags_some: { id: 'h1' },
+      })
+    })
+  })
 })
