@@ -257,10 +257,19 @@ describe('SearchResults', () => {
       expect(apollo.searchGroups.query.call({ $i18n: i18n })).toBe(searchGroups(i18n))
     })
 
-    it('strips the leading search operator from the query variable', () => {
-      const ctx = { search: '#berlin', firstGroups: 5, groupsOffset: 0 }
+    // The query variable strips a single leading search operator (!@#&); plain
+    // and empty inputs must pass through untouched.
+    it.each([
+      ['#berlin', 'berlin'],
+      ['!berlin', 'berlin'],
+      ['@berlin', 'berlin'],
+      ['&berlin', 'berlin'],
+      ['berlin', 'berlin'],
+      ['', ''],
+    ])('derives variables stripping the leading operator: %s -> %s', (search, expected) => {
+      const ctx = { search, firstGroups: 5, groupsOffset: 0 }
       expect(apollo.searchGroups.variables.call(ctx)).toEqual({
-        query: 'berlin',
+        query: expected,
         firstGroups: 5,
         groupsOffset: 0,
       })
