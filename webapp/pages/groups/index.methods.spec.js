@@ -58,6 +58,17 @@ describe('pages/groups/index.vue — methods', () => {
       expect(ctx.activePage).toBe(2)
       expect(refetch).toHaveBeenCalled()
     })
+
+    // The method itself has no lower bound — it relies on the `hasPrevious` UI guard.
+    // Pinning that contract makes a regression visible if the method is ever wired
+    // up without the guard (it would page into a negative offset).
+    it('decrements past the first page when called without the hasPrevious guard', () => {
+      const refetch = jest.fn()
+      const ctx = { activePage: 0, $apollo: { queries: { Group: { refetch } } } }
+      methods.previousResults.call(ctx)
+      expect(ctx.activePage).toBe(-1)
+      expect(refetch).toHaveBeenCalled()
+    })
   })
 
   describe('nextResults', () => {
@@ -66,6 +77,15 @@ describe('pages/groups/index.vue — methods', () => {
       const ctx = { activePage: 0, $apollo: { queries: { Group: { refetch } } } }
       methods.nextResults.call(ctx)
       expect(ctx.activePage).toBe(1)
+      expect(refetch).toHaveBeenCalled()
+    })
+
+    // Like previousResults, nextResults has no upper bound and depends on `hasNext`.
+    it('increments past the last page when called without the hasNext guard', () => {
+      const refetch = jest.fn()
+      const ctx = { activePage: 5, $apollo: { queries: { Group: { refetch } } } }
+      methods.nextResults.call(ctx)
+      expect(ctx.activePage).toBe(6)
       expect(refetch).toHaveBeenCalled()
     })
   })
