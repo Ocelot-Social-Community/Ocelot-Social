@@ -1,4 +1,5 @@
 import authenticated from './authenticated.js'
+import links from '~/constants/links.js'
 
 const makeCtx = (overrides = {}) => {
   const dispatch = overrides.dispatch ?? jest.fn().mockResolvedValue(true)
@@ -26,29 +27,26 @@ describe('authenticated middleware', () => {
     const result = await authenticated(ctx)
     expect(result).toBe(true)
     expect(ctx.dispatch).toHaveBeenCalledWith('auth/check')
+    expect(ctx.redirect).not.toHaveBeenCalled()
   })
 
-  it('redirects to landing with the current path when unauthenticated', async () => {
+  it('redirects to the landing page with the current path when unauthenticated', async () => {
     const ctx = makeCtx({ dispatch: jest.fn().mockResolvedValue(false) })
     await authenticated(ctx)
-    expect(ctx.redirect).toHaveBeenCalled()
-    const [, params] = ctx.redirect.mock.calls[0]
-    expect(params).toEqual({ path: '/home' })
+    expect(ctx.redirect).toHaveBeenCalledWith(links.LANDING_PAGE, { path: '/home' })
   })
 
   it('redirects without `path` param when current route is the root', async () => {
     const ctx = makeCtx({ dispatch: jest.fn().mockResolvedValue(false) })
     ctx.route = { name: 'index', path: '/' }
     await authenticated(ctx)
-    const [, params] = ctx.redirect.mock.calls[0]
-    expect(params).toEqual({})
+    expect(ctx.redirect).toHaveBeenCalledWith(links.LANDING_PAGE, {})
   })
 
   it('redirects without `path` param when route.path is empty', async () => {
     const ctx = makeCtx({ dispatch: jest.fn().mockResolvedValue(false) })
     ctx.route = { name: 'index', path: '' }
     await authenticated(ctx)
-    const [, params] = ctx.redirect.mock.calls[0]
-    expect(params).toEqual({})
+    expect(ctx.redirect).toHaveBeenCalledWith(links.LANDING_PAGE, {})
   })
 })
