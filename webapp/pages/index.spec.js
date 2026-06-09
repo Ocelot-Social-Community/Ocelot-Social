@@ -2,6 +2,7 @@ import { shallowMount, mount } from '@vue/test-utils'
 import PostIndex from './index.vue'
 import Vuex from 'vuex'
 import HashtagsFilter from '~/components/HashtagsFilter/HashtagsFilter'
+import { filterPosts } from '~/graphql/PostQuery.js'
 
 const localVue = global.localVue
 
@@ -149,6 +150,59 @@ describe('PostIndex', () => {
         wrapper = Wrapper()
         await wrapper.setData({ showDonations: true })
         expect(wrapper.find('.top-info-bar').exists()).toBe(true)
+      })
+    })
+  })
+
+  describe('Post apollo query (filterPosts wiring)', () => {
+    const { apollo } = PostIndex
+
+    it('wires the Post query to the filterPosts builder', () => {
+      expect(apollo.Post.query()).toBe(filterPosts())
+    })
+
+    it('derives variables from the final filters, page size and ordering (pinned first)', () => {
+      const ctx = { finalFilters: { categoryId: 'cat1' }, pageSize: 12, orderBy: 'sortDate_desc' }
+      expect(apollo.Post.variables.call(ctx)).toEqual({
+        filter: { categoryId: 'cat1' },
+        first: 12,
+        orderBy: ['pinned_asc', 'sortDate_desc'],
+        offset: 0,
+      })
+    })
+
+    it('update() stores the returned posts', () => {
+      const ctx = { posts: [] }
+      apollo.Post.update.call(ctx, { Post: [{ id: 'p1' }] })
+      expect(ctx.posts).toEqual([{ id: 'p1' }])
+    })
+
+    // The template reads `posts.length` unguarded, so update() must always
+    // leave an array behind even when Apollo yields a null/partial response.
+    it.each([
+      ['null', { Post: null }],
+      ['undefined', { Post: undefined }],
+      ['an empty response', {}],
+    ])('update() falls back to an empty array when Post is %s', (_label, data) => {
+      const ctx = { posts: [{ id: 'stale' }] }
+      apollo.Post.update.call(ctx, data)
+      expect(ctx.posts).toEqual([])
+    })
+  })
+
+  describe('finalFilters computed (feeds the Post query variables)', () => {
+    const { finalFilters } = PostIndex.computed
+
+    it('passes the store filter through unchanged when no hashtag is active', () => {
+      const ctx = { postsFilter: { categories_some: { id: 'cat1' } }, hashtag: null }
+      expect(finalFilters.call(ctx)).toEqual({ categories_some: { id: 'cat1' } })
+    })
+
+    it('merges a tags_some filter for the active hashtag', () => {
+      const ctx = { postsFilter: { categories_some: { id: 'cat1' } }, hashtag: 'h1' }
+      expect(finalFilters.call(ctx)).toEqual({
+        categories_some: { id: 'cat1' },
+        tags_some: { id: 'h1' },
       })
     })
   })

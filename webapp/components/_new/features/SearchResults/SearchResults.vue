@@ -341,6 +341,7 @@ export default {
         return !this.search
       },
       update({ searchHashtags }) {
+        if (!searchHashtags) return
         this.hashtags = searchHashtags.hashtags
         this.hashtagCount = searchHashtags.hashtagCount
         if (
@@ -370,6 +371,7 @@ export default {
         return !this.search
       },
       update({ searchUsers }) {
+        if (!searchUsers) return
         this.users = searchUsers.users
         this.userCount = searchUsers.userCount
         if (this.activeTab === null && this.postCount === 0 && this.userCount > 0)
@@ -393,6 +395,7 @@ export default {
         return !this.search
       },
       update({ searchPosts }) {
+        if (!searchPosts) return
         this.posts = searchPosts.posts
         this.postCount = searchPosts.postCount
         if (this.postCount > 0 && !this.tabManuallySet) this.activeTab = 'Post'
@@ -415,6 +418,7 @@ export default {
         return !this.search
       },
       update({ searchGroups }) {
+        if (!searchGroups) return
         this.groups = searchGroups.groups
         this.groupCount = searchGroups.groupCount
         if (

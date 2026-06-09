@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils'
 import Vuex from 'vuex'
 import SearchResults from './SearchResults'
+import { searchGroups } from '~/graphql/Search.js'
 import helpers from '~/storybook/helpers'
 
 helpers.init()
@@ -242,6 +243,91 @@ describe('SearchResults', () => {
           ).toMatchObject({ query: '', firstPosts: 12, postsOffset: 0 })
         })
       })
+    })
+  })
+
+  describe('searchGroups apollo wiring', () => {
+    const { apollo } = SearchResults
+
+    it('wires the query to the searchGroups builder, threading the active locale', () => {
+      // A non-default locale ('de', not the 'en' fallback) makes this also prove
+      // the live $i18n locale is injected: searchGroups('de') is a different
+      // cached document (name(lang: "de")), so a hardcoded locale would not match.
+      const i18n = { locale: () => 'de' }
+      expect(apollo.searchGroups.query.call({ $i18n: i18n })).toBe(searchGroups(i18n))
+    })
+
+    // The query variable strips a single leading search operator (!@#&); plain
+    // and empty inputs must pass through untouched.
+    it.each([
+      ['#berlin', 'berlin'],
+      ['!berlin', 'berlin'],
+      ['@berlin', 'berlin'],
+      ['&berlin', 'berlin'],
+      ['berlin', 'berlin'],
+      ['', ''],
+    ])('derives variables stripping the leading operator: %s -> %s', (search, expected) => {
+      const ctx = { search, firstGroups: 5, groupsOffset: 0 }
+      expect(apollo.searchGroups.variables.call(ctx)).toEqual({
+        query: expected,
+        firstGroups: 5,
+        groupsOffset: 0,
+      })
+    })
+
+    it.each([
+      ['', true],
+      [undefined, true],
+      ['berlin', false],
+    ])('skip() gates the query on a present search term (search=%s -> skip=%s)', (search, skip) => {
+      expect(apollo.searchGroups.skip.call({ search })).toBe(skip)
+    })
+
+    it('update() maps groups + count and auto-selects the Group tab when only groups match', () => {
+      const ctx = { activeTab: null, postCount: 0, userCount: 0, groups: [], groupCount: 0 }
+      apollo.searchGroups.update.call(ctx, {
+        searchGroups: { groups: [{ id: 'g1' }], groupCount: 1 },
+      })
+      expect(ctx.groups).toEqual([{ id: 'g1' }])
+      expect(ctx.groupCount).toBe(1)
+      expect(ctx.activeTab).toBe('Group')
+    })
+
+    it('update() leaves the active tab untouched when posts already matched', () => {
+      const ctx = { activeTab: 'Post', postCount: 3, userCount: 0, groups: [], groupCount: 0 }
+      apollo.searchGroups.update.call(ctx, {
+        searchGroups: { groups: [{ id: 'g1' }], groupCount: 1 },
+      })
+      expect(ctx.activeTab).toBe('Post')
+    })
+
+    it.each([
+      ['null', { searchGroups: null }],
+      ['undefined', { searchGroups: undefined }],
+    ])('update() leaves existing state untouched on a %s response', (_label, data) => {
+      const ctx = {
+        activeTab: 'Post',
+        groups: [{ id: 'existing' }],
+        groupCount: 7,
+        postCount: 0,
+        userCount: 0,
+      }
+      apollo.searchGroups.update.call(ctx, data)
+      expect(ctx.groups).toEqual([{ id: 'existing' }])
+      expect(ctx.groupCount).toBe(7)
+      expect(ctx.activeTab).toBe('Post')
+    })
+
+    it('update() does not auto-select the Group tab when users also matched', () => {
+      // activeTab null and no posts, but users matched → groups must not win.
+      const ctx = { activeTab: null, postCount: 0, userCount: 2, groups: [], groupCount: 0 }
+      apollo.searchGroups.update.call(ctx, {
+        searchGroups: { groups: [{ id: 'g1' }], groupCount: 1 },
+      })
+      expect(ctx.activeTab).toBeNull()
+      // state is still mapped regardless of the tab decision
+      expect(ctx.groups).toEqual([{ id: 'g1' }])
+      expect(ctx.groupCount).toBe(1)
     })
   })
 })
