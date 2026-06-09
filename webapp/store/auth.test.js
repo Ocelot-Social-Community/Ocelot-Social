@@ -175,11 +175,12 @@ describe('actions', () => {
         expect(commit.mock.calls).toEqual(expect.arrayContaining([['SET_TOKEN', token]]))
       })
 
-      it('fetches the user, initializes categories, and refetches the policy', () => {
+      it('fetches the user, initializes categories, refetches and re-subscribes the policy', () => {
         expect(dispatch.mock.calls).toEqual([
           ['fetchCurrentUser'],
           ['categories/init', null, { root: true }],
           ['policy/init', null, { root: true }],
+          ['policy/resubscribe', null, { root: true }],
         ])
       })
 
@@ -260,6 +261,10 @@ describe('actions', () => {
 
     it('refetches the policy as anonymous so authenticated-only keys reset', () => {
       expect(dispatch).toHaveBeenCalledWith('policy/init', null, { root: true })
+    })
+
+    it('re-subscribes the policy on the now-anonymous websocket', () => {
+      expect(dispatch).toHaveBeenCalledWith('policy/resubscribe', null, { root: true })
     })
   })
 })

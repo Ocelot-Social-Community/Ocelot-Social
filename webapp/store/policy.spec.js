@@ -132,19 +132,30 @@ describe('policy store', () => {
       it('fetches the viewer-scoped policy and commits snapshot + initialized', async () => {
         const policy = { publicRegistration: true, apiKeysEnabled: null }
         const query = jest.fn().mockResolvedValue({ data: { policy } })
-        await bindAction(actions.init, { query })({ commit })
+        await bindAction(actions.init, { query })({ commit, state: { isInitialized: false } })
 
         expect(query).toHaveBeenCalled()
         expect(commit).toHaveBeenCalledWith('SET_SNAPSHOT', policy)
         expect(commit).toHaveBeenCalledWith('SET_INITIALIZED')
       })
 
-      it('falls back to an empty snapshot (everything off) and stays uninitialized on failure', async () => {
+      it('falls back to an empty snapshot on the first load (never initialized) when the query fails', async () => {
         const query = jest.fn().mockRejectedValue(new Error('network'))
-        await bindAction(actions.init, { query })({ commit })
+        await bindAction(actions.init, { query })({ commit, state: { isInitialized: false } })
 
         expect(commit).toHaveBeenCalledWith('SET_SNAPSHOT', {})
-        expect(commit).toHaveBeenCalledWith('SET_INITIALIZED', false)
+      })
+
+      it('keeps the known-good snapshot when a refetch fails after a prior init (no wipe)', async () => {
+        // Around login the websocket reconnect fires a second init() whose query
+        // is aborted by Apollo's resetStore. That failure must not blank public
+        // keys (e.g. inviteRegistration) the first init already loaded.
+        const query = jest
+          .fn()
+          .mockRejectedValue(new Error('Store reset while query was in flight'))
+        await bindAction(actions.init, { query })({ commit, state: { isInitialized: true } })
+
+        expect(commit).not.toHaveBeenCalledWith('SET_SNAPSHOT', {})
       })
     })
 
@@ -319,6 +330,31 @@ describe('policy store', () => {
         }).not.toThrow()
 
         expect(commit).not.toHaveBeenCalledWith('PATCH_KEY', expect.anything())
+      })
+    })
+
+    describe('resubscribe', () => {
+      it('tears down the stale subscription and opens a fresh one on the new socket', () => {
+        // restartWebsockets() on login/logout drops the operation handler, so the
+        // old observable goes silent — resubscribe must unsubscribe it and open a
+        // brand-new subscription that re-registers a live handler.
+        const unsubscribe = jest.fn()
+        const innerSubscribe = jest.fn(() => ({ unsubscribe }))
+        const clientSubscribe = jest.fn(() => ({ subscribe: innerSubscribe }))
+
+        // Open one first so there is a handle to tear down.
+        bindAction(actions.subscribe, { subscribe: clientSubscribe })({
+          commit,
+          state: { subscriptionActive: false },
+        })
+        expect(innerSubscribe).toHaveBeenCalledTimes(1)
+
+        bindAction(actions.resubscribe, { subscribe: clientSubscribe })({ commit })
+
+        expect(unsubscribe).toHaveBeenCalledTimes(1)
+        expect(commit).toHaveBeenCalledWith('SET_SUBSCRIPTION_ACTIVE', false)
+        expect(innerSubscribe).toHaveBeenCalledTimes(2)
+        expect(commit).toHaveBeenCalledWith('SET_SUBSCRIPTION_ACTIVE', true)
       })
     })
   })

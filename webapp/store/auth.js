@@ -111,6 +111,10 @@ export const actions = {
       // returns the viewer-scoped keys (e.g. apiKeysEnabled) that were null
       // while anonymous — no full page reload needed.
       await dispatch('policy/init', null, { root: true })
+      // onLogin() restarted the websocket (restartWebsockets), which drops the
+      // policyChanged subscription's handler. Re-open it so live updates keep
+      // arriving without a full page reload.
+      await dispatch('policy/resubscribe', null, { root: true })
       if (cookies.get(metadata.COOKIE_NAME) === undefined) {
         throw new Error('no-cookie')
       }
@@ -128,5 +132,8 @@ export const actions = {
     // Refetch as anonymous so authenticated-only keys (e.g. apiKeysEnabled)
     // reset to their defaults instead of lingering from the logged-in session.
     await dispatch('policy/init', null, { root: true })
+    // onLogout() restarted the websocket too; re-open the subscription on the
+    // now-anonymous connection so public-key changes still arrive live.
+    await dispatch('policy/resubscribe', null, { root: true })
   },
 }

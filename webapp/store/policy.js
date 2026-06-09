@@ -68,12 +68,44 @@ export const getters = {
 
 const apolloClient = (ctx) => ctx.app.apolloProvider.defaultClient
 
+// The live policyChanged subscription handle (one client per browser tab). Kept
+// at module scope so a forced websocket restart can tear it down and re-open a
+// fresh one: $apolloHelpers.onLogin/onLogout call restartWebsockets(), which
+// closes the socket and *resends the operation without its handler* — so the old
+// observable goes silent and live updates stop arriving until a full page
+// reload. Only a brand-new apolloClient.subscribe() re-registers a live handler
+// on the new connection. (A plain auto-reconnect keeps handlers, so this only
+// bites the login/logout path.)
+let policySubscription = null
+
+const openPolicySubscription = (store, commit) => {
+  const observable = apolloClient(store).subscribe({ query: PolicySubscription() })
+  policySubscription = observable.subscribe({
+    next({ data }) {
+      const event = data?.policyChanged
+      if (!event) return
+      try {
+        // Value-only notification: update the live snapshot. The last-change
+        // line is not updated live (it refreshes from policyDefaults on the
+        // next fetch) — the broadcast carries no actor/timestamp.
+        commit('PATCH_KEY', { key: event.key, value: JSON.parse(event.value) })
+      } catch (err) {
+        // Ignore malformed event payloads.
+      }
+    },
+    error() {
+      commit('SET_SUBSCRIPTION_ACTIVE', false)
+    },
+  })
+  commit('SET_SUBSCRIPTION_ACTIVE', true)
+}
+
 export const actions = {
   // Fetches the viewer-scoped snapshot. Re-dispatched whenever the auth state
   // changes (after login / logout) so authenticated keys appear / reset without
   // a full page reload — the single query returns exactly what the current
   // viewer may see.
-  async init({ commit }) {
+  async init({ commit, state }) {
     try {
       const {
         data: { policy },
@@ -84,10 +116,17 @@ export const actions = {
       commit('SET_SNAPSHOT', policy)
       commit('SET_INITIALIZED')
     } catch (err) {
-      // Non-fatal: render with everything off until the backend answers
-      // (login/register screens degrade gracefully).
-      commit('SET_SNAPSHOT', {})
-      commit('SET_INITIALIZED', false)
+      // A failed refetch must NOT wipe a known-good snapshot. Around login the
+      // websocket reconnect triggers a second init() whose in-flight query is
+      // aborted by Apollo's resetStore ("Store reset while query was in flight");
+      // wiping to {} here would drop public keys (e.g. inviteRegistration) the
+      // first init already loaded, hiding the header invite button until the next
+      // change event. Only fall back to "everything off" on the very first load
+      // (nothing to preserve); otherwise keep the last snapshot and let the next
+      // successful init / change event re-sync.
+      if (!state.isInitialized) {
+        commit('SET_SNAPSHOT', {})
+      }
     }
   },
 
@@ -149,24 +188,20 @@ export const actions = {
     if (state.subscriptionActive) {
       return
     }
-    const observable = apolloClient(this).subscribe({ query: PolicySubscription() })
-    observable.subscribe({
-      next({ data }) {
-        const event = data?.policyChanged
-        if (!event) return
-        try {
-          // Value-only notification: update the live snapshot. The last-change
-          // line is not updated live (it refreshes from policyDefaults on the
-          // next fetch) — the broadcast carries no actor/timestamp.
-          commit('PATCH_KEY', { key: event.key, value: JSON.parse(event.value) })
-        } catch (err) {
-          // Ignore malformed event payloads.
-        }
-      },
-      error() {
-        commit('SET_SUBSCRIPTION_ACTIVE', false)
-      },
-    })
-    commit('SET_SUBSCRIPTION_ACTIVE', true)
+    openPolicySubscription(this, commit)
+  },
+
+  // Re-open the subscription after a forced websocket restart (login / logout).
+  // restartWebsockets() drops the previous operation's handler, so the existing
+  // observable receives nothing — tear it down and open a fresh subscription on
+  // the new connection. Without this, live policy changes stop arriving after a
+  // client-side login until the user does a full page reload.
+  resubscribe({ commit }) {
+    if (policySubscription) {
+      policySubscription.unsubscribe?.()
+      policySubscription = null
+    }
+    commit('SET_SUBSCRIPTION_ACTIVE', false)
+    openPolicySubscription(this, commit)
   },
 }
