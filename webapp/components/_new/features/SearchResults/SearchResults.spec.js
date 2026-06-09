@@ -283,5 +283,17 @@ describe('SearchResults', () => {
       })
       expect(ctx.activeTab).toBe('Post')
     })
+
+    it('update() does not auto-select the Group tab when users also matched', () => {
+      // activeTab null and no posts, but users matched → groups must not win.
+      const ctx = { activeTab: null, postCount: 0, userCount: 2, groups: [], groupCount: 0 }
+      apollo.searchGroups.update.call(ctx, {
+        searchGroups: { groups: [{ id: 'g1' }], groupCount: 1 },
+      })
+      expect(ctx.activeTab).toBeNull()
+      // state is still mapped regardless of the tab decision
+      expect(ctx.groups).toEqual([{ id: 'g1' }])
+      expect(ctx.groupCount).toBe(1)
+    })
   })
 })
