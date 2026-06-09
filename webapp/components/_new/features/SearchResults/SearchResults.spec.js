@@ -275,6 +275,14 @@ describe('SearchResults', () => {
       })
     })
 
+    it.each([
+      ['', true],
+      [undefined, true],
+      ['berlin', false],
+    ])('skip() gates the query on a present search term (search=%s -> skip=%s)', (search, skip) => {
+      expect(apollo.searchGroups.skip.call({ search })).toBe(skip)
+    })
+
     it('update() maps groups + count and auto-selects the Group tab when only groups match', () => {
       const ctx = { activeTab: null, postCount: 0, userCount: 0, groups: [], groupCount: 0 }
       apollo.searchGroups.update.call(ctx, {
@@ -290,6 +298,23 @@ describe('SearchResults', () => {
       apollo.searchGroups.update.call(ctx, {
         searchGroups: { groups: [{ id: 'g1' }], groupCount: 1 },
       })
+      expect(ctx.activeTab).toBe('Post')
+    })
+
+    it.each([
+      ['null', { searchGroups: null }],
+      ['undefined', { searchGroups: undefined }],
+    ])('update() leaves existing state untouched on a %s response', (_label, data) => {
+      const ctx = {
+        activeTab: 'Post',
+        groups: [{ id: 'existing' }],
+        groupCount: 7,
+        postCount: 0,
+        userCount: 0,
+      }
+      apollo.searchGroups.update.call(ctx, data)
+      expect(ctx.groups).toEqual([{ id: 'existing' }])
+      expect(ctx.groupCount).toBe(7)
       expect(ctx.activeTab).toBe('Post')
     })
 
