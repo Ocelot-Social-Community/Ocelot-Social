@@ -474,8 +474,10 @@ describe('pages/profile/_id/_slug.vue — apollo', () => {
   const { apollo } = ProfileSlug
 
   describe('profilePagePosts query', () => {
-    it('wires the query to the profilePagePosts builder (localised via $i18n)', () => {
-      const i18n = { locale: () => 'en' }
+    it('wires the query to the profilePagePosts builder, threading the active locale', () => {
+      // Non-default locale ('de') so this also proves the live $i18n locale is
+      // injected — profilePagePosts('de') is a distinct cached document.
+      const i18n = { locale: () => 'de' }
       expect(apollo.profilePagePosts.query.call({ $i18n: i18n })).toBe(profilePagePosts(i18n))
     })
 

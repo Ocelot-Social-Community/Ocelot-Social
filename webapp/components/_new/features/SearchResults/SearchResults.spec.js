@@ -249,8 +249,11 @@ describe('SearchResults', () => {
   describe('searchGroups apollo wiring', () => {
     const { apollo } = SearchResults
 
-    it('wires the query to the searchGroups builder (localised via $i18n)', () => {
-      const i18n = { locale: () => 'en' }
+    it('wires the query to the searchGroups builder, threading the active locale', () => {
+      // A non-default locale ('de', not the 'en' fallback) makes this also prove
+      // the live $i18n locale is injected: searchGroups('de') is a different
+      // cached document (name(lang: "de")), so a hardcoded locale would not match.
+      const i18n = { locale: () => 'de' }
       expect(apollo.searchGroups.query.call({ $i18n: i18n })).toBe(searchGroups(i18n))
     })
 
