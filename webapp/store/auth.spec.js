@@ -247,10 +247,14 @@ describe('auth store', () => {
         const helpers = apolloHelpers()
         const commit = jest.fn()
         const dispatch = jest.fn().mockResolvedValue()
-        await actions.login.call(makeLoginThis(mutate, helpers), { commit, dispatch }, {
-          email: 'a@b.c',
-          password: 'pw',
-        })
+        await actions.login.call(
+          makeLoginThis(mutate, helpers),
+          { commit, dispatch },
+          {
+            email: 'a@b.c',
+            password: 'pw',
+          },
+        )
 
         expect(commit).toHaveBeenNthCalledWith(1, 'SET_PENDING', true)
         expect(mutate).toHaveBeenCalledWith(
@@ -272,10 +276,14 @@ describe('auth store', () => {
         const commit = jest.fn()
         const dispatch = jest.fn().mockResolvedValue()
         await expect(
-          actions.login.call(makeLoginThis(mutate, apolloHelpers()), { commit, dispatch }, {
-            email: 'a@b.c',
-            password: 'pw',
-          }),
+          actions.login.call(
+            makeLoginThis(mutate, apolloHelpers()),
+            { commit, dispatch },
+            {
+              email: 'a@b.c',
+              password: 'pw',
+            },
+          ),
         ).rejects.toThrow('no-cookie')
         expect(commit).toHaveBeenLastCalledWith('SET_PENDING', false)
       })
@@ -285,10 +293,14 @@ describe('auth store', () => {
         const commit = jest.fn()
         const dispatch = jest.fn().mockResolvedValue()
         await expect(
-          actions.login.call(makeLoginThis(mutate, apolloHelpers()), { commit, dispatch }, {
-            email: 'a@b.c',
-            password: 'wrong',
-          }),
+          actions.login.call(
+            makeLoginThis(mutate, apolloHelpers()),
+            { commit, dispatch },
+            {
+              email: 'a@b.c',
+              password: 'wrong',
+            },
+          ),
         ).rejects.toThrow('bad-credentials')
         // bailed out before persisting the session
         expect(commit).not.toHaveBeenCalledWith('SET_TOKEN', expect.anything())
