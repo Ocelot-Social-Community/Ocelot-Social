@@ -259,12 +259,15 @@ describe('actions', () => {
       expect(onLogout).toHaveBeenCalled()
     })
 
-    it('refetches the policy as anonymous so authenticated-only keys reset', () => {
-      expect(dispatch).toHaveBeenCalledWith('policy/init', null, { root: true })
-    })
-
-    it('re-subscribes the policy on the now-anonymous websocket', () => {
-      expect(dispatch).toHaveBeenCalledWith('policy/resubscribe', null, { root: true })
+    it('refetches the policy as anonymous, then re-subscribes — in that order', () => {
+      // Order matters: resubscribe re-opens the websocket subscription the
+      // logout restarted, and it must run after the anonymous policy/init has
+      // reset the snapshot. An exact ordered match guards against a regression
+      // that swaps the two.
+      expect(dispatch.mock.calls).toEqual([
+        ['policy/init', null, { root: true }],
+        ['policy/resubscribe', null, { root: true }],
+      ])
     })
   })
 })
