@@ -1,4 +1,5 @@
 import { internalPageMixins } from './internalPageMixins.js'
+import InternalPage from '~/components/_new/features/InternalPage/InternalPage.vue'
 
 jest.mock('~/constants/links.js', () => ({
   __esModule: true,
@@ -16,7 +17,7 @@ describe('internalPageMixins', () => {
   })
 
   it('declares the InternalPage component', () => {
-    expect(built.components.InternalPage).toBeDefined()
+    expect(built.components.InternalPage).toBe(InternalPage)
   })
 
   describe('head()', () => {
