@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import postListActions from './postListActions.js'
+import PostMutations from '~/graphql/PostMutations'
 
 // postListActions is a mixin whose methods rely on `this.$apollo`, `this.$t`,
 // `this.$toast`, and Vuex-mapped mutations. Mount it on a tiny no-template
@@ -53,13 +54,15 @@ describe('postListActions mixin', () => {
     ['pushPost', 'post.menu.pushedSuccessfully', {}],
     ['unpushPost', 'post.menu.unpushedSuccessfully', {}],
   ])('%s', (method, successKey, opts) => {
-    it('calls mutate, toasts success, refetches and (if applicable) updates the store', async () => {
+    it('calls mutate with the matching mutation, toasts success, refetches and (if applicable) updates the store', async () => {
       const { vm, mutate, success, ...spies } = makeVm()
       const refetch = jest.fn()
       vm[method]({ id: 'p1' }, refetch)
       await vm.$nextTick()
       await Promise.resolve()
-      expect(mutate).toHaveBeenCalledWith(expect.objectContaining({ variables: { id: 'p1' } }))
+      expect(mutate).toHaveBeenCalledWith(
+        expect.objectContaining({ mutation: PostMutations()[method], variables: { id: 'p1' } }),
+      )
       expect(success).toHaveBeenCalledWith(successKey)
       expect(refetch).toHaveBeenCalled()
       if (opts.storeAssert) {
@@ -91,7 +94,10 @@ describe('postListActions mixin', () => {
       await Promise.resolve()
       await Promise.resolve()
       expect(mutate).toHaveBeenCalledWith(
-        expect.objectContaining({ variables: { value: true, id: 'p1' } }),
+        expect.objectContaining({
+          mutation: PostMutations().toggleObservePost,
+          variables: { value: true, id: 'p1' },
+        }),
       )
       expect(success).toHaveBeenCalledWith('post.menu.observedSuccessfully')
       expect(refetch).toHaveBeenCalled()
@@ -103,7 +109,10 @@ describe('postListActions mixin', () => {
       await Promise.resolve()
       await Promise.resolve()
       expect(mutate).toHaveBeenCalledWith(
-        expect.objectContaining({ variables: { value: false, id: 'p1' } }),
+        expect.objectContaining({
+          mutation: PostMutations().toggleObservePost,
+          variables: { value: false, id: 'p1' },
+        }),
       )
       expect(success).toHaveBeenCalledWith('post.menu.unobservedSuccessfully')
     })
