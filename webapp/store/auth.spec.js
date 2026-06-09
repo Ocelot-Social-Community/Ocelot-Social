@@ -1,6 +1,15 @@
 import { state as createState, mutations, getters, actions } from './auth.js'
 import { VERSION } from '~/constants/terms-and-conditions-version.js'
 
+// auth.js instantiates `new Cookie()` at module load and reads the auth cookie
+// inside login(). Mock universal-cookie so we can drive that branch (cookie
+// present → success, cookie missing → 'no-cookie' throw). `get` reads the value
+// lazily so the mock survives the construction that happens during import.
+let mockCookieValue
+jest.mock('universal-cookie', () =>
+  jest.fn().mockImplementation(() => ({ get: () => mockCookieValue })),
+)
+
 const noop = () => {}
 
 describe('auth store', () => {
@@ -224,15 +233,81 @@ describe('auth store', () => {
       })
     })
 
-    describe('logout', () => {
-      it('resets user/token and calls onLogout', async () => {
+    describe('login', () => {
+      const makeLoginThis = (mutate, helpers) => ({
+        app: {
+          apolloProvider: { defaultClient: { mutate } },
+          $apolloHelpers: helpers,
+        },
+      })
+
+      it('runs the full happy path: mutate, onLogin, token, user, categories/policy, pending toggle', async () => {
+        mockCookieValue = 'cookie-present'
+        const mutate = jest.fn().mockResolvedValue({ data: { login: 'jwt' } })
+        const helpers = apolloHelpers()
         const commit = jest.fn()
+        const dispatch = jest.fn().mockResolvedValue()
+        await actions.login.call(makeLoginThis(mutate, helpers), { commit, dispatch }, {
+          email: 'a@b.c',
+          password: 'pw',
+        })
+
+        expect(commit).toHaveBeenNthCalledWith(1, 'SET_PENDING', true)
+        expect(mutate).toHaveBeenCalledWith(
+          expect.objectContaining({ variables: { email: 'a@b.c', password: 'pw' } }),
+        )
+        expect(helpers.onLogin).toHaveBeenCalledWith('jwt')
+        expect(commit).toHaveBeenCalledWith('SET_TOKEN', 'jwt')
+        expect(dispatch).toHaveBeenCalledWith('fetchCurrentUser')
+        expect(dispatch).toHaveBeenCalledWith('categories/init', null, { root: true })
+        expect(dispatch).toHaveBeenCalledWith('policy/init', null, { root: true })
+        expect(dispatch).toHaveBeenCalledWith('policy/resubscribe', null, { root: true })
+        // finally{} always clears pending
+        expect(commit).toHaveBeenLastCalledWith('SET_PENDING', false)
+      })
+
+      it('throws (and still clears pending) when the auth cookie is missing afterwards', async () => {
+        mockCookieValue = undefined
+        const mutate = jest.fn().mockResolvedValue({ data: { login: 'jwt' } })
+        const commit = jest.fn()
+        const dispatch = jest.fn().mockResolvedValue()
+        await expect(
+          actions.login.call(makeLoginThis(mutate, apolloHelpers()), { commit, dispatch }, {
+            email: 'a@b.c',
+            password: 'pw',
+          }),
+        ).rejects.toThrow('no-cookie')
+        expect(commit).toHaveBeenLastCalledWith('SET_PENDING', false)
+      })
+
+      it('throws (and still clears pending) when the login mutation fails', async () => {
+        const mutate = jest.fn().mockRejectedValue(new Error('bad-credentials'))
+        const commit = jest.fn()
+        const dispatch = jest.fn().mockResolvedValue()
+        await expect(
+          actions.login.call(makeLoginThis(mutate, apolloHelpers()), { commit, dispatch }, {
+            email: 'a@b.c',
+            password: 'wrong',
+          }),
+        ).rejects.toThrow('bad-credentials')
+        // bailed out before persisting the session
+        expect(commit).not.toHaveBeenCalledWith('SET_TOKEN', expect.anything())
+        expect(dispatch).not.toHaveBeenCalledWith('fetchCurrentUser')
+        expect(commit).toHaveBeenLastCalledWith('SET_PENDING', false)
+      })
+    })
+
+    describe('logout', () => {
+      it('resets user/token, calls onLogout and re-inits the anonymous policy', async () => {
+        const commit = jest.fn()
+        const dispatch = jest.fn().mockResolvedValue()
         const helpers = apolloHelpers('jwt')
-        const result = await actions.logout.call({ app: { $apolloHelpers: helpers } }, { commit })
+        await actions.logout.call({ app: { $apolloHelpers: helpers } }, { commit, dispatch })
         expect(commit).toHaveBeenCalledWith('SET_USER', null)
         expect(commit).toHaveBeenCalledWith('SET_TOKEN', null)
         expect(helpers.onLogout).toHaveBeenCalled()
-        expect(result).toBe('logged-out')
+        expect(dispatch).toHaveBeenCalledWith('policy/init', null, { root: true })
+        expect(dispatch).toHaveBeenCalledWith('policy/resubscribe', null, { root: true })
       })
     })
   })
