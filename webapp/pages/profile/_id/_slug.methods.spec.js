@@ -468,3 +468,31 @@ describe('pages/profile/_id/_slug.vue — computed', () => {
     })
   })
 })
+
+describe('pages/profile/_id/_slug.vue — apollo', () => {
+  const { apollo } = ProfileSlug
+
+  describe('profilePagePosts query', () => {
+    it('builds the profilePagePosts query localised via $i18n', () => {
+      const doc = apollo.profilePagePosts.query.call({ $i18n: { locale: () => 'en' } })
+      const op = doc.loc.source.body.replace(/\s+/g, ' ')
+      expect(op).toContain('profilePagePosts(filter: $filter, first: $first, offset: $offset')
+    })
+
+    it('derives variables from the active filter, page size and date ordering', () => {
+      const ctx = { filter: { author: { id: 'u1' } }, pageSize: 6 }
+      expect(apollo.profilePagePosts.variables.call(ctx)).toEqual({
+        filter: { author: { id: 'u1' } },
+        first: 6,
+        offset: 0,
+        orderBy: 'sortDate_desc',
+      })
+    })
+
+    it('update() writes the returned posts into component state', () => {
+      const ctx = { posts: [] }
+      apollo.profilePagePosts.update.call(ctx, { profilePagePosts: [{ id: 'p1' }] })
+      expect(ctx.posts).toEqual([{ id: 'p1' }])
+    })
+  })
+})

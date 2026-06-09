@@ -152,4 +152,31 @@ describe('PostIndex', () => {
       })
     })
   })
+
+  describe('Post apollo query (filterPosts wiring)', () => {
+    const { apollo } = PostIndex
+
+    it('builds the paginated filterPosts query', () => {
+      const op = apollo.Post.query().loc.source.body.replace(/\s+/g, ' ')
+      expect(op).toContain(
+        'Post(filter: $filter, first: $first, offset: $offset, orderBy: $orderBy)',
+      )
+    })
+
+    it('derives variables from the final filters, page size and ordering (pinned first)', () => {
+      const ctx = { finalFilters: { categoryId: 'cat1' }, pageSize: 12, orderBy: 'sortDate_desc' }
+      expect(apollo.Post.variables.call(ctx)).toEqual({
+        filter: { categoryId: 'cat1' },
+        first: 12,
+        orderBy: ['pinned_asc', 'sortDate_desc'],
+        offset: 0,
+      })
+    })
+
+    it('update() stores the returned posts', () => {
+      const ctx = { posts: [] }
+      apollo.Post.update.call(ctx, { Post: [{ id: 'p1' }] })
+      expect(ctx.posts).toEqual([{ id: 'p1' }])
+    })
+  })
 })

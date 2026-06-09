@@ -244,4 +244,43 @@ describe('SearchResults', () => {
       })
     })
   })
+
+  describe('searchGroups apollo wiring', () => {
+    const { apollo } = SearchResults
+
+    it('builds the searchGroups query localised via $i18n', () => {
+      const doc = apollo.searchGroups.query.call({ $i18n: { locale: () => 'en' } })
+      const op = doc.loc.source.body.replace(/\s+/g, ' ')
+      expect(op).toContain(
+        'searchGroups(query: $query, firstGroups: $firstGroups, groupsOffset: $groupsOffset)',
+      )
+    })
+
+    it('strips the leading search operator from the query variable', () => {
+      const ctx = { search: '#berlin', firstGroups: 5, groupsOffset: 0 }
+      expect(apollo.searchGroups.variables.call(ctx)).toEqual({
+        query: 'berlin',
+        firstGroups: 5,
+        groupsOffset: 0,
+      })
+    })
+
+    it('update() maps groups + count and auto-selects the Group tab when only groups match', () => {
+      const ctx = { activeTab: null, postCount: 0, userCount: 0, groups: [], groupCount: 0 }
+      apollo.searchGroups.update.call(ctx, {
+        searchGroups: { groups: [{ id: 'g1' }], groupCount: 1 },
+      })
+      expect(ctx.groups).toEqual([{ id: 'g1' }])
+      expect(ctx.groupCount).toBe(1)
+      expect(ctx.activeTab).toBe('Group')
+    })
+
+    it('update() leaves the active tab untouched when posts already matched', () => {
+      const ctx = { activeTab: 'Post', postCount: 3, userCount: 0, groups: [], groupCount: 0 }
+      apollo.searchGroups.update.call(ctx, {
+        searchGroups: { groups: [{ id: 'g1' }], groupCount: 1 },
+      })
+      expect(ctx.activeTab).toBe('Post')
+    })
+  })
 })
