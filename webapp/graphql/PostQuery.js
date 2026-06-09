@@ -87,43 +87,6 @@ export const filterPosts = () => {
   `
 }
 
-export const filterMapPosts = (i18n) => {
-  const lang = i18n.locale().toUpperCase()
-  return gql`
-    ${user}
-    ${userCounts}
-    ${location('User', lang)}
-    ${badges}
-    ${post}
-    ${postCounts}
-    ${tagsCategoriesAndPinned}
-
-    query Post($filter: _PostFilter, $first: Int, $offset: Int, $orderBy: [_PostOrdering]) {
-      Post(filter: $filter, first: $first, offset: $offset, orderBy: $orderBy) {
-        postType
-        eventStart
-        eventEnd
-        eventVenue
-        eventLocationName
-        eventLocation {
-          lng
-          lat
-        }
-        eventIsOnline
-        ...post
-        ...postCounts
-        ...tagsCategoriesAndPinned
-        author {
-          ...user
-          ...userCounts
-          ...locationOnUser
-          ...badges
-        }
-      }
-    }
-  `
-}
-
 export const profilePagePosts = (i18n) => {
   const lang = i18n.locale().toUpperCase()
   return gql`
@@ -154,52 +117,6 @@ export const profilePagePosts = (i18n) => {
           ...userCounts
           ...locationOnUser
           ...badges
-        }
-      }
-    }
-  `
-}
-
-export const PostsEmotionsByCurrentUser = () => {
-  return gql`
-    query PostsEmotionsByCurrentUser($postId: ID!) {
-      PostsEmotionsByCurrentUser(postId: $postId)
-    }
-  `
-}
-
-export const relatedContributions = (i18n) => {
-  const lang = i18n.locale().toUpperCase()
-  return gql`
-    ${user}
-    ${userCounts}
-    ${location('User', lang)}
-    ${badges}
-    ${post}
-    ${postCounts}
-    ${tagsCategoriesAndPinned}
-
-    query Post($slug: String!) {
-      Post(slug: $slug) {
-        ...post
-        ...postCounts
-        ...tagsCategoriesAndPinned
-        author {
-          ...user
-          ...userCounts
-          ...locationOnUser
-          ...badges
-        }
-        relatedContributions(first: 2) {
-          ...post
-          ...postCounts
-          ...tagsCategoriesAndPinned
-          author {
-            ...user
-            ...userCounts
-            ...locationOnUser
-            ...badges
-          }
         }
       }
     }
