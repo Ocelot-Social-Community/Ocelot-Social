@@ -13,6 +13,12 @@ jest.mock('universal-cookie', () =>
 const noop = () => {}
 
 describe('auth store', () => {
+  // Reset the shared cookie-mock state so each test starts deterministically
+  // (login tests set it explicitly; everything else gets a clean "no cookie").
+  beforeEach(() => {
+    mockCookieValue = undefined
+  })
+
   describe('initial state', () => {
     it('starts logged out', () => {
       expect(createState()).toEqual({ user: null, token: null, pending: false })
