@@ -384,7 +384,9 @@ export default {
         }
       },
       update({ Post }) {
-        this.posts = Post
+        // Keep `posts` an array even on a null/partial Apollo response — the
+        // template reads `posts.length` unguarded (skeleton + grid class).
+        this.posts = Post || []
       },
       fetchPolicy: 'cache-and-network',
     },

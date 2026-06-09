@@ -178,5 +178,17 @@ describe('PostIndex', () => {
       apollo.Post.update.call(ctx, { Post: [{ id: 'p1' }] })
       expect(ctx.posts).toEqual([{ id: 'p1' }])
     })
+
+    // The template reads `posts.length` unguarded, so update() must always
+    // leave an array behind even when Apollo yields a null/partial response.
+    it.each([
+      ['null', { Post: null }],
+      ['undefined', { Post: undefined }],
+      ['an empty response', {}],
+    ])('update() falls back to an empty array when Post is %s', (_label, data) => {
+      const ctx = { posts: [{ id: 'stale' }] }
+      apollo.Post.update.call(ctx, data)
+      expect(ctx.posts).toEqual([])
+    })
   })
 })
