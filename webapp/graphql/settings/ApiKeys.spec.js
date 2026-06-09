@@ -18,9 +18,9 @@ describe('graphql/settings/ApiKeys', () => {
 
   it('builds the createApiKey mutation with apiKey + secret return shape', () => {
     const op = printOp(createApiKeyMutation())
-    expect(op).toContain('createApiKey(name: $name, expiresInDays: $expiresInDays)')
-    expect(op).toContain('apiKey {')
-    expect(op).toContain('secret')
+    expect(op).toContain(
+      'createApiKey(name: $name, expiresInDays: $expiresInDays) { apiKey { id name keyPrefix createdAt expiresAt disabled } secret }',
+    )
   })
 
   it('builds the updateApiKey mutation with name return value', () => {
