@@ -175,11 +175,12 @@ describe('actions', () => {
         expect(commit.mock.calls).toEqual(expect.arrayContaining([['SET_TOKEN', token]]))
       })
 
-      it('fetches the user, initializes categories, and refetches the policy', () => {
+      it('fetches the user, initializes categories, refetches and re-subscribes the policy', () => {
         expect(dispatch.mock.calls).toEqual([
           ['fetchCurrentUser'],
           ['categories/init', null, { root: true }],
           ['policy/init', null, { root: true }],
+          ['policy/resubscribe', null, { root: true }],
         ])
       })
 
@@ -258,8 +259,15 @@ describe('actions', () => {
       expect(onLogout).toHaveBeenCalled()
     })
 
-    it('refetches the policy as anonymous so authenticated-only keys reset', () => {
-      expect(dispatch).toHaveBeenCalledWith('policy/init', null, { root: true })
+    it('refetches the policy as anonymous, then re-subscribes — in that order', () => {
+      // Order matters: resubscribe re-opens the websocket subscription the
+      // logout restarted, and it must run after the anonymous policy/init has
+      // reset the snapshot. An exact ordered match guards against a regression
+      // that swaps the two.
+      expect(dispatch.mock.calls).toEqual([
+        ['policy/init', null, { root: true }],
+        ['policy/resubscribe', null, { root: true }],
+      ])
     })
   })
 })
