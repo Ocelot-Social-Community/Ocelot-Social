@@ -105,6 +105,18 @@ describe('SelectUserSearch', () => {
       methods.onDelete.call(ctx, { target: { value: '   ' } })
       expect(ctx.query).toBe('')
     })
+
+    it('falls back to empty (and clears) when the event has no target', () => {
+      const ctx = {
+        query: 'foo',
+        user: { id: 'u1' },
+        users: [{ id: 'u1' }],
+        handleInput: methods.handleInput,
+        clear: methods.clear,
+      }
+      methods.onDelete.call(ctx, {})
+      expect(ctx).toMatchObject({ query: '', user: {}, users: [] })
+    })
   })
 
   describe('onSelect', () => {
