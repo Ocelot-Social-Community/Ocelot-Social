@@ -2,6 +2,7 @@ import { shallowMount, mount } from '@vue/test-utils'
 import PostIndex from './index.vue'
 import Vuex from 'vuex'
 import HashtagsFilter from '~/components/HashtagsFilter/HashtagsFilter'
+import { filterPosts } from '~/graphql/PostQuery.js'
 
 const localVue = global.localVue
 
@@ -156,11 +157,8 @@ describe('PostIndex', () => {
   describe('Post apollo query (filterPosts wiring)', () => {
     const { apollo } = PostIndex
 
-    it('builds the paginated filterPosts query', () => {
-      const op = apollo.Post.query().loc.source.body.replace(/\s+/g, ' ')
-      expect(op).toContain(
-        'Post(filter: $filter, first: $first, offset: $offset, orderBy: $orderBy)',
-      )
+    it('wires the Post query to the filterPosts builder', () => {
+      expect(apollo.Post.query()).toBe(filterPosts())
     })
 
     it('derives variables from the final filters, page size and ordering (pinned first)', () => {

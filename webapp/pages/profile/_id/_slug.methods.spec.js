@@ -14,6 +14,7 @@
 // methods/computed objects from the SFC module, which is supported in Jest
 // because the file's <script> exports a default options bag.
 import ProfileSlug from './_slug.vue'
+import { profilePagePosts } from '~/graphql/PostQuery.js'
 
 const { methods, computed } = ProfileSlug
 
@@ -473,10 +474,9 @@ describe('pages/profile/_id/_slug.vue — apollo', () => {
   const { apollo } = ProfileSlug
 
   describe('profilePagePosts query', () => {
-    it('builds the profilePagePosts query localised via $i18n', () => {
-      const doc = apollo.profilePagePosts.query.call({ $i18n: { locale: () => 'en' } })
-      const op = doc.loc.source.body.replace(/\s+/g, ' ')
-      expect(op).toContain('profilePagePosts(filter: $filter, first: $first, offset: $offset')
+    it('wires the query to the profilePagePosts builder (localised via $i18n)', () => {
+      const i18n = { locale: () => 'en' }
+      expect(apollo.profilePagePosts.query.call({ $i18n: i18n })).toBe(profilePagePosts(i18n))
     })
 
     it('derives variables from the active filter, page size and date ordering', () => {

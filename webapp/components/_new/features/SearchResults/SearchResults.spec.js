@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils'
 import Vuex from 'vuex'
 import SearchResults from './SearchResults'
+import { searchGroups } from '~/graphql/Search.js'
 import helpers from '~/storybook/helpers'
 
 helpers.init()
@@ -248,12 +249,9 @@ describe('SearchResults', () => {
   describe('searchGroups apollo wiring', () => {
     const { apollo } = SearchResults
 
-    it('builds the searchGroups query localised via $i18n', () => {
-      const doc = apollo.searchGroups.query.call({ $i18n: { locale: () => 'en' } })
-      const op = doc.loc.source.body.replace(/\s+/g, ' ')
-      expect(op).toContain(
-        'searchGroups(query: $query, firstGroups: $firstGroups, groupsOffset: $groupsOffset)',
-      )
+    it('wires the query to the searchGroups builder (localised via $i18n)', () => {
+      const i18n = { locale: () => 'en' }
+      expect(apollo.searchGroups.query.call({ $i18n: i18n })).toBe(searchGroups(i18n))
     })
 
     it('strips the leading search operator from the query variable', () => {
