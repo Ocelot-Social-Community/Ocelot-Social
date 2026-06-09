@@ -356,6 +356,28 @@ describe('policy store', () => {
         expect(innerSubscribe).toHaveBeenCalledTimes(2)
         expect(commit).toHaveBeenCalledWith('SET_SUBSCRIPTION_ACTIVE', true)
       })
+
+      it('opens a fresh subscription without crashing when there is no prior handle', () => {
+        // Recover flow: resubscribe may run before any subscribe (e.g. login on a
+        // client whose initial subscribe never fired). A fresh module instance
+        // guarantees the module-level handle starts null, so this exercises the
+        // "no handle to tear down" branch in isolation.
+        jest.isolateModules(() => {
+          const { actions: freshActions } = require('./policy')
+          const innerSubscribe = jest.fn(() => ({ unsubscribe: jest.fn() }))
+          const clientSubscribe = jest.fn(() => ({ subscribe: innerSubscribe }))
+
+          expect(() =>
+            freshActions.resubscribe.bind({
+              app: { apolloProvider: { defaultClient: { subscribe: clientSubscribe } } },
+            })({ commit }),
+          ).not.toThrow()
+
+          expect(innerSubscribe).toHaveBeenCalledTimes(1)
+          expect(commit).toHaveBeenCalledWith('SET_SUBSCRIPTION_ACTIVE', false)
+          expect(commit).toHaveBeenCalledWith('SET_SUBSCRIPTION_ACTIVE', true)
+        })
+      })
     })
   })
 })
