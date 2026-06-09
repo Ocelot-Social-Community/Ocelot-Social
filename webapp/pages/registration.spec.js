@@ -328,6 +328,32 @@ describe('Registration', () => {
       })
     })
 
+    describe('live policy change (reactivity)', () => {
+      it('remounts the slider to the new registration mode when the policy flips', async () => {
+        // Reactive $policy so a change propagates through the registrationType
+        // computed exactly like the real Vuex-backed $policy does.
+        const policyState = Vue.observable({
+          publicRegistration: false,
+          inviteRegistration: false,
+        })
+        mocks.$policy = { get: (key) => policyState[key] }
+        mocks.$route.query = {}
+        wrapper = await Wrapper()
+
+        // Everything off → the "no public registration" slide.
+        expect(wrapper.find('.hc-empty').exists()).toBe(true)
+        expect(wrapper.find('.enter-email').exists()).toBe(false)
+
+        // Admin enables public registration live; the slider must follow without
+        // a page reload (relies on the :key remount in registration.vue).
+        policyState.publicRegistration = true
+        await Vue.nextTick()
+
+        expect(wrapper.find('.enter-email').exists()).toBe(true)
+        expect(wrapper.find('.hc-empty').exists()).toBe(false)
+      })
+    })
+
     it('renders', async () => {
       wrapper = await Wrapper()
       expect(wrapper.find('.registration-slider')).toBeTruthy()

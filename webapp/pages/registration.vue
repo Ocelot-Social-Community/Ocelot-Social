@@ -1,6 +1,14 @@
 <template>
   <div class="registration-page">
+    <!--
+      Keyed on the registration method so a live policy change (admin toggling
+      publicRegistration / inviteRegistration) remounts the slider: it derives
+      its slide set once in data() from registrationType, so without a fresh
+      mount the form would stay frozen on the previous mode. A mode switch is
+      exactly when resetting any in-progress input is the correct behaviour.
+    -->
     <registration-slider
+      :key="registrationType.method"
       :registrationType="registrationType.method"
       :activePage="registrationType.activePage"
       :overwriteSliderData="overwriteSliderData"
