@@ -109,10 +109,13 @@ describe('auth store', () => {
         const previousServer = process.server
         process.server = false
         try {
-          await actions.init.call({ app: { $apolloHelpers: apolloHelpers('jwt') } }, {
-            commit,
-            dispatch,
-          })
+          await actions.init.call(
+            { app: { $apolloHelpers: apolloHelpers('jwt') } },
+            {
+              commit,
+              dispatch,
+            },
+          )
         } finally {
           process.server = previousServer
         }
@@ -126,10 +129,13 @@ describe('auth store', () => {
         const previousServer = process.server
         process.server = true
         try {
-          await actions.init.call({ app: { $apolloHelpers: apolloHelpers(null) } }, {
-            commit,
-            dispatch,
-          })
+          await actions.init.call(
+            { app: { $apolloHelpers: apolloHelpers(null) } },
+            {
+              commit,
+              dispatch,
+            },
+          )
         } finally {
           process.server = previousServer
         }
@@ -142,10 +148,13 @@ describe('auth store', () => {
         const previousServer = process.server
         process.server = true
         try {
-          await actions.init.call({ app: { $apolloHelpers: apolloHelpers('jwt') } }, {
-            commit,
-            dispatch,
-          })
+          await actions.init.call(
+            { app: { $apolloHelpers: apolloHelpers('jwt') } },
+            {
+              commit,
+              dispatch,
+            },
+          )
         } finally {
           process.server = previousServer
         }
@@ -162,7 +171,10 @@ describe('auth store', () => {
           dispatch,
           getters: { isLoggedIn: false },
         }
-        const result = await actions.check.call({ app: { $apolloHelpers: apolloHelpers(null) } }, ctx)
+        const result = await actions.check.call(
+          { app: { $apolloHelpers: apolloHelpers(null) } },
+          ctx,
+        )
         expect(dispatch).toHaveBeenCalledWith('logout')
         expect(result).toBe(false)
       })
@@ -174,7 +186,10 @@ describe('auth store', () => {
           dispatch,
           getters: { isLoggedIn: true },
         }
-        const result = await actions.check.call({ app: { $apolloHelpers: apolloHelpers('jwt') } }, ctx)
+        const result = await actions.check.call(
+          { app: { $apolloHelpers: apolloHelpers('jwt') } },
+          ctx,
+        )
         expect(dispatch).not.toHaveBeenCalled()
         expect(result).toBe(true)
       })

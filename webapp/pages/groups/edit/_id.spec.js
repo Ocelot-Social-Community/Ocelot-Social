@@ -7,7 +7,9 @@ localVue.use(Vuex)
 
 const Stub = (name, slot = false) => ({
   name,
-  template: slot ? `<div class="stub-${name.toLowerCase()}"><slot /></div>` : `<div class="stub-${name.toLowerCase()}" />`,
+  template: slot
+    ? `<div class="stub-${name.toLowerCase()}"><slot /></div>`
+    : `<div class="stub-${name.toLowerCase()}" />`,
 })
 
 const stubs = {

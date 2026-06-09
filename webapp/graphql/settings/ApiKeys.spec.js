@@ -11,7 +11,9 @@ describe('graphql/settings/ApiKeys', () => {
   it('builds the myApiKeys query with all fields', () => {
     const op = printOp(myApiKeysQuery())
     expect(op).toContain('myApiKeys {')
-    expect(op).toMatch(/id\s+name\s+keyPrefix\s+createdAt\s+lastUsedAt\s+expiresAt\s+disabled\s+disabledAt/)
+    expect(op).toMatch(
+      /id\s+name\s+keyPrefix\s+createdAt\s+lastUsedAt\s+expiresAt\s+disabled\s+disabledAt/,
+    )
   })
 
   it('builds the createApiKey mutation with apiKey + secret return shape', () => {

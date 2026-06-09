@@ -256,7 +256,11 @@ describe('pages/profile/_id/_slug.vue — methods', () => {
   })
 
   describe('toggleFollow', () => {
-    const buildCtx = ({ followed, isFollowing = false, optimisticResult = { success: true } } = {}) => {
+    const buildCtx = ({
+      followed,
+      isFollowing = false,
+      optimisticResult = { success: true },
+    } = {}) => {
       const baseUser = {
         id: 'u9',
         followedByCount: followed ? 5 : 4,

@@ -59,9 +59,7 @@ describe('postListActions mixin', () => {
       vm[method]({ id: 'p1' }, refetch)
       await vm.$nextTick()
       await Promise.resolve()
-      expect(mutate).toHaveBeenCalledWith(
-        expect.objectContaining({ variables: { id: 'p1' } }),
-      )
+      expect(mutate).toHaveBeenCalledWith(expect.objectContaining({ variables: { id: 'p1' } }))
       expect(success).toHaveBeenCalledWith(successKey)
       expect(refetch).toHaveBeenCalled()
       if (opts.storeAssert) {

@@ -3,7 +3,10 @@ import Index from './index.vue'
 
 const localVue = createLocalVue()
 
-const Stub = (name) => ({ name, template: `<div class="stub-${name.toLowerCase()}"><slot /></div>` })
+const Stub = (name) => ({
+  name,
+  template: `<div class="stub-${name.toLowerCase()}"><slot /></div>`,
+})
 
 const stubs = {
   OsCard: Stub('OsCard'),

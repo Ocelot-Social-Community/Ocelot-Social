@@ -4,6 +4,8 @@
 // Fragment/Slice/Plugin constructors (which expect properly typed Nodes),
 // we mock them with cooperative test doubles.
 
+import pasteRule from './pasteRule'
+
 jest.mock('prosemirror-state', () => ({
   // Plugin just stashes its spec so we can introspect it.
   Plugin: function (spec) {
@@ -17,8 +19,6 @@ jest.mock('prosemirror-model', () => ({
     return { content, openStart, openEnd }
   },
 }))
-
-import pasteRule from './pasteRule'
 
 const textNode = (text) => ({
   isText: true,
