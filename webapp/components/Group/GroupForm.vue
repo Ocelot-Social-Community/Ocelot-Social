@@ -150,7 +150,8 @@
             variant="primary"
             appearance="filled"
             type="submit"
-            :disabled="checkFormError(formErrors)"
+            :loading="loading"
+            :disabled="loading || checkFormError(formErrors)"
           >
             <template #icon><os-icon :icon="icons.save" /></template>
             {{ update ? $t('group.update') : $t('group.save') }}
@@ -209,10 +210,19 @@ export default {
     const initialCategoryIds = categories ? categories.map((category) => category.id) : []
     return {
       disabled: false,
+      loading: false,
       groupTypeOptions: ['public', 'closed', 'hidden'],
       loadingGeo: false,
       cities: [],
       initialCategoryIds,
+      savedBaseline: {
+        name: name || '',
+        slug: slug || '',
+        about: about || '',
+        description: description || '',
+        actionRadius: actionRadius || '',
+        locationName: locationName || '',
+      },
       formData: {
         name: name || '',
         slug: slug || '',
@@ -273,8 +283,7 @@ export default {
       return this.$filters.removeHtml(this.formData.description).length
     },
     sameLocation() {
-      const dbLocationName = this.group.locationName || ''
-      return dbLocationName === this.formLocationName
+      return this.savedBaseline.locationName === this.formLocationName
     },
     sameCategories() {
       if (this.initialCategoryIds.length !== this.formData.categoryIds.length) return false
@@ -283,11 +292,11 @@ export default {
     disableButtonByUpdate() {
       if (!this.update) return true
       return (
-        this.group.name === this.formData.name &&
-        this.group.slug === this.formData.slug &&
-        this.group.about === this.formData.about &&
-        this.group.description === this.formData.description &&
-        this.group.actionRadius === this.formData.actionRadius &&
+        this.savedBaseline.name === this.formData.name &&
+        this.savedBaseline.slug === this.formData.slug &&
+        this.savedBaseline.about === this.formData.about &&
+        this.savedBaseline.description === this.formData.description &&
+        this.savedBaseline.actionRadius === this.formData.actionRadius &&
         this.sameLocation &&
         this.sameCategories
       )
@@ -318,6 +327,7 @@ export default {
       this.formSubmit(this.submit)
     },
     submit() {
+      this.loading = true
       const { name, slug, about, description, groupType, actionRadius, categoryIds } = this.formData
       const variables = {
         name,
@@ -329,12 +339,23 @@ export default {
         locationName: this.formLocationName,
         categoryIds,
       }
+      const done = (success) => {
+        this.loading = false
+        if (success) {
+          this.savedBaseline = {
+            name: this.formData.name,
+            slug: this.formData.slug,
+            about: this.formData.about,
+            description: this.formData.description,
+            actionRadius: this.formData.actionRadius,
+            locationName: this.formLocationName,
+          }
+          this.initialCategoryIds = [...this.formData.categoryIds]
+        }
+      }
       this.update
-        ? this.$emit('updateGroup', {
-            ...variables,
-            id: this.group.id,
-          })
-        : this.$emit('createGroup', variables)
+        ? this.$emit('updateGroup', { ...variables, id: this.group.id }, done)
+        : this.$emit('createGroup', variables, done)
     },
   },
 }
