@@ -16,8 +16,13 @@ type PolicyLastChange {
 type Policy {
   publicRegistration: Boolean!
   inviteRegistration: Boolean!
+  askForRealName: Boolean!
+  requireLocation: Boolean!
   categoriesActive: Boolean!
+  badgesEnabled: Boolean!
   apiKeysEnabled: Boolean
+  apiKeysMaxPerUser: Int
+  maxGroupPinnedPosts: Int
 }
 
 type PolicyChangeEvent {

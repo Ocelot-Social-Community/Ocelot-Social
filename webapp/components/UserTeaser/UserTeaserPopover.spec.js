@@ -75,9 +75,7 @@ describe('UserTeaserPopover', () => {
       },
       mocks: {
         $t: jest.fn((t) => t),
-        $env: {
-          BADGES_ENABLED: badgesEnabled,
-        },
+        $policy: { get: (key) => (key === 'badgesEnabled' ? badgesEnabled : false) },
       },
     })
   }

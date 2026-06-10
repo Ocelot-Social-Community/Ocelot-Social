@@ -143,9 +143,14 @@
       "description": "Runtime configuration. Changes apply immediately for all connected clients.",
       "descriptions": {
         "apiKeysEnabled": "Let users create personal API keys for programmatic backend access. Affects the API keys section in user settings.",
+        "apiKeysMaxPerUser": "Maximum number of active API keys a single user may hold at once.",
+        "askForRealName": "Ask new users for their real (given and family) name during registration instead of a single display name.",
+        "badgesEnabled": "Enable the badges feature: badges are shown on profiles and teasers and can be managed in the admin area.",
         "categoriesActive": "Enable topic categories for posts and groups so content can be classified and filtered. Requires at least one category to exist.",
         "inviteRegistration": "Let existing members invite new users via invite codes. When off, invite codes cannot be redeemed to sign up.",
-        "publicRegistration": "Allow anyone to create an account directly, without an invite code. When off, new users can only join via an invitation."
+        "maxGroupPinnedPosts": "Maximum number of posts that can be pinned within a group. Set to 0 to disable pinning in groups.",
+        "publicRegistration": "Allow anyone to create an account directly, without an invite code. When off, new users can only join via an invitation.",
+        "requireLocation": "Make a location mandatory during registration and in profile settings."
       },
       "groups": {
         "features": {
@@ -157,9 +162,14 @@
       },
       "keys": {
         "apiKeysEnabled": "API keys",
+        "apiKeysMaxPerUser": "Max. API keys per user",
+        "askForRealName": "Ask for real name",
+        "badgesEnabled": "Badges",
         "categoriesActive": "Categories",
         "inviteRegistration": "Invite registration",
-        "publicRegistration": "Open registration"
+        "maxGroupPinnedPosts": "Max. pinned posts per group",
+        "publicRegistration": "Open registration",
+        "requireLocation": "Require location"
       },
       "lastUpdated": "Last changed: {timestamp} by {actor}",
       "name": "Network policy",

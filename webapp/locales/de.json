@@ -143,9 +143,14 @@
       "description": "Laufzeit-Konfiguration. Änderungen wirken sofort für alle verbundenen Clients.",
       "descriptions": {
         "apiKeysEnabled": "Ermöglicht Nutzern, persönliche API-Schlüssel für den programmatischen Zugriff aufs Backend zu erstellen. Betrifft den API-Schlüssel-Bereich in den Nutzereinstellungen.",
+        "apiKeysMaxPerUser": "Maximale Anzahl aktiver API-Schlüssel, die ein einzelner Nutzer gleichzeitig besitzen darf.",
+        "askForRealName": "Fragt neue Nutzer bei der Registrierung nach ihrem echten Vor- und Nachnamen statt nach einem einzelnen Anzeigenamen.",
+        "badgesEnabled": "Aktiviert die Badge-Funktion: Badges werden auf Profilen und Teasern angezeigt und können im Admin-Bereich verwaltet werden.",
         "categoriesActive": "Aktiviert Themen-Kategorien für Beiträge und Gruppen, damit Inhalte eingeordnet und gefiltert werden können. Erfordert mindestens eine angelegte Kategorie.",
         "inviteRegistration": "Erlaubt bestehenden Mitgliedern, neue Nutzer per Einladungscode einzuladen. Ist dies aus, können Codes nicht zur Registrierung eingelöst werden.",
-        "publicRegistration": "Erlaubt es jedem, direkt ein Konto zu erstellen – ohne Einladungscode. Ist dies aus, können neue Nutzer nur per Einladung beitreten."
+        "maxGroupPinnedPosts": "Maximale Anzahl an Beiträgen, die innerhalb einer Gruppe angepinnt werden können. 0 deaktiviert das Anpinnen in Gruppen.",
+        "publicRegistration": "Erlaubt es jedem, direkt ein Konto zu erstellen – ohne Einladungscode. Ist dies aus, können neue Nutzer nur per Einladung beitreten.",
+        "requireLocation": "Macht die Angabe eines Ortes bei der Registrierung und in den Profileinstellungen verpflichtend."
       },
       "groups": {
         "features": {
@@ -157,9 +162,14 @@
       },
       "keys": {
         "apiKeysEnabled": "API-Schlüssel",
+        "apiKeysMaxPerUser": "Max. API-Schlüssel pro Nutzer",
+        "askForRealName": "Nach echtem Namen fragen",
+        "badgesEnabled": "Badges",
         "categoriesActive": "Kategorien",
         "inviteRegistration": "Registrierung per Einladung",
-        "publicRegistration": "Offene Registrierung"
+        "maxGroupPinnedPosts": "Max. angepinnte Beiträge pro Gruppe",
+        "publicRegistration": "Offene Registrierung",
+        "requireLocation": "Ort verpflichtend"
       },
       "lastUpdated": "Zuletzt geändert: {timestamp} von {actor}",
       "name": "Netzwerk-Konfiguration",

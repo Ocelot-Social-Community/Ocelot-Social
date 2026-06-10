@@ -20,7 +20,8 @@ import type { Context } from '@src/context'
 let authenticatedUser: Context['user']
 const context = () => ({
   authenticatedUser,
-  config: { API_KEYS_ENABLED: true, API_KEYS_MAX_PER_USER: 3 },
+  config: { API_KEYS_ENABLED: true },
+  policy: { apiKeysMaxPerUser: 3 },
 })
 let query: ApolloTestSetup['query']
 let mutate: ApolloTestSetup['mutate']
@@ -159,7 +160,8 @@ describe('createApiKey', () => {
       authenticatedUser = (await user.toJson()) as Context['user']
       const contextDisabled = () => ({
         authenticatedUser,
-        config: { API_KEYS_ENABLED: false, API_KEYS_MAX_PER_USER: 5 },
+        config: { API_KEYS_ENABLED: false },
+        policy: { apiKeysMaxPerUser: 5 },
       })
       const setup = await createApolloTestSetup({ context: contextDisabled })
       const { errors } = await setup.mutate({

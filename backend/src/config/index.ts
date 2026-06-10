@@ -165,11 +165,7 @@ const options = {
   MAX_PINNED_POSTS: Number.isNaN(Number(process.env.MAX_PINNED_POSTS))
     ? 1
     : Number(process.env.MAX_PINNED_POSTS),
-  MAX_GROUP_PINNED_POSTS: Number.isNaN(Number(process.env.MAX_GROUP_PINNED_POSTS))
-    ? 1
-    : Number(process.env.MAX_GROUP_PINNED_POSTS),
   API_KEYS_ENABLED: env.API_KEYS_ENABLED === 'true',
-  API_KEYS_MAX_PER_USER: (env.API_KEYS_MAX_PER_USER && parseInt(env.API_KEYS_MAX_PER_USER)) || 5,
 }
 
 const language = {

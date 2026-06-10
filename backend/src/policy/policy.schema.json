@@ -20,6 +20,20 @@
       "x-envSeed": "INVITE_REGISTRATION",
       "description": "Whether registration via invite code is enabled."
     },
+    "askForRealName": {
+      "type": "boolean",
+      "default": false,
+      "x-visibility": ["public"],
+      "x-envSeed": "ASK_FOR_REAL_NAME",
+      "description": "Whether registration asks for the user's real (given / family) name. Read during anonymous registration, so visible to 'public'."
+    },
+    "requireLocation": {
+      "type": "boolean",
+      "default": false,
+      "x-visibility": ["public"],
+      "x-envSeed": "REQUIRE_LOCATION",
+      "description": "Whether a location is mandatory on registration and in profile settings. Read during anonymous registration, so visible to 'public'."
+    },
     "categoriesActive": {
       "type": "boolean",
       "default": false,
@@ -27,13 +41,44 @@
       "x-envSeed": "CATEGORIES_ACTIVE",
       "description": "Whether the categories feature for posts and groups is active."
     },
+    "badgesEnabled": {
+      "type": "boolean",
+      "default": false,
+      "x-visibility": ["public"],
+      "x-envSeed": "BADGES_ENABLED",
+      "description": "Whether the badges feature is enabled (badges shown on profiles / teasers and managed in admin). Shown on publicly visible profiles, so visible to 'public'."
+    },
     "apiKeysEnabled": {
       "type": "boolean",
       "default": false,
       "x-visibility": ["authenticated"],
       "x-envSeed": "API_KEYS_ENABLED",
       "description": "Whether API keys functionality (personal keys for backend access) is enabled. Only relevant to logged-in users (Settings / Admin), so visible to 'authenticated' (and admin)."
+    },
+    "apiKeysMaxPerUser": {
+      "type": "integer",
+      "default": 5,
+      "x-visibility": ["authenticated"],
+      "x-envSeed": "API_KEYS_MAX_PER_USER",
+      "description": "Maximum number of active API keys a single user may hold. Only relevant to logged-in users (Settings), so visible to 'authenticated' (and admin)."
+    },
+    "maxGroupPinnedPosts": {
+      "type": "integer",
+      "default": 1,
+      "x-visibility": ["authenticated"],
+      "x-envSeed": "MAX_GROUP_PINNED_POSTS",
+      "description": "Maximum number of posts that can be pinned within a group (0 disables pinning). Only relevant to logged-in users, so visible to 'authenticated' (and admin)."
     }
   },
-  "required": ["publicRegistration", "inviteRegistration", "categoriesActive", "apiKeysEnabled"]
+  "required": [
+    "publicRegistration",
+    "inviteRegistration",
+    "askForRealName",
+    "requireLocation",
+    "categoriesActive",
+    "badgesEnabled",
+    "apiKeysEnabled",
+    "apiKeysMaxPerUser",
+    "maxGroupPinnedPosts"
+  ]
 }

@@ -528,14 +528,15 @@ export default {
       if (!context.user) {
         throw new Error('Missing authenticated user.')
       }
-      const { config } = context
+      const { policy } = context
+      const maxGroupPinnedPosts = policy.get('maxGroupPinnedPosts')
 
-      if (config.MAX_GROUP_PINNED_POSTS === 0) {
+      if (maxGroupPinnedPosts === 0) {
         throw new Error('Pinned posts are not allowed!')
       }
 
-      // If MAX_GROUP_PINNED_POSTS === 1 -> Delete old pin
-      if (config.MAX_GROUP_PINNED_POSTS === 1) {
+      // If maxGroupPinnedPosts === 1 -> Delete old pin
+      if (maxGroupPinnedPosts === 1) {
         await context.database.write({
           query: `
           MATCH (post:Post {id: $params.id})-[:IN]->(group:Group)
@@ -544,7 +545,7 @@ export default {
           DELETE pinned`,
           variables: { user: context.user, params },
         })
-        // If MAX_GROUP_PINNED_POSTS !== 1 -> Check if max is reached
+        // If maxGroupPinnedPosts !== 1 -> Check if max is reached
       } else {
         const result = await context.database.query({
           query: `
@@ -553,7 +554,7 @@ export default {
           RETURN toString(count(pinnedPosts)) as count`,
           variables: { user: context.user, params },
         })
-        if (result.records[0].get('count') >= config.MAX_GROUP_PINNED_POSTS) {
+        if (result.records[0].get('count') >= maxGroupPinnedPosts) {
           throw new Error('Reached maxed pinned posts already. Unpin a post first.')
         }
       }

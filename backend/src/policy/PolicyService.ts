@@ -31,7 +31,7 @@ import {
 import { allKeys, canView, defaultFor, envSeedFor, typeFor } from './schema'
 
 import type { PolicyViewer } from './schema'
-import type { NetworkPolicy, PolicyKey } from './types'
+import type { NetworkPolicy, PolicyKey, PolicyValue } from './types'
 
 type DbContext = ReturnType<typeof databaseContext>
 
@@ -118,7 +118,7 @@ export class PolicyService {
       const existing = dbValues[key]
       // Adopt a stored value only if it still matches the schema type.
       if (existing !== undefined && this.typeMatches(key, existing)) {
-        this.cache[key] = existing as NetworkPolicy[PolicyKey]
+        this.cache[key] = existing as never
         continue
       }
       // Missing, or present with a wrong type (out-of-band edit / un-migrated type
@@ -141,7 +141,7 @@ export class PolicyService {
       // (The DB row itself could be clobbered by the seed in that boot-window race,
       // but the cache stays correct and the next change re-syncs the DB; a policy
       // change coinciding with this instance's boot is vanishingly rare.)
-      this.cache[key] ??= seedValue as NetworkPolicy[PolicyKey]
+      this.cache[key] ??= seedValue as never
     }
 
     // Most recent change (who + when) for the admin UI. Read from the DB after
@@ -173,8 +173,8 @@ export class PolicyService {
   // middleware rejects); keys the viewer may not see are explicitly `null`.
   // Visibility is decided by canView() — the single source of truth shared with
   // the subscription filter.
-  getVisibleSnapshot(user: PolicyViewer | null | undefined): Record<PolicyKey, boolean | null> {
-    const out = {} as Record<PolicyKey, boolean | null>
+  getVisibleSnapshot(user: PolicyViewer | null | undefined): Record<PolicyKey, PolicyValue | null> {
+    const out = {} as Record<PolicyKey, PolicyValue | null>
     for (const key of allKeys()) {
       out[key] = canView(key, user) ? this.get(key) : null
     }
@@ -192,8 +192,8 @@ export class PolicyService {
 
   // Defaults as visible to a viewer — same canView scoping as getVisibleSnapshot
   // (admins see every key; non-visible keys are null).
-  getVisibleDefaults(user: PolicyViewer | null | undefined): Record<PolicyKey, boolean | null> {
-    const out = {} as Record<PolicyKey, boolean | null>
+  getVisibleDefaults(user: PolicyViewer | null | undefined): Record<PolicyKey, PolicyValue | null> {
+    const out = {} as Record<PolicyKey, PolicyValue | null>
     for (const key of allKeys()) {
       out[key] = canView(key, user) ? this.getDefault(key) : null
     }
@@ -234,7 +234,7 @@ export class PolicyService {
     await deleteSetting(this.db, POLICY_NAMESPACE, key)
 
     const newValue = this.getDefault(key)
-    this.cache[key] = newValue
+    this.cache[key] = newValue as never
 
     const event: PolicyChangeEvent = {
       key,

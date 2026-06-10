@@ -143,9 +143,14 @@
       "description": "Konfigurim në kohë reale. Ndryshimet aplikohen menjëherë për të gjithë klientët e lidhur.",
       "descriptions": {
         "apiKeysEnabled": "Lejon përdoruesit të krijojnë çelësa API personalë për qasje programatike në backend. Prek seksionin e çelësave API te cilësimet e përdoruesit.",
+        "apiKeysMaxPerUser": "Numri maksimal i çelësave API aktivë që një përdorues i vetëm mund të ketë njëkohësisht.",
+        "askForRealName": "U kërkon përdoruesve të rinj emrin e tyre të vërtetë (emri dhe mbiemri) gjatë regjistrimit, në vend të një emri të vetëm shfaqjeje.",
+        "badgesEnabled": "Aktivizon funksionin e stemave: stemat shfaqen në profile dhe parapamje dhe mund të menaxhohen në zonën e administrimit.",
         "categoriesActive": "Aktivizon kategoritë tematike për postimet dhe grupet, për të klasifikuar dhe filtruar përmbajtjen. Kërkon të paktën një kategori.",
         "inviteRegistration": "Lejon anëtarët ekzistues të ftojnë përdorues të rinj me kode ftese. Kur është joaktive, kodet e ftesës nuk mund të përdoren për regjistrim.",
-        "publicRegistration": "Lejon këdo të krijojë një llogari drejtpërdrejt, pa kod ftese. Kur është joaktive, përdoruesit e rinj mund të bashkohen vetëm me ftesë."
+        "maxGroupPinnedPosts": "Numri maksimal i postimeve që mund të fiksohen brenda një grupi. Vendos 0 për të çaktivizuar fiksimin në grupe.",
+        "publicRegistration": "Lejon këdo të krijojë një llogari drejtpërdrejt, pa kod ftese. Kur është joaktive, përdoruesit e rinj mund të bashkohen vetëm me ftesë.",
+        "requireLocation": "E bën të detyrueshme një vendndodhje gjatë regjistrimit dhe në cilësimet e profilit."
       },
       "groups": {
         "features": {
@@ -157,9 +162,14 @@
       },
       "keys": {
         "apiKeysEnabled": "Çelësat API",
+        "apiKeysMaxPerUser": "Maks. çelësa API për përdorues",
+        "askForRealName": "Kërko emrin e vërtetë",
+        "badgesEnabled": "Stema",
         "categoriesActive": "Kategoritë",
         "inviteRegistration": "Regjistrim me ftesë",
-        "publicRegistration": "Regjistrim i hapur"
+        "maxGroupPinnedPosts": "Maks. postime të fiksuara për grup",
+        "publicRegistration": "Regjistrim i hapur",
+        "requireLocation": "Vendndodhja e detyrueshme"
       },
       "lastUpdated": "Ndryshuar së fundi: {timestamp} nga {actor}",
       "name": "Politika e rrjetit",

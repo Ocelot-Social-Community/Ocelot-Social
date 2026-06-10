@@ -143,9 +143,14 @@
       "description": "Configurazione runtime. Le modifiche si applicano immediatamente a tutti i client connessi.",
       "descriptions": {
         "apiKeysEnabled": "Consente agli utenti di creare chiavi API personali per l'accesso programmatico al backend. Riguarda la sezione chiavi API nelle impostazioni utente.",
+        "apiKeysMaxPerUser": "Numero massimo di chiavi API attive che un singolo utente può avere contemporaneamente.",
+        "askForRealName": "Chiede ai nuovi utenti il loro nome reale (nome e cognome) durante la registrazione invece di un singolo nome visualizzato.",
+        "badgesEnabled": "Abilita la funzione badge: i badge vengono mostrati su profili e anteprime e possono essere gestiti nell'area di amministrazione.",
         "categoriesActive": "Attiva le categorie tematiche per post e gruppi, per classificare e filtrare i contenuti. Richiede almeno una categoria.",
         "inviteRegistration": "Consente ai membri esistenti di invitare nuovi utenti tramite codici di invito. Se disattivato, i codici di invito non possono essere usati per registrarsi.",
-        "publicRegistration": "Consente a chiunque di creare un account direttamente, senza codice di invito. Se disattivato, i nuovi utenti possono iscriversi solo tramite invito."
+        "maxGroupPinnedPosts": "Numero massimo di post che possono essere fissati all'interno di un gruppo. Imposta 0 per disabilitare il fissaggio nei gruppi.",
+        "publicRegistration": "Consente a chiunque di creare un account direttamente, senza codice di invito. Se disattivato, i nuovi utenti possono iscriversi solo tramite invito.",
+        "requireLocation": "Rende obbligatoria una posizione durante la registrazione e nelle impostazioni del profilo."
       },
       "groups": {
         "features": {
@@ -157,9 +162,14 @@
       },
       "keys": {
         "apiKeysEnabled": "Chiavi API",
+        "apiKeysMaxPerUser": "Max. chiavi API per utente",
+        "askForRealName": "Chiedi il nome reale",
+        "badgesEnabled": "Badge",
         "categoriesActive": "Categorie",
         "inviteRegistration": "Registrazione su invito",
-        "publicRegistration": "Registrazione aperta"
+        "maxGroupPinnedPosts": "Max. post fissati per gruppo",
+        "publicRegistration": "Registrazione aperta",
+        "requireLocation": "Posizione obbligatoria"
       },
       "lastUpdated": "Ultima modifica: {timestamp} da {actor}",
       "name": "Criteri di rete",

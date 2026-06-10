@@ -62,8 +62,13 @@ describe('Query.policy', () => {
       expect(data.policy).toEqual({
         publicRegistration: false,
         inviteRegistration: true,
+        askForRealName: false,
+        requireLocation: false,
         categoriesActive: true,
+        badgesEnabled: false,
         apiKeysEnabled: null,
+        apiKeysMaxPerUser: null, // authenticated-only integer → null for anon
+        maxGroupPinnedPosts: null,
       })
     })
   })
@@ -128,10 +133,17 @@ describe('Query.policyDefaults', () => {
     for (const key of [
       'publicRegistration',
       'inviteRegistration',
+      'askForRealName',
+      'requireLocation',
       'categoriesActive',
+      'badgesEnabled',
       'apiKeysEnabled',
     ]) {
       expect(typeof data.policyDefaults.defaults[key]).toBe('boolean')
+    }
+    // Integer-typed policy keys come back as numbers (Int), not coerced booleans.
+    for (const key of ['apiKeysMaxPerUser', 'maxGroupPinnedPosts']) {
+      expect(typeof data.policyDefaults.defaults[key]).toBe('number')
     }
     // lastChange is bundled here (replaces the former policyLastChange query);
     // null on a fresh in-memory policy with no human change yet.
@@ -219,6 +231,20 @@ describe('setPolicy value validation (integration)', () => {
     expect(errors?.[0]?.extensions?.code).toBe('BAD_USER_INPUT')
     expect(errors?.[0]?.message).toMatch(/Type mismatch/)
   })
+
+  it('classifies a non-integer value for an integer key as BAD_USER_INPUT', async () => {
+    authenticatedUser = asUser('admin')
+
+    // 1.5 is valid JSON but apiKeysMaxPerUser is integer → type mismatch, surfaced
+    // as a client input error rather than an internal one.
+    const { errors } = await query({
+      query: setPolicyMutation,
+      variables: { key: 'apiKeysMaxPerUser', value: '1.5' },
+    })
+
+    expect(errors?.[0]?.extensions?.code).toBe('BAD_USER_INPUT')
+    expect(errors?.[0]?.message).toMatch(/Type mismatch/)
+  })
 })
 
 describe('Mutation resolvers (unit)', () => {
@@ -244,6 +270,24 @@ describe('Mutation resolvers (unit)', () => {
         actor: 'admin-1',
         timestamp: 'ts',
       })
+    })
+
+    it('parses an integer JSON value for an integer key', async () => {
+      const set = jest.fn().mockResolvedValue({
+        key: 'apiKeysMaxPerUser',
+        value: 10,
+        actor: 'admin-1',
+        timestamp: 'ts',
+      })
+
+      const result = await policyResolvers.Mutation.setPolicy(
+        null,
+        { key: 'apiKeysMaxPerUser', value: '10' },
+        mutationContext({ set }),
+      )
+
+      expect(set).toHaveBeenCalledWith('apiKeysMaxPerUser', 10, 'admin-1')
+      expect(result.value).toBe('10') // serialized back as a JSON-encoded string
     })
 
     it('rejects a value that is not valid JSON as a BAD_USER_INPUT error', async () => {

@@ -281,7 +281,7 @@ export default {
   },
   computed: {
     maxKeys() {
-      return this.$env.API_KEYS_MAX_PER_USER || 5
+      return this.$policy.get('apiKeysMaxPerUser') || 5
     },
     activeKeys() {
       return (this.myApiKeys || []).filter((k) => !k.disabled)

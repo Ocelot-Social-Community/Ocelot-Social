@@ -12,18 +12,20 @@ import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import type { NetworkPolicy } from '@src/policy'
 
 const defaultConfig = {
   CATEGORIES_ACTIVE: false,
 }
 let config: Partial<Context['config']>
+let policy: Partial<NetworkPolicy>
 
 let anyUser
 let allGroupsUser
 let publicUser
 let publicAdminUser
 let authenticatedUser: Context['user']
-const context = () => ({ authenticatedUser, config })
+const context = () => ({ authenticatedUser, config, policy })
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
@@ -46,6 +48,7 @@ afterAll(() => {
 
 beforeEach(async () => {
   config = { ...defaultConfig }
+  policy = {}
   authenticatedUser = null
 
   anyUser = await Factory.build('user', {
@@ -226,9 +229,9 @@ describe('pin groupPosts', () => {
     })
   })
 
-  describe('MAX_GROUP_PINNED_POSTS is 1', () => {
+  describe('maxGroupPinnedPosts is 1', () => {
     beforeEach(async () => {
-      config = { ...defaultConfig, MAX_GROUP_PINNED_POSTS: 1 }
+      policy = { maxGroupPinnedPosts: 1 }
       authenticatedUser = await publicUser.toJson()
     })
     it('returns post-1-to-public-group as first, pinned post', async () => {
@@ -312,9 +315,9 @@ describe('pin groupPosts', () => {
     })
   })
 
-  describe('MAX_GROUP_PINNED_POSTS is 2', () => {
+  describe('maxGroupPinnedPosts is 2', () => {
     beforeEach(async () => {
-      config = { ...defaultConfig, MAX_GROUP_PINNED_POSTS: 2 }
+      policy = { maxGroupPinnedPosts: 2 }
       authenticatedUser = await publicUser.toJson()
     })
     it('returns pinned posts before unpinned posts', async () => {

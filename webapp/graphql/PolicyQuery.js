@@ -8,8 +8,13 @@ export default () => gql`
     policy {
       publicRegistration
       inviteRegistration
+      askForRealName
+      requireLocation
       categoriesActive
+      badgesEnabled
       apiKeysEnabled
+      apiKeysMaxPerUser
+      maxGroupPinnedPosts
     }
   }
 `

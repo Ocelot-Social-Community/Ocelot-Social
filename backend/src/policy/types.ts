@@ -5,11 +5,20 @@
 export interface NetworkPolicy {
   publicRegistration: boolean
   inviteRegistration: boolean
+  askForRealName: boolean
+  requireLocation: boolean
   categoriesActive: boolean
+  badgesEnabled: boolean
   apiKeysEnabled: boolean
+  apiKeysMaxPerUser: number
+  maxGroupPinnedPosts: number
 }
 
 export type PolicyKey = keyof NetworkPolicy
+
+// The value a policy key can hold across all keys (boolean toggles and integer
+// limits today; string-typed keys are supported by the schema/service for later).
+export type PolicyValue = NetworkPolicy[PolicyKey]
 
 // An audience is a tag that a policy key can be made visible to (via the key's
 // "x-visibility" list in the schema) and that a viewer can be a member of.

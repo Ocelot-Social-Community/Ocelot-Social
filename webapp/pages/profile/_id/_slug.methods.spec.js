@@ -387,14 +387,18 @@ describe('pages/profile/_id/_slug.vue — computed', () => {
   })
 
   describe('userBadges', () => {
-    it('is null when BADGES_ENABLED is off', () => {
-      const ctx = { $env: { BADGES_ENABLED: false }, user: {} }
+    const policyMock = (badgesEnabled) => ({
+      get: (key) => key === 'badgesEnabled' && badgesEnabled,
+    })
+
+    it('is null when the badges policy is off', () => {
+      const ctx = { $policy: policyMock(false), user: {} }
       expect(computed.userBadges.call(ctx)).toBeNull()
     })
 
     it('combines badgeVerification with badgeTrophiesSelected when enabled', () => {
       const ctx = {
-        $env: { BADGES_ENABLED: true },
+        $policy: policyMock(true),
         user: { badgeVerification: 'V', badgeTrophiesSelected: ['A', 'B'] },
       }
       expect(computed.userBadges.call(ctx)).toEqual(['V', 'A', 'B'])
@@ -402,7 +406,7 @@ describe('pages/profile/_id/_slug.vue — computed', () => {
 
     it('handles a missing badgeTrophiesSelected list', () => {
       const ctx = {
-        $env: { BADGES_ENABLED: true },
+        $policy: policyMock(true),
         user: { badgeVerification: 'V' },
       }
       expect(computed.userBadges.call(ctx)).toEqual(['V'])

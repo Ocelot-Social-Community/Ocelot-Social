@@ -56,18 +56,26 @@ describe('policy visibility', () => {
   describe('visibleKeys()', () => {
     it('returns only public keys for anonymous viewers', () => {
       expect(visibleKeys(null).sort()).toEqual([
+        'askForRealName',
+        'badgesEnabled',
         'categoriesActive',
         'inviteRegistration',
         'publicRegistration',
+        'requireLocation',
       ])
     })
 
     it('returns all keys for a logged-in viewer', () => {
       expect(visibleKeys({ role: 'user' }).sort()).toEqual([
         'apiKeysEnabled',
+        'apiKeysMaxPerUser',
+        'askForRealName',
+        'badgesEnabled',
         'categoriesActive',
         'inviteRegistration',
+        'maxGroupPinnedPosts',
         'publicRegistration',
+        'requireLocation',
       ])
     })
   })

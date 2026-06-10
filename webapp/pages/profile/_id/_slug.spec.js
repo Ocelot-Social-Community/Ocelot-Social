@@ -62,9 +62,7 @@ describe('ProfileSlug', () => {
       data: () => data,
       mocks: {
         ...mocks,
-        $env: {
-          BADGES_ENABLED: badgesEnabled,
-        },
+        $policy: { get: (key) => (key === 'badgesEnabled' ? badgesEnabled : false) },
       },
     })
   }

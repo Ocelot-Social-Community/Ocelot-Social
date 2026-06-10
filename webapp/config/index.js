@@ -51,15 +51,10 @@ const options = {
   // Cookies
   COOKIE_EXPIRE_TIME: process.env.COOKIE_EXPIRE_TIME || 730, // Two years by default
   COOKIE_HTTPS_ONLY: process.env.COOKIE_HTTPS_ONLY || process.env.NODE_ENV === 'production', // ensure true in production if not set explicitly
-  BADGES_ENABLED: process.env.BADGES_ENABLED === 'true' || false,
+  // BADGES_ENABLED, ASK_FOR_REAL_NAME, REQUIRE_LOCATION, MAX_GROUP_PINNED_POSTS and
+  // API_KEYS_MAX_PER_USER moved to the runtime network policy (read via $policy.get).
   INVITE_LINK_LIMIT: process.env.INVITE_LINK_LIMIT || 7,
   NETWORK_NAME: process.env.NETWORK_NAME || 'Ocelot.social',
-  ASK_FOR_REAL_NAME: process.env.ASK_FOR_REAL_NAME === 'true' || false,
-  REQUIRE_LOCATION: process.env.REQUIRE_LOCATION === 'true' || false,
-  MAX_GROUP_PINNED_POSTS: Number.isNaN(Number(process.env.MAX_GROUP_PINNED_POSTS))
-    ? 1
-    : Number(process.env.MAX_GROUP_PINNED_POSTS),
-  API_KEYS_MAX_PER_USER: Number(process.env.API_KEYS_MAX_PER_USER) || 5,
 }
 
 const language = {

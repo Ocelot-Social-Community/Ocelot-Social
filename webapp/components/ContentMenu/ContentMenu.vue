@@ -317,7 +317,7 @@ export default {
       )
     },
     canBeGroupPinned() {
-      const maxGroupPinnedPosts = this.$env.MAX_GROUP_PINNED_POSTS
+      const maxGroupPinnedPosts = this.$policy.get('maxGroupPinnedPosts')
       return (
         maxGroupPinnedPosts === 1 ||
         (maxGroupPinnedPosts > 1 &&

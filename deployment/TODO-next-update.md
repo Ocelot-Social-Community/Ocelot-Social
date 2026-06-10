@@ -2,6 +2,26 @@
 
 When you introduce a new version and branding and deploy it on your network, you need to consider the following changes and actions:
 
+## Network policy: registration & feature flags moved to runtime config
+
+The following flags are now part of the **runtime network policy** (bucket B): they
+are served by the backend at runtime, can be changed live by an admin under
+**Admin → Network policy** (no redeploy), and are seeded from the **backend** ENV
+on first start. They are no longer read from the **webapp** build/ENV.
+
+- `ASK_FOR_REAL_NAME`, `REQUIRE_LOCATION`, `BADGES_ENABLED` — these used to be
+  **webapp** ENV variables. **Action:** move them to the **backend** environment
+  (`.env`, `docker-compose.yml` or `values.yaml`). If you previously set e.g.
+  `BADGES_ENABLED=true` on the webapp only, set it on the **backend** now (or toggle
+  it in the admin UI), otherwise it falls back to the schema default (`false`).
+- `MAX_GROUP_PINNED_POSTS`, `API_KEYS_MAX_PER_USER` — already backend ENV variables;
+  no change to where you set them. They are now additionally editable live in the
+  admin UI; the backend ENV value is the seed/`reset` default.
+
+Remove `BADGES_ENABLED`, `ASK_FOR_REAL_NAME`, `REQUIRE_LOCATION`,
+`MAX_GROUP_PINNED_POSTS` and `API_KEYS_MAX_PER_USER` from the **webapp** environment
+— the webapp no longer reads them (see `webapp/.env.template`).
+
 ## Version >= 3.2.0 with 'ocelotDockerVersionTag' 3.2.0-XXX
 
 ### Backend and Kubernetes Config `DBMS_DEFAULT_DATABASE`
