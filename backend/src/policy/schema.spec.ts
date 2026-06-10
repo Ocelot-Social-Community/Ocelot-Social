@@ -5,7 +5,7 @@ import { audiencesFor, audiencesOf, canView, visibleKeys } from './schema'
 
 describe('policy visibility', () => {
   describe('audiencesFor()', () => {
-    it('reads the x-visibility list from the schema', () => {
+    it('reads the visibility list from the schema', () => {
       expect(audiencesFor('publicRegistration')).toEqual(['public'])
       expect(audiencesFor('apiKeysEnabled')).toEqual(['authenticated'])
     })

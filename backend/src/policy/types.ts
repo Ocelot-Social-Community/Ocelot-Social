@@ -25,7 +25,7 @@ export type PolicyKey = keyof NetworkPolicy
 export type PolicyValue = NetworkPolicy[PolicyKey]
 
 // An audience is a tag that a policy key can be made visible to (via the key's
-// "x-visibility" list in the schema) and that a viewer can be a member of.
+// "visibility" list in the schema) and that a viewer can be a member of.
 //
 // Well-known audiences:
 //   • 'public'        — every viewer, including anonymous (universal membership)

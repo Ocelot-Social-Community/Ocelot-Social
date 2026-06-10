@@ -9,98 +9,98 @@
     "publicRegistration": {
       "type": "boolean",
       "default": false,
-      "x-visibility": ["public"],
-      "x-envSeed": "PUBLIC_REGISTRATION",
+      "visibility": ["public"],
+      "envSeed": "PUBLIC_REGISTRATION",
       "description": "Whether new users can register without an invite code."
     },
     "inviteRegistration": {
       "type": "boolean",
       "default": true,
-      "x-visibility": ["public"],
-      "x-envSeed": "INVITE_REGISTRATION",
+      "visibility": ["public"],
+      "envSeed": "INVITE_REGISTRATION",
       "description": "Whether registration via invite code is enabled."
     },
     "askForRealName": {
       "type": "boolean",
       "default": false,
-      "x-visibility": ["public"],
-      "x-envSeed": "ASK_FOR_REAL_NAME",
+      "visibility": ["public"],
+      "envSeed": "ASK_FOR_REAL_NAME",
       "description": "Whether registration asks for the user's real (given / family) name. Read during anonymous registration, so visible to 'public'."
     },
     "requireLocation": {
       "type": "boolean",
       "default": false,
-      "x-visibility": ["public"],
-      "x-envSeed": "REQUIRE_LOCATION",
+      "visibility": ["public"],
+      "envSeed": "REQUIRE_LOCATION",
       "description": "Whether a location is mandatory on registration and in profile settings. Read during anonymous registration, so visible to 'public'."
     },
     "inviteLinkLimit": {
       "type": "integer",
       "minimum": 0,
       "default": 7,
-      "x-visibility": ["authenticated"],
-      "x-envSeed": "INVITE_LINK_LIMIT",
+      "visibility": ["authenticated"],
+      "envSeed": "INVITE_LINK_LIMIT",
       "description": "Maximum number of personal invite links a user may have. Only relevant to logged-in users (invitations UI), so visible to 'authenticated' (and admin)."
     },
     "inviteCodesPersonalPerUser": {
       "type": "integer",
       "minimum": 0,
       "default": 7,
-      "x-visibility": ["authenticated"],
-      "x-envSeed": "INVITE_CODES_PERSONAL_PER_USER",
+      "visibility": ["authenticated"],
+      "envSeed": "INVITE_CODES_PERSONAL_PER_USER",
       "description": "Maximum number of personal invite codes a single user may generate. Only relevant to logged-in users, so visible to 'authenticated' (and admin)."
     },
     "inviteCodesGroupPerUser": {
       "type": "integer",
       "minimum": 0,
       "default": 7,
-      "x-visibility": ["authenticated"],
-      "x-envSeed": "INVITE_CODES_GROUP_PER_USER",
+      "visibility": ["authenticated"],
+      "envSeed": "INVITE_CODES_GROUP_PER_USER",
       "description": "Maximum number of group invite codes a single user may generate per group. Only relevant to logged-in users, so visible to 'authenticated' (and admin)."
     },
     "categoriesActive": {
       "type": "boolean",
       "default": false,
-      "x-visibility": ["public"],
-      "x-envSeed": "CATEGORIES_ACTIVE",
+      "visibility": ["public"],
+      "envSeed": "CATEGORIES_ACTIVE",
       "description": "Whether the categories feature for posts and groups is active."
     },
     "badgesEnabled": {
       "type": "boolean",
       "default": false,
-      "x-visibility": ["public"],
-      "x-envSeed": "BADGES_ENABLED",
+      "visibility": ["public"],
+      "envSeed": "BADGES_ENABLED",
       "description": "Whether the badges feature is enabled (badges shown on profiles / teasers and managed in admin). Shown on publicly visible profiles, so visible to 'public'."
     },
     "apiKeysEnabled": {
       "type": "boolean",
       "default": false,
-      "x-visibility": ["authenticated"],
-      "x-envSeed": "API_KEYS_ENABLED",
+      "visibility": ["authenticated"],
+      "envSeed": "API_KEYS_ENABLED",
       "description": "Whether API keys functionality (personal keys for backend access) is enabled. Only relevant to logged-in users (Settings / Admin), so visible to 'authenticated' (and admin)."
     },
     "apiKeysMaxPerUser": {
       "type": "integer",
       "minimum": 0,
       "default": 5,
-      "x-visibility": ["authenticated"],
-      "x-envSeed": "API_KEYS_MAX_PER_USER",
+      "visibility": ["authenticated"],
+      "envSeed": "API_KEYS_MAX_PER_USER",
       "description": "Maximum number of active API keys a single user may hold. Only relevant to logged-in users (Settings), so visible to 'authenticated' (and admin)."
     },
     "maxPinnedPosts": {
       "type": "integer",
       "minimum": 0,
       "default": 1,
-      "x-visibility": ["authenticated"],
-      "x-envSeed": "MAX_PINNED_POSTS",
+      "visibility": ["authenticated"],
+      "envSeed": "MAX_PINNED_POSTS",
       "description": "Maximum number of posts that can be pinned network-wide (0 disables pinning). Only relevant to logged-in users, so visible to 'authenticated' (and admin)."
     },
     "maxGroupPinnedPosts": {
       "type": "integer",
       "minimum": 0,
       "default": 1,
-      "x-visibility": ["authenticated"],
-      "x-envSeed": "MAX_GROUP_PINNED_POSTS",
+      "visibility": ["authenticated"],
+      "envSeed": "MAX_GROUP_PINNED_POSTS",
       "description": "Maximum number of posts that can be pinned within a group (0 disables pinning). Only relevant to logged-in users, so visible to 'authenticated' (and admin)."
     }
   },

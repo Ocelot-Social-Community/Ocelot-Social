@@ -19,8 +19,8 @@ interface RawProperty {
   default: unknown
   minimum?: number
   description?: string
-  'x-visibility'?: Audience[]
-  'x-envSeed'?: string
+  visibility?: Audience[]
+  envSeed?: string
 }
 
 interface RawSchema {
@@ -39,7 +39,7 @@ export function defaultFor<K extends PolicyKey>(key: K): NetworkPolicy[K] {
 }
 
 export function envSeedFor(key: PolicyKey): string | undefined {
-  return rawSchema.properties[key]['x-envSeed']
+  return rawSchema.properties[key].envSeed
 }
 
 export function typeFor(key: PolicyKey): string {
@@ -50,17 +50,17 @@ export function typeFor(key: PolicyKey): string {
 // Per-key validators compiled once from the schema. Run in `strict: true` mode
 // so schema-authoring mistakes (typo'd / unknown keywords, wrong shapes) fail
 // fast at module load. The custom annotation keywords are registered as known
-// AND their values are validated: `x-visibility` must be a string array,
-// `x-envSeed` a string. A future x-* keyword (e.g. x-licenseRequired) MUST be
+// AND their values are validated: `visibility` must be a string array,
+// `envSeed` a string. A future custom keyword (e.g. licenseRequired) MUST be
 // registered here too, otherwise strict mode rejects the schema.
 // These keywords carry metadata only (no `validate`/`code`), so they never
 // affect data validation — only type and constraints (e.g. `minimum`) do that.
 const ajv = new Ajv({ strict: true })
 ajv.addKeyword({
-  keyword: 'x-visibility',
+  keyword: 'visibility',
   metaSchema: { type: 'array', items: { type: 'string' } },
 })
-ajv.addKeyword({ keyword: 'x-envSeed', metaSchema: { type: 'string' } })
+ajv.addKeyword({ keyword: 'envSeed', metaSchema: { type: 'string' } })
 const validators = Object.fromEntries(
   allKeys().map((key) => [key, ajv.compile(rawSchema.properties[key])]),
 ) as Record<PolicyKey, ValidateFunction>
@@ -90,7 +90,7 @@ export interface PolicyViewer {
 // (push/splice) would otherwise silently alter the effective visibility
 // process-wide and could weaken canView().
 export function audiencesFor(key: PolicyKey): Audience[] {
-  return [...(rawSchema.properties[key]['x-visibility'] ?? [])]
+  return [...(rawSchema.properties[key].visibility ?? [])]
 }
 
 // The audiences a viewer belongs to. 'public' is universal (every viewer,

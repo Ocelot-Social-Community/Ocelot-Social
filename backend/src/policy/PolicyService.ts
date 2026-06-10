@@ -11,7 +11,7 @@
 //
 // Resolution order at init() time:
 //   1. DB value (kept if present)
-//   2. ENV seed via x-envSeed → written to DB once
+//   2. ENV seed via envSeed → written to DB once
 //   3. Schema default → written to DB once
 //
 // Single-instance: no special concern. Multi-instance: eventual consistency via
@@ -187,7 +187,7 @@ export class PolicyService {
     return out
   }
 
-  // The default a key resets to: the ENV seed (x-envSeed) configured for this
+  // The default a key resets to: the ENV seed (envSeed) configured for this
   // deployment if set, otherwise the schema default. Single source of truth for
   // "the configured default" — the frontend has none of its own.
   getDefault<K extends PolicyKey>(key: K): NetworkPolicy[K] {
@@ -353,7 +353,7 @@ export function createInMemoryPolicyService(
   const svc = Object.create(PolicyService.prototype) as unknown as PolicyServiceInternal
   svc.cache = { ...values }
   svc.initialised = true
-  svc.env = env // so getDefault() can read x-envSeed values
+  svc.env = env // so getDefault() can read envSeed values
   // The double has no DB (built via Object.create, no constructor). Make init()
   // a genuine no-op so a test that calls it lands here instead of the real DB
   // path with an undefined this.db (matches the "init() is a no-op" contract).
