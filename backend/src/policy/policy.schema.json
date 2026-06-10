@@ -81,11 +81,11 @@
     },
     "apiKeysMaxPerUser": {
       "type": "integer",
-      "minimum": 0,
+      "minimum": 1,
       "default": 5,
       "visibility": ["authenticated"],
       "envSeed": "API_KEYS_MAX_PER_USER",
-      "description": "Maximum number of active API keys a single user may hold. Only relevant to logged-in users (Settings), so visible to 'authenticated' (and admin)."
+      "description": "Maximum number of active API keys a single user may hold (>= 1). Disabling API keys entirely is done via apiKeysEnabled, so 0 is not a valid limit. Only relevant to logged-in users (Settings), so visible to 'authenticated' (and admin)."
     },
     "maxPinnedPosts": {
       "type": "integer",

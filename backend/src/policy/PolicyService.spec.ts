@@ -414,16 +414,22 @@ describe('PolicyService', () => {
       )
     })
 
-    it('rejects a negative value for an integer key (schema minimum: 0)', async () => {
+    it('enforces per-key schema minimums (apiKeysMaxPerUser >= 1, maxPinnedPosts >= 0)', async () => {
       readAllSettings.mockResolvedValue({})
       const svc = new PolicyService(dbStub)
       await svc.init({})
 
-      await expect(svc.set('apiKeysMaxPerUser', -1 as never, 'actor')).rejects.toThrow(
-        /must be >= 0/,
+      // apiKeysMaxPerUser has minimum 1: disabling is done via apiKeysEnabled, so 0
+      // (and negative) are invalid.
+      await expect(svc.set('apiKeysMaxPerUser', 0 as never, 'actor')).rejects.toThrow(
+        /must be >= 1/,
       )
-      // 0 is valid (e.g. disables the feature) and must NOT be rejected.
+      await expect(svc.set('apiKeysMaxPerUser', -1 as never, 'actor')).rejects.toThrow(
+        /must be >= 1/,
+      )
+      // maxPinnedPosts has minimum 0: 0 disables pinning (valid), negative is rejected.
       await expect(svc.set('maxPinnedPosts', 0, 'actor')).resolves.toBeDefined()
+      await expect(svc.set('maxPinnedPosts', -1 as never, 'actor')).rejects.toThrow(/must be >= 0/)
     })
 
     it('does not throw when no pubsub is configured', async () => {

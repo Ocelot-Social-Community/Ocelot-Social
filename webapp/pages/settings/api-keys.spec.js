@@ -173,6 +173,14 @@ describe('settings/api-keys.vue', () => {
       wrapper = Wrapper()
       expect(wrapper.vm.maxKeys).toBe(5)
     })
+
+    it('falls back to 0 (fail-closed) when the policy value is not loaded', () => {
+      // No frontend config default: while the policy snapshot is absent, maxKeys is
+      // 0 (create disabled) rather than a guessed number. `??` only fills null/undefined.
+      mocks.$policy = { get: () => undefined }
+      wrapper = Wrapper()
+      expect(wrapper.vm.maxKeys).toBe(0)
+    })
   })
 
   describe('create key', () => {
