@@ -27,17 +27,15 @@ import type { NetworkPolicy } from '@src/policy'
 let user
 
 let authenticatedUser: Context['user']
-const context = () => ({ authenticatedUser, config, policy })
+const context = () => ({ authenticatedUser, policy })
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
-const defaultConfig = {
-  CATEGORIES_ACTIVE: true,
-  // MAPBOX_TOKEN: CONFIG.MAPBOX_TOKEN,
+const defaultPolicy = {
+  categoriesActive: true,
 }
-let config: Partial<Context['config']>
 let policy: Partial<NetworkPolicy>
 
 beforeAll(async () => {
@@ -59,8 +57,7 @@ const categoryIds = ['cat9', 'cat4', 'cat15']
 let variables
 
 beforeEach(async () => {
-  config = { ...defaultConfig }
-  policy = {}
+  policy = { ...defaultPolicy }
   variables = {}
   user = await Factory.build(
     'user',
@@ -1233,7 +1230,7 @@ describe('pin posts', () => {
 
     describe('maxPinnedPosts is 0', () => {
       beforeEach(async () => {
-        policy = { maxPinnedPosts: 0 }
+        policy = { ...defaultPolicy, maxPinnedPosts: 0 }
 
         await Factory.build(
           'post',
@@ -1257,7 +1254,7 @@ describe('pin posts', () => {
 
     describe('maxPinnedPosts is 1', () => {
       beforeEach(() => {
-        policy = { maxPinnedPosts: 1 }
+        policy = { ...defaultPolicy, maxPinnedPosts: 1 }
       })
 
       describe('are allowed to pin posts', () => {
@@ -1599,7 +1596,7 @@ describe('pin posts', () => {
       const postsPinnedCountsQuery = `query { PostsPinnedCounts { currentlyPinnedPosts } }`
 
       beforeEach(async () => {
-        policy = { maxPinnedPosts: 3 }
+        policy = { ...defaultPolicy, maxPinnedPosts: 3 }
 
         await Factory.build(
           'post',

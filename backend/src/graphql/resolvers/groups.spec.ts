@@ -33,7 +33,7 @@ let ownerMemberUser
 let secondOwnerMemberUser
 
 let authenticatedUser: Context['user']
-const context = () => ({ authenticatedUser, config })
+const context = () => ({ authenticatedUser, policy })
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
@@ -43,9 +43,8 @@ const categoryIds = ['cat9', 'cat4', 'cat15']
 const descriptionAdditional100 =
   ' 123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789'
 let variables = {}
-const config = {
-  CATEGORIES_ACTIVE: true,
-  // MAPBOX_TOKEN: CONFIG.MAPBOX_TOKEN,
+const policy = {
+  categoriesActive: true,
 }
 
 const seedBasicsAndClearAuthentication = async () => {

@@ -59,10 +59,6 @@ export const TEST_CONFIG = {
   SUPPORT_URL: '',
   APPLICATION_NAME: '',
   ORGANIZATION_URL: '',
-  PUBLIC_REGISTRATION: false,
-  INVITE_REGISTRATION: true,
-  CATEGORIES_ACTIVE: false,
-  API_KEYS_ENABLED: false,
 
   LANGUAGE_DEFAULT: 'en',
   LOG_LEVEL: 'DEBUG',
@@ -71,9 +67,8 @@ export const TEST_CONFIG = {
 interface OverwritableContextParams {
   authenticatedUser?: Context['user']
   config?: Partial<typeof CONFIG>
-  // Override network-policy values for a test (e.g. { maxGroupPinnedPosts: 0 }).
-  // The four flags also mirrored from config (publicRegistration, …) can still be
-  // set via config for backwards compatibility; anything here takes precedence.
+  // Override network-policy values for a test (e.g. { categoriesActive: true,
+  // maxGroupPinnedPosts: 0 }); unset keys fall back to their schema defaults.
   policy?: Partial<NetworkPolicy>
   pubsub?: Context['pubsub']
 }
@@ -94,17 +89,9 @@ export const createApolloTestSetup = async (opts?: CreateTestServerOptions) => {
       pubsub,
     } = await testContext()
     const merged = { ...TEST_CONFIG, ...config }
-    // Build a per-request policy mirror so existing tests that toggle config.X keep
-    // working; an explicit `policy` override (for keys with no config mirror, e.g.
-    // maxGroupPinnedPosts / apiKeysMaxPerUser) takes precedence. Keys not set here
-    // fall back to their schema defaults inside createInMemoryPolicyService.
-    const policy = createInMemoryPolicyService({
-      publicRegistration: merged.PUBLIC_REGISTRATION,
-      inviteRegistration: merged.INVITE_REGISTRATION,
-      categoriesActive: merged.CATEGORIES_ACTIVE,
-      apiKeysEnabled: merged.API_KEYS_ENABLED,
-      ...policyOverride,
-    })
+    // Network policy values are set per-test via the `policy` override; any key not
+    // set falls back to its schema default inside createInMemoryPolicyService.
+    const policy = createInMemoryPolicyService(policyOverride)
     return getContext({
       authenticatedUser,
       database,

@@ -22,8 +22,8 @@ jest.mock('../helpers/isUserOnline', () => ({
 }))
 
 let authenticatedUser: Context['user']
-const config = { CATEGORIES_ACTIVE: false }
-const context = () => ({ authenticatedUser, config })
+const policy = { categoriesActive: false }
+const context = () => ({ authenticatedUser, policy })
 let mutate: ApolloTestSetup['mutate']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']

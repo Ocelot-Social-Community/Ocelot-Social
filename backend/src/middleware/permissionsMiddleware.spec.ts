@@ -9,20 +9,21 @@ import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import type { NetworkPolicy } from '@src/policy'
 
 let variables
 let owner, anotherRegularUser, administrator, moderator
 
 let authenticatedUser: Context['user']
-let config: Partial<Context['config']>
-const context = () => ({ authenticatedUser, config })
+let policy: Partial<NetworkPolicy>
+const context = () => ({ authenticatedUser, policy })
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
 beforeEach(() => {
-  config = { CATEGORIES_ACTIVE: true }
+  policy = { categoriesActive: true }
 })
 
 beforeAll(async () => {
@@ -183,11 +184,11 @@ describe('authorization', () => {
             code: 'ABCDEF',
           })
 
-          config = {
-            ...config,
-            CATEGORIES_ACTIVE: true,
-            INVITE_REGISTRATION: false,
-            PUBLIC_REGISTRATION: false,
+          policy = {
+            ...policy,
+            categoriesActive: true,
+            inviteRegistration: false,
+            publicRegistration: false,
           }
         })
 
@@ -230,11 +231,11 @@ describe('authorization', () => {
           await Factory.build('inviteCode', {
             code: 'ABCDEF',
           })
-          config = {
-            ...config,
-            CATEGORIES_ACTIVE: true,
-            INVITE_REGISTRATION: false,
-            PUBLIC_REGISTRATION: true,
+          policy = {
+            ...policy,
+            categoriesActive: true,
+            inviteRegistration: false,
+            publicRegistration: true,
           }
         })
 
@@ -259,11 +260,11 @@ describe('authorization', () => {
           await Factory.build('inviteCode', {
             code: 'ABCDEF',
           })
-          config = {
-            ...config,
-            CATEGORIES_ACTIVE: true,
-            INVITE_REGISTRATION: true,
-            PUBLIC_REGISTRATION: false,
+          policy = {
+            ...policy,
+            categoriesActive: true,
+            inviteRegistration: true,
+            publicRegistration: false,
           }
         })
 

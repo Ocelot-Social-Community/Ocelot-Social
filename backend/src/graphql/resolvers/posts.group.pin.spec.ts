@@ -14,10 +14,6 @@ import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 import type { NetworkPolicy } from '@src/policy'
 
-const defaultConfig = {
-  CATEGORIES_ACTIVE: false,
-}
-let config: Partial<Context['config']>
 let policy: Partial<NetworkPolicy>
 
 let anyUser
@@ -25,7 +21,7 @@ let allGroupsUser
 let publicUser
 let publicAdminUser
 let authenticatedUser: Context['user']
-const context = () => ({ authenticatedUser, config, policy })
+const context = () => ({ authenticatedUser, policy })
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
@@ -47,7 +43,6 @@ afterAll(() => {
 })
 
 beforeEach(async () => {
-  config = { ...defaultConfig }
   policy = {}
   authenticatedUser = null
 

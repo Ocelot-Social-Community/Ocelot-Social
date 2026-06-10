@@ -17,10 +17,11 @@ import policyResolvers from './policy'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import type { NetworkPolicy } from '@src/policy'
 
 let authenticatedUser: Context['user']
-let config: Partial<Context['config']>
-const context = () => ({ authenticatedUser, config })
+let policy: Partial<NetworkPolicy>
+const context = () => ({ authenticatedUser, policy })
 
 let query: ApolloTestSetup['query']
 let server: ApolloTestSetup['server']
@@ -28,8 +29,8 @@ let database: ApolloTestSetup['database']
 
 const asUser = (role: string) => ({ id: `${role}-1`, role }) as unknown as Context['user']
 
-const mutationContext = (policy: unknown): Context =>
-  ({ user: { id: 'admin-1' }, policy }) as unknown as Context
+const mutationContext = (policyDouble: unknown): Context =>
+  ({ user: { id: 'admin-1' }, policy: policyDouble }) as unknown as Context
 
 beforeAll(async () => {
   const setup = await createApolloTestSetup({ context })
@@ -48,7 +49,7 @@ beforeEach(() => {
   authenticatedUser = null
   // apiKeysEnabled is "authenticated"-visibility; the value is true here so we
   // can tell "null because not visible" apart from "false because that's the value".
-  config = { API_KEYS_ENABLED: true, CATEGORIES_ACTIVE: true }
+  policy = { apiKeysEnabled: true, categoriesActive: true }
 })
 
 describe('Query.policy', () => {
@@ -90,7 +91,7 @@ describe('Query.policy', () => {
 
     it('returns the real value (false), not null, when the feature is disabled', async () => {
       authenticatedUser = asUser('user')
-      config = { API_KEYS_ENABLED: false }
+      policy = { apiKeysEnabled: false }
 
       const { data } = await query({ query: policyQuery })
 

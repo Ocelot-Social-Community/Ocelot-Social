@@ -155,10 +155,9 @@ const options = {
   SUPPORT_URL: emails.SUPPORT_LINK,
   APPLICATION_NAME: metadata.APPLICATION_NAME,
   ORGANIZATION_URL: emails.ORGANIZATION_LINK,
-  PUBLIC_REGISTRATION: env.PUBLIC_REGISTRATION === 'true' || false,
-  INVITE_REGISTRATION: env.INVITE_REGISTRATION !== 'false', // default = true
-  CATEGORIES_ACTIVE: process.env.CATEGORIES_ACTIVE === 'true' || false,
-  API_KEYS_ENABLED: env.API_KEYS_ENABLED === 'true',
+  // publicRegistration, inviteRegistration, categoriesActive and apiKeysEnabled
+  // are network-policy keys now — the backend reads them from the policy
+  // (ENV-seeded), not from CONFIG. See backend/src/policy.
 }
 
 const language = {
