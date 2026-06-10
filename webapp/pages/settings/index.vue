@@ -7,7 +7,7 @@
         model="name"
         icon="user"
         :label="
-          $env.ASK_FOR_REAL_NAME
+          $policy.get('askForRealName') === true
             ? $t('settings.data.realNamePlease')
             : $t('settings.data.labelName')
         "
@@ -17,7 +17,7 @@
       <location-select
         class="location-selet"
         v-model="formData.locationName"
-        :canBeCleared="!$env.REQUIRE_LOCATION"
+        :canBeCleared="$policy.get('requireLocation') !== true"
       />
       <!-- eslint-enable vue/use-v-on-exact -->
       <ocelot-input
@@ -96,7 +96,7 @@ export default {
         translate: this.$t,
       })
       return {
-        locationName: { required: this.$env.REQUIRE_LOCATION },
+        locationName: { required: this.$policy.get('requireLocation') === true },
         name: { required: true, min: 3 },
         ...uniqueSlugForm.formSchema,
       }

@@ -1,9 +1,13 @@
 import { postsPinnedCountsQuery } from '~/graphql/PostQuery'
 
+// Only the live network-wide pinned count lives here. The limit (maxPinnedPosts)
+// is a network-policy key, read via $policy.get('maxPinnedPosts') — see
+// mixins/pinnedPosts.js. `loaded` guards the one-off fetch (the count is only
+// needed, and only fetched, when the policy allows more than one pin).
 export const state = () => {
   return {
-    maxPinnedPosts: 0,
     currentlyPinnedPosts: 0,
+    loaded: false,
   }
 }
 
@@ -14,20 +18,20 @@ export const mutations = {
   unpinPost(state) {
     state.currentlyPinnedPosts--
   },
-  setMaxPinnedPosts(state, value) {
-    state.maxPinnedPosts = value
-  },
   setCurrentlyPinnedPosts(state, value) {
     state.currentlyPinnedPosts = value
+  },
+  setLoaded(state, value = true) {
+    state.loaded = value
   },
 }
 
 export const getters = {
-  maxPinnedPosts(state) {
-    return state.maxPinnedPosts
-  },
   currentlyPinnedPosts(state) {
     return state.currentlyPinnedPosts
+  },
+  loaded(state) {
+    return state.loaded
   },
 }
 
@@ -37,7 +41,7 @@ export const actions = {
     const {
       data: { PostsPinnedCounts },
     } = await client.query({ query: postsPinnedCountsQuery() })
-    commit('setMaxPinnedPosts', PostsPinnedCounts.maxPinnedPosts)
     commit('setCurrentlyPinnedPosts', PostsPinnedCounts.currentlyPinnedPosts)
+    commit('setLoaded')
   },
 }

@@ -101,7 +101,7 @@ export default {
             } */
       ]
 
-      if (this.$env.BADGES_ENABLED) {
+      if (this.$policy.get('badgesEnabled')) {
         routes.splice(2, 0, {
           name: this.$t('settings.badges.name'),
           path: `/settings/badges`,

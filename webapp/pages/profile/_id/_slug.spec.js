@@ -62,9 +62,7 @@ describe('ProfileSlug', () => {
       data: () => data,
       mocks: {
         ...mocks,
-        $env: {
-          BADGES_ENABLED: badgesEnabled,
-        },
+        $policy: { get: (key) => (key === 'badgesEnabled' ? badgesEnabled : false) },
       },
     })
   }
@@ -82,8 +80,8 @@ describe('ProfileSlug', () => {
             id: 'u23',
           },
           'auth/isAdmin': () => false,
-          'pinnedPosts/maxPinnedPosts': () => 0,
           'pinnedPosts/currentlyPinnedPosts': () => 0,
+          'pinnedPosts/loaded': () => true,
         },
         dispatch: jest.fn().mockResolvedValue(),
       }

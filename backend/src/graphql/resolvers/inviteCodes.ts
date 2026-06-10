@@ -163,7 +163,7 @@ export default {
       ).records[0].get('count')
 
       if (
-        parseInt(userInviteCodeAmount as string) >= context.config.INVITE_CODES_PERSONAL_PER_USER
+        parseInt(userInviteCodeAmount as string) >= context.policy.get('inviteCodesPersonalPerUser')
       ) {
         throw new Error('You have reached the maximum of Invite Codes you can generate')
       }
@@ -203,7 +203,9 @@ export default {
         })
       ).records[0].get('count')
 
-      if (parseInt(userInviteCodeAmount as string) >= context.config.INVITE_CODES_GROUP_PER_USER) {
+      if (
+        parseInt(userInviteCodeAmount as string) >= context.policy.get('inviteCodesGroupPerUser')
+      ) {
         throw new Error(
           'You have reached the maximum of Invite Codes you can generate for this group',
         )

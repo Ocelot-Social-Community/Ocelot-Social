@@ -23,8 +23,8 @@ jest.mock('@src/emails/sendEmail', () => ({
 
 let emaillessMember
 let authenticatedUser: Context['user']
-const config = { CATEGORIES_ACTIVE: false }
-const context = () => ({ authenticatedUser, config })
+const policy = { categoriesActive: false }
+const context = () => ({ authenticatedUser, policy })
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']

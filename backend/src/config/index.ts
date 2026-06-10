@@ -155,21 +155,9 @@ const options = {
   SUPPORT_URL: emails.SUPPORT_LINK,
   APPLICATION_NAME: metadata.APPLICATION_NAME,
   ORGANIZATION_URL: emails.ORGANIZATION_LINK,
-  PUBLIC_REGISTRATION: env.PUBLIC_REGISTRATION === 'true' || false,
-  INVITE_REGISTRATION: env.INVITE_REGISTRATION !== 'false', // default = true
-  INVITE_CODES_PERSONAL_PER_USER:
-    (env.INVITE_CODES_PERSONAL_PER_USER && parseInt(env.INVITE_CODES_PERSONAL_PER_USER)) || 7,
-  INVITE_CODES_GROUP_PER_USER:
-    (env.INVITE_CODES_GROUP_PER_USER && parseInt(env.INVITE_CODES_GROUP_PER_USER)) || 7,
-  CATEGORIES_ACTIVE: process.env.CATEGORIES_ACTIVE === 'true' || false,
-  MAX_PINNED_POSTS: Number.isNaN(Number(process.env.MAX_PINNED_POSTS))
-    ? 1
-    : Number(process.env.MAX_PINNED_POSTS),
-  MAX_GROUP_PINNED_POSTS: Number.isNaN(Number(process.env.MAX_GROUP_PINNED_POSTS))
-    ? 1
-    : Number(process.env.MAX_GROUP_PINNED_POSTS),
-  API_KEYS_ENABLED: env.API_KEYS_ENABLED === 'true',
-  API_KEYS_MAX_PER_USER: (env.API_KEYS_MAX_PER_USER && parseInt(env.API_KEYS_MAX_PER_USER)) || 5,
+  // publicRegistration, inviteRegistration, categoriesActive and apiKeysEnabled
+  // are network-policy keys now — the backend reads them from the policy
+  // (ENV-seeded), not from CONFIG. See backend/src/policy.
 }
 
 const language = {

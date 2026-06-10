@@ -20,9 +20,7 @@ describe('ContentMenu.vue - Group', () => {
       $router: {
         push: jest.fn(),
       },
-      $env: {
-        MAX_GROUP_PINNED_POSTS: 0,
-      },
+      $policy: { get: () => 0 },
     }
   })
 
@@ -35,8 +33,8 @@ describe('ContentMenu.vue - Group', () => {
   const getters = {
     'auth/isModerator': () => false,
     'auth/isAdmin': () => false,
-    'pinnedPosts/maxPinnedPosts': () => 1,
     'pinnedPosts/currentlyPinnedPosts': () => 1,
+    'pinnedPosts/loaded': () => true,
   }
   const actions = {
     'pinnedPosts/fetch': jest.fn(),
@@ -63,9 +61,7 @@ describe('ContentMenu.vue - Group', () => {
 
     describe('when maxGroupPinnedPosts = 0', () => {
       beforeEach(() => {
-        mocks.$env = {
-          MAX_GROUP_PINNED_POSTS: 0,
-        }
+        mocks.$policy = { get: () => 0 }
       })
 
       it('can not pin unpinned post', async () => {
@@ -118,9 +114,7 @@ describe('ContentMenu.vue - Group', () => {
 
     describe('when maxPinnedPosts = 1', () => {
       beforeEach(() => {
-        mocks.$env = {
-          MAX_GROUP_PINNED_POSTS: 1,
-        }
+        mocks.$policy = { get: () => 1 }
       })
 
       describe('when currentlyPinnedPostsCount = 0', () => {
@@ -262,9 +256,7 @@ describe('ContentMenu.vue - Group', () => {
 
     describe('when maxPinnedPosts = 2', () => {
       beforeEach(() => {
-        mocks.$env = {
-          MAX_GROUP_PINNED_POSTS: 2,
-        }
+        mocks.$policy = { get: () => 2 }
       })
 
       describe('when currentlyPinnedPostsCount = 1', () => {
@@ -397,9 +389,7 @@ describe('ContentMenu.vue - Group', () => {
 
     describe('when maxGroupPinnedPosts = 0', () => {
       beforeEach(() => {
-        mocks.$env = {
-          MAX_GROUP_PINNED_POSTS: 0,
-        }
+        mocks.$policy = { get: () => 0 }
       })
 
       it('can not pin unpinned post', async () => {
@@ -452,9 +442,7 @@ describe('ContentMenu.vue - Group', () => {
 
     describe('when maxPinnedPosts = 1', () => {
       beforeEach(() => {
-        mocks.$env = {
-          MAX_GROUP_PINNED_POSTS: 1,
-        }
+        mocks.$policy = { get: () => 1 }
       })
 
       describe('when currentlyPinnedPostsCount = 0', () => {
@@ -596,9 +584,7 @@ describe('ContentMenu.vue - Group', () => {
 
     describe('when maxPinnedPosts = 2', () => {
       beforeEach(() => {
-        mocks.$env = {
-          MAX_GROUP_PINNED_POSTS: 2,
-        }
+        mocks.$policy = { get: () => 2 }
       })
 
       describe('when currentlyPinnedPostsCount = 1', () => {
@@ -731,9 +717,7 @@ describe('ContentMenu.vue - Group', () => {
 
     describe('when maxGroupPinnedPosts = 0', () => {
       beforeEach(() => {
-        mocks.$env = {
-          MAX_GROUP_PINNED_POSTS: 0,
-        }
+        mocks.$policy = { get: () => 0 }
       })
 
       it('can not pin unpinned post', async () => {
@@ -773,9 +757,7 @@ describe('ContentMenu.vue - Group', () => {
 
     describe('when maxPinnedPosts = 1', () => {
       beforeEach(() => {
-        mocks.$env = {
-          MAX_GROUP_PINNED_POSTS: 1,
-        }
+        mocks.$policy = { get: () => 1 }
       })
 
       it('can not pin unpinned post', async () => {

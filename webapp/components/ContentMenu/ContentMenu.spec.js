@@ -28,6 +28,9 @@ describe('ContentMenu.vue', () => {
       $router: {
         push: jest.fn(),
       },
+      // maxPinnedPosts now comes from the network policy (not the pinnedPosts
+      // store); delegate to the existing mock so the per-test values still apply.
+      $policy: { get: (key) => (key === 'maxPinnedPosts' ? maxPinnedPostsMock() : false) },
     }
   })
 
@@ -35,8 +38,8 @@ describe('ContentMenu.vue', () => {
     getters = {
       'auth/isModerator': () => false,
       'auth/isAdmin': () => false,
-      'pinnedPosts/maxPinnedPosts': maxPinnedPostsMock,
       'pinnedPosts/currentlyPinnedPosts': currentlyPinnedPostsMock,
+      'pinnedPosts/loaded': () => true,
     }
     actions = {
       'pinnedPosts/fetch': jest.fn(),

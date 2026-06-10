@@ -281,7 +281,12 @@ export default {
   },
   computed: {
     maxKeys() {
-      return this.$env.API_KEYS_MAX_PER_USER || 5
+      // `?? 0` (not `|| 5`): inject no frontend config default — the real default
+      // lives in the backend policy (a configured value is always >= 1; disabling
+      // API keys is done via apiKeysEnabled). 0 is only the fail-closed fallback
+      // while the policy snapshot isn't loaded, and `??` (vs `||`) leaves any real
+      // value untouched.
+      return this.$policy.get('apiKeysMaxPerUser') ?? 0
     },
     activeKeys() {
       return (this.myApiKeys || []).filter((k) => !k.disabled)

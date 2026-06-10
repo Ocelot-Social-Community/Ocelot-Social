@@ -16,8 +16,8 @@ describe('invites.vue', () => {
       },
       $env: {
         NETWORK_NAME: 'test-network',
-        INVITE_LINK_LIMIT: 5,
       },
+      $policy: { get: (key) => (key === 'inviteLinkLimit' ? 5 : false) },
       $toast: {
         success: jest.fn(),
         error: jest.fn(),

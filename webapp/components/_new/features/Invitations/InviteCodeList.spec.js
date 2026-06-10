@@ -44,7 +44,7 @@ const defaultMocks = {
     return key
   }),
   $toast: { success: jest.fn(), error: jest.fn() },
-  $env: { INVITE_LINK_LIMIT: 7 },
+  $policy: { get: (key) => (key === 'inviteLinkLimit' ? 7 : false) },
   $apollo: {
     mutate: jest.fn().mockResolvedValue({}),
   },

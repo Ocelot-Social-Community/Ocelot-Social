@@ -73,9 +73,7 @@ describe('Users', () => {
 
   describe('given badges are enabled', () => {
     beforeEach(() => {
-      mocks.$env = {
-        BADGES_ENABLED: true,
-      }
+      mocks.$policy = { get: (key) => key === 'badgesEnabled' }
       wrapper = Wrapper()
     })
 
@@ -86,9 +84,7 @@ describe('Users', () => {
 
   describe('given badges are disabled', () => {
     beforeEach(() => {
-      mocks.$env = {
-        BADGES_ENABLED: false,
-      }
+      mocks.$policy = { get: () => false }
       wrapper = Wrapper()
     })
 

@@ -419,7 +419,7 @@ export default {
       return this.User ? this.User[0] : {}
     },
     userBadges() {
-      if (!this.$env.BADGES_ENABLED) return null
+      if (!this.$policy.get('badgesEnabled')) return null
       return [this.user.badgeVerification, ...(this.user.badgeTrophiesSelected || [])]
     },
     userName() {

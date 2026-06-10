@@ -143,9 +143,18 @@
       "description": "Configuración en tiempo de ejecución. Los cambios se aplican inmediatamente a todos los clientes conectados.",
       "descriptions": {
         "apiKeysEnabled": "Permite a los usuarios crear claves API personales para acceder al backend mediante programación. Afecta a la sección de claves API en los ajustes de usuario.",
+        "apiKeysMaxPerUser": "Número máximo de claves API activas que un mismo usuario puede tener a la vez.",
+        "askForRealName": "Pide a los nuevos usuarios su nombre real (nombre y apellidos) durante el registro en lugar de un único nombre visible.",
+        "badgesEnabled": "Activa la función de insignias: las insignias se muestran en los perfiles y resúmenes y se gestionan en el área de administración.",
         "categoriesActive": "Activa las categorías temáticas para publicaciones y grupos, para clasificar y filtrar el contenido. Requiere que exista al menos una categoría.",
+        "inviteCodesGroupPerUser": "Número máximo de códigos de invitación de grupo que un mismo usuario puede generar por grupo.",
+        "inviteCodesPersonalPerUser": "Número máximo de códigos de invitación personales que un mismo usuario puede generar.",
+        "inviteLinkLimit": "Número máximo de enlaces de invitación personales que un mismo usuario puede tener.",
         "inviteRegistration": "Permite que los miembros existentes inviten a nuevos usuarios mediante códigos de invitación. Si está desactivado, los códigos de invitación no pueden canjearse para registrarse.",
-        "publicRegistration": "Permite que cualquiera cree una cuenta directamente, sin código de invitación. Si está desactivado, los nuevos usuarios solo pueden unirse mediante una invitación."
+        "maxGroupPinnedPosts": "Número máximo de publicaciones que se pueden fijar dentro de un grupo. Pon 0 para desactivar la fijación en grupos.",
+        "maxPinnedPosts": "Número máximo de publicaciones que se pueden fijar en toda la red (administradores). Pon 0 para desactivar la fijación.",
+        "publicRegistration": "Permite que cualquiera cree una cuenta directamente, sin código de invitación. Si está desactivado, los nuevos usuarios solo pueden unirse mediante una invitación.",
+        "requireLocation": "Hace obligatoria una ubicación durante el registro y en los ajustes del perfil."
       },
       "groups": {
         "features": {
@@ -157,9 +166,18 @@
       },
       "keys": {
         "apiKeysEnabled": "Claves API",
+        "apiKeysMaxPerUser": "Máx. claves API por usuario",
+        "askForRealName": "Pedir nombre real",
+        "badgesEnabled": "Insignias",
         "categoriesActive": "Categorías",
+        "inviteCodesGroupPerUser": "Máx. códigos de invitación de grupo por usuario",
+        "inviteCodesPersonalPerUser": "Máx. códigos de invitación personales por usuario",
+        "inviteLinkLimit": "Máx. enlaces de invitación por usuario",
         "inviteRegistration": "Registro por invitación",
-        "publicRegistration": "Registro abierto"
+        "maxGroupPinnedPosts": "Máx. publicaciones fijadas por grupo",
+        "maxPinnedPosts": "Máx. publicaciones fijadas (red)",
+        "publicRegistration": "Registro abierto",
+        "requireLocation": "Ubicación obligatoria"
       },
       "lastUpdated": "Última modificación: {timestamp} por {actor}",
       "name": "Política de red",

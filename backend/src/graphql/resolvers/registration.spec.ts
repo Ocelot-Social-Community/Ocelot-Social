@@ -11,15 +11,16 @@ import type EmailAddress from '@db/models/EmailAddress'
 import type User from '@db/models/User'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import type { NetworkPolicy } from '@src/policy'
 
 let variables
 
 let authenticatedUser: Context['user']
-const context = () => ({ authenticatedUser, config })
+const context = () => ({ authenticatedUser, policy })
 let mutate: ApolloTestSetup['mutate']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
-let config: Partial<Context['config']> = {}
+let policy: Partial<NetworkPolicy> = {}
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -36,7 +37,7 @@ afterAll(() => {
 })
 
 beforeEach(() => {
-  config = {}
+  policy = {}
   variables = {}
 })
 
@@ -52,9 +53,9 @@ describe('Signup', () => {
   describe('unauthenticated', () => {
     beforeEach(() => {
       authenticatedUser = null
-      config = {
-        INVITE_REGISTRATION: false,
-        PUBLIC_REGISTRATION: false,
+      policy = {
+        inviteRegistration: false,
+        publicRegistration: false,
       }
     })
 

@@ -7,15 +7,17 @@ import { setPolicyMutation, resetPolicyMutation } from '~/graphql/PolicyMutation
 const toLastChange = (event) => (event ? { actor: event.actor, timestamp: event.timestamp } : null)
 
 // Build a key→value map from a backend policy response. The frontend keeps NO
-// config defaults of its own (single source of truth is the backend): we just
-// strip Apollo's __typename and treat any key the viewer may not see (null) as
-// "off" (false), so a stale authenticated value can never linger.
+// config defaults of its own (single source of truth is the backend): we only
+// strip Apollo's __typename. A key the viewer may not see comes back as null and
+// is passed through as null — boolean consumers treat null as falsy ("off"),
+// integer consumers fall back defensively (e.g. `value || default`). We never
+// inject a frontend default value here.
 const normalize = (data) => {
   const out = {}
   for (const key of Object.keys(data || {})) {
     if (key === '__typename') continue
     const value = data[key]
-    out[key] = value === null || value === undefined ? false : value
+    out[key] = value === undefined ? null : value
   }
   return out
 }

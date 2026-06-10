@@ -26,7 +26,7 @@ describe('settings/api-keys.vue', () => {
 
     mocks = {
       $t: jest.fn((key) => key),
-      $env: { API_KEYS_MAX_PER_USER: 5 },
+      $policy: { get: (key) => (key === 'apiKeysMaxPerUser' ? 5 : false) },
       $toast: {
         success: jest.fn(),
         error: jest.fn(),
@@ -169,9 +169,17 @@ describe('settings/api-keys.vue', () => {
       expect(wrapper.vm.revokedKeys[0].id).toBe('k-revoked')
     })
 
-    it('maxKeys reads from $env', () => {
+    it('maxKeys reads from the network policy ($policy)', () => {
       wrapper = Wrapper()
       expect(wrapper.vm.maxKeys).toBe(5)
+    })
+
+    it('falls back to 0 (fail-closed) when the policy value is not loaded', () => {
+      // No frontend config default: while the policy snapshot is absent, maxKeys is
+      // 0 (create disabled) rather than a guessed number. `??` only fills null/undefined.
+      mocks.$policy = { get: () => undefined }
+      wrapper = Wrapper()
+      expect(wrapper.vm.maxKeys).toBe(0)
     })
   })
 

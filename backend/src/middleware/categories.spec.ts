@@ -6,20 +6,20 @@ import { createApolloTestSetup } from '@root/test/helpers'
 import { categories } from '@src/constants/categories'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
+import type { NetworkPolicy } from '@src/policy'
 
-let config: Partial<Context['config']>
+let policy: Partial<NetworkPolicy>
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
 beforeEach(() => {
-  config = {}
+  policy = {}
 })
 
 beforeAll(async () => {
   await cleanDatabase()
-  const context = () => ({ config, authenticatedUser: null })
+  const context = () => ({ policy, authenticatedUser: null })
   const apolloSetup = await createApolloTestSetup({ context })
   query = apolloSetup.query
   database = apolloSetup.database
@@ -43,7 +43,7 @@ afterAll(() => {
 describe('categories middleware', () => {
   describe('categories are active', () => {
     beforeEach(() => {
-      config = { ...config, CATEGORIES_ACTIVE: true }
+      policy = { ...policy, categoriesActive: true }
     })
 
     it('returns the categories', async () => {
@@ -63,7 +63,7 @@ describe('categories middleware', () => {
 
   describe('categories are not active', () => {
     beforeEach(() => {
-      config = { ...config, CATEGORIES_ACTIVE: false }
+      policy = { ...policy, categoriesActive: false }
     })
 
     it('returns an empty array though there are categories in the db', async () => {

@@ -12,8 +12,8 @@ import type { Context } from '@src/context'
 
 let user
 let authenticatedUser: Context['user']
-const config = { CATEGORIES_ACTIVE: false }
-const context = () => ({ authenticatedUser, config })
+const policy = { categoriesActive: false }
+const context = () => ({ authenticatedUser, policy })
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']

@@ -110,7 +110,7 @@ export default {
       return this.inviteCodes.filter((c) => !c.isValid)
     },
     maxLinks() {
-      return Number(this.$env.INVITE_LINK_LIMIT)
+      return Number(this.$policy.get('inviteLinkLimit'))
     },
     totalInvitedCount() {
       return this.inviteCodes.reduce((sum, c) => sum + (c.redeemedByCount || 0), 0)

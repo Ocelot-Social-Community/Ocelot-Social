@@ -17,17 +17,50 @@ describe('admin/policy.vue', () => {
   const snapshot = {
     publicRegistration: false,
     inviteRegistration: true,
+    askForRealName: false,
+    requireLocation: false,
+    inviteLinkLimit: 7,
+    inviteCodesPersonalPerUser: 7,
+    inviteCodesGroupPerUser: 7,
     categoriesActive: false,
+    badgesEnabled: false,
     apiKeysEnabled: false,
+    apiKeysMaxPerUser: 5,
+    maxPinnedPosts: 1,
+    maxGroupPinnedPosts: 1,
   }
   // Deliberately differs from the snapshot on categoriesActive, so we can assert
   // the grey text shows the configured DEFAULT, not the current toggle value.
   const defaults = {
     publicRegistration: false,
     inviteRegistration: true,
+    askForRealName: false,
+    requireLocation: false,
+    inviteLinkLimit: 7,
+    inviteCodesPersonalPerUser: 7,
+    inviteCodesGroupPerUser: 7,
     categoriesActive: true,
+    badgesEnabled: false,
     apiKeysEnabled: false,
+    apiKeysMaxPerUser: 5,
+    maxPinnedPosts: 1,
+    maxGroupPinnedPosts: 1,
   }
+  const ALL_KEYS = [
+    'publicRegistration',
+    'inviteRegistration',
+    'askForRealName',
+    'requireLocation',
+    'inviteLinkLimit',
+    'inviteCodesPersonalPerUser',
+    'inviteCodesGroupPerUser',
+    'categoriesActive',
+    'badgesEnabled',
+    'apiKeysEnabled',
+    'apiKeysMaxPerUser',
+    'maxPinnedPosts',
+    'maxGroupPinnedPosts',
+  ]
   const lastChange = { actor: 'jenny-rostock', timestamp: '2026-01-02T03:04:05.000Z' }
 
   beforeEach(() => {
@@ -74,16 +107,21 @@ describe('admin/policy.vue', () => {
 
   it('renders every policy with a name and a detailed description', () => {
     wrapper = Wrapper()
-    for (const key of [
-      'publicRegistration',
-      'inviteRegistration',
-      'categoriesActive',
-      'apiKeysEnabled',
-    ]) {
+    for (const key of ALL_KEYS) {
       expect(wrapper.find(`[data-test="policy-${key}"]`).exists()).toBe(true)
       expect(wrapper.text()).toContain(`admin.policy.keys.${key}`)
       expect(wrapper.text()).toContain(`admin.policy.descriptions.${key}`)
     }
+  })
+
+  it('renders integer policies as number inputs reflecting the snapshot value', async () => {
+    wrapper = Wrapper()
+    await flushPromises()
+    const numberInput = wrapper.find('#policy-apiKeysMaxPerUser')
+    expect(numberInput.element.type).toBe('number')
+    expect(numberInput.element.value).toBe('5')
+    // Booleans stay checkboxes.
+    expect(wrapper.find('#policy-publicRegistration').element.type).toBe('checkbox')
   })
 
   it('fetches the policy on mount and reflects the snapshot in the checkboxes', async () => {
@@ -170,6 +208,22 @@ describe('admin/policy.vue', () => {
       expect(mocks.$toast.success).toHaveBeenCalled()
     })
 
+    it('saves an integer policy as a number via setKey', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+
+      // apiKeysMaxPerUser is 5 in the snapshot → change it to 10 (dirties the form).
+      await wrapper.find('#policy-apiKeysMaxPerUser').setValue('10')
+      await wrapper.find('form').trigger('submit')
+      await flushPromises()
+
+      expect(setKey).toHaveBeenCalledTimes(1)
+      expect(setKey).toHaveBeenCalledWith(expect.anything(), {
+        key: 'apiKeysMaxPerUser',
+        value: 10, // v-model.number → a real number, not the string "10"
+      })
+    })
+
     it('does not call setKey when nothing changed', async () => {
       wrapper = Wrapper()
       await flushPromises()
@@ -187,13 +241,8 @@ describe('admin/policy.vue', () => {
       await wrapper.find('[data-test="policy-reset"]').trigger('click')
       await flushPromises()
 
-      expect(resetKey).toHaveBeenCalledTimes(4) // one per policy key
-      for (const key of [
-        'publicRegistration',
-        'inviteRegistration',
-        'categoriesActive',
-        'apiKeysEnabled',
-      ]) {
+      expect(resetKey).toHaveBeenCalledTimes(ALL_KEYS.length) // one per policy key
+      for (const key of ALL_KEYS) {
         expect(resetKey).toHaveBeenCalledWith(expect.anything(), { key })
       }
       expect(mocks.$toast.success).toHaveBeenCalled()

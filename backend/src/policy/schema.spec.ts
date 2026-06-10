@@ -5,7 +5,7 @@ import { audiencesFor, audiencesOf, canView, visibleKeys } from './schema'
 
 describe('policy visibility', () => {
   describe('audiencesFor()', () => {
-    it('reads the x-visibility list from the schema', () => {
+    it('reads the visibility list from the schema', () => {
       expect(audiencesFor('publicRegistration')).toEqual(['public'])
       expect(audiencesFor('apiKeysEnabled')).toEqual(['authenticated'])
     })
@@ -56,18 +56,30 @@ describe('policy visibility', () => {
   describe('visibleKeys()', () => {
     it('returns only public keys for anonymous viewers', () => {
       expect(visibleKeys(null).sort()).toEqual([
+        'askForRealName',
+        'badgesEnabled',
         'categoriesActive',
         'inviteRegistration',
         'publicRegistration',
+        'requireLocation',
       ])
     })
 
     it('returns all keys for a logged-in viewer', () => {
       expect(visibleKeys({ role: 'user' }).sort()).toEqual([
         'apiKeysEnabled',
+        'apiKeysMaxPerUser',
+        'askForRealName',
+        'badgesEnabled',
         'categoriesActive',
+        'inviteCodesGroupPerUser',
+        'inviteCodesPersonalPerUser',
+        'inviteLinkLimit',
         'inviteRegistration',
+        'maxGroupPinnedPosts',
+        'maxPinnedPosts',
         'publicRegistration',
+        'requireLocation',
       ])
     })
   })

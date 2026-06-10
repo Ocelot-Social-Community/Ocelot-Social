@@ -5,14 +5,27 @@
 export interface NetworkPolicy {
   publicRegistration: boolean
   inviteRegistration: boolean
+  askForRealName: boolean
+  requireLocation: boolean
+  inviteLinkLimit: number
+  inviteCodesPersonalPerUser: number
+  inviteCodesGroupPerUser: number
   categoriesActive: boolean
+  badgesEnabled: boolean
   apiKeysEnabled: boolean
+  apiKeysMaxPerUser: number
+  maxPinnedPosts: number
+  maxGroupPinnedPosts: number
 }
 
 export type PolicyKey = keyof NetworkPolicy
 
+// The value a policy key can hold across all keys (boolean toggles and integer
+// limits today; string-typed keys are supported by the schema/service for later).
+export type PolicyValue = NetworkPolicy[PolicyKey]
+
 // An audience is a tag that a policy key can be made visible to (via the key's
-// "x-visibility" list in the schema) and that a viewer can be a member of.
+// "visibility" list in the schema) and that a viewer can be a member of.
 //
 // Well-known audiences:
 //   • 'public'        — every viewer, including anonymous (universal membership)
@@ -30,3 +43,17 @@ export type Audience = string
 export const PUBLIC_AUDIENCE: Audience = 'public'
 export const AUTHENTICATED_AUDIENCE: Audience = 'authenticated'
 export const ADMIN_AUDIENCE: Audience = 'admin'
+
+// Audiences that may appear in a key's `visibility` list in the schema: the two
+// universal/auth audiences plus the built-in user roles (UserRole: admin,
+// moderator, user). The static schema is authored at build time, so it can only
+// reference these known audiences — runtime dynamic roles (if ever added) are
+// matched in audiencesOf(), not written into the schema. Used to enum-validate
+// `visibility` at module load. Keep in sync with the UserRole enum.
+export const KNOWN_AUDIENCES: Audience[] = [
+  PUBLIC_AUDIENCE,
+  AUTHENTICATED_AUDIENCE,
+  ADMIN_AUDIENCE,
+  'moderator',
+  'user',
+]
