@@ -127,7 +127,6 @@ export const postsPinnedCountsQuery = () => {
   return gql`
     query {
       PostsPinnedCounts {
-        maxPinnedPosts
         currentlyPinnedPosts
       }
     }

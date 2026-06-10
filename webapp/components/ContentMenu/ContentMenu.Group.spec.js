@@ -33,8 +33,8 @@ describe('ContentMenu.vue - Group', () => {
   const getters = {
     'auth/isModerator': () => false,
     'auth/isAdmin': () => false,
-    'pinnedPosts/maxPinnedPosts': () => 1,
     'pinnedPosts/currentlyPinnedPosts': () => 1,
+    'pinnedPosts/loaded': () => true,
   }
   const actions = {
     'pinnedPosts/fetch': jest.fn(),

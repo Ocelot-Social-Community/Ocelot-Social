@@ -3,10 +3,10 @@ import { postsPinnedCountsQuery } from '~/graphql/PostQuery'
 
 describe('pinned post store', () => {
   describe('initial state', () => {
-    it('sets all values to 0', () => {
+    it('starts with no pinned posts and not loaded', () => {
       expect(initialState()).toEqual({
-        maxPinnedPosts: 0,
         currentlyPinnedPosts: 0,
+        loaded: false,
       })
     })
   })
@@ -14,8 +14,8 @@ describe('pinned post store', () => {
   describe('mutations', () => {
     let testMutation
     const state = {
-      maxPinnedPosts: 0,
       currentlyPinnedPosts: 0,
+      loaded: false,
     }
 
     describe('pinPost', () => {
@@ -39,17 +39,6 @@ describe('pinned post store', () => {
       })
     })
 
-    describe('setMaxPinnedPosts', () => {
-      it('sets maxPinnedPosts correctly', () => {
-        state.maxPinnedPosts = 3
-        testMutation = () => {
-          mutations.setMaxPinnedPosts(state, 1)
-          return getters.maxPinnedPosts(state)
-        }
-        expect(testMutation()).toBe(1)
-      })
-    })
-
     describe('setCurrentlyPinnedPosts', () => {
       it('sets currentlyPinnedPosts', () => {
         state.currentlyPinnedPosts = 3
@@ -60,13 +49,23 @@ describe('pinned post store', () => {
         expect(testMutation()).toBe(1)
       })
     })
+
+    describe('setLoaded', () => {
+      it('marks the count as loaded', () => {
+        state.loaded = false
+        testMutation = () => {
+          mutations.setLoaded(state)
+          return getters.loaded(state)
+        }
+        expect(testMutation()).toBe(true)
+      })
+    })
   })
 
   describe('actions', () => {
     const queryMock = jest.fn().mockResolvedValue({
       data: {
         PostsPinnedCounts: {
-          maxPinnedPosts: 3,
           currentlyPinnedPosts: 2,
         },
       },
@@ -99,12 +98,12 @@ describe('pinned post store', () => {
         })
       })
 
-      it('commits setMaxPinnedPosts', () => {
-        expect(commit).toBeCalledWith('setMaxPinnedPosts', 3)
-      })
-
       it('commits setCurrentlyPinnedPosts', () => {
         expect(commit).toBeCalledWith('setCurrentlyPinnedPosts', 2)
+      })
+
+      it('commits setLoaded', () => {
+        expect(commit).toBeCalledWith('setLoaded')
       })
     })
   })

@@ -1596,7 +1596,7 @@ describe('pin posts', () => {
     })
 
     describe('maxPinnedPosts = 3', () => {
-      const postsPinnedCountsQuery = `query { PostsPinnedCounts { maxPinnedPosts, currentlyPinnedPosts } }`
+      const postsPinnedCountsQuery = `query { PostsPinnedCounts { currentlyPinnedPosts } }`
 
       beforeEach(async () => {
         policy = { maxPinnedPosts: 3 }
@@ -1673,7 +1673,6 @@ describe('pin posts', () => {
           ).resolves.toMatchObject({
             data: {
               PostsPinnedCounts: {
-                maxPinnedPosts: 3,
                 currentlyPinnedPosts: 1,
               },
             },
@@ -1709,7 +1708,6 @@ describe('pin posts', () => {
             ).resolves.toMatchObject({
               data: {
                 PostsPinnedCounts: {
-                  maxPinnedPosts: 3,
                   currentlyPinnedPosts: 2,
                 },
               },
@@ -1745,7 +1743,6 @@ describe('pin posts', () => {
               ).resolves.toMatchObject({
                 data: {
                   PostsPinnedCounts: {
-                    maxPinnedPosts: 3,
                     currentlyPinnedPosts: 3,
                   },
                 },

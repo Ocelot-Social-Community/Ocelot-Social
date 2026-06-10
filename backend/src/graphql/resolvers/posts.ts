@@ -167,14 +167,14 @@ export default {
       }
     },
     PostsPinnedCounts: async (_object, params, context: Context, _resolveInfo) => {
-      const { policy } = context
+      // Only the live network-wide pinned count lives here; the limit
+      // (maxPinnedPosts) is a network-policy key read via the `policy` query.
       const [postsPinnedCount] = (
         await context.database.query({
           query: 'MATCH (p:Post { pinned: true }) RETURN COUNT (p) AS count',
         })
       ).records.map((r) => Number(r.get('count').toString()))
       return {
-        maxPinnedPosts: policy.get('maxPinnedPosts'),
         currentlyPinnedPosts: postsPinnedCount,
       }
     },
