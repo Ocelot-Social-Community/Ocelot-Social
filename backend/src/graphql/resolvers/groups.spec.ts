@@ -18,6 +18,8 @@ import muteGroupMutation from '@graphql/queries/groups/muteGroup.gql'
 import RemoveUserFromGroup from '@graphql/queries/groups/RemoveUserFromGroup.gql'
 import unmuteGroupMutation from '@graphql/queries/groups/unmuteGroup.gql'
 import UpdateGroup from '@graphql/queries/groups/UpdateGroup.gql'
+import CreatePost from '@graphql/queries/posts/CreatePost.gql'
+import Post from '@graphql/queries/posts/Post.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
@@ -3146,6 +3148,111 @@ describe('in mode', () => {
                   expect(errors?.[0]).toHaveProperty('message', 'Too many categories!')
                 })
               })
+            })
+          })
+
+          describe('groupType', () => {
+            let adminGroupTypeTestUser
+
+            beforeAll(async () => {
+              adminGroupTypeTestUser = await Factory.build(
+                'user',
+                { id: 'admin-group-type-test-user', name: 'Admin Group Type TestUser' },
+                { email: 'admin-group-type-test-user@example.org', password: '1234' },
+              )
+              authenticatedUser = await user.toJson()
+              await mutate({
+                mutation: UpdateGroup,
+                variables: { id: 'my-group', groupType: 'public' },
+              })
+              await mutate({
+                mutation: ChangeGroupMemberRole,
+                variables: {
+                  groupId: 'my-group',
+                  userId: 'admin-group-type-test-user',
+                  roleInGroup: 'admin',
+                },
+              })
+              await mutate({
+                mutation: CreatePost,
+                variables: {
+                  id: 'group-type-test-post',
+                  title: 'Group Type Test Post',
+                  content: 'Content for group type change test',
+                  postType: 'Article',
+                  groupId: 'my-group',
+                },
+              })
+            })
+
+            it('can change groupType from public to hidden', async () => {
+              await expect(
+                mutate({
+                  mutation: UpdateGroup,
+                  variables: { id: 'my-group', groupType: 'hidden' },
+                }),
+              ).resolves.toMatchObject({
+                data: {
+                  UpdateGroup: { id: 'my-group', groupType: 'hidden', myRole: 'owner' },
+                },
+                errors: undefined,
+              })
+            })
+
+            it('non-member cannot see posts after public → hidden change', async () => {
+              authenticatedUser = await noMemberUser.toJson()
+              const result = await query({ query: Post })
+              const postIds = result.data?.Post.map((p: { id: string }) => p.id) ?? []
+              expect(postIds).not.toContain('group-type-test-post')
+            })
+
+            it('can change groupType from hidden back to public', async () => {
+              authenticatedUser = await user.toJson()
+              await expect(
+                mutate({
+                  mutation: UpdateGroup,
+                  variables: { id: 'my-group', groupType: 'public' },
+                }),
+              ).resolves.toMatchObject({
+                data: {
+                  UpdateGroup: { id: 'my-group', groupType: 'public', myRole: 'owner' },
+                },
+                errors: undefined,
+              })
+            })
+
+            it('non-member can see posts again after hidden → public change', async () => {
+              authenticatedUser = await noMemberUser.toJson()
+              const result = await query({ query: Post })
+              const postIds = result.data?.Post.map((p: { id: string }) => p.id) ?? []
+              expect(postIds).toContain('group-type-test-post')
+            })
+
+            it('usual member cannot change groupType', async () => {
+              authenticatedUser = await usualMemberUser.toJson()
+              const { errors } = await mutate({
+                mutation: UpdateGroup,
+                variables: { id: 'my-group', groupType: 'hidden' },
+              })
+              expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
+            })
+
+            it('non-member cannot change groupType', async () => {
+              authenticatedUser = await noMemberUser.toJson()
+              const { errors } = await mutate({
+                mutation: UpdateGroup,
+                variables: { id: 'my-group', groupType: 'hidden' },
+              })
+              expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
+            })
+
+            it('admin member cannot change groupType', async () => {
+              authenticatedUser = await adminGroupTypeTestUser.toJson()
+              const { errors } = await mutate({
+                mutation: UpdateGroup,
+                variables: { id: 'my-group', groupType: 'hidden' },
+              })
+              expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
             })
           })
 
