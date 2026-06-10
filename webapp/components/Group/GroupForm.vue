@@ -39,7 +39,7 @@
           name="groupType"
           model="groupType"
           :value="formData.groupType"
-          :disabled="update && group.myRole !== 'owner'"
+          :disabled="update && group?.myRole !== 'owner'"
           @change="changeGroupType($event)"
         >
           <option v-for="groupType in groupTypeOptions" :key="groupType" :value="groupType">
