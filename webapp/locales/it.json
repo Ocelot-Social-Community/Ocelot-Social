@@ -154,11 +154,17 @@
         "maxGroupPinnedPosts": "Numero massimo di post che possono essere fissati all'interno di un gruppo. Imposta 0 per disabilitare il fissaggio nei gruppi.",
         "maxPinnedPosts": "Numero massimo di post che possono essere fissati sull'intera rete (amministratori). Imposta 0 per disabilitare il fissaggio.",
         "publicRegistration": "Consente a chiunque di creare un account direttamente, senza codice di invito. Se disattivato, i nuovi utenti possono iscriversi solo tramite invito.",
-        "requireLocation": "Rende obbligatoria una posizione durante la registrazione e nelle impostazioni del profilo."
+        "requireLocation": "Rende obbligatoria una posizione durante la registrazione e nelle impostazioni del profilo.",
+        "showContentFilterHeaderMenu": "Mostra il filtro dei contenuti nel menu di intestazione.",
+        "showContentFilterMasonryGrid": "Mostra il filtro dei contenuti nella griglia masonry (feed).",
+        "showGroupButtonInHeader": "Mostra il pulsante dei gruppi nell'intestazione."
       },
       "groups": {
         "features": {
           "title": "Funzionalità"
+        },
+        "layout": {
+          "title": "Layout"
         },
         "registration": {
           "title": "Registrazione"
@@ -177,7 +183,10 @@
         "maxGroupPinnedPosts": "Max. post fissati per gruppo",
         "maxPinnedPosts": "Max. post fissati (rete)",
         "publicRegistration": "Registrazione aperta",
-        "requireLocation": "Posizione obbligatoria"
+        "requireLocation": "Posizione obbligatoria",
+        "showContentFilterHeaderMenu": "Filtro contenuti nell'intestazione",
+        "showContentFilterMasonryGrid": "Filtro contenuti nella griglia",
+        "showGroupButtonInHeader": "Pulsante gruppi nell'intestazione"
       },
       "lastUpdated": "Ultima modifica: {timestamp} da {actor}",
       "name": "Criteri di rete",

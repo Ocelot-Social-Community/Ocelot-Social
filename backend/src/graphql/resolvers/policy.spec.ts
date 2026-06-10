@@ -67,6 +67,9 @@ describe('Query.policy', () => {
         requireLocation: false,
         categoriesActive: true,
         badgesEnabled: false,
+        showContentFilterHeaderMenu: true,
+        showContentFilterMasonryGrid: false,
+        showGroupButtonInHeader: true,
         // authenticated-only keys → null for an anonymous viewer
         apiKeysEnabled: null,
         apiKeysMaxPerUser: null,
@@ -144,6 +147,9 @@ describe('Query.policyDefaults', () => {
       'categoriesActive',
       'badgesEnabled',
       'apiKeysEnabled',
+      'showContentFilterHeaderMenu',
+      'showContentFilterMasonryGrid',
+      'showGroupButtonInHeader',
     ]) {
       expect(typeof data.policyDefaults.defaults[key]).toBe('boolean')
     }

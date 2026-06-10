@@ -154,11 +154,17 @@
         "maxGroupPinnedPosts": "Maximum number of posts that can be pinned within a group. Set to 0 to disable pinning in groups.",
         "maxPinnedPosts": "Maximum number of posts that can be pinned network-wide (admins). Set to 0 to disable pinning.",
         "publicRegistration": "Allow anyone to create an account directly, without an invite code. When off, new users can only join via an invitation.",
-        "requireLocation": "Make a location mandatory during registration and in profile settings."
+        "requireLocation": "Make a location mandatory during registration and in profile settings.",
+        "showContentFilterHeaderMenu": "Show the content filter in the header menu.",
+        "showContentFilterMasonryGrid": "Show the content filter in the masonry grid (newsfeed).",
+        "showGroupButtonInHeader": "Show the groups button in the header."
       },
       "groups": {
         "features": {
           "title": "Features"
+        },
+        "layout": {
+          "title": "Layout"
         },
         "registration": {
           "title": "Registration"
@@ -177,7 +183,10 @@
         "maxGroupPinnedPosts": "Max. pinned posts per group",
         "maxPinnedPosts": "Max. pinned posts (network)",
         "publicRegistration": "Open registration",
-        "requireLocation": "Require location"
+        "requireLocation": "Require location",
+        "showContentFilterHeaderMenu": "Content filter in header",
+        "showContentFilterMasonryGrid": "Content filter in grid",
+        "showGroupButtonInHeader": "Groups button in header"
       },
       "lastUpdated": "Last changed: {timestamp} by {actor}",
       "name": "Network policy",
