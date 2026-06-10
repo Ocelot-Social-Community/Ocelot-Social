@@ -21,7 +21,7 @@
         @click="openAndFocus"
         :class="[
           resolvedIcon && 'ds-select-has-icon',
-          resolvedIconRight && 'ds-select-has-icon-right',
+          (resolvedIconRight || !!$slots['icon-right']) && 'ds-select-has-icon-right',
           multiple && 'ds-select-multiple',
         ]"
       >
