@@ -206,11 +206,13 @@ export default {
   data() {
     const { name, slug, groupType, about, description, actionRadius, locationName, categories } =
       this.group
+    const initialCategoryIds = categories ? categories.map((category) => category.id) : []
     return {
       disabled: false,
       groupTypeOptions: ['public', 'closed', 'hidden'],
       loadingGeo: false,
       cities: [],
+      initialCategoryIds,
       formData: {
         name: name || '',
         slug: slug || '',
@@ -219,7 +221,7 @@ export default {
         description: description || '',
         locationName: locationName || '',
         actionRadius: actionRadius || '',
-        categoryIds: categories ? categories.map((category) => category.id) : [],
+        categoryIds: [...initialCategoryIds],
       },
       formSchema: {
         name: { required: true, min: NAME_LENGTH_MIN, max: NAME_LENGTH_MAX },
@@ -275,15 +277,8 @@ export default {
       return dbLocationName === this.formLocationName
     },
     sameCategories() {
-      if (this.group.categories.length !== this.formData.categoryIds.length) return false
-      const groupCategories = []
-      this.group.categories.forEach((categories) => {
-        groupCategories.push(categories.id)
-        const some = this.formData.categoryIds.some((item) => item === categories.id)
-        if (!some) return false
-      })
-
-      return true
+      if (this.initialCategoryIds.length !== this.formData.categoryIds.length) return false
+      return this.initialCategoryIds.every((id) => this.formData.categoryIds.includes(id))
     },
     disableButtonByUpdate() {
       if (!this.update) return true
