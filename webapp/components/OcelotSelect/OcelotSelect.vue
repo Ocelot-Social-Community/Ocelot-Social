@@ -111,8 +111,10 @@
           </li>
         </ul>
       </div>
-      <div v-if="resolvedIconRight" class="ocelot-select-icon-right">
-        <os-icon :icon="resolvedIconRight" />
+      <div v-if="resolvedIconRight || $slots['icon-right']" class="ocelot-select-icon-right">
+        <slot name="icon-right">
+          <os-icon :icon="resolvedIconRight" />
+        </slot>
       </div>
     </div>
   </div>
