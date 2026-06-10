@@ -618,9 +618,9 @@ export default {
     },
     showOrChangeChat(userId) {
       if (this.getShowChat.showChat && this.getShowChat.chatUserId === userId) {
-        this.showChat({ showChat: false, chatUserId: null })
+        this.showChat({ showChat: false, chatUserId: null, groupId: null })
       } else {
-        this.showChat({ showChat: true, chatUserId: userId })
+        this.showChat({ showChat: true, chatUserId: userId, groupId: null })
       }
     },
   },
