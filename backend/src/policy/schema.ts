@@ -47,11 +47,20 @@ export function typeFor(key: PolicyKey): string {
 }
 
 // --- Value validation (Ajv) ------------------------------------------------
-// Per-key validators compiled once from the schema. `strict: false` lets the
-// custom annotation keywords (x-visibility, x-envSeed) pass through instead of
-// being rejected. This enforces the FULL schema for a key — type AND constraints
-// such as `minimum` — replacing the former hand-rolled type-only check.
-const ajv = new Ajv({ strict: false })
+// Per-key validators compiled once from the schema. Run in `strict: true` mode
+// so schema-authoring mistakes (typo'd / unknown keywords, wrong shapes) fail
+// fast at module load. The custom annotation keywords are registered as known
+// AND their values are validated: `x-visibility` must be a string array,
+// `x-envSeed` a string. A future x-* keyword (e.g. x-licenseRequired) MUST be
+// registered here too, otherwise strict mode rejects the schema.
+// These keywords carry metadata only (no `validate`/`code`), so they never
+// affect data validation — only type and constraints (e.g. `minimum`) do that.
+const ajv = new Ajv({ strict: true })
+ajv.addKeyword({
+  keyword: 'x-visibility',
+  metaSchema: { type: 'array', items: { type: 'string' } },
+})
+ajv.addKeyword({ keyword: 'x-envSeed', metaSchema: { type: 'string' } })
 const validators = Object.fromEntries(
   allKeys().map((key) => [key, ajv.compile(rawSchema.properties[key])]),
 ) as Record<PolicyKey, ValidateFunction>
