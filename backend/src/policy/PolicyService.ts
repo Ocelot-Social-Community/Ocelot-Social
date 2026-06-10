@@ -28,7 +28,7 @@ import {
   readLastChange,
   writeSetting,
 } from './repository'
-import { allKeys, canView, defaultFor, envSeedFor, typeFor } from './schema'
+import { allKeys, canView, defaultFor, envSeedFor, typeFor, validatePolicyValue } from './schema'
 
 import type { PolicyViewer } from './schema'
 import type { NetworkPolicy, PolicyKey, PolicyValue } from './types'
@@ -116,18 +116,18 @@ export class PolicyService {
       if (this.cache[key] !== undefined) continue
 
       const existing = dbValues[key]
-      // Adopt a stored value only if it still matches the schema type.
-      if (existing !== undefined && this.typeMatches(key, existing)) {
+      // Adopt a stored value only if it still satisfies the schema.
+      if (existing !== undefined && this.isValidValue(key, existing)) {
         this.cache[key] = existing as never
         continue
       }
-      // Missing, or present with a wrong type (out-of-band edit / un-migrated type
+      // Missing, or present but invalid (out-of-band edit / un-migrated schema
       // change) — reseed from ENV/default. Never throw: a corrupt row must not
       // crash startup.
       if (existing !== undefined) {
         // eslint-disable-next-line no-console
         console.warn(
-          `[policy] DB value for '${key}' has wrong type (${typeof existing}); reseeding from ENV/default.`,
+          `[policy] DB value for '${key}' is invalid (${typeof existing}); reseeding from ENV/default.`,
         )
       }
 
@@ -218,7 +218,7 @@ export class PolicyService {
     actor: string,
   ): Promise<PolicyChangeEvent> {
     this.assertKnownKey(key)
-    this.assertTypeMatches(key, value)
+    this.assertValidValue(key, value)
 
     await writeSetting(this.db, POLICY_NAMESPACE, key, value, actor)
     this.cache[key] = value
@@ -289,10 +289,10 @@ export class PolicyService {
     // version publishing a wrong-typed value) instead of corrupting the cache —
     // symmetric with init()'s reseed-on-mismatch. Never throws: this runs inside
     // the pubsub handler, and lastChange must not move for a rejected event.
-    if (!this.typeMatches(event.key, event.value)) {
+    if (!this.isValidValue(event.key, event.value)) {
       // eslint-disable-next-line no-console
       console.warn(
-        `[policy] ignoring external change for '${event.key}' with wrong type (${typeof event.value}).`,
+        `[policy] ignoring invalid external change for '${event.key}' (${typeof event.value}).`,
       )
       return
     }
@@ -310,24 +310,17 @@ export class PolicyService {
     }
   }
 
-  // Non-throwing type check, shared by init() (reseed on mismatch) and
-  // assertTypeMatches() (throw on mismatch).
-  private typeMatches(key: PolicyKey, value: unknown): boolean {
-    const expected = typeFor(key)
-    const actual = typeof value
-    return (
-      (expected === 'boolean' && actual === 'boolean') ||
-      (expected === 'integer' && actual === 'number' && Number.isInteger(value)) ||
-      (expected === 'string' && actual === 'string')
-    )
+  // Non-throwing schema validity check (type AND constraints, e.g. minimum),
+  // shared by init() (reseed on mismatch) and assertValidValue() (throw on
+  // mismatch). Delegates to the Ajv-backed validator in schema.ts.
+  private isValidValue(key: PolicyKey, value: unknown): boolean {
+    return validatePolicyValue(key, value) === true
   }
 
-  private assertTypeMatches(key: PolicyKey, value: unknown): void {
-    if (!this.typeMatches(key, value)) {
-      const expected = typeFor(key)
-      throw new PolicyValidationError(
-        `Type mismatch for policy key '${key}': expected ${expected}, got ${typeof value}`,
-      )
+  private assertValidValue(key: PolicyKey, value: unknown): void {
+    const result = validatePolicyValue(key, value)
+    if (result !== true) {
+      throw new PolicyValidationError(`Invalid value for policy key '${key}': ${result}`)
     }
   }
 }

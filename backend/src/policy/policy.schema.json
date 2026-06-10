@@ -36,6 +36,7 @@
     },
     "inviteLinkLimit": {
       "type": "integer",
+      "minimum": 0,
       "default": 7,
       "x-visibility": ["authenticated"],
       "x-envSeed": "INVITE_LINK_LIMIT",
@@ -43,6 +44,7 @@
     },
     "inviteCodesPersonalPerUser": {
       "type": "integer",
+      "minimum": 0,
       "default": 7,
       "x-visibility": ["authenticated"],
       "x-envSeed": "INVITE_CODES_PERSONAL_PER_USER",
@@ -50,6 +52,7 @@
     },
     "inviteCodesGroupPerUser": {
       "type": "integer",
+      "minimum": 0,
       "default": 7,
       "x-visibility": ["authenticated"],
       "x-envSeed": "INVITE_CODES_GROUP_PER_USER",
@@ -78,6 +81,7 @@
     },
     "apiKeysMaxPerUser": {
       "type": "integer",
+      "minimum": 0,
       "default": 5,
       "x-visibility": ["authenticated"],
       "x-envSeed": "API_KEYS_MAX_PER_USER",
@@ -85,6 +89,7 @@
     },
     "maxPinnedPosts": {
       "type": "integer",
+      "minimum": 0,
       "default": 1,
       "x-visibility": ["authenticated"],
       "x-envSeed": "MAX_PINNED_POSTS",
@@ -92,6 +97,7 @@
     },
     "maxGroupPinnedPosts": {
       "type": "integer",
+      "minimum": 0,
       "default": 1,
       "x-visibility": ["authenticated"],
       "x-envSeed": "MAX_GROUP_PINNED_POSTS",

@@ -7,13 +7,17 @@
 // file). require() is the established pattern for static config in this codebase.
 /* eslint-disable @typescript-eslint/no-require-imports, import-x/no-commonjs, n/global-require */
 /* eslint-disable security/detect-object-injection */ // keys come from the fixed schema, never user input
+import { Ajv } from 'ajv'
+
 import { ADMIN_AUDIENCE, AUTHENTICATED_AUDIENCE, PUBLIC_AUDIENCE } from './types'
 
 import type { Audience, NetworkPolicy, PolicyKey } from './types'
+import type { ValidateFunction } from 'ajv'
 
 interface RawProperty {
   type: string
   default: unknown
+  minimum?: number
   description?: string
   'x-visibility'?: Audience[]
   'x-envSeed'?: string
@@ -40,6 +44,24 @@ export function envSeedFor(key: PolicyKey): string | undefined {
 
 export function typeFor(key: PolicyKey): string {
   return rawSchema.properties[key].type
+}
+
+// --- Value validation (Ajv) ------------------------------------------------
+// Per-key validators compiled once from the schema. `strict: false` lets the
+// custom annotation keywords (x-visibility, x-envSeed) pass through instead of
+// being rejected. This enforces the FULL schema for a key — type AND constraints
+// such as `minimum` — replacing the former hand-rolled type-only check.
+const ajv = new Ajv({ strict: false })
+const validators = Object.fromEntries(
+  allKeys().map((key) => [key, ajv.compile(rawSchema.properties[key])]),
+) as Record<PolicyKey, ValidateFunction>
+
+// Validate a value for a key against its schema (type + constraints). Returns
+// true if valid, otherwise a human-readable error message.
+export function validatePolicyValue(key: PolicyKey, value: unknown): true | string {
+  const validate = validators[key]
+  if (validate(value)) return true
+  return ajv.errorsText(validate.errors, { dataVar: key })
 }
 
 // --- Visibility: membership-based, not rank-based -------------------------

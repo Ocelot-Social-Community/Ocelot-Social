@@ -233,7 +233,7 @@ describe('setPolicy value validation (integration)', () => {
   it('classifies a valid-JSON value of the wrong type as BAD_USER_INPUT', async () => {
     authenticatedUser = asUser('admin')
 
-    // "123" is valid JSON (number) but apiKeysEnabled is boolean → type mismatch.
+    // "123" is valid JSON (number) but apiKeysEnabled is boolean → schema mismatch.
     // It reaches policy.set() and must come back as a client input error, not as
     // a generic/internal error.
     const { errors } = await query({
@@ -242,13 +242,13 @@ describe('setPolicy value validation (integration)', () => {
     })
 
     expect(errors?.[0]?.extensions?.code).toBe('BAD_USER_INPUT')
-    expect(errors?.[0]?.message).toMatch(/Type mismatch/)
+    expect(errors?.[0]?.message).toMatch(/must be boolean/)
   })
 
   it('classifies a non-integer value for an integer key as BAD_USER_INPUT', async () => {
     authenticatedUser = asUser('admin')
 
-    // 1.5 is valid JSON but apiKeysMaxPerUser is integer → type mismatch, surfaced
+    // 1.5 is valid JSON but apiKeysMaxPerUser is integer → schema mismatch, surfaced
     // as a client input error rather than an internal one.
     const { errors } = await query({
       query: setPolicyMutation,
@@ -256,7 +256,7 @@ describe('setPolicy value validation (integration)', () => {
     })
 
     expect(errors?.[0]?.extensions?.code).toBe('BAD_USER_INPUT')
-    expect(errors?.[0]?.message).toMatch(/Type mismatch/)
+    expect(errors?.[0]?.message).toMatch(/must be integer/)
   })
 })
 

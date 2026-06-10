@@ -379,7 +379,7 @@ describe('PolicyService', () => {
       await svc.init({})
 
       await expect(svc.set('publicRegistration', 'true' as never, 'actor')).rejects.toThrow(
-        /Type mismatch/,
+        /must be boolean/,
       )
     })
 
@@ -407,11 +407,23 @@ describe('PolicyService', () => {
       await svc.init({})
 
       await expect(svc.set('apiKeysMaxPerUser', true as never, 'actor')).rejects.toThrow(
-        /Type mismatch/,
+        /must be integer/,
       )
       await expect(svc.set('apiKeysMaxPerUser', 1.5 as never, 'actor')).rejects.toThrow(
-        /Type mismatch/,
+        /must be integer/,
       )
+    })
+
+    it('rejects a negative value for an integer key (schema minimum: 0)', async () => {
+      readAllSettings.mockResolvedValue({})
+      const svc = new PolicyService(dbStub)
+      await svc.init({})
+
+      await expect(svc.set('apiKeysMaxPerUser', -1 as never, 'actor')).rejects.toThrow(
+        /must be >= 0/,
+      )
+      // 0 is valid (e.g. disables the feature) and must NOT be rejected.
+      await expect(svc.set('maxPinnedPosts', 0, 'actor')).resolves.toBeDefined()
     })
 
     it('does not throw when no pubsub is configured', async () => {
