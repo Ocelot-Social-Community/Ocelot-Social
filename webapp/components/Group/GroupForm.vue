@@ -39,7 +39,7 @@
           name="groupType"
           model="groupType"
           :value="formData.groupType"
-          :disabled="update"
+          :disabled="update && group.myRole !== 'owner'"
           @change="changeGroupType($event)"
         >
           <option v-for="groupType in groupTypeOptions" :key="groupType" :value="groupType">
@@ -290,6 +290,7 @@ export default {
       return (
         this.group.name === this.formData.name &&
         this.group.slug === this.formData.slug &&
+        this.group.groupType === this.formData.groupType &&
         this.group.about === this.formData.about &&
         this.group.description === this.formData.description &&
         this.group.actionRadius === this.formData.actionRadius &&

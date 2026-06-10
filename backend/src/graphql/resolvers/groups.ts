@@ -243,6 +243,11 @@ export default {
           if (!context.user) {
             throw new Error('Missing authenticated user.')
           }
+          const previousGroupTypeResult = await transaction.run(
+            `MATCH (group:Group {id: $groupId}) RETURN group.groupType AS groupType`,
+            { groupId },
+          )
+          const previousGroupType = previousGroupTypeResult.records[0]?.get('groupType')
           if (policy.get('categoriesActive') && categoryIds?.length) {
             await transaction.run(
               `
@@ -277,6 +282,29 @@ export default {
             params,
           })
           const [group] = transactionResponse.records.map((record) => record.get('group'))
+          if (params.groupType && params.groupType !== previousGroupType) {
+            if (params.groupType === 'public') {
+              await transaction.run(
+                `
+                  MATCH (user:User)-[r:CANNOT_SEE]->(post:Post)-[:IN]->(group:Group {id: $groupId})
+                  DELETE r
+                `,
+                { groupId },
+              )
+            } else {
+              await transaction.run(
+                `
+                  MATCH (group:Group {id: $groupId})<-[:IN]-(post:Post)
+                  OPTIONAL MATCH (member:User)-[m:MEMBER_OF]->(group)
+                    WHERE m.role IN ['usual', 'admin', 'owner']
+                  WITH post, collect(member.id) AS memberIds
+                  MATCH (user:User) WHERE NOT user.id IN memberIds
+                  MERGE (user)-[:CANNOT_SEE]->(post)
+                `,
+                { groupId },
+              )
+            }
+          }
           if (avatarInput) {
             await images(context.config).mergeImage(group, 'AVATAR_IMAGE', avatarInput, {
               transaction,
