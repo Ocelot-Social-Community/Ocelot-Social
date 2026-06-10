@@ -17,10 +17,11 @@ import policyResolvers from './policy'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import type { NetworkPolicy } from '@src/policy'
 
 let authenticatedUser: Context['user']
-let config: Partial<Context['config']>
-const context = () => ({ authenticatedUser, config })
+let policy: Partial<NetworkPolicy>
+const context = () => ({ authenticatedUser, policy })
 
 let query: ApolloTestSetup['query']
 let server: ApolloTestSetup['server']
@@ -28,8 +29,8 @@ let database: ApolloTestSetup['database']
 
 const asUser = (role: string) => ({ id: `${role}-1`, role }) as unknown as Context['user']
 
-const mutationContext = (policy: unknown): Context =>
-  ({ user: { id: 'admin-1' }, policy }) as unknown as Context
+const mutationContext = (policyDouble: unknown): Context =>
+  ({ user: { id: 'admin-1' }, policy: policyDouble }) as unknown as Context
 
 beforeAll(async () => {
   const setup = await createApolloTestSetup({ context })
@@ -48,7 +49,7 @@ beforeEach(() => {
   authenticatedUser = null
   // apiKeysEnabled is "authenticated"-visibility; the value is true here so we
   // can tell "null because not visible" apart from "false because that's the value".
-  config = { API_KEYS_ENABLED: true, CATEGORIES_ACTIVE: true }
+  policy = { apiKeysEnabled: true, categoriesActive: true }
 })
 
 describe('Query.policy', () => {
@@ -62,8 +63,18 @@ describe('Query.policy', () => {
       expect(data.policy).toEqual({
         publicRegistration: false,
         inviteRegistration: true,
+        askForRealName: false,
+        requireLocation: false,
         categoriesActive: true,
+        badgesEnabled: false,
+        // authenticated-only keys → null for an anonymous viewer
         apiKeysEnabled: null,
+        apiKeysMaxPerUser: null,
+        maxPinnedPosts: null,
+        maxGroupPinnedPosts: null,
+        inviteLinkLimit: null,
+        inviteCodesPersonalPerUser: null,
+        inviteCodesGroupPerUser: null,
       })
     })
   })
@@ -80,7 +91,7 @@ describe('Query.policy', () => {
 
     it('returns the real value (false), not null, when the feature is disabled', async () => {
       authenticatedUser = asUser('user')
-      config = { API_KEYS_ENABLED: false }
+      policy = { apiKeysEnabled: false }
 
       const { data } = await query({ query: policyQuery })
 
@@ -128,10 +139,24 @@ describe('Query.policyDefaults', () => {
     for (const key of [
       'publicRegistration',
       'inviteRegistration',
+      'askForRealName',
+      'requireLocation',
       'categoriesActive',
+      'badgesEnabled',
       'apiKeysEnabled',
     ]) {
       expect(typeof data.policyDefaults.defaults[key]).toBe('boolean')
+    }
+    // Integer-typed policy keys come back as numbers (Int), not coerced booleans.
+    for (const key of [
+      'apiKeysMaxPerUser',
+      'maxPinnedPosts',
+      'maxGroupPinnedPosts',
+      'inviteLinkLimit',
+      'inviteCodesPersonalPerUser',
+      'inviteCodesGroupPerUser',
+    ]) {
+      expect(typeof data.policyDefaults.defaults[key]).toBe('number')
     }
     // lastChange is bundled here (replaces the former policyLastChange query);
     // null on a fresh in-memory policy with no human change yet.
@@ -208,7 +233,7 @@ describe('setPolicy value validation (integration)', () => {
   it('classifies a valid-JSON value of the wrong type as BAD_USER_INPUT', async () => {
     authenticatedUser = asUser('admin')
 
-    // "123" is valid JSON (number) but apiKeysEnabled is boolean → type mismatch.
+    // "123" is valid JSON (number) but apiKeysEnabled is boolean → schema mismatch.
     // It reaches policy.set() and must come back as a client input error, not as
     // a generic/internal error.
     const { errors } = await query({
@@ -217,7 +242,21 @@ describe('setPolicy value validation (integration)', () => {
     })
 
     expect(errors?.[0]?.extensions?.code).toBe('BAD_USER_INPUT')
-    expect(errors?.[0]?.message).toMatch(/Type mismatch/)
+    expect(errors?.[0]?.message).toMatch(/must be boolean/)
+  })
+
+  it('classifies a non-integer value for an integer key as BAD_USER_INPUT', async () => {
+    authenticatedUser = asUser('admin')
+
+    // 1.5 is valid JSON but apiKeysMaxPerUser is integer → schema mismatch, surfaced
+    // as a client input error rather than an internal one.
+    const { errors } = await query({
+      query: setPolicyMutation,
+      variables: { key: 'apiKeysMaxPerUser', value: '1.5' },
+    })
+
+    expect(errors?.[0]?.extensions?.code).toBe('BAD_USER_INPUT')
+    expect(errors?.[0]?.message).toMatch(/must be integer/)
   })
 })
 
@@ -244,6 +283,24 @@ describe('Mutation resolvers (unit)', () => {
         actor: 'admin-1',
         timestamp: 'ts',
       })
+    })
+
+    it('parses an integer JSON value for an integer key', async () => {
+      const set = jest.fn().mockResolvedValue({
+        key: 'apiKeysMaxPerUser',
+        value: 10,
+        actor: 'admin-1',
+        timestamp: 'ts',
+      })
+
+      const result = await policyResolvers.Mutation.setPolicy(
+        null,
+        { key: 'apiKeysMaxPerUser', value: '10' },
+        mutationContext({ set }),
+      )
+
+      expect(set).toHaveBeenCalledWith('apiKeysMaxPerUser', 10, 'admin-1')
+      expect(result.value).toBe('10') // serialized back as a JSON-encoded string
     })
 
     it('rejects a value that is not valid JSON as a BAD_USER_INPUT error', async () => {

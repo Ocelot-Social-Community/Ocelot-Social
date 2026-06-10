@@ -145,9 +145,18 @@ describe('PolicyService', () => {
   describe('getVisibleSnapshot()', () => {
     const ALL_KEYS = [
       'apiKeysEnabled',
+      'apiKeysMaxPerUser',
+      'askForRealName',
+      'badgesEnabled',
       'categoriesActive',
+      'inviteCodesGroupPerUser',
+      'inviteCodesPersonalPerUser',
+      'inviteLinkLimit',
       'inviteRegistration',
+      'maxGroupPinnedPosts',
+      'maxPinnedPosts',
       'publicRegistration',
+      'requireLocation',
     ]
 
     const initService = async () => {
@@ -180,6 +189,20 @@ describe('PolicyService', () => {
       expect(Object.keys(snap).sort()).toEqual(ALL_KEYS)
       expect(snap.apiKeysEnabled).toBe(false)
     })
+
+    it('returns integer keys as numbers (schema default) to a logged-in viewer', async () => {
+      const svc = await initService()
+      const snap = svc.getVisibleSnapshot({ role: 'user' })
+      expect(snap.apiKeysMaxPerUser).toBe(5) // integer schema default, not coerced to boolean
+      expect(snap.maxGroupPinnedPosts).toBe(1)
+    })
+
+    it('hides authenticated integer keys as null from an anonymous viewer', async () => {
+      const svc = await initService()
+      const snap = svc.getVisibleSnapshot(null)
+      expect(snap.apiKeysMaxPerUser).toBeNull()
+      expect(snap.maxGroupPinnedPosts).toBeNull()
+    })
   })
 
   describe('getDefault() / getVisibleDefaults()', () => {
@@ -201,6 +224,25 @@ describe('PolicyService', () => {
 
       expect(svc.getDefault('apiKeysEnabled')).toBe(true)
       expect(svc.getDefault('publicRegistration')).toBe(true)
+    })
+
+    it('parses an integer ENV seed and exposes it as a number default', async () => {
+      readAllSettings.mockResolvedValue({})
+      const svc = new PolicyService(dbStub)
+      await svc.init({ API_KEYS_MAX_PER_USER: '3', MAX_GROUP_PINNED_POSTS: '0' })
+
+      expect(svc.getDefault('apiKeysMaxPerUser')).toBe(3)
+      expect(svc.get('apiKeysMaxPerUser')).toBe(3) // seeded into the cache
+      expect(svc.getDefault('maxGroupPinnedPosts')).toBe(0) // 0 is a valid value, not "missing"
+    })
+
+    it('falls back to the integer schema default when no ENV seed is set', async () => {
+      readAllSettings.mockResolvedValue({})
+      const svc = new PolicyService(dbStub)
+      await svc.init({})
+
+      expect(svc.getDefault('apiKeysMaxPerUser')).toBe(5)
+      expect(svc.getDefault('maxGroupPinnedPosts')).toBe(1)
     })
 
     it('scopes getVisibleDefaults by canView (anon hides apiKeysEnabled, admin sees all)', async () => {
@@ -337,8 +379,57 @@ describe('PolicyService', () => {
       await svc.init({})
 
       await expect(svc.set('publicRegistration', 'true' as never, 'actor')).rejects.toThrow(
-        /Type mismatch/,
+        /must be boolean/,
       )
+    })
+
+    it('persists an integer value for an integer key', async () => {
+      readAllSettings.mockResolvedValue({})
+      const svc = new PolicyService(dbStub)
+      await svc.init({})
+
+      const event = await svc.set('apiKeysMaxPerUser', 10, 'admin-id-1')
+
+      expect(svc.get('apiKeysMaxPerUser')).toBe(10)
+      expect(event.value).toBe(10)
+      expect(writeSetting).toHaveBeenCalledWith(
+        expect.anything(),
+        'policy',
+        'apiKeysMaxPerUser',
+        10,
+        'admin-id-1',
+      )
+    })
+
+    it('rejects type mismatches for an integer key (boolean / non-integer)', async () => {
+      readAllSettings.mockResolvedValue({})
+      const svc = new PolicyService(dbStub)
+      await svc.init({})
+
+      await expect(svc.set('apiKeysMaxPerUser', true as never, 'actor')).rejects.toThrow(
+        /must be integer/,
+      )
+      await expect(svc.set('apiKeysMaxPerUser', 1.5 as never, 'actor')).rejects.toThrow(
+        /must be integer/,
+      )
+    })
+
+    it('enforces per-key schema minimums (apiKeysMaxPerUser >= 1, maxPinnedPosts >= 0)', async () => {
+      readAllSettings.mockResolvedValue({})
+      const svc = new PolicyService(dbStub)
+      await svc.init({})
+
+      // apiKeysMaxPerUser has minimum 1: disabling is done via apiKeysEnabled, so 0
+      // (and negative) are invalid.
+      await expect(svc.set('apiKeysMaxPerUser', 0 as never, 'actor')).rejects.toThrow(
+        /must be >= 1/,
+      )
+      await expect(svc.set('apiKeysMaxPerUser', -1 as never, 'actor')).rejects.toThrow(
+        /must be >= 1/,
+      )
+      // maxPinnedPosts has minimum 0: 0 disables pinning (valid), negative is rejected.
+      await expect(svc.set('maxPinnedPosts', 0, 'actor')).resolves.toBeDefined()
+      await expect(svc.set('maxPinnedPosts', -1 as never, 'actor')).rejects.toThrow(/must be >= 0/)
     })
 
     it('does not throw when no pubsub is configured', async () => {

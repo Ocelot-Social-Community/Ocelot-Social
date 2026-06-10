@@ -71,7 +71,7 @@
                 {{ $t('admin.users.table.columns.role') }}
               </th>
               <th
-                v-if="$env.BADGES_ENABLED"
+                v-if="$policy.get('badgesEnabled')"
                 scope="col"
                 class="ds-table-head-col ds-table-head-col-right"
               >
@@ -127,7 +127,7 @@
                   <p class="ds-text" v-else>{{ user.role }}</p>
                 </template>
               </td>
-              <td v-if="$env.BADGES_ENABLED" class="ds-table-col ds-table-col-right">
+              <td v-if="$policy.get('badgesEnabled')" class="ds-table-col ds-table-col-right">
                 <os-button
                   as="nuxt-link"
                   :to="{

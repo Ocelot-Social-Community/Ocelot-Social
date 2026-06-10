@@ -8,6 +8,7 @@ import createServer from '@src/server'
 import type { ApolloServerPlugin } from '@apollo/server'
 import type CONFIG from '@config/index'
 import type { Context } from '@src/context'
+import type { NetworkPolicy } from '@src/policy'
 import type { DocumentNode } from 'graphql'
 
 export const TEST_CONFIG = {
@@ -58,15 +59,6 @@ export const TEST_CONFIG = {
   SUPPORT_URL: '',
   APPLICATION_NAME: '',
   ORGANIZATION_URL: '',
-  PUBLIC_REGISTRATION: false,
-  INVITE_REGISTRATION: true,
-  INVITE_CODES_PERSONAL_PER_USER: 7,
-  INVITE_CODES_GROUP_PER_USER: 7,
-  CATEGORIES_ACTIVE: false,
-  MAX_PINNED_POSTS: 1,
-  MAX_GROUP_PINNED_POSTS: 1,
-  API_KEYS_ENABLED: false,
-  API_KEYS_MAX_PER_USER: 5,
 
   LANGUAGE_DEFAULT: 'en',
   LOG_LEVEL: 'DEBUG',
@@ -75,6 +67,9 @@ export const TEST_CONFIG = {
 interface OverwritableContextParams {
   authenticatedUser?: Context['user']
   config?: Partial<typeof CONFIG>
+  // Override network-policy values for a test (e.g. { categoriesActive: true,
+  // maxGroupPinnedPosts: 0 }); unset keys fall back to their schema defaults.
+  policy?: Partial<NetworkPolicy>
   pubsub?: Context['pubsub']
 }
 interface CreateTestServerOptions {
@@ -87,15 +82,16 @@ export const createApolloTestSetup = async (opts?: CreateTestServerOptions) => {
   const { context: testContext, plugins } = opts ?? defaultOpts
   const database = databaseContext()
   const contextFn = async (req: { headers: { authorization?: string } }) => {
-    const { authenticatedUser, config = {}, pubsub } = await testContext()
+    const {
+      authenticatedUser,
+      config = {},
+      policy: policyOverride = {},
+      pubsub,
+    } = await testContext()
     const merged = { ...TEST_CONFIG, ...config }
-    // Build a per-request policy mirror so existing tests that toggle config.X keep working.
-    const policy = createInMemoryPolicyService({
-      publicRegistration: merged.PUBLIC_REGISTRATION,
-      inviteRegistration: merged.INVITE_REGISTRATION,
-      categoriesActive: merged.CATEGORIES_ACTIVE,
-      apiKeysEnabled: merged.API_KEYS_ENABLED,
-    })
+    // Network policy values are set per-test via the `policy` override; any key not
+    // set falls back to its schema default inside createInMemoryPolicyService.
+    const policy = createInMemoryPolicyService(policyOverride)
     return getContext({
       authenticatedUser,
       database,

@@ -14,13 +14,24 @@ import generatePersonalInviteCode from '@graphql/queries/invites/generatePersona
 import invalidateInviteCode from '@graphql/queries/invites/invalidateInviteCode.gql'
 import redeemInviteCode from '@graphql/queries/invites/redeemInviteCode.gql'
 import unauthenticatedValidateInviteCode from '@graphql/queries/invites/unauthenticatedValidateInviteCode.gql'
-import { createApolloTestSetup, TEST_CONFIG } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
+// The invite-code limits are network policy now; pin them explicitly so the
+// "max reached" loops below are deterministic regardless of the schema default.
+const INVITE_CODES_PERSONAL_PER_USER = 7
+const INVITE_CODES_GROUP_PER_USER = 7
+
 let authenticatedUser: Context['user']
-const context = () => ({ authenticatedUser })
+const context = () => ({
+  authenticatedUser,
+  policy: {
+    inviteCodesPersonalPerUser: INVITE_CODES_PERSONAL_PER_USER,
+    inviteCodesGroupPerUser: INVITE_CODES_GROUP_PER_USER,
+  },
+})
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
@@ -434,7 +445,7 @@ describe('generatePersonalInviteCode', () => {
 
     it('throws an error when the max amount of invite links was reached', async () => {
       let lastCode
-      for (let i = 0; i < TEST_CONFIG.INVITE_CODES_PERSONAL_PER_USER; i++) {
+      for (let i = 0; i < INVITE_CODES_PERSONAL_PER_USER; i++) {
         lastCode = await mutate({ mutation: generatePersonalInviteCode })
         expect(lastCode).toMatchObject({
           errors: undefined,
@@ -692,7 +703,7 @@ describe('generateGroupInviteCode', () => {
 
     it('throws an error when the max amount of invite links was reached', async () => {
       let lastCode
-      for (let i = 0; i < TEST_CONFIG.INVITE_CODES_GROUP_PER_USER; i++) {
+      for (let i = 0; i < INVITE_CODES_GROUP_PER_USER; i++) {
         lastCode = await mutate({
           mutation: generateGroupInviteCode,
           variables: { groupId: 'public-group' },

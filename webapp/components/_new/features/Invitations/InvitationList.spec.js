@@ -49,9 +49,7 @@ describe('InvitationList.vue', () => {
           success: jest.fn(),
           error: jest.fn(),
         },
-        $env: {
-          INVITE_LINK_LIMIT: limit,
-        },
+        $policy: { get: (key) => (key === 'inviteLinkLimit' ? limit : false) },
       },
       stubs: {
         'client-only': true,

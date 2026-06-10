@@ -21,10 +21,24 @@ describe('policy store', () => {
         expect(s.snapshot).toEqual({ publicRegistration: true, categoriesActive: true })
       })
 
-      it('treats a non-visible key (null) as off (false)', () => {
+      it('passes a non-visible key (null) through as null (no frontend default injected)', () => {
         const s = { snapshot: {} }
-        mutations.SET_SNAPSHOT(s, { apiKeysEnabled: null })
-        expect(s.snapshot.apiKeysEnabled).toBe(false)
+        mutations.SET_SNAPSHOT(s, { apiKeysEnabled: null, apiKeysMaxPerUser: null })
+        expect(s.snapshot.apiKeysEnabled).toBeNull()
+        expect(s.snapshot.apiKeysMaxPerUser).toBeNull()
+      })
+
+      it('collapses an explicit undefined value to null (snapshot never holds undefined)', () => {
+        const s = { snapshot: {} }
+        mutations.SET_SNAPSHOT(s, { apiKeysEnabled: undefined })
+        expect(s.snapshot.apiKeysEnabled).toBeNull()
+      })
+
+      it('keeps a visible integer value, including 0', () => {
+        const s = { snapshot: {} }
+        mutations.SET_SNAPSHOT(s, { maxGroupPinnedPosts: 0, apiKeysMaxPerUser: 3 })
+        expect(s.snapshot.maxGroupPinnedPosts).toBe(0)
+        expect(s.snapshot.apiKeysMaxPerUser).toBe(3)
       })
 
       it('strips Apollo __typename', () => {
@@ -41,14 +55,19 @@ describe('policy store', () => {
     })
 
     describe('SET_DEFAULTS', () => {
-      it('stores backend defaults (null → false, __typename stripped)', () => {
+      it('stores backend defaults (null passed through, __typename stripped)', () => {
         const s = { defaults: {} }
         mutations.SET_DEFAULTS(s, {
           inviteRegistration: true,
           apiKeysEnabled: null,
+          apiKeysMaxPerUser: 5,
           __typename: 'Policy',
         })
-        expect(s.defaults).toEqual({ inviteRegistration: true, apiKeysEnabled: false })
+        expect(s.defaults).toEqual({
+          inviteRegistration: true,
+          apiKeysEnabled: null,
+          apiKeysMaxPerUser: 5,
+        })
       })
     })
 

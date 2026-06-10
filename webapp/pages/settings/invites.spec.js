@@ -18,7 +18,8 @@ describe('invites.vue', () => {
       mocks: {
         $t: jest.fn((key) => key),
         $toast: { success: jest.fn(), error: jest.fn() },
-        $env: { INVITE_LINK_LIMIT: 7, NETWORK_NAME: 'TestNetwork' },
+        $env: { NETWORK_NAME: 'TestNetwork' },
+        $policy: { get: (key) => (key === 'inviteLinkLimit' ? 7 : false) },
         $apollo: { mutate: jest.fn().mockResolvedValue({}) },
         $store: {
           getters: { 'auth/user': sampleUser },

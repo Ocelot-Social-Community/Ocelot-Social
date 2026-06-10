@@ -55,8 +55,8 @@ describe('PostTeaser', () => {
       'auth/user': () => {
         return {}
       },
-      'pinnedPosts/maxPinnedPosts': () => 0,
       'pinnedPosts/currentlyPinnedPosts': () => 0,
+      'pinnedPosts/loaded': () => true,
     }
     actions = {
       'categories/init': jest.fn(),

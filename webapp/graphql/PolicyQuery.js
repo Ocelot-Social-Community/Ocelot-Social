@@ -8,8 +8,17 @@ export default () => gql`
     policy {
       publicRegistration
       inviteRegistration
+      askForRealName
+      requireLocation
+      inviteLinkLimit
+      inviteCodesPersonalPerUser
+      inviteCodesGroupPerUser
       categoriesActive
+      badgesEnabled
       apiKeysEnabled
+      apiKeysMaxPerUser
+      maxPinnedPosts
+      maxGroupPinnedPosts
     }
   }
 `

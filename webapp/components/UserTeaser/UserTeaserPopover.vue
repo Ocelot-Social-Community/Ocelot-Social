@@ -1,7 +1,7 @@
 <template>
   <div class="user-teaser-popover">
     <badges
-      v-if="$env.BADGES_ENABLED && user.badgeVerification"
+      v-if="$policy.get('badgesEnabled') && user.badgeVerification"
       :badges="[user.badgeVerification, ...user.badgeTrophiesSelected]"
     />
     <location-info

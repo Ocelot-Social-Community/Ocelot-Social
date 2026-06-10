@@ -143,9 +143,18 @@
       "description": "Configuration en exécution. Les modifications s'appliquent immédiatement à tous les clients connectés.",
       "descriptions": {
         "apiKeysEnabled": "Permet aux utilisateurs de créer des clés API personnelles pour un accès programmatique au backend. Affecte la section des clés API dans les paramètres utilisateur.",
+        "apiKeysMaxPerUser": "Nombre maximal de clés API actives qu'un même utilisateur peut détenir à la fois.",
+        "askForRealName": "Demande aux nouveaux utilisateurs leur vrai nom (prénom et nom) lors de l'inscription plutôt qu'un simple nom affiché.",
+        "badgesEnabled": "Active la fonction badges : les badges sont affichés sur les profils et aperçus et peuvent être gérés dans l'espace d'administration.",
         "categoriesActive": "Active les catégories thématiques pour les publications et les groupes, afin de classer et filtrer le contenu. Nécessite au moins une catégorie.",
+        "inviteCodesGroupPerUser": "Nombre maximal de codes d'invitation de groupe qu'un même utilisateur peut générer par groupe.",
+        "inviteCodesPersonalPerUser": "Nombre maximal de codes d'invitation personnels qu'un même utilisateur peut générer.",
+        "inviteLinkLimit": "Nombre maximal de liens d'invitation personnels qu'un même utilisateur peut avoir.",
         "inviteRegistration": "Permet aux membres existants d'inviter de nouveaux utilisateurs via des codes d'invitation. Désactivé, les codes d'invitation ne peuvent pas être utilisés pour s'inscrire.",
-        "publicRegistration": "Permet à n'importe qui de créer un compte directement, sans code d'invitation. Désactivé, les nouveaux utilisateurs ne peuvent rejoindre que sur invitation."
+        "maxGroupPinnedPosts": "Nombre maximal de publications pouvant être épinglées dans un groupe. Mettez 0 pour désactiver l'épinglage dans les groupes.",
+        "maxPinnedPosts": "Nombre maximal de publications pouvant être épinglées sur tout le réseau (administrateurs). Mettez 0 pour désactiver l'épinglage.",
+        "publicRegistration": "Permet à n'importe qui de créer un compte directement, sans code d'invitation. Désactivé, les nouveaux utilisateurs ne peuvent rejoindre que sur invitation.",
+        "requireLocation": "Rend une localisation obligatoire lors de l'inscription et dans les paramètres du profil."
       },
       "groups": {
         "features": {
@@ -157,9 +166,18 @@
       },
       "keys": {
         "apiKeysEnabled": "Clés API",
+        "apiKeysMaxPerUser": "Max. de clés API par utilisateur",
+        "askForRealName": "Demander le vrai nom",
+        "badgesEnabled": "Badges",
         "categoriesActive": "Catégories",
+        "inviteCodesGroupPerUser": "Max. de codes d'invitation de groupe par utilisateur",
+        "inviteCodesPersonalPerUser": "Max. de codes d'invitation personnels par utilisateur",
+        "inviteLinkLimit": "Max. de liens d'invitation par utilisateur",
         "inviteRegistration": "Inscription sur invitation",
-        "publicRegistration": "Inscription ouverte"
+        "maxGroupPinnedPosts": "Max. de publications épinglées par groupe",
+        "maxPinnedPosts": "Max. de publications épinglées (réseau)",
+        "publicRegistration": "Inscription ouverte",
+        "requireLocation": "Localisation obligatoire"
       },
       "lastUpdated": "Dernière modification : {timestamp} par {actor}",
       "name": "Politique réseau",

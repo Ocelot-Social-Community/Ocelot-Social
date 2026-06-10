@@ -22,21 +22,21 @@ import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import type { NetworkPolicy } from '@src/policy'
 
 let user
 
 let authenticatedUser: Context['user']
-const context = () => ({ authenticatedUser, config })
+const context = () => ({ authenticatedUser, policy })
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
-const defaultConfig = {
-  CATEGORIES_ACTIVE: true,
-  // MAPBOX_TOKEN: CONFIG.MAPBOX_TOKEN,
+const defaultPolicy = {
+  categoriesActive: true,
 }
-let config: Partial<Context['config']>
+let policy: Partial<NetworkPolicy>
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -57,7 +57,7 @@ const categoryIds = ['cat9', 'cat4', 'cat15']
 let variables
 
 beforeEach(async () => {
-  config = { ...defaultConfig }
+  policy = { ...defaultPolicy }
   variables = {}
   user = await Factory.build(
     'user',
@@ -1228,9 +1228,9 @@ describe('pin posts', () => {
       authenticatedUser = await admin.toJson()
     })
 
-    describe('MAX_PINNED_POSTS is 0', () => {
+    describe('maxPinnedPosts is 0', () => {
       beforeEach(async () => {
-        config = { ...defaultConfig, MAX_PINNED_POSTS: 0 }
+        policy = { ...defaultPolicy, maxPinnedPosts: 0 }
 
         await Factory.build(
           'post',
@@ -1252,9 +1252,9 @@ describe('pin posts', () => {
       })
     })
 
-    describe('MAX_PINNED_POSTS is 1', () => {
+    describe('maxPinnedPosts is 1', () => {
       beforeEach(() => {
-        config = { ...defaultConfig, MAX_PINNED_POSTS: 1 }
+        policy = { ...defaultPolicy, maxPinnedPosts: 1 }
       })
 
       describe('are allowed to pin posts', () => {
@@ -1592,11 +1592,11 @@ describe('pin posts', () => {
       })
     })
 
-    describe('MAX_PINNED_POSTS = 3', () => {
-      const postsPinnedCountsQuery = `query { PostsPinnedCounts { maxPinnedPosts, currentlyPinnedPosts } }`
+    describe('maxPinnedPosts = 3', () => {
+      const postsPinnedCountsQuery = `query { PostsPinnedCounts { currentlyPinnedPosts } }`
 
       beforeEach(async () => {
-        config = { ...defaultConfig, MAX_PINNED_POSTS: 3 }
+        policy = { ...defaultPolicy, maxPinnedPosts: 3 }
 
         await Factory.build(
           'post',
@@ -1670,7 +1670,6 @@ describe('pin posts', () => {
           ).resolves.toMatchObject({
             data: {
               PostsPinnedCounts: {
-                maxPinnedPosts: 3,
                 currentlyPinnedPosts: 1,
               },
             },
@@ -1706,7 +1705,6 @@ describe('pin posts', () => {
             ).resolves.toMatchObject({
               data: {
                 PostsPinnedCounts: {
-                  maxPinnedPosts: 3,
                   currentlyPinnedPosts: 2,
                 },
               },
@@ -1742,7 +1740,6 @@ describe('pin posts', () => {
               ).resolves.toMatchObject({
                 data: {
                   PostsPinnedCounts: {
-                    maxPinnedPosts: 3,
                     currentlyPinnedPosts: 3,
                   },
                 },

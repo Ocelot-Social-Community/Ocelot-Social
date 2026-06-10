@@ -7,16 +7,20 @@
 // file). require() is the established pattern for static config in this codebase.
 /* eslint-disable @typescript-eslint/no-require-imports, import-x/no-commonjs, n/global-require */
 /* eslint-disable security/detect-object-injection */ // keys come from the fixed schema, never user input
-import { ADMIN_AUDIENCE, AUTHENTICATED_AUDIENCE, PUBLIC_AUDIENCE } from './types'
+import { Ajv } from 'ajv'
+
+import { ADMIN_AUDIENCE, AUTHENTICATED_AUDIENCE, KNOWN_AUDIENCES, PUBLIC_AUDIENCE } from './types'
 
 import type { Audience, NetworkPolicy, PolicyKey } from './types'
+import type { ValidateFunction } from 'ajv'
 
 interface RawProperty {
   type: string
   default: unknown
+  minimum?: number
   description?: string
-  'x-visibility'?: Audience[]
-  'x-envSeed'?: string
+  visibility?: Audience[]
+  envSeed?: string
 }
 
 interface RawSchema {
@@ -35,11 +39,39 @@ export function defaultFor<K extends PolicyKey>(key: K): NetworkPolicy[K] {
 }
 
 export function envSeedFor(key: PolicyKey): string | undefined {
-  return rawSchema.properties[key]['x-envSeed']
+  return rawSchema.properties[key].envSeed
 }
 
 export function typeFor(key: PolicyKey): string {
   return rawSchema.properties[key].type
+}
+
+// --- Value validation (Ajv) ------------------------------------------------
+// Per-key validators compiled once from the schema. Run in `strict: true` mode
+// so schema-authoring mistakes (typo'd / unknown keywords, wrong shapes) fail
+// fast at module load. The custom annotation keywords are registered as known
+// AND their values are validated: `visibility` must be an array of KNOWN_AUDIENCES
+// (so a typo'd audience — which would silently make a key match nobody — is caught
+// at module load), `envSeed` a string. A future custom keyword (e.g. licenseRequired)
+// MUST be registered here too, otherwise strict mode rejects the schema.
+// These keywords carry metadata only (no `validate`/`code`), so they never
+// affect data validation — only type and constraints (e.g. `minimum`) do that.
+const ajv = new Ajv({ strict: true })
+ajv.addKeyword({
+  keyword: 'visibility',
+  metaSchema: { type: 'array', items: { type: 'string', enum: KNOWN_AUDIENCES } },
+})
+ajv.addKeyword({ keyword: 'envSeed', metaSchema: { type: 'string' } })
+const validators = Object.fromEntries(
+  allKeys().map((key) => [key, ajv.compile(rawSchema.properties[key])]),
+) as Record<PolicyKey, ValidateFunction>
+
+// Validate a value for a key against its schema (type + constraints). Returns
+// true if valid, otherwise a human-readable error message.
+export function validatePolicyValue(key: PolicyKey, value: unknown): true | string {
+  const validate = validators[key]
+  if (validate(value)) return true
+  return ajv.errorsText(validate.errors, { dataVar: key })
 }
 
 // --- Visibility: membership-based, not rank-based -------------------------
@@ -59,7 +91,7 @@ export interface PolicyViewer {
 // (push/splice) would otherwise silently alter the effective visibility
 // process-wide and could weaken canView().
 export function audiencesFor(key: PolicyKey): Audience[] {
-  return [...(rawSchema.properties[key]['x-visibility'] ?? [])]
+  return [...(rawSchema.properties[key].visibility ?? [])]
 }
 
 // The audiences a viewer belongs to. 'public' is universal (every viewer,

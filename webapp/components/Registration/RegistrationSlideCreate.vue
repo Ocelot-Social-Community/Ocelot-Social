@@ -194,17 +194,17 @@ export default {
       formSchema: {
         givenName: {
           type: 'string',
-          required: this.$env.ASK_FOR_REAL_NAME,
+          required: this.$policy.get('askForRealName') === true,
           min: 2,
         },
         surName: {
           type: 'string',
-          required: this.$env.ASK_FOR_REAL_NAME,
+          required: this.$policy.get('askForRealName') === true,
           min: 2,
         },
         name: {
           type: 'string',
-          required: !this.$env.ASK_FOR_REAL_NAME,
+          required: this.$policy.get('askForRealName') !== true,
           min: 3,
         },
         ...passwordForm.formSchema,
@@ -256,10 +256,10 @@ export default {
       return isNestedValue ? this.locationName.value : isDirectString ? this.locationName : ''
     },
     locationRequired() {
-      return this.$env.REQUIRE_LOCATION
+      return this.$policy.get('requireLocation') === true
     },
     askForRealName() {
-      return this.$env.ASK_FOR_REAL_NAME
+      return this.$policy.get('askForRealName') === true
     },
     validInput() {
       return (

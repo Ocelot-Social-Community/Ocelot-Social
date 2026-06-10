@@ -143,9 +143,18 @@
       "description": "Runtime-configuratie. Wijzigingen worden onmiddellijk toegepast voor alle verbonden clients.",
       "descriptions": {
         "apiKeysEnabled": "Laat gebruikers persoonlijke API-sleutels aanmaken voor programmatische toegang tot de backend. Heeft invloed op het API-sleutelgedeelte in de gebruikersinstellingen.",
+        "apiKeysMaxPerUser": "Maximaal aantal actieve API-sleutels dat één gebruiker tegelijk mag hebben.",
+        "askForRealName": "Vraagt nieuwe gebruikers tijdens de registratie om hun echte naam (voor- en achternaam) in plaats van één weergavenaam.",
+        "badgesEnabled": "Schakelt de badgefunctie in: badges worden op profielen en teasers getoond en kunnen in het beheergedeelte worden beheerd.",
         "categoriesActive": "Schakelt themacategorieën voor berichten en groepen in, om inhoud te classificeren en te filteren. Vereist ten minste één categorie.",
+        "inviteCodesGroupPerUser": "Maximaal aantal groepsuitnodigingscodes dat één gebruiker per groep mag aanmaken.",
+        "inviteCodesPersonalPerUser": "Maximaal aantal persoonlijke uitnodigingscodes dat één gebruiker mag aanmaken.",
+        "inviteLinkLimit": "Maximaal aantal persoonlijke uitnodigingslinks dat één gebruiker mag hebben.",
         "inviteRegistration": "Laat bestaande leden nieuwe gebruikers uitnodigen via uitnodigingscodes. Uitgeschakeld kunnen uitnodigingscodes niet worden gebruikt om te registreren.",
-        "publicRegistration": "Laat iedereen direct een account aanmaken, zonder uitnodigingscode. Uitgeschakeld kunnen nieuwe gebruikers alleen via een uitnodiging deelnemen."
+        "maxGroupPinnedPosts": "Maximaal aantal berichten dat binnen een groep kan worden vastgezet. Stel 0 in om vastzetten in groepen uit te schakelen.",
+        "maxPinnedPosts": "Maximaal aantal berichten dat netwerkbreed kan worden vastgezet (beheerders). Stel 0 in om vastzetten uit te schakelen.",
+        "publicRegistration": "Laat iedereen direct een account aanmaken, zonder uitnodigingscode. Uitgeschakeld kunnen nieuwe gebruikers alleen via een uitnodiging deelnemen.",
+        "requireLocation": "Maakt een locatie verplicht tijdens de registratie en in de profielinstellingen."
       },
       "groups": {
         "features": {
@@ -157,9 +166,18 @@
       },
       "keys": {
         "apiKeysEnabled": "API-sleutels",
+        "apiKeysMaxPerUser": "Max. API-sleutels per gebruiker",
+        "askForRealName": "Vraag om echte naam",
+        "badgesEnabled": "Badges",
         "categoriesActive": "Categorieën",
+        "inviteCodesGroupPerUser": "Max. groepsuitnodigingscodes per gebruiker",
+        "inviteCodesPersonalPerUser": "Max. persoonlijke uitnodigingscodes per gebruiker",
+        "inviteLinkLimit": "Max. uitnodigingslinks per gebruiker",
         "inviteRegistration": "Registratie via uitnodiging",
-        "publicRegistration": "Open registratie"
+        "maxGroupPinnedPosts": "Max. vastgezette berichten per groep",
+        "maxPinnedPosts": "Max. vastgezette berichten (netwerk)",
+        "publicRegistration": "Open registratie",
+        "requireLocation": "Locatie verplicht"
       },
       "lastUpdated": "Laatst gewijzigd: {timestamp} door {actor}",
       "name": "Netwerkbeleid",

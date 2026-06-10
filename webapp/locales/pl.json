@@ -143,9 +143,18 @@
       "description": "Konfiguracja czasu wykonywania. Zmiany są stosowane natychmiast dla wszystkich połączonych klientów.",
       "descriptions": {
         "apiKeysEnabled": "Pozwala użytkownikom tworzyć osobiste klucze API do programowego dostępu do backendu. Dotyczy sekcji kluczy API w ustawieniach użytkownika.",
+        "apiKeysMaxPerUser": "Maksymalna liczba aktywnych kluczy API, które jeden użytkownik może posiadać jednocześnie.",
+        "askForRealName": "Podczas rejestracji prosi nowych użytkowników o prawdziwe imię i nazwisko zamiast pojedynczej nazwy wyświetlanej.",
+        "badgesEnabled": "Włącza funkcję odznak: odznaki są pokazywane na profilach i podglądach oraz można nimi zarządzać w panelu administracyjnym.",
         "categoriesActive": "Włącza kategorie tematyczne dla wpisów i grup, aby klasyfikować i filtrować treści. Wymaga istnienia co najmniej jednej kategorii.",
+        "inviteCodesGroupPerUser": "Maksymalna liczba grupowych kodów zaproszeń, które jeden użytkownik może wygenerować na grupę.",
+        "inviteCodesPersonalPerUser": "Maksymalna liczba osobistych kodów zaproszeń, które może wygenerować jeden użytkownik.",
+        "inviteLinkLimit": "Maksymalna liczba osobistych linków zaproszeń, które może mieć jeden użytkownik.",
         "inviteRegistration": "Pozwala obecnym członkom zapraszać nowych użytkowników za pomocą kodów zaproszeń. Po wyłączeniu kodów zaproszeń nie można użyć do rejestracji.",
-        "publicRegistration": "Pozwala każdemu utworzyć konto bezpośrednio, bez kodu zaproszenia. Po wyłączeniu nowi użytkownicy mogą dołączyć tylko przez zaproszenie."
+        "maxGroupPinnedPosts": "Maksymalna liczba postów, które można przypiąć w grupie. Ustaw 0, aby wyłączyć przypinanie w grupach.",
+        "maxPinnedPosts": "Maksymalna liczba postów, które można przypiąć w całej sieci (administratorzy). Ustaw 0, aby wyłączyć przypinanie.",
+        "publicRegistration": "Pozwala każdemu utworzyć konto bezpośrednio, bez kodu zaproszenia. Po wyłączeniu nowi użytkownicy mogą dołączyć tylko przez zaproszenie.",
+        "requireLocation": "Sprawia, że podanie lokalizacji jest obowiązkowe podczas rejestracji i w ustawieniach profilu."
       },
       "groups": {
         "features": {
@@ -157,9 +166,18 @@
       },
       "keys": {
         "apiKeysEnabled": "Klucze API",
+        "apiKeysMaxPerUser": "Maks. kluczy API na użytkownika",
+        "askForRealName": "Pytaj o prawdziwe imię",
+        "badgesEnabled": "Odznaki",
         "categoriesActive": "Kategorie",
+        "inviteCodesGroupPerUser": "Maks. grupowych kodów zaproszeń na użytkownika",
+        "inviteCodesPersonalPerUser": "Maks. osobistych kodów zaproszeń na użytkownika",
+        "inviteLinkLimit": "Maks. linków zaproszeń na użytkownika",
         "inviteRegistration": "Rejestracja z zaproszeniem",
-        "publicRegistration": "Otwarta rejestracja"
+        "maxGroupPinnedPosts": "Maks. przypiętych postów na grupę",
+        "maxPinnedPosts": "Maks. przypiętych postów (sieć)",
+        "publicRegistration": "Otwarta rejestracja",
+        "requireLocation": "Lokalizacja wymagana"
       },
       "lastUpdated": "Ostatnia zmiana: {timestamp} przez {actor}",
       "name": "Zasady sieci",

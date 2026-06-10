@@ -9,8 +9,17 @@ export default () => gql`
       defaults {
         publicRegistration
         inviteRegistration
+        askForRealName
+        requireLocation
+        inviteLinkLimit
+        inviteCodesPersonalPerUser
+        inviteCodesGroupPerUser
         categoriesActive
+        badgesEnabled
         apiKeysEnabled
+        apiKeysMaxPerUser
+        maxPinnedPosts
+        maxGroupPinnedPosts
       }
       lastChange {
         actor

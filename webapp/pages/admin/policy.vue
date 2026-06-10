@@ -24,6 +24,17 @@
 
         <div v-for="key in group.keys" :key="key" class="policy-row">
           <input
+            v-if="isNumberKey(key)"
+            :id="`policy-${key}`"
+            type="number"
+            min="0"
+            step="1"
+            class="policy-row__number"
+            v-model.number="form[key]"
+            :data-test="`policy-${key}`"
+          />
+          <input
+            v-else
             :id="`policy-${key}`"
             type="checkbox"
             class="policy-row__checkbox"
@@ -84,14 +95,55 @@ export default {
     return {
       // Policies grouped under headings; related settings share a group.
       groups: [
-        { id: 'registration', keys: ['publicRegistration', 'inviteRegistration'] },
-        { id: 'features', keys: ['categoriesActive', 'apiKeysEnabled'] },
+        {
+          id: 'registration',
+          keys: [
+            'publicRegistration',
+            'inviteRegistration',
+            'askForRealName',
+            'requireLocation',
+            'inviteLinkLimit',
+            'inviteCodesPersonalPerUser',
+            'inviteCodesGroupPerUser',
+          ],
+        },
+        {
+          id: 'features',
+          keys: [
+            'categoriesActive',
+            'badgesEnabled',
+            'apiKeysEnabled',
+            'apiKeysMaxPerUser',
+            'maxPinnedPosts',
+            'maxGroupPinnedPosts',
+          ],
+        },
       ],
+      // Keys rendered as a number input instead of a checkbox (integer policies).
+      numberKeys: [
+        'inviteLinkLimit',
+        'inviteCodesPersonalPerUser',
+        'inviteCodesGroupPerUser',
+        'apiKeysMaxPerUser',
+        'maxPinnedPosts',
+        'maxGroupPinnedPosts',
+      ],
+      // Form scaffold — overwritten from the viewer-scoped snapshot on mount; the
+      // frontend holds no real defaults of its own (those come from the backend).
       form: {
         publicRegistration: false,
         inviteRegistration: false,
+        askForRealName: false,
+        requireLocation: false,
+        inviteLinkLimit: 0,
+        inviteCodesPersonalPerUser: 0,
+        inviteCodesGroupPerUser: 0,
         categoriesActive: false,
+        badgesEnabled: false,
         apiKeysEnabled: false,
+        apiKeysMaxPerUser: 0,
+        maxPinnedPosts: 0,
+        maxGroupPinnedPosts: 0,
       },
       saving: false,
       // Becomes true after the initial mount fetch so the snapshot watcher only
@@ -123,6 +175,9 @@ export default {
     formatTimestamp(timestamp) {
       const date = new Date(timestamp)
       return Number.isNaN(date.getTime()) ? timestamp : date.toLocaleString()
+    },
+    isNumberKey(key) {
+      return this.numberKeys.includes(key)
     },
     syncFormFromSnapshot() {
       this.keys.forEach((k) => {
@@ -238,6 +293,11 @@ form {
 
   &__checkbox {
     margin-top: 0.15em;
+    flex-shrink: 0;
+  }
+  &__number {
+    width: 4.5em;
+    margin-top: -0.1em;
     flex-shrink: 0;
   }
   &__label {

@@ -11,7 +11,7 @@
 //
 // Resolution order at init() time:
 //   1. DB value (kept if present)
-//   2. ENV seed via x-envSeed → written to DB once
+//   2. ENV seed via envSeed → written to DB once
 //   3. Schema default → written to DB once
 //
 // Single-instance: no special concern. Multi-instance: eventual consistency via
@@ -28,10 +28,10 @@ import {
   readLastChange,
   writeSetting,
 } from './repository'
-import { allKeys, canView, defaultFor, envSeedFor, typeFor } from './schema'
+import { allKeys, canView, defaultFor, envSeedFor, typeFor, validatePolicyValue } from './schema'
 
 import type { PolicyViewer } from './schema'
-import type { NetworkPolicy, PolicyKey } from './types'
+import type { NetworkPolicy, PolicyKey, PolicyValue } from './types'
 
 type DbContext = ReturnType<typeof databaseContext>
 
@@ -116,18 +116,18 @@ export class PolicyService {
       if (this.cache[key] !== undefined) continue
 
       const existing = dbValues[key]
-      // Adopt a stored value only if it still matches the schema type.
-      if (existing !== undefined && this.typeMatches(key, existing)) {
-        this.cache[key] = existing as NetworkPolicy[PolicyKey]
+      // Adopt a stored value only if it still satisfies the schema.
+      if (existing !== undefined && this.isValidValue(key, existing)) {
+        this.cache[key] = existing as never
         continue
       }
-      // Missing, or present with a wrong type (out-of-band edit / un-migrated type
+      // Missing, or present but invalid (out-of-band edit / un-migrated schema
       // change) — reseed from ENV/default. Never throw: a corrupt row must not
       // crash startup.
       if (existing !== undefined) {
         // eslint-disable-next-line no-console
         console.warn(
-          `[policy] DB value for '${key}' has wrong type (${typeof existing}); reseeding from ENV/default.`,
+          `[policy] DB value for '${key}' is invalid (${typeof existing}); reseeding from ENV/default.`,
         )
       }
 
@@ -141,7 +141,7 @@ export class PolicyService {
       // (The DB row itself could be clobbered by the seed in that boot-window race,
       // but the cache stays correct and the next change re-syncs the DB; a policy
       // change coinciding with this instance's boot is vanishingly rare.)
-      this.cache[key] ??= seedValue as NetworkPolicy[PolicyKey]
+      this.cache[key] ??= seedValue as never
     }
 
     // Most recent change (who + when) for the admin UI. Read from the DB after
@@ -159,6 +159,12 @@ export class PolicyService {
     }
   }
 
+  // Server-side accessor: ALWAYS returns a concrete value — the cached value, or
+  // the schema default if a key was never set (`?? defaultFor`). It NEVER returns
+  // null/undefined (the return type is the non-nullable NetworkPolicy[K]). Viewer
+  // visibility scoping — where a key can come back as `null` — lives only in
+  // getVisibleSnapshot()/the GraphQL `policy` query, NOT in this accessor. So
+  // resolvers can compare the result directly (=== / >=) without null-guarding.
   get<K extends PolicyKey>(key: K): NetworkPolicy[K] {
     if (!this.initialised) {
       // Guard against access before init() — should only happen in tests
@@ -173,15 +179,15 @@ export class PolicyService {
   // middleware rejects); keys the viewer may not see are explicitly `null`.
   // Visibility is decided by canView() — the single source of truth shared with
   // the subscription filter.
-  getVisibleSnapshot(user: PolicyViewer | null | undefined): Record<PolicyKey, boolean | null> {
-    const out = {} as Record<PolicyKey, boolean | null>
+  getVisibleSnapshot(user: PolicyViewer | null | undefined): Record<PolicyKey, PolicyValue | null> {
+    const out = {} as Record<PolicyKey, PolicyValue | null>
     for (const key of allKeys()) {
       out[key] = canView(key, user) ? this.get(key) : null
     }
     return out
   }
 
-  // The default a key resets to: the ENV seed (x-envSeed) configured for this
+  // The default a key resets to: the ENV seed (envSeed) configured for this
   // deployment if set, otherwise the schema default. Single source of truth for
   // "the configured default" — the frontend has none of its own.
   getDefault<K extends PolicyKey>(key: K): NetworkPolicy[K] {
@@ -192,8 +198,8 @@ export class PolicyService {
 
   // Defaults as visible to a viewer — same canView scoping as getVisibleSnapshot
   // (admins see every key; non-visible keys are null).
-  getVisibleDefaults(user: PolicyViewer | null | undefined): Record<PolicyKey, boolean | null> {
-    const out = {} as Record<PolicyKey, boolean | null>
+  getVisibleDefaults(user: PolicyViewer | null | undefined): Record<PolicyKey, PolicyValue | null> {
+    const out = {} as Record<PolicyKey, PolicyValue | null>
     for (const key of allKeys()) {
       out[key] = canView(key, user) ? this.getDefault(key) : null
     }
@@ -212,7 +218,7 @@ export class PolicyService {
     actor: string,
   ): Promise<PolicyChangeEvent> {
     this.assertKnownKey(key)
-    this.assertTypeMatches(key, value)
+    this.assertValidValue(key, value)
 
     await writeSetting(this.db, POLICY_NAMESPACE, key, value, actor)
     this.cache[key] = value
@@ -234,7 +240,7 @@ export class PolicyService {
     await deleteSetting(this.db, POLICY_NAMESPACE, key)
 
     const newValue = this.getDefault(key)
-    this.cache[key] = newValue
+    this.cache[key] = newValue as never
 
     const event: PolicyChangeEvent = {
       key,
@@ -283,10 +289,10 @@ export class PolicyService {
     // version publishing a wrong-typed value) instead of corrupting the cache —
     // symmetric with init()'s reseed-on-mismatch. Never throws: this runs inside
     // the pubsub handler, and lastChange must not move for a rejected event.
-    if (!this.typeMatches(event.key, event.value)) {
+    if (!this.isValidValue(event.key, event.value)) {
       // eslint-disable-next-line no-console
       console.warn(
-        `[policy] ignoring external change for '${event.key}' with wrong type (${typeof event.value}).`,
+        `[policy] ignoring invalid external change for '${event.key}' (${typeof event.value}).`,
       )
       return
     }
@@ -304,24 +310,17 @@ export class PolicyService {
     }
   }
 
-  // Non-throwing type check, shared by init() (reseed on mismatch) and
-  // assertTypeMatches() (throw on mismatch).
-  private typeMatches(key: PolicyKey, value: unknown): boolean {
-    const expected = typeFor(key)
-    const actual = typeof value
-    return (
-      (expected === 'boolean' && actual === 'boolean') ||
-      (expected === 'integer' && actual === 'number' && Number.isInteger(value)) ||
-      (expected === 'string' && actual === 'string')
-    )
+  // Non-throwing schema validity check (type AND constraints, e.g. minimum),
+  // shared by init() (reseed on mismatch) and assertValidValue() (throw on
+  // mismatch). Delegates to the Ajv-backed validator in schema.ts.
+  private isValidValue(key: PolicyKey, value: unknown): boolean {
+    return validatePolicyValue(key, value) === true
   }
 
-  private assertTypeMatches(key: PolicyKey, value: unknown): void {
-    if (!this.typeMatches(key, value)) {
-      const expected = typeFor(key)
-      throw new PolicyValidationError(
-        `Type mismatch for policy key '${key}': expected ${expected}, got ${typeof value}`,
-      )
+  private assertValidValue(key: PolicyKey, value: unknown): void {
+    const result = validatePolicyValue(key, value)
+    if (result !== true) {
+      throw new PolicyValidationError(`Invalid value for policy key '${key}': ${result}`)
     }
   }
 }
@@ -354,7 +353,7 @@ export function createInMemoryPolicyService(
   const svc = Object.create(PolicyService.prototype) as unknown as PolicyServiceInternal
   svc.cache = { ...values }
   svc.initialised = true
-  svc.env = env // so getDefault() can read x-envSeed values
+  svc.env = env // so getDefault() can read envSeed values
   // The double has no DB (built via Object.create, no constructor). Make init()
   // a genuine no-op so a test that calls it lands here instead of the real DB
   // path with an undefined this.db (matches the "init() is a no-op" contract).

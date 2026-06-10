@@ -34,9 +34,7 @@ describe('settings.vue', () => {
 
   describe('given badges are enabled', () => {
     beforeEach(() => {
-      mocks.$env = {
-        BADGES_ENABLED: true,
-      }
+      policyValues.badgesEnabled = true
       wrapper = Wrapper()
     })
 
@@ -47,9 +45,7 @@ describe('settings.vue', () => {
 
   describe('given badges are disabled', () => {
     beforeEach(() => {
-      mocks.$env = {
-        BADGES_ENABLED: false,
-      }
+      policyValues.badgesEnabled = false
       wrapper = Wrapper()
     })
 
@@ -60,7 +56,7 @@ describe('settings.vue', () => {
 
   describe('policy-gated tabs', () => {
     beforeEach(() => {
-      mocks.$env = { BADGES_ENABLED: false }
+      policyValues.badgesEnabled = false
     })
 
     it('hides the invites and api-keys tabs when the policy disables them', () => {

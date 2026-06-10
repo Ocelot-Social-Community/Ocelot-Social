@@ -151,13 +151,13 @@ export default {
           keyPrefix: prefix,
           createdAt,
           expiresAt,
-          maxKeys: context.config.API_KEYS_MAX_PER_USER,
+          maxKeys: context.policy.get('apiKeysMaxPerUser'),
         },
       })
 
       if (result.records.length === 0) {
         throw new Error(
-          `Maximum of ${String(context.config.API_KEYS_MAX_PER_USER)} active API keys reached`,
+          `Maximum of ${String(context.policy.get('apiKeysMaxPerUser'))} active API keys reached`,
         )
       }
 

@@ -48,7 +48,7 @@ export default {
       return this.inviteCodes.filter((inviteCode) => inviteCode.isValid)
     },
     maxLinks() {
-      return Number(this.$env.INVITE_LINK_LIMIT)
+      return Number(this.$policy.get('inviteLinkLimit'))
     },
     isLimitReached() {
       return this.validInviteCodes.length >= this.maxLinks
