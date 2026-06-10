@@ -52,12 +52,9 @@ describe('pages/groups/edit/_id/index.vue', () => {
 
   describe('updateGroup', () => {
     it('passes the form values straight through as mutation variables', async () => {
-      const mutate = jest.fn().mockImplementation(({ update }) => {
-        update(null, { data: { UpdateGroup: { id: 'g1', slug: 'new-slug' } } })
-        return Promise.resolve()
-      })
+      const mutate = jest.fn().mockResolvedValue()
       const { wrapper } = factory(mutate)
-      await wrapper.vm.updateGroup(samplePayload)
+      await wrapper.vm.updateGroup(samplePayload, jest.fn())
       expect(mutate).toHaveBeenCalled()
       const arg = mutate.mock.calls[0][0]
       expect(arg.variables).toEqual({
@@ -73,35 +70,29 @@ describe('pages/groups/edit/_id/index.vue', () => {
       })
     })
 
-    it('navigates to the new slug on success', async () => {
-      const mutate = jest.fn().mockImplementation(({ update }) => {
-        update(null, { data: { UpdateGroup: { id: 'g1', slug: 'fresh-slug' } } })
-        return Promise.resolve()
-      })
+    it('shows success toast and calls done(true) without navigating', async () => {
+      const mutate = jest.fn().mockResolvedValue()
       const { wrapper, $router, $toast } = factory(mutate)
-      await wrapper.vm.updateGroup(samplePayload)
+      const done = jest.fn()
+      await wrapper.vm.updateGroup(samplePayload, done)
       expect($toast.success).toHaveBeenCalledWith('group.updatedGroup')
-      expect($router.push).toHaveBeenCalledWith({
-        name: 'groups-id-slug',
-        params: { id: 'g1', slug: 'fresh-slug' },
-      })
+      expect(done).toHaveBeenCalledWith(true)
+      expect($router.push).not.toHaveBeenCalled()
     })
 
     it('surfaces mutation errors via toast and does not navigate', async () => {
       const mutate = jest.fn().mockRejectedValue(new Error('boom'))
       const { wrapper, $router, $toast } = factory(mutate)
-      await wrapper.vm.updateGroup(samplePayload)
+      const done = jest.fn()
+      await wrapper.vm.updateGroup(samplePayload, done)
       expect($toast.error).toHaveBeenCalledWith('boom')
       expect($router.push).not.toHaveBeenCalled()
     })
 
     it('is wired up to the @updateGroup event from GroupForm', async () => {
-      const mutate = jest.fn().mockImplementation(({ update }) => {
-        update(null, { data: { UpdateGroup: { id: 'g1', slug: 's' } } })
-        return Promise.resolve()
-      })
+      const mutate = jest.fn().mockResolvedValue()
       const { wrapper } = factory(mutate)
-      wrapper.findComponent({ name: 'GroupForm' }).vm.$emit('updateGroup', samplePayload)
+      wrapper.findComponent({ name: 'GroupForm' }).vm.$emit('updateGroup', samplePayload, jest.fn())
       await wrapper.vm.$nextTick()
       await wrapper.vm.$nextTick()
       expect(mutate).toHaveBeenCalled()
