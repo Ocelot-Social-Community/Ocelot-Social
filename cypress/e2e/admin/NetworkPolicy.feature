@@ -26,6 +26,22 @@ Feature: Admin network policy
       | key                |
       | publicRegistration |
       | categoriesActive   |
+      | askForRealName     |
+      | requireLocation    |
+      | badgesEnabled      |
+
+  # Integer policy — the number input persists a numeric value across a reload.
+  Scenario: Admin changes an integer policy via the number input and it persists
+    Given the network policy "apiKeysMaxPerUser" is the number "3"
+    And I am logged in as "admin"
+    When I navigate to page "/admin/policy"
+    Then the number input with ID "policy-apiKeysMaxPerUser" should have value "3"
+    When I set the policy "apiKeysMaxPerUser" to "10"
+    And I save the policy form
+    Then I see a toaster with status "success"
+    When I navigate to page "/admin/policy"
+    Then the number input with ID "policy-apiKeysMaxPerUser" should have value "10"
+    And I see the policy last-changed info naming "admin"
 
   # Reset — a key returns to its configured (ENV/schema) default.
   Scenario: Admin resets the policy to its configured default

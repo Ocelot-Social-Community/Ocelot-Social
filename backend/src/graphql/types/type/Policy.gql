@@ -18,10 +18,14 @@ type Policy {
   inviteRegistration: Boolean!
   askForRealName: Boolean!
   requireLocation: Boolean!
+  inviteLinkLimit: Int
+  inviteCodesPersonalPerUser: Int
+  inviteCodesGroupPerUser: Int
   categoriesActive: Boolean!
   badgesEnabled: Boolean!
   apiKeysEnabled: Boolean
   apiKeysMaxPerUser: Int
+  maxPinnedPosts: Int
   maxGroupPinnedPosts: Int
 }
 

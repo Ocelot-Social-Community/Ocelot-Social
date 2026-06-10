@@ -34,6 +34,27 @@
       "x-envSeed": "REQUIRE_LOCATION",
       "description": "Whether a location is mandatory on registration and in profile settings. Read during anonymous registration, so visible to 'public'."
     },
+    "inviteLinkLimit": {
+      "type": "integer",
+      "default": 7,
+      "x-visibility": ["authenticated"],
+      "x-envSeed": "INVITE_LINK_LIMIT",
+      "description": "Maximum number of personal invite links a user may have. Only relevant to logged-in users (invitations UI), so visible to 'authenticated' (and admin)."
+    },
+    "inviteCodesPersonalPerUser": {
+      "type": "integer",
+      "default": 7,
+      "x-visibility": ["authenticated"],
+      "x-envSeed": "INVITE_CODES_PERSONAL_PER_USER",
+      "description": "Maximum number of personal invite codes a single user may generate. Only relevant to logged-in users, so visible to 'authenticated' (and admin)."
+    },
+    "inviteCodesGroupPerUser": {
+      "type": "integer",
+      "default": 7,
+      "x-visibility": ["authenticated"],
+      "x-envSeed": "INVITE_CODES_GROUP_PER_USER",
+      "description": "Maximum number of group invite codes a single user may generate per group. Only relevant to logged-in users, so visible to 'authenticated' (and admin)."
+    },
     "categoriesActive": {
       "type": "boolean",
       "default": false,
@@ -62,6 +83,13 @@
       "x-envSeed": "API_KEYS_MAX_PER_USER",
       "description": "Maximum number of active API keys a single user may hold. Only relevant to logged-in users (Settings), so visible to 'authenticated' (and admin)."
     },
+    "maxPinnedPosts": {
+      "type": "integer",
+      "default": 1,
+      "x-visibility": ["authenticated"],
+      "x-envSeed": "MAX_PINNED_POSTS",
+      "description": "Maximum number of posts that can be pinned network-wide (0 disables pinning). Only relevant to logged-in users, so visible to 'authenticated' (and admin)."
+    },
     "maxGroupPinnedPosts": {
       "type": "integer",
       "default": 1,
@@ -75,10 +103,14 @@
     "inviteRegistration",
     "askForRealName",
     "requireLocation",
+    "inviteLinkLimit",
+    "inviteCodesPersonalPerUser",
+    "inviteCodesGroupPerUser",
     "categoriesActive",
     "badgesEnabled",
     "apiKeysEnabled",
     "apiKeysMaxPerUser",
+    "maxPinnedPosts",
     "maxGroupPinnedPosts"
   ]
 }

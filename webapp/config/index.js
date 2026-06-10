@@ -51,9 +51,9 @@ const options = {
   // Cookies
   COOKIE_EXPIRE_TIME: process.env.COOKIE_EXPIRE_TIME || 730, // Two years by default
   COOKIE_HTTPS_ONLY: process.env.COOKIE_HTTPS_ONLY || process.env.NODE_ENV === 'production', // ensure true in production if not set explicitly
-  // BADGES_ENABLED, ASK_FOR_REAL_NAME, REQUIRE_LOCATION, MAX_GROUP_PINNED_POSTS and
-  // API_KEYS_MAX_PER_USER moved to the runtime network policy (read via $policy.get).
-  INVITE_LINK_LIMIT: process.env.INVITE_LINK_LIMIT || 7,
+  // The network-policy flags (BADGES_ENABLED, ASK_FOR_REAL_NAME, REQUIRE_LOCATION,
+  // INVITE_LINK_LIMIT, INVITE_CODES_*, MAX_PINNED_POSTS, MAX_GROUP_PINNED_POSTS,
+  // API_KEYS_MAX_PER_USER) moved to the runtime network policy (read via $policy.get).
   NETWORK_NAME: process.env.NETWORK_NAME || 'Ocelot.social',
 }
 

@@ -10,10 +10,14 @@ export default () => gql`
       inviteRegistration
       askForRealName
       requireLocation
+      inviteLinkLimit
+      inviteCodesPersonalPerUser
+      inviteCodesGroupPerUser
       categoriesActive
       badgesEnabled
       apiKeysEnabled
       apiKeysMaxPerUser
+      maxPinnedPosts
       maxGroupPinnedPosts
     }
   }

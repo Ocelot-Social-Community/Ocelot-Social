@@ -66,9 +66,14 @@ describe('Query.policy', () => {
         requireLocation: false,
         categoriesActive: true,
         badgesEnabled: false,
+        // authenticated-only keys → null for an anonymous viewer
         apiKeysEnabled: null,
-        apiKeysMaxPerUser: null, // authenticated-only integer → null for anon
+        apiKeysMaxPerUser: null,
+        maxPinnedPosts: null,
         maxGroupPinnedPosts: null,
+        inviteLinkLimit: null,
+        inviteCodesPersonalPerUser: null,
+        inviteCodesGroupPerUser: null,
       })
     })
   })
@@ -142,7 +147,14 @@ describe('Query.policyDefaults', () => {
       expect(typeof data.policyDefaults.defaults[key]).toBe('boolean')
     }
     // Integer-typed policy keys come back as numbers (Int), not coerced booleans.
-    for (const key of ['apiKeysMaxPerUser', 'maxGroupPinnedPosts']) {
+    for (const key of [
+      'apiKeysMaxPerUser',
+      'maxPinnedPosts',
+      'maxGroupPinnedPosts',
+      'inviteLinkLimit',
+      'inviteCodesPersonalPerUser',
+      'inviteCodesGroupPerUser',
+    ]) {
       expect(typeof data.policyDefaults.defaults[key]).toBe('number')
     }
     // lastChange is bundled here (replaces the former policyLastChange query);

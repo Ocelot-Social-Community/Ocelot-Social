@@ -167,14 +167,14 @@ export default {
       }
     },
     PostsPinnedCounts: async (_object, params, context: Context, _resolveInfo) => {
-      const { config } = context
+      const { policy } = context
       const [postsPinnedCount] = (
         await context.database.query({
           query: 'MATCH (p:Post { pinned: true }) RETURN COUNT (p) AS count',
         })
       ).records.map((r) => Number(r.get('count').toString()))
       return {
-        maxPinnedPosts: config.MAX_PINNED_POSTS,
+        maxPinnedPosts: policy.get('maxPinnedPosts'),
         currentlyPinnedPosts: postsPinnedCount,
       }
     },
@@ -427,8 +427,9 @@ export default {
       if (!context.user) {
         throw new Error('Missing authenticated user.')
       }
-      const { config } = context
-      if (config.MAX_PINNED_POSTS === 0) throw new Error('Pinned posts are not allowed!')
+      const { policy } = context
+      const maxPinnedPosts = policy.get('maxPinnedPosts')
+      if (maxPinnedPosts === 0) throw new Error('Pinned posts are not allowed!')
       let pinnedPostWithNestedAttributes
       const { driver, user } = context
       const session = driver.session()
@@ -442,7 +443,7 @@ export default {
         SET post.pinned = true
         RETURN post, pinned.createdAt as pinnedAt`
 
-      if (config.MAX_PINNED_POSTS === 1) {
+      if (maxPinnedPosts === 1) {
         let writeTxResultPromise = session.writeTransaction(async (transaction) => {
           const deletePreviousRelationsResponse = await transaction.run(
             `
@@ -487,7 +488,7 @@ export default {
             query: `MATCH (:User)-[:PINNED]->(post:Post { pinned: true }) RETURN COUNT(post) AS count`,
           })
         ).records.map((r) => Number(r.get('count').toString()))
-        if (currentPinnedPostCount >= config.MAX_PINNED_POSTS) {
+        if (currentPinnedPostCount >= maxPinnedPosts) {
           throw new Error('Max number of pinned posts is reached!')
         }
         const [pinPostResult] = (

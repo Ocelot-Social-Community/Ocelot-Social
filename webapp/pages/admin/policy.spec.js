@@ -19,10 +19,14 @@ describe('admin/policy.vue', () => {
     inviteRegistration: true,
     askForRealName: false,
     requireLocation: false,
+    inviteLinkLimit: 7,
+    inviteCodesPersonalPerUser: 7,
+    inviteCodesGroupPerUser: 7,
     categoriesActive: false,
     badgesEnabled: false,
     apiKeysEnabled: false,
     apiKeysMaxPerUser: 5,
+    maxPinnedPosts: 1,
     maxGroupPinnedPosts: 1,
   }
   // Deliberately differs from the snapshot on categoriesActive, so we can assert
@@ -32,10 +36,14 @@ describe('admin/policy.vue', () => {
     inviteRegistration: true,
     askForRealName: false,
     requireLocation: false,
+    inviteLinkLimit: 7,
+    inviteCodesPersonalPerUser: 7,
+    inviteCodesGroupPerUser: 7,
     categoriesActive: true,
     badgesEnabled: false,
     apiKeysEnabled: false,
     apiKeysMaxPerUser: 5,
+    maxPinnedPosts: 1,
     maxGroupPinnedPosts: 1,
   }
   const ALL_KEYS = [
@@ -43,10 +51,14 @@ describe('admin/policy.vue', () => {
     'inviteRegistration',
     'askForRealName',
     'requireLocation',
+    'inviteLinkLimit',
+    'inviteCodesPersonalPerUser',
+    'inviteCodesGroupPerUser',
     'categoriesActive',
     'badgesEnabled',
     'apiKeysEnabled',
     'apiKeysMaxPerUser',
+    'maxPinnedPosts',
     'maxGroupPinnedPosts',
   ]
   const lastChange = { actor: 'jenny-rostock', timestamp: '2026-01-02T03:04:05.000Z' }

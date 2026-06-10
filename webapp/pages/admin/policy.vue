@@ -97,7 +97,15 @@ export default {
       groups: [
         {
           id: 'registration',
-          keys: ['publicRegistration', 'inviteRegistration', 'askForRealName', 'requireLocation'],
+          keys: [
+            'publicRegistration',
+            'inviteRegistration',
+            'askForRealName',
+            'requireLocation',
+            'inviteLinkLimit',
+            'inviteCodesPersonalPerUser',
+            'inviteCodesGroupPerUser',
+          ],
         },
         {
           id: 'features',
@@ -106,12 +114,20 @@ export default {
             'badgesEnabled',
             'apiKeysEnabled',
             'apiKeysMaxPerUser',
+            'maxPinnedPosts',
             'maxGroupPinnedPosts',
           ],
         },
       ],
       // Keys rendered as a number input instead of a checkbox (integer policies).
-      numberKeys: ['apiKeysMaxPerUser', 'maxGroupPinnedPosts'],
+      numberKeys: [
+        'inviteLinkLimit',
+        'inviteCodesPersonalPerUser',
+        'inviteCodesGroupPerUser',
+        'apiKeysMaxPerUser',
+        'maxPinnedPosts',
+        'maxGroupPinnedPosts',
+      ],
       // Form scaffold — overwritten from the viewer-scoped snapshot on mount; the
       // frontend holds no real defaults of its own (those come from the backend).
       form: {
@@ -119,10 +135,14 @@ export default {
         inviteRegistration: false,
         askForRealName: false,
         requireLocation: false,
+        inviteLinkLimit: 0,
+        inviteCodesPersonalPerUser: 0,
+        inviteCodesGroupPerUser: 0,
         categoriesActive: false,
         badgesEnabled: false,
         apiKeysEnabled: false,
         apiKeysMaxPerUser: 0,
+        maxPinnedPosts: 0,
         maxGroupPinnedPosts: 0,
       },
       saving: false,

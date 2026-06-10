@@ -22,11 +22,12 @@ import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import type { NetworkPolicy } from '@src/policy'
 
 let user
 
 let authenticatedUser: Context['user']
-const context = () => ({ authenticatedUser, config })
+const context = () => ({ authenticatedUser, config, policy })
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
@@ -37,6 +38,7 @@ const defaultConfig = {
   // MAPBOX_TOKEN: CONFIG.MAPBOX_TOKEN,
 }
 let config: Partial<Context['config']>
+let policy: Partial<NetworkPolicy>
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -58,6 +60,7 @@ let variables
 
 beforeEach(async () => {
   config = { ...defaultConfig }
+  policy = {}
   variables = {}
   user = await Factory.build(
     'user',
@@ -1228,9 +1231,9 @@ describe('pin posts', () => {
       authenticatedUser = await admin.toJson()
     })
 
-    describe('MAX_PINNED_POSTS is 0', () => {
+    describe('maxPinnedPosts is 0', () => {
       beforeEach(async () => {
-        config = { ...defaultConfig, MAX_PINNED_POSTS: 0 }
+        policy = { maxPinnedPosts: 0 }
 
         await Factory.build(
           'post',
@@ -1252,9 +1255,9 @@ describe('pin posts', () => {
       })
     })
 
-    describe('MAX_PINNED_POSTS is 1', () => {
+    describe('maxPinnedPosts is 1', () => {
       beforeEach(() => {
-        config = { ...defaultConfig, MAX_PINNED_POSTS: 1 }
+        policy = { maxPinnedPosts: 1 }
       })
 
       describe('are allowed to pin posts', () => {
@@ -1592,11 +1595,11 @@ describe('pin posts', () => {
       })
     })
 
-    describe('MAX_PINNED_POSTS = 3', () => {
+    describe('maxPinnedPosts = 3', () => {
       const postsPinnedCountsQuery = `query { PostsPinnedCounts { maxPinnedPosts, currentlyPinnedPosts } }`
 
       beforeEach(async () => {
-        config = { ...defaultConfig, MAX_PINNED_POSTS: 3 }
+        policy = { maxPinnedPosts: 3 }
 
         await Factory.build(
           'post',

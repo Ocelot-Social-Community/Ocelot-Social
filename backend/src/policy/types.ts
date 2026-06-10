@@ -7,10 +7,14 @@ export interface NetworkPolicy {
   inviteRegistration: boolean
   askForRealName: boolean
   requireLocation: boolean
+  inviteLinkLimit: number
+  inviteCodesPersonalPerUser: number
+  inviteCodesGroupPerUser: number
   categoriesActive: boolean
   badgesEnabled: boolean
   apiKeysEnabled: boolean
   apiKeysMaxPerUser: number
+  maxPinnedPosts: number
   maxGroupPinnedPosts: number
 }
 

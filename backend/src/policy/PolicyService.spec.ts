@@ -149,8 +149,12 @@ describe('PolicyService', () => {
       'askForRealName',
       'badgesEnabled',
       'categoriesActive',
+      'inviteCodesGroupPerUser',
+      'inviteCodesPersonalPerUser',
+      'inviteLinkLimit',
       'inviteRegistration',
       'maxGroupPinnedPosts',
+      'maxPinnedPosts',
       'publicRegistration',
       'requireLocation',
     ]
