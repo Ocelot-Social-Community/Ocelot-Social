@@ -1,5 +1,5 @@
 <template>
-  <os-button class="my-filter-button" variant="primary" appearance="filled" @click="clickButton">
+  <os-button class="my-filter-button" variant="primary" appearance="filled" size="sm" @click="clickButton">
     {{ title }}
     <template #suffix>
       <os-button
