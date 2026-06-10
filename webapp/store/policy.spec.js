@@ -28,6 +28,12 @@ describe('policy store', () => {
         expect(s.snapshot.apiKeysMaxPerUser).toBeNull()
       })
 
+      it('collapses an explicit undefined value to null (snapshot never holds undefined)', () => {
+        const s = { snapshot: {} }
+        mutations.SET_SNAPSHOT(s, { apiKeysEnabled: undefined })
+        expect(s.snapshot.apiKeysEnabled).toBeNull()
+      })
+
       it('keeps a visible integer value, including 0', () => {
         const s = { snapshot: {} }
         mutations.SET_SNAPSHOT(s, { maxGroupPinnedPosts: 0, apiKeysMaxPerUser: 3 })
