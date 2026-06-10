@@ -9,7 +9,7 @@
 /* eslint-disable security/detect-object-injection */ // keys come from the fixed schema, never user input
 import { Ajv } from 'ajv'
 
-import { ADMIN_AUDIENCE, AUTHENTICATED_AUDIENCE, PUBLIC_AUDIENCE } from './types'
+import { ADMIN_AUDIENCE, AUTHENTICATED_AUDIENCE, KNOWN_AUDIENCES, PUBLIC_AUDIENCE } from './types'
 
 import type { Audience, NetworkPolicy, PolicyKey } from './types'
 import type { ValidateFunction } from 'ajv'
@@ -50,15 +50,16 @@ export function typeFor(key: PolicyKey): string {
 // Per-key validators compiled once from the schema. Run in `strict: true` mode
 // so schema-authoring mistakes (typo'd / unknown keywords, wrong shapes) fail
 // fast at module load. The custom annotation keywords are registered as known
-// AND their values are validated: `visibility` must be a string array,
-// `envSeed` a string. A future custom keyword (e.g. licenseRequired) MUST be
-// registered here too, otherwise strict mode rejects the schema.
+// AND their values are validated: `visibility` must be an array of KNOWN_AUDIENCES
+// (so a typo'd audience — which would silently make a key match nobody — is caught
+// at module load), `envSeed` a string. A future custom keyword (e.g. licenseRequired)
+// MUST be registered here too, otherwise strict mode rejects the schema.
 // These keywords carry metadata only (no `validate`/`code`), so they never
 // affect data validation — only type and constraints (e.g. `minimum`) do that.
 const ajv = new Ajv({ strict: true })
 ajv.addKeyword({
   keyword: 'visibility',
-  metaSchema: { type: 'array', items: { type: 'string' } },
+  metaSchema: { type: 'array', items: { type: 'string', enum: KNOWN_AUDIENCES } },
 })
 ajv.addKeyword({ keyword: 'envSeed', metaSchema: { type: 'string' } })
 const validators = Object.fromEntries(
