@@ -587,10 +587,11 @@ export default {
       }
     },
     showOrChangeGroupChat(groupId) {
-      if (this.getShowChat.showChat) {
+      if (this.getShowChat.showChat && this.getShowChat.groupId === groupId) {
         this.showChat({ showChat: false, chatUserId: null, groupId: null })
+      } else {
+        this.showChat({ showChat: true, chatUserId: null, groupId })
       }
-      this.showChat({ showChat: true, chatUserId: null, groupId })
     },
     // handleTab(tab) {
     //   if (this.tabActive !== tab) {

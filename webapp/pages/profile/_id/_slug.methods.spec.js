@@ -244,15 +244,23 @@ describe('pages/profile/_id/_slug.vue — methods', () => {
       const showChat = jest.fn()
       const ctx = { getShowChat: { showChat: false }, showChat }
       methods.showOrChangeChat.call(ctx, 'u1')
-      expect(showChat).toHaveBeenCalledWith({ showChat: true, chatUserId: 'u1' })
+      expect(showChat).toHaveBeenCalledWith({ showChat: true, chatUserId: 'u1', groupId: null })
     })
 
-    it('first closes an existing chat, then opens the new one', () => {
+    it('switches to a different user chat with a single call', () => {
       const showChat = jest.fn()
-      const ctx = { getShowChat: { showChat: true }, showChat }
+      const ctx = { getShowChat: { showChat: true, chatUserId: 'u1' }, showChat }
       methods.showOrChangeChat.call(ctx, 'u2')
-      expect(showChat).toHaveBeenNthCalledWith(1, { showChat: false, chatUserId: null })
-      expect(showChat).toHaveBeenNthCalledWith(2, { showChat: true, chatUserId: 'u2' })
+      expect(showChat).toHaveBeenCalledTimes(1)
+      expect(showChat).toHaveBeenCalledWith({ showChat: true, chatUserId: 'u2', groupId: null })
+    })
+
+    it('closes the chat when clicking the same user again (toggle)', () => {
+      const showChat = jest.fn()
+      const ctx = { getShowChat: { showChat: true, chatUserId: 'u1' }, showChat }
+      methods.showOrChangeChat.call(ctx, 'u1')
+      expect(showChat).toHaveBeenCalledTimes(1)
+      expect(showChat).toHaveBeenCalledWith({ showChat: false, chatUserId: null, groupId: null })
     })
   })
 
