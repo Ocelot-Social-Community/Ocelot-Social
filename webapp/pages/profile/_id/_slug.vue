@@ -617,10 +617,11 @@ export default {
       if (type === 'followedBy') this.followedByCount = count
     },
     showOrChangeChat(userId) {
-      if (this.getShowChat.showChat) {
-        this.showChat({ showChat: false, chatUserId: null })
+      if (this.getShowChat.showChat && this.getShowChat.chatUserId === userId) {
+        this.showChat({ showChat: false, chatUserId: null, groupId: null })
+      } else {
+        this.showChat({ showChat: true, chatUserId: userId, groupId: null })
       }
-      this.showChat({ showChat: true, chatUserId: userId })
     },
   },
   apollo: {

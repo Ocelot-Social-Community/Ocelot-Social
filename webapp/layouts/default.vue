@@ -16,6 +16,7 @@
     >
       <client-only>
         <chat
+          :key="getShowChat.groupId || getShowChat.chatUserId"
           singleRoom
           :userId="getShowChat.chatUserId"
           :groupId="getShowChat.groupId"

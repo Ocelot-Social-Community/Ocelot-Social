@@ -9,8 +9,9 @@ Feature: Group Chat
       | alice   | alice@example.org  | 1234     | alice  | Alice         | 0.0.4                          |
       | bob     | bob@example.org    | 4321     | bob    | Bob           | 0.0.4                          |
     And the following "groups" are in the database:
-      | id          | name         | slug         | ownerId | groupType | description                                                                                                       |
-      | test-group  | Test Group   | test-group   | alice   | public    | This is a test group for e2e testing of the group chat feature. It needs to be long enough to pass validation.     |
+      | id           | name          | slug          | ownerId | groupType | description                                                                                                        |
+      | test-group   | Test Group    | test-group    | alice   | public    | This is a test group for e2e testing of the group chat feature. It needs to be long enough to pass validation.      |
+      | second-group | Second Group  | second-group  | alice   | public    | This is a second test group for e2e testing of chat switching. It needs to be long enough to pass validation here.  |
 
   Scenario: Open group chat from group profile
     Given "bob" is a member of group "test-group"
@@ -43,3 +44,14 @@ Feature: Group Chat
     And I am logged in as "bob"
     And I navigate to page "/chat"
     Then I see a group icon before "Test Group" in the room list
+
+  Scenario: Switch floating chat from one group to another
+    Given "bob" is a member of group "test-group"
+    And "bob" is a member of group "second-group"
+    And I am logged in as "bob"
+    And I navigate to page "/groups/test-group/test-group"
+    When I click on the group chat button
+    Then I see the group chat popup with name "Test Group"
+    When I navigate to page "/groups/second-group/second-group"
+    And I click on the group chat button
+    Then I see the group chat popup with name "Second Group"
