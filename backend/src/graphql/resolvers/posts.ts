@@ -555,7 +555,7 @@ export default {
           RETURN toString(count(pinnedPosts)) as count`,
           variables: { user: context.user, params },
         })
-        if (result.records[0].get('count') >= maxGroupPinnedPosts) {
+        if (Number(result.records[0].get('count')) >= maxGroupPinnedPosts) {
           throw new Error('Reached maxed pinned posts already. Unpin a post first.')
         }
       }

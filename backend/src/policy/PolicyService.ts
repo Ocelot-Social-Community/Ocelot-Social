@@ -159,6 +159,12 @@ export class PolicyService {
     }
   }
 
+  // Server-side accessor: ALWAYS returns a concrete value — the cached value, or
+  // the schema default if a key was never set (`?? defaultFor`). It NEVER returns
+  // null/undefined (the return type is the non-nullable NetworkPolicy[K]). Viewer
+  // visibility scoping — where a key can come back as `null` — lives only in
+  // getVisibleSnapshot()/the GraphQL `policy` query, NOT in this accessor. So
+  // resolvers can compare the result directly (=== / >=) without null-guarding.
   get<K extends PolicyKey>(key: K): NetworkPolicy[K] {
     if (!this.initialised) {
       // Guard against access before init() — should only happen in tests
