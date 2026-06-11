@@ -132,6 +132,20 @@ describe('GroupForm', () => {
       expect(wrapper.vm.disableButtonByUpdate).toBe(true)
     })
 
+    it('keeps loading false and disableButtonByUpdate false after failed save', async () => {
+      await wrapper.vm.$set(wrapper.vm.formData, 'name', 'New Name')
+      await wrapper.vm.$set(wrapper.vm.formData, 'categoryIds', ['cat-1', 'cat-2', 'cat-4'])
+      expect(wrapper.vm.disableButtonByUpdate).toBe(false)
+
+      wrapper.vm.submit()
+      const [, done] = wrapper.emitted('updateGroup')[0]
+      done(false)
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.vm.loading).toBe(false)
+      expect(wrapper.vm.disableButtonByUpdate).toBe(false)
+    })
+
     it('is false again after save and further changes', async () => {
       wrapper.vm.submit()
       const [, done] = wrapper.emitted('updateGroup')[0]

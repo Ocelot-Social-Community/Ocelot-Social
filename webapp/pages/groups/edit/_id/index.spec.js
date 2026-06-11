@@ -86,6 +86,7 @@ describe('pages/groups/edit/_id/index.vue', () => {
       const done = jest.fn()
       await wrapper.vm.updateGroup(samplePayload, done)
       expect($toast.error).toHaveBeenCalledWith('boom')
+      expect(done).toHaveBeenCalled()
       expect($router.push).not.toHaveBeenCalled()
     })
 
