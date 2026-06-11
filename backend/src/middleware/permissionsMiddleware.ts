@@ -605,6 +605,7 @@ export default shield(
       email: or(isMyOwn, hasPermission('user.email.readAny')),
       emailNotificationSettings: isMyOwn,
       inviteCodes: isMyOwn,
+      roleNames: hasPermission('role.manage'),
     },
     Group: {
       '*': isAuthenticated, // TODO - only those who are allowed to see the group

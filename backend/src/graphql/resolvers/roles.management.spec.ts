@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -250,6 +251,55 @@ describe('role management', () => {
         variables: { userId: 'member-id', roleName: 'owner' },
       })
       expect(errors?.[0].message).toMatch(/last owner/)
+    })
+  })
+
+  describe('legacy role sync + roleNames', () => {
+    const USER_INFO = `query ($id: ID!) { User(id: $id) { id role roleNames } }`
+    const readUser = async (id) => {
+      const { data } = await query({ query: USER_INFO, variables: { id } })
+      return data.User[0]
+    }
+
+    beforeEach(async () => {
+      await Factory.build(
+        'user',
+        { id: 'm2', role: 'user' },
+        { email: 'm2@e.org', password: '1234' },
+      )
+      await asAdmin()
+    })
+
+    it('syncs the legacy tier and exposes roleNames when a tier role is assigned', async () => {
+      await mutate({ mutation: ASSIGN_ROLE, variables: { userId: 'm2', roleName: 'moderator' } })
+      const user = await readUser('m2')
+      expect(user.role).toBe('moderator')
+      expect(user.roleNames).toEqual(['moderator'])
+    })
+
+    it('leaves the legacy tier at user when only a custom role is assigned', async () => {
+      await mutate({
+        mutation: CREATE_ROLE,
+        variables: {
+          name: 'badge-setter',
+          description: null,
+          rank: 15,
+          permissions: ['badge.manage'],
+        },
+      })
+      await mutate({ mutation: ASSIGN_ROLE, variables: { userId: 'm2', roleName: 'badge-setter' } })
+      const user = await readUser('m2')
+      expect(user.role).toBe('user')
+      expect(user.roleNames).toContain('badge-setter')
+    })
+
+    it('reverts the legacy tier when the tier role is unassigned', async () => {
+      await mutate({ mutation: ASSIGN_ROLE, variables: { userId: 'm2', roleName: 'admin' } })
+      expect((await readUser('m2')).role).toBe('admin')
+      await mutate({ mutation: UNASSIGN_ROLE, variables: { userId: 'm2', roleName: 'admin' } })
+      const user = await readUser('m2')
+      expect(user.role).toBe('user')
+      expect(user.roleNames).toEqual([])
     })
   })
 })

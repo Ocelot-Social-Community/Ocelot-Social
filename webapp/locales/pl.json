@@ -222,6 +222,8 @@
         "placeholder": "e-mail, nazwa lub opis"
       },
       "name": "Użytkownicy",
+      "addRole": "Assign role…",
+      "removeRole": "Remove role {role}",
       "roleChanged": "Rola została zmieniona!",
       "table": {
         "columns": {

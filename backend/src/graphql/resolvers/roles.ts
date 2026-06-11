@@ -30,6 +30,20 @@ const countMembers = async (context: Context, name: string): Promise<number> => 
 const actorIsOwner = (context: Context): boolean =>
   effectiveRoleNames(context.user ?? {}).includes(OWNER_ROLE)
 
+// Keep the legacy `user.role` tier consistent with the HAS_ROLE edges so the
+// (not-yet-migrated) frontend isAdmin/isModerator gating stays correct during the
+// transition. Mapped into the UserRole enum: owner/admin → 'admin', moderator →
+// 'moderator', otherwise the baseline 'user'. Appended after an edge change.
+const SYNC_LEGACY_ROLE = `
+  WITH u
+  OPTIONAL MATCH (u)-[:HAS_ROLE]->(tier:Role)
+  WITH u, collect(tier.name) AS tierNames
+  SET u.role = CASE
+    WHEN 'owner' IN tierNames OR 'admin' IN tierNames THEN 'admin'
+    WHEN 'moderator' IN tierNames THEN 'moderator'
+    ELSE 'user'
+  END`
+
 export default {
   Query: {
     // Legacy: the built-in role names for the (legacy) switchUserRole UI. Kept
@@ -152,6 +166,7 @@ export default {
         query: `MATCH (u:User {id: $userId})
                 MATCH (r:Role {id: $roleName})
                 MERGE (u)-[:HAS_ROLE]->(r)
+                ${SYNC_LEGACY_ROLE}
                 RETURN u {.*} AS user`,
         variables: { userId, roleName },
       })
@@ -178,12 +193,26 @@ export default {
         query: `MATCH (u:User {id: $userId})
                 OPTIONAL MATCH (u)-[h:HAS_ROLE]->(:Role {id: $roleName})
                 DELETE h
+                ${SYNC_LEGACY_ROLE}
                 RETURN u {.*} AS user`,
         variables: { userId, roleName },
       })
       const user = result.records[0]?.get('user') as unknown
       if (!user) throw new UserInputError('Could not find User')
       return user
+    },
+  },
+
+  User: {
+    // Dynamic role names for a user (HAS_ROLE edges). Gated by role.manage in the
+    // shield. The baseline 'user' is implicit and not stored as an edge, so it
+    // never appears here.
+    roleNames: async (parent: { id: string }, _args: unknown, context: Context) => {
+      const result = await context.database.query({
+        query: `MATCH (:User {id: $id})-[:HAS_ROLE]->(r:Role) RETURN r.name AS name ORDER BY r.rank DESC, r.name ASC`,
+        variables: { id: parent.id },
+      })
+      return result.records.map((record) => record.get('name') as string)
     },
   },
 }

@@ -222,6 +222,8 @@
         "placeholder": "e-mail, naam of beschrijving"
       },
       "name": "Gebruikers",
+      "addRole": "Assign role…",
+      "removeRole": "Remove role {role}",
       "roleChanged": "Rol succesvol gewijzigd!",
       "table": {
         "columns": {

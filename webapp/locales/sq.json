@@ -222,6 +222,8 @@
         "placeholder": "e-mail, emër ose përshkrim"
       },
       "name": "Përdoruesit",
+      "addRole": "Assign role…",
+      "removeRole": "Remove role {role}",
       "roleChanged": "Roli u ndryshua me sukses!",
       "table": {
         "columns": {

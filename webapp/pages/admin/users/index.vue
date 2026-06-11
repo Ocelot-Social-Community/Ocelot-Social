@@ -114,18 +114,36 @@
               <td class="ds-table-col ds-table-col-right">{{ user.commentedCount }}</td>
               <td class="ds-table-col ds-table-col-right">{{ user.shoutedCount }}</td>
               <td class="ds-table-col ds-table-col-right">
-                <template v-if="userRoles.length">
-                  <select
-                    v-if="user.id !== currentUser.id"
-                    :value="user.role"
-                    @change="changeUserRole(user.id, $event)"
+                <div class="user-roles">
+                  <span
+                    v-for="rn in user.roleNames"
+                    :key="rn"
+                    class="user-roles__chip"
+                    :data-test="`user-role-${user.id}-${rn}`"
                   >
-                    <option v-for="value in userRoles" :key="value" :value="value">
-                      {{ value }}
+                    {{ rn }}
+                    <button
+                      v-if="user.id !== currentUser.id && rn !== 'owner'"
+                      type="button"
+                      class="user-roles__remove"
+                      :aria-label="$t('admin.users.removeRole', { role: rn })"
+                      @click="unassign(user, rn)"
+                    >
+                      ×
+                    </button>
+                  </span>
+                  <select
+                    v-if="user.id !== currentUser.id && assignableRoles(user).length"
+                    class="user-roles__add"
+                    :data-test="`user-role-add-${user.id}`"
+                    @change="assign(user, $event)"
+                  >
+                    <option value="" selected disabled>{{ $t('admin.users.addRole') }}</option>
+                    <option v-for="rn in assignableRoles(user)" :key="rn" :value="rn">
+                      {{ rn }}
                     </option>
                   </select>
-                  <p class="ds-text" v-else>{{ user.role }}</p>
-                </template>
+                </div>
               </td>
               <td v-if="$policy.get('badgesEnabled')" class="ds-table-col ds-table-col-right">
                 <os-button
@@ -161,7 +179,7 @@ import { mapGetters } from 'vuex'
 import { isEmail } from 'validator'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
 import { adminUserQuery } from '~/graphql/User'
-import { FetchAllRoles, updateUserRole } from '~/graphql/admin/Roles'
+import { rolesQuery, assignRoleMutation, unassignRoleMutation } from '~/graphql/admin/Roles'
 import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
@@ -187,7 +205,7 @@ export default {
       hasNext: false,
       email: null,
       filter: null,
-      userRoles: [],
+      allRoleNames: [],
       formData: {
         query: '',
       },
@@ -220,12 +238,10 @@ export default {
         return User.map((u, i) => Object.assign({}, u, { index: this.offset + i }))
       },
     },
-    userRoles: {
-      query() {
-        return FetchAllRoles()
-      },
-      update({ availableRoles }) {
-        return availableRoles
+    allRoleNames: {
+      query: rolesQuery,
+      update({ roles }) {
+        return (roles || []).map((role) => role.name)
       },
     },
   },
@@ -249,19 +265,28 @@ export default {
         }
       }
     },
-    changeUserRole(id, event) {
-      const newRole = event.target.value
-      this.$apollo
-        .mutate({
-          mutation: updateUserRole(),
-          variables: { role: newRole, id },
-        })
-        .then(({ data }) => {
-          this.$toast.success(this.$t('admin.users.roleChanged'))
-        })
-        .catch((error) => {
-          this.$toast.error(error.message)
-        })
+    // Roles a user does not yet hold and that may be assigned in bulk here.
+    // `owner` (sensitive, owner-only transfer) and the implicit `user` baseline
+    // are deliberately excluded.
+    assignableRoles(user) {
+      const held = new Set(user.roleNames || [])
+      return this.allRoleNames.filter((rn) => rn !== 'owner' && rn !== 'user' && !held.has(rn))
+    },
+    assign(user, event) {
+      const roleName = event.target.value
+      event.target.value = '' // reset the select back to the placeholder
+      if (!roleName) return undefined
+      return this.mutateRole(assignRoleMutation, { userId: user.id, roleName })
+    },
+    unassign(user, roleName) {
+      return this.mutateRole(unassignRoleMutation, { userId: user.id, roleName })
+    },
+    mutateRole(mutation, variables) {
+      return this.$apollo
+        .mutate({ mutation, variables })
+        .then(() => this.$apollo.queries.User.refetch())
+        .then(() => this.$toast.success(this.$t('admin.users.roleChanged')))
+        .catch((error) => this.$toast.error(error.message))
     },
   },
 }
@@ -270,5 +295,34 @@ export default {
 <style lang="scss">
 .admin-users > .os-card:first-child {
   margin-bottom: $space-small;
+}
+.user-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-xx-small;
+  justify-content: flex-end;
+  align-items: center;
+
+  &__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2em;
+    padding: 0.05em 0.4em;
+    border-radius: $border-radius-base;
+    background: $background-color-softer;
+    font-size: 0.85em;
+    white-space: nowrap;
+  }
+  &__remove {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    color: $text-color-soft;
+  }
+  &__add {
+    font-size: 0.85em;
+  }
 }
 </style>

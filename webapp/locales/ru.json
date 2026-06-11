@@ -222,6 +222,8 @@
         "placeholder": "Электронная почта, имя или описание"
       },
       "name": "Пользователи",
+      "addRole": "Assign role…",
+      "removeRole": "Remove role {role}",
       "roleChanged": "Роль успешно изменена!",
       "table": {
         "columns": {

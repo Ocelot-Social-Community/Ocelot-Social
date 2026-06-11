@@ -222,6 +222,8 @@
         "placeholder": "електронна пошта, ім'я або опис"
       },
       "name": "Користувачі",
+      "addRole": "Assign role…",
+      "removeRole": "Remove role {role}",
       "roleChanged": "Роль успішно змінено!",
       "table": {
         "columns": {
