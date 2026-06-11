@@ -113,7 +113,7 @@
       </div>
       <div v-if="resolvedIconRight || $slots['icon-right']" class="ocelot-select-icon-right">
         <slot name="icon-right">
-          <os-icon :icon="resolvedIconRight" />
+          <os-icon v-if="resolvedIconRight" :icon="resolvedIconRight" />
         </slot>
       </div>
     </div>
