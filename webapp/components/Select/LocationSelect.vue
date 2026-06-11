@@ -12,21 +12,22 @@
       :placeholder="$t('settings.data.labelCity') + ' …'"
       :loading="loadingGeo"
       @input.native="handleCityInput"
-    />
-    <os-button
-      v-if="(locationName !== '' && canBeCleared) || loadingGeo"
-      data-test="clear-location-button"
-      variant="primary"
-      appearance="ghost"
-      size="sm"
-      circle
-      :loading="loadingGeo"
-      :aria-label="$t('actions.clear')"
-      style="position: relative; float: right; top: -48px; right: 4px"
-      @click="clearLocationName"
     >
-      <template #icon><os-icon :icon="icons.close" /></template>
-    </os-button>
+      <template v-if="(locationName !== '' && canBeCleared) || loadingGeo" #icon-right>
+        <os-button
+          data-test="clear-location-button"
+          variant="primary"
+          appearance="ghost"
+          size="sm"
+          circle
+          :loading="loadingGeo"
+          :aria-label="$t('actions.clear')"
+          @click.stop="clearLocationName"
+        >
+          <template #icon><os-icon :icon="icons.close" /></template>
+        </os-button>
+      </template>
+    </ocelot-select>
   </div>
 </template>
 
@@ -163,3 +164,9 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+::v-deep .ocelot-select-icon-right {
+  right: 4px;
+}
+</style>

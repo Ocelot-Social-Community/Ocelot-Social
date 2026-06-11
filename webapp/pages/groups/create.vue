@@ -37,7 +37,7 @@ export default {
     }
   },
   methods: {
-    async createGroup(value) {
+    async createGroup(value, done) {
       const { name, about, description, groupType, actionRadius, locationName, categoryIds } = value
       const variables = {
         name,
@@ -66,6 +66,7 @@ export default {
         })
       } catch (error) {
         this.$toast.error(error.message)
+        done()
       }
     },
   },
