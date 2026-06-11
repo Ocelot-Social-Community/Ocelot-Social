@@ -110,8 +110,10 @@ describe('admin/policy.vue', () => {
     wrapper = Wrapper()
     expect(wrapper.find('[data-test="policy-group-registration"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="policy-group-features"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="policy-group-layout"]').exists()).toBe(true)
     expect(wrapper.text()).toContain('admin.policy.groups.registration.title')
     expect(wrapper.text()).toContain('admin.policy.groups.features.title')
+    expect(wrapper.text()).toContain('admin.policy.groups.layout.title')
   })
 
   it('renders every policy with a name and a detailed description', () => {
