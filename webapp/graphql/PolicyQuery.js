@@ -15,6 +15,9 @@ export default () => gql`
       inviteCodesGroupPerUser
       categoriesActive
       badgesEnabled
+      showContentFilterHeaderMenu
+      showContentFilterMasonryGrid
+      showGroupButtonInHeader
       apiKeysEnabled
       apiKeysMaxPerUser
       maxPinnedPosts

@@ -154,11 +154,17 @@
         "maxGroupPinnedPosts": "Maximale Anzahl an Beiträgen, die innerhalb einer Gruppe angepinnt werden können. 0 deaktiviert das Anpinnen in Gruppen.",
         "maxPinnedPosts": "Maximale Anzahl an Beiträgen, die netzwerkweit angepinnt werden können (Admins). 0 deaktiviert das Anpinnen.",
         "publicRegistration": "Erlaubt es jedem, direkt ein Konto zu erstellen – ohne Einladungscode. Ist dies aus, können neue Nutzer nur per Einladung beitreten.",
-        "requireLocation": "Macht die Angabe eines Ortes bei der Registrierung und in den Profileinstellungen verpflichtend."
+        "requireLocation": "Macht die Angabe eines Ortes bei der Registrierung und in den Profileinstellungen verpflichtend.",
+        "showContentFilterHeaderMenu": "Zeigt den Inhaltsfilter im Header-Menü.",
+        "showContentFilterMasonryGrid": "Zeigt den Inhaltsfilter im Masonry-Raster (Newsfeed).",
+        "showGroupButtonInHeader": "Zeigt den Gruppen-Button im Header."
       },
       "groups": {
         "features": {
           "title": "Funktionen"
+        },
+        "layout": {
+          "title": "Layout"
         },
         "registration": {
           "title": "Registrierung"
@@ -177,7 +183,10 @@
         "maxGroupPinnedPosts": "Max. angepinnte Beiträge pro Gruppe",
         "maxPinnedPosts": "Max. angepinnte Beiträge (Netzwerk)",
         "publicRegistration": "Offene Registrierung",
-        "requireLocation": "Ort verpflichtend"
+        "requireLocation": "Ort verpflichtend",
+        "showContentFilterHeaderMenu": "Inhaltsfilter im Header",
+        "showContentFilterMasonryGrid": "Inhaltsfilter im Raster",
+        "showGroupButtonInHeader": "Gruppen-Button im Header"
       },
       "lastUpdated": "Zuletzt geändert: {timestamp} von {actor}",
       "name": "Netzwerk-Konfiguration",

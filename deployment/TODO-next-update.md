@@ -23,6 +23,19 @@ Remove `BADGES_ENABLED`, `ASK_FOR_REAL_NAME`, `REQUIRE_LOCATION`, `INVITE_LINK_L
 `MAX_GROUP_PINNED_POSTS` and `API_KEYS_MAX_PER_USER` from the **webapp** environment
 — the webapp no longer reads them (see `webapp/.env.template`).
 
+### Layout toggles moved from branding constants to the network policy
+
+`SHOW_CONTENT_FILTER_HEADER_MENU`, `SHOW_CONTENT_FILTER_MASONRY_GRID` and
+`SHOW_GROUP_BUTTON_IN_HEADER` were **webapp branding constants**
+(`branding/constants/filter.{js,ts}` and `groups.{js,ts}`). They are now runtime
+network-policy keys (`showContentFilterHeaderMenu`, `showContentFilterMasonryGrid`,
+`showGroupButtonInHeader`), live-editable under **Admin → Network policy → Layout**.
+**Action:** set them via the **backend** ENV (`SHOW_CONTENT_FILTER_HEADER_MENU` etc.,
+defaults `true`/`false`/`true`) or in the admin UI, and drop them from your
+`branding/constants/filter` and `groups` — the webapp no longer reads them there
+(`webapp/constants/filter.js` was removed; `SHOW_GROUP_BUTTON_IN_HEADER` removed from
+`webapp/constants/groups.js`).
+
 ## Version >= 3.2.0 with 'ocelotDockerVersionTag' 3.2.0-XXX
 
 ### Backend and Kubernetes Config `DBMS_DEFAULT_DATABASE`

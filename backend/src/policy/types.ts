@@ -12,6 +12,9 @@ export interface NetworkPolicy {
   inviteCodesGroupPerUser: number
   categoriesActive: boolean
   badgesEnabled: boolean
+  showContentFilterHeaderMenu: boolean
+  showContentFilterMasonryGrid: boolean
+  showGroupButtonInHeader: boolean
   apiKeysEnabled: boolean
   apiKeysMaxPerUser: number
   maxPinnedPosts: number

@@ -154,11 +154,17 @@
         "maxGroupPinnedPosts": "Numri maksimal i postimeve që mund të fiksohen brenda një grupi. Vendos 0 për të çaktivizuar fiksimin në grupe.",
         "maxPinnedPosts": "Numri maksimal i postimeve që mund të fiksohen në të gjithë rrjetin (administratorët). Vendos 0 për të çaktivizuar fiksimin.",
         "publicRegistration": "Lejon këdo të krijojë një llogari drejtpërdrejt, pa kod ftese. Kur është joaktive, përdoruesit e rinj mund të bashkohen vetëm me ftesë.",
-        "requireLocation": "E bën të detyrueshme një vendndodhje gjatë regjistrimit dhe në cilësimet e profilit."
+        "requireLocation": "E bën të detyrueshme një vendndodhje gjatë regjistrimit dhe në cilësimet e profilit.",
+        "showContentFilterHeaderMenu": "Shfaq filtrin e përmbajtjes në menynë e kreut.",
+        "showContentFilterMasonryGrid": "Shfaq filtrin e përmbajtjes në rrjetën masonry (lajme).",
+        "showGroupButtonInHeader": "Shfaq butonin e grupeve në krye."
       },
       "groups": {
         "features": {
           "title": "Veçoritë"
+        },
+        "layout": {
+          "title": "Struktura"
         },
         "registration": {
           "title": "Regjistrimi"
@@ -177,7 +183,10 @@
         "maxGroupPinnedPosts": "Maks. postime të fiksuara për grup",
         "maxPinnedPosts": "Maks. postime të fiksuara (rrjeti)",
         "publicRegistration": "Regjistrim i hapur",
-        "requireLocation": "Vendndodhja e detyrueshme"
+        "requireLocation": "Vendndodhja e detyrueshme",
+        "showContentFilterHeaderMenu": "Filtri i përmbajtjes në krye",
+        "showContentFilterMasonryGrid": "Filtri i përmbajtjes në rrjetë",
+        "showGroupButtonInHeader": "Butoni i grupeve në krye"
       },
       "lastUpdated": "Ndryshuar së fundi: {timestamp} nga {actor}",
       "name": "Politika e rrjetit",

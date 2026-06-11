@@ -62,6 +62,9 @@ describe('policy visibility', () => {
         'inviteRegistration',
         'publicRegistration',
         'requireLocation',
+        'showContentFilterHeaderMenu',
+        'showContentFilterMasonryGrid',
+        'showGroupButtonInHeader',
       ])
     })
 
@@ -80,6 +83,9 @@ describe('policy visibility', () => {
         'maxPinnedPosts',
         'publicRegistration',
         'requireLocation',
+        'showContentFilterHeaderMenu',
+        'showContentFilterMasonryGrid',
+        'showGroupButtonInHeader',
       ])
     })
   })

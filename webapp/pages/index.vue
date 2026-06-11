@@ -189,7 +189,6 @@ import { DonationsQuery } from '~/graphql/Donations'
 import { filterPosts } from '~/graphql/PostQuery.js'
 import UpdateQuery from '~/components/utils/UpdateQuery'
 import FilterMenuComponent from '~/components/FilterMenu/FilterMenuComponent'
-import { SHOW_CONTENT_FILTER_MASONRY_GRID } from '~/constants/filter.js'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
@@ -225,7 +224,6 @@ export default {
       offset: 0,
       pageSize: 12,
       hashtag,
-      SHOW_CONTENT_FILTER_MASONRY_GRID,
       singleColumn: false,
     }
   },
@@ -235,6 +233,10 @@ export default {
       postsFilter: 'posts/filter',
       orderBy: 'posts/orderBy',
     }),
+    // Layout toggle served by the network policy (formerly a branding constant).
+    SHOW_CONTENT_FILTER_MASONRY_GRID() {
+      return this.$policy.get('showContentFilterMasonryGrid') === true
+    },
     filterButtonIcon() {
       return this.showFilter ? this.icons.angleUp : this.icons.angleDown
     },

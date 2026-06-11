@@ -154,11 +154,17 @@
         "maxGroupPinnedPosts": "Maksymalna liczba postów, które można przypiąć w grupie. Ustaw 0, aby wyłączyć przypinanie w grupach.",
         "maxPinnedPosts": "Maksymalna liczba postów, które można przypiąć w całej sieci (administratorzy). Ustaw 0, aby wyłączyć przypinanie.",
         "publicRegistration": "Pozwala każdemu utworzyć konto bezpośrednio, bez kodu zaproszenia. Po wyłączeniu nowi użytkownicy mogą dołączyć tylko przez zaproszenie.",
-        "requireLocation": "Sprawia, że podanie lokalizacji jest obowiązkowe podczas rejestracji i w ustawieniach profilu."
+        "requireLocation": "Sprawia, że podanie lokalizacji jest obowiązkowe podczas rejestracji i w ustawieniach profilu.",
+        "showContentFilterHeaderMenu": "Pokazuje filtr treści w menu nagłówka.",
+        "showContentFilterMasonryGrid": "Pokazuje filtr treści w siatce masonry (aktualności).",
+        "showGroupButtonInHeader": "Pokazuje przycisk grup w nagłówku."
       },
       "groups": {
         "features": {
           "title": "Funkcje"
+        },
+        "layout": {
+          "title": "Układ"
         },
         "registration": {
           "title": "Rejestracja"
@@ -177,7 +183,10 @@
         "maxGroupPinnedPosts": "Maks. przypiętych postów na grupę",
         "maxPinnedPosts": "Maks. przypiętych postów (sieć)",
         "publicRegistration": "Otwarta rejestracja",
-        "requireLocation": "Lokalizacja wymagana"
+        "requireLocation": "Lokalizacja wymagana",
+        "showContentFilterHeaderMenu": "Filtr treści w nagłówku",
+        "showContentFilterMasonryGrid": "Filtr treści w siatce",
+        "showGroupButtonInHeader": "Przycisk grup w nagłówku"
       },
       "lastUpdated": "Ostatnia zmiana: {timestamp} przez {actor}",
       "name": "Zasady sieci",
