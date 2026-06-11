@@ -477,6 +477,10 @@ export default shield(
       VerifyNonce: allow,
       queryLocations: allow,
       availableRoles: hasPermission('role.manage'),
+      permissionCatalog: hasPermission('role.manage'),
+      roles: hasPermission('role.manage'),
+      userRoles: hasPermission('role.manage'),
+      myPermissions: isAuthenticated,
       Room: isAuthenticated,
       Message: isAuthenticated,
       UnreadRooms: isAuthenticated,
@@ -569,6 +573,11 @@ export default shield(
       adminRevokeUserApiKeys: hasPermission('apiKey.administer'),
 
       switchUserRole: hasPermission('role.manage'),
+      createRole: hasPermission('role.manage'),
+      updateRole: hasPermission('role.manage'),
+      deleteRole: hasPermission('role.manage'),
+      assignRole: hasPermission('role.manage'),
+      unassignRole: hasPermission('role.manage'),
       markTeaserAsViewed: allow,
 
       // Network Policy

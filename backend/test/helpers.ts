@@ -10,7 +10,7 @@ import type { ApolloServerPlugin } from '@apollo/server'
 import type CONFIG from '@config/index'
 import type { Context } from '@src/context'
 import type { NetworkPolicy } from '@src/policy'
-import type { RoleDefinition } from '@src/role'
+import type { RoleDefinition, RoleService } from '@src/role'
 import type { DocumentNode } from 'graphql'
 
 export const TEST_CONFIG = {
@@ -76,6 +76,9 @@ interface OverwritableContextParams {
   // permission from the `user` role); defaults to the seeded DEFAULT_ROLES. The
   // user's effective permissions are resolved from these via their role string.
   roles?: RoleDefinition[]
+  // Inject a real (DB-backed) RoleService instead of the in-memory default —
+  // needed by tests that mutate roles / HAS_ROLE edges (createRole, assignRole …).
+  roleService?: RoleService
   pubsub?: Context['pubsub']
 }
 interface CreateTestServerOptions {
@@ -93,6 +96,7 @@ export const createApolloTestSetup = async (opts?: CreateTestServerOptions) => {
       config = {},
       policy: policyOverride = {},
       roles: rolesOverride,
+      roleService,
       pubsub,
     } = await testContext()
     const merged = { ...TEST_CONFIG, ...config }
@@ -100,8 +104,9 @@ export const createApolloTestSetup = async (opts?: CreateTestServerOptions) => {
     // set falls back to its schema default inside createInMemoryPolicyService.
     const policy = createInMemoryPolicyService(policyOverride)
     // Roles default to the seeded DEFAULT_ROLES so authorization resolves exactly
-    // as in production; a test can override them to exercise restricted roles.
-    const role = createInMemoryRoleService(rolesOverride)
+    // as in production; a test can override the definitions, or inject a real
+    // DB-backed RoleService when it needs to mutate roles / HAS_ROLE edges.
+    const role = roleService ?? createInMemoryRoleService(rolesOverride)
     return getContext({
       authenticatedUser,
       database,

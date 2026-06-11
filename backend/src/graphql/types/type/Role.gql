@@ -1,0 +1,37 @@
+# Dynamic roles & global permissions (RBAC, global axis). The permission catalog
+# is code-owned (keys are dotted/namespaced → String, not an enum); roles are
+# runtime data managed here. See docu/roles-permissions-concept.md.
+
+type Permission {
+  key: String!
+  group: String!
+  description: String!
+}
+
+type Role {
+  name: String!
+  description: String
+  rank: Int!
+  protected: Boolean!
+  permissions: [String!]!
+  memberCount: Int
+}
+
+type Query {
+  "The closed permission catalog (admin / role.manage)."
+  permissionCatalog: [Permission!]!
+  "All roles with their permission bundles and member counts (role.manage)."
+  roles: [Role!]!
+  "The roles assigned to a specific user (role.manage) — for the admin UI."
+  userRoles(userId: ID!): [Role!]!
+  "The current viewer's effective permission keys — drives the webapp can()."
+  myPermissions: [String!]!
+}
+
+type Mutation {
+  createRole(name: String!, description: String, rank: Int!, permissions: [String!]!): Role!
+  updateRole(name: String!, description: String, rank: Int!, permissions: [String!]!): Role!
+  deleteRole(name: String!): String!
+  assignRole(userId: ID!, roleName: String!): User!
+  unassignRole(userId: ID!, roleName: String!): User!
+}
