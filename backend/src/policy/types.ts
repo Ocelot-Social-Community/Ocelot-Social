@@ -2,6 +2,22 @@
 // Must stay in sync with ./policy.schema.json — the JSON schema is the single
 // source of truth; these types and the GraphQL SDL are hand-mirrors of it.
 
+// An audience is a tag a policy key can be made visible to (via its "visibility"
+// list in the schema) and that a viewer can belong to. There are two auth-state
+// audiences plus permission audiences:
+//   • 'public'        — every viewer, including anonymous (universal membership)
+//   • 'authenticated' — any logged-in user
+//   • 'perm:<key>'    — viewers holding that permission (owner/admin via their
+//                       effective permission set)
+//
+// Permission audiences REPLACE the former role-name audiences ('admin'/'moderator'/
+// role names): keying on permissions decouples the static, code-owned schema from
+// dynamic, admin-managed role names (a rename/delete can no longer silently
+// mis-scope a key) and from the legacy `user.role` field. Visibility is membership-
+// based (set intersection in canView), never a linear rank. An empty/missing
+// visibility list ⇒ admin-only, resolved to 'perm:policy.manage' in audiencesFor.
+import { allPermissionKeys } from '@src/permission'
+
 export interface NetworkPolicy {
   publicRegistration: boolean
   inviteRegistration: boolean
@@ -27,36 +43,18 @@ export type PolicyKey = keyof NetworkPolicy
 // limits today; string-typed keys are supported by the schema/service for later).
 export type PolicyValue = NetworkPolicy[PolicyKey]
 
-// An audience is a tag that a policy key can be made visible to (via the key's
-// "visibility" list in the schema) and that a viewer can be a member of.
-//
-// Well-known audiences:
-//   • 'public'        — every viewer, including anonymous (universal membership)
-//   • 'authenticated' — any logged-in user
-//   • role names      — 'admin', 'moderator', and, in the future, admin-defined
-//                       dynamic roles
-//
-// 'admin' is an implicit superuser: it sees every key and need not be listed on
-// one. Visibility is membership-based (set intersection in canView), NOT a
-// linear rank — so non-hierarchical / dynamically-created roles slot in without
-// touching any call site. The type is intentionally open (string) because the
-// full set of audiences is not known at compile time once roles are dynamic.
 export type Audience = string
 
 export const PUBLIC_AUDIENCE: Audience = 'public'
 export const AUTHENTICATED_AUDIENCE: Audience = 'authenticated'
-export const ADMIN_AUDIENCE: Audience = 'admin'
+export const PERMISSION_AUDIENCE_PREFIX = 'perm:'
 
 // Audiences that may appear in a key's `visibility` list in the schema: the two
-// universal/auth audiences plus the built-in user roles (UserRole: admin,
-// moderator, user). The static schema is authored at build time, so it can only
-// reference these known audiences — runtime dynamic roles (if ever added) are
-// matched in audiencesOf(), not written into the schema. Used to enum-validate
-// `visibility` at module load. Keep in sync with the UserRole enum.
+// auth-state audiences plus one 'perm:<key>' per catalog permission. Used to
+// enum-validate `visibility` at module load, so a typo'd permission audience —
+// which would silently match nobody — is rejected rather than mis-scoping a key.
 export const KNOWN_AUDIENCES: Audience[] = [
   PUBLIC_AUDIENCE,
   AUTHENTICATED_AUDIENCE,
-  ADMIN_AUDIENCE,
-  'moderator',
-  'user',
+  ...allPermissionKeys().map((key) => `${PERMISSION_AUDIENCE_PREFIX}${key}`),
 ]

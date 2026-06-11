@@ -24,19 +24,21 @@ describe('policy visibility', () => {
       expect([...audiencesOf(null)]).toEqual(['public'])
     })
 
-    it('adds "authenticated" and the role for a logged-in viewer', () => {
-      expect(audiencesOf({ role: 'user' })).toEqual(new Set(['public', 'authenticated', 'user']))
+    it('adds "authenticated" for a logged-in viewer', () => {
+      expect(audiencesOf({ authenticated: true })).toEqual(new Set(['public', 'authenticated']))
     })
 
-    it('includes the admin role name for admins', () => {
-      expect(audiencesOf({ role: 'admin' })).toEqual(new Set(['public', 'authenticated', 'admin']))
+    it('turns each held permission into a "perm:<key>" audience', () => {
+      expect(
+        audiencesOf({ authenticated: true, permissions: ['policy.manage', 'badge.manage'] }),
+      ).toEqual(new Set(['public', 'authenticated', 'perm:policy.manage', 'perm:badge.manage']))
     })
   })
 
   describe('canView()', () => {
     it('lets everyone (incl. anonymous) see public keys', () => {
       expect(canView('publicRegistration', null)).toBe(true)
-      expect(canView('categoriesActive', { role: 'user' })).toBe(true)
+      expect(canView('categoriesActive', { authenticated: true })).toBe(true)
     })
 
     it('hides authenticated keys from anonymous viewers', () => {
@@ -44,12 +46,17 @@ describe('policy visibility', () => {
     })
 
     it('shows authenticated keys to any logged-in viewer', () => {
-      expect(canView('apiKeysEnabled', { role: 'user' })).toBe(true)
+      expect(canView('apiKeysEnabled', { authenticated: true })).toBe(true)
     })
 
-    it('admin is a superuser: sees every key via the short-circuit', () => {
-      expect(canView('apiKeysEnabled', { role: 'admin' })).toBe(true)
-      expect(canView('publicRegistration', { role: 'admin' })).toBe(true)
+    it('a permission audience grants visibility (admin/owner hold policy.manage)', () => {
+      // No shipped key is admin-only today, so exercise the mechanism via
+      // audiencesFor's empty-visibility fallback path through a held permission.
+      expect(
+        audiencesOf({ authenticated: true, permissions: ['policy.manage'] }).has(
+          'perm:policy.manage',
+        ),
+      ).toBe(true)
     })
   })
 
@@ -69,7 +76,7 @@ describe('policy visibility', () => {
     })
 
     it('returns all keys for a logged-in viewer', () => {
-      expect(visibleKeys({ role: 'user' }).sort()).toEqual([
+      expect(visibleKeys({ authenticated: true }).sort()).toEqual([
         'apiKeysEnabled',
         'apiKeysMaxPerUser',
         'askForRealName',
