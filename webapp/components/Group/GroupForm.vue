@@ -218,6 +218,7 @@ export default {
       savedBaseline: {
         name: name || '',
         slug: slug || '',
+        groupType: groupType || '',
         about: about || '',
         description: description || '',
         actionRadius: actionRadius || '',
@@ -333,9 +334,9 @@ export default {
       const variables = {
         name,
         slug,
+        groupType,
         about,
         description,
-        groupType,
         actionRadius,
         locationName: this.formLocationName,
         categoryIds,
@@ -346,6 +347,7 @@ export default {
           this.savedBaseline = {
             name: this.formData.name,
             slug: this.formData.slug,
+            groupType: this.formData.groupType,
             about: this.formData.about,
             description: this.formData.description,
             actionRadius: this.formData.actionRadius,
