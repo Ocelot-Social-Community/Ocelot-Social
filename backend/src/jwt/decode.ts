@@ -12,7 +12,13 @@ export interface DecodedUser {
   id: string
   slug: string
   name: string
+  // Legacy flat role, kept transitionally. Authorization resolves from `roles`
+  // (HAS_ROLE) when present, otherwise bridges from this (see effectiveRoleNames).
   role: string
+  // Dynamic role names from (:User)-[:HAS_ROLE]->(:Role). Empty until the R5
+  // migration assigns edges. Optional so other DecodedUser constructions need not
+  // set it; decode() always populates it (empty array when there are no edges).
+  roles?: string[]
   disabled: boolean
   authMethod?: 'jwt' | 'apiKey'
   apiKeyId?: string
@@ -38,7 +44,10 @@ const decodeJwt = async (
     const fetchUserTransactionResponse = await transaction.run(
       `
       MATCH (user:User {id: $id, deleted: false, disabled: false })
-      RETURN user {.id, .slug, .name, .role, .disabled, .actorId}
+      RETURN user {
+        .id, .slug, .name, .role, .disabled, .actorId,
+        roles: [(user)-[:HAS_ROLE]->(r:Role) | r.name]
+      }
       LIMIT 1
     `,
       { id },
@@ -69,7 +78,10 @@ const decodeApiKey = async (driver: Driver, key: string): Promise<DecodedUser | 
           AND (k.expiresAt IS NULL OR datetime(k.expiresAt) > datetime())
           AND user.deleted = false
           AND user.disabled = false
-        RETURN user {.id, .slug, .name, .role, .disabled, .actorId} AS user, k.id AS keyId
+        RETURN user {
+          .id, .slug, .name, .role, .disabled, .actorId,
+          roles: [(user)-[:HAS_ROLE]->(r:Role) | r.name]
+        } AS user, k.id AS keyId
         LIMIT 1
       `,
         { keyHash },

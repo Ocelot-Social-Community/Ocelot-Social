@@ -4,7 +4,6 @@
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unnecessary-type-conversion */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { rule, shield, deny, allow, or, and } from 'graphql-shield'
 
@@ -15,6 +14,7 @@ import { validateInviteCode } from '@graphql/resolvers/inviteCodes'
 
 import type SocialMedia from '@db/models/SocialMedia'
 import type { Context } from '@src/context'
+import type { PermissionKey } from '@src/permission'
 
 const debug = !!CONFIG.DEBUG
 const allowExternalErrors = true
@@ -27,12 +27,25 @@ const isAuthenticated = rule({
   return !!ctx?.user?.id
 })
 
-const isModerator = rule()(async (_parent, _args, { user }: Context, _info) => {
-  return !!(user && (user.role === 'moderator' || user.role === 'admin'))
-})
+// Generic permission gate. Reads the per-request effective permission set that
+// the context resolves from the user's roles (RoleService). This REPLACES the
+// former role-string checks (isAdmin / isModerator): the operation→permission
+// mapping below stays in code (under review), only role→permission is dynamic
+// data. The permission argument is typed against the catalog, so a typo or a
+// removed key is a compile-time error (the shield→catalog drift guard).
+const hasPermission = (permission: PermissionKey) =>
+  rule({ cache: 'contextual' })(async (_parent, _args, ctx: Context) => {
+    return ctx.effectivePermissions.has(permission)
+  })
 
-const isAdmin = rule()(async (_parent, _args, { user }: Context, _info) => {
-  return !!(user?.role === 'admin')
+// Composite capability: creating a group needs `group.create`; a hidden group
+// additionally needs `group.create_hidden`.
+const canCreateGroup = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
+  if (!ctx.effectivePermissions.has('group.create')) return false
+  if (args.groupType === 'hidden' && !ctx.effectivePermissions.has('group.create_hidden')) {
+    return false
+  }
+  return true
 })
 
 const apiKeysEnabled = rule({ cache: 'contextual' })(async (
@@ -443,8 +456,8 @@ export default shield(
       embed: allow,
       Category: allow,
       Tag: allow,
-      reports: isModerator,
-      statistics: isAdmin,
+      reports: hasPermission('content.moderate'),
+      statistics: hasPermission('network.statistics.read'),
       currentUser: isAuthenticated,
       Group: isAuthenticated,
       GroupMembers: isAllowedSeeingGroupMembers,
@@ -452,7 +465,7 @@ export default shield(
       Post: allow,
       profilePagePosts: allow,
       Comment: allow,
-      User: and(isAuthenticated, or(noEmailFilter, isAdmin)),
+      User: and(isAuthenticated, or(noEmailFilter, hasPermission('user.email.readAny'))),
       Badge: allow,
       PostsEmotionsCountByEmotion: allow,
       PostsEmotionsByCurrentUser: isAuthenticated,
@@ -463,62 +476,64 @@ export default shield(
       userData: isAuthenticated,
       VerifyNonce: allow,
       queryLocations: allow,
-      availableRoles: isAdmin,
+      availableRoles: hasPermission('role.manage'),
       Room: isAuthenticated,
       Message: isAuthenticated,
       UnreadRooms: isAuthenticated,
       videoCallConfig: allow,
       videoCallParticipantCount: isAuthenticated,
-      PostsPinnedCounts: isAdmin,
+      PostsPinnedCounts: hasPermission('post.pin'),
 
       // Invite Code
       validateInviteCode: allow,
 
       // API Keys
       myApiKeys: and(isAuthenticated, apiKeysEnabled),
-      apiKeyUsers: isAdmin,
-      apiKeysForUser: isAdmin,
+      apiKeyUsers: hasPermission('apiKey.administer'),
+      apiKeysForUser: hasPermission('apiKey.administer'),
 
       // Network Policy — one query for everyone; per-field visibility (which
       // keys a viewer actually receives) is enforced inside the resolver via
       // canView(). Anonymous viewers still need it (login/register screen).
       policy: allow,
-      // Configured defaults + last-change audit info are admin-only (deployment
-      // config); bundled in the single policyDefaults query.
-      policyDefaults: isAdmin,
+      // Configured defaults + last-change audit info are policy-admin-only
+      // (deployment config); bundled in the single policyDefaults query.
+      policyDefaults: hasPermission('policy.manage'),
     },
     Mutation: {
       '*': deny,
       login: allow,
-      Signup: or(publicRegistration, inviteRegistration, isAdmin),
+      // The isAdmin branch (admin-initiated registration) maps to role.manage —
+      // user/role administration, which the default admin role holds.
+      Signup: or(publicRegistration, inviteRegistration, hasPermission('role.manage')),
       SignupVerification: allow,
       UpdateUser: onlyYourself,
-      CreateGroup: isAuthenticated,
+      CreateGroup: and(isAuthenticated, canCreateGroup),
       UpdateGroup: isAllowedToChangeGroupSettings,
       JoinGroup: isAllowedToJoinGroup,
       LeaveGroup: isAllowedToLeaveGroup,
       ChangeGroupMemberRole: isAllowedToChangeGroupMemberRole,
       RemoveUserFromGroup: canRemoveUserFromGroup,
-      CreatePost: and(isAuthenticated, isMemberOfGroup),
+      CreatePost: and(isAuthenticated, hasPermission('post.create'), isMemberOfGroup),
       UpdatePost: isAuthor,
       DeletePost: isAuthor,
       fileReport: isAuthenticated,
       CreateSocialMedia: isAuthenticated,
       UpdateSocialMedia: isMySocialMedia,
       DeleteSocialMedia: isMySocialMedia,
-      setVerificationBadge: isAdmin,
-      rewardTrophyBadge: isAdmin,
-      revokeBadge: isAdmin,
+      setVerificationBadge: hasPermission('badge.manage'),
+      rewardTrophyBadge: hasPermission('badge.manage'),
+      revokeBadge: hasPermission('badge.manage'),
       followUser: isAuthenticated,
       unfollowUser: isAuthenticated,
       shout: isAuthenticated,
       unshout: isAuthenticated,
       changePassword: isAuthenticated,
-      review: isModerator,
+      review: hasPermission('content.moderate'),
       CreateComment: and(isAuthenticated, canCommentPost),
       UpdateComment: isAuthor,
       DeleteComment: isAuthor,
-      DeleteUser: or(isDeletingOwnAccount, isAdmin),
+      DeleteUser: or(isDeletingOwnAccount, hasPermission('user.delete.any')),
       requestPasswordReset: allow,
       resetPassword: allow,
       AddPostEmotions: isAuthenticated,
@@ -532,16 +547,16 @@ export default shield(
       markAllAsRead: isAuthenticated,
       AddEmailAddress: isAuthenticated,
       VerifyEmailAddress: isAuthenticated,
-      pinPost: isAdmin,
-      unpinPost: isAdmin,
+      pinPost: hasPermission('post.pin'),
+      unpinPost: hasPermission('post.pin'),
       pinGroupPost: isAllowedToPinGroupPost,
       unpinGroupPost: isAllowedToPinGroupPost,
-      pushPost: isAdmin,
-      unpushPost: isAdmin,
-      UpdateDonations: isAdmin,
+      pushPost: hasPermission('post.push'),
+      unpushPost: hasPermission('post.push'),
+      UpdateDonations: hasPermission('donation.manage'),
 
       // InviteCode
-      generatePersonalInviteCode: isAuthenticated,
+      generatePersonalInviteCode: and(isAuthenticated, hasPermission('user.invite')),
       generateGroupInviteCode: isAllowedToGenerateGroupInviteCode,
       invalidateInviteCode: isAuthenticated,
       redeemInviteCode: isAuthenticated,
@@ -550,15 +565,15 @@ export default shield(
       createApiKey: and(isAuthenticated, apiKeysEnabled),
       updateApiKey: isAuthenticated,
       revokeApiKey: isAuthenticated,
-      adminRevokeApiKey: isAdmin,
-      adminRevokeUserApiKeys: isAdmin,
+      adminRevokeApiKey: hasPermission('apiKey.administer'),
+      adminRevokeUserApiKeys: hasPermission('apiKey.administer'),
 
-      switchUserRole: isAdmin,
+      switchUserRole: hasPermission('role.manage'),
       markTeaserAsViewed: allow,
 
       // Network Policy
-      setPolicy: isAdmin,
-      resetPolicy: isAdmin,
+      setPolicy: hasPermission('policy.manage'),
+      resetPolicy: hasPermission('policy.manage'),
 
       saveCategorySettings: isAuthenticated,
       updateOnlineStatus: isAuthenticated,
@@ -578,7 +593,7 @@ export default shield(
       name: allow,
       slug: allow,
       avatar: allow,
-      email: or(isMyOwn, isAdmin),
+      email: or(isMyOwn, hasPermission('user.email.readAny')),
       emailNotificationSettings: isMyOwn,
       inviteCodes: isMyOwn,
     },
@@ -601,7 +616,7 @@ export default shield(
     Location: {
       distanceToMe: isAuthenticated,
     },
-    Report: isModerator,
+    Report: hasPermission('content.moderate'),
   },
   {
     debug,

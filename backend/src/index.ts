@@ -4,9 +4,11 @@ import { closeDriver } from './db/neo4j'
 import { loggerPlugin } from './plugins/apolloLogger'
 import { getPolicyService } from './policy'
 import createProxy from './proxy'
+import { getRoleService } from './role'
 import createServer from './server'
 
 import type { PolicyPubSub } from './policy'
+import type { RolePubSub } from './role'
 
 async function main() {
   // Initialize network policy (seeds DB from ENV if values are missing) and
@@ -16,6 +18,11 @@ async function main() {
   // App entry point: read the deployment environment to seed the policy.
   // eslint-disable-next-line n/no-process-env
   await getPolicyService().init(process.env, pubsub)
+
+  // Initialize roles (seeds the default roles idempotently) and subscribe to
+  // roles.changed for cross-instance cache sync. Also must complete before the
+  // server accepts requests, since authorization resolves against the cache.
+  await getRoleService().init(pubsub as unknown as RolePubSub)
 
   const { server, httpServer } = await createServer({
     plugins: [loggerPlugin],

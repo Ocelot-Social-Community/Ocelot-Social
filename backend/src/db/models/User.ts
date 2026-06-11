@@ -14,7 +14,15 @@ export default {
   },
   deleted: { type: 'boolean', default: false },
   disabled: { type: 'boolean', default: false },
+  // Legacy flat role (admin/moderator/user). Kept transitionally alongside the
+  // dynamic HAS_ROLE relationship below for rollback safety; retired in a later step.
   role: { type: 'string', default: 'user' },
+  roles: {
+    type: 'relationship',
+    relationship: 'HAS_ROLE',
+    target: 'Role',
+    direction: 'out',
+  },
   publicKey: 'string',
   privateKey: 'string',
   wasInvited: 'boolean',

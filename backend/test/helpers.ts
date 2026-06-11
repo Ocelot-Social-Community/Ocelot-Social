@@ -3,12 +3,14 @@
 import databaseContext from '@context/database'
 import { getContext } from '@src/context'
 import { createInMemoryPolicyService } from '@src/policy'
+import { createInMemoryRoleService } from '@src/role'
 import createServer from '@src/server'
 
 import type { ApolloServerPlugin } from '@apollo/server'
 import type CONFIG from '@config/index'
 import type { Context } from '@src/context'
 import type { NetworkPolicy } from '@src/policy'
+import type { RoleDefinition } from '@src/role'
 import type { DocumentNode } from 'graphql'
 
 export const TEST_CONFIG = {
@@ -70,6 +72,10 @@ interface OverwritableContextParams {
   // Override network-policy values for a test (e.g. { categoriesActive: true,
   // maxGroupPinnedPosts: 0 }); unset keys fall back to their schema defaults.
   policy?: Partial<NetworkPolicy>
+  // Override the role definitions for a test (e.g. to revoke a baseline
+  // permission from the `user` role); defaults to the seeded DEFAULT_ROLES. The
+  // user's effective permissions are resolved from these via their role string.
+  roles?: RoleDefinition[]
   pubsub?: Context['pubsub']
 }
 interface CreateTestServerOptions {
@@ -86,18 +92,23 @@ export const createApolloTestSetup = async (opts?: CreateTestServerOptions) => {
       authenticatedUser,
       config = {},
       policy: policyOverride = {},
+      roles: rolesOverride,
       pubsub,
     } = await testContext()
     const merged = { ...TEST_CONFIG, ...config }
     // Network policy values are set per-test via the `policy` override; any key not
     // set falls back to its schema default inside createInMemoryPolicyService.
     const policy = createInMemoryPolicyService(policyOverride)
+    // Roles default to the seeded DEFAULT_ROLES so authorization resolves exactly
+    // as in production; a test can override them to exercise restricted roles.
+    const role = createInMemoryRoleService(rolesOverride)
     return getContext({
       authenticatedUser,
       database,
       pubsub,
       config: merged,
       policy,
+      role,
     })(req)
   }
 
