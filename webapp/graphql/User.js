@@ -424,6 +424,7 @@ export const currentUserQuery = gql`
       }
       activeCategories
     }
+    myPermissions
   }
 `
 

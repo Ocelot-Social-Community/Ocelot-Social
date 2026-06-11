@@ -196,6 +196,23 @@
       "saveSuccess": "Política atualizada.",
       "title": "Configurações da política de rede"
     },
+    "roles": {
+      "allPermissions": "Holds every permission (protected).",
+      "create": "Create role",
+      "createTitle": "Create a new role",
+      "delete": "Delete",
+      "description": "Create roles and assign permissions. Changes apply immediately.",
+      "descriptionLabel": "Description",
+      "members": "{count} members",
+      "name": "Roles & permissions",
+      "nameLabel": "Name",
+      "protected": "protected",
+      "rank": "Rank",
+      "save": "Save",
+      "saveError": "Could not save role: {message}",
+      "saveSuccess": "Role saved.",
+      "title": "Roles & permissions"
+    },
     "settings": {
       "name": "Configurações"
     },

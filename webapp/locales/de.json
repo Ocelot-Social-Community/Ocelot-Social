@@ -196,6 +196,23 @@
       "saveSuccess": "Konfiguration aktualisiert.",
       "title": "Einstellungen der Netzwerk-Konfiguration"
     },
+    "roles": {
+      "allPermissions": "Hält alle Berechtigungen (geschützt).",
+      "create": "Rolle erstellen",
+      "createTitle": "Neue Rolle erstellen",
+      "delete": "Löschen",
+      "description": "Rollen erstellen und Berechtigungen vergeben. Änderungen gelten sofort.",
+      "descriptionLabel": "Beschreibung",
+      "members": "{count} Mitglieder",
+      "name": "Rollen & Berechtigungen",
+      "nameLabel": "Name",
+      "protected": "geschützt",
+      "rank": "Rang",
+      "save": "Speichern",
+      "saveError": "Rolle konnte nicht gespeichert werden: {message}",
+      "saveSuccess": "Rolle gespeichert.",
+      "title": "Rollen & Berechtigungen"
+    },
     "settings": {
       "name": "Einstellungen"
     },

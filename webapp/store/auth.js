@@ -11,6 +11,9 @@ export const state = () => {
     user: null,
     token: null,
     pending: false,
+    // The current user's effective permission keys (from the backend myPermissions
+    // query). Drives can(); empty while anonymous.
+    permissions: [],
   }
 }
 
@@ -26,6 +29,9 @@ export const mutations = {
   },
   SET_PENDING(state, pending) {
     state.pending = pending
+  },
+  SET_PERMISSIONS(state, permissions) {
+    state.permissions = Array.isArray(permissions) ? permissions : []
   },
 }
 
@@ -44,6 +50,15 @@ export const getters = {
   },
   isModerator(state) {
     return !!state.user && (state.user.role === 'admin' || state.user.role === 'moderator')
+  },
+  permissions(state) {
+    return state.permissions
+  },
+  // Generic capability check — true if the current user holds the given permission
+  // key. Mirrors the backend hasPermission gate; the dynamic counterpart to the
+  // role-string getters above.
+  can: (state) => (permission) => {
+    return Array.isArray(state.permissions) && state.permissions.includes(permission)
   },
   user(state) {
     return state.user || {}
@@ -84,6 +99,7 @@ export const actions = {
       } = await client.query({ query: currentUserQuery })
       if (!currentUser) return dispatch('logout')
       commit('SET_USER', currentUser)
+      commit('SET_PERMISSIONS', myPermissions || [])
       return currentUser
     } catch {
       return dispatch('logout')
@@ -132,6 +148,7 @@ export const actions = {
   async logout({ commit, dispatch }) {
     commit('SET_USER', null)
     commit('SET_TOKEN', null)
+    commit('SET_PERMISSIONS', [])
     await this.app.$apolloHelpers.onLogout()
     // Refetch as anonymous so authenticated-only keys (e.g. apiKeysEnabled)
     // reset to their defaults instead of lingering from the logged-in session.

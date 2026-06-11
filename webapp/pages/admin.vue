@@ -68,6 +68,10 @@ export default {
           name: this.$t('admin.policy.name'),
           path: '/admin/policy',
         },
+        {
+          name: this.$t('admin.roles.name'),
+          path: '/admin/roles',
+        },
         ...(this.$policy.get('apiKeysEnabled')
           ? [{ name: this.$t('admin.api-keys.name'), path: `/admin/api-keys` }]
           : []),
