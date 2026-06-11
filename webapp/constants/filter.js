@@ -1,2 +1,0 @@
-export const SHOW_CONTENT_FILTER_HEADER_MENU = true
-export const SHOW_CONTENT_FILTER_MASONRY_GRID = false

@@ -154,11 +154,17 @@
         "maxGroupPinnedPosts": "Número máximo de publicaciones que se pueden fijar dentro de un grupo. Pon 0 para desactivar la fijación en grupos.",
         "maxPinnedPosts": "Número máximo de publicaciones que se pueden fijar en toda la red (administradores). Pon 0 para desactivar la fijación.",
         "publicRegistration": "Permite que cualquiera cree una cuenta directamente, sin código de invitación. Si está desactivado, los nuevos usuarios solo pueden unirse mediante una invitación.",
-        "requireLocation": "Hace obligatoria una ubicación durante el registro y en los ajustes del perfil."
+        "requireLocation": "Hace obligatoria una ubicación durante el registro y en los ajustes del perfil.",
+        "showContentFilterHeaderMenu": "Muestra el filtro de contenido en el menú de cabecera.",
+        "showContentFilterMasonryGrid": "Muestra el filtro de contenido en la cuadrícula masonry (noticias).",
+        "showGroupButtonInHeader": "Muestra el botón de grupos en la cabecera."
       },
       "groups": {
         "features": {
           "title": "Funciones"
+        },
+        "layout": {
+          "title": "Diseño"
         },
         "registration": {
           "title": "Registro"
@@ -177,7 +183,10 @@
         "maxGroupPinnedPosts": "Máx. publicaciones fijadas por grupo",
         "maxPinnedPosts": "Máx. publicaciones fijadas (red)",
         "publicRegistration": "Registro abierto",
-        "requireLocation": "Ubicación obligatoria"
+        "requireLocation": "Ubicación obligatoria",
+        "showContentFilterHeaderMenu": "Filtro de contenido en cabecera",
+        "showContentFilterMasonryGrid": "Filtro de contenido en cuadrícula",
+        "showGroupButtonInHeader": "Botón de grupos en cabecera"
       },
       "lastUpdated": "Última modificación: {timestamp} por {actor}",
       "name": "Política de red",

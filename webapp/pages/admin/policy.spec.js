@@ -28,6 +28,9 @@ describe('admin/policy.vue', () => {
     apiKeysMaxPerUser: 5,
     maxPinnedPosts: 1,
     maxGroupPinnedPosts: 1,
+    showContentFilterHeaderMenu: true,
+    showContentFilterMasonryGrid: false,
+    showGroupButtonInHeader: true,
   }
   // Deliberately differs from the snapshot on categoriesActive, so we can assert
   // the grey text shows the configured DEFAULT, not the current toggle value.
@@ -45,6 +48,9 @@ describe('admin/policy.vue', () => {
     apiKeysMaxPerUser: 5,
     maxPinnedPosts: 1,
     maxGroupPinnedPosts: 1,
+    showContentFilterHeaderMenu: true,
+    showContentFilterMasonryGrid: false,
+    showGroupButtonInHeader: true,
   }
   const ALL_KEYS = [
     'publicRegistration',
@@ -60,6 +66,9 @@ describe('admin/policy.vue', () => {
     'apiKeysMaxPerUser',
     'maxPinnedPosts',
     'maxGroupPinnedPosts',
+    'showContentFilterHeaderMenu',
+    'showContentFilterMasonryGrid',
+    'showGroupButtonInHeader',
   ]
   const lastChange = { actor: 'jenny-rostock', timestamp: '2026-01-02T03:04:05.000Z' }
 
@@ -101,8 +110,10 @@ describe('admin/policy.vue', () => {
     wrapper = Wrapper()
     expect(wrapper.find('[data-test="policy-group-registration"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="policy-group-features"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="policy-group-layout"]').exists()).toBe(true)
     expect(wrapper.text()).toContain('admin.policy.groups.registration.title')
     expect(wrapper.text()).toContain('admin.policy.groups.features.title')
+    expect(wrapper.text()).toContain('admin.policy.groups.layout.title')
   })
 
   it('renders every policy with a name and a detailed description', () => {

@@ -157,6 +157,9 @@ describe('PolicyService', () => {
       'maxPinnedPosts',
       'publicRegistration',
       'requireLocation',
+      'showContentFilterHeaderMenu',
+      'showContentFilterMasonryGrid',
+      'showGroupButtonInHeader',
     ]
 
     const initService = async () => {

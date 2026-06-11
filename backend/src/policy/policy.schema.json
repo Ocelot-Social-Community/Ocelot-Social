@@ -72,6 +72,27 @@
       "envSeed": "BADGES_ENABLED",
       "description": "Whether the badges feature is enabled (badges shown on profiles / teasers and managed in admin). Shown on publicly visible profiles, so visible to 'public'."
     },
+    "showContentFilterHeaderMenu": {
+      "type": "boolean",
+      "default": true,
+      "visibility": ["public"],
+      "envSeed": "SHOW_CONTENT_FILTER_HEADER_MENU",
+      "description": "Whether the content filter is shown in the header menu. Layout toggle on pages visible to everyone, so visible to 'public'."
+    },
+    "showContentFilterMasonryGrid": {
+      "type": "boolean",
+      "default": false,
+      "visibility": ["public"],
+      "envSeed": "SHOW_CONTENT_FILTER_MASONRY_GRID",
+      "description": "Whether the content filter is shown in the masonry grid (newsfeed). Layout toggle on the anonymous-accessible landing page, so visible to 'public'."
+    },
+    "showGroupButtonInHeader": {
+      "type": "boolean",
+      "default": true,
+      "visibility": ["public"],
+      "envSeed": "SHOW_GROUP_BUTTON_IN_HEADER",
+      "description": "Whether the groups button is shown in the header. Layout toggle in the header shown to everyone, so visible to 'public'."
+    },
     "apiKeysEnabled": {
       "type": "boolean",
       "default": false,
@@ -114,6 +135,9 @@
     "inviteCodesGroupPerUser",
     "categoriesActive",
     "badgesEnabled",
+    "showContentFilterHeaderMenu",
+    "showContentFilterMasonryGrid",
+    "showGroupButtonInHeader",
     "apiKeysEnabled",
     "apiKeysMaxPerUser",
     "maxPinnedPosts",

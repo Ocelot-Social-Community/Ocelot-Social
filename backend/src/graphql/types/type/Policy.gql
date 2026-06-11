@@ -23,6 +23,9 @@ type Policy {
   inviteCodesGroupPerUser: Int
   categoriesActive: Boolean!
   badgesEnabled: Boolean!
+  showContentFilterHeaderMenu: Boolean!
+  showContentFilterMasonryGrid: Boolean!
+  showGroupButtonInHeader: Boolean!
   apiKeysEnabled: Boolean
   apiKeysMaxPerUser: Int
   maxPinnedPosts: Int

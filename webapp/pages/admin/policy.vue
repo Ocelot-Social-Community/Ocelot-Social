@@ -118,6 +118,14 @@ export default {
             'maxGroupPinnedPosts',
           ],
         },
+        {
+          id: 'layout',
+          keys: [
+            'showContentFilterHeaderMenu',
+            'showContentFilterMasonryGrid',
+            'showGroupButtonInHeader',
+          ],
+        },
       ],
       // Keys rendered as a number input instead of a checkbox (integer policies).
       numberKeys: [
@@ -144,6 +152,9 @@ export default {
         apiKeysMaxPerUser: 0,
         maxPinnedPosts: 0,
         maxGroupPinnedPosts: 0,
+        showContentFilterHeaderMenu: false,
+        showContentFilterMasonryGrid: false,
+        showGroupButtonInHeader: false,
       },
       saving: false,
       // Becomes true after the initial mount fetch so the snapshot watcher only

@@ -154,11 +154,17 @@
         "maxGroupPinnedPosts": "Nombre maximal de publications pouvant être épinglées dans un groupe. Mettez 0 pour désactiver l'épinglage dans les groupes.",
         "maxPinnedPosts": "Nombre maximal de publications pouvant être épinglées sur tout le réseau (administrateurs). Mettez 0 pour désactiver l'épinglage.",
         "publicRegistration": "Permet à n'importe qui de créer un compte directement, sans code d'invitation. Désactivé, les nouveaux utilisateurs ne peuvent rejoindre que sur invitation.",
-        "requireLocation": "Rend une localisation obligatoire lors de l'inscription et dans les paramètres du profil."
+        "requireLocation": "Rend une localisation obligatoire lors de l'inscription et dans les paramètres du profil.",
+        "showContentFilterHeaderMenu": "Affiche le filtre de contenu dans le menu d'en-tête.",
+        "showContentFilterMasonryGrid": "Affiche le filtre de contenu dans la grille en maçonnerie (fil d'actualité).",
+        "showGroupButtonInHeader": "Affiche le bouton des groupes dans l'en-tête."
       },
       "groups": {
         "features": {
           "title": "Fonctionnalités"
+        },
+        "layout": {
+          "title": "Mise en page"
         },
         "registration": {
           "title": "Inscription"
@@ -177,7 +183,10 @@
         "maxGroupPinnedPosts": "Max. de publications épinglées par groupe",
         "maxPinnedPosts": "Max. de publications épinglées (réseau)",
         "publicRegistration": "Inscription ouverte",
-        "requireLocation": "Localisation obligatoire"
+        "requireLocation": "Localisation obligatoire",
+        "showContentFilterHeaderMenu": "Filtre de contenu dans l'en-tête",
+        "showContentFilterMasonryGrid": "Filtre de contenu dans la grille",
+        "showGroupButtonInHeader": "Bouton groupes dans l'en-tête"
       },
       "lastUpdated": "Dernière modification : {timestamp} par {actor}",
       "name": "Politique réseau",

@@ -577,8 +577,6 @@ import isEmpty from 'lodash/isEmpty'
 import orderBy from 'lodash/orderBy'
 import throttle from 'lodash/throttle'
 import locales from '~/locales'
-import { SHOW_GROUP_BUTTON_IN_HEADER } from '~/constants/groups.js'
-import { SHOW_CONTENT_FILTER_HEADER_MENU } from '~/constants/filter.js'
 import LOGOS from '~/constants/logosBranded.js'
 import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
 import ChatNotificationMenu from '~/components/ChatNotificationMenu/ChatNotificationMenu'
@@ -625,8 +623,6 @@ export default {
       isEmpty,
       links,
       LOGOS,
-      SHOW_GROUP_BUTTON_IN_HEADER,
-      SHOW_CONTENT_FILTER_HEADER_MENU,
       isHeaderMenu: headerMenuBranded.MENU.length > 0,
       customButton: headerMenuBranded.CUSTOM_BUTTON,
       menu: headerMenuBranded.MENU,
@@ -647,6 +643,13 @@ export default {
     }),
     inviteRegistration() {
       return this.$policy.get('inviteRegistration') === true
+    },
+    // Layout toggles served by the network policy (formerly branding constants).
+    SHOW_GROUP_BUTTON_IN_HEADER() {
+      return this.$policy.get('showGroupButtonInHeader') === true
+    },
+    SHOW_CONTENT_FILTER_HEADER_MENU() {
+      return this.$policy.get('showContentFilterHeaderMenu') === true
     },
     showFilterMenuDropdown() {
       const [firstRoute] = this.$route.matched

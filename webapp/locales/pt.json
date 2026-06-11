@@ -154,11 +154,17 @@
         "maxGroupPinnedPosts": "Número máximo de publicações que podem ser fixadas dentro de um grupo. Defina 0 para desativar a fixação em grupos.",
         "maxPinnedPosts": "Número máximo de publicações que podem ser fixadas em toda a rede (administradores). Defina 0 para desativar a fixação.",
         "publicRegistration": "Permite que qualquer pessoa crie uma conta diretamente, sem código de convite. Quando desativado, novos utilizadores só podem entrar por convite.",
-        "requireLocation": "Torna obrigatória uma localização durante o registo e nas definições do perfil."
+        "requireLocation": "Torna obrigatória uma localização durante o registo e nas definições do perfil.",
+        "showContentFilterHeaderMenu": "Mostra o filtro de conteúdo no menu de cabeçalho.",
+        "showContentFilterMasonryGrid": "Mostra o filtro de conteúdo na grelha masonry (notícias).",
+        "showGroupButtonInHeader": "Mostra o botão de grupos no cabeçalho."
       },
       "groups": {
         "features": {
           "title": "Funcionalidades"
+        },
+        "layout": {
+          "title": "Esquema"
         },
         "registration": {
           "title": "Registo"
@@ -177,7 +183,10 @@
         "maxGroupPinnedPosts": "Máx. de publicações fixadas por grupo",
         "maxPinnedPosts": "Máx. de publicações fixadas (rede)",
         "publicRegistration": "Registo aberto",
-        "requireLocation": "Localização obrigatória"
+        "requireLocation": "Localização obrigatória",
+        "showContentFilterHeaderMenu": "Filtro de conteúdo no cabeçalho",
+        "showContentFilterMasonryGrid": "Filtro de conteúdo na grelha",
+        "showGroupButtonInHeader": "Botão de grupos no cabeçalho"
       },
       "lastUpdated": "Última alteração: {timestamp} por {actor}",
       "name": "Política de rede",
