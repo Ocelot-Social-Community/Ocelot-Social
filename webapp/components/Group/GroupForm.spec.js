@@ -45,4 +45,115 @@ describe('GroupForm', () => {
       expect(wrapper.findAll('.group-form')).toHaveLength(1)
     })
   })
+
+  const group = {
+    id: '1',
+    name: 'Test Group',
+    slug: 'test-group',
+    groupType: 'public',
+    about: 'About',
+    description: 'Description text',
+    actionRadius: 'local',
+    locationName: '',
+    categories: [
+      { id: 'cat-1', slug: 'family' },
+      { id: 'cat-2', slug: 'work' },
+      { id: 'cat-3', slug: 'psyche' },
+    ],
+  }
+
+  describe('sameCategories', () => {
+    beforeEach(() => {
+      wrapper = mount(GroupForm, {
+        propsData: { update: true, group },
+        mocks,
+        localVue,
+        stubs,
+        store,
+      })
+    })
+
+    it('returns true when categories unchanged', () => {
+      expect(wrapper.vm.sameCategories).toBe(true)
+    })
+
+    it('returns false when a category is deselected', async () => {
+      await wrapper.vm.$set(wrapper.vm.formData, 'categoryIds', ['cat-1', 'cat-2'])
+      expect(wrapper.vm.sameCategories).toBe(false)
+    })
+
+    it('returns false when a category is swapped (same count)', async () => {
+      await wrapper.vm.$set(wrapper.vm.formData, 'categoryIds', ['cat-1', 'cat-2', 'cat-4'])
+      expect(wrapper.vm.sameCategories).toBe(false)
+    })
+
+    it('returns true when same categories re-selected after deselect', async () => {
+      await wrapper.vm.$set(wrapper.vm.formData, 'categoryIds', ['cat-1', 'cat-2'])
+      await wrapper.vm.$set(wrapper.vm.formData, 'categoryIds', ['cat-1', 'cat-2', 'cat-3'])
+      expect(wrapper.vm.sameCategories).toBe(true)
+    })
+  })
+
+  describe('disableButtonByUpdate', () => {
+    beforeEach(() => {
+      wrapper = mount(GroupForm, {
+        propsData: { update: true, group },
+        mocks,
+        localVue,
+        stubs,
+        store,
+      })
+    })
+
+    it('is true initially when nothing changed', () => {
+      expect(wrapper.vm.disableButtonByUpdate).toBe(true)
+    })
+
+    it('is false when name is changed', async () => {
+      await wrapper.vm.$set(wrapper.vm.formData, 'name', 'New Name')
+      expect(wrapper.vm.disableButtonByUpdate).toBe(false)
+    })
+
+    it('is false when a category is swapped', async () => {
+      await wrapper.vm.$set(wrapper.vm.formData, 'categoryIds', ['cat-1', 'cat-2', 'cat-4'])
+      expect(wrapper.vm.disableButtonByUpdate).toBe(false)
+    })
+
+    it('is true again after successful save', async () => {
+      await wrapper.vm.$set(wrapper.vm.formData, 'name', 'New Name')
+      await wrapper.vm.$set(wrapper.vm.formData, 'categoryIds', ['cat-1', 'cat-2', 'cat-4'])
+      expect(wrapper.vm.disableButtonByUpdate).toBe(false)
+
+      wrapper.vm.submit()
+      const [, done] = wrapper.emitted('updateGroup')[0]
+      done(true)
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.vm.disableButtonByUpdate).toBe(true)
+    })
+
+    it('keeps loading false and disableButtonByUpdate false after failed save', async () => {
+      await wrapper.vm.$set(wrapper.vm.formData, 'name', 'New Name')
+      await wrapper.vm.$set(wrapper.vm.formData, 'categoryIds', ['cat-1', 'cat-2', 'cat-4'])
+      expect(wrapper.vm.disableButtonByUpdate).toBe(false)
+
+      wrapper.vm.submit()
+      const [, done] = wrapper.emitted('updateGroup')[0]
+      done(false)
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.vm.loading).toBe(false)
+      expect(wrapper.vm.disableButtonByUpdate).toBe(false)
+    })
+
+    it('is false again after save and further changes', async () => {
+      wrapper.vm.submit()
+      const [, done] = wrapper.emitted('updateGroup')[0]
+      done(true)
+      await wrapper.vm.$nextTick()
+
+      await wrapper.vm.$set(wrapper.vm.formData, 'name', 'Changed Again')
+      expect(wrapper.vm.disableButtonByUpdate).toBe(false)
+    })
+  })
 })

@@ -81,8 +81,10 @@ describe('pages/groups/create.vue', () => {
     it('surfaces mutation errors via toast and does not navigate', async () => {
       const mutate = jest.fn().mockRejectedValue(new Error('boom'))
       const { wrapper, $router, $toast } = factory(mutate)
-      await wrapper.vm.createGroup(samplePayload)
+      const done = jest.fn()
+      await wrapper.vm.createGroup(samplePayload, done)
       expect($toast.error).toHaveBeenCalledWith('boom')
+      expect(done).toHaveBeenCalled()
       expect($router.push).not.toHaveBeenCalled()
     })
 

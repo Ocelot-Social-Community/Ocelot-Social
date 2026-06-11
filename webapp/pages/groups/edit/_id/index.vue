@@ -26,7 +26,7 @@ export default {
     },
   },
   methods: {
-    async updateGroup(value) {
+    async updateGroup(value, done) {
       const {
         id,
         slug,
@@ -49,24 +49,16 @@ export default {
         locationName,
         categoryIds,
       }
-      let responseId, responseSlug
       try {
         await this.$apollo.mutate({
           mutation: updateGroupMutation(),
           variables,
-          update: (_store, { data }) => {
-            const { id: groupId, slug: groupSlug } = data.UpdateGroup
-            responseId = groupId
-            responseSlug = groupSlug
-          },
         })
         this.$toast.success(this.$t('group.updatedGroup'))
-        this.$router.push({
-          name: 'groups-id-slug',
-          params: { id: responseId, slug: responseSlug },
-        })
+        done(true)
       } catch (error) {
         this.$toast.error(error.message)
+        done()
       }
     },
   },
