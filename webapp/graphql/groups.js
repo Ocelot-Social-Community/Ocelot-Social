@@ -63,6 +63,7 @@ export const updateGroupMutation = () => {
       $slug: String
       $about: String
       $description: String
+      $groupType: GroupType
       $actionRadius: GroupActionRadius
       $categoryIds: [ID]
       $avatar: ImageInput
@@ -74,6 +75,7 @@ export const updateGroupMutation = () => {
         slug: $slug
         about: $about
         description: $description
+        groupType: $groupType
         actionRadius: $actionRadius
         categoryIds: $categoryIds
         avatar: $avatar

@@ -124,7 +124,7 @@ type Mutation {
     about: String
     description: String
 
-    # groupType: GroupType # is not possible at the moment and has to be discussed. may be in the stronger direction: public → closed → hidden
+    groupType: GroupType
 
     actionRadius: GroupActionRadius
     categoryIds: [ID]

@@ -39,7 +39,7 @@
           name="groupType"
           model="groupType"
           :value="formData.groupType"
-          :disabled="update"
+          :disabled="update && (!group || group.myRole !== 'owner')"
           @change="changeGroupType($event)"
         >
           <option v-for="groupType in groupTypeOptions" :key="groupType" :value="groupType">
@@ -218,6 +218,7 @@ export default {
       savedBaseline: {
         name: name || '',
         slug: slug || '',
+        groupType: groupType || '',
         about: about || '',
         description: description || '',
         actionRadius: actionRadius || '',
@@ -294,6 +295,7 @@ export default {
       return (
         this.savedBaseline.name === this.formData.name &&
         this.savedBaseline.slug === this.formData.slug &&
+        this.savedBaseline.groupType === this.formData.groupType &&
         this.savedBaseline.about === this.formData.about &&
         this.savedBaseline.description === this.formData.description &&
         this.savedBaseline.actionRadius === this.formData.actionRadius &&
@@ -332,9 +334,9 @@ export default {
       const variables = {
         name,
         slug,
+        groupType,
         about,
         description,
-        groupType,
         actionRadius,
         locationName: this.formLocationName,
         categoryIds,
@@ -345,6 +347,7 @@ export default {
           this.savedBaseline = {
             name: this.formData.name,
             slug: this.formData.slug,
+            groupType: this.formData.groupType,
             about: this.formData.about,
             description: this.formData.description,
             actionRadius: this.formData.actionRadius,
