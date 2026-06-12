@@ -104,11 +104,12 @@ docker exec ocelot-social-backend-1 yarn prod:migrate up
 
 You can seed some optional data into the database.
 
-To create the default admin <admin@example.org> with password `1234` use:
+To create the default owner <admin@example.org> with password `1234` use (this
+bootstrap account is the instance owner — the failsafe superuser):
 
 ```sh
 # in backend with database running (In docker or local)
-yarn db:data:admin
+yarn db:data:owner
 ```
 
 When using `CATEGORIES_ACTIVE=true` you also want to seed the categories with:

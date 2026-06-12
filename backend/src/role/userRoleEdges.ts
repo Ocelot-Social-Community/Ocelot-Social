@@ -13,11 +13,17 @@ type DbContext = ReturnType<typeof databaseContext>
 // scripts that never call RoleService.init(), so without this a freshly
 // created database would have NO role edges and the role system would appear
 // empty (memberCounts 0), working only via the legacy-role fallback. Idempotent.
-export async function ensureUserRoleEdges(db: DbContext = databaseContext()): Promise<void> {
+// Seed the default role nodes (idempotent, ON CREATE). Needed before any
+// HAS_ROLE edge can be created against them.
+export async function seedDefaultRoleNodes(db: DbContext = databaseContext()): Promise<void> {
   const now = new Date().toISOString()
   for (const role of DEFAULT_ROLES) {
     await seedRole(db, role, now)
   }
+}
+
+export async function ensureUserRoleEdges(db: DbContext = databaseContext()): Promise<void> {
+  await seedDefaultRoleNodes(db)
   await db.write({
     query: `MATCH (u:User)
             WHERE NOT (u)-[:HAS_ROLE]->(:Role)

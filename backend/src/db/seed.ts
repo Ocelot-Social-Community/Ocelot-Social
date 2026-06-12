@@ -2020,6 +2020,18 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     // Single-role system: give every seeded user a HAS_ROLE edge (this script runs
     // as a CLI without RoleService.init, so the role system would otherwise be empty).
     await ensureUserRoleEdges()
+
+    // peterLustig (admin@example.org, u1) is the instance OWNER — the failsafe
+    // superuser. Replace his tier edge with the owner edge (his legacy `role` stays
+    // 'admin', since owner is not a UserRole enum value).
+    await database.write({
+      query: `MATCH (u:User {id: 'u1'})
+              OPTIONAL MATCH (u)-[h:HAS_ROLE]->(:Role)
+              DELETE h
+              WITH u
+              MATCH (r:Role {id: 'owner'})
+              MERGE (u)-[:HAS_ROLE]->(r)`,
+    })
   } catch (err) {
     /* eslint-disable-next-line no-console */
     console.error(err)
