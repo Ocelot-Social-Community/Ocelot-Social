@@ -1,6 +1,6 @@
 <template>
   <div>
-    <label class="ds-input-label">
+    <label v-if="showLabel" class="ds-input-label">
       {{ `${$t('settings.data.labelCity')}` + locationNameLabelAddOnOldName }}
     </label>
     <ocelot-select
@@ -9,8 +9,7 @@
       :options="cities"
       icon="map-marker"
       :icon-right="null"
-      :placeholder="$t('settings.data.labelCity') + ' …'"
-      :loading="loadingGeo"
+      :placeholder="placeholder !== null ? placeholder : $t('settings.data.labelCity') + ' …'"
       @input.native="handleCityInput"
     >
       <template v-if="(locationName !== '' && canBeCleared) || loadingGeo" #icon-right>
@@ -55,9 +54,25 @@ export default {
       required: false,
       default: true,
     },
+    types: {
+      type: String,
+      required: false,
+      default: 'region,place,country',
+    },
+    placeholder: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    showLabel: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   async created() {
     this.icons = iconRegistry
+    this._cityQueryId = 0
     await this.resolveLocalizedLocation()
   },
   data() {
@@ -89,10 +104,12 @@ export default {
       if (newVal !== this.currentValue) {
         this.currentValue = newVal
       }
-      // resolve when value is set after initial mount (e.g. settings page)
-      const newName = typeof newVal === 'object' ? newVal.value : newVal
+      // Only re-resolve when the incoming value is a plain string (e.g. loaded
+      // from DB on settings page). An object means the user already selected a
+      // result from the dropdown — no re-query needed.
+      if (typeof newVal === 'object') return
       const oldName = typeof oldVal === 'object' ? oldVal.value : oldVal
-      if (newName && newName !== oldName) {
+      if (newVal && newVal !== oldName) {
         this.resolveLocalizedLocation()
       }
     },
@@ -104,6 +121,10 @@ export default {
     handleCityInput(event) {
       const value = event.target ? event.target.value.trim() : ''
       clearTimeout(this.debounceTimeout)
+      if (value.length < 3) {
+        this.cities = []
+        return
+      }
       this.debounceTimeout = setTimeout(() => this.requestGeoData(value), 500)
     },
     processLocationsResult(places) {
@@ -127,6 +148,8 @@ export default {
         return
       }
 
+      const reqId = ++this._cityQueryId
+
       try {
         this.loadingGeo = true
 
@@ -137,18 +160,20 @@ export default {
           data: { queryLocations: result },
         } = await this.$apollo.query({
           query: queryLocations(),
-          variables: { place, lang },
+          variables: { place, lang, types: this.types },
           fetchPolicy: 'network-only',
         })
+
+        if (reqId !== this._cityQueryId) return
 
         this.cities = this.processLocationsResult(result)
         this.loadingGeo = false
 
         return this.cities.find((city) => city.value === value)
       } catch (error) {
-        this.$toast.error(error.message)
+        if (reqId === this._cityQueryId) this.$toast.error(error.message)
       } finally {
-        this.loadingGeo = false
+        if (reqId === this._cityQueryId) this.loadingGeo = false
       }
     },
     async resolveLocalizedLocation() {

@@ -314,7 +314,7 @@ describe('ContributionForm.vue', () => {
         })
 
         it('has input for event location', () => {
-          expect(wrapper.find('input[name="eventLocationName"]').exists()).toBe(true)
+          expect(wrapper.findComponent({ name: 'LocationSelect' }).exists()).toBe(true)
         })
 
         describe('click is online event', () => {
@@ -323,7 +323,7 @@ describe('ContributionForm.vue', () => {
           })
 
           it('has no input for event location', () => {
-            expect(wrapper.find('input[name="eventLocationName"]').exists()).toBe(false)
+            expect(wrapper.findComponent({ name: 'LocationSelect' }).exists()).toBe(false)
           })
         })
 
@@ -348,7 +348,7 @@ describe('ContributionForm.vue', () => {
               .findComponent({ name: 'DatePicker' })
               .vm.$emit('change', new Date(now.getFullYear(), now.getMonth() + 1).toISOString())
             wrapper.find('input[name="eventVenue"]').setValue('Ellis Kinderzimmer')
-            wrapper.find('input[name="eventLocationName"]').setValue('Deutschland')
+            wrapper.vm.updateFormField('eventLocationName', 'Deutschland')
           })
 
           it('has submit button not disabled', () => {
@@ -373,6 +373,29 @@ describe('ContributionForm.vue', () => {
                     eventIsOnline: false,
                     eventEnd: null,
                   },
+                }),
+              })
+            })
+          })
+
+          describe('submit with LocationSelect object payload', () => {
+            beforeEach(async () => {
+              wrapper.vm.updateFormField('eventLocationName', {
+                label: 'Deutschland, Germany',
+                value: 'Deutschland, Germany',
+                id: 'place.abc123',
+              })
+              await wrapper.find('form').trigger('submit')
+              await wrapper.vm.$nextTick()
+            })
+
+            it('extracts the value string from the location object', () => {
+              expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
+                mutation: PostMutations().CreatePost,
+                variables: expect.objectContaining({
+                  eventInput: expect.objectContaining({
+                    eventLocationName: 'Deutschland, Germany',
+                  }),
                 }),
               })
             })

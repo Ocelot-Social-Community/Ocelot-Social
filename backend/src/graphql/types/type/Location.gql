@@ -27,5 +27,5 @@ type LocationMapBox {
 }
 
 type Query {
-  queryLocations(place: String!, lang: String!): [LocationMapBox]!
+  queryLocations(place: String!, lang: String!, types: String): [LocationMapBox]!
 }

@@ -16,6 +16,7 @@
         :aria-label="$t('invite-codes.generate-code')"
         type="submit"
         :disabled="disabled"
+        :loading="loading"
       >
         <template #icon>
           <os-icon :icon="icons.plus" />
@@ -35,6 +36,10 @@ export default {
   components: { OsButton, OsIcon, OcelotInput },
   props: {
     disabled: {
+      type: Boolean,
+      default: false,
+    },
+    loading: {
       type: Boolean,
       default: false,
     },

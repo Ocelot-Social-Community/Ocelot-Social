@@ -63,22 +63,19 @@
             <div class="ds-grid event-date-grid">
               <div class="event-grid-item">
                 <!-- <label>Beginn</label> -->
-                <div class="event-grid-item-z-helper">
-                  <date-picker
-                    name="eventStart"
-                    v-model="formData.eventStart"
-                    type="datetime"
-                    value-type="format"
-                    :minute-step="15"
-                    Xformat="DD-MM-YYYY HH:mm"
-                    class="event-grid-item-z-helper"
-                    :placeholder="$t('post.viewEvent.eventStart')"
-                    :disabled-date="notBeforeToday"
-                    :disabled-time="notBeforeNow"
-                    :show-second="false"
-                    @change="changeEventStart($event)"
-                  ></date-picker>
-                </div>
+                <date-picker
+                  name="eventStart"
+                  v-model="formData.eventStart"
+                  type="datetime"
+                  value-type="date"
+                  :minute-step="15"
+                  format="DD.MM.YYYY HH:mm"
+                  :placeholder="$t('post.viewEvent.eventStart')"
+                  :disabled-date="notBeforeToday"
+                  :disabled-time="notBeforeNow"
+                  :show-second="false"
+                  @change="changeEventStart($event)"
+                ></date-picker>
                 <div
                   v-if="formErrors && formErrors.eventStart"
                   class="chipbox event-grid-item-margin-helper"
@@ -99,10 +96,10 @@
                   v-model="formData.eventEnd"
                   name="eventEnd"
                   type="datetime"
-                  value-type="format"
+                  value-type="date"
                   :minute-step="15"
                   :seconds-step="0"
-                  Xformat="DD-MM-YYYY HH:mm"
+                  format="DD.MM.YYYY HH:mm"
                   :placeholder="$t('post.viewEvent.eventEnd')"
                   class="event-grid-item-font-helper"
                   :disabled-date="notBeforeEventDay"
@@ -131,24 +128,21 @@
                 </div>
               </div>
               <div v-if="showEventLocationName" class="event-grid-item">
-                <ocelot-input
-                  model="eventLocationName"
-                  name="eventLocationName"
+                <location-select
+                  v-model="formData.eventLocationName"
+                  types="region,place,country,address"
+                  :show-previous-location="false"
+                  :show-label="false"
                   :placeholder="$t('post.viewEvent.eventLocationName')"
                 />
-                <div class="chipbox">
-                  <os-badge
-                    role="status"
-                    aria-live="polite"
-                    :variant="formErrors && formErrors.eventLocationName ? 'danger' : undefined"
-                  >
-                    {{ formData.eventLocationName.length }}/{{ formSchema.eventLocationName.max }}
-                    <os-icon
-                      v-if="formErrors && formErrors.eventLocationName"
-                      :icon="icons.warning"
-                    />
-                  </os-badge>
-                </div>
+                <os-badge
+                  v-if="formErrors && formErrors.eventLocationName"
+                  role="status"
+                  aria-live="polite"
+                  variant="danger"
+                >
+                  <os-icon :icon="icons.warning" />
+                </os-badge>
               </div>
             </div>
 
@@ -234,6 +228,7 @@ import 'vue2-datepicker/scss/index.scss'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
+import LocationSelect from '~/components/Select/LocationSelect'
 
 export default {
   mixins: [GetCategories, formValidation],
@@ -248,6 +243,7 @@ export default {
     OsIcon,
     PageParamsLink,
     OcelotInput,
+    LocationSelect,
   },
   props: {
     contribution: {
@@ -325,15 +321,14 @@ export default {
         },
         eventLocationName: {
           required: !!this.createEvent && !this.formData.eventIsOnline,
-          min: 3,
-          max: 100,
           validator: (_, value = '') => {
             if (!this.createEvent) return []
             if (this.formData.eventIsOnline) return []
-            if (!value.trim()) {
+            const name = typeof value === 'object' ? value?.value : value
+            if (!name?.trim()) {
               return [new Error(this.$t('common.validations.eventLocationNameNotEmpty'))]
             }
-            if (value.length < 3 || value.length > 100) {
+            if (name.length < 3 || name.length > 100) {
               return [
                 new Error(
                   this.$t('common.validations.eventLocationNameLength', { min: 3, max: 100 }),
@@ -352,7 +347,9 @@ export default {
           eventVenue: this.formData.eventVenue,
           eventEnd: this.formData.eventEnd ? new Date(this.formData.eventEnd).toISOString() : null,
           eventIsOnline: this.formData.eventIsOnline,
-          eventLocationName: !this.formData.eventIsOnline ? this.formData.eventLocationName : null,
+          eventLocationName: !this.formData.eventIsOnline
+            ? (this.formData.eventLocationName?.value ?? this.formData.eventLocationName) || null
+            : null,
         }
       }
       return undefined
@@ -426,8 +423,8 @@ export default {
         imageBlurred,
         imageUpload: null,
         categoryIds: categories ? categories.map((category) => category.id) : [],
-        eventStart: eventStart || null,
-        eventEnd: eventEnd || null,
+        eventStart: eventStart ? new Date(eventStart) : null,
+        eventEnd: eventEnd ? new Date(eventEnd) : null,
         eventLocation: eventLocation || '',
         eventLocationName: eventLocationName || '',
         eventVenue: eventVenue || '',
@@ -497,7 +494,7 @@ export default {
     updateEditorContent(value) {
       this.updateFormField('content', value)
     },
-    changeEventIsOnline(event) {
+    changeEventIsOnline() {
       this.updateFormField('eventIsOnline', this.formData.eventIsOnline)
     },
     changeEventEnd(event) {
@@ -581,9 +578,6 @@ export default {
 
   .event-grid-item {
     grid-row-end: span 3;
-  }
-  .event-grid-item-z-helper {
-    z-index: 20;
   }
   .event-grid-item-margin-helper {
     margin-top: 10px;

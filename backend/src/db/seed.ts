@@ -41,6 +41,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
   const context = () => ({
     authenticatedUser,
     config: CONFIG,
+    policy: { categoriesActive: true },
   })
   const apolloSetup = await createApolloTestSetup({ context })
   const { mutate, server, database } = apolloSetup
@@ -163,6 +164,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         name: 'Peter Lustig',
         slug: 'peter-lustig',
         role: 'admin',
+        locationName: 'Berlin, Germany',
       },
       {
         email: 'admin@example.org',
@@ -175,6 +177,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         name: 'Bob der Baumeister',
         slug: 'bob-der-baumeister',
         role: 'moderator',
+        locationName: 'Hamburg, Germany',
       },
       {
         email: 'moderator@example.org',
@@ -188,6 +191,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         name: 'Jenny Rostock',
         slug: 'jenny-rostock',
         role: 'user',
+        locationName: 'Paris, France',
       },
       {
         email: 'user@example.org',
@@ -200,6 +204,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         name: 'Huey',
         slug: 'huey',
         role: 'user',
+        locationName: 'Paris, France',
       },
       {
         email: 'huey@example.org',

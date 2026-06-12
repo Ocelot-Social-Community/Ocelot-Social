@@ -58,6 +58,7 @@ describe('LocationSelect', () => {
         variables: {
           place: 'nowhere',
           lang: 'en',
+          types: 'region,place,country',
         },
         fetchPolicy: 'network-only',
       })
@@ -94,6 +95,49 @@ describe('LocationSelect', () => {
 
       it('does not show the previous location', () => {
         expect(wrapper.find('.ds-input-label').text()).toBe('settings.data.labelCity')
+      })
+    })
+
+    describe('custom types prop', () => {
+      beforeEach(() => {
+        queryMock.mockClear()
+        wrapper = mount(LocationSelect, {
+          mocks,
+          localVue,
+          propsData: { value: 'nowhere', types: 'address' },
+        })
+      })
+
+      it('forwards the types prop to apollo', () => {
+        expect(queryMock).toBeCalledWith({
+          query: queryLocations(),
+          variables: {
+            place: 'nowhere',
+            lang: 'en',
+            types: 'address',
+          },
+          fetchPolicy: 'network-only',
+        })
+      })
+    })
+
+    describe('short user input is ignored', () => {
+      beforeEach(() => {
+        queryMock.mockClear()
+        jest.useFakeTimers()
+        wrapper = mount(LocationSelect, { mocks, localVue, propsData: { value: '' } })
+      })
+
+      afterEach(() => {
+        jest.useRealTimers()
+      })
+
+      it('does not call apollo for input shorter than 3 characters', () => {
+        const input = wrapper.find('#city')
+        input.element.value = 'ab'
+        input.trigger('input')
+        jest.runAllTimers()
+        expect(queryMock).not.toHaveBeenCalled()
       })
     })
   })

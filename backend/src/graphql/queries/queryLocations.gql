@@ -1,5 +1,5 @@
-query queryLocations($place: String!, $lang: String!) {
-  queryLocations(place: $place, lang: $lang) {
+query queryLocations($place: String!, $lang: String!, $types: String) {
+  queryLocations(place: $place, lang: $lang, types: $types) {
     place_name
     id
   }
