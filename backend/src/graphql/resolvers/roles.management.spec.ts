@@ -310,4 +310,37 @@ describe('role management', () => {
       expect(errors?.[0].message).toMatch(/owner/)
     })
   })
+
+  describe('User(roleName) filter', () => {
+    const USERS_BY_ROLE = `query ($roleName: String) { User(roleName: $roleName) { id roleName } }`
+
+    it('returns only users holding the given role (role.manage)', async () => {
+      await Factory.build(
+        'user',
+        { id: 'mod1', role: 'moderator' },
+        { email: 'mod1@e.org', password: '1234' },
+      )
+      await asAdmin() // admin-id, admin role
+      const { data, errors } = await query({
+        query: USERS_BY_ROLE,
+        variables: { roleName: 'moderator' },
+      })
+      expect(errors).toBeUndefined()
+      const ids = data.User.map((u) => u.id)
+      expect(ids).toContain('mod1')
+      expect(ids).not.toContain('admin-id')
+      expect(data.User.every((u) => u.roleName === 'moderator')).toBe(true)
+    })
+
+    it('forbids filtering by role without role.manage', async () => {
+      const plain = await Factory.build(
+        'user',
+        { id: 'plain', role: 'user' },
+        { email: 'plain@e.org', password: '1234' },
+      )
+      authenticatedUser = (await plain.toJson()) as Context['user']
+      const { errors } = await query({ query: USERS_BY_ROLE, variables: { roleName: 'admin' } })
+      expect(errors?.[0].message).toMatch(/Not Authorized/)
+    })
+  })
 })

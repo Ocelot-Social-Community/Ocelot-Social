@@ -70,6 +70,36 @@ export default {
           await session.close()
         }
       }
+      if (args.roleName) {
+        // Filter by the single HAS_ROLE edge (admin role-member list). Enumerating
+        // role membership is role.manage-only.
+        if (!context.effectivePermissions.has('role.manage')) {
+          throw new ForbiddenError('Not Authorized!')
+        }
+        const session = context.driver.session()
+        try {
+          const readTxResult = await session.readTransaction((txc) => {
+            return txc.run(
+              `
+              MATCH (user:User)-[:HAS_ROLE]->(:Role {name: $args.roleName})
+              WHERE coalesce(user.deleted, false) = false
+              RETURN user {.*}
+              ORDER BY user.createdAt DESC
+              SKIP toInteger($args.offset) LIMIT toInteger($args.first)`,
+              {
+                args: {
+                  roleName: args.roleName,
+                  offset: args.offset ?? 0,
+                  first: args.first ?? 25,
+                },
+              },
+            )
+          })
+          return readTxResult.records.map((r) => r.get('user'))
+        } finally {
+          await session.close()
+        }
+      }
       args = await filterUsersHasLocation(args, context)
       return neo4jgraphql(object, args, context, resolveInfo)
     },

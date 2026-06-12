@@ -7,6 +7,7 @@ const stubs = {
   // Render slot content so the inner role sections appear.
   OsCard: { template: '<div><slot /></div>' },
   OsButton: { template: '<button><slot /></button>' },
+  'nuxt-link': { props: ['to'], template: '<a><slot /></a>' },
 }
 
 const permissionCatalog = [
@@ -107,6 +108,13 @@ describe('admin/roles.vue', () => {
     wrapper.vm.$t = (path) => `T:${path}`
     expect(wrapper.vm.permLabel(perm)).toBe('T:admin.roles.perm.badge_manage')
     expect(wrapper.vm.groupLabel('moderation')).toBe('T:admin.roles.groups.moderation')
+  })
+
+  it('links the member count to the user list filtered by that role', () => {
+    const wrapper = Wrapper() // owner active by default
+    const link = wrapper.find('[data-test="role-owner-members"]')
+    expect(link.exists()).toBe(true)
+    expect(link.props('to')).toEqual({ name: 'admin-users', query: { role: 'owner' } })
   })
 
   it('previews the permission diff when hovering another role pill', async () => {

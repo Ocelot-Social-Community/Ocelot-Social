@@ -69,9 +69,13 @@
             {{ $t('admin.roles.protected') }}
           </span>
         </h3>
-        <span class="role__members">
+        <nuxt-link
+          class="role__members"
+          :to="{ name: 'admin-users', query: { role: activeRole.name } }"
+          :data-test="`role-${activeRole.name}-members`"
+        >
           {{ $t('admin.roles.members', { count: activeRole.memberCount || 0 }) }}
-        </span>
+        </nuxt-link>
       </header>
 
       <template v-if="forms[activeRole.name]">
@@ -464,6 +468,12 @@ export default {
   &__members {
     color: $text-color-soft;
     font-size: 0.85em;
+    text-decoration: none;
+
+    &:hover {
+      color: $color-primary;
+      text-decoration: underline;
+    }
   }
   &__protected-note {
     color: $text-color-soft;

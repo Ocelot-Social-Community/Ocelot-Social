@@ -241,6 +241,7 @@
     },
     "users": {
       "addRole": "Assign role…",
+      "allRoles": "All roles",
       "empty": "No users found",
       "form": {
         "placeholder": "e-mail, name or description"

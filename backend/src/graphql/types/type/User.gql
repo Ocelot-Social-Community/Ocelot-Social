@@ -188,6 +188,8 @@ type Query {
     about: String
     createdAt: String
     updatedAt: String
+    "Filter users by their single role (HAS_ROLE edge). Requires role.manage."
+    roleName: String
     first: Int
     offset: Int
     orderBy: [_UserOrdering]

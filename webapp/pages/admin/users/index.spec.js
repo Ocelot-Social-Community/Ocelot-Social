@@ -22,6 +22,8 @@ describe('Users', () => {
       error: jest.fn(),
       success: jest.fn(),
     },
+    $route: { query: {} },
+    $router: { replace: jest.fn(() => Promise.resolve()) },
   }
 
   const getters = {
@@ -180,6 +182,32 @@ describe('Users', () => {
         }),
       })
       expect(w.find('[data-test="user-role-select-theowner"]').exists()).toBe(false)
+    })
+
+    it('renders the role filter dropdown', () => {
+      expect(wrapper.find('[data-test="users-role-filter"]').exists()).toBe(true)
+    })
+
+    it('setRoleFilter sets the role and clears the text search', () => {
+      wrapper.vm.formData.query = 'abc'
+      wrapper.vm.email = 'x@example.org'
+      wrapper.vm.setRoleFilter('moderator')
+      expect(wrapper.vm.roleFilter).toBe('moderator')
+      expect(wrapper.vm.formData.query).toBe('')
+      expect(wrapper.vm.email).toBe(null)
+    })
+
+    it('passes roleName to the query when a role filter is set', () => {
+      wrapper.vm.roleFilter = 'moderator'
+      const vars = wrapper.vm.$options.apollo.User.variables.call(wrapper.vm)
+      expect(vars.roleName).toBe('moderator')
+    })
+
+    it('initializes the role filter from the route query', () => {
+      mocks.$route = { query: { role: 'admin' } }
+      const w = Wrapper()
+      expect(w.vm.roleFilter).toBe('admin')
+      mocks.$route = { query: {} }
     })
 
     it('lets an owner edit an owner and offers the owner option', () => {

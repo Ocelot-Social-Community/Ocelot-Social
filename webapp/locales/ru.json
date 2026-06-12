@@ -241,6 +241,7 @@
     },
     "users": {
       "addRole": "Assign role…",
+      "allRoles": "Все роли",
       "empty": "Пользователи не найдены",
       "form": {
         "placeholder": "Электронная почта, имя или описание"

@@ -25,6 +25,21 @@
           </div>
         </div>
       </form>
+      <div class="role-filter">
+        <label class="role-filter__label" for="users-role-filter">
+          {{ $t('admin.users.table.columns.role') }}:
+        </label>
+        <select
+          id="users-role-filter"
+          class="role-filter__select"
+          :value="roleFilter || ''"
+          data-test="users-role-filter"
+          @change="setRoleFilter($event.target.value || null)"
+        >
+          <option value="">{{ $t('admin.users.allRoles') }}</option>
+          <option v-for="rn in allRoleNames" :key="rn" :value="rn">{{ rn }}</option>
+        </select>
+      </div>
     </os-card>
     <os-card v-if="User && User.length">
       <div class="ds-table-wrap">
@@ -174,6 +189,9 @@ export default {
   },
   created() {
     this.icons = iconRegistry
+    // Deep-link from "x members" on the roles page: /admin/users?role=<name>.
+    const role = this.$route && this.$route.query && this.$route.query.role
+    if (role) this.roleFilter = role
   },
   data() {
     const pageSize = 15
@@ -185,6 +203,7 @@ export default {
       hasNext: false,
       email: null,
       filter: null,
+      roleFilter: null,
       allRoleNames: [],
       formData: {
         query: '',
@@ -215,10 +234,11 @@ export default {
         return adminUserQuery()
       },
       variables() {
-        const { offset, first, email, filter } = this
+        const { offset, first, email, filter, roleFilter } = this
         const variables = { first, offset }
-        if (email) variables.email = email
-        if (filter) variables.filter = filter
+        if (roleFilter) variables.roleName = roleFilter
+        else if (email) variables.email = email
+        else if (filter) variables.filter = filter
         return variables
       },
       update({ User }) {
@@ -242,8 +262,21 @@ export default {
     next() {
       this.offset += this.pageSize
     },
+    // The role filter and the text/email search are separate modes; setting one
+    // clears the other.
+    setRoleFilter(roleName) {
+      this.roleFilter = roleName
+      this.offset = 0
+      this.email = null
+      this.filter = null
+      this.formData.query = ''
+      if (this.$router) {
+        this.$router.replace({ query: roleName ? { role: roleName } : {} }).catch(() => {})
+      }
+    },
     onSubmit() {
       this.offset = 0
+      this.roleFilter = null
       const { query } = this.formData
       if (isEmail(query)) {
         this.email = query
@@ -282,5 +315,16 @@ export default {
 }
 .user-role-select {
   font-size: 0.85em;
+}
+.role-filter {
+  display: flex;
+  align-items: center;
+  gap: $space-x-small;
+  margin-top: $space-small;
+  font-size: 0.9em;
+
+  &__label {
+    color: $text-color-soft;
+  }
 }
 </style>

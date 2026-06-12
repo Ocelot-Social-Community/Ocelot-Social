@@ -241,6 +241,7 @@
     },
     "users": {
       "addRole": "Assign role…",
+      "allRoles": "Усі ролі",
       "empty": "Користувачів не знайдено",
       "form": {
         "placeholder": "електронна пошта, ім'я або опис"

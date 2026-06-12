@@ -241,6 +241,7 @@
     },
     "users": {
       "addRole": "Assign role…",
+      "allRoles": "Të gjitha rolet",
       "empty": "Nuk u gjetën përdorues",
       "form": {
         "placeholder": "e-mail, emër ose përshkrim"

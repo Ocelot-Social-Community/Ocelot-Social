@@ -241,6 +241,7 @@
     },
     "users": {
       "addRole": "Assign role…",
+      "allRoles": "Alle rollen",
       "empty": "Geen gebruikers gevonden",
       "form": {
         "placeholder": "e-mail, naam of beschrijving"
