@@ -104,10 +104,12 @@ export default {
       if (newVal !== this.currentValue) {
         this.currentValue = newVal
       }
-      // resolve when value is set after initial mount (e.g. settings page)
-      const newName = typeof newVal === 'object' ? newVal.value : newVal
+      // Only re-resolve when the incoming value is a plain string (e.g. loaded
+      // from DB on settings page). An object means the user already selected a
+      // result from the dropdown — no re-query needed.
+      if (typeof newVal === 'object') return
       const oldName = typeof oldVal === 'object' ? oldVal.value : oldVal
-      if (newName && newName !== oldName) {
+      if (newVal && newVal !== oldName) {
         this.resolveLocalizedLocation()
       }
     },
