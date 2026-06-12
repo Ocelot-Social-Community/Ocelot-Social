@@ -145,25 +145,27 @@ export default {
       if (!context.role.getRole(roleName)) {
         throw new UserInputError(`Unknown role: ${roleName}`)
       }
-      // Only an owner may grant ownership (a role.manage admin must not escalate
-      // themselves or others to owner).
-      if (roleName === OWNER_ROLE && !actorIsOwner(context)) {
-        throw new ForbiddenError('Only an owner may assign the owner role.')
+      // Owner status is owner-controlled. Look up whether the target is currently an
+      // owner and how many owners exist.
+      const guard = await context.database.query({
+        query: `OPTIONAL MATCH (target:User {id: $userId})-[:HAS_ROLE]->(targetOwner:Role {id: 'owner'})
+                OPTIONAL MATCH (o:User)-[:HAS_ROLE]->(:Role {id: 'owner'})
+                RETURN count(DISTINCT targetOwner) AS isOwner, count(DISTINCT o) AS ownerCount`,
+        variables: { userId },
+      })
+      const row = guard.records[0]
+      const targetIsOwner = Number(row?.get('isOwner') ?? 0) > 0
+      const ownerCount = Number(row?.get('ownerCount') ?? 0)
+
+      // Only an owner may grant the owner role OR change an owner's role; a
+      // role.manage admin manages non-owner roles only (no escalating to owner, no
+      // demoting an owner).
+      if ((roleName === OWNER_ROLE || targetIsOwner) && !actorIsOwner(context)) {
+        throw new ForbiddenError('Only an owner may assign or change the owner role.')
       }
-      // Never demote the last owner away from owner — keep the instance failsafe.
-      if (roleName !== OWNER_ROLE) {
-        const guard = await context.database.query({
-          query: `OPTIONAL MATCH (target:User {id: $userId})-[:HAS_ROLE]->(targetOwner:Role {id: 'owner'})
-                  OPTIONAL MATCH (o:User)-[:HAS_ROLE]->(:Role {id: 'owner'})
-                  RETURN count(DISTINCT targetOwner) AS isOwner, count(DISTINCT o) AS ownerCount`,
-          variables: { userId },
-        })
-        const row = guard.records[0]
-        const targetIsOwner = Number(row?.get('isOwner') ?? 0) > 0
-        const ownerCount = Number(row?.get('ownerCount') ?? 0)
-        if (targetIsOwner && ownerCount <= 1) {
-          throw new ForbiddenError('Cannot remove the last owner.')
-        }
+      // Never demote the last owner — keep the instance failsafe.
+      if (targetIsOwner && roleName !== OWNER_ROLE && ownerCount <= 1) {
+        throw new ForbiddenError('Cannot remove the last owner.')
       }
       // Replace the user's single HAS_ROLE edge.
       const result = await context.database.write({

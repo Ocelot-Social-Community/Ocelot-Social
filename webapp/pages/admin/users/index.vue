@@ -115,13 +115,13 @@
               <td class="ds-table-col ds-table-col-right">{{ user.shoutedCount }}</td>
               <td class="ds-table-col ds-table-col-right">
                 <select
-                  v-if="user.id !== currentUser.id"
+                  v-if="canEditRole(user)"
                   class="user-role-select"
                   :value="user.roleName"
                   :data-test="`user-role-select-${user.id}`"
                   @change="setRole(user, $event)"
                 >
-                  <option v-for="rn in allRoleNames" :key="rn" :value="rn">{{ rn }}</option>
+                  <option v-for="rn in assignableRoleNames" :key="rn" :value="rn">{{ rn }}</option>
                 </select>
                 <span v-else class="ds-text">{{ user.roleName }}</span>
               </td>
@@ -195,6 +195,16 @@ export default {
     hasPrevious() {
       return this.offset > 0
     },
+    // Only an owner may grant the owner role (mirrors the backend rule).
+    isOwner() {
+      return !!this.currentUser && this.currentUser.roleName === 'owner'
+    },
+    // Role options offered in the dropdown — owner only for owners.
+    assignableRoleNames() {
+      return this.isOwner
+        ? this.allRoleNames
+        : this.allRoleNames.filter((roleName) => roleName !== 'owner')
+    },
     ...mapGetters({
       currentUser: 'auth/user',
     }),
@@ -244,6 +254,13 @@ export default {
           OR: [{ name_contains: query }, { slug_contains: query }, { about_contains: query }],
         }
       }
+    },
+    // Whether the current user may change this user's role: not your own role, and
+    // only an owner may change an owner (mirrors the backend rule).
+    canEditRole(user) {
+      if (!this.currentUser || user.id === this.currentUser.id) return false
+      if (user.roleName === 'owner' && !this.isOwner) return false
+      return true
     },
     // Set a user's single role (replaces their current one). Owner assignment is
     // enforced owner-only by the backend; a forbidden choice surfaces as a toast.

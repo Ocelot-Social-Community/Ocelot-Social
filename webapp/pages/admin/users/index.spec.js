@@ -158,5 +158,49 @@ describe('Users', () => {
       await wrapper.vm.setRole({ id: 'user' }, { target: { value: 'admin' } })
       expect(mocks.$toast.success).toHaveBeenCalled()
     })
+
+    const optionValues = (select) =>
+      select.findAll('option').wrappers.map((option) => option.attributes('value'))
+
+    it('hides the owner option from a non-owner admin', () => {
+      const select = wrapper.find('[data-test="user-role-select-user"]')
+      expect(optionValues(select)).not.toContain('owner')
+    })
+
+    it('does not let a non-owner admin change an owner', () => {
+      const store = new Vuex.Store({ getters })
+      const w = mount(Users, {
+        mocks,
+        localVue,
+        store,
+        stubs,
+        data: () => ({
+          allRoleNames: ['user', 'admin', 'owner'],
+          User: [{ id: 'theowner', name: 'Owner', roleName: 'owner', slug: 'owner' }],
+        }),
+      })
+      expect(w.find('[data-test="user-role-select-theowner"]').exists()).toBe(false)
+    })
+
+    it('lets an owner edit an owner and offers the owner option', () => {
+      const ownerGetters = {
+        'auth/isAdmin': () => true,
+        'auth/user': () => ({ id: 'me', roleName: 'owner' }),
+      }
+      const store = new Vuex.Store({ getters: ownerGetters })
+      const w = mount(Users, {
+        mocks,
+        localVue,
+        store,
+        stubs,
+        data: () => ({
+          allRoleNames: ['user', 'admin', 'owner'],
+          User: [{ id: 'theowner', name: 'Owner', roleName: 'owner', slug: 'owner' }],
+        }),
+      })
+      const select = w.find('[data-test="user-role-select-theowner"]')
+      expect(select.exists()).toBe(true)
+      expect(optionValues(select)).toContain('owner')
+    })
   })
 })

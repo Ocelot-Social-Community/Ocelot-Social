@@ -312,11 +312,6 @@ exports[`Users given badges are disabled renders 1`] = `
                   admin
                 </option>
                 <option
-                  value="owner"
-                >
-                  owner
-                </option>
-                <option
                   value="badge-setter"
                 >
                   badge-setter
@@ -416,11 +411,6 @@ exports[`Users given badges are disabled renders 1`] = `
                   value="admin"
                 >
                   admin
-                </option>
-                <option
-                  value="owner"
-                >
-                  owner
                 </option>
                 <option
                   value="badge-setter"
@@ -830,11 +820,6 @@ exports[`Users given badges are enabled renders 1`] = `
                   admin
                 </option>
                 <option
-                  value="owner"
-                >
-                  owner
-                </option>
-                <option
                   value="badge-setter"
                 >
                   badge-setter
@@ -967,11 +952,6 @@ exports[`Users given badges are enabled renders 1`] = `
                   value="admin"
                 >
                   admin
-                </option>
-                <option
-                  value="owner"
-                >
-                  owner
                 </option>
                 <option
                   value="badge-setter"

@@ -293,5 +293,21 @@ describe('role management', () => {
       })
       expect(errors?.[0].message).toMatch(/last owner/)
     })
+
+    it('forbids a (non-owner) admin from changing an owner’s role', async () => {
+      // an owner first makes member-id an owner
+      authenticatedUser = { id: 'owner-actor', roles: ['owner'] } as unknown as Context['user']
+      await mutate({
+        mutation: SET_USER_ROLE,
+        variables: { userId: 'member-id', roleName: 'owner' },
+      })
+      // a (non-owner) admin must not be able to demote that owner
+      await asAdmin()
+      const { errors } = await mutate({
+        mutation: SET_USER_ROLE,
+        variables: { userId: 'member-id', roleName: 'user' },
+      })
+      expect(errors?.[0].message).toMatch(/owner/)
+    })
   })
 })
