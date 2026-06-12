@@ -49,21 +49,37 @@ describe('admin/roles.vue', () => {
       stubs,
       data: () => ({ roles, permissionCatalog }),
     })
-    // The apollo result() hook (which builds the editable drafts) does not fire
-    // with a mocked $apollo, so build them explicitly.
+    // The apollo result() hook (which builds the editable drafts + selects the
+    // default active role) does not fire with a mocked $apollo, so build explicitly.
     wrapper.vm.buildForms()
     return wrapper
   }
 
-  it('renders a section for every role', () => {
+  it('renders a switcher tab for every role', () => {
     const wrapper = Wrapper()
+    expect(wrapper.find('[data-test="role-tab-owner"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="role-tab-badge-setter"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="role-tab-user"]').exists()).toBe(true)
+  })
+
+  it('shows only the active role (the first one) at a time', () => {
+    const wrapper = Wrapper()
+    expect(wrapper.vm.activeRoleName).toBe('owner')
     expect(wrapper.find('[data-test="role-owner"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="role-badge-setter"]').exists()).toBe(false)
+    expect(wrapper.find('[data-test="role-user"]').exists()).toBe(false)
+  })
+
+  it('switches the active role when another tab is clicked', async () => {
+    const wrapper = Wrapper()
+    await wrapper.find('[data-test="role-tab-badge-setter"]').trigger('click')
+    expect(wrapper.vm.activeRoleName).toBe('badge-setter')
     expect(wrapper.find('[data-test="role-badge-setter"]').exists()).toBe(true)
-    expect(wrapper.find('[data-test="role-user"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="role-owner"]').exists()).toBe(false)
   })
 
   it('does not offer to edit or delete the protected owner role', () => {
-    const wrapper = Wrapper()
+    const wrapper = Wrapper() // owner is active by default
     expect(wrapper.find('[data-test="role-owner-save"]').exists()).toBe(false)
     expect(wrapper.find('[data-test="role-owner-delete"]').exists()).toBe(false)
   })
@@ -104,22 +120,29 @@ describe('admin/roles.vue', () => {
     )
   })
 
-  it('createRole sends the new role with its selected permissions', async () => {
+  it('the + button turns into a name input', async () => {
     const wrapper = Wrapper()
-    wrapper.setData({
-      newRole: {
-        name: 'event-org',
-        permissions: { 'badge.manage': false, 'post.create': true },
-      },
-    })
+    expect(wrapper.find('[data-test="role-add"]').exists()).toBe(true)
+    await wrapper.find('[data-test="role-add"]').trigger('click')
+    expect(wrapper.vm.creating).toBe(true)
+    expect(wrapper.find('[data-test="new-role-name"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="role-add"]').exists()).toBe(false)
+  })
+
+  it('createRole creates an empty role from the typed name and selects it', async () => {
+    const wrapper = Wrapper()
+    wrapper.vm.startCreate()
+    wrapper.setData({ newRole: { name: 'event-org' } })
     await wrapper.vm.createRole()
     expect(mutate).toHaveBeenCalledWith(
       expect.objectContaining({
         variables: {
           name: 'event-org',
-          permissions: ['post.create'],
+          permissions: [],
         },
       }),
     )
+    expect(wrapper.vm.activeRoleName).toBe('event-org')
+    expect(wrapper.vm.creating).toBe(false)
   })
 })

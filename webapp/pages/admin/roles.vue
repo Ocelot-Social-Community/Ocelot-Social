@@ -3,30 +3,87 @@
     <h2 class="title">{{ $t('admin.roles.title') }}</h2>
     <p class="description">{{ $t('admin.roles.description') }}</p>
 
-    <!-- Existing roles -->
-    <section v-for="role in roles" :key="role.name" class="role" :data-test="`role-${role.name}`">
+    <!-- Role switcher: one pill per role, plus an add button that turns into a
+         name input. Only the active role's permissions are shown below. -->
+    <div class="role-tabs" data-test="role-tabs">
+      <button
+        v-for="role in roles"
+        :key="role.name"
+        type="button"
+        class="role-tab"
+        :class="{ 'role-tab--active': role.name === activeRoleName }"
+        :data-test="`role-tab-${role.name}`"
+        @click="setActive(role.name)"
+      >
+        {{ role.name }}
+        <span v-if="role.protected" class="role-tab__badge" :title="$t('admin.roles.protected')">
+          ★
+        </span>
+      </button>
+
+      <!-- Add a role: the + button morphs into a name input -->
+      <button
+        v-if="!creating"
+        type="button"
+        class="role-tab role-tab--add"
+        :title="$t('admin.roles.create')"
+        :aria-label="$t('admin.roles.create')"
+        data-test="role-add"
+        @click="startCreate"
+      >
+        +
+      </button>
+      <span v-else class="role-tab role-tab--input" data-test="role-create">
+        <input
+          ref="newRoleInput"
+          v-model="newRole.name"
+          type="text"
+          class="role-tab__input"
+          :placeholder="$t('admin.roles.nameLabel')"
+          data-test="new-role-name"
+          @keyup.enter="createRole"
+          @keyup.esc="cancelCreate"
+        />
+        <button
+          type="button"
+          class="role-tab__confirm"
+          :disabled="!newRole.name || saving"
+          :aria-label="$t('admin.roles.create')"
+          data-test="new-role-create"
+          @click="createRole"
+        >
+          ✓
+        </button>
+        <button type="button" class="role-tab__cancel" @click="cancelCreate">✕</button>
+      </span>
+    </div>
+
+    <!-- Active role -->
+    <section v-if="activeRole" class="role" :data-test="`role-${activeRole.name}`">
       <header class="role__header">
         <h3 class="role__name">
-          {{ role.name }}
-          <span v-if="role.protected" class="role__badge">{{ $t('admin.roles.protected') }}</span>
+          {{ activeRole.name }}
+          <span v-if="activeRole.protected" class="role__badge">
+            {{ $t('admin.roles.protected') }}
+          </span>
         </h3>
         <span class="role__members">
-          {{ $t('admin.roles.members', { count: role.memberCount || 0 }) }}
+          {{ $t('admin.roles.members', { count: activeRole.memberCount || 0 }) }}
         </span>
       </header>
 
-      <template v-if="role.protected">
+      <template v-if="activeRole.protected">
         <p class="role__protected-note">{{ $t('admin.roles.allPermissions') }}</p>
       </template>
 
-      <template v-else-if="forms[role.name]">
+      <template v-else-if="forms[activeRole.name]">
         <fieldset v-for="group in permissionGroups" :key="group.name" class="perm-group">
           <legend class="perm-group__title">{{ group.name }}</legend>
           <label v-for="permission in group.permissions" :key="permission.key" class="perm-row">
             <input
               type="checkbox"
-              v-model="forms[role.name].permissions[permission.key]"
-              :data-test="`role-${role.name}-perm-${permission.key}`"
+              v-model="forms[activeRole.name].permissions[permission.key]"
+              :data-test="`role-${activeRole.name}-perm-${permission.key}`"
             />
             <span class="perm-row__text">
               <span class="perm-row__key">{{ permission.key }}</span>
@@ -39,58 +96,24 @@
           <os-button
             variant="primary"
             appearance="filled"
-            :disabled="!isDirty(role) || saving"
-            @click="saveRole(role)"
-            :data-test="`role-${role.name}-save`"
+            :disabled="!isDirty(activeRole) || saving"
+            :data-test="`role-${activeRole.name}-save`"
+            @click="saveRole(activeRole)"
           >
             {{ $t('admin.roles.save') }}
           </os-button>
           <os-button
-            v-if="canDelete(role)"
+            v-if="canDelete(activeRole)"
             variant="danger"
             appearance="ghost"
             :disabled="saving"
-            @click="removeRole(role)"
-            :data-test="`role-${role.name}-delete`"
+            :data-test="`role-${activeRole.name}-delete`"
+            @click="removeRole(activeRole)"
           >
             {{ $t('admin.roles.delete') }}
           </os-button>
         </div>
       </template>
-    </section>
-
-    <!-- Create a new role -->
-    <section class="role role--new" data-test="role-create">
-      <h3 class="role__name">{{ $t('admin.roles.createTitle') }}</h3>
-      <div class="role__meta">
-        <label class="role__field">
-          <span>{{ $t('admin.roles.nameLabel') }}</span>
-          <input type="text" v-model="newRole.name" data-test="new-role-name" />
-        </label>
-      </div>
-
-      <fieldset v-for="group in permissionGroups" :key="group.name" class="perm-group">
-        <legend class="perm-group__title">{{ group.name }}</legend>
-        <label v-for="permission in group.permissions" :key="permission.key" class="perm-row">
-          <input type="checkbox" v-model="newRole.permissions[permission.key]" />
-          <span class="perm-row__text">
-            <span class="perm-row__key">{{ permission.key }}</span>
-            <span class="perm-row__desc">{{ permission.description }}</span>
-          </span>
-        </label>
-      </fieldset>
-
-      <div class="role__actions">
-        <os-button
-          variant="primary"
-          appearance="filled"
-          :disabled="!newRole.name || saving"
-          @click="createRole"
-          data-test="new-role-create"
-        >
-          {{ $t('admin.roles.create') }}
-        </os-button>
-      </div>
     </section>
   </os-card>
 </template>
@@ -117,7 +140,11 @@ export default {
       permissionCatalog: [],
       // Editable drafts keyed by role name, rebuilt whenever roles load.
       forms: {},
-      newRole: { name: '', permissions: {} },
+      // The single role currently shown.
+      activeRoleName: null,
+      // Whether the + button is in name-input mode.
+      creating: false,
+      newRole: { name: '' },
       saving: false,
     }
   },
@@ -131,12 +158,18 @@ export default {
     },
     permissionCatalog: {
       query: permissionCatalogQuery,
-      result() {
-        this.newRole.permissions = emptyPermissionMap(this.permissionCatalog)
-      },
     },
   },
+  created() {
+    // Select a default active role from any roles already present (e.g. in tests);
+    // the apollo result() re-runs this once roles load.
+    this.ensureActive()
+  },
   computed: {
+    // The role object currently selected in the switcher.
+    activeRole() {
+      return this.roles.find((role) => role.name === this.activeRoleName) || null
+    },
     // Catalog grouped by permission group, for sectioned checkboxes.
     permissionGroups() {
       const byGroup = {}
@@ -160,6 +193,33 @@ export default {
         }
       }
       this.forms = forms
+      this.ensureActive()
+    },
+    // Keep a valid role selected: default to the first one, and re-select after a
+    // role is deleted/renamed away.
+    ensureActive() {
+      if (!this.roles.length) {
+        this.activeRoleName = null
+        return
+      }
+      if (!this.roles.some((role) => role.name === this.activeRoleName)) {
+        this.activeRoleName = this.roles[0].name
+      }
+    },
+    setActive(name) {
+      this.activeRoleName = name
+      this.cancelCreate()
+    },
+    startCreate() {
+      this.creating = true
+      this.newRole.name = ''
+      this.$nextTick(() => {
+        if (this.$refs.newRoleInput) this.$refs.newRoleInput.focus()
+      })
+    },
+    cancelCreate() {
+      this.creating = false
+      this.newRole.name = ''
     },
     selectedPermissions(permissionMap) {
       return Object.keys(permissionMap).filter((key) => permissionMap[key])
@@ -204,6 +264,8 @@ export default {
           mutation: deleteRoleMutation,
           variables: { name: role.name },
         })
+        // The deleted role can no longer be active; fall back in ensureActive().
+        if (this.activeRoleName === role.name) this.activeRoleName = null
         await this.$apollo.queries.roles.refetch()
         this.$toast.success(this.$t('admin.roles.saveSuccess'))
       } catch (err) {
@@ -212,21 +274,20 @@ export default {
         this.saving = false
       }
     },
+    // Create an empty role from the typed name, then select it so its permissions
+    // can be edited and saved.
     async createRole() {
+      const name = this.newRole.name.trim()
+      if (!name || this.saving) return
       this.saving = true
       try {
         await this.$apollo.mutate({
           mutation: createRoleMutation,
-          variables: {
-            name: this.newRole.name,
-            permissions: this.selectedPermissions(this.newRole.permissions),
-          },
+          variables: { name, permissions: [] },
         })
         await this.$apollo.queries.roles.refetch()
-        this.newRole = {
-          name: '',
-          permissions: emptyPermissionMap(this.permissionCatalog),
-        }
+        this.activeRoleName = name
+        this.cancelCreate()
         this.$toast.success(this.$t('admin.roles.saveSuccess'))
       } catch (err) {
         this.$toast.error(this.$t('admin.roles.saveError', { message: err.message }))
@@ -246,15 +307,77 @@ export default {
   margin-bottom: $space-base;
   color: $text-color-soft;
 }
-.role {
-  border-top: 1px solid $border-color-softer;
-  padding-top: $space-small;
-  margin-top: $space-small;
+.role-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-x-small;
+  padding-bottom: $space-small;
+  border-bottom: 1px solid $border-color-softer;
+}
+.role-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-xxx-small;
+  padding: $space-xx-small $space-small;
+  border: 1px solid $border-color-soft;
+  border-radius: $border-radius-x-large;
+  background: $background-color-base;
+  color: $text-color-base;
+  font-size: 0.9em;
+  line-height: 1.4;
+  cursor: pointer;
 
-  &--new {
-    border-top: 2px solid $border-color-soft;
-    margin-top: $space-base;
+  &:hover {
+    background: $background-color-softer;
   }
+  &--active {
+    border-color: $color-primary;
+    background: $color-primary;
+    color: $color-primary-inverse;
+    font-weight: bold;
+
+    &:hover {
+      background: $color-primary;
+    }
+  }
+  &--add {
+    font-weight: bold;
+    border-style: dashed;
+  }
+  &--input {
+    padding: $space-xxx-small $space-xx-small;
+    cursor: default;
+  }
+  &__badge {
+    font-size: 0.8em;
+  }
+  &__input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    min-width: 8rem;
+  }
+  &__confirm,
+  &__cancel {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0 $space-xxx-small;
+    color: $text-color-soft;
+
+    &:hover {
+      color: $text-color-base;
+    }
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+  }
+}
+.role {
+  padding-top: $space-base;
   &__header {
     display: flex;
     align-items: baseline;
@@ -278,17 +401,6 @@ export default {
   &__protected-note {
     color: $text-color-soft;
     font-style: italic;
-  }
-  &__meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: $space-small;
-    margin: $space-x-small 0;
-  }
-  &__field {
-    display: flex;
-    flex-direction: column;
-    font-size: 0.85em;
   }
   &__actions {
     margin-top: $space-x-small;
