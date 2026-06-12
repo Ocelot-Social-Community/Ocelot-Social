@@ -174,27 +174,42 @@ export default {
   },
   created() {
     this.icons = iconRegistry
-    // Restore the search string from the URL: ?q=<search> (or the legacy ?role=<name>
-    // deep-link from the roles page "x members" link).
-    const query = (this.$route && this.$route.query) || {}
-    if (query.q) this.formData.query = query.q
-    else if (query.role) this.formData.query = `role:${query.role}`
-    if (this.formData.query) this.applyQuery()
   },
   data() {
     const pageSize = 15
+    // Initialize the filter from the URL here (not in created), so the first apollo
+    // fetch already carries it — otherwise the list loads unfiltered and then
+    // re-fetches filtered (a flash of all users). Reads ?q=<search>, or the legacy
+    // ?role=<name> deep-link from the roles page "x members" link.
+    //
+    // NB: parse inline — `this.parseSearch` reads `allRoleNames`, a vue-apollo
+    // property that is not available yet during data() initialization.
+    const routeQuery = (this.$route && this.$route.query) || {}
+    let query = ''
+    if (routeQuery.q) query = routeQuery.q
+    else if (routeQuery.role) query = `role:${routeQuery.role}`
+    const tokens = query.trim().split(/\s+/).filter(Boolean)
+    let roleName = null
+    const terms = []
+    for (const token of tokens) {
+      const match = /^role:(.+)$/i.exec(token)
+      if (match) roleName = match[1]
+      else terms.push(token)
+    }
+    const term = terms.join(' ')
+    const mail = term && isEmail(term) ? term : null
     return {
       offset: 0,
       pageSize,
       first: pageSize,
       User: [],
       hasNext: false,
-      email: null,
-      searchText: null,
-      roleFilter: null,
+      email: mail,
+      searchText: mail ? null : term || null,
+      roleFilter: roleName,
       allRoleNames: [],
       formData: {
-        query: '',
+        query,
       },
     }
   },
@@ -282,7 +297,9 @@ export default {
       for (const token of tokens) {
         const match = /^role:(.+)$/i.exec(token)
         if (match) {
-          const known = this.allRoleNames.find((r) => r.toLowerCase() === match[1].toLowerCase())
+          const known = (this.allRoleNames || []).find(
+            (r) => r.toLowerCase() === match[1].toLowerCase(),
+          )
           roleName = known || match[1]
         } else {
           terms.push(token)
