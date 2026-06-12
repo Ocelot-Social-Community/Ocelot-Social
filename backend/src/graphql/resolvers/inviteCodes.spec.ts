@@ -1050,7 +1050,7 @@ describe('redeemInviteCode', () => {
       })
       authenticatedUser = await invitingUser.toJson()
       await expect(
-        query({ query: GroupMembers, variables: { id: 'hidden-group' } }),
+        query({ query: GroupMembers, variables: { id: 'hidden-group', includePending: true } }),
       ).resolves.toMatchObject({
         data: {
           GroupMembers: expect.arrayContaining([
