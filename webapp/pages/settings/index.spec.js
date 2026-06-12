@@ -274,14 +274,14 @@ describe('index.vue', () => {
         jest.useFakeTimers()
 
         wrapper.find('#city').trigger('input')
-        wrapper.find('#city').setValue('B')
+        wrapper.find('#city').setValue('Ber')
 
         jest.runAllTimers()
 
         expect(mocks.$apollo.query).toHaveBeenCalledWith(
           expect.objectContaining({
             variables: expect.objectContaining({
-              place: 'B',
+              place: 'Ber',
             }),
           }),
         )

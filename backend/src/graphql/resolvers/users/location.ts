@@ -162,9 +162,29 @@ export const createOrUpdateLocations = async (
   })
 }
 
-export const queryLocations = async ({ place, lang }, context: Context) => {
+const ALLOWED_LOCATION_TYPES = new Set([
+  'country',
+  'region',
+  'postcode',
+  'district',
+  'place',
+  'locality',
+  'neighborhood',
+  'address',
+  'poi',
+])
+const DEFAULT_LOCATION_TYPES = 'region,place,country'
+
+export const queryLocations = async ({ place, lang, types }, context: Context) => {
+  const safeTypes = types
+    ? types
+        .split(',')
+        .map((t: string) => t.trim())
+        .filter((t: string) => ALLOWED_LOCATION_TYPES.has(t))
+        .join(',') || DEFAULT_LOCATION_TYPES
+    : DEFAULT_LOCATION_TYPES
   const res: any = await fetch(
-    `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?access_token=${context.config.MAPBOX_TOKEN}&types=region,place,country&language=${lang}`,
+    `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(place)}.json?access_token=${context.config.MAPBOX_TOKEN}&types=${safeTypes}&language=${encodeURIComponent(lang)}`,
     {
       signal: AbortSignal.timeout(REQUEST_TIMEOUT),
     },

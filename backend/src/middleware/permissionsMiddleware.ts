@@ -10,6 +10,7 @@ import { rule, shield, deny, allow, or, and } from 'graphql-shield'
 
 import CONFIG from '@config/index'
 import { getNeode } from '@db/neo4j'
+import { AuthenticationError } from '@graphql/errors'
 import { validateInviteCode } from '@graphql/resolvers/inviteCodes'
 
 import type SocialMedia from '@db/models/SocialMedia'
@@ -606,6 +607,6 @@ export default shield(
     debug,
     allowExternalErrors,
     fallbackRule: allow,
-    fallbackError: Error('Not Authorized!'),
+    fallbackError: new AuthenticationError('Not Authorized!'),
   },
 )

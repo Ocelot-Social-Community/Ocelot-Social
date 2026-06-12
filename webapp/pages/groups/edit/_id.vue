@@ -25,7 +25,7 @@
 
 <script>
 import { OsMenu } from '@ocelot-social/ui'
-import { groupQuery } from '~/graphql/groups.js'
+import { groupEditQuery } from '~/graphql/groups.js'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -70,7 +70,7 @@ export default {
         Group: [group],
       },
     } = await client.query({
-      query: groupQuery(), // "this.$i18n" is undefined here, so we use default lang
+      query: groupEditQuery(),
       variables: { id },
     })
     if (group.myRole !== 'owner') {

@@ -18,6 +18,7 @@
     <create-invitation
       @generate-invite-code="generateInviteCode"
       :disabled="isLimitReached"
+      :loading="loading"
       class="create-invitation"
     />
   </div>
@@ -37,6 +38,10 @@ export default {
     copyMessage: {
       type: String,
       default: '',
+    },
+    loading: {
+      type: Boolean,
+      default: false,
     },
   },
   components: {

@@ -227,6 +227,35 @@ export const groupQuery = (i18n) => {
         ...locationOnGroup
         membersCount
         myRole
+      }
+    }
+  `
+}
+
+export const groupEditQuery = () => {
+  return gql`
+    ${imageUrls}
+
+    query ($id: ID) {
+      Group(id: $id) {
+        id
+        name
+        slug
+        about
+        description
+        groupType
+        actionRadius
+        locationName
+        categories {
+          id
+          slug
+          name
+          icon
+        }
+        avatar {
+          ...imageUrls
+        }
+        myRole
         inviteCodes {
           createdAt
           code
