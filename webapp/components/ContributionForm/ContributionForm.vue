@@ -131,24 +131,20 @@
                 </div>
               </div>
               <div v-if="showEventLocationName" class="event-grid-item">
-                <ocelot-input
-                  model="eventLocationName"
-                  name="eventLocationName"
+                <location-select
+                  v-model="formData.eventLocationName"
+                  types="region,place,country,address"
+                  :show-previous-location="false"
                   :placeholder="$t('post.viewEvent.eventLocationName')"
                 />
-                <div class="chipbox">
-                  <os-badge
-                    role="status"
-                    aria-live="polite"
-                    :variant="formErrors && formErrors.eventLocationName ? 'danger' : undefined"
-                  >
-                    {{ formData.eventLocationName.length }}/{{ formSchema.eventLocationName.max }}
-                    <os-icon
-                      v-if="formErrors && formErrors.eventLocationName"
-                      :icon="icons.warning"
-                    />
-                  </os-badge>
-                </div>
+                <os-badge
+                  v-if="formErrors && formErrors.eventLocationName"
+                  role="status"
+                  aria-live="polite"
+                  variant="danger"
+                >
+                  <os-icon :icon="icons.warning" />
+                </os-badge>
               </div>
             </div>
 
@@ -234,6 +230,7 @@ import 'vue2-datepicker/scss/index.scss'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
+import LocationSelect from '~/components/Select/LocationSelect'
 
 export default {
   mixins: [GetCategories, formValidation],
@@ -248,6 +245,7 @@ export default {
     OsIcon,
     PageParamsLink,
     OcelotInput,
+    LocationSelect,
   },
   props: {
     contribution: {
@@ -325,20 +323,12 @@ export default {
         },
         eventLocationName: {
           required: !!this.createEvent && !this.formData.eventIsOnline,
-          min: 3,
-          max: 100,
           validator: (_, value = '') => {
             if (!this.createEvent) return []
             if (this.formData.eventIsOnline) return []
-            if (!value.trim()) {
+            const name = typeof value === 'object' ? value?.value : value
+            if (!name?.trim()) {
               return [new Error(this.$t('common.validations.eventLocationNameNotEmpty'))]
-            }
-            if (value.length < 3 || value.length > 100) {
-              return [
-                new Error(
-                  this.$t('common.validations.eventLocationNameLength', { min: 3, max: 100 }),
-                ),
-              ]
             }
             return []
           },
@@ -352,7 +342,9 @@ export default {
           eventVenue: this.formData.eventVenue,
           eventEnd: this.formData.eventEnd ? new Date(this.formData.eventEnd).toISOString() : null,
           eventIsOnline: this.formData.eventIsOnline,
-          eventLocationName: !this.formData.eventIsOnline ? this.formData.eventLocationName : null,
+          eventLocationName: !this.formData.eventIsOnline
+            ? (this.formData.eventLocationName?.value ?? this.formData.eventLocationName) || null
+            : null,
         }
       }
       return undefined

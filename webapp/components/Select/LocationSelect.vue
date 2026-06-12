@@ -9,7 +9,7 @@
       :options="cities"
       icon="map-marker"
       :icon-right="null"
-      :placeholder="$t('settings.data.labelCity') + ' …'"
+      :placeholder="placeholder !== null ? placeholder : $t('settings.data.labelCity') + ' …'"
       :loading="loadingGeo"
       @input.native="handleCityInput"
     >
@@ -54,6 +54,16 @@ export default {
       type: Boolean,
       required: false,
       default: true,
+    },
+    types: {
+      type: String,
+      required: false,
+      default: 'region,place,country',
+    },
+    placeholder: {
+      type: String,
+      required: false,
+      default: null,
     },
   },
   async created() {
@@ -137,7 +147,7 @@ export default {
           data: { queryLocations: result },
         } = await this.$apollo.query({
           query: queryLocations(),
-          variables: { place, lang },
+          variables: { place, lang, types: this.types },
           fetchPolicy: 'network-only',
         })
 

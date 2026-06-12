@@ -162,9 +162,10 @@ export const createOrUpdateLocations = async (
   })
 }
 
-export const queryLocations = async ({ place, lang }, context: Context) => {
+export const queryLocations = async ({ place, lang, types }, context: Context) => {
+  const locationTypes = types ?? 'region,place,country'
   const res: any = await fetch(
-    `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?access_token=${context.config.MAPBOX_TOKEN}&types=region,place,country&language=${lang}`,
+    `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?access_token=${context.config.MAPBOX_TOKEN}&types=${locationTypes}&language=${lang}`,
     {
       signal: AbortSignal.timeout(REQUEST_TIMEOUT),
     },
