@@ -112,6 +112,13 @@ bootstrap account is the instance owner — the failsafe superuser):
 yarn db:data:owner
 ```
 
+To promote an existing user to owner (e.g. a legacy instance that has no owner yet —
+the API only lets an existing owner grant the owner role), use, by email, slug or id:
+
+```sh
+yarn db:data:promote-owner <email | slug | id>
+```
+
 When using `CATEGORIES_ACTIVE=true` you also want to seed the categories with:
 
 ```sh

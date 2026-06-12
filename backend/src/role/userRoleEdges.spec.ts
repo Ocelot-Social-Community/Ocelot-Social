@@ -4,7 +4,7 @@
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver } from '@db/neo4j'
 
-import { ensureUserRoleEdges } from './userRoleEdges'
+import { ensureUserRoleEdges, promoteToOwner } from './userRoleEdges'
 
 const rolesOf = async (userId: string): Promise<string[]> => {
   const session = getDriver().session()
@@ -30,7 +30,19 @@ const roleNodeExists = async (name: string): Promise<boolean> => {
   }
 }
 
-describe('ensureUserRoleEdges', () => {
+const legacyRole = async (userId: string): Promise<string> => {
+  const session = getDriver().session()
+  try {
+    const result = await session.readTransaction((tx) =>
+      tx.run(`MATCH (u:User {id: $userId}) RETURN u.role AS role`, { userId }),
+    )
+    return result.records[0].get('role') as string
+  } finally {
+    await session.close()
+  }
+}
+
+describe('role-edge helpers (DB)', () => {
   beforeEach(async () => {
     await cleanDatabase()
     await Factory.build('user', { id: 'a', role: 'admin' }, { email: 'a@e.org', password: '1' })
@@ -60,5 +72,25 @@ describe('ensureUserRoleEdges', () => {
     await ensureUserRoleEdges()
     await ensureUserRoleEdges()
     expect(await rolesOf('a')).toEqual(['admin'])
+  })
+
+  describe('promoteToOwner', () => {
+    it('promotes a user found by email, replacing their previous role', async () => {
+      await ensureUserRoleEdges() // 'u' now holds the user edge
+      const result = await promoteToOwner('u@e.org')
+      expect(result?.id).toBe('u')
+      expect(await rolesOf('u')).toEqual(['owner']) // single edge, replaced
+      expect(await legacyRole('u')).toBe('admin') // legacy tier synced
+    })
+
+    it('promotes a user found by id (seeds roles itself, no prior edge needed)', async () => {
+      const result = await promoteToOwner('a')
+      expect(result?.id).toBe('a')
+      expect(await rolesOf('a')).toEqual(['owner'])
+    })
+
+    it('returns null for an unknown identifier', async () => {
+      expect(await promoteToOwner('nobody@nowhere.org')).toBeNull()
+    })
   })
 })
