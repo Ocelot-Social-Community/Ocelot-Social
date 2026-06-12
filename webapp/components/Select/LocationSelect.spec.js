@@ -97,5 +97,28 @@ describe('LocationSelect', () => {
         expect(wrapper.find('.ds-input-label').text()).toBe('settings.data.labelCity')
       })
     })
+
+    describe('custom types prop', () => {
+      beforeEach(() => {
+        queryMock.mockClear()
+        wrapper = mount(LocationSelect, {
+          mocks,
+          localVue,
+          propsData: { value: 'nowhere', types: 'address' },
+        })
+      })
+
+      it('forwards the types prop to apollo', () => {
+        expect(queryMock).toBeCalledWith({
+          query: queryLocations(),
+          variables: {
+            place: 'nowhere',
+            lang: 'en',
+            types: 'address',
+          },
+          fetchPolicy: 'network-only',
+        })
+      })
+    })
   })
 })

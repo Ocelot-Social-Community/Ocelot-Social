@@ -377,6 +377,28 @@ describe('ContributionForm.vue', () => {
               })
             })
           })
+
+          describe('submit with LocationSelect object payload', () => {
+            beforeEach(() => {
+              wrapper.vm.updateFormField('eventLocationName', {
+                label: 'Deutschland, Germany',
+                value: 'Deutschland, Germany',
+                id: 'place.abc123',
+              })
+              wrapper.find('form').trigger('submit')
+            })
+
+            it('extracts the value string from the location object', () => {
+              expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
+                mutation: PostMutations().CreatePost,
+                variables: expect.objectContaining({
+                  eventInput: expect.objectContaining({
+                    eventLocationName: 'Deutschland, Germany',
+                  }),
+                }),
+              })
+            })
+          })
         })
       })
     })
