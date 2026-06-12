@@ -177,17 +177,27 @@ describe('Users', () => {
       expect(w.find('[data-test="user-role-select-theowner"]').exists()).toBe(false)
     })
 
-    it('renders the role filter dropdown', () => {
-      expect(wrapper.find('[data-test="users-role-filter"]').exists()).toBe(true)
+    it('parses a role:<name> token from the search box, combinable with free text', () => {
+      wrapper.vm.formData.query = 'role:moderator anna'
+      wrapper.vm.onSubmit()
+      expect(wrapper.vm.roleFilter).toBe('moderator')
+      expect(wrapper.vm.searchText).toBe('anna')
+      expect(wrapper.vm.email).toBe(null)
     })
 
-    it('setRoleFilter keeps the text search (combinable) but clears the e-mail lookup', () => {
-      wrapper.vm.searchText = 'abc'
-      wrapper.vm.email = 'x@example.org'
-      wrapper.vm.setRoleFilter('moderator')
+    it('resolves the role token case-insensitively against the known roles', () => {
+      wrapper.vm.formData.query = 'role:Moderator'
+      wrapper.vm.onSubmit()
       expect(wrapper.vm.roleFilter).toBe('moderator')
-      expect(wrapper.vm.searchText).toBe('abc') // kept → combines with the role
-      expect(wrapper.vm.email).toBe(null) // e-mail is a standalone precise lookup
+    })
+
+    it('syncs the search string to the URL as ?q=', () => {
+      mocks.$router.replace.mockClear()
+      wrapper.vm.formData.query = 'role:moderator anna'
+      wrapper.vm.onSubmit()
+      expect(mocks.$router.replace).toHaveBeenCalledWith({
+        query: { q: 'role:moderator anna' },
+      })
     })
 
     it('passes roleName to the query when a role filter is set', () => {
@@ -204,10 +214,20 @@ describe('Users', () => {
       expect(vars.search).toBe('anna')
     })
 
-    it('initializes the role filter from the route query', () => {
-      mocks.$route = { query: { role: 'admin' } }
+    it('restores the search string (and parsed role) from the URL ?q=', () => {
+      mocks.$route = { query: { q: 'role:admin anna' } }
       const w = Wrapper()
+      expect(w.vm.formData.query).toBe('role:admin anna')
       expect(w.vm.roleFilter).toBe('admin')
+      expect(w.vm.searchText).toBe('anna')
+      mocks.$route = { query: {} }
+    })
+
+    it('still supports the legacy ?role= deep-link', () => {
+      mocks.$route = { query: { role: 'moderator' } }
+      const w = Wrapper()
+      expect(w.vm.formData.query).toBe('role:moderator')
+      expect(w.vm.roleFilter).toBe('moderator')
       mocks.$route = { query: {} }
     })
 

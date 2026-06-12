@@ -245,7 +245,7 @@
       "allRoles": "Alle rollen",
       "empty": "Geen gebruikers gevonden",
       "form": {
-        "placeholder": "e-mail, naam of beschrijving"
+        "placeholder": "e-mail, naam, beschrijving of role:moderator"
       },
       "name": "Gebruikers",
       "removeRole": "Remove role {role}",

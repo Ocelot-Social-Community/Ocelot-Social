@@ -114,7 +114,7 @@ describe('admin/roles.vue', () => {
     const wrapper = Wrapper() // owner active by default
     const link = wrapper.find('[data-test="role-owner-members"]')
     expect(link.exists()).toBe(true)
-    expect(link.props('to')).toEqual({ name: 'admin-users', query: { role: 'owner' } })
+    expect(link.props('to')).toEqual({ name: 'admin-users', query: { q: 'role:owner' } })
   })
 
   it('previews the permission diff when hovering another role pill', async () => {

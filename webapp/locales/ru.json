@@ -245,7 +245,7 @@
       "allRoles": "Все роли",
       "empty": "Пользователи не найдены",
       "form": {
-        "placeholder": "Электронная почта, имя или описание"
+        "placeholder": "эл. почта, имя, описание или role:moderator"
       },
       "name": "Пользователи",
       "removeRole": "Remove role {role}",

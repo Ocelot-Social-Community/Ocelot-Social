@@ -25,21 +25,6 @@
           </div>
         </div>
       </form>
-      <div class="role-filter">
-        <label class="role-filter__label" for="users-role-filter">
-          {{ $t('admin.users.table.columns.role') }}:
-        </label>
-        <select
-          id="users-role-filter"
-          class="role-filter__select"
-          :value="roleFilter || ''"
-          data-test="users-role-filter"
-          @change="setRoleFilter($event.target.value || null)"
-        >
-          <option value="">{{ $t('admin.users.allRoles') }}</option>
-          <option v-for="rn in allRoleNames" :key="rn" :value="rn">{{ rn }}</option>
-        </select>
-      </div>
     </os-card>
     <os-card v-if="User && User.length">
       <div class="ds-table-wrap">
@@ -189,9 +174,12 @@ export default {
   },
   created() {
     this.icons = iconRegistry
-    // Deep-link from "x members" on the roles page: /admin/users?role=<name>.
-    const role = this.$route && this.$route.query && this.$route.query.role
-    if (role) this.roleFilter = role
+    // Restore the search string from the URL: ?q=<search> (or the legacy ?role=<name>
+    // deep-link from the roles page "x members" link).
+    const query = (this.$route && this.$route.query) || {}
+    if (query.q) this.formData.query = query.q
+    else if (query.role) this.formData.query = `role:${query.role}`
+    if (this.formData.query) this.applyQuery()
   },
   data() {
     const pageSize = 15
@@ -266,30 +254,51 @@ export default {
     next() {
       this.offset += this.pageSize
     },
-    // The role filter combines with the text search; only an e-mail lookup (which is
-    // precise and standalone) is cleared when a role is selected.
-    setRoleFilter(roleName) {
-      this.roleFilter = roleName
-      this.offset = 0
-      this.email = null
-      if (this.$router) {
-        const query = { ...this.$route.query }
-        if (roleName) query.role = roleName
-        else delete query.role
-        this.$router.replace({ query }).catch(() => {})
-      }
-    },
+    // The search box is the single source of truth: a `role:<name>` token filters by
+    // role, the rest is free text (or a standalone exact e-mail lookup). Both combine.
     onSubmit() {
       this.offset = 0
-      const { query } = this.formData
-      // An e-mail is matched exactly (standalone); free text combines with the role.
-      if (isEmail(query)) {
-        this.email = query
+      this.applyQuery()
+      this.syncRoute()
+    },
+    // Resolve the current search box into role / text / e-mail query state.
+    applyQuery() {
+      const { roleName, term } = this.parseSearch(this.formData.query)
+      this.roleFilter = roleName
+      if (term && isEmail(term)) {
+        this.email = term
         this.searchText = null
       } else {
         this.email = null
-        this.searchText = query || null
+        this.searchText = term || null
       }
+    },
+    // Split the query into an optional `role:<name>` token (resolved against the known
+    // role names, case-insensitively) and the remaining free-text term.
+    parseSearch(raw) {
+      const tokens = (raw || '').trim().split(/\s+/).filter(Boolean)
+      let roleName = null
+      const terms = []
+      for (const token of tokens) {
+        const match = /^role:(.+)$/i.exec(token)
+        if (match) {
+          const known = this.allRoleNames.find((r) => r.toLowerCase() === match[1].toLowerCase())
+          roleName = known || match[1]
+        } else {
+          terms.push(token)
+        }
+      }
+      return { roleName, term: terms.join(' ') }
+    },
+    // Persist the search string to the URL (?q=…) so it is shareable and survives
+    // reloads; the path stays /admin/users, keeping the menu highlight.
+    syncRoute() {
+      if (!this.$router) return
+      const query = { ...this.$route.query }
+      const q = (this.formData.query || '').trim()
+      if (q) query.q = q
+      else delete query.q
+      this.$router.replace({ query }).catch(() => {})
     },
     // Whether the current user may change this user's role: not your own role, and
     // only an owner may change an owner (mirrors the backend rule).
@@ -318,16 +327,5 @@ export default {
 }
 .user-role-select {
   font-size: 0.85em;
-}
-.role-filter {
-  display: flex;
-  align-items: center;
-  gap: $space-x-small;
-  margin-top: $space-small;
-  font-size: 0.9em;
-
-  &__label {
-    color: $text-color-soft;
-  }
 }
 </style>

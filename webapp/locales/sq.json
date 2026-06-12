@@ -245,7 +245,7 @@
       "allRoles": "Të gjitha rolet",
       "empty": "Nuk u gjetën përdorues",
       "form": {
-        "placeholder": "e-mail, emër ose përshkrim"
+        "placeholder": "email, emër, përshkrim ose role:moderator"
       },
       "name": "Përdoruesit",
       "removeRole": "Remove role {role}",

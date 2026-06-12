@@ -245,7 +245,7 @@
       "allRoles": "Wszystkie role",
       "empty": "Nie znaleziono użytkowników",
       "form": {
-        "placeholder": "e-mail, nazwa lub opis"
+        "placeholder": "e-mail, nazwa, opis lub role:moderator"
       },
       "name": "Użytkownicy",
       "removeRole": "Remove role {role}",

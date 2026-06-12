@@ -71,7 +71,7 @@
         </h3>
         <nuxt-link
           class="role__members"
-          :to="{ name: 'admin-users', query: { role: activeRole.name } }"
+          :to="{ name: 'admin-users', query: { q: `role:${activeRole.name}` } }"
           :data-test="`role-${activeRole.name}-members`"
         >
           {{ $t('admin.roles.members', { count: activeRole.memberCount || 0 }) }}

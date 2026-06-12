@@ -32,6 +32,15 @@ describe('admin.vue', () => {
     })
   })
 
+  describe('active menu highlight', () => {
+    it('matches by path, ignoring query params (keeps the highlight on ?q=…)', () => {
+      mocks.$route = { path: '/admin/users', query: { q: 'role:moderator' } }
+      wrapper = Wrapper()
+      expect(wrapper.vm.matcher('/admin/users')).toBe(true)
+      expect(wrapper.vm.matcher('/admin')).toBe(false)
+    })
+  })
+
   describe('the API-keys admin menu item', () => {
     it('is hidden when the apiKeysEnabled policy is off', () => {
       wrapper = Wrapper() // policyValues empty ⇒ off
