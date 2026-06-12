@@ -113,25 +113,41 @@ Factory.define('basicUser')
     return hashSync(password, 10)
   })
 
+// Single-role: link a freshly built user to their role's :Role node (HAS_ROLE), so
+// the role system is populated at creation time. Graceful no-op when the role node
+// has not been seeded (e.g. most unit tests), where the legacy `user.role` fallback
+// applies. `roles` is the relationship key on the User neode model.
+const relateUserToRole = async (user, roleName) => {
+  if (!roleName) return
+  const role = await neode.find('Role', roleName)
+  if (role) await user.relateTo(role, 'roles')
+}
+
 Factory.define('userWithoutEmailAddress')
   .extend('basicUser')
   .option('about', faker.lorem.paragraph)
   .after(async (buildObject, _options) => {
-    return neode.create('User', buildObject)
+    const user = await neode.create('User', buildObject)
+    await relateUserToRole(user, buildObject.role)
+    return user
   })
 
 Factory.define('userWithAboutNull')
   .extend('basicUser')
   .option('about', null)
   .after(async (buildObject, _options) => {
-    return neode.create('User', buildObject)
+    const user = await neode.create('User', buildObject)
+    await relateUserToRole(user, buildObject.role)
+    return user
   })
 
 Factory.define('userWithAboutEmpty')
   .extend('basicUser')
   .option('about', '')
   .after(async (buildObject, _options) => {
-    return neode.create('User', buildObject)
+    const user = await neode.create('User', buildObject)
+    await relateUserToRole(user, buildObject.role)
+    return user
   })
 
 Factory.define('user')
@@ -162,6 +178,7 @@ Factory.define('user')
     ])
     await Promise.all([user.relateTo(email, 'primaryEmail'), email.relateTo(user, 'belongsTo')])
     if (avatar) await user.relateTo(avatar, 'avatar')
+    await relateUserToRole(user, buildObject.role)
     return user
   })
 
