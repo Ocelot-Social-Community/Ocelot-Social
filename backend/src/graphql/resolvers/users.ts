@@ -70,9 +70,9 @@ export default {
           await session.close()
         }
       }
-      if (args.roleName) {
-        // Filter by the single HAS_ROLE edge (admin role-member list). Enumerating
-        // role membership is role.manage-only.
+      if (args.roleName || args.search) {
+        // Admin user search: filter by single role (HAS_ROLE) and/or a free-text term
+        // (name/slug/about, case-insensitive), combinable. role.manage-only.
         if (!context.effectivePermissions.has('role.manage')) {
           throw new ForbiddenError('Not Authorized!')
         }
@@ -81,14 +81,20 @@ export default {
           const readTxResult = await session.readTransaction((txc) => {
             return txc.run(
               `
-              MATCH (user:User)-[:HAS_ROLE]->(:Role {name: $args.roleName})
+              MATCH (user:User)
               WHERE coalesce(user.deleted, false) = false
-              RETURN user {.*}
+                AND ($args.roleName IS NULL OR (user)-[:HAS_ROLE]->(:Role {name: $args.roleName}))
+                AND ($args.term IS NULL
+                     OR toLower(user.name) CONTAINS $args.term
+                     OR toLower(user.slug) CONTAINS $args.term
+                     OR toLower(coalesce(user.about, '')) CONTAINS $args.term)
+              RETURN user {.*, email: head([(user)-[:PRIMARY_EMAIL]->(e:EmailAddress) | e.email])}
               ORDER BY user.createdAt DESC
               SKIP toInteger($args.offset) LIMIT toInteger($args.first)`,
               {
                 args: {
-                  roleName: args.roleName,
+                  roleName: args.roleName ?? null,
+                  term: args.search ? String(args.search).toLowerCase() : null,
                   offset: args.offset ?? 0,
                   first: args.first ?? 25,
                 },

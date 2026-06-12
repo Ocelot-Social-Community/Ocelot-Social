@@ -202,7 +202,7 @@ export default {
       User: [],
       hasNext: false,
       email: null,
-      filter: null,
+      searchText: null,
       roleFilter: null,
       allRoleNames: [],
       formData: {
@@ -234,11 +234,15 @@ export default {
         return adminUserQuery()
       },
       variables() {
-        const { offset, first, email, filter, roleFilter } = this
+        const { offset, first, email, roleFilter, searchText } = this
         const variables = { first, offset }
+        // An e-mail is a precise standalone lookup; otherwise role + text combine.
+        if (email) {
+          variables.email = email
+          return variables
+        }
         if (roleFilter) variables.roleName = roleFilter
-        else if (email) variables.email = email
-        else if (filter) variables.filter = filter
+        if (searchText) variables.search = searchText
         return variables
       },
       update({ User }) {
@@ -262,30 +266,29 @@ export default {
     next() {
       this.offset += this.pageSize
     },
-    // The role filter and the text/email search are separate modes; setting one
-    // clears the other.
+    // The role filter combines with the text search; only an e-mail lookup (which is
+    // precise and standalone) is cleared when a role is selected.
     setRoleFilter(roleName) {
       this.roleFilter = roleName
       this.offset = 0
       this.email = null
-      this.filter = null
-      this.formData.query = ''
       if (this.$router) {
-        this.$router.replace({ query: roleName ? { role: roleName } : {} }).catch(() => {})
+        const query = { ...this.$route.query }
+        if (roleName) query.role = roleName
+        else delete query.role
+        this.$router.replace({ query }).catch(() => {})
       }
     },
     onSubmit() {
       this.offset = 0
-      this.roleFilter = null
       const { query } = this.formData
+      // An e-mail is matched exactly (standalone); free text combines with the role.
       if (isEmail(query)) {
         this.email = query
-        this.filter = null
+        this.searchText = null
       } else {
         this.email = null
-        this.filter = {
-          OR: [{ name_contains: query }, { slug_contains: query }, { about_contains: query }],
-        }
+        this.searchText = query || null
       }
     },
     // Whether the current user may change this user's role: not your own role, and

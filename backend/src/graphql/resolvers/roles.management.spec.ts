@@ -311,10 +311,12 @@ describe('role management', () => {
     })
   })
 
-  describe('User(roleName) filter', () => {
-    const USERS_BY_ROLE = `query ($roleName: String) { User(roleName: $roleName) { id roleName } }`
+  describe('User admin search (roleName / search)', () => {
+    const SEARCH = `query ($roleName: String, $search: String) {
+      User(roleName: $roleName, search: $search) { id email roleName contributionsCount }
+    }`
 
-    it('returns only users holding the given role (role.manage)', async () => {
+    it('filters users by their single role', async () => {
       await Factory.build(
         'user',
         { id: 'mod1', role: 'moderator' },
@@ -322,24 +324,45 @@ describe('role management', () => {
       )
       await asAdmin() // admin-id, admin role
       const { data, errors } = await query({
-        query: USERS_BY_ROLE,
+        query: SEARCH,
         variables: { roleName: 'moderator' },
       })
       expect(errors).toBeUndefined()
       const ids = data.User.map((u) => u.id)
       expect(ids).toContain('mod1')
       expect(ids).not.toContain('admin-id')
-      expect(data.User.every((u) => u.roleName === 'moderator')).toBe(true)
     })
 
-    it('forbids filtering by role without role.manage', async () => {
+    it('combines the role filter with a text search', async () => {
+      await Factory.build(
+        'user',
+        { id: 'mod-anna', name: 'Anna', role: 'moderator' },
+        { email: 'anna@e.org', password: '1234' },
+      )
+      await Factory.build(
+        'user',
+        { id: 'mod-bob', name: 'Bob', role: 'moderator' },
+        { email: 'bob@e.org', password: '1234' },
+      )
+      await asAdmin()
+      const { data, errors } = await query({
+        query: SEARCH,
+        variables: { roleName: 'moderator', search: 'ann' },
+      })
+      expect(errors).toBeUndefined()
+      const ids = data.User.map((u) => u.id)
+      expect(ids).toContain('mod-anna')
+      expect(ids).not.toContain('mod-bob')
+    })
+
+    it('forbids the admin search without role.manage', async () => {
       const plain = await Factory.build(
         'user',
         { id: 'plain', role: 'user' },
         { email: 'plain@e.org', password: '1234' },
       )
       authenticatedUser = (await plain.toJson()) as Context['user']
-      const { errors } = await query({ query: USERS_BY_ROLE, variables: { roleName: 'admin' } })
+      const { errors } = await query({ query: SEARCH, variables: { roleName: 'admin' } })
       expect(errors?.[0].message).toMatch(/Not Authorized/)
     })
   })

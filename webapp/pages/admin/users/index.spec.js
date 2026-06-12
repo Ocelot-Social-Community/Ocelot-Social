@@ -100,22 +100,15 @@ describe('Users', () => {
       it('searches users for exact email address', async () => {
         const wrapper = await searchAction(Wrapper(), { query: 'email@example.org' })
         expect(wrapper.vm.email).toEqual('email@example.org')
-        expect(wrapper.vm.filter).toBe(null)
+        expect(wrapper.vm.searchText).toBe(null)
       })
     })
 
     describe('query is just text', () => {
-      it('tries to find matching users by `name`, `slug` or `about`', async () => {
+      it('searches by free text (combinable with the role filter)', async () => {
         const wrapper = await searchAction(await Wrapper(), { query: 'Find me' })
-        const expected = {
-          OR: [
-            { name_contains: 'Find me' },
-            { slug_contains: 'Find me' },
-            { about_contains: 'Find me' },
-          ],
-        }
         expect(wrapper.vm.email).toBe(null)
-        expect(wrapper.vm.filter).toEqual(expected)
+        expect(wrapper.vm.searchText).toEqual('Find me')
       })
     })
   })
@@ -188,19 +181,27 @@ describe('Users', () => {
       expect(wrapper.find('[data-test="users-role-filter"]').exists()).toBe(true)
     })
 
-    it('setRoleFilter sets the role and clears the text search', () => {
-      wrapper.vm.formData.query = 'abc'
+    it('setRoleFilter keeps the text search (combinable) but clears the e-mail lookup', () => {
+      wrapper.vm.searchText = 'abc'
       wrapper.vm.email = 'x@example.org'
       wrapper.vm.setRoleFilter('moderator')
       expect(wrapper.vm.roleFilter).toBe('moderator')
-      expect(wrapper.vm.formData.query).toBe('')
-      expect(wrapper.vm.email).toBe(null)
+      expect(wrapper.vm.searchText).toBe('abc') // kept → combines with the role
+      expect(wrapper.vm.email).toBe(null) // e-mail is a standalone precise lookup
     })
 
     it('passes roleName to the query when a role filter is set', () => {
       wrapper.vm.roleFilter = 'moderator'
       const vars = wrapper.vm.$options.apollo.User.variables.call(wrapper.vm)
       expect(vars.roleName).toBe('moderator')
+    })
+
+    it('combines role and free-text search in the query variables', () => {
+      wrapper.vm.roleFilter = 'moderator'
+      wrapper.vm.searchText = 'anna'
+      const vars = wrapper.vm.$options.apollo.User.variables.call(wrapper.vm)
+      expect(vars.roleName).toBe('moderator')
+      expect(vars.search).toBe('anna')
     })
 
     it('initializes the role filter from the route query', () => {
