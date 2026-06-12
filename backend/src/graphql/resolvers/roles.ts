@@ -17,9 +17,18 @@ const toGraphqlRole = (def: RoleDefinition, memberCount: number | null = null) =
 })
 
 // Member count for a single role (HAS_ROLE edges).
+// Members are counted by their EFFECTIVE single role: the HAS_ROLE edge if present,
+// otherwise the legacy `user.role` tier, otherwise the baseline (mirrors
+// effectiveRoleName). So a user is counted even before the migration creates edges
+// or for a fresh signup that only has the legacy field.
 const countMembers = async (context: Context, name: string): Promise<number> => {
   const result = await context.database.query({
-    query: `MATCH (:User)-[:HAS_ROLE]->(r:Role {id: $name}) RETURN count(*) AS count`,
+    query: `MATCH (u:User)
+            WHERE coalesce(u.deleted, false) = false
+            OPTIONAL MATCH (u)-[:HAS_ROLE]->(r:Role)
+            WITH coalesce(r.name, u.role, 'user') AS roleName
+            WHERE roleName = $name
+            RETURN count(*) AS count`,
     variables: { name },
   })
   return Number(result.records[0]?.get('count') ?? 0)
@@ -41,8 +50,14 @@ export default {
 
     roles: async (_parent: unknown, _args: unknown, context: Context) => {
       const defs = context.role.allRoles()
+      // Count every (non-deleted) user once, by their effective single role
+      // (HAS_ROLE edge → legacy tier → baseline) — see countMembers above.
       const result = await context.database.query({
-        query: `MATCH (:User)-[:HAS_ROLE]->(r:Role) RETURN r.name AS name, count(*) AS count`,
+        query: `MATCH (u:User)
+                WHERE coalesce(u.deleted, false) = false
+                OPTIONAL MATCH (u)-[:HAS_ROLE]->(r:Role)
+                WITH coalesce(r.name, u.role, 'user') AS roleName
+                RETURN roleName AS name, count(*) AS count`,
       })
       const counts = new Map<string, number>(
         result.records.map((record) => [record.get('name') as string, Number(record.get('count'))]),

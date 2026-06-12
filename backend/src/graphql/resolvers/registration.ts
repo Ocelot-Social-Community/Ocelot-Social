@@ -82,6 +82,11 @@ export default {
             FOREACH (invisiblePost IN invisiblePosts |
               MERGE (user)-[:CANNOT_SEE]->(invisiblePost)
             )
+            WITH user
+            OPTIONAL MATCH (baselineRole:Role {id: 'user'})
+            FOREACH (r IN CASE WHEN baselineRole IS NULL THEN [] ELSE [baselineRole] END |
+              MERGE (user)-[:HAS_ROLE]->(r)
+            )
             RETURN user {.*}
           `,
           {

@@ -19,6 +19,7 @@ import CreateGroupRoom from '@graphql/queries/messaging/CreateGroupRoom.gql'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
 import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+import { ensureUserRoleEdges } from '@src/role'
 
 import Factory from './factories'
 import { trophies, verification } from './seed/badges'
@@ -2015,6 +2016,10 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     }
 
     // Group g0 (Investigative Journalism) - intentionally NO chat seeded
+
+    // Single-role system: give every seeded user a HAS_ROLE edge (this script runs
+    // as a CLI without RoleService.init, so the role system would otherwise be empty).
+    await ensureUserRoleEdges()
   } catch (err) {
     /* eslint-disable-next-line no-console */
     console.error(err)

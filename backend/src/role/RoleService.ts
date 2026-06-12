@@ -163,10 +163,17 @@ export class RoleService {
     })
   }
 
-  // Number of users currently assigned this role (HAS_ROLE edges).
+  // Number of users whose EFFECTIVE single role is this one (HAS_ROLE edge, else
+  // the legacy `user.role` tier, else baseline) — consistent with the member count
+  // shown in the admin UI, so "blocked: still assigned" matches what's displayed.
   private async countMembers(name: string): Promise<number> {
     const result = await this.db.query({
-      query: `MATCH (:User)-[:HAS_ROLE]->(:Role {id: $name}) RETURN count(*) AS count`,
+      query: `MATCH (u:User)
+              WHERE coalesce(u.deleted, false) = false
+              OPTIONAL MATCH (u)-[:HAS_ROLE]->(r:Role)
+              WITH coalesce(r.name, u.role, 'user') AS roleName
+              WHERE roleName = $name
+              RETURN count(*) AS count`,
       variables: { name },
     })
     return Number(result.records[0]?.get('count') ?? 0)

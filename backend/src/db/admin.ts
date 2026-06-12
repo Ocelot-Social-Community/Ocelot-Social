@@ -4,6 +4,8 @@
 import { hashSync } from 'bcryptjs'
 import { v4 as uuid } from 'uuid'
 
+import { ensureUserRoleEdges } from '@src/role'
+
 import { getDriver } from './neo4j'
 
 const defaultAdmin = {
@@ -40,6 +42,9 @@ const createDefaultAdminUser = async () => {
   try {
     await createAdminTxResultPromise
     console.log('Successfully created default admin user!') // eslint-disable-line no-console
+    // Single-role system: seed the role nodes and give the admin (and any other
+    // edgeless user) their HAS_ROLE edge — this CLI never runs RoleService.init.
+    await ensureUserRoleEdges()
     // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (error) {
     console.log(error) // eslint-disable-line no-console

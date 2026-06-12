@@ -134,6 +134,18 @@ describe('role management', () => {
         'user',
       ])
     })
+
+    it('counts members by their effective role (legacy role string, no edge needed)', async () => {
+      await Factory.build('user', { id: 'm', role: 'user' }, { email: 'm@e.org', password: '1234' })
+      await asAdmin() // admin-id, role 'admin', also no HAS_ROLE edge
+      const { data } = await query({ query: ROLES })
+      const roleList = data.roles as Array<{ name: string; memberCount: number }>
+      const byName: Record<string, number> = Object.fromEntries(
+        roleList.map((r) => [r.name, r.memberCount]),
+      )
+      expect(byName.user).toBeGreaterThanOrEqual(1) // the baseline member
+      expect(byName.admin).toBeGreaterThanOrEqual(1) // the admin, via legacy user.role
+    })
   })
 
   describe('createRole', () => {
