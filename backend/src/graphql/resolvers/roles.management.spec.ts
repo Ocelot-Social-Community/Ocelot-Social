@@ -31,15 +31,14 @@ const asAdmin = async () => {
 const PERMISSION_CATALOG = `query { permissionCatalog { key group description } }`
 const MY_PERMISSIONS = `query { myPermissions }`
 const ROLES = `query { roles { name rank protected permissions memberCount } }`
-const USER_ROLES = `query ($userId: ID!) { userRoles(userId: $userId) { name } }`
+const USER_INFO = `query ($id: ID!) { User(id: $id) { id role roleName } }`
 const CREATE_ROLE = `mutation ($name: String!, $description: String, $rank: Int!, $permissions: [String!]!) {
   createRole(name: $name, description: $description, rank: $rank, permissions: $permissions) {
     name permissions rank protected memberCount
   }
 }`
 const DELETE_ROLE = `mutation ($name: String!) { deleteRole(name: $name) }`
-const ASSIGN_ROLE = `mutation ($userId: ID!, $roleName: String!) { assignRole(userId: $userId, roleName: $roleName) { id } }`
-const UNASSIGN_ROLE = `mutation ($userId: ID!, $roleName: String!) { unassignRole(userId: $userId, roleName: $roleName) { id } }`
+const SET_USER_ROLE = `mutation ($userId: ID!, $roleName: String!) { setUserRole(userId: $userId, roleName: $roleName) { id role roleName } }`
 
 describe('role management', () => {
   beforeAll(async () => {
@@ -189,7 +188,7 @@ describe('role management', () => {
       expect(errors?.[0].message).toMatch(/baseline/)
     })
 
-    it('deletes a custom role', async () => {
+    it('deletes a custom role that no user holds', async () => {
       await mutate({
         mutation: CREATE_ROLE,
         variables: { name: 'temp', description: null, rank: 1, permissions: [] },
@@ -198,64 +197,24 @@ describe('role management', () => {
       expect(errors).toBeUndefined()
       expect(data.deleteRole).toBe('temp')
     })
-  })
 
-  describe('assignRole / unassignRole', () => {
-    beforeEach(async () => {
+    it('refuses to delete a role that is still assigned to a user', async () => {
       await Factory.build(
         'user',
-        { id: 'member-id', role: 'user' },
-        { email: 'member@e.org', password: '1234' },
+        { id: 'holder', role: 'user' },
+        { email: 'h@e.org', password: '1234' },
       )
-    })
-
-    it('assigns a role and reflects it in userRoles', async () => {
-      await asAdmin()
       await mutate({
         mutation: CREATE_ROLE,
-        variables: {
-          name: 'badge-setter',
-          description: null,
-          rank: 15,
-          permissions: ['badge.manage'],
-        },
+        variables: { name: 'held', description: null, rank: 1, permissions: [] },
       })
-      const { errors } = await mutate({
-        mutation: ASSIGN_ROLE,
-        variables: { userId: 'member-id', roleName: 'badge-setter' },
-      })
-      expect(errors).toBeUndefined()
-      const { data } = await query({ query: USER_ROLES, variables: { userId: 'member-id' } })
-      expect(data.userRoles.map((r: { name: string }) => r.name)).toEqual(['badge-setter'])
-    })
-
-    it('forbids a (non-owner) admin from assigning the owner role', async () => {
-      await asAdmin()
-      const { errors } = await mutate({
-        mutation: ASSIGN_ROLE,
-        variables: { userId: 'member-id', roleName: 'owner' },
-      })
-      expect(errors?.[0].message).toMatch(/owner/)
-    })
-
-    it('lets an owner assign owner, but refuses removing the last owner', async () => {
-      authenticatedUser = { id: 'owner-actor', roles: ['owner'] } as unknown as Context['user']
-      const assigned = await mutate({
-        mutation: ASSIGN_ROLE,
-        variables: { userId: 'member-id', roleName: 'owner' },
-      })
-      expect(assigned.errors).toBeUndefined()
-      // member is now the only owner → unassigning must be refused
-      const { errors } = await mutate({
-        mutation: UNASSIGN_ROLE,
-        variables: { userId: 'member-id', roleName: 'owner' },
-      })
-      expect(errors?.[0].message).toMatch(/last owner/)
+      await mutate({ mutation: SET_USER_ROLE, variables: { userId: 'holder', roleName: 'held' } })
+      const { errors } = await mutate({ mutation: DELETE_ROLE, variables: { name: 'held' } })
+      expect(errors?.[0].message).toMatch(/assigned/)
     })
   })
 
-  describe('legacy role sync + roleNames', () => {
-    const USER_INFO = `query ($id: ID!) { User(id: $id) { id role roleNames } }`
+  describe('setUserRole', () => {
     const readUser = async (id) => {
       const { data } = await query({ query: USER_INFO, variables: { id } })
       return data.User[0]
@@ -264,20 +223,13 @@ describe('role management', () => {
     beforeEach(async () => {
       await Factory.build(
         'user',
-        { id: 'm2', role: 'user' },
-        { email: 'm2@e.org', password: '1234' },
+        { id: 'member-id', role: 'user' },
+        { email: 'member@e.org', password: '1234' },
       )
+    })
+
+    it('sets the single role and reflects it in roleName + the legacy tier', async () => {
       await asAdmin()
-    })
-
-    it('syncs the legacy tier and exposes roleNames when a tier role is assigned', async () => {
-      await mutate({ mutation: ASSIGN_ROLE, variables: { userId: 'm2', roleName: 'moderator' } })
-      const user = await readUser('m2')
-      expect(user.role).toBe('moderator')
-      expect(user.roleNames).toEqual(['moderator'])
-    })
-
-    it('leaves the legacy tier at user when only a custom role is assigned', async () => {
       await mutate({
         mutation: CREATE_ROLE,
         variables: {
@@ -287,19 +239,62 @@ describe('role management', () => {
           permissions: ['badge.manage'],
         },
       })
-      await mutate({ mutation: ASSIGN_ROLE, variables: { userId: 'm2', roleName: 'badge-setter' } })
-      const user = await readUser('m2')
-      expect(user.role).toBe('user')
-      expect(user.roleNames).toContain('badge-setter')
+      const { errors } = await mutate({
+        mutation: SET_USER_ROLE,
+        variables: { userId: 'member-id', roleName: 'badge-setter' },
+      })
+      expect(errors).toBeUndefined()
+      const user = await readUser('member-id')
+      expect(user.roleName).toBe('badge-setter')
+      expect(user.role).toBe('user') // custom role → legacy tier stays 'user'
     })
 
-    it('reverts the legacy tier when the tier role is unassigned', async () => {
-      await mutate({ mutation: ASSIGN_ROLE, variables: { userId: 'm2', roleName: 'admin' } })
-      expect((await readUser('m2')).role).toBe('admin')
-      await mutate({ mutation: UNASSIGN_ROLE, variables: { userId: 'm2', roleName: 'admin' } })
-      const user = await readUser('m2')
-      expect(user.role).toBe('user')
-      expect(user.roleNames).toEqual([])
+    it('replaces the previous role rather than accumulating', async () => {
+      await asAdmin()
+      await mutate({
+        mutation: SET_USER_ROLE,
+        variables: { userId: 'member-id', roleName: 'moderator' },
+      })
+      await mutate({
+        mutation: SET_USER_ROLE,
+        variables: { userId: 'member-id', roleName: 'admin' },
+      })
+      const user = await readUser('member-id')
+      expect(user.roleName).toBe('admin')
+      expect(user.role).toBe('admin')
+    })
+
+    it('syncs the legacy tier for tier roles', async () => {
+      await asAdmin()
+      await mutate({
+        mutation: SET_USER_ROLE,
+        variables: { userId: 'member-id', roleName: 'moderator' },
+      })
+      expect((await readUser('member-id')).role).toBe('moderator')
+    })
+
+    it('forbids a (non-owner) admin from assigning the owner role', async () => {
+      await asAdmin()
+      const { errors } = await mutate({
+        mutation: SET_USER_ROLE,
+        variables: { userId: 'member-id', roleName: 'owner' },
+      })
+      expect(errors?.[0].message).toMatch(/owner/)
+    })
+
+    it('lets an owner assign owner, but refuses demoting the last owner', async () => {
+      authenticatedUser = { id: 'owner-actor', roles: ['owner'] } as unknown as Context['user']
+      const assigned = await mutate({
+        mutation: SET_USER_ROLE,
+        variables: { userId: 'member-id', roleName: 'owner' },
+      })
+      expect(assigned.errors).toBeUndefined()
+      // member is now the only owner → demoting them must be refused
+      const { errors } = await mutate({
+        mutation: SET_USER_ROLE,
+        variables: { userId: 'member-id', roleName: 'user' },
+      })
+      expect(errors?.[0].message).toMatch(/last owner/)
     })
   })
 })

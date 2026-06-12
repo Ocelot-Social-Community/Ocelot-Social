@@ -46,7 +46,7 @@ describe('Users', () => {
             email: 'user@example.org',
             name: 'User',
             role: 'moderator',
-            roleNames: ['moderator'],
+            roleName: 'moderator',
             slug: 'user',
           },
           {
@@ -54,7 +54,7 @@ describe('Users', () => {
             email: 'user2@example.org',
             name: 'User',
             role: 'user',
-            roleNames: [],
+            roleName: 'user',
             slug: 'user',
           },
         ],
@@ -120,65 +120,44 @@ describe('Users', () => {
     })
   })
 
-  describe('role assignment', () => {
+  describe('role', () => {
     beforeEach(() => {
       mocks.$apollo.mutate.mockClear()
       mocks.$toast.success.mockClear()
       mocks.$policy = { get: () => false }
       wrapper = Wrapper()
-      wrapper.setData({
-        allRoleNames: ['user', 'moderator', 'admin', 'owner', 'badge-setter'],
-        User: [
-          {
-            id: 'admin',
-            email: 'admin@example.org',
-            name: 'Admin',
-            role: 'admin',
-            roleNames: ['admin'],
-            slug: 'admin',
-          },
-          {
-            id: 'user',
-            email: 'user@example.org',
-            name: 'User',
-            role: 'user',
-            roleNames: ['badge-setter'],
-            slug: 'user',
-          },
-        ],
+    })
+
+    it('shows a single role dropdown for other users', () => {
+      expect(wrapper.find('[data-test="user-role-select-user"]').exists()).toBe(true)
+    })
+
+    it('does not offer a role dropdown for the current admin', () => {
+      const store = new Vuex.Store({ getters })
+      const own = mount(Users, {
+        mocks,
+        localVue,
+        store,
+        stubs,
+        data: () => ({
+          allRoleNames: ['user', 'admin'],
+          User: [{ id: 'admin', name: 'Admin', role: 'admin', roleName: 'admin', slug: 'admin' }],
+        }),
       })
+      expect(own.find('[data-test="user-role-select-admin"]').exists()).toBe(false)
     })
 
-    it('excludes owner, the baseline user role and already-held roles from the assignable list', () => {
-      const target = wrapper.vm.User.find((u) => u.id === 'user')
-      expect(wrapper.vm.assignableRoles(target)).toEqual(['moderator', 'admin'])
-    })
-
-    it('offers no assignment controls for the current admin row', () => {
-      const adminRow = wrapper.findAll('tr').at(1)
-      expect(adminRow.find('[data-test="user-role-add-admin"]').exists()).toBe(false)
-      expect(adminRow.find('.user-roles__remove').exists()).toBe(false)
-    })
-
-    it('assigns a selected role to another user', () => {
-      const select = wrapper.find('[data-test="user-role-add-user"]')
-      // options: [placeholder, moderator, admin] → pick moderator
-      select.findAll('option').at(1).setSelected()
+    it('sets the selected single role', () => {
+      const select = wrapper.find('[data-test="user-role-select-user"]')
+      // options follow allRoleNames; pick 'admin' (index 2)
+      select.findAll('option').at(2).setSelected()
       expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
-        expect.objectContaining({ variables: { userId: 'user', roleName: 'moderator' } }),
-      )
-    })
-
-    it('unassigns a held role via the chip remove button', async () => {
-      const chip = wrapper.find('[data-test="user-role-user-badge-setter"]')
-      await chip.find('.user-roles__remove').trigger('click')
-      expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
-        expect.objectContaining({ variables: { userId: 'user', roleName: 'badge-setter' } }),
+        expect.objectContaining({ variables: { userId: 'user', roleName: 'admin' } }),
       )
     })
 
     it('toasts a success message after a change', async () => {
-      await wrapper.vm.unassign({ id: 'user' }, 'badge-setter')
+      await wrapper.vm.setRole({ id: 'user' }, { target: { value: 'admin' } })
       expect(mocks.$toast.success).toHaveBeenCalled()
     })
   })

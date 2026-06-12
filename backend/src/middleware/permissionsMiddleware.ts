@@ -576,8 +576,7 @@ export default shield(
       createRole: hasPermission('role.manage'),
       updateRole: hasPermission('role.manage'),
       deleteRole: hasPermission('role.manage'),
-      assignRole: hasPermission('role.manage'),
-      unassignRole: hasPermission('role.manage'),
+      setUserRole: hasPermission('role.manage'),
       markTeaserAsViewed: allow,
 
       // Network Policy
@@ -605,7 +604,7 @@ export default shield(
       email: or(isMyOwn, hasPermission('user.email.readAny')),
       emailNotificationSettings: isMyOwn,
       inviteCodes: isMyOwn,
-      roleNames: hasPermission('role.manage'),
+      roleName: hasPermission('role.manage'),
     },
     Group: {
       '*': isAuthenticated, // TODO - only those who are allowed to see the group

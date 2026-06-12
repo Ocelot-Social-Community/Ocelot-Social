@@ -9,45 +9,36 @@ import type { RoleChangeEvent, RolePubSub } from './types'
 const BASELINE = ['post.create', 'group.create', 'group.create_hidden', 'user.invite']
 
 describe('RoleService', () => {
-  describe('permissionsForRoles (base set for the request context)', () => {
+  describe('permissionsForRole (single-role resolution)', () => {
     const svc = createInMemoryRoleService()
 
     it('expands owner to the FULL catalog (expand-then-mask)', () => {
-      expect([...svc.permissionsForRoles([OWNER_ROLE])].sort()).toEqual(
+      expect([...svc.permissionsForRole(OWNER_ROLE)].sort()).toEqual(
         [...allPermissionKeys()].sort(),
       )
     })
 
-    it('expands owner to all even when combined with other roles', () => {
-      expect(svc.permissionsForRoles([USER_ROLE, OWNER_ROLE]).size).toBe(allPermissionKeys().length)
+    it('returns the self-contained baseline for the user role', () => {
+      expect([...svc.permissionsForRole(USER_ROLE)].sort()).toEqual([...BASELINE].sort())
     })
 
-    it('returns the baseline for the user role', () => {
-      expect([...svc.permissionsForRoles([USER_ROLE])].sort()).toEqual([...BASELINE].sort())
-    })
-
-    it('unions roles additively — [user, moderator] adds content.moderate', () => {
-      const perms = svc.permissionsForRoles([USER_ROLE, MODERATOR_ROLE])
+    it('returns the self-contained moderator set (baseline + content.moderate)', () => {
+      const perms = svc.permissionsForRole(MODERATOR_ROLE)
       expect(perms.has('content.moderate')).toBe(true)
       for (const baseline of BASELINE) expect(perms.has(baseline as never)).toBe(true)
     })
 
-    it('admin holds the moderation + admin extras on top of the baseline (via [user, admin])', () => {
-      const perms = svc.permissionsForRoles([USER_ROLE, ADMIN_ROLE])
+    it('returns the self-contained admin set (baseline + moderation + admin extras)', () => {
+      const perms = svc.permissionsForRole(ADMIN_ROLE)
       expect(perms.has('content.moderate')).toBe(true)
       expect(perms.has('role.manage')).toBe(true)
       expect(perms.has('policy.manage')).toBe(true)
       expect(perms.has('badge.manage')).toBe(true)
+      for (const baseline of BASELINE) expect(perms.has(baseline as never)).toBe(true)
     })
 
-    it('ignores unknown role names', () => {
-      expect(svc.permissionsForRoles(['ghost-role'])).toEqual(new Set())
-      // a known role alongside an unknown one still contributes
-      expect(svc.permissionsForRoles([USER_ROLE, 'ghost-role']).size).toBe(BASELINE.length)
-    })
-
-    it('returns an empty set for no roles', () => {
-      expect(svc.permissionsForRoles([])).toEqual(new Set())
+    it('falls back to the baseline for an unknown role (never permission-less)', () => {
+      expect([...svc.permissionsForRole('ghost-role')].sort()).toEqual([...BASELINE].sort())
     })
   })
 

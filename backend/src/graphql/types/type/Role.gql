@@ -32,6 +32,6 @@ type Mutation {
   createRole(name: String!, description: String, rank: Int!, permissions: [String!]!): Role!
   updateRole(name: String!, description: String, rank: Int!, permissions: [String!]!): Role!
   deleteRole(name: String!): String!
-  assignRole(userId: ID!, roleName: String!): User!
-  unassignRole(userId: ID!, roleName: String!): User!
+  "Set a user's single role (replaces their current role)."
+  setUserRole(userId: ID!, roleName: String!): User!
 }

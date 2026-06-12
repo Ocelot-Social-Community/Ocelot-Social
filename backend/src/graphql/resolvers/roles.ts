@@ -1,6 +1,6 @@
 import { ForbiddenError, UserInputError } from '@graphql/errors'
 import { permissionCatalog } from '@src/permission'
-import { OWNER_ROLE, RoleValidationError, effectiveRoleNames } from '@src/role'
+import { OWNER_ROLE, RoleValidationError, effectiveRoleName } from '@src/role'
 
 import type { Context } from '@src/context'
 import type { RoleDefinition } from '@src/role'
@@ -28,21 +28,7 @@ const countMembers = async (context: Context, name: string): Promise<number> => 
 }
 
 const actorIsOwner = (context: Context): boolean =>
-  effectiveRoleNames(context.user ?? {}).includes(OWNER_ROLE)
-
-// Keep the legacy `user.role` tier consistent with the HAS_ROLE edges so the
-// (not-yet-migrated) frontend isAdmin/isModerator gating stays correct during the
-// transition. Mapped into the UserRole enum: owner/admin → 'admin', moderator →
-// 'moderator', otherwise the baseline 'user'. Appended after an edge change.
-const SYNC_LEGACY_ROLE = `
-  WITH u
-  OPTIONAL MATCH (u)-[:HAS_ROLE]->(tier:Role)
-  WITH u, collect(tier.name) AS tierNames
-  SET u.role = CASE
-    WHEN 'owner' IN tierNames OR 'admin' IN tierNames THEN 'admin'
-    WHEN 'moderator' IN tierNames THEN 'moderator'
-    ELSE 'user'
-  END`
+  effectiveRoleName(context.user ?? {}) === OWNER_ROLE
 
 export default {
   Query: {
@@ -149,7 +135,9 @@ export default {
       }
     },
 
-    assignRole: async (
+    // Set a user's single role (replaces whatever role they had). Single-role
+    // model: there is exactly one HAS_ROLE edge per user.
+    setUserRole: async (
       _parent: unknown,
       { userId, roleName }: { userId: string; roleName: string },
       context: Context,
@@ -157,43 +145,41 @@ export default {
       if (!context.role.getRole(roleName)) {
         throw new UserInputError(`Unknown role: ${roleName}`)
       }
-      // Only an owner may grant ownership (a role.manage admin must not be able to
-      // escalate themselves or others to owner).
+      // Only an owner may grant ownership (a role.manage admin must not escalate
+      // themselves or others to owner).
       if (roleName === OWNER_ROLE && !actorIsOwner(context)) {
         throw new ForbiddenError('Only an owner may assign the owner role.')
       }
-      const result = await context.database.write({
-        query: `MATCH (u:User {id: $userId})
-                MATCH (r:Role {id: $roleName})
-                MERGE (u)-[:HAS_ROLE]->(r)
-                ${SYNC_LEGACY_ROLE}
-                RETURN u {.*} AS user`,
-        variables: { userId, roleName },
-      })
-      const user = result.records[0]?.get('user') as unknown
-      if (!user) throw new UserInputError('Could not find User')
-      return user
-    },
-
-    unassignRole: async (
-      _parent: unknown,
-      { userId, roleName }: { userId: string; roleName: string },
-      context: Context,
-    ) => {
-      if (roleName === OWNER_ROLE) {
-        if (!actorIsOwner(context)) {
-          throw new ForbiddenError('Only an owner may remove the owner role.')
-        }
-        // Never strip the last owner — the instance must always keep its failsafe.
-        if ((await countMembers(context, OWNER_ROLE)) <= 1) {
+      // Never demote the last owner away from owner — keep the instance failsafe.
+      if (roleName !== OWNER_ROLE) {
+        const guard = await context.database.query({
+          query: `OPTIONAL MATCH (target:User {id: $userId})-[:HAS_ROLE]->(targetOwner:Role {id: 'owner'})
+                  OPTIONAL MATCH (o:User)-[:HAS_ROLE]->(:Role {id: 'owner'})
+                  RETURN count(DISTINCT targetOwner) AS isOwner, count(DISTINCT o) AS ownerCount`,
+          variables: { userId },
+        })
+        const row = guard.records[0]
+        const targetIsOwner = Number(row?.get('isOwner') ?? 0) > 0
+        const ownerCount = Number(row?.get('ownerCount') ?? 0)
+        if (targetIsOwner && ownerCount <= 1) {
           throw new ForbiddenError('Cannot remove the last owner.')
         }
       }
+      // Replace the single edge and keep the legacy `user.role` tier in sync (for
+      // the not-yet-migrated frontend isAdmin/isModerator gating): owner/admin →
+      // 'admin', moderator → 'moderator', any other role → 'user'.
       const result = await context.database.write({
         query: `MATCH (u:User {id: $userId})
-                OPTIONAL MATCH (u)-[h:HAS_ROLE]->(:Role {id: $roleName})
-                DELETE h
-                ${SYNC_LEGACY_ROLE}
+                MATCH (r:Role {id: $roleName})
+                OPTIONAL MATCH (u)-[old:HAS_ROLE]->(:Role)
+                DELETE old
+                WITH u, r
+                MERGE (u)-[:HAS_ROLE]->(r)
+                SET u.role = CASE
+                  WHEN r.name IN ['owner', 'admin'] THEN 'admin'
+                  WHEN r.name = 'moderator' THEN 'moderator'
+                  ELSE 'user'
+                END
                 RETURN u {.*} AS user`,
         variables: { userId, roleName },
       })
@@ -204,15 +190,15 @@ export default {
   },
 
   User: {
-    // Dynamic role names for a user (HAS_ROLE edges). Gated by role.manage in the
-    // shield. The baseline 'user' is implicit and not stored as an edge, so it
-    // never appears here.
-    roleNames: async (parent: { id: string }, _args: unknown, context: Context) => {
+    // The user's single role name. Source of truth is the HAS_ROLE edge; falls
+    // back to the legacy `role` tier and then the baseline so an edgeless user
+    // (e.g. a fresh signup) still reports its effective role. Gated by role.manage.
+    roleName: async (parent: { id: string; role?: string }, _args: unknown, context: Context) => {
       const result = await context.database.query({
-        query: `MATCH (:User {id: $id})-[:HAS_ROLE]->(r:Role) RETURN r.name AS name ORDER BY r.rank DESC, r.name ASC`,
+        query: `MATCH (:User {id: $id})-[:HAS_ROLE]->(r:Role) RETURN r.name AS name ORDER BY r.rank DESC LIMIT 1`,
         variables: { id: parent.id },
       })
-      return result.records.map((record) => record.get('name') as string)
+      return (result.records[0]?.get('name') as string | undefined) ?? parent.role ?? 'user'
     },
   },
 }

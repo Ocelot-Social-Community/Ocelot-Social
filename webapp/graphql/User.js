@@ -83,7 +83,7 @@ export const adminUserQuery = () => {
         slug
         email
         role
-        roleNames
+        roleName
         createdAt
         contributionsCount
         commentedCount

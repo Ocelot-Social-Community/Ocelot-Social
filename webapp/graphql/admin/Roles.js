@@ -88,18 +88,12 @@ export const deleteRoleMutation = gql`
   }
 `
 
-export const assignRoleMutation = gql`
+export const setUserRoleMutation = gql`
   mutation ($userId: ID!, $roleName: String!) {
-    assignRole(userId: $userId, roleName: $roleName) {
+    setUserRole(userId: $userId, roleName: $roleName) {
       id
-    }
-  }
-`
-
-export const unassignRoleMutation = gql`
-  mutation ($userId: ID!, $roleName: String!) {
-    unassignRole(userId: $userId, roleName: $roleName) {
-      id
+      role
+      roleName
     }
   }
 `

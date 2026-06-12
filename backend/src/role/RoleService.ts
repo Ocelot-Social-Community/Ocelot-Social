@@ -4,8 +4,8 @@
 //   • init() seeds the default roles (ON CREATE, edit-respecting), populates the
 //     in-memory cache, and (if a pubsub is provided) subscribes to
 //     ROLE_CHANGED_CHANNEL so other backend instances stay in sync.
-//   • permissionsForRoles() is the hot path the request context uses to resolve a
-//     user's base permission set (owner ⇒ full catalog; otherwise the union).
+//   • permissionsForRole() is the hot path the request context uses to resolve a
+//     user's permission set from their single role (owner ⇒ full catalog).
 //   • upsertRole() / deleteRole() persist, update the cache, and publish a change.
 //
 // Multi-instance: eventual consistency via Redis pub/sub; same-name concurrent
@@ -74,21 +74,17 @@ export class RoleService {
     }
   }
 
-  // The BASE permission set for a set of role names: the request context applies
-  // masks (view-as, OAuth scopes) on top. `owner` is the protected superuser and
-  // EXPANDS to the full catalog here (expand-then-mask) — never an unconditional
-  // bypass, so a scoped token / view-as preview can still narrow it downstream.
-  permissionsForRoles(roleNames: readonly string[]): Set<PermissionKey> {
-    if (roleNames.includes(OWNER_ROLE)) {
+  // The permission set for a user's single role (SINGLE-ROLE model — no union).
+  // `owner` EXPANDS to the full catalog (expand-then-mask — never an unconditional
+  // bypass, so a scoped token / view-as preview can still narrow it downstream).
+  // An unknown role (e.g. a stale edge) falls back to the baseline so a user is
+  // never left permission-less.
+  permissionsForRole(roleName: string): Set<PermissionKey> {
+    if (roleName === OWNER_ROLE) {
       return new Set(allPermissionKeys())
     }
-    const out = new Set<PermissionKey>()
-    for (const name of roleNames) {
-      const def = this.cache.get(name)
-      if (!def) continue
-      for (const permission of def.permissions) out.add(permission)
-    }
-    return out
+    const def = this.cache.get(roleName) ?? this.cache.get(USER_ROLE)
+    return new Set(def?.permissions ?? [])
   }
 
   getRole(name: string): RoleDefinition | undefined {
@@ -138,11 +134,19 @@ export class RoleService {
     if (existing.protected) {
       throw new RoleValidationError(`Role '${name}' is protected and cannot be deleted.`)
     }
-    // The baseline role is implicit for every authenticated user (Variante A);
-    // deleting it would strip every member's baseline permissions. It stays
-    // editable (an admin can change the baseline) but not deletable.
+    // The baseline role is the default for new users; deleting it would leave
+    // signups without a role. It stays editable but not deletable.
     if (name === USER_ROLE) {
-      throw new RoleValidationError(`Role '${USER_ROLE}' is the baseline role and cannot be deleted.`)
+      throw new RoleValidationError(
+        `Role '${USER_ROLE}' is the baseline role and cannot be deleted.`,
+      )
+    }
+    // A role currently assigned to users cannot be deleted (would orphan them).
+    const members = await this.countMembers(name)
+    if (members > 0) {
+      throw new RoleValidationError(
+        `Role '${name}' is assigned to ${String(members)} user(s) and cannot be deleted.`,
+      )
     }
 
     await dbDeleteRole(this.db, name)
@@ -153,6 +157,15 @@ export class RoleService {
       actor,
       timestamp: new Date().toISOString(),
     })
+  }
+
+  // Number of users currently assigned this role (HAS_ROLE edges).
+  private async countMembers(name: string): Promise<number> {
+    const result = await this.db.query({
+      query: `MATCH (:User)-[:HAS_ROLE]->(:Role {id: $name}) RETURN count(*) AS count`,
+      variables: { name },
+    })
+    return Number(result.records[0]?.get('count') ?? 0)
   }
 
   // Apply a change broadcast by any instance (including our own echo). Idempotent.

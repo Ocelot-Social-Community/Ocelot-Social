@@ -32,15 +32,26 @@ describe('DEFAULT_ROLES', () => {
     }
   })
 
-  it('keeps the additive model: admin can also moderate', () => {
-    const admin = DEFAULT_ROLES.find((role) => role.name === ADMIN_ROLE)
-    expect(admin?.permissions).toContain('content.moderate')
-  })
+  const BASELINE = ['post.create', 'group.create', 'group.create_hidden', 'user.invite']
 
   it('gives the user baseline the everyday capabilities', () => {
     const user = DEFAULT_ROLES.find((role) => role.name === USER_ROLE)
-    expect(user?.permissions).toEqual(
-      expect.arrayContaining(['post.create', 'group.create', 'group.create_hidden', 'user.invite']),
+    expect(user?.permissions).toEqual(expect.arrayContaining(BASELINE))
+  })
+
+  // Single-role model: each role's permission set is self-contained, so the
+  // higher roles include the baseline rather than relying on a union.
+  it('makes moderator self-contained (baseline + content.moderate)', () => {
+    const moderator = DEFAULT_ROLES.find((role) => role.name === MODERATOR_ROLE)
+    expect(moderator?.permissions).toEqual(
+      expect.arrayContaining([...BASELINE, 'content.moderate']),
+    )
+  })
+
+  it('makes admin self-contained (baseline + moderation + admin extras)', () => {
+    const admin = DEFAULT_ROLES.find((role) => role.name === ADMIN_ROLE)
+    expect(admin?.permissions).toEqual(
+      expect.arrayContaining([...BASELINE, 'content.moderate', 'role.manage', 'policy.manage']),
     )
   })
 })

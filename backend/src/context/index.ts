@@ -4,7 +4,7 @@ import CONFIG from '@src/config'
 import { decode } from '@src/jwt/decode'
 import ocelotLogger from '@src/logger'
 import { getPolicyService } from '@src/policy'
-import { effectiveRoleNames, getRoleService } from '@src/role'
+import { effectiveRoleName, getRoleService } from '@src/role'
 
 import type { DecodedUser } from '@src/jwt/decode'
 import type { PermissionKey } from '@src/permission'
@@ -41,11 +41,11 @@ export const getContext =
       authenticatedUser === null
         ? null
         : (authenticatedUser ?? (await decode({ driver, config })(req.headers.authorization)))
-    // The per-request BASE effective permission set, resolved once from the user's
-    // roles (owner ⇒ full catalog). The seam for masks (view-as, OAuth scopes)
-    // that will intersect this set later. Anonymous viewers hold no permissions.
+    // The per-request effective permission set, resolved once from the user's
+    // single role (owner ⇒ full catalog). The seam for masks (view-as, OAuth
+    // scopes) that will intersect this set later. Anonymous viewers hold none.
     const effectivePermissions: Set<PermissionKey> = user
-      ? role.permissionsForRoles(effectiveRoleNames(user))
+      ? role.permissionsForRole(effectiveRoleName(user))
       : new Set<PermissionKey>()
     const result = {
       database,

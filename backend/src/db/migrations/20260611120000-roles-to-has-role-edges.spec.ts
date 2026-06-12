@@ -3,7 +3,7 @@
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver } from '@db/neo4j'
-import { effectiveRoleNames } from '@src/role'
+import { effectiveRoleName } from '@src/role'
 
 import { down, up } from './20260611120000-roles-to-has-role-edges'
 
@@ -74,9 +74,9 @@ describe('migration: roles-to-has-role-edges', () => {
         { id: 'member-id', legacy: 'user' },
       ]
       for (const { id, legacy } of cases) {
-        const viaEdges = effectiveRoleNames({ roles: await rolesOf(id) })
-        const viaLegacy = effectiveRoleNames({ role: legacy })
-        expect(viaEdges.sort()).toEqual(viaLegacy.sort())
+        const viaEdges = effectiveRoleName({ roles: await rolesOf(id) })
+        const viaLegacy = effectiveRoleName({ role: legacy })
+        expect(viaEdges).toEqual(viaLegacy)
       }
     })
 

@@ -45,8 +45,8 @@ type User {
   deleted: Boolean
   disabled: Boolean
   role: UserRole!
-  "Dynamic role names assigned via HAS_ROLE (role.manage). The baseline 'user' is implicit and not listed."
-  roleNames: [String!]!
+  "The user's single dynamic role name (HAS_ROLE), incl. custom roles (role.manage). The legacy `role` enum above mirrors its tier."
+  roleName: String
   publicKey: String
   invitedBy: User @relation(name: "INVITED", direction: "IN")
   invited: [User] @relation(name: "INVITED", direction: "OUT")
