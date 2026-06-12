@@ -2790,6 +2790,7 @@ describe('in mode', () => {
                 query: groupMembersQuery,
                 variables: {
                   id: groupId,
+                  includePending: true,
                 },
               })
               return result.data?.GroupMembers
