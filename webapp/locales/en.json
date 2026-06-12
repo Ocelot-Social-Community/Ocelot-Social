@@ -199,6 +199,7 @@
     "roles": {
       "allPermissions": "Holds every permission (protected).",
       "cannotDelete": "This role cannot be deleted.",
+      "cannotDeleteHasMembers": "This role still has members — reassign them before deleting it.",
       "create": "Create role",
       "createTitle": "Create a new role",
       "delete": "Delete",

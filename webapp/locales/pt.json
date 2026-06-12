@@ -199,6 +199,7 @@
     "roles": {
       "allPermissions": "Detém todas as permissões (protegida).",
       "cannotDelete": "Esta função não pode ser excluída.",
+      "cannotDeleteHasMembers": "Esta função ainda tem membros — reatribua-os antes de a eliminar.",
       "create": "Criar função",
       "createTitle": "Criar uma nova função",
       "delete": "Eliminar",

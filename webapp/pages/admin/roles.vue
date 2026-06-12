@@ -296,8 +296,12 @@ export default {
       )
     },
     canDelete(role) {
-      // Protected (owner) and the implicit baseline (user) cannot be deleted.
-      return !role.protected && role.name !== 'user'
+      // Protected (owner) and the implicit baseline (user) cannot be deleted, and a
+      // role with members would orphan them — reassign first (enforced by the backend).
+      return !role.protected && role.name !== 'user' && (role.memberCount || 0) === 0
+    },
+    hasMembers(role) {
+      return (role.memberCount || 0) > 0
     },
     saveDisabled(role) {
       // Protected roles are read-only; otherwise save only when there are changes.
@@ -307,7 +311,13 @@ export default {
       return role.protected ? this.$t('admin.roles.protectedHint') : ''
     },
     deleteHint(role) {
-      return this.canDelete(role) ? '' : this.$t('admin.roles.cannotDelete')
+      if (this.canDelete(role)) return ''
+      // A role that is only undeletable because it still has members gets the
+      // specific "reassign first" hint.
+      if (!role.protected && role.name !== 'user' && this.hasMembers(role)) {
+        return this.$t('admin.roles.cannotDeleteHasMembers')
+      }
+      return this.$t('admin.roles.cannotDelete')
     },
     async saveRole(role) {
       const form = this.forms[role.name]

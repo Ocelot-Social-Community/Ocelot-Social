@@ -199,6 +199,7 @@
     "roles": {
       "allPermissions": "Hält alle Berechtigungen (geschützt).",
       "cannotDelete": "Diese Rolle kann nicht gelöscht werden.",
+      "cannotDeleteHasMembers": "Diese Rolle hat noch Mitglieder — weise ihnen erst eine andere Rolle zu.",
       "create": "Rolle erstellen",
       "createTitle": "Neue Rolle erstellen",
       "delete": "Löschen",

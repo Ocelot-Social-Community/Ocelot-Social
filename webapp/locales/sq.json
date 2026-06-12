@@ -199,6 +199,7 @@
     "roles": {
       "allPermissions": "Ka të gjitha lejet (i mbrojtur).",
       "cannotDelete": "Ky rol nuk mund të fshihet.",
+      "cannotDeleteHasMembers": "Ky rol ka ende anëtarë — caktojuni një rol tjetër para se ta fshini.",
       "create": "Krijo rol",
       "createTitle": "Krijo një rol të ri",
       "delete": "Fshi",

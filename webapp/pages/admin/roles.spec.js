@@ -129,11 +129,20 @@ describe('admin/roles.vue', () => {
     })
   })
 
-  it('only allows deleting non-protected, non-baseline roles', () => {
+  it('only allows deleting non-protected, non-baseline roles without members', () => {
     const wrapper = Wrapper()
     expect(wrapper.vm.canDelete(roles[0])).toBe(false) // owner (protected)
     expect(wrapper.vm.canDelete(roles[2])).toBe(false) // user (baseline)
-    expect(wrapper.vm.canDelete(roles[1])).toBe(true) // badge-setter
+    expect(wrapper.vm.canDelete(roles[1])).toBe(false) // badge-setter still has 2 members
+    expect(wrapper.vm.canDelete({ name: 'empty', protected: false, memberCount: 0 })).toBe(true)
+  })
+
+  it('hints to reassign members before a role with members can be deleted', () => {
+    const wrapper = Wrapper()
+    // badge-setter has members → undeletable with the "reassign first" hint
+    expect(wrapper.vm.deleteHint(roles[1])).toBe('admin.roles.cannotDeleteHasMembers')
+    // an empty custom role is deletable → no hint
+    expect(wrapper.vm.deleteHint({ name: 'empty', protected: false, memberCount: 0 })).toBe('')
   })
 
   it('tracks dirtiness when a permission is toggled', () => {

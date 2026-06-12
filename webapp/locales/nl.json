@@ -199,6 +199,7 @@
     "roles": {
       "allPermissions": "Heeft alle rechten (beschermd).",
       "cannotDelete": "Deze rol kan niet worden verwijderd.",
+      "cannotDeleteHasMembers": "Deze rol heeft nog leden — wijs ze eerst een andere rol toe.",
       "create": "Rol aanmaken",
       "createTitle": "Een nieuwe rol aanmaken",
       "delete": "Verwijderen",

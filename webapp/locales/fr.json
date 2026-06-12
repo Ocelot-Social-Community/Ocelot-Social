@@ -199,6 +199,7 @@
     "roles": {
       "allPermissions": "Détient toutes les permissions (protégé).",
       "cannotDelete": "Ce rôle ne peut pas être supprimé.",
+      "cannotDeleteHasMembers": "Ce rôle a encore des membres — réattribuez-les avant de le supprimer.",
       "create": "Créer un rôle",
       "createTitle": "Créer un nouveau rôle",
       "delete": "Supprimer",

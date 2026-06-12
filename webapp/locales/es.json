@@ -199,6 +199,7 @@
     "roles": {
       "allPermissions": "Tiene todos los permisos (protegido).",
       "cannotDelete": "Este rol no se puede eliminar.",
+      "cannotDeleteHasMembers": "Este rol todavía tiene miembros: reasígnalos antes de eliminarlo.",
       "create": "Crear rol",
       "createTitle": "Crear un nuevo rol",
       "delete": "Eliminar",
