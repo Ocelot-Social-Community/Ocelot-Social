@@ -98,6 +98,29 @@ describe('admin/roles.vue', () => {
     expect(checkbox.attributes('disabled')).toBeDefined()
   })
 
+  it('rebuilds the owner form once the catalog loads after the roles', async () => {
+    // roles arrive before the permission catalog: forms are built against an empty
+    // catalog first → owner would have no checked permissions until a rebuild.
+    const wrapper = mount(Roles, {
+      localVue,
+      mocks: {
+        $t: jest.fn((key) => key),
+        $te: jest.fn(() => false),
+        $toast: { error: jest.fn(), success: jest.fn() },
+        $apollo: { mutate: jest.fn(), queries: { roles: { refetch: jest.fn() } } },
+      },
+      stubs,
+      data: () => ({ roles, permissionCatalog: [] }),
+    })
+    wrapper.vm.buildForms()
+    expect(Object.keys(wrapper.vm.forms.owner.permissions)).toHaveLength(0)
+    // catalog arrives → its result() handler rebuilds the forms
+    wrapper.setData({ permissionCatalog })
+    wrapper.vm.buildForms()
+    expect(Object.values(wrapper.vm.forms.owner.permissions).every(Boolean)).toBe(true)
+    expect(Object.keys(wrapper.vm.forms.owner.permissions).length).toBeGreaterThan(0)
+  })
+
   it('localizes group + permission labels, falling back to the catalog description', () => {
     const wrapper = Wrapper()
     const perm = { key: 'badge.manage', description: 'Grant badges' }
