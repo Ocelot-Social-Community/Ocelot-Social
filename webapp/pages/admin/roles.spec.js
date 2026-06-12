@@ -15,11 +15,10 @@ const permissionCatalog = [
 ]
 
 const roles = [
-  { name: 'owner', description: 'o', rank: 100, protected: true, permissions: [], memberCount: 1 },
+  { name: 'owner', description: 'o', protected: true, permissions: [], memberCount: 1 },
   {
     name: 'badge-setter',
     description: '',
-    rank: 15,
     protected: false,
     permissions: ['badge.manage'],
     memberCount: 2,
@@ -27,7 +26,6 @@ const roles = [
   {
     name: 'user',
     description: 'baseline',
-    rank: 10,
     protected: false,
     permissions: ['post.create'],
     memberCount: 5,
@@ -94,7 +92,6 @@ describe('admin/roles.vue', () => {
       expect.objectContaining({
         variables: expect.objectContaining({
           name: 'badge-setter',
-          rank: 15,
           permissions: expect.arrayContaining(['badge.manage', 'post.create']),
         }),
       }),
@@ -115,7 +112,6 @@ describe('admin/roles.vue', () => {
       newRole: {
         name: 'event-org',
         description: 'Organizers',
-        rank: 20,
         permissions: { 'badge.manage': false, 'post.create': true },
       },
     })
@@ -125,7 +121,6 @@ describe('admin/roles.vue', () => {
         variables: {
           name: 'event-org',
           description: 'Organizers',
-          rank: 20,
           permissions: ['post.create'],
         },
       }),

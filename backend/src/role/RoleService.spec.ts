@@ -45,7 +45,7 @@ describe('RoleService', () => {
   describe('allRoles / getRole', () => {
     const svc = createInMemoryRoleService()
 
-    it('returns roles ranked high → low', () => {
+    it('returns roles broadest-first (owner, then by permission count)', () => {
       const names = svc.allRoles().map((role) => role.name)
       expect(names).toEqual([OWNER_ROLE, ADMIN_ROLE, MODERATOR_ROLE, USER_ROLE])
     })
@@ -65,7 +65,6 @@ describe('RoleService', () => {
         definition: {
           name: 'editor',
           description: null,
-          rank: 20,
           protected: false,
           permissions: ['post.create', 'ghost.permission'] as never,
         },
@@ -94,7 +93,7 @@ describe('RoleService', () => {
     it('refuses to edit a protected role', async () => {
       await expect(
         svc.upsertRole(
-          { name: OWNER_ROLE, description: null, rank: 1, protected: false, permissions: [] },
+          { name: OWNER_ROLE, description: null, protected: false, permissions: [] },
           'u1',
         ),
       ).rejects.toBeInstanceOf(RoleValidationError)
@@ -102,10 +101,7 @@ describe('RoleService', () => {
 
     it('refuses to create a role flagged protected', async () => {
       await expect(
-        svc.upsertRole(
-          { name: 'evil', description: null, rank: 1, protected: true, permissions: [] },
-          'u1',
-        ),
+        svc.upsertRole({ name: 'evil', description: null, protected: true, permissions: [] }, 'u1'),
       ).rejects.toBeInstanceOf(RoleValidationError)
     })
 
@@ -155,7 +151,6 @@ describe('RoleService', () => {
         {
           name: 'badge-setter',
           description: 'Can grant badges',
-          rank: 15,
           protected: false,
           permissions: ['badge.manage', 'ghost.permission'],
         },
@@ -178,7 +173,7 @@ describe('RoleService', () => {
       const { svc, published, fakePubsub } = makeService()
       await svc.init(fakePubsub)
       await svc.upsertRole(
-        { name: 'temp', description: null, rank: 1, protected: false, permissions: [] },
+        { name: 'temp', description: null, protected: false, permissions: [] },
         'admin-1',
       )
 

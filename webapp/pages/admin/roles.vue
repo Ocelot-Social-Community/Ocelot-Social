@@ -29,10 +29,6 @@
               :data-test="`role-${role.name}-description`"
             />
           </label>
-          <label class="role__field role__field--rank">
-            <span>{{ $t('admin.roles.rank') }}</span>
-            <input type="number" step="1" v-model.number="forms[role.name].rank" />
-          </label>
         </div>
 
         <fieldset v-for="group in permissionGroups" :key="group.name" class="perm-group">
@@ -86,10 +82,6 @@
           <span>{{ $t('admin.roles.descriptionLabel') }}</span>
           <input type="text" v-model="newRole.description" />
         </label>
-        <label class="role__field role__field--rank">
-          <span>{{ $t('admin.roles.rank') }}</span>
-          <input type="number" step="1" v-model.number="newRole.rank" />
-        </label>
       </div>
 
       <fieldset v-for="group in permissionGroups" :key="group.name" class="perm-group">
@@ -140,7 +132,7 @@ export default {
       permissionCatalog: [],
       // Editable drafts keyed by role name, rebuilt whenever roles load.
       forms: {},
-      newRole: { name: '', description: '', rank: 10, permissions: {} },
+      newRole: { name: '', description: '', permissions: {} },
       saving: false,
     }
   },
@@ -180,7 +172,6 @@ export default {
         for (const key of role.permissions) permissions[key] = true
         forms[role.name] = {
           description: role.description || '',
-          rank: role.rank,
           permissions,
         }
       }
@@ -196,7 +187,6 @@ export default {
       const original = [...role.permissions].sort()
       return (
         form.description !== (role.description || '') ||
-        form.rank !== role.rank ||
         selected.length !== original.length ||
         selected.some((key, index) => key !== original[index])
       )
@@ -214,7 +204,6 @@ export default {
           variables: {
             name: role.name,
             description: form.description || null,
-            rank: form.rank,
             permissions: this.selectedPermissions(form.permissions),
           },
         })
@@ -249,7 +238,6 @@ export default {
           variables: {
             name: this.newRole.name,
             description: this.newRole.description || null,
-            rank: this.newRole.rank,
             permissions: this.selectedPermissions(this.newRole.permissions),
           },
         })
@@ -257,7 +245,6 @@ export default {
         this.newRole = {
           name: '',
           description: '',
-          rank: 10,
           permissions: emptyPermissionMap(this.permissionCatalog),
         }
         this.$toast.success(this.$t('admin.roles.saveSuccess'))
@@ -322,10 +309,6 @@ export default {
     display: flex;
     flex-direction: column;
     font-size: 0.85em;
-
-    &--rank {
-      max-width: 6em;
-    }
   }
   &__actions {
     margin-top: $space-x-small;

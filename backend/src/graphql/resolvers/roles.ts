@@ -12,7 +12,6 @@ const ROLE_NAME_RE = /^[a-z0-9][a-z0-9_-]{1,49}$/i
 const toGraphqlRole = (def: RoleDefinition, memberCount: number | null = null) => ({
   name: def.name,
   description: def.description,
-  rank: def.rank,
   protected: def.protected,
   permissions: def.permissions,
   memberCount,
@@ -71,7 +70,7 @@ export default {
   Mutation: {
     createRole: async (
       _parent: unknown,
-      args: { name: string; description?: string | null; rank: number; permissions: string[] },
+      args: { name: string; description?: string | null; permissions: string[] },
       context: Context,
     ) => {
       if (!ROLE_NAME_RE.test(args.name)) {
@@ -85,7 +84,6 @@ export default {
           {
             name: args.name,
             description: args.description ?? null,
-            rank: args.rank,
             protected: false,
             permissions: args.permissions,
           },
@@ -101,7 +99,7 @@ export default {
 
     updateRole: async (
       _parent: unknown,
-      args: { name: string; description?: string | null; rank: number; permissions: string[] },
+      args: { name: string; description?: string | null; permissions: string[] },
       context: Context,
     ) => {
       if (!context.role.getRole(args.name)) {
@@ -112,7 +110,6 @@ export default {
           {
             name: args.name,
             description: args.description ?? null,
-            rank: args.rank,
             protected: false,
             permissions: args.permissions,
           },
@@ -195,7 +192,7 @@ export default {
     // (e.g. a fresh signup) still reports its effective role. Gated by role.manage.
     roleName: async (parent: { id: string; role?: string }, _args: unknown, context: Context) => {
       const result = await context.database.query({
-        query: `MATCH (:User {id: $id})-[:HAS_ROLE]->(r:Role) RETURN r.name AS name ORDER BY r.rank DESC LIMIT 1`,
+        query: `MATCH (:User {id: $id})-[:HAS_ROLE]->(r:Role) RETURN r.name AS name ORDER BY r.name ASC LIMIT 1`,
         variables: { id: parent.id },
       })
       return (result.records[0]?.get('name') as string | undefined) ?? parent.role ?? 'user'

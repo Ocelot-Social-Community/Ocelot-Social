@@ -6,11 +6,8 @@ import type { PermissionKey } from '@src/permission'
 export interface RoleDefinition {
   name: string
   description: string | null
-  // Display-only ranking: which badge a multi-role user shows. NO effect on
-  // authorization (permissions are a flat union, not a rank).
-  rank: number
   // Protected roles (only `owner`) cannot be edited or deleted, and `owner`
-  // additionally resolves to the full catalog (see RoleService.permissionsForRoles).
+  // additionally resolves to the full catalog (see RoleService.permissionsForRole).
   protected: boolean
   permissions: PermissionKey[]
 }

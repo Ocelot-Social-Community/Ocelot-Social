@@ -17,13 +17,12 @@ export async function up(_next) {
     for (const role of DEFAULT_ROLES) {
       await transaction.run(
         `MERGE (r:Role {id: $name})
-         ON CREATE SET r.name = $name, r.description = $description, r.rank = $rank,
+         ON CREATE SET r.name = $name, r.description = $description,
                        r.protected = $protected, r.permissions = $permissions,
                        r.createdAt = $now, r.updatedAt = $now`,
         {
           name: role.name,
           description: role.description,
-          rank: role.rank,
           protected: role.protected,
           permissions: JSON.stringify(role.permissions),
           now,
@@ -41,11 +40,13 @@ export async function up(_next) {
        MERGE (u)-[:HAS_ROLE]->(r)`,
     )
 
-    // 2. Collapse any user with multiple edges to a single one — keep the
-    //    highest-rank role, delete the rest.
+    // 2. Collapse any user with multiple edges to a single one. Defensive
+    //    (single-role forbids >1 edge going forward); keeps a deterministic role —
+    //    owner if present (never silently demote an owner), otherwise the
+    //    alphabetically first — and deletes the rest.
     await transaction.run(
       `MATCH (u:User)-[h:HAS_ROLE]->(r:Role)
-       WITH u, h, r ORDER BY r.rank DESC
+       WITH u, h, r ORDER BY CASE WHEN r.name = 'owner' THEN 0 ELSE 1 END ASC, r.name ASC
        WITH u, collect(h) AS rels
        WHERE size(rels) > 1
        FOREACH (rel IN rels[1..] | DELETE rel)`,

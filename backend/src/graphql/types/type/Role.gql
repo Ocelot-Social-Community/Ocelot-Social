@@ -11,7 +11,6 @@ type Permission {
 type Role {
   name: String!
   description: String
-  rank: Int!
   protected: Boolean!
   permissions: [String!]!
   memberCount: Int
@@ -29,8 +28,8 @@ type Query {
 }
 
 type Mutation {
-  createRole(name: String!, description: String, rank: Int!, permissions: [String!]!): Role!
-  updateRole(name: String!, description: String, rank: Int!, permissions: [String!]!): Role!
+  createRole(name: String!, description: String, permissions: [String!]!): Role!
+  updateRole(name: String!, description: String, permissions: [String!]!): Role!
   deleteRole(name: String!): String!
   "Set a user's single role (replaces their current role)."
   setUserRole(userId: ID!, roleName: String!): User!

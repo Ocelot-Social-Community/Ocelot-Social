@@ -53,12 +53,12 @@ describe('migration: single-role-edges', () => {
       { id: 'multi-id', role: 'moderator' },
       { email: 'x@e.org', password: '1' },
     )
-    // Role nodes (with ranks, so dedup can order) + a user with TWO edges.
+    // Role nodes + a user with TWO edges (to exercise the dedup collapse).
     await run(`
-      MERGE (:Role {id: 'owner', name: 'owner', rank: 100})
-      MERGE (:Role {id: 'admin', name: 'admin', rank: 80})
-      MERGE (:Role {id: 'moderator', name: 'moderator', rank: 50})
-      MERGE (:Role {id: 'user', name: 'user', rank: 10})
+      MERGE (:Role {id: 'owner', name: 'owner'})
+      MERGE (:Role {id: 'admin', name: 'admin'})
+      MERGE (:Role {id: 'moderator', name: 'moderator'})
+      MERGE (:Role {id: 'user', name: 'user'})
     `)
     await run(`
       MATCH (u:User {id: 'multi-id'}), (a:Role {id: 'admin'}), (m:Role {id: 'moderator'})
@@ -79,9 +79,10 @@ describe('migration: single-role-edges', () => {
     expect(await rolesOf('member-id')).toEqual(['user']) // baseline gets an explicit edge
   })
 
-  it('collapses multiple edges to the highest-rank role', async () => {
+  it('collapses multiple edges to a single deterministic role', async () => {
     await up(noop)
-    expect(await rolesOf('multi-id')).toEqual(['admin']) // admin (80) over moderator (50)
+    // owner-first then alphabetical → admin wins over moderator
+    expect(await rolesOf('multi-id')).toEqual(['admin'])
   })
 
   it('syncs the legacy user.role tier', async () => {

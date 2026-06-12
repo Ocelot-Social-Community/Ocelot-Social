@@ -13,27 +13,25 @@ type DbContext = ReturnType<typeof databaseContext>
 interface RawRoleRow {
   name: string
   description: string | null
-  rank: number
   protected: boolean
   permissions: string
 }
 
 // Read every stored role, with its permission list sanitised against the catalog
-// (catalog-drift keys are dropped — a removed permission grants nothing).
+// (catalog-drift keys are dropped — a removed permission grants nothing). Final
+// display order is decided in RoleService.allRoles (by permission breadth).
 export async function readAllRoles(db: DbContext): Promise<RoleDefinition[]> {
   const result = await db.query({
     query: `MATCH (r:Role)
             RETURN r.name AS name, r.description AS description,
-                   r.rank AS rank, r.protected AS protected, r.permissions AS permissions
-            ORDER BY r.rank DESC, r.name ASC`,
+                   r.protected AS protected, r.permissions AS permissions
+            ORDER BY r.name ASC`,
   })
 
   return result.records.map((record) => {
     const row = {
       name: record.get('name') as string,
       description: record.get('description') as string | null,
-      // neode stores ints as JS numbers via the driver; coerce defensively.
-      rank: Number(record.get('rank') ?? 0),
       protected: Boolean(record.get('protected')),
       permissions: (record.get('permissions') as string | null) ?? '[]',
     } satisfies RawRoleRow
@@ -48,7 +46,6 @@ export async function readAllRoles(db: DbContext): Promise<RoleDefinition[]> {
     return {
       name: row.name,
       description: row.description,
-      rank: row.rank,
       protected: row.protected,
       permissions: sanitizePermissions(Array.isArray(parsed) ? (parsed as string[]) : []),
     }
@@ -62,7 +59,6 @@ export async function seedRole(db: DbContext, role: RoleDefinition, now: string)
     query: `MERGE (r:Role {id: $name})
             ON CREATE SET r.name = $name,
                           r.description = $description,
-                          r.rank = $rank,
                           r.protected = $protected,
                           r.permissions = $permissions,
                           r.createdAt = $now,
@@ -70,7 +66,6 @@ export async function seedRole(db: DbContext, role: RoleDefinition, now: string)
     variables: {
       name: role.name,
       description: role.description,
-      rank: role.rank,
       protected: role.protected,
       permissions: JSON.stringify(role.permissions),
       now,
@@ -90,7 +85,6 @@ export async function writeRole(
             ON CREATE SET r.createdAt = $now
             SET r.name = $name,
                 r.description = $description,
-                r.rank = $rank,
                 r.protected = $protected,
                 r.permissions = $permissions,
                 r.updatedAt = $now,
@@ -98,7 +92,6 @@ export async function writeRole(
     variables: {
       name: role.name,
       description: role.description,
-      rank: role.rank,
       protected: role.protected,
       permissions: JSON.stringify(role.permissions),
       actor,

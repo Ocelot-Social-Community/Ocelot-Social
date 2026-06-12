@@ -91,9 +91,15 @@ export class RoleService {
     return this.cache.get(name)
   }
 
-  // All role definitions, ranked high → low for stable display.
+  // All role definitions in display order: broadest first. `owner` (the full
+  // catalog) on top, then by how many permissions the role grants, ties broken
+  // alphabetically. Derived from the role data — there is no ordering field.
   allRoles(): RoleDefinition[] {
-    return [...this.cache.values()].sort((a, b) => b.rank - a.rank || a.name.localeCompare(b.name))
+    const breadth = (role: RoleDefinition) =>
+      role.name === OWNER_ROLE ? Number.POSITIVE_INFINITY : role.permissions.length
+    return [...this.cache.values()].sort(
+      (a, b) => breadth(b) - breadth(a) || a.name.localeCompare(b.name),
+    )
   }
 
   // Create or update a role. Protected roles (owner) are immutable; a non-protected
@@ -114,7 +120,6 @@ export class RoleService {
     const definition: RoleDefinition = {
       name: input.name,
       description: input.description,
-      rank: input.rank,
       protected: false,
       permissions: sanitizePermissions(input.permissions),
     }

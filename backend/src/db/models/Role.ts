@@ -11,7 +11,6 @@ export default {
   id: { type: 'string', primary: true },
   name: { type: 'string', indexed: true },
   description: { type: 'string', allow: [null] },
-  rank: { type: 'int', default: 0 },
   protected: { type: 'boolean', default: false },
   permissions: { type: 'string', default: '[]' },
   members: {

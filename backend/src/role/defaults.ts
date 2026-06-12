@@ -28,14 +28,12 @@ export const DEFAULT_ROLES: RoleDefinition[] = [
     name: OWNER_ROLE,
     description:
       'Instance owner — protected superuser with every permission. Cannot be locked out.',
-    rank: 100,
     protected: true,
     permissions: [],
   },
   {
     name: ADMIN_ROLE,
     description: 'Network administrator.',
-    rank: 80,
     protected: false,
     permissions: [
       ...BASELINE,
@@ -55,14 +53,12 @@ export const DEFAULT_ROLES: RoleDefinition[] = [
   {
     name: MODERATOR_ROLE,
     description: 'Content moderator.',
-    rank: 50,
     protected: false,
     permissions: [...BASELINE, 'content.moderate'],
   },
   {
     name: USER_ROLE,
     description: 'Baseline member — the capabilities a standard user has.',
-    rank: 10,
     protected: false,
     permissions: [...BASELINE],
   },
