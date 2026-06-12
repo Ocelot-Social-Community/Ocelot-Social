@@ -58,6 +58,7 @@ describe('LocationSelect', () => {
         variables: {
           place: 'nowhere',
           lang: 'en',
+          types: 'region,place,country',
         },
         fetchPolicy: 'network-only',
       })
