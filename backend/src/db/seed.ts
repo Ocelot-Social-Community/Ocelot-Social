@@ -164,6 +164,21 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     // eslint-disable-next-line no-console
     console.log('seed', 'users')
+    // Petra Lustig is the instance OWNER — the failsafe superuser (single HAS_ROLE
+    // edge to the owner role). Login: owner@example.org / 1234.
+    await Factory.build(
+      'user',
+      {
+        id: 'u0',
+        name: 'Petra Lustig',
+        slug: 'petra-lustig',
+      },
+      {
+        email: 'owner@example.org',
+        roleName: 'owner',
+        avatar: null,
+      },
+    )
     const peterLustig = await Factory.build(
       'user',
       {
@@ -174,10 +189,9 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         locationName: 'Berlin, Germany',
       },
       {
+        // peterLustig is an admin (admin role via the 'admin' tier selector).
+        // Login: admin@example.org / 1234.
         email: 'admin@example.org',
-        // peterLustig is the instance OWNER — the failsafe superuser. Assigned the
-        // owner role node (its single HAS_ROLE edge) directly at creation.
-        roleName: 'owner',
       },
     )
     const bobDerBaumeister = await Factory.build(

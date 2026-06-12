@@ -156,7 +156,8 @@ Logins for the live demos and developers (local developers after the following i
 | :--- | :--- | :--- |
 | `user@example.org` | 1234 | user |
 | `moderator@example.org` | 1234 | moderator |
-| `admin@example.org` | 1234 | owner |
+| `admin@example.org` | 1234 | admin |
+| `owner@example.org` | 1234 | owner |
 
 #### Docker Installation
 
