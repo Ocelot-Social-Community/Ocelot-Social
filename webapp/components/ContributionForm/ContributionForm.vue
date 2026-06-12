@@ -63,22 +63,19 @@
             <div class="ds-grid event-date-grid">
               <div class="event-grid-item">
                 <!-- <label>Beginn</label> -->
-                <div class="event-grid-item-z-helper">
-                  <date-picker
-                    name="eventStart"
-                    v-model="formData.eventStart"
-                    type="datetime"
-                    value-type="format"
-                    :minute-step="15"
-                    Xformat="DD-MM-YYYY HH:mm"
-                    class="event-grid-item-z-helper"
-                    :placeholder="$t('post.viewEvent.eventStart')"
-                    :disabled-date="notBeforeToday"
-                    :disabled-time="notBeforeNow"
-                    :show-second="false"
-                    @change="changeEventStart($event)"
-                  ></date-picker>
-                </div>
+                <date-picker
+                  name="eventStart"
+                  v-model="formData.eventStart"
+                  type="datetime"
+                  value-type="date"
+                  :minute-step="15"
+                  format="DD.MM.YYYY HH:mm"
+                  :placeholder="$t('post.viewEvent.eventStart')"
+                  :disabled-date="notBeforeToday"
+                  :disabled-time="notBeforeNow"
+                  :show-second="false"
+                  @change="changeEventStart($event)"
+                ></date-picker>
                 <div
                   v-if="formErrors && formErrors.eventStart"
                   class="chipbox event-grid-item-margin-helper"
@@ -99,10 +96,10 @@
                   v-model="formData.eventEnd"
                   name="eventEnd"
                   type="datetime"
-                  value-type="format"
+                  value-type="date"
                   :minute-step="15"
                   :seconds-step="0"
-                  Xformat="DD-MM-YYYY HH:mm"
+                  format="DD.MM.YYYY HH:mm"
                   :placeholder="$t('post.viewEvent.eventEnd')"
                   class="event-grid-item-font-helper"
                   :disabled-date="notBeforeEventDay"
@@ -135,6 +132,7 @@
                   v-model="formData.eventLocationName"
                   types="region,place,country,address"
                   :show-previous-location="false"
+                  :show-label="false"
                   :placeholder="$t('post.viewEvent.eventLocationName')"
                 />
                 <os-badge
@@ -418,8 +416,8 @@ export default {
         imageBlurred,
         imageUpload: null,
         categoryIds: categories ? categories.map((category) => category.id) : [],
-        eventStart: eventStart || null,
-        eventEnd: eventEnd || null,
+        eventStart: eventStart ? new Date(eventStart) : null,
+        eventEnd: eventEnd ? new Date(eventEnd) : null,
         eventLocation: eventLocation || '',
         eventLocationName: eventLocationName || '',
         eventVenue: eventVenue || '',
@@ -489,7 +487,7 @@ export default {
     updateEditorContent(value) {
       this.updateFormField('content', value)
     },
-    changeEventIsOnline(event) {
+    changeEventIsOnline() {
       this.updateFormField('eventIsOnline', this.formData.eventIsOnline)
     },
     changeEventEnd(event) {
@@ -573,9 +571,6 @@ export default {
 
   .event-grid-item {
     grid-row-end: span 3;
-  }
-  .event-grid-item-z-helper {
-    z-index: 20;
   }
   .event-grid-item-margin-helper {
     margin-top: 10px;

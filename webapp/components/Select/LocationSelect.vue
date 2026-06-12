@@ -1,6 +1,6 @@
 <template>
   <div>
-    <label class="ds-input-label">
+    <label v-if="showLabel" class="ds-input-label">
       {{ `${$t('settings.data.labelCity')}` + locationNameLabelAddOnOldName }}
     </label>
     <ocelot-select
@@ -10,7 +10,6 @@
       icon="map-marker"
       :icon-right="null"
       :placeholder="placeholder !== null ? placeholder : $t('settings.data.labelCity') + ' …'"
-      :loading="loadingGeo"
       @input.native="handleCityInput"
     >
       <template v-if="(locationName !== '' && canBeCleared) || loadingGeo" #icon-right>
@@ -64,6 +63,11 @@ export default {
       type: String,
       required: false,
       default: null,
+    },
+    showLabel: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
   },
   async created() {
