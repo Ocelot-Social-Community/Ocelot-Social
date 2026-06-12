@@ -20,17 +20,6 @@
       </template>
 
       <template v-else-if="forms[role.name]">
-        <div class="role__meta">
-          <label class="role__field">
-            <span>{{ $t('admin.roles.descriptionLabel') }}</span>
-            <input
-              type="text"
-              v-model="forms[role.name].description"
-              :data-test="`role-${role.name}-description`"
-            />
-          </label>
-        </div>
-
         <fieldset v-for="group in permissionGroups" :key="group.name" class="perm-group">
           <legend class="perm-group__title">{{ group.name }}</legend>
           <label v-for="permission in group.permissions" :key="permission.key" class="perm-row">
@@ -77,10 +66,6 @@
         <label class="role__field">
           <span>{{ $t('admin.roles.nameLabel') }}</span>
           <input type="text" v-model="newRole.name" data-test="new-role-name" />
-        </label>
-        <label class="role__field">
-          <span>{{ $t('admin.roles.descriptionLabel') }}</span>
-          <input type="text" v-model="newRole.description" />
         </label>
       </div>
 
@@ -132,7 +117,7 @@ export default {
       permissionCatalog: [],
       // Editable drafts keyed by role name, rebuilt whenever roles load.
       forms: {},
-      newRole: { name: '', description: '', permissions: {} },
+      newRole: { name: '', permissions: {} },
       saving: false,
     }
   },
@@ -171,7 +156,6 @@ export default {
         const permissions = emptyPermissionMap(this.permissionCatalog)
         for (const key of role.permissions) permissions[key] = true
         forms[role.name] = {
-          description: role.description || '',
           permissions,
         }
       }
@@ -186,7 +170,6 @@ export default {
       const selected = this.selectedPermissions(form.permissions).sort()
       const original = [...role.permissions].sort()
       return (
-        form.description !== (role.description || '') ||
         selected.length !== original.length ||
         selected.some((key, index) => key !== original[index])
       )
@@ -203,7 +186,6 @@ export default {
           mutation: updateRoleMutation,
           variables: {
             name: role.name,
-            description: form.description || null,
             permissions: this.selectedPermissions(form.permissions),
           },
         })
@@ -237,14 +219,12 @@ export default {
           mutation: createRoleMutation,
           variables: {
             name: this.newRole.name,
-            description: this.newRole.description || null,
             permissions: this.selectedPermissions(this.newRole.permissions),
           },
         })
         await this.$apollo.queries.roles.refetch()
         this.newRole = {
           name: '',
-          description: '',
           permissions: emptyPermissionMap(this.permissionCatalog),
         }
         this.$toast.success(this.$t('admin.roles.saveSuccess'))

@@ -10,7 +10,6 @@
 export default {
   id: { type: 'string', primary: true },
   name: { type: 'string', indexed: true },
-  description: { type: 'string', allow: [null] },
   protected: { type: 'boolean', default: false },
   permissions: { type: 'string', default: '[]' },
   members: {

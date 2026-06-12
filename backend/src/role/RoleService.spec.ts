@@ -64,7 +64,6 @@ describe('RoleService', () => {
         name: 'editor',
         definition: {
           name: 'editor',
-          description: null,
           protected: false,
           permissions: ['post.create', 'ghost.permission'] as never,
         },
@@ -92,16 +91,13 @@ describe('RoleService', () => {
 
     it('refuses to edit a protected role', async () => {
       await expect(
-        svc.upsertRole(
-          { name: OWNER_ROLE, description: null, protected: false, permissions: [] },
-          'u1',
-        ),
+        svc.upsertRole({ name: OWNER_ROLE, protected: false, permissions: [] }, 'u1'),
       ).rejects.toBeInstanceOf(RoleValidationError)
     })
 
     it('refuses to create a role flagged protected', async () => {
       await expect(
-        svc.upsertRole({ name: 'evil', description: null, protected: true, permissions: [] }, 'u1'),
+        svc.upsertRole({ name: 'evil', protected: true, permissions: [] }, 'u1'),
       ).rejects.toBeInstanceOf(RoleValidationError)
     })
 
@@ -150,7 +146,6 @@ describe('RoleService', () => {
       const created = await svc.upsertRole(
         {
           name: 'badge-setter',
-          description: 'Can grant badges',
           protected: false,
           permissions: ['badge.manage', 'ghost.permission'],
         },
@@ -172,10 +167,7 @@ describe('RoleService', () => {
     it('deletes a role and broadcasts a tombstone', async () => {
       const { svc, published, fakePubsub } = makeService()
       await svc.init(fakePubsub)
-      await svc.upsertRole(
-        { name: 'temp', description: null, protected: false, permissions: [] },
-        'admin-1',
-      )
+      await svc.upsertRole({ name: 'temp', protected: false, permissions: [] }, 'admin-1')
 
       await svc.deleteRole('temp', 'admin-1')
 

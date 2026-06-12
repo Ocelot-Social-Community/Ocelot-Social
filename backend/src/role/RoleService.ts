@@ -119,7 +119,6 @@ export class RoleService {
 
     const definition: RoleDefinition = {
       name: input.name,
-      description: input.description,
       protected: false,
       permissions: sanitizePermissions(input.permissions),
     }

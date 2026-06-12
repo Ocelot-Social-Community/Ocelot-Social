@@ -5,7 +5,6 @@ import type { PermissionKey } from '@src/permission'
 // role definitions are runtime DATA, Redis-synced across instances like policy.
 export interface RoleDefinition {
   name: string
-  description: string | null
   // Protected roles (only `owner`) cannot be edited or deleted, and `owner`
   // additionally resolves to the full catalog (see RoleService.permissionsForRole).
   protected: boolean

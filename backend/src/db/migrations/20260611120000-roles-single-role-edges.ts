@@ -17,12 +17,11 @@ export async function up(_next) {
     for (const role of DEFAULT_ROLES) {
       await transaction.run(
         `MERGE (r:Role {id: $name})
-         ON CREATE SET r.name = $name, r.description = $description,
+         ON CREATE SET r.name = $name,
                        r.protected = $protected, r.permissions = $permissions,
                        r.createdAt = $now, r.updatedAt = $now`,
         {
           name: role.name,
-          description: role.description,
           protected: role.protected,
           permissions: JSON.stringify(role.permissions),
           now,

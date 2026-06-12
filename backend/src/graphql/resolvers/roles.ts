@@ -11,7 +11,6 @@ const ROLE_NAME_RE = /^[a-z0-9][a-z0-9_-]{1,49}$/i
 
 const toGraphqlRole = (def: RoleDefinition, memberCount: number | null = null) => ({
   name: def.name,
-  description: def.description,
   protected: def.protected,
   permissions: def.permissions,
   memberCount,
@@ -70,7 +69,7 @@ export default {
   Mutation: {
     createRole: async (
       _parent: unknown,
-      args: { name: string; description?: string | null; permissions: string[] },
+      args: { name: string; permissions: string[] },
       context: Context,
     ) => {
       if (!ROLE_NAME_RE.test(args.name)) {
@@ -83,7 +82,6 @@ export default {
         const def = await context.role.upsertRole(
           {
             name: args.name,
-            description: args.description ?? null,
             protected: false,
             permissions: args.permissions,
           },
@@ -99,7 +97,7 @@ export default {
 
     updateRole: async (
       _parent: unknown,
-      args: { name: string; description?: string | null; permissions: string[] },
+      args: { name: string; permissions: string[] },
       context: Context,
     ) => {
       if (!context.role.getRole(args.name)) {
@@ -109,7 +107,6 @@ export default {
         const def = await context.role.upsertRole(
           {
             name: args.name,
-            description: args.description ?? null,
             protected: false,
             permissions: args.permissions,
           },

@@ -38,7 +38,6 @@ export const rolesQuery = gql`
   query {
     roles {
       name
-      description
       protected
       permissions
       memberCount
@@ -55,10 +54,9 @@ export const userRolesQuery = gql`
 `
 
 export const createRoleMutation = gql`
-  mutation ($name: String!, $description: String, $permissions: [String!]!) {
-    createRole(name: $name, description: $description, permissions: $permissions) {
+  mutation ($name: String!, $permissions: [String!]!) {
+    createRole(name: $name, permissions: $permissions) {
       name
-      description
       protected
       permissions
       memberCount
@@ -67,10 +65,9 @@ export const createRoleMutation = gql`
 `
 
 export const updateRoleMutation = gql`
-  mutation ($name: String!, $description: String, $permissions: [String!]!) {
-    updateRole(name: $name, description: $description, permissions: $permissions) {
+  mutation ($name: String!, $permissions: [String!]!) {
+    updateRole(name: $name, permissions: $permissions) {
       name
-      description
       protected
       permissions
       memberCount

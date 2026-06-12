@@ -12,7 +12,6 @@ type DbContext = ReturnType<typeof databaseContext>
 
 interface RawRoleRow {
   name: string
-  description: string | null
   protected: boolean
   permissions: string
 }
@@ -23,15 +22,13 @@ interface RawRoleRow {
 export async function readAllRoles(db: DbContext): Promise<RoleDefinition[]> {
   const result = await db.query({
     query: `MATCH (r:Role)
-            RETURN r.name AS name, r.description AS description,
-                   r.protected AS protected, r.permissions AS permissions
+            RETURN r.name AS name, r.protected AS protected, r.permissions AS permissions
             ORDER BY r.name ASC`,
   })
 
   return result.records.map((record) => {
     const row = {
       name: record.get('name') as string,
-      description: record.get('description') as string | null,
       protected: Boolean(record.get('protected')),
       permissions: (record.get('permissions') as string | null) ?? '[]',
     } satisfies RawRoleRow
@@ -45,7 +42,6 @@ export async function readAllRoles(db: DbContext): Promise<RoleDefinition[]> {
     }
     return {
       name: row.name,
-      description: row.description,
       protected: row.protected,
       permissions: sanitizePermissions(Array.isArray(parsed) ? (parsed as string[]) : []),
     }
@@ -58,14 +54,12 @@ export async function seedRole(db: DbContext, role: RoleDefinition, now: string)
   await db.write({
     query: `MERGE (r:Role {id: $name})
             ON CREATE SET r.name = $name,
-                          r.description = $description,
                           r.protected = $protected,
                           r.permissions = $permissions,
                           r.createdAt = $now,
                           r.updatedAt = $now`,
     variables: {
       name: role.name,
-      description: role.description,
       protected: role.protected,
       permissions: JSON.stringify(role.permissions),
       now,
@@ -84,14 +78,12 @@ export async function writeRole(
     query: `MERGE (r:Role {id: $name})
             ON CREATE SET r.createdAt = $now
             SET r.name = $name,
-                r.description = $description,
                 r.protected = $protected,
                 r.permissions = $permissions,
                 r.updatedAt = $now,
                 r.updatedBy = $actor`,
     variables: {
       name: role.name,
-      description: role.description,
       protected: role.protected,
       permissions: JSON.stringify(role.permissions),
       actor,

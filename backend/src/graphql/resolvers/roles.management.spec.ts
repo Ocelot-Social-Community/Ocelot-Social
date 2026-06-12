@@ -32,8 +32,8 @@ const PERMISSION_CATALOG = `query { permissionCatalog { key group description } 
 const MY_PERMISSIONS = `query { myPermissions }`
 const ROLES = `query { roles { name protected permissions memberCount } }`
 const USER_INFO = `query ($id: ID!) { User(id: $id) { id role roleName } }`
-const CREATE_ROLE = `mutation ($name: String!, $description: String, $permissions: [String!]!) {
-  createRole(name: $name, description: $description, permissions: $permissions) {
+const CREATE_ROLE = `mutation ($name: String!, $permissions: [String!]!) {
+  createRole(name: $name, permissions: $permissions) {
     name permissions protected memberCount
   }
 }`
@@ -144,7 +144,6 @@ describe('role management', () => {
         mutation: CREATE_ROLE,
         variables: {
           name: 'badge-setter',
-          description: 'x',
           permissions: ['badge.manage', 'ghost.perm'],
         },
       })
@@ -160,7 +159,7 @@ describe('role management', () => {
     it('rejects a duplicate role name', async () => {
       const { errors } = await mutate({
         mutation: CREATE_ROLE,
-        variables: { name: 'admin', description: null, permissions: [] },
+        variables: { name: 'admin', permissions: [] },
       })
       expect(errors?.[0].message).toMatch(/already exists/)
     })
@@ -168,7 +167,7 @@ describe('role management', () => {
     it('rejects an invalid role name', async () => {
       const { errors } = await mutate({
         mutation: CREATE_ROLE,
-        variables: { name: 'has spaces!', description: null, permissions: [] },
+        variables: { name: 'has spaces!', permissions: [] },
       })
       expect(errors?.[0].message).toMatch(/Invalid role name/)
     })
@@ -190,7 +189,7 @@ describe('role management', () => {
     it('deletes a custom role that no user holds', async () => {
       await mutate({
         mutation: CREATE_ROLE,
-        variables: { name: 'temp', description: null, permissions: [] },
+        variables: { name: 'temp', permissions: [] },
       })
       const { data, errors } = await mutate({ mutation: DELETE_ROLE, variables: { name: 'temp' } })
       expect(errors).toBeUndefined()
@@ -205,7 +204,7 @@ describe('role management', () => {
       )
       await mutate({
         mutation: CREATE_ROLE,
-        variables: { name: 'held', description: null, permissions: [] },
+        variables: { name: 'held', permissions: [] },
       })
       await mutate({ mutation: SET_USER_ROLE, variables: { userId: 'holder', roleName: 'held' } })
       const { errors } = await mutate({ mutation: DELETE_ROLE, variables: { name: 'held' } })
@@ -233,7 +232,6 @@ describe('role management', () => {
         mutation: CREATE_ROLE,
         variables: {
           name: 'badge-setter',
-          description: null,
           permissions: ['badge.manage'],
         },
       })

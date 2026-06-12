@@ -15,17 +15,15 @@ const permissionCatalog = [
 ]
 
 const roles = [
-  { name: 'owner', description: 'o', protected: true, permissions: [], memberCount: 1 },
+  { name: 'owner', protected: true, permissions: [], memberCount: 1 },
   {
     name: 'badge-setter',
-    description: '',
     protected: false,
     permissions: ['badge.manage'],
     memberCount: 2,
   },
   {
     name: 'user',
-    description: 'baseline',
     protected: false,
     permissions: ['post.create'],
     memberCount: 5,
@@ -111,7 +109,6 @@ describe('admin/roles.vue', () => {
     wrapper.setData({
       newRole: {
         name: 'event-org',
-        description: 'Organizers',
         permissions: { 'badge.manage': false, 'post.create': true },
       },
     })
@@ -120,7 +117,6 @@ describe('admin/roles.vue', () => {
       expect.objectContaining({
         variables: {
           name: 'event-org',
-          description: 'Organizers',
           permissions: ['post.create'],
         },
       }),
