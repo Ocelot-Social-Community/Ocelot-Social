@@ -46,6 +46,7 @@ export default {
       showConfirmModal: false,
       currentModalData: null,
       loadingGenerateCode: false,
+      invalidatingCodes: new Set(),
     }
   },
   props: {
@@ -60,6 +61,7 @@ export default {
       this.showConfirmModal = true
     },
     async generateGroupInviteCode(comment) {
+      if (this.loadingGenerateCode) return
       this.loadingGenerateCode = true
       try {
         await this.$apollo.mutate({
@@ -80,6 +82,8 @@ export default {
       }
     },
     async invalidateInviteCode(code) {
+      if (this.invalidatingCodes.has(code)) return
+      this.invalidatingCodes.add(code)
       try {
         await this.$apollo.mutate({
           mutation: invalidateInviteCode(),
@@ -99,6 +103,8 @@ export default {
         this.$toast.success(this.$t('invite-codes.invalidate-success'))
       } catch (error) {
         this.$toast.error(this.$t('invite-codes.invalidate-error', { error: error.message }))
+      } finally {
+        this.invalidatingCodes.delete(code)
       }
     },
   },
