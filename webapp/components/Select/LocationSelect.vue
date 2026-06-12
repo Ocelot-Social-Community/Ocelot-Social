@@ -118,6 +118,10 @@ export default {
     handleCityInput(event) {
       const value = event.target ? event.target.value.trim() : ''
       clearTimeout(this.debounceTimeout)
+      if (value.length < 3) {
+        this.cities = []
+        return
+      }
       this.debounceTimeout = setTimeout(() => this.requestGeoData(value), 500)
     },
     processLocationsResult(places) {

@@ -328,6 +328,13 @@ export default {
             if (!name?.trim()) {
               return [new Error(this.$t('common.validations.eventLocationNameNotEmpty'))]
             }
+            if (name.length < 3 || name.length > 100) {
+              return [
+                new Error(
+                  this.$t('common.validations.eventLocationNameLength', { min: 3, max: 100 }),
+                ),
+              ]
+            }
             return []
           },
         },
