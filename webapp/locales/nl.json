@@ -197,21 +197,21 @@
       "title": "Netwerkbeleid-instellingen"
     },
     "roles": {
-      "allPermissions": "Holds every permission (protected).",
+      "allPermissions": "Heeft alle rechten (beschermd).",
       "cannotDelete": "Deze rol kan niet worden verwijderd.",
-      "create": "Create role",
-      "createTitle": "Create a new role",
-      "delete": "Delete",
-      "description": "Create roles and assign permissions. Changes apply immediately.",
+      "create": "Rol aanmaken",
+      "createTitle": "Een nieuwe rol aanmaken",
+      "delete": "Verwijderen",
+      "description": "Maak rollen aan en wijs rechten toe. Wijzigingen worden direct toegepast.",
       "groups": {
         "administration": "Beheer",
         "content": "Inhoud",
         "membership": "Lidmaatschap",
         "moderation": "Moderatie"
       },
-      "members": "{count} members",
-      "name": "Roles & permissions",
-      "nameLabel": "Name",
+      "members": "{count} leden",
+      "name": "Rollen en rechten",
+      "nameLabel": "Naam",
       "perm": {
         "apiKey_administer": "API-sleutels van andere gebruikers beheren.",
         "badge_manage": "Badges toekennen en intrekken.",
@@ -229,12 +229,12 @@
         "user_email_readAny": "Het e-mailadres van elke gebruiker lezen.",
         "user_invite": "Persoonlijke uitnodigingscodes genereren."
       },
-      "protected": "protected",
+      "protected": "beschermd",
       "protectedHint": "De eigenaarsrol heeft alle rechten en kan niet worden bewerkt.",
-      "save": "Save",
-      "saveError": "Could not save role: {message}",
-      "saveSuccess": "Role saved.",
-      "title": "Roles & permissions"
+      "save": "Opslaan",
+      "saveError": "Kon rol niet opslaan: {message}",
+      "saveSuccess": "Rol opgeslagen.",
+      "title": "Rollen en rechten"
     },
     "settings": {
       "name": "Instellingen"

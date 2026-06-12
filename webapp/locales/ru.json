@@ -197,21 +197,21 @@
       "title": "Настройки политики сети"
     },
     "roles": {
-      "allPermissions": "Holds every permission (protected).",
+      "allPermissions": "Имеет все разрешения (защищённая).",
       "cannotDelete": "Эту роль нельзя удалить.",
-      "create": "Create role",
-      "createTitle": "Create a new role",
-      "delete": "Delete",
-      "description": "Create roles and assign permissions. Changes apply immediately.",
+      "create": "Создать роль",
+      "createTitle": "Создать новую роль",
+      "delete": "Удалить",
+      "description": "Создавайте роли и назначайте разрешения. Изменения применяются сразу.",
       "groups": {
         "administration": "Администрирование",
         "content": "Контент",
         "membership": "Участники",
         "moderation": "Модерация"
       },
-      "members": "{count} members",
-      "name": "Roles & permissions",
-      "nameLabel": "Name",
+      "members": "{count} участников",
+      "name": "Роли и разрешения",
+      "nameLabel": "Название",
       "perm": {
         "apiKey_administer": "Управление API-ключами других пользователей.",
         "badge_manage": "Выдача и отзыв значков.",
@@ -229,12 +229,12 @@
         "user_email_readAny": "Чтение адреса эл. почты любого пользователя.",
         "user_invite": "Создание персональных кодов приглашения."
       },
-      "protected": "protected",
+      "protected": "защищённая",
       "protectedHint": "Роль владельца имеет все разрешения и не может быть изменена.",
-      "save": "Save",
-      "saveError": "Could not save role: {message}",
-      "saveSuccess": "Role saved.",
-      "title": "Roles & permissions"
+      "save": "Сохранить",
+      "saveError": "Не удалось сохранить роль: {message}",
+      "saveSuccess": "Роль сохранена.",
+      "title": "Роли и разрешения"
     },
     "settings": {
       "name": "Настройки"

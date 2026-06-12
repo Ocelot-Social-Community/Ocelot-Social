@@ -197,21 +197,21 @@
       "title": "Налаштування політики мережі"
     },
     "roles": {
-      "allPermissions": "Holds every permission (protected).",
+      "allPermissions": "Має всі дозволи (захищена).",
       "cannotDelete": "Цю роль не можна видалити.",
-      "create": "Create role",
-      "createTitle": "Create a new role",
-      "delete": "Delete",
-      "description": "Create roles and assign permissions. Changes apply immediately.",
+      "create": "Створити роль",
+      "createTitle": "Створити нову роль",
+      "delete": "Видалити",
+      "description": "Створюйте ролі та призначайте дозволи. Зміни застосовуються одразу.",
       "groups": {
         "administration": "Адміністрування",
         "content": "Контент",
         "membership": "Учасники",
         "moderation": "Модерація"
       },
-      "members": "{count} members",
-      "name": "Roles & permissions",
-      "nameLabel": "Name",
+      "members": "{count} учасників",
+      "name": "Ролі та дозволи",
+      "nameLabel": "Назва",
       "perm": {
         "apiKey_administer": "Керування API-ключами інших користувачів.",
         "badge_manage": "Надання та відкликання значків.",
@@ -229,12 +229,12 @@
         "user_email_readAny": "Читання адреси ел. пошти будь-якого користувача.",
         "user_invite": "Генерування персональних кодів запрошення."
       },
-      "protected": "protected",
+      "protected": "захищена",
       "protectedHint": "Роль власника має всі дозволи й не може бути змінена.",
-      "save": "Save",
-      "saveError": "Could not save role: {message}",
-      "saveSuccess": "Role saved.",
-      "title": "Roles & permissions"
+      "save": "Зберегти",
+      "saveError": "Не вдалося зберегти роль: {message}",
+      "saveSuccess": "Роль збережено.",
+      "title": "Ролі та дозволи"
     },
     "settings": {
       "name": "Налаштування"

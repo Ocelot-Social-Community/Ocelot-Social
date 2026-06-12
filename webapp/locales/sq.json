@@ -197,21 +197,21 @@
       "title": "Cilësimet e politikës së rrjetit"
     },
     "roles": {
-      "allPermissions": "Holds every permission (protected).",
+      "allPermissions": "Ka të gjitha lejet (i mbrojtur).",
       "cannotDelete": "Ky rol nuk mund të fshihet.",
-      "create": "Create role",
-      "createTitle": "Create a new role",
-      "delete": "Delete",
-      "description": "Create roles and assign permissions. Changes apply immediately.",
+      "create": "Krijo rol",
+      "createTitle": "Krijo një rol të ri",
+      "delete": "Fshi",
+      "description": "Krijo role dhe cakto leje. Ndryshimet zbatohen menjëherë.",
       "groups": {
         "administration": "Administrim",
         "content": "Përmbajtje",
         "membership": "Anëtarësia",
         "moderation": "Moderim"
       },
-      "members": "{count} members",
-      "name": "Roles & permissions",
-      "nameLabel": "Name",
+      "members": "{count} anëtarë",
+      "name": "Rolet dhe lejet",
+      "nameLabel": "Emri",
       "perm": {
         "apiKey_administer": "Administro çelësat API të përdoruesve të tjerë.",
         "badge_manage": "Jep dhe hiq stema.",
@@ -229,12 +229,12 @@
         "user_email_readAny": "Lexo adresën e email-it të çdo përdoruesi.",
         "user_invite": "Gjenero kode ftese personale."
       },
-      "protected": "protected",
+      "protected": "i mbrojtur",
       "protectedHint": "Roli i pronarit ka të gjitha lejet dhe nuk mund të modifikohet.",
-      "save": "Save",
-      "saveError": "Could not save role: {message}",
-      "saveSuccess": "Role saved.",
-      "title": "Roles & permissions"
+      "save": "Ruaj",
+      "saveError": "Roli nuk u ruajt dot: {message}",
+      "saveSuccess": "Roli u ruajt.",
+      "title": "Rolet dhe lejet"
     },
     "settings": {
       "name": "Cilësimet"

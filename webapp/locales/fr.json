@@ -197,21 +197,21 @@
       "title": "Paramètres de la politique réseau"
     },
     "roles": {
-      "allPermissions": "Holds every permission (protected).",
+      "allPermissions": "Détient toutes les permissions (protégé).",
       "cannotDelete": "Ce rôle ne peut pas être supprimé.",
-      "create": "Create role",
-      "createTitle": "Create a new role",
-      "delete": "Delete",
-      "description": "Create roles and assign permissions. Changes apply immediately.",
+      "create": "Créer un rôle",
+      "createTitle": "Créer un nouveau rôle",
+      "delete": "Supprimer",
+      "description": "Créez des rôles et attribuez des permissions. Les changements s’appliquent immédiatement.",
       "groups": {
         "administration": "Administration",
         "content": "Contenu",
         "membership": "Adhésion",
         "moderation": "Modération"
       },
-      "members": "{count} members",
-      "name": "Roles & permissions",
-      "nameLabel": "Name",
+      "members": "{count} membres",
+      "name": "Rôles et permissions",
+      "nameLabel": "Nom",
       "perm": {
         "apiKey_administer": "Administrer les clés API des autres utilisateurs.",
         "badge_manage": "Attribuer et retirer des badges.",
@@ -229,12 +229,12 @@
         "user_email_readAny": "Lire l’adresse e-mail de n’importe quel utilisateur.",
         "user_invite": "Générer des codes d’invitation personnels."
       },
-      "protected": "protected",
+      "protected": "protégé",
       "protectedHint": "Le rôle propriétaire détient toutes les permissions et ne peut pas être modifié.",
-      "save": "Save",
-      "saveError": "Could not save role: {message}",
-      "saveSuccess": "Role saved.",
-      "title": "Roles & permissions"
+      "save": "Enregistrer",
+      "saveError": "Impossible d’enregistrer le rôle : {message}",
+      "saveSuccess": "Rôle enregistré.",
+      "title": "Rôles et permissions"
     },
     "settings": {
       "name": "Paramètres"

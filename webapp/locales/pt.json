@@ -197,21 +197,21 @@
       "title": "Configurações da política de rede"
     },
     "roles": {
-      "allPermissions": "Holds every permission (protected).",
+      "allPermissions": "Detém todas as permissões (protegida).",
       "cannotDelete": "Esta função não pode ser excluída.",
-      "create": "Create role",
-      "createTitle": "Create a new role",
-      "delete": "Delete",
-      "description": "Create roles and assign permissions. Changes apply immediately.",
+      "create": "Criar função",
+      "createTitle": "Criar uma nova função",
+      "delete": "Eliminar",
+      "description": "Crie funções e atribua permissões. As alterações aplicam-se imediatamente.",
       "groups": {
         "administration": "Administração",
         "content": "Conteúdo",
         "membership": "Adesão",
         "moderation": "Moderação"
       },
-      "members": "{count} members",
-      "name": "Roles & permissions",
-      "nameLabel": "Name",
+      "members": "{count} membros",
+      "name": "Funções e permissões",
+      "nameLabel": "Nome",
       "perm": {
         "apiKey_administer": "Administrar as chaves de API de outros utilizadores.",
         "badge_manage": "Conceder e revogar distintivos.",
@@ -229,12 +229,12 @@
         "user_email_readAny": "Ler o endereço de e-mail de qualquer utilizador.",
         "user_invite": "Gerar códigos de convite pessoais."
       },
-      "protected": "protected",
+      "protected": "protegida",
       "protectedHint": "A função de proprietário detém todas as permissões e não pode ser editada.",
-      "save": "Save",
-      "saveError": "Could not save role: {message}",
-      "saveSuccess": "Role saved.",
-      "title": "Roles & permissions"
+      "save": "Guardar",
+      "saveError": "Não foi possível guardar a função: {message}",
+      "saveSuccess": "Função guardada.",
+      "title": "Funções e permissões"
     },
     "settings": {
       "name": "Configurações"

@@ -197,21 +197,21 @@
       "title": "Ustawienia zasad sieci"
     },
     "roles": {
-      "allPermissions": "Holds every permission (protected).",
+      "allPermissions": "Posiada wszystkie uprawnienia (chroniona).",
       "cannotDelete": "Tej roli nie można usunąć.",
-      "create": "Create role",
-      "createTitle": "Create a new role",
-      "delete": "Delete",
-      "description": "Create roles and assign permissions. Changes apply immediately.",
+      "create": "Utwórz rolę",
+      "createTitle": "Utwórz nową rolę",
+      "delete": "Usuń",
+      "description": "Twórz role i przypisuj uprawnienia. Zmiany obowiązują natychmiast.",
       "groups": {
         "administration": "Administracja",
         "content": "Treści",
         "membership": "Członkostwo",
         "moderation": "Moderacja"
       },
-      "members": "{count} members",
-      "name": "Roles & permissions",
-      "nameLabel": "Name",
+      "members": "{count} członków",
+      "name": "Role i uprawnienia",
+      "nameLabel": "Nazwa",
       "perm": {
         "apiKey_administer": "Zarządzanie kluczami API innych użytkowników.",
         "badge_manage": "Przyznawanie i odbieranie odznak.",
@@ -229,12 +229,12 @@
         "user_email_readAny": "Odczyt adresu e-mail dowolnego użytkownika.",
         "user_invite": "Generowanie osobistych kodów zaproszeń."
       },
-      "protected": "protected",
+      "protected": "chroniona",
       "protectedHint": "Rola właściciela ma wszystkie uprawnienia i nie można jej edytować.",
-      "save": "Save",
-      "saveError": "Could not save role: {message}",
-      "saveSuccess": "Role saved.",
-      "title": "Roles & permissions"
+      "save": "Zapisz",
+      "saveError": "Nie można zapisać roli: {message}",
+      "saveSuccess": "Rola zapisana.",
+      "title": "Role i uprawnienia"
     },
     "settings": {
       "name": "Ustawienia"
