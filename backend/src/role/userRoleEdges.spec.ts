@@ -4,7 +4,7 @@
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver } from '@db/neo4j'
 
-import { ensureUserRoleEdges, promoteToOwner } from './userRoleEdges'
+import { ensureUserRoleEdges, promoteToOwner, seedDefaultRoleNodes } from './userRoleEdges'
 
 const rolesOf = async (userId: string): Promise<string[]> => {
   const session = getDriver().session()
@@ -91,6 +91,19 @@ describe('role-edge helpers (DB)', () => {
 
     it('returns null for an unknown identifier', async () => {
       expect(await promoteToOwner('nobody@nowhere.org')).toBeNull()
+    })
+  })
+
+  describe('factory roleName option', () => {
+    it('links a user to the given role node at creation, overriding the tier', async () => {
+      await seedDefaultRoleNodes() // role nodes must exist for the factory edge
+      await Factory.build(
+        'user',
+        { id: 'o', role: 'admin' },
+        { email: 'o@e.org', password: '1', roleName: 'owner' },
+      )
+      expect(await rolesOf('o')).toEqual(['owner']) // owner edge, not the admin tier
+      expect(await legacyRole('o')).toBe('admin') // legacy tier untouched
     })
   })
 })

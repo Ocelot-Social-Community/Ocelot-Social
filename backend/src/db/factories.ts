@@ -114,9 +114,11 @@ Factory.define('basicUser')
   })
 
 // Single-role: link a freshly built user to their role's :Role node (HAS_ROLE), so
-// the role system is populated at creation time. Graceful no-op when the role node
-// has not been seeded (e.g. most unit tests), where the legacy `user.role` fallback
-// applies. `roles` is the relationship key on the User neode model.
+// the role system is populated at creation time. The target role node is the
+// `roleName` option when given (e.g. 'owner', which is not a UserRole tier), else the
+// user's legacy `role` tier. Graceful no-op when the role node has not been seeded
+// (e.g. most unit tests), where the legacy `user.role` fallback applies. `roles` is
+// the relationship key on the User neode model.
 const relateUserToRole = async (user, roleName) => {
   if (!roleName) return
   const role = await neode.find('Role', roleName)
@@ -126,27 +128,30 @@ const relateUserToRole = async (user, roleName) => {
 Factory.define('userWithoutEmailAddress')
   .extend('basicUser')
   .option('about', faker.lorem.paragraph)
-  .after(async (buildObject, _options) => {
+  .option('roleName', null)
+  .after(async (buildObject, options) => {
     const user = await neode.create('User', buildObject)
-    await relateUserToRole(user, buildObject.role)
+    await relateUserToRole(user, options.roleName ?? buildObject.role)
     return user
   })
 
 Factory.define('userWithAboutNull')
   .extend('basicUser')
   .option('about', null)
-  .after(async (buildObject, _options) => {
+  .option('roleName', null)
+  .after(async (buildObject, options) => {
     const user = await neode.create('User', buildObject)
-    await relateUserToRole(user, buildObject.role)
+    await relateUserToRole(user, options.roleName ?? buildObject.role)
     return user
   })
 
 Factory.define('userWithAboutEmpty')
   .extend('basicUser')
   .option('about', '')
-  .after(async (buildObject, _options) => {
+  .option('roleName', null)
+  .after(async (buildObject, options) => {
     const user = await neode.create('User', buildObject)
-    await relateUserToRole(user, buildObject.role)
+    await relateUserToRole(user, options.roleName ?? buildObject.role)
     return user
   })
 
@@ -154,6 +159,7 @@ Factory.define('user')
   .extend('basicUser')
   .option('about', faker.lorem.paragraph)
   .option('email', null)
+  .option('roleName', null)
   .option('avatar', () =>
     Factory.build('image', {
       url: faker.image.avatar(),
@@ -178,7 +184,7 @@ Factory.define('user')
     ])
     await Promise.all([user.relateTo(email, 'primaryEmail'), email.relateTo(user, 'belongsTo')])
     if (avatar) await user.relateTo(avatar, 'avatar')
-    await relateUserToRole(user, buildObject.role)
+    await relateUserToRole(user, options.roleName ?? buildObject.role)
     return user
   })
 

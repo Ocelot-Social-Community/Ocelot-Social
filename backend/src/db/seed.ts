@@ -19,7 +19,7 @@ import CreateGroupRoom from '@graphql/queries/messaging/CreateGroupRoom.gql'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
 import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
-import { ensureUserRoleEdges } from '@src/role'
+import { ensureUserRoleEdges, seedDefaultRoleNodes } from '@src/role'
 
 import Factory from './factories'
 import { trophies, verification } from './seed/badges'
@@ -49,6 +49,12 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
   const { neode } = database
 
   try {
+    // Single-role system: seed the default role nodes up front so every user gets
+    // their HAS_ROLE edge at creation time (the factory links to the role node), and
+    // peterLustig can be created directly as owner. This script runs as a CLI without
+    // RoleService.init(), so nothing else seeds the role nodes.
+    await seedDefaultRoleNodes(database)
+
     // eslint-disable-next-line no-console
     console.log('seed', 'locations')
 
@@ -169,6 +175,10 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
       {
         email: 'admin@example.org',
+        // peterLustig is the instance OWNER — the failsafe superuser. Assigned the
+        // owner role node directly at creation; the legacy `role` tier stays 'admin'
+        // (owner is not a UserRole enum value).
+        roleName: 'owner',
       },
     )
     const bobDerBaumeister = await Factory.build(
@@ -2017,21 +2027,9 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     // Group g0 (Investigative Journalism) - intentionally NO chat seeded
 
-    // Single-role system: give every seeded user a HAS_ROLE edge (this script runs
-    // as a CLI without RoleService.init, so the role system would otherwise be empty).
+    // Safety net: give any user still without a HAS_ROLE edge their tier edge (users
+    // built by the factory after seeding the role nodes already have one). Idempotent.
     await ensureUserRoleEdges()
-
-    // peterLustig (admin@example.org, u1) is the instance OWNER — the failsafe
-    // superuser. Replace his tier edge with the owner edge (his legacy `role` stays
-    // 'admin', since owner is not a UserRole enum value).
-    await database.write({
-      query: `MATCH (u:User {id: 'u1'})
-              OPTIONAL MATCH (u)-[h:HAS_ROLE]->(:Role)
-              DELETE h
-              WITH u
-              MATCH (r:Role {id: 'owner'})
-              MERGE (u)-[:HAS_ROLE]->(r)`,
-    })
   } catch (err) {
     /* eslint-disable-next-line no-console */
     console.error(err)
