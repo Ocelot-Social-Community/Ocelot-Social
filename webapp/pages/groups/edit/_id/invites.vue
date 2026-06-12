@@ -8,6 +8,7 @@
         @invalidate-invite-code="invalidateInviteCode"
         @open-delete-modal="openDeleteModal"
         :inviteCodes="group.inviteCodes"
+        :loading="loadingGenerateCode"
         :copy-message="
           group.groupType === 'hidden'
             ? $t('invite-codes.invite-link-message-hidden-group', {
@@ -44,6 +45,7 @@ export default {
     return {
       showConfirmModal: false,
       currentModalData: null,
+      loadingGenerateCode: false,
     }
   },
   props: {
@@ -58,6 +60,7 @@ export default {
       this.showConfirmModal = true
     },
     async generateGroupInviteCode(comment) {
+      this.loadingGenerateCode = true
       try {
         await this.$apollo.mutate({
           mutation: generateGroupInviteCode(),
@@ -72,6 +75,8 @@ export default {
         this.$toast.success(this.$t('invite-codes.create-success'))
       } catch (error) {
         this.$toast.error(this.$t('invite-codes.create-error', { error: error.message }))
+      } finally {
+        this.loadingGenerateCode = false
       }
     },
     async invalidateInviteCode(code) {
@@ -81,7 +86,7 @@ export default {
           variables: {
             code,
           },
-          update: (_, { data: { _invalidateInviteCode } }) => {
+          update: () => {
             this.$emit(
               'update-invite-codes',
               this.group.inviteCodes.map((inviteCode) => ({
