@@ -176,8 +176,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       {
         email: 'admin@example.org',
         // peterLustig is the instance OWNER — the failsafe superuser. Assigned the
-        // owner role node directly at creation; the legacy `role` tier stays 'admin'
-        // (owner is not a UserRole enum value).
+        // owner role node (its single HAS_ROLE edge) directly at creation.
         roleName: 'owner',
       },
     )
