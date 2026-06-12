@@ -198,6 +198,8 @@
     },
     "roles": {
       "allPermissions": "Holds every permission (protected).",
+      "cannotDelete": "Este rol no se puede eliminar.",
+      "protectedHint": "El rol propietario tiene todos los permisos y no se puede editar.",
       "create": "Create role",
       "createTitle": "Create a new role",
       "delete": "Delete",

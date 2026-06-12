@@ -198,6 +198,8 @@
     },
     "roles": {
       "allPermissions": "Holds every permission (protected).",
+      "cannotDelete": "Deze rol kan niet worden verwijderd.",
+      "protectedHint": "De eigenaarsrol heeft alle rechten en kan niet worden bewerkt.",
       "create": "Create role",
       "createTitle": "Create a new role",
       "delete": "Delete",

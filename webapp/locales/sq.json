@@ -198,6 +198,8 @@
     },
     "roles": {
       "allPermissions": "Holds every permission (protected).",
+      "cannotDelete": "Ky rol nuk mund të fshihet.",
+      "protectedHint": "Roli i pronarit ka të gjitha lejet dhe nuk mund të modifikohet.",
       "create": "Create role",
       "createTitle": "Create a new role",
       "delete": "Delete",

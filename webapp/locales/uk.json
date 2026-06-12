@@ -198,6 +198,8 @@
     },
     "roles": {
       "allPermissions": "Holds every permission (protected).",
+      "cannotDelete": "Цю роль не можна видалити.",
+      "protectedHint": "Роль власника має всі дозволи й не може бути змінена.",
       "create": "Create role",
       "createTitle": "Create a new role",
       "delete": "Delete",

@@ -198,6 +198,8 @@
     },
     "roles": {
       "allPermissions": "Holds every permission (protected).",
+      "cannotDelete": "Esta função não pode ser excluída.",
+      "protectedHint": "A função de proprietário detém todas as permissões e não pode ser editada.",
       "create": "Create role",
       "createTitle": "Create a new role",
       "delete": "Delete",

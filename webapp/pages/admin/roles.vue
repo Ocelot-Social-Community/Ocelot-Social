@@ -14,6 +14,8 @@
         :class="{ 'role-tab--active': role.name === activeRoleName }"
         :data-test="`role-tab-${role.name}`"
         @click="setActive(role.name)"
+        @mouseenter="hoveredRoleName = role.name"
+        @mouseleave="hoveredRoleName = null"
       >
         {{ role.name }}
         <span v-if="role.protected" class="role-tab__badge" :title="$t('admin.roles.protected')">
@@ -72,16 +74,25 @@
         </span>
       </header>
 
-      <template v-if="activeRole.protected">
-        <p class="role__protected-note">{{ $t('admin.roles.allPermissions') }}</p>
-      </template>
+      <template v-if="forms[activeRole.name]">
+        <p v-if="activeRole.protected" class="role__protected-note">
+          {{ $t('admin.roles.allPermissions') }}
+        </p>
 
-      <template v-else-if="forms[activeRole.name]">
         <fieldset v-for="group in permissionGroups" :key="group.name" class="perm-group">
           <legend class="perm-group__title">{{ group.name }}</legend>
-          <label v-for="permission in group.permissions" :key="permission.key" class="perm-row">
+          <label
+            v-for="permission in group.permissions"
+            :key="permission.key"
+            class="perm-row"
+            :class="{
+              'perm-row--added': hoverDiff[permission.key] === 'added',
+              'perm-row--removed': hoverDiff[permission.key] === 'removed',
+            }"
+          >
             <input
               type="checkbox"
+              :disabled="activeRole.protected"
               v-model="forms[activeRole.name].permissions[permission.key]"
               :data-test="`role-${activeRole.name}-perm-${permission.key}`"
             />
@@ -93,25 +104,29 @@
         </fieldset>
 
         <div class="role__actions">
-          <os-button
-            variant="primary"
-            appearance="filled"
-            :disabled="!isDirty(activeRole) || saving"
-            :data-test="`role-${activeRole.name}-save`"
-            @click="saveRole(activeRole)"
-          >
-            {{ $t('admin.roles.save') }}
-          </os-button>
-          <os-button
-            v-if="canDelete(activeRole)"
-            variant="danger"
-            appearance="ghost"
-            :disabled="saving"
-            :data-test="`role-${activeRole.name}-delete`"
-            @click="removeRole(activeRole)"
-          >
-            {{ $t('admin.roles.delete') }}
-          </os-button>
+          <!-- Always visible; disabled (with a hint) where the action does not apply. -->
+          <span class="role__action" :title="saveHint(activeRole)">
+            <os-button
+              variant="primary"
+              appearance="filled"
+              :disabled="saveDisabled(activeRole)"
+              :data-test="`role-${activeRole.name}-save`"
+              @click="saveRole(activeRole)"
+            >
+              {{ $t('admin.roles.save') }}
+            </os-button>
+          </span>
+          <span class="role__action" :title="deleteHint(activeRole)">
+            <os-button
+              variant="danger"
+              appearance="ghost"
+              :disabled="!canDelete(activeRole) || saving"
+              :data-test="`role-${activeRole.name}-delete`"
+              @click="removeRole(activeRole)"
+            >
+              {{ $t('admin.roles.delete') }}
+            </os-button>
+          </span>
         </div>
       </template>
     </section>
@@ -142,6 +157,8 @@ export default {
       forms: {},
       // The single role currently shown.
       activeRoleName: null,
+      // The role pill currently hovered, to preview its diff against the active role.
+      hoveredRoleName: null,
       // Whether the + button is in name-input mode.
       creating: false,
       newRole: { name: '' },
@@ -170,6 +187,24 @@ export default {
     activeRole() {
       return this.roles.find((role) => role.name === this.activeRoleName) || null
     },
+    // When hovering another pill, map each permission key to how it differs from the
+    // active role: 'added' (hovered role has it, active doesn't) / 'removed' (active
+    // has it, hovered doesn't). Empty while hovering nothing or the active role.
+    hoverDiff() {
+      if (!this.hoveredRoleName || this.hoveredRoleName === this.activeRoleName) return {}
+      const hovered = this.roles.find((role) => role.name === this.hoveredRoleName)
+      if (!hovered) return {}
+      const activeSet = this.permissionSetOf(this.activeRole)
+      const hoveredSet = this.permissionSetOf(hovered)
+      const diff = {}
+      for (const permission of this.permissionCatalog) {
+        const inActive = activeSet.has(permission.key)
+        const inHovered = hoveredSet.has(permission.key)
+        if (inHovered && !inActive) diff[permission.key] = 'added'
+        else if (!inHovered && inActive) diff[permission.key] = 'removed'
+      }
+      return diff
+    },
     // Catalog grouped by permission group, for sectioned checkboxes.
     permissionGroups() {
       const byGroup = {}
@@ -185,15 +220,22 @@ export default {
     buildForms() {
       const forms = {}
       for (const role of this.roles) {
-        if (role.protected) continue
         const permissions = emptyPermissionMap(this.permissionCatalog)
-        for (const key of role.permissions) permissions[key] = true
+        // Protected roles (owner) hold the full catalog — shown all-checked, disabled.
+        const keys = role.protected ? Object.keys(permissions) : role.permissions
+        for (const key of keys) permissions[key] = true
         forms[role.name] = {
           permissions,
         }
       }
       this.forms = forms
       this.ensureActive()
+    },
+    // The effective permission key set of a role (full catalog for protected roles).
+    permissionSetOf(role) {
+      if (!role) return new Set()
+      if (role.protected) return new Set(this.permissionCatalog.map((p) => p.key))
+      return new Set(role.permissions)
     },
     // Keep a valid role selected: default to the first one, and re-select after a
     // role is deleted/renamed away.
@@ -237,6 +279,16 @@ export default {
     canDelete(role) {
       // Protected (owner) and the implicit baseline (user) cannot be deleted.
       return !role.protected && role.name !== 'user'
+    },
+    saveDisabled(role) {
+      // Protected roles are read-only; otherwise save only when there are changes.
+      return role.protected || !this.isDirty(role) || this.saving
+    },
+    saveHint(role) {
+      return role.protected ? this.$t('admin.roles.protectedHint') : ''
+    },
+    deleteHint(role) {
+      return this.canDelete(role) ? '' : this.$t('admin.roles.cannotDelete')
     },
     async saveRole(role) {
       const form = this.forms[role.name]
@@ -407,6 +459,10 @@ export default {
     display: flex;
     gap: $space-small;
   }
+  // Wrapper so the title hint shows even while the button inside is disabled.
+  &__action {
+    display: inline-flex;
+  }
 }
 .perm-group {
   border: none;
@@ -426,7 +482,25 @@ export default {
   align-items: flex-start;
   gap: $space-x-small;
   margin: $space-xxx-small 0;
+  padding: $space-xxx-small $space-xx-small;
+  border-radius: $border-radius-small;
+  border-left: 3px solid transparent;
   cursor: pointer;
+  transition: background-color 0.1s ease;
+
+  // Hover-diff against the active role: the hovered role would add (green) or
+  // remove (red) this permission.
+  &--added {
+    background: rgba($color-success, 0.16);
+    border-left-color: $color-success;
+  }
+  &--removed {
+    background: rgba($color-danger, 0.16);
+    border-left-color: $color-danger;
+  }
+  input:disabled {
+    cursor: default;
+  }
 
   &__text {
     display: flex;

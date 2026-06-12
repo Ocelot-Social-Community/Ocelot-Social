@@ -78,10 +78,35 @@ describe('admin/roles.vue', () => {
     expect(wrapper.find('[data-test="role-owner"]').exists()).toBe(false)
   })
 
-  it('does not offer to edit or delete the protected owner role', () => {
+  it('shows a disabled save + delete (with a hint) for the protected owner role', async () => {
     const wrapper = Wrapper() // owner is active by default
-    expect(wrapper.find('[data-test="role-owner-save"]').exists()).toBe(false)
-    expect(wrapper.find('[data-test="role-owner-delete"]').exists()).toBe(false)
+    await wrapper.vm.$nextTick()
+    expect(wrapper.find('[data-test="role-owner-save"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="role-owner-delete"]').exists()).toBe(true)
+    expect(wrapper.vm.saveDisabled(roles[0])).toBe(true)
+    expect(wrapper.vm.canDelete(roles[0])).toBe(false)
+    expect(wrapper.vm.saveHint(roles[0])).toBeTruthy()
+    expect(wrapper.vm.deleteHint(roles[0])).toBeTruthy()
+  })
+
+  it('shows the owner permissions all checked and disabled', async () => {
+    const wrapper = Wrapper() // owner active by default
+    await wrapper.vm.$nextTick()
+    expect(Object.values(wrapper.vm.forms.owner.permissions).every(Boolean)).toBe(true)
+    const checkbox = wrapper.find('[data-test="role-owner-perm-badge.manage"]')
+    expect(checkbox.attributes('disabled')).toBeDefined()
+  })
+
+  it('previews the permission diff when hovering another role pill', async () => {
+    const wrapper = Wrapper()
+    wrapper.vm.setActive('badge-setter')
+    await wrapper.vm.$nextTick()
+    await wrapper.find('[data-test="role-tab-user"]').trigger('mouseenter')
+    // active (badge-setter) has badge.manage but not post.create; user is the inverse.
+    expect(wrapper.vm.hoverDiff).toEqual({
+      'badge.manage': 'removed',
+      'post.create': 'added',
+    })
   })
 
   it('only allows deleting non-protected, non-baseline roles', () => {

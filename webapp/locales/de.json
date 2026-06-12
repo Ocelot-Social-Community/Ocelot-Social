@@ -198,6 +198,8 @@
     },
     "roles": {
       "allPermissions": "Hält alle Berechtigungen (geschützt).",
+      "cannotDelete": "Diese Rolle kann nicht gelöscht werden.",
+      "protectedHint": "Die Owner-Rolle hält alle Berechtigungen und kann nicht bearbeitet werden.",
       "create": "Rolle erstellen",
       "createTitle": "Neue Rolle erstellen",
       "delete": "Löschen",
