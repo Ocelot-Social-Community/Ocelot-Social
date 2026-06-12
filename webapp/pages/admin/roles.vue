@@ -179,6 +179,12 @@ export default {
     },
     permissionCatalog: {
       query: permissionCatalogQuery,
+      // Rebuild the forms once the catalog is known — otherwise a roles result that
+      // arrives first builds them against an empty catalog (owner would show no
+      // checked permissions).
+      result() {
+        this.buildForms()
+      },
     },
   },
   created() {
