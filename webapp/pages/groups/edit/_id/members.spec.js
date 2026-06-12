@@ -91,7 +91,7 @@ describe('pages/groups/edit/_id/members.vue', () => {
       expect(apollo.query.call({})).toBeDefined()
     })
 
-    it('passes the group id with a large page size', () => {
+    it('passes the group id with a large page size and includes pending', () => {
       const variables = apollo.variables.call({ group: { id: 'g1' } })
       expect(variables).toEqual({ id: 'g1', first: 999999, includePending: true })
     })
