@@ -78,12 +78,16 @@ export const actions = {
 
   async fetchCurrentUser({ commit, dispatch }) {
     const client = this.app.apolloProvider.defaultClient
-    const {
-      data: { currentUser },
-    } = await client.query({ query: currentUserQuery })
-    if (!currentUser) return dispatch('logout')
-    commit('SET_USER', currentUser)
-    return currentUser
+    try {
+      const {
+        data: { currentUser },
+      } = await client.query({ query: currentUserQuery })
+      if (!currentUser) return dispatch('logout')
+      commit('SET_USER', currentUser)
+      return currentUser
+    } catch {
+      return dispatch('logout')
+    }
   },
 
   async login({ commit, dispatch }, { email, password }) {
