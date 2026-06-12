@@ -1835,6 +1835,41 @@ describe('in mode', () => {
             })
           })
         })
+
+        describe('membersCount', () => {
+          describe('public group', () => {
+            beforeEach(async () => {
+              authenticatedUser = await user.toJson()
+            })
+
+            it('counts only non-pending members', async () => {
+              const result = await query({ query: groupQuery, variables: { id: 'public-group' } })
+              expect(result.data?.Group[0]).toMatchObject({ id: 'public-group', membersCount: 3 })
+            })
+          })
+
+          describe('closed group', () => {
+            beforeEach(async () => {
+              authenticatedUser = await ownerOfClosedGroupUser.toJson()
+            })
+
+            it('counts only non-pending members', async () => {
+              const result = await query({ query: groupQuery, variables: { id: 'closed-group' } })
+              expect(result.data?.Group[0]).toMatchObject({ id: 'closed-group', membersCount: 2 })
+            })
+          })
+
+          describe('hidden group', () => {
+            beforeEach(async () => {
+              authenticatedUser = await ownerOfHiddenGroupUser.toJson()
+            })
+
+            it('counts only non-pending members', async () => {
+              const result = await query({ query: groupQuery, variables: { id: 'hidden-group' } })
+              expect(result.data?.Group[0]).toMatchObject({ id: 'hidden-group', membersCount: 3 })
+            })
+          })
+        })
       })
     })
 

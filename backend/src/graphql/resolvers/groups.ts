@@ -553,10 +553,25 @@ export default {
         isMutedByMe:
           'MATCH (this) RETURN EXISTS( (this)<-[:MUTED]-(:User {id: $cypherParams.currentUserId}) )',
       },
-      count: {
-        membersCount: '<-[:MEMBER_OF]-(related:User)',
-      },
     }),
+    membersCount: async (parent, _args, context: Context, _resolveInfo) => {
+      if (typeof parent.membersCount !== 'undefined') return parent.membersCount
+      const session = context.driver.session()
+      try {
+        return await session.readTransaction(async (txc) => {
+          const cypher = `
+            MATCH (:Group {id: $id})<-[membership:MEMBER_OF]-(:User)
+            WHERE membership.role <> 'pending'
+            RETURN COUNT(membership) as count
+          `
+          const result = await txc.run(cypher, { id: parent.id })
+          const [response] = result.records.map((r) => r.get('count').toNumber())
+          return response
+        })
+      } finally {
+        await session.close()
+      }
+    },
     name: async (parent, _args, context: Context, _resolveInfo) => {
       if (!context.user) {
         return parent.groupType === 'hidden' ? '' : parent.name
