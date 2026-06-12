@@ -4,7 +4,7 @@
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver } from '@db/neo4j'
 
-import { up } from './20260611120000-roles-single-role-edges'
+import { up } from './migrations/20260611120000-roles-single-role-edges'
 
 const noop = () => undefined
 
