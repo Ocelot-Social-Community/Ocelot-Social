@@ -12,12 +12,10 @@ export interface DecodedUser {
   id: string
   slug: string
   name: string
-  // Legacy flat role, kept transitionally. Authorization resolves from `roles`
-  // (HAS_ROLE) when present, otherwise bridges from this (see effectiveRoleNames).
-  role: string
-  // Dynamic role names from (:User)-[:HAS_ROLE]->(:Role). Empty until the R5
-  // migration assigns edges. Optional so other DecodedUser constructions need not
-  // set it; decode() always populates it (empty array when there are no edges).
+  // The user's single role name from (:User)-[:HAS_ROLE]->(:Role). Authorization
+  // resolves from this (see effectiveRoleName). Optional so other DecodedUser
+  // constructions need not set it; decode() always populates it (empty array when
+  // there is no edge, which resolves to the USER_ROLE baseline).
   roles?: string[]
   disabled: boolean
   authMethod?: 'jwt' | 'apiKey'
@@ -45,7 +43,7 @@ const decodeJwt = async (
       `
       MATCH (user:User {id: $id, deleted: false, disabled: false })
       RETURN user {
-        .id, .slug, .name, .role, .disabled, .actorId,
+        .id, .slug, .name, .disabled, .actorId,
         roles: [(user)-[:HAS_ROLE]->(r:Role) | r.name]
       }
       LIMIT 1

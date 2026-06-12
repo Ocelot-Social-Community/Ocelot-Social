@@ -14,6 +14,7 @@ import { v4 as uuid } from 'uuid'
 import { generateInviteCode } from '@graphql/resolvers/inviteCodes'
 import { isUniqueFor } from '@middleware/sluggifyMiddleware'
 import uniqueSlug, { toSlug } from '@middleware/slugify/uniqueSlug'
+import { seedDefaultRoleNodes } from '@src/role'
 
 import { getDriver, getNeode } from './neo4j'
 
@@ -45,6 +46,10 @@ export const cleanDatabase = async ({ withMigrations } = { withMigrations: false
   } finally {
     await session.close()
   }
+  // Re-seed the default role nodes so factory-built users get their HAS_ROLE edge
+  // and authorization resolves from the single-role system (there is no legacy
+  // user.role fallback anymore).
+  await seedDefaultRoleNodes()
 }
 
 Factory.define('category')
@@ -114,15 +119,26 @@ Factory.define('basicUser')
   })
 
 // Single-role: link a freshly built user to their role's :Role node (HAS_ROLE), so
-// the role system is populated at creation time. The target role node is the
-// `roleName` option when given (e.g. 'owner', which is not a UserRole tier), else the
-// user's legacy `role` tier. Graceful no-op when the role node has not been seeded
-// (e.g. most unit tests), where the legacy `user.role` fallback applies. `roles` is
-// the relationship key on the User neode model.
+// the role system is populated at creation time and authorization resolves from it.
+// The target role node is the `roleName` option when given (e.g. 'owner'), else the
+// `role` build attr (a convenience selector — 'admin'/'moderator'/'user' — that is
+// NOT persisted; there is no User.role property). Role nodes are seeded by
+// cleanDatabase, so the edge is created in tests too. `roles` is the relationship key
+// on the User neode model.
 const relateUserToRole = async (user, roleName) => {
   if (!roleName) return
   const role = await neode.find('Role', roleName)
   if (role) await user.relateTo(role, 'roles')
+}
+
+// Create a User node from the build attrs, then link it to its role node. `role` is
+// only a role-node selector (see relateUserToRole), so it is stripped before create.
+const createUserWithRole = async (buildObject, roleNameOverride) => {
+  const roleName = roleNameOverride ?? buildObject.role
+  delete buildObject.role
+  const user = await neode.create('User', buildObject)
+  await relateUserToRole(user, roleName)
+  return user
 }
 
 Factory.define('userWithoutEmailAddress')
@@ -130,9 +146,7 @@ Factory.define('userWithoutEmailAddress')
   .option('about', faker.lorem.paragraph)
   .option('roleName', null)
   .after(async (buildObject, options) => {
-    const user = await neode.create('User', buildObject)
-    await relateUserToRole(user, options.roleName ?? buildObject.role)
-    return user
+    return createUserWithRole(buildObject, options.roleName)
   })
 
 Factory.define('userWithAboutNull')
@@ -140,9 +154,7 @@ Factory.define('userWithAboutNull')
   .option('about', null)
   .option('roleName', null)
   .after(async (buildObject, options) => {
-    const user = await neode.create('User', buildObject)
-    await relateUserToRole(user, options.roleName ?? buildObject.role)
-    return user
+    return createUserWithRole(buildObject, options.roleName)
   })
 
 Factory.define('userWithAboutEmpty')
@@ -150,9 +162,7 @@ Factory.define('userWithAboutEmpty')
   .option('about', '')
   .option('roleName', null)
   .after(async (buildObject, options) => {
-    const user = await neode.create('User', buildObject)
-    await relateUserToRole(user, options.roleName ?? buildObject.role)
-    return user
+    return createUserWithRole(buildObject, options.roleName)
   })
 
 Factory.define('user')
@@ -177,6 +187,8 @@ Factory.define('user')
     if (!options.email) {
       options.email = `${buildObject.slug as string}@example.org`
     }
+    const roleName = options.roleName ?? buildObject.role
+    delete buildObject.role
     const [user, email, avatar] = await Promise.all([
       neode.create('User', buildObject),
       neode.create('EmailAddress', { email: options.email }),
@@ -184,7 +196,7 @@ Factory.define('user')
     ])
     await Promise.all([user.relateTo(email, 'primaryEmail'), email.relateTo(user, 'belongsTo')])
     if (avatar) await user.relateTo(avatar, 'avatar')
-    await relateUserToRole(user, options.roleName ?? buildObject.role)
+    await relateUserToRole(user, roleName)
     return user
   })
 

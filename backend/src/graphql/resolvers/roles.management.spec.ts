@@ -31,14 +31,14 @@ const asAdmin = async () => {
 const PERMISSION_CATALOG = `query { permissionCatalog { key group description } }`
 const MY_PERMISSIONS = `query { myPermissions }`
 const ROLES = `query { roles { name protected permissions memberCount } }`
-const USER_INFO = `query ($id: ID!) { User(id: $id) { id role roleName } }`
+const USER_INFO = `query ($id: ID!) { User(id: $id) { id roleName } }`
 const CREATE_ROLE = `mutation ($name: String!, $permissions: [String!]!) {
   createRole(name: $name, permissions: $permissions) {
     name permissions protected memberCount
   }
 }`
 const DELETE_ROLE = `mutation ($name: String!) { deleteRole(name: $name) }`
-const SET_USER_ROLE = `mutation ($userId: ID!, $roleName: String!) { setUserRole(userId: $userId, roleName: $roleName) { id role roleName } }`
+const SET_USER_ROLE = `mutation ($userId: ID!, $roleName: String!) { setUserRole(userId: $userId, roleName: $roleName) { id roleName } }`
 
 describe('role management', () => {
   beforeAll(async () => {
@@ -135,16 +135,16 @@ describe('role management', () => {
       ])
     })
 
-    it('counts members by their effective role (legacy role string, no edge needed)', async () => {
+    it('counts members by their single HAS_ROLE edge', async () => {
       await Factory.build('user', { id: 'm', role: 'user' }, { email: 'm@e.org', password: '1234' })
-      await asAdmin() // admin-id, role 'admin', also no HAS_ROLE edge
+      await asAdmin() // admin-id, admin edge
       const { data } = await query({ query: ROLES })
       const roleList = data.roles as Array<{ name: string; memberCount: number }>
       const byName: Record<string, number> = Object.fromEntries(
         roleList.map((r) => [r.name, r.memberCount]),
       )
       expect(byName.user).toBeGreaterThanOrEqual(1) // the baseline member
-      expect(byName.admin).toBeGreaterThanOrEqual(1) // the admin, via legacy user.role
+      expect(byName.admin).toBeGreaterThanOrEqual(1) // the admin, via its edge
     })
   })
 
@@ -238,7 +238,7 @@ describe('role management', () => {
       )
     })
 
-    it('sets the single role and reflects it in roleName + the legacy tier', async () => {
+    it('sets the single role and reflects it in roleName', async () => {
       await asAdmin()
       await mutate({
         mutation: CREATE_ROLE,
@@ -254,7 +254,6 @@ describe('role management', () => {
       expect(errors).toBeUndefined()
       const user = await readUser('member-id')
       expect(user.roleName).toBe('badge-setter')
-      expect(user.role).toBe('user') // custom role → legacy tier stays 'user'
     })
 
     it('replaces the previous role rather than accumulating', async () => {
@@ -269,16 +268,6 @@ describe('role management', () => {
       })
       const user = await readUser('member-id')
       expect(user.roleName).toBe('admin')
-      expect(user.role).toBe('admin')
-    })
-
-    it('syncs the legacy tier for tier roles', async () => {
-      await asAdmin()
-      await mutate({
-        mutation: SET_USER_ROLE,
-        variables: { userId: 'member-id', roleName: 'moderator' },
-      })
-      expect((await readUser('member-id')).role).toBe('moderator')
     })
 
     it('forbids a (non-owner) admin from assigning the owner role', async () => {

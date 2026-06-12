@@ -8,8 +8,7 @@ import { seedDefaultRoleNodes } from '@src/role'
 
 import { getDriver } from './neo4j'
 
-// The bootstrap account: the instance OWNER (protected failsafe superuser). Its
-// legacy `role` tier stays 'admin' (owner is not a UserRole enum value); the actual
+// The bootstrap account: the instance OWNER (protected failsafe superuser). The
 // single role is the HAS_ROLE -> owner edge created below. Login stays
 // admin@example.org / 1234.
 const defaultOwner = {
@@ -35,7 +34,6 @@ const createDefaultOwnerUser = async () => {
         })-[:BELONGS_TO]->(u:User {
         name: "${defaultOwner.name}",
         encryptedPassword: "${defaultOwner.password}",
-        role: "admin",
         id: "${defaultOwner.id}",
         slug: "${defaultOwner.slug}",
         createdAt: toString(datetime()),

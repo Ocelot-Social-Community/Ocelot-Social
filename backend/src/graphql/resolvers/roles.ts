@@ -16,17 +16,15 @@ const toGraphqlRole = (def: RoleDefinition, memberCount: number | null = null) =
   memberCount,
 })
 
-// Member count for a single role (HAS_ROLE edges).
-// Members are counted by their EFFECTIVE single role: the HAS_ROLE edge if present,
-// otherwise the legacy `user.role` tier, otherwise the baseline (mirrors
-// effectiveRoleName). So a user is counted even before the migration creates edges
-// or for a fresh signup that only has the legacy field.
+// Member count for a single role. Members are counted by their single HAS_ROLE
+// edge; an edgeless user (should not occur post-migration) falls back to the
+// baseline — consistent with effectiveRoleName.
 const countMembers = async (context: Context, name: string): Promise<number> => {
   const result = await context.database.query({
     query: `MATCH (u:User)
             WHERE coalesce(u.deleted, false) = false
             OPTIONAL MATCH (u)-[:HAS_ROLE]->(r:Role)
-            WITH coalesce(r.name, u.role, 'user') AS roleName
+            WITH coalesce(r.name, 'user') AS roleName
             WHERE roleName = $name
             RETURN count(*) AS count`,
     variables: { name },
@@ -39,24 +37,17 @@ const actorIsOwner = (context: Context): boolean =>
 
 export default {
   Query: {
-    // Legacy: the built-in role names for the (legacy) switchUserRole UI. Kept
-    // within the UserRole enum contract; the dynamic system uses `roles`.
-    // eslint-disable-next-line @typescript-eslint/require-await
-    availableRoles: async (_parent, _args, _context, _resolveInfo) => {
-      return ['admin', 'moderator', 'user']
-    },
-
     permissionCatalog: (_parent: unknown, _args: unknown, _context: Context) => permissionCatalog(),
 
     roles: async (_parent: unknown, _args: unknown, context: Context) => {
       const defs = context.role.allRoles()
-      // Count every (non-deleted) user once, by their effective single role
-      // (HAS_ROLE edge → legacy tier → baseline) — see countMembers above.
+      // Count every (non-deleted) user once, by their single HAS_ROLE edge (edgeless
+      // users fall back to the baseline) — see countMembers above.
       const result = await context.database.query({
         query: `MATCH (u:User)
                 WHERE coalesce(u.deleted, false) = false
                 OPTIONAL MATCH (u)-[:HAS_ROLE]->(r:Role)
-                WITH coalesce(r.name, u.role, 'user') AS roleName
+                WITH coalesce(r.name, 'user') AS roleName
                 RETURN roleName AS name, count(*) AS count`,
       })
       const counts = new Map<string, number>(
@@ -174,9 +165,7 @@ export default {
           throw new ForbiddenError('Cannot remove the last owner.')
         }
       }
-      // Replace the single edge and keep the legacy `user.role` tier in sync (for
-      // the not-yet-migrated frontend isAdmin/isModerator gating): owner/admin →
-      // 'admin', moderator → 'moderator', any other role → 'user'.
+      // Replace the user's single HAS_ROLE edge.
       const result = await context.database.write({
         query: `MATCH (u:User {id: $userId})
                 MATCH (r:Role {id: $roleName})
@@ -184,11 +173,6 @@ export default {
                 DELETE old
                 WITH u, r
                 MERGE (u)-[:HAS_ROLE]->(r)
-                SET u.role = CASE
-                  WHEN r.name IN ['owner', 'admin'] THEN 'admin'
-                  WHEN r.name = 'moderator' THEN 'moderator'
-                  ELSE 'user'
-                END
                 RETURN u {.*} AS user`,
         variables: { userId, roleName },
       })
@@ -199,15 +183,15 @@ export default {
   },
 
   User: {
-    // The user's single role name. Source of truth is the HAS_ROLE edge; falls
-    // back to the legacy `role` tier and then the baseline so an edgeless user
-    // (e.g. a fresh signup) still reports its effective role. Gated by role.manage.
-    roleName: async (parent: { id: string; role?: string }, _args: unknown, context: Context) => {
+    // The user's single role name (source of truth: the HAS_ROLE edge). Falls back
+    // to the baseline so an edgeless user still reports an effective role. Gated by
+    // role.manage.
+    roleName: async (parent: { id: string }, _args: unknown, context: Context) => {
       const result = await context.database.query({
         query: `MATCH (:User {id: $id})-[:HAS_ROLE]->(r:Role) RETURN r.name AS name ORDER BY r.name ASC LIMIT 1`,
         variables: { id: parent.id },
       })
-      return (result.records[0]?.get('name') as string | undefined) ?? parent.role ?? 'user'
+      return (result.records[0]?.get('name') as string | undefined) ?? 'user'
     },
   },
 }

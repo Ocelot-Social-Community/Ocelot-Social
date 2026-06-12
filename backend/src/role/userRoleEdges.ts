@@ -38,9 +38,8 @@ export async function ensureUserRoleEdges(db: DbContext = databaseContext()): Pr
 
 // Promote a user (matched by email, slug, or id) to the single `owner` role — the
 // shell escape hatch for legacy instances that have no owner yet (the API only lets
-// an existing owner grant owner). Seeds the role nodes, replaces the user's role
-// edge with owner, and syncs the legacy tier to 'admin'. Returns the promoted user,
-// or null if no user matched.
+// an existing owner grant owner). Seeds the role nodes and replaces the user's role
+// edge with owner. Returns the promoted user, or null if no user matched.
 export async function promoteToOwner(
   identifier: string,
   db: DbContext = databaseContext(),
@@ -57,7 +56,6 @@ export async function promoteToOwner(
             WITH u
             MATCH (owner:Role {id: 'owner'})
             MERGE (u)-[:HAS_ROLE]->(owner)
-            SET u.role = 'admin'
             RETURN u.id AS id, u.slug AS slug`,
     variables: { identifier },
   })

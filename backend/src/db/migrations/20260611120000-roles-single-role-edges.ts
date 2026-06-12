@@ -4,7 +4,7 @@ import { getDriver } from '@db/neo4j'
 import { DEFAULT_ROLES } from '@src/role'
 
 export const description =
-  'Normalize to the single-role model: every user has exactly one HAS_ROLE edge (baseline users get the user role; any extra edges collapse to the highest-rank one), and the legacy user.role tier is synced.'
+  'Normalize to the single-role model: derive every user a single HAS_ROLE edge from their legacy user.role tier (baseline users get the user role; any extra edges collapse to the highest-rank one), then drop the legacy user.role property.'
 
 export async function up(_next) {
   const driver = getDriver()
@@ -51,15 +51,9 @@ export async function up(_next) {
        FOREACH (rel IN rels[1..] | DELETE rel)`,
     )
 
-    // 3. Sync the legacy user.role tier to the single role.
-    await transaction.run(
-      `MATCH (u:User)-[:HAS_ROLE]->(r:Role)
-       SET u.role = CASE
-         WHEN r.name IN ['owner', 'admin'] THEN 'admin'
-         WHEN r.name = 'moderator' THEN 'moderator'
-         ELSE 'user'
-       END`,
-    )
+    // 3. Drop the legacy user.role property — authorization now resolves solely from
+    //    the HAS_ROLE edge derived above.
+    await transaction.run(`MATCH (u:User) REMOVE u.role`)
 
     await transaction.commit()
   } catch (error) {

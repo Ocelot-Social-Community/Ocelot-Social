@@ -476,7 +476,6 @@ export default shield(
       userData: isAuthenticated,
       VerifyNonce: allow,
       queryLocations: allow,
-      availableRoles: hasPermission('role.manage'),
       permissionCatalog: hasPermission('role.manage'),
       roles: hasPermission('role.manage'),
       userRoles: hasPermission('role.manage'),
@@ -572,7 +571,6 @@ export default shield(
       adminRevokeApiKey: hasPermission('apiKey.administer'),
       adminRevokeUserApiKeys: hasPermission('apiKey.administer'),
 
-      switchUserRole: hasPermission('role.manage'),
       createRole: hasPermission('role.manage'),
       updateRole: hasPermission('role.manage'),
       deleteRole: hasPermission('role.manage'),

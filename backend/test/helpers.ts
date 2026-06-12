@@ -86,6 +86,22 @@ interface CreateTestServerOptions {
   plugins?: ApolloServerPlugin[]
 }
 
+// Resolve the authenticated user's single role name from its HAS_ROLE edge, the way
+// decode() does in production. Tests build authenticatedUser from user.toJson(), which
+// carries no role name; without this the user would resolve to no permissions.
+const resolveAuthUserRoles = async (
+  database: ReturnType<typeof databaseContext>,
+  authenticatedUser: Context['user'] | undefined,
+): Promise<Context['user'] | undefined> => {
+  if (!authenticatedUser?.id) return authenticatedUser
+  const result = await database.query({
+    query: `MATCH (u:User {id: $id}) RETURN [(u)-[:HAS_ROLE]->(r:Role) | r.name] AS roles`,
+    variables: { id: authenticatedUser.id },
+  })
+  const roles = (result.records[0]?.get('roles') as string[] | undefined) ?? []
+  return { ...authenticatedUser, roles }
+}
+
 export const createApolloTestSetup = async (opts?: CreateTestServerOptions) => {
   const defaultOpts: CreateTestServerOptions = { context: () => ({ authenticatedUser: null }) }
   const { context: testContext, plugins } = opts ?? defaultOpts
@@ -107,8 +123,13 @@ export const createApolloTestSetup = async (opts?: CreateTestServerOptions) => {
     // as in production; a test can override the definitions, or inject a real
     // DB-backed RoleService when it needs to mutate roles / HAS_ROLE edges.
     const role = roleService ?? createInMemoryRoleService(rolesOverride)
+    // Tests set authenticatedUser from `user.toJson()`, which does not carry the
+    // user's role name. Production resolves it in decode() from the HAS_ROLE edge;
+    // mirror that here so effectivePermissions are correct (the legacy user.role
+    // carrier is gone). Role nodes + edges exist because cleanDatabase seeds them.
+    const resolvedUser = await resolveAuthUserRoles(database, authenticatedUser)
     return getContext({
-      authenticatedUser,
+      authenticatedUser: resolvedUser,
       database,
       pubsub,
       config: merged,

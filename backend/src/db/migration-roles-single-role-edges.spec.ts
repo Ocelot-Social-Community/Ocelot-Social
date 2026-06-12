@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
-import Factory, { cleanDatabase } from '@db/factories'
+import { cleanDatabase } from '@db/factories'
 import { getDriver } from '@db/neo4j'
 
 import { up } from './migrations/20260611120000-roles-single-role-edges'
@@ -25,41 +25,25 @@ const rolesOf = async (userId: string): Promise<string[]> => {
   return result.records.map((r) => r.get('name') as string).sort()
 }
 
-const legacyRole = async (userId: string): Promise<string> => {
+const legacyRole = async (userId: string): Promise<string | null> => {
   const result = await run(`MATCH (u:User {id: $userId}) RETURN u.role AS role`, { userId })
-  return result.records[0].get('role') as string
+  return result.records[0].get('role') as string | null
 }
 
 describe('migration: single-role-edges', () => {
   beforeEach(async () => {
     await cleanDatabase()
-    await Factory.build(
-      'user',
-      { id: 'admin-id', role: 'admin' },
-      { email: 'a@e.org', password: '1' },
-    )
-    await Factory.build(
-      'user',
-      { id: 'mod-id', role: 'moderator' },
-      { email: 'm@e.org', password: '1' },
-    )
-    await Factory.build(
-      'user',
-      { id: 'member-id', role: 'user' },
-      { email: 'u@e.org', password: '1' },
-    )
-    await Factory.build(
-      'user',
-      { id: 'multi-id', role: 'moderator' },
-      { email: 'x@e.org', password: '1' },
-    )
-    // Role nodes + a user with TWO edges (to exercise the dedup collapse).
+    // Legacy-shaped data built via raw Cypher (NOT the factory, which already creates
+    // HAS_ROLE edges): users carry the legacy `role` tier and have no edge yet. The
+    // migration must derive the edge and then drop `role`.
     await run(`
-      MERGE (:Role {id: 'owner', name: 'owner'})
-      MERGE (:Role {id: 'admin', name: 'admin'})
-      MERGE (:Role {id: 'moderator', name: 'moderator'})
-      MERGE (:Role {id: 'user', name: 'user'})
+      CREATE (:User {id: 'admin-id', role: 'admin', deleted: false})
+      CREATE (:User {id: 'mod-id', role: 'moderator', deleted: false})
+      CREATE (:User {id: 'member-id', role: 'user', deleted: false})
+      CREATE (:User {id: 'multi-id', role: 'moderator', deleted: false})
     `)
+    // A user with TWO edges (to exercise the dedup collapse). cleanDatabase already
+    // seeded the role nodes.
     await run(`
       MATCH (u:User {id: 'multi-id'}), (a:Role {id: 'admin'}), (m:Role {id: 'moderator'})
       MERGE (u)-[:HAS_ROLE]->(a)
@@ -85,9 +69,9 @@ describe('migration: single-role-edges', () => {
     expect(await rolesOf('multi-id')).toEqual(['admin'])
   })
 
-  it('syncs the legacy user.role tier', async () => {
+  it('drops the legacy user.role property', async () => {
     await up(noop)
-    expect(await legacyRole('multi-id')).toBe('admin')
-    expect(await legacyRole('member-id')).toBe('user')
+    expect(await legacyRole('admin-id')).toBeNull()
+    expect(await legacyRole('member-id')).toBeNull()
   })
 })

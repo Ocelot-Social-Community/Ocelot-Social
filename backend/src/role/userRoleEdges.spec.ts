@@ -30,17 +30,6 @@ const roleNodeExists = async (name: string): Promise<boolean> => {
   }
 }
 
-const legacyRole = async (userId: string): Promise<string> => {
-  const session = getDriver().session()
-  try {
-    const result = await session.readTransaction((tx) =>
-      tx.run(`MATCH (u:User {id: $userId}) RETURN u.role AS role`, { userId }),
-    )
-    return result.records[0].get('role') as string
-  } finally {
-    await session.close()
-  }
-}
 
 describe('role-edge helpers (DB)', () => {
   beforeEach(async () => {
@@ -80,7 +69,6 @@ describe('role-edge helpers (DB)', () => {
       const result = await promoteToOwner('u@e.org')
       expect(result?.id).toBe('u')
       expect(await rolesOf('u')).toEqual(['owner']) // single edge, replaced
-      expect(await legacyRole('u')).toBe('admin') // legacy tier synced
     })
 
     it('promotes a user found by id (seeds roles itself, no prior edge needed)', async () => {
@@ -103,7 +91,6 @@ describe('role-edge helpers (DB)', () => {
         { email: 'o@e.org', password: '1', roleName: 'owner' },
       )
       expect(await rolesOf('o')).toEqual(['owner']) // owner edge, not the admin tier
-      expect(await legacyRole('o')).toBe('admin') // legacy tier untouched
     })
   })
 })

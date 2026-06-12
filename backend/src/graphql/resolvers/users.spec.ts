@@ -12,7 +12,6 @@ import resetTrophyBadgesSelected from '@graphql/queries/badges/resetTrophyBadges
 import setTrophyBadgeSelected from '@graphql/queries/badges/setTrophyBadgeSelected.gql'
 import saveCategorySettings from '@graphql/queries/saveCategorySettings.gql'
 import DeleteUser from '@graphql/queries/users/DeleteUser.gql'
-import switchUserRole from '@graphql/queries/users/switchUserRole.gql'
 import updateOnlineStatus from '@graphql/queries/users/updateOnlineStatus.gql'
 import UpdateUser from '@graphql/queries/users/UpdateUser.gql'
 import userQuery from '@graphql/queries/users/User.gql'
@@ -484,68 +483,8 @@ describe('Delete a User as admin', () => {
   })
 })
 
-describe('switch user role', () => {
-  beforeEach(async () => {
-    user = await Factory.build('user', {
-      id: 'user',
-      role: 'user',
-    })
-    admin = await Factory.build('user', {
-      role: 'admin',
-      id: 'admin',
-    })
-  })
-
-  describe('as simple user', () => {
-    it('cannot change the role', async () => {
-      authenticatedUser = await user.toJson()
-      variables = {
-        id: 'user',
-        role: 'admin',
-      }
-      await expect(mutate({ mutation: switchUserRole, variables })).resolves.toMatchObject({
-        data: { switchUserRole: null },
-        errors: [{ message: 'Not Authorized!' }],
-      })
-    })
-  })
-
-  describe('as admin', () => {
-    it('changes the role of other user', async () => {
-      authenticatedUser = await admin.toJson()
-      variables = {
-        id: 'user',
-        role: 'moderator',
-      }
-      await expect(mutate({ mutation: switchUserRole, variables })).resolves.toEqual(
-        expect.objectContaining({
-          data: {
-            switchUserRole: expect.objectContaining({
-              role: 'moderator',
-            }),
-          },
-        }),
-      )
-    })
-
-    it('cannot change own role', async () => {
-      authenticatedUser = await admin.toJson()
-      variables = {
-        id: 'admin',
-        role: 'moderator',
-      }
-      await expect(mutate({ mutation: switchUserRole, variables })).resolves.toEqual(
-        expect.objectContaining({
-          errors: [
-            expect.objectContaining({
-              message: 'you-cannot-change-your-own-role',
-            }),
-          ],
-        }),
-      )
-    })
-  })
-})
+// The legacy switchUserRole mutation has been removed; assigning a user's single
+// role is covered by setUserRole in roles.management.spec.ts.
 
 let anotherUser
 

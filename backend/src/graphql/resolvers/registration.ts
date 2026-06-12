@@ -68,7 +68,6 @@ export default {
             MERGE (user)<-[:BELONGS_TO]-(email)
             SET user += $args
             SET user.id = randomUUID()
-            SET user.role = 'user'
             SET user.createdAt = toString(datetime())
             SET user.updatedAt = toString(datetime())
             SET user.allowEmbedIframes = false

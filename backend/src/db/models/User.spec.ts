@@ -22,17 +22,6 @@ afterEach(async () => {
   await cleanDatabase()
 })
 
-describe('role', () => {
-  it('defaults to `user`', async () => {
-    const user = await neode.create('User', { name: 'John' })
-    await expect(user.toJson()).resolves.toEqual(
-      expect.objectContaining({
-        role: 'user',
-      }),
-    )
-  })
-})
-
 describe('slug', () => {
   it('normalizes to lowercase letters', async () => {
     const user = await neode.create('User', { slug: 'Matt' })

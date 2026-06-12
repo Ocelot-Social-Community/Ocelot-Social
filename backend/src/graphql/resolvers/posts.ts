@@ -434,8 +434,10 @@ export default {
       const { driver, user } = context
       const session = driver.session()
       const { id: userId } = user
+      // Authorization is enforced by the shield (post.pin permission); this only
+      // needs the acting user to attach the PINNED edge.
       const pinPostCypher = `
-        MATCH (user:User {id: $userId}) WHERE user.role = 'admin'
+        MATCH (user:User {id: $userId})
         MATCH (post:Post {id: $params.id})
         WHERE NOT EXISTS((post)-[:IN]->(:Group)) OR 
           (post)-[:IN]->(:Group { groupType: 'public'})

@@ -281,33 +281,6 @@ export default {
         await session.close()
       }
     },
-    switchUserRole: async (_object, args, context, _resolveInfo) => {
-      const { role, id } = args
-
-      if (context.user.id === id) throw new Error('you-cannot-change-your-own-role')
-      const session = context.driver.session()
-      try {
-        const user = await session.writeTransaction(async (transaction) => {
-          const switchUserRoleResponse = await transaction.run(
-            `
-              MATCH (user:User {id: $id})
-              OPTIONAL MATCH (user)-[:PRIMARY_EMAIL]->(e:EmailAddress)
-              SET user.role = $role
-              SET user.updatedAt = toString(datetime())
-              RETURN user {.*, email: e.email}
-            `,
-            { id, role },
-          )
-          return switchUserRoleResponse.records.map((record) => record.get('user'))[0]
-        })
-        if (!user) {
-          throw new UserInputError('Could not find User')
-        }
-        return user
-      } finally {
-        await session.close()
-      }
-    },
     saveCategorySettings: async (_object, args, context, _resolveInfo) => {
       const { activeCategories } = args
       const {
