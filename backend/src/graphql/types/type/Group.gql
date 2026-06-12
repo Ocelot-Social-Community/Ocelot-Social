@@ -88,7 +88,7 @@ type Query {
   # orderBy: [_GroupOrdering] # not implemented yet
   # filter: _GroupFilter # not implemented yet
 
-  GroupMembers(id: ID!, first: Int, offset: Int): [GroupMember]
+  GroupMembers(id: ID!, first: Int, offset: Int, includePending: Boolean): [GroupMember]
   # orderBy: [_UserOrdering] # not implemented yet
   # filter: _UserFilter # not implemented yet
 

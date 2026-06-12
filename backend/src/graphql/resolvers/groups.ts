@@ -83,12 +83,14 @@ export default {
       }
     },
     GroupMembers: async (_object, params, context: Context, _resolveInfo) => {
-      const { id: groupId, first = 25, offset = 0 } = params
+      const { id: groupId, first = 25, offset = 0, includePending = false } = params
       const session = context.driver.session()
       try {
         return await session.readTransaction(async (txc) => {
+          const pendingFilter = includePending ? '' : "WHERE membership.role <> 'pending'"
           const groupMemberCypher = `
             MATCH (user:User)-[membership:MEMBER_OF]->(:Group {id: $groupId})
+            ${pendingFilter}
             RETURN user {.*}, membership {.*}
             SKIP toInteger($offset) LIMIT toInteger($first)
           `
