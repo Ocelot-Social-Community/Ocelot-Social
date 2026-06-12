@@ -379,13 +379,14 @@ describe('ContributionForm.vue', () => {
           })
 
           describe('submit with LocationSelect object payload', () => {
-            beforeEach(() => {
+            beforeEach(async () => {
               wrapper.vm.updateFormField('eventLocationName', {
                 label: 'Deutschland, Germany',
                 value: 'Deutschland, Germany',
                 id: 'place.abc123',
               })
-              wrapper.find('form').trigger('submit')
+              await wrapper.find('form').trigger('submit')
+              await wrapper.vm.$nextTick()
             })
 
             it('extracts the value string from the location object', () => {

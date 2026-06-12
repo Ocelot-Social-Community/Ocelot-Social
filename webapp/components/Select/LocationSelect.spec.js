@@ -120,5 +120,25 @@ describe('LocationSelect', () => {
         })
       })
     })
+
+    describe('short user input is ignored', () => {
+      beforeEach(() => {
+        queryMock.mockClear()
+        jest.useFakeTimers()
+        wrapper = mount(LocationSelect, { mocks, localVue, propsData: { value: '' } })
+      })
+
+      afterEach(() => {
+        jest.useRealTimers()
+      })
+
+      it('does not call apollo for input shorter than 3 characters', () => {
+        const input = wrapper.find('#city')
+        input.element.value = 'ab'
+        input.trigger('input')
+        jest.runAllTimers()
+        expect(queryMock).not.toHaveBeenCalled()
+      })
+    })
   })
 })

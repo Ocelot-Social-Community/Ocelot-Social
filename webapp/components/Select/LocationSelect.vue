@@ -72,6 +72,7 @@ export default {
   },
   async created() {
     this.icons = iconRegistry
+    this._cityQueryId = 0
     await this.resolveLocalizedLocation()
   },
   data() {
@@ -145,6 +146,8 @@ export default {
         return
       }
 
+      const reqId = ++this._cityQueryId
+
       try {
         this.loadingGeo = true
 
@@ -159,14 +162,16 @@ export default {
           fetchPolicy: 'network-only',
         })
 
+        if (reqId !== this._cityQueryId) return
+
         this.cities = this.processLocationsResult(result)
         this.loadingGeo = false
 
         return this.cities.find((city) => city.value === value)
       } catch (error) {
-        this.$toast.error(error.message)
+        if (reqId === this._cityQueryId) this.$toast.error(error.message)
       } finally {
-        this.loadingGeo = false
+        if (reqId === this._cityQueryId) this.loadingGeo = false
       }
     },
     async resolveLocalizedLocation() {
