@@ -199,15 +199,38 @@
     "roles": {
       "allPermissions": "Holds every permission (protected).",
       "cannotDelete": "Ky rol nuk mund të fshihet.",
-      "protectedHint": "Roli i pronarit ka të gjitha lejet dhe nuk mund të modifikohet.",
       "create": "Create role",
       "createTitle": "Create a new role",
       "delete": "Delete",
       "description": "Create roles and assign permissions. Changes apply immediately.",
+      "groups": {
+        "administration": "Administrim",
+        "content": "Përmbajtje",
+        "membership": "Anëtarësia",
+        "moderation": "Moderim"
+      },
       "members": "{count} members",
       "name": "Roles & permissions",
       "nameLabel": "Name",
+      "perm": {
+        "apiKey_administer": "Administro çelësat API të përdoruesve të tjerë.",
+        "badge_manage": "Jep dhe hiq stema.",
+        "content_moderate": "Shqyrto dhe vendos për përmbajtjen e raportuar.",
+        "donation_manage": "Konfiguro widget-in e donacioneve.",
+        "group_create": "Krijo grupe.",
+        "group_create_hidden": "Krijo grupe të fshehura.",
+        "network_statistics_read": "Shiko statistikat e të gjithë rrjetit.",
+        "policy_manage": "Shiko dhe ndrysho cilësimet e politikave të rrjetit.",
+        "post_create": "Krijo postime.",
+        "post_pin": "Ngjit dhe shkëput postimet në të gjithë rrjetin.",
+        "post_push": "Promovo dhe tërhiq (boost) postimet.",
+        "role_manage": "Menaxho rolet dhe cakto ato te përdoruesit.",
+        "user_delete_any": "Fshi llogarinë e çdo përdoruesi.",
+        "user_email_readAny": "Lexo adresën e email-it të çdo përdoruesi.",
+        "user_invite": "Gjenero kode ftese personale."
+      },
       "protected": "protected",
+      "protectedHint": "Roli i pronarit ka të gjitha lejet dhe nuk mund të modifikohet.",
       "save": "Save",
       "saveError": "Could not save role: {message}",
       "saveSuccess": "Role saved.",
@@ -217,12 +240,12 @@
       "name": "Cilësimet"
     },
     "users": {
+      "addRole": "Assign role…",
       "empty": "Nuk u gjetën përdorues",
       "form": {
         "placeholder": "e-mail, emër ose përshkrim"
       },
       "name": "Përdoruesit",
-      "addRole": "Assign role…",
       "removeRole": "Remove role {role}",
       "roleChanged": "Roli u ndryshua me sukses!",
       "table": {

@@ -199,15 +199,38 @@
     "roles": {
       "allPermissions": "Hält alle Berechtigungen (geschützt).",
       "cannotDelete": "Diese Rolle kann nicht gelöscht werden.",
-      "protectedHint": "Die Owner-Rolle hält alle Berechtigungen und kann nicht bearbeitet werden.",
       "create": "Rolle erstellen",
       "createTitle": "Neue Rolle erstellen",
       "delete": "Löschen",
       "description": "Rollen erstellen und Berechtigungen vergeben. Änderungen gelten sofort.",
+      "groups": {
+        "administration": "Administration",
+        "content": "Inhalte",
+        "membership": "Mitgliedschaft",
+        "moderation": "Moderation"
+      },
       "members": "{count} Mitglieder",
       "name": "Rollen & Berechtigungen",
       "nameLabel": "Name",
+      "perm": {
+        "apiKey_administer": "API-Schlüssel anderer Nutzer verwalten.",
+        "badge_manage": "Badges vergeben und entziehen.",
+        "content_moderate": "Gemeldete Inhalte prüfen und entscheiden.",
+        "donation_manage": "Das Spenden-Widget konfigurieren.",
+        "group_create": "Gruppen erstellen.",
+        "group_create_hidden": "Versteckte Gruppen erstellen.",
+        "network_statistics_read": "Netzwerkweite Statistiken einsehen.",
+        "policy_manage": "Netzwerk-Richtlinien einsehen und ändern.",
+        "post_create": "Beiträge erstellen.",
+        "post_pin": "Beiträge netzwerkweit anpinnen und lösen.",
+        "post_push": "Beiträge pushen und zurücknehmen (boosten).",
+        "role_manage": "Rollen verwalten und Nutzern zuweisen.",
+        "user_delete_any": "Beliebiges Nutzerkonto löschen.",
+        "user_email_readAny": "E-Mail-Adresse beliebiger Nutzer lesen.",
+        "user_invite": "Persönliche Einladungscodes erzeugen."
+      },
       "protected": "geschützt",
+      "protectedHint": "Die Owner-Rolle hält alle Berechtigungen und kann nicht bearbeitet werden.",
       "save": "Speichern",
       "saveError": "Rolle konnte nicht gespeichert werden: {message}",
       "saveSuccess": "Rolle gespeichert.",
@@ -217,12 +240,12 @@
       "name": "Einstellungen"
     },
     "users": {
+      "addRole": "Rolle zuweisen…",
       "empty": "Keine Nutzer gefunden",
       "form": {
         "placeholder": "E-Mail, Name oder Beschreibung"
       },
       "name": "Nutzer",
-      "addRole": "Rolle zuweisen…",
       "removeRole": "Rolle {role} entfernen",
       "roleChanged": "Rolle erfolgreich geändert!",
       "table": {

@@ -199,15 +199,38 @@
     "roles": {
       "allPermissions": "Holds every permission (protected).",
       "cannotDelete": "Эту роль нельзя удалить.",
-      "protectedHint": "Роль владельца имеет все разрешения и не может быть изменена.",
       "create": "Create role",
       "createTitle": "Create a new role",
       "delete": "Delete",
       "description": "Create roles and assign permissions. Changes apply immediately.",
+      "groups": {
+        "administration": "Администрирование",
+        "content": "Контент",
+        "membership": "Участники",
+        "moderation": "Модерация"
+      },
       "members": "{count} members",
       "name": "Roles & permissions",
       "nameLabel": "Name",
+      "perm": {
+        "apiKey_administer": "Управление API-ключами других пользователей.",
+        "badge_manage": "Выдача и отзыв значков.",
+        "content_moderate": "Проверка и решения по жалобам на контент.",
+        "donation_manage": "Настройка виджета пожертвований.",
+        "group_create": "Создание групп.",
+        "group_create_hidden": "Создание скрытых групп.",
+        "network_statistics_read": "Просмотр статистики по всей сети.",
+        "policy_manage": "Просмотр и изменение настроек политики сети.",
+        "post_create": "Создание записей.",
+        "post_pin": "Закрепление и открепление записей по всей сети.",
+        "post_push": "Продвижение и отмена продвижения (boost) записей.",
+        "role_manage": "Управление ролями и их назначение пользователям.",
+        "user_delete_any": "Удаление учётной записи любого пользователя.",
+        "user_email_readAny": "Чтение адреса эл. почты любого пользователя.",
+        "user_invite": "Создание персональных кодов приглашения."
+      },
       "protected": "protected",
+      "protectedHint": "Роль владельца имеет все разрешения и не может быть изменена.",
       "save": "Save",
       "saveError": "Could not save role: {message}",
       "saveSuccess": "Role saved.",
@@ -217,12 +240,12 @@
       "name": "Настройки"
     },
     "users": {
+      "addRole": "Assign role…",
       "empty": "Пользователи не найдены",
       "form": {
         "placeholder": "Электронная почта, имя или описание"
       },
       "name": "Пользователи",
-      "addRole": "Assign role…",
       "removeRole": "Remove role {role}",
       "roleChanged": "Роль успешно изменена!",
       "table": {

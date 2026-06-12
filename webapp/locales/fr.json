@@ -199,15 +199,38 @@
     "roles": {
       "allPermissions": "Holds every permission (protected).",
       "cannotDelete": "Ce rôle ne peut pas être supprimé.",
-      "protectedHint": "Le rôle propriétaire détient toutes les permissions et ne peut pas être modifié.",
       "create": "Create role",
       "createTitle": "Create a new role",
       "delete": "Delete",
       "description": "Create roles and assign permissions. Changes apply immediately.",
+      "groups": {
+        "administration": "Administration",
+        "content": "Contenu",
+        "membership": "Adhésion",
+        "moderation": "Modération"
+      },
       "members": "{count} members",
       "name": "Roles & permissions",
       "nameLabel": "Name",
+      "perm": {
+        "apiKey_administer": "Administrer les clés API des autres utilisateurs.",
+        "badge_manage": "Attribuer et retirer des badges.",
+        "content_moderate": "Examiner et décider du contenu signalé.",
+        "donation_manage": "Configurer le widget de dons.",
+        "group_create": "Créer des groupes.",
+        "group_create_hidden": "Créer des groupes cachés.",
+        "network_statistics_read": "Consulter les statistiques de tout le réseau.",
+        "policy_manage": "Consulter et modifier les paramètres de politique du réseau.",
+        "post_create": "Créer des publications.",
+        "post_pin": "Épingler et désépingler des publications sur tout le réseau.",
+        "post_push": "Mettre en avant et retirer (boost) des publications.",
+        "role_manage": "Gérer les rôles et les attribuer aux utilisateurs.",
+        "user_delete_any": "Supprimer le compte de n’importe quel utilisateur.",
+        "user_email_readAny": "Lire l’adresse e-mail de n’importe quel utilisateur.",
+        "user_invite": "Générer des codes d’invitation personnels."
+      },
       "protected": "protected",
+      "protectedHint": "Le rôle propriétaire détient toutes les permissions et ne peut pas être modifié.",
       "save": "Save",
       "saveError": "Could not save role: {message}",
       "saveSuccess": "Role saved.",
@@ -217,12 +240,12 @@
       "name": "Paramètres"
     },
     "users": {
+      "addRole": "Assign role…",
       "empty": "Aucun utilisateur trouvé",
       "form": {
         "placeholder": "mail, nom ou description"
       },
       "name": "Utilisateurs",
-      "addRole": "Assign role…",
       "removeRole": "Remove role {role}",
       "roleChanged": "Rôle modifié avec succès !",
       "table": {

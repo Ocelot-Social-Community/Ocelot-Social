@@ -80,7 +80,7 @@
         </p>
 
         <fieldset v-for="group in permissionGroups" :key="group.name" class="perm-group">
-          <legend class="perm-group__title">{{ group.name }}</legend>
+          <legend class="perm-group__title">{{ groupLabel(group.name) }}</legend>
           <label
             v-for="permission in group.permissions"
             :key="permission.key"
@@ -98,7 +98,7 @@
             />
             <span class="perm-row__text">
               <span class="perm-row__key">{{ permission.key }}</span>
-              <span class="perm-row__desc">{{ permission.description }}</span>
+              <span class="perm-row__desc">{{ permLabel(permission) }}</span>
             </span>
           </label>
         </fieldset>
@@ -230,6 +230,21 @@ export default {
       }
       this.forms = forms
       this.ensureActive()
+    },
+    // Localized label for a permission group, falling back to the raw group name.
+    // vuex-i18n returns the key itself when there is no translation.
+    groupLabel(group) {
+      const path = `admin.roles.groups.${group}`
+      const label = this.$t(path)
+      return label && label !== path ? label : group
+    },
+    // Localized description for a permission. The catalog key is dotted, so it is
+    // sanitised to a flat i18n key; falls back to the catalog's English description
+    // (e.g. for a permission added before its translation exists).
+    permLabel(permission) {
+      const path = `admin.roles.perm.${permission.key.replace(/\./g, '_')}`
+      const label = this.$t(path)
+      return label && label !== path ? label : permission.description
     },
     // The effective permission key set of a role (full catalog for protected roles).
     permissionSetOf(role) {

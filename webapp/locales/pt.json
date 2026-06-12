@@ -199,15 +199,38 @@
     "roles": {
       "allPermissions": "Holds every permission (protected).",
       "cannotDelete": "Esta função não pode ser excluída.",
-      "protectedHint": "A função de proprietário detém todas as permissões e não pode ser editada.",
       "create": "Create role",
       "createTitle": "Create a new role",
       "delete": "Delete",
       "description": "Create roles and assign permissions. Changes apply immediately.",
+      "groups": {
+        "administration": "Administração",
+        "content": "Conteúdo",
+        "membership": "Adesão",
+        "moderation": "Moderação"
+      },
       "members": "{count} members",
       "name": "Roles & permissions",
       "nameLabel": "Name",
+      "perm": {
+        "apiKey_administer": "Administrar as chaves de API de outros utilizadores.",
+        "badge_manage": "Conceder e revogar distintivos.",
+        "content_moderate": "Analisar e decidir sobre conteúdo denunciado.",
+        "donation_manage": "Configurar o widget de doações.",
+        "group_create": "Criar grupos.",
+        "group_create_hidden": "Criar grupos ocultos.",
+        "network_statistics_read": "Ver estatísticas de toda a rede.",
+        "policy_manage": "Ver e alterar as definições de política da rede.",
+        "post_create": "Criar publicações.",
+        "post_pin": "Fixar e desafixar publicações em toda a rede.",
+        "post_push": "Impulsionar e remover (boost) publicações.",
+        "role_manage": "Gerir funções e atribuí-las aos utilizadores.",
+        "user_delete_any": "Eliminar a conta de qualquer utilizador.",
+        "user_email_readAny": "Ler o endereço de e-mail de qualquer utilizador.",
+        "user_invite": "Gerar códigos de convite pessoais."
+      },
       "protected": "protected",
+      "protectedHint": "A função de proprietário detém todas as permissões e não pode ser editada.",
       "save": "Save",
       "saveError": "Could not save role: {message}",
       "saveSuccess": "Role saved.",
@@ -217,12 +240,12 @@
       "name": "Configurações"
     },
     "users": {
+      "addRole": "Assign role…",
       "empty": "Nenhum usuário encontrado",
       "form": {
         "placeholder": "e-mail, nome ou descrição"
       },
       "name": "Usuários",
-      "addRole": "Assign role…",
       "removeRole": "Remove role {role}",
       "roleChanged": "Papel alterado com sucesso!",
       "table": {

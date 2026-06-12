@@ -199,15 +199,38 @@
     "roles": {
       "allPermissions": "Holds every permission (protected).",
       "cannotDelete": "Deze rol kan niet worden verwijderd.",
-      "protectedHint": "De eigenaarsrol heeft alle rechten en kan niet worden bewerkt.",
       "create": "Create role",
       "createTitle": "Create a new role",
       "delete": "Delete",
       "description": "Create roles and assign permissions. Changes apply immediately.",
+      "groups": {
+        "administration": "Beheer",
+        "content": "Inhoud",
+        "membership": "Lidmaatschap",
+        "moderation": "Moderatie"
+      },
       "members": "{count} members",
       "name": "Roles & permissions",
       "nameLabel": "Name",
+      "perm": {
+        "apiKey_administer": "API-sleutels van andere gebruikers beheren.",
+        "badge_manage": "Badges toekennen en intrekken.",
+        "content_moderate": "Gerapporteerde inhoud beoordelen en beslissen.",
+        "donation_manage": "De donatiewidget configureren.",
+        "group_create": "Groepen maken.",
+        "group_create_hidden": "Verborgen groepen maken.",
+        "network_statistics_read": "Netwerkbrede statistieken bekijken.",
+        "policy_manage": "Netwerkbeleid bekijken en wijzigen.",
+        "post_create": "Berichten maken.",
+        "post_pin": "Berichten netwerkbreed vastpinnen en losmaken.",
+        "post_push": "Berichten pushen en terugtrekken (boost).",
+        "role_manage": "Rollen beheren en aan gebruikers toewijzen.",
+        "user_delete_any": "Het account van elke gebruiker verwijderen.",
+        "user_email_readAny": "Het e-mailadres van elke gebruiker lezen.",
+        "user_invite": "Persoonlijke uitnodigingscodes genereren."
+      },
       "protected": "protected",
+      "protectedHint": "De eigenaarsrol heeft alle rechten en kan niet worden bewerkt.",
       "save": "Save",
       "saveError": "Could not save role: {message}",
       "saveSuccess": "Role saved.",
@@ -217,12 +240,12 @@
       "name": "Instellingen"
     },
     "users": {
+      "addRole": "Assign role…",
       "empty": "Geen gebruikers gevonden",
       "form": {
         "placeholder": "e-mail, naam of beschrijving"
       },
       "name": "Gebruikers",
-      "addRole": "Assign role…",
       "removeRole": "Remove role {role}",
       "roleChanged": "Rol succesvol gewijzigd!",
       "table": {

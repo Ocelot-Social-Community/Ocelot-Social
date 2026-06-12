@@ -97,6 +97,18 @@ describe('admin/roles.vue', () => {
     expect(checkbox.attributes('disabled')).toBeDefined()
   })
 
+  it('localizes group + permission labels, falling back to the catalog description', () => {
+    const wrapper = Wrapper()
+    const perm = { key: 'badge.manage', description: 'Grant badges' }
+    // No translation present (mock $t returns the key): fall back to the description.
+    expect(wrapper.vm.permLabel(perm)).toBe('Grant badges')
+    expect(wrapper.vm.groupLabel('moderation')).toBe('moderation')
+    // Translation present: look it up by the sanitised (dot-free) key.
+    wrapper.vm.$t = (path) => `T:${path}`
+    expect(wrapper.vm.permLabel(perm)).toBe('T:admin.roles.perm.badge_manage')
+    expect(wrapper.vm.groupLabel('moderation')).toBe('T:admin.roles.groups.moderation')
+  })
+
   it('previews the permission diff when hovering another role pill', async () => {
     const wrapper = Wrapper()
     wrapper.vm.setActive('badge-setter')
