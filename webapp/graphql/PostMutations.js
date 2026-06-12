@@ -93,7 +93,6 @@ export default () => {
           pinnedBy {
             id
             name
-            role
           }
           postType
           eventStart
@@ -151,7 +150,6 @@ export default () => {
           pinnedBy {
             id
             name
-            role
           }
         }
       }
@@ -168,7 +166,6 @@ export default () => {
           pinnedBy {
             id
             name
-            role
           }
         }
       }
@@ -185,7 +182,6 @@ export default () => {
           pinnedBy {
             id
             name
-            role
           }
         }
       }
@@ -202,7 +198,6 @@ export default () => {
           pinnedBy {
             id
             name
-            role
           }
         }
       }
@@ -219,7 +214,6 @@ export default () => {
           pinnedBy {
             id
             name
-            role
           }
         }
       }
@@ -236,7 +230,6 @@ export default () => {
           pinnedBy {
             id
             name
-            role
           }
         }
       }

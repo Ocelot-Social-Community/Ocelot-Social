@@ -30,7 +30,6 @@ const roleNodeExists = async (name: string): Promise<boolean> => {
   }
 }
 
-
 describe('role-edge helpers (DB)', () => {
   beforeEach(async () => {
     await cleanDatabase()

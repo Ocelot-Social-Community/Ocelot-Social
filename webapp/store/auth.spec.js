@@ -82,17 +82,17 @@ describe('auth store', () => {
       expect(getters.pending({ pending: undefined })).toBe(false)
     })
 
-    it('isAdmin requires role === admin', () => {
-      expect(getters.isAdmin({ user: null })).toBe(false)
-      expect(getters.isAdmin({ user: { role: 'usual' } })).toBe(false)
-      expect(getters.isAdmin({ user: { role: 'admin' } })).toBe(true)
+    it('isAdmin requires an admin-area permission', () => {
+      expect(getters.isAdmin({ permissions: [] })).toBe(false)
+      expect(getters.isAdmin({ permissions: ['post.create'] })).toBe(false)
+      expect(getters.isAdmin({ permissions: ['role.manage'] })).toBe(true)
+      expect(getters.isAdmin({ permissions: ['policy.manage'] })).toBe(true)
     })
 
-    it('isModerator accepts admin OR moderator role', () => {
-      expect(getters.isModerator({ user: null })).toBe(false)
-      expect(getters.isModerator({ user: { role: 'usual' } })).toBe(false)
-      expect(getters.isModerator({ user: { role: 'moderator' } })).toBe(true)
-      expect(getters.isModerator({ user: { role: 'admin' } })).toBe(true)
+    it('isModerator requires the content.moderate permission', () => {
+      expect(getters.isModerator({ permissions: [] })).toBe(false)
+      expect(getters.isModerator({ permissions: ['post.create'] })).toBe(false)
+      expect(getters.isModerator({ permissions: ['content.moderate'] })).toBe(true)
     })
 
     it('permissions returns the stored permission array', () => {

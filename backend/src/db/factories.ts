@@ -52,6 +52,27 @@ export const cleanDatabase = async ({ withMigrations } = { withMigrations: false
   await seedDefaultRoleNodes()
 }
 
+// Test helper: replace a user's single HAS_ROLE edge with the named role (role nodes
+// are seeded by cleanDatabase). Returns the same node. Used where a test promotes an
+// existing user to moderator/admin mid-scenario (the legacy user.role is gone).
+export const assignRoleEdge = async (user, roleName: string) => {
+  const { id } = await user.toJson()
+  const session = driver.session()
+  try {
+    await session.writeTransaction((transaction) =>
+      transaction.run(
+        `MATCH (u:User {id: $id})
+         OPTIONAL MATCH (u)-[h:HAS_ROLE]->(:Role) DELETE h
+         WITH u MATCH (r:Role {id: $roleName}) MERGE (u)-[:HAS_ROLE]->(r)`,
+        { id, roleName },
+      ),
+    )
+  } finally {
+    await session.close()
+  }
+  return user
+}
+
 Factory.define('category')
   .attr('id', uuid)
   .attr('icon', 'globe')

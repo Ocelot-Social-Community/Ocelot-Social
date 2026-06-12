@@ -602,7 +602,9 @@ export default shield(
       email: or(isMyOwn, hasPermission('user.email.readAny')),
       emailNotificationSettings: isMyOwn,
       inviteCodes: isMyOwn,
-      roleName: hasPermission('role.manage'),
+      // Users may read their own role name (for the role badge); role.manage admins
+      // read anyone's.
+      roleName: or(isMyOwn, hasPermission('role.manage')),
     },
     Group: {
       '*': isAuthenticated, // TODO - only those who are allowed to see the group

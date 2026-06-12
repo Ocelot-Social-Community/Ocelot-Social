@@ -82,7 +82,6 @@ export const adminUserQuery = () => {
         name
         slug
         email
-        role
         roleName
         createdAt
         contributionsCount
@@ -405,7 +404,7 @@ export const currentUserQuery = gql`
         description
       }
       email
-      role
+      roleName
       about
       locationName
       locale

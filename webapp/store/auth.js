@@ -6,6 +6,18 @@ import metadata from '~/constants/metadata'
 
 const cookies = new Cookie()
 
+// Permissions that grant access to (some part of) the admin area. A user holding any
+// of them sees the admin entry and may enter; each admin page still gates on its own
+// permission, and the backend enforces every action.
+const ADMIN_AREA_PERMISSIONS = [
+  'network.statistics.read',
+  'role.manage',
+  'policy.manage',
+  'donation.manage',
+  'apiKey.administer',
+  'user.email.readAny',
+]
+
 export const state = () => {
   return {
     user: null,
@@ -45,11 +57,18 @@ export const getters = {
   pending(state) {
     return !!state.pending
   },
+  // Access to the admin area: holds any administration-area permission. Replaces the
+  // former role==='admin' tier check so custom roles with admin capabilities qualify.
   isAdmin(state) {
-    return !!state.user && state.user.role === 'admin'
+    return (
+      Array.isArray(state.permissions) &&
+      ADMIN_AREA_PERMISSIONS.some((permission) => state.permissions.includes(permission))
+    )
   },
+  // Can moderate content (access reports/review, see disabled content). Replaces the
+  // former admin/moderator tier check.
   isModerator(state) {
-    return !!state.user && (state.user.role === 'admin' || state.user.role === 'moderator')
+    return Array.isArray(state.permissions) && state.permissions.includes('content.moderate')
   },
   permissions(state) {
     return state.permissions

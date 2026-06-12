@@ -88,7 +88,9 @@ interface CreateTestServerOptions {
 
 // Resolve the authenticated user's single role name from its HAS_ROLE edge, the way
 // decode() does in production. Tests build authenticatedUser from user.toJson(), which
-// carries no role name; without this the user would resolve to no permissions.
+// carries no role name; without this the user would resolve to no permissions. The
+// DB edge wins; if the user has no node (a bare literal like { id, roles: ['owner'] }),
+// any role names already on the literal are kept.
 const resolveAuthUserRoles = async (
   database: ReturnType<typeof databaseContext>,
   authenticatedUser: Context['user'] | undefined,
@@ -98,8 +100,12 @@ const resolveAuthUserRoles = async (
     query: `MATCH (u:User {id: $id}) RETURN [(u)-[:HAS_ROLE]->(r:Role) | r.name] AS roles`,
     variables: { id: authenticatedUser.id },
   })
-  const roles = (result.records[0]?.get('roles') as string[] | undefined) ?? []
-  return { ...authenticatedUser, roles }
+  const dbRoles = (result.records[0]?.get('roles') as string[] | undefined) ?? []
+  if (dbRoles.length > 0) return { ...authenticatedUser, roles: dbRoles }
+  const provided = authenticatedUser.roles
+  const literalRoles =
+    Array.isArray(provided) && provided.every((r) => typeof r === 'string') ? provided : []
+  return { ...authenticatedUser, roles: literalRoles }
 }
 
 export const createApolloTestSetup = async (opts?: CreateTestServerOptions) => {

@@ -27,7 +27,7 @@ let query: ApolloTestSetup['query']
 let server: ApolloTestSetup['server']
 let database: ApolloTestSetup['database']
 
-const asUser = (role: string) => ({ id: `${role}-1`, role }) as unknown as Context['user']
+const asUser = (role: string) => ({ id: `${role}-1`, roles: [role] }) as unknown as Context['user']
 
 const mutationContext = (policyDouble: unknown): Context =>
   ({ user: { id: 'admin-1' }, policy: policyDouble }) as unknown as Context

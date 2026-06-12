@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-
 import { cleanDatabase } from '@db/factories'
 import { getDriver } from '@db/neo4j'
 

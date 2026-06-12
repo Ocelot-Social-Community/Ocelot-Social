@@ -258,8 +258,8 @@
               <profile-avatar :profile="user" size="small" class="mobile-avatar" />
               <div class="mobile-user-details">
                 <b>{{ userName }}</b>
-                <span v-if="user.role !== 'user'" class="mobile-user-role">
-                  {{ user.role | camelCase }}
+                <span v-if="user.roleName && user.roleName !== 'user'" class="mobile-user-role">
+                  {{ user.roleName | camelCase }}
                 </span>
               </div>
               <os-button
