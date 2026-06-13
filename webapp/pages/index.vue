@@ -85,23 +85,25 @@
         <donation-info :goal="goal" :progress="progress" />
       </div>
       <client-only>
-        <os-button
-          as="nuxt-link"
-          :to="{ name: 'post-create-type' }"
-          v-tooltip="{
-            content: $t('contribution.newPost'),
-            placement: 'left',
-          }"
-          class="post-add-button"
-          variant="primary"
-          appearance="filled"
-          circle
-          size="xl"
-        >
-          <template #icon>
-            <os-icon :icon="icons.plus" />
-          </template>
-        </os-button>
+        <permission-disable permission="post.create">
+          <os-button
+            as="nuxt-link"
+            :to="{ name: 'post-create-type' }"
+            v-tooltip="{
+              content: $t('contribution.newPost'),
+              placement: 'left',
+            }"
+            class="post-add-button"
+            variant="primary"
+            appearance="filled"
+            circle
+            size="xl"
+          >
+            <template #icon>
+              <os-icon :icon="icons.plus" />
+            </template>
+          </os-button>
+        </permission-disable>
       </client-only>
     </div>
 

@@ -8,20 +8,22 @@
         v-model="comment"
         :schema="{ type: 'string', max: 30 }"
       />
-      <os-button
-        variant="primary"
-        appearance="outline"
-        circle
-        class="generate-invite-code"
-        :aria-label="$t('invite-codes.generate-code')"
-        type="submit"
-        :disabled="disabled"
-        :loading="loading"
-      >
-        <template #icon>
-          <os-icon :icon="icons.plus" />
-        </template>
-      </os-button>
+      <permission-disable permission="user.invite">
+        <os-button
+          variant="primary"
+          appearance="outline"
+          circle
+          class="generate-invite-code"
+          :aria-label="$t('invite-codes.generate-code')"
+          type="submit"
+          :disabled="disabled || !$can('user.invite')"
+          :loading="loading"
+        >
+          <template #icon>
+            <os-icon :icon="icons.plus" />
+          </template>
+        </os-button>
+      </permission-disable>
     </form>
   </div>
 </template>

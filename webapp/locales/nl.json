@@ -1024,6 +1024,9 @@
     "next": "Volgende",
     "previous": "Vorige"
   },
+  "permissions": {
+    "deniedHint": "Je hebt hiervoor geen rechten."
+  },
   "post": {
     "comment": {
       "joinGroup": "Lid geworden van groep „<b>{name}</b>“",

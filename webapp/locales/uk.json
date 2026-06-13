@@ -1024,6 +1024,9 @@
     "next": "Далі",
     "previous": "Назад"
   },
+  "permissions": {
+    "deniedHint": "У вас немає дозволу на це."
+  },
   "post": {
     "comment": {
       "joinGroup": "Приєднався(-лася) до групи «<b>{name}</b>»",

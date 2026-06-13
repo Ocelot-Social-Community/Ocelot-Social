@@ -1024,6 +1024,9 @@
     "next": "Next",
     "previous": "Previous"
   },
+  "permissions": {
+    "deniedHint": "You don't have permission for this."
+  },
   "post": {
     "comment": {
       "joinGroup": "Joined group „<b>{name}</b>“",

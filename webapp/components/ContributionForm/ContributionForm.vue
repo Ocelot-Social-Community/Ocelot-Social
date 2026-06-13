@@ -193,18 +193,20 @@
               >
                 {{ $t('actions.cancel') }}
               </os-button>
-              <os-button
-                variant="primary"
-                appearance="filled"
-                type="submit"
-                :loading="loading"
-                :disabled="!!formErrors"
-              >
-                <template #icon>
-                  <os-icon :icon="icons.check" />
-                </template>
-                {{ $t('actions.save') }}
-              </os-button>
+              <permission-disable :permission="!contribution.id ? 'post.create' : ''">
+                <os-button
+                  variant="primary"
+                  appearance="filled"
+                  type="submit"
+                  :loading="loading"
+                  :disabled="!!formErrors || (!contribution.id && !$can('post.create'))"
+                >
+                  <template #icon>
+                    <os-icon :icon="icons.check" />
+                  </template>
+                  {{ $t('actions.save') }}
+                </os-button>
+              </permission-disable>
             </div>
           </div>
         </os-card>

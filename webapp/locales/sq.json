@@ -1024,6 +1024,9 @@
     "next": "Tjetër",
     "previous": "Mëparshëm"
   },
+  "permissions": {
+    "deniedHint": "Nuk ke leje për këtë."
+  },
   "post": {
     "comment": {
       "joinGroup": "U bashkua me grupin „<b>{name}</b>“",

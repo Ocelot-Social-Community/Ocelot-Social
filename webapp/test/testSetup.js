@@ -7,6 +7,8 @@ import Filters from '~/plugins/vue-filters'
 import InfiniteLoading from '~/plugins/vue-infinite-loading'
 import Directives from '~/plugins/vue-directives'
 import VueObserveVisibility from '~/plugins/vue-observe-visibility'
+import PermissionGate from '~/components/_new/generic/PermissionGate/PermissionGate.vue'
+import PermissionDisable from '~/components/_new/generic/PermissionDisable/PermissionDisable.vue'
 
 window.matchMedia =
   window.matchMedia ||
@@ -37,6 +39,12 @@ console.error = (...args) => {
 // `mocks: { $policy: { get: () => true } }`.
 config.mocks.$policy = { get: () => false }
 
+// Mirror the $can inject (plugins/permissions.js) on the prototype so every component
+// has it (config.mocks is not merged when a spec passes its own `mocks`). Granted by
+// default so existing tests behave as before; denied/gray-out tests override per-mount
+// with `mocks: { $can: () => false }` or `(p) => allowed.includes(p)`.
+Vue.prototype.$can = () => true
+
 global.localVue = createLocalVue()
 
 global.localVue.use(Vuex)
@@ -45,6 +53,11 @@ global.localVue.use(Filters)
 global.localVue.use(Directives)
 global.localVue.use(InfiniteLoading)
 global.localVue.use(VueObserveVisibility)
+
+// Register the permission primitives globally (registered via plugins/permissions.js
+// in the app; here for components that use them in templates).
+Vue.component('PermissionGate', PermissionGate)
+Vue.component('PermissionDisable', PermissionDisable)
 
 // Register router-link stub globally (OsMenu/OsMenuItem render it via h())
 Vue.component('router-link', {

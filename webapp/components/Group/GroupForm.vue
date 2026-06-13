@@ -146,16 +146,20 @@
           <os-button as="nuxt-link" to="/groups" variant="default" appearance="filled">
             {{ $t('actions.cancel') }}
           </os-button>
-          <os-button
-            variant="primary"
-            appearance="filled"
-            type="submit"
-            :loading="loading"
-            :disabled="loading || checkFormError(formErrors)"
-          >
-            <template #icon><os-icon :icon="icons.save" /></template>
-            {{ update ? $t('group.update') : $t('group.save') }}
-          </os-button>
+          <permission-disable :permission="!update ? 'group.create' : ''">
+            <os-button
+              variant="primary"
+              appearance="filled"
+              type="submit"
+              :loading="loading"
+              :disabled="
+                loading || checkFormError(formErrors) || (!update && !$can('group.create'))
+              "
+            >
+              <template #icon><os-icon :icon="icons.save" /></template>
+              {{ update ? $t('group.update') : $t('group.save') }}
+            </os-button>
+          </permission-disable>
         </div>
       </template>
     </form>

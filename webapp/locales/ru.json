@@ -1024,6 +1024,9 @@
     "next": "Вперёд",
     "previous": "Назад"
   },
+  "permissions": {
+    "deniedHint": "У вас нет прав для этого."
+  },
   "post": {
     "comment": {
       "joinGroup": "Вступил в группу „<b>{name}</b>“",
