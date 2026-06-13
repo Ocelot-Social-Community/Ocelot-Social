@@ -193,20 +193,23 @@
               >
                 {{ $t('actions.cancel') }}
               </os-button>
-              <permission-disable :permission="!contribution.id ? 'post.create' : ''">
-                <os-button
-                  variant="primary"
-                  appearance="filled"
-                  type="submit"
-                  :loading="loading"
-                  :disabled="!!formErrors || (!contribution.id && !$can('post.create'))"
-                >
-                  <template #icon>
-                    <os-icon :icon="icons.check" />
-                  </template>
-                  {{ $t('actions.save') }}
-                </os-button>
-              </permission-disable>
+              <os-button
+                variant="primary"
+                appearance="filled"
+                type="submit"
+                :loading="loading"
+                :disabled="!!formErrors"
+                :class="{ 'permission-denied': !contribution.id && !$can('post.create') }"
+                v-tooltip="{
+                  content:
+                    !contribution.id && !$can('post.create') ? $t('permissions.deniedHint') : '',
+                }"
+              >
+                <template #icon>
+                  <os-icon :icon="icons.check" />
+                </template>
+                {{ $t('actions.save') }}
+              </os-button>
             </div>
           </div>
         </os-card>
@@ -446,6 +449,9 @@ export default {
       return date <= new Date(this.formData.eventStart)
     },
     onSubmit() {
+      // Block creating a post without permission (editing stays allowed). The button
+      // is grayed; this also guards keyboard Enter and direct navigation.
+      if (!this.contribution.id && !this.$can('post.create')) return
       this.formSubmit(this.submit)
     },
     submit() {

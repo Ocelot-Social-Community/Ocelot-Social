@@ -8,7 +8,6 @@ import InfiniteLoading from '~/plugins/vue-infinite-loading'
 import Directives from '~/plugins/vue-directives'
 import VueObserveVisibility from '~/plugins/vue-observe-visibility'
 import PermissionGate from '~/components/_new/generic/PermissionGate/PermissionGate.vue'
-import PermissionDisable from '~/components/_new/generic/PermissionDisable/PermissionDisable.vue'
 
 window.matchMedia =
   window.matchMedia ||
@@ -54,10 +53,9 @@ global.localVue.use(Directives)
 global.localVue.use(InfiniteLoading)
 global.localVue.use(VueObserveVisibility)
 
-// Register the permission primitives globally (registered via plugins/permissions.js
-// in the app; here for components that use them in templates).
+// Register the permission primitive globally (registered via plugins/permissions.js
+// in the app; here for components that use it in templates).
 Vue.component('PermissionGate', PermissionGate)
-Vue.component('PermissionDisable', PermissionDisable)
 
 // Register router-link stub globally (OsMenu/OsMenuItem render it via h())
 Vue.component('router-link', {

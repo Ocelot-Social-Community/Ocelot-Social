@@ -8,22 +8,22 @@
         v-model="comment"
         :schema="{ type: 'string', max: 30 }"
       />
-      <permission-disable permission="user.invite">
-        <os-button
-          variant="primary"
-          appearance="outline"
-          circle
-          class="generate-invite-code"
-          :aria-label="$t('invite-codes.generate-code')"
-          type="submit"
-          :disabled="disabled || !$can('user.invite')"
-          :loading="loading"
-        >
-          <template #icon>
-            <os-icon :icon="icons.plus" />
-          </template>
-        </os-button>
-      </permission-disable>
+      <os-button
+        variant="primary"
+        appearance="outline"
+        circle
+        class="generate-invite-code"
+        :class="{ 'permission-denied': !$can('user.invite') }"
+        :aria-label="$t('invite-codes.generate-code')"
+        type="submit"
+        :disabled="disabled"
+        :loading="loading"
+        v-tooltip="{ content: !$can('user.invite') ? $t('permissions.deniedHint') : '' }"
+      >
+        <template #icon>
+          <os-icon :icon="icons.plus" />
+        </template>
+      </os-button>
     </form>
   </div>
 </template>
@@ -56,6 +56,7 @@ export default {
   },
   methods: {
     generateInviteCode() {
+      if (!this.$can('user.invite')) return
       this.$emit('generate-invite-code', this.comment)
       this.comment = ''
     },

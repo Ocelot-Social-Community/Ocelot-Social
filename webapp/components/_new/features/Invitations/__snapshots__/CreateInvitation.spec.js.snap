@@ -54,40 +54,36 @@ exports[`CreateInvitation.vue renders 1`] = `
         </transition-stub>
       </div>
        
-      <span
-        class="permission-disable"
+      <button
+        aria-label="invite-codes.generate-code"
+        class="generate-invite-code os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled)] disabled:text-[var(--color-disabled)] disabled:hover:bg-transparent disabled:hover:text-[var(--color-disabled)] disabled:hover:border-[var(--color-disabled)] disabled:active:bg-transparent disabled:active:text-[var(--color-disabled)] disabled:active:border-[var(--color-disabled)] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] generate-invite-code"
+        data-appearance="outline"
+        data-variant="primary"
+        type="submit"
       >
-        <button
-          aria-label="invite-codes.generate-code"
-          class="generate-invite-code os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled)] disabled:text-[var(--color-disabled)] disabled:hover:bg-transparent disabled:hover:text-[var(--color-disabled)] disabled:hover:border-[var(--color-disabled)] disabled:active:bg-transparent disabled:active:text-[var(--color-disabled)] disabled:active:border-[var(--color-disabled)] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] generate-invite-code"
-          data-appearance="outline"
-          data-variant="primary"
-          type="submit"
+        <span
+          class="inline-flex items-center"
         >
           <span
-            class="inline-flex items-center"
+            class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
           >
             <span
-              class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+              aria-hidden="true"
+              class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
             >
-              <span
-                aria-hidden="true"
-                class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+              <svg
+                fill="currentColor"
+                viewBox="0 0 32 32"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <svg
-                  fill="currentColor"
-                  viewBox="0 0 32 32"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M15 5h2v10h10v2h-10v10h-2v-10h-10v-2h10v-10z"
-                  />
-                </svg>
-              </span>
+                <path
+                  d="M15 5h2v10h10v2h-10v10h-2v-10h-10v-2h10v-10z"
+                />
+              </svg>
             </span>
           </span>
-        </button>
-      </span>
+        </span>
+      </button>
     </form>
   </div>
 </div>
@@ -148,40 +144,36 @@ exports[`CreateInvitation.vue renders with disabled button 1`] = `
         </transition-stub>
       </div>
        
-      <span
-        class="permission-disable"
+      <button
+        aria-label="invite-codes.generate-code"
+        class="generate-invite-code os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled)] disabled:text-[var(--color-disabled)] disabled:hover:bg-transparent disabled:hover:text-[var(--color-disabled)] disabled:hover:border-[var(--color-disabled)] disabled:active:bg-transparent disabled:active:text-[var(--color-disabled)] disabled:active:border-[var(--color-disabled)] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] generate-invite-code"
+        data-appearance="outline"
+        data-variant="primary"
+        type="submit"
       >
-        <button
-          aria-label="invite-codes.generate-code"
-          class="generate-invite-code os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled)] disabled:text-[var(--color-disabled)] disabled:hover:bg-transparent disabled:hover:text-[var(--color-disabled)] disabled:hover:border-[var(--color-disabled)] disabled:active:bg-transparent disabled:active:text-[var(--color-disabled)] disabled:active:border-[var(--color-disabled)] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] generate-invite-code"
-          data-appearance="outline"
-          data-variant="primary"
-          type="submit"
+        <span
+          class="inline-flex items-center"
         >
           <span
-            class="inline-flex items-center"
+            class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
           >
             <span
-              class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+              aria-hidden="true"
+              class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
             >
-              <span
-                aria-hidden="true"
-                class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+              <svg
+                fill="currentColor"
+                viewBox="0 0 32 32"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <svg
-                  fill="currentColor"
-                  viewBox="0 0 32 32"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M15 5h2v10h10v2h-10v10h-2v-10h-10v-2h10v-10z"
-                  />
-                </svg>
-              </span>
+                <path
+                  d="M15 5h2v10h10v2h-10v10h-2v-10h-10v-2h10v-10z"
+                />
+              </svg>
             </span>
           </span>
-        </button>
-      </span>
+        </span>
+      </button>
     </form>
   </div>
 </div>

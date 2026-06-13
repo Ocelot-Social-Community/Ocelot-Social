@@ -84,23 +84,24 @@
                 <client-only>
                   <dropdown ref="inviteDropdown" offset="8" placement="top" noMouseLeaveClosing>
                     <template #default="{ toggleMenu }">
-                      <permission-disable permission="user.invite">
-                        <os-button
-                          variant="primary"
-                          appearance="ghost"
-                          circle
-                          :aria-label="$t('invite-codes.button.tooltip')"
-                          v-tooltip="{
-                            content: $t('invite-codes.button.tooltip'),
-                            placement: 'bottom-start',
-                          }"
-                          @click.prevent="toggleMenu"
-                        >
-                          <template #icon>
-                            <os-icon :icon="icons.userPlus" />
-                          </template>
-                        </os-button>
-                      </permission-disable>
+                      <os-button
+                        variant="primary"
+                        appearance="ghost"
+                        circle
+                        :class="{ 'permission-denied': !$can('user.invite') }"
+                        :aria-label="$t('invite-codes.button.tooltip')"
+                        v-tooltip="{
+                          content: $can('user.invite')
+                            ? $t('invite-codes.button.tooltip')
+                            : $t('permissions.deniedHint'),
+                          placement: 'bottom-start',
+                        }"
+                        @click.prevent="$can('user.invite') && toggleMenu()"
+                      >
+                        <template #icon>
+                          <os-icon :icon="icons.userPlus" />
+                        </template>
+                      </os-button>
                     </template>
                     <template #popover>
                       <div class="invite-list">

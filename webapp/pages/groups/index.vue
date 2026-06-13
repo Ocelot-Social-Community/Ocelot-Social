@@ -7,26 +7,27 @@
     <div class="ds-mb-large">
       <!-- create group -->
       <div class="ds-mb-large ds-space-centered">
-        <permission-disable permission="group.create">
-          <os-button
-            as="nuxt-link"
-            :to="{ name: 'groups-create' }"
-            class="group-add-button"
-            variant="primary"
-            appearance="filled"
-            circle
-            size="xl"
-            :aria-label="$t('group.createNewGroup.tooltip')"
-            v-tooltip="{
-              content: $t('group.createNewGroup.tooltip'),
-              placement: 'left',
-            }"
-          >
-            <template #icon>
-              <os-icon :icon="icons.plus" />
-            </template>
-          </os-button>
-        </permission-disable>
+        <os-button
+          :as="$can('group.create') ? 'nuxt-link' : 'button'"
+          :to="{ name: 'groups-create' }"
+          :class="{ 'permission-denied': !$can('group.create') }"
+          class="group-add-button"
+          variant="primary"
+          appearance="filled"
+          circle
+          size="xl"
+          :aria-label="$t('group.createNewGroup.tooltip')"
+          v-tooltip="{
+            content: $can('group.create')
+              ? $t('group.createNewGroup.tooltip')
+              : $t('permissions.deniedHint'),
+            placement: 'left',
+          }"
+        >
+          <template #icon>
+            <os-icon :icon="icons.plus" />
+          </template>
+        </os-button>
       </div>
       <!-- group list -->
       <div class="ds-mb-large ds-space-centered" v-if="showPagination">

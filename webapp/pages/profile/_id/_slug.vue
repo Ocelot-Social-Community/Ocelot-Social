@@ -159,25 +159,26 @@
         />
 
         <div v-if="myProfile" class="profile-post-add-button-container">
-          <permission-disable permission="post.create">
-            <os-button
-              as="nuxt-link"
-              :to="{ name: 'post-create-type' }"
-              v-tooltip="{
-                content: $t('contribution.newPost'),
-                placement: 'left',
-              }"
-              class="profile-post-add-button"
-              variant="primary"
-              appearance="filled"
-              circle
-              :aria-label="$t('contribution.newPost')"
-            >
-              <template #icon>
-                <os-icon :icon="icons.plus" />
-              </template>
-            </os-button>
-          </permission-disable>
+          <os-button
+            :as="$can('post.create') ? 'nuxt-link' : 'button'"
+            :to="{ name: 'post-create-type' }"
+            :class="{ 'permission-denied': !$can('post.create') }"
+            v-tooltip="{
+              content: $can('post.create')
+                ? $t('contribution.newPost')
+                : $t('permissions.deniedHint'),
+              placement: 'left',
+            }"
+            class="profile-post-add-button"
+            variant="primary"
+            appearance="filled"
+            circle
+            :aria-label="$t('contribution.newPost')"
+          >
+            <template #icon>
+              <os-icon :icon="icons.plus" />
+            </template>
+          </os-button>
         </div>
 
         <masonry-grid>

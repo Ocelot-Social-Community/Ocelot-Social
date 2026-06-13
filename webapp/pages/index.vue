@@ -85,25 +85,26 @@
         <donation-info :goal="goal" :progress="progress" />
       </div>
       <client-only>
-        <permission-disable permission="post.create">
-          <os-button
-            as="nuxt-link"
-            :to="{ name: 'post-create-type' }"
-            v-tooltip="{
-              content: $t('contribution.newPost'),
-              placement: 'left',
-            }"
-            class="post-add-button"
-            variant="primary"
-            appearance="filled"
-            circle
-            size="xl"
-          >
-            <template #icon>
-              <os-icon :icon="icons.plus" />
-            </template>
-          </os-button>
-        </permission-disable>
+        <os-button
+          :as="$can('post.create') ? 'nuxt-link' : 'button'"
+          :to="{ name: 'post-create-type' }"
+          :class="{ 'permission-denied': !$can('post.create') }"
+          v-tooltip="{
+            content: $can('post.create')
+              ? $t('contribution.newPost')
+              : $t('permissions.deniedHint'),
+            placement: 'left',
+          }"
+          class="post-add-button"
+          variant="primary"
+          appearance="filled"
+          circle
+          size="xl"
+        >
+          <template #icon>
+            <os-icon :icon="icons.plus" />
+          </template>
+        </os-button>
       </client-only>
     </div>
 

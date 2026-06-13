@@ -1,12 +1,11 @@
 import Vue from 'vue'
 
-import PermissionDisable from '~/components/_new/generic/PermissionDisable/PermissionDisable.vue'
 import PermissionGate from '~/components/_new/generic/PermissionGate/PermissionGate.vue'
 
-// The "hide" primitive (<permission-gate>) and the "gray out" wrapper
-// (<permission-disable>), available everywhere.
+// The "hide" primitive, available everywhere as <permission-gate permission="x">.
+// (The "gray out" pattern is applied directly on the element: $can('x') drives a
+// `.permission-denied` class + tooltip, which works for positioned/fixed buttons too.)
 Vue.component('PermissionGate', PermissionGate)
-Vue.component('PermissionDisable', PermissionDisable)
 
 // Injects $can('permission.key') for synchronous template access (mirrors $policy)
 // — the "gray out" primitive: :disabled="!$can('x')". The Vuex 'auth' module

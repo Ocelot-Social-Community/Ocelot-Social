@@ -253,28 +253,29 @@
           </os-card>
         </div>
         <div v-if="isGroupMemberNonePending" class="ds-mt-small ds-mb-small ds-space-centered">
-          <permission-disable permission="post.create">
-            <os-button
-              as="nuxt-link"
-              :to="{
-                name: 'post-create-type',
-                query: { groupId: group.id },
-              }"
-              class="profile-post-add-button"
-              variant="primary"
-              appearance="filled"
-              circle
-              :aria-label="$t('contribution.newPost')"
-              v-tooltip="{
-                content: $t('contribution.newPost'),
-                placement: 'left',
-              }"
-            >
-              <template #icon>
-                <os-icon :icon="icons.plus" />
-              </template>
-            </os-button>
-          </permission-disable>
+          <os-button
+            :as="$can('post.create') ? 'nuxt-link' : 'button'"
+            :to="{
+              name: 'post-create-type',
+              query: { groupId: group.id },
+            }"
+            :class="{ 'permission-denied': !$can('post.create') }"
+            class="profile-post-add-button"
+            variant="primary"
+            appearance="filled"
+            circle
+            :aria-label="$t('contribution.newPost')"
+            v-tooltip="{
+              content: $can('post.create')
+                ? $t('contribution.newPost')
+                : $t('permissions.deniedHint'),
+              placement: 'left',
+            }"
+          >
+            <template #icon>
+              <os-icon :icon="icons.plus" />
+            </template>
+          </os-button>
         </div>
         <masonry-grid class="ds-mt-small">
           <!-- Group post feed -->

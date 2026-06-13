@@ -483,3 +483,12 @@ textarea.ds-input-size-large { min-height: $input-height-large; }
 .ds-input-has-focus .ds-select-icon,
 .ds-input-has-focus .ds-select-icon-right { color: $text-color-base; }
 .ds-select-icon-right { right: 0; left: auto; }
+
+// Permission gray-out: a visually-disabled (but still hoverable, so the tooltip
+// works) appearance for actions the current user lacks permission for. Applied
+// directly on the element (works for positioned/fixed buttons, unlike a wrapper).
+.permission-denied {
+  opacity: 0.45;
+  filter: grayscale(0.7);
+  cursor: not-allowed;
+}
