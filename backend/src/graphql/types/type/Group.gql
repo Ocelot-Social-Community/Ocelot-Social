@@ -39,7 +39,9 @@ type Group {
   categories: [Category] @relation(name: "CATEGORIZED", direction: "OUT")
 
   membersCount: Int!
-    @cypher(statement: "MATCH (this)<-[:MEMBER_OF]-(r:User) RETURN COUNT(DISTINCT r)")
+    @cypher(
+      statement: "MATCH (this)<-[membership:MEMBER_OF]-(:User) WHERE membership.role <> 'pending' RETURN COUNT(membership)"
+    )
 
   myRole: GroupMemberRole # if 'null' then the current user is no member
   posts: [Post] @relation(name: "IN", direction: "IN")
@@ -88,7 +90,7 @@ type Query {
   # orderBy: [_GroupOrdering] # not implemented yet
   # filter: _GroupFilter # not implemented yet
 
-  GroupMembers(id: ID!, first: Int, offset: Int): [GroupMember]
+  GroupMembers(id: ID!, first: Int, offset: Int, includePending: Boolean): [GroupMember]
   # orderBy: [_UserOrdering] # not implemented yet
   # filter: _UserFilter # not implemented yet
 

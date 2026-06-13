@@ -1429,7 +1429,7 @@ describe('in mode', () => {
                 authenticatedUser = await ownerOfClosedGroupUser.toJson()
               })
 
-              it('finds all members', async () => {
+              it('finds non-pending members', async () => {
                 const result = await query({
                   query: groupMembersQuery,
                   variables,
@@ -1437,14 +1437,6 @@ describe('in mode', () => {
                 expect(result).toMatchObject({
                   data: {
                     GroupMembers: expect.arrayContaining([
-                      expect.objectContaining({
-                        user: expect.objectContaining({
-                          id: 'current-user',
-                        }),
-                        membership: expect.objectContaining({
-                          role: 'pending',
-                        }),
-                      }),
                       expect.objectContaining({
                         user: expect.objectContaining({
                           id: 'owner-of-closed-group',
@@ -1465,6 +1457,33 @@ describe('in mode', () => {
                   },
                   errors: undefined,
                 })
+                expect(result.data?.GroupMembers.length).toBe(2)
+              })
+
+              it('finds all members including pending when includePending is true', async () => {
+                const result = await query({
+                  query: groupMembersQuery,
+                  variables: { ...variables, includePending: true },
+                })
+                expect(result).toMatchObject({
+                  data: {
+                    GroupMembers: expect.arrayContaining([
+                      expect.objectContaining({
+                        user: expect.objectContaining({ id: 'current-user' }),
+                        membership: expect.objectContaining({ role: 'pending' }),
+                      }),
+                      expect.objectContaining({
+                        user: expect.objectContaining({ id: 'owner-of-closed-group' }),
+                        membership: expect.objectContaining({ role: 'owner' }),
+                      }),
+                      expect.objectContaining({
+                        user: expect.objectContaining({ id: 'owner-of-hidden-group' }),
+                        membership: expect.objectContaining({ role: 'usual' }),
+                      }),
+                    ]),
+                  },
+                  errors: undefined,
+                })
                 expect(result.data?.GroupMembers.length).toBe(3)
               })
             })
@@ -1474,7 +1493,7 @@ describe('in mode', () => {
                 authenticatedUser = await ownerOfHiddenGroupUser.toJson()
               })
 
-              it('finds all members', async () => {
+              it('finds non-pending members', async () => {
                 const result = await query({
                   query: groupMembersQuery,
                   variables,
@@ -1482,14 +1501,6 @@ describe('in mode', () => {
                 expect(result).toMatchObject({
                   data: {
                     GroupMembers: expect.arrayContaining([
-                      expect.objectContaining({
-                        user: expect.objectContaining({
-                          id: 'current-user',
-                        }),
-                        membership: expect.objectContaining({
-                          role: 'pending',
-                        }),
-                      }),
                       expect.objectContaining({
                         user: expect.objectContaining({
                           id: 'owner-of-closed-group',
@@ -1505,6 +1516,33 @@ describe('in mode', () => {
                         membership: expect.objectContaining({
                           role: 'usual',
                         }),
+                      }),
+                    ]),
+                  },
+                  errors: undefined,
+                })
+                expect(result.data?.GroupMembers.length).toBe(2)
+              })
+
+              it('finds all members including pending when includePending is true', async () => {
+                const result = await query({
+                  query: groupMembersQuery,
+                  variables: { ...variables, includePending: true },
+                })
+                expect(result).toMatchObject({
+                  data: {
+                    GroupMembers: expect.arrayContaining([
+                      expect.objectContaining({
+                        user: expect.objectContaining({ id: 'current-user' }),
+                        membership: expect.objectContaining({ role: 'pending' }),
+                      }),
+                      expect.objectContaining({
+                        user: expect.objectContaining({ id: 'owner-of-closed-group' }),
+                        membership: expect.objectContaining({ role: 'owner' }),
+                      }),
+                      expect.objectContaining({
+                        user: expect.objectContaining({ id: 'owner-of-hidden-group' }),
+                        membership: expect.objectContaining({ role: 'usual' }),
                       }),
                     ]),
                   },
@@ -1551,7 +1589,7 @@ describe('in mode', () => {
                 authenticatedUser = await ownerOfHiddenGroupUser.toJson()
               })
 
-              it('finds all members', async () => {
+              it('finds non-pending members', async () => {
                 const result = await query({
                   query: groupMembersQuery,
                   variables,
@@ -1559,14 +1597,6 @@ describe('in mode', () => {
                 expect(result).toMatchObject({
                   data: {
                     GroupMembers: expect.arrayContaining([
-                      expect.objectContaining({
-                        user: expect.objectContaining({
-                          id: 'pending-user',
-                        }),
-                        membership: expect.objectContaining({
-                          role: 'pending',
-                        }),
-                      }),
                       expect.objectContaining({
                         user: expect.objectContaining({
                           id: 'current-user',
@@ -1590,6 +1620,37 @@ describe('in mode', () => {
                         membership: expect.objectContaining({
                           role: 'owner',
                         }),
+                      }),
+                    ]),
+                  },
+                  errors: undefined,
+                })
+                expect(result.data?.GroupMembers.length).toBe(3)
+              })
+
+              it('finds all members including pending when includePending is true', async () => {
+                const result = await query({
+                  query: groupMembersQuery,
+                  variables: { ...variables, includePending: true },
+                })
+                expect(result).toMatchObject({
+                  data: {
+                    GroupMembers: expect.arrayContaining([
+                      expect.objectContaining({
+                        user: expect.objectContaining({ id: 'pending-user' }),
+                        membership: expect.objectContaining({ role: 'pending' }),
+                      }),
+                      expect.objectContaining({
+                        user: expect.objectContaining({ id: 'current-user' }),
+                        membership: expect.objectContaining({ role: 'usual' }),
+                      }),
+                      expect.objectContaining({
+                        user: expect.objectContaining({ id: 'owner-of-closed-group' }),
+                        membership: expect.objectContaining({ role: 'admin' }),
+                      }),
+                      expect.objectContaining({
+                        user: expect.objectContaining({ id: 'owner-of-hidden-group' }),
+                        membership: expect.objectContaining({ role: 'owner' }),
                       }),
                     ]),
                   },
@@ -1604,7 +1665,7 @@ describe('in mode', () => {
                 authenticatedUser = await user.toJson()
               })
 
-              it('finds all members', async () => {
+              it('finds non-pending members', async () => {
                 const result = await query({
                   query: groupMembersQuery,
                   variables,
@@ -1612,14 +1673,6 @@ describe('in mode', () => {
                 expect(result).toMatchObject({
                   data: {
                     GroupMembers: expect.arrayContaining([
-                      expect.objectContaining({
-                        user: expect.objectContaining({
-                          id: 'pending-user',
-                        }),
-                        membership: expect.objectContaining({
-                          role: 'pending',
-                        }),
-                      }),
                       expect.objectContaining({
                         user: expect.objectContaining({
                           id: 'current-user',
@@ -1648,6 +1701,37 @@ describe('in mode', () => {
                   },
                   errors: undefined,
                 })
+                expect(result.data?.GroupMembers.length).toBe(3)
+              })
+
+              it('finds all members including pending when includePending is true', async () => {
+                const result = await query({
+                  query: groupMembersQuery,
+                  variables: { ...variables, includePending: true },
+                })
+                expect(result).toMatchObject({
+                  data: {
+                    GroupMembers: expect.arrayContaining([
+                      expect.objectContaining({
+                        user: expect.objectContaining({ id: 'pending-user' }),
+                        membership: expect.objectContaining({ role: 'pending' }),
+                      }),
+                      expect.objectContaining({
+                        user: expect.objectContaining({ id: 'current-user' }),
+                        membership: expect.objectContaining({ role: 'usual' }),
+                      }),
+                      expect.objectContaining({
+                        user: expect.objectContaining({ id: 'owner-of-closed-group' }),
+                        membership: expect.objectContaining({ role: 'admin' }),
+                      }),
+                      expect.objectContaining({
+                        user: expect.objectContaining({ id: 'owner-of-hidden-group' }),
+                        membership: expect.objectContaining({ role: 'owner' }),
+                      }),
+                    ]),
+                  },
+                  errors: undefined,
+                })
                 expect(result.data?.GroupMembers.length).toBe(4)
               })
             })
@@ -1657,7 +1741,7 @@ describe('in mode', () => {
                 authenticatedUser = await ownerOfClosedGroupUser.toJson()
               })
 
-              it('finds all members', async () => {
+              it('finds non-pending members', async () => {
                 const result = await query({
                   query: groupMembersQuery,
                   variables,
@@ -1665,14 +1749,6 @@ describe('in mode', () => {
                 expect(result).toMatchObject({
                   data: {
                     GroupMembers: expect.arrayContaining([
-                      expect.objectContaining({
-                        user: expect.objectContaining({
-                          id: 'pending-user',
-                        }),
-                        membership: expect.objectContaining({
-                          role: 'pending',
-                        }),
-                      }),
                       expect.objectContaining({
                         user: expect.objectContaining({
                           id: 'current-user',
@@ -1696,6 +1772,37 @@ describe('in mode', () => {
                         membership: expect.objectContaining({
                           role: 'owner',
                         }),
+                      }),
+                    ]),
+                  },
+                  errors: undefined,
+                })
+                expect(result.data?.GroupMembers.length).toBe(3)
+              })
+
+              it('finds all members including pending when includePending is true', async () => {
+                const result = await query({
+                  query: groupMembersQuery,
+                  variables: { ...variables, includePending: true },
+                })
+                expect(result).toMatchObject({
+                  data: {
+                    GroupMembers: expect.arrayContaining([
+                      expect.objectContaining({
+                        user: expect.objectContaining({ id: 'pending-user' }),
+                        membership: expect.objectContaining({ role: 'pending' }),
+                      }),
+                      expect.objectContaining({
+                        user: expect.objectContaining({ id: 'current-user' }),
+                        membership: expect.objectContaining({ role: 'usual' }),
+                      }),
+                      expect.objectContaining({
+                        user: expect.objectContaining({ id: 'owner-of-closed-group' }),
+                        membership: expect.objectContaining({ role: 'admin' }),
+                      }),
+                      expect.objectContaining({
+                        user: expect.objectContaining({ id: 'owner-of-hidden-group' }),
+                        membership: expect.objectContaining({ role: 'owner' }),
                       }),
                     ]),
                   },
@@ -1725,6 +1832,41 @@ describe('in mode', () => {
                 const { errors } = await query({ query: groupMembersQuery, variables })
                 expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
               })
+            })
+          })
+        })
+
+        describe('membersCount', () => {
+          describe('public group', () => {
+            beforeEach(async () => {
+              authenticatedUser = await user.toJson()
+            })
+
+            it('counts only non-pending members', async () => {
+              const result = await query({ query: groupQuery, variables: { id: 'public-group' } })
+              expect(result.data?.Group[0]).toMatchObject({ id: 'public-group', membersCount: 3 })
+            })
+          })
+
+          describe('closed group', () => {
+            beforeEach(async () => {
+              authenticatedUser = await ownerOfClosedGroupUser.toJson()
+            })
+
+            it('counts only non-pending members', async () => {
+              const result = await query({ query: groupQuery, variables: { id: 'closed-group' } })
+              expect(result.data?.Group[0]).toMatchObject({ id: 'closed-group', membersCount: 2 })
+            })
+          })
+
+          describe('hidden group', () => {
+            beforeEach(async () => {
+              authenticatedUser = await ownerOfHiddenGroupUser.toJson()
+            })
+
+            it('counts only non-pending members', async () => {
+              const result = await query({ query: groupQuery, variables: { id: 'hidden-group' } })
+              expect(result.data?.Group[0]).toMatchObject({ id: 'hidden-group', membersCount: 3 })
             })
           })
         })
@@ -2648,6 +2790,7 @@ describe('in mode', () => {
                 query: groupMembersQuery,
                 variables: {
                   id: groupId,
+                  includePending: true,
                 },
               })
               return result.data?.GroupMembers
