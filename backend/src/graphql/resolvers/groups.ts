@@ -11,7 +11,7 @@ import { v4 as uuid } from 'uuid'
 
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '@constants/categories'
 import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '@constants/groups'
-import { UserInputError } from '@graphql/errors'
+import { ForbiddenError, UserInputError } from '@graphql/errors'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
 
 import Resolver from './helpers/Resolver'
@@ -250,6 +250,15 @@ export default {
             { groupId },
           )
           const previousGroupType = previousGroupTypeResult.records[0]?.get('groupType')
+          // Turning a group hidden needs group.create_hidden (same gate as creating
+          // one). Keeping an already-hidden group hidden is fine.
+          if (
+            params.groupType === 'hidden' &&
+            previousGroupType !== 'hidden' &&
+            !context.effectivePermissions.has('group.create_hidden')
+          ) {
+            throw new ForbiddenError('Not Authorized!')
+          }
           if (policy.get('categoriesActive') && categoryIds?.length) {
             await transaction.run(
               `
