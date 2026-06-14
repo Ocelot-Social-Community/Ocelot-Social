@@ -288,7 +288,7 @@ describe('decode', () => {
           name: 'Jenny Rostock',
           id: 'u3',
           slug: 'jenny-rostock',
-          roles: ['user'],
+          roleName: 'user',
         })
       })
 

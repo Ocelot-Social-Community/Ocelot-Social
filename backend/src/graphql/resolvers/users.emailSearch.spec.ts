@@ -69,7 +69,10 @@ describe('admin user search — e-mail filter is gated by user.email.readAny', (
       { id: 'manager', name: 'Manager', role: null },
       { email: 'manager@example.org', password: '1234' },
     )
-    authenticatedUser = { ...(await manager.toJson()), roles: ['usermanager'] } as Context['user']
+    authenticatedUser = {
+      ...(await manager.toJson()),
+      roleName: 'usermanager',
+    } as Context['user']
   }
 
   it('reaches the search (has role.manage) but does NOT match by e-mail (no oracle)', async () => {

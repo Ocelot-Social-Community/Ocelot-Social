@@ -63,16 +63,15 @@ beforeEach(async () => {
     { id: 'restricted-user', name: 'Restricted User' },
     { email: 'restricted@example.org', password: '1234' },
   )
+  // Owner with the network `owner` role (full catalog ⇒ has group.create_hidden).
+  // Use the factory `role` so the user gets EXACTLY ONE HAS_ROLE edge — adding a
+  // second edge on top of the factory default would violate the single-role model
+  // and (correctly) fail closed to USER_ROLE.
   ownerUser = await Factory.build(
     'user',
-    { id: 'owner-user', name: 'Owner User' },
+    { id: 'owner-user', name: 'Owner User', role: 'owner' },
     { email: 'owner-user@example.org', password: '1234' },
   )
-  // Give ownerUser the network `owner` role (full catalog ⇒ has group.create_hidden).
-  await database.write({
-    query: `MATCH (u:User { id: 'owner-user' }), (r:Role { name: 'owner' }) MERGE (u)-[:HAS_ROLE]->(r)`,
-    variables: {},
-  })
   authenticatedUser = null
 })
 

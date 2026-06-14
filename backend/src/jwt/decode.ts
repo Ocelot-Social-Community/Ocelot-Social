@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-
 import { createHash } from 'node:crypto'
 
 import { verify } from 'jsonwebtoken'
+
+import { resolveRoleName } from '@src/role'
 
 import type CONFIG from '@src/config'
 import type { JwtPayload } from 'jsonwebtoken'
@@ -12,15 +12,19 @@ export interface DecodedUser {
   id: string
   slug: string
   name: string
-  // The user's single role name from (:User)-[:HAS_ROLE]->(:Role). Authorization
-  // resolves from this (see effectiveRoleName). Optional so other DecodedUser
-  // constructions need not set it; decode() always populates it (empty array when
-  // there is no edge, which resolves to the USER_ROLE baseline).
-  roles?: string[]
+  // The user's single resolved role name from (:User)-[:HAS_ROLE]->(:Role),
+  // collapsed at decode time by resolveRoleName (>1 edge fails closed to the
+  // baseline). Authorization resolves from this (see effectiveRoleName). Optional so
+  // other DecodedUser constructions need not set it; absent ⇒ USER_ROLE baseline.
+  roleName?: string
   disabled: boolean
   authMethod?: 'jwt' | 'apiKey'
   apiKeyId?: string
 }
+
+// The raw user shape as returned by the decode Cypher (carries the HAS_ROLE edge
+// names as an array + actorId); collapsed to DecodedUser via resolveRoleName.
+type RawDbUser = Omit<DecodedUser, 'roleName'> & { roles?: string[]; actorId?: string }
 
 const jwt = { verify }
 
@@ -38,7 +42,7 @@ const decodeJwt = async (
   }
   const session = context.driver.session()
 
-  const readTxResultPromise = session.readTransaction<DecodedUser[]>(async (transaction) => {
+  const readTxResultPromise = session.readTransaction<RawDbUser[]>(async (transaction) => {
     const fetchUserTransactionResponse = await transaction.run(
       `
       MATCH (user:User {id: $id, deleted: false, disabled: false })
@@ -50,13 +54,15 @@ const decodeJwt = async (
     `,
       { id },
     )
-    return fetchUserTransactionResponse.records.map((record) => record.get('user'))
+    return fetchUserTransactionResponse.records.map((record) => record.get('user') as RawDbUser)
   })
   try {
-    const [currentUser] = await readTxResultPromise
-    if (!currentUser) return null
+    const [raw] = await readTxResultPromise
+    if (!raw) return null
+    const { roles, ...rest } = raw
     return {
-      ...currentUser,
+      ...rest,
+      roleName: resolveRoleName(roles),
       authMethod: 'jwt' as const,
     }
   } finally {
@@ -88,7 +94,7 @@ const decodeApiKey = async (driver: Driver, key: string): Promise<DecodedUser | 
     if (result.records.length === 0) return null
 
     const record = result.records[0]
-    const user = record.get('user') as DecodedUser
+    const raw = record.get('user') as RawDbUser
     const keyId = record.get('keyId') as string
 
     // Update lastUsedAt asynchronously (non-blocking, separate session)
@@ -103,8 +109,10 @@ const decodeApiKey = async (driver: Driver, key: string): Promise<DecodedUser | 
       .catch(() => {})
       .finally(async () => updateSession.close())
 
+    const { roles, ...rest } = raw
     return {
-      ...user,
+      ...rest,
+      roleName: resolveRoleName(roles),
       authMethod: 'apiKey' as const,
       apiKeyId: keyId,
     }

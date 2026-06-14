@@ -280,7 +280,7 @@ describe('role management', () => {
     })
 
     it('lets an owner assign owner, but refuses demoting the last owner', async () => {
-      authenticatedUser = { id: 'owner-actor', roles: ['owner'] } as unknown as Context['user']
+      authenticatedUser = { id: 'owner-actor', roleName: 'owner' } as unknown as Context['user']
       const assigned = await mutate({
         mutation: SET_USER_ROLE,
         variables: { userId: 'member-id', roleName: 'owner' },
@@ -296,7 +296,7 @@ describe('role management', () => {
 
     it('forbids a (non-owner) admin from changing an owner’s role', async () => {
       // an owner first makes member-id an owner
-      authenticatedUser = { id: 'owner-actor', roles: ['owner'] } as unknown as Context['user']
+      authenticatedUser = { id: 'owner-actor', roleName: 'owner' } as unknown as Context['user']
       await mutate({
         mutation: SET_USER_ROLE,
         variables: { userId: 'member-id', roleName: 'owner' },

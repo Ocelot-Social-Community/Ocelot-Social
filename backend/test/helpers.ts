@@ -3,7 +3,7 @@
 import databaseContext from '@context/database'
 import { getContext } from '@src/context'
 import { createInMemoryPolicyService } from '@src/policy'
-import { createInMemoryRoleService } from '@src/role'
+import { createInMemoryRoleService, resolveRoleName } from '@src/role'
 import createServer from '@src/server'
 
 import type { ApolloServerPlugin } from '@apollo/server'
@@ -89,8 +89,9 @@ interface CreateTestServerOptions {
 // Resolve the authenticated user's single role name from its HAS_ROLE edge, the way
 // decode() does in production. Tests build authenticatedUser from user.toJson(), which
 // carries no role name; without this the user would resolve to no permissions. The
-// DB edge wins; if the user has no node (a bare literal like { id, roles: ['owner'] }),
-// any role names already on the literal are kept.
+// DB edge wins (collapsed via resolveRoleName, so multi-edge fails closed); if the
+// user has no node (a bare literal like { id, roleName: 'owner' }), the literal
+// roleName already on it is kept.
 const resolveAuthUserRoles = async (
   database: ReturnType<typeof databaseContext>,
   authenticatedUser: Context['user'] | undefined,
@@ -101,11 +102,8 @@ const resolveAuthUserRoles = async (
     variables: { id: authenticatedUser.id },
   })
   const dbRoles = (result.records[0]?.get('roles') as string[] | undefined) ?? []
-  if (dbRoles.length > 0) return { ...authenticatedUser, roles: dbRoles }
-  const provided = authenticatedUser.roles
-  const literalRoles =
-    Array.isArray(provided) && provided.every((r) => typeof r === 'string') ? provided : []
-  return { ...authenticatedUser, roles: literalRoles }
+  if (dbRoles.length > 0) return { ...authenticatedUser, roleName: resolveRoleName(dbRoles) }
+  return { ...authenticatedUser, roleName: authenticatedUser.roleName }
 }
 
 export const createApolloTestSetup = async (opts?: CreateTestServerOptions) => {
