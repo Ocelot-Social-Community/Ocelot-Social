@@ -123,6 +123,17 @@ export default {
         })
         const orderBy = orderClauses.length > 0 ? orderClauses.join(', ') : 'user.createdAt DESC'
 
+        // Searching BY e-mail is an oracle on personal data, so gate it with the
+        // SAME permission that gates reading the e-mail field (User.email shield
+        // rule) — role.manage alone must not let someone probe addresses. Without
+        // it, the e-mail term simply does not match (and is never returned).
+        const canReadEmail = context.effectivePermissions.has('user.email.readAny')
+        const emailSearchClause = canReadEmail
+          ? `OR toLower(
+                          coalesce(head([(user)-[:PRIMARY_EMAIL]->(e:EmailAddress) | e.email]), '')
+                        ) CONTAINS $args.term`
+          : ''
+
         const session = context.driver.session()
         try {
           const readTxResult = await session.readTransaction((txc) => {
@@ -134,7 +145,8 @@ export default {
                 AND ($args.term IS NULL
                      OR toLower(user.name) CONTAINS $args.term
                      OR toLower(user.slug) CONTAINS $args.term
-                     OR toLower(coalesce(user.about, '')) CONTAINS $args.term)
+                     OR toLower(coalesce(user.about, '')) CONTAINS $args.term
+                     ${emailSearchClause})
               RETURN user {.*, email: head([(user)-[:PRIMARY_EMAIL]->(e:EmailAddress) | e.email])}
               ORDER BY ${orderBy}
               SKIP toInteger($args.offset) LIMIT toInteger($args.first)`,

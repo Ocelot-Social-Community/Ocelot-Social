@@ -97,17 +97,15 @@ describe('Users', () => {
     })
 
     describe('query looks like an email address', () => {
-      it('searches users for exact email address', async () => {
+      it('searches a full e-mail as free text too (partial match, no exact-only case)', async () => {
         const wrapper = await searchAction(Wrapper(), { query: 'email@example.org' })
-        expect(wrapper.vm.email).toEqual('email@example.org')
-        expect(wrapper.vm.searchText).toBe(null)
+        expect(wrapper.vm.searchText).toEqual('email@example.org')
       })
     })
 
     describe('query is just text', () => {
       it('searches by free text (combinable with the role filter)', async () => {
         const wrapper = await searchAction(await Wrapper(), { query: 'Find me' })
-        expect(wrapper.vm.email).toBe(null)
         expect(wrapper.vm.searchText).toEqual('Find me')
       })
     })
@@ -182,7 +180,6 @@ describe('Users', () => {
       wrapper.vm.onSubmit()
       expect(wrapper.vm.roleFilter).toBe('moderator')
       expect(wrapper.vm.searchText).toBe('anna')
-      expect(wrapper.vm.email).toBe(null)
     })
 
     it('resolves the role token case-insensitively against the known roles', () => {

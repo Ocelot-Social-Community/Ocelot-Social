@@ -177,6 +177,24 @@ describe('User', () => {
       expect(data.User.map((u) => u.name).sort()).toEqual(['Anna', 'Bob'])
     })
 
+    it('matches a free-text term against the email address (partial)', async () => {
+      const { data, errors } = await query({
+        query: searchQuery,
+        variables: { search: 'bob@example' },
+      })
+      expect(errors).toBeUndefined()
+      expect(data.User.map((u) => u.name)).toEqual(['Bob'])
+    })
+
+    it('matches a FULL email address via free-text search (substring, not exact-only)', async () => {
+      const { data, errors } = await query({
+        query: searchQuery,
+        variables: { search: 'bob@example.org' },
+      })
+      expect(errors).toBeUndefined()
+      expect(data.User.map((u) => u.name)).toEqual(['Bob'])
+    })
+
     it('honours orderBy (ascending and descending)', async () => {
       const asc = await query({
         query: searchQuery,

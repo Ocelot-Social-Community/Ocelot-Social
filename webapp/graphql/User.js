@@ -70,9 +70,8 @@ export const minimisedUserQuery = () => {
 
 export const adminUserQuery = () => {
   return gql`
-    query ($first: Int, $offset: Int, $email: String, $roleName: String, $search: String) {
+    query ($first: Int, $offset: Int, $roleName: String, $search: String) {
       User(
-        email: $email
         roleName: $roleName
         search: $search
         first: $first

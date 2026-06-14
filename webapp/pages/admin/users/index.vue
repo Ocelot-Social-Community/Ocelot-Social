@@ -156,7 +156,6 @@
 import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
-import { isEmail } from 'validator'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
 import { adminUserQuery } from '~/graphql/User'
 import { rolesQuery, setUserRoleMutation } from '~/graphql/admin/Roles'
@@ -200,15 +199,13 @@ export default {
       else terms.push(token)
     }
     const term = terms.join(' ')
-    const mail = term && isEmail(term) ? term : null
     return {
       offset: 0,
       pageSize,
       first: pageSize,
       User: [],
       hasNext: false,
-      email: mail,
-      searchText: mail ? null : term || null,
+      searchText: term || null,
       roleFilter: roleName,
       allRoleNames: [],
       formData: {
@@ -240,13 +237,10 @@ export default {
         return adminUserQuery()
       },
       variables() {
-        const { offset, first, email, roleFilter, searchText } = this
+        const { offset, first, roleFilter, searchText } = this
         const variables = { first, offset }
-        // An e-mail is a precise standalone lookup; otherwise role + text combine.
-        if (email) {
-          variables.email = email
-          return variables
-        }
+        // Role + free text combine; the free text is a substring match across
+        // name/slug/about/email (partial e-mail included) — no exact-e-mail case.
         if (roleFilter) variables.roleName = roleFilter
         if (searchText) variables.search = searchText
         return variables
@@ -273,23 +267,17 @@ export default {
       this.offset += this.pageSize
     },
     // The search box is the single source of truth: a `role:<name>` token filters by
-    // role, the rest is free text (or a standalone exact e-mail lookup). Both combine.
+    // role, the rest is free text (substring match, partial e-mail included). Both combine.
     onSubmit() {
       this.offset = 0
       this.applyQuery()
       this.syncRoute()
     },
-    // Resolve the current search box into role / text / e-mail query state.
+    // Resolve the current search box into role / free-text query state.
     applyQuery() {
       const { roleName, term } = this.parseSearch(this.formData.query)
       this.roleFilter = roleName
-      if (term && isEmail(term)) {
-        this.email = term
-        this.searchText = null
-      } else {
-        this.email = null
-        this.searchText = term || null
-      }
+      this.searchText = term || null
     },
     // Split the query into an optional `role:<name>` token (resolved against the known
     // role names, case-insensitively) and the remaining free-text term.
