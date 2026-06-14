@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable @typescript-eslint/require-await */
 
 import { hashSync } from 'bcryptjs'
 import { v4 as uuid } from 'uuid'
@@ -27,7 +26,10 @@ const createDefaultOwnerUser = async () => {
   const driver = getDriver()
   const session = driver.session()
   const createOwnerTxResultPromise = session.writeTransaction(async (txc) => {
-    txc.run(
+    // Return the run promise so writeTransaction awaits the query before
+    // committing — otherwise the callback resolves immediately and the commit can
+    // race the (possibly unfinished) write.
+    return txc.run(
       `MERGE (e:EmailAddress {
         email: "${defaultOwner.email}",
         createdAt: toString(datetime())
@@ -52,10 +54,12 @@ const createDefaultOwnerUser = async () => {
     console.log('Successfully created default owner user!') // eslint-disable-line no-console
     // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (error) {
-    console.log(error) // eslint-disable-line no-console
+    console.error(error) // eslint-disable-line no-console
+    // Signal failure so a broken bootstrap doesn't exit 0 (matches promote-owner).
+    process.exitCode = 1
   } finally {
-    session.close()
-    driver.close()
+    await session.close()
+    await driver.close()
   }
 }
 
