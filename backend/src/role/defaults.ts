@@ -23,6 +23,14 @@ const BASELINE: RoleDefinition['permissions'] = [
   'user.invite',
 ]
 
+// The roles that MUST always exist and are re-ensured on every boot / bootstrap:
+// `owner` (the protected failsafe superuser) and `user` (the baseline every
+// account and registration resolves to). The OPTIONAL roles (admin, moderator)
+// are seeded only on a fresh, empty install and may be permanently deleted
+// afterward — the boot-seed will not resurrect them. The factory-reset CLI
+// (`db:data:roles`) is the explicit path to restore the full set.
+export const MANDATORY_ROLE_NAMES: readonly string[] = [OWNER_ROLE, USER_ROLE]
+
 export const DEFAULT_ROLES: RoleDefinition[] = [
   {
     name: OWNER_ROLE,

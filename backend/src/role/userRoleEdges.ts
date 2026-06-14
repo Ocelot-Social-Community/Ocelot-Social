@@ -1,17 +1,60 @@
 import databaseContext from '@context/database'
 
-import { DEFAULT_ROLES } from './defaults'
-import { seedRole } from './repository'
+import { DEFAULT_ROLES, MANDATORY_ROLE_NAMES } from './defaults'
+import { readAllRoles, seedRole } from './repository'
+
+import type { RoleDefinition } from './types'
 
 type DbContext = ReturnType<typeof databaseContext>
 
-// Seed the default role nodes (idempotent, ON CREATE). Needed before any
-// HAS_ROLE edge can be created against them.
-export async function seedDefaultRoleNodes(db: DbContext = databaseContext()): Promise<void> {
+// Which default roles to (re)create given what already exists:
+//   • fresh/empty DB → the full default set (first-run bootstrap)
+//   • established DB → only the MANDATORY roles (owner/user) that are missing
+//     (self-heal); optional roles (admin/moderator) are NEVER resurrected here,
+//     so an operator can delete them permanently. The factory-reset CLI
+//     (`db:data:roles`) restores the full set on demand.
+function selectRolesToSeed(existingNames: Set<string>): RoleDefinition[] {
+  if (existingNames.size === 0) return DEFAULT_ROLES
+  return DEFAULT_ROLES.filter(
+    (role) => MANDATORY_ROLE_NAMES.includes(role.name) && !existingNames.has(role.name),
+  )
+}
+
+// Ensure the default role nodes exist (idempotent). Reads once, writes ONLY when
+// something is actually missing (steady state: a single read, no writes), then
+// returns the persisted role set so callers can reuse it without re-reading.
+export async function seedDefaultRoleNodes(
+  db: DbContext = databaseContext(),
+): Promise<RoleDefinition[]> {
+  const existing = await readAllRoles(db)
+  const existingNames = new Set(existing.map((role) => role.name))
+  const toSeed = selectRolesToSeed(existingNames)
+  if (toSeed.length === 0) return existing
+
   const now = new Date().toISOString()
-  for (const role of DEFAULT_ROLES) {
+  for (const role of toSeed) {
     await seedRole(db, role, now)
   }
+
+  // A mandatory role missing on a NON-empty DB is an anomaly: we self-heal it (the
+  // network stays up) but must surface it — repeated occurrences point at a deeper
+  // problem (bad restore, a rogue delete). A fresh install seeding everything is
+  // normal and stays quiet.
+  const healedMandatory = toSeed
+    .filter((role) => MANDATORY_ROLE_NAMES.includes(role.name))
+    .map((role) => role.name)
+  if (existingNames.size > 0 && healedMandatory.length > 0) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `RoleService: restored missing mandatory role(s): ${healedMandatory.join(
+        ', ',
+      )}. Investigate why they were absent.`,
+    )
+  }
+
+  // Re-read so the returned set (and the boot invariant that consumes it) reflects
+  // what actually persisted, not merely what we attempted to write.
+  return readAllRoles(db)
 }
 
 // Ensure the default role nodes exist and every user has exactly one

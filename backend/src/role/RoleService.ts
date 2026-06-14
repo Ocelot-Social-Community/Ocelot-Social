@@ -14,9 +14,10 @@
 import databaseContext from '@context/database'
 import { allPermissionKeys, sanitizePermissions } from '@src/permission'
 
-import { DEFAULT_ROLES } from './defaults'
-import { deleteRole as dbDeleteRole, readAllRoles, seedRole, writeRole } from './repository'
+import { DEFAULT_ROLES, MANDATORY_ROLE_NAMES } from './defaults'
+import { deleteRole as dbDeleteRole, writeRole } from './repository'
 import { OWNER_ROLE, USER_ROLE } from './types'
+import { seedDefaultRoleNodes } from './userRoleEdges'
 
 import type { RoleChangeEvent, RoleDefinition, RolePubSub } from './types'
 import type { PermissionKey } from '@src/permission'
@@ -49,14 +50,11 @@ export class RoleService {
       })
     }
 
-    // Seed defaults idempotently — ON CREATE only, so an admin-edited role is
-    // never reverted on restart.
-    const now = new Date().toISOString()
-    for (const role of DEFAULT_ROLES) {
-      await seedRole(this.db, role, now)
-    }
-
-    const roles = await readAllRoles(this.db)
+    // Ensure the default roles and reuse the persisted set for the cache (no second
+    // read). Full set on a fresh DB; on an established one only missing mandatory
+    // roles (owner/user) are self-healed — a deleted admin/moderator is NOT
+    // resurrected (the factory-reset CLI restores them deliberately).
+    const roles = await seedDefaultRoleNodes(this.db)
     for (const role of roles) {
       // A concurrent change event during init already set this role to a fresher
       // value — don't clobber it with the read.
@@ -64,18 +62,15 @@ export class RoleService {
       this.cache.set(role.name, role)
     }
 
-    // Boot invariant: every default role must be present after seeding. seedRole
-    // MERGEs each one immediately above, so a missing default here means the seed
-    // genuinely did not take (DB error, wrong key, a future no-op refactor). Fail
-    // fast rather than serve an instance where authorization or signup (the
-    // baseline `user` role) is silently broken. A runtime deletion of admin/
-    // moderator does not trip this — the next boot re-seeds it before this check.
-    const missingDefaults = DEFAULT_ROLES.filter((role) => !this.cache.has(role.name)).map(
-      (role) => role.name,
-    )
-    if (missingDefaults.length > 0) {
+    // Boot invariant: the MANDATORY roles must exist after seeding — owner (the
+    // failsafe superuser) and user (the registration/authorization baseline). A
+    // missing one means seeding did not take (DB error, wrong key, a future no-op
+    // refactor); fail fast rather than serve a broken instance. Optional roles
+    // (admin/moderator) are intentionally NOT required here: they may be deleted.
+    const missingMandatory = MANDATORY_ROLE_NAMES.filter((name) => !this.cache.has(name))
+    if (missingMandatory.length > 0) {
       throw new Error(
-        `RoleService.init: default role node(s) missing after seeding: ${missingDefaults.join(
+        `RoleService.init: mandatory role node(s) missing after seeding: ${missingMandatory.join(
           ', ',
         )}. Refusing to start — authorization and user registration depend on them.`,
       )

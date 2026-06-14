@@ -30,6 +30,17 @@ const roleNodeExists = async (name: string): Promise<boolean> => {
   }
 }
 
+const deleteRoleNode = async (name: string): Promise<void> => {
+  const session = getDriver().session()
+  try {
+    await session.writeTransaction((tx) =>
+      tx.run(`MATCH (r:Role {id: $name}) DETACH DELETE r`, { name }),
+    )
+  } finally {
+    await session.close()
+  }
+}
+
 describe('role-edge helpers (DB)', () => {
   beforeEach(async () => {
     await cleanDatabase()
@@ -91,6 +102,47 @@ describe('role-edge helpers (DB)', () => {
 
     it('returns null for an unknown identifier', async () => {
       expect(await promoteToOwner('nobody@nowhere.org')).toBeNull()
+    })
+  })
+
+  describe('seed policy (durable deletion of optional roles)', () => {
+    // cleanDatabase (beforeEach) seeds a fresh DB, so all four roles exist here.
+    it('does not resurrect a deleted admin/moderator on an established DB', async () => {
+      await deleteRoleNode('moderator')
+      await deleteRoleNode('admin')
+
+      await seedDefaultRoleNodes() // DB is non-empty ⇒ only owner & user are ensured
+
+      expect(await roleNodeExists('moderator')).toBe(false)
+      expect(await roleNodeExists('admin')).toBe(false)
+      // mandatory roles remain
+      expect(await roleNodeExists('owner')).toBe(true)
+      expect(await roleNodeExists('user')).toBe(true)
+    })
+
+    it('re-creates the mandatory owner & user roles if they were deleted', async () => {
+      await deleteRoleNode('owner')
+      await deleteRoleNode('user')
+      // admin/moderator still present ⇒ DB is non-empty (established path)
+
+      await seedDefaultRoleNodes()
+
+      expect(await roleNodeExists('owner')).toBe(true)
+      expect(await roleNodeExists('user')).toBe(true)
+    })
+
+    it('seeds the full set again only when the DB is completely empty', async () => {
+      await deleteRoleNode('owner')
+      await deleteRoleNode('admin')
+      await deleteRoleNode('moderator')
+      await deleteRoleNode('user')
+
+      await seedDefaultRoleNodes() // empty ⇒ fresh install ⇒ all four
+
+      expect(await roleNodeExists('owner')).toBe(true)
+      expect(await roleNodeExists('admin')).toBe(true)
+      expect(await roleNodeExists('moderator')).toBe(true)
+      expect(await roleNodeExists('user')).toBe(true)
     })
   })
 

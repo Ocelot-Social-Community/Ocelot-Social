@@ -132,8 +132,8 @@ describe('RoleService', () => {
       const writes: Array<{ query: string; variables?: object }> = []
       const published: Array<{ channel: string; payload: { roleChanged: RoleChangeEvent } }> = []
       const fakeDb = {
-        // Return the seeded defaults so init()'s boot invariant (all DEFAULT_ROLES
-        // present) is satisfied, the same as a real DB after the seed loop.
+        // Return the seeded defaults: a non-empty DB (established install), so
+        // init() ensures the mandatory roles and its boot invariant is satisfied.
         query: async () => Promise.resolve({ records: DEFAULT_ROLES.map(roleRecord) }),
         write: async (statement: { query: string; variables?: object }) => {
           writes.push(statement)
@@ -187,9 +187,11 @@ describe('RoleService', () => {
       expect(event).toMatchObject({ name: 'temp', definition: null, actor: 'admin-1' })
     })
 
-    it('refuses to start (boot invariant) when a default role is missing after seeding', async () => {
-      // Simulate a seed that did not produce the baseline `user` node (DB error /
-      // wrong key). init() must reject so a broken instance never serves traffic.
+    it('refuses to start (boot invariant) when a mandatory role is missing after seeding', async () => {
+      // The write never lands (fake write is a no-op), so `user` stays missing even
+      // after the self-heal attempt. init() must reject so a broken instance never
+      // serves traffic.
+      const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
       const fakeDb = {
         query: async () =>
           Promise.resolve({
@@ -198,7 +200,80 @@ describe('RoleService', () => {
         write: async () => Promise.resolve({ records: [] }),
       } as unknown as DbArg
       const svc = new RoleService(fakeDb)
-      await expect(svc.init()).rejects.toThrow(/default role node\(s\) missing after seeding/)
+      await expect(svc.init()).rejects.toThrow(/mandatory role node\(s\) missing after seeding/)
+      warn.mockRestore()
+    })
+
+    it('seeds the full default set on a fresh (empty) install', async () => {
+      const writes: Array<{ variables?: { name?: string } }> = []
+      let queryCalls = 0
+      const fakeDb = {
+        query: async () => {
+          queryCalls += 1
+          // First read (the fresh-check) sees an empty DB; later reads reflect the
+          // now-seeded roles so init()'s cache + invariant pass.
+          return Promise.resolve({ records: queryCalls === 1 ? [] : DEFAULT_ROLES.map(roleRecord) })
+        },
+        write: async (statement: { variables?: { name?: string } }) => {
+          writes.push(statement)
+          return Promise.resolve({ records: [] })
+        },
+      } as unknown as DbArg
+      const svc = new RoleService(fakeDb)
+      await svc.init()
+
+      const seeded = writes.map((w) => w.variables?.name)
+      expect(seeded).toEqual(
+        expect.arrayContaining([OWNER_ROLE, ADMIN_ROLE, MODERATOR_ROLE, USER_ROLE]),
+      )
+    })
+
+    it('writes nothing on an established install where all roles already exist', async () => {
+      const writes: Array<{ variables?: { name?: string } }> = []
+      const fakeDb = {
+        query: async () => Promise.resolve({ records: DEFAULT_ROLES.map(roleRecord) }), // all present
+        write: async (statement: { variables?: { name?: string } }) => {
+          writes.push(statement)
+          return Promise.resolve({ records: [] })
+        },
+      } as unknown as DbArg
+      const svc = new RoleService(fakeDb)
+      await svc.init()
+
+      // Steady state: a single read, zero writes — no MERGE churn per boot.
+      expect(writes).toHaveLength(0)
+    })
+
+    it('self-heals only the missing mandatory role (not admin/moderator) and warns', async () => {
+      const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+      const writes: Array<{ variables?: { name?: string } }> = []
+      let queryCalls = 0
+      const fakeDb = {
+        query: async () => {
+          queryCalls += 1
+          // First read: `user` is missing on a non-empty DB. Re-read (after the
+          // heal write) reflects it restored, so the boot invariant passes.
+          return Promise.resolve({
+            records:
+              queryCalls === 1
+                ? DEFAULT_ROLES.filter((role) => role.name !== USER_ROLE).map(roleRecord)
+                : DEFAULT_ROLES.map(roleRecord),
+          })
+        },
+        write: async (statement: { variables?: { name?: string } }) => {
+          writes.push(statement)
+          return Promise.resolve({ records: [] })
+        },
+      } as unknown as DbArg
+      const svc = new RoleService(fakeDb)
+      await svc.init()
+
+      const seeded = writes.map((w) => w.variables?.name)
+      expect(seeded).toEqual([USER_ROLE]) // only the missing mandatory role
+      expect(seeded).not.toContain(ADMIN_ROLE)
+      expect(seeded).not.toContain(MODERATOR_ROLE)
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining(USER_ROLE))
+      warn.mockRestore()
     })
   })
 })
