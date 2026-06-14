@@ -200,6 +200,7 @@
                 :loading="loading"
                 :disabled="!!formErrors"
                 :class="{ 'permission-denied': !contribution.id && !$can('post.create') }"
+                :aria-disabled="!contribution.id && !$can('post.create')"
                 v-tooltip="{
                   content:
                     !contribution.id && !$can('post.create') ? $t('permissions.deniedHint') : '',

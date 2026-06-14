@@ -11,6 +11,7 @@
           :as="$can('group.create') ? 'nuxt-link' : 'button'"
           :to="{ name: 'groups-create' }"
           :class="{ 'permission-denied': !$can('group.create') }"
+          :aria-disabled="!$can('group.create')"
           class="group-add-button"
           variant="primary"
           appearance="filled"

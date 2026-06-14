@@ -47,9 +47,7 @@
             :key="groupType"
             :value="groupType"
             :disabled="
-              groupType === 'hidden' &&
-              group.groupType !== 'hidden' &&
-              !$can('group.create_hidden')
+              groupType === 'hidden' && group.groupType !== 'hidden' && !$can('group.create_hidden')
             "
           >
             {{ $t(`group.typesOptions.${groupType}`) }}
@@ -162,6 +160,7 @@
             :loading="loading"
             :disabled="loading || checkFormError(formErrors)"
             :class="{ 'permission-denied': !update && !$can('group.create') }"
+            :aria-disabled="!update && !$can('group.create')"
             v-tooltip="{
               content: !update && !$can('group.create') ? $t('permissions.deniedHint') : '',
             }"

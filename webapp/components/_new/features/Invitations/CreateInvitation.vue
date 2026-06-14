@@ -14,6 +14,7 @@
         circle
         class="generate-invite-code"
         :class="{ 'permission-denied': !$can('user.invite') }"
+        :aria-disabled="!$can('user.invite')"
         :aria-label="$t('invite-codes.generate-code')"
         type="submit"
         :disabled="disabled"

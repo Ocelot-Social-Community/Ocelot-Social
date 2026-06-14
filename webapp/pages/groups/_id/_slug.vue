@@ -260,6 +260,7 @@
               query: { groupId: group.id },
             }"
             :class="{ 'permission-denied': !$can('post.create') }"
+            :aria-disabled="!$can('post.create')"
             class="profile-post-add-button"
             variant="primary"
             appearance="filled"
