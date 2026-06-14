@@ -178,8 +178,8 @@ export default {
     const pageSize = 15
     // Initialize the filter from the URL here (not in created), so the first apollo
     // fetch already carries it — otherwise the list loads unfiltered and then
-    // re-fetches filtered (a flash of all users). Reads ?q=<search>, or the legacy
-    // ?role=<name> deep-link from the roles page "x members" link.
+    // re-fetches filtered (a flash of all users). Reads the ?q=<search> param; the
+    // roles page "x members" link points here as ?q=role:<name>.
     //
     // NB: parse inline — `this.parseSearch` reads `allRoleNames`, a vue-apollo
     // property that is not available yet during data() initialization.
@@ -187,9 +187,7 @@ export default {
     // A repeated param (?q=a&q=b) arrives as an array; take the last value so
     // query parsing always operates on a string (and never crashes on .trim()).
     const firstString = (value) => (Array.isArray(value) ? value[value.length - 1] : value) || ''
-    let query = ''
-    if (routeQuery.q) query = firstString(routeQuery.q)
-    else if (routeQuery.role) query = `role:${firstString(routeQuery.role)}`
+    const query = routeQuery.q ? firstString(routeQuery.q) : ''
     const tokens = query.trim().split(/\s+/).filter(Boolean)
     let roleName = null
     const terms = []
@@ -230,6 +228,18 @@ export default {
     ...mapGetters({
       currentUser: 'auth/user',
     }),
+  },
+  watch: {
+    // A deep-linked role token (?q=role:Owner) is parsed in data() before the known
+    // role names have loaded, so its casing can't be
+    // resolved yet. Once allRoleNames arrives, snap roleFilter to the canonical
+    // casing — the backend matches role names exactly, so without this a wrong-case
+    // deep link would return nothing until the form is re-submitted.
+    allRoleNames(names) {
+      if (!this.roleFilter) return
+      const canonical = (names || []).find((r) => r.toLowerCase() === this.roleFilter.toLowerCase())
+      if (canonical && canonical !== this.roleFilter) this.roleFilter = canonical
+    },
   },
   apollo: {
     User: {

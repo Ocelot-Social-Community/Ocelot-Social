@@ -230,11 +230,19 @@ describe('Users', () => {
       mocks.$route = { query: {} }
     })
 
-    it('still supports the legacy ?role= deep-link', () => {
-      mocks.$route = { query: { role: 'moderator' } }
-      const w = Wrapper()
-      expect(w.vm.formData.query).toBe('role:moderator')
-      expect(w.vm.roleFilter).toBe('moderator')
+    it('normalises a deep-linked role token to canonical casing once role names load', async () => {
+      mocks.$route = { query: { q: 'role:Owner' } }
+      const store = new Vuex.Store({ getters })
+      const w = mount(Users, {
+        mocks,
+        localVue,
+        store,
+        stubs,
+        data: () => ({ allRoleNames: [], User: [] }),
+      })
+      expect(w.vm.roleFilter).toBe('Owner') // raw, before the known role names arrive
+      await w.setData({ allRoleNames: ['user', 'admin', 'owner'] })
+      expect(w.vm.roleFilter).toBe('owner') // snapped to the canonical casing
       mocks.$route = { query: {} }
     })
 
