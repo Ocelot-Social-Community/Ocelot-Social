@@ -39,6 +39,11 @@ describe('admin.vue', () => {
       expect(wrapper.vm.matcher('/admin/users')).toBe(true)
       expect(wrapper.vm.matcher('/admin')).toBe(false)
     })
+
+    it('returns false (without throwing) when $route is missing', () => {
+      wrapper = Wrapper() // no $route mock
+      expect(wrapper.vm.matcher('/admin/users')).toBe(false)
+    })
   })
 
   describe('the API-keys admin menu item', () => {
