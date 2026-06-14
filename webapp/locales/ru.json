@@ -241,14 +241,14 @@
       "name": "Настройки"
     },
     "users": {
-      "addRole": "Assign role…",
+      "addRole": "Назначить роль…",
       "allRoles": "Все роли",
       "empty": "Пользователи не найдены",
       "form": {
         "placeholder": "эл. почта, имя, описание или role:moderator"
       },
       "name": "Пользователи",
-      "removeRole": "Remove role {role}",
+      "removeRole": "Удалить роль {role}",
       "roleChanged": "Роль успешно изменена!",
       "table": {
         "columns": {

@@ -241,14 +241,14 @@
       "name": "Cilësimet"
     },
     "users": {
-      "addRole": "Assign role…",
+      "addRole": "Cakto rol…",
       "allRoles": "Të gjitha rolet",
       "empty": "Nuk u gjetën përdorues",
       "form": {
         "placeholder": "email, emër, përshkrim ose role:moderator"
       },
       "name": "Përdoruesit",
-      "removeRole": "Remove role {role}",
+      "removeRole": "Hiq rolin {role}",
       "roleChanged": "Roli u ndryshua me sukses!",
       "table": {
         "columns": {

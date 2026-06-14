@@ -241,14 +241,14 @@
       "name": "Paramètres"
     },
     "users": {
-      "addRole": "Assign role…",
+      "addRole": "Attribuer un rôle…",
       "allRoles": "Tous les rôles",
       "empty": "Aucun utilisateur trouvé",
       "form": {
         "placeholder": "e-mail, nom, description ou role:moderator"
       },
       "name": "Utilisateurs",
-      "removeRole": "Remove role {role}",
+      "removeRole": "Retirer le rôle {role}",
       "roleChanged": "Rôle modifié avec succès !",
       "table": {
         "columns": {

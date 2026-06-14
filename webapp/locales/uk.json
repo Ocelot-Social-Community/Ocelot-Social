@@ -241,14 +241,14 @@
       "name": "Налаштування"
     },
     "users": {
-      "addRole": "Assign role…",
+      "addRole": "Призначити роль…",
       "allRoles": "Усі ролі",
       "empty": "Користувачів не знайдено",
       "form": {
         "placeholder": "ел. пошта, ім'я, опис або role:moderator"
       },
       "name": "Користувачі",
-      "removeRole": "Remove role {role}",
+      "removeRole": "Вилучити роль {role}",
       "roleChanged": "Роль успішно змінено!",
       "table": {
         "columns": {

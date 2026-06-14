@@ -241,14 +241,14 @@
       "name": "Configurações"
     },
     "users": {
-      "addRole": "Assign role…",
+      "addRole": "Atribuir função…",
       "allRoles": "Todas as funções",
       "empty": "Nenhum usuário encontrado",
       "form": {
         "placeholder": "e-mail, nome, descrição ou role:moderator"
       },
       "name": "Usuários",
-      "removeRole": "Remove role {role}",
+      "removeRole": "Remover função {role}",
       "roleChanged": "Papel alterado com sucesso!",
       "table": {
         "columns": {

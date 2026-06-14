@@ -241,14 +241,14 @@
       "name": "Instellingen"
     },
     "users": {
-      "addRole": "Assign role…",
+      "addRole": "Rol toewijzen…",
       "allRoles": "Alle rollen",
       "empty": "Geen gebruikers gevonden",
       "form": {
         "placeholder": "e-mail, naam, beschrijving of role:moderator"
       },
       "name": "Gebruikers",
-      "removeRole": "Remove role {role}",
+      "removeRole": "Rol {role} verwijderen",
       "roleChanged": "Rol succesvol gewijzigd!",
       "table": {
         "columns": {
