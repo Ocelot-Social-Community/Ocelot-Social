@@ -104,6 +104,8 @@ describe('UserTeaser', () => {
         $apollo: {
           query: jest.fn(() => Promise.resolve({ data: { user } })),
         },
+        // content.moderate ⇐ the isModerator test flag (component uses $can now)
+        $can: (permission) => permission === 'content.moderate' && isModerator,
       },
     })
   }

@@ -46,6 +46,7 @@ describe('PostSlug', () => {
             return { id: '1stUser' }
           },
           'auth/isModerator': () => false,
+          'auth/isAdmin': () => false,
         },
         actions: {
           'categories/init': jest.fn(),
@@ -55,6 +56,8 @@ describe('PostSlug', () => {
       const propsData = {}
       mocks = {
         $t: jest.fn((t) => t),
+        // Non-moderator viewer (children now gate via $can, not auth/isModerator).
+        $can: (permission) => permission !== 'content.moderate',
         $filters: {
           truncate: (a) => a,
           removeHtml: (a) => a,

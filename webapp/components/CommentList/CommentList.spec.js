@@ -45,6 +45,7 @@ describe('CommentList.vue', () => {
       store = new Vuex.Store({
         getters: {
           'auth/isModerator': () => false,
+          'auth/isAdmin': () => false,
           'auth/user': () => {
             return { id: 'some-user' }
           },
@@ -55,6 +56,10 @@ describe('CommentList.vue', () => {
       })
       mocks = {
         $t: (key) => key,
+        // Non-moderator viewer: grant everything except content.moderate so the
+        // moderation-aware children (CommentCard) hide disabled/deleted content as
+        // before (the components now use $can instead of the auth/isModerator getter).
+        $can: (permission) => permission !== 'content.moderate',
         $filters: {
           truncate: (a) => a,
           removeHtml: (a) => a,

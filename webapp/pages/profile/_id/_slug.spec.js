@@ -73,6 +73,11 @@ describe('ProfileSlug', () => {
         removeLinks: (c) => c,
         truncate: (a) => a,
       }
+      // Ordinary (non-admin, non-moderator) viewer — consistent with this spec's
+      // auth/isModerator=false / auth/isAdmin=false store getters. The children gate
+      // via $can now, so deny exactly the elevated capabilities they used to gate.
+      mocks.$can = (permission) =>
+        !['content.moderate', 'post.pin', 'post.push', 'user.delete.any'].includes(permission)
       mocks.$store = {
         getters: {
           'auth/isModerator': () => false,

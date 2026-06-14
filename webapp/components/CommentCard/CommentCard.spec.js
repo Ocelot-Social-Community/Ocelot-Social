@@ -40,6 +40,9 @@ describe('CommentCard.vue', () => {
           },
         }),
       },
+      // content.moderate ⇐ the existing isModerator test flag (component uses $can now)
+      $can: (permission) =>
+        permission === 'content.moderate' ? getters['auth/isModerator']() : false,
     }
     stubs = {
       ContentViewer: { template: '<div>{{ content }}</div>', props: ['content'] },
@@ -51,6 +54,7 @@ describe('CommentCard.vue', () => {
         return {}
       },
       'auth/isModerator': () => false,
+      'auth/isAdmin': () => false,
     }
   })
 

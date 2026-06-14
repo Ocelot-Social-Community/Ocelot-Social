@@ -26,8 +26,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import UserTeaserNonAnonymous from './UserTeaserNonAnonymous'
 
@@ -51,12 +49,9 @@ export default {
     hoverDelay: { type: Number, default: 500 },
   },
   computed: {
-    ...mapGetters({
-      isModerator: 'auth/isModerator',
-    }),
     displayAnonymous() {
-      const { user, isModerator } = this
-      return !user || user.deleted || (user.disabled && !isModerator)
+      const { user } = this
+      return !user || user.deleted || (user.disabled && !this.$can('content.moderate'))
     },
   },
   methods: {

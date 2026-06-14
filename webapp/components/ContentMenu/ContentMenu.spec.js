@@ -31,6 +31,13 @@ describe('ContentMenu.vue', () => {
       // maxPinnedPosts now comes from the network policy (not the pinnedPosts
       // store); delegate to the existing mock so the per-test values still apply.
       $policy: { get: (key) => (key === 'maxPinnedPosts' ? maxPinnedPostsMock() : false) },
+      // Bridge the existing isModerator/isAdmin test flags to the $can permission
+      // checks the component now uses: content.moderate ⇐ isModerator; the
+      // post.pin / post.push / user.delete.any actions ⇐ the (former) isAdmin flag.
+      $can: (permission) =>
+        permission === 'content.moderate'
+          ? getters['auth/isModerator']()
+          : getters['auth/isAdmin'](),
     }
   })
 
