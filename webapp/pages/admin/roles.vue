@@ -56,7 +56,14 @@
         >
           ✓
         </button>
-        <button type="button" class="role-tab__cancel" @click="cancelCreate">✕</button>
+        <button
+          type="button"
+          class="role-tab__cancel"
+          :aria-label="$t('actions.cancel')"
+          @click="cancelCreate"
+        >
+          ✕
+        </button>
       </span>
     </div>
 
