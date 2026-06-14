@@ -41,6 +41,14 @@ describe('policy visibility', () => {
         audiencesOf({ authenticated: true, permissions: ['policy.manage', 'badge.manage'] }),
       ).toEqual(new Set(['public', 'authenticated', 'perm:policy.manage', 'perm:badge.manage']))
     })
+
+    it('ignores permissions on an unauthenticated viewer (no leak without auth)', () => {
+      // Defensive: an inconsistent context carrying permissions but authenticated:false
+      // must not yield perm:<key> audiences — anonymous viewers hold none.
+      expect(audiencesOf({ authenticated: false, permissions: ['policy.manage'] })).toEqual(
+        new Set(['public']),
+      )
+    })
   })
 
   describe('canView()', () => {

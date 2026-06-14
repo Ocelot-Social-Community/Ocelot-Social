@@ -107,13 +107,17 @@ export function audiencesFor(key: PolicyKey): Audience[] {
 }
 
 // The audiences a viewer belongs to. 'public' is universal (every viewer,
-// including anonymous); logged-in viewers additionally carry 'authenticated';
-// every held permission becomes a 'perm:<key>' audience.
+// including anonymous). The 'authenticated' audience and every 'perm:<key>'
+// audience are gated on the auth status: an anonymous viewer holds none, even if
+// an inconsistent upstream context were to carry permissions. This keeps canView()
+// a safe single source of truth (no permission leak without authentication).
 export function audiencesOf(viewer: PolicyViewer | null | undefined): Set<Audience> {
   const audiences = new Set<Audience>([PUBLIC_AUDIENCE])
-  if (viewer?.authenticated) audiences.add(AUTHENTICATED_AUDIENCE)
-  for (const permission of viewer?.permissions ?? []) {
-    audiences.add(`${PERMISSION_AUDIENCE_PREFIX}${permission}`)
+  if (viewer?.authenticated) {
+    audiences.add(AUTHENTICATED_AUDIENCE)
+    for (const permission of viewer.permissions ?? []) {
+      audiences.add(`${PERMISSION_AUDIENCE_PREFIX}${permission}`)
+    }
   }
   return audiences
 }
