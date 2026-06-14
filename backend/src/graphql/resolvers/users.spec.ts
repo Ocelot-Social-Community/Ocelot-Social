@@ -122,6 +122,98 @@ describe('User', () => {
       })
     })
   })
+
+  describe('admin user search (roleName / search)', () => {
+    const searchQuery = `
+      query AdminUserSearch(
+        $roleName: String, $search: String, $first: Int, $offset: Int,
+        $orderBy: [_UserOrdering], $filter: _UserFilter, $locationName: String
+      ) {
+        User(
+          roleName: $roleName, search: $search, first: $first, offset: $offset,
+          orderBy: $orderBy, filter: $filter, locationName: $locationName
+        ) { id name }
+      }`
+
+    let normalUser
+
+    beforeEach(async () => {
+      await Factory.build(
+        'user',
+        { id: 'mod-anna', name: 'Anna', role: 'moderator' },
+        { email: 'anna@example.org', password: '1234' },
+      )
+      await Factory.build(
+        'user',
+        { id: 'mod-bob', name: 'Bob', role: 'moderator' },
+        { email: 'bob@example.org', password: '1234' },
+      )
+      normalUser = await Factory.build(
+        'user',
+        { id: 'plain-carol', name: 'Carol', role: 'user' },
+        { email: 'carol@example.org', password: '1234' },
+      )
+      const admin = await Factory.build(
+        'user',
+        { id: 'admin', name: 'Admin', role: 'admin' },
+        { email: 'admin@example.org', password: '1234' },
+      )
+      authenticatedUser = await admin.toJson()
+    })
+
+    it('requires role.manage (a normal user is forbidden)', async () => {
+      authenticatedUser = await normalUser.toJson()
+      await expect(
+        query({ query: searchQuery, variables: { roleName: 'moderator' } }),
+      ).resolves.toMatchObject({ errors: [{ message: 'Not Authorized!' }] })
+    })
+
+    it('filters users by their single role', async () => {
+      const { data, errors } = await query({
+        query: searchQuery,
+        variables: { roleName: 'moderator' },
+      })
+      expect(errors).toBeUndefined()
+      expect(data.User.map((u) => u.name).sort()).toEqual(['Anna', 'Bob'])
+    })
+
+    it('honours orderBy (ascending and descending)', async () => {
+      const asc = await query({
+        query: searchQuery,
+        variables: { roleName: 'moderator', orderBy: ['name_asc'] },
+      })
+      expect(asc.data.User.map((u) => u.name)).toEqual(['Anna', 'Bob'])
+      const desc = await query({
+        query: searchQuery,
+        variables: { roleName: 'moderator', orderBy: ['name_desc'] },
+      })
+      expect(desc.data.User.map((u) => u.name)).toEqual(['Bob', 'Anna'])
+    })
+
+    it('rejects an orderBy it does not support', async () => {
+      const { errors } = await query({
+        query: searchQuery,
+        variables: { roleName: 'moderator', orderBy: ['about_asc'] },
+      })
+      expect(errors?.[0].message).toContain('Unsupported orderBy')
+    })
+
+    it('rejects combining roleName/search with an incompatible filter (locationName)', async () => {
+      const { errors } = await query({
+        query: searchQuery,
+        variables: { roleName: 'moderator', locationName: 'Hamburg' },
+      })
+      expect(errors?.[0].message).toContain('cannot be combined with')
+    })
+
+    it('rejects combining roleName/search with a structured filter', async () => {
+      const { errors } = await query({
+        query: searchQuery,
+        variables: { search: 'ann', filter: { id: 'mod-anna' } },
+      })
+      expect(errors?.[0].message).toContain('cannot be combined with')
+    })
+  })
 })
 
 describe('UpdateUser', () => {

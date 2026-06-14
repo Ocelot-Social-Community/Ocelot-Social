@@ -76,6 +76,53 @@ export default {
         if (!context.effectivePermissions.has('role.manage')) {
           throw new ForbiddenError('Not Authorized!')
         }
+        // This specialised path honours only roleName/search + pagination + ordering.
+        // Other filter args the schema advertises do NOT compose here, so reject them
+        // explicitly instead of silently ignoring (which would make results depend on
+        // the argument combination — see the standard neo4jgraphql path below).
+        const incompatible = Object.entries({
+          id: args.id,
+          name: args.name,
+          slug: args.slug,
+          locationName: args.locationName,
+          about: args.about,
+          createdAt: args.createdAt,
+          updatedAt: args.updatedAt,
+          filter: args.filter,
+        })
+          .filter(([, value]) => value !== undefined && value !== null)
+          .map(([key]) => key)
+        if (incompatible.length > 0) {
+          throw new UserInputError(
+            `roleName/search cannot be combined with: ${incompatible.join(', ')}.`,
+          )
+        }
+        // Honour orderBy via a whitelist — field names are interpolated into Cypher,
+        // so they must never come from raw input (Map.get avoids that injection sink).
+        // Defaults to newest-first, matching the admin list.
+        const userOrdering = new Map<string, string>([
+          ['id_asc', 'user.id ASC'],
+          ['id_desc', 'user.id DESC'],
+          ['slug_asc', 'user.slug ASC'],
+          ['slug_desc', 'user.slug DESC'],
+          ['name_asc', 'user.name ASC'],
+          ['name_desc', 'user.name DESC'],
+          ['createdAt_asc', 'user.createdAt ASC'],
+          ['createdAt_desc', 'user.createdAt DESC'],
+          ['updatedAt_asc', 'user.updatedAt ASC'],
+          ['updatedAt_desc', 'user.updatedAt DESC'],
+        ])
+        const orderByInput =
+          args.orderBy == null ? [] : Array.isArray(args.orderBy) ? args.orderBy : [args.orderBy]
+        const orderClauses = orderByInput.map((entry) => {
+          const clause = userOrdering.get(String(entry))
+          if (!clause) {
+            throw new UserInputError(`Unsupported orderBy '${String(entry)}' for the user search.`)
+          }
+          return clause
+        })
+        const orderBy = orderClauses.length > 0 ? orderClauses.join(', ') : 'user.createdAt DESC'
+
         const session = context.driver.session()
         try {
           const readTxResult = await session.readTransaction((txc) => {
@@ -89,7 +136,7 @@ export default {
                      OR toLower(user.slug) CONTAINS $args.term
                      OR toLower(coalesce(user.about, '')) CONTAINS $args.term)
               RETURN user {.*, email: head([(user)-[:PRIMARY_EMAIL]->(e:EmailAddress) | e.email])}
-              ORDER BY user.createdAt DESC
+              ORDER BY ${orderBy}
               SKIP toInteger($args.offset) LIMIT toInteger($args.first)`,
               {
                 args: {
