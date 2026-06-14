@@ -59,7 +59,8 @@ describe('CommentList.vue', () => {
         // Non-moderator viewer: grant everything except content.moderate so the
         // moderation-aware children (CommentCard) hide disabled/deleted content as
         // before (the components now use $can instead of the auth/isModerator getter).
-        $can: (permission) => permission !== 'content.moderate',
+        $can: (permission) =>
+          !['content.moderate', 'post.pin', 'post.push', 'user.delete.any'].includes(permission),
         $filters: {
           truncate: (a) => a,
           removeHtml: (a) => a,

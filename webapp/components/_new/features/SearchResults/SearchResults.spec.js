@@ -33,7 +33,8 @@ describe('SearchResults', () => {
     mocks = {
       $t: jest.fn(),
       // Non-moderator viewer (children now gate via $can, not auth/isModerator).
-      $can: (permission) => permission !== 'content.moderate',
+      $can: (permission) =>
+        !['content.moderate', 'post.pin', 'post.push', 'user.delete.any'].includes(permission),
     }
     getters = {
       'auth/user': () => {
