@@ -77,7 +77,7 @@ const decodeApiKey = async (driver: Driver, key: string): Promise<DecodedUser | 
           AND user.deleted = false
           AND user.disabled = false
         RETURN user {
-          .id, .slug, .name, .role, .disabled, .actorId,
+          .id, .slug, .name, .disabled, .actorId,
           roles: [(user)-[:HAS_ROLE]->(r:Role) | r.name]
         } AS user, k.id AS keyId
         LIMIT 1
