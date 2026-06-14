@@ -20,5 +20,8 @@ describe('PermissionGate', () => {
   it('renders nothing when the permission is denied', () => {
     const wrapper = Wrapper(false)
     expect(wrapper.find('.gated').exists()).toBe(false)
+    // Not just the missing .gated element — no residual markup or text at all.
+    expect(wrapper.findAll('*')).toHaveLength(0)
+    expect(wrapper.text()).toBe('')
   })
 })
