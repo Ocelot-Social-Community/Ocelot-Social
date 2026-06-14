@@ -34,24 +34,40 @@ describe('DEFAULT_ROLES', () => {
 
   const BASELINE = ['post.create', 'group.create', 'group.create_hidden', 'user.invite']
 
-  it('gives the user baseline the everyday capabilities', () => {
-    const user = DEFAULT_ROLES.find((role) => role.name === USER_ROLE)
-    expect(user?.permissions).toEqual(expect.arrayContaining(BASELINE))
+  // The audited extras the admin role grants ON TOP of the baseline. Keep this in
+  // sync with defaults.ts consciously — these tests assert the EXACT permission set
+  // (not a subset), so any added/removed privilege turns red and must be reviewed.
+  const ADMIN_EXTRAS = [
+    'content.moderate',
+    'badge.manage',
+    'network.statistics.read',
+    'role.manage',
+    'policy.manage',
+    'donation.manage',
+    'apiKey.administer',
+    'user.email.readAny',
+    'user.delete.any',
+    'post.pin',
+    'post.push',
+  ]
+
+  // Order-independent exact-set comparison: catches both a missing capability AND
+  // an unintended extra one (privilege escalation drift).
+  const permsOf = (name: string) =>
+    [...(DEFAULT_ROLES.find((role) => role.name === name)?.permissions ?? [])].sort()
+  const exactly = (...perms: string[]) => [...perms].sort()
+
+  it('gives the user role EXACTLY the baseline (no extra privileges)', () => {
+    expect(permsOf(USER_ROLE)).toEqual(exactly(...BASELINE))
   })
 
   // Single-role model: each role's permission set is self-contained, so the
   // higher roles include the baseline rather than relying on a union.
-  it('makes moderator self-contained (baseline + content.moderate)', () => {
-    const moderator = DEFAULT_ROLES.find((role) => role.name === MODERATOR_ROLE)
-    expect(moderator?.permissions).toEqual(
-      expect.arrayContaining([...BASELINE, 'content.moderate']),
-    )
+  it('gives moderator EXACTLY baseline + content.moderate', () => {
+    expect(permsOf(MODERATOR_ROLE)).toEqual(exactly(...BASELINE, 'content.moderate'))
   })
 
-  it('makes admin self-contained (baseline + moderation + admin extras)', () => {
-    const admin = DEFAULT_ROLES.find((role) => role.name === ADMIN_ROLE)
-    expect(admin?.permissions).toEqual(
-      expect.arrayContaining([...BASELINE, 'content.moderate', 'role.manage', 'policy.manage']),
-    )
+  it('gives admin EXACTLY baseline + the audited admin extras (privilege-drift guard)', () => {
+    expect(permsOf(ADMIN_ROLE)).toEqual(exactly(...BASELINE, ...ADMIN_EXTRAS))
   })
 })
