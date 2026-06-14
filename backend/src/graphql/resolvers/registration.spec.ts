@@ -227,6 +227,22 @@ describe('SignupVerification', () => {
             })
           })
 
+          it('fails hard and persists no user when the baseline "user" role is missing', async () => {
+            // Simulate a misconfigured DB where role seeding never ran. The single-
+            // role model needs exactly one HAS_ROLE edge, so signup must roll back
+            // rather than create an edgeless, half-initialized account.
+            await database.write({ query: `MATCH (r:Role {id: 'user'}) DETACH DELETE r` })
+
+            const { errors } = await mutate({ mutation: SignupVerification, variables })
+            expect(errors).toBeDefined()
+
+            const { records } = await database.neode.cypher(
+              `MATCH (u:User {name: $name}) RETURN u`,
+              { name: 'John Doe' },
+            )
+            expect(records).toHaveLength(0)
+          })
+
           it('sets `verifiedAt` attribute of EmailAddress', async () => {
             await mutate({ mutation: SignupVerification, variables })
             const email = await database.neode.first(

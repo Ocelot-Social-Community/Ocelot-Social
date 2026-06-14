@@ -86,7 +86,7 @@ export default {
             FOREACH (r IN CASE WHEN baselineRole IS NULL THEN [] ELSE [baselineRole] END |
               MERGE (user)-[:HAS_ROLE]->(r)
             )
-            RETURN user {.*}
+            RETURN user {.*} AS user, baselineRole IS NOT NULL AS roleAssigned
           `,
           {
             args,
@@ -96,8 +96,18 @@ export default {
             locationName,
           },
         )
-        const [user] = createUserTransactionResponse.records.map((record) => record.get('user'))
+        const [record] = createUserTransactionResponse.records
+        const user = record?.get('user')
         if (!user) throw new UserInputError('Invalid email or nonce')
+        // The single-role model requires exactly one HAS_ROLE edge. If the baseline
+        // 'user' role node is not seeded, fail hard (rolls back this transaction)
+        // rather than persist a half-initialized, edgeless user that later breaks
+        // roleName / userRoles / role filters.
+        if (!record.get('roleAssigned')) {
+          throw new Error(
+            'The baseline "user" role is not seeded; cannot assign a role to the new account.',
+          )
+        }
 
         return user
       })
