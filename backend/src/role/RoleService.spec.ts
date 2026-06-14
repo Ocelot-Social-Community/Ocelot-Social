@@ -119,11 +119,22 @@ describe('RoleService', () => {
   describe('upsert / delete success paths (fake DB + pubsub)', () => {
     type DbArg = ConstructorParameters<typeof RoleService>[0]
 
+    // A neode-style record for readAllRoles (name/protected/permissions-as-JSON).
+    const roleRecord = (role: { name: string; protected: boolean; permissions: string[] }) => ({
+      get: (key: string) => {
+        if (key === 'permissions') return JSON.stringify(role.permissions)
+        if (key === 'protected') return role.protected
+        return role.name
+      },
+    })
+
     const makeService = () => {
       const writes: Array<{ query: string; variables?: object }> = []
       const published: Array<{ channel: string; payload: { roleChanged: RoleChangeEvent } }> = []
       const fakeDb = {
-        query: async () => Promise.resolve({ records: [] }),
+        // Return the seeded defaults so init()'s boot invariant (all DEFAULT_ROLES
+        // present) is satisfied, the same as a real DB after the seed loop.
+        query: async () => Promise.resolve({ records: DEFAULT_ROLES.map(roleRecord) }),
         write: async (statement: { query: string; variables?: object }) => {
           writes.push(statement)
           return Promise.resolve({ records: [] })
@@ -174,6 +185,20 @@ describe('RoleService', () => {
       expect(svc.getRole('temp')).toBeUndefined()
       const event = published[published.length - 1]?.payload.roleChanged
       expect(event).toMatchObject({ name: 'temp', definition: null, actor: 'admin-1' })
+    })
+
+    it('refuses to start (boot invariant) when a default role is missing after seeding', async () => {
+      // Simulate a seed that did not produce the baseline `user` node (DB error /
+      // wrong key). init() must reject so a broken instance never serves traffic.
+      const fakeDb = {
+        query: async () =>
+          Promise.resolve({
+            records: DEFAULT_ROLES.filter((role) => role.name !== USER_ROLE).map(roleRecord),
+          }),
+        write: async () => Promise.resolve({ records: [] }),
+      } as unknown as DbArg
+      const svc = new RoleService(fakeDb)
+      await expect(svc.init()).rejects.toThrow(/default role node\(s\) missing after seeding/)
     })
   })
 })

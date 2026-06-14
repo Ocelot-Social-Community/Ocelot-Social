@@ -64,6 +64,23 @@ export class RoleService {
       this.cache.set(role.name, role)
     }
 
+    // Boot invariant: every default role must be present after seeding. seedRole
+    // MERGEs each one immediately above, so a missing default here means the seed
+    // genuinely did not take (DB error, wrong key, a future no-op refactor). Fail
+    // fast rather than serve an instance where authorization or signup (the
+    // baseline `user` role) is silently broken. A runtime deletion of admin/
+    // moderator does not trip this — the next boot re-seeds it before this check.
+    const missingDefaults = DEFAULT_ROLES.filter((role) => !this.cache.has(role.name)).map(
+      (role) => role.name,
+    )
+    if (missingDefaults.length > 0) {
+      throw new Error(
+        `RoleService.init: default role node(s) missing after seeding: ${missingDefaults.join(
+          ', ',
+        )}. Refusing to start — authorization and user registration depend on them.`,
+      )
+    }
+
     this.initialised = true
   }
 
