@@ -257,6 +257,19 @@ describe('auth store', () => {
         expect(commit).toHaveBeenCalledWith('SET_PERMISSIONS', ['role.manage'])
       })
 
+      it('falls back to [] when myPermissions is absent (clears any stale permissions)', async () => {
+        const query = jest.fn().mockResolvedValue({
+          data: { currentUser: { id: 'u1' } }, // no myPermissions in the response
+        })
+        const commit = jest.fn()
+        const ctx = { commit, dispatch: jest.fn() }
+        await actions.fetchCurrentUser.call(
+          { app: { apolloProvider: { defaultClient: { query } } } },
+          ctx,
+        )
+        expect(commit).toHaveBeenCalledWith('SET_PERMISSIONS', [])
+      })
+
       it('dispatches logout when currentUser is null', async () => {
         const query = jest.fn().mockResolvedValue({ data: { currentUser: null } })
         const commit = jest.fn()
