@@ -223,6 +223,16 @@ describe('Users', () => {
       mocks.$route = { query: {} }
     })
 
+    it('handles a repeated ?q=a&q=b param (array) without crashing on init', () => {
+      mocks.$route = { query: { q: ['role:user', 'role:admin anna'] } }
+      const w = Wrapper()
+      // Last value wins; parsing still yields a string-based filter.
+      expect(w.vm.formData.query).toBe('role:admin anna')
+      expect(w.vm.roleFilter).toBe('admin')
+      expect(w.vm.searchText).toBe('anna')
+      mocks.$route = { query: {} }
+    })
+
     it('still supports the legacy ?role= deep-link', () => {
       mocks.$route = { query: { role: 'moderator' } }
       const w = Wrapper()

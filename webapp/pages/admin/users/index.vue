@@ -185,9 +185,12 @@ export default {
     // NB: parse inline — `this.parseSearch` reads `allRoleNames`, a vue-apollo
     // property that is not available yet during data() initialization.
     const routeQuery = (this.$route && this.$route.query) || {}
+    // A repeated param (?q=a&q=b) arrives as an array; take the last value so
+    // query parsing always operates on a string (and never crashes on .trim()).
+    const firstString = (value) => (Array.isArray(value) ? value[value.length - 1] : value) || ''
     let query = ''
-    if (routeQuery.q) query = routeQuery.q
-    else if (routeQuery.role) query = `role:${routeQuery.role}`
+    if (routeQuery.q) query = firstString(routeQuery.q)
+    else if (routeQuery.role) query = `role:${firstString(routeQuery.role)}`
     const tokens = query.trim().split(/\s+/).filter(Boolean)
     let roleName = null
     const terms = []
