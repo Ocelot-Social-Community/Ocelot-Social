@@ -76,6 +76,19 @@ describe('role-edge helpers (DB)', () => {
       expect(await rolesOf('a')).toEqual(['owner'])
     })
 
+    it('promotes a user found by slug', async () => {
+      // 'slug-user' is neither an id nor an email of any user, so this exercises
+      // the slug branch of the matcher exclusively.
+      await Factory.build(
+        'user',
+        { id: 's', slug: 'slug-user', role: 'user' },
+        { email: 's@e.org', password: '1' },
+      )
+      const result = await promoteToOwner('slug-user')
+      expect(result?.id).toBe('s')
+      expect(await rolesOf('s')).toEqual(['owner'])
+    })
+
     it('returns null for an unknown identifier', async () => {
       expect(await promoteToOwner('nobody@nowhere.org')).toBeNull()
     })
