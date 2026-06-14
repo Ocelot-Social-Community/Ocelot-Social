@@ -60,19 +60,22 @@ afterEach(async () => {
 
 describe('admin user search — e-mail filter is gated by user.email.readAny', () => {
   // A user with the `usermanager` role: role.manage but no user.email.readAny.
-  // Built with `role: null` so it carries NO HAS_ROLE edge (the factory default
-  // would link `user`, which the DB-edge lookup would prefer) — the literal `roles`
-  // then resolves to the custom role via the in-memory role service.
+  // Built with `role: null` (no factory-default `user` edge), then linked to a real
+  // `usermanager` role node via a single HAS_ROLE edge — so the user resolves through
+  // an actual edge (exactly like production), and the in-memory ROLES override gives
+  // that role its permissions. No literal-role shortcut.
   const asUserManager = async () => {
     const manager = await Factory.build(
       'user',
       { id: 'manager', name: 'Manager', role: null },
       { email: 'manager@example.org', password: '1234' },
     )
-    authenticatedUser = {
-      ...(await manager.toJson()),
-      roleName: 'usermanager',
-    } as Context['user']
+    await database.write({
+      query: `MATCH (u:User { id: 'manager' })
+              MERGE (r:Role { id: 'usermanager', name: 'usermanager' })
+              MERGE (u)-[:HAS_ROLE]->(r)`,
+    })
+    authenticatedUser = (await manager.toJson()) as Context['user']
   }
 
   it('reaches the search (has role.manage) but does NOT match by e-mail (no oracle)', async () => {

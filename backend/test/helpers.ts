@@ -86,23 +86,30 @@ interface CreateTestServerOptions {
   plugins?: ApolloServerPlugin[]
 }
 
-// Resolve the authenticated user's single role name from its HAS_ROLE edge, the way
-// decode() does in production. Tests build authenticatedUser from user.toJson(), which
-// carries no role name; without this the user would resolve to no permissions. The
-// DB edge wins (collapsed via resolveRoleName, so multi-edge fails closed); if the
-// user has no node (a bare literal like { id, roleName: 'owner' }), the literal
-// roleName already on it is kept.
+// Resolve the authenticated user's single role name the way decode() does in
+// production. Tests build authenticatedUser from user.toJson(), which carries no role
+// name; without this the user would resolve to no permissions.
+//
+// A user that EXISTS in the DB resolves SOLELY from its HAS_ROLE edges (collapsed via
+// resolveRoleName, so multi-edge fails closed; no edge ⇒ USER_ROLE baseline). We do
+// NOT fall back to a literal for a real user — that would let a test literal mask a
+// missing/un-migrated edge and make the harness laxer than production. The literal
+// roleName is only honoured for a BARE literal viewer with no DB node at all (e.g.
+// { id, roleName: 'owner' }), distinguished here via OPTIONAL MATCH.
 const resolveAuthUserRoles = async (
   database: ReturnType<typeof databaseContext>,
   authenticatedUser: Context['user'] | undefined,
 ): Promise<Context['user'] | undefined> => {
   if (!authenticatedUser?.id) return authenticatedUser
   const result = await database.query({
-    query: `MATCH (u:User {id: $id}) RETURN [(u)-[:HAS_ROLE]->(r:Role) | r.name] AS roles`,
+    query: `OPTIONAL MATCH (u:User {id: $id})
+            RETURN u IS NOT NULL AS userExists, [(u)-[:HAS_ROLE]->(r:Role) | r.name] AS roles`,
     variables: { id: authenticatedUser.id },
   })
-  const dbRoles = (result.records[0]?.get('roles') as string[] | undefined) ?? []
-  if (dbRoles.length > 0) return { ...authenticatedUser, roleName: resolveRoleName(dbRoles) }
+  const record = result.records[0]
+  const userExists = record?.get('userExists') === true
+  const dbRoles = (record?.get('roles') as string[] | undefined) ?? []
+  if (userExists) return { ...authenticatedUser, roleName: resolveRoleName(dbRoles) }
   return { ...authenticatedUser, roleName: authenticatedUser.roleName }
 }
 
