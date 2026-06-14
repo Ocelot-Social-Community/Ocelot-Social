@@ -59,14 +59,22 @@ export const assignRoleEdge = async (user, roleName: string) => {
   const { id } = await user.toJson()
   const session = driver.session()
   try {
-    await session.writeTransaction((transaction) =>
+    // Match the target role FIRST: an unknown roleName then yields zero rows, so
+    // the DELETE/MERGE never run (no silent edge wipe) and we can fail loudly
+    // below — a typo'd role in a test must not corrupt state and pass quietly.
+    const result = await session.writeTransaction((transaction) =>
       transaction.run(
         `MATCH (u:User {id: $id})
+         MATCH (r:Role {id: $roleName})
          OPTIONAL MATCH (u)-[h:HAS_ROLE]->(:Role) DELETE h
-         WITH u MATCH (r:Role {id: $roleName}) MERGE (u)-[:HAS_ROLE]->(r)`,
+         MERGE (u)-[:HAS_ROLE]->(r)
+         RETURN r.id AS roleId`,
         { id, roleName },
       ),
     )
+    if (result.records.length === 0) {
+      throw new Error(`assignRoleEdge: no Role node found for "${roleName}" (role not seeded?)`)
+    }
   } finally {
     await session.close()
   }
