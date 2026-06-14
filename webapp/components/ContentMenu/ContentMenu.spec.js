@@ -43,10 +43,8 @@ describe('ContentMenu.vue', () => {
   describe('mount', () => {
     getters = {
       // Privilege is driven per-test via the `granted` permission set ($can mock).
-      // These two are kept only because the test tree still resolves them (Vuex would
-      // otherwise warn "unknown getter"); they are NOT what gates the actions.
-      'auth/isModerator': () => false,
-      'auth/isAdmin': () => false,
+      // No auth/* store getters needed: the component and the pinnedPosts mixin both
+      // gate on $can now (not auth/isAdmin / auth/isModerator).
       'pinnedPosts/currentlyPinnedPosts': currentlyPinnedPostsMock,
       'pinnedPosts/loaded': () => true,
     }
@@ -856,6 +854,39 @@ describe('ContentMenu.vue', () => {
         expect(wrapper.emitted('toggleObservePost')).toEqual([
           ['d23a4265-f5f7-4e17-9f86-85f714b4b9f8', false],
         ])
+      })
+    })
+
+    // The pinnedPosts mixin fetches the live network-wide pin count only for viewers
+    // who may actually pin — gated on post.pin (NOT a coarse isAdmin), consistent with
+    // the pin action itself.
+    describe('pinned-posts count fetch (mixin gates on post.pin)', () => {
+      const mountWith = (canPin) => {
+        const fetch = jest.fn()
+        const store = new Vuex.Store({
+          getters: {
+            'pinnedPosts/currentlyPinnedPosts': () => 0,
+            'pinnedPosts/loaded': () => false, // not yet fetched
+          },
+          actions: { 'pinnedPosts/fetch': fetch },
+        })
+        maxPinnedPostsMock.mockReturnValue(3) // > 1 → the live count is relevant
+        mount(ContentMenu, {
+          propsData: { resourceType: 'contribution', resource: { id: 'x' } },
+          mocks: { ...mocks, $can: (permission) => (permission === 'post.pin' ? canPin : false) },
+          store,
+          localVue,
+          stubs,
+        })
+        return fetch
+      }
+
+      it('fetches the count when the viewer may pin (post.pin)', () => {
+        expect(mountWith(true)).toHaveBeenCalled()
+      })
+
+      it('does NOT fetch when the viewer cannot pin', () => {
+        expect(mountWith(false)).not.toHaveBeenCalled()
       })
     })
   })

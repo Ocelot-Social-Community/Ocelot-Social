@@ -54,7 +54,6 @@ describe('CommentCard.vue', () => {
         return {}
       },
       'auth/isModerator': () => false,
-      'auth/isAdmin': () => false,
     }
   })
 
