@@ -1,0 +1,41 @@
+# SpectaQL configuration — generates the static HTML API reference.
+#
+# Source of truth is the printed, *augmented* runtime schema (see
+# `yarn schema:print`), NOT the hand-written .gql files: neo4j-graphql-js adds
+# auto-generated queries, filters, orderBy and CRUD mutations that only exist in
+# the built schema.
+#
+# Build:   yarn docs:api      (prints schema + renders HTML into ./public-docs)
+# Output:  ./public-docs/index.html  (single, self-contained page)
+
+spectaql:
+  targetDir: ./public-docs
+  # No custom logo/favicon yet — keep the default theme. Point these at branding
+  # assets later if the docs get embedded into docs.ocelot.social.
+  logoFile: false
+  faviconFile: false
+
+introspection:
+  # Read the SDL produced by `yarn schema:print` rather than introspecting a live
+  # server, so docs build deterministically in CI without a running Neo4j/backend.
+  schemaFile: ./schema.graphql
+  # neo4j-graphql-js generates a lot of helper types/fields; keep them visible so
+  # the reference matches what the API actually accepts.
+  removeTrailingPeriodFromDescriptions: false
+
+info:
+  title: ocelot.social GraphQL API
+  description: >
+    Reference documentation for the ocelot.social GraphQL API, generated from the
+    backend schema. The endpoint and authentication depend on your deployment;
+    the URL below is the local development default (configurable via GRAPHQL_URI).
+  x-introItems:
+    - title: Authentication
+      description: >
+        Most queries and mutations require a valid JWT, sent as a Bearer token in
+        the `Authorization` header. Obtain one via the `login` mutation.
+
+servers:
+  - url: http://localhost:4000/
+    description: Local development (default GRAPHQL_URI)
+    production: false

@@ -12,6 +12,8 @@
     "build": "tsc && tsc-alias && ./scripts/build.copy.files.sh",
     "dev": "nodemon --exec tsx src/index.ts -e js,ts,gql",
     "dev:debug": "nodemon --exec node --inspect=0.0.0.0:9229 build/src/index.js -e js,ts,gql",
+    "schema:print": "tsx --require ./src/graphql/gql-register.ts src/graphql/print-schema.ts",
+    "docs:api": "yarn run schema:print && spectaql spectaql.yml",
     "lint": "eslint --max-warnings 0 .",
     "test": "cross-env NODE_ENV=test NODE_OPTIONS=--max-old-space-size=8192 jest --runInBand --coverage --forceExit --detectOpenHandles",
     "db:reset": "tsx src/db/reset.ts",
