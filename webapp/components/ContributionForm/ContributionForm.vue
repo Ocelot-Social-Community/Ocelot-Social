@@ -450,9 +450,14 @@ export default {
       return date <= new Date(this.formData.eventStart)
     },
     onSubmit() {
-      // Block creating a post without permission (editing stays allowed). The button
-      // is grayed; this also guards keyboard Enter and direct navigation.
-      if (!this.contribution.id && !this.$can('post.create')) return
+      // Block creating a post without permission (editing stays allowed). The button is
+      // grayed (permission-denied + aria-disabled + tooltip); this also guards keyboard
+      // Enter and direct navigation. Surface the reason via a toast instead of a silent
+      // no-op so a click/Enter isn't swallowed without feedback.
+      if (!this.contribution.id && !this.$can('post.create')) {
+        this.$toast.error(this.$t('permissions.deniedHint'))
+        return
+      }
       this.formSubmit(this.submit)
     },
     submit() {
