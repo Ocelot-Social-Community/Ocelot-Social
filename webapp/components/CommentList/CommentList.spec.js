@@ -56,11 +56,11 @@ describe('CommentList.vue', () => {
       })
       mocks = {
         $t: (key) => key,
-        // Non-moderator viewer: grant everything except content.moderate so the
-        // moderation-aware children (CommentCard) hide disabled/deleted content as
-        // before (the components now use $can instead of the auth/isModerator getter).
+        // Ordinary member viewer: deny-by-default, granting only the baseline
+        // permissions. content.moderate stays denied, so CommentCard hides
+        // disabled/deleted content (components gate via $can now).
         $can: (permission) =>
-          !['content.moderate', 'post.pin', 'post.push', 'user.delete.any'].includes(permission),
+          ['post.create', 'group.create', 'group.create_hidden', 'user.invite'].includes(permission),
         $filters: {
           truncate: (a) => a,
           removeHtml: (a) => a,

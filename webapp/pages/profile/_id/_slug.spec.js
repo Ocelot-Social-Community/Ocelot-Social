@@ -73,11 +73,11 @@ describe('ProfileSlug', () => {
         removeLinks: (c) => c,
         truncate: (a) => a,
       }
-      // Ordinary (non-admin, non-moderator) viewer — consistent with this spec's
-      // auth/isModerator=false / auth/isAdmin=false store getters. The children gate
-      // via $can now, so deny exactly the elevated capabilities they used to gate.
+      // Ordinary member viewer: deny-by-default, granting only the baseline
+      // permissions a normal member holds (children gate via $can now). Elevated /
+      // moderation gates — and any newly added permission — stay denied.
       mocks.$can = (permission) =>
-        !['content.moderate', 'post.pin', 'post.push', 'user.delete.any'].includes(permission)
+        ['post.create', 'group.create', 'group.create_hidden', 'user.invite'].includes(permission)
       mocks.$store = {
         getters: {
           'auth/isModerator': () => false,

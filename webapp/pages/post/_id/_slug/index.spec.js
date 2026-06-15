@@ -58,7 +58,7 @@ describe('PostSlug', () => {
         $t: jest.fn((t) => t),
         // Non-moderator viewer (children now gate via $can, not auth/isModerator).
         $can: (permission) =>
-          !['content.moderate', 'post.pin', 'post.push', 'user.delete.any'].includes(permission),
+          ['post.create', 'group.create', 'group.create_hidden', 'user.invite'].includes(permission),
         $filters: {
           truncate: (a) => a,
           removeHtml: (a) => a,
