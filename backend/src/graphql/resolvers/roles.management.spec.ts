@@ -268,8 +268,18 @@ describe('role management', () => {
     })
 
     it('returns an empty list for a user without a role edge', async () => {
+      await Factory.build(
+        'user',
+        { id: 'edgeless', role: 'user' },
+        { email: 'edgeless@e.org', password: '1234' },
+      )
+      // Strip the HAS_ROLE edge the factory created, so the user genuinely has none.
+      await database.write({
+        query: `MATCH (:User {id: $userId})-[h:HAS_ROLE]->(:Role) DELETE h`,
+        variables: { userId: 'edgeless' },
+      })
       await asAdmin()
-      const { data, errors } = await query({ query: USER_ROLES, variables: { userId: 'ghost' } })
+      const { data, errors } = await query({ query: USER_ROLES, variables: { userId: 'edgeless' } })
       expect(errors).toBeUndefined()
       expect(data.userRoles).toEqual([])
     })
