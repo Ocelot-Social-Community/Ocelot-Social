@@ -208,6 +208,7 @@
       "description": "Create roles and assign permissions. Changes apply immediately.",
       "groups": {
         "administration": "Administration",
+        "account": "Account",
         "communication": "Communication",
         "content": "Content",
         "membership": "Membership",
@@ -218,6 +219,7 @@
       "nameLabel": "Name",
       "perm": {
         "apiKey_administer": "Administer other users’ API keys.",
+        "apiKey_create": "Create personal API keys.",
         "badge_manage": "Grant and revoke badges.",
         "comment_create": "Comment on posts.",
         "content_moderate": "Review and decide on reported content.",
@@ -1227,6 +1229,7 @@
         "expiry-never": "No expiry",
         "limit-reached": "You have reached the maximum of {max} active API keys. Revoke an existing key to create a new one.",
         "name-label": "Name",
+        "no-permission": "Creating API keys is not enabled for your role.",
         "submit": "Create key",
         "success": "API key created successfully",
         "title": "Create new API Key"

@@ -208,6 +208,7 @@
       "description": "Crie funções e atribua permissões. As alterações aplicam-se imediatamente.",
       "groups": {
         "administration": "Administração",
+        "account": "Conta",
         "communication": "Comunicação",
         "content": "Conteúdo",
         "membership": "Adesão",
@@ -218,6 +219,7 @@
       "nameLabel": "Nome",
       "perm": {
         "apiKey_administer": "Administrar as chaves de API de outros utilizadores.",
+        "apiKey_create": "Criar chaves API pessoais.",
         "badge_manage": "Conceder e revogar distintivos.",
         "comment_create": "Comentar publicações.",
         "content_moderate": "Analisar e decidir sobre conteúdo denunciado.",
@@ -1227,6 +1229,7 @@
         "expiry-never": "Sem data de expiração",
         "limit-reached": "Atingiste o máximo de {max} API Keys ativas. Revoga uma key existente para criar uma nova.",
         "name-label": "Nome",
+        "no-permission": "A criação de chaves API não está ativada para a tua função.",
         "submit": "Criar key",
         "success": "API Key criada com sucesso",
         "title": "Criar novo API Key"

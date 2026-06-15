@@ -30,10 +30,11 @@ export type PermissionKey =
   | 'videoCall.create_public'
   | 'videoCall.create_closed'
   | 'videoCall.create_hidden'
+  | 'apiKey.create'
 
 // Grouping for the admin UI. Open string (the JSON is the source of truth); the
 // known groups today are 'administration' | 'moderation' | 'content' | 'membership'
-// | 'communication'.
+// | 'communication' | 'account'.
 export type PermissionGroup = string
 
 export interface PermissionCatalogEntry {

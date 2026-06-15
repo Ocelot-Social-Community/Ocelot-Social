@@ -208,6 +208,7 @@
       "description": "Maak rollen aan en wijs rechten toe. Wijzigingen worden direct toegepast.",
       "groups": {
         "administration": "Beheer",
+        "account": "Account",
         "communication": "Communicatie",
         "content": "Inhoud",
         "membership": "Lidmaatschap",
@@ -218,6 +219,7 @@
       "nameLabel": "Naam",
       "perm": {
         "apiKey_administer": "API-sleutels van andere gebruikers beheren.",
+        "apiKey_create": "Persoonlijke API-sleutels aanmaken.",
         "badge_manage": "Badges toekennen en intrekken.",
         "comment_create": "Reageren op berichten.",
         "content_moderate": "Gerapporteerde inhoud beoordelen en beslissen.",
@@ -1227,6 +1229,7 @@
         "expiry-never": "Geen vervaldatum",
         "limit-reached": "Je hebt het maximum van {max} actieve API Keys bereikt. Trek een bestaande key in om een nieuwe aan te maken.",
         "name-label": "Naam",
+        "no-permission": "Het aanmaken van API-sleutels is niet ingeschakeld voor jouw rol.",
         "submit": "Key aanmaken",
         "success": "API Key is aangemaakt",
         "title": "Nieuwe API Key aanmaken"

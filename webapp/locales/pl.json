@@ -208,6 +208,7 @@
       "description": "Twórz role i przypisuj uprawnienia. Zmiany obowiązują natychmiast.",
       "groups": {
         "administration": "Administracja",
+        "account": "Konto",
         "communication": "Komunikacja",
         "content": "Treści",
         "membership": "Członkostwo",
@@ -218,6 +219,7 @@
       "nameLabel": "Nazwa",
       "perm": {
         "apiKey_administer": "Zarządzanie kluczami API innych użytkowników.",
+        "apiKey_create": "Tworzenie osobistych kluczy API.",
         "badge_manage": "Przyznawanie i odbieranie odznak.",
         "comment_create": "Komentowanie wpisów.",
         "content_moderate": "Przeglądanie i rozstrzyganie zgłoszonych treści.",
@@ -1227,6 +1229,7 @@
         "expiry-never": "Bez daty wygaśnięcia",
         "limit-reached": "Osiągnąłeś maksymalną liczbę {max} aktywnych API Keys. Unieważnij istniejący key, aby utworzyć nowy.",
         "name-label": "Nazwa",
+        "no-permission": "Tworzenie kluczy API nie jest włączone dla Twojej roli.",
         "submit": "Utwórz key",
         "success": "API Key został utworzony",
         "title": "Utwórz nowy API Key"

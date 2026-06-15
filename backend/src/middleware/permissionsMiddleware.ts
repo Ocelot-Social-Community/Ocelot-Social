@@ -565,7 +565,7 @@ export default shield(
       redeemInviteCode: isAuthenticated,
 
       // API Keys
-      createApiKey: and(isAuthenticated, apiKeysEnabled),
+      createApiKey: and(isAuthenticated, apiKeysEnabled, hasPermission('apiKey.create')),
       updateApiKey: isAuthenticated,
       revokeApiKey: isAuthenticated,
       adminRevokeApiKey: hasPermission('apiKey.administer'),

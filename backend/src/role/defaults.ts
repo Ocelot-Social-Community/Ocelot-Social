@@ -27,6 +27,10 @@ const BASELINE: RoleDefinition['permissions'] = [
   // implementation). videoCall.create_closed / _hidden are NOT granted by default —
   // they are opt-in per role (owner still holds them via full-catalog expansion).
   'videoCall.create_public',
+  // Creating personal API keys was open to any authenticated user (when the feature
+  // is enabled) — baseline preserves that. NOTE: group 'account', NOT 'administration',
+  // so holding it does not make a user count as an admin (isAdmin is group-driven).
+  'apiKey.create',
 ]
 
 // The roles that MUST always exist and are re-ensured on every boot / bootstrap:

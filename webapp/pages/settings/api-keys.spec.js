@@ -89,6 +89,14 @@ describe('settings/api-keys.vue', () => {
       expect(wrapper.find('#api-key-expiry').exists()).toBe(true)
     })
 
+    it('hides the create form and shows a note when the role lacks apiKey.create', () => {
+      mocks.$can = () => false
+      wrapper = Wrapper()
+      expect(wrapper.find('[data-test="create-api-key-submit"]').exists()).toBe(false)
+      expect(wrapper.find('[data-test="api-key-create-denied"]').exists()).toBe(true)
+      expect(wrapper.text()).toContain('settings.api-keys.create.no-permission')
+    })
+
     it('shows empty state when no keys exist', () => {
       wrapper = Wrapper()
       expect(wrapper.text()).toContain('settings.api-keys.list.empty')

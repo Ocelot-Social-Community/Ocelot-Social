@@ -208,6 +208,7 @@
       "description": "Créez des rôles et attribuez des permissions. Les changements s’appliquent immédiatement.",
       "groups": {
         "administration": "Administration",
+        "account": "Compte",
         "communication": "Communication",
         "content": "Contenu",
         "membership": "Adhésion",
@@ -218,6 +219,7 @@
       "nameLabel": "Nom",
       "perm": {
         "apiKey_administer": "Administrer les clés API des autres utilisateurs.",
+        "apiKey_create": "Créer des clés API personnelles.",
         "badge_manage": "Attribuer et retirer des badges.",
         "comment_create": "Commenter les publications.",
         "content_moderate": "Examiner et décider du contenu signalé.",
@@ -1227,6 +1229,7 @@
         "expiry-never": "Sans date d'expiration",
         "limit-reached": "Tu as atteint le maximum de {max} API Keys actives. Révoque une key existante pour en créer une nouvelle.",
         "name-label": "Nom",
+        "no-permission": "La création de clés API n’est pas activée pour votre rôle.",
         "submit": "Créer la key",
         "success": "API Key créée avec succès",
         "title": "Créer un nouveau API Key"

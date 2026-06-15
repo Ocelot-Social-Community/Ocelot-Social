@@ -34,6 +34,7 @@ const EXPECTED_KEYS: PermissionKey[] = [
   'videoCall.create_public',
   'videoCall.create_closed',
   'videoCall.create_hidden',
+  'apiKey.create',
 ]
 
 describe('permission catalog', () => {
@@ -64,6 +65,7 @@ describe('permission catalog', () => {
         'content',
         'membership',
         'communication',
+        'account',
       ]
       for (const key of allPermissionKeys()) {
         expect(knownGroups).toContain(groupFor(key))

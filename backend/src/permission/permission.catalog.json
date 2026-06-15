@@ -83,6 +83,10 @@
     "videoCall.create_hidden": {
       "group": "communication",
       "description": "Start (open) a video call in a hidden group. Joining an existing call stays open to any member."
+    },
+    "apiKey.create": {
+      "group": "account",
+      "description": "Create personal API keys for backend access (managing/revoking existing keys stays available)."
     }
   }
 }

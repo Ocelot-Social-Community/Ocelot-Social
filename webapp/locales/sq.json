@@ -208,6 +208,7 @@
       "description": "Krijo role dhe cakto leje. Ndryshimet zbatohen menjëherë.",
       "groups": {
         "administration": "Administrim",
+        "account": "Llogaria",
         "communication": "Komunikim",
         "content": "Përmbajtje",
         "membership": "Anëtarësia",
@@ -218,6 +219,7 @@
       "nameLabel": "Emri",
       "perm": {
         "apiKey_administer": "Administro çelësat API të përdoruesve të tjerë.",
+        "apiKey_create": "Krijo çelësa API personalë.",
         "badge_manage": "Jep dhe hiq stema.",
         "comment_create": "Komento postime.",
         "content_moderate": "Shqyrto dhe vendos për përmbajtjen e raportuar.",
@@ -1227,6 +1229,7 @@
         "expiry-never": "Pa datë skadimi",
         "limit-reached": "Ke arritur maksimumin e {max} API Keys aktive. Revoko një key ekzistues për të krijuar një të ri.",
         "name-label": "Emri",
+        "no-permission": "Krijimi i çelësave API nuk është aktivizuar për rolin tënd.",
         "submit": "Krijo key",
         "success": "API Key u krijua me sukses",
         "title": "Krijo API Key të ri"
