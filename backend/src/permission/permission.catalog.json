@@ -56,6 +56,10 @@
       "group": "content",
       "description": "Comment on posts (still subject to group membership where applicable)."
     },
+    "socialMedia.create": {
+      "group": "content",
+      "description": "Add social-media links to one's own profile."
+    },
     "group.create": {
       "group": "content",
       "description": "Create groups."

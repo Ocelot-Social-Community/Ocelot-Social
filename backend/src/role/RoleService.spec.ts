@@ -9,6 +9,7 @@ import type { RoleChangeEvent, RolePubSub } from './types'
 const BASELINE = [
   'post.create',
   'comment.create',
+  'socialMedia.create',
   'group.create',
   'group.create_hidden',
   'user.invite',

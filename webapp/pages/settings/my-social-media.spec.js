@@ -109,6 +109,26 @@ describe('my-social-media.vue', () => {
       })
     })
 
+    describe('adding a link without the socialMedia.create permission', () => {
+      beforeEach(async () => {
+        mocks.$can = () => false
+        wrapper = Wrapper()
+        form = wrapper.find('form')
+        form.trigger('submit') // enter add mode
+        await Vue.nextTick()
+        input = wrapper.find('input#editSocialMedia')
+      })
+
+      it('does not mutate and shows a denied-hint toast instead of a silent/failed submit', async () => {
+        input.setValue(newSocialMediaUrl)
+        form.trigger('submit')
+        await Vue.nextTick()
+        await flushPromises()
+        expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+        expect(mocks.$toast.error).toHaveBeenCalledTimes(1)
+      })
+    })
+
     describe('handleInputValid', () => {
       beforeEach(() => {
         wrapper = Wrapper()

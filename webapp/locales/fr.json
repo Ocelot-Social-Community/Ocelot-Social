@@ -229,6 +229,7 @@
         "post_pin": "Épingler et désépingler des publications sur tout le réseau.",
         "post_push": "Mettre en avant et retirer (boost) des publications.",
         "role_manage": "Gérer les rôles et les attribuer aux utilisateurs.",
+        "socialMedia_create": "Ajouter des liens de réseaux sociaux à son profil.",
         "user_delete_any": "Supprimer le compte de n’importe quel utilisateur.",
         "user_email_readAny": "Lire l’adresse e-mail de n’importe quel utilisateur.",
         "user_invite": "Générer des codes d’invitation personnels."

@@ -12,13 +12,18 @@ import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import type { RoleDefinition } from '@src/role'
 
 let authenticatedUser: Context['user']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
+// Per-test role override: when set, the in-memory RoleService is built from these
+// definitions instead of the defaults — used to test the socialMedia.create gate by
+// giving the viewer a role that lacks it.
+let rolesOverride: RoleDefinition[] | undefined
 
-const context = () => ({ authenticatedUser })
+const context = () => ({ authenticatedUser, roles: rolesOverride })
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -53,6 +58,7 @@ describe('SocialMedia', () => {
   }
 
   beforeEach(async () => {
+    rolesOverride = undefined
     const someUserNode = await Factory.build(
       'user',
       {
@@ -133,6 +139,18 @@ describe('SocialMedia', () => {
         expect(result.errors![0].message).toEqual(
           expect.stringContaining('"url" must be a valid uri'),
         )
+      })
+
+      it('denies creating social media for a role without socialMedia.create', async () => {
+        rolesOverride = [
+          {
+            name: 'user',
+            protected: false,
+            permissions: ['post.create', 'comment.create', 'group.create', 'user.invite'],
+          },
+        ]
+        const result = await socialMediaAction(user, CreateSocialMedia, variables)
+        expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 

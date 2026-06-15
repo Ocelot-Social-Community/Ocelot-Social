@@ -229,6 +229,7 @@
         "post_pin": "Pin and unpin posts network-wide.",
         "post_push": "Push and unpush (boost) posts.",
         "role_manage": "Manage roles and assign them to users.",
+        "socialMedia_create": "Add social-media links to your profile.",
         "user_delete_any": "Delete any user’s account.",
         "user_email_readAny": "Read any user’s email address.",
         "user_invite": "Generate personal invite codes."

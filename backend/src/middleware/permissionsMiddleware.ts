@@ -521,7 +521,7 @@ export default shield(
       UpdatePost: isAuthor,
       DeletePost: isAuthor,
       fileReport: isAuthenticated,
-      CreateSocialMedia: isAuthenticated,
+      CreateSocialMedia: and(isAuthenticated, hasPermission('socialMedia.create')),
       UpdateSocialMedia: isMySocialMedia,
       DeleteSocialMedia: isMySocialMedia,
       setVerificationBadge: hasPermission('badge.manage'),

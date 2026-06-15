@@ -229,6 +229,7 @@
         "post_pin": "Przypinanie i odpinanie wpisów w całej sieci.",
         "post_push": "Promowanie i wycofywanie (boost) wpisów.",
         "role_manage": "Zarządzanie rolami i przypisywanie ich użytkownikom.",
+        "socialMedia_create": "Dodawanie linków do mediów społecznościowych do profilu.",
         "user_delete_any": "Usuwanie konta dowolnego użytkownika.",
         "user_email_readAny": "Odczyt adresu e-mail dowolnego użytkownika.",
         "user_invite": "Generowanie osobistych kodów zaproszeń."

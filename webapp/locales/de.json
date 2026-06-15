@@ -229,6 +229,7 @@
         "post_pin": "Beiträge netzwerkweit anpinnen und lösen.",
         "post_push": "Beiträge pushen und zurücknehmen (boosten).",
         "role_manage": "Rollen verwalten und Nutzern zuweisen.",
+        "socialMedia_create": "Social-Media-Links zum eigenen Profil hinzufügen.",
         "user_delete_any": "Beliebiges Nutzerkonto löschen.",
         "user_email_readAny": "E-Mail-Adresse beliebiger Nutzer lesen.",
         "user_invite": "Persönliche Einladungscodes erzeugen."

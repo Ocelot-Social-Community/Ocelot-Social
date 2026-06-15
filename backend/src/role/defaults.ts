@@ -19,6 +19,7 @@ import type { RoleDefinition } from './types'
 const BASELINE: RoleDefinition['permissions'] = [
   'post.create',
   'comment.create',
+  'socialMedia.create',
   'group.create',
   'group.create_hidden',
   'user.invite',
