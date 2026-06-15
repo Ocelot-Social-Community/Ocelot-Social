@@ -186,8 +186,8 @@ export default {
     const routeQuery = (this.$route && this.$route.query) || {}
     // A repeated param (?q=a&q=b) arrives as an array; take the last value so
     // query parsing always operates on a string (and never crashes on .trim()).
-    const firstString = (value) => (Array.isArray(value) ? value[value.length - 1] : value) || ''
-    const query = routeQuery.q ? firstString(routeQuery.q) : ''
+    const coerceToString = (value) => (Array.isArray(value) ? value[value.length - 1] : value) || ''
+    const query = routeQuery.q ? coerceToString(routeQuery.q) : ''
     const tokens = query.trim().split(/\s+/).filter(Boolean)
     let roleName = null
     const terms = []
@@ -333,7 +333,13 @@ export default {
         .mutate({ mutation: setUserRoleMutation, variables: { userId: user.id, roleName } })
         .then(() => this.$apollo.queries.User.refetch())
         .then(() => this.$toast.success(this.$t('admin.users.roleChanged')))
-        .catch((error) => this.$toast.error(error.message))
+        .catch((error) => {
+          // The select is one-way bound to user.roleName; a failed mutation leaves the
+          // DOM showing the rejected choice. Reset it to the real role so the UI stays
+          // truthful even when no refetch runs (e.g. a network error).
+          event.target.value = user.roleName
+          this.$toast.error(error.message)
+        })
     },
   },
 }
