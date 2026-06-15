@@ -145,10 +145,10 @@ describe('Users', () => {
       expect(own.find('[data-test="user-role-select-admin"]').exists()).toBe(false)
     })
 
-    it('sets the selected single role', () => {
+    it('sets the selected single role', async () => {
       const select = wrapper.find('[data-test="user-role-select-user"]')
       // options follow allRoleNames; pick 'admin' (index 2)
-      select.findAll('option').at(2).setSelected()
+      await select.findAll('option').at(2).setSelected()
       expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
         expect.objectContaining({ variables: { userId: 'user', roleName: 'admin' } }),
       )
