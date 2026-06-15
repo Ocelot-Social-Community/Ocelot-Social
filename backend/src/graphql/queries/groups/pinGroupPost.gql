@@ -11,7 +11,7 @@ mutation pinGroupPost($id: ID!) {
     pinnedBy {
       id
       name
-      role
+      roleName
     }
     createdAt
     updatedAt

@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { setTimeout } from 'node:timers/promises'
 
-import { cleanDatabase } from '@db/factories'
+import { assignRoleEdge, cleanDatabase } from '@db/factories'
 import adminRevokeApiKey from '@graphql/queries/apiKeys/adminRevokeApiKey.gql'
 import adminRevokeUserApiKeys from '@graphql/queries/apiKeys/adminRevokeUserApiKeys.gql'
 import apiKeysForUser from '@graphql/queries/apiKeys/apiKeysForUser.gql'
@@ -342,8 +342,10 @@ describe('admin operations', () => {
       id: 'u-admin',
       name: 'Admin',
       slug: 'admin',
-      role: 'admin',
     })
+    // Single-role model: admin permissions come from a HAS_ROLE edge, not a legacy
+    // user.role property.
+    await assignRoleEdge(adminUser, 'admin')
     authenticatedUser = (await regularUser.toJson()) as Context['user']
     const { data } = await mutate({ mutation: createApiKey, variables: { name: 'Regular Key' } })
     keyId = data.createApiKey.apiKey.id

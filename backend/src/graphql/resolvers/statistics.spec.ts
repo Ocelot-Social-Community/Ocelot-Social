@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import Factory, { cleanDatabase } from '@db/factories'
+import Factory, { assignRoleEdge, cleanDatabase } from '@db/factories'
 import statistics from '@graphql/queries/statistics.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
@@ -90,8 +90,10 @@ describe('statistics', () => {
       currentUser = await database.neode.create('User', {
         name: 'Current User',
         id: 'u1',
-        role: 'admin',
       })
+      // Single-role model: admin permissions come from a HAS_ROLE edge, not a
+      // legacy user.role property.
+      await assignRoleEdge(currentUser, 'admin')
       authenticatedUser = await currentUser.toJson()
     })
 
