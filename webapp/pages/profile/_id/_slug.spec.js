@@ -214,6 +214,30 @@ describe('ProfileSlug', () => {
           expect(wrapper.container).toMatchSnapshot()
         })
       })
+
+      // The add-post button is the only $can-gated element on this page. Snapshots
+      // above cover the granted member; assert both branches of the deny-by-default
+      // gate explicitly so an RBAC regression (e.g. a denied action staying a live
+      // link) fails loudly rather than silently changing a snapshot.
+      describe('add-post button gating (post.create)', () => {
+        const addButton = () => wrapper.container.querySelector('.profile-post-add-button')
+
+        it('renders a working link when post.create is granted', () => {
+          mocks.$can = () => true
+          wrapper = Wrapper(true, user)
+          const button = addButton()
+          expect(button.tagName.toLowerCase()).toBe('nuxt-link-stub')
+          expect(button.classList.contains('permission-denied')).toBe(false)
+        })
+
+        it('renders a denied, non-link button when post.create is denied', () => {
+          mocks.$can = () => false
+          wrapper = Wrapper(true, user)
+          const button = addButton()
+          expect(button.tagName.toLowerCase()).toBe('button')
+          expect(button.classList.contains('permission-denied')).toBe(true)
+        })
+      })
     })
   })
 })
