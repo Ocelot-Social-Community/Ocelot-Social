@@ -208,6 +208,7 @@
       "description": "Créez des rôles et attribuez des permissions. Les changements s’appliquent immédiatement.",
       "groups": {
         "administration": "Administration",
+        "communication": "Communication",
         "content": "Contenu",
         "membership": "Adhésion",
         "moderation": "Modération"
@@ -232,7 +233,10 @@
         "socialMedia_create": "Ajouter des liens de réseaux sociaux à son profil.",
         "user_delete_any": "Supprimer le compte de n’importe quel utilisateur.",
         "user_email_readAny": "Lire l’adresse e-mail de n’importe quel utilisateur.",
-        "user_invite": "Générer des codes d’invitation personnels."
+        "user_invite": "Générer des codes d’invitation personnels.",
+        "videoCall_create_public": "Démarrer un appel vidéo dans un groupe public.",
+        "videoCall_create_closed": "Démarrer un appel vidéo dans un groupe fermé.",
+        "videoCall_create_hidden": "Démarrer un appel vidéo dans un groupe caché."
       },
       "protected": "protégé",
       "protectedHint": "Le rôle propriétaire détient toutes les permissions et ne peut pas être modifié.",

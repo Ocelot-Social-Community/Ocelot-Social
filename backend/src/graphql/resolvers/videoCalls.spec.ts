@@ -14,6 +14,7 @@ import { groupIdFromRoomName, roomNameForGroup } from './videoCalls'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import type { RoleDefinition } from '@src/role'
 
 let listParticipantsMock = jest.fn()
 
@@ -66,7 +67,10 @@ const DESCRIPTION_OVERRIDE = {
 
 let authenticatedUser: Context['user']
 let livekitConfig: Record<string, unknown> = {}
-const context = () => ({ authenticatedUser, config: livekitConfig })
+// Per-test role override: tweaks the viewer's effective permissions to test the
+// per-group-type open gate (videoCall.create_public / _closed / _hidden).
+let rolesOverride: RoleDefinition[] | undefined
+const context = () => ({ authenticatedUser, config: livekitConfig, roles: rolesOverride })
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
@@ -88,6 +92,7 @@ beforeEach(async () => {
   listParticipantsMock = jest.fn().mockResolvedValue([])
   livekitConfig = {}
   authenticatedUser = null
+  rolesOverride = undefined
   const [member, outsider] = await Promise.all([
     Factory.build('user', { id: 'member-1', name: 'Member' }),
     Factory.build('user', { id: 'outsider-1', name: 'Outsider' }),
@@ -158,7 +163,9 @@ describe('videoCallParticipantCount', () => {
     expect(errors?.[0].message).toMatch(/not a member/i)
   })
 
-  it('throws when group is closed (not public)', async () => {
+  it('returns the count for a member of a non-public (closed) group', async () => {
+    // Video calls are available in every group type now; viewing the count only
+    // needs membership (opening is gated separately on the mutation).
     livekitConfig = ENABLED_LIVEKIT
     authenticatedUser = memberJson
     await Factory.build(
@@ -166,11 +173,13 @@ describe('videoCallParticipantCount', () => {
       { id: 'cl-1', groupType: 'closed', ...DESCRIPTION_OVERRIDE },
       { ownerId: 'member-1' },
     )
-    const { errors } = await query({
+    listParticipantsMock.mockResolvedValueOnce([{}, {}])
+    const { data, errors } = await query({
       query: VideoCallParticipantCount,
       variables: { groupId: 'cl-1' },
     })
-    expect(errors?.[0].message).toMatch(/only available for public groups/i)
+    expect(errors).toBeUndefined()
+    expect(data.videoCallParticipantCount).toBe(2)
   })
 
   it('returns the participant count for a public group member', async () => {
@@ -268,7 +277,9 @@ describe('joinGroupVideoCall', () => {
     expect(errors?.[0].message).toMatch(/not a member/i)
   })
 
-  it('throws for non-public groups', async () => {
+  it('denies OPENING a hidden-group call without videoCall.create_hidden (baseline user)', async () => {
+    // No live participants (default mock → []), so this is an OPEN. The baseline user
+    // holds videoCall.create_public but not _hidden → denied for a hidden group.
     livekitConfig = ENABLED_LIVEKIT
     authenticatedUser = memberJson
     await Factory.build(
@@ -280,10 +291,65 @@ describe('joinGroupVideoCall', () => {
       mutation: JoinGroupVideoCall,
       variables: { groupId: 'h-1' },
     })
-    expect(errors?.[0].message).toMatch(/only available for public groups/i)
+    expect(errors?.[0].message).toMatch(/may not start a video call/i)
   })
 
-  it('returns token, url and deterministic room name for a public-group member', async () => {
+  it('allows JOINING an existing hidden-group call without the open permission', async () => {
+    // A call is already running (participants > 0) → this is a JOIN, which any member
+    // may do regardless of the per-type open permission.
+    livekitConfig = ENABLED_LIVEKIT
+    authenticatedUser = memberJson
+    await Factory.build(
+      'group',
+      { id: 'h-1', groupType: 'hidden', ...DESCRIPTION_OVERRIDE },
+      { ownerId: 'member-1' },
+    )
+    listParticipantsMock.mockResolvedValueOnce([{}, {}])
+    const { data, errors } = await mutate({
+      mutation: JoinGroupVideoCall,
+      variables: { groupId: 'h-1' },
+    })
+    expect(errors).toBeUndefined()
+    expect(data.joinGroupVideoCall.roomName).toBe('group-h-1')
+    expect(data.joinGroupVideoCall.token).toContain('member-1')
+  })
+
+  it('denies OPENING a public-group call when the role lacks videoCall.create_public', async () => {
+    livekitConfig = ENABLED_LIVEKIT
+    authenticatedUser = memberJson
+    rolesOverride = [
+      { name: 'user', protected: false, permissions: ['post.create', 'comment.create'] },
+    ]
+    await Factory.build(
+      'group',
+      { id: 'pub-1', groupType: 'public', ...DESCRIPTION_OVERRIDE },
+      { ownerId: 'member-1' },
+    )
+    const { errors } = await mutate({
+      mutation: JoinGroupVideoCall,
+      variables: { groupId: 'pub-1' },
+    })
+    expect(errors?.[0].message).toMatch(/may not start a video call/i)
+  })
+
+  it('allows OPENING a hidden-group call when the role holds videoCall.create_hidden', async () => {
+    livekitConfig = ENABLED_LIVEKIT
+    authenticatedUser = memberJson
+    rolesOverride = [{ name: 'user', protected: false, permissions: ['videoCall.create_hidden'] }]
+    await Factory.build(
+      'group',
+      { id: 'h-1', groupType: 'hidden', ...DESCRIPTION_OVERRIDE },
+      { ownerId: 'member-1' },
+    )
+    const { data, errors } = await mutate({
+      mutation: JoinGroupVideoCall,
+      variables: { groupId: 'h-1' },
+    })
+    expect(errors).toBeUndefined()
+    expect(data.joinGroupVideoCall.roomName).toBe('group-h-1')
+  })
+
+  it('returns token, url and deterministic room name when OPENING a public-group call (baseline user)', async () => {
     livekitConfig = ENABLED_LIVEKIT
     authenticatedUser = memberJson
     await Factory.build(

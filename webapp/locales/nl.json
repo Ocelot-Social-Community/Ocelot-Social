@@ -208,6 +208,7 @@
       "description": "Maak rollen aan en wijs rechten toe. Wijzigingen worden direct toegepast.",
       "groups": {
         "administration": "Beheer",
+        "communication": "Communicatie",
         "content": "Inhoud",
         "membership": "Lidmaatschap",
         "moderation": "Moderatie"
@@ -232,7 +233,10 @@
         "socialMedia_create": "Social-media-links aan je profiel toevoegen.",
         "user_delete_any": "Het account van elke gebruiker verwijderen.",
         "user_email_readAny": "Het e-mailadres van elke gebruiker lezen.",
-        "user_invite": "Persoonlijke uitnodigingscodes genereren."
+        "user_invite": "Persoonlijke uitnodigingscodes genereren.",
+        "videoCall_create_public": "Een videogesprek starten in een openbare groep.",
+        "videoCall_create_closed": "Een videogesprek starten in een gesloten groep.",
+        "videoCall_create_hidden": "Een videogesprek starten in een verborgen groep."
       },
       "protected": "beschermd",
       "protectedHint": "De eigenaarsrol heeft alle rechten en kan niet worden bewerkt.",

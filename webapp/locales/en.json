@@ -208,6 +208,7 @@
       "description": "Create roles and assign permissions. Changes apply immediately.",
       "groups": {
         "administration": "Administration",
+        "communication": "Communication",
         "content": "Content",
         "membership": "Membership",
         "moderation": "Moderation"
@@ -232,7 +233,10 @@
         "socialMedia_create": "Add social-media links to your profile.",
         "user_delete_any": "Delete any user’s account.",
         "user_email_readAny": "Read any user’s email address.",
-        "user_invite": "Generate personal invite codes."
+        "user_invite": "Generate personal invite codes.",
+        "videoCall_create_public": "Start a video call in a public group.",
+        "videoCall_create_closed": "Start a video call in a closed group.",
+        "videoCall_create_hidden": "Start a video call in a hidden group."
       },
       "protected": "protected",
       "protectedHint": "The owner role holds every permission and cannot be edited.",

@@ -208,6 +208,7 @@
       "description": "Crea ruoli e assegna i permessi. Le modifiche si applicano immediatamente.",
       "groups": {
         "administration": "Amministrazione",
+        "communication": "Comunicazione",
         "content": "Contenuti",
         "membership": "Iscrizione",
         "moderation": "Moderazione"
@@ -232,7 +233,10 @@
         "socialMedia_create": "Aggiungere link ai social media al proprio profilo.",
         "user_delete_any": "Eliminare l’account di qualsiasi utente.",
         "user_email_readAny": "Leggere l’indirizzo e-mail di qualsiasi utente.",
-        "user_invite": "Generare codici di invito personali."
+        "user_invite": "Generare codici di invito personali.",
+        "videoCall_create_public": "Avviare una videochiamata in un gruppo pubblico.",
+        "videoCall_create_closed": "Avviare una videochiamata in un gruppo chiuso.",
+        "videoCall_create_hidden": "Avviare una videochiamata in un gruppo nascosto."
       },
       "protected": "protetto",
       "protectedHint": "Il ruolo proprietario ha tutti i permessi e non può essere modificato.",

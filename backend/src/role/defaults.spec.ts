@@ -39,6 +39,7 @@ describe('DEFAULT_ROLES', () => {
     'group.create',
     'group.create_hidden',
     'user.invite',
+    'videoCall.create_public',
   ]
 
   // The audited extras the admin role grants ON TOP of the baseline. Keep this in

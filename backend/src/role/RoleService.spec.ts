@@ -13,6 +13,7 @@ const BASELINE = [
   'group.create',
   'group.create_hidden',
   'user.invite',
+  'videoCall.create_public',
 ]
 
 describe('RoleService', () => {

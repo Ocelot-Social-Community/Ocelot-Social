@@ -208,6 +208,7 @@
       "description": "Rollen erstellen und Berechtigungen vergeben. Änderungen gelten sofort.",
       "groups": {
         "administration": "Administration",
+        "communication": "Kommunikation",
         "content": "Inhalte",
         "membership": "Mitgliedschaft",
         "moderation": "Moderation"
@@ -232,7 +233,10 @@
         "socialMedia_create": "Social-Media-Links zum eigenen Profil hinzufügen.",
         "user_delete_any": "Beliebiges Nutzerkonto löschen.",
         "user_email_readAny": "E-Mail-Adresse beliebiger Nutzer lesen.",
-        "user_invite": "Persönliche Einladungscodes erzeugen."
+        "user_invite": "Persönliche Einladungscodes erzeugen.",
+        "videoCall_create_public": "Videoanruf in einer öffentlichen Gruppe starten.",
+        "videoCall_create_closed": "Videoanruf in einer geschlossenen Gruppe starten.",
+        "videoCall_create_hidden": "Videoanruf in einer verborgenen Gruppe starten."
       },
       "protected": "geschützt",
       "protectedHint": "Die Owner-Rolle hält alle Berechtigungen und kann nicht bearbeitet werden.",

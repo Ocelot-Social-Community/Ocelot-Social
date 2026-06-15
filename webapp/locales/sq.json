@@ -208,6 +208,7 @@
       "description": "Krijo role dhe cakto leje. Ndryshimet zbatohen menjëherë.",
       "groups": {
         "administration": "Administrim",
+        "communication": "Komunikim",
         "content": "Përmbajtje",
         "membership": "Anëtarësia",
         "moderation": "Moderim"
@@ -232,7 +233,10 @@
         "socialMedia_create": "Shto lidhje të mediave sociale në profilin tënd.",
         "user_delete_any": "Fshi llogarinë e çdo përdoruesi.",
         "user_email_readAny": "Lexo adresën e email-it të çdo përdoruesi.",
-        "user_invite": "Gjenero kode ftese personale."
+        "user_invite": "Gjenero kode ftese personale.",
+        "videoCall_create_public": "Nis një thirrje video në një grup publik.",
+        "videoCall_create_closed": "Nis një thirrje video në një grup të mbyllur.",
+        "videoCall_create_hidden": "Nis një thirrje video në një grup të fshehur."
       },
       "protected": "i mbrojtur",
       "protectedHint": "Roli i pronarit ka të gjitha lejet dhe nuk mund të modifikohet.",

@@ -208,6 +208,7 @@
       "description": "Crie funções e atribua permissões. As alterações aplicam-se imediatamente.",
       "groups": {
         "administration": "Administração",
+        "communication": "Comunicação",
         "content": "Conteúdo",
         "membership": "Adesão",
         "moderation": "Moderação"
@@ -232,7 +233,10 @@
         "socialMedia_create": "Adicionar ligações de redes sociais ao perfil.",
         "user_delete_any": "Eliminar a conta de qualquer utilizador.",
         "user_email_readAny": "Ler o endereço de e-mail de qualquer utilizador.",
-        "user_invite": "Gerar códigos de convite pessoais."
+        "user_invite": "Gerar códigos de convite pessoais.",
+        "videoCall_create_public": "Iniciar uma chamada de vídeo num grupo público.",
+        "videoCall_create_closed": "Iniciar uma chamada de vídeo num grupo fechado.",
+        "videoCall_create_hidden": "Iniciar uma chamada de vídeo num grupo oculto."
       },
       "protected": "protegida",
       "protectedHint": "A função de proprietário detém todas as permissões e não pode ser editada.",

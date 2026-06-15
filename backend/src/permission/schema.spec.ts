@@ -31,6 +31,9 @@ const EXPECTED_KEYS: PermissionKey[] = [
   'group.create',
   'group.create_hidden',
   'user.invite',
+  'videoCall.create_public',
+  'videoCall.create_closed',
+  'videoCall.create_hidden',
 ]
 
 describe('permission catalog', () => {
@@ -55,7 +58,13 @@ describe('permission catalog', () => {
     })
 
     it('only uses known groups', () => {
-      const knownGroups = ['administration', 'moderation', 'content', 'membership']
+      const knownGroups = [
+        'administration',
+        'moderation',
+        'content',
+        'membership',
+        'communication',
+      ]
       for (const key of allPermissionKeys()) {
         expect(knownGroups).toContain(groupFor(key))
       }

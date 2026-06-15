@@ -208,6 +208,7 @@
       "description": "Twórz role i przypisuj uprawnienia. Zmiany obowiązują natychmiast.",
       "groups": {
         "administration": "Administracja",
+        "communication": "Komunikacja",
         "content": "Treści",
         "membership": "Członkostwo",
         "moderation": "Moderacja"
@@ -232,7 +233,10 @@
         "socialMedia_create": "Dodawanie linków do mediów społecznościowych do profilu.",
         "user_delete_any": "Usuwanie konta dowolnego użytkownika.",
         "user_email_readAny": "Odczyt adresu e-mail dowolnego użytkownika.",
-        "user_invite": "Generowanie osobistych kodów zaproszeń."
+        "user_invite": "Generowanie osobistych kodów zaproszeń.",
+        "videoCall_create_public": "Rozpoczynanie rozmowy wideo w grupie publicznej.",
+        "videoCall_create_closed": "Rozpoczynanie rozmowy wideo w grupie zamkniętej.",
+        "videoCall_create_hidden": "Rozpoczynanie rozmowy wideo w grupie ukrytej."
       },
       "protected": "chroniona",
       "protectedHint": "Rola właściciela ma wszystkie uprawnienia i nie można jej edytować.",

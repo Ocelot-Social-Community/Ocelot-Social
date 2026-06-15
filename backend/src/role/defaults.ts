@@ -23,6 +23,10 @@ const BASELINE: RoleDefinition['permissions'] = [
   'group.create',
   'group.create_hidden',
   'user.invite',
+  // Only public-group video calls are baseline (parity with the prior public-only
+  // implementation). videoCall.create_closed / _hidden are NOT granted by default —
+  // they are opt-in per role (owner still holds them via full-catalog expansion).
+  'videoCall.create_public',
 ]
 
 // The roles that MUST always exist and are re-ensured on every boot / bootstrap:

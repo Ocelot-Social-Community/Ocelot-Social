@@ -689,7 +689,7 @@ describe('GroupProfileSlug', () => {
       Vue.config.warnHandler = savedWarnHandler
     })
 
-    const mountWithGroup = (group) => {
+    const mountWithGroup = (group, extraMocks = {}) => {
       openVideoCallMock = jest.fn()
       currentUserMock.mockReturnValue(peterLustig)
       const enabledStore = new Vuex.Store({
@@ -722,6 +722,7 @@ describe('GroupProfileSlug', () => {
         },
         mocks: {
           ...mocks,
+          ...extraMocks,
           $apollo: {
             loading: false,
             mutate: jest.fn().mockResolvedValue(),
@@ -740,9 +741,32 @@ describe('GroupProfileSlug', () => {
       expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(true)
     })
 
-    it('hides the video-call button for a non-public group', () => {
+    it('renders the video-call button for a non-public group member (joining is open to all)', () => {
       const wrapper = mountWithGroup({ ...yogaPractice, groupType: 'closed', myRole: 'usual' })
-      expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(false)
+      expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(true)
+    })
+
+    it('grays out the button (permission-denied) when the role may not open a call and none is running', () => {
+      // No per-type open permission ($can → false) and no active call (count 0): the
+      // button is shown but marked denied; joining-only would re-enable it.
+      const wrapper = mountWithGroup(
+        { ...yogaPractice, groupType: 'closed', myRole: 'usual' },
+        { $can: () => false },
+      )
+      const button = wrapper.find('[data-test="video-call-btn"]')
+      expect(button.exists()).toBe(true)
+      expect(button.classes()).toContain('permission-denied')
+    })
+
+    it('does not gray out the button when a call is already running (join is allowed)', async () => {
+      const wrapper = mountWithGroup(
+        { ...yogaPractice, groupType: 'closed', myRole: 'usual' },
+        { $can: () => false },
+      )
+      wrapper.setData({ videoCallParticipantCount: 2 })
+      await wrapper.vm.$nextTick()
+      const button = wrapper.find('[data-test="video-call-btn"]')
+      expect(button.classes()).not.toContain('permission-denied')
     })
 
     it('hides the video-call button for non-members', () => {
