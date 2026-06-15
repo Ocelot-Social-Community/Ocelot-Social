@@ -238,6 +238,14 @@ describe('role management', () => {
       })
       expect(errors?.[0].message).toMatch(/Unknown role/)
     })
+
+    it('forbids editing the protected owner role (RoleValidationError → Forbidden)', async () => {
+      const { errors } = await mutate({
+        mutation: UPDATE_ROLE,
+        variables: { name: 'owner', permissions: [] },
+      })
+      expect(errors?.[0].message).toMatch(/protected/)
+    })
   })
 
   describe('userRoles', () => {
@@ -248,7 +256,10 @@ describe('role management', () => {
         { email: 'target@e.org', password: '1234' },
       )
       await asAdmin()
-      await mutate({ mutation: SET_USER_ROLE, variables: { userId: 'target', roleName: 'moderator' } })
+      await mutate({
+        mutation: SET_USER_ROLE,
+        variables: { userId: 'target', roleName: 'moderator' },
+      })
       const { data, errors } = await query({ query: USER_ROLES, variables: { userId: 'target' } })
       expect(errors).toBeUndefined()
       expect(data.userRoles).toEqual([
@@ -347,6 +358,15 @@ describe('role management', () => {
       })
       const user = await readUser('member-id')
       expect(user.roleName).toBe('admin')
+    })
+
+    it('rejects an unknown role name', async () => {
+      await asAdmin()
+      const { errors } = await mutate({
+        mutation: SET_USER_ROLE,
+        variables: { userId: 'member-id', roleName: 'no-such-role' },
+      })
+      expect(errors?.[0].message).toMatch(/Unknown role/)
     })
 
     it('forbids a (non-owner) admin from assigning the owner role', async () => {
