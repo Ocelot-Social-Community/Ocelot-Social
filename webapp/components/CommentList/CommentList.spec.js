@@ -60,7 +60,9 @@ describe('CommentList.vue', () => {
         // permissions. content.moderate stays denied, so CommentCard hides
         // disabled/deleted content (components gate via $can now).
         $can: (permission) =>
-          ['post.create', 'group.create', 'group.create_hidden', 'user.invite'].includes(permission),
+          ['post.create', 'group.create', 'group.create_hidden', 'user.invite'].includes(
+            permission,
+          ),
         $filters: {
           truncate: (a) => a,
           removeHtml: (a) => a,
