@@ -70,10 +70,10 @@ export const minimisedUserQuery = () => {
 
 export const adminUserQuery = () => {
   return gql`
-    query ($filter: _UserFilter, $first: Int, $offset: Int, $email: String) {
+    query ($first: Int, $offset: Int, $roleName: String, $search: String) {
       User(
-        email: $email
-        filter: $filter
+        roleName: $roleName
+        search: $search
         first: $first
         offset: $offset
         orderBy: createdAt_desc
@@ -82,7 +82,7 @@ export const adminUserQuery = () => {
         name
         slug
         email
-        role
+        roleName
         createdAt
         contributionsCount
         commentedCount
@@ -404,7 +404,7 @@ export const currentUserQuery = gql`
         description
       }
       email
-      role
+      roleName
       about
       locationName
       locale
@@ -424,6 +424,7 @@ export const currentUserQuery = gql`
       }
       activeCategories
     }
+    myPermissions
   }
 `
 

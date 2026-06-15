@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable jest/no-commented-out-tests */
-import Factory, { cleanDatabase } from '@db/factories'
+import Factory, { assignRoleEdge, cleanDatabase } from '@db/factories'
 import AddPostEmotions from '@graphql/queries/emotions/AddPostEmotions.gql'
 import PostsEmotionsByCurrentUser from '@graphql/queries/emotions/PostsEmotionsByCurrentUser.gql'
 import PostsEmotionsCountByEmotion from '@graphql/queries/emotions/PostsEmotionsCountByEmotion.gql'
@@ -949,7 +949,7 @@ describe('push posts', () => {
   describe('moderators', () => {
     let moderator
     beforeEach(async () => {
-      moderator = await user.update({ role: 'moderator', updatedAt: new Date().toISOString() })
+      moderator = await assignRoleEdge(user, 'moderator')
       authenticatedUser = await moderator.toJson()
     })
 
@@ -1095,7 +1095,7 @@ describe('unpush posts', () => {
   describe('moderators', () => {
     let moderator
     beforeEach(async () => {
-      moderator = await user.update({ role: 'moderator', updatedAt: new Date().toISOString() })
+      moderator = await assignRoleEdge(user, 'moderator')
       authenticatedUser = await moderator.toJson()
     })
 
@@ -1205,7 +1205,7 @@ describe('pin posts', () => {
   describe('moderators', () => {
     let moderator
     beforeEach(async () => {
-      moderator = await user.update({ role: 'moderator', updatedAt: new Date().toISOString() })
+      moderator = await assignRoleEdge(user, 'moderator')
       authenticatedUser = await moderator.toJson()
     })
 
@@ -1221,10 +1221,10 @@ describe('pin posts', () => {
     let admin
     beforeEach(async () => {
       admin = await user.update({
-        role: 'admin',
         name: 'Admin',
         updatedAt: new Date().toISOString(),
       })
+      admin = await assignRoleEdge(admin, 'admin')
       authenticatedUser = await admin.toJson()
     })
 
@@ -1282,7 +1282,7 @@ describe('pin posts', () => {
                 pinnedBy: {
                   id: 'current-user',
                   name: 'Admin',
-                  role: 'admin',
+                  roleName: 'admin',
                 },
               },
             },
@@ -1347,7 +1347,7 @@ describe('pin posts', () => {
                 pinnedBy: {
                   id: 'current-user',
                   name: 'Admin',
-                  role: 'admin',
+                  roleName: 'admin',
                 },
               },
             },
@@ -1370,7 +1370,7 @@ describe('pin posts', () => {
                 pinnedBy: {
                   id: 'current-user',
                   name: 'Admin',
-                  role: 'admin',
+                  roleName: 'admin',
                 },
               },
             },
@@ -1456,7 +1456,7 @@ describe('pin posts', () => {
                 pinnedBy: {
                   id: 'current-user',
                   name: 'Admin',
-                  role: 'admin',
+                  roleName: 'admin',
                 },
               },
             },
@@ -1844,7 +1844,7 @@ describe('unpin posts', () => {
   describe('moderators cannot unpin posts', () => {
     let moderator
     beforeEach(async () => {
-      moderator = await user.update({ role: 'moderator', updatedAt: new Date().toISOString() })
+      moderator = await assignRoleEdge(user, 'moderator')
       authenticatedUser = await moderator.toJson()
     })
 
@@ -1860,10 +1860,10 @@ describe('unpin posts', () => {
     let admin
     beforeEach(async () => {
       admin = await user.update({
-        role: 'admin',
         name: 'Admin',
         updatedAt: new Date().toISOString(),
       })
+      admin = await assignRoleEdge(admin, 'admin')
       authenticatedUser = await admin.toJson()
       await admin.relateTo(pinnedPost, 'pinned', { createdAt: new Date().toISOString() })
     })

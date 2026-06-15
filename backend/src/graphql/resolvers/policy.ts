@@ -4,7 +4,15 @@ import { UserInputError } from '@graphql/errors'
 import { POLICY_CHANGED_CHANNEL, PolicyValidationError, canView } from '@src/policy'
 
 import type { Context } from '@src/context'
-import type { NetworkPolicy, PolicyKey } from '@src/policy'
+import type { NetworkPolicy, PolicyKey, PolicyViewer } from '@src/policy'
+
+// The policy viewer is the auth state plus the request's effective permission
+// set (resolved from the user's roles in the context). Visibility keys on
+// permissions, not on role names — see policy/schema.ts.
+const viewerOf = (ctx: Context): PolicyViewer => ({
+  authenticated: !!ctx.user,
+  permissions: ctx.effectivePermissions,
+})
 
 // Full event for the admin-only mutations (the admin sees who/when of their own
 // change). actor = the acting admin's id; always present here.
@@ -25,15 +33,15 @@ export default {
     // Single resolver: returns the snapshot scoped to the viewer's audiences.
     // Keys the viewer may not see are omitted → null in the (nullable) GraphQL
     // fields. Public keys are always present.
-    policy: (_parent: unknown, _args: unknown, { policy, user }: Context) =>
-      policy.getVisibleSnapshot(user),
+    policy: (_parent: unknown, _args: unknown, ctx: Context) =>
+      ctx.policy.getVisibleSnapshot(viewerOf(ctx)),
     // Admin-only (see permissionsMiddleware). One round-trip carrying both
     // admin-only pieces: the configured defaults (canView-scoped, admin sees
     // all) and the most recent change (null until a real change). Replaces the
     // former separate policyLastChange query.
-    policyDefaults: (_parent: unknown, _args: unknown, { policy, user }: Context) => ({
-      defaults: policy.getVisibleDefaults(user),
-      lastChange: policy.getLastChange(),
+    policyDefaults: (_parent: unknown, _args: unknown, ctx: Context) => ({
+      defaults: ctx.policy.getVisibleDefaults(viewerOf(ctx)),
+      lastChange: ctx.policy.getLastChange(),
     }),
   },
   Mutation: {
@@ -80,8 +88,8 @@ export default {
       subscribe: withFilter(
         (_parent: unknown, _args: unknown, { pubsub }: Context) =>
           pubsub.asyncIterator(POLICY_CHANGED_CHANNEL),
-        (payload: { policyChanged: { key: string } }, _args: unknown, { user }: Context) =>
-          canView(payload.policyChanged.key as PolicyKey, user),
+        (payload: { policyChanged: { key: string } }, _args: unknown, ctx: Context) =>
+          canView(payload.policyChanged.key as PolicyKey, viewerOf(ctx)),
       ),
       // The broadcast is a lean value-change notification only: key + value, no
       // actor/timestamp. The admin-only last-change audit (who/when) lives solely

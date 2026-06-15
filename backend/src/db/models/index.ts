@@ -18,6 +18,7 @@ import Location from './Location'
 import Migration from './Migration'
 import Post from './Post'
 import Report from './Report'
+import Role from './Role'
 import Setting from './Setting'
 import SocialMedia from './SocialMedia'
 import Tag from './Tag'
@@ -45,6 +46,7 @@ export default {
   Migration,
   Post,
   Report,
+  Role,
   Setting,
   SocialMedia,
   Tag,

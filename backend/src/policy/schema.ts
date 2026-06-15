@@ -9,7 +9,12 @@
 /* eslint-disable security/detect-object-injection */ // keys come from the fixed schema, never user input
 import { Ajv } from 'ajv'
 
-import { ADMIN_AUDIENCE, AUTHENTICATED_AUDIENCE, KNOWN_AUDIENCES, PUBLIC_AUDIENCE } from './types'
+import {
+  AUTHENTICATED_AUDIENCE,
+  KNOWN_AUDIENCES,
+  PERMISSION_AUDIENCE_PREFIX,
+  PUBLIC_AUDIENCE,
+} from './types'
 
 import type { Audience, NetworkPolicy, PolicyKey } from './types'
 import type { ValidateFunction } from 'ajv'
@@ -74,52 +79,58 @@ export function validatePolicyValue(key: PolicyKey, value: unknown): true | stri
   return ajv.errorsText(validate.errors, { dataVar: key })
 }
 
-// --- Visibility: membership-based, not rank-based -------------------------
+// --- Visibility: permission-based membership ------------------------------
 // The whole "who may see what" mechanism is three small functions. Both the
 // `policy` query resolver and the policyChanged subscription filter go through
 // canView() — it is the single source of truth for visibility.
 
-// Minimal viewer shape — just the role for now; widen to roles[] when dynamic
-// multi-role assignment lands (only audiencesOf() needs to change).
+// Minimal viewer shape: the auth state plus the viewer's effective permission
+// keys (the request context resolves these from the user's roles). No role name
+// is read here — visibility keys on permissions, not on dynamic role names.
 export interface PolicyViewer {
-  role?: string | null
+  authenticated: boolean
+  permissions?: Iterable<string>
 }
 
-// The audiences a key is visible to. Empty/missing ⇒ admin-only (admin still
-// sees it via canView's superuser short-circuit). Returns a COPY: the value is
-// a shared reference into the loaded schema singleton, so a caller mutating it
-// (push/splice) would otherwise silently alter the effective visibility
-// process-wide and could weaken canView().
+// Admin-only keys (empty/missing visibility) resolve to this permission audience,
+// so owner/admin — who hold policy.manage in their effective permission set — see
+// them, with no special superuser short-circuit needed.
+const ADMIN_ONLY_AUDIENCE: Audience = `${PERMISSION_AUDIENCE_PREFIX}policy.manage`
+
+// The audiences a key is visible to. Empty/missing ⇒ admin-only (policy.manage).
+// Returns a COPY: the value is a shared reference into the loaded schema
+// singleton, so a caller mutating it (push/splice) would otherwise silently
+// alter the effective visibility process-wide and could weaken canView().
 export function audiencesFor(key: PolicyKey): Audience[] {
-  return [...(rawSchema.properties[key].visibility ?? [])]
+  const visibility = rawSchema.properties[key].visibility
+  return visibility && visibility.length > 0 ? [...visibility] : [ADMIN_ONLY_AUDIENCE]
 }
 
 // The audiences a viewer belongs to. 'public' is universal (every viewer,
-// including anonymous); logged-in viewers additionally carry 'authenticated'
-// and their role name(s).
-export function audiencesOf(user: PolicyViewer | null | undefined): Set<Audience> {
+// including anonymous). The 'authenticated' audience and every 'perm:<key>'
+// audience are gated on the auth status: an anonymous viewer holds none, even if
+// an inconsistent upstream context were to carry permissions. This keeps canView()
+// a safe single source of truth (no permission leak without authentication).
+export function audiencesOf(viewer: PolicyViewer | null | undefined): Set<Audience> {
   const audiences = new Set<Audience>([PUBLIC_AUDIENCE])
-  if (user) {
+  if (viewer?.authenticated) {
     audiences.add(AUTHENTICATED_AUDIENCE)
-    if (user.role) audiences.add(user.role)
+    for (const permission of viewer.permissions ?? []) {
+      audiences.add(`${PERMISSION_AUDIENCE_PREFIX}${permission}`)
+    }
   }
   return audiences
 }
 
-// Whether a viewer is an admin (superuser) — canView's short-circuit.
-function isAdminViewer(user: PolicyViewer | null | undefined): boolean {
-  return audiencesOf(user).has(ADMIN_AUDIENCE)
-}
-
-// The single visibility primitive. Admin sees everything; everyone else sees a
-// key iff they share at least one audience with it.
-export function canView(key: PolicyKey, user: PolicyViewer | null | undefined): boolean {
-  if (isAdminViewer(user)) return true
-  const viewer = audiencesOf(user)
-  return audiencesFor(key).some((audience) => viewer.has(audience))
+// The single visibility primitive: a viewer sees a key iff they share at least
+// one audience with it. Owner/admin "see everything" simply because their
+// effective permission set covers every key's permission audience.
+export function canView(key: PolicyKey, viewer: PolicyViewer | null | undefined): boolean {
+  const viewerAudiences = audiencesOf(viewer)
+  return audiencesFor(key).some((audience) => viewerAudiences.has(audience))
 }
 
 // All keys a viewer may see.
-export function visibleKeys(user: PolicyViewer | null | undefined): PolicyKey[] {
-  return allKeys().filter((key) => canView(key, user))
+export function visibleKeys(viewer: PolicyViewer | null | undefined): PolicyKey[] {
+  return allKeys().filter((key) => canView(key, viewer))
 }

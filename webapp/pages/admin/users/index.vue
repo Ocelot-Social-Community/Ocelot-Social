@@ -114,18 +114,16 @@
               <td class="ds-table-col ds-table-col-right">{{ user.commentedCount }}</td>
               <td class="ds-table-col ds-table-col-right">{{ user.shoutedCount }}</td>
               <td class="ds-table-col ds-table-col-right">
-                <template v-if="userRoles.length">
-                  <select
-                    v-if="user.id !== currentUser.id"
-                    :value="user.role"
-                    @change="changeUserRole(user.id, $event)"
-                  >
-                    <option v-for="value in userRoles" :key="value" :value="value">
-                      {{ value }}
-                    </option>
-                  </select>
-                  <p class="ds-text" v-else>{{ user.role }}</p>
-                </template>
+                <select
+                  v-if="canEditRole(user)"
+                  class="user-role-select"
+                  :value="user.roleName"
+                  :data-test="`user-role-select-${user.id}`"
+                  @change="setRole(user, $event)"
+                >
+                  <option v-for="rn in assignableRoleNames" :key="rn" :value="rn">{{ rn }}</option>
+                </select>
+                <span v-else class="ds-text">{{ user.roleName }}</span>
               </td>
               <td v-if="$policy.get('badgesEnabled')" class="ds-table-col ds-table-col-right">
                 <os-button
@@ -158,10 +156,9 @@
 import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
-import { isEmail } from 'validator'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
 import { adminUserQuery } from '~/graphql/User'
-import { FetchAllRoles, updateUserRole } from '~/graphql/admin/Roles'
+import { rolesQuery, setUserRoleMutation } from '~/graphql/admin/Roles'
 import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
@@ -179,17 +176,38 @@ export default {
   },
   data() {
     const pageSize = 15
+    // Initialize the filter from the URL here (not in created), so the first apollo
+    // fetch already carries it — otherwise the list loads unfiltered and then
+    // re-fetches filtered (a flash of all users). Reads the ?q=<search> param; the
+    // roles page "x members" link points here as ?q=role:<name>.
+    //
+    // NB: parse inline — `this.parseSearch` reads `allRoleNames`, a vue-apollo
+    // property that is not available yet during data() initialization.
+    const routeQuery = (this.$route && this.$route.query) || {}
+    // A repeated param (?q=a&q=b) arrives as an array; take the last value so
+    // query parsing always operates on a string (and never crashes on .trim()).
+    const coerceToString = (value) => (Array.isArray(value) ? value[value.length - 1] : value) || ''
+    const query = routeQuery.q ? coerceToString(routeQuery.q) : ''
+    const tokens = query.trim().split(/\s+/).filter(Boolean)
+    let roleName = null
+    const terms = []
+    for (const token of tokens) {
+      const match = /^role:(.+)$/i.exec(token)
+      if (match) roleName = match[1]
+      else terms.push(token)
+    }
+    const term = terms.join(' ')
     return {
       offset: 0,
       pageSize,
       first: pageSize,
       User: [],
       hasNext: false,
-      email: null,
-      filter: null,
-      userRoles: [],
+      searchText: term || null,
+      roleFilter: roleName,
+      allRoleNames: [],
       formData: {
-        query: '',
+        query,
       },
     }
   },
@@ -197,9 +215,31 @@ export default {
     hasPrevious() {
       return this.offset > 0
     },
+    // Only an owner may grant the owner role (mirrors the backend rule).
+    isOwner() {
+      return !!this.currentUser && this.currentUser.roleName === 'owner'
+    },
+    // Role options offered in the dropdown — owner only for owners.
+    assignableRoleNames() {
+      return this.isOwner
+        ? this.allRoleNames
+        : this.allRoleNames.filter((roleName) => roleName !== 'owner')
+    },
     ...mapGetters({
       currentUser: 'auth/user',
     }),
+  },
+  watch: {
+    // A deep-linked role token (?q=role:Owner) is parsed in data() before the known
+    // role names have loaded, so its casing can't be
+    // resolved yet. Once allRoleNames arrives, snap roleFilter to the canonical
+    // casing — the backend matches role names exactly, so without this a wrong-case
+    // deep link would return nothing until the form is re-submitted.
+    allRoleNames(names) {
+      if (!this.roleFilter) return
+      const canonical = (names || []).find((r) => r.toLowerCase() === this.roleFilter.toLowerCase())
+      if (canonical && canonical !== this.roleFilter) this.roleFilter = canonical
+    },
   },
   apollo: {
     User: {
@@ -207,10 +247,12 @@ export default {
         return adminUserQuery()
       },
       variables() {
-        const { offset, first, email, filter } = this
+        const { offset, first, roleFilter, searchText } = this
         const variables = { first, offset }
-        if (email) variables.email = email
-        if (filter) variables.filter = filter
+        // Role + free text combine; the free text is a substring match across
+        // name/slug/about/email (partial e-mail included) — no exact-e-mail case.
+        if (roleFilter) variables.roleName = roleFilter
+        if (searchText) variables.search = searchText
         return variables
       },
       update({ User }) {
@@ -220,12 +262,10 @@ export default {
         return User.map((u, i) => Object.assign({}, u, { index: this.offset + i }))
       },
     },
-    userRoles: {
-      query() {
-        return FetchAllRoles()
-      },
-      update({ availableRoles }) {
-        return availableRoles
+    allRoleNames: {
+      query: rolesQuery,
+      update({ roles }) {
+        return (roles || []).map((role) => role.name)
       },
     },
   },
@@ -236,30 +276,68 @@ export default {
     next() {
       this.offset += this.pageSize
     },
+    // The search box is the single source of truth: a `role:<name>` token filters by
+    // role, the rest is free text (substring match, partial e-mail included). Both combine.
     onSubmit() {
       this.offset = 0
-      const { query } = this.formData
-      if (isEmail(query)) {
-        this.email = query
-        this.filter = null
-      } else {
-        this.email = null
-        this.filter = {
-          OR: [{ name_contains: query }, { slug_contains: query }, { about_contains: query }],
+      this.applyQuery()
+      this.syncRoute()
+    },
+    // Resolve the current search box into role / free-text query state.
+    applyQuery() {
+      const { roleName, term } = this.parseSearch(this.formData.query)
+      this.roleFilter = roleName
+      this.searchText = term || null
+    },
+    // Split the query into an optional `role:<name>` token (resolved against the known
+    // role names, case-insensitively) and the remaining free-text term.
+    parseSearch(raw) {
+      const tokens = (raw || '').trim().split(/\s+/).filter(Boolean)
+      let roleName = null
+      const terms = []
+      for (const token of tokens) {
+        const match = /^role:(.+)$/i.exec(token)
+        if (match) {
+          const known = (this.allRoleNames || []).find(
+            (r) => r.toLowerCase() === match[1].toLowerCase(),
+          )
+          roleName = known || match[1]
+        } else {
+          terms.push(token)
         }
       }
+      return { roleName, term: terms.join(' ') }
     },
-    changeUserRole(id, event) {
-      const newRole = event.target.value
-      this.$apollo
-        .mutate({
-          mutation: updateUserRole(),
-          variables: { role: newRole, id },
-        })
-        .then(({ data }) => {
-          this.$toast.success(this.$t('admin.users.roleChanged'))
-        })
+    // Persist the search string to the URL (?q=…) so it is shareable and survives
+    // reloads; the path stays /admin/users, keeping the menu highlight.
+    syncRoute() {
+      if (!this.$router) return
+      const query = { ...this.$route.query }
+      const q = (this.formData.query || '').trim()
+      if (q) query.q = q
+      else delete query.q
+      this.$router.replace({ query }).catch(() => {})
+    },
+    // Whether the current user may change this user's role: not your own role, and
+    // only an owner may change an owner (mirrors the backend rule).
+    canEditRole(user) {
+      if (!this.currentUser || user.id === this.currentUser.id) return false
+      if (user.roleName === 'owner' && !this.isOwner) return false
+      return true
+    },
+    // Set a user's single role (replaces their current one). Owner assignment is
+    // enforced owner-only by the backend; a forbidden choice surfaces as a toast.
+    setRole(user, event) {
+      const roleName = event.target.value
+      return this.$apollo
+        .mutate({ mutation: setUserRoleMutation, variables: { userId: user.id, roleName } })
+        .then(() => this.$apollo.queries.User.refetch())
+        .then(() => this.$toast.success(this.$t('admin.users.roleChanged')))
         .catch((error) => {
+          // The select is one-way bound to user.roleName; a failed mutation leaves the
+          // DOM showing the rejected choice. Reset it to the real role so the UI stays
+          // truthful even when no refetch runs (e.g. a network error).
+          event.target.value = user.roleName
           this.$toast.error(error.message)
         })
     },
@@ -270,5 +348,8 @@ export default {
 <style lang="scss">
 .admin-users > .os-card:first-child {
   margin-bottom: $space-small;
+}
+.user-role-select {
+  font-size: 0.85em;
 }
 </style>

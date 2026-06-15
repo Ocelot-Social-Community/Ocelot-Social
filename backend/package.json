@@ -17,7 +17,9 @@
     "db:reset": "tsx src/db/reset.ts",
     "db:reset:withmigrations": "tsx src/db/reset-with-migrations.ts",
     "db:seed": "tsx --require ./src/graphql/gql-register.ts src/db/seed.ts",
-    "db:data:admin": "tsx src/db/admin.ts",
+    "db:data:owner": "tsx src/db/owner.ts",
+    "db:data:promote-owner": "tsx src/db/promote-owner.ts",
+    "db:data:roles": "tsx src/db/roles.ts",
     "db:data:badges": "tsx src/db/badges.ts",
     "db:data:branding": "tsx src/db/data-branding.ts",
     "db:data:categories": "tsx src/db/categories.ts",
@@ -27,7 +29,9 @@
     "prod:migrate": "migrate --migrations-dir ./build/src/db/migrations --store ./build/src/db/migrate/store.js",
     "prod:db:data:branding": "node build/src/db/data-branding.js",
     "prod:db:data:categories": "node build/src/db/categories.js",
-    "prod:db:data:admin": "node build/src/db/admin.js",
+    "prod:db:data:owner": "node build/src/db/owner.js",
+    "prod:db:data:promote-owner": "node build/src/db/promote-owner.js",
+    "prod:db:data:roles": "node build/src/db/roles.js",
     "prod:db:func:disable:notifications": "node build/src/db/disable-notifications.js"
   },
   "dependencies": {

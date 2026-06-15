@@ -10,31 +10,30 @@ const stubs = {
 
 describe('Users', () => {
   let wrapper
+  let mocks
 
-  const mocks = {
+  // A fresh mock set per test: the page mutates $route/$policy (and tests assert on
+  // the $apollo/$toast/$router spies), so sharing one object across tests would make
+  // them order-dependent and flaky. Rebuild before each test instead of mutating and
+  // hand-restoring a shared instance.
+  const createMocks = () => ({
     $t: jest.fn((t) => t),
     $apollo: {
       loading: false,
-      mutate: jest
-        .fn()
-        .mockRejectedValue({ message: 'Ouch!' })
-        .mockResolvedValue({
-          data: {
-            switchUserRole: {
-              id: 'user',
-              email: 'user@example.org',
-              name: 'User',
-              role: 'moderator',
-              slug: 'user',
-            },
-          },
-        }),
+      mutate: jest.fn().mockResolvedValue({ data: {} }),
+      queries: { User: { refetch: jest.fn().mockResolvedValue() } },
     },
     $toast: {
       error: jest.fn(),
       success: jest.fn(),
     },
-  }
+    $route: { query: {} },
+    $router: { replace: jest.fn(() => Promise.resolve()) },
+  })
+
+  beforeEach(() => {
+    mocks = createMocks()
+  })
 
   const getters = {
     'auth/isAdmin': () => true,
@@ -51,19 +50,20 @@ describe('Users', () => {
       store,
       stubs,
       data: () => ({
+        allRoleNames: ['user', 'moderator', 'admin', 'owner', 'badge-setter'],
         User: [
           {
             id: 'user',
             email: 'user@example.org',
             name: 'User',
-            role: 'moderator',
+            roleName: 'moderator',
             slug: 'user',
           },
           {
             id: 'user2',
             email: 'user2@example.org',
             name: 'User',
-            role: 'moderator',
+            roleName: 'user',
             slug: 'user',
           },
         ],
@@ -96,6 +96,7 @@ describe('Users', () => {
   describe('search', () => {
     let searchAction
     beforeEach(() => {
+      mocks.$policy = { get: () => false }
       wrapper = Wrapper()
       searchAction = (wrapper, { query }) => {
         wrapper.find('input').setValue(query)
@@ -105,75 +106,168 @@ describe('Users', () => {
     })
 
     describe('query looks like an email address', () => {
-      it('searches users for exact email address', async () => {
+      it('searches a full e-mail as free text too (partial match, no exact-only case)', async () => {
         const wrapper = await searchAction(Wrapper(), { query: 'email@example.org' })
-        expect(wrapper.vm.email).toEqual('email@example.org')
-        expect(wrapper.vm.filter).toBe(null)
+        expect(wrapper.vm.searchText).toEqual('email@example.org')
       })
     })
 
     describe('query is just text', () => {
-      it('tries to find matching users by `name`, `slug` or `about`', async () => {
+      it('searches by free text (combinable with the role filter)', async () => {
         const wrapper = await searchAction(await Wrapper(), { query: 'Find me' })
-        const expected = {
-          OR: [
-            { name_contains: 'Find me' },
-            { slug_contains: 'Find me' },
-            { about_contains: 'Find me' },
-          ],
-        }
-        expect(wrapper.vm.email).toBe(null)
-        expect(wrapper.vm.filter).toEqual(expected)
+        expect(wrapper.vm.searchText).toEqual('Find me')
       })
     })
   })
 
-  describe('change roles', () => {
-    beforeAll(() => {
+  describe('role', () => {
+    beforeEach(() => {
+      mocks.$policy = { get: () => false }
       wrapper = Wrapper()
-      wrapper.setData({
-        User: [
-          {
-            id: 'admin',
-            email: 'admin@example.org',
-            name: 'Admin',
-            role: 'admin',
-            slug: 'admin',
-          },
-          {
-            id: 'user',
-            email: 'user@example.org',
-            name: 'User',
-            role: 'user',
-            slug: 'user',
-          },
-        ],
-        userRoles: ['user', 'moderator', 'admin'],
-      })
     })
 
-    it('cannot change own role', () => {
-      const adminRow = wrapper.findAll('tr').at(1)
-      expect(adminRow.find('select').exists()).toBe(false)
+    it('shows a single role dropdown for other users', () => {
+      expect(wrapper.find('[data-test="user-role-select-user"]').exists()).toBe(true)
     })
 
-    it('changes the role of another user', () => {
-      const userRow = wrapper.findAll('tr').at(2)
-      userRow.findAll('option').at(1).setSelected()
-      expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
-        expect.objectContaining({
-          variables: {
-            id: 'user',
-            role: 'moderator',
-          },
+    it('does not offer a role dropdown for the current admin', () => {
+      const store = new Vuex.Store({ getters })
+      const own = mount(Users, {
+        mocks,
+        localVue,
+        store,
+        stubs,
+        data: () => ({
+          allRoleNames: ['user', 'admin'],
+          User: [{ id: 'admin', name: 'Admin', role: 'admin', roleName: 'admin', slug: 'admin' }],
         }),
+      })
+      expect(own.find('[data-test="user-role-select-admin"]').exists()).toBe(false)
+    })
+
+    it('sets the selected single role', async () => {
+      const select = wrapper.find('[data-test="user-role-select-user"]')
+      // options follow allRoleNames; pick 'admin' (index 2)
+      await select.findAll('option').at(2).setSelected()
+      expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+        expect.objectContaining({ variables: { userId: 'user', roleName: 'admin' } }),
       )
     })
 
-    it('toasts a success message after role has changed', () => {
-      const userRow = wrapper.findAll('tr').at(2)
-      userRow.findAll('option').at(1).setSelected()
+    it('toasts a success message after a change', async () => {
+      await wrapper.vm.setRole({ id: 'user' }, { target: { value: 'admin' } })
       expect(mocks.$toast.success).toHaveBeenCalled()
+    })
+
+    const optionValues = (select) =>
+      select.findAll('option').wrappers.map((option) => option.attributes('value'))
+
+    it('hides the owner option from a non-owner admin', () => {
+      const select = wrapper.find('[data-test="user-role-select-user"]')
+      expect(optionValues(select)).not.toContain('owner')
+    })
+
+    it('does not let a non-owner admin change an owner', () => {
+      const store = new Vuex.Store({ getters })
+      const w = mount(Users, {
+        mocks,
+        localVue,
+        store,
+        stubs,
+        data: () => ({
+          allRoleNames: ['user', 'admin', 'owner'],
+          User: [{ id: 'theowner', name: 'Owner', roleName: 'owner', slug: 'owner' }],
+        }),
+      })
+      expect(w.find('[data-test="user-role-select-theowner"]').exists()).toBe(false)
+    })
+
+    it('parses a role:<name> token from the search box, combinable with free text', () => {
+      wrapper.vm.formData.query = 'role:moderator anna'
+      wrapper.vm.onSubmit()
+      expect(wrapper.vm.roleFilter).toBe('moderator')
+      expect(wrapper.vm.searchText).toBe('anna')
+    })
+
+    it('resolves the role token case-insensitively against the known roles', () => {
+      wrapper.vm.formData.query = 'role:Moderator'
+      wrapper.vm.onSubmit()
+      expect(wrapper.vm.roleFilter).toBe('moderator')
+    })
+
+    it('syncs the search string to the URL as ?q=', () => {
+      wrapper.vm.formData.query = 'role:moderator anna'
+      wrapper.vm.onSubmit()
+      expect(mocks.$router.replace).toHaveBeenCalledWith({
+        query: { q: 'role:moderator anna' },
+      })
+    })
+
+    it('passes roleName to the query when a role filter is set', () => {
+      wrapper.vm.roleFilter = 'moderator'
+      const vars = wrapper.vm.$options.apollo.User.variables.call(wrapper.vm)
+      expect(vars.roleName).toBe('moderator')
+    })
+
+    it('combines role and free-text search in the query variables', () => {
+      wrapper.vm.roleFilter = 'moderator'
+      wrapper.vm.searchText = 'anna'
+      const vars = wrapper.vm.$options.apollo.User.variables.call(wrapper.vm)
+      expect(vars.roleName).toBe('moderator')
+      expect(vars.search).toBe('anna')
+    })
+
+    it('restores the search string (and parsed role) from the URL ?q=', () => {
+      mocks.$route = { query: { q: 'role:admin anna' } }
+      const w = Wrapper()
+      expect(w.vm.formData.query).toBe('role:admin anna')
+      expect(w.vm.roleFilter).toBe('admin')
+      expect(w.vm.searchText).toBe('anna')
+    })
+
+    it('handles a repeated ?q=a&q=b param (array) without crashing on init', () => {
+      mocks.$route = { query: { q: ['role:user', 'role:admin anna'] } }
+      const w = Wrapper()
+      // Last value wins; parsing still yields a string-based filter.
+      expect(w.vm.formData.query).toBe('role:admin anna')
+      expect(w.vm.roleFilter).toBe('admin')
+      expect(w.vm.searchText).toBe('anna')
+    })
+
+    it('normalises a deep-linked role token to canonical casing once role names load', async () => {
+      mocks.$route = { query: { q: 'role:Owner' } }
+      const store = new Vuex.Store({ getters })
+      const w = mount(Users, {
+        mocks,
+        localVue,
+        store,
+        stubs,
+        data: () => ({ allRoleNames: [], User: [] }),
+      })
+      expect(w.vm.roleFilter).toBe('Owner') // raw, before the known role names arrive
+      await w.setData({ allRoleNames: ['user', 'admin', 'owner'] })
+      expect(w.vm.roleFilter).toBe('owner') // snapped to the canonical casing
+    })
+
+    it('lets an owner edit an owner and offers the owner option', () => {
+      const ownerGetters = {
+        'auth/isAdmin': () => true,
+        'auth/user': () => ({ id: 'me', roleName: 'owner' }),
+      }
+      const store = new Vuex.Store({ getters: ownerGetters })
+      const w = mount(Users, {
+        mocks,
+        localVue,
+        store,
+        stubs,
+        data: () => ({
+          allRoleNames: ['user', 'admin', 'owner'],
+          User: [{ id: 'theowner', name: 'Owner', roleName: 'owner', slug: 'owner' }],
+        }),
+      })
+      const select = w.find('[data-test="user-role-select-theowner"]')
+      expect(select.exists()).toBe(true)
+      expect(optionValues(select)).toContain('owner')
     })
   })
 })

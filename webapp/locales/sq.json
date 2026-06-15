@@ -196,15 +196,61 @@
       "saveSuccess": "Politika u përditësua.",
       "title": "Cilësimet e politikës së rrjetit"
     },
+    "roles": {
+      "allPermissions": "Ka të gjitha lejet (i mbrojtur).",
+      "cannotDelete": "Ky rol nuk mund të fshihet.",
+      "cannotDeleteHasMembers": "Ky rol ka ende anëtarë — caktojuni një rol tjetër para se ta fshini.",
+      "create": "Krijo rol",
+      "createTitle": "Krijo një rol të ri",
+      "delete": "Fshi",
+      "deleteError": "Roli nuk u fshi dot: {message}",
+      "deleteSuccess": "Roli u fshi.",
+      "description": "Krijo role dhe cakto leje. Ndryshimet zbatohen menjëherë.",
+      "groups": {
+        "administration": "Administrim",
+        "content": "Përmbajtje",
+        "membership": "Anëtarësia",
+        "moderation": "Moderim"
+      },
+      "members": "{count} anëtarë",
+      "name": "Rolet dhe lejet",
+      "nameLabel": "Emri",
+      "perm": {
+        "apiKey_administer": "Administro çelësat API të përdoruesve të tjerë.",
+        "badge_manage": "Jep dhe hiq stema.",
+        "content_moderate": "Shqyrto dhe vendos për përmbajtjen e raportuar.",
+        "donation_manage": "Konfiguro widget-in e donacioneve.",
+        "group_create": "Krijo grupe.",
+        "group_create_hidden": "Krijo grupe të fshehura.",
+        "network_statistics_read": "Shiko statistikat e të gjithë rrjetit.",
+        "policy_manage": "Shiko dhe ndrysho cilësimet e politikave të rrjetit.",
+        "post_create": "Krijo postime.",
+        "post_pin": "Ngjit dhe shkëput postimet në të gjithë rrjetin.",
+        "post_push": "Promovo dhe tërhiq (boost) postimet.",
+        "role_manage": "Menaxho rolet dhe cakto ato te përdoruesit.",
+        "user_delete_any": "Fshi llogarinë e çdo përdoruesi.",
+        "user_email_readAny": "Lexo adresën e email-it të çdo përdoruesi.",
+        "user_invite": "Gjenero kode ftese personale."
+      },
+      "protected": "i mbrojtur",
+      "protectedHint": "Roli i pronarit ka të gjitha lejet dhe nuk mund të modifikohet.",
+      "save": "Ruaj",
+      "saveError": "Roli nuk u ruajt dot: {message}",
+      "saveSuccess": "Roli u ruajt.",
+      "title": "Rolet dhe lejet"
+    },
     "settings": {
       "name": "Cilësimet"
     },
     "users": {
+      "addRole": "Cakto rol…",
+      "allRoles": "Të gjitha rolet",
       "empty": "Nuk u gjetën përdorues",
       "form": {
-        "placeholder": "e-mail, emër ose përshkrim"
+        "placeholder": "email, emër, përshkrim ose role:moderator"
       },
       "name": "Përdoruesit",
+      "removeRole": "Hiq rolin {role}",
       "roleChanged": "Roli u ndryshua me sukses!",
       "table": {
         "columns": {
@@ -979,6 +1025,9 @@
   "pagination": {
     "next": "Tjetër",
     "previous": "Mëparshëm"
+  },
+  "permissions": {
+    "deniedHint": "Nuk ke leje për këtë."
   },
   "post": {
     "comment": {

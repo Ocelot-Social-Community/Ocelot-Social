@@ -21,7 +21,7 @@ describe('auth store', () => {
 
   describe('initial state', () => {
     it('starts logged out', () => {
-      expect(createState()).toEqual({ user: null, token: null, pending: false })
+      expect(createState()).toEqual({ user: null, token: null, pending: false, permissions: [] })
     })
   })
 
@@ -55,6 +55,14 @@ describe('auth store', () => {
       mutations.SET_PENDING(state, false)
       expect(state.pending).toBe(false)
     })
+
+    it('SET_PERMISSIONS stores an array, coercing non-arrays to empty', () => {
+      const state = createState()
+      mutations.SET_PERMISSIONS(state, ['post.create', 'badge.manage'])
+      expect(state.permissions).toEqual(['post.create', 'badge.manage'])
+      mutations.SET_PERMISSIONS(state, null)
+      expect(state.permissions).toEqual([])
+    })
   })
 
   describe('getters', () => {
@@ -74,17 +82,29 @@ describe('auth store', () => {
       expect(getters.pending({ pending: undefined })).toBe(false)
     })
 
-    it('isAdmin requires role === admin', () => {
-      expect(getters.isAdmin({ user: null })).toBe(false)
-      expect(getters.isAdmin({ user: { role: 'usual' } })).toBe(false)
-      expect(getters.isAdmin({ user: { role: 'admin' } })).toBe(true)
+    it('isAdmin requires an admin-area permission', () => {
+      expect(getters.isAdmin({ permissions: [] })).toBe(false)
+      expect(getters.isAdmin({ permissions: ['post.create'] })).toBe(false)
+      expect(getters.isAdmin({ permissions: ['role.manage'] })).toBe(true)
+      expect(getters.isAdmin({ permissions: ['policy.manage'] })).toBe(true)
     })
 
-    it('isModerator accepts admin OR moderator role', () => {
-      expect(getters.isModerator({ user: null })).toBe(false)
-      expect(getters.isModerator({ user: { role: 'usual' } })).toBe(false)
-      expect(getters.isModerator({ user: { role: 'moderator' } })).toBe(true)
-      expect(getters.isModerator({ user: { role: 'admin' } })).toBe(true)
+    it('isModerator requires the content.moderate permission', () => {
+      expect(getters.isModerator({ permissions: [] })).toBe(false)
+      expect(getters.isModerator({ permissions: ['post.create'] })).toBe(false)
+      expect(getters.isModerator({ permissions: ['content.moderate'] })).toBe(true)
+    })
+
+    it('permissions returns the stored permission array', () => {
+      expect(getters.permissions({ permissions: ['post.create'] })).toEqual(['post.create'])
+    })
+
+    it('can() is true only for held permissions', () => {
+      const can = getters.can({ permissions: ['post.create', 'role.manage'] })
+      expect(can('role.manage')).toBe(true)
+      expect(can('badge.manage')).toBe(false)
+      // tolerates a missing/non-array permissions state (e.g. anonymous)
+      expect(getters.can({ permissions: undefined })('post.create')).toBe(false)
     })
 
     it('user returns the stored user or an empty object', () => {
@@ -224,6 +244,32 @@ describe('auth store', () => {
         expect(result).toEqual({ id: 'u1' })
       })
 
+      it('commits the effective permissions from myPermissions', async () => {
+        const query = jest.fn().mockResolvedValue({
+          data: { currentUser: { id: 'u1' }, myPermissions: ['role.manage'] },
+        })
+        const commit = jest.fn()
+        const ctx = { commit, dispatch: jest.fn() }
+        await actions.fetchCurrentUser.call(
+          { app: { apolloProvider: { defaultClient: { query } } } },
+          ctx,
+        )
+        expect(commit).toHaveBeenCalledWith('SET_PERMISSIONS', ['role.manage'])
+      })
+
+      it('falls back to [] when myPermissions is absent (clears any stale permissions)', async () => {
+        const query = jest.fn().mockResolvedValue({
+          data: { currentUser: { id: 'u1' } }, // no myPermissions in the response
+        })
+        const commit = jest.fn()
+        const ctx = { commit, dispatch: jest.fn() }
+        await actions.fetchCurrentUser.call(
+          { app: { apolloProvider: { defaultClient: { query } } } },
+          ctx,
+        )
+        expect(commit).toHaveBeenCalledWith('SET_PERMISSIONS', [])
+      })
+
       it('dispatches logout when currentUser is null', async () => {
         const query = jest.fn().mockResolvedValue({ data: { currentUser: null } })
         const commit = jest.fn()
@@ -323,6 +369,7 @@ describe('auth store', () => {
         await actions.logout.call({ app: { $apolloHelpers: helpers } }, { commit, dispatch })
         expect(commit).toHaveBeenCalledWith('SET_USER', null)
         expect(commit).toHaveBeenCalledWith('SET_TOKEN', null)
+        expect(commit).toHaveBeenCalledWith('SET_PERMISSIONS', [])
         expect(helpers.onLogout).toHaveBeenCalled()
         expect(dispatch).toHaveBeenCalledWith('policy/init', null, { root: true })
         expect(dispatch).toHaveBeenCalledWith('policy/resubscribe', null, { root: true })

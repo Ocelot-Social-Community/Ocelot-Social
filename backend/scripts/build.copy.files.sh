@@ -26,3 +26,7 @@ cp -r src/graphql/types/type/*.gql build/src/graphql/types/type/
 # policy schema
 mkdir -p build/src/policy/
 cp src/policy/policy.schema.json build/src/policy/
+
+# permission catalog
+mkdir -p build/src/permission/
+cp src/permission/permission.catalog.json build/src/permission/

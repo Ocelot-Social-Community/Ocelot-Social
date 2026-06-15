@@ -32,12 +32,16 @@ describe('SearchResults', () => {
   beforeEach(() => {
     mocks = {
       $t: jest.fn(),
+      // Non-moderator viewer (children now gate via $can, not auth/isModerator).
+      $can: (permission) =>
+        ['post.create', 'group.create', 'group.create_hidden', 'user.invite'].includes(permission),
     }
     getters = {
       'auth/user': () => {
         return { id: 'u343', name: 'Matt' }
       },
       'auth/isModerator': () => false,
+      'auth/isAdmin': () => false,
     }
     propsData = {
       pageSize: 12,

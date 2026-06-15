@@ -14,6 +14,7 @@ import { v4 as uuid } from 'uuid'
 import { generateInviteCode } from '@graphql/resolvers/inviteCodes'
 import { isUniqueFor } from '@middleware/sluggifyMiddleware'
 import uniqueSlug, { toSlug } from '@middleware/slugify/uniqueSlug'
+import { seedDefaultRoleNodes } from '@src/role'
 
 import { getDriver, getNeode } from './neo4j'
 
@@ -45,6 +46,39 @@ export const cleanDatabase = async ({ withMigrations } = { withMigrations: false
   } finally {
     await session.close()
   }
+  // Re-seed the default role nodes so factory-built users get their HAS_ROLE edge
+  // and authorization resolves from the single-role system (there is no legacy
+  // user.role fallback anymore).
+  await seedDefaultRoleNodes()
+}
+
+// Test helper: replace a user's single HAS_ROLE edge with the named role (role nodes
+// are seeded by cleanDatabase). Returns the same node. Used where a test promotes an
+// existing user to moderator/admin mid-scenario (the legacy user.role is gone).
+export const assignRoleEdge = async (user, roleName: string) => {
+  const { id } = await user.toJson()
+  const session = driver.session()
+  try {
+    // Match the target role FIRST: an unknown roleName then yields zero rows, so
+    // the DELETE/MERGE never run (no silent edge wipe) and we can fail loudly
+    // below — a typo'd role in a test must not corrupt state and pass quietly.
+    const result = await session.writeTransaction((transaction) =>
+      transaction.run(
+        `MATCH (u:User {id: $id})
+         MATCH (r:Role {id: $roleName})
+         OPTIONAL MATCH (u)-[h:HAS_ROLE]->(:Role) DELETE h
+         MERGE (u)-[:HAS_ROLE]->(r)
+         RETURN r.id AS roleId`,
+        { id, roleName },
+      ),
+    )
+    if (result.records.length === 0) {
+      throw new Error(`assignRoleEdge: no Role node found for "${roleName}" (role not seeded?)`)
+    }
+  } finally {
+    await session.close()
+  }
+  return user
 }
 
 Factory.define('category')
@@ -113,31 +147,58 @@ Factory.define('basicUser')
     return hashSync(password, 10)
   })
 
+// Single-role: link a freshly built user to their role's :Role node (HAS_ROLE), so
+// the role system is populated at creation time and authorization resolves from it.
+// The target role node is the `roleName` option when given (e.g. 'owner'), else the
+// `role` build attr (a convenience selector — 'admin'/'moderator'/'user' — that is
+// NOT persisted; there is no User.role property). Role nodes are seeded by
+// cleanDatabase, so the edge is created in tests too. `roles` is the relationship key
+// on the User neode model.
+const relateUserToRole = async (user, roleName) => {
+  if (!roleName) return
+  const role = await neode.find('Role', roleName)
+  if (role) await user.relateTo(role, 'roles')
+}
+
+// Create a User node from the build attrs, then link it to its role node. `role` is
+// only a role-node selector (see relateUserToRole), so it is stripped before create.
+const createUserWithRole = async (buildObject, roleNameOverride) => {
+  const roleName = roleNameOverride ?? buildObject.role
+  delete buildObject.role
+  const user = await neode.create('User', buildObject)
+  await relateUserToRole(user, roleName)
+  return user
+}
+
 Factory.define('userWithoutEmailAddress')
   .extend('basicUser')
   .option('about', faker.lorem.paragraph)
-  .after(async (buildObject, _options) => {
-    return neode.create('User', buildObject)
+  .option('roleName', null)
+  .after(async (buildObject, options) => {
+    return createUserWithRole(buildObject, options.roleName)
   })
 
 Factory.define('userWithAboutNull')
   .extend('basicUser')
   .option('about', null)
-  .after(async (buildObject, _options) => {
-    return neode.create('User', buildObject)
+  .option('roleName', null)
+  .after(async (buildObject, options) => {
+    return createUserWithRole(buildObject, options.roleName)
   })
 
 Factory.define('userWithAboutEmpty')
   .extend('basicUser')
   .option('about', '')
-  .after(async (buildObject, _options) => {
-    return neode.create('User', buildObject)
+  .option('roleName', null)
+  .after(async (buildObject, options) => {
+    return createUserWithRole(buildObject, options.roleName)
   })
 
 Factory.define('user')
   .extend('basicUser')
   .option('about', faker.lorem.paragraph)
   .option('email', null)
+  .option('roleName', null)
   .option('avatar', () =>
     Factory.build('image', {
       url: faker.image.avatar(),
@@ -155,6 +216,8 @@ Factory.define('user')
     if (!options.email) {
       options.email = `${buildObject.slug as string}@example.org`
     }
+    const roleName = options.roleName ?? buildObject.role
+    delete buildObject.role
     const [user, email, avatar] = await Promise.all([
       neode.create('User', buildObject),
       neode.create('EmailAddress', { email: options.email }),
@@ -162,6 +225,7 @@ Factory.define('user')
     ])
     await Promise.all([user.relateTo(email, 'primaryEmail'), email.relateTo(user, 'belongsTo')])
     if (avatar) await user.relateTo(avatar, 'avatar')
+    await relateUserToRole(user, roleName)
     return user
   })
 

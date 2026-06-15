@@ -227,6 +227,30 @@ describe('SignupVerification', () => {
             })
           })
 
+          it('fails hard and persists no user when the baseline "user" role is missing', async () => {
+            // Simulate a misconfigured DB where role seeding never ran. The single-
+            // role model needs exactly one HAS_ROLE edge, so signup must roll back
+            // rather than create an edgeless, half-initialized account.
+            await database.write({ query: `MATCH (r:Role {id: 'user'}) DETACH DELETE r` })
+
+            const { data, errors } = await mutate({ mutation: SignupVerification, variables })
+            // Assert the specific baseline-role failure (not just any error) and that
+            // the mutation yielded no account — otherwise an unrelated error would let
+            // this test pass and mask a regression.
+            expect(errors).toEqual([
+              expect.objectContaining({
+                message: expect.stringContaining('baseline "user" role is not seeded'),
+              }),
+            ])
+            expect(data?.SignupVerification ?? null).toBeNull()
+
+            const { records } = await database.neode.cypher(
+              `MATCH (u:User {name: $name}) RETURN u`,
+              { name: 'John Doe' },
+            )
+            expect(records).toHaveLength(0)
+          })
+
           it('sets `verifiedAt` attribute of EmailAddress', async () => {
             await mutate({ mutation: SignupVerification, variables })
             const email = await database.neode.first(

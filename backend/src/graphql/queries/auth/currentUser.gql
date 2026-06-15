@@ -7,7 +7,7 @@ query currentUser {
       url
     }
     email
-    role
+    roleName
     activeCategories
     following {
       id

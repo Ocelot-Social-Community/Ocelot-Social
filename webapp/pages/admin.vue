@@ -3,7 +3,12 @@
     <h1 class="ds-heading ds-heading-h1">{{ $t('admin.name') }}</h1>
     <div class="ds-flex ds-flex-gap-small admin-layout">
       <div class="admin-layout__sidebar">
-        <os-menu :routes="routes" :is-exact="() => true" link-tag="router-link" />
+        <os-menu
+          :routes="routes"
+          :matcher="matcher"
+          :is-exact="() => true"
+          link-tag="router-link"
+        />
       </div>
       <div class="admin-layout__main">
         <transition name="slide-up" appear>
@@ -68,6 +73,10 @@ export default {
           name: this.$t('admin.policy.name'),
           path: '/admin/policy',
         },
+        {
+          name: this.$t('admin.roles.name'),
+          path: '/admin/roles',
+        },
         ...(this.$policy.get('apiKeysEnabled')
           ? [{ name: this.$t('admin.api-keys.name'), path: `/admin/api-keys` }]
           : []),
@@ -77,6 +86,13 @@ export default {
           path: `/admin/settings`
         } */
       ]
+    },
+  },
+  methods: {
+    // Highlight the active item by path only, so query params (e.g. the user-list
+    // ?q=… search string) don't drop the highlight.
+    matcher(url) {
+      return !!this.$route && this.$route.path === url
     },
   },
 }

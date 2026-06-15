@@ -160,10 +160,14 @@
 
         <div v-if="myProfile" class="profile-post-add-button-container">
           <os-button
-            as="nuxt-link"
+            :as="$can('post.create') ? 'nuxt-link' : 'button'"
             :to="{ name: 'post-create-type' }"
+            :class="{ 'permission-denied': !$can('post.create') }"
+            :aria-disabled="!$can('post.create')"
             v-tooltip="{
-              content: $t('contribution.newPost'),
+              content: $can('post.create')
+                ? $t('contribution.newPost')
+                : $t('permissions.deniedHint'),
               placement: 'left',
             }"
             class="profile-post-add-button"

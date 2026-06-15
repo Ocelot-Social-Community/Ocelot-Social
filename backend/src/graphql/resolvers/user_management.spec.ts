@@ -139,7 +139,7 @@ describe('currentUser', () => {
               email: 'test@example.org',
               name: 'Matilde Hermiston',
               slug: 'matilde-hermiston',
-              role: 'user',
+              roleName: 'user',
             },
           },
         }

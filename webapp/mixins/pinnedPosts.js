@@ -5,7 +5,6 @@ export default {
     ...mapGetters({
       currentlyPinnedPosts: 'pinnedPosts/currentlyPinnedPosts',
       pinnedPostsLoaded: 'pinnedPosts/loaded',
-      isAdmin: 'auth/isAdmin',
     }),
     // The pin limit is a network-policy key (single source of truth, live via the
     // policy subscription) — no longer carried by the PostsPinnedCounts query.
@@ -18,11 +17,11 @@ export default {
       fetchPinnedPostsCount: 'pinnedPosts/fetch',
     }),
     // The live network-wide count is only consulted when more than one pin is
-    // allowed (max === 1 / 0 never need it), and only admins can pin — so in the
-    // common single-pin deployment the PostsPinnedCounts round-trip is skipped
-    // entirely. Fetched at most once (guarded by the store's `loaded` flag).
+    // allowed (max === 1 / 0 never need it), and only users who may pin (post.pin)
+    // need it — so in the common single-pin deployment the PostsPinnedCounts
+    // round-trip is skipped entirely. Fetched at most once (guarded by `loaded`).
     maybeFetchPinnedPostsCount() {
-      if (this.isAdmin && this.maxPinnedPosts > 1 && !this.pinnedPostsLoaded) {
+      if (this.$can('post.pin') && this.maxPinnedPosts > 1 && !this.pinnedPostsLoaded) {
         this.fetchPinnedPostsCount()
       }
     },

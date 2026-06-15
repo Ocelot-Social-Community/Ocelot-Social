@@ -196,15 +196,61 @@
       "saveSuccess": "Policy updated.",
       "title": "Network policy settings"
     },
+    "roles": {
+      "allPermissions": "Holds every permission (protected).",
+      "cannotDelete": "This role cannot be deleted.",
+      "cannotDeleteHasMembers": "This role still has members — reassign them before deleting it.",
+      "create": "Create role",
+      "createTitle": "Create a new role",
+      "delete": "Delete",
+      "deleteError": "Could not delete role: {message}",
+      "deleteSuccess": "Role deleted.",
+      "description": "Create roles and assign permissions. Changes apply immediately.",
+      "groups": {
+        "administration": "Administration",
+        "content": "Content",
+        "membership": "Membership",
+        "moderation": "Moderation"
+      },
+      "members": "{count} members",
+      "name": "Roles & permissions",
+      "nameLabel": "Name",
+      "perm": {
+        "apiKey_administer": "Administer other users’ API keys.",
+        "badge_manage": "Grant and revoke badges.",
+        "content_moderate": "Review and decide on reported content.",
+        "donation_manage": "Configure the donations widget.",
+        "group_create": "Create groups.",
+        "group_create_hidden": "Create hidden groups.",
+        "network_statistics_read": "Read network-wide statistics.",
+        "policy_manage": "View and change network policy settings.",
+        "post_create": "Create posts.",
+        "post_pin": "Pin and unpin posts network-wide.",
+        "post_push": "Push and unpush (boost) posts.",
+        "role_manage": "Manage roles and assign them to users.",
+        "user_delete_any": "Delete any user’s account.",
+        "user_email_readAny": "Read any user’s email address.",
+        "user_invite": "Generate personal invite codes."
+      },
+      "protected": "protected",
+      "protectedHint": "The owner role holds every permission and cannot be edited.",
+      "save": "Save",
+      "saveError": "Could not save role: {message}",
+      "saveSuccess": "Role saved.",
+      "title": "Roles & permissions"
+    },
     "settings": {
       "name": "Settings"
     },
     "users": {
+      "addRole": "Assign role…",
+      "allRoles": "All roles",
       "empty": "No users found",
       "form": {
-        "placeholder": "e-mail, name or description"
+        "placeholder": "e-mail, name, description, or role:moderator"
       },
       "name": "Users",
+      "removeRole": "Remove role {role}",
       "roleChanged": "Role changed successfully!",
       "table": {
         "columns": {
@@ -979,6 +1025,9 @@
   "pagination": {
     "next": "Next",
     "previous": "Previous"
+  },
+  "permissions": {
+    "deniedHint": "You don't have permission for this."
   },
   "post": {
     "comment": {

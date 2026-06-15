@@ -13,10 +13,13 @@
         appearance="outline"
         circle
         class="generate-invite-code"
+        :class="{ 'permission-denied': !$can('user.invite') }"
+        :aria-disabled="!$can('user.invite')"
         :aria-label="$t('invite-codes.generate-code')"
         type="submit"
         :disabled="disabled"
         :loading="loading"
+        v-tooltip="{ content: !$can('user.invite') ? $t('permissions.deniedHint') : '' }"
       >
         <template #icon>
           <os-icon :icon="icons.plus" />
@@ -54,6 +57,13 @@ export default {
   },
   methods: {
     generateInviteCode() {
+      // The button is grayed (permission-denied + aria-disabled + tooltip) but stays
+      // clickable so the tooltip works; surface the reason via a toast instead of a
+      // silent no-op so a click/Enter isn't swallowed without feedback.
+      if (!this.$can('user.invite')) {
+        this.$toast.error(this.$t('permissions.deniedHint'))
+        return
+      }
       this.$emit('generate-invite-code', this.comment)
       this.comment = ''
     },

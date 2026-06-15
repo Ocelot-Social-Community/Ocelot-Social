@@ -179,23 +179,25 @@ describe('PolicyService', () => {
       expect(snap.publicRegistration).toBe(false) // public key still has its value
     })
 
-    it('exposes authenticated key values to a logged-in (non-admin) viewer', async () => {
+    it('exposes authenticated key values to a logged-in viewer', async () => {
       const svc = await initService()
-      const snap = svc.getVisibleSnapshot({ role: 'user' })
+      const snap = svc.getVisibleSnapshot({ authenticated: true })
       expect(Object.keys(snap).sort()).toEqual(ALL_KEYS)
       expect(snap.apiKeysEnabled).toBe(false) // value, not null
     })
 
-    it('exposes everything to an admin (superuser short-circuit)', async () => {
+    it('exposes every (auth-state) key to an admin viewer', async () => {
       const svc = await initService()
-      const snap = svc.getVisibleSnapshot({ role: 'admin' })
+      // admin's effective permissions cover any permission-gated key; the shipped
+      // keys are all public/authenticated, so an authenticated viewer sees them.
+      const snap = svc.getVisibleSnapshot({ authenticated: true, permissions: ['policy.manage'] })
       expect(Object.keys(snap).sort()).toEqual(ALL_KEYS)
       expect(snap.apiKeysEnabled).toBe(false)
     })
 
     it('returns integer keys as numbers (schema default) to a logged-in viewer', async () => {
       const svc = await initService()
-      const snap = svc.getVisibleSnapshot({ role: 'user' })
+      const snap = svc.getVisibleSnapshot({ authenticated: true })
       expect(snap.apiKeysMaxPerUser).toBe(5) // integer schema default, not coerced to boolean
       expect(snap.maxGroupPinnedPosts).toBe(1)
     })
@@ -255,7 +257,7 @@ describe('PolicyService', () => {
 
       expect(svc.getVisibleDefaults(null).apiKeysEnabled).toBeNull()
       expect(svc.getVisibleDefaults(null).inviteRegistration).toBe(true)
-      expect(svc.getVisibleDefaults({ role: 'admin' }).apiKeysEnabled).toBe(false)
+      expect(svc.getVisibleDefaults({ authenticated: true }).apiKeysEnabled).toBe(false)
     })
   })
 

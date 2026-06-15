@@ -42,7 +42,14 @@
           :disabled="update && (!group || group.myRole !== 'owner')"
           @change="changeGroupType($event)"
         >
-          <option v-for="groupType in groupTypeOptions" :key="groupType" :value="groupType">
+          <option
+            v-for="groupType in groupTypeOptions"
+            :key="groupType"
+            :value="groupType"
+            :disabled="
+              groupType === 'hidden' && group.groupType !== 'hidden' && !$can('group.create_hidden')
+            "
+          >
             {{ $t(`group.typesOptions.${groupType}`) }}
           </option>
         </select>
@@ -152,6 +159,11 @@
             type="submit"
             :loading="loading"
             :disabled="loading || checkFormError(formErrors)"
+            :class="{ 'permission-denied': !update && !$can('group.create') }"
+            :aria-disabled="!update && !$can('group.create')"
+            v-tooltip="{
+              content: !update && !$can('group.create') ? $t('permissions.deniedHint') : '',
+            }"
           >
             <template #icon><os-icon :icon="icons.save" /></template>
             {{ update ? $t('group.update') : $t('group.save') }}
@@ -326,6 +338,19 @@ export default {
       this.updateFormField('description', value)
     },
     onSubmit() {
+      // Block creating a group without permission (the button is grayed; this also
+      // guards keyboard Enter and direct navigation to the form).
+      if (!this.update && !this.$can('group.create')) return
+      // Turning a group hidden (creating one, or switching an existing group to
+      // hidden) additionally needs group.create_hidden. Editing an already-hidden
+      // group is fine.
+      if (
+        this.formData.groupType === 'hidden' &&
+        this.group.groupType !== 'hidden' &&
+        !this.$can('group.create_hidden')
+      ) {
+        return
+      }
       this.formSubmit(this.submit)
     },
     submit() {

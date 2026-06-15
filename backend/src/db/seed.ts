@@ -19,6 +19,7 @@ import CreateGroupRoom from '@graphql/queries/messaging/CreateGroupRoom.gql'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
 import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+import { ensureUserRoleEdges, seedDefaultRoleNodes } from '@src/role'
 
 import Factory from './factories'
 import { trophies, verification } from './seed/badges'
@@ -48,6 +49,12 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
   const { neode } = database
 
   try {
+    // Single-role system: seed the default role nodes up front so every user gets
+    // their HAS_ROLE edge at creation time (the factory links to the role node), and
+    // peterLustig can be created directly as owner. This script runs as a CLI without
+    // RoleService.init(), so nothing else seeds the role nodes.
+    await seedDefaultRoleNodes(database)
+
     // eslint-disable-next-line no-console
     console.log('seed', 'locations')
 
@@ -157,6 +164,24 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     // eslint-disable-next-line no-console
     console.log('seed', 'users')
+    // Two role-assignment patterns below, by design (see relateUserToRole in
+    // factories.ts): the `owner` is granted explicitly via the `roleName` option,
+    // while the admin/moderator/user *tiers* use the `role` build-attr selector.
+    // Petra Lustig is the instance OWNER — the failsafe superuser (single HAS_ROLE
+    // edge to the owner role). Login: owner@example.org / 1234.
+    await Factory.build(
+      'user',
+      {
+        id: 'u0',
+        name: 'Petra Lustig',
+        slug: 'petra-lustig',
+      },
+      {
+        email: 'owner@example.org',
+        roleName: 'owner',
+        avatar: null,
+      },
+    )
     const peterLustig = await Factory.build(
       'user',
       {
@@ -167,6 +192,8 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         locationName: 'Berlin, Germany',
       },
       {
+        // peterLustig is an admin (admin role via the 'admin' tier selector).
+        // Login: admin@example.org / 1234.
         email: 'admin@example.org',
       },
     )
@@ -2015,6 +2042,10 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     }
 
     // Group g0 (Investigative Journalism) - intentionally NO chat seeded
+
+    // Safety net: give any user still without a HAS_ROLE edge their tier edge (users
+    // built by the factory after seeding the role nodes already have one). Idempotent.
+    await ensureUserRoleEdges()
   } catch (err) {
     /* eslint-disable-next-line no-console */
     console.error(err)

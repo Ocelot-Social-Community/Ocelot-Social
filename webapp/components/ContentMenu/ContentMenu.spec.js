@@ -13,7 +13,7 @@ const stubs = {
   'report-modal': { template: '<div class="report-modal-stub" />' },
 }
 
-let getters, actions, mocks, menuToggle, openModalSpy
+let getters, actions, mocks, menuToggle, openModalSpy, granted
 
 const maxPinnedPostsMock = jest.fn()
 const currentlyPinnedPostsMock = jest.fn()
@@ -31,13 +31,20 @@ describe('ContentMenu.vue', () => {
       // maxPinnedPosts now comes from the network policy (not the pinnedPosts
       // store); delegate to the existing mock so the per-test values still apply.
       $policy: { get: (key) => (key === 'maxPinnedPosts' ? maxPinnedPostsMock() : false) },
+      // Per-test permission set: each test grants EXACTLY the permission it exercises
+      // (post.pin / post.push / user.delete.any / content.moderate) via granted.add(),
+      // so the tests verify the granular gating — not a coarse "isAdmin" lump. Reset
+      // here, so tests are independent (no cross-test privilege leakage).
+      $can: (permission) => granted.has(permission),
     }
+    granted = new Set()
   })
 
   describe('mount', () => {
     getters = {
-      'auth/isModerator': () => false,
-      'auth/isAdmin': () => false,
+      // Privilege is driven per-test via the `granted` permission set ($can mock).
+      // No auth/* store getters needed: the component and the pinnedPosts mixin both
+      // gate on $can now (not auth/isAdmin / auth/isModerator).
       'pinnedPosts/currentlyPinnedPosts': currentlyPinnedPostsMock,
       'pinnedPosts/loaded': () => true,
     }
@@ -93,7 +100,7 @@ describe('ContentMenu.vue', () => {
 
     describe('admin can', () => {
       it('push post', async () => {
-        getters['auth/isAdmin'] = () => true
+        granted.add('post.push')
         const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'contribution',
@@ -123,7 +130,7 @@ describe('ContentMenu.vue', () => {
       })
 
       it('not unpush post which was not pushed', async () => {
-        getters['auth/isAdmin'] = () => true
+        granted.add('post.push')
         const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'contribution',
@@ -139,7 +146,7 @@ describe('ContentMenu.vue', () => {
       })
 
       it('unpush post which was pushed', async () => {
-        getters['auth/isAdmin'] = () => true
+        granted.add('post.push')
         const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'contribution',
@@ -174,7 +181,7 @@ describe('ContentMenu.vue', () => {
         })
 
         it('not pin unpinned post', async () => {
-          getters['auth/isAdmin'] = () => true
+          granted.add('post.pin')
           const wrapper = await openContentMenu({
             isOwner: false,
             resourceType: 'contribution',
@@ -189,6 +196,7 @@ describe('ContentMenu.vue', () => {
         })
 
         it('unpin pinned post', async () => {
+          granted.add('post.pin')
           const wrapper = await openContentMenu({
             isOwner: false,
             resourceType: 'contribution',
@@ -219,7 +227,7 @@ describe('ContentMenu.vue', () => {
         })
 
         it('pin unpinned post', async () => {
-          getters['auth/isAdmin'] = () => true
+          granted.add('post.pin')
           const wrapper = await openContentMenu({
             isOwner: false,
             resourceType: 'contribution',
@@ -244,6 +252,7 @@ describe('ContentMenu.vue', () => {
         })
 
         it('unpin pinned post', async () => {
+          granted.add('post.pin')
           const wrapper = await openContentMenu({
             isOwner: false,
             resourceType: 'contribution',
@@ -269,7 +278,7 @@ describe('ContentMenu.vue', () => {
 
         describe('post in public group', () => {
           it('can pin unpinned post', async () => {
-            getters['auth/isAdmin'] = () => true
+            granted.add('post.pin')
             const wrapper = await openContentMenu({
               isOwner: false,
               resourceType: 'contribution',
@@ -302,7 +311,7 @@ describe('ContentMenu.vue', () => {
 
         describe('post in closed group', () => {
           it('can not be pinned', async () => {
-            getters['auth/isAdmin'] = () => true
+            granted.add('post.pin')
             const wrapper = await openContentMenu({
               isOwner: false,
               resourceType: 'contribution',
@@ -322,7 +331,7 @@ describe('ContentMenu.vue', () => {
 
         describe('post in hidden group', () => {
           it('can not be pinned', async () => {
-            getters['auth/isAdmin'] = () => true
+            granted.add('post.pin')
             const wrapper = await openContentMenu({
               isOwner: false,
               resourceType: 'contribution',
@@ -349,7 +358,7 @@ describe('ContentMenu.vue', () => {
           })
 
           it('pin unpinned post', async () => {
-            getters['auth/isAdmin'] = () => true
+            granted.add('post.pin')
             const wrapper = await openContentMenu({
               isOwner: false,
               resourceType: 'contribution',
@@ -374,6 +383,7 @@ describe('ContentMenu.vue', () => {
           })
 
           it('unpin pinned post', async () => {
+            granted.add('post.pin')
             const wrapper = await openContentMenu({
               isOwner: false,
               resourceType: 'contribution',
@@ -405,7 +415,7 @@ describe('ContentMenu.vue', () => {
           })
 
           it('not pin unpinned post', async () => {
-            getters['auth/isAdmin'] = () => true
+            granted.add('post.pin')
             const wrapper = await openContentMenu({
               isOwner: false,
               resourceType: 'contribution',
@@ -420,6 +430,7 @@ describe('ContentMenu.vue', () => {
           })
 
           it('unpin pinned post', async () => {
+            granted.add('post.pin')
             const wrapper = await openContentMenu({
               isOwner: false,
               resourceType: 'contribution',
@@ -446,6 +457,7 @@ describe('ContentMenu.vue', () => {
       })
 
       it('can delete another user', async () => {
+        granted.add('user.delete.any')
         getters['auth/user'] = () => {
           return { id: 'some-user', slug: 'some-user' }
         }
@@ -472,6 +484,7 @@ describe('ContentMenu.vue', () => {
       })
 
       it('can not delete the own account', async () => {
+        granted.add('user.delete.any')
         const wrapper = await openContentMenu({
           resourceType: 'user',
           resource: {
@@ -519,8 +532,6 @@ describe('ContentMenu.vue', () => {
 
     describe('reporting', () => {
       it('a post of another user is possible', async () => {
-        getters['auth/isAdmin'] = () => false
-        getters['auth/isModerator'] = () => false
         const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'contribution',
@@ -591,8 +602,7 @@ describe('ContentMenu.vue', () => {
 
     describe('moderator', () => {
       it('can disable posts', async () => {
-        getters['auth/isAdmin'] = () => false
-        getters['auth/isModerator'] = () => true
+        granted.add('content.moderate')
         const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'contribution',
@@ -611,6 +621,7 @@ describe('ContentMenu.vue', () => {
       })
 
       it('can disable comments', async () => {
+        granted.add('content.moderate')
         const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'comment',
@@ -629,6 +640,7 @@ describe('ContentMenu.vue', () => {
       })
 
       it('can disable users', async () => {
+        granted.add('content.moderate')
         const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'user',
@@ -647,6 +659,7 @@ describe('ContentMenu.vue', () => {
       })
 
       it('can disable organizations', async () => {
+        granted.add('content.moderate')
         const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'organization',
@@ -665,6 +678,7 @@ describe('ContentMenu.vue', () => {
       })
 
       it('can release posts', async () => {
+        granted.add('content.moderate')
         const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'contribution',
@@ -683,6 +697,7 @@ describe('ContentMenu.vue', () => {
       })
 
       it('can release comments', async () => {
+        granted.add('content.moderate')
         const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'comment',
@@ -701,6 +716,7 @@ describe('ContentMenu.vue', () => {
       })
 
       it('can release users', async () => {
+        granted.add('content.moderate')
         const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'user',
@@ -719,6 +735,7 @@ describe('ContentMenu.vue', () => {
       })
 
       it('can release organizations', async () => {
+        granted.add('content.moderate')
         const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'organization',
@@ -739,8 +756,6 @@ describe('ContentMenu.vue', () => {
 
     describe('user', () => {
       it('can access settings', async () => {
-        getters['auth/isAdmin'] = () => false
-        getters['auth/isModerator'] = () => false
         const wrapper = await openContentMenu({
           isOwner: true,
           resourceType: 'user',
@@ -839,6 +854,39 @@ describe('ContentMenu.vue', () => {
         expect(wrapper.emitted('toggleObservePost')).toEqual([
           ['d23a4265-f5f7-4e17-9f86-85f714b4b9f8', false],
         ])
+      })
+    })
+
+    // The pinnedPosts mixin fetches the live network-wide pin count only for viewers
+    // who may actually pin — gated on post.pin (NOT a coarse isAdmin), consistent with
+    // the pin action itself.
+    describe('pinned-posts count fetch (mixin gates on post.pin)', () => {
+      const mountWith = (canPin) => {
+        const fetch = jest.fn()
+        const store = new Vuex.Store({
+          getters: {
+            'pinnedPosts/currentlyPinnedPosts': () => 0,
+            'pinnedPosts/loaded': () => false, // not yet fetched
+          },
+          actions: { 'pinnedPosts/fetch': fetch },
+        })
+        maxPinnedPostsMock.mockReturnValue(3) // > 1 → the live count is relevant
+        mount(ContentMenu, {
+          propsData: { resourceType: 'contribution', resource: { id: 'x' } },
+          mocks: { ...mocks, $can: (permission) => (permission === 'post.pin' ? canPin : false) },
+          store,
+          localVue,
+          stubs,
+        })
+        return fetch
+      }
+
+      it('fetches the count when the viewer may pin (post.pin)', () => {
+        expect(mountWith(true)).toHaveBeenCalled()
+      })
+
+      it('does NOT fetch when the viewer cannot pin', () => {
+        expect(mountWith(false)).not.toHaveBeenCalled()
       })
     })
   })

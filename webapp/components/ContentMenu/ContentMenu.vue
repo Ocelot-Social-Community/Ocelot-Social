@@ -123,7 +123,10 @@ export default {
           })
         }
 
-        if (this.isAdmin && (!this.resource.group || this.resource.group.groupType === 'public')) {
+        if (
+          this.$can('post.pin') &&
+          (!this.resource.group || this.resource.group.groupType === 'public')
+        ) {
           if (!this.resource.pinnedBy && this.canBePinned) {
             routes.push({
               label: this.$t(`post.menu.pin`),
@@ -145,7 +148,7 @@ export default {
           }
         }
 
-        if (this.isAdmin) {
+        if (this.$can('post.push')) {
           routes.push({
             label: this.$t(`post.menu.push`),
             callback: () => {
@@ -155,7 +158,7 @@ export default {
           })
         }
 
-        if (this.isAdmin && this.resource.sortDate !== this.resource.createdAt) {
+        if (this.$can('post.push') && this.resource.sortDate !== this.resource.createdAt) {
           routes.push({
             label: this.$t(`post.menu.unpush`),
             callback: () => {
@@ -211,7 +214,7 @@ export default {
         })
       }
 
-      if (!this.isOwner && this.isModerator) {
+      if (!this.isOwner && this.$can('content.moderate')) {
         if (!this.resource.disabled) {
           routes.push({
             label: this.$t(`disable.${this.resourceType}.title`),
@@ -273,7 +276,7 @@ export default {
               icon: this.icons.userTimes,
             })
           }
-          if (this.isAdmin === true) {
+          if (this.$can('user.delete.any')) {
             routes.push({
               label: this.$t(`settings.deleteUserAccount.name`),
               callback: () => {
@@ -303,12 +306,6 @@ export default {
       }
 
       return routes
-    },
-    isModerator() {
-      return this.$store.getters['auth/isModerator']
-    },
-    isAdmin() {
-      return this.$store.getters['auth/isAdmin']
     },
     canBePinned() {
       return (

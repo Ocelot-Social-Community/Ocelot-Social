@@ -199,6 +199,12 @@
                 type="submit"
                 :loading="loading"
                 :disabled="!!formErrors"
+                :class="{ 'permission-denied': !contribution.id && !$can('post.create') }"
+                :aria-disabled="!contribution.id && !$can('post.create')"
+                v-tooltip="{
+                  content:
+                    !contribution.id && !$can('post.create') ? $t('permissions.deniedHint') : '',
+                }"
               >
                 <template #icon>
                   <os-icon :icon="icons.check" />
@@ -444,6 +450,14 @@ export default {
       return date <= new Date(this.formData.eventStart)
     },
     onSubmit() {
+      // Block creating a post without permission (editing stays allowed). The button is
+      // grayed (permission-denied + aria-disabled + tooltip); this also guards keyboard
+      // Enter and direct navigation. Surface the reason via a toast instead of a silent
+      // no-op so a click/Enter isn't swallowed without feedback.
+      if (!this.contribution.id && !this.$can('post.create')) {
+        this.$toast.error(this.$t('permissions.deniedHint'))
+        return
+      }
       this.formSubmit(this.submit)
     },
     submit() {

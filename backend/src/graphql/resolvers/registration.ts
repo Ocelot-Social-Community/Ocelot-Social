@@ -68,7 +68,6 @@ export default {
             MERGE (user)<-[:BELONGS_TO]-(email)
             SET user += $args
             SET user.id = randomUUID()
-            SET user.role = 'user'
             SET user.createdAt = toString(datetime())
             SET user.updatedAt = toString(datetime())
             SET user.allowEmbedIframes = false
@@ -82,7 +81,12 @@ export default {
             FOREACH (invisiblePost IN invisiblePosts |
               MERGE (user)-[:CANNOT_SEE]->(invisiblePost)
             )
-            RETURN user {.*}
+            WITH user
+            OPTIONAL MATCH (baselineRole:Role {id: 'user'})
+            FOREACH (r IN CASE WHEN baselineRole IS NULL THEN [] ELSE [baselineRole] END |
+              MERGE (user)-[:HAS_ROLE]->(r)
+            )
+            RETURN user {.*} AS user, baselineRole IS NOT NULL AS roleAssigned
           `,
           {
             args,
@@ -92,8 +96,18 @@ export default {
             locationName,
           },
         )
-        const [user] = createUserTransactionResponse.records.map((record) => record.get('user'))
+        const [record] = createUserTransactionResponse.records
+        const user = record?.get('user')
         if (!user) throw new UserInputError('Invalid email or nonce')
+        // The single-role model requires exactly one HAS_ROLE edge. If the baseline
+        // 'user' role node is not seeded, fail hard (rolls back this transaction)
+        // rather than persist a half-initialized, edgeless user that later breaks
+        // roleName / userRoles / role filters.
+        if (!record.get('roleAssigned')) {
+          throw new Error(
+            'The baseline "user" role is not seeded; cannot assign a role to the new account.',
+          )
+        }
 
         return user
       })

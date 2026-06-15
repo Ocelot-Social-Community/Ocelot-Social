@@ -196,15 +196,61 @@
       "saveSuccess": "Zasady zaktualizowane.",
       "title": "Ustawienia zasad sieci"
     },
+    "roles": {
+      "allPermissions": "Posiada wszystkie uprawnienia (chroniona).",
+      "cannotDelete": "Tej roli nie można usunąć.",
+      "cannotDeleteHasMembers": "Ta rola ma jeszcze członków — najpierw przypisz im inną rolę.",
+      "create": "Utwórz rolę",
+      "createTitle": "Utwórz nową rolę",
+      "delete": "Usuń",
+      "deleteError": "Nie można usunąć roli: {message}",
+      "deleteSuccess": "Rola usunięta.",
+      "description": "Twórz role i przypisuj uprawnienia. Zmiany obowiązują natychmiast.",
+      "groups": {
+        "administration": "Administracja",
+        "content": "Treści",
+        "membership": "Członkostwo",
+        "moderation": "Moderacja"
+      },
+      "members": "{count} członków",
+      "name": "Role i uprawnienia",
+      "nameLabel": "Nazwa",
+      "perm": {
+        "apiKey_administer": "Zarządzanie kluczami API innych użytkowników.",
+        "badge_manage": "Przyznawanie i odbieranie odznak.",
+        "content_moderate": "Przeglądanie i rozstrzyganie zgłoszonych treści.",
+        "donation_manage": "Konfigurowanie widgetu darowizn.",
+        "group_create": "Tworzenie grup.",
+        "group_create_hidden": "Tworzenie ukrytych grup.",
+        "network_statistics_read": "Przeglądanie statystyk całej sieci.",
+        "policy_manage": "Przeglądanie i zmiana ustawień zasad sieci.",
+        "post_create": "Tworzenie wpisów.",
+        "post_pin": "Przypinanie i odpinanie wpisów w całej sieci.",
+        "post_push": "Promowanie i wycofywanie (boost) wpisów.",
+        "role_manage": "Zarządzanie rolami i przypisywanie ich użytkownikom.",
+        "user_delete_any": "Usuwanie konta dowolnego użytkownika.",
+        "user_email_readAny": "Odczyt adresu e-mail dowolnego użytkownika.",
+        "user_invite": "Generowanie osobistych kodów zaproszeń."
+      },
+      "protected": "chroniona",
+      "protectedHint": "Rola właściciela ma wszystkie uprawnienia i nie można jej edytować.",
+      "save": "Zapisz",
+      "saveError": "Nie można zapisać roli: {message}",
+      "saveSuccess": "Rola zapisana.",
+      "title": "Role i uprawnienia"
+    },
     "settings": {
       "name": "Ustawienia"
     },
     "users": {
+      "addRole": "Przypisz rolę…",
+      "allRoles": "Wszystkie role",
       "empty": "Nie znaleziono użytkowników",
       "form": {
-        "placeholder": "e-mail, nazwa lub opis"
+        "placeholder": "e-mail, nazwa, opis lub role:moderator"
       },
       "name": "Użytkownicy",
+      "removeRole": "Usuń rolę {role}",
       "roleChanged": "Rola została zmieniona!",
       "table": {
         "columns": {
@@ -979,6 +1025,9 @@
   "pagination": {
     "next": "Następna",
     "previous": "Poprzednia"
+  },
+  "permissions": {
+    "deniedHint": "Nie masz do tego uprawnień."
   },
   "post": {
     "comment": {

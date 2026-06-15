@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ocelot.social/schemas/permission-catalog.json",
+  "title": "PermissionCatalog",
+  "description": "Closed, code-owned catalog of global permissions. Each key names a real enforcement point in the GraphQL shield (operation -> permission). Roles (DB data) bundle these keys; a permission has meaning only at its enforcement point, so the catalog is decoupled as DATA but closed in lifecycle (a new key ships with a new gate). Keys are dotted/namespaced (readable, scope-friendly) and therefore exposed over the API as String + catalog-validated, not as a GraphQL enum.",
+  "permissions": {
+    "network.statistics.read": {
+      "group": "administration",
+      "description": "Read network-wide statistics and pinned-post counts."
+    },
+    "role.manage": {
+      "group": "administration",
+      "description": "Manage roles and their permissions, and assign/unassign roles to users."
+    },
+    "policy.manage": {
+      "group": "administration",
+      "description": "View and change network policy settings (defaults, set, reset)."
+    },
+    "donation.manage": {
+      "group": "administration",
+      "description": "Configure the donations widget."
+    },
+    "apiKey.administer": {
+      "group": "administration",
+      "description": "Administer other users' API keys (list and revoke)."
+    },
+    "user.email.readAny": {
+      "group": "administration",
+      "description": "Read any user's email address (beyond one's own)."
+    },
+    "badge.manage": {
+      "group": "moderation",
+      "description": "Grant and revoke verification and trophy badges."
+    },
+    "content.moderate": {
+      "group": "moderation",
+      "description": "Access reports and review (decide) on reported content."
+    },
+    "user.delete.any": {
+      "group": "moderation",
+      "description": "Delete any user's account (own-account deletion stays self-allowed)."
+    },
+    "post.pin": {
+      "group": "moderation",
+      "description": "Pin and unpin posts network-wide."
+    },
+    "post.push": {
+      "group": "moderation",
+      "description": "Push and unpush (boost) posts."
+    },
+    "post.create": {
+      "group": "content",
+      "description": "Create posts (still subject to group membership where applicable)."
+    },
+    "group.create": {
+      "group": "content",
+      "description": "Create groups."
+    },
+    "group.create_hidden": {
+      "group": "content",
+      "description": "Create hidden groups (in addition to group.create)."
+    },
+    "user.invite": {
+      "group": "membership",
+      "description": "Generate personal invite codes to invite people to the network."
+    }
+  }
+}

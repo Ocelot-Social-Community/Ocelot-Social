@@ -292,7 +292,31 @@ exports[`Users given badges are disabled renders 1`] = `
             <td
               class="ds-table-col ds-table-col-right"
             >
-              <!---->
+              <select
+                class="user-role-select"
+                data-test="user-role-select-user"
+              >
+                <option
+                  value="user"
+                >
+                  user
+                </option>
+                <option
+                  value="moderator"
+                >
+                  moderator
+                </option>
+                <option
+                  value="admin"
+                >
+                  admin
+                </option>
+                <option
+                  value="badge-setter"
+                >
+                  badge-setter
+                </option>
+              </select>
             </td>
              
             <!---->
@@ -369,7 +393,31 @@ exports[`Users given badges are disabled renders 1`] = `
             <td
               class="ds-table-col ds-table-col-right"
             >
-              <!---->
+              <select
+                class="user-role-select"
+                data-test="user-role-select-user2"
+              >
+                <option
+                  value="user"
+                >
+                  user
+                </option>
+                <option
+                  value="moderator"
+                >
+                  moderator
+                </option>
+                <option
+                  value="admin"
+                >
+                  admin
+                </option>
+                <option
+                  value="badge-setter"
+                >
+                  badge-setter
+                </option>
+              </select>
             </td>
              
             <!---->
@@ -752,7 +800,31 @@ exports[`Users given badges are enabled renders 1`] = `
             <td
               class="ds-table-col ds-table-col-right"
             >
-              <!---->
+              <select
+                class="user-role-select"
+                data-test="user-role-select-user"
+              >
+                <option
+                  value="user"
+                >
+                  user
+                </option>
+                <option
+                  value="moderator"
+                >
+                  moderator
+                </option>
+                <option
+                  value="admin"
+                >
+                  admin
+                </option>
+                <option
+                  value="badge-setter"
+                >
+                  badge-setter
+                </option>
+              </select>
             </td>
              
             <td
@@ -862,7 +934,31 @@ exports[`Users given badges are enabled renders 1`] = `
             <td
               class="ds-table-col ds-table-col-right"
             >
-              <!---->
+              <select
+                class="user-role-select"
+                data-test="user-role-select-user2"
+              >
+                <option
+                  value="user"
+                >
+                  user
+                </option>
+                <option
+                  value="moderator"
+                >
+                  moderator
+                </option>
+                <option
+                  value="admin"
+                >
+                  admin
+                </option>
+                <option
+                  value="badge-setter"
+                >
+                  badge-setter
+                </option>
+              </select>
             </td>
              
             <td

@@ -156,4 +156,72 @@ describe('GroupForm', () => {
       expect(wrapper.vm.disableButtonByUpdate).toBe(false)
     })
   })
+
+  describe('hidden group permission (group.create_hidden)', () => {
+    const mountWith = (can) =>
+      mount(GroupForm, {
+        propsData: { update: false, group: {} },
+        mocks: { $t: jest.fn(), $can: can },
+        localVue,
+        stubs,
+        store,
+      })
+
+    it('blocks onSubmit for a hidden group without group.create_hidden', () => {
+      const wrapper = mountWith((p) => p === 'group.create') // create yes, create_hidden no
+      const formSubmit = jest.spyOn(wrapper.vm, 'formSubmit').mockImplementation(() => {})
+      wrapper.vm.formData.groupType = 'hidden'
+      wrapper.vm.onSubmit()
+      expect(formSubmit).not.toHaveBeenCalled()
+    })
+
+    it('allows onSubmit for a hidden group with group.create_hidden', () => {
+      const wrapper = mountWith(() => true)
+      const formSubmit = jest.spyOn(wrapper.vm, 'formSubmit').mockImplementation(() => {})
+      wrapper.vm.formData.groupType = 'hidden'
+      wrapper.vm.onSubmit()
+      expect(formSubmit).toHaveBeenCalled()
+    })
+
+    it('disables the hidden option in the type select when not permitted', () => {
+      const wrapper = mountWith((p) => p === 'group.create')
+      const hiddenOption = wrapper
+        .findAll('option')
+        .wrappers.find((o) => o.attributes('value') === 'hidden')
+      expect(hiddenOption.attributes('disabled')).toBeDefined()
+    })
+
+    const mountEdit = (can, groupOverrides = {}) =>
+      mount(GroupForm, {
+        propsData: { update: true, group: { ...group, ...groupOverrides } },
+        mocks: { $t: jest.fn(), $can: can },
+        localVue,
+        stubs,
+        store,
+      })
+
+    it('blocks switching an existing public group to hidden without group.create_hidden', () => {
+      const wrapper = mountEdit(() => false, { groupType: 'public' })
+      const formSubmit = jest.spyOn(wrapper.vm, 'formSubmit').mockImplementation(() => {})
+      wrapper.vm.formData.groupType = 'hidden'
+      wrapper.vm.onSubmit()
+      expect(formSubmit).not.toHaveBeenCalled()
+    })
+
+    it('allows editing an already-hidden group without group.create_hidden', () => {
+      const wrapper = mountEdit(() => false, { groupType: 'hidden' })
+      const formSubmit = jest.spyOn(wrapper.vm, 'formSubmit').mockImplementation(() => {})
+      wrapper.vm.formData.groupType = 'hidden'
+      wrapper.vm.onSubmit()
+      expect(formSubmit).toHaveBeenCalled()
+    })
+
+    it('keeps the hidden option enabled when the group is already hidden', () => {
+      const wrapper = mountEdit(() => false, { groupType: 'hidden' })
+      const hiddenOption = wrapper
+        .findAll('option')
+        .wrappers.find((o) => o.attributes('value') === 'hidden')
+      expect(hiddenOption.attributes('disabled')).toBeUndefined()
+    })
+  })
 })

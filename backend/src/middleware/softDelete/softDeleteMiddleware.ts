@@ -2,23 +2,26 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
+import type { Context } from '@src/context'
 import type { IMiddlewareResolver } from 'graphql-middleware/dist/types'
 
-const isModerator = ({ user }) => {
-  return user && (user.role === 'moderator' || user.role === 'admin')
+// Moderators (anyone holding content.moderate) may see disabled content; everyone
+// else has it filtered/obfuscated. Resolved from the per-request permission set.
+const canModerate = ({ effectivePermissions }: Pick<Context, 'effectivePermissions'>) => {
+  return effectivePermissions.has('content.moderate')
 }
 
 const setDefaultFilters: IMiddlewareResolver = async (resolve, root, args, context, info) => {
   args.deleted = false
 
-  if (!isModerator(context)) {
+  if (!canModerate(context)) {
     args.disabled = false
   }
   return resolve(root, args, context, info)
 }
 
 const obfuscate: IMiddlewareResolver = async (resolve, root, args, context, info) => {
-  if (root.deleted || (!isModerator(context) && root.disabled)) {
+  if (root.deleted || (!canModerate(context) && root.disabled)) {
     root.content = 'UNAVAILABLE'
     root.title = 'UNAVAILABLE'
     root.slug = 'UNAVAILABLE'

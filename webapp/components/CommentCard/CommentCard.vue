@@ -135,7 +135,6 @@ export default {
   computed: {
     ...mapGetters({
       user: 'auth/user',
-      isModerator: 'auth/isModerator',
     }),
     hasLongContent() {
       return this.$filters.removeHtml(this.comment.content).length > COMMENT_MAX_UNTRUNCATED_LENGTH
@@ -146,7 +145,7 @@ export default {
       return this.$store.getters['auth/user'].id === author.id
     },
     isUnavailable() {
-      return (this.comment.deleted || this.comment.disabled) && !this.isModerator
+      return (this.comment.deleted || this.comment.disabled) && !this.$can('content.moderate')
     },
     wasEdited() {
       return this.comment.createdAt !== this.comment.updatedAt

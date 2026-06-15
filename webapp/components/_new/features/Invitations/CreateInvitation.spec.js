@@ -7,7 +7,7 @@ const localVue = global.localVue
 describe('CreateInvitation.vue', () => {
   let wrapper
 
-  const Wrapper = ({ isDisabled = false }) => {
+  const Wrapper = ({ isDisabled = false, mocks = {} } = {}) => {
     return render(CreateInvitation, {
       localVue,
       propsData: {
@@ -15,6 +15,7 @@ describe('CreateInvitation.vue', () => {
       },
       mocks: {
         $t: jest.fn((v) => v),
+        ...mocks,
       },
     })
   }
@@ -46,6 +47,16 @@ describe('CreateInvitation.vue', () => {
       await fireEvent.update(input, 'Test comment')
       await fireEvent.click(button)
       expect(wrapper.emitted()['generate-invite-code']).toEqual([['Test comment']])
+    })
+  })
+
+  describe('without the user.invite permission', () => {
+    it('does not emit and shows a denied-hint toast instead of a silent no-op', async () => {
+      const $toast = { error: jest.fn() }
+      wrapper = Wrapper({ mocks: { $can: () => false, $toast } })
+      await fireEvent.click(screen.getByRole('button'))
+      expect(wrapper.emitted()['generate-invite-code']).toBeUndefined()
+      expect($toast.error).toHaveBeenCalledWith('permissions.deniedHint')
     })
   })
 })

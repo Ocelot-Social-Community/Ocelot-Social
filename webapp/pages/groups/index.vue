@@ -8,8 +8,10 @@
       <!-- create group -->
       <div class="ds-mb-large ds-space-centered">
         <os-button
-          as="nuxt-link"
+          :as="$can('group.create') ? 'nuxt-link' : 'button'"
           :to="{ name: 'groups-create' }"
+          :class="{ 'permission-denied': !$can('group.create') }"
+          :aria-disabled="!$can('group.create')"
           class="group-add-button"
           variant="primary"
           appearance="filled"
@@ -17,7 +19,9 @@
           size="xl"
           :aria-label="$t('group.createNewGroup.tooltip')"
           v-tooltip="{
-            content: $t('group.createNewGroup.tooltip'),
+            content: $can('group.create')
+              ? $t('group.createNewGroup.tooltip')
+              : $t('permissions.deniedHint'),
             placement: 'left',
           }"
         >

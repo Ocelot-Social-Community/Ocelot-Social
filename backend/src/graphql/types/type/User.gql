@@ -5,8 +5,6 @@ enum _UserOrdering {
   name_desc
   slug_asc
   slug_desc
-  role_asc
-  role_desc
   locationName_asc
   locationName_desc
   about_asc
@@ -44,7 +42,8 @@ type User {
   avatar: Image @relation(name: "AVATAR_IMAGE", direction: "OUT")
   deleted: Boolean
   disabled: Boolean
-  role: UserRole!
+  "The user's single dynamic role name (HAS_ROLE), incl. custom roles. Visible with role.manage."
+  roleName: String
   publicKey: String
   invitedBy: User @relation(name: "INVITED", direction: "IN")
   invited: [User] @relation(name: "INVITED", direction: "OUT")
@@ -177,7 +176,6 @@ input _UserFilter {
   followedBy_none: _UserFilter
   followedBy_single: _UserFilter
   followedBy_every: _UserFilter
-  role_in: [UserRole!]
 }
 
 type Query {
@@ -186,18 +184,19 @@ type Query {
     email: String # admins need to search for a user sometimes
     name: String
     slug: String
-    role: UserRole
     locationName: String
     about: String
     createdAt: String
     updatedAt: String
+    "Admin user search: filter by single role (HAS_ROLE) and/or a free-text term (name/slug/about/email). Combinable; requires role.manage."
+    roleName: String
+    search: String
     first: Int
     offset: Int
     orderBy: [_UserOrdering]
     filter: _UserFilter
   ): [User]
 
-  availableRoles: [UserRole]!
   mutedUsers: [User]
   blockedUsers: [User]
   currentUser: User!
@@ -235,8 +234,6 @@ type Mutation {
 
   followUser(id: ID!): User
   unfollowUser(id: ID!): User
-
-  switchUserRole(role: UserRole!, id: ID!): User
 
   saveCategorySettings(activeCategories: [String]): Boolean
 

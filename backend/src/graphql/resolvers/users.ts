@@ -70,6 +70,101 @@ export default {
           await session.close()
         }
       }
+      if (args.roleName || args.search) {
+        // Admin user search: filter by single role (HAS_ROLE) and/or a free-text term
+        // (name/slug/about, case-insensitive), combinable. role.manage-only.
+        if (!context.effectivePermissions.has('role.manage')) {
+          throw new ForbiddenError('Not Authorized!')
+        }
+        // This specialised path honours only roleName/search + pagination + ordering.
+        // Other filter args the schema advertises do NOT compose here, so reject them
+        // explicitly instead of silently ignoring (which would make results depend on
+        // the argument combination — see the standard neo4jgraphql path below).
+        const incompatible = Object.entries({
+          id: args.id,
+          name: args.name,
+          slug: args.slug,
+          locationName: args.locationName,
+          about: args.about,
+          createdAt: args.createdAt,
+          updatedAt: args.updatedAt,
+          filter: args.filter,
+        })
+          .filter(([, value]) => value !== undefined && value !== null)
+          .map(([key]) => key)
+        if (incompatible.length > 0) {
+          throw new UserInputError(
+            `roleName/search cannot be combined with: ${incompatible.join(', ')}.`,
+          )
+        }
+        // Honour orderBy via a whitelist — field names are interpolated into Cypher,
+        // so they must never come from raw input (Map.get avoids that injection sink).
+        // Defaults to newest-first, matching the admin list.
+        const userOrdering = new Map<string, string>([
+          ['id_asc', 'user.id ASC'],
+          ['id_desc', 'user.id DESC'],
+          ['slug_asc', 'user.slug ASC'],
+          ['slug_desc', 'user.slug DESC'],
+          ['name_asc', 'user.name ASC'],
+          ['name_desc', 'user.name DESC'],
+          ['createdAt_asc', 'user.createdAt ASC'],
+          ['createdAt_desc', 'user.createdAt DESC'],
+          ['updatedAt_asc', 'user.updatedAt ASC'],
+          ['updatedAt_desc', 'user.updatedAt DESC'],
+        ])
+        const orderByInput =
+          args.orderBy == null ? [] : Array.isArray(args.orderBy) ? args.orderBy : [args.orderBy]
+        const orderClauses = orderByInput.map((entry) => {
+          const clause = userOrdering.get(String(entry))
+          if (!clause) {
+            throw new UserInputError(`Unsupported orderBy '${String(entry)}' for the user search.`)
+          }
+          return clause
+        })
+        const orderBy = orderClauses.length > 0 ? orderClauses.join(', ') : 'user.createdAt DESC'
+
+        // Searching BY e-mail is an oracle on personal data, so gate it with the
+        // SAME permission that gates reading the e-mail field (User.email shield
+        // rule) — role.manage alone must not let someone probe addresses. Without
+        // it, the e-mail term simply does not match (and is never returned).
+        const canReadEmail = context.effectivePermissions.has('user.email.readAny')
+        const emailSearchClause = canReadEmail
+          ? `OR toLower(
+                          coalesce(head([(user)-[:PRIMARY_EMAIL]->(e:EmailAddress) | e.email]), '')
+                        ) CONTAINS $args.term`
+          : ''
+
+        const session = context.driver.session()
+        try {
+          const readTxResult = await session.readTransaction((txc) => {
+            return txc.run(
+              `
+              MATCH (user:User)
+              WHERE coalesce(user.deleted, false) = false
+                AND ($args.roleName IS NULL OR (user)-[:HAS_ROLE]->(:Role {name: $args.roleName}))
+                AND ($args.term IS NULL
+                     OR toLower(user.name) CONTAINS $args.term
+                     OR toLower(user.slug) CONTAINS $args.term
+                     OR toLower(coalesce(user.about, '')) CONTAINS $args.term
+                     ${emailSearchClause})
+              RETURN user {.*, email: head([(user)-[:PRIMARY_EMAIL]->(e:EmailAddress) | e.email])}
+              ORDER BY ${orderBy}
+              SKIP toInteger($args.offset) LIMIT toInteger($args.first)`,
+              {
+                args: {
+                  roleName: args.roleName ?? null,
+                  term: args.search ? String(args.search).toLowerCase() : null,
+                  offset: args.offset ?? 0,
+                  first: args.first ?? 25,
+                },
+              },
+            )
+          })
+          return readTxResult.records.map((r) => r.get('user'))
+        } finally {
+          await session.close()
+        }
+      }
       args = await filterUsersHasLocation(args, context)
       return neo4jgraphql(object, args, context, resolveInfo)
     },
@@ -277,33 +372,6 @@ export default {
           await images(context.config).deleteImage(user, 'AVATAR_IMAGE', { transaction })
           return user
         })
-      } finally {
-        await session.close()
-      }
-    },
-    switchUserRole: async (_object, args, context, _resolveInfo) => {
-      const { role, id } = args
-
-      if (context.user.id === id) throw new Error('you-cannot-change-your-own-role')
-      const session = context.driver.session()
-      try {
-        const user = await session.writeTransaction(async (transaction) => {
-          const switchUserRoleResponse = await transaction.run(
-            `
-              MATCH (user:User {id: $id})
-              OPTIONAL MATCH (user)-[:PRIMARY_EMAIL]->(e:EmailAddress)
-              SET user.role = $role
-              SET user.updatedAt = toString(datetime())
-              RETURN user {.*, email: e.email}
-            `,
-            { id, role },
-          )
-          return switchUserRoleResponse.records.map((record) => record.get('user'))[0]
-        })
-        if (!user) {
-          throw new UserInputError('Could not find User')
-        }
-        return user
       } finally {
         await session.close()
       }

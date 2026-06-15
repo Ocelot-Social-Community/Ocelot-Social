@@ -285,10 +285,10 @@ describe('decode', () => {
 
       it('returns user object without email', async () => {
         await expect(decode(context)(validAuthorizationHeader)).resolves.toMatchObject({
-          role: 'user',
           name: 'Jenny Rostock',
           id: 'u3',
           slug: 'jenny-rostock',
+          roleName: 'user',
         })
       })
 

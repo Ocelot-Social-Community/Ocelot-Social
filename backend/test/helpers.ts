@@ -3,12 +3,14 @@
 import databaseContext from '@context/database'
 import { getContext } from '@src/context'
 import { createInMemoryPolicyService } from '@src/policy'
+import { createInMemoryRoleService, resolveRoleName } from '@src/role'
 import createServer from '@src/server'
 
 import type { ApolloServerPlugin } from '@apollo/server'
 import type CONFIG from '@config/index'
 import type { Context } from '@src/context'
 import type { NetworkPolicy } from '@src/policy'
+import type { RoleDefinition, RoleService } from '@src/role'
 import type { DocumentNode } from 'graphql'
 
 export const TEST_CONFIG = {
@@ -70,11 +72,45 @@ interface OverwritableContextParams {
   // Override network-policy values for a test (e.g. { categoriesActive: true,
   // maxGroupPinnedPosts: 0 }); unset keys fall back to their schema defaults.
   policy?: Partial<NetworkPolicy>
+  // Override the role definitions for a test (e.g. to revoke a baseline
+  // permission from the `user` role); defaults to the seeded DEFAULT_ROLES. The
+  // user's effective permissions are resolved from these via their role string.
+  roles?: RoleDefinition[]
+  // Inject a real (DB-backed) RoleService instead of the in-memory default —
+  // needed by tests that mutate roles / HAS_ROLE edges (createRole, assignRole …).
+  roleService?: RoleService
   pubsub?: Context['pubsub']
 }
 interface CreateTestServerOptions {
   context: () => OverwritableContextParams | Promise<OverwritableContextParams>
   plugins?: ApolloServerPlugin[]
+}
+
+// Resolve the authenticated user's single role name the way decode() does in
+// production. Tests build authenticatedUser from user.toJson(), which carries no role
+// name; without this the user would resolve to no permissions.
+//
+// A user that EXISTS in the DB resolves SOLELY from its HAS_ROLE edges (collapsed via
+// resolveRoleName, so multi-edge fails closed; no edge ⇒ USER_ROLE baseline). We do
+// NOT fall back to a literal for a real user — that would let a test literal mask a
+// missing/un-migrated edge and make the harness laxer than production. The literal
+// roleName is only honoured for a BARE literal viewer with no DB node at all (e.g.
+// { id, roleName: 'owner' }), distinguished here via OPTIONAL MATCH.
+const resolveAuthUserRoles = async (
+  database: ReturnType<typeof databaseContext>,
+  authenticatedUser: Context['user'] | undefined,
+): Promise<Context['user'] | undefined> => {
+  if (!authenticatedUser?.id) return authenticatedUser
+  const result = await database.query({
+    query: `OPTIONAL MATCH (u:User {id: $id})
+            RETURN u IS NOT NULL AS userExists, [(u)-[:HAS_ROLE]->(r:Role) | r.name] AS roles`,
+    variables: { id: authenticatedUser.id },
+  })
+  const record = result.records[0]
+  const userExists = record?.get('userExists') === true
+  const dbRoles = (record?.get('roles') as string[] | undefined) ?? []
+  if (userExists) return { ...authenticatedUser, roleName: resolveRoleName(dbRoles) }
+  return { ...authenticatedUser, roleName: authenticatedUser.roleName }
 }
 
 export const createApolloTestSetup = async (opts?: CreateTestServerOptions) => {
@@ -86,18 +122,30 @@ export const createApolloTestSetup = async (opts?: CreateTestServerOptions) => {
       authenticatedUser,
       config = {},
       policy: policyOverride = {},
+      roles: rolesOverride,
+      roleService,
       pubsub,
     } = await testContext()
     const merged = { ...TEST_CONFIG, ...config }
     // Network policy values are set per-test via the `policy` override; any key not
     // set falls back to its schema default inside createInMemoryPolicyService.
     const policy = createInMemoryPolicyService(policyOverride)
+    // Roles default to the seeded DEFAULT_ROLES so authorization resolves exactly
+    // as in production; a test can override the definitions, or inject a real
+    // DB-backed RoleService when it needs to mutate roles / HAS_ROLE edges.
+    const role = roleService ?? createInMemoryRoleService(rolesOverride)
+    // Tests set authenticatedUser from `user.toJson()`, which does not carry the
+    // user's role name. Production resolves it in decode() from the HAS_ROLE edge;
+    // mirror that here so effectivePermissions are correct (the legacy user.role
+    // carrier is gone). Role nodes + edges exist because cleanDatabase seeds them.
+    const resolvedUser = await resolveAuthUserRoles(database, authenticatedUser)
     return getContext({
-      authenticatedUser,
+      authenticatedUser: resolvedUser,
       database,
       pubsub,
       config: merged,
       policy,
+      role,
     })(req)
   }
 

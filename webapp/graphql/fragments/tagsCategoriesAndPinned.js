@@ -14,7 +14,6 @@ export const tagsCategoriesAndPinned = gql`
     pinnedBy {
       id
       name
-      role
     }
   }
 `

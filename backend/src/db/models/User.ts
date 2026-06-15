@@ -14,7 +14,14 @@ export default {
   },
   deleted: { type: 'boolean', default: false },
   disabled: { type: 'boolean', default: false },
-  role: { type: 'string', default: 'user' },
+  // The user's single role: exactly one (:User)-[:HAS_ROLE]->(:Role) edge. Resolved
+  // into authorization (effectiveRoleName / effectivePermissions) per request.
+  roles: {
+    type: 'relationship',
+    relationship: 'HAS_ROLE',
+    target: 'Role',
+    direction: 'out',
+  },
   publicKey: 'string',
   privateKey: 'string',
   wasInvited: 'boolean',

@@ -254,18 +254,22 @@
         </div>
         <div v-if="isGroupMemberNonePending" class="ds-mt-small ds-mb-small ds-space-centered">
           <os-button
-            as="nuxt-link"
+            :as="$can('post.create') ? 'nuxt-link' : 'button'"
             :to="{
               name: 'post-create-type',
               query: { groupId: group.id },
             }"
+            :class="{ 'permission-denied': !$can('post.create') }"
+            :aria-disabled="!$can('post.create')"
             class="profile-post-add-button"
             variant="primary"
             appearance="filled"
             circle
             :aria-label="$t('contribution.newPost')"
             v-tooltip="{
-              content: $t('contribution.newPost'),
+              content: $can('post.create')
+                ? $t('contribution.newPost')
+                : $t('permissions.deniedHint'),
               placement: 'left',
             }"
           >

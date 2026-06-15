@@ -88,12 +88,15 @@
                         variant="primary"
                         appearance="ghost"
                         circle
+                        :class="{ 'permission-denied': !$can('user.invite') }"
                         :aria-label="$t('invite-codes.button.tooltip')"
                         v-tooltip="{
-                          content: $t('invite-codes.button.tooltip'),
+                          content: $can('user.invite')
+                            ? $t('invite-codes.button.tooltip')
+                            : $t('permissions.deniedHint'),
                           placement: 'bottom-start',
                         }"
-                        @click.prevent="toggleMenu"
+                        @click.prevent="$can('user.invite') && toggleMenu()"
                       >
                         <template #icon>
                           <os-icon :icon="icons.userPlus" />
@@ -258,8 +261,8 @@
               <profile-avatar :profile="user" size="small" class="mobile-avatar" />
               <div class="mobile-user-details">
                 <b>{{ userName }}</b>
-                <span v-if="user.role !== 'user'" class="mobile-user-role">
-                  {{ user.role | camelCase }}
+                <span v-if="user.roleName && user.roleName !== 'user'" class="mobile-user-role">
+                  {{ user.roleName | camelCase }}
                 </span>
               </div>
               <os-button

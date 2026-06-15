@@ -196,15 +196,61 @@
       "saveSuccess": "Konfiguration aktualisiert.",
       "title": "Einstellungen der Netzwerk-Konfiguration"
     },
+    "roles": {
+      "allPermissions": "Hält alle Berechtigungen (geschützt).",
+      "cannotDelete": "Diese Rolle kann nicht gelöscht werden.",
+      "cannotDeleteHasMembers": "Diese Rolle hat noch Mitglieder — weise ihnen erst eine andere Rolle zu.",
+      "create": "Rolle erstellen",
+      "createTitle": "Neue Rolle erstellen",
+      "delete": "Löschen",
+      "deleteError": "Rolle konnte nicht gelöscht werden: {message}",
+      "deleteSuccess": "Rolle gelöscht.",
+      "description": "Rollen erstellen und Berechtigungen vergeben. Änderungen gelten sofort.",
+      "groups": {
+        "administration": "Administration",
+        "content": "Inhalte",
+        "membership": "Mitgliedschaft",
+        "moderation": "Moderation"
+      },
+      "members": "{count} Mitglieder",
+      "name": "Rollen & Berechtigungen",
+      "nameLabel": "Name",
+      "perm": {
+        "apiKey_administer": "API-Schlüssel anderer Nutzer verwalten.",
+        "badge_manage": "Badges vergeben und entziehen.",
+        "content_moderate": "Gemeldete Inhalte prüfen und entscheiden.",
+        "donation_manage": "Das Spenden-Widget konfigurieren.",
+        "group_create": "Gruppen erstellen.",
+        "group_create_hidden": "Versteckte Gruppen erstellen.",
+        "network_statistics_read": "Netzwerkweite Statistiken einsehen.",
+        "policy_manage": "Netzwerk-Richtlinien einsehen und ändern.",
+        "post_create": "Beiträge erstellen.",
+        "post_pin": "Beiträge netzwerkweit anpinnen und lösen.",
+        "post_push": "Beiträge pushen und zurücknehmen (boosten).",
+        "role_manage": "Rollen verwalten und Nutzern zuweisen.",
+        "user_delete_any": "Beliebiges Nutzerkonto löschen.",
+        "user_email_readAny": "E-Mail-Adresse beliebiger Nutzer lesen.",
+        "user_invite": "Persönliche Einladungscodes erzeugen."
+      },
+      "protected": "geschützt",
+      "protectedHint": "Die Owner-Rolle hält alle Berechtigungen und kann nicht bearbeitet werden.",
+      "save": "Speichern",
+      "saveError": "Rolle konnte nicht gespeichert werden: {message}",
+      "saveSuccess": "Rolle gespeichert.",
+      "title": "Rollen & Berechtigungen"
+    },
     "settings": {
       "name": "Einstellungen"
     },
     "users": {
+      "addRole": "Rolle zuweisen…",
+      "allRoles": "Alle Rollen",
       "empty": "Keine Nutzer gefunden",
       "form": {
-        "placeholder": "E-Mail, Name oder Beschreibung"
+        "placeholder": "E-Mail, Name, Beschreibung oder role:moderator"
       },
       "name": "Nutzer",
+      "removeRole": "Rolle {role} entfernen",
       "roleChanged": "Rolle erfolgreich geändert!",
       "table": {
         "columns": {
@@ -979,6 +1025,9 @@
   "pagination": {
     "next": "Weiter",
     "previous": "Zurück"
+  },
+  "permissions": {
+    "deniedHint": "Dir fehlt die Berechtigung dafür."
   },
   "post": {
     "comment": {

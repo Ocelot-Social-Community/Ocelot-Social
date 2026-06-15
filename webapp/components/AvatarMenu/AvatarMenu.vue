@@ -27,9 +27,9 @@
       <div class="avatar-menu-popover">
         {{ $t('login.hello') }}
         <b>{{ userName }}</b>
-        <template v-if="user.role !== 'user'">
+        <template v-if="user.roleName && user.roleName !== 'user'">
           <p class="ds-text ds-text-softer ds-text-size-small" style="margin-bottom: 0">
-            {{ user.role | camelCase }}
+            {{ user.roleName | camelCase }}
           </p>
         </template>
         <hr />

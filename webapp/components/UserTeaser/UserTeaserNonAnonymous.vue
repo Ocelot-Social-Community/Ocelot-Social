@@ -56,7 +56,6 @@
 <script>
 import { OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import { mapGetters } from 'vuex'
 
 import { userTeaserQuery } from '~/graphql/User.js'
 import DateTime from '~/components/DateTime'
@@ -89,10 +88,6 @@ export default {
     hoverDelay: { type: Number, default: 500 },
   },
   computed: {
-    ...mapGetters({
-      isModerator: 'auth/isModerator',
-    }),
-
     itsMe() {
       return this.user.slug === this.$store.getters['auth/user'].slug
     },

@@ -196,15 +196,61 @@
       "saveSuccess": "Política actualizada.",
       "title": "Configuración de política de red"
     },
+    "roles": {
+      "allPermissions": "Tiene todos los permisos (protegido).",
+      "cannotDelete": "Este rol no se puede eliminar.",
+      "cannotDeleteHasMembers": "Este rol todavía tiene miembros: reasígnalos antes de eliminarlo.",
+      "create": "Crear rol",
+      "createTitle": "Crear un nuevo rol",
+      "delete": "Eliminar",
+      "deleteError": "No se pudo eliminar el rol: {message}",
+      "deleteSuccess": "Rol eliminado.",
+      "description": "Crea roles y asigna permisos. Los cambios se aplican de inmediato.",
+      "groups": {
+        "administration": "Administración",
+        "content": "Contenido",
+        "membership": "Membresía",
+        "moderation": "Moderación"
+      },
+      "members": "{count} miembros",
+      "name": "Roles y permisos",
+      "nameLabel": "Nombre",
+      "perm": {
+        "apiKey_administer": "Administrar las claves API de otros usuarios.",
+        "badge_manage": "Otorgar y revocar insignias.",
+        "content_moderate": "Revisar y decidir sobre el contenido denunciado.",
+        "donation_manage": "Configurar el widget de donaciones.",
+        "group_create": "Crear grupos.",
+        "group_create_hidden": "Crear grupos ocultos.",
+        "network_statistics_read": "Ver estadísticas de toda la red.",
+        "policy_manage": "Ver y cambiar la configuración de políticas de la red.",
+        "post_create": "Crear publicaciones.",
+        "post_pin": "Fijar y desfijar publicaciones en toda la red.",
+        "post_push": "Impulsar y retirar (boost) publicaciones.",
+        "role_manage": "Gestionar roles y asignarlos a los usuarios.",
+        "user_delete_any": "Eliminar la cuenta de cualquier usuario.",
+        "user_email_readAny": "Leer la dirección de correo de cualquier usuario.",
+        "user_invite": "Generar códigos de invitación personales."
+      },
+      "protected": "protegido",
+      "protectedHint": "El rol propietario tiene todos los permisos y no se puede editar.",
+      "save": "Guardar",
+      "saveError": "No se pudo guardar el rol: {message}",
+      "saveSuccess": "Rol guardado.",
+      "title": "Roles y permisos"
+    },
     "settings": {
       "name": "Configuración"
     },
     "users": {
+      "addRole": "Asignar rol…",
+      "allRoles": "Todos los roles",
       "empty": "No se han encontrado usuarios",
       "form": {
-        "placeholder": "correo electrónico, nombre o descripción"
+        "placeholder": "correo, nombre, descripción o role:moderator"
       },
       "name": "Usuarios",
+      "removeRole": "Quitar rol {role}",
       "roleChanged": "¡Rol cambiado con éxito!",
       "table": {
         "columns": {
@@ -979,6 +1025,9 @@
   "pagination": {
     "next": "Siguiente",
     "previous": "Anterior"
+  },
+  "permissions": {
+    "deniedHint": "No tienes permiso para esto."
   },
   "post": {
     "comment": {

@@ -196,15 +196,61 @@
       "saveSuccess": "Política atualizada.",
       "title": "Configurações da política de rede"
     },
+    "roles": {
+      "allPermissions": "Detém todas as permissões (protegida).",
+      "cannotDelete": "Esta função não pode ser excluída.",
+      "cannotDeleteHasMembers": "Esta função ainda tem membros — reatribua-os antes de a eliminar.",
+      "create": "Criar função",
+      "createTitle": "Criar uma nova função",
+      "delete": "Eliminar",
+      "deleteError": "Não foi possível eliminar a função: {message}",
+      "deleteSuccess": "Função eliminada.",
+      "description": "Crie funções e atribua permissões. As alterações aplicam-se imediatamente.",
+      "groups": {
+        "administration": "Administração",
+        "content": "Conteúdo",
+        "membership": "Adesão",
+        "moderation": "Moderação"
+      },
+      "members": "{count} membros",
+      "name": "Funções e permissões",
+      "nameLabel": "Nome",
+      "perm": {
+        "apiKey_administer": "Administrar as chaves de API de outros utilizadores.",
+        "badge_manage": "Conceder e revogar distintivos.",
+        "content_moderate": "Analisar e decidir sobre conteúdo denunciado.",
+        "donation_manage": "Configurar o widget de doações.",
+        "group_create": "Criar grupos.",
+        "group_create_hidden": "Criar grupos ocultos.",
+        "network_statistics_read": "Ver estatísticas de toda a rede.",
+        "policy_manage": "Ver e alterar as definições de política da rede.",
+        "post_create": "Criar publicações.",
+        "post_pin": "Fixar e desafixar publicações em toda a rede.",
+        "post_push": "Impulsionar e remover (boost) publicações.",
+        "role_manage": "Gerir funções e atribuí-las aos utilizadores.",
+        "user_delete_any": "Eliminar a conta de qualquer utilizador.",
+        "user_email_readAny": "Ler o endereço de e-mail de qualquer utilizador.",
+        "user_invite": "Gerar códigos de convite pessoais."
+      },
+      "protected": "protegida",
+      "protectedHint": "A função de proprietário detém todas as permissões e não pode ser editada.",
+      "save": "Guardar",
+      "saveError": "Não foi possível guardar a função: {message}",
+      "saveSuccess": "Função guardada.",
+      "title": "Funções e permissões"
+    },
     "settings": {
       "name": "Configurações"
     },
     "users": {
+      "addRole": "Atribuir função…",
+      "allRoles": "Todas as funções",
       "empty": "Nenhum usuário encontrado",
       "form": {
-        "placeholder": "e-mail, nome ou descrição"
+        "placeholder": "e-mail, nome, descrição ou role:moderator"
       },
       "name": "Usuários",
+      "removeRole": "Remover função {role}",
       "roleChanged": "Papel alterado com sucesso!",
       "table": {
         "columns": {
@@ -979,6 +1025,9 @@
   "pagination": {
     "next": "Seguinte",
     "previous": "Anterior"
+  },
+  "permissions": {
+    "deniedHint": "Não tens permissão para isto."
   },
   "post": {
     "comment": {

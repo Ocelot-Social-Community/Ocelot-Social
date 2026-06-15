@@ -161,6 +161,21 @@ describe('ContributionForm.vue', () => {
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining(expectedParams))
         })
 
+        it('blocks a permission-less create with a denied-hint toast, not a silent no-op', async () => {
+          const denied = mount(ContributionForm, {
+            mocks: { ...mocks, $can: () => false },
+            localVue,
+            store,
+            propsData,
+            stubs,
+          })
+          denied.find('.ds-input').setValue(postTitle)
+          await denied.vm.updateEditorContent(postContent)
+          await denied.find('form').trigger('submit')
+          expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+          expect(mocks.$toast.error).toHaveBeenCalledWith('permissions.deniedHint')
+        })
+
         it('supports adding a teaser image', async () => {
           expectedParams.variables.image = {
             aspectRatio: null,
