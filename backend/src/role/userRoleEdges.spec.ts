@@ -51,7 +51,9 @@ describe('role-edge helpers (DB)', () => {
 
   afterAll(async () => {
     await cleanDatabase()
-    await getDriver().close()
+    // Driver close can run in the background (repo teardown pattern); only the
+    // cleanup needs awaiting.
+    void getDriver().close()
   })
 
   it('seeds the default role nodes', async () => {
