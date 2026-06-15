@@ -163,6 +163,7 @@
             :as="$can('post.create') ? 'nuxt-link' : 'button'"
             :to="{ name: 'post-create-type' }"
             :class="{ 'permission-denied': !$can('post.create') }"
+            :aria-disabled="!$can('post.create')"
             v-tooltip="{
               content: $can('post.create')
                 ? $t('contribution.newPost')
