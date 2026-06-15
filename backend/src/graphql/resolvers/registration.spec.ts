@@ -233,8 +233,16 @@ describe('SignupVerification', () => {
             // rather than create an edgeless, half-initialized account.
             await database.write({ query: `MATCH (r:Role {id: 'user'}) DETACH DELETE r` })
 
-            const { errors } = await mutate({ mutation: SignupVerification, variables })
-            expect(errors).toBeDefined()
+            const { data, errors } = await mutate({ mutation: SignupVerification, variables })
+            // Assert the specific baseline-role failure (not just any error) and that
+            // the mutation yielded no account — otherwise an unrelated error would let
+            // this test pass and mask a regression.
+            expect(errors).toEqual([
+              expect.objectContaining({
+                message: expect.stringContaining('baseline "user" role is not seeded'),
+              }),
+            ])
+            expect(data?.SignupVerification ?? null).toBeNull()
 
             const { records } = await database.neode.cypher(
               `MATCH (u:User {name: $name}) RETURN u`,
