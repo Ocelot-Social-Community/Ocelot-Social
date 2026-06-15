@@ -58,8 +58,12 @@ describe('auth store', () => {
 
     it('SET_PERMISSIONS stores an array, coercing non-arrays to empty', () => {
       const state = createState()
-      mutations.SET_PERMISSIONS(state, ['post.create', 'badge.manage'])
-      expect(state.permissions).toEqual(['post.create', 'badge.manage'])
+      const perms = [
+        { key: 'post.create', group: 'content' },
+        { key: 'badge.manage', group: 'moderation' },
+      ]
+      mutations.SET_PERMISSIONS(state, perms)
+      expect(state.permissions).toEqual(perms)
       mutations.SET_PERMISSIONS(state, null)
       expect(state.permissions).toEqual([])
     })
@@ -82,25 +86,46 @@ describe('auth store', () => {
       expect(getters.pending({ pending: undefined })).toBe(false)
     })
 
-    it('isAdmin requires an admin-area permission', () => {
+    it('isAdmin holds for ANY administration-group permission (group-driven, not a key list)', () => {
       expect(getters.isAdmin({ permissions: [] })).toBe(false)
-      expect(getters.isAdmin({ permissions: ['post.create'] })).toBe(false)
-      expect(getters.isAdmin({ permissions: ['role.manage'] })).toBe(true)
-      expect(getters.isAdmin({ permissions: ['policy.manage'] })).toBe(true)
+      expect(getters.isAdmin({ permissions: [{ key: 'post.create', group: 'content' }] })).toBe(
+        false,
+      )
+      expect(
+        getters.isAdmin({ permissions: [{ key: 'role.manage', group: 'administration' }] }),
+      ).toBe(true)
+      // A different administration-group key qualifies too — no per-key list to maintain.
+      expect(
+        getters.isAdmin({ permissions: [{ key: 'policy.manage', group: 'administration' }] }),
+      ).toBe(true)
     })
 
-    it('isModerator requires the content.moderate permission', () => {
+    it('isModerator requires content.moderate specifically (not any moderation-group key)', () => {
       expect(getters.isModerator({ permissions: [] })).toBe(false)
-      expect(getters.isModerator({ permissions: ['post.create'] })).toBe(false)
-      expect(getters.isModerator({ permissions: ['content.moderate'] })).toBe(true)
+      expect(getters.isModerator({ permissions: [{ key: 'post.create', group: 'content' }] })).toBe(
+        false,
+      )
+      // post.pin is moderation-group but must NOT grant the moderation page.
+      expect(getters.isModerator({ permissions: [{ key: 'post.pin', group: 'moderation' }] })).toBe(
+        false,
+      )
+      expect(
+        getters.isModerator({ permissions: [{ key: 'content.moderate', group: 'moderation' }] }),
+      ).toBe(true)
     })
 
     it('permissions returns the stored permission array', () => {
-      expect(getters.permissions({ permissions: ['post.create'] })).toEqual(['post.create'])
+      const perms = [{ key: 'post.create', group: 'content' }]
+      expect(getters.permissions({ permissions: perms })).toEqual(perms)
     })
 
-    it('can() is true only for held permissions', () => {
-      const can = getters.can({ permissions: ['post.create', 'role.manage'] })
+    it('can() is true only for held permission keys', () => {
+      const can = getters.can({
+        permissions: [
+          { key: 'post.create', group: 'content' },
+          { key: 'role.manage', group: 'administration' },
+        ],
+      })
       expect(can('role.manage')).toBe(true)
       expect(can('badge.manage')).toBe(false)
       // tolerates a missing/non-array permissions state (e.g. anonymous)
@@ -244,9 +269,10 @@ describe('auth store', () => {
         expect(result).toEqual({ id: 'u1' })
       })
 
-      it('commits the effective permissions from myPermissions', async () => {
+      it('commits the effective permissions (with their groups) from myPermissions', async () => {
+        const myPermissions = [{ key: 'role.manage', group: 'administration' }]
         const query = jest.fn().mockResolvedValue({
-          data: { currentUser: { id: 'u1' }, myPermissions: ['role.manage'] },
+          data: { currentUser: { id: 'u1' }, myPermissions },
         })
         const commit = jest.fn()
         const ctx = { commit, dispatch: jest.fn() }
@@ -254,7 +280,7 @@ describe('auth store', () => {
           { app: { apolloProvider: { defaultClient: { query } } } },
           ctx,
         )
-        expect(commit).toHaveBeenCalledWith('SET_PERMISSIONS', ['role.manage'])
+        expect(commit).toHaveBeenCalledWith('SET_PERMISSIONS', myPermissions)
       })
 
       it('falls back to [] when myPermissions is absent (clears any stale permissions)', async () => {

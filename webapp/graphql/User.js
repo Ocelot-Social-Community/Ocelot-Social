@@ -424,7 +424,10 @@ export const currentUserQuery = gql`
       }
       activeCategories
     }
-    myPermissions
+    myPermissions {
+      key
+      group
+    }
   }
 `
 

@@ -29,7 +29,7 @@ const asAdmin = async () => {
 }
 
 const PERMISSION_CATALOG = `query { permissionCatalog { key group description } }`
-const MY_PERMISSIONS = `query { myPermissions }`
+const MY_PERMISSIONS = `query { myPermissions { key group } }`
 const ROLES = `query { roles { name protected permissions memberCount } }`
 const USER_INFO = `query ($id: ID!) { User(id: $id) { id roleName } }`
 const CREATE_ROLE = `mutation ($name: String!, $permissions: [String!]!) {
@@ -104,7 +104,8 @@ describe('role management', () => {
       )
       authenticatedUser = await user.toJson()
       const { data } = await query({ query: MY_PERMISSIONS })
-      expect(data.myPermissions).toEqual(
+      const keys = data.myPermissions.map((p: { key: string }) => p.key)
+      expect(keys).toEqual(
         expect.arrayContaining([
           'post.create',
           'group.create',
@@ -112,14 +113,20 @@ describe('role management', () => {
           'user.invite',
         ]),
       )
-      expect(data.myPermissions).not.toContain('role.manage')
+      expect(keys).not.toContain('role.manage')
     })
 
-    it('includes admin permissions for an admin', async () => {
+    it('includes admin permissions for an admin, each carrying its catalog group', async () => {
       await asAdmin()
       const { data } = await query({ query: MY_PERMISSIONS })
+      const keys = data.myPermissions.map((p: { key: string }) => p.key)
+      expect(keys).toEqual(expect.arrayContaining(['role.manage', 'content.moderate']))
+      // Every entry carries its group, so the webapp can gate areas by group.
       expect(data.myPermissions).toEqual(
-        expect.arrayContaining(['role.manage', 'content.moderate']),
+        expect.arrayContaining([
+          { key: 'role.manage', group: 'administration' },
+          { key: 'content.moderate', group: 'moderation' },
+        ]),
       )
     })
   })

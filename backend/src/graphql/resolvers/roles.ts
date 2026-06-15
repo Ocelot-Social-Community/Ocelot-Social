@@ -1,5 +1,5 @@
 import { ForbiddenError, UserInputError } from '@graphql/errors'
-import { permissionCatalog } from '@src/permission'
+import { groupFor, permissionCatalog } from '@src/permission'
 import { OWNER_ROLE, RoleValidationError, effectiveRoleName } from '@src/role'
 
 import type { Context } from '@src/context'
@@ -67,9 +67,11 @@ export default {
         .map((def) => toGraphqlRole(def))
     },
 
-    myPermissions: (_parent: unknown, _args: unknown, context: Context) => [
-      ...context.effectivePermissions,
-    ],
+    // Each effective permission carries its catalog group, so the webapp can gate UI
+    // areas by group (e.g. admin area = ANY administration-group permission) from a
+    // single payload — no second query and no key/group drift.
+    myPermissions: (_parent: unknown, _args: unknown, context: Context) =>
+      [...context.effectivePermissions].map((key) => ({ key, group: groupFor(key) })),
   },
 
   Mutation: {

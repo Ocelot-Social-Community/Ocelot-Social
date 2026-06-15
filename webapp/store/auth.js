@@ -6,25 +6,19 @@ import metadata from '~/constants/metadata'
 
 const cookies = new Cookie()
 
-// Permissions that grant access to (some part of) the admin area. A user holding any
-// of them sees the admin entry and may enter; each admin page still gates on its own
-// permission, and the backend enforces every action.
-const ADMIN_AREA_PERMISSIONS = [
-  'network.statistics.read',
-  'role.manage',
-  'policy.manage',
-  'donation.manage',
-  'apiKey.administer',
-  'user.email.readAny',
-]
+// Permission catalog groups. The backend tags every effective permission with its
+// group (myPermissions { key group }), so area gating derives from the group — a new
+// admin/moderation key is picked up automatically with no list to maintain here.
+const ADMINISTRATION_GROUP = 'administration'
 
 export const state = () => {
   return {
     user: null,
     token: null,
     pending: false,
-    // The current user's effective permission keys (from the backend myPermissions
-    // query). Drives can(); empty while anonymous.
+    // The current user's effective permissions as { key, group } objects (from the
+    // backend myPermissions query). Drives can() and group-based area gating; empty
+    // while anonymous.
     permissions: [],
   }
 }
@@ -57,18 +51,24 @@ export const getters = {
   pending(state) {
     return !!state.pending
   },
-  // Access to the admin area: holds any administration-area permission. Replaces the
-  // former role==='admin' tier check so custom roles with admin capabilities qualify.
+  // Access to the admin area: holds ANY administration-group permission. Group-driven
+  // (not a key list), so a new admin permission grants the admin entry automatically.
+  // Each admin page still gates on its own permission; the backend enforces actions.
   isAdmin(state) {
     return (
       Array.isArray(state.permissions) &&
-      ADMIN_AREA_PERMISSIONS.some((permission) => state.permissions.includes(permission))
+      state.permissions.some((permission) => permission.group === ADMINISTRATION_GROUP)
     )
   },
-  // Can moderate content (access reports/review, see disabled content). Replaces the
-  // former admin/moderator tier check.
+  // Can moderate content (access reports/review, see disabled content). The moderation
+  // PAGE is specifically content.moderate (not any moderation-group key — e.g. post.pin
+  // alone must not grant the reports page). Switch to a group check if moderation ever
+  // becomes a multi-page area.
   isModerator(state) {
-    return Array.isArray(state.permissions) && state.permissions.includes('content.moderate')
+    return (
+      Array.isArray(state.permissions) &&
+      state.permissions.some((p) => p.key === 'content.moderate')
+    )
   },
   permissions(state) {
     return state.permissions
@@ -77,7 +77,7 @@ export const getters = {
   // key. Mirrors the backend hasPermission gate; the dynamic counterpart to the
   // role-string getters above.
   can: (state) => (permission) => {
-    return Array.isArray(state.permissions) && state.permissions.includes(permission)
+    return Array.isArray(state.permissions) && state.permissions.some((p) => p.key === permission)
   },
   user(state) {
     return state.user || {}
