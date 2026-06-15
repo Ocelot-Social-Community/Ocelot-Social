@@ -57,7 +57,13 @@ export default {
   },
   methods: {
     generateInviteCode() {
-      if (!this.$can('user.invite')) return
+      // The button is grayed (permission-denied + aria-disabled + tooltip) but stays
+      // clickable so the tooltip works; surface the reason via a toast instead of a
+      // silent no-op so a click/Enter isn't swallowed without feedback.
+      if (!this.$can('user.invite')) {
+        this.$toast.error(this.$t('permissions.deniedHint'))
+        return
+      }
       this.$emit('generate-invite-code', this.comment)
       this.comment = ''
     },
