@@ -203,6 +203,8 @@
       "create": "Rolle erstellen",
       "createTitle": "Neue Rolle erstellen",
       "delete": "Löschen",
+      "deleteError": "Rolle konnte nicht gelöscht werden: {message}",
+      "deleteSuccess": "Rolle gelöscht.",
       "description": "Rollen erstellen und Berechtigungen vergeben. Änderungen gelten sofort.",
       "groups": {
         "administration": "Administration",

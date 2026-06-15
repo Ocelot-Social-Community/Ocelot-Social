@@ -361,9 +361,9 @@ export default {
         // The deleted role can no longer be active; fall back in ensureActive().
         if (this.activeRoleName === role.name) this.activeRoleName = null
         await this.$apollo.queries.roles.refetch()
-        this.$toast.success(this.$t('admin.roles.saveSuccess'))
+        this.$toast.success(this.$t('admin.roles.deleteSuccess'))
       } catch (err) {
-        this.$toast.error(this.$t('admin.roles.saveError', { message: err.message }))
+        this.$toast.error(this.$t('admin.roles.deleteError', { message: err.message }))
       } finally {
         this.saving = false
       }

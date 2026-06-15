@@ -203,6 +203,8 @@
       "create": "Rol aanmaken",
       "createTitle": "Een nieuwe rol aanmaken",
       "delete": "Verwijderen",
+      "deleteError": "Kon rol niet verwijderen: {message}",
+      "deleteSuccess": "Rol verwijderd.",
       "description": "Maak rollen aan en wijs rechten toe. Wijzigingen worden direct toegepast.",
       "groups": {
         "administration": "Beheer",

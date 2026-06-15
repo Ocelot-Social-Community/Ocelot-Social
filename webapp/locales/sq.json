@@ -203,6 +203,8 @@
       "create": "Krijo rol",
       "createTitle": "Krijo një rol të ri",
       "delete": "Fshi",
+      "deleteError": "Roli nuk u fshi dot: {message}",
+      "deleteSuccess": "Roli u fshi.",
       "description": "Krijo role dhe cakto leje. Ndryshimet zbatohen menjëherë.",
       "groups": {
         "administration": "Administrim",

@@ -203,6 +203,8 @@
       "create": "Utwórz rolę",
       "createTitle": "Utwórz nową rolę",
       "delete": "Usuń",
+      "deleteError": "Nie można usunąć roli: {message}",
+      "deleteSuccess": "Rola usunięta.",
       "description": "Twórz role i przypisuj uprawnienia. Zmiany obowiązują natychmiast.",
       "groups": {
         "administration": "Administracja",

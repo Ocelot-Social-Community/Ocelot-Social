@@ -203,6 +203,8 @@
       "create": "Criar função",
       "createTitle": "Criar uma nova função",
       "delete": "Eliminar",
+      "deleteError": "Não foi possível eliminar a função: {message}",
+      "deleteSuccess": "Função eliminada.",
       "description": "Crie funções e atribua permissões. As alterações aplicam-se imediatamente.",
       "groups": {
         "administration": "Administração",

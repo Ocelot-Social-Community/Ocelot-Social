@@ -203,6 +203,8 @@
       "create": "Create role",
       "createTitle": "Create a new role",
       "delete": "Delete",
+      "deleteError": "Could not delete role: {message}",
+      "deleteSuccess": "Role deleted.",
       "description": "Create roles and assign permissions. Changes apply immediately.",
       "groups": {
         "administration": "Administration",

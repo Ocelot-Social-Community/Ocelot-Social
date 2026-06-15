@@ -203,6 +203,8 @@
       "create": "Crea ruolo",
       "createTitle": "Crea un nuovo ruolo",
       "delete": "Elimina",
+      "deleteError": "Impossibile eliminare il ruolo: {message}",
+      "deleteSuccess": "Ruolo eliminato.",
       "description": "Crea ruoli e assegna i permessi. Le modifiche si applicano immediatamente.",
       "groups": {
         "administration": "Amministrazione",
