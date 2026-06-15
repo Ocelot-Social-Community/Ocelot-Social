@@ -164,6 +164,9 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     // eslint-disable-next-line no-console
     console.log('seed', 'users')
+    // Two role-assignment patterns below, by design (see relateUserToRole in
+    // factories.ts): the `owner` is granted explicitly via the `roleName` option,
+    // while the admin/moderator/user *tiers* use the `role` build-attr selector.
     // Petra Lustig is the instance OWNER — the failsafe superuser (single HAS_ROLE
     // edge to the owner role). Login: owner@example.org / 1234.
     await Factory.build(
