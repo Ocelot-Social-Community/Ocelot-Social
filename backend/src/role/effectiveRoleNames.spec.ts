@@ -1,6 +1,12 @@
 import { effectiveRoleName, resolveRoleName } from './effectiveRoleNames'
 import { USER_ROLE } from './types'
 
+// Restore any spy (e.g. the console.warn spy below) even if an assertion throws
+// mid-test, so a leaked mock can't corrupt later tests.
+afterEach(() => {
+  jest.restoreAllMocks()
+})
+
 describe('resolveRoleName (collapse HAS_ROLE edges → one role)', () => {
   it('returns the single edge (incl. custom roles)', () => {
     expect(resolveRoleName(['badge-setter'])).toBe('badge-setter')
@@ -20,7 +26,6 @@ describe('resolveRoleName (collapse HAS_ROLE edges → one role)', () => {
     expect(resolveRoleName(['admin', 'user'])).toBe(USER_ROLE)
     expect(resolveRoleName(['owner', 'admin'])).toBe(USER_ROLE)
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('single-role model violated'))
-    warn.mockRestore()
   })
 })
 
