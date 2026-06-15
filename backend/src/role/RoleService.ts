@@ -41,12 +41,20 @@ export class RoleService {
   async init(pubsub?: RolePubSub): Promise<void> {
     this.pubsub = pubsub
 
+    // Names deleted by a change event during init(): a delete on the (still empty)
+    // cache is a no-op, so without remembering it the stale read below would
+    // resurrect the role. Only tracked until initialised (post-init deletes apply
+    // directly and would just grow this set).
+    const deletedDuringInit = new Set<string>()
+
     // Subscribe BEFORE reading (same reasoning as PolicyService): a change
     // published by another instance in the read/subscribe gap would otherwise be
     // missed, leaving this instance stale until the next change.
     if (pubsub) {
       this.subscriptionId = await pubsub.subscribe(ROLE_CHANGED_CHANNEL, (payload) => {
-        this.applyExternalChange(payload.roleChanged)
+        const event = payload.roleChanged
+        if (!this.initialised && event.definition === null) deletedDuringInit.add(event.name)
+        this.applyExternalChange(event)
       })
     }
 
@@ -59,6 +67,9 @@ export class RoleService {
       // A concurrent change event during init already set this role to a fresher
       // value — don't clobber it with the read.
       if (this.cache.has(role.name)) continue
+      // A concurrent delete event removed this role mid-init; the read snapshot is
+      // stale, so don't resurrect it (events win over the initial read).
+      if (deletedDuringInit.has(role.name)) continue
       this.cache.set(role.name, role)
     }
 

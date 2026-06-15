@@ -244,6 +244,48 @@ describe('RoleService', () => {
       expect(writes).toHaveLength(0)
     })
 
+    it('does not resurrect a role deleted by an event that arrives during init()', async () => {
+      // Race: another instance deletes `admin` while this one is booting. The delete
+      // event lands during the role read (cache still empty → delete is a no-op), and
+      // the read snapshot is stale (still contains admin). init() must NOT re-add it.
+      let onChange: ((payload: { roleChanged: RoleChangeEvent }) => void) | undefined
+      let fired = false
+      const fakeDb = {
+        query: async () => {
+          // Fire the delete mid-read, before the cache-fill loop runs.
+          if (!fired && onChange) {
+            fired = true
+            onChange({
+              roleChanged: {
+                name: ADMIN_ROLE,
+                definition: null,
+                actor: 'other-instance',
+                timestamp: 't',
+              },
+            })
+          }
+          return Promise.resolve({ records: DEFAULT_ROLES.map(roleRecord) }) // stale: still has admin
+        },
+        write: async () => Promise.resolve({ records: [] }),
+      } as unknown as DbArg
+      const fakePubsub: RolePubSub = {
+        publish: () => undefined,
+        subscribe: async (_channel, listener) => {
+          onChange = listener as typeof onChange
+          return Promise.resolve(1)
+        },
+        unsubscribe: () => undefined,
+      }
+      const svc = new RoleService(fakeDb)
+      await svc.init(fakePubsub)
+
+      expect(svc.getRole(ADMIN_ROLE)).toBeUndefined() // stayed deleted, not resurrected
+      // The mandatory roles (and the unaffected optional one) are still cached.
+      expect(svc.getRole(OWNER_ROLE)).toBeDefined()
+      expect(svc.getRole(USER_ROLE)).toBeDefined()
+      expect(svc.getRole(MODERATOR_ROLE)).toBeDefined()
+    })
+
     it('self-heals only the missing mandatory role (not admin/moderator) and warns', async () => {
       const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
       const writes: Array<{ variables?: { name?: string } }> = []
