@@ -90,6 +90,7 @@
           :to="{ name: 'post-create-type' }"
           :class="{ 'permission-denied': !$can('post.create') }"
           :aria-disabled="!$can('post.create')"
+          :aria-label="$t('contribution.newPost')"
           v-tooltip="{
             content: $can('post.create')
               ? $t('contribution.newPost')
