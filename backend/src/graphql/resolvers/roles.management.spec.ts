@@ -37,6 +37,12 @@ const CREATE_ROLE = `mutation ($name: String!, $permissions: [String!]!) {
     name permissions protected memberCount
   }
 }`
+const UPDATE_ROLE = `mutation ($name: String!, $permissions: [String!]!) {
+  updateRole(name: $name, permissions: $permissions) {
+    name permissions protected memberCount
+  }
+}`
+const USER_ROLES = `query ($userId: ID!) { userRoles(userId: $userId) { name protected permissions } }`
 const DELETE_ROLE = `mutation ($name: String!) { deleteRole(name: $name) }`
 const SET_USER_ROLE = `mutation ($userId: ID!, $roleName: String!) { setUserRole(userId: $userId, roleName: $roleName) { id roleName } }`
 
@@ -182,6 +188,79 @@ describe('role management', () => {
         variables: { name: 'has spaces!', permissions: [] },
       })
       expect(errors?.[0].message).toMatch(/Invalid role name/)
+    })
+  })
+
+  describe('updateRole', () => {
+    beforeEach(asAdmin)
+
+    it('updates a role’s permissions, sanitising unknown ones', async () => {
+      await mutate({
+        mutation: CREATE_ROLE,
+        variables: { name: 'badge-setter', permissions: ['badge.manage'] },
+      })
+      const { data, errors } = await mutate({
+        mutation: UPDATE_ROLE,
+        variables: { name: 'badge-setter', permissions: ['content.moderate', 'ghost.perm'] },
+      })
+      expect(errors).toBeUndefined()
+      expect(data.updateRole).toMatchObject({
+        name: 'badge-setter',
+        permissions: ['content.moderate'],
+        protected: false,
+        memberCount: 0,
+      })
+    })
+
+    it('reports the member count of the updated role', async () => {
+      await Factory.build(
+        'user',
+        { id: 'holder', role: 'user' },
+        { email: 'holder@e.org', password: '1234' },
+      )
+      await mutate({
+        mutation: CREATE_ROLE,
+        variables: { name: 'held', permissions: [] },
+      })
+      await mutate({ mutation: SET_USER_ROLE, variables: { userId: 'holder', roleName: 'held' } })
+      const { data, errors } = await mutate({
+        mutation: UPDATE_ROLE,
+        variables: { name: 'held', permissions: ['badge.manage'] },
+      })
+      expect(errors).toBeUndefined()
+      expect(data.updateRole.memberCount).toBe(1)
+    })
+
+    it('rejects updating an unknown role', async () => {
+      const { errors } = await mutate({
+        mutation: UPDATE_ROLE,
+        variables: { name: 'does-not-exist', permissions: [] },
+      })
+      expect(errors?.[0].message).toMatch(/Unknown role/)
+    })
+  })
+
+  describe('userRoles', () => {
+    it('returns the role(s) assigned to a user via their HAS_ROLE edge', async () => {
+      await Factory.build(
+        'user',
+        { id: 'target', role: 'user' },
+        { email: 'target@e.org', password: '1234' },
+      )
+      await asAdmin()
+      await mutate({ mutation: SET_USER_ROLE, variables: { userId: 'target', roleName: 'moderator' } })
+      const { data, errors } = await query({ query: USER_ROLES, variables: { userId: 'target' } })
+      expect(errors).toBeUndefined()
+      expect(data.userRoles).toEqual([
+        expect.objectContaining({ name: 'moderator', protected: false }),
+      ])
+    })
+
+    it('returns an empty list for a user without a role edge', async () => {
+      await asAdmin()
+      const { data, errors } = await query({ query: USER_ROLES, variables: { userId: 'ghost' } })
+      expect(errors).toBeUndefined()
+      expect(data.userRoles).toEqual([])
     })
   })
 
