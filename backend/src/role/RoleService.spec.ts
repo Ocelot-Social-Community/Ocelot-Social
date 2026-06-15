@@ -6,7 +6,13 @@ import { ADMIN_ROLE, MODERATOR_ROLE, OWNER_ROLE, USER_ROLE } from './types'
 
 import type { RoleChangeEvent, RolePubSub } from './types'
 
-const BASELINE = ['post.create', 'group.create', 'group.create_hidden', 'user.invite']
+const BASELINE = [
+  'post.create',
+  'comment.create',
+  'group.create',
+  'group.create_hidden',
+  'user.invite',
+]
 
 describe('RoleService', () => {
   describe('permissionsForRole (single-role resolution)', () => {

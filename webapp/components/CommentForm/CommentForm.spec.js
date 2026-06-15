@@ -104,6 +104,26 @@ describe('CommentForm.vue', () => {
       })
     })
 
+    describe('create comment without comment.create permission', () => {
+      let mutateSpy
+      let deniedWrapper
+      beforeEach(() => {
+        mutateSpy = jest.fn()
+        deniedWrapper = mount(CommentForm, {
+          mocks: { ...mocks, $can: () => false, $apollo: { mutate: mutateSpy } },
+          localVue,
+          propsData: { post: { id: 'p001' } },
+        })
+      })
+
+      it('does not mutate and shows a denied-hint toast instead of a silent no-op', async () => {
+        deniedWrapper.vm.updateEditorContent('this is a comment')
+        await deniedWrapper.find('form').trigger('submit')
+        expect(mutateSpy).not.toHaveBeenCalled()
+        expect(mocks.$toast.error).toHaveBeenCalled()
+      })
+    })
+
     describe('update comment', () => {
       beforeEach(() => {
         mocks = {

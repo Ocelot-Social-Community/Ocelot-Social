@@ -533,7 +533,7 @@ export default shield(
       unshout: isAuthenticated,
       changePassword: isAuthenticated,
       review: hasPermission('content.moderate'),
-      CreateComment: and(isAuthenticated, canCommentPost),
+      CreateComment: and(isAuthenticated, hasPermission('comment.create'), canCommentPost),
       UpdateComment: isAuthor,
       DeleteComment: isAuthor,
       DeleteUser: or(isDeletingOwnAccount, hasPermission('user.delete.any')),

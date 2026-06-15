@@ -218,6 +218,7 @@
       "perm": {
         "apiKey_administer": "Zarządzanie kluczami API innych użytkowników.",
         "badge_manage": "Przyznawanie i odbieranie odznak.",
+        "comment_create": "Komentowanie wpisów.",
         "content_moderate": "Przeglądanie i rozstrzyganie zgłoszonych treści.",
         "donation_manage": "Konfigurowanie widgetu darowizn.",
         "group_create": "Tworzenie grup.",
@@ -1032,6 +1033,7 @@
   "post": {
     "comment": {
       "joinGroup": "Dołączył/a do grupy „<b>{name}</b>“",
+      "noPermission": "Komentowanie nie jest włączone dla Twojej roli.",
       "reply": "Odpowiedz",
       "submit": "Komentarz",
       "submitted": "Komentarz dodany",

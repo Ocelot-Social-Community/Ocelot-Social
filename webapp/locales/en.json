@@ -218,6 +218,7 @@
       "perm": {
         "apiKey_administer": "Administer other users’ API keys.",
         "badge_manage": "Grant and revoke badges.",
+        "comment_create": "Comment on posts.",
         "content_moderate": "Review and decide on reported content.",
         "donation_manage": "Configure the donations widget.",
         "group_create": "Create groups.",
@@ -1032,6 +1033,7 @@
   "post": {
     "comment": {
       "joinGroup": "Joined group „<b>{name}</b>“",
+      "noPermission": "Commenting is not enabled for your role.",
       "reply": "Reply",
       "submit": "Comment",
       "submitted": "Comment submitted!",

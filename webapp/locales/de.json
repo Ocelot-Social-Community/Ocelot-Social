@@ -218,6 +218,7 @@
       "perm": {
         "apiKey_administer": "API-Schlüssel anderer Nutzer verwalten.",
         "badge_manage": "Badges vergeben und entziehen.",
+        "comment_create": "Beiträge kommentieren.",
         "content_moderate": "Gemeldete Inhalte prüfen und entscheiden.",
         "donation_manage": "Das Spenden-Widget konfigurieren.",
         "group_create": "Gruppen erstellen.",
@@ -1032,6 +1033,7 @@
   "post": {
     "comment": {
       "joinGroup": "Gruppe „<b>{name}</b>“ beigetreten",
+      "noPermission": "Kommentieren ist für deine Rolle nicht freigeschaltet.",
       "reply": "Antworten",
       "submit": "Kommentiere",
       "submitted": "Kommentar gesendet",

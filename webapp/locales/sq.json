@@ -218,6 +218,7 @@
       "perm": {
         "apiKey_administer": "Administro çelësat API të përdoruesve të tjerë.",
         "badge_manage": "Jep dhe hiq stema.",
+        "comment_create": "Komento postime.",
         "content_moderate": "Shqyrto dhe vendos për përmbajtjen e raportuar.",
         "donation_manage": "Konfiguro widget-in e donacioneve.",
         "group_create": "Krijo grupe.",
@@ -1032,6 +1033,7 @@
   "post": {
     "comment": {
       "joinGroup": "U bashkua me grupin „<b>{name}</b>“",
+      "noPermission": "Komentimi nuk është aktivizuar për rolin tënd.",
       "reply": "Përgjigju",
       "submit": "Komento",
       "submitted": "Komenti u dërgua!",

@@ -18,6 +18,7 @@ import type { RoleDefinition } from './types'
 // The baseline capabilities of a standard member.
 const BASELINE: RoleDefinition['permissions'] = [
   'post.create',
+  'comment.create',
   'group.create',
   'group.create_hidden',
   'user.invite',

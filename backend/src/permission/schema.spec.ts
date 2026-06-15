@@ -26,6 +26,7 @@ const EXPECTED_KEYS: PermissionKey[] = [
   'post.pin',
   'post.push',
   'post.create',
+  'comment.create',
   'group.create',
   'group.create_hidden',
   'user.invite',

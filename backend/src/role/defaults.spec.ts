@@ -32,7 +32,13 @@ describe('DEFAULT_ROLES', () => {
     }
   })
 
-  const BASELINE = ['post.create', 'group.create', 'group.create_hidden', 'user.invite']
+  const BASELINE = [
+    'post.create',
+    'comment.create',
+    'group.create',
+    'group.create_hidden',
+    'user.invite',
+  ]
 
   // The audited extras the admin role grants ON TOP of the baseline. Keep this in
   // sync with defaults.ts consciously — these tests assert the EXACT permission set

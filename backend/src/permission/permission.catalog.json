@@ -52,6 +52,10 @@
       "group": "content",
       "description": "Create posts (still subject to group membership where applicable)."
     },
+    "comment.create": {
+      "group": "content",
+      "description": "Comment on posts (still subject to group membership where applicable)."
+    },
     "group.create": {
       "group": "content",
       "description": "Create groups."

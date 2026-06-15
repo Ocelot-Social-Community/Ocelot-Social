@@ -218,6 +218,7 @@
       "perm": {
         "apiKey_administer": "Administrar las claves API de otros usuarios.",
         "badge_manage": "Otorgar y revocar insignias.",
+        "comment_create": "Comentar publicaciones.",
         "content_moderate": "Revisar y decidir sobre el contenido denunciado.",
         "donation_manage": "Configurar el widget de donaciones.",
         "group_create": "Crear grupos.",
@@ -1032,6 +1033,7 @@
   "post": {
     "comment": {
       "joinGroup": "Se unió al grupo „<b>{name}</b>“",
+      "noPermission": "Los comentarios no están habilitados para tu rol.",
       "reply": "Contestar",
       "submit": "Comentario",
       "submitted": "Comentario enviado",

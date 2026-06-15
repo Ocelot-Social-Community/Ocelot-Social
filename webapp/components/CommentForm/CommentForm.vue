@@ -55,6 +55,15 @@ export default {
   created() {
     this.icons = iconRegistry
   },
+  computed: {
+    // Creating a comment is gated by comment.create; editing an existing one is not
+    // (that path is author-gated). Consumers normally hide the create form entirely
+    // when this is true (see the post page); this guards handleSubmit as a defence-in-
+    // depth safety net so a stray ungated render can't silently no-op a submit.
+    cannotComment() {
+      return !this.update && !this.$can('comment.create')
+    },
+  },
   data() {
     return {
       disabled: true,
@@ -97,6 +106,12 @@ export default {
       }
     },
     async handleSubmit() {
+      // The submit button is grayed but stays clickable (so the tooltip works); give
+      // feedback instead of a silent no-op when the viewer lacks comment.create.
+      if (this.cannotComment) {
+        this.$toast.error(this.$t('permissions.deniedHint'))
+        return
+      }
       const mutateParams = !this.update
         ? {
             mutation: CommentMutations().CreateComment,

@@ -218,6 +218,7 @@
       "perm": {
         "apiKey_administer": "API-sleutels van andere gebruikers beheren.",
         "badge_manage": "Badges toekennen en intrekken.",
+        "comment_create": "Reageren op berichten.",
         "content_moderate": "Gerapporteerde inhoud beoordelen en beslissen.",
         "donation_manage": "De donatiewidget configureren.",
         "group_create": "Groepen maken.",
@@ -1032,6 +1033,7 @@
   "post": {
     "comment": {
       "joinGroup": "Lid geworden van groep „<b>{name}</b>“",
+      "noPermission": "Reageren is niet ingeschakeld voor jouw rol.",
       "reply": "Antwoorden",
       "submit": "Reageren",
       "submitted": "Reactie geplaatst!",
