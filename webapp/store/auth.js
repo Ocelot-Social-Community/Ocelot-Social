@@ -114,7 +114,7 @@ export const actions = {
     const client = this.app.apolloProvider.defaultClient
     try {
       const {
-        data: { currentUser },
+        data: { currentUser, myPermissions },
       } = await client.query({ query: currentUserQuery })
       if (!currentUser) return dispatch('logout')
       commit('SET_USER', currentUser)
