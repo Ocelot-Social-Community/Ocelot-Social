@@ -10,8 +10,13 @@ const stubs = {
 
 describe('Users', () => {
   let wrapper
+  let mocks
 
-  const mocks = {
+  // A fresh mock set per test: the page mutates $route/$policy (and tests assert on
+  // the $apollo/$toast/$router spies), so sharing one object across tests would make
+  // them order-dependent and flaky. Rebuild before each test instead of mutating and
+  // hand-restoring a shared instance.
+  const createMocks = () => ({
     $t: jest.fn((t) => t),
     $apollo: {
       loading: false,
@@ -24,7 +29,11 @@ describe('Users', () => {
     },
     $route: { query: {} },
     $router: { replace: jest.fn(() => Promise.resolve()) },
-  }
+  })
+
+  beforeEach(() => {
+    mocks = createMocks()
+  })
 
   const getters = {
     'auth/isAdmin': () => true,
@@ -113,8 +122,6 @@ describe('Users', () => {
 
   describe('role', () => {
     beforeEach(() => {
-      mocks.$apollo.mutate.mockClear()
-      mocks.$toast.success.mockClear()
       mocks.$policy = { get: () => false }
       wrapper = Wrapper()
     })
@@ -189,7 +196,6 @@ describe('Users', () => {
     })
 
     it('syncs the search string to the URL as ?q=', () => {
-      mocks.$router.replace.mockClear()
       wrapper.vm.formData.query = 'role:moderator anna'
       wrapper.vm.onSubmit()
       expect(mocks.$router.replace).toHaveBeenCalledWith({
@@ -217,7 +223,6 @@ describe('Users', () => {
       expect(w.vm.formData.query).toBe('role:admin anna')
       expect(w.vm.roleFilter).toBe('admin')
       expect(w.vm.searchText).toBe('anna')
-      mocks.$route = { query: {} }
     })
 
     it('handles a repeated ?q=a&q=b param (array) without crashing on init', () => {
@@ -227,7 +232,6 @@ describe('Users', () => {
       expect(w.vm.formData.query).toBe('role:admin anna')
       expect(w.vm.roleFilter).toBe('admin')
       expect(w.vm.searchText).toBe('anna')
-      mocks.$route = { query: {} }
     })
 
     it('normalises a deep-linked role token to canonical casing once role names load', async () => {
@@ -243,7 +247,6 @@ describe('Users', () => {
       expect(w.vm.roleFilter).toBe('Owner') // raw, before the known role names arrive
       await w.setData({ allRoleNames: ['user', 'admin', 'owner'] })
       expect(w.vm.roleFilter).toBe('owner') // snapped to the canonical casing
-      mocks.$route = { query: {} }
     })
 
     it('lets an owner edit an owner and offers the owner option', () => {
