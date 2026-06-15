@@ -72,10 +72,6 @@ describe('role management', () => {
     authenticatedUser = null
   })
 
-  afterEach(async () => {
-    await cleanDatabase()
-  })
-
   describe('authorization (role.manage)', () => {
     it('denies permissionCatalog to a plain user', async () => {
       const user = await Factory.build(
@@ -325,7 +321,7 @@ describe('role management', () => {
   })
 
   describe('setUserRole', () => {
-    const readUser = async (id) => {
+    const readUser = async (id: string) => {
       const { data } = await query({ query: USER_INFO, variables: { id } })
       return data.User[0]
     }
