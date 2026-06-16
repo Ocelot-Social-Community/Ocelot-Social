@@ -15,6 +15,7 @@ backup-cron-job.log
 node_modules/
 cypress/videos
 cypress/screenshots/
+cypress/reports/
 cypress.env.json
 deployment/configurations/
 
