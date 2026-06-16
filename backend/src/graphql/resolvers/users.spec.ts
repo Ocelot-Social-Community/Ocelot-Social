@@ -161,11 +161,26 @@ describe('User', () => {
       authenticatedUser = await admin.toJson()
     })
 
-    it('requires role.manage (a normal user is forbidden)', async () => {
+    it('requires a user-administration capability (a plain user is forbidden)', async () => {
       authenticatedUser = await normalUser.toJson()
       await expect(
         query({ query: searchQuery, variables: { roleName: 'moderator' } }),
       ).resolves.toMatchObject({ errors: [{ message: 'Not Authorized!' }] })
+    })
+
+    it('is reachable by a moderation user-admin capability (default moderator holds badge.manage)', async () => {
+      const moderator = await Factory.build(
+        'user',
+        { id: 'mod-search', name: 'ModSearch', role: 'moderator' },
+        { email: 'modsearch@example.org', password: '1234' },
+      )
+      authenticatedUser = await moderator.toJson()
+      const { data, errors } = await query({
+        query: searchQuery,
+        variables: { search: 'Anna' },
+      })
+      expect(errors).toBeUndefined()
+      expect(data.User.map((u) => u.name)).toEqual(['Anna'])
     })
 
     it('filters users by their single role', async () => {

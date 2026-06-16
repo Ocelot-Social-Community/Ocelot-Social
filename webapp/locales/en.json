@@ -259,6 +259,13 @@
     "users": {
       "addRole": "Assign role…",
       "allRoles": "All roles",
+      "delete": {
+        "error": "Could not delete user: {message}",
+        "message": "Do you really want to permanently delete <strong>{name}</strong>? This cannot be undone.",
+        "submit": "Delete user",
+        "success": "User deleted.",
+        "title": "Delete user?"
+      },
       "empty": "No users found",
       "form": {
         "placeholder": "e-mail, name, description, or role:moderator"
@@ -272,6 +279,7 @@
           "comments": "Comments",
           "contributions": "Contributions",
           "createdAt": "Created at",
+          "delete": "Delete",
           "email": "E-mail",
           "name": "Name",
           "number": "No.",
@@ -1003,7 +1011,7 @@
       "submitter": "Reported by"
     },
     "users": {
-      "name": "Badges"
+      "name": "Users"
     }
   },
   "notifications": {

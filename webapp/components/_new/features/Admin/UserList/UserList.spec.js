@@ -6,6 +6,8 @@ const localVue = global.localVue
 
 const stubs = {
   'nuxt-link': true,
+  // Stubbed: delete tests assert on state/callbacks, not the modal's rendering.
+  ConfirmModal: true,
 }
 
 describe('UserList', () => {
@@ -120,9 +122,11 @@ describe('UserList', () => {
         wrapper = Wrapper()
       })
 
-      it('shows the email and role columns', () => {
+      it('shows the email, role, badge and delete columns', () => {
         expect(wrapper.find('[data-test="user-role-select-user"]').exists()).toBe(true)
         expect(wrapper.text()).toContain('user@example.org')
+        expect(wrapper.text()).toContain('admin.users.table.columns.badges')
+        expect(wrapper.find('[data-test="user-delete-user"]').exists()).toBe(true)
       })
 
       it('requests the email and roleName fields', () => {
@@ -161,11 +165,65 @@ describe('UserList', () => {
         expect(wrapper.vm.$options.apollo.allRoleNames.skip.call(wrapper.vm)).toBe(true)
       })
 
-      it('still shows the badge action', () => {
-        // The badge button is an os-button rendered as nuxt-link; its column header
-        // (badges) is present when badges are enabled.
-        expect(wrapper.text()).toContain('admin.users.table.columns.badges')
+      it('hides the badge column (no badge.manage)', () => {
+        expect(wrapper.text()).not.toContain('admin.users.table.columns.badges')
       })
+
+      it('hides the delete column (no user.delete.any)', () => {
+        expect(wrapper.find('[data-test="user-delete-user"]').exists()).toBe(false)
+      })
+    })
+
+    describe('a viewer with only user.delete.any (delete-capable moderator)', () => {
+      beforeEach(() => {
+        mocks.$can = jest.fn((permission) => permission === 'user.delete.any')
+        wrapper = Wrapper()
+      })
+
+      it('shows the delete column but not badges/email/role', () => {
+        expect(wrapper.find('[data-test="user-delete-user"]').exists()).toBe(true)
+        expect(wrapper.text()).not.toContain('admin.users.table.columns.badges')
+        expect(wrapper.text()).not.toContain('user@example.org')
+        expect(wrapper.find('[data-test="user-role-select-user"]').exists()).toBe(false)
+      })
+    })
+  })
+
+  describe('delete user', () => {
+    beforeEach(() => {
+      mocks.$policy = { get: () => false }
+    })
+
+    it('shows a delete button for other users', () => {
+      const w = Wrapper()
+      expect(w.find('[data-test="user-delete-user"]').exists()).toBe(true)
+    })
+
+    it('hides the delete button on the current user own row', () => {
+      const w = Wrapper({
+        data: () => ({
+          allRoleNames: [],
+          User: [{ id: 'admin', name: 'Admin', slug: 'admin' }],
+        }),
+      })
+      expect(w.find('[data-test="user-delete-admin"]').exists()).toBe(false)
+    })
+
+    it('opens a confirmation modal instead of deleting immediately', () => {
+      const w = Wrapper()
+      w.vm.confirmDeleteUser({ id: 'user', name: 'User' })
+      expect(w.vm.showConfirmModal).toBe(true)
+      expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+    })
+
+    it('deletes the account (empty resource) when confirmed', async () => {
+      const w = Wrapper()
+      w.vm.confirmDeleteUser({ id: 'user', name: 'User' })
+      await w.vm.confirmModalData.buttons.confirm.callback()
+      expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+        expect.objectContaining({ variables: { id: 'user', resource: [] } }),
+      )
+      expect(mocks.$toast.success).toHaveBeenCalled()
     })
   })
 

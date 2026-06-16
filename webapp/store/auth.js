@@ -82,6 +82,16 @@ export const getters = {
       state.permissions.some((permission) => permission.group === MODERATION_GROUP)
     )
   },
+  // May open the moderation user list: holds any per-user moderation capability
+  // (badge.manage OR user.delete.any). Drives the moderation "Users" entry + the list
+  // page guard; each column/action inside gates on its own key. The badge DETAIL page
+  // stays badge.manage-only (canManageBadges middleware).
+  canManageUsers(state) {
+    return (
+      Array.isArray(state.permissions) &&
+      state.permissions.some((p) => p.key === 'badge.manage' || p.key === 'user.delete.any')
+    )
+  },
   permissions(state) {
     return state.permissions
   },

@@ -11,13 +11,15 @@ const localVue = global.localVue
 describe('moderation.vue', () => {
   let mocks
 
-  const Wrapper = ({ isModerator = true, canManageBadges = true } = {}) => {
+  const Wrapper = ({ isModerator = true, canManageUsers = true } = {}) => {
     mocks = {
       $t: jest.fn((key) => key),
-      $can: jest.fn((permission) => canManageBadges && permission === 'badge.manage'),
     }
     const store = new Vuex.Store({
-      getters: { 'auth/isModerator': () => isModerator },
+      getters: {
+        'auth/isModerator': () => isModerator,
+        'auth/canManageUsers': () => canManageUsers,
+      },
     })
     return mount(moderation, { mocks, localVue, store, stubs })
   }
@@ -31,8 +33,8 @@ describe('moderation.vue', () => {
     expect(routes.map((r) => r.path)).toContain('/moderation')
   })
 
-  it('shows the badges entry for a badge.manage holder', () => {
-    const routes = Wrapper({ canManageBadges: true }).vm.routes
+  it('shows the users entry for a per-user moderation capability', () => {
+    const routes = Wrapper({ canManageUsers: true }).vm.routes
     expect(routes.map((r) => r.path)).toContain('/moderation/users')
   })
 
@@ -41,8 +43,8 @@ describe('moderation.vue', () => {
     expect(routes.map((r) => r.path)).not.toContain('/moderation')
   })
 
-  it('hides the badges entry without badge.manage', () => {
-    const routes = Wrapper({ canManageBadges: false }).vm.routes
+  it('hides the users entry without badge.manage or user.delete.any', () => {
+    const routes = Wrapper({ canManageUsers: false }).vm.routes
     expect(routes.map((r) => r.path)).not.toContain('/moderation/users')
   })
 })

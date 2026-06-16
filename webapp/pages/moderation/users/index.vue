@@ -6,9 +6,10 @@
 import UserList from '~/components/_new/features/Admin/UserList/UserList.vue'
 
 export default {
-  // badge.manage gates the badge management this page exists for; the email/role
-  // columns gate themselves further down (a moderator usually holds neither).
-  middleware: ['canManageBadges'],
+  // Reachable by any per-user moderation capability (badge.manage OR user.delete.any);
+  // every column/action inside gates on its own key. email/role gate themselves too (a
+  // moderator usually holds neither).
+  middleware: ['canManageUsers'],
   components: {
     UserList,
   },

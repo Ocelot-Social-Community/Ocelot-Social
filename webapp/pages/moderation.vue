@@ -30,6 +30,7 @@ export default {
   computed: {
     ...mapGetters({
       isModerator: 'auth/isModerator',
+      canManageUsers: 'auth/canManageUsers',
     }),
     routes() {
       const routes = []
@@ -39,7 +40,7 @@ export default {
           path: `/moderation`,
         })
       }
-      if (this.$can('badge.manage')) {
+      if (this.canManageUsers) {
         routes.push({
           name: this.$t('moderation.users.name'),
           path: `/moderation/users`,

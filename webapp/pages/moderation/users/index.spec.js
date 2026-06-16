@@ -12,7 +12,7 @@ describe('moderation/users/index.vue', () => {
     expect(list.props('badgeRouteName')).toBe('moderation-users-id')
   })
 
-  it('is gated by the badge.manage middleware', () => {
-    expect(Page.middleware).toContain('canManageBadges')
+  it('is gated by the per-user moderation middleware', () => {
+    expect(Page.middleware).toContain('canManageUsers')
   })
 })

@@ -259,6 +259,13 @@
     "users": {
       "addRole": "Rolle zuweisen…",
       "allRoles": "Alle Rollen",
+      "delete": {
+        "error": "Nutzer konnte nicht gelöscht werden: {message}",
+        "message": "Willst du <strong>{name}</strong> wirklich dauerhaft löschen? Das kann nicht rückgängig gemacht werden.",
+        "submit": "Nutzer löschen",
+        "success": "Nutzer gelöscht.",
+        "title": "Nutzer löschen?"
+      },
       "empty": "Keine Nutzer gefunden",
       "form": {
         "placeholder": "E-Mail, Name, Beschreibung oder role:moderator"
@@ -272,6 +279,7 @@
           "comments": "Kommentare",
           "contributions": "Beiträge",
           "createdAt": "Erstellt am",
+          "delete": "Löschen",
           "email": "E-Mail",
           "name": "Name",
           "number": "Nr.",
@@ -1003,7 +1011,7 @@
       "submitter": "Gemeldet von"
     },
     "users": {
-      "name": "Badges"
+      "name": "Nutzer"
     }
   },
   "notifications": {

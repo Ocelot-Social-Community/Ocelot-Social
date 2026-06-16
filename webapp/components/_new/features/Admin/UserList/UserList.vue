@@ -77,11 +77,18 @@
                 {{ $t('admin.users.table.columns.role') }}
               </th>
               <th
-                v-if="$policy.get('badgesEnabled')"
+                v-if="$policy.get('badgesEnabled') && canManageBadges"
                 scope="col"
                 class="ds-table-head-col ds-table-head-col-right"
               >
                 {{ $t('admin.users.table.columns.badges') }}
+              </th>
+              <th
+                v-if="canDeleteUsers"
+                scope="col"
+                class="ds-table-head-col ds-table-head-col-right"
+              >
+                {{ $t('admin.users.table.columns.delete') }}
               </th>
             </tr>
           </thead>
@@ -131,7 +138,10 @@
                 </select>
                 <span v-else class="ds-text">{{ user.roleName }}</span>
               </td>
-              <td v-if="$policy.get('badgesEnabled')" class="ds-table-col ds-table-col-right">
+              <td
+                v-if="$policy.get('badgesEnabled') && canManageBadges"
+                class="ds-table-col ds-table-col-right"
+              >
                 <os-button
                   as="nuxt-link"
                   :to="{
@@ -146,6 +156,19 @@
                   <template #icon><os-icon :icon="icons.pencil" /></template>
                 </os-button>
               </td>
+              <td v-if="canDeleteUsers" class="ds-table-col ds-table-col-right">
+                <os-button
+                  v-if="user.id !== currentUser.id"
+                  variant="danger"
+                  appearance="ghost"
+                  circle
+                  :data-test="`user-delete-${user.id}`"
+                  :aria-label="$t('admin.users.delete.title')"
+                  @click="confirmDeleteUser(user)"
+                >
+                  <template #icon><os-icon :icon="icons.trash" /></template>
+                </os-button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -155,6 +178,12 @@
     <os-card v-else>
       <div class="ds-placeholder">{{ $t('admin.users.empty') }}</div>
     </os-card>
+
+    <confirm-modal
+      v-if="showConfirmModal"
+      :modalData="confirmModalData"
+      @close="showConfirmModal = false"
+    />
   </div>
 </template>
 
@@ -162,8 +191,9 @@
 import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
+import ConfirmModal from '~/components/Modal/ConfirmModal'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
-import { adminUserQuery } from '~/graphql/User'
+import { adminUserQuery, deleteUserMutation } from '~/graphql/User'
 import { rolesQuery, setUserRoleMutation } from '~/graphql/admin/Roles'
 import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
@@ -177,6 +207,7 @@ import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 export default {
   mixins: [formValidation],
   components: {
+    ConfirmModal,
     OsButton,
     OsCard,
     OsIcon,
@@ -228,6 +259,9 @@ export default {
       formData: {
         query,
       },
+      // Confirm-modal state for the delete-user action.
+      showConfirmModal: false,
+      confirmModalData: null,
     }
   },
   computed: {
@@ -241,6 +275,17 @@ export default {
     },
     canManageRoles() {
       return this.$can('role.manage')
+    },
+    // Badge column is shown only to badge.manage holders — the list is now also
+    // reachable by delete-only moderators, who must not see the badge action.
+    canManageBadges() {
+      return this.$can('badge.manage')
+    },
+    // Delete column is shown to user.delete.any holders; the per-row button is hidden
+    // for one's own account (self-deletion lives in settings, and the backend blocks
+    // it here anyway via the same gate).
+    canDeleteUsers() {
+      return this.$can('user.delete.any')
     },
     // Only an owner may grant the owner role (mirrors the backend rule).
     isOwner() {
@@ -358,6 +403,43 @@ export default {
       if (!this.currentUser || user.id === this.currentUser.id) return false
       if (user.roleName === 'owner' && !this.isOwner) return false
       return true
+    },
+    // Open a confirmation dialog before deleting a user (reuses the shared ConfirmModal,
+    // whose confirm button runs the callback). Danger-styled.
+    confirmDeleteUser(user) {
+      this.confirmModalData = {
+        titleIdent: 'admin.users.delete.title',
+        messageIdent: 'admin.users.delete.message',
+        messageParams: { name: user.name },
+        buttons: {
+          confirm: {
+            danger: true,
+            icon: this.icons.trash,
+            textIdent: 'admin.users.delete.submit',
+            callback: () => this.deleteUser(user),
+          },
+          cancel: {
+            icon: this.icons.close,
+            textIdent: 'actions.cancel',
+            callback: () => {},
+          },
+        },
+      }
+      this.showConfirmModal = true
+    },
+    // Delete the account only (empty `resource` — keeps the user's posts/comments).
+    async deleteUser(user) {
+      try {
+        await this.$apollo.mutate({
+          mutation: deleteUserMutation(),
+          variables: { id: user.id, resource: [] },
+        })
+        await this.$apollo.queries.User.refetch()
+        this.$toast.success(this.$t('admin.users.delete.success'))
+      } catch (error) {
+        this.$toast.error(this.$t('admin.users.delete.error', { message: error.message }))
+        throw error
+      }
     },
     // Set a user's single role (replaces their current one). Owner assignment is
     // enforced owner-only by the backend; a forbidden choice surfaces as a toast.

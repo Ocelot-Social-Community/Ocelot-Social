@@ -216,6 +216,15 @@ exports[`UserList given badges are disabled renders 1`] = `
             </th>
              
             <!---->
+             
+            <th
+              class="ds-table-head-col ds-table-head-col-right"
+              scope="col"
+            >
+              
+              admin.users.table.columns.delete
+            
+            </th>
           </tr>
         </thead>
          
@@ -320,6 +329,42 @@ exports[`UserList given badges are disabled renders 1`] = `
             </td>
              
             <!---->
+             
+            <td
+              class="ds-table-col ds-table-col-right"
+            >
+              <button
+                aria-label="admin.users.delete.title"
+                class="os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-danger)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] disabled:hover:bg-transparent disabled:hover:text-[var(--color-disabled)] disabled:active:bg-transparent disabled:active:text-[var(--color-disabled)] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle text-[var(--color-danger)] hover:bg-[var(--color-danger)] hover:text-[var(--color-danger-contrast)] active:bg-[var(--color-danger-active)] active:text-[var(--color-danger-contrast)] rounded-full p-0 w-[36px]"
+                data-appearance="ghost"
+                data-test="user-delete-user"
+                data-variant="danger"
+                type="button"
+              >
+                <span
+                  class="inline-flex items-center"
+                >
+                  <span
+                    class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  >
+                    <span
+                      aria-hidden="true"
+                      class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                    >
+                      <svg
+                        fill="currentColor"
+                        viewBox="0 0 32 32"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M14.25 4h4c0.522 0 1.061 0.186 1.438 0.563s0.563 0.915 0.563 1.438v1h6v2h-1v16c0 1.645-1.355 3-3 3h-12c-1.645 0-3-1.355-3-3v-16h-1v-2h6v-1c0-0.522 0.185-1.061 0.563-1.438s0.915-0.563 1.438-0.563zM14.25 6v1h4v-1h-4zM9.25 9v16c0 0.555 0.445 1 1 1h12c0.555 0 1-0.445 1-1v-16h-14zM11.25 12h2v11h-2v-11zM15.25 12h2v11h-2v-11zM19.25 12h2v11h-2v-11z"
+                        />
+                      </svg>
+                    </span>
+                  </span>
+                </span>
+              </button>
+            </td>
           </tr>
           <tr>
             <td
@@ -421,6 +466,42 @@ exports[`UserList given badges are disabled renders 1`] = `
             </td>
              
             <!---->
+             
+            <td
+              class="ds-table-col ds-table-col-right"
+            >
+              <button
+                aria-label="admin.users.delete.title"
+                class="os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-danger)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] disabled:hover:bg-transparent disabled:hover:text-[var(--color-disabled)] disabled:active:bg-transparent disabled:active:text-[var(--color-disabled)] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle text-[var(--color-danger)] hover:bg-[var(--color-danger)] hover:text-[var(--color-danger-contrast)] active:bg-[var(--color-danger-active)] active:text-[var(--color-danger-contrast)] rounded-full p-0 w-[36px]"
+                data-appearance="ghost"
+                data-test="user-delete-user2"
+                data-variant="danger"
+                type="button"
+              >
+                <span
+                  class="inline-flex items-center"
+                >
+                  <span
+                    class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  >
+                    <span
+                      aria-hidden="true"
+                      class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                    >
+                      <svg
+                        fill="currentColor"
+                        viewBox="0 0 32 32"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M14.25 4h4c0.522 0 1.061 0.186 1.438 0.563s0.563 0.915 0.563 1.438v1h6v2h-1v16c0 1.645-1.355 3-3 3h-12c-1.645 0-3-1.355-3-3v-16h-1v-2h6v-1c0-0.522 0.185-1.061 0.563-1.438s0.915-0.563 1.438-0.563zM14.25 6v1h4v-1h-4zM9.25 9v16c0 0.555 0.445 1 1 1h12c0.555 0 1-0.445 1-1v-16h-14zM11.25 12h2v11h-2v-11zM15.25 12h2v11h-2v-11zM19.25 12h2v11h-2v-11z"
+                        />
+                      </svg>
+                    </span>
+                  </span>
+                </span>
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -498,6 +579,8 @@ exports[`UserList given badges are disabled renders 1`] = `
       </button>
     </div>
   </div>
+   
+  <!---->
 </div>
 `;
 
@@ -724,6 +807,15 @@ exports[`UserList given badges are enabled renders 1`] = `
               admin.users.table.columns.badges
             
             </th>
+             
+            <th
+              class="ds-table-head-col ds-table-head-col-right"
+              scope="col"
+            >
+              
+              admin.users.table.columns.delete
+            
+            </th>
           </tr>
         </thead>
          
@@ -861,6 +953,42 @@ exports[`UserList given badges are enabled renders 1`] = `
                 </span>
               </nuxt-link-stub>
             </td>
+             
+            <td
+              class="ds-table-col ds-table-col-right"
+            >
+              <button
+                aria-label="admin.users.delete.title"
+                class="os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-danger)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] disabled:hover:bg-transparent disabled:hover:text-[var(--color-disabled)] disabled:active:bg-transparent disabled:active:text-[var(--color-disabled)] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle text-[var(--color-danger)] hover:bg-[var(--color-danger)] hover:text-[var(--color-danger-contrast)] active:bg-[var(--color-danger-active)] active:text-[var(--color-danger-contrast)] rounded-full p-0 w-[36px]"
+                data-appearance="ghost"
+                data-test="user-delete-user"
+                data-variant="danger"
+                type="button"
+              >
+                <span
+                  class="inline-flex items-center"
+                >
+                  <span
+                    class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  >
+                    <span
+                      aria-hidden="true"
+                      class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                    >
+                      <svg
+                        fill="currentColor"
+                        viewBox="0 0 32 32"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M14.25 4h4c0.522 0 1.061 0.186 1.438 0.563s0.563 0.915 0.563 1.438v1h6v2h-1v16c0 1.645-1.355 3-3 3h-12c-1.645 0-3-1.355-3-3v-16h-1v-2h6v-1c0-0.522 0.185-1.061 0.563-1.438s0.915-0.563 1.438-0.563zM14.25 6v1h4v-1h-4zM9.25 9v16c0 0.555 0.445 1 1 1h12c0.555 0 1-0.445 1-1v-16h-14zM11.25 12h2v11h-2v-11zM15.25 12h2v11h-2v-11zM19.25 12h2v11h-2v-11z"
+                        />
+                      </svg>
+                    </span>
+                  </span>
+                </span>
+              </button>
+            </td>
           </tr>
           <tr>
             <td
@@ -995,6 +1123,42 @@ exports[`UserList given badges are enabled renders 1`] = `
                 </span>
               </nuxt-link-stub>
             </td>
+             
+            <td
+              class="ds-table-col ds-table-col-right"
+            >
+              <button
+                aria-label="admin.users.delete.title"
+                class="os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-danger)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] disabled:hover:bg-transparent disabled:hover:text-[var(--color-disabled)] disabled:active:bg-transparent disabled:active:text-[var(--color-disabled)] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle text-[var(--color-danger)] hover:bg-[var(--color-danger)] hover:text-[var(--color-danger-contrast)] active:bg-[var(--color-danger-active)] active:text-[var(--color-danger-contrast)] rounded-full p-0 w-[36px]"
+                data-appearance="ghost"
+                data-test="user-delete-user2"
+                data-variant="danger"
+                type="button"
+              >
+                <span
+                  class="inline-flex items-center"
+                >
+                  <span
+                    class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  >
+                    <span
+                      aria-hidden="true"
+                      class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                    >
+                      <svg
+                        fill="currentColor"
+                        viewBox="0 0 32 32"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M14.25 4h4c0.522 0 1.061 0.186 1.438 0.563s0.563 0.915 0.563 1.438v1h6v2h-1v16c0 1.645-1.355 3-3 3h-12c-1.645 0-3-1.355-3-3v-16h-1v-2h6v-1c0-0.522 0.185-1.061 0.563-1.438s0.915-0.563 1.438-0.563zM14.25 6v1h4v-1h-4zM9.25 9v16c0 0.555 0.445 1 1 1h12c0.555 0 1-0.445 1-1v-16h-14zM11.25 12h2v11h-2v-11zM15.25 12h2v11h-2v-11zM19.25 12h2v11h-2v-11z"
+                        />
+                      </svg>
+                    </span>
+                  </span>
+                </span>
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -1072,5 +1236,7 @@ exports[`UserList given badges are enabled renders 1`] = `
       </button>
     </div>
   </div>
+   
+  <!---->
 </div>
 `;
