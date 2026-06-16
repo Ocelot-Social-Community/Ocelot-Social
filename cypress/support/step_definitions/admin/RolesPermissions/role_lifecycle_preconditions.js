@@ -21,6 +21,21 @@ defineStep('a role {string} granting {string} exists', (roleName, permission) =>
   )
 })
 
+// Ensure a role is absent via the real API (deleteRole) — the RoleService cache
+// survives the per-scenario DB wipe AND persists across runs, so a role a previous
+// scenario/run created would otherwise still be "already exists" here. Members are
+// gone after the DB wipe, so the delete is unguarded.
+defineStep('the role {string} does not exist', (roleName) => {
+  cy.authenticateAs(ADMIN).then((client) =>
+    client.request(`query { roles { name } }`).then((data) => {
+      if (!data.roles.some((role) => role.name === roleName)) return undefined
+      return client.request(`mutation ($name: String!) { deleteRole(name: $name) }`, {
+        name: roleName,
+      })
+    }),
+  )
+})
+
 // Assign a user (by id) to a role via setUserRole — the real path that updates the
 // HAS_ROLE edge and the role cache.
 defineStep('the user with id {string} is assigned the role {string}', (userId, roleName) => {

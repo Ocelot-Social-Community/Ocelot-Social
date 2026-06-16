@@ -69,7 +69,8 @@ Feature: Admin roles & permissions (RBAC)
 
   # B — role management lifecycle through the admin UI.
   Scenario: Admin creates a custom role, grants it a permission, and it persists
-    Given I am logged in as "admin"
+    Given the role "editor" does not exist
+    And I am logged in as "admin"
     When I navigate to page "/admin/roles"
     And I start creating a role named "editor"
     And I confirm creating the role
