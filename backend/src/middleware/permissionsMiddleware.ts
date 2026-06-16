@@ -38,14 +38,23 @@ const hasPermission = (permission: PermissionKey) =>
     return ctx.effectivePermissions.has(permission)
   })
 
-// Composite capability: creating a group needs `group.create`; a hidden group
-// additionally needs `group.create_hidden`.
-const canCreateGroup = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
-  if (!ctx.effectivePermissions.has('group.create')) return false
-  if (args.groupType === 'hidden' && !ctx.effectivePermissions.has('group.create_hidden')) {
-    return false
+// Flat per-group-type creation rights (mirrors videoCall.create_*): creating a group
+// of a given type needs exactly that type's permission, independent of the others.
+const groupCreatePermissionForType = (groupType: string): PermissionKey | null => {
+  switch (groupType) {
+    case 'public':
+      return 'group.create_public'
+    case 'closed':
+      return 'group.create_closed'
+    case 'hidden':
+      return 'group.create_hidden'
+    default:
+      return null
   }
-  return true
+}
+const canCreateGroup = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
+  const permission = groupCreatePermissionForType(args.groupType)
+  return !!permission && ctx.effectivePermissions.has(permission)
 })
 
 const apiKeysEnabled = rule({ cache: 'contextual' })(async (

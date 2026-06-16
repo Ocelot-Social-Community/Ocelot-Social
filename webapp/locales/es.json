@@ -207,8 +207,8 @@
       "deleteSuccess": "Rol eliminado.",
       "description": "Crea roles y asigna permisos. Los cambios se aplican de inmediato.",
       "groups": {
-        "administration": "Administración",
         "account": "Cuenta",
+        "administration": "Administración",
         "communication": "Comunicación",
         "content": "Contenido",
         "membership": "Membresía",
@@ -224,8 +224,9 @@
         "comment_create": "Comentar publicaciones.",
         "content_moderate": "Revisar y decidir sobre el contenido denunciado.",
         "donation_manage": "Configurar el widget de donaciones.",
-        "group_create": "Crear grupos.",
+        "group_create_closed": "Crear grupos cerrados.",
         "group_create_hidden": "Crear grupos ocultos.",
+        "group_create_public": "Crear grupos públicos.",
         "network_statistics_read": "Ver estadísticas de toda la red.",
         "policy_manage": "Ver y cambiar la configuración de políticas de la red.",
         "post_create": "Crear publicaciones.",
@@ -236,9 +237,9 @@
         "user_delete_any": "Eliminar la cuenta de cualquier usuario.",
         "user_email_readAny": "Leer la dirección de correo de cualquier usuario.",
         "user_invite": "Generar códigos de invitación personales.",
-        "videoCall_create_public": "Iniciar una videollamada en un grupo público.",
         "videoCall_create_closed": "Iniciar una videollamada en un grupo cerrado.",
-        "videoCall_create_hidden": "Iniciar una videollamada en un grupo oculto."
+        "videoCall_create_hidden": "Iniciar una videollamada en un grupo oculto.",
+        "videoCall_create_public": "Iniciar una videollamada en un grupo público."
       },
       "protected": "protegido",
       "protectedHint": "El rol propietario tiene todos los permisos y no se puede editar.",

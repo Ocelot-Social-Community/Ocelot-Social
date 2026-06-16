@@ -46,9 +46,7 @@
             v-for="groupType in groupTypeOptions"
             :key="groupType"
             :value="groupType"
-            :disabled="
-              groupType === 'hidden' && group.groupType !== 'hidden' && !$can('group.create_hidden')
-            "
+            :disabled="groupType !== group.groupType && !$can(`group.create_${groupType}`)"
           >
             {{ $t(`group.typesOptions.${groupType}`) }}
           </option>
@@ -159,10 +157,10 @@
             type="submit"
             :loading="loading"
             :disabled="loading || checkFormError(formErrors)"
-            :class="{ 'permission-denied': !update && !$can('group.create') }"
-            :aria-disabled="!update && !$can('group.create')"
+            :class="{ 'permission-denied': !canCreateSelectedGroup }"
+            :aria-disabled="!canCreateSelectedGroup"
             v-tooltip="{
-              content: !update && !$can('group.create') ? $t('permissions.deniedHint') : '',
+              content: !canCreateSelectedGroup ? $t('permissions.deniedHint') : '',
             }"
           >
             <template #icon><os-icon :icon="icons.save" /></template>
@@ -302,6 +300,15 @@ export default {
       if (this.initialCategoryIds.length !== this.formData.categoryIds.length) return false
       return this.initialCategoryIds.every((id) => this.formData.categoryIds.includes(id))
     },
+    // Flat per-type create rights (mirrors the backend group.create_* shield): the
+    // "create group" entry point is open if the user may create at least one type, and
+    // the submit gate keys off the currently selected type.
+    canCreateAnyGroup() {
+      return this.groupTypeOptions.some((type) => this.$can(`group.create_${type}`))
+    },
+    canCreateSelectedGroup() {
+      return this.update || this.$can(`group.create_${this.formData.groupType}`)
+    },
     disableButtonByUpdate() {
       if (!this.update) return true
       return (
@@ -338,12 +345,11 @@ export default {
       this.updateFormField('description', value)
     },
     onSubmit() {
-      // Block creating a group without permission (the button is grayed; this also
-      // guards keyboard Enter and direct navigation to the form).
-      if (!this.update && !this.$can('group.create')) return
-      // Turning a group hidden (creating one, or switching an existing group to
-      // hidden) additionally needs group.create_hidden. Editing an already-hidden
-      // group is fine.
+      // Block creating a group of a type the user may not create (the button is grayed;
+      // this also guards keyboard Enter and direct navigation to the form).
+      if (!this.update && !this.$can(`group.create_${this.formData.groupType}`)) return
+      // Switching an existing group TO hidden additionally needs group.create_hidden
+      // (the privacy-raising transition). Editing an already-hidden group is fine.
       if (
         this.formData.groupType === 'hidden' &&
         this.group.groupType !== 'hidden' &&

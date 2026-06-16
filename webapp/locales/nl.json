@@ -207,8 +207,8 @@
       "deleteSuccess": "Rol verwijderd.",
       "description": "Maak rollen aan en wijs rechten toe. Wijzigingen worden direct toegepast.",
       "groups": {
-        "administration": "Beheer",
         "account": "Account",
+        "administration": "Beheer",
         "communication": "Communicatie",
         "content": "Inhoud",
         "membership": "Lidmaatschap",
@@ -224,8 +224,9 @@
         "comment_create": "Reageren op berichten.",
         "content_moderate": "Gerapporteerde inhoud beoordelen en beslissen.",
         "donation_manage": "De donatiewidget configureren.",
-        "group_create": "Groepen maken.",
+        "group_create_closed": "Gesloten groepen maken.",
         "group_create_hidden": "Verborgen groepen maken.",
+        "group_create_public": "Openbare groepen maken.",
         "network_statistics_read": "Netwerkbrede statistieken bekijken.",
         "policy_manage": "Netwerkbeleid bekijken en wijzigen.",
         "post_create": "Berichten maken.",
@@ -236,9 +237,9 @@
         "user_delete_any": "Het account van elke gebruiker verwijderen.",
         "user_email_readAny": "Het e-mailadres van elke gebruiker lezen.",
         "user_invite": "Persoonlijke uitnodigingscodes genereren.",
-        "videoCall_create_public": "Een videogesprek starten in een openbare groep.",
         "videoCall_create_closed": "Een videogesprek starten in een gesloten groep.",
-        "videoCall_create_hidden": "Een videogesprek starten in een verborgen groep."
+        "videoCall_create_hidden": "Een videogesprek starten in een verborgen groep.",
+        "videoCall_create_public": "Een videogesprek starten in een openbare groep."
       },
       "protected": "beschermd",
       "protectedHint": "De eigenaarsrol heeft alle rechten en kan niet worden bewerkt.",

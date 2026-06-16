@@ -133,7 +133,13 @@ describe('CreateComment', () => {
           {
             name: 'user',
             protected: false,
-            permissions: ['post.create', 'group.create', 'group.create_hidden', 'user.invite'],
+            permissions: [
+              'post.create',
+              'group.create_public',
+              'group.create_closed',
+              'group.create_hidden',
+              'user.invite',
+            ],
           },
         ]
         const { errors } = await mutate({ mutation: CreateComment, variables })

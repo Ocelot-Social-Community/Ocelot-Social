@@ -207,8 +207,8 @@
       "deleteSuccess": "Rolle gelöscht.",
       "description": "Rollen erstellen und Berechtigungen vergeben. Änderungen gelten sofort.",
       "groups": {
-        "administration": "Administration",
         "account": "Konto",
+        "administration": "Administration",
         "communication": "Kommunikation",
         "content": "Inhalte",
         "membership": "Mitgliedschaft",
@@ -224,8 +224,9 @@
         "comment_create": "Beiträge kommentieren.",
         "content_moderate": "Gemeldete Inhalte prüfen und entscheiden.",
         "donation_manage": "Das Spenden-Widget konfigurieren.",
-        "group_create": "Gruppen erstellen.",
+        "group_create_closed": "Geschlossene Gruppen erstellen.",
         "group_create_hidden": "Versteckte Gruppen erstellen.",
+        "group_create_public": "Öffentliche Gruppen erstellen.",
         "network_statistics_read": "Netzwerkweite Statistiken einsehen.",
         "policy_manage": "Netzwerk-Richtlinien einsehen und ändern.",
         "post_create": "Beiträge erstellen.",
@@ -236,9 +237,9 @@
         "user_delete_any": "Beliebiges Nutzerkonto löschen.",
         "user_email_readAny": "E-Mail-Adresse beliebiger Nutzer lesen.",
         "user_invite": "Persönliche Einladungscodes erzeugen.",
-        "videoCall_create_public": "Videoanruf in einer öffentlichen Gruppe starten.",
         "videoCall_create_closed": "Videoanruf in einer geschlossenen Gruppe starten.",
-        "videoCall_create_hidden": "Videoanruf in einer verborgenen Gruppe starten."
+        "videoCall_create_hidden": "Videoanruf in einer verborgenen Gruppe starten.",
+        "videoCall_create_public": "Videoanruf in einer öffentlichen Gruppe starten."
       },
       "protected": "geschützt",
       "protectedHint": "Die Owner-Rolle hält alle Berechtigungen und kann nicht bearbeitet werden.",

@@ -157,7 +157,7 @@ describe('GroupForm', () => {
     })
   })
 
-  describe('hidden group permission (group.create_hidden)', () => {
+  describe('per-type create permissions (group.create_*)', () => {
     const mountWith = (can) =>
       mount(GroupForm, {
         propsData: { update: false, group: {} },
@@ -167,10 +167,22 @@ describe('GroupForm', () => {
         store,
       })
 
+    // Flat model: each group type is gated by its own permission. A user who can
+    // create public/closed groups but not hidden ones.
+    const canExceptHidden = (p) => p !== 'group.create_hidden'
+
     it('blocks onSubmit for a hidden group without group.create_hidden', () => {
-      const wrapper = mountWith((p) => p === 'group.create') // create yes, create_hidden no
+      const wrapper = mountWith(canExceptHidden)
       const formSubmit = jest.spyOn(wrapper.vm, 'formSubmit').mockImplementation(() => {})
       wrapper.vm.formData.groupType = 'hidden'
+      wrapper.vm.onSubmit()
+      expect(formSubmit).not.toHaveBeenCalled()
+    })
+
+    it('blocks onSubmit for a public group without group.create_public', () => {
+      const wrapper = mountWith((p) => p !== 'group.create_public')
+      const formSubmit = jest.spyOn(wrapper.vm, 'formSubmit').mockImplementation(() => {})
+      wrapper.vm.formData.groupType = 'public'
       wrapper.vm.onSubmit()
       expect(formSubmit).not.toHaveBeenCalled()
     })
@@ -184,11 +196,24 @@ describe('GroupForm', () => {
     })
 
     it('disables the hidden option in the type select when not permitted', () => {
-      const wrapper = mountWith((p) => p === 'group.create')
+      const wrapper = mountWith(canExceptHidden)
       const hiddenOption = wrapper
         .findAll('option')
         .wrappers.find((o) => o.attributes('value') === 'hidden')
       expect(hiddenOption.attributes('disabled')).toBeDefined()
+    })
+
+    it('disables the closed option in the type select when not permitted', () => {
+      const wrapper = mountWith((p) => p !== 'group.create_closed')
+      const closedOption = wrapper
+        .findAll('option')
+        .wrappers.find((o) => o.attributes('value') === 'closed')
+      expect(closedOption.attributes('disabled')).toBeDefined()
+    })
+
+    it('canCreateAnyGroup is false only when no type is permitted', () => {
+      expect(mountWith(() => false).vm.canCreateAnyGroup).toBe(false)
+      expect(mountWith((p) => p === 'group.create_closed').vm.canCreateAnyGroup).toBe(true)
     })
 
     const mountEdit = (can, groupOverrides = {}) =>

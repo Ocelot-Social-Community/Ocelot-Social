@@ -62,7 +62,8 @@ describe('PostSlug', () => {
           [
             'post.create',
             'comment.create',
-            'group.create',
+            'group.create_public',
+            'group.create_closed',
             'group.create_hidden',
             'user.invite',
           ].includes(permission),

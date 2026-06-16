@@ -207,8 +207,8 @@
       "deleteSuccess": "Role deleted.",
       "description": "Create roles and assign permissions. Changes apply immediately.",
       "groups": {
-        "administration": "Administration",
         "account": "Account",
+        "administration": "Administration",
         "communication": "Communication",
         "content": "Content",
         "membership": "Membership",
@@ -224,8 +224,9 @@
         "comment_create": "Comment on posts.",
         "content_moderate": "Review and decide on reported content.",
         "donation_manage": "Configure the donations widget.",
-        "group_create": "Create groups.",
+        "group_create_closed": "Create closed groups.",
         "group_create_hidden": "Create hidden groups.",
+        "group_create_public": "Create public groups.",
         "network_statistics_read": "Read network-wide statistics.",
         "policy_manage": "View and change network policy settings.",
         "post_create": "Create posts.",
@@ -236,9 +237,9 @@
         "user_delete_any": "Delete any user’s account.",
         "user_email_readAny": "Read any user’s email address.",
         "user_invite": "Generate personal invite codes.",
-        "videoCall_create_public": "Start a video call in a public group.",
         "videoCall_create_closed": "Start a video call in a closed group.",
-        "videoCall_create_hidden": "Start a video call in a hidden group."
+        "videoCall_create_hidden": "Start a video call in a hidden group.",
+        "videoCall_create_public": "Start a video call in a public group."
       },
       "protected": "protected",
       "protectedHint": "The owner role holds every permission and cannot be edited.",

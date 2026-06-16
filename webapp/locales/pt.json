@@ -207,8 +207,8 @@
       "deleteSuccess": "Função eliminada.",
       "description": "Crie funções e atribua permissões. As alterações aplicam-se imediatamente.",
       "groups": {
-        "administration": "Administração",
         "account": "Conta",
+        "administration": "Administração",
         "communication": "Comunicação",
         "content": "Conteúdo",
         "membership": "Adesão",
@@ -224,8 +224,9 @@
         "comment_create": "Comentar publicações.",
         "content_moderate": "Analisar e decidir sobre conteúdo denunciado.",
         "donation_manage": "Configurar o widget de doações.",
-        "group_create": "Criar grupos.",
+        "group_create_closed": "Criar grupos fechados.",
         "group_create_hidden": "Criar grupos ocultos.",
+        "group_create_public": "Criar grupos públicos.",
         "network_statistics_read": "Ver estatísticas de toda a rede.",
         "policy_manage": "Ver e alterar as definições de política da rede.",
         "post_create": "Criar publicações.",
@@ -236,9 +237,9 @@
         "user_delete_any": "Eliminar a conta de qualquer utilizador.",
         "user_email_readAny": "Ler o endereço de e-mail de qualquer utilizador.",
         "user_invite": "Gerar códigos de convite pessoais.",
-        "videoCall_create_public": "Iniciar uma chamada de vídeo num grupo público.",
         "videoCall_create_closed": "Iniciar uma chamada de vídeo num grupo fechado.",
-        "videoCall_create_hidden": "Iniciar uma chamada de vídeo num grupo oculto."
+        "videoCall_create_hidden": "Iniciar uma chamada de vídeo num grupo oculto.",
+        "videoCall_create_public": "Iniciar uma chamada de vídeo num grupo público."
       },
       "protected": "protegida",
       "protectedHint": "A função de proprietário detém todas as permissões e não pode ser editada.",

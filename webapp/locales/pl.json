@@ -207,8 +207,8 @@
       "deleteSuccess": "Rola usunięta.",
       "description": "Twórz role i przypisuj uprawnienia. Zmiany obowiązują natychmiast.",
       "groups": {
-        "administration": "Administracja",
         "account": "Konto",
+        "administration": "Administracja",
         "communication": "Komunikacja",
         "content": "Treści",
         "membership": "Członkostwo",
@@ -224,8 +224,9 @@
         "comment_create": "Komentowanie wpisów.",
         "content_moderate": "Przeglądanie i rozstrzyganie zgłoszonych treści.",
         "donation_manage": "Konfigurowanie widgetu darowizn.",
-        "group_create": "Tworzenie grup.",
+        "group_create_closed": "Tworzenie grup zamkniętych.",
         "group_create_hidden": "Tworzenie ukrytych grup.",
+        "group_create_public": "Tworzenie grup publicznych.",
         "network_statistics_read": "Przeglądanie statystyk całej sieci.",
         "policy_manage": "Przeglądanie i zmiana ustawień zasad sieci.",
         "post_create": "Tworzenie wpisów.",
@@ -236,9 +237,9 @@
         "user_delete_any": "Usuwanie konta dowolnego użytkownika.",
         "user_email_readAny": "Odczyt adresu e-mail dowolnego użytkownika.",
         "user_invite": "Generowanie osobistych kodów zaproszeń.",
-        "videoCall_create_public": "Rozpoczynanie rozmowy wideo w grupie publicznej.",
         "videoCall_create_closed": "Rozpoczynanie rozmowy wideo w grupie zamkniętej.",
-        "videoCall_create_hidden": "Rozpoczynanie rozmowy wideo w grupie ukrytej."
+        "videoCall_create_hidden": "Rozpoczynanie rozmowy wideo w grupie ukrytej.",
+        "videoCall_create_public": "Rozpoczynanie rozmowy wideo w grupie publicznej."
       },
       "protected": "chroniona",
       "protectedHint": "Rola właściciela ma wszystkie uprawnienia i nie można jej edytować.",

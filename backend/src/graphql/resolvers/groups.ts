@@ -250,8 +250,10 @@ export default {
             { groupId },
           )
           const previousGroupType = previousGroupTypeResult.records[0]?.get('groupType')
-          // Turning a group hidden needs group.create_hidden (same gate as creating
-          // one). Keeping an already-hidden group hidden is fine.
+          // Turning a group hidden needs group.create_hidden (same gate as creating a
+          // hidden group). Keeping an already-hidden group hidden is fine. Switching to
+          // other types is intentionally not gated here — only the privacy-raising
+          // transition to hidden is.
           if (
             params.groupType === 'hidden' &&
             previousGroupType !== 'hidden' &&

@@ -60,13 +60,17 @@
       "group": "content",
       "description": "Add social-media links to one's own profile."
     },
-    "group.create": {
+    "group.create_public": {
       "group": "content",
-      "description": "Create groups."
+      "description": "Create public groups."
+    },
+    "group.create_closed": {
+      "group": "content",
+      "description": "Create closed groups."
     },
     "group.create_hidden": {
       "group": "content",
-      "description": "Create hidden groups (in addition to group.create)."
+      "description": "Create hidden groups."
     },
     "user.invite": {
       "group": "membership",

@@ -20,7 +20,12 @@ const BASELINE: RoleDefinition['permissions'] = [
   'post.create',
   'comment.create',
   'socialMedia.create',
-  'group.create',
+  // Flat per-group-type creation rights (mirrors videoCall.create_*). The baseline
+  // grants all three for parity with the prior model (group.create covered public +
+  // closed, group.create_hidden added hidden) — i.e. every member could create any
+  // group type. Tightening a type out of the baseline is a per-role opt-in.
+  'group.create_public',
+  'group.create_closed',
   'group.create_hidden',
   'user.invite',
   // Only public-group video calls are baseline (parity with the prior public-only

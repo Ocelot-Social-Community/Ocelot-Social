@@ -120,7 +120,8 @@ describe('role management', () => {
       expect(keys).toEqual(
         expect.arrayContaining([
           'post.create',
-          'group.create',
+          'group.create_public',
+          'group.create_closed',
           'group.create_hidden',
           'user.invite',
         ]),

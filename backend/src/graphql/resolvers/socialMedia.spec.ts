@@ -146,7 +146,13 @@ describe('SocialMedia', () => {
           {
             name: 'user',
             protected: false,
-            permissions: ['post.create', 'comment.create', 'group.create', 'user.invite'],
+            permissions: [
+              'post.create',
+              'comment.create',
+              'group.create_public',
+              'group.create_closed',
+              'user.invite',
+            ],
           },
         ]
         const result = await socialMediaAction(user, CreateSocialMedia, variables)
