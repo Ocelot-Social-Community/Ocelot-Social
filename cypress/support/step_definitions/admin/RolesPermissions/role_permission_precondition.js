@@ -38,10 +38,6 @@ const setRolePermission = (roleName, permission, shouldHave) => {
   )
 }
 
-defineStep('the role {string} has the permission {string}', (roleName, permission) => {
-  setRolePermission(roleName, permission, true)
-})
-
 defineStep('the role {string} does not have the permission {string}', (roleName, permission) => {
   setRolePermission(roleName, permission, false)
 })

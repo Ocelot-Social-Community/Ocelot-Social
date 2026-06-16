@@ -31,8 +31,7 @@ Feature: Admin roles & permissions (RBAC)
 
   # 3 — the management flow: toggling a permission persists across a reload.
   Scenario: Admin revokes a permission from the user role and it persists across a reload
-    Given the role "user" has the permission "comment.create"
-    And I am logged in as "admin"
+    Given I am logged in as "admin"
     When I navigate to page "/admin/roles"
     And I select the role "user"
     Then the permission "comment.create" for role "user" should "be.checked"
@@ -46,8 +45,7 @@ Feature: Admin roles & permissions (RBAC)
   # 4 — the cross-cutting RBAC loop: revoking comment.create disables commenting for
   # that role (the effect no unit/integration test can span end to end).
   Scenario: Granting and revoking comment.create toggles the comment form for a normal user
-    Given the role "user" has the permission "comment.create"
-    And I am logged in as "peter-pan"
+    Given I am logged in as "peter-pan"
     When I navigate to page "/post/post-1/a-post"
     Then I see the comment form
     When the role "user" does not have the permission "comment.create"
@@ -69,8 +67,7 @@ Feature: Admin roles & permissions (RBAC)
 
   # B — role management lifecycle through the admin UI.
   Scenario: Admin creates a custom role, grants it a permission, and it persists
-    Given the role "editor" does not exist
-    And I am logged in as "admin"
+    Given I am logged in as "admin"
     When I navigate to page "/admin/roles"
     And I start creating a role named "editor"
     And I confirm creating the role
