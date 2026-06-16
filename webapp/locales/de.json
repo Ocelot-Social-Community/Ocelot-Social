@@ -1001,6 +1001,9 @@
       "reportedOn": "Datum",
       "status": "Aktueller Status",
       "submitter": "Gemeldet von"
+    },
+    "users": {
+      "name": "Badges"
     }
   },
   "notifications": {

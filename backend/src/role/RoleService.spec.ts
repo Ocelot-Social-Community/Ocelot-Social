@@ -32,9 +32,10 @@ describe('RoleService', () => {
       expect([...svc.permissionsForRole(USER_ROLE)].sort()).toEqual([...BASELINE].sort())
     })
 
-    it('returns the self-contained moderator set (baseline + content.moderate)', () => {
+    it('returns the self-contained moderator set (baseline + content.moderate + badge.manage)', () => {
       const perms = svc.permissionsForRole(MODERATOR_ROLE)
       expect(perms.has('content.moderate')).toBe(true)
+      expect(perms.has('badge.manage')).toBe(true)
       for (const baseline of BASELINE) expect(perms.has(baseline as never)).toBe(true)
     })
 

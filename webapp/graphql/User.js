@@ -68,7 +68,11 @@ export const minimisedUserQuery = () => {
   `
 }
 
-export const adminUserQuery = () => {
+// email and roleName are field-gated in the backend (user.email.readAny / role.manage),
+// so a viewer lacking the right must NOT request the field — a denied field aborts the
+// whole response under apollo's default errorPolicy. Callers pass withEmail/withRole
+// from their $can checks; the role-filtered area (moderation) omits them.
+export const adminUserQuery = ({ withEmail = true, withRole = true } = {}) => {
   return gql`
     query ($first: Int, $offset: Int, $roleName: String, $search: String) {
       User(
@@ -81,8 +85,8 @@ export const adminUserQuery = () => {
         id
         name
         slug
-        email
-        roleName
+        ${withEmail ? 'email' : ''}
+        ${withRole ? 'roleName' : ''}
         createdAt
         contributionsCount
         commentedCount

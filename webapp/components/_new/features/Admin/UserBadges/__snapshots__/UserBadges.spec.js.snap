@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`.vue renders 1`] = `
+exports[`UserBadges renders 1`] = `
 <body>
   <div>
     <section

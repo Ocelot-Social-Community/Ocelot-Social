@@ -73,7 +73,9 @@ export const DEFAULT_ROLES: RoleDefinition[] = [
   {
     name: MODERATOR_ROLE,
     protected: false,
-    permissions: [...BASELINE, 'content.moderate'],
+    // badge.manage is a moderation-group capability (badges are a moderation act),
+    // so the default moderator can grant/revoke badges via the moderation area.
+    permissions: [...BASELINE, 'content.moderate', 'badge.manage'],
   },
   {
     name: USER_ROLE,

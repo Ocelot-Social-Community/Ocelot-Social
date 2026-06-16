@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Users given badges are disabled renders 1`] = `
+exports[`UserList given badges are disabled renders 1`] = `
 <div
   class="admin-users"
 >
@@ -501,7 +501,7 @@ exports[`Users given badges are disabled renders 1`] = `
 </div>
 `;
 
-exports[`Users given badges are enabled renders 1`] = `
+exports[`UserList given badges are enabled renders 1`] = `
 <div
   class="admin-users"
 >

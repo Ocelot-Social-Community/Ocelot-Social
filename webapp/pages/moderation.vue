@@ -18,20 +18,34 @@
 
 <script>
 import { OsMenu } from '@ocelot-social/ui'
+import { mapGetters } from 'vuex'
 
 export default {
   components: {
     OsMenu,
   },
-  middleware: ['isModerator'],
+  // Area access is group-driven (any moderation-group permission); each entry below
+  // gates on its own permission.
+  middleware: ['canAccessModeration'],
   computed: {
+    ...mapGetters({
+      isModerator: 'auth/isModerator',
+    }),
     routes() {
-      return [
-        {
+      const routes = []
+      if (this.isModerator) {
+        routes.push({
           name: this.$t('moderation.reports.name'),
           path: `/moderation`,
-        },
-      ]
+        })
+      }
+      if (this.$can('badge.manage')) {
+        routes.push({
+          name: this.$t('moderation.users.name'),
+          path: `/moderation/users`,
+        })
+      }
+      return routes
     },
   },
 }

@@ -114,6 +114,25 @@ describe('auth store', () => {
       ).toBe(true)
     })
 
+    it('canAccessModeration holds for ANY moderation-group permission (group-driven, like isAdmin)', () => {
+      expect(getters.canAccessModeration({ permissions: [] })).toBe(false)
+      expect(
+        getters.canAccessModeration({ permissions: [{ key: 'post.create', group: 'content' }] }),
+      ).toBe(false)
+      // badge.manage alone (no content.moderate) grants area access.
+      expect(
+        getters.canAccessModeration({
+          permissions: [{ key: 'badge.manage', group: 'moderation' }],
+        }),
+      ).toBe(true)
+      // content.moderate qualifies too — any moderation-group key does.
+      expect(
+        getters.canAccessModeration({
+          permissions: [{ key: 'content.moderate', group: 'moderation' }],
+        }),
+      ).toBe(true)
+    })
+
     it('permissions returns the stored permission array', () => {
       const perms = [{ key: 'post.create', group: 'content' }]
       expect(getters.permissions({ permissions: perms })).toEqual(perms)

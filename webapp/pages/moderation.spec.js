@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils'
+import Vuex from 'vuex'
 import moderation from './moderation.vue'
 
 const stubs = {
@@ -8,30 +9,40 @@ const stubs = {
 const localVue = global.localVue
 
 describe('moderation.vue', () => {
-  let wrapper
   let mocks
 
-  beforeEach(() => {
+  const Wrapper = ({ isModerator = true, canManageBadges = true } = {}) => {
     mocks = {
-      $t: jest.fn(),
+      $t: jest.fn((key) => key),
+      $can: jest.fn((permission) => canManageBadges && permission === 'badge.manage'),
     }
+    const store = new Vuex.Store({
+      getters: { 'auth/isModerator': () => isModerator },
+    })
+    return mount(moderation, { mocks, localVue, store, stubs })
+  }
+
+  it('renders', () => {
+    expect(Wrapper().element.tagName).toBe('DIV')
   })
 
-  describe('mount', () => {
-    const Wrapper = () => {
-      return mount(moderation, {
-        mocks,
-        localVue,
-        stubs,
-      })
-    }
+  it('shows the reports entry for a content moderator', () => {
+    const routes = Wrapper({ isModerator: true }).vm.routes
+    expect(routes.map((r) => r.path)).toContain('/moderation')
+  })
 
-    beforeEach(() => {
-      wrapper = Wrapper()
-    })
+  it('shows the badges entry for a badge.manage holder', () => {
+    const routes = Wrapper({ canManageBadges: true }).vm.routes
+    expect(routes.map((r) => r.path)).toContain('/moderation/users')
+  })
 
-    it('renders', () => {
-      expect(wrapper.element.tagName).toBe('DIV')
-    })
+  it('hides the reports entry without content.moderate', () => {
+    const routes = Wrapper({ isModerator: false }).vm.routes
+    expect(routes.map((r) => r.path)).not.toContain('/moderation')
+  })
+
+  it('hides the badges entry without badge.manage', () => {
+    const routes = Wrapper({ canManageBadges: false }).vm.routes
+    expect(routes.map((r) => r.path)).not.toContain('/moderation/users')
   })
 })

@@ -10,6 +10,7 @@ const cookies = new Cookie()
 // group (myPermissions { key group }), so area gating derives from the group — a new
 // admin/moderation key is picked up automatically with no list to maintain here.
 const ADMINISTRATION_GROUP = 'administration'
+const MODERATION_GROUP = 'moderation'
 
 export const state = () => {
   return {
@@ -60,14 +61,25 @@ export const getters = {
       state.permissions.some((permission) => permission.group === ADMINISTRATION_GROUP)
     )
   },
-  // Can moderate content (access reports/review, see disabled content). The moderation
-  // PAGE is specifically content.moderate (not any moderation-group key — e.g. post.pin
-  // alone must not grant the reports page). Switch to a group check if moderation ever
-  // becomes a multi-page area.
+  // Can moderate content (access reports/review, see disabled content). The reports
+  // PAGE is specifically content.moderate — NOT any moderation-group key, so e.g. a
+  // post.pin holder does not get the reports page. (Area access is canAccessModeration.)
   isModerator(state) {
     return (
       Array.isArray(state.permissions) &&
       state.permissions.some((p) => p.key === 'content.moderate')
+    )
+  },
+  // Access to the moderation AREA: holds ANY moderation-group permission. Group-driven
+  // (mirrors isAdmin), so a new moderation permission grants the area entry
+  // automatically. The area is multi-page (reports = content.moderate, badges =
+  // badge.manage); each page still gates on its own permission, the backend enforces
+  // actions. A holder of only a content-action moderation key (post.pin/push,
+  // user.delete.any) enters but sees no page entry — an accepted edge.
+  canAccessModeration(state) {
+    return (
+      Array.isArray(state.permissions) &&
+      state.permissions.some((permission) => permission.group === MODERATION_GROUP)
     )
   },
   permissions(state) {

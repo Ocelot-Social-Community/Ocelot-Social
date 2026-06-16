@@ -640,7 +640,7 @@ export default {
     ...mapGetters({
       isLoggedIn: 'auth/isLoggedIn',
       user: 'auth/user',
-      isModerator: 'auth/isModerator',
+      canAccessModeration: 'auth/canAccessModeration',
       isAdmin: 'auth/isAdmin',
       filterActive: 'posts/isActive',
     }),
@@ -703,7 +703,7 @@ export default {
           icon: this.icons.cogs,
         },
       ]
-      if (this.isModerator) {
+      if (this.canAccessModeration) {
         routes.push({
           name: this.$t('moderation.name'),
           path: '/moderation',

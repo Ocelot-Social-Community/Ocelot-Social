@@ -77,7 +77,7 @@ describe('AvatarMenu.vue', () => {
           'auth/user': () => {
             return { id: 'u343', slug: 'matt' }
           },
-          'auth/isModerator': () => false,
+          'auth/canAccessModeration': () => false,
           'auth/isAdmin': () => false,
         }
         wrapper = Wrapper()
@@ -125,7 +125,7 @@ describe('AvatarMenu.vue', () => {
             'auth/user': () => {
               return { id: 'u343', slug: 'matt' }
             },
-            'auth/isModerator': () => true,
+            'auth/canAccessModeration': () => true,
             'auth/isAdmin': () => false,
           }
           wrapper = Wrapper()
@@ -151,7 +151,7 @@ describe('AvatarMenu.vue', () => {
             'auth/user': () => {
               return { id: 'u343', slug: 'matt' }
             },
-            'auth/isModerator': () => true,
+            'auth/canAccessModeration': () => true,
             'auth/isAdmin': () => true,
           }
           wrapper = Wrapper()

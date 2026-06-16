@@ -73,8 +73,10 @@ describe('DEFAULT_ROLES', () => {
 
   // Single-role model: each role's permission set is self-contained, so the
   // higher roles include the baseline rather than relying on a union.
-  it('gives moderator EXACTLY baseline + content.moderate', () => {
-    expect(permsOf(MODERATOR_ROLE)).toEqual(exactly(...BASELINE, 'content.moderate'))
+  it('gives moderator EXACTLY baseline + content.moderate + badge.manage', () => {
+    expect(permsOf(MODERATOR_ROLE)).toEqual(
+      exactly(...BASELINE, 'content.moderate', 'badge.manage'),
+    )
   })
 
   it('gives admin EXACTLY baseline + the audited admin extras (privilege-drift guard)', () => {
