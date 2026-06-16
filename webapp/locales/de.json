@@ -246,6 +246,11 @@
       "save": "Speichern",
       "saveError": "Rolle konnte nicht gespeichert werden: {message}",
       "saveSuccess": "Rolle gespeichert.",
+      "selfLockout": {
+        "confirm": "Trotzdem entfernen",
+        "message": "Du entfernst gerade die Berechtigung „Rollen verwalten“ von <strong>{role}</strong> — deiner eigenen Rolle. Du kannst danach keine Rollen mehr verwalten; nur ein Owner kann das rückgängig machen. Fortfahren?",
+        "title": "Eigene Rollenverwaltung entfernen?"
+      },
       "title": "Rollen & Berechtigungen"
     },
     "settings": {

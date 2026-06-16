@@ -246,6 +246,11 @@
       "save": "Save",
       "saveError": "Could not save role: {message}",
       "saveSuccess": "Role saved.",
+      "selfLockout": {
+        "confirm": "Remove anyway",
+        "message": "You are about to remove the “manage roles” permission from <strong>{role}</strong> — your own role. You will then no longer be able to manage roles; only an owner can restore it. Continue?",
+        "title": "Remove your own role management?"
+      },
       "title": "Roles & permissions"
     },
     "settings": {

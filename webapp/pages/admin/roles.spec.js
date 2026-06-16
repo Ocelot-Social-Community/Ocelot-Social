@@ -189,6 +189,79 @@ describe('admin/roles.vue', () => {
     )
   })
 
+  describe('self-lockout warning', () => {
+    const catalog = [{ key: 'role.manage', group: 'administration', description: 'Manage roles' }]
+    const adminRole = {
+      name: 'admin',
+      protected: false,
+      permissions: ['role.manage'],
+      memberCount: 1,
+    }
+
+    // Mount with the auth context the warning depends on ($store roleName + $can).
+    const LockoutWrapper = ({ ownRole = 'admin', canManage = true } = {}) => {
+      const localMutate = jest.fn().mockResolvedValue({})
+      const wrapper = mount(Roles, {
+        localVue,
+        mocks: {
+          $t: jest.fn((key, args) => (args ? `${key}:${JSON.stringify(args)}` : key)),
+          $toast: { error: jest.fn(), success: jest.fn() },
+          $apollo: {
+            mutate: localMutate,
+            queries: { roles: { refetch: jest.fn().mockResolvedValue() } },
+          },
+          $store: { getters: { 'auth/user': { roleName: ownRole } } },
+          $can: (permission) => canManage && permission === 'role.manage',
+        },
+        // Stub the modal itself — we assert on state/callbacks, not its rendering.
+        stubs: { ...stubs, ConfirmModal: true },
+        data: () => ({ roles: [adminRole], permissionCatalog: catalog }),
+      })
+      wrapper.vm.buildForms()
+      return { wrapper, localMutate }
+    }
+
+    it('warns (and defers the save) when removing role.manage from the own role', async () => {
+      const { wrapper, localMutate } = LockoutWrapper()
+      wrapper.vm.forms.admin.permissions['role.manage'] = false
+      const result = wrapper.vm.saveRole(adminRole)
+      expect(result).toBeUndefined()
+      expect(wrapper.vm.showConfirmModal).toBe(true)
+      expect(localMutate).not.toHaveBeenCalled()
+      // Confirming runs the actual mutation with the now-empty permission set.
+      await wrapper.vm.confirmModalData.buttons.confirm.callback()
+      expect(localMutate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: expect.objectContaining({ name: 'admin', permissions: [] }),
+        }),
+      )
+    })
+
+    it('saves directly when the own role keeps role.manage', async () => {
+      const { wrapper, localMutate } = LockoutWrapper()
+      await wrapper.vm.saveRole(adminRole) // role.manage still checked
+      expect(wrapper.vm.showConfirmModal).toBe(false)
+      expect(localMutate).toHaveBeenCalled()
+    })
+
+    it('does not warn when editing a role that is not the user own', () => {
+      const { wrapper } = LockoutWrapper({ ownRole: 'someone-else' })
+      wrapper.vm.forms.admin.permissions['role.manage'] = false
+      expect(wrapper.vm.wouldLockSelfOut(adminRole)).toBe(false)
+    })
+
+    it('does not warn when the user does not currently hold role.manage', () => {
+      const { wrapper } = LockoutWrapper({ canManage: false })
+      wrapper.vm.forms.admin.permissions['role.manage'] = false
+      expect(wrapper.vm.wouldLockSelfOut(adminRole)).toBe(false)
+    })
+
+    it('does not warn (no auth context) in plain mounts', () => {
+      const wrapper = Wrapper()
+      expect(wrapper.vm.wouldLockSelfOut(roles[1])).toBe(false)
+    })
+  })
+
   it('removeRole deletes by name', async () => {
     const wrapper = Wrapper()
     await wrapper.vm.removeRole(roles[1])
