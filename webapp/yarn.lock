@@ -14242,10 +14242,10 @@ listr@0.14.3:
     p-map "^2.0.0"
     rxjs "^6.3.3"
 
-livekit-client@^2.19.1:
-  version "2.19.1"
-  resolved "https://registry.yarnpkg.com/livekit-client/-/livekit-client-2.19.1.tgz#e5012a4308a73f8f1d4231cb6f5b096df8519979"
-  integrity sha512-knwEuozt3d7optuUMvw+0PGrV/68GWXrTdAefezOM51Dk8QLb28qOm73UMSSQET58gUqelxqU1afchd2YyPKnQ==
+livekit-client@^2.19.2:
+  version "2.19.2"
+  resolved "https://registry.yarnpkg.com/livekit-client/-/livekit-client-2.19.2.tgz#641fca83b7edf3f4022134a7079553794e04017f"
+  integrity sha512-Kvk07QYDWRAbmYNLRll04ZIuxMQobW/oLPYnmR1kCy8GGHpU0gqyHf704Rz+29zfy8IJZRjKqeVbzGSKn9sumw==
   dependencies:
     "@livekit/mutex" "1.1.1"
     "@livekit/protocol" "1.45.8"
