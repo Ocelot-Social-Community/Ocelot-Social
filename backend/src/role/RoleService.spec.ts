@@ -253,6 +253,27 @@ describe('RoleService', () => {
       expect(writes).toHaveLength(0)
     })
 
+    it('reload() resyncs the cache from the DB, dropping roles no longer present', async () => {
+      const { svc, fakePubsub } = makeService()
+      await svc.init(fakePubsub)
+      // A role that lives only in this instance's cache (e.g. created then removed in
+      // the DB out-of-process) — what a stale cache after db:reset looks like.
+      svc.applyExternalChange({
+        name: 'ghost',
+        definition: { name: 'ghost', protected: false, permissions: [] },
+        actor: 'x',
+        timestamp: 't',
+      })
+      expect(svc.getRole('ghost')).toBeDefined()
+
+      await svc.reload()
+
+      // The (fake) DB returns only the defaults → the stale role is gone, defaults stay.
+      expect(svc.getRole('ghost')).toBeUndefined()
+      expect(svc.getRole(ADMIN_ROLE)).toBeDefined()
+      expect(svc.getRole(USER_ROLE)).toBeDefined()
+    })
+
     it('does not resurrect a role deleted by an event that arrives during init()', async () => {
       // Race: another instance deletes `admin` while this one is booting. The delete
       // event lands during the role read (cache still empty → delete is a no-op), and

@@ -56,6 +56,12 @@ const apiKeysEnabled = rule({ cache: 'contextual' })(async (
   return policy.get('apiKeysEnabled')
 })
 
+// Outside production, allow the cache-resync trigger without auth: db:reset/db:seed
+// and the e2e harness must be able to call it when no users exist yet (right after a
+// wipe). In production it falls through to the system.resync permission. The action is
+// read-only/idempotent (re-read the DB into the in-memory caches).
+const isNotProduction = rule({ cache: 'contextual' })(async () => !CONFIG.PRODUCTION)
+
 const onlyYourself = rule({
   cache: 'no_cache',
 })(async (_parent, args, context: Context, _info) => {
@@ -580,6 +586,9 @@ export default shield(
       // Network Policy
       setPolicy: hasPermission('policy.manage'),
       resetPolicy: hasPermission('policy.manage'),
+
+      // Cache resync (ops/dev recovery): system.resync in prod, open in dev/test.
+      resyncCaches: or(isNotProduction, hasPermission('system.resync')),
 
       saveCategorySettings: isAuthenticated,
       updateOnlineStatus: isAuthenticated,

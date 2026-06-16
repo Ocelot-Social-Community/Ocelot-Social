@@ -4,6 +4,7 @@
 import CONFIG from '@config/index'
 
 import { cleanDatabase } from './factories'
+import { nudgeCacheResync } from './resync-caches'
 
 if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
   throw new Error(`You cannot clean the database in a non-staging and real production environment!`)
@@ -13,6 +14,9 @@ if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
   try {
     await cleanDatabase()
     console.log('Successfully deleted all nodes and relations!') // eslint-disable-line no-console
+    // A running server still holds stale role/policy caches after this wipe — nudge it
+    // to resync (best-effort; no-op if the backend is down).
+    await nudgeCacheResync()
     process.exit(0)
     // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (err) {

@@ -117,6 +117,18 @@ describe('PolicyService', () => {
       expect(svc.get('apiKeysEnabled')).toBe(false)
     })
 
+    it('reload() resyncs the cache from the DB (picks up an out-of-process change)', async () => {
+      readAllSettings.mockResolvedValue({ publicRegistration: true })
+      const svc = new PolicyService(dbStub)
+      await svc.init({})
+      expect(svc.get('publicRegistration')).toBe(true)
+
+      // The DB changed out-of-process (e.g. a db:reset/seed); reload re-reads it.
+      readAllSettings.mockResolvedValue({ publicRegistration: false })
+      await svc.reload()
+      expect(svc.get('publicRegistration')).toBe(false)
+    })
+
     it('repairs (does not adopt) a stored value whose type no longer matches the schema', async () => {
       // A corrupt / un-migrated DB value: a number for a boolean key. It must be
       // reseeded from ENV/default and the broken DB row overwritten (writeSetting),

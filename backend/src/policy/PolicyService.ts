@@ -108,6 +108,16 @@ export class PolicyService {
       })
     }
 
+    await this.loadFromDb()
+
+    this.initialised = true
+  }
+
+  // Re-read the policy snapshot from the DB into the cache, WITHOUT touching the
+  // pubsub subscription. Shared by init() and reload(); the latter is the cache-resync
+  // trigger used after a DB reset/seed (a separate process wipes the DB but cannot
+  // clear this in-memory cache, so we re-read on demand).
+  private async loadFromDb(): Promise<void> {
     const dbValues = await readAllSettings(this.db, POLICY_NAMESPACE)
 
     for (const key of allKeys()) {
@@ -132,7 +142,7 @@ export class PolicyService {
       }
 
       const envName = envSeedFor(key)
-      const envValue = envName ? parseEnvValue(envName, env, typeFor(key)) : undefined
+      const envValue = envName ? parseEnvValue(envName, this.env, typeFor(key)) : undefined
       const seedValue = envValue !== undefined ? envValue : defaultFor(key)
 
       await writeSetting(this.db, POLICY_NAMESPACE, key, seedValue, 'system:seed')
@@ -148,8 +158,14 @@ export class PolicyService {
     // the snapshot; a change-event during init may have set it too — readLastChange
     // reflects the committed DB truth, so it is the authoritative final value.
     this.lastChange = (await readLastChange(this.db, POLICY_NAMESPACE)) ?? undefined
+  }
 
-    this.initialised = true
+  // Resync the cache from the DB after an out-of-process change (e.g. db:reset/seed).
+  // Clears first so values for keys removed from the DB fall back to ENV/default
+  // rather than lingering. Does not re-subscribe.
+  async reload(): Promise<void> {
+    this.cache = {}
+    await this.loadFromDb()
   }
 
   shutdown(): void {

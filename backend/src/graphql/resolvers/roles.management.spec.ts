@@ -95,6 +95,18 @@ describe('role management', () => {
     })
   })
 
+  describe('resyncCaches', () => {
+    it('is allowed without auth outside production and resyncs the caches', async () => {
+      // NODE_ENV=test → not production → the shield's isNotProduction branch permits it
+      // (so db:reset / e2e can trigger a resync when no users exist). The resolver
+      // reloads the role + policy caches from the DB and returns true.
+      authenticatedUser = null
+      const { data, errors } = await mutate({ mutation: `mutation { resyncCaches }` })
+      expect(errors).toBeUndefined()
+      expect(data.resyncCaches).toBe(true)
+    })
+  })
+
   describe('myPermissions', () => {
     it('returns the baseline for a member', async () => {
       const user = await Factory.build(

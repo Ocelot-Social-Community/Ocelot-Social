@@ -20,6 +20,7 @@ const EXPECTED_KEYS: PermissionKey[] = [
   'donation.manage',
   'apiKey.administer',
   'user.email.readAny',
+  'system.resync',
   'badge.manage',
   'content.moderate',
   'user.delete.any',

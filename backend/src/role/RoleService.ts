@@ -90,6 +90,18 @@ export class RoleService {
     this.initialised = true
   }
 
+  // Resync the cache from the DB after an out-of-process change (e.g. db:reset/seed):
+  // a separate process wipes/reseeds the DB but cannot clear this in-memory cache. We
+  // clear first so roles deleted from the DB stop lingering, then re-read the persisted
+  // set (re-seeding defaults if needed). Does NOT re-subscribe.
+  async reload(): Promise<void> {
+    const roles = await seedDefaultRoleNodes(this.db)
+    this.cache.clear()
+    for (const role of roles) {
+      this.cache.set(role.name, role)
+    }
+  }
+
   shutdown(): void {
     if (this.subscriptionId !== undefined && this.pubsub) {
       this.pubsub.unsubscribe(this.subscriptionId)
