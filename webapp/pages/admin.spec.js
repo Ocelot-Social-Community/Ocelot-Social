@@ -78,6 +78,13 @@ describe('admin.vue', () => {
       expect(text).not.toContain('admin.dashboard.name') // no network.statistics.read
       expect(text).not.toContain('admin.donations.name') // no donation.manage
     })
+
+    it('shows the reports tab for a content moderator, hides it otherwise', () => {
+      mocks.$can = (permission) => permission === 'content.moderate'
+      expect(Wrapper().text()).toContain('moderation.reports.name')
+      mocks.$can = (permission) => permission === 'policy.manage'
+      expect(Wrapper().text()).not.toContain('moderation.reports.name')
+    })
   })
 
   describe('landing redirect', () => {

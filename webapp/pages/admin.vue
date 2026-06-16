@@ -61,6 +61,11 @@ export default {
           permissions: ['user.email.readAny', 'role.manage', 'badge.manage', 'user.delete.any'],
         },
         {
+          name: this.$t('moderation.reports.name'),
+          path: '/admin/reports',
+          permissions: ['content.moderate'],
+        },
+        {
           name: this.$t('admin.categories.name'),
           path: '/admin/categories',
           permissions: [],
