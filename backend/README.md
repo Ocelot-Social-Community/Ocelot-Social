@@ -180,6 +180,8 @@ docker compose down -v
 
 > Note: This just deletes the data and not the constraints, hence you do not need to rerun `yarn db:migrate init` or `yarn db:migrate up`.
 
+> Note on caches: the role & policy permission caches live in the running server process. A `db:reset` / `db:seed` runs in a **separate** process, so it cannot clear them directly — the running server's caches would otherwise go stale (e.g. still point at roles that were just wiped). In dev/test the reset/seed scripts therefore best-effort POST `mutation { resyncCaches }` to the server, which re-reads both caches from the DB. This mutation is **disabled in production**; there a cache resync is simply a **rolling restart**, since each instance re-reads the DB on boot.
+
 ### Data migrations
 
 Although Neo4J is schema-less,you might find yourself in a situation in which

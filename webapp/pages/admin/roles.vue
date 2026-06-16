@@ -90,29 +90,33 @@
           {{ $t('admin.roles.allPermissions') }}
         </p>
 
-        <fieldset v-for="group in permissionGroups" :key="group.name" class="perm-group">
-          <legend class="perm-group__title">{{ groupLabel(group.name) }}</legend>
-          <label
-            v-for="permission in group.permissions"
-            :key="permission.key"
-            class="perm-row"
-            :class="{
-              'perm-row--added': hoverDiff[permission.key] === 'added',
-              'perm-row--removed': hoverDiff[permission.key] === 'removed',
-            }"
-          >
-            <input
-              type="checkbox"
-              :disabled="activeRole.protected"
-              v-model="forms[activeRole.name].permissions[permission.key]"
-              :data-test="`role-${activeRole.name}-perm-${permission.key}`"
-            />
-            <span class="perm-row__text">
-              <span class="perm-row__key">{{ permission.key }}</span>
-              <span class="perm-row__desc">{{ permLabel(permission) }}</span>
-            </span>
-          </label>
-        </fieldset>
+        <!-- Two-column masonry on desktop (>=1024px) for a compact overview; each
+             group stays intact (break-inside: avoid). Single column on mobile. -->
+        <div class="perm-groups">
+          <fieldset v-for="group in permissionGroups" :key="group.name" class="perm-group">
+            <legend class="perm-group__title">{{ groupLabel(group.name) }}</legend>
+            <label
+              v-for="permission in group.permissions"
+              :key="permission.key"
+              class="perm-row"
+              :class="{
+                'perm-row--added': hoverDiff[permission.key] === 'added',
+                'perm-row--removed': hoverDiff[permission.key] === 'removed',
+              }"
+            >
+              <input
+                type="checkbox"
+                :disabled="activeRole.protected"
+                v-model="forms[activeRole.name].permissions[permission.key]"
+                :data-test="`role-${activeRole.name}-perm-${permission.key}`"
+              />
+              <span class="perm-row__text">
+                <span class="perm-row__key">{{ permission.key }}</span>
+                <span class="perm-row__desc">{{ permLabel(permission) }}</span>
+              </span>
+            </label>
+          </fieldset>
+        </div>
 
         <div class="role__actions">
           <!-- Always visible; disabled (with a hint) where the action does not apply. -->
@@ -512,10 +516,25 @@ export default {
     display: inline-flex;
   }
 }
+// Desktop (>=1024px): pack the permission groups into two columns for a more
+// compact overview. Mobile/tablet stay single-column (the default). column-* is
+// used (rather than grid/flex) so unequal-height groups fill the space tightly.
+.perm-groups {
+  @media #{$media-query-large} {
+    column-count: 2;
+    column-gap: $space-large;
+  }
+}
 .perm-group {
   border: none;
   padding: 0;
   margin: $space-x-small 0;
+  // Keep a group (title + its rows) from splitting across the two columns.
+  break-inside: avoid;
+  // The first group's top margin would otherwise misalign the two column tops.
+  &:first-child {
+    margin-top: 0;
+  }
 
   &__title {
     color: $text-color-soft;
