@@ -5,19 +5,28 @@
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { createApolloTestSetup } from '@root/test/helpers'
-import { RoleService } from '@src/role'
+import { PERMISSIONS_CHANGED_CHANNEL, RoleService } from '@src/role'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 let authenticatedUser: Context['user']
 let roleService: RoleService
+// Optional per-test pubsub spy; when unset, the context falls back to the default
+// server pubsub (harmless in-memory).
+let pubsubMock: { publish: jest.Mock; asyncIterator: jest.Mock } | undefined
 let query: ApolloTestSetup['query']
 let mutate: ApolloTestSetup['mutate']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
-const contextFn = () => ({ authenticatedUser, roleService })
+const contextFn = () => ({
+  authenticatedUser,
+  roleService,
+  // Test spy standing in for the pubsub; cast since it implements only the bits the
+  // role mutations use (publish). Undefined → the helper's default server pubsub.
+  pubsub: pubsubMock as unknown as Context['pubsub'],
+})
 
 const asAdmin = async () => {
   const admin = await Factory.build(
@@ -70,6 +79,60 @@ describe('role management', () => {
     roleService = new RoleService(database)
     await roleService.init()
     authenticatedUser = null
+    pubsubMock = undefined
+  })
+
+  // The live permissionsChanged broadcast (clients refetch their permissions on it).
+  describe('permissionsChanged broadcast', () => {
+    beforeEach(async () => {
+      pubsubMock = { publish: jest.fn().mockResolvedValue(undefined), asyncIterator: jest.fn() }
+      await asAdmin()
+      await mutate({
+        mutation: CREATE_ROLE,
+        variables: { name: 'broadcast-role', permissions: [] },
+      })
+      pubsubMock.publish.mockClear()
+    })
+
+    it('does not broadcast on createRole (a brand-new role has no holders yet)', async () => {
+      await mutate({
+        mutation: CREATE_ROLE,
+        variables: { name: 'fresh-role', permissions: [] },
+      })
+      expect(pubsubMock?.publish).not.toHaveBeenCalled()
+    })
+
+    it('broadcasts on updateRole (a role permission set changed)', async () => {
+      await mutate({
+        mutation: UPDATE_ROLE,
+        variables: { name: 'broadcast-role', permissions: ['post.pin'] },
+      })
+      expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
+        permissionsChanged: { roleName: 'broadcast-role' },
+      })
+    })
+
+    it('broadcasts on deleteRole (former holders fall back to baseline)', async () => {
+      await mutate({ mutation: DELETE_ROLE, variables: { name: 'broadcast-role' } })
+      expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
+        permissionsChanged: { roleName: 'broadcast-role' },
+      })
+    })
+
+    it('broadcasts on setUserRole (the target user permissions changed)', async () => {
+      await Factory.build(
+        'user',
+        { id: 'member-x', role: 'user' },
+        { email: 'member-x@example.org', password: '1234' },
+      )
+      await mutate({
+        mutation: SET_USER_ROLE,
+        variables: { userId: 'member-x', roleName: 'broadcast-role' },
+      })
+      expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
+        permissionsChanged: { roleName: 'broadcast-role' },
+      })
+    })
   })
 
   describe('authorization (role.manage)', () => {

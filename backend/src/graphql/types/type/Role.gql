@@ -47,3 +47,17 @@ type Mutation {
   "Set a user's single role (replaces their current role)."
   setUserRole(userId: ID!, roleName: String!): User!
 }
+
+"""
+A signal that effective permissions may have changed (a role's permission set, or a
+user's role assignment). Clients refetch their own myPermissions on receipt — the
+payload carries only the affected role name, no actor (Datensparsamkeit).
+"""
+type PermissionsChanged {
+  roleName: String
+}
+
+type Subscription {
+  "Fires when a role's permissions or a user's role assignment changes."
+  permissionsChanged: PermissionsChanged!
+}

@@ -21,7 +21,13 @@ describe('auth store', () => {
 
   describe('initial state', () => {
     it('starts logged out', () => {
-      expect(createState()).toEqual({ user: null, token: null, pending: false, permissions: [] })
+      expect(createState()).toEqual({
+        user: null,
+        token: null,
+        pending: false,
+        permissions: [],
+        permissionsSubscriptionActive: false,
+      })
     })
   })
 
@@ -66,6 +72,14 @@ describe('auth store', () => {
       expect(state.permissions).toEqual(perms)
       mutations.SET_PERMISSIONS(state, null)
       expect(state.permissions).toEqual([])
+    })
+
+    it('SET_PERMISSIONS_SUBSCRIPTION_ACTIVE toggles the flag', () => {
+      const state = createState()
+      mutations.SET_PERMISSIONS_SUBSCRIPTION_ACTIVE(state, true)
+      expect(state.permissionsSubscriptionActive).toBe(true)
+      mutations.SET_PERMISSIONS_SUBSCRIPTION_ACTIVE(state, false)
+      expect(state.permissionsSubscriptionActive).toBe(false)
     })
   })
 
@@ -284,6 +298,93 @@ describe('auth store', () => {
         )
         expect(dispatch).not.toHaveBeenCalled()
         expect(result).toBe(true)
+      })
+    })
+
+    describe('refreshPermissions', () => {
+      const callWith = (query, commit) =>
+        actions.refreshPermissions.call(
+          { app: { apolloProvider: { defaultClient: { query } } } },
+          { commit },
+        )
+
+      it('commits the freshly fetched permissions', async () => {
+        const myPermissions = [{ key: 'network.statistics.read', group: 'administration' }]
+        const query = jest.fn().mockResolvedValue({ data: { myPermissions } })
+        const commit = jest.fn()
+        await callWith(query, commit)
+        expect(commit).toHaveBeenCalledWith('SET_PERMISSIONS', myPermissions)
+      })
+
+      it('falls back to [] when myPermissions is absent', async () => {
+        const query = jest.fn().mockResolvedValue({ data: {} })
+        const commit = jest.fn()
+        await callWith(query, commit)
+        expect(commit).toHaveBeenCalledWith('SET_PERMISSIONS', [])
+      })
+
+      it('keeps existing permissions on a transient error (no commit, no throw)', async () => {
+        const query = jest.fn().mockRejectedValue(new Error('boom'))
+        const commit = jest.fn()
+        await callWith(query, commit)
+        expect(commit).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('permissions subscription', () => {
+      // A fake apollo client whose subscribe() exposes the registered handler so the
+      // next/error callbacks can be driven directly.
+      const makeStore = (permissionsSubscriptionActive = false) => {
+        let handler
+        const innerSubscribe = jest.fn((h) => {
+          handler = h
+          return { unsubscribe: jest.fn() }
+        })
+        const subscribe = jest.fn(() => ({ subscribe: innerSubscribe }))
+        const commit = jest.fn()
+        const dispatch = jest.fn()
+        const store = {
+          app: { apolloProvider: { defaultClient: { subscribe } } },
+          commit,
+          dispatch,
+          state: { permissionsSubscriptionActive },
+        }
+        return { store, subscribe, commit, dispatch, getHandler: () => handler }
+      }
+
+      it('opens the subscription and marks it active when inactive', () => {
+        const { store, subscribe, commit } = makeStore(false)
+        actions.subscribePermissions.call(store, store)
+        expect(subscribe).toHaveBeenCalled()
+        expect(commit).toHaveBeenCalledWith('SET_PERMISSIONS_SUBSCRIPTION_ACTIVE', true)
+      })
+
+      it('is a no-op when already active', () => {
+        const { store, subscribe } = makeStore(true)
+        actions.subscribePermissions.call(store, store)
+        expect(subscribe).not.toHaveBeenCalled()
+      })
+
+      it('refetches permissions when an event arrives', () => {
+        const { store, dispatch, getHandler } = makeStore(false)
+        actions.subscribePermissions.call(store, store)
+        getHandler().next()
+        expect(dispatch).toHaveBeenCalledWith('refreshPermissions')
+      })
+
+      it('marks the subscription inactive on error', () => {
+        const { store, commit, getHandler } = makeStore(false)
+        actions.subscribePermissions.call(store, store)
+        getHandler().error()
+        expect(commit).toHaveBeenCalledWith('SET_PERMISSIONS_SUBSCRIPTION_ACTIVE', false)
+      })
+
+      it('resubscribePermissions tears down and re-opens', () => {
+        const { store, subscribe, commit } = makeStore(true)
+        actions.resubscribePermissions.call(store, store)
+        expect(commit).toHaveBeenCalledWith('SET_PERMISSIONS_SUBSCRIPTION_ACTIVE', false)
+        expect(subscribe).toHaveBeenCalled()
+        expect(commit).toHaveBeenCalledWith('SET_PERMISSIONS_SUBSCRIPTION_ACTIVE', true)
       })
     })
 

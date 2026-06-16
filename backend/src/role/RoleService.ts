@@ -26,6 +26,14 @@ type DbContext = ReturnType<typeof databaseContext>
 
 export const ROLE_CHANGED_CHANNEL = 'roles.changed'
 
+// Client-facing notification channel: published by the role mutations (resolver) when
+// a change may alter someone's effective permissions — a role's permission set
+// (updateRole/deleteRole) or a user's role assignment (setUserRole). Distinct from the
+// internal ROLE_CHANGED_CHANNEL (cross-instance cache sync, role-definition payloads):
+// this one only signals connected clients to refetch their permissions, via the
+// permissionsChanged GraphQL subscription.
+export const PERMISSIONS_CHANGED_CHANNEL = 'permissions.changed'
+
 // Domain-level error (protected-role edit, unknown role, …). Free of any GraphQL
 // dependency — the resolver translates it at the transport boundary.
 export class RoleValidationError extends Error {}

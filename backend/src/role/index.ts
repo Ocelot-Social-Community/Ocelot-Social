@@ -5,6 +5,7 @@ export {
   setRoleServiceForTesting,
   createInMemoryRoleService,
   ROLE_CHANGED_CHANNEL,
+  PERMISSIONS_CHANGED_CHANNEL,
 } from './RoleService'
 export { DEFAULT_ROLES } from './defaults'
 export { ensureUserRoleEdges, seedDefaultRoleNodes, promoteToOwner } from './userRoleEdges'

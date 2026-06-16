@@ -175,12 +175,13 @@ describe('actions', () => {
         expect(commit.mock.calls).toEqual(expect.arrayContaining([['SET_TOKEN', token]]))
       })
 
-      it('fetches the user, initializes categories, refetches and re-subscribes the policy', () => {
+      it('fetches the user, initializes categories, refetches and re-subscribes the policy + permissions', () => {
         expect(dispatch.mock.calls).toEqual([
           ['fetchCurrentUser'],
           ['categories/init', null, { root: true }],
           ['policy/init', null, { root: true }],
           ['policy/resubscribe', null, { root: true }],
+          ['resubscribePermissions'],
         ])
       })
 
@@ -267,6 +268,7 @@ describe('actions', () => {
       expect(dispatch.mock.calls).toEqual([
         ['policy/init', null, { root: true }],
         ['policy/resubscribe', null, { root: true }],
+        ['resubscribePermissions'],
       ])
     })
   })

@@ -1,10 +1,46 @@
 import gql from 'graphql-tag'
 import { VERSION } from '~/constants/terms-and-conditions-version.js'
 import { currentUserQuery } from '~/graphql/User'
+import PermissionsSubscription from '~/graphql/PermissionsSubscription'
 import Cookie from 'universal-cookie'
 import metadata from '~/constants/metadata'
 
 const cookies = new Cookie()
+
+// Just the viewer's effective permissions — used to refetch live (on a permissionsChanged
+// event) without re-pulling the whole currentUser, and without the logout-on-error of
+// fetchCurrentUser.
+const myPermissionsQuery = gql`
+  query {
+    myPermissions {
+      key
+      group
+    }
+  }
+`
+
+const apolloClient = (ctx) => ctx.app.apolloProvider.defaultClient
+
+// The live permissionsChanged subscription handle (one per browser tab). Module-scope
+// so a forced websocket restart (login/logout) can tear it down and re-open a fresh
+// one — same reasoning as the policy subscription.
+let permissionsSubscription = null
+
+const openPermissionsSubscription = (store, commit, dispatch) => {
+  const observable = apolloClient(store).subscribe({ query: PermissionsSubscription() })
+  permissionsSubscription = observable.subscribe({
+    next() {
+      // A role's permissions or some user's role assignment changed — it may affect
+      // THIS viewer, so refetch their effective permissions (admin/moderation menus,
+      // $can gates etc. update without a reload).
+      dispatch('refreshPermissions')
+    },
+    error() {
+      commit('SET_PERMISSIONS_SUBSCRIPTION_ACTIVE', false)
+    },
+  })
+  commit('SET_PERMISSIONS_SUBSCRIPTION_ACTIVE', true)
+}
 
 // Permission catalog groups. The backend tags every effective permission with its
 // group (myPermissions { key group }), so area gating derives from the group — a new
@@ -21,6 +57,7 @@ export const state = () => {
     // backend myPermissions query). Drives can() and group-based area gating; empty
     // while anonymous.
     permissions: [],
+    permissionsSubscriptionActive: false,
   }
 }
 
@@ -39,6 +76,9 @@ export const mutations = {
   },
   SET_PERMISSIONS(state, permissions) {
     state.permissions = Array.isArray(permissions) ? permissions : []
+  },
+  SET_PERMISSIONS_SUBSCRIPTION_ACTIVE(state, value) {
+    state.permissionsSubscriptionActive = value
   },
 }
 
@@ -132,6 +172,42 @@ export const actions = {
     return getters.isLoggedIn
   },
 
+  // Refetch only the viewer's effective permissions (live, on a permissionsChanged
+  // event). Lightweight and self-contained: a transient failure keeps the current
+  // permissions rather than wiping them or logging out (unlike fetchCurrentUser).
+  async refreshPermissions({ commit }) {
+    try {
+      const {
+        data: { myPermissions },
+      } = await this.app.apolloProvider.defaultClient.query({
+        query: myPermissionsQuery,
+        fetchPolicy: 'network-only',
+      })
+      commit('SET_PERMISSIONS', myPermissions || [])
+    } catch {
+      // Keep the last-known permissions on a transient error.
+    }
+  },
+
+  // Subscribe once per client to permissionsChanged; idempotent. On each event the
+  // viewer's permissions are refetched so menus/$can update without a page reload.
+  subscribePermissions({ commit, dispatch, state }) {
+    if (state.permissionsSubscriptionActive) return
+    openPermissionsSubscription(this, commit, dispatch)
+  },
+
+  // Re-open the subscription after a forced websocket restart (login / logout) — the
+  // old operation's handler is dropped by restartWebsockets(), so live events stop
+  // arriving until a fresh subscribe(). Mirrors policy/resubscribe.
+  resubscribePermissions({ commit, dispatch }) {
+    if (permissionsSubscription) {
+      permissionsSubscription.unsubscribe?.()
+      permissionsSubscription = null
+    }
+    commit('SET_PERMISSIONS_SUBSCRIPTION_ACTIVE', false)
+    openPermissionsSubscription(this, commit, dispatch)
+  },
+
   async fetchCurrentUser({ commit, dispatch }) {
     const client = this.app.apolloProvider.defaultClient
     try {
@@ -176,6 +252,9 @@ export const actions = {
       // policyChanged subscription's handler. Re-open it so live updates keep
       // arriving without a full page reload.
       await dispatch('policy/resubscribe', null, { root: true })
+      // Re-open the permissionsChanged subscription on the new (authenticated) socket
+      // so role/permission changes apply live without a reload.
+      dispatch('resubscribePermissions')
       if (cookies.get(metadata.COOKIE_NAME) === undefined) {
         throw new Error('no-cookie')
       }
@@ -197,5 +276,6 @@ export const actions = {
     // onLogout() restarted the websocket too; re-open the subscription on the
     // now-anonymous connection so public-key changes still arrive live.
     await dispatch('policy/resubscribe', null, { root: true })
+    dispatch('resubscribePermissions')
   },
 }
