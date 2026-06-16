@@ -55,7 +55,6 @@ describe('DEFAULT_ROLES', () => {
     'donation.manage',
     'apiKey.administer',
     'user.email.readAny',
-    'system.resync',
     'user.delete.any',
     'post.pin',
     'post.push',

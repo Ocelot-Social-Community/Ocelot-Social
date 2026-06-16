@@ -1,10 +1,10 @@
 type Mutation {
   """
-  Resynchronise the in-memory role & policy caches from the database. Recovery hook
-  for the case where an out-of-process change (db:reset / db:seed) leaves a running
-  server's caches stale. Gated by the system.resync permission in production; allowed
-  unauthenticated outside production so dev/test tooling (db:reset, e2e) can trigger it
-  even when no users exist yet.
+  Resynchronise the in-memory role & policy caches from the database. Dev/test-only
+  recovery hook for when an out-of-process change (db:reset / db:seed, the e2e harness)
+  leaves a running server's caches stale; it needs no auth outside production so it
+  works even when no users exist yet (right after a wipe). Disabled in production —
+  there a rolling restart re-reads the DB on each instance's boot.
   """
   resyncCaches: Boolean!
 }

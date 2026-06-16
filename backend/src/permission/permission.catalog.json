@@ -28,10 +28,6 @@
       "group": "administration",
       "description": "Read any user's email address (beyond one's own)."
     },
-    "system.resync": {
-      "group": "administration",
-      "description": "Resynchronise the in-memory role/policy caches from the database (ops recovery)."
-    },
     "badge.manage": {
       "group": "moderation",
       "description": "Grant and revoke verification and trophy badges."
