@@ -20,7 +20,7 @@ exports[`UserList given badges are disabled renders 1`] = `
         class="ds-flex ds-flex-gap-small"
       >
         <div
-          style="flex: 0 0 90%; width: 90%;"
+          style="flex: 1 1 auto; min-width: 0;"
         >
           <div
             class="ds-form-item ds-input-size-base"
@@ -521,7 +521,7 @@ exports[`UserList given badges are enabled renders 1`] = `
         class="ds-flex ds-flex-gap-small"
       >
         <div
-          style="flex: 0 0 90%; width: 90%;"
+          style="flex: 1 1 auto; min-width: 0;"
         >
           <div
             class="ds-form-item ds-input-size-base"

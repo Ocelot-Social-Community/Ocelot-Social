@@ -4,7 +4,9 @@
       <h2 class="title">{{ $t('admin.users.name') }}</h2>
       <form @submit.prevent="onSubmit" novalidate>
         <div class="ds-flex ds-flex-gap-small">
-          <div style="flex: 0 0 90%; width: 90%">
+          <!-- Input grows to fill so the search button sits flush right, aligning with
+               the badge edit-button column in the results table below. -->
+          <div style="flex: 1 1 auto; min-width: 0">
             <ocelot-input
               model="query"
               :placeholder="$t('admin.users.form.placeholder')"
