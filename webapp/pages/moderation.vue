@@ -3,9 +3,17 @@
     <h1 class="ds-heading ds-heading-h1">
       {{ $t('moderation.name') }}
     </h1>
-    <div class="ds-flex ds-flex-gap-small moderation-layout">
+    <os-card v-if="areaHasNoAccessibleRoute">
+      <div class="ds-mb-large ds-space-centered">
+        <div class="ds-mb-large">
+          <img :src="errorIconPath" width="40" />
+        </div>
+        <p class="ds-text">{{ $t('site.error-occurred') }}</p>
+      </div>
+    </os-card>
+    <div v-else class="ds-flex ds-flex-gap-small moderation-layout">
       <div class="moderation-layout__sidebar">
-        <os-menu :routes="routes" link-tag="router-link" />
+        <os-menu :routes="accessibleRoutes" link-tag="router-link" />
       </div>
       <div class="moderation-layout__main">
         <transition name="slide-up" appear>
@@ -17,36 +25,38 @@
 </template>
 
 <script>
-import { OsMenu } from '@ocelot-social/ui'
-import { mapGetters } from 'vuex'
+import { OsCard, OsMenu } from '@ocelot-social/ui'
+import areaNavigation from '~/mixins/areaNavigation'
 
 export default {
   components: {
+    OsCard,
     OsMenu,
   },
-  // Area access is group-driven (any moderation-group permission); each entry below
-  // gates on its own permission.
+  mixins: [areaNavigation],
+  // Area access is group-driven (any moderation-group permission); the mixin then
+  // redirects to the first accessible sub-page, or shows the error when none is (e.g.
+  // a post.pin-only holder: in the moderation group, but with no moderation PAGE).
   middleware: ['canAccessModeration'],
+  data() {
+    return {
+      errorIconPath: '/img/svg/emoji/cry.svg',
+    }
+  },
   computed: {
-    ...mapGetters({
-      isModerator: 'auth/isModerator',
-      canManageUsers: 'auth/canManageUsers',
-    }),
-    routes() {
-      const routes = []
-      if (this.isModerator) {
-        routes.push({
+    allRoutes() {
+      return [
+        {
           name: this.$t('moderation.reports.name'),
-          path: `/moderation`,
-        })
-      }
-      if (this.canManageUsers) {
-        routes.push({
+          path: '/moderation',
+          permissions: ['content.moderate'],
+        },
+        {
           name: this.$t('moderation.users.name'),
-          path: `/moderation/users`,
-        })
-      }
-      return routes
+          path: '/moderation/users',
+          permissions: ['badge.manage', 'user.delete.any'],
+        },
+      ]
     },
   },
 }
