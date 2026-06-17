@@ -20,9 +20,10 @@ const EXPECTED_KEYS: PermissionKey[] = [
   'donation.manage',
   'apiKey.administer',
   'user.email.readAny',
+  'user.delete.any',
   'badge.manage',
   'content.moderate',
-  'user.delete.any',
+  'user.disable',
   'post.pin',
   'post.push',
   'post.create',
@@ -57,6 +58,13 @@ describe('permission catalog', () => {
       expect(groupFor(key).length).toBeGreaterThan(0)
       expect(descriptionFor(key)).toEqual(expect.any(String))
       expect(descriptionFor(key).length).toBeGreaterThan(0)
+    })
+
+    it('files the destructive per-user actions in the right groups', () => {
+      // user.delete.any is irreversible/admin-grade → administration; user.disable is
+      // reversible/moderator-grade → moderation. This drives isAdmin / canAccessModeration.
+      expect(groupFor('user.delete.any')).toBe('administration')
+      expect(groupFor('user.disable')).toBe('moderation')
     })
 
     it('only uses known groups', () => {

@@ -84,6 +84,13 @@
                 {{ $t('admin.users.table.columns.badges') }}
               </th>
               <th
+                v-if="canDisableUsers"
+                scope="col"
+                class="ds-table-head-col ds-table-head-col-right"
+              >
+                {{ $t('admin.users.table.columns.status') }}
+              </th>
+              <th
                 v-if="canDeleteUsers"
                 scope="col"
                 class="ds-table-head-col ds-table-head-col-right"
@@ -156,6 +163,25 @@
                   <template #icon><os-icon :icon="icons.pencil" /></template>
                 </os-button>
               </td>
+              <td v-if="canDisableUsers" class="ds-table-col ds-table-col-right">
+                <os-button
+                  v-if="user.id !== currentUser.id"
+                  :variant="user.disabled ? 'primary' : 'danger'"
+                  appearance="ghost"
+                  circle
+                  :data-test="`user-disable-${user.id}`"
+                  :aria-label="
+                    user.disabled
+                      ? $t('admin.users.disable.enableLabel')
+                      : $t('admin.users.disable.disableLabel')
+                  "
+                  @click="toggleDisableUser(user)"
+                >
+                  <template #icon>
+                    <os-icon :icon="user.disabled ? icons.eye : icons.ban" />
+                  </template>
+                </os-button>
+              </td>
               <td v-if="canDeleteUsers" class="ds-table-col ds-table-col-right">
                 <os-button
                   v-if="user.id !== currentUser.id"
@@ -193,7 +219,7 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
-import { adminUserQuery, deleteUserMutation } from '~/graphql/User'
+import { adminUserQuery, deleteUserMutation, disableUserMutation } from '~/graphql/User'
 import { rolesQuery, setUserRoleMutation } from '~/graphql/admin/Roles'
 import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
@@ -203,7 +229,10 @@ import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 // each area routes to its own badge-detail page. Columns gate per permission:
 // - email   → user.email.readAny  (field-gated server-side; query omits it without the right)
 // - role    → role.manage         (field-gated; query omits roleName, rolesQuery skipped)
-// A moderator typically holds neither, so they see only the badge action.
+// - badges  → badge.manage
+// - status  → user.disable        (reversible disable/enable toggle; moderation-grade)
+// - delete  → user.delete.any     (irreversible; administration-grade)
+// A default moderator holds badge.manage + user.disable; delete is admin-only.
 export default {
   mixins: [formValidation],
   components: {
@@ -286,6 +315,13 @@ export default {
     // it here anyway via the same gate).
     canDeleteUsers() {
       return this.$can('user.delete.any')
+    },
+    // Disable/enable column — shown to user.disable holders. The reversible, moderator-grade
+    // counterpart to delete; the per-row button is hidden for one's own account, and the
+    // backend additionally enforces the act-on hierarchy (you can only disable a user whose
+    // permissions are a strict subset of yours).
+    canDisableUsers() {
+      return this.$can('user.disable')
     },
     // Only an owner may grant the owner role (mirrors the backend rule).
     isOwner() {
@@ -438,6 +474,27 @@ export default {
         this.$toast.success(this.$t('admin.users.delete.success'))
       } catch (error) {
         this.$toast.error(this.$t('admin.users.delete.error', { message: error.message }))
+        throw error
+      }
+    },
+    // Toggle a user's disabled state (reversible deactivation). No confirm dialog —
+    // it is reversible, unlike delete. The backend enforces user.disable + the act-on
+    // hierarchy; a forbidden target surfaces as an error toast.
+    async toggleDisableUser(user) {
+      const disable = !user.disabled
+      try {
+        await this.$apollo.mutate({
+          mutation: disableUserMutation(),
+          variables: { id: user.id, disable },
+        })
+        await this.$apollo.queries.User.refetch()
+        this.$toast.success(
+          disable
+            ? this.$t('admin.users.disable.disabledSuccess')
+            : this.$t('admin.users.disable.enabledSuccess'),
+        )
+      } catch (error) {
+        this.$toast.error(this.$t('admin.users.disable.error', { message: error.message }))
         throw error
       }
     },

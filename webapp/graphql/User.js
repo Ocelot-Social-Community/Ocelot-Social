@@ -88,6 +88,7 @@ export const adminUserQuery = ({ withEmail = true, withRole = true } = {}) => {
         ${withEmail ? 'email' : ''}
         ${withRole ? 'roleName' : ''}
         createdAt
+        disabled
         contributionsCount
         commentedCount
         shoutedCount
@@ -104,6 +105,20 @@ export const deleteUserMutation = () => {
     mutation ($id: ID!, $resource: [Deletable]) {
       DeleteUser(id: $id, resource: $resource) {
         id
+      }
+    }
+  `
+}
+
+// Reversibly disable (deactivate) or re-enable a user account. Gated server-side by
+// `and(user.disable, canActOnTargetUser)` — the moderator-grade, reversible counterpart
+// to the irreversible, admin-only DeleteUser. Used by the shared admin/moderation list.
+export const disableUserMutation = () => {
+  return gql`
+    mutation ($id: ID!, $disable: Boolean!) {
+      disableUser(id: $id, disable: $disable) {
+        id
+        disabled
       }
     }
   `

@@ -38,6 +38,13 @@ describe('moderation.vue', () => {
     expect(paths).toEqual(['/moderation/users'])
   })
 
+  it('shows the users page for a disable-only moderator (user.disable)', () => {
+    const paths = Wrapper({ can: (p) => p === 'user.disable' }).vm.accessibleRoutes.map(
+      (r) => r.path,
+    )
+    expect(paths).toEqual(['/moderation/users'])
+  })
+
   it('redirects from the inaccessible reports landing to the first accessible page', () => {
     const replace = jest.fn(() => Promise.resolve())
     Wrapper({

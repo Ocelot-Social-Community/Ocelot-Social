@@ -28,6 +28,10 @@
       "group": "administration",
       "description": "Read any user's email address (beyond one's own)."
     },
+    "user.delete.any": {
+      "group": "administration",
+      "description": "Delete any user's account, subject to the act-on hierarchy — you can only delete a user whose permissions are a strict subset of yours (own-account deletion stays self-allowed)."
+    },
     "badge.manage": {
       "group": "moderation",
       "description": "Grant and revoke verification and trophy badges."
@@ -36,9 +40,9 @@
       "group": "moderation",
       "description": "Access reports and review (decide) on reported content."
     },
-    "user.delete.any": {
+    "user.disable": {
       "group": "moderation",
-      "description": "Delete any user's account (own-account deletion stays self-allowed)."
+      "description": "Disable (deactivate) and re-enable user accounts (reversible), subject to the act-on hierarchy — you can only disable a user whose permissions are a strict subset of yours."
     },
     "post.pin": {
       "group": "moderation",

@@ -147,7 +147,7 @@ describe('auth store', () => {
       ).toBe(true)
     })
 
-    it('canManageUsers holds for badge.manage OR user.delete.any', () => {
+    it('canManageUsers holds for badge.manage OR user.disable OR user.delete.any', () => {
       expect(getters.canManageUsers({ permissions: [] })).toBe(false)
       expect(
         getters.canManageUsers({ permissions: [{ key: 'content.moderate', group: 'moderation' }] }),
@@ -156,7 +156,12 @@ describe('auth store', () => {
         getters.canManageUsers({ permissions: [{ key: 'badge.manage', group: 'moderation' }] }),
       ).toBe(true)
       expect(
-        getters.canManageUsers({ permissions: [{ key: 'user.delete.any', group: 'moderation' }] }),
+        getters.canManageUsers({ permissions: [{ key: 'user.disable', group: 'moderation' }] }),
+      ).toBe(true)
+      expect(
+        getters.canManageUsers({
+          permissions: [{ key: 'user.delete.any', group: 'administration' }],
+        }),
       ).toBe(true)
     })
 

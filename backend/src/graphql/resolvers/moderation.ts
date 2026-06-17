@@ -38,5 +38,32 @@ export default {
         await session.close()
       }
     },
+
+    // Directly deactivate / reactivate a user account — the reversible, moderator-grade
+    // counterpart to the irreversible, admin-only DeleteUser. Unlike `review` it needs
+    // no report; it just toggles user.disabled. The shield gates it on the user.disable
+    // permission AND the act-on hierarchy (canActOnTargetUser), so a moderator cannot
+    // disable a peer or a higher-privileged user.
+    disableUser: async (_object, params, context) => {
+      const { id, disable } = params
+      const session = context.driver.session()
+      try {
+        const writeTxResultPromise = session.writeTransaction(async (txc) => {
+          const response = await txc.run(
+            `
+              MATCH (user:User {id: $id})
+              SET user.disabled = $disable
+              RETURN user {.*}
+            `,
+            { id, disable },
+          )
+          return response.records.map((record) => record.get('user'))
+        })
+        const [user] = await writeTxResultPromise
+        return user || null
+      } finally {
+        await session.close()
+      }
+    },
   },
 }

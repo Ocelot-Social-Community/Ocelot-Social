@@ -266,6 +266,13 @@
         "success": "User deleted.",
         "title": "Delete user?"
       },
+      "disable": {
+        "disableLabel": "Disable user",
+        "disabledSuccess": "User disabled.",
+        "enableLabel": "Re-enable user",
+        "enabledSuccess": "User re-enabled.",
+        "error": "Could not change user status: {message}"
+      },
       "empty": "No users found",
       "form": {
         "placeholder": "e-mail, name, description, or role:moderator"
@@ -285,7 +292,8 @@
           "number": "No.",
           "role": "Role",
           "shouted": "Shouted",
-          "slug": "Slug"
+          "slug": "Slug",
+          "status": "Status"
         }
       }
     }

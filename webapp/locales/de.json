@@ -266,6 +266,13 @@
         "success": "Nutzer gelöscht.",
         "title": "Nutzer löschen?"
       },
+      "disable": {
+        "disableLabel": "Nutzer deaktivieren",
+        "disabledSuccess": "Nutzer deaktiviert.",
+        "enableLabel": "Nutzer reaktivieren",
+        "enabledSuccess": "Nutzer reaktiviert.",
+        "error": "Nutzerstatus konnte nicht geändert werden: {message}"
+      },
       "empty": "Keine Nutzer gefunden",
       "form": {
         "placeholder": "E-Mail, Name, Beschreibung oder role:moderator"
@@ -285,7 +292,8 @@
           "number": "Nr.",
           "role": "Rolle",
           "shouted": "Geteilt",
-          "slug": "Alias"
+          "slug": "Alias",
+          "status": "Status"
         }
       }
     }

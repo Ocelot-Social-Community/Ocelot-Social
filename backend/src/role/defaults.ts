@@ -59,6 +59,10 @@ export const DEFAULT_ROLES: RoleDefinition[] = [
       ...BASELINE,
       'content.moderate',
       'badge.manage',
+      // admin MUST hold every moderator capability (incl. user.disable) so the
+      // act-on dominance rule keeps the intuitive chain owner ⊋ admin ⊋ moderator
+      // ⊋ user — i.e. an admin can disable/delete a moderator (see role/dominance.ts).
+      'user.disable',
       'network.statistics.read',
       'role.manage',
       'policy.manage',
@@ -75,7 +79,9 @@ export const DEFAULT_ROLES: RoleDefinition[] = [
     protected: false,
     // badge.manage is a moderation-group capability (badges are a moderation act),
     // so the default moderator can grant/revoke badges via the moderation area.
-    permissions: [...BASELINE, 'content.moderate', 'badge.manage'],
+    // user.disable lets a moderator deactivate (reversible) abusive accounts — the
+    // moderator-grade alternative to the admin-only, irreversible user.delete.any.
+    permissions: [...BASELINE, 'content.moderate', 'badge.manage', 'user.disable'],
   },
   {
     name: USER_ROLE,

@@ -639,8 +639,8 @@ describe('ContentMenu.vue', () => {
         expect(openModalSpy).toHaveBeenCalledWith('confirm', 'disable')
       })
 
-      it('can disable users', async () => {
-        granted.add('content.moderate')
+      it('can disable users (gated on user.disable, not content.moderate)', async () => {
+        granted.add('user.disable')
         const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'user',
@@ -656,6 +656,44 @@ describe('ContentMenu.vue', () => {
           .at(0)
           .trigger('click')
         expect(openModalSpy).toHaveBeenCalledWith('confirm', 'disable')
+      })
+
+      it('does NOT offer user disable to a content.moderate-only holder (no user.disable)', async () => {
+        granted.add('content.moderate')
+        const wrapper = await openContentMenu({
+          isOwner: false,
+          resourceType: 'user',
+          resource: {
+            id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+            disabled: false,
+          },
+        })
+        const disableItems = wrapper
+          .findAll('.os-menu-item')
+          .filter((item) => item.text() === 'disable.user.title')
+        expect(disableItems).toHaveLength(0)
+      })
+
+      it('disables a user through the disableUser mutation (not review)', async () => {
+        granted.add('user.disable')
+        const mutate = jest.fn().mockResolvedValue({ data: {} })
+        mocks.$apollo = { mutate }
+        mocks.$toast = { success: jest.fn(), error: jest.fn() }
+        mocks.$filters = { truncate: (s) => s }
+        const wrapper = await openContentMenu({
+          isOwner: false,
+          resourceType: 'user',
+          resource: {
+            id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+            disabled: false,
+          },
+        })
+        await wrapper.vm.reviewModalData('disable').buttons.confirm.callback()
+        expect(mutate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            variables: { id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8', disable: true },
+          }),
+        )
       })
 
       it('can disable organizations', async () => {
@@ -716,7 +754,7 @@ describe('ContentMenu.vue', () => {
       })
 
       it('can release users', async () => {
-        granted.add('content.moderate')
+        granted.add('user.disable')
         const wrapper = await openContentMenu({
           isOwner: false,
           resourceType: 'user',

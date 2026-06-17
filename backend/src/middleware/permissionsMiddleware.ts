@@ -11,6 +11,7 @@ import CONFIG from '@config/index'
 import { getNeode } from '@db/neo4j'
 import { AuthenticationError } from '@graphql/errors'
 import { validateInviteCode } from '@graphql/resolvers/inviteCodes'
+import { dominates } from '@src/role'
 
 import type SocialMedia from '@db/models/SocialMedia'
 import type { Context } from '@src/context'
@@ -403,6 +404,62 @@ const isDeletingOwnAccount = rule({
   return context.user?.id === args.id
 })
 
+// The target user's effective permission set, resolved from their single role
+// (owner ⇒ full catalog, edgeless/unknown ⇒ baseline) — the same resolution the
+// request context applies to the actor (context/index.ts).
+const effectivePermissionsOfUser = async (
+  context: Context,
+  userId: string,
+): Promise<Set<PermissionKey>> => {
+  const result = await context.database.query({
+    query: `OPTIONAL MATCH (u:User {id: $userId})-[:HAS_ROLE]->(r:Role)
+            RETURN coalesce(r.name, 'user') AS roleName`,
+    variables: { userId },
+  })
+  const roleName = (result.records[0]?.get('roleName') as string | undefined) ?? 'user'
+  return context.role.permissionsForRole(roleName)
+}
+
+// Act-on hierarchy guard for per-user destructive actions (delete, disable): the
+// actor may only act on a target whose permissions are a STRICT SUBSET of theirs
+// (dominates() — see role/dominance.ts). Closes the privilege-escalation hole
+// where a holder of user.delete.any / user.disable could act on a peer or a
+// higher-privileged user (admin/owner). The gating permission itself is checked
+// separately via hasPermission(); this rule only enforces the relative ranking.
+const canActOnTargetUser = rule({ cache: 'no_cache' })(async (_parent, args, context: Context) => {
+  const targetId = args.id as string | undefined
+  if (!targetId) return false
+  const targetPermissions = await effectivePermissionsOfUser(context, targetId)
+  return dominates(context.effectivePermissions, targetPermissions)
+})
+
+// Same hierarchy guard for the report `review` mutation, which can disable the
+// reported resource. Only Users carry a role, so Posts/Comments pass through; a
+// reported User is subject to the dominance rule (a moderator must not disable an
+// admin/owner by reviewing a report against them).
+const canModerateTargetUser = rule({ cache: 'no_cache' })(async (
+  _parent,
+  args,
+  context: Context,
+) => {
+  const resourceId = args.resourceId as string | undefined
+  if (!resourceId) return false
+  const result = await context.database.query({
+    query: `MATCH (resource {id: $resourceId})
+              OPTIONAL MATCH (resource)-[:HAS_ROLE]->(r:Role)
+              RETURN 'User' IN labels(resource) AS isUser, coalesce(r.name, 'user') AS roleName`,
+    variables: { resourceId },
+  })
+  const row = result.records[0]
+  // Resource not found — let the resolver handle it; no user can be escalated.
+  if (!row) return true
+  if (!(row.get('isUser') as boolean)) return true
+  const targetPermissions = context.role.permissionsForRole(
+    (row.get('roleName') as string | undefined) ?? 'user',
+  )
+  return dominates(context.effectivePermissions, targetPermissions)
+})
+
 const noEmailFilter = rule({
   cache: 'no_cache',
 })(async (_, args) => {
@@ -547,11 +604,15 @@ export default shield(
       shout: isAuthenticated,
       unshout: isAuthenticated,
       changePassword: isAuthenticated,
-      review: hasPermission('content.moderate'),
+      review: and(hasPermission('content.moderate'), canModerateTargetUser),
       CreateComment: and(isAuthenticated, hasPermission('comment.create'), canCommentPost),
       UpdateComment: isAuthor,
       DeleteComment: isAuthor,
-      DeleteUser: or(isDeletingOwnAccount, hasPermission('user.delete.any')),
+      DeleteUser: or(
+        isDeletingOwnAccount,
+        and(hasPermission('user.delete.any'), canActOnTargetUser),
+      ),
+      disableUser: and(hasPermission('user.disable'), canActOnTargetUser),
       requestPasswordReset: allow,
       resetPassword: allow,
       AddPostEmotions: isAuthenticated,

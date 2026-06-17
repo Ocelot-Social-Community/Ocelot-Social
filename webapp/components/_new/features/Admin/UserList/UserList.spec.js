@@ -122,10 +122,11 @@ describe('UserList', () => {
         wrapper = Wrapper()
       })
 
-      it('shows the email, role, badge and delete columns', () => {
+      it('shows the email, role, badge, disable and delete columns', () => {
         expect(wrapper.find('[data-test="user-role-select-user"]').exists()).toBe(true)
         expect(wrapper.text()).toContain('user@example.org')
         expect(wrapper.text()).toContain('admin.users.table.columns.badges')
+        expect(wrapper.find('[data-test="user-disable-user"]').exists()).toBe(true)
         expect(wrapper.find('[data-test="user-delete-user"]').exists()).toBe(true)
       })
 
@@ -180,11 +181,24 @@ describe('UserList', () => {
         wrapper = Wrapper()
       })
 
-      it('shows the delete column but not badges/email/role', () => {
+      it('shows the delete column but not badges/email/role/disable', () => {
         expect(wrapper.find('[data-test="user-delete-user"]').exists()).toBe(true)
         expect(wrapper.text()).not.toContain('admin.users.table.columns.badges')
         expect(wrapper.text()).not.toContain('user@example.org')
         expect(wrapper.find('[data-test="user-role-select-user"]').exists()).toBe(false)
+        expect(wrapper.find('[data-test="user-disable-user"]').exists()).toBe(false)
+      })
+    })
+
+    describe('a viewer with only user.disable (moderator)', () => {
+      beforeEach(() => {
+        mocks.$can = jest.fn((permission) => permission === 'user.disable')
+        wrapper = Wrapper()
+      })
+
+      it('shows the disable toggle but not the delete column', () => {
+        expect(wrapper.find('[data-test="user-disable-user"]').exists()).toBe(true)
+        expect(wrapper.find('[data-test="user-delete-user"]').exists()).toBe(false)
       })
     })
   })
@@ -224,6 +238,46 @@ describe('UserList', () => {
         expect.objectContaining({ variables: { id: 'user', resource: [] } }),
       )
       expect(mocks.$toast.success).toHaveBeenCalled()
+    })
+  })
+
+  describe('disable user', () => {
+    beforeEach(() => {
+      mocks.$policy = { get: () => false }
+    })
+
+    it('hides the disable toggle on the current user own row', () => {
+      const w = Wrapper({
+        data: () => ({
+          allRoleNames: [],
+          User: [{ id: 'admin', name: 'Admin', slug: 'admin' }],
+        }),
+      })
+      expect(w.find('[data-test="user-disable-admin"]').exists()).toBe(false)
+    })
+
+    it('disables an enabled user (disable: true) and toasts success', async () => {
+      const w = Wrapper()
+      await w.vm.toggleDisableUser({ id: 'user', disabled: false })
+      expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+        expect.objectContaining({ variables: { id: 'user', disable: true } }),
+      )
+      expect(mocks.$toast.success).toHaveBeenCalled()
+    })
+
+    it('re-enables a disabled user (disable: false)', async () => {
+      const w = Wrapper()
+      await w.vm.toggleDisableUser({ id: 'user', disabled: true })
+      expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+        expect.objectContaining({ variables: { id: 'user', disable: false } }),
+      )
+    })
+
+    it('toasts an error when the mutation fails', async () => {
+      mocks.$apollo.mutate = jest.fn().mockRejectedValue(new Error('nope'))
+      const w = Wrapper()
+      await expect(w.vm.toggleDisableUser({ id: 'user', disabled: false })).rejects.toThrow('nope')
+      expect(mocks.$toast.error).toHaveBeenCalled()
     })
   })
 

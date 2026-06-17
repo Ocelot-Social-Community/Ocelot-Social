@@ -54,7 +54,7 @@ export default {
         {
           name: this.$t('moderation.users.name'),
           path: '/moderation/users',
-          permissions: ['badge.manage', 'user.delete.any'],
+          permissions: ['badge.manage', 'user.disable', 'user.delete.any'],
         },
       ]
     },
