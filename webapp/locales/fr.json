@@ -246,6 +246,11 @@
       "save": "Enregistrer",
       "saveError": "Impossible d’enregistrer le rôle : {message}",
       "saveSuccess": "Rôle enregistré.",
+      "selfLockout": {
+        "confirm": "Retirer quand même",
+        "message": "Vous êtes sur le point de retirer la permission « gérer les rôles » de <strong>{role}</strong> — votre propre rôle. Vous ne pourrez alors plus gérer les rôles ; seul un propriétaire pourra la rétablir. Continuer ?",
+        "title": "Retirer la gestion de votre propre rôle ?"
+      },
       "title": "Rôles et permissions"
     },
     "settings": {
@@ -254,6 +259,13 @@
     "users": {
       "addRole": "Attribuer un rôle…",
       "allRoles": "Tous les rôles",
+      "delete": {
+        "error": "Impossible de supprimer l'utilisateur : {message}",
+        "message": "Voulez-vous vraiment supprimer définitivement <strong>{name}</strong> ? Cette action est irréversible.",
+        "submit": "Supprimer l'utilisateur",
+        "success": "Utilisateur supprimé.",
+        "title": "Supprimer l'utilisateur ?"
+      },
       "empty": "Aucun utilisateur trouvé",
       "form": {
         "placeholder": "e-mail, nom, description ou role:moderator"
@@ -267,6 +279,7 @@
           "comments": "Commentaires",
           "contributions": "Contributions",
           "createdAt": "Créé le",
+          "delete": "Supprimer",
           "email": "E-mail",
           "name": "Nom",
           "number": "N°",
@@ -996,6 +1009,9 @@
       "reportedOn": "Date",
       "status": "Statut actuel",
       "submitter": "signalé par"
+    },
+    "users": {
+      "name": "Utilisateurs"
     }
   },
   "notifications": {

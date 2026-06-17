@@ -246,6 +246,11 @@
       "save": "Zapisz",
       "saveError": "Nie można zapisać roli: {message}",
       "saveSuccess": "Rola zapisana.",
+      "selfLockout": {
+        "confirm": "Usuń mimo to",
+        "message": "Zamierzasz usunąć uprawnienie „zarządzanie rolami” z roli <strong>{role}</strong> — Twojej własnej roli. Nie będziesz już mógł zarządzać rolami; tylko właściciel może je przywrócić. Kontynuować?",
+        "title": "Usunąć zarządzanie własną rolą?"
+      },
       "title": "Role i uprawnienia"
     },
     "settings": {
@@ -254,6 +259,13 @@
     "users": {
       "addRole": "Przypisz rolę…",
       "allRoles": "Wszystkie role",
+      "delete": {
+        "error": "Nie można usunąć użytkownika: {message}",
+        "message": "Czy na pewno chcesz trwale usunąć <strong>{name}</strong>? Tej operacji nie można cofnąć.",
+        "submit": "Usuń użytkownika",
+        "success": "Użytkownik usunięty.",
+        "title": "Usunąć użytkownika?"
+      },
       "empty": "Nie znaleziono użytkowników",
       "form": {
         "placeholder": "e-mail, nazwa, opis lub role:moderator"
@@ -267,6 +279,7 @@
           "comments": "Komentarze",
           "contributions": "Wpisy",
           "createdAt": "Utworzono",
+          "delete": "Usuń",
           "email": "E-mail",
           "name": "Nazwa",
           "number": "Nr",
@@ -996,6 +1009,9 @@
       "reportedOn": "Data",
       "status": "Aktualny status",
       "submitter": "zgłoszone przez"
+    },
+    "users": {
+      "name": "Użytkownicy"
     }
   },
   "notifications": {

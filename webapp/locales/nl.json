@@ -246,6 +246,11 @@
       "save": "Opslaan",
       "saveError": "Kon rol niet opslaan: {message}",
       "saveSuccess": "Rol opgeslagen.",
+      "selfLockout": {
+        "confirm": "Toch verwijderen",
+        "message": "Je staat op het punt de rechten ‘rollen beheren’ te verwijderen van <strong>{role}</strong> — je eigen rol. Je kunt dan geen rollen meer beheren; alleen een eigenaar kan dit herstellen. Doorgaan?",
+        "title": "Je eigen rolbeheer verwijderen?"
+      },
       "title": "Rollen en rechten"
     },
     "settings": {
@@ -254,6 +259,13 @@
     "users": {
       "addRole": "Rol toewijzen…",
       "allRoles": "Alle rollen",
+      "delete": {
+        "error": "Kan gebruiker niet verwijderen: {message}",
+        "message": "Weet je zeker dat je <strong>{name}</strong> permanent wilt verwijderen? Dit kan niet ongedaan worden gemaakt.",
+        "submit": "Gebruiker verwijderen",
+        "success": "Gebruiker verwijderd.",
+        "title": "Gebruiker verwijderen?"
+      },
       "empty": "Geen gebruikers gevonden",
       "form": {
         "placeholder": "e-mail, naam, beschrijving of role:moderator"
@@ -267,6 +279,7 @@
           "comments": "Reacties",
           "contributions": "Bijdragen",
           "createdAt": "Aangemaakt op",
+          "delete": "Verwijderen",
           "email": "E-mail",
           "name": "Naam",
           "number": "Nr.",
@@ -996,6 +1009,9 @@
       "reportedOn": "Datum",
       "status": "Huidige status",
       "submitter": "Gemeld door"
+    },
+    "users": {
+      "name": "Gebruikers"
     }
   },
   "notifications": {

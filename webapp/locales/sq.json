@@ -246,6 +246,11 @@
       "save": "Ruaj",
       "saveError": "Roli nuk u ruajt dot: {message}",
       "saveSuccess": "Roli u ruajt.",
+      "selfLockout": {
+        "confirm": "Hiqe gjithsesi",
+        "message": "Po hiqni lejen «menaxho rolet» nga <strong>{role}</strong> — roli juaj. Pas kësaj nuk do të mund të menaxhoni më rolet; vetëm një pronar mund ta rivendosë. Të vazhdohet?",
+        "title": "Të hiqet menaxhimi i rolit tuaj?"
+      },
       "title": "Rolet dhe lejet"
     },
     "settings": {
@@ -254,6 +259,13 @@
     "users": {
       "addRole": "Cakto rol…",
       "allRoles": "Të gjitha rolet",
+      "delete": {
+        "error": "Përdoruesi nuk u fshi dot: {message}",
+        "message": "Doni vërtet ta fshini përgjithmonë <strong>{name}</strong>? Ky veprim nuk mund të zhbëhet.",
+        "submit": "Fshi përdoruesin",
+        "success": "Përdoruesi u fshi.",
+        "title": "Të fshihet përdoruesi?"
+      },
       "empty": "Nuk u gjetën përdorues",
       "form": {
         "placeholder": "email, emër, përshkrim ose role:moderator"
@@ -267,6 +279,7 @@
           "comments": "Komente",
           "contributions": "Kontribute",
           "createdAt": "Krijuar më",
+          "delete": "Fshi",
           "email": "E-mail",
           "name": "Emri",
           "number": "Nr.",
@@ -996,6 +1009,9 @@
       "reportedOn": "Data",
       "status": "Statusi aktual",
       "submitter": "Raportuar nga"
+    },
+    "users": {
+      "name": "Përdoruesit"
     }
   },
   "notifications": {

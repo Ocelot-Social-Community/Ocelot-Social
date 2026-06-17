@@ -246,6 +246,11 @@
       "save": "Guardar",
       "saveError": "No se pudo guardar el rol: {message}",
       "saveSuccess": "Rol guardado.",
+      "selfLockout": {
+        "confirm": "Quitar de todos modos",
+        "message": "Estás a punto de quitar el permiso “gestionar roles” de <strong>{role}</strong>, tu propio rol. Después ya no podrás gestionar roles; solo un propietario podrá restaurarlo. ¿Continuar?",
+        "title": "¿Quitar la gestión de tu propio rol?"
+      },
       "title": "Roles y permisos"
     },
     "settings": {
@@ -254,6 +259,13 @@
     "users": {
       "addRole": "Asignar rol…",
       "allRoles": "Todos los roles",
+      "delete": {
+        "error": "No se pudo eliminar al usuario: {message}",
+        "message": "¿Seguro que quieres eliminar permanentemente a <strong>{name}</strong>? Esto no se puede deshacer.",
+        "submit": "Eliminar usuario",
+        "success": "Usuario eliminado.",
+        "title": "¿Eliminar usuario?"
+      },
       "empty": "No se han encontrado usuarios",
       "form": {
         "placeholder": "correo, nombre, descripción o role:moderator"
@@ -267,6 +279,7 @@
           "comments": "Comentarios",
           "contributions": "Contribuciones",
           "createdAt": "Creado el",
+          "delete": "Eliminar",
           "email": "Correo electrónico",
           "name": "Nombre",
           "number": "N.º",
@@ -996,6 +1009,9 @@
       "reportedOn": "Fecha",
       "status": "Estado actual",
       "submitter": "comunicado por"
+    },
+    "users": {
+      "name": "Usuarios"
     }
   },
   "notifications": {

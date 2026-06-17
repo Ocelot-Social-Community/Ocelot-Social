@@ -246,6 +246,11 @@
       "save": "Guardar",
       "saveError": "Não foi possível guardar a função: {message}",
       "saveSuccess": "Função guardada.",
+      "selfLockout": {
+        "confirm": "Remover mesmo assim",
+        "message": "Você está prestes a remover a permissão “gerenciar funções” de <strong>{role}</strong> — sua própria função. Depois disso, você não poderá mais gerenciar funções; apenas um proprietário pode restaurá-la. Continuar?",
+        "title": "Remover o gerenciamento da sua própria função?"
+      },
       "title": "Funções e permissões"
     },
     "settings": {
@@ -254,6 +259,13 @@
     "users": {
       "addRole": "Atribuir função…",
       "allRoles": "Todas as funções",
+      "delete": {
+        "error": "Não foi possível excluir o usuário: {message}",
+        "message": "Você realmente deseja excluir permanentemente <strong>{name}</strong>? Isso não pode ser desfeito.",
+        "submit": "Excluir usuário",
+        "success": "Usuário excluído.",
+        "title": "Excluir usuário?"
+      },
       "empty": "Nenhum usuário encontrado",
       "form": {
         "placeholder": "e-mail, nome, descrição ou role:moderator"
@@ -267,6 +279,7 @@
           "comments": "Comentários",
           "contributions": "Contribuições",
           "createdAt": "Criado em",
+          "delete": "Excluir",
           "email": "E-mail",
           "name": "Nome",
           "number": "N.º",
@@ -996,6 +1009,9 @@
       "reportedOn": "Data",
       "status": "Status atual",
       "submitter": "denunciado por"
+    },
+    "users": {
+      "name": "Usuários"
     }
   },
   "notifications": {

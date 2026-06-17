@@ -246,6 +246,11 @@
       "save": "Salva",
       "saveError": "Impossibile salvare il ruolo: {message}",
       "saveSuccess": "Ruolo salvato.",
+      "selfLockout": {
+        "confirm": "Rimuovi comunque",
+        "message": "Stai per rimuovere il permesso «gestisci ruoli» da <strong>{role}</strong> — il tuo stesso ruolo. Dopodiché non potrai più gestire i ruoli; solo un proprietario potrà ripristinarlo. Continuare?",
+        "title": "Rimuovere la gestione del tuo ruolo?"
+      },
       "title": "Ruoli e permessi"
     },
     "settings": {
@@ -254,6 +259,13 @@
     "users": {
       "addRole": "Assegna ruolo…",
       "allRoles": "Tutti i ruoli",
+      "delete": {
+        "error": "Impossibile cancellare l'utente: {message}",
+        "message": "Vuoi davvero cancellare definitivamente <strong>{name}</strong>? L'operazione non può essere annullata.",
+        "submit": "Cancella utente",
+        "success": "Utente cancellato.",
+        "title": "Cancellare l'utente?"
+      },
       "empty": "Nessun utente trovato",
       "form": {
         "placeholder": "e-mail, nome, descrizione o role:moderator"
@@ -267,6 +279,7 @@
           "comments": "Commenti",
           "contributions": "Contributi",
           "createdAt": "Creato il",
+          "delete": "Cancella",
           "email": "E-mail",
           "name": "Nome",
           "number": "N.",
@@ -996,6 +1009,9 @@
       "reportedOn": "Data",
       "status": "Stato attuale",
       "submitter": "Segnalato da"
+    },
+    "users": {
+      "name": "Utenti"
     }
   },
   "notifications": {
