@@ -13,7 +13,13 @@ const setRolePermission = (roleName, permission, shouldHave) => {
       .request(`query { roles { name permissions } }`)
       .then((data) => {
         const role = data.roles.find((r) => r.name === roleName)
-        const permissions = new Set(role ? role.permissions : [])
+        // Fail early with a clear cause (and the available roles) instead of an indirect
+        // updateRole error / silent no-op when the fixture role is missing.
+        expect(
+          role,
+          `role "${roleName}" not found among [${data.roles.map((r) => r.name).join(', ')}]`,
+        ).to.exist
+        const permissions = new Set(role.permissions)
         if (shouldHave) {
           permissions.add(permission)
         } else {
