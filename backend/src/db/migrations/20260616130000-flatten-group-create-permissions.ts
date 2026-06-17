@@ -19,16 +19,23 @@ async function rewriteRolePermissions(transform: (permissions: string[]) => stri
     const now = new Date().toISOString()
     for (const record of result.records) {
       const id = record.get('id') as string
-      let permissions: string[] = []
+      let parsed: unknown
       try {
-        const parsed: unknown = JSON.parse((record.get('permissions') as string | null) ?? '[]')
-        if (Array.isArray(parsed)) permissions = parsed as string[]
+        parsed = JSON.parse((record.get('permissions') as string | null) ?? '[]')
       } catch (error) {
-        // Malformed JSON ⇒ treat as no permissions; rethrow anything unexpected
-        // (mirrors role/repository.ts).
-        if (!(error instanceof SyntaxError)) throw error
-        permissions = []
+        // A corrupt permissions value is an invariant violation (the app always writes
+        // valid JSON). Abort loudly rather than silently overwriting it with only the
+        // new permission — the surrounding transaction rolls back, so no data is lost.
+        throw new Error(
+          `Migration aborted: role ${id} has malformed permissions JSON; fix it manually before re-running. Cause: ${String(error)}`,
+        )
       }
+      if (!Array.isArray(parsed)) {
+        throw new Error(
+          `Migration aborted: role ${id} has non-array permissions JSON; fix it manually before re-running.`,
+        )
+      }
+      const permissions = parsed as string[]
       const next = transform(permissions)
       // Skip the write when nothing changed (idempotent re-runs, untouched roles).
       if (JSON.stringify(next) === JSON.stringify(permissions)) {
