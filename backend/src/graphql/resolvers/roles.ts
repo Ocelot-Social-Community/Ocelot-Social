@@ -14,11 +14,21 @@ import type { RoleDefinition } from '@src/role'
 // their own (the permissionsChanged subscription). Fire-and-forget: the mutation has
 // already committed; a pubsub hiccup must not fail it.
 const publishPermissionsChanged = (context: Context, roleName: string | null): void => {
-  void Promise.resolve(
-    context.pubsub.publish(PERMISSIONS_CHANGED_CHANNEL, { permissionsChanged: { roleName } }),
-  ).catch(() => {
-    /* best-effort broadcast */
-  })
+  // publish() may throw SYNCHRONOUSLY or reject ASYNCHRONOUSLY (its type is
+  // void | Promise<void>), so guard BOTH: a bare Promise.resolve(publish()).catch()
+  // would let a synchronous throw escape and crash the already-committed mutation.
+  // Mirrors RoleService.publishChange / PolicyService.publishChange.
+  try {
+    const result = context.pubsub.publish(PERMISSIONS_CHANGED_CHANNEL, {
+      permissionsChanged: { roleName },
+    })
+    void Promise.resolve(result).catch(() => {
+      /* best-effort broadcast (async rejection) */
+    })
+    // eslint-disable-next-line no-catch-all/no-catch-all
+  } catch {
+    /* best-effort broadcast (synchronous throw) */
+  }
 }
 
 // Role name format: lowercase-ish slug, used as the node key and as a policy

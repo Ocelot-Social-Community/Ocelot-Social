@@ -133,6 +133,26 @@ describe('role management', () => {
         permissionsChanged: { roleName: 'broadcast-role' },
       })
     })
+
+    it('does not fail the already-committed mutation when publish throws synchronously', async () => {
+      // pubsub.publish is typed void | Promise<void>, so it may throw SYNCHRONOUSLY.
+      // The DB write has already committed by the time we broadcast — a synchronous
+      // throw must be swallowed, not surfaced as a mutation error. Guards the try-wrap
+      // in publishPermissionsChanged (a bare Promise.resolve(publish()).catch() would
+      // let it escape).
+      pubsubMock?.publish.mockImplementation(() => {
+        throw new Error('pubsub down')
+      })
+      const { data, errors } = await mutate({
+        mutation: UPDATE_ROLE,
+        variables: { name: 'broadcast-role', permissions: ['post.pin'] },
+      })
+      expect(errors).toBeUndefined()
+      expect(data?.updateRole).toMatchObject({
+        name: 'broadcast-role',
+        permissions: ['post.pin'],
+      })
+    })
   })
 
   describe('authorization (role.manage)', () => {
