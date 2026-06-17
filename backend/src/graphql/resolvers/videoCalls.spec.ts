@@ -349,6 +349,41 @@ describe('joinGroupVideoCall', () => {
     expect(data.joinGroupVideoCall.roomName).toBe('group-h-1')
   })
 
+  it('denies OPENING a closed-group call when the role lacks videoCall.create_closed', async () => {
+    livekitConfig = ENABLED_LIVEKIT
+    authenticatedUser = memberJson
+    rolesOverride = [
+      { name: 'user', protected: false, permissions: ['post.create', 'comment.create'] },
+    ]
+    await Factory.build(
+      'group',
+      { id: 'cl-1', groupType: 'closed', ...DESCRIPTION_OVERRIDE },
+      { ownerId: 'member-1' },
+    )
+    const { errors } = await mutate({
+      mutation: JoinGroupVideoCall,
+      variables: { groupId: 'cl-1' },
+    })
+    expect(errors?.[0].message).toMatch(/may not start a video call/i)
+  })
+
+  it('allows OPENING a closed-group call when the role holds videoCall.create_closed', async () => {
+    livekitConfig = ENABLED_LIVEKIT
+    authenticatedUser = memberJson
+    rolesOverride = [{ name: 'user', protected: false, permissions: ['videoCall.create_closed'] }]
+    await Factory.build(
+      'group',
+      { id: 'cl-1', groupType: 'closed', ...DESCRIPTION_OVERRIDE },
+      { ownerId: 'member-1' },
+    )
+    const { data, errors } = await mutate({
+      mutation: JoinGroupVideoCall,
+      variables: { groupId: 'cl-1' },
+    })
+    expect(errors).toBeUndefined()
+    expect(data.joinGroupVideoCall.roomName).toBe('group-cl-1')
+  })
+
   it('returns token, url and deterministic room name when OPENING a public-group call (baseline user)', async () => {
     livekitConfig = ENABLED_LIVEKIT
     authenticatedUser = memberJson
