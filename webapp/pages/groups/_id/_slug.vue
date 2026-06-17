@@ -573,9 +573,21 @@ export default {
       this._videoCallCountSub = null
       this.videoCallParticipantCount = 0
     },
-    openGroupVideoCall(groupId) {
+    async openGroupVideoCall(groupId) {
       // Button stays clickable (so the tooltip works); give feedback instead of a
       // silent no-op / raw backend error when the viewer may not start a call here.
+      // The deny rests on the live participant count, so refetch before blocking: a
+      // stale snapshot (subscription lag / load race) must not reject a JOIN that the
+      // backend would allow once a call is actually running.
+      if (this.videoCallOpenDenied) {
+        try {
+          await this.$apollo.queries.videoCallParticipantCount?.refetch()
+        } catch (err) {
+          // Refetch failed → fall through and decide on the count we already have.
+          // eslint-disable-next-line no-console
+          console.error('videoCallParticipantCount refetch failed:', err)
+        }
+      }
       if (this.videoCallOpenDenied) {
         this.$toast.error(this.$t('permissions.deniedHint'))
         return

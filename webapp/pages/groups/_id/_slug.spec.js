@@ -822,6 +822,25 @@ describe('GroupProfileSlug', () => {
       expect(mocks.$toast.error).not.toHaveBeenCalled()
     })
 
+    it('refetches the count before denying, then proceeds with the JOIN when a call turns out to be running', async () => {
+      // Stale snapshot: count is 0 at click time, but a refetch reveals a live call.
+      // The client must re-check and not hard-block the JOIN on the stale value.
+      const wrapper = mountWithGroup(
+        { ...yogaPractice, groupType: 'closed', myRole: 'usual' },
+        { $can: () => false },
+      )
+      const refetch = jest.fn().mockImplementation(() => {
+        wrapper.vm.videoCallParticipantCount = 2
+        return Promise.resolve()
+      })
+      wrapper.vm.$apollo.queries.videoCallParticipantCount = { refetch }
+      await wrapper.find('[data-test="video-call-btn"]').trigger('click')
+      await wrapper.vm.$nextTick()
+      expect(refetch).toHaveBeenCalledTimes(1)
+      expect(openVideoCallMock).toHaveBeenCalledTimes(1)
+      expect(mocks.$toast.error).not.toHaveBeenCalled()
+    })
+
     // Regression guard: even with the "happy" combination (public group,
     // confirmed member, peter-lustig logged in) the button must stay hidden
     // when the feature flag is off. The other test scenarios in this file
