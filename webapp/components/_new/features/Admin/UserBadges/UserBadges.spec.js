@@ -90,6 +90,8 @@ describe('UserBadges', () => {
     expect(wrapper.baseElement).toMatchSnapshot()
   })
 
+  // The four badge scenarios (inactive/active × verification/trophy) are independent
+  // siblings: each grabs its own button, so none inherits another's beforeEach setup.
   describe('after clicking an inactive verification badge', () => {
     let button
     beforeEach(() => {
@@ -147,124 +149,122 @@ describe('UserBadges', () => {
         expect(mocks.$toast.error).toHaveBeenCalledWith('admin.badges.setVerification.error')
       })
     })
+  })
 
-    describe('after clicking an inactive trophy badge', () => {
-      let button
-      beforeEach(() => {
-        button = screen.getByAltText(availableBadges[2].description)
+  describe('after clicking an inactive trophy badge', () => {
+    let button
+    beforeEach(() => {
+      button = screen.getByAltText(availableBadges[2].description)
+    })
+
+    describe('and successful server response', () => {
+      beforeEach(async () => {
+        mocks.$apollo.mutate.mockResolvedValue({
+          data: {
+            setTrophyBadge: {
+              id: 'user1',
+              badgeVerification: null,
+              badgeTrophies: [
+                {
+                  id: availableBadges[2].id,
+                },
+              ],
+            },
+          },
+        })
+        await fireEvent.click(button)
       })
 
-      describe('and successful server response', () => {
-        beforeEach(async () => {
-          mocks.$apollo.mutate.mockResolvedValue({
-            data: {
-              setTrophyBadge: {
-                id: 'user1',
-                badgeVerification: null,
-                badgeTrophies: [
-                  {
-                    id: availableBadges[2].id,
-                  },
-                ],
-              },
-            },
-          })
-          await fireEvent.click(button)
-        })
-
-        it('calls the mutation', async () => {
-          expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
-            mutation: expect.anything(),
-            variables: {
-              badgeId: availableBadges[2].id,
-              userId: 'user1',
-            },
-          })
-        })
-
-        it('shows success message', async () => {
-          expect(mocks.$toast.success).toHaveBeenCalledWith('admin.badges.rewardTrophy.success')
+      it('calls the mutation', async () => {
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
+          mutation: expect.anything(),
+          variables: {
+            badgeId: availableBadges[2].id,
+            userId: 'user1',
+          },
         })
       })
 
-      describe('and failed server response', () => {
-        beforeEach(async () => {
-          mocks.$apollo.mutate.mockRejectedValue({ message: 'Ouch!' })
-          await fireEvent.click(button)
-        })
-
-        it('calls the mutation', async () => {
-          expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
-            mutation: expect.anything(),
-            variables: {
-              badgeId: availableBadges[2].id,
-              userId: 'user1',
-            },
-          })
-        })
-
-        it('shows error message', async () => {
-          expect(mocks.$toast.error).toHaveBeenCalledWith('admin.badges.rewardTrophy.error')
-        })
+      it('shows success message', async () => {
+        expect(mocks.$toast.success).toHaveBeenCalledWith('admin.badges.rewardTrophy.success')
       })
     })
 
-    describe('after clicking an active verification badge', () => {
-      let button
-      beforeEach(() => {
-        button = screen.getByAltText(availableBadges[0].description)
+    describe('and failed server response', () => {
+      beforeEach(async () => {
+        mocks.$apollo.mutate.mockRejectedValue({ message: 'Ouch!' })
+        await fireEvent.click(button)
       })
 
-      describe('and successful server response', () => {
-        beforeEach(async () => {
-          mocks.$apollo.mutate.mockResolvedValue({
-            data: {
-              setVerificationBadge: {
-                id: 'user1',
-                badgeVerification: null,
-                badgeTrophies: [],
-              },
-            },
-          })
-          await fireEvent.click(button)
-        })
-
-        it('calls the mutation', async () => {
-          expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
-            mutation: expect.anything(),
-            variables: {
-              badgeId: availableBadges[0].id,
-              userId: 'user1',
-            },
-          })
-        })
-
-        it('shows success message', async () => {
-          expect(mocks.$toast.success).toHaveBeenCalledWith(
-            'admin.badges.revokeVerification.success',
-          )
+      it('calls the mutation', async () => {
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
+          mutation: expect.anything(),
+          variables: {
+            badgeId: availableBadges[2].id,
+            userId: 'user1',
+          },
         })
       })
 
-      describe('and failed server response', () => {
-        beforeEach(async () => {
-          mocks.$apollo.mutate.mockRejectedValue({ message: 'Ouch!' })
-          await fireEvent.click(button)
-        })
+      it('shows error message', async () => {
+        expect(mocks.$toast.error).toHaveBeenCalledWith('admin.badges.rewardTrophy.error')
+      })
+    })
+  })
 
-        it('calls the mutation', async () => {
-          expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
-            mutation: expect.anything(),
-            variables: {
-              badgeId: availableBadges[0].id,
-              userId: 'user1',
+  describe('after clicking an active verification badge', () => {
+    let button
+    beforeEach(() => {
+      button = screen.getByAltText(availableBadges[0].description)
+    })
+
+    describe('and successful server response', () => {
+      beforeEach(async () => {
+        mocks.$apollo.mutate.mockResolvedValue({
+          data: {
+            setVerificationBadge: {
+              id: 'user1',
+              badgeVerification: null,
+              badgeTrophies: [],
             },
-          })
+          },
         })
+        await fireEvent.click(button)
+      })
 
-        it('shows error message', async () => {
-          expect(mocks.$toast.error).toHaveBeenCalledWith('admin.badges.revokeVerification.error')
+      it('calls the mutation', async () => {
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
+          mutation: expect.anything(),
+          variables: {
+            badgeId: availableBadges[0].id,
+            userId: 'user1',
+          },
         })
+      })
+
+      it('shows success message', async () => {
+        expect(mocks.$toast.success).toHaveBeenCalledWith('admin.badges.revokeVerification.success')
+      })
+    })
+
+    describe('and failed server response', () => {
+      beforeEach(async () => {
+        mocks.$apollo.mutate.mockRejectedValue({ message: 'Ouch!' })
+        await fireEvent.click(button)
+      })
+
+      it('calls the mutation', async () => {
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
+          mutation: expect.anything(),
+          variables: {
+            badgeId: availableBadges[0].id,
+            userId: 'user1',
+          },
+        })
+      })
+
+      it('shows error message', async () => {
+        expect(mocks.$toast.error).toHaveBeenCalledWith('admin.badges.revokeVerification.error')
       })
     })
   })
