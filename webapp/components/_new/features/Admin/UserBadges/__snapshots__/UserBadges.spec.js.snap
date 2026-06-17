@@ -5,6 +5,7 @@ exports[`UserBadges renders 1`] = `
   <div>
     <section
       class="ds-section"
+      data-test="user-badges"
     >
       <div
         class="ds-mb-large"

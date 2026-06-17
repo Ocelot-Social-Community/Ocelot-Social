@@ -1,5 +1,5 @@
 <template>
-  <section class="ds-section">
+  <section class="ds-section" data-test="user-badges">
     <div class="ds-mb-large">
       <h1 class="ds-heading ds-heading-h3">
         {{ user && user.name }}

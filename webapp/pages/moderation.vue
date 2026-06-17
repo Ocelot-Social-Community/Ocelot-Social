@@ -4,7 +4,7 @@
       {{ $t('moderation.name') }}
     </h1>
     <os-card v-if="areaHasNoAccessibleRoute">
-      <div class="ds-mb-large ds-space-centered">
+      <div class="ds-mb-large ds-space-centered" data-test="area-no-access">
         <div class="ds-mb-large">
           <img :src="errorIconPath" width="40" />
         </div>

@@ -99,3 +99,46 @@ Feature: Admin roles & permissions (RBAC)
     When I navigate to page "/admin/users"
     And I assign the role "editor" to the user with id "peter"
     Then the user with id "peter" has the role "editor" selected
+
+  # C — live RBAC: a permission change applies WITHOUT a reload, via the
+  # permissionsChanged subscription. The acting admin's own menu updates over the
+  # websocket — the path no unit/integration test can span.
+  Scenario: A granted permission adds its admin menu entry live, without a reload
+    Given the role "admin" does not have the permission "network.statistics.read"
+    And I am logged in as "admin"
+    When I navigate to page "/admin/roles"
+    And I select the role "admin"
+    Then I do not see a link to page "/admin"
+    When I enable the permission "network.statistics.read" for role "admin"
+    And I save the role "admin"
+    Then I see a toaster with status "success"
+    And I eventually see a link to page "/admin"
+
+  # D — landing redirect: an admin who can't see the dashboard is sent to the first
+  # tab they can actually use, instead of the dashboard's error state.
+  Scenario: An admin without statistics lands on the first accessible admin page
+    Given the role "admin" does not have the permission "network.statistics.read"
+    And I am logged in as "admin"
+    When I navigate to page "/admin"
+    Then I am on page "/admin/users"
+
+  # E — reports surfaced in the admin area (admin holding content.moderate).
+  Scenario: An admin with content.moderate sees and opens the reports in the admin area
+    Given somebody reported the following posts:
+      | submitterEmail          | resourceId | reasonCategory     | reasonDescription |
+      | r.submitter@example.org | post-1     | discrimination_etc | Offensive content |
+    And I am logged in as "admin"
+    When I navigate to page "/admin"
+    Then I see a link to page "/admin/reports"
+    When I navigate to page "/admin/reports"
+    Then I am on page "/admin/reports"
+    And I see the reported post "A shared post" in the list
+
+  # F — deleting a user from the list (user.delete.any) with a confirmation dialog.
+  Scenario: Admin deletes a user from the user list after confirming
+    Given I am logged in as "admin"
+    When I navigate to page "/admin/users"
+    And I delete the user with id "peter"
+    And I confirm the action in the modal
+    Then I see a toaster with status "success"
+    And I do not see the element with test id "user-delete-peter"
