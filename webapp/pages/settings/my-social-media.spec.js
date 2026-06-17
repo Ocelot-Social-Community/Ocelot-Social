@@ -112,6 +112,9 @@ describe('my-social-media.vue', () => {
     describe('adding a link without the socialMedia.create permission', () => {
       beforeEach(async () => {
         mocks.$can = () => false
+        // Identity $t locally so the denied-hint assertion can match the i18n key
+        // without affecting the .text()-based tests elsewhere in this spec.
+        mocks.$t = (key) => key
         wrapper = Wrapper()
         form = wrapper.find('form')
         form.trigger('submit') // enter add mode
@@ -126,6 +129,7 @@ describe('my-social-media.vue', () => {
         await flushPromises()
         expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
         expect(mocks.$toast.error).toHaveBeenCalledTimes(1)
+        expect(mocks.$toast.error).toHaveBeenCalledWith('permissions.deniedHint')
       })
     })
 

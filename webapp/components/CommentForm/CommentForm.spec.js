@@ -16,7 +16,7 @@ describe('CommentForm.vue', () => {
 
   beforeEach(() => {
     mocks = {
-      $t: jest.fn(),
+      $t: jest.fn((key) => key),
       $i18n: {
         locale: () => 'en',
       },
@@ -120,7 +120,7 @@ describe('CommentForm.vue', () => {
         deniedWrapper.vm.updateEditorContent('this is a comment')
         await deniedWrapper.find('form').trigger('submit')
         expect(mutateSpy).not.toHaveBeenCalled()
-        expect(mocks.$toast.error).toHaveBeenCalled()
+        expect(mocks.$toast.error).toHaveBeenCalledWith('permissions.deniedHint')
       })
     })
 
