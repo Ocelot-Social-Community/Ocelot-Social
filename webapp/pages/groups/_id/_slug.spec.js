@@ -796,6 +796,32 @@ describe('GroupProfileSlug', () => {
       })
     })
 
+    it('does not dispatch videoCall/OPEN but shows a toast when the viewer may not open a call', async () => {
+      // No open permission ($can → false) and no running call (count 0): clicking the
+      // (still-clickable) button must short-circuit with feedback instead of an OPEN.
+      const wrapper = mountWithGroup(
+        { ...yogaPractice, groupType: 'closed', myRole: 'usual' },
+        { $can: () => false },
+      )
+      await wrapper.find('[data-test="video-call-btn"]').trigger('click')
+      expect(openVideoCallMock).not.toHaveBeenCalled()
+      expect(mocks.$toast.error).toHaveBeenCalledWith('permissions.deniedHint')
+    })
+
+    it('dispatches videoCall/OPEN (no toast) when a call is already running, even without open permission', async () => {
+      // Counter > 0 → this is a JOIN, allowed for any member regardless of the open
+      // permission: the click must dispatch and not surface the denied feedback.
+      const wrapper = mountWithGroup(
+        { ...yogaPractice, groupType: 'closed', myRole: 'usual' },
+        { $can: () => false },
+      )
+      wrapper.setData({ videoCallParticipantCount: 2 })
+      await wrapper.vm.$nextTick()
+      await wrapper.find('[data-test="video-call-btn"]').trigger('click')
+      expect(openVideoCallMock).toHaveBeenCalledTimes(1)
+      expect(mocks.$toast.error).not.toHaveBeenCalled()
+    })
+
     // Regression guard: even with the "happy" combination (public group,
     // confirmed member, peter-lustig logged in) the button must stay hidden
     // when the feature flag is off. The other test scenarios in this file
