@@ -7,7 +7,12 @@ export {
   permissionCatalog,
   sanitizePermissions,
 } from './schema'
-export { isGateOpen, isPermissionAvailable } from './gates'
+export {
+  isGateOpen,
+  isPermissionAvailable,
+  isPermissionGatePolicyKey,
+  PERMISSION_GATE_POLICY_KEYS,
+} from './gates'
 export type { GateContext } from './gates'
 export type {
   PermissionKey,

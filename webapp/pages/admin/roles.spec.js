@@ -150,6 +150,33 @@ describe('admin/roles.vue', () => {
     expect(wrapper.find('.perm-row__gate').exists()).toBe(true)
   })
 
+  it('preserves unsaved edits when forms are rebuilt by a live refetch', async () => {
+    // A permissionsChanged signal (role change elsewhere, or a gate-policy toggle)
+    // refetches and rebuilds forms. An editable role with in-progress edits must keep
+    // them; a clean role refreshes from the server.
+    const wrapper = Wrapper()
+    wrapper.vm.setActive('user')
+    // user starts with only post.create; tick badge.manage on (now dirty, unsaved).
+    wrapper.vm.forms.user.permissions['badge.manage'] = true
+    expect(wrapper.vm.isDirty(roles.find((r) => r.name === 'user'))).toBe(true)
+    // A rebuild (as a live refetch would trigger) must not clobber the edit.
+    wrapper.vm.buildForms()
+    expect(wrapper.vm.forms.user.permissions['badge.manage']).toBe(true)
+    // The untouched badge-setter role is rebuilt from the server set.
+    expect(wrapper.vm.forms['badge-setter'].permissions['badge.manage']).toBe(true)
+    expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(false)
+  })
+
+  it('refreshFromServer refetches the catalog and roles (live availability update)', () => {
+    const wrapper = Wrapper()
+    const permissionCatalog = { refetch: jest.fn() }
+    const rolesQ = { refetch: jest.fn() }
+    wrapper.vm.$apollo.queries = { permissionCatalog, roles: rolesQ }
+    wrapper.vm.refreshFromServer()
+    expect(permissionCatalog.refetch).toHaveBeenCalledTimes(1)
+    expect(rolesQ.refetch).toHaveBeenCalledTimes(1)
+  })
+
   it('rebuilds the owner form once the catalog loads after the roles', async () => {
     // roles arrive before the permission catalog: forms are built against an empty
     // catalog first → owner would have no checked permissions until a rebuild.

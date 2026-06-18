@@ -1,4 +1,9 @@
-import { isGateOpen, isPermissionAvailable } from './gates'
+import {
+  isGateOpen,
+  isPermissionAvailable,
+  isPermissionGatePolicyKey,
+  PERMISSION_GATE_POLICY_KEYS,
+} from './gates'
 
 import type { GateContext } from './gates'
 
@@ -50,6 +55,21 @@ describe('permission gates', () => {
       expect(isPermissionAvailable('apiKey.create', ctx({ policy: { get: () => false } }))).toBe(
         false,
       )
+    })
+  })
+
+  describe('isPermissionGatePolicyKey', () => {
+    it('flags the apiKeys gate policy key (the runtime-toggle gate)', () => {
+      expect(isPermissionGatePolicyKey('apiKeysEnabled')).toBe(true)
+    })
+
+    it('does not flag unrelated policy keys', () => {
+      expect(isPermissionGatePolicyKey('apiKeysMaxPerUser')).toBe(false)
+      expect(isPermissionGatePolicyKey('categoriesActive')).toBe(false)
+    })
+
+    it('exposes the set it checks against', () => {
+      expect(PERMISSION_GATE_POLICY_KEYS).toContain('apiKeysEnabled')
     })
   })
 })

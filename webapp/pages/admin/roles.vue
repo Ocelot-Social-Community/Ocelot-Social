@@ -165,6 +165,7 @@
 <script>
 import { OsButton, OsCard } from '@ocelot-social/ui'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
+import permissionsChangedSubscription from '~/graphql/PermissionsSubscription'
 import { iconRegistry } from '~/utils/iconRegistry'
 import {
   createRoleMutation,
@@ -209,11 +210,28 @@ export default {
     },
     permissionCatalog: {
       query: permissionCatalogQuery,
+      // cache-and-network so re-entering this route (admin tabs are separate routes via
+      // <nuxt-child/>) always re-resolves `available` against the CURRENT policy/config —
+      // otherwise a cache-first read shows a gate's stale state (e.g. apiKey.create still
+      // greyed out right after enabling API keys on the policy tab).
+      fetchPolicy: 'cache-and-network',
       // Rebuild the forms once the catalog is known — otherwise a roles result that
       // arrives first builds them against an empty catalog (owner would show no
       // checked permissions).
       result() {
         this.buildForms()
+      },
+    },
+    // Live signal that effective permissions may have changed: a role's permission set,
+    // a user's role assignment, OR a permission-gating policy toggle (e.g. apiKeysEnabled).
+    // Refetch the catalog so its `available` flags and the role sets reflect it without a
+    // reload; unsaved edits are preserved by buildForms.
+    $subscribe: {
+      permissionsChanged: {
+        query: permissionsChangedSubscription(),
+        result() {
+          this.refreshFromServer()
+        },
       },
     },
   },
@@ -265,9 +283,23 @@ export default {
     },
   },
   methods: {
+    // Refetch catalog (its `available` flags) + roles after a permissionsChanged signal.
+    // Guarded with optional chaining so it is a no-op in environments without live
+    // smart queries (e.g. unit mounts).
+    refreshFromServer() {
+      this.$apollo.queries.permissionCatalog?.refetch()
+      this.$apollo.queries.roles?.refetch()
+    },
     buildForms() {
       const forms = {}
       for (const role of this.roles) {
+        // Preserve an editable role's draft while it has unsaved edits, so a live refetch
+        // (another admin's change, or a permission-gating policy toggle) does not clobber
+        // in-progress work. Protected roles are never edited → always rebuilt.
+        if (!role.protected && this.forms[role.name] && this.isDirty(role)) {
+          forms[role.name] = this.forms[role.name]
+          continue
+        }
         const permissions = emptyPermissionMap(this.permissionCatalog)
         // Protected roles (owner) hold the full catalog — shown all-checked, disabled.
         const keys = role.protected ? Object.keys(permissions) : role.permissions

@@ -13,7 +13,7 @@ import type { RoleDefinition } from '@src/role'
 // Notify connected clients that effective permissions may have changed so they refetch
 // their own (the permissionsChanged subscription). Fire-and-forget: the mutation has
 // already committed; a pubsub hiccup must not fail it.
-const publishPermissionsChanged = (context: Context, roleName: string | null): void => {
+export const publishPermissionsChanged = (context: Context, roleName: string | null): void => {
   // publish() may throw SYNCHRONOUSLY or reject ASYNCHRONOUSLY (its type is
   // void | Promise<void>), so guard BOTH: a bare Promise.resolve(publish()).catch()
   // would let a synchronous throw escape and crash the already-committed mutation.
