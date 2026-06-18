@@ -276,6 +276,23 @@ describe('RoleService', () => {
       expect(svc.getRole(USER_ROLE)).toBeDefined()
     })
 
+    it('reload() enforces the mandatory-role invariant (rejects when owner/user is missing)', async () => {
+      // Same boot invariant as init(): if the resync ends up without a mandatory role
+      // (here `user` never lands because the fake write is a no-op), reload() must reject
+      // rather than silently install a half-empty role set.
+      const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+      const fakeDb = {
+        query: async () =>
+          Promise.resolve({
+            records: DEFAULT_ROLES.filter((role) => role.name !== USER_ROLE).map(roleRecord),
+          }),
+        write: async () => Promise.resolve({ records: [] }),
+      } as unknown as DbArg
+      const svc = new RoleService(fakeDb)
+      await expect(svc.reload()).rejects.toThrow(/mandatory role node\(s\) missing after seeding/)
+      warn.mockRestore()
+    })
+
     it('does not resurrect a role deleted by an event that arrives during init()', async () => {
       // Race: another instance deletes `admin` while this one is booting. The delete
       // event lands during the role read (cache still empty → delete is a no-op), and

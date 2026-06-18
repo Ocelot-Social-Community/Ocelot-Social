@@ -81,21 +81,26 @@ export class RoleService {
       this.cache.set(role.name, role)
     }
 
-    // Boot invariant: the MANDATORY roles must exist after seeding — owner (the
-    // failsafe superuser) and user (the registration/authorization baseline). A
-    // missing one means seeding did not take (DB error, wrong key, a future no-op
-    // refactor); fail fast rather than serve a broken instance. Optional roles
-    // (admin/moderator) are intentionally NOT required here: they may be deleted.
+    // Boot invariant: the mandatory roles (owner/user) must exist after seeding.
+    this.assertMandatoryRoles('init')
+
+    this.initialised = true
+  }
+
+  // The MANDATORY roles must exist after (re)seeding — owner (the failsafe superuser)
+  // and user (the registration/authorization baseline). A missing one means seeding did
+  // not take (DB error, wrong key, a future no-op refactor); fail fast rather than serve
+  // a broken instance. Optional roles (admin/moderator) are intentionally NOT required:
+  // they may be deleted. Shared by init() (boot) and reload() (out-of-process resync).
+  private assertMandatoryRoles(context: string): void {
     const missingMandatory = MANDATORY_ROLE_NAMES.filter((name) => !this.cache.has(name))
     if (missingMandatory.length > 0) {
       throw new Error(
-        `RoleService.init: mandatory role node(s) missing after seeding: ${missingMandatory.join(
+        `RoleService.${context}: mandatory role node(s) missing after seeding: ${missingMandatory.join(
           ', ',
-        )}. Refusing to start — authorization and user registration depend on them.`,
+        )}. Refusing to continue — authorization and user registration depend on them.`,
       )
     }
-
-    this.initialised = true
   }
 
   // Resync the cache from the DB after an out-of-process change (e.g. db:reset/seed):
@@ -108,6 +113,9 @@ export class RoleService {
     for (const role of roles) {
       this.cache.set(role.name, role)
     }
+    // Same invariant as init(): a resync that lost owner/user left a broken cache, so
+    // fail loudly rather than report success with a half-empty role set.
+    this.assertMandatoryRoles('reload')
   }
 
   shutdown(): void {
