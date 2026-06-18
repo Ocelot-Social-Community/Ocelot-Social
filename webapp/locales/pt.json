@@ -266,6 +266,13 @@
         "success": "Usuário excluído.",
         "title": "Excluir usuário?"
       },
+      "disable": {
+        "disabledSuccess": "Usuário desativado.",
+        "disableLabel": "Desativar usuário",
+        "enabledSuccess": "Usuário reativado.",
+        "enableLabel": "Reativar usuário",
+        "error": "Não foi possível alterar o status do usuário: {message}"
+      },
       "empty": "Nenhum usuário encontrado",
       "form": {
         "placeholder": "e-mail, nome, descrição ou role:moderator"
@@ -285,7 +292,8 @@
           "number": "N.º",
           "role": "Função",
           "shouted": "Partilhado",
-          "slug": "Slug"
+          "slug": "Slug",
+          "status": "Status"
         }
       }
     }

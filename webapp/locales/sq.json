@@ -266,6 +266,13 @@
         "success": "Përdoruesi u fshi.",
         "title": "Të fshihet përdoruesi?"
       },
+      "disable": {
+        "disabledSuccess": "Përdoruesi u çaktivizua.",
+        "disableLabel": "Çaktivizo përdoruesin",
+        "enabledSuccess": "Përdoruesi u riaktivizua.",
+        "enableLabel": "Riaktivizo përdoruesin",
+        "error": "Statusi i përdoruesit nuk u ndryshua dot: {message}"
+      },
       "empty": "Nuk u gjetën përdorues",
       "form": {
         "placeholder": "email, emër, përshkrim ose role:moderator"
@@ -285,7 +292,8 @@
           "number": "Nr.",
           "role": "Roli",
           "shouted": "Rekomanduar",
-          "slug": "Slug"
+          "slug": "Slug",
+          "status": "Statusi"
         }
       }
     }

@@ -266,6 +266,13 @@
         "success": "Użytkownik usunięty.",
         "title": "Usunąć użytkownika?"
       },
+      "disable": {
+        "disabledSuccess": "Użytkownik został dezaktywowany.",
+        "disableLabel": "Dezaktywuj użytkownika",
+        "enabledSuccess": "Użytkownik został ponownie aktywowany.",
+        "enableLabel": "Ponownie aktywuj użytkownika",
+        "error": "Nie udało się zmienić statusu użytkownika: {message}"
+      },
       "empty": "Nie znaleziono użytkowników",
       "form": {
         "placeholder": "e-mail, nazwa, opis lub role:moderator"
@@ -285,7 +292,8 @@
           "number": "Nr",
           "role": "Rola",
           "shouted": "Udostępniono",
-          "slug": "Alias"
+          "slug": "Alias",
+          "status": "Status"
         }
       }
     }

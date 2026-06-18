@@ -266,6 +266,13 @@
         "success": "Utente cancellato.",
         "title": "Cancellare l'utente?"
       },
+      "disable": {
+        "disabledSuccess": "Utente disabilitato.",
+        "disableLabel": "Disabilita utente",
+        "enabledSuccess": "Utente riabilitato.",
+        "enableLabel": "Riabilita utente",
+        "error": "Impossibile cambiare lo stato dell'utente: {message}"
+      },
       "empty": "Nessun utente trovato",
       "form": {
         "placeholder": "e-mail, nome, descrizione o role:moderator"
@@ -285,7 +292,8 @@
           "number": "N.",
           "role": "Ruolo",
           "shouted": "Condiviso",
-          "slug": "Alias"
+          "slug": "Alias",
+          "status": "Stato"
         }
       }
     }

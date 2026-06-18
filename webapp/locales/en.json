@@ -267,10 +267,10 @@
         "title": "Delete user?"
       },
       "disable": {
-        "disableLabel": "Disable user",
         "disabledSuccess": "User disabled.",
-        "enableLabel": "Re-enable user",
+        "disableLabel": "Disable user",
         "enabledSuccess": "User re-enabled.",
+        "enableLabel": "Re-enable user",
         "error": "Could not change user status: {message}"
       },
       "empty": "No users found",

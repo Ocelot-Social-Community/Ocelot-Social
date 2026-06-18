@@ -267,10 +267,10 @@
         "title": "Nutzer löschen?"
       },
       "disable": {
-        "disableLabel": "Nutzer deaktivieren",
         "disabledSuccess": "Nutzer deaktiviert.",
-        "enableLabel": "Nutzer reaktivieren",
+        "disableLabel": "Nutzer deaktivieren",
         "enabledSuccess": "Nutzer reaktiviert.",
+        "enableLabel": "Nutzer reaktivieren",
         "error": "Nutzerstatus konnte nicht geändert werden: {message}"
       },
       "empty": "Keine Nutzer gefunden",

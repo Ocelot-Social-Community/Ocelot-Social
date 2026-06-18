@@ -266,6 +266,13 @@
         "success": "Usuario eliminado.",
         "title": "¿Eliminar usuario?"
       },
+      "disable": {
+        "disabledSuccess": "Usuario desactivado.",
+        "disableLabel": "Desactivar usuario",
+        "enabledSuccess": "Usuario reactivado.",
+        "enableLabel": "Reactivar usuario",
+        "error": "No se pudo cambiar el estado del usuario: {message}"
+      },
       "empty": "No se han encontrado usuarios",
       "form": {
         "placeholder": "correo, nombre, descripción o role:moderator"
@@ -285,7 +292,8 @@
           "number": "N.º",
           "role": "Rol",
           "shouted": "Compartido",
-          "slug": "Alias"
+          "slug": "Alias",
+          "status": "Estado"
         }
       }
     }

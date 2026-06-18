@@ -266,6 +266,13 @@
         "success": "Gebruiker verwijderd.",
         "title": "Gebruiker verwijderen?"
       },
+      "disable": {
+        "disabledSuccess": "Gebruiker gedeactiveerd.",
+        "disableLabel": "Gebruiker deactiveren",
+        "enabledSuccess": "Gebruiker opnieuw geactiveerd.",
+        "enableLabel": "Gebruiker opnieuw activeren",
+        "error": "Kon de gebruikersstatus niet wijzigen: {message}"
+      },
       "empty": "Geen gebruikers gevonden",
       "form": {
         "placeholder": "e-mail, naam, beschrijving of role:moderator"
@@ -285,7 +292,8 @@
           "number": "Nr.",
           "role": "Rol",
           "shouted": "Gedeeld",
-          "slug": "Alias"
+          "slug": "Alias",
+          "status": "Status"
         }
       }
     }

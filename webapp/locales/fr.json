@@ -266,6 +266,13 @@
         "success": "Utilisateur supprimé.",
         "title": "Supprimer l'utilisateur ?"
       },
+      "disable": {
+        "disabledSuccess": "Utilisateur désactivé.",
+        "disableLabel": "Désactiver l'utilisateur",
+        "enabledSuccess": "Utilisateur réactivé.",
+        "enableLabel": "Réactiver l'utilisateur",
+        "error": "Impossible de modifier le statut de l'utilisateur : {message}"
+      },
       "empty": "Aucun utilisateur trouvé",
       "form": {
         "placeholder": "e-mail, nom, description ou role:moderator"
@@ -285,7 +292,8 @@
           "number": "N°",
           "role": "Rôle",
           "shouted": "Partagé",
-          "slug": "Identifiant"
+          "slug": "Identifiant",
+          "status": "Statut"
         }
       }
     }
