@@ -138,15 +138,20 @@ describe('admin/roles.vue', () => {
     wrapper.vm.buildForms()
     wrapper.vm.setActive('user') // a non-protected role, so disabling is gate-driven only
     await wrapper.vm.$nextTick()
-    // The gated right is disabled; the ungated one stays editable.
-    expect(
-      wrapper.find('[data-test="role-user-perm-videoCall.create_public"]').attributes('disabled'),
-    ).toBeDefined()
-    expect(
-      wrapper.find('[data-test="role-user-perm-post.create"]').attributes('disabled'),
-    ).toBeUndefined()
-    // …and the "not configured" note is shown next to it.
-    expect(wrapper.find('.perm-row__gate').exists()).toBe(true)
+    // Resolve each permission's row (the label wrapping its checkbox) so assertions are
+    // scoped to the right permission, not the page at large.
+    const rowOf = (key) =>
+      wrapper
+        .findAll('.perm-row')
+        .wrappers.find((row) => row.find(`[data-test="role-user-perm-${key}"]`).exists())
+    const gatedRow = rowOf('videoCall.create_public')
+    const openRow = rowOf('post.create')
+    // The gated right is disabled and carries the "not configured" note…
+    expect(gatedRow.find('input').attributes('disabled')).toBeDefined()
+    expect(gatedRow.find('.perm-row__gate').exists()).toBe(true)
+    // …the ungated one stays editable and shows no note.
+    expect(openRow.find('input').attributes('disabled')).toBeUndefined()
+    expect(openRow.find('.perm-row__gate').exists()).toBe(false)
   })
 
   it('preserves unsaved edits when forms are rebuilt by a live refetch', async () => {
