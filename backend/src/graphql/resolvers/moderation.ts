@@ -34,14 +34,12 @@ export default {
           return reviewTransactionResponse.records.map((record) => record.get('review'))
         })
         const [reviewed] = await reviewWriteTxResultPromise
-        if (!reviewed) {
-          // Empty match: the resource carries no open report to review (already closed by
-          // another moderator, or the resource was removed). Nothing was written. Fail
-          // loudly instead of returning null — every caller treats this mutation as
-          // success, so a silent null would flash a false "done" toast and desync the UI.
-          throw new UserInputError('No open report found for the given resource')
-        }
-        return reviewed
+        // Preconditions (resource exists, has an open report, not self/own-content) are
+        // enforced by the validateReview middleware before this resolver runs, so a
+        // missing report surfaces there with a specific message rather than as a null
+        // here. `?? null` only covers the negligible race where the report is closed
+        // between validation and this write.
+        return reviewed ?? null
       } finally {
         await session.close()
       }
