@@ -15,14 +15,23 @@ const neodeInstance = getNeode()
 // role/policy caches — so a custom role a previous scenario created would linger and
 // e.g. break a "create that role" flow with "already exists". After the wipe we nudge
 // the server to resync its caches from the fresh DB (resyncCaches needs no auth outside
-// production). failOnStatusCode:false so a transient server hiccup never fails setup.
+// production).
+//
+// The resync is part of the setup contract, NOT best-effort: if it fails, the server
+// serves stale caches and the scenario hits confusing downstream errors (403 /
+// "already exists") whose real cause is the setup. So assert it actually ran
+// (resyncCaches returns true; it errors only if a service reload itself fails) — fail
+// loudly here instead of letting a green-but-stale setup produce flaky test failures.
 beforeEach(() => {
   cy.then(() => cleanDatabase())
   cy.request({
     method: 'POST',
     url: CONFIG.GRAPHQL_URI,
     body: { query: 'mutation { resyncCaches }' },
-    failOnStatusCode: false,
+  }).then((response) => {
+    expect(response.status, 'resyncCaches HTTP status').to.eq(200)
+    expect(response.body.errors, 'resyncCaches GraphQL errors').to.be.undefined
+    expect(response.body.data.resyncCaches, 'resyncCaches result').to.eq(true)
   })
 })
 
