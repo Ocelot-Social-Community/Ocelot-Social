@@ -241,6 +241,7 @@
         "videoCall_create_hidden": "Rozpoczynanie rozmowy wideo w grupie ukrytej.",
         "videoCall_create_public": "Rozpoczynanie rozmowy wideo w grupie publicznej."
       },
+      "permUnavailable": "Funkcja nieskonfigurowana — przyznanie tego uprawnienia nie ma efektu.",
       "protected": "chroniona",
       "protectedHint": "Rola właściciela ma wszystkie uprawnienia i nie można jej edytować.",
       "save": "Zapisz",

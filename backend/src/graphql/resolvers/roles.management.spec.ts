@@ -37,7 +37,7 @@ const asAdmin = async () => {
   authenticatedUser = await admin.toJson()
 }
 
-const PERMISSION_CATALOG = `query { permissionCatalog { key group description } }`
+const PERMISSION_CATALOG = `query { permissionCatalog { key group description gatedBy available } }`
 const MY_PERMISSIONS = `query { myPermissions { key group } }`
 const ROLES = `query { roles { name protected permissions memberCount } }`
 const USER_INFO = `query ($id: ID!) { User(id: $id) { id roleName } }`
@@ -168,13 +168,25 @@ describe('role management', () => {
       expect(errors).toEqual([expect.objectContaining({ message: 'Not Authorized!' })])
     })
 
-    it('allows permissionCatalog for an admin', async () => {
+    it('allows permissionCatalog for an admin, carrying gates without erroring on ungated keys', async () => {
       await asAdmin()
       const { data, errors } = await query({ query: PERMISSION_CATALOG })
+      // Regression guard: an ungated permission's gatedBy must serialise as null, not
+      // undefined (a resolver returning undefined for a nullable field is a GraphQL error).
       expect(errors).toBeUndefined()
-      expect(data.permissionCatalog.map((p: { key: string }) => p.key)).toEqual(
-        expect.arrayContaining(['role.manage', 'badge.manage', 'post.create']),
-      )
+      const catalog = data.permissionCatalog as Array<{
+        key: string
+        gatedBy: string | null
+        available: boolean
+      }>
+      const byKey = new Map(catalog.map((p) => [p.key, p] as const))
+      expect(byKey.get('post.create')).toMatchObject({ gatedBy: null, available: true })
+      expect(byKey.get('videoCall.create_public')?.gatedBy).toBe('videoCall')
+      expect(byKey.get('apiKey.create')?.gatedBy).toBe('apiKeys')
+      // available is a non-null boolean for every entry.
+      for (const entry of catalog) {
+        expect(typeof entry.available).toBe('boolean')
+      }
     })
   })
 

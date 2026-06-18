@@ -241,6 +241,7 @@
         "videoCall_create_hidden": "Videoanruf in einer verborgenen Gruppe starten.",
         "videoCall_create_public": "Videoanruf in einer öffentlichen Gruppe starten."
       },
+      "permUnavailable": "Funktion nicht konfiguriert – das Recht hat keine Wirkung.",
       "protected": "geschützt",
       "protectedHint": "Die Owner-Rolle hält alle Berechtigungen und kann nicht bearbeitet werden.",
       "save": "Speichern",

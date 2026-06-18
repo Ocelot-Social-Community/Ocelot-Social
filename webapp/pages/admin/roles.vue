@@ -7,7 +7,7 @@
          name input. Only the active role's permissions are shown below. -->
     <div class="role-tabs" data-test="role-tabs">
       <button
-        v-for="role in roles"
+        v-for="role in orderedRoles"
         :key="role.name"
         type="button"
         class="role-tab"
@@ -102,17 +102,22 @@
               :class="{
                 'perm-row--added': hoverDiff[permission.key] === 'added',
                 'perm-row--removed': hoverDiff[permission.key] === 'removed',
+                'perm-row--unavailable': permission.available === false,
               }"
+              :title="permission.available === false ? $t('admin.roles.permUnavailable') : null"
             >
               <input
                 type="checkbox"
-                :disabled="activeRole.protected"
+                :disabled="activeRole.protected || permission.available === false"
                 v-model="forms[activeRole.name].permissions[permission.key]"
                 :data-test="`role-${activeRole.name}-perm-${permission.key}`"
               />
               <span class="perm-row__text">
                 <span class="perm-row__key">{{ permission.key }}</span>
                 <span class="perm-row__desc">{{ permLabel(permission) }}</span>
+                <span v-if="permission.available === false" class="perm-row__gate">
+                  {{ $t('admin.roles.permUnavailable') }}
+                </span>
               </span>
             </label>
           </fieldset>
@@ -160,6 +165,7 @@
 <script>
 import { OsButton, OsCard } from '@ocelot-social/ui'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
+import permissionsChangedSubscription from '~/graphql/PermissionsSubscription'
 import { iconRegistry } from '~/utils/iconRegistry'
 import {
   createRoleMutation,
@@ -204,11 +210,28 @@ export default {
     },
     permissionCatalog: {
       query: permissionCatalogQuery,
+      // cache-and-network so re-entering this route (admin tabs are separate routes via
+      // <nuxt-child/>) always re-resolves `available` against the CURRENT policy/config —
+      // otherwise a cache-first read shows a gate's stale state (e.g. apiKey.create still
+      // greyed out right after enabling API keys on the policy tab).
+      fetchPolicy: 'cache-and-network',
       // Rebuild the forms once the catalog is known — otherwise a roles result that
       // arrives first builds them against an empty catalog (owner would show no
       // checked permissions).
       result() {
         this.buildForms()
+      },
+    },
+    // Live signal that effective permissions may have changed: a role's permission set,
+    // a user's role assignment, OR a permission-gating policy toggle (e.g. apiKeysEnabled).
+    // Refetch the catalog so its `available` flags and the role sets reflect it without a
+    // reload; unsaved edits are preserved by buildForms.
+    $subscribe: {
+      permissionsChanged: {
+        query: permissionsChangedSubscription(),
+        result() {
+          this.refreshFromServer()
+        },
       },
     },
   },
@@ -219,6 +242,13 @@ export default {
     this.ensureActive()
   },
   computed: {
+    // Display order: lowest-privilege first (the baseline `user` group leads, the
+    // protected `owner` failsafe — which has no editable settings — trails). The
+    // backend returns roles broadest-first (owner → … → user); reversing reads the
+    // hierarchy bottom-up, which is what the admin wants to start from.
+    orderedRoles() {
+      return [...this.roles].reverse()
+    },
     // The role object currently selected in the switcher.
     activeRole() {
       return this.roles.find((role) => role.name === this.activeRoleName) || null
@@ -253,9 +283,23 @@ export default {
     },
   },
   methods: {
+    // Refetch catalog (its `available` flags) + roles after a permissionsChanged signal.
+    // Guarded with optional chaining so it is a no-op in environments without live
+    // smart queries (e.g. unit mounts).
+    refreshFromServer() {
+      this.$apollo.queries.permissionCatalog?.refetch()
+      this.$apollo.queries.roles?.refetch()
+    },
     buildForms() {
       const forms = {}
       for (const role of this.roles) {
+        // Preserve an editable role's draft while it has unsaved edits, so a live refetch
+        // (another admin's change, or a permission-gating policy toggle) does not clobber
+        // in-progress work. Protected roles are never edited → always rebuilt.
+        if (!role.protected && this.forms[role.name] && this.isDirty(role)) {
+          forms[role.name] = this.forms[role.name]
+          continue
+        }
         const permissions = emptyPermissionMap(this.permissionCatalog)
         // Protected roles (owner) hold the full catalog — shown all-checked, disabled.
         const keys = role.protected ? Object.keys(permissions) : role.permissions
@@ -288,15 +332,15 @@ export default {
       if (role.protected) return new Set(this.permissionCatalog.map((p) => p.key))
       return new Set(role.permissions)
     },
-    // Keep a valid role selected: default to the first one, and re-select after a
-    // role is deleted/renamed away.
+    // Keep a valid role selected: default to the first one shown (lowest-privilege,
+    // the baseline `user` group), and re-select after a role is deleted/renamed away.
     ensureActive() {
       if (!this.roles.length) {
         this.activeRoleName = null
         return
       }
       if (!this.roles.some((role) => role.name === this.activeRoleName)) {
-        this.activeRoleName = this.roles[0].name
+        this.activeRoleName = this.orderedRoles[0].name
       }
     },
     setActive(name) {
@@ -616,6 +660,12 @@ export default {
     background: rgba($color-danger, 0.16);
     border-left-color: $color-danger;
   }
+  // The permission's feature is not configured/enabled: granting it has no effect,
+  // so the row is dimmed and the checkbox disabled (with an explanatory note).
+  &--unavailable {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
   input:disabled {
     cursor: default;
   }
@@ -632,6 +682,11 @@ export default {
   &__desc {
     color: $text-color-soft;
     font-size: 0.8em;
+  }
+  &__gate {
+    color: $color-danger;
+    font-size: 0.75em;
+    font-style: italic;
   }
 }
 </style>

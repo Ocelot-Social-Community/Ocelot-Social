@@ -241,6 +241,7 @@
         "videoCall_create_hidden": "Iniciar uma chamada de vídeo num grupo oculto.",
         "videoCall_create_public": "Iniciar uma chamada de vídeo num grupo público."
       },
+      "permUnavailable": "Recurso não configurado — conceder esta permissão não tem efeito.",
       "protected": "protegida",
       "protectedHint": "A função de proprietário detém todas as permissões e não pode ser editada.",
       "save": "Guardar",

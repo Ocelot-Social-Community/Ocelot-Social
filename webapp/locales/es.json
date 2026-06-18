@@ -241,6 +241,7 @@
         "videoCall_create_hidden": "Iniciar una videollamada en un grupo oculto.",
         "videoCall_create_public": "Iniciar una videollamada en un grupo público."
       },
+      "permUnavailable": "Función no configurada: conceder este permiso no tiene efecto.",
       "protected": "protegido",
       "protectedHint": "El rol propietario tiene todos los permisos y no se puede editar.",
       "save": "Guardar",
