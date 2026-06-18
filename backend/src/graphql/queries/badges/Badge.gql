@@ -1,4 +1,4 @@
-query {
+query Badges {
   Badge {
     id
     type
