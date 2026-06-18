@@ -69,6 +69,9 @@ export default {
     permissionCatalog: (_parent: unknown, _args: unknown, context: Context) =>
       permissionCatalog().map((entry) => ({
         ...entry,
+        // Coerce the optional gate to null: GraphQL errors on a resolver returning
+        // undefined for a nullable field; null is the explicit "no gate" value.
+        gatedBy: entry.gatedBy ?? null,
         available: isPermissionAvailable(entry.key, context),
       })),
 
