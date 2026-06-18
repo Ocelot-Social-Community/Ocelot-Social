@@ -8,5 +8,11 @@ defineStep('I see a toaster with status {string}', (status) => {
     case 'error':
       cy.get('.iziToast.iziToast-color-red').should('be.visible')
       break
+    default:
+      // The step *is* the assertion: an unknown status (typo in the feature file or an
+      // unsupported value) must fail loudly instead of passing with no check at all.
+      throw new Error(
+        `Unknown toaster status "${status}"; expected "success" or "error".`,
+      )
   }
 })
