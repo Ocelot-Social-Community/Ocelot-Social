@@ -479,7 +479,10 @@ export default {
     },
     // Toggle a user's disabled state (reversible deactivation). No confirm dialog —
     // it is reversible, unlike delete. The backend enforces user.disable + the act-on
-    // hierarchy; a forbidden target surfaces as an error toast.
+    // hierarchy; a forbidden target surfaces as an error toast. Invoked directly from
+    // @click (not via the awaiting ConfirmModal like deleteUser), so the error is fully
+    // handled here with the toast and NOT re-thrown — a re-throw would only become an
+    // unhandled rejection / global-error-handler noise with no consumer.
     async toggleDisableUser(user) {
       const disable = !user.disabled
       try {
@@ -495,7 +498,6 @@ export default {
         )
       } catch (error) {
         this.$toast.error(this.$t('admin.users.disable.error', { message: error.message }))
-        throw error
       }
     },
     // Set a user's single role (replaces their current one). Owner assignment is

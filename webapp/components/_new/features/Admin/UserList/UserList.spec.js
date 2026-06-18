@@ -273,10 +273,12 @@ describe('UserList', () => {
       )
     })
 
-    it('toasts an error when the mutation fails', async () => {
+    it('toasts an error when the mutation fails and does not re-throw (direct @click handler)', async () => {
       mocks.$apollo.mutate = jest.fn().mockRejectedValue(new Error('nope'))
       const w = Wrapper()
-      await expect(w.vm.toggleDisableUser({ id: 'user', disabled: false })).rejects.toThrow('nope')
+      // Must resolve (not reject): re-throwing from a non-awaited @click handler would
+      // surface as an unhandled rejection. The error is fully handled via the toast.
+      await expect(w.vm.toggleDisableUser({ id: 'user', disabled: false })).resolves.toBeUndefined()
       expect(mocks.$toast.error).toHaveBeenCalled()
     })
   })
