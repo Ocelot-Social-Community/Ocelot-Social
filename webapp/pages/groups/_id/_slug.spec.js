@@ -841,6 +841,26 @@ describe('GroupProfileSlug', () => {
       expect(mocks.$toast.error).not.toHaveBeenCalled()
     })
 
+    it('degrades gracefully when the pre-deny refetch fails: falls back to the stale count and denies', async () => {
+      // Refetch rejects (network/load race): the failure must be swallowed (no unhandled
+      // rejection / raw backend error) and the decision falls back to the stale count we
+      // already have — which here is 0, so the JOIN stays denied with the usual toast.
+      const wrapper = mountWithGroup(
+        { ...yogaPractice, groupType: 'closed', myRole: 'usual' },
+        { $can: () => false },
+      )
+      const refetch = jest.fn().mockRejectedValue(new Error('network down'))
+      wrapper.vm.$apollo.queries.videoCallParticipantCount = { refetch }
+      const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
+      await wrapper.find('[data-test="video-call-btn"]').trigger('click')
+      await wrapper.vm.$nextTick()
+      expect(refetch).toHaveBeenCalledTimes(1)
+      expect(openVideoCallMock).not.toHaveBeenCalled()
+      expect(mocks.$toast.error).toHaveBeenCalledWith('permissions.deniedHint')
+      expect(consoleError).toHaveBeenCalled()
+      consoleError.mockRestore()
+    })
+
     // Regression guard: even with the "happy" combination (public group,
     // confirmed member, peter-lustig logged in) the button must stay hidden
     // when the feature flag is off. The other test scenarios in this file
