@@ -207,7 +207,9 @@
       "deleteSuccess": "Role deleted.",
       "description": "Create roles and assign permissions. Changes apply immediately.",
       "groups": {
+        "account": "Account",
         "administration": "Administration",
+        "communication": "Communication",
         "content": "Content",
         "membership": "Membership",
         "moderation": "Moderation"
@@ -217,26 +219,38 @@
       "nameLabel": "Name",
       "perm": {
         "apiKey_administer": "Administer other users’ API keys.",
+        "apiKey_create": "Create personal API keys.",
         "badge_manage": "Grant and revoke badges.",
+        "comment_create": "Comment on posts.",
         "content_moderate": "Review and decide on reported content.",
         "donation_manage": "Configure the donations widget.",
-        "group_create": "Create groups.",
+        "group_create_closed": "Create closed groups.",
         "group_create_hidden": "Create hidden groups.",
+        "group_create_public": "Create public groups.",
         "network_statistics_read": "Read network-wide statistics.",
         "policy_manage": "View and change network policy settings.",
         "post_create": "Create posts.",
         "post_pin": "Pin and unpin posts network-wide.",
         "post_push": "Push and unpush (boost) posts.",
         "role_manage": "Manage roles and assign them to users.",
+        "socialMedia_create": "Add social-media links to your profile.",
         "user_delete_any": "Delete any user’s account.",
         "user_email_readAny": "Read any user’s email address.",
-        "user_invite": "Generate personal invite codes."
+        "user_invite": "Generate personal invite codes.",
+        "videoCall_create_closed": "Start a video call in a closed group.",
+        "videoCall_create_hidden": "Start a video call in a hidden group.",
+        "videoCall_create_public": "Start a video call in a public group."
       },
       "protected": "protected",
       "protectedHint": "The owner role holds every permission and cannot be edited.",
       "save": "Save",
       "saveError": "Could not save role: {message}",
       "saveSuccess": "Role saved.",
+      "selfLockout": {
+        "confirm": "Remove anyway",
+        "message": "You are about to remove the “manage roles” permission from <strong>{role}</strong> — your own role. You will then no longer be able to manage roles; only an owner can restore it. Continue?",
+        "title": "Remove your own role management?"
+      },
       "title": "Roles & permissions"
     },
     "settings": {
@@ -245,6 +259,20 @@
     "users": {
       "addRole": "Assign role…",
       "allRoles": "All roles",
+      "delete": {
+        "error": "Could not delete user: {message}",
+        "message": "Do you really want to permanently delete <strong>{name}</strong>? This cannot be undone.",
+        "submit": "Delete user",
+        "success": "User deleted.",
+        "title": "Delete user?"
+      },
+      "disable": {
+        "disabledSuccess": "User disabled.",
+        "disableLabel": "Disable user",
+        "enabledSuccess": "User re-enabled.",
+        "enableLabel": "Re-enable user",
+        "error": "Could not change user status: {message}"
+      },
       "empty": "No users found",
       "form": {
         "placeholder": "e-mail, name, description, or role:moderator"
@@ -258,12 +286,14 @@
           "comments": "Comments",
           "contributions": "Contributions",
           "createdAt": "Created at",
+          "delete": "Delete",
           "email": "E-mail",
           "name": "Name",
           "number": "No.",
           "role": "Role",
           "shouted": "Shouted",
-          "slug": "Slug"
+          "slug": "Slug",
+          "status": "Status"
         }
       }
     }
@@ -987,6 +1017,9 @@
       "reportedOn": "Date",
       "status": "Current status",
       "submitter": "Reported by"
+    },
+    "users": {
+      "name": "Users"
     }
   },
   "notifications": {
@@ -1032,6 +1065,7 @@
   "post": {
     "comment": {
       "joinGroup": "Joined group „<b>{name}</b>“",
+      "noPermission": "Commenting is not enabled for your role.",
       "reply": "Reply",
       "submit": "Comment",
       "submitted": "Comment submitted!",
@@ -1220,6 +1254,7 @@
         "expiry-never": "No expiry",
         "limit-reached": "You have reached the maximum of {max} active API keys. Revoke an existing key to create a new one.",
         "name-label": "Name",
+        "no-permission": "Creating API keys is not enabled for your role.",
         "submit": "Create key",
         "success": "API key created successfully",
         "title": "Create new API Key"

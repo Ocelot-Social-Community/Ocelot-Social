@@ -68,7 +68,11 @@ export const minimisedUserQuery = () => {
   `
 }
 
-export const adminUserQuery = () => {
+// email and roleName are field-gated in the backend (user.email.readAny / role.manage),
+// so a viewer lacking the right must NOT request the field — a denied field aborts the
+// whole response under apollo's default errorPolicy. Callers pass withEmail/withRole
+// from their $can checks; the role-filtered area (moderation) omits them.
+export const adminUserQuery = ({ withEmail = true, withRole = true } = {}) => {
   return gql`
     query ($first: Int, $offset: Int, $roleName: String, $search: String) {
       User(
@@ -81,12 +85,40 @@ export const adminUserQuery = () => {
         id
         name
         slug
-        email
-        roleName
+        ${withEmail ? 'email' : ''}
+        ${withRole ? 'roleName' : ''}
         createdAt
+        disabled
         contributionsCount
         commentedCount
         shoutedCount
+      }
+    }
+  `
+}
+
+// Delete a user account (and optionally their posts/comments via `resource`). Gated
+// server-side by `or(isDeletingOwnAccount, user.delete.any)`; the admin/moderation
+// user list uses it for other accounts, passing an empty `resource` (account only).
+export const deleteUserMutation = () => {
+  return gql`
+    mutation ($id: ID!, $resource: [Deletable]) {
+      DeleteUser(id: $id, resource: $resource) {
+        id
+      }
+    }
+  `
+}
+
+// Reversibly disable (deactivate) or re-enable a user account. Gated server-side by
+// `and(user.disable, canActOnTargetUser)` — the moderator-grade, reversible counterpart
+// to the irreversible, admin-only DeleteUser. Used by the shared admin/moderation list.
+export const disableUserMutation = () => {
+  return gql`
+    mutation ($id: ID!, $disable: Boolean!) {
+      disableUser(id: $id, disable: $disable) {
+        id
+        disabled
       }
     }
   `
@@ -424,7 +456,10 @@ export const currentUserQuery = gql`
       }
       activeCategories
     }
-    myPermissions
+    myPermissions {
+      key
+      group
+    }
   }
 `
 

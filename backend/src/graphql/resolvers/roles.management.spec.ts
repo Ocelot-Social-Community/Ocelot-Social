@@ -5,19 +5,28 @@
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { createApolloTestSetup } from '@root/test/helpers'
-import { RoleService } from '@src/role'
+import { PERMISSIONS_CHANGED_CHANNEL, RoleService } from '@src/role'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 let authenticatedUser: Context['user']
 let roleService: RoleService
+// Optional per-test pubsub spy; when unset, the context falls back to the default
+// server pubsub (harmless in-memory).
+let pubsubMock: { publish: jest.Mock; asyncIterator: jest.Mock } | undefined
 let query: ApolloTestSetup['query']
 let mutate: ApolloTestSetup['mutate']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
-const contextFn = () => ({ authenticatedUser, roleService })
+const contextFn = () => ({
+  authenticatedUser,
+  roleService,
+  // Test spy standing in for the pubsub; cast since it implements only the bits the
+  // role mutations use (publish). Undefined → the helper's default server pubsub.
+  pubsub: pubsubMock as unknown as Context['pubsub'],
+})
 
 const asAdmin = async () => {
   const admin = await Factory.build(
@@ -29,7 +38,7 @@ const asAdmin = async () => {
 }
 
 const PERMISSION_CATALOG = `query { permissionCatalog { key group description } }`
-const MY_PERMISSIONS = `query { myPermissions }`
+const MY_PERMISSIONS = `query { myPermissions { key group } }`
 const ROLES = `query { roles { name protected permissions memberCount } }`
 const USER_INFO = `query ($id: ID!) { User(id: $id) { id roleName } }`
 const CREATE_ROLE = `mutation ($name: String!, $permissions: [String!]!) {
@@ -70,6 +79,80 @@ describe('role management', () => {
     roleService = new RoleService(database)
     await roleService.init()
     authenticatedUser = null
+    pubsubMock = undefined
+  })
+
+  // The live permissionsChanged broadcast (clients refetch their permissions on it).
+  describe('permissionsChanged broadcast', () => {
+    beforeEach(async () => {
+      pubsubMock = { publish: jest.fn().mockResolvedValue(undefined), asyncIterator: jest.fn() }
+      await asAdmin()
+      await mutate({
+        mutation: CREATE_ROLE,
+        variables: { name: 'broadcast-role', permissions: [] },
+      })
+      pubsubMock.publish.mockClear()
+    })
+
+    it('does not broadcast on createRole (a brand-new role has no holders yet)', async () => {
+      await mutate({
+        mutation: CREATE_ROLE,
+        variables: { name: 'fresh-role', permissions: [] },
+      })
+      expect(pubsubMock?.publish).not.toHaveBeenCalled()
+    })
+
+    it('broadcasts on updateRole (a role permission set changed)', async () => {
+      await mutate({
+        mutation: UPDATE_ROLE,
+        variables: { name: 'broadcast-role', permissions: ['post.pin'] },
+      })
+      expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
+        permissionsChanged: { roleName: 'broadcast-role' },
+      })
+    })
+
+    it('broadcasts on deleteRole (former holders fall back to baseline)', async () => {
+      await mutate({ mutation: DELETE_ROLE, variables: { name: 'broadcast-role' } })
+      expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
+        permissionsChanged: { roleName: 'broadcast-role' },
+      })
+    })
+
+    it('broadcasts on setUserRole (the target user permissions changed)', async () => {
+      await Factory.build(
+        'user',
+        { id: 'member-x', role: 'user' },
+        { email: 'member-x@example.org', password: '1234' },
+      )
+      await mutate({
+        mutation: SET_USER_ROLE,
+        variables: { userId: 'member-x', roleName: 'broadcast-role' },
+      })
+      expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
+        permissionsChanged: { roleName: 'broadcast-role' },
+      })
+    })
+
+    it('does not fail the already-committed mutation when publish throws synchronously', async () => {
+      // pubsub.publish is typed void | Promise<void>, so it may throw SYNCHRONOUSLY.
+      // The DB write has already committed by the time we broadcast — a synchronous
+      // throw must be swallowed, not surfaced as a mutation error. Guards the try-wrap
+      // in publishPermissionsChanged (a bare Promise.resolve(publish()).catch() would
+      // let it escape).
+      pubsubMock?.publish.mockImplementation(() => {
+        throw new Error('pubsub down')
+      })
+      const { data, errors } = await mutate({
+        mutation: UPDATE_ROLE,
+        variables: { name: 'broadcast-role', permissions: ['post.pin'] },
+      })
+      expect(errors).toBeUndefined()
+      expect(data?.updateRole).toMatchObject({
+        name: 'broadcast-role',
+        permissions: ['post.pin'],
+      })
+    })
   })
 
   describe('authorization (role.manage)', () => {
@@ -95,6 +178,18 @@ describe('role management', () => {
     })
   })
 
+  describe('resyncCaches', () => {
+    it('is allowed without auth outside production and resyncs the caches', async () => {
+      // NODE_ENV=test → not production → the shield's isNotProduction branch permits it
+      // (so db:reset / e2e can trigger a resync when no users exist). The resolver
+      // reloads the role + policy caches from the DB and returns true.
+      authenticatedUser = null
+      const { data, errors } = await mutate({ mutation: `mutation { resyncCaches }` })
+      expect(errors).toBeUndefined()
+      expect(data.resyncCaches).toBe(true)
+    })
+  })
+
   describe('myPermissions', () => {
     it('returns the baseline for a member', async () => {
       const user = await Factory.build(
@@ -104,22 +199,30 @@ describe('role management', () => {
       )
       authenticatedUser = await user.toJson()
       const { data } = await query({ query: MY_PERMISSIONS })
-      expect(data.myPermissions).toEqual(
+      const keys = data.myPermissions.map((p: { key: string }) => p.key)
+      expect(keys).toEqual(
         expect.arrayContaining([
           'post.create',
-          'group.create',
+          'group.create_public',
+          'group.create_closed',
           'group.create_hidden',
           'user.invite',
         ]),
       )
-      expect(data.myPermissions).not.toContain('role.manage')
+      expect(keys).not.toContain('role.manage')
     })
 
-    it('includes admin permissions for an admin', async () => {
+    it('includes admin permissions for an admin, each carrying its catalog group', async () => {
       await asAdmin()
       const { data } = await query({ query: MY_PERMISSIONS })
+      const keys = data.myPermissions.map((p: { key: string }) => p.key)
+      expect(keys).toEqual(expect.arrayContaining(['role.manage', 'content.moderate']))
+      // Every entry carries its group, so the webapp can gate areas by group.
       expect(data.myPermissions).toEqual(
-        expect.arrayContaining(['role.manage', 'content.moderate']),
+        expect.arrayContaining([
+          { key: 'role.manage', group: 'administration' },
+          { key: 'content.moderate', group: 'moderation' },
+        ]),
       )
     })
   })

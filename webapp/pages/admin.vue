@@ -1,10 +1,18 @@
 <template>
   <div>
     <h1 class="ds-heading ds-heading-h1">{{ $t('admin.name') }}</h1>
-    <div class="ds-flex ds-flex-gap-small admin-layout">
+    <os-card v-if="areaHasNoAccessibleRoute">
+      <div class="ds-mb-large ds-space-centered" data-test="area-no-access">
+        <div class="ds-mb-large">
+          <img :src="errorIconPath" width="40" />
+        </div>
+        <p class="ds-text">{{ $t('site.error-occurred') }}</p>
+      </div>
+    </os-card>
+    <div v-else class="ds-flex ds-flex-gap-small admin-layout">
       <div class="admin-layout__sidebar">
         <os-menu
-          :routes="routes"
+          :routes="accessibleRoutes"
           :matcher="matcher"
           :is-exact="() => true"
           link-tag="router-link"
@@ -20,71 +28,79 @@
 </template>
 
 <script>
-import { OsMenu } from '@ocelot-social/ui'
+import { OsCard, OsMenu } from '@ocelot-social/ui'
+import areaNavigation from '~/mixins/areaNavigation'
 
 export default {
   components: {
+    OsCard,
     OsMenu,
   },
+  mixins: [areaNavigation],
   middleware: ['isAdmin'],
+  data() {
+    return {
+      errorIconPath: '/img/svg/emoji/cry.svg',
+    }
+  },
   computed: {
-    routes() {
+    // Every admin tab with the permission(s) that make its page usable. The
+    // areaNavigation mixin filters this to accessibleRoutes (sidebar) and redirects
+    // away from a tab the viewer can't use. Categories/hashtags are open read pages
+    // (no dedicated permission); invite maps to role.manage (admin-initiated signup).
+    allRoutes() {
       return [
         {
           name: this.$t('admin.dashboard.name'),
-          path: `/admin`,
+          path: '/admin',
+          permissions: ['network.statistics.read'],
         },
         {
           name: this.$t('admin.users.name'),
-          path: `/admin/users`,
+          path: '/admin/users',
+          permissions: ['user.email.readAny', 'role.manage', 'badge.manage', 'user.delete.any'],
         },
-        // TODO implement
-        /* {
-          name: this.$t('admin.organizations.name'),
-          path: `/admin/organizations`
-        }, */
-        // TODO implement
-        /* {
-          name: this.$t('admin.pages.name'),
-          path: `/admin/pages`
-        }, */
-        // TODO implement
-        /* {
-          name: this.$t('admin.notifications.name'),
-          path: `/admin/notifications`
-        }, */
+        {
+          name: this.$t('moderation.reports.name'),
+          path: '/admin/reports',
+          permissions: ['content.moderate'],
+        },
         {
           name: this.$t('admin.categories.name'),
-          path: `/admin/categories`,
+          path: '/admin/categories',
+          permissions: [],
         },
         {
           name: this.$t('admin.hashtags.name'),
-          path: `/admin/hashtags`,
+          path: '/admin/hashtags',
+          permissions: [],
         },
         {
           name: this.$t('admin.invites.name'),
-          path: `/admin/invite`,
+          path: '/admin/invite',
+          permissions: ['role.manage'],
         },
         {
           name: this.$t('admin.donations.name'),
           path: '/admin/donations',
+          permissions: ['donation.manage'],
         },
         {
           name: this.$t('admin.policy.name'),
           path: '/admin/policy',
+          permissions: ['policy.manage'],
         },
         {
           name: this.$t('admin.roles.name'),
           path: '/admin/roles',
+          permissions: ['role.manage'],
         },
-        ...(this.$policy.get('apiKeysEnabled')
-          ? [{ name: this.$t('admin.api-keys.name'), path: `/admin/api-keys` }]
-          : []),
-        // TODO implement
-        /* {
-          name: this.$t('admin.settings.name'),
-          path: `/admin/settings`
-        } */
+        {
+          name: this.$t('admin.api-keys.name'),
+          path: '/admin/api-keys',
+          permissions: ['apiKey.administer'],
+          policy: 'apiKeysEnabled',
+        },
       ]
     },
   },

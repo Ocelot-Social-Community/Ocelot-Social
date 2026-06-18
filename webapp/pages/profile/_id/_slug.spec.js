@@ -77,7 +77,13 @@ describe('ProfileSlug', () => {
       // permissions a normal member holds (children gate via $can now). Elevated /
       // moderation gates — and any newly added permission — stay denied.
       mocks.$can = (permission) =>
-        ['post.create', 'group.create', 'group.create_hidden', 'user.invite'].includes(permission)
+        [
+          'post.create',
+          'group.create_public',
+          'group.create_closed',
+          'group.create_hidden',
+          'user.invite',
+        ].includes(permission)
       mocks.$store = {
         getters: {
           'auth/isModerator': () => false,

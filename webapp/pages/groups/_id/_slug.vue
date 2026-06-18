@@ -105,8 +105,12 @@
               variant="primary"
               appearance="outline"
               full-width
+              :class="{ 'permission-denied': videoCallOpenDenied }"
+              :aria-disabled="videoCallOpenDenied"
               v-tooltip="{
-                content: $t('videoCall.groupVideoCallButton.tooltip', { name: groupName }),
+                content: videoCallOpenDenied
+                  ? $t('permissions.deniedHint')
+                  : $t('videoCall.groupVideoCallButton.tooltip', { name: groupName }),
                 placement: 'bottom-start',
               }"
               @click="openGroupVideoCall(group.id)"
@@ -438,12 +442,17 @@ export default {
       return (this.chatRoom && this.chatRoom.unreadCount) || 0
     },
     canShowVideoCallButton() {
-      return (
-        this.videoCallEnabled &&
-        this.isGroupMemberNonePending &&
-        this.group &&
-        this.group.groupType === 'public'
-      )
+      // Shown to members of ANY group type: joining an existing call is open to all
+      // members. Opening one (no active call) is gated per group type below.
+      return this.videoCallEnabled && this.isGroupMemberNonePending && !!this.group
+    },
+    // Network permission to OPEN (start) a call in this group's type.
+    canOpenVideoCall() {
+      return this.group ? this.$can(`videoCall.create_${this.group.groupType}`) : false
+    },
+    // No call running and the viewer may not start one → the button is a dead end.
+    videoCallOpenDenied() {
+      return this.videoCallParticipantCount === 0 && !this.canOpenVideoCall
     },
     groupName() {
       const { name } = this.group || {}
@@ -564,7 +573,25 @@ export default {
       this._videoCallCountSub = null
       this.videoCallParticipantCount = 0
     },
-    openGroupVideoCall(groupId) {
+    async openGroupVideoCall(groupId) {
+      // Button stays clickable (so the tooltip works); give feedback instead of a
+      // silent no-op / raw backend error when the viewer may not start a call here.
+      // The deny rests on the live participant count, so refetch before blocking: a
+      // stale snapshot (subscription lag / load race) must not reject a JOIN that the
+      // backend would allow once a call is actually running.
+      if (this.videoCallOpenDenied) {
+        try {
+          await this.$apollo.queries.videoCallParticipantCount?.refetch()
+        } catch (err) {
+          // Refetch failed → fall through and decide on the count we already have.
+          // eslint-disable-next-line no-console
+          console.error('videoCallParticipantCount refetch failed:', err)
+        }
+      }
+      if (this.videoCallOpenDenied) {
+        this.$toast.error(this.$t('permissions.deniedHint'))
+        return
+      }
       this.openVideoCall({
         groupId,
         groupName: this.groupName,

@@ -207,7 +207,9 @@
       "deleteSuccess": "Rol eliminado.",
       "description": "Crea roles y asigna permisos. Los cambios se aplican de inmediato.",
       "groups": {
+        "account": "Cuenta",
         "administration": "Administración",
+        "communication": "Comunicación",
         "content": "Contenido",
         "membership": "Membresía",
         "moderation": "Moderación"
@@ -217,26 +219,38 @@
       "nameLabel": "Nombre",
       "perm": {
         "apiKey_administer": "Administrar las claves API de otros usuarios.",
+        "apiKey_create": "Crear claves API personales.",
         "badge_manage": "Otorgar y revocar insignias.",
+        "comment_create": "Comentar publicaciones.",
         "content_moderate": "Revisar y decidir sobre el contenido denunciado.",
         "donation_manage": "Configurar el widget de donaciones.",
-        "group_create": "Crear grupos.",
+        "group_create_closed": "Crear grupos cerrados.",
         "group_create_hidden": "Crear grupos ocultos.",
+        "group_create_public": "Crear grupos públicos.",
         "network_statistics_read": "Ver estadísticas de toda la red.",
         "policy_manage": "Ver y cambiar la configuración de políticas de la red.",
         "post_create": "Crear publicaciones.",
         "post_pin": "Fijar y desfijar publicaciones en toda la red.",
         "post_push": "Impulsar y retirar (boost) publicaciones.",
         "role_manage": "Gestionar roles y asignarlos a los usuarios.",
+        "socialMedia_create": "Añadir enlaces de redes sociales al perfil.",
         "user_delete_any": "Eliminar la cuenta de cualquier usuario.",
         "user_email_readAny": "Leer la dirección de correo de cualquier usuario.",
-        "user_invite": "Generar códigos de invitación personales."
+        "user_invite": "Generar códigos de invitación personales.",
+        "videoCall_create_closed": "Iniciar una videollamada en un grupo cerrado.",
+        "videoCall_create_hidden": "Iniciar una videollamada en un grupo oculto.",
+        "videoCall_create_public": "Iniciar una videollamada en un grupo público."
       },
       "protected": "protegido",
       "protectedHint": "El rol propietario tiene todos los permisos y no se puede editar.",
       "save": "Guardar",
       "saveError": "No se pudo guardar el rol: {message}",
       "saveSuccess": "Rol guardado.",
+      "selfLockout": {
+        "confirm": "Quitar de todos modos",
+        "message": "Estás a punto de quitar el permiso “gestionar roles” de <strong>{role}</strong>, tu propio rol. Después ya no podrás gestionar roles; solo un propietario podrá restaurarlo. ¿Continuar?",
+        "title": "¿Quitar la gestión de tu propio rol?"
+      },
       "title": "Roles y permisos"
     },
     "settings": {
@@ -245,6 +259,20 @@
     "users": {
       "addRole": "Asignar rol…",
       "allRoles": "Todos los roles",
+      "delete": {
+        "error": "No se pudo eliminar al usuario: {message}",
+        "message": "¿Seguro que quieres eliminar permanentemente a <strong>{name}</strong>? Esto no se puede deshacer.",
+        "submit": "Eliminar usuario",
+        "success": "Usuario eliminado.",
+        "title": "¿Eliminar usuario?"
+      },
+      "disable": {
+        "disabledSuccess": "Usuario desactivado.",
+        "disableLabel": "Desactivar usuario",
+        "enabledSuccess": "Usuario reactivado.",
+        "enableLabel": "Reactivar usuario",
+        "error": "No se pudo cambiar el estado del usuario: {message}"
+      },
       "empty": "No se han encontrado usuarios",
       "form": {
         "placeholder": "correo, nombre, descripción o role:moderator"
@@ -258,12 +286,14 @@
           "comments": "Comentarios",
           "contributions": "Contribuciones",
           "createdAt": "Creado el",
+          "delete": "Eliminar",
           "email": "Correo electrónico",
           "name": "Nombre",
           "number": "N.º",
           "role": "Rol",
           "shouted": "Compartido",
-          "slug": "Alias"
+          "slug": "Alias",
+          "status": "Estado"
         }
       }
     }
@@ -987,6 +1017,9 @@
       "reportedOn": "Fecha",
       "status": "Estado actual",
       "submitter": "comunicado por"
+    },
+    "users": {
+      "name": "Usuarios"
     }
   },
   "notifications": {
@@ -1032,6 +1065,7 @@
   "post": {
     "comment": {
       "joinGroup": "Se unió al grupo „<b>{name}</b>“",
+      "noPermission": "Los comentarios no están habilitados para tu rol.",
       "reply": "Contestar",
       "submit": "Comentario",
       "submitted": "Comentario enviado",
@@ -1220,6 +1254,7 @@
         "expiry-never": "Sin fecha de expiración",
         "limit-reached": "Has alcanzado el máximo de {max} API Keys activas. Revoca una key existente para crear una nueva.",
         "name-label": "Nombre",
+        "no-permission": "La creación de claves API no está habilitada para tu rol.",
         "submit": "Crear key",
         "success": "API Key creada con éxito",
         "title": "Crear nueva API Key"

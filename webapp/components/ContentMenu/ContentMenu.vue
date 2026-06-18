@@ -57,6 +57,7 @@ import Dropdown from '~/components/Dropdown'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
 import ReportModal from '~/components/Modal/ReportModal'
 import { reviewMutation } from '~/graphql/Moderation.js'
+import { disableUserMutation } from '~/graphql/User'
 import PinnedPostsMixin from '~/mixins/pinnedPosts'
 
 export default {
@@ -214,7 +215,7 @@ export default {
         })
       }
 
-      if (!this.isOwner && this.$can('content.moderate')) {
+      if (!this.isOwner && this.canDisableResource) {
         if (!this.resource.disabled) {
           routes.push({
             label: this.$t(`disable.${this.resourceType}.title`),
@@ -307,6 +308,17 @@ export default {
 
       return routes
     },
+    // Disabling a USER account is a user.disable capability (the moderator-grade,
+    // reversible counterpart to user.delete.any), routed through the dedicated
+    // disableUser mutation — same as the admin/moderation user list. Disabling
+    // CONTENT (post/comment/organization) stays content.moderate via the report
+    // `review` mutation. So the gate (and the mutation, see reviewModalData) depend
+    // on the resource type.
+    canDisableResource() {
+      return this.resourceType === 'user'
+        ? this.$can('user.disable')
+        : this.$can('content.moderate')
+    },
     canBePinned() {
       return (
         this.maxPinnedPosts === 1 ||
@@ -362,10 +374,23 @@ export default {
             textIdent: `${action}.submit`,
             callback: async () => {
               try {
-                await this.$apollo.mutate({
-                  mutation: reviewMutation(),
-                  variables: { resourceId: this.resource.id, disable, closed: false },
-                })
+                // Users go through the dedicated disableUser mutation (user.disable);
+                // content (post/comment/organization) through the report review
+                // mutation (content.moderate). Mirrors the gate in canDisableResource.
+                const mutationOptions =
+                  this.resourceType === 'user'
+                    ? {
+                        mutation: disableUserMutation(),
+                        variables: { id: this.resource.id, disable },
+                      }
+                    : {
+                        mutation: reviewMutation(),
+                        variables: { resourceId: this.resource.id, disable, closed: false },
+                      }
+                // A target that no longer exists (or, for content, has no open report to
+                // review) makes the backend reject with a UserInputError, so the catch
+                // below handles it — no success toast, no local `disabled` flip.
+                await this.$apollo.mutate(mutationOptions)
                 this.$toast.success(this.$t(`${action}.success`))
                 this.$set(this.resource, 'disabled', disable)
               } catch (err) {

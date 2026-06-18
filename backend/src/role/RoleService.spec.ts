@@ -6,7 +6,17 @@ import { ADMIN_ROLE, MODERATOR_ROLE, OWNER_ROLE, USER_ROLE } from './types'
 
 import type { RoleChangeEvent, RolePubSub } from './types'
 
-const BASELINE = ['post.create', 'group.create', 'group.create_hidden', 'user.invite']
+const BASELINE = [
+  'post.create',
+  'comment.create',
+  'socialMedia.create',
+  'group.create_public',
+  'group.create_closed',
+  'group.create_hidden',
+  'user.invite',
+  'videoCall.create_public',
+  'apiKey.create',
+]
 
 describe('RoleService', () => {
   describe('permissionsForRole (single-role resolution)', () => {
@@ -22,9 +32,10 @@ describe('RoleService', () => {
       expect([...svc.permissionsForRole(USER_ROLE)].sort()).toEqual([...BASELINE].sort())
     })
 
-    it('returns the self-contained moderator set (baseline + content.moderate)', () => {
+    it('returns the self-contained moderator set (baseline + content.moderate + badge.manage)', () => {
       const perms = svc.permissionsForRole(MODERATOR_ROLE)
       expect(perms.has('content.moderate')).toBe(true)
+      expect(perms.has('badge.manage')).toBe(true)
       for (const baseline of BASELINE) expect(perms.has(baseline as never)).toBe(true)
     })
 
@@ -242,6 +253,44 @@ describe('RoleService', () => {
 
       // Steady state: a single read, zero writes — no MERGE churn per boot.
       expect(writes).toHaveLength(0)
+    })
+
+    it('reload() resyncs the cache from the DB, dropping roles no longer present', async () => {
+      const { svc, fakePubsub } = makeService()
+      await svc.init(fakePubsub)
+      // A role that lives only in this instance's cache (e.g. created then removed in
+      // the DB out-of-process) — what a stale cache after db:reset looks like.
+      svc.applyExternalChange({
+        name: 'ghost',
+        definition: { name: 'ghost', protected: false, permissions: [] },
+        actor: 'x',
+        timestamp: 't',
+      })
+      expect(svc.getRole('ghost')).toBeDefined()
+
+      await svc.reload()
+
+      // The (fake) DB returns only the defaults → the stale role is gone, defaults stay.
+      expect(svc.getRole('ghost')).toBeUndefined()
+      expect(svc.getRole(ADMIN_ROLE)).toBeDefined()
+      expect(svc.getRole(USER_ROLE)).toBeDefined()
+    })
+
+    it('reload() enforces the mandatory-role invariant (rejects when owner/user is missing)', async () => {
+      // Same boot invariant as init(): if the resync ends up without a mandatory role
+      // (here `user` never lands because the fake write is a no-op), reload() must reject
+      // rather than silently install a half-empty role set.
+      const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+      const fakeDb = {
+        query: async () =>
+          Promise.resolve({
+            records: DEFAULT_ROLES.filter((role) => role.name !== USER_ROLE).map(roleRecord),
+          }),
+        write: async () => Promise.resolve({ records: [] }),
+      } as unknown as DbArg
+      const svc = new RoleService(fakeDb)
+      await expect(svc.reload()).rejects.toThrow(/mandatory role node\(s\) missing after seeding/)
+      warn.mockRestore()
     })
 
     it('does not resurrect a role deleted by an event that arrives during init()', async () => {

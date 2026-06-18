@@ -90,29 +90,33 @@
           {{ $t('admin.roles.allPermissions') }}
         </p>
 
-        <fieldset v-for="group in permissionGroups" :key="group.name" class="perm-group">
-          <legend class="perm-group__title">{{ groupLabel(group.name) }}</legend>
-          <label
-            v-for="permission in group.permissions"
-            :key="permission.key"
-            class="perm-row"
-            :class="{
-              'perm-row--added': hoverDiff[permission.key] === 'added',
-              'perm-row--removed': hoverDiff[permission.key] === 'removed',
-            }"
-          >
-            <input
-              type="checkbox"
-              :disabled="activeRole.protected"
-              v-model="forms[activeRole.name].permissions[permission.key]"
-              :data-test="`role-${activeRole.name}-perm-${permission.key}`"
-            />
-            <span class="perm-row__text">
-              <span class="perm-row__key">{{ permission.key }}</span>
-              <span class="perm-row__desc">{{ permLabel(permission) }}</span>
-            </span>
-          </label>
-        </fieldset>
+        <!-- Two-column masonry on desktop (>=1024px) for a compact overview; each
+             group stays intact (break-inside: avoid). Single column on mobile. -->
+        <div class="perm-groups">
+          <fieldset v-for="group in permissionGroups" :key="group.name" class="perm-group">
+            <legend class="perm-group__title">{{ groupLabel(group.name) }}</legend>
+            <label
+              v-for="permission in group.permissions"
+              :key="permission.key"
+              class="perm-row"
+              :class="{
+                'perm-row--added': hoverDiff[permission.key] === 'added',
+                'perm-row--removed': hoverDiff[permission.key] === 'removed',
+              }"
+            >
+              <input
+                type="checkbox"
+                :disabled="activeRole.protected"
+                v-model="forms[activeRole.name].permissions[permission.key]"
+                :data-test="`role-${activeRole.name}-perm-${permission.key}`"
+              />
+              <span class="perm-row__text">
+                <span class="perm-row__key">{{ permission.key }}</span>
+                <span class="perm-row__desc">{{ permLabel(permission) }}</span>
+              </span>
+            </label>
+          </fieldset>
+        </div>
 
         <div class="role__actions">
           <!-- Always visible; disabled (with a hint) where the action does not apply. -->
@@ -141,11 +145,22 @@
         </div>
       </template>
     </section>
+
+    <!-- Soft warning when an admin is about to strip role.manage from their own
+         role (a self-lockout, recoverable only by an owner). Not a hard block —
+         the owner role is the real failsafe. -->
+    <confirm-modal
+      v-if="showConfirmModal"
+      :modalData="confirmModalData"
+      @close="showConfirmModal = false"
+    />
   </os-card>
 </template>
 
 <script>
 import { OsButton, OsCard } from '@ocelot-social/ui'
+import ConfirmModal from '~/components/Modal/ConfirmModal'
+import { iconRegistry } from '~/utils/iconRegistry'
 import {
   createRoleMutation,
   deleteRoleMutation,
@@ -158,7 +173,7 @@ const emptyPermissionMap = (catalog) =>
   catalog.reduce((map, permission) => ({ ...map, [permission.key]: false }), {})
 
 export default {
-  components: { OsButton, OsCard },
+  components: { ConfirmModal, OsButton, OsCard },
   middleware: ['isAdmin'],
   data() {
     return {
@@ -174,6 +189,9 @@ export default {
       creating: false,
       newRole: { name: '' },
       saving: false,
+      // Confirm-modal state for the self-lockout warning (see saveRole).
+      showConfirmModal: false,
+      confirmModalData: null,
     }
   },
   apollo: {
@@ -195,6 +213,7 @@ export default {
     },
   },
   created() {
+    this.icons = iconRegistry
     // Select a default active role from any roles already present (e.g. in tests);
     // the apollo result() re-runs this once roles load.
     this.ensureActive()
@@ -332,7 +351,43 @@ export default {
       }
       return this.$t('admin.roles.cannotDelete')
     },
-    async saveRole(role) {
+    // Would saving `role` strip role.manage from the CURRENT user's own role? In the
+    // single-role model that locks the actor out of this very page — recoverable only
+    // by an owner. The owner role is the hard failsafe (it always holds role.manage,
+    // checkboxes disabled), so this is a soft confirm, not a block. Guarded for unit
+    // tests where $store/$can are absent.
+    wouldLockSelfOut(role) {
+      const ownRole = this.$store?.getters?.['auth/user']?.roleName
+      if (!ownRole || role.name !== ownRole) return false
+      if (typeof this.$can !== 'function' || !this.$can('role.manage')) return false
+      return !this.selectedPermissions(this.forms[role.name].permissions).includes('role.manage')
+    },
+    saveRole(role) {
+      if (this.wouldLockSelfOut(role)) {
+        this.confirmModalData = {
+          titleIdent: 'admin.roles.selfLockout.title',
+          messageIdent: 'admin.roles.selfLockout.message',
+          messageParams: { role: role.name },
+          buttons: {
+            confirm: {
+              danger: true,
+              icon: this.icons.exclamationCircle,
+              textIdent: 'admin.roles.selfLockout.confirm',
+              callback: () => this.performSave(role),
+            },
+            cancel: {
+              icon: this.icons.close,
+              textIdent: 'actions.cancel',
+              callback: () => {},
+            },
+          },
+        }
+        this.showConfirmModal = true
+        return undefined
+      }
+      return this.performSave(role)
+    },
+    async performSave(role) {
       const form = this.forms[role.name]
       this.saving = true
       try {
@@ -512,10 +567,25 @@ export default {
     display: inline-flex;
   }
 }
+// Desktop (>=1024px): pack the permission groups into two columns for a more
+// compact overview. Mobile/tablet stay single-column (the default). column-* is
+// used (rather than grid/flex) so unequal-height groups fill the space tightly.
+.perm-groups {
+  @media #{$media-query-large} {
+    column-count: 2;
+    column-gap: $space-large;
+  }
+}
 .perm-group {
   border: none;
   padding: 0;
   margin: $space-x-small 0;
+  // Keep a group (title + its rows) from splitting across the two columns.
+  break-inside: avoid;
+  // The first group's top margin would otherwise misalign the two column tops.
+  &:first-child {
+    margin-top: 0;
+  }
 
   &__title {
     color: $text-color-soft;

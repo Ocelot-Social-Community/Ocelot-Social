@@ -35,6 +35,9 @@ const helpers = {
           isModerator() {
             return true
           },
+          canAccessModeration() {
+            return true
+          },
           isAdmin() {
             return true
           },

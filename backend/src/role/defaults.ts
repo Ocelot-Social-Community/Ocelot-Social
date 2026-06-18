@@ -18,9 +18,24 @@ import type { RoleDefinition } from './types'
 // The baseline capabilities of a standard member.
 const BASELINE: RoleDefinition['permissions'] = [
   'post.create',
-  'group.create',
+  'comment.create',
+  'socialMedia.create',
+  // Flat per-group-type creation rights (mirrors videoCall.create_*). The baseline
+  // grants all three for parity with the prior model (group.create covered public +
+  // closed, group.create_hidden added hidden) — i.e. every member could create any
+  // group type. Tightening a type out of the baseline is a per-role opt-in.
+  'group.create_public',
+  'group.create_closed',
   'group.create_hidden',
   'user.invite',
+  // Only public-group video calls are baseline (parity with the prior public-only
+  // implementation). videoCall.create_closed / _hidden are NOT granted by default —
+  // they are opt-in per role (owner still holds them via full-catalog expansion).
+  'videoCall.create_public',
+  // Creating personal API keys was open to any authenticated user (when the feature
+  // is enabled) — baseline preserves that. NOTE: group 'account', NOT 'administration',
+  // so holding it does not make a user count as an admin (isAdmin is group-driven).
+  'apiKey.create',
 ]
 
 // The roles that MUST always exist and are re-ensured on every boot / bootstrap:
@@ -44,6 +59,10 @@ export const DEFAULT_ROLES: RoleDefinition[] = [
       ...BASELINE,
       'content.moderate',
       'badge.manage',
+      // admin MUST hold every moderator capability (incl. user.disable) so the
+      // act-on dominance rule keeps the intuitive chain owner ⊋ admin ⊋ moderator
+      // ⊋ user — i.e. an admin can disable/delete a moderator (see role/dominance.ts).
+      'user.disable',
       'network.statistics.read',
       'role.manage',
       'policy.manage',
@@ -58,7 +77,11 @@ export const DEFAULT_ROLES: RoleDefinition[] = [
   {
     name: MODERATOR_ROLE,
     protected: false,
-    permissions: [...BASELINE, 'content.moderate'],
+    // badge.manage is a moderation-group capability (badges are a moderation act),
+    // so the default moderator can grant/revoke badges via the moderation area.
+    // user.disable lets a moderator deactivate (reversible) abusive accounts — the
+    // moderator-grade alternative to the admin-only, irreversible user.delete.any.
+    permissions: [...BASELINE, 'content.moderate', 'badge.manage', 'user.disable'],
   },
   {
     name: USER_ROLE,

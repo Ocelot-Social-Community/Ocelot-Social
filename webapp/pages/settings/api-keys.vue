@@ -1,7 +1,11 @@
 <template>
   <div>
-    <!-- Create new key -->
-    <os-card class="ds-mb-large">
+    <!-- Create new key — gated by apiKey.create; managing existing keys below stays open. -->
+    <os-card v-if="!canCreateApiKey" class="ds-mb-large" data-test="api-key-create-denied">
+      <h2 class="title">{{ $t('settings.api-keys.create.title') }}</h2>
+      <p class="ds-text">{{ $t('settings.api-keys.create.no-permission') }}</p>
+    </os-card>
+    <os-card v-else class="ds-mb-large">
       <h2 class="title">{{ $t('settings.api-keys.create.title') }}</h2>
       <form @submit.prevent="createKey">
         <div class="ds-mb-small">
@@ -280,6 +284,11 @@ export default {
     }
   },
   computed: {
+    // Network permission to create personal API keys. Managing/revoking existing keys
+    // stays available regardless, so only the create card is gated.
+    canCreateApiKey() {
+      return this.$can('apiKey.create')
+    },
     maxKeys() {
       // `?? 0` (not `|| 5`): inject no frontend config default — the real default
       // lives in the backend policy (a configured value is always >= 1; disabling
@@ -300,6 +309,12 @@ export default {
   },
   methods: {
     async createKey() {
+      // Defence-in-depth: the create form is hidden without apiKey.create, but guard the
+      // handler too so a stray call can't silently fail against the backend gate.
+      if (!this.canCreateApiKey) {
+        this.$toast.error(this.$t('permissions.deniedHint'))
+        return
+      }
       if (!this.name.trim()) return
       this.creating = true
       try {

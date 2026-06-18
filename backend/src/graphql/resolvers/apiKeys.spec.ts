@@ -16,11 +16,16 @@ import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import type { RoleDefinition } from '@src/role'
 
 let authenticatedUser: Context['user']
+// Per-test role override: tweaks the viewer's effective permissions to test the
+// apiKey.create gate by giving them a role that lacks it.
+let rolesOverride: RoleDefinition[] | undefined
 const context = () => ({
   authenticatedUser,
   policy: { apiKeysEnabled: true, apiKeysMaxPerUser: 3 },
+  roles: rolesOverride,
 })
 let query: ApolloTestSetup['query']
 let mutate: ApolloTestSetup['mutate']
@@ -64,6 +69,7 @@ describe('createApiKey', () => {
 
   describe('authenticated', () => {
     beforeEach(async () => {
+      rolesOverride = undefined
       const user = await database.neode.create('User', {
         id: 'u1',
         name: 'Test User',
@@ -71,6 +77,15 @@ describe('createApiKey', () => {
         role: 'user',
       })
       authenticatedUser = (await user.toJson()) as Context['user']
+    })
+
+    it('denies creating an API key for a role without apiKey.create', async () => {
+      rolesOverride = [{ name: 'user', protected: false, permissions: ['post.create'] }]
+      const { errors } = await mutate({
+        mutation: createApiKey,
+        variables: { name: 'Forbidden Key' },
+      })
+      expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
 
     it('creates an API key and returns secret with oak_ prefix', async () => {

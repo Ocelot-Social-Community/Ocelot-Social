@@ -8,10 +8,10 @@
       <!-- create group -->
       <div class="ds-mb-large ds-space-centered">
         <os-button
-          :as="$can('group.create') ? 'nuxt-link' : 'button'"
+          :as="canCreateAnyGroup ? 'nuxt-link' : 'button'"
           :to="{ name: 'groups-create' }"
-          :class="{ 'permission-denied': !$can('group.create') }"
-          :aria-disabled="!$can('group.create')"
+          :class="{ 'permission-denied': !canCreateAnyGroup }"
+          :aria-disabled="!canCreateAnyGroup"
           class="group-add-button"
           variant="primary"
           appearance="filled"
@@ -19,7 +19,7 @@
           size="xl"
           :aria-label="$t('group.createNewGroup.tooltip')"
           v-tooltip="{
-            content: $can('group.create')
+            content: canCreateAnyGroup
               ? $t('group.createNewGroup.tooltip')
               : $t('permissions.deniedHint'),
             placement: 'left',
@@ -119,6 +119,11 @@ export default {
     },
   },
   computed: {
+    // The create-group entry point is open if the user may create at least one group
+    // type (flat group.create_* rights mirror the backend shield).
+    canCreateAnyGroup() {
+      return ['public', 'closed', 'hidden'].some((type) => this.$can(`group.create_${type}`))
+    },
     activeTab() {
       return this.tabOptions.find((tab) => tab.type === this.tabActive)
     },

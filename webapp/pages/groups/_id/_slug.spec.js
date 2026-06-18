@@ -689,7 +689,7 @@ describe('GroupProfileSlug', () => {
       Vue.config.warnHandler = savedWarnHandler
     })
 
-    const mountWithGroup = (group) => {
+    const mountWithGroup = (group, extraMocks = {}) => {
       openVideoCallMock = jest.fn()
       currentUserMock.mockReturnValue(peterLustig)
       const enabledStore = new Vuex.Store({
@@ -722,6 +722,7 @@ describe('GroupProfileSlug', () => {
         },
         mocks: {
           ...mocks,
+          ...extraMocks,
           $apollo: {
             loading: false,
             mutate: jest.fn().mockResolvedValue(),
@@ -740,9 +741,32 @@ describe('GroupProfileSlug', () => {
       expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(true)
     })
 
-    it('hides the video-call button for a non-public group', () => {
+    it('renders the video-call button for a non-public group member (joining is open to all)', () => {
       const wrapper = mountWithGroup({ ...yogaPractice, groupType: 'closed', myRole: 'usual' })
-      expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(false)
+      expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(true)
+    })
+
+    it('grays out the button (permission-denied) when the role may not open a call and none is running', () => {
+      // No per-type open permission ($can → false) and no active call (count 0): the
+      // button is shown but marked denied; joining-only would re-enable it.
+      const wrapper = mountWithGroup(
+        { ...yogaPractice, groupType: 'closed', myRole: 'usual' },
+        { $can: () => false },
+      )
+      const button = wrapper.find('[data-test="video-call-btn"]')
+      expect(button.exists()).toBe(true)
+      expect(button.classes()).toContain('permission-denied')
+    })
+
+    it('does not gray out the button when a call is already running (join is allowed)', async () => {
+      const wrapper = mountWithGroup(
+        { ...yogaPractice, groupType: 'closed', myRole: 'usual' },
+        { $can: () => false },
+      )
+      wrapper.setData({ videoCallParticipantCount: 2 })
+      await wrapper.vm.$nextTick()
+      const button = wrapper.find('[data-test="video-call-btn"]')
+      expect(button.classes()).not.toContain('permission-denied')
     })
 
     it('hides the video-call button for non-members', () => {
@@ -770,6 +794,71 @@ describe('GroupProfileSlug', () => {
         groupSlug: group.slug,
         groupAvatar: group.avatar,
       })
+    })
+
+    it('does not dispatch videoCall/OPEN but shows a toast when the viewer may not open a call', async () => {
+      // No open permission ($can → false) and no running call (count 0): clicking the
+      // (still-clickable) button must short-circuit with feedback instead of an OPEN.
+      const wrapper = mountWithGroup(
+        { ...yogaPractice, groupType: 'closed', myRole: 'usual' },
+        { $can: () => false },
+      )
+      await wrapper.find('[data-test="video-call-btn"]').trigger('click')
+      expect(openVideoCallMock).not.toHaveBeenCalled()
+      expect(mocks.$toast.error).toHaveBeenCalledWith('permissions.deniedHint')
+    })
+
+    it('dispatches videoCall/OPEN (no toast) when a call is already running, even without open permission', async () => {
+      // Counter > 0 → this is a JOIN, allowed for any member regardless of the open
+      // permission: the click must dispatch and not surface the denied feedback.
+      const wrapper = mountWithGroup(
+        { ...yogaPractice, groupType: 'closed', myRole: 'usual' },
+        { $can: () => false },
+      )
+      wrapper.setData({ videoCallParticipantCount: 2 })
+      await wrapper.vm.$nextTick()
+      await wrapper.find('[data-test="video-call-btn"]').trigger('click')
+      expect(openVideoCallMock).toHaveBeenCalledTimes(1)
+      expect(mocks.$toast.error).not.toHaveBeenCalled()
+    })
+
+    it('refetches the count before denying, then proceeds with the JOIN when a call turns out to be running', async () => {
+      // Stale snapshot: count is 0 at click time, but a refetch reveals a live call.
+      // The client must re-check and not hard-block the JOIN on the stale value.
+      const wrapper = mountWithGroup(
+        { ...yogaPractice, groupType: 'closed', myRole: 'usual' },
+        { $can: () => false },
+      )
+      const refetch = jest.fn().mockImplementation(() => {
+        wrapper.vm.videoCallParticipantCount = 2
+        return Promise.resolve()
+      })
+      wrapper.vm.$apollo.queries.videoCallParticipantCount = { refetch }
+      await wrapper.find('[data-test="video-call-btn"]').trigger('click')
+      await wrapper.vm.$nextTick()
+      expect(refetch).toHaveBeenCalledTimes(1)
+      expect(openVideoCallMock).toHaveBeenCalledTimes(1)
+      expect(mocks.$toast.error).not.toHaveBeenCalled()
+    })
+
+    it('degrades gracefully when the pre-deny refetch fails: falls back to the stale count and denies', async () => {
+      // Refetch rejects (network/load race): the failure must be swallowed (no unhandled
+      // rejection / raw backend error) and the decision falls back to the stale count we
+      // already have — which here is 0, so the JOIN stays denied with the usual toast.
+      const wrapper = mountWithGroup(
+        { ...yogaPractice, groupType: 'closed', myRole: 'usual' },
+        { $can: () => false },
+      )
+      const refetch = jest.fn().mockRejectedValue(new Error('network down'))
+      wrapper.vm.$apollo.queries.videoCallParticipantCount = { refetch }
+      const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
+      await wrapper.find('[data-test="video-call-btn"]').trigger('click')
+      await wrapper.vm.$nextTick()
+      expect(refetch).toHaveBeenCalledTimes(1)
+      expect(openVideoCallMock).not.toHaveBeenCalled()
+      expect(mocks.$toast.error).toHaveBeenCalledWith('permissions.deniedHint')
+      expect(consoleError).toHaveBeenCalled()
+      consoleError.mockRestore()
     })
 
     // Regression guard: even with the "happy" combination (public group,

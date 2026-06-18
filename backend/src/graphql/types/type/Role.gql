@@ -8,6 +8,12 @@ type Permission {
   description: String!
 }
 
+"A permission the current viewer effectively holds, carrying its catalog group so the webapp can gate UI areas by group (e.g. show the admin area for ANY administration-group permission) without a hard-coded key list."
+type EffectivePermission {
+  key: String!
+  group: String!
+}
+
 type Role {
   name: String!
   protected: Boolean!
@@ -22,8 +28,8 @@ type Query {
   roles: [Role!]!
   "The roles assigned to a specific user (role.manage) — for the admin UI."
   userRoles(userId: ID!): [Role!]!
-  "The current viewer's effective permission keys — drives the webapp can()."
-  myPermissions: [String!]!
+  "The current viewer's effective permissions, each carrying its catalog group — drives the webapp can() and group-based area gating."
+  myPermissions: [EffectivePermission!]!
 }
 
 type Mutation {
@@ -33,4 +39,14 @@ type Mutation {
   deleteRole(name: String!): String!
   "Set a user's single role (replaces their current role)."
   setUserRole(userId: ID!, roleName: String!): User!
+}
+
+"A signal that effective permissions may have changed (a role's permission set, or a user's role assignment). Clients refetch their own myPermissions on receipt — the payload carries only the affected role name, no actor (Datensparsamkeit)."
+type PermissionsChanged {
+  roleName: String
+}
+
+type Subscription {
+  "Fires when a role's permissions or a user's role assignment changes."
+  permissionsChanged: PermissionsChanged!
 }

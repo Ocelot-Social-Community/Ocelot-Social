@@ -57,10 +57,16 @@ describe('PostSlug', () => {
       mocks = {
         $t: jest.fn((t) => t),
         // Non-moderator viewer (children now gate via $can, not auth/isModerator).
+        // A normal member holds the baseline, including comment.create.
         $can: (permission) =>
-          ['post.create', 'group.create', 'group.create_hidden', 'user.invite'].includes(
-            permission,
-          ),
+          [
+            'post.create',
+            'comment.create',
+            'group.create_public',
+            'group.create_closed',
+            'group.create_hidden',
+            'user.invite',
+          ].includes(permission),
         $filters: {
           truncate: (a) => a,
           removeHtml: (a) => a,
@@ -613,6 +619,37 @@ describe('PostSlug', () => {
         expect(wrapper.vm.commentingAllowedByGroupRole).toBe(true)
         wrapper.setData({ group: { myRole: 'pending' } })
         expect(wrapper.vm.commentingAllowedByGroupRole).toBe(false)
+      })
+
+      it('canComment reflects the comment.create permission (gates the comment form)', () => {
+        expect(PostSlug.computed.canComment.call({ $can: () => true })).toBe(true)
+        expect(PostSlug.computed.canComment.call({ $can: (p) => p !== 'comment.create' })).toBe(
+          false,
+        )
+      })
+
+      it('commentingDisabledMessage gives a dedicated reason when comment.create is missing', () => {
+        // No group, not blocked, group-role OK → the only reason left is the permission.
+        const base = {
+          isBlocked: false,
+          post: {},
+          commentingAllowedByGroupRole: true,
+          $t: (key) => key,
+        }
+        expect(
+          PostSlug.computed.commentingDisabledMessage.call({ ...base, canComment: false }),
+        ).toBe('post.comment.noPermission')
+        // Permission present, or another (actionable) reason → keep the generic message.
+        expect(
+          PostSlug.computed.commentingDisabledMessage.call({ ...base, canComment: true }),
+        ).toBe('settings.blocked-users.explanation.commenting-disabled')
+        expect(
+          PostSlug.computed.commentingDisabledMessage.call({
+            ...base,
+            isBlocked: true,
+            canComment: false,
+          }),
+        ).toBe('settings.blocked-users.explanation.commenting-disabled')
       })
     })
 

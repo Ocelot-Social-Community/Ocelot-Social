@@ -125,6 +125,13 @@ export default {
       // console.log(thisList.$refs)
     },
     async handleSubmitSocialMedia(thisList, isCreation, item, formData) {
+      // Adding a link is gated by socialMedia.create; editing an existing one is not
+      // (that path is owner-gated on the backend). Give friendly feedback instead of
+      // the raw backend "Not Authorized" error when the role lacks the permission.
+      if (isCreation && !this.$can('socialMedia.create')) {
+        thisList.$toast.error(this.$t('permissions.deniedHint'))
+        return false
+      }
       item.url = formData.socialMediaUrl
 
       const items = this.socialMediaLinks

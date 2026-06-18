@@ -22,6 +22,7 @@ import { createApolloTestSetup } from '@root/test/helpers'
 import { ensureUserRoleEdges, seedDefaultRoleNodes } from '@src/role'
 
 import Factory from './factories'
+import { nudgeCacheResync } from './resync-caches'
 import { trophies, verification } from './seed/badges'
 
 if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
@@ -2046,6 +2047,10 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     // Safety net: give any user still without a HAS_ROLE edge their tier edge (users
     // built by the factory after seeding the role nodes already have one). Idempotent.
     await ensureUserRoleEdges()
+
+    // A running server still holds stale role/policy caches after this seed — nudge it
+    // to resync (best-effort; no-op if the backend is down).
+    await nudgeCacheResync()
   } catch (err) {
     /* eslint-disable-next-line no-console */
     console.error(err)

@@ -32,7 +32,17 @@ describe('DEFAULT_ROLES', () => {
     }
   })
 
-  const BASELINE = ['post.create', 'group.create', 'group.create_hidden', 'user.invite']
+  const BASELINE = [
+    'post.create',
+    'comment.create',
+    'socialMedia.create',
+    'group.create_public',
+    'group.create_closed',
+    'group.create_hidden',
+    'user.invite',
+    'videoCall.create_public',
+    'apiKey.create',
+  ]
 
   // The audited extras the admin role grants ON TOP of the baseline. Keep this in
   // sync with defaults.ts consciously — these tests assert the EXACT permission set
@@ -40,6 +50,7 @@ describe('DEFAULT_ROLES', () => {
   const ADMIN_EXTRAS = [
     'content.moderate',
     'badge.manage',
+    'user.disable',
     'network.statistics.read',
     'role.manage',
     'policy.manage',
@@ -63,11 +74,26 @@ describe('DEFAULT_ROLES', () => {
 
   // Single-role model: each role's permission set is self-contained, so the
   // higher roles include the baseline rather than relying on a union.
-  it('gives moderator EXACTLY baseline + content.moderate', () => {
-    expect(permsOf(MODERATOR_ROLE)).toEqual(exactly(...BASELINE, 'content.moderate'))
+  it('gives moderator EXACTLY baseline + content.moderate + badge.manage + user.disable', () => {
+    expect(permsOf(MODERATOR_ROLE)).toEqual(
+      exactly(...BASELINE, 'content.moderate', 'badge.manage', 'user.disable'),
+    )
   })
 
   it('gives admin EXACTLY baseline + the audited admin extras (privilege-drift guard)', () => {
     expect(permsOf(ADMIN_ROLE)).toEqual(exactly(...BASELINE, ...ADMIN_EXTRAS))
+  })
+
+  // The act-on dominance rule (role/dominance.ts) derives hierarchy from set inclusion,
+  // so the default roles MUST form a strict superset chain admin ⊋ moderator ⊋ user —
+  // otherwise an admin could not disable/delete a moderator. This guards that invariant.
+  it('forms a strict superset chain admin ⊋ moderator ⊋ user (act-on hierarchy)', () => {
+    const user = new Set(permsOf(USER_ROLE))
+    const moderator = new Set(permsOf(MODERATOR_ROLE))
+    const admin = new Set(permsOf(ADMIN_ROLE))
+    const isStrictSuperset = (a: Set<string>, b: Set<string>) =>
+      a.size > b.size && [...b].every((p) => a.has(p))
+    expect(isStrictSuperset(moderator, user)).toBe(true)
+    expect(isStrictSuperset(admin, moderator)).toBe(true)
   })
 })

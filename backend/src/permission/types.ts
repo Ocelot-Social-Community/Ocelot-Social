@@ -16,18 +16,27 @@ export type PermissionKey =
   | 'donation.manage'
   | 'apiKey.administer'
   | 'user.email.readAny'
+  | 'user.delete.any'
   | 'badge.manage'
   | 'content.moderate'
-  | 'user.delete.any'
+  | 'user.disable'
   | 'post.pin'
   | 'post.push'
   | 'post.create'
-  | 'group.create'
+  | 'comment.create'
+  | 'socialMedia.create'
+  | 'group.create_public'
+  | 'group.create_closed'
   | 'group.create_hidden'
   | 'user.invite'
+  | 'videoCall.create_public'
+  | 'videoCall.create_closed'
+  | 'videoCall.create_hidden'
+  | 'apiKey.create'
 
 // Grouping for the admin UI. Open string (the JSON is the source of truth); the
-// known groups today are 'administration' | 'moderation' | 'content' | 'membership'.
+// known groups today are 'administration' | 'moderation' | 'content' | 'membership'
+// | 'communication' | 'account'.
 export type PermissionGroup = string
 
 export interface PermissionCatalogEntry {

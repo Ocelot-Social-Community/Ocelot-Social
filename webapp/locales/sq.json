@@ -207,7 +207,9 @@
       "deleteSuccess": "Roli u fshi.",
       "description": "Krijo role dhe cakto leje. Ndryshimet zbatohen menjëherë.",
       "groups": {
+        "account": "Llogaria",
         "administration": "Administrim",
+        "communication": "Komunikim",
         "content": "Përmbajtje",
         "membership": "Anëtarësia",
         "moderation": "Moderim"
@@ -217,26 +219,38 @@
       "nameLabel": "Emri",
       "perm": {
         "apiKey_administer": "Administro çelësat API të përdoruesve të tjerë.",
+        "apiKey_create": "Krijo çelësa API personalë.",
         "badge_manage": "Jep dhe hiq stema.",
+        "comment_create": "Komento postime.",
         "content_moderate": "Shqyrto dhe vendos për përmbajtjen e raportuar.",
         "donation_manage": "Konfiguro widget-in e donacioneve.",
-        "group_create": "Krijo grupe.",
+        "group_create_closed": "Krijo grupe të mbyllura.",
         "group_create_hidden": "Krijo grupe të fshehura.",
+        "group_create_public": "Krijo grupe publike.",
         "network_statistics_read": "Shiko statistikat e të gjithë rrjetit.",
         "policy_manage": "Shiko dhe ndrysho cilësimet e politikave të rrjetit.",
         "post_create": "Krijo postime.",
         "post_pin": "Ngjit dhe shkëput postimet në të gjithë rrjetin.",
         "post_push": "Promovo dhe tërhiq (boost) postimet.",
         "role_manage": "Menaxho rolet dhe cakto ato te përdoruesit.",
+        "socialMedia_create": "Shto lidhje të mediave sociale në profilin tënd.",
         "user_delete_any": "Fshi llogarinë e çdo përdoruesi.",
         "user_email_readAny": "Lexo adresën e email-it të çdo përdoruesi.",
-        "user_invite": "Gjenero kode ftese personale."
+        "user_invite": "Gjenero kode ftese personale.",
+        "videoCall_create_closed": "Nis një thirrje video në një grup të mbyllur.",
+        "videoCall_create_hidden": "Nis një thirrje video në një grup të fshehur.",
+        "videoCall_create_public": "Nis një thirrje video në një grup publik."
       },
       "protected": "i mbrojtur",
       "protectedHint": "Roli i pronarit ka të gjitha lejet dhe nuk mund të modifikohet.",
       "save": "Ruaj",
       "saveError": "Roli nuk u ruajt dot: {message}",
       "saveSuccess": "Roli u ruajt.",
+      "selfLockout": {
+        "confirm": "Hiqe gjithsesi",
+        "message": "Po hiqni lejen «menaxho rolet» nga <strong>{role}</strong> — roli juaj. Pas kësaj nuk do të mund të menaxhoni më rolet; vetëm një pronar mund ta rivendosë. Të vazhdohet?",
+        "title": "Të hiqet menaxhimi i rolit tuaj?"
+      },
       "title": "Rolet dhe lejet"
     },
     "settings": {
@@ -245,6 +259,20 @@
     "users": {
       "addRole": "Cakto rol…",
       "allRoles": "Të gjitha rolet",
+      "delete": {
+        "error": "Përdoruesi nuk u fshi dot: {message}",
+        "message": "Doni vërtet ta fshini përgjithmonë <strong>{name}</strong>? Ky veprim nuk mund të zhbëhet.",
+        "submit": "Fshi përdoruesin",
+        "success": "Përdoruesi u fshi.",
+        "title": "Të fshihet përdoruesi?"
+      },
+      "disable": {
+        "disabledSuccess": "Përdoruesi u çaktivizua.",
+        "disableLabel": "Çaktivizo përdoruesin",
+        "enabledSuccess": "Përdoruesi u riaktivizua.",
+        "enableLabel": "Riaktivizo përdoruesin",
+        "error": "Statusi i përdoruesit nuk u ndryshua dot: {message}"
+      },
       "empty": "Nuk u gjetën përdorues",
       "form": {
         "placeholder": "email, emër, përshkrim ose role:moderator"
@@ -258,12 +286,14 @@
           "comments": "Komente",
           "contributions": "Kontribute",
           "createdAt": "Krijuar më",
+          "delete": "Fshi",
           "email": "E-mail",
           "name": "Emri",
           "number": "Nr.",
           "role": "Roli",
           "shouted": "Rekomanduar",
-          "slug": "Slug"
+          "slug": "Slug",
+          "status": "Statusi"
         }
       }
     }
@@ -987,6 +1017,9 @@
       "reportedOn": "Data",
       "status": "Statusi aktual",
       "submitter": "Raportuar nga"
+    },
+    "users": {
+      "name": "Përdoruesit"
     }
   },
   "notifications": {
@@ -1032,6 +1065,7 @@
   "post": {
     "comment": {
       "joinGroup": "U bashkua me grupin „<b>{name}</b>“",
+      "noPermission": "Komentimi nuk është aktivizuar për rolin tënd.",
       "reply": "Përgjigju",
       "submit": "Komento",
       "submitted": "Komenti u dërgua!",
@@ -1220,6 +1254,7 @@
         "expiry-never": "Pa datë skadimi",
         "limit-reached": "Ke arritur maksimumin e {max} API Keys aktive. Revoko një key ekzistues për të krijuar një të ri.",
         "name-label": "Emri",
+        "no-permission": "Krijimi i çelësave API nuk është aktivizuar për rolin tënd.",
         "submit": "Krijo key",
         "success": "API Key u krijua me sukses",
         "title": "Krijo API Key të ri"

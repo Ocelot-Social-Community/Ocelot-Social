@@ -1,9 +1,35 @@
 import { ForbiddenError, UserInputError } from '@graphql/errors'
-import { permissionCatalog } from '@src/permission'
-import { OWNER_ROLE, RoleValidationError, effectiveRoleName } from '@src/role'
+import { groupFor, permissionCatalog } from '@src/permission'
+import {
+  OWNER_ROLE,
+  PERMISSIONS_CHANGED_CHANNEL,
+  RoleValidationError,
+  effectiveRoleName,
+} from '@src/role'
 
 import type { Context } from '@src/context'
 import type { RoleDefinition } from '@src/role'
+
+// Notify connected clients that effective permissions may have changed so they refetch
+// their own (the permissionsChanged subscription). Fire-and-forget: the mutation has
+// already committed; a pubsub hiccup must not fail it.
+const publishPermissionsChanged = (context: Context, roleName: string | null): void => {
+  // publish() may throw SYNCHRONOUSLY or reject ASYNCHRONOUSLY (its type is
+  // void | Promise<void>), so guard BOTH: a bare Promise.resolve(publish()).catch()
+  // would let a synchronous throw escape and crash the already-committed mutation.
+  // Mirrors RoleService.publishChange / PolicyService.publishChange.
+  try {
+    const result = context.pubsub.publish(PERMISSIONS_CHANGED_CHANNEL, {
+      permissionsChanged: { roleName },
+    })
+    void Promise.resolve(result).catch(() => {
+      /* best-effort broadcast (async rejection) */
+    })
+    // eslint-disable-next-line no-catch-all/no-catch-all
+  } catch {
+    /* best-effort broadcast (synchronous throw) */
+  }
+}
 
 // Role name format: lowercase-ish slug, used as the node key and as a policy
 // audience. Kept conservative so names stay safe identifiers.
@@ -67,9 +93,11 @@ export default {
         .map((def) => toGraphqlRole(def))
     },
 
-    myPermissions: (_parent: unknown, _args: unknown, context: Context) => [
-      ...context.effectivePermissions,
-    ],
+    // Each effective permission carries its catalog group, so the webapp can gate UI
+    // areas by group (e.g. admin area = ANY administration-group permission) from a
+    // single payload — no second query and no key/group drift.
+    myPermissions: (_parent: unknown, _args: unknown, context: Context) =>
+      [...context.effectivePermissions].map((key) => ({ key, group: groupFor(key) })),
   },
 
   Mutation: {
@@ -118,6 +146,8 @@ export default {
           },
           context.user?.id ?? 'unknown',
         )
+        // The permission set changed → every holder of this role must refetch.
+        publishPermissionsChanged(context, def.name)
         return toGraphqlRole(def, await countMembers(context, def.name))
       } catch (err) {
         if (err instanceof RoleValidationError) throw new ForbiddenError(err.message)
@@ -128,6 +158,8 @@ export default {
     deleteRole: async (_parent: unknown, { name }: { name: string }, context: Context) => {
       try {
         await context.role.deleteRole(name, context.user?.id ?? 'unknown')
+        // Former holders fall back to the baseline → they must refetch.
+        publishPermissionsChanged(context, name)
         return name
       } catch (err) {
         if (err instanceof RoleValidationError) throw new ForbiddenError(err.message)
@@ -180,7 +212,20 @@ export default {
       })
       const user = result.records[0]?.get('user') as unknown
       if (!user) throw new UserInputError('Could not find User')
+      // The target user's effective permissions changed → they must refetch.
+      publishPermissionsChanged(context, roleName)
       return user
+    },
+  },
+
+  Subscription: {
+    permissionsChanged: {
+      // Broadcast to every connected client; each refetches its own myPermissions.
+      // No per-viewer filter — the payload reveals only the affected role name.
+      subscribe: (_parent: unknown, _args: unknown, { pubsub }: Context) =>
+        pubsub.asyncIterator(PERMISSIONS_CHANGED_CHANNEL),
+      resolve: (payload: { permissionsChanged: { roleName: string | null } }) =>
+        payload.permissionsChanged,
     },
   },
 

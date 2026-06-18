@@ -207,7 +207,9 @@
       "deleteSuccess": "Rol verwijderd.",
       "description": "Maak rollen aan en wijs rechten toe. Wijzigingen worden direct toegepast.",
       "groups": {
+        "account": "Account",
         "administration": "Beheer",
+        "communication": "Communicatie",
         "content": "Inhoud",
         "membership": "Lidmaatschap",
         "moderation": "Moderatie"
@@ -217,26 +219,38 @@
       "nameLabel": "Naam",
       "perm": {
         "apiKey_administer": "API-sleutels van andere gebruikers beheren.",
+        "apiKey_create": "Persoonlijke API-sleutels aanmaken.",
         "badge_manage": "Badges toekennen en intrekken.",
+        "comment_create": "Reageren op berichten.",
         "content_moderate": "Gerapporteerde inhoud beoordelen en beslissen.",
         "donation_manage": "De donatiewidget configureren.",
-        "group_create": "Groepen maken.",
+        "group_create_closed": "Gesloten groepen maken.",
         "group_create_hidden": "Verborgen groepen maken.",
+        "group_create_public": "Openbare groepen maken.",
         "network_statistics_read": "Netwerkbrede statistieken bekijken.",
         "policy_manage": "Netwerkbeleid bekijken en wijzigen.",
         "post_create": "Berichten maken.",
         "post_pin": "Berichten netwerkbreed vastpinnen en losmaken.",
         "post_push": "Berichten pushen en terugtrekken (boost).",
         "role_manage": "Rollen beheren en aan gebruikers toewijzen.",
+        "socialMedia_create": "Social-media-links aan je profiel toevoegen.",
         "user_delete_any": "Het account van elke gebruiker verwijderen.",
         "user_email_readAny": "Het e-mailadres van elke gebruiker lezen.",
-        "user_invite": "Persoonlijke uitnodigingscodes genereren."
+        "user_invite": "Persoonlijke uitnodigingscodes genereren.",
+        "videoCall_create_closed": "Een videogesprek starten in een gesloten groep.",
+        "videoCall_create_hidden": "Een videogesprek starten in een verborgen groep.",
+        "videoCall_create_public": "Een videogesprek starten in een openbare groep."
       },
       "protected": "beschermd",
       "protectedHint": "De eigenaarsrol heeft alle rechten en kan niet worden bewerkt.",
       "save": "Opslaan",
       "saveError": "Kon rol niet opslaan: {message}",
       "saveSuccess": "Rol opgeslagen.",
+      "selfLockout": {
+        "confirm": "Toch verwijderen",
+        "message": "Je staat op het punt de rechten ‘rollen beheren’ te verwijderen van <strong>{role}</strong> — je eigen rol. Je kunt dan geen rollen meer beheren; alleen een eigenaar kan dit herstellen. Doorgaan?",
+        "title": "Je eigen rolbeheer verwijderen?"
+      },
       "title": "Rollen en rechten"
     },
     "settings": {
@@ -245,6 +259,20 @@
     "users": {
       "addRole": "Rol toewijzen…",
       "allRoles": "Alle rollen",
+      "delete": {
+        "error": "Kan gebruiker niet verwijderen: {message}",
+        "message": "Weet je zeker dat je <strong>{name}</strong> permanent wilt verwijderen? Dit kan niet ongedaan worden gemaakt.",
+        "submit": "Gebruiker verwijderen",
+        "success": "Gebruiker verwijderd.",
+        "title": "Gebruiker verwijderen?"
+      },
+      "disable": {
+        "disabledSuccess": "Gebruiker gedeactiveerd.",
+        "disableLabel": "Gebruiker deactiveren",
+        "enabledSuccess": "Gebruiker opnieuw geactiveerd.",
+        "enableLabel": "Gebruiker opnieuw activeren",
+        "error": "Kon de gebruikersstatus niet wijzigen: {message}"
+      },
       "empty": "Geen gebruikers gevonden",
       "form": {
         "placeholder": "e-mail, naam, beschrijving of role:moderator"
@@ -258,12 +286,14 @@
           "comments": "Reacties",
           "contributions": "Bijdragen",
           "createdAt": "Aangemaakt op",
+          "delete": "Verwijderen",
           "email": "E-mail",
           "name": "Naam",
           "number": "Nr.",
           "role": "Rol",
           "shouted": "Gedeeld",
-          "slug": "Alias"
+          "slug": "Alias",
+          "status": "Status"
         }
       }
     }
@@ -987,6 +1017,9 @@
       "reportedOn": "Datum",
       "status": "Huidige status",
       "submitter": "Gemeld door"
+    },
+    "users": {
+      "name": "Gebruikers"
     }
   },
   "notifications": {
@@ -1032,6 +1065,7 @@
   "post": {
     "comment": {
       "joinGroup": "Lid geworden van groep „<b>{name}</b>“",
+      "noPermission": "Reageren is niet ingeschakeld voor jouw rol.",
       "reply": "Antwoorden",
       "submit": "Reageren",
       "submitted": "Reactie geplaatst!",
@@ -1220,6 +1254,7 @@
         "expiry-never": "Geen vervaldatum",
         "limit-reached": "Je hebt het maximum van {max} actieve API Keys bereikt. Trek een bestaande key in om een nieuwe aan te maken.",
         "name-label": "Naam",
+        "no-permission": "Het aanmaken van API-sleutels is niet ingeschakeld voor jouw rol.",
         "submit": "Key aanmaken",
         "success": "API Key is aangemaakt",
         "title": "Nieuwe API Key aanmaken"

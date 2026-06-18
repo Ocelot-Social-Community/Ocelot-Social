@@ -207,7 +207,9 @@
       "deleteSuccess": "Função eliminada.",
       "description": "Crie funções e atribua permissões. As alterações aplicam-se imediatamente.",
       "groups": {
+        "account": "Conta",
         "administration": "Administração",
+        "communication": "Comunicação",
         "content": "Conteúdo",
         "membership": "Adesão",
         "moderation": "Moderação"
@@ -217,26 +219,38 @@
       "nameLabel": "Nome",
       "perm": {
         "apiKey_administer": "Administrar as chaves de API de outros utilizadores.",
+        "apiKey_create": "Criar chaves API pessoais.",
         "badge_manage": "Conceder e revogar distintivos.",
+        "comment_create": "Comentar publicações.",
         "content_moderate": "Analisar e decidir sobre conteúdo denunciado.",
         "donation_manage": "Configurar o widget de doações.",
-        "group_create": "Criar grupos.",
+        "group_create_closed": "Criar grupos fechados.",
         "group_create_hidden": "Criar grupos ocultos.",
+        "group_create_public": "Criar grupos públicos.",
         "network_statistics_read": "Ver estatísticas de toda a rede.",
         "policy_manage": "Ver e alterar as definições de política da rede.",
         "post_create": "Criar publicações.",
         "post_pin": "Fixar e desafixar publicações em toda a rede.",
         "post_push": "Impulsionar e remover (boost) publicações.",
         "role_manage": "Gerir funções e atribuí-las aos utilizadores.",
+        "socialMedia_create": "Adicionar ligações de redes sociais ao perfil.",
         "user_delete_any": "Eliminar a conta de qualquer utilizador.",
         "user_email_readAny": "Ler o endereço de e-mail de qualquer utilizador.",
-        "user_invite": "Gerar códigos de convite pessoais."
+        "user_invite": "Gerar códigos de convite pessoais.",
+        "videoCall_create_closed": "Iniciar uma chamada de vídeo num grupo fechado.",
+        "videoCall_create_hidden": "Iniciar uma chamada de vídeo num grupo oculto.",
+        "videoCall_create_public": "Iniciar uma chamada de vídeo num grupo público."
       },
       "protected": "protegida",
       "protectedHint": "A função de proprietário detém todas as permissões e não pode ser editada.",
       "save": "Guardar",
       "saveError": "Não foi possível guardar a função: {message}",
       "saveSuccess": "Função guardada.",
+      "selfLockout": {
+        "confirm": "Remover mesmo assim",
+        "message": "Você está prestes a remover a permissão “gerenciar funções” de <strong>{role}</strong> — sua própria função. Depois disso, você não poderá mais gerenciar funções; apenas um proprietário pode restaurá-la. Continuar?",
+        "title": "Remover o gerenciamento da sua própria função?"
+      },
       "title": "Funções e permissões"
     },
     "settings": {
@@ -245,6 +259,20 @@
     "users": {
       "addRole": "Atribuir função…",
       "allRoles": "Todas as funções",
+      "delete": {
+        "error": "Não foi possível excluir o usuário: {message}",
+        "message": "Você realmente deseja excluir permanentemente <strong>{name}</strong>? Isso não pode ser desfeito.",
+        "submit": "Excluir usuário",
+        "success": "Usuário excluído.",
+        "title": "Excluir usuário?"
+      },
+      "disable": {
+        "disabledSuccess": "Usuário desativado.",
+        "disableLabel": "Desativar usuário",
+        "enabledSuccess": "Usuário reativado.",
+        "enableLabel": "Reativar usuário",
+        "error": "Não foi possível alterar o status do usuário: {message}"
+      },
       "empty": "Nenhum usuário encontrado",
       "form": {
         "placeholder": "e-mail, nome, descrição ou role:moderator"
@@ -258,12 +286,14 @@
           "comments": "Comentários",
           "contributions": "Contribuições",
           "createdAt": "Criado em",
+          "delete": "Excluir",
           "email": "E-mail",
           "name": "Nome",
           "number": "N.º",
           "role": "Função",
           "shouted": "Partilhado",
-          "slug": "Slug"
+          "slug": "Slug",
+          "status": "Status"
         }
       }
     }
@@ -987,6 +1017,9 @@
       "reportedOn": "Data",
       "status": "Status atual",
       "submitter": "denunciado por"
+    },
+    "users": {
+      "name": "Usuários"
     }
   },
   "notifications": {
@@ -1032,6 +1065,7 @@
   "post": {
     "comment": {
       "joinGroup": "Entrou no grupo „<b>{name}</b>“",
+      "noPermission": "Os comentários não estão ativados para a tua função.",
       "reply": "Responder",
       "submit": "Commentar",
       "submitted": "Comentário Enviado",
@@ -1220,6 +1254,7 @@
         "expiry-never": "Sem data de expiração",
         "limit-reached": "Atingiste o máximo de {max} API Keys ativas. Revoga uma key existente para criar uma nova.",
         "name-label": "Nome",
+        "no-permission": "A criação de chaves API não está ativada para a tua função.",
         "submit": "Criar key",
         "success": "API Key criada com sucesso",
         "title": "Criar novo API Key"

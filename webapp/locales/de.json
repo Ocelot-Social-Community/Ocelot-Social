@@ -207,7 +207,9 @@
       "deleteSuccess": "Rolle gelöscht.",
       "description": "Rollen erstellen und Berechtigungen vergeben. Änderungen gelten sofort.",
       "groups": {
+        "account": "Konto",
         "administration": "Administration",
+        "communication": "Kommunikation",
         "content": "Inhalte",
         "membership": "Mitgliedschaft",
         "moderation": "Moderation"
@@ -217,26 +219,38 @@
       "nameLabel": "Name",
       "perm": {
         "apiKey_administer": "API-Schlüssel anderer Nutzer verwalten.",
+        "apiKey_create": "Persönliche API-Schlüssel erstellen.",
         "badge_manage": "Badges vergeben und entziehen.",
+        "comment_create": "Beiträge kommentieren.",
         "content_moderate": "Gemeldete Inhalte prüfen und entscheiden.",
         "donation_manage": "Das Spenden-Widget konfigurieren.",
-        "group_create": "Gruppen erstellen.",
+        "group_create_closed": "Geschlossene Gruppen erstellen.",
         "group_create_hidden": "Versteckte Gruppen erstellen.",
+        "group_create_public": "Öffentliche Gruppen erstellen.",
         "network_statistics_read": "Netzwerkweite Statistiken einsehen.",
         "policy_manage": "Netzwerk-Richtlinien einsehen und ändern.",
         "post_create": "Beiträge erstellen.",
         "post_pin": "Beiträge netzwerkweit anpinnen und lösen.",
         "post_push": "Beiträge pushen und zurücknehmen (boosten).",
         "role_manage": "Rollen verwalten und Nutzern zuweisen.",
+        "socialMedia_create": "Social-Media-Links zum eigenen Profil hinzufügen.",
         "user_delete_any": "Beliebiges Nutzerkonto löschen.",
         "user_email_readAny": "E-Mail-Adresse beliebiger Nutzer lesen.",
-        "user_invite": "Persönliche Einladungscodes erzeugen."
+        "user_invite": "Persönliche Einladungscodes erzeugen.",
+        "videoCall_create_closed": "Videoanruf in einer geschlossenen Gruppe starten.",
+        "videoCall_create_hidden": "Videoanruf in einer verborgenen Gruppe starten.",
+        "videoCall_create_public": "Videoanruf in einer öffentlichen Gruppe starten."
       },
       "protected": "geschützt",
       "protectedHint": "Die Owner-Rolle hält alle Berechtigungen und kann nicht bearbeitet werden.",
       "save": "Speichern",
       "saveError": "Rolle konnte nicht gespeichert werden: {message}",
       "saveSuccess": "Rolle gespeichert.",
+      "selfLockout": {
+        "confirm": "Trotzdem entfernen",
+        "message": "Du entfernst gerade die Berechtigung „Rollen verwalten“ von <strong>{role}</strong> — deiner eigenen Rolle. Du kannst danach keine Rollen mehr verwalten; nur ein Owner kann das rückgängig machen. Fortfahren?",
+        "title": "Eigene Rollenverwaltung entfernen?"
+      },
       "title": "Rollen & Berechtigungen"
     },
     "settings": {
@@ -245,6 +259,20 @@
     "users": {
       "addRole": "Rolle zuweisen…",
       "allRoles": "Alle Rollen",
+      "delete": {
+        "error": "Nutzer konnte nicht gelöscht werden: {message}",
+        "message": "Willst du <strong>{name}</strong> wirklich dauerhaft löschen? Das kann nicht rückgängig gemacht werden.",
+        "submit": "Nutzer löschen",
+        "success": "Nutzer gelöscht.",
+        "title": "Nutzer löschen?"
+      },
+      "disable": {
+        "disabledSuccess": "Nutzer deaktiviert.",
+        "disableLabel": "Nutzer deaktivieren",
+        "enabledSuccess": "Nutzer reaktiviert.",
+        "enableLabel": "Nutzer reaktivieren",
+        "error": "Nutzerstatus konnte nicht geändert werden: {message}"
+      },
       "empty": "Keine Nutzer gefunden",
       "form": {
         "placeholder": "E-Mail, Name, Beschreibung oder role:moderator"
@@ -258,12 +286,14 @@
           "comments": "Kommentare",
           "contributions": "Beiträge",
           "createdAt": "Erstellt am",
+          "delete": "Löschen",
           "email": "E-Mail",
           "name": "Name",
           "number": "Nr.",
           "role": "Rolle",
           "shouted": "Geteilt",
-          "slug": "Alias"
+          "slug": "Alias",
+          "status": "Status"
         }
       }
     }
@@ -987,6 +1017,9 @@
       "reportedOn": "Datum",
       "status": "Aktueller Status",
       "submitter": "Gemeldet von"
+    },
+    "users": {
+      "name": "Nutzer"
     }
   },
   "notifications": {
@@ -1032,6 +1065,7 @@
   "post": {
     "comment": {
       "joinGroup": "Gruppe „<b>{name}</b>“ beigetreten",
+      "noPermission": "Kommentieren ist für deine Rolle nicht freigeschaltet.",
       "reply": "Antworten",
       "submit": "Kommentiere",
       "submitted": "Kommentar gesendet",
@@ -1220,6 +1254,7 @@
         "expiry-never": "Kein Ablaufdatum",
         "limit-reached": "Du hast das Maximum von {max} aktiven API Keys erreicht. Widerrufe einen bestehenden Key, um einen neuen zu erstellen.",
         "name-label": "Name",
+        "no-permission": "Das Erstellen von API-Schlüsseln ist für deine Rolle nicht freigeschaltet.",
         "submit": "Key erstellen",
         "success": "API Key wurde erstellt",
         "title": "Neuen API Key erstellen"

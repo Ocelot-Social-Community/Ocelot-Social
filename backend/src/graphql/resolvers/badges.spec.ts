@@ -106,9 +106,9 @@ describe('Badges', () => {
       })
     })
 
-    describe('authenticated as moderator', () => {
-      beforeEach(() => {
-        authenticatedUser = moderator.toJson()
+    describe('authenticated as a user without badge.manage', () => {
+      beforeEach(async () => {
+        authenticatedUser = await regularUser.toJson()
       })
 
       describe('rewards badge to user', () => {
@@ -119,6 +119,18 @@ describe('Badges', () => {
             data: { setVerificationBadge: null },
             errors: [{ message: 'Not Authorized!' }],
           })
+        })
+      })
+    })
+
+    describe('authenticated as moderator (holds badge.manage)', () => {
+      beforeEach(async () => {
+        authenticatedUser = await moderator.toJson()
+      })
+
+      it('is authorized to set a verification badge', async () => {
+        await expect(mutate({ mutation: setVerificationBadge, variables })).resolves.toMatchObject({
+          data: { setVerificationBadge: { id: 'regular-user-id' } },
         })
       })
     })
@@ -289,9 +301,9 @@ describe('Badges', () => {
       })
     })
 
-    describe('authenticated as moderator', () => {
-      beforeEach(() => {
-        authenticatedUser = moderator.toJson()
+    describe('authenticated as a user without badge.manage', () => {
+      beforeEach(async () => {
+        authenticatedUser = await regularUser.toJson()
       })
 
       describe('rewards badge to user', () => {
@@ -870,9 +882,9 @@ describe('Badges', () => {
       })
     })
 
-    describe('authenticated moderator', () => {
+    describe('authenticated as a user without badge.manage', () => {
       beforeEach(async () => {
-        authenticatedUser = await moderator.toJson()
+        authenticatedUser = await regularUser.toJson()
       })
 
       describe('removes badge from user', () => {
@@ -881,6 +893,18 @@ describe('Badges', () => {
             data: { revokeBadge: null },
             errors: [{ message: 'Not Authorized!' }],
           })
+        })
+      })
+    })
+
+    describe('authenticated moderator (holds badge.manage)', () => {
+      beforeEach(async () => {
+        authenticatedUser = await moderator.toJson()
+      })
+
+      it('is authorized to remove a badge', async () => {
+        await expect(mutate({ mutation: revokeBadge, variables })).resolves.toMatchObject({
+          data: { revokeBadge: { id: 'regular-user-id' } },
         })
       })
     })

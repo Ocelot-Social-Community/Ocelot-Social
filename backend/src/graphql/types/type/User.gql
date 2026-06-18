@@ -226,6 +226,9 @@ type Mutation {
 
   DeleteUser(id: ID!, resource: [Deletable]): User
 
+  "Reversibly deactivate (disable: true) or reactivate (disable: false) a user account. Moderator-grade, subject to the act-on hierarchy."
+  disableUser(id: ID!, disable: Boolean!): User
+
   muteUser(id: ID!): User
   unmuteUser(id: ID!): User
 

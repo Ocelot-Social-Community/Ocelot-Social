@@ -11,6 +11,7 @@ import CONFIG from '@config/index'
 import { getNeode } from '@db/neo4j'
 import { AuthenticationError } from '@graphql/errors'
 import { validateInviteCode } from '@graphql/resolvers/inviteCodes'
+import { dominates } from '@src/role'
 
 import type SocialMedia from '@db/models/SocialMedia'
 import type { Context } from '@src/context'
@@ -38,14 +39,23 @@ const hasPermission = (permission: PermissionKey) =>
     return ctx.effectivePermissions.has(permission)
   })
 
-// Composite capability: creating a group needs `group.create`; a hidden group
-// additionally needs `group.create_hidden`.
-const canCreateGroup = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
-  if (!ctx.effectivePermissions.has('group.create')) return false
-  if (args.groupType === 'hidden' && !ctx.effectivePermissions.has('group.create_hidden')) {
-    return false
+// Flat per-group-type creation rights (mirrors videoCall.create_*): creating a group
+// of a given type needs exactly that type's permission, independent of the others.
+const groupCreatePermissionForType = (groupType: string): PermissionKey | null => {
+  switch (groupType) {
+    case 'public':
+      return 'group.create_public'
+    case 'closed':
+      return 'group.create_closed'
+    case 'hidden':
+      return 'group.create_hidden'
+    default:
+      return null
   }
-  return true
+}
+const canCreateGroup = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
+  const permission = groupCreatePermissionForType(args.groupType)
+  return !!permission && ctx.effectivePermissions.has(permission)
 })
 
 const apiKeysEnabled = rule({ cache: 'contextual' })(async (
@@ -55,6 +65,12 @@ const apiKeysEnabled = rule({ cache: 'contextual' })(async (
 ) => {
   return policy.get('apiKeysEnabled')
 })
+
+// Gates the dev/test-only cache-resync trigger: db:reset/db:seed and the e2e harness
+// must be able to call it when no users exist yet (right after a wipe), so it is open
+// outside production and fully disabled in production. Prod cache resyncs are handled
+// by a rolling restart (each instance re-reads the DB on boot), not this mutation.
+const isNotProduction = rule({ cache: 'contextual' })(async () => !CONFIG.PRODUCTION)
 
 const onlyYourself = rule({
   cache: 'no_cache',
@@ -388,6 +404,68 @@ const isDeletingOwnAccount = rule({
   return context.user?.id === args.id
 })
 
+// The target user's effective permission set, resolved from their single role
+// (owner ⇒ full catalog, edgeless/unknown ⇒ baseline) — the same resolution the
+// request context applies to the actor (context/index.ts).
+const effectivePermissionsOfUser = async (
+  context: Context,
+  userId: string,
+): Promise<Set<PermissionKey>> => {
+  const result = await context.database.query({
+    query: `OPTIONAL MATCH (u:User {id: $userId})-[:HAS_ROLE]->(r:Role)
+            RETURN coalesce(r.name, 'user') AS roleName`,
+    variables: { userId },
+  })
+  const roleName = (result.records[0]?.get('roleName') as string | undefined) ?? 'user'
+  return context.role.permissionsForRole(roleName)
+}
+
+// Act-on hierarchy guard for per-user destructive actions (delete, disable): the
+// actor may only act on a target whose permissions are a STRICT SUBSET of theirs
+// (dominates() — see role/dominance.ts). Closes the privilege-escalation hole
+// where a holder of user.delete.any / user.disable could act on a peer or a
+// higher-privileged user (admin/owner). The gating permission itself is checked
+// separately via hasPermission(); this rule only enforces the relative ranking.
+const canActOnTargetUser = rule({ cache: 'no_cache' })(async (_parent, args, context: Context) => {
+  const targetId = args.id as string | undefined
+  if (!targetId) return false
+  const targetPermissions = await effectivePermissionsOfUser(context, targetId)
+  return dominates(context.effectivePermissions, targetPermissions)
+})
+
+// Same hierarchy guard for the report `review` mutation, which can disable the
+// reported resource. Only Users carry a role, so Posts/Comments pass through; a
+// reported User is subject to the dominance rule (a moderator must not disable an
+// admin/owner by reviewing a report against them).
+const canModerateTargetUser = rule({ cache: 'no_cache' })(async (
+  _parent,
+  args,
+  context: Context,
+) => {
+  const resourceId = args.resourceId as string | undefined
+  if (!resourceId) return false
+  // Self-review is a conflict-of-interest case, not a privilege-escalation one: you can
+  // never strictly dominate your own permission set, so the dominance check below would
+  // reject it with a generic "Not Authorized!". Let it pass here and leave it to
+  // validateReview, which rejects self-review with the specific "You cannot review
+  // yourself!" message. Self stays blocked — just by the rule that owns that concern.
+  if (resourceId === context.user?.id) return true
+  const result = await context.database.query({
+    query: `MATCH (resource {id: $resourceId})
+              OPTIONAL MATCH (resource)-[:HAS_ROLE]->(r:Role)
+              RETURN 'User' IN labels(resource) AS isUser, coalesce(r.name, 'user') AS roleName`,
+    variables: { resourceId },
+  })
+  const row = result.records[0]
+  // Resource not found — let the resolver handle it; no user can be escalated.
+  if (!row) return true
+  if (!(row.get('isUser') as boolean)) return true
+  const targetPermissions = context.role.permissionsForRole(
+    (row.get('roleName') as string | undefined) ?? 'user',
+  )
+  return dominates(context.effectivePermissions, targetPermissions)
+})
+
 const noEmailFilter = rule({
   cache: 'no_cache',
 })(async (_, args) => {
@@ -521,7 +599,7 @@ export default shield(
       UpdatePost: isAuthor,
       DeletePost: isAuthor,
       fileReport: isAuthenticated,
-      CreateSocialMedia: isAuthenticated,
+      CreateSocialMedia: and(isAuthenticated, hasPermission('socialMedia.create')),
       UpdateSocialMedia: isMySocialMedia,
       DeleteSocialMedia: isMySocialMedia,
       setVerificationBadge: hasPermission('badge.manage'),
@@ -532,11 +610,15 @@ export default shield(
       shout: isAuthenticated,
       unshout: isAuthenticated,
       changePassword: isAuthenticated,
-      review: hasPermission('content.moderate'),
-      CreateComment: and(isAuthenticated, canCommentPost),
+      review: and(hasPermission('content.moderate'), canModerateTargetUser),
+      CreateComment: and(isAuthenticated, hasPermission('comment.create'), canCommentPost),
       UpdateComment: isAuthor,
       DeleteComment: isAuthor,
-      DeleteUser: or(isDeletingOwnAccount, hasPermission('user.delete.any')),
+      DeleteUser: or(
+        isDeletingOwnAccount,
+        and(hasPermission('user.delete.any'), canActOnTargetUser),
+      ),
+      disableUser: and(hasPermission('user.disable'), canActOnTargetUser),
       requestPasswordReset: allow,
       resetPassword: allow,
       AddPostEmotions: isAuthenticated,
@@ -565,7 +647,7 @@ export default shield(
       redeemInviteCode: isAuthenticated,
 
       // API Keys
-      createApiKey: and(isAuthenticated, apiKeysEnabled),
+      createApiKey: and(isAuthenticated, apiKeysEnabled, hasPermission('apiKey.create')),
       updateApiKey: isAuthenticated,
       revokeApiKey: isAuthenticated,
       adminRevokeApiKey: hasPermission('apiKey.administer'),
@@ -580,6 +662,10 @@ export default shield(
       // Network Policy
       setPolicy: hasPermission('policy.manage'),
       resetPolicy: hasPermission('policy.manage'),
+
+      // Cache resync: dev/test recovery hook only (db:reset/seed + e2e). Disabled in
+      // production — fleet resyncs there are done via a rolling restart.
+      resyncCaches: isNotProduction,
 
       saveCategorySettings: isAuthenticated,
       updateOnlineStatus: isAuthenticated,

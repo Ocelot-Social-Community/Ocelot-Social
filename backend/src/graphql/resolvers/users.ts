@@ -71,9 +71,19 @@ export default {
         }
       }
       if (args.roleName || args.search) {
-        // Admin user search: filter by single role (HAS_ROLE) and/or a free-text term
-        // (name/slug/about, case-insensitive), combinable. role.manage-only.
-        if (!context.effectivePermissions.has('role.manage')) {
+        // Admin/moderation user search: filter by single role (HAS_ROLE) and/or a
+        // free-text term (name/slug/about, case-insensitive), combinable. Open to any
+        // user-administration capability — role.manage (role assignment), badge.manage
+        // / user.delete.any (moderation user actions on this list), user.email.readAny
+        // (admins). Sensitive FIELDS stay field-gated (User.email / User.roleName) and
+        // the e-mail search TERM is gated separately below on user.email.readAny.
+        const mayAdministerUsers = [
+          'role.manage',
+          'badge.manage',
+          'user.delete.any',
+          'user.email.readAny',
+        ].some((permission) => context.effectivePermissions.has(permission))
+        if (!mayAdministerUsers) {
           throw new ForbiddenError('Not Authorized!')
         }
         // This specialised path honours only roleName/search + pagination + ordering.

@@ -10,10 +10,15 @@ import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import type { RoleDefinition } from '@src/role'
 
 let variables, commentAuthor, newlyCreatedComment
 let authenticatedUser: Context['user']
-const context = () => ({ authenticatedUser })
+// Per-test role override: when set, the in-memory RoleService is built from these
+// definitions instead of the defaults — used to test the comment.create gate by
+// giving the viewer a role that lacks it.
+let rolesOverride: RoleDefinition[] | undefined
+const context = () => ({ authenticatedUser, roles: rolesOverride })
 let mutate: ApolloTestSetup['mutate']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
@@ -35,6 +40,7 @@ afterAll(async () => {
 
 beforeEach(async () => {
   authenticatedUser = null
+  rolesOverride = undefined
   variables = {}
   await database.neode.create('Category', {
     id: 'cat9',
@@ -119,6 +125,25 @@ describe('CreateComment', () => {
           data: { CreateComment: { author: { name: 'Author' } } },
           errors: undefined,
         })
+      })
+
+      it('denies commenting to a role without the comment.create permission', async () => {
+        // Same viewer, but their (user) role no longer grants comment.create.
+        rolesOverride = [
+          {
+            name: 'user',
+            protected: false,
+            permissions: [
+              'post.create',
+              'group.create_public',
+              'group.create_closed',
+              'group.create_hidden',
+              'user.invite',
+            ],
+          },
+        ]
+        const { errors } = await mutate({ mutation: CreateComment, variables })
+        expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
   })

@@ -155,7 +155,8 @@
                 v-if="
                   showNewCommentForm &&
                   !isBlocked &&
-                  (!this.post.group || commentingAllowedByGroupRole)
+                  (!this.post.group || commentingAllowedByGroupRole) &&
+                  canComment
                 "
                 ref="commentForm"
                 :post="post"
@@ -163,11 +164,7 @@
               />
               <!-- commenting disabled -->
               <div class="ds-placeholder" v-else>
-                <hc-empty
-                  margin="xxx-small"
-                  icon="messages"
-                  :message="$t('settings.blocked-users.explanation.commenting-disabled')"
-                >
+                <hc-empty margin="xxx-small" icon="messages" :message="commentingDisabledMessage">
                   <cta-unblock-author v-if="isBlocked" :author="post.author" />
                   <cta-join-leave-group
                     v-else-if="group && !commentingAllowedByGroupRole"
@@ -363,6 +360,23 @@ export default {
     },
     commentingAllowedByGroupRole() {
       return this.group && ['usual', 'admin', 'owner'].includes(this.group.myRole)
+    },
+    // Network permission to comment at all (separate from group membership / blocking).
+    canComment() {
+      return this.$can('comment.create')
+    },
+    // Reason-specific placeholder text. Block and group cases keep the generic message
+    // (each carries an actionable CTA); the permission case gets a dedicated message —
+    // there is no CTA, since only an admin can grant the role.
+    commentingDisabledMessage() {
+      if (
+        !this.isBlocked &&
+        (!this.post.group || this.commentingAllowedByGroupRole) &&
+        !this.canComment
+      ) {
+        return this.$t('post.comment.noPermission')
+      }
+      return this.$t('settings.blocked-users.explanation.commenting-disabled')
     },
   },
   methods: {

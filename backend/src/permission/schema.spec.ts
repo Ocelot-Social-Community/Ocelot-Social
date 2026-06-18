@@ -20,15 +20,23 @@ const EXPECTED_KEYS: PermissionKey[] = [
   'donation.manage',
   'apiKey.administer',
   'user.email.readAny',
+  'user.delete.any',
   'badge.manage',
   'content.moderate',
-  'user.delete.any',
+  'user.disable',
   'post.pin',
   'post.push',
   'post.create',
-  'group.create',
+  'comment.create',
+  'socialMedia.create',
+  'group.create_public',
+  'group.create_closed',
   'group.create_hidden',
   'user.invite',
+  'videoCall.create_public',
+  'videoCall.create_closed',
+  'videoCall.create_hidden',
+  'apiKey.create',
 ]
 
 describe('permission catalog', () => {
@@ -52,8 +60,22 @@ describe('permission catalog', () => {
       expect(descriptionFor(key).length).toBeGreaterThan(0)
     })
 
+    it('files the destructive per-user actions in the right groups', () => {
+      // user.delete.any is irreversible/admin-grade → administration; user.disable is
+      // reversible/moderator-grade → moderation. This drives isAdmin / canAccessModeration.
+      expect(groupFor('user.delete.any')).toBe('administration')
+      expect(groupFor('user.disable')).toBe('moderation')
+    })
+
     it('only uses known groups', () => {
-      const knownGroups = ['administration', 'moderation', 'content', 'membership']
+      const knownGroups = [
+        'administration',
+        'moderation',
+        'content',
+        'membership',
+        'communication',
+        'account',
+      ]
       for (const key of allPermissionKeys()) {
         expect(knownGroups).toContain(groupFor(key))
       }

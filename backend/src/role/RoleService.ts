@@ -26,6 +26,14 @@ type DbContext = ReturnType<typeof databaseContext>
 
 export const ROLE_CHANGED_CHANNEL = 'roles.changed'
 
+// Client-facing notification channel: published by the role mutations (resolver) when
+// a change may alter someone's effective permissions — a role's permission set
+// (updateRole/deleteRole) or a user's role assignment (setUserRole). Distinct from the
+// internal ROLE_CHANGED_CHANNEL (cross-instance cache sync, role-definition payloads):
+// this one only signals connected clients to refetch their permissions, via the
+// permissionsChanged GraphQL subscription.
+export const PERMISSIONS_CHANGED_CHANNEL = 'permissions.changed'
+
 // Domain-level error (protected-role edit, unknown role, …). Free of any GraphQL
 // dependency — the resolver translates it at the transport boundary.
 export class RoleValidationError extends Error {}
@@ -73,21 +81,41 @@ export class RoleService {
       this.cache.set(role.name, role)
     }
 
-    // Boot invariant: the MANDATORY roles must exist after seeding — owner (the
-    // failsafe superuser) and user (the registration/authorization baseline). A
-    // missing one means seeding did not take (DB error, wrong key, a future no-op
-    // refactor); fail fast rather than serve a broken instance. Optional roles
-    // (admin/moderator) are intentionally NOT required here: they may be deleted.
+    // Boot invariant: the mandatory roles (owner/user) must exist after seeding.
+    this.assertMandatoryRoles('init')
+
+    this.initialised = true
+  }
+
+  // The MANDATORY roles must exist after (re)seeding — owner (the failsafe superuser)
+  // and user (the registration/authorization baseline). A missing one means seeding did
+  // not take (DB error, wrong key, a future no-op refactor); fail fast rather than serve
+  // a broken instance. Optional roles (admin/moderator) are intentionally NOT required:
+  // they may be deleted. Shared by init() (boot) and reload() (out-of-process resync).
+  private assertMandatoryRoles(context: string): void {
     const missingMandatory = MANDATORY_ROLE_NAMES.filter((name) => !this.cache.has(name))
     if (missingMandatory.length > 0) {
       throw new Error(
-        `RoleService.init: mandatory role node(s) missing after seeding: ${missingMandatory.join(
+        `RoleService.${context}: mandatory role node(s) missing after seeding: ${missingMandatory.join(
           ', ',
-        )}. Refusing to start — authorization and user registration depend on them.`,
+        )}. Refusing to continue — authorization and user registration depend on them.`,
       )
     }
+  }
 
-    this.initialised = true
+  // Resync the cache from the DB after an out-of-process change (e.g. db:reset/seed):
+  // a separate process wipes/reseeds the DB but cannot clear this in-memory cache. We
+  // clear first so roles deleted from the DB stop lingering, then re-read the persisted
+  // set (re-seeding defaults if needed). Does NOT re-subscribe.
+  async reload(): Promise<void> {
+    const roles = await seedDefaultRoleNodes(this.db)
+    this.cache.clear()
+    for (const role of roles) {
+      this.cache.set(role.name, role)
+    }
+    // Same invariant as init(): a resync that lost owner/user left a broken cache, so
+    // fail loudly rather than report success with a half-empty role set.
+    this.assertMandatoryRoles('reload')
   }
 
   shutdown(): void {
