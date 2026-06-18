@@ -29,8 +29,13 @@ export const defaultVerificationBadge = {
 
 export default {
   Query: {
-    Badge: async (object, args, context, resolveInfo) =>
-      neo4jgraphql(object, args, context, resolveInfo),
+    // Sort by the stable badge id so the list is deterministic and identical across
+    // instances. Without this the order follows the database insertion (seed) order,
+    // which differs between instances even though the badge data is the same.
+    Badge: async (object, args, context, resolveInfo) => {
+      const badges = await neo4jgraphql(object, args, context, resolveInfo)
+      return badges.sort((a, b) => String(a.id).localeCompare(String(b.id)))
+    },
   },
 
   Mutation: {

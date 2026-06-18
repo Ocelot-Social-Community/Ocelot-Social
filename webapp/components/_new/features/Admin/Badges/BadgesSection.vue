@@ -8,7 +8,7 @@
         @click="toggleBadge(badge)"
         :class="{ badge, inactive: !badge.isActive }"
       >
-        <img :src="backendPath(badge.icon)" :alt="badge.description" />
+        <img :src="backendPath(badge.icon)" :alt="badge.description" :title="badge.description" />
       </button>
     </div>
     <div v-else>

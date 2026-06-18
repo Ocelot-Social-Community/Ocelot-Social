@@ -1,0 +1,8 @@
+query {
+  Badge {
+    id
+    type
+    icon
+    description
+  }
+}
