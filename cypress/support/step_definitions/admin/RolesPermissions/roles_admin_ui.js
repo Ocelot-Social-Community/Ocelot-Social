@@ -1,10 +1,5 @@
 import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-// Generic existence check by data-test attribute (e.g. role tabs on /admin/roles).
-defineStep('I see the element with test id {string}', (testId) => {
-  cy.get(`[data-test="${testId}"]`).should('exist')
-})
-
 defineStep('I select the role {string}', (roleName) => {
   cy.get(`[data-test="role-tab-${roleName}"]`).click()
 })
