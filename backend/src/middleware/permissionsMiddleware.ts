@@ -444,6 +444,12 @@ const canModerateTargetUser = rule({ cache: 'no_cache' })(async (
 ) => {
   const resourceId = args.resourceId as string | undefined
   if (!resourceId) return false
+  // Self-review is a conflict-of-interest case, not a privilege-escalation one: you can
+  // never strictly dominate your own permission set, so the dominance check below would
+  // reject it with a generic "Not Authorized!". Let it pass here and leave it to
+  // validateReview, which rejects self-review with the specific "You cannot review
+  // yourself!" message. Self stays blocked — just by the rule that owns that concern.
+  if (resourceId === context.user?.id) return true
   const result = await context.database.query({
     query: `MATCH (resource {id: $resourceId})
               OPTIONAL MATCH (resource)-[:HAS_ROLE]->(r:Role)
