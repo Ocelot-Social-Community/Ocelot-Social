@@ -7,7 +7,7 @@
          name input. Only the active role's permissions are shown below. -->
     <div class="role-tabs" data-test="role-tabs">
       <button
-        v-for="role in roles"
+        v-for="role in orderedRoles"
         :key="role.name"
         type="button"
         class="role-tab"
@@ -102,17 +102,22 @@
               :class="{
                 'perm-row--added': hoverDiff[permission.key] === 'added',
                 'perm-row--removed': hoverDiff[permission.key] === 'removed',
+                'perm-row--unavailable': permission.available === false,
               }"
+              :title="permission.available === false ? $t('admin.roles.permUnavailable') : null"
             >
               <input
                 type="checkbox"
-                :disabled="activeRole.protected"
+                :disabled="activeRole.protected || permission.available === false"
                 v-model="forms[activeRole.name].permissions[permission.key]"
                 :data-test="`role-${activeRole.name}-perm-${permission.key}`"
               />
               <span class="perm-row__text">
                 <span class="perm-row__key">{{ permission.key }}</span>
                 <span class="perm-row__desc">{{ permLabel(permission) }}</span>
+                <span v-if="permission.available === false" class="perm-row__gate">
+                  {{ $t('admin.roles.permUnavailable') }}
+                </span>
               </span>
             </label>
           </fieldset>
@@ -219,6 +224,13 @@ export default {
     this.ensureActive()
   },
   computed: {
+    // Display order: lowest-privilege first (the baseline `user` group leads, the
+    // protected `owner` failsafe — which has no editable settings — trails). The
+    // backend returns roles broadest-first (owner → … → user); reversing reads the
+    // hierarchy bottom-up, which is what the admin wants to start from.
+    orderedRoles() {
+      return [...this.roles].reverse()
+    },
     // The role object currently selected in the switcher.
     activeRole() {
       return this.roles.find((role) => role.name === this.activeRoleName) || null
@@ -288,15 +300,15 @@ export default {
       if (role.protected) return new Set(this.permissionCatalog.map((p) => p.key))
       return new Set(role.permissions)
     },
-    // Keep a valid role selected: default to the first one, and re-select after a
-    // role is deleted/renamed away.
+    // Keep a valid role selected: default to the first one shown (lowest-privilege,
+    // the baseline `user` group), and re-select after a role is deleted/renamed away.
     ensureActive() {
       if (!this.roles.length) {
         this.activeRoleName = null
         return
       }
       if (!this.roles.some((role) => role.name === this.activeRoleName)) {
-        this.activeRoleName = this.roles[0].name
+        this.activeRoleName = this.orderedRoles[0].name
       }
     },
     setActive(name) {
@@ -616,6 +628,12 @@ export default {
     background: rgba($color-danger, 0.16);
     border-left-color: $color-danger;
   }
+  // The permission's feature is not configured/enabled: granting it has no effect,
+  // so the row is dimmed and the checkbox disabled (with an explanatory note).
+  &--unavailable {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
   input:disabled {
     cursor: default;
   }
@@ -632,6 +650,11 @@ export default {
   &__desc {
     color: $text-color-soft;
     font-size: 0.8em;
+  }
+  &__gate {
+    color: $color-danger;
+    font-size: 0.75em;
+    font-style: italic;
   }
 }
 </style>

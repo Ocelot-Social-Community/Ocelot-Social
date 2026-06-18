@@ -1,6 +1,7 @@
 import {
   allPermissionKeys,
   descriptionFor,
+  gateFor,
   groupFor,
   isKnownPermission,
   permissionCatalog,
@@ -58,6 +59,18 @@ describe('permission catalog', () => {
       expect(groupFor(key).length).toBeGreaterThan(0)
       expect(descriptionFor(key)).toEqual(expect.any(String))
       expect(descriptionFor(key).length).toBeGreaterThan(0)
+    })
+
+    it('gates video-call and api-key rights, leaves the rest ungated', () => {
+      expect(gateFor('videoCall.create_public')).toBe('videoCall')
+      expect(gateFor('videoCall.create_closed')).toBe('videoCall')
+      expect(gateFor('videoCall.create_hidden')).toBe('videoCall')
+      expect(gateFor('apiKey.create')).toBe('apiKeys')
+      // A representative ungated right.
+      expect(gateFor('post.create')).toBeUndefined()
+      // The projection carries the gate through.
+      const publicCall = permissionCatalog().find((e) => e.key === 'videoCall.create_public')
+      expect(publicCall?.gatedBy).toBe('videoCall')
     })
 
     it('files the destructive per-user actions in the right groups', () => {

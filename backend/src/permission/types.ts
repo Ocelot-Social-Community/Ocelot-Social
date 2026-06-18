@@ -39,7 +39,18 @@ export type PermissionKey =
 // | 'communication' | 'account'.
 export type PermissionGroup = string
 
+// A permission may be gated by a runtime feature toggle: the right exists in the
+// catalog and can be bundled into roles, but is only *effective* while its gate is
+// open (the feature is configured/enabled). Gates resolve to a boolean from either
+// env CONFIG or the network POLICY — see ./gates.ts. 'videoCall' reads
+// config.LIVEKIT_ENABLED (needs LiveKit secrets, so config not a runtime toggle);
+// 'apiKeys' reads the apiKeysEnabled policy flag.
+export type PermissionGate = 'videoCall' | 'apiKeys'
+
 export interface PermissionCatalogEntry {
   group: PermissionGroup
+  // Optional runtime feature gate; when set, the permission is only effective while
+  // the gate is open. Absent ⇒ always effective.
+  gatedBy?: PermissionGate
   description: string
 }
