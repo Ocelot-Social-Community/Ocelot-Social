@@ -20,8 +20,12 @@ describe('permission gates', () => {
       expect(isGateOpen('videoCall', ctx({ config: { LIVEKIT_ENABLED: false } }))).toBe(false)
     })
 
-    it('apiKeys follows the apiKeysEnabled policy flag', () => {
-      expect(isGateOpen('apiKeys', ctx({ policy: { get: () => true } }))).toBe(true)
+    it('apiKeys reads exactly the apiKeysEnabled policy flag', () => {
+      // Key-aware mock: returns true ONLY for 'apiKeysEnabled', so querying any other key
+      // would yield false and fail this test (a wrong key can't pass unnoticed).
+      const get = jest.fn((key: 'apiKeysEnabled') => key === 'apiKeysEnabled')
+      expect(isGateOpen('apiKeys', ctx({ policy: { get } }))).toBe(true)
+      expect(get).toHaveBeenCalledWith('apiKeysEnabled')
       expect(isGateOpen('apiKeys', ctx({ policy: { get: () => false } }))).toBe(false)
     })
 
@@ -48,10 +52,10 @@ describe('permission gates', () => {
       }
     })
 
-    it('apiKey.create tracks the apiKeys gate', () => {
-      expect(isPermissionAvailable('apiKey.create', ctx({ policy: { get: () => true } }))).toBe(
-        true,
-      )
+    it('apiKey.create tracks the apiKeys gate (via the apiKeysEnabled key)', () => {
+      const get = jest.fn((key: 'apiKeysEnabled') => key === 'apiKeysEnabled')
+      expect(isPermissionAvailable('apiKey.create', ctx({ policy: { get } }))).toBe(true)
+      expect(get).toHaveBeenCalledWith('apiKeysEnabled')
       expect(isPermissionAvailable('apiKey.create', ctx({ policy: { get: () => false } }))).toBe(
         false,
       )
