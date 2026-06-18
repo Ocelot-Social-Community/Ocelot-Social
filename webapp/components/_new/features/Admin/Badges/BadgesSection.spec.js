@@ -57,5 +57,10 @@ describe('Admin/BadgesSection', () => {
       await fireEvent.click(button)
       expect(wrapper.emitted().toggleBadge[0][0]).toEqual(badge1)
     })
+
+    it('shows the badge description as a tooltip, like on the profile', () => {
+      const image = screen.getByAltText(badge1.description)
+      expect(image.getAttribute('title')).toBe(badge1.description)
+    })
   })
 })

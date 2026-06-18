@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { TROPHY_BADGES_SELECTED_MAX } from '@constants/badges'
 import Factory, { cleanDatabase } from '@db/factories'
+import Badge from '@graphql/queries/badges/Badge.gql'
 import revokeBadge from '@graphql/queries/badges/revokeBadge.gql'
 import rewardTrophyBadge from '@graphql/queries/badges/rewardTrophyBadge.gql'
 import setTrophyBadgeSelected from '@graphql/queries/badges/setTrophyBadgeSelected.gql'
@@ -36,6 +37,37 @@ afterAll(() => {
   void server.stop()
   void database.driver.close()
   database.neode.close()
+})
+
+describe('Badge query', () => {
+  afterEach(async () => {
+    await cleanDatabase()
+  })
+
+  it('returns badges ordered by id, independent of insertion order', async () => {
+    authenticatedUser = null
+    // Build badges in an order that does not match their alphabetical id order, so a
+    // missing sort would surface as the insertion order instead of the expected one.
+    for (const id of ['trophy_rhino', 'verification_admin', 'trophy_bear', 'trophy_airship']) {
+      await Factory.build('badge', {
+        id,
+        type: id.startsWith('verification') ? 'verification' : 'trophy',
+        description: id,
+        icon: `/img/badges/${id}.svg`,
+      })
+    }
+    await expect(query({ query: Badge })).resolves.toMatchObject({
+      data: {
+        Badge: [
+          { id: 'trophy_airship' },
+          { id: 'trophy_bear' },
+          { id: 'trophy_rhino' },
+          { id: 'verification_admin' },
+        ],
+      },
+      errors: undefined,
+    })
+  })
 })
 
 describe('Badges', () => {
