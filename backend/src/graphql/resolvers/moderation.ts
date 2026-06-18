@@ -2,7 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+import { UserInputError } from '@graphql/errors'
+
 export default {
   Mutation: {
     review: async (_object, params, context, _resolveInfo) => {
@@ -33,7 +34,14 @@ export default {
           return reviewTransactionResponse.records.map((record) => record.get('review'))
         })
         const [reviewed] = await reviewWriteTxResultPromise
-        return reviewed || null
+        if (!reviewed) {
+          // Empty match: the resource carries no open report to review (already closed by
+          // another moderator, or the resource was removed). Nothing was written. Fail
+          // loudly instead of returning null — every caller treats this mutation as
+          // success, so a silent null would flash a false "done" toast and desync the UI.
+          throw new UserInputError('No open report found for the given resource')
+        }
+        return reviewed
       } finally {
         await session.close()
       }
@@ -60,7 +68,13 @@ export default {
           return response.records.map((record) => record.get('user'))
         })
         const [user] = await writeTxResultPromise
-        return user || null
+        if (!user) {
+          // No User with that id (deleted concurrently). The shield's dominance check
+          // treats a missing target as a baseline user and lets it through, so this is
+          // reachable; fail loudly rather than returning a success-looking null.
+          throw new UserInputError('Could not find User')
+        }
+        return user
       } finally {
         await session.close()
       }

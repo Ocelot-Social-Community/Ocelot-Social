@@ -175,6 +175,21 @@ describe('moderate resources', () => {
         expect(Date.parse(secondReview.data.review.updatedAt)).toEqual(expect.any(Number))
         expect(firstReview.data.review.updatedAt).not.toEqual(secondReview.data.review.updatedAt)
       })
+
+      it('errors (no silent null) when the resource has no open report to review', async () => {
+        // The hierarchy shield lets a missing/unreported resource through to the resolver
+        // (no user can be escalated). The resolver must reject instead of returning null,
+        // which every caller would mistake for a successful moderation.
+        await expect(
+          mutate({
+            mutation: review,
+            variables: { resourceId: 'resource-without-report', disable: true, closed: false },
+          }),
+        ).resolves.toMatchObject({
+          data: { review: null },
+          errors: [{ message: 'No open report found for the given resource' }],
+        })
+      })
     })
   })
 

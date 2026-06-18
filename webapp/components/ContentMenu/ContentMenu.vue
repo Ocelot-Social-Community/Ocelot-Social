@@ -387,6 +387,9 @@ export default {
                         mutation: reviewMutation(),
                         variables: { resourceId: this.resource.id, disable, closed: false },
                       }
+                // A target that no longer exists (or, for content, has no open report to
+                // review) makes the backend reject with a UserInputError, so the catch
+                // below handles it — no success toast, no local `disabled` flip.
                 await this.$apollo.mutate(mutationOptions)
                 this.$toast.success(this.$t(`${action}.success`))
                 this.$set(this.resource, 'disabled', disable)

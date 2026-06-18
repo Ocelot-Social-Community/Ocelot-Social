@@ -676,24 +676,47 @@ describe('ContentMenu.vue', () => {
 
       it('disables a user through the disableUser mutation (not review)', async () => {
         granted.add('user.disable')
-        const mutate = jest.fn().mockResolvedValue({ data: {} })
+        const mutate = jest
+          .fn()
+          .mockResolvedValue({ data: { disableUser: { id: 'd23a4265', disabled: true } } })
         mocks.$apollo = { mutate }
         mocks.$toast = { success: jest.fn(), error: jest.fn() }
         mocks.$filters = { truncate: (s) => s }
-        const wrapper = await openContentMenu({
-          isOwner: false,
-          resourceType: 'user',
-          resource: {
-            id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
-            disabled: false,
-          },
-        })
+        const resource = {
+          id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+          disabled: false,
+        }
+        const wrapper = await openContentMenu({ isOwner: false, resourceType: 'user', resource })
         await wrapper.vm.reviewModalData('disable').buttons.confirm.callback()
         expect(mutate).toHaveBeenCalledWith(
           expect.objectContaining({
             variables: { id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8', disable: true },
           }),
         )
+        expect(mocks.$toast.success).toHaveBeenCalledWith('disable.success')
+        expect(resource.disabled).toBe(true)
+      })
+
+      it('does not flip local state nor show success when the mutation fails', async () => {
+        // The backend rejects (e.g. UserInputError when the target no longer exists or has
+        // no open report). Unlike ReportList/UserList this menu does NOT refetch, so a wrong
+        // local `disabled` flip would persist until reload — assert it stays untouched.
+        granted.add('user.disable')
+        const mutate = jest.fn().mockRejectedValue(new Error('Could not find User'))
+        mocks.$apollo = { mutate }
+        mocks.$toast = { success: jest.fn(), error: jest.fn() }
+        mocks.$filters = { truncate: (s) => s }
+        const resource = {
+          id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+          disabled: false,
+        }
+        const wrapper = await openContentMenu({ isOwner: false, resourceType: 'user', resource })
+        await expect(
+          wrapper.vm.reviewModalData('disable').buttons.confirm.callback(),
+        ).rejects.toThrow('Could not find User')
+        expect(mocks.$toast.success).not.toHaveBeenCalled()
+        expect(mocks.$toast.error).toHaveBeenCalledWith('Could not find User')
+        expect(resource.disabled).toBe(false)
       })
 
       it('can disable organizations', async () => {

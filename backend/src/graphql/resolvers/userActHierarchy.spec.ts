@@ -123,6 +123,19 @@ describe('act-on hierarchy', () => {
         mutate({ mutation: DISABLE_USER, variables: { id: 'other-moderator', disable: true } }),
       ).resolves.toMatchObject({ errors: [{ message: 'Not Authorized!' }] })
     })
+
+    it('errors (no silent null) when the target user does not exist', async () => {
+      // The dominance shield treats a missing target as a baseline user and lets a
+      // moderator through, so the resolver is reached with an empty match. It must reject
+      // instead of returning null, which callers would mistake for a successful disable.
+      await as('the-moderator')
+      await expect(
+        mutate({ mutation: DISABLE_USER, variables: { id: 'no-such-user', disable: true } }),
+      ).resolves.toMatchObject({
+        data: { disableUser: null },
+        errors: [{ message: 'Could not find User' }],
+      })
+    })
   })
 
   describe('DeleteUser (user.delete.any + dominance)', () => {
