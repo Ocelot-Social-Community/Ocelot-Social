@@ -12,6 +12,7 @@ import resetPolicyMutation from '@graphql/queries/policy/resetPolicy.gql'
 import setPolicyMutation from '@graphql/queries/policy/setPolicy.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 import { POLICY_CHANGED_CHANNEL, allKeys } from '@src/policy'
+import { PERMISSIONS_CHANGED_CHANNEL } from '@src/role'
 
 import policyResolvers from './policy'
 
@@ -341,6 +342,65 @@ describe('Mutation resolvers (unit)', () => {
 
       expect(reset).toHaveBeenCalledWith('categoriesActive', 'admin-1')
       expect(result.value).toBe('false')
+    })
+  })
+
+  // A gate-flag change flips permission availability network-wide, so it must also
+  // signal the permission system (clients refetch myPermissions + the roles catalog).
+  describe('permissions-gate broadcast', () => {
+    const ctxWithPubsub = (policyDouble: unknown, publish: jest.Mock): Context =>
+      ({ user: { id: 'admin-1' }, policy: policyDouble, pubsub: { publish } }) as unknown as Context
+
+    it('broadcasts permissionsChanged when setPolicy changes a gate flag', async () => {
+      const set = jest.fn().mockResolvedValue({
+        key: 'apiKeysEnabled',
+        value: false,
+        actor: 'admin-1',
+        timestamp: 't',
+      })
+      const publish = jest.fn()
+      await policyResolvers.Mutation.setPolicy(
+        null,
+        { key: 'apiKeysEnabled', value: 'false' },
+        ctxWithPubsub({ set }, publish),
+      )
+      expect(publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
+        permissionsChanged: { roleName: null },
+      })
+    })
+
+    it('does NOT broadcast permissionsChanged for a non-gate policy key', async () => {
+      const set = jest.fn().mockResolvedValue({
+        key: 'apiKeysMaxPerUser',
+        value: 7,
+        actor: 'admin-1',
+        timestamp: 't',
+      })
+      const publish = jest.fn()
+      await policyResolvers.Mutation.setPolicy(
+        null,
+        { key: 'apiKeysMaxPerUser', value: '7' },
+        ctxWithPubsub({ set }, publish),
+      )
+      expect(publish).not.toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, expect.anything())
+    })
+
+    it('broadcasts permissionsChanged when resetPolicy resets a gate flag', async () => {
+      const reset = jest.fn().mockResolvedValue({
+        key: 'apiKeysEnabled',
+        value: false,
+        actor: 'admin-1',
+        timestamp: 't',
+      })
+      const publish = jest.fn()
+      await policyResolvers.Mutation.resetPolicy(
+        null,
+        { key: 'apiKeysEnabled' },
+        ctxWithPubsub({ reset }, publish),
+      )
+      expect(publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
+        permissionsChanged: { roleName: null },
+      })
     })
   })
 })

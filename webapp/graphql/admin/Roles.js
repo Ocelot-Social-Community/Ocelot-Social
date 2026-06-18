@@ -8,6 +8,8 @@ export const permissionCatalogQuery = gql`
       key
       group
       description
+      gatedBy
+      available
     }
   }
 `

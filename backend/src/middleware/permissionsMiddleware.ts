@@ -11,6 +11,7 @@ import CONFIG from '@config/index'
 import { getNeode } from '@db/neo4j'
 import { AuthenticationError } from '@graphql/errors'
 import { validateInviteCode } from '@graphql/resolvers/inviteCodes'
+import { isPermissionAvailable } from '@src/permission'
 import { dominates } from '@src/role'
 
 import type SocialMedia from '@db/models/SocialMedia'
@@ -36,7 +37,10 @@ const isAuthenticated = rule({
 // removed key is a compile-time error (the shield→catalog drift guard).
 const hasPermission = (permission: PermissionKey) =>
   rule({ cache: 'contextual' })(async (_parent, _args, ctx: Context) => {
-    return ctx.effectivePermissions.has(permission)
+    // A granted permission only authorizes while its runtime feature gate (if any) is
+    // open — e.g. apiKey.create needs the apiKeysEnabled policy. This couples the right
+    // to its env/policy flag in one place, so every hasPermission() gate inherits it.
+    return ctx.effectivePermissions.has(permission) && isPermissionAvailable(permission, ctx)
   })
 
 // Flat per-group-type creation rights (mirrors videoCall.create_*): creating a group
@@ -647,7 +651,9 @@ export default shield(
       redeemInviteCode: isAuthenticated,
 
       // API Keys
-      createApiKey: and(isAuthenticated, apiKeysEnabled, hasPermission('apiKey.create')),
+      // apiKey.create is gated by the apiKeysEnabled policy via the catalog (gatedBy),
+      // so hasPermission() already enforces the toggle — no separate apiKeysEnabled here.
+      createApiKey: and(isAuthenticated, hasPermission('apiKey.create')),
       updateApiKey: isAuthenticated,
       revokeApiKey: isAuthenticated,
       adminRevokeApiKey: hasPermission('apiKey.administer'),

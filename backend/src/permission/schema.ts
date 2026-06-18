@@ -9,7 +9,12 @@
 // static config in this codebase.
 /* eslint-disable @typescript-eslint/no-require-imports, import-x/no-commonjs, n/global-require */
 /* eslint-disable security/detect-object-injection */ // keys come from the fixed catalog, never user input
-import type { PermissionCatalogEntry, PermissionGroup, PermissionKey } from './types'
+import type {
+  PermissionCatalogEntry,
+  PermissionGate,
+  PermissionGroup,
+  PermissionKey,
+} from './types'
 
 interface RawCatalog {
   permissions: Record<string, PermissionCatalogEntry>
@@ -43,17 +48,25 @@ export function descriptionFor(key: PermissionKey): string {
   return catalog[key].description
 }
 
+// The runtime feature gate a permission depends on, or undefined when it is always
+// effective. See ./gates.ts for how a gate name resolves to a boolean.
+export function gateFor(key: PermissionKey): PermissionGate | undefined {
+  return catalog[key].gatedBy
+}
+
 // The full catalog as a flat list — the shape the admin UI / GraphQL resolver
-// projects (key + group + description). Returns fresh objects so callers can't
-// mutate the singleton.
+// projects (key + group + gatedBy + description). Returns fresh objects so callers
+// can't mutate the singleton.
 export function permissionCatalog(): Array<{
   key: PermissionKey
   group: PermissionGroup
+  gatedBy?: PermissionGate
   description: string
 }> {
   return allPermissionKeys().map((key) => ({
     key,
     group: groupFor(key),
+    gatedBy: gateFor(key),
     description: descriptionFor(key),
   }))
 }

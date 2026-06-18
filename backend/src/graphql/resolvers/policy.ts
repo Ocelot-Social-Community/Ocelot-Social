@@ -1,7 +1,10 @@
 import { withFilter } from 'graphql-subscriptions'
 
 import { UserInputError } from '@graphql/errors'
+import { isPermissionGatePolicyKey } from '@src/permission'
 import { POLICY_CHANGED_CHANNEL, PolicyValidationError, canView } from '@src/policy'
+
+import { publishPermissionsChanged } from './roles'
 
 import type { Context } from '@src/context'
 import type { NetworkPolicy, PolicyKey, PolicyViewer } from '@src/policy'
@@ -48,8 +51,9 @@ export default {
     setPolicy: async (
       _parent: unknown,
       { key, value }: { key: string; value: string },
-      { policy, user }: Context,
+      context: Context,
     ) => {
+      const { policy, user } = context
       let parsed: unknown
       try {
         parsed = JSON.parse(value)
@@ -62,6 +66,10 @@ export default {
           parsed as NetworkPolicy[PolicyKey],
           user?.id ?? 'unknown',
         )
+        // A gate-flag change flips permission availability network-wide, so signal the
+        // permission system too: clients refetch myPermissions (can()) and the admin
+        // roles catalog (available) live, not just the policy value.
+        if (isPermissionGatePolicyKey(key)) publishPermissionsChanged(context, null)
         return serializeEvent(event)
       } catch (err) {
         // A domain validation error (e.g. a valid-JSON value of the wrong type,
@@ -70,9 +78,11 @@ export default {
         throw err
       }
     },
-    resetPolicy: async (_parent: unknown, { key }: { key: string }, { policy, user }: Context) => {
+    resetPolicy: async (_parent: unknown, { key }: { key: string }, context: Context) => {
+      const { policy, user } = context
       try {
         const event = await policy.reset(key as PolicyKey, user?.id ?? 'unknown')
+        if (isPermissionGatePolicyKey(key)) publishPermissionsChanged(context, null)
         return serializeEvent(event)
       } catch (err) {
         if (err instanceof PolicyValidationError) throw new UserInputError(err.message)

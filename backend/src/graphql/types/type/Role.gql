@@ -6,6 +6,10 @@ type Permission {
   key: String!
   group: String!
   description: String!
+  "The runtime feature gate this permission depends on (e.g. videoCall, apiKeys), or null when it is always effective."
+  gatedBy: String
+  "Whether the permission is effective right now for the requesting viewer's config/policy. False ⇒ the feature is not configured/enabled; the admin UI disables granting it."
+  available: Boolean!
 }
 
 "A permission the current viewer effectively holds, carrying its catalog group so the webapp can gate UI areas by group (e.g. show the admin area for ANY administration-group permission) without a hard-coded key list."

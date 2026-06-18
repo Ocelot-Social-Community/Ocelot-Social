@@ -241,6 +241,7 @@
         "videoCall_create_hidden": "Nis një thirrje video në një grup të fshehur.",
         "videoCall_create_public": "Nis një thirrje video në një grup publik."
       },
+      "permUnavailable": "Funksioni nuk është konfiguruar — dhënia e kësaj të drejte nuk ka efekt.",
       "protected": "i mbrojtur",
       "protectedHint": "Roli i pronarit ka të gjitha lejet dhe nuk mund të modifikohet.",
       "save": "Ruaj",

@@ -63,12 +63,24 @@ describe('admin/roles.vue', () => {
     expect(wrapper.find('[data-test="role-tab-user"]').exists()).toBe(true)
   })
 
-  it('shows only the active role (the first one) at a time', () => {
+  it('shows only the active role at a time, defaulting to the lowest-privilege (user) role', () => {
     const wrapper = Wrapper()
-    expect(wrapper.vm.activeRoleName).toBe('owner')
-    expect(wrapper.find('[data-test="role-owner"]').exists()).toBe(true)
+    // Display order is reversed (lowest-privilege first), so the baseline `user` role
+    // leads and is selected by default; the protected `owner` failsafe trails.
+    expect(wrapper.vm.activeRoleName).toBe('user')
+    expect(wrapper.find('[data-test="role-user"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="role-owner"]').exists()).toBe(false)
     expect(wrapper.find('[data-test="role-badge-setter"]').exists()).toBe(false)
-    expect(wrapper.find('[data-test="role-user"]').exists()).toBe(false)
+  })
+
+  it('orders the role tabs lowest-privilege first (user … owner)', () => {
+    const wrapper = Wrapper()
+    // Assert the full visible tab order straight from the DOM (the role-tab buttons only,
+    // not the add button / container), so a regression in the rendered order is caught.
+    const tabOrder = wrapper
+      .findAll('[data-test^="role-tab-"]')
+      .wrappers.map((w) => w.attributes('data-test'))
+    expect(tabOrder).toEqual(['role-tab-user', 'role-tab-badge-setter', 'role-tab-owner'])
   })
 
   it('switches the active role when another tab is clicked', async () => {
@@ -80,7 +92,8 @@ describe('admin/roles.vue', () => {
   })
 
   it('shows a disabled save + delete (with a hint) for the protected owner role', async () => {
-    const wrapper = Wrapper() // owner is active by default
+    const wrapper = Wrapper()
+    wrapper.vm.setActive('owner')
     await wrapper.vm.$nextTick()
     expect(wrapper.find('[data-test="role-owner-save"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="role-owner-delete"]').exists()).toBe(true)
@@ -91,11 +104,81 @@ describe('admin/roles.vue', () => {
   })
 
   it('shows the owner permissions all checked and disabled', async () => {
-    const wrapper = Wrapper() // owner active by default
+    const wrapper = Wrapper()
+    wrapper.vm.setActive('owner')
     await wrapper.vm.$nextTick()
     expect(Object.values(wrapper.vm.forms.owner.permissions).every(Boolean)).toBe(true)
     const checkbox = wrapper.find('[data-test="role-owner-perm-badge.manage"]')
     expect(checkbox.attributes('disabled')).toBeDefined()
+  })
+
+  it('disables a permission whose feature gate is closed and shows a note', async () => {
+    // The backend marks a right unavailable (available: false) when its feature isn't
+    // configured (e.g. video conferencing). The admin must not be able to grant it.
+    const gatedCatalog = [
+      { key: 'post.create', group: 'content', description: 'Create posts', available: true },
+      {
+        key: 'videoCall.create_public',
+        group: 'communication',
+        description: 'Start a public call',
+        gatedBy: 'videoCall',
+        available: false,
+      },
+    ]
+    const wrapper = mount(Roles, {
+      localVue,
+      mocks: {
+        $t: jest.fn((key) => key),
+        $toast: { error: jest.fn(), success: jest.fn() },
+        $apollo: { mutate: jest.fn(), queries: { roles: { refetch: jest.fn() } } },
+      },
+      stubs,
+      data: () => ({ roles, permissionCatalog: gatedCatalog }),
+    })
+    wrapper.vm.buildForms()
+    wrapper.vm.setActive('user') // a non-protected role, so disabling is gate-driven only
+    await wrapper.vm.$nextTick()
+    // Resolve each permission's row (the label wrapping its checkbox) so assertions are
+    // scoped to the right permission, not the page at large.
+    const rowOf = (key) =>
+      wrapper
+        .findAll('.perm-row')
+        .wrappers.find((row) => row.find(`[data-test="role-user-perm-${key}"]`).exists())
+    const gatedRow = rowOf('videoCall.create_public')
+    const openRow = rowOf('post.create')
+    // The gated right is disabled and carries the "not configured" note…
+    expect(gatedRow.find('input').attributes('disabled')).toBeDefined()
+    expect(gatedRow.find('.perm-row__gate').exists()).toBe(true)
+    // …the ungated one stays editable and shows no note.
+    expect(openRow.find('input').attributes('disabled')).toBeUndefined()
+    expect(openRow.find('.perm-row__gate').exists()).toBe(false)
+  })
+
+  it('preserves unsaved edits when forms are rebuilt by a live refetch', async () => {
+    // A permissionsChanged signal (role change elsewhere, or a gate-policy toggle)
+    // refetches and rebuilds forms. An editable role with in-progress edits must keep
+    // them; a clean role refreshes from the server.
+    const wrapper = Wrapper()
+    wrapper.vm.setActive('user')
+    // user starts with only post.create; tick badge.manage on (now dirty, unsaved).
+    wrapper.vm.forms.user.permissions['badge.manage'] = true
+    expect(wrapper.vm.isDirty(roles.find((r) => r.name === 'user'))).toBe(true)
+    // A rebuild (as a live refetch would trigger) must not clobber the edit.
+    wrapper.vm.buildForms()
+    expect(wrapper.vm.forms.user.permissions['badge.manage']).toBe(true)
+    // The untouched badge-setter role is rebuilt from the server set.
+    expect(wrapper.vm.forms['badge-setter'].permissions['badge.manage']).toBe(true)
+    expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(false)
+  })
+
+  it('refreshFromServer refetches the catalog and roles (live availability update)', () => {
+    const wrapper = Wrapper()
+    const permissionCatalog = { refetch: jest.fn() }
+    const rolesQ = { refetch: jest.fn() }
+    wrapper.vm.$apollo.queries = { permissionCatalog, roles: rolesQ }
+    wrapper.vm.refreshFromServer()
+    expect(permissionCatalog.refetch).toHaveBeenCalledTimes(1)
+    expect(rolesQ.refetch).toHaveBeenCalledTimes(1)
   })
 
   it('rebuilds the owner form once the catalog loads after the roles', async () => {
@@ -133,8 +216,10 @@ describe('admin/roles.vue', () => {
     expect(wrapper.vm.groupLabel('moderation')).toBe('T:admin.roles.groups.moderation')
   })
 
-  it('links the member count to the user list filtered by that role', () => {
-    const wrapper = Wrapper() // owner active by default
+  it('links the member count to the user list filtered by that role', async () => {
+    const wrapper = Wrapper()
+    wrapper.vm.setActive('owner')
+    await wrapper.vm.$nextTick()
     const link = wrapper.find('[data-test="role-owner-members"]')
     expect(link.exists()).toBe(true)
     expect(link.props('to')).toEqual({ name: 'admin-users', query: { q: 'role:owner' } })

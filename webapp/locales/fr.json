@@ -241,6 +241,7 @@
         "videoCall_create_hidden": "Démarrer un appel vidéo dans un groupe caché.",
         "videoCall_create_public": "Démarrer un appel vidéo dans un groupe public."
       },
+      "permUnavailable": "Fonctionnalité non configurée — accorder ce droit n'a aucun effet.",
       "protected": "protégé",
       "protectedHint": "Le rôle propriétaire détient toutes les permissions et ne peut pas être modifié.",
       "save": "Enregistrer",

@@ -1,5 +1,5 @@
 import { ForbiddenError, UserInputError } from '@graphql/errors'
-import { groupFor, permissionCatalog } from '@src/permission'
+import { groupFor, isPermissionAvailable, permissionCatalog } from '@src/permission'
 import {
   OWNER_ROLE,
   PERMISSIONS_CHANGED_CHANNEL,
@@ -13,7 +13,7 @@ import type { RoleDefinition } from '@src/role'
 // Notify connected clients that effective permissions may have changed so they refetch
 // their own (the permissionsChanged subscription). Fire-and-forget: the mutation has
 // already committed; a pubsub hiccup must not fail it.
-const publishPermissionsChanged = (context: Context, roleName: string | null): void => {
+export const publishPermissionsChanged = (context: Context, roleName: string | null): void => {
   // publish() may throw SYNCHRONOUSLY or reject ASYNCHRONOUSLY (its type is
   // void | Promise<void>), so guard BOTH: a bare Promise.resolve(publish()).catch()
   // would let a synchronous throw escape and crash the already-committed mutation.
@@ -63,7 +63,17 @@ const actorIsOwner = (context: Context): boolean =>
 
 export default {
   Query: {
-    permissionCatalog: (_parent: unknown, _args: unknown, _context: Context) => permissionCatalog(),
+    // Each catalog entry carries its runtime gate (gatedBy) and whether that gate is
+    // currently open (available) for THIS request's config/policy, so the admin roles
+    // UI can disable rights whose feature isn't configured (e.g. video conferencing).
+    permissionCatalog: (_parent: unknown, _args: unknown, context: Context) =>
+      permissionCatalog().map((entry) => ({
+        ...entry,
+        // Coerce the optional gate to null: GraphQL errors on a resolver returning
+        // undefined for a nullable field; null is the explicit "no gate" value.
+        gatedBy: entry.gatedBy ?? null,
+        available: isPermissionAvailable(entry.key, context),
+      })),
 
     roles: async (_parent: unknown, _args: unknown, context: Context) => {
       const defs = context.role.allRoles()
@@ -95,9 +105,13 @@ export default {
 
     // Each effective permission carries its catalog group, so the webapp can gate UI
     // areas by group (e.g. admin area = ANY administration-group permission) from a
-    // single payload — no second query and no key/group drift.
+    // single payload — no second query and no key/group drift. A right whose runtime
+    // gate is closed (feature not configured) is dropped here too, so the viewer's
+    // can() reflects what is actually usable, not just what the role nominally grants.
     myPermissions: (_parent: unknown, _args: unknown, context: Context) =>
-      [...context.effectivePermissions].map((key) => ({ key, group: groupFor(key) })),
+      [...context.effectivePermissions]
+        .filter((key) => isPermissionAvailable(key, context))
+        .map((key) => ({ key, group: groupFor(key) })),
   },
 
   Mutation: {

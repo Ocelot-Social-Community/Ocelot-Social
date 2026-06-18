@@ -241,6 +241,7 @@
         "videoCall_create_hidden": "Start a video call in a hidden group.",
         "videoCall_create_public": "Start a video call in a public group."
       },
+      "permUnavailable": "Feature not configured — granting this has no effect.",
       "protected": "protected",
       "protectedHint": "The owner role holds every permission and cannot be edited.",
       "save": "Save",

@@ -241,6 +241,7 @@
         "videoCall_create_hidden": "Avviare una videochiamata in un gruppo nascosto.",
         "videoCall_create_public": "Avviare una videochiamata in un gruppo pubblico."
       },
+      "permUnavailable": "Funzionalità non configurata: concedere questo permesso non ha effetto.",
       "protected": "protetto",
       "protectedHint": "Il ruolo proprietario ha tutti i permessi e non può essere modificato.",
       "save": "Salva",
