@@ -75,13 +75,12 @@ describe('admin/roles.vue', () => {
 
   it('orders the role tabs lowest-privilege first (user … owner)', () => {
     const wrapper = Wrapper()
-    const tabNames = wrapper
-      .findAll('.role-tab')
+    // Assert the full visible tab order straight from the DOM (the role-tab buttons only,
+    // not the add button / container), so a regression in the rendered order is caught.
+    const tabOrder = wrapper
+      .findAll('[data-test^="role-tab-"]')
       .wrappers.map((w) => w.attributes('data-test'))
-      .filter((t) => t && t.startsWith('role-tab-') && t !== 'role-tab-badge-setter')
-    // owner is last; user is first of the default roles.
-    expect(wrapper.vm.orderedRoles.map((r) => r.name)).toEqual(['user', 'badge-setter', 'owner'])
-    expect(tabNames[tabNames.length - 1]).toBe('role-tab-owner')
+    expect(tabOrder).toEqual(['role-tab-user', 'role-tab-badge-setter', 'role-tab-owner'])
   })
 
   it('switches the active role when another tab is clicked', async () => {
