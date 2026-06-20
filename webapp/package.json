@@ -42,7 +42,7 @@
     "intersection-observer": "^0.12.0",
     "jest-serializer-vue": "^3.1.0",
     "livekit-client": "^2.19.2",
-    "linkify-it": "~5.0.0",
+    "linkify-it": "~5.0.1",
     "mapbox-gl": "1.13.3",
     "nuxt": "^2.18.1",
     "nuxt-dropzone": "^1.0.4",
