@@ -1,6 +1,6 @@
 {
   "name": "ocelot-social-webapp",
-  "version": "3.16.3",
+  "version": "3.17.0",
   "description": "ocelot.social Frontend",
   "repository": "https://github.com/Ocelot-Social-Community/Ocelot-Social",
   "author": "ocelot.social Community",
@@ -41,8 +41,8 @@
     "graphql": "14.7.0",
     "intersection-observer": "^0.12.0",
     "jest-serializer-vue": "^3.1.0",
-    "livekit-client": "^2.19.2",
     "linkify-it": "~5.0.0",
+    "livekit-client": "^2.19.2",
     "mapbox-gl": "1.13.3",
     "nuxt": "^2.18.1",
     "nuxt-dropzone": "^1.0.4",
