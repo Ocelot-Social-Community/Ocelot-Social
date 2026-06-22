@@ -100,6 +100,12 @@
       "envSeed": "API_KEYS_ENABLED",
       "description": "Whether API keys functionality (personal keys for backend access) is enabled. Only relevant to logged-in users (Settings / Admin), so visible to 'authenticated' (and admin)."
     },
+    "videoConference": {
+      "type": "boolean",
+      "default": true,
+      "requiresEnv": ["LIVEKIT_URL", "LIVEKIT_API_KEY", "LIVEKIT_API_SECRET"],
+      "description": "Whether video conferencing (LiveKit) is enabled. The single runtime switch for the videoCall.* permissions. Requires the three LiveKit env vars (URL/key/secret): without them the feature is unavailable regardless of this flag (the toggle is forced off and greyed in the admin UI). Admin-only."
+    },
     "apiKeysMaxPerUser": {
       "type": "integer",
       "minimum": 1,

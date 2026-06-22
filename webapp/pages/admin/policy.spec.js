@@ -26,6 +26,7 @@ describe('admin/policy.vue', () => {
     badgesEnabled: false,
     apiKeysEnabled: false,
     apiKeysMaxPerUser: 5,
+    videoConference: true,
     maxPinnedPosts: 1,
     maxGroupPinnedPosts: 1,
     showContentFilterHeaderMenu: true,
@@ -46,6 +47,7 @@ describe('admin/policy.vue', () => {
     badgesEnabled: false,
     apiKeysEnabled: false,
     apiKeysMaxPerUser: 5,
+    videoConference: true,
     maxPinnedPosts: 1,
     maxGroupPinnedPosts: 1,
     showContentFilterHeaderMenu: true,
@@ -64,6 +66,7 @@ describe('admin/policy.vue', () => {
     'badgesEnabled',
     'apiKeysEnabled',
     'apiKeysMaxPerUser',
+    'videoConference',
     'maxPinnedPosts',
     'maxGroupPinnedPosts',
     'showContentFilterHeaderMenu',
@@ -457,6 +460,55 @@ describe('admin/policy.vue', () => {
         expect(resetKey).toHaveBeenCalledWith(expect.anything(), { key })
       }
       expect(mocks.$toast.success).toHaveBeenCalled()
+    })
+  })
+
+  describe('env-gated availability (policyConfig)', () => {
+    const stubs = { 'nuxt-link': { template: '<a :href="to"><slot /></a>', props: ['to'] } }
+    const ENTRY = {
+      key: 'videoConference',
+      type: 'boolean',
+      effective: 'false',
+      softwareDefault: 'true',
+      configuredDefault: 'true',
+      envSeed: null,
+      envSeedState: null,
+      requiresEnv: [{ name: 'LIVEKIT_URL', state: 'missing' }],
+      available: false,
+    }
+    const mountWithConfig = (policyConfig) => {
+      const w = mount(Policy, { mocks, localVue, store, stubs })
+      w.setData({ policyConfig })
+      return w
+    }
+
+    it('greys out and disables an env-unavailable key, linking to the config tab', async () => {
+      const w = mountWithConfig([ENTRY])
+      await w.vm.$nextTick()
+      expect(w.vm.isUnavailable('videoConference')).toBe(true)
+      expect(w.find('[data-test="policy-videoConference"]').attributes('disabled')).toBeTruthy()
+      expect(w.find('[data-test="policy-env-videoConference"]').exists()).toBe(true)
+      expect(w.find('.policy-row__env-link').attributes('href')).toBe(
+        '/admin/config#videoConference',
+      )
+    })
+
+    it('renders the software-default layer for a configured key', async () => {
+      const w = mountWithConfig([ENTRY])
+      await w.vm.$nextTick()
+      expect(w.vm.softwareDefaultOf('videoConference')).toBe('true')
+      expect(w.find('[data-test="policy-software-videoConference"]').exists()).toBe(true)
+    })
+
+    it('softwareDefaultOf returns null for unknown keys and the raw string on bad JSON', () => {
+      const w = mountWithConfig([{ ...ENTRY, softwareDefault: 'not json' }])
+      expect(w.vm.softwareDefaultOf('apiKeysEnabled')).toBeNull()
+      expect(w.vm.softwareDefaultOf('videoConference')).toBe('not json')
+    })
+
+    it('treats keys without a config entry as available', () => {
+      const w = mountWithConfig([])
+      expect(w.vm.isUnavailable('videoConference')).toBe(false)
     })
   })
 })

@@ -28,7 +28,15 @@ import {
   readLastChange,
   writeSetting,
 } from './repository'
-import { allKeys, canView, defaultFor, envSeedFor, typeFor, validatePolicyValue } from './schema'
+import {
+  allKeys,
+  canView,
+  defaultFor,
+  envSeedFor,
+  requiresEnvFor,
+  typeFor,
+  validatePolicyValue,
+} from './schema'
 
 import type { PolicyViewer } from './schema'
 import type { NetworkPolicy, PolicyKey, PolicyValue } from './types'
@@ -210,6 +218,40 @@ export class PolicyService {
     const envName = envSeedFor(key)
     const envValue = envName ? parseEnvValue(envName, this.env, typeFor(key)) : undefined
     return (envValue !== undefined ? envValue : defaultFor(key)) as NetworkPolicy[K]
+  }
+
+  // The hard env requirements of a key with each one's presence state (set | empty |
+  // missing). Empty array ⇒ the key has no env dependency. env presence is fixed at
+  // process start (the same `this.env` used for seeding), so this is stable for the
+  // process lifetime — no per-request config needed. Drives both the gate fold and the
+  // admin config view (which env var is missing).
+  requiresEnvStatus(key: PolicyKey): { name: string; state: 'set' | 'empty' | 'missing' }[] {
+    return requiresEnvFor(key).map((name) => ({ name, state: this.envState(name) }))
+  }
+
+  // Presence state of a single env var: set | empty | missing. Reports presence only,
+  // never the value — safe to surface to the admin config view for any var name
+  // (e.g. a key's envSeed source).
+  envState(name: string): 'set' | 'empty' | 'missing' {
+    const value = this.env[name]
+    return value === undefined ? 'missing' : value === '' ? 'empty' : 'set'
+  }
+
+  // Whether a key's hard env requirements are all satisfied (so its flag can take
+  // effect). Always true for keys without a `requiresEnv`.
+  isAvailable(key: PolicyKey): boolean {
+    return this.requiresEnvStatus(key).every((entry) => entry.state === 'set')
+  }
+
+  // The effective value: the stored flag folded with env availability. A boolean key
+  // whose hard env requirements are unmet is forced to false (the feature cannot work
+  // without its secrets), regardless of the stored flag — this is the single value the
+  // permission gates read, so roles depend only on the policy, never on env directly.
+  getEffective<K extends PolicyKey>(key: K): NetworkPolicy[K] {
+    if (!this.isAvailable(key) && typeFor(key) === 'boolean') {
+      return false as NetworkPolicy[K]
+    }
+    return this.get(key)
   }
 
   // Defaults as visible to a viewer — same canView scoping as getVisibleSnapshot

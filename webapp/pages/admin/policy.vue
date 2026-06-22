@@ -51,8 +51,12 @@
         <div
           v-for="key in group.keys"
           :key="key"
+          :id="key"
           class="policy-row"
-          :class="{ 'policy-row--conflict': conflict[key] }"
+          :class="{
+            'policy-row--conflict': conflict[key],
+            'policy-row--unavailable': isUnavailable(key),
+          }"
         >
           <input
             v-if="isNumberKey(key)"
@@ -62,6 +66,7 @@
             step="1"
             class="policy-row__number"
             v-model.number="form[key]"
+            :disabled="isUnavailable(key)"
             :data-test="`policy-${key}`"
           />
           <input
@@ -70,6 +75,7 @@
             type="checkbox"
             class="policy-row__checkbox"
             v-model="form[key]"
+            :disabled="isUnavailable(key)"
             :data-test="`policy-${key}`"
           />
           <label :for="`policy-${key}`" class="policy-row__label">
@@ -82,9 +88,26 @@
               >
                 {{ $t('admin.policy.defaultValue', { value: String(defaults[key]) }) }}
               </span>
+              <span
+                v-if="softwareDefaultOf(key) !== null"
+                class="policy-row__software"
+                :data-test="`policy-software-${key}`"
+              >
+                {{ $t('admin.policy.softwareDefault', { value: softwareDefaultOf(key) }) }}
+              </span>
             </span>
             <span class="policy-row__description">
               {{ $t(`admin.policy.descriptions.${key}`) }}
+            </span>
+            <span
+              v-if="isUnavailable(key)"
+              class="policy-row__env"
+              :data-test="`policy-env-${key}`"
+            >
+              {{ $t('admin.policy.envUnavailable') }}
+              <nuxt-link :to="`/admin/config#${key}`" class="policy-row__env-link">
+                {{ $t('admin.policy.envLink') }}
+              </nuxt-link>
             </span>
             <span
               v-if="conflict[key]"
@@ -125,10 +148,20 @@
 <script>
 import { OsButton, OsCard } from '@ocelot-social/ui'
 import { mapActions, mapGetters } from 'vuex'
+import { policyConfigQuery } from '~/graphql/admin/PolicyConfig'
 
 export default {
   components: { OsButton, OsCard },
   middleware: ['isAdmin'],
+  apollo: {
+    // Per-key config layers + env availability. Drives the env-dependency UI: a key
+    // whose hard env requirements are unmet is greyed/disabled here and links to the
+    // config tab (where the missing env vars are listed).
+    policyConfig: {
+      query: policyConfigQuery,
+      fetchPolicy: 'cache-and-network',
+    },
+  },
   data() {
     return {
       // Policies grouped under headings; related settings share a group.
@@ -152,6 +185,7 @@ export default {
             'badgesEnabled',
             'apiKeysEnabled',
             'apiKeysMaxPerUser',
+            'videoConference',
             'maxPinnedPosts',
             'maxGroupPinnedPosts',
           ],
@@ -188,6 +222,7 @@ export default {
         badgesEnabled: false,
         apiKeysEnabled: false,
         apiKeysMaxPerUser: 0,
+        videoConference: false,
         maxPinnedPosts: 0,
         maxGroupPinnedPosts: 0,
         showContentFilterHeaderMenu: false,
@@ -206,6 +241,8 @@ export default {
       // reconciles (and refetches the last-change info) for *subsequent* (e.g. remote)
       // changes — the initial snapshot population is handled by the explicit mount sync.
       loaded: false,
+      // Per-key config layers + availability from the backend (apollo above).
+      policyConfig: [],
     }
   },
   computed: {
@@ -225,6 +262,10 @@ export default {
     hasConflict() {
       return this.keys.some((k) => this.conflict[k])
     },
+    // Per-key config entry keyed for O(1) template lookup (availability, layers).
+    configByKey() {
+      return Object.fromEntries(this.policyConfig.map((entry) => [entry.key, entry]))
+    },
   },
   methods: {
     ...mapActions({
@@ -239,6 +280,21 @@ export default {
     },
     isNumberKey(key) {
       return this.numberKeys.includes(key)
+    },
+    // A key is unavailable when its hard env requirements are unmet: the stored flag
+    // has no effect, so the input is disabled and a link to the config tab is shown.
+    isUnavailable(key) {
+      return this.configByKey[key]?.available === false
+    },
+    // The code baseline (third value layer), formatted for display, or null if unknown.
+    softwareDefaultOf(key) {
+      const entry = this.configByKey[key]
+      if (!entry) return null
+      try {
+        return String(JSON.parse(entry.softwareDefault))
+      } catch {
+        return entry.softwareDefault
+      }
     },
     // Hard sync: adopt the whole server snapshot, reset the baseline to it, and clear all
     // conflicts. Used on mount, reset-to-default, and "load new version" (discard my edits).
@@ -477,6 +533,14 @@ form {
     font-size: 0.8em;
     font-weight: normal;
   }
+  &__software {
+    margin-left: $space-xx-small;
+    color: $text-color-soft;
+    font-family: monospace;
+    font-size: 0.75em;
+    font-weight: normal;
+    opacity: 0.75;
+  }
   &__description {
     color: $text-color-soft;
     font-size: 0.85em;
@@ -487,6 +551,20 @@ form {
     color: $color-warning-active;
     font-size: 0.8em;
     font-weight: 600;
+  }
+  &__env {
+    color: $color-danger;
+    font-size: 0.85em;
+    line-height: 1.25;
+  }
+  &__env-link {
+    white-space: nowrap;
+  }
+
+  // Hard env requirement unmet: the stored flag has no effect, so dim the row and
+  // disable its input (the env note + config link explain why).
+  &--unavailable {
+    opacity: 0.6;
   }
 }
 .actions {

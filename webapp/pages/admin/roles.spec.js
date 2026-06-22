@@ -121,7 +121,7 @@ describe('admin/roles.vue', () => {
         key: 'videoCall.create_public',
         group: 'communication',
         description: 'Start a public call',
-        gatedBy: 'videoCall',
+        gatedBy: 'videoConference',
         available: false,
       },
     ]

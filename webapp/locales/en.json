@@ -139,24 +139,28 @@
       "name": "Pages"
     },
     "config": {
-      "name": "System configuration",
-      "title": "System configuration",
-      "description": "Status of the feature gates and their underlying configuration. Secret values are never shown — only whether they are set.",
-      "gates": {
-        "videoCall": "Video calls (LiveKit)",
-        "apiKeys": "API keys"
+      "name": "Environment",
+      "title": "Environment configuration",
+      "description": "Deployment configuration behind the network policy. Secret values are never shown — only whether they are set.",
+      "required": {
+        "title": "Required environment variables",
+        "hint": "Hard requirements. While one is missing the feature is unavailable regardless of its policy. Changing these needs a redeploy and a backend restart."
       },
-      "statusConfigured": "configured",
-      "statusNotConfigured": "not configured",
-      "sourceEnv": "Set via environment — changing it requires a redeploy and a backend restart.",
-      "sourcePolicy": "A runtime default — change it on the network policy tab.",
-      "policyLink": "Go to network policy",
+      "requiredFor": "required for {policy}",
+      "seed": {
+        "title": "Environment-seeded defaults",
+        "hint": "These only seed a policy's default at first start. An admin can override them live on the network policy tab."
+      },
+      "seedsDefault": "seeds {policy} (default {value})",
+      "software": {
+        "title": "Software defaults",
+        "hint": "The code baseline a policy falls back to without any environment configuration."
+      },
       "state": {
         "set": "set",
         "empty": "empty",
         "missing": "missing"
-      },
-      "secretTag": "secret (value hidden)"
+      }
     },
     "policy": {
       "conflict": {
@@ -166,9 +170,13 @@
         "serverValue": "server now: {value}"
       },
       "defaultValue": "default: {value}",
+      "softwareDefault": "code default: {value}",
+      "envUnavailable": "Required environment is not configured — this toggle has no effect until it is.",
+      "envLink": "View environment",
       "description": "Runtime configuration. Changes apply immediately for all connected clients.",
       "descriptions": {
         "apiKeysEnabled": "Let users create personal API keys for programmatic backend access. Affects the API keys section in user settings.",
+        "videoConference": "Enable video conferencing (LiveKit). The runtime switch for the video-call permissions. Requires the LiveKit environment variables; without them it stays off and greyed out.",
         "apiKeysMaxPerUser": "Maximum number of active API keys a single user may hold at once.",
         "askForRealName": "Ask new users for their real (given and family) name during registration instead of a single display name.",
         "badgesEnabled": "Enable the badges feature: badges are shown on profiles and teasers and can be managed in the admin area.",
@@ -198,6 +206,7 @@
       },
       "keys": {
         "apiKeysEnabled": "API keys",
+        "videoConference": "Video conferencing",
         "apiKeysMaxPerUser": "Max. API keys per user",
         "askForRealName": "Ask for real name",
         "badgesEnabled": "Badges",

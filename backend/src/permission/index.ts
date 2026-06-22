@@ -14,14 +14,6 @@ export {
   PERMISSION_GATE_POLICY_KEYS,
 } from './gates'
 export type { GateContext } from './gates'
-export { systemConfigStatus } from './systemConfig'
-export type {
-  ConfigKeyStatus,
-  ConfigKeyState,
-  FeatureGateStatus,
-  FeatureGateSource,
-  SystemConfigContext,
-} from './systemConfig'
 export type {
   PermissionKey,
   PermissionGroup,

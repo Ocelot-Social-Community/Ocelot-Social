@@ -3,83 +3,128 @@
     <h2 class="title">{{ $t('admin.config.title') }}</h2>
     <p class="description">{{ $t('admin.config.description') }}</p>
 
-    <section
-      v-for="gate in systemConfig"
-      :id="gate.gate"
-      :key="gate.gate"
-      class="gate"
-      :data-test="`config-gate-${gate.gate}`"
-    >
-      <div class="gate__header">
-        <h3 class="gate__title">{{ $t(`admin.config.gates.${gate.gate}`) }}</h3>
-        <span
-          class="badge"
-          :class="gate.open ? 'badge--ok' : 'badge--error'"
-          :data-test="`config-gate-${gate.gate}-status`"
+    <!-- Required environment (hard): missing → the feature is broken; needs a redeploy. -->
+    <section v-if="requiredEnv.length" class="layer" data-test="config-required">
+      <h3 class="layer__title layer__title--required">{{ $t('admin.config.required.title') }}</h3>
+      <p class="layer__hint">{{ $t('admin.config.required.hint') }}</p>
+      <ul class="rows">
+        <li
+          v-for="entry in requiredEnv"
+          :id="entry.policyKey"
+          :key="`${entry.policyKey}-${entry.name}`"
+          class="row"
+          :data-test="`config-required-${entry.name}`"
         >
-          {{
-            gate.open ? $t('admin.config.statusConfigured') : $t('admin.config.statusNotConfigured')
-          }}
-        </span>
-      </div>
+          <code class="row__name">{{ entry.name }}</code>
+          <span class="badge" :class="entry.state === 'set' ? 'badge--ok' : 'badge--error'">
+            {{ $t(`admin.config.state.${entry.state}`) }}
+          </span>
+          <span class="row__note">
+            {{ $t('admin.config.requiredFor', { policy: policyLabel(entry.policyKey) }) }}
+          </span>
+        </li>
+      </ul>
+    </section>
 
-      <!-- Runtime-changeable default: point at the policy tab instead of env keys. -->
-      <p v-if="gate.source === 'policy'" class="gate__source">
-        {{ $t('admin.config.sourcePolicy') }}
-        <nuxt-link to="/admin/policy" class="gate__link">
-          {{ $t('admin.config.policyLink') }}
-        </nuxt-link>
-      </p>
+    <!-- Env-seeded defaults (soft): only seed the default; an admin can override live. -->
+    <section v-if="seeded.length" class="layer" data-test="config-seeded">
+      <h3 class="layer__title layer__title--seed">{{ $t('admin.config.seed.title') }}</h3>
+      <p class="layer__hint">{{ $t('admin.config.seed.hint') }}</p>
+      <ul class="rows">
+        <li
+          v-for="entry in seeded"
+          :key="entry.key"
+          class="row"
+          :data-test="`config-seed-${entry.key}`"
+        >
+          <code class="row__name">{{ entry.envSeed }}</code>
+          <span class="badge" :class="`badge--${seedSeverity(entry.envSeedState)}`">
+            {{ $t(`admin.config.state.${entry.envSeedState}`) }}
+          </span>
+          <span class="row__note">
+            {{
+              $t('admin.config.seedsDefault', {
+                policy: policyLabel(entry.key),
+                value: fmt(entry.configuredDefault),
+              })
+            }}
+          </span>
+        </li>
+      </ul>
+    </section>
 
-      <!-- Fixed at deploy time: list the underlying env keys with their presence state. -->
-      <template v-else>
-        <p class="gate__source">{{ $t('admin.config.sourceEnv') }}</p>
-        <ul class="keys">
-          <li
-            v-for="entry in gate.keys"
-            :key="entry.key"
-            class="key"
-            :data-test="`config-key-${entry.key}`"
-          >
-            <code class="key__name">{{ entry.key }}</code>
-            <span class="badge" :class="`badge--${stateClass(entry.state)}`">
-              {{ $t(`admin.config.state.${entry.state}`) }}
-            </span>
-            <span v-if="entry.secret" class="key__secret">{{ $t('admin.config.secretTag') }}</span>
-            <code v-else-if="entry.value" class="key__value">{{ entry.value }}</code>
-          </li>
-        </ul>
-      </template>
+    <!-- Software defaults (muted): the code baseline a key resets to without any config. -->
+    <section class="layer" data-test="config-software">
+      <h3 class="layer__title layer__title--software">{{ $t('admin.config.software.title') }}</h3>
+      <p class="layer__hint">{{ $t('admin.config.software.hint') }}</p>
+      <ul class="rows">
+        <li
+          v-for="entry in policyConfig"
+          :key="entry.key"
+          class="row row--muted"
+          :data-test="`config-software-${entry.key}`"
+        >
+          <span class="row__name">{{ policyLabel(entry.key) }}</span>
+          <code class="row__value">{{ fmt(entry.softwareDefault) }}</code>
+        </li>
+      </ul>
     </section>
   </os-card>
 </template>
 
 <script>
 import { OsCard } from '@ocelot-social/ui'
-import { systemConfigQuery } from '~/graphql/admin/SystemConfig'
+import { policyConfigQuery } from '~/graphql/admin/PolicyConfig'
 
 export default {
   components: { OsCard },
   middleware: ['isAdmin'],
   data() {
     return {
-      systemConfig: [],
+      policyConfig: [],
     }
   },
   apollo: {
-    systemConfig: {
-      query: systemConfigQuery,
+    policyConfig: {
+      query: policyConfigQuery,
       // Re-resolve against the CURRENT deployment state every time the tab is opened
       // (admin tabs are separate routes) — a stale cache could hide a just-fixed secret.
       fetchPolicy: 'cache-and-network',
     },
   },
+  computed: {
+    // Hard env requirements, flattened to one row per (policy, env var).
+    requiredEnv() {
+      return this.policyConfig.flatMap((entry) =>
+        entry.requiresEnv.map((req) => ({
+          policyKey: entry.key,
+          name: req.name,
+          state: req.state,
+        })),
+      )
+    },
+    // Policies whose default is seeded from an env var (soft override).
+    seeded() {
+      return this.policyConfig.filter((entry) => entry.envSeed)
+    },
+  },
   methods: {
-    // Map the key presence state to a badge severity.
-    stateClass(state) {
-      if (state === 'set') return 'ok'
-      if (state === 'empty') return 'warn'
-      return 'error'
+    // Reuse the policy tab's human labels for policy keys.
+    policyLabel(key) {
+      return this.$t(`admin.policy.keys.${key}`)
+    },
+    // Pretty-print a JSON-encoded policy value for display.
+    fmt(json) {
+      try {
+        return String(JSON.parse(json))
+      } catch {
+        return json
+      }
+    },
+    // Seed presence is soft: present → neutral info, absent → falls back to software
+    // default (a warning at most, never an error like a hard requirement).
+    seedSeverity(state) {
+      return state === 'set' ? 'info' : 'warn'
     },
   },
 }
@@ -93,56 +138,58 @@ export default {
   margin: 0 0 $space-base;
   color: $text-color-soft;
 }
-.gate {
+.layer {
   margin-bottom: $space-base;
-  padding-bottom: $space-small;
-  border-bottom: 1px solid $border-color-softer;
 
-  &:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-  }
-
-  &__header {
-    display: flex;
-    align-items: center;
-    gap: $space-small;
-  }
   &__title {
-    margin: 0;
+    margin: 0 0 $space-xxx-small;
+    padding-bottom: $space-xxx-small;
+    border-bottom: 2px solid $border-color-softer;
+    font-size: 1em;
+
+    // Severity-coded section headings.
+    &--required {
+      border-bottom-color: $color-danger;
+    }
+    &--seed {
+      border-bottom-color: $color-primary;
+    }
+    &--software {
+      border-bottom-color: $border-color-softer;
+      color: $text-color-soft;
+    }
   }
-  &__source {
-    margin: $space-xx-small 0 $space-x-small;
+  &__hint {
+    margin: 0 0 $space-x-small;
     color: $text-color-soft;
-    font-size: 0.9em;
-  }
-  &__link {
-    white-space: nowrap;
+    font-size: 0.85em;
   }
 }
-.keys {
+.rows {
   list-style: none;
   margin: 0;
   padding: 0;
 }
-.key {
+.row {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: $space-x-small;
   margin: $space-xxx-small 0;
 
+  &--muted {
+    color: $text-color-soft;
+    font-size: 0.9em;
+  }
   &__name {
     font-weight: 600;
   }
   &__value {
     color: $text-color-soft;
-    word-break: break-all;
   }
-  &__secret {
+  &__note {
     color: $text-color-soft;
-    font-size: 0.8em;
-    font-style: italic;
+    font-size: 0.85em;
   }
 }
 .badge {
@@ -165,6 +212,10 @@ export default {
   &--error {
     background-color: $color-danger;
     color: $color-danger-inverse;
+  }
+  &--info {
+    background-color: $color-primary;
+    color: $color-primary-inverse;
   }
 }
 </style>

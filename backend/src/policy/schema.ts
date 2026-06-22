@@ -26,6 +26,7 @@ interface RawProperty {
   description?: string
   visibility?: Audience[]
   envSeed?: string
+  requiresEnv?: string[]
 }
 
 interface RawSchema {
@@ -45,6 +46,13 @@ export function defaultFor<K extends PolicyKey>(key: K): NetworkPolicy[K] {
 
 export function envSeedFor(key: PolicyKey): string | undefined {
   return rawSchema.properties[key].envSeed
+}
+
+// The env vars a key HARD-requires to be effective (distinct from envSeed, which
+// only seeds the default). Empty/undefined ⇒ no env dependency. Used to fold env
+// availability into the policy's effective value and to surface it in the admin UI.
+export function requiresEnvFor(key: PolicyKey): string[] {
+  return rawSchema.properties[key].requiresEnv ?? []
 }
 
 export function typeFor(key: PolicyKey): string {
@@ -67,6 +75,10 @@ ajv.addKeyword({
   metaSchema: { type: 'array', items: { type: 'string', enum: KNOWN_AUDIENCES } },
 })
 ajv.addKeyword({ keyword: 'envSeed', metaSchema: { type: 'string' } })
+ajv.addKeyword({
+  keyword: 'requiresEnv',
+  metaSchema: { type: 'array', items: { type: 'string' } },
+})
 const validators = Object.fromEntries(
   allKeys().map((key) => [key, ajv.compile(rawSchema.properties[key])]),
 ) as Record<PolicyKey, ValidateFunction>

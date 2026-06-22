@@ -172,6 +172,7 @@ describe('PolicyService', () => {
       'showContentFilterHeaderMenu',
       'showContentFilterMasonryGrid',
       'showGroupButtonInHeader',
+      'videoConference',
     ]
 
     const initService = async () => {

@@ -30,8 +30,11 @@ const httpUrlFor = (livekitUrl: string) =>
       ? livekitUrl.replace(/^ws:\/\//, 'http://')
       : livekitUrl
 
-const ensureEnabled = (config: { LIVEKIT_ENABLED: boolean }) => {
-  if (!config.LIVEKIT_ENABLED) {
+// The videoConference policy is the single runtime switch. Its effective value already
+// folds in the LiveKit env requirements (requiresEnv), so an enabled call is guaranteed
+// to have the secrets the RoomService below needs.
+const ensureEnabled = (enabled: boolean) => {
+  if (!enabled) {
     throw new Error('Video calls are disabled.')
   }
 }
@@ -182,10 +185,10 @@ export default {
   },
   Query: {
     videoCallConfig: (_root, _args, context) => ({
-      enabled: !!context.config.LIVEKIT_ENABLED,
+      enabled: context.policy.getEffective('videoConference'),
     }),
     videoCallParticipantCount: async (_root, params: { groupId: string }, context) => {
-      ensureEnabled(context.config)
+      ensureEnabled(context.policy.getEffective('videoConference'))
       // Viewing the count (and joining) only needs membership — opening is gated below.
       await getGroupMembershipType(context.driver, params.groupId, context.user.id)
       return getLiveParticipantCount(context.config, roomNameForGroup(params.groupId))
@@ -193,7 +196,7 @@ export default {
   },
   Mutation: {
     joinGroupVideoCall: async (_root, params: { groupId: string }, context) => {
-      ensureEnabled(context.config)
+      ensureEnabled(context.policy.getEffective('videoConference'))
       const groupType = await getGroupMembershipType(
         context.driver,
         params.groupId,

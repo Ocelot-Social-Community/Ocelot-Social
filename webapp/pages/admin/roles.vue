@@ -196,7 +196,7 @@
                   {{ $t('admin.roles.permUnavailable') }}
                   <nuxt-link
                     v-if="permission.gatedBy && $can('policy.manage')"
-                    :to="`/admin/config#${permission.gatedBy}`"
+                    :to="`/admin/policy#${permission.gatedBy}`"
                     class="perm-row__gate-link"
                     :data-test="`perm-gate-link-${permission.key}`"
                   >

@@ -72,6 +72,9 @@ interface OverwritableContextParams {
   // Override network-policy values for a test (e.g. { categoriesActive: true,
   // maxGroupPinnedPosts: 0 }); unset keys fall back to their schema defaults.
   policy?: Partial<NetworkPolicy>
+  // Override the env the policy service sees (for keys whose effective value folds
+  // env availability, e.g. videoConference's requiresEnv LiveKit vars).
+  env?: Record<string, string | undefined>
   // Override the role definitions for a test (e.g. to revoke a baseline
   // permission from the `user` role); defaults to the seeded DEFAULT_ROLES. The
   // user's effective permissions are resolved from these via their role string.
@@ -122,14 +125,16 @@ export const createApolloTestSetup = async (opts?: CreateTestServerOptions) => {
       authenticatedUser,
       config = {},
       policy: policyOverride = {},
+      env: envOverride = {},
       roles: rolesOverride,
       roleService,
       pubsub,
     } = await testContext()
     const merged = { ...TEST_CONFIG, ...config }
     // Network policy values are set per-test via the `policy` override; any key not
-    // set falls back to its schema default inside createInMemoryPolicyService.
-    const policy = createInMemoryPolicyService(policyOverride)
+    // set falls back to its schema default inside createInMemoryPolicyService. The
+    // env override lets a test satisfy a key's requiresEnv (e.g. videoConference).
+    const policy = createInMemoryPolicyService(policyOverride, envOverride)
     // Roles default to the seeded DEFAULT_ROLES so authorization resolves exactly
     // as in production; a test can override the definitions, or inject a real
     // DB-backed RoleService when it needs to mutate roles / HAS_ROLE edges.

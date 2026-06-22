@@ -32,6 +32,7 @@ export interface NetworkPolicy {
   showContentFilterMasonryGrid: boolean
   showGroupButtonInHeader: boolean
   apiKeysEnabled: boolean
+  videoConference: boolean
   apiKeysMaxPerUser: number
   maxPinnedPosts: number
   maxGroupPinnedPosts: number

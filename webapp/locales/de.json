@@ -139,24 +139,28 @@
       "name": "Seiten"
     },
     "config": {
-      "name": "Systemkonfiguration",
-      "title": "Systemkonfiguration",
-      "description": "Status der Feature-Gates und ihrer zugrundeliegenden Konfiguration. Secret-Werte werden nie angezeigt – nur, ob sie gesetzt sind.",
-      "gates": {
-        "videoCall": "Videoanrufe (LiveKit)",
-        "apiKeys": "API-Keys"
+      "name": "Umgebung",
+      "title": "Umgebungskonfiguration",
+      "description": "Deployment-Konfiguration hinter der Netzwerk-Konfiguration. Secret-Werte werden nie angezeigt – nur, ob sie gesetzt sind.",
+      "required": {
+        "title": "Erforderliche Umgebungsvariablen",
+        "hint": "Harte Voraussetzungen. Solange eine fehlt, ist die Funktion unabhängig von ihrer Policy nicht verfügbar. Änderungen erfordern ein Redeploy und einen Backend-Neustart."
       },
-      "statusConfigured": "konfiguriert",
-      "statusNotConfigured": "nicht konfiguriert",
-      "sourceEnv": "Über die Umgebung gesetzt – Änderung erfordert ein Redeploy und einen Backend-Neustart.",
-      "sourcePolicy": "Ein Laufzeit-Default – im Reiter Netzwerk-Konfiguration änderbar.",
-      "policyLink": "Zur Netzwerk-Konfiguration",
+      "requiredFor": "erforderlich für {policy}",
+      "seed": {
+        "title": "Umgebungs-Seed-Defaults",
+        "hint": "Diese setzen nur beim ersten Start den Default einer Policy. Ein Admin kann sie zur Laufzeit im Reiter Netzwerk-Konfiguration überschreiben."
+      },
+      "seedsDefault": "seedet {policy} (Default {value})",
+      "software": {
+        "title": "Software-Defaults",
+        "hint": "Die Code-Baseline, auf die eine Policy ohne Umgebungskonfiguration zurückfällt."
+      },
       "state": {
         "set": "gesetzt",
         "empty": "leer",
         "missing": "fehlt"
-      },
-      "secretTag": "Secret (Wert verborgen)"
+      }
     },
     "policy": {
       "conflict": {
@@ -166,9 +170,13 @@
         "serverValue": "Server jetzt: {value}"
       },
       "defaultValue": "Standard: {value}",
+      "softwareDefault": "Code-Standard: {value}",
+      "envUnavailable": "Erforderliche Umgebung nicht konfiguriert – dieser Schalter hat keine Wirkung, bis sie gesetzt ist.",
+      "envLink": "Zur Umgebung",
       "description": "Laufzeit-Konfiguration. Änderungen wirken sofort für alle verbundenen Clients.",
       "descriptions": {
         "apiKeysEnabled": "Ermöglicht Nutzern, persönliche API-Schlüssel für den programmatischen Zugriff aufs Backend zu erstellen. Betrifft den API-Schlüssel-Bereich in den Nutzereinstellungen.",
+        "videoConference": "Videokonferenzen (LiveKit) aktivieren. Der Laufzeit-Schalter für die Videoanruf-Berechtigungen. Erfordert die LiveKit-Umgebungsvariablen; ohne sie bleibt er aus und ausgegraut.",
         "apiKeysMaxPerUser": "Maximale Anzahl aktiver API-Schlüssel, die ein einzelner Nutzer gleichzeitig besitzen darf.",
         "askForRealName": "Fragt neue Nutzer bei der Registrierung nach ihrem echten Vor- und Nachnamen statt nach einem einzelnen Anzeigenamen.",
         "badgesEnabled": "Aktiviert die Badge-Funktion: Badges werden auf Profilen und Teasern angezeigt und können im Admin-Bereich verwaltet werden.",
@@ -198,6 +206,7 @@
       },
       "keys": {
         "apiKeysEnabled": "API-Schlüssel",
+        "videoConference": "Videokonferenzen",
         "apiKeysMaxPerUser": "Max. API-Schlüssel pro Nutzer",
         "askForRealName": "Nach echtem Namen fragen",
         "badgesEnabled": "Badges",

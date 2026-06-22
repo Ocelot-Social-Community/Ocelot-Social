@@ -3,107 +3,105 @@ import config from './config.vue'
 
 const localVue = global.localVue
 
-const stubs = {
-  'os-card': { template: '<div><slot /></div>' },
-  'nuxt-link': { template: '<a><slot /></a>', props: ['to'] },
-}
+const stubs = { 'os-card': { template: '<div><slot /></div>' } }
+
+const SAMPLE = [
+  {
+    key: 'videoConference',
+    type: 'boolean',
+    effective: 'true',
+    softwareDefault: 'true',
+    configuredDefault: 'true',
+    envSeed: null,
+    envSeedState: null,
+    requiresEnv: [
+      { name: 'LIVEKIT_URL', state: 'set' },
+      { name: 'LIVEKIT_API_SECRET', state: 'missing' },
+    ],
+    available: false,
+  },
+  {
+    key: 'apiKeysEnabled',
+    type: 'boolean',
+    effective: 'false',
+    softwareDefault: 'false',
+    configuredDefault: 'true',
+    envSeed: 'API_KEYS_ENABLED',
+    envSeedState: 'set',
+    requiresEnv: [],
+    available: true,
+  },
+  {
+    key: 'publicRegistration',
+    type: 'boolean',
+    effective: 'true',
+    softwareDefault: 'false',
+    configuredDefault: 'true',
+    envSeed: 'PUBLIC_REGISTRATION',
+    envSeedState: 'missing',
+    requiresEnv: [],
+    available: true,
+  },
+]
 
 describe('admin/config.vue', () => {
-  let wrapper
   const mocks = { $t: (key) => key }
 
-  const Wrapper = (systemConfig = []) => {
-    const w = shallowMount(config, { mocks, localVue, stubs })
-    w.setData({ systemConfig })
-    return w
+  const Wrapper = (policyConfig = SAMPLE) => {
+    const wrapper = shallowMount(config, { mocks, localVue, stubs })
+    wrapper.setData({ policyConfig })
+    return wrapper
   }
 
-  const envGate = (overrides = {}) => ({
-    gate: 'videoCall',
-    open: false,
-    source: 'env',
-    policyKey: null,
-    keys: [
-      { key: 'LIVEKIT_URL', secret: false, state: 'set', value: 'wss://lk.example.org' },
-      { key: 'LIVEKIT_API_KEY', secret: true, state: 'empty', value: null },
-      { key: 'LIVEKIT_API_SECRET', secret: true, state: 'missing', value: null },
-    ],
-    ...overrides,
-  })
+  describe('helpers', () => {
+    it('fmt parses JSON-encoded values', () => {
+      expect(Wrapper().vm.fmt('true')).toBe('true')
+      expect(Wrapper().vm.fmt('5')).toBe('5')
+      expect(Wrapper().vm.fmt('not json')).toBe('not json')
+    })
 
-  const policyGate = (overrides = {}) => ({
-    gate: 'apiKeys',
-    open: true,
-    source: 'policy',
-    policyKey: 'apiKeysEnabled',
-    keys: [],
-    ...overrides,
-  })
-
-  describe('stateClass', () => {
-    it('maps presence state to badge severity', () => {
-      wrapper = Wrapper()
-      expect(wrapper.vm.stateClass('set')).toBe('ok')
-      expect(wrapper.vm.stateClass('empty')).toBe('warn')
-      expect(wrapper.vm.stateClass('missing')).toBe('error')
+    it('seedSeverity is info when set, warn otherwise', () => {
+      const vm = Wrapper().vm
+      expect(vm.seedSeverity('set')).toBe('info')
+      expect(vm.seedSeverity('missing')).toBe('warn')
     })
   })
 
-  describe('gate status badge', () => {
-    it('shows an error badge when the gate is closed', async () => {
-      wrapper = Wrapper([envGate({ open: false })])
+  describe('required environment section', () => {
+    it('flattens hard requirements and colours by state', async () => {
+      const wrapper = Wrapper()
       await wrapper.vm.$nextTick()
-      const badge = wrapper.find('[data-test="config-gate-videoCall-status"]')
-      expect(badge.classes()).toContain('badge--error')
-      expect(badge.text()).toBe('admin.config.statusNotConfigured')
-    })
-
-    it('shows an ok badge when the gate is open', async () => {
-      wrapper = Wrapper([envGate({ open: true })])
-      await wrapper.vm.$nextTick()
-      const badge = wrapper.find('[data-test="config-gate-videoCall-status"]')
-      expect(badge.classes()).toContain('badge--ok')
-      expect(badge.text()).toBe('admin.config.statusConfigured')
+      expect(wrapper.vm.requiredEnv).toHaveLength(2)
+      const ok = wrapper.find('[data-test="config-required-LIVEKIT_URL"] .badge')
+      const bad = wrapper.find('[data-test="config-required-LIVEKIT_API_SECRET"] .badge')
+      expect(ok.classes()).toContain('badge--ok')
+      expect(bad.classes()).toContain('badge--error')
     })
   })
 
-  describe('env gate keys', () => {
-    beforeEach(async () => {
-      wrapper = Wrapper([envGate()])
+  describe('env-seeded section', () => {
+    it('lists keys with an envSeed and grades the seed presence', async () => {
+      const wrapper = Wrapper()
       await wrapper.vm.$nextTick()
-    })
-
-    it('renders one row per env key with the right state badge', () => {
-      expect(wrapper.find('[data-test="config-key-LIVEKIT_URL"] .badge--ok').exists()).toBe(true)
-      expect(wrapper.find('[data-test="config-key-LIVEKIT_API_KEY"] .badge--warn').exists()).toBe(
-        true,
+      expect(wrapper.vm.seeded.map((entry) => entry.key)).toEqual([
+        'apiKeysEnabled',
+        'publicRegistration',
+      ])
+      expect(wrapper.find('[data-test="config-seed-apiKeysEnabled"] .badge').classes()).toContain(
+        'badge--info',
       )
       expect(
-        wrapper.find('[data-test="config-key-LIVEKIT_API_SECRET"] .badge--error').exists(),
-      ).toBe(true)
-    })
-
-    it('shows the value for non-secret keys but masks secrets', () => {
-      const url = wrapper.find('[data-test="config-key-LIVEKIT_URL"]')
-      expect(url.text()).toContain('wss://lk.example.org')
-      expect(url.find('.key__secret').exists()).toBe(false)
-
-      const secret = wrapper.find('[data-test="config-key-LIVEKIT_API_KEY"]')
-      expect(secret.find('.key__secret').exists()).toBe(true)
-      expect(secret.find('.key__value').exists()).toBe(false)
+        wrapper.find('[data-test="config-seed-publicRegistration"] .badge').classes(),
+      ).toContain('badge--warn')
     })
   })
 
-  describe('policy gate', () => {
-    beforeEach(async () => {
-      wrapper = Wrapper([policyGate()])
+  describe('software defaults section', () => {
+    it('renders one muted row per policy key', async () => {
+      const wrapper = Wrapper()
       await wrapper.vm.$nextTick()
-    })
-
-    it('links to the policy tab and renders no env keys', () => {
-      const section = wrapper.find('[data-test="config-gate-apiKeys"]')
-      expect(section.find('.gate__link').exists()).toBe(true)
-      expect(section.findAll('.key')).toHaveLength(0)
+      expect(wrapper.findAll('[data-test^="config-software-"]')).toHaveLength(3)
+      expect(wrapper.find('[data-test="config-software-videoConference"]').exists()).toBe(true)
     })
   })
 })
