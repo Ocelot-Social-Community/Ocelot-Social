@@ -12,9 +12,7 @@
       </div>
     </os-card>
     <div v-else class="ds-flex ds-flex-gap-small moderation-layout">
-      <div class="moderation-layout__sidebar">
-        <os-menu :routes="accessibleRoutes" link-tag="router-link" />
-      </div>
+      <area-menu :routes="accessibleRoutes" :aria-label="$t('moderation.name')" />
       <div class="moderation-layout__main">
         <transition name="slide-up" appear>
           <nuxt-child />
@@ -25,13 +23,14 @@
 </template>
 
 <script>
-import { OsCard, OsMenu } from '@ocelot-social/ui'
+import { OsCard } from '@ocelot-social/ui'
+import AreaMenu from '~/components/_new/generic/AreaMenu/AreaMenu'
 import areaNavigation from '~/mixins/areaNavigation'
 
 export default {
   components: {
     OsCard,
-    OsMenu,
+    AreaMenu,
   },
   mixins: [areaNavigation],
   // Area access is group-driven (any moderation-group permission); the mixin then
@@ -63,18 +62,11 @@ export default {
 </script>
 
 <style lang="scss">
-.moderation-layout__sidebar,
+// AreaMenu owns its own responsive width (full-width select on narrow viewports,
+// 200px sidebar from $media-query-small up); the main column just fills the rest
+// and shrinks below its content's intrinsic width instead of wrapping under the menu.
 .moderation-layout__main {
-  flex: 0 0 100%;
-  width: 100%;
-}
-@media #{$media-query-medium} {
-  .moderation-layout__sidebar {
-    flex: 0 0 200px;
-    width: 200px;
-  }
-  .moderation-layout__main {
-    flex: 1 0 0;
-  }
+  flex: 1 1 0;
+  min-width: 0;
 }
 </style>

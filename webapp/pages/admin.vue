@@ -10,14 +10,12 @@
       </div>
     </os-card>
     <div v-else class="ds-flex ds-flex-gap-small admin-layout">
-      <div class="admin-layout__sidebar">
-        <os-menu
-          :routes="accessibleRoutes"
-          :matcher="matcher"
-          :is-exact="() => true"
-          link-tag="router-link"
-        />
-      </div>
+      <area-menu
+        :routes="accessibleRoutes"
+        :matcher="matcher"
+        :is-exact="() => true"
+        :aria-label="$t('admin.name')"
+      />
       <div class="admin-layout__main">
         <transition name="slide-up" appear>
           <nuxt-child />
@@ -28,13 +26,14 @@
 </template>
 
 <script>
-import { OsCard, OsMenu } from '@ocelot-social/ui'
+import { OsCard } from '@ocelot-social/ui'
+import AreaMenu from '~/components/_new/generic/AreaMenu/AreaMenu'
 import areaNavigation from '~/mixins/areaNavigation'
 
 export default {
   components: {
     OsCard,
-    OsMenu,
+    AreaMenu,
   },
   mixins: [areaNavigation],
   middleware: ['isAdmin'],
@@ -115,22 +114,12 @@ export default {
 </script>
 
 <style lang="scss">
-.admin-layout__sidebar,
+// AreaMenu owns its own responsive width (full-width select on narrow viewports,
+// 200px sidebar from $media-query-small up). min-width: 0 lets the main column shrink
+// below its content's intrinsic width (e.g. the wide users table), so it stays beside
+// the menu instead of wrapping to a second row under it; the content can then scroll/wrap.
 .admin-layout__main {
-  flex: 0 0 100%;
-  width: 100%;
-}
-@media #{$media-query-medium} {
-  .admin-layout__sidebar {
-    flex: 0 0 200px;
-    width: 200px;
-  }
-  .admin-layout__main {
-    // min-width: 0 lets the main column shrink below its content's intrinsic
-    // width (e.g. the wide users table), so it stays beside the sidebar instead
-    // of wrapping to a second row under it. The content can then scroll/wrap.
-    flex: 1 1 0;
-    min-width: 0;
-  }
+  flex: 1 1 0;
+  min-width: 0;
 }
 </style>

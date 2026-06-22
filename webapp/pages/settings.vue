@@ -4,21 +4,7 @@
       <h1 class="ds-heading ds-heading-h1">{{ $t('settings.name') }}</h1>
     </div>
     <div class="settings-layout">
-      <div class="settings-menu-desktop">
-        <os-menu :routes="routes" :is-exact="() => true" link-tag="router-link" />
-      </div>
-      <div class="settings-menu-mobile">
-        <select
-          class="settings-select"
-          :value="$route.path"
-          :aria-label="$t('settings.name')"
-          @change="$router.push($event.target.value)"
-        >
-          <option v-for="route in routes" :key="route.path" :value="route.path">
-            {{ route.name }}
-          </option>
-        </select>
-      </div>
+      <area-menu :routes="routes" :is-exact="() => true" :aria-label="$t('settings.name')" />
       <div class="settings-content" id="settings-content">
         <transition name="slide-up" appear>
           <nuxt-child />
@@ -29,11 +15,11 @@
 </template>
 
 <script>
-import { OsMenu } from '@ocelot-social/ui'
+import AreaMenu from '~/components/_new/generic/AreaMenu/AreaMenu'
 
 export default {
   components: {
-    OsMenu,
+    AreaMenu,
   },
   computed: {
     routes() {
@@ -126,43 +112,12 @@ export default {
   gap: $space-xx-small;
 }
 
-.settings-menu-desktop {
-  display: none;
-  width: 200px;
-  flex-shrink: 0;
-}
-
-.settings-menu-mobile {
-  display: block;
-  margin-bottom: $space-small;
-}
-
-.settings-select {
-  width: 100%;
-  padding: $space-x-small $space-large $space-x-small $space-small;
-  font-size: $font-size-base;
-  border: 1px solid $color-neutral-80;
-  border-radius: $border-radius-base;
-  background-color: white;
-  color: $text-color-base;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%234b4554' d='M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right $space-small center;
-  cursor: pointer;
-
-  &:focus {
-    outline: 1px dashed $color-primary;
-    outline-offset: -1px;
-  }
-}
-
 .settings-content {
   flex: 1;
   min-width: 0;
 }
 
-@media screen and (min-width: 600px) {
+@media #{$media-query-small} {
   .settings-header {
     margin-bottom: $space-small;
   }
@@ -170,14 +125,6 @@ export default {
   .settings-layout {
     flex-direction: row;
     gap: $space-small;
-  }
-
-  .settings-menu-desktop {
-    display: block;
-  }
-
-  .settings-menu-mobile {
-    display: none;
   }
 
   .settings-content {

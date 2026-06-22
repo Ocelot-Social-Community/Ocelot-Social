@@ -19,10 +19,10 @@ exports[`settings.vue given badges are disabled renders 1`] = `
       class="settings-layout"
     >
       <div
-        class="settings-menu-desktop"
+        class="area-menu"
       >
         <nav
-          class="os-menu"
+          class="area-menu__list os-menu area-menu__list"
         >
           <ul
             class="os-menu-list"
@@ -150,91 +150,88 @@ exports[`settings.vue given badges are disabled renders 1`] = `
             </li>
           </ul>
         </nav>
-      </div>
-       
-      <div
-        class="settings-menu-mobile"
-      >
+         
         <select
           aria-label="settings.name"
-          class="settings-select"
+          class="area-menu__select"
+          data-test="area-menu-select"
         >
           <option
             value="/settings"
           >
             
-          settings.data.name
-        
+      settings.data.name
+    
           </option>
           <option
             value="/settings/my-email-address"
           >
             
-          settings.email.name
-        
+      settings.email.name
+    
           </option>
           <option
             value="/settings/security"
           >
             
-          settings.security.name
-        
+      settings.security.name
+    
           </option>
           <option
             value="/settings/privacy"
           >
             
-          settings.privacy.name
-        
+      settings.privacy.name
+    
           </option>
           <option
             value="/settings/my-social-media"
           >
             
-          settings.social-media.name
-        
+      settings.social-media.name
+    
           </option>
           <option
             value="/settings/muted-users"
           >
             
-          settings.muted-users.name
-        
+      settings.muted-users.name
+    
           </option>
           <option
             value="/settings/blocked-users"
           >
             
-          settings.blocked-users.name
-        
+      settings.blocked-users.name
+    
           </option>
           <option
             value="/settings/embeds"
           >
             
-          settings.embeds.name
-        
+      settings.embeds.name
+    
           </option>
           <option
             value="/settings/notifications"
           >
             
-          settings.notifications.name
-        
+      settings.notifications.name
+    
           </option>
           <option
             value="/settings/data-download"
           >
             
-          settings.download.name
-        
+      settings.download.name
+    
           </option>
           <option
             value="/settings/delete-account"
           >
             
-          settings.deleteUserAccount.name
-        
+      settings.deleteUserAccount.name
+    
           </option>
         </select>
       </div>
@@ -274,10 +271,10 @@ exports[`settings.vue given badges are enabled renders 1`] = `
       class="settings-layout"
     >
       <div
-        class="settings-menu-desktop"
+        class="area-menu"
       >
         <nav
-          class="os-menu"
+          class="area-menu__list os-menu area-menu__list"
         >
           <ul
             class="os-menu-list"
@@ -416,98 +413,95 @@ exports[`settings.vue given badges are enabled renders 1`] = `
             </li>
           </ul>
         </nav>
-      </div>
-       
-      <div
-        class="settings-menu-mobile"
-      >
+         
         <select
           aria-label="settings.name"
-          class="settings-select"
+          class="area-menu__select"
+          data-test="area-menu-select"
         >
           <option
             value="/settings"
           >
             
-          settings.data.name
-        
+      settings.data.name
+    
           </option>
           <option
             value="/settings/my-email-address"
           >
             
-          settings.email.name
-        
+      settings.email.name
+    
           </option>
           <option
             value="/settings/badges"
           >
             
-          settings.badges.name
-        
+      settings.badges.name
+    
           </option>
           <option
             value="/settings/security"
           >
             
-          settings.security.name
-        
+      settings.security.name
+    
           </option>
           <option
             value="/settings/privacy"
           >
             
-          settings.privacy.name
-        
+      settings.privacy.name
+    
           </option>
           <option
             value="/settings/my-social-media"
           >
             
-          settings.social-media.name
-        
+      settings.social-media.name
+    
           </option>
           <option
             value="/settings/muted-users"
           >
             
-          settings.muted-users.name
-        
+      settings.muted-users.name
+    
           </option>
           <option
             value="/settings/blocked-users"
           >
             
-          settings.blocked-users.name
-        
+      settings.blocked-users.name
+    
           </option>
           <option
             value="/settings/embeds"
           >
             
-          settings.embeds.name
-        
+      settings.embeds.name
+    
           </option>
           <option
             value="/settings/notifications"
           >
             
-          settings.notifications.name
-        
+      settings.notifications.name
+    
           </option>
           <option
             value="/settings/data-download"
           >
             
-          settings.download.name
-        
+      settings.download.name
+    
           </option>
           <option
             value="/settings/delete-account"
           >
             
-          settings.deleteUserAccount.name
-        
+      settings.deleteUserAccount.name
+    
           </option>
         </select>
       </div>
