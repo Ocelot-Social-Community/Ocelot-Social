@@ -15,10 +15,13 @@ module.exports = {
     '!**/.eslintrc.js',
     '!**/.prettierrc.js',
     '!**/nuxt.config.js',
+    // Tooling / build-time patch scripts — not shipped app code.
+    '!**/jest.config.js',
+    '!scripts/**',
   ],
   coverageThreshold: {
     global: {
-      lines: 92,
+      lines: 95,
     },
   },
   coverageProvider: 'v8',
