@@ -126,7 +126,11 @@ export default {
     width: 200px;
   }
   .admin-layout__main {
-    flex: 1 0 0;
+    // min-width: 0 lets the main column shrink below its content's intrinsic
+    // width (e.g. the wide users table), so it stays beside the sidebar instead
+    // of wrapping to a second row under it. The content can then scroll/wrap.
+    flex: 1 1 0;
+    min-width: 0;
   }
 }
 </style>
