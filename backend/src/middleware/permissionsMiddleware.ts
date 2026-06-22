@@ -584,6 +584,9 @@ export default shield(
       // Configured defaults + last-change audit info are policy-admin-only
       // (deployment config); bundled in the single policyDefaults query.
       policyDefaults: hasPermission('policy.manage'),
+      // Feature-gate config status (env presence + policy sources). Same admin scope
+      // as policyDefaults; secret values are never returned by the resolver.
+      systemConfig: hasPermission('policy.manage'),
     },
     Mutation: {
       '*': deny,

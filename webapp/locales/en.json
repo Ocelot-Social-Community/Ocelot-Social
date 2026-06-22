@@ -138,6 +138,26 @@
     "pages": {
       "name": "Pages"
     },
+    "config": {
+      "name": "System configuration",
+      "title": "System configuration",
+      "description": "Status of the feature gates and their underlying configuration. Secret values are never shown — only whether they are set.",
+      "gates": {
+        "videoCall": "Video calls (LiveKit)",
+        "apiKeys": "API keys"
+      },
+      "statusConfigured": "configured",
+      "statusNotConfigured": "not configured",
+      "sourceEnv": "Set via environment — changing it requires a redeploy and a backend restart.",
+      "sourcePolicy": "A runtime default — change it on the network policy tab.",
+      "policyLink": "Go to network policy",
+      "state": {
+        "set": "set",
+        "empty": "empty",
+        "missing": "missing"
+      },
+      "secretTag": "secret (value hidden)"
+    },
     "policy": {
       "conflict": {
         "keep": "Keep editing",
@@ -253,6 +273,7 @@
         "videoCall_create_public": "Start a video call in a public group."
       },
       "permUnavailable": "Feature not configured — granting this has no effect.",
+      "permUnavailableLink": "View configuration",
       "protected": "protected",
       "protectedHint": "The owner role holds every permission and cannot be edited.",
       "rename": "Rename role",

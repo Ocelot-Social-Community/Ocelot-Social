@@ -138,6 +138,26 @@
     "pages": {
       "name": "Seiten"
     },
+    "config": {
+      "name": "Systemkonfiguration",
+      "title": "Systemkonfiguration",
+      "description": "Status der Feature-Gates und ihrer zugrundeliegenden Konfiguration. Secret-Werte werden nie angezeigt – nur, ob sie gesetzt sind.",
+      "gates": {
+        "videoCall": "Videoanrufe (LiveKit)",
+        "apiKeys": "API-Keys"
+      },
+      "statusConfigured": "konfiguriert",
+      "statusNotConfigured": "nicht konfiguriert",
+      "sourceEnv": "Über die Umgebung gesetzt – Änderung erfordert ein Redeploy und einen Backend-Neustart.",
+      "sourcePolicy": "Ein Laufzeit-Default – im Reiter Netzwerk-Konfiguration änderbar.",
+      "policyLink": "Zur Netzwerk-Konfiguration",
+      "state": {
+        "set": "gesetzt",
+        "empty": "leer",
+        "missing": "fehlt"
+      },
+      "secretTag": "Secret (Wert verborgen)"
+    },
     "policy": {
       "conflict": {
         "keep": "Weiter bearbeiten",
@@ -253,6 +273,7 @@
         "videoCall_create_public": "Videoanruf in einer öffentlichen Gruppe starten."
       },
       "permUnavailable": "Funktion nicht konfiguriert – das Recht hat keine Wirkung.",
+      "permUnavailableLink": "Konfiguration ansehen",
       "protected": "geschützt",
       "protectedHint": "Die Owner-Rolle hält alle Berechtigungen und kann nicht bearbeitet werden.",
       "rename": "Rolle umbenennen",

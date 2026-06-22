@@ -194,6 +194,14 @@
                 <span class="perm-row__desc">{{ permLabel(permission) }}</span>
                 <span v-if="permission.available === false" class="perm-row__gate">
                   {{ $t('admin.roles.permUnavailable') }}
+                  <nuxt-link
+                    v-if="permission.gatedBy && $can('policy.manage')"
+                    :to="`/admin/config#${permission.gatedBy}`"
+                    class="perm-row__gate-link"
+                    :data-test="`perm-gate-link-${permission.key}`"
+                  >
+                    {{ $t('admin.roles.permUnavailableLink') }}
+                  </nuxt-link>
                 </span>
               </span>
             </label>

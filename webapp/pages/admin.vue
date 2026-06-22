@@ -90,6 +90,11 @@ export default {
           permissions: ['policy.manage'],
         },
         {
+          name: this.$t('admin.config.name'),
+          path: '/admin/config',
+          permissions: ['policy.manage'],
+        },
+        {
           name: this.$t('admin.roles.name'),
           path: '/admin/roles',
           permissions: ['role.manage'],
