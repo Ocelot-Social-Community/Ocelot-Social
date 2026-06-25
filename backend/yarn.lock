@@ -2293,10 +2293,10 @@
     titleize "2"
     tlds "^1.261.0"
 
-"@livekit/protocol@^1.46.3":
-  version "1.46.4"
-  resolved "https://registry.yarnpkg.com/@livekit/protocol/-/protocol-1.46.4.tgz#621c7584d470ace8b4f540dfd2671589483a327e"
-  integrity sha512-yJZ8xvyVcs9CczK2V/EQQrSW0MA9VaZ1vL+FI6fd85KhIjfOg26HvrdUl2LZPT78Tu4R4opV4AW58eN5vgmzqg==
+"@livekit/protocol@^1.46.6":
+  version "1.48.0"
+  resolved "https://registry.yarnpkg.com/@livekit/protocol/-/protocol-1.48.0.tgz#74d44d65fb049e33c927a6ed46b673cb0386b9ab"
+  integrity sha512-fYHYgltH6YavAsokl3qsHLkBdQeKCl4UORVTub5crS3t8JtKFZ0uinHDFQ+XXdNKS6Ub9gcOjV+UHcDiqnWXoQ==
   dependencies:
     "@bufbuild/protobuf" "^1.10.0"
 
@@ -8105,13 +8105,13 @@ linkifyjs@^4.3.2:
   resolved "https://registry.yarnpkg.com/linkifyjs/-/linkifyjs-4.3.2.tgz#d97eb45419aabf97ceb4b05a7adeb7b8c8ade2b1"
   integrity sha512-NT1CJtq3hHIreOianA8aSXn6Cw0JzYOuDQbOrSPe7gqFnCpKP++MQe3ODgO3oh2GJFORkAAdqredOa60z63GbA==
 
-livekit-server-sdk@^2.15.4:
-  version "2.15.4"
-  resolved "https://registry.yarnpkg.com/livekit-server-sdk/-/livekit-server-sdk-2.15.4.tgz#01dcbd4fe79ce822f536bd1f876c2f6f9d8d7d01"
-  integrity sha512-L/Ynu5zH1Qjfifmk3LnymL2JpvtisMFCM2wf7iM6H42WZRx6yvRECXa0hiK9/zi7br8d1x/a7fQIw1yJ/bneOA==
+livekit-server-sdk@^2.15.5:
+  version "2.15.5"
+  resolved "https://registry.yarnpkg.com/livekit-server-sdk/-/livekit-server-sdk-2.15.5.tgz#51330638acfac71d1c4016ffc977ec9e056c4cda"
+  integrity sha512-Uzs4tVebvY4/+pO9pG1nMMVRDZPnOJolZIOWIiSEnUXFBywq+eNWHrR8mplKL8Qn13mSTQLjKVXfGCGTAMQeYg==
   dependencies:
     "@bufbuild/protobuf" "^1.10.1"
-    "@livekit/protocol" "^1.46.3"
+    "@livekit/protocol" "^1.46.6"
     camelcase-keys "^9.0.0"
     jose "^5.1.2"
 

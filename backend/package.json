@@ -63,7 +63,7 @@
     "languagedetect": "^2.0.0",
     "linkify-html": "^4.3.2",
     "linkifyjs": "^4.3.2",
-    "livekit-server-sdk": "^2.15.4",
+    "livekit-server-sdk": "^2.15.5",
     "lodash": "~4.18.1",
     "metascraper": "^5.50.0",
     "metascraper-author": "^5.50.0",
