@@ -44,7 +44,7 @@
     "@types/mime-types": "^3.0.1",
     "ajv": "^8.20.0",
     "bcryptjs": "~3.0.3",
-    "body-parser": "^2.2.2",
+    "body-parser": "^2.3.0",
     "cheerio": "~1.2.0",
     "cross-env": "~10.1.0",
     "dotenv": "~17.0.1",
