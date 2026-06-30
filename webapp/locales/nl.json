@@ -1150,9 +1150,9 @@
     "memberSince": "Lid sinds",
     "network": {
       "andMore": "en {number} meer …",
-      "followedBy": "wordt gevolgd door:",
+      "followedBy": "wordt gevolgd door",
       "followedByNobody": "wordt door niemand gevolgd.",
-      "following": "volgt:",
+      "following": "volgt",
       "followingNobody": "volgt niemand.",
       "title": "Netwerk"
     },

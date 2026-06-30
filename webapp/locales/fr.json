@@ -1150,9 +1150,9 @@
     "memberSince": "Membre depuis",
     "network": {
       "andMore": "et {number} plus…",
-      "followedBy": "est suivi par:",
+      "followedBy": "est suivi par",
       "followedByNobody": "n'est suivi par personne.",
-      "following": "suit:",
+      "following": "suit",
       "followingNobody": "ne suit personne.",
       "title": "Réseau"
     },

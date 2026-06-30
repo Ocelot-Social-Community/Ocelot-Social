@@ -1150,9 +1150,9 @@
     "memberSince": "Учасник з",
     "network": {
       "andMore": "та ще {number} …",
-      "followedBy": "підписані:",
+      "followedBy": "підписані",
       "followedByNobody": "ніхто не підписаний.",
-      "following": "підписаний(-а) на:",
+      "following": "підписаний(-а) на",
       "followingNobody": "ні на кого не підписаний(-а).",
       "title": "Мережа"
     },

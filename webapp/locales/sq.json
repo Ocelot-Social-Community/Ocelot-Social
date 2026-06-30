@@ -1150,9 +1150,9 @@
     "memberSince": "Anëtar që nga",
     "network": {
       "andMore": "dhe {number} më shumë …",
-      "followedBy": "ndiqet nga:",
+      "followedBy": "ndiqet nga",
       "followedByNobody": "nuk ndiqet nga askush.",
-      "following": "po ndjek:",
+      "following": "po ndjek",
       "followingNobody": "nuk ndjek askënd.",
       "title": "Rrjeti"
     },
