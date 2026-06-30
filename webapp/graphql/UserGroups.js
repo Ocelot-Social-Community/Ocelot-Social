@@ -34,3 +34,13 @@ export const setGroupMembershipVisibilityMutation = () => {
     }
   `
 }
+
+export const groupMembershipVisibilityChangedSubscription = () => {
+  return gql`
+    subscription GroupMembershipVisibilityChanged($userId: ID!) {
+      groupMembershipVisibilityChanged(userId: $userId) {
+        userId
+      }
+    }
+  `
+}

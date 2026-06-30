@@ -44,7 +44,11 @@
 import { OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
-import { profileUserGroupsQuery, setGroupMembershipVisibilityMutation } from '~/graphql/UserGroups'
+import {
+  profileUserGroupsQuery,
+  setGroupMembershipVisibilityMutation,
+  groupMembershipVisibilityChangedSubscription,
+} from '~/graphql/UserGroups'
 
 const GROUP_TYPES = ['public', 'closed', 'hidden']
 
@@ -68,6 +72,23 @@ export default {
   },
   created() {
     this.icons = iconRegistry
+  },
+  mounted() {
+    const observer = this.$apollo.subscribe({
+      query: groupMembershipVisibilityChangedSubscription(),
+      variables: { userId: this.userId },
+    })
+    this._groupVisibilitySubscription = observer.subscribe({
+      next: () => {
+        this.$apollo.queries.groups.refetch()
+      },
+      error: () => {},
+    })
+  },
+  beforeDestroy() {
+    if (this._groupVisibilitySubscription) {
+      this._groupVisibilitySubscription.unsubscribe()
+    }
   },
   computed: {
     hasGroups() {

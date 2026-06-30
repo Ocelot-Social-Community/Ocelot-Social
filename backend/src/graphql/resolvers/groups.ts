@@ -8,9 +8,11 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { v4 as uuid } from 'uuid'
+import { withFilter } from 'graphql-subscriptions'
 
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '@constants/categories'
 import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '@constants/groups'
+import { GROUP_MEMBERSHIP_VISIBILITY_CHANGED } from '@constants/subscriptions'
 import { ForbiddenError, UserInputError } from '@graphql/errors'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
 
@@ -495,6 +497,9 @@ export default {
           if (!membership) {
             throw new UserInputError('User is not a member of this group')
           }
+          void context.pubsub.publish(GROUP_MEMBERSHIP_VISIBILITY_CHANGED, {
+            groupMembershipVisibilityChanged: { userId },
+          })
           return membership
         })
       } finally {
@@ -668,6 +673,22 @@ export default {
         return parent.groupType === 'hidden' ? '' : parent.about
       }
       return parent.about
+    },
+  },
+  Subscription: {
+    groupMembershipVisibilityChanged: {
+      subscribe: withFilter(
+        (_parent, _args, context: Context) =>
+          context.pubsub.asyncIterator(GROUP_MEMBERSHIP_VISIBILITY_CHANGED),
+        (
+          payload: { groupMembershipVisibilityChanged: { userId: string } },
+          args: { userId: string },
+          context: Context,
+        ) => {
+          if (!context.user) return false
+          return payload.groupMembershipVisibilityChanged.userId === args.userId
+        },
+      ),
     },
   },
 }

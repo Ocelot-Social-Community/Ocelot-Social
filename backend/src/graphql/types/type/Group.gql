@@ -150,3 +150,11 @@ type Mutation {
 
   setGroupMembershipVisibility(groupId: ID!, showOnProfile: Boolean!): MEMBER_OF
 }
+
+type GroupMembershipVisibilityChanged {
+  userId: ID!
+}
+
+type Subscription {
+  groupMembershipVisibilityChanged(userId: ID!): GroupMembershipVisibilityChanged!
+}
