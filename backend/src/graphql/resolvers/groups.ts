@@ -64,7 +64,7 @@ export default {
             ${(isMember === true && "WHERE membership IS NOT NULL AND (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])") || ''}
             ${(isMember === false && "WHERE membership IS NULL AND (group.groupType IN ['public', 'closed'])") || ''}
             ${(isMember === undefined && "WHERE (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])") || ''}
-            RETURN group {.*, myRole: membership.role}
+            RETURN group {.*, myRole: membership.role, showOnProfile: coalesce(membership.showOnProfile, true)}
             ORDER BY group.createdAt DESC
             ${first !== undefined && offset !== undefined ? 'SKIP toInteger($offset) LIMIT toInteger($first)' : ''}
           `,
@@ -472,6 +472,35 @@ export default {
         await session.close()
       }
     },
+    setGroupMembershipVisibility: async (_parent, params, context: Context, _resolveInfo) => {
+      if (!context.user) {
+        throw new Error('Missing authenticated user.')
+      }
+      const { groupId, showOnProfile } = params
+      const userId = context.user.id
+      const session = context.driver.session()
+      try {
+        return await session.writeTransaction(async (transaction) => {
+          const result = await transaction.run(
+            `
+              MATCH (user:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
+              WHERE membership.role IN ['usual', 'admin', 'owner']
+              SET membership.showOnProfile = $showOnProfile
+              SET membership.updatedAt = toString(datetime())
+              RETURN membership {.*}
+            `,
+            { userId, groupId, showOnProfile },
+          )
+          const [membership] = result.records.map((r) => r.get('membership'))
+          if (!membership) {
+            throw new UserInputError('User is not a member of this group')
+          }
+          return membership
+        })
+      } finally {
+        await session.close()
+      }
+    },
     unmuteGroup: async (_parent, params, context: Context, _resolveInfo) => {
       if (!context.user) {
         throw new Error('Missing authenticated user.')
@@ -496,6 +525,51 @@ export default {
           )
           const [group] = transactionResponse.records.map((record) => record.get('group'))
           return group
+        })
+      } finally {
+        await session.close()
+      }
+    },
+  },
+  User: {
+    groups: async (parent, _args, context: Context, _resolveInfo) => {
+      const profileUserId = parent.id
+      const viewerId = context.user?.id
+      const isOwnProfile = profileUserId === viewerId
+      const session = context.driver.session()
+      try {
+        return await session.readTransaction(async (txc) => {
+          let cypher: string
+          if (isOwnProfile) {
+            cypher = `
+              MATCH (profileUser:User {id: $profileUserId})-[membership:MEMBER_OF]->(group:Group)
+              WHERE membership.role IN ['usual', 'admin', 'owner']
+              RETURN group {.*, myRole: membership.role, showOnProfile: coalesce(membership.showOnProfile, true)}
+              ORDER BY group.groupType ASC, group.createdAt DESC
+            `
+          } else {
+            cypher = `
+              MATCH (profileUser:User {id: $profileUserId})-[membership:MEMBER_OF]->(group:Group)
+              WHERE membership.role IN ['usual', 'admin', 'owner']
+                AND coalesce(membership.showOnProfile, true) = true
+              OPTIONAL MATCH (viewer:User {id: $viewerId})-[viewerMembership:MEMBER_OF]->(group)
+              WITH profileUser, membership, group, viewerMembership
+              WHERE (
+                (group.groupType = 'public' AND coalesce(profileUser.showPublicGroupsOnProfile, true) = true)
+                OR (group.groupType = 'closed' AND coalesce(profileUser.showClosedGroupsOnProfile, true) = true)
+                OR (
+                  group.groupType = 'hidden'
+                  AND coalesce(profileUser.showHiddenGroupsOnProfile, true) = true
+                  AND viewerMembership IS NOT NULL
+                  AND viewerMembership.role IN ['usual', 'admin', 'owner']
+                )
+              )
+              RETURN group {.*, myRole: membership.role, showOnProfile: coalesce(membership.showOnProfile, true)}
+              ORDER BY group.groupType ASC, group.createdAt DESC
+            `
+          }
+          const result = await txc.run(cypher, { profileUserId, viewerId })
+          return result.records.map((r) => r.get('group'))
         })
       } finally {
         await session.close()

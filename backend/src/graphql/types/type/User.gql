@@ -61,6 +61,9 @@ type User {
 
   allowEmbedIframes: Boolean
   showShoutsPublicly: Boolean
+  showPublicGroupsOnProfile: Boolean
+  showClosedGroupsOnProfile: Boolean
+  showHiddenGroupsOnProfile: Boolean
   emailNotificationSettings: [EmailNotificationSettings]! @neo4j_ignore
   locale: String
   friends: [User]! @relation(name: "FRIENDS", direction: "BOTH")
@@ -139,6 +142,8 @@ type User {
   emotions: [EMOTED]
 
   activeCategories: [String] @neo4j_ignore
+
+  groups: [Group] @neo4j_ignore
 }
 
 input _UserFilter {
@@ -220,6 +225,9 @@ type Mutation {
     termsAndConditionsAgreedAt: String
     allowEmbedIframes: Boolean
     showShoutsPublicly: Boolean
+    showPublicGroupsOnProfile: Boolean
+    showClosedGroupsOnProfile: Boolean
+    showHiddenGroupsOnProfile: Boolean
     emailNotificationSettings: [EmailNotificationSettingsInput]
     locale: String
   ): User

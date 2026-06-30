@@ -748,7 +748,9 @@
       "menuButton": "Group menu",
       "muteGroup": "Mute group",
       "unmuteGroup": "Unmute group",
-      "visitGroupPage": "Show group"
+      "visitGroupPage": "Show group",
+      "showOnProfile": "Show on my profile",
+      "hideFromProfile": "Hide from my profile"
     },
     "createNewGroup": {
       "title": "Create A New Group",
@@ -1156,7 +1158,15 @@
     },
     "shouted": "Shouted",
     "socialMedia": "Where else can I find",
-    "userAnonym": "Anonymous"
+    "userAnonym": "Anonymous",
+    "groups": {
+      "title": "Groups",
+      "public": "Public groups",
+      "closed": "Closed groups",
+      "hidden": "Secret groups",
+      "nobody": "no groups",
+      "hiddenFromOthers": "hidden from others"
+    }
   },
   "quotes": {
     "african": {
@@ -1454,7 +1464,11 @@
     "privacy": {
       "make-shouts-public": "Share articles I have shouted on my public profile",
       "name": "Privacy",
-      "success-update": "Privacy settings saved!"
+      "success-update": "Privacy settings saved!",
+      "show-groups-on-profile-section": "Show groups on profile",
+      "show-public-groups-on-profile": "Show public groups on my profile",
+      "show-closed-groups-on-profile": "Show closed groups on my profile",
+      "show-hidden-groups-on-profile": "Show secret groups on my profile"
     },
     "security": {
       "change-password": {

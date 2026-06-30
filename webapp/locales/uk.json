@@ -748,7 +748,9 @@
       "menuButton": "Меню групи",
       "muteGroup": "Вимкнути сповіщення групи",
       "unmuteGroup": "Увімкнути сповіщення групи",
-      "visitGroupPage": "Показати групу"
+      "visitGroupPage": "Показати групу",
+      "showOnProfile": "Show on my profile",
+      "hideFromProfile": "Hide from my profile"
     },
     "createNewGroup": {
       "title": "Створити нову групу",
@@ -1156,7 +1158,15 @@
     },
     "shouted": "Рекомендовано",
     "socialMedia": "Де ще можна знайти",
-    "userAnonym": "Анонімний"
+    "userAnonym": "Анонімний",
+    "groups": {
+      "title": "Groups",
+      "public": "Public groups",
+      "closed": "Closed groups",
+      "hidden": "Secret groups",
+      "nobody": "no groups",
+      "hiddenFromOthers": "hidden from others"
+    }
   },
   "quotes": {
     "african": {
@@ -1454,7 +1464,11 @@
     "privacy": {
       "make-shouts-public": "Показувати статті, які я рекомендував(-ла), у моєму публічному профілі",
       "name": "Конфіденційність",
-      "success-update": "Налаштування конфіденційності збережено!"
+      "success-update": "Налаштування конфіденційності збережено!",
+      "show-groups-on-profile-section": "Show groups on profile",
+      "show-public-groups-on-profile": "Show public groups on my profile",
+      "show-closed-groups-on-profile": "Show closed groups on my profile",
+      "show-hidden-groups-on-profile": "Show secret groups on my profile"
     },
     "security": {
       "change-password": {

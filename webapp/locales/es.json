@@ -748,7 +748,9 @@
       "menuButton": "Menú del grupo",
       "muteGroup": "Silenciar grupo",
       "unmuteGroup": "Desactivar silencio del grupo",
-      "visitGroupPage": "Mostrar grupo"
+      "visitGroupPage": "Mostrar grupo",
+      "showOnProfile": "Show on my profile",
+      "hideFromProfile": "Hide from my profile"
     },
     "createNewGroup": {
       "title": "Crear un nuevo grupo",
@@ -1156,7 +1158,15 @@
     },
     "shouted": "Recomendado",
     "socialMedia": "¿Dónde más puedo encontrar?",
-    "userAnonym": "Anónimo"
+    "userAnonym": "Anónimo",
+    "groups": {
+      "title": "Groups",
+      "public": "Public groups",
+      "closed": "Closed groups",
+      "hidden": "Secret groups",
+      "nobody": "no groups",
+      "hiddenFromOthers": "hidden from others"
+    }
   },
   "quotes": {
     "african": {
@@ -1454,7 +1464,11 @@
     "privacy": {
       "make-shouts-public": "Compartir artículos que he recomendado en mi perfil público",
       "name": "Privacidad",
-      "success-update": "Configuración de privacidad guardada"
+      "success-update": "Configuración de privacidad guardada",
+      "show-groups-on-profile-section": "Show groups on profile",
+      "show-public-groups-on-profile": "Show public groups on my profile",
+      "show-closed-groups-on-profile": "Show closed groups on my profile",
+      "show-hidden-groups-on-profile": "Show secret groups on my profile"
     },
     "security": {
       "change-password": {

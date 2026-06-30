@@ -1,0 +1,53 @@
+import { getDriver } from '@db/neo4j'
+
+export const description =
+  'Add showOnProfile field to all existing MEMBER_OF relationships, defaulting to true. Controls whether a group membership is displayed on the user profile page.'
+
+export async function up(_next) {
+  const driver = getDriver()
+  const session = driver.session()
+  const transaction = session.beginTransaction()
+  try {
+    await transaction.run(
+      `
+        MATCH (user:User)-[membership:MEMBER_OF]->(group:Group)
+        WHERE membership.showOnProfile IS NULL
+        SET membership.showOnProfile = true
+      `,
+    )
+    await transaction.commit()
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.log(error)
+    await transaction.rollback()
+    // eslint-disable-next-line no-console
+    console.log('rolled back')
+    throw new Error(error)
+  } finally {
+    await session.close()
+  }
+}
+
+export async function down(_next) {
+  const driver = getDriver()
+  const session = driver.session()
+  const transaction = session.beginTransaction()
+  try {
+    await transaction.run(
+      `
+        MATCH (user:User)-[membership:MEMBER_OF]->(group:Group)
+        REMOVE membership.showOnProfile
+      `,
+    )
+    await transaction.commit()
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.log(error)
+    await transaction.rollback()
+    // eslint-disable-next-line no-console
+    console.log('rolled back')
+    throw new Error(error)
+  } finally {
+    await session.close()
+  }
+}

@@ -748,7 +748,9 @@
       "menuButton": "Groepsmenu",
       "muteGroup": "Groep dempen",
       "unmuteGroup": "Groep niet meer dempen",
-      "visitGroupPage": "Groep bekijken"
+      "visitGroupPage": "Groep bekijken",
+      "showOnProfile": "Show on my profile",
+      "hideFromProfile": "Hide from my profile"
     },
     "createNewGroup": {
       "title": "Een nieuwe groep aanmaken",
@@ -1156,7 +1158,15 @@
     },
     "shouted": "Geshout",
     "socialMedia": "Waar vind ik nog meer",
-    "userAnonym": "Anoniem"
+    "userAnonym": "Anoniem",
+    "groups": {
+      "title": "Groups",
+      "public": "Public groups",
+      "closed": "Closed groups",
+      "hidden": "Secret groups",
+      "nobody": "no groups",
+      "hiddenFromOthers": "hidden from others"
+    }
   },
   "quotes": {
     "african": {
@@ -1454,7 +1464,11 @@
     "privacy": {
       "make-shouts-public": "Artikelen die ik heb geshout delen op mijn openbare profiel",
       "name": "Privacy",
-      "success-update": "Privacy-instellingen opgeslagen!"
+      "success-update": "Privacy-instellingen opgeslagen!",
+      "show-groups-on-profile-section": "Show groups on profile",
+      "show-public-groups-on-profile": "Show public groups on my profile",
+      "show-closed-groups-on-profile": "Show closed groups on my profile",
+      "show-hidden-groups-on-profile": "Show secret groups on my profile"
     },
     "security": {
       "change-password": {

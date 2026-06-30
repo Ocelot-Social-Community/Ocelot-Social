@@ -748,7 +748,9 @@
       "menuButton": "Menuja e grupit",
       "muteGroup": "Hesht grupin",
       "unmuteGroup": "Çhesht grupin",
-      "visitGroupPage": "Shfaq grupin"
+      "visitGroupPage": "Shfaq grupin",
+      "showOnProfile": "Show on my profile",
+      "hideFromProfile": "Hide from my profile"
     },
     "createNewGroup": {
       "title": "Krijo një grup të ri",
@@ -1156,7 +1158,15 @@
     },
     "shouted": "Rekomanduar",
     "socialMedia": "Ku tjetër mund ta gjej",
-    "userAnonym": "Anonim"
+    "userAnonym": "Anonim",
+    "groups": {
+      "title": "Groups",
+      "public": "Public groups",
+      "closed": "Closed groups",
+      "hidden": "Secret groups",
+      "nobody": "no groups",
+      "hiddenFromOthers": "hidden from others"
+    }
   },
   "quotes": {
     "african": {
@@ -1454,7 +1464,11 @@
     "privacy": {
       "make-shouts-public": "Ndaj artikujt që kam rekomanduar në profilin tim publik",
       "name": "Privatësia",
-      "success-update": "Cilësimet e privatësisë u ruajtën!"
+      "success-update": "Cilësimet e privatësisë u ruajtën!",
+      "show-groups-on-profile-section": "Show groups on profile",
+      "show-public-groups-on-profile": "Show public groups on my profile",
+      "show-closed-groups-on-profile": "Show closed groups on my profile",
+      "show-hidden-groups-on-profile": "Show secret groups on my profile"
     },
     "security": {
       "change-password": {

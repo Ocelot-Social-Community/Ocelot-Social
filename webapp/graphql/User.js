@@ -343,6 +343,9 @@ export const updateUserMutation = () => {
       $about: String
       $allowEmbedIframes: Boolean
       $showShoutsPublicly: Boolean
+      $showPublicGroupsOnProfile: Boolean
+      $showClosedGroupsOnProfile: Boolean
+      $showHiddenGroupsOnProfile: Boolean
       $emailNotificationSettings: [EmailNotificationSettingsInput]
       $termsAndConditionsAgreedVersion: String
       $avatar: ImageInput
@@ -356,6 +359,9 @@ export const updateUserMutation = () => {
         about: $about
         allowEmbedIframes: $allowEmbedIframes
         showShoutsPublicly: $showShoutsPublicly
+        showPublicGroupsOnProfile: $showPublicGroupsOnProfile
+        showClosedGroupsOnProfile: $showClosedGroupsOnProfile
+        showHiddenGroupsOnProfile: $showHiddenGroupsOnProfile
         emailNotificationSettings: $emailNotificationSettings
         termsAndConditionsAgreedVersion: $termsAndConditionsAgreedVersion
         avatar: $avatar
@@ -369,6 +375,9 @@ export const updateUserMutation = () => {
         about
         allowEmbedIframes
         showShoutsPublicly
+        showPublicGroupsOnProfile
+        showClosedGroupsOnProfile
+        showHiddenGroupsOnProfile
         emailNotificationSettings {
           type
           settings {

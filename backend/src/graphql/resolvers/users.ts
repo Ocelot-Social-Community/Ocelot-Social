@@ -686,6 +686,9 @@ export default {
         'termsAndConditionsAgreedAt',
         'allowEmbedIframes',
         'showShoutsPublicly',
+        'showPublicGroupsOnProfile',
+        'showClosedGroupsOnProfile',
+        'showHiddenGroupsOnProfile',
         'locale',
       ],
       boolean: {
