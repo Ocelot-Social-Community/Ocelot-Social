@@ -3313,10 +3313,10 @@
   resolved "https://registry.yarnpkg.com/@livekit/mutex/-/mutex-1.1.1.tgz#72492b611d55be8130ba2271b7a436d94b1bc6d4"
   integrity sha512-EsshAucklmpuUAfkABPxJNhzj9v2sG7JuzFDL4ML1oJQSV14sqrpTYnsaOudMAw9yOaW53NU3QQTlUQoRs4czw==
 
-"@livekit/protocol@1.45.8":
-  version "1.45.8"
-  resolved "https://registry.yarnpkg.com/@livekit/protocol/-/protocol-1.45.8.tgz#8314925fcd285f3fe5e3cc3b38110dbc4ed77d8f"
-  integrity sha512-Q+l57E7w/xxOBFVWzdX5rkAZO7ffyF+rlDzNUYq2SU114+5aTyCq+PK4unaEVDNd4952Af7wteKr3sOgasGuaA==
+"@livekit/protocol@1.46.6":
+  version "1.46.6"
+  resolved "https://registry.yarnpkg.com/@livekit/protocol/-/protocol-1.46.6.tgz#329cb5c81b7b7b32e0243b6b8069cb3af94d5cf7"
+  integrity sha512-upzlHP1vi/kZ/QqALZTFskQ0ifqc2f15RKucHYOsIHJsaXvEYanG75mAb7o+Yomfs4XhQ4BaRsdY+TFHXpaqrg==
   dependencies:
     "@bufbuild/protobuf" "^1.10.0"
 
@@ -14242,13 +14242,13 @@ listr@0.14.3:
     p-map "^2.0.0"
     rxjs "^6.3.3"
 
-livekit-client@^2.19.2:
-  version "2.19.2"
-  resolved "https://registry.yarnpkg.com/livekit-client/-/livekit-client-2.19.2.tgz#641fca83b7edf3f4022134a7079553794e04017f"
-  integrity sha512-Kvk07QYDWRAbmYNLRll04ZIuxMQobW/oLPYnmR1kCy8GGHpU0gqyHf704Rz+29zfy8IJZRjKqeVbzGSKn9sumw==
+livekit-client@^2.20.0:
+  version "2.20.0"
+  resolved "https://registry.yarnpkg.com/livekit-client/-/livekit-client-2.20.0.tgz#e7459a7aba0670a217f2f219d7b4dbf1e5548773"
+  integrity sha512-RIJcpvBmOmwz3jTj3rmdY6Dzr55HrhcaJjMgY+HSmoEM+yIRyA40m7r8UKv0hnZWM3z/AYhP1q8C8ciz5UWFKQ==
   dependencies:
     "@livekit/mutex" "1.1.1"
-    "@livekit/protocol" "1.45.8"
+    "@livekit/protocol" "1.46.6"
     events "^3.3.0"
     jose "^6.1.0"
     loglevel "^1.9.2"
@@ -17434,10 +17434,10 @@ prettier@^1.18.2:
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.8.8.tgz#e8c5d7e98a4305ffe3de2e1fc4aca1a71c28b1da"
   integrity sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==
 
-prettier@~3.8.4:
-  version "3.8.4"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.8.4.tgz#f334f013ac04a96676f24dabc23c1c4ae1bae411"
-  integrity sha512-N2MylSdi48+5N/6S5j+maeHbUSIzzZ5uOcX5Hm4QpV8Dkb1HFjfAKTKX6yNPJQD9AhcT3ifHNB66tWTTJDi11Q==
+prettier@~3.9.3:
+  version "3.9.3"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.9.3.tgz#4caabe6fb955e8b8f13319f25872522ece519534"
+  integrity sha512-HWmu+K+zvHNpaMfSnYeqdqrDbR16cuIXaPx8WoHaviQkDJh1/0BNtOZmHVQI5jc3wXv0H1yXc9wjvFdXh+n3hQ==
 
 pretty-bytes@^5.6.0:
   version "5.6.0"
