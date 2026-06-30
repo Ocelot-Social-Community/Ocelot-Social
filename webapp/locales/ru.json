@@ -750,7 +750,8 @@
       "unmuteGroup": "Включить уведомления группы",
       "visitGroupPage": "Показать группу",
       "showOnProfile": "Show on my profile",
-      "hideFromProfile": "Hide from my profile"
+      "hideFromProfile": "Hide from my profile",
+      "profileVisibilityUpdated": "Видимость обновлена"
     },
     "createNewGroup": {
       "title": "Создать новую группу",
@@ -1466,9 +1467,10 @@
       "name": "Конфиденциальность",
       "success-update": "Настройки приватности сохранены",
       "show-groups-on-profile-section": "Show groups on profile",
+      "show-groups-on-profile-hint": "Видимость каждой отдельной группы также можно настроить через меню с тремя точками группы или непосредственно в списке групп на вашем профиле.",
       "show-public-groups-on-profile": "Show public groups on my profile",
       "show-closed-groups-on-profile": "Show closed groups on my profile",
-      "show-hidden-groups-on-profile": "Show secret groups on my profile"
+      "show-hidden-groups-on-profile": "Показывать секретные группы в моём профиле"
     },
     "security": {
       "change-password": {

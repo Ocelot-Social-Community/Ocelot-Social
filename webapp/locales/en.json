@@ -750,7 +750,8 @@
       "unmuteGroup": "Unmute group",
       "visitGroupPage": "Show group",
       "showOnProfile": "Show on my profile",
-      "hideFromProfile": "Hide from my profile"
+      "hideFromProfile": "Hide from my profile",
+      "profileVisibilityUpdated": "Visibility updated"
     },
     "createNewGroup": {
       "title": "Create A New Group",
@@ -1466,6 +1467,7 @@
       "name": "Privacy",
       "success-update": "Privacy settings saved!",
       "show-groups-on-profile-section": "Show groups on profile",
+      "show-groups-on-profile-hint": "The visibility of each individual group can also be set via the group's three-dot menu or directly in the group list on your profile.",
       "show-public-groups-on-profile": "Show public groups on my profile",
       "show-closed-groups-on-profile": "Show closed groups on my profile",
       "show-hidden-groups-on-profile": "Show secret groups on my profile"

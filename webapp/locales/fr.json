@@ -750,7 +750,8 @@
       "unmuteGroup": "Réactiver le groupe",
       "visitGroupPage": "Afficher le groupe",
       "showOnProfile": "Show on my profile",
-      "hideFromProfile": "Hide from my profile"
+      "hideFromProfile": "Hide from my profile",
+      "profileVisibilityUpdated": "Visibilité mise à jour"
     },
     "createNewGroup": {
       "title": "Créer un nouveau groupe",
@@ -1466,9 +1467,10 @@
       "name": "Confidentialité",
       "success-update": "Paramètres de confidentialité enregistrés",
       "show-groups-on-profile-section": "Show groups on profile",
+      "show-groups-on-profile-hint": "La visibilité de chaque groupe individuel peut également être définie via le menu à trois points du groupe ou directement dans la liste des groupes sur votre profil.",
       "show-public-groups-on-profile": "Show public groups on my profile",
       "show-closed-groups-on-profile": "Show closed groups on my profile",
-      "show-hidden-groups-on-profile": "Show secret groups on my profile"
+      "show-hidden-groups-on-profile": "Afficher les groupes secrets sur mon profil"
     },
     "security": {
       "change-password": {

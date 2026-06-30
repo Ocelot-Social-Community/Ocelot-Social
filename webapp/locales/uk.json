@@ -750,7 +750,8 @@
       "unmuteGroup": "Увімкнути сповіщення групи",
       "visitGroupPage": "Показати групу",
       "showOnProfile": "Show on my profile",
-      "hideFromProfile": "Hide from my profile"
+      "hideFromProfile": "Hide from my profile",
+      "profileVisibilityUpdated": "Видимість оновлено"
     },
     "createNewGroup": {
       "title": "Створити нову групу",
@@ -1466,9 +1467,10 @@
       "name": "Конфіденційність",
       "success-update": "Налаштування конфіденційності збережено!",
       "show-groups-on-profile-section": "Show groups on profile",
+      "show-groups-on-profile-hint": "Видимість кожної окремої групи також можна налаштувати через меню з трьома крапками групи або безпосередньо в списку груп у вашому профілі.",
       "show-public-groups-on-profile": "Show public groups on my profile",
       "show-closed-groups-on-profile": "Show closed groups on my profile",
-      "show-hidden-groups-on-profile": "Show secret groups on my profile"
+      "show-hidden-groups-on-profile": "Показувати таємні групи в моєму профілі"
     },
     "security": {
       "change-password": {

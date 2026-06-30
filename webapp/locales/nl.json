@@ -750,7 +750,8 @@
       "unmuteGroup": "Groep niet meer dempen",
       "visitGroupPage": "Groep bekijken",
       "showOnProfile": "Show on my profile",
-      "hideFromProfile": "Hide from my profile"
+      "hideFromProfile": "Hide from my profile",
+      "profileVisibilityUpdated": "Zichtbaarheid bijgewerkt"
     },
     "createNewGroup": {
       "title": "Een nieuwe groep aanmaken",
@@ -1466,9 +1467,10 @@
       "name": "Privacy",
       "success-update": "Privacy-instellingen opgeslagen!",
       "show-groups-on-profile-section": "Show groups on profile",
+      "show-groups-on-profile-hint": "De zichtbaarheid van elke afzonderlijke groep kan ook worden ingesteld via het driepuntsmenu van de groep of rechtstreeks in de groeplijst op uw profiel.",
       "show-public-groups-on-profile": "Show public groups on my profile",
       "show-closed-groups-on-profile": "Show closed groups on my profile",
-      "show-hidden-groups-on-profile": "Show secret groups on my profile"
+      "show-hidden-groups-on-profile": "Geheime groepen op mijn profiel weergeven"
     },
     "security": {
       "change-password": {

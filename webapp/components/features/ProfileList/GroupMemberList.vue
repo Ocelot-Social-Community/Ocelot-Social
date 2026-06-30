@@ -143,7 +143,7 @@ export default {
   }
 
   > :nth-child(n):not(:last-child) {
-    margin-bottom: $space-small;
+    margin-bottom: $space-x-small;
   }
 
   .type-label {
@@ -155,7 +155,7 @@ export default {
   .group-list {
     list-style: none;
     padding: 0;
-    margin: 0 0 $space-x-small 0;
+    margin: 0;
   }
 
   .group-item {

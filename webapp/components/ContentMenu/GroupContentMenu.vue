@@ -73,6 +73,11 @@ export default {
     this.icons = iconRegistry
     this.localShowOnProfile = this.group.showOnProfile !== false
   },
+  watch: {
+    'group.showOnProfile'(newVal) {
+      this.localShowOnProfile = newVal !== false
+    },
+  },
   computed: {
     isMember() {
       return ['usual', 'admin', 'owner'].includes(this.group.myRole)
@@ -162,6 +167,7 @@ export default {
         })
         this.localShowOnProfile = showOnProfile
         this.$emit('profileVisibilityChanged', this.group.id, showOnProfile)
+        this.$toast.success(this.$t('group.contentMenu.profileVisibilityUpdated'))
       } catch (error) {
         this.$toast.error(error.message)
       }

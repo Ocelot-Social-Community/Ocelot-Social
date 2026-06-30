@@ -6,8 +6,11 @@
       <label for="allow-shouts">{{ $t('settings.privacy.make-shouts-public') }}</label>
     </div>
     <hr class="ds-my-small" />
-    <p class="ds-text ds-text-soft ds-mb-x-small">
+    <h3 class="ds-mb-x-small">
       {{ $t('settings.privacy.show-groups-on-profile-section') }}
+    </h3>
+    <p class="ds-text-small ds-text-soft ds-mb-x-small">
+      {{ $t('settings.privacy.show-groups-on-profile-hint') }}
     </p>
     <div class="ds-mb-x-small">
       <input id="show-public-groups" type="checkbox" v-model="showPublicGroups" />

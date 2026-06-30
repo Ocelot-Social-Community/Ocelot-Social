@@ -750,7 +750,8 @@
       "unmuteGroup": "Çhesht grupin",
       "visitGroupPage": "Shfaq grupin",
       "showOnProfile": "Show on my profile",
-      "hideFromProfile": "Hide from my profile"
+      "hideFromProfile": "Hide from my profile",
+      "profileVisibilityUpdated": "Dukshmëria u përditësua"
     },
     "createNewGroup": {
       "title": "Krijo një grup të ri",
@@ -1466,9 +1467,10 @@
       "name": "Privatësia",
       "success-update": "Cilësimet e privatësisë u ruajtën!",
       "show-groups-on-profile-section": "Show groups on profile",
+      "show-groups-on-profile-hint": "Dukshmëria e çdo grupi individual mund të caktohet gjithashtu nëpërmjet menysë me tre pika të grupit ose drejtpërdrejt në listën e grupeve në profilin tuaj.",
       "show-public-groups-on-profile": "Show public groups on my profile",
       "show-closed-groups-on-profile": "Show closed groups on my profile",
-      "show-hidden-groups-on-profile": "Show secret groups on my profile"
+      "show-hidden-groups-on-profile": "Shfaq grupet sekrete në profilin tim"
     },
     "security": {
       "change-password": {

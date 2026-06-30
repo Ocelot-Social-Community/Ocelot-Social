@@ -8,6 +8,7 @@
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import { TROPHY_BADGES_SELECTED_MAX } from '@constants/badges'
+import { GROUP_MEMBERSHIP_VISIBILITY_CHANGED } from '@constants/subscriptions'
 import { getNeode } from '@db/neo4j'
 import { UserInputError, ForbiddenError } from '@graphql/errors'
 
@@ -310,6 +311,14 @@ export default {
         })
         // TODO: put in a middleware, see "CreateGroup", "UpdateGroup"
         await createOrUpdateLocations('User', params.id, params.locationName, session, context)
+        if (
+          'showPublicGroupsOnProfile' in params ||
+          'showClosedGroupsOnProfile' in params
+        ) {
+          void context.pubsub.publish(GROUP_MEMBERSHIP_VISIBILITY_CHANGED, {
+            groupMembershipVisibilityChanged: { userId: params.id },
+          })
+        }
         return user
       } finally {
         await session.close()

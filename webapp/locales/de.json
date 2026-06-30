@@ -750,7 +750,8 @@
       "unmuteGroup": "Nicht stummschalten",
       "visitGroupPage": "Gruppe anzeigen",
       "showOnProfile": "Auf meinem Profil anzeigen",
-      "hideFromProfile": "Von meinem Profil verbergen"
+      "hideFromProfile": "Von meinem Profil verbergen",
+      "profileVisibilityUpdated": "Sichtbarkeit aktualisiert"
     },
     "createNewGroup": {
       "title": "Erstelle eine neue Gruppe",
@@ -1466,6 +1467,7 @@
       "name": "Privatsphäre",
       "success-update": "Privatsphäre-Einstellungen gespeichert!",
       "show-groups-on-profile-section": "Gruppen auf Profil anzeigen",
+      "show-groups-on-profile-hint": "Die Sichtbarkeit jeder einzelnen Gruppe kann auch im Dreipunktmenü der Gruppe oder direkt in der Gruppenliste auf deinem Profil eingestellt werden.",
       "show-public-groups-on-profile": "Öffentliche Gruppen auf meinem Profil anzeigen",
       "show-closed-groups-on-profile": "Geschlossene Gruppen auf meinem Profil anzeigen",
       "show-hidden-groups-on-profile": "Geheime Gruppen auf meinem Profil anzeigen"
