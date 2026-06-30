@@ -1160,7 +1160,7 @@
     "socialMedia": "Ku tjetër mund ta gjej",
     "userAnonym": "Anonim",
     "groups": {
-      "title": "Groups",
+      "title": "Groups of {name}",
       "public": "Public groups",
       "closed": "Closed groups",
       "hidden": "Secret groups",

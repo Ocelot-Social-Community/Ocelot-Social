@@ -1160,7 +1160,7 @@
     "socialMedia": "Onde mais posso encontrar",
     "userAnonym": "Anônimo",
     "groups": {
-      "title": "Groups",
+      "title": "Groups of {name}",
       "public": "Public groups",
       "closed": "Closed groups",
       "hidden": "Secret groups",

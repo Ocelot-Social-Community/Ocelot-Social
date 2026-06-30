@@ -148,7 +148,12 @@
           @fetchAllConnections="fetchAllConnections"
         />
         <div class="ds-mb-large"></div>
-        <group-member-list v-if="user.id" :user-id="user.id" :my-profile="myProfile" />
+        <group-member-list
+          v-if="user.id"
+          :user-id="user.id"
+          :user-name="userName"
+          :my-profile="myProfile"
+        />
         <social-media :user-name="userName" :user="user" />
       </div>
 

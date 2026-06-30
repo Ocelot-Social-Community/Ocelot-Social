@@ -1160,7 +1160,7 @@
     "socialMedia": "Де ще можна знайти",
     "userAnonym": "Анонімний",
     "groups": {
-      "title": "Groups",
+      "title": "Groups of {name}",
       "public": "Public groups",
       "closed": "Closed groups",
       "hidden": "Secret groups",

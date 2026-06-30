@@ -1,6 +1,6 @@
 <template>
   <os-card v-if="hasGroups || myProfile" class="group-member-list">
-    <h5 class="title spacer-x-small">{{ $t('profile.groups.title') }}</h5>
+    <h5 class="title spacer-x-small">{{ $t('profile.groups.title', { name: userName }) }}</h5>
 
     <template v-if="hasGroups">
       <div v-for="type in groupTypes" :key="type">
@@ -57,6 +57,7 @@ export default {
   },
   props: {
     userId: { type: String, required: true },
+    userName: { type: String, default: '' },
     myProfile: { type: Boolean, default: false },
   },
   data() {
