@@ -682,6 +682,7 @@ export default shield(
       toggleObservePost: isAuthenticated,
       muteGroup: and(isAuthenticated, isMemberOfGroup),
       unmuteGroup: and(isAuthenticated, isMemberOfGroup),
+      setGroupMembershipVisibility: and(isAuthenticated, isMemberOfGroup),
       setTrophyBadgeSelected: isAuthenticated,
       resetTrophyBadgesSelected: isAuthenticated,
     },
