@@ -1,9 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { writeFileSync } from 'node:fs'
 import path from 'node:path'
 
-import { lexicographicSortSchema, printSchema } from 'graphql'
+import { lexicographicSortSchema, print, printSchema } from 'graphql'
+import { makeAugmentedSchema } from 'neo4j-graphql-js'
 
-import schema from './schema'
+import typeDefs from '@graphql/types/index'
+
+import { augmentedSchemaConfig } from './schema.augment-config'
 
 // Print the fully *augmented* runtime schema (neo4j-graphql-js adds auto-generated
 // queries, filters, orderBy and CRUD mutations on top of the hand-written SDL) to
@@ -11,11 +15,25 @@ import schema from './schema'
 // (SpectaQL). It is a git-ignored build artifact (see backend/.gitignore),
 // regenerated on every `docs:api` / `docs:dev` run — it is not committed.
 //
+// The schema is built from typeDefs + the shared augmentation config ONLY (no
+// resolvers), so printing does not import runtime config and its required-env
+// assertions — the SDL is defined by the type system, not by execution. This also
+// means `schema:print` needs no env and no .gql require-hook.
+//
 // Sorting lexicographically keeps the output deterministic across runs regardless
 // of file load order, so regenerating without API changes yields an identical file.
 const outFile = path.resolve(__dirname, '../../schema.graphql')
 
-const sdl = printSchema(lexicographicSortSchema(schema as Parameters<typeof printSchema>[0]))
+// makeAugmentedSchema is untyped (neo4j-graphql-js); cast its result to the type
+// printSchema expects, matching the original pattern.
+const sdl = printSchema(
+  lexicographicSortSchema(
+    makeAugmentedSchema({
+      typeDefs: print(typeDefs),
+      config: augmentedSchemaConfig,
+    }) as Parameters<typeof printSchema>[0],
+  ),
+)
 
 // eslint-disable-next-line n/no-sync
 writeFileSync(outFile, sdl + '\n', 'utf-8')

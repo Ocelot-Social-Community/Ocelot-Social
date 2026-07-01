@@ -3,7 +3,11 @@ import path from 'node:path'
 import { loadFilesSync } from '@graphql-tools/load-files'
 import { mergeTypeDefs } from '@graphql-tools/merge'
 
-import { allKeys } from '@src/policy'
+// Import allKeys() from the pure schema module, NOT the @src/policy barrel: the
+// barrel re-exports PolicyService, which pulls in neo4j/redis/config (with its
+// required-env assertions). typeDefs only needs the key list, so this keeps the
+// type system — and thus `schema:print` — free of runtime config/env.
+import { allKeys } from '@src/policy/schema'
 
 import type { DocumentNode } from 'graphql'
 

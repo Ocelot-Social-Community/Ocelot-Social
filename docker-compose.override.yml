@@ -122,23 +122,19 @@ services:
       - ./packages/ui:/app
       - /app/node_modules
 
-  # Documentation site (VuePress) incl. the embedded GraphQL API reference.
-  # Self-contained (own Node 20 + deps), so it can run without the rest of the
-  # stack. Serves the handbook on http://localhost:8080 and the API reference at
-  # http://localhost:8080/api/. The whole repo is mounted for live editing;
-  # node_modules stay in the image via anonymous volumes.
+  # Documentation site on http://localhost:8080 — the VuePress handbook with the
+  # embedded GraphQL API reference at /api, built once (multi-stage) and served
+  # statically by nginx. This is a build artifact: rebuild (`docker compose up
+  # docs --build`) to pick up doc changes. For live-editing the handbook use
+  # `npm run docs:dev` on the host; for the API reference `cd backend && yarn docs:dev`.
   docs:
     image: ghcr.io/ocelot-social-community/ocelot-social/documentation:local-development
     build:
       context: .
       dockerfile: ./documentation/Dockerfile
-      target: development
+      target: production
     ports:
-      - "8080:8080"
-    volumes:
-      - ./:/workspace
-      - /workspace/node_modules
-      - /workspace/backend/node_modules
+      - "8080:80"
 
 volumes:
   minio_data:
