@@ -20,9 +20,12 @@ type Group {
   id: ID!
   "The group's title."
   name: String!
+  "URL-safe unique handle for the group."
   slug: String!
 
+  "ISO 8601 date-time string of creation."
   createdAt: String!
+  "ISO 8601 date-time string of the last update."
   updatedAt: String!
   deleted: Boolean
   disabled: Boolean

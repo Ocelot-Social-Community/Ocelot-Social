@@ -14,6 +14,7 @@ type Room {
   "The group this room belongs to, or null for a direct room."
   group: Group @relation(name: "ROOM_FOR", direction: "OUT")
 
+  "Alias of id; prefer id in new code."
   roomId: String! @cypher(statement: "RETURN this.id")
   "True if this is a group room, false for a direct room."
   isGroupRoom: Boolean!

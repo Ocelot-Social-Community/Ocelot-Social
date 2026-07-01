@@ -42,6 +42,7 @@ type Comment {
   "ActivityPub activity id, for federated comments."
   activityId: String
   author: User @relation(name: "WROTE", direction: "IN")
+  "Comment body as rich text (HTML)."
   content: String!
   "The post this comment belongs to."
   post: Post @relation(name: "COMMENTS", direction: "OUT")

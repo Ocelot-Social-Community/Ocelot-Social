@@ -44,6 +44,7 @@ type User {
   "The user's primary email address. Visible only to the owner or with user.email.readAny."
   email: String!
     @cypher(statement: "MATCH (this)-[:PRIMARY_EMAIL]->(e:EmailAddress) RETURN e.email")
+  "URL-safe unique handle for the user."
   slug: String!
   avatar: Image @relation(name: "AVATAR_IMAGE", direction: "OUT")
   "True once the account has been deleted (soft delete)."
@@ -65,7 +66,9 @@ type User {
   about: String
   socialMedia: [SocialMedia]! @relation(name: "OWNED_BY", direction: "IN")
 
+  "ISO 8601 date-time string of registration."
   createdAt: String
+  "ISO 8601 date-time string of the last update."
   updatedAt: String
 
   "Version of the terms & conditions the user last agreed to."

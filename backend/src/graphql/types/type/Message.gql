@@ -28,6 +28,7 @@ type Message {
     @cypher(
       statement: "MATCH (this)<-[:CREATED]-(:User)-[:AVATAR_IMAGE]->(image:Image) RETURN image.url"
     )
+  "Alias of createdAt; prefer createdAt in new code."
   date: String! @cypher(statement: "RETURN this.createdAt")
 
   "Whether the message has been persisted (delivery-status flag)."

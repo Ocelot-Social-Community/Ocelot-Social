@@ -132,7 +132,9 @@ type Post {
   objectId: String
   author: User @relation(name: "WROTE", direction: "IN")
   title: String!
+  "URL-safe unique handle for the post."
   slug: String!
+  "Post body as rich text (HTML)."
   content: String!
   "The post's hero image."
   image: Image @relation(name: "HERO_IMAGE", direction: "OUT")
@@ -145,10 +147,13 @@ type Post {
   pinned: Boolean
   "Whether the post is pinned within its group."
   groupPinned: Boolean
+  "ISO 8601 date-time string of creation."
   createdAt: String
+  "ISO 8601 date-time string of the last update."
   updatedAt: String
   "Date used to sort the post in feeds (may differ from createdAt, e.g. for events)."
   sortDate: String
+  "Content language as an IETF/ISO code (e.g. `en`, `de`)."
   language: String
   "When the post was pinned instance-wide, or null if not pinned."
   pinnedAt: String
