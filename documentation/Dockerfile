@@ -4,7 +4,10 @@
 # Self-contained on Node 20 (matching the docs deploy) so it does not share the
 # backend's Alpine/Node-25 node_modules. Build context is the repo root.
 
-FROM node:20-bookworm-slim AS base
+# Node 22: the backend deps (metascraper) require Node >= 22, and this image runs
+# the backend toolchain to print the schema for the API reference. VuePress builds
+# fine on 22 too.
+FROM node:22-bookworm-slim AS base
 LABEL org.label-schema.name="ocelot.social:documentation"
 LABEL org.label-schema.description="VuePress documentation site incl. the GraphQL API reference"
 LABEL maintainer="devops@ocelot.social"
