@@ -34,7 +34,13 @@ jobs:
         with:
           node-version: 20
 
-      - name: Build Vuepress Pages
+      # Backend deps are needed to print the schema + run SpectaQL for the embedded
+      # API reference (predocs:build → docs:api). Skip native build scripts (re2 etc.),
+      # which doc generation does not use.
+      - name: Install backend dependencies (for the GraphQL API reference)
+        run: cd backend && yarn install --frozen-lockfile --ignore-scripts
+
+      - name: Build Vuepress Pages (incl. GraphQL API reference)
         run: npm install && npm run docs:build
 
       - name: Deploy Vuepress to Github Pages

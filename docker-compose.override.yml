@@ -122,27 +122,23 @@ services:
       - ./packages/ui:/app
       - /app/node_modules
 
-  # Live-reloading GraphQL API reference (SpectaQL) for development.
-  # Reuses the backend dev image and its (host-mounted) node_modules, so spectaql
-  # comes from the backend's devDependencies — no separate install. Waits for the
-  # backend's `yarn install` to finish, then serves http://localhost:4400 and
-  # regenerates on any src/graphql/**/*.gql change (live reload on 4401).
+  # Documentation site (VuePress) incl. the embedded GraphQL API reference.
+  # Self-contained (own Node 20 + deps), so it can run without the rest of the
+  # stack. Serves the handbook on http://localhost:8080 and the API reference at
+  # http://localhost:8080/api/. The whole repo is mounted for live editing;
+  # node_modules stay in the image via anonymous volumes.
   docs:
-    image: ghcr.io/ocelot-social-community/ocelot-social/backend:local-development
+    image: ghcr.io/ocelot-social-community/ocelot-social/documentation:local-development
     build:
-      context: ./backend
+      context: .
+      dockerfile: ./documentation/Dockerfile
       target: development
-    depends_on:
-      - backend
-    command: >
-      sh -c "until [ -x node_modules/.bin/spectaql ]; do
-      echo 'docs: waiting for backend yarn install...'; sleep 3; done;
-      yarn docs:dev"
     ports:
-      - "4400:4400"
-      - "4401:4401"
+      - "8080:8080"
     volumes:
-      - ./backend:/app
+      - ./:/workspace
+      - /workspace/node_modules
+      - /workspace/backend/node_modules
 
 volumes:
   minio_data:

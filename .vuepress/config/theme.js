@@ -33,6 +33,13 @@ export default hopeTheme({
       link: 'https://stage.ocelot.social/',
       target: '_self',
     },
+    {
+      // Static GraphQL API reference (SpectaQL), generated into
+      // .vuepress/public/api by `npm run docs:api` (runs before docs:build).
+      text: 'API',
+      link: '/api/',
+      target: '_self',
+    },
   ],
   plugins: {
     mdEnhance: {

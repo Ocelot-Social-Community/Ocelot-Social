@@ -29,6 +29,8 @@
   "scripts": {
     "db:seed": "cd backend && yarn run db:seed",
     "db:reset": "cd backend && yarn run db:reset",
+    "docs:api": "cd backend && yarn run schema:print && ./node_modules/.bin/spectaql --target-dir ../.vuepress/public/api spectaql.yml",
+    "predocs:build": "npm run docs:api",
     "docs:build": "NODE_OPTIONS=--openssl-legacy-provider vuepress build .",
     "docs:dev": "NODE_OPTIONS=--openssl-legacy-provider vuepress dev .",
     "cypress:run": "cypress run --e2e --browser electron --config-file ./cypress/cypress.config.js",
