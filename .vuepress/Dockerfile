@@ -5,6 +5,11 @@
 # the Node version it needs (the backend toolchain needs Node 25; VuePress builds
 # on Node 20), then only the static output ships.
 #
+# The VuePress deps are declared in the repo-root package.json: VuePress resolves
+# `vuepress`/`vuepress-theme-hope` (config imports + its CLI) relative to the source
+# dir, which is the repo root — so they must live in the root node_modules, not a
+# subfolder. `npm ci` installs them there.
+#
 # Build context is the repo root; see .vuepress/Dockerfile.dockerignore.
 
 # 1) Generate the GraphQL API reference on the backend's Node (schema:print + SpectaQL).
