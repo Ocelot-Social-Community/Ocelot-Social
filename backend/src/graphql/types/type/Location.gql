@@ -16,7 +16,9 @@ type Location {
     )
   "The place's granularity (e.g. country, region, place)."
   type: String!
+  "Latitude in decimal degrees (WGS84)."
   lat: Float
+  "Longitude in decimal degrees (WGS84)."
   lng: Float
   "The enclosing place one level up in the hierarchy."
   parent: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
