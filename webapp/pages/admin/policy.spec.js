@@ -199,6 +199,84 @@ describe('admin/policy.vue', () => {
     expect(fetchDefaults).toHaveBeenCalledTimes(2) // failed mount fetch + watcher refetch
   })
 
+  describe('concurrent-edit conflicts', () => {
+    it('an untouched field follows a remote change live, with no conflict', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+      // No local edits; a remote admin turns publicRegistration on.
+      store.commit('policy/SET_SNAP', { ...snapshot, publicRegistration: true })
+      await flushPromises()
+      expect(wrapper.find('#policy-publicRegistration').element.checked).toBe(true)
+      expect(wrapper.vm.hasConflict).toBe(false)
+      expect(wrapper.find('[data-test="policy-conflict"]').exists()).toBe(false)
+    })
+
+    it('flags a conflict on a locally-edited field the server also moved, keeping my value', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+      // Local edit: inviteLinkLimit 7 → 10 (unsaved).
+      await wrapper.find('#policy-inviteLinkLimit').setValue('10')
+      // Remote: another admin sets it to 99 AND (untouched here) turns publicRegistration on.
+      store.commit('policy/SET_SNAP', {
+        ...snapshot,
+        inviteLinkLimit: 99,
+        publicRegistration: true,
+      })
+      await flushPromises()
+      // My unsaved value is kept, not clobbered; the field is flagged + highlighted.
+      expect(wrapper.vm.conflict.inviteLinkLimit).toBe(true)
+      expect(wrapper.vm.hasConflict).toBe(true)
+      expect(wrapper.find('#policy-inviteLinkLimit').element.value).toBe('10')
+      expect(wrapper.find('[data-test="policy-conflict"]').exists()).toBe(true)
+      // The incoming server value (99) is surfaced on the row.
+      const note = wrapper.find('[data-test="policy-conflict-inviteLinkLimit"]')
+      expect(note.exists()).toBe(true)
+      expect(note.text()).toContain('99')
+      // The untouched field still followed the server live (no conflict on it).
+      expect(wrapper.find('#policy-publicRegistration').element.checked).toBe(true)
+      expect(wrapper.vm.conflict.publicRegistration).toBeFalsy()
+    })
+
+    it('loadServerVersion discards local edits and adopts the server value, clearing the banner', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+      await wrapper.find('#policy-inviteLinkLimit').setValue('10')
+      store.commit('policy/SET_SNAP', { ...snapshot, inviteLinkLimit: 99 })
+      await flushPromises()
+      expect(wrapper.vm.hasConflict).toBe(true)
+
+      await wrapper.find('[data-test="policy-conflict-load"]').trigger('click')
+      expect(wrapper.vm.hasConflict).toBe(false)
+      expect(wrapper.find('#policy-inviteLinkLimit').element.value).toBe('99')
+    })
+
+    it('dismissConflict hides the banner but keeps my edits (keep editing)', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+      await wrapper.find('#policy-inviteLinkLimit').setValue('10')
+      store.commit('policy/SET_SNAP', { ...snapshot, inviteLinkLimit: 99 })
+      await flushPromises()
+      expect(wrapper.vm.hasConflict).toBe(true)
+
+      await wrapper.find('[data-test="policy-conflict-keep"]').trigger('click')
+      expect(wrapper.vm.hasConflict).toBe(false)
+      expect(wrapper.find('#policy-inviteLinkLimit').element.value).toBe('10')
+    })
+
+    it('does not mistake the admin’s own save for a conflict', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+      await wrapper.find('#policy-publicRegistration').setChecked(true)
+      await wrapper.find('form').trigger('submit')
+      await flushPromises()
+      // The backend echoes our write back via the subscription (snapshot → our value).
+      store.commit('policy/SET_SNAP', { ...snapshot, publicRegistration: true })
+      await flushPromises()
+      expect(wrapper.vm.hasConflict).toBe(false)
+      expect(wrapper.find('#policy-publicRegistration').element.checked).toBe(true)
+    })
+  })
+
   // Vuex calls an action as (context, payload), so the asserted call has the
   // store context as the first arg and the component's payload as the second.
   describe('write path', () => {

@@ -136,6 +136,37 @@
           {{ $t('admin.roles.allPermissions') }}
         </p>
 
+        <!-- Concurrent-edit conflict: another admin changed this role while the current
+             admin has unsaved edits. The draft is kept (their work is never silently lost);
+             the diverged rows are highlighted below. Load = discard mine, take the server's;
+             Keep = keep editing (my save will overwrite). -->
+        <div
+          v-if="conflicts[activeRole.name]"
+          class="role__conflict"
+          role="alert"
+          :data-test="`role-${activeRole.name}-conflict`"
+        >
+          <span class="role__conflict-text">{{ $t('admin.roles.conflict.message') }}</span>
+          <span class="role__conflict-actions">
+            <os-button
+              variant="primary"
+              appearance="filled"
+              :data-test="`role-${activeRole.name}-conflict-load`"
+              @click="loadServerVersion(activeRole.name)"
+            >
+              {{ $t('admin.roles.conflict.load') }}
+            </os-button>
+            <os-button
+              variant="primary"
+              appearance="ghost"
+              :data-test="`role-${activeRole.name}-conflict-keep`"
+              @click="dismissConflict(activeRole.name)"
+            >
+              {{ $t('admin.roles.conflict.keep') }}
+            </os-button>
+          </span>
+        </div>
+
         <!-- Two-column masonry on desktop (>=1024px) for a compact overview; each
              group stays intact (break-inside: avoid). Single column on mobile. -->
         <div class="perm-groups">
@@ -146,8 +177,8 @@
               :key="permission.key"
               class="perm-row"
               :class="{
-                'perm-row--added': hoverDiff[permission.key] === 'added',
-                'perm-row--removed': hoverDiff[permission.key] === 'removed',
+                'perm-row--added': rowDiff(permission.key) === 'added',
+                'perm-row--removed': rowDiff(permission.key) === 'removed',
                 'perm-row--unavailable': permission.available === false,
               }"
               :title="permission.available === false ? $t('admin.roles.permUnavailable') : null"
@@ -234,6 +265,10 @@ export default {
       permissionCatalog: [],
       // Editable drafts keyed by role name, rebuilt whenever roles load.
       forms: {},
+      // Concurrent-edit conflicts keyed by role name: true while a locally-edited draft's
+      // server set has moved under it (another admin saved). Cleared by resolving or
+      // dismissing the banner; re-raised by the next remote change.
+      conflicts: {},
       // The single role currently shown.
       activeRoleName: null,
       // The role pill currently hovered, to preview its diff against the active role.
@@ -321,6 +356,24 @@ export default {
       }
       return diff
     },
+    // While a conflict banner is up for the active role, which permissions the OTHER admin
+    // changed relative to this draft's baseline — 'added' (server now grants it) / 'removed'
+    // (server dropped it). These are exactly the keys the current admin's save would revert,
+    // so they are highlighted (reusing the hover-diff green/red). Empty when no conflict.
+    conflictDiff() {
+      const form = this.activeRole && this.forms[this.activeRoleName]
+      if (!this.activeRole || !this.conflicts[this.activeRoleName] || !form) return {}
+      const baseSet = new Set(form.baseline)
+      const serverSet = this.permissionSetOf(this.activeRole)
+      const diff = {}
+      for (const permission of this.permissionCatalog) {
+        const inBase = baseSet.has(permission.key)
+        const inServer = serverSet.has(permission.key)
+        if (inServer && !inBase) diff[permission.key] = 'added'
+        else if (!inServer && inBase) diff[permission.key] = 'removed'
+      }
+      return diff
+    },
     // Catalog grouped by permission group, for sectioned checkboxes.
     permissionGroups() {
       const byGroup = {}
@@ -380,7 +433,9 @@ export default {
     },
     buildForms() {
       const forms = {}
+      const conflicts = {}
       for (const role of this.roles) {
+        const existing = this.forms[role.name]
         // Preserve an editable role's draft only when THIS admin has locally edited it, so a
         // live refetch (another admin's change, or a permission-gating policy toggle) does
         // not clobber in-progress work — but an untouched draft DOES refresh to the new
@@ -388,8 +443,15 @@ export default {
         // (not `role.permissions`, which the refetch has already moved), so a remote change
         // under an unedited form is not mistaken for a local edit (which would leave the
         // checkboxes showing the stale set until a reload). Protected roles → always rebuilt.
-        if (!role.protected && this.forms[role.name] && this.isLocallyEdited(role.name)) {
-          forms[role.name] = this.forms[role.name]
+        if (!role.protected && existing && this.isLocallyEdited(role.name)) {
+          forms[role.name] = existing
+          // If the server set also moved away from what this draft was built on, another
+          // admin changed the role under our edit → surface a conflict instead of silently
+          // keeping (and later overwriting) their change. Carry a still-open banner across
+          // this rebuild; a resolved/dismissed one only re-raises on a genuinely new move.
+          if (this.serverMovedFromBaseline(role, existing)) {
+            conflicts[role.name] = true
+          }
           continue
         }
         const permissions = emptyPermissionMap(this.permissionCatalog)
@@ -404,7 +466,36 @@ export default {
         }
       }
       this.forms = forms
+      this.conflicts = conflicts
       this.ensureActive()
+    },
+    // Whether the current server permission set of `role` differs from the set `form` was
+    // built on (its baseline) — i.e. another writer moved it since this draft started.
+    serverMovedFromBaseline(role, form) {
+      const server = [...role.permissions].sort()
+      const baseline = [...(form.baseline || [])].sort()
+      return server.length !== baseline.length || server.some((key, i) => key !== baseline[i])
+    },
+    // Hover-diff (previewing another pill) takes precedence; otherwise the conflict-diff
+    // (persistent while a conflict banner is up). Drives the row highlight.
+    rowDiff(key) {
+      return this.hoverDiff[key] || this.conflictDiff[key] || null
+    },
+    // Resolve a conflict by discarding local edits and rebuilding the draft from the current
+    // server set (take theirs). The banner clears; baseline advances to the server set.
+    loadServerVersion(name) {
+      const role = this.roles.find((r) => r.name === name)
+      if (!role) return
+      const permissions = emptyPermissionMap(this.permissionCatalog)
+      const keys = role.protected ? Object.keys(permissions) : role.permissions
+      for (const key of keys) permissions[key] = true
+      this.$set(this.forms, name, { permissions, baseline: [...keys] })
+      this.$set(this.conflicts, name, false)
+    },
+    // Keep editing (keep mine): hide the banner but preserve the draft. A later remote
+    // change re-raises the conflict; the eventual save overwrites the server set.
+    dismissConflict(name) {
+      this.$set(this.conflicts, name, false)
     },
     // Localized label for a permission group, falling back to the raw group name.
     // vuex-i18n returns the key itself when there is no translation.
@@ -620,13 +711,19 @@ export default {
       const form = this.forms[role.name]
       this.saving = true
       try {
+        const permissions = this.selectedPermissions(form.permissions)
         await this.$apollo.mutate({
           mutation: updateRoleMutation,
           variables: {
             name: role.name,
-            permissions: this.selectedPermissions(form.permissions),
+            permissions,
           },
         })
+        // We are now the last writer for this role: advance the draft's baseline to what we
+        // saved and clear any conflict, so the imminent refetch rebuilds the draft cleanly
+        // (isLocallyEdited → false) instead of mistaking our own save for a remote conflict.
+        form.baseline = [...permissions]
+        this.$set(this.conflicts, role.name, false)
         await this.$apollo.queries.roles.refetch()
         this.$toast.success(this.$t('admin.roles.saveSuccess'))
       } catch (err) {
@@ -808,6 +905,27 @@ export default {
   &__protected-note {
     color: $text-color-soft;
     font-style: italic;
+  }
+  // Concurrent-edit conflict banner: a remote change landed under this admin's edit.
+  &__conflict {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-x-small;
+    margin: $space-x-small 0;
+    padding: $space-x-small $space-small;
+    border-radius: $border-radius-base;
+    border-left: 3px solid $color-warning;
+    background: rgba($color-warning, 0.14);
+    font-size: 0.9em;
+  }
+  &__conflict-text {
+    flex: 1 1 16rem;
+  }
+  &__conflict-actions {
+    display: inline-flex;
+    gap: $space-x-small;
   }
   &__actions {
     margin-top: $space-x-small;

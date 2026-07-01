@@ -191,6 +191,71 @@ describe('admin/roles.vue', () => {
     // The untouched draft adopts the new set instead of keeping the stale one.
     expect(wrapper.vm.forms['badge-setter'].permissions['badge.manage']).toBe(true)
     expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(true)
+    // An untouched draft refreshing is not a conflict.
+    expect(wrapper.vm.conflicts['badge-setter']).toBeFalsy()
+  })
+
+  describe('concurrent-edit conflicts', () => {
+    // Put badge-setter into a conflict: locally edit it, then a refetch brings a server
+    // set that another admin moved (badge.manage removed) under the edit.
+    const intoConflict = async () => {
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.forms['badge-setter'].permissions['post.create'] = true // local, unsaved
+      wrapper.setData({
+        roles: roles.map((r) => (r.name === 'badge-setter' ? { ...r, permissions: [] } : r)),
+      })
+      wrapper.vm.buildForms()
+      await wrapper.vm.$nextTick()
+      return wrapper
+    }
+
+    it('flags a conflict but keeps the draft, and highlights the other admin’s change', async () => {
+      const wrapper = await intoConflict()
+      expect(wrapper.vm.conflicts['badge-setter']).toBe(true)
+      // The unsaved local edit survives (never silently clobbered).
+      expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(true)
+      // The highlight marks what the OTHER admin changed (baseline → server), not my edit.
+      expect(wrapper.vm.conflictDiff).toEqual({ 'badge.manage': 'removed' })
+      expect(wrapper.vm.rowDiff('badge.manage')).toBe('removed')
+      // The banner renders with its resolve/keep actions.
+      expect(wrapper.find('[data-test="role-badge-setter-conflict"]').exists()).toBe(true)
+      expect(wrapper.find('[data-test="role-badge-setter-conflict-load"]').exists()).toBe(true)
+      expect(wrapper.find('[data-test="role-badge-setter-conflict-keep"]').exists()).toBe(true)
+    })
+
+    it('loadServerVersion discards local edits, rebuilds from the server, clears the banner', async () => {
+      const wrapper = await intoConflict()
+      wrapper.vm.loadServerVersion('badge-setter')
+      expect(wrapper.vm.conflicts['badge-setter']).toBe(false)
+      // Rebuilt from the server set ([]) — both my edit and the removed permission are gone.
+      expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(false)
+      expect(wrapper.vm.forms['badge-setter'].permissions['badge.manage']).toBe(false)
+      expect(wrapper.vm.conflictDiff).toEqual({})
+    })
+
+    it('dismissConflict hides the banner but keeps the draft (keep editing)', async () => {
+      const wrapper = await intoConflict()
+      wrapper.vm.dismissConflict('badge-setter')
+      expect(wrapper.vm.conflicts['badge-setter']).toBe(false)
+      expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(true)
+    })
+
+    it('does not mistake the admin’s own save for a conflict', async () => {
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.forms['badge-setter'].permissions['post.create'] = true
+      await wrapper.vm.saveRole(roles.find((r) => r.name === 'badge-setter'))
+      // performSave advanced the baseline to the saved set; the refetch that echoes our own
+      // write back must not raise a conflict.
+      wrapper.setData({
+        roles: roles.map((r) =>
+          r.name === 'badge-setter' ? { ...r, permissions: ['badge.manage', 'post.create'] } : r,
+        ),
+      })
+      wrapper.vm.buildForms()
+      expect(wrapper.vm.conflicts['badge-setter']).toBeFalsy()
+    })
   })
 
   it('refreshFromServer refetches the catalog and roles (live availability update)', () => {

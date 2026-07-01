@@ -139,6 +139,12 @@
       "name": "Pages"
     },
     "policy": {
+      "conflict": {
+        "keep": "Doorgaan met bewerken",
+        "load": "Nieuwe versie laden",
+        "message": "Een instelling is elders gewijzigd terwijl je aan het bewerken was. Je niet-opgeslagen wijzigingen blijven behouden — controleer de gemarkeerde instellingen.",
+        "serverValue": "server nu: {value}"
+      },
       "defaultValue": "standaard: {value}",
       "description": "Runtime-configuratie. Wijzigingen worden onmiddellijk toegepast voor alle verbonden clients.",
       "descriptions": {
@@ -200,6 +206,11 @@
       "allPermissions": "Heeft alle rechten (beschermd).",
       "cannotDelete": "Deze rol kan niet worden verwijderd.",
       "cannotDeleteHasMembers": "Deze rol heeft nog leden — wijs ze eerst een andere rol toe.",
+      "conflict": {
+        "keep": "Doorgaan met bewerken",
+        "load": "Nieuwe versie laden",
+        "message": "Deze rol is elders gewijzigd terwijl je aan het bewerken was. Je niet-opgeslagen wijzigingen blijven behouden — controleer de gemarkeerde rechten."
+      },
       "create": "Rol aanmaken",
       "createTitle": "Een nieuwe rol aanmaken",
       "delete": "Verwijderen",

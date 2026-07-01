@@ -139,6 +139,12 @@
       "name": "Pages"
     },
     "policy": {
+      "conflict": {
+        "keep": "Keep editing",
+        "load": "Load new version",
+        "message": "A setting was changed elsewhere while you were editing. Your unsaved changes are kept — review the highlighted settings.",
+        "serverValue": "server now: {value}"
+      },
       "defaultValue": "default: {value}",
       "description": "Runtime configuration. Changes apply immediately for all connected clients.",
       "descriptions": {
@@ -200,6 +206,11 @@
       "allPermissions": "Holds every permission (protected).",
       "cannotDelete": "This role cannot be deleted.",
       "cannotDeleteHasMembers": "This role still has members — reassign them before deleting it.",
+      "conflict": {
+        "keep": "Keep editing",
+        "load": "Load new version",
+        "message": "This role was changed elsewhere while you were editing. Your unsaved changes are kept — review the highlighted permissions."
+      },
       "create": "Create role",
       "createTitle": "Create a new role",
       "delete": "Delete",

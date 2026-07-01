@@ -139,6 +139,12 @@
       "name": "Seiten"
     },
     "policy": {
+      "conflict": {
+        "keep": "Weiter bearbeiten",
+        "load": "Neue Version laden",
+        "message": "Eine Einstellung wurde an anderer Stelle geändert, während du sie bearbeitet hast. Deine ungespeicherten Änderungen bleiben erhalten — prüfe die hervorgehobenen Einstellungen.",
+        "serverValue": "Server jetzt: {value}"
+      },
       "defaultValue": "Standard: {value}",
       "description": "Laufzeit-Konfiguration. Änderungen wirken sofort für alle verbundenen Clients.",
       "descriptions": {
@@ -200,6 +206,11 @@
       "allPermissions": "Hält alle Berechtigungen (geschützt).",
       "cannotDelete": "Diese Rolle kann nicht gelöscht werden.",
       "cannotDeleteHasMembers": "Diese Rolle hat noch Mitglieder — weise ihnen erst eine andere Rolle zu.",
+      "conflict": {
+        "keep": "Weiter bearbeiten",
+        "load": "Neue Version laden",
+        "message": "Diese Rolle wurde an anderer Stelle geändert, während du sie bearbeitet hast. Deine ungespeicherten Änderungen bleiben erhalten — prüfe die hervorgehobenen Berechtigungen."
+      },
       "create": "Rolle erstellen",
       "createTitle": "Neue Rolle erstellen",
       "delete": "Löschen",
