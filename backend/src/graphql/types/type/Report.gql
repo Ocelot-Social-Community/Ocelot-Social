@@ -18,6 +18,7 @@ type Report {
 "The kind of node a report can target."
 union ReportedResource = User | Post | Comment
 
+"The rule set by which a report's aggregate state is derived."
 enum ReportRule {
   latestReviewUpdatedAtRules
 }
@@ -35,6 +36,7 @@ type Query {
   ): [Report]
 }
 
+"Ordering options for the reports query."
 enum ReportOrdering {
   createdAt_asc
   createdAt_desc

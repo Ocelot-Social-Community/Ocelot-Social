@@ -17,6 +17,7 @@ type NOTIFIED {
 "The kind of node a notification originates from."
 union NotificationSource = Post | Comment | Group
 
+"Ordering options for the notifications query."
 enum NotificationOrdering {
   createdAt_asc
   createdAt_desc

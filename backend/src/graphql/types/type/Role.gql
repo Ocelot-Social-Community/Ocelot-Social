@@ -2,6 +2,7 @@
 # is code-owned (keys are dotted/namespaced → String, not an enum); roles are
 # runtime data managed here. See docu/roles-permissions-concept.md.
 
+"A single entry in the permission catalog: a grantable right and its metadata."
 type Permission {
   key: String!
   group: String!

@@ -5,11 +5,13 @@ type Query {
   policyDefaults: PolicyDefaults!
 }
 
+"The configured policy defaults together with audit info about the last change."
 type PolicyDefaults {
   defaults: Policy!
   lastChange: PolicyLastChange
 }
 
+"Who last changed a policy value, and when."
 type PolicyLastChange {
   actor: String!
   timestamp: String!

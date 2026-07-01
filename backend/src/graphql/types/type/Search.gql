@@ -3,21 +3,25 @@ union SearchResult = Post | User | Tag | Group
 "A candidate recipient when starting a chat: a user or a group."
 union ChatTarget = User | Group
 
+"A page of post search results with the total match count."
 type postSearchResults {
   postCount: Int
   posts: [Post]!
 }
 
+"A page of user search results with the total match count."
 type userSearchResults {
   userCount: Int
   users: [User]!
 }
 
+"A page of hashtag search results with the total match count."
 type hashtagSearchResults {
   hashtagCount: Int
   hashtags: [Tag]!
 }
 
+"A page of group search results with the total match count."
 type groupSearchResults {
   groupCount: Int
   groups: [Group]!

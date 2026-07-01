@@ -11,6 +11,7 @@ type REVIEWED {
   moderator: User
   resource: ReviewedResource
 }
+"The kind of node a moderation decision can apply to."
 union ReviewedResource = User | Post | Comment
 
 type Mutation {
