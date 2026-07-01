@@ -17,9 +17,12 @@ FROM base AS development
 #
 # The backend deps are needed only to print the schema and run SpectaQL, so skip
 # native build scripts (re2 etc.) — none are used for documentation generation.
-COPY package.json ./
+# Copy the lockfile too and use `npm ci`: it installs the exact locked tree
+# deterministically and does NOT re-resolve, so the vuepress rc peer-dependency
+# graph (theme-hope vs. search-pro) stays consistent instead of hitting ERESOLVE.
+COPY package.json package-lock.json ./
 COPY backend/package.json backend/yarn.lock ./backend/
-RUN npm install --no-audit --no-fund
+RUN npm ci --no-audit --no-fund
 RUN cd backend && yarn install --frozen-lockfile --ignore-scripts
 
 # On start: regenerate the API reference into .vuepress/public/api, then serve the
