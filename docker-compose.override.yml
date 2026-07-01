@@ -126,7 +126,7 @@ services:
   # embedded GraphQL API reference at /api, built once (multi-stage) and served
   # statically by nginx. This is a build artifact: rebuild (`docker compose up
   # docs --build`) to pick up doc changes. For live-editing the handbook use
-  # `npm run docs:dev` on the host; for the API reference `cd backend && yarn docs:dev`.
+  # `npm run docs:dev` on the host; regenerate the API reference with `npm run docs:api`.
   docs:
     image: ghcr.io/ocelot-social-community/ocelot-social/documentation:local-development
     build:

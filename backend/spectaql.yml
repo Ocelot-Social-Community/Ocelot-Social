@@ -6,7 +6,6 @@
 # the built schema.
 #
 # Build:   yarn docs:api      (prints schema + renders HTML into ./public-docs)
-# Live:    yarn docs:dev      (serves + live-reloads on .gql changes)
 # Output:  ./public-docs/index.html  (single, self-contained page)
 
 spectaql:
