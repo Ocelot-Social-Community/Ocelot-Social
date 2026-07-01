@@ -5,7 +5,7 @@
 # the Node version it needs (the backend toolchain needs Node 25; VuePress builds
 # on Node 20), then only the static output ships.
 #
-# Build context is the repo root; see documentation/Dockerfile.dockerignore.
+# Build context is the repo root; see .vuepress/Dockerfile.dockerignore.
 
 # 1) Generate the GraphQL API reference on the backend's Node (schema:print + SpectaQL).
 FROM node:25-bookworm-slim AS apidocs

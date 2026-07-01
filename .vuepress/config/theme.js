@@ -34,11 +34,13 @@ export default hopeTheme({
       target: '_self',
     },
     {
-      // Static GraphQL API reference (SpectaQL), generated into
-      // .vuepress/public/api by `npm run docs:api` (runs before docs:build).
+      // Static GraphQL API reference (SpectaQL) served from .vuepress/public/api.
+      // It is a standalone page outside the VuePress SPA, so open it as a real
+      // navigation (target: '_blank') — vue-router does not intercept clicks with
+      // a target, avoiding a client-side 404; the browser full-loads /api/.
       text: 'API',
       link: '/api/',
-      target: '_self',
+      target: '_blank',
     },
   ],
   plugins: {

@@ -131,7 +131,7 @@ services:
     image: ghcr.io/ocelot-social-community/ocelot-social/documentation:local-development
     build:
       context: .
-      dockerfile: ./documentation/Dockerfile
+      dockerfile: ./.vuepress/Dockerfile
       target: production
     ports:
       - "8080:80"
