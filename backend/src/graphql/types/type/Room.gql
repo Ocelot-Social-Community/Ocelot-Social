@@ -3,15 +3,19 @@ enum _RoomOrdering {
   createdAt_desc
 }
 
+"A chat room, either a one-to-one direct conversation between two users or the shared chat room of a group."
 type Room {
   id: ID!
   createdAt: String
   updatedAt: String
 
+  "Participants of the room."
   users: [User]! @relation(name: "CHATS_IN", direction: "IN")
+  "The group this room belongs to, or null for a direct room."
   group: Group @relation(name: "ROOM_FOR", direction: "OUT")
 
   roomId: String! @cypher(statement: "RETURN this.id")
+  "True if this is a group room, false for a direct room."
   isGroupRoom: Boolean!
     @cypher(
       statement: """
@@ -19,6 +23,7 @@ type Room {
       RETURN g IS NOT NULL
       """
     )
+  "Display name: the group's name for a group room, otherwise the other participant's name."
   roomName: String!
     @cypher(
       statement: """
@@ -29,6 +34,7 @@ type Room {
       RETURN COALESCE(g.name, user.name)
       """
     )
+  "Display avatar URL: the group's avatar for a group room, otherwise the other participant's avatar."
   avatar: String
     @cypher(
       statement: """
@@ -42,8 +48,10 @@ type Room {
       """
     )
 
+  "Timestamp of the most recent message, for sorting the room list."
   lastMessageAt: String
 
+  "The most recent message in the room."
   lastMessage: Message
     @cypher(
       statement: """
@@ -53,19 +61,23 @@ type Room {
       """
     )
 
-  "Count unread messages, excluding those from blocked/muted senders"
+  "Count unread messages, excluding those from blocked/muted senders."
   unreadCount: Int
 }
 
 type Mutation {
+  "Create (or fetch) the chat room for a group. Requires authentication."
   CreateGroupRoom(groupId: ID!): Room
 }
 
 type Query {
+  "List the current user's chat rooms. Direct rooms are looked up by `userId`, group rooms by `groupId`. Requires authentication."
   Room(id: ID, userId: ID, groupId: ID, first: Int, before: String, search: String, orderBy: [_RoomOrdering]): [Room]
+  "Number of the current user's rooms with unread messages. Requires authentication."
   UnreadRooms: Int
 }
 
 type Subscription {
+  "Pushes a room whenever its state changes (e.g. a new message arrives)."
   roomUpdated: Room
 }

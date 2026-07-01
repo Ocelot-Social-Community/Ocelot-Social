@@ -1,1 +1,2 @@
+"The `Upload` scalar type represents a file upload, sent as multipart/form-data per the GraphQL multipart request spec."
 scalar Upload

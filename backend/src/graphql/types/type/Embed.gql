@@ -1,4 +1,6 @@
+"oEmbed-style metadata scraped from an external URL, used to render link previews."
 type Embed {
+  "The oEmbed resource type (e.g. link, video, photo, rich)."
   type: String
   title: String
   author: String
@@ -6,14 +8,18 @@ type Embed {
   date: String
   description: String
   url: String
+  "URL of a representative preview image."
   image: String
   audio: String
   video: String
+  "Detected content language."
   lang: String
+  "Embeddable HTML fragment (e.g. a player iframe), when the provider offers one."
   html: String
   sources: [String]
 }
 
 type Query {
+  "Fetch link-preview metadata for a URL. Public."
   embed(url: String!): Embed
 }

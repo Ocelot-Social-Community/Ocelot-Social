@@ -36,30 +36,39 @@ input _CommentFilter {
   post_not_in: [_PostFilter!]
 }
 
+"A comment written by a user in reply to a post."
 type Comment {
   id: ID!
+  "ActivityPub activity id, for federated comments."
   activityId: String
   author: User @relation(name: "WROTE", direction: "IN")
   content: String!
+  "The post this comment belongs to."
   post: Post @relation(name: "COMMENTS", direction: "OUT")
   createdAt: String
   updatedAt: String
+  "True once the comment has been moderated away."
   deleted: Boolean
+  "True once the comment has been disabled by a moderator."
   disabled: Boolean
+  "Whether the current user observes the post this comment belongs to."
   isPostObservedByMe: Boolean!
     @cypher(
       statement: "MATCH (this)-[:COMMENTS]->(:Post)<-[obs:OBSERVES]-(u:User {id: $cypherParams.currentUserId}) WHERE obs.active = true RETURN COUNT(u) >= 1"
     )
+  "Number of users observing the post this comment belongs to."
   postObservingUsersCount: Int!
     @cypher(
       statement: "MATCH (this)-[:COMMENTS]->(:Post)<-[obs:OBSERVES]-(u:User) WHERE obs.active = true AND NOT u.disabled = true AND NOT u.deleted = true RETURN COUNT(DISTINCT u)"
     )
 
+  "Whether the current user has shouted (endorsed) this comment."
   shoutedByCurrentUser: Boolean!
     @cypher(
       statement: "MATCH (this) RETURN EXISTS((this)<-[:SHOUTED]-(:User {id: $cypherParams.currentUserId}))"
     )
 
+  "Number of users who have shouted (endorsed) this comment."
   shoutedCount: Int!
     @cypher(
       statement: "MATCH (this)<-[:SHOUTED]-(related:User) WHERE NOT related.deleted = true AND NOT related.disabled = true RETURN COUNT(DISTINCT related)"
@@ -67,6 +76,7 @@ type Comment {
 }
 
 type Query {
+  "List comments. Public."
   Comment(
     id: ID
     content: String
@@ -80,7 +90,10 @@ type Query {
 }
 
 type Mutation {
+  "Write a comment on a post. Requires authentication, the `comment.create` permission, and permission to comment on that post."
   CreateComment(id: ID, postId: ID!, content: String!): Comment
+  "Edit one of your own comments. Restricted to the author."
   UpdateComment(id: ID!, content: String!): Comment
+  "Delete one of your own comments. Restricted to the author."
   DeleteComment(id: ID!): Comment
 }

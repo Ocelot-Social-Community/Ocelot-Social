@@ -6,8 +6,10 @@ enum _MessageOrdering {
   indexId_desc
 }
 
+"A single chat message within a room."
 type Message {
   id: ID!
+  "Monotonically increasing index of the message within its room, used for ordering and paging."
   indexId: Int!
   createdAt: String
   updatedAt: String
@@ -17,16 +19,22 @@ type Message {
   author: User! @relation(name: "CREATED", direction: "IN")
   room: Room! @relation(name: "INSIDE", direction: "OUT")
 
+  "Id of the sending user."
   senderId: String! @cypher(statement: "MATCH (this)<-[:CREATED]-(user:User) RETURN user.id")
+  "Display name of the sending user."
   username: String! @cypher(statement: "MATCH (this)<-[:CREATED]-(user:User) RETURN user.name")
+  "Avatar URL of the sending user."
   avatar: String
     @cypher(
       statement: "MATCH (this)<-[:CREATED]-(:User)-[:AVATAR_IMAGE]->(image:Image) RETURN image.url"
     )
   date: String! @cypher(statement: "RETURN this.createdAt")
 
+  "Whether the message has been persisted (delivery-status flag)."
   saved: Boolean
+  "Whether the message has been distributed to recipients (delivery-status flag)."
   distributed: Boolean
+  "Whether the current user has seen the message (always true for messages they sent)."
   seen: Boolean
     @cypher(
       statement: """
@@ -39,19 +47,24 @@ type Message {
       RETURN count(unseer) = 0
       """
     )
+  "Files attached to the message."
   files: [File]! @relation(name: "ATTACHMENT", direction: "OUT")
 }
 
 type Mutation {
+  "Send a message to a room (by `roomId`) or to a user (by `userId`, opening a direct room). Requires authentication."
   CreateMessage(roomId: ID, userId: ID, content: String, files: [FileInput]): Message
 
+  "Mark the given messages as seen by the current user. Requires authentication."
   MarkMessagesAsSeen(messageIds: [String!]): Boolean
 }
 
 type Query {
+  "List messages in a room, newest first, with index-based paging. Requires authentication."
   Message(roomId: ID!, first: Int, offset: Int, beforeIndex: Int, orderBy: [_MessageOrdering]): [Message]
 }
 
+"Real-time delivery/seen-status update for messages in a room."
 type ChatMessageStatusPayload {
   roomId: ID!
   messageIds: [String!]!
@@ -59,6 +72,8 @@ type ChatMessageStatusPayload {
 }
 
 type Subscription {
+  "Pushes newly added messages in the current user's rooms."
   chatMessageAdded: Message
+  "Pushes delivery/seen status changes for messages."
   chatMessageStatusUpdated: ChatMessageStatusPayload
 }

@@ -1,5 +1,7 @@
 type Query {
+  "The instance's network policy. Public — anonymous viewers (login/register screen) need it. Per-field visibility is enforced in the resolver: a viewer only receives the keys they may see."
   policy: Policy!
+  "The configured policy defaults plus last-change audit info. Requires the `policy.manage` permission."
   policyDefaults: PolicyDefaults!
 }
 
@@ -13,25 +15,43 @@ type PolicyLastChange {
   timestamp: String!
 }
 
+"Instance-wide configuration flags governing registration, moderation features and UI toggles. Which keys a caller actually receives depends on their permissions."
 type Policy {
+  "Whether anyone may register without an invite."
   publicRegistration: Boolean!
+  "Whether registration via invite code is enabled."
   inviteRegistration: Boolean!
+  "Whether the registration form asks for the user's real name."
   askForRealName: Boolean!
+  "Whether a location is mandatory during registration."
   requireLocation: Boolean!
+  "Maximum number of redemptions per invite link, or null for unlimited."
   inviteLinkLimit: Int
+  "Maximum number of personal invite codes a user may hold."
   inviteCodesPersonalPerUser: Int
+  "Maximum number of group invite codes a user may hold per group."
   inviteCodesGroupPerUser: Int
+  "Whether the category taxonomy is enabled."
   categoriesActive: Boolean!
+  "Whether badges are enabled."
   badgesEnabled: Boolean!
+  "Whether the content filter appears in the header menu."
   showContentFilterHeaderMenu: Boolean!
+  "Whether the content filter appears above the masonry grid."
   showContentFilterMasonryGrid: Boolean!
+  "Whether the groups button is shown in the header."
   showGroupButtonInHeader: Boolean!
+  "Whether personal API keys are enabled."
   apiKeysEnabled: Boolean
+  "Maximum number of API keys a user may hold."
   apiKeysMaxPerUser: Int
+  "Maximum number of instance-wide pinned posts."
   maxPinnedPosts: Int
+  "Maximum number of pinned posts per group."
   maxGroupPinnedPosts: Int
 }
 
+"An applied change to a single policy key, with audit metadata."
 type PolicyChangeEvent {
   key: PolicyKey!
   value: String!
@@ -39,16 +59,20 @@ type PolicyChangeEvent {
   timestamp: String!
 }
 
+"A policy key/value change, broadcast to subscribers."
 type PolicyValueChanged {
   key: PolicyKey!
   value: String!
 }
 
 type Mutation {
+  "Set a single policy key to a value. Requires the `policy.manage` permission."
   setPolicy(key: PolicyKey!, value: String!): PolicyChangeEvent!
+  "Reset a single policy key to its configured default. Requires the `policy.manage` permission."
   resetPolicy(key: PolicyKey!): PolicyChangeEvent!
 }
 
 type Subscription {
+  "Fires whenever a policy value changes, so clients can update live."
   policyChanged: PolicyValueChanged!
 }

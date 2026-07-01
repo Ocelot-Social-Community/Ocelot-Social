@@ -1,11 +1,21 @@
+"An individual email-notification toggle, identifying the event that triggers an email."
 enum EmailNotificationSettingsName {
+  "Someone commented on a post the user observes."
   commentOnObservedPost
+  "The user was mentioned in a post or comment."
   mention
+  "A user the current user follows published a post."
   followingUsers
+  "A new post was created in a group the user is a member of."
   postInGroup
+  "The user received a direct chat message."
   chatMessage
+  "A user joined a group the user administrates."
   groupMemberJoined
+  "A user left a group the user administrates."
   groupMemberLeft
+  "A member was removed from a group the user administrates."
   groupMemberRemoved
+  "A member's role changed in a group the user administrates."
   groupMemberRoleChanged
 }

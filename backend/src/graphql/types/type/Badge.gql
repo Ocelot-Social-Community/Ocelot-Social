@@ -1,26 +1,38 @@
+"A badge that can be attached to users — either a verification mark or an awardable trophy."
 type Badge {
   id: ID!
   type: BadgeType!
+  "Identifier/URL of the badge's icon asset."
   icon: String!
   createdAt: String
   description: String!
+  "Whether this badge is the instance-wide default of its type."
   isDefault: Boolean!
 
+  "Users currently wearing this trophy badge."
   rewarded: [User]! @relation(name: "REWARDED", direction: "OUT")
+  "Users whose verification this badge represents."
   verifies: [User]! @relation(name: "VERIFIES", direction: "OUT")
 }
 
+"The purpose of a badge."
 enum BadgeType {
+  "Marks a user as verified."
   verification
+  "An achievement a user can be awarded and choose to display."
   trophy
 }
 
 type Query {
+  "List all available badges. Public."
   Badge: [Badge]
 }
 
 type Mutation {
+  "Assign a verification badge to a user. Requires the `badge.manage` permission."
   setVerificationBadge(badgeId: ID!, userId: ID!): User
+  "Award a trophy badge to a user. Requires the `badge.manage` permission."
   rewardTrophyBadge(badgeId: ID!, userId: ID!): User
+  "Remove a badge from a user. Requires the `badge.manage` permission."
   revokeBadge(badgeId: ID!, userId: ID!): User
 }

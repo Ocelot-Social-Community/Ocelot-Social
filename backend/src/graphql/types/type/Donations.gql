@@ -1,16 +1,22 @@
+"Instance-wide donation campaign state, shown in the donation progress widget."
 type Donations {
   id: ID!
   createdAt: String!
   updatedAt: String!
+  "Whether the donation widget is shown to users."
   showDonations: Boolean!
+  "Fundraising target amount."
   goal: Int!
+  "Amount raised so far."
   progress: Int!
 }
 
 type Query {
+  "The current donation campaign state. Requires authentication."
   Donations: Donations
 }
 
 type Mutation {
+  "Update the donation campaign settings. Requires the `donation.manage` permission."
   UpdateDonations(showDonations: Boolean, goal: Int, progress: Int): Donations
 }

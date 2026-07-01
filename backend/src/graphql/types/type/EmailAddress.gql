@@ -1,15 +1,20 @@
+"An email address belonging to a user, with its verification state."
 type EmailAddress {
   email: ID!
+  "When the address was verified, or null if still unverified."
   verifiedAt: String
   createdAt: String
 }
 
 type Query {
+  "Check whether a signup/verification nonce is valid for the given email. Public."
   VerifyNonce(email: String!, nonce: String!): Boolean!
 }
 
 type Mutation {
+  "Begin registration for an email address, sending a verification nonce. Allowed when public or invite registration is enabled (or by an admin with `role.manage`); an inviteCode is required for invite-only registration."
   Signup(email: String!, locale: String!, inviteCode: String = null): EmailAddress
+  "Complete registration by confirming the nonce and creating the user account. Public."
   SignupVerification(
     nonce: String!
     email: String!
@@ -22,6 +27,8 @@ type Mutation {
     locale: String
     locationName: String = null
   ): User
+  "Add a further email address to the current account, sending a verification nonce. Requires authentication."
   AddEmailAddress(email: String!): EmailAddress
+  "Confirm a pending email address via its nonce. Requires authentication."
   VerifyEmailAddress(nonce: String!, email: String!): EmailAddress
 }

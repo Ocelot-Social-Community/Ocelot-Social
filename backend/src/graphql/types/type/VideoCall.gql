@@ -1,27 +1,37 @@
+"Whether group video calls are available on this instance."
 type VideoCallConfig {
   enabled: Boolean!
 }
 
+"Credentials for connecting to a group's video-call room on the media server."
 type VideoCallJoinPayload {
+  "Access token authorising the current user to join the room."
   token: String!
+  "WebSocket URL of the media server."
   url: String!
+  "Name of the room to join."
   roomName: String!
 }
 
+"Live participant count for a group's video call."
 type VideoCallParticipantCount {
   groupId: ID!
   count: Int!
 }
 
 type Query {
+  "Whether video calls are enabled on this instance. Public."
   videoCallConfig: VideoCallConfig!
+  "Current number of participants in a group's video call. Requires authentication."
   videoCallParticipantCount(groupId: ID!): Int!
 }
 
 type Mutation {
+  "Join a group's video call, returning the credentials to connect. Requires authentication."
   joinGroupVideoCall(groupId: ID!): VideoCallJoinPayload!
 }
 
 type Subscription {
+  "Pushes the updated participant count as users join or leave a group's video call."
   videoCallParticipantCountChanged(groupId: ID!): VideoCallParticipantCount!
 }

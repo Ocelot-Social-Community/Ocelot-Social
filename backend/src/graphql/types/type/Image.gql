@@ -1,5 +1,8 @@
+"An image asset (avatar, hero image, etc.) with rendering metadata."
 type Image {
+  "The image's URL, which also serves as its identifier."
   url: ID!
+  "URL of a variant resized to the requested width/height."
   transform(width: Int, height: Int): String
 
   # urlW34: String,
@@ -8,12 +11,17 @@ type Image {
   # urlW640: String,
   # urlW1024: String,
 
+  "Alternative text for accessibility."
   alt: String
+  "Whether the image is flagged as sensitive and should be blurred by default."
   sensitive: Boolean
+  "Width-to-height ratio, used to reserve layout space before load."
   aspectRatio: Float
+  "MIME type of the image."
   type: String
 }
 
+"Input for uploading or updating an image. Provide `upload` to set a new file."
 input ImageInput {
   alt: String
   upload: Upload
