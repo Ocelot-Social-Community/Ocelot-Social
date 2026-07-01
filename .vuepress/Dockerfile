@@ -29,7 +29,9 @@ COPY --from=apidocs /api ./.vuepress/public/api
 RUN NODE_OPTIONS=--openssl-legacy-provider npm run docs:build
 
 # 3) Serve the static output.
-FROM nginx:alpine AS production
+# nginx-unprivileged runs as a non-root user (UID 101) and listens on 8080,
+# so the final image has no root process (addresses Trivy DS-0002).
+FROM nginxinc/nginx-unprivileged:alpine AS production
 LABEL org.label-schema.name="ocelot.social:documentation"
 LABEL maintainer="devops@ocelot.social"
 COPY --from=build /repo/.vuepress/dist /usr/share/nginx/html

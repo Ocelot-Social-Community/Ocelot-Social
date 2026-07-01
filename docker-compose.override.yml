@@ -134,7 +134,7 @@ services:
       dockerfile: ./.vuepress/Dockerfile
       target: production
     ports:
-      - "8080:80"
+      - "8080:8080"
 
 volumes:
   minio_data:
