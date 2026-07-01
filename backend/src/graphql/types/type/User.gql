@@ -17,60 +17,83 @@ enum _UserOrdering {
   locale_desc
 }
 
+"Input toggling a single email notification setting on or off."
 input EmailNotificationSettingsInput {
   name: EmailNotificationSettingsName
   value: Boolean
 }
 
+"A user's email notification toggles for one category (post, chat or group)."
 type EmailNotificationSettings {
   type: EmailNotificationSettingsType
   settings: [EmailNotificationSettingsOption] @neo4j_ignore
 }
 
+"A single email notification toggle and its current value."
 type EmailNotificationSettingsOption {
   name: EmailNotificationSettingsName
   value: Boolean
 }
 
+"A person's account. Most fields are readable by any authenticated user; a few (email, notification and invite settings) are restricted to the owner or to admins."
 type User {
   id: ID!
+  "ActivityPub actor id, for federated users."
   actorId: String
   name: String
+  "The user's primary email address. Visible only to the owner or with user.email.readAny."
   email: String!
     @cypher(statement: "MATCH (this)-[:PRIMARY_EMAIL]->(e:EmailAddress) RETURN e.email")
+  "URL-safe unique handle for the user."
   slug: String!
   avatar: Image @relation(name: "AVATAR_IMAGE", direction: "OUT")
+  "True once the account has been deleted (soft delete)."
   deleted: Boolean
+  "True while the account is disabled/deactivated."
   disabled: Boolean
   "The user's single dynamic role name (HAS_ROLE), incl. custom roles. Visible with role.manage."
   roleName: String
+  "The user's public key, for federation/verification."
   publicKey: String
+  "The user who invited this user, if any."
   invitedBy: User @relation(name: "INVITED", direction: "IN")
+  "Users this user has invited."
   invited: [User] @relation(name: "INVITED", direction: "OUT")
 
   locationName: String
   location: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
+  "The user's profile bio."
   about: String
   socialMedia: [SocialMedia]! @relation(name: "OWNED_BY", direction: "IN")
 
+  "ISO 8601 date-time string of registration."
   createdAt: String
+  "ISO 8601 date-time string of the last update."
   updatedAt: String
 
+  "Version of the terms & conditions the user last agreed to."
   termsAndConditionsAgreedVersion: String
+  "When the user last agreed to the terms & conditions."
   termsAndConditionsAgreedAt: String
 
+  "Whether the user permits embedded iframes in content they view."
   allowEmbedIframes: Boolean
+  "Whether the user's shouts are shown publicly on their profile."
   showShoutsPublicly: Boolean
+  "The user's email notification settings. Visible only to the owner."
   emailNotificationSettings: [EmailNotificationSettings]! @neo4j_ignore
+  "The user's preferred UI language."
   locale: String
   friends: [User]! @relation(name: "FRIENDS", direction: "BOTH")
   friendsCount: Int!
     @cypher(statement: "MATCH (this)<-[:FRIENDS]->(r:User) RETURN COUNT(DISTINCT r)")
 
+  "Users this user follows."
   following: [User]! @relation(name: "FOLLOWS", direction: "OUT")
   followingCount: Int!
     @cypher(statement: "MATCH (this)-[:FOLLOWS]->(r:User) RETURN COUNT(DISTINCT r)")
 
+  "Users who follow this user."
   followedBy: [User]! @relation(name: "FOLLOWS", direction: "IN")
   followedByCount: Int!
     @cypher(statement: "MATCH (this)<-[:FOLLOWS]-(r:User) RETURN COUNT(DISTINCT r)")
@@ -81,6 +104,7 @@ type User {
       statement: "MATCH (this)<-[:FOLLOWS]-(u:User { id: $cypherParams.currentUserId}) RETURN COUNT(u) >= 1"
     )
 
+  "Whether this user is blocked by the current user."
   isBlocked: Boolean!
     @cypher(
       statement: """
@@ -88,6 +112,7 @@ type User {
       RETURN COUNT(user) >= 1
       """
     )
+  "Whether there is a block in either direction between this user and the current user."
   blocked: Boolean!
     @cypher(
       statement: """
@@ -96,6 +121,7 @@ type User {
       """
     )
 
+  "Whether this user is muted by the current user."
   isMuted: Boolean!
     @cypher(
       statement: """
@@ -110,12 +136,15 @@ type User {
   # statement: "MATCH (this)-[w:WROTE]->(p:Post) RETURN p as Post, w.timestamp as timestamp"
   # )
 
+  "Posts written by this user."
   contributions: [Post]! @relation(name: "WROTE", direction: "OUT")
   contributionsCount: Int! @neo4j_ignore
 
+  "Comments written by this user."
   comments: [Comment]! @relation(name: "WROTE", direction: "OUT")
   commentedCount: Int! @neo4j_ignore
 
+  "Posts this user has shouted (endorsed)."
   shouted: [Post]! @relation(name: "SHOUTED", direction: "OUT")
   shoutedCount: Int! @neo4j_ignore
 
@@ -123,10 +152,14 @@ type User {
 
   # Badges
 
+  "The user's verification badge."
   badgeVerification: Badge! @neo4j_ignore
+  "All trophy badges awarded to the user."
   badgeTrophies: [Badge]! @relation(name: "REWARDED", direction: "IN")
   badgeTrophiesCount: Int! @cypher(statement: "MATCH (this)<-[:REWARDED]-(r:Badge) RETURN COUNT(r)")
+  "Trophy badges the user has chosen to display, in slot order."
   badgeTrophiesSelected: [Badge!]! @neo4j_ignore
+  "Awarded trophy badges the user is not currently displaying."
   badgeTrophiesUnused: [Badge]! @neo4j_ignore
   badgeTrophiesUnusedCount: Int! @neo4j_ignore
 
@@ -134,10 +167,12 @@ type User {
   inviteCodes: [InviteCode]! @neo4j_ignore
   # inviteCodes: [InviteCode]! @relation(name: "GENERATED", direction: "OUT")
 
+  "The invite code this user redeemed on registration, if any."
   redeemedInviteCode: InviteCode @relation(name: "REDEEMED", direction: "OUT")
 
   emotions: [EMOTED]
 
+  "Category slugs the user has activated as their content filter."
   activeCategories: [String] @neo4j_ignore
 }
 
@@ -179,6 +214,7 @@ input _UserFilter {
 }
 
 type Query {
+  "Look up users. Requires authentication; filtering by `email` additionally requires the user.email.readAny permission (used for admin user search)."
   User(
     id: ID
     email: String # admins need to search for a user sometimes
@@ -190,6 +226,7 @@ type Query {
     updatedAt: String
     "Admin user search: filter by single role (HAS_ROLE) and/or a free-text term (name/slug/about/email). Combinable; requires role.manage."
     roleName: String
+    "Free-text search over name/slug/about (and email for admins)."
     search: String
     first: Int
     offset: Int
@@ -197,24 +234,30 @@ type Query {
     filter: _UserFilter
   ): [User]
 
+  "Users the current user has muted. Requires authentication."
   mutedUsers: [User]
+  "Users the current user has blocked. Requires authentication."
   blockedUsers: [User]
+  "The currently authenticated user. Requires authentication."
   currentUser: User!
 }
 
+"Resources that can be deleted along with a user account."
 enum Deletable {
   Post
   Comment
 }
 
 type Mutation {
+  "Update your own profile. Restricted to the account owner."
   UpdateUser(
     id: ID!
     name: String
     email: String
     slug: String
     avatar: ImageInput
-    locationName: String # empty string '' sets it to null
+    "Empty string '' clears the location (sets it to null)."
+    locationName: String
     about: String
     termsAndConditionsAgreedVersion: String
     termsAndConditionsAgreedAt: String
@@ -224,31 +267,45 @@ type Mutation {
     locale: String
   ): User
 
+  "Delete a user account. Allowed for the account owner, or with user.delete.any subject to the act-on hierarchy. Optionally also delete the user's posts and/or comments via `resource`."
   DeleteUser(id: ID!, resource: [Deletable]): User
 
   "Reversibly deactivate (disable: true) or reactivate (disable: false) a user account. Moderator-grade, subject to the act-on hierarchy."
   disableUser(id: ID!, disable: Boolean!): User
 
+  "Mute a user, hiding their content from the current user. Requires authentication."
   muteUser(id: ID!): User
+  "Unmute a previously muted user. Requires authentication."
   unmuteUser(id: ID!): User
 
+  "Block a user, cutting off interaction in both directions. Requires authentication."
   blockUser(id: ID!): User
+  "Unblock a previously blocked user. Requires authentication."
   unblockUser(id: ID!): User
 
+  "Follow a user. Requires authentication."
   followUser(id: ID!): User
+  "Unfollow a user. Requires authentication."
   unfollowUser(id: ID!): User
 
+  "Set the current user's active content-filter categories. Requires authentication."
   saveCategorySettings(activeCategories: [String]): Boolean
 
+  "Update the current user's online/away status. Requires authentication."
   updateOnlineStatus(status: OnlineStatus!): Boolean!
 
+  "Request a password-reset email for the given address. Public."
   requestPasswordReset(email: String!, locale: String!): Boolean!
+  "Reset a password using the nonce from the reset email. Public."
   resetPassword(email: String!, nonce: String!, newPassword: String!): Boolean!
+  "Change the current user's password. Requires authentication."
   changePassword(oldPassword: String!, newPassword: String!): String!
 
   "Get a JWT Token for the given Email and password"
   login(email: String!, password: String!): String!
 
+  "Choose which trophy badge to display in a given slot (null clears the slot). Requires authentication."
   setTrophyBadgeSelected(slot: Int!, badgeId: ID): User
+  "Clear all displayed trophy badges. Requires authentication."
   resetTrophyBadgesSelected: User
 }

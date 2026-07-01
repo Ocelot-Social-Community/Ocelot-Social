@@ -29,7 +29,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Setup Node 20
+      # The embedded API reference is generated with the backend toolchain, which
+      # needs the backend's Node (metascraper requires >= 22, and tsx's require-hook
+      # mis-resolves on Node 22.x — schema:print runs cleanly only on the backend's
+      # Node 25). So generate it here on the backend's Node, into .vuepress/public/api.
+      - name: Setup backend Node (for the GraphQL API reference)
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        with:
+          node-version-file: 'backend/.nvmrc'
+
+      - name: Generate GraphQL API reference (SpectaQL)
+        run: cd backend && yarn install --frozen-lockfile --ignore-scripts && cd .. && npm run docs:api
+
+      # VuePress builds on Node 20; it just copies the already-generated
+      # .vuepress/public/api into the site. Keep these as separate steps so each
+      # tool runs on the Node version it supports.
+      - name: Setup Node 20 (for VuePress)
         uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
         with:
           node-version: 20

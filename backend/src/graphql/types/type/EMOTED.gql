@@ -1,5 +1,8 @@
+"Relationship representing a user's emotional reaction to a post."
 type EMOTED @relation(name: "EMOTED") {
+  "The reacting user."
   from: User
+  "The post reacted to."
   to: Post
 
   emotion: Emotion
@@ -7,6 +10,7 @@ type EMOTED @relation(name: "EMOTED") {
   updatedAt: String
 }
 
+"Selects which emotion to add or remove on a post."
 input _EMOTEDInput {
   emotion: Emotion
   createdAt: String
@@ -20,6 +24,8 @@ input _PostEMOTEDFilter {
 }
 
 type Mutation {
+  "Add the current user's emotional reaction to a post. Requires authentication."
   AddPostEmotions(to: _PostInput!, data: _EMOTEDInput!): EMOTED
+  "Remove the current user's emotional reaction from a post. Requires authentication."
   RemovePostEmotions(to: _PostInput!, data: _EMOTEDInput!): EMOTED
 }

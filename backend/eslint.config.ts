@@ -40,8 +40,25 @@ export default [
       },
     },
     rules: {
-      // Would require descriptions on every type/field/input — too noisy for now
-      '@graphql-eslint/require-description': 'off',
+      // Documentation gate for the API reference (SpectaQL). Scoped to the surface
+      // we hand-author and that is worth documenting:
+      //   - rootField: every Query/Mutation/Subscription field (each API operation)
+      //   - Union/Scalar/Interface type definitions
+      // Deliberately NOT enforced: ObjectTypeDefinition/EnumTypeDefinition/
+      // InputObjectTypeDefinition. Object types would flag every re-opened
+      // `type Query/Mutation/Subscription` block (the schema is split across files),
+      // and enums/inputs carry the neo4j-graphql-js `_*Filter`/`_*Ordering` helpers
+      // that are generated noise. Those domain types are still documented by
+      // convention; only the low-signal/unsatisfiable kinds are left unchecked.
+      '@graphql-eslint/require-description': [
+        'error',
+        {
+          rootField: true,
+          UnionTypeDefinition: true,
+          ScalarTypeDefinition: true,
+          InterfaceTypeDefinition: true,
+        },
+      ],
       // camelCase operation names and _id/_ne underscores conflict with existing schema
       '@graphql-eslint/naming-convention': 'off',
       // Many types (Image, File, InviteCode, etc.) intentionally lack id: ID!

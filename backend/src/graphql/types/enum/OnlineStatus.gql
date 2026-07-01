@@ -1,3 +1,4 @@
+"A user's self-reported presence state."
 enum OnlineStatus {
   online
   away

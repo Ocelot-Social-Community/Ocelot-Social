@@ -1,14 +1,20 @@
+"Relationship recording a moderator's decision on a report."
 type REVIEWED {
   createdAt: String!
   updatedAt: String!
+  "Whether the moderator disabled (hid) the reported resource."
   disable: Boolean!
+  "Whether the moderator closed the report."
   closed: Boolean!
   report: Report
+  "The moderator who made the decision."
   moderator: User
   resource: ReviewedResource
 }
+"The kind of node a moderation decision can apply to."
 union ReviewedResource = User | Post | Comment
 
 type Mutation {
+  "Record a moderation decision on a reported resource: optionally disable (hide) it and/or close the report. Requires the `content.moderate` permission and must respect the act-on hierarchy for the target user."
   review(resourceId: ID!, disable: Boolean, closed: Boolean): REVIEWED
 }

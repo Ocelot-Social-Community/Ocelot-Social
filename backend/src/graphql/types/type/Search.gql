@@ -1,31 +1,43 @@
+"A single hit in the global search, which can be any searchable entity."
 union SearchResult = Post | User | Tag | Group
+"A candidate recipient when starting a chat: a user or a group."
 union ChatTarget = User | Group
 
+"A page of post search results with the total match count."
 type postSearchResults {
   postCount: Int
   posts: [Post]!
 }
 
+"A page of user search results with the total match count."
 type userSearchResults {
   userCount: Int
   users: [User]!
 }
 
+"A page of hashtag search results with the total match count."
 type hashtagSearchResults {
   hashtagCount: Int
   hashtags: [Tag]!
 }
 
+"A page of group search results with the total match count."
 type groupSearchResults {
   groupCount: Int
   groups: [Group]!
 }
 
 type Query {
+  "Search posts by title/content. Public."
   searchPosts(query: String!, firstPosts: Int, postsOffset: Int): postSearchResults!
+  "Search users by name/slug. Public."
   searchUsers(query: String!, firstUsers: Int, usersOffset: Int): userSearchResults!
+  "Search groups by name/description. Public."
   searchGroups(query: String!, firstGroups: Int, groupsOffset: Int): groupSearchResults!
+  "Search hashtags. Public."
   searchHashtags(query: String!, firstHashtags: Int, hashtagsOffset: Int): hashtagSearchResults!
+  "Combined search across posts, users, tags and groups, for the global search box. Public."
   searchResults(query: String!, limit: Int = 5): [SearchResult]!
+  "Search for users and groups to start a chat with. Requires authentication."
   searchChatTargets(query: String!, limit: Int = 10): [ChatTarget]!
 }

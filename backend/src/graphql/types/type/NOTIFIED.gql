@@ -1,16 +1,23 @@
+"Relationship representing a notification delivered to a user about some source activity."
 type NOTIFIED {
   id: ID!
+  "The post, comment or group the notification is about."
   from: NotificationSource
+  "The recipient of the notification."
   to: User
   createdAt: String!
   updatedAt: String!
+  "Whether the recipient has read the notification."
   read: Boolean
   reason: NotificationReason
+  "The user who triggered the notification, when applicable."
   relatedUser: User
 }
 
+"The kind of node a notification originates from."
 union NotificationSource = Post | Comment | Group
 
+"Ordering options for the notifications query."
 enum NotificationOrdering {
   createdAt_asc
   createdAt_desc
@@ -18,6 +25,7 @@ enum NotificationOrdering {
   updatedAt_desc
 }
 
+"Why a notification was created."
 enum NotificationReason {
   mentioned_in_post
   mentioned_in_comment
@@ -26,20 +34,27 @@ enum NotificationReason {
   user_left_group
   changed_group_member_role
   removed_user_from_group
+  "A user the recipient follows published a post."
   followed_user_posted
+  "A new post was created in a group the recipient belongs to."
   post_in_group
 }
 
 type Query {
+  "The current user's notifications. Requires authentication."
   notifications(read: Boolean, orderBy: NotificationOrdering, first: Int, offset: Int): [NOTIFIED]
 }
 
 type Mutation {
+  "Mark a notification as read. Requires authentication."
   markAsRead(id: ID!): NOTIFIED
+  "Mark a notification as unread. Requires authentication."
   markAsUnread(id: ID!): NOTIFIED
+  "Mark all of the current user's notifications as read. Requires authentication."
   markAllAsRead: [NOTIFIED]
 }
 
 type Subscription {
+  "Pushes newly created notifications for the current user in real time."
   notificationAdded: NOTIFIED
 }

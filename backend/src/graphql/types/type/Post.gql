@@ -123,29 +123,46 @@ enum _PostOrdering {
   groupPinned_desc
 }
 
+"A contribution — an article or event — written by a user, optionally within a group."
 type Post {
   id: ID!
+  "ActivityPub activity id, for federated posts."
   activityId: String
+  "ActivityPub object id, for federated posts."
   objectId: String
   author: User @relation(name: "WROTE", direction: "IN")
   title: String!
+  "URL-safe unique handle for the post."
   slug: String!
+  "Post body as rich text (HTML)."
   content: String!
+  "The post's hero image."
   image: Image @relation(name: "HERO_IMAGE", direction: "OUT")
   visibility: Visibility
+  "True once the post has been moderated away."
   deleted: Boolean
+  "True once the post has been disabled by a moderator."
   disabled: Boolean
+  "Whether the post is pinned instance-wide."
   pinned: Boolean
+  "Whether the post is pinned within its group."
   groupPinned: Boolean
+  "ISO 8601 date-time string of creation."
   createdAt: String
+  "ISO 8601 date-time string of the last update."
   updatedAt: String
+  "Date used to sort the post in feeds (may differ from createdAt, e.g. for events)."
   sortDate: String
+  "Content language as an IETF/ISO code (e.g. `en`, `de`)."
   language: String
+  "When the post was pinned instance-wide, or null if not pinned."
   pinnedAt: String
     @cypher(
       statement: "MATCH (this)<-[pinned:PINNED]-(:User) WHERE NOT this.deleted = true AND NOT this.disabled = true RETURN pinned.createdAt"
     )
+  "The user who pinned the post instance-wide."
   pinnedBy: User @relation(name: "PINNED", direction: "IN")
+  "Up to 10 other posts sharing a tag or category with this one."
   relatedContributions: [Post]!
     @cypher(
       statement: """
@@ -159,12 +176,14 @@ type Post {
   categories: [Category] @relation(name: "CATEGORIZED", direction: "OUT")
 
   comments: [Comment]! @relation(name: "COMMENTS", direction: "IN")
+  "Number of visible (non-deleted, non-disabled) comments."
   commentsCount: Int!
     @cypher(
       statement: "MATCH (this)<-[:COMMENTS]-(r:Comment) WHERE NOT r.deleted = true AND NOT r.disabled = true RETURN COUNT(DISTINCT r)"
     )
 
   shoutedBy: [User]! @relation(name: "SHOUTED", direction: "IN")
+  "Number of users who have shouted (endorsed) this post."
   shoutedCount: Int!
     @cypher(
       statement: "MATCH (this)<-[:SHOUTED]-(r:User) WHERE NOT r.deleted = true AND NOT r.disabled = true RETURN COUNT(DISTINCT r)"
@@ -182,43 +201,59 @@ type Post {
   "Unread notifications for comments in this post targeting the currently logged in user."
   unreadCommentNotificationsByCurrentUser: [NOTIFIED!]! @neo4j_ignore
 
+  "Number of times the post has been opened."
   clickedCount: Int!
 
+  "Number of times the post's teaser has been viewed."
   viewedTeaserCount: Int!
+  "Whether the current user has viewed the post's teaser."
   viewedTeaserByCurrentUser: Boolean!
     @cypher(
       statement: "MATCH (this)<-[:VIEWED_TEASER]-(u:User {id: $cypherParams.currentUserId}) RETURN COUNT(u) >= 1"
     )
 
   emotions: [EMOTED]
+  "Total number of emotional reactions on the post."
   emotionsCount: Int!
     @cypher(statement: "MATCH (this)<-[emoted:EMOTED]-(:User) RETURN COUNT(DISTINCT emoted)")
 
+  "The group this post belongs to, or null for a public/timeline post."
   group: Group @relation(name: "IN", direction: "OUT")
 
+  "The post's type(s), derived from its Neo4j labels (e.g. Article, Event)."
   postType: [PostType] @cypher(statement: "RETURN [l IN labels(this) WHERE NOT l = 'Post']")
 
+  "Name of the event's location (Event posts)."
   eventLocationName: String
+  "Structured location of the event (Event posts)."
   eventLocation: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
+  "Venue/room of the event (Event posts)."
   eventVenue: String
+  "Event start time (Event posts)."
   eventStart: String
+  "Event end time (Event posts)."
   eventEnd: String
+  "Whether the event takes place online (Event posts)."
   eventIsOnline: Boolean
 
+  "Whether the current user observes this post (receives notifications about its comments)."
   isObservedByMe: Boolean!
     @cypher(
       statement: "MATCH (this)<-[obs:OBSERVES]-(u:User {id: $cypherParams.currentUserId}) WHERE obs.active = true RETURN COUNT(u) >= 1"
     )
+  "Number of users observing this post."
   observingUsersCount: Int!
     @cypher(
       statement: "MATCH (this)<-[obs:OBSERVES]-(u:User) WHERE obs.active = true AND NOT u.deleted = true AND NOT u.disabled = true RETURN COUNT(DISTINCT u)"
     )
 }
 
+"References a post by id."
 input _PostInput {
   id: ID!
 }
 
+"Event details supplied when a post is of type Event."
 input _EventInput {
   eventStart: String!
   eventEnd: String
@@ -228,6 +263,7 @@ input _EventInput {
 }
 
 type Mutation {
+  "Create a post. Requires authentication and the `post.create` permission; posting into a group additionally requires membership of that group."
   CreatePost(
     id: ID
     title: String!
@@ -237,10 +273,13 @@ type Mutation {
     visibility: Visibility
     language: String
     categoryIds: [ID]
+    "Post into this group; omit for a public/timeline post."
     groupId: ID
     postType: PostType = Article
+    "Event details; required when postType is Event."
     eventInput: _EventInput
   ): Post
+  "Update one of your own posts. Restricted to the author."
   UpdatePost(
     id: ID!
     title: String!
@@ -253,32 +292,45 @@ type Mutation {
     postType: PostType
     eventInput: _EventInput
   ): Post
+  "Delete one of your own posts. Restricted to the author."
   DeletePost(id: ID!): Post
+  "Add the current user's emotional reaction to a post. Requires authentication."
   AddPostEmotions(to: _PostInput!, data: _EMOTEDInput!): EMOTED
+  "Remove the current user's emotional reaction from a post. Requires authentication."
   RemovePostEmotions(to: _PostInput!, data: _EMOTEDInput!): EMOTED
 
+  "Pin a post instance-wide. Requires the `post.pin` permission."
   pinPost(id: ID!): Post
+  "Remove an instance-wide pin. Requires the `post.pin` permission."
   unpinPost(id: ID!): Post
+  "Pin a post within its group. Restricted to those allowed to pin in that group."
   pinGroupPost(id: ID!): Post
+  "Remove a group pin. Restricted to those allowed to pin in that group."
   unpinGroupPost(id: ID!): Post
 
+  "Mark a post's teaser as viewed by the current user. Public."
   markTeaserAsViewed(id: ID!): Post
+  "Push (boost) a post to the top of feeds. Requires the `post.push` permission."
   pushPost(id: ID!): Post!
+  "Remove a post's push/boost. Requires the `post.push` permission."
   unpushPost(id: ID!): Post!
 
-  "Shout the given Type and ID"
+  "Shout (endorse) the given post or comment. Requires authentication."
   shout(id: ID!, type: ShoutTypeEnum!): Boolean!
-  "Unshout the given Type and ID"
+  "Withdraw a shout from the given post or comment. Requires authentication."
   unshout(id: ID!, type: ShoutTypeEnum!): Boolean!
 
+  "Start or stop observing a post (to receive notifications about its comments). Requires authentication."
   toggleObservePost(id: ID!, value: Boolean!): Post!
 }
 
+"Instance-wide pinned-post counters."
 type PinnedPostCounts {
   currentlyPinnedPosts: Int!
 }
 
 type Query {
+  "List posts (the main feed query). Public. Combine with `filter`, `orderBy` and paging for feeds, profiles and groups."
   Post(
     id: ID
     title: String
@@ -296,8 +348,12 @@ type Query {
     filter: _PostFilter
     imageAspectRatio: Float
   ): [Post]
+  "Count of a single emotion on a post. Public."
   PostsEmotionsCountByEmotion(postId: ID!, data: _EMOTEDInput!): Int!
+  "The emotions the current user has left on a post. Requires authentication."
   PostsEmotionsByCurrentUser(postId: ID!): [String]
+  "Posts for a user's profile page. Public."
   profilePagePosts(filter: _PostFilter, first: Int, offset: Int, orderBy: [_PostOrdering]): [Post]
+  "Instance-wide pinned-post counts. Requires the `post.pin` permission."
   PostsPinnedCounts: PinnedPostCounts!
 }

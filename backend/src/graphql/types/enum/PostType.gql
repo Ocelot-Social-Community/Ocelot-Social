@@ -1,4 +1,7 @@
+"The kind of content a post represents. Stored as an additional Neo4j node label."
 enum PostType {
+  "A regular text article."
   Article
+  "An event with a date, and optionally a location or online link."
   Event
 }

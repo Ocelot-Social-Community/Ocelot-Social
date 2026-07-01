@@ -1,3 +1,4 @@
+"A link to an external social-media profile, shown on a user's profile."
 type SocialMedia {
   id: ID!
   url: String
@@ -5,7 +6,10 @@ type SocialMedia {
 }
 
 type Mutation {
+  "Add a social-media link to your profile. Requires the `socialMedia.create` permission."
   CreateSocialMedia(id: ID, url: String!): SocialMedia
+  "Update one of your own social-media links. Restricted to the owner."
   UpdateSocialMedia(id: ID!, url: String!): SocialMedia
+  "Remove one of your own social-media links. Restricted to the owner."
   DeleteSocialMedia(id: ID!): SocialMedia
 }

@@ -1,5 +1,9 @@
+"Who is allowed to see a post."
 enum Visibility {
+  "Visible to everyone, including logged-out visitors and federated instances."
   public
+  "Visible only to the author's friends."
   friends
+  "Visible only to the author."
   private
 }

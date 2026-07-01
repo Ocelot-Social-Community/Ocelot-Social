@@ -1,39 +1,59 @@
+"A personal API key that authenticates programmatic access on behalf of its owner. Only a non-secret prefix and metadata are stored; the secret itself is shown exactly once, at creation."
 type ApiKey {
   id: ID!
+  "Human-readable label chosen by the owner."
   name: String!
+  "Non-secret leading segment of the key, used to identify it in listings."
   keyPrefix: String!
   createdAt: String!
+  "When the key last authenticated a request, or null if never used."
   lastUsedAt: String
+  "When the key expires, or null if it never expires."
   expiresAt: String
+  "True once the key has been revoked."
   disabled: Boolean!
   disabledAt: String
   owner: User @relation(name: "HAS_API_KEY", direction: "IN")
 }
 
+"Returned exactly once, on creation — the only moment the full secret is exposed."
 type ApiKeyWithSecret {
   apiKey: ApiKey!
+  "The full API key secret. Store it now; it cannot be retrieved again."
   secret: String!
 }
 
+"Aggregated per-user API-key usage, for the administration overview."
 type ApiKeyUserSummary {
   user: User!
+  "Number of the user's currently active (non-revoked) keys."
   activeCount: Int!
+  "Number of the user's revoked keys."
   revokedCount: Int!
   postsCount: Int!
   commentsCount: Int!
+  "Most recent time any of the user's keys was used, or null."
   lastActivity: String
 }
 
 type Query {
+  "The requesting user's own API keys. Requires authentication and the apiKeysEnabled policy."
   myApiKeys: [ApiKey!]!
+  "Administration overview of API-key usage per user. Requires the `apiKey.administer` permission."
   apiKeyUsers(first: Int, offset: Int): [ApiKeyUserSummary!]!
+  "All API keys belonging to a given user. Requires the `apiKey.administer` permission."
   apiKeysForUser(userId: ID!): [ApiKey!]!
 }
 
 type Mutation {
+  "Create a new API key and return its secret (shown only here). Requires the `apiKey.create` permission (gated by the apiKeysEnabled policy)."
   createApiKey(name: String!, expiresInDays: Int): ApiKeyWithSecret!
+  "Rename one of your own API keys. Requires authentication."
   updateApiKey(id: ID!, name: String!): ApiKey!
+  "Revoke one of your own API keys. Requires authentication."
   revokeApiKey(id: ID!): Boolean!
+  "Revoke any user's API key (administration). Requires the `apiKey.administer` permission."
   adminRevokeApiKey(id: ID!): Boolean!
+  "Revoke all of a user's API keys and return how many were revoked. Requires the `apiKey.administer` permission."
   adminRevokeUserApiKeys(userId: ID!): Int!
 }

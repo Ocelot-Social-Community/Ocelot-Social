@@ -1,0 +1,172 @@
+# SpectaQL configuration — generates the static HTML API reference.
+#
+# Source of truth is the printed, *augmented* runtime schema (see
+# `yarn schema:print`), NOT the hand-written .gql files: neo4j-graphql-js adds
+# auto-generated queries, filters, orderBy and CRUD mutations that only exist in
+# the built schema.
+#
+# Build:   yarn docs:api      (prints schema + renders HTML into ./public-docs)
+# Output:  ./public-docs/index.html  (single, self-contained page)
+
+spectaql:
+  targetDir: ./public-docs
+  # No custom logo/favicon yet — keep the default theme. Point these at branding
+  # assets later if the docs get embedded into docs.ocelot.social.
+  logoFile: false
+  faviconFile: false
+
+introspection:
+  # Read the SDL produced by `yarn schema:print` rather than introspecting a live
+  # server, so docs build deterministically in CI without a running Neo4j/backend.
+  schemaFile: ./schema.graphql
+  # neo4j-graphql-js generates a lot of helper types/fields; keep them visible so
+  # the reference matches what the API actually accepts.
+  removeTrailingPeriodFromDescriptions: false
+
+info:
+  title: ocelot.social GraphQL API
+  description: >
+    Reference documentation for the ocelot.social GraphQL API, generated from the
+    backend schema. The endpoint and authentication depend on your deployment;
+    the URL below is the local development default (configurable via GRAPHQL_URI).
+  x-introItems:
+    - title: Authentication
+      description: |
+        Most operations require authentication. Send a token in the
+        `Authorization` header as a Bearer token on every request:
+
+        ```
+        Authorization: Bearer <token>
+        ```
+
+        Two kinds of token are accepted, distinguished by prefix:
+
+        - **JWT** — obtained from the `login` mutation; used by the web app.
+        - **Personal API key** (prefix `oak_`) — for programmatic access, created
+          with `createApiKey` when the `apiKeysEnabled` policy is on. The secret is
+          shown only once, at creation.
+
+        Unauthenticated requests are allowed for public operations (e.g. `Post`,
+        `searchPosts`, `Category`); everything else resolves the current user from
+        the token.
+
+    - title: Permissions & roles
+      description: |
+        Beyond being logged in, many operations require a specific **permission**.
+        Each operation's description states what it needs — e.g. *"Requires the
+        `content.moderate` permission"* or *"Restricted to the author"*.
+
+        Permissions are granted through **roles** (dynamic, admin-managed). A
+        caller's effective permissions can be read with `myPermissions`. Some
+        rights are additionally gated by a runtime feature policy (e.g.
+        `apiKey.create` only applies while `apiKeysEnabled` is on). Moderator- and
+        owner-grade actions also respect an "act-on" hierarchy that prevents acting
+        on higher-ranked users.
+
+    - title: Errors
+      description: |
+        Responses follow the GraphQL convention: `data` carries the result and an
+        `errors` array carries any problems, each with a `message` and a `path`.
+        Authorization failures surface as a top-level error with the message
+        `Not Authorized!`. A partial `data` payload alongside `errors` is normal
+        when only some fields fail.
+
+    - title: Real-time subscriptions
+      description: |
+        Live updates (new notifications, chat messages, room and policy changes)
+        are delivered via **GraphQL subscriptions** over WebSocket using the
+        `graphql-ws` protocol, on the same endpoint. Pass the same
+        `Authorization` header in the connection parameters.
+
+        ```graphql
+        subscription {
+          notificationAdded {
+            id
+            reason
+            read
+          }
+        }
+        ```
+
+    - title: File uploads
+      description: |
+        File and image uploads use the
+        [GraphQL multipart request spec](https://github.com/jaydenseric/graphql-multipart-request-spec)
+        via the `Upload` scalar. Avatars and post images take an `ImageInput`
+        (`upload` field), chat attachments take a `FileInput`. Non-multipart
+        clients may instead reference already-hosted assets by URL.
+
+    - title: Federation
+      description: |
+        The schema carries ActivityPub identifiers (`actorId`, `activityId`,
+        `objectId`, `publicKey`) on users, posts and comments for federation with
+        other instances. Most clients can ignore these fields.
+
+    - title: Examples
+      description: |
+        A few representative operations. Send variables alongside each query and
+        the `Authorization` header (except for `login`).
+
+        **Log in and obtain a JWT**
+
+        ```graphql
+        mutation ($email: String!, $password: String!) {
+          login(email: $email, password: $password)
+        }
+        ```
+
+        **The current user**
+
+        ```graphql
+        query {
+          currentUser {
+            id
+            slug
+            name
+            avatar { url }
+          }
+        }
+        ```
+
+        **Create a post**
+
+        ```graphql
+        mutation ($title: String!, $content: String!, $categoryIds: [ID]) {
+          CreatePost(title: $title, content: $content, categoryIds: $categoryIds) {
+            id
+            slug
+          }
+        }
+        ```
+
+        **A page of the feed**
+
+        ```graphql
+        query ($first: Int, $offset: Int, $orderBy: [_PostOrdering]) {
+          Post(first: $first, offset: $offset, orderBy: $orderBy) {
+            id
+            title
+            createdAt
+            author { id name }
+            commentsCount
+            shoutedCount
+          }
+        }
+        ```
+
+        **Send a chat message**
+
+        ```graphql
+        mutation ($roomId: ID, $content: String) {
+          CreateMessage(roomId: $roomId, content: $content) {
+            id
+            content
+            createdAt
+          }
+        }
+        ```
+
+servers:
+  - url: http://localhost:4000/
+    description: Local development (default GRAPHQL_URI)
+    production: false

@@ -1,13 +1,17 @@
 type Query {
+  "Instance-wide usage counters. Requires the `network.statistics.read` permission."
   statistics: Statistics!
 }
 
+"Aggregate counts describing the whole instance."
 type Statistics {
+  "Number of active (non-deleted) user accounts."
   users: Int!
   usersDeleted: Int!
   posts: Int!
   comments: Int!
   notifications: Int!
+  "Number of registered email addresses."
   emails: Int!
   follows: Int!
   shouts: Int!
@@ -21,6 +25,7 @@ type Statistics {
   inviteCodesExpired: Int!
   inviteCodesRedeemed: Int!
   badgesRewarded: Int!
+  "Number of trophy badges users have chosen to display."
   badgesDisplayed: Int!
   usersVerified: Int!
   reports: Int!

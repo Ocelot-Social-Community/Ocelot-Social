@@ -22,6 +22,8 @@ deployment/configurations/
 .vuepress/.cache/
 .vuepress/.temp/
 .vuepress/dist/
+# Generated GraphQL API reference (SpectaQL), embedded into the VuePress site at /api/
+.vuepress/public/api/
 
 
 !.gitkeep

@@ -1,8 +1,12 @@
+"A file attached to a chat message."
 type File {
+  "The file's URL, which also serves as its identifier."
   url: ID!
   name: String
   extension: String
+  "MIME type of the file."
   type: String
+  "Duration in seconds for audio/video files."
   duration: Float
   # size: Int
   # audio: Boolean
@@ -10,7 +14,9 @@ type File {
   # progress: Int
 }
 
+"Input for a file to attach to a chat message. The file itself must be provided as `upload` (attaching without it is rejected); the remaining fields are its metadata."
 input FileInput {
+  "The file to upload. Required — the resolver rejects an attachment without it."
   upload: Upload
   name: String
   extension: String

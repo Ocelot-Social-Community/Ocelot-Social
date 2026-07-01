@@ -1,8 +1,10 @@
+"A bundle of a user together with their posts, used for GDPR-style data export/inspection."
 type UserData {
   user: User!
   posts: [Post]
 }
 
 type Query {
+  "Fetch a user together with their posts. Defaults to the current user when no id is given. Requires authentication."
   userData(id: ID): UserData
 }

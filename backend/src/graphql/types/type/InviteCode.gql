@@ -1,29 +1,42 @@
+"An invite code. A personal code lets its holder register on the instance; a group code additionally grants membership in a specific group. May be limited by an expiry and a redemption limit."
 type InviteCode {
+  "The code string, which also serves as its identifier."
   code: ID!
   createdAt: String!
+  "The user who issued the code."
   generatedBy: User @relation(name: "GENERATED", direction: "IN")
+  "Users who have redeemed this code."
   redeemedBy: [User] @relation(name: "REDEEMED", direction: "IN")
   redeemedByCount: Int! @cypher(statement: "MATCH (this)<-[:REDEEMED]-(related:User)")
+  "When the code expires, or null if it never expires."
   expiresAt: String
+  "Free-form note the issuer attached to the code."
   comment: String
 
+  "The group this code invites into, or null for a personal (registration-only) code."
   invitedTo: Group @neo4j_ignore
   # invitedFrom: User! @neo4j_ignore # -> see generatedBy
 
+  "Whether the code can still be redeemed (not expired, invalidated, or over its redemption limit)."
   isValid: Boolean! @neo4j_ignore
 }
 
 type Query {
+  "Look up an invite code and its validity, e.g. on the registration screen. Public."
   validateInviteCode(code: String!): InviteCode
 }
 
 type Mutation {
+  "Issue a personal invite code for registering new users. Requires authentication and the `user.invite` permission."
   generatePersonalInviteCode(expiresAt: String = null, comment: String = null): InviteCode!
+  "Issue an invite code granting membership in a group. Restricted to admins/owners of that group."
   generateGroupInviteCode(
     groupId: ID!
     expiresAt: String = null
     comment: String = null
   ): InviteCode!
+  "Invalidate one of your invite codes so it can no longer be redeemed. Requires authentication."
   invalidateInviteCode(code: String!): InviteCode
+  "Redeem an invite code for the current user (registration and/or group membership). Requires authentication."
   redeemInviteCode(code: String!): Boolean!
 }
