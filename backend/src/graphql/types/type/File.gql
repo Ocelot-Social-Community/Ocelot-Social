@@ -14,8 +14,9 @@ type File {
   # progress: Int
 }
 
-"Input for attaching a file to a message; provide either an upload or already-hosted metadata."
+"Input for a file to attach to a chat message. The file itself must be provided as `upload` (attaching without it is rejected); the remaining fields are its metadata."
 input FileInput {
+  "The file to upload. Required — the resolver rejects an attachment without it."
   upload: Upload
   name: String
   extension: String
