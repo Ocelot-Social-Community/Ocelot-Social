@@ -171,6 +171,28 @@ describe('admin/roles.vue', () => {
     expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(false)
   })
 
+  it('refreshes an untouched draft to the new server set on a live refetch (reactive checkboxes)', async () => {
+    // Regression: another admin changes a role while this admin views it. The refetch moves
+    // role.permissions; an untouched draft must adopt the new set (checkboxes update without
+    // a reload). The bug preserved the stale draft because the changed server set alone
+    // looked "dirty".
+    const wrapper = Wrapper()
+    wrapper.vm.setActive('badge-setter')
+    // badge-setter starts with only badge.manage, no local edits.
+    expect(wrapper.vm.forms['badge-setter'].permissions['badge.manage']).toBe(true)
+    expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(false)
+    // Simulate the refetch result: the server now also grants post.create to badge-setter.
+    wrapper.setData({
+      roles: roles.map((r) =>
+        r.name === 'badge-setter' ? { ...r, permissions: ['badge.manage', 'post.create'] } : r,
+      ),
+    })
+    wrapper.vm.buildForms()
+    // The untouched draft adopts the new set instead of keeping the stale one.
+    expect(wrapper.vm.forms['badge-setter'].permissions['badge.manage']).toBe(true)
+    expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(true)
+  })
+
   it('refreshFromServer refetches the catalog and roles (live availability update)', () => {
     const wrapper = Wrapper()
     const permissionCatalog = { refetch: jest.fn() }

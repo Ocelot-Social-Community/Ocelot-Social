@@ -381,10 +381,14 @@ export default {
     buildForms() {
       const forms = {}
       for (const role of this.roles) {
-        // Preserve an editable role's draft while it has unsaved edits, so a live refetch
-        // (another admin's change, or a permission-gating policy toggle) does not clobber
-        // in-progress work. Protected roles are never edited → always rebuilt.
-        if (!role.protected && this.forms[role.name] && this.isDirty(role)) {
+        // Preserve an editable role's draft only when THIS admin has locally edited it, so a
+        // live refetch (another admin's change, or a permission-gating policy toggle) does
+        // not clobber in-progress work — but an untouched draft DOES refresh to the new
+        // server set. `isLocallyEdited` compares against the draft's own build-time baseline
+        // (not `role.permissions`, which the refetch has already moved), so a remote change
+        // under an unedited form is not mistaken for a local edit (which would leave the
+        // checkboxes showing the stale set until a reload). Protected roles → always rebuilt.
+        if (!role.protected && this.forms[role.name] && this.isLocallyEdited(role.name)) {
           forms[role.name] = this.forms[role.name]
           continue
         }
@@ -394,6 +398,9 @@ export default {
         for (const key of keys) permissions[key] = true
         forms[role.name] = {
           permissions,
+          // Snapshot of the server set this draft was built from, so a later refetch can
+          // tell a local edit apart from a remote change (see isLocallyEdited).
+          baseline: [...keys],
         }
       }
       this.forms = forms
@@ -533,6 +540,20 @@ export default {
       return (
         selected.length !== original.length ||
         selected.some((key, index) => key !== original[index])
+      )
+    },
+    // Whether the draft differs from the server set it was BUILT from (its baseline),
+    // i.e. this admin has toggled something locally. Unlike isDirty (draft vs the current
+    // server set), this is stable across a live refetch that moves role.permissions, so it
+    // only protects genuine in-progress edits from being rebuilt (see buildForms).
+    isLocallyEdited(roleName) {
+      const form = this.forms[roleName]
+      if (!form || !form.baseline) return false
+      const selected = this.selectedPermissions(form.permissions).sort()
+      const baseline = [...form.baseline].sort()
+      return (
+        selected.length !== baseline.length ||
+        selected.some((key, index) => key !== baseline[index])
       )
     },
     canDelete(role) {
