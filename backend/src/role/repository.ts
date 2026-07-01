@@ -92,6 +92,28 @@ export async function writeRole(
   })
 }
 
+// Rename a role in place: SET the new id/name on the SAME node, so its HAS_ROLE
+// edges (which reference node identity, not the name) survive untouched — members
+// are preserved. The `id` uniqueness constraint (neode Role model) rejects a
+// collision with an existing role. Guards (protected/mandatory, existence,
+// collision) live at the service/resolver layer.
+export async function renameRole(
+  db: DbContext,
+  oldName: string,
+  newName: string,
+  actor: string,
+  now: string,
+): Promise<void> {
+  await db.write({
+    query: `MATCH (r:Role {id: $oldName})
+            SET r.id = $newName,
+                r.name = $newName,
+                r.updatedAt = $now,
+                r.updatedBy = $actor`,
+    variables: { oldName, newName, actor, now },
+  })
+}
+
 // Delete a role and all its HAS_ROLE edges (DETACH). Protected roles are guarded
 // at the service/resolver layer, not here.
 export async function deleteRole(db: DbContext, name: string): Promise<void> {

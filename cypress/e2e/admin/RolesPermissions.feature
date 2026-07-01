@@ -93,6 +93,22 @@ Feature: Admin roles & permissions (RBAC)
     Then I see a toaster with status "success"
     And I do not see the element with test id "role-tab-editor"
 
+  # B2 — renaming a custom role through the admin UI keeps its members (the exact
+  # gap a live test hit: an existing custom role could not be renamed at all).
+  Scenario: Admin renames a custom role, and it keeps its members
+    Given a role "editor" granting "comment.create" exists
+    And the user with id "peter" is assigned the role "editor"
+    And I am logged in as "admin"
+    When I navigate to page "/admin/roles"
+    And I select the role "editor"
+    And I start renaming the role to "content-lead"
+    And I confirm the rename
+    Then I see a toaster with status "success"
+    And I see the element with test id "role-tab-content-lead"
+    And I do not see the element with test id "role-tab-editor"
+    When I navigate to page "/admin/users"
+    Then the user with id "peter" has the role "content-lead" selected
+
   Scenario: Admin assigns a custom role to a user via the users page
     Given a role "editor" granting "comment.create" exists
     And I am logged in as "admin"

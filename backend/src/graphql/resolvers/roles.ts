@@ -169,6 +169,32 @@ export default {
       }
     },
 
+    renameRole: async (
+      _parent: unknown,
+      { name, newName }: { name: string; newName: string },
+      context: Context,
+    ) => {
+      if (!ROLE_NAME_RE.test(newName)) {
+        throw new UserInputError('Invalid role name.')
+      }
+      if (!context.role.getRole(name)) {
+        throw new UserInputError(`Unknown role: ${name}`)
+      }
+      if (name !== newName && context.role.getRole(newName)) {
+        throw new UserInputError(`Role '${newName}' already exists.`)
+      }
+      try {
+        const def = await context.role.renameRole(name, newName, context.user?.id ?? 'unknown')
+        // The role's identity changed → every holder's roleName changed and any open
+        // admin roles view must refetch. Broadcast under the new name.
+        publishPermissionsChanged(context, def.name)
+        return toGraphqlRole(def, await countMembers(context, def.name))
+      } catch (err) {
+        if (err instanceof RoleValidationError) throw new ForbiddenError(err.message)
+        throw err
+      }
+    },
+
     deleteRole: async (_parent: unknown, { name }: { name: string }, context: Context) => {
       try {
         await context.role.deleteRole(name, context.user?.id ?? 'unknown')

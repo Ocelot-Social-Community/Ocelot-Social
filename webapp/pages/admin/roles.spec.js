@@ -380,4 +380,72 @@ describe('admin/roles.vue', () => {
     expect(wrapper.vm.activeRoleName).toBe('event-org')
     expect(wrapper.vm.creating).toBe(false)
   })
+
+  describe('rename', () => {
+    it('offers rename only for non-protected, non-baseline roles', () => {
+      const wrapper = Wrapper()
+      expect(wrapper.vm.canRename(roles[0])).toBe(false) // owner (protected)
+      expect(wrapper.vm.canRename(roles[2])).toBe(false) // user (baseline)
+      expect(wrapper.vm.canRename(roles[1])).toBe(true) // badge-setter (custom)
+    })
+
+    it('shows the rename affordance only for a renamable active role', async () => {
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      await wrapper.vm.$nextTick()
+      expect(wrapper.find('[data-test="role-rename"]').exists()).toBe(true)
+      // The baseline user role cannot be renamed → no pencil.
+      wrapper.vm.setActive('user')
+      await wrapper.vm.$nextTick()
+      expect(wrapper.find('[data-test="role-rename"]').exists()).toBe(false)
+    })
+
+    it('the pencil turns the role name into an input prefilled with the current name', async () => {
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      await wrapper.vm.$nextTick()
+      await wrapper.find('[data-test="role-rename"]').trigger('click')
+      expect(wrapper.vm.renaming).toBe(true)
+      expect(wrapper.vm.renameValue).toBe('badge-setter')
+      expect(wrapper.find('[data-test="rename-role-name"]').exists()).toBe(true)
+    })
+
+    it('renameRole sends the old and new name, then selects the renamed role', async () => {
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.startRename()
+      wrapper.setData({ renameValue: 'badge-master' })
+      await wrapper.vm.renameRole()
+      expect(mutate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: { name: 'badge-setter', newName: 'badge-master' },
+        }),
+      )
+      expect(wrapper.vm.activeRoleName).toBe('badge-master')
+      expect(wrapper.vm.renaming).toBe(false)
+    })
+
+    it('renameRole is a no-op when the name is unchanged or empty', async () => {
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.startRename()
+      wrapper.setData({ renameValue: 'badge-setter' }) // unchanged
+      await wrapper.vm.renameRole()
+      wrapper.setData({ renameValue: '   ' }) // blank
+      await wrapper.vm.renameRole()
+      expect(mutate).not.toHaveBeenCalled()
+    })
+
+    it('starting a rename cancels create mode (and vice versa)', () => {
+      const wrapper = Wrapper()
+      wrapper.vm.startCreate()
+      expect(wrapper.vm.creating).toBe(true)
+      wrapper.vm.startRename()
+      expect(wrapper.vm.creating).toBe(false)
+      expect(wrapper.vm.renaming).toBe(true)
+      wrapper.vm.startCreate()
+      expect(wrapper.vm.renaming).toBe(false)
+      expect(wrapper.vm.creating).toBe(true)
+    })
+  })
 })

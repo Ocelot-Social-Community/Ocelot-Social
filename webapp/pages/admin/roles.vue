@@ -71,9 +71,52 @@
     <section v-if="activeRole" class="role" :data-test="`role-${activeRole.name}`">
       <header class="role__header">
         <h3 class="role__name">
-          {{ activeRole.name }}
-          <span v-if="activeRole.protected" class="role__badge">
-            {{ $t('admin.roles.protected') }}
+          <template v-if="!renaming">
+            {{ activeRole.name }}
+            <button
+              v-if="canRename(activeRole)"
+              type="button"
+              class="role__rename"
+              :title="$t('admin.roles.rename')"
+              :aria-label="$t('admin.roles.rename')"
+              data-test="role-rename"
+              @click="startRename"
+            >
+              ✎
+            </button>
+            <span v-if="activeRole.protected" class="role__badge">
+              {{ $t('admin.roles.protected') }}
+            </span>
+          </template>
+          <span v-else class="role-tab role-tab--input" data-test="role-rename-edit">
+            <input
+              ref="renameInput"
+              v-model="renameValue"
+              type="text"
+              class="role-tab__input"
+              :placeholder="$t('admin.roles.nameLabel')"
+              data-test="rename-role-name"
+              @keyup.enter="renameRole"
+              @keyup.esc="cancelRename"
+            />
+            <button
+              type="button"
+              class="role-tab__confirm"
+              :disabled="!renameValue.trim() || renameValue.trim() === activeRole.name || saving"
+              :aria-label="$t('admin.roles.rename')"
+              data-test="rename-role-confirm"
+              @click="renameRole"
+            >
+              ✓
+            </button>
+            <button
+              type="button"
+              class="role-tab__cancel"
+              :aria-label="$t('actions.cancel')"
+              @click="cancelRename"
+            >
+              ✕
+            </button>
           </span>
         </h3>
         <nuxt-link
@@ -171,6 +214,7 @@ import {
   createRoleMutation,
   deleteRoleMutation,
   permissionCatalogQuery,
+  renameRoleMutation,
   rolesQuery,
   updateRoleMutation,
 } from '~/graphql/admin/Roles.js'
@@ -194,6 +238,9 @@ export default {
       // Whether the + button is in name-input mode.
       creating: false,
       newRole: { name: '' },
+      // Whether the active role's name is being edited (rename mode), and its draft.
+      renaming: false,
+      renameValue: '',
       saving: false,
       // Confirm-modal state for the self-lockout warning (see saveRole).
       showConfirmModal: false,
@@ -346,8 +393,50 @@ export default {
     setActive(name) {
       this.activeRoleName = name
       this.cancelCreate()
+      this.cancelRename()
+    },
+    // Mandatory roles are load-bearing by name (owner ⇒ full catalog, user ⇒ the
+    // baseline fallback) and cannot be renamed — mirrors the backend guard.
+    canRename(role) {
+      return !role.protected && role.name !== 'user'
+    },
+    startRename() {
+      this.creating = false
+      this.renaming = true
+      this.renameValue = this.activeRole.name
+      this.$nextTick(() => {
+        if (this.$refs.renameInput) this.$refs.renameInput.focus()
+      })
+    },
+    cancelRename() {
+      this.renaming = false
+      this.renameValue = ''
+    },
+    // Rename the active role, keeping its permissions and members. On success the
+    // switcher re-selects it under its new name; a permissionsChanged broadcast makes
+    // other admins' open views refetch.
+    async renameRole() {
+      const oldName = this.activeRole.name
+      const newName = this.renameValue.trim()
+      if (!newName || newName === oldName || this.saving) return
+      this.saving = true
+      try {
+        await this.$apollo.mutate({
+          mutation: renameRoleMutation,
+          variables: { name: oldName, newName },
+        })
+        await this.$apollo.queries.roles.refetch()
+        this.activeRoleName = newName
+        this.cancelRename()
+        this.$toast.success(this.$t('admin.roles.renameSuccess'))
+      } catch (err) {
+        this.$toast.error(this.$t('admin.roles.renameError', { message: err.message }))
+      } finally {
+        this.saving = false
+      }
     },
     startCreate() {
+      this.cancelRename()
       this.creating = true
       this.newRole.name = ''
       this.$nextTick(() => {
@@ -586,6 +675,19 @@ export default {
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: $text-color-soft;
+  }
+  // Pencil affordance next to the role name; reveals the inline rename input.
+  &__rename {
+    margin-left: $space-xx-small;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 0.7em;
+    color: $text-color-soft;
+
+    &:hover {
+      color: $color-primary;
+    }
   }
   &__members {
     color: $text-color-soft;

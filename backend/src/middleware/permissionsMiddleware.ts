@@ -661,6 +661,7 @@ export default shield(
 
       createRole: hasPermission('role.manage'),
       updateRole: hasPermission('role.manage'),
+      renameRole: hasPermission('role.manage'),
       deleteRole: hasPermission('role.manage'),
       setUserRole: hasPermission('role.manage'),
       markTeaserAsViewed: allow,

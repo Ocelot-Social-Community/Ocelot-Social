@@ -35,6 +35,16 @@ defineStep('I confirm creating the role', () => {
   cy.get('[data-test="new-role-create"]').click()
 })
 
+defineStep('I start renaming the role to {string}', (newName) => {
+  cy.get('[data-test="role-rename"]').click()
+  // The input is prefilled with the current name — clear it before typing the new one.
+  cy.get('[data-test="rename-role-name"]').clear().type(newName)
+})
+
+defineStep('I confirm the rename', () => {
+  cy.get('[data-test="rename-role-confirm"]').click()
+})
+
 defineStep('I delete the role {string}', (roleName) => {
   cy.get(`[data-test="role-${roleName}-delete"]`).click()
 })

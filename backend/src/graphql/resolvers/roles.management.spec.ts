@@ -53,6 +53,11 @@ const UPDATE_ROLE = `mutation ($name: String!, $permissions: [String!]!) {
 }`
 const USER_ROLES = `query ($userId: ID!) { userRoles(userId: $userId) { name protected permissions } }`
 const DELETE_ROLE = `mutation ($name: String!) { deleteRole(name: $name) }`
+const RENAME_ROLE = `mutation ($name: String!, $newName: String!) {
+  renameRole(name: $name, newName: $newName) {
+    name permissions protected memberCount
+  }
+}`
 const SET_USER_ROLE = `mutation ($userId: ID!, $roleName: String!) { setUserRole(userId: $userId, roleName: $roleName) { id roleName } }`
 
 describe('role management', () => {
@@ -109,6 +114,16 @@ describe('role management', () => {
       })
       expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
         permissionsChanged: { roleName: 'broadcast-role' },
+      })
+    })
+
+    it('broadcasts on renameRole under the new name (holders’ role name changed)', async () => {
+      await mutate({
+        mutation: RENAME_ROLE,
+        variables: { name: 'broadcast-role', newName: 'broadcast-renamed' },
+      })
+      expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
+        permissionsChanged: { roleName: 'broadcast-renamed' },
       })
     })
 
@@ -432,6 +447,90 @@ describe('role management', () => {
       await mutate({ mutation: SET_USER_ROLE, variables: { userId: 'holder', roleName: 'held' } })
       const { errors } = await mutate({ mutation: DELETE_ROLE, variables: { name: 'held' } })
       expect(errors?.[0].message).toMatch(/assigned/)
+    })
+  })
+
+  describe('renameRole', () => {
+    beforeEach(asAdmin)
+
+    it('renames a custom role, preserving its permissions and its members', async () => {
+      await Factory.build(
+        'user',
+        { id: 'member-1', role: 'user' },
+        { email: 'm1@e.org', password: '1234' },
+      )
+      await mutate({
+        mutation: CREATE_ROLE,
+        variables: { name: 'editor', permissions: ['post.pin'] },
+      })
+      await mutate({
+        mutation: SET_USER_ROLE,
+        variables: { userId: 'member-1', roleName: 'editor' },
+      })
+
+      const { data, errors } = await mutate({
+        mutation: RENAME_ROLE,
+        variables: { name: 'editor', newName: 'content-lead' },
+      })
+
+      expect(errors).toBeUndefined()
+      // Permissions kept; the member moved with the role (edge preserved).
+      expect(data.renameRole).toMatchObject({
+        name: 'content-lead',
+        permissions: ['post.pin'],
+        memberCount: 1,
+      })
+      // The old name is gone and the member now reports the new role name.
+      const { data: rolesData } = await query({ query: ROLES })
+      expect(rolesData.roles.map((role: { name: string }) => role.name)).toContain('content-lead')
+      expect(rolesData.roles.map((role: { name: string }) => role.name)).not.toContain('editor')
+      const { data: userData } = await query({
+        query: USER_INFO,
+        variables: { id: 'member-1' },
+      })
+      expect(userData.User[0].roleName).toBe('content-lead')
+    })
+
+    it('forbids renaming the protected owner role', async () => {
+      const { errors } = await mutate({
+        mutation: RENAME_ROLE,
+        variables: { name: 'owner', newName: 'boss' },
+      })
+      expect(errors?.[0].message).toMatch(/protected/)
+    })
+
+    it('forbids renaming the mandatory user role', async () => {
+      const { errors } = await mutate({
+        mutation: RENAME_ROLE,
+        variables: { name: 'user', newName: 'member' },
+      })
+      expect(errors?.[0].message).toMatch(/mandatory/)
+    })
+
+    it('rejects renaming an unknown role', async () => {
+      const { errors } = await mutate({
+        mutation: RENAME_ROLE,
+        variables: { name: 'nope', newName: 'whatever' },
+      })
+      expect(errors?.[0].message).toMatch(/Unknown role/)
+    })
+
+    it('rejects renaming onto an existing role name', async () => {
+      await mutate({ mutation: CREATE_ROLE, variables: { name: 'editor', permissions: [] } })
+      const { errors } = await mutate({
+        mutation: RENAME_ROLE,
+        variables: { name: 'editor', newName: 'admin' },
+      })
+      expect(errors?.[0].message).toMatch(/already exists/)
+    })
+
+    it('rejects an invalid new role name', async () => {
+      await mutate({ mutation: CREATE_ROLE, variables: { name: 'editor', permissions: [] } })
+      const { errors } = await mutate({
+        mutation: RENAME_ROLE,
+        variables: { name: 'editor', newName: 'Not Valid!' },
+      })
+      expect(errors?.[0].message).toMatch(/Invalid role name/)
     })
   })
 
