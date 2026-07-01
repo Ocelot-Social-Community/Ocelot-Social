@@ -42,7 +42,3 @@ vuepress: &vuepress
 documentation: &documentation
   - *vuepress
   - *markdown
-  # The embedded API reference is generated from the GraphQL SDL + SpectaQL config,
-  # so schema/config changes must also trigger a docs rebuild & redeploy.
-  - 'backend/src/graphql/**/*.gql'
-  - 'backend/spectaql.yml'

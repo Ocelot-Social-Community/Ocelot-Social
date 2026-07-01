@@ -45,7 +45,9 @@ yarn docs:api
    generates queries, `filter`/`orderBy` arguments and CRUD mutations that do
    **not** exist in the hand-written `src/graphql/**/*.gql` files. Introspecting
    the built schema (rather than the SDL files) is therefore the only complete
-   source of truth. The print runs without a Neo4j connection, so it works in CI.
+   source of truth. The printer builds the augmented schema from `typeDefs` only
+   (no resolvers), so it pulls in no runtime config and needs **no env and no
+   Neo4j connection** — it just emits the SDL, which works anywhere (CI, Docker).
 2. **`spectaql spectaql.yml`** renders the SDL into static HTML under
    `public-docs/` (git-ignored). Configure title, intro and endpoint in
    [`spectaql.yml`](./spectaql.yml).
@@ -54,11 +56,13 @@ Both `schema.graphql` and `public-docs/` are git-ignored build artifacts —
 `docs:api` regenerates `schema.graphql` on every run, so it never needs to be
 committed.
 
-### CI
+### Hosting: embedded in the documentation site
 
-The [`docs-api` workflow](../.github/workflows/docs-api.yml) builds the HTML on
-every backend change and uploads it as the `graphql-api-docs` artifact (download
-it from the workflow run). Hosting is intentionally not wired up yet — the docs
-could later be embedded into `docs.ocelot.social` if desired.
+The API reference is part of the VuePress documentation site: the
+[`deploy-documentation` workflow](../.github/workflows/deploy-documentation.yml)
+generates it into `.vuepress/public/api` (via the repo-root `npm run docs:api`)
+and `vuepress build` ships it to `docs.ocelot.social/api` (linked from the "API"
+navbar entry). Locally, `docker compose up docs` serves the whole site, and
+`cd backend && yarn docs:api` still produces the standalone `public-docs/` HTML.
 
 
