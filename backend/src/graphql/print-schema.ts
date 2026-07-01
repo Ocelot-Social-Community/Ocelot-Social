@@ -9,6 +9,8 @@ import typeDefs from '@graphql/types/index'
 
 import { augmentedSchemaConfig } from './schema.augment-config'
 
+import type { GraphQLSchema } from 'graphql'
+
 // Print the fully *augmented* runtime schema (neo4j-graphql-js adds auto-generated
 // queries, filters, orderBy and CRUD mutations on top of the hand-written SDL) to
 // an SDL file. This file is the source of truth consumed by the API docs generator
@@ -24,16 +26,15 @@ import { augmentedSchemaConfig } from './schema.augment-config'
 // of file load order, so regenerating without API changes yields an identical file.
 const outFile = path.resolve(__dirname, '../../schema.graphql')
 
-// makeAugmentedSchema is untyped (neo4j-graphql-js); cast its result to the type
-// printSchema expects, matching the original pattern.
-const sdl = printSchema(
-  lexicographicSortSchema(
-    makeAugmentedSchema({
-      typeDefs: print(typeDefs),
-      config: augmentedSchemaConfig,
-    }) as Parameters<typeof printSchema>[0],
-  ),
-)
+// neo4j-graphql-js ships no types, so makeAugmentedSchema() is `any`; assert the
+// GraphQLSchema it actually returns so the rest is type-checked (this cast is the
+// type boundary, not redundant — removing it fails no-unsafe-argument).
+const schema = makeAugmentedSchema({
+  typeDefs: print(typeDefs),
+  config: augmentedSchemaConfig,
+}) as GraphQLSchema
+
+const sdl = printSchema(lexicographicSortSchema(schema))
 
 // eslint-disable-next-line n/no-sync
 writeFileSync(outFile, sdl + '\n', 'utf-8')
