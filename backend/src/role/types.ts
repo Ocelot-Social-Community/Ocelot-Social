@@ -23,6 +23,10 @@ export const USER_ROLE = 'user'
 export interface RoleChangeEvent {
   name: string
   definition: RoleDefinition | null // null ⇒ deleted
+  // Set only for a rename: the role's former name. The node is renamed in place
+  // (its HAS_ROLE edges are untouched), so subscribers must drop the stale cache
+  // key under this name and re-add the definition under the new `name`.
+  previousName?: string
   actor: string
   timestamp: string
 }

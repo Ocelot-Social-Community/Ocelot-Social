@@ -55,6 +55,17 @@ export const updateRoleMutation = gql`
   }
 `
 
+export const renameRoleMutation = gql`
+  mutation ($name: String!, $newName: String!) {
+    renameRole(name: $name, newName: $newName) {
+      name
+      protected
+      permissions
+      memberCount
+    }
+  }
+`
+
 export const deleteRoleMutation = gql`
   mutation ($name: String!) {
     deleteRole(name: $name)

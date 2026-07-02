@@ -42,6 +42,7 @@
           type="text"
           class="role-tab__input"
           :placeholder="$t('admin.roles.nameLabel')"
+          :aria-label="$t('admin.roles.create')"
           data-test="new-role-name"
           @keyup.enter="createRole"
           @keyup.esc="cancelCreate"
@@ -71,9 +72,54 @@
     <section v-if="activeRole" class="role" :data-test="`role-${activeRole.name}`">
       <header class="role__header">
         <h3 class="role__name">
-          {{ activeRole.name }}
-          <span v-if="activeRole.protected" class="role__badge">
-            {{ $t('admin.roles.protected') }}
+          <template v-if="!renaming">
+            <span class="role__label">{{ $t('admin.roles.roleLabel') }}:</span>
+            {{ activeRole.name }}
+            <button
+              v-if="canRename(activeRole)"
+              type="button"
+              class="role__rename"
+              :title="$t('admin.roles.rename')"
+              :aria-label="$t('admin.roles.rename')"
+              data-test="role-rename"
+              @click="startRename"
+            >
+              ✎
+            </button>
+            <span v-if="activeRole.protected" class="role__badge">
+              {{ $t('admin.roles.protected') }}
+            </span>
+          </template>
+          <span v-else class="role-tab role-tab--input" data-test="role-rename-edit">
+            <input
+              ref="renameInput"
+              v-model="renameValue"
+              type="text"
+              class="role-tab__input"
+              :placeholder="$t('admin.roles.nameLabel')"
+              :aria-label="$t('admin.roles.rename')"
+              data-test="rename-role-name"
+              @keyup.enter="renameRole"
+              @keyup.esc="cancelRename"
+            />
+            <button
+              type="button"
+              class="role-tab__confirm"
+              :disabled="!renameValue.trim() || renameValue.trim() === activeRole.name || saving"
+              :aria-label="$t('admin.roles.rename')"
+              data-test="rename-role-confirm"
+              @click="renameRole"
+            >
+              ✓
+            </button>
+            <button
+              type="button"
+              class="role-tab__cancel"
+              :aria-label="$t('actions.cancel')"
+              @click="cancelRename"
+            >
+              ✕
+            </button>
           </span>
         </h3>
         <nuxt-link
@@ -171,6 +217,7 @@ import {
   createRoleMutation,
   deleteRoleMutation,
   permissionCatalogQuery,
+  renameRoleMutation,
   rolesQuery,
   updateRoleMutation,
 } from '~/graphql/admin/Roles.js'
@@ -194,6 +241,9 @@ export default {
       // Whether the + button is in name-input mode.
       creating: false,
       newRole: { name: '' },
+      // Whether the active role's name is being edited (rename mode), and its draft.
+      renaming: false,
+      renameValue: '',
       saving: false,
       // Confirm-modal state for the self-lockout warning (see saveRole).
       showConfirmModal: false,
@@ -229,8 +279,8 @@ export default {
     $subscribe: {
       permissionsChanged: {
         query: permissionsChangedSubscription(),
-        result() {
-          this.refreshFromServer()
+        result({ data }) {
+          this.onPermissionsChanged(data && data.permissionsChanged)
         },
       },
     },
@@ -283,6 +333,44 @@ export default {
     },
   },
   methods: {
+    // A permissionsChanged signal arrived: a role's permission set, a user's role
+    // assignment, a permission-gating policy toggle, OR a rename (here or elsewhere).
+    // On a rename, follow the selection to the new name and patch this client's cache
+    // BEFORE refetching, so a viewer who had the renamed role selected keeps it (rather
+    // than the refetch's stale cache emit dropping it). Then refetch to reconcile.
+    onPermissionsChanged(change) {
+      if (change && change.previousRoleName) {
+        this.followRename(change.previousRoleName, change.roleName)
+      }
+      this.refreshFromServer()
+    },
+    // Reflect a rename that happened on this or another client: patch the roles-query
+    // cache (so a cache-and-network refetch never re-serves the old name), mirror it in
+    // the local list, move the selection if it was on the renamed role, and rebuild the
+    // drafts so the role body keeps rendering.
+    followRename(oldName, newName) {
+      if (!newName || oldName === newName) return
+      // If this client has the rename editor open on the very role being renamed, close it:
+      // its renameValue is now stale, and confirming would submit it against the (already
+      // renamed) role. Checked before the selection moves off oldName below.
+      if (this.renaming && this.activeRoleName === oldName) this.cancelRename()
+      // Move the selection FIRST. Patching the cache below writes the roles query, which
+      // broadcasts SYNCHRONOUSLY to the roles smart-query (→ result → buildForms →
+      // ensureActive). If the selection were still the old name at that point, ensureActive
+      // would reset it to the first tab (the "jump to front" flash) before we could follow.
+      if (this.activeRoleName === oldName) this.activeRoleName = newName
+      this.patchRolesCacheRename(this.$apollo?.provider?.defaultClient, oldName, { name: newName })
+      this.roles = this.roles.map((role) =>
+        role.name === oldName ? { ...role, name: newName } : role,
+      )
+      // Carry any in-progress (unsaved) draft from the old name to the new one — forms are
+      // keyed by role name, so a rename mid-edit would otherwise drop the edits. buildForms
+      // then preserves it as dirty (or rebuilds it from the server when it was clean).
+      if (this.forms[oldName] && !this.forms[newName]) {
+        this.forms = { ...this.forms, [newName]: this.forms[oldName] }
+      }
+      this.buildForms()
+    },
     // Refetch catalog (its `available` flags) + roles after a permissionsChanged signal.
     // Guarded with optional chaining so it is a no-op in environments without live
     // smart queries (e.g. unit mounts).
@@ -340,14 +428,90 @@ export default {
         return
       }
       if (!this.roles.some((role) => role.name === this.activeRoleName)) {
+        // A previously-selected role vanished from the list. Don't snap to the first tab
+        // on a transient stale-cache emit while a refetch is still in flight — the fresh
+        // network list may still hold it (e.g. a rename following its new name). Only
+        // fall back once loading has settled. The initial (null) selection is immediate.
+        if (this.activeRoleName && this.$apollo?.queries?.roles?.loading) return
         this.activeRoleName = this.orderedRoles[0].name
       }
     },
     setActive(name) {
       this.activeRoleName = name
       this.cancelCreate()
+      this.cancelRename()
+    },
+    // Mandatory roles are load-bearing by name (owner ⇒ full catalog, user ⇒ the
+    // baseline fallback) and cannot be renamed — mirrors the backend guard.
+    canRename(role) {
+      return !role.protected && role.name !== 'user'
+    },
+    startRename() {
+      this.creating = false
+      this.renaming = true
+      this.renameValue = this.activeRole.name
+      this.$nextTick(() => {
+        if (this.$refs.renameInput) this.$refs.renameInput.focus()
+      })
+    },
+    cancelRename() {
+      this.renaming = false
+      this.renameValue = ''
+    },
+    // Reflect a rename in the roles-query cache so every subsequent read already carries
+    // the new name — the refetch below AND the permissionsChanged-triggered refresh both
+    // fetch cache-and-network, so a stale cache emit (still holding the OLD name) would
+    // otherwise make ensureActive reset the selection to the first tab.
+    patchRolesCacheRename(store, oldName, renamed) {
+      if (!renamed) return
+      let cached
+      try {
+        cached = store.readQuery({ query: rolesQuery })
+      } catch (e) {
+        // The roles query is not in the cache yet — nothing to patch.
+        return
+      }
+      if (!cached) return
+      store.writeQuery({
+        query: rolesQuery,
+        data: {
+          roles: cached.roles.map((role) =>
+            role.name === oldName ? { ...role, ...renamed } : role,
+          ),
+        },
+      })
+    },
+    // Rename the active role, keeping its permissions and members. Follow the rename
+    // locally (select the new name, patch the cache, rebuild drafts) via the same path as
+    // a remote rename, THEN refetch. We deliberately do NOT patch the cache in the mutation
+    // `update`: writeQuery there broadcasts to the roles smart-query while the selection is
+    // still the old name, which resets it to the first tab (a "jump to front" flash).
+    async renameRole() {
+      const oldName = this.activeRole.name
+      const newName = this.renameValue.trim()
+      if (!newName || newName === oldName || this.saving) return
+      this.saving = true
+      try {
+        await this.$apollo.mutate({
+          mutation: renameRoleMutation,
+          variables: { name: oldName, newName },
+        })
+        this.followRename(oldName, newName)
+        this.cancelRename()
+        this.$toast.success(this.$t('admin.roles.renameSuccess'))
+      } catch (err) {
+        this.$toast.error(this.$t('admin.roles.renameError', { message: err.message }))
+        return
+      } finally {
+        this.saving = false
+      }
+      // Best-effort reconciliation, OUTSIDE the mutation's try: followRename already updated
+      // the UI optimistically, so a refetch hiccup must not surface as a rename error on top
+      // of the success toast already shown.
+      await this.$apollo.queries.roles.refetch().catch(() => undefined)
     },
     startCreate() {
+      this.cancelRename()
       this.creating = true
       this.newRole.name = ''
       this.$nextTick(() => {
@@ -576,9 +740,19 @@ export default {
     align-items: baseline;
     justify-content: space-between;
     gap: $space-small;
+    // Set the role identity apart from its permission groups with a clear gap, so the
+    // (possibly terse, e.g. "ra") role name reads as its own header rather than crowding
+    // the first group title.
+    margin-bottom: $space-base;
   }
   &__name {
     margin: 0;
+  }
+  // "Role:" prefix before the name, so a poorly-named role (ra, rb) still reads as the
+  // role name. Softer + lighter than the name it labels.
+  &__label {
+    color: $text-color-soft;
+    font-weight: normal;
   }
   &__badge {
     margin-left: $space-xx-small;
@@ -586,6 +760,19 @@ export default {
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: $text-color-soft;
+  }
+  // Pencil affordance next to the role name; reveals the inline rename input.
+  &__rename {
+    margin-left: $space-xx-small;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 0.7em;
+    color: $text-color-soft;
+
+    &:hover {
+      color: $color-primary;
+    }
   }
   &__members {
     color: $text-color-soft;

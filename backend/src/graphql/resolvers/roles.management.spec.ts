@@ -4,6 +4,18 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
 import Factory, { cleanDatabase } from '@db/factories'
+import CREATE_ROLE from '@graphql/queries/roles/createRole.gql'
+import DELETE_ROLE from '@graphql/queries/roles/deleteRole.gql'
+import MY_PERMISSIONS from '@graphql/queries/roles/myPermissions.gql'
+import PERMISSION_CATALOG from '@graphql/queries/roles/permissionCatalog.gql'
+import RENAME_ROLE from '@graphql/queries/roles/renameRole.gql'
+import RESYNC_CACHES from '@graphql/queries/roles/resyncCaches.gql'
+import ROLES from '@graphql/queries/roles/roles.gql'
+import SEARCH from '@graphql/queries/roles/searchUsersByRole.gql'
+import SET_USER_ROLE from '@graphql/queries/roles/setUserRole.gql'
+import UPDATE_ROLE from '@graphql/queries/roles/updateRole.gql'
+import USER_ROLES from '@graphql/queries/roles/userRoles.gql'
+import USER_INFO from '@graphql/queries/roles/userWithRole.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 import { PERMISSIONS_CHANGED_CHANNEL, RoleService } from '@src/role'
 
@@ -36,24 +48,6 @@ const asAdmin = async () => {
   )
   authenticatedUser = await admin.toJson()
 }
-
-const PERMISSION_CATALOG = `query { permissionCatalog { key group description gatedBy available } }`
-const MY_PERMISSIONS = `query { myPermissions { key group } }`
-const ROLES = `query { roles { name protected permissions memberCount } }`
-const USER_INFO = `query ($id: ID!) { User(id: $id) { id roleName } }`
-const CREATE_ROLE = `mutation ($name: String!, $permissions: [String!]!) {
-  createRole(name: $name, permissions: $permissions) {
-    name permissions protected memberCount
-  }
-}`
-const UPDATE_ROLE = `mutation ($name: String!, $permissions: [String!]!) {
-  updateRole(name: $name, permissions: $permissions) {
-    name permissions protected memberCount
-  }
-}`
-const USER_ROLES = `query ($userId: ID!) { userRoles(userId: $userId) { name protected permissions } }`
-const DELETE_ROLE = `mutation ($name: String!) { deleteRole(name: $name) }`
-const SET_USER_ROLE = `mutation ($userId: ID!, $roleName: String!) { setUserRole(userId: $userId, roleName: $roleName) { id roleName } }`
 
 describe('role management', () => {
   beforeAll(async () => {
@@ -108,14 +102,24 @@ describe('role management', () => {
         variables: { name: 'broadcast-role', permissions: ['post.pin'] },
       })
       expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
-        permissionsChanged: { roleName: 'broadcast-role' },
+        permissionsChanged: { roleName: 'broadcast-role', previousRoleName: null },
+      })
+    })
+
+    it('broadcasts on renameRole with BOTH the new and the previous name (selection can follow)', async () => {
+      await mutate({
+        mutation: RENAME_ROLE,
+        variables: { name: 'broadcast-role', newName: 'broadcast-renamed' },
+      })
+      expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
+        permissionsChanged: { roleName: 'broadcast-renamed', previousRoleName: 'broadcast-role' },
       })
     })
 
     it('broadcasts on deleteRole (former holders fall back to baseline)', async () => {
       await mutate({ mutation: DELETE_ROLE, variables: { name: 'broadcast-role' } })
       expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
-        permissionsChanged: { roleName: 'broadcast-role' },
+        permissionsChanged: { roleName: 'broadcast-role', previousRoleName: null },
       })
     })
 
@@ -130,7 +134,7 @@ describe('role management', () => {
         variables: { userId: 'member-x', roleName: 'broadcast-role' },
       })
       expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
-        permissionsChanged: { roleName: 'broadcast-role' },
+        permissionsChanged: { roleName: 'broadcast-role', previousRoleName: null },
       })
     })
 
@@ -196,7 +200,7 @@ describe('role management', () => {
       // (so db:reset / e2e can trigger a resync when no users exist). The resolver
       // reloads the role + policy caches from the DB and returns true.
       authenticatedUser = null
-      const { data, errors } = await mutate({ mutation: `mutation { resyncCaches }` })
+      const { data, errors } = await mutate({ mutation: RESYNC_CACHES })
       expect(errors).toBeUndefined()
       expect(data.resyncCaches).toBe(true)
     })
@@ -435,6 +439,105 @@ describe('role management', () => {
     })
   })
 
+  describe('renameRole', () => {
+    beforeEach(asAdmin)
+
+    it('renames a custom role, preserving its permissions and its members', async () => {
+      await Factory.build(
+        'user',
+        { id: 'member-1', role: 'user' },
+        { email: 'm1@e.org', password: '1234' },
+      )
+      await mutate({
+        mutation: CREATE_ROLE,
+        variables: { name: 'editor', permissions: ['post.pin'] },
+      })
+      await mutate({
+        mutation: SET_USER_ROLE,
+        variables: { userId: 'member-1', roleName: 'editor' },
+      })
+
+      const { data, errors } = await mutate({
+        mutation: RENAME_ROLE,
+        variables: { name: 'editor', newName: 'content-lead' },
+      })
+
+      expect(errors).toBeUndefined()
+      // Permissions kept; the member moved with the role (edge preserved).
+      expect(data.renameRole).toMatchObject({
+        name: 'content-lead',
+        permissions: ['post.pin'],
+        memberCount: 1,
+      })
+      // The old name is gone and the member now reports the new role name.
+      const { data: rolesData } = await query({ query: ROLES })
+      expect(rolesData.roles.map((role: { name: string }) => role.name)).toContain('content-lead')
+      expect(rolesData.roles.map((role: { name: string }) => role.name)).not.toContain('editor')
+      const { data: userData } = await query({
+        query: USER_INFO,
+        variables: { id: 'member-1' },
+      })
+      expect(userData.User[0].roleName).toBe('content-lead')
+    })
+
+    it('forbids renaming the protected owner role', async () => {
+      const { errors } = await mutate({
+        mutation: RENAME_ROLE,
+        variables: { name: 'owner', newName: 'boss' },
+      })
+      expect(errors?.[0].message).toMatch(/protected/)
+    })
+
+    it('forbids renaming the mandatory user role', async () => {
+      const { errors } = await mutate({
+        mutation: RENAME_ROLE,
+        variables: { name: 'user', newName: 'member' },
+      })
+      expect(errors?.[0].message).toMatch(/mandatory/)
+    })
+
+    it('rejects renaming an unknown role', async () => {
+      const { errors } = await mutate({
+        mutation: RENAME_ROLE,
+        variables: { name: 'nope', newName: 'whatever' },
+      })
+      expect(errors?.[0].message).toMatch(/Unknown role/)
+    })
+
+    it('rejects renaming onto an existing role name', async () => {
+      await mutate({ mutation: CREATE_ROLE, variables: { name: 'editor', permissions: [] } })
+      const { errors } = await mutate({
+        mutation: RENAME_ROLE,
+        variables: { name: 'editor', newName: 'admin' },
+      })
+      expect(errors?.[0].message).toMatch(/already exists/)
+    })
+
+    it('rejects an invalid new role name', async () => {
+      await mutate({ mutation: CREATE_ROLE, variables: { name: 'editor', permissions: [] } })
+      const { errors } = await mutate({
+        mutation: RENAME_ROLE,
+        variables: { name: 'editor', newName: 'Not Valid!' },
+      })
+      expect(errors?.[0].message).toMatch(/Invalid role name/)
+    })
+
+    it('maps a uniqueness-constraint race on the write to a stable conflict error', async () => {
+      await mutate({ mutation: CREATE_ROLE, variables: { name: 'editor', permissions: [] } })
+      // Lose the race: the pre-check passes (the target name is free), then the write
+      // throws the Neo4j uniqueness violation a concurrent rename would cause.
+      const constraintError = Object.assign(new Error('constraint'), {
+        code: 'Neo.ClientError.Schema.ConstraintValidationFailed',
+      })
+      jest.spyOn(roleService, 'renameRole').mockRejectedValueOnce(constraintError)
+      const { errors } = await mutate({
+        mutation: RENAME_ROLE,
+        variables: { name: 'editor', newName: 'reviewer' },
+      })
+      expect(errors?.[0].message).toMatch(/already exists/)
+    })
+  })
+
   describe('setUserRole', () => {
     const readUser = async (id: string) => {
       const { data } = await query({ query: USER_INFO, variables: { id } })
@@ -532,10 +635,6 @@ describe('role management', () => {
   })
 
   describe('User admin search (roleName / search)', () => {
-    const SEARCH = `query ($roleName: String, $search: String) {
-      User(roleName: $roleName, search: $search) { id email roleName contributionsCount }
-    }`
-
     it('filters users by their single role', async () => {
       await Factory.build(
         'user',

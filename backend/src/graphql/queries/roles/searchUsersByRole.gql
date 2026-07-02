@@ -1,0 +1,8 @@
+query searchUsersByRole($roleName: String, $search: String) {
+  User(roleName: $roleName, search: $search) {
+    id
+    email
+    roleName
+    contributionsCount
+  }
+}
