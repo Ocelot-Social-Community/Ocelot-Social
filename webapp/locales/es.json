@@ -139,6 +139,12 @@
       "name": "Páginas"
     },
     "policy": {
+      "conflict": {
+        "keep": "Seguir editando",
+        "load": "Cargar la nueva versión",
+        "message": "Un ajuste se modificó en otro lugar mientras lo editabas. Tus cambios sin guardar se conservan: revisa los ajustes resaltados.",
+        "serverValue": "servidor ahora: {value}"
+      },
       "defaultValue": "predeterminado: {value}",
       "description": "Configuración en tiempo de ejecución. Los cambios se aplican inmediatamente a todos los clientes conectados.",
       "descriptions": {
@@ -200,6 +206,11 @@
       "allPermissions": "Tiene todos los permisos (protegido).",
       "cannotDelete": "Este rol no se puede eliminar.",
       "cannotDeleteHasMembers": "Este rol todavía tiene miembros: reasígnalos antes de eliminarlo.",
+      "conflict": {
+        "keep": "Seguir editando",
+        "load": "Cargar la nueva versión",
+        "message": "Este rol se modificó en otro lugar mientras lo editabas. Tus cambios sin guardar se conservan: revisa los permisos resaltados."
+      },
       "create": "Crear rol",
       "createTitle": "Crear un nuevo rol",
       "delete": "Eliminar",
