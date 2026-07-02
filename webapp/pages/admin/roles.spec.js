@@ -224,6 +224,25 @@ describe('admin/roles.vue', () => {
       expect(wrapper.find('[data-test="role-badge-setter-conflict-keep"]').exists()).toBe(true)
     })
 
+    it('highlights a permission the other admin ADDED (added branch of the diff)', async () => {
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      // Local edit: untick badge.manage (so the draft is dirty and preserved).
+      wrapper.vm.forms['badge-setter'].permissions['badge.manage'] = false
+      // Remote: another admin GRANTS post.create (not in this draft's baseline).
+      wrapper.setData({
+        roles: roles.map((r) =>
+          r.name === 'badge-setter' ? { ...r, permissions: ['badge.manage', 'post.create'] } : r,
+        ),
+      })
+      wrapper.vm.buildForms()
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.conflicts['badge-setter']).toBe(true)
+      // The newly-granted permission is marked 'added'; the unchanged one is not in the diff.
+      expect(wrapper.vm.conflictDiff).toEqual({ 'post.create': 'added' })
+      expect(wrapper.vm.rowDiff('post.create')).toBe('added')
+    })
+
     it('loadServerVersion discards local edits, rebuilds from the server, clears the banner', async () => {
       const wrapper = await intoConflict()
       wrapper.vm.loadServerVersion('badge-setter')
