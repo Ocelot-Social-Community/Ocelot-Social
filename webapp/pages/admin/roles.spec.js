@@ -416,7 +416,10 @@ describe('admin/roles.vue', () => {
       await wrapper.find('[data-test="role-rename"]').trigger('click')
       expect(wrapper.vm.renaming).toBe(true)
       expect(wrapper.vm.renameValue).toBe('badge-setter')
-      expect(wrapper.find('[data-test="rename-role-name"]').exists()).toBe(true)
+      const input = wrapper.find('[data-test="rename-role-name"]')
+      expect(input.exists()).toBe(true)
+      // Explicit accessible name (the placeholder alone is not a reliable label).
+      expect(input.attributes('aria-label')).toBe('admin.roles.rename')
     })
 
     it('renameRole sends the old and new name, then selects the renamed role', async () => {
