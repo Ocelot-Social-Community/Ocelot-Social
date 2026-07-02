@@ -295,14 +295,35 @@ describe('admin/policy.vue', () => {
       expect(wrapper.find('#policy-publicRegistration').element.checked).toBe(true)
     })
 
-    it('does not mistake the admin’s own save for a conflict', async () => {
+    it('does not raise a false conflict when the server echo lands while the own save is still in flight', async () => {
       wrapper = Wrapper()
       await flushPromises()
+
+      // Hold the write open so the snapshot echo can arrive WHILE the save is still pending
+      // — the real race. (If the baseline were advanced only AFTER the await, the reconcile
+      // during this window would see form≠baseline & snapshot≠baseline and cry conflict.)
+      let resolveSetKey
+      setKey.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolveSetKey = resolve
+          }),
+      )
+
       await wrapper.find('#policy-publicRegistration').setChecked(true)
-      await wrapper.find('form').trigger('submit')
-      await flushPromises()
-      // The backend echoes our write back via the subscription (snapshot → our value).
+      wrapper.find('form').trigger('submit') // do NOT await — the save is now in flight
+      await wrapper.vm.$nextTick()
+
+      // The backend broadcasts our own write back before setKey resolves.
       store.commit('policy/SET_SNAP', { ...snapshot, publicRegistration: true })
+      await flushPromises()
+
+      // No false conflict during the in-flight window (baseline advanced before the await).
+      expect(wrapper.vm.hasConflict).toBe(false)
+      expect(wrapper.find('[data-test="policy-conflict"]').exists()).toBe(false)
+
+      // And still consistent once the write completes.
+      resolveSetKey()
       await flushPromises()
       expect(wrapper.vm.hasConflict).toBe(false)
       expect(wrapper.find('#policy-publicRegistration').element.checked).toBe(true)
