@@ -5,10 +5,10 @@ export const profileUserGroupsQuery = () => {
   return gql`
     ${imageUrls}
 
-    query ProfileUserGroups($id: ID!) {
+    query ProfileUserGroups($id: ID!, $first: Int, $offset: Int) {
       User(id: $id) {
         id
-        groups {
+        groups(first: $first, offset: $offset) {
           id
           name
           slug

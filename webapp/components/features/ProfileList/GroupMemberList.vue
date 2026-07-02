@@ -2,46 +2,54 @@
   <os-card v-if="hasGroups || myProfile" class="group-member-list">
     <h5 class="title spacer-x-small">{{ $t('profile.groups.title', { name: userName }) }}</h5>
 
-    <template v-if="hasGroups">
-      <div v-for="type in groupTypes" :key="type">
-        <template v-if="groupsByType[type] && groupsByType[type].length">
-          <p class="type-label">{{ $t(`profile.groups.${type}`) }}</p>
-          <ul class="group-list">
-            <li v-for="group in groupsByType[type]" :key="group.id" class="group-item">
-              <nuxt-link
-                class="group-item__link"
-                :to="{ name: 'groups-id-slug', params: { id: group.id, slug: group.slug } }"
-              >
-                <profile-avatar :profile="group" size="small" class="group-item__avatar" />
-                <div class="group-item__info">
-                  <span class="group-item__name">{{ group.name }}</span>
-                  <span class="group-item__slug ds-text-soft">&amp;{{ group.slug }}</span>
-                </div>
-              </nuxt-link>
-              <button
-                v-if="myProfile"
-                class="group-item__visibility-btn"
-                :title="
-                  group.showOnProfile
-                    ? $t('group.contentMenu.hideFromProfile')
-                    : $t('group.contentMenu.showOnProfile')
-                "
-                @click.prevent="toggleVisibility(group)"
-              >
-                <os-icon :icon="group.showOnProfile ? icons.eye : icons.eyeSlash" />
-              </button>
-            </li>
-          </ul>
-        </template>
-      </div>
-    </template>
+    <div class="group-scroll-container" ref="scrollContainer">
+      <template v-if="hasGroups">
+        <div v-for="type in groupTypes" :key="type">
+          <template v-if="groupsByType[type] && groupsByType[type].length">
+            <p class="type-label">{{ $t(`profile.groups.${type}`) }}</p>
+            <ul class="group-list">
+              <li v-for="group in groupsByType[type]" :key="group.id" class="group-item">
+                <nuxt-link
+                  class="group-item__link"
+                  :to="{ name: 'groups-id-slug', params: { id: group.id, slug: group.slug } }"
+                >
+                  <profile-avatar :profile="group" size="small" class="group-item__avatar" />
+                  <div class="group-item__info">
+                    <span class="group-item__name">{{ group.name }}</span>
+                    <span class="group-item__slug ds-text-soft">&amp;{{ group.slug }}</span>
+                  </div>
+                </nuxt-link>
+                <button
+                  v-if="myProfile"
+                  class="group-item__visibility-btn"
+                  :title="
+                    group.showOnProfile
+                      ? $t('group.contentMenu.hideFromProfile')
+                      : $t('group.contentMenu.showOnProfile')
+                  "
+                  @click.prevent="toggleVisibility(group)"
+                >
+                  <os-icon :icon="group.showOnProfile ? icons.eye : icons.eyeSlash" />
+                </button>
+              </li>
+            </ul>
+          </template>
+        </div>
+      </template>
 
-    <p v-else class="nobody-message">{{ $t('profile.groups.nobody') }}</p>
+      <p v-else-if="!loadingGroups" class="nobody-message">
+        {{ $t('profile.groups.nobody') }}
+      </p>
+
+      <div v-if="loadingMore || loadingGroups" class="loading-more">
+        <os-spinner size="small" />
+      </div>
+    </div>
   </os-card>
 </template>
 
 <script>
-import { OsCard, OsIcon } from '@ocelot-social/ui'
+import { OsCard, OsIcon, OsSpinner } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import {
@@ -51,12 +59,14 @@ import {
 } from '~/graphql/UserGroups'
 
 const GROUP_TYPES = ['public', 'closed', 'hidden']
+const PAGE_SIZE = 10
 
 export default {
   name: 'GroupMemberList',
   components: {
     OsCard,
     OsIcon,
+    OsSpinner,
     ProfileAvatar,
   },
   props: {
@@ -68,26 +78,40 @@ export default {
     return {
       groups: [],
       groupTypes: GROUP_TYPES,
+      loadingGroups: false,
+      loadingMore: false,
+      allGroupsLoaded: false,
     }
   },
   created() {
     this.icons = iconRegistry
   },
-  mounted() {
+  async mounted() {
     const observer = this.$apollo.subscribe({
       query: groupMembershipVisibilityChangedSubscription(),
       variables: { userId: this.userId },
     })
     this._groupVisibilitySubscription = observer.subscribe({
       next: () => {
-        this.$apollo.queries.groups.refetch()
+        this.reloadGroups()
       },
       error: () => {},
+    })
+
+    await this.loadGroups(0)
+
+    this.$nextTick(() => {
+      if (this.$refs.scrollContainer) {
+        this.$refs.scrollContainer.addEventListener('scroll', this.onScroll)
+      }
     })
   },
   beforeDestroy() {
     if (this._groupVisibilitySubscription) {
       this._groupVisibilitySubscription.unsubscribe()
+    }
+    if (this.$refs.scrollContainer) {
+      this.$refs.scrollContainer.removeEventListener('scroll', this.onScroll)
     }
   },
   computed: {
@@ -102,6 +126,50 @@ export default {
     },
   },
   methods: {
+    async loadGroups(offset) {
+      if (offset === 0) {
+        this.loadingGroups = true
+        this.groups = []
+        this.allGroupsLoaded = false
+      } else {
+        this.loadingMore = true
+      }
+      try {
+        const { data } = await this.$apollo.query({
+          query: profileUserGroupsQuery(),
+          variables: { id: this.userId, first: PAGE_SIZE, offset },
+          fetchPolicy: 'network-only',
+        })
+        const newGroups = data?.User?.[0]?.groups || []
+        this.groups = [...this.groups, ...newGroups]
+        if (newGroups.length < PAGE_SIZE) this.allGroupsLoaded = true
+      } catch (error) {
+        this.$toast.error(error.message)
+      } finally {
+        this.loadingGroups = false
+        this.loadingMore = false
+        // If container is not yet scrollable but there might be more, load more
+        await this.$nextTick()
+        const el = this.$refs.scrollContainer
+        if (el && el.scrollHeight <= el.clientHeight && !this.allGroupsLoaded) {
+          await this.loadGroups(this.groups.length)
+        }
+      }
+    },
+    async loadMore() {
+      if (this.allGroupsLoaded || this.loadingMore || this.loadingGroups) return
+      await this.loadGroups(this.groups.length)
+    },
+    onScroll() {
+      const el = this.$refs.scrollContainer
+      if (!el || this.allGroupsLoaded || this.loadingMore || this.loadingGroups) return
+      if (el.scrollTop + el.clientHeight >= el.scrollHeight - 40) {
+        this.loadMore()
+      }
+    },
+    reloadGroups() {
+      this.loadGroups(0)
+    },
     async toggleVisibility(group) {
       const newValue = !group.showOnProfile
       try {
@@ -113,20 +181,6 @@ export default {
       } catch (error) {
         this.$toast.error(error.message)
       }
-    },
-  },
-  apollo: {
-    groups: {
-      query() {
-        return profileUserGroupsQuery()
-      },
-      variables() {
-        return { id: this.userId }
-      },
-      update({ User }) {
-        return (User && User[0] && User[0].groups) || []
-      },
-      fetchPolicy: 'cache-and-network',
     },
   },
 }
@@ -144,6 +198,11 @@ export default {
 
   > :nth-child(n):not(:last-child) {
     margin-bottom: $space-x-small;
+  }
+
+  .group-scroll-container {
+    max-height: 320px;
+    overflow-y: auto;
   }
 
   .type-label {
@@ -215,6 +274,12 @@ export default {
         color: $text-color-base;
       }
     }
+  }
+
+  .loading-more {
+    display: flex;
+    justify-content: center;
+    padding: $space-x-small 0;
   }
 
   .nobody-message {

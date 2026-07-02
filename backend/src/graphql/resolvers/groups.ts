@@ -572,10 +572,12 @@ export default {
     },
   },
   User: {
-    groups: async (parent, _args, context: Context, _resolveInfo) => {
+    groups: async (parent, args, context: Context, _resolveInfo) => {
       const profileUserId = parent.id
       const viewerId = context.user?.id
       const isOwnProfile = profileUserId === viewerId
+      const first = args.first ?? 10
+      const offset = args.offset ?? 0
       const session = context.driver.session()
       try {
         return await session.readTransaction(async (txc) => {
@@ -586,6 +588,7 @@ export default {
               WHERE membership.role IN ['usual', 'admin', 'owner']
               RETURN group {.*, myRole: membership.role, showOnProfile: coalesce(membership.showOnProfile, true)}
               ORDER BY group.groupType ASC, group.createdAt DESC
+              SKIP toInteger($offset) LIMIT toInteger($first)
             `
           } else {
             cypher = `
@@ -606,9 +609,10 @@ export default {
               )
               RETURN group {.*, myRole: membership.role, showOnProfile: coalesce(membership.showOnProfile, true)}
               ORDER BY group.groupType ASC, group.createdAt DESC
+              SKIP toInteger($offset) LIMIT toInteger($first)
             `
           }
-          const result = await txc.run(cypher, { profileUserId, viewerId })
+          const result = await txc.run(cypher, { profileUserId, viewerId, first, offset })
           return result.records.map((r) => r.get('group'))
         })
       } finally {
