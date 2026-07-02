@@ -42,6 +42,14 @@ export const publishPermissionsChanged = (
 // audience. Kept conservative so names stay safe identifiers.
 const ROLE_NAME_RE = /^[a-z0-9][a-z0-9_-]{1,49}$/i
 
+// A Neo4j uniqueness-constraint violation on Role.id. Reachable only via renameRole's
+// `SET r.id` losing a race to a concurrent rename (createRole/updateRole MERGE, so they
+// never trip it). Detected by the driver error code — same guard the other resolvers use.
+const isRoleNameConflict = (err: unknown): boolean =>
+  err instanceof Error &&
+  'code' in err &&
+  err.code === 'Neo.ClientError.Schema.ConstraintValidationFailed'
+
 const toGraphqlRole = (def: RoleDefinition, memberCount: number | null = null) => ({
   name: def.name,
   protected: def.protected,
@@ -199,6 +207,10 @@ export default {
         return toGraphqlRole(def, await countMembers(context, def.name))
       } catch (err) {
         if (err instanceof RoleValidationError) throw new ForbiddenError(err.message)
+        // Lost the uniqueness-constraint race on Role.id: a concurrent rename claimed
+        // `newName` between our getRole(newName) snapshot and the write. Surface the same
+        // stable conflict as the pre-check, not a raw driver error.
+        if (isRoleNameConflict(err)) throw new UserInputError(`Role '${newName}' already exists.`)
         throw err
       }
     },

@@ -521,6 +521,21 @@ describe('role management', () => {
       })
       expect(errors?.[0].message).toMatch(/Invalid role name/)
     })
+
+    it('maps a uniqueness-constraint race on the write to a stable conflict error', async () => {
+      await mutate({ mutation: CREATE_ROLE, variables: { name: 'editor', permissions: [] } })
+      // Lose the race: the pre-check passes (the target name is free), then the write
+      // throws the Neo4j uniqueness violation a concurrent rename would cause.
+      const constraintError = Object.assign(new Error('constraint'), {
+        code: 'Neo.ClientError.Schema.ConstraintValidationFailed',
+      })
+      jest.spyOn(roleService, 'renameRole').mockRejectedValueOnce(constraintError)
+      const { errors } = await mutate({
+        mutation: RENAME_ROLE,
+        variables: { name: 'editor', newName: 'reviewer' },
+      })
+      expect(errors?.[0].message).toMatch(/already exists/)
+    })
   })
 
   describe('setUserRole', () => {
