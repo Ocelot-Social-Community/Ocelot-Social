@@ -52,15 +52,13 @@ describe('RegistrationSlideCreate', () => {
 
     it('renders the success state', async () => {
       const wrapper = Wrapper()
-      wrapper.setData({ response: 'success' })
-      await wrapper.vm.$nextTick()
+      await wrapper.setData({ response: 'success' })
       expect(wrapper.find('.ds-text-success').exists()).toBe(true)
     })
 
     it('renders the error state', async () => {
       const wrapper = Wrapper()
-      wrapper.setData({ response: 'error' })
-      await wrapper.vm.$nextTick()
+      await wrapper.setData({ response: 'error' })
       expect(wrapper.find('.ds-text-danger').exists()).toBe(true)
     })
   })
@@ -103,21 +101,21 @@ describe('RegistrationSlideCreate', () => {
   })
 
   describe('computed', () => {
-    it('formLocationName resolves an object value', () => {
+    it('formLocationName resolves an object value', async () => {
       const wrapper = Wrapper()
-      wrapper.setData({ locationName: { value: 'Berlin' } })
+      await wrapper.setData({ locationName: { value: 'Berlin' } })
       expect(wrapper.vm.formLocationName).toBe('Berlin')
     })
 
-    it('formLocationName resolves a direct string', () => {
+    it('formLocationName resolves a direct string', async () => {
       const wrapper = Wrapper()
-      wrapper.setData({ locationName: 'Hamburg' })
+      await wrapper.setData({ locationName: 'Hamburg' })
       expect(wrapper.vm.formLocationName).toBe('Hamburg')
     })
 
-    it('formLocationName falls back to empty string', () => {
+    it('formLocationName falls back to empty string', async () => {
       const wrapper = Wrapper()
-      wrapper.setData({ locationName: 42 })
+      await wrapper.setData({ locationName: 42 })
       expect(wrapper.vm.formLocationName).toBe('')
     })
 
@@ -126,10 +124,10 @@ describe('RegistrationSlideCreate', () => {
       expect(wrapper.vm.validInput).toBe(false)
     })
 
-    it('validInput is true once all requirements (incl. required location) are met', () => {
+    it('validInput is true once all requirements (incl. required location) are met', async () => {
       policyValues.requireLocation = true
       const wrapper = Wrapper()
-      wrapper.setData({
+      await wrapper.setData({
         formData: {
           ...wrapper.vm.formData,
           name: 'Peter',
@@ -143,10 +141,10 @@ describe('RegistrationSlideCreate', () => {
       expect(wrapper.vm.validInput).toBeTruthy()
     })
 
-    it('validInput checks given/sur name length when real names are required', () => {
+    it('validInput checks given/sur name length when real names are required', async () => {
       policyValues.askForRealName = true
       const wrapper = Wrapper()
-      wrapper.setData({
+      await wrapper.setData({
         formData: {
           ...wrapper.vm.formData,
           givenName: 'Pe',
@@ -160,10 +158,10 @@ describe('RegistrationSlideCreate', () => {
       expect(wrapper.vm.validInput).toBeTruthy()
     })
 
-    it('toggles the password reveal icons', () => {
+    it('toggles the password reveal icons', async () => {
       const wrapper = Wrapper()
       const closed = wrapper.vm.passwordIcon
-      wrapper.setData({ showPassword: true, showPasswordConfirm: true })
+      await wrapper.setData({ showPassword: true, showPasswordConfirm: true })
       expect(wrapper.vm.passwordIcon).not.toBe(closed)
       expect(wrapper.vm.passwordConfirmIcon).toBe(wrapper.vm.icons.eyeSlash)
     })
