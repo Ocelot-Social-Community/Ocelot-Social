@@ -51,7 +51,13 @@ describe('HeaderMenu', () => {
   const directives = { 'scroll-to': {} }
   let wrappers
   const Wrapper = () => {
-    const wrapper = shallowMount(HeaderMenu, { store: buildStore(), mocks, localVue, stubs, directives })
+    const wrapper = shallowMount(HeaderMenu, {
+      store: buildStore(),
+      mocks,
+      localVue,
+      stubs,
+      directives,
+    })
     wrappers.push(wrapper)
     return wrapper
   }
