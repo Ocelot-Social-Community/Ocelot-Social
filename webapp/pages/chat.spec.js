@@ -141,13 +141,20 @@ describe('chat.vue', () => {
   describe('toggleSearch', () => {
     it('opens the search panel and scrolls it into view', async () => {
       const scrollIntoView = jest.fn()
+      // jsdom doesn't implement scrollIntoView, so save/restore around the mock to
+      // avoid leaking the stub into other specs.
+      const original = Element.prototype.scrollIntoView
       Element.prototype.scrollIntoView = scrollIntoView
-      const wrapper = Wrapper()
-      wrapper.vm.toggleSearch()
-      expect(wrapper.vm.showSearch).toBe(true)
-      await wrapper.vm.$nextTick()
-      await wrapper.vm.$nextTick()
-      expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' })
+      try {
+        const wrapper = Wrapper()
+        wrapper.vm.toggleSearch()
+        expect(wrapper.vm.showSearch).toBe(true)
+        await wrapper.vm.$nextTick()
+        await wrapper.vm.$nextTick()
+        expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' })
+      } finally {
+        Element.prototype.scrollIntoView = original
+      }
     })
 
     it('closes the search panel again on a second toggle', () => {
