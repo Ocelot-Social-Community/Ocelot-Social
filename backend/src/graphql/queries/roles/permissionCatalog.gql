@@ -1,0 +1,9 @@
+query permissionCatalog {
+  permissionCatalog {
+    key
+    group
+    description
+    gatedBy
+    available
+  }
+}

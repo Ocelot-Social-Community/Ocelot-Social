@@ -1,0 +1,7 @@
+query userRoles($userId: ID!) {
+  userRoles(userId: $userId) {
+    name
+    protected
+    permissions
+  }
+}

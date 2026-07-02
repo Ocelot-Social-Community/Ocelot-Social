@@ -1,0 +1,6 @@
+query myPermissions {
+  myPermissions {
+    key
+    group
+  }
+}

@@ -1,0 +1,6 @@
+query userWithRole($id: ID!) {
+  User(id: $id) {
+    id
+    roleName
+  }
+}

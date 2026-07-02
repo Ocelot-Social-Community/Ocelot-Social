@@ -4,6 +4,18 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
 import Factory, { cleanDatabase } from '@db/factories'
+import CREATE_ROLE from '@graphql/queries/roles/createRole.gql'
+import DELETE_ROLE from '@graphql/queries/roles/deleteRole.gql'
+import MY_PERMISSIONS from '@graphql/queries/roles/myPermissions.gql'
+import PERMISSION_CATALOG from '@graphql/queries/roles/permissionCatalog.gql'
+import RENAME_ROLE from '@graphql/queries/roles/renameRole.gql'
+import RESYNC_CACHES from '@graphql/queries/roles/resyncCaches.gql'
+import ROLES from '@graphql/queries/roles/roles.gql'
+import SEARCH from '@graphql/queries/roles/searchUsersByRole.gql'
+import SET_USER_ROLE from '@graphql/queries/roles/setUserRole.gql'
+import UPDATE_ROLE from '@graphql/queries/roles/updateRole.gql'
+import USER_ROLES from '@graphql/queries/roles/userRoles.gql'
+import USER_INFO from '@graphql/queries/roles/userWithRole.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 import { PERMISSIONS_CHANGED_CHANNEL, RoleService } from '@src/role'
 
@@ -37,28 +49,6 @@ const asAdmin = async () => {
   authenticatedUser = await admin.toJson()
 }
 
-const PERMISSION_CATALOG = `query { permissionCatalog { key group description gatedBy available } }`
-const MY_PERMISSIONS = `query { myPermissions { key group } }`
-const ROLES = `query { roles { name protected permissions memberCount } }`
-const USER_INFO = `query ($id: ID!) { User(id: $id) { id roleName } }`
-const CREATE_ROLE = `mutation ($name: String!, $permissions: [String!]!) {
-  createRole(name: $name, permissions: $permissions) {
-    name permissions protected memberCount
-  }
-}`
-const UPDATE_ROLE = `mutation ($name: String!, $permissions: [String!]!) {
-  updateRole(name: $name, permissions: $permissions) {
-    name permissions protected memberCount
-  }
-}`
-const USER_ROLES = `query ($userId: ID!) { userRoles(userId: $userId) { name protected permissions } }`
-const DELETE_ROLE = `mutation ($name: String!) { deleteRole(name: $name) }`
-const RENAME_ROLE = `mutation ($name: String!, $newName: String!) {
-  renameRole(name: $name, newName: $newName) {
-    name permissions protected memberCount
-  }
-}`
-const SET_USER_ROLE = `mutation ($userId: ID!, $roleName: String!) { setUserRole(userId: $userId, roleName: $roleName) { id roleName } }`
 
 describe('role management', () => {
   beforeAll(async () => {
@@ -211,7 +201,7 @@ describe('role management', () => {
       // (so db:reset / e2e can trigger a resync when no users exist). The resolver
       // reloads the role + policy caches from the DB and returns true.
       authenticatedUser = null
-      const { data, errors } = await mutate({ mutation: `mutation { resyncCaches }` })
+      const { data, errors } = await mutate({ mutation: RESYNC_CACHES })
       expect(errors).toBeUndefined()
       expect(data.resyncCaches).toBe(true)
     })
@@ -631,10 +621,6 @@ describe('role management', () => {
   })
 
   describe('User admin search (roleName / search)', () => {
-    const SEARCH = `query ($roleName: String, $search: String) {
-      User(roleName: $roleName, search: $search) { id email roleName contributionsCount }
-    }`
-
     it('filters users by their single role', async () => {
       await Factory.build(
         'user',

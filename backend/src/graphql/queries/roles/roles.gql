@@ -1,0 +1,8 @@
+query roles {
+  roles {
+    name
+    protected
+    permissions
+    memberCount
+  }
+}
