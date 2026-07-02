@@ -109,6 +109,20 @@ Feature: Admin roles & permissions (RBAC)
     When I navigate to page "/admin/users"
     Then the user with id "peter" has the role "content-lead" selected
 
+  # B3 — the name-collision guard (RoleService.renameRole) surfaces in the UI: renaming
+  # onto an existing role name is rejected and the error toast is shown; the role keeps
+  # its old name.
+  Scenario: Renaming a role onto an existing name surfaces an error in the UI
+    Given a role "editor" granting "comment.create" exists
+    And a role "reviewer" granting "comment.create" exists
+    And I am logged in as "admin"
+    When I navigate to page "/admin/roles"
+    And I select the role "editor"
+    And I start renaming the role to "reviewer"
+    And I confirm the rename
+    Then I see a toaster with status "error"
+    And I see the element with test id "role-tab-editor"
+
   Scenario: Admin assigns a custom role to a user via the users page
     Given a role "editor" granting "comment.create" exists
     And I am logged in as "admin"
