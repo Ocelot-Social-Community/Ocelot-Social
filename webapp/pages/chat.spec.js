@@ -52,6 +52,13 @@ describe('chat.vue', () => {
     }
   })
 
+  // Restore real timers even if a fake-timer test fails mid-assertion, so leaked
+  // fake timers can't bleed into later tests. useRealTimers() is a safe no-op
+  // when real timers are already active.
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
   describe('mounted: adopting the URL room context into Vuex', () => {
     it('opens the group chat when the URL carries a groupId', () => {
       mocks.$route = { query: { groupId: 'g1' } }
@@ -128,7 +135,6 @@ describe('chat.vue', () => {
       wrapper.vm.$refs.chat = chatRef
       jest.advanceTimersByTime(100)
       expect(chatRef.newRoom).toHaveBeenCalledWith('u1')
-      jest.useRealTimers()
     })
   })
 
