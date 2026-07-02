@@ -312,6 +312,21 @@ describe('admin/policy.vue', () => {
       expect(wrapper.find('#policy-publicRegistration').element.checked).toBe(true)
     })
 
+    it('re-raises the conflict when the server moves the same key again after a dismiss', async () => {
+      await intoConflict()
+      await wrapper.find('[data-test="policy-conflict-keep"]').trigger('click')
+      expect(wrapper.vm.hasConflict).toBe(false)
+
+      // A genuinely NEW remote move on the SAME key (99 → 42) raises the conflict anew.
+      store.commit('policy/SET_SNAP', { ...snapshot, inviteLinkLimit: 42 })
+      await flushPromises()
+      expect(wrapper.vm.conflict.inviteLinkLimit).toBe(true)
+      expect(wrapper.find('[data-test="policy-conflict"]').exists()).toBe(true)
+      // My unsaved value is still kept, and the note surfaces the NEW server value.
+      expect(wrapper.find('#policy-inviteLinkLimit').element.value).toBe('10')
+      expect(wrapper.find('[data-test="policy-conflict-inviteLinkLimit"]').text()).toContain('42')
+    })
+
     it('rolls back the baseline when a save fails, so a later snapshot update cannot clobber the unsaved input', async () => {
       wrapper = Wrapper()
       await flushPromises()
