@@ -243,6 +243,26 @@ describe('admin/roles.vue', () => {
       expect(wrapper.vm.rowDiff('post.create')).toBe('added')
     })
 
+    it('does not flag a conflict when the draft matches what another admin already saved', async () => {
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      // Local edit: grant post.create.
+      wrapper.vm.forms['badge-setter'].permissions['post.create'] = true
+      // Another admin saved the SAME change — the server set now equals our draft.
+      wrapper.setData({
+        roles: roles.map((r) =>
+          r.name === 'badge-setter' ? { ...r, permissions: ['badge.manage', 'post.create'] } : r,
+        ),
+      })
+      wrapper.vm.buildForms()
+      await wrapper.vm.$nextTick()
+      // Draft == new server set → nothing to reconcile, no banner (no phantom conflict).
+      expect(wrapper.vm.conflicts['badge-setter']).toBeFalsy()
+      expect(wrapper.find('[data-test="role-badge-setter-conflict"]').exists()).toBe(false)
+      // The edit is retained.
+      expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(true)
+    })
+
     it('loadServerVersion discards local edits, rebuilds from the server, clears the banner', async () => {
       const wrapper = await intoConflict()
       expect(wrapper.find('[data-test="role-badge-setter-conflict"]').exists()).toBe(true)

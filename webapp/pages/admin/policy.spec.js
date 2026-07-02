@@ -237,6 +237,24 @@ describe('admin/policy.vue', () => {
       expect(wrapper.vm.conflict.publicRegistration).toBeFalsy()
     })
 
+    it('does not flag a phantom conflict when a checkbox edit converges with the server’s new value', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+      // Local edit: turn publicRegistration on (baseline false → form true).
+      await wrapper.find('#policy-publicRegistration').setChecked(true)
+      // A remote admin independently turns the SAME flag on. For a boolean, a server "move"
+      // from the baseline can only land on the value the local edit already chose, so this
+      // must reconcile silently — not raise a conflict on values that actually agree.
+      store.commit('policy/SET_SNAP', { ...snapshot, publicRegistration: true })
+      await flushPromises()
+      expect(wrapper.vm.conflict.publicRegistration).toBeFalsy()
+      expect(wrapper.vm.hasConflict).toBe(false)
+      expect(wrapper.find('[data-test="policy-conflict"]').exists()).toBe(false)
+      expect(wrapper.find('#policy-publicRegistration').element.checked).toBe(true)
+      // Fully settled: the agreed value became the baseline, so nothing is left to save.
+      expect(wrapper.vm.isDirty).toBe(false)
+    })
+
     it('loadServerVersion discards local edits and adopts the server value, clearing the banner', async () => {
       wrapper = Wrapper()
       await flushPromises()

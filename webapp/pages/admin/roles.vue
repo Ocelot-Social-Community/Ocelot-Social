@@ -445,11 +445,12 @@ export default {
         // checkboxes showing the stale set until a reload). Protected roles → always rebuilt.
         if (!role.protected && existing && this.isLocallyEdited(role.name)) {
           forms[role.name] = existing
-          // If the server set also moved away from what this draft was built on, another
-          // admin changed the role under our edit → surface a conflict instead of silently
-          // keeping (and later overwriting) their change. Carry a still-open banner across
-          // this rebuild; a resolved/dismissed one only re-raises on a genuinely new move.
-          if (this.serverMovedFromBaseline(role, existing)) {
+          // A conflict is a real disagreement: the server set moved from what this draft was
+          // built on AND our draft still differs from that new set. If our edit happens to
+          // match what another admin saved, there is nothing to reconcile — no banner. A
+          // resolved/dismissed banner only re-raises on a genuinely new move (baseline
+          // advanced on dismiss), never on a plain rebuild.
+          if (this.serverMovedFromBaseline(role, existing) && this.isDirty(role)) {
             conflicts[role.name] = true
           }
           continue

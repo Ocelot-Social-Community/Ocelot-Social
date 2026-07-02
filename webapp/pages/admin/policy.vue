@@ -260,11 +260,19 @@ export default {
         const locallyEdited = this.form[k] !== this.baseline[k]
         const serverMoved = this.snapshot[k] !== this.baseline[k]
         if (!locallyEdited) {
+          // untouched → follow the server live.
           this.form[k] = this.snapshot[k]
           this.baseline[k] = this.snapshot[k]
           conflict[k] = false
-        } else if (serverMoved) {
+        } else if (serverMoved && this.form[k] !== this.snapshot[k]) {
+          // edited here AND the server moved it to a DIFFERENT value → real conflict.
           conflict[k] = true
+        } else if (serverMoved) {
+          // edited here but the server moved to the SAME value we chose (for a boolean the
+          // only possible move) → no real contradiction; adopt it as the baseline so the
+          // field settles (not dirty, no banner) rather than flagging a phantom conflict.
+          this.baseline[k] = this.snapshot[k]
+          conflict[k] = false
         }
         // edited here, server unchanged → keep editing, no conflict.
       })
