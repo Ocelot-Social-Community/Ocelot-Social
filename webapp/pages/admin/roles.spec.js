@@ -434,12 +434,14 @@ describe('admin/roles.vue', () => {
       expect(wrapper.vm.renaming).toBe(false)
     })
 
-    it('optimistically re-selects the renamed role with its draft, independent of the refetch', async () => {
+    it('optimistically re-selects the renamed role and carries its unsaved draft, independent of the refetch', async () => {
       // Regression: the selection (and the role body, keyed by forms[activeRole.name])
       // must follow the rename immediately — not depend on the cache-and-network refetch,
       // whose stale cache emit would otherwise reset it to the first tab.
       const wrapper = Wrapper()
       wrapper.vm.setActive('badge-setter')
+      // Make an unsaved edit before renaming: tick a permission the role doesn't have.
+      wrapper.vm.forms['badge-setter'].permissions['post.create'] = true
       wrapper.vm.startRename()
       wrapper.setData({ renameValue: 'badge-master' })
       await wrapper.vm.renameRole()
@@ -447,8 +449,10 @@ describe('admin/roles.vue', () => {
       expect(names).toContain('badge-master')
       expect(names).not.toContain('badge-setter')
       expect(wrapper.vm.activeRole.name).toBe('badge-master')
-      // The renamed role's editable draft exists, so its permissions section renders.
-      expect(wrapper.vm.forms['badge-master']).toBeTruthy()
+      // The unsaved draft moved with the role: the ticked permission survives under the
+      // new name (alongside the role's existing one), so the edit is not silently lost.
+      expect(wrapper.vm.forms['badge-master'].permissions['post.create']).toBe(true)
+      expect(wrapper.vm.forms['badge-master'].permissions['badge.manage']).toBe(true)
     })
 
     it('patchRolesCacheRename rewrites the renamed role in the roles-query cache', () => {

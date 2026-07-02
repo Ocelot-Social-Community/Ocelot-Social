@@ -357,6 +357,12 @@ export default {
       this.roles = this.roles.map((role) =>
         role.name === oldName ? { ...role, name: newName } : role,
       )
+      // Carry any in-progress (unsaved) draft from the old name to the new one — forms are
+      // keyed by role name, so a rename mid-edit would otherwise drop the edits. buildForms
+      // then preserves it as dirty (or rebuilds it from the server when it was clean).
+      if (this.forms[oldName] && !this.forms[newName]) {
+        this.forms = { ...this.forms, [newName]: this.forms[oldName] }
+      }
       this.buildForms()
     },
     // Refetch catalog (its `available` flags) + roles after a permissionsChanged signal.
