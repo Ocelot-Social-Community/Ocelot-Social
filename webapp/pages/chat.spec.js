@@ -106,6 +106,17 @@ describe('chat.vue', () => {
       expect(wrapper.vm.$router.replace).toHaveBeenCalledWith({ path: '/chat', query: {} })
     })
 
+    it('prefers the group room when both a groupId and a userId are present', () => {
+      mocks.$route = { query: { groupId: 'g1', userId: 'u1' } }
+      const wrapper = Wrapper()
+      const chatRef = { newRoom: jest.fn(), newGroupRoom: jest.fn() }
+      wrapper.vm.$refs.chat = chatRef
+      wrapper.vm.openFromQuery()
+      expect(chatRef.newGroupRoom).toHaveBeenCalledWith('g1')
+      expect(chatRef.newRoom).not.toHaveBeenCalled()
+      expect(wrapper.vm.$router.replace).toHaveBeenCalledWith({ path: '/chat', query: {} })
+    })
+
     it('retries via setTimeout until the chat ref is available', () => {
       jest.useFakeTimers()
       mocks.$route = { query: { userId: 'u1' } }
