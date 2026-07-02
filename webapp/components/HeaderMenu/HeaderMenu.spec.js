@@ -49,10 +49,15 @@ describe('HeaderMenu', () => {
     })
 
   const directives = { 'scroll-to': {} }
-  const Wrapper = () =>
-    shallowMount(HeaderMenu, { store: buildStore(), mocks, localVue, stubs, directives })
+  let wrappers
+  const Wrapper = () => {
+    const wrapper = shallowMount(HeaderMenu, { store: buildStore(), mocks, localVue, stubs, directives })
+    wrappers.push(wrapper)
+    return wrapper
+  }
 
   beforeEach(() => {
+    wrappers = []
     authState = {
       isLoggedIn: true,
       user: { id: 'u1', slug: 'peter', name: 'Peter' },
@@ -72,6 +77,13 @@ describe('HeaderMenu', () => {
       $apollo: { mutate: jest.fn().mockResolvedValue({ data: { UpdateUser: { locale: 'de' } } }) },
       $toast: { success: jest.fn(), error: jest.fn() },
     }
+  })
+
+  // Destroy every mounted instance so its global scroll/mousemove/click listeners
+  // are removed and can't bleed into later tests. destroy() is a no-op on an
+  // already-destroyed wrapper (e.g. the lifecycle test that destroys itself).
+  afterEach(() => {
+    wrappers.forEach((wrapper) => wrapper.destroy())
   })
 
   describe('computed', () => {
