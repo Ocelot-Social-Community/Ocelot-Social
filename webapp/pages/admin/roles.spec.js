@@ -562,7 +562,10 @@ describe('admin/roles.vue', () => {
       expect(toastError).toHaveBeenCalledWith(
         'admin.roles.renameError:{"message":"Role already exists."}',
       )
-      // The rename mode stays open so the admin can correct the name.
+      // The rename mode stays open (with the typed value) so the admin can correct the
+      // name — the error path must not cancel it or move the selection.
+      expect(wrapper.vm.renaming).toBe(true)
+      expect(wrapper.vm.renameValue).toBe('badge-master')
       expect(wrapper.vm.activeRoleName).toBe('badge-setter')
     })
 
