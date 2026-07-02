@@ -31,14 +31,29 @@ FROM base AS development
 CMD ["/bin/bash", "-c", "yarn install && yarn run dev"]
 
 FROM base AS build
+# package.json-first: bake the dev-dependency install into the webapp-build base image
+# as its own cacheable layer (mirrors the test_build stage). Branding overlays are
+# build-time assets/config/locales only and never change dependencies, so node_modules
+# baked here stays valid for every downstream branding build — turning the per-build
+# ONBUILD install from a cold ~2min install into a fast integrity check.
+COPY webapp/package.json webapp/yarn.lock ./
+COPY webapp/scripts ./scripts/
+RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
+    yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 COPY webapp/ .
 # branding is unified in /branding in branding repositories
 ONBUILD COPY webap[p]/brandin[g]/ .
 ONBUILD COPY brandin[g]/ .
 ONBUILD RUN tools/merge-locales.sh
+# node_modules is baked above; with an unchanged lockfile this resolves in seconds
+# (integrity check), not a full reinstall. Kept as a guard in case a branding build
+# ever overrides dependencies (then --frozen-lockfile correctly forces a fresh install).
 ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
-ONBUILD RUN yarn run build
+# Persist the webpack/babel cache (nuxt build.cache + babel cacheDirectory write to
+# node_modules/.cache) so incremental rebuilds on a durable builder reuse it.
+ONBUILD RUN --mount=type=cache,target=/app/node_modules/.cache,sharing=locked \
+    yarn run build
 ONBUILD RUN mkdir /build && \
     cp -r ./.nuxt ./nuxt.config.js ./config ./constants ./static ./locales ./package.json ./yarn.lock ./scripts /build
 ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
