@@ -200,6 +200,17 @@ describe('admin/policy.vue', () => {
   })
 
   describe('concurrent-edit conflicts', () => {
+    // Drive the page into a conflict on inviteLinkLimit: local edit 7 → 10, then a remote
+    // admin moves the server value to 99 under it. Mirrors roles.spec.js intoConflict().
+    const intoConflict = async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+      await wrapper.find('#policy-inviteLinkLimit').setValue('10')
+      store.commit('policy/SET_SNAP', { ...snapshot, inviteLinkLimit: 99 })
+      await flushPromises()
+      return wrapper
+    }
+
     it('an untouched field follows a remote change live, with no conflict', async () => {
       wrapper = Wrapper()
       await flushPromises()
@@ -256,11 +267,7 @@ describe('admin/policy.vue', () => {
     })
 
     it('loadServerVersion discards local edits and adopts the server value, clearing the banner', async () => {
-      wrapper = Wrapper()
-      await flushPromises()
-      await wrapper.find('#policy-inviteLinkLimit').setValue('10')
-      store.commit('policy/SET_SNAP', { ...snapshot, inviteLinkLimit: 99 })
-      await flushPromises()
+      await intoConflict()
       expect(wrapper.vm.hasConflict).toBe(true)
       expect(wrapper.find('[data-test="policy-conflict"]').exists()).toBe(true)
 
@@ -273,11 +280,7 @@ describe('admin/policy.vue', () => {
     })
 
     it('dismissConflict hides the banner but keeps my edits (keep editing)', async () => {
-      wrapper = Wrapper()
-      await flushPromises()
-      await wrapper.find('#policy-inviteLinkLimit').setValue('10')
-      store.commit('policy/SET_SNAP', { ...snapshot, inviteLinkLimit: 99 })
-      await flushPromises()
+      await intoConflict()
       expect(wrapper.vm.hasConflict).toBe(true)
       expect(wrapper.find('[data-test="policy-conflict"]').exists()).toBe(true)
 
@@ -289,11 +292,7 @@ describe('admin/policy.vue', () => {
     })
 
     it('does not re-raise a dismissed conflict when an unrelated field later changes', async () => {
-      wrapper = Wrapper()
-      await flushPromises()
-      await wrapper.find('#policy-inviteLinkLimit').setValue('10')
-      store.commit('policy/SET_SNAP', { ...snapshot, inviteLinkLimit: 99 })
-      await flushPromises()
+      await intoConflict()
       expect(wrapper.vm.hasConflict).toBe(true)
 
       await wrapper.find('[data-test="policy-conflict-keep"]').trigger('click')
