@@ -499,12 +499,16 @@ export default {
         this.followRename(oldName, newName)
         this.cancelRename()
         this.$toast.success(this.$t('admin.roles.renameSuccess'))
-        await this.$apollo.queries.roles.refetch()
       } catch (err) {
         this.$toast.error(this.$t('admin.roles.renameError', { message: err.message }))
+        return
       } finally {
         this.saving = false
       }
+      // Best-effort reconciliation, OUTSIDE the mutation's try: followRename already updated
+      // the UI optimistically, so a refetch hiccup must not surface as a rename error on top
+      // of the success toast already shown.
+      await this.$apollo.queries.roles.refetch().catch(() => undefined)
     },
     startCreate() {
       this.cancelRename()

@@ -572,6 +572,23 @@ describe('admin/roles.vue', () => {
       expect(wrapper.vm.activeRoleName).toBe('badge-setter')
     })
 
+    it('does not show a rename error when only the post-rename refetch fails', async () => {
+      // The mutation succeeded and followRename already updated the UI, so a failing
+      // reconciliation refetch must NOT add a renameError on top of the success toast.
+      const wrapper = Wrapper()
+      const toastSuccess = wrapper.vm.$toast.success
+      const toastError = wrapper.vm.$toast.error
+      wrapper.vm.$apollo.queries.roles.refetch = jest.fn().mockRejectedValue(new Error('network'))
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.startRename()
+      wrapper.setData({ renameValue: 'badge-master' })
+      await wrapper.vm.renameRole()
+      expect(toastSuccess).toHaveBeenCalledWith('admin.roles.renameSuccess')
+      expect(toastError).not.toHaveBeenCalled()
+      // The optimistic rename stands despite the refetch failure.
+      expect(wrapper.vm.activeRoleName).toBe('badge-master')
+    })
+
     it('renameRole is a no-op when the name is unchanged or empty', async () => {
       const wrapper = Wrapper()
       wrapper.vm.setActive('badge-setter')
