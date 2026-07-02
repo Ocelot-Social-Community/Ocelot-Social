@@ -263,6 +263,25 @@ describe('admin/roles.vue', () => {
       expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(true)
     })
 
+    it('clears the conflict when the server reverts to the draft’s baseline (change undone)', async () => {
+      const wrapper = await intoConflict() // draft edited; server removed badge.manage
+      expect(wrapper.vm.conflicts['badge-setter']).toBe(true)
+      // The other admin's change is undone: the server bounces back to the original set.
+      wrapper.setData({
+        roles: roles.map((r) =>
+          r.name === 'badge-setter' ? { ...r, permissions: ['badge.manage'] } : r,
+        ),
+      })
+      wrapper.vm.buildForms()
+      await wrapper.vm.$nextTick()
+      // No divergence from the baseline remains → banner clears on its own.
+      expect(wrapper.vm.conflicts['badge-setter']).toBeFalsy()
+      expect(wrapper.find('[data-test="role-badge-setter-conflict"]').exists()).toBe(false)
+      // My unsaved edit survives (still dirty vs the server set, so Save stays enabled).
+      expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(true)
+      expect(wrapper.vm.isDirty(wrapper.vm.roles.find((r) => r.name === 'badge-setter'))).toBe(true)
+    })
+
     it('loadServerVersion discards local edits, rebuilds from the server, clears the banner', async () => {
       const wrapper = await intoConflict()
       expect(wrapper.find('[data-test="role-badge-setter-conflict"]').exists()).toBe(true)

@@ -327,6 +327,23 @@ describe('admin/policy.vue', () => {
       expect(wrapper.find('[data-test="policy-conflict-inviteLinkLimit"]').text()).toContain('42')
     })
 
+    it('clears the conflict when the server reverts to the baseline (change undone), without a click', async () => {
+      await intoConflict()
+      expect(wrapper.vm.hasConflict).toBe(true)
+
+      // The other admin's change is undone: the server bounces back to the original baseline
+      // value (7). No divergence from the baseline remains, so the banner must clear on its
+      // own — it is now just an ordinary unsaved edit (10 vs 7), not a conflict.
+      store.commit('policy/SET_SNAP', { ...snapshot, inviteLinkLimit: 7 })
+      await flushPromises()
+      expect(wrapper.vm.conflict.inviteLinkLimit).toBeFalsy()
+      expect(wrapper.vm.hasConflict).toBe(false)
+      expect(wrapper.find('[data-test="policy-conflict"]').exists()).toBe(false)
+      // My unsaved edit survives, and it is still dirty (10 ≠ server 7) so Save stays enabled.
+      expect(wrapper.find('#policy-inviteLinkLimit').element.value).toBe('10')
+      expect(wrapper.vm.isDirty).toBe(true)
+    })
+
     it('rolls back the baseline when a save fails, so a later snapshot update cannot clobber the unsaved input', async () => {
       wrapper = Wrapper()
       await flushPromises()

@@ -273,8 +273,12 @@ export default {
           // field settles (not dirty, no banner) rather than flagging a phantom conflict.
           this.baseline[k] = this.snapshot[k]
           conflict[k] = false
+        } else {
+          // edited here, server still at (or reverted back to) our baseline → just an
+          // ordinary unsaved edit, not a conflict. Clear any stale banner, e.g. after a
+          // remote change was undone (server bounced away from and back to the baseline).
+          conflict[k] = false
         }
-        // edited here, server unchanged → keep editing, no conflict.
       })
       this.conflict = conflict
     },
