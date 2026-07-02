@@ -381,6 +381,15 @@ describe('admin/roles.vue', () => {
     expect(wrapper.vm.creating).toBe(false)
   })
 
+  it('labels the active role name so a terse name still reads as the role', async () => {
+    const wrapper = Wrapper()
+    wrapper.vm.setActive('badge-setter')
+    await wrapper.vm.$nextTick()
+    const label = wrapper.find('.role__label')
+    expect(label.exists()).toBe(true)
+    expect(label.text()).toBe('admin.roles.roleLabel:')
+  })
+
   describe('rename', () => {
     it('offers rename only for non-protected, non-baseline roles', () => {
       const wrapper = Wrapper()

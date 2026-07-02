@@ -247,6 +247,7 @@
       "rename": "Rename role",
       "renameError": "Could not rename role: {message}",
       "renameSuccess": "Role renamed.",
+      "roleLabel": "Role",
       "save": "Save",
       "saveError": "Could not save role: {message}",
       "saveSuccess": "Role saved.",

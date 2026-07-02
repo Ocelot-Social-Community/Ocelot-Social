@@ -72,6 +72,7 @@
       <header class="role__header">
         <h3 class="role__name">
           <template v-if="!renaming">
+            <span class="role__label">{{ $t('admin.roles.roleLabel') }}:</span>
             {{ activeRole.name }}
             <button
               v-if="canRename(activeRole)"
@@ -723,9 +724,19 @@ export default {
     align-items: baseline;
     justify-content: space-between;
     gap: $space-small;
+    // Set the role identity apart from its permission groups with a clear gap, so the
+    // (possibly terse, e.g. "ra") role name reads as its own header rather than crowding
+    // the first group title.
+    margin-bottom: $space-base;
   }
   &__name {
     margin: 0;
+  }
+  // "Role:" prefix before the name, so a poorly-named role (ra, rb) still reads as the
+  // role name. Softer + lighter than the name it labels.
+  &__label {
+    color: $text-color-soft;
+    font-weight: normal;
   }
   &__badge {
     margin-left: $space-xx-small;
