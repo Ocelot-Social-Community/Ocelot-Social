@@ -276,8 +276,8 @@ export default {
     $subscribe: {
       permissionsChanged: {
         query: permissionsChangedSubscription(),
-        result() {
-          this.refreshFromServer()
+        result({ data }) {
+          this.onPermissionsChanged(data && data.permissionsChanged)
         },
       },
     },
@@ -330,6 +330,34 @@ export default {
     },
   },
   methods: {
+    // A permissionsChanged signal arrived: a role's permission set, a user's role
+    // assignment, a permission-gating policy toggle, OR a rename (here or elsewhere).
+    // On a rename, follow the selection to the new name and patch this client's cache
+    // BEFORE refetching, so a viewer who had the renamed role selected keeps it (rather
+    // than the refetch's stale cache emit dropping it). Then refetch to reconcile.
+    onPermissionsChanged(change) {
+      if (change && change.previousRoleName) {
+        this.followRename(change.previousRoleName, change.roleName)
+      }
+      this.refreshFromServer()
+    },
+    // Reflect a rename that happened on this or another client: patch the roles-query
+    // cache (so a cache-and-network refetch never re-serves the old name), mirror it in
+    // the local list, move the selection if it was on the renamed role, and rebuild the
+    // drafts so the role body keeps rendering.
+    followRename(oldName, newName) {
+      if (!newName || oldName === newName) return
+      // Move the selection FIRST. Patching the cache below writes the roles query, which
+      // broadcasts SYNCHRONOUSLY to the roles smart-query (→ result → buildForms →
+      // ensureActive). If the selection were still the old name at that point, ensureActive
+      // would reset it to the first tab (the "jump to front" flash) before we could follow.
+      if (this.activeRoleName === oldName) this.activeRoleName = newName
+      this.patchRolesCacheRename(this.$apollo?.provider?.defaultClient, oldName, { name: newName })
+      this.roles = this.roles.map((role) =>
+        role.name === oldName ? { ...role, name: newName } : role,
+      )
+      this.buildForms()
+    },
     // Refetch catalog (its `available` flags) + roles after a permissionsChanged signal.
     // Guarded with optional chaining so it is a no-op in environments without live
     // smart queries (e.g. unit mounts).
@@ -387,6 +415,11 @@ export default {
         return
       }
       if (!this.roles.some((role) => role.name === this.activeRoleName)) {
+        // A previously-selected role vanished from the list. Don't snap to the first tab
+        // on a transient stale-cache emit while a refetch is still in flight — the fresh
+        // network list may still hold it (e.g. a rename following its new name). Only
+        // fall back once loading has settled. The initial (null) selection is immediate.
+        if (this.activeRoleName && this.$apollo?.queries?.roles?.loading) return
         this.activeRoleName = this.orderedRoles[0].name
       }
     },
@@ -412,9 +445,34 @@ export default {
       this.renaming = false
       this.renameValue = ''
     },
-    // Rename the active role, keeping its permissions and members. On success the
-    // switcher re-selects it under its new name; a permissionsChanged broadcast makes
-    // other admins' open views refetch.
+    // Reflect a rename in the roles-query cache so every subsequent read already carries
+    // the new name — the refetch below AND the permissionsChanged-triggered refresh both
+    // fetch cache-and-network, so a stale cache emit (still holding the OLD name) would
+    // otherwise make ensureActive reset the selection to the first tab.
+    patchRolesCacheRename(store, oldName, renamed) {
+      if (!renamed) return
+      let cached
+      try {
+        cached = store.readQuery({ query: rolesQuery })
+      } catch (e) {
+        // The roles query is not in the cache yet — nothing to patch.
+        return
+      }
+      if (!cached) return
+      store.writeQuery({
+        query: rolesQuery,
+        data: {
+          roles: cached.roles.map((role) =>
+            role.name === oldName ? { ...role, ...renamed } : role,
+          ),
+        },
+      })
+    },
+    // Rename the active role, keeping its permissions and members. Follow the rename
+    // locally (select the new name, patch the cache, rebuild drafts) via the same path as
+    // a remote rename, THEN refetch. We deliberately do NOT patch the cache in the mutation
+    // `update`: writeQuery there broadcasts to the roles smart-query while the selection is
+    // still the old name, which resets it to the first tab (a "jump to front" flash).
     async renameRole() {
       const oldName = this.activeRole.name
       const newName = this.renameValue.trim()
@@ -425,10 +483,10 @@ export default {
           mutation: renameRoleMutation,
           variables: { name: oldName, newName },
         })
-        await this.$apollo.queries.roles.refetch()
-        this.activeRoleName = newName
+        this.followRename(oldName, newName)
         this.cancelRename()
         this.$toast.success(this.$t('admin.roles.renameSuccess'))
+        await this.$apollo.queries.roles.refetch()
       } catch (err) {
         this.$toast.error(this.$t('admin.roles.renameError', { message: err.message }))
       } finally {

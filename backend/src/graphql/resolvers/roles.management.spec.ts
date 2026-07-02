@@ -113,24 +113,24 @@ describe('role management', () => {
         variables: { name: 'broadcast-role', permissions: ['post.pin'] },
       })
       expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
-        permissionsChanged: { roleName: 'broadcast-role' },
+        permissionsChanged: { roleName: 'broadcast-role', previousRoleName: null },
       })
     })
 
-    it('broadcasts on renameRole under the new name (holders’ role name changed)', async () => {
+    it('broadcasts on renameRole with BOTH the new and the previous name (selection can follow)', async () => {
       await mutate({
         mutation: RENAME_ROLE,
         variables: { name: 'broadcast-role', newName: 'broadcast-renamed' },
       })
       expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
-        permissionsChanged: { roleName: 'broadcast-renamed' },
+        permissionsChanged: { roleName: 'broadcast-renamed', previousRoleName: 'broadcast-role' },
       })
     })
 
     it('broadcasts on deleteRole (former holders fall back to baseline)', async () => {
       await mutate({ mutation: DELETE_ROLE, variables: { name: 'broadcast-role' } })
       expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
-        permissionsChanged: { roleName: 'broadcast-role' },
+        permissionsChanged: { roleName: 'broadcast-role', previousRoleName: null },
       })
     })
 
@@ -145,7 +145,7 @@ describe('role management', () => {
         variables: { userId: 'member-x', roleName: 'broadcast-role' },
       })
       expect(pubsubMock?.publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
-        permissionsChanged: { roleName: 'broadcast-role' },
+        permissionsChanged: { roleName: 'broadcast-role', previousRoleName: null },
       })
     })
 

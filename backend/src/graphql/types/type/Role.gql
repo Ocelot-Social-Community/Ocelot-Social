@@ -57,6 +57,8 @@ type Mutation {
 "A signal that effective permissions may have changed (a role's permission set, or a user's role assignment). Clients refetch their own myPermissions on receipt — the payload carries only the affected role name, no actor (Datensparsamkeit)."
 type PermissionsChanged {
   roleName: String
+  "Set only for a rename: the role's former name, so an admin roles view with this role selected can follow the selection to its new name."
+  previousRoleName: String
 }
 
 type Subscription {

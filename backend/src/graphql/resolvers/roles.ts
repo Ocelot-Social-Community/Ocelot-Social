@@ -13,14 +13,21 @@ import type { RoleDefinition } from '@src/role'
 // Notify connected clients that effective permissions may have changed so they refetch
 // their own (the permissionsChanged subscription). Fire-and-forget: the mutation has
 // already committed; a pubsub hiccup must not fail it.
-export const publishPermissionsChanged = (context: Context, roleName: string | null): void => {
+export const publishPermissionsChanged = (
+  context: Context,
+  roleName: string | null,
+  // Set only for a rename: the role's former name, so a client whose admin roles view
+  // has this role selected can follow the selection to the new name (and patch its
+  // roles-query cache) instead of losing it on the refetch.
+  previousRoleName: string | null = null,
+): void => {
   // publish() may throw SYNCHRONOUSLY or reject ASYNCHRONOUSLY (its type is
   // void | Promise<void>), so guard BOTH: a bare Promise.resolve(publish()).catch()
   // would let a synchronous throw escape and crash the already-committed mutation.
   // Mirrors RoleService.publishChange / PolicyService.publishChange.
   try {
     const result = context.pubsub.publish(PERMISSIONS_CHANGED_CHANNEL, {
-      permissionsChanged: { roleName },
+      permissionsChanged: { roleName, previousRoleName },
     })
     void Promise.resolve(result).catch(() => {
       /* best-effort broadcast (async rejection) */
@@ -186,8 +193,9 @@ export default {
       try {
         const def = await context.role.renameRole(name, newName, context.user?.id ?? 'unknown')
         // The role's identity changed → every holder's roleName changed and any open
-        // admin roles view must refetch. Broadcast under the new name.
-        publishPermissionsChanged(context, def.name)
+        // admin roles view must refetch. Broadcast the new name AND the old one, so a
+        // viewer with this role selected can follow it to its new name.
+        publishPermissionsChanged(context, def.name, name)
         return toGraphqlRole(def, await countMembers(context, def.name))
       } catch (err) {
         if (err instanceof RoleValidationError) throw new ForbiddenError(err.message)
@@ -264,8 +272,9 @@ export default {
       // No per-viewer filter — the payload reveals only the affected role name.
       subscribe: (_parent: unknown, _args: unknown, { pubsub }: Context) =>
         pubsub.asyncIterator(PERMISSIONS_CHANGED_CHANNEL),
-      resolve: (payload: { permissionsChanged: { roleName: string | null } }) =>
-        payload.permissionsChanged,
+      resolve: (payload: {
+        permissionsChanged: { roleName: string | null; previousRoleName?: string | null }
+      }) => payload.permissionsChanged,
     },
   },
 

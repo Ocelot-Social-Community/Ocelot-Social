@@ -425,6 +425,134 @@ describe('admin/roles.vue', () => {
       expect(wrapper.vm.renaming).toBe(false)
     })
 
+    it('optimistically re-selects the renamed role with its draft, independent of the refetch', async () => {
+      // Regression: the selection (and the role body, keyed by forms[activeRole.name])
+      // must follow the rename immediately — not depend on the cache-and-network refetch,
+      // whose stale cache emit would otherwise reset it to the first tab.
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.startRename()
+      wrapper.setData({ renameValue: 'badge-master' })
+      await wrapper.vm.renameRole()
+      const names = wrapper.vm.roles.map((role) => role.name)
+      expect(names).toContain('badge-master')
+      expect(names).not.toContain('badge-setter')
+      expect(wrapper.vm.activeRole.name).toBe('badge-master')
+      // The renamed role's editable draft exists, so its permissions section renders.
+      expect(wrapper.vm.forms['badge-master']).toBeTruthy()
+    })
+
+    it('patchRolesCacheRename rewrites the renamed role in the roles-query cache', () => {
+      const wrapper = Wrapper()
+      const store = {
+        readQuery: jest.fn(() => ({
+          roles: [
+            { name: 'owner', permissions: [] },
+            { name: 'badge-setter', permissions: ['badge.manage'] },
+          ],
+        })),
+        writeQuery: jest.fn(),
+      }
+      wrapper.vm.patchRolesCacheRename(store, 'badge-setter', {
+        name: 'badge-master',
+        permissions: ['badge.manage'],
+      })
+      expect(store.writeQuery).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: {
+            roles: [
+              { name: 'owner', permissions: [] },
+              { name: 'badge-master', permissions: ['badge.manage'] },
+            ],
+          },
+        }),
+      )
+    })
+
+    it('patchRolesCacheRename no-ops when there is no payload or no cached roles query', () => {
+      const wrapper = Wrapper()
+      const throwingStore = {
+        readQuery: jest.fn(() => {
+          throw new Error('not in cache')
+        }),
+        writeQuery: jest.fn(),
+      }
+      // Missing mutation payload → nothing read or written.
+      wrapper.vm.patchRolesCacheRename(throwingStore, 'badge-setter', null)
+      expect(throwingStore.readQuery).not.toHaveBeenCalled()
+      // Cache miss (readQuery throws) → swallowed, no write.
+      wrapper.vm.patchRolesCacheRename(throwingStore, 'badge-setter', { name: 'x' })
+      expect(throwingStore.writeQuery).not.toHaveBeenCalled()
+      // Cache read returns nothing → also a no-op.
+      const emptyStore = { readQuery: jest.fn(() => null), writeQuery: jest.fn() }
+      wrapper.vm.patchRolesCacheRename(emptyStore, 'badge-setter', { name: 'x' })
+      expect(emptyStore.writeQuery).not.toHaveBeenCalled()
+    })
+
+    it('renameRole patches the roles-query cache (via followRename) and selects the new name', async () => {
+      const wrapper = Wrapper()
+      const cache = {
+        readQuery: jest.fn(() => ({ roles: [{ name: 'badge-setter', permissions: [] }] })),
+        writeQuery: jest.fn(),
+      }
+      wrapper.vm.$apollo.provider = { defaultClient: cache }
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.startRename()
+      wrapper.setData({ renameValue: 'badge-master' })
+      await wrapper.vm.renameRole()
+      expect(cache.writeQuery).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: { roles: [{ name: 'badge-master', permissions: [] }] },
+        }),
+      )
+      expect(wrapper.vm.activeRoleName).toBe('badge-master')
+    })
+
+    it('follows the rename even though the cache write broadcasts to the roles query mid-update', () => {
+      // Regression: writeQuery broadcasts SYNCHRONOUSLY to the roles smart-query
+      // (→ ensureActive). The selection must be moved BEFORE the cache write, else the
+      // broadcast resets it to the first tab and the follow condition (=== oldName) misses.
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      const cache = {
+        readQuery: jest.fn(() => ({
+          roles: [{ name: 'badge-setter', permissions: ['badge.manage'] }],
+        })),
+        writeQuery: jest.fn(() => {
+          // Simulate Apollo's broadcast: the list now carries the new name, ensureActive runs.
+          wrapper.vm.roles = [
+            { name: 'owner', protected: true, permissions: [], memberCount: 1 },
+            {
+              name: 'badge-master',
+              protected: false,
+              permissions: ['badge.manage'],
+              memberCount: 2,
+            },
+            { name: 'user', protected: false, permissions: ['post.create'], memberCount: 5 },
+          ]
+          wrapper.vm.ensureActive()
+        }),
+      }
+      wrapper.vm.$apollo.provider = { defaultClient: cache }
+      wrapper.vm.followRename('badge-setter', 'badge-master')
+      expect(wrapper.vm.activeRoleName).toBe('badge-master')
+    })
+
+    it('shows an error toast when the rename mutation fails', async () => {
+      const wrapper = Wrapper()
+      const toastError = wrapper.vm.$toast.error
+      wrapper.vm.$apollo.mutate = jest.fn().mockRejectedValue(new Error('Role already exists.'))
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.startRename()
+      wrapper.setData({ renameValue: 'badge-master' })
+      await wrapper.vm.renameRole()
+      expect(toastError).toHaveBeenCalledWith(
+        'admin.roles.renameError:{"message":"Role already exists."}',
+      )
+      // The rename mode stays open so the admin can correct the name.
+      expect(wrapper.vm.activeRoleName).toBe('badge-setter')
+    })
+
     it('renameRole is a no-op when the name is unchanged or empty', async () => {
       const wrapper = Wrapper()
       wrapper.vm.setActive('badge-setter')
@@ -434,6 +562,75 @@ describe('admin/roles.vue', () => {
       wrapper.setData({ renameValue: '   ' }) // blank
       await wrapper.vm.renameRole()
       expect(mutate).not.toHaveBeenCalled()
+    })
+
+    it('onPermissionsChanged follows a rename from another client and keeps it selected', async () => {
+      // A second admin viewing the renamed role: the subscription carries the old name,
+      // so the selection follows to the new one instead of resetting to the first tab.
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      const cache = {
+        readQuery: jest.fn(() => ({
+          roles: [{ name: 'badge-setter', permissions: ['badge.manage'] }],
+        })),
+        writeQuery: jest.fn(),
+      }
+      wrapper.vm.$apollo.provider = { defaultClient: cache }
+      wrapper.vm.onPermissionsChanged({
+        roleName: 'badge-master',
+        previousRoleName: 'badge-setter',
+      })
+      expect(wrapper.vm.activeRoleName).toBe('badge-master')
+      const names = wrapper.vm.roles.map((role) => role.name)
+      expect(names).toContain('badge-master')
+      expect(names).not.toContain('badge-setter')
+      expect(wrapper.vm.forms['badge-master']).toBeTruthy()
+      // The client cache is patched so the refetch's stale emit cannot drop the role.
+      expect(cache.writeQuery).toHaveBeenCalled()
+    })
+
+    it('onPermissionsChanged keeps the selection when a different role is renamed', () => {
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('user')
+      wrapper.vm.onPermissionsChanged({
+        roleName: 'badge-master',
+        previousRoleName: 'badge-setter',
+      })
+      expect(wrapper.vm.activeRoleName).toBe('user')
+      const names = wrapper.vm.roles.map((role) => role.name)
+      expect(names).toContain('badge-master')
+      expect(names).not.toContain('badge-setter')
+    })
+
+    it('onPermissionsChanged just refreshes on a non-rename signal', () => {
+      const wrapper = Wrapper()
+      const refresh = jest.spyOn(wrapper.vm, 'refreshFromServer').mockImplementation(() => {})
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.onPermissionsChanged({ roleName: 'user', previousRoleName: null })
+      expect(wrapper.vm.activeRoleName).toBe('badge-setter')
+      expect(refresh).toHaveBeenCalled()
+    })
+
+    it('ensureActive does not reset a vanished selection while a refetch is in flight', () => {
+      // The transient stale-cache emit during a rename refetch drops the old name from
+      // the list; the selection must NOT snap to the first tab (the "jump to front"
+      // flash) while loading — only once the network settles.
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.$apollo.queries = { roles: { loading: true } }
+      // Simulate the stale emit: the list momentarily lacks the selected role.
+      wrapper.setData({
+        roles: [
+          { name: 'owner', protected: true, permissions: [], memberCount: 1 },
+          { name: 'user', protected: false, permissions: ['post.create'], memberCount: 5 },
+        ],
+      })
+      wrapper.vm.ensureActive()
+      expect(wrapper.vm.activeRoleName).toBe('badge-setter') // held, not reset to 'user'
+      // Once the network has settled and the role is genuinely gone, fall back.
+      wrapper.vm.$apollo.queries.roles.loading = false
+      wrapper.vm.ensureActive()
+      expect(wrapper.vm.activeRoleName).toBe('user')
     })
 
     it('starting a rename cancels create mode (and vice versa)', () => {
