@@ -738,17 +738,23 @@ describe('VideoCall', () => {
       jest.useFakeTimers()
       const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
       withApollo(wrapper)
-      return wrapper.vm.connect().then(() => {
-        const room = wrapper.vm.room
-        room.handlers.ActiveSpeakersChanged([{ identity: 'a' }, { identity: 'b' }])
-        jest.advanceTimersByTime(200)
-        expect(wrapper.vm.activeSpeakerIds).toEqual(['a', 'b'])
-        // Identical set within the next window is a no-op.
-        room.handlers.ActiveSpeakersChanged([{ identity: 'a' }, { identity: 'b' }])
-        jest.advanceTimersByTime(200)
-        expect(wrapper.vm.activeSpeakerIds).toEqual(['a', 'b'])
-        jest.useRealTimers()
-      })
+      return wrapper.vm
+        .connect()
+        .then(() => {
+          const room = wrapper.vm.room
+          room.handlers.ActiveSpeakersChanged([{ identity: 'a' }, { identity: 'b' }])
+          jest.advanceTimersByTime(200)
+          expect(wrapper.vm.activeSpeakerIds).toEqual(['a', 'b'])
+          // Identical set within the next window is a no-op.
+          room.handlers.ActiveSpeakersChanged([{ identity: 'a' }, { identity: 'b' }])
+          jest.advanceTimersByTime(200)
+          expect(wrapper.vm.activeSpeakerIds).toEqual(['a', 'b'])
+        })
+        // Restore real timers even if an assertion above throws, so leaked fake
+        // timers can't make later tests flaky.
+        .finally(() => {
+          jest.useRealTimers()
+        })
     })
 
     it('routes a server-side disconnect through leave(), ignoring our own disconnect', async () => {
