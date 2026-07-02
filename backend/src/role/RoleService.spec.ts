@@ -96,12 +96,17 @@ describe('RoleService', () => {
       expect(svc.getRole(MODERATOR_ROLE)).toBeUndefined()
     })
 
-    it('migrates the cache key on a rename event (drops the previous name)', () => {
+    it('migrates the cache key on a rename event (drops the previous name), sanitising permissions', () => {
       const svc = createInMemoryRoleService(DEFAULT_ROLES)
       svc.applyExternalChange({
         name: 'staff',
         previousName: MODERATOR_ROLE,
-        definition: { name: 'staff', protected: false, permissions: ['content.moderate'] },
+        definition: {
+          name: 'staff',
+          protected: false,
+          // A catalog-drift key must be filtered out on the rename path too.
+          permissions: ['content.moderate', 'ghost.permission'] as never,
+        },
         actor: 'u1',
         timestamp: 't',
       })
