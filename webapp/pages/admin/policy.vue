@@ -298,17 +298,23 @@ export default {
         const changes = this.keys
           .filter((k) => this.form[k] !== this.snapshot[k])
           .map((key) => ({ key, value: this.form[key] }))
-        // We become the last writer for these keys: advance their baseline to the value we
-        // are writing (and clear any conflict on them) so the snapshot update our own save
-        // triggers reconciles cleanly instead of being seen as a remote conflict.
-        const conflict = { ...this.conflict }
-        changes.forEach(({ key, value }) => {
+        for (const { key, value } of changes) {
+          // Advance THIS key's baseline right before its write, so the server echo of a
+          // SUCCESSFUL write — which can arrive while setKey is still pending — reconciles
+          // cleanly instead of looking like a remote conflict.
+          const previousBaseline = this.baseline[key]
           this.baseline[key] = value
-          conflict[key] = false
-        })
-        this.conflict = conflict
-        for (const change of changes) {
-          await this.setKey(change)
+          try {
+            await this.setKey({ key, value })
+          } catch (err) {
+            // The write did not persist: roll this key's baseline back, else a later snapshot
+            // update would mistake the unsaved local value for the baseline and silently
+            // overwrite the input. Already-persisted keys keep their advanced baseline.
+            this.baseline[key] = previousBaseline
+            throw err
+          }
+          // Persisted → this key is the server's value now, so it is no longer in conflict.
+          this.$set(this.conflict, key, false)
         }
         this.$toast.success(this.$t('admin.policy.saveSuccess'))
       } catch (err) {

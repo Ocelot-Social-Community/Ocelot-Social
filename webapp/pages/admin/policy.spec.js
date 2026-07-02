@@ -313,6 +313,26 @@ describe('admin/policy.vue', () => {
       expect(wrapper.find('#policy-publicRegistration').element.checked).toBe(true)
     })
 
+    it('rolls back the baseline when a save fails, so a later snapshot update cannot clobber the unsaved input', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+      // Local edit on a number field (7 → 10, unsaved).
+      await wrapper.find('#policy-inviteLinkLimit').setValue('10')
+      // The write fails.
+      setKey.mockRejectedValueOnce(new Error('network'))
+      await wrapper.find('form').trigger('submit')
+      await flushPromises()
+      expect(mocks.$toast.error).toHaveBeenCalled()
+
+      // A later UNRELATED remote change reconciles the form. Because the failed key's baseline
+      // was rolled back, the field is still treated as locally edited — its value survives
+      // instead of being silently reset to the (still 7) server value.
+      store.commit('policy/SET_SNAP', { ...snapshot, publicRegistration: true })
+      await flushPromises()
+      expect(wrapper.find('#policy-inviteLinkLimit').element.value).toBe('10')
+      expect(wrapper.find('#policy-publicRegistration').element.checked).toBe(true) // unrelated followed
+    })
+
     it('does not raise a false conflict when the server echo lands while the own save is still in flight', async () => {
       wrapper = Wrapper()
       await flushPromises()
