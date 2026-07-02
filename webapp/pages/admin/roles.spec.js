@@ -621,6 +621,33 @@ describe('admin/roles.vue', () => {
       expect(names).not.toContain('badge-setter')
     })
 
+    it('closes an open rename editor when that same role is renamed externally', () => {
+      // A stale renameValue must not survive an external rename of the role being edited —
+      // otherwise confirming it would submit the stale name against the renamed role.
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.startRename()
+      wrapper.setData({ renameValue: 'my-typed-name' })
+      expect(wrapper.vm.renaming).toBe(true)
+      wrapper.vm.onPermissionsChanged({
+        roleName: 'badge-master',
+        previousRoleName: 'badge-setter',
+      })
+      expect(wrapper.vm.renaming).toBe(false)
+      expect(wrapper.vm.renameValue).toBe('')
+      expect(wrapper.vm.activeRoleName).toBe('badge-master')
+    })
+
+    it('keeps an open rename editor when a different role is renamed externally', () => {
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.startRename()
+      wrapper.vm.onPermissionsChanged({ roleName: 'founder', previousRoleName: 'owner' })
+      // The editor is for badge-setter, so an owner→founder rename leaves it open.
+      expect(wrapper.vm.renaming).toBe(true)
+      expect(wrapper.vm.activeRoleName).toBe('badge-setter')
+    })
+
     it('onPermissionsChanged just refreshes on a non-rename signal', () => {
       const wrapper = Wrapper()
       const refresh = jest.spyOn(wrapper.vm, 'refreshFromServer').mockImplementation(() => {})

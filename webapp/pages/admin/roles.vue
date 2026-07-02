@@ -350,6 +350,10 @@ export default {
     // drafts so the role body keeps rendering.
     followRename(oldName, newName) {
       if (!newName || oldName === newName) return
+      // If this client has the rename editor open on the very role being renamed, close it:
+      // its renameValue is now stale, and confirming would submit it against the (already
+      // renamed) role. Checked before the selection moves off oldName below.
+      if (this.renaming && this.activeRoleName === oldName) this.cancelRename()
       // Move the selection FIRST. Patching the cache below writes the roles query, which
       // broadcasts SYNCHRONOUSLY to the roles smart-query (→ result → buildForms →
       // ensureActive). If the selection were still the old name at that point, ensureActive
