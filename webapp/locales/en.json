@@ -832,7 +832,8 @@
     "unmute": "Unmute group",
     "unmuted": "Group unmuted",
     "update": "Save change",
-    "updatedGroup": "The group data has been changed."
+    "updatedGroup": "The group data has been changed.",
+    "showMembers": "Member list visible to everyone"
   },
   "hashtags-filter": {
     "clearSearch": "Clear search",

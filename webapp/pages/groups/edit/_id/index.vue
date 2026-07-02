@@ -37,6 +37,7 @@ export default {
         actionRadius,
         locationName,
         categoryIds,
+        showMembers,
       } = value
       const variables = {
         id,
@@ -48,6 +49,7 @@ export default {
         actionRadius,
         locationName,
         categoryIds,
+        showMembers,
       }
       try {
         await this.$apollo.mutate({

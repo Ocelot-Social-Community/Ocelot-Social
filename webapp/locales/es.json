@@ -832,7 +832,8 @@
     "unmute": "Desactivar silencio",
     "unmuted": "Silencio del grupo desactivado",
     "update": "Guardar cambios",
-    "updatedGroup": "Los datos del grupo han sido cambiados."
+    "updatedGroup": "Los datos del grupo han sido cambiados.",
+    "showMembers": "Lista de miembros visible para todos"
   },
   "hashtags-filter": {
     "clearSearch": "Borrar búsqueda",

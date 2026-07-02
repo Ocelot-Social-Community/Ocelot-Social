@@ -86,24 +86,51 @@ export default {
     },
     GroupMembers: async (_object, params, context: Context, _resolveInfo) => {
       const { id: groupId, first = 25, offset = 0, includePending = false } = params
+      const viewerId = context.user?.id ?? ''
       const session = context.driver.session()
       try {
         return await session.readTransaction(async (txc) => {
-          const pendingFilter = includePending ? '' : "WHERE membership.role <> 'pending'"
-          const groupMemberCypher = `
-            MATCH (user:User)-[membership:MEMBER_OF]->(:Group {id: $groupId})
-            ${pendingFilter}
-            RETURN user {.*}, membership {.*}
-            SKIP toInteger($offset) LIMIT toInteger($first)
-          `
-          const transactionResponse = await txc.run(groupMemberCypher, {
-            groupId,
-            first,
-            offset,
-          })
-          return transactionResponse.records.map((record) => {
-            return { user: record.get('user'), membership: record.get('membership') }
-          })
+          const memberCheckResult = await txc.run(
+            `MATCH (:User {id: $viewerId})-[m:MEMBER_OF]->(:Group {id: $groupId})
+             WHERE m.role IN ['usual', 'admin', 'owner']
+             RETURN m.role AS role`,
+            { viewerId, groupId },
+          )
+          const isMember = memberCheckResult.records.length > 0
+
+          let cypher: string
+          if (isMember) {
+            const pendingFilter = includePending ? '' : "AND membership.role <> 'pending'"
+            cypher = `
+              MATCH (user:User)-[membership:MEMBER_OF]->(:Group {id: $groupId})
+              WHERE true ${pendingFilter}
+              RETURN user {.*}, membership {.*}
+              SKIP toInteger($offset) LIMIT toInteger($first)
+            `
+          } else {
+            cypher = `
+              MATCH (group:Group {id: $groupId})
+              WHERE (
+                group.groupType = 'public'
+                OR (group.groupType = 'closed' AND coalesce(group.showMembers, false) = true)
+              )
+              MATCH (user:User)-[membership:MEMBER_OF]->(group)
+              WHERE membership.role <> 'pending'
+                AND coalesce(membership.showOnProfile, true) = true
+                AND (
+                  (group.groupType = 'public' AND coalesce(user.showPublicGroupsOnProfile, true) = true)
+                  OR (group.groupType = 'closed' AND coalesce(user.showClosedGroupsOnProfile, true) = true)
+                )
+              RETURN user {.*}, membership {.*}
+              SKIP toInteger($offset) LIMIT toInteger($first)
+            `
+          }
+
+          const result = await txc.run(cypher, { groupId, first, offset })
+          return result.records.map((record) => ({
+            user: record.get('user'),
+            membership: record.get('membership'),
+          }))
         })
       } finally {
         await session.close()
@@ -673,6 +700,12 @@ export default {
         return parent.groupType === 'hidden' ? '' : parent.about
       }
       return parent.about
+    },
+    showMembers: (parent) => {
+      if (parent.groupType === 'public') return true
+      if (parent.groupType === 'hidden') return false
+      // closed: configurable by owner; default false when property not yet set on the node
+      return (parent.showMembers as boolean) ?? false
     },
   },
   Subscription: {

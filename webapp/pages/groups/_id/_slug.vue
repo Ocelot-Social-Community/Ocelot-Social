@@ -481,11 +481,13 @@ export default {
       return this.GroupMembers ? this.GroupMembers : []
     },
     isAllowedSeeingGroupMembers() {
-      return (
-        this.group &&
-        (this.group.groupType === 'public' ||
-          (['closed', 'hidden'].includes(this.group.groupType) && this.isGroupMemberNonePending))
-      )
+      if (!this.group) return false
+      if (this.group.groupType === 'public') return true
+      if (['closed', 'hidden'].includes(this.group.groupType) && this.isGroupMemberNonePending)
+        return true
+      // non-members can see the member list of a closed group when the owner enabled showMembers
+      if (this.group.groupType === 'closed' && this.group.showMembers === true) return true
+      return false
     },
     // tabOptions() {
     //   return [

@@ -832,7 +832,8 @@
     "unmute": "Cofnij wyciszenie grupy",
     "unmuted": "Wyciszenie grupy cofnięte",
     "update": "Zapisz zmianę",
-    "updatedGroup": "Dane grupy zostały zmienione."
+    "updatedGroup": "Dane grupy zostały zmienione.",
+    "showMembers": "Lista członków widoczna dla wszystkich"
   },
   "hashtags-filter": {
     "clearSearch": "Wyczyść wyszukiwanie",

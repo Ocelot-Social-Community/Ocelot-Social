@@ -832,7 +832,8 @@
     "unmute": "Reativar grupo",
     "unmuted": "Grupo reativado",
     "update": "Salvar alterações",
-    "updatedGroup": "Os dados do grupo foram alterados."
+    "updatedGroup": "Os dados do grupo foram alterados.",
+    "showMembers": "Lista de membros visível para todos"
   },
   "hashtags-filter": {
     "clearSearch": "Limpar busca",

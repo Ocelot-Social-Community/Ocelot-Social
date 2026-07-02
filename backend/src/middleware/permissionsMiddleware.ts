@@ -159,12 +159,12 @@ const isAllowedSeeingGroupMembers = rule({
   })
   try {
     const { member, group } = await readTxPromise
+    const isMember = !!member && ['usual', 'admin', 'owner'].includes(member.myRoleInGroup)
     return (
       !!group &&
       (group.groupType === 'public' ||
-        (['closed', 'hidden'].includes(group.groupType) &&
-          !!member &&
-          ['usual', 'admin', 'owner'].includes(member.myRoleInGroup)))
+        (['closed', 'hidden'].includes(group.groupType) && isMember) ||
+        (group.groupType === 'closed' && group.showMembers === true))
     )
   } catch (error) {
     throw new Error(error)

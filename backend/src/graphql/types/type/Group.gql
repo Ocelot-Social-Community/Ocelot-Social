@@ -45,6 +45,7 @@ type Group {
 
   myRole: GroupMemberRole # if 'null' then the current user is no member
   showOnProfile: Boolean # whether the profile owner shows this group on their profile
+  showMembers: Boolean # for closed groups: whether non-members can see the member list
   posts: [Post] @relation(name: "IN", direction: "IN")
 
   isMutedByMe: Boolean!
@@ -133,6 +134,7 @@ type Mutation {
     categoryIds: [ID]
     avatar: ImageInput # test this as result
     locationName: String # empty string '' sets it to null
+    showMembers: Boolean
   ): Group
 
   # DeleteGroup(id: ID!): Group

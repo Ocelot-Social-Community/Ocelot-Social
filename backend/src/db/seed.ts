@@ -468,6 +468,10 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         locationName: 'France',
       },
     })
+    await database.write({
+      query: `MATCH (group:Group {id: 'g1'}) SET group.showMembers = true`,
+      variables: {},
+    })
     await mutate({
       mutation: JoinGroup,
       variables: {

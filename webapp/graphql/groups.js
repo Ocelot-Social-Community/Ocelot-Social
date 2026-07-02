@@ -68,6 +68,7 @@ export const updateGroupMutation = () => {
       $categoryIds: [ID]
       $avatar: ImageInput
       $locationName: String # empty string '' sets it to null
+      $showMembers: Boolean
     ) {
       UpdateGroup(
         id: $id
@@ -80,6 +81,7 @@ export const updateGroupMutation = () => {
         categoryIds: $categoryIds
         avatar: $avatar
         locationName: $locationName
+        showMembers: $showMembers
       ) {
         id
         name
@@ -104,6 +106,7 @@ export const updateGroupMutation = () => {
         }
         locationName
         myRole
+        showMembers
       }
     }
   `
@@ -227,6 +230,7 @@ export const groupQuery = (i18n) => {
         ...locationOnGroup
         membersCount
         myRole
+        showMembers
       }
     }
   `
@@ -256,6 +260,7 @@ export const groupEditQuery = () => {
           ...imageUrls
         }
         myRole
+        showMembers
         inviteCodes {
           createdAt
           code

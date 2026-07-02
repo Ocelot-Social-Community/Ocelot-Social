@@ -832,7 +832,8 @@
     "unmute": "Groep niet meer dempen",
     "unmuted": "Groep niet meer gedempt",
     "update": "Wijziging opslaan",
-    "updatedGroup": "De groepsgegevens zijn gewijzigd."
+    "updatedGroup": "De groepsgegevens zijn gewijzigd.",
+    "showMembers": "Ledenlijst zichtbaar voor iedereen"
   },
   "hashtags-filter": {
     "clearSearch": "Zoekopdracht wissen",

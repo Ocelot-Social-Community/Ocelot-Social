@@ -832,7 +832,8 @@
     "unmute": "Çhesht grupin",
     "unmuted": "Grupi u çhesht",
     "update": "Ruaj ndryshimin",
-    "updatedGroup": "Të dhënat e grupit u ndryshuan."
+    "updatedGroup": "Të dhënat e grupit u ndryshuan.",
+    "showMembers": "Lista e anëtarëve e dukshme për të gjithë"
   },
   "hashtags-filter": {
     "clearSearch": "Pastro kërkimin",

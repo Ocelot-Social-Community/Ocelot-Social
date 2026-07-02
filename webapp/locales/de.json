@@ -832,7 +832,8 @@
     "unmute": "Nicht stummschalten",
     "unmuted": "Gruppe nicht mehr stummgeschaltet",
     "update": "Änderung speichern",
-    "updatedGroup": "Die Gruppendaten wurden geändert!"
+    "updatedGroup": "Die Gruppendaten wurden geändert!",
+    "showMembers": "Mitgliederliste für alle sichtbar"
   },
   "hashtags-filter": {
     "clearSearch": "Suche löschen",
