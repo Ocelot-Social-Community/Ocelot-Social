@@ -244,9 +244,13 @@ describe('admin/policy.vue', () => {
       store.commit('policy/SET_SNAP', { ...snapshot, inviteLinkLimit: 99 })
       await flushPromises()
       expect(wrapper.vm.hasConflict).toBe(true)
+      expect(wrapper.find('[data-test="policy-conflict"]').exists()).toBe(true)
 
       await wrapper.find('[data-test="policy-conflict-load"]').trigger('click')
       expect(wrapper.vm.hasConflict).toBe(false)
+      // The banner is gone from the DOM (not just the computed), and the per-row note too.
+      expect(wrapper.find('[data-test="policy-conflict"]').exists()).toBe(false)
+      expect(wrapper.find('[data-test="policy-conflict-inviteLinkLimit"]').exists()).toBe(false)
       expect(wrapper.find('#policy-inviteLinkLimit').element.value).toBe('99')
     })
 
@@ -257,9 +261,12 @@ describe('admin/policy.vue', () => {
       store.commit('policy/SET_SNAP', { ...snapshot, inviteLinkLimit: 99 })
       await flushPromises()
       expect(wrapper.vm.hasConflict).toBe(true)
+      expect(wrapper.find('[data-test="policy-conflict"]').exists()).toBe(true)
 
       await wrapper.find('[data-test="policy-conflict-keep"]').trigger('click')
       expect(wrapper.vm.hasConflict).toBe(false)
+      // The banner is gone from the DOM (not just the computed), but the edit is kept.
+      expect(wrapper.find('[data-test="policy-conflict"]').exists()).toBe(false)
       expect(wrapper.find('#policy-inviteLinkLimit').element.value).toBe('10')
     })
 

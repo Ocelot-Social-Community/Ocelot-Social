@@ -245,8 +245,12 @@ describe('admin/roles.vue', () => {
 
     it('loadServerVersion discards local edits, rebuilds from the server, clears the banner', async () => {
       const wrapper = await intoConflict()
+      expect(wrapper.find('[data-test="role-badge-setter-conflict"]').exists()).toBe(true)
       wrapper.vm.loadServerVersion('badge-setter')
+      await wrapper.vm.$nextTick()
       expect(wrapper.vm.conflicts['badge-setter']).toBe(false)
+      // The banner is gone from the DOM (not just the computed).
+      expect(wrapper.find('[data-test="role-badge-setter-conflict"]').exists()).toBe(false)
       // Rebuilt from the server set ([]) — both my edit and the removed permission are gone.
       expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(false)
       expect(wrapper.vm.forms['badge-setter'].permissions['badge.manage']).toBe(false)
@@ -255,8 +259,12 @@ describe('admin/roles.vue', () => {
 
     it('dismissConflict hides the banner but keeps the draft (keep editing)', async () => {
       const wrapper = await intoConflict()
+      expect(wrapper.find('[data-test="role-badge-setter-conflict"]').exists()).toBe(true)
       wrapper.vm.dismissConflict('badge-setter')
+      await wrapper.vm.$nextTick()
       expect(wrapper.vm.conflicts['badge-setter']).toBe(false)
+      // The banner is gone from the DOM (not just the computed), but the edit is kept.
+      expect(wrapper.find('[data-test="role-badge-setter-conflict"]').exists()).toBe(false)
       expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(true)
     })
 
