@@ -65,6 +65,12 @@ describe('chat.vue', () => {
       expect(committed).toContainEqual({ showChat: true, chatUserId: 'u1', groupId: null })
     })
 
+    it('prefers the groupId when the URL carries both a groupId and a userId', () => {
+      mocks.$route = { query: { groupId: 'g1', userId: 'u1' } }
+      Wrapper()
+      expect(committed).toContainEqual({ showChat: true, chatUserId: null, groupId: 'g1' })
+    })
+
     it('closes the chat when the URL carries neither', () => {
       Wrapper()
       expect(committed).toContainEqual({ showChat: false, chatUserId: null, groupId: null })
