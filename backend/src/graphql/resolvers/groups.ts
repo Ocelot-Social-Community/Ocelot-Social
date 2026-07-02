@@ -7,12 +7,15 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { v4 as uuid } from 'uuid'
 import { withFilter } from 'graphql-subscriptions'
+import { v4 as uuid } from 'uuid'
 
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '@constants/categories'
 import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '@constants/groups'
-import { GROUP_MEMBERSHIP_VISIBILITY_CHANGED } from '@constants/subscriptions'
+import {
+  GROUP_MEMBERSHIP_VISIBILITY_CHANGED,
+  GROUP_SHOW_MEMBERS_CHANGED,
+} from '@constants/subscriptions'
 import { ForbiddenError, UserInputError } from '@graphql/errors'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
 
@@ -356,6 +359,11 @@ export default {
         })
         // TODO: put in a middleware, see "CreateGroup", "UpdateUser"
         await createOrUpdateLocations('Group', params.id, params.locationName, session, context)
+        if ('showMembers' in params) {
+          void context.pubsub.publish(GROUP_SHOW_MEMBERS_CHANGED, {
+            groupShowMembersChanged: { groupId },
+          })
+        }
         return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
@@ -720,6 +728,15 @@ export default {
         ) => {
           if (!context.user) return false
           return payload.groupMembershipVisibilityChanged.userId === args.userId
+        },
+      ),
+    },
+    groupShowMembersChanged: {
+      subscribe: withFilter(
+        (_parent, _args, context: Context) =>
+          context.pubsub.asyncIterator(GROUP_SHOW_MEMBERS_CHANGED),
+        (payload: { groupShowMembersChanged: { groupId: string } }, args: { groupId: string }) => {
+          return payload.groupShowMembersChanged.groupId === args.groupId
         },
       ),
     },

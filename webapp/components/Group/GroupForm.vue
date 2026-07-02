@@ -66,7 +66,7 @@
         </os-badge>
 
         <!-- showMembers -->
-        <div v-if="update" class="show-members-control">
+        <div class="show-members-control">
           <input
             id="show-members"
             type="checkbox"

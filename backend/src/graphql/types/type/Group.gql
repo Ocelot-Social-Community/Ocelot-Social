@@ -119,6 +119,7 @@ type Mutation {
     # avatar: ImageInput # a group can not be created with an avatar
 
     locationName: String # empty string '' sets it to null
+    showMembers: Boolean
   ): Group
 
   UpdateGroup(
@@ -157,6 +158,11 @@ type GroupMembershipVisibilityChanged {
   userId: ID!
 }
 
+type GroupShowMembersChanged {
+  groupId: ID!
+}
+
 type Subscription {
   groupMembershipVisibilityChanged(userId: ID!): GroupMembershipVisibilityChanged!
+  groupShowMembersChanged(groupId: ID!): GroupShowMembersChanged!
 }

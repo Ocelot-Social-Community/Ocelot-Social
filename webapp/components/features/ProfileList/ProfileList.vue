@@ -4,6 +4,9 @@
       <h5 class="title spacer-x-small">
         {{ title }}
       </h5>
+      <p v-if="subtitle" class="ds-text ds-text-soft ds-text-size-small spacer-x-small">
+        {{ subtitle }}
+      </p>
 
       <!-- Virtual Scroller for better performance -->
       <recycle-scroller
@@ -87,6 +90,7 @@ export default {
   props: {
     uniqueName: { type: String, required: true },
     title: { type: String, required: true },
+    subtitle: { type: String, default: null },
     titleNobody: { type: String, default: null },
     allProfilesCount: { type: Number, required: true },
     profiles: { type: Array, required: true },

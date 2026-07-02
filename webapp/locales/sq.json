@@ -796,6 +796,8 @@
     "membersCount": "Anëtar ::: Anëtarë",
     "membersListTitle": "Anëtarët e grupit",
     "membersListTitleNotAllowedSeeingGroupMembers": "Anëtarët e grupit të padukshëm",
+    "membersListVisibleToNonMembers": "Jo-anëtarët mund ta shohin këtë listë.",
+    "membersListNotVisibleToNonMembers": "Jo-anëtarët nuk mund ta shohin këtë listë.",
     "modal": {
       "cancel": "Anulo",
       "confirm": "Konfirmo",

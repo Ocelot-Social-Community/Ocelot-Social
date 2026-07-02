@@ -796,6 +796,8 @@
     "membersCount": "Lid ::: Leden",
     "membersListTitle": "Groepsleden",
     "membersListTitleNotAllowedSeeingGroupMembers": "Groepsleden onzichtbaar",
+    "membersListVisibleToNonMembers": "Niet-leden kunnen deze lijst zien.",
+    "membersListNotVisibleToNonMembers": "Niet-leden kunnen deze lijst niet zien.",
     "modal": {
       "cancel": "Annuleren",
       "confirm": "Bevestigen",

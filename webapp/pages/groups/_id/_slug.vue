@@ -218,6 +218,7 @@
         <profile-list
           :uniqueName="'groupMembersFilter'"
           :title="$t('group.membersListTitle')"
+          :subtitle="membersListSubtitle"
           :titleNobody="
             !isAllowedSeeingGroupMembers
               ? $t('group.membersListTitleNotAllowedSeeingGroupMembers')
@@ -343,7 +344,12 @@ import {
 import { iconRegistry } from '~/utils/iconRegistry'
 import uniqBy from 'lodash/uniqBy'
 import { profilePagePosts } from '~/graphql/PostQuery'
-import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/groups'
+import {
+  updateGroupMutation,
+  groupQuery,
+  groupMembersQuery,
+  groupShowMembersChangedSubscription,
+} from '~/graphql/groups'
 import { roomUnreadQuery, roomUpdated } from '~/graphql/Rooms'
 import {
   videoCallParticipantCountQuery,
@@ -489,6 +495,13 @@ export default {
       if (this.group.groupType === 'closed' && this.group.showMembers === true) return true
       return false
     },
+    membersListSubtitle() {
+      if (!this.group || !this.isGroupMemberNonePending) return null
+      if (this.group.groupType === 'public' || this.group.showMembers === true) {
+        return this.$t('group.membersListVisibleToNonMembers')
+      }
+      return this.$t('group.membersListNotVisibleToNonMembers')
+    },
     // tabOptions() {
     //   return [
     //     {
@@ -521,12 +534,15 @@ export default {
     })
     this._roomUpdatedSub = null
     this._videoCallCountSub = null
+    this._groupShowMembersSub = null
     if (this.isGroupMemberNonePending) this.setupRoomUpdatedSubscription()
     if (this.canShowVideoCallButton) this.setupVideoCallCountSubscription()
+    this.setupGroupShowMembersSubscription()
   },
   beforeDestroy() {
     this._roomUpdatedSub?.unsubscribe()
     this._videoCallCountSub?.unsubscribe()
+    this._groupShowMembersSub?.unsubscribe()
   },
   watch: {
     isAllowedSeeingGroupMembers(to, _from) {
@@ -548,6 +564,22 @@ export default {
       showChat: 'chat/SET_OPEN_CHAT',
       openVideoCall: 'videoCall/OPEN',
     }),
+    setupGroupShowMembersSubscription() {
+      if (this._groupShowMembersSub) return
+      const groupId = this.$route.params.id
+      if (!groupId) return
+      const observer = this.$apollo.subscribe({
+        query: groupShowMembersChangedSubscription(),
+        variables: { groupId },
+        fetchPolicy: 'no-cache',
+      })
+      this._groupShowMembersSub = observer.subscribe({
+        next: () => {
+          this.$apollo.queries.Group.refetch()
+        },
+        error: () => {},
+      })
+    },
     setupVideoCallCountSubscription() {
       if (this._videoCallCountSub) return
       const groupId = this.$route.params.id

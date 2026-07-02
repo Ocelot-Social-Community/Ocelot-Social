@@ -16,6 +16,7 @@ export const createGroupMutation = () => {
       $actionRadius: GroupActionRadius!
       $categoryIds: [ID]
       $locationName: String # empty string '' sets it to null
+      $showMembers: Boolean
     ) {
       CreateGroup(
         id: $id
@@ -27,6 +28,7 @@ export const createGroupMutation = () => {
         actionRadius: $actionRadius
         categoryIds: $categoryIds
         locationName: $locationName
+        showMembers: $showMembers
       ) {
         id
         name
@@ -293,6 +295,16 @@ export const groupMembersQuery = () => {
         membership {
           role
         }
+      }
+    }
+  `
+}
+
+export const groupShowMembersChangedSubscription = () => {
+  return gql`
+    subscription GroupShowMembersChanged($groupId: ID!) {
+      groupShowMembersChanged(groupId: $groupId) {
+        groupId
       }
     }
   `

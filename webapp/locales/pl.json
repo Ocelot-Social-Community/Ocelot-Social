@@ -796,6 +796,8 @@
     "membersCount": "Członek ::: Członkowie",
     "membersListTitle": "Członkowie grupy",
     "membersListTitleNotAllowedSeeingGroupMembers": "Członkowie grupy niewidoczni",
+    "membersListVisibleToNonMembers": "Osoby spoza grupy mogą zobaczyć tę listę.",
+    "membersListNotVisibleToNonMembers": "Osoby spoza grupy nie mogą zobaczyć tej listy.",
     "modal": {
       "cancel": "Anuluj",
       "confirm": "Potwierdź",

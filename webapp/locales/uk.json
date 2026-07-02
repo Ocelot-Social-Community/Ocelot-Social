@@ -796,6 +796,8 @@
     "membersCount": "Учасник ::: Учасники",
     "membersListTitle": "Учасники групи",
     "membersListTitleNotAllowedSeeingGroupMembers": "Учасники групи приховані",
+    "membersListVisibleToNonMembers": "Не-учасники можуть бачити цей список.",
+    "membersListNotVisibleToNonMembers": "Не-учасники не можуть бачити цей список.",
     "modal": {
       "cancel": "Скасувати",
       "confirm": "Підтвердити",
