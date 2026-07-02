@@ -140,9 +140,9 @@
     },
     "policy": {
       "conflict": {
-        "keep": "Continuer l’édition",
+        "keep": "Continuer l'édition",
         "load": "Charger la nouvelle version",
-        "message": "Un paramètre a été modifié ailleurs pendant que vous l’éditiez. Vos modifications non enregistrées sont conservées — vérifiez les paramètres mis en évidence.",
+        "message": "Un paramètre a été modifié ailleurs pendant que vous l'éditiez. Vos modifications non enregistrées sont conservées — vérifiez les paramètres mis en évidence.",
         "serverValue": "serveur désormais : {value}"
       },
       "defaultValue": "par défaut : {value}",
@@ -207,9 +207,9 @@
       "cannotDelete": "Ce rôle ne peut pas être supprimé.",
       "cannotDeleteHasMembers": "Ce rôle a encore des membres — réattribuez-les avant de le supprimer.",
       "conflict": {
-        "keep": "Continuer l’édition",
+        "keep": "Continuer l'édition",
         "load": "Charger la nouvelle version",
-        "message": "Ce rôle a été modifié ailleurs pendant que vous l’éditiez. Vos modifications non enregistrées sont conservées — vérifiez les permissions mises en évidence."
+        "message": "Ce rôle a été modifié ailleurs pendant que vous l'éditiez. Vos modifications non enregistrées sont conservées — vérifiez les permissions mises en évidence."
       },
       "create": "Créer un rôle",
       "createTitle": "Créer un nouveau rôle",

@@ -142,7 +142,7 @@
       "conflict": {
         "keep": "Continua a modificare",
         "load": "Carica la nuova versione",
-        "message": "Un’impostazione è stata modificata altrove mentre la stavi modificando. Le tue modifiche non salvate vengono mantenute: controlla le impostazioni evidenziate.",
+        "message": "Un'impostazione è stata modificata altrove mentre la stavi modificando. Le tue modifiche non salvate vengono mantenute: controlla le impostazioni evidenziate.",
         "serverValue": "server ora: {value}"
       },
       "defaultValue": "predefinito: {value}",
