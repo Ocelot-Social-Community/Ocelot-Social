@@ -14,6 +14,7 @@ import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import DeletePost from '@graphql/queries/posts/DeletePost.gql'
 import pinPost from '@graphql/queries/posts/pinPost.gql'
 import Post from '@graphql/queries/posts/Post.gql'
+import postsPinnedCountsQuery from '@graphql/queries/posts/postsPinnedCounts.gql'
 import pushPost from '@graphql/queries/posts/pushPost.gql'
 import unpinPost from '@graphql/queries/posts/unpinPost.gql'
 import unpushPost from '@graphql/queries/posts/unpushPost.gql'
@@ -1593,8 +1594,6 @@ describe('pin posts', () => {
     })
 
     describe('maxPinnedPosts = 3', () => {
-      const postsPinnedCountsQuery = `query { PostsPinnedCounts { currentlyPinnedPosts } }`
-
       beforeEach(async () => {
         policy = { ...defaultPolicy, maxPinnedPosts: 3 }
 

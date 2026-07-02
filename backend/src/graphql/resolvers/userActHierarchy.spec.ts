@@ -11,8 +11,8 @@
 
 import Factory, { cleanDatabase } from '@db/factories'
 import review from '@graphql/queries/moderation/review.gql'
-import DISABLE_USER from '@graphql/queries/users/disableUser.gql'
 import DELETE_USER from '@graphql/queries/users/DeleteUser.gql'
+import DISABLE_USER from '@graphql/queries/users/disableUser.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
@@ -25,7 +25,7 @@ let server: ApolloTestSetup['server']
 
 const contextFn = () => ({ authenticatedUser })
 
-const buildUser =(id: string, role: string) =>
+const buildUser = (id: string, role: string) =>
   Factory.build('user', { id, name: id, role }, { email: `${id}@example.org`, password: '1234' })
 
 describe('act-on hierarchy', () => {

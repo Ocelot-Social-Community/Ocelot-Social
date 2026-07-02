@@ -49,7 +49,6 @@ const asAdmin = async () => {
   authenticatedUser = await admin.toJson()
 }
 
-
 describe('role management', () => {
   beforeAll(async () => {
     await cleanDatabase()
