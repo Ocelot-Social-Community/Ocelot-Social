@@ -100,12 +100,14 @@ describe('HeaderMenu', () => {
     })
 
     it('showFilterMenuDropdown is true only on the index route', () => {
-      const wrapper = Wrapper()
-      expect(wrapper.vm.showFilterMenuDropdown).toBe(true)
-      wrapper.vm.$route.matched = [{ name: 'other' }]
-      expect(wrapper.vm.showFilterMenuDropdown).toBe(false)
-      wrapper.vm.$route.matched = []
-      expect(wrapper.vm.showFilterMenuDropdown).toBeFalsy()
+      // Fresh wrapper per route state so the assertion never depends on a
+      // computed cache being invalidated by a mutated $route mock.
+      mocks.$route.matched = [{ name: 'index' }]
+      expect(Wrapper().vm.showFilterMenuDropdown).toBe(true)
+      mocks.$route.matched = [{ name: 'other' }]
+      expect(Wrapper().vm.showFilterMenuDropdown).toBe(false)
+      mocks.$route.matched = []
+      expect(Wrapper().vm.showFilterMenuDropdown).toBeFalsy()
     })
 
     it('userName falls back to the anonymous label without a user', () => {
@@ -115,12 +117,13 @@ describe('HeaderMenu', () => {
     })
 
     it('currentLocale resolves the active locale and defaults otherwise', () => {
-      const wrapper = Wrapper()
-      expect(wrapper.vm.currentLocale.code).toBe('en')
-      // Unknown locale → falls back to the first configured locale.
+      expect(Wrapper().vm.currentLocale.code).toBe('en')
+      // Unknown locale → falls back to the first configured locale. A fresh
+      // wrapper avoids relying on the computed re-running after the mock changes.
       mocks.$i18n.locale = () => 'xx-unknown'
-      expect(wrapper.vm.currentLocale).toBeTruthy()
-      expect(wrapper.vm.currentLocale.code).toBeDefined()
+      const fallback = Wrapper().vm.currentLocale
+      expect(fallback).toBeTruthy()
+      expect(fallback.code).toBeDefined()
     })
 
     it('sortedLocales is ordered by name', () => {
@@ -139,24 +142,24 @@ describe('HeaderMenu', () => {
     })
 
     it('mobileAvatarMenuOpen reflects the toggle then the route', () => {
+      // An explicit toggle wins over the route.
       const wrapper = Wrapper()
       wrapper.vm.mobileAvatarMenuOpen = true
       expect(wrapper.vm.mobileAvatarMenuOpen).toBe(true)
-      wrapper.vm.mobileAvatarMenuToggled = null
-      wrapper.vm.$route.path = '/settings'
-      expect(wrapper.vm.mobileAvatarMenuOpen).toBe(true)
-      wrapper.vm.$route.path = '/somewhere-else'
-      expect(wrapper.vm.mobileAvatarMenuOpen).toBe(false)
+      // Without a toggle (fresh wrapper, toggled === null) it follows the route.
+      mocks.$route.path = '/settings'
+      expect(Wrapper().vm.mobileAvatarMenuOpen).toBe(true)
+      mocks.$route.path = '/somewhere-else'
+      expect(Wrapper().vm.mobileAvatarMenuOpen).toBe(false)
     })
 
     it('mobileMoreMenuOpen reflects the toggle then the footer route', () => {
       const wrapper = Wrapper()
       wrapper.vm.mobileMoreMenuOpen = true
       expect(wrapper.vm.mobileMoreMenuOpen).toBe(true)
-      wrapper.vm.mobileMoreMenuToggled = null
-      // Whatever the footer paths are, a clearly-unrelated path must be closed.
-      wrapper.vm.$route.path = '/definitely-not-a-footer-page'
-      expect(wrapper.vm.mobileMoreMenuOpen).toBe(false)
+      // Without a toggle, a clearly-unrelated (non-footer) path stays closed.
+      mocks.$route.path = '/definitely-not-a-footer-page'
+      expect(Wrapper().vm.mobileMoreMenuOpen).toBe(false)
     })
   })
 
