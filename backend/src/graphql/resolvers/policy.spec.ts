@@ -365,7 +365,7 @@ describe('Mutation resolvers (unit)', () => {
         ctxWithPubsub({ set }, publish),
       )
       expect(publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
-        permissionsChanged: { roleName: null },
+        permissionsChanged: { roleName: null, previousRoleName: null },
       })
     })
 
@@ -399,7 +399,7 @@ describe('Mutation resolvers (unit)', () => {
         ctxWithPubsub({ reset }, publish),
       )
       expect(publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
-        permissionsChanged: { roleName: null },
+        permissionsChanged: { roleName: null, previousRoleName: null },
       })
     })
   })
