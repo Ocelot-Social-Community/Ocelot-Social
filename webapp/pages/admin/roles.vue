@@ -492,9 +492,13 @@ export default {
       this.$set(this.forms, name, { permissions, baseline: [...keys] })
       this.$set(this.conflicts, name, false)
     },
-    // Keep editing (keep mine): hide the banner but preserve the draft. A later remote
-    // change re-raises the conflict; the eventual save overwrites the server set.
+    // Keep editing (keep mine): hide the banner but preserve the draft. Advance the draft's
+    // baseline to the acknowledged server set so a plain rebuild does not re-pop the banner;
+    // only a genuinely NEW remote move raises it again. The eventual save overwrites theirs.
     dismissConflict(name) {
+      const form = this.forms[name]
+      const role = this.roles.find((r) => r.name === name)
+      if (form && role) form.baseline = [...role.permissions]
       this.$set(this.conflicts, name, false)
     },
     // Localized label for a permission group, falling back to the raw group name.

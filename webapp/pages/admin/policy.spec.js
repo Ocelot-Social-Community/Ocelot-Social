@@ -263,6 +263,31 @@ describe('admin/policy.vue', () => {
       expect(wrapper.find('#policy-inviteLinkLimit').element.value).toBe('10')
     })
 
+    it('does not re-raise a dismissed conflict when an unrelated field later changes', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+      await wrapper.find('#policy-inviteLinkLimit').setValue('10')
+      store.commit('policy/SET_SNAP', { ...snapshot, inviteLinkLimit: 99 })
+      await flushPromises()
+      expect(wrapper.vm.hasConflict).toBe(true)
+
+      await wrapper.find('[data-test="policy-conflict-keep"]').trigger('click')
+      expect(wrapper.vm.hasConflict).toBe(false)
+
+      // A later UNRELATED remote change (different key) reconciles again; the acknowledged
+      // conflict on inviteLinkLimit must not re-pop, and its draft value stays.
+      store.commit('policy/SET_SNAP', {
+        ...snapshot,
+        inviteLinkLimit: 99,
+        publicRegistration: true,
+      })
+      await flushPromises()
+      expect(wrapper.vm.conflict.inviteLinkLimit).toBeFalsy()
+      expect(wrapper.find('#policy-inviteLinkLimit').element.value).toBe('10')
+      // The unrelated field still followed the server live.
+      expect(wrapper.find('#policy-publicRegistration').element.checked).toBe(true)
+    })
+
     it('does not mistake the admin’s own save for a conflict', async () => {
       wrapper = Wrapper()
       await flushPromises()

@@ -241,6 +241,31 @@ describe('admin/roles.vue', () => {
       expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(true)
     })
 
+    it('does not re-raise a dismissed conflict on a rebuild without a new server change', async () => {
+      const wrapper = await intoConflict()
+      wrapper.vm.dismissConflict('badge-setter')
+      // A further refetch echoing the SAME (already-acknowledged) server set must not
+      // re-pop the banner, while the draft stays preserved.
+      wrapper.vm.buildForms()
+      expect(wrapper.vm.conflicts['badge-setter']).toBeFalsy()
+      expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(true)
+    })
+
+    it('re-raises the conflict when the server moves again after a dismiss', async () => {
+      const wrapper = await intoConflict()
+      wrapper.vm.dismissConflict('badge-setter')
+      wrapper.vm.buildForms()
+      expect(wrapper.vm.conflicts['badge-setter']).toBeFalsy()
+      // A genuinely NEW remote move (server set changes again) raises the banner anew.
+      wrapper.setData({
+        roles: roles.map((r) =>
+          r.name === 'badge-setter' ? { ...r, permissions: ['post.create'] } : r,
+        ),
+      })
+      wrapper.vm.buildForms()
+      expect(wrapper.vm.conflicts['badge-setter']).toBe(true)
+    })
+
     it('does not mistake the admin’s own save for a conflict', async () => {
       const wrapper = Wrapper()
       wrapper.vm.setActive('badge-setter')

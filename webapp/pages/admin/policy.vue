@@ -274,9 +274,14 @@ export default {
     loadServerVersion() {
       this.syncFormFromSnapshot()
     },
-    // Keep editing (keep mine): hide the banner but preserve the draft values. A later
-    // remote change re-raises the conflict; the eventual save overwrites the server value.
+    // Keep editing (keep mine): hide the banner but preserve the draft values. Advance the
+    // baseline of the conflicted keys to the acknowledged server value so a later unrelated
+    // reconcile does not re-pop the banner; only a genuinely NEW move on a key raises it
+    // again. The eventual save overwrites the server value.
     dismissConflict() {
+      this.keys.forEach((k) => {
+        if (this.conflict[k]) this.baseline[k] = this.snapshot[k]
+      })
       this.conflict = {}
     },
     async save() {
