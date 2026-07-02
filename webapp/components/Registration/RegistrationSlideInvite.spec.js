@@ -49,10 +49,10 @@ describe('RegistrationSlideInvite', () => {
   })
 
   describe('computed', () => {
-    it('validInput requires a 6-character code', () => {
+    it('validInput requires a 6-character code', async () => {
       const wrapper = Wrapper()
       expect(wrapper.vm.validInput).toBe(false)
-      wrapper.setData({ formData: { inviteCode: 'ABCDEF' } })
+      await wrapper.setData({ formData: { inviteCode: 'ABCDEF' } })
       expect(wrapper.vm.validInput).toBe(true)
     })
 
@@ -62,7 +62,7 @@ describe('RegistrationSlideInvite', () => {
       expect(wrapper.vm.invitedTo).toBeNull()
     })
 
-    it('invitedBy / invitedTo resolve from the validated response', () => {
+    it('invitedBy / invitedTo resolve from the validated response', async () => {
       propsData.sliderData = baseSliderData({
         sliders: [
           {
@@ -78,7 +78,7 @@ describe('RegistrationSlideInvite', () => {
         ],
       })
       const wrapper = Wrapper()
-      wrapper.setData({ formData: { inviteCode: 'ABCDEF' } })
+      await wrapper.setData({ formData: { inviteCode: 'ABCDEF' } })
       expect(wrapper.vm.invitedBy).toEqual({ name: 'Host' })
       expect(wrapper.vm.invitedTo).toEqual({ name: 'Group', groupType: 'public' })
     })
@@ -133,7 +133,7 @@ describe('RegistrationSlideInvite', () => {
 
     it('runs DB verification once the code is complete', async () => {
       const wrapper = Wrapper()
-      wrapper.setData({ formData: { inviteCode: 'ABCDEF' } })
+      await wrapper.setData({ formData: { inviteCode: 'ABCDEF' } })
       mocks.$apollo.query.mockClear()
       await wrapper.vm.sendValidation()
       expect(mocks.$apollo.query).toHaveBeenCalled()
@@ -190,7 +190,7 @@ describe('RegistrationSlideInvite', () => {
 
     it('is a no-op while a request is already in flight', async () => {
       const wrapper = Wrapper()
-      wrapper.setData({ dbRequestInProgress: true })
+      await wrapper.setData({ dbRequestInProgress: true })
       mocks.$apollo.query.mockClear()
       const result = await wrapper.vm.handleSubmitVerify()
       expect(result).toBeUndefined()
