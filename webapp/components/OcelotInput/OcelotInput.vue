@@ -7,10 +7,13 @@
       <div v-if="resolvedIcon" class="ds-input-icon">
         <os-icon :icon="resolvedIcon" />
       </div>
+      <div v-else-if="prefix" class="ds-input-icon">
+        {{ prefix }}
+      </div>
       <component
         class="ds-input"
         :class="[
-          resolvedIcon && 'ds-input-has-icon',
+          (resolvedIcon || prefix) && 'ds-input-has-icon',
           resolvedIconRight && 'ds-input-has-icon-right',
         ]"
         :id="id"
@@ -117,6 +120,10 @@ export default {
     rows: {
       type: [String, Number],
       default: 1,
+    },
+    prefix: {
+      type: String,
+      default: null,
     },
     icon: {
       type: String,

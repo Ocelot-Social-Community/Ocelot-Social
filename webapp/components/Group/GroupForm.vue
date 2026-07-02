@@ -24,7 +24,7 @@
           v-if="update"
           :label="$t('group.labelSlug')"
           model="slug"
-          icon="at"
+          prefix="&amp;"
           :placeholder="`${$t('group.labelSlug')} …`"
         ></ocelot-input>
 
