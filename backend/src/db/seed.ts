@@ -306,6 +306,14 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await jennyRostock.relateTo(trophyStarter, 'selected', { slot: 1 })
     await jennyRostock.relateTo(trophyFlower, 'selected', { slot: 2 })
 
+    const jennySocialMedias = await Promise.all([
+      Factory.build('socialMedia', { url: 'https://t.me/jenny_rostock_test' }),
+      Factory.build('socialMedia', { url: 'http://nsosp.org/de/Quanten-Fluss-Theorie' }),
+      Factory.build('socialMedia', { url: 'http://nsosp.org/de/Superial-Zahlen' }),
+      Factory.build('socialMedia', { url: 'http://nsosp.org/de/New-Soul-Of-Science-Project' }),
+    ])
+    await Promise.all(jennySocialMedias.map((sm) => sm.relateTo(jennyRostock, 'ownedBy')))
+
     await huey.relateTo(trophyPanda, 'rewarded')
     await huey.relateTo(trophyTiger, 'rewarded')
     await huey.relateTo(trophyAlienship, 'rewarded')
