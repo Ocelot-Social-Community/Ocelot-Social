@@ -158,6 +158,20 @@
         "set": "set",
         "empty": "empty",
         "missing": "missing"
+      },
+      "category": {
+        "server": "Server",
+        "database": "Database",
+        "redis": "Redis",
+        "storage": "Storage / S3",
+        "mail": "Email / SMTP",
+        "auth": "Authentication",
+        "maps": "Maps",
+        "video": "Video conferencing",
+        "registration": "Registration",
+        "features": "Features",
+        "monitoring": "Monitoring",
+        "general": "General"
       }
     },
     "policy": {

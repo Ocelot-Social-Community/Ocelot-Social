@@ -8,65 +8,98 @@ const stubs = {
   'nuxt-link': { template: '<a :href="to"><slot /></a>', props: ['to'] },
 }
 
-// Covers every row shape: a policy with only hard requirements (no seed) + two secrets
-// in different states, a seed whose admin override diverges from the env value, a seed
-// whose env is unset (falls back to the software default), and an integer seed.
+// Covers every row shape the systemConfig query yields: a hard-requirement pair (a
+// non-secret URL that is present + a secret that is missing → blocking), a seed whose
+// admin override diverges from the env value, a seed whose env is unset (falls back to
+// the software default), a plain non-secret infra var, and a plain secret. Categories
+// are deliberately out of display order to exercise the grouping/sort.
 const SAMPLE = [
   {
-    key: 'videoConference',
-    type: 'boolean',
-    effective: 'false',
-    softwareDefault: 'true',
-    configuredDefault: 'true',
-    envSeed: null,
-    envSeedState: null,
-    requiresEnv: [
-      { name: 'LIVEKIT_URL', state: 'set' },
-      { name: 'LIVEKIT_API_SECRET', state: 'missing' },
-    ],
-    available: false,
+    envKey: 'LIVEKIT_URL',
+    category: 'video',
+    secret: false,
+    state: 'set',
+    effective: null,
+    override: null,
+    envValue: 'wss://lk.example.org',
+    softwareDefault: null,
+    overridable: false,
+    policyKey: 'videoConference',
+    blocking: false,
   },
   {
-    key: 'apiKeysEnabled',
-    type: 'boolean',
+    envKey: 'LIVEKIT_API_SECRET',
+    category: 'video',
+    secret: true,
+    state: 'missing',
+    effective: null,
+    override: null,
+    envValue: null,
+    softwareDefault: null,
+    overridable: false,
+    policyKey: 'videoConference',
+    blocking: true,
+  },
+  {
+    envKey: 'API_KEYS_ENABLED',
+    category: 'features',
+    secret: false,
+    state: 'set',
     effective: 'false',
+    override: 'false',
+    envValue: 'true',
     softwareDefault: 'false',
-    configuredDefault: 'true',
-    envSeed: 'API_KEYS_ENABLED',
-    envSeedState: 'set',
-    requiresEnv: [],
-    available: true,
+    overridable: true,
+    policyKey: 'apiKeysEnabled',
+    blocking: false,
   },
   {
-    key: 'publicRegistration',
-    type: 'boolean',
+    envKey: 'PUBLIC_REGISTRATION',
+    category: 'registration',
+    secret: false,
+    state: 'missing',
     effective: 'true',
+    override: null,
+    envValue: null,
     softwareDefault: 'false',
-    configuredDefault: 'true',
-    envSeed: 'PUBLIC_REGISTRATION',
-    envSeedState: 'missing',
-    requiresEnv: [],
-    available: true,
+    overridable: true,
+    policyKey: 'publicRegistration',
+    blocking: false,
   },
   {
-    key: 'inviteLinkLimit',
-    type: 'integer',
-    effective: '5',
-    softwareDefault: '7',
-    configuredDefault: '5',
-    envSeed: 'INVITE_LINK_LIMIT',
-    envSeedState: 'set',
-    requiresEnv: [],
-    available: true,
+    envKey: 'NEO4J_URI',
+    category: 'database',
+    secret: false,
+    state: 'set',
+    effective: 'bolt://db:7687',
+    override: null,
+    envValue: 'bolt://db:7687',
+    softwareDefault: 'bolt://localhost:7687',
+    overridable: false,
+    policyKey: null,
+    blocking: false,
+  },
+  {
+    envKey: 'JWT_SECRET',
+    category: 'auth',
+    secret: true,
+    state: 'set',
+    effective: null,
+    override: null,
+    envValue: null,
+    softwareDefault: null,
+    overridable: false,
+    policyKey: null,
+    blocking: false,
   },
 ]
 
 describe('admin/config.vue', () => {
   const mocks = { $t: (key) => key }
 
-  const Wrapper = async (policyConfig = SAMPLE) => {
+  const Wrapper = async (systemConfig = SAMPLE) => {
     const wrapper = shallowMount(config, { mocks, localVue, stubs })
-    await wrapper.setData({ policyConfig })
+    await wrapper.setData({ systemConfig })
     return wrapper
   }
 
@@ -77,21 +110,28 @@ describe('admin/config.vue', () => {
       const vm = (await Wrapper()).vm
       expect(vm.fmt('true')).toBe('true')
       expect(vm.fmt('5')).toBe('5')
-      expect(vm.fmt('not json')).toBe('not json')
+      expect(vm.fmt('bolt://db:7687')).toBe('bolt://db:7687')
     })
   })
 
-  describe('row flattening', () => {
-    it('emits one row per env var: a seed row per seeded policy, one per required secret', async () => {
+  describe('grouping', () => {
+    it('groups rows by category in a fixed display order, dropping empty categories', async () => {
       const wrapper = await Wrapper()
-      expect(wrapper.vm.rows.map((r) => r.envKey)).toEqual([
-        'LIVEKIT_URL',
-        'LIVEKIT_API_SECRET',
-        'API_KEYS_ENABLED',
-        'PUBLIC_REGISTRATION',
-        'INVITE_LINK_LIMIT',
+      expect(wrapper.vm.groups.map((g) => g.category)).toEqual([
+        'database',
+        'auth',
+        'video',
+        'registration',
+        'features',
       ])
-      expect(wrapper.findAll('[data-test^="config-row-"]')).toHaveLength(5)
+      // Each present category renders a group tbody with its heading label.
+      const video = wrapper.find('[data-test="config-group-video"]')
+      expect(video.find('.config-group-head th').text()).toBe('admin.config.category.video')
+    })
+
+    it('keeps every env var (one row each) across the groups', async () => {
+      const wrapper = await Wrapper()
+      expect(wrapper.findAll('[data-test^="config-row-"]')).toHaveLength(6)
     })
 
     it('anchors only the first row of each policy, so #<policyKey> has no duplicate id', async () => {
@@ -100,39 +140,59 @@ describe('admin/config.vue', () => {
       expect(row(wrapper, 'LIVEKIT_URL').attributes('id')).toBe('videoConference')
       expect(row(wrapper, 'LIVEKIT_API_SECRET').attributes('id')).toBeUndefined()
       expect(row(wrapper, 'API_KEYS_ENABLED').attributes('id')).toBe('apiKeysEnabled')
+      // A plain var has no policy → no anchor.
+      expect(row(wrapper, 'NEO4J_URI').attributes('id')).toBeUndefined()
     })
   })
 
-  describe('required secrets', () => {
-    it('shows presence and does not flag a satisfied requirement', async () => {
+  describe('plain infrastructure var', () => {
+    it('shows the effective value, env value and software default, with no override link', async () => {
+      const neo4j = row(await Wrapper(), 'NEO4J_URI')
+      expect(neo4j.find('.cell--effective .value').text()).toBe('bolt://db:7687')
+      expect(neo4j.find('[data-test="config-envvalue-NEO4J_URI"]').text()).toBe('bolt://db:7687')
+      expect(neo4j.find('.cell--muted code').text()).toBe('bolt://localhost:7687')
+      expect(neo4j.find('[data-test="config-override-NEO4J_URI"]').exists()).toBe(false)
+      // only the override column is em-dashed
+      expect(neo4j.findAll('.cell-empty')).toHaveLength(1)
+    })
+  })
+
+  describe('secrets', () => {
+    it('reports a plain secret by presence only, em-dashing all value columns', async () => {
+      const jwt = row(await Wrapper(), 'JWT_SECRET')
+      expect(jwt.find('[data-test="config-state-JWT_SECRET"]').classes()).toContain('badge--ok')
+      expect(jwt.find('[data-test="config-override-JWT_SECRET"]').exists()).toBe(false)
+      expect(jwt.find('[data-test="config-envvalue-JWT_SECRET"]').exists()).toBe(false)
+      // override, env value and software default all em-dashed
+      expect(jwt.findAll('.cell-empty')).toHaveLength(3)
+    })
+  })
+
+  describe('hard-requirement vars', () => {
+    it('shows a present non-secret requirement value, without flagging it', async () => {
       const url = row(await Wrapper(), 'LIVEKIT_URL')
       expect(url.find('[data-test="config-state-LIVEKIT_URL"]').classes()).toContain('badge--ok')
+      expect(url.find('[data-test="config-envvalue-LIVEKIT_URL"]').text()).toBe(
+        'wss://lk.example.org',
+      )
       expect(url.classes()).not.toContain('config-row--blocking')
       expect(url.find('.cell__blocks').exists()).toBe(false)
     })
 
-    it('flags a missing requirement as blocking, naming the feature it breaks', async () => {
+    it('flags a missing secret requirement as blocking, naming the feature it breaks', async () => {
       const secret = row(await Wrapper(), 'LIVEKIT_API_SECRET')
       expect(secret.find('[data-test="config-state-LIVEKIT_API_SECRET"]').classes()).toContain(
         'badge--error',
       )
       expect(secret.classes()).toContain('config-row--blocking')
       expect(secret.find('.cell__blocks').exists()).toBe(true)
-    })
-
-    it('em-dashes the value columns of a secret, and offers no override link', async () => {
-      const secret = row(await Wrapper(), 'LIVEKIT_API_SECRET')
-      // A secret is not a policy value → no override link, just a dash.
       expect(secret.find('[data-test="config-override-LIVEKIT_API_SECRET"]').exists()).toBe(false)
-      expect(secret.find('[data-test="config-envvalue-LIVEKIT_API_SECRET"]').exists()).toBe(false)
-      expect(secret.findAll('.cell-empty')).toHaveLength(3)
     })
   })
 
-  describe('seed vars', () => {
+  describe('overridable policy seeds', () => {
     it('shows the diverging override value, linking to its policy on the policy tab', async () => {
       const api = row(await Wrapper(), 'API_KEYS_ENABLED')
-      // effective false, env-seed configured true → an admin override is present.
       expect(api.find('.cell--effective .value').text()).toBe('false')
       const link = api.find('[data-test="config-override-API_KEYS_ENABLED"]')
       expect(link.text()).toBe('false')
@@ -155,13 +215,6 @@ describe('admin/config.vue', () => {
       const empty = pub.find('.cell-empty')
       expect(empty.find('[aria-hidden="true"]').text()).toBe('—')
       expect(empty.find('.config-caption').text()).toBe('admin.config.notSet')
-    })
-
-    it('renders integer seeds through fmt (env value and software default)', async () => {
-      const invite = row(await Wrapper(), 'INVITE_LINK_LIMIT')
-      expect(invite.find('.cell--effective .value').text()).toBe('5')
-      expect(invite.find('[data-test="config-envvalue-INVITE_LINK_LIMIT"]').text()).toBe('5')
-      expect(invite.find('.cell--muted code').text()).toBe('7')
     })
   })
 })

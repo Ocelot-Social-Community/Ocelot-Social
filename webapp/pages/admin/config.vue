@@ -3,12 +3,13 @@
     <h2 class="title">{{ $t('admin.config.title') }}</h2>
     <p class="description">{{ $t('admin.config.description') }}</p>
 
-    <!-- One row per environment variable the deployment recognises (its seed vars and
-         its hard-requirement secrets). Read-only diagnostic mirror: it shows what the
-         ENV provides, while the live effective values are edited on the policy tab.
-         Columns run most-important → least: effective state, whether a policy overrides
-         it, the env value, and the software default it falls back to. Secrets report
-         presence only (never a value), so their value columns are em-dashed. -->
+    <!-- One row per environment variable the deployment recognises, grouped by area.
+         Read-only diagnostic mirror: it shows what the ENV provides, while the live
+         effective values of policy-backed vars are edited on the policy tab. Columns
+         run most-important → least: effective state, whether a policy overrides it,
+         the env value, and the software default it falls back to. Secrets (and hard
+         env requirements) report presence only via a badge — their value columns are
+         em-dashed, a secret value is never sent to the client. -->
     <div class="config-table-wrap">
       <table class="config-table" data-test="config-table">
         <caption class="config-caption">{{ $t('admin.config.tableCaption') }}</caption>
@@ -21,9 +22,20 @@
             <th scope="col" class="col--muted">{{ $t('admin.config.col.softwareDefault') }}</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody
+          v-for="group in groups"
+          :key="group.category"
+          :data-test="`config-group-${group.category}`"
+        >
+          <!-- Category sub-heading spanning the row group. -->
+          <tr class="config-group-head">
+            <th scope="colgroup" colspan="5">
+              {{ $t(`admin.config.category.${group.category}`) }}
+            </th>
+          </tr>
+
           <tr
-            v-for="row in rows"
+            v-for="row in group.rows"
             :id="row.anchor"
             :key="row.envKey"
             class="config-row"
@@ -35,22 +47,22 @@
               <code>{{ row.envKey }}</code>
             </th>
 
-            <!-- 2. Effective state in operation: the policy's effective value for a seed
-                 var, or the secret's presence (set / missing) for a hard requirement. -->
+            <!-- 2. Effective state in operation. A value-bearing var shows its effective
+                 value; a secret or a hard-requirement var shows presence only (badge). -->
             <td class="cell cell--effective">
-              <span v-if="row.kind === 'seed'" class="value">{{ row.effective }}</span>
+              <span v-if="row.effective !== null" class="value">{{ fmt(row.effective) }}</span>
               <template v-else>
                 <span
                   class="badge"
-                  :class="row.presence === 'set' ? 'badge--ok' : 'badge--error'"
+                  :class="row.state === 'set' ? 'badge--ok' : 'badge--error'"
                   :data-test="`config-state-${row.envKey}`"
                 >
-                  {{ $t(`admin.config.state.${row.presence}`) }}
-                </span>
-                <span v-if="row.blocking" class="cell__blocks">
-                  {{ $t('admin.config.blocks', { policy: policyLabel(row.policyKey) }) }}
+                  {{ $t(`admin.config.state.${row.state}`) }}
                 </span>
               </template>
+              <span v-if="row.blocking" class="cell__blocks">
+                {{ $t('admin.config.blocks', { policy: policyLabel(row.policyKey) }) }}
+              </span>
             </td>
 
             <!-- 3. Policy override: when the value is governed by an editable policy, this
@@ -66,7 +78,7 @@
                 :data-test="`config-override-${row.envKey}`"
                 :aria-label="$t('admin.config.editPolicy', { policy: policyLabel(row.policyKey) })"
               >
-                <span v-if="row.override !== null" class="value">{{ row.override }}</span>
+                <span v-if="row.override !== null" class="value">{{ fmt(row.override) }}</span>
                 <span v-else>{{ $t('admin.config.setOverride') }}</span>
               </nuxt-link>
               <span v-else class="cell-empty">
@@ -75,10 +87,11 @@
               </span>
             </td>
 
-            <!-- 4. Env value: the seeded value when the env var is set, else nothing. -->
+            <!-- 4. Env value: the value the env var itself provides when set, else nothing
+                 (secrets and unset vars are em-dashed). -->
             <td class="cell">
               <code v-if="row.envValue !== null" :data-test="`config-envvalue-${row.envKey}`">
-                {{ row.envValue }}
+                {{ fmt(row.envValue) }}
               </code>
               <span v-else class="cell-empty">
                 <span aria-hidden="true">&mdash;</span>
@@ -86,10 +99,10 @@
               </span>
             </td>
 
-            <!-- 5. Software default: the code baseline the value falls back to. A secret
-                 provides no value, so it has no software default. -->
+            <!-- 5. Software default: the code baseline the value falls back to. Secrets
+                 and hard-requirement vars have none. -->
             <td class="cell cell--muted">
-              <code v-if="row.softwareDefault !== null">{{ row.softwareDefault }}</code>
+              <code v-if="row.softwareDefault !== null">{{ fmt(row.softwareDefault) }}</code>
               <span v-else class="cell-empty">
                 <span aria-hidden="true">&mdash;</span>
                 <span class="config-caption">{{ $t('admin.config.notSet') }}</span>
@@ -104,95 +117,77 @@
 
 <script>
 import { OsCard } from '@ocelot-social/ui'
-import { policyConfigQuery } from '~/graphql/admin/PolicyConfig'
+import { systemConfigQuery } from '~/graphql/admin/SystemConfig'
+
+// Fixed display order of the category groups (infrastructure first, then feature
+// policies, then diagnostics). A category with no rows is skipped in `groups`.
+const CATEGORY_ORDER = [
+  'server',
+  'database',
+  'redis',
+  'storage',
+  'mail',
+  'auth',
+  'maps',
+  'video',
+  'registration',
+  'features',
+  'monitoring',
+  'general',
+]
 
 export default {
   components: { OsCard },
   middleware: ['isAdmin'],
   data() {
     return {
-      policyConfig: [],
+      systemConfig: [],
     }
   },
   apollo: {
-    policyConfig: {
-      query: policyConfigQuery,
+    systemConfig: {
+      query: systemConfigQuery,
       // Re-resolve against the CURRENT deployment state every time the tab is opened
       // (admin tabs are separate routes) — a stale cache could hide a just-fixed secret.
       fetchPolicy: 'cache-and-network',
     },
   },
   computed: {
-    // One row per env variable, flattened from the per-policy config. A policy contributes
-    // either a single seed row (its envSeed) or one row per hard-requirement secret
-    // (requiresEnv) — every policy has at least one env var, so no policy is dropped.
-    rows() {
-      // Anchor the FIRST row of each policy with the policy key, so the policy tab's
-      // "see config" link (/admin/config#<key>) lands here without duplicate element ids.
+    // The env vars grouped by category in CATEGORY_ORDER, empty groups dropped. The
+    // FIRST row of each policy carries the policy key as its element id, so the policy
+    // tab's "see config" link (/admin/config#<key>) lands here without duplicate ids.
+    groups() {
       const anchored = new Set()
-      const anchorFor = (policyKey) => {
-        if (anchored.has(policyKey)) return undefined
-        anchored.add(policyKey)
-        return policyKey
-      }
-      const out = []
-      for (const entry of this.policyConfig) {
-        if (entry.envSeed) {
-          // A seed policy has no hard env requirement, so its effective value equals its
-          // stored value — an override is therefore EXACTLY effective != configuredDefault
-          // (the env-seed value if set, else the software default). No phantom overrides.
-          const overridden = entry.effective !== entry.configuredDefault
-          out.push({
-            envKey: entry.envSeed,
-            kind: 'seed',
-            policyKey: entry.key,
-            presence: entry.envSeedState,
-            effective: this.fmt(entry.effective),
-            override: overridden ? this.fmt(entry.effective) : null,
-            // The env only contributes a value when it is actually set; empty/missing
-            // falls back to the software default, so this cell is em-dashed.
-            envValue: entry.envSeedState === 'set' ? this.fmt(entry.configuredDefault) : null,
-            softwareDefault: this.fmt(entry.softwareDefault),
-            blocking: false,
-            // A seed maps to a policy value the admin can override on the policy tab.
-            overridable: true,
-            anchor: anchorFor(entry.key),
-          })
+      const byCategory = new Map()
+      for (const entry of this.systemConfig) {
+        let anchor
+        if (entry.policyKey && !anchored.has(entry.policyKey)) {
+          anchored.add(entry.policyKey)
+          anchor = entry.policyKey
         }
-        for (const req of entry.requiresEnv) {
-          out.push({
-            envKey: req.name,
-            kind: 'required',
-            policyKey: entry.key,
-            presence: req.state,
-            // A secret has no value: it gates availability only. Its effective cell shows
-            // presence; its value columns are em-dashed.
-            effective: null,
-            override: null,
-            envValue: null,
-            softwareDefault: null,
-            // Unmet hard requirement → the feature is broken regardless of its policy flag.
-            blocking: req.state !== 'set',
-            // A secret is not itself a policy value — there is nothing to override on it.
-            overridable: false,
-            anchor: anchorFor(entry.key),
-          })
-        }
+        const rows = byCategory.get(entry.category) ?? []
+        rows.push({ ...entry, anchor })
+        byCategory.set(entry.category, rows)
       }
-      return out
+      return CATEGORY_ORDER.filter((category) => byCategory.has(category)).map((category) => ({
+        category,
+        rows: byCategory.get(category),
+      }))
     },
   },
   methods: {
-    // Reuse the policy tab's human labels for policy keys (used in the "blocks …" hint).
+    // Reuse the policy tab's human labels for policy keys (used in the "blocks …" hint
+    // and the override link's accessible name).
     policyLabel(key) {
       return this.$t(`admin.policy.keys.${key}`)
     },
-    // Pretty-print a JSON-encoded policy value for display.
-    fmt(json) {
+    // Pretty-print a value for display: JSON-encoded policy values parse to their
+    // primitive; a raw env string passes through unchanged.
+    fmt(value) {
       try {
-        return String(JSON.parse(json))
+        return String(JSON.parse(value))
       } catch {
-        return json
+        return value
       }
     },
   },
@@ -241,6 +236,16 @@ export default {
   .col--muted {
     color: $text-color-soft;
   }
+}
+// Category sub-heading spanning the whole width, introducing each row group.
+.config-group-head th {
+  padding-top: $space-base;
+  color: $text-color-base;
+  font-size: 0.85em;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid $border-color-soft;
 }
 .config-row {
   // Reserve the accent gutter on every row so the layout doesn't shift when a row

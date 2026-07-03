@@ -587,6 +587,9 @@ export default shield(
       // Per-policy config layers + hard env requirements. Same admin scope as
       // policyDefaults; only env presence state is returned, never secret values.
       policyConfig: hasPermission('policy.manage'),
+      // Every recognised env var (registry + policy overlay) for the config tab.
+      // Same admin scope; secret values are never returned, only presence state.
+      systemConfig: hasPermission('policy.manage'),
     },
     Mutation: {
       '*': deny,
