@@ -61,12 +61,7 @@
             <!-- 2. Effective state in operation. A value-bearing var shows its effective
                  value; a secret or a hard-requirement var shows presence only (badge). -->
             <td class="cell cell--effective">
-              <span
-                v-if="row.effective !== null"
-                class="value truncate"
-                :title="truncTitle(row.effectiveText)"
-                :tabindex="truncTab(row.effectiveText)"
-              >
+              <span v-if="row.effective !== null" class="value truncate">
                 {{ row.effectiveText }}
               </span>
               <template v-else>
@@ -121,8 +116,6 @@
                 v-else-if="row.envValue !== null"
                 class="truncate"
                 :data-test="`config-envvalue-${row.envKey}`"
-                :title="truncTitle(row.envValueText)"
-                :tabindex="truncTab(row.envValueText)"
               >
                 {{ row.envValueText }}
               </code>
@@ -136,12 +129,7 @@
                  and hard-requirement vars have none — em-dashed as "no default" (not as
                  "not set", which would wrongly read as an unset env var). -->
             <td class="cell cell--muted">
-              <code
-                v-if="row.softwareDefault !== null"
-                class="truncate"
-                :title="truncTitle(row.softwareDefaultText)"
-                :tabindex="truncTab(row.softwareDefaultText)"
-              >
+              <code v-if="row.softwareDefault !== null" class="truncate">
                 {{ row.softwareDefaultText }}
               </code>
               <span v-else class="cell-empty">
@@ -250,18 +238,33 @@ export default {
         return value
       }
     },
-    // A value long enough to be worth truncating (shown ellipsised, full value on
-    // hover/tap). Short values render as plain, non-interactive text.
-    needsTrunc(text) {
-      return typeof text === 'string' && text.length > 24
+    // Whether a value is ACTUALLY clipped depends on the (fixed) column width, not a
+    // character count — so it is measured from the DOM. Only clipped cells become
+    // interactive: focusable (tap/keyboard reveal on touch), a help cursor, and a native
+    // title tooltip. The visual hover/focus reveal itself is pure CSS (a no-op when a
+    // cell isn't clipped), so it needs no marking. Runs after render and on resize.
+    refreshTruncation() {
+      const nodes = this.$el?.querySelectorAll?.('.truncate')
+      if (!nodes) return
+      nodes.forEach((el) => {
+        const clipped = el.scrollWidth > el.clientWidth
+        el.classList.toggle('is-clipped', clipped)
+        if (clipped) {
+          el.setAttribute('tabindex', '0')
+          el.setAttribute('title', (el.textContent || '').trim())
+        } else {
+          el.removeAttribute('tabindex')
+          el.removeAttribute('title')
+        }
+      })
     },
-    // title tooltip / tabindex only for truncated values, so short cells stay
-    // non-interactive and don't clutter the keyboard tab order.
-    truncTitle(text) {
-      return this.needsTrunc(text) ? text : null
-    },
-    truncTab(text) {
-      return this.needsTrunc(text) ? 0 : null
+    onResize() {
+      // Coalesce bursts of resize events into one measurement per frame.
+      if (this.resizeFrame) return
+      this.resizeFrame = requestAnimationFrame(() => {
+        this.resizeFrame = null
+        this.refreshTruncation()
+      })
     },
     // Highlight and scroll to the row deep-linked from the policy/roles tabs
     // (/admin/config#<policyKey>). The hash targets a policy's anchored (first) row; a
@@ -297,9 +300,17 @@ export default {
   mounted() {
     // Covers the case where the query result is already cached (rows present at mount).
     this.applyHashHighlight()
+    this.$nextTick(this.refreshTruncation)
+    window.addEventListener('resize', this.onResize)
+  },
+  updated() {
+    // Rows/values changed → re-measure which cells are clipped.
+    this.$nextTick(this.refreshTruncation)
   },
   beforeDestroy() {
     clearTimeout(this.highlightTimer)
+    if (this.resizeFrame) cancelAnimationFrame(this.resizeFrame)
+    window.removeEventListener('resize', this.onResize)
   },
 }
 </script>
@@ -452,22 +463,28 @@ export default {
   color: $text-color-soft;
 }
 // Values are clipped to their fixed column on a single line (no wrapping, no widening
-// the table). The full value is revealed on hover via the native title tooltip, and on
-// tap / keyboard focus, which expands it in place (mobile has no hover). Only actually
-// truncated values are focusable (see truncTab), so short cells stay inert.
+// the table). refreshTruncation() marks the cells that are actually clipped (.is-clipped)
+// and makes only those focusable + tooltipped.
 .truncate {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.truncate[tabindex] {
-  cursor: pointer;
+.truncate.is-clipped {
+  cursor: help;
 }
+// Reveal the full value in place on hover (desktop) and on tap / keyboard focus (mobile
+// has no hover). The full text is already in the DOM — this just lifts the clipping so it
+// wraps within its column. Applied to every value: it is a no-op when the cell isn't
+// actually clipped, so it correctly reveals regardless of the value's length.
+.truncate:hover,
 .truncate:focus {
   overflow: visible;
   white-space: normal;
   overflow-wrap: anywhere;
+}
+.truncate:focus {
   outline: 2px solid $color-secondary;
   outline-offset: 1px;
 }
