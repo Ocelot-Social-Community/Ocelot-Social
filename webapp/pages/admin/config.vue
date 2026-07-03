@@ -373,8 +373,11 @@ export default {
     overflow-wrap: anywhere;
   }
   thead th {
-    color: $text-color-soft;
-    font-size: 0.8em;
+    // Dark (not soft-grey) so the bold weight actually reads as bold — matching the key
+    // column / category sub-headings. The app font (Lato) only ships 400/700, so a grey
+    // 700 header otherwise looks lighter than the dark key names. Same font size as the
+    // body cells (no shrinking) — it inherits the table's 0.9em.
+    color: $text-color-base;
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 0.03em;
@@ -388,9 +391,6 @@ export default {
     z-index: $z-index-sticky;
     background: $background-color-base;
     box-shadow: inset 0 -2px 0 $border-color-softer;
-  }
-  .col--muted {
-    color: $text-color-soft;
   }
 }
 
@@ -483,9 +483,6 @@ export default {
   }
   &--effective .value {
     font-weight: 600;
-  }
-  &--muted {
-    color: $text-color-soft;
   }
   &__blocks {
     display: block;
