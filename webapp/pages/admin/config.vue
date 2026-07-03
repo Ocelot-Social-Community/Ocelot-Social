@@ -239,22 +239,24 @@ export default {
       }
     },
     // Whether a value is ACTUALLY clipped depends on the (fixed) column width, not a
-    // character count — so it is measured from the DOM. Only clipped cells become
-    // interactive: focusable (tap/keyboard reveal on touch), a help cursor, and a native
-    // title tooltip. The visual hover/focus reveal itself is pure CSS (a no-op when a
-    // cell isn't clipped), so it needs no marking. Runs after render and on resize.
+    // character count — so it is measured from the DOM. A clipped value marks its CELL
+    // (not the clipped text, whose overflow:hidden would crop the tooltip) as interactive:
+    // .is-clipped (positioning + cursor), focusable for touch/keyboard, and data-full
+    // carrying the value the CSS tooltip renders. Runs after render and on resize.
     refreshTruncation() {
       const nodes = this.$el?.querySelectorAll?.('.truncate')
       if (!nodes) return
       nodes.forEach((el) => {
+        const cell = el.parentElement
+        if (!cell) return
         const clipped = el.scrollWidth > el.clientWidth
-        el.classList.toggle('is-clipped', clipped)
+        cell.classList.toggle('is-clipped', clipped)
         if (clipped) {
-          el.setAttribute('tabindex', '0')
-          el.setAttribute('title', (el.textContent || '').trim())
+          cell.setAttribute('tabindex', '0')
+          cell.setAttribute('data-full', (el.textContent || '').trim())
         } else {
-          el.removeAttribute('tabindex')
-          el.removeAttribute('title')
+          cell.removeAttribute('tabindex')
+          cell.removeAttribute('data-full')
         }
       })
     },
@@ -496,30 +498,55 @@ export default {
   color: $text-color-soft;
 }
 // Values are clipped to their fixed column on a single line (no wrapping, no widening
-// the table). refreshTruncation() marks the cells that are actually clipped (.is-clipped)
-// and makes only those focusable + tooltipped.
+// the table). refreshTruncation() flags the CELLS whose value is actually clipped.
 .truncate {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.truncate.is-clipped {
+// A clipped cell reveals the full value as an overlay tooltip on hover / tap / keyboard
+// focus — an ::after on the cell (whose overflow is visible, unlike the clipped .truncate)
+// so it floats above the table WITHOUT growing the row (no layout shift). The value comes
+// from data-full; the cell is the positioning context.
+.cell.is-clipped {
+  position: relative;
   cursor: help;
 }
-// Reveal the full value in place on hover (desktop) and on tap / keyboard focus (mobile
-// has no hover). The full text is already in the DOM — this just lifts the clipping so it
-// wraps within its column. Applied to every value: it is a no-op when the cell isn't
-// actually clipped, so it correctly reveals regardless of the value's length.
-.truncate:hover,
-.truncate:focus {
-  overflow: visible;
+.cell.is-clipped:hover,
+.cell.is-clipped:focus {
+  // Lift above sibling cells so the tooltip is never covered by later rows.
+  z-index: 10;
+}
+.cell.is-clipped:focus {
+  outline: 2px solid $color-secondary;
+  outline-offset: -2px;
+}
+.cell.is-clipped:hover::after,
+.cell.is-clipped:focus::after {
+  content: attr(data-full);
+  position: absolute;
+  top: calc(100% - #{$space-xxx-small});
+  // Anchored to the cell's right edge and extending left — there is always room to the
+  // left (earlier columns), so the tooltip stays on screen.
+  right: $space-x-small;
+  z-index: 20;
+  width: max-content;
+  max-width: min(50ch, calc(100vw - 1rem));
+  padding: $space-xx-small $space-x-small;
+  background: $background-color-inverse;
+  color: $text-color-inverse;
+  border-radius: $border-radius-base;
+  box-shadow: 0 2px 10px rgba($color-neutral-0, 0.25);
+  // Undo the header/cell text styling for a plain, readable tooltip.
   white-space: normal;
   overflow-wrap: anywhere;
-}
-.truncate:focus {
-  outline: 2px solid $color-secondary;
-  outline-offset: 1px;
+  font-weight: normal;
+  font-size: 0.9em;
+  text-transform: none;
+  letter-spacing: normal;
+  line-height: 1.4;
+  pointer-events: none;
 }
 // A set secret: shown as masked dots (present, value withheld) rather than a value or
 // a misleading "not set" dash.

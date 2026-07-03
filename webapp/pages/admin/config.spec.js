@@ -363,25 +363,28 @@ describe('admin/config.vue', () => {
       expect(code.text()).toBe(LONG)
     })
 
-    it('marks a clipped cell interactive: is-clipped, focusable and a full-value title', async () => {
+    it('flags the clipped value cell for a tooltip: is-clipped, focusable, data-full', async () => {
       const w = await Wrapper()
       const code = row(w, 'NEO4J_URI').find('[data-test="config-envvalue-NEO4J_URI"]')
       // simulate the fixed column clipping the value, then re-measure
       setWidths(code.element, 500, 100)
       w.vm.refreshTruncation()
-      expect(code.classes()).toContain('is-clipped')
-      expect(code.attributes('tabindex')).toBe('0')
-      expect(code.attributes('title')).toBe('bolt://db:7687')
+      // the CELL (not the clipped text) carries the tooltip affordance
+      const cell = code.element.parentElement
+      expect(cell.classList.contains('is-clipped')).toBe(true)
+      expect(cell.getAttribute('tabindex')).toBe('0')
+      expect(cell.getAttribute('data-full')).toBe('bolt://db:7687')
     })
 
-    it('leaves a cell that fits non-interactive (no title, not in the tab order)', async () => {
+    it('leaves a cell that fits non-interactive (no tooltip, not in the tab order)', async () => {
       const w = await Wrapper()
       const code = row(w, 'NEO4J_URI').find('[data-test="config-envvalue-NEO4J_URI"]')
       setWidths(code.element, 100, 100) // scrollWidth == clientWidth → fits
       w.vm.refreshTruncation()
-      expect(code.classes()).not.toContain('is-clipped')
-      expect(code.attributes('title')).toBeUndefined()
-      expect(code.attributes('tabindex')).toBeUndefined()
+      const cell = code.element.parentElement
+      expect(cell.classList.contains('is-clipped')).toBe(false)
+      expect(cell.getAttribute('data-full')).toBe(null)
+      expect(cell.getAttribute('tabindex')).toBe(null)
     })
 
     it('coalesces a burst of resize events into a single re-measure per frame', async () => {
