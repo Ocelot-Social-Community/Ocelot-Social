@@ -139,6 +139,9 @@ const CATEGORY_ORDER = [
   'general',
 ]
 
+// How long a deep-link highlight stays before it fades out (see applyHashHighlight).
+const HIGHLIGHT_DURATION_MS = 2500
+
 export default {
   components: { OsCard },
   middleware: ['isAdmin'],
@@ -205,6 +208,7 @@ export default {
     // bare "#" or a key with no matching row clears the highlight. No-ops until the row
     // exists (apollo may still be loading), re-run by the watchers below.
     applyHashHighlight() {
+      clearTimeout(this.highlightTimer)
       const key = (this.$route?.hash || '').replace(/^#/, '')
       const known = key && this.systemConfig.some((entry) => entry.policyKey === key)
       this.highlightedKey = known ? key : null
@@ -212,6 +216,12 @@ export default {
       this.$nextTick(() => {
         document.getElementById(this.highlightedKey)?.scrollIntoView({ block: 'center' })
       })
+      // Fade the highlight out after a moment: it draws the eye on arrival without
+      // sticking permanently. Clearing the key drops the class; the CSS transition
+      // animates the fade.
+      this.highlightTimer = setTimeout(() => {
+        this.highlightedKey = null
+      }, HIGHLIGHT_DURATION_MS)
     },
   },
   watch: {
@@ -227,6 +237,9 @@ export default {
   mounted() {
     // Covers the case where the query result is already cached (rows present at mount).
     this.applyHashHighlight()
+  },
+  beforeDestroy() {
+    clearTimeout(this.highlightTimer)
   },
 }
 </script>
@@ -292,6 +305,15 @@ export default {
   }
   // Keep the row clear of the sticky admin header when scrolled to via #key.
   scroll-margin-top: $space-base;
+  // Animate the deep-link highlight fading back out (applyHashHighlight clears the key
+  // after a moment). Only when the user hasn't asked for reduced motion.
+  @media (prefers-reduced-motion: no-preference) {
+    transition: background-color 0.6s ease;
+
+    th.cell--key {
+      transition: border-left-color 0.6s ease;
+    }
+  }
 
   // A missing hard-requirement secret breaks its feature → flag the whole row.
   &--blocking {
@@ -306,10 +328,10 @@ export default {
   // anchored row so the admin sees which env var the link pointed at. Placed after
   // --blocking so a highlighted row reads as the navigation target.
   &--highlight {
-    background: rgba($color-primary, 0.1);
+    background: rgba($color-secondary, 0.1);
 
     th.cell--key {
-      border-left-color: $color-primary;
+      border-left-color: $color-secondary;
     }
   }
 }

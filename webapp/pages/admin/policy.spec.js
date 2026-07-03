@@ -563,5 +563,18 @@ describe('admin/policy.vue', () => {
       await w.vm.$nextTick()
       expect(w.vm.highlightedKey).toBe('videoConference')
     })
+
+    it('fades the highlight out after a delay (clears the key so the class drops)', async () => {
+      // Fake only the timers; keep setImmediate real so flushPromises still settles.
+      jest.useFakeTimers({ doNotFake: ['setImmediate'] })
+      const { w } = mountWithRoute('#apiKeysEnabled')
+      await flushPromises()
+      expect(w.vm.highlightedKey).toBe('apiKeysEnabled')
+      jest.advanceTimersByTime(2500)
+      expect(w.vm.highlightedKey).toBeNull()
+      await w.vm.$nextTick()
+      expect(w.find('#apiKeysEnabled').classes()).not.toContain('policy-row--highlight')
+      jest.useRealTimers()
+    })
   })
 })

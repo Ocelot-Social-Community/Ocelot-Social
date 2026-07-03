@@ -151,6 +151,9 @@ import { OsButton, OsCard } from '@ocelot-social/ui'
 import { mapActions, mapGetters } from 'vuex'
 import { policyConfigQuery } from '~/graphql/admin/PolicyConfig'
 
+// How long a deep-link highlight stays before it fades out (see applyHashHighlight).
+const HIGHLIGHT_DURATION_MS = 2500
+
 export default {
   components: { OsButton, OsCard },
   middleware: ['isAdmin'],
@@ -291,12 +294,19 @@ export default {
     // (/admin/policy#<key>). Reads the route hash (a bare "#" or an unknown key clears
     // the highlight) and centres the row once the DOM has it.
     applyHashHighlight() {
+      clearTimeout(this.highlightTimer)
       const key = (this.$route?.hash || '').replace(/^#/, '')
       this.highlightedKey = this.keys.includes(key) ? key : null
       if (!this.highlightedKey) return
       this.$nextTick(() => {
         document.getElementById(this.highlightedKey)?.scrollIntoView({ block: 'center' })
       })
+      // Fade the highlight out after a moment: it draws the eye on arrival without
+      // sticking permanently. Clearing the key drops the class; the CSS transition
+      // animates the fade.
+      this.highlightTimer = setTimeout(() => {
+        this.highlightedKey = null
+      }, HIGHLIGHT_DURATION_MS)
     },
     // A key is unavailable when its hard env requirements are unmet: the stored flag
     // has no effect, so the input is disabled and a link to the config tab is shown.
@@ -457,6 +467,9 @@ export default {
     // Rows are rendered now → highlight/scroll to the deep-linked one, if any.
     this.applyHashHighlight()
   },
+  beforeDestroy() {
+    clearTimeout(this.highlightTimer)
+  },
 }
 </script>
 
@@ -528,6 +541,13 @@ form {
   padding-left: $space-xx-small;
   // Keep the row clear of the sticky header when navigated to via #key from the config tab.
   scroll-margin-top: $space-base;
+  // Animate the deep-link highlight fading back out (applyHashHighlight clears the key
+  // after a moment). Only when the user hasn't asked for reduced motion.
+  @media (prefers-reduced-motion: no-preference) {
+    transition:
+      background-color 0.6s ease,
+      border-left-color 0.6s ease;
+  }
 
   // Navigated to from the config tab (/admin/policy#<key>) → highlight the target row so
   // the admin sees which policy the config link pointed at. The class is driven from the
@@ -535,8 +555,8 @@ form {
   // update :target; the :target rule stays as a fallback for a real full-page load/reload.
   &--highlight,
   &:target {
-    border-left-color: $color-primary;
-    background: rgba($color-primary, 0.1);
+    border-left-color: $color-secondary;
+    background: rgba($color-secondary, 0.1);
   }
 
   // This field was edited locally AND changed on the server → highlight it.

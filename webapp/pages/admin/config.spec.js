@@ -275,5 +275,17 @@ describe('admin/config.vue', () => {
       expect(w.vm.highlightedKey).toBe('publicRegistration')
       expect(row(w, 'PUBLIC_REGISTRATION').classes()).toContain('config-row--highlight')
     })
+
+    it('fades the highlight out after a delay (clears the key so the class drops)', async () => {
+      // Fake only the timers; keep setImmediate real so setData/nextTick still settle.
+      jest.useFakeTimers({ doNotFake: ['setImmediate'] })
+      const { w } = await mountWithRoute('#apiKeysEnabled')
+      expect(w.vm.highlightedKey).toBe('apiKeysEnabled')
+      jest.advanceTimersByTime(2500)
+      expect(w.vm.highlightedKey).toBeNull()
+      await w.vm.$nextTick()
+      expect(row(w, 'API_KEYS_ENABLED').classes()).not.toContain('config-row--highlight')
+      jest.useRealTimers()
+    })
   })
 })
