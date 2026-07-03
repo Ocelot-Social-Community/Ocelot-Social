@@ -3,7 +3,10 @@ import config from './config.vue'
 
 const localVue = global.localVue
 
-const stubs = { 'os-card': { template: '<div><slot /></div>' } }
+const stubs = {
+  'os-card': { template: '<div><slot /></div>' },
+  'nuxt-link': { template: '<a :href="to"><slot /></a>', props: ['to'] },
+}
 
 // Covers every row shape: a policy with only hard requirements (no seed) + two secrets
 // in different states, a seed whose admin override diverges from the env value, a seed
@@ -117,8 +120,9 @@ describe('admin/config.vue', () => {
       expect(secret.find('.cell__blocks').exists()).toBe(true)
     })
 
-    it('em-dashes the value columns of a secret (presence only, never a value)', async () => {
+    it('em-dashes the value columns of a secret, and offers no override link', async () => {
       const secret = row(await Wrapper(), 'LIVEKIT_API_SECRET')
+      // A secret is not a policy value → no override link, just a dash.
       expect(secret.find('[data-test="config-override-LIVEKIT_API_SECRET"]').exists()).toBe(false)
       expect(secret.find('[data-test="config-envvalue-LIVEKIT_API_SECRET"]').exists()).toBe(false)
       expect(secret.findAll('.cell-empty')).toHaveLength(3)
@@ -126,18 +130,23 @@ describe('admin/config.vue', () => {
   })
 
   describe('seed vars', () => {
-    it('shows the effective value, and the override only when it diverges from the default', async () => {
+    it('shows the diverging override value, linking to its policy on the policy tab', async () => {
       const api = row(await Wrapper(), 'API_KEYS_ENABLED')
       // effective false, env-seed configured true → an admin override is present.
       expect(api.find('.cell--effective .value').text()).toBe('false')
-      expect(api.find('[data-test="config-override-API_KEYS_ENABLED"]').text()).toBe('false')
-      expect(api.find('[data-test="config-envvalue-API_KEYS_ENABLED"]').text()).toBe('true')
+      const link = api.find('[data-test="config-override-API_KEYS_ENABLED"]')
+      expect(link.text()).toBe('false')
+      expect(link.attributes('href')).toBe('/admin/policy#apiKeysEnabled')
     })
 
-    it('shows no override when the effective value equals the configured default', async () => {
+    it('offers a "set override" link to the policy when no override diverges yet', async () => {
       const pub = row(await Wrapper(), 'PUBLIC_REGISTRATION')
       expect(pub.find('.cell--effective .value').text()).toBe('true')
-      expect(pub.find('[data-test="config-override-PUBLIC_REGISTRATION"]').exists()).toBe(false)
+      const link = pub.find('[data-test="config-override-PUBLIC_REGISTRATION"]')
+      expect(link.exists()).toBe(true)
+      expect(link.classes()).toContain('override-link--empty')
+      expect(link.attributes('href')).toBe('/admin/policy#publicRegistration')
+      expect(link.text()).toBe('admin.config.setOverride')
     })
 
     it('em-dashes the env value when the seed var is unset, with an accessible label', async () => {

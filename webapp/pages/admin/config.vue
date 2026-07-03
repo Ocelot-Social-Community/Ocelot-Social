@@ -53,16 +53,22 @@
               </template>
             </td>
 
-            <!-- 3. Policy override: present only when an admin's live value diverges from
-                 the configured default (env seed, else software default). -->
+            <!-- 3. Policy override: when the value is governed by an editable policy, this
+                 links to that policy on the policy tab (which highlights it via :target).
+                 Shows the override value if one diverges from the configured default, else
+                 a "set override" affordance. Env vars without a policy get a plain dash. -->
             <td class="cell">
-              <span
-                v-if="row.override !== null"
-                class="value"
+              <nuxt-link
+                v-if="row.overridable"
+                :to="`/admin/policy#${row.policyKey}`"
+                class="override-link"
+                :class="{ 'override-link--empty': row.override === null }"
                 :data-test="`config-override-${row.envKey}`"
+                :aria-label="$t('admin.config.editPolicy', { policy: policyLabel(row.policyKey) })"
               >
-                {{ row.override }}
-              </span>
+                <span v-if="row.override !== null" class="value">{{ row.override }}</span>
+                <span v-else>{{ $t('admin.config.setOverride') }}</span>
+              </nuxt-link>
               <span v-else class="cell-empty">
                 <span aria-hidden="true">&mdash;</span>
                 <span class="config-caption">{{ $t('admin.config.notSet') }}</span>
@@ -148,6 +154,8 @@ export default {
             envValue: entry.envSeedState === 'set' ? this.fmt(entry.configuredDefault) : null,
             softwareDefault: this.fmt(entry.softwareDefault),
             blocking: false,
+            // A seed maps to a policy value the admin can override on the policy tab.
+            overridable: true,
             anchor: anchorFor(entry.key),
           })
         }
@@ -165,6 +173,8 @@ export default {
             softwareDefault: null,
             // Unmet hard requirement → the feature is broken regardless of its policy flag.
             blocking: req.state !== 'set',
+            // A secret is not itself a policy value — there is nothing to override on it.
+            overridable: false,
             anchor: anchorFor(entry.key),
           })
         }
@@ -267,6 +277,18 @@ export default {
 }
 .cell-empty {
   color: $text-color-soft;
+}
+// Link from an overridable value to its policy on the policy tab.
+.override-link {
+  .value {
+    font-weight: 600;
+  }
+  // No override set yet: muted, but still a clear affordance to go set one.
+  &--empty {
+    color: $text-color-soft;
+    font-size: 0.85em;
+    font-style: italic;
+  }
 }
 .badge {
   display: inline-block;

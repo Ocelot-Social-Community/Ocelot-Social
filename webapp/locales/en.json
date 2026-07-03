@@ -151,6 +151,8 @@
         "softwareDefault": "Software default"
       },
       "blocks": "blocks {policy}",
+      "setOverride": "override",
+      "editPolicy": "Edit the {policy} policy",
       "notSet": "not set",
       "state": {
         "set": "set",

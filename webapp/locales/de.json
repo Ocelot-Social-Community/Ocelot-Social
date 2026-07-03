@@ -151,6 +151,8 @@
         "softwareDefault": "Software-Default"
       },
       "blocks": "blockiert {policy}",
+      "setOverride": "überschreiben",
+      "editPolicy": "Policy {policy} bearbeiten",
       "notSet": "nicht gesetzt",
       "state": {
         "set": "gesetzt",

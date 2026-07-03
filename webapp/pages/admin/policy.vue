@@ -502,6 +502,15 @@ form {
   line-height: 1.3;
   border-left: 3px solid transparent;
   padding-left: $space-xx-small;
+  // Keep the row clear of the sticky header when navigated to via #key from the config tab.
+  scroll-margin-top: $space-base;
+
+  // Navigated to from the config tab (/admin/policy#<key>) → highlight the target row so
+  // the admin sees which policy the config link pointed at.
+  &:target {
+    border-left-color: $color-primary;
+    background: rgba($color-primary, 0.1);
+  }
 
   // This field was edited locally AND changed on the server → highlight it.
   &--conflict {
