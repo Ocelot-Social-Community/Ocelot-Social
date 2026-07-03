@@ -81,6 +81,8 @@ export default {
   padding: 16px;
   gap: 12px;
   min-width: 200px;
+  max-width: 280px;
+  width: 280px;
 }
 
 .group-header {
