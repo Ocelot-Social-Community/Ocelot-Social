@@ -341,21 +341,23 @@ export default {
   border-collapse: collapse;
   font-size: 0.9em;
 
-  // Column widths (sum 100%): the key gets the most room, the override the least.
+  // Mobile-first: show only the three most important columns (key / effective state /
+  // policy override). The env value and software default are hidden so the narrow table
+  // stays readable; the desktop media query below re-adds them.
   .col--key {
-    width: 24%;
+    width: 46%;
   }
   .col--effective {
-    width: 20%;
+    width: 32%;
   }
   .col--override {
-    width: 12%;
-  }
-  .col--envvalue {
     width: 22%;
   }
-  .col--default {
-    width: 22%;
+  th:nth-child(4),
+  td:nth-child(4),
+  th:nth-child(5),
+  td:nth-child(5) {
+    display: none;
   }
 
   th,
@@ -374,11 +376,11 @@ export default {
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 0.03em;
-    border-bottom: 2px solid $border-color-softer;
     // Freeze the column header just below the fixed app header (its height is exposed as
-    // --header-height) so it stays visible while the page scrolls. border-collapse drops
-    // a sticky cell's own border during scroll → keep the divider as an inset shadow, and
-    // give the cell an opaque background so scrolled rows don't show through.
+    // --header-height) so it stays visible while the page scrolls. A SINGLE divider via an
+    // inset shadow (no border-bottom, which would double it at rest and is anyway dropped
+    // by border-collapse while scrolling); opaque background so scrolled rows don't show through.
+    border-bottom: none;
     position: sticky;
     top: var(--header-height, 6rem);
     z-index: $z-index-sticky;
@@ -387,6 +389,37 @@ export default {
   }
   .col--muted {
     color: $text-color-soft;
+  }
+}
+
+// Desktop: room for all five columns; the env-var name no longer wraps (mobile still does).
+@media #{$media-query-medium} {
+  .config-table {
+    .col--key {
+      width: 24%;
+    }
+    .col--effective {
+      width: 20%;
+    }
+    .col--override {
+      width: 12%;
+    }
+    .col--envvalue {
+      width: 22%;
+    }
+    .col--default {
+      width: 22%;
+    }
+    th:nth-child(4),
+    td:nth-child(4),
+    th:nth-child(5),
+    td:nth-child(5) {
+      display: table-cell;
+    }
+    .cell--key {
+      white-space: nowrap;
+      overflow: hidden;
+    }
   }
 }
 // Category sub-heading spanning the whole width, introducing each row group. The

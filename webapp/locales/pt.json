@@ -138,6 +138,44 @@
     "pages": {
       "name": "Páginas"
     },
+    "config": {
+      "name": "Ambiente",
+      "title": "Configuração do ambiente",
+      "description": "Todas as variáveis de ambiente que esta implantação lê e como são resolvidas. É um espelho de diagnóstico só de leitura do ambiente da implantação; os valores ativos são editados na aba Política de rede. Os valores secretos nunca são mostrados, apenas se estão definidos.",
+      "tableCaption": "Variáveis de ambiente com o seu estado efetivo, substituição de política, valor do ambiente e valor padrão do software.",
+      "col": {
+        "envKey": "Variável de ambiente",
+        "effective": "Estado efetivo",
+        "override": "Substituição de política",
+        "envValue": "Valor do ambiente",
+        "softwareDefault": "Padrão do software"
+      },
+      "blocks": "bloqueia {policy}",
+      "setOverride": "substituir",
+      "editPolicy": "Editar a política {policy}",
+      "notSet": "não definido",
+      "noDefault": "sem padrão",
+      "secretHidden": "definido (valor oculto)",
+      "state": {
+        "set": "definido",
+        "empty": "vazio",
+        "missing": "ausente"
+      },
+      "category": {
+        "server": "Servidor",
+        "database": "Base de dados",
+        "redis": "Redis",
+        "storage": "Armazenamento / S3",
+        "mail": "E-mail / SMTP",
+        "auth": "Autenticação",
+        "maps": "Mapas",
+        "video": "Videoconferência",
+        "registration": "Registo",
+        "features": "Funcionalidades",
+        "monitoring": "Monitorização",
+        "general": "Geral"
+      }
+    },
     "policy": {
       "conflict": {
         "keep": "Continuar a editar",

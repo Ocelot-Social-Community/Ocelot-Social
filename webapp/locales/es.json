@@ -138,6 +138,44 @@
     "pages": {
       "name": "Páginas"
     },
+    "config": {
+      "name": "Entorno",
+      "title": "Configuración del entorno",
+      "description": "Todas las variables de entorno que lee este despliegue y cómo se resuelven. Es un reflejo de diagnóstico de solo lectura del entorno del despliegue; los valores en vivo se editan en la pestaña Política de red. Los valores secretos nunca se muestran, solo si están definidos.",
+      "tableCaption": "Variables de entorno con su estado efectivo, anulación de política, valor de entorno y valor predeterminado del software.",
+      "col": {
+        "envKey": "Variable de entorno",
+        "effective": "Estado efectivo",
+        "override": "Anulación de política",
+        "envValue": "Valor de entorno",
+        "softwareDefault": "Predeterminado del software"
+      },
+      "blocks": "bloquea {policy}",
+      "setOverride": "anular",
+      "editPolicy": "Editar la política {policy}",
+      "notSet": "sin definir",
+      "noDefault": "sin predeterminado",
+      "secretHidden": "definido (valor oculto)",
+      "state": {
+        "set": "definido",
+        "empty": "vacío",
+        "missing": "ausente"
+      },
+      "category": {
+        "server": "Servidor",
+        "database": "Base de datos",
+        "redis": "Redis",
+        "storage": "Almacenamiento / S3",
+        "mail": "Correo / SMTP",
+        "auth": "Autenticación",
+        "maps": "Mapas",
+        "video": "Videoconferencia",
+        "registration": "Registro",
+        "features": "Funciones",
+        "monitoring": "Monitorización",
+        "general": "General"
+      }
+    },
     "policy": {
       "conflict": {
         "keep": "Seguir editando",

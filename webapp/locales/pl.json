@@ -138,6 +138,44 @@
     "pages": {
       "name": "Strony"
     },
+    "config": {
+      "name": "Środowisko",
+      "title": "Konfiguracja środowiska",
+      "description": "Wszystkie zmienne środowiskowe odczytywane przez to wdrożenie i sposób ich rozwiązywania. To diagnostyczne, tylko do odczytu odzwierciedlenie środowiska wdrożenia; wartości aktywne edytuje się na karcie Zasady sieci. Wartości tajne nigdy nie są pokazywane, tylko to, czy są ustawione.",
+      "tableCaption": "Zmienne środowiskowe z ich stanem efektywnym, nadpisaniem zasad, wartością środowiska i wartością domyślną oprogramowania.",
+      "col": {
+        "envKey": "Zmienna środowiskowa",
+        "effective": "Stan efektywny",
+        "override": "Nadpisanie zasad",
+        "envValue": "Wartość środowiska",
+        "softwareDefault": "Domyślna oprogramowania"
+      },
+      "blocks": "blokuje {policy}",
+      "setOverride": "nadpisz",
+      "editPolicy": "Edytuj zasadę {policy}",
+      "notSet": "nie ustawiono",
+      "noDefault": "brak domyślnej",
+      "secretHidden": "ustawione (wartość ukryta)",
+      "state": {
+        "set": "ustawione",
+        "empty": "puste",
+        "missing": "brak"
+      },
+      "category": {
+        "server": "Serwer",
+        "database": "Baza danych",
+        "redis": "Redis",
+        "storage": "Magazyn / S3",
+        "mail": "E-mail / SMTP",
+        "auth": "Uwierzytelnianie",
+        "maps": "Mapy",
+        "video": "Wideokonferencje",
+        "registration": "Rejestracja",
+        "features": "Funkcje",
+        "monitoring": "Monitorowanie",
+        "general": "Ogólne"
+      }
+    },
     "policy": {
       "conflict": {
         "keep": "Kontynuuj edycję",

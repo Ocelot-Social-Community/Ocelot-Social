@@ -138,6 +138,44 @@
     "pages": {
       "name": "Faqet"
     },
+    "config": {
+      "name": "Mjedisi",
+      "title": "Konfigurimi i mjedisit",
+      "description": "Çdo ndryshore mjedisi që lexon ky vendosje dhe si zgjidhet. Ky është një pasqyrë diagnostikuese vetëm për lexim e mjedisit të vendosjes; vlerat aktive redaktohen te skeda Politika e rrjetit. Vlerat sekrete nuk shfaqen kurrë, vetëm nëse janë caktuar.",
+      "tableCaption": "Ndryshoret e mjedisit me gjendjen e tyre efektive, mbivendosjen e politikës, vlerën e mjedisit dhe vlerën e parazgjedhur të softuerit.",
+      "col": {
+        "envKey": "Ndryshore mjedisi",
+        "effective": "Gjendja efektive",
+        "override": "Mbivendosje e politikës",
+        "envValue": "Vlera e mjedisit",
+        "softwareDefault": "Parazgjedhja e softuerit"
+      },
+      "blocks": "bllokon {policy}",
+      "setOverride": "mbivendos",
+      "editPolicy": "Redakto politikën {policy}",
+      "notSet": "e pacaktuar",
+      "noDefault": "pa parazgjedhje",
+      "secretHidden": "e caktuar (vlera e fshehur)",
+      "state": {
+        "set": "e caktuar",
+        "empty": "bosh",
+        "missing": "mungon"
+      },
+      "category": {
+        "server": "Serveri",
+        "database": "Baza e të dhënave",
+        "redis": "Redis",
+        "storage": "Ruajtja / S3",
+        "mail": "Email / SMTP",
+        "auth": "Autentikimi",
+        "maps": "Hartat",
+        "video": "Videokonferencë",
+        "registration": "Regjistrimi",
+        "features": "Veçoritë",
+        "monitoring": "Monitorimi",
+        "general": "Të përgjithshme"
+      }
+    },
     "policy": {
       "conflict": {
         "keep": "Vazhdo redaktimin",

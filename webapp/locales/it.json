@@ -138,6 +138,44 @@
     "pages": {
       "name": "Pagine"
     },
+    "config": {
+      "name": "Ambiente",
+      "title": "Configurazione dell'ambiente",
+      "description": "Tutte le variabili d'ambiente lette da questo deployment e come vengono risolte. È uno specchio diagnostico di sola lettura dell'ambiente del deployment; i valori attivi si modificano nella scheda Criteri di rete. I valori segreti non vengono mai mostrati, solo se sono impostati.",
+      "tableCaption": "Variabili d'ambiente con il loro stato effettivo, override del criterio, valore dell'ambiente e valore predefinito del software.",
+      "col": {
+        "envKey": "Variabile d'ambiente",
+        "effective": "Stato effettivo",
+        "override": "Override del criterio",
+        "envValue": "Valore dell'ambiente",
+        "softwareDefault": "Predefinito del software"
+      },
+      "blocks": "blocca {policy}",
+      "setOverride": "esegui override",
+      "editPolicy": "Modifica il criterio {policy}",
+      "notSet": "non impostato",
+      "noDefault": "nessun predefinito",
+      "secretHidden": "impostato (valore nascosto)",
+      "state": {
+        "set": "impostato",
+        "empty": "vuoto",
+        "missing": "mancante"
+      },
+      "category": {
+        "server": "Server",
+        "database": "Database",
+        "redis": "Redis",
+        "storage": "Archiviazione / S3",
+        "mail": "Email / SMTP",
+        "auth": "Autenticazione",
+        "maps": "Mappe",
+        "video": "Videoconferenza",
+        "registration": "Registrazione",
+        "features": "Funzionalità",
+        "monitoring": "Monitoraggio",
+        "general": "Generale"
+      }
+    },
     "policy": {
       "conflict": {
         "keep": "Continua a modificare",

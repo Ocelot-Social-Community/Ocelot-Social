@@ -138,6 +138,44 @@
     "pages": {
       "name": "Pages"
     },
+    "config": {
+      "name": "Omgeving",
+      "title": "Omgevingsconfiguratie",
+      "description": "Elke omgevingsvariabele die deze deployment leest, en hoe deze wordt bepaald. Dit is een alleen-lezen diagnostische weergave van de deployment-omgeving; actieve waarden worden bewerkt op het tabblad Netwerkbeleid. Geheime waarden worden nooit getoond, alleen of ze zijn ingesteld.",
+      "tableCaption": "Omgevingsvariabelen met hun effectieve status, beleidsoverschrijving, omgevingswaarde en softwarestandaard.",
+      "col": {
+        "envKey": "Omgevingsvariabele",
+        "effective": "Effectieve status",
+        "override": "Beleidsoverschrijving",
+        "envValue": "Omgevingswaarde",
+        "softwareDefault": "Softwarestandaard"
+      },
+      "blocks": "blokkeert {policy}",
+      "setOverride": "overschrijven",
+      "editPolicy": "Beleid {policy} bewerken",
+      "notSet": "niet ingesteld",
+      "noDefault": "geen standaard",
+      "secretHidden": "ingesteld (waarde verborgen)",
+      "state": {
+        "set": "ingesteld",
+        "empty": "leeg",
+        "missing": "ontbreekt"
+      },
+      "category": {
+        "server": "Server",
+        "database": "Database",
+        "redis": "Redis",
+        "storage": "Opslag / S3",
+        "mail": "E-mail / SMTP",
+        "auth": "Authenticatie",
+        "maps": "Kaarten",
+        "video": "Videoconferentie",
+        "registration": "Registratie",
+        "features": "Functies",
+        "monitoring": "Monitoring",
+        "general": "Algemeen"
+      }
+    },
     "policy": {
       "conflict": {
         "keep": "Doorgaan met bewerken",

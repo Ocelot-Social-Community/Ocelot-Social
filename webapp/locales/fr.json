@@ -138,6 +138,44 @@
     "pages": {
       "name": "Pages"
     },
+    "config": {
+      "name": "Environnement",
+      "title": "Configuration de l'environnement",
+      "description": "Toutes les variables d'environnement que ce déploiement lit, et comment elles sont résolues. Ceci est un miroir de diagnostic en lecture seule de l'environnement du déploiement ; les valeurs actives se modifient dans l'onglet Politique réseau. Les valeurs secrètes ne sont jamais affichées, seulement si elles sont définies.",
+      "tableCaption": "Variables d'environnement avec leur état effectif, le remplacement par la politique, la valeur d'environnement et la valeur par défaut du logiciel.",
+      "col": {
+        "envKey": "Variable d'environnement",
+        "effective": "État effectif",
+        "override": "Remplacement par la politique",
+        "envValue": "Valeur d'environnement",
+        "softwareDefault": "Valeur par défaut du logiciel"
+      },
+      "blocks": "bloque {policy}",
+      "setOverride": "remplacer",
+      "editPolicy": "Modifier la politique {policy}",
+      "notSet": "non définie",
+      "noDefault": "aucune valeur par défaut",
+      "secretHidden": "définie (valeur masquée)",
+      "state": {
+        "set": "définie",
+        "empty": "vide",
+        "missing": "absente"
+      },
+      "category": {
+        "server": "Serveur",
+        "database": "Base de données",
+        "redis": "Redis",
+        "storage": "Stockage / S3",
+        "mail": "E-mail / SMTP",
+        "auth": "Authentification",
+        "maps": "Cartes",
+        "video": "Visioconférence",
+        "registration": "Inscription",
+        "features": "Fonctionnalités",
+        "monitoring": "Supervision",
+        "general": "Général"
+      }
+    },
     "policy": {
       "conflict": {
         "keep": "Continuer l'édition",
