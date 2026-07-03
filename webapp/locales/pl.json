@@ -1171,6 +1171,8 @@
       "public": "Public groups",
       "closed": "Closed groups",
       "hidden": "Secret groups",
+      "shared": "Wspólne grupy",
+      "other": "Grupy beze mnie",
       "nobody": "no groups",
       "hiddenFromOthers": "hidden from others"
     }

@@ -49,7 +49,8 @@ import {
   groupMembershipVisibilityChangedSubscription,
 } from '~/graphql/UserGroups'
 
-const GROUP_TYPES = ['public', 'closed', 'hidden']
+const GROUP_SECTIONS_BY_TYPE = ['public', 'closed', 'hidden']
+const GROUP_SECTIONS_BY_MEMBERSHIP = ['shared', 'other']
 const PAGE_SIZE = 10
 
 export default {
@@ -68,7 +69,6 @@ export default {
   data() {
     return {
       groups: [],
-      groupTypes: GROUP_TYPES,
       loadingGroups: false,
       loadingMore: false,
       allGroupsLoaded: false,
@@ -110,13 +110,24 @@ export default {
       return this.groups && this.groups.length > 0
     },
     groupsByType() {
-      return GROUP_TYPES.reduce((acc, type) => {
-        acc[type] = (this.groups || []).filter((g) => g.groupType === type)
-        return acc
-      }, {})
+      if (this.myProfile) {
+        return GROUP_SECTIONS_BY_TYPE.reduce((acc, type) => {
+          acc[type] = (this.groups || []).filter((g) => g.groupType === type)
+          return acc
+        }, {})
+      }
+      return {
+        shared: (this.groups || []).filter(
+          (g) => g.myRole !== null && g.myRole !== 'pending',
+        ),
+        other: (this.groups || []).filter(
+          (g) => g.myRole === null || g.myRole === 'pending',
+        ),
+      }
     },
     typesWithGroups() {
-      return GROUP_TYPES.filter((type) => this.groupsByType[type]?.length > 0)
+      const types = this.myProfile ? GROUP_SECTIONS_BY_TYPE : GROUP_SECTIONS_BY_MEMBERSHIP
+      return types.filter((type) => this.groupsByType[type]?.length > 0)
     },
   },
   methods: {

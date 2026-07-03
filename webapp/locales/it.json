@@ -1171,6 +1171,8 @@
       "public": "Public groups",
       "closed": "Closed groups",
       "hidden": "Secret groups",
+      "shared": "Gruppi condivisi",
+      "other": "Gruppi senza di me",
       "nobody": "no groups",
       "hiddenFromOthers": "hidden from others"
     }
