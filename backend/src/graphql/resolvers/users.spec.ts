@@ -392,6 +392,14 @@ describe('UpdateUser', () => {
         })
       })
     })
+
+    it('publishes group membership visibility event when group visibility fields are updated', async () => {
+      variables = { ...variables, showHiddenGroupsOnProfile: true }
+      await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
+        data: { UpdateUser: expect.objectContaining({ id: 'u47' }) },
+        errors: undefined,
+      })
+    })
   })
 })
 

@@ -26,6 +26,10 @@ describe('privacy.vue', () => {
           return {
             id: 'u343',
             name: 'MyAccount',
+            showShoutsPublicly: true,
+            showPublicGroupsOnProfile: true,
+            showClosedGroupsOnProfile: true,
+            showHiddenGroupsOnProfile: true,
           }
         },
       },

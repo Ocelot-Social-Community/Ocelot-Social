@@ -672,6 +672,49 @@ describe('GroupProfileSlug', () => {
       // neither subscription is set up again after role change
       expect(subscribeMock).toHaveBeenCalledTimes(2)
     })
+
+    it('logs errors from the groupShowMembersChanged subscription', () => {
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+      const capturedCallbacks = []
+      const capturingInnerSubscribe = jest.fn().mockImplementation((callbacks) => {
+        capturedCallbacks.push(callbacks)
+        return { unsubscribe: jest.fn() }
+      })
+      const capturingSubscribeMock = jest.fn().mockReturnValue({ subscribe: capturingInnerSubscribe })
+      currentUserMock.mockReturnValue(peterLustig)
+      mount(GroupProfileSlug, {
+        localVue,
+        store,
+        stubs: {
+          ...stubs,
+          'infinite-loading': true,
+          'masonry-grid': true,
+          'masonry-grid-item': true,
+          'post-teaser': true,
+          'content-viewer': true,
+        },
+        mocks: {
+          ...mocks,
+          $apollo: {
+            loading: false,
+            mutate: jest.fn().mockResolvedValue(),
+            subscribe: capturingSubscribeMock,
+            queries: { chatRoom: { refetch: jest.fn() }, Group: { refetch: jest.fn() } },
+          },
+        },
+        data: () => ({ group: { ...yogaPractice, myRole: 'usual' }, GroupMembers: [] }),
+      })
+      // subscribe is called twice: roomUpdated (index 0) and groupShowMembers (index 1)
+      const groupShowMembersError = capturedCallbacks[1]?.error
+      expect(groupShowMembersError).toBeDefined()
+      const mockError = new Error('subscription failed')
+      groupShowMembersError(mockError)
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'groupShowMembersChanged subscription error:',
+        mockError,
+      )
+      consoleSpy.mockRestore()
+    })
   })
 
   describe('video call button (videoCall/enabled = true)', () => {

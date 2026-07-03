@@ -21,10 +21,13 @@ import UpdateGroup from '@graphql/queries/groups/UpdateGroup.gql'
 import UserGroups from '@graphql/queries/groups/UserGroups.gql'
 import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import Post from '@graphql/queries/posts/Post.gql'
+import { PubSub } from 'graphql-subscriptions'
 import { createApolloTestSetup } from '@root/test/helpers'
+import { GROUP_SHOW_MEMBERS_CHANGED } from '@constants/subscriptions'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import groupsResolver from './groups'
 // import CONFIG from '@src/config'
 
 let user
@@ -3963,5 +3966,25 @@ describe('in mode', () => {
         expect(notShared?.myRole).toBeNull()
       })
     })
+  })
+})
+
+describe('Subscription.groupShowMembersChanged filter', () => {
+  it('passes matching events through for authenticated users', async () => {
+    const pubsub = new PubSub()
+    const context = { pubsub, user: { id: 'u1' } } as unknown as Context
+    const iterator = groupsResolver.Subscription.groupShowMembersChanged.subscribe(
+      null,
+      { groupId: 'g1' },
+      context,
+      null,
+    )
+    const next = iterator.next()
+    await pubsub.publish(GROUP_SHOW_MEMBERS_CHANGED, {
+      groupShowMembersChanged: { groupId: 'g1' },
+    })
+    const { value } = await next
+    expect(value).toEqual({ groupShowMembersChanged: { groupId: 'g1' } })
+    await iterator.return?.()
   })
 })
