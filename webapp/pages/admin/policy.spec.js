@@ -511,4 +511,57 @@ describe('admin/policy.vue', () => {
       expect(w.vm.isUnavailable('videoConference')).toBe(false)
     })
   })
+
+  describe('deep-link highlight from the config tab', () => {
+    // The app runs vue-router in history mode, so an in-app navigation is a pushState
+    // that browsers don't re-evaluate :target for — the row is highlighted from the
+    // route hash instead. A reactive $route lets us exercise the hash watcher too; jsdom
+    // has no scrollIntoView, so stub it.
+    let attached
+    // Attach to the real document so getElementById (used by the scroll) resolves.
+    const mountWithRoute = (hash) => {
+      const $route = localVue.observable({ hash })
+      attached = mount(Policy, {
+        mocks: { ...mocks, $route },
+        localVue,
+        store,
+        attachTo: document.body,
+      })
+      return { w: attached, $route }
+    }
+
+    beforeEach(() => {
+      window.HTMLElement.prototype.scrollIntoView = jest.fn()
+    })
+    afterEach(() => {
+      attached?.destroy()
+      attached = undefined
+    })
+
+    it('highlights and scrolls to the row matching the route hash', async () => {
+      const { w } = mountWithRoute('#apiKeysEnabled')
+      await flushPromises()
+      expect(w.vm.highlightedKey).toBe('apiKeysEnabled')
+      expect(w.find('#apiKeysEnabled').classes()).toContain('policy-row--highlight')
+      expect(w.find('#publicRegistration').classes()).not.toContain('policy-row--highlight')
+      expect(window.HTMLElement.prototype.scrollIntoView).toHaveBeenCalled()
+    })
+
+    it('highlights nothing for an unknown or empty hash', async () => {
+      const { w } = mountWithRoute('#nonsense')
+      await flushPromises()
+      expect(w.vm.highlightedKey).toBeNull()
+      expect(w.find('.policy-row--highlight').exists()).toBe(false)
+      expect(window.HTMLElement.prototype.scrollIntoView).not.toHaveBeenCalled()
+    })
+
+    it('re-evaluates the highlight when the hash changes without a remount', async () => {
+      const { w, $route } = mountWithRoute('')
+      await flushPromises()
+      expect(w.vm.highlightedKey).toBeNull()
+      $route.hash = '#videoConference'
+      await w.vm.$nextTick()
+      expect(w.vm.highlightedKey).toBe('videoConference')
+    })
+  })
 })

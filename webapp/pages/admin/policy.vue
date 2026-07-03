@@ -56,6 +56,7 @@
           :class="{
             'policy-row--conflict': conflict[key],
             'policy-row--unavailable': isUnavailable(key),
+            'policy-row--highlight': highlightedKey === key,
           }"
         >
           <input
@@ -243,6 +244,11 @@ export default {
       loaded: false,
       // Per-key config layers + availability from the backend (apollo above).
       policyConfig: [],
+      // The policy key deep-linked to from the config tab (/admin/policy#<key>), used
+      // to highlight its row. Driven from the route hash rather than the CSS :target
+      // pseudo-class: the app runs vue-router in history mode, so an in-app navigation
+      // is a history.pushState that browsers do NOT re-evaluate :target for.
+      highlightedKey: null,
     }
   },
   computed: {
@@ -280,6 +286,17 @@ export default {
     },
     isNumberKey(key) {
       return this.numberKeys.includes(key)
+    },
+    // Highlight and scroll to the policy row deep-linked from the config tab
+    // (/admin/policy#<key>). Reads the route hash (a bare "#" or an unknown key clears
+    // the highlight) and centres the row once the DOM has it.
+    applyHashHighlight() {
+      const key = (this.$route?.hash || '').replace(/^#/, '')
+      this.highlightedKey = this.keys.includes(key) ? key : null
+      if (!this.highlightedKey) return
+      this.$nextTick(() => {
+        document.getElementById(this.highlightedKey)?.scrollIntoView({ block: 'center' })
+      })
     },
     // A key is unavailable when its hard env requirements are unmet: the stored flag
     // has no effect, so the input is disabled and a link to the config tab is shown.
@@ -417,6 +434,11 @@ export default {
       },
       deep: true,
     },
+    // Deep-linked to while already on this page (or the hash changed) → re-evaluate
+    // which row to highlight without a remount.
+    '$route.hash'() {
+      this.applyHashHighlight()
+    },
   },
   async mounted() {
     // Required: the viewer-scoped snapshot drives the form/checkboxes. policy/init
@@ -432,6 +454,8 @@ export default {
     }
     this.syncFormFromSnapshot()
     this.loaded = true
+    // Rows are rendered now → highlight/scroll to the deep-linked one, if any.
+    this.applyHashHighlight()
   },
 }
 </script>
@@ -506,7 +530,10 @@ form {
   scroll-margin-top: $space-base;
 
   // Navigated to from the config tab (/admin/policy#<key>) → highlight the target row so
-  // the admin sees which policy the config link pointed at.
+  // the admin sees which policy the config link pointed at. The class is driven from the
+  // route hash (see applyHashHighlight) because history-mode pushState navigations don't
+  // update :target; the :target rule stays as a fallback for a real full-page load/reload.
+  &--highlight,
   &:target {
     border-left-color: $color-primary;
     background: rgba($color-primary, 0.1);
