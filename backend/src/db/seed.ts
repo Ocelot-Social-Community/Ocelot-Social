@@ -306,13 +306,15 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await jennyRostock.relateTo(trophyStarter, 'selected', { slot: 1 })
     await jennyRostock.relateTo(trophyFlower, 'selected', { slot: 2 })
 
-    const jennySocialMedias = await Promise.all([
-      Factory.build('socialMedia', { url: 'https://t.me/jenny_rostock_test' }),
-      Factory.build('socialMedia', { url: 'http://nsosp.org/de/Quanten-Fluss-Theorie' }),
-      Factory.build('socialMedia', { url: 'http://nsosp.org/de/Superial-Zahlen' }),
-      Factory.build('socialMedia', { url: 'http://nsosp.org/de/New-Soul-Of-Science-Project' }),
-    ])
-    await Promise.all(jennySocialMedias.map((sm) => sm.relateTo(jennyRostock, 'ownedBy')))
+    for (const url of [
+      'https://t.me/jenny_rostock_test',
+      'http://nsosp.org/de/Quanten-Fluss-Theorie',
+      'http://nsosp.org/de/Superial-Zahlen',
+      'http://nsosp.org/de/New-Soul-Of-Science-Project',
+    ]) {
+      const sm = await Factory.build('socialMedia', { url })
+      await sm.relateTo(jennyRostock, 'ownedBy')
+    }
 
     await huey.relateTo(trophyPanda, 'rewarded')
     await huey.relateTo(trophyTiger, 'rewarded')
@@ -643,6 +645,355 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         roleInGroup: 'usual',
       },
     })
+
+    authenticatedUser = await jennyRostock.toJson()
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g3',
+        name: 'Quantum Flow Theory',
+        about: 'Exploring the Quantum Flow Theory as a new foundation for physics.',
+        description: `<h3>What is Quantum Flow Theory?</h3><p>Quantum Flow Theory proposes a new way of understanding the building blocks of nature — not as particles or waves, but as flows of quantised information.</p><h3>Goals</h3><p>We discuss research, share papers, and develop ideas together that challenge and extend current physical models.</p>`,
+        groupType: 'public',
+        actionRadius: 'global',
+        categoryIds: ['cat9', 'cat16'],
+        locationName: 'France',
+      },
+    })
+    await mutate({
+      mutation: JoinGroup,
+      variables: { groupId: 'g3', userId: 'u1' },
+    })
+    await mutate({
+      mutation: JoinGroup,
+      variables: { groupId: 'g3', userId: 'u4' },
+    })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g3', userId: 'u1', roleInGroup: 'usual' },
+    })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g4',
+        name: 'New Soul Of Science Project',
+        about: 'A project bridging science, philosophy, and the human soul.',
+        description: `<h3>The Project</h3><p>The New Soul Of Science Project (NSOSP) aims to develop a holistic scientific worldview that integrates consciousness, matter, and meaning into a coherent framework.</p><h3>Topics</h3><p>We explore superial numbers, quantum flow, and the foundations of a new natural philosophy.</p>`,
+        groupType: 'public',
+        actionRadius: 'global',
+        categoryIds: ['cat9', 'cat16'],
+        locationName: 'France',
+      },
+    })
+    await mutate({
+      mutation: JoinGroup,
+      variables: { groupId: 'g4', userId: 'u4' },
+    })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g4', userId: 'u4', roleInGroup: 'usual' },
+    })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g5',
+        name: 'Superial Numbers',
+        about: 'Research group for a new kind of number beyond real and complex numbers.',
+        description: `<h3>What are Superial Numbers?</h3><p>Superial numbers extend the known number systems — real, complex, and hypercomplex — into a new domain that may help describe quantum phenomena and consciousness mathematically.</p><h3>Members</h3><p>This is a closed research group for people actively working on or studying superial number theory.</p>`,
+        groupType: 'closed',
+        actionRadius: 'continental',
+        categoryIds: ['cat9'],
+        locationName: 'France',
+      },
+    })
+    await mutate({
+      mutation: JoinGroup,
+      variables: { groupId: 'g5', userId: 'u4' },
+    })
+    await mutate({
+      mutation: JoinGroup,
+      variables: { groupId: 'g5', userId: 'u5' },
+    })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g5', userId: 'u4', roleInGroup: 'admin' },
+    })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g5', userId: 'u5', roleInGroup: 'usual' },
+    })
+
+    // authenticatedUser is still jennyRostock (u3)
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g6',
+        name: 'Gradido – Wertschätzungseinheit',
+        about: 'Eine Wertschätzungseinheit nach dem Vorbild der Natur für Wohlstand, Frieden und Freiheit.',
+        description: `<h3>Was ist Gradido?</h3><p>Gradido wurde aus über 20 Jahren Forschung an der Gradido-Akademie für Wirtschaftsbionik entwickelt. Es ist eine Wertschätzungseinheit, die darauf abzielt, „Wohlstand, Frieden und Freiheit für alle Menschen – im Einklang mit der Natur" zu schaffen.</p><h3>Wie funktioniert es?</h3><p>Das Dreifache Wohl bildet das ethische Fundament: das Wohl des Einzelnen, das Wohl der Gemeinschaft und das Wohl der Natur. Neue Gradidos werden bevölkerungsbasiert ausgegeben – ohne Schulden. Entscheidend: 50 % der Guthaben verfallen jährlich, was Stabilität gewährleistet und Blasen verhindert.</p><h3>Wirtschaftsbionik</h3><p>Das theoretische Fundament der Initiative ist die „Wirtschaftsbionik", die Prinzipien der Natur untersucht, die seit Milliarden von Jahren Fülle, Vielfalt und Balance erhalten.</p>`,
+        groupType: 'public',
+        actionRadius: 'global',
+        categoryIds: ['cat6', 'cat9', 'cat16'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g6', userId: 'u1' } })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g6', userId: 'u4' } })
+    await mutate({ mutation: ChangeGroupMemberRole, variables: { groupId: 'g6', userId: 'u1', roleInGroup: 'usual' } })
+    await mutate({ mutation: ChangeGroupMemberRole, variables: { groupId: 'g6', userId: 'u4', roleInGroup: 'usual' } })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g7',
+        name: 'Gesundheit fängt im Boden an',
+        about: 'Das Bodenmikrobiom als Grundlage menschlicher Gesundheit – von der Erde bis zum Darm.',
+        description: `<h3>Unsere Mission</h3><p>Das Projekt, geleitet von Ulrike B. Rapp (Agraringenieurin für regenerative Landwirtschaft), zielt darauf ab, „humus- und mikrobiomreiche Böden als Grundlage gesunden Lebens" in den Händen von Gartenanbauern, Landwirten und Gemeinschaftsgärten zu entwickeln und zu sichern.</p><h3>Kerngedanke</h3><p>Wachsende Belege deuten darauf hin, dass das Darmmikrobiom eine entscheidende Rolle bei psychischer Gesundheit, Immunerkrankungen, Allergien, Stoffwechselstörungen und Krebs spielt. Der Grundsatz „gesunder Boden – gesunde Pflanze – gesunder Mensch" erfährt durch die Mikrobiomforschung wissenschaftliche Bestätigung.</p><h3>Aktivitäten</h3><ul><li><p>Vorträge und Workshops zu biozyklischem Humusboden und Kompostierung</p></li><li><p>Beratung für Gärtner und Gemeinschaftsinitiativen</p></li><li><p>Chroma-Bodentests zur Visualisierung der Bodenqualität</p></li></ul>`,
+        groupType: 'public',
+        actionRadius: 'national',
+        categoryIds: ['cat12', 'cat14'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g7', userId: 'u4' } })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g7', userId: 'u5' } })
+    await mutate({ mutation: ChangeGroupMemberRole, variables: { groupId: 'g7', userId: 'u4', roleInGroup: 'usual' } })
+    await mutate({ mutation: ChangeGroupMemberRole, variables: { groupId: 'g7', userId: 'u5', roleInGroup: 'usual' } })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g8',
+        name: 'Minuto – Komplementärwährung',
+        about: 'Zeitgutscheine als dezentrales, regionales Zahlungsmittel für Leistungen und Waren.',
+        description: `<h3>Was ist Minuto?</h3><p>Minuto ist „ein Zahlungsmittel zum Selbermachen in Form von Zeitgutscheinen für qualitative Leistung" – ein dezentrales, regionales Zahlungssystem, das menschliche Fähigkeiten und Kooperation statt Konkurrenz betont.</p><h3>So funktioniert es</h3><p>Teilnehmende drucken Vorlagen aus, ergänzen persönliche Angaben und holen die Unterschriften zweier Bürgen. Es gibt keine zentrale Ausgabestelle – jeder ist seine eigene Zentralbank. Das System wirkt am besten in geografischen Gemeinschaften, wo Menschen sich leicht vernetzen können.</p><h3>Einsatzmöglichkeiten</h3><p>Gutscheine können für Dienstleistungen (Backen, Computerhilfe, Gartenarbeit, Transport) und Waren (handgefertigte Artikel, Gebrauchtes, Vermietung) getauscht werden.</p>`,
+        groupType: 'closed',
+        actionRadius: 'regional',
+        categoryIds: ['cat6', 'cat9'],
+        locationName: 'Stralsund, Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g8', userId: 'u4' } })
+    await mutate({ mutation: ChangeGroupMemberRole, variables: { groupId: 'g8', userId: 'u4', roleInGroup: 'admin' } })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g9',
+        name: 'IT4C – Technologie für Wandel',
+        about: 'Freie Software und offene Prozesse im Dienst des Gemeinwohls und gesellschaftlichen Wandels.',
+        description: `<h3>Wer wir sind</h3><p>IT4C ist ein Netzwerk engagierter Softwareentwickler:innen, Designer:innen und Berater:innen, das „Initiativen, Organisationen und Bewegungen" begleitet, die sich für eine gerechte, nachhaltige und demokratische Welt einsetzen. Die Arbeitsweise ist „open, solidarisch, menschenzentriert".</p><h3>Was wir tun</h3><p>IT4C betrachtet Softwareentwicklung nicht als Selbstzweck, sondern als Vehikel für sozialen Wandel. Digitale Souveränität steht im Mittelpunkt – durch transparente, ethisch reflektierte und partizipative Entwicklungsprozesse.</p><h3>Projekte</h3><ul><li><p><strong>Ocelot.social</strong>: Open-Source-Software für demokratische Alternativen zu kommerziellen Plattformen</p></li><li><p><strong>Utopia Map</strong>: Kollaborative Mapping-Plattform für Transformationsinitiativen</p></li></ul>`,
+        groupType: 'public',
+        actionRadius: 'global',
+        categoryIds: ['cat13', 'cat15'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g9', userId: 'u1' } })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g9', userId: 'u4' } })
+    await mutate({ mutation: ChangeGroupMemberRole, variables: { groupId: 'g9', userId: 'u1', roleInGroup: 'usual' } })
+    await mutate({ mutation: ChangeGroupMemberRole, variables: { groupId: 'g9', userId: 'u4', roleInGroup: 'admin' } })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g10',
+        name: 'Linux Werkstatt – Privatsphäre',
+        about: 'Privatsphäre auf digitalen Geräten umsetzen – von Linux auf dem PC bis zu GrapheneOS auf dem Smartphone.',
+        description: `<h3>Worum geht es?</h3><p>Die Linux Werkstatt entstand aus Datenschutzvorträgen von Chriz Stein und hat inzwischen Teilnehmende in ganz Deutschland. Das dezentrale Netzwerk lokaler Teams teilt technisches Wissen und Best Practices rund um datenschutzfreundliche Betriebssysteme und Anwendungen.</p><h3>Computer und Notebooks</h3><p>Wir begleiten den Umstieg auf Linux-basierte Betriebssysteme und Open-Source-Alternativen zu proprietärer Software wie Microsoft Office.</p><h3>Smartphones</h3><p>Teams helfen dabei, datenschutzfokussierte Systeme wie GrapheneOS, /e/OS und LineageOS zu evaluieren und empfehlen alternative Apps für Messaging, E-Mail, Navigation und digitale Geldbörsen.</p>`,
+        groupType: 'closed',
+        actionRadius: 'national',
+        categoryIds: ['cat15', 'cat11'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g10', userId: 'u4' } })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g10', userId: 'u5' } })
+    await mutate({ mutation: ChangeGroupMemberRole, variables: { groupId: 'g10', userId: 'u4', roleInGroup: 'usual' } })
+    await mutate({ mutation: ChangeGroupMemberRole, variables: { groupId: 'g10', userId: 'u5', roleInGroup: 'usual' } })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g11',
+        name: 'Terra Nova – Gemeinschaft & Biohotel',
+        about: 'Ein Gemeinschaftsort an der Ostsee – Begegnungsraum, essbare Landschaft und Biohotel.',
+        description: `<h3>Terra Nova auf Gut Nisdorf</h3><p>18 km von Stralsund entfernt liegt auf einem 700 Jahre alten Gutshof das Terra-Nova-Projekt. Im Sommer ist es ein Biohotel für Familien und Naturliebende, in den anderen Jahreszeiten „eine Oase der Stille". Das Anwesen bietet Gärten, einen Naturteich und Waldgebiete mit legendären Sonnenuntergängen über den Bodden.</p><h3>Unsere Vision</h3><p>Wir entwickeln eine essbare Landschaft und einen Begegnungsort, an dem authentische menschliche Verbindung jenseits von Meinungen und Vorurteilen entstehen kann. Die Gründungsgemeinschaft vereint Expertise in Bau, Ökologie, Permakultur, Unternehmensberatung, Journalismus und sozialer Moderation.</p><h3>Mitmachen</h3><p>Praktikant:innen und Interessierte können lernen und gleichzeitig zu Bau-, Garten-, Küchen- und Konstruktionsprojekten beitragen.</p>`,
+        groupType: 'public',
+        actionRadius: 'regional',
+        categoryIds: ['cat1', 'cat12', 'cat10'],
+        locationName: 'Nisdorf, Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g11', userId: 'u4' } })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g11', userId: 'u6' } })
+    await mutate({ mutation: ChangeGroupMemberRole, variables: { groupId: 'g11', userId: 'u4', roleInGroup: 'usual' } })
+    await mutate({ mutation: ChangeGroupMemberRole, variables: { groupId: 'g11', userId: 'u6', roleInGroup: 'usual' } })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g12',
+        name: 'Lehren 2.0 – Beruf sinnvoll leben',
+        about: 'Professionelle Entwicklung für Lehrkräfte: Wandel von der Defizit- zur Potenzialkultur.',
+        description: `<h3>Das Programm</h3><p>Lehren 2.0 ist ein inspirierender, kreativer Online-Kurs mit Präsenzterminen in vier Modulen für Lehrkräfte, Schulleitungen und Eltern an freien Schulen. Das Ziel: das bestehende Bildungssystem durch gleichwertige Beziehungen und Selbstverantwortung der Lernenden umgestalten.</p><h3>Holistische Pädagogik</h3><p>Im Mittelpunkt steht, dass „eine logopädagogische Haltung der Lehrperson eine entscheidende Rolle für die Bindung an Kinder" und ihre Lernentwicklung spielt. Der Lehrplan bietet Werkzeuge, die Erziehende dabei unterstützen, das Potenzial von Kindern durch bedeutungsvolle Pädagogik zu fördern.</p><h3>Abschluss</h3><p>Das Programm endet mit einer Zertifizierung durch einen Bildungsbrief.</p>`,
+        groupType: 'closed',
+        actionRadius: 'national',
+        categoryIds: ['cat3', 'cat17'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g12', userId: 'u4' } })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g12', userId: 'u5' } })
+    await mutate({ mutation: ChangeGroupMemberRole, variables: { groupId: 'g12', userId: 'u4', roleInGroup: 'usual' } })
+    await mutate({ mutation: ChangeGroupMemberRole, variables: { groupId: 'g12', userId: 'u5', roleInGroup: 'usual' } })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g13',
+        name: 'Montessori Grundschule Nordzypern',
+        about: 'Aufbau einer Montessori-Grundschule in Nordzypern für kindgerechtes, selbstbestimmtes Lernen.',
+        description: `<h3>Das Projekt</h3><p>Die Initiative entstand, als Uri Reick mit seiner Familie nach Nordzypern zog und nur staatliche Schulen oder britische Privatschulen vorfand. Gemeinsam mit Dincel Sukrettin, Leiter eines Montessori-Kindergartens, und zwei weiteren deutschen Familien startete er den Aufbau einer neuen Schule.</p><h3>Pädagogik</h3><p>Der geplante Lehrplan betont Montessori- und Freie-Lern-Ansätze bei gleichzeitiger Erfüllung staatlicher Anforderungen für die Anerkennung. Unterrichtssprachen sind Englisch, Türkisch und Deutsch; weitere Schwerpunkte sind Gartenanbau, Ernährung und digitale Kompetenz.</p><h3>Zahlen & Ziele</h3><p>Im ersten Jahr sollen 20–40 Kinder der Klassen 1–3 aufgenommen werden. Die Vision wächst auf bis zu 100 Schüler:innen in den Klassen 1–5 innerhalb von vier Jahren. Finanzielle Unterstützung durch Genossenschaft und Crowdfunding ist geplant.</p>`,
+        groupType: 'public',
+        actionRadius: 'continental',
+        categoryIds: ['cat7', 'cat8'],
+        locationName: 'North Cyprus',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g13', userId: 'u4' } })
+    await mutate({ mutation: ChangeGroupMemberRole, variables: { groupId: 'g13', userId: 'u4', roleInGroup: 'usual' } })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g14',
+        name: 'Lebenswege – Potenzialentfaltung',
+        about: 'Kreative Wegbegleitung durch Wissen, Tanz, Worte, Gestaltung und Lieder zur Entfaltung des Seelensinns.',
+        description: `<h3>Die Initiative</h3><p>Gegründet von Kersten Elisabeth Pfaff, Choreografin und Tanzpädagogin, fokussiert sich diese Initiative auf den „inneren Ausdruck des Menschen" durch multiple kreative Ausdrucksformen. Die Arbeit zielt darauf ab, menschliches Potenzial über verschiedene Modalitäten zugänglich zu machen.</p><h3>Angebote</h3><ul><li><p><strong>Vorträge</strong> mit anthroposophischen Grundlagen: „Die lebendige Kraft der Sprache", Märchen als Seelenbilder, Bewusstseinserweiterung</p></li><li><p><strong>Bewegung & Tanz</strong>: feminine Archetypen, mythologische Themen, kreativem und Seelentanz</p></li><li><p><strong>Persönlichkeitsentwicklung</strong>: Programme zu Ruf, Beruf und Berufung, Lebensgestaltung und Lebensalter</p></li><li><p><strong>Jahreszeitliche Feste & Singen</strong>: Rauhnächte, Gemeinschaftssingen</p></li></ul>`,
+        groupType: 'public',
+        actionRadius: 'regional',
+        categoryIds: ['cat3', 'cat16', 'cat17'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g14', userId: 'u1' } })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g14', userId: 'u4' } })
+    await mutate({ mutation: ChangeGroupMemberRole, variables: { groupId: 'g14', userId: 'u1', roleInGroup: 'usual' } })
+    await mutate({ mutation: ChangeGroupMemberRole, variables: { groupId: 'g14', userId: 'u4', roleInGroup: 'usual' } })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g15',
+        name: 'Treffpunkt Genossenschaft',
+        about: 'Platz, um Ideen vorzustellen und sich aktiv im Netzwerk zu vernetzen.',
+        description: `<h3>Was ist der Treffpunkt Genossenschaft?</h3><p>Ein Begegnungsort für Menschen mit Ideen, die zu den Werten der Genossenschaft passen und Unterstützung bei der Umsetzung suchen oder sich aktiv im Netzwerk vernetzen möchten.</p><h3>Wie es funktioniert</h3><p>Interessierte stellen sich vor, indem sie ihren persönlichen Hintergrund, ihre motivierenden Ideen oder ihr Projektwerk teilen und Gemeinsamkeiten für die Zusammenarbeit benennen. Das Team meldet sich dann zur Vorbereitung der nächsten Treffen.</p><h3>Wen wir suchen</h3><ul><li><p>Menschen mit Interesse an der Arbeit mit oder in der Genossenschaft</p></li><li><p>Personen mit guten Ideen, die Umsetzungsunterstützung benötigen</p></li><li><p>Projektgründende, die dem Netzwerk beitreten möchten</p></li></ul>`,
+        groupType: 'closed',
+        actionRadius: 'national',
+        categoryIds: ['cat9', 'cat0'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g15', userId: 'u4' } })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g15', userId: 'u6' } })
+    await mutate({ mutation: ChangeGroupMemberRole, variables: { groupId: 'g15', userId: 'u4', roleInGroup: 'usual' } })
+    await mutate({ mutation: ChangeGroupMemberRole, variables: { groupId: 'g15', userId: 'u6', roleInGroup: 'usual' } })
+
+    // eslint-disable-next-line no-console
+    console.log('seed', 'group avatars')
+    for (const { groupId, url, alt, aspectRatio } of [
+      {
+        groupId: 'g3',
+        url: 'http://nsosp.org/share/images/FrQFT/FrQFT_header_v01_3.jpg',
+        alt: 'Quantum Flow Theory',
+        aspectRatio: 1.78,
+      },
+      {
+        groupId: 'g4',
+        url: 'http://nsosp.org/share/images/NSOSP/NSOSP_header_v01_9.jpg',
+        alt: 'New Soul Of Science Project',
+        aspectRatio: 1.78,
+      },
+      {
+        groupId: 'g5',
+        url: 'https://nsosp.org/share/images/SN/SN_header_v04-01.jpg',
+        alt: 'Superial Numbers',
+        aspectRatio: 1.0,
+      },
+      {
+        groupId: 'g6',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/gradido_coin.png',
+        alt: 'Gradido Coin',
+        aspectRatio: 1.0,
+      },
+      {
+        groupId: 'g7',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/Mikrobiom-Biozyklische-Humuserde-gesund.jpg',
+        alt: 'Gesundheit im Boden',
+        aspectRatio: 1.5,
+      },
+      {
+        groupId: 'g8',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/pixabay-arttower-ancient-cropped-2000x500-1.jpg',
+        alt: 'Minuto Komplementärwährung',
+        aspectRatio: 4.0,
+      },
+      {
+        groupId: 'g9',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/IT4C-Website-Bild-ohne-Text.webp',
+        alt: 'IT4C Team',
+        aspectRatio: 1.5,
+      },
+      {
+        groupId: 'g10',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/Logo_Linux_Werkstatt.jpg',
+        alt: 'Linux Werkstatt Logo',
+        aspectRatio: 1.0,
+      },
+      {
+        groupId: 'g11',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/TerraNova-Rittergut.jpg',
+        alt: 'Terra Nova Rittergut',
+        aspectRatio: 1.5,
+      },
+      {
+        groupId: 'g12',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/Lehren-2_0-fortbildung-modular.jpg',
+        alt: 'Lehren 2.0 Fortbildung',
+        aspectRatio: 1.5,
+      },
+      {
+        groupId: 'g13',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/Gruppenfoto-e1738164285204.jpg',
+        alt: 'Montessori Nordzypern Gruppe',
+        aspectRatio: 1.33,
+      },
+      {
+        groupId: 'g14',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/Kersten-Pfaff-header-chateau-neu1.jpg',
+        alt: 'Lebenswege Potenzialentfaltung',
+        aspectRatio: 1.78,
+      },
+      {
+        groupId: 'g15',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/82tpeld0_e4-e1741358592420.jpg',
+        alt: 'Treffpunkt Genossenschaft',
+        aspectRatio: 1.5,
+      },
+    ]) {
+      await database.write({
+        query: `
+          MATCH (group:Group {id: $groupId})
+          MERGE (img:Image {url: $url})
+          SET img.alt = $alt, img.aspectRatio = $aspectRatio, img.type = 'image/jpeg'
+          MERGE (group)-[:AVATAR_IMAGE]->(img)
+        `,
+        variables: { groupId, url, alt, aspectRatio },
+      })
+    }
 
     authenticatedUser = await louie.toJson()
     await mutate({
