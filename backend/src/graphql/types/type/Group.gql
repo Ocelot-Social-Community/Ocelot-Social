@@ -183,6 +183,7 @@ type Mutation {
   "Unmute a previously muted group. Requires membership."
   unmuteGroup(groupId: ID!): Group
 
+  "Toggle whether a group membership is shown on the current user's profile."
   setGroupMembershipVisibility(groupId: ID!, showOnProfile: Boolean!): MEMBER_OF
 }
 
@@ -195,6 +196,8 @@ type GroupShowMembersChanged {
 }
 
 type Subscription {
+  "Fires when a user changes which group memberships are visible on their profile."
   groupMembershipVisibilityChanged(userId: ID!): GroupMembershipVisibilityChanged!
+  "Fires when a closed group's showMembers setting changes."
   groupShowMembersChanged(groupId: ID!): GroupShowMembersChanged!
 }
