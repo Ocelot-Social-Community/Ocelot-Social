@@ -394,7 +394,7 @@ export default {
   }
 }
 
-// Desktop: room for all five columns; the env-var name no longer wraps (mobile still does).
+// Desktop: room for all five columns (env value + software default are re-added).
 @media #{$media-query-medium} {
   .config-table {
     .col--key {
@@ -417,10 +417,6 @@ export default {
     th:nth-child(5),
     td:nth-child(5) {
       display: table-cell;
-    }
-    .cell--key {
-      white-space: nowrap;
-      overflow: hidden;
     }
   }
 }
