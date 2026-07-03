@@ -33,7 +33,7 @@
       </p>
 
       <div v-if="loadingMore || loadingGroups" class="loading-more">
-        <os-spinner size="small" />
+        <os-spinner size="xs" />
       </div>
     </div>
   </os-card>
