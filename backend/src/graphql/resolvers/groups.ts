@@ -608,7 +608,9 @@ export default {
                 )
               )
               RETURN group {.*, myRole: membership.role, showOnProfile: coalesce(membership.showOnProfile, true)}
-              ORDER BY group.groupType ASC, group.createdAt DESC
+              ORDER BY
+                CASE WHEN viewerMembership IS NOT NULL AND viewerMembership.role IN ['usual', 'admin', 'owner'] THEN 0 ELSE 1 END ASC,
+                group.createdAt DESC
               SKIP toInteger($offset) LIMIT toInteger($first)
             `
           }
