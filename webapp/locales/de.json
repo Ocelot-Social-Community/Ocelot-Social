@@ -141,21 +141,17 @@
     "config": {
       "name": "Umgebung",
       "title": "Umgebungskonfiguration",
-      "description": "Deployment-Konfiguration hinter der Netzwerk-Konfiguration. Secret-Werte werden nie angezeigt – nur, ob sie gesetzt sind.",
-      "required": {
-        "title": "Erforderliche Umgebungsvariablen",
-        "hint": "Harte Voraussetzungen. Solange eine fehlt, ist die Funktion unabhängig von ihrer Policy nicht verfügbar. Änderungen erfordern ein Redeploy und einen Backend-Neustart."
+      "description": "Jede Umgebungsvariable, die dieses Deployment liest, und wie sie sich auflöst. Ein reiner Lese-/Diagnosespiegel der Deployment-Umgebung – Live-Werte werden im Reiter Netzwerk-Konfiguration bearbeitet. Secret-Werte werden nie angezeigt, nur ob sie gesetzt sind.",
+      "tableCaption": "Umgebungsvariablen mit ihrem effektiven Zustand, Policy-Override, Umgebungswert und Software-Default.",
+      "col": {
+        "envKey": "Umgebungsvariable",
+        "effective": "Effektiver Zustand",
+        "override": "Policy-Override",
+        "envValue": "Umgebungswert",
+        "softwareDefault": "Software-Default"
       },
-      "requiredFor": "erforderlich für {policy}",
-      "seed": {
-        "title": "Umgebungs-Seed-Defaults",
-        "hint": "Diese setzen nur beim ersten Start den Default einer Policy. Ein Admin kann sie zur Laufzeit im Reiter Netzwerk-Konfiguration überschreiben."
-      },
-      "seedsDefault": "seedet {policy} (Default {value})",
-      "software": {
-        "title": "Software-Defaults",
-        "hint": "Die Code-Baseline, auf die eine Policy ohne Umgebungskonfiguration zurückfällt."
-      },
+      "blocks": "blockiert {policy}",
+      "notSet": "nicht gesetzt",
       "state": {
         "set": "gesetzt",
         "empty": "leer",

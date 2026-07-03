@@ -141,21 +141,17 @@
     "config": {
       "name": "Environment",
       "title": "Environment configuration",
-      "description": "Deployment configuration behind the network policy. Secret values are never shown — only whether they are set.",
-      "required": {
-        "title": "Required environment variables",
-        "hint": "Hard requirements. While one is missing the feature is unavailable regardless of its policy. Changing these needs a redeploy and a backend restart."
+      "description": "Every environment variable this deployment reads, and how it resolves. This is a read-only diagnostic mirror of the deployment env — live values are edited on the network policy tab. Secret values are never shown, only whether they are set.",
+      "tableCaption": "Environment variables with their effective state, policy override, environment value and software default.",
+      "col": {
+        "envKey": "Environment variable",
+        "effective": "Effective state",
+        "override": "Policy override",
+        "envValue": "Environment value",
+        "softwareDefault": "Software default"
       },
-      "requiredFor": "required for {policy}",
-      "seed": {
-        "title": "Environment-seeded defaults",
-        "hint": "These only seed a policy's default at first start. An admin can override them live on the network policy tab."
-      },
-      "seedsDefault": "seeds {policy} (default {value})",
-      "software": {
-        "title": "Software defaults",
-        "hint": "The code baseline a policy falls back to without any environment configuration."
-      },
+      "blocks": "blocks {policy}",
+      "notSet": "not set",
       "state": {
         "set": "set",
         "empty": "empty",
