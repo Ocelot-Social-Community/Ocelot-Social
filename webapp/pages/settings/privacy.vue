@@ -105,7 +105,10 @@ export default {
           },
         })
       } catch (error) {
-        this.shoutsAllowed = !this.shoutsAllowed
+        this.shoutsAllowed = this.currentUser.showShoutsPublicly || false
+        this.showPublicGroups = this.currentUser.showPublicGroupsOnProfile !== false
+        this.showClosedGroups = this.currentUser.showClosedGroupsOnProfile !== false
+        this.showHiddenGroups = this.currentUser.showHiddenGroupsOnProfile !== false
         this.$toast.error(error.message)
       }
     },

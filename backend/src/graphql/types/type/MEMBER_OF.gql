@@ -3,5 +3,5 @@ type MEMBER_OF {
   createdAt: String!
   updatedAt: String!
   role: GroupMemberRole!
-  showOnProfile: Boolean!
+  showOnProfile: Boolean
 }

@@ -607,7 +607,7 @@ export default {
                   AND viewerMembership.role IN ['usual', 'admin', 'owner']
                 )
               )
-              RETURN group {.*, myRole: membership.role, showOnProfile: coalesce(membership.showOnProfile, true)}
+              RETURN group {.*, myRole: viewerMembership.role, showOnProfile: coalesce(membership.showOnProfile, true)}
               ORDER BY
                 CASE WHEN viewerMembership IS NOT NULL AND viewerMembership.role IN ['usual', 'admin', 'owner'] THEN 0 ELSE 1 END ASC,
                 group.createdAt DESC
@@ -754,7 +754,12 @@ export default {
       subscribe: withFilter(
         (_parent, _args, context: Context) =>
           context.pubsub.asyncIterator(GROUP_SHOW_MEMBERS_CHANGED),
-        (payload: { groupShowMembersChanged: { groupId: string } }, args: { groupId: string }) => {
+        (
+          payload: { groupShowMembersChanged: { groupId: string } },
+          args: { groupId: string },
+          context: Context,
+        ) => {
+          if (!context.user) return false
           return payload.groupShowMembersChanged.groupId === args.groupId
         },
       ),

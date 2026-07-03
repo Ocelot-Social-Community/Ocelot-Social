@@ -19,6 +19,11 @@
                     ? $t('group.contentMenu.hideFromProfile')
                     : $t('group.contentMenu.showOnProfile')
                 "
+                :aria-label="
+                  group.showOnProfile
+                    ? $t('group.contentMenu.hideFromProfile')
+                    : $t('group.contentMenu.showOnProfile')
+                "
                 @click.prevent="toggleVisibility(group)"
               >
                 <os-icon :icon="group.showOnProfile ? icons.eye : icons.eyeSlash" />

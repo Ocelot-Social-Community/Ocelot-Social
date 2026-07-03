@@ -580,7 +580,10 @@ export default {
         next: () => {
           this.$apollo.queries.Group.refetch()
         },
-        error: () => {},
+        error: (err) => {
+          // eslint-disable-next-line no-console
+          console.error('groupShowMembersChanged subscription error:', err)
+        },
       })
     },
     setupVideoCallCountSubscription() {
