@@ -297,7 +297,9 @@ export default {
     color: $text-color-soft;
   }
 }
-// Category sub-heading spanning the whole width, introducing each row group.
+// Category sub-heading spanning the whole width, introducing each row group. The
+// leading gap separates one group from the previous one, so the very first group
+// (directly under the table head) drops it.
 .config-group-head th {
   padding-top: $space-base;
   color: $text-color-base;
@@ -306,6 +308,9 @@ export default {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   border-bottom: 2px solid $border-color-soft;
+}
+.config-table tbody:first-of-type .config-group-head th {
+  padding-top: calc($space-base / 2);
 }
 .config-row {
   // Reserve the accent gutter on every row so the layout doesn't shift when a row
