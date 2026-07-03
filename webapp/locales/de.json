@@ -835,7 +835,10 @@
     "unmuted": "Gruppe nicht mehr stummgeschaltet",
     "update": "Änderung speichern",
     "updatedGroup": "Die Gruppendaten wurden geändert!",
-    "showMembers": "Mitgliederliste für alle sichtbar"
+    "showMembers": "Mitgliederliste für alle sichtbar",
+    "teaser": {
+      "openGroup": "Gruppe öffnen"
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Suche löschen",

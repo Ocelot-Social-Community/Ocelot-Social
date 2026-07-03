@@ -835,7 +835,10 @@
     "unmuted": "Grupi u çhesht",
     "update": "Ruaj ndryshimin",
     "updatedGroup": "Të dhënat e grupit u ndryshuan.",
-    "showMembers": "Lista e anëtarëve e dukshme për të gjithë"
+    "showMembers": "Lista e anëtarëve e dukshme për të gjithë",
+    "teaser": {
+      "openGroup": "Hap grupin"
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Pastro kërkimin",

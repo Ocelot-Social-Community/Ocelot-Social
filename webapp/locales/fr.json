@@ -835,7 +835,10 @@
     "unmuted": "Groupe réactivé",
     "update": "Enregistrer les modifications",
     "updatedGroup": "Les données du groupe ont été modifiées.",
-    "showMembers": "Liste des membres visible par tous"
+    "showMembers": "Liste des membres visible par tous",
+    "teaser": {
+      "openGroup": "Ouvrir le groupe"
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Réinitialiser la recherche",

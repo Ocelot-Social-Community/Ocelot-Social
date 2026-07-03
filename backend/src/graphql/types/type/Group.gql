@@ -57,6 +57,7 @@ type Group {
   inviteCodes: [InviteCode]! @neo4j_ignore
 
   currentlyPinnedPostsCount: Int! @neo4j_ignore
+  postsCount: Int! @neo4j_ignore
 }
 
 type GroupMember {

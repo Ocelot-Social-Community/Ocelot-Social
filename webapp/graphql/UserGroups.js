@@ -1,9 +1,12 @@
 import gql from 'graphql-tag'
 import { imageUrls } from './fragments/imageUrls'
+import { location } from './fragments/location'
 
-export const profileUserGroupsQuery = () => {
+export const profileUserGroupsQuery = (i18n) => {
+  const lang = i18n ? i18n.locale().toUpperCase() : 'EN'
   return gql`
     ${imageUrls}
+    ${location('Group', lang)}
 
     query ProfileUserGroups($id: ID!, $first: Int, $offset: Int) {
       User(id: $id) {
@@ -12,9 +15,14 @@ export const profileUserGroupsQuery = () => {
           id
           name
           slug
+          about
           groupType
+          actionRadius
+          membersCount
+          postsCount
           myRole
           showOnProfile
+          ...locationOnGroup
           avatar {
             ...imageUrls
           }

@@ -835,7 +835,10 @@
     "unmuted": "Gruppo riattivato",
     "update": "Salva modifiche",
     "updatedGroup": "I dati del gruppo sono stati modificati.",
-    "showMembers": "Elenco membri visibile a tutti"
+    "showMembers": "Elenco membri visibile a tutti",
+    "teaser": {
+      "openGroup": "Apri gruppo"
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Cancella ricerca",

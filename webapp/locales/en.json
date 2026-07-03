@@ -835,7 +835,10 @@
     "unmuted": "Group unmuted",
     "update": "Save change",
     "updatedGroup": "The group data has been changed.",
-    "showMembers": "Member list visible to everyone"
+    "showMembers": "Member list visible to everyone",
+    "teaser": {
+      "openGroup": "Open group"
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Clear search",

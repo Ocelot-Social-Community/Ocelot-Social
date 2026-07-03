@@ -835,7 +835,10 @@
     "unmuted": "Groep niet meer gedempt",
     "update": "Wijziging opslaan",
     "updatedGroup": "De groepsgegevens zijn gewijzigd.",
-    "showMembers": "Ledenlijst zichtbaar voor iedereen"
+    "showMembers": "Ledenlijst zichtbaar voor iedereen",
+    "teaser": {
+      "openGroup": "Groep openen"
+    }
   },
   "hashtags-filter": {
     "clearSearch": "Zoekopdracht wissen",

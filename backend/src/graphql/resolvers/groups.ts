@@ -656,6 +656,19 @@ export default {
         })
       ).records.map((r) => r.get('inviteCodes'))
     },
+    postsCount: async (parent, _args, context: Context, _resolveInfo) => {
+      if (!parent.id) {
+        throw new Error('Can not identify selected Group!')
+      }
+      const result = await context.database.query({
+        query: `
+          MATCH (post:Post)-[:IN]->(:Group {id: $group.id})
+          WHERE NOT post.deleted AND NOT post.disabled
+          RETURN toString(count(post)) as count`,
+        variables: { group: parent },
+      })
+      return result.records[0].get('count')
+    },
     currentlyPinnedPostsCount: async (parent, _args, context: Context, _resolveInfo) => {
       if (!parent.id) {
         throw new Error('Can not identify selected Group!')

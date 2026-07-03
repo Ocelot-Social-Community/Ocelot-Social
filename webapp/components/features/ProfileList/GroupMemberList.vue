@@ -4,21 +4,13 @@
 
     <div class="group-scroll-container" ref="scrollContainer">
       <template v-if="hasGroups">
-        <div v-for="type in groupTypes" :key="type">
-          <template v-if="groupsByType[type] && groupsByType[type].length">
-            <p class="type-label">{{ $t(`profile.groups.${type}`) }}</p>
-            <ul class="group-list">
-              <li v-for="group in groupsByType[type]" :key="group.id" class="group-item">
-                <nuxt-link
-                  class="group-item__link"
-                  :to="{ name: 'groups-id-slug', params: { id: group.id, slug: group.slug } }"
-                >
-                  <profile-avatar :profile="group" size="small" class="group-item__avatar" />
-                  <div class="group-item__info">
-                    <span class="group-item__name">{{ group.name }}</span>
-                    <span class="group-item__slug ds-text-soft">&amp;{{ group.slug }}</span>
-                  </div>
-                </nuxt-link>
+        <div v-for="(type, idx) in typesWithGroups" :key="type">
+          <p class="type-label" :class="{ 'type-label--not-first': idx > 0 }">
+            {{ $t(`profile.groups.${type}`) }}
+          </p>
+          <ul class="group-list">
+            <li v-for="group in groupsByType[type]" :key="group.id" class="group-item">
+                <group-teaser :group="group" class="group-item__teaser" />
                 <button
                   v-if="myProfile"
                   class="group-item__visibility-btn"
@@ -33,7 +25,6 @@
                 </button>
               </li>
             </ul>
-          </template>
         </div>
       </template>
 
@@ -51,7 +42,7 @@
 <script>
 import { OsCard, OsIcon, OsSpinner } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import GroupTeaser from '~/components/GroupTeaser/GroupTeaser'
 import {
   profileUserGroupsQuery,
   setGroupMembershipVisibilityMutation,
@@ -67,7 +58,7 @@ export default {
     OsCard,
     OsIcon,
     OsSpinner,
-    ProfileAvatar,
+    GroupTeaser,
   },
   props: {
     userId: { type: String, required: true },
@@ -124,6 +115,9 @@ export default {
         return acc
       }, {})
     },
+    typesWithGroups() {
+      return GROUP_TYPES.filter((type) => this.groupsByType[type]?.length > 0)
+    },
   },
   methods: {
     async loadGroups(offset) {
@@ -136,7 +130,7 @@ export default {
       }
       try {
         const { data } = await this.$apollo.query({
-          query: profileUserGroupsQuery(),
+          query: profileUserGroupsQuery(this.$i18n),
           variables: { id: this.userId, first: PAGE_SIZE, offset },
           fetchPolicy: 'network-only',
         })
@@ -209,6 +203,10 @@ export default {
     font-size: $font-size-small;
     color: $text-color-soft;
     margin-bottom: $space-xx-small;
+
+    &--not-first {
+      margin-top: $space-small;
+    }
   }
 
   .group-list {
@@ -227,38 +225,9 @@ export default {
       background-color: $background-color-primary-inverse;
     }
 
-    &__link {
-      display: flex;
-      align-items: center;
+    &__teaser {
       flex: 1;
       min-width: 0;
-      color: $text-color-base;
-      text-decoration: none;
-      gap: $space-x-small;
-    }
-
-    &__avatar {
-      flex-shrink: 0;
-    }
-
-    &__info {
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-
-    &__name {
-      font-size: $font-size-base;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    &__slug {
-      font-size: $font-size-small;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     &__visibility-btn {
