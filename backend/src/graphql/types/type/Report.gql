@@ -1,31 +1,42 @@
+"A moderation report about a user, post or comment, aggregating all filings and reviews for that resource."
 type Report {
   id: ID!
   createdAt: String!
   updatedAt: String!
   rule: ReportRule!
+  "Whether the reported resource is currently disabled (hidden)."
   disable: Boolean!
+  "Whether the report has been closed by a moderator."
   closed: Boolean!
+  "All filings submitted against the resource."
   filed: [FILED]!
+  "All moderator reviews of the report."
   reviewed: [REVIEWED]!
   resource: ReportedResource!
 }
 
+"The kind of node a report can target."
 union ReportedResource = User | Post | Comment
 
+"The rule set by which a report's aggregate state is derived."
 enum ReportRule {
   latestReviewUpdatedAtRules
 }
 
 type Query {
+  "List moderation reports for the moderation queue. Requires the `content.moderate` permission."
   reports(
     orderBy: ReportOrdering
     first: Int
     offset: Int
+    "Filter by whether the report has been reviewed."
     reviewed: Boolean
+    "Filter by whether the report is closed."
     closed: Boolean
   ): [Report]
 }
 
+"Ordering options for the reports query."
 enum ReportOrdering {
   createdAt_asc
   createdAt_desc

@@ -199,6 +199,206 @@ describe('admin/policy.vue', () => {
     expect(fetchDefaults).toHaveBeenCalledTimes(2) // failed mount fetch + watcher refetch
   })
 
+  describe('concurrent-edit conflicts', () => {
+    // Drive the page into a conflict on inviteLinkLimit: local edit 7 → 10, then a remote
+    // admin moves the server value to 99 under it. Mirrors roles.spec.js intoConflict().
+    const intoConflict = async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+      await wrapper.find('#policy-inviteLinkLimit').setValue('10')
+      store.commit('policy/SET_SNAP', { ...snapshot, inviteLinkLimit: 99 })
+      await flushPromises()
+      return wrapper
+    }
+
+    it('an untouched field follows a remote change live, with no conflict', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+      // No local edits; a remote admin turns publicRegistration on.
+      store.commit('policy/SET_SNAP', { ...snapshot, publicRegistration: true })
+      await flushPromises()
+      expect(wrapper.find('#policy-publicRegistration').element.checked).toBe(true)
+      expect(wrapper.vm.hasConflict).toBe(false)
+      expect(wrapper.find('[data-test="policy-conflict"]').exists()).toBe(false)
+    })
+
+    it('flags a conflict on a locally-edited field the server also moved, keeping my value', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+      // Local edit: inviteLinkLimit 7 → 10 (unsaved).
+      await wrapper.find('#policy-inviteLinkLimit').setValue('10')
+      // Remote: another admin sets it to 99 AND (untouched here) turns publicRegistration on.
+      store.commit('policy/SET_SNAP', {
+        ...snapshot,
+        inviteLinkLimit: 99,
+        publicRegistration: true,
+      })
+      await flushPromises()
+      // My unsaved value is kept, not clobbered; the field is flagged + highlighted.
+      expect(wrapper.vm.conflict.inviteLinkLimit).toBe(true)
+      expect(wrapper.vm.hasConflict).toBe(true)
+      expect(wrapper.find('#policy-inviteLinkLimit').element.value).toBe('10')
+      expect(wrapper.find('[data-test="policy-conflict"]').exists()).toBe(true)
+      // The incoming server value (99) is surfaced on the row.
+      const note = wrapper.find('[data-test="policy-conflict-inviteLinkLimit"]')
+      expect(note.exists()).toBe(true)
+      expect(note.text()).toContain('99')
+      // The untouched field still followed the server live (no conflict on it).
+      expect(wrapper.find('#policy-publicRegistration').element.checked).toBe(true)
+      expect(wrapper.vm.conflict.publicRegistration).toBeFalsy()
+    })
+
+    it('does not flag a phantom conflict when a checkbox edit converges with the server’s new value', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+      // Local edit: turn publicRegistration on (baseline false → form true).
+      await wrapper.find('#policy-publicRegistration').setChecked(true)
+      // A remote admin independently turns the SAME flag on. For a boolean, a server "move"
+      // from the baseline can only land on the value the local edit already chose, so this
+      // must reconcile silently — not raise a conflict on values that actually agree.
+      store.commit('policy/SET_SNAP', { ...snapshot, publicRegistration: true })
+      await flushPromises()
+      expect(wrapper.vm.conflict.publicRegistration).toBeFalsy()
+      expect(wrapper.vm.hasConflict).toBe(false)
+      expect(wrapper.find('[data-test="policy-conflict"]').exists()).toBe(false)
+      expect(wrapper.find('#policy-publicRegistration').element.checked).toBe(true)
+      // Fully settled: the agreed value became the baseline, so nothing is left to save.
+      expect(wrapper.vm.isDirty).toBe(false)
+    })
+
+    it('loadServerVersion discards local edits and adopts the server value, clearing the banner', async () => {
+      await intoConflict()
+      expect(wrapper.vm.hasConflict).toBe(true)
+      expect(wrapper.find('[data-test="policy-conflict"]').exists()).toBe(true)
+
+      await wrapper.find('[data-test="policy-conflict-load"]').trigger('click')
+      expect(wrapper.vm.hasConflict).toBe(false)
+      // The banner is gone from the DOM (not just the computed), and the per-row note too.
+      expect(wrapper.find('[data-test="policy-conflict"]').exists()).toBe(false)
+      expect(wrapper.find('[data-test="policy-conflict-inviteLinkLimit"]').exists()).toBe(false)
+      expect(wrapper.find('#policy-inviteLinkLimit').element.value).toBe('99')
+    })
+
+    it('dismissConflict hides the banner but keeps my edits (keep editing)', async () => {
+      await intoConflict()
+      expect(wrapper.vm.hasConflict).toBe(true)
+      expect(wrapper.find('[data-test="policy-conflict"]').exists()).toBe(true)
+
+      await wrapper.find('[data-test="policy-conflict-keep"]').trigger('click')
+      expect(wrapper.vm.hasConflict).toBe(false)
+      // The banner is gone from the DOM (not just the computed), but the edit is kept.
+      expect(wrapper.find('[data-test="policy-conflict"]').exists()).toBe(false)
+      expect(wrapper.find('#policy-inviteLinkLimit').element.value).toBe('10')
+    })
+
+    it('does not re-raise a dismissed conflict when an unrelated field later changes', async () => {
+      await intoConflict()
+      expect(wrapper.vm.hasConflict).toBe(true)
+
+      await wrapper.find('[data-test="policy-conflict-keep"]').trigger('click')
+      expect(wrapper.vm.hasConflict).toBe(false)
+
+      // A later UNRELATED remote change (different key) reconciles again; the acknowledged
+      // conflict on inviteLinkLimit must not re-pop, and its draft value stays.
+      store.commit('policy/SET_SNAP', {
+        ...snapshot,
+        inviteLinkLimit: 99,
+        publicRegistration: true,
+      })
+      await flushPromises()
+      expect(wrapper.vm.conflict.inviteLinkLimit).toBeFalsy()
+      expect(wrapper.find('#policy-inviteLinkLimit').element.value).toBe('10')
+      // The unrelated field still followed the server live.
+      expect(wrapper.find('#policy-publicRegistration').element.checked).toBe(true)
+    })
+
+    it('re-raises the conflict when the server moves the same key again after a dismiss', async () => {
+      await intoConflict()
+      await wrapper.find('[data-test="policy-conflict-keep"]').trigger('click')
+      expect(wrapper.vm.hasConflict).toBe(false)
+
+      // A genuinely NEW remote move on the SAME key (99 → 42) raises the conflict anew.
+      store.commit('policy/SET_SNAP', { ...snapshot, inviteLinkLimit: 42 })
+      await flushPromises()
+      expect(wrapper.vm.conflict.inviteLinkLimit).toBe(true)
+      expect(wrapper.find('[data-test="policy-conflict"]').exists()).toBe(true)
+      // My unsaved value is still kept, and the note surfaces the NEW server value.
+      expect(wrapper.find('#policy-inviteLinkLimit').element.value).toBe('10')
+      expect(wrapper.find('[data-test="policy-conflict-inviteLinkLimit"]').text()).toContain('42')
+    })
+
+    it('clears the conflict when the server reverts to the baseline (change undone), without a click', async () => {
+      await intoConflict()
+      expect(wrapper.vm.hasConflict).toBe(true)
+
+      // The other admin's change is undone: the server bounces back to the original baseline
+      // value (7). No divergence from the baseline remains, so the banner must clear on its
+      // own — it is now just an ordinary unsaved edit (10 vs 7), not a conflict.
+      store.commit('policy/SET_SNAP', { ...snapshot, inviteLinkLimit: 7 })
+      await flushPromises()
+      expect(wrapper.vm.conflict.inviteLinkLimit).toBeFalsy()
+      expect(wrapper.vm.hasConflict).toBe(false)
+      expect(wrapper.find('[data-test="policy-conflict"]').exists()).toBe(false)
+      // My unsaved edit survives, and it is still dirty (10 ≠ server 7) so Save stays enabled.
+      expect(wrapper.find('#policy-inviteLinkLimit').element.value).toBe('10')
+      expect(wrapper.vm.isDirty).toBe(true)
+    })
+
+    it('rolls back the baseline when a save fails, so a later snapshot update cannot clobber the unsaved input', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+      // Local edit on a number field (7 → 10, unsaved).
+      await wrapper.find('#policy-inviteLinkLimit').setValue('10')
+      // The write fails.
+      setKey.mockRejectedValueOnce(new Error('network'))
+      await wrapper.find('form').trigger('submit')
+      await flushPromises()
+      expect(mocks.$toast.error).toHaveBeenCalled()
+
+      // A later UNRELATED remote change reconciles the form. Because the failed key's baseline
+      // was rolled back, the field is still treated as locally edited — its value survives
+      // instead of being silently reset to the (still 7) server value.
+      store.commit('policy/SET_SNAP', { ...snapshot, publicRegistration: true })
+      await flushPromises()
+      expect(wrapper.find('#policy-inviteLinkLimit').element.value).toBe('10')
+      expect(wrapper.find('#policy-publicRegistration').element.checked).toBe(true) // unrelated followed
+    })
+
+    it('does not raise a false conflict when the server echo lands while the own save is still in flight', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+
+      // Hold the write open so the snapshot echo can arrive WHILE the save is still pending
+      // — the real race. (If the baseline were advanced only AFTER the await, the reconcile
+      // during this window would see form≠baseline & snapshot≠baseline and cry conflict.)
+      let resolveSetKey
+      setKey.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolveSetKey = resolve
+          }),
+      )
+
+      await wrapper.find('#policy-publicRegistration').setChecked(true)
+      wrapper.find('form').trigger('submit') // do NOT await — the save is now in flight
+      await wrapper.vm.$nextTick()
+
+      // The backend broadcasts our own write back before setKey resolves.
+      store.commit('policy/SET_SNAP', { ...snapshot, publicRegistration: true })
+      await flushPromises()
+
+      // No false conflict during the in-flight window (baseline advanced before the await).
+      expect(wrapper.vm.hasConflict).toBe(false)
+      expect(wrapper.find('[data-test="policy-conflict"]').exists()).toBe(false)
+
+      // And still consistent once the write completes.
+      resolveSetKey()
+      await flushPromises()
+      expect(wrapper.vm.hasConflict).toBe(false)
+      expect(wrapper.find('#policy-publicRegistration').element.checked).toBe(true)
+    })
+  })
+
   // Vuex calls an action as (context, payload), so the asserted call has the
   // store context as the first arg and the component's payload as the second.
   describe('write path', () => {

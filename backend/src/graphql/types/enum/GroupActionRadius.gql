@@ -1,7 +1,9 @@
+"The geographic reach a group intends its activities to have."
 enum GroupActionRadius {
   regional
   national
   continental
   global
+  "Tongue-in-cheek maximum reach: beyond planet Earth."
   interplanetary
 }

@@ -11,6 +11,8 @@
 
 import Factory, { cleanDatabase } from '@db/factories'
 import review from '@graphql/queries/moderation/review.gql'
+import DELETE_USER from '@graphql/queries/users/DeleteUser.gql'
+import DISABLE_USER from '@graphql/queries/users/disableUser.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
@@ -22,13 +24,6 @@ let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
 const contextFn = () => ({ authenticatedUser })
-
-const DISABLE_USER = `mutation ($id: ID!, $disable: Boolean!) {
-  disableUser(id: $id, disable: $disable) { id disabled }
-}`
-const DELETE_USER = `mutation ($id: ID!, $resource: [Deletable]) {
-  DeleteUser(id: $id, resource: $resource) { id deleted }
-}`
 
 const buildUser = (id: string, role: string) =>
   Factory.build('user', { id, name: id, role }, { email: `${id}@example.org`, password: '1234' })

@@ -139,6 +139,12 @@
       "name": "Strony"
     },
     "policy": {
+      "conflict": {
+        "keep": "Kontynuuj edycję",
+        "load": "Wczytaj nową wersję",
+        "message": "Ustawienie zostało zmienione w innym miejscu podczas edycji. Twoje niezapisane zmiany zostały zachowane — sprawdź wyróżnione ustawienia.",
+        "serverValue": "serwer teraz: {value}"
+      },
       "defaultValue": "domyślnie: {value}",
       "description": "Konfiguracja czasu wykonywania. Zmiany są stosowane natychmiast dla wszystkich połączonych klientów.",
       "descriptions": {
@@ -200,6 +206,11 @@
       "allPermissions": "Posiada wszystkie uprawnienia (chroniona).",
       "cannotDelete": "Tej roli nie można usunąć.",
       "cannotDeleteHasMembers": "Ta rola ma jeszcze członków — najpierw przypisz im inną rolę.",
+      "conflict": {
+        "keep": "Kontynuuj edycję",
+        "load": "Wczytaj nową wersję",
+        "message": "Ta rola została zmieniona w innym miejscu podczas edycji. Twoje niezapisane zmiany zostały zachowane — sprawdź wyróżnione uprawnienia."
+      },
       "create": "Utwórz rolę",
       "createTitle": "Utwórz nową rolę",
       "delete": "Usuń",
@@ -244,6 +255,10 @@
       "permUnavailable": "Funkcja nieskonfigurowana — przyznanie tego uprawnienia nie ma efektu.",
       "protected": "chroniona",
       "protectedHint": "Rola właściciela ma wszystkie uprawnienia i nie można jej edytować.",
+      "rename": "Zmień nazwę roli",
+      "renameError": "Nie można zmienić nazwy roli: {message}",
+      "renameSuccess": "Nazwa roli zmieniona.",
+      "roleLabel": "Rola",
       "save": "Zapisz",
       "saveError": "Nie można zapisać roli: {message}",
       "saveSuccess": "Rola zapisana.",

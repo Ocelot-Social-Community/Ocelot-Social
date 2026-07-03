@@ -1,5 +1,9 @@
+"Determines a group's discoverability and how users become members."
 enum GroupType {
+  "Anyone can find the group and join without approval."
   public
+  "Anyone can find the group, but joining requires approval by a group admin/owner."
   closed
+  "The group is unlisted; it can only be found and joined via invite."
   hidden
 }

@@ -1,6 +1,11 @@
+"A user's role within a group, in ascending order of privilege."
 enum GroupMemberRole {
+  "Membership requested but not yet approved (closed groups); not counted as a member."
   pending
+  "Regular member."
   usual
+  "Can manage members and group settings."
   admin
+  "Full control over the group, including deleting it; there is exactly one owner."
   owner
 }

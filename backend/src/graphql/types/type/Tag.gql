@@ -15,10 +15,13 @@ input _TagFilter {
   taggedPosts_every: _PostFilter
 }
 
+"A free-form hashtag. The tag's text is its id. Tags are created implicitly from post content (unlike the curated Category taxonomy)."
 type Tag {
   id: ID!
   taggedPosts: [Post]! @relation(name: "TAGGED", direction: "IN")
+  "Total number of posts carrying this tag."
   taggedCount: Int! @cypher(statement: "MATCH (this)<-[:TAGGED]-(p) RETURN COUNT(DISTINCT p)")
+  "Number of distinct authors who have used this tag."
   taggedCountUnique: Int!
     @cypher(statement: "MATCH (this)<-[:TAGGED]-(p)<-[:WROTE]-(u:User) RETURN COUNT(DISTINCT u)")
   deleted: Boolean
@@ -35,5 +38,6 @@ enum _TagOrdering {
 }
 
 type Query {
+  "List hashtags, e.g. for a trending-tags widget. Public."
   Tag(id: ID, first: Int, offset: Int, orderBy: [_TagOrdering], filter: _TagFilter): [Tag]
 }

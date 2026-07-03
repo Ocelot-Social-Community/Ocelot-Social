@@ -13,14 +13,21 @@ import type { RoleDefinition } from '@src/role'
 // Notify connected clients that effective permissions may have changed so they refetch
 // their own (the permissionsChanged subscription). Fire-and-forget: the mutation has
 // already committed; a pubsub hiccup must not fail it.
-export const publishPermissionsChanged = (context: Context, roleName: string | null): void => {
+export const publishPermissionsChanged = (
+  context: Context,
+  roleName: string | null,
+  // Set only for a rename: the role's former name, so a client whose admin roles view
+  // has this role selected can follow the selection to the new name (and patch its
+  // roles-query cache) instead of losing it on the refetch.
+  previousRoleName: string | null = null,
+): void => {
   // publish() may throw SYNCHRONOUSLY or reject ASYNCHRONOUSLY (its type is
   // void | Promise<void>), so guard BOTH: a bare Promise.resolve(publish()).catch()
   // would let a synchronous throw escape and crash the already-committed mutation.
   // Mirrors RoleService.publishChange / PolicyService.publishChange.
   try {
     const result = context.pubsub.publish(PERMISSIONS_CHANGED_CHANNEL, {
-      permissionsChanged: { roleName },
+      permissionsChanged: { roleName, previousRoleName },
     })
     void Promise.resolve(result).catch(() => {
       /* best-effort broadcast (async rejection) */
@@ -34,6 +41,14 @@ export const publishPermissionsChanged = (context: Context, roleName: string | n
 // Role name format: lowercase-ish slug, used as the node key and as a policy
 // audience. Kept conservative so names stay safe identifiers.
 const ROLE_NAME_RE = /^[a-z0-9][a-z0-9_-]{1,49}$/i
+
+// A Neo4j uniqueness-constraint violation on Role.id. Reachable only via renameRole's
+// `SET r.id` losing a race to a concurrent rename (createRole/updateRole MERGE, so they
+// never trip it). Detected by the driver error code — same guard the other resolvers use.
+const isRoleNameConflict = (err: unknown): boolean =>
+  err instanceof Error &&
+  'code' in err &&
+  err.code === 'Neo.ClientError.Schema.ConstraintValidationFailed'
 
 const toGraphqlRole = (def: RoleDefinition, memberCount: number | null = null) => ({
   name: def.name,
@@ -169,6 +184,37 @@ export default {
       }
     },
 
+    renameRole: async (
+      _parent: unknown,
+      { name, newName }: { name: string; newName: string },
+      context: Context,
+    ) => {
+      if (!ROLE_NAME_RE.test(newName)) {
+        throw new UserInputError('Invalid role name.')
+      }
+      if (!context.role.getRole(name)) {
+        throw new UserInputError(`Unknown role: ${name}`)
+      }
+      if (name !== newName && context.role.getRole(newName)) {
+        throw new UserInputError(`Role '${newName}' already exists.`)
+      }
+      try {
+        const def = await context.role.renameRole(name, newName, context.user?.id ?? 'unknown')
+        // The role's identity changed → every holder's roleName changed and any open
+        // admin roles view must refetch. Broadcast the new name AND the old one, so a
+        // viewer with this role selected can follow it to its new name.
+        publishPermissionsChanged(context, def.name, name)
+        return toGraphqlRole(def, await countMembers(context, def.name))
+      } catch (err) {
+        if (err instanceof RoleValidationError) throw new ForbiddenError(err.message)
+        // Lost the uniqueness-constraint race on Role.id: a concurrent rename claimed
+        // `newName` between our getRole(newName) snapshot and the write. Surface the same
+        // stable conflict as the pre-check, not a raw driver error.
+        if (isRoleNameConflict(err)) throw new UserInputError(`Role '${newName}' already exists.`)
+        throw err
+      }
+    },
+
     deleteRole: async (_parent: unknown, { name }: { name: string }, context: Context) => {
       try {
         await context.role.deleteRole(name, context.user?.id ?? 'unknown')
@@ -238,8 +284,9 @@ export default {
       // No per-viewer filter — the payload reveals only the affected role name.
       subscribe: (_parent: unknown, _args: unknown, { pubsub }: Context) =>
         pubsub.asyncIterator(PERMISSIONS_CHANGED_CHANNEL),
-      resolve: (payload: { permissionsChanged: { roleName: string | null } }) =>
-        payload.permissionsChanged,
+      resolve: (payload: {
+        permissionsChanged: { roleName: string | null; previousRoleName?: string | null }
+      }) => payload.permissionsChanged,
     },
   },
 

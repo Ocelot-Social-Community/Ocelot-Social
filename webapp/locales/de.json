@@ -139,6 +139,12 @@
       "name": "Seiten"
     },
     "policy": {
+      "conflict": {
+        "keep": "Weiter bearbeiten",
+        "load": "Neue Version laden",
+        "message": "Eine Einstellung wurde an anderer Stelle geändert, während du sie bearbeitet hast. Deine ungespeicherten Änderungen bleiben erhalten — prüfe die hervorgehobenen Einstellungen.",
+        "serverValue": "Server jetzt: {value}"
+      },
       "defaultValue": "Standard: {value}",
       "description": "Laufzeit-Konfiguration. Änderungen wirken sofort für alle verbundenen Clients.",
       "descriptions": {
@@ -200,6 +206,11 @@
       "allPermissions": "Hält alle Berechtigungen (geschützt).",
       "cannotDelete": "Diese Rolle kann nicht gelöscht werden.",
       "cannotDeleteHasMembers": "Diese Rolle hat noch Mitglieder — weise ihnen erst eine andere Rolle zu.",
+      "conflict": {
+        "keep": "Weiter bearbeiten",
+        "load": "Neue Version laden",
+        "message": "Diese Rolle wurde an anderer Stelle geändert, während du sie bearbeitet hast. Deine ungespeicherten Änderungen bleiben erhalten — prüfe die hervorgehobenen Berechtigungen."
+      },
       "create": "Rolle erstellen",
       "createTitle": "Neue Rolle erstellen",
       "delete": "Löschen",
@@ -244,6 +255,10 @@
       "permUnavailable": "Funktion nicht konfiguriert – das Recht hat keine Wirkung.",
       "protected": "geschützt",
       "protectedHint": "Die Owner-Rolle hält alle Berechtigungen und kann nicht bearbeitet werden.",
+      "rename": "Rolle umbenennen",
+      "renameError": "Rolle konnte nicht umbenannt werden: {message}",
+      "renameSuccess": "Rolle umbenannt.",
+      "roleLabel": "Rolle",
       "save": "Speichern",
       "saveError": "Rolle konnte nicht gespeichert werden: {message}",
       "saveSuccess": "Rolle gespeichert.",

@@ -95,6 +95,24 @@ describe('RoleService', () => {
       })
       expect(svc.getRole(MODERATOR_ROLE)).toBeUndefined()
     })
+
+    it('migrates the cache key on a rename event (drops the previous name), sanitising permissions', () => {
+      const svc = createInMemoryRoleService(DEFAULT_ROLES)
+      svc.applyExternalChange({
+        name: 'staff',
+        previousName: MODERATOR_ROLE,
+        definition: {
+          name: 'staff',
+          protected: false,
+          // A catalog-drift key must be filtered out on the rename path too.
+          permissions: ['content.moderate', 'ghost.permission'] as never,
+        },
+        actor: 'u1',
+        timestamp: 't',
+      })
+      expect(svc.getRole(MODERATOR_ROLE)).toBeUndefined()
+      expect(svc.getRole('staff')?.permissions).toEqual(['content.moderate'])
+    })
   })
 
   describe('upsert / delete guards (throw before any DB access)', () => {
@@ -124,6 +142,30 @@ describe('RoleService', () => {
 
     it('refuses to delete an unknown role', async () => {
       await expect(svc.deleteRole('nope', 'u1')).rejects.toBeInstanceOf(RoleValidationError)
+    })
+
+    it('refuses to rename a protected role', async () => {
+      await expect(svc.renameRole(OWNER_ROLE, 'boss', 'u1')).rejects.toBeInstanceOf(
+        RoleValidationError,
+      )
+    })
+
+    it('refuses to rename a mandatory role (the baseline user role)', async () => {
+      await expect(svc.renameRole(USER_ROLE, 'member', 'u1')).rejects.toBeInstanceOf(
+        RoleValidationError,
+      )
+    })
+
+    it('refuses to rename an unknown role', async () => {
+      await expect(svc.renameRole('nope', 'whatever', 'u1')).rejects.toBeInstanceOf(
+        RoleValidationError,
+      )
+    })
+
+    it('refuses to rename onto an existing role name', async () => {
+      await expect(svc.renameRole(MODERATOR_ROLE, ADMIN_ROLE, 'u1')).rejects.toBeInstanceOf(
+        RoleValidationError,
+      )
     })
   })
 
@@ -196,6 +238,33 @@ describe('RoleService', () => {
       expect(svc.getRole('temp')).toBeUndefined()
       const event = published[published.length - 1]?.payload.roleChanged
       expect(event).toMatchObject({ name: 'temp', definition: null, actor: 'admin-1' })
+    })
+
+    it('renames a role: migrates the cache key, persists, and broadcasts previousName', async () => {
+      const { svc, writes, published, fakePubsub } = makeService()
+      await svc.init(fakePubsub)
+      await svc.upsertRole({ name: 'temp', protected: false, permissions: ['badge.manage'] }, 'a-1')
+
+      const renamed = await svc.renameRole('temp', 'badge-setter', 'a-1')
+
+      expect(renamed).toMatchObject({ name: 'badge-setter', permissions: ['badge.manage'] })
+      // Cache key migrated, permissions preserved.
+      expect(svc.getRole('temp')).toBeUndefined()
+      expect(svc.getRole('badge-setter')?.permissions).toEqual(['badge.manage'])
+      // Persisted as a rename (old → new), not a create.
+      expect(writes[writes.length - 1]?.variables).toMatchObject({
+        oldName: 'temp',
+        newName: 'badge-setter',
+        actor: 'a-1',
+      })
+      // Broadcast carries the previous name so peers drop the stale key.
+      const event = published[published.length - 1]?.payload.roleChanged
+      expect(event).toMatchObject({
+        name: 'badge-setter',
+        previousName: 'temp',
+        actor: 'a-1',
+      })
+      expect(event?.definition?.permissions).toEqual(['badge.manage'])
     })
 
     it('refuses to start (boot invariant) when a mandatory role is missing after seeding', async () => {

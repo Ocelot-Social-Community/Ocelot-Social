@@ -1,5 +1,9 @@
+"The category a set of email-notification toggles belongs to."
 enum EmailNotificationSettingsType {
+  "Notifications about posts and comments."
   post
+  "Notifications about direct chat messages."
   chat
+  "Notifications about group membership events."
   group
 }

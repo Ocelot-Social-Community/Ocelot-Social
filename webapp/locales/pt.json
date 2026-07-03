@@ -139,6 +139,12 @@
       "name": "Páginas"
     },
     "policy": {
+      "conflict": {
+        "keep": "Continuar a editar",
+        "load": "Carregar a nova versão",
+        "message": "Uma definição foi alterada noutro local enquanto a editava. As suas alterações não guardadas são mantidas — reveja as definições destacadas.",
+        "serverValue": "servidor agora: {value}"
+      },
       "defaultValue": "padrão: {value}",
       "description": "Configuração em tempo de execução. As alterações são aplicadas imediatamente a todos os clientes conectados.",
       "descriptions": {
@@ -200,6 +206,11 @@
       "allPermissions": "Detém todas as permissões (protegida).",
       "cannotDelete": "Esta função não pode ser excluída.",
       "cannotDeleteHasMembers": "Esta função ainda tem membros — reatribua-os antes de a eliminar.",
+      "conflict": {
+        "keep": "Continuar a editar",
+        "load": "Carregar a nova versão",
+        "message": "Esta função foi alterada noutro local enquanto a editava. As suas alterações não guardadas são mantidas — reveja as permissões destacadas."
+      },
       "create": "Criar função",
       "createTitle": "Criar uma nova função",
       "delete": "Eliminar",
@@ -244,6 +255,10 @@
       "permUnavailable": "Recurso não configurado — conceder esta permissão não tem efeito.",
       "protected": "protegida",
       "protectedHint": "A função de proprietário detém todas as permissões e não pode ser editada.",
+      "rename": "Renomear função",
+      "renameError": "Não foi possível renomear a função: {message}",
+      "renameSuccess": "Função renomeada.",
+      "roleLabel": "Função",
       "save": "Guardar",
       "saveError": "Não foi possível guardar a função: {message}",
       "saveSuccess": "Função guardada.",

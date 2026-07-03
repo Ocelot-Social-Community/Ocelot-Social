@@ -1,3 +1,4 @@
+"The kind of node that can be shouted (endorsed/boosted)."
 enum ShoutTypeEnum {
   Post
   Comment

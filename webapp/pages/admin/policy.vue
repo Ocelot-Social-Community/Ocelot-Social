@@ -11,6 +11,32 @@
       }}
     </p>
 
+    <!-- Concurrent-edit conflict: a setting changed on the server while this admin has
+         unsaved edits. The draft is kept (their work is never silently lost); the diverged
+         rows are highlighted with the incoming server value. Load = discard mine, take the
+         server's; Keep = keep editing (my save will overwrite). -->
+    <div v-if="hasConflict" class="policy-conflict" role="alert" data-test="policy-conflict">
+      <span class="policy-conflict__text">{{ $t('admin.policy.conflict.message') }}</span>
+      <span class="policy-conflict__actions">
+        <os-button
+          variant="primary"
+          appearance="filled"
+          data-test="policy-conflict-load"
+          @click="loadServerVersion"
+        >
+          {{ $t('admin.policy.conflict.load') }}
+        </os-button>
+        <os-button
+          variant="primary"
+          appearance="ghost"
+          data-test="policy-conflict-keep"
+          @click="dismissConflict"
+        >
+          {{ $t('admin.policy.conflict.keep') }}
+        </os-button>
+      </span>
+    </div>
+
     <form @submit.prevent="save" novalidate>
       <fieldset
         v-for="group in groups"
@@ -22,7 +48,12 @@
           {{ $t(`admin.policy.groups.${group.id}.title`) }}
         </legend>
 
-        <div v-for="key in group.keys" :key="key" class="policy-row">
+        <div
+          v-for="key in group.keys"
+          :key="key"
+          class="policy-row"
+          :class="{ 'policy-row--conflict': conflict[key] }"
+        >
           <input
             v-if="isNumberKey(key)"
             :id="`policy-${key}`"
@@ -54,6 +85,13 @@
             </span>
             <span class="policy-row__description">
               {{ $t(`admin.policy.descriptions.${key}`) }}
+            </span>
+            <span
+              v-if="conflict[key]"
+              class="policy-row__conflict"
+              :data-test="`policy-conflict-${key}`"
+            >
+              {{ $t('admin.policy.conflict.serverValue', { value: String(snapshot[key]) }) }}
             </span>
           </label>
         </div>
@@ -156,9 +194,17 @@ export default {
         showContentFilterMasonryGrid: false,
         showGroupButtonInHeader: false,
       },
+      // Snapshot value each form field was last synced from. Lets a live snapshot change
+      // tell an untouched field (follow it live) from a locally-edited one (guard it, and
+      // flag a conflict if the server moved it too).
+      baseline: {},
+      // Per-key concurrent-edit conflicts: a field this admin edited was ALSO changed on the
+      // server. Cleared by resolving/dismissing the banner; re-raised by the next remote move.
+      conflict: {},
       saving: false,
       // Becomes true after the initial mount fetch so the snapshot watcher only
-      // refetches the last-change info for *subsequent* (e.g. remote) changes.
+      // reconciles (and refetches the last-change info) for *subsequent* (e.g. remote)
+      // changes — the initial snapshot population is handled by the explicit mount sync.
       loaded: false,
     }
   },
@@ -175,6 +221,10 @@ export default {
     isDirty() {
       return this.keys.some((k) => this.form[k] !== this.snapshot[k])
     },
+    // Any field this admin edited that the server also moved underneath.
+    hasConflict() {
+      return this.keys.some((k) => this.conflict[k])
+    },
   },
   methods: {
     ...mapActions({
@@ -190,10 +240,61 @@ export default {
     isNumberKey(key) {
       return this.numberKeys.includes(key)
     },
+    // Hard sync: adopt the whole server snapshot, reset the baseline to it, and clear all
+    // conflicts. Used on mount, reset-to-default, and "load new version" (discard my edits).
     syncFormFromSnapshot() {
+      const baseline = {}
       this.keys.forEach((k) => {
         this.form[k] = this.snapshot[k]
+        baseline[k] = this.snapshot[k]
       })
+      this.baseline = baseline
+      this.conflict = {}
+    },
+    // Soft sync on a live snapshot change: per key, an untouched field follows the server
+    // (reactive), while a field this admin edited is guarded — and, if the server moved it
+    // too, marked as a conflict (keep my value, surface it) instead of being clobbered.
+    reconcileWithSnapshot() {
+      const conflict = { ...this.conflict }
+      this.keys.forEach((k) => {
+        const locallyEdited = this.form[k] !== this.baseline[k]
+        const serverMoved = this.snapshot[k] !== this.baseline[k]
+        if (!locallyEdited) {
+          // untouched → follow the server live.
+          this.form[k] = this.snapshot[k]
+          this.baseline[k] = this.snapshot[k]
+          conflict[k] = false
+        } else if (serverMoved && this.form[k] !== this.snapshot[k]) {
+          // edited here AND the server moved it to a DIFFERENT value → real conflict.
+          conflict[k] = true
+        } else if (serverMoved) {
+          // edited here but the server moved to the SAME value we chose (for a boolean the
+          // only possible move) → no real contradiction; adopt it as the baseline so the
+          // field settles (not dirty, no banner) rather than flagging a phantom conflict.
+          this.baseline[k] = this.snapshot[k]
+          conflict[k] = false
+        } else {
+          // edited here, server still at (or reverted back to) our baseline → just an
+          // ordinary unsaved edit, not a conflict. Clear any stale banner, e.g. after a
+          // remote change was undone (server bounced away from and back to the baseline).
+          conflict[k] = false
+        }
+      })
+      this.conflict = conflict
+    },
+    // Resolve a conflict by discarding local edits and adopting the server snapshot.
+    loadServerVersion() {
+      this.syncFormFromSnapshot()
+    },
+    // Keep editing (keep mine): hide the banner but preserve the draft values. Advance the
+    // baseline of the conflicted keys to the acknowledged server value so a later unrelated
+    // reconcile does not re-pop the banner; only a genuinely NEW move on a key raises it
+    // again. The eventual save overwrites the server value.
+    dismissConflict() {
+      this.keys.forEach((k) => {
+        if (this.conflict[k]) this.baseline[k] = this.snapshot[k]
+      })
+      this.conflict = {}
     },
     async save() {
       this.saving = true
@@ -201,8 +302,23 @@ export default {
         const changes = this.keys
           .filter((k) => this.form[k] !== this.snapshot[k])
           .map((key) => ({ key, value: this.form[key] }))
-        for (const change of changes) {
-          await this.setKey(change)
+        for (const { key, value } of changes) {
+          // Advance THIS key's baseline right before its write, so the server echo of a
+          // SUCCESSFUL write — which can arrive while setKey is still pending — reconciles
+          // cleanly instead of looking like a remote conflict.
+          const previousBaseline = this.baseline[key]
+          this.baseline[key] = value
+          try {
+            await this.setKey({ key, value })
+          } catch (err) {
+            // The write did not persist: roll this key's baseline back, else a later snapshot
+            // update would mistake the unsaved local value for the baseline and silently
+            // overwrite the input. Already-persisted keys keep their advanced baseline.
+            this.baseline[key] = previousBaseline
+            throw err
+          }
+          // Persisted → this key is the server's value now, so it is no longer in conflict.
+          this.$set(this.conflict, key, false)
         }
         this.$toast.success(this.$t('admin.policy.saveSuccess'))
       } catch (err) {
@@ -229,14 +345,19 @@ export default {
   watch: {
     snapshot: {
       handler() {
-        this.syncFormFromSnapshot()
-        // After the initial load, a snapshot change means someone (possibly a
-        // remote admin, via the subscription) changed a policy. The broadcast
-        // carries no actor/timestamp (Datensparsamkeit), so refetch the admin
-        // bundle to keep the "last changed by … at …" line correct. Cheap and
-        // page-scoped: only runs while this admin page is open. Fault-tolerant:
-        // a failed refresh just leaves the last-changed line stale, never throws.
-        if (this.loaded) this.fetchDefaults().catch(() => undefined)
+        // The initial snapshot population (during mount) is handled by the explicit
+        // syncFormFromSnapshot() in mounted(); ignore it here so an unset baseline is not
+        // mistaken for a pile of local edits.
+        if (!this.loaded) return
+        // A snapshot change after load means someone (possibly a remote admin, via the
+        // subscription) changed a policy. Reconcile per key: untouched fields follow it
+        // live, edited fields are guarded and flagged as conflicts if the server moved them.
+        this.reconcileWithSnapshot()
+        // The broadcast carries no actor/timestamp (Datensparsamkeit), so refetch the admin
+        // bundle to keep the "last changed by … at …" line correct. Cheap and page-scoped:
+        // only runs while this admin page is open. Fault-tolerant: a failed refresh just
+        // leaves the last-changed line stale, never throws.
+        this.fetchDefaults().catch(() => undefined)
       },
       deep: true,
     },
@@ -295,12 +416,42 @@ form {
     text-transform: uppercase;
   }
 }
+// Concurrent-edit conflict banner: a remote change landed under this admin's edit.
+.policy-conflict {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-x-small;
+  margin-top: $space-small;
+  padding: $space-x-small $space-small;
+  border-radius: $border-radius-base;
+  border-left: 3px solid $color-warning;
+  background: rgba($color-warning, 0.14);
+  font-size: 0.9em;
+
+  &__text {
+    flex: 1 1 16rem;
+  }
+  &__actions {
+    display: inline-flex;
+    gap: $space-x-small;
+  }
+}
 .policy-row {
   display: flex;
   align-items: flex-start;
   gap: $space-x-small;
   margin: $space-xx-small 0;
   line-height: 1.3;
+  border-left: 3px solid transparent;
+  padding-left: $space-xx-small;
+
+  // This field was edited locally AND changed on the server → highlight it.
+  &--conflict {
+    border-left-color: $color-warning;
+    background: rgba($color-warning, 0.1);
+  }
 
   &__checkbox {
     margin-top: 0.15em;
@@ -330,6 +481,12 @@ form {
     color: $text-color-soft;
     font-size: 0.85em;
     line-height: 1.25;
+  }
+  &__conflict {
+    margin-top: 0.15em;
+    color: $color-warning-active;
+    font-size: 0.8em;
+    font-weight: 600;
   }
 }
 .actions {

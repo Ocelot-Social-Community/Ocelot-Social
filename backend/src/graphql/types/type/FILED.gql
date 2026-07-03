@@ -1,22 +1,34 @@
+"Relationship recording that a user filed a moderation report against a resource, with the stated reason."
 type FILED {
   createdAt: String!
   reasonCategory: ReasonCategory!
+  "Free-text explanation the reporter provided."
   reasonDescription: String!
+  "The user who filed the report."
   submitter: User
 }
 
-"this list equals the strings of an array in file `webapp/constants/modals.js`"
+"Reason a report was filed. This list equals the strings of an array in file `webapp/constants/modals.js`."
 enum ReasonCategory {
+  "None of the listed categories fits."
   other
+  "Discrimination, racism, sexism and the like."
   discrimination_etc
+  "Pornographic content or links to it."
   pornographic_content_links
+  "Glorification or trivialisation of cruel or inhuman acts."
   glorific_trivia_of_cruel_inhuman_acts
+  "Publishing private/identifying information (doxing)."
   doxing
+  "Intentional intimidation, stalking or persecution."
   intentional_intimidation_stalking_persecution
+  "Unsolicited advertising of products, services or commercial offers."
   advert_products_services_commercial
+  "Criminal behaviour or violation of (German) law."
   criminal_behavior_violation_german_law
 }
 
+"The result of filing a report, echoing the reason and linking to the created report."
 type FiledReport {
   createdAt: String!
   reasonCategory: ReasonCategory!
@@ -26,6 +38,7 @@ type FiledReport {
 }
 
 type Mutation {
+  "File a moderation report against a user, post or comment. Requires authentication."
   fileReport(
     resourceId: ID!
     reasonCategory: ReasonCategory!

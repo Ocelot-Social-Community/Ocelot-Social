@@ -2,6 +2,7 @@
 # is code-owned (keys are dotted/namespaced → String, not an enum); roles are
 # runtime data managed here. See docu/roles-permissions-concept.md.
 
+"A single entry in the permission catalog: a grantable right and its metadata."
 type Permission {
   key: String!
   group: String!
@@ -18,10 +19,14 @@ type EffectivePermission {
   group: String!
 }
 
+"A named bundle of permissions that can be assigned to users."
 type Role {
   name: String!
+  "Whether the role is a protected built-in that cannot be deleted."
   protected: Boolean!
+  "The permission keys granted by this role."
   permissions: [String!]!
+  "Number of users currently assigned this role."
   memberCount: Int
 }
 
@@ -37,17 +42,23 @@ type Query {
 }
 
 type Mutation {
+  "Create a new role with the given permission bundle. Requires the `role.manage` permission."
   createRole(name: String!, permissions: [String!]!): Role!
+  "Replace an existing role's permission bundle. Requires the `role.manage` permission."
   updateRole(name: String!, permissions: [String!]!): Role!
-  "Delete a role. Returns the deleted role's name (the input name echoed back on success)."
+  "Rename a role, keeping its permission bundle and all its members (its HAS_ROLE edges are preserved). The mandatory owner and user roles cannot be renamed. Requires the `role.manage` permission."
+  renameRole(name: String!, newName: String!): Role!
+  "Delete a role. Returns the deleted role's name (the input name echoed back on success). Requires the `role.manage` permission."
   deleteRole(name: String!): String!
-  "Set a user's single role (replaces their current role)."
+  "Set a user's single role (replaces their current role). Requires the `role.manage` permission."
   setUserRole(userId: ID!, roleName: String!): User!
 }
 
 "A signal that effective permissions may have changed (a role's permission set, or a user's role assignment). Clients refetch their own myPermissions on receipt — the payload carries only the affected role name, no actor (Datensparsamkeit)."
 type PermissionsChanged {
   roleName: String
+  "Set only for a rename: the role's former name, so an admin roles view with this role selected can follow the selection to its new name."
+  previousRoleName: String
 }
 
 type Subscription {

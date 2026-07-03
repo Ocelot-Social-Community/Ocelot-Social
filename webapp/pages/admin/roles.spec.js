@@ -171,6 +171,184 @@ describe('admin/roles.vue', () => {
     expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(false)
   })
 
+  it('refreshes an untouched draft to the new server set on a live refetch (reactive checkboxes)', async () => {
+    // Regression: another admin changes a role while this admin views it. The refetch moves
+    // role.permissions; an untouched draft must adopt the new set (checkboxes update without
+    // a reload). The bug preserved the stale draft because the changed server set alone
+    // looked "dirty".
+    const wrapper = Wrapper()
+    wrapper.vm.setActive('badge-setter')
+    // badge-setter starts with only badge.manage, no local edits.
+    expect(wrapper.vm.forms['badge-setter'].permissions['badge.manage']).toBe(true)
+    expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(false)
+    // Simulate the refetch result: the server now also grants post.create to badge-setter.
+    wrapper.setData({
+      roles: roles.map((r) =>
+        r.name === 'badge-setter' ? { ...r, permissions: ['badge.manage', 'post.create'] } : r,
+      ),
+    })
+    wrapper.vm.buildForms()
+    // The untouched draft adopts the new set instead of keeping the stale one.
+    expect(wrapper.vm.forms['badge-setter'].permissions['badge.manage']).toBe(true)
+    expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(true)
+    // An untouched draft refreshing is not a conflict.
+    expect(wrapper.vm.conflicts['badge-setter']).toBeFalsy()
+  })
+
+  describe('concurrent-edit conflicts', () => {
+    // Put badge-setter into a conflict: locally edit it, then a refetch brings a server
+    // set that another admin moved (badge.manage removed) under the edit.
+    const intoConflict = async () => {
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.forms['badge-setter'].permissions['post.create'] = true // local, unsaved
+      wrapper.setData({
+        roles: roles.map((r) => (r.name === 'badge-setter' ? { ...r, permissions: [] } : r)),
+      })
+      wrapper.vm.buildForms()
+      await wrapper.vm.$nextTick()
+      return wrapper
+    }
+
+    it('flags a conflict but keeps the draft, and highlights the other admin’s change', async () => {
+      const wrapper = await intoConflict()
+      expect(wrapper.vm.conflicts['badge-setter']).toBe(true)
+      // The unsaved local edit survives (never silently clobbered).
+      expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(true)
+      // The highlight marks what the OTHER admin changed (baseline → server), not my edit.
+      expect(wrapper.vm.conflictDiff).toEqual({ 'badge.manage': 'removed' })
+      expect(wrapper.vm.rowDiff('badge.manage')).toBe('removed')
+      // The banner renders with its resolve/keep actions.
+      expect(wrapper.find('[data-test="role-badge-setter-conflict"]').exists()).toBe(true)
+      expect(wrapper.find('[data-test="role-badge-setter-conflict-load"]').exists()).toBe(true)
+      expect(wrapper.find('[data-test="role-badge-setter-conflict-keep"]').exists()).toBe(true)
+    })
+
+    it('highlights a permission the other admin ADDED (added branch of the diff)', async () => {
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      // Local edit: untick badge.manage (so the draft is dirty and preserved).
+      wrapper.vm.forms['badge-setter'].permissions['badge.manage'] = false
+      // Remote: another admin GRANTS post.create (not in this draft's baseline).
+      wrapper.setData({
+        roles: roles.map((r) =>
+          r.name === 'badge-setter' ? { ...r, permissions: ['badge.manage', 'post.create'] } : r,
+        ),
+      })
+      wrapper.vm.buildForms()
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.conflicts['badge-setter']).toBe(true)
+      // The newly-granted permission is marked 'added'; the unchanged one is not in the diff.
+      expect(wrapper.vm.conflictDiff).toEqual({ 'post.create': 'added' })
+      expect(wrapper.vm.rowDiff('post.create')).toBe('added')
+    })
+
+    it('does not flag a conflict when the draft matches what another admin already saved', async () => {
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      // Local edit: grant post.create.
+      wrapper.vm.forms['badge-setter'].permissions['post.create'] = true
+      // Another admin saved the SAME change — the server set now equals our draft.
+      wrapper.setData({
+        roles: roles.map((r) =>
+          r.name === 'badge-setter' ? { ...r, permissions: ['badge.manage', 'post.create'] } : r,
+        ),
+      })
+      wrapper.vm.buildForms()
+      await wrapper.vm.$nextTick()
+      // Draft == new server set → nothing to reconcile, no banner (no phantom conflict).
+      expect(wrapper.vm.conflicts['badge-setter']).toBeFalsy()
+      expect(wrapper.find('[data-test="role-badge-setter-conflict"]').exists()).toBe(false)
+      // The edit is retained.
+      expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(true)
+    })
+
+    it('clears the conflict when the server reverts to the draft’s baseline (change undone)', async () => {
+      const wrapper = await intoConflict() // draft edited; server removed badge.manage
+      expect(wrapper.vm.conflicts['badge-setter']).toBe(true)
+      // The other admin's change is undone: the server bounces back to the original set.
+      wrapper.setData({
+        roles: roles.map((r) =>
+          r.name === 'badge-setter' ? { ...r, permissions: ['badge.manage'] } : r,
+        ),
+      })
+      wrapper.vm.buildForms()
+      await wrapper.vm.$nextTick()
+      // No divergence from the baseline remains → banner clears on its own.
+      expect(wrapper.vm.conflicts['badge-setter']).toBeFalsy()
+      expect(wrapper.find('[data-test="role-badge-setter-conflict"]').exists()).toBe(false)
+      // My unsaved edit survives (still dirty vs the server set, so Save stays enabled).
+      expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(true)
+      expect(wrapper.vm.isDirty(wrapper.vm.roles.find((r) => r.name === 'badge-setter'))).toBe(true)
+    })
+
+    it('loadServerVersion discards local edits, rebuilds from the server, clears the banner', async () => {
+      const wrapper = await intoConflict()
+      expect(wrapper.find('[data-test="role-badge-setter-conflict"]').exists()).toBe(true)
+      wrapper.vm.loadServerVersion('badge-setter')
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.conflicts['badge-setter']).toBe(false)
+      // The banner is gone from the DOM (not just the computed).
+      expect(wrapper.find('[data-test="role-badge-setter-conflict"]').exists()).toBe(false)
+      // Rebuilt from the server set ([]) — both my edit and the removed permission are gone.
+      expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(false)
+      expect(wrapper.vm.forms['badge-setter'].permissions['badge.manage']).toBe(false)
+      expect(wrapper.vm.conflictDiff).toEqual({})
+    })
+
+    it('dismissConflict hides the banner but keeps the draft (keep editing)', async () => {
+      const wrapper = await intoConflict()
+      expect(wrapper.find('[data-test="role-badge-setter-conflict"]').exists()).toBe(true)
+      wrapper.vm.dismissConflict('badge-setter')
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.conflicts['badge-setter']).toBe(false)
+      // The banner is gone from the DOM (not just the computed), but the edit is kept.
+      expect(wrapper.find('[data-test="role-badge-setter-conflict"]').exists()).toBe(false)
+      expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(true)
+    })
+
+    it('does not re-raise a dismissed conflict on a rebuild without a new server change', async () => {
+      const wrapper = await intoConflict()
+      wrapper.vm.dismissConflict('badge-setter')
+      // A further refetch echoing the SAME (already-acknowledged) server set must not
+      // re-pop the banner, while the draft stays preserved.
+      wrapper.vm.buildForms()
+      expect(wrapper.vm.conflicts['badge-setter']).toBeFalsy()
+      expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(true)
+    })
+
+    it('re-raises the conflict when the server moves again after a dismiss', async () => {
+      const wrapper = await intoConflict()
+      wrapper.vm.dismissConflict('badge-setter')
+      wrapper.vm.buildForms()
+      expect(wrapper.vm.conflicts['badge-setter']).toBeFalsy()
+      // A genuinely NEW remote move (server set changes again) raises the banner anew.
+      wrapper.setData({
+        roles: roles.map((r) =>
+          r.name === 'badge-setter' ? { ...r, permissions: ['post.create'] } : r,
+        ),
+      })
+      wrapper.vm.buildForms()
+      expect(wrapper.vm.conflicts['badge-setter']).toBe(true)
+    })
+
+    it('does not mistake the admin’s own save for a conflict', async () => {
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.forms['badge-setter'].permissions['post.create'] = true
+      await wrapper.vm.saveRole(roles.find((r) => r.name === 'badge-setter'))
+      // performSave advanced the baseline to the saved set; the refetch that echoes our own
+      // write back must not raise a conflict.
+      wrapper.setData({
+        roles: roles.map((r) =>
+          r.name === 'badge-setter' ? { ...r, permissions: ['badge.manage', 'post.create'] } : r,
+        ),
+      })
+      wrapper.vm.buildForms()
+      expect(wrapper.vm.conflicts['badge-setter']).toBeFalsy()
+    })
+  })
+
   it('refreshFromServer refetches the catalog and roles (live availability update)', () => {
     const wrapper = Wrapper()
     const permissionCatalog = { refetch: jest.fn() }
@@ -379,5 +557,333 @@ describe('admin/roles.vue', () => {
     )
     expect(wrapper.vm.activeRoleName).toBe('event-org')
     expect(wrapper.vm.creating).toBe(false)
+  })
+
+  it('labels the active role name so a terse name still reads as the role', async () => {
+    const wrapper = Wrapper()
+    wrapper.vm.setActive('badge-setter')
+    await wrapper.vm.$nextTick()
+    const label = wrapper.find('.role__label')
+    expect(label.exists()).toBe(true)
+    expect(label.text()).toBe('admin.roles.roleLabel:')
+  })
+
+  describe('rename', () => {
+    it('offers rename only for non-protected, non-baseline roles', () => {
+      const wrapper = Wrapper()
+      expect(wrapper.vm.canRename(roles[0])).toBe(false) // owner (protected)
+      expect(wrapper.vm.canRename(roles[2])).toBe(false) // user (baseline)
+      expect(wrapper.vm.canRename(roles[1])).toBe(true) // badge-setter (custom)
+    })
+
+    it('shows the rename affordance only for a renamable active role', async () => {
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      await wrapper.vm.$nextTick()
+      expect(wrapper.find('[data-test="role-rename"]').exists()).toBe(true)
+      // The baseline user role cannot be renamed → no pencil.
+      wrapper.vm.setActive('user')
+      await wrapper.vm.$nextTick()
+      expect(wrapper.find('[data-test="role-rename"]').exists()).toBe(false)
+    })
+
+    it('the pencil turns the role name into an input prefilled with the current name', async () => {
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      await wrapper.vm.$nextTick()
+      await wrapper.find('[data-test="role-rename"]').trigger('click')
+      expect(wrapper.vm.renaming).toBe(true)
+      expect(wrapper.vm.renameValue).toBe('badge-setter')
+      const input = wrapper.find('[data-test="rename-role-name"]')
+      expect(input.exists()).toBe(true)
+      // Explicit accessible name (the placeholder alone is not a reliable label).
+      expect(input.attributes('aria-label')).toBe('admin.roles.rename')
+    })
+
+    it('renameRole sends the old and new name, then selects the renamed role', async () => {
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.startRename()
+      wrapper.setData({ renameValue: 'badge-master' })
+      await wrapper.vm.renameRole()
+      expect(mutate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: { name: 'badge-setter', newName: 'badge-master' },
+        }),
+      )
+      expect(wrapper.vm.activeRoleName).toBe('badge-master')
+      expect(wrapper.vm.renaming).toBe(false)
+    })
+
+    it('optimistically re-selects the renamed role and carries its unsaved draft, independent of the refetch', async () => {
+      // Regression: the selection (and the role body, keyed by forms[activeRole.name])
+      // must follow the rename immediately — not depend on the cache-and-network refetch,
+      // whose stale cache emit would otherwise reset it to the first tab.
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      // Make an unsaved edit before renaming: tick a permission the role doesn't have.
+      wrapper.vm.forms['badge-setter'].permissions['post.create'] = true
+      wrapper.vm.startRename()
+      wrapper.setData({ renameValue: 'badge-master' })
+      await wrapper.vm.renameRole()
+      const names = wrapper.vm.roles.map((role) => role.name)
+      expect(names).toContain('badge-master')
+      expect(names).not.toContain('badge-setter')
+      expect(wrapper.vm.activeRole.name).toBe('badge-master')
+      // The unsaved draft moved with the role: the ticked permission survives under the
+      // new name (alongside the role's existing one), so the edit is not silently lost.
+      expect(wrapper.vm.forms['badge-master'].permissions['post.create']).toBe(true)
+      expect(wrapper.vm.forms['badge-master'].permissions['badge.manage']).toBe(true)
+    })
+
+    it('patchRolesCacheRename rewrites the renamed role in the roles-query cache', () => {
+      const wrapper = Wrapper()
+      const store = {
+        readQuery: jest.fn(() => ({
+          roles: [
+            { name: 'owner', permissions: [] },
+            { name: 'badge-setter', permissions: ['badge.manage'] },
+          ],
+        })),
+        writeQuery: jest.fn(),
+      }
+      wrapper.vm.patchRolesCacheRename(store, 'badge-setter', {
+        name: 'badge-master',
+        permissions: ['badge.manage'],
+      })
+      expect(store.writeQuery).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: {
+            roles: [
+              { name: 'owner', permissions: [] },
+              { name: 'badge-master', permissions: ['badge.manage'] },
+            ],
+          },
+        }),
+      )
+    })
+
+    it('patchRolesCacheRename no-ops when there is no payload or no cached roles query', () => {
+      const wrapper = Wrapper()
+      const throwingStore = {
+        readQuery: jest.fn(() => {
+          throw new Error('not in cache')
+        }),
+        writeQuery: jest.fn(),
+      }
+      // Missing mutation payload → nothing read or written.
+      wrapper.vm.patchRolesCacheRename(throwingStore, 'badge-setter', null)
+      expect(throwingStore.readQuery).not.toHaveBeenCalled()
+      // Cache miss (readQuery throws) → swallowed, no write.
+      wrapper.vm.patchRolesCacheRename(throwingStore, 'badge-setter', { name: 'x' })
+      expect(throwingStore.writeQuery).not.toHaveBeenCalled()
+      // Cache read returns nothing → also a no-op.
+      const emptyStore = { readQuery: jest.fn(() => null), writeQuery: jest.fn() }
+      wrapper.vm.patchRolesCacheRename(emptyStore, 'badge-setter', { name: 'x' })
+      expect(emptyStore.writeQuery).not.toHaveBeenCalled()
+    })
+
+    it('renameRole patches the roles-query cache (via followRename) and selects the new name', async () => {
+      const wrapper = Wrapper()
+      const cache = {
+        readQuery: jest.fn(() => ({ roles: [{ name: 'badge-setter', permissions: [] }] })),
+        writeQuery: jest.fn(),
+      }
+      wrapper.vm.$apollo.provider = { defaultClient: cache }
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.startRename()
+      wrapper.setData({ renameValue: 'badge-master' })
+      await wrapper.vm.renameRole()
+      expect(cache.writeQuery).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: { roles: [{ name: 'badge-master', permissions: [] }] },
+        }),
+      )
+      expect(wrapper.vm.activeRoleName).toBe('badge-master')
+    })
+
+    it('follows the rename even though the cache write broadcasts to the roles query mid-update', () => {
+      // Regression: writeQuery broadcasts SYNCHRONOUSLY to the roles smart-query
+      // (→ ensureActive). The selection must be moved BEFORE the cache write, else the
+      // broadcast resets it to the first tab and the follow condition (=== oldName) misses.
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      const cache = {
+        readQuery: jest.fn(() => ({
+          roles: [{ name: 'badge-setter', permissions: ['badge.manage'] }],
+        })),
+        writeQuery: jest.fn(() => {
+          // Simulate Apollo's broadcast: the list now carries the new name, ensureActive runs.
+          wrapper.vm.roles = [
+            { name: 'owner', protected: true, permissions: [], memberCount: 1 },
+            {
+              name: 'badge-master',
+              protected: false,
+              permissions: ['badge.manage'],
+              memberCount: 2,
+            },
+            { name: 'user', protected: false, permissions: ['post.create'], memberCount: 5 },
+          ]
+          wrapper.vm.ensureActive()
+        }),
+      }
+      wrapper.vm.$apollo.provider = { defaultClient: cache }
+      wrapper.vm.followRename('badge-setter', 'badge-master')
+      expect(wrapper.vm.activeRoleName).toBe('badge-master')
+    })
+
+    it('shows an error toast when the rename mutation fails', async () => {
+      const wrapper = Wrapper()
+      const toastError = wrapper.vm.$toast.error
+      wrapper.vm.$apollo.mutate = jest.fn().mockRejectedValue(new Error('Role already exists.'))
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.startRename()
+      wrapper.setData({ renameValue: 'badge-master' })
+      await wrapper.vm.renameRole()
+      expect(toastError).toHaveBeenCalledWith(
+        'admin.roles.renameError:{"message":"Role already exists."}',
+      )
+      // The rename mode stays open (with the typed value) so the admin can correct the
+      // name — the error path must not cancel it or move the selection.
+      expect(wrapper.vm.renaming).toBe(true)
+      expect(wrapper.vm.renameValue).toBe('badge-master')
+      expect(wrapper.vm.activeRoleName).toBe('badge-setter')
+    })
+
+    it('does not show a rename error when only the post-rename refetch fails', async () => {
+      // The mutation succeeded and followRename already updated the UI, so a failing
+      // reconciliation refetch must NOT add a renameError on top of the success toast.
+      const wrapper = Wrapper()
+      const toastSuccess = wrapper.vm.$toast.success
+      const toastError = wrapper.vm.$toast.error
+      wrapper.vm.$apollo.queries.roles.refetch = jest.fn().mockRejectedValue(new Error('network'))
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.startRename()
+      wrapper.setData({ renameValue: 'badge-master' })
+      await wrapper.vm.renameRole()
+      expect(toastSuccess).toHaveBeenCalledWith('admin.roles.renameSuccess')
+      expect(toastError).not.toHaveBeenCalled()
+      // The optimistic rename stands despite the refetch failure.
+      expect(wrapper.vm.activeRoleName).toBe('badge-master')
+    })
+
+    it('renameRole is a no-op when the name is unchanged or empty', async () => {
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.startRename()
+      wrapper.setData({ renameValue: 'badge-setter' }) // unchanged
+      await wrapper.vm.renameRole()
+      wrapper.setData({ renameValue: '   ' }) // blank
+      await wrapper.vm.renameRole()
+      expect(mutate).not.toHaveBeenCalled()
+    })
+
+    it('onPermissionsChanged follows a rename from another client and keeps it selected', async () => {
+      // A second admin viewing the renamed role: the subscription carries the old name,
+      // so the selection follows to the new one instead of resetting to the first tab.
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      const cache = {
+        readQuery: jest.fn(() => ({
+          roles: [{ name: 'badge-setter', permissions: ['badge.manage'] }],
+        })),
+        writeQuery: jest.fn(),
+      }
+      wrapper.vm.$apollo.provider = { defaultClient: cache }
+      wrapper.vm.onPermissionsChanged({
+        roleName: 'badge-master',
+        previousRoleName: 'badge-setter',
+      })
+      expect(wrapper.vm.activeRoleName).toBe('badge-master')
+      const names = wrapper.vm.roles.map((role) => role.name)
+      expect(names).toContain('badge-master')
+      expect(names).not.toContain('badge-setter')
+      expect(wrapper.vm.forms['badge-master']).toBeTruthy()
+      // The client cache is patched so the refetch's stale emit cannot drop the role.
+      expect(cache.writeQuery).toHaveBeenCalled()
+    })
+
+    it('onPermissionsChanged keeps the selection when a different role is renamed', () => {
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('user')
+      wrapper.vm.onPermissionsChanged({
+        roleName: 'badge-master',
+        previousRoleName: 'badge-setter',
+      })
+      expect(wrapper.vm.activeRoleName).toBe('user')
+      const names = wrapper.vm.roles.map((role) => role.name)
+      expect(names).toContain('badge-master')
+      expect(names).not.toContain('badge-setter')
+    })
+
+    it('closes an open rename editor when that same role is renamed externally', () => {
+      // A stale renameValue must not survive an external rename of the role being edited —
+      // otherwise confirming it would submit the stale name against the renamed role.
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.startRename()
+      wrapper.setData({ renameValue: 'my-typed-name' })
+      expect(wrapper.vm.renaming).toBe(true)
+      wrapper.vm.onPermissionsChanged({
+        roleName: 'badge-master',
+        previousRoleName: 'badge-setter',
+      })
+      expect(wrapper.vm.renaming).toBe(false)
+      expect(wrapper.vm.renameValue).toBe('')
+      expect(wrapper.vm.activeRoleName).toBe('badge-master')
+    })
+
+    it('keeps an open rename editor when a different role is renamed externally', () => {
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.startRename()
+      wrapper.vm.onPermissionsChanged({ roleName: 'founder', previousRoleName: 'owner' })
+      // The editor is for badge-setter, so an owner→founder rename leaves it open.
+      expect(wrapper.vm.renaming).toBe(true)
+      expect(wrapper.vm.activeRoleName).toBe('badge-setter')
+    })
+
+    it('onPermissionsChanged just refreshes on a non-rename signal', () => {
+      const wrapper = Wrapper()
+      const refresh = jest.spyOn(wrapper.vm, 'refreshFromServer').mockImplementation(() => {})
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.onPermissionsChanged({ roleName: 'user', previousRoleName: null })
+      expect(wrapper.vm.activeRoleName).toBe('badge-setter')
+      expect(refresh).toHaveBeenCalled()
+    })
+
+    it('ensureActive does not reset a vanished selection while a refetch is in flight', () => {
+      // The transient stale-cache emit during a rename refetch drops the old name from
+      // the list; the selection must NOT snap to the first tab (the "jump to front"
+      // flash) while loading — only once the network settles.
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.$apollo.queries = { roles: { loading: true } }
+      // Simulate the stale emit: the list momentarily lacks the selected role.
+      wrapper.setData({
+        roles: [
+          { name: 'owner', protected: true, permissions: [], memberCount: 1 },
+          { name: 'user', protected: false, permissions: ['post.create'], memberCount: 5 },
+        ],
+      })
+      wrapper.vm.ensureActive()
+      expect(wrapper.vm.activeRoleName).toBe('badge-setter') // held, not reset to 'user'
+      // Once the network has settled and the role is genuinely gone, fall back.
+      wrapper.vm.$apollo.queries.roles.loading = false
+      wrapper.vm.ensureActive()
+      expect(wrapper.vm.activeRoleName).toBe('user')
+    })
+
+    it('starting a rename cancels create mode (and vice versa)', () => {
+      const wrapper = Wrapper()
+      wrapper.vm.startCreate()
+      expect(wrapper.vm.creating).toBe(true)
+      wrapper.vm.startRename()
+      expect(wrapper.vm.creating).toBe(false)
+      expect(wrapper.vm.renaming).toBe(true)
+      wrapper.vm.startCreate()
+      expect(wrapper.vm.renaming).toBe(false)
+      expect(wrapper.vm.creating).toBe(true)
+    })
   })
 })

@@ -15,20 +15,28 @@
 #   updatedAt_desc
 # }
 
+"A group: a space where members share posts, chat and optionally hold video calls. Discoverability and joining are governed by its groupType."
 type Group {
   id: ID!
-  name: String! # title
+  "The group's title."
+  name: String!
+  "URL-safe unique handle for the group."
   slug: String!
 
+  "ISO 8601 date-time string of creation."
   createdAt: String!
+  "ISO 8601 date-time string of the last update."
   updatedAt: String!
   deleted: Boolean
   disabled: Boolean
 
   avatar: Image @relation(name: "AVATAR_IMAGE", direction: "OUT")
 
-  about: String # goal
+  "Short statement of the group's goal."
+  about: String
+  "Full group description (rich text)."
   description: String!
+  "Plain-text excerpt of the description, for previews."
   descriptionExcerpt: String!
   groupType: GroupType!
   actionRadius: GroupActionRadius!
@@ -38,28 +46,33 @@ type Group {
 
   categories: [Category] @relation(name: "CATEGORIZED", direction: "OUT")
 
+  "Number of members, excluding those with a pending join request."
   membersCount: Int!
     @cypher(
       statement: "MATCH (this)<-[membership:MEMBER_OF]-(:User) WHERE membership.role <> 'pending' RETURN COUNT(membership)"
     )
 
+  "The current user's role in this group, or null if they are not a member."
   myRole: GroupMemberRole # if 'null' then the current user is no member
   showOnProfile: Boolean # whether the profile owner shows this group on their profile
   showMembers: Boolean # for closed groups: whether non-members can see the member list
   posts: [Post] @relation(name: "IN", direction: "IN")
 
+  "Whether the current user has muted this group."
   isMutedByMe: Boolean!
     @cypher(
       statement: "MATCH (this) RETURN EXISTS( (this)<-[:MUTED]-(:User {id: $cypherParams.currentUserId}) )"
     )
 
-  "inviteCodes to this group the current user has generated"
+  "Invite codes to this group the current user has generated."
   inviteCodes: [InviteCode]! @neo4j_ignore
 
+  "Number of posts currently pinned within this group."
   currentlyPinnedPostsCount: Int! @neo4j_ignore
   postsCount: Int! @neo4j_ignore
 }
 
+"A group member paired with their membership relationship (role, join date)."
 type GroupMember {
   user: User
   membership: MEMBER_OF
@@ -82,9 +95,12 @@ input _GroupFilter {
 }
 
 type Query {
+  "List groups. Requires authentication. Filter to the current user's memberships with `isMember`, or to located groups with `hasLocation`."
   Group(
-    isMember: Boolean # if 'undefined' or 'null' then get all groups
-    hasLocation: Boolean # if 'true' then only groups with a location
+    "Null/undefined returns all groups; true only the user's groups; false only groups they are not in."
+    isMember: Boolean
+    "If true, only groups that have a location."
+    hasLocation: Boolean
     id: ID
     slug: String
     first: Int
@@ -93,10 +109,12 @@ type Query {
   # orderBy: [_GroupOrdering] # not implemented yet
   # filter: _GroupFilter # not implemented yet
 
+  "List a group's members. Visibility depends on the viewer's relation to the group. Set `includePending` to also return unapproved join requests (for admins/owners)."
   GroupMembers(id: ID!, first: Int, offset: Int, includePending: Boolean): [GroupMember]
   # orderBy: [_UserOrdering] # not implemented yet
   # filter: _UserFilter # not implemented yet
 
+  "Count groups, optionally restricted to the current user's memberships. Requires authentication."
   GroupCount(isMember: Boolean): Int
 
   # AvailableGroupTypes: [GroupType]!
@@ -107,6 +125,7 @@ type Query {
 }
 
 type Mutation {
+  "Create a group. Requires authentication and the `group.create_<type>` permission matching the chosen groupType."
   CreateGroup(
     id: ID
     name: String!
@@ -119,10 +138,12 @@ type Mutation {
 
     # avatar: ImageInput # a group can not be created with an avatar
 
-    locationName: String # empty string '' sets it to null
+    "Empty string '' clears the location (sets it to null)."
+    locationName: String
     showMembers: Boolean
   ): Group
 
+  "Update a group's settings. Restricted to admins/owners of the group."
   UpdateGroup(
     id: ID!
     name: String
@@ -135,21 +156,28 @@ type Mutation {
     actionRadius: GroupActionRadius
     categoryIds: [ID]
     avatar: ImageInput # test this as result
-    locationName: String # empty string '' sets it to null
+    "Empty string '' clears the location (sets it to null)."
+    locationName: String
     showMembers: Boolean
   ): Group
 
   # DeleteGroup(id: ID!): Group
 
+  "Join a group, or accept/approve a pending membership. Allowed per the group's join rules; joining on behalf of another user requires the appropriate rights."
   JoinGroup(groupId: ID!, userId: ID!): GroupMember
 
+  "Leave a group, or (for admins/owners) let a member leave."
   LeaveGroup(groupId: ID!, userId: ID!): GroupMember
 
+  "Change a member's role in a group. Restricted to admins/owners, subject to the role hierarchy."
   ChangeGroupMemberRole(groupId: ID!, userId: ID!, roleInGroup: GroupMemberRole!): GroupMember
 
+  "Remove a user from a group. Restricted to those allowed to manage the group's members."
   RemoveUserFromGroup(groupId: ID!, userId: ID!): GroupMember
 
+  "Mute a group so its posts no longer appear in the current user's feed. Requires membership."
   muteGroup(groupId: ID!): Group
+  "Unmute a previously muted group. Requires membership."
   unmuteGroup(groupId: ID!): Group
 
   setGroupMembershipVisibility(groupId: ID!, showOnProfile: Boolean!): MEMBER_OF

@@ -1,0 +1,8 @@
+mutation renameRole($name: String!, $newName: String!) {
+  renameRole(name: $name, newName: $newName) {
+    name
+    permissions
+    protected
+    memberCount
+  }
+}

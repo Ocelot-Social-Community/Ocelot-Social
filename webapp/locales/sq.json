@@ -139,6 +139,12 @@
       "name": "Faqet"
     },
     "policy": {
+      "conflict": {
+        "keep": "Vazhdo redaktimin",
+        "load": "Ngarko versionin e ri",
+        "message": "Një cilësim u ndryshua diku tjetër ndërkohë që po e ndryshoje. Ndryshimet e tua të paruajtura ruhen — shqyrto cilësimet e theksuara.",
+        "serverValue": "serveri tani: {value}"
+      },
       "defaultValue": "parazgjedhur: {value}",
       "description": "Konfigurim në kohë reale. Ndryshimet aplikohen menjëherë për të gjithë klientët e lidhur.",
       "descriptions": {
@@ -200,6 +206,11 @@
       "allPermissions": "Ka të gjitha lejet (i mbrojtur).",
       "cannotDelete": "Ky rol nuk mund të fshihet.",
       "cannotDeleteHasMembers": "Ky rol ka ende anëtarë — caktojuni një rol tjetër para se ta fshini.",
+      "conflict": {
+        "keep": "Vazhdo redaktimin",
+        "load": "Ngarko versionin e ri",
+        "message": "Ky rol u ndryshua diku tjetër ndërkohë që po e ndryshoje. Ndryshimet e tua të paruajtura ruhen — shqyrto lejet e theksuara."
+      },
       "create": "Krijo rol",
       "createTitle": "Krijo një rol të ri",
       "delete": "Fshi",
@@ -244,6 +255,10 @@
       "permUnavailable": "Funksioni nuk është konfiguruar — dhënia e kësaj të drejte nuk ka efekt.",
       "protected": "i mbrojtur",
       "protectedHint": "Roli i pronarit ka të gjitha lejet dhe nuk mund të modifikohet.",
+      "rename": "Riemërto rolin",
+      "renameError": "Roli nuk u riemërtua dot: {message}",
+      "renameSuccess": "Roli u riemërtua.",
+      "roleLabel": "Rol",
       "save": "Ruaj",
       "saveError": "Roli nuk u ruajt dot: {message}",
       "saveSuccess": "Roli u ruajt.",

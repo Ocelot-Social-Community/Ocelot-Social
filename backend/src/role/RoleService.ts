@@ -15,7 +15,7 @@ import databaseContext from '@context/database'
 import { allPermissionKeys, sanitizePermissions } from '@src/permission'
 
 import { DEFAULT_ROLES, MANDATORY_ROLE_NAMES } from './defaults'
-import { deleteRole as dbDeleteRole, writeRole } from './repository'
+import { deleteRole as dbDeleteRole, renameRole as dbRenameRole, writeRole } from './repository'
 import { OWNER_ROLE, USER_ROLE } from './types'
 import { seedDefaultRoleNodes } from './userRoleEdges'
 
@@ -181,6 +181,38 @@ export class RoleService {
     return definition
   }
 
+  // Rename a role: change its identifier while keeping its permission bundle AND all
+  // its members (the HAS_ROLE edges reference node identity, so renaming the node in
+  // place preserves them). The mandatory roles (owner/user) cannot be renamed — their
+  // names are load-bearing constants (owner ⇒ full-catalog expansion, user ⇒ the
+  // baseline fallback). Persists, migrates the cache key (delete old → set new), and
+  // broadcasts a rename event carrying the previous name so peers migrate their key too.
+  async renameRole(oldName: string, newName: string, actor: string): Promise<RoleDefinition> {
+    const existing = this.cache.get(oldName)
+    if (!existing) {
+      throw new RoleValidationError(`Unknown role: ${oldName}`)
+    }
+    if (existing.protected) {
+      throw new RoleValidationError(`Role '${oldName}' is protected and cannot be renamed.`)
+    }
+    if (MANDATORY_ROLE_NAMES.includes(oldName)) {
+      throw new RoleValidationError(`Role '${oldName}' is mandatory and cannot be renamed.`)
+    }
+    // A no-op rename (same name) is idempotent success — nothing to persist or broadcast.
+    if (oldName === newName) return existing
+    if (this.cache.get(newName)) {
+      throw new RoleValidationError(`Role '${newName}' already exists.`)
+    }
+
+    const definition: RoleDefinition = { ...existing, name: newName }
+    const now = new Date().toISOString()
+    await dbRenameRole(this.db, oldName, newName, actor, now)
+    this.cache.delete(oldName)
+    this.cache.set(newName, definition)
+    this.publishChange({ name: newName, previousName: oldName, definition, actor, timestamp: now })
+    return definition
+  }
+
   async deleteRole(name: string, actor: string): Promise<void> {
     const existing = this.cache.get(name)
     if (!existing) {
@@ -232,6 +264,11 @@ export class RoleService {
 
   // Apply a change broadcast by any instance (including our own echo). Idempotent.
   applyExternalChange(event: RoleChangeEvent): void {
+    // A rename arrives as a single event carrying the former name: drop the stale
+    // cache key first, so the role is not left duplicated under both names.
+    if (event.previousName && event.previousName !== event.name) {
+      this.cache.delete(event.previousName)
+    }
     if (event.definition === null) {
       this.cache.delete(event.name)
       return

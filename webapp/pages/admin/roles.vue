@@ -42,6 +42,7 @@
           type="text"
           class="role-tab__input"
           :placeholder="$t('admin.roles.nameLabel')"
+          :aria-label="$t('admin.roles.create')"
           data-test="new-role-name"
           @keyup.enter="createRole"
           @keyup.esc="cancelCreate"
@@ -71,9 +72,54 @@
     <section v-if="activeRole" class="role" :data-test="`role-${activeRole.name}`">
       <header class="role__header">
         <h3 class="role__name">
-          {{ activeRole.name }}
-          <span v-if="activeRole.protected" class="role__badge">
-            {{ $t('admin.roles.protected') }}
+          <template v-if="!renaming">
+            <span class="role__label">{{ $t('admin.roles.roleLabel') }}:</span>
+            {{ activeRole.name }}
+            <button
+              v-if="canRename(activeRole)"
+              type="button"
+              class="role__rename"
+              :title="$t('admin.roles.rename')"
+              :aria-label="$t('admin.roles.rename')"
+              data-test="role-rename"
+              @click="startRename"
+            >
+              ✎
+            </button>
+            <span v-if="activeRole.protected" class="role__badge">
+              {{ $t('admin.roles.protected') }}
+            </span>
+          </template>
+          <span v-else class="role-tab role-tab--input" data-test="role-rename-edit">
+            <input
+              ref="renameInput"
+              v-model="renameValue"
+              type="text"
+              class="role-tab__input"
+              :placeholder="$t('admin.roles.nameLabel')"
+              :aria-label="$t('admin.roles.rename')"
+              data-test="rename-role-name"
+              @keyup.enter="renameRole"
+              @keyup.esc="cancelRename"
+            />
+            <button
+              type="button"
+              class="role-tab__confirm"
+              :disabled="!renameValue.trim() || renameValue.trim() === activeRole.name || saving"
+              :aria-label="$t('admin.roles.rename')"
+              data-test="rename-role-confirm"
+              @click="renameRole"
+            >
+              ✓
+            </button>
+            <button
+              type="button"
+              class="role-tab__cancel"
+              :aria-label="$t('actions.cancel')"
+              @click="cancelRename"
+            >
+              ✕
+            </button>
           </span>
         </h3>
         <nuxt-link
@@ -90,6 +136,37 @@
           {{ $t('admin.roles.allPermissions') }}
         </p>
 
+        <!-- Concurrent-edit conflict: another admin changed this role while the current
+             admin has unsaved edits. The draft is kept (their work is never silently lost);
+             the diverged rows are highlighted below. Load = discard mine, take the server's;
+             Keep = keep editing (my save will overwrite). -->
+        <div
+          v-if="conflicts[activeRole.name]"
+          class="role__conflict"
+          role="alert"
+          :data-test="`role-${activeRole.name}-conflict`"
+        >
+          <span class="role__conflict-text">{{ $t('admin.roles.conflict.message') }}</span>
+          <span class="role__conflict-actions">
+            <os-button
+              variant="primary"
+              appearance="filled"
+              :data-test="`role-${activeRole.name}-conflict-load`"
+              @click="loadServerVersion(activeRole.name)"
+            >
+              {{ $t('admin.roles.conflict.load') }}
+            </os-button>
+            <os-button
+              variant="primary"
+              appearance="ghost"
+              :data-test="`role-${activeRole.name}-conflict-keep`"
+              @click="dismissConflict(activeRole.name)"
+            >
+              {{ $t('admin.roles.conflict.keep') }}
+            </os-button>
+          </span>
+        </div>
+
         <!-- Two-column masonry on desktop (>=1024px) for a compact overview; each
              group stays intact (break-inside: avoid). Single column on mobile. -->
         <div class="perm-groups">
@@ -100,8 +177,8 @@
               :key="permission.key"
               class="perm-row"
               :class="{
-                'perm-row--added': hoverDiff[permission.key] === 'added',
-                'perm-row--removed': hoverDiff[permission.key] === 'removed',
+                'perm-row--added': rowDiff(permission.key) === 'added',
+                'perm-row--removed': rowDiff(permission.key) === 'removed',
                 'perm-row--unavailable': permission.available === false,
               }"
               :title="permission.available === false ? $t('admin.roles.permUnavailable') : null"
@@ -171,6 +248,7 @@ import {
   createRoleMutation,
   deleteRoleMutation,
   permissionCatalogQuery,
+  renameRoleMutation,
   rolesQuery,
   updateRoleMutation,
 } from '~/graphql/admin/Roles.js'
@@ -187,6 +265,10 @@ export default {
       permissionCatalog: [],
       // Editable drafts keyed by role name, rebuilt whenever roles load.
       forms: {},
+      // Concurrent-edit conflicts keyed by role name: true while a locally-edited draft's
+      // server set has moved under it (another admin saved). Cleared by resolving or
+      // dismissing the banner; re-raised by the next remote change.
+      conflicts: {},
       // The single role currently shown.
       activeRoleName: null,
       // The role pill currently hovered, to preview its diff against the active role.
@@ -194,6 +276,9 @@ export default {
       // Whether the + button is in name-input mode.
       creating: false,
       newRole: { name: '' },
+      // Whether the active role's name is being edited (rename mode), and its draft.
+      renaming: false,
+      renameValue: '',
       saving: false,
       // Confirm-modal state for the self-lockout warning (see saveRole).
       showConfirmModal: false,
@@ -229,8 +314,8 @@ export default {
     $subscribe: {
       permissionsChanged: {
         query: permissionsChangedSubscription(),
-        result() {
-          this.refreshFromServer()
+        result({ data }) {
+          this.onPermissionsChanged(data && data.permissionsChanged)
         },
       },
     },
@@ -271,6 +356,24 @@ export default {
       }
       return diff
     },
+    // While a conflict banner is up for the active role, which permissions the OTHER admin
+    // changed relative to this draft's baseline — 'added' (server now grants it) / 'removed'
+    // (server dropped it). These are exactly the keys the current admin's save would revert,
+    // so they are highlighted (reusing the hover-diff green/red). Empty when no conflict.
+    conflictDiff() {
+      const form = this.activeRole && this.forms[this.activeRoleName]
+      if (!this.activeRole || !this.conflicts[this.activeRoleName] || !form) return {}
+      const baseSet = new Set(form.baseline)
+      const serverSet = this.permissionSetOf(this.activeRole)
+      const diff = {}
+      for (const permission of this.permissionCatalog) {
+        const inBase = baseSet.has(permission.key)
+        const inServer = serverSet.has(permission.key)
+        if (inServer && !inBase) diff[permission.key] = 'added'
+        else if (!inServer && inBase) diff[permission.key] = 'removed'
+      }
+      return diff
+    },
     // Catalog grouped by permission group, for sectioned checkboxes.
     permissionGroups() {
       const byGroup = {}
@@ -283,6 +386,44 @@ export default {
     },
   },
   methods: {
+    // A permissionsChanged signal arrived: a role's permission set, a user's role
+    // assignment, a permission-gating policy toggle, OR a rename (here or elsewhere).
+    // On a rename, follow the selection to the new name and patch this client's cache
+    // BEFORE refetching, so a viewer who had the renamed role selected keeps it (rather
+    // than the refetch's stale cache emit dropping it). Then refetch to reconcile.
+    onPermissionsChanged(change) {
+      if (change && change.previousRoleName) {
+        this.followRename(change.previousRoleName, change.roleName)
+      }
+      this.refreshFromServer()
+    },
+    // Reflect a rename that happened on this or another client: patch the roles-query
+    // cache (so a cache-and-network refetch never re-serves the old name), mirror it in
+    // the local list, move the selection if it was on the renamed role, and rebuild the
+    // drafts so the role body keeps rendering.
+    followRename(oldName, newName) {
+      if (!newName || oldName === newName) return
+      // If this client has the rename editor open on the very role being renamed, close it:
+      // its renameValue is now stale, and confirming would submit it against the (already
+      // renamed) role. Checked before the selection moves off oldName below.
+      if (this.renaming && this.activeRoleName === oldName) this.cancelRename()
+      // Move the selection FIRST. Patching the cache below writes the roles query, which
+      // broadcasts SYNCHRONOUSLY to the roles smart-query (→ result → buildForms →
+      // ensureActive). If the selection were still the old name at that point, ensureActive
+      // would reset it to the first tab (the "jump to front" flash) before we could follow.
+      if (this.activeRoleName === oldName) this.activeRoleName = newName
+      this.patchRolesCacheRename(this.$apollo?.provider?.defaultClient, oldName, { name: newName })
+      this.roles = this.roles.map((role) =>
+        role.name === oldName ? { ...role, name: newName } : role,
+      )
+      // Carry any in-progress (unsaved) draft from the old name to the new one — forms are
+      // keyed by role name, so a rename mid-edit would otherwise drop the edits. buildForms
+      // then preserves it as dirty (or rebuilds it from the server when it was clean).
+      if (this.forms[oldName] && !this.forms[newName]) {
+        this.forms = { ...this.forms, [newName]: this.forms[oldName] }
+      }
+      this.buildForms()
+    },
     // Refetch catalog (its `available` flags) + roles after a permissionsChanged signal.
     // Guarded with optional chaining so it is a no-op in environments without live
     // smart queries (e.g. unit mounts).
@@ -292,12 +433,26 @@ export default {
     },
     buildForms() {
       const forms = {}
+      const conflicts = {}
       for (const role of this.roles) {
-        // Preserve an editable role's draft while it has unsaved edits, so a live refetch
-        // (another admin's change, or a permission-gating policy toggle) does not clobber
-        // in-progress work. Protected roles are never edited → always rebuilt.
-        if (!role.protected && this.forms[role.name] && this.isDirty(role)) {
-          forms[role.name] = this.forms[role.name]
+        const existing = this.forms[role.name]
+        // Preserve an editable role's draft only when THIS admin has locally edited it, so a
+        // live refetch (another admin's change, or a permission-gating policy toggle) does
+        // not clobber in-progress work — but an untouched draft DOES refresh to the new
+        // server set. `isLocallyEdited` compares against the draft's own build-time baseline
+        // (not `role.permissions`, which the refetch has already moved), so a remote change
+        // under an unedited form is not mistaken for a local edit (which would leave the
+        // checkboxes showing the stale set until a reload). Protected roles → always rebuilt.
+        if (!role.protected && existing && this.isLocallyEdited(role.name)) {
+          forms[role.name] = existing
+          // A conflict is a real disagreement: the server set moved from what this draft was
+          // built on AND our draft still differs from that new set. If our edit happens to
+          // match what another admin saved, there is nothing to reconcile — no banner. A
+          // resolved/dismissed banner only re-raises on a genuinely new move (baseline
+          // advanced on dismiss), never on a plain rebuild.
+          if (this.serverMovedFromBaseline(role, existing) && this.isDirty(role)) {
+            conflicts[role.name] = true
+          }
           continue
         }
         const permissions = emptyPermissionMap(this.permissionCatalog)
@@ -306,10 +461,46 @@ export default {
         for (const key of keys) permissions[key] = true
         forms[role.name] = {
           permissions,
+          // Snapshot of the server set this draft was built from, so a later refetch can
+          // tell a local edit apart from a remote change (see isLocallyEdited).
+          baseline: [...keys],
         }
       }
       this.forms = forms
+      this.conflicts = conflicts
       this.ensureActive()
+    },
+    // Whether the current server permission set of `role` differs from the set `form` was
+    // built on (its baseline) — i.e. another writer moved it since this draft started.
+    serverMovedFromBaseline(role, form) {
+      const server = [...role.permissions].sort()
+      const baseline = [...(form.baseline || [])].sort()
+      return server.length !== baseline.length || server.some((key, i) => key !== baseline[i])
+    },
+    // Hover-diff (previewing another pill) takes precedence; otherwise the conflict-diff
+    // (persistent while a conflict banner is up). Drives the row highlight.
+    rowDiff(key) {
+      return this.hoverDiff[key] || this.conflictDiff[key] || null
+    },
+    // Resolve a conflict by discarding local edits and rebuilding the draft from the current
+    // server set (take theirs). The banner clears; baseline advances to the server set.
+    loadServerVersion(name) {
+      const role = this.roles.find((r) => r.name === name)
+      if (!role) return
+      const permissions = emptyPermissionMap(this.permissionCatalog)
+      const keys = role.protected ? Object.keys(permissions) : role.permissions
+      for (const key of keys) permissions[key] = true
+      this.$set(this.forms, name, { permissions, baseline: [...keys] })
+      this.$set(this.conflicts, name, false)
+    },
+    // Keep editing (keep mine): hide the banner but preserve the draft. Advance the draft's
+    // baseline to the acknowledged server set so a plain rebuild does not re-pop the banner;
+    // only a genuinely NEW remote move raises it again. The eventual save overwrites theirs.
+    dismissConflict(name) {
+      const form = this.forms[name]
+      const role = this.roles.find((r) => r.name === name)
+      if (form && role) form.baseline = [...role.permissions]
+      this.$set(this.conflicts, name, false)
     },
     // Localized label for a permission group, falling back to the raw group name.
     // vuex-i18n returns the key itself when there is no translation.
@@ -340,14 +531,90 @@ export default {
         return
       }
       if (!this.roles.some((role) => role.name === this.activeRoleName)) {
+        // A previously-selected role vanished from the list. Don't snap to the first tab
+        // on a transient stale-cache emit while a refetch is still in flight — the fresh
+        // network list may still hold it (e.g. a rename following its new name). Only
+        // fall back once loading has settled. The initial (null) selection is immediate.
+        if (this.activeRoleName && this.$apollo?.queries?.roles?.loading) return
         this.activeRoleName = this.orderedRoles[0].name
       }
     },
     setActive(name) {
       this.activeRoleName = name
       this.cancelCreate()
+      this.cancelRename()
+    },
+    // Mandatory roles are load-bearing by name (owner ⇒ full catalog, user ⇒ the
+    // baseline fallback) and cannot be renamed — mirrors the backend guard.
+    canRename(role) {
+      return !role.protected && role.name !== 'user'
+    },
+    startRename() {
+      this.creating = false
+      this.renaming = true
+      this.renameValue = this.activeRole.name
+      this.$nextTick(() => {
+        if (this.$refs.renameInput) this.$refs.renameInput.focus()
+      })
+    },
+    cancelRename() {
+      this.renaming = false
+      this.renameValue = ''
+    },
+    // Reflect a rename in the roles-query cache so every subsequent read already carries
+    // the new name — the refetch below AND the permissionsChanged-triggered refresh both
+    // fetch cache-and-network, so a stale cache emit (still holding the OLD name) would
+    // otherwise make ensureActive reset the selection to the first tab.
+    patchRolesCacheRename(store, oldName, renamed) {
+      if (!renamed) return
+      let cached
+      try {
+        cached = store.readQuery({ query: rolesQuery })
+      } catch (e) {
+        // The roles query is not in the cache yet — nothing to patch.
+        return
+      }
+      if (!cached) return
+      store.writeQuery({
+        query: rolesQuery,
+        data: {
+          roles: cached.roles.map((role) =>
+            role.name === oldName ? { ...role, ...renamed } : role,
+          ),
+        },
+      })
+    },
+    // Rename the active role, keeping its permissions and members. Follow the rename
+    // locally (select the new name, patch the cache, rebuild drafts) via the same path as
+    // a remote rename, THEN refetch. We deliberately do NOT patch the cache in the mutation
+    // `update`: writeQuery there broadcasts to the roles smart-query while the selection is
+    // still the old name, which resets it to the first tab (a "jump to front" flash).
+    async renameRole() {
+      const oldName = this.activeRole.name
+      const newName = this.renameValue.trim()
+      if (!newName || newName === oldName || this.saving) return
+      this.saving = true
+      try {
+        await this.$apollo.mutate({
+          mutation: renameRoleMutation,
+          variables: { name: oldName, newName },
+        })
+        this.followRename(oldName, newName)
+        this.cancelRename()
+        this.$toast.success(this.$t('admin.roles.renameSuccess'))
+      } catch (err) {
+        this.$toast.error(this.$t('admin.roles.renameError', { message: err.message }))
+        return
+      } finally {
+        this.saving = false
+      }
+      // Best-effort reconciliation, OUTSIDE the mutation's try: followRename already updated
+      // the UI optimistically, so a refetch hiccup must not surface as a rename error on top
+      // of the success toast already shown.
+      await this.$apollo.queries.roles.refetch().catch(() => undefined)
     },
     startCreate() {
+      this.cancelRename()
       this.creating = true
       this.newRole.name = ''
       this.$nextTick(() => {
@@ -369,6 +636,20 @@ export default {
       return (
         selected.length !== original.length ||
         selected.some((key, index) => key !== original[index])
+      )
+    },
+    // Whether the draft differs from the server set it was BUILT from (its baseline),
+    // i.e. this admin has toggled something locally. Unlike isDirty (draft vs the current
+    // server set), this is stable across a live refetch that moves role.permissions, so it
+    // only protects genuine in-progress edits from being rebuilt (see buildForms).
+    isLocallyEdited(roleName) {
+      const form = this.forms[roleName]
+      if (!form || !form.baseline) return false
+      const selected = this.selectedPermissions(form.permissions).sort()
+      const baseline = [...form.baseline].sort()
+      return (
+        selected.length !== baseline.length ||
+        selected.some((key, index) => key !== baseline[index])
       )
     },
     canDelete(role) {
@@ -435,13 +716,19 @@ export default {
       const form = this.forms[role.name]
       this.saving = true
       try {
+        const permissions = this.selectedPermissions(form.permissions)
         await this.$apollo.mutate({
           mutation: updateRoleMutation,
           variables: {
             name: role.name,
-            permissions: this.selectedPermissions(form.permissions),
+            permissions,
           },
         })
+        // We are now the last writer for this role: advance the draft's baseline to what we
+        // saved and clear any conflict, so the imminent refetch rebuilds the draft cleanly
+        // (isLocallyEdited → false) instead of mistaking our own save for a remote conflict.
+        form.baseline = [...permissions]
+        this.$set(this.conflicts, role.name, false)
         await this.$apollo.queries.roles.refetch()
         this.$toast.success(this.$t('admin.roles.saveSuccess'))
       } catch (err) {
@@ -576,9 +863,19 @@ export default {
     align-items: baseline;
     justify-content: space-between;
     gap: $space-small;
+    // Set the role identity apart from its permission groups with a clear gap, so the
+    // (possibly terse, e.g. "ra") role name reads as its own header rather than crowding
+    // the first group title.
+    margin-bottom: $space-base;
   }
   &__name {
     margin: 0;
+  }
+  // "Role:" prefix before the name, so a poorly-named role (ra, rb) still reads as the
+  // role name. Softer + lighter than the name it labels.
+  &__label {
+    color: $text-color-soft;
+    font-weight: normal;
   }
   &__badge {
     margin-left: $space-xx-small;
@@ -586,6 +883,19 @@ export default {
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: $text-color-soft;
+  }
+  // Pencil affordance next to the role name; reveals the inline rename input.
+  &__rename {
+    margin-left: $space-xx-small;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 0.7em;
+    color: $text-color-soft;
+
+    &:hover {
+      color: $color-primary;
+    }
   }
   &__members {
     color: $text-color-soft;
@@ -600,6 +910,27 @@ export default {
   &__protected-note {
     color: $text-color-soft;
     font-style: italic;
+  }
+  // Concurrent-edit conflict banner: a remote change landed under this admin's edit.
+  &__conflict {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-x-small;
+    margin: $space-x-small 0;
+    padding: $space-x-small $space-small;
+    border-radius: $border-radius-base;
+    border-left: 3px solid $color-warning;
+    background: rgba($color-warning, 0.14);
+    font-size: 0.9em;
+  }
+  &__conflict-text {
+    flex: 1 1 16rem;
+  }
+  &__conflict-actions {
+    display: inline-flex;
+    gap: $space-x-small;
   }
   &__actions {
     margin-top: $space-x-small;

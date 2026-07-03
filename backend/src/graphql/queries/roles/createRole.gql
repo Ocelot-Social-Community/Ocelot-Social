@@ -1,0 +1,8 @@
+mutation createRole($name: String!, $permissions: [String!]!) {
+  createRole(name: $name, permissions: $permissions) {
+    name
+    permissions
+    protected
+    memberCount
+  }
+}

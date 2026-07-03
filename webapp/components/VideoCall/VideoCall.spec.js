@@ -2,6 +2,53 @@ import Vuex from 'vuex'
 import { mount, createLocalVue } from '@vue/test-utils'
 import VideoCall from './VideoCall.vue'
 
+// connect() does `await import('livekit-client')` — mock it with a fake Room that
+// records its event handlers (so tests can fire them) and resolves connect/disconnect.
+jest.mock('livekit-client', () => {
+  const RoomEvent = {
+    ParticipantConnected: 'ParticipantConnected',
+    ParticipantDisconnected: 'ParticipantDisconnected',
+    TrackSubscribed: 'TrackSubscribed',
+    TrackUnsubscribed: 'TrackUnsubscribed',
+    TrackMuted: 'TrackMuted',
+    TrackUnmuted: 'TrackUnmuted',
+    ParticipantMetadataChanged: 'ParticipantMetadataChanged',
+    ActiveSpeakersChanged: 'ActiveSpeakersChanged',
+    LocalTrackPublished: 'LocalTrackPublished',
+    LocalTrackUnpublished: 'LocalTrackUnpublished',
+    Disconnected: 'Disconnected',
+  }
+  const Track = {
+    Source: { Microphone: 'microphone', Camera: 'camera', ScreenShare: 'screen_share' },
+  }
+  const DisconnectReason = { CLIENT_INITIATED: 'CLIENT_INITIATED' }
+  class Room {
+    constructor(opts) {
+      this.opts = opts
+      this.handlers = {}
+      this.localParticipant = {
+        isScreenShareEnabled: false,
+        isMicrophoneEnabled: true,
+        isCameraEnabled: false,
+        audioTrackPublications: new Map(),
+        videoTrackPublications: new Map(),
+        setMicrophoneEnabled: jest.fn().mockResolvedValue(),
+        setCameraEnabled: jest.fn().mockResolvedValue(),
+        setScreenShareEnabled: jest.fn().mockResolvedValue(),
+      }
+      this.remoteParticipants = new Map()
+      this.connect = jest.fn().mockResolvedValue()
+      this.disconnect = jest.fn().mockResolvedValue()
+    }
+
+    on(evt, cb) {
+      this.handlers[evt] = cb
+      return this
+    }
+  }
+  return { __esModule: true, Room, RoomEvent, Track, DisconnectReason }
+})
+
 const localVue = createLocalVue()
 localVue.use(Vuex)
 
@@ -45,6 +92,7 @@ const buildStore = (state = {}) => {
         'videoCall/SET_MINIMIZED': setMinimized,
         'videoCall/CLOSE': close,
         'videoCall/SET_PHASE': setStorePhase,
+        'videoCall/SET_PARTICIPANT_COUNT': jest.fn(),
         'chat/SET_OPEN_CHAT': showChat,
       },
     }),
@@ -658,6 +706,305 @@ describe('VideoCall', () => {
         const arg = setStorePhase.mock.calls[setStorePhase.mock.calls.length - 1][1]
         expect(arg).toBe('connecting')
       })
+    })
+  })
+
+  describe('connect (livekit handshake)', () => {
+    const withApollo = (wrapper, payload = { url: 'ws://lk', token: 'tok' }) => {
+      wrapper.vm.$apollo = {
+        mutate: jest.fn().mockResolvedValue({ data: { joinGroupVideoCall: payload } }),
+      }
+    }
+
+    it('joins the room, enables devices and wires event handlers', async () => {
+      const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+      withApollo(wrapper)
+      await wrapper.vm.connect()
+      expect(wrapper.vm.phase).toBe('in-call')
+      const room = wrapper.vm.room
+      expect(room.connect).toHaveBeenCalled()
+      expect(room.localParticipant.setMicrophoneEnabled).toHaveBeenCalledWith(true)
+      expect(room.localParticipant.setCameraEnabled).toHaveBeenCalledWith(true)
+      expect(() => room.handlers.ParticipantConnected()).not.toThrow()
+      room.localParticipant.isScreenShareEnabled = true
+      room.handlers.LocalTrackPublished()
+      expect(wrapper.vm.screenShareEnabled).toBe(true)
+      room.localParticipant.isScreenShareEnabled = false
+      room.handlers.LocalTrackUnpublished()
+      expect(wrapper.vm.screenShareEnabled).toBe(false)
+    })
+
+    it('throttles active-speaker updates', () => {
+      jest.useFakeTimers()
+      const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+      withApollo(wrapper)
+      return (
+        wrapper.vm
+          .connect()
+          .then(() => {
+            const room = wrapper.vm.room
+            room.handlers.ActiveSpeakersChanged([{ identity: 'a' }, { identity: 'b' }])
+            jest.advanceTimersByTime(200)
+            expect(wrapper.vm.activeSpeakerIds).toEqual(['a', 'b'])
+            // Identical set within the next window is a no-op.
+            room.handlers.ActiveSpeakersChanged([{ identity: 'a' }, { identity: 'b' }])
+            jest.advanceTimersByTime(200)
+            expect(wrapper.vm.activeSpeakerIds).toEqual(['a', 'b'])
+          })
+          // Restore real timers even if an assertion above throws, so leaked fake
+          // timers can't make later tests flaky.
+          .finally(() => {
+            jest.useRealTimers()
+          })
+      )
+    })
+
+    it('routes a server-side disconnect through leave(), ignoring our own disconnect', async () => {
+      const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+      withApollo(wrapper)
+      await wrapper.vm.connect()
+      const room = wrapper.vm.room
+      const leave = jest.spyOn(wrapper.vm, 'leave').mockResolvedValue()
+      room.handlers.Disconnected('CLIENT_INITIATED')
+      expect(leave).not.toHaveBeenCalled()
+      room.handlers.Disconnected('SERVER_SHUTDOWN')
+      expect(leave).toHaveBeenCalled()
+    })
+
+    it('enters the error phase without a group id', async () => {
+      const { wrapper } = factory({ show: false, groupId: null })
+      withApollo(wrapper)
+      await wrapper.vm.connect()
+      expect(wrapper.vm.phase).toBe('error')
+      expect(wrapper.vm.error).toBe('Missing group id')
+    })
+
+    it('enters the error phase when no token is returned', async () => {
+      const { wrapper } = factory({ show: false, groupId: 'g1' })
+      wrapper.vm.$apollo = { mutate: jest.fn().mockResolvedValue({ data: {} }) }
+      await wrapper.vm.connect()
+      expect(wrapper.vm.phase).toBe('error')
+    })
+  })
+
+  describe('refreshTiles (full tile build)', () => {
+    it('builds local + remote tiles and sanitises avatar metadata', () => {
+      const { wrapper } = factory({ show: false })
+      const Track = {
+        Source: { Microphone: 'microphone', Camera: 'camera', ScreenShare: 'screen_share' },
+      }
+      const localP = {
+        identity: 'u1',
+        name: 'Alice',
+        isCameraEnabled: true,
+        isScreenShareEnabled: true,
+        metadata: null,
+        audioTrackPublications: new Map([['a', { source: 'microphone', track: { id: 'at' } }]]),
+        videoTrackPublications: new Map([
+          ['c', { source: 'camera', track: { id: 'ct' } }],
+          ['s', { source: 'screen_share', track: { id: 'st' } }],
+        ]),
+      }
+      const remote = (identity, metadata) => ({
+        identity,
+        name: identity,
+        isCameraEnabled: false,
+        isScreenShareEnabled: false,
+        metadata,
+        audioTrackPublications: new Map(),
+        videoTrackPublications: new Map(),
+      })
+      wrapper.vm.Track = Track
+      wrapper.vm.room = {
+        localParticipant: localP,
+        remoteParticipants: new Map([
+          ['r1', remote('r1', JSON.stringify({ userId: 'bob', avatarUrl: 'https://x.org/a.png' }))],
+          ['r2', remote('r2', '{not json')],
+          ['r3', remote('r3', JSON.stringify({ avatarUrl: 'javascript:alert(1)' }))],
+          ['r4', remote('r4', JSON.stringify({ avatarUrl: 'http://[' }))],
+        ]),
+      }
+      wrapper.vm.refreshTiles()
+      const tiles = wrapper.vm.tiles
+      expect(tiles.filter((t) => t.isLocal && !t.isScreen)).toHaveLength(1)
+      expect(tiles.filter((t) => t.isLocal && t.isScreen)).toHaveLength(1)
+      expect(tiles.filter((t) => !t.isLocal)).toHaveLength(4)
+      expect(tiles.find((t) => t.identity === 'r1').profile.avatar.url).toBe('https://x.org/a.png')
+      expect(tiles.find((t) => t.identity === 'r3').profile.avatar).toBeNull()
+      expect(tiles.find((t) => t.identity === 'r4').profile.avatar).toBeNull()
+    })
+  })
+
+  describe('cleanup (track teardown)', () => {
+    it('stops local tracks (tolerating stop errors) and clears the speaker timer', async () => {
+      const { wrapper } = factory({ show: false })
+      const stop = jest.fn(() => {
+        throw new Error('stop')
+      })
+      const mediaStop = jest.fn(() => {
+        throw new Error('mstop')
+      })
+      const track = { stop, mediaStreamTrack: { stop: mediaStop } }
+      const lp = {
+        audioTrackPublications: new Map([['a', { track }]]),
+        videoTrackPublications: new Map([['v', { track: null }]]),
+      }
+      wrapper.vm.room = { localParticipant: lp, disconnect: jest.fn().mockResolvedValue() }
+      wrapper.vm._activeSpeakersTimer = 123
+      const clearSpy = jest.spyOn(global, 'clearTimeout')
+      await wrapper.vm.cleanup()
+      expect(stop).toHaveBeenCalled()
+      expect(mediaStop).toHaveBeenCalled()
+      expect(clearSpy).toHaveBeenCalledWith(123)
+      expect(wrapper.vm.room).toBeNull()
+      clearSpy.mockRestore()
+    })
+
+    it('swallows errors while enumerating local tracks', async () => {
+      const { wrapper } = factory({ show: false })
+      wrapper.vm.room = {
+        get localParticipant() {
+          throw new Error('boom')
+        },
+        disconnect: jest.fn().mockResolvedValue(),
+      }
+      await expect(wrapper.vm.cleanup()).resolves.toBeUndefined()
+      expect(wrapper.vm.room).toBeNull()
+    })
+  })
+
+  describe('toggleScreenShare', () => {
+    const enableScreenShare = () => {
+      Object.defineProperty(global.navigator, 'mediaDevices', {
+        value: { getDisplayMedia: jest.fn() },
+        configurable: true,
+      })
+    }
+    const roomWith = (setScreenShareEnabled) => ({
+      localParticipant: {
+        setScreenShareEnabled,
+        isScreenShareEnabled: false,
+        isCameraEnabled: false,
+        audioTrackPublications: new Map(),
+        videoTrackPublications: new Map(),
+      },
+      remoteParticipants: new Map(),
+    })
+
+    it('enables screen share and refreshes tiles', async () => {
+      enableScreenShare()
+      const { wrapper } = factory({ show: false })
+      const setScreenShareEnabled = jest.fn().mockResolvedValue()
+      wrapper.vm.room = roomWith(setScreenShareEnabled)
+      wrapper.setData({ screenShareEnabled: false })
+      await wrapper.vm.toggleScreenShare()
+      expect(setScreenShareEnabled).toHaveBeenCalledWith(true, { audio: true })
+      expect(wrapper.vm.screenShareEnabled).toBe(true)
+    })
+
+    it('surfaces a toast on a non-cancel screen-share error', async () => {
+      enableScreenShare()
+      const { wrapper } = factory({ show: false })
+      const err = Object.assign(new Error('x'), { name: 'NotReadableError' })
+      wrapper.vm.room = roomWith(jest.fn().mockRejectedValue(err))
+      wrapper.vm.$toast = { error: jest.fn() }
+      await wrapper.vm.toggleScreenShare()
+      expect(wrapper.vm.$toast.error).toHaveBeenCalled()
+    })
+
+    it('stays silent when the user cancels the picker', async () => {
+      enableScreenShare()
+      const { wrapper } = factory({ show: false })
+      const err = Object.assign(new Error('x'), { name: 'NotAllowedError' })
+      wrapper.vm.room = roomWith(jest.fn().mockRejectedValue(err))
+      wrapper.vm.$toast = { error: jest.fn() }
+      await wrapper.vm.toggleScreenShare()
+      expect(wrapper.vm.$toast.error).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('primaryTile', () => {
+    it('prioritises screen share, then remote camera, then any remote, then the first tile', () => {
+      const { wrapper } = factory({ show: false })
+      expect(wrapper.vm.primaryTile).toBeNull()
+      wrapper.setData({ tiles: [{ key: 'a', isLocal: true, isScreen: false, videoTrack: null }] })
+      expect(wrapper.vm.primaryTile.key).toBe('a')
+      wrapper.setData({
+        tiles: [
+          { key: 'local', isLocal: true, isScreen: false, videoTrack: null },
+          { key: 'remote', isLocal: false, isScreen: false, videoTrack: null },
+        ],
+      })
+      expect(wrapper.vm.primaryTile.key).toBe('remote')
+      wrapper.setData({
+        tiles: [
+          { key: 'local', isLocal: true, isScreen: false, videoTrack: null },
+          { key: 'rcam', isLocal: false, isScreen: false, videoTrack: {} },
+        ],
+      })
+      expect(wrapper.vm.primaryTile.key).toBe('rcam')
+      wrapper.setData({
+        tiles: [
+          { key: 'screen', isLocal: true, isScreen: true, videoTrack: {} },
+          { key: 'rcam', isLocal: false, isScreen: false, videoTrack: {} },
+        ],
+      })
+      expect(wrapper.vm.primaryTile.key).toBe('screen')
+    })
+  })
+
+  describe('watchers', () => {
+    it('tears down when show flips from open to closed', () => {
+      const { wrapper } = factory({ show: false })
+      const cleanup = jest.spyOn(wrapper.vm, 'cleanup').mockResolvedValue()
+      wrapper.vm.$options.watch.show.handler.call(wrapper.vm, false, true)
+      expect(cleanup).toHaveBeenCalled()
+    })
+
+    it('$route watcher minimises / maximises with the call URL', () => {
+      const min = factory({ show: true, minimized: true })
+      min.wrapper.setData({ phase: 'in-call' })
+      min.wrapper.vm.$options.watch.$route.call(min.wrapper.vm, { name: 'call-id-slug' })
+      // Mutation handler receives (state, payload) — assert the payload.
+      expect(min.setMinimized.mock.calls[0][1]).toBe(false)
+
+      const max = factory({ show: true, minimized: false })
+      max.wrapper.setData({ phase: 'in-call' })
+      max.wrapper.vm.$options.watch.$route.call(max.wrapper.vm, { name: 'groups-id-slug' })
+      expect(max.setMinimized.mock.calls[0][1]).toBe(true)
+    })
+
+    it('$route watcher ignores changes outside an active call', () => {
+      const { wrapper, setMinimized } = factory({ show: false })
+      wrapper.vm.$options.watch.$route.call(wrapper.vm, { name: 'call-id-slug' })
+      expect(setMinimized).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('beforeDestroy', () => {
+    it('runs cleanup on destroy', () => {
+      const { wrapper } = factory({ show: false })
+      const cleanup = jest.spyOn(wrapper.vm, 'cleanup').mockResolvedValue()
+      wrapper.destroy()
+      expect(cleanup).toHaveBeenCalled()
+    })
+  })
+
+  describe('computed edge cases', () => {
+    it('chatOpenForThisGroup matches the active group chat', () => {
+      const { wrapper } = factory({
+        show: true,
+        groupId: 'g1',
+        chat: { showChat: true, chatUserId: null, groupId: 'g1' },
+      })
+      expect(wrapper.vm.chatOpenForThisGroup).toBe(true)
+    })
+
+    it('onCallRoute reflects the call route name', () => {
+      expect(factory({ show: true, routeName: 'call-id-slug' }).wrapper.vm.onCallRoute).toBe(true)
+      expect(factory({ show: true, routeName: 'groups-id-slug' }).wrapper.vm.onCallRoute).toBe(
+        false,
+      )
     })
   })
 })

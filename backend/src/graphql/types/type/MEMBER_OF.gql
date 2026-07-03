@@ -1,3 +1,4 @@
+"Relationship carrying a user's membership in a group, including their role and when it began."
 type MEMBER_OF {
   createdAt: String!
   updatedAt: String!

@@ -5,36 +5,10 @@ import { makeAugmentedSchema } from 'neo4j-graphql-js'
 import typeDefs from '@graphql/types/index'
 
 import resolvers from './resolvers'
+import { augmentedSchemaConfig } from './schema.augment-config'
 
 export default makeAugmentedSchema({
   typeDefs: print(typeDefs),
   resolvers,
-  config: {
-    query: {
-      exclude: [
-        'ApiKey',
-        'ApiKeyWithSecret',
-        'ApiKeyUserSummary',
-        'Badge',
-        'Embed',
-        'EmailNotificationSettings',
-        'EmailNotificationSettingsOption',
-        'EmailAddress',
-        'Notification',
-        'Statistics',
-        'LoggedInUser',
-        'Location',
-        'SocialMedia',
-        'NOTIFIED',
-        'FILED',
-        'REVIEWED',
-        'Report',
-        'Group',
-        'VideoCallConfig',
-        'VideoCallJoinPayload',
-        'VideoCallParticipantCount',
-      ],
-    },
-    mutation: false,
-  },
+  config: augmentedSchemaConfig,
 })

@@ -139,6 +139,12 @@
       "name": "Pages"
     },
     "policy": {
+      "conflict": {
+        "keep": "Continuer l'édition",
+        "load": "Charger la nouvelle version",
+        "message": "Un paramètre a été modifié ailleurs pendant que vous l'éditiez. Vos modifications non enregistrées sont conservées — vérifiez les paramètres mis en évidence.",
+        "serverValue": "serveur désormais : {value}"
+      },
       "defaultValue": "par défaut : {value}",
       "description": "Configuration en exécution. Les modifications s'appliquent immédiatement à tous les clients connectés.",
       "descriptions": {
@@ -200,6 +206,11 @@
       "allPermissions": "Détient toutes les permissions (protégé).",
       "cannotDelete": "Ce rôle ne peut pas être supprimé.",
       "cannotDeleteHasMembers": "Ce rôle a encore des membres — réattribuez-les avant de le supprimer.",
+      "conflict": {
+        "keep": "Continuer l'édition",
+        "load": "Charger la nouvelle version",
+        "message": "Ce rôle a été modifié ailleurs pendant que vous l'éditiez. Vos modifications non enregistrées sont conservées — vérifiez les permissions mises en évidence."
+      },
       "create": "Créer un rôle",
       "createTitle": "Créer un nouveau rôle",
       "delete": "Supprimer",
@@ -244,6 +255,10 @@
       "permUnavailable": "Fonctionnalité non configurée — accorder ce droit n'a aucun effet.",
       "protected": "protégé",
       "protectedHint": "Le rôle propriétaire détient toutes les permissions et ne peut pas être modifié.",
+      "rename": "Renommer le rôle",
+      "renameError": "Impossible de renommer le rôle : {message}",
+      "renameSuccess": "Rôle renommé.",
+      "roleLabel": "Rôle",
       "save": "Enregistrer",
       "saveError": "Impossible d’enregistrer le rôle : {message}",
       "saveSuccess": "Rôle enregistré.",

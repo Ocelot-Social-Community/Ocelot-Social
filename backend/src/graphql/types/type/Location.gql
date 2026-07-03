@@ -1,5 +1,7 @@
+"A geographic place (city, region, country, …) linked to users, groups and events. Places nest via `parent`, forming a hierarchy up to the country level."
 type Location {
   id: ID!
+  "Localized place name. Falls back through the requested `lang`, the instance default language, and finally the raw name/id."
   name(lang: String = ""): String!
     @cypher(
       statement: """
@@ -12,20 +14,27 @@ type Location {
       )
       """
     )
+  "The place's granularity (e.g. country, region, place)."
   type: String!
+  "Latitude in decimal degrees (WGS84)."
   lat: Float
+  "Longitude in decimal degrees (WGS84)."
   lng: Float
+  "The enclosing place one level up in the hierarchy."
   parent: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
+  "Distance in kilometres from the current user's location. Requires authentication."
   distanceToMe: Int
 }
 
 # This is not smart - we need one location for everything - use the same type everywhere!
 
+"A geocoding suggestion returned by the MapBox-backed place search."
 type LocationMapBox {
   id: ID!
   place_name: String!
 }
 
 type Query {
+  "Search for places via the MapBox geocoder, to attach a location to a profile, group or event. Public."
   queryLocations(place: String!, lang: String!, types: String): [LocationMapBox]!
 }

@@ -1,0 +1,25 @@
+# Scoped ignore for the documentation image build (build context = repo root).
+# Keep .md sources, .vuepress/, and backend/ (for schema:print + SpectaQL); drop
+# the heavy build artifacts and installed deps so the context stays small.
+**/node_modules
+.git
+**/build
+**/dist
+**/coverage
+**/.nuxt
+.vuepress/.cache
+.vuepress/.temp
+.vuepress/dist
+.vuepress/public/api
+cypress/videos
+cypress/screenshots
+cypress/reports
+deployment/configurations
+**/*.log
+release
+.env
+**/.env
+# Design/concept scratch (not in the site nav / SUMMARY.md, often WIP and not valid
+# VuePress markdown). Keeps the local build in parity with CI, which only has
+# committed files.
+docu
