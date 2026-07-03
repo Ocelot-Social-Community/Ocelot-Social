@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { getDriver } from '@db/neo4j'
 
 export const description =

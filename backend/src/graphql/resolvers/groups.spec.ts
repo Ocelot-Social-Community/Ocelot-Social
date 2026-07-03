@@ -3943,7 +3943,7 @@ describe('in mode', () => {
         })
         const groups: Array<{ id: string; myRole: string | null }> =
           result.data?.User?.[0]?.groups ?? []
-        expect(groups.length).toBe(2)
+        expect(groups).toHaveLength(2)
         // shared group must come first
         expect(groups[0].id).toBe('group-shared')
         expect(groups[0].myRole).not.toBeNull()
@@ -3951,7 +3951,7 @@ describe('in mode', () => {
         expect(groups[1].myRole).toBeNull()
       })
 
-      it('myRole is null for the profile owner\'s group the viewer has not joined', async () => {
+      it("myRole is null for the profile owner's group the viewer has not joined", async () => {
         authenticatedUser = await viewerUser.toJson()
         const result = await query({
           query: UserGroups,

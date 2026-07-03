@@ -311,10 +311,7 @@ export default {
         })
         // TODO: put in a middleware, see "CreateGroup", "UpdateGroup"
         await createOrUpdateLocations('User', params.id, params.locationName, session, context)
-        if (
-          'showPublicGroupsOnProfile' in params ||
-          'showClosedGroupsOnProfile' in params
-        ) {
+        if ('showPublicGroupsOnProfile' in params || 'showClosedGroupsOnProfile' in params) {
           void context.pubsub.publish(GROUP_MEMBERSHIP_VISIBILITY_CHANGED, {
             groupMembershipVisibilityChanged: { userId: params.id },
           })
