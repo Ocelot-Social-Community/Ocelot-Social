@@ -53,9 +53,11 @@ type Group {
     )
 
   "The current user's role in this group, or null if they are not a member."
-  myRole: GroupMemberRole # if 'null' then the current user is no member
-  showOnProfile: Boolean # whether the profile owner shows this group on their profile
-  showMembers: Boolean # for closed groups: whether non-members can see the member list
+  myRole: GroupMemberRole
+  "Whether the profile owner has chosen to show this group on their public profile."
+  showOnProfile: Boolean
+  "For closed groups: whether non-members can see the member list."
+  showMembers: Boolean
   posts: [Post] @relation(name: "IN", direction: "IN")
 
   "Whether the current user has muted this group."
@@ -69,6 +71,7 @@ type Group {
 
   "Number of posts currently pinned within this group."
   currentlyPinnedPostsCount: Int! @neo4j_ignore
+  "Total number of non-deleted, non-disabled posts in this group."
   postsCount: Int! @neo4j_ignore
 }
 

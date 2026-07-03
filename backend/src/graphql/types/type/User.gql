@@ -80,8 +80,11 @@ type User {
   allowEmbedIframes: Boolean
   "Whether the user's shouts are shown publicly on their profile."
   showShoutsPublicly: Boolean
+  "Whether the user's public group memberships are shown on their profile."
   showPublicGroupsOnProfile: Boolean
+  "Whether the user's closed group memberships are shown on their profile."
   showClosedGroupsOnProfile: Boolean
+  "Whether the user's hidden group memberships are shown on their profile."
   showHiddenGroupsOnProfile: Boolean
   "The user's email notification settings. Visible only to the owner."
   emailNotificationSettings: [EmailNotificationSettings]! @neo4j_ignore
@@ -178,6 +181,7 @@ type User {
   "Category slugs the user has activated as their content filter."
   activeCategories: [String] @neo4j_ignore
 
+  "Groups this user is a member of. Ordered by shared membership with the viewer first."
   groups(first: Int, offset: Int): [Group] @neo4j_ignore
 }
 
