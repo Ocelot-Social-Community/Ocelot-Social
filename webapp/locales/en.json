@@ -759,14 +759,14 @@
     "categoriesTitle": "Topics of the group",
     "changeMemberRole": "The role has been changed to “{role}”!",
     "contentMenu": {
+      "hideFromProfile": "Hide from my profile",
       "inviteLinks": "Invite links",
       "menuButton": "Group menu",
       "muteGroup": "Mute group",
-      "unmuteGroup": "Unmute group",
-      "visitGroupPage": "Show group",
+      "profileVisibilityUpdated": "Visibility updated",
       "showOnProfile": "Show on my profile",
-      "hideFromProfile": "Hide from my profile",
-      "profileVisibilityUpdated": "Visibility updated"
+      "unmuteGroup": "Unmute group",
+      "visitGroupPage": "Show group"
     },
     "createNewGroup": {
       "title": "Create A New Group",
@@ -809,10 +809,10 @@
       "slug": "Unique name"
     },
     "membersCount": "Member ::: Members",
+    "membersListNotVisibleToNonMembers": "Non-members cannot see this list.",
     "membersListTitle": "Group Members",
     "membersListTitleNotAllowedSeeingGroupMembers": "Group Members invisible",
     "membersListVisibleToNonMembers": "Non-members can see this list.",
-    "membersListNotVisibleToNonMembers": "Non-members cannot see this list.",
     "modal": {
       "cancel": "Cancel",
       "confirm": "Confirm",
@@ -835,6 +835,10 @@
       "usual": "Member"
     },
     "save": "Create new group",
+    "showMembers": "Member list visible to everyone",
+    "teaser": {
+      "openGroup": "Open group"
+    },
     "type": "Visibility of the group",
     "types": {
       "closed": "Closed",
@@ -849,11 +853,7 @@
     "unmute": "Unmute group",
     "unmuted": "Group unmuted",
     "update": "Save change",
-    "updatedGroup": "The group data has been changed.",
-    "showMembers": "Member list visible to everyone",
-    "teaser": {
-      "openGroup": "Open group"
-    }
+    "updatedGroup": "The group data has been changed."
   },
   "hashtags-filter": {
     "clearSearch": "Clear search",
@@ -1164,6 +1164,16 @@
     "follow": "Follow",
     "followers": "Followers",
     "following": "Following",
+    "groups": {
+      "closed": "Closed groups",
+      "hidden": "Secret groups",
+      "hiddenFromOthers": "hidden from others",
+      "nobody": "no groups",
+      "other": "Groups without me",
+      "public": "Public groups",
+      "shared": "Shared groups",
+      "title": "Groups of {name}"
+    },
     "invites": {
       "description": "Enter their e-mail address for invitation.",
       "emailPlaceholder": "E-mail to invite",
@@ -1180,17 +1190,7 @@
     },
     "shouted": "Shouted",
     "socialMedia": "Where else can I find",
-    "userAnonym": "Anonymous",
-    "groups": {
-      "title": "Groups of {name}",
-      "public": "Public groups",
-      "closed": "Closed groups",
-      "hidden": "Secret groups",
-      "shared": "Shared groups",
-      "other": "Groups without me",
-      "nobody": "no groups",
-      "hiddenFromOthers": "hidden from others"
-    }
+    "userAnonym": "Anonymous"
   },
   "quotes": {
     "african": {
@@ -1488,12 +1488,12 @@
     "privacy": {
       "make-shouts-public": "Share articles I have shouted on my public profile",
       "name": "Privacy",
-      "success-update": "Privacy settings saved!",
-      "show-groups-on-profile-section": "Show groups on profile",
-      "show-groups-on-profile-hint": "The visibility of each individual group can also be set via the group's three-dot menu or directly in the group list on your profile.",
-      "show-public-groups-on-profile": "Show public groups on my profile",
       "show-closed-groups-on-profile": "Show closed groups on my profile",
-      "show-hidden-groups-on-profile": "Show secret groups on my profile"
+      "show-groups-on-profile-hint": "The visibility of each individual group can also be set via the group's three-dot menu or directly in the group list on your profile.",
+      "show-groups-on-profile-section": "Show groups on profile",
+      "show-hidden-groups-on-profile": "Show secret groups on my profile",
+      "show-public-groups-on-profile": "Show public groups on my profile",
+      "success-update": "Privacy settings saved!"
     },
     "security": {
       "change-password": {

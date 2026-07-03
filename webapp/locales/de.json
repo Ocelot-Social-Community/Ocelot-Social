@@ -759,14 +759,14 @@
     "categoriesTitle": "Themen der Gruppe",
     "changeMemberRole": "Die Rolle wurde auf „{role}“ geändert!",
     "contentMenu": {
+      "hideFromProfile": "Von meinem Profil verbergen",
       "inviteLinks": "Einladungslinks",
       "menuButton": "Gruppenmenü",
       "muteGroup": "Stummschalten",
-      "unmuteGroup": "Nicht stummschalten",
-      "visitGroupPage": "Gruppe anzeigen",
+      "profileVisibilityUpdated": "Sichtbarkeit aktualisiert",
       "showOnProfile": "Auf meinem Profil anzeigen",
-      "hideFromProfile": "Von meinem Profil verbergen",
-      "profileVisibilityUpdated": "Sichtbarkeit aktualisiert"
+      "unmuteGroup": "Nicht stummschalten",
+      "visitGroupPage": "Gruppe anzeigen"
     },
     "createNewGroup": {
       "title": "Erstelle eine neue Gruppe",
@@ -809,10 +809,10 @@
       "slug": "Eindeutiger Name"
     },
     "membersCount": "Mitglied ::: Mitglieder",
+    "membersListNotVisibleToNonMembers": "Nicht-Mitglieder können diese Liste nicht sehen.",
     "membersListTitle": "Gruppenmitglieder",
     "membersListTitleNotAllowedSeeingGroupMembers": "Gruppenmitglieder unsichtbar",
     "membersListVisibleToNonMembers": "Nicht-Mitglieder können diese Liste sehen.",
-    "membersListNotVisibleToNonMembers": "Nicht-Mitglieder können diese Liste nicht sehen.",
     "modal": {
       "cancel": "Abbrechen",
       "confirm": "Bestätigen",
@@ -835,6 +835,10 @@
       "usual": "Mitglied"
     },
     "save": "Neue Gruppe anlegen",
+    "showMembers": "Mitgliederliste für alle sichtbar",
+    "teaser": {
+      "openGroup": "Gruppe öffnen"
+    },
     "type": "Öffentlichkeit der Gruppe",
     "types": {
       "closed": "Geschlossen",
@@ -849,11 +853,7 @@
     "unmute": "Nicht stummschalten",
     "unmuted": "Gruppe nicht mehr stummgeschaltet",
     "update": "Änderung speichern",
-    "updatedGroup": "Die Gruppendaten wurden geändert!",
-    "showMembers": "Mitgliederliste für alle sichtbar",
-    "teaser": {
-      "openGroup": "Gruppe öffnen"
-    }
+    "updatedGroup": "Die Gruppendaten wurden geändert!"
   },
   "hashtags-filter": {
     "clearSearch": "Suche löschen",
@@ -1164,6 +1164,16 @@
     "follow": "Folgen",
     "followers": "Folgen",
     "following": "Folge Ich",
+    "groups": {
+      "closed": "Geschlossene Gruppen",
+      "hidden": "Geheime Gruppen",
+      "hiddenFromOthers": "für andere verborgen",
+      "nobody": "keine Gruppen",
+      "other": "Gruppen ohne mich",
+      "public": "Öffentliche Gruppen",
+      "shared": "Gemeinsame Gruppen",
+      "title": "Gruppen von {name}"
+    },
     "invites": {
       "description": "Zur Einladung die E-Mail-Adresse hier eintragen.",
       "emailPlaceholder": "E-Mail-Adresse für die Einladung",
@@ -1180,17 +1190,7 @@
     },
     "shouted": "Empfohlen",
     "socialMedia": "Wo sonst finde ich",
-    "userAnonym": "Anonymus",
-    "groups": {
-      "title": "Gruppen von {name}",
-      "public": "Öffentliche Gruppen",
-      "closed": "Geschlossene Gruppen",
-      "hidden": "Geheime Gruppen",
-      "shared": "Gemeinsame Gruppen",
-      "other": "Gruppen ohne mich",
-      "nobody": "keine Gruppen",
-      "hiddenFromOthers": "für andere verborgen"
-    }
+    "userAnonym": "Anonymus"
   },
   "quotes": {
     "african": {
@@ -1488,12 +1488,12 @@
     "privacy": {
       "make-shouts-public": "Teile von mir empfohlene Artikel öffentlich auf meinem Profil",
       "name": "Privatsphäre",
-      "success-update": "Privatsphäre-Einstellungen gespeichert!",
-      "show-groups-on-profile-section": "Gruppen auf Profil anzeigen",
-      "show-groups-on-profile-hint": "Die Sichtbarkeit jeder einzelnen Gruppe kann auch im Dreipunktmenü der Gruppe oder direkt in der Gruppenliste auf deinem Profil eingestellt werden.",
-      "show-public-groups-on-profile": "Öffentliche Gruppen auf meinem Profil anzeigen",
       "show-closed-groups-on-profile": "Geschlossene Gruppen auf meinem Profil anzeigen",
-      "show-hidden-groups-on-profile": "Geheime Gruppen auf meinem Profil anzeigen"
+      "show-groups-on-profile-hint": "Die Sichtbarkeit jeder einzelnen Gruppe kann auch im Dreipunktmenü der Gruppe oder direkt in der Gruppenliste auf deinem Profil eingestellt werden.",
+      "show-groups-on-profile-section": "Gruppen auf Profil anzeigen",
+      "show-hidden-groups-on-profile": "Geheime Gruppen auf meinem Profil anzeigen",
+      "show-public-groups-on-profile": "Öffentliche Gruppen auf meinem Profil anzeigen",
+      "success-update": "Privatsphäre-Einstellungen gespeichert!"
     },
     "security": {
       "change-password": {

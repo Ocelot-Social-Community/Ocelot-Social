@@ -759,14 +759,14 @@
     "categoriesTitle": "Argomenti del gruppo",
     "changeMemberRole": "Il ruolo è stato cambiato in “{role}”!",
     "contentMenu": {
+      "hideFromProfile": "Hide from my profile",
       "inviteLinks": "Link di invito",
       "menuButton": "Menu del gruppo",
       "muteGroup": "Silenzia gruppo",
-      "unmuteGroup": "Riattiva gruppo",
-      "visitGroupPage": "Mostra gruppo",
+      "profileVisibilityUpdated": "Visibilità aggiornata",
       "showOnProfile": "Show on my profile",
-      "hideFromProfile": "Hide from my profile",
-      "profileVisibilityUpdated": "Visibilità aggiornata"
+      "unmuteGroup": "Riattiva gruppo",
+      "visitGroupPage": "Mostra gruppo"
     },
     "createNewGroup": {
       "title": "Crea un nuovo gruppo",
@@ -809,10 +809,10 @@
       "slug": "Nome unico"
     },
     "membersCount": "Membro ::: Membri",
+    "membersListNotVisibleToNonMembers": "I non membri non possono vedere questa lista.",
     "membersListTitle": "Membri del gruppo",
     "membersListTitleNotAllowedSeeingGroupMembers": "Membri del gruppo invisibili",
     "membersListVisibleToNonMembers": "I non membri possono vedere questa lista.",
-    "membersListNotVisibleToNonMembers": "I non membri non possono vedere questa lista.",
     "modal": {
       "cancel": "Annulla",
       "confirm": "Conferma",
@@ -835,6 +835,10 @@
       "usual": "Membro"
     },
     "save": "Crea nuovo gruppo",
+    "showMembers": "Elenco membri visibile a tutti",
+    "teaser": {
+      "openGroup": "Apri gruppo"
+    },
     "type": "Visibilità del gruppo",
     "types": {
       "closed": "Chiuso",
@@ -849,11 +853,7 @@
     "unmute": "Riattiva gruppo",
     "unmuted": "Gruppo riattivato",
     "update": "Salva modifiche",
-    "updatedGroup": "I dati del gruppo sono stati modificati.",
-    "showMembers": "Elenco membri visibile a tutti",
-    "teaser": {
-      "openGroup": "Apri gruppo"
-    }
+    "updatedGroup": "I dati del gruppo sono stati modificati."
   },
   "hashtags-filter": {
     "clearSearch": "Cancella ricerca",
@@ -1164,6 +1164,16 @@
     "follow": "Seguire",
     "followers": "Seguenti",
     "following": "Seguendo",
+    "groups": {
+      "closed": "Closed groups",
+      "hidden": "Secret groups",
+      "hiddenFromOthers": "hidden from others",
+      "nobody": "no groups",
+      "other": "Gruppi senza di me",
+      "public": "Public groups",
+      "shared": "Gruppi condivisi",
+      "title": "Groups of {name}"
+    },
     "invites": {
       "description": "Inserisci il loro indirizzo e-mail per l'invito.",
       "emailPlaceholder": "E-mail da invitare",
@@ -1180,17 +1190,7 @@
     },
     "shouted": "Gridato",
     "socialMedia": "Dove altro posso trovare",
-    "userAnonym": "Anonimo",
-    "groups": {
-      "title": "Groups of {name}",
-      "public": "Public groups",
-      "closed": "Closed groups",
-      "hidden": "Secret groups",
-      "shared": "Gruppi condivisi",
-      "other": "Gruppi senza di me",
-      "nobody": "no groups",
-      "hiddenFromOthers": "hidden from others"
-    }
+    "userAnonym": "Anonimo"
   },
   "quotes": {
     "african": {
@@ -1488,12 +1488,12 @@
     "privacy": {
       "make-shouts-public": "Condividi gli articoli che ho raccomandato sul mio profilo pubblico",
       "name": "Privacy",
-      "success-update": "Impostazioni privacy salvate!",
-      "show-groups-on-profile-section": "Show groups on profile",
-      "show-groups-on-profile-hint": "La visibilità di ogni singolo gruppo può essere impostata anche tramite il menu a tre puntini del gruppo o direttamente nell'elenco dei gruppi del tuo profilo.",
-      "show-public-groups-on-profile": "Show public groups on my profile",
       "show-closed-groups-on-profile": "Show closed groups on my profile",
-      "show-hidden-groups-on-profile": "Mostra gruppi segreti nel mio profilo"
+      "show-groups-on-profile-hint": "La visibilità di ogni singolo gruppo può essere impostata anche tramite il menu a tre puntini del gruppo o direttamente nell'elenco dei gruppi del tuo profilo.",
+      "show-groups-on-profile-section": "Show groups on profile",
+      "show-hidden-groups-on-profile": "Mostra gruppi segreti nel mio profilo",
+      "show-public-groups-on-profile": "Show public groups on my profile",
+      "success-update": "Impostazioni privacy salvate!"
     },
     "security": {
       "change-password": {

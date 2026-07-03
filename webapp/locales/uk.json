@@ -759,14 +759,14 @@
     "categoriesTitle": "Теми групи",
     "changeMemberRole": "Роль змінено на «{role}»!",
     "contentMenu": {
+      "hideFromProfile": "Hide from my profile",
       "inviteLinks": "Посилання для запрошення",
       "menuButton": "Меню групи",
       "muteGroup": "Вимкнути сповіщення групи",
-      "unmuteGroup": "Увімкнути сповіщення групи",
-      "visitGroupPage": "Показати групу",
+      "profileVisibilityUpdated": "Видимість оновлено",
       "showOnProfile": "Show on my profile",
-      "hideFromProfile": "Hide from my profile",
-      "profileVisibilityUpdated": "Видимість оновлено"
+      "unmuteGroup": "Увімкнути сповіщення групи",
+      "visitGroupPage": "Показати групу"
     },
     "createNewGroup": {
       "title": "Створити нову групу",
@@ -809,10 +809,10 @@
       "slug": "Унікальне ім'я"
     },
     "membersCount": "Учасник ::: Учасники",
+    "membersListNotVisibleToNonMembers": "Не-учасники не можуть бачити цей список.",
     "membersListTitle": "Учасники групи",
     "membersListTitleNotAllowedSeeingGroupMembers": "Учасники групи приховані",
     "membersListVisibleToNonMembers": "Не-учасники можуть бачити цей список.",
-    "membersListNotVisibleToNonMembers": "Не-учасники не можуть бачити цей список.",
     "modal": {
       "cancel": "Скасувати",
       "confirm": "Підтвердити",
@@ -835,6 +835,10 @@
       "usual": "Учасник"
     },
     "save": "Створити нову групу",
+    "showMembers": "Список учасників видимий для всіх",
+    "teaser": {
+      "openGroup": "Відкрити групу"
+    },
     "type": "Видимість групи",
     "types": {
       "closed": "Закрита",
@@ -849,11 +853,7 @@
     "unmute": "Увімкнути сповіщення групи",
     "unmuted": "Сповіщення групи увімкнено",
     "update": "Зберегти зміни",
-    "updatedGroup": "Дані групи змінено.",
-    "showMembers": "Список учасників видимий для всіх",
-    "teaser": {
-      "openGroup": "Відкрити групу"
-    }
+    "updatedGroup": "Дані групи змінено."
   },
   "hashtags-filter": {
     "clearSearch": "Очистити пошук",
@@ -1164,6 +1164,16 @@
     "follow": "Підписатися",
     "followers": "Підписники",
     "following": "Підписки",
+    "groups": {
+      "closed": "Closed groups",
+      "hidden": "Secret groups",
+      "hiddenFromOthers": "hidden from others",
+      "nobody": "no groups",
+      "other": "Групи без мене",
+      "public": "Public groups",
+      "shared": "Спільні групи",
+      "title": "Groups of {name}"
+    },
     "invites": {
       "description": "Введіть їхню електронну адресу для запрошення.",
       "emailPlaceholder": "Електронна пошта для запрошення",
@@ -1180,17 +1190,7 @@
     },
     "shouted": "Рекомендовано",
     "socialMedia": "Де ще можна знайти",
-    "userAnonym": "Анонімний",
-    "groups": {
-      "title": "Groups of {name}",
-      "public": "Public groups",
-      "closed": "Closed groups",
-      "hidden": "Secret groups",
-      "shared": "Спільні групи",
-      "other": "Групи без мене",
-      "nobody": "no groups",
-      "hiddenFromOthers": "hidden from others"
-    }
+    "userAnonym": "Анонімний"
   },
   "quotes": {
     "african": {
@@ -1488,12 +1488,12 @@
     "privacy": {
       "make-shouts-public": "Показувати статті, які я рекомендував(-ла), у моєму публічному профілі",
       "name": "Конфіденційність",
-      "success-update": "Налаштування конфіденційності збережено!",
-      "show-groups-on-profile-section": "Show groups on profile",
-      "show-groups-on-profile-hint": "Видимість кожної окремої групи також можна налаштувати через меню з трьома крапками групи або безпосередньо в списку груп у вашому профілі.",
-      "show-public-groups-on-profile": "Show public groups on my profile",
       "show-closed-groups-on-profile": "Show closed groups on my profile",
-      "show-hidden-groups-on-profile": "Показувати таємні групи в моєму профілі"
+      "show-groups-on-profile-hint": "Видимість кожної окремої групи також можна налаштувати через меню з трьома крапками групи або безпосередньо в списку груп у вашому профілі.",
+      "show-groups-on-profile-section": "Show groups on profile",
+      "show-hidden-groups-on-profile": "Показувати таємні групи в моєму профілі",
+      "show-public-groups-on-profile": "Show public groups on my profile",
+      "success-update": "Налаштування конфіденційності збережено!"
     },
     "security": {
       "change-password": {
