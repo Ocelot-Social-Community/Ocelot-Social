@@ -154,6 +154,8 @@
       "setOverride": "override",
       "editPolicy": "Edit the {policy} policy",
       "notSet": "not set",
+      "noDefault": "no default",
+      "secretHidden": "set (value hidden)",
       "state": {
         "set": "set",
         "empty": "empty",

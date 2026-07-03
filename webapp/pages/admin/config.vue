@@ -8,8 +8,8 @@
          effective values of policy-backed vars are edited on the policy tab. Columns
          run most-important → least: effective state, whether a policy overrides it,
          the env value, and the software default it falls back to. Secrets (and hard
-         env requirements) report presence only via a badge — their value columns are
-         em-dashed, a secret value is never sent to the client. -->
+         env requirements) report presence only via a badge; a set secret shows its env
+         value masked (present, but the value is never sent to the client). -->
     <div class="config-table-wrap">
       <table class="config-table" data-test="config-table">
         <caption class="config-caption">{{ $t('admin.config.tableCaption') }}</caption>
@@ -90,10 +90,19 @@
               </span>
             </td>
 
-            <!-- 4. Env value: the value the env var itself provides when set, else nothing
-                 (secrets and unset vars are em-dashed). -->
+            <!-- 4. Env value: the value the env var itself provides. A set secret is shown
+                 masked (present, but its value is never revealed), a plain var shows its
+                 value, and an unset var is em-dashed. -->
             <td class="cell">
-              <code v-if="row.envValue !== null" :data-test="`config-envvalue-${row.envKey}`">
+              <span
+                v-if="row.secret && row.state === 'set'"
+                class="value value--masked"
+                :data-test="`config-envvalue-${row.envKey}`"
+              >
+                <span aria-hidden="true">••••••</span>
+                <span class="config-caption">{{ $t('admin.config.secretHidden') }}</span>
+              </span>
+              <code v-else-if="row.envValue !== null" :data-test="`config-envvalue-${row.envKey}`">
                 {{ fmt(row.envValue) }}
               </code>
               <span v-else class="cell-empty">
@@ -103,12 +112,13 @@
             </td>
 
             <!-- 5. Software default: the code baseline the value falls back to. Secrets
-                 and hard-requirement vars have none. -->
+                 and hard-requirement vars have none — em-dashed as "no default" (not as
+                 "not set", which would wrongly read as an unset env var). -->
             <td class="cell cell--muted">
               <code v-if="row.softwareDefault !== null">{{ fmt(row.softwareDefault) }}</code>
               <span v-else class="cell-empty">
                 <span aria-hidden="true">&mdash;</span>
-                <span class="config-caption">{{ $t('admin.config.notSet') }}</span>
+                <span class="config-caption">{{ $t('admin.config.noDefault') }}</span>
               </span>
             </td>
           </tr>
@@ -354,6 +364,12 @@ export default {
 }
 .cell-empty {
   color: $text-color-soft;
+}
+// A set secret: shown as masked dots (present, value withheld) rather than a value or
+// a misleading "not set" dash.
+.value--masked {
+  color: $text-color-soft;
+  letter-spacing: 0.15em;
 }
 // Link from an overridable value to its policy on the policy tab.
 .override-link {

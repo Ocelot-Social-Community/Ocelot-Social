@@ -158,13 +158,30 @@ describe('admin/config.vue', () => {
   })
 
   describe('secrets', () => {
-    it('reports a plain secret by presence only, em-dashing all value columns', async () => {
+    it('shows a set secret as present-but-masked (never its value), with no default', async () => {
       const jwt = row(await Wrapper(), 'JWT_SECRET')
+      // presence badge in the effective column
       expect(jwt.find('[data-test="config-state-JWT_SECRET"]').classes()).toContain('badge--ok')
+      // env value: masked (marked as set), NOT "not set", and never the actual value
+      const envValue = jwt.find('[data-test="config-envvalue-JWT_SECRET"]')
+      expect(envValue.exists()).toBe(true)
+      expect(envValue.classes()).toContain('value--masked')
+      expect(envValue.text()).toContain('admin.config.secretHidden')
+      // no override link; a secret has no software default → "no default", not "not set"
       expect(jwt.find('[data-test="config-override-JWT_SECRET"]').exists()).toBe(false)
-      expect(jwt.find('[data-test="config-envvalue-JWT_SECRET"]').exists()).toBe(false)
-      // override, env value and software default all em-dashed
-      expect(jwt.findAll('.cell-empty')).toHaveLength(3)
+      expect(jwt.text()).toContain('admin.config.noDefault')
+      // only the override and software-default columns are em-dashed now
+      expect(jwt.findAll('.cell-empty')).toHaveLength(2)
+    })
+
+    it('em-dashes (does not mask) a secret that is missing', async () => {
+      const secret = row(await Wrapper(), 'LIVEKIT_API_SECRET')
+      expect(secret.find('[data-test="config-state-LIVEKIT_API_SECRET"]').classes()).toContain(
+        'badge--error',
+      )
+      // no masked value for a missing secret — the env-value column is em-dashed
+      expect(secret.find('[data-test="config-envvalue-LIVEKIT_API_SECRET"]').exists()).toBe(false)
+      expect(secret.find('.value--masked').exists()).toBe(false)
     })
   })
 
