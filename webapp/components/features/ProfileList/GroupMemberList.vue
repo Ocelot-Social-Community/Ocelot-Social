@@ -10,21 +10,21 @@
           </p>
           <ul class="group-list">
             <li v-for="group in groupsByType[type]" :key="group.id" class="group-item">
-                <group-teaser :group="group" class="group-item__teaser" />
-                <button
-                  v-if="myProfile"
-                  class="group-item__visibility-btn"
-                  :title="
-                    group.showOnProfile
-                      ? $t('group.contentMenu.hideFromProfile')
-                      : $t('group.contentMenu.showOnProfile')
-                  "
-                  @click.prevent="toggleVisibility(group)"
-                >
-                  <os-icon :icon="group.showOnProfile ? icons.eye : icons.eyeSlash" />
-                </button>
-              </li>
-            </ul>
+              <group-teaser :group="group" class="group-item__teaser" />
+              <button
+                v-if="myProfile"
+                class="group-item__visibility-btn"
+                :title="
+                  group.showOnProfile
+                    ? $t('group.contentMenu.hideFromProfile')
+                    : $t('group.contentMenu.showOnProfile')
+                "
+                @click.prevent="toggleVisibility(group)"
+              >
+                <os-icon :icon="group.showOnProfile ? icons.eye : icons.eyeSlash" />
+              </button>
+            </li>
+          </ul>
         </div>
       </template>
 
@@ -117,12 +117,8 @@ export default {
         }, {})
       }
       return {
-        shared: (this.groups || []).filter(
-          (g) => g.myRole !== null && g.myRole !== 'pending',
-        ),
-        other: (this.groups || []).filter(
-          (g) => g.myRole === null || g.myRole === 'pending',
-        ),
+        shared: (this.groups || []).filter((g) => g.myRole !== null && g.myRole !== 'pending'),
+        other: (this.groups || []).filter((g) => g.myRole === null || g.myRole === 'pending'),
       }
     },
     typesWithGroups() {

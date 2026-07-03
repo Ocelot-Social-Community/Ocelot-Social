@@ -140,7 +140,10 @@ describe('GroupMemberList.vue', () => {
           { id: '1', groupType: 'public', myRole: 'usual' },
           { id: '2', groupType: 'closed', myRole: null },
         ]
-        expect(Wrapper({ myProfile: false }, groups).vm.typesWithGroups).toEqual(['shared', 'other'])
+        expect(Wrapper({ myProfile: false }, groups).vm.typesWithGroups).toEqual([
+          'shared',
+          'other',
+        ])
       })
 
       it('returns empty array when there are no groups', () => {

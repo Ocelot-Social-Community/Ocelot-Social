@@ -32,10 +32,7 @@
         />
       </li>
       <li v-if="group.postsCount !== undefined">
-        <os-number
-          :count="group.postsCount"
-          :label="$t('common.post', null, group.postsCount)"
-        />
+        <os-number :count="group.postsCount" :label="$t('common.post', null, group.postsCount)" />
       </li>
     </ul>
     <os-button
