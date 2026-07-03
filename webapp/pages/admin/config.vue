@@ -267,15 +267,23 @@ export default {
 .config-caption {
   @include visually-hidden;
 }
-// Let the wide table scroll horizontally on narrow admin viewports instead of wrapping
-// its monospace values into an unreadable mess.
+// Plain block: the page (not an inner box) scrolls, so it grows with the content. The
+// column header stays visible via a viewport-sticky thead (see thead th) — which only
+// works while NO ancestor is a scroll container, hence no overflow here.
 .config-table-wrap {
-  overflow-x: auto;
+  overflow: visible;
 }
 .config-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9em;
+
+  // Without a horizontal scroll box, long unbroken values (URLs, DSNs) must wrap rather
+  // than push the table wider than the page. Only the value cells (td); the env-var key
+  // (th) keeps its identifier intact.
+  td {
+    overflow-wrap: anywhere;
+  }
 
   th,
   td {
@@ -290,8 +298,18 @@ export default {
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 0.03em;
-    border-bottom: 2px solid $border-color-softer;
     white-space: nowrap;
+    // Freeze the column header just below the fixed app header (whose height the header
+    // menu exposes as --header-height) so it stays visible while the page scrolls — the
+    // same viewport-sticky pattern as the admin tab navigation. border-collapse drops a
+    // sticky cell's own border during scroll, so draw the divider with an inset shadow
+    // instead of border-bottom, and give the cell an opaque background so scrolled rows
+    // don't show through.
+    position: sticky;
+    top: var(--header-height, 6rem);
+    z-index: $z-index-sticky;
+    background: $background-color-base;
+    box-shadow: inset 0 -2px 0 $border-color-softer;
   }
   .col--muted {
     color: $text-color-soft;
