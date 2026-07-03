@@ -278,19 +278,17 @@ export default {
   border-collapse: collapse;
   font-size: 0.9em;
 
-  // Without a horizontal scroll box, long unbroken values (URLs, DSNs) must wrap rather
-  // than push the table wider than the page. Only the value cells (td); the env-var key
-  // (th) keeps its identifier intact.
-  td {
-    overflow-wrap: anywhere;
-  }
-
   th,
   td {
     padding: $space-xx-small $space-x-small;
     text-align: left;
     vertical-align: top;
     border-bottom: 1px solid $border-color-softer;
+    // Without a horizontal scroll box (which would break the viewport-sticky header),
+    // the table must always fit its container: long unbroken values (URLs, DSNs) and
+    // env-var names wrap instead of pushing the table past the page/card — so nothing is
+    // clipped off-screen and the mobile layout stays intact.
+    overflow-wrap: anywhere;
   }
   thead th {
     color: $text-color-soft;
@@ -298,7 +296,8 @@ export default {
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 0.03em;
-    white-space: nowrap;
+    // NB: intentionally NOT `white-space: nowrap` — the headers must be able to wrap so
+    // the table can shrink to narrow (mobile) widths instead of overflowing the card.
     // Freeze the column header just below the fixed app header (whose height the header
     // menu exposes as --header-height) so it stays visible while the page scrolls — the
     // same viewport-sticky pattern as the admin tab navigation. border-collapse drops a
