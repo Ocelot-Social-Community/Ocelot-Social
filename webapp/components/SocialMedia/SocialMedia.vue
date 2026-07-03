@@ -1,18 +1,14 @@
 <template>
   <div v-if="user.socialMedia && user.socialMedia.length" class="ds-my-large">
     <os-card class="social-media-bc">
-      <div class="ds-my-x-small">
-        <h5 class="ds-text ds-text-soft" data-test="social-media-list-headline">
-          {{ $t('profile.socialMedia') }} {{ userName | truncate(15) }}?
-        </h5>
-        <template>
-          <div v-for="link in socialMediaLinks()" :key="link.url" class="ds-my-x-small">
-            <a :href="link.url" target="_blank" rel="noopener noreferrer">
-              <favicon :src="link.favicon" :size="22" />
-              {{ link.username }}
-            </a>
-          </div>
-        </template>
+      <h5 class="title spacer-x-small" data-test="social-media-list-headline">
+        {{ $t('profile.socialMedia') }} {{ userName | truncate(15) }}?
+      </h5>
+      <div v-for="link in socialMediaLinks()" :key="link.url" class="ds-my-x-small">
+        <a :href="link.url" target="_blank" rel="noopener noreferrer">
+          <favicon :src="link.favicon" :size="22" />
+          {{ link.username }}
+        </a>
       </div>
     </os-card>
   </div>
@@ -50,9 +46,14 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .social-media-bc {
   position: relative;
   height: auto;
+
+  > .title {
+    color: $text-color-soft;
+    font-size: $font-size-base;
+  }
 }
 </style>
