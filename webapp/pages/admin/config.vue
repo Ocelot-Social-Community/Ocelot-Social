@@ -39,7 +39,10 @@
             :id="row.anchor"
             :key="row.envKey"
             class="config-row"
-            :class="{ 'config-row--blocking': row.blocking }"
+            :class="{
+              'config-row--blocking': row.blocking,
+              'config-row--highlight': row.anchor && row.anchor === highlightedKey,
+            }"
             :data-test="`config-row-${row.envKey}`"
           >
             <!-- 1. Env variable — the actionable identity of the row. -->
@@ -142,6 +145,13 @@ export default {
   data() {
     return {
       systemConfig: [],
+      // The policy key deep-linked to from the policy/roles tabs (/admin/config#<key>),
+      // used to highlight and scroll to its row. Driven from the route hash rather than
+      // the CSS :target pseudo-class: the app runs vue-router in history mode, so an
+      // in-app navigation is a history.pushState that browsers don't re-evaluate :target
+      // for. Rows arrive asynchronously (apollo), so the highlight is (re)applied when the
+      // data or the hash changes.
+      highlightedKey: null,
     }
   },
   apollo: {
@@ -190,6 +200,33 @@ export default {
         return value
       }
     },
+    // Highlight and scroll to the row deep-linked from the policy/roles tabs
+    // (/admin/config#<policyKey>). The hash targets a policy's anchored (first) row; a
+    // bare "#" or a key with no matching row clears the highlight. No-ops until the row
+    // exists (apollo may still be loading), re-run by the watchers below.
+    applyHashHighlight() {
+      const key = (this.$route?.hash || '').replace(/^#/, '')
+      const known = key && this.systemConfig.some((entry) => entry.policyKey === key)
+      this.highlightedKey = known ? key : null
+      if (!this.highlightedKey) return
+      this.$nextTick(() => {
+        document.getElementById(this.highlightedKey)?.scrollIntoView({ block: 'center' })
+      })
+    },
+  },
+  watch: {
+    // Rows arrive asynchronously (apollo) → highlight once they're populated; and again
+    // if the deep-link hash changes while already on this tab.
+    systemConfig() {
+      this.applyHashHighlight()
+    },
+    '$route.hash'() {
+      this.applyHashHighlight()
+    },
+  },
+  mounted() {
+    // Covers the case where the query result is already cached (rows present at mount).
+    this.applyHashHighlight()
   },
 }
 </script>
@@ -253,6 +290,8 @@ export default {
   th.cell--key {
     border-left: 3px solid transparent;
   }
+  // Keep the row clear of the sticky admin header when scrolled to via #key.
+  scroll-margin-top: $space-base;
 
   // A missing hard-requirement secret breaks its feature → flag the whole row.
   &--blocking {
@@ -260,6 +299,17 @@ export default {
 
     th.cell--key {
       border-left-color: $color-danger;
+    }
+  }
+
+  // Deep-linked to from the policy/roles tabs (/admin/config#<key>) → highlight the
+  // anchored row so the admin sees which env var the link pointed at. Placed after
+  // --blocking so a highlighted row reads as the navigation target.
+  &--highlight {
+    background: rgba($color-primary, 0.1);
+
+    th.cell--key {
+      border-left-color: $color-primary;
     }
   }
 }

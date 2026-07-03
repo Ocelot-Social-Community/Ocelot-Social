@@ -217,4 +217,63 @@ describe('admin/config.vue', () => {
       expect(empty.find('.config-caption').text()).toBe('admin.config.notSet')
     })
   })
+
+  describe('deep-link highlight from the policy/roles tabs', () => {
+    // history-mode pushState doesn't update :target, so the anchored row is highlighted
+    // from the route hash. A reactive $route exercises the hash watcher; attach to the
+    // document so getElementById (the scroll target) resolves; jsdom has no scrollIntoView.
+    let attached
+    const mountWithRoute = async (hash, systemConfig = SAMPLE) => {
+      const $route = localVue.observable({ hash })
+      attached = shallowMount(config, {
+        mocks: { ...mocks, $route },
+        localVue,
+        stubs,
+        attachTo: document.body,
+      })
+      await attached.setData({ systemConfig })
+      await attached.vm.$nextTick()
+      return { w: attached, $route }
+    }
+
+    beforeEach(() => {
+      window.HTMLElement.prototype.scrollIntoView = jest.fn()
+    })
+    afterEach(() => {
+      attached?.destroy()
+      attached = undefined
+    })
+
+    it('highlights and scrolls to the anchored row matching the route hash', async () => {
+      const { w } = await mountWithRoute('#apiKeysEnabled')
+      expect(w.vm.highlightedKey).toBe('apiKeysEnabled')
+      expect(row(w, 'API_KEYS_ENABLED').classes()).toContain('config-row--highlight')
+      expect(row(w, 'NEO4J_URI').classes()).not.toContain('config-row--highlight')
+      expect(window.HTMLElement.prototype.scrollIntoView).toHaveBeenCalled()
+    })
+
+    it('highlights the anchored (first) row of a policy with only hard requirements', async () => {
+      // videoConference has no seed → its first requirement (LIVEKIT_URL) carries the anchor.
+      const { w } = await mountWithRoute('#videoConference')
+      expect(w.vm.highlightedKey).toBe('videoConference')
+      expect(row(w, 'LIVEKIT_URL').classes()).toContain('config-row--highlight')
+      expect(row(w, 'LIVEKIT_API_SECRET').classes()).not.toContain('config-row--highlight')
+    })
+
+    it('highlights nothing for an unknown or empty hash', async () => {
+      const { w } = await mountWithRoute('#nonsense')
+      expect(w.vm.highlightedKey).toBeNull()
+      expect(w.find('.config-row--highlight').exists()).toBe(false)
+      expect(window.HTMLElement.prototype.scrollIntoView).not.toHaveBeenCalled()
+    })
+
+    it('re-evaluates the highlight when the hash changes without a remount', async () => {
+      const { w, $route } = await mountWithRoute('')
+      expect(w.vm.highlightedKey).toBeNull()
+      $route.hash = '#publicRegistration'
+      await w.vm.$nextTick()
+      expect(w.vm.highlightedKey).toBe('publicRegistration')
+      expect(row(w, 'PUBLIC_REGISTRATION').classes()).toContain('config-row--highlight')
+    })
+  })
 })
