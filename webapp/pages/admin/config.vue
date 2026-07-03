@@ -208,8 +208,8 @@ export default {
         rows.push({
           ...entry,
           anchor,
-          // Pre-format the value strings once (used for the cell text, the title tooltip
-          // and the truncation decision) instead of calling fmt() repeatedly in template.
+          // Pre-format the value strings once instead of calling fmt() repeatedly in the
+          // template.
           effectiveText: entry.effective === null ? null : this.fmt(entry.effective),
           envValueText: entry.envValue === null ? null : this.fmt(entry.envValue),
           softwareDefaultText:

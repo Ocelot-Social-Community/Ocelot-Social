@@ -333,14 +333,15 @@ describe('admin/config.vue', () => {
   })
 
   describe('value truncation', () => {
-    it('needsTrunc flags only strings longer than the ellipsis threshold', async () => {
-      const vm = (await Wrapper()).vm
-      expect(vm.needsTrunc('short')).toBe(false)
-      expect(vm.needsTrunc('x'.repeat(25))).toBe(true)
-      expect(vm.needsTrunc(null)).toBe(false)
-    })
+    // refreshTruncation() decides interactivity from real geometry (whether a cell is
+    // clipped by its column), not a character count. jsdom has no layout, so stub
+    // scrollWidth/clientWidth to simulate a clipped vs. fitting cell.
+    const setWidths = (el, scroll, client) => {
+      Object.defineProperty(el, 'scrollWidth', { value: scroll, configurable: true })
+      Object.defineProperty(el, 'clientWidth', { value: client, configurable: true })
+    }
 
-    it('truncates a long value and exposes the full value via title + focusable reveal', async () => {
+    it('always keeps the full value in the DOM regardless of column width', async () => {
       const LONG = 'https://s3.eu-central-1.example.com/some/very/long/endpoint'
       const w = await Wrapper([
         {
@@ -359,18 +360,44 @@ describe('admin/config.vue', () => {
       ])
       const code = w.find('[data-test="config-envvalue-AWS_ENDPOINT"]')
       expect(code.classes()).toContain('truncate')
-      // full value stays in the DOM (screen readers) and is offered as a hover tooltip …
       expect(code.text()).toBe(LONG)
-      expect(code.attributes('title')).toBe(LONG)
-      // … and the element is focusable so a tap / keyboard focus can reveal it on mobile.
-      expect(code.attributes('tabindex')).toBe('0')
     })
 
-    it('leaves a short value non-interactive (no title, not in the tab order)', async () => {
-      const code = row(await Wrapper(), 'NEO4J_URI').find('[data-test="config-envvalue-NEO4J_URI"]')
-      expect(code.classes()).toContain('truncate')
+    it('marks a clipped cell interactive: is-clipped, focusable and a full-value title', async () => {
+      const w = await Wrapper()
+      const code = row(w, 'NEO4J_URI').find('[data-test="config-envvalue-NEO4J_URI"]')
+      // simulate the fixed column clipping the value, then re-measure
+      setWidths(code.element, 500, 100)
+      w.vm.refreshTruncation()
+      expect(code.classes()).toContain('is-clipped')
+      expect(code.attributes('tabindex')).toBe('0')
+      expect(code.attributes('title')).toBe('bolt://db:7687')
+    })
+
+    it('leaves a cell that fits non-interactive (no title, not in the tab order)', async () => {
+      const w = await Wrapper()
+      const code = row(w, 'NEO4J_URI').find('[data-test="config-envvalue-NEO4J_URI"]')
+      setWidths(code.element, 100, 100) // scrollWidth == clientWidth → fits
+      w.vm.refreshTruncation()
+      expect(code.classes()).not.toContain('is-clipped')
       expect(code.attributes('title')).toBeUndefined()
       expect(code.attributes('tabindex')).toBeUndefined()
+    })
+
+    it('coalesces a burst of resize events into a single re-measure per frame', async () => {
+      const w = await Wrapper()
+      const spy = jest.spyOn(w.vm, 'refreshTruncation')
+      let frameCb
+      const raf = jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
+        frameCb = cb
+        return 7
+      })
+      w.vm.onResize() // schedules a frame
+      w.vm.onResize() // frame already pending → coalesced, no second schedule
+      expect(raf).toHaveBeenCalledTimes(1)
+      frameCb() // run the frame
+      expect(spy).toHaveBeenCalled()
+      raf.mockRestore()
     })
   })
 })
