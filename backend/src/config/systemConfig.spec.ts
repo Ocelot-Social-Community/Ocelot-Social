@@ -64,6 +64,17 @@ describe('systemConfigStatus', () => {
       expect(rowFor('JWT_SECRET', { JWT_SECRET: '' }).state).toBe('empty')
       expect(rowFor('JWT_SECRET', {}).state).toBe('missing')
     })
+
+    it("surfaces a secret's software default (a public code constant) but never its env value", () => {
+      const row = rowFor('NEO4J_PASSWORD', { NEO4J_PASSWORD: 'deployed-secret' })
+      expect(row.secret).toBe(true)
+      expect(row.state).toBe('set')
+      // deployed value withheld …
+      expect(row.envValue).toBeNull()
+      expect(row.effective).toBeNull()
+      // … but the public software default is shown (so it isn't misreported as "no default").
+      expect(row.softwareDefault).toBe('neo4j')
+    })
   })
 
   describe('plain non-secret infrastructure var', () => {

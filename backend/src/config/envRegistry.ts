@@ -41,7 +41,8 @@ export interface EnvVarSpec {
   // Display grouping on the admin config tab.
   category: EnvCategory
   // The code baseline the value falls back to when the var is unset, as a display
-  // string. null when there is no meaningful default (or the var is a secret).
+  // string, or null when there is none. This is a PUBLIC code constant (not a deployed
+  // secret), so it is surfaced even for a secret var — only the runtime env value is hidden.
   softwareDefault: string | null
 }
 
@@ -71,7 +72,9 @@ export const ENV_REGISTRY: EnvVarSpec[] = [
     softwareDefault: 'bolt://localhost:7687',
   },
   { name: 'NEO4J_USERNAME', secret: false, category: 'database', softwareDefault: 'neo4j' },
-  { name: 'NEO4J_PASSWORD', secret: true, category: 'database', softwareDefault: null },
+  // A software default is a PUBLIC code constant (config/index.ts), not the deployed
+  // secret — so it is shown even for a secret var. Only the runtime env VALUE is hidden.
+  { name: 'NEO4J_PASSWORD', secret: true, category: 'database', softwareDefault: 'neo4j' },
 
   // --- Mail / SMTP --------------------------------------------------------
   { name: 'EMAIL_DEFAULT_SENDER', secret: false, category: 'mail', softwareDefault: null },

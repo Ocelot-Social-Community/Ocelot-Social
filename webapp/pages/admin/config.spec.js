@@ -174,6 +174,32 @@ describe('admin/config.vue', () => {
       expect(jwt.findAll('.cell-empty')).toHaveLength(2)
     })
 
+    it('shows the software default of a secret that has one, while masking its env value', async () => {
+      // A software default is a public code constant → shown even for a secret; only the
+      // deployed env value stays masked. NEO4J_PASSWORD is the real-world case.
+      const w = await Wrapper([
+        {
+          envKey: 'NEO4J_PASSWORD',
+          category: 'database',
+          secret: true,
+          state: 'set',
+          effective: null,
+          override: null,
+          envValue: null,
+          softwareDefault: 'neo4j',
+          overridable: false,
+          policyKey: null,
+          blocking: false,
+        },
+      ])
+      const pw = row(w, 'NEO4J_PASSWORD')
+      // env value masked (deployed secret withheld)
+      expect(pw.find('.value--masked').exists()).toBe(true)
+      // software default shown as a value, not "no default"
+      expect(pw.find('.cell--muted code').text()).toBe('neo4j')
+      expect(pw.text()).not.toContain('admin.config.noDefault')
+    })
+
     it('em-dashes (does not mask) a secret that is missing', async () => {
       const secret = row(await Wrapper(), 'LIVEKIT_API_SECRET')
       expect(secret.find('[data-test="config-state-LIVEKIT_API_SECRET"]').classes()).toContain(

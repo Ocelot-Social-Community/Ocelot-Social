@@ -147,7 +147,9 @@ export function systemConfigStatus(env: Env, policy: PolicyLike): SystemConfigRo
       effective: spec.secret ? null : (value ?? spec.softwareDefault),
       override: null,
       envValue: value,
-      softwareDefault: spec.secret ? null : spec.softwareDefault,
+      // The software default is a public code constant, so it is surfaced even for a
+      // secret (only the runtime env value above is withheld).
+      softwareDefault: spec.softwareDefault,
       overridable: false,
       policyKey: null,
       blocking: false,
