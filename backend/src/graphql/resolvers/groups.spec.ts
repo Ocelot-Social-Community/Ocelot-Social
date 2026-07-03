@@ -6,6 +6,9 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable jest/no-commented-out-tests */
+import { PubSub } from 'graphql-subscriptions'
+
+import { GROUP_SHOW_MEMBERS_CHANGED } from '@constants/subscriptions'
 import Factory, { cleanDatabase } from '@db/factories'
 import ChangeGroupMemberRole from '@graphql/queries/groups/ChangeGroupMemberRole.gql'
 import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
@@ -21,13 +24,12 @@ import UpdateGroup from '@graphql/queries/groups/UpdateGroup.gql'
 import UserGroups from '@graphql/queries/groups/UserGroups.gql'
 import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import Post from '@graphql/queries/posts/Post.gql'
-import { PubSub } from 'graphql-subscriptions'
 import { createApolloTestSetup } from '@root/test/helpers'
-import { GROUP_SHOW_MEMBERS_CHANGED } from '@constants/subscriptions'
+
+import groupsResolver from './groups'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
-import groupsResolver from './groups'
 // import CONFIG from '@src/config'
 
 let user

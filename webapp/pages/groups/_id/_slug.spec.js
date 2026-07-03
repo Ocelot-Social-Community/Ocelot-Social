@@ -680,7 +680,9 @@ describe('GroupProfileSlug', () => {
         capturedCallbacks.push(callbacks)
         return { unsubscribe: jest.fn() }
       })
-      const capturingSubscribeMock = jest.fn().mockReturnValue({ subscribe: capturingInnerSubscribe })
+      const capturingSubscribeMock = jest
+        .fn()
+        .mockReturnValue({ subscribe: capturingInnerSubscribe })
       currentUserMock.mockReturnValue(peterLustig)
       mount(GroupProfileSlug, {
         localVue,
