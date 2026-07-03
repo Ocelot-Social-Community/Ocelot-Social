@@ -85,13 +85,13 @@ export default {
           permissions: ['donation.manage'],
         },
         {
-          name: this.$t('admin.policy.name'),
-          path: '/admin/policy',
+          name: this.$t('admin.config.name'),
+          path: '/admin/config',
           permissions: ['policy.manage'],
         },
         {
-          name: this.$t('admin.config.name'),
-          path: '/admin/config',
+          name: this.$t('admin.policy.name'),
+          path: '/admin/policy',
           permissions: ['policy.manage'],
         },
         {
