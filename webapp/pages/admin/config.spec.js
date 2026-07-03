@@ -331,4 +331,46 @@ describe('admin/config.vue', () => {
       jest.useRealTimers()
     })
   })
+
+  describe('value truncation', () => {
+    it('needsTrunc flags only strings longer than the ellipsis threshold', async () => {
+      const vm = (await Wrapper()).vm
+      expect(vm.needsTrunc('short')).toBe(false)
+      expect(vm.needsTrunc('x'.repeat(25))).toBe(true)
+      expect(vm.needsTrunc(null)).toBe(false)
+    })
+
+    it('truncates a long value and exposes the full value via title + focusable reveal', async () => {
+      const LONG = 'https://s3.eu-central-1.example.com/some/very/long/endpoint'
+      const w = await Wrapper([
+        {
+          envKey: 'AWS_ENDPOINT',
+          category: 'storage',
+          secret: false,
+          state: 'set',
+          effective: LONG,
+          override: null,
+          envValue: LONG,
+          softwareDefault: null,
+          overridable: false,
+          policyKey: null,
+          blocking: false,
+        },
+      ])
+      const code = w.find('[data-test="config-envvalue-AWS_ENDPOINT"]')
+      expect(code.classes()).toContain('truncate')
+      // full value stays in the DOM (screen readers) and is offered as a hover tooltip …
+      expect(code.text()).toBe(LONG)
+      expect(code.attributes('title')).toBe(LONG)
+      // … and the element is focusable so a tap / keyboard focus can reveal it on mobile.
+      expect(code.attributes('tabindex')).toBe('0')
+    })
+
+    it('leaves a short value non-interactive (no title, not in the tab order)', async () => {
+      const code = row(await Wrapper(), 'NEO4J_URI').find('[data-test="config-envvalue-NEO4J_URI"]')
+      expect(code.classes()).toContain('truncate')
+      expect(code.attributes('title')).toBeUndefined()
+      expect(code.attributes('tabindex')).toBeUndefined()
+    })
+  })
 })

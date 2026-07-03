@@ -13,6 +13,13 @@
     <div class="config-table-wrap">
       <table class="config-table" data-test="config-table">
         <caption class="config-caption">{{ $t('admin.config.tableCaption') }}</caption>
+        <colgroup>
+          <col class="col--key" />
+          <col class="col--effective" />
+          <col class="col--override" />
+          <col class="col--envvalue" />
+          <col class="col--default" />
+        </colgroup>
         <thead>
           <tr>
             <th scope="col">{{ $t('admin.config.col.envKey') }}</th>
@@ -45,7 +52,8 @@
             }"
             :data-test="`config-row-${row.envKey}`"
           >
-            <!-- 1. Env variable — the actionable identity of the row. -->
+            <!-- 1. Env variable — the actionable identity of the row. Never truncated
+                 (it's the primary identifier); wraps on very narrow viewports instead. -->
             <th scope="row" class="cell cell--key">
               <code>{{ row.envKey }}</code>
             </th>
@@ -53,7 +61,14 @@
             <!-- 2. Effective state in operation. A value-bearing var shows its effective
                  value; a secret or a hard-requirement var shows presence only (badge). -->
             <td class="cell cell--effective">
-              <span v-if="row.effective !== null" class="value">{{ fmt(row.effective) }}</span>
+              <span
+                v-if="row.effective !== null"
+                class="value truncate"
+                :title="truncTitle(row.effectiveText)"
+                :tabindex="truncTab(row.effectiveText)"
+              >
+                {{ row.effectiveText }}
+              </span>
               <template v-else>
                 <span
                   class="badge"
@@ -102,8 +117,14 @@
                 <span aria-hidden="true">••••••</span>
                 <span class="config-caption">{{ $t('admin.config.secretHidden') }}</span>
               </span>
-              <code v-else-if="row.envValue !== null" :data-test="`config-envvalue-${row.envKey}`">
-                {{ fmt(row.envValue) }}
+              <code
+                v-else-if="row.envValue !== null"
+                class="truncate"
+                :data-test="`config-envvalue-${row.envKey}`"
+                :title="truncTitle(row.envValueText)"
+                :tabindex="truncTab(row.envValueText)"
+              >
+                {{ row.envValueText }}
               </code>
               <span v-else class="cell-empty">
                 <span aria-hidden="true">&mdash;</span>
@@ -115,7 +136,14 @@
                  and hard-requirement vars have none — em-dashed as "no default" (not as
                  "not set", which would wrongly read as an unset env var). -->
             <td class="cell cell--muted">
-              <code v-if="row.softwareDefault !== null">{{ fmt(row.softwareDefault) }}</code>
+              <code
+                v-if="row.softwareDefault !== null"
+                class="truncate"
+                :title="truncTitle(row.softwareDefaultText)"
+                :tabindex="truncTab(row.softwareDefaultText)"
+              >
+                {{ row.softwareDefaultText }}
+              </code>
               <span v-else class="cell-empty">
                 <span aria-hidden="true">&mdash;</span>
                 <span class="config-caption">{{ $t('admin.config.noDefault') }}</span>
@@ -189,7 +217,16 @@ export default {
           anchor = entry.policyKey
         }
         const rows = byCategory.get(entry.category) ?? []
-        rows.push({ ...entry, anchor })
+        rows.push({
+          ...entry,
+          anchor,
+          // Pre-format the value strings once (used for the cell text, the title tooltip
+          // and the truncation decision) instead of calling fmt() repeatedly in template.
+          effectiveText: entry.effective === null ? null : this.fmt(entry.effective),
+          envValueText: entry.envValue === null ? null : this.fmt(entry.envValue),
+          softwareDefaultText:
+            entry.softwareDefault === null ? null : this.fmt(entry.softwareDefault),
+        })
         byCategory.set(entry.category, rows)
       }
       return CATEGORY_ORDER.filter((category) => byCategory.has(category)).map((category) => ({
@@ -212,6 +249,19 @@ export default {
       } catch {
         return value
       }
+    },
+    // A value long enough to be worth truncating (shown ellipsised, full value on
+    // hover/tap). Short values render as plain, non-interactive text.
+    needsTrunc(text) {
+      return typeof text === 'string' && text.length > 24
+    },
+    // title tooltip / tabindex only for truncated values, so short cells stay
+    // non-interactive and don't clutter the keyboard tab order.
+    truncTitle(text) {
+      return this.needsTrunc(text) ? text : null
+    },
+    truncTab(text) {
+      return this.needsTrunc(text) ? 0 : null
     },
     // Highlight and scroll to the row deep-linked from the policy/roles tabs
     // (/admin/config#<policyKey>). The hash targets a policy's anchored (first) row; a
@@ -267,16 +317,35 @@ export default {
 .config-caption {
   @include visually-hidden;
 }
-// Plain block: the page (not an inner box) scrolls, so it grows with the content. The
-// column header stays visible via a viewport-sticky thead (see thead th) — which only
-// works while NO ancestor is a scroll container, hence no overflow here.
+// No horizontal scroll box (it would break the viewport-sticky header). Instead the
+// table is fixed-layout at width:100%, so it is ALWAYS exactly as wide as the card —
+// never wider (no desktop overflow past the card, no mobile page-fill). Long values are
+// clipped to their column (see .truncate), keys/headers wrap.
 .config-table-wrap {
   overflow: visible;
 }
 .config-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: 0.9em;
+
+  // Column widths (sum 100%): the key gets the most room, the override the least.
+  .col--key {
+    width: 24%;
+  }
+  .col--effective {
+    width: 20%;
+  }
+  .col--override {
+    width: 12%;
+  }
+  .col--envvalue {
+    width: 22%;
+  }
+  .col--default {
+    width: 22%;
+  }
 
   th,
   td {
@@ -284,10 +353,8 @@ export default {
     text-align: left;
     vertical-align: top;
     border-bottom: 1px solid $border-color-softer;
-    // Without a horizontal scroll box (which would break the viewport-sticky header),
-    // the table must always fit its container: long unbroken values (URLs, DSNs) and
-    // env-var names wrap instead of pushing the table past the page/card — so nothing is
-    // clipped off-screen and the mobile layout stays intact.
+    // Keys and headers wrap within their fixed column instead of overflowing it; value
+    // cells opt out via .truncate (single line + ellipsis).
     overflow-wrap: anywhere;
   }
   thead th {
@@ -296,14 +363,11 @@ export default {
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 0.03em;
-    // NB: intentionally NOT `white-space: nowrap` — the headers must be able to wrap so
-    // the table can shrink to narrow (mobile) widths instead of overflowing the card.
-    // Freeze the column header just below the fixed app header (whose height the header
-    // menu exposes as --header-height) so it stays visible while the page scrolls — the
-    // same viewport-sticky pattern as the admin tab navigation. border-collapse drops a
-    // sticky cell's own border during scroll, so draw the divider with an inset shadow
-    // instead of border-bottom, and give the cell an opaque background so scrolled rows
-    // don't show through.
+    border-bottom: 2px solid $border-color-softer;
+    // Freeze the column header just below the fixed app header (its height is exposed as
+    // --header-height) so it stays visible while the page scrolls. border-collapse drops
+    // a sticky cell's own border during scroll → keep the divider as an inset shadow, and
+    // give the cell an opaque background so scrolled rows don't show through.
     position: sticky;
     top: var(--header-height, 6rem);
     z-index: $z-index-sticky;
@@ -386,6 +450,26 @@ export default {
 }
 .cell-empty {
   color: $text-color-soft;
+}
+// Values are clipped to their fixed column on a single line (no wrapping, no widening
+// the table). The full value is revealed on hover via the native title tooltip, and on
+// tap / keyboard focus, which expands it in place (mobile has no hover). Only actually
+// truncated values are focusable (see truncTab), so short cells stay inert.
+.truncate {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.truncate[tabindex] {
+  cursor: pointer;
+}
+.truncate:focus {
+  overflow: visible;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  outline: 2px solid $color-secondary;
+  outline-offset: 1px;
 }
 // A set secret: shown as masked dots (present, value withheld) rather than a value or
 // a misleading "not set" dash.
