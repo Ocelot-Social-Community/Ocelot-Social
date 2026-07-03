@@ -537,7 +537,7 @@ export default {
     this._groupShowMembersSub = null
     if (this.isGroupMemberNonePending) this.setupRoomUpdatedSubscription()
     if (this.canShowVideoCallButton) this.setupVideoCallCountSubscription()
-    this.setupGroupShowMembersSubscription()
+    if (this.group?.myRole) this.setupGroupShowMembersSubscription()
   },
   beforeDestroy() {
     this._roomUpdatedSub?.unsubscribe()
@@ -557,6 +557,9 @@ export default {
     canShowVideoCallButton(can) {
       if (can) this.setupVideoCallCountSubscription()
       else this.teardownVideoCallCountSubscription()
+    },
+    'group.myRole'(myRole) {
+      if (myRole) this.setupGroupShowMembersSubscription()
     },
   },
   methods: {

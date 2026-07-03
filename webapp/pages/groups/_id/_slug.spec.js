@@ -665,10 +665,12 @@ describe('GroupProfileSlug', () => {
 
     it('does not double-subscribe if membership signal fires multiple times', async () => {
       const wrapper = mountWithGroup({ ...yogaPractice, myRole: 'usual' })
-      expect(subscribeMock).toHaveBeenCalledTimes(1)
+      // roomUpdated + groupShowMembers are both set up on mount for members
+      expect(subscribeMock).toHaveBeenCalledTimes(2)
       wrapper.setData({ group: { ...yogaPractice, myRole: 'admin' } })
       await wrapper.vm.$nextTick()
-      expect(subscribeMock).toHaveBeenCalledTimes(1)
+      // neither subscription is set up again after role change
+      expect(subscribeMock).toHaveBeenCalledTimes(2)
     })
   })
 
