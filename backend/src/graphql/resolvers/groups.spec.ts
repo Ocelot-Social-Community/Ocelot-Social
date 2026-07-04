@@ -3312,7 +3312,9 @@ describe('in mode', () => {
                     variables: { id: 'my-group', showMembers: true },
                   }),
                 ).resolves.toMatchObject({
-                  data: { UpdateGroup: expect.objectContaining({ id: 'my-group', myRole: 'owner' }) },
+                  data: {
+                    UpdateGroup: expect.objectContaining({ id: 'my-group', myRole: 'owner' }),
+                  },
                   errors: undefined,
                 })
               })
