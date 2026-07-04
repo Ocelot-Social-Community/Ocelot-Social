@@ -54,6 +54,7 @@ export default {
   > .title {
     color: $text-color-soft;
     font-size: $font-size-base;
+    margin-bottom: $space-small;
   }
 }
 </style>

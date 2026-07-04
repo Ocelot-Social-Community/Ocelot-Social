@@ -200,10 +200,7 @@ export default {
   > .title {
     color: $text-color-soft;
     font-size: $font-size-base;
-  }
-
-  > :nth-child(n):not(:last-child) {
-    margin-bottom: $space-x-small;
+    margin-bottom: $space-small;
   }
 
   .group-scroll-container {
