@@ -1,3 +1,4 @@
+/// <reference types="jest" />
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -8,7 +9,10 @@
 /* eslint-disable jest/no-commented-out-tests */
 import { PubSub } from 'graphql-subscriptions'
 
-import { GROUP_SHOW_MEMBERS_CHANGED } from '@constants/subscriptions'
+import {
+  GROUP_MEMBERSHIP_VISIBILITY_CHANGED,
+  GROUP_SHOW_MEMBERS_CHANGED,
+} from '@constants/subscriptions'
 import Factory, { cleanDatabase } from '@db/factories'
 import ChangeGroupMemberRole from '@graphql/queries/groups/ChangeGroupMemberRole.gql'
 import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
@@ -3987,6 +3991,26 @@ describe('Subscription.groupShowMembersChanged filter', () => {
     })
     const { value } = await next
     expect(value).toEqual({ groupShowMembersChanged: { groupId: 'g1' } })
+    await iterator.return?.()
+  })
+})
+
+describe('Subscription.groupMembershipVisibilityChanged filter', () => {
+  it('passes matching events through for authenticated users', async () => {
+    const pubsub = new PubSub()
+    const context = { pubsub, user: { id: 'u1' } } as unknown as Context
+    const iterator = groupsResolver.Subscription.groupMembershipVisibilityChanged.subscribe(
+      null,
+      { userId: 'u2' },
+      context,
+      null,
+    )
+    const next = iterator.next()
+    await pubsub.publish(GROUP_MEMBERSHIP_VISIBILITY_CHANGED, {
+      groupMembershipVisibilityChanged: { userId: 'u2' },
+    })
+    const { value } = await next
+    expect(value).toEqual({ groupMembershipVisibilityChanged: { userId: 'u2' } })
     await iterator.return?.()
   })
 })
