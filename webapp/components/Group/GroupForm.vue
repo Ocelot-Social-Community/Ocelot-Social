@@ -241,6 +241,8 @@ export default {
       showMembers,
     } = this.group
     const initialCategoryIds = categories ? categories.map((category) => category.id) : []
+    const effectiveShowMembersInitial =
+      groupType === 'public' ? true : groupType === 'hidden' ? false : (showMembers ?? false)
     return {
       disabled: false,
       loading: false,
@@ -256,7 +258,7 @@ export default {
         description: description || '',
         actionRadius: actionRadius || '',
         locationName: locationName || '',
-        showMembers: showMembers ?? false,
+        showMembers: effectiveShowMembersInitial,
       },
       formData: {
         name: name || '',
@@ -350,7 +352,7 @@ export default {
         this.savedBaseline.actionRadius === this.formData.actionRadius &&
         this.sameLocation &&
         this.sameCategories &&
-        this.savedBaseline.showMembers === this.formData.showMembers
+        this.savedBaseline.showMembers === this.effectiveShowMembers
       )
     },
   },
