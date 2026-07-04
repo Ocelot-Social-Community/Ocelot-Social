@@ -48,8 +48,9 @@ export interface EnvVarSpec {
   softwareDefault: string | null
 }
 
-// Every recognised env var except the policy-seed vars. Mirrors the reads in
-// config/index.ts (keep in sync when a new env var is introduced there).
+// Every recognised env var except the policy-seed vars. Kept in lockstep with the reads
+// in config/index.ts — enforced by envRegistry.spec.ts, which fails if the runtime reads a
+// var this registry omits (or declares one nothing reads).
 export const ENV_REGISTRY: EnvVarSpec[] = [
   // --- Server -------------------------------------------------------------
   { name: 'NODE_ENV', secret: false, category: 'server', softwareDefault: null },
