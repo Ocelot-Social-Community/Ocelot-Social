@@ -12,8 +12,8 @@
         <span class="group-teaser__name">{{ group.name }}</span>
       </user-teaser-helper>
     </template>
-    <template #popover="{ isOpen }">
-      <group-teaser-popover v-if="isOpen" :group="group" :group-link="groupLink" />
+    <template #popover>
+      <group-teaser-popover :group="group" :group-link="groupLink" />
     </template>
   </dropdown>
 </template>
