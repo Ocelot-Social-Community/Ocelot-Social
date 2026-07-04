@@ -146,6 +146,7 @@
 
 <script>
 import { OsCard } from '@ocelot-social/ui'
+import deepLinkHighlight from '~/mixins/deepLinkHighlight'
 import { systemConfigQuery } from '~/graphql/admin/SystemConfig'
 
 // Fixed display order of the category groups (infrastructure first, then feature
@@ -165,22 +166,16 @@ const CATEGORY_ORDER = [
   'general',
 ]
 
-// How long a deep-link highlight stays before it fades out (see applyHashHighlight).
-const HIGHLIGHT_DURATION_MS = 2500
-
 export default {
   components: { OsCard },
+  // Deep-link highlight (highlightedKey, applyHashHighlight, hash watcher, fade timer) is
+  // shared with the policy tab. Rows arrive asynchronously (apollo), so the highlight is
+  // re-applied from the systemConfig watcher below once the data is populated.
+  mixins: [deepLinkHighlight],
   middleware: ['isAdmin'],
   data() {
     return {
       systemConfig: [],
-      // The policy key deep-linked to from the policy/roles tabs (/admin/config#<key>),
-      // used to highlight and scroll to its row. Driven from the route hash rather than
-      // the CSS :target pseudo-class: the app runs vue-router in history mode, so an
-      // in-app navigation is a history.pushState that browsers don't re-evaluate :target
-      // for. Rows arrive asynchronously (apollo), so the highlight is (re)applied when the
-      // data or the hash changes.
-      highlightedKey: null,
     }
   },
   apollo: {
@@ -268,40 +263,21 @@ export default {
         this.refreshTruncation()
       })
     },
-    // Highlight and scroll to the row deep-linked from the policy/roles tabs
-    // (/admin/config#<policyKey>). The hash targets a policy's anchored (first) row; a
-    // bare "#" or a key with no matching row clears the highlight. No-ops until the row
-    // exists (apollo may still be loading), re-run by the watchers below.
-    applyHashHighlight() {
-      clearTimeout(this.highlightTimer)
-      const key = (this.$route?.hash || '').replace(/^#/, '')
-      const known = key && this.systemConfig.some((entry) => entry.policyKey === key)
-      this.highlightedKey = known ? key : null
-      if (!this.highlightedKey) return
-      this.$nextTick(() => {
-        document.getElementById(this.highlightedKey)?.scrollIntoView({ block: 'center' })
-      })
-      // Fade the highlight out after a moment: it draws the eye on arrival without
-      // sticking permanently. Clearing the key drops the class; the CSS transition
-      // animates the fade.
-      this.highlightTimer = setTimeout(() => {
-        this.highlightedKey = null
-      }, HIGHLIGHT_DURATION_MS)
+    // The hash keys this tab can highlight (deepLinkHighlight mixin): every policy key
+    // present. The deep link from the policy/roles tabs targets a policy's anchored first
+    // row, whose element id is the policy key.
+    highlightableKeys() {
+      return this.systemConfig.map((entry) => entry.policyKey).filter(Boolean)
     },
   },
   watch: {
-    // Rows arrive asynchronously (apollo) → highlight once they're populated; and again
-    // if the deep-link hash changes while already on this tab.
+    // Rows arrive asynchronously (apollo) → (re)apply the deep-link highlight once they're
+    // populated. The hash-change case is handled by the mixin's own watcher.
     systemConfig() {
-      this.applyHashHighlight()
-    },
-    '$route.hash'() {
       this.applyHashHighlight()
     },
   },
   mounted() {
-    // Covers the case where the query result is already cached (rows present at mount).
-    this.applyHashHighlight()
     this.$nextTick(this.refreshTruncation)
     window.addEventListener('resize', this.onResize)
   },
@@ -310,7 +286,6 @@ export default {
     this.$nextTick(this.refreshTruncation)
   },
   beforeDestroy() {
-    clearTimeout(this.highlightTimer)
     if (this.resizeFrame) cancelAnimationFrame(this.resizeFrame)
     window.removeEventListener('resize', this.onResize)
   },

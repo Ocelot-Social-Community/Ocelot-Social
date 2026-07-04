@@ -130,23 +130,5 @@
       "envSeed": "MAX_GROUP_PINNED_POSTS",
       "description": "Maximum number of posts that can be pinned within a group (0 disables pinning). Only relevant to logged-in users, so visible to 'authenticated' (and admin)."
     }
-  },
-  "required": [
-    "publicRegistration",
-    "inviteRegistration",
-    "askForRealName",
-    "requireLocation",
-    "inviteLinkLimit",
-    "inviteCodesPersonalPerUser",
-    "inviteCodesGroupPerUser",
-    "categoriesActive",
-    "badgesEnabled",
-    "showContentFilterHeaderMenu",
-    "showContentFilterMasonryGrid",
-    "showGroupButtonInHeader",
-    "apiKeysEnabled",
-    "apiKeysMaxPerUser",
-    "maxPinnedPosts",
-    "maxGroupPinnedPosts"
-  ]
+  }
 }

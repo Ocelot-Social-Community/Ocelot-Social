@@ -31,7 +31,6 @@ interface RawProperty {
 
 interface RawSchema {
   properties: Record<string, RawProperty>
-  required?: string[]
 }
 
 const rawSchema = require('./policy.schema.json') as RawSchema

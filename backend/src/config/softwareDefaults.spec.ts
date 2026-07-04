@@ -1,0 +1,82 @@
+// Keys iterated below come from the fixed SOFTWARE_DEFAULTS / config module, never user
+// input — the object-injection lint is a false positive here.
+/* eslint-disable security/detect-object-injection */
+import { ENV_SPEC_BY_NAME } from './envRegistry'
+import { SOFTWARE_DEFAULTS } from './softwareDefaults'
+
+import type { Config } from './index'
+
+// The subset of config/index.ts the runtime guard reads back (the flags whose default
+// lives in comparison logic there rather than in the map).
+interface LoadedConfig {
+  default: Config
+  nodemailerTransportOptions: {
+    ignoreTLS?: boolean
+    secure?: boolean
+    tls?: { rejectUnauthorized: boolean }
+  }
+}
+
+// (a) Structural guard: the admin "software default" column (envRegistry) must surface
+// exactly the canonical value, so nobody can re-inline a diverging literal. Every key in
+// the map is an env var present in the registry; its display string is String(value).
+describe('SOFTWARE_DEFAULTS ↔ envRegistry display', () => {
+  it('surfaces each canonical default as the registry display string', () => {
+    for (const [name, value] of Object.entries(SOFTWARE_DEFAULTS)) {
+      const spec = ENV_SPEC_BY_NAME[name]
+      expect(spec).toBeDefined()
+      expect(spec.softwareDefault).toBe(String(value))
+    }
+  })
+})
+
+// (b) Runtime guard for the inverted-boolean flags. Unlike the ?? / || cases (which read
+// SOFTWARE_DEFAULTS directly in config/index.ts and therefore cannot drift), these flags
+// encode their default in comparison logic (`!== 'false'` / `=== 'true'`), separate from
+// the map — so a flipped comparison would silently disagree with what the admin sees. This
+// asserts config's actual unset-default equals the map value.
+describe('SOFTWARE_DEFAULTS ↔ config runtime default (boolean flags)', () => {
+  // config/index.ts refuses to load unless the hard-required vars are present, so supply
+  // dummies. The flags under test are deliberately ABSENT, so config yields their defaults.
+  const REQUIRED: Record<string, string> = {
+    NODE_ENV: 'test',
+    EMAIL_DEFAULT_SENDER: 'x',
+    AWS_ACCESS_KEY_ID: 'x',
+    AWS_SECRET_ACCESS_KEY: 'x',
+    AWS_ENDPOINT: 'x',
+    AWS_REGION: 'x',
+    AWS_BUCKET: 'x',
+    IMAGOR_PUBLIC_URL: 'x',
+    IMAGOR_SECRET: 'x',
+    MAPBOX_TOKEN: 'x',
+    JWT_SECRET: 'x',
+  }
+
+  // config reads Cypress.env() when a global `Cypress` is present (see config/index.ts).
+  // Injecting it bypasses process.env / the repo .env entirely — otherwise .env (which sets
+  // SMTP_* etc.) would mask the true software defaults we mean to assert.
+  const loadConfigWithFlagsUnset = () => {
+    jest.resetModules()
+    const g = global as unknown as { Cypress?: { env: () => Record<string, string> } }
+    g.Cypress = { env: () => ({ ...REQUIRED }) }
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports, n/global-require
+      return require('./index') as LoadedConfig
+    } finally {
+      delete g.Cypress
+    }
+  }
+
+  it('defaults SMTP ignoreTLS / secure / rejectUnauthorized to the map values', () => {
+    const { nodemailerTransportOptions } = loadConfigWithFlagsUnset()
+    const tls = nodemailerTransportOptions.tls as { rejectUnauthorized: boolean }
+    expect(nodemailerTransportOptions.ignoreTLS).toBe(SOFTWARE_DEFAULTS.SMTP_IGNORE_TLS)
+    expect(nodemailerTransportOptions.secure).toBe(SOFTWARE_DEFAULTS.SMTP_SECURE)
+    expect(tls.rejectUnauthorized).toBe(SOFTWARE_DEFAULTS.SMTP_REJECT_UNAUTHORIZED)
+  })
+
+  it('defaults PRODUCTION_DB_CLEAN_ALLOW to the map value', () => {
+    const { default: CONFIG } = loadConfigWithFlagsUnset()
+    expect(CONFIG.PRODUCTION_DB_CLEAN_ALLOW).toBe(SOFTWARE_DEFAULTS.PRODUCTION_DB_CLEAN_ALLOW)
+  })
+})

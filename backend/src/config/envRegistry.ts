@@ -13,6 +13,8 @@
 // Secret hygiene: a var missing from this registry defaults to secret=true in
 // systemConfig.ts, so a newly introduced var can never leak its value by omission.
 
+import { SOFTWARE_DEFAULTS } from './softwareDefaults'
+
 import type { PolicyKey } from '@src/policy'
 
 // Display groups, rendered as sub-headings on the config tab (labels are i18n keys
@@ -55,13 +57,13 @@ export const ENV_REGISTRY: EnvVarSpec[] = [
     name: 'CLIENT_URI',
     secret: false,
     category: 'server',
-    softwareDefault: 'http://localhost:3000',
+    softwareDefault: SOFTWARE_DEFAULTS.CLIENT_URI,
   },
   {
     name: 'GRAPHQL_URI',
     secret: false,
     category: 'server',
-    softwareDefault: 'http://localhost:4000',
+    softwareDefault: SOFTWARE_DEFAULTS.GRAPHQL_URI,
   },
 
   // --- Database -----------------------------------------------------------
@@ -69,27 +71,62 @@ export const ENV_REGISTRY: EnvVarSpec[] = [
     name: 'NEO4J_URI',
     secret: false,
     category: 'database',
-    softwareDefault: 'bolt://localhost:7687',
+    softwareDefault: SOFTWARE_DEFAULTS.NEO4J_URI,
   },
-  { name: 'NEO4J_USERNAME', secret: false, category: 'database', softwareDefault: 'neo4j' },
+  {
+    name: 'NEO4J_USERNAME',
+    secret: false,
+    category: 'database',
+    softwareDefault: SOFTWARE_DEFAULTS.NEO4J_USERNAME,
+  },
   // A software default is a PUBLIC code constant (config/index.ts), not the deployed
   // secret — so it is shown even for a secret var. Only the runtime env VALUE is hidden.
-  { name: 'NEO4J_PASSWORD', secret: true, category: 'database', softwareDefault: 'neo4j' },
+  {
+    name: 'NEO4J_PASSWORD',
+    secret: true,
+    category: 'database',
+    softwareDefault: SOFTWARE_DEFAULTS.NEO4J_PASSWORD,
+  },
 
   // --- Mail / SMTP --------------------------------------------------------
   { name: 'EMAIL_DEFAULT_SENDER', secret: false, category: 'mail', softwareDefault: null },
   { name: 'SMTP_HOST', secret: false, category: 'mail', softwareDefault: null },
   { name: 'SMTP_PORT', secret: false, category: 'mail', softwareDefault: null },
-  { name: 'SMTP_IGNORE_TLS', secret: false, category: 'mail', softwareDefault: 'true' },
-  { name: 'SMTP_SECURE', secret: false, category: 'mail', softwareDefault: 'false' },
+  {
+    name: 'SMTP_IGNORE_TLS',
+    secret: false,
+    category: 'mail',
+    softwareDefault: String(SOFTWARE_DEFAULTS.SMTP_IGNORE_TLS),
+  },
+  {
+    name: 'SMTP_SECURE',
+    secret: false,
+    category: 'mail',
+    softwareDefault: String(SOFTWARE_DEFAULTS.SMTP_SECURE),
+  },
   { name: 'SMTP_USERNAME', secret: false, category: 'mail', softwareDefault: null },
   { name: 'SMTP_PASSWORD', secret: true, category: 'mail', softwareDefault: null },
   { name: 'SMTP_DKIM_DOMAINNAME', secret: false, category: 'mail', softwareDefault: null },
   { name: 'SMTP_DKIM_KEYSELECTOR', secret: false, category: 'mail', softwareDefault: null },
   { name: 'SMTP_DKIM_PRIVATEKEY', secret: true, category: 'mail', softwareDefault: null },
-  { name: 'SMTP_MAX_CONNECTIONS', secret: false, category: 'mail', softwareDefault: '5' },
-  { name: 'SMTP_MAX_MESSAGES', secret: false, category: 'mail', softwareDefault: '100' },
-  { name: 'SMTP_REJECT_UNAUTHORIZED', secret: false, category: 'mail', softwareDefault: 'true' },
+  {
+    name: 'SMTP_MAX_CONNECTIONS',
+    secret: false,
+    category: 'mail',
+    softwareDefault: String(SOFTWARE_DEFAULTS.SMTP_MAX_CONNECTIONS),
+  },
+  {
+    name: 'SMTP_MAX_MESSAGES',
+    secret: false,
+    category: 'mail',
+    softwareDefault: String(SOFTWARE_DEFAULTS.SMTP_MAX_MESSAGES),
+  },
+  {
+    name: 'SMTP_REJECT_UNAUTHORIZED',
+    secret: false,
+    category: 'mail',
+    softwareDefault: String(SOFTWARE_DEFAULTS.SMTP_REJECT_UNAUTHORIZED),
+  },
 
   // --- Storage / S3 -------------------------------------------------------
   { name: 'PROXY_S3', secret: false, category: 'storage', softwareDefault: null },
@@ -105,7 +142,12 @@ export const ENV_REGISTRY: EnvVarSpec[] = [
 
   // --- Auth ---------------------------------------------------------------
   { name: 'JWT_SECRET', secret: true, category: 'auth', softwareDefault: null },
-  { name: 'JWT_EXPIRES', secret: false, category: 'auth', softwareDefault: '2y' },
+  {
+    name: 'JWT_EXPIRES',
+    secret: false,
+    category: 'auth',
+    softwareDefault: SOFTWARE_DEFAULTS.JWT_EXPIRES,
+  },
 
   // --- Maps ---------------------------------------------------------------
   { name: 'MAPBOX_TOKEN', secret: true, category: 'maps', softwareDefault: null },
@@ -131,11 +173,16 @@ export const ENV_REGISTRY: EnvVarSpec[] = [
     name: 'PRODUCTION_DB_CLEAN_ALLOW',
     secret: false,
     category: 'general',
-    softwareDefault: 'false',
+    softwareDefault: String(SOFTWARE_DEFAULTS.PRODUCTION_DB_CLEAN_ALLOW),
   },
   { name: 'DISABLED_MIDDLEWARES', secret: false, category: 'general', softwareDefault: null },
   { name: 'SUPPORT_EMAIL', secret: false, category: 'general', softwareDefault: null },
-  { name: 'LANGUAGE_DEFAULT', secret: false, category: 'general', softwareDefault: 'en' },
+  {
+    name: 'LANGUAGE_DEFAULT',
+    secret: false,
+    category: 'general',
+    softwareDefault: SOFTWARE_DEFAULTS.LANGUAGE_DEFAULT,
+  },
 ]
 
 // Category for each policy key's env row(s). Policy seed vars and their hard-required

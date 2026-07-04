@@ -9,6 +9,7 @@ import { config } from 'dotenv'
 
 import emails from './emails'
 import metadata from './metadata'
+import { SOFTWARE_DEFAULTS } from './softwareDefaults'
 
 import type * as SMTPTransport from 'nodemailer/lib/smtp-pool'
 
@@ -26,7 +27,7 @@ const environment = {
   TEST: env.NODE_ENV === 'test',
   PRODUCTION: env.NODE_ENV === 'production',
   // used for staging enviroments if 'PRODUCTION=true' and 'PRODUCTION_DB_CLEAN_ALLOW=true'
-  PRODUCTION_DB_CLEAN_ALLOW: env.PRODUCTION_DB_CLEAN_ALLOW === 'true' || false, // default = false
+  PRODUCTION_DB_CLEAN_ALLOW: env.PRODUCTION_DB_CLEAN_ALLOW === 'true', // default = SOFTWARE_DEFAULTS.PRODUCTION_DB_CLEAN_ALLOW (false)
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   DISABLED_MIDDLEWARES: ['test', 'development'].includes(env.NODE_ENV!)
     ? (env.DISABLED_MIDDLEWARES?.split(',') ?? [])
@@ -37,9 +38,9 @@ const environment = {
 }
 
 const server = {
-  CLIENT_URI: env.CLIENT_URI ?? 'http://localhost:3000',
-  GRAPHQL_URI: env.GRAPHQL_URI ?? 'http://localhost:4000',
-  JWT_EXPIRES: env.JWT_EXPIRES ?? '2y',
+  CLIENT_URI: env.CLIENT_URI ?? SOFTWARE_DEFAULTS.CLIENT_URI,
+  GRAPHQL_URI: env.GRAPHQL_URI ?? SOFTWARE_DEFAULTS.GRAPHQL_URI,
+  JWT_EXPIRES: env.JWT_EXPIRES ?? SOFTWARE_DEFAULTS.JWT_EXPIRES,
 }
 
 const SMTP_HOST = env.SMTP_HOST
@@ -52,8 +53,11 @@ const SMTP_DKIM_DOMAINNAME = env.SMTP_DKIM_DOMAINNAME
 const SMTP_DKIM_KEYSELECTOR = env.SMTP_DKIM_KEYSELECTOR
 // PEM format = https://docs.progress.com/bundle/datadirect-hybrid-data-pipeline-installation-46/page/PEM-file-format.html
 const SMTP_DKIM_PRIVATEKEY = env.SMTP_DKIM_PRIVATEKEY?.replace(/\\n/g, '\n') // replace all "\n" in .env string by real line break
-const SMTP_MAX_CONNECTIONS = (env.SMTP_MAX_CONNECTIONS && parseInt(env.SMTP_MAX_CONNECTIONS)) || 5
-const SMTP_MAX_MESSAGES = (env.SMTP_MAX_MESSAGES && parseInt(env.SMTP_MAX_MESSAGES)) || 100
+const SMTP_MAX_CONNECTIONS =
+  (env.SMTP_MAX_CONNECTIONS && parseInt(env.SMTP_MAX_CONNECTIONS)) ||
+  SOFTWARE_DEFAULTS.SMTP_MAX_CONNECTIONS
+const SMTP_MAX_MESSAGES =
+  (env.SMTP_MAX_MESSAGES && parseInt(env.SMTP_MAX_MESSAGES)) || SOFTWARE_DEFAULTS.SMTP_MAX_MESSAGES
 const SMTP_REJECT_UNAUTHORIZED = env.SMTP_REJECT_UNAUTHORIZED !== 'false' // default = true
 
 const nodemailerTransportOptions: SMTPTransport.Options = {
@@ -83,9 +87,9 @@ if (SMTP_DKIM_DOMAINNAME && SMTP_DKIM_KEYSELECTOR && SMTP_DKIM_PRIVATEKEY) {
 }
 
 const neo4j = {
-  NEO4J_URI: env.NEO4J_URI ?? 'bolt://localhost:7687',
-  NEO4J_USERNAME: env.NEO4J_USERNAME ?? 'neo4j',
-  NEO4J_PASSWORD: env.NEO4J_PASSWORD ?? 'neo4j',
+  NEO4J_URI: env.NEO4J_URI ?? SOFTWARE_DEFAULTS.NEO4J_URI,
+  NEO4J_USERNAME: env.NEO4J_USERNAME ?? SOFTWARE_DEFAULTS.NEO4J_USERNAME,
+  NEO4J_PASSWORD: env.NEO4J_PASSWORD ?? SOFTWARE_DEFAULTS.NEO4J_PASSWORD,
 }
 
 const sentry = {
@@ -161,7 +165,7 @@ const options = {
 }
 
 const language = {
-  LANGUAGE_DEFAULT: process.env.LANGUAGE_DEFAULT ?? 'en',
+  LANGUAGE_DEFAULT: process.env.LANGUAGE_DEFAULT ?? SOFTWARE_DEFAULTS.LANGUAGE_DEFAULT,
 }
 
 const CONFIG = {

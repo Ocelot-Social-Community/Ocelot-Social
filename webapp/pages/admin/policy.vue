@@ -149,13 +149,15 @@
 <script>
 import { OsButton, OsCard } from '@ocelot-social/ui'
 import { mapActions, mapGetters } from 'vuex'
+import deepLinkHighlight from '~/mixins/deepLinkHighlight'
 import { policyConfigQuery } from '~/graphql/admin/PolicyConfig'
-
-// How long a deep-link highlight stays before it fades out (see applyHashHighlight).
-const HIGHLIGHT_DURATION_MS = 2500
 
 export default {
   components: { OsButton, OsCard },
+  // Deep-link highlight (highlightedKey, applyHashHighlight, hash watcher, fade timer) is
+  // shared with the config tab. The policy rows are static (v-for over `groups`), so the
+  // mixin's own mount is enough — no async re-apply needed.
+  mixins: [deepLinkHighlight],
   middleware: ['isAdmin'],
   apollo: {
     // Per-key config layers + env availability. Drives the env-dependency UI: a key
@@ -247,11 +249,6 @@ export default {
       loaded: false,
       // Per-key config layers + availability from the backend (apollo above).
       policyConfig: [],
-      // The policy key deep-linked to from the config tab (/admin/policy#<key>), used
-      // to highlight its row. Driven from the route hash rather than the CSS :target
-      // pseudo-class: the app runs vue-router in history mode, so an in-app navigation
-      // is a history.pushState that browsers do NOT re-evaluate :target for.
-      highlightedKey: null,
     }
   },
   computed: {
@@ -290,23 +287,10 @@ export default {
     isNumberKey(key) {
       return this.numberKeys.includes(key)
     },
-    // Highlight and scroll to the policy row deep-linked from the config tab
-    // (/admin/policy#<key>). Reads the route hash (a bare "#" or an unknown key clears
-    // the highlight) and centres the row once the DOM has it.
-    applyHashHighlight() {
-      clearTimeout(this.highlightTimer)
-      const key = (this.$route?.hash || '').replace(/^#/, '')
-      this.highlightedKey = this.keys.includes(key) ? key : null
-      if (!this.highlightedKey) return
-      this.$nextTick(() => {
-        document.getElementById(this.highlightedKey)?.scrollIntoView({ block: 'center' })
-      })
-      // Fade the highlight out after a moment: it draws the eye on arrival without
-      // sticking permanently. Clearing the key drops the class; the CSS transition
-      // animates the fade.
-      this.highlightTimer = setTimeout(() => {
-        this.highlightedKey = null
-      }, HIGHLIGHT_DURATION_MS)
+    // The hash keys this tab can highlight (deepLinkHighlight mixin): every policy key,
+    // whose row element id is the key itself.
+    highlightableKeys() {
+      return this.keys
     },
     // A key is unavailable when its hard env requirements are unmet: the stored flag
     // has no effect, so the input is disabled and a link to the config tab is shown.
@@ -444,11 +428,6 @@ export default {
       },
       deep: true,
     },
-    // Deep-linked to while already on this page (or the hash changed) → re-evaluate
-    // which row to highlight without a remount.
-    '$route.hash'() {
-      this.applyHashHighlight()
-    },
   },
   async mounted() {
     // Required: the viewer-scoped snapshot drives the form/checkboxes. policy/init
@@ -464,11 +443,6 @@ export default {
     }
     this.syncFormFromSnapshot()
     this.loaded = true
-    // Rows are rendered now → highlight/scroll to the deep-linked one, if any.
-    this.applyHashHighlight()
-  },
-  beforeDestroy() {
-    clearTimeout(this.highlightTimer)
   },
 }
 </script>
