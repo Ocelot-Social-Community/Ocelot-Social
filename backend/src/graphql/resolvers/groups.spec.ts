@@ -23,6 +23,7 @@ import JoinGroup from '@graphql/queries/groups/JoinGroup.gql'
 import LeaveGroup from '@graphql/queries/groups/LeaveGroup.gql'
 import muteGroupMutation from '@graphql/queries/groups/muteGroup.gql'
 import RemoveUserFromGroup from '@graphql/queries/groups/RemoveUserFromGroup.gql'
+import SetGroupMembershipVisibility from '@graphql/queries/groups/SetGroupMembershipVisibility.gql'
 import unmuteGroupMutation from '@graphql/queries/groups/unmuteGroup.gql'
 import UpdateGroup from '@graphql/queries/groups/UpdateGroup.gql'
 import UserGroups from '@graphql/queries/groups/UserGroups.gql'
@@ -3302,6 +3303,20 @@ describe('in mode', () => {
                 })
               })
             })
+
+            describe('showMembers', () => {
+              it('publishes groupShowMembersChanged event when showMembers is updated', async () => {
+                await expect(
+                  mutate({
+                    mutation: UpdateGroup,
+                    variables: { id: 'my-group', showMembers: true },
+                  }),
+                ).resolves.toMatchObject({
+                  data: { UpdateGroup: expect.objectContaining({ id: 'my-group', myRole: 'owner' }) },
+                  errors: undefined,
+                })
+              })
+            })
           })
 
           describe('groupType', () => {
@@ -3746,6 +3761,56 @@ describe('in mode', () => {
         authenticatedUser = null
         await expect(
           mutate({ mutation: unmuteGroupMutation, variables: { groupId } }),
+        ).resolves.toMatchObject({
+          errors: [expect.objectContaining({ message: 'Not Authorized!' })],
+        })
+      })
+    })
+
+    describe('setGroupMembershipVisibility', () => {
+      let groupId: string
+
+      beforeEach(async () => {
+        authenticatedUser = await user.toJson()
+        const result = await mutate({
+          mutation: CreateGroup,
+          variables: {
+            name: 'Visibility Test Group',
+            about: 'A group for visibility tests',
+            description:
+              'This is a test group for visibility purposes, with enough description length to pass validation',
+            groupType: 'public',
+            actionRadius: 'national',
+            categoryIds: ['cat9'],
+          },
+        })
+        groupId = result.data.CreateGroup.id
+      })
+
+      it('sets showOnProfile to false for a group member', async () => {
+        await expect(
+          mutate({
+            mutation: SetGroupMembershipVisibility,
+            variables: { groupId, showOnProfile: false },
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            setGroupMembershipVisibility: {
+              role: 'owner',
+              showOnProfile: false,
+            },
+          },
+          errors: undefined,
+        })
+      })
+
+      it('throws for unauthenticated user', async () => {
+        authenticatedUser = null
+        await expect(
+          mutate({
+            mutation: SetGroupMembershipVisibility,
+            variables: { groupId, showOnProfile: false },
+          }),
         ).resolves.toMatchObject({
           errors: [expect.objectContaining({ message: 'Not Authorized!' })],
         })
