@@ -50,6 +50,7 @@ export const createGroupMutation = () => {
         }
         locationName
         myRole
+        showMembers
       }
     }
   `

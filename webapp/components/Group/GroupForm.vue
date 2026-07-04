@@ -415,7 +415,7 @@ export default {
             description: this.formData.description,
             actionRadius: this.formData.actionRadius,
             locationName: this.formLocationName,
-            showMembers: this.formData.showMembers,
+            showMembers: this.effectiveShowMembers,
           }
           this.initialCategoryIds = [...this.formData.categoryIds]
         }

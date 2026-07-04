@@ -120,10 +120,6 @@ export default {
               MATCH (user:User)-[membership:MEMBER_OF]->(group)
               WHERE membership.role <> 'pending'
                 AND coalesce(membership.showOnProfile, true) = true
-                AND (
-                  (group.groupType = 'public' AND coalesce(user.showPublicGroupsOnProfile, true) = true)
-                  OR (group.groupType = 'closed' AND coalesce(user.showClosedGroupsOnProfile, true) = true)
-                )
               RETURN user {.*}, membership {.*}
               SKIP toInteger($offset) LIMIT toInteger($first)
             `

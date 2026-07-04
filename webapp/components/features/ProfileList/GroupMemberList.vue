@@ -91,7 +91,7 @@ export default {
       next: () => {
         this.reloadGroups()
       },
-      error: () => {},
+      error: (err) => this.$toast.error(err.message),
     })
 
     await this.loadGroups(0)
