@@ -311,6 +311,22 @@ export class PolicyService {
     return event
   }
 
+  // Reset several keys to their defaults in one call. Validates every key first (so a bad
+  // key fails the whole batch before any write), then resets only the keys that actually
+  // diverge from their default — a key already at its default has no stored override to
+  // delete and needs no broadcast. Returns one event per key that changed; each still
+  // broadcasts per-key (the subscription is per-key), but from a single request and a
+  // single last-change, instead of N sequential round-trips.
+  async resetMany(keys: PolicyKey[], actor: string): Promise<PolicyChangeEvent[]> {
+    for (const key of keys) this.assertKnownKey(key)
+    const events: PolicyChangeEvent[] = []
+    for (const key of keys) {
+      if (this.get(key) === this.getDefault(key)) continue
+      events.push(await this.reset(key, actor))
+    }
+    return events
+  }
+
   // Broadcast a change to other instances. Intentionally non-blocking: the DB
   // write is the commit point and the local cache is already updated, so a
   // broadcast failure must NOT fail the caller's set()/reset(). We log both

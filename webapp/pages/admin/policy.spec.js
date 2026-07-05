@@ -12,7 +12,7 @@ describe('admin/policy.vue', () => {
   let init
   let fetchDefaults
   let setKey
-  let resetKey
+  let resetKeys
 
   const snapshot = {
     publicRegistration: false,
@@ -118,7 +118,7 @@ describe('admin/policy.vue', () => {
     init = jest.fn().mockResolvedValue()
     fetchDefaults = jest.fn().mockResolvedValue()
     setKey = jest.fn().mockResolvedValue()
-    resetKey = jest.fn().mockResolvedValue()
+    resetKeys = jest.fn().mockResolvedValue([])
     store = new Vuex.Store({
       modules: {
         policy: {
@@ -136,7 +136,7 @@ describe('admin/policy.vue', () => {
               state.snap = value
             },
           },
-          actions: { init, fetchDefaults, setKey, resetKey },
+          actions: { init, fetchDefaults, setKey, resetKeys },
         },
       },
     })
@@ -519,17 +519,16 @@ describe('admin/policy.vue', () => {
       expect(setKey).not.toHaveBeenCalled()
     })
 
-    it('resets every key to its default via resetKey', async () => {
+    it('resets every key to its default via a single bulk resetKeys call', async () => {
       wrapper = Wrapper()
       await flushPromises()
 
       await wrapper.find('[data-test="policy-reset"]').trigger('click')
       await flushPromises()
 
-      expect(resetKey).toHaveBeenCalledTimes(ALL_KEYS.length) // one per policy key
-      for (const key of ALL_KEYS) {
-        expect(resetKey).toHaveBeenCalledWith(expect.anything(), { key })
-      }
+      // One round-trip for all keys, not one mutation per key.
+      expect(resetKeys).toHaveBeenCalledTimes(1)
+      expect(resetKeys).toHaveBeenCalledWith(expect.anything(), { keys: ALL_KEYS })
       expect(mocks.$toast.success).toHaveBeenCalled()
     })
   })

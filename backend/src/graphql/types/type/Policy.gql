@@ -74,6 +74,8 @@ type Mutation {
   setPolicy(key: PolicyKey!, value: String!): PolicyChangeEvent!
   "Reset a single policy key to its configured default. Requires the `policy.manage` permission."
   resetPolicy(key: PolicyKey!): PolicyChangeEvent!
+  "Reset several policy keys to their configured defaults in one request (only keys that diverge actually change). Requires the `policy.manage` permission."
+  resetPolicies(keys: [PolicyKey!]!): [PolicyChangeEvent!]!
 }
 
 type Subscription {

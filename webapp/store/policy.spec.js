@@ -291,6 +291,51 @@ describe('policy store', () => {
       })
     })
 
+    describe('resetKeys (bulk)', () => {
+      it('patches each returned event and records the last change once', async () => {
+        const resetPolicies = [
+          { key: 'categoriesActive', value: 'false', actor: 'admin-1', timestamp: 't1' },
+          { key: 'apiKeysMaxPerUser', value: '5', actor: 'admin-1', timestamp: 't2' },
+        ]
+        const mutate = jest.fn().mockResolvedValue({ data: { resetPolicies } })
+        await bindAction(actions.resetKeys, { mutate })(
+          { commit },
+          { keys: ['categoriesActive', 'apiKeysMaxPerUser'] },
+        )
+
+        expect(mutate).toHaveBeenCalledTimes(1)
+        expect(commit).toHaveBeenCalledWith('PATCH_KEY', { key: 'categoriesActive', value: false })
+        expect(commit).toHaveBeenCalledWith('PATCH_KEY', { key: 'apiKeysMaxPerUser', value: 5 })
+        // Last change recorded once, from the last event of the batch.
+        expect(commit).toHaveBeenCalledWith('SET_LAST_CHANGE', {
+          actor: 'admin-1',
+          timestamp: 't2',
+        })
+      })
+
+      it('records no change when nothing diverged (empty result)', async () => {
+        const mutate = jest.fn().mockResolvedValue({ data: { resetPolicies: [] } })
+        await bindAction(actions.resetKeys, { mutate })({ commit }, { keys: ['categoriesActive'] })
+
+        expect(commit).not.toHaveBeenCalledWith('PATCH_KEY', expect.anything())
+        expect(commit).not.toHaveBeenCalledWith('SET_LAST_CHANGE', expect.anything())
+      })
+
+      it('skips an unparseable value but still records the last change', async () => {
+        const resetPolicies = [
+          { key: 'categoriesActive', value: '{bad', actor: 'admin-1', timestamp: 't1' },
+        ]
+        const mutate = jest.fn().mockResolvedValue({ data: { resetPolicies } })
+        await bindAction(actions.resetKeys, { mutate })({ commit }, { keys: ['categoriesActive'] })
+
+        expect(commit).not.toHaveBeenCalledWith('PATCH_KEY', expect.anything())
+        expect(commit).toHaveBeenCalledWith('SET_LAST_CHANGE', {
+          actor: 'admin-1',
+          timestamp: 't1',
+        })
+      })
+    })
+
     describe('subscribe', () => {
       it('is a no-op when already subscribed', () => {
         const clientSubscribe = jest.fn()

@@ -17,7 +17,8 @@ import {
   deleteSetting as deleteSettingImpl,
 } from './repository'
 
-import type { PolicyPubSub, PolicyChangeEvent } from './PolicyService'
+import type { PolicyChangeEvent, PolicyPubSub } from './PolicyService'
+import type { PolicyKey } from './types'
 
 jest.mock('./repository', () => ({
   POLICY_NAMESPACE: 'policy',
@@ -561,6 +562,52 @@ describe('PolicyService', () => {
           policyChanged: expect.objectContaining({ key: 'publicRegistration' }),
         }),
       )
+    })
+  })
+
+  describe('resetMany()', () => {
+    it('resets only the keys that diverge from their default, skipping the rest', async () => {
+      // publicRegistration overridden to true; inviteRegistration is already at its default.
+      readAllSettings.mockResolvedValue({ publicRegistration: true })
+      const svc = new PolicyService(dbStub)
+      await svc.init({}) // no env seeds → schema defaults (publicRegistration=false, inviteRegistration=true)
+
+      const events = await svc.resetMany(['publicRegistration', 'inviteRegistration'], 'actor')
+
+      expect(events.map((e) => e.key)).toEqual(['publicRegistration'])
+      expect(deleteSetting).toHaveBeenCalledWith(expect.anything(), 'policy', 'publicRegistration')
+      expect(deleteSetting).not.toHaveBeenCalledWith(expect.anything(), 'policy', 'inviteRegistration')
+      expect(svc.get('publicRegistration')).toBe(false)
+    })
+
+    it('validates every key before writing (an unknown key fails the whole batch)', async () => {
+      readAllSettings.mockResolvedValue({ publicRegistration: true })
+      const svc = new PolicyService(dbStub)
+      await svc.init({})
+
+      await expect(
+        svc.resetMany(['publicRegistration', 'nope'] as PolicyKey[], 'actor'),
+      ).rejects.toThrow()
+      // The bad key was caught up front, so nothing was written.
+      expect(deleteSetting).not.toHaveBeenCalled()
+    })
+
+    it('publishes one change event per key that actually changed', async () => {
+      readAllSettings.mockResolvedValue({ publicRegistration: true, categoriesActive: true })
+      const publish = jest.fn()
+      const pubsub: PolicyPubSub = {
+        publish,
+        subscribe: jest.fn().mockResolvedValue(1),
+        unsubscribe: jest.fn(),
+      }
+      const svc = new PolicyService(dbStub)
+      await svc.init({}, pubsub) // defaults: publicRegistration=false, categoriesActive=false, inviteRegistration=true
+      publish.mockClear()
+
+      await svc.resetMany(['publicRegistration', 'categoriesActive', 'inviteRegistration'], 'actor')
+
+      // Two diverged (were true, default false); inviteRegistration was already at default.
+      expect(publish).toHaveBeenCalledTimes(2)
     })
   })
 

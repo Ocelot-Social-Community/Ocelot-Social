@@ -345,6 +345,28 @@ describe('Mutation resolvers (unit)', () => {
     })
   })
 
+  describe('resetPolicies (bulk)', () => {
+    it('calls policy.resetMany once and serializes the returned events', async () => {
+      const resetMany = jest.fn().mockResolvedValue([
+        { key: 'categoriesActive', value: false, actor: 'admin-1', timestamp: 'ts' },
+        { key: 'apiKeysMaxPerUser', value: 5, actor: 'admin-1', timestamp: 'ts' },
+      ])
+
+      const result = await policyResolvers.Mutation.resetPolicies(
+        null,
+        { keys: ['categoriesActive', 'apiKeysMaxPerUser'] },
+        mutationContext({ resetMany }),
+      )
+
+      expect(resetMany).toHaveBeenCalledTimes(1)
+      expect(resetMany).toHaveBeenCalledWith(['categoriesActive', 'apiKeysMaxPerUser'], 'admin-1')
+      expect(result.map((r) => [r.key, r.value])).toEqual([
+        ['categoriesActive', 'false'],
+        ['apiKeysMaxPerUser', '5'],
+      ])
+    })
+  })
+
   // A gate-flag change flips permission availability network-wide, so it must also
   // signal the permission system (clients refetch myPermissions + the roles catalog).
   describe('permissions-gate broadcast', () => {
@@ -401,6 +423,38 @@ describe('Mutation resolvers (unit)', () => {
       expect(publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
         permissionsChanged: { roleName: null, previousRoleName: null },
       })
+    })
+
+    it('broadcasts permissionsChanged once when a bulk reset changes a gate flag', async () => {
+      const resetMany = jest.fn().mockResolvedValue([
+        { key: 'publicRegistration', value: false, actor: 'admin-1', timestamp: 't' },
+        { key: 'apiKeysEnabled', value: false, actor: 'admin-1', timestamp: 't' },
+      ])
+      const publish = jest.fn()
+      await policyResolvers.Mutation.resetPolicies(
+        null,
+        { keys: ['publicRegistration', 'apiKeysEnabled'] },
+        ctxWithPubsub({ resetMany }, publish),
+      )
+      const gateBroadcasts = publish.mock.calls.filter(
+        ([channel]) => channel === PERMISSIONS_CHANGED_CHANNEL,
+      )
+      expect(gateBroadcasts).toHaveLength(1)
+    })
+
+    it('does NOT broadcast permissionsChanged when no reset gate flag actually changed', async () => {
+      // apiKeysEnabled was requested but already at its default, so resetMany didn't return
+      // it — no permission availability changed, no signal.
+      const resetMany = jest.fn().mockResolvedValue([
+        { key: 'publicRegistration', value: false, actor: 'admin-1', timestamp: 't' },
+      ])
+      const publish = jest.fn()
+      await policyResolvers.Mutation.resetPolicies(
+        null,
+        { keys: ['publicRegistration', 'apiKeysEnabled'] },
+        ctxWithPubsub({ resetMany }, publish),
+      )
+      expect(publish).not.toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, expect.anything())
     })
   })
 })

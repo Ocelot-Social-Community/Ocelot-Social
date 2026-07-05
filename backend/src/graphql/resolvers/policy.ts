@@ -89,6 +89,24 @@ export default {
         throw err
       }
     },
+    // Bulk reset (the admin "reset all" button): one round-trip instead of N, resetting only
+    // the keys that actually diverge from their default.
+    resetPolicies: async (_parent: unknown, { keys }: { keys: string[] }, context: Context) => {
+      const { policy, user } = context
+      try {
+        const events = await policy.resetMany(keys as PolicyKey[], user?.id ?? 'unknown')
+        // One permissionsChanged signal if a reset key that actually changed gates a
+        // permission — clients refetch myPermissions + the admin roles catalog once, not
+        // once per key.
+        if (events.some((event) => isPermissionGatePolicyKey(event.key))) {
+          publishPermissionsChanged(context, null)
+        }
+        return events.map(serializeEvent)
+      } catch (err) {
+        if (err instanceof PolicyValidationError) throw new UserInputError(err.message)
+        throw err
+      }
+    },
   },
   Subscription: {
     policyChanged: {

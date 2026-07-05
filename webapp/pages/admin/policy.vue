@@ -229,7 +229,7 @@ export default {
       fetchPolicy: 'policy/init',
       fetchDefaults: 'policy/fetchDefaults',
       setKey: 'policy/setKey',
-      resetKey: 'policy/resetKey',
+      resetKeys: 'policy/resetKeys',
     }),
     formatTimestamp(timestamp) {
       const date = new Date(timestamp)
@@ -352,9 +352,9 @@ export default {
     async resetAllToDefault() {
       this.saving = true
       try {
-        for (const key of this.keys) {
-          await this.resetKey({ key })
-        }
+        // One bulk mutation instead of N sequential resets — the backend resets only the
+        // keys that actually diverge and emits a single last-change / broadcast burst.
+        await this.resetKeys({ keys: this.keys })
         this.syncFormFromSnapshot()
         this.$toast.success(this.$t('admin.policy.saveSuccess'))
       } catch (err) {

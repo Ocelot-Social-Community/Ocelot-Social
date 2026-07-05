@@ -1,7 +1,11 @@
 import PolicyQuery from '~/graphql/PolicyQuery'
 import PolicyDefaultsQuery from '~/graphql/PolicyDefaultsQuery'
 import PolicySubscription from '~/graphql/PolicySubscription'
-import { setPolicyMutation, resetPolicyMutation } from '~/graphql/PolicyMutations'
+import {
+  setPolicyMutation,
+  resetPolicyMutation,
+  resetPoliciesMutation,
+} from '~/graphql/PolicyMutations'
 
 // Extract { actor, timestamp } from a mutation result / policyDefaults.lastChange.
 const toLastChange = (event) => (event ? { actor: event.actor, timestamp: event.timestamp } : null)
@@ -181,6 +185,29 @@ export const actions = {
     }
     commit('SET_LAST_CHANGE', toLastChange(resetPolicy))
     return resetPolicy
+  },
+
+  // Reset several keys in one round-trip (the admin "reset all" button). The backend only
+  // returns events for keys that actually diverged, so patch each of those locally; the
+  // pubsub broadcast delivers the authoritative values to other tabs.
+  async resetKeys({ commit }, { keys }) {
+    const {
+      data: { resetPolicies },
+    } = await apolloClient(this).mutate({
+      mutation: resetPoliciesMutation(),
+      variables: { keys },
+    })
+    for (const event of resetPolicies) {
+      try {
+        commit('PATCH_KEY', { key: event.key, value: JSON.parse(event.value) })
+      } catch (err) {
+        // Ignore an unparseable value; the subscription delivers the authoritative one.
+      }
+    }
+    if (resetPolicies.length) {
+      commit('SET_LAST_CHANGE', toLastChange(resetPolicies[resetPolicies.length - 1]))
+    }
+    return resetPolicies
   },
 
   // Subscribes once per client to policyChanged. Idempotent — repeated calls

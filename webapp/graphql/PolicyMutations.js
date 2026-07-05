@@ -21,3 +21,14 @@ export const resetPolicyMutation = () => gql`
     }
   }
 `
+
+export const resetPoliciesMutation = () => gql`
+  mutation resetPolicies($keys: [PolicyKey!]!) {
+    resetPolicies(keys: $keys) {
+      key
+      value
+      actor
+      timestamp
+    }
+  }
+`
