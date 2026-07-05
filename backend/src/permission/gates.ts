@@ -31,10 +31,10 @@ export function isGateOpen(gate: PermissionGate, ctx: GateContext): boolean {
 // catalog's `gatedBy` declarations (the single source) rather than hand-listed, so a new
 // gated permission auto-registers its gate here. (PermissionGate stays the compile-time
 // mirror of these values, drift-guarded in schema.spec.ts.)
-export const PERMISSION_GATE_POLICY_KEYS: readonly string[] = allPermissionGates()
+export const PERMISSION_GATE_POLICY_KEYS: readonly PermissionGate[] = allPermissionGates()
 
-export function isPermissionGatePolicyKey(key: string): boolean {
-  return PERMISSION_GATE_POLICY_KEYS.includes(key)
+export function isPermissionGatePolicyKey(key: string): key is PermissionGate {
+  return (PERMISSION_GATE_POLICY_KEYS as readonly string[]).includes(key)
 }
 
 // Whether a permission is effective right now: ungated permissions always are; a
