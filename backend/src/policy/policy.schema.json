@@ -11,6 +11,7 @@
       "default": false,
       "visibility": ["public"],
       "envSeed": "PUBLIC_REGISTRATION",
+      "category": "registration",
       "description": "Whether new users can register without an invite code."
     },
     "inviteRegistration": {
@@ -18,6 +19,7 @@
       "default": true,
       "visibility": ["public"],
       "envSeed": "INVITE_REGISTRATION",
+      "category": "registration",
       "description": "Whether registration via invite code is enabled."
     },
     "askForRealName": {
@@ -25,6 +27,7 @@
       "default": false,
       "visibility": ["public"],
       "envSeed": "ASK_FOR_REAL_NAME",
+      "category": "registration",
       "description": "Whether registration asks for the user's real (given / family) name. Read during anonymous registration, so visible to 'public'."
     },
     "requireLocation": {
@@ -32,6 +35,7 @@
       "default": false,
       "visibility": ["public"],
       "envSeed": "REQUIRE_LOCATION",
+      "category": "registration",
       "description": "Whether a location is mandatory on registration and in profile settings. Read during anonymous registration, so visible to 'public'."
     },
     "inviteLinkLimit": {
@@ -40,6 +44,7 @@
       "default": 7,
       "visibility": ["authenticated"],
       "envSeed": "INVITE_LINK_LIMIT",
+      "category": "registration",
       "description": "Maximum number of personal invite links a user may have. Only relevant to logged-in users (invitations UI), so visible to 'authenticated' (and admin)."
     },
     "inviteCodesPersonalPerUser": {
@@ -48,6 +53,7 @@
       "default": 7,
       "visibility": ["authenticated"],
       "envSeed": "INVITE_CODES_PERSONAL_PER_USER",
+      "category": "registration",
       "description": "Maximum number of personal invite codes a single user may generate. Only relevant to logged-in users, so visible to 'authenticated' (and admin)."
     },
     "inviteCodesGroupPerUser": {
@@ -56,6 +62,7 @@
       "default": 7,
       "visibility": ["authenticated"],
       "envSeed": "INVITE_CODES_GROUP_PER_USER",
+      "category": "registration",
       "description": "Maximum number of group invite codes a single user may generate per group. Only relevant to logged-in users, so visible to 'authenticated' (and admin)."
     },
     "categoriesActive": {
@@ -63,6 +70,7 @@
       "default": false,
       "visibility": ["public"],
       "envSeed": "CATEGORIES_ACTIVE",
+      "category": "features",
       "description": "Whether the categories feature for posts and groups is active."
     },
     "badgesEnabled": {
@@ -70,6 +78,7 @@
       "default": false,
       "visibility": ["public"],
       "envSeed": "BADGES_ENABLED",
+      "category": "features",
       "description": "Whether the badges feature is enabled (badges shown on profiles / teasers and managed in admin). Shown on publicly visible profiles, so visible to 'public'."
     },
     "showContentFilterHeaderMenu": {
@@ -77,6 +86,7 @@
       "default": true,
       "visibility": ["public"],
       "envSeed": "SHOW_CONTENT_FILTER_HEADER_MENU",
+      "category": "features",
       "description": "Whether the content filter is shown in the header menu. Layout toggle on pages visible to everyone, so visible to 'public'."
     },
     "showContentFilterMasonryGrid": {
@@ -84,6 +94,7 @@
       "default": false,
       "visibility": ["public"],
       "envSeed": "SHOW_CONTENT_FILTER_MASONRY_GRID",
+      "category": "features",
       "description": "Whether the content filter is shown in the masonry grid (newsfeed). Layout toggle on the anonymous-accessible landing page, so visible to 'public'."
     },
     "showGroupButtonInHeader": {
@@ -91,6 +102,7 @@
       "default": true,
       "visibility": ["public"],
       "envSeed": "SHOW_GROUP_BUTTON_IN_HEADER",
+      "category": "features",
       "description": "Whether the groups button is shown in the header. Layout toggle in the header shown to everyone, so visible to 'public'."
     },
     "apiKeysEnabled": {
@@ -98,12 +110,14 @@
       "default": false,
       "visibility": ["authenticated"],
       "envSeed": "API_KEYS_ENABLED",
+      "category": "features",
       "description": "Whether API keys functionality (personal keys for backend access) is enabled. Only relevant to logged-in users (Settings / Admin), so visible to 'authenticated' (and admin)."
     },
     "videoConference": {
       "type": "boolean",
       "default": true,
       "requiresEnv": ["LIVEKIT_URL", "LIVEKIT_API_KEY", "LIVEKIT_API_SECRET"],
+      "category": "video",
       "description": "Whether video conferencing (LiveKit) is enabled. The single runtime switch for the videoCall.* permissions. Requires the three LiveKit env vars (URL/key/secret): without them the feature is unavailable regardless of this flag (the toggle is forced off and greyed in the admin UI). Admin-only."
     },
     "apiKeysMaxPerUser": {
@@ -112,6 +126,7 @@
       "default": 5,
       "visibility": ["authenticated"],
       "envSeed": "API_KEYS_MAX_PER_USER",
+      "category": "features",
       "description": "Maximum number of active API keys a single user may hold (>= 1). Disabling API keys entirely is done via apiKeysEnabled, so 0 is not a valid limit. Only relevant to logged-in users (Settings), so visible to 'authenticated' (and admin)."
     },
     "maxPinnedPosts": {
@@ -120,6 +135,7 @@
       "default": 1,
       "visibility": ["authenticated"],
       "envSeed": "MAX_PINNED_POSTS",
+      "category": "features",
       "description": "Maximum number of posts that can be pinned network-wide (0 disables pinning). Only relevant to logged-in users, so visible to 'authenticated' (and admin)."
     },
     "maxGroupPinnedPosts": {
@@ -128,6 +144,7 @@
       "default": 1,
       "visibility": ["authenticated"],
       "envSeed": "MAX_GROUP_PINNED_POSTS",
+      "category": "features",
       "description": "Maximum number of posts that can be pinned within a group (0 disables pinning). Only relevant to logged-in users, so visible to 'authenticated' (and admin)."
     }
   }

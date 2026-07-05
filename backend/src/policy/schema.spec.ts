@@ -1,7 +1,7 @@
 // Unit tests for the visibility primitive — the single mechanism shared by the
 // `policy` query resolver and the policyChanged subscription filter.
 
-import { audiencesFor, audiencesOf, canView, visibleKeys } from './schema'
+import { allKeys, audiencesFor, audiencesOf, canView, categoryFor, visibleKeys } from './schema'
 
 // The subset of ./schema the perm-gating tests re-import against a mocked JSON
 // schema. Built from the already-imported functions to avoid a namespace import.
@@ -168,5 +168,23 @@ describe('policy visibility', () => {
         'showGroupButtonInHeader',
       ])
     })
+  })
+})
+
+describe('categoryFor', () => {
+  it('returns each key’s declared admin-config category', () => {
+    expect(categoryFor('publicRegistration')).toBe('registration')
+    expect(categoryFor('inviteLinkLimit')).toBe('registration')
+    expect(categoryFor('apiKeysEnabled')).toBe('features')
+    expect(categoryFor('maxGroupPinnedPosts')).toBe('features')
+    expect(categoryFor('videoConference')).toBe('video')
+  })
+
+  it('has a category for every policy key (schema is the single source, no silent gaps)', () => {
+    // A missing category throws at module load; this also guards that the accessor never
+    // returns undefined for a known key.
+    for (const key of allKeys()) {
+      expect(categoryFor(key)).toEqual(expect.any(String))
+    }
   })
 })

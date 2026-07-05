@@ -15,24 +15,9 @@
 
 import { SOFTWARE_DEFAULTS } from './softwareDefaults'
 
-import type { PolicyKey } from '@src/policy'
-
-// Display groups, rendered as sub-headings on the config tab (labels are i18n keys
-// admin.config.category.<category> on the webapp side). Order there is fixed by the
-// webapp; the backend only tags each row with its category.
-export type EnvCategory =
-  | 'server'
-  | 'database'
-  | 'mail'
-  | 'storage'
-  | 'auth'
-  | 'maps'
-  | 'video'
-  | 'redis'
-  | 'monitoring'
-  | 'registration'
-  | 'features'
-  | 'general'
+// The category vocabulary (display groups on the config tab) lives in ./categories so the
+// policy schema can validate each key's `category` against the same source.
+import type { EnvCategory } from './categories'
 
 export interface EnvVarSpec {
   // The environment variable name (e.g. NEO4J_URI).
@@ -186,27 +171,9 @@ export const ENV_REGISTRY: EnvVarSpec[] = [
   },
 ]
 
-// Category for each policy key's env row(s). Policy seed vars and their hard-required
-// env vars inherit their policy's category. Anything unmapped falls back to 'features'.
-export const POLICY_CATEGORY: Partial<Record<PolicyKey, EnvCategory>> = {
-  publicRegistration: 'registration',
-  inviteRegistration: 'registration',
-  askForRealName: 'registration',
-  requireLocation: 'registration',
-  inviteLinkLimit: 'registration',
-  inviteCodesPersonalPerUser: 'registration',
-  inviteCodesGroupPerUser: 'registration',
-  categoriesActive: 'features',
-  badgesEnabled: 'features',
-  showContentFilterHeaderMenu: 'features',
-  showContentFilterMasonryGrid: 'features',
-  showGroupButtonInHeader: 'features',
-  apiKeysEnabled: 'features',
-  apiKeysMaxPerUser: 'features',
-  maxPinnedPosts: 'features',
-  maxGroupPinnedPosts: 'features',
-  videoConference: 'video',
-}
+// A policy key's env-row category is no longer mapped here — each key declares its own
+// `category` in policy.schema.json (read via categoryFor), so there is one definition per
+// key and no separate table to keep in sync.
 
 // Fast lookup of a var's metadata by name. Used by systemConfig.ts to resolve the
 // secret flag / category of a policy's hard-required env var.

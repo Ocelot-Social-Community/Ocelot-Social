@@ -12,11 +12,12 @@
 //     var, e.g. a LiveKit key), or a plain infrastructure row.
 
 /* eslint-disable security/detect-object-injection */ // keys come from the fixed policy schema / env registry, never user input
-import { allKeys, envSeedFor, policyValueLayers, requiresEnvFor } from '@src/policy'
+import { allKeys, categoryFor, envSeedFor, policyValueLayers, requiresEnvFor } from '@src/policy'
 
-import { ENV_REGISTRY, ENV_SPEC_BY_NAME, POLICY_CATEGORY } from './envRegistry'
+import { ENV_REGISTRY, ENV_SPEC_BY_NAME } from './envRegistry'
 
-import type { EnvCategory, EnvVarSpec } from './envRegistry'
+import type { EnvCategory } from './categories'
+import type { EnvVarSpec } from './envRegistry'
 import type { PolicyKey } from '@src/policy'
 
 export type ConfigKeyState = 'set' | 'empty' | 'missing'
@@ -67,9 +68,6 @@ export interface PolicyLike {
 const specFor = (name: string): EnvVarSpec =>
   ENV_SPEC_BY_NAME[name] ?? { name, secret: true, category: 'general', softwareDefault: null }
 
-// Category for a policy key's env rows, defaulting to 'features'.
-const categoryOf = (key: PolicyKey): EnvCategory => POLICY_CATEGORY[key] ?? 'features'
-
 // One row per recognised env var, merging static registry metadata with the live
 // policy overlay. Order: policy rows in schema order (seed or hard-requirement),
 // then the remaining plain infrastructure rows in registry order. The client groups
@@ -81,7 +79,7 @@ export function systemConfigStatus(env: Env, policy: PolicyLike): SystemConfigRo
   const governed = new Set<string>()
 
   for (const key of allKeys()) {
-    const category = categoryOf(key)
+    const category = categoryFor(key)
     const seed = envSeedFor(key)
 
     if (seed) {

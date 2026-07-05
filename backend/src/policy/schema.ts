@@ -9,6 +9,8 @@
 /* eslint-disable security/detect-object-injection */ // keys come from the fixed schema, never user input
 import { Ajv } from 'ajv'
 
+import { ENV_CATEGORIES } from '@src/config/categories'
+
 import {
   AUTHENTICATED_AUDIENCE,
   KNOWN_AUDIENCES,
@@ -17,6 +19,7 @@ import {
 } from './types'
 
 import type { Audience, NetworkPolicy, PolicyKey } from './types'
+import type { EnvCategory } from '@src/config/categories'
 import type { ValidateFunction } from 'ajv'
 
 interface RawProperty {
@@ -27,6 +30,10 @@ interface RawProperty {
   visibility?: Audience[]
   envSeed?: string
   requiresEnv?: string[]
+  // The admin config-tab display group. Declared per key, enum-validated at schema compile;
+  // read via categoryFor (which throws if a key omitted it). Optional in this type only so
+  // that missing-category check is expressible — every key must declare one.
+  category?: EnvCategory
 }
 
 interface RawSchema {
@@ -58,6 +65,19 @@ export function typeFor(key: PolicyKey): string {
   return rawSchema.properties[key].type
 }
 
+// The admin config-tab display group for a key. Single source: the key's own `category` in
+// the schema (the former POLICY_CATEGORY map is gone). Throws if a key forgot to declare
+// one — surfaced where the category is actually read, rather than silently mis-grouping it
+// in the admin UI. (When present, the value is enum-validated against ENV_CATEGORIES at
+// schema compile above; schema.spec exercises categoryFor over every key as a CI guard.)
+export function categoryFor(key: PolicyKey): EnvCategory {
+  const category = rawSchema.properties[key].category
+  if (category === undefined) {
+    throw new Error(`policy.schema.json: key "${key}" is missing a "category"`)
+  }
+  return category
+}
+
 // --- Value validation (Ajv) ------------------------------------------------
 // Per-key validators compiled once from the schema. Run in `strict: true` mode
 // so schema-authoring mistakes (typo'd / unknown keywords, wrong shapes) fail
@@ -77,6 +97,12 @@ ajv.addKeyword({ keyword: 'envSeed', metaSchema: { type: 'string' } })
 ajv.addKeyword({
   keyword: 'requiresEnv',
   metaSchema: { type: 'array', items: { type: 'string' } },
+})
+// `category` must be one of the known display groups — a typo'd category (which would put
+// the key in a phantom admin-config group) is rejected at module load.
+ajv.addKeyword({
+  keyword: 'category',
+  metaSchema: { type: 'string', enum: [...ENV_CATEGORIES] },
 })
 const validators = Object.fromEntries(
   allKeys().map((key) => [key, ajv.compile(rawSchema.properties[key])]),

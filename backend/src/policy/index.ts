@@ -15,6 +15,7 @@ export {
   audiencesOf,
   canView,
   visibleKeys,
+  categoryFor,
   defaultFor,
   envSeedFor,
   requiresEnvFor,
