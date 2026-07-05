@@ -54,6 +54,19 @@ export function gateFor(key: PermissionKey): PermissionGate | undefined {
   return catalog[key].gatedBy
 }
 
+// The distinct runtime gates the catalog declares, in first-seen (declaration) order.
+// This is the set of policy keys whose value flips permission availability network-wide —
+// derived from the catalog (the single source) so a newly gated permission automatically
+// registers its gate, with no separate hand-maintained list to keep in sync.
+export function allPermissionGates(): PermissionGate[] {
+  const gates = new Set<PermissionGate>()
+  for (const key of allPermissionKeys()) {
+    const gate = gateFor(key)
+    if (gate !== undefined) gates.add(gate)
+  }
+  return [...gates]
+}
+
 // The full catalog as a flat list — the shape the admin UI / GraphQL resolver
 // projects (key + group + gatedBy + description). Returns fresh objects so callers
 // can't mutate the singleton.

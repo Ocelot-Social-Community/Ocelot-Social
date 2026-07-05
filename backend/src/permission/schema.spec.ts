@@ -1,4 +1,5 @@
 import {
+  allPermissionGates,
   allPermissionKeys,
   descriptionFor,
   gateFor,
@@ -71,6 +72,12 @@ describe('permission catalog', () => {
       // The projection carries the gate through.
       const publicCall = permissionCatalog().find((e) => e.key === 'videoCall.create_public')
       expect(publicCall?.gatedBy).toBe('videoConference')
+    })
+
+    it('derives the distinct permission gates from the catalog, in declaration order', () => {
+      // Feeds PERMISSION_GATE_POLICY_KEYS in gates.ts — de-duplicated (videoConference is
+      // declared by three video-call rights) and ordered by first appearance.
+      expect(allPermissionGates()).toEqual(['videoConference', 'apiKeysEnabled'])
     })
 
     it('files the destructive per-user actions in the right groups', () => {

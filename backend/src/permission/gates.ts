@@ -9,7 +9,7 @@
 // `requiresEnv` (e.g. videoConference needs the LiveKit secrets), and PolicyService
 // folds that into getEffective() — so a gate never reads env directly. This collapses
 // the former two gate sources (config vs policy) into one.
-import { gateFor } from './schema'
+import { allPermissionGates, gateFor } from './schema'
 
 import type { PermissionGate, PermissionKey } from './types'
 
@@ -27,10 +27,11 @@ export function isGateOpen(gate: PermissionGate, ctx: GateContext): boolean {
 
 // Policy keys whose value gates a permission: changing one flips permission
 // availability network-wide, so setPolicy/resetPolicy re-broadcast permissionsChanged
-// for them (clients refetch myPermissions + the admin roles catalog). Both gate keys
-// are policy keys now — videoConference (env-gated via requiresEnv) and apiKeysEnabled
-// (a pure runtime toggle).
-export const PERMISSION_GATE_POLICY_KEYS: readonly string[] = ['videoConference', 'apiKeysEnabled']
+// for them (clients refetch myPermissions + the admin roles catalog). Derived from the
+// catalog's `gatedBy` declarations (the single source) rather than hand-listed, so a new
+// gated permission auto-registers its gate here. (PermissionGate stays the compile-time
+// mirror of these values, drift-guarded in schema.spec.ts.)
+export const PERMISSION_GATE_POLICY_KEYS: readonly string[] = allPermissionGates()
 
 export function isPermissionGatePolicyKey(key: string): boolean {
   return PERMISSION_GATE_POLICY_KEYS.includes(key)

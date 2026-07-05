@@ -45,6 +45,8 @@ type Policy {
   showGroupButtonInHeader: Boolean!
   "Whether personal API keys are enabled."
   apiKeysEnabled: Boolean
+  "Whether video conferencing (LiveKit) is enabled. Admin-only, so null for non-admin viewers."
+  videoConference: Boolean
   "Maximum number of API keys a user may hold."
   apiKeysMaxPerUser: Int
   "Maximum number of instance-wide pinned posts."
