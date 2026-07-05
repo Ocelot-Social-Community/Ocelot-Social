@@ -469,9 +469,11 @@ describe('Mutation resolvers (unit)', () => {
     it('does NOT broadcast permissionsChanged when no reset gate flag actually changed', async () => {
       // apiKeysEnabled was requested but already at its default, so resetMany didn't return
       // it — no permission availability changed, no signal.
-      const resetMany = jest.fn().mockResolvedValue([
-        { key: 'publicRegistration', value: false, actor: 'admin-1', timestamp: 't' },
-      ])
+      const resetMany = jest
+        .fn()
+        .mockResolvedValue([
+          { key: 'publicRegistration', value: false, actor: 'admin-1', timestamp: 't' },
+        ])
       const publish = jest.fn()
       await policyResolvers.Mutation.resetPolicies(
         null,

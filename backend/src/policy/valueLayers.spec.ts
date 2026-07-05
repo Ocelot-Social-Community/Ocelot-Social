@@ -25,7 +25,10 @@ describe('policyValueLayers', () => {
   it('reflects a diverging admin override in effective vs the env-seeded configured default', () => {
     // env seeds the default true; the admin stored false → effective and configuredDefault
     // diverge, which is exactly what the config tab reads as an "override present".
-    const policy = createInMemoryPolicyService({ apiKeysEnabled: false }, { API_KEYS_ENABLED: 'true' })
+    const policy = createInMemoryPolicyService(
+      { apiKeysEnabled: false },
+      { API_KEYS_ENABLED: 'true' },
+    )
     const layers = policyValueLayers(policy, 'apiKeysEnabled')
     expect(layers.effective).toBe('false')
     expect(layers.configuredDefault).toBe('true')

@@ -576,7 +576,11 @@ describe('PolicyService', () => {
 
       expect(events.map((e) => e.key)).toEqual(['publicRegistration'])
       expect(deleteSetting).toHaveBeenCalledWith(expect.anything(), 'policy', 'publicRegistration')
-      expect(deleteSetting).not.toHaveBeenCalledWith(expect.anything(), 'policy', 'inviteRegistration')
+      expect(deleteSetting).not.toHaveBeenCalledWith(
+        expect.anything(),
+        'policy',
+        'inviteRegistration',
+      )
       expect(svc.get('publicRegistration')).toBe(false)
     })
 
