@@ -18,9 +18,7 @@ import { ENV_REGISTRY, ENV_SPEC_BY_NAME } from './envRegistry'
 
 import type { EnvCategory } from './categories'
 import type { EnvVarSpec } from './envRegistry'
-import type { PolicyKey } from '@src/policy'
-
-export type ConfigKeyState = 'set' | 'empty' | 'missing'
+import type { ConfigKeyState, PolicyKey } from '@src/policy'
 
 export interface SystemConfigRow {
   // The environment variable name.

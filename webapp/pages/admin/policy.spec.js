@@ -165,10 +165,12 @@ describe('admin/policy.vue', () => {
     // videoConference now groups under its backend category ('video'), derived from
     // policyConfig rather than a hand-maintained FE list.
     expect(wrapper.find('[data-test="policy-group-video"]').exists()).toBe(true)
-    expect(wrapper.text()).toContain('admin.policy.groups.registration.title')
-    expect(wrapper.text()).toContain('admin.policy.groups.features.title')
-    expect(wrapper.text()).toContain('admin.policy.groups.layout.title')
-    expect(wrapper.text()).toContain('admin.policy.groups.video.title')
+    // Group titles reuse the shared config-tab category labels (admin.config.category.*),
+    // so the two admin tabs don't carry parallel label sets for the same categories.
+    expect(wrapper.text()).toContain('admin.config.category.registration')
+    expect(wrapper.text()).toContain('admin.config.category.features')
+    expect(wrapper.text()).toContain('admin.config.category.layout')
+    expect(wrapper.text()).toContain('admin.config.category.video')
   })
 
   it('appends an unknown backend category as its own group instead of dropping its keys', () => {

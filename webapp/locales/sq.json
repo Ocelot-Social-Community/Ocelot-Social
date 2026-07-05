@@ -204,20 +204,6 @@
         "showContentFilterMasonryGrid": "Shfaq filtrin e përmbajtjes në rrjetën masonry (lajme).",
         "showGroupButtonInHeader": "Shfaq butonin e grupeve në krye."
       },
-      "groups": {
-        "features": {
-          "title": "Veçoritë"
-        },
-        "layout": {
-          "title": "Struktura"
-        },
-        "registration": {
-          "title": "Regjistrimi"
-        },
-        "video": {
-          "title": "Videokonferencë"
-        }
-      },
       "keys": {
         "apiKeysEnabled": "Çelësat API",
         "apiKeysMaxPerUser": "Maks. çelësa API për përdorues",

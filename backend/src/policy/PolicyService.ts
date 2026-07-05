@@ -39,7 +39,7 @@ import {
 } from './schema'
 
 import type { PolicyViewer } from './schema'
-import type { NetworkPolicy, PolicyKey, PolicyValue } from './types'
+import type { ConfigKeyState, NetworkPolicy, PolicyKey, PolicyValue } from './types'
 
 type DbContext = ReturnType<typeof databaseContext>
 
@@ -225,14 +225,14 @@ export class PolicyService {
   // process start (the same `this.env` used for seeding), so this is stable for the
   // process lifetime — no per-request config needed. Drives both the gate fold and the
   // admin config view (which env var is missing).
-  requiresEnvStatus(key: PolicyKey): { name: string; state: 'set' | 'empty' | 'missing' }[] {
+  requiresEnvStatus(key: PolicyKey): { name: string; state: ConfigKeyState }[] {
     return requiresEnvFor(key).map((name) => ({ name, state: this.envState(name) }))
   }
 
   // Presence state of a single env var: set | empty | missing. Reports presence only,
   // never the value — safe to surface to the admin config view for any var name
   // (e.g. a key's envSeed source).
-  envState(name: string): 'set' | 'empty' | 'missing' {
+  envState(name: string): ConfigKeyState {
     const value = this.env[name]
     return value === undefined ? 'missing' : value === '' ? 'empty' : 'set'
   }

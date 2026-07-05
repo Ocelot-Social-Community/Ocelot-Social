@@ -204,20 +204,6 @@
         "showContentFilterMasonryGrid": "Показує фільтр вмісту в сітці masonry (стрічка).",
         "showGroupButtonInHeader": "Показує кнопку груп у шапці."
       },
-      "groups": {
-        "features": {
-          "title": "Функції"
-        },
-        "layout": {
-          "title": "Макет"
-        },
-        "registration": {
-          "title": "Реєстрація"
-        },
-        "video": {
-          "title": "Відеоконференції"
-        }
-      },
       "keys": {
         "apiKeysEnabled": "API-ключі",
         "apiKeysMaxPerUser": "Макс. API-ключів на користувача",

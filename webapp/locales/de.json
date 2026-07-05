@@ -208,20 +208,6 @@
         "showContentFilterMasonryGrid": "Zeigt den Inhaltsfilter im Masonry-Raster (Newsfeed).",
         "showGroupButtonInHeader": "Zeigt den Gruppen-Button im Header."
       },
-      "groups": {
-        "features": {
-          "title": "Funktionen"
-        },
-        "layout": {
-          "title": "Layout"
-        },
-        "registration": {
-          "title": "Registrierung"
-        },
-        "video": {
-          "title": "Videokonferenz"
-        }
-      },
       "keys": {
         "apiKeysEnabled": "API-Schlüssel",
         "videoConference": "Videokonferenzen",

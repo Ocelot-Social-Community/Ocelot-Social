@@ -204,20 +204,6 @@
         "showContentFilterMasonryGrid": "Affiche le filtre de contenu dans la grille en maçonnerie (fil d'actualité).",
         "showGroupButtonInHeader": "Affiche le bouton des groupes dans l'en-tête."
       },
-      "groups": {
-        "features": {
-          "title": "Fonctionnalités"
-        },
-        "layout": {
-          "title": "Mise en page"
-        },
-        "registration": {
-          "title": "Inscription"
-        },
-        "video": {
-          "title": "Visioconférence"
-        }
-      },
       "keys": {
         "apiKeysEnabled": "Clés API",
         "apiKeysMaxPerUser": "Max. de clés API par utilisateur",

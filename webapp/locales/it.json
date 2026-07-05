@@ -204,20 +204,6 @@
         "showContentFilterMasonryGrid": "Mostra il filtro dei contenuti nella griglia masonry (feed).",
         "showGroupButtonInHeader": "Mostra il pulsante dei gruppi nell'intestazione."
       },
-      "groups": {
-        "features": {
-          "title": "Funzionalità"
-        },
-        "layout": {
-          "title": "Layout"
-        },
-        "registration": {
-          "title": "Registrazione"
-        },
-        "video": {
-          "title": "Videoconferenza"
-        }
-      },
       "keys": {
         "apiKeysEnabled": "Chiavi API",
         "apiKeysMaxPerUser": "Max. chiavi API per utente",

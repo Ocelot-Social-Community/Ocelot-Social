@@ -34,7 +34,7 @@
         :data-test="`policy-group-${group.id}`"
       >
         <legend class="policy-group__title">
-          {{ $t(`admin.policy.groups.${group.id}.title`) }}
+          {{ $t(`admin.config.category.${group.id}`) }}
         </legend>
 
         <div

@@ -204,20 +204,6 @@
         "showContentFilterMasonryGrid": "Pokazuje filtr treści w siatce masonry (aktualności).",
         "showGroupButtonInHeader": "Pokazuje przycisk grup w nagłówku."
       },
-      "groups": {
-        "features": {
-          "title": "Funkcje"
-        },
-        "layout": {
-          "title": "Układ"
-        },
-        "registration": {
-          "title": "Rejestracja"
-        },
-        "video": {
-          "title": "Wideokonferencje"
-        }
-      },
       "keys": {
         "apiKeysEnabled": "Klucze API",
         "apiKeysMaxPerUser": "Maks. kluczy API na użytkownika",

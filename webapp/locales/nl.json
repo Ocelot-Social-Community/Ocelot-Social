@@ -204,20 +204,6 @@
         "showContentFilterMasonryGrid": "Toont het inhoudsfilter in het masonry-raster (nieuwsoverzicht).",
         "showGroupButtonInHeader": "Toont de groepenknop in de koptekst."
       },
-      "groups": {
-        "features": {
-          "title": "Functies"
-        },
-        "layout": {
-          "title": "Lay-out"
-        },
-        "registration": {
-          "title": "Registratie"
-        },
-        "video": {
-          "title": "Videoconferentie"
-        }
-      },
       "keys": {
         "apiKeysEnabled": "API-sleutels",
         "apiKeysMaxPerUser": "Max. API-sleutels per gebruiker",

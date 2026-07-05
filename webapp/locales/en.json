@@ -208,20 +208,6 @@
         "showContentFilterMasonryGrid": "Show the content filter in the masonry grid (newsfeed).",
         "showGroupButtonInHeader": "Show the groups button in the header."
       },
-      "groups": {
-        "features": {
-          "title": "Features"
-        },
-        "layout": {
-          "title": "Layout"
-        },
-        "registration": {
-          "title": "Registration"
-        },
-        "video": {
-          "title": "Video conferencing"
-        }
-      },
       "keys": {
         "apiKeysEnabled": "API keys",
         "videoConference": "Video conferencing",

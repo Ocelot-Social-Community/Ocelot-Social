@@ -204,20 +204,6 @@
         "showContentFilterMasonryGrid": "Показывает фильтр контента в сетке masonry (лента).",
         "showGroupButtonInHeader": "Показывает кнопку групп в шапке."
       },
-      "groups": {
-        "features": {
-          "title": "Функции"
-        },
-        "layout": {
-          "title": "Макет"
-        },
-        "registration": {
-          "title": "Регистрация"
-        },
-        "video": {
-          "title": "Видеоконференции"
-        }
-      },
       "keys": {
         "apiKeysEnabled": "API-ключи",
         "apiKeysMaxPerUser": "Макс. API-ключей на пользователя",
