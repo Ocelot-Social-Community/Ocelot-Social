@@ -1,4 +1,4 @@
-import { allKeys, envSeedFor, policyValueLayers, typeFor } from '@src/policy'
+import { allKeys, categoryFor, envSeedFor, policyValueLayers, typeFor } from '@src/policy'
 
 import type { Context } from '@src/context'
 
@@ -16,6 +16,7 @@ export default {
         return {
           key,
           type: typeFor(key),
+          category: categoryFor(key),
           ...policyValueLayers(policy, key),
           envSeed,
           envSeedState: envSeed ? policy.envState(envSeed) : null,

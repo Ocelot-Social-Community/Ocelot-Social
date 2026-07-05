@@ -34,6 +34,13 @@ describe('policyConfig resolver', () => {
     expect(new Set(keys).size).toBe(keys.length)
   })
 
+  it('exposes each key’s display category (from the schema), so the admin UI groups without a hand-list', () => {
+    expect(rowFor('publicRegistration').category).toBe('registration')
+    expect(rowFor('showGroupButtonInHeader').category).toBe('layout')
+    expect(rowFor('apiKeysEnabled').category).toBe('features')
+    expect(rowFor('videoConference').category).toBe('video')
+  })
+
   describe('videoConference (env-gated)', () => {
     const LIVEKIT = {
       LIVEKIT_URL: 'wss://lk.example.org',

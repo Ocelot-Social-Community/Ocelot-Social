@@ -173,7 +173,8 @@
         "registration": "Registratie",
         "features": "Functies",
         "monitoring": "Monitoring",
-        "general": "Algemeen"
+        "general": "Algemeen",
+        "layout": "Lay-out"
       }
     },
     "policy": {
@@ -212,6 +213,9 @@
         },
         "registration": {
           "title": "Registratie"
+        },
+        "video": {
+          "title": "Videoconferentie"
         }
       },
       "keys": {

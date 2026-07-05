@@ -162,6 +162,7 @@ const CATEGORY_ORDER = [
   'video',
   'registration',
   'features',
+  'layout',
   'monitoring',
   'general',
 ]

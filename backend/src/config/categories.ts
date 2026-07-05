@@ -21,6 +21,7 @@ export const ENV_CATEGORIES = [
   'monitoring',
   'registration',
   'features',
+  'layout',
   'general',
 ] as const
 

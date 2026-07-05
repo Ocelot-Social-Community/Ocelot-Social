@@ -173,7 +173,8 @@
         "registration": "Registo",
         "features": "Funcionalidades",
         "monitoring": "Monitorização",
-        "general": "Geral"
+        "general": "Geral",
+        "layout": "Esquema"
       }
     },
     "policy": {
@@ -212,6 +213,9 @@
         },
         "registration": {
           "title": "Registo"
+        },
+        "video": {
+          "title": "Videoconferência"
         }
       },
       "keys": {

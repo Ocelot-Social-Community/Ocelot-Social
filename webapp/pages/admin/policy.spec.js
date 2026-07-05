@@ -73,6 +73,45 @@ describe('admin/policy.vue', () => {
     'showContentFilterMasonryGrid',
     'showGroupButtonInHeader',
   ]
+  // Backend-provided per-key config (policyConfig query). The page derives its groups,
+  // number-vs-checkbox, and form keys from this now — no hand-maintained FE lists — so the
+  // tests feed a realistic fixture (category + type per key) instead.
+  const CATEGORY_OF = {
+    publicRegistration: 'registration',
+    inviteRegistration: 'registration',
+    askForRealName: 'registration',
+    requireLocation: 'registration',
+    inviteLinkLimit: 'registration',
+    inviteCodesPersonalPerUser: 'registration',
+    inviteCodesGroupPerUser: 'registration',
+    categoriesActive: 'features',
+    badgesEnabled: 'features',
+    apiKeysEnabled: 'features',
+    apiKeysMaxPerUser: 'features',
+    maxPinnedPosts: 'features',
+    maxGroupPinnedPosts: 'features',
+    showContentFilterHeaderMenu: 'layout',
+    showContentFilterMasonryGrid: 'layout',
+    showGroupButtonInHeader: 'layout',
+    videoConference: 'video',
+  }
+  const NUMBER_KEYS = new Set([
+    'inviteLinkLimit',
+    'inviteCodesPersonalPerUser',
+    'inviteCodesGroupPerUser',
+    'apiKeysMaxPerUser',
+    'maxPinnedPosts',
+    'maxGroupPinnedPosts',
+  ])
+  const policyConfigFixture = () =>
+    ALL_KEYS.map((key) => ({
+      key,
+      category: CATEGORY_OF[key],
+      type: NUMBER_KEYS.has(key) ? 'integer' : 'boolean',
+      available: true,
+      softwareDefault: JSON.stringify(defaults[key]),
+    }))
+
   const lastChange = { actor: 'jenny-rostock', timestamp: '2026-01-02T03:04:05.000Z' }
 
   beforeEach(() => {
@@ -107,16 +146,46 @@ describe('admin/policy.vue', () => {
     }
   })
 
-  const Wrapper = () => mount(Policy, { mocks, localVue, store })
+  const Wrapper = () =>
+    mount(Policy, {
+      mocks,
+      localVue,
+      store,
+      // The page groups/types/keys off policyConfig; feed it so the rows render.
+      data() {
+        return { policyConfig: policyConfigFixture() }
+      },
+    })
 
   it('renders the policies grouped under category headings', () => {
     wrapper = Wrapper()
     expect(wrapper.find('[data-test="policy-group-registration"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="policy-group-features"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="policy-group-layout"]').exists()).toBe(true)
+    // videoConference now groups under its backend category ('video'), derived from
+    // policyConfig rather than a hand-maintained FE list.
+    expect(wrapper.find('[data-test="policy-group-video"]').exists()).toBe(true)
     expect(wrapper.text()).toContain('admin.policy.groups.registration.title')
     expect(wrapper.text()).toContain('admin.policy.groups.features.title')
     expect(wrapper.text()).toContain('admin.policy.groups.layout.title')
+    expect(wrapper.text()).toContain('admin.policy.groups.video.title')
+  })
+
+  it('appends an unknown backend category as its own group instead of dropping its keys', () => {
+    // Graceful degradation: a category the FE order list doesn't know about must still be
+    // rendered (never silently vanish), so a new backend category needs no FE change.
+    wrapper = mount(Policy, {
+      mocks,
+      localVue,
+      store,
+      data() {
+        return {
+          policyConfig: [{ key: 'publicRegistration', category: 'brandNewGroup', type: 'boolean' }],
+        }
+      },
+    })
+    expect(wrapper.find('[data-test="policy-group-brandNewGroup"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="policy-publicRegistration"]').exists()).toBe(true)
   })
 
   it('renders every policy with a name and a detailed description', () => {
@@ -468,6 +537,7 @@ describe('admin/policy.vue', () => {
     const ENTRY = {
       key: 'videoConference',
       type: 'boolean',
+      category: 'video',
       effective: 'false',
       softwareDefault: 'true',
       configuredDefault: 'true',
@@ -526,6 +596,10 @@ describe('admin/policy.vue', () => {
         localVue,
         store,
         attachTo: document.body,
+        // Rows are derived from policyConfig; without it there is nothing to highlight.
+        data() {
+          return { policyConfig: policyConfigFixture() }
+        },
       })
       return { w: attached, $route }
     }

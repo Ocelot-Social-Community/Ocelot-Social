@@ -173,7 +173,8 @@
         "registration": "Inscription",
         "features": "Fonctionnalités",
         "monitoring": "Supervision",
-        "general": "Général"
+        "general": "Général",
+        "layout": "Mise en page"
       }
     },
     "policy": {
@@ -212,6 +213,9 @@
         },
         "registration": {
           "title": "Inscription"
+        },
+        "video": {
+          "title": "Visioconférence"
         }
       },
       "keys": {

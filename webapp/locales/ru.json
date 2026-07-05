@@ -173,7 +173,8 @@
         "registration": "Регистрация",
         "features": "Функции",
         "monitoring": "Мониторинг",
-        "general": "Общее"
+        "general": "Общее",
+        "layout": "Макет"
       }
     },
     "policy": {
@@ -212,6 +213,9 @@
         },
         "registration": {
           "title": "Регистрация"
+        },
+        "video": {
+          "title": "Видеоконференции"
         }
       },
       "keys": {

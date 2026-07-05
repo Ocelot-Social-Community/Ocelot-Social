@@ -142,11 +142,16 @@ import ConflictBanner from '~/components/ConflictBanner.vue'
 import deepLinkHighlight from '~/mixins/deepLinkHighlight'
 import { policyConfigQuery } from '~/graphql/admin/PolicyConfig'
 
+// Display order of the policy groups. Groups are derived from each key's backend `category`
+// (via policyConfig), so adding a key needs no hand-maintained list here — this only fixes
+// the order. A category not listed is appended after these, so nothing silently vanishes.
+const CATEGORY_ORDER = ['registration', 'features', 'layout', 'video']
+
 export default {
   components: { ConflictBanner, OsButton, OsCard },
   // Deep-link highlight (highlightedKey, applyHashHighlight, hash watcher, fade timer) is
-  // shared with the config tab. The policy rows are static (v-for over `groups`), so the
-  // mixin's own mount is enough — no async re-apply needed.
+  // shared with the config tab. Rows are derived from policyConfig (async), so the highlight
+  // is re-applied from the policyConfig watcher below once the rows exist.
   mixins: [deepLinkHighlight],
   middleware: ['isAdmin'],
   apollo: {
@@ -160,71 +165,9 @@ export default {
   },
   data() {
     return {
-      // Policies grouped under headings; related settings share a group.
-      groups: [
-        {
-          id: 'registration',
-          keys: [
-            'publicRegistration',
-            'inviteRegistration',
-            'askForRealName',
-            'requireLocation',
-            'inviteLinkLimit',
-            'inviteCodesPersonalPerUser',
-            'inviteCodesGroupPerUser',
-          ],
-        },
-        {
-          id: 'features',
-          keys: [
-            'categoriesActive',
-            'badgesEnabled',
-            'apiKeysEnabled',
-            'apiKeysMaxPerUser',
-            'videoConference',
-            'maxPinnedPosts',
-            'maxGroupPinnedPosts',
-          ],
-        },
-        {
-          id: 'layout',
-          keys: [
-            'showContentFilterHeaderMenu',
-            'showContentFilterMasonryGrid',
-            'showGroupButtonInHeader',
-          ],
-        },
-      ],
-      // Keys rendered as a number input instead of a checkbox (integer policies).
-      numberKeys: [
-        'inviteLinkLimit',
-        'inviteCodesPersonalPerUser',
-        'inviteCodesGroupPerUser',
-        'apiKeysMaxPerUser',
-        'maxPinnedPosts',
-        'maxGroupPinnedPosts',
-      ],
-      // Form scaffold — overwritten from the viewer-scoped snapshot on mount; the
-      // frontend holds no real defaults of its own (those come from the backend).
-      form: {
-        publicRegistration: false,
-        inviteRegistration: false,
-        askForRealName: false,
-        requireLocation: false,
-        inviteLinkLimit: 0,
-        inviteCodesPersonalPerUser: 0,
-        inviteCodesGroupPerUser: 0,
-        categoriesActive: false,
-        badgesEnabled: false,
-        apiKeysEnabled: false,
-        apiKeysMaxPerUser: 0,
-        videoConference: false,
-        maxPinnedPosts: 0,
-        maxGroupPinnedPosts: 0,
-        showContentFilterHeaderMenu: false,
-        showContentFilterMasonryGrid: false,
-        showGroupButtonInHeader: false,
-      },
+      // Editable form values, keyed by policy key. Populated from the viewer-scoped snapshot
+      // on mount (via $set — the key set is derived from the backend, not scaffolded here).
+      form: {},
       // Snapshot value each form field was last synced from. Lets a live snapshot change
       // tell an untouched field (follow it live) from a locally-edited one (guard it, and
       // flag a conflict if the server moved it too).
@@ -247,9 +190,27 @@ export default {
       defaults: 'policy/defaults',
       lastChange: 'policy/lastChange',
     }),
-    // Flat list of all keys across groups — used by the form logic below.
+    // All policy keys the viewer can see — read from the snapshot (present right after the
+    // mount fetch), so the form logic never waits on the policyConfig query. The rendered
+    // rows (groups) come from policyConfig; both cover the same key set.
     keys() {
-      return this.groups.flatMap((group) => group.keys)
+      return Object.keys(this.snapshot)
+    },
+    // Rows grouped by each key's backend category (policyConfig), ordered by CATEGORY_ORDER.
+    // No hand-maintained grouping/number-key/scaffold list — a new key shows up under its
+    // schema category automatically. An unknown category is appended (never dropped).
+    groups() {
+      const byCategory = new Map()
+      for (const entry of this.policyConfig) {
+        const list = byCategory.get(entry.category) ?? []
+        list.push(entry.key)
+        byCategory.set(entry.category, list)
+      }
+      const ordered = [
+        ...CATEGORY_ORDER.filter((category) => byCategory.has(category)),
+        ...[...byCategory.keys()].filter((category) => !CATEGORY_ORDER.includes(category)),
+      ]
+      return ordered.map((category) => ({ id: category, keys: byCategory.get(category) }))
     },
     isDirty() {
       return this.keys.some((k) => this.form[k] !== this.snapshot[k])
@@ -274,8 +235,10 @@ export default {
       const date = new Date(timestamp)
       return Number.isNaN(date.getTime()) ? timestamp : date.toLocaleString()
     },
+    // Integer policies render as a number input (booleans as a checkbox). The type comes
+    // from the backend (policyConfig), so there is no separate number-key list to maintain.
     isNumberKey(key) {
-      return this.numberKeys.includes(key)
+      return this.configByKey[key]?.type === 'integer'
     },
     // The hash keys this tab can highlight (deepLinkHighlight mixin): every policy key,
     // whose row element id is the key itself.
@@ -302,7 +265,9 @@ export default {
     syncFormFromSnapshot() {
       const baseline = {}
       this.keys.forEach((k) => {
-        this.form[k] = this.snapshot[k]
+        // $set: the form starts empty and its keys come from the backend, so a plain
+        // assignment on a new key would not be reactive in Vue 2.
+        this.$set(this.form, k, this.snapshot[k])
         baseline[k] = this.snapshot[k]
       })
       this.baseline = baseline
@@ -417,6 +382,11 @@ export default {
         this.fetchDefaults().catch(() => undefined)
       },
       deep: true,
+    },
+    // Rows are derived from policyConfig (async) → (re)apply the deep-link highlight once
+    // they're populated, so a deep link that arrived before the rows still scrolls/highlights.
+    policyConfig() {
+      this.applyHashHighlight()
     },
   },
   async mounted() {

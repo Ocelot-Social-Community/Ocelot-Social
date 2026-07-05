@@ -173,7 +173,8 @@
         "registration": "Regjistrimi",
         "features": "Veçoritë",
         "monitoring": "Monitorimi",
-        "general": "Të përgjithshme"
+        "general": "Të përgjithshme",
+        "layout": "Struktura"
       }
     },
     "policy": {
@@ -212,6 +213,9 @@
         },
         "registration": {
           "title": "Regjistrimi"
+        },
+        "video": {
+          "title": "Videokonferencë"
         }
       },
       "keys": {
