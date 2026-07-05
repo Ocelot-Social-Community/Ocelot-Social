@@ -85,6 +85,45 @@
       "name": "Categorie",
       "postCount": "Messaggi"
     },
+    "config": {
+      "blocks": "blocca {policy}",
+      "category": {
+        "auth": "Autenticazione",
+        "database": "Database",
+        "features": "Funzionalità",
+        "general": "Generale",
+        "layout": "Layout",
+        "mail": "Email / SMTP",
+        "maps": "Mappe",
+        "monitoring": "Monitoraggio",
+        "redis": "Redis",
+        "registration": "Registrazione",
+        "server": "Server",
+        "storage": "Archiviazione / S3",
+        "video": "Videoconferenza"
+      },
+      "col": {
+        "effective": "Stato effettivo",
+        "envKey": "Variabile d'ambiente",
+        "envValue": "Valore dell'ambiente",
+        "override": "Override del criterio",
+        "softwareDefault": "Predefinito del software"
+      },
+      "description": "Tutte le variabili d'ambiente lette da questo deployment e come vengono risolte. È uno specchio diagnostico di sola lettura dell'ambiente del deployment; i valori attivi si modificano nella scheda Criteri di rete. I valori segreti non vengono mai mostrati, solo se sono impostati.",
+      "editPolicy": "Modifica il criterio {policy}",
+      "name": "Ambiente",
+      "noDefault": "nessun predefinito",
+      "notSet": "non impostato",
+      "secretHidden": "impostato (valore nascosto)",
+      "setOverride": "esegui override",
+      "state": {
+        "empty": "vuoto",
+        "missing": "mancante",
+        "set": "impostato"
+      },
+      "tableCaption": "Variabili d'ambiente con il loro stato effettivo, override del criterio, valore dell'ambiente e valore predefinito del software.",
+      "title": "Configurazione dell'ambiente"
+    },
     "dashboard": {
       "badgesDisplayed": "Badge visualizzati",
       "badgesRewarded": "Badge assegnati",
@@ -138,45 +177,6 @@
     "pages": {
       "name": "Pagine"
     },
-    "config": {
-      "name": "Ambiente",
-      "title": "Configurazione dell'ambiente",
-      "description": "Tutte le variabili d'ambiente lette da questo deployment e come vengono risolte. È uno specchio diagnostico di sola lettura dell'ambiente del deployment; i valori attivi si modificano nella scheda Criteri di rete. I valori segreti non vengono mai mostrati, solo se sono impostati.",
-      "tableCaption": "Variabili d'ambiente con il loro stato effettivo, override del criterio, valore dell'ambiente e valore predefinito del software.",
-      "col": {
-        "envKey": "Variabile d'ambiente",
-        "effective": "Stato effettivo",
-        "override": "Override del criterio",
-        "envValue": "Valore dell'ambiente",
-        "softwareDefault": "Predefinito del software"
-      },
-      "blocks": "blocca {policy}",
-      "setOverride": "esegui override",
-      "editPolicy": "Modifica il criterio {policy}",
-      "notSet": "non impostato",
-      "noDefault": "nessun predefinito",
-      "secretHidden": "impostato (valore nascosto)",
-      "state": {
-        "set": "impostato",
-        "empty": "vuoto",
-        "missing": "mancante"
-      },
-      "category": {
-        "server": "Server",
-        "database": "Database",
-        "redis": "Redis",
-        "storage": "Archiviazione / S3",
-        "mail": "Email / SMTP",
-        "auth": "Autenticazione",
-        "maps": "Mappe",
-        "video": "Videoconferenza",
-        "registration": "Registrazione",
-        "features": "Funzionalità",
-        "monitoring": "Monitoraggio",
-        "general": "Generale",
-        "layout": "Layout"
-      }
-    },
     "policy": {
       "conflict": {
         "keep": "Continua a modificare",
@@ -202,8 +202,11 @@
         "requireLocation": "Rende obbligatoria una posizione durante la registrazione e nelle impostazioni del profilo.",
         "showContentFilterHeaderMenu": "Mostra il filtro dei contenuti nel menu di intestazione.",
         "showContentFilterMasonryGrid": "Mostra il filtro dei contenuti nella griglia masonry (feed).",
-        "showGroupButtonInHeader": "Mostra il pulsante dei gruppi nell'intestazione."
+        "showGroupButtonInHeader": "Mostra il pulsante dei gruppi nell'intestazione.",
+        "videoConference": "Abilita la videoconferenza (LiveKit). L’interruttore runtime per i permessi delle videochiamate. Richiede le variabili d’ambiente di LiveKit; senza di esse resta disattivata e in grigio."
       },
+      "envLink": "Visualizza ambiente",
+      "envUnavailable": "L’ambiente richiesto non è configurato: questa opzione non ha effetto finché non lo sarà.",
       "keys": {
         "apiKeysEnabled": "Chiavi API",
         "apiKeysMaxPerUser": "Max. chiavi API per utente",
@@ -220,7 +223,8 @@
         "requireLocation": "Posizione obbligatoria",
         "showContentFilterHeaderMenu": "Filtro contenuti nell'intestazione",
         "showContentFilterMasonryGrid": "Filtro contenuti nella griglia",
-        "showGroupButtonInHeader": "Pulsante gruppi nell'intestazione"
+        "showGroupButtonInHeader": "Pulsante gruppi nell'intestazione",
+        "videoConference": "Videoconferenza"
       },
       "lastUpdated": "Ultima modifica: {timestamp} da {actor}",
       "name": "Criteri di rete",
@@ -281,6 +285,7 @@
         "videoCall_create_public": "Avviare una videochiamata in un gruppo pubblico."
       },
       "permUnavailable": "Funzionalità non configurata: concedere questo permesso non ha effetto.",
+      "permUnavailableLink": "Visualizza configurazione",
       "protected": "protetto",
       "protectedHint": "Il ruolo proprietario ha tutti i permessi e non può essere modificato.",
       "rename": "Rinomina ruolo",

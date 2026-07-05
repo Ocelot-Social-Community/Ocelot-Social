@@ -85,6 +85,45 @@
       "name": "Categorias",
       "postCount": "Postagens"
     },
+    "config": {
+      "blocks": "bloqueia {policy}",
+      "category": {
+        "auth": "Autenticação",
+        "database": "Base de dados",
+        "features": "Funcionalidades",
+        "general": "Geral",
+        "layout": "Esquema",
+        "mail": "E-mail / SMTP",
+        "maps": "Mapas",
+        "monitoring": "Monitorização",
+        "redis": "Redis",
+        "registration": "Registo",
+        "server": "Servidor",
+        "storage": "Armazenamento / S3",
+        "video": "Videoconferência"
+      },
+      "col": {
+        "effective": "Estado efetivo",
+        "envKey": "Variável de ambiente",
+        "envValue": "Valor do ambiente",
+        "override": "Substituição de política",
+        "softwareDefault": "Padrão do software"
+      },
+      "description": "Todas as variáveis de ambiente que esta implantação lê e como são resolvidas. É um espelho de diagnóstico só de leitura do ambiente da implantação; os valores ativos são editados na aba Política de rede. Os valores secretos nunca são mostrados, apenas se estão definidos.",
+      "editPolicy": "Editar a política {policy}",
+      "name": "Ambiente",
+      "noDefault": "sem padrão",
+      "notSet": "não definido",
+      "secretHidden": "definido (valor oculto)",
+      "setOverride": "substituir",
+      "state": {
+        "empty": "vazio",
+        "missing": "ausente",
+        "set": "definido"
+      },
+      "tableCaption": "Variáveis de ambiente com o seu estado efetivo, substituição de política, valor do ambiente e valor padrão do software.",
+      "title": "Configuração do ambiente"
+    },
     "dashboard": {
       "badgesDisplayed": "Emblemas exibidos",
       "badgesRewarded": "Emblemas concedidos",
@@ -138,45 +177,6 @@
     "pages": {
       "name": "Páginas"
     },
-    "config": {
-      "name": "Ambiente",
-      "title": "Configuração do ambiente",
-      "description": "Todas as variáveis de ambiente que esta implantação lê e como são resolvidas. É um espelho de diagnóstico só de leitura do ambiente da implantação; os valores ativos são editados na aba Política de rede. Os valores secretos nunca são mostrados, apenas se estão definidos.",
-      "tableCaption": "Variáveis de ambiente com o seu estado efetivo, substituição de política, valor do ambiente e valor padrão do software.",
-      "col": {
-        "envKey": "Variável de ambiente",
-        "effective": "Estado efetivo",
-        "override": "Substituição de política",
-        "envValue": "Valor do ambiente",
-        "softwareDefault": "Padrão do software"
-      },
-      "blocks": "bloqueia {policy}",
-      "setOverride": "substituir",
-      "editPolicy": "Editar a política {policy}",
-      "notSet": "não definido",
-      "noDefault": "sem padrão",
-      "secretHidden": "definido (valor oculto)",
-      "state": {
-        "set": "definido",
-        "empty": "vazio",
-        "missing": "ausente"
-      },
-      "category": {
-        "server": "Servidor",
-        "database": "Base de dados",
-        "redis": "Redis",
-        "storage": "Armazenamento / S3",
-        "mail": "E-mail / SMTP",
-        "auth": "Autenticação",
-        "maps": "Mapas",
-        "video": "Videoconferência",
-        "registration": "Registo",
-        "features": "Funcionalidades",
-        "monitoring": "Monitorização",
-        "general": "Geral",
-        "layout": "Esquema"
-      }
-    },
     "policy": {
       "conflict": {
         "keep": "Continuar a editar",
@@ -202,8 +202,11 @@
         "requireLocation": "Torna obrigatória uma localização durante o registo e nas definições do perfil.",
         "showContentFilterHeaderMenu": "Mostra o filtro de conteúdo no menu de cabeçalho.",
         "showContentFilterMasonryGrid": "Mostra o filtro de conteúdo na grelha masonry (notícias).",
-        "showGroupButtonInHeader": "Mostra o botão de grupos no cabeçalho."
+        "showGroupButtonInHeader": "Mostra o botão de grupos no cabeçalho.",
+        "videoConference": "Ativa a videoconferência (LiveKit). O interruptor de tempo de execução para as permissões de chamada de vídeo. Requer as variáveis de ambiente do LiveKit; sem elas permanece desativada e esmaecida."
       },
+      "envLink": "Ver ambiente",
+      "envUnavailable": "O ambiente necessário não está configurado — esta opção não tem efeito até que esteja.",
       "keys": {
         "apiKeysEnabled": "Chaves de API",
         "apiKeysMaxPerUser": "Máx. de chaves de API por utilizador",
@@ -220,7 +223,8 @@
         "requireLocation": "Localização obrigatória",
         "showContentFilterHeaderMenu": "Filtro de conteúdo no cabeçalho",
         "showContentFilterMasonryGrid": "Filtro de conteúdo na grelha",
-        "showGroupButtonInHeader": "Botão de grupos no cabeçalho"
+        "showGroupButtonInHeader": "Botão de grupos no cabeçalho",
+        "videoConference": "Videoconferência"
       },
       "lastUpdated": "Última alteração: {timestamp} por {actor}",
       "name": "Política de rede",
@@ -281,6 +285,7 @@
         "videoCall_create_public": "Iniciar uma chamada de vídeo num grupo público."
       },
       "permUnavailable": "Recurso não configurado — conceder esta permissão não tem efeito.",
+      "permUnavailableLink": "Ver configuração",
       "protected": "protegida",
       "protectedHint": "A função de proprietário detém todas as permissões e não pode ser editada.",
       "rename": "Renomear função",

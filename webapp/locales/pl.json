@@ -85,6 +85,45 @@
       "name": "Kategorie",
       "postCount": "Stanowiska"
     },
+    "config": {
+      "blocks": "blokuje {policy}",
+      "category": {
+        "auth": "Uwierzytelnianie",
+        "database": "Baza danych",
+        "features": "Funkcje",
+        "general": "Ogólne",
+        "layout": "Układ",
+        "mail": "E-mail / SMTP",
+        "maps": "Mapy",
+        "monitoring": "Monitorowanie",
+        "redis": "Redis",
+        "registration": "Rejestracja",
+        "server": "Serwer",
+        "storage": "Magazyn / S3",
+        "video": "Wideokonferencje"
+      },
+      "col": {
+        "effective": "Stan efektywny",
+        "envKey": "Zmienna środowiskowa",
+        "envValue": "Wartość środowiska",
+        "override": "Nadpisanie zasad",
+        "softwareDefault": "Domyślna oprogramowania"
+      },
+      "description": "Wszystkie zmienne środowiskowe odczytywane przez to wdrożenie i sposób ich rozwiązywania. To diagnostyczne, tylko do odczytu odzwierciedlenie środowiska wdrożenia; wartości aktywne edytuje się na karcie Zasady sieci. Wartości tajne nigdy nie są pokazywane, tylko to, czy są ustawione.",
+      "editPolicy": "Edytuj zasadę {policy}",
+      "name": "Środowisko",
+      "noDefault": "brak domyślnej",
+      "notSet": "nie ustawiono",
+      "secretHidden": "ustawione (wartość ukryta)",
+      "setOverride": "nadpisz",
+      "state": {
+        "empty": "puste",
+        "missing": "brak",
+        "set": "ustawione"
+      },
+      "tableCaption": "Zmienne środowiskowe z ich stanem efektywnym, nadpisaniem zasad, wartością środowiska i wartością domyślną oprogramowania.",
+      "title": "Konfiguracja środowiska"
+    },
     "dashboard": {
       "badgesDisplayed": "Wyświetlone odznaki",
       "badgesRewarded": "Przyznane odznaki",
@@ -138,45 +177,6 @@
     "pages": {
       "name": "Strony"
     },
-    "config": {
-      "name": "Środowisko",
-      "title": "Konfiguracja środowiska",
-      "description": "Wszystkie zmienne środowiskowe odczytywane przez to wdrożenie i sposób ich rozwiązywania. To diagnostyczne, tylko do odczytu odzwierciedlenie środowiska wdrożenia; wartości aktywne edytuje się na karcie Zasady sieci. Wartości tajne nigdy nie są pokazywane, tylko to, czy są ustawione.",
-      "tableCaption": "Zmienne środowiskowe z ich stanem efektywnym, nadpisaniem zasad, wartością środowiska i wartością domyślną oprogramowania.",
-      "col": {
-        "envKey": "Zmienna środowiskowa",
-        "effective": "Stan efektywny",
-        "override": "Nadpisanie zasad",
-        "envValue": "Wartość środowiska",
-        "softwareDefault": "Domyślna oprogramowania"
-      },
-      "blocks": "blokuje {policy}",
-      "setOverride": "nadpisz",
-      "editPolicy": "Edytuj zasadę {policy}",
-      "notSet": "nie ustawiono",
-      "noDefault": "brak domyślnej",
-      "secretHidden": "ustawione (wartość ukryta)",
-      "state": {
-        "set": "ustawione",
-        "empty": "puste",
-        "missing": "brak"
-      },
-      "category": {
-        "server": "Serwer",
-        "database": "Baza danych",
-        "redis": "Redis",
-        "storage": "Magazyn / S3",
-        "mail": "E-mail / SMTP",
-        "auth": "Uwierzytelnianie",
-        "maps": "Mapy",
-        "video": "Wideokonferencje",
-        "registration": "Rejestracja",
-        "features": "Funkcje",
-        "monitoring": "Monitorowanie",
-        "general": "Ogólne",
-        "layout": "Układ"
-      }
-    },
     "policy": {
       "conflict": {
         "keep": "Kontynuuj edycję",
@@ -202,8 +202,11 @@
         "requireLocation": "Sprawia, że podanie lokalizacji jest obowiązkowe podczas rejestracji i w ustawieniach profilu.",
         "showContentFilterHeaderMenu": "Pokazuje filtr treści w menu nagłówka.",
         "showContentFilterMasonryGrid": "Pokazuje filtr treści w siatce masonry (aktualności).",
-        "showGroupButtonInHeader": "Pokazuje przycisk grup w nagłówku."
+        "showGroupButtonInHeader": "Pokazuje przycisk grup w nagłówku.",
+        "videoConference": "Włącza wideokonferencje (LiveKit). Przełącznik czasu wykonania dla uprawnień połączeń wideo. Wymaga zmiennych środowiskowych LiveKit; bez nich pozostaje wyłączone i wyszarzone."
       },
+      "envLink": "Zobacz środowisko",
+      "envUnavailable": "Wymagane środowisko nie jest skonfigurowane — ten przełącznik nie działa, dopóki nie zostanie.",
       "keys": {
         "apiKeysEnabled": "Klucze API",
         "apiKeysMaxPerUser": "Maks. kluczy API na użytkownika",
@@ -220,7 +223,8 @@
         "requireLocation": "Lokalizacja wymagana",
         "showContentFilterHeaderMenu": "Filtr treści w nagłówku",
         "showContentFilterMasonryGrid": "Filtr treści w siatce",
-        "showGroupButtonInHeader": "Przycisk grup w nagłówku"
+        "showGroupButtonInHeader": "Przycisk grup w nagłówku",
+        "videoConference": "Wideokonferencje"
       },
       "lastUpdated": "Ostatnia zmiana: {timestamp} przez {actor}",
       "name": "Zasady sieci",
@@ -281,6 +285,7 @@
         "videoCall_create_public": "Rozpoczynanie rozmowy wideo w grupie publicznej."
       },
       "permUnavailable": "Funkcja nieskonfigurowana — przyznanie tego uprawnienia nie ma efektu.",
+      "permUnavailableLink": "Zobacz konfigurację",
       "protected": "chroniona",
       "protectedHint": "Rola właściciela ma wszystkie uprawnienia i nie można jej edytować.",
       "rename": "Zmień nazwę roli",

@@ -85,6 +85,45 @@
       "name": "Topics",
       "postCount": "Posts"
     },
+    "config": {
+      "blocks": "blocks {policy}",
+      "category": {
+        "auth": "Authentication",
+        "database": "Database",
+        "features": "Features",
+        "general": "General",
+        "layout": "Layout",
+        "mail": "Email / SMTP",
+        "maps": "Maps",
+        "monitoring": "Monitoring",
+        "redis": "Redis",
+        "registration": "Registration",
+        "server": "Server",
+        "storage": "Storage / S3",
+        "video": "Video conferencing"
+      },
+      "col": {
+        "effective": "Effective state",
+        "envKey": "Environment variable",
+        "envValue": "Environment value",
+        "override": "Policy override",
+        "softwareDefault": "Software default"
+      },
+      "description": "Every environment variable this deployment reads, and how it resolves. This is a read-only diagnostic mirror of the deployment env — live values are edited on the network policy tab. Secret values are never shown, only whether they are set.",
+      "editPolicy": "Edit the {policy} policy",
+      "name": "Environment",
+      "noDefault": "no default",
+      "notSet": "not set",
+      "secretHidden": "set (value hidden)",
+      "setOverride": "override",
+      "state": {
+        "empty": "empty",
+        "missing": "missing",
+        "set": "set"
+      },
+      "tableCaption": "Environment variables with their effective state, policy override, environment value and software default.",
+      "title": "Environment configuration"
+    },
     "dashboard": {
       "badgesDisplayed": "Badges Displayed",
       "badgesRewarded": "Badges Rewarded",
@@ -138,45 +177,6 @@
     "pages": {
       "name": "Pages"
     },
-    "config": {
-      "name": "Environment",
-      "title": "Environment configuration",
-      "description": "Every environment variable this deployment reads, and how it resolves. This is a read-only diagnostic mirror of the deployment env — live values are edited on the network policy tab. Secret values are never shown, only whether they are set.",
-      "tableCaption": "Environment variables with their effective state, policy override, environment value and software default.",
-      "col": {
-        "envKey": "Environment variable",
-        "effective": "Effective state",
-        "override": "Policy override",
-        "envValue": "Environment value",
-        "softwareDefault": "Software default"
-      },
-      "blocks": "blocks {policy}",
-      "setOverride": "override",
-      "editPolicy": "Edit the {policy} policy",
-      "notSet": "not set",
-      "noDefault": "no default",
-      "secretHidden": "set (value hidden)",
-      "state": {
-        "set": "set",
-        "empty": "empty",
-        "missing": "missing"
-      },
-      "category": {
-        "server": "Server",
-        "database": "Database",
-        "redis": "Redis",
-        "storage": "Storage / S3",
-        "mail": "Email / SMTP",
-        "auth": "Authentication",
-        "maps": "Maps",
-        "video": "Video conferencing",
-        "registration": "Registration",
-        "features": "Features",
-        "monitoring": "Monitoring",
-        "general": "General",
-        "layout": "Layout"
-      }
-    },
     "policy": {
       "conflict": {
         "keep": "Keep editing",
@@ -185,13 +185,9 @@
         "serverValue": "server now: {value}"
       },
       "defaultValue": "default: {value}",
-      "softwareDefault": "code default: {value}",
-      "envUnavailable": "Required environment is not configured — this toggle has no effect until it is.",
-      "envLink": "View environment",
       "description": "Runtime configuration. Changes apply immediately for all connected clients.",
       "descriptions": {
         "apiKeysEnabled": "Let users create personal API keys for programmatic backend access. Affects the API keys section in user settings.",
-        "videoConference": "Enable video conferencing (LiveKit). The runtime switch for the video-call permissions. Requires the LiveKit environment variables; without them it stays off and greyed out.",
         "apiKeysMaxPerUser": "Maximum number of active API keys a single user may hold at once.",
         "askForRealName": "Ask new users for their real (given and family) name during registration instead of a single display name.",
         "badgesEnabled": "Enable the badges feature: badges are shown on profiles and teasers and can be managed in the admin area.",
@@ -206,11 +202,13 @@
         "requireLocation": "Make a location mandatory during registration and in profile settings.",
         "showContentFilterHeaderMenu": "Show the content filter in the header menu.",
         "showContentFilterMasonryGrid": "Show the content filter in the masonry grid (newsfeed).",
-        "showGroupButtonInHeader": "Show the groups button in the header."
+        "showGroupButtonInHeader": "Show the groups button in the header.",
+        "videoConference": "Enable video conferencing (LiveKit). The runtime switch for the video-call permissions. Requires the LiveKit environment variables; without them it stays off and greyed out."
       },
+      "envLink": "View environment",
+      "envUnavailable": "Required environment is not configured — this toggle has no effect until it is.",
       "keys": {
         "apiKeysEnabled": "API keys",
-        "videoConference": "Video conferencing",
         "apiKeysMaxPerUser": "Max. API keys per user",
         "askForRealName": "Ask for real name",
         "badgesEnabled": "Badges",
@@ -225,7 +223,8 @@
         "requireLocation": "Require location",
         "showContentFilterHeaderMenu": "Content filter in header",
         "showContentFilterMasonryGrid": "Content filter in grid",
-        "showGroupButtonInHeader": "Groups button in header"
+        "showGroupButtonInHeader": "Groups button in header",
+        "videoConference": "Video conferencing"
       },
       "lastUpdated": "Last changed: {timestamp} by {actor}",
       "name": "Network policy",
