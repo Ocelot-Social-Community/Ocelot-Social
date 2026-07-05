@@ -116,6 +116,7 @@
     "videoConference": {
       "type": "boolean",
       "default": true,
+      "visibility": [],
       "requiresEnv": ["LIVEKIT_URL", "LIVEKIT_API_KEY", "LIVEKIT_API_SECRET"],
       "category": "video",
       "description": "Whether video conferencing (LiveKit) is enabled. The single runtime switch for the videoCall.* permissions. Requires the three LiveKit env vars (URL/key/secret): without them the feature is unavailable regardless of this flag (the toggle is forced off and greyed in the admin UI). Admin-only."
