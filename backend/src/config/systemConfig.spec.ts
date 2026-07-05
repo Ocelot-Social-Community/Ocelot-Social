@@ -91,6 +91,16 @@ describe('systemConfigStatus', () => {
       expect(unset.softwareDefault).toBe('bolt://localhost:7687')
     })
 
+    it('shows a boolean toggle (DEBUG) as off by default rather than "no default"', () => {
+      const unset = rowFor('DEBUG', {})
+      // Off by default — falls back to 'false', not an em-dashed "no default".
+      expect(unset.softwareDefault).toBe('false')
+      expect(unset.effective).toBe('false')
+
+      const set = rowFor('DEBUG', { DEBUG: 'app:*' })
+      expect(set.envValue).toBe('app:*')
+    })
+
     it('is never overridable and carries no policy key', () => {
       const row = rowFor('SMTP_HOST', { SMTP_HOST: 'mail.example.org' })
       expect(row.overridable).toBe(false)

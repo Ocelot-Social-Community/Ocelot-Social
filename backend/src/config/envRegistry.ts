@@ -154,7 +154,12 @@ export const ENV_REGISTRY: EnvVarSpec[] = [
   { name: 'COMMIT', secret: false, category: 'monitoring', softwareDefault: null },
 
   // --- General ------------------------------------------------------------
-  { name: 'DEBUG', secret: false, category: 'general', softwareDefault: null },
+  // Off by default: DEBUG is a boolean toggle that is only on in non-production when
+  // explicitly set, and is forced off in production (see config/index.ts) — so its baseline
+  // is 'false', not "no default". Its off-ness is encoded in that logic (there is no config
+  // fallback constant), which is why it is a direct literal here rather than in
+  // softwareDefaults.ts.
+  { name: 'DEBUG', secret: false, category: 'general', softwareDefault: 'false' },
   {
     name: 'PRODUCTION_DB_CLEAN_ALLOW',
     secret: false,
