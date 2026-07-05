@@ -58,7 +58,9 @@ export function envSeedFor(key: PolicyKey): string | undefined {
 // only seeds the default). Empty/undefined ⇒ no env dependency. Used to fold env
 // availability into the policy's effective value and to surface it in the admin UI.
 export function requiresEnvFor(key: PolicyKey): string[] {
-  return rawSchema.properties[key].requiresEnv ?? []
+  // Copy so a caller's push/splice can't mutate the shared schema array and
+  // silently alter isAvailable/getEffective network-wide.
+  return [...(rawSchema.properties[key].requiresEnv ?? [])]
 }
 
 export function typeFor(key: PolicyKey): string {
