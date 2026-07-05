@@ -15,27 +15,16 @@
          unsaved edits. The draft is kept (their work is never silently lost); the diverged
          rows are highlighted with the incoming server value. Load = discard mine, take the
          server's; Keep = keep editing (my save will overwrite). -->
-    <div v-if="hasConflict" class="policy-conflict" role="alert" data-test="policy-conflict">
-      <span class="policy-conflict__text">{{ $t('admin.policy.conflict.message') }}</span>
-      <span class="policy-conflict__actions">
-        <os-button
-          variant="primary"
-          appearance="filled"
-          data-test="policy-conflict-load"
-          @click="loadServerVersion"
-        >
-          {{ $t('admin.policy.conflict.load') }}
-        </os-button>
-        <os-button
-          variant="primary"
-          appearance="ghost"
-          data-test="policy-conflict-keep"
-          @click="dismissConflict"
-        >
-          {{ $t('admin.policy.conflict.keep') }}
-        </os-button>
-      </span>
-    </div>
+    <conflict-banner
+      v-if="hasConflict"
+      class="policy-conflict"
+      :message="$t('admin.policy.conflict.message')"
+      :load-label="$t('admin.policy.conflict.load')"
+      :keep-label="$t('admin.policy.conflict.keep')"
+      data-test="policy-conflict"
+      @load="loadServerVersion"
+      @keep="dismissConflict"
+    />
 
     <form @submit.prevent="save" novalidate>
       <fieldset
@@ -149,11 +138,12 @@
 <script>
 import { OsButton, OsCard } from '@ocelot-social/ui'
 import { mapActions, mapGetters } from 'vuex'
+import ConflictBanner from '~/components/ConflictBanner.vue'
 import deepLinkHighlight from '~/mixins/deepLinkHighlight'
 import { policyConfigQuery } from '~/graphql/admin/PolicyConfig'
 
 export default {
-  components: { OsButton, OsCard },
+  components: { ConflictBanner, OsButton, OsCard },
   // Deep-link highlight (highlightedKey, applyHashHighlight, hash watcher, fade timer) is
   // shared with the config tab. The policy rows are static (v-for over `groups`), so the
   // mixin's own mount is enough — no async re-apply needed.
@@ -483,27 +473,9 @@ form {
     text-transform: uppercase;
   }
 }
-// Concurrent-edit conflict banner: a remote change landed under this admin's edit.
+// Outer spacing for the shared conflict banner (its appearance lives in ConflictBanner.vue).
 .policy-conflict {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: $space-x-small;
   margin-top: $space-small;
-  padding: $space-x-small $space-small;
-  border-radius: $border-radius-base;
-  border-left: 3px solid $color-warning;
-  background: rgba($color-warning, 0.14);
-  font-size: 0.9em;
-
-  &__text {
-    flex: 1 1 16rem;
-  }
-  &__actions {
-    display: inline-flex;
-    gap: $space-x-small;
-  }
 }
 .policy-row {
   display: flex;

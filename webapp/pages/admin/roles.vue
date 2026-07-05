@@ -140,32 +140,16 @@
              admin has unsaved edits. The draft is kept (their work is never silently lost);
              the diverged rows are highlighted below. Load = discard mine, take the server's;
              Keep = keep editing (my save will overwrite). -->
-        <div
+        <conflict-banner
           v-if="conflicts[activeRole.name]"
           class="role__conflict"
-          role="alert"
+          :message="$t('admin.roles.conflict.message')"
+          :load-label="$t('admin.roles.conflict.load')"
+          :keep-label="$t('admin.roles.conflict.keep')"
           :data-test="`role-${activeRole.name}-conflict`"
-        >
-          <span class="role__conflict-text">{{ $t('admin.roles.conflict.message') }}</span>
-          <span class="role__conflict-actions">
-            <os-button
-              variant="primary"
-              appearance="filled"
-              :data-test="`role-${activeRole.name}-conflict-load`"
-              @click="loadServerVersion(activeRole.name)"
-            >
-              {{ $t('admin.roles.conflict.load') }}
-            </os-button>
-            <os-button
-              variant="primary"
-              appearance="ghost"
-              :data-test="`role-${activeRole.name}-conflict-keep`"
-              @click="dismissConflict(activeRole.name)"
-            >
-              {{ $t('admin.roles.conflict.keep') }}
-            </os-button>
-          </span>
-        </div>
+          @load="loadServerVersion(activeRole.name)"
+          @keep="dismissConflict(activeRole.name)"
+        />
 
         <!-- Two-column masonry on desktop (>=1024px) for a compact overview; each
              group stays intact (break-inside: avoid). Single column on mobile. -->
@@ -250,6 +234,7 @@
 <script>
 import { OsButton, OsCard } from '@ocelot-social/ui'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
+import ConflictBanner from '~/components/ConflictBanner.vue'
 import permissionsChangedSubscription from '~/graphql/PermissionsSubscription'
 import { iconRegistry } from '~/utils/iconRegistry'
 import {
@@ -265,7 +250,7 @@ const emptyPermissionMap = (catalog) =>
   catalog.reduce((map, permission) => ({ ...map, [permission.key]: false }), {})
 
 export default {
-  components: { ConfirmModal, OsButton, OsCard },
+  components: { ConfirmModal, ConflictBanner, OsButton, OsCard },
   middleware: ['isAdmin'],
   data() {
     return {
@@ -919,26 +904,9 @@ export default {
     color: $text-color-soft;
     font-style: italic;
   }
-  // Concurrent-edit conflict banner: a remote change landed under this admin's edit.
+  // Outer spacing for the shared conflict banner (its appearance lives in ConflictBanner.vue).
   &__conflict {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: $space-x-small;
     margin: $space-x-small 0;
-    padding: $space-x-small $space-small;
-    border-radius: $border-radius-base;
-    border-left: 3px solid $color-warning;
-    background: rgba($color-warning, 0.14);
-    font-size: 0.9em;
-  }
-  &__conflict-text {
-    flex: 1 1 16rem;
-  }
-  &__conflict-actions {
-    display: inline-flex;
-    gap: $space-x-small;
   }
   &__actions {
     margin-top: $space-x-small;
