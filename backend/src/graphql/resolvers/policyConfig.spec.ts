@@ -1,4 +1,4 @@
-import { createInMemoryPolicyService } from '@src/policy'
+import { allKeys, createInMemoryPolicyService } from '@src/policy'
 
 import resolvers from './policyConfig'
 
@@ -27,11 +27,10 @@ const rowFor = (
 }
 
 describe('policyConfig resolver', () => {
-  it('returns one row per policy key', () => {
+  it('returns exactly one row per policy key', () => {
     const keys = rowsFor().map((row) => row.key)
-    expect(keys).toContain('videoConference')
-    expect(keys).toContain('apiKeysEnabled')
     expect(new Set(keys).size).toBe(keys.length)
+    expect([...keys].sort()).toEqual([...allKeys()].sort())
   })
 
   it('exposes each key’s display category (from the schema), so the admin UI groups without a hand-list', () => {
