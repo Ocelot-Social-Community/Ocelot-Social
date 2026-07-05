@@ -215,6 +215,30 @@ describe('admin/config.vue', () => {
       expect(secret.find('[data-test="config-envvalue-LIVEKIT_API_SECRET"]').exists()).toBe(false)
       expect(secret.find('.value--masked').exists()).toBe(false)
     })
+
+    it('renders an EMPTY var as its own state (distinct label from missing), still flagged', async () => {
+      // The backend distinguishes set | empty | missing (an env var present but ''
+      // vs. absent). The badge is binary (only 'set' is ok), but the label must stay
+      // three-way so an empty value is not conflated with a missing one.
+      const w = await Wrapper([
+        {
+          envKey: 'LIVEKIT_API_SECRET',
+          category: 'video',
+          secret: true,
+          state: 'empty',
+          effective: null,
+          override: null,
+          envValue: null,
+          softwareDefault: null,
+          overridable: false,
+          policyKey: 'videoConference',
+          blocking: true,
+        },
+      ])
+      const badge = row(w, 'LIVEKIT_API_SECRET').find('[data-test="config-state-LIVEKIT_API_SECRET"]')
+      expect(badge.classes()).toContain('badge--error')
+      expect(badge.text()).toBe('admin.config.state.empty')
+    })
   })
 
   describe('hard-requirement vars', () => {
