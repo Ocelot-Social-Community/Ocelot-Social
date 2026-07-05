@@ -78,13 +78,6 @@
               >
                 {{ $t('admin.policy.defaultValue', { value: String(defaults[key]) }) }}
               </span>
-              <span
-                v-if="softwareDefaultOf(key) !== null"
-                class="policy-row__software"
-                :data-test="`policy-software-${key}`"
-              >
-                {{ $t('admin.policy.softwareDefault', { value: softwareDefaultOf(key) }) }}
-              </span>
             </span>
             <span class="policy-row__description">
               {{ $t(`admin.policy.descriptions.${key}`) }}
@@ -125,7 +118,7 @@
           variant="primary"
           appearance="ghost"
           @click="resetAllToDefault"
-          :disabled="saving"
+          :disabled="!resetHasEffect || saving"
           data-test="policy-reset"
         >
           {{ $t('admin.policy.reset') }}
@@ -215,6 +208,16 @@ export default {
     isDirty() {
       return this.keys.some((k) => this.form[k] !== this.snapshot[k])
     },
+    // Whether "reset to default" would actually change anything: some key's effective value
+    // still diverges from its configured default. Mirrors the backend bulk reset (which only
+    // resets diverging keys), so the button disables once everything is already at default.
+    // If the defaults haven't loaded yet, allow it rather than guess.
+    resetHasEffect() {
+      if (!this.defaults || Object.keys(this.defaults).length === 0) return true
+      return this.keys.some(
+        (k) => this.defaults[k] !== undefined && this.snapshot[k] !== this.defaults[k],
+      )
+    },
     // Any field this admin edited that the server also moved underneath.
     hasConflict() {
       return this.keys.some((k) => this.conflict[k])
@@ -249,16 +252,6 @@ export default {
     // has no effect, so the input is disabled and a link to the config tab is shown.
     isUnavailable(key) {
       return this.configByKey[key]?.available === false
-    },
-    // The code baseline (third value layer), formatted for display, or null if unknown.
-    softwareDefaultOf(key) {
-      const entry = this.configByKey[key]
-      if (!entry) return null
-      try {
-        return String(JSON.parse(entry.softwareDefault))
-      } catch {
-        return entry.softwareDefault
-      }
     },
     // Hard sync: adopt the whole server snapshot, reset the baseline to it, and clear all
     // conflicts. Used on mount, reset-to-default, and "load new version" (discard my edits).
@@ -504,14 +497,6 @@ form {
     font-family: monospace;
     font-size: 0.8em;
     font-weight: normal;
-  }
-  &__software {
-    margin-left: $space-xx-small;
-    color: $text-color-soft;
-    font-family: monospace;
-    font-size: 0.75em;
-    font-weight: normal;
-    opacity: 0.75;
   }
   &__description {
     color: $text-color-soft;

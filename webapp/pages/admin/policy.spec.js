@@ -531,6 +531,46 @@ describe('admin/policy.vue', () => {
       expect(resetKeys).toHaveBeenCalledWith(expect.anything(), { keys: ALL_KEYS })
       expect(mocks.$toast.success).toHaveBeenCalled()
     })
+
+    it('enables reset only while some key still diverges from its default', async () => {
+      // Fixtures differ on categoriesActive (snapshot false, default true) → something to reset.
+      wrapper = Wrapper()
+      await flushPromises()
+      expect(wrapper.vm.resetHasEffect).toBe(true)
+      expect(wrapper.find('[data-test="policy-reset"]').attributes('disabled')).toBeFalsy()
+
+      // Make the effective snapshot match the configured defaults exactly → nothing to reset.
+      store.commit('policy/SET_SNAP', { ...defaults })
+      await flushPromises()
+      expect(wrapper.vm.resetHasEffect).toBe(false)
+      expect(wrapper.find('[data-test="policy-reset"]').attributes('disabled')).toBeTruthy()
+    })
+
+    it('allows reset while the configured defaults have not loaded yet', () => {
+      const noDefaultsStore = new Vuex.Store({
+        modules: {
+          policy: {
+            namespaced: true,
+            state: () => ({ snap: { ...snapshot } }),
+            getters: {
+              snapshot: (s) => s.snap,
+              defaults: () => ({}),
+              lastChange: () => lastChange,
+            },
+            actions: { init, fetchDefaults, setKey, resetKeys },
+          },
+        },
+      })
+      const w = mount(Policy, {
+        mocks,
+        localVue,
+        store: noDefaultsStore,
+        data() {
+          return { policyConfig: policyConfigFixture() }
+        },
+      })
+      expect(w.vm.resetHasEffect).toBe(true)
+    })
   })
 
   describe('env-gated availability (policyConfig)', () => {
@@ -562,19 +602,6 @@ describe('admin/policy.vue', () => {
       expect(w.find('.policy-row__env-link').attributes('href')).toBe(
         '/admin/config#videoConference',
       )
-    })
-
-    it('renders the software-default layer for a configured key', async () => {
-      const w = mountWithConfig([ENTRY])
-      await w.vm.$nextTick()
-      expect(w.vm.softwareDefaultOf('videoConference')).toBe('true')
-      expect(w.find('[data-test="policy-software-videoConference"]').exists()).toBe(true)
-    })
-
-    it('softwareDefaultOf returns null for unknown keys and the raw string on bad JSON', () => {
-      const w = mountWithConfig([{ ...ENTRY, softwareDefault: 'not json' }])
-      expect(w.vm.softwareDefaultOf('apiKeysEnabled')).toBeNull()
-      expect(w.vm.softwareDefaultOf('videoConference')).toBe('not json')
     })
 
     it('treats keys without a config entry as available', () => {
