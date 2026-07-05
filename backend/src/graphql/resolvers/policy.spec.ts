@@ -193,6 +193,30 @@ describe('Mutation.setPolicy / resetPolicy authorization', () => {
 
     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
   })
+
+  it('forbids the bulk resetPolicies for non-admins', async () => {
+    authenticatedUser = asUser('user')
+
+    const { errors } = await query({
+      query: parse('mutation { resetPolicies(keys: [apiKeysEnabled]) { key } }'),
+    })
+
+    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
+  })
+
+  it('lets the bulk resetPolicies past the shield for an admin (the gate is registered)', async () => {
+    // A deny test alone would pass even if the mutation were MISSING from the shield (default
+    // deny). This admin path is what catches a forgotten shield registration: an admin must
+    // not be denied. (The harness policy service has no writable DB, so execution may still
+    // error internally — that is a test-setup limitation, not what we assert here.)
+    authenticatedUser = asUser('admin')
+
+    const { errors } = await query({
+      query: parse('mutation { resetPolicies(keys: [apiKeysEnabled]) { key } }'),
+    })
+
+    expect(errors?.[0]?.message).not.toBe('Not Authorized!')
+  })
 })
 
 describe('PolicyKey enum (schema-derived contract)', () => {

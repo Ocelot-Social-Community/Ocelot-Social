@@ -675,6 +675,7 @@ export default shield(
       // Network Policy
       setPolicy: hasPermission('policy.manage'),
       resetPolicy: hasPermission('policy.manage'),
+      resetPolicies: hasPermission('policy.manage'),
 
       // Cache resync: dev/test recovery hook only (db:reset/seed + e2e). Disabled in
       // production — fleet resyncs there are done via a rolling restart.
