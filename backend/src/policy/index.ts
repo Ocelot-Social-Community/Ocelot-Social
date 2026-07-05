@@ -21,3 +21,5 @@ export {
   typeFor,
 } from './schema'
 export type { PolicyViewer } from './schema'
+export { policyValueLayers } from './valueLayers'
+export type { PolicyValueLayers } from './valueLayers'

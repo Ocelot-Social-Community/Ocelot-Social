@@ -1,4 +1,4 @@
-import { allKeys, defaultFor, envSeedFor, typeFor } from '@src/policy'
+import { allKeys, envSeedFor, policyValueLayers, typeFor } from '@src/policy'
 
 import type { Context } from '@src/context'
 
@@ -16,9 +16,7 @@ export default {
         return {
           key,
           type: typeFor(key),
-          effective: JSON.stringify(policy.getEffective(key)),
-          softwareDefault: JSON.stringify(defaultFor(key)),
-          configuredDefault: JSON.stringify(policy.getDefault(key)),
+          ...policyValueLayers(policy, key),
           envSeed,
           envSeedState: envSeed ? policy.envState(envSeed) : null,
           requiresEnv: policy.requiresEnvStatus(key),

@@ -12,7 +12,7 @@
 //     var, e.g. a LiveKit key), or a plain infrastructure row.
 
 /* eslint-disable security/detect-object-injection */ // keys come from the fixed policy schema / env registry, never user input
-import { allKeys, defaultFor, envSeedFor, requiresEnvFor } from '@src/policy'
+import { allKeys, envSeedFor, policyValueLayers, requiresEnvFor } from '@src/policy'
 
 import { ENV_REGISTRY, ENV_SPEC_BY_NAME, POLICY_CATEGORY } from './envRegistry'
 
@@ -87,8 +87,7 @@ export function systemConfigStatus(env: Env, policy: PolicyLike): SystemConfigRo
     if (seed) {
       governed.add(seed)
       const seedState = policy.envState(seed)
-      const effective = JSON.stringify(policy.getEffective(key))
-      const configuredDefault = JSON.stringify(policy.getDefault(key))
+      const { effective, softwareDefault, configuredDefault } = policyValueLayers(policy, key)
       // A seeded key has no hard requirement, so effective == configuredDefault unless
       // an admin overrode it in the DB — that divergence IS the override, exactly.
       const overridden = effective !== configuredDefault
@@ -102,7 +101,7 @@ export function systemConfigStatus(env: Env, policy: PolicyLike): SystemConfigRo
         // The env only contributes a value when actually set; otherwise the configured
         // default equals the software default and this column is em-dashed.
         envValue: seedState === 'set' ? configuredDefault : null,
-        softwareDefault: JSON.stringify(defaultFor(key)),
+        softwareDefault,
         overridable: true,
         policyKey: key,
         blocking: false,
