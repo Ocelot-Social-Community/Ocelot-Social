@@ -112,6 +112,12 @@ describe('admin/config.vue', () => {
       expect(vm.fmt('5')).toBe('5')
       expect(vm.fmt('bolt://db:7687')).toBe('bolt://db:7687')
     })
+
+    it('renders a JSON list as a JS array literal (empty and set)', async () => {
+      const vm = (await Wrapper()).vm
+      expect(vm.fmt('[]')).toBe('[]')
+      expect(vm.fmt('["m_a","m_b"]')).toBe("['m_a', 'm_b']")
+    })
   })
 
   describe('grouping', () => {

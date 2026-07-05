@@ -31,6 +31,9 @@ export interface EnvVarSpec {
   // string, or null when there is none. This is a PUBLIC code constant (not a deployed
   // secret), so it is surfaced even for a secret var — only the runtime env value is hidden.
   softwareDefault: string | null
+  // Whether the var is a comma-separated list. Its runtime value and default are surfaced as
+  // a JSON array (so an empty list reads as [] and a set one as ["a","b"], not a bare string).
+  list?: boolean
 }
 
 // Every recognised env var except the policy-seed vars. Kept in lockstep with the reads
@@ -154,19 +157,29 @@ export const ENV_REGISTRY: EnvVarSpec[] = [
   { name: 'COMMIT', secret: false, category: 'monitoring', softwareDefault: null },
 
   // --- General ------------------------------------------------------------
-  // Off by default: DEBUG is a boolean toggle that is only on in non-production when
-  // explicitly set, and is forced off in production (see config/index.ts) — so its baseline
-  // is 'false', not "no default". Its off-ness is encoded in that logic (there is no config
-  // fallback constant), which is why it is a direct literal here rather than in
-  // softwareDefaults.ts.
-  { name: 'DEBUG', secret: false, category: 'general', softwareDefault: 'false' },
+  // Off by default (a boolean toggle, only on in non-production when explicitly set, forced
+  // off in production) → baseline 'false', not "no default". Single-sourced from the map.
+  {
+    name: 'DEBUG',
+    secret: false,
+    category: 'general',
+    softwareDefault: String(SOFTWARE_DEFAULTS.DEBUG),
+  },
   {
     name: 'PRODUCTION_DB_CLEAN_ALLOW',
     secret: false,
     category: 'general',
     softwareDefault: String(SOFTWARE_DEFAULTS.PRODUCTION_DB_CLEAN_ALLOW),
   },
-  { name: 'DISABLED_MIDDLEWARES', secret: false, category: 'general', softwareDefault: null },
+  // A comma-separated list; shown as a JSON array so the empty default reads as [] and a set
+  // value as ["m_a","m_b"] rather than a bare/blank string.
+  {
+    name: 'DISABLED_MIDDLEWARES',
+    secret: false,
+    category: 'general',
+    list: true,
+    softwareDefault: JSON.stringify(SOFTWARE_DEFAULTS.DISABLED_MIDDLEWARES),
+  },
   { name: 'SUPPORT_EMAIL', secret: false, category: 'general', softwareDefault: null },
   {
     name: 'LANGUAGE_DEFAULT',

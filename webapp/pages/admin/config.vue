@@ -225,11 +225,15 @@ export default {
     policyLabel(key) {
       return this.$t(`admin.policy.keys.${key}`)
     },
-    // Pretty-print a value for display: JSON-encoded policy values parse to their
-    // primitive; a raw env string passes through unchanged.
+    // Pretty-print a value for display: JSON-encoded policy values parse to their primitive;
+    // a JSON list (e.g. DISABLED_MIDDLEWARES) renders as a JS array literal — [] when empty,
+    // ['m_a', 'm_b'] when set — instead of a blank/comma string; a raw env string passes
+    // through unchanged.
     fmt(value) {
       try {
-        return String(JSON.parse(value))
+        const parsed = JSON.parse(value)
+        if (Array.isArray(parsed)) return `[${parsed.map((entry) => `'${entry}'`).join(', ')}]`
+        return String(parsed)
       } catch {
         return value
       }

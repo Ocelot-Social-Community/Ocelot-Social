@@ -25,17 +25,19 @@ describe('SOFTWARE_DEFAULTS ↔ envRegistry display', () => {
     for (const [name, value] of Object.entries(SOFTWARE_DEFAULTS)) {
       const spec = ENV_SPEC_BY_NAME[name]
       expect(spec).toBeDefined()
-      expect(spec.softwareDefault).toBe(String(value))
+      // Lists are surfaced as a JSON array ([] / ["a","b"]); scalars via String().
+      const expected = Array.isArray(value) ? JSON.stringify(value) : String(value)
+      expect(spec.softwareDefault).toBe(expected)
     }
   })
 })
 
-// (b) Runtime guard for the inverted-boolean flags. Unlike the ?? / || cases (which read
-// SOFTWARE_DEFAULTS directly in config/index.ts and therefore cannot drift), these flags
-// encode their default in comparison logic (`!== 'false'` / `=== 'true'`), separate from
-// the map — so a flipped comparison would silently disagree with what the admin sees. This
-// asserts config's actual unset-default equals the map value.
-describe('SOFTWARE_DEFAULTS ↔ config runtime default (boolean flags)', () => {
+// (b) Runtime guard for the logic-gated defaults. Unlike the ?? / || cases (which read
+// SOFTWARE_DEFAULTS directly in config/index.ts and therefore cannot drift), these encode
+// their default in comparison / NODE_ENV logic (`!== 'false'`, `=== 'true'`, or a
+// NODE_ENV branch), separate from the map — so a flipped comparison would silently disagree
+// with what the admin sees. This asserts config's actual unset-default matches the map.
+describe('SOFTWARE_DEFAULTS ↔ config runtime default (logic-gated defaults)', () => {
   // config/index.ts refuses to load unless the hard-required vars are present, so supply
   // dummies. The flags under test are deliberately ABSENT, so config yields their defaults.
   const REQUIRED: Record<string, string> = {
@@ -78,5 +80,19 @@ describe('SOFTWARE_DEFAULTS ↔ config runtime default (boolean flags)', () => {
   it('defaults PRODUCTION_DB_CLEAN_ALLOW to the map value', () => {
     const { default: CONFIG } = loadConfigWithFlagsUnset()
     expect(CONFIG.PRODUCTION_DB_CLEAN_ALLOW).toBe(SOFTWARE_DEFAULTS.PRODUCTION_DB_CLEAN_ALLOW)
+  })
+
+  it('defaults DEBUG to falsy (off)', () => {
+    // DEBUG's unset value is NODE_ENV-gated (undefined in non-production, false in
+    // production), so it is guarded as falsy rather than strictly `false`; the map records
+    // its off baseline (false) as the single display source.
+    const { default: CONFIG } = loadConfigWithFlagsUnset()
+    expect(CONFIG.DEBUG).toBeFalsy()
+    expect(SOFTWARE_DEFAULTS.DEBUG).toBe(false)
+  })
+
+  it('defaults DISABLED_MIDDLEWARES to the empty list', () => {
+    const { default: CONFIG } = loadConfigWithFlagsUnset()
+    expect(CONFIG.DISABLED_MIDDLEWARES).toEqual(SOFTWARE_DEFAULTS.DISABLED_MIDDLEWARES)
   })
 })

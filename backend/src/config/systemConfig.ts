@@ -131,7 +131,18 @@ export function systemConfigStatus(env: Env, policy: PolicyLike): SystemConfigRo
   for (const spec of ENV_REGISTRY) {
     if (governed.has(spec.name)) continue
     const state = policy.envState(spec.name)
-    const value = !spec.secret && state === 'set' ? (env[spec.name] ?? null) : null
+    const rawValue = !spec.secret && state === 'set' ? (env[spec.name] ?? null) : null
+    // A list var arrives comma-separated in the env; surface it (and its default) as a JSON
+    // array so an empty list reads as [] and a set one as ["a","b"], not a bare string.
+    const value =
+      rawValue !== null && spec.list
+        ? JSON.stringify(
+            rawValue
+              .split(',')
+              .map((entry) => entry.trim())
+              .filter(Boolean),
+          )
+        : rawValue
     rows.push({
       envKey: spec.name,
       category: spec.category,

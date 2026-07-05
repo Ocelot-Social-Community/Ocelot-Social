@@ -101,6 +101,17 @@ describe('systemConfigStatus', () => {
       expect(set.envValue).toBe('app:*')
     })
 
+    it('shows a list var (DISABLED_MIDDLEWARES) as a JSON array, empty by default', () => {
+      const unset = rowFor('DISABLED_MIDDLEWARES', {})
+      expect(unset.softwareDefault).toBe('[]')
+      expect(unset.effective).toBe('[]') // falls back to the empty-list default
+
+      // The comma-separated env value becomes a JSON array (entries trimmed, blanks dropped).
+      const set = rowFor('DISABLED_MIDDLEWARES', { DISABLED_MIDDLEWARES: 'm_a, m_b' })
+      expect(set.envValue).toBe('["m_a","m_b"]')
+      expect(set.effective).toBe('["m_a","m_b"]')
+    })
+
     it('is never overridable and carries no policy key', () => {
       const row = rowFor('SMTP_HOST', { SMTP_HOST: 'mail.example.org' })
       expect(row.overridable).toBe(false)
