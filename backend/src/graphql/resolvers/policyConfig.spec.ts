@@ -34,6 +34,11 @@ describe('policyConfig resolver', () => {
     expect([...keys].sort()).toEqual([...allKeys()].sort())
   })
 
+  it('returns an empty list when the context has no policy service (guarded, like systemConfig)', () => {
+    const rows = resolvers.Query.policyConfig(null, null, {} as unknown as Context)
+    expect(rows).toEqual([])
+  })
+
   it('exposes each key’s display category (from the schema), so the admin UI groups without a hand-list', () => {
     expect(rowFor('publicRegistration').category).toBe('registration')
     expect(rowFor('showGroupButtonInHeader').category).toBe('layout')

@@ -14,6 +14,10 @@ export default {
   Query: {
     policyConfig: (_parent: unknown, _args: unknown, context: Context) => {
       const { policy } = context
+      // Match systemConfig: no policy service on the context (context.policy is optional —
+      // e.g. an uninitialised request path) → empty list rather than crashing on
+      // policyValueLayers / policy.envState / requiresEnvStatus / isAvailable below.
+      if (!policy) return []
       return allKeys()
         .map((key) => {
           const envSeed = envSeedFor(key) ?? null
