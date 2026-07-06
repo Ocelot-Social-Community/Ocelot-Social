@@ -10,11 +10,13 @@ Feature: Moderation area access (RBAC)
       | peter-pan | peter@example.org     | 1234     | peter     | Peter Pan | user      | 0.0.4                           |
       | admin     | admin@example.org     | 1234     | admin     | Admin     | admin     | 0.0.4                           |
 
-  # The default moderator holds badge.manage → the user list is surfaced under
-  # moderation, reusing the admin component, but WITHOUT the e-mail column (the
-  # moderator has no user.email.readAny).
+  # The default moderator holds badge.manage → the per-user badge page is surfaced under
+  # moderation, reusing the admin user component, but WITHOUT the e-mail column (the
+  # moderator has no user.email.readAny). badge.manage is gated by the badgesEnabled policy
+  # (default OFF), so enable it here — otherwise the capability is inert and the page 403s.
   Scenario: A moderator reaches the user list under moderation without seeing e-mails
-    Given I am logged in as "moderator"
+    Given the network policy "badgesEnabled" is "true"
+    And I am logged in as "moderator"
     And I navigate to page "/"
     When I click on the avatar menu in the top right corner
     Then I see the moderation menu item
