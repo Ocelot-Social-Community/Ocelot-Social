@@ -20,6 +20,7 @@ export default () => gql`
       showGroupButtonInHeader
       apiKeysEnabled
       apiKeysMaxPerUser
+      videoConference
       maxPinnedPosts
       maxGroupPinnedPosts
     }

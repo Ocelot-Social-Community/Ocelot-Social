@@ -183,9 +183,10 @@ export default {
       defaults: 'policy/defaults',
       lastChange: 'policy/lastChange',
     }),
-    // All policy keys the viewer can see — read from the snapshot (present right after the
-    // mount fetch), so the form logic never waits on the policyConfig query. The rendered
-    // rows (groups) come from policyConfig; both cover the same key set.
+    // All policy keys present in the snapshot (the viewer-scoped values, available right
+    // after the mount fetch) — drives the form/dirty/save logic, which never waits on the
+    // policyConfig query. The rendered rows (groups) and highlight set come from policyConfig
+    // instead; the two are expected to align, but the highlight no longer depends on it.
     keys() {
       return Object.keys(this.snapshot)
     },
@@ -243,10 +244,13 @@ export default {
     isNumberKey(key) {
       return this.configByKey[key]?.type === 'integer'
     },
-    // The hash keys this tab can highlight (deepLinkHighlight mixin): every policy key,
-    // whose row element id is the key itself.
+    // The hash keys this tab can highlight (deepLinkHighlight mixin): every RENDERED row,
+    // whose element id is the key itself. Derived from policyConfig (the same source the
+    // rows are rendered from) rather than the snapshot, so a deep link to any visible row
+    // highlights even if the snapshot query's field list drifts from the backend key set
+    // (as videoConference once did) — mirrors the config tab, which is single-sourced too.
     highlightableKeys() {
-      return this.keys
+      return this.policyConfig.map((entry) => entry.key)
     },
     // A key is unavailable when its hard env requirements are unmet: the stored flag
     // has no effect, so the input is disabled and a link to the config tab is shown.

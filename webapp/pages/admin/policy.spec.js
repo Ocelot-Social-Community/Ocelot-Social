@@ -666,6 +666,22 @@ describe('admin/policy.vue', () => {
       expect(w.vm.highlightedKey).toBe('videoConference')
     })
 
+    it('highlights a rendered row even when the snapshot omits its key (drift guard)', async () => {
+      // Regression: videoConference was once missing from the snapshot query's field list,
+      // yet its row still renders (rows come from policyConfig). highlightableKeys() derives
+      // from the rendered rows, not the snapshot, so the deep link from the roles tab
+      // (/admin/policy#videoConference) still scrolls to and highlights the row.
+      const { videoConference: _omitted, ...withoutVideo } = snapshot
+      store.commit('policy/SET_SNAP', withoutVideo)
+      const { w } = mountWithRoute('#videoConference')
+      await flushPromises()
+      expect(w.vm.keys).not.toContain('videoConference') // snapshot really lacks it
+      expect(w.find('#videoConference').exists()).toBe(true) // but the row is rendered
+      expect(w.vm.highlightedKey).toBe('videoConference')
+      expect(w.find('#videoConference').classes()).toContain('policy-row--highlight')
+      expect(window.HTMLElement.prototype.scrollIntoView).toHaveBeenCalled()
+    })
+
     it('fades the highlight out after a delay (clears the key so the class drops)', async () => {
       // Fake only the timers; keep setImmediate real so flushPromises still settles.
       jest.useFakeTimers({ doNotFake: ['setImmediate'] })
