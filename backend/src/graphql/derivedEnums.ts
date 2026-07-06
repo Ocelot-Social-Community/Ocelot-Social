@@ -18,12 +18,28 @@ import { ENV_CATEGORIES } from '../config/categories'
 import policySchema from '../policy/policy.schema.json'
 /* eslint-enable import-x/no-relative-parent-imports */
 
+// A GraphQL enum value must be a valid GraphQL name. A policy key or category with e.g. a dot
+// or a leading digit would otherwise only surface as a cryptic schema-PARSE error, far from its
+// source — so assert it here at SDL-build time, with a message that names the offender.
+const GRAPHQL_NAME = /^[_a-zA-Z][_a-zA-Z0-9]*$/
+
+export function enumSDL(name: string, values: readonly string[]): string {
+  for (const value of values) {
+    if (!GRAPHQL_NAME.test(value)) {
+      throw new Error(
+        `derivedEnums: "${value}" is not a valid GraphQL enum value for ${name} (must match ${GRAPHQL_NAME.source}).`,
+      )
+    }
+  }
+  return `enum ${name} { ${values.join(' ')} }`
+}
+
 // PolicyKey — every key in the policy schema. Object.keys(properties) is exactly what
 // policy/schema.ts's allKeys() returns, in the same (declaration) order.
-export const policyKeyEnumSDL = `enum PolicyKey { ${Object.keys(policySchema.properties).join(' ')} }`
+export const policyKeyEnumSDL = enumSDL('PolicyKey', Object.keys(policySchema.properties))
 
 // EnvCategory — the shared category vocabulary, in its global display order.
-export const envCategoryEnumSDL = `enum EnvCategory { ${ENV_CATEGORIES.join(' ')} }`
+export const envCategoryEnumSDL = enumSDL('EnvCategory', ENV_CATEGORIES)
 
 // Every derived enum, for spreading into a schema source list.
 export const derivedEnumSDLs = [policyKeyEnumSDL, envCategoryEnumSDL]
