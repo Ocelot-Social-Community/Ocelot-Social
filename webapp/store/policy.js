@@ -23,7 +23,19 @@ const normalize = (entries) => {
   const out = {}
   for (const entry of Array.isArray(entries) ? entries : []) {
     if (!entry || entry.key === '__typename') continue
-    out[entry.key] = entry.value == null ? null : JSON.parse(entry.value)
+    if (entry.value == null) {
+      out[entry.key] = null
+      continue
+    }
+    try {
+      out[entry.key] = JSON.parse(entry.value)
+    } catch (err) {
+      // Guard each value like setKey/resetKeys do: a single unparseable value must not throw
+      // and take the whole snapshot down — init()'s catch would then discard even the public
+      // keys. Fall back to null (the same safe default a not-visible key gets), keeping the
+      // rest of the snapshot intact.
+      out[entry.key] = null
+    }
   }
   return out
 }

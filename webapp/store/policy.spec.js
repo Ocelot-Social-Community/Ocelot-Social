@@ -52,6 +52,19 @@ describe('policy store', () => {
         expect(s.snapshot.apiKeysMaxPerUser).toBe(3)
       })
 
+      it('falls back a single unparseable value to null without dropping the other keys', () => {
+        const s = { snapshot: {} }
+        mutations.SET_SNAPSHOT(s, [
+          { key: 'publicRegistration', value: 'true' },
+          { key: 'apiKeysEnabled', value: 'not-json' }, // JSON.parse throws for this one
+          { key: 'inviteRegistration', value: 'false' },
+        ])
+        // The bad value is null; the surrounding (public) keys survive intact.
+        expect(s.snapshot.apiKeysEnabled).toBeNull()
+        expect(s.snapshot.publicRegistration).toBe(true)
+        expect(s.snapshot.inviteRegistration).toBe(false)
+      })
+
       it('ignores a per-entry Apollo __typename', () => {
         const s = { snapshot: {} }
         mutations.SET_SNAPSHOT(s, [
