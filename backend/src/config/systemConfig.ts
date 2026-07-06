@@ -14,6 +14,7 @@
 /* eslint-disable security/detect-object-injection */ // keys come from the fixed policy schema / env registry, never user input
 import { allKeys, categoryFor, envSeedFor, policyValueLayers, requiresEnvFor } from '@src/policy'
 
+import { categoryRank } from './categories'
 import { ENV_REGISTRY, ENV_SPEC_BY_NAME } from './envRegistry'
 
 import type { EnvCategory } from './categories'
@@ -67,9 +68,11 @@ const specFor = (name: string): EnvVarSpec =>
   ENV_SPEC_BY_NAME[name] ?? { name, secret: true, category: 'general', softwareDefault: null }
 
 // One row per recognised env var, merging static registry metadata with the live
-// policy overlay. Order: policy rows in schema order (seed or hard-requirement),
-// then the remaining plain infrastructure rows in registry order. The client groups
-// by category for display, so only intra-category order matters here.
+// policy overlay. Rows are returned in the global category display order (categoryRank,
+// derived from ENV_CATEGORIES) with a stable sort, so the admin config tab renders its
+// groups straight from row order — no client-side category order list. Within a category
+// the pre-sort order is preserved: policy rows (schema order: seed or hard-requirement)
+// ahead of the plain registry rows.
 export function systemConfigStatus(env: Env, policy: PolicyLike): SystemConfigRow[] {
   const rows: SystemConfigRow[] = []
   // Names owned by a policy (seed or hard requirement) — excluded from the plain pass
@@ -162,5 +165,7 @@ export function systemConfigStatus(env: Env, policy: PolicyLike): SystemConfigRo
     })
   }
 
-  return rows
+  // Stable sort into the global category display order (ENV_CATEGORIES). Array.sort is
+  // stable, so the intra-category order built above is preserved.
+  return rows.sort((a, b) => categoryRank(a.category) - categoryRank(b.category))
 }

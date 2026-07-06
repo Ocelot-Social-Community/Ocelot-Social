@@ -135,11 +135,6 @@ import ConflictBanner from '~/components/ConflictBanner.vue'
 import deepLinkHighlight from '~/mixins/deepLinkHighlight'
 import { policyConfigQuery } from '~/graphql/admin/PolicyConfig'
 
-// Display order of the policy groups. Groups are derived from each key's backend `category`
-// (via policyConfig), so adding a key needs no hand-maintained list here — this only fixes
-// the order. A category not listed is appended after these, so nothing silently vanishes.
-const CATEGORY_ORDER = ['registration', 'features', 'layout', 'video']
-
 export default {
   components: { ConflictBanner, OsButton, OsCard },
   // Deep-link highlight (highlightedKey, applyHashHighlight, hash watcher, fade timer) is
@@ -190,9 +185,10 @@ export default {
     keys() {
       return Object.keys(this.snapshot)
     },
-    // Rows grouped by each key's backend category (policyConfig), ordered by CATEGORY_ORDER.
-    // No hand-maintained grouping/number-key/scaffold list — a new key shows up under its
-    // schema category automatically. An unknown category is appended (never dropped).
+    // Rows grouped by each key's backend category (policyConfig). policyConfig arrives in the
+    // backend's global category display order (categoryRank, from ENV_CATEGORIES), so a Map
+    // keyed by category preserves that order — no hand-maintained order/grouping list here. A
+    // new key shows up under its schema category automatically, in the backend-defined slot.
     groups() {
       const byCategory = new Map()
       for (const entry of this.policyConfig) {
@@ -200,11 +196,7 @@ export default {
         list.push(entry.key)
         byCategory.set(entry.category, list)
       }
-      const ordered = [
-        ...CATEGORY_ORDER.filter((category) => byCategory.has(category)),
-        ...[...byCategory.keys()].filter((category) => !CATEGORY_ORDER.includes(category)),
-      ]
-      return ordered.map((category) => ({ id: category, keys: byCategory.get(category) }))
+      return [...byCategory.entries()].map(([id, keys]) => ({ id, keys }))
     },
     isDirty() {
       return this.keys.some((k) => this.form[k] !== this.snapshot[k])

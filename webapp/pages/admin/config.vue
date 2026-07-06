@@ -149,24 +149,6 @@ import { OsCard } from '@ocelot-social/ui'
 import deepLinkHighlight from '~/mixins/deepLinkHighlight'
 import { systemConfigQuery } from '~/graphql/admin/SystemConfig'
 
-// Fixed display order of the category groups (infrastructure first, then feature
-// policies, then diagnostics). A category with no rows is skipped in `groups`.
-const CATEGORY_ORDER = [
-  'server',
-  'database',
-  'redis',
-  'storage',
-  'mail',
-  'auth',
-  'maps',
-  'video',
-  'registration',
-  'features',
-  'layout',
-  'monitoring',
-  'general',
-]
-
 export default {
   components: { OsCard },
   // Deep-link highlight (highlightedKey, applyHashHighlight, hash watcher, fade timer) is
@@ -188,8 +170,10 @@ export default {
     },
   },
   computed: {
-    // The env vars grouped by category in CATEGORY_ORDER, empty groups dropped. The
-    // FIRST row of each policy carries the policy key as its element id, so the policy
+    // The env vars grouped by category. systemConfig arrives in the backend's global category
+    // display order (categoryRank, from ENV_CATEGORIES), so a Map keyed by category preserves
+    // that order — no hand-maintained order list here, and empty groups simply never appear.
+    // The FIRST row of each policy carries the policy key as its element id, so the policy
     // tab's "see config" link (/admin/config#<key>) lands here without duplicate ids.
     groups() {
       const anchored = new Set()
@@ -213,10 +197,7 @@ export default {
         })
         byCategory.set(entry.category, rows)
       }
-      return CATEGORY_ORDER.filter((category) => byCategory.has(category)).map((category) => ({
-        category,
-        rows: byCategory.get(category),
-      }))
+      return [...byCategory.entries()].map(([category, rows]) => ({ category, rows }))
     },
   },
   methods: {

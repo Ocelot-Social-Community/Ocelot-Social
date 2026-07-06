@@ -1,3 +1,4 @@
+import { categoryRank } from '@src/config/categories'
 import { allKeys, createInMemoryPolicyService } from '@src/policy'
 
 import resolvers from './policyConfig'
@@ -38,6 +39,14 @@ describe('policyConfig resolver', () => {
     expect(rowFor('showGroupButtonInHeader').category).toBe('layout')
     expect(rowFor('apiKeysEnabled').category).toBe('features')
     expect(rowFor('videoConference').category).toBe('video')
+  })
+
+  it('returns rows in the global category display order, so the policy tab renders straight from row order', () => {
+    // Same single, backend-owned order (ENV_CATEGORIES) as the config tab; the policy tab
+    // keeps no order list of its own, so the sort has to hold here at the source.
+    const ranks = rowsFor().map((row) => categoryRank(row.category))
+    const sorted = [...ranks].sort((a, b) => a - b)
+    expect(ranks).toEqual(sorted)
   })
 
   describe('videoConference (env-gated)', () => {

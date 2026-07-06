@@ -11,8 +11,10 @@ const stubs = {
 // Covers every row shape the systemConfig query yields: a hard-requirement pair (a
 // non-secret URL that is present + a secret that is missing → blocking), a seed whose
 // admin override diverges from the env value, a seed whose env is unset (falls back to
-// the software default), a plain non-secret infra var, and a plain secret. Categories
-// are deliberately out of display order to exercise the grouping/sort.
+// the software default), a plain non-secret infra var, and a plain secret. The backend
+// returns rows already in the global category display order; the component preserves that
+// row order (grouping by first appearance), so the fixture's category order IS the expected
+// group order (canonical ordering itself is covered in systemConfig.spec.ts).
 const SAMPLE = [
   {
     envKey: 'LIVEKIT_URL',
@@ -121,14 +123,16 @@ describe('admin/config.vue', () => {
   })
 
   describe('grouping', () => {
-    it('groups rows by category in a fixed display order, dropping empty categories', async () => {
+    it('groups rows by category preserving the backend row order, dropping empty categories', async () => {
       const wrapper = await Wrapper()
+      // The component no longer sorts — it renders groups in the order the backend rows
+      // arrive (first appearance per category). Here that is the SAMPLE fixture's order.
       expect(wrapper.vm.groups.map((g) => g.category)).toEqual([
+        'video',
+        'features',
+        'registration',
         'database',
         'auth',
-        'video',
-        'registration',
-        'features',
       ])
       // Each present category renders a group tbody with its heading label.
       const video = wrapper.find('[data-test="config-group-video"]')
@@ -235,7 +239,9 @@ describe('admin/config.vue', () => {
           blocking: true,
         },
       ])
-      const badge = row(w, 'LIVEKIT_API_SECRET').find('[data-test="config-state-LIVEKIT_API_SECRET"]')
+      const badge = row(w, 'LIVEKIT_API_SECRET').find(
+        '[data-test="config-state-LIVEKIT_API_SECRET"]',
+      )
       expect(badge.classes()).toContain('badge--error')
       expect(badge.text()).toBe('admin.config.state.empty')
     })

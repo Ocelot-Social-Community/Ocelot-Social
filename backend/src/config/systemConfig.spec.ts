@@ -1,5 +1,6 @@
 import { createInMemoryPolicyService } from '@src/policy'
 
+import { categoryRank } from './categories'
 import { ENV_REGISTRY } from './envRegistry'
 import { systemConfigStatus } from './systemConfig'
 
@@ -48,6 +49,14 @@ describe('systemConfigStatus', () => {
     const liveKitRows = rowsFor().filter((row) => row.envKey === 'LIVEKIT_API_SECRET')
     expect(liveKitRows).toHaveLength(1)
     expect(liveKitRows[0].policyKey).toBe('videoConference')
+  })
+
+  it('returns rows in the global category display order (categoryRank is non-decreasing)', () => {
+    // The backend owns the single, global category order (ENV_CATEGORIES); the admin config
+    // tab renders straight from row order, so this contract must hold at the source.
+    const ranks = rowsFor().map((row) => categoryRank(row.category))
+    const sorted = [...ranks].sort((a, b) => a - b)
+    expect(ranks).toEqual(sorted)
   })
 
   describe('secret hygiene', () => {
