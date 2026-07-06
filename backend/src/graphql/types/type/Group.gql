@@ -54,6 +54,10 @@ type Group {
 
   "The current user's role in this group, or null if they are not a member."
   myRole: GroupMemberRole
+  "Whether the profile owner has chosen to show this group on their public profile."
+  showOnProfile: Boolean
+  "For closed groups: whether non-members can see the member list."
+  showMembers: Boolean
   posts: [Post] @relation(name: "IN", direction: "IN")
 
   "Whether the current user has muted this group."
@@ -67,6 +71,8 @@ type Group {
 
   "Number of posts currently pinned within this group."
   currentlyPinnedPostsCount: Int! @neo4j_ignore
+  "Total number of non-deleted, non-disabled posts in this group."
+  postsCount: Int! @neo4j_ignore
 }
 
 "A group member paired with their membership relationship (role, join date)."
@@ -137,6 +143,7 @@ type Mutation {
 
     "Empty string '' clears the location (sets it to null)."
     locationName: String
+    showMembers: Boolean
   ): Group
 
   "Update a group's settings. Restricted to admins/owners of the group."
@@ -154,6 +161,7 @@ type Mutation {
     avatar: ImageInput # test this as result
     "Empty string '' clears the location (sets it to null)."
     locationName: String
+    showMembers: Boolean
   ): Group
 
   # DeleteGroup(id: ID!): Group
@@ -174,4 +182,22 @@ type Mutation {
   muteGroup(groupId: ID!): Group
   "Unmute a previously muted group. Requires membership."
   unmuteGroup(groupId: ID!): Group
+
+  "Toggle whether a group membership is shown on the current user's profile."
+  setGroupMembershipVisibility(groupId: ID!, showOnProfile: Boolean!): MEMBER_OF
+}
+
+type GroupMembershipVisibilityChanged {
+  userId: ID!
+}
+
+type GroupShowMembersChanged {
+  groupId: ID!
+}
+
+type Subscription {
+  "Fires when a user changes which group memberships are visible on their profile."
+  groupMembershipVisibilityChanged(userId: ID!): GroupMembershipVisibilityChanged!
+  "Fires when a closed group's showMembers setting changes."
+  groupShowMembersChanged(groupId: ID!): GroupShowMembersChanged!
 }

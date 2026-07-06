@@ -759,9 +759,12 @@
     "categoriesTitle": "Sujets du groupe",
     "changeMemberRole": "Le rôle a été changé en “{role}” !",
     "contentMenu": {
+      "hideFromProfile": "Masquer de mon profil",
       "inviteLinks": "Liens d'invitation",
       "menuButton": "Menu du groupe",
       "muteGroup": "Mettre le groupe en sourdine",
+      "profileVisibilityUpdated": "Visibilité mise à jour",
+      "showOnProfile": "Afficher sur mon profil",
       "unmuteGroup": "Réactiver le groupe",
       "visitGroupPage": "Afficher le groupe"
     },
@@ -806,8 +809,10 @@
       "slug": "Nom unique"
     },
     "membersCount": "Membre ::: Membres",
+    "membersListNotVisibleToNonMembers": "Les non-membres ne peuvent pas voir cette liste.",
     "membersListTitle": "Membres du groupe",
     "membersListTitleNotAllowedSeeingGroupMembers": "Membres du groupe invisibles",
+    "membersListVisibleToNonMembers": "Les non-membres peuvent voir cette liste.",
     "modal": {
       "cancel": "Annuler",
       "confirm": "Confirmer",
@@ -830,6 +835,10 @@
       "usual": "Membre"
     },
     "save": "Créer un nouveau groupe",
+    "showMembers": "Liste des membres visible par tous",
+    "teaser": {
+      "openGroup": "Ouvrir le groupe"
+    },
     "type": "Visibilité du groupe",
     "types": {
       "closed": "Fermé",
@@ -1155,6 +1164,16 @@
     "follow": "Suivre",
     "followers": "Suiveurs",
     "following": "Suivant",
+    "groups": {
+      "closed": "Groupes fermés",
+      "hidden": "Groupes secrets",
+      "hiddenFromOthers": "caché des autres",
+      "nobody": "aucun groupe",
+      "other": "Groupes sans moi",
+      "public": "Groupes publics",
+      "shared": "Groupes partagés",
+      "title": "Groupes de {name}"
+    },
     "invites": {
       "description": "Entrez leur adresse mail pour l'invitation.",
       "emailPlaceholder": "Mail d'invitation",
@@ -1163,9 +1182,9 @@
     "memberSince": "Membre depuis",
     "network": {
       "andMore": "et {number} plus…",
-      "followedBy": "est suivi par:",
+      "followedBy": "est suivi par",
       "followedByNobody": "n'est suivi par personne.",
-      "following": "suit:",
+      "following": "suit",
       "followingNobody": "ne suit personne.",
       "title": "Réseau"
     },
@@ -1469,6 +1488,11 @@
     "privacy": {
       "make-shouts-public": "Partager les articles que j'ai recommandés sur mon profil",
       "name": "Confidentialité",
+      "show-closed-groups-on-profile": "Afficher les groupes fermés sur mon profil",
+      "show-groups-on-profile-hint": "La visibilité de chaque groupe individuel peut également être définie via le menu à trois points du groupe ou directement dans la liste des groupes sur votre profil.",
+      "show-groups-on-profile-section": "Afficher les groupes sur le profil",
+      "show-hidden-groups-on-profile": "Afficher les groupes secrets sur mon profil",
+      "show-public-groups-on-profile": "Afficher les groupes publics sur mon profil",
       "success-update": "Paramètres de confidentialité enregistrés"
     },
     "security": {

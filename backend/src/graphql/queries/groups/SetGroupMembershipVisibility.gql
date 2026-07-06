@@ -1,0 +1,6 @@
+mutation SetGroupMembershipVisibility($groupId: ID!, $showOnProfile: Boolean!) {
+  setGroupMembershipVisibility(groupId: $groupId, showOnProfile: $showOnProfile) {
+    role
+    showOnProfile
+  }
+}

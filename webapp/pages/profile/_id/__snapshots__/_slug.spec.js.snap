@@ -416,6 +416,12 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
           user="[object Object]"
         />
          
+        <div
+          class="ds-mb-large"
+        />
+         
+        <!---->
+         
         <!---->
       </div>
        
@@ -1122,6 +1128,12 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
           user="[object Object]"
         />
          
+        <div
+          class="ds-mb-large"
+        />
+         
+        <!---->
+         
         <!---->
       </div>
        
@@ -1676,6 +1688,34 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           type="following"
           user="[object Object]"
         />
+         
+        <div
+          class="ds-mb-large"
+        />
+         
+        <div
+          class="group-member-list os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-member-list"
+        >
+          <h5
+            class="title spacer-x-small"
+          >
+            profile.groups.title
+          </h5>
+           
+          <div
+            class="group-scroll-container"
+          >
+            <p
+              class="nobody-message"
+            >
+              
+      profile.groups.nobody
+    
+            </p>
+             
+            <!---->
+          </div>
+        </div>
          
         <!---->
       </div>
@@ -2309,6 +2349,34 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           type="following"
           user="[object Object]"
         />
+         
+        <div
+          class="ds-mb-large"
+        />
+         
+        <div
+          class="group-member-list os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-member-list"
+        >
+          <h5
+            class="title spacer-x-small"
+          >
+            profile.groups.title
+          </h5>
+           
+          <div
+            class="group-scroll-container"
+          >
+            <p
+              class="nobody-message"
+            >
+              
+      profile.groups.nobody
+    
+            </p>
+             
+            <!---->
+          </div>
+        </div>
          
         <!---->
       </div>

@@ -759,9 +759,12 @@
     "categoriesTitle": "Tematy grupy",
     "changeMemberRole": "Rola została zmieniona na “{role}”!",
     "contentMenu": {
+      "hideFromProfile": "Hide from my profile",
       "inviteLinks": "Linki zaproszeń",
       "menuButton": "Menu grupy",
       "muteGroup": "Wycisz grupę",
+      "profileVisibilityUpdated": "Widoczność zaktualizowana",
+      "showOnProfile": "Show on my profile",
       "unmuteGroup": "Cofnij wyciszenie grupy",
       "visitGroupPage": "Pokaż grupę"
     },
@@ -806,8 +809,10 @@
       "slug": "Unikalna nazwa"
     },
     "membersCount": "Członek ::: Członkowie",
+    "membersListNotVisibleToNonMembers": "Osoby spoza grupy nie mogą zobaczyć tej listy.",
     "membersListTitle": "Członkowie grupy",
     "membersListTitleNotAllowedSeeingGroupMembers": "Członkowie grupy niewidoczni",
+    "membersListVisibleToNonMembers": "Osoby spoza grupy mogą zobaczyć tę listę.",
     "modal": {
       "cancel": "Anuluj",
       "confirm": "Potwierdź",
@@ -830,6 +835,10 @@
       "usual": "Członek"
     },
     "save": "Utwórz nową grupę",
+    "showMembers": "Lista członków widoczna dla wszystkich",
+    "teaser": {
+      "openGroup": "Otwórz grupę"
+    },
     "type": "Widoczność grupy",
     "types": {
       "closed": "Zamknięta",
@@ -1155,6 +1164,16 @@
     "follow": "Obserwuj",
     "followers": "Obserwujący",
     "following": "Obserwowani",
+    "groups": {
+      "closed": "Closed groups",
+      "hidden": "Secret groups",
+      "hiddenFromOthers": "hidden from others",
+      "nobody": "no groups",
+      "other": "Grupy beze mnie",
+      "public": "Public groups",
+      "shared": "Wspólne grupy",
+      "title": "Groups of {name}"
+    },
     "invites": {
       "description": "Wprowadź adres e-mail, aby wysłać zaproszenie.",
       "emailPlaceholder": "E-mail do zaproszenia",
@@ -1163,9 +1182,9 @@
     "memberSince": "Członek od",
     "network": {
       "andMore": "i {number} więcej …",
-      "followedBy": "jest obserwowany:",
+      "followedBy": "jest obserwowany",
       "followedByNobody": "nikt go nie obserwuje.",
-      "following": "obserwuje:",
+      "following": "obserwuje",
       "followingNobody": "nikogo nie obserwuje.",
       "title": "Sieć"
     },
@@ -1469,6 +1488,11 @@
     "privacy": {
       "make-shouts-public": "Udostępniaj artykuły, które poleciłem/am, na moim publicznym profilu",
       "name": "Prywatność",
+      "show-closed-groups-on-profile": "Show closed groups on my profile",
+      "show-groups-on-profile-hint": "Widoczność każdej indywidualnej grupy można również ustawić za pomocą menu z trzema kropkami grupy lub bezpośrednio na liście grup w swoim profilu.",
+      "show-groups-on-profile-section": "Show groups on profile",
+      "show-hidden-groups-on-profile": "Pokaż tajne grupy na moim profilu",
+      "show-public-groups-on-profile": "Show public groups on my profile",
       "success-update": "Ustawienia prywatności zapisane!"
     },
     "security": {

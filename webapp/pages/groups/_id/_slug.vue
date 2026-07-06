@@ -218,6 +218,7 @@
         <profile-list
           :uniqueName="'groupMembersFilter'"
           :title="$t('group.membersListTitle')"
+          :subtitle="membersListSubtitle"
           :titleNobody="
             !isAllowedSeeingGroupMembers
               ? $t('group.membersListTitleNotAllowedSeeingGroupMembers')
@@ -343,7 +344,12 @@ import {
 import { iconRegistry } from '~/utils/iconRegistry'
 import uniqBy from 'lodash/uniqBy'
 import { profilePagePosts } from '~/graphql/PostQuery'
-import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/groups'
+import {
+  updateGroupMutation,
+  groupQuery,
+  groupMembersQuery,
+  groupShowMembersChangedSubscription,
+} from '~/graphql/groups'
 import { roomUnreadQuery, roomUpdated } from '~/graphql/Rooms'
 import {
   videoCallParticipantCountQuery,
@@ -481,11 +487,20 @@ export default {
       return this.GroupMembers ? this.GroupMembers : []
     },
     isAllowedSeeingGroupMembers() {
-      return (
-        this.group &&
-        (this.group.groupType === 'public' ||
-          (['closed', 'hidden'].includes(this.group.groupType) && this.isGroupMemberNonePending))
-      )
+      if (!this.group) return false
+      if (this.group.groupType === 'public') return true
+      if (['closed', 'hidden'].includes(this.group.groupType) && this.isGroupMemberNonePending)
+        return true
+      // non-members can see the member list of a closed group when the owner enabled showMembers
+      if (this.group.groupType === 'closed' && this.group.showMembers === true) return true
+      return false
+    },
+    membersListSubtitle() {
+      if (!this.group || !this.isGroupMemberNonePending) return null
+      if (this.group.groupType === 'public' || this.group.showMembers === true) {
+        return this.$t('group.membersListVisibleToNonMembers')
+      }
+      return this.$t('group.membersListNotVisibleToNonMembers')
     },
     // tabOptions() {
     //   return [
@@ -519,12 +534,15 @@ export default {
     })
     this._roomUpdatedSub = null
     this._videoCallCountSub = null
+    this._groupShowMembersSub = null
     if (this.isGroupMemberNonePending) this.setupRoomUpdatedSubscription()
     if (this.canShowVideoCallButton) this.setupVideoCallCountSubscription()
+    if (this.group?.myRole) this.setupGroupShowMembersSubscription()
   },
   beforeDestroy() {
     this._roomUpdatedSub?.unsubscribe()
     this._videoCallCountSub?.unsubscribe()
+    this._groupShowMembersSub?.unsubscribe()
   },
   watch: {
     isAllowedSeeingGroupMembers(to, _from) {
@@ -540,12 +558,34 @@ export default {
       if (can) this.setupVideoCallCountSubscription()
       else this.teardownVideoCallCountSubscription()
     },
+    'group.myRole'(myRole) {
+      if (myRole) this.setupGroupShowMembersSubscription()
+    },
   },
   methods: {
     ...mapMutations({
       showChat: 'chat/SET_OPEN_CHAT',
       openVideoCall: 'videoCall/OPEN',
     }),
+    setupGroupShowMembersSubscription() {
+      if (this._groupShowMembersSub) return
+      const groupId = this.$route.params.id
+      if (!groupId) return
+      const observer = this.$apollo.subscribe({
+        query: groupShowMembersChangedSubscription(),
+        variables: { groupId },
+        fetchPolicy: 'no-cache',
+      })
+      this._groupShowMembersSub = observer.subscribe({
+        next: () => {
+          this.$apollo.queries.Group.refetch()
+        },
+        error: (err) => {
+          // eslint-disable-next-line no-console
+          console.error('groupShowMembersChanged subscription error:', err)
+        },
+      })
+    },
     setupVideoCallCountSubscription() {
       if (this._videoCallCountSub) return
       const groupId = this.$route.params.id

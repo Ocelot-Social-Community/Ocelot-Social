@@ -759,9 +759,12 @@
     "categoriesTitle": "Temat e grupit",
     "changeMemberRole": "Roli u ndryshua në “{role}”!",
     "contentMenu": {
+      "hideFromProfile": "Hide from my profile",
       "inviteLinks": "Lidhje ftese",
       "menuButton": "Menuja e grupit",
       "muteGroup": "Hesht grupin",
+      "profileVisibilityUpdated": "Dukshmëria u përditësua",
+      "showOnProfile": "Show on my profile",
       "unmuteGroup": "Çhesht grupin",
       "visitGroupPage": "Shfaq grupin"
     },
@@ -806,8 +809,10 @@
       "slug": "Emri unik"
     },
     "membersCount": "Anëtar ::: Anëtarë",
+    "membersListNotVisibleToNonMembers": "Jo-anëtarët nuk mund ta shohin këtë listë.",
     "membersListTitle": "Anëtarët e grupit",
     "membersListTitleNotAllowedSeeingGroupMembers": "Anëtarët e grupit të padukshëm",
+    "membersListVisibleToNonMembers": "Jo-anëtarët mund ta shohin këtë listë.",
     "modal": {
       "cancel": "Anulo",
       "confirm": "Konfirmo",
@@ -830,6 +835,10 @@
       "usual": "Anëtar"
     },
     "save": "Krijo grup të ri",
+    "showMembers": "Lista e anëtarëve e dukshme për të gjithë",
+    "teaser": {
+      "openGroup": "Hap grupin"
+    },
     "type": "Dukshmëria e grupit",
     "types": {
       "closed": "I mbyllur",
@@ -1155,6 +1164,16 @@
     "follow": "Ndiq",
     "followers": "Ndjekës",
     "following": "Duke ndjekur",
+    "groups": {
+      "closed": "Closed groups",
+      "hidden": "Secret groups",
+      "hiddenFromOthers": "hidden from others",
+      "nobody": "no groups",
+      "other": "Grupe pa mua",
+      "public": "Public groups",
+      "shared": "Grupe të ndara",
+      "title": "Groups of {name}"
+    },
     "invites": {
       "description": "Fut adresën e tyre të e-mailit për ftesë.",
       "emailPlaceholder": "E-mail për ftesë",
@@ -1163,9 +1182,9 @@
     "memberSince": "Anëtar që nga",
     "network": {
       "andMore": "dhe {number} më shumë …",
-      "followedBy": "ndiqet nga:",
+      "followedBy": "ndiqet nga",
       "followedByNobody": "nuk ndiqet nga askush.",
-      "following": "po ndjek:",
+      "following": "po ndjek",
       "followingNobody": "nuk ndjek askënd.",
       "title": "Rrjeti"
     },
@@ -1469,6 +1488,11 @@
     "privacy": {
       "make-shouts-public": "Ndaj artikujt që kam rekomanduar në profilin tim publik",
       "name": "Privatësia",
+      "show-closed-groups-on-profile": "Show closed groups on my profile",
+      "show-groups-on-profile-hint": "Dukshmëria e çdo grupi individual mund të caktohet gjithashtu nëpërmjet menysë me tre pika të grupit ose drejtpërdrejt në listën e grupeve në profilin tuaj.",
+      "show-groups-on-profile-section": "Show groups on profile",
+      "show-hidden-groups-on-profile": "Shfaq grupet sekrete në profilin tim",
+      "show-public-groups-on-profile": "Show public groups on my profile",
       "success-update": "Cilësimet e privatësisë u ruajtën!"
     },
     "security": {

@@ -38,7 +38,16 @@ export default {
   },
   methods: {
     async createGroup(value, done) {
-      const { name, about, description, groupType, actionRadius, locationName, categoryIds } = value
+      const {
+        name,
+        about,
+        description,
+        groupType,
+        actionRadius,
+        locationName,
+        categoryIds,
+        showMembers,
+      } = value
       const variables = {
         name,
         about,
@@ -47,6 +56,7 @@ export default {
         actionRadius,
         locationName,
         categoryIds,
+        showMembers,
       }
       let responseId, responseSlug
       try {

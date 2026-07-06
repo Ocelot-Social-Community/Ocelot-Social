@@ -42,6 +42,7 @@
 import { OsButton, OsIcon, OsMenu, OsMenuItem } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import Dropdown from '~/components/Dropdown'
+import { setGroupMembershipVisibilityMutation } from '~/graphql/UserGroups'
 
 export default {
   name: 'GroupContentMenu',
@@ -63,7 +64,24 @@ export default {
     group: { type: Object, required: true },
     placement: { type: String, default: 'bottom-end' },
   },
+  data() {
+    return {
+      localShowOnProfile: null,
+    }
+  },
+  created() {
+    this.icons = iconRegistry
+    this.localShowOnProfile = this.group.showOnProfile !== false
+  },
+  watch: {
+    'group.showOnProfile'(newVal) {
+      this.localShowOnProfile = newVal !== false
+    },
+  },
   computed: {
+    isMember() {
+      return ['usual', 'admin', 'owner'].includes(this.group.myRole)
+    },
     routes() {
       const routes = []
 
@@ -96,6 +114,26 @@ export default {
         }
       }
 
+      if (this.isMember) {
+        if (this.localShowOnProfile) {
+          routes.push({
+            label: this.$t('group.contentMenu.hideFromProfile'),
+            icon: this.icons.eyeSlash,
+            callback: () => {
+              this.toggleProfileVisibility(false)
+            },
+          })
+        } else {
+          routes.push({
+            label: this.$t('group.contentMenu.showOnProfile'),
+            icon: this.icons.eye,
+            callback: () => {
+              this.toggleProfileVisibility(true)
+            },
+          })
+        }
+      }
+
       if (this.group.myRole === 'owner') {
         routes.push({
           label: this.$t('admin.settings.name'),
@@ -112,9 +150,6 @@ export default {
       return routes
     },
   },
-  created() {
-    this.icons = iconRegistry
-  },
   methods: {
     openItem(route, toggleMenu) {
       if (route.callback) {
@@ -123,6 +158,19 @@ export default {
         this.$router.push(route)
       }
       toggleMenu()
+    },
+    async toggleProfileVisibility(showOnProfile) {
+      try {
+        await this.$apollo.mutate({
+          mutation: setGroupMembershipVisibilityMutation(),
+          variables: { groupId: this.group.id, showOnProfile },
+        })
+        this.localShowOnProfile = showOnProfile
+        this.$emit('profileVisibilityChanged', this.group.id, showOnProfile)
+        this.$toast.success(this.$t('group.contentMenu.profileVisibilityUpdated'))
+      } catch (error) {
+        this.$toast.error(error.message)
+      }
     },
   },
 }

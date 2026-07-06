@@ -7,10 +7,15 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-use-before-define */
+import { withFilter } from 'graphql-subscriptions'
 import { v4 as uuid } from 'uuid'
 
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '@constants/categories'
 import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '@constants/groups'
+import {
+  GROUP_MEMBERSHIP_VISIBILITY_CHANGED,
+  GROUP_SHOW_MEMBERS_CHANGED,
+} from '@constants/subscriptions'
 import { ForbiddenError, UserInputError } from '@graphql/errors'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
 
@@ -64,7 +69,7 @@ export default {
             ${(isMember === true && "WHERE membership IS NOT NULL AND (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])") || ''}
             ${(isMember === false && "WHERE membership IS NULL AND (group.groupType IN ['public', 'closed'])") || ''}
             ${(isMember === undefined && "WHERE (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])") || ''}
-            RETURN group {.*, myRole: membership.role}
+            RETURN group {.*, myRole: membership.role, showOnProfile: coalesce(membership.showOnProfile, true)}
             ORDER BY group.createdAt DESC
             ${first !== undefined && offset !== undefined ? 'SKIP toInteger($offset) LIMIT toInteger($first)' : ''}
           `,
@@ -84,24 +89,47 @@ export default {
     },
     GroupMembers: async (_object, params, context: Context, _resolveInfo) => {
       const { id: groupId, first = 25, offset = 0, includePending = false } = params
+      const viewerId = context.user?.id ?? ''
       const session = context.driver.session()
       try {
         return await session.readTransaction(async (txc) => {
-          const pendingFilter = includePending ? '' : "WHERE membership.role <> 'pending'"
-          const groupMemberCypher = `
-            MATCH (user:User)-[membership:MEMBER_OF]->(:Group {id: $groupId})
-            ${pendingFilter}
-            RETURN user {.*}, membership {.*}
-            SKIP toInteger($offset) LIMIT toInteger($first)
-          `
-          const transactionResponse = await txc.run(groupMemberCypher, {
-            groupId,
-            first,
-            offset,
-          })
-          return transactionResponse.records.map((record) => {
-            return { user: record.get('user'), membership: record.get('membership') }
-          })
+          const memberCheckResult = await txc.run(
+            `MATCH (:User {id: $viewerId})-[m:MEMBER_OF]->(:Group {id: $groupId})
+             WHERE m.role IN ['usual', 'admin', 'owner']
+             RETURN m.role AS role`,
+            { viewerId, groupId },
+          )
+          const isMember = memberCheckResult.records.length > 0
+
+          let cypher: string
+          if (isMember) {
+            const pendingFilter = includePending ? '' : "AND membership.role <> 'pending'"
+            cypher = `
+              MATCH (user:User)-[membership:MEMBER_OF]->(:Group {id: $groupId})
+              WHERE true ${pendingFilter}
+              RETURN user {.*}, membership {.*}
+              SKIP toInteger($offset) LIMIT toInteger($first)
+            `
+          } else {
+            cypher = `
+              MATCH (group:Group {id: $groupId})
+              WHERE (
+                group.groupType = 'public'
+                OR (group.groupType = 'closed' AND coalesce(group.showMembers, false) = true)
+              )
+              MATCH (user:User)-[membership:MEMBER_OF]->(group)
+              WHERE membership.role <> 'pending'
+                AND coalesce(membership.showOnProfile, true) = true
+              RETURN user {.*}, membership {.*}
+              SKIP toInteger($offset) LIMIT toInteger($first)
+            `
+          }
+
+          const result = await txc.run(cypher, { groupId, first, offset })
+          return result.records.map((record) => ({
+            user: record.get('user'),
+            membership: record.get('membership'),
+          }))
         })
       } finally {
         await session.close()
@@ -327,6 +355,11 @@ export default {
         })
         // TODO: put in a middleware, see "CreateGroup", "UpdateUser"
         await createOrUpdateLocations('Group', params.id, params.locationName, session, context)
+        if ('showMembers' in params) {
+          void context.pubsub.publish(GROUP_SHOW_MEMBERS_CHANGED, {
+            groupShowMembersChanged: { groupId },
+          })
+        }
         return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
@@ -472,6 +505,38 @@ export default {
         await session.close()
       }
     },
+    setGroupMembershipVisibility: async (_parent, params, context: Context, _resolveInfo) => {
+      if (!context.user) {
+        throw new Error('Missing authenticated user.')
+      }
+      const { groupId, showOnProfile } = params
+      const userId = context.user.id
+      const session = context.driver.session()
+      try {
+        return await session.writeTransaction(async (transaction) => {
+          const result = await transaction.run(
+            `
+              MATCH (user:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
+              WHERE membership.role IN ['usual', 'admin', 'owner']
+              SET membership.showOnProfile = $showOnProfile
+              SET membership.updatedAt = toString(datetime())
+              RETURN membership {.*}
+            `,
+            { userId, groupId, showOnProfile },
+          )
+          const [membership] = result.records.map((r) => r.get('membership'))
+          if (!membership) {
+            throw new UserInputError('User is not a member of this group')
+          }
+          void context.pubsub.publish(GROUP_MEMBERSHIP_VISIBILITY_CHANGED, {
+            groupMembershipVisibilityChanged: { userId },
+          })
+          return membership
+        })
+      } finally {
+        await session.close()
+      }
+    },
     unmuteGroup: async (_parent, params, context: Context, _resolveInfo) => {
       if (!context.user) {
         throw new Error('Missing authenticated user.')
@@ -496,6 +561,57 @@ export default {
           )
           const [group] = transactionResponse.records.map((record) => record.get('group'))
           return group
+        })
+      } finally {
+        await session.close()
+      }
+    },
+  },
+  User: {
+    groups: async (parent, args, context: Context, _resolveInfo) => {
+      const profileUserId = parent.id
+      const viewerId = context.user?.id
+      const isOwnProfile = profileUserId === viewerId
+      const first = args.first ?? 10
+      const offset = args.offset ?? 0
+      const session = context.driver.session()
+      try {
+        return await session.readTransaction(async (txc) => {
+          let cypher: string
+          if (isOwnProfile) {
+            cypher = `
+              MATCH (profileUser:User {id: $profileUserId})-[membership:MEMBER_OF]->(group:Group)
+              WHERE membership.role IN ['usual', 'admin', 'owner']
+              RETURN group {.*, myRole: membership.role, showOnProfile: coalesce(membership.showOnProfile, true)}
+              ORDER BY group.groupType ASC, group.createdAt DESC
+              SKIP toInteger($offset) LIMIT toInteger($first)
+            `
+          } else {
+            cypher = `
+              MATCH (profileUser:User {id: $profileUserId})-[membership:MEMBER_OF]->(group:Group)
+              WHERE membership.role IN ['usual', 'admin', 'owner']
+                AND coalesce(membership.showOnProfile, true) = true
+              OPTIONAL MATCH (viewer:User {id: $viewerId})-[viewerMembership:MEMBER_OF]->(group)
+              WITH profileUser, membership, group, viewerMembership
+              WHERE (
+                (group.groupType = 'public' AND coalesce(profileUser.showPublicGroupsOnProfile, true) = true)
+                OR (group.groupType = 'closed' AND coalesce(profileUser.showClosedGroupsOnProfile, true) = true)
+                OR (
+                  group.groupType = 'hidden'
+                  AND coalesce(profileUser.showHiddenGroupsOnProfile, true) = true
+                  AND viewerMembership IS NOT NULL
+                  AND viewerMembership.role IN ['usual', 'admin', 'owner']
+                )
+              )
+              RETURN group {.*, myRole: viewerMembership.role, showOnProfile: coalesce(membership.showOnProfile, true)}
+              ORDER BY
+                CASE WHEN viewerMembership IS NOT NULL AND viewerMembership.role IN ['usual', 'admin', 'owner'] THEN 0 ELSE 1 END ASC,
+                group.createdAt DESC
+              SKIP toInteger($offset) LIMIT toInteger($first)
+            `
+          }
+          const result = await txc.run(cypher, { profileUserId, viewerId, first, offset })
+          return result.records.map((r) => r.get('group'))
         })
       } finally {
         await session.close()
@@ -537,6 +653,19 @@ export default {
           },
         })
       ).records.map((r) => r.get('inviteCodes'))
+    },
+    postsCount: async (parent, _args, context: Context, _resolveInfo) => {
+      if (!parent.id) {
+        throw new Error('Can not identify selected Group!')
+      }
+      const result = await context.database.query({
+        query: `
+          MATCH (post:Post)-[:IN]->(:Group {id: $group.id})
+          WHERE NOT post.deleted AND NOT post.disabled
+          RETURN toString(count(post)) as count`,
+        variables: { group: parent },
+      })
+      return result.records[0].get('count')
     },
     currentlyPinnedPostsCount: async (parent, _args, context: Context, _resolveInfo) => {
       if (!parent.id) {
@@ -594,6 +723,42 @@ export default {
         return parent.groupType === 'hidden' ? '' : parent.about
       }
       return parent.about
+    },
+    showMembers: (parent) => {
+      if (parent.groupType === 'public') return true
+      if (parent.groupType === 'hidden') return false
+      // closed: configurable by owner; default false when property not yet set on the node
+      return (parent.showMembers as boolean) ?? false
+    },
+  },
+  Subscription: {
+    groupMembershipVisibilityChanged: {
+      subscribe: withFilter(
+        (_parent, _args, context: Context) =>
+          context.pubsub.asyncIterator(GROUP_MEMBERSHIP_VISIBILITY_CHANGED),
+        (
+          payload: { groupMembershipVisibilityChanged: { userId: string } },
+          args: { userId: string },
+          context: Context,
+        ) => {
+          if (!context.user) return false
+          return payload.groupMembershipVisibilityChanged.userId === args.userId
+        },
+      ),
+    },
+    groupShowMembersChanged: {
+      subscribe: withFilter(
+        (_parent, _args, context: Context) =>
+          context.pubsub.asyncIterator(GROUP_SHOW_MEMBERS_CHANGED),
+        (
+          payload: { groupShowMembersChanged: { groupId: string } },
+          args: { groupId: string },
+          context: Context,
+        ) => {
+          if (!context.user) return false
+          return payload.groupShowMembersChanged.groupId === args.groupId
+        },
+      ),
     },
   },
 }

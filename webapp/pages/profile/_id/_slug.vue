@@ -147,6 +147,13 @@
           type="following"
           @fetchAllConnections="fetchAllConnections"
         />
+        <div class="ds-mb-large"></div>
+        <group-member-list
+          v-if="user.id"
+          :user-id="user.id"
+          :user-name="userName"
+          :my-profile="myProfile"
+        />
         <social-media :user-name="userName" :user="user" />
       </div>
 
@@ -297,6 +304,7 @@ import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 import { useFollowUser } from '~/composables/useFollowUser'
 import HcBadges from '~/components/Badges.vue'
 import FollowList, { followListVisibleCount } from '~/components/features/ProfileList/FollowList'
+import GroupMemberList from '~/components/features/ProfileList/GroupMemberList'
 import HcEmpty from '~/components/Empty/Empty'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import AvatarUploader from '~/components/Uploader/AvatarUploader'
@@ -344,6 +352,7 @@ export default {
     MasonryGrid,
     MasonryGridItem,
     FollowList,
+    GroupMemberList,
     TabNavigation,
     LocationInfo,
   },

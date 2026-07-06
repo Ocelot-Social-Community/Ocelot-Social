@@ -249,4 +249,39 @@ describe('GroupForm', () => {
       expect(hiddenOption.attributes('disabled')).toBeUndefined()
     })
   })
+
+  describe('effectiveShowMembers', () => {
+    const mountWithType = (groupType, showMembers = false) =>
+      mount(GroupForm, {
+        propsData: { update: false, group: { groupType, showMembers } },
+        mocks: { $t: jest.fn(), $can: () => true },
+        localVue,
+        stubs,
+        store,
+      })
+
+    it('returns true for public groups regardless of showMembers', () => {
+      expect(mountWithType('public', false).vm.effectiveShowMembers).toBe(true)
+      expect(mountWithType('public', true).vm.effectiveShowMembers).toBe(true)
+    })
+
+    it('returns false for hidden groups regardless of showMembers', () => {
+      expect(mountWithType('hidden', true).vm.effectiveShowMembers).toBe(false)
+      expect(mountWithType('hidden', false).vm.effectiveShowMembers).toBe(false)
+    })
+
+    it('returns the actual showMembers value for closed groups', () => {
+      expect(mountWithType('closed', false).vm.effectiveShowMembers).toBe(false)
+      expect(mountWithType('closed', true).vm.effectiveShowMembers).toBe(true)
+    })
+
+    it('disables the checkbox when groupType is not closed', async () => {
+      const wrapper = mountWithType('public')
+      expect(wrapper.find('#show-members').attributes('disabled')).toBeDefined()
+      await wrapper.vm.$set(wrapper.vm.formData, 'groupType', 'closed')
+      expect(wrapper.find('#show-members').attributes('disabled')).toBeUndefined()
+      await wrapper.vm.$set(wrapper.vm.formData, 'groupType', 'hidden')
+      expect(wrapper.find('#show-members').attributes('disabled')).toBeDefined()
+    })
+  })
 })

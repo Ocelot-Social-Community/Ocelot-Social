@@ -1,0 +1,13 @@
+query UserGroups($id: ID!, $first: Int, $offset: Int) {
+  User(id: $id) {
+    id
+    groups(first: $first, offset: $offset) {
+      id
+      name
+      groupType
+      myRole
+      membersCount
+      postsCount
+    }
+  }
+}

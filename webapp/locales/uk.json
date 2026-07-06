@@ -759,9 +759,12 @@
     "categoriesTitle": "Теми групи",
     "changeMemberRole": "Роль змінено на «{role}»!",
     "contentMenu": {
+      "hideFromProfile": "Hide from my profile",
       "inviteLinks": "Посилання для запрошення",
       "menuButton": "Меню групи",
       "muteGroup": "Вимкнути сповіщення групи",
+      "profileVisibilityUpdated": "Видимість оновлено",
+      "showOnProfile": "Show on my profile",
       "unmuteGroup": "Увімкнути сповіщення групи",
       "visitGroupPage": "Показати групу"
     },
@@ -806,8 +809,10 @@
       "slug": "Унікальне ім'я"
     },
     "membersCount": "Учасник ::: Учасники",
+    "membersListNotVisibleToNonMembers": "Не-учасники не можуть бачити цей список.",
     "membersListTitle": "Учасники групи",
     "membersListTitleNotAllowedSeeingGroupMembers": "Учасники групи приховані",
+    "membersListVisibleToNonMembers": "Не-учасники можуть бачити цей список.",
     "modal": {
       "cancel": "Скасувати",
       "confirm": "Підтвердити",
@@ -830,6 +835,10 @@
       "usual": "Учасник"
     },
     "save": "Створити нову групу",
+    "showMembers": "Список учасників видимий для всіх",
+    "teaser": {
+      "openGroup": "Відкрити групу"
+    },
     "type": "Видимість групи",
     "types": {
       "closed": "Закрита",
@@ -1155,6 +1164,16 @@
     "follow": "Підписатися",
     "followers": "Підписники",
     "following": "Підписки",
+    "groups": {
+      "closed": "Closed groups",
+      "hidden": "Secret groups",
+      "hiddenFromOthers": "hidden from others",
+      "nobody": "no groups",
+      "other": "Групи без мене",
+      "public": "Public groups",
+      "shared": "Спільні групи",
+      "title": "Groups of {name}"
+    },
     "invites": {
       "description": "Введіть їхню електронну адресу для запрошення.",
       "emailPlaceholder": "Електронна пошта для запрошення",
@@ -1163,9 +1182,9 @@
     "memberSince": "Учасник з",
     "network": {
       "andMore": "та ще {number} …",
-      "followedBy": "підписані:",
+      "followedBy": "підписані",
       "followedByNobody": "ніхто не підписаний.",
-      "following": "підписаний(-а) на:",
+      "following": "підписаний(-а) на",
       "followingNobody": "ні на кого не підписаний(-а).",
       "title": "Мережа"
     },
@@ -1469,6 +1488,11 @@
     "privacy": {
       "make-shouts-public": "Показувати статті, які я рекомендував(-ла), у моєму публічному профілі",
       "name": "Конфіденційність",
+      "show-closed-groups-on-profile": "Show closed groups on my profile",
+      "show-groups-on-profile-hint": "Видимість кожної окремої групи також можна налаштувати через меню з трьома крапками групи або безпосередньо в списку груп у вашому профілі.",
+      "show-groups-on-profile-section": "Show groups on profile",
+      "show-hidden-groups-on-profile": "Показувати таємні групи в моєму профілі",
+      "show-public-groups-on-profile": "Show public groups on my profile",
       "success-update": "Налаштування конфіденційності збережено!"
     },
     "security": {

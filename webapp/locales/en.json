@@ -759,9 +759,12 @@
     "categoriesTitle": "Topics of the group",
     "changeMemberRole": "The role has been changed to “{role}”!",
     "contentMenu": {
+      "hideFromProfile": "Hide from my profile",
       "inviteLinks": "Invite links",
       "menuButton": "Group menu",
       "muteGroup": "Mute group",
+      "profileVisibilityUpdated": "Visibility updated",
+      "showOnProfile": "Show on my profile",
       "unmuteGroup": "Unmute group",
       "visitGroupPage": "Show group"
     },
@@ -806,8 +809,10 @@
       "slug": "Unique name"
     },
     "membersCount": "Member ::: Members",
+    "membersListNotVisibleToNonMembers": "Non-members cannot see this list.",
     "membersListTitle": "Group Members",
     "membersListTitleNotAllowedSeeingGroupMembers": "Group Members invisible",
+    "membersListVisibleToNonMembers": "Non-members can see this list.",
     "modal": {
       "cancel": "Cancel",
       "confirm": "Confirm",
@@ -830,6 +835,10 @@
       "usual": "Member"
     },
     "save": "Create new group",
+    "showMembers": "Member list visible to everyone",
+    "teaser": {
+      "openGroup": "Open group"
+    },
     "type": "Visibility of the group",
     "types": {
       "closed": "Closed",
@@ -1155,6 +1164,16 @@
     "follow": "Follow",
     "followers": "Followers",
     "following": "Following",
+    "groups": {
+      "closed": "Closed groups",
+      "hidden": "Secret groups",
+      "hiddenFromOthers": "hidden from others",
+      "nobody": "no groups",
+      "other": "Groups without me",
+      "public": "Public groups",
+      "shared": "Shared groups",
+      "title": "Groups of {name}"
+    },
     "invites": {
       "description": "Enter their e-mail address for invitation.",
       "emailPlaceholder": "E-mail to invite",
@@ -1163,9 +1182,9 @@
     "memberSince": "Member since",
     "network": {
       "andMore": "and {number} more …",
-      "followedBy": "is followed by:",
+      "followedBy": "is followed by",
       "followedByNobody": "is not followed by anyone.",
-      "following": "is following:",
+      "following": "is following",
       "followingNobody": "follows nobody.",
       "title": "Network"
     },
@@ -1469,6 +1488,11 @@
     "privacy": {
       "make-shouts-public": "Share articles I have shouted on my public profile",
       "name": "Privacy",
+      "show-closed-groups-on-profile": "Show closed groups on my profile",
+      "show-groups-on-profile-hint": "The visibility of each individual group can also be set via the group's three-dot menu or directly in the group list on your profile.",
+      "show-groups-on-profile-section": "Show groups on profile",
+      "show-hidden-groups-on-profile": "Show secret groups on my profile",
+      "show-public-groups-on-profile": "Show public groups on my profile",
       "success-update": "Privacy settings saved!"
     },
     "security": {

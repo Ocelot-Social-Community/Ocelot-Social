@@ -759,9 +759,12 @@
     "categoriesTitle": "Onderwerpen van de groep",
     "changeMemberRole": "De rol is gewijzigd naar “{role}”!",
     "contentMenu": {
+      "hideFromProfile": "Hide from my profile",
       "inviteLinks": "Uitnodigingslinks",
       "menuButton": "Groepsmenu",
       "muteGroup": "Groep dempen",
+      "profileVisibilityUpdated": "Zichtbaarheid bijgewerkt",
+      "showOnProfile": "Show on my profile",
       "unmuteGroup": "Groep niet meer dempen",
       "visitGroupPage": "Groep bekijken"
     },
@@ -806,8 +809,10 @@
       "slug": "Unieke naam"
     },
     "membersCount": "Lid ::: Leden",
+    "membersListNotVisibleToNonMembers": "Niet-leden kunnen deze lijst niet zien.",
     "membersListTitle": "Groepsleden",
     "membersListTitleNotAllowedSeeingGroupMembers": "Groepsleden onzichtbaar",
+    "membersListVisibleToNonMembers": "Niet-leden kunnen deze lijst zien.",
     "modal": {
       "cancel": "Annuleren",
       "confirm": "Bevestigen",
@@ -830,6 +835,10 @@
       "usual": "Lid"
     },
     "save": "Nieuwe groep aanmaken",
+    "showMembers": "Ledenlijst zichtbaar voor iedereen",
+    "teaser": {
+      "openGroup": "Groep openen"
+    },
     "type": "Zichtbaarheid van de groep",
     "types": {
       "closed": "Gesloten",
@@ -1155,6 +1164,16 @@
     "follow": "Volgen",
     "followers": "Volgelingen",
     "following": "Volgt",
+    "groups": {
+      "closed": "Closed groups",
+      "hidden": "Secret groups",
+      "hiddenFromOthers": "hidden from others",
+      "nobody": "no groups",
+      "other": "Groepen zonder mij",
+      "public": "Public groups",
+      "shared": "Gedeelde groepen",
+      "title": "Groups of {name}"
+    },
     "invites": {
       "description": "Voer hun e-mailadres in voor de uitnodiging.",
       "emailPlaceholder": "E-mail om uit te nodigen",
@@ -1163,9 +1182,9 @@
     "memberSince": "Lid sinds",
     "network": {
       "andMore": "en {number} meer …",
-      "followedBy": "wordt gevolgd door:",
+      "followedBy": "wordt gevolgd door",
       "followedByNobody": "wordt door niemand gevolgd.",
-      "following": "volgt:",
+      "following": "volgt",
       "followingNobody": "volgt niemand.",
       "title": "Netwerk"
     },
@@ -1469,6 +1488,11 @@
     "privacy": {
       "make-shouts-public": "Artikelen die ik heb geshout delen op mijn openbare profiel",
       "name": "Privacy",
+      "show-closed-groups-on-profile": "Show closed groups on my profile",
+      "show-groups-on-profile-hint": "De zichtbaarheid van elke afzonderlijke groep kan ook worden ingesteld via het driepuntsmenu van de groep of rechtstreeks in de groeplijst op uw profiel.",
+      "show-groups-on-profile-section": "Show groups on profile",
+      "show-hidden-groups-on-profile": "Geheime groepen op mijn profiel weergeven",
+      "show-public-groups-on-profile": "Show public groups on my profile",
       "success-update": "Privacy-instellingen opgeslagen!"
     },
     "security": {

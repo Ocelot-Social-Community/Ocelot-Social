@@ -5,6 +5,9 @@ mutation UpdateUser(
   $about: String
   $allowEmbedIframes: Boolean
   $showShoutsPublicly: Boolean
+  $showPublicGroupsOnProfile: Boolean
+  $showClosedGroupsOnProfile: Boolean
+  $showHiddenGroupsOnProfile: Boolean
   $emailNotificationSettings: [EmailNotificationSettingsInput]
   $termsAndConditionsAgreedVersion: String
   $avatar: ImageInput
@@ -18,6 +21,9 @@ mutation UpdateUser(
     about: $about
     allowEmbedIframes: $allowEmbedIframes
     showShoutsPublicly: $showShoutsPublicly
+    showPublicGroupsOnProfile: $showPublicGroupsOnProfile
+    showClosedGroupsOnProfile: $showClosedGroupsOnProfile
+    showHiddenGroupsOnProfile: $showHiddenGroupsOnProfile
     emailNotificationSettings: $emailNotificationSettings
     termsAndConditionsAgreedVersion: $termsAndConditionsAgreedVersion
     avatar: $avatar

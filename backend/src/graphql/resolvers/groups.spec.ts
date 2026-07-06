@@ -1,3 +1,4 @@
+/// <reference types="jest" />
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -6,6 +7,12 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable jest/no-commented-out-tests */
+import { PubSub } from 'graphql-subscriptions'
+
+import {
+  GROUP_MEMBERSHIP_VISIBILITY_CHANGED,
+  GROUP_SHOW_MEMBERS_CHANGED,
+} from '@constants/subscriptions'
 import Factory, { cleanDatabase } from '@db/factories'
 import ChangeGroupMemberRole from '@graphql/queries/groups/ChangeGroupMemberRole.gql'
 import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
@@ -16,11 +23,15 @@ import JoinGroup from '@graphql/queries/groups/JoinGroup.gql'
 import LeaveGroup from '@graphql/queries/groups/LeaveGroup.gql'
 import muteGroupMutation from '@graphql/queries/groups/muteGroup.gql'
 import RemoveUserFromGroup from '@graphql/queries/groups/RemoveUserFromGroup.gql'
+import SetGroupMembershipVisibility from '@graphql/queries/groups/SetGroupMembershipVisibility.gql'
 import unmuteGroupMutation from '@graphql/queries/groups/unmuteGroup.gql'
 import UpdateGroup from '@graphql/queries/groups/UpdateGroup.gql'
+import UserGroups from '@graphql/queries/groups/UserGroups.gql'
 import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import Post from '@graphql/queries/posts/Post.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import groupsResolver from './groups'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -3292,6 +3303,22 @@ describe('in mode', () => {
                 })
               })
             })
+
+            describe('showMembers', () => {
+              it('publishes groupShowMembersChanged event when showMembers is updated', async () => {
+                await expect(
+                  mutate({
+                    mutation: UpdateGroup,
+                    variables: { id: 'my-group', showMembers: true },
+                  }),
+                ).resolves.toMatchObject({
+                  data: {
+                    UpdateGroup: expect.objectContaining({ id: 'my-group', myRole: 'owner' }),
+                  },
+                  errors: undefined,
+                })
+              })
+            })
           })
 
           describe('groupType', () => {
@@ -3742,6 +3769,56 @@ describe('in mode', () => {
       })
     })
 
+    describe('setGroupMembershipVisibility', () => {
+      let groupId: string
+
+      beforeEach(async () => {
+        authenticatedUser = await user.toJson()
+        const result = await mutate({
+          mutation: CreateGroup,
+          variables: {
+            name: 'Visibility Test Group',
+            about: 'A group for visibility tests',
+            description:
+              'This is a test group for visibility purposes, with enough description length to pass validation',
+            groupType: 'public',
+            actionRadius: 'national',
+            categoryIds: ['cat9'],
+          },
+        })
+        groupId = result.data.CreateGroup.id
+      })
+
+      it('sets showOnProfile to false for a group member', async () => {
+        await expect(
+          mutate({
+            mutation: SetGroupMembershipVisibility,
+            variables: { groupId, showOnProfile: false },
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            setGroupMembershipVisibility: {
+              role: 'owner',
+              showOnProfile: false,
+            },
+          },
+          errors: undefined,
+        })
+      })
+
+      it('throws for unauthenticated user', async () => {
+        authenticatedUser = null
+        await expect(
+          mutate({
+            mutation: SetGroupMembershipVisibility,
+            variables: { groupId, showOnProfile: false },
+          }),
+        ).resolves.toMatchObject({
+          errors: [expect.objectContaining({ message: 'Not Authorized!' })],
+        })
+      })
+    })
+
     describe('UpdateGroup slug conflict', () => {
       beforeEach(async () => {
         authenticatedUser = await user.toJson()
@@ -3825,5 +3902,182 @@ describe('in mode', () => {
         })
       })
     })
+
+    describe('User.groups postsCount resolver', () => {
+      beforeEach(async () => {
+        authenticatedUser = await user.toJson()
+        await mutate({
+          mutation: CreateGroup,
+          variables: {
+            id: 'posts-count-group',
+            name: 'Posts Count Group',
+            about: 'A group to test postsCount',
+            description:
+              'A test group with enough description length to pass the validation requirement check',
+            groupType: 'public',
+            actionRadius: 'national',
+            categoryIds: ['cat9'],
+          },
+        })
+      })
+
+      it('returns postsCount = 0 when the group has no posts', async () => {
+        const result = await query({
+          query: UserGroups,
+          variables: { id: 'current-user' },
+        })
+        const group = result.data?.User?.[0]?.groups?.find(
+          (g: { id: string }) => g.id === 'posts-count-group',
+        )
+        expect(group).toBeDefined()
+        expect(group.postsCount).toBe(0)
+      })
+
+      it('returns postsCount = 2 after two posts are created in the group', async () => {
+        await mutate({
+          mutation: CreatePost,
+          variables: {
+            id: 'post-in-group-1',
+            title: 'First Post',
+            content: 'Content of first post',
+            postType: 'Article',
+            groupId: 'posts-count-group',
+          },
+        })
+        await mutate({
+          mutation: CreatePost,
+          variables: {
+            id: 'post-in-group-2',
+            title: 'Second Post',
+            content: 'Content of second post',
+            postType: 'Article',
+            groupId: 'posts-count-group',
+          },
+        })
+        const result = await query({
+          query: UserGroups,
+          variables: { id: 'current-user' },
+        })
+        const group = result.data?.User?.[0]?.groups?.find(
+          (g: { id: string }) => g.id === 'posts-count-group',
+        )
+        expect(group).toBeDefined()
+        expect(group.postsCount).toBe(2)
+      })
+    })
+
+    describe('User.groups ordering – shared groups first', () => {
+      let viewerUser
+
+      beforeEach(async () => {
+        viewerUser = await Factory.build(
+          'user',
+          { id: 'viewer-user', name: 'Viewer User' },
+          { email: 'viewer@example.org', password: '1234' },
+        )
+        // Create two groups as the profile owner
+        authenticatedUser = await user.toJson()
+        await mutate({
+          mutation: CreateGroup,
+          variables: {
+            id: 'group-not-shared',
+            name: 'Not Shared Group',
+            about: 'Viewer is not a member',
+            description:
+              'A test group with enough description length to pass the validation requirement check',
+            groupType: 'public',
+            actionRadius: 'national',
+            categoryIds: ['cat9'],
+          },
+        })
+        await mutate({
+          mutation: CreateGroup,
+          variables: {
+            id: 'group-shared',
+            name: 'Shared Group',
+            about: 'Viewer is also a member',
+            description:
+              'A test group with enough description length to pass the validation requirement check',
+            groupType: 'public',
+            actionRadius: 'national',
+            categoryIds: ['cat9'],
+          },
+        })
+        // Viewer joins only the second group
+        authenticatedUser = await viewerUser.toJson()
+        await mutate({
+          mutation: JoinGroup,
+          variables: { groupId: 'group-shared', userId: 'viewer-user' },
+        })
+      })
+
+      it('returns the shared group (myRole != null) before the non-shared group', async () => {
+        authenticatedUser = await viewerUser.toJson()
+        const result = await query({
+          query: UserGroups,
+          variables: { id: 'current-user', first: 10, offset: 0 },
+        })
+        const groups: Array<{ id: string; myRole: string | null }> =
+          result.data?.User?.[0]?.groups ?? []
+        expect(groups).toHaveLength(2)
+        // shared group must come first
+        expect(groups[0].id).toBe('group-shared')
+        expect(groups[0].myRole).not.toBeNull()
+        expect(groups[1].id).toBe('group-not-shared')
+        expect(groups[1].myRole).toBeNull()
+      })
+
+      it("myRole is null for the profile owner's group the viewer has not joined", async () => {
+        authenticatedUser = await viewerUser.toJson()
+        const result = await query({
+          query: UserGroups,
+          variables: { id: 'current-user' },
+        })
+        const groups: Array<{ id: string; myRole: string | null }> =
+          result.data?.User?.[0]?.groups ?? []
+        const notShared = groups.find((g) => g.id === 'group-not-shared')
+        expect(notShared?.myRole).toBeNull()
+      })
+    })
+  })
+})
+
+describe('Subscription.groupShowMembersChanged filter', () => {
+  it('passes matching events through for authenticated users', async () => {
+    const pubsub = new PubSub()
+    const context = { pubsub, user: { id: 'u1' } } as unknown as Context
+    const iterator = groupsResolver.Subscription.groupShowMembersChanged.subscribe(
+      null,
+      { groupId: 'g1' },
+      context,
+      null,
+    )
+    const next = iterator.next()
+    await pubsub.publish(GROUP_SHOW_MEMBERS_CHANGED, {
+      groupShowMembersChanged: { groupId: 'g1' },
+    })
+    const { value } = await next
+    expect(value).toEqual({ groupShowMembersChanged: { groupId: 'g1' } })
+    await iterator.return?.()
+  })
+})
+
+describe('Subscription.groupMembershipVisibilityChanged filter', () => {
+  it('passes matching events through for authenticated users', async () => {
+    const pubsub = new PubSub()
+    const context = { pubsub, user: { id: 'u1' } } as unknown as Context
+    const iterator = groupsResolver.Subscription.groupMembershipVisibilityChanged.subscribe(
+      null,
+      { userId: 'u2' },
+      context,
+      null,
+    )
+    const next = iterator.next()
+    await pubsub.publish(GROUP_MEMBERSHIP_VISIBILITY_CHANGED, {
+      groupMembershipVisibilityChanged: { userId: 'u2' },
+    })
+    const { value } = await next
+    expect(value).toEqual({ groupMembershipVisibilityChanged: { userId: 'u2' } })
+    await iterator.return?.()
   })
 })

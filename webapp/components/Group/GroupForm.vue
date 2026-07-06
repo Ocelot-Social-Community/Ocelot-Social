@@ -24,7 +24,7 @@
           v-if="update"
           :label="$t('group.labelSlug')"
           model="slug"
-          icon="at"
+          prefix="&amp;"
           :placeholder="`${$t('group.labelSlug')} …`"
         ></ocelot-input>
 
@@ -64,6 +64,20 @@
             :icon="icons.warning"
           />
         </os-badge>
+
+        <!-- showMembers -->
+        <div class="show-members-control">
+          <input
+            id="show-members"
+            type="checkbox"
+            :checked="effectiveShowMembers"
+            :disabled="formData.groupType !== 'closed'"
+            @change="formData.showMembers = $event.target.checked"
+          />
+          <label for="show-members" :class="{ 'is-disabled': formData.groupType !== 'closed' }">
+            {{ $t('group.showMembers') }}
+          </label>
+        </div>
 
         <!-- goal -->
         <ocelot-input
@@ -215,9 +229,20 @@ export default {
     },
   },
   data() {
-    const { name, slug, groupType, about, description, actionRadius, locationName, categories } =
-      this.group
+    const {
+      name,
+      slug,
+      groupType,
+      about,
+      description,
+      actionRadius,
+      locationName,
+      categories,
+      showMembers,
+    } = this.group
     const initialCategoryIds = categories ? categories.map((category) => category.id) : []
+    const effectiveShowMembersInitial =
+      groupType === 'public' ? true : groupType === 'hidden' ? false : (showMembers ?? false)
     return {
       disabled: false,
       loading: false,
@@ -233,6 +258,7 @@ export default {
         description: description || '',
         actionRadius: actionRadius || '',
         locationName: locationName || '',
+        showMembers: effectiveShowMembersInitial,
       },
       formData: {
         name: name || '',
@@ -243,6 +269,7 @@ export default {
         locationName: locationName || '',
         actionRadius: actionRadius || '',
         categoryIds: [...initialCategoryIds],
+        showMembers: showMembers ?? false,
       },
       formSchema: {
         name: { required: true, min: NAME_LENGTH_MIN, max: NAME_LENGTH_MAX },
@@ -309,6 +336,11 @@ export default {
     canCreateSelectedGroup() {
       return this.update || this.$can(`group.create_${this.formData.groupType}`)
     },
+    effectiveShowMembers() {
+      if (this.formData.groupType === 'public') return true
+      if (this.formData.groupType === 'hidden') return false
+      return this.formData.showMembers
+    },
     disableButtonByUpdate() {
       if (!this.update) return true
       return (
@@ -319,7 +351,8 @@ export default {
         this.savedBaseline.description === this.formData.description &&
         this.savedBaseline.actionRadius === this.formData.actionRadius &&
         this.sameLocation &&
-        this.sameCategories
+        this.sameCategories &&
+        this.savedBaseline.showMembers === this.effectiveShowMembers
       )
     },
   },
@@ -371,6 +404,7 @@ export default {
         actionRadius,
         locationName: this.formLocationName,
         categoryIds,
+        showMembers: this.effectiveShowMembers,
       }
       const done = (success) => {
         this.loading = false
@@ -383,6 +417,7 @@ export default {
             description: this.formData.description,
             actionRadius: this.formData.actionRadius,
             locationName: this.formLocationName,
+            showMembers: this.effectiveShowMembers,
           }
           this.initialCategoryIds = [...this.formData.categoryIds]
         }
@@ -417,6 +452,19 @@ export default {
   display: flex;
   flex-direction: column;
 
+  > .show-members-control {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: $space-x-small;
+    margin-top: -$space-base - $space-x-small;
+    margin-bottom: $space-x-large;
+
+    label.is-disabled {
+      opacity: 0.5;
+    }
+  }
+
   > .ds-form-item {
     margin: 0;
   }
@@ -427,7 +475,7 @@ export default {
     cursor: default;
   }
 
-  > div:not(.buttons) {
+  > div:not(.buttons):not(.show-members-control) {
     display: flex;
     flex-direction: column;
 

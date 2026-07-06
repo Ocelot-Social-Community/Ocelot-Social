@@ -759,9 +759,12 @@
     "categoriesTitle": "Темы группы",
     "changeMemberRole": "Роль изменена на “{role}”!",
     "contentMenu": {
+      "hideFromProfile": "Hide from my profile",
       "inviteLinks": "Ссылки приглашения",
       "menuButton": "Меню группы",
       "muteGroup": "Отключить уведомления группы",
+      "profileVisibilityUpdated": "Видимость обновлена",
+      "showOnProfile": "Show on my profile",
       "unmuteGroup": "Включить уведомления группы",
       "visitGroupPage": "Показать группу"
     },
@@ -806,8 +809,10 @@
       "slug": "Уникальное имя"
     },
     "membersCount": "Участник ::: Участники",
+    "membersListNotVisibleToNonMembers": "Не-участники не могут видеть этот список.",
     "membersListTitle": "Участники группы",
     "membersListTitleNotAllowedSeeingGroupMembers": "Участники группы скрыты",
+    "membersListVisibleToNonMembers": "Не-участники могут видеть этот список.",
     "modal": {
       "cancel": "Отмена",
       "confirm": "Подтвердить",
@@ -830,6 +835,10 @@
       "usual": "Участник"
     },
     "save": "Создать новую группу",
+    "showMembers": "Список участников виден всем",
+    "teaser": {
+      "openGroup": "Открыть группу"
+    },
     "type": "Видимость группы",
     "types": {
       "closed": "Закрытая",
@@ -1155,6 +1164,16 @@
     "follow": "Подписаться",
     "followers": "Подписчики",
     "following": "Подписки",
+    "groups": {
+      "closed": "Closed groups",
+      "hidden": "Secret groups",
+      "hiddenFromOthers": "hidden from others",
+      "nobody": "no groups",
+      "other": "Группы без меня",
+      "public": "Public groups",
+      "shared": "Общие группы",
+      "title": "Groups of {name}"
+    },
     "invites": {
       "description": "Введите адрес электронной почты для приглашения.",
       "emailPlaceholder": "Электронная почта для приглашения",
@@ -1163,9 +1182,9 @@
     "memberSince": "Участник с",
     "network": {
       "andMore": "и ещё {number} человек... ::: и ещё {number} человека... ::: и ещё {number} человек...",
-      "followedBy": "ваши подписчики:",
+      "followedBy": "ваши подписчики",
       "followedByNobody": "у вас нет подписчиков.",
-      "following": "подписан на:",
+      "following": "подписан на",
       "followingNobody": "ни на кого не подписан.",
       "title": "Сеть"
     },
@@ -1469,6 +1488,11 @@
     "privacy": {
       "make-shouts-public": "Публиковать в моем публичном профиле статьи в которых я участвовал",
       "name": "Конфиденциальность",
+      "show-closed-groups-on-profile": "Show closed groups on my profile",
+      "show-groups-on-profile-hint": "Видимость каждой отдельной группы также можно настроить через меню с тремя точками группы или непосредственно в списке групп на вашем профиле.",
+      "show-groups-on-profile-section": "Show groups on profile",
+      "show-hidden-groups-on-profile": "Показывать секретные группы в моём профиле",
+      "show-public-groups-on-profile": "Show public groups on my profile",
       "success-update": "Настройки приватности сохранены"
     },
     "security": {
