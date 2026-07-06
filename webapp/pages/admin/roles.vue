@@ -995,5 +995,11 @@ export default {
     font-size: 0.75em;
     font-style: italic;
   }
+  // The deep-link to the policy tab. Colour/affordance come from the global `a` reset
+  // ($color-primary, no underline — the app-wide link convention, matching the policy tab's
+  // env-link); only keep it from wrapping mid-phrase inside the italic gate note.
+  &__gate-link {
+    white-space: nowrap;
+  }
 }
 </style>
