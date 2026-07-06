@@ -3,8 +3,8 @@
 type SystemConfigEntry {
   "The environment variable name (e.g. NEO4J_URI, LIVEKIT_API_SECRET)."
   envKey: String!
-  "Display grouping (server, database, mail, storage, auth, maps, video, redis, monitoring, registration, features, general)."
-  category: String!
+  "Display grouping. Enum derived from the shared category vocabulary (config/categories)."
+  category: EnvCategory!
   "Whether the value is sensitive — reported by presence only, its value is never returned."
   secret: Boolean!
   "Presence of the env var."
