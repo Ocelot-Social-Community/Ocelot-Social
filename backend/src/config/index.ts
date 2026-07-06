@@ -29,9 +29,14 @@ const environment = {
   PRODUCTION: env.NODE_ENV === 'production',
   // used for staging enviroments if 'PRODUCTION=true' and 'PRODUCTION_DB_CLEAN_ALLOW=true'
   PRODUCTION_DB_CLEAN_ALLOW: env.PRODUCTION_DB_CLEAN_ALLOW === 'true', // default = SOFTWARE_DEFAULTS.PRODUCTION_DB_CLEAN_ALLOW (false)
+  // split→trim→filter so an empty DISABLED_MIDDLEWARES yields [] rather than [''] (which
+  // matches no middleware but prints a spurious `Disabled "" middleware` warning); trim also
+  // tolerates "a, b".
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   DISABLED_MIDDLEWARES: ['test', 'development'].includes(env.NODE_ENV!)
-    ? (env.DISABLED_MIDDLEWARES?.split(',') ?? [])
+    ? (env.DISABLED_MIDDLEWARES?.split(',')
+        .map((name) => name.trim())
+        .filter(Boolean) ?? [])
     : [],
   SEND_MAIL: env.NODE_ENV !== 'test',
   LOG_LEVEL: 'DEBUG',
@@ -39,9 +44,12 @@ const environment = {
 }
 
 const server = {
-  CLIENT_URI: env.CLIENT_URI ?? SOFTWARE_DEFAULTS.CLIENT_URI,
-  GRAPHQL_URI: env.GRAPHQL_URI ?? SOFTWARE_DEFAULTS.GRAPHQL_URI,
-  JWT_EXPIRES: env.JWT_EXPIRES ?? SOFTWARE_DEFAULTS.JWT_EXPIRES,
+  // `||` (not `??`): for these an empty string is a misconfiguration, so fall back to the
+  // working default rather than let '' through — an empty CLIENT_URI/GRAPHQL_URI crashes
+  // `new URL(path, '')`, and an empty JWT_EXPIRES is rejected by jwt.sign at token issuance.
+  CLIENT_URI: env.CLIENT_URI || SOFTWARE_DEFAULTS.CLIENT_URI,
+  GRAPHQL_URI: env.GRAPHQL_URI || SOFTWARE_DEFAULTS.GRAPHQL_URI,
+  JWT_EXPIRES: env.JWT_EXPIRES || SOFTWARE_DEFAULTS.JWT_EXPIRES,
 }
 
 const SMTP_HOST = env.SMTP_HOST
