@@ -10,6 +10,7 @@ import { createTransport } from 'nodemailer'
 // import type Email as EmailType from '@types/email-templates'
 
 import CONFIG, { nodemailerTransportOptions } from '@config/index'
+import { SUPPORTED_LOCALES } from '@config/locales'
 import logosWebapp from '@config/logosBranded'
 import metadata from '@config/metadata'
 
@@ -39,7 +40,7 @@ const email = new Email({
   },
   transport,
   i18n: {
-    locales: ['en', 'de', 'nl', 'fr', 'it', 'es', 'pt', 'pl', 'ru', 'sq', 'uk'],
+    locales: [...SUPPORTED_LOCALES],
     defaultLocale: CONFIG.LANGUAGE_DEFAULT,
     retryInDefaultLocale: false,
     directory: path.join(__dirname, 'locales'),

@@ -8,6 +8,7 @@
 import { config } from 'dotenv'
 
 import emails from './emails'
+import { resolveLocale } from './locales'
 import metadata from './metadata'
 import { SOFTWARE_DEFAULTS } from './softwareDefaults'
 
@@ -165,7 +166,11 @@ const options = {
 }
 
 const language = {
-  LANGUAGE_DEFAULT: process.env.LANGUAGE_DEFAULT ?? SOFTWARE_DEFAULTS.LANGUAGE_DEFAULT,
+  // Validate against the supported locales and fall back — an empty or invalid
+  // LANGUAGE_DEFAULT (e.g. '' or 'xx') must NOT become the app-wide default locale
+  // (`??` alone would let it through), which drives email localisation and the request
+  // context's languageDefault.
+  LANGUAGE_DEFAULT: resolveLocale(process.env.LANGUAGE_DEFAULT, SOFTWARE_DEFAULTS.LANGUAGE_DEFAULT),
 }
 
 const CONFIG = {

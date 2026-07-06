@@ -191,4 +191,32 @@ describe('systemConfigStatus', () => {
       expect(byKey[spec.name]).toBe(spec.category)
     }
   })
+
+  describe('normalized var (LANGUAGE_DEFAULT, validated against the supported locales)', () => {
+    it('shows a supported locale as-is', () => {
+      const row = rowFor('LANGUAGE_DEFAULT', { LANGUAGE_DEFAULT: 'de' })
+      expect(row.effective).toBe('de')
+      expect(row.envValue).toBe('de')
+    })
+
+    it('resolves an invalid env value to the fallback in effective, keeping the raw env value visible', () => {
+      // The runtime falls back to 'en' for an unsupported code, so the config tab must show the
+      // SAME effective value — while the admin still sees the raw 'xx' they set (envValue).
+      const row = rowFor('LANGUAGE_DEFAULT', { LANGUAGE_DEFAULT: 'xx' })
+      expect(row.effective).toBe('en')
+      expect(row.envValue).toBe('xx')
+    })
+
+    it('resolves an empty env value to the fallback (matching the runtime, not shown verbatim)', () => {
+      const row = rowFor('LANGUAGE_DEFAULT', { LANGUAGE_DEFAULT: '' })
+      expect(row.state).toBe('empty')
+      expect(row.effective).toBe('en')
+    })
+
+    it('falls back to the default language when unset', () => {
+      const row = rowFor('LANGUAGE_DEFAULT', {})
+      expect(row.state).toBe('missing')
+      expect(row.effective).toBe('en')
+    })
+  })
 })

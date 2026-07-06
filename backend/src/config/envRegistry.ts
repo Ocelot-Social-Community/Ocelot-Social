@@ -13,6 +13,7 @@
 // Secret hygiene: a var missing from this registry defaults to secret=true in
 // systemConfig.ts, so a newly introduced var can never leak its value by omission.
 
+import { resolveLocale } from './locales'
 import { SOFTWARE_DEFAULTS } from './softwareDefaults'
 
 // The category vocabulary (display groups on the config tab) lives in ./categories so the
@@ -34,6 +35,13 @@ export interface EnvVarSpec {
   // Whether the var is a comma-separated list. Its runtime value and default are surfaced as
   // a JSON array (so an empty list reads as [] and a set one as ["a","b"], not a bare string).
   list?: boolean
+  // Optional resolver mapping the RAW env value (undefined when unset) to the value actually
+  // in operation, for a var VALIDATED at the config boundary — e.g. LANGUAGE_DEFAULT is checked
+  // against the supported locales and falls back. The admin config tab shows this as the
+  // effective value, so an invalid/empty env value ('xx' / '') displays as its resolved
+  // fallback ('en') — matching the runtime — while the raw env value stays visible in its own
+  // column. Omit for a var whose effective value is simply "env value, else software default".
+  normalize?: (raw: string | undefined) => string
 }
 
 // Every recognised env var except the policy-seed vars. Kept in lockstep with the reads
@@ -186,6 +194,10 @@ export const ENV_REGISTRY: EnvVarSpec[] = [
     secret: false,
     category: 'general',
     softwareDefault: SOFTWARE_DEFAULTS.LANGUAGE_DEFAULT,
+    // Validated against the supported locales (same as config/index.ts), so the config tab's
+    // effective value matches the runtime: an empty or invalid LANGUAGE_DEFAULT resolves to the
+    // software default rather than being shown verbatim.
+    normalize: (raw) => resolveLocale(raw, SOFTWARE_DEFAULTS.LANGUAGE_DEFAULT),
   },
 ]
 

@@ -146,14 +146,25 @@ export function systemConfigStatus(env: Env, policy: PolicyLike): SystemConfigRo
               .filter(Boolean),
           )
         : rawValue
+    // The value actually in operation. A var with a `normalize` hook (e.g. LANGUAGE_DEFAULT,
+    // validated against the supported locales) resolves the raw env value the same way the
+    // runtime does — so an invalid/empty env value shows its resolved fallback here (matching
+    // reality), while the raw env value stays in the envValue column. Otherwise: the env value,
+    // else the software default it falls back to. Secret: null → presence badge only.
+    let effective: string | null
+    if (spec.secret) {
+      effective = null
+    } else if (spec.normalize) {
+      effective = spec.normalize(env[spec.name])
+    } else {
+      effective = value ?? spec.softwareDefault
+    }
     rows.push({
       envKey: spec.name,
       category: spec.category,
       secret: spec.secret,
       state,
-      // Non-secret: show the value in effect (env value, else the software default it
-      // falls back to). Secret: null → presence badge only.
-      effective: spec.secret ? null : (value ?? spec.softwareDefault),
+      effective,
       override: null,
       envValue: value,
       // The software default is a public code constant, so it is surfaced even for a
