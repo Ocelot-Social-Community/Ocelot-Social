@@ -6,13 +6,12 @@ import config from 'eslint-config-it4c'
 import graphql from 'eslint-config-it4c/modules/graphql'
 import jest from 'eslint-config-it4c/modules/jest'
 
-import policySchema from './src/policy/policy.schema.json'
-
-// PolicyKey enum is derived from policy.schema.json (the single source of truth),
-// the same way src/graphql/types/index.ts injects it into the runtime schema.
-// graphql-eslint loads the static .gql files, so it needs the enum supplied here
-// too — otherwise Policy.gql's `key: PolicyKey!` would be an unknown type.
-const policyKeyEnumSDL = `enum PolicyKey { ${Object.keys(policySchema.properties).join(' ')} }`
+// The PolicyKey / EnvCategory enums are derived from their single sources and injected into the
+// runtime schema by src/graphql/types/index.ts. graphql-eslint loads the STATIC .gql files, so
+// it needs the same enums — else a .gql using `PolicyKey!` / `EnvCategory!` is an unknown type.
+// Import the SDL from the SAME module the runtime uses, so the two schemas can't drift (that
+// module is deliberately alias-free and dependency-light so this config's loader can import it).
+import { derivedEnumSDLs } from './src/graphql/derivedEnums'
 
 export default [
   {
@@ -34,7 +33,7 @@ export default [
       parser: graphql[0].plugins['@graphql-eslint'].parser,
       parserOptions: {
         graphQLConfig: {
-          schema: ['./src/graphql/types/**/*.gql', policyKeyEnumSDL],
+          schema: ['./src/graphql/types/**/*.gql', ...derivedEnumSDLs],
           documents: './src/graphql/queries/**/*.gql',
         },
       },
