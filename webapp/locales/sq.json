@@ -227,6 +227,7 @@
         "videoConference": "Videokonferencë"
       },
       "lastUpdated": "Ndryshuar së fundi: {timestamp} nga {actor}",
+      "loadError": "Nuk mund të ngarkohet konfigurimi i politikës: {message}",
       "name": "Politika e rrjetit",
       "reset": "Rikthe te paracaktimi",
       "save": "Ruaj ndryshimet",

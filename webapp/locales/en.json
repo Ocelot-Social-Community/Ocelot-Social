@@ -227,6 +227,7 @@
         "videoConference": "Video conferencing"
       },
       "lastUpdated": "Last changed: {timestamp} by {actor}",
+      "loadError": "Could not load policy configuration: {message}",
       "name": "Network policy",
       "reset": "Reset to default",
       "save": "Save changes",

@@ -227,6 +227,7 @@
         "videoConference": "Wideokonferencje"
       },
       "lastUpdated": "Ostatnia zmiana: {timestamp} przez {actor}",
+      "loadError": "Nie można wczytać konfiguracji zasad: {message}",
       "name": "Zasady sieci",
       "reset": "Przywróć domyślne",
       "save": "Zapisz zmiany",

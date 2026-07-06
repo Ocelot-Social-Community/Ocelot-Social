@@ -227,6 +227,7 @@
         "videoConference": "Videovergaderen"
       },
       "lastUpdated": "Laatst gewijzigd: {timestamp} door {actor}",
+      "loadError": "Beleidsconfiguratie kon niet worden geladen: {message}",
       "name": "Netwerkbeleid",
       "reset": "Standaardwaarde herstellen",
       "save": "Wijzigingen opslaan",

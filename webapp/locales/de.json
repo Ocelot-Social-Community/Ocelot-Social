@@ -227,6 +227,7 @@
         "videoConference": "Videokonferenzen"
       },
       "lastUpdated": "Zuletzt geändert: {timestamp} von {actor}",
+      "loadError": "Konfiguration konnte nicht geladen werden: {message}",
       "name": "Netzwerk-Konfiguration",
       "reset": "Auf Standard zurücksetzen",
       "save": "Änderungen speichern",

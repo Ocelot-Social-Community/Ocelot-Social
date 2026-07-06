@@ -610,6 +610,32 @@ describe('admin/policy.vue', () => {
     })
   })
 
+  describe('policyConfig load failure — degraded fallback (keys never vanish)', () => {
+    const stubs = { 'nuxt-link': { template: '<a :href="to"><slot /></a>', props: ['to'] } }
+    // policyConfig stays [] (query failed or not yet loaded); the snapshot (values) is present.
+    const mountWithoutConfig = () => mount(Policy, { mocks, localVue, store, stubs })
+
+    it('still renders every snapshot key, so a metadata-query failure does not blank the page', async () => {
+      const w = mountWithoutConfig()
+      await flushPromises()
+      for (const key of ALL_KEYS) {
+        expect(w.find(`[data-test="policy-${key}"]`).exists()).toBe(true)
+      }
+      // Collapsed into a single fallback group; proper grouping returns once policyConfig loads.
+      expect(w.vm.groups).toHaveLength(1)
+      expect(w.vm.groups[0].keys).toEqual(expect.arrayContaining(ALL_KEYS))
+    })
+
+    it('infers the input type from the snapshot value when the metadata is missing', async () => {
+      const w = mountWithoutConfig()
+      await flushPromises()
+      // inviteLinkLimit is a number in the snapshot → number input; publicRegistration a boolean
+      // → checkbox — no policyConfig.type needed.
+      expect(w.find('#policy-inviteLinkLimit').element.type).toBe('number')
+      expect(w.find('#policy-publicRegistration').element.type).toBe('checkbox')
+    })
+  })
+
   describe('deep-link highlight from the config tab', () => {
     // The app runs vue-router in history mode, so an in-app navigation is a pushState
     // that browsers don't re-evaluate :target for — the row is highlighted from the

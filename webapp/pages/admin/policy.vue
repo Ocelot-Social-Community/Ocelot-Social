@@ -149,6 +149,12 @@ export default {
     policyConfig: {
       query: policyConfigQuery,
       fetchPolicy: 'cache-and-network',
+      // A failure of this metadata query must not silently blank the page: surface it, and
+      // groups() falls back to the snapshot keys so every value stays visible and editable
+      // (with widget type inferred from the value — see isNumberKey).
+      error(error) {
+        this.$toast.error(this.$t('admin.policy.loadError', { message: error.message }))
+      },
     },
   },
   data() {
@@ -190,6 +196,13 @@ export default {
     // keyed by category preserves that order — no hand-maintained order/grouping list here. A
     // new key shows up under its schema category automatically, in the backend-defined slot.
     groups() {
+      // If the policyConfig metadata query has not loaded (or failed), fall back to a single
+      // group of the snapshot keys so a metadata hiccup never blanks the whole policy page —
+      // every value stays visible and editable (grouping is degraded, widget type is inferred
+      // from the value in isNumberKey). Proper grouping returns once policyConfig loads.
+      if (!this.policyConfig.length) {
+        return this.keys.length ? [{ id: 'general', keys: this.keys }] : []
+      }
       const byCategory = new Map()
       for (const entry of this.policyConfig) {
         const list = byCategory.get(entry.category) ?? []
@@ -233,8 +246,13 @@ export default {
     },
     // Integer policies render as a number input (booleans as a checkbox). The type comes
     // from the backend (policyConfig), so there is no separate number-key list to maintain.
+    // While that metadata is unavailable (not yet loaded or the query failed), infer the type
+    // from the snapshot value (already parsed to boolean/number) so the fallback group still
+    // renders the right input.
     isNumberKey(key) {
-      return this.configByKey[key]?.type === 'integer'
+      const entry = this.configByKey[key]
+      if (entry) return entry.type === 'integer'
+      return typeof this.snapshot[key] === 'number'
     },
     // The hash keys this tab can highlight (deepLinkHighlight mixin): every RENDERED row,
     // whose element id is the key itself. Derived from policyConfig (the same source the

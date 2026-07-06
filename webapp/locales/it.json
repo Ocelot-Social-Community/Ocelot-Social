@@ -227,6 +227,7 @@
         "videoConference": "Videoconferenza"
       },
       "lastUpdated": "Ultima modifica: {timestamp} da {actor}",
+      "loadError": "Impossibile caricare la configurazione dei criteri: {message}",
       "name": "Criteri di rete",
       "reset": "Ripristina predefinito",
       "save": "Salva modifiche",

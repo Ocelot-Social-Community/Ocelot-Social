@@ -227,6 +227,7 @@
         "videoConference": "Videoconferencia"
       },
       "lastUpdated": "Última modificación: {timestamp} por {actor}",
+      "loadError": "No se pudo cargar la configuración de la política: {message}",
       "name": "Política de red",
       "reset": "Restablecer al valor predeterminado",
       "save": "Guardar cambios",
