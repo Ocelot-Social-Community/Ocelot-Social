@@ -31,19 +31,32 @@ const serializeEvent = (event: {
   timestamp: event.timestamp,
 })
 
+// Serialize a viewer-scoped snapshot/defaults record into GraphQL entries. The
+// record already carries EVERY key (getVisibleSnapshot/getVisibleDefaults iterate
+// allKeys()), so the entry list is complete by construction — the client selects
+// `{ key value }` and receives all keys, with no hand-maintained field list to
+// drift from the backend key set. A key the viewer may not see (or a genuinely
+// unset value) is null; every other value is JSON-encoded, matching the
+// setPolicy/policyChanged value convention.
+const toEntries = (record: Record<string, unknown>) =>
+  Object.entries(record).map(([key, value]) => ({
+    key,
+    value: value === null || value === undefined ? null : JSON.stringify(value),
+  }))
+
 export default {
   Query: {
-    // Single resolver: returns the snapshot scoped to the viewer's audiences.
-    // Keys the viewer may not see are omitted → null in the (nullable) GraphQL
-    // fields. Public keys are always present.
+    // Single resolver: returns the snapshot scoped to the viewer's audiences as a
+    // key/value list. Keys the viewer may not see carry a null value. Public keys
+    // are always present.
     policy: (_parent: unknown, _args: unknown, ctx: Context) =>
-      ctx.policy.getVisibleSnapshot(viewerOf(ctx)),
+      toEntries(ctx.policy.getVisibleSnapshot(viewerOf(ctx))),
     // Admin-only (see permissionsMiddleware). One round-trip carrying both
     // admin-only pieces: the configured defaults (canView-scoped, admin sees
     // all) and the most recent change (null until a real change). Replaces the
     // former separate policyLastChange query.
     policyDefaults: (_parent: unknown, _args: unknown, ctx: Context) => ({
-      defaults: ctx.policy.getVisibleDefaults(viewerOf(ctx)),
+      defaults: toEntries(ctx.policy.getVisibleDefaults(viewerOf(ctx))),
       lastChange: ctx.policy.getLastChange(),
     }),
   },

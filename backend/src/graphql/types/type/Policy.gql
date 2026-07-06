@@ -1,13 +1,19 @@
 type Query {
-  "The instance's network policy. Public — anonymous viewers (login/register screen) need it. Per-field visibility is enforced in the resolver: a viewer only receives the keys they may see."
-  policy: Policy!
+  "The instance's network policy as a key/value list — every recognised policy key, so a client needs no per-key field selection and the set stays in sync with the backend automatically. Public — anonymous viewers (login/register screen) need it. Per-key visibility is enforced in the resolver: a key the viewer may not see carries a null value."
+  policy: [PolicyEntry!]!
   "The configured policy defaults plus last-change audit info. Requires the `policy.manage` permission."
   policyDefaults: PolicyDefaults!
 }
 
+"A single policy key with its current (or default) value, JSON-encoded (heterogeneous types: boolean / integer). The value is null for a key the viewer may not see, or a genuinely unset value (e.g. an unlimited limit)."
+type PolicyEntry {
+  key: PolicyKey!
+  value: String
+}
+
 "The configured policy defaults together with audit info about the last change."
 type PolicyDefaults {
-  defaults: Policy!
+  defaults: [PolicyEntry!]!
   lastChange: PolicyLastChange
 }
 
@@ -15,44 +21,6 @@ type PolicyDefaults {
 type PolicyLastChange {
   actor: String!
   timestamp: String!
-}
-
-"Instance-wide configuration flags governing registration, moderation features and UI toggles. Which keys a caller actually receives depends on their permissions."
-type Policy {
-  "Whether anyone may register without an invite."
-  publicRegistration: Boolean!
-  "Whether registration via invite code is enabled."
-  inviteRegistration: Boolean!
-  "Whether the registration form asks for the user's real name."
-  askForRealName: Boolean!
-  "Whether a location is mandatory during registration."
-  requireLocation: Boolean!
-  "Maximum number of redemptions per invite link, or null for unlimited."
-  inviteLinkLimit: Int
-  "Maximum number of personal invite codes a user may hold."
-  inviteCodesPersonalPerUser: Int
-  "Maximum number of group invite codes a user may hold per group."
-  inviteCodesGroupPerUser: Int
-  "Whether the category taxonomy is enabled."
-  categoriesActive: Boolean!
-  "Whether badges are enabled."
-  badgesEnabled: Boolean!
-  "Whether the content filter appears in the header menu."
-  showContentFilterHeaderMenu: Boolean!
-  "Whether the content filter appears above the masonry grid."
-  showContentFilterMasonryGrid: Boolean!
-  "Whether the groups button is shown in the header."
-  showGroupButtonInHeader: Boolean!
-  "Whether personal API keys are enabled."
-  apiKeysEnabled: Boolean
-  "Whether video conferencing (LiveKit) is enabled. Admin-only, so null for non-admin viewers."
-  videoConference: Boolean
-  "Maximum number of API keys a user may hold."
-  apiKeysMaxPerUser: Int
-  "Maximum number of instance-wide pinned posts."
-  maxPinnedPosts: Int
-  "Maximum number of pinned posts per group."
-  maxGroupPinnedPosts: Int
 }
 
 "An applied change to a single policy key, with audit metadata."

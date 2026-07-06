@@ -14,36 +14,50 @@ describe('policy store', () => {
   })
 
   describe('mutations', () => {
+    // The backend returns a key/value list ({ key, value }, value JSON-encoded); the
+    // mutation folds it into a key→value map, parsing each value.
     describe('SET_SNAPSHOT', () => {
-      it('keeps the values the backend returned (no frontend-side defaults added)', () => {
+      it('parses the JSON values the backend returned into a key→value map', () => {
         const s = { snapshot: {} }
-        mutations.SET_SNAPSHOT(s, { publicRegistration: true, categoriesActive: true })
+        mutations.SET_SNAPSHOT(s, [
+          { key: 'publicRegistration', value: 'true' },
+          { key: 'categoriesActive', value: 'true' },
+        ])
         expect(s.snapshot).toEqual({ publicRegistration: true, categoriesActive: true })
       })
 
-      it('passes a non-visible key (null) through as null (no frontend default injected)', () => {
+      it('passes a non-visible key (null value) through as null (no frontend default injected)', () => {
         const s = { snapshot: {} }
-        mutations.SET_SNAPSHOT(s, { apiKeysEnabled: null, apiKeysMaxPerUser: null })
+        mutations.SET_SNAPSHOT(s, [
+          { key: 'apiKeysEnabled', value: null },
+          { key: 'apiKeysMaxPerUser', value: null },
+        ])
         expect(s.snapshot.apiKeysEnabled).toBeNull()
         expect(s.snapshot.apiKeysMaxPerUser).toBeNull()
       })
 
-      it('collapses an explicit undefined value to null (snapshot never holds undefined)', () => {
+      it('treats a missing (undefined) value as null (snapshot never holds undefined)', () => {
         const s = { snapshot: {} }
-        mutations.SET_SNAPSHOT(s, { apiKeysEnabled: undefined })
+        mutations.SET_SNAPSHOT(s, [{ key: 'apiKeysEnabled', value: undefined }])
         expect(s.snapshot.apiKeysEnabled).toBeNull()
       })
 
       it('keeps a visible integer value, including 0', () => {
         const s = { snapshot: {} }
-        mutations.SET_SNAPSHOT(s, { maxGroupPinnedPosts: 0, apiKeysMaxPerUser: 3 })
+        mutations.SET_SNAPSHOT(s, [
+          { key: 'maxGroupPinnedPosts', value: '0' },
+          { key: 'apiKeysMaxPerUser', value: '3' },
+        ])
         expect(s.snapshot.maxGroupPinnedPosts).toBe(0)
         expect(s.snapshot.apiKeysMaxPerUser).toBe(3)
       })
 
-      it('strips Apollo __typename', () => {
+      it('ignores a per-entry Apollo __typename', () => {
         const s = { snapshot: {} }
-        mutations.SET_SNAPSHOT(s, { publicRegistration: true, __typename: 'Policy' })
+        mutations.SET_SNAPSHOT(s, [
+          { key: 'publicRegistration', value: 'true', __typename: 'PolicyEntry' },
+        ])
+        expect(s.snapshot).toEqual({ publicRegistration: true })
         expect(s.snapshot).not.toHaveProperty('__typename')
       })
 
@@ -55,14 +69,13 @@ describe('policy store', () => {
     })
 
     describe('SET_DEFAULTS', () => {
-      it('stores backend defaults (null passed through, __typename stripped)', () => {
+      it('parses the defaults list into a map (null passed through)', () => {
         const s = { defaults: {} }
-        mutations.SET_DEFAULTS(s, {
-          inviteRegistration: true,
-          apiKeysEnabled: null,
-          apiKeysMaxPerUser: 5,
-          __typename: 'Policy',
-        })
+        mutations.SET_DEFAULTS(s, [
+          { key: 'inviteRegistration', value: 'true' },
+          { key: 'apiKeysEnabled', value: null },
+          { key: 'apiKeysMaxPerUser', value: '5' },
+        ])
         expect(s.defaults).toEqual({
           inviteRegistration: true,
           apiKeysEnabled: null,
@@ -149,7 +162,11 @@ describe('policy store', () => {
 
     describe('init', () => {
       it('fetches the viewer-scoped policy and commits snapshot + initialized', async () => {
-        const policy = { publicRegistration: true, apiKeysEnabled: null }
+        // key/value list from the backend, passed straight to SET_SNAPSHOT (which parses it).
+        const policy = [
+          { key: 'publicRegistration', value: 'true' },
+          { key: 'apiKeysEnabled', value: null },
+        ]
         const query = jest.fn().mockResolvedValue({ data: { policy } })
         await bindAction(actions.init, { query })({ commit, state: { isInitialized: false } })
 
@@ -162,7 +179,7 @@ describe('policy store', () => {
         const query = jest.fn().mockRejectedValue(new Error('network'))
         await bindAction(actions.init, { query })({ commit, state: { isInitialized: false } })
 
-        expect(commit).toHaveBeenCalledWith('SET_SNAPSHOT', {})
+        expect(commit).toHaveBeenCalledWith('SET_SNAPSHOT', [])
       })
 
       it('keeps the known-good snapshot when a refetch fails after a prior init (no wipe)', async () => {
@@ -174,14 +191,17 @@ describe('policy store', () => {
           .mockRejectedValue(new Error('Store reset while query was in flight'))
         await bindAction(actions.init, { query })({ commit, state: { isInitialized: true } })
 
-        expect(commit).not.toHaveBeenCalledWith('SET_SNAPSHOT', {})
+        expect(commit).not.toHaveBeenCalledWith('SET_SNAPSHOT', [])
       })
     })
 
     describe('fetchDefaults', () => {
       it('queries the admin bundle and commits both defaults and last change', async () => {
         const policyDefaults = {
-          defaults: { publicRegistration: false, apiKeysEnabled: false },
+          defaults: [
+            { key: 'publicRegistration', value: 'false' },
+            { key: 'apiKeysEnabled', value: 'false' },
+          ],
           lastChange: { actor: 'admin-1', timestamp: 'ts' },
         }
         const query = jest.fn().mockResolvedValue({ data: { policyDefaults } })
@@ -197,7 +217,7 @@ describe('policy store', () => {
 
       it('commits a null last change when nothing has changed yet', async () => {
         const policyDefaults = {
-          defaults: { publicRegistration: false },
+          defaults: [{ key: 'publicRegistration', value: 'false' }],
           lastChange: null,
         }
         const query = jest.fn().mockResolvedValue({ data: { policyDefaults } })
