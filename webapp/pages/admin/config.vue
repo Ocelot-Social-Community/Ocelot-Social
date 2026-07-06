@@ -36,7 +36,7 @@
         >
           <!-- Category sub-heading spanning the row group. -->
           <tr class="config-group-head">
-            <th scope="colgroup" colspan="5">
+            <th scope="rowgroup" colspan="5">
               {{ $t(`admin.config.category.${group.category}`) }}
             </th>
           </tr>
