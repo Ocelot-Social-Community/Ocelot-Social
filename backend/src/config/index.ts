@@ -177,8 +177,9 @@ const language = {
   // Validate against the supported locales and fall back — an empty or invalid
   // LANGUAGE_DEFAULT (e.g. '' or 'xx') must NOT become the app-wide default locale
   // (`??` alone would let it through), which drives email localisation and the request
-  // context's languageDefault.
-  LANGUAGE_DEFAULT: resolveLocale(process.env.LANGUAGE_DEFAULT, SOFTWARE_DEFAULTS.LANGUAGE_DEFAULT),
+  // context's languageDefault. Read via `env` (not `process.env`) so a Cypress.env() override
+  // is honoured, consistent with every other read above.
+  LANGUAGE_DEFAULT: resolveLocale(env.LANGUAGE_DEFAULT, SOFTWARE_DEFAULTS.LANGUAGE_DEFAULT),
 }
 
 const CONFIG = {
