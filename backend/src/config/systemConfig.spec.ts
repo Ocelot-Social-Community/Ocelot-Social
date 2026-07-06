@@ -121,6 +121,18 @@ describe('systemConfigStatus', () => {
       expect(set.effective).toBe('["m_a","m_b"]')
     })
 
+    it('drops blank and whitespace-only entries when parsing a list var', () => {
+      // Empty entries (double comma) and whitespace-only entries must not survive the parse.
+      const set = rowFor('DISABLED_MIDDLEWARES', { DISABLED_MIDDLEWARES: 'm_a,, m_b , ,m_c' })
+      expect(set.envValue).toBe('["m_a","m_b","m_c"]')
+      expect(set.effective).toBe('["m_a","m_b","m_c"]')
+
+      // An all-blank value collapses to the empty list, not [""].
+      const blank = rowFor('DISABLED_MIDDLEWARES', { DISABLED_MIDDLEWARES: ' , ,' })
+      expect(blank.envValue).toBe('[]')
+      expect(blank.effective).toBe('[]')
+    })
+
     it('is never overridable and carries no policy key', () => {
       const row = rowFor('SMTP_HOST', { SMTP_HOST: 'mail.example.org' })
       expect(row.overridable).toBe(false)
