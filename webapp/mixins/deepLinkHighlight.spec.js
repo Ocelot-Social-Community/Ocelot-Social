@@ -26,8 +26,8 @@ describe('deepLinkHighlight mixin', () => {
     jest.restoreAllMocks()
   })
 
-  it('starts with no highlighted key', () => {
-    expect(deepLinkHighlight.data()).toEqual({ highlightedKey: null })
+  it('starts with no highlighted key and no pending fade timer', () => {
+    expect(deepLinkHighlight.data()).toEqual({ highlightedKey: null, highlightTimer: null })
   })
 
   it('has no highlightable keys by default (components override it)', () => {

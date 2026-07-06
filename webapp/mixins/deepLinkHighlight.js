@@ -27,10 +27,14 @@ export default {
       // The key deep-linked to via the route hash, used to highlight and scroll to its
       // row. null when the hash is empty or does not match a highlightable key.
       highlightedKey: null,
+      // Handle of the fade-out timer (see applyHashHighlight). Non-reactive in effect, but
+      // declared here so every instance property this mixin owns is visible in one place.
+      highlightTimer: null,
     }
   },
   methods: {
-    // The hash keys that have a highlightable element (id === key). Overridden per page.
+    // The hash keys that have a highlightable element (id === key), as an array. Overridden
+    // per page.
     highlightableKeys() {
       return []
     },
@@ -40,7 +44,7 @@ export default {
     applyHashHighlight() {
       clearTimeout(this.highlightTimer)
       const key = (this.$route?.hash || '').replace(/^#/, '')
-      const known = !!key && [...this.highlightableKeys()].includes(key)
+      const known = !!key && this.highlightableKeys().includes(key)
       this.highlightedKey = known ? key : null
       if (!this.highlightedKey) return
       this.$nextTick(() => {
