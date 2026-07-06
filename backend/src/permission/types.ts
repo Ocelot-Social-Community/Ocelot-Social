@@ -43,9 +43,14 @@ export type PermissionGroup = string
 // catalog and can be bundled into roles, but is only *effective* while its gate is
 // open. A gate names the POLICY key that switches it on — see ./gates.ts. Roles thus
 // depend only on policy; any env dependency lives inside the policy's effective value
-// (e.g. 'videoConference' declares requiresEnv for the LiveKit secrets). Both gate
-// keys must be valid PolicyKeys.
-export type PermissionGate = 'videoConference' | 'apiKeysEnabled'
+// (e.g. 'videoConference' declares requiresEnv for the LiveKit secrets). Every gate key
+// must be a valid (boolean) PolicyKey. This union is the compile-time mirror of the
+// catalog's `gatedBy` values — drift-guarded against allPermissionGates() in schema.spec.ts.
+export type PermissionGate =
+  | 'videoConference'
+  | 'apiKeysEnabled'
+  | 'badgesEnabled'
+  | 'inviteRegistration'
 
 export interface PermissionCatalogEntry {
   group: PermissionGroup

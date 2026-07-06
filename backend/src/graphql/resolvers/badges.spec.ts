@@ -18,7 +18,10 @@ import type { Context } from '@src/context'
 let regularUser, administrator, moderator, badge, verification
 
 let authenticatedUser: Context['user']
-const context = () => ({ authenticatedUser })
+// badge.manage is gated by the badgesEnabled policy (default OFF), so enable it here —
+// otherwise hasPermission('badge.manage') is closed and every badge mutation is denied
+// regardless of the role. The gate itself is unit-covered in permission/schema.spec.ts.
+const context = () => ({ authenticatedUser, policy: { badgesEnabled: true } })
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']

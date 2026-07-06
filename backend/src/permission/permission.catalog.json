@@ -34,6 +34,7 @@
     },
     "badge.manage": {
       "group": "moderation",
+      "gatedBy": "badgesEnabled",
       "description": "Grant and revoke verification and trophy badges."
     },
     "content.moderate": {
@@ -78,6 +79,7 @@
     },
     "user.invite": {
       "group": "membership",
+      "gatedBy": "inviteRegistration",
       "description": "Generate personal invite codes to invite people to the network."
     },
     "videoCall.create_public": {
