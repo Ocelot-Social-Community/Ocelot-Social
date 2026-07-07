@@ -584,6 +584,12 @@ export default shield(
       // Configured defaults + last-change audit info are policy-admin-only
       // (deployment config); bundled in the single policyDefaults query.
       policyDefaults: hasPermission('policy.manage'),
+      // Per-policy config layers + hard env requirements. Same admin scope as
+      // policyDefaults; only env presence state is returned, never secret values.
+      policyConfig: hasPermission('policy.manage'),
+      // Every recognised env var (registry + policy overlay) for the config tab.
+      // Same admin scope; secret values are never returned, only presence state.
+      systemConfig: hasPermission('policy.manage'),
     },
     Mutation: {
       '*': deny,
@@ -669,6 +675,7 @@ export default shield(
       // Network Policy
       setPolicy: hasPermission('policy.manage'),
       resetPolicy: hasPermission('policy.manage'),
+      resetPolicies: hasPermission('policy.manage'),
 
       // Cache resync: dev/test recovery hook only (db:reset/seed + e2e). Disabled in
       // production — fleet resyncs there are done via a rolling restart.

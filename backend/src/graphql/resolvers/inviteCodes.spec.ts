@@ -28,6 +28,9 @@ let authenticatedUser: Context['user']
 const context = () => ({
   authenticatedUser,
   policy: {
+    // user.invite is gated by inviteRegistration; pin it on so generatePersonalInviteCode
+    // stays available here regardless of the schema default (the gate is unit-covered).
+    inviteRegistration: true,
     inviteCodesPersonalPerUser: INVITE_CODES_PERSONAL_PER_USER,
     inviteCodesGroupPerUser: INVITE_CODES_GROUP_PER_USER,
   },

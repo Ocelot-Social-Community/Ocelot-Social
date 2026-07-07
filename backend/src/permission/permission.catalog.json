@@ -34,6 +34,7 @@
     },
     "badge.manage": {
       "group": "moderation",
+      "gatedBy": "badgesEnabled",
       "description": "Grant and revoke verification and trophy badges."
     },
     "content.moderate": {
@@ -78,26 +79,27 @@
     },
     "user.invite": {
       "group": "membership",
+      "gatedBy": "inviteRegistration",
       "description": "Generate personal invite codes to invite people to the network."
     },
     "videoCall.create_public": {
       "group": "communication",
-      "gatedBy": "videoCall",
+      "gatedBy": "videoConference",
       "description": "Start (open) a video call in a public group. Joining an existing call stays open to any member."
     },
     "videoCall.create_closed": {
       "group": "communication",
-      "gatedBy": "videoCall",
+      "gatedBy": "videoConference",
       "description": "Start (open) a video call in a closed group. Joining an existing call stays open to any member."
     },
     "videoCall.create_hidden": {
       "group": "communication",
-      "gatedBy": "videoCall",
+      "gatedBy": "videoConference",
       "description": "Start (open) a video call in a hidden group. Joining an existing call stays open to any member."
     },
     "apiKey.create": {
       "group": "account",
-      "gatedBy": "apiKeys",
+      "gatedBy": "apiKeysEnabled",
       "description": "Create personal API keys for backend access (managing/revoking existing keys stays available)."
     }
   }

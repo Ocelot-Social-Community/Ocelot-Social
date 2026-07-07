@@ -1,20 +1,6 @@
 query policy {
   policy {
-    publicRegistration
-    inviteRegistration
-    askForRealName
-    requireLocation
-    inviteLinkLimit
-    inviteCodesPersonalPerUser
-    inviteCodesGroupPerUser
-    categoriesActive
-    badgesEnabled
-    showContentFilterHeaderMenu
-    showContentFilterMasonryGrid
-    showGroupButtonInHeader
-    apiKeysEnabled
-    apiKeysMaxPerUser
-    maxPinnedPosts
-    maxGroupPinnedPosts
+    key
+    value
   }
 }

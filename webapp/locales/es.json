@@ -85,6 +85,45 @@
       "name": "Categorías",
       "postCount": "Contribuciones"
     },
+    "config": {
+      "blocks": "bloquea {policy}",
+      "category": {
+        "auth": "Autenticación",
+        "database": "Base de datos",
+        "features": "Funciones",
+        "general": "General",
+        "layout": "Diseño",
+        "mail": "Correo / SMTP",
+        "maps": "Mapas",
+        "monitoring": "Monitorización",
+        "redis": "Redis",
+        "registration": "Registro",
+        "server": "Servidor",
+        "storage": "Almacenamiento / S3",
+        "video": "Videoconferencia"
+      },
+      "col": {
+        "effective": "Estado efectivo",
+        "envKey": "Variable de entorno",
+        "envValue": "Valor de entorno",
+        "override": "Anulación de política",
+        "softwareDefault": "Predeterminado del software"
+      },
+      "description": "Todas las variables de entorno que lee este despliegue y cómo se resuelven. Es un reflejo de diagnóstico de solo lectura del entorno del despliegue; los valores en vivo se editan en la pestaña Política de red. Los valores secretos nunca se muestran, solo si están definidos.",
+      "editPolicy": "Editar la política {policy}",
+      "name": "Entorno",
+      "noDefault": "sin predeterminado",
+      "notSet": "sin definir",
+      "secretHidden": "definido (valor oculto)",
+      "setOverride": "anular",
+      "state": {
+        "empty": "vacío",
+        "missing": "ausente",
+        "set": "definido"
+      },
+      "tableCaption": "Variables de entorno con su estado efectivo, anulación de política, valor de entorno y valor predeterminado del software.",
+      "title": "Configuración del entorno"
+    },
     "dashboard": {
       "badgesDisplayed": "Insignias mostradas",
       "badgesRewarded": "Insignias otorgadas",
@@ -163,19 +202,11 @@
         "requireLocation": "Hace obligatoria una ubicación durante el registro y en los ajustes del perfil.",
         "showContentFilterHeaderMenu": "Muestra el filtro de contenido en el menú de cabecera.",
         "showContentFilterMasonryGrid": "Muestra el filtro de contenido en la cuadrícula masonry (noticias).",
-        "showGroupButtonInHeader": "Muestra el botón de grupos en la cabecera."
+        "showGroupButtonInHeader": "Muestra el botón de grupos en la cabecera.",
+        "videoConference": "Activa la videoconferencia (LiveKit). El interruptor en tiempo de ejecución para los permisos de videollamada. Requiere las variables de entorno de LiveKit; sin ellas permanece desactivada y atenuada."
       },
-      "groups": {
-        "features": {
-          "title": "Funciones"
-        },
-        "layout": {
-          "title": "Diseño"
-        },
-        "registration": {
-          "title": "Registro"
-        }
-      },
+      "envLink": "Ver entorno",
+      "envUnavailable": "El entorno requerido no está configurado; este ajuste no tiene efecto hasta que lo esté.",
       "keys": {
         "apiKeysEnabled": "Claves API",
         "apiKeysMaxPerUser": "Máx. claves API por usuario",
@@ -192,9 +223,11 @@
         "requireLocation": "Ubicación obligatoria",
         "showContentFilterHeaderMenu": "Filtro de contenido en cabecera",
         "showContentFilterMasonryGrid": "Filtro de contenido en cuadrícula",
-        "showGroupButtonInHeader": "Botón de grupos en cabecera"
+        "showGroupButtonInHeader": "Botón de grupos en cabecera",
+        "videoConference": "Videoconferencia"
       },
       "lastUpdated": "Última modificación: {timestamp} por {actor}",
+      "loadError": "No se pudo cargar la configuración de la política: {message}",
       "name": "Política de red",
       "reset": "Restablecer al valor predeterminado",
       "save": "Guardar cambios",
@@ -253,6 +286,7 @@
         "videoCall_create_public": "Iniciar una videollamada en un grupo público."
       },
       "permUnavailable": "Función no configurada: conceder este permiso no tiene efecto.",
+      "permUnavailableLink": "Ver configuración",
       "protected": "protegido",
       "protectedHint": "El rol propietario tiene todos los permisos y no se puede editar.",
       "rename": "Renombrar rol",

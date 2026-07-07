@@ -1,22 +1,8 @@
 query policyDefaults {
   policyDefaults {
     defaults {
-      publicRegistration
-      inviteRegistration
-      askForRealName
-      requireLocation
-      inviteLinkLimit
-      inviteCodesPersonalPerUser
-      inviteCodesGroupPerUser
-      categoriesActive
-      badgesEnabled
-      showContentFilterHeaderMenu
-      showContentFilterMasonryGrid
-      showGroupButtonInHeader
-      apiKeysEnabled
-      apiKeysMaxPerUser
-      maxPinnedPosts
-      maxGroupPinnedPosts
+      key
+      value
     }
     lastChange {
       actor

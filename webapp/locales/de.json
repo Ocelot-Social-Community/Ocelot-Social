@@ -85,6 +85,45 @@
       "name": "Themen",
       "postCount": "Beiträge"
     },
+    "config": {
+      "blocks": "blockiert {policy}",
+      "category": {
+        "auth": "Authentifizierung",
+        "database": "Datenbank",
+        "features": "Funktionen",
+        "general": "Allgemein",
+        "layout": "Layout",
+        "mail": "E-Mail / SMTP",
+        "maps": "Karten",
+        "monitoring": "Monitoring",
+        "redis": "Redis",
+        "registration": "Registrierung",
+        "server": "Server",
+        "storage": "Speicher / S3",
+        "video": "Videokonferenz"
+      },
+      "col": {
+        "effective": "Effektiver Zustand",
+        "envKey": "Umgebungsvariable",
+        "envValue": "Umgebungswert",
+        "override": "Policy-Override",
+        "softwareDefault": "Software-Default"
+      },
+      "description": "Jede Umgebungsvariable, die dieses Deployment liest, und wie sie sich auflöst. Ein reiner Lese-/Diagnosespiegel der Deployment-Umgebung – Live-Werte werden im Reiter Netzwerk-Konfiguration bearbeitet. Secret-Werte werden nie angezeigt, nur ob sie gesetzt sind.",
+      "editPolicy": "Policy {policy} bearbeiten",
+      "name": "Umgebung",
+      "noDefault": "kein Standardwert",
+      "notSet": "nicht gesetzt",
+      "secretHidden": "gesetzt (Wert verborgen)",
+      "setOverride": "überschreiben",
+      "state": {
+        "empty": "leer",
+        "missing": "fehlt",
+        "set": "gesetzt"
+      },
+      "tableCaption": "Umgebungsvariablen mit ihrem effektiven Zustand, Policy-Override, Umgebungswert und Software-Default.",
+      "title": "Umgebungskonfiguration"
+    },
     "dashboard": {
       "badgesDisplayed": "Badges ausgestellt",
       "badgesRewarded": "Badges verteilt",
@@ -163,19 +202,11 @@
         "requireLocation": "Macht die Angabe eines Ortes bei der Registrierung und in den Profileinstellungen verpflichtend.",
         "showContentFilterHeaderMenu": "Zeigt den Inhaltsfilter im Header-Menü.",
         "showContentFilterMasonryGrid": "Zeigt den Inhaltsfilter im Masonry-Raster (Newsfeed).",
-        "showGroupButtonInHeader": "Zeigt den Gruppen-Button im Header."
+        "showGroupButtonInHeader": "Zeigt den Gruppen-Button im Header.",
+        "videoConference": "Videokonferenzen (LiveKit) aktivieren. Der Laufzeit-Schalter für die Videoanruf-Berechtigungen. Erfordert die LiveKit-Umgebungsvariablen; ohne sie bleibt er aus und ausgegraut."
       },
-      "groups": {
-        "features": {
-          "title": "Funktionen"
-        },
-        "layout": {
-          "title": "Layout"
-        },
-        "registration": {
-          "title": "Registrierung"
-        }
-      },
+      "envLink": "Zur Umgebung",
+      "envUnavailable": "Erforderliche Umgebung nicht konfiguriert – dieser Schalter hat keine Wirkung, bis sie gesetzt ist.",
       "keys": {
         "apiKeysEnabled": "API-Schlüssel",
         "apiKeysMaxPerUser": "Max. API-Schlüssel pro Nutzer",
@@ -192,9 +223,11 @@
         "requireLocation": "Ort verpflichtend",
         "showContentFilterHeaderMenu": "Inhaltsfilter im Header",
         "showContentFilterMasonryGrid": "Inhaltsfilter im Raster",
-        "showGroupButtonInHeader": "Gruppen-Button im Header"
+        "showGroupButtonInHeader": "Gruppen-Button im Header",
+        "videoConference": "Videokonferenzen"
       },
       "lastUpdated": "Zuletzt geändert: {timestamp} von {actor}",
+      "loadError": "Konfiguration konnte nicht geladen werden: {message}",
       "name": "Netzwerk-Konfiguration",
       "reset": "Auf Standard zurücksetzen",
       "save": "Änderungen speichern",
@@ -253,6 +286,7 @@
         "videoCall_create_public": "Videoanruf in einer öffentlichen Gruppe starten."
       },
       "permUnavailable": "Funktion nicht konfiguriert – das Recht hat keine Wirkung.",
+      "permUnavailableLink": "Konfiguration ansehen",
       "protected": "geschützt",
       "protectedHint": "Die Owner-Rolle hält alle Berechtigungen und kann nicht bearbeitet werden.",
       "rename": "Rolle umbenennen",

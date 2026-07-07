@@ -85,6 +85,45 @@
       "name": "Catégories",
       "postCount": "Postes"
     },
+    "config": {
+      "blocks": "bloque {policy}",
+      "category": {
+        "auth": "Authentification",
+        "database": "Base de données",
+        "features": "Fonctionnalités",
+        "general": "Général",
+        "layout": "Mise en page",
+        "mail": "E-mail / SMTP",
+        "maps": "Cartes",
+        "monitoring": "Supervision",
+        "redis": "Redis",
+        "registration": "Inscription",
+        "server": "Serveur",
+        "storage": "Stockage / S3",
+        "video": "Visioconférence"
+      },
+      "col": {
+        "effective": "État effectif",
+        "envKey": "Variable d'environnement",
+        "envValue": "Valeur d'environnement",
+        "override": "Remplacement par la politique",
+        "softwareDefault": "Valeur par défaut du logiciel"
+      },
+      "description": "Toutes les variables d'environnement que ce déploiement lit, et comment elles sont résolues. Ceci est un miroir de diagnostic en lecture seule de l'environnement du déploiement ; les valeurs actives se modifient dans l'onglet Politique réseau. Les valeurs secrètes ne sont jamais affichées, seulement si elles sont définies.",
+      "editPolicy": "Modifier la politique {policy}",
+      "name": "Environnement",
+      "noDefault": "aucune valeur par défaut",
+      "notSet": "non définie",
+      "secretHidden": "définie (valeur masquée)",
+      "setOverride": "remplacer",
+      "state": {
+        "empty": "vide",
+        "missing": "absente",
+        "set": "définie"
+      },
+      "tableCaption": "Variables d'environnement avec leur état effectif, le remplacement par la politique, la valeur d'environnement et la valeur par défaut du logiciel.",
+      "title": "Configuration de l'environnement"
+    },
     "dashboard": {
       "badgesDisplayed": "Badges affichés",
       "badgesRewarded": "Badges attribués",
@@ -163,19 +202,11 @@
         "requireLocation": "Rend une localisation obligatoire lors de l'inscription et dans les paramètres du profil.",
         "showContentFilterHeaderMenu": "Affiche le filtre de contenu dans le menu d'en-tête.",
         "showContentFilterMasonryGrid": "Affiche le filtre de contenu dans la grille en maçonnerie (fil d'actualité).",
-        "showGroupButtonInHeader": "Affiche le bouton des groupes dans l'en-tête."
+        "showGroupButtonInHeader": "Affiche le bouton des groupes dans l'en-tête.",
+        "videoConference": "Active la visioconférence (LiveKit). L’interrupteur d’exécution pour les autorisations d’appel vidéo. Nécessite les variables d’environnement LiveKit ; sans elles, elle reste désactivée et grisée."
       },
-      "groups": {
-        "features": {
-          "title": "Fonctionnalités"
-        },
-        "layout": {
-          "title": "Mise en page"
-        },
-        "registration": {
-          "title": "Inscription"
-        }
-      },
+      "envLink": "Voir l’environnement",
+      "envUnavailable": "L’environnement requis n’est pas configuré — ce réglage n’a aucun effet tant qu’il ne l’est pas.",
       "keys": {
         "apiKeysEnabled": "Clés API",
         "apiKeysMaxPerUser": "Max. de clés API par utilisateur",
@@ -192,9 +223,11 @@
         "requireLocation": "Localisation obligatoire",
         "showContentFilterHeaderMenu": "Filtre de contenu dans l'en-tête",
         "showContentFilterMasonryGrid": "Filtre de contenu dans la grille",
-        "showGroupButtonInHeader": "Bouton groupes dans l'en-tête"
+        "showGroupButtonInHeader": "Bouton groupes dans l'en-tête",
+        "videoConference": "Visioconférence"
       },
       "lastUpdated": "Dernière modification : {timestamp} par {actor}",
+      "loadError": "Impossible de charger la configuration de la politique : {message}",
       "name": "Politique réseau",
       "reset": "Réinitialiser par défaut",
       "save": "Enregistrer les modifications",
@@ -253,6 +286,7 @@
         "videoCall_create_public": "Démarrer un appel vidéo dans un groupe public."
       },
       "permUnavailable": "Fonctionnalité non configurée — accorder ce droit n'a aucun effet.",
+      "permUnavailableLink": "Voir la configuration",
       "protected": "protégé",
       "protectedHint": "Le rôle propriétaire détient toutes les permissions et ne peut pas être modifié.",
       "rename": "Renommer le rôle",

@@ -85,6 +85,45 @@
       "name": "Topics",
       "postCount": "Posts"
     },
+    "config": {
+      "blocks": "blocks {policy}",
+      "category": {
+        "auth": "Authentication",
+        "database": "Database",
+        "features": "Features",
+        "general": "General",
+        "layout": "Layout",
+        "mail": "Email / SMTP",
+        "maps": "Maps",
+        "monitoring": "Monitoring",
+        "redis": "Redis",
+        "registration": "Registration",
+        "server": "Server",
+        "storage": "Storage / S3",
+        "video": "Video conferencing"
+      },
+      "col": {
+        "effective": "Effective state",
+        "envKey": "Environment variable",
+        "envValue": "Environment value",
+        "override": "Policy override",
+        "softwareDefault": "Software default"
+      },
+      "description": "Every environment variable this deployment reads, and how it resolves. This is a read-only diagnostic mirror of the deployment env — live values are edited on the network policy tab. Secret values are never shown, only whether they are set.",
+      "editPolicy": "Edit the {policy} policy",
+      "name": "Environment",
+      "noDefault": "no default",
+      "notSet": "not set",
+      "secretHidden": "set (value hidden)",
+      "setOverride": "override",
+      "state": {
+        "empty": "empty",
+        "missing": "missing",
+        "set": "set"
+      },
+      "tableCaption": "Environment variables with their effective state, policy override, environment value and software default.",
+      "title": "Environment configuration"
+    },
     "dashboard": {
       "badgesDisplayed": "Badges Displayed",
       "badgesRewarded": "Badges Rewarded",
@@ -163,19 +202,11 @@
         "requireLocation": "Make a location mandatory during registration and in profile settings.",
         "showContentFilterHeaderMenu": "Show the content filter in the header menu.",
         "showContentFilterMasonryGrid": "Show the content filter in the masonry grid (newsfeed).",
-        "showGroupButtonInHeader": "Show the groups button in the header."
+        "showGroupButtonInHeader": "Show the groups button in the header.",
+        "videoConference": "Enable video conferencing (LiveKit). The runtime switch for the video-call permissions. Requires the LiveKit environment variables; without them it stays off and greyed out."
       },
-      "groups": {
-        "features": {
-          "title": "Features"
-        },
-        "layout": {
-          "title": "Layout"
-        },
-        "registration": {
-          "title": "Registration"
-        }
-      },
+      "envLink": "View environment",
+      "envUnavailable": "Required environment is not configured — this toggle has no effect until it is.",
       "keys": {
         "apiKeysEnabled": "API keys",
         "apiKeysMaxPerUser": "Max. API keys per user",
@@ -192,9 +223,11 @@
         "requireLocation": "Require location",
         "showContentFilterHeaderMenu": "Content filter in header",
         "showContentFilterMasonryGrid": "Content filter in grid",
-        "showGroupButtonInHeader": "Groups button in header"
+        "showGroupButtonInHeader": "Groups button in header",
+        "videoConference": "Video conferencing"
       },
       "lastUpdated": "Last changed: {timestamp} by {actor}",
+      "loadError": "Could not load policy configuration: {message}",
       "name": "Network policy",
       "reset": "Reset to default",
       "save": "Save changes",
@@ -253,6 +286,7 @@
         "videoCall_create_public": "Start a video call in a public group."
       },
       "permUnavailable": "Feature not configured — granting this has no effect.",
+      "permUnavailableLink": "View configuration",
       "protected": "protected",
       "protectedHint": "The owner role holds every permission and cannot be edited.",
       "rename": "Rename role",

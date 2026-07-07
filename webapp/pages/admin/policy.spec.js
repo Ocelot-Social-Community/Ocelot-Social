@@ -12,7 +12,7 @@ describe('admin/policy.vue', () => {
   let init
   let fetchDefaults
   let setKey
-  let resetKey
+  let resetKeys
 
   const snapshot = {
     publicRegistration: false,
@@ -26,6 +26,7 @@ describe('admin/policy.vue', () => {
     badgesEnabled: false,
     apiKeysEnabled: false,
     apiKeysMaxPerUser: 5,
+    videoConference: true,
     maxPinnedPosts: 1,
     maxGroupPinnedPosts: 1,
     showContentFilterHeaderMenu: true,
@@ -46,6 +47,7 @@ describe('admin/policy.vue', () => {
     badgesEnabled: false,
     apiKeysEnabled: false,
     apiKeysMaxPerUser: 5,
+    videoConference: true,
     maxPinnedPosts: 1,
     maxGroupPinnedPosts: 1,
     showContentFilterHeaderMenu: true,
@@ -64,19 +66,59 @@ describe('admin/policy.vue', () => {
     'badgesEnabled',
     'apiKeysEnabled',
     'apiKeysMaxPerUser',
+    'videoConference',
     'maxPinnedPosts',
     'maxGroupPinnedPosts',
     'showContentFilterHeaderMenu',
     'showContentFilterMasonryGrid',
     'showGroupButtonInHeader',
   ]
+  // Backend-provided per-key config (policyConfig query). The page derives its groups,
+  // number-vs-checkbox, and form keys from this now — no hand-maintained FE lists — so the
+  // tests feed a realistic fixture (category + type per key) instead.
+  const CATEGORY_OF = {
+    publicRegistration: 'registration',
+    inviteRegistration: 'registration',
+    askForRealName: 'registration',
+    requireLocation: 'registration',
+    inviteLinkLimit: 'registration',
+    inviteCodesPersonalPerUser: 'registration',
+    inviteCodesGroupPerUser: 'registration',
+    categoriesActive: 'features',
+    badgesEnabled: 'features',
+    apiKeysEnabled: 'features',
+    apiKeysMaxPerUser: 'features',
+    maxPinnedPosts: 'features',
+    maxGroupPinnedPosts: 'features',
+    showContentFilterHeaderMenu: 'layout',
+    showContentFilterMasonryGrid: 'layout',
+    showGroupButtonInHeader: 'layout',
+    videoConference: 'video',
+  }
+  const NUMBER_KEYS = new Set([
+    'inviteLinkLimit',
+    'inviteCodesPersonalPerUser',
+    'inviteCodesGroupPerUser',
+    'apiKeysMaxPerUser',
+    'maxPinnedPosts',
+    'maxGroupPinnedPosts',
+  ])
+  const policyConfigFixture = () =>
+    ALL_KEYS.map((key) => ({
+      key,
+      category: CATEGORY_OF[key],
+      type: NUMBER_KEYS.has(key) ? 'integer' : 'boolean',
+      available: true,
+      softwareDefault: JSON.stringify(defaults[key]),
+    }))
+
   const lastChange = { actor: 'jenny-rostock', timestamp: '2026-01-02T03:04:05.000Z' }
 
   beforeEach(() => {
     init = jest.fn().mockResolvedValue()
     fetchDefaults = jest.fn().mockResolvedValue()
     setKey = jest.fn().mockResolvedValue()
-    resetKey = jest.fn().mockResolvedValue()
+    resetKeys = jest.fn().mockResolvedValue([])
     store = new Vuex.Store({
       modules: {
         policy: {
@@ -94,7 +136,7 @@ describe('admin/policy.vue', () => {
               state.snap = value
             },
           },
-          actions: { init, fetchDefaults, setKey, resetKey },
+          actions: { init, fetchDefaults, setKey, resetKeys },
         },
       },
     })
@@ -104,16 +146,48 @@ describe('admin/policy.vue', () => {
     }
   })
 
-  const Wrapper = () => mount(Policy, { mocks, localVue, store })
+  const Wrapper = () =>
+    mount(Policy, {
+      mocks,
+      localVue,
+      store,
+      // The page groups/types/keys off policyConfig; feed it so the rows render.
+      data() {
+        return { policyConfig: policyConfigFixture() }
+      },
+    })
 
   it('renders the policies grouped under category headings', () => {
     wrapper = Wrapper()
     expect(wrapper.find('[data-test="policy-group-registration"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="policy-group-features"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="policy-group-layout"]').exists()).toBe(true)
-    expect(wrapper.text()).toContain('admin.policy.groups.registration.title')
-    expect(wrapper.text()).toContain('admin.policy.groups.features.title')
-    expect(wrapper.text()).toContain('admin.policy.groups.layout.title')
+    // videoConference now groups under its backend category ('video'), derived from
+    // policyConfig rather than a hand-maintained FE list.
+    expect(wrapper.find('[data-test="policy-group-video"]').exists()).toBe(true)
+    // Group titles reuse the shared config-tab category labels (admin.config.category.*),
+    // so the two admin tabs don't carry parallel label sets for the same categories.
+    expect(wrapper.text()).toContain('admin.config.category.registration')
+    expect(wrapper.text()).toContain('admin.config.category.features')
+    expect(wrapper.text()).toContain('admin.config.category.layout')
+    expect(wrapper.text()).toContain('admin.config.category.video')
+  })
+
+  it('appends an unknown backend category as its own group instead of dropping its keys', () => {
+    // Graceful degradation: a category the FE order list doesn't know about must still be
+    // rendered (never silently vanish), so a new backend category needs no FE change.
+    wrapper = mount(Policy, {
+      mocks,
+      localVue,
+      store,
+      data() {
+        return {
+          policyConfig: [{ key: 'publicRegistration', category: 'brandNewGroup', type: 'boolean' }],
+        }
+      },
+    })
+    expect(wrapper.find('[data-test="policy-group-brandNewGroup"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="policy-publicRegistration"]').exists()).toBe(true)
   })
 
   it('renders every policy with a name and a detailed description', () => {
@@ -445,18 +519,206 @@ describe('admin/policy.vue', () => {
       expect(setKey).not.toHaveBeenCalled()
     })
 
-    it('resets every key to its default via resetKey', async () => {
+    it('resets every key to its default via a single bulk resetKeys call', async () => {
       wrapper = Wrapper()
       await flushPromises()
 
       await wrapper.find('[data-test="policy-reset"]').trigger('click')
       await flushPromises()
 
-      expect(resetKey).toHaveBeenCalledTimes(ALL_KEYS.length) // one per policy key
-      for (const key of ALL_KEYS) {
-        expect(resetKey).toHaveBeenCalledWith(expect.anything(), { key })
-      }
+      // One round-trip for all keys, not one mutation per key.
+      expect(resetKeys).toHaveBeenCalledTimes(1)
+      expect(resetKeys).toHaveBeenCalledWith(expect.anything(), { keys: ALL_KEYS })
       expect(mocks.$toast.success).toHaveBeenCalled()
+    })
+
+    it('enables reset only while some key still diverges from its default', async () => {
+      // Fixtures differ on categoriesActive (snapshot false, default true) → something to reset.
+      wrapper = Wrapper()
+      await flushPromises()
+      expect(wrapper.vm.resetHasEffect).toBe(true)
+      expect(wrapper.find('[data-test="policy-reset"]').attributes('disabled')).toBeFalsy()
+
+      // Make the effective snapshot match the configured defaults exactly → nothing to reset.
+      store.commit('policy/SET_SNAP', { ...defaults })
+      await flushPromises()
+      expect(wrapper.vm.resetHasEffect).toBe(false)
+      expect(wrapper.find('[data-test="policy-reset"]').attributes('disabled')).toBeTruthy()
+    })
+
+    it('allows reset while the configured defaults have not loaded yet', () => {
+      const noDefaultsStore = new Vuex.Store({
+        modules: {
+          policy: {
+            namespaced: true,
+            state: () => ({ snap: { ...snapshot } }),
+            getters: {
+              snapshot: (s) => s.snap,
+              defaults: () => ({}),
+              lastChange: () => lastChange,
+            },
+            actions: { init, fetchDefaults, setKey, resetKeys },
+          },
+        },
+      })
+      const w = mount(Policy, {
+        mocks,
+        localVue,
+        store: noDefaultsStore,
+        data() {
+          return { policyConfig: policyConfigFixture() }
+        },
+      })
+      expect(w.vm.resetHasEffect).toBe(true)
+    })
+  })
+
+  describe('env-gated availability (policyConfig)', () => {
+    const stubs = { 'nuxt-link': { template: '<a :href="to"><slot /></a>', props: ['to'] } }
+    const ENTRY = {
+      key: 'videoConference',
+      type: 'boolean',
+      category: 'video',
+      effective: 'false',
+      softwareDefault: 'true',
+      configuredDefault: 'true',
+      envSeed: null,
+      envSeedState: null,
+      requiresEnv: [{ name: 'LIVEKIT_URL', state: 'missing' }],
+      available: false,
+    }
+    const mountWithConfig = (policyConfig) => {
+      const w = mount(Policy, { mocks, localVue, store, stubs })
+      w.setData({ policyConfig })
+      return w
+    }
+
+    it('greys out and disables an env-unavailable key, linking to the config tab', async () => {
+      const w = mountWithConfig([ENTRY])
+      await w.vm.$nextTick()
+      expect(w.vm.isUnavailable('videoConference')).toBe(true)
+      expect(w.find('[data-test="policy-videoConference"]').attributes('disabled')).toBeTruthy()
+      expect(w.find('[data-test="policy-env-videoConference"]').exists()).toBe(true)
+      expect(w.find('.policy-row__env-link').attributes('href')).toBe(
+        '/admin/config#videoConference',
+      )
+    })
+
+    it('treats keys without a config entry as available', () => {
+      const w = mountWithConfig([])
+      expect(w.vm.isUnavailable('videoConference')).toBe(false)
+    })
+  })
+
+  describe('policyConfig load failure — degraded fallback (keys never vanish)', () => {
+    const stubs = { 'nuxt-link': { template: '<a :href="to"><slot /></a>', props: ['to'] } }
+    // policyConfig stays [] (query failed or not yet loaded); the snapshot (values) is present.
+    const mountWithoutConfig = () => mount(Policy, { mocks, localVue, store, stubs })
+
+    it('still renders every snapshot key, so a metadata-query failure does not blank the page', async () => {
+      const w = mountWithoutConfig()
+      await flushPromises()
+      for (const key of ALL_KEYS) {
+        expect(w.find(`[data-test="policy-${key}"]`).exists()).toBe(true)
+      }
+      // Collapsed into a single fallback group; proper grouping returns once policyConfig loads.
+      expect(w.vm.groups).toHaveLength(1)
+      expect(w.vm.groups[0].keys).toEqual(expect.arrayContaining(ALL_KEYS))
+    })
+
+    it('infers the input type from the snapshot value when the metadata is missing', async () => {
+      const w = mountWithoutConfig()
+      await flushPromises()
+      // inviteLinkLimit is a number in the snapshot → number input; publicRegistration a boolean
+      // → checkbox — no policyConfig.type needed.
+      expect(w.find('#policy-inviteLinkLimit').element.type).toBe('number')
+      expect(w.find('#policy-publicRegistration').element.type).toBe('checkbox')
+    })
+  })
+
+  describe('deep-link highlight from the config tab', () => {
+    // The app runs vue-router in history mode, so an in-app navigation is a pushState
+    // that browsers don't re-evaluate :target for — the row is highlighted from the
+    // route hash instead. A reactive $route lets us exercise the hash watcher too; jsdom
+    // has no scrollIntoView, so stub it.
+    let attached
+    // Attach to the real document so getElementById (used by the scroll) resolves.
+    const mountWithRoute = (hash) => {
+      const $route = localVue.observable({ hash })
+      attached = mount(Policy, {
+        mocks: { ...mocks, $route },
+        localVue,
+        store,
+        attachTo: document.body,
+        // Rows are derived from policyConfig; without it there is nothing to highlight.
+        data() {
+          return { policyConfig: policyConfigFixture() }
+        },
+      })
+      return { w: attached, $route }
+    }
+
+    beforeEach(() => {
+      window.HTMLElement.prototype.scrollIntoView = jest.fn()
+    })
+    afterEach(() => {
+      attached?.destroy()
+      attached = undefined
+    })
+
+    it('highlights and scrolls to the row matching the route hash', async () => {
+      const { w } = mountWithRoute('#apiKeysEnabled')
+      await flushPromises()
+      expect(w.vm.highlightedKey).toBe('apiKeysEnabled')
+      expect(w.find('#apiKeysEnabled').classes()).toContain('policy-row--highlight')
+      expect(w.find('#publicRegistration').classes()).not.toContain('policy-row--highlight')
+      expect(window.HTMLElement.prototype.scrollIntoView).toHaveBeenCalled()
+    })
+
+    it('highlights nothing for an unknown or empty hash', async () => {
+      const { w } = mountWithRoute('#nonsense')
+      await flushPromises()
+      expect(w.vm.highlightedKey).toBeNull()
+      expect(w.find('.policy-row--highlight').exists()).toBe(false)
+      expect(window.HTMLElement.prototype.scrollIntoView).not.toHaveBeenCalled()
+    })
+
+    it('re-evaluates the highlight when the hash changes without a remount', async () => {
+      const { w, $route } = mountWithRoute('')
+      await flushPromises()
+      expect(w.vm.highlightedKey).toBeNull()
+      $route.hash = '#videoConference'
+      await w.vm.$nextTick()
+      expect(w.vm.highlightedKey).toBe('videoConference')
+    })
+
+    it('highlights a rendered row even when the snapshot omits its key (drift guard)', async () => {
+      // Regression: videoConference was once missing from the snapshot query's field list,
+      // yet its row still renders (rows come from policyConfig). highlightableKeys() derives
+      // from the rendered rows, not the snapshot, so the deep link from the roles tab
+      // (/admin/policy#videoConference) still scrolls to and highlights the row.
+      const { videoConference: _omitted, ...withoutVideo } = snapshot
+      store.commit('policy/SET_SNAP', withoutVideo)
+      const { w } = mountWithRoute('#videoConference')
+      await flushPromises()
+      expect(w.vm.keys).not.toContain('videoConference') // snapshot really lacks it
+      expect(w.find('#videoConference').exists()).toBe(true) // but the row is rendered
+      expect(w.vm.highlightedKey).toBe('videoConference')
+      expect(w.find('#videoConference').classes()).toContain('policy-row--highlight')
+      expect(window.HTMLElement.prototype.scrollIntoView).toHaveBeenCalled()
+    })
+
+    it('fades the highlight out after a delay (clears the key so the class drops)', async () => {
+      // Fake only the timers; keep setImmediate real so flushPromises still settles.
+      jest.useFakeTimers({ doNotFake: ['setImmediate'] })
+      const { w } = mountWithRoute('#apiKeysEnabled')
+      await flushPromises()
+      expect(w.vm.highlightedKey).toBe('apiKeysEnabled')
+      jest.advanceTimersByTime(2500)
+      expect(w.vm.highlightedKey).toBeNull()
+      await w.vm.$nextTick()
+      expect(w.find('#apiKeysEnabled').classes()).not.toContain('policy-row--highlight')
+      jest.useRealTimers()
     })
   })
 })

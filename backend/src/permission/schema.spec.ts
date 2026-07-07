@@ -1,4 +1,5 @@
 import {
+  allPermissionGates,
   allPermissionKeys,
   descriptionFor,
   gateFor,
@@ -61,16 +62,35 @@ describe('permission catalog', () => {
       expect(descriptionFor(key).length).toBeGreaterThan(0)
     })
 
-    it('gates video-call and api-key rights, leaves the rest ungated', () => {
-      expect(gateFor('videoCall.create_public')).toBe('videoCall')
-      expect(gateFor('videoCall.create_closed')).toBe('videoCall')
-      expect(gateFor('videoCall.create_hidden')).toBe('videoCall')
-      expect(gateFor('apiKey.create')).toBe('apiKeys')
+    it('gates the feature-dependent rights, leaves the rest ungated', () => {
+      expect(gateFor('videoCall.create_public')).toBe('videoConference')
+      expect(gateFor('videoCall.create_closed')).toBe('videoConference')
+      expect(gateFor('videoCall.create_hidden')).toBe('videoConference')
+      expect(gateFor('apiKey.create')).toBe('apiKeysEnabled')
+      // badge.manage is inert while badges are disabled; user.invite while invite
+      // registration is off (codes couldn't be redeemed). NB: apiKey.administer is
+      // deliberately NOT gated — admins must be able to revoke still-valid keys after the
+      // feature is turned off.
+      expect(gateFor('badge.manage')).toBe('badgesEnabled')
+      expect(gateFor('user.invite')).toBe('inviteRegistration')
+      expect(gateFor('apiKey.administer')).toBeUndefined()
       // A representative ungated right.
       expect(gateFor('post.create')).toBeUndefined()
       // The projection carries the gate through.
       const publicCall = permissionCatalog().find((e) => e.key === 'videoCall.create_public')
-      expect(publicCall?.gatedBy).toBe('videoCall')
+      expect(publicCall?.gatedBy).toBe('videoConference')
+    })
+
+    it('derives the distinct permission gates from the catalog, in declaration order', () => {
+      // Feeds PERMISSION_GATE_POLICY_KEYS in gates.ts — de-duplicated (videoConference is
+      // declared by three video-call rights) and ordered by first appearance in the catalog:
+      // badge.manage, then user.invite, then the video-call rights, then apiKey.create.
+      expect(allPermissionGates()).toEqual([
+        'badgesEnabled',
+        'inviteRegistration',
+        'videoConference',
+        'apiKeysEnabled',
+      ])
     })
 
     it('files the destructive per-user actions in the right groups', () => {

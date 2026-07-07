@@ -3,21 +3,17 @@ import path from 'node:path'
 import { loadFilesSync } from '@graphql-tools/load-files'
 import { mergeTypeDefs } from '@graphql-tools/merge'
 
-// Import allKeys() from the pure schema module, NOT the @src/policy barrel: the
-// barrel re-exports PolicyService, which pulls in neo4j/redis/config (with its
-// required-env assertions). typeDefs only needs the key list, so this keeps the
-// type system — and thus `schema:print` — free of runtime config/env.
-import { allKeys } from '@src/policy/schema'
+// PolicyKey and EnvCategory are DERIVED from their single sources (policy.schema.json /
+// config/categories) rather than hand-written in SDL — so .gql files can use `PolicyKey!` /
+// `EnvCategory!` as typed, validated, introspectable contracts without duplicating the
+// vocabularies. Their SDL is built in ../derivedEnums, which is shared with eslint.config.ts's
+// static schema, so the runtime and lint schemas cannot drift (and stay free of the ajv/@src
+// dependencies the ESLint config loader can't resolve).
+import { derivedEnumSDLs } from '@src/graphql/derivedEnums'
 
 import type { DocumentNode } from 'graphql'
 
 // eslint-disable-next-line n/no-sync
 const typeDefs = loadFilesSync<DocumentNode>(path.join(__dirname, './**/*.gql'))
 
-// The PolicyKey enum is DERIVED from policy.schema.json (via allKeys()) rather
-// than hand-written in SDL — so the schema JSON stays the single source of truth
-// for the key list, and Policy.gql can use `PolicyKey!` for a typed, validated,
-// introspectable contract without duplicating the keys.
-const policyKeyEnum = `enum PolicyKey { ${allKeys().join(' ')} }`
-
-export default mergeTypeDefs([...typeDefs, policyKeyEnum])
+export default mergeTypeDefs([...typeDefs, ...derivedEnumSDLs])

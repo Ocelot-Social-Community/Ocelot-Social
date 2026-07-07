@@ -185,8 +185,8 @@ describe('role management', () => {
       }>
       const byKey = new Map(catalog.map((p) => [p.key, p] as const))
       expect(byKey.get('post.create')).toMatchObject({ gatedBy: null, available: true })
-      expect(byKey.get('videoCall.create_public')?.gatedBy).toBe('videoCall')
-      expect(byKey.get('apiKey.create')?.gatedBy).toBe('apiKeys')
+      expect(byKey.get('videoCall.create_public')?.gatedBy).toBe('videoConference')
+      expect(byKey.get('apiKey.create')?.gatedBy).toBe('apiKeysEnabled')
       // available is a non-null boolean for every entry.
       for (const entry of catalog) {
         expect(typeof entry.available).toBe('boolean')

@@ -32,6 +32,7 @@ export interface NetworkPolicy {
   showContentFilterMasonryGrid: boolean
   showGroupButtonInHeader: boolean
   apiKeysEnabled: boolean
+  videoConference: boolean
   apiKeysMaxPerUser: number
   maxPinnedPosts: number
   maxGroupPinnedPosts: number
@@ -42,6 +43,11 @@ export type PolicyKey = keyof NetworkPolicy
 // The value a policy key can hold across all keys (boolean toggles and integer
 // limits today; string-typed keys are supported by the schema/service for later).
 export type PolicyValue = NetworkPolicy[PolicyKey]
+
+// Presence state of an env var: set (defined, non-empty), empty (defined but blank), or
+// missing. Produced by the PolicyService (envState) and surfaced in the admin config view;
+// lives here so config/systemConfig can import it without a config → policy → config cycle.
+export type ConfigKeyState = 'set' | 'empty' | 'missing'
 
 export type Audience = string
 

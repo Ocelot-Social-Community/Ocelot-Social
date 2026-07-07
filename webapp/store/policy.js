@@ -1,23 +1,41 @@
 import PolicyQuery from '~/graphql/PolicyQuery'
 import PolicyDefaultsQuery from '~/graphql/PolicyDefaultsQuery'
 import PolicySubscription from '~/graphql/PolicySubscription'
-import { setPolicyMutation, resetPolicyMutation } from '~/graphql/PolicyMutations'
+import {
+  setPolicyMutation,
+  resetPolicyMutation,
+  resetPoliciesMutation,
+} from '~/graphql/PolicyMutations'
 
 // Extract { actor, timestamp } from a mutation result / policyDefaults.lastChange.
 const toLastChange = (event) => (event ? { actor: event.actor, timestamp: event.timestamp } : null)
 
-// Build a key→value map from a backend policy response. The frontend keeps NO
-// config defaults of its own (single source of truth is the backend): we only
-// strip Apollo's __typename. A key the viewer may not see comes back as null and
-// is passed through as null — boolean consumers treat null as falsy ("off"),
-// integer consumers fall back defensively (e.g. `value || default`). We never
-// inject a frontend default value here.
-const normalize = (data) => {
+// Build a key→value map from a backend policy response. The backend returns a
+// key/value list ({ key, value }) covering every recognised policy key, so the map
+// always reflects the full backend key set — no hand-maintained field list to drift.
+// The value is JSON-encoded (heterogeneous types: boolean / integer), matching the
+// live subscription payload; we parse it here. A key the viewer may not see comes
+// back with a null value and is passed through as null — boolean consumers treat
+// null as falsy ("off"), integer consumers fall back defensively (e.g.
+// `value || default`). The frontend keeps NO config defaults of its own (single
+// source of truth is the backend); we never inject a frontend default value here.
+const normalize = (entries) => {
   const out = {}
-  for (const key of Object.keys(data || {})) {
-    if (key === '__typename') continue
-    const value = data[key]
-    out[key] = value === undefined ? null : value
+  for (const entry of Array.isArray(entries) ? entries : []) {
+    if (!entry || entry.key === '__typename') continue
+    if (entry.value == null) {
+      out[entry.key] = null
+      continue
+    }
+    try {
+      out[entry.key] = JSON.parse(entry.value)
+    } catch (err) {
+      // Guard each value like setKey/resetKeys do: a single unparseable value must not throw
+      // and take the whole snapshot down — init()'s catch would then discard even the public
+      // keys. Fall back to null (the same safe default a not-visible key gets), keeping the
+      // rest of the snapshot intact.
+      out[entry.key] = null
+    }
   }
   return out
 }
@@ -127,7 +145,7 @@ export const actions = {
       // (nothing to preserve); otherwise keep the last snapshot and let the next
       // successful init / change event re-sync.
       if (!state.isInitialized) {
-        commit('SET_SNAPSHOT', {})
+        commit('SET_SNAPSHOT', [])
       }
     }
   },
@@ -181,6 +199,29 @@ export const actions = {
     }
     commit('SET_LAST_CHANGE', toLastChange(resetPolicy))
     return resetPolicy
+  },
+
+  // Reset several keys in one round-trip (the admin "reset all" button). The backend only
+  // returns events for keys that actually diverged, so patch each of those locally; the
+  // pubsub broadcast delivers the authoritative values to other tabs.
+  async resetKeys({ commit }, { keys }) {
+    const {
+      data: { resetPolicies },
+    } = await apolloClient(this).mutate({
+      mutation: resetPoliciesMutation(),
+      variables: { keys },
+    })
+    for (const event of resetPolicies) {
+      try {
+        commit('PATCH_KEY', { key: event.key, value: JSON.parse(event.value) })
+      } catch (err) {
+        // Ignore an unparseable value; the subscription delivers the authoritative one.
+      }
+    }
+    if (resetPolicies.length) {
+      commit('SET_LAST_CHANGE', toLastChange(resetPolicies[resetPolicies.length - 1]))
+    }
+    return resetPolicies
   },
 
   // Subscribes once per client to policyChanged. Idempotent — repeated calls

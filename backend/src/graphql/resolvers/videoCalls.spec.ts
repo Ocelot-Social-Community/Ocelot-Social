@@ -70,7 +70,15 @@ let livekitConfig: Record<string, unknown> = {}
 // Per-test role override: tweaks the viewer's effective permissions to test the
 // per-group-type open gate (videoCall.create_public / _closed / _hidden).
 let rolesOverride: RoleDefinition[] | undefined
-const context = () => ({ authenticatedUser, config: livekitConfig, roles: rolesOverride })
+// videoConference's effective value (the single switch the resolvers now read) folds
+// the LiveKit env via requiresEnv, so feed the same LiveKit vars as the policy env:
+// ENABLED_LIVEKIT → videoConference available + on; {} → unavailable → off.
+const context = () => ({
+  authenticatedUser,
+  config: livekitConfig,
+  env: livekitConfig as Record<string, string | undefined>,
+  roles: rolesOverride,
+})
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']

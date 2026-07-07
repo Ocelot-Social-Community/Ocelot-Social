@@ -30,6 +30,14 @@ let database: ApolloTestSetup['database']
 
 const asUser = (role: string) => ({ id: `${role}-1`, roleName: role }) as unknown as Context['user']
 
+// The policy / policyDefaults queries return a key/value list (value JSON-encoded);
+// fold it back into a key→value map for the assertions. Mirrors the frontend store's
+// normalize(): a null value (key not visible / unset) stays null.
+const asMap = (entries: Array<{ key: string; value: string | null }>) =>
+  Object.fromEntries(
+    entries.map(({ key, value }) => [key, value === null ? null : JSON.parse(value)]),
+  )
+
 const mutationContext = (policyDouble: unknown): Context =>
   ({ user: { id: 'admin-1' }, policy: policyDouble }) as unknown as Context
 
@@ -61,7 +69,7 @@ describe('Query.policy', () => {
       const { data, errors } = await query({ query: policyQuery })
 
       expect(errors).toBeUndefined()
-      expect(data.policy).toEqual({
+      expect(asMap(data.policy)).toEqual({
         publicRegistration: false,
         inviteRegistration: true,
         askForRealName: false,
@@ -79,6 +87,8 @@ describe('Query.policy', () => {
         inviteLinkLimit: null,
         inviteCodesPersonalPerUser: null,
         inviteCodesGroupPerUser: null,
+        // admin-only key → null for an anonymous viewer
+        videoConference: null,
       })
     })
   })
@@ -90,7 +100,7 @@ describe('Query.policy', () => {
       const { data, errors } = await query({ query: policyQuery })
 
       expect(errors).toBeUndefined()
-      expect(data.policy.apiKeysEnabled).toBe(true)
+      expect(asMap(data.policy).apiKeysEnabled).toBe(true)
     })
 
     it('returns the real value (false), not null, when the feature is disabled', async () => {
@@ -99,7 +109,7 @@ describe('Query.policy', () => {
 
       const { data } = await query({ query: policyQuery })
 
-      expect(data.policy.apiKeysEnabled).toBe(false)
+      expect(asMap(data.policy).apiKeysEnabled).toBe(false)
     })
   })
 
@@ -110,7 +120,7 @@ describe('Query.policy', () => {
       const { data, errors } = await query({ query: policyQuery })
 
       expect(errors).toBeUndefined()
-      expect(data.policy.apiKeysEnabled).toBe(true)
+      expect(asMap(data.policy).apiKeysEnabled).toBe(true)
     })
   })
 })
@@ -138,6 +148,7 @@ describe('Query.policyDefaults', () => {
     const { data, errors } = await query({ query: policyDefaultsQuery })
 
     expect(errors).toBeUndefined()
+    const defaults = asMap(data.policyDefaults.defaults)
     // Admin sees all keys; the exact default value (schema vs ENV seed) is
     // covered deterministically in PolicyService.spec.ts → getDefault().
     for (const key of [
@@ -148,11 +159,12 @@ describe('Query.policyDefaults', () => {
       'categoriesActive',
       'badgesEnabled',
       'apiKeysEnabled',
+      'videoConference',
       'showContentFilterHeaderMenu',
       'showContentFilterMasonryGrid',
       'showGroupButtonInHeader',
     ]) {
-      expect(typeof data.policyDefaults.defaults[key]).toBe('boolean')
+      expect(typeof defaults[key]).toBe('boolean')
     }
     // Integer-typed policy keys come back as numbers (Int), not coerced booleans.
     for (const key of [
@@ -163,7 +175,7 @@ describe('Query.policyDefaults', () => {
       'inviteCodesPersonalPerUser',
       'inviteCodesGroupPerUser',
     ]) {
-      expect(typeof data.policyDefaults.defaults[key]).toBe('number')
+      expect(typeof defaults[key]).toBe('number')
     }
     // lastChange is bundled here (replaces the former policyLastChange query);
     // null on a fresh in-memory policy with no human change yet.
@@ -193,6 +205,30 @@ describe('Mutation.setPolicy / resetPolicy authorization', () => {
 
     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
   })
+
+  it('forbids the bulk resetPolicies for non-admins', async () => {
+    authenticatedUser = asUser('user')
+
+    const { errors } = await query({
+      query: parse('mutation { resetPolicies(keys: [apiKeysEnabled]) { key } }'),
+    })
+
+    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
+  })
+
+  it('lets the bulk resetPolicies past the shield for an admin (the gate is registered)', async () => {
+    // A deny test alone would pass even if the mutation were MISSING from the shield (default
+    // deny). This admin path is what catches a forgotten shield registration: an admin must
+    // not be denied. (The harness policy service has no writable DB, so execution may still
+    // error internally — that is a test-setup limitation, not what we assert here.)
+    authenticatedUser = asUser('admin')
+
+    const { errors } = await query({
+      query: parse('mutation { resetPolicies(keys: [apiKeysEnabled]) { key } }'),
+    })
+
+    expect(errors?.[0]?.message).not.toBe('Not Authorized!')
+  })
 })
 
 describe('PolicyKey enum (schema-derived contract)', () => {
@@ -218,21 +254,18 @@ describe('PolicyKey enum (schema-derived contract)', () => {
     expect(errors?.[0]?.message).toMatch(/PolicyKey/)
   })
 
-  // The Policy type fields are hand-written SDL (kept explicit for readability,
-  // unlike the generated enum). This guard fails if a key is added to
-  // policy.schema.json but its Policy field is forgotten (or vice versa).
-  it('keeps the hand-written Policy type fields in sync with the schema keys', async () => {
-    const { data, errors } = await query({
-      query: parse('{ __type(name: "Policy") { fields { name } } }'),
-    })
+  // The policy / policyDefaults queries return a key/value list keyed by the
+  // PolicyKey enum (which the test above pins to allKeys()), so there is no longer
+  // a hand-written Policy SDL type to drift from the schema keys — the former
+  // "keep the Policy type fields in sync" guard is obsolete and was removed.
+  it('returns every schema key in the policy list, with no hand-maintained selection', async () => {
+    authenticatedUser = asUser('admin')
+
+    const { data, errors } = await query({ query: policyQuery })
+
     expect(errors).toBeUndefined()
-    const fields = data.__type.fields as Array<{ name: string }>
-    // neo4j-graphql-js injects an `_id` field at runtime; ignore such additions.
-    const names = fields
-      .map((f) => f.name)
-      .filter((name) => !name.startsWith('_'))
-      .sort()
-    expect(names).toEqual([...allKeys()].sort())
+    const keys = (data.policy as Array<{ key: string }>).map((entry) => entry.key).sort()
+    expect(keys).toEqual([...allKeys()].sort())
   })
 })
 
@@ -345,6 +378,28 @@ describe('Mutation resolvers (unit)', () => {
     })
   })
 
+  describe('resetPolicies (bulk)', () => {
+    it('calls policy.resetMany once and serializes the returned events', async () => {
+      const resetMany = jest.fn().mockResolvedValue([
+        { key: 'categoriesActive', value: false, actor: 'admin-1', timestamp: 'ts' },
+        { key: 'apiKeysMaxPerUser', value: 5, actor: 'admin-1', timestamp: 'ts' },
+      ])
+
+      const result = await policyResolvers.Mutation.resetPolicies(
+        null,
+        { keys: ['categoriesActive', 'apiKeysMaxPerUser'] },
+        mutationContext({ resetMany }),
+      )
+
+      expect(resetMany).toHaveBeenCalledTimes(1)
+      expect(resetMany).toHaveBeenCalledWith(['categoriesActive', 'apiKeysMaxPerUser'], 'admin-1')
+      expect(result.map((r) => [r.key, r.value])).toEqual([
+        ['categoriesActive', 'false'],
+        ['apiKeysMaxPerUser', '5'],
+      ])
+    })
+  })
+
   // A gate-flag change flips permission availability network-wide, so it must also
   // signal the permission system (clients refetch myPermissions + the roles catalog).
   describe('permissions-gate broadcast', () => {
@@ -401,6 +456,40 @@ describe('Mutation resolvers (unit)', () => {
       expect(publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
         permissionsChanged: { roleName: null, previousRoleName: null },
       })
+    })
+
+    it('broadcasts permissionsChanged once when a bulk reset changes a gate flag', async () => {
+      const resetMany = jest.fn().mockResolvedValue([
+        { key: 'publicRegistration', value: false, actor: 'admin-1', timestamp: 't' },
+        { key: 'apiKeysEnabled', value: false, actor: 'admin-1', timestamp: 't' },
+      ])
+      const publish = jest.fn()
+      await policyResolvers.Mutation.resetPolicies(
+        null,
+        { keys: ['publicRegistration', 'apiKeysEnabled'] },
+        ctxWithPubsub({ resetMany }, publish),
+      )
+      const gateBroadcasts = publish.mock.calls.filter(
+        ([channel]) => channel === PERMISSIONS_CHANGED_CHANNEL,
+      )
+      expect(gateBroadcasts).toHaveLength(1)
+    })
+
+    it('does NOT broadcast permissionsChanged when no reset gate flag actually changed', async () => {
+      // apiKeysEnabled was requested but already at its default, so resetMany didn't return
+      // it — no permission availability changed, no signal.
+      const resetMany = jest
+        .fn()
+        .mockResolvedValue([
+          { key: 'publicRegistration', value: false, actor: 'admin-1', timestamp: 't' },
+        ])
+      const publish = jest.fn()
+      await policyResolvers.Mutation.resetPolicies(
+        null,
+        { keys: ['publicRegistration', 'apiKeysEnabled'] },
+        ctxWithPubsub({ resetMany }, publish),
+      )
+      expect(publish).not.toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, expect.anything())
     })
   })
 })

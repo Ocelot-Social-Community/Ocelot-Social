@@ -85,6 +85,45 @@
       "name": "Temat",
       "postCount": "Postime"
     },
+    "config": {
+      "blocks": "bllokon {policy}",
+      "category": {
+        "auth": "Autentikimi",
+        "database": "Baza e të dhënave",
+        "features": "Veçoritë",
+        "general": "Të përgjithshme",
+        "layout": "Struktura",
+        "mail": "Email / SMTP",
+        "maps": "Hartat",
+        "monitoring": "Monitorimi",
+        "redis": "Redis",
+        "registration": "Regjistrimi",
+        "server": "Serveri",
+        "storage": "Ruajtja / S3",
+        "video": "Videokonferencë"
+      },
+      "col": {
+        "effective": "Gjendja efektive",
+        "envKey": "Ndryshore mjedisi",
+        "envValue": "Vlera e mjedisit",
+        "override": "Mbivendosje e politikës",
+        "softwareDefault": "Parazgjedhja e softuerit"
+      },
+      "description": "Çdo ndryshore mjedisi që lexon ky vendosje dhe si zgjidhet. Ky është një pasqyrë diagnostikuese vetëm për lexim e mjedisit të vendosjes; vlerat aktive redaktohen te skeda Politika e rrjetit. Vlerat sekrete nuk shfaqen kurrë, vetëm nëse janë caktuar.",
+      "editPolicy": "Redakto politikën {policy}",
+      "name": "Mjedisi",
+      "noDefault": "pa parazgjedhje",
+      "notSet": "e pacaktuar",
+      "secretHidden": "e caktuar (vlera e fshehur)",
+      "setOverride": "mbivendos",
+      "state": {
+        "empty": "bosh",
+        "missing": "mungon",
+        "set": "e caktuar"
+      },
+      "tableCaption": "Ndryshoret e mjedisit me gjendjen e tyre efektive, mbivendosjen e politikës, vlerën e mjedisit dhe vlerën e parazgjedhur të softuerit.",
+      "title": "Konfigurimi i mjedisit"
+    },
     "dashboard": {
       "badgesDisplayed": "Emblema të shfaqura",
       "badgesRewarded": "Emblema të dhëna",
@@ -163,19 +202,11 @@
         "requireLocation": "E bën të detyrueshme një vendndodhje gjatë regjistrimit dhe në cilësimet e profilit.",
         "showContentFilterHeaderMenu": "Shfaq filtrin e përmbajtjes në menynë e kreut.",
         "showContentFilterMasonryGrid": "Shfaq filtrin e përmbajtjes në rrjetën masonry (lajme).",
-        "showGroupButtonInHeader": "Shfaq butonin e grupeve në krye."
+        "showGroupButtonInHeader": "Shfaq butonin e grupeve në krye.",
+        "videoConference": "Aktivizon videokonferencën (LiveKit). Çelësi në kohën e ekzekutimit për lejet e telefonatave me video. Kërkon variablat e mjedisit të LiveKit; pa to mbetet i fikur dhe i zbehur."
       },
-      "groups": {
-        "features": {
-          "title": "Veçoritë"
-        },
-        "layout": {
-          "title": "Struktura"
-        },
-        "registration": {
-          "title": "Regjistrimi"
-        }
-      },
+      "envLink": "Shiko mjedisin",
+      "envUnavailable": "Mjedisi i kërkuar nuk është konfiguruar — ky çelës nuk ka efekt derisa të konfigurohet.",
       "keys": {
         "apiKeysEnabled": "Çelësat API",
         "apiKeysMaxPerUser": "Maks. çelësa API për përdorues",
@@ -192,9 +223,11 @@
         "requireLocation": "Vendndodhja e detyrueshme",
         "showContentFilterHeaderMenu": "Filtri i përmbajtjes në krye",
         "showContentFilterMasonryGrid": "Filtri i përmbajtjes në rrjetë",
-        "showGroupButtonInHeader": "Butoni i grupeve në krye"
+        "showGroupButtonInHeader": "Butoni i grupeve në krye",
+        "videoConference": "Videokonferencë"
       },
       "lastUpdated": "Ndryshuar së fundi: {timestamp} nga {actor}",
+      "loadError": "Nuk mund të ngarkohet konfigurimi i politikës: {message}",
       "name": "Politika e rrjetit",
       "reset": "Rikthe te paracaktimi",
       "save": "Ruaj ndryshimet",
@@ -253,6 +286,7 @@
         "videoCall_create_public": "Nis një thirrje video në një grup publik."
       },
       "permUnavailable": "Funksioni nuk është konfiguruar — dhënia e kësaj të drejte nuk ka efekt.",
+      "permUnavailableLink": "Shiko konfigurimin",
       "protected": "i mbrojtur",
       "protectedHint": "Roli i pronarit ka të gjitha lejet dhe nuk mund të modifikohet.",
       "rename": "Riemërto rolin",

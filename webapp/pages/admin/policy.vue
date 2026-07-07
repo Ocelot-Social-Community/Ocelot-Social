@@ -15,27 +15,16 @@
          unsaved edits. The draft is kept (their work is never silently lost); the diverged
          rows are highlighted with the incoming server value. Load = discard mine, take the
          server's; Keep = keep editing (my save will overwrite). -->
-    <div v-if="hasConflict" class="policy-conflict" role="alert" data-test="policy-conflict">
-      <span class="policy-conflict__text">{{ $t('admin.policy.conflict.message') }}</span>
-      <span class="policy-conflict__actions">
-        <os-button
-          variant="primary"
-          appearance="filled"
-          data-test="policy-conflict-load"
-          @click="loadServerVersion"
-        >
-          {{ $t('admin.policy.conflict.load') }}
-        </os-button>
-        <os-button
-          variant="primary"
-          appearance="ghost"
-          data-test="policy-conflict-keep"
-          @click="dismissConflict"
-        >
-          {{ $t('admin.policy.conflict.keep') }}
-        </os-button>
-      </span>
-    </div>
+    <conflict-banner
+      v-if="hasConflict"
+      class="policy-conflict"
+      :message="$t('admin.policy.conflict.message')"
+      :load-label="$t('admin.policy.conflict.load')"
+      :keep-label="$t('admin.policy.conflict.keep')"
+      data-test="policy-conflict"
+      @load="loadServerVersion"
+      @keep="dismissConflict"
+    />
 
     <form @submit.prevent="save" novalidate>
       <fieldset
@@ -45,14 +34,19 @@
         :data-test="`policy-group-${group.id}`"
       >
         <legend class="policy-group__title">
-          {{ $t(`admin.policy.groups.${group.id}.title`) }}
+          {{ $t(`admin.config.category.${group.id}`) }}
         </legend>
 
         <div
           v-for="key in group.keys"
           :key="key"
+          :id="key"
           class="policy-row"
-          :class="{ 'policy-row--conflict': conflict[key] }"
+          :class="{
+            'policy-row--conflict': conflict[key],
+            'policy-row--unavailable': isUnavailable(key),
+            'policy-row--highlight': highlightedKey === key,
+          }"
         >
           <input
             v-if="isNumberKey(key)"
@@ -62,6 +56,7 @@
             step="1"
             class="policy-row__number"
             v-model.number="form[key]"
+            :disabled="isUnavailable(key)"
             :data-test="`policy-${key}`"
           />
           <input
@@ -70,6 +65,7 @@
             type="checkbox"
             class="policy-row__checkbox"
             v-model="form[key]"
+            :disabled="isUnavailable(key)"
             :data-test="`policy-${key}`"
           />
           <label :for="`policy-${key}`" class="policy-row__label">
@@ -85,6 +81,16 @@
             </span>
             <span class="policy-row__description">
               {{ $t(`admin.policy.descriptions.${key}`) }}
+            </span>
+            <span
+              v-if="isUnavailable(key)"
+              class="policy-row__env"
+              :data-test="`policy-env-${key}`"
+            >
+              {{ $t('admin.policy.envUnavailable') }}
+              <nuxt-link :to="`/admin/config#${key}`" class="policy-row__env-link">
+                {{ $t('admin.policy.envLink') }}
+              </nuxt-link>
             </span>
             <span
               v-if="conflict[key]"
@@ -112,7 +118,7 @@
           variant="primary"
           appearance="ghost"
           @click="resetAllToDefault"
-          :disabled="saving"
+          :disabled="!resetHasEffect || saving"
           data-test="policy-reset"
         >
           {{ $t('admin.policy.reset') }}
@@ -125,75 +131,37 @@
 <script>
 import { OsButton, OsCard } from '@ocelot-social/ui'
 import { mapActions, mapGetters } from 'vuex'
+import ConflictBanner from '~/components/ConflictBanner.vue'
+import deepLinkHighlight from '~/mixins/deepLinkHighlight'
+import { policyConfigQuery } from '~/graphql/admin/PolicyConfig'
 
 export default {
-  components: { OsButton, OsCard },
+  components: { ConflictBanner, OsButton, OsCard },
+  // Deep-link highlight (highlightedKey, applyHashHighlight, hash watcher, fade timer) is
+  // shared with the config tab. Rows are derived from policyConfig (async), so the highlight
+  // is re-applied from the policyConfig watcher below once the rows exist.
+  mixins: [deepLinkHighlight],
   middleware: ['isAdmin'],
+  apollo: {
+    // Per-key config layers + env availability. Drives the env-dependency UI: a key
+    // whose hard env requirements are unmet is greyed/disabled here and links to the
+    // config tab (where the missing env vars are listed).
+    policyConfig: {
+      query: policyConfigQuery,
+      fetchPolicy: 'cache-and-network',
+      // A failure of this metadata query must not silently blank the page: surface it, and
+      // groups() falls back to the snapshot keys so every value stays visible and editable
+      // (with widget type inferred from the value — see isNumberKey).
+      error(error) {
+        this.$toast.error(this.$t('admin.policy.loadError', { message: error.message }))
+      },
+    },
+  },
   data() {
     return {
-      // Policies grouped under headings; related settings share a group.
-      groups: [
-        {
-          id: 'registration',
-          keys: [
-            'publicRegistration',
-            'inviteRegistration',
-            'askForRealName',
-            'requireLocation',
-            'inviteLinkLimit',
-            'inviteCodesPersonalPerUser',
-            'inviteCodesGroupPerUser',
-          ],
-        },
-        {
-          id: 'features',
-          keys: [
-            'categoriesActive',
-            'badgesEnabled',
-            'apiKeysEnabled',
-            'apiKeysMaxPerUser',
-            'maxPinnedPosts',
-            'maxGroupPinnedPosts',
-          ],
-        },
-        {
-          id: 'layout',
-          keys: [
-            'showContentFilterHeaderMenu',
-            'showContentFilterMasonryGrid',
-            'showGroupButtonInHeader',
-          ],
-        },
-      ],
-      // Keys rendered as a number input instead of a checkbox (integer policies).
-      numberKeys: [
-        'inviteLinkLimit',
-        'inviteCodesPersonalPerUser',
-        'inviteCodesGroupPerUser',
-        'apiKeysMaxPerUser',
-        'maxPinnedPosts',
-        'maxGroupPinnedPosts',
-      ],
-      // Form scaffold — overwritten from the viewer-scoped snapshot on mount; the
-      // frontend holds no real defaults of its own (those come from the backend).
-      form: {
-        publicRegistration: false,
-        inviteRegistration: false,
-        askForRealName: false,
-        requireLocation: false,
-        inviteLinkLimit: 0,
-        inviteCodesPersonalPerUser: 0,
-        inviteCodesGroupPerUser: 0,
-        categoriesActive: false,
-        badgesEnabled: false,
-        apiKeysEnabled: false,
-        apiKeysMaxPerUser: 0,
-        maxPinnedPosts: 0,
-        maxGroupPinnedPosts: 0,
-        showContentFilterHeaderMenu: false,
-        showContentFilterMasonryGrid: false,
-        showGroupButtonInHeader: false,
-      },
+      // Editable form values, keyed by policy key. Populated from the viewer-scoped snapshot
+      // on mount (via $set — the key set is derived from the backend, not scaffolded here).
+      form: {},
       // Snapshot value each form field was last synced from. Lets a live snapshot change
       // tell an untouched field (follow it live) from a locally-edited one (guard it, and
       // flag a conflict if the server moved it too).
@@ -206,6 +174,8 @@ export default {
       // reconciles (and refetches the last-change info) for *subsequent* (e.g. remote)
       // changes — the initial snapshot population is handled by the explicit mount sync.
       loaded: false,
+      // Per-key config layers + availability from the backend (apollo above).
+      policyConfig: [],
     }
   },
   computed: {
@@ -214,16 +184,53 @@ export default {
       defaults: 'policy/defaults',
       lastChange: 'policy/lastChange',
     }),
-    // Flat list of all keys across groups — used by the form logic below.
+    // All policy keys present in the snapshot (the viewer-scoped values, available right
+    // after the mount fetch) — drives the form/dirty/save logic, which never waits on the
+    // policyConfig query. The rendered rows (groups) and highlight set come from policyConfig
+    // instead; the two are expected to align, but the highlight no longer depends on it.
     keys() {
-      return this.groups.flatMap((group) => group.keys)
+      return Object.keys(this.snapshot)
+    },
+    // Rows grouped by each key's backend category (policyConfig). policyConfig arrives in the
+    // backend's global category display order (categoryRank, from ENV_CATEGORIES), so a Map
+    // keyed by category preserves that order — no hand-maintained order/grouping list here. A
+    // new key shows up under its schema category automatically, in the backend-defined slot.
+    groups() {
+      // If the policyConfig metadata query has not loaded (or failed), fall back to a single
+      // group of the snapshot keys so a metadata hiccup never blanks the whole policy page —
+      // every value stays visible and editable (grouping is degraded, widget type is inferred
+      // from the value in isNumberKey). Proper grouping returns once policyConfig loads.
+      if (!this.policyConfig.length) {
+        return this.keys.length ? [{ id: 'general', keys: this.keys }] : []
+      }
+      const byCategory = new Map()
+      for (const entry of this.policyConfig) {
+        const list = byCategory.get(entry.category) ?? []
+        list.push(entry.key)
+        byCategory.set(entry.category, list)
+      }
+      return [...byCategory.entries()].map(([id, keys]) => ({ id, keys }))
     },
     isDirty() {
       return this.keys.some((k) => this.form[k] !== this.snapshot[k])
     },
+    // Whether "reset to default" would actually change anything: some key's effective value
+    // still diverges from its configured default. Mirrors the backend bulk reset (which only
+    // resets diverging keys), so the button disables once everything is already at default.
+    // If the defaults haven't loaded yet, allow it rather than guess.
+    resetHasEffect() {
+      if (!this.defaults || Object.keys(this.defaults).length === 0) return true
+      return this.keys.some(
+        (k) => this.defaults[k] !== undefined && this.snapshot[k] !== this.defaults[k],
+      )
+    },
     // Any field this admin edited that the server also moved underneath.
     hasConflict() {
       return this.keys.some((k) => this.conflict[k])
+    },
+    // Per-key config entry keyed for O(1) template lookup (availability, layers).
+    configByKey() {
+      return Object.fromEntries(this.policyConfig.map((entry) => [entry.key, entry]))
     },
   },
   methods: {
@@ -231,21 +238,43 @@ export default {
       fetchPolicy: 'policy/init',
       fetchDefaults: 'policy/fetchDefaults',
       setKey: 'policy/setKey',
-      resetKey: 'policy/resetKey',
+      resetKeys: 'policy/resetKeys',
     }),
     formatTimestamp(timestamp) {
       const date = new Date(timestamp)
       return Number.isNaN(date.getTime()) ? timestamp : date.toLocaleString()
     },
+    // Integer policies render as a number input (booleans as a checkbox). The type comes
+    // from the backend (policyConfig), so there is no separate number-key list to maintain.
+    // While that metadata is unavailable (not yet loaded or the query failed), infer the type
+    // from the snapshot value (already parsed to boolean/number) so the fallback group still
+    // renders the right input.
     isNumberKey(key) {
-      return this.numberKeys.includes(key)
+      const entry = this.configByKey[key]
+      if (entry) return entry.type === 'integer'
+      return typeof this.snapshot[key] === 'number'
+    },
+    // The hash keys this tab can highlight (deepLinkHighlight mixin): every RENDERED row,
+    // whose element id is the key itself. Derived from policyConfig (the same source the
+    // rows are rendered from) rather than the snapshot, so a deep link to any visible row
+    // highlights even if the snapshot query's field list drifts from the backend key set
+    // (as videoConference once did) — mirrors the config tab, which is single-sourced too.
+    highlightableKeys() {
+      return this.policyConfig.map((entry) => entry.key)
+    },
+    // A key is unavailable when its hard env requirements are unmet: the stored flag
+    // has no effect, so the input is disabled and a link to the config tab is shown.
+    isUnavailable(key) {
+      return this.configByKey[key]?.available === false
     },
     // Hard sync: adopt the whole server snapshot, reset the baseline to it, and clear all
     // conflicts. Used on mount, reset-to-default, and "load new version" (discard my edits).
     syncFormFromSnapshot() {
       const baseline = {}
       this.keys.forEach((k) => {
-        this.form[k] = this.snapshot[k]
+        // $set: the form starts empty and its keys come from the backend, so a plain
+        // assignment on a new key would not be reactive in Vue 2.
+        this.$set(this.form, k, this.snapshot[k])
         baseline[k] = this.snapshot[k]
       })
       this.baseline = baseline
@@ -330,9 +359,9 @@ export default {
     async resetAllToDefault() {
       this.saving = true
       try {
-        for (const key of this.keys) {
-          await this.resetKey({ key })
-        }
+        // One bulk mutation instead of N sequential resets — the backend resets only the
+        // keys that actually diverge and emits a single last-change / broadcast burst.
+        await this.resetKeys({ keys: this.keys })
         this.syncFormFromSnapshot()
         this.$toast.success(this.$t('admin.policy.saveSuccess'))
       } catch (err) {
@@ -360,6 +389,11 @@ export default {
         this.fetchDefaults().catch(() => undefined)
       },
       deep: true,
+    },
+    // Rows are derived from policyConfig (async) → (re)apply the deep-link highlight once
+    // they're populated, so a deep link that arrived before the rows still scrolls/highlights.
+    policyConfig() {
+      this.applyHashHighlight()
     },
   },
   async mounted() {
@@ -416,27 +450,9 @@ form {
     text-transform: uppercase;
   }
 }
-// Concurrent-edit conflict banner: a remote change landed under this admin's edit.
+// Outer spacing for the shared conflict banner (its appearance lives in ConflictBanner.vue).
 .policy-conflict {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: $space-x-small;
   margin-top: $space-small;
-  padding: $space-x-small $space-small;
-  border-radius: $border-radius-base;
-  border-left: 3px solid $color-warning;
-  background: rgba($color-warning, 0.14);
-  font-size: 0.9em;
-
-  &__text {
-    flex: 1 1 16rem;
-  }
-  &__actions {
-    display: inline-flex;
-    gap: $space-x-small;
-  }
 }
 .policy-row {
   display: flex;
@@ -446,6 +462,25 @@ form {
   line-height: 1.3;
   border-left: 3px solid transparent;
   padding-left: $space-xx-small;
+  // Keep the row clear of the sticky header when navigated to via #key from the config tab.
+  scroll-margin-top: $space-base;
+  // Animate the deep-link highlight fading back out (applyHashHighlight clears the key
+  // after a moment). Only when the user hasn't asked for reduced motion.
+  @media (prefers-reduced-motion: no-preference) {
+    transition:
+      background-color 0.6s ease,
+      border-left-color 0.6s ease;
+  }
+
+  // Navigated to from the config tab (/admin/policy#<key>) → highlight the target row so
+  // the admin sees which policy the config link pointed at. The class is driven from the
+  // route hash (see applyHashHighlight) because history-mode pushState navigations don't
+  // update :target; the :target rule stays as a fallback for a real full-page load/reload.
+  &--highlight,
+  &:target {
+    border-left-color: $color-secondary;
+    background: rgba($color-secondary, 0.1);
+  }
 
   // This field was edited locally AND changed on the server → highlight it.
   &--conflict {
@@ -487,6 +522,20 @@ form {
     color: $color-warning-active;
     font-size: 0.8em;
     font-weight: 600;
+  }
+  &__env {
+    color: $color-danger;
+    font-size: 0.85em;
+    line-height: 1.25;
+  }
+  &__env-link {
+    white-space: nowrap;
+  }
+
+  // Hard env requirement unmet: the stored flag has no effect, so dim the row and
+  // disable its input (the env note + config link explain why).
+  &--unavailable {
+    opacity: 0.6;
   }
 }
 .actions {

@@ -1,0 +1,31 @@
+# ConfigKeyState (set | empty | missing) is defined in PolicyConfig.gql and reused here.
+
+type SystemConfigEntry {
+  "The environment variable name (e.g. NEO4J_URI, LIVEKIT_API_SECRET)."
+  envKey: String!
+  "Display grouping. Enum derived from the shared category vocabulary (config/categories)."
+  category: EnvCategory!
+  "Whether the value is sensitive — reported by presence only, its value is never returned."
+  secret: Boolean!
+  "Presence of the env var."
+  state: ConfigKeyState!
+  "Effective (in-operation) value as a display string (JSON-encoded for policy values, raw otherwise); null ⇒ show presence badge."
+  effective: String
+  "Admin override value when it diverges from the configured default (policy rows only), else null."
+  override: String
+  "Value the env var itself provides when set (JSON-encoded for seed vars, raw otherwise); null for secrets/unset/hard-requirement rows."
+  envValue: String
+  "The software default the value falls back to, or null (none / secret)."
+  softwareDefault: String
+  "Whether an admin can override this via a policy (deep-link target)."
+  overridable: Boolean!
+  "The policy key to deep-link to on the policy tab (set for policy rows), else null."
+  policyKey: String
+  "An unmet hard env requirement that breaks its feature regardless of the policy flag."
+  blocking: Boolean!
+}
+
+type Query {
+  "Every environment variable the deployment recognises, with its effective/override/env-value/software-default layers and presence state (policy.manage). Secret values are never returned — only presence state."
+  systemConfig: [SystemConfigEntry!]!
+}

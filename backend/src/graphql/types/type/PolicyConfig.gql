@@ -1,0 +1,40 @@
+enum ConfigKeyState {
+  set
+  empty
+  missing
+}
+
+type EnvKeyStatus {
+  "The environment variable name (e.g. LIVEKIT_API_SECRET)."
+  name: String!
+  "Presence state — the only thing reported; a value is never returned."
+  state: ConfigKeyState!
+}
+
+type PolicyConfigEntry {
+  "The policy key (e.g. videoConference, apiKeysEnabled)."
+  key: String!
+  "Value type: boolean | integer."
+  type: String!
+  "Admin display group the key belongs to (e.g. registration, features, layout, video)."
+  category: String!
+  "Effective value (env-folded), JSON-encoded. This is what the permission gates read."
+  effective: String!
+  "The software default baked into the schema, JSON-encoded."
+  softwareDefault: String!
+  "The configured default = env seed if set, else the software default, JSON-encoded."
+  configuredDefault: String!
+  "Name of the env var that SEEDS the default (soft), or null."
+  envSeed: String
+  "Presence of the envSeed var, or null when the key has no envSeed."
+  envSeedState: ConfigKeyState
+  "Hard env requirements with their presence state (empty when the key needs no env)."
+  requiresEnv: [EnvKeyStatus!]!
+  "Whether all hard env requirements are met (always true when there are none)."
+  available: Boolean!
+}
+
+type Query {
+  "Per-policy configuration with its software/env-seed/effective value layers and hard env requirements (policy.manage). Secret values are never returned — only env presence state."
+  policyConfig: [PolicyConfigEntry!]!
+}

@@ -85,6 +85,45 @@
       "name": "Categorieën",
       "postCount": "Berichten"
     },
+    "config": {
+      "blocks": "blokkeert {policy}",
+      "category": {
+        "auth": "Authenticatie",
+        "database": "Database",
+        "features": "Functies",
+        "general": "Algemeen",
+        "layout": "Lay-out",
+        "mail": "E-mail / SMTP",
+        "maps": "Kaarten",
+        "monitoring": "Monitoring",
+        "redis": "Redis",
+        "registration": "Registratie",
+        "server": "Server",
+        "storage": "Opslag / S3",
+        "video": "Videoconferentie"
+      },
+      "col": {
+        "effective": "Effectieve status",
+        "envKey": "Omgevingsvariabele",
+        "envValue": "Omgevingswaarde",
+        "override": "Beleidsoverschrijving",
+        "softwareDefault": "Softwarestandaard"
+      },
+      "description": "Elke omgevingsvariabele die deze deployment leest, en hoe deze wordt bepaald. Dit is een alleen-lezen diagnostische weergave van de deployment-omgeving; actieve waarden worden bewerkt op het tabblad Netwerkbeleid. Geheime waarden worden nooit getoond, alleen of ze zijn ingesteld.",
+      "editPolicy": "Beleid {policy} bewerken",
+      "name": "Omgeving",
+      "noDefault": "geen standaard",
+      "notSet": "niet ingesteld",
+      "secretHidden": "ingesteld (waarde verborgen)",
+      "setOverride": "overschrijven",
+      "state": {
+        "empty": "leeg",
+        "missing": "ontbreekt",
+        "set": "ingesteld"
+      },
+      "tableCaption": "Omgevingsvariabelen met hun effectieve status, beleidsoverschrijving, omgevingswaarde en softwarestandaard.",
+      "title": "Omgevingsconfiguratie"
+    },
     "dashboard": {
       "badgesDisplayed": "Weergegeven badges",
       "badgesRewarded": "Toegekende badges",
@@ -163,19 +202,11 @@
         "requireLocation": "Maakt een locatie verplicht tijdens de registratie en in de profielinstellingen.",
         "showContentFilterHeaderMenu": "Toont het inhoudsfilter in het koptekstmenu.",
         "showContentFilterMasonryGrid": "Toont het inhoudsfilter in het masonry-raster (nieuwsoverzicht).",
-        "showGroupButtonInHeader": "Toont de groepenknop in de koptekst."
+        "showGroupButtonInHeader": "Toont de groepenknop in de koptekst.",
+        "videoConference": "Schakelt videovergaderen in (LiveKit). De runtime-schakelaar voor de video-oproeprechten. Vereist de LiveKit-omgevingsvariabelen; zonder deze blijft het uitgeschakeld en grijs."
       },
-      "groups": {
-        "features": {
-          "title": "Functies"
-        },
-        "layout": {
-          "title": "Lay-out"
-        },
-        "registration": {
-          "title": "Registratie"
-        }
-      },
+      "envLink": "Omgeving bekijken",
+      "envUnavailable": "De vereiste omgeving is niet geconfigureerd — deze schakelaar heeft geen effect totdat dat wel zo is.",
       "keys": {
         "apiKeysEnabled": "API-sleutels",
         "apiKeysMaxPerUser": "Max. API-sleutels per gebruiker",
@@ -192,9 +223,11 @@
         "requireLocation": "Locatie verplicht",
         "showContentFilterHeaderMenu": "Inhoudsfilter in koptekst",
         "showContentFilterMasonryGrid": "Inhoudsfilter in raster",
-        "showGroupButtonInHeader": "Groepenknop in koptekst"
+        "showGroupButtonInHeader": "Groepenknop in koptekst",
+        "videoConference": "Videovergaderen"
       },
       "lastUpdated": "Laatst gewijzigd: {timestamp} door {actor}",
+      "loadError": "Beleidsconfiguratie kon niet worden geladen: {message}",
       "name": "Netwerkbeleid",
       "reset": "Standaardwaarde herstellen",
       "save": "Wijzigingen opslaan",
@@ -253,6 +286,7 @@
         "videoCall_create_public": "Een videogesprek starten in een openbare groep."
       },
       "permUnavailable": "Functie niet geconfigureerd — dit recht heeft geen effect.",
+      "permUnavailableLink": "Configuratie bekijken",
       "protected": "beschermd",
       "protectedHint": "De eigenaarsrol heeft alle rechten en kan niet worden bewerkt.",
       "rename": "Rol hernoemen",
