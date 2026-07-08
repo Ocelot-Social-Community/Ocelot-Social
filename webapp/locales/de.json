@@ -209,6 +209,7 @@
       },
       "envLink": "Zur Umgebung",
       "envUnavailable": "Erforderliche Umgebung nicht konfiguriert – dieser Schalter hat keine Wirkung, bis sie gesetzt ist.",
+      "policyUnavailable": "Diese Option ist wirkungslos, bis die Funktion aktiviert wird, von der sie abhängt:",
       "keys": {
         "apiKeysEnabled": "API-Schlüssel",
         "apiKeysMaxPerUser": "Max. API-Schlüssel pro Nutzer",

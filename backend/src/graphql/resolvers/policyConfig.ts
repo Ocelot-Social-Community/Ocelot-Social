@@ -1,5 +1,12 @@
 import { categoryRank } from '@src/config/categories'
-import { allKeys, categoryFor, envSeedFor, policyValueLayers, typeFor } from '@src/policy'
+import {
+  allKeys,
+  categoryFor,
+  envSeedFor,
+  policyValueLayers,
+  requiresPolicyFor,
+  typeFor,
+} from '@src/policy'
 
 import type { Context } from '@src/context'
 
@@ -21,6 +28,11 @@ export default {
       return allKeys()
         .map((key) => {
           const envSeed = envSeedFor(key) ?? null
+          // policy→policy dependencies with their current effective (satisfied) state.
+          const requiresPolicy = requiresPolicyFor(key).map((dependency) => ({
+            key: dependency,
+            satisfied: policy.getEffective(dependency) === true,
+          }))
           return {
             key,
             type: typeFor(key),
@@ -29,7 +41,11 @@ export default {
             envSeed,
             envSeedState: envSeed ? policy.envState(envSeed) : null,
             requiresEnv: policy.requiresEnvStatus(key),
-            available: policy.isAvailable(key),
+            requiresPolicy,
+            // A key can take effect only when its hard env requirements AND its policy
+            // dependencies are all met — so the admin tab greys the group header toggle
+            // while the groups feature is off, mirroring the env-unavailable behaviour.
+            available: policy.isAvailable(key) && requiresPolicy.every((d) => d.satisfied),
           }
         })
         .sort((a, b) => categoryRank(a.category) - categoryRank(b.category))

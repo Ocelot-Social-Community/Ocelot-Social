@@ -209,6 +209,7 @@
       },
       "envLink": "Zobacz środowisko",
       "envUnavailable": "Wymagane środowisko nie jest skonfigurowane — ten przełącznik nie działa, dopóki nie zostanie.",
+      "policyUnavailable": "Ta opcja nie działa, dopóki nie zostanie włączona funkcja, od której zależy:",
       "keys": {
         "apiKeysEnabled": "Klucze API",
         "apiKeysMaxPerUser": "Maks. kluczy API na użytkownika",

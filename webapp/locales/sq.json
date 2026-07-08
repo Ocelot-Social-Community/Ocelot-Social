@@ -209,6 +209,7 @@
       },
       "envLink": "Shiko mjedisin",
       "envUnavailable": "Mjedisi i kërkuar nuk është konfiguruar — ky çelës nuk ka efekt derisa të konfigurohet.",
+      "policyUnavailable": "Ky ndryshim nuk ka efekt derisa të aktivizohet funksioni nga i cili varet:",
       "keys": {
         "apiKeysEnabled": "Çelësat API",
         "apiKeysMaxPerUser": "Maks. çelësa API për përdorues",

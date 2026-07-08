@@ -209,6 +209,7 @@
       },
       "envLink": "View environment",
       "envUnavailable": "Required environment is not configured — this toggle has no effect until it is.",
+      "policyUnavailable": "This toggle has no effect until the feature it depends on is enabled:",
       "keys": {
         "apiKeysEnabled": "API keys",
         "apiKeysMaxPerUser": "Max. API keys per user",

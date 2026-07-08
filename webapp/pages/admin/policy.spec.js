@@ -585,6 +585,22 @@ describe('admin/policy.vue', () => {
       envSeed: null,
       envSeedState: null,
       requiresEnv: [{ name: 'LIVEKIT_URL', state: 'missing' }],
+      requiresPolicy: [],
+      available: false,
+    }
+    // A key made unavailable by a policy→policy dependency (showGroupButtonInHeader ←
+    // groupsEnabled), not by env — should link to the depended-on policy, not the config tab.
+    const POLICY_GATED_ENTRY = {
+      key: 'showGroupButtonInHeader',
+      type: 'boolean',
+      category: 'layout',
+      effective: 'false',
+      softwareDefault: 'true',
+      configuredDefault: 'true',
+      envSeed: 'SHOW_GROUP_BUTTON_IN_HEADER',
+      envSeedState: 'set',
+      requiresEnv: [],
+      requiresPolicy: [{ key: 'groupsEnabled', satisfied: false }],
       available: false,
     }
     const mountWithConfig = (policyConfig) => {
@@ -602,6 +618,20 @@ describe('admin/policy.vue', () => {
       expect(w.find('.policy-row__env-link').attributes('href')).toBe(
         '/admin/config#videoConference',
       )
+    })
+
+    it('greys out a policy-gated key and links to the depended-on policy (not the config tab)', async () => {
+      const w = mountWithConfig([POLICY_GATED_ENTRY])
+      await w.vm.$nextTick()
+      expect(w.vm.isUnavailable('showGroupButtonInHeader')).toBe(true)
+      expect(w.vm.unmetPolicyDeps('showGroupButtonInHeader')).toEqual([
+        { key: 'groupsEnabled', satisfied: false },
+      ])
+      expect(
+        w.find('[data-test="policy-showGroupButtonInHeader"]').attributes('disabled'),
+      ).toBeTruthy()
+      // Links to the groups policy row on the same tab, not /admin/config.
+      expect(w.find('.policy-row__env-link').attributes('href')).toBe('/admin/policy#groupsEnabled')
     })
 
     it('treats keys without a config entry as available', () => {

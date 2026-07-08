@@ -209,6 +209,7 @@
       },
       "envLink": "Omgeving bekijken",
       "envUnavailable": "De vereiste omgeving is niet geconfigureerd — deze schakelaar heeft geen effect totdat dat wel zo is.",
+      "policyUnavailable": "Deze schakelaar heeft geen effect totdat de functie waarvan hij afhangt is ingeschakeld:",
       "keys": {
         "apiKeysEnabled": "API-sleutels",
         "apiKeysMaxPerUser": "Max. API-sleutels per gebruiker",

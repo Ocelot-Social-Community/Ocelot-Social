@@ -87,10 +87,21 @@
               class="policy-row__env"
               :data-test="`policy-env-${key}`"
             >
-              {{ $t('admin.policy.envUnavailable') }}
-              <nuxt-link :to="`/admin/config#${key}`" class="policy-row__env-link">
-                {{ $t('admin.policy.envLink') }}
-              </nuxt-link>
+              <template v-if="unmetPolicyDeps(key).length">
+                {{ $t('admin.policy.policyUnavailable') }}
+                <nuxt-link
+                  :to="`/admin/policy#${unmetPolicyDeps(key)[0].key}`"
+                  class="policy-row__env-link"
+                >
+                  {{ $t(`admin.policy.keys.${unmetPolicyDeps(key)[0].key}`) }}
+                </nuxt-link>
+              </template>
+              <template v-else>
+                {{ $t('admin.policy.envUnavailable') }}
+                <nuxt-link :to="`/admin/config#${key}`" class="policy-row__env-link">
+                  {{ $t('admin.policy.envLink') }}
+                </nuxt-link>
+              </template>
             </span>
             <span
               v-if="conflict[key]"
@@ -262,10 +273,17 @@ export default {
     highlightableKeys() {
       return this.policyConfig.map((entry) => entry.key)
     },
-    // A key is unavailable when its hard env requirements are unmet: the stored flag
-    // has no effect, so the input is disabled and a link to the config tab is shown.
+    // A key is unavailable when a hard requirement is unmet (env presence OR a policy→policy
+    // dependency being off): the stored flag has no effect, so the input is disabled and a
+    // link to the blocker is shown.
     isUnavailable(key) {
       return this.configByKey[key]?.available === false
+    },
+    // Policy dependencies of a key that are currently off — these make it unavailable and,
+    // unlike an unmet env requirement, link to the depended-on policy row (same tab), not the
+    // env config tab. Empty for a key blocked only by env (or not blocked at all).
+    unmetPolicyDeps(key) {
+      return (this.configByKey[key]?.requiresPolicy ?? []).filter((dep) => !dep.satisfied)
     },
     // Hard sync: adopt the whole server snapshot, reset the baseline to it, and clear all
     // conflicts. Used on mount, reset-to-default, and "load new version" (discard my edits).

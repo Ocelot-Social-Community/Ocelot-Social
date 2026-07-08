@@ -11,6 +11,13 @@ type EnvKeyStatus {
   state: ConfigKeyState!
 }
 
+type PolicyDependencyStatus {
+  "A policy key this one depends on (policy→policy gate), e.g. groupsEnabled."
+  key: String!
+  "Whether that dependency is currently effectively on. An unsatisfied dependency makes the dependent key unavailable (its stored value has no effect)."
+  satisfied: Boolean!
+}
+
 type PolicyConfigEntry {
   "The policy key (e.g. videoConference, apiKeysEnabled)."
   key: String!
@@ -30,7 +37,9 @@ type PolicyConfigEntry {
   envSeedState: ConfigKeyState
   "Hard env requirements with their presence state (empty when the key needs no env)."
   requiresEnv: [EnvKeyStatus!]!
-  "Whether all hard env requirements are met (always true when there are none)."
+  "Policy keys this one depends on (policy→policy gate) with their satisfied state (empty when the key depends on no other policy)."
+  requiresPolicy: [PolicyDependencyStatus!]!
+  "Whether all hard requirements are met — both env presence AND policy dependencies (always true when there are none). A false value greys/disables the key in the admin policy tab."
   available: Boolean!
 }
 

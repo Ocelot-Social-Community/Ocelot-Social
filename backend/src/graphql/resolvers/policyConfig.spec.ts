@@ -113,4 +113,27 @@ describe('policyConfig resolver', () => {
     expect(row.envSeed).toBeNull()
     expect(row.envSeedState).toBeNull()
   })
+
+  describe('showGroupButtonInHeader (policy-gated by groupsEnabled)', () => {
+    it('reports its policy dependency and stays available while groups are on', () => {
+      const row = rowFor('showGroupButtonInHeader', { groupsEnabled: true })
+      expect(row.requiresPolicy).toEqual([{ key: 'groupsEnabled', satisfied: true }])
+      expect(row.available).toBe(true)
+      // Env-only keys carry an empty policy-dependency list.
+      expect(rowFor('badgesEnabled').requiresPolicy).toEqual([])
+    })
+
+    it('is unavailable (its stored toggle inert) while the groups feature is off', () => {
+      const row = rowFor('showGroupButtonInHeader', {
+        groupsEnabled: false,
+        showGroupButtonInHeader: true,
+      })
+      expect(row.requiresPolicy).toEqual([{ key: 'groupsEnabled', satisfied: false }])
+      // available folds the policy dependency (not just env) — this is what greys the toggle.
+      expect(row.available).toBe(false)
+      // The raw stored value is still exposed on the value layers (admin edits raw); only
+      // the effective value folds off.
+      expect(JSON.parse(row.effective)).toBe(false)
+    })
+  })
 })

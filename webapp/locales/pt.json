@@ -209,6 +209,7 @@
       },
       "envLink": "Ver ambiente",
       "envUnavailable": "O ambiente necessário não está configurado — esta opção não tem efeito até que esteja.",
+      "policyUnavailable": "Esta opção não tem efeito até que a funcionalidade da qual depende seja ativada:",
       "keys": {
         "apiKeysEnabled": "Chaves de API",
         "apiKeysMaxPerUser": "Máx. de chaves de API por utilizador",

@@ -209,6 +209,7 @@
       },
       "envLink": "Ver entorno",
       "envUnavailable": "El entorno requerido no está configurado; este ajuste no tiene efecto hasta que lo esté.",
+      "policyUnavailable": "Esta opción no tiene efecto hasta que se active la función de la que depende:",
       "keys": {
         "apiKeysEnabled": "Claves API",
         "apiKeysMaxPerUser": "Máx. claves API por usuario",

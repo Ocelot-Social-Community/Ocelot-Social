@@ -209,6 +209,7 @@
       },
       "envLink": "Voir l’environnement",
       "envUnavailable": "L’environnement requis n’est pas configuré — ce réglage n’a aucun effet tant qu’il ne l’est pas.",
+      "policyUnavailable": "Cette option est sans effet tant que la fonctionnalité dont elle dépend n'est pas activée :",
       "keys": {
         "apiKeysEnabled": "Clés API",
         "apiKeysMaxPerUser": "Max. de clés API par utilisateur",
