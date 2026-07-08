@@ -50,6 +50,7 @@ export type PermissionGate =
   | 'videoConference'
   | 'apiKeysEnabled'
   | 'badgesEnabled'
+  | 'socialMediaEnabled'
   | 'inviteRegistration'
 
 export interface PermissionCatalogEntry {

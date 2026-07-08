@@ -22,8 +22,11 @@ let server: ApolloTestSetup['server']
 // definitions instead of the defaults — used to test the socialMedia.create gate by
 // giving the viewer a role that lacks it.
 let rolesOverride: RoleDefinition[] | undefined
+// Per-test network-policy override: unset keys fall back to their schema defaults, so
+// socialMediaEnabled is `true` (feature on) unless a test flips it off to check the gate.
+let policyOverride: Record<string, unknown> | undefined
 
-const context = () => ({ authenticatedUser, roles: rolesOverride })
+const context = () => ({ authenticatedUser, roles: rolesOverride, policy: policyOverride })
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -59,6 +62,7 @@ describe('SocialMedia', () => {
 
   beforeEach(async () => {
     rolesOverride = undefined
+    policyOverride = undefined
     const someUserNode = await Factory.build(
       'user',
       {
@@ -139,6 +143,12 @@ describe('SocialMedia', () => {
         expect(result.errors![0].message).toEqual(
           expect.stringContaining('"url" must be a valid uri'),
         )
+      })
+
+      it('denies creating social media when the socialMediaEnabled policy is off', async () => {
+        policyOverride = { socialMediaEnabled: false }
+        const result = await socialMediaAction(user, CreateSocialMedia, variables)
+        expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
       })
 
       it('denies creating social media for a role without socialMedia.create', async () => {
@@ -223,6 +233,13 @@ describe('SocialMedia', () => {
 
         expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
       })
+
+      it('denies updating when the socialMediaEnabled policy is off', async () => {
+        policyOverride = { socialMediaEnabled: false }
+        const result = await socialMediaAction(user, UpdateSocialMedia, variables)
+
+        expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
+      })
     })
   })
 
@@ -273,6 +290,48 @@ describe('SocialMedia', () => {
           expect.objectContaining(expected),
         )
       })
+
+      it('denies deleting when the socialMediaEnabled policy is off', async () => {
+        policyOverride = { socialMediaEnabled: false }
+        const result = await socialMediaAction(user, DeleteSocialMedia, variables)
+
+        expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
+      })
+    })
+  })
+
+  // The socialMedia field is public (anonymous profile viewers reach it), so the
+  // gate is enforced server-side in the User.socialMedia resolver — not just hidden
+  // in the webapp. When the feature is off, no links are exposed at all.
+  describe('reading a user’s socialMedia (server-side field gate)', () => {
+    const readSocialMedia = `
+      query ($id: ID!) {
+        User(id: $id) {
+          id
+          socialMedia {
+            id
+            url
+          }
+        }
+      }
+    `
+
+    beforeEach(async () => {
+      await setUpSocialMedia()
+      authenticatedUser = owner
+    })
+
+    it('exposes the links while the socialMediaEnabled policy is on', async () => {
+      const result = await query({ query: readSocialMedia, variables: { id: owner.id } })
+
+      expect(result.data!.User[0].socialMedia).toEqual([{ id: expect.any(String), url }])
+    })
+
+    it('exposes no links while the socialMediaEnabled policy is off', async () => {
+      policyOverride = { socialMediaEnabled: false }
+      const result = await query({ query: readSocialMedia, variables: { id: owner.id } })
+
+      expect(result.data!.User[0].socialMedia).toEqual([])
     })
   })
 })

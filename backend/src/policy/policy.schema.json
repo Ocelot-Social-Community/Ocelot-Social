@@ -81,6 +81,14 @@
       "category": "features",
       "description": "Whether the badges feature is enabled (badges shown on profiles / teasers and managed in admin). Shown on publicly visible profiles, so visible to 'public'."
     },
+    "socialMediaEnabled": {
+      "type": "boolean",
+      "default": true,
+      "visibility": ["public"],
+      "envSeed": "SOCIAL_MEDIA_ENABLED",
+      "category": "features",
+      "description": "Whether the social-media links feature is enabled (links shown on profiles and managed in settings; gate for the socialMedia.create permission and for editing/deleting links). Shown on publicly visible profiles, so visible to 'public'."
+    },
     "showContentFilterHeaderMenu": {
       "type": "boolean",
       "default": true,

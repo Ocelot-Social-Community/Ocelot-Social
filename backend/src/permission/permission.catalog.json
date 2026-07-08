@@ -63,6 +63,7 @@
     },
     "socialMedia.create": {
       "group": "content",
+      "gatedBy": "socialMediaEnabled",
       "description": "Add social-media links to one's own profile."
     },
     "group.create_public": {

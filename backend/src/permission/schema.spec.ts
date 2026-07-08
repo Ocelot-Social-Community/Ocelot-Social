@@ -87,6 +87,7 @@ describe('permission catalog', () => {
       // badge.manage, then user.invite, then the video-call rights, then apiKey.create.
       expect(allPermissionGates()).toEqual([
         'badgesEnabled',
+        'socialMediaEnabled',
         'inviteRegistration',
         'videoConference',
         'apiKeysEnabled',
