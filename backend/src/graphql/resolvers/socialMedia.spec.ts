@@ -12,6 +12,7 @@ import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import type { NetworkPolicy } from '@src/policy'
 import type { RoleDefinition } from '@src/role'
 
 let authenticatedUser: Context['user']
@@ -22,9 +23,13 @@ let server: ApolloTestSetup['server']
 // definitions instead of the defaults — used to test the socialMedia.create gate by
 // giving the viewer a role that lacks it.
 let rolesOverride: RoleDefinition[] | undefined
-// Per-test network-policy override: unset keys fall back to their schema defaults, so
-// socialMediaEnabled is `true` (feature on) unless a test flips it off to check the gate.
-let policyOverride: Record<string, unknown> | undefined
+// Per-test network-policy override — these are policy VALUES, not a policy service.
+// createApolloTestSetup feeds them to createInMemoryPolicyService (see test/helpers.ts), so
+// the resolver/shield receive a REAL PolicyService on context.policy whose getEffective()
+// returns these values — the same getEffective the production paths call. Unset keys fall
+// back to their schema defaults, so socialMediaEnabled is `true` (feature on) unless a test
+// flips it off to check the gate.
+let policyOverride: Partial<NetworkPolicy> | undefined
 
 const context = () => ({ authenticatedUser, roles: rolesOverride, policy: policyOverride })
 
