@@ -203,6 +203,7 @@
         "showContentFilterHeaderMenu": "Toont het inhoudsfilter in het koptekstmenu.",
         "showContentFilterMasonryGrid": "Toont het inhoudsfilter in het masonry-raster (nieuwsoverzicht).",
         "showGroupButtonInHeader": "Toont de groepenknop in de koptekst.",
+        "socialMediaEnabled": "Schakelt de functie voor social-mediakoppelingen in: koppelingen worden op profielen getoond en beheerd in de gebruikersinstellingen.",
         "videoConference": "Schakelt videovergaderen in (LiveKit). De runtime-schakelaar voor de video-oproeprechten. Vereist de LiveKit-omgevingsvariabelen; zonder deze blijft het uitgeschakeld en grijs."
       },
       "envLink": "Omgeving bekijken",
@@ -224,6 +225,7 @@
         "showContentFilterHeaderMenu": "Inhoudsfilter in koptekst",
         "showContentFilterMasonryGrid": "Inhoudsfilter in raster",
         "showGroupButtonInHeader": "Groepenknop in koptekst",
+        "socialMediaEnabled": "Sociale media",
         "videoConference": "Videovergaderen"
       },
       "lastUpdated": "Laatst gewijzigd: {timestamp} door {actor}",

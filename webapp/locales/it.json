@@ -203,6 +203,7 @@
         "showContentFilterHeaderMenu": "Mostra il filtro dei contenuti nel menu di intestazione.",
         "showContentFilterMasonryGrid": "Mostra il filtro dei contenuti nella griglia masonry (feed).",
         "showGroupButtonInHeader": "Mostra il pulsante dei gruppi nell'intestazione.",
+        "socialMediaEnabled": "Abilita la funzione dei link ai social media: i link sono mostrati sui profili e gestiti nelle impostazioni utente.",
         "videoConference": "Abilita la videoconferenza (LiveKit). L’interruttore runtime per i permessi delle videochiamate. Richiede le variabili d’ambiente di LiveKit; senza di esse resta disattivata e in grigio."
       },
       "envLink": "Visualizza ambiente",
@@ -224,6 +225,7 @@
         "showContentFilterHeaderMenu": "Filtro contenuti nell'intestazione",
         "showContentFilterMasonryGrid": "Filtro contenuti nella griglia",
         "showGroupButtonInHeader": "Pulsante gruppi nell'intestazione",
+        "socialMediaEnabled": "Social media",
         "videoConference": "Videoconferenza"
       },
       "lastUpdated": "Ultima modifica: {timestamp} da {actor}",

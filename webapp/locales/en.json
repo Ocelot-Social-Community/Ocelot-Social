@@ -203,6 +203,7 @@
         "showContentFilterHeaderMenu": "Show the content filter in the header menu.",
         "showContentFilterMasonryGrid": "Show the content filter in the masonry grid (newsfeed).",
         "showGroupButtonInHeader": "Show the groups button in the header.",
+        "socialMediaEnabled": "Enable the social-media links feature: links are shown on profiles and managed in user settings.",
         "videoConference": "Enable video conferencing (LiveKit). The runtime switch for the video-call permissions. Requires the LiveKit environment variables; without them it stays off and greyed out."
       },
       "envLink": "View environment",
@@ -224,6 +225,7 @@
         "showContentFilterHeaderMenu": "Content filter in header",
         "showContentFilterMasonryGrid": "Content filter in grid",
         "showGroupButtonInHeader": "Groups button in header",
+        "socialMediaEnabled": "Social media",
         "videoConference": "Video conferencing"
       },
       "lastUpdated": "Last changed: {timestamp} by {actor}",
