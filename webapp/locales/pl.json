@@ -203,6 +203,7 @@
         "showContentFilterHeaderMenu": "Pokazuje filtr treści w menu nagłówka.",
         "showContentFilterMasonryGrid": "Pokazuje filtr treści w siatce masonry (aktualności).",
         "showGroupButtonInHeader": "Pokazuje przycisk grup w nagłówku.",
+        "socialMediaEnabled": "Włącza funkcję linków do mediów społecznościowych: linki są wyświetlane w profilach i zarządzane w ustawieniach użytkownika.",
         "videoConference": "Włącza wideokonferencje (LiveKit). Przełącznik czasu wykonania dla uprawnień połączeń wideo. Wymaga zmiennych środowiskowych LiveKit; bez nich pozostaje wyłączone i wyszarzone."
       },
       "envLink": "Zobacz środowisko",
@@ -224,6 +225,7 @@
         "showContentFilterHeaderMenu": "Filtr treści w nagłówku",
         "showContentFilterMasonryGrid": "Filtr treści w siatce",
         "showGroupButtonInHeader": "Przycisk grup w nagłówku",
+        "socialMediaEnabled": "Media społecznościowe",
         "videoConference": "Wideokonferencje"
       },
       "lastUpdated": "Ostatnia zmiana: {timestamp} przez {actor}",

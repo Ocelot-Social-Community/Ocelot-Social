@@ -203,6 +203,7 @@
         "showContentFilterHeaderMenu": "Shfaq filtrin e përmbajtjes në menynë e kreut.",
         "showContentFilterMasonryGrid": "Shfaq filtrin e përmbajtjes në rrjetën masonry (lajme).",
         "showGroupButtonInHeader": "Shfaq butonin e grupeve në krye.",
+        "socialMediaEnabled": "Aktivizon funksionin e lidhjeve të mediave sociale: lidhjet shfaqen në profile dhe menaxhohen te cilësimet e përdoruesit.",
         "videoConference": "Aktivizon videokonferencën (LiveKit). Çelësi në kohën e ekzekutimit për lejet e telefonatave me video. Kërkon variablat e mjedisit të LiveKit; pa to mbetet i fikur dhe i zbehur."
       },
       "envLink": "Shiko mjedisin",
@@ -224,6 +225,7 @@
         "showContentFilterHeaderMenu": "Filtri i përmbajtjes në krye",
         "showContentFilterMasonryGrid": "Filtri i përmbajtjes në rrjetë",
         "showGroupButtonInHeader": "Butoni i grupeve në krye",
+        "socialMediaEnabled": "Media sociale",
         "videoConference": "Videokonferencë"
       },
       "lastUpdated": "Ndryshuar së fundi: {timestamp} nga {actor}",

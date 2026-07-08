@@ -14,6 +14,8 @@ describe('SocialMedia.vue', () => {
 
     mocks = {
       $t: jest.fn(),
+      // Feature on by default; individual scenarios flip it off to check the gate.
+      $policy: { get: jest.fn(() => true) },
     }
   })
 
@@ -162,6 +164,28 @@ describe('SocialMedia.vue', () => {
       it('keeps the leading www. in the username path segment', () => {
         const link = wrapper.findAll('a').at(0)
         expect(link.text()).toContain('www.example')
+      })
+    })
+
+    describe('when the socialMediaEnabled policy is off', () => {
+      beforeEach(() => {
+        mocks.$policy.get = jest.fn(() => false)
+        propsData.userName = 'Jenny Rostock'
+        propsData.user = {
+          socialMedia: [
+            {
+              id: 'ee1e8ed6-fbef-4bcf-b411-a12926f2ea1e',
+              url: 'https://www.instagram.com/nimitbhargava',
+              __typename: 'SocialMedia',
+            },
+          ],
+        }
+      })
+
+      it('renders no links even though the user has some', () => {
+        const wrapper = Wrapper()
+        expect(wrapper.find('.social-media-bc').exists()).toBe(false)
+        expect(wrapper.findAll('a')).toHaveLength(0)
       })
     })
 

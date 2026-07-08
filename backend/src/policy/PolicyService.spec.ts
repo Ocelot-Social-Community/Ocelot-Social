@@ -173,6 +173,7 @@ describe('PolicyService', () => {
       'showContentFilterHeaderMenu',
       'showContentFilterMasonryGrid',
       'showGroupButtonInHeader',
+      'socialMediaEnabled',
       'videoConference',
     ]
 

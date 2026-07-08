@@ -70,6 +70,18 @@ const apiKeysEnabled = rule({ cache: 'contextual' })(async (
   return policy.get('apiKeysEnabled')
 })
 
+// Editing/deleting a social-media link is owner-gated, not permission-gated, so it
+// does not inherit the socialMediaEnabled gate via hasPermission() the way
+// CreateSocialMedia (socialMedia.create) does. Combine this with isMySocialMedia so
+// the whole feature — create, edit, delete — hangs off the one policy toggle.
+const socialMediaEnabled = rule({ cache: 'contextual' })(async (
+  _parent,
+  _args,
+  { policy }: Context,
+) => {
+  return policy.getEffective('socialMediaEnabled')
+})
+
 // Gates the dev/test-only cache-resync trigger: db:reset/db:seed and the e2e harness
 // must be able to call it when no users exist yet (right after a wipe), so it is open
 // outside production and fully disabled in production. Prod cache resyncs are handled
@@ -610,8 +622,8 @@ export default shield(
       DeletePost: isAuthor,
       fileReport: isAuthenticated,
       CreateSocialMedia: and(isAuthenticated, hasPermission('socialMedia.create')),
-      UpdateSocialMedia: isMySocialMedia,
-      DeleteSocialMedia: isMySocialMedia,
+      UpdateSocialMedia: and(socialMediaEnabled, isMySocialMedia),
+      DeleteSocialMedia: and(socialMediaEnabled, isMySocialMedia),
       setVerificationBadge: hasPermission('badge.manage'),
       rewardTrophyBadge: hasPermission('badge.manage'),
       revokeBadge: hasPermission('badge.manage'),

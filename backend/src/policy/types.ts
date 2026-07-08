@@ -28,6 +28,7 @@ export interface NetworkPolicy {
   inviteCodesGroupPerUser: number
   categoriesActive: boolean
   badgesEnabled: boolean
+  socialMediaEnabled: boolean
   showContentFilterHeaderMenu: boolean
   showContentFilterMasonryGrid: boolean
   showGroupButtonInHeader: boolean

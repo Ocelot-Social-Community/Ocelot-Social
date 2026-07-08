@@ -203,6 +203,7 @@
         "showContentFilterHeaderMenu": "Показывает фильтр контента в меню шапки.",
         "showContentFilterMasonryGrid": "Показывает фильтр контента в сетке masonry (лента).",
         "showGroupButtonInHeader": "Показывает кнопку групп в шапке.",
+        "socialMediaEnabled": "Включает функцию ссылок на социальные сети: ссылки отображаются в профилях и управляются в настройках пользователя.",
         "videoConference": "Включает видеоконференции (LiveKit). Переключатель времени выполнения для разрешений видеозвонков. Требует переменные окружения LiveKit; без них остаётся выключенным и неактивным."
       },
       "envLink": "Показать окружение",
@@ -224,6 +225,7 @@
         "showContentFilterHeaderMenu": "Фильтр контента в шапке",
         "showContentFilterMasonryGrid": "Фильтр контента в сетке",
         "showGroupButtonInHeader": "Кнопка групп в шапке",
+        "socialMediaEnabled": "Социальные сети",
         "videoConference": "Видеоконференции"
       },
       "lastUpdated": "Последнее изменение: {timestamp} от {actor}",

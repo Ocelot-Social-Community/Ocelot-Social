@@ -1,5 +1,8 @@
 <template>
-  <div v-if="user.socialMedia && user.socialMedia.length" class="ds-my-large">
+  <div
+    v-if="$policy.get('socialMediaEnabled') && user.socialMedia && user.socialMedia.length"
+    class="ds-my-large"
+  >
     <os-card class="social-media-bc">
       <h5 class="title spacer-x-small" data-test="social-media-list-headline">
         {{ $t('profile.socialMedia') }} {{ userName | truncate(15) }}?

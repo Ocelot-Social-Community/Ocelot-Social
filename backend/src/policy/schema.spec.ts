@@ -145,6 +145,7 @@ describe('policy visibility', () => {
         'showContentFilterHeaderMenu',
         'showContentFilterMasonryGrid',
         'showGroupButtonInHeader',
+        'socialMediaEnabled',
       ])
     })
 
@@ -166,6 +167,7 @@ describe('policy visibility', () => {
         'showContentFilterHeaderMenu',
         'showContentFilterMasonryGrid',
         'showGroupButtonInHeader',
+        'socialMediaEnabled',
       ])
     })
   })

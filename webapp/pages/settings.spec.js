@@ -35,6 +35,7 @@ describe('settings.vue', () => {
   describe('given badges are enabled', () => {
     beforeEach(() => {
       policyValues.badgesEnabled = true
+      policyValues.socialMediaEnabled = true
       wrapper = Wrapper()
     })
 
@@ -46,6 +47,7 @@ describe('settings.vue', () => {
   describe('given badges are disabled', () => {
     beforeEach(() => {
       policyValues.badgesEnabled = false
+      policyValues.socialMediaEnabled = true
       wrapper = Wrapper()
     })
 
@@ -70,6 +72,17 @@ describe('settings.vue', () => {
       wrapper = Wrapper()
       expect(wrapper.queryAllByText('settings.invites.name').length).toBeGreaterThan(0)
       expect(wrapper.queryAllByText('settings.api-keys.name').length).toBeGreaterThan(0)
+    })
+
+    it('hides the social-media tab when the policy disables it', () => {
+      wrapper = Wrapper() // policyValues empty ⇒ socialMediaEnabled off
+      expect(wrapper.queryAllByText('settings.social-media.name')).toHaveLength(0)
+    })
+
+    it('shows the social-media tab when the policy enables it', () => {
+      policyValues = { socialMediaEnabled: true }
+      wrapper = Wrapper()
+      expect(wrapper.queryAllByText('settings.social-media.name').length).toBeGreaterThan(0)
     })
   })
 })

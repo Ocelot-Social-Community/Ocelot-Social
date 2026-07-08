@@ -667,6 +667,22 @@ export default {
         await session.close()
       }
     },
+    socialMedia: async (parent, _params, context: Context, _resolveInfo) => {
+      // Server-side enforcement of the socialMediaEnabled gate: while the feature is
+      // off, expose no links at all (data minimisation) rather than relying on the
+      // webapp to hide them — the field is public, so anonymous profile viewers hit
+      // this too. When on, this mirrors the default hasMany relation resolver.
+      if (!context.policy.getEffective('socialMediaEnabled')) return []
+      return (
+        await context.database.query({
+          query: `
+          MATCH (user:User {id: $user.id})<-[:OWNED_BY]-(socialMedia:SocialMedia)
+          RETURN socialMedia {.*}
+          `,
+          variables: { user: parent },
+        })
+      ).records.map((record) => record.get('socialMedia'))
+    },
     badgeVerification: async (parent, _params, context, _resolveInfo) => {
       const session = context.driver.session()
       try {
@@ -730,7 +746,6 @@ export default {
         followedBy: '<-[:FOLLOWS]-(related:User)',
         following: '-[:FOLLOWS]->(related:User)',
         friends: '-[:FRIENDS]-(related:User)',
-        socialMedia: '<-[:OWNED_BY]-(related:SocialMedia)',
         contributions: '-[:WROTE]->(related:Post)',
         comments: '-[:WROTE]->(related:Comment)',
         shouted: '-[:SHOUTED]->(related:Post)',
