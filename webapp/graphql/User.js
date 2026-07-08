@@ -513,11 +513,14 @@ export const userDataQuery = (i18n) => {
 export const userTeaserQuery = (i18n) => {
   const lang = i18n.locale().toUpperCase()
   return gql`
+    ${user}
     ${badges}
     ${location('User', lang)}
 
     query ($id: ID!) {
       User(id: $id) {
+        ...user
+        about
         followedByCount
         contributionsCount
         commentedCount
