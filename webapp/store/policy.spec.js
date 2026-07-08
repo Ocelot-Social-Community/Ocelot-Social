@@ -227,6 +227,11 @@ describe('policy store', () => {
       const lastChange = { actor: 'admin-1', timestamp: 'ts' }
       expect(getters.lastChange({ lastChange })).toBe(lastChange)
     })
+
+    it('deps returns the policy→policy dependency map (for the admin tab live fold)', () => {
+      const deps = { showGroupButtonInHeader: ['groupsEnabled'] }
+      expect(getters.deps({ deps })).toBe(deps)
+    })
   })
 
   describe('actions', () => {

@@ -88,6 +88,12 @@ export const getters = {
   snapshot(state) {
     return state.snapshot
   },
+  // The policy→policy dependency map (key → keys that gate it). Static schema metadata the
+  // admin policy tab reads to fold availability live (grey a dependent key when its
+  // dependency is off), so a toggle reacts without refetching the policyConfig metadata.
+  deps(state) {
+    return state.deps
+  },
   // Raw stored value — the admin policy tab edits this (it must distinguish "toggled off"
   // from "gated off by a dependency"). App consumers use getEffective via $policy.get.
   get: (state) => (key) => state.snapshot[key],

@@ -114,26 +114,11 @@ describe('policyConfig resolver', () => {
     expect(row.envSeedState).toBeNull()
   })
 
-  describe('showGroupButtonInHeader (policy-gated by groupsEnabled)', () => {
-    it('reports its policy dependency and stays available while groups are on', () => {
-      const row = rowFor('showGroupButtonInHeader', { groupsEnabled: true })
-      expect(row.requiresPolicy).toEqual([{ key: 'groupsEnabled', satisfied: true }])
-      expect(row.available).toBe(true)
-      // Env-only keys carry an empty policy-dependency list.
-      expect(rowFor('badgesEnabled').requiresPolicy).toEqual([])
-    })
-
-    it('is unavailable (its stored toggle inert) while the groups feature is off', () => {
-      const row = rowFor('showGroupButtonInHeader', {
-        groupsEnabled: false,
-        showGroupButtonInHeader: true,
-      })
-      expect(row.requiresPolicy).toEqual([{ key: 'groupsEnabled', satisfied: false }])
-      // available folds the policy dependency (not just env) — this is what greys the toggle.
-      expect(row.available).toBe(false)
-      // The raw stored value is still exposed on the value layers (admin edits raw); only
-      // the effective value folds off.
-      expect(JSON.parse(row.effective)).toBe(false)
-    })
+  it('reports env-only availability (policy→policy deps are folded live in the client, not here)', () => {
+    // showGroupButtonInHeader depends on groupsEnabled, but that gating is applied client-side
+    // (so re-enabling groups un-greys it without refetching). This metadata stays available
+    // — it has no env requirement — regardless of the groups flag.
+    expect(rowFor('showGroupButtonInHeader', { groupsEnabled: false }).available).toBe(true)
+    expect(rowFor('showGroupButtonInHeader', { groupsEnabled: true }).available).toBe(true)
   })
 })
