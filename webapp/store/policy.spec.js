@@ -5,6 +5,7 @@ describe('policy store', () => {
     it('starts empty (no frontend defaults), uninitialized, no subscription', () => {
       expect(state()).toEqual({
         snapshot: {},
+        deps: {},
         defaults: {},
         lastChange: null,
         isInitialized: false,
@@ -79,6 +80,20 @@ describe('policy store', () => {
         mutations.SET_SNAPSHOT(s, null)
         expect(s.snapshot).toEqual({})
       })
+
+      it('records each entry’s requiresPolicy dependency list (empty when absent)', () => {
+        const s = { snapshot: {} }
+        mutations.SET_SNAPSHOT(s, [
+          { key: 'groupsEnabled', value: 'true', requiresPolicy: [] },
+          { key: 'showGroupButtonInHeader', value: 'true', requiresPolicy: ['groupsEnabled'] },
+          { key: 'badgesEnabled', value: 'false' }, // no requiresPolicy field ⇒ []
+        ])
+        expect(s.deps).toEqual({
+          groupsEnabled: [],
+          showGroupButtonInHeader: ['groupsEnabled'],
+          badgesEnabled: [],
+        })
+      })
     })
 
     describe('SET_DEFAULTS', () => {
@@ -137,9 +152,60 @@ describe('policy store', () => {
   describe('getters', () => {
     const snapshot = { apiKeysEnabled: true, categoriesActive: false }
 
-    it('get(key) reads from the snapshot', () => {
+    it('get(key) reads the RAW snapshot value (what the admin tab edits)', () => {
       expect(getters.get({ snapshot })('apiKeysEnabled')).toBe(true)
       expect(getters.get({ snapshot })('categoriesActive')).toBe(false)
+    })
+
+    describe('getEffective(key) — policy→policy fold', () => {
+      // getEffective recurses over other getters; Vuex passes the getters object as the
+      // 2nd arg. Build it once so the recursion resolves against the same closure.
+      const build = (snapshot, deps) => {
+        const state = { snapshot, deps }
+        const g = {}
+        g.getEffective = getters.getEffective(state, g)
+        return g.getEffective
+      }
+
+      it('returns the raw value for a key without dependencies', () => {
+        const getEffective = build({ apiKeysEnabled: true, maxPinnedPosts: 3 }, {})
+        expect(getEffective('apiKeysEnabled')).toBe(true)
+        expect(getEffective('maxPinnedPosts')).toBe(3)
+      })
+
+      it('folds a dependent boolean to false while its required policy is off', () => {
+        const getEffective = build(
+          { showGroupButtonInHeader: true, groupsEnabled: false },
+          { showGroupButtonInHeader: ['groupsEnabled'] },
+        )
+        // Raw stays true (get), but the effective value folds off.
+        expect(
+          getters.get({ snapshot: { showGroupButtonInHeader: true } })('showGroupButtonInHeader'),
+        ).toBe(true)
+        expect(getEffective('showGroupButtonInHeader')).toBe(false)
+      })
+
+      it('passes the raw value through once every required policy is on', () => {
+        expect(
+          build(
+            { showGroupButtonInHeader: true, groupsEnabled: true },
+            { showGroupButtonInHeader: ['groupsEnabled'] },
+          )('showGroupButtonInHeader'),
+        ).toBe(true)
+        // The dependency being on does not flip the key's own off state.
+        expect(
+          build(
+            { showGroupButtonInHeader: false, groupsEnabled: true },
+            { showGroupButtonInHeader: ['groupsEnabled'] },
+          )('showGroupButtonInHeader'),
+        ).toBe(false)
+      })
+
+      it('folds transitively through a chain of dependencies', () => {
+        // a → b → c: c off pulls b off, which pulls a off.
+        const getEffective = build({ a: true, b: true, c: false }, { a: ['b'], b: ['c'] })
+        expect(getEffective('a')).toBe(false)
+      })
     })
 
     it('snapshot returns the whole snapshot', () => {

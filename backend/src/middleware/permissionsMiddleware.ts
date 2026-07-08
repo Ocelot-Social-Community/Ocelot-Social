@@ -59,7 +59,13 @@ const groupCreatePermissionForType = (groupType: string): PermissionKey | null =
 }
 const canCreateGroup = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
   const permission = groupCreatePermissionForType(args.groupType)
-  return !!permission && ctx.effectivePermissions.has(permission)
+  // Like hasPermission(): a granted right only authorizes while its runtime gate is open —
+  // group.create_* is gated by groupsEnabled, so creation is blocked when groups are off.
+  return (
+    !!permission &&
+    ctx.effectivePermissions.has(permission) &&
+    isPermissionAvailable(permission, ctx)
+  )
 })
 
 const apiKeysEnabled = rule({ cache: 'contextual' })(async (

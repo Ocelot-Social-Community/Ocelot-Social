@@ -10,6 +10,7 @@ export default () => gql`
     policy {
       key
       value
+      requiresPolicy
     }
   }
 `

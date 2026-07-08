@@ -1,4 +1,5 @@
 import {
+  blockingGateFor,
   isGateOpen,
   isPermissionAvailable,
   isPermissionGatePolicyKey,
@@ -42,13 +43,27 @@ describe('permission gates', () => {
       expect(isPermissionAvailable('role.manage', closed)).toBe(true)
     })
 
-    it('videoCall.* tracks the videoConference policy gate', () => {
+    it('videoCall.* needs BOTH the videoConference and groupsEnabled gates (AND)', () => {
       for (const key of [
         'videoCall.create_public',
         'videoCall.create_closed',
         'videoCall.create_hidden',
       ] as const) {
-        expect(isPermissionAvailable(key, ctx(['videoConference']))).toBe(true)
+        // Both open ⇒ available; either one closed ⇒ not available.
+        expect(isPermissionAvailable(key, ctx(['videoConference', 'groupsEnabled']))).toBe(true)
+        expect(isPermissionAvailable(key, ctx(['videoConference']))).toBe(false)
+        expect(isPermissionAvailable(key, ctx(['groupsEnabled']))).toBe(false)
+        expect(isPermissionAvailable(key, ctx([]))).toBe(false)
+      }
+    })
+
+    it('group.create_* tracks the groupsEnabled policy gate', () => {
+      for (const key of [
+        'group.create_public',
+        'group.create_closed',
+        'group.create_hidden',
+      ] as const) {
+        expect(isPermissionAvailable(key, ctx(['groupsEnabled']))).toBe(true)
         expect(isPermissionAvailable(key, ctx([]))).toBe(false)
       }
     })
@@ -56,6 +71,27 @@ describe('permission gates', () => {
     it('apiKey.create tracks the apiKeysEnabled policy gate', () => {
       expect(isPermissionAvailable('apiKey.create', ctx(['apiKeysEnabled']))).toBe(true)
       expect(isPermissionAvailable('apiKey.create', ctx([]))).toBe(false)
+    })
+  })
+
+  describe('blockingGateFor', () => {
+    it('is null for an ungated permission and for a fully-open gated one', () => {
+      expect(blockingGateFor('post.create', ctx())).toBeNull()
+      expect(
+        blockingGateFor('videoCall.create_public', ctx(['videoConference', 'groupsEnabled'])),
+      ).toBeNull()
+    })
+
+    it('returns the first currently-closed gate (declaration order)', () => {
+      // videoConference is declared first in the catalog for videoCall.create_*, so when
+      // both are closed it is the one surfaced; opening it reveals groupsEnabled next.
+      expect(blockingGateFor('videoCall.create_public', ctx([]))).toBe('videoConference')
+      expect(blockingGateFor('videoCall.create_public', ctx(['videoConference']))).toBe(
+        'groupsEnabled',
+      )
+      expect(blockingGateFor('videoCall.create_public', ctx(['groupsEnabled']))).toBe(
+        'videoConference',
+      )
     })
   })
 

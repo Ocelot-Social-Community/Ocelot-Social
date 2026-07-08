@@ -48,38 +48,41 @@ export function descriptionFor(key: PermissionKey): string {
   return catalog[key].description
 }
 
-// The runtime feature gate a permission depends on, or undefined when it is always
-// effective. See ./gates.ts for how a gate name resolves to a boolean.
-export function gateFor(key: PermissionKey): PermissionGate | undefined {
-  return catalog[key].gatedBy
+// The runtime feature gates a permission depends on, normalised to a list (empty when
+// the permission is always effective). A single `gatedBy` string is shorthand for a
+// one-element list; an array means the permission is effective only while EVERY listed
+// gate is open (AND). See ./gates.ts for how a gate name resolves to a boolean.
+export function gatesFor(key: PermissionKey): PermissionGate[] {
+  const gatedBy = catalog[key].gatedBy
+  if (gatedBy === undefined) return []
+  return Array.isArray(gatedBy) ? [...gatedBy] : [gatedBy]
 }
 
 // The distinct runtime gates the catalog declares, in first-seen (declaration) order.
 // This is the set of policy keys whose value flips permission availability network-wide —
 // derived from the catalog (the single source) so a newly gated permission automatically
-// registers its gate, with no separate hand-maintained list to keep in sync.
+// registers its gate(s), with no separate hand-maintained list to keep in sync.
 export function allPermissionGates(): PermissionGate[] {
   const gates = new Set<PermissionGate>()
   for (const key of allPermissionKeys()) {
-    const gate = gateFor(key)
-    if (gate !== undefined) gates.add(gate)
+    for (const gate of gatesFor(key)) gates.add(gate)
   }
   return [...gates]
 }
 
 // The full catalog as a flat list — the shape the admin UI / GraphQL resolver
-// projects (key + group + gatedBy + description). Returns fresh objects so callers
-// can't mutate the singleton.
+// projects (key + group + gatedBy + description). `gatedBy` is normalised to a list.
+// Returns fresh objects so callers can't mutate the singleton.
 export function permissionCatalog(): Array<{
   key: PermissionKey
   group: PermissionGroup
-  gatedBy?: PermissionGate
+  gatedBy: PermissionGate[]
   description: string
 }> {
   return allPermissionKeys().map((key) => ({
     key,
     group: groupFor(key),
-    gatedBy: gateFor(key),
+    gatedBy: gatesFor(key),
     description: descriptionFor(key),
   }))
 }

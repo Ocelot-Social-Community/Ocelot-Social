@@ -3,13 +3,14 @@ export {
   isKnownPermission,
   groupFor,
   descriptionFor,
-  gateFor,
+  gatesFor,
   permissionCatalog,
   sanitizePermissions,
 } from './schema'
 export {
   isGateOpen,
   isPermissionAvailable,
+  blockingGateFor,
   isPermissionGatePolicyKey,
   PERMISSION_GATE_POLICY_KEYS,
 } from './gates'

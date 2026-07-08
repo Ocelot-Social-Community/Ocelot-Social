@@ -2,7 +2,12 @@ import { withFilter } from 'graphql-subscriptions'
 
 import { UserInputError } from '@graphql/errors'
 import { isPermissionGatePolicyKey } from '@src/permission'
-import { POLICY_CHANGED_CHANNEL, PolicyValidationError, canView } from '@src/policy'
+import {
+  POLICY_CHANGED_CHANNEL,
+  PolicyValidationError,
+  canView,
+  requiresPolicyFor,
+} from '@src/policy'
 
 import { publishPermissionsChanged } from './roles'
 
@@ -42,6 +47,10 @@ const toEntries = (record: Record<string, unknown>) =>
   Object.entries(record).map(([key, value]) => ({
     key,
     value: value === null || value === undefined ? null : JSON.stringify(value),
+    // Static schema metadata (same for every viewer): which policy keys gate this one, so
+    // the client can re-fold the effective value (a layout toggle that respects its feature
+    // gate). Empty for most keys.
+    requiresPolicy: requiresPolicyFor(key as PolicyKey),
   }))
 
 export default {

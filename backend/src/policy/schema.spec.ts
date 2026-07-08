@@ -1,7 +1,16 @@
 // Unit tests for the visibility primitive — the single mechanism shared by the
 // `policy` query resolver and the policyChanged subscription filter.
 
-import { allKeys, audiencesFor, audiencesOf, canView, categoryFor, visibleKeys } from './schema'
+import {
+  allKeys,
+  audiencesFor,
+  audiencesOf,
+  canView,
+  categoryFor,
+  requiresPolicyFor,
+  typeFor,
+  visibleKeys,
+} from './schema'
 
 // The subset of ./schema the perm-gating tests re-import against a mocked JSON
 // schema. Built from the already-imported functions to avoid a namespace import.
@@ -139,6 +148,7 @@ describe('policy visibility', () => {
         'askForRealName',
         'badgesEnabled',
         'categoriesActive',
+        'groupsEnabled',
         'inviteRegistration',
         'publicRegistration',
         'requireLocation',
@@ -156,6 +166,7 @@ describe('policy visibility', () => {
         'askForRealName',
         'badgesEnabled',
         'categoriesActive',
+        'groupsEnabled',
         'inviteCodesGroupPerUser',
         'inviteCodesPersonalPerUser',
         'inviteLinkLimit',
@@ -187,6 +198,39 @@ describe('categoryFor', () => {
     // returns undefined for a known key.
     for (const key of allKeys()) {
       expect(categoryFor(key)).toEqual(expect.any(String))
+    }
+  })
+})
+
+describe('requiresPolicyFor', () => {
+  it('returns the declared policy→policy dependencies (empty for most keys)', () => {
+    expect(requiresPolicyFor('showGroupButtonInHeader')).toEqual(['groupsEnabled'])
+    expect(requiresPolicyFor('groupsEnabled')).toEqual([])
+    expect(requiresPolicyFor('badgesEnabled')).toEqual([])
+  })
+
+  it('returns a fresh copy — a caller mutating it cannot alter the shared schema', () => {
+    const deps = requiresPolicyFor('showGroupButtonInHeader')
+    deps.push('groupsEnabled')
+    expect(requiresPolicyFor('showGroupButtonInHeader')).toEqual(['groupsEnabled'])
+  })
+
+  // The graph invariants (dep exists, both boolean, visibility superset, acyclic) are
+  // asserted at module load — reaching this test at all means they held for the shipped
+  // schema. Re-check the properties here so a future schema edit that violates one fails
+  // loudly with a specific message instead of a mystery boot error.
+  it('every dependency is a known boolean key visible wherever the dependent is', () => {
+    for (const key of allKeys()) {
+      const keyAudiences = new Set(audiencesFor(key))
+      for (const dep of requiresPolicyFor(key)) {
+        expect(allKeys()).toContain(dep)
+        expect(typeFor(key)).toBe('boolean')
+        expect(typeFor(dep)).toBe('boolean')
+        // Every audience that can see the dependent must also see the dependency.
+        for (const audience of keyAudiences) {
+          expect(audiencesFor(dep)).toContain(audience)
+        }
+      }
     }
   })
 })

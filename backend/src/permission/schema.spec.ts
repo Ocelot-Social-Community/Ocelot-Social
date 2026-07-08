@@ -2,7 +2,7 @@ import {
   allPermissionGates,
   allPermissionKeys,
   descriptionFor,
-  gateFor,
+  gatesFor,
   groupFor,
   isKnownPermission,
   permissionCatalog,
@@ -63,31 +63,38 @@ describe('permission catalog', () => {
     })
 
     it('gates the feature-dependent rights, leaves the rest ungated', () => {
-      expect(gateFor('videoCall.create_public')).toBe('videoConference')
-      expect(gateFor('videoCall.create_closed')).toBe('videoConference')
-      expect(gateFor('videoCall.create_hidden')).toBe('videoConference')
-      expect(gateFor('apiKey.create')).toBe('apiKeysEnabled')
-      // badge.manage is inert while badges are disabled; user.invite while invite
-      // registration is off (codes couldn't be redeemed). NB: apiKey.administer is
-      // deliberately NOT gated — admins must be able to revoke still-valid keys after the
-      // feature is turned off.
-      expect(gateFor('badge.manage')).toBe('badgesEnabled')
-      expect(gateFor('user.invite')).toBe('inviteRegistration')
-      expect(gateFor('apiKey.administer')).toBeUndefined()
+      // Group video calls need BOTH the video feature AND the groups feature on — multi-gate
+      // (AND), normalised to a list. gatedBy is a list now; ungated rights get [].
+      expect(gatesFor('videoCall.create_public')).toEqual(['videoConference', 'groupsEnabled'])
+      expect(gatesFor('videoCall.create_closed')).toEqual(['videoConference', 'groupsEnabled'])
+      expect(gatesFor('videoCall.create_hidden')).toEqual(['videoConference', 'groupsEnabled'])
+      expect(gatesFor('apiKey.create')).toEqual(['apiKeysEnabled'])
+      // Creating groups is gated by the groups feature; badge.manage is inert while badges
+      // are disabled; user.invite while invite registration is off (codes couldn't be
+      // redeemed). NB: apiKey.administer is deliberately NOT gated — admins must be able to
+      // revoke still-valid keys after the feature is turned off.
+      expect(gatesFor('group.create_public')).toEqual(['groupsEnabled'])
+      expect(gatesFor('group.create_closed')).toEqual(['groupsEnabled'])
+      expect(gatesFor('group.create_hidden')).toEqual(['groupsEnabled'])
+      expect(gatesFor('badge.manage')).toEqual(['badgesEnabled'])
+      expect(gatesFor('user.invite')).toEqual(['inviteRegistration'])
+      expect(gatesFor('apiKey.administer')).toEqual([])
       // A representative ungated right.
-      expect(gateFor('post.create')).toBeUndefined()
-      // The projection carries the gate through.
+      expect(gatesFor('post.create')).toEqual([])
+      // The projection carries the (multi-)gate through.
       const publicCall = permissionCatalog().find((e) => e.key === 'videoCall.create_public')
-      expect(publicCall?.gatedBy).toBe('videoConference')
+      expect(publicCall?.gatedBy).toEqual(['videoConference', 'groupsEnabled'])
     })
 
     it('derives the distinct permission gates from the catalog, in declaration order', () => {
-      // Feeds PERMISSION_GATE_POLICY_KEYS in gates.ts — de-duplicated (videoConference is
-      // declared by three video-call rights) and ordered by first appearance in the catalog:
-      // badge.manage, then user.invite, then the video-call rights, then apiKey.create.
+      // Feeds PERMISSION_GATE_POLICY_KEYS in gates.ts — de-duplicated (groupsEnabled and
+      // videoConference are each declared by several rights) and ordered by first appearance
+      // in the catalog: badge.manage, group.create_*, user.invite, the video-call rights,
+      // then apiKey.create.
       expect(allPermissionGates()).toEqual([
         'badgesEnabled',
         'socialMediaEnabled',
+        'groupsEnabled',
         'inviteRegistration',
         'videoConference',
         'apiKeysEnabled',

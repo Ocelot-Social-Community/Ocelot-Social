@@ -19,6 +19,7 @@ export {
   defaultFor,
   envSeedFor,
   requiresEnvFor,
+  requiresPolicyFor,
   typeFor,
 } from './schema'
 export type { PolicyViewer } from './schema'

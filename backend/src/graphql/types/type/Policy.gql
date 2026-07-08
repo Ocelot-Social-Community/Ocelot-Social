@@ -9,6 +9,8 @@ type Query {
 type PolicyEntry {
   key: PolicyKey!
   value: String
+  "Other policy keys this one depends on (policy→policy gate): the key is only effective while every listed key is effectively on. Static schema metadata (empty for most keys); the client re-folds it so a layout toggle respects its feature gate (e.g. showGroupButtonInHeader depends on groupsEnabled)."
+  requiresPolicy: [PolicyKey!]!
 }
 
 "The configured policy defaults together with audit info about the last change."
