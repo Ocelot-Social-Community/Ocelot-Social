@@ -79,6 +79,7 @@ const tabToFilterMapping = (tab) => {
 
 export default {
   name: 'Groups',
+  middleware: ['groupsEnabled'],
   components: {
     OsButton,
     OsIcon,

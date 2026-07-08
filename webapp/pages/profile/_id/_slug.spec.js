@@ -62,7 +62,14 @@ describe('ProfileSlug', () => {
       data: () => data,
       mocks: {
         ...mocks,
-        $policy: { get: (key) => (key === 'badgesEnabled' ? badgesEnabled : false) },
+        $policy: {
+          // Groups feature on (so the profile groups list renders); badges per test arg.
+          get: (key) => {
+            if (key === 'badgesEnabled') return badgesEnabled
+            if (key === 'groupsEnabled') return true
+            return false
+          },
+        },
       },
     })
   }

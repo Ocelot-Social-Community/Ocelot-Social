@@ -569,6 +569,10 @@ export default {
   },
   User: {
     groups: async (parent, args, context: Context, _resolveInfo) => {
+      // Server-side enforcement of the groups gate: with the feature off, a profile exposes
+      // no groups at all (data minimisation), rather than relying on the webapp to hide the
+      // list. Mirrors the socialMedia field gate.
+      if (!context.policy.getEffective('groupsEnabled')) return []
       const profileUserId = parent.id
       const viewerId = context.user?.id
       const isOwnProfile = profileUserId === viewerId
