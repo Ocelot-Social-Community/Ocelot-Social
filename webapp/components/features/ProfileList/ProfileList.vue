@@ -11,12 +11,14 @@
       <!-- Virtual Scroller for better performance -->
       <recycle-scroller
         v-if="isMoreAsVisible && showVirtualScroll"
+        ref="scrollEl"
         :items="filteredConnections"
         :item-size="itemHeight"
         key-field="id"
         :class="profilesClass"
         class="profiles-virtual"
         v-slot="{ item }"
+        @scroll.native="onScroll"
       >
         <div class="connections__item">
           <user-teaser :user="item" />
@@ -24,7 +26,7 @@
       </recycle-scroller>
 
       <!-- Normal list for only a few items -->
-      <ul v-else :class="profilesClass">
+      <ul v-else ref="scrollEl" :class="profilesClass" @scroll="onScroll">
         <li
           v-for="connection in displayedConnections"
           :key="connection.id"
@@ -45,29 +47,16 @@
         @input.native="setFilter"
       />
 
-      <os-button
-        v-if="hasMore"
-        data-test="load-all-connections-btn"
-        variant="primary"
-        appearance="outline"
-        :loading="loading"
-        class="spacer-x-small"
-        size="sm"
-        @click="$emit('fetchAllProfiles')"
-      >
-        {{
-          $t('profile.network.andMore', {
-            number: allProfilesCount - profiles.length,
-          })
-        }}
-      </os-button>
+      <div v-if="hasMore && loading" class="loading-more">
+        <os-spinner size="xs" />
+      </div>
     </template>
     <p v-else-if="titleNobody" class="nobody-message">{{ titleNobody }}</p>
   </os-card>
 </template>
 
 <script>
-import { OsButton, OsCard } from '@ocelot-social/ui'
+import { OsCard, OsSpinner } from '@ocelot-social/ui'
 import { escape } from 'xregexp/xregexp-all.js'
 // @ts-ignore
 import { RecycleScroller } from 'vue-virtual-scroller'
@@ -76,13 +65,14 @@ import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export const profileListVisibleCount = 6
+
 const VIRTUAL_SCROLL_THRESHOLD = 50
 
 export default {
   name: 'ProfileList',
   components: {
-    OsButton,
     OsCard,
+    OsSpinner,
     UserTeaser,
     RecycleScroller,
     OcelotInput,
@@ -170,9 +160,33 @@ export default {
       return fuzzyScores.map((score) => score.user)
     },
   },
+  mounted() {
+    this.$nextTick(this.checkScrollable)
+  },
+  updated() {
+    this.$nextTick(this.checkScrollable)
+  },
   methods: {
     setFilter(evt) {
       this.filter = evt.target.value
+    },
+    onScroll() {
+      if (!this.hasMore || this.loading) return
+      const el = this.$refs.scrollEl
+      if (!el) return
+      const domEl = el.$el || el
+      if (domEl.scrollTop + domEl.clientHeight >= domEl.scrollHeight - 40) {
+        this.$emit('fetchAllProfiles')
+      }
+    },
+    checkScrollable() {
+      if (!this.hasMore || this.loading) return
+      const el = this.$refs.scrollEl
+      if (!el) return
+      const domEl = el.$el || el
+      if (domEl.scrollHeight <= domEl.clientHeight) {
+        this.$emit('fetchAllProfiles')
+      }
     },
   },
 }
@@ -232,6 +246,12 @@ export default {
   .nobody-message {
     text-align: center;
     color: $text-color-soft;
+  }
+
+  .loading-more {
+    display: flex;
+    justify-content: center;
+    padding: $space-x-small 0;
   }
 
   > :nth-child(n):not(:last-child) {

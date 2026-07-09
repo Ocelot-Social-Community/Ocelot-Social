@@ -1,7 +1,7 @@
 <template>
   <div class="user-teaser-popover">
     <div v-if="user" class="user-header">
-      <profile-avatar :profile="user" size="medium" />
+      <profile-avatar :profile="user" class="popover-avatar" />
       <div class="user-names">
         <span class="user-name">{{ user.name }}</span>
         <span class="user-slug ds-text-soft">@{{ user.slug }}</span>
@@ -157,5 +157,11 @@ export default {
 
 .open-link {
   margin-top: 4px;
+}
+
+.popover-avatar {
+  width: 64px;
+  height: 64px;
+  font-size: 1.5rem;
 }
 </style>

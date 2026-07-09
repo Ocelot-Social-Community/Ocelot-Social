@@ -4,9 +4,8 @@ import GroupMemberList from './GroupMemberList.vue'
 const localVue = global.localVue
 
 const stubs = {
-  'os-card': { template: '<div><slot /></div>' },
+  'infinite-scroll-list': { template: '<div><slot /></div>' },
   'os-icon': true,
-  'os-spinner': true,
   'group-teaser': true,
 }
 

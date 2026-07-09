@@ -217,28 +217,6 @@ describe('pages/profile/_id/_slug.vue — methods', () => {
     })
   })
 
-  describe('fetchAllConnections', () => {
-    it('writes followingCount on type=following', () => {
-      const ctx = { followingCount: 0, followedByCount: 0 }
-      methods.fetchAllConnections.call(ctx, 'following', 42)
-      expect(ctx.followingCount).toBe(42)
-      expect(ctx.followedByCount).toBe(0)
-    })
-
-    it('writes followedByCount on type=followedBy', () => {
-      const ctx = { followingCount: 0, followedByCount: 0 }
-      methods.fetchAllConnections.call(ctx, 'followedBy', 7)
-      expect(ctx.followedByCount).toBe(7)
-    })
-
-    it('is a no-op for an unknown connection type', () => {
-      const ctx = { followingCount: 0, followedByCount: 0 }
-      methods.fetchAllConnections.call(ctx, 'something-else', 9)
-      expect(ctx.followingCount).toBe(0)
-      expect(ctx.followedByCount).toBe(0)
-    })
-  })
-
   describe('showOrChangeChat', () => {
     it('opens chat for the user when nothing is open yet', () => {
       const showChat = jest.fn()

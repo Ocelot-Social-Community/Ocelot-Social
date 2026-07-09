@@ -1,47 +1,119 @@
 <template>
-  <profile-list
-    :uniqueName="`${type}Filter`"
-    :title="$filters.truncate(userName, 15) + ' ' + $t(`profile.network.${type}`)"
-    :titleNobody="$filters.truncate(userName, 15) + ' ' + $t(`profile.network.${type}Nobody`)"
-    :allProfilesCount="allConnectionsCount"
-    :profiles="connections"
-    :loading="loading"
-    @fetchAllProfiles="$emit('fetchAllConnections', type, allConnectionsCount)"
-  />
+  <infinite-scroll-list
+    :title="listTitle"
+    :nobody-message="nobodyMessage"
+    :empty="!hasConnections && !loadingConnections"
+    :loading="loadingConnections || loadingMore"
+    :has-more="!allLoaded"
+    @load-more="loadMore"
+  >
+    <ul class="connections">
+      <li v-for="connection in connections" :key="connection.id" class="connections__item">
+        <user-teaser :user="connection" />
+      </li>
+    </ul>
+  </infinite-scroll-list>
 </template>
 
 <script>
-import ProfileList, { profileListVisibleCount } from '~/components/features/ProfileList/ProfileList'
+import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import InfiniteScrollList from './InfiniteScrollList.vue'
+import { followConnectionsQuery } from '~/graphql/User'
 
-export const followListVisibleCount = profileListVisibleCount
+const PAGE_SIZE = 10
 
 export default {
-  name: 'FollowerList',
+  name: 'FollowList',
   components: {
-    ProfileList,
+    UserTeaser,
+    InfiniteScrollList,
   },
   props: {
-    user: { type: Object, default: null },
+    userId: { type: String, required: true },
+    userName: { type: String, default: '' },
     type: { type: String, default: 'following' },
-    loading: { type: Boolean, default: false },
+  },
+  data() {
+    return {
+      connections: [],
+      totalCount: 0,
+      loadingConnections: false,
+      loadingMore: false,
+      allLoaded: false,
+    }
   },
   computed: {
-    userName() {
-      const { name } = this.user || {}
-      return name || this.$t('profile.userAnonym')
+    hasConnections() {
+      return this.connections.length > 0
     },
-    allConnectionsCount() {
-      return this.user[`${this.type}Count`]
+    listTitle() {
+      const name = this.$filters.truncate(this.userName, 15)
+      return `${name} ${this.$t(`profile.network.${this.type}`)}`
     },
-    connections() {
-      const list = this.user[this.type] || []
-      const seen = new Set()
-      return list.filter((u) => {
-        if (!u || !u.id || seen.has(u.id)) return false
-        seen.add(u.id)
-        return true
-      })
+    nobodyMessage() {
+      const name = this.$filters.truncate(this.userName, 15)
+      return `${name} ${this.$t(`profile.network.${this.type}Nobody`)}`
+    },
+  },
+  async mounted() {
+    await this.loadConnections(0)
+  },
+  methods: {
+    async loadConnections(offset) {
+      if (offset === 0) {
+        this.loadingConnections = true
+        this.connections = []
+        this.allLoaded = false
+        this.totalCount = 0
+      } else {
+        this.loadingMore = true
+      }
+      try {
+        const { data } = await this.$apollo.query({
+          query: followConnectionsQuery(this.type, this.$i18n),
+          variables: { id: this.userId, first: PAGE_SIZE, offset },
+          fetchPolicy: 'network-only',
+        })
+        const userData = data?.User?.[0]
+        if (userData) {
+          this.totalCount = userData[`${this.type}Count`] || 0
+          const newItems = userData[this.type] || []
+          const merged = [...this.connections, ...newItems]
+          const seen = new Set()
+          this.connections = merged.filter((u) => {
+            if (!u || !u.id || seen.has(u.id)) return false
+            seen.add(u.id)
+            return true
+          })
+          if (newItems.length < PAGE_SIZE) this.allLoaded = true
+        }
+      } catch (error) {
+        this.$toast.error(error.message)
+      } finally {
+        this.loadingConnections = false
+        this.loadingMore = false
+      }
+    },
+    async loadMore() {
+      if (this.allLoaded || this.loadingMore || this.loadingConnections) return
+      await this.loadConnections(this.connections.length)
     },
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.connections {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  &__item {
+    padding: $space-xx-small;
+
+    &:hover {
+      background-color: $background-color-primary-inverse;
+    }
+  }
+}
+</style>
