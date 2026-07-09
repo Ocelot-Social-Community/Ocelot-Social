@@ -68,7 +68,7 @@ export default {
     ProfileAvatar,
   },
   props: {
-    userId: { type: String },
+    userId: { type: String, required: true },
     userLink: { type: Object },
   },
   computed: {
