@@ -148,7 +148,7 @@
 </template>
 
 <script>
-import { VERSION } from '~/constants/terms-and-conditions-version.js'
+import branding from '@ocelot-social/branding'
 import links from '~/constants/links'
 import { SignupVerificationMutation } from '~/graphql/Registration.js'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
@@ -325,7 +325,7 @@ export default {
       const { password } = this.formData
       const name = this.buildName(this.formData).replace(threePerEmSpace, ' ')
       const { email, inviteCode = null, nonce } = this.sliderData.collectedInputData
-      const termsAndConditionsAgreedVersion = VERSION
+      const termsAndConditionsAgreedVersion = branding.termsAndConditions.version
       const locale = this.$i18n.locale()
 
       try {

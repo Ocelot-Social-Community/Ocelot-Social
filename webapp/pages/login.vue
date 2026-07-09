@@ -9,7 +9,6 @@
 <script>
 import LoginForm from '~/components/LoginForm/LoginForm.vue'
 import branding from '@ocelot-social/branding'
-import { VERSION } from '~/constants/terms-and-conditions-version.js'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -23,7 +22,10 @@ export default {
     }),
   },
   asyncData({ store, redirect }) {
-    if (store.getters['auth/user'].termsAndConditionsAgreedVersion === VERSION) {
+    if (
+      store.getters['auth/user'].termsAndConditionsAgreedVersion ===
+      branding.termsAndConditions.version
+    ) {
       redirect('/')
     }
   },

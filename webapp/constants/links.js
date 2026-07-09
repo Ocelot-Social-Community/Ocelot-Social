@@ -1,149 +1,44 @@
-// this file is replaced on rebranding by https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding/tree/master/branding/constants/
+// Adapter: builds the footer / static-page PageParams from the shared branding link DATA
+// (branding.links, typed in @ocelot-social/branding) via the framework page defaults
+// (InternalPages). A brand defines links purely as data in its branding override — this file
+// (webapp-only, because PageParams is webapp code) turns that data into PageParams objects.
+// Consumers keep importing `~/constants/links` and get the same shape as before
+// (LANDING_PAGE, ORGANIZATION, …, FOOTER_LINK_LIST).
+
+import branding from '@ocelot-social/branding'
 
 import { defaultPageParamsPages } from '~/components/utils/InternalPages.js'
 
-const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
-  // if defined it's dominating
-  externalLink: {
-    url: 'https://ocelot.social',
-    target: '_blank',
-  },
+const { landingPage, pages, footerOrder } = branding.links
 
-  internalPage: {
-    // footerIdent: 'site.made', // localized string identifier, if undefined default is used
-    // headTitleIdent: 'site.made', // localized string identifier, if undefined default is used
-    // headlineIdent: 'site.made', // localized string identifier, on null it's hidden, if undefined default is used
-    hasContainer: true,
-    hasBaseCard: true,
-    hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
-  },
-})
-const DONATE = defaultPageParamsPages.DONATE.overwrite({
-  // if defined it's dominating
-  externalLink: {
-    url: 'https://ocelot.social/en/donate/',
-    target: '_blank',
-  },
+// Build each static page from its framework default overlaid with the brand's sparse override.
+const built = {
+  ORGANIZATION: defaultPageParamsPages.ORGANIZATION.overwrite(pages.organization),
+  DONATE: defaultPageParamsPages.DONATE.overwrite(pages.donate),
+  IMPRINT: defaultPageParamsPages.IMPRINT.overwrite(pages.imprint),
+  TERMS_AND_CONDITIONS: defaultPageParamsPages.TERMS_AND_CONDITIONS.overwrite(
+    pages.termsAndConditions,
+  ),
+  CODE_OF_CONDUCT: defaultPageParamsPages.CODE_OF_CONDUCT.overwrite(pages.codeOfConduct),
+  DATA_PRIVACY: defaultPageParamsPages.DATA_PRIVACY.overwrite(pages.dataPrivacy),
+  FAQ: defaultPageParamsPages.FAQ.overwrite(pages.faq),
+  SUPPORT: defaultPageParamsPages.SUPPORT.overwrite(pages.support),
+}
 
-  internalPage: {
-    // footerIdent: 'site.donate', // localized string identifier, if undefined default is used
-    // headTitleIdent: 'site.donate', // localized string identifier, if undefined default is used
-    // headlineIdent: 'site.donate', // localized string identifier, on null it's hidden, if undefined default is used
-    hasContainer: true,
-    hasBaseCard: true,
-    hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
-  },
-})
-const IMPRINT = defaultPageParamsPages.IMPRINT.overwrite({
-  externalLink: {
-    url: 'https://ocelot.social/en/imprint/',
-    target: '_blank',
-  },
-
-  internalPage: {
-    // footerIdent: 'site.imprint', // localized string identifier, if undefined default is used
-    // headTitleIdent: 'site.imprint', // localized string identifier, if undefined default is used
-    // headlineIdent: 'site.imprint', // localized string identifier, on null it's hidden, if undefined default is used
-    hasContainer: true,
-    hasBaseCard: true,
-    hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
-  },
-})
-const TERMS_AND_CONDITIONS = defaultPageParamsPages.TERMS_AND_CONDITIONS.overwrite({
-  // externalLink: null, // if defined it's dominating
-
-  internalPage: {
-    // footerIdent: 'site.termsAndConditions', // localized string identifier, if undefined default is used
-    // headTitleIdent: 'site.termsAndConditions', // localized string identifier, if undefined default is used
-    // headlineIdent: 'site.termsAndConditions', // localized string identifier, on null it's hidden, if undefined default is used
-    hasContainer: true,
-    hasBaseCard: true,
-    hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
-  },
-})
-const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.overwrite({
-  // externalLink: null, // if defined it's dominating
-
-  internalPage: {
-    // footerIdent: 'site.code-of-conduct', // localized string identifier, if undefined default is used
-    // headTitleIdent: 'site.code-of-conduct', // localized string identifier, if undefined default is used
-    // headlineIdent: 'site.code-of-conduct', // localized string identifier, on null it's hidden, if undefined default is used
-    hasContainer: true,
-    hasBaseCard: true,
-    hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
-  },
-})
-const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
-  // externalLink: null, // if defined it's dominating
-
-  internalPage: {
-    // footerIdent: 'site.data-privacy', // localized string identifier, if undefined default is used
-    // headTitleIdent: 'site.data-privacy', // localized string identifier, if undefined default is used
-    // headlineIdent: 'site.data-privacy', // localized string identifier, on null it's hidden, if undefined default is used
-    hasContainer: true,
-    hasBaseCard: true,
-    hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
-  },
-})
-const FAQ = defaultPageParamsPages.FAQ.overwrite({
-  // externalLink: null, // if defined it's dominating
-
-  internalPage: {
-    // footerIdent: 'site.faq', // localized string identifier, if undefined default is used
-    // headTitleIdent: 'site.faq', // localized string identifier, if undefined default is used
-    // headlineIdent: 'site.faq', // on null default is used, on empty string it's hidden
-    hasContainer: true,
-    hasBaseCard: true,
-    hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
-  },
-})
-const SUPPORT = defaultPageParamsPages.SUPPORT.overwrite({
-  // if defined it's dominating
-  externalLink: {
-    url: 'https://ocelot.social',
-    target: '_blank',
-  },
-
-  internalPage: {
-    // footerIdent: 'site.support', // localized string identifier, if undefined default is used
-    // headTitleIdent: 'site.support', // localized string identifier, if undefined default is used
-    // headlineIdent: 'site.support', // on null default is used, on empty string it's hidden
-    hasContainer: true,
-    hasBaseCard: true,
-    hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
-  },
-})
+// Map the footer order (data keys) back to the built PageParams.
+const byKey = {
+  organization: built.ORGANIZATION,
+  donate: built.DONATE,
+  imprint: built.IMPRINT,
+  termsAndConditions: built.TERMS_AND_CONDITIONS,
+  codeOfConduct: built.CODE_OF_CONDUCT,
+  dataPrivacy: built.DATA_PRIVACY,
+  faq: built.FAQ,
+  support: built.SUPPORT,
+}
 
 export default {
-  LANDING_PAGE: '/login', // examples: '/login', '/registration', '/organization', or external 'https://ocelot.social'
-
-  // you can find and store templates for 👇🏼 at https://github.com/Ocelot-Social-Community/Ocelot-Social-Deploy-Rebranding/tree/master/branding/templates/
-
-  ORGANIZATION,
-  DONATE,
-  IMPRINT,
-  TERMS_AND_CONDITIONS,
-  CODE_OF_CONDUCT,
-  DATA_PRIVACY,
-  FAQ,
-  SUPPORT,
-
-  FOOTER_LINK_LIST: [
-    ORGANIZATION,
-    TERMS_AND_CONDITIONS,
-    CODE_OF_CONDUCT,
-    DATA_PRIVACY,
-    FAQ,
-    DONATE,
-    SUPPORT,
-    IMPRINT,
-  ],
+  LANDING_PAGE: landingPage,
+  ...built,
+  FOOTER_LINK_LIST: footerOrder.map((key) => byKey[key]),
 }
