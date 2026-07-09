@@ -18,10 +18,10 @@ import { createApolloTestSetup } from '@root/test/helpers'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
-jest.mock('@constants/groups', () => {
+jest.mock('@src/branding', () => {
   return {
     __esModule: true,
-    DESCRIPTION_WITHOUT_HTML_LENGTH_MIN: 5,
+    default: { group: { descriptionMinLength: 5, descriptionExcerptLength: 250 } },
   }
 })
 

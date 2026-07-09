@@ -11,13 +11,13 @@ import { withFilter } from 'graphql-subscriptions'
 import { v4 as uuid } from 'uuid'
 
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '@constants/categories'
-import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '@constants/groups'
 import {
   GROUP_MEMBERSHIP_VISIBILITY_CHANGED,
   GROUP_SHOW_MEMBERS_CHANGED,
 } from '@constants/subscriptions'
 import { ForbiddenError, UserInputError } from '@graphql/errors'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
+import branding from '@src/branding'
 
 import Resolver from './helpers/Resolver'
 import { images } from './images/images'
@@ -186,7 +186,7 @@ export default {
       if (
         params.description === undefined ||
         params.description === null ||
-        removeHtmlTags(params.description).length < DESCRIPTION_WITHOUT_HTML_LENGTH_MIN
+        removeHtmlTags(params.description).length < branding.group.descriptionMinLength
       ) {
         throw new UserInputError('Description too short!')
       }
@@ -263,7 +263,7 @@ export default {
       }
       if (
         params.description &&
-        removeHtmlTags(params.description).length < DESCRIPTION_WITHOUT_HTML_LENGTH_MIN
+        removeHtmlTags(params.description).length < branding.group.descriptionMinLength
       ) {
         throw new UserInputError('Description too short!')
       }

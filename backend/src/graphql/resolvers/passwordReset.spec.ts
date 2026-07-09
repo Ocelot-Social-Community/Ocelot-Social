@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import registrationConstants from '@constants/registrationBranded'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import login from '@graphql/queries/auth/login.gql'
 import requestPasswordReset from '@graphql/queries/auth/requestPasswordReset.gql'
 import resetPassword from '@graphql/queries/auth/resetPassword.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+import branding from '@src/branding'
 
 import createPasswordReset from './helpers/createPasswordReset'
 
@@ -112,7 +113,7 @@ describe('passwordReset', () => {
           const resets = await getAllPasswordResets()
           const [reset] = resets
           const { nonce } = reset.properties
-          expect(nonce).toHaveLength(registrationConstants.NONCE_LENGTH)
+          expect(nonce).toHaveLength(branding.registration.nonceLength)
         })
       })
     })

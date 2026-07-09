@@ -11,18 +11,17 @@ import { createTransport } from 'nodemailer'
 
 import CONFIG, { nodemailerTransportOptions } from '@config/index'
 import { SUPPORTED_LOCALES } from '@config/locales'
-import logosWebapp from '@config/logosBranded'
-import metadata from '@config/metadata'
+import branding from '@src/branding'
 
 import type { UserDbProperties } from '@db/types/User'
 
-const welcomeImageUrl = new URL(logosWebapp.LOGO_WELCOME_PATH, CONFIG.CLIENT_URI)
+const welcomeImageUrl = new URL(branding.logos.welcomePath, CONFIG.CLIENT_URI)
 const settingsUrl = new URL('/settings/notifications', CONFIG.CLIENT_URI)
 
 export const defaultParams = {
   welcomeImageUrl,
   APPLICATION_NAME: CONFIG.APPLICATION_NAME,
-  ORGANIZATION_NAME: metadata.ORGANIZATION_NAME,
+  ORGANIZATION_NAME: branding.metadata.organizationName,
   ORGANIZATION_URL: CONFIG.ORGANIZATION_URL,
   // Optional at the template level: the mails render a "with support" and a "without support"
   // variant (the latter reachable in tests via `delete defaultParams.SUPPORT_EMAIL`). CONFIG

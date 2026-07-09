@@ -7,8 +7,9 @@
 /* eslint-disable n/no-process-env */
 import { config } from 'dotenv'
 
+import branding from '@src/branding'
+
 import { resolveLocale } from './locales'
-import metadata from './metadata'
 import { SOFTWARE_DEFAULTS } from './softwareDefaults'
 
 import type * as SMTPTransport from 'nodemailer/lib/smtp-pool'
@@ -169,7 +170,7 @@ const options = {
   // address / link. The env var names are SUPPORT_LINK / ORGANIZATION_LINK.
   SUPPORT_EMAIL: env.SUPPORT_EMAIL || SOFTWARE_DEFAULTS.SUPPORT_EMAIL,
   SUPPORT_URL: env.SUPPORT_LINK || SOFTWARE_DEFAULTS.SUPPORT_LINK,
-  APPLICATION_NAME: metadata.APPLICATION_NAME,
+  APPLICATION_NAME: branding.metadata.applicationName,
   ORGANIZATION_URL: env.ORGANIZATION_LINK || SOFTWARE_DEFAULTS.ORGANIZATION_LINK,
   // publicRegistration, inviteRegistration, categoriesActive and apiKeysEnabled
   // are network-policy keys now — the backend reads them from the policy

@@ -5,18 +5,18 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import trunc from 'trunc-html'
 
-import { DESCRIPTION_EXCERPT_HTML_LENGTH } from '@constants/groups'
+import branding from '@src/branding'
 
 import type { IMiddlewareResolver } from 'graphql-middleware/dist/types'
 
 const createGroup: IMiddlewareResolver = async (resolve, root, args, context, info) => {
-  args.descriptionExcerpt = trunc(args.description, DESCRIPTION_EXCERPT_HTML_LENGTH).html
+  args.descriptionExcerpt = trunc(args.description, branding.group.descriptionExcerptLength).html
   return resolve(root, args, context, info)
 }
 
 const updateGroup: IMiddlewareResolver = async (resolve, root, args, context, info) => {
   if (args.description)
-    args.descriptionExcerpt = trunc(args.description, DESCRIPTION_EXCERPT_HTML_LENGTH).html
+    args.descriptionExcerpt = trunc(args.description, branding.group.descriptionExcerptLength).html
   return resolve(root, args, context, info)
 }
 

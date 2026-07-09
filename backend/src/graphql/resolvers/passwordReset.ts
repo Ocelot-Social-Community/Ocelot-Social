@@ -7,7 +7,7 @@
 import bcrypt from 'bcryptjs'
 import { v4 as uuid } from 'uuid'
 
-import registrationConstants from '@constants/registrationBranded'
+import branding from '@src/branding'
 
 import createPasswordReset from './helpers/createPasswordReset'
 import normalizeEmail from './helpers/normalizeEmail'
@@ -20,7 +20,7 @@ export default {
       const { driver } = context
       email = normalizeEmail(email)
       // TODO: why this is generated differntly from 'backend/src/schema/resolvers/helpers/generateNonce.js'?
-      const nonce = uuid().substring(0, registrationConstants.NONCE_LENGTH)
+      const nonce = uuid().substring(0, branding.registration.nonceLength)
       return createPasswordReset({ driver, nonce, email })
     },
     resetPassword: async (_parent, { email, nonce, newPassword }, { driver }) => {
