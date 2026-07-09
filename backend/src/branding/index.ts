@@ -1,21 +1,13 @@
-// Resolved branding config: framework defaults with the brand's sparse overrides deep-merged
-// on top (overrides win). Import this everywhere a brand-tunable constant is needed:
+// Backend access point for the shared branding config. Thin re-export of the framework-wide
+// `@ocelot-social/branding` package — the SINGLE source consumed by both backend and webapp, so
+// brand-tunable constants (group limits, registration lengths, metadata, logo paths, …) cannot
+// drift between the two. Import it as `@src/branding`:
 //
 //   import branding from '@src/branding'
-//   ... branding.group.descriptionMinLength
+//   branding.group.descriptionMinLength
 //
-// `merge` mutates its first argument, so we merge into a fresh object to avoid clobbering the
-// defaults. See docu/branding-architecture-konzept.md ("Schicht A konkret").
+// The schema, framework defaults and the brand override slot live in the package; see
+// docu/branding-architecture-konzept.md ("Schicht A konkret").
 
-import { merge } from 'lodash'
-
-import { brandingDefaults } from './defaults'
-import overrides from './overrides'
-
-import type { BrandingConfig } from './schema'
-
-const branding: BrandingConfig = merge({}, brandingDefaults, overrides)
-
-export type { BrandingConfig } from './schema'
-export { brandingDefaults } from './defaults'
-export default branding
+export { default, brandingDefaults } from '@ocelot-social/branding'
+export type { BrandingConfig } from '@ocelot-social/branding'

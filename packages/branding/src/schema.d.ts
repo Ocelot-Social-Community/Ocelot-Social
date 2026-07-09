@@ -12,6 +12,10 @@
 
 export interface BrandingConfig {
   group: {
+    /** Minimum length of a group name (webapp form validation). */
+    nameLengthMin: number
+    /** Maximum length of a group name (webapp form validation). */
+    nameLengthMax: number
     /** Minimum length of a group description with HTML tags stripped. */
     descriptionMinLength: number
     /** Length a group description is truncated to for its excerpt (HTML stripped). */

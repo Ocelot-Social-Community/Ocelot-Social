@@ -30,5 +30,7 @@ function deepMerge(base, patch) {
 
 const branding = deepMerge(brandingDefaults, overrides)
 
-// Expose both a default (for `import branding from …`) and named exports.
-module.exports = { default: branding, branding, brandingDefaults }
+// Expose both a default (for `import branding from …`) and named exports. `__esModule: true`
+// so a TS/babel `esModuleInterop` default import resolves to `branding` (not the whole
+// module.exports).
+module.exports = { __esModule: true, default: branding, branding, brandingDefaults }

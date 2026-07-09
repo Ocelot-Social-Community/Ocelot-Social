@@ -6,6 +6,8 @@
 /** @type {import('./schema').BrandingConfig} */
 const brandingDefaults = {
   group: {
+    nameLengthMin: 3,
+    nameLengthMax: 50,
     descriptionMinLength: 3,
     descriptionExcerptLength: 250,
   },
