@@ -422,7 +422,11 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
           class="ds-mb-large"
         />
          
-        <!---->
+        <div
+          class="group-member-list"
+          user-id="u3"
+          user-name="Bob the builder"
+        />
          
         <!---->
       </div>
@@ -1136,7 +1140,11 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
           class="ds-mb-large"
         />
          
-        <!---->
+        <div
+          class="group-member-list"
+          user-id="u3"
+          user-name="Bob the builder"
+        />
          
         <!---->
       </div>
@@ -1700,34 +1708,11 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
         />
          
         <div
-          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
-        >
-          <div
-            class="infinite-scroll-list"
-          >
-            <h5
-              class="title"
-            >
-              
-      profile.groups.title
-      
-              <!---->
-            </h5>
-             
-            <div
-              class="scroll-container"
-            >
-               
-              <p
-                class="nobody-message"
-              >
-                profile.groups.nobody
-              </p>
-               
-              <!---->
-            </div>
-          </div>
-        </div>
+          class="group-member-list"
+          my-profile="true"
+          user-id="u23"
+          user-name="Bob the builder"
+        />
          
         <!---->
       </div>
@@ -2369,34 +2354,11 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
         />
          
         <div
-          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
-        >
-          <div
-            class="infinite-scroll-list"
-          >
-            <h5
-              class="title"
-            >
-              
-      profile.groups.title
-      
-              <!---->
-            </h5>
-             
-            <div
-              class="scroll-container"
-            >
-               
-              <p
-                class="nobody-message"
-              >
-                profile.groups.nobody
-              </p>
-               
-              <!---->
-            </div>
-          </div>
-        </div>
+          class="group-member-list"
+          my-profile="true"
+          user-id="u23"
+          user-name="Bob the builder"
+        />
          
         <!---->
       </div>
