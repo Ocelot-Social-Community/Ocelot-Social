@@ -746,6 +746,10 @@ export default {
           context: Context,
         ) => {
           if (!context.user) return false
+          // Subscriptions bypass the permissionsMiddleware shield (it gates only
+          // Query/Mutation), so the groups feature gate must be re-applied here — otherwise
+          // group events keep flowing while groupsEnabled is off.
+          if (!context.policy.getEffective('groupsEnabled')) return false
           return payload.groupMembershipVisibilityChanged.userId === args.userId
         },
       ),
@@ -760,6 +764,9 @@ export default {
           context: Context,
         ) => {
           if (!context.user) return false
+          // See groupMembershipVisibilityChanged: the shield does not cover Subscriptions,
+          // so re-gate on groupsEnabled here so no group events leak while the feature is off.
+          if (!context.policy.getEffective('groupsEnabled')) return false
           return payload.groupShowMembersChanged.groupId === args.groupId
         },
       ),

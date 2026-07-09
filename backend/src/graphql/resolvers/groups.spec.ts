@@ -7,6 +7,8 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable jest/no-commented-out-tests */
+import { setImmediate as scheduleMacrotask } from 'node:timers/promises'
+
 import { PubSub } from 'graphql-subscriptions'
 
 import {
@@ -30,6 +32,7 @@ import UserGroups from '@graphql/queries/groups/UserGroups.gql'
 import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import Post from '@graphql/queries/posts/Post.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+import { createInMemoryPolicyService } from '@src/policy'
 
 import groupsResolver from './groups'
 
@@ -4042,10 +4045,32 @@ describe('in mode', () => {
   })
 })
 
+// Subscriptions bypass the permissionsMiddleware shield (it gates only Query/Mutation), so
+// the groupsEnabled gate is re-applied inside each withFilter callback. These tests drive the
+// filter directly: an event reaches iterator.next() only when the filter returns true.
+//
+// withFilter delivers on the microtask queue, so a would-be delivery resolves `next` before
+// any macrotask runs. Racing `next` against a setImmediate macrotask therefore gives a
+// deterministic verdict — 'delivered' if the event passed the filter, 'pending' if it was
+// dropped — with no arbitrary sleep. (Asserting the drop via iterator.return() does NOT work:
+// return() resolves the pending pull with done:true and wins even when the gate is absent,
+// so that shape passes whether or not the event was gated — it cannot catch a regression.)
+const MACROTASK = Symbol('macrotask')
+async function deliveredWithin(
+  next: Promise<IteratorResult<unknown>>,
+): Promise<'delivered' | 'pending'> {
+  const outcome = await Promise.race([
+    next.then(() => 'delivered' as const),
+    scheduleMacrotask(MACROTASK),
+  ])
+  return outcome === MACROTASK ? 'pending' : outcome
+}
+
 describe('Subscription.groupShowMembersChanged filter', () => {
   it('passes matching events through for authenticated users', async () => {
     const pubsub = new PubSub()
-    const context = { pubsub, user: { id: 'u1' } } as unknown as Context
+    const policy = createInMemoryPolicyService({})
+    const context = { pubsub, policy, user: { id: 'u1' } } as unknown as Context
     const iterator = groupsResolver.Subscription.groupShowMembersChanged.subscribe(
       null,
       { groupId: 'g1' },
@@ -4060,12 +4085,32 @@ describe('Subscription.groupShowMembersChanged filter', () => {
     expect(value).toEqual({ groupShowMembersChanged: { groupId: 'g1' } })
     await iterator.return?.()
   })
+
+  it('drops events while groupsEnabled is off', async () => {
+    const pubsub = new PubSub()
+    const policy = createInMemoryPolicyService({ groupsEnabled: false })
+    const context = { pubsub, policy, user: { id: 'u1' } } as unknown as Context
+    const iterator = groupsResolver.Subscription.groupShowMembersChanged.subscribe(
+      null,
+      { groupId: 'g1' },
+      context,
+      null,
+    )
+    const next = iterator.next()
+    // Matches on groupId, so only the feature gate can drop it.
+    await pubsub.publish(GROUP_SHOW_MEMBERS_CHANGED, {
+      groupShowMembersChanged: { groupId: 'g1' },
+    })
+    expect(await deliveredWithin(next)).toBe('pending')
+    await iterator.return?.()
+  })
 })
 
 describe('Subscription.groupMembershipVisibilityChanged filter', () => {
   it('passes matching events through for authenticated users', async () => {
     const pubsub = new PubSub()
-    const context = { pubsub, user: { id: 'u1' } } as unknown as Context
+    const policy = createInMemoryPolicyService({})
+    const context = { pubsub, policy, user: { id: 'u1' } } as unknown as Context
     const iterator = groupsResolver.Subscription.groupMembershipVisibilityChanged.subscribe(
       null,
       { userId: 'u2' },
@@ -4078,6 +4123,25 @@ describe('Subscription.groupMembershipVisibilityChanged filter', () => {
     })
     const { value } = await next
     expect(value).toEqual({ groupMembershipVisibilityChanged: { userId: 'u2' } })
+    await iterator.return?.()
+  })
+
+  it('drops events while groupsEnabled is off', async () => {
+    const pubsub = new PubSub()
+    const policy = createInMemoryPolicyService({ groupsEnabled: false })
+    const context = { pubsub, policy, user: { id: 'u1' } } as unknown as Context
+    const iterator = groupsResolver.Subscription.groupMembershipVisibilityChanged.subscribe(
+      null,
+      { userId: 'u2' },
+      context,
+      null,
+    )
+    const next = iterator.next()
+    // Matches on userId, so only the feature gate can drop it.
+    await pubsub.publish(GROUP_MEMBERSHIP_VISIBILITY_CHANGED, {
+      groupMembershipVisibilityChanged: { userId: 'u2' },
+    })
+    expect(await deliveredWithin(next)).toBe('pending')
     await iterator.return?.()
   })
 })
