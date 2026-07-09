@@ -8,9 +8,9 @@
       <div ref="scrollEl" class="scroll-container" @scroll="onScroll">
         <slot />
         <p v-if="empty && !loading" class="nobody-message">{{ nobodyMessage }}</p>
-      </div>
-      <div v-if="loading" class="loading-indicator">
-        <os-spinner size="sm" />
+        <div v-if="loading" class="loading-indicator">
+          <os-spinner size="md" />
+        </div>
       </div>
     </div>
   </os-card>
@@ -87,17 +87,17 @@ export default {
   max-height: 320px;
   overflow-y: auto;
 
-  /* Firefox */
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
+  /* Standard: Firefox + Safari 18+ */
+  scrollbar-width: none;
 
   &.is-scrolling {
+    scrollbar-width: thin;
     scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
   }
 
-  /* Webkit */
+  /* Webkit: Safari < 18, Chrome */
   &::-webkit-scrollbar {
-    width: 6px;
+    width: 0;
   }
 
   &::-webkit-scrollbar-track {
@@ -107,6 +107,10 @@ export default {
   &::-webkit-scrollbar-thumb {
     background: transparent;
     border-radius: 3px;
+  }
+
+  &.is-scrolling::-webkit-scrollbar {
+    width: 6px;
   }
 
   &.is-scrolling::-webkit-scrollbar-thumb {
