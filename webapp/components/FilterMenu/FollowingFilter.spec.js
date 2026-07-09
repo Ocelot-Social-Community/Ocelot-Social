@@ -25,6 +25,8 @@ describe('FollowingFilter', () => {
 
   const mocks = {
     $t: jest.fn((string) => string),
+    // Groups feature on by default; the "off" case flips this.
+    $policy: { get: jest.fn(() => true) },
   }
 
   const Wrapper = () => {
@@ -77,6 +79,16 @@ describe('FollowingFilter', () => {
         const clearFollowerButton = wrapper.find('.following-filter .item-all-follower button')
         clearFollowerButton.trigger('click')
         expect(mutations['posts/RESET_FOLLOWERS_FILTER']).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('when the groups feature is disabled', () => {
+      it('hides the "posts in my groups" filter', () => {
+        mocks.$policy = { get: jest.fn(() => false) }
+        const wrapper = Wrapper()
+        expect(
+          wrapper.find('.following-filter .filter-list .posts-in-my-groups-item').exists(),
+        ).toBe(false)
       })
     })
   })

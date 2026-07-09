@@ -35,13 +35,17 @@ const isAuthenticated = rule({
 // mapping below stays in code (under review), only role→permission is dynamic
 // data. The permission argument is typed against the catalog, so a typo or a
 // removed key is a compile-time error (the shield→catalog drift guard).
+// The single source of truth for "does this request currently hold this permission":
+// the right must be in the resolved effective set AND its runtime feature gate (if any)
+// must be open — e.g. apiKey.create needs the apiKeysEnabled policy. Couples the right to
+// its env/policy flag in one place so every caller inherits identical semantics.
+const hasPermissionEffective = (ctx: Context, permission: PermissionKey): boolean =>
+  ctx.effectivePermissions.has(permission) && isPermissionAvailable(permission, ctx)
+
 const hasPermission = (permission: PermissionKey) =>
-  rule({ cache: 'contextual' })(async (_parent, _args, ctx: Context) => {
-    // A granted permission only authorizes while its runtime feature gate (if any) is
-    // open — e.g. apiKey.create needs the apiKeysEnabled policy. This couples the right
-    // to its env/policy flag in one place, so every hasPermission() gate inherits it.
-    return ctx.effectivePermissions.has(permission) && isPermissionAvailable(permission, ctx)
-  })
+  rule({ cache: 'contextual' })(async (_parent, _args, ctx: Context) =>
+    hasPermissionEffective(ctx, permission),
+  )
 
 // Flat per-group-type creation rights (mirrors videoCall.create_*): creating a group
 // of a given type needs exactly that type's permission, independent of the others.
@@ -59,7 +63,10 @@ const groupCreatePermissionForType = (groupType: string): PermissionKey | null =
 }
 const canCreateGroup = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
   const permission = groupCreatePermissionForType(args.groupType)
-  return !!permission && ctx.effectivePermissions.has(permission)
+  // Same check as hasPermission(), but the permission depends on the requested groupType,
+  // so it can't be a static hasPermission() gate. group.create_* is gated by groupsEnabled,
+  // so hasPermissionEffective also blocks creation when groups are off.
+  return !!permission && hasPermissionEffective(ctx, permission)
 })
 
 const apiKeysEnabled = rule({ cache: 'contextual' })(async (
@@ -80,6 +87,16 @@ const socialMediaEnabled = rule({ cache: 'contextual' })(async (
   { policy }: Context,
 ) => {
   return policy.getEffective('socialMediaEnabled')
+})
+
+// The whole groups feature hangs off one policy toggle. Group creation is already gated
+// via the group.create_* permissions (gatedBy groupsEnabled); this rule gates the rest —
+// viewing/browsing groups and every group mutation that is NOT permission-based (join,
+// leave, member management, invites, group rooms/calls) — so nothing group-related is
+// reachable over the API while the feature is off. getEffective, so it also respects any
+// (future) env dependency the policy declares.
+const groupsEnabled = rule({ cache: 'contextual' })(async (_parent, _args, { policy }: Context) => {
+  return policy.getEffective('groupsEnabled')
 })
 
 // Gates the dev/test-only cache-resync trigger: db:reset/db:seed and the e2e harness
@@ -545,7 +562,7 @@ export default shield(
       searchChatTargets: isAuthenticated,
       searchPosts: allow,
       searchUsers: allow,
-      searchGroups: allow,
+      searchGroups: groupsEnabled,
       searchHashtags: allow,
       embed: allow,
       Category: allow,
@@ -553,9 +570,9 @@ export default shield(
       reports: hasPermission('content.moderate'),
       statistics: hasPermission('network.statistics.read'),
       currentUser: isAuthenticated,
-      Group: isAuthenticated,
-      GroupMembers: isAllowedSeeingGroupMembers,
-      GroupCount: isAuthenticated,
+      Group: and(groupsEnabled, isAuthenticated),
+      GroupMembers: and(groupsEnabled, isAllowedSeeingGroupMembers),
+      GroupCount: and(groupsEnabled, isAuthenticated),
       Post: allow,
       profilePagePosts: allow,
       Comment: allow,
@@ -612,11 +629,11 @@ export default shield(
       SignupVerification: allow,
       UpdateUser: onlyYourself,
       CreateGroup: and(isAuthenticated, canCreateGroup),
-      UpdateGroup: isAllowedToChangeGroupSettings,
-      JoinGroup: isAllowedToJoinGroup,
-      LeaveGroup: isAllowedToLeaveGroup,
-      ChangeGroupMemberRole: isAllowedToChangeGroupMemberRole,
-      RemoveUserFromGroup: canRemoveUserFromGroup,
+      UpdateGroup: and(groupsEnabled, isAllowedToChangeGroupSettings),
+      JoinGroup: and(groupsEnabled, isAllowedToJoinGroup),
+      LeaveGroup: and(groupsEnabled, isAllowedToLeaveGroup),
+      ChangeGroupMemberRole: and(groupsEnabled, isAllowedToChangeGroupMemberRole),
+      RemoveUserFromGroup: and(groupsEnabled, canRemoveUserFromGroup),
       CreatePost: and(isAuthenticated, hasPermission('post.create'), isMemberOfGroup),
       UpdatePost: isAuthor,
       DeletePost: isAuthor,
@@ -656,15 +673,15 @@ export default shield(
       VerifyEmailAddress: isAuthenticated,
       pinPost: hasPermission('post.pin'),
       unpinPost: hasPermission('post.pin'),
-      pinGroupPost: isAllowedToPinGroupPost,
-      unpinGroupPost: isAllowedToPinGroupPost,
+      pinGroupPost: and(groupsEnabled, isAllowedToPinGroupPost),
+      unpinGroupPost: and(groupsEnabled, isAllowedToPinGroupPost),
       pushPost: hasPermission('post.push'),
       unpushPost: hasPermission('post.push'),
       UpdateDonations: hasPermission('donation.manage'),
 
       // InviteCode
       generatePersonalInviteCode: and(isAuthenticated, hasPermission('user.invite')),
-      generateGroupInviteCode: isAllowedToGenerateGroupInviteCode,
+      generateGroupInviteCode: and(groupsEnabled, isAllowedToGenerateGroupInviteCode),
       invalidateInviteCode: isAuthenticated,
       redeemInviteCode: isAuthenticated,
 
@@ -695,14 +712,14 @@ export default shield(
 
       saveCategorySettings: isAuthenticated,
       updateOnlineStatus: isAuthenticated,
-      CreateGroupRoom: isAuthenticated,
+      CreateGroupRoom: and(groupsEnabled, isAuthenticated),
       CreateMessage: isAuthenticated,
-      joinGroupVideoCall: isAuthenticated,
+      joinGroupVideoCall: and(groupsEnabled, isAuthenticated),
       MarkMessagesAsSeen: isAuthenticated,
       toggleObservePost: isAuthenticated,
-      muteGroup: and(isAuthenticated, isMemberOfGroup),
-      unmuteGroup: and(isAuthenticated, isMemberOfGroup),
-      setGroupMembershipVisibility: and(isAuthenticated, isMemberOfGroup),
+      muteGroup: and(groupsEnabled, isAuthenticated, isMemberOfGroup),
+      unmuteGroup: and(groupsEnabled, isAuthenticated, isMemberOfGroup),
+      setGroupMembershipVisibility: and(groupsEnabled, isAuthenticated, isMemberOfGroup),
       setTrophyBadgeSelected: isAuthenticated,
       resetTrophyBadgesSelected: isAuthenticated,
     },

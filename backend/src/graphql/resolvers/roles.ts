@@ -1,5 +1,10 @@
 import { ForbiddenError, UserInputError } from '@graphql/errors'
-import { groupFor, isPermissionAvailable, permissionCatalog } from '@src/permission'
+import {
+  blockingGateFor,
+  groupFor,
+  isPermissionAvailable,
+  permissionCatalog,
+} from '@src/permission'
 import {
   OWNER_ROLE,
   PERMISSIONS_CHANGED_CHANNEL,
@@ -84,9 +89,10 @@ export default {
     permissionCatalog: (_parent: unknown, _args: unknown, context: Context) =>
       permissionCatalog().map((entry) => ({
         ...entry,
-        // Coerce the optional gate to null: GraphQL errors on a resolver returning
-        // undefined for a nullable field; null is the explicit "no gate" value.
-        gatedBy: entry.gatedBy ?? null,
+        // A permission may have several gates now; expose the first one currently
+        // CLOSED (the one the admin needs to open) so the roles UI deep-links to an
+        // actionable policy. Null when the permission is effective (available).
+        gatedBy: blockingGateFor(entry.key, context),
         available: isPermissionAvailable(entry.key, context),
       })),
 

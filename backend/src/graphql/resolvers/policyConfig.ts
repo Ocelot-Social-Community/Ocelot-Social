@@ -29,6 +29,9 @@ export default {
             envSeed,
             envSeedState: envSeed ? policy.envState(envSeed) : null,
             requiresEnv: policy.requiresEnvStatus(key),
+            // Env availability only; policy→policy dependencies (requiresPolicy on the policy
+            // query) are folded live in the admin tab so re-enabling a dependency un-greys the
+            // dependent key without refetching this metadata.
             available: policy.isAvailable(key),
           }
         })

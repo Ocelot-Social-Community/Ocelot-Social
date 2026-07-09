@@ -14,10 +14,11 @@ import {
   CHAT_MESSAGE_STATUS_UPDATED,
   ROOM_UPDATED,
 } from '@constants/subscriptions'
+import { ForbiddenError } from '@graphql/errors'
 
 import { attachments } from './attachments/attachments'
 import Resolver from './helpers/Resolver'
-import { getRoomProperties } from './rooms'
+import { getRoomProperties, groupChatGated, roomIsGroupRoom } from './rooms'
 
 import type { File } from './attachments/attachments'
 
@@ -83,6 +84,16 @@ export default {
   Query: {
     Message: async (object, params, context, resolveInfo) => {
       const { roomId, beforeIndex } = params
+      // Group chat is gated by the groups feature: while it is off, a group room's messages
+      // are not served (its history stays in the DB, just inaccessible). DM rooms are unaffected.
+      if (groupChatGated(context) && roomId) {
+        const session = context.driver.session()
+        try {
+          if (await roomIsGroupRoom(roomId, session)) return []
+        } finally {
+          await session.close()
+        }
+      }
       delete params.roomId
       delete params.beforeIndex
       if (!params.filter) params.filter = {}
@@ -143,6 +154,13 @@ export default {
       const session = context.driver.session()
 
       try {
+        // Block posting into a group room while the groups feature is off (the userId/DM path
+        // can never resolve a group room, so only the roomId path needs the check). Inside the
+        // try so the finally closes the session even if roomIsGroupRoom() throws on a DB error.
+        if (roomId && groupChatGated(context) && (await roomIsGroupRoom(roomId, session))) {
+          throw new ForbiddenError('Not Authorized!')
+        }
+
         return await session.writeTransaction(async (transaction) => {
           // If userId is provided, find-or-create a DM room first
           if (userId) {

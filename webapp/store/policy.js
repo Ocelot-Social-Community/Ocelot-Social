@@ -40,8 +40,22 @@ const normalize = (entries) => {
   return out
 }
 
+// The policy→policy dependency map (key → other keys that gate it). Static schema metadata
+// carried on each policy entry, so $policy.get can re-fold the effective value client-side
+// (a layout toggle respects its feature gate). Deps never change at runtime, so only the
+// full snapshot fetch sets them; the value-only live subscription leaves them untouched.
+const normalizeDeps = (entries) => {
+  const out = {}
+  for (const entry of Array.isArray(entries) ? entries : []) {
+    if (!entry || entry.key === '__typename') continue
+    out[entry.key] = Array.isArray(entry.requiresPolicy) ? entry.requiresPolicy : []
+  }
+  return out
+}
+
 export const state = () => ({
   snapshot: {},
+  deps: {},
   defaults: {},
   lastChange: null,
   isInitialized: false,
@@ -51,6 +65,7 @@ export const state = () => ({
 export const mutations = {
   SET_SNAPSHOT(state, snapshot) {
     state.snapshot = normalize(snapshot)
+    state.deps = normalizeDeps(snapshot)
   },
   SET_DEFAULTS(state, defaults) {
     state.defaults = normalize(defaults)
@@ -73,7 +88,27 @@ export const getters = {
   snapshot(state) {
     return state.snapshot
   },
+  // The policy→policy dependency map (key → keys that gate it). Static schema metadata the
+  // admin policy tab reads to fold availability live (grey a dependent key when its
+  // dependency is off), so a toggle reacts without refetching the policyConfig metadata.
+  deps(state) {
+    return state.deps
+  },
+  // Raw stored value — the admin policy tab edits this (it must distinguish "toggled off"
+  // from "gated off by a dependency"). App consumers use getEffective via $policy.get.
   get: (state) => (key) => state.snapshot[key],
+  // Effective value with the policy→policy gate folded in (mirrors the backend
+  // getEffective): a boolean key whose any required policy is not effectively on folds to
+  // false. Non-boolean / non-true values pass through unchanged. Recurses over the dep
+  // graph (validated acyclic on the backend, so it terminates).
+  getEffective: (state, getters) => (key) => {
+    const value = state.snapshot[key]
+    if (value !== true) return value
+    for (const dependency of state.deps[key] || []) {
+      if (getters.getEffective(dependency) !== true) return false
+    }
+    return true
+  },
   defaults(state) {
     return state.defaults
   },

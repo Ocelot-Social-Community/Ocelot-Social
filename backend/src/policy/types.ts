@@ -29,6 +29,7 @@ export interface NetworkPolicy {
   categoriesActive: boolean
   badgesEnabled: boolean
   socialMediaEnabled: boolean
+  groupsEnabled: boolean
   showContentFilterHeaderMenu: boolean
   showContentFilterMasonryGrid: boolean
   showGroupButtonInHeader: boolean

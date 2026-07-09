@@ -9,7 +9,7 @@
 // `requiresEnv` (e.g. videoConference needs the LiveKit secrets), and PolicyService
 // folds that into getEffective() — so a gate never reads env directly. This collapses
 // the former two gate sources (config vs policy) into one.
-import { allPermissionGates, gateFor } from './schema'
+import { allPermissionGates, gatesFor } from './schema'
 
 import type { PermissionGate, PermissionKey } from './types'
 
@@ -38,8 +38,15 @@ export function isPermissionGatePolicyKey(key: string): key is PermissionGate {
 }
 
 // Whether a permission is effective right now: ungated permissions always are; a
-// gated one only while its backing policy is effectively on.
+// gated one only while EVERY backing policy is effectively on (AND semantics).
 export function isPermissionAvailable(key: PermissionKey, ctx: GateContext): boolean {
-  const gate = gateFor(key)
-  return gate === undefined || isGateOpen(gate, ctx)
+  return gatesFor(key).every((gate) => isGateOpen(gate, ctx))
+}
+
+// The first gate currently closing a permission — the actionable one for the admin to
+// open — or null when the permission is effective. A multi-gated permission can be
+// blocked by more than one policy; surfacing the first-closed lets the admin roles UI
+// deep-link straight to a policy that will move the needle (open one, refetch, repeat).
+export function blockingGateFor(key: PermissionKey, ctx: GateContext): PermissionGate | null {
+  return gatesFor(key).find((gate) => !isGateOpen(gate, ctx)) ?? null
 }

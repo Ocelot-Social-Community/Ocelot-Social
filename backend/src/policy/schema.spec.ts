@@ -1,7 +1,16 @@
 // Unit tests for the visibility primitive — the single mechanism shared by the
 // `policy` query resolver and the policyChanged subscription filter.
 
-import { allKeys, audiencesFor, audiencesOf, canView, categoryFor, visibleKeys } from './schema'
+import {
+  allKeys,
+  audiencesFor,
+  audiencesOf,
+  canView,
+  categoryFor,
+  requiresPolicyFor,
+  typeFor,
+  visibleKeys,
+} from './schema'
 
 // The subset of ./schema the perm-gating tests re-import against a mocked JSON
 // schema. Built from the already-imported functions to avoid a namespace import.
@@ -139,6 +148,7 @@ describe('policy visibility', () => {
         'askForRealName',
         'badgesEnabled',
         'categoriesActive',
+        'groupsEnabled',
         'inviteRegistration',
         'publicRegistration',
         'requireLocation',
@@ -156,6 +166,7 @@ describe('policy visibility', () => {
         'askForRealName',
         'badgesEnabled',
         'categoriesActive',
+        'groupsEnabled',
         'inviteCodesGroupPerUser',
         'inviteCodesPersonalPerUser',
         'inviteLinkLimit',
@@ -188,5 +199,99 @@ describe('categoryFor', () => {
     for (const key of allKeys()) {
       expect(categoryFor(key)).toEqual(expect.any(String))
     }
+  })
+})
+
+describe('requiresPolicyFor', () => {
+  it('returns the declared policy→policy dependencies (empty for most keys)', () => {
+    expect(requiresPolicyFor('showGroupButtonInHeader')).toEqual(['groupsEnabled'])
+    expect(requiresPolicyFor('groupsEnabled')).toEqual([])
+    expect(requiresPolicyFor('badgesEnabled')).toEqual([])
+  })
+
+  it('returns a fresh copy — a caller mutating it cannot alter the shared schema', () => {
+    const deps = requiresPolicyFor('showGroupButtonInHeader')
+    deps.push('groupsEnabled')
+    expect(requiresPolicyFor('showGroupButtonInHeader')).toEqual(['groupsEnabled'])
+  })
+
+  // The graph invariants (dep exists, both boolean, visibility superset, acyclic) are
+  // asserted at module load — reaching this test at all means they held for the shipped
+  // schema. Re-check the properties here so a future schema edit that violates one fails
+  // loudly with a specific message instead of a mystery boot error.
+  it('every dependency is a known boolean key visible wherever the dependent is', () => {
+    for (const key of allKeys()) {
+      const keyAudiences = new Set(audiencesFor(key))
+      for (const dep of requiresPolicyFor(key)) {
+        expect(allKeys()).toContain(dep)
+        expect(typeFor(key)).toBe('boolean')
+        expect(typeFor(dep)).toBe('boolean')
+        // Every audience that can see the dependent must also see the dependency.
+        for (const audience of keyAudiences) {
+          expect(audiencesFor(dep)).toContain(audience)
+        }
+      }
+    }
+  })
+
+  // The shipped schema is valid, so assertRequiresPolicyGraph()'s throw branches never fire
+  // against it — the invariant test above proves the properties hold, but not that a
+  // VIOLATION is actually rejected. Inject deliberately broken schemas and assert the module
+  // refuses to load, so a future refactor of the detection code (e.g. the DFS cycle check)
+  // that stops throwing is caught. Each case isolates one branch.
+  describe('assertRequiresPolicyGraph rejects a mis-authored schema at module load', () => {
+    // Returns a thunk that reloads ./schema against a mocked JSON; assertRequiresPolicyGraph
+    // runs during require, so a violation surfaces as a throw when the thunk is called.
+    const loadWith = (properties: Record<string, unknown>) => (): void => {
+      jest.isolateModules(() => {
+        jest.doMock('./policy.schema.json', () => ({ type: 'object', properties }))
+        // eslint-disable-next-line @typescript-eslint/no-require-imports, n/global-require, import-x/no-unassigned-import
+        require('./schema')
+      })
+    }
+
+    it('throws on a requiresPolicy cycle', () => {
+      expect(
+        loadWith({
+          a: { type: 'boolean', default: false, requiresPolicy: ['b'] },
+          b: { type: 'boolean', default: false, requiresPolicy: ['a'] },
+        }),
+      ).toThrow(/requiresPolicy cycle/)
+    })
+
+    it('throws when a dependency names an unknown key', () => {
+      expect(
+        loadWith({
+          a: { type: 'boolean', default: false, requiresPolicy: ['missing'] },
+        }),
+      ).toThrow(/requiresPolicy unknown key "missing"/)
+    })
+
+    it('throws when the dependent key is not boolean', () => {
+      expect(
+        loadWith({
+          a: { type: 'number', default: 0, requiresPolicy: ['b'] },
+          b: { type: 'boolean', default: false },
+        }),
+      ).toThrow(/"a" has requiresPolicy but is not boolean/)
+    })
+
+    it('throws when a dependency is not boolean', () => {
+      expect(
+        loadWith({
+          a: { type: 'boolean', default: false, requiresPolicy: ['b'] },
+          b: { type: 'number', default: 0 },
+        }),
+      ).toThrow(/requiresPolicy non-boolean key "b"/)
+    })
+
+    it('throws when a dependency is not visible everywhere the dependent is', () => {
+      expect(
+        loadWith({
+          a: { type: 'boolean', default: false, visibility: ['public'], requiresPolicy: ['b'] },
+          b: { type: 'boolean', default: false, visibility: ['authenticated'] },
+        }),
+      ).toThrow(/visible to "public" but its requiresPolicy dependency "b" is not/)
+    })
   })
 })

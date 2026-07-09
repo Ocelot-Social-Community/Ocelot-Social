@@ -35,7 +35,7 @@
             {{ $t('filter-menu.following') }}
           </os-button>
         </li>
-        <li class="item posts-in-my-groups-item">
+        <li v-if="$policy.get('groupsEnabled')" class="item posts-in-my-groups-item">
           <os-button
             variant="primary"
             :appearance="filteredByPostsInMyGroups ? 'filled' : 'outline'"

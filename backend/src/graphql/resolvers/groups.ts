@@ -569,6 +569,10 @@ export default {
   },
   User: {
     groups: async (parent, args, context: Context, _resolveInfo) => {
+      // Server-side enforcement of the groups gate: with the feature off, a profile exposes
+      // no groups at all (data minimisation), rather than relying on the webapp to hide the
+      // list. Mirrors the socialMedia field gate.
+      if (!context.policy.getEffective('groupsEnabled')) return []
       const profileUserId = parent.id
       const viewerId = context.user?.id
       const isOwnProfile = profileUserId === viewerId
@@ -742,6 +746,10 @@ export default {
           context: Context,
         ) => {
           if (!context.user) return false
+          // Subscriptions bypass the permissionsMiddleware shield (it gates only
+          // Query/Mutation), so the groups feature gate must be re-applied here — otherwise
+          // group events keep flowing while groupsEnabled is off.
+          if (!context.policy.getEffective('groupsEnabled')) return false
           return payload.groupMembershipVisibilityChanged.userId === args.userId
         },
       ),
@@ -756,6 +764,9 @@ export default {
           context: Context,
         ) => {
           if (!context.user) return false
+          // See groupMembershipVisibilityChanged: the shield does not cover Subscriptions,
+          // so re-gate on groupsEnabled here so no group events leak while the feature is off.
+          if (!context.policy.getEffective('groupsEnabled')) return false
           return payload.groupShowMembersChanged.groupId === args.groupId
         },
       ),

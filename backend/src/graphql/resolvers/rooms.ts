@@ -12,10 +12,14 @@ import { ROOM_UPDATED } from '@constants/subscriptions'
 
 import Resolver from './helpers/Resolver'
 
-export const getUnreadRoomsCount = async (userId, session) => {
+// excludeGroupRooms: when the groups feature is off, group rooms must not count towards the
+// unread badge (they are hidden everywhere else too). The rest of the query is unchanged.
+export const getUnreadRoomsCount = async (userId, session, excludeGroupRooms = false) => {
   return session.readTransaction(async (transaction) => {
+    const groupRoomFilter = excludeGroupRooms ? 'AND NOT (room)-[:ROOM_FOR]->(:Group)' : ''
     const unreadRoomsCypher = `
       MATCH (user:User { id: $userId })-[:HAS_NOT_SEEN]->(message:Message)-[:INSIDE]->(room:Room)<-[:CHATS_IN]-(user)
+      WHERE true ${groupRoomFilter}
       OPTIONAL MATCH (message)<-[:CREATED]-(sender:User)
       WHERE (user)-[:BLOCKED]->(sender) OR (user)-[:MUTED]->(sender)
       WITH room, message, sender
@@ -24,6 +28,23 @@ export const getUnreadRoomsCount = async (userId, session) => {
     `
     const unreadRoomsTxResponse = await transaction.run(unreadRoomsCypher, { userId })
     return unreadRoomsTxResponse.records.map((record) => record.get('count'))[0]
+  })
+}
+
+// Whether the groups feature is currently off for this request — group chat (rooms, their
+// messages, unread counts, chat-target search) is hidden/blocked while it is. Default false
+// (feature on) if no policy service is on the context, so chat never breaks on a missing policy.
+export const groupChatGated = (context) => context.policy?.getEffective('groupsEnabled') === false
+
+// Whether a room is a group room (has a ROOM_FOR edge to a Group). Used to block messaging in
+// a group room while the groups feature is off, without denying DM rooms (shared mutations).
+export const roomIsGroupRoom = async (roomId, session) => {
+  return session.readTransaction(async (transaction) => {
+    const result = await transaction.run(
+      'MATCH (room:Room { id: $roomId }) RETURN EXISTS((room)-[:ROOM_FOR]->(:Group)) AS isGroup',
+      { roomId },
+    )
+    return result.records[0]?.get('isGroup') === true
   })
 }
 
@@ -74,6 +95,12 @@ export default {
   },
   Query: {
     Room: async (object, params, context, resolveInfo) => {
+      // Group chat is gated by the groups feature: while it is off, no group room is served
+      // (not fetched by groupId, not listed) and its messages are blocked (see messages.ts).
+      // Existing rooms/messages stay in the DB and reappear when the feature is re-enabled.
+      const groupsOff = groupChatGated(context)
+      if (groupsOff && params.groupId) return []
+
       // Single room lookup by userId or groupId
       if (params.userId || params.groupId) {
         const session = context.driver.session()
@@ -110,6 +137,20 @@ export default {
 
       // Single room lookup by id
       if (params.id) {
+        // Groups off ⇒ a known/cached group room id must not resolve either. neo4j-graphql-js
+        // generates no filter for the single `group` relation (_RoomFilter only exposes the
+        // `users_*` filters), so there is no declarative "not a group room" filter to add to
+        // the lookup — guard with an explicit EXISTS check (mirrors the messages.ts gate).
+        // Only runs while the feature is off (a network-wide admin state), so it adds no cost
+        // to normal operation; for a group room it returns early *instead of* the main query.
+        if (groupsOff) {
+          const session = context.driver.session()
+          try {
+            if (await roomIsGroupRoom(params.id, session)) return []
+          } finally {
+            await session.close()
+          }
+        }
         if (!params.filter) params.filter = {}
         params.filter.users_some = { id: context.user.id }
         return neo4jgraphql(object, params, context, resolveInfo)
@@ -125,13 +166,16 @@ export default {
           const conditions: string[] = []
           if (before) conditions.push('sortDate < $before')
           if (search) conditions.push('toLower(roomName) CONTAINS toLower($search)')
+          // Groups off ⇒ drop group rooms from the chat list entirely (they carry a ROOM_FOR
+          // edge to a Group). `g` is kept in the WITH so it can be filtered here.
+          if (groupsOff) conditions.push('g IS NULL')
           const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''
           const cypher = `
             MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)
             OPTIONAL MATCH (room)-[:ROOM_FOR]->(g:Group)
             OPTIONAL MATCH (room)<-[:CHATS_IN]-(otherUser:User)
               WHERE g IS NULL AND otherUser.id <> $currentUserId
-            WITH room, COALESCE(room.lastMessageAt, room.createdAt) AS sortDate,
+            WITH room, g, COALESCE(room.lastMessageAt, room.createdAt) AS sortDate,
                  COALESCE(g.name, otherUser.name) AS roomName
             ${whereClause}
             RETURN room.id AS id
@@ -171,7 +215,8 @@ export default {
       } = context
       const session = context.driver.session()
       try {
-        const count = await getUnreadRoomsCount(currentUserId, session)
+        // Exclude group rooms from the unread badge while the groups feature is off.
+        const count = await getUnreadRoomsCount(currentUserId, session, groupChatGated(context))
         return count
       } finally {
         await session.close()

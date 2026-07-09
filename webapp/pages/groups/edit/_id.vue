@@ -29,6 +29,7 @@ import { groupEditQuery } from '~/graphql/groups.js'
 import { mapGetters } from 'vuex'
 
 export default {
+  middleware: ['groupsEnabled'],
   components: {
     OsMenu,
   },

@@ -125,11 +125,15 @@ describe('admin/policy.vue', () => {
           namespaced: true,
           // snapshot lives in state so a test can mutate it and trigger the
           // component's reactive snapshot watcher (remote-change simulation).
-          state: () => ({ snap: { ...snapshot } }),
+          state: () => ({ snap: { ...snapshot }, deps: {} }),
           getters: {
             snapshot: (state) => state.snap,
             defaults: () => defaults,
             lastChange: () => lastChange,
+            // policy→policy dependency map + effective reader used by the tab to fold
+            // availability live (single-level deps → effective == raw snapshot value here).
+            deps: (state) => state.deps,
+            getEffective: (state) => (key) => state.snap[key],
           },
           mutations: {
             SET_SNAP: (state, value) => {
@@ -551,11 +555,13 @@ describe('admin/policy.vue', () => {
         modules: {
           policy: {
             namespaced: true,
-            state: () => ({ snap: { ...snapshot } }),
+            state: () => ({ snap: { ...snapshot }, deps: {} }),
             getters: {
               snapshot: (s) => s.snap,
               defaults: () => ({}),
               lastChange: () => lastChange,
+              deps: (s) => s.deps,
+              getEffective: (s) => (key) => s.snap[key],
             },
             actions: { init, fetchDefaults, setKey, resetKeys },
           },
@@ -587,6 +593,20 @@ describe('admin/policy.vue', () => {
       requiresEnv: [{ name: 'LIVEKIT_URL', state: 'missing' }],
       available: false,
     }
+    // A key gated by a policy→policy dependency (showGroupButtonInHeader ← groupsEnabled), NOT
+    // by env — it is env-available; the tab folds the dependency live from the store.
+    const POLICY_GATED_ENTRY = {
+      key: 'showGroupButtonInHeader',
+      type: 'boolean',
+      category: 'layout',
+      effective: 'false',
+      softwareDefault: 'true',
+      configuredDefault: 'true',
+      envSeed: 'SHOW_GROUP_BUTTON_IN_HEADER',
+      envSeedState: 'set',
+      requiresEnv: [],
+      available: true,
+    }
     const mountWithConfig = (policyConfig) => {
       const w = mount(Policy, { mocks, localVue, store, stubs })
       w.setData({ policyConfig })
@@ -602,6 +622,31 @@ describe('admin/policy.vue', () => {
       expect(w.find('.policy-row__env-link').attributes('href')).toBe(
         '/admin/config#videoConference',
       )
+    })
+
+    it('folds a policy dependency LIVE — greys the dependent key the moment its dependency goes off, and un-greys it again (no refetch)', async () => {
+      store.state.policy.deps = { showGroupButtonInHeader: ['groupsEnabled'] }
+      store.commit('policy/SET_SNAP', { ...snapshot, groupsEnabled: true })
+      const w = mountWithConfig([POLICY_GATED_ENTRY])
+      await w.vm.$nextTick()
+      // Dependency on ⇒ the (env-available) key is editable.
+      expect(w.vm.isUnavailable('showGroupButtonInHeader')).toBe(false)
+
+      // Groups goes off (as a save / remote change updates the snapshot) — no policyConfig
+      // refetch — and the dependent key greys immediately, linking to the groups policy row.
+      store.commit('policy/SET_SNAP', { ...snapshot, groupsEnabled: false })
+      await w.vm.$nextTick()
+      expect(w.vm.isUnavailable('showGroupButtonInHeader')).toBe(true)
+      expect(w.vm.unmetPolicyDeps('showGroupButtonInHeader')).toEqual(['groupsEnabled'])
+      expect(
+        w.find('[data-test="policy-showGroupButtonInHeader"]').attributes('disabled'),
+      ).toBeTruthy()
+      expect(w.find('.policy-row__env-link').attributes('href')).toBe('/admin/policy#groupsEnabled')
+
+      // Re-enable groups ⇒ the key un-greys again, still without a refetch.
+      store.commit('policy/SET_SNAP', { ...snapshot, groupsEnabled: true })
+      await w.vm.$nextTick()
+      expect(w.vm.isUnavailable('showGroupButtonInHeader')).toBe(false)
     })
 
     it('treats keys without a config entry as available', () => {

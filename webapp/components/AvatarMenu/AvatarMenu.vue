@@ -92,11 +92,16 @@ export default {
           path: `/profile/${this.user.id}/${this.user.slug}`,
           icon: this.icons.user,
         },
-        {
-          name: this.$t('header.avatarMenu.groups'),
-          path: '/groups',
-          icon: this.icons.users,
-        },
+        // The groups feature can be disabled network-wide; hide its entry when off.
+        ...(this.$policy.get('groupsEnabled')
+          ? [
+              {
+                name: this.$t('header.avatarMenu.groups'),
+                path: '/groups',
+                icon: this.icons.users,
+              },
+            ]
+          : []),
         {
           name: this.$t('header.avatarMenu.map'),
           path: `/map`,

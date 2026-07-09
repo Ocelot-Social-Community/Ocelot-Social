@@ -29,6 +29,7 @@ const options = {
 const persistentLinks = PersistentLinks(options)
 
 export default {
+  middleware: ['groupsEnabled'],
   mixins: [persistentLinks],
 }
 </script>
