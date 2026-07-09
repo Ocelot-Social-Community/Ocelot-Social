@@ -15,6 +15,7 @@ describe('change-password', () => {
 
   beforeEach(() => {
     mocks = {
+      $env: { SUPPORT_EMAIL: 'support@example.org' },
       $toast: {
         success: jest.fn(),
         error: jest.fn(),

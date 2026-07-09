@@ -38,6 +38,13 @@ export const SOFTWARE_DEFAULTS = {
   // No middlewares disabled by default — the empty list displays as '' (String([])).
   DISABLED_MIDDLEWARES: [] as readonly string[],
   LANGUAGE_DEFAULT: 'en',
+  // --- Contact / organisation (per-deployment identity) ---
+  // Scalar identity values a deployment overrides via env (surfaced read-only in the admin
+  // env tab, NOT policy-overridable). The env var name is SUPPORT_LINK / ORGANIZATION_LINK;
+  // config/index.ts exposes them under the CONFIG keys SUPPORT_URL / ORGANIZATION_URL.
+  SUPPORT_EMAIL: 'hello@ocelot.social',
+  SUPPORT_LINK: 'https://ocelot.social',
+  ORGANIZATION_LINK: 'https://ocelot.social',
 } as const
 
 export type SoftwareDefaultKey = keyof typeof SOFTWARE_DEFAULTS

@@ -28,6 +28,7 @@ describe('RegistrationSlideCreate', () => {
     policyValues = { askForRealName: false, requireLocation: false }
     mocks = {
       $t: jest.fn((key) => key),
+      $env: { SUPPORT_EMAIL: 'support@example.org' },
       $policy: { get: (key) => policyValues[key] },
       $i18n: { locale: () => 'en' },
       $apollo: { mutate: jest.fn().mockResolvedValue({}) },

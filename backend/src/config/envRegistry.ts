@@ -87,6 +87,12 @@ export const ENV_REGISTRY: EnvVarSpec[] = [
 
   // --- Mail / SMTP --------------------------------------------------------
   { name: 'EMAIL_DEFAULT_SENDER', secret: false, category: 'mail', softwareDefault: null },
+  {
+    name: 'SUPPORT_EMAIL',
+    secret: false,
+    category: 'mail',
+    softwareDefault: SOFTWARE_DEFAULTS.SUPPORT_EMAIL,
+  },
   { name: 'SMTP_HOST', secret: false, category: 'mail', softwareDefault: null },
   { name: 'SMTP_PORT', secret: false, category: 'mail', softwareDefault: null },
   {
@@ -188,7 +194,20 @@ export const ENV_REGISTRY: EnvVarSpec[] = [
     list: true,
     softwareDefault: JSON.stringify(SOFTWARE_DEFAULTS.DISABLED_MIDDLEWARES),
   },
-  { name: 'SUPPORT_EMAIL', secret: false, category: 'general', softwareDefault: null },
+  // Contact / organisation identity links (env var names SUPPORT_LINK / ORGANIZATION_LINK;
+  // exposed under the CONFIG keys SUPPORT_URL / ORGANIZATION_URL).
+  {
+    name: 'SUPPORT_LINK',
+    secret: false,
+    category: 'general',
+    softwareDefault: SOFTWARE_DEFAULTS.SUPPORT_LINK,
+  },
+  {
+    name: 'ORGANIZATION_LINK',
+    secret: false,
+    category: 'general',
+    softwareDefault: SOFTWARE_DEFAULTS.ORGANIZATION_LINK,
+  },
   {
     name: 'LANGUAGE_DEFAULT',
     secret: false,
