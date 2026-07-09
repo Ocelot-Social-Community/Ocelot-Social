@@ -1,7 +1,10 @@
 <template>
   <os-card>
     <div class="infinite-scroll-list">
-      <h5 v-if="title" class="title">{{ title }}</h5>
+      <h5 v-if="title" class="title">
+        {{ title }}
+        <span v-if="count !== null" class="count">({{ count }})</span>
+      </h5>
       <div ref="scrollEl" class="scroll-container" @scroll="onScroll">
         <slot />
         <p v-if="empty && !loading" class="nobody-message">{{ nobodyMessage }}</p>
@@ -21,6 +24,7 @@ export default {
   components: { OsCard, OsSpinner },
   props: {
     title: { type: String, default: null },
+    count: { type: Number, default: null },
     nobodyMessage: { type: String, default: null },
     empty: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
@@ -72,6 +76,10 @@ export default {
     color: $text-color-soft;
     font-size: $font-size-base;
     margin-bottom: $space-small;
+
+    .count {
+      font-weight: normal;
+    }
   }
 }
 

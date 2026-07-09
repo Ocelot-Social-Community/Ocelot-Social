@@ -1,8 +1,9 @@
 <template>
   <infinite-scroll-list
     :title="listTitle"
+    :count="totalCount"
     :nobody-message="nobodyMessage"
-    :empty="!hasConnections && !loadingConnections"
+    :empty="!hasConnections"
     :loading="loadingConnections || loadingMore"
     :has-more="!allLoaded"
     @load-more="loadMore"
@@ -36,8 +37,8 @@ export default {
   data() {
     return {
       connections: [],
-      totalCount: 0,
-      loadingConnections: false,
+      totalCount: null,
+      loadingConnections: true,
       loadingMore: false,
       allLoaded: false,
     }
@@ -76,7 +77,7 @@ export default {
         })
         const userData = data?.User?.[0]
         if (userData) {
-          this.totalCount = userData[`${this.type}Count`] || 0
+          this.totalCount = userData[`${this.type}Count`] ?? null
           const newItems = userData[this.type] || []
           const merged = [...this.connections, ...newItems]
           const seen = new Set()

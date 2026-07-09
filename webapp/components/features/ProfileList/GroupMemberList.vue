@@ -1,7 +1,8 @@
 <template>
   <infinite-scroll-list
-    v-if="hasGroups || myProfile"
+    v-if="hasGroups || myProfile || loadingGroups"
     :title="$t('profile.groups.title', { name: userName })"
+    :count="allGroupsLoaded ? groups.length : null"
     :nobody-message="$t('profile.groups.nobody')"
     :empty="!hasGroups"
     :loading="loadingGroups || loadingMore"
@@ -68,7 +69,7 @@ export default {
   data() {
     return {
       groups: [],
-      loadingGroups: false,
+      loadingGroups: true,
       loadingMore: false,
       allGroupsLoaded: false,
     }
@@ -83,6 +84,10 @@ export default {
     })
     this._groupVisibilitySubscription = observer.subscribe({
       next: () => {
+        if (this._skipNextSubscriptionReload) {
+          this._skipNextSubscriptionReload = false
+          return
+        }
         this.reloadGroups()
       },
       error: (err) => this.$toast.error(err.message),
@@ -150,13 +155,16 @@ export default {
     },
     async toggleVisibility(group) {
       const newValue = !group.showOnProfile
+      group.showOnProfile = newValue
+      this._skipNextSubscriptionReload = true
       try {
         await this.$apollo.mutate({
           mutation: setGroupMembershipVisibilityMutation(),
           variables: { groupId: group.id, showOnProfile: newValue },
         })
-        group.showOnProfile = newValue
       } catch (error) {
+        group.showOnProfile = !newValue
+        this._skipNextSubscriptionReload = false
         this.$toast.error(error.message)
       }
     },
