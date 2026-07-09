@@ -14,6 +14,19 @@ const brandingDefaults = {
   registration: {
     nonceLength: 5,
     inviteCodeLength: 6,
+    layout: 'no-header',
+  },
+  login: {
+    layout: 'no-header',
+  },
+  comment: {
+    minLength: 1,
+    maxUntruncatedLength: 1200,
+    truncateToLength: 180,
+  },
+  dateTime: {
+    relativeDateTime: true,
+    absoluteDateTimeFormat: 'P',
   },
   metadata: {
     applicationName: 'ocelot.social',

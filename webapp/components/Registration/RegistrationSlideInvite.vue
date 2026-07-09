@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import registrationConstants from '~/constants/registrationBranded.js'
+import branding from '@ocelot-social/branding'
 import { validateInviteCode } from '~/graphql/InviteCode'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import formValidation from '~/mixins/formValidation'
@@ -62,11 +62,11 @@ export default {
       formSchema: {
         inviteCode: {
           type: 'string',
-          min: registrationConstants.INVITE_CODE_LENGTH,
-          max: registrationConstants.INVITE_CODE_LENGTH,
+          min: branding.registration.inviteCodeLength,
+          max: branding.registration.inviteCodeLength,
           required: true,
           message: this.$t('components.registration.invite-code.form.validations.length', {
-            inviteCodeLength: registrationConstants.INVITE_CODE_LENGTH,
+            inviteCodeLength: branding.registration.inviteCodeLength,
           }),
           placeholder: this.$t('components.registration.invite-code.form.invite-code'),
         },

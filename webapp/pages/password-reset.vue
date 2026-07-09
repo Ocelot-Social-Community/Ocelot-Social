@@ -23,7 +23,7 @@
 <script>
 import links from '~/constants/links.js'
 import metadata from '~/constants/metadata.js'
-import loginConstants from '~/constants/loginBranded.js'
+import branding from '@ocelot-social/branding'
 import { OsCard } from '@ocelot-social/ui'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
@@ -36,7 +36,7 @@ export default {
     OsCard,
     PageParamsLink,
   },
-  layout: loginConstants.LAYOUT,
+  layout: branding.login.layout,
   data() {
     return {
       metadata,

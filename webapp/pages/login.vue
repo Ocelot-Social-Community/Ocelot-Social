@@ -8,12 +8,12 @@
 
 <script>
 import LoginForm from '~/components/LoginForm/LoginForm.vue'
-import loginConstants from '~/constants/loginBranded.js'
+import branding from '@ocelot-social/branding'
 import { VERSION } from '~/constants/terms-and-conditions-version.js'
 import { mapGetters } from 'vuex'
 
 export default {
-  layout: loginConstants.LAYOUT,
+  layout: branding.login.layout,
   components: {
     LoginForm,
   },

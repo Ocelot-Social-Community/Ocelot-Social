@@ -26,6 +26,26 @@ export interface BrandingConfig {
     nonceLength: number
     /** Length of a generated invite code. */
     inviteCodeLength: number
+    /** Nuxt page layout used for the registration flow (webapp). */
+    layout: string
+  }
+  login: {
+    /** Nuxt page layout used for the login / password-reset pages (webapp). */
+    layout: string
+  }
+  comment: {
+    /** Minimum length of a comment (HTML stripped). */
+    minLength: number
+    /** Above this length a comment is truncated in the card view. */
+    maxUntruncatedLength: number
+    /** Length a long comment is truncated to. */
+    truncateToLength: number
+  }
+  dateTime: {
+    /** Whether timestamps are shown relative ("3h ago") rather than absolute. */
+    relativeDateTime: boolean
+    /** date-fns format token for absolute timestamps. */
+    absoluteDateTimeFormat: string
   }
   metadata: {
     /** Application name (e-mail "from" name, PWA name, …). */

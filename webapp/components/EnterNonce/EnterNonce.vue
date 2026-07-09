@@ -28,7 +28,7 @@
 
 <script>
 import { OsButton } from '@ocelot-social/ui'
-import registrationConstants from '~/constants/registration'
+import branding from '@ocelot-social/branding'
 import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
@@ -51,7 +51,7 @@ export default {
           max: 5,
           required: true,
           message: this.$t('components.registration.email-nonce.form.validations.length', {
-            nonceLength: registrationConstants.NONCE_LENGTH,
+            nonceLength: branding.registration.nonceLength,
           }),
         },
       },

@@ -18,7 +18,7 @@
 <script>
 import gql from 'graphql-tag'
 import { isEmail } from 'validator'
-import registrationConstants from '~/constants/registration'
+import branding from '@ocelot-social/branding'
 import formValidation from '~/mixins/formValidation'
 
 import EmailDisplayAndVerify from './EmailDisplayAndVerify'
@@ -47,11 +47,11 @@ export default {
       formSchema: {
         nonce: {
           type: 'string',
-          min: registrationConstants.NONCE_LENGTH,
-          max: registrationConstants.NONCE_LENGTH,
+          min: branding.registration.nonceLength,
+          max: branding.registration.nonceLength,
           required: true,
           message: this.$t('components.registration.email-nonce.form.validations.length', {
-            nonceLength: registrationConstants.NONCE_LENGTH,
+            nonceLength: branding.registration.nonceLength,
           }),
         },
       },

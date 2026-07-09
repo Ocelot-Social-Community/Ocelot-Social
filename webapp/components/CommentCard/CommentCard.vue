@@ -79,7 +79,7 @@
 import { OsButton, OsCard, OsIcon, OsActionButton } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
-import { COMMENT_MAX_UNTRUNCATED_LENGTH, COMMENT_TRUNCATE_TO_LENGTH } from '~/constants/comment'
+import branding from '@ocelot-social/branding'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import ContentViewer from '~/components/Editor/ContentViewer'
@@ -137,7 +137,10 @@ export default {
       user: 'auth/user',
     }),
     hasLongContent() {
-      return this.$filters.removeHtml(this.comment.content).length > COMMENT_MAX_UNTRUNCATED_LENGTH
+      return (
+        this.$filters.removeHtml(this.comment.content).length >
+        branding.comment.maxUntruncatedLength
+      )
     },
     isAuthor() {
       const { author } = this.comment
@@ -160,7 +163,7 @@ export default {
     },
     commentContent() {
       if (this.hasLongContent && this.isCollapsed) {
-        return this.$filters.truncate(this.comment.content, COMMENT_TRUNCATE_TO_LENGTH)
+        return this.$filters.truncate(this.comment.content, branding.comment.truncateToLength)
       }
 
       return this.comment.content
