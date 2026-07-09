@@ -13,6 +13,7 @@ import Factory, { cleanDatabase } from '@db/factories'
 import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
 import groupQuery from '@graphql/queries/groups/Group.gql'
 import JoinGroup from '@graphql/queries/groups/JoinGroup.gql'
+import LeaveGroup from '@graphql/queries/groups/LeaveGroup.gql'
 import UpdateGroup from '@graphql/queries/groups/UpdateGroup.gql'
 import UserGroups from '@graphql/queries/groups/UserGroups.gql'
 import CreateGroupRoom from '@graphql/queries/messaging/CreateGroupRoom.gql'
@@ -144,6 +145,14 @@ describe('groups feature gate (groupsEnabled)', () => {
       const result = await mutate({
         mutation: UpdateGroup,
         variables: { id: 'g1', name: 'Renamed' },
+      })
+      expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
+    })
+
+    it('denies leaving a group', async () => {
+      const result = await mutate({
+        mutation: LeaveGroup,
+        variables: { groupId: 'g1', userId: 'group-owner' },
       })
       expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
     })
