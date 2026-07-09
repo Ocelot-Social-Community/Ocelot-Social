@@ -209,7 +209,6 @@
       },
       "envLink": "Zobacz środowisko",
       "envUnavailable": "Wymagane środowisko nie jest skonfigurowane — ten przełącznik nie działa, dopóki nie zostanie.",
-      "policyUnavailable": "Ta opcja nie działa, dopóki nie zostanie włączona funkcja, od której zależy:",
       "keys": {
         "apiKeysEnabled": "Klucze API",
         "apiKeysMaxPerUser": "Maks. kluczy API na użytkownika",
@@ -234,6 +233,7 @@
       "lastUpdated": "Ostatnia zmiana: {timestamp} przez {actor}",
       "loadError": "Nie można wczytać konfiguracji zasad: {message}",
       "name": "Zasady sieci",
+      "policyUnavailable": "Ta opcja nie działa, dopóki nie zostanie włączona funkcja, od której zależy:",
       "reset": "Przywróć domyślne",
       "save": "Zapisz zmiany",
       "saveError": "Nie można zaktualizować zasad: {message}",

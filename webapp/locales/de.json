@@ -209,7 +209,6 @@
       },
       "envLink": "Zur Umgebung",
       "envUnavailable": "Erforderliche Umgebung nicht konfiguriert – dieser Schalter hat keine Wirkung, bis sie gesetzt ist.",
-      "policyUnavailable": "Diese Option ist wirkungslos, bis die Funktion aktiviert wird, von der sie abhängt:",
       "keys": {
         "apiKeysEnabled": "API-Schlüssel",
         "apiKeysMaxPerUser": "Max. API-Schlüssel pro Nutzer",
@@ -234,6 +233,7 @@
       "lastUpdated": "Zuletzt geändert: {timestamp} von {actor}",
       "loadError": "Konfiguration konnte nicht geladen werden: {message}",
       "name": "Netzwerk-Konfiguration",
+      "policyUnavailable": "Diese Option ist wirkungslos, bis die Funktion aktiviert wird, von der sie abhängt:",
       "reset": "Auf Standard zurücksetzen",
       "save": "Änderungen speichern",
       "saveError": "Konfiguration konnte nicht aktualisiert werden: {message}",

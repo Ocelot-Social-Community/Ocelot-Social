@@ -209,7 +209,6 @@
       },
       "envLink": "View environment",
       "envUnavailable": "Required environment is not configured — this toggle has no effect until it is.",
-      "policyUnavailable": "This toggle has no effect until the feature it depends on is enabled:",
       "keys": {
         "apiKeysEnabled": "API keys",
         "apiKeysMaxPerUser": "Max. API keys per user",
@@ -234,6 +233,7 @@
       "lastUpdated": "Last changed: {timestamp} by {actor}",
       "loadError": "Could not load policy configuration: {message}",
       "name": "Network policy",
+      "policyUnavailable": "This toggle has no effect until the feature it depends on is enabled:",
       "reset": "Reset to default",
       "save": "Save changes",
       "saveError": "Could not update policy: {message}",

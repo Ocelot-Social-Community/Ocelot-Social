@@ -209,7 +209,6 @@
       },
       "envLink": "Visualizza ambiente",
       "envUnavailable": "L’ambiente richiesto non è configurato: questa opzione non ha effetto finché non lo sarà.",
-      "policyUnavailable": "Questa opzione non ha effetto finché non viene attivata la funzione da cui dipende:",
       "keys": {
         "apiKeysEnabled": "Chiavi API",
         "apiKeysMaxPerUser": "Max. chiavi API per utente",
@@ -234,6 +233,7 @@
       "lastUpdated": "Ultima modifica: {timestamp} da {actor}",
       "loadError": "Impossibile caricare la configurazione dei criteri: {message}",
       "name": "Criteri di rete",
+      "policyUnavailable": "Questa opzione non ha effetto finché non viene attivata la funzione da cui dipende:",
       "reset": "Ripristina predefinito",
       "save": "Salva modifiche",
       "saveError": "Impossibile aggiornare i criteri: {message}",

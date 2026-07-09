@@ -209,7 +209,6 @@
       },
       "envLink": "Ver entorno",
       "envUnavailable": "El entorno requerido no está configurado; este ajuste no tiene efecto hasta que lo esté.",
-      "policyUnavailable": "Esta opción no tiene efecto hasta que se active la función de la que depende:",
       "keys": {
         "apiKeysEnabled": "Claves API",
         "apiKeysMaxPerUser": "Máx. claves API por usuario",
@@ -234,6 +233,7 @@
       "lastUpdated": "Última modificación: {timestamp} por {actor}",
       "loadError": "No se pudo cargar la configuración de la política: {message}",
       "name": "Política de red",
+      "policyUnavailable": "Esta opción no tiene efecto hasta que se active la función de la que depende:",
       "reset": "Restablecer al valor predeterminado",
       "save": "Guardar cambios",
       "saveError": "No se pudo actualizar la política: {message}",

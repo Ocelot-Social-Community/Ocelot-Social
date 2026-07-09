@@ -209,7 +209,6 @@
       },
       "envLink": "Shiko mjedisin",
       "envUnavailable": "Mjedisi i kërkuar nuk është konfiguruar — ky çelës nuk ka efekt derisa të konfigurohet.",
-      "policyUnavailable": "Ky ndryshim nuk ka efekt derisa të aktivizohet funksioni nga i cili varet:",
       "keys": {
         "apiKeysEnabled": "Çelësat API",
         "apiKeysMaxPerUser": "Maks. çelësa API për përdorues",
@@ -234,6 +233,7 @@
       "lastUpdated": "Ndryshuar së fundi: {timestamp} nga {actor}",
       "loadError": "Nuk mund të ngarkohet konfigurimi i politikës: {message}",
       "name": "Politika e rrjetit",
+      "policyUnavailable": "Ky ndryshim nuk ka efekt derisa të aktivizohet funksioni nga i cili varet:",
       "reset": "Rikthe te paracaktimi",
       "save": "Ruaj ndryshimet",
       "saveError": "Nuk mund të përditësohet politika: {message}",

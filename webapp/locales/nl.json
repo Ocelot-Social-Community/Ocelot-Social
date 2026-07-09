@@ -209,7 +209,6 @@
       },
       "envLink": "Omgeving bekijken",
       "envUnavailable": "De vereiste omgeving is niet geconfigureerd — deze schakelaar heeft geen effect totdat dat wel zo is.",
-      "policyUnavailable": "Deze schakelaar heeft geen effect totdat de functie waarvan hij afhangt is ingeschakeld:",
       "keys": {
         "apiKeysEnabled": "API-sleutels",
         "apiKeysMaxPerUser": "Max. API-sleutels per gebruiker",
@@ -234,6 +233,7 @@
       "lastUpdated": "Laatst gewijzigd: {timestamp} door {actor}",
       "loadError": "Beleidsconfiguratie kon niet worden geladen: {message}",
       "name": "Netwerkbeleid",
+      "policyUnavailable": "Deze schakelaar heeft geen effect totdat de functie waarvan hij afhangt is ingeschakeld:",
       "reset": "Standaardwaarde herstellen",
       "save": "Wijzigingen opslaan",
       "saveError": "Beleid kon niet worden bijgewerkt: {message}",
