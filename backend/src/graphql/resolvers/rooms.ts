@@ -137,6 +137,20 @@ export default {
 
       // Single room lookup by id
       if (params.id) {
+        // Groups off ⇒ a known/cached group room id must not resolve either. neo4j-graphql-js
+        // generates no filter for the single `group` relation (_RoomFilter only exposes the
+        // `users_*` filters), so there is no declarative "not a group room" filter to add to
+        // the lookup — guard with an explicit EXISTS check (mirrors the messages.ts gate).
+        // Only runs while the feature is off (a network-wide admin state), so it adds no cost
+        // to normal operation; for a group room it returns early *instead of* the main query.
+        if (groupsOff) {
+          const session = context.driver.session()
+          try {
+            if (await roomIsGroupRoom(params.id, session)) return []
+          } finally {
+            await session.close()
+          }
+        }
         if (!params.filter) params.filter = {}
         params.filter.users_some = { id: context.user.id }
         return neo4jgraphql(object, params, context, resolveInfo)

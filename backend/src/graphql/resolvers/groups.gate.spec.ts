@@ -203,6 +203,13 @@ describe('groups feature gate (groupsEnabled)', () => {
       expect(result.data!.Room).toEqual([])
     })
 
+    it('does not fetch the group room by its (known/cached) room id', async () => {
+      authenticatedUser = ownerAuth
+      const result = await query({ query: RoomQuery, variables: { id: roomId } })
+      expect(result.errors).toBeUndefined()
+      expect(result.data!.Room).toEqual([])
+    })
+
     it('serves no messages for the group room', async () => {
       authenticatedUser = ownerAuth
       const result = await query({ query: MessageQuery, variables: { roomId } })
