@@ -1708,7 +1708,10 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
             <h5
               class="title"
             >
-              profile.groups.title
+              
+      profile.groups.title
+      
+              <!---->
             </h5>
              
             <div
@@ -1720,9 +1723,9 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
               >
                 profile.groups.nobody
               </p>
+               
+              <!---->
             </div>
-             
-            <!---->
           </div>
         </div>
          
@@ -2374,7 +2377,10 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
             <h5
               class="title"
             >
-              profile.groups.title
+              
+      profile.groups.title
+      
+              <!---->
             </h5>
              
             <div
@@ -2386,9 +2392,9 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
               >
                 profile.groups.nobody
               </p>
+               
+              <!---->
             </div>
-             
-            <!---->
           </div>
         </div>
          
