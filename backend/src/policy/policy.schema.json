@@ -81,6 +81,22 @@
       "category": "features",
       "description": "Whether the badges feature is enabled (badges shown on profiles / teasers and managed in admin). Shown on publicly visible profiles, so visible to 'public'."
     },
+    "socialMediaEnabled": {
+      "type": "boolean",
+      "default": true,
+      "visibility": ["public"],
+      "envSeed": "SOCIAL_MEDIA_ENABLED",
+      "category": "features",
+      "description": "Whether the social-media links feature is enabled (links shown on profiles and managed in settings; gate for the socialMedia.create permission and for editing/deleting links). Shown on publicly visible profiles, so visible to 'public'."
+    },
+    "groupsEnabled": {
+      "type": "boolean",
+      "default": true,
+      "visibility": ["public"],
+      "envSeed": "GROUPS_ENABLED",
+      "category": "features",
+      "description": "Whether the groups feature is enabled (creating and browsing groups, group video calls). Gate for the group.create_* permissions and — together with videoConference — the videoCall.create_* permissions, and for the showGroupButtonInHeader layout toggle. Shown on publicly visible pages, so visible to 'public'."
+    },
     "showContentFilterHeaderMenu": {
       "type": "boolean",
       "default": true,
@@ -102,8 +118,9 @@
       "default": true,
       "visibility": ["public"],
       "envSeed": "SHOW_GROUP_BUTTON_IN_HEADER",
+      "requiresPolicy": ["groupsEnabled"],
       "category": "layout",
-      "description": "Whether the groups button is shown in the header. Layout toggle in the header shown to everyone, so visible to 'public'."
+      "description": "Whether the groups button is shown in the header. Layout toggle in the header shown to everyone, so visible to 'public'. Only effective while the groups feature (groupsEnabled) is on — with groups disabled network-wide the button is force-hidden regardless of this toggle."
     },
     "apiKeysEnabled": {
       "type": "boolean",

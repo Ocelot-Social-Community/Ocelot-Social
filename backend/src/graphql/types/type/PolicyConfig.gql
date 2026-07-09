@@ -30,7 +30,7 @@ type PolicyConfigEntry {
   envSeedState: ConfigKeyState
   "Hard env requirements with their presence state (empty when the key needs no env)."
   requiresEnv: [EnvKeyStatus!]!
-  "Whether all hard env requirements are met (always true when there are none)."
+  "Whether all hard env requirements are met (always true when there are none). Policy→policy dependencies (requiresPolicy on the policy query) are folded live in the client, not here, so re-enabling a dependency un-greys the dependent key without a refetch."
   available: Boolean!
 }
 

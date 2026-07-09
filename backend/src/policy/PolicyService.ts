@@ -34,6 +34,7 @@ import {
   defaultFor,
   envSeedFor,
   requiresEnvFor,
+  requiresPolicyFor,
   typeFor,
   validatePolicyValue,
 } from './schema'
@@ -248,8 +249,15 @@ export class PolicyService {
   // without its secrets), regardless of the stored flag — this is the single value the
   // permission gates read, so roles depend only on the policy, never on env directly.
   getEffective<K extends PolicyKey>(key: K): NetworkPolicy[K] {
-    if (!this.isAvailable(key) && typeFor(key) === 'boolean') {
-      return false as NetworkPolicy[K]
+    if (typeFor(key) === 'boolean') {
+      // Env dependency: a boolean key whose hard env requirements are unmet is off.
+      if (!this.isAvailable(key)) return false as NetworkPolicy[K]
+      // Policy→policy dependency: a boolean key is effective only while every policy it
+      // depends on is itself effectively on (recursion folds their env/policy deps too;
+      // the schema is validated acyclic at load, so this terminates).
+      for (const dependency of requiresPolicyFor(key)) {
+        if (!this.getEffective(dependency)) return false as NetworkPolicy[K]
+      }
     }
     return this.get(key)
   }

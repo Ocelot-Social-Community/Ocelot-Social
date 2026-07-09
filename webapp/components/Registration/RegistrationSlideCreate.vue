@@ -150,7 +150,6 @@
 <script>
 import { VERSION } from '~/constants/terms-and-conditions-version.js'
 import links from '~/constants/links'
-import emails from '~/constants/emails'
 import { SignupVerificationMutation } from '~/graphql/Registration.js'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import PasswordStrength from '~/components/Password/Strength'
@@ -184,7 +183,7 @@ export default {
     const passwordForm = PasswordForm({ translate: this.$t })
     return {
       links,
-      supportEmail: emails.SUPPORT_EMAIL,
+      supportEmail: this.$env.SUPPORT_EMAIL,
       formData: {
         givenName: '',
         surName: '',

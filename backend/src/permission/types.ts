@@ -39,23 +39,27 @@ export type PermissionKey =
 // | 'communication' | 'account'.
 export type PermissionGroup = string
 
-// A permission may be gated by a runtime feature toggle: the right exists in the
-// catalog and can be bundled into roles, but is only *effective* while its gate is
-// open. A gate names the POLICY key that switches it on — see ./gates.ts. Roles thus
-// depend only on policy; any env dependency lives inside the policy's effective value
-// (e.g. 'videoConference' declares requiresEnv for the LiveKit secrets). Every gate key
-// must be a valid (boolean) PolicyKey. This union is the compile-time mirror of the
-// catalog's `gatedBy` values — drift-guarded against allPermissionGates() in schema.spec.ts.
+// A permission may be gated by one OR MORE runtime feature toggles: the right exists
+// in the catalog and can be bundled into roles, but is only *effective* while ALL its
+// gates are open (AND semantics). A gate names the POLICY key that switches it on —
+// see ./gates.ts. Roles thus depend only on policy; any env dependency lives inside the
+// policy's effective value (e.g. 'videoConference' declares requiresEnv for the LiveKit
+// secrets). Every gate key must be a valid (boolean) PolicyKey. This union is the
+// compile-time mirror of the catalog's `gatedBy` values — drift-guarded against
+// allPermissionGates() in schema.spec.ts.
 export type PermissionGate =
   | 'videoConference'
   | 'apiKeysEnabled'
   | 'badgesEnabled'
+  | 'socialMediaEnabled'
+  | 'groupsEnabled'
   | 'inviteRegistration'
 
 export interface PermissionCatalogEntry {
   group: PermissionGroup
-  // Optional runtime feature gate; when set, the permission is only effective while
-  // the gate is open. Absent ⇒ always effective.
-  gatedBy?: PermissionGate
+  // Optional runtime feature gate(s); when set, the permission is only effective while
+  // every listed gate is open. A single string is shorthand for a one-element list.
+  // Absent ⇒ always effective. Normalised to an array via gatesFor() in ./schema.ts.
+  gatedBy?: PermissionGate | PermissionGate[]
   description: string
 }

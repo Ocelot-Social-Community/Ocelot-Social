@@ -24,6 +24,8 @@ describe('AvatarMenu.vue', () => {
         }),
       },
       $t: jest.fn((a) => a),
+      // Groups feature on by default; the "off" case flips this.
+      $policy: { get: jest.fn(() => true) },
     }
     getters = {
       'auth/user': () => {
@@ -116,6 +118,19 @@ describe('AvatarMenu.vue', () => {
         it('displays a total of 6 links', () => {
           const allLinks = wrapper.findAll('.os-menu-item')
           expect(allLinks).toHaveLength(6)
+        })
+
+        describe('when the groups feature is disabled', () => {
+          beforeEach(() => {
+            mocks.$policy = { get: jest.fn(() => false) }
+            wrapper = Wrapper()
+            wrapper.find('.avatar-menu-trigger').trigger('click')
+          })
+
+          it('hides the groups link (one fewer)', () => {
+            expect(wrapper.vm.routes.some((route) => route.path === '/groups')).toBe(false)
+            expect(wrapper.findAll('.os-menu-item')).toHaveLength(5)
+          })
         })
       })
 

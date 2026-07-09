@@ -40,10 +40,9 @@ export default {
           name: this.$t('settings.privacy.name'),
           path: '/settings/privacy',
         },
-        {
-          name: this.$t('settings.social-media.name'),
-          path: `/settings/my-social-media`,
-        },
+        ...(this.$policy.get('socialMediaEnabled')
+          ? [{ name: this.$t('settings.social-media.name'), path: `/settings/my-social-media` }]
+          : []),
         ...(this.$policy.get('inviteRegistration') === true
           ? [{ name: this.$t('settings.invites.name'), path: `/settings/invites` }]
           : []),

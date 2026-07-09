@@ -7,7 +7,6 @@
 /* eslint-disable n/no-process-env */
 import { config } from 'dotenv'
 
-import emails from './emails'
 import { resolveLocale } from './locales'
 import metadata from './metadata'
 import { SOFTWARE_DEFAULTS } from './softwareDefaults'
@@ -164,10 +163,14 @@ function assertRequiredConfig(
 assertRequiredConfig(required)
 
 const options = {
-  SUPPORT_EMAIL: env.SUPPORT_EMAIL,
-  SUPPORT_URL: emails.SUPPORT_LINK,
+  // Contact / organisation identity — env-sourced (surfaced read-only in the admin env tab,
+  // not policy-overridable), with the ocelot baseline as software default. `||` (not `??`):
+  // an empty value is a misconfiguration, so fall back rather than show a blank support
+  // address / link. The env var names are SUPPORT_LINK / ORGANIZATION_LINK.
+  SUPPORT_EMAIL: env.SUPPORT_EMAIL || SOFTWARE_DEFAULTS.SUPPORT_EMAIL,
+  SUPPORT_URL: env.SUPPORT_LINK || SOFTWARE_DEFAULTS.SUPPORT_LINK,
   APPLICATION_NAME: metadata.APPLICATION_NAME,
-  ORGANIZATION_URL: emails.ORGANIZATION_LINK,
+  ORGANIZATION_URL: env.ORGANIZATION_LINK || SOFTWARE_DEFAULTS.ORGANIZATION_LINK,
   // publicRegistration, inviteRegistration, categoriesActive and apiKeysEnabled
   // are network-policy keys now — the backend reads them from the policy
   // (ENV-seeded), not from CONFIG. See backend/src/policy.

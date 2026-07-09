@@ -260,9 +260,11 @@ export default {
         limit,
         userId,
       }
+      // Groups off ⇒ no group chat targets (mirrors searchGroups being gated); DM targets stay.
+      const groupsOff = context.policy?.getEffective('groupsEnabled') === false
       const results = [
         ...(await getSearchResults(context, searchUsersSetup, params)),
-        ...(await getSearchResults(context, searchMyGroupsSetup, params)),
+        ...(groupsOff ? [] : await getSearchResults(context, searchMyGroupsSetup, params)),
       ]
       results.sort((a, b) => (b._score || 0) - (a._score || 0))
       return results.slice(0, limit)
@@ -281,17 +283,21 @@ export default {
         userId,
       }
 
+      // Groups off ⇒ groups drop out of the global search too (mirrors the gated searchGroups).
+      const groupsOff = context.policy?.getEffective('groupsEnabled') === false
+
       if (searchType === '')
         return [
           ...(await getSearchResults(context, searchPostsSetup, params)),
           ...(await getSearchResults(context, searchUsersSetup, params)),
-          ...(await getSearchResults(context, searchGroupsSetup, params)),
+          ...(groupsOff ? [] : await getSearchResults(context, searchGroupsSetup, params)),
           ...(await getSearchResults(context, searchHashtagsSetup, params)),
         ]
 
       params.limit = 15
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const type: any = multiSearchMap.find((obj) => obj.symbol === searchType)
+      if (groupsOff && type?.setup === searchGroupsSetup) return []
       return getSearchResults(context, type.setup, params)
     },
   },

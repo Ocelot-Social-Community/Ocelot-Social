@@ -24,7 +24,10 @@ export const defaultParams = {
   APPLICATION_NAME: CONFIG.APPLICATION_NAME,
   ORGANIZATION_NAME: metadata.ORGANIZATION_NAME,
   ORGANIZATION_URL: CONFIG.ORGANIZATION_URL,
-  SUPPORT_EMAIL: CONFIG.SUPPORT_EMAIL,
+  // Optional at the template level: the mails render a "with support" and a "without support"
+  // variant (the latter reachable in tests via `delete defaultParams.SUPPORT_EMAIL`). CONFIG
+  // always supplies a value now (software default), so widen the type to keep that path valid.
+  SUPPORT_EMAIL: CONFIG.SUPPORT_EMAIL as string | undefined,
   supportUrl: CONFIG.SUPPORT_URL,
   settingsUrl,
   renderSettingsUrl: true,

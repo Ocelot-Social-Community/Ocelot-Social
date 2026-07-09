@@ -76,6 +76,8 @@ describe('Query.policy', () => {
         requireLocation: false,
         categoriesActive: true,
         badgesEnabled: false,
+        socialMediaEnabled: true,
+        groupsEnabled: true,
         showContentFilterHeaderMenu: true,
         showContentFilterMasonryGrid: false,
         showGroupButtonInHeader: true,
@@ -90,6 +92,20 @@ describe('Query.policy', () => {
         // admin-only key → null for an anonymous viewer
         videoConference: null,
       })
+    })
+
+    it('carries each key’s requiresPolicy dependencies (static metadata) so the client can re-fold', async () => {
+      authenticatedUser = null
+
+      const { data } = await query({ query: policyQuery })
+
+      const entries = data.policy as Array<{ key: string; requiresPolicy: string[] }>
+      const byKey = Object.fromEntries(entries.map((entry) => [entry.key, entry.requiresPolicy]))
+      // The one policy→policy edge in the schema: the layout toggle depends on the feature.
+      expect(byKey.showGroupButtonInHeader).toEqual(['groupsEnabled'])
+      // A plain key carries an empty list, never null (the field is non-nullable).
+      expect(byKey.groupsEnabled).toEqual([])
+      expect(byKey.badgesEnabled).toEqual([])
     })
   })
 
@@ -158,6 +174,8 @@ describe('Query.policyDefaults', () => {
       'requireLocation',
       'categoriesActive',
       'badgesEnabled',
+      'socialMediaEnabled',
+      'groupsEnabled',
       'apiKeysEnabled',
       'videoConference',
       'showContentFilterHeaderMenu',

@@ -149,7 +149,7 @@
         />
         <div class="ds-mb-large"></div>
         <group-member-list
-          v-if="user.id"
+          v-if="user.id && $policy.get('groupsEnabled')"
           :user-id="user.id"
           :user-name="userName"
           :my-profile="myProfile"

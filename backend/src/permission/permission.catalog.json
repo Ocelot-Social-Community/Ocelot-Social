@@ -63,18 +63,22 @@
     },
     "socialMedia.create": {
       "group": "content",
+      "gatedBy": "socialMediaEnabled",
       "description": "Add social-media links to one's own profile."
     },
     "group.create_public": {
       "group": "content",
+      "gatedBy": "groupsEnabled",
       "description": "Create public groups."
     },
     "group.create_closed": {
       "group": "content",
+      "gatedBy": "groupsEnabled",
       "description": "Create closed groups."
     },
     "group.create_hidden": {
       "group": "content",
+      "gatedBy": "groupsEnabled",
       "description": "Create hidden groups."
     },
     "user.invite": {
@@ -84,17 +88,17 @@
     },
     "videoCall.create_public": {
       "group": "communication",
-      "gatedBy": "videoConference",
+      "gatedBy": ["videoConference", "groupsEnabled"],
       "description": "Start (open) a video call in a public group. Joining an existing call stays open to any member."
     },
     "videoCall.create_closed": {
       "group": "communication",
-      "gatedBy": "videoConference",
+      "gatedBy": ["videoConference", "groupsEnabled"],
       "description": "Start (open) a video call in a closed group. Joining an existing call stays open to any member."
     },
     "videoCall.create_hidden": {
       "group": "communication",
-      "gatedBy": "videoConference",
+      "gatedBy": ["videoConference", "groupsEnabled"],
       "description": "Start (open) a video call in a hidden group. Joining an existing call stays open to any member."
     },
     "apiKey.create": {

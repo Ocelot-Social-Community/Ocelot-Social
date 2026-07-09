@@ -30,6 +30,11 @@ interface RawProperty {
   visibility?: Audience[]
   envSeed?: string
   requiresEnv?: string[]
+  // Other POLICY keys this one depends on: a boolean key is only effective while every
+  // listed policy is effectively on (policy→policy gate). Folded into getEffective(),
+  // mirroring requiresEnv one layer up. Validated acyclic + boolean + visibility-superset
+  // at module load (assertRequiresPolicyGraph).
+  requiresPolicy?: string[]
   // The admin config-tab display group. Declared per key, enum-validated at schema compile;
   // read via categoryFor (which throws if a key omitted it). Optional in this type only so
   // that missing-category check is expressible — every key must declare one.
@@ -61,6 +66,14 @@ export function requiresEnvFor(key: PolicyKey): string[] {
   // Copy so a caller's push/splice can't mutate the shared schema array and
   // silently alter isAvailable/getEffective network-wide.
   return [...(rawSchema.properties[key].requiresEnv ?? [])]
+}
+
+// The other POLICY keys a key hard-depends on (distinct from requiresEnv). Empty/undefined
+// ⇒ no policy dependency. Folded into getEffective(): a boolean key whose any dependency is
+// effectively off is itself forced off, so a single feature toggle can gate other policy
+// keys (e.g. groupsEnabled gates the showGroupButtonInHeader layout toggle). Returns a copy.
+export function requiresPolicyFor(key: PolicyKey): PolicyKey[] {
+  return [...(rawSchema.properties[key].requiresPolicy ?? [])] as PolicyKey[]
 }
 
 export function typeFor(key: PolicyKey): string {
@@ -98,6 +111,10 @@ ajv.addKeyword({
 ajv.addKeyword({ keyword: 'envSeed', metaSchema: { type: 'string' } })
 ajv.addKeyword({
   keyword: 'requiresEnv',
+  metaSchema: { type: 'array', items: { type: 'string' } },
+})
+ajv.addKeyword({
+  keyword: 'requiresPolicy',
   metaSchema: { type: 'array', items: { type: 'string' } },
 })
 // `category` must be one of the known display groups — a typo'd category (which would put
@@ -173,3 +190,67 @@ export function canView(key: PolicyKey, viewer: PolicyViewer | null | undefined)
 export function visibleKeys(viewer: PolicyViewer | null | undefined): PolicyKey[] {
   return allKeys().filter((key) => canView(key, viewer))
 }
+
+// --- requiresPolicy graph invariants (validated once at module load) ------
+// A policy→policy dependency must be safe to fold in getEffective() AND to re-fold on the
+// client ($policy plugin). We assert at load — the same fail-fast discipline as the Ajv
+// keyword checks — so a mis-authored dependency is a boot error, never a silent
+// mis-gate at runtime:
+//   • the dependency names a real key,
+//   • both the key and its dependency are boolean (only a toggle can be "off", and only a
+//     boolean key is force-off-able — a numeric limit isn't gate-able),
+//   • the graph is acyclic (a plain recursion in getEffective must terminate),
+//   • visibility superset: every audience that can see the key can see the dependency
+//     (audiencesFor(key) ⊆ audiencesFor(dep)) — otherwise a viewer who sees the key but
+//     not its gate could not evaluate the fold client-side.
+function assertRequiresPolicyGraph(): void {
+  const keys = allKeys()
+  const keySet = new Set<string>(keys)
+  for (const key of keys) {
+    const deps = requiresPolicyFor(key)
+    if (deps.length === 0) continue
+    if (typeFor(key) !== 'boolean') {
+      throw new Error(`policy.schema.json: "${key}" has requiresPolicy but is not boolean`)
+    }
+    const keyAudiences = new Set(audiencesFor(key))
+    for (const dep of deps) {
+      if (!keySet.has(dep)) {
+        throw new Error(`policy.schema.json: "${key}" requiresPolicy unknown key "${dep}"`)
+      }
+      if (typeFor(dep) !== 'boolean') {
+        throw new Error(`policy.schema.json: "${key}" requiresPolicy non-boolean key "${dep}"`)
+      }
+      const depAudiences = new Set(audiencesFor(dep))
+      for (const audience of keyAudiences) {
+        if (!depAudiences.has(audience)) {
+          throw new Error(
+            `policy.schema.json: "${key}" is visible to "${audience}" but its requiresPolicy ` +
+              `dependency "${dep}" is not — a viewer could not evaluate the gate`,
+          )
+        }
+      }
+    }
+  }
+  // Cycle detection (DFS with a recursion stack). A cycle would make getEffective recurse
+  // forever, so reject it at load rather than risk a stack overflow on a request.
+  const WHITE = 0
+  const GREY = 1
+  const BLACK = 2
+  const colour = new Map<string, number>(keys.map((key) => [key, WHITE]))
+  const visit = (key: PolicyKey): void => {
+    colour.set(key, GREY)
+    for (const dep of requiresPolicyFor(key)) {
+      const state = colour.get(dep)
+      if (state === GREY) {
+        throw new Error(`policy.schema.json: requiresPolicy cycle through "${dep}"`)
+      }
+      if (state === WHITE) visit(dep)
+    }
+    colour.set(key, BLACK)
+  }
+  for (const key of keys) {
+    if (colour.get(key) === WHITE) visit(key)
+  }
+}
+
+assertRequiresPolicyGraph()

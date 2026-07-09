@@ -2,5 +2,6 @@ query policy {
   policy {
     key
     value
+    requiresPolicy
   }
 }

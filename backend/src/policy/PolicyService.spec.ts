@@ -162,6 +162,7 @@ describe('PolicyService', () => {
       'askForRealName',
       'badgesEnabled',
       'categoriesActive',
+      'groupsEnabled',
       'inviteCodesGroupPerUser',
       'inviteCodesPersonalPerUser',
       'inviteLinkLimit',
@@ -173,6 +174,7 @@ describe('PolicyService', () => {
       'showContentFilterHeaderMenu',
       'showContentFilterMasonryGrid',
       'showGroupButtonInHeader',
+      'socialMediaEnabled',
       'videoConference',
     ]
 
@@ -342,6 +344,34 @@ describe('PolicyService', () => {
       await expect(svc.init({})).resolves.toBeUndefined()
       expect(readAllSettings).not.toHaveBeenCalled()
       expect(svc.get('publicRegistration')).toBe(true) // cache preserved
+    })
+  })
+
+  describe('getEffective() policy→policy gate', () => {
+    it('folds a dependent boolean to false while its required policy is off', () => {
+      // showGroupButtonInHeader requiresPolicy groupsEnabled. Raw value is untouched (the
+      // admin still sees / edits the stored toggle); only the EFFECTIVE value folds off.
+      const svc = createInMemoryPolicyService({
+        showGroupButtonInHeader: true,
+        groupsEnabled: false,
+      })
+      expect(svc.get('showGroupButtonInHeader')).toBe(true)
+      expect(svc.getEffective('groupsEnabled')).toBe(false)
+      expect(svc.getEffective('showGroupButtonInHeader')).toBe(false)
+    })
+
+    it('passes the raw value through once every required policy is on', () => {
+      const on = createInMemoryPolicyService({
+        showGroupButtonInHeader: true,
+        groupsEnabled: true,
+      })
+      expect(on.getEffective('showGroupButtonInHeader')).toBe(true)
+      // The dependency being on does not override the key's own off state.
+      const off = createInMemoryPolicyService({
+        showGroupButtonInHeader: false,
+        groupsEnabled: true,
+      })
+      expect(off.getEffective('showGroupButtonInHeader')).toBe(false)
     })
   })
 

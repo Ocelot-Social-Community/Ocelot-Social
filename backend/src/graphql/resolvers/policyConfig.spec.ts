@@ -113,4 +113,12 @@ describe('policyConfig resolver', () => {
     expect(row.envSeed).toBeNull()
     expect(row.envSeedState).toBeNull()
   })
+
+  it('reports env-only availability (policy→policy deps are folded live in the client, not here)', () => {
+    // showGroupButtonInHeader depends on groupsEnabled, but that gating is applied client-side
+    // (so re-enabling groups un-greys it without refetching). This metadata stays available
+    // — it has no env requirement — regardless of the groups flag.
+    expect(rowFor('showGroupButtonInHeader', { groupsEnabled: false }).available).toBe(true)
+    expect(rowFor('showGroupButtonInHeader', { groupsEnabled: true }).available).toBe(true)
+  })
 })

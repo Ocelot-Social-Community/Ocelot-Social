@@ -27,6 +27,7 @@ import GroupForm from '~/components/Group/GroupForm'
 import { createGroupMutation } from '~/graphql/groups.js'
 
 export default {
+  middleware: ['groupsEnabled'],
   components: {
     OsCard,
     GroupForm,
