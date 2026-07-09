@@ -647,328 +647,358 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          PL
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            PL
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Peter Lustig
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Peter Lustig
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <span
+                  class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-danger-contrast)] bg-[var(--color-danger)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
+                >
+                  
+              group.roles.owner
+            
+                </span>
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          JR
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            JR
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Jenny Rostock
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Jenny Rostock
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          BDB
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            BDB
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Bob der Baumeister
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Bob der Baumeister
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          H
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            H
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Huey
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Huey
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
           </ul>
@@ -2793,328 +2823,358 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          PL
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            PL
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Peter Lustig
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Peter Lustig
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <span
+                  class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-danger-contrast)] bg-[var(--color-danger)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
+                >
+                  
+              group.roles.owner
+            
+                </span>
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          JR
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            JR
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Jenny Rostock
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Jenny Rostock
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          BDB
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            BDB
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Bob der Baumeister
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Bob der Baumeister
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          H
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            H
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Huey
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Huey
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
           </ul>
@@ -3902,328 +3962,358 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          PL
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            PL
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Peter Lustig
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Peter Lustig
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <span
+                  class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-danger-contrast)] bg-[var(--color-danger)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
+                >
+                  
+              group.roles.owner
+            
+                </span>
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          JR
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            JR
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Jenny Rostock
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Jenny Rostock
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          BDB
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            BDB
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Bob der Baumeister
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Bob der Baumeister
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          H
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            H
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Huey
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Huey
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
           </ul>
@@ -4749,328 +4839,358 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          PL
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            PL
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Peter Lustig
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Peter Lustig
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <span
+                  class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-danger-contrast)] bg-[var(--color-danger)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
+                >
+                  
+              group.roles.owner
+            
+                </span>
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          JR
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            JR
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Jenny Rostock
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Jenny Rostock
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          BDB
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            BDB
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Bob der Baumeister
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Bob der Baumeister
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          H
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            H
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Huey
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Huey
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
           </ul>
@@ -5581,328 +5701,358 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          PL
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            PL
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Peter Lustig
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Peter Lustig
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <span
+                  class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-danger-contrast)] bg-[var(--color-danger)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
+                >
+                  
+              group.roles.owner
+            
+                </span>
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          JR
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            JR
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Jenny Rostock
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Jenny Rostock
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          BDB
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            BDB
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Bob der Baumeister
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Bob der Baumeister
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          H
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            H
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Huey
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Huey
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
           </ul>
@@ -6580,328 +6730,358 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          PL
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            PL
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Peter Lustig
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Peter Lustig
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <span
+                  class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-danger-contrast)] bg-[var(--color-danger)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
+                >
+                  
+              group.roles.owner
+            
+                </span>
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          JR
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            JR
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Jenny Rostock
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Jenny Rostock
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          BDB
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            BDB
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Bob der Baumeister
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Bob der Baumeister
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          H
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            H
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Huey
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Huey
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
           </ul>
@@ -7766,328 +7946,358 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          PL
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            PL
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Peter Lustig
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Peter Lustig
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <span
+                  class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-danger-contrast)] bg-[var(--color-danger)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
+                >
+                  
+              group.roles.owner
+            
+                </span>
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          JR
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            JR
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Jenny Rostock
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Jenny Rostock
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          BDB
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            BDB
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Bob der Baumeister
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Bob der Baumeister
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          H
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            H
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Huey
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Huey
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
           </ul>
@@ -8895,328 +9105,358 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          PL
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            PL
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Peter Lustig
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Peter Lustig
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <span
+                  class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-danger-contrast)] bg-[var(--color-danger)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
+                >
+                  
+              group.roles.owner
+            
+                </span>
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          JR
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            JR
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Jenny Rostock
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Jenny Rostock
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          BDB
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            BDB
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Bob der Baumeister
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Bob der Baumeister
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
             <li
               class="connections__item"
             >
               <div
-                class=""
-                placement="top-start"
+                class="member-teaser"
               >
-                <client-only-stub>
-                  <v-popover-stub
-                    autohide="true"
-                    boundarieselement="viewport"
-                    class="user-teaser"
-                    container="body"
-                    delay="0"
-                    handleresize="true"
-                    offset="16"
-                    openclass="open"
-                    opengroup="0"
-                    placement="bottom-end"
-                    popoverarrowclass="tooltip-arrow popover-arrow"
-                    popoverbaseclass="tooltip popover"
-                    popoverclass="vue-popover-theme"
-                    popoverinnerclass="tooltip-inner popover-inner"
-                    popoverwrapperclass="wrapper"
-                    popperoptions="[object Object]"
-                    trigger="manual"
-                  >
-                    <nuxt-link-stub
-                      data-test="avatarUserLink"
-                      to="[object Object]"
+                <div
+                  class="member-teaser__user"
+                  placement="top-start"
+                >
+                  <client-only-stub>
+                    <v-popover-stub
+                      autohide="true"
+                      boundarieselement="viewport"
+                      class="user-teaser"
+                      container="body"
+                      delay="0"
+                      handleresize="true"
+                      offset="16"
+                      openclass="open"
+                      opengroup="0"
+                      placement="bottom-end"
+                      popoverarrowclass="tooltip-arrow popover-arrow"
+                      popoverbaseclass="tooltip popover"
+                      popoverclass="vue-popover-theme"
+                      popoverinnerclass="tooltip-inner popover-inner"
+                      popoverwrapperclass="wrapper"
+                      popperoptions="[object Object]"
+                      trigger="manual"
                     >
-                      <div
-                        class="profile-avatar --small --no-image"
+                      <nuxt-link-stub
+                        data-test="avatarUserLink"
+                        to="[object Object]"
                       >
-                        <span
-                          class="initials"
+                        <div
+                          class="profile-avatar --small --no-image"
                         >
-                          H
-                        </span>
-                         
-                        <!---->
-                         
-                        <!---->
-                      </div>
-                    </nuxt-link-stub>
-                     
-                    <div
-                      class="info flex-direction-column"
-                    >
-                      <div
-                        class="flex-direction-column"
-                      >
-                        <nuxt-link-stub
-                          to="[object Object]"
-                        >
+                          <span
+                            class="initials"
+                          >
+                            H
+                          </span>
+                           
                           <!---->
                            
-                          <span
-                            class="name"
-                          >
-                            Huey
-                          </span>
-                        </nuxt-link-stub>
-                         
-                        <!---->
-                         
-                        <!---->
-                         
-                        <span>
-                          
                           <!---->
-                        </span>
+                        </div>
+                      </nuxt-link-stub>
+                       
+                      <div
+                        class="info flex-direction-column"
+                      >
+                        <div
+                          class="flex-direction-column"
+                        >
+                          <nuxt-link-stub
+                            to="[object Object]"
+                          >
+                            <!---->
+                             
+                            <span
+                              class="name"
+                            >
+                              Huey
+                            </span>
+                          </nuxt-link-stub>
+                           
+                          <!---->
+                           
+                          <!---->
+                           
+                          <span>
+                            
+                            <!---->
+                          </span>
+                        </div>
+                         
+                        <!---->
                       </div>
                        
-                      <!---->
-                    </div>
-                     
-                    <div />
-                  </v-popover-stub>
-                </client-only-stub>
+                      <div />
+                    </v-popover-stub>
+                  </client-only-stub>
+                </div>
+                 
+                <!---->
               </div>
             </li>
           </ul>
