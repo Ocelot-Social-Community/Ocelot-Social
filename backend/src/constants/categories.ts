@@ -1,6 +1,6 @@
-// this file is duplicated in `backend/src/constants/metadata` and `webapp/constants/metadata.js`
-export const CATEGORIES_MIN = 1
-export const CATEGORIES_MAX = 3
+// The seed list of post/group categories (used by db/seed + tests). The MIN/MAX
+// counts moved to the shared branding config (branding.category). The list itself is brand
+// data seeded to the DB, not part of the branding override schema.
 
 export const categories = [
   {

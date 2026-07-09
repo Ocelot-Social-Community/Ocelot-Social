@@ -1,0 +1,111 @@
+// The branding override schema — the typed contract between framework code and a brand.
+//
+// ALLOW-LIST: only keys here are brand-overridable. Framework-internal constants (editor type
+// ids, keycodes, GraphQL-enum mirrors, chat SCSS theme) are deliberately NOT here. Curation
+// criterion (see docu/branding-architecture-konzept.md, "Schicht A konkret"): a key belongs
+// here only if it is a per-network identity / UX / validation choice a brand operator would
+// plausibly change — not runtime admin governance (Policy) and not framework-internal wiring.
+
+/** A single header-menu entry: either an internal `path` or an external `url` (+ target). */
+export interface MenuEntry {
+  nameIdent?: string
+  path?: string
+  url?: string
+  target?: '_blank' | '_self'
+}
+
+/** Optional custom button in the header menu. */
+export interface CustomButton {
+  iconPath?: string
+  iconWidth?: string
+  iconAltText?: string
+  toolTipIdent?: string
+  path?: string
+  url?: string
+  target?: '_blank' | '_self'
+}
+
+/** Click behaviour of the header logo: either an external link or an internal route. */
+export interface LogoClick {
+  externalLink: { url: string; target: '_blank' | '_self' } | null
+  internalPath?: { to: { name: string }; scrollTo?: string }
+}
+
+export interface BrandingConfig {
+  group: {
+    nameLengthMin: number
+    nameLengthMax: number
+    descriptionMinLength: number
+    descriptionExcerptLength: number
+  }
+  registration: {
+    nonceLength: number
+    inviteCodeLength: number
+    layout: string
+  }
+  login: {
+    layout: string
+  }
+  comment: {
+    minLength: number
+    maxUntruncatedLength: number
+    truncateToLength: number
+  }
+  dateTime: {
+    relativeDateTime: boolean
+    absoluteDateTimeFormat: string
+  }
+  metadata: {
+    applicationName: string
+    applicationShortName: string
+    applicationDescription: string
+    organizationName: string
+    organizationJurisdiction: string
+    /** Auth cookie name (webapp apollo + auth store). */
+    cookieName: string
+    /** Primary theme colour (PWA manifest theme_color; $color-primary). */
+    themeColor: string
+  }
+  logos: {
+    headerPath: string
+    headerTabletPath?: string
+    headerMobilePath: string
+    headerWidth: string
+    headerTabletWidth?: string
+    headerMobileWidth: string
+    headerClick: LogoClick
+    signupPath: string
+    /** Welcome logo, also embedded in e-mails (backend). */
+    welcomePath: string
+    logoutPath: string
+    passwordResetPath: string
+  }
+  headerMenu: {
+    customButton: CustomButton
+    menu: MenuEntry[]
+  }
+  donation: {
+    progressBarColorType: 'gradient' | 'uni'
+  }
+  badges: {
+    /** Maximum number of trophy badges a user may select for display. */
+    trophyBadgesSelectedMax: number
+  }
+  category: {
+    /** Min / max number of categories required on a post / group. (The category LIST itself is
+     * seeded to the DB per brand, not part of this config.) */
+    min: number
+    max: number
+  }
+}
+
+/** A recursive partial — a brand override is sparse, supplying only the keys it changes. */
+export type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends Array<infer U>
+    ? Array<U>
+    : T[P] extends object
+      ? DeepPartial<T[P]>
+      : T[P]
+}
+
+export type BrandingOverrides = DeepPartial<BrandingConfig>

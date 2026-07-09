@@ -23,7 +23,7 @@
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { resolveIcon } from '~/utils/iconRegistry'
-import { CATEGORIES_MAX } from '~/constants/categories.js'
+import branding from '@ocelot-social/branding'
 import xor from 'lodash/xor'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
@@ -42,7 +42,7 @@ export default {
   },
   data() {
     return {
-      selectedMax: CATEGORIES_MAX,
+      selectedMax: branding.category.max,
       selectedCategoryIds: this.existingCategoryIds,
     }
   },

@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { PROGRESS_BAR_COLOR_TYPE } from '~/constants/donation.js'
+import branding from '@ocelot-social/branding'
 
 export default {
   props: {
@@ -39,7 +39,7 @@ export default {
       return `width: ${(this.progress / this.goal) * 100}%;`
     },
     progressBarColorClass() {
-      return PROGRESS_BAR_COLOR_TYPE === 'gradient'
+      return branding.donation.progressBarColorType === 'gradient'
         ? 'color-repeating-linear-gradient'
         : 'color-uni'
     },

@@ -10,7 +10,6 @@
 import { withFilter } from 'graphql-subscriptions'
 import { v4 as uuid } from 'uuid'
 
-import { CATEGORIES_MIN, CATEGORIES_MAX } from '@constants/categories'
 import {
   GROUP_MEMBERSHIP_VISIBILITY_CHANGED,
   GROUP_SHOW_MEMBERS_CHANGED,
@@ -177,10 +176,14 @@ export default {
       // exists — otherwise group creation would be impossible on an empty
       // category DB (mirrors the frontend gating in getCategoriesMixin).
       const enforceCategories = policy.get('categoriesActive') && (await categoriesExist(context))
-      if (enforceCategories && (!categoryIds || categoryIds.length < CATEGORIES_MIN)) {
+      if (enforceCategories && (!categoryIds || categoryIds.length < branding.category.min)) {
         throw new UserInputError('Too few categories!')
       }
-      if (policy.get('categoriesActive') && categoryIds && categoryIds.length > CATEGORIES_MAX) {
+      if (
+        policy.get('categoriesActive') &&
+        categoryIds &&
+        categoryIds.length > branding.category.max
+      ) {
         throw new UserInputError('Too many categories!')
       }
       if (
@@ -254,10 +257,10 @@ export default {
       params.locationName = params.locationName === '' ? null : params.locationName
 
       if (policy.get('categoriesActive') && categoryIds) {
-        if (categoryIds.length < CATEGORIES_MIN) {
+        if (categoryIds.length < branding.category.min) {
           throw new UserInputError('Too few categories!')
         }
-        if (categoryIds.length > CATEGORIES_MAX) {
+        if (categoryIds.length > branding.category.max) {
           throw new UserInputError('Too many categories!')
         }
       }

@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import { TROPHY_BADGES_SELECTED_MAX } from '@constants/badges'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import Badge from '@graphql/queries/badges/Badge.gql'
 import revokeBadge from '@graphql/queries/badges/revokeBadge.gql'
@@ -11,6 +11,7 @@ import setTrophyBadgeSelected from '@graphql/queries/badges/setTrophyBadgeSelect
 import setVerificationBadge from '@graphql/queries/badges/setVerificationBadge.gql'
 import User from '@graphql/queries/users/User.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+import branding from '@src/branding'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -666,7 +667,7 @@ describe('Badges', () => {
       })
 
       it('does not select badge when maximum selected are already reached', async () => {
-        for (let i = 0; i < TROPHY_BADGES_SELECTED_MAX; i++) {
+        for (let i = 0; i < branding.badges.trophyBadgesSelectedMax; i++) {
           await Factory.build('badge', {
             id: `trophy_${i}`,
             type: 'trophy',

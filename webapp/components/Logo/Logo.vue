@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import logos from '~/constants/logosBranded.js'
+import branding from '@ocelot-social/branding'
 import metadata from '~/constants/metadata.js'
 
 /**
@@ -83,19 +83,19 @@ export default {
   data() {
     const logosObject = {
       header: {
-        path: logos.LOGO_HEADER_PATH,
-        tabletPath: logos.LOGO_HEADER_TABLET_PATH || null,
-        mobilePath: logos.LOGO_HEADER_MOBILE_PATH || null,
+        path: branding.logos.headerPath,
+        tabletPath: branding.logos.headerTabletPath || null,
+        mobilePath: branding.logos.headerMobilePath || null,
         alt: 'Header',
-        widthDefault: logos.LOGO_HEADER_WIDTH,
-        tabletWidthDefault: logos.LOGO_HEADER_TABLET_WIDTH || logos.LOGO_HEADER_WIDTH,
-        mobileWidthDefault: logos.LOGO_HEADER_MOBILE_WIDTH || logos.LOGO_HEADER_WIDTH,
+        widthDefault: branding.logos.headerWidth,
+        tabletWidthDefault: branding.logos.headerTabletWidth || branding.logos.headerWidth,
+        mobileWidthDefault: branding.logos.headerMobileWidth || branding.logos.headerWidth,
       },
-      welcome: { path: logos.LOGO_WELCOME_PATH, alt: 'Welcome', widthDefault: '200px' },
-      signup: { path: logos.LOGO_SIGNUP_PATH, alt: 'Sign Up', widthDefault: '200px' },
-      logout: { path: logos.LOGO_LOGOUT_PATH, alt: 'Logging Out', widthDefault: '200px' },
+      welcome: { path: branding.logos.welcomePath, alt: 'Welcome', widthDefault: '200px' },
+      signup: { path: branding.logos.signupPath, alt: 'Sign Up', widthDefault: '200px' },
+      logout: { path: branding.logos.logoutPath, alt: 'Logging Out', widthDefault: '200px' },
       passwordReset: {
-        path: logos.LOGO_PASSWORD_RESET_PATH,
+        path: branding.logos.passwordResetPath,
         alt: 'Reset Your Password',
         widthDefault: '200px',
       },

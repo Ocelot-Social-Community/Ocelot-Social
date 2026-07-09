@@ -191,7 +191,6 @@ import { OsBadge, OsButton, OsIcon } from '@ocelot-social/ui'
 import branding from '@ocelot-social/branding'
 import { iconRegistry } from '~/utils/iconRegistry'
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
-import { CATEGORIES_MIN, CATEGORIES_MAX } from '~/constants/categories.js'
 import Editor from '~/components/Editor/Editor'
 import ActionRadiusSelect from '~/components/Select/ActionRadiusSelect'
 import LocationSelect from '~/components/Select/LocationSelect'
@@ -295,7 +294,7 @@ export default {
           validator: (_, value = []) => {
             if (
               this.categoriesActive &&
-              (value.length < CATEGORIES_MIN || value.length > CATEGORIES_MAX)
+              (value.length < branding.category.min || value.length > branding.category.max)
             ) {
               return [new Error(this.$t('common.validations.categories'))]
             }

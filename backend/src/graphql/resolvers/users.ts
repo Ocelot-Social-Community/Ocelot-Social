@@ -7,10 +7,10 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
-import { TROPHY_BADGES_SELECTED_MAX } from '@constants/badges'
 import { GROUP_MEMBERSHIP_VISIBILITY_CHANGED } from '@constants/subscriptions'
 import { getNeode } from '@db/neo4j'
 import { UserInputError, ForbiddenError } from '@graphql/errors'
+import branding from '@src/branding'
 
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
 import { filterUsersHasLocation } from './helpers/filterHasLocation'
@@ -462,9 +462,9 @@ export default {
         user: { id: userId },
       } = context
 
-      if (slot >= TROPHY_BADGES_SELECTED_MAX || slot < 0) {
+      if (slot >= branding.badges.trophyBadgesSelectedMax || slot < 0) {
         throw new Error(
-          `Invalid slot! There is only ${TROPHY_BADGES_SELECTED_MAX} badge-slots to fill`,
+          `Invalid slot! There is only ${branding.badges.trophyBadgesSelectedMax} badge-slots to fill`,
         )
       }
 
@@ -622,7 +622,7 @@ export default {
           )
           return result.records
         })
-        const result = Array(TROPHY_BADGES_SELECTED_MAX).fill(defaultTrophyBadge)
+        const result = Array(branding.badges.trophyBadgesSelectedMax).fill(defaultTrophyBadge)
         badgesSelected.forEach((record) => {
           result[record.get('slot')] = record.get('badge')
         })
