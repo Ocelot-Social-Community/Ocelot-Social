@@ -65,4 +65,32 @@ export const brandingDefaults: BrandingConfig = {
     min: 1,
     max: 3,
   },
+  links: {
+    landingPage: '/login',
+    // Only externalLink differs from the InternalPages base for vanilla ocelot; the internal
+    // pages (terms/conduct/privacy/faq) keep their framework defaults (empty override).
+    pages: {
+      organization: { externalLink: { url: 'https://ocelot.social', target: '_blank' } },
+      donate: { externalLink: { url: 'https://ocelot.social/en/donate/', target: '_blank' } },
+      imprint: { externalLink: { url: 'https://ocelot.social/en/imprint/', target: '_blank' } },
+      termsAndConditions: {},
+      codeOfConduct: {},
+      dataPrivacy: {},
+      faq: {},
+      support: { externalLink: { url: 'https://ocelot.social', target: '_blank' } },
+    },
+    footerOrder: [
+      'organization',
+      'termsAndConditions',
+      'codeOfConduct',
+      'dataPrivacy',
+      'faq',
+      'donate',
+      'support',
+      'imprint',
+    ],
+  },
+  termsAndConditions: {
+    version: '0.0.4',
+  },
 }

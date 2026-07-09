@@ -31,6 +31,34 @@ export interface LogoClick {
   internalPath?: { to: { name: string }; scrollTo?: string }
 }
 
+/** The footer / static pages a brand can point at an external URL or re-order. */
+export type LinkPageKey =
+  | 'organization'
+  | 'donate'
+  | 'imprint'
+  | 'termsAndConditions'
+  | 'codeOfConduct'
+  | 'dataPrivacy'
+  | 'faq'
+  | 'support'
+
+/**
+ * A brand's sparse override for one static page. Only what differs from the framework page
+ * defaults (see webapp InternalPages) — usually just `externalLink`. `null` externalLink means
+ * "use the internal page". `internalPage` idents override localized strings when set.
+ */
+export interface LinkPageOverride {
+  externalLink?: { url: string; target: '_blank' | '_self' } | null
+  internalPage?: {
+    footerIdent?: string | null
+    headTitleIdent?: string | null
+    headlineIdent?: string | null
+    hasContainer?: boolean
+    hasBaseCard?: boolean
+    hasLoginInHeader?: boolean
+  }
+}
+
 export interface BrandingConfig {
   group: {
     nameLengthMin: number
@@ -96,6 +124,19 @@ export interface BrandingConfig {
      * seeded to the DB per brand, not part of this config.) */
     min: number
     max: number
+  }
+  links: {
+    /** Route (or external URL) the landing page redirects to, e.g. '/login'. */
+    landingPage: string
+    /** Per static-page overrides (raw data; the webapp's ~/constants/links adapter builds the
+     * PageParams from these via InternalPages). */
+    pages: Record<LinkPageKey, LinkPageOverride>
+    /** Static pages shown in the footer, in order. */
+    footerOrder: LinkPageKey[]
+  }
+  termsAndConditions: {
+    /** Current T&C version; bumped when the terms change to force re-acceptance. */
+    version: string
   }
 }
 
