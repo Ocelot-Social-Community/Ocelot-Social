@@ -55,7 +55,7 @@ describe('ProfileSlug', () => {
     }
   })
 
-  const Wrapper = (badgesEnabled, data) => {
+  const Wrapper = (badgesEnabled, data, groupsEnabled = true) => {
     return render(ProfileSlug, {
       localVue,
       stubs,
@@ -63,10 +63,10 @@ describe('ProfileSlug', () => {
       mocks: {
         ...mocks,
         $policy: {
-          // Groups feature on (so the profile groups list renders); badges per test arg.
+          // Badges + groups per test args; both default the profile to its full layout.
           get: (key) => {
             if (key === 'badgesEnabled') return badgesEnabled
-            if (key === 'groupsEnabled') return true
+            if (key === 'groupsEnabled') return groupsEnabled
             return false
           },
         },
@@ -249,6 +249,23 @@ describe('ProfileSlug', () => {
           const button = addButton()
           expect(button.tagName.toLowerCase()).toBe('button')
           expect(button.classList.contains('permission-denied')).toBe(true)
+        })
+      })
+
+      // The profile groups list is gated on the groupsEnabled policy. Assert both branches
+      // so removing the $policy.get('groupsEnabled') condition from the v-if fails loudly
+      // instead of silently leaking the list while the groups feature is off.
+      describe('group member list gating (groupsEnabled)', () => {
+        const groupList = () => wrapper.container.querySelector('.group-member-list')
+
+        it('renders the group member list while groupsEnabled is on', () => {
+          wrapper = Wrapper(true, user, true)
+          expect(groupList()).not.toBeNull()
+        })
+
+        it('hides the group member list while groupsEnabled is off', () => {
+          wrapper = Wrapper(true, user, false)
+          expect(groupList()).toBeNull()
         })
       })
     })
