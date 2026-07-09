@@ -35,13 +35,17 @@ const isAuthenticated = rule({
 // mapping below stays in code (under review), only role→permission is dynamic
 // data. The permission argument is typed against the catalog, so a typo or a
 // removed key is a compile-time error (the shield→catalog drift guard).
+// The single source of truth for "does this request currently hold this permission":
+// the right must be in the resolved effective set AND its runtime feature gate (if any)
+// must be open — e.g. apiKey.create needs the apiKeysEnabled policy. Couples the right to
+// its env/policy flag in one place so every caller inherits identical semantics.
+const hasPermissionEffective = (ctx: Context, permission: PermissionKey): boolean =>
+  ctx.effectivePermissions.has(permission) && isPermissionAvailable(permission, ctx)
+
 const hasPermission = (permission: PermissionKey) =>
-  rule({ cache: 'contextual' })(async (_parent, _args, ctx: Context) => {
-    // A granted permission only authorizes while its runtime feature gate (if any) is
-    // open — e.g. apiKey.create needs the apiKeysEnabled policy. This couples the right
-    // to its env/policy flag in one place, so every hasPermission() gate inherits it.
-    return ctx.effectivePermissions.has(permission) && isPermissionAvailable(permission, ctx)
-  })
+  rule({ cache: 'contextual' })(async (_parent, _args, ctx: Context) =>
+    hasPermissionEffective(ctx, permission),
+  )
 
 // Flat per-group-type creation rights (mirrors videoCall.create_*): creating a group
 // of a given type needs exactly that type's permission, independent of the others.
@@ -59,13 +63,10 @@ const groupCreatePermissionForType = (groupType: string): PermissionKey | null =
 }
 const canCreateGroup = rule({ cache: 'no_cache' })(async (_parent, args, ctx: Context) => {
   const permission = groupCreatePermissionForType(args.groupType)
-  // Like hasPermission(): a granted right only authorizes while its runtime gate is open —
-  // group.create_* is gated by groupsEnabled, so creation is blocked when groups are off.
-  return (
-    !!permission &&
-    ctx.effectivePermissions.has(permission) &&
-    isPermissionAvailable(permission, ctx)
-  )
+  // Same check as hasPermission(), but the permission depends on the requested groupType,
+  // so it can't be a static hasPermission() gate. group.create_* is gated by groupsEnabled,
+  // so hasPermissionEffective also blocks creation when groups are off.
+  return !!permission && hasPermissionEffective(ctx, permission)
 })
 
 const apiKeysEnabled = rule({ cache: 'contextual' })(async (
