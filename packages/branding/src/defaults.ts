@@ -36,6 +36,11 @@ export const brandingDefaults: BrandingConfig = {
     organizationJurisdiction: 'City of Angels',
     cookieName: 'ocelot-social-token',
     themeColor: 'rgb(23, 181, 63)',
+    ogImage: '/img/custom/logo-squared.png',
+    ogImageAlt: 'ocelot.social Logo',
+    ogImageWidth: '1200',
+    ogImageHeight: '1140',
+    ogImageType: 'image/png',
   },
   logos: {
     headerPath: '/img/custom/logo-horizontal.svg',

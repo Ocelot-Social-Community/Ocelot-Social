@@ -93,6 +93,12 @@ export interface BrandingConfig {
     cookieName: string
     /** Primary theme colour (PWA manifest theme_color; $color-primary). */
     themeColor: string
+    /** Open Graph image (link previews). Path is asset-coupled (served from static/). */
+    ogImage: string
+    ogImageAlt: string
+    ogImageWidth: string
+    ogImageHeight: string
+    ogImageType: string
   }
   logos: {
     headerPath: string
