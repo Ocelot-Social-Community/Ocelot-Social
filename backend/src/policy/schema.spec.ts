@@ -240,19 +240,19 @@ describe('requiresPolicyFor', () => {
   // refuses to load, so a future refactor of the detection code (e.g. the DFS cycle check)
   // that stops throwing is caught. Each case isolates one branch.
   describe('assertRequiresPolicyGraph rejects a mis-authored schema at module load', () => {
-    // Reload ./schema against a mocked JSON; assertRequiresPolicyGraph runs during require,
-    // so a violation surfaces as a throw out of loadWithProperties.
-    const loadWithProperties = (properties: Record<string, unknown>) => {
+    // Returns a thunk that reloads ./schema against a mocked JSON; assertRequiresPolicyGraph
+    // runs during require, so a violation surfaces as a throw when the thunk is called.
+    const loadWith = (properties: Record<string, unknown>) => (): void => {
       jest.isolateModules(() => {
         jest.doMock('./policy.schema.json', () => ({ type: 'object', properties }))
-        // eslint-disable-next-line @typescript-eslint/no-require-imports, n/global-require
+        // eslint-disable-next-line @typescript-eslint/no-require-imports, n/global-require, import-x/no-unassigned-import
         require('./schema')
       })
     }
 
     it('throws on a requiresPolicy cycle', () => {
-      expect(() =>
-        loadWithProperties({
+      expect(
+        loadWith({
           a: { type: 'boolean', default: false, requiresPolicy: ['b'] },
           b: { type: 'boolean', default: false, requiresPolicy: ['a'] },
         }),
@@ -260,16 +260,16 @@ describe('requiresPolicyFor', () => {
     })
 
     it('throws when a dependency names an unknown key', () => {
-      expect(() =>
-        loadWithProperties({
+      expect(
+        loadWith({
           a: { type: 'boolean', default: false, requiresPolicy: ['missing'] },
         }),
       ).toThrow(/requiresPolicy unknown key "missing"/)
     })
 
     it('throws when the dependent key is not boolean', () => {
-      expect(() =>
-        loadWithProperties({
+      expect(
+        loadWith({
           a: { type: 'number', default: 0, requiresPolicy: ['b'] },
           b: { type: 'boolean', default: false },
         }),
@@ -277,8 +277,8 @@ describe('requiresPolicyFor', () => {
     })
 
     it('throws when a dependency is not boolean', () => {
-      expect(() =>
-        loadWithProperties({
+      expect(
+        loadWith({
           a: { type: 'boolean', default: false, requiresPolicy: ['b'] },
           b: { type: 'number', default: 0 },
         }),
@@ -286,8 +286,8 @@ describe('requiresPolicyFor', () => {
     })
 
     it('throws when a dependency is not visible everywhere the dependent is', () => {
-      expect(() =>
-        loadWithProperties({
+      expect(
+        loadWith({
           a: { type: 'boolean', default: false, visibility: ['public'], requiresPolicy: ['b'] },
           b: { type: 'boolean', default: false, visibility: ['authenticated'] },
         }),
