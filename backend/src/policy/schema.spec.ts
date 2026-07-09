@@ -233,4 +233,65 @@ describe('requiresPolicyFor', () => {
       }
     }
   })
+
+  // The shipped schema is valid, so assertRequiresPolicyGraph()'s throw branches never fire
+  // against it — the invariant test above proves the properties hold, but not that a
+  // VIOLATION is actually rejected. Inject deliberately broken schemas and assert the module
+  // refuses to load, so a future refactor of the detection code (e.g. the DFS cycle check)
+  // that stops throwing is caught. Each case isolates one branch.
+  describe('assertRequiresPolicyGraph rejects a mis-authored schema at module load', () => {
+    // Reload ./schema against a mocked JSON; assertRequiresPolicyGraph runs during require,
+    // so a violation surfaces as a throw out of loadWithProperties.
+    const loadWithProperties = (properties: Record<string, unknown>) => {
+      jest.isolateModules(() => {
+        jest.doMock('./policy.schema.json', () => ({ type: 'object', properties }))
+        // eslint-disable-next-line @typescript-eslint/no-require-imports, n/global-require
+        require('./schema')
+      })
+    }
+
+    it('throws on a requiresPolicy cycle', () => {
+      expect(() =>
+        loadWithProperties({
+          a: { type: 'boolean', default: false, requiresPolicy: ['b'] },
+          b: { type: 'boolean', default: false, requiresPolicy: ['a'] },
+        }),
+      ).toThrow(/requiresPolicy cycle/)
+    })
+
+    it('throws when a dependency names an unknown key', () => {
+      expect(() =>
+        loadWithProperties({
+          a: { type: 'boolean', default: false, requiresPolicy: ['missing'] },
+        }),
+      ).toThrow(/requiresPolicy unknown key "missing"/)
+    })
+
+    it('throws when the dependent key is not boolean', () => {
+      expect(() =>
+        loadWithProperties({
+          a: { type: 'number', default: 0, requiresPolicy: ['b'] },
+          b: { type: 'boolean', default: false },
+        }),
+      ).toThrow(/"a" has requiresPolicy but is not boolean/)
+    })
+
+    it('throws when a dependency is not boolean', () => {
+      expect(() =>
+        loadWithProperties({
+          a: { type: 'boolean', default: false, requiresPolicy: ['b'] },
+          b: { type: 'number', default: 0 },
+        }),
+      ).toThrow(/requiresPolicy non-boolean key "b"/)
+    })
+
+    it('throws when a dependency is not visible everywhere the dependent is', () => {
+      expect(() =>
+        loadWithProperties({
+          a: { type: 'boolean', default: false, visibility: ['public'], requiresPolicy: ['b'] },
+          b: { type: 'boolean', default: false, visibility: ['authenticated'] },
+        }),
+      ).toThrow(/visible to "public" but its requiresPolicy dependency "b" is not/)
+    })
+  })
 })
