@@ -33,7 +33,6 @@
 
 <script>
 import { SweetalertIcon } from 'vue-sweetalert-icons'
-import emails from '~/constants/emails.js'
 import { useResetPassword } from '~/composables/useResetPassword'
 import PasswordForm from '~/components/Password/PasswordForm'
 
@@ -47,7 +46,7 @@ export default {
     return {
       email,
       nonce,
-      supportEmail: emails.SUPPORT_EMAIL,
+      supportEmail: this.$env.SUPPORT_EMAIL,
       changePasswordResult: null,
     }
   },

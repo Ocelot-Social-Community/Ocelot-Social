@@ -39,7 +39,6 @@
 
 <script>
 import { OsCard } from '@ocelot-social/ui'
-import emails from '~/constants/emails.js'
 import { VerifyEmailAddressMutation } from '~/graphql/EmailAddress.js'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 
@@ -62,7 +61,7 @@ export default {
   },
   data() {
     return {
-      supportEmail: emails.SUPPORT_EMAIL,
+      supportEmail: this.$env.SUPPORT_EMAIL,
     }
   },
   async asyncData(context) {

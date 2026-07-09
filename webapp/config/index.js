@@ -62,12 +62,21 @@ const language = {
   LANGUAGE_FALLBACK: process.env.LANGUAGE_FALLBACK || 'en',
 }
 
+// Support contact address — set per deployment via env. In CONFIG so nuxt-env exposes it at
+// runtime as `$env.SUPPORT_EMAIL` (same channel as NETWORK_NAME); default mirrors the backend's
+// software default. The organisation/support LINKS live only in the backend (email templates) —
+// the webapp's footer links come from ~/constants/links, so they are not duplicated here.
+const organization = {
+  SUPPORT_EMAIL: process.env.SUPPORT_EMAIL || 'hello@ocelot.social',
+}
+
 const CONFIG = {
   ...environment,
   ...server,
   ...sentry,
   ...options,
   ...language,
+  ...organization,
 }
 
 // override process.env with the values here since they contain default values
