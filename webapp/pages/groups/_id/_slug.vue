@@ -227,10 +227,22 @@
           :allProfilesCount="
             isAllowedSeeingGroupMembers && group.membersCount ? group.membersCount : 0
           "
-          :profiles="isAllowedSeeingGroupMembers ? groupMembers.map((d) => d.user) : []"
+          :profiles="enrichedMembers"
           :loading="hydrated && $apollo.loading"
           @fetchAllProfiles="fetchAllMembers"
-        />
+        >
+          <template #item="{ item }">
+            <div class="member-teaser">
+              <user-teaser :user="item" class="member-teaser__user" />
+              <os-badge v-if="item.membershipRole === 'owner'" variant="danger" size="sm">
+                {{ $t('group.roles.owner') }}
+              </os-badge>
+              <os-badge v-else-if="item.membershipRole === 'admin'" variant="primary" size="sm">
+                {{ $t('group.roles.admin') }}
+              </os-badge>
+            </div>
+          </template>
+        </profile-list>
         <!-- <social-media :user-name="groupName" :user="user" /> -->
       </div>
 
@@ -370,6 +382,7 @@ import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import ProfileList from '~/components/features/ProfileList/ProfileList'
+import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
 import { mapGetters, mapMutations } from 'vuex'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
@@ -403,6 +416,7 @@ export default {
     PostTeaser,
     ProfileAvatar,
     ProfileList,
+    UserTeaser,
     MasonryGrid,
     MasonryGridItem,
     // SocialMedia,
@@ -494,6 +508,13 @@ export default {
       // non-members can see the member list of a closed group when the owner enabled showMembers
       if (this.group.groupType === 'closed' && this.group.showMembers === true) return true
       return false
+    },
+    enrichedMembers() {
+      if (!this.isAllowedSeeingGroupMembers) return []
+      return this.groupMembers.map((d) => ({
+        ...d.user,
+        membershipRole: d.membership.role,
+      }))
     },
     membersListSubtitle() {
       if (!this.group || !this.isGroupMemberNonePending) return null
@@ -968,6 +989,17 @@ export default {
 }
 .word-break-all {
   overflow-wrap: anywhere;
+}
+.member-teaser {
+  display: flex;
+  align-items: center;
+  gap: $space-x-small;
+  width: 100%;
+
+  .member-teaser__user {
+    flex: 1;
+    min-width: 0;
+  }
 }
 .collaps-button {
   align-self: flex-end;

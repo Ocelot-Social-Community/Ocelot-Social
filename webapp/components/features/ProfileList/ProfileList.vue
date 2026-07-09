@@ -21,7 +21,9 @@
         @scroll.native="onScroll"
       >
         <div class="connections__item">
-          <user-teaser :user="item" />
+          <slot name="item" :item="item">
+            <user-teaser :user="item" />
+          </slot>
         </div>
       </recycle-scroller>
 
@@ -32,7 +34,9 @@
           :key="connection.id"
           class="connections__item"
         >
-          <user-teaser :user="connection" />
+          <slot name="item" :item="connection">
+            <user-teaser :user="connection" />
+          </slot>
         </li>
       </ul>
 
