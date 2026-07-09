@@ -4069,7 +4069,7 @@ async function deliveredWithin(
 describe('Subscription.groupShowMembersChanged filter', () => {
   it('passes matching events through for authenticated users', async () => {
     const pubsub = new PubSub()
-    const policy = createInMemoryPolicyService({})
+    const policy = createInMemoryPolicyService({ groupsEnabled: true })
     const context = { pubsub, policy, user: { id: 'u1' } } as unknown as Context
     const iterator = groupsResolver.Subscription.groupShowMembersChanged.subscribe(
       null,
@@ -4109,7 +4109,7 @@ describe('Subscription.groupShowMembersChanged filter', () => {
 describe('Subscription.groupMembershipVisibilityChanged filter', () => {
   it('passes matching events through for authenticated users', async () => {
     const pubsub = new PubSub()
-    const policy = createInMemoryPolicyService({})
+    const policy = createInMemoryPolicyService({ groupsEnabled: true })
     const context = { pubsub, policy, user: { id: 'u1' } } as unknown as Context
     const iterator = groupsResolver.Subscription.groupMembershipVisibilityChanged.subscribe(
       null,
