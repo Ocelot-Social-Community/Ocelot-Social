@@ -152,6 +152,23 @@ export interface BrandingConfig {
    * separate locale-file mechanism, no rebuild. See docu/branding-architecture-konzept.md.
    */
   locales: Record<string, Record<string, unknown>>
+  /**
+   * References into the brand's ONE served assets folder (`<brand>/assets/`, served at
+   * `/branding/<brand>/…`). All content links a brand ships are defined here as data. Paths are
+   * written by the brand relative to its assets folder; the build namespaces them to
+   * `/branding/<brand>/…` so multiple brands never collide. (Logo & OG-image paths in `logos` /
+   * `metadata.ogImage` are asset paths too and are namespaced the same way.)
+   */
+  assets: {
+    /** Extra stylesheets, injected as <link> at runtime (CSS custom properties, fonts via
+     * @font-face pointing at files in the same served folder), e.g. ['css/custom.css']. */
+    css: string[]
+    /** Static-page HTML per page per locale code, e.g. `html.imprint.de = 'html/de/imprint.html'`.
+     * Loaded at runtime by the InternalPage view (replaces the build-bundled html i18n). */
+    html: Partial<Record<LinkPageKey, Record<string, string>>>
+    /** Favicon path, e.g. 'favicon.ico'. */
+    favicon: string | null
+  }
 }
 
 /** A recursive partial — a brand override is sparse, supplying only the keys it changes. */

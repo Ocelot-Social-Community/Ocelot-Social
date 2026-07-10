@@ -100,4 +100,10 @@ export const brandingDefaults: BrandingConfig = {
   },
   // No locale overrides by default; a brand adds only the strings it changes.
   locales: {},
+  // No extra assets by default; a brand references its served content here.
+  assets: {
+    css: [],
+    html: {},
+    favicon: null,
+  },
 }
