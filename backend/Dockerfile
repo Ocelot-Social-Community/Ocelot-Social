@@ -1,4 +1,17 @@
 # syntax=docker/dockerfile:1
+
+# Build the shared branding package (tsc -> dist). Placed at /packages/branding in `base` so the
+# backend's `file:../packages/branding` dependency resolves. Requires the repo-root build context
+# (see docker-compose*.yml / .github/workflows — backend now builds with `context: .`).
+FROM node:25.9.0-alpine AS branding-library
+RUN mkdir -p /app
+WORKDIR /app
+COPY packages/branding/package.json ./
+RUN --mount=type=cache,target=/root/.npm,sharing=locked \
+    npm install
+COPY packages/branding/. .
+RUN npm run build
+
 FROM node:25.9.0-alpine AS base
 LABEL org.label-schema.name="ocelot.social:backend"
 LABEL org.label-schema.description="Backend of the Social Network Software ocelot.social"
@@ -14,13 +27,15 @@ EXPOSE ${PORT}
 RUN apk --no-cache add git python3 make g++ bash linux-headers
 RUN mkdir -p /app
 WORKDIR /app
+COPY --from=branding-library ./app/ /packages/branding/
 CMD ["/bin/bash", "-c", "yarn run start"]
 
 FROM base AS development
 CMD ["/bin/sh", "-c", "yarn install && yarn run dev"]
 
 FROM base AS build
-COPY . .
+# Repo-root build context now (for /packages/branding): copy only the backend subtree to /app.
+COPY backend/ .
 ONBUILD COPY ./branding/constants/ src/config/tmp
 # copy categories to brand them (use yarn prod:db:data:categories)
 ONBUILD COPY ./branding/constants/ src/constants/

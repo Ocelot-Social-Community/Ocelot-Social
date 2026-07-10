@@ -12,15 +12,15 @@ jobs:
             file: neo4j/Dockerfile
             target: community
           - name: backend-base
-            context: backend
+            context: .
             file: backend/Dockerfile
             target: base
           - name: backend-build
-            context: backend
+            context: .
             file: backend/Dockerfile
             target: build
           - name: backend
-            context: backend
+            context: .
             file: backend/Dockerfile
             target: production
           - name: webapp-base

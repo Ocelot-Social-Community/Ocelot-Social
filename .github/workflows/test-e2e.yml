@@ -32,7 +32,7 @@ jobs:
       - name: Backend | Build image
         uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
         with:
-          context: backend
+          context: .
           file: backend/Dockerfile
           target: test
           load: true

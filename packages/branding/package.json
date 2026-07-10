@@ -10,8 +10,7 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "tsc",
-    "prepare": "tsc"
+    "build": "tsc"
   },
   "devDependencies": {
     "typescript": "^5.6.0"

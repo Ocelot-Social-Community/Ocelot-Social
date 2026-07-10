@@ -30,7 +30,8 @@ services:
   backend:
     image: ghcr.io/ocelot-social-community/ocelot-social/backend:${OCELOT_VERSION:-latest}
     build:
-      context: ./backend
+      context: .
+      dockerfile: ./backend/Dockerfile
       target: production
     depends_on:
       - neo4j

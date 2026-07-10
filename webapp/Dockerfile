@@ -9,6 +9,17 @@ RUN --mount=type=cache,target=/root/.npm,sharing=locked \
 COPY packages/ui/. .
 RUN npm run build
 
+# Build the shared branding package (tsc -> dist). Placed at /packages/branding in `base` so the
+# webapp's `file:../packages/branding` dependency resolves (context is already the repo root).
+FROM node:25.9.0-alpine AS branding-library
+RUN mkdir -p /app
+WORKDIR /app
+COPY packages/branding/package.json ./
+RUN --mount=type=cache,target=/root/.npm,sharing=locked \
+    npm install
+COPY packages/branding/. .
+RUN npm run build
+
 FROM node:25.9.0-alpine AS base
 LABEL org.label-schema.name="ocelot.social:webapp"
 LABEL org.label-schema.description="Web Frontend of the Social Network Software ocelot.social"
@@ -25,6 +36,7 @@ RUN apk --no-cache add git python3 make g++ bash jq
 RUN mkdir -p /app
 WORKDIR /app
 COPY --from=ui-library ./app/ /packages/ui/
+COPY --from=branding-library ./app/ /packages/branding/
 CMD ["/bin/bash", "-c", "yarn run start"]
 
 FROM base AS development
