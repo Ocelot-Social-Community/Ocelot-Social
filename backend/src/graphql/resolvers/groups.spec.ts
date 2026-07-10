@@ -1642,6 +1642,23 @@ describe('in mode', () => {
                 expect(result.data?.GroupMembers.length).toBe(3)
               })
 
+              it('returns members ordered: owner first, then admin, then usual', async () => {
+                const result = await query({ query: groupMembersQuery, variables })
+                const members = result.data?.GroupMembers
+                expect(members[0]).toMatchObject({
+                  user: expect.objectContaining({ id: 'owner-of-hidden-group' }),
+                  membership: expect.objectContaining({ role: 'owner' }),
+                })
+                expect(members[1]).toMatchObject({
+                  user: expect.objectContaining({ id: 'owner-of-closed-group' }),
+                  membership: expect.objectContaining({ role: 'admin' }),
+                })
+                expect(members[2]).toMatchObject({
+                  user: expect.objectContaining({ id: 'current-user' }),
+                  membership: expect.objectContaining({ role: 'usual' }),
+                })
+              })
+
               it('finds all members including pending when includePending is true', async () => {
                 const result = await query({
                   query: groupMembersQuery,

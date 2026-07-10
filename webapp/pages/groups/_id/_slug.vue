@@ -511,10 +511,14 @@ export default {
     },
     enrichedMembers() {
       if (!this.isAllowedSeeingGroupMembers) return []
-      return this.groupMembers.map((d) => ({
-        ...d.user,
-        membershipRole: d.membership.role,
-      }))
+      const roleOrder = { owner: 0, admin: 1 }
+      return this.groupMembers
+        .map((d) => ({ ...d.user, membershipRole: d.membership.role }))
+        .sort((a, b) => {
+          const aOrder = roleOrder[a.membershipRole] ?? 2
+          const bOrder = roleOrder[b.membershipRole] ?? 2
+          return aOrder - bOrder
+        })
     },
     membersListSubtitle() {
       if (!this.group || !this.isGroupMemberNonePending) return null

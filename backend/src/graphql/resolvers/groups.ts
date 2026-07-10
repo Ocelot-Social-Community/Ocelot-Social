@@ -102,12 +102,20 @@ export default {
           const isMember = memberCheckResult.records.length > 0
 
           let cypher: string
+          const roleOrder = `
+            CASE membership.role
+              WHEN 'owner' THEN 0
+              WHEN 'admin' THEN 1
+              WHEN 'usual' THEN 2
+              ELSE 3
+            END, user.name`
           if (isMember) {
             const pendingFilter = includePending ? '' : "AND membership.role <> 'pending'"
             cypher = `
               MATCH (user:User)-[membership:MEMBER_OF]->(:Group {id: $groupId})
               WHERE true ${pendingFilter}
               RETURN user {.*}, membership {.*}
+              ORDER BY ${roleOrder}
               SKIP toInteger($offset) LIMIT toInteger($first)
             `
           } else {
@@ -121,6 +129,7 @@ export default {
               WHERE membership.role <> 'pending'
                 AND coalesce(membership.showOnProfile, true) = true
               RETURN user {.*}, membership {.*}
+              ORDER BY ${roleOrder}
               SKIP toInteger($offset) LIMIT toInteger($first)
             `
           }
