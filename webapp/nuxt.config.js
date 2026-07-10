@@ -138,6 +138,7 @@ export default {
    ** Plugins to load before mounting the App
    */
   plugins: [
+    { src: '~/plugins/branding.js', ssr: true },
     { src: '~/plugins/policy.js', ssr: true },
     { src: '~/plugins/policy-subscribe.js', ssr: false },
     { src: '~/plugins/permissions.js', ssr: true },

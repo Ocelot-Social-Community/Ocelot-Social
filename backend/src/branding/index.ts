@@ -9,5 +9,5 @@
 // The schema, framework defaults and the brand override slot live in the package; see
 // docu/branding-architecture-konzept.md ("Schicht A konkret").
 
-export { default, brandingDefaults } from '@ocelot-social/branding'
+export { default, brandingDefaults, setBranding, getBranding } from '@ocelot-social/branding'
 export type { BrandingConfig } from '@ocelot-social/branding'
