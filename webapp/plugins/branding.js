@@ -8,10 +8,11 @@
 //   1. $OCELOT_BRANDING_PATH — a single compiled branding.json (dev / single-brand). Simple.
 //   2. $OCELOT_BRANDING_ASSETS_DIR — the served multi-brand folder (manifest.json + <id>/…). The
 //      ACTIVE brand is the `activeBranding` policy value (queried from the backend so SSR renders
-//      the switched brand), with fallbacks: $OCELOT_ACTIVE_BRANDING, then the sole brand if the
-//      manifest has exactly one, else vanilla. The chosen <id>/branding.json is loaded + serialised
-//      together with its id (window.__NUXT__.brandingId) so the live-switch plugin can detect a
-//      divergence and reload.
+//      the switched brand); '' = framework defaults (vanilla), which is the DEFAULT. Baked-in
+//      brandings are only made AVAILABLE (listed for the admin Branding tab), never auto-activated
+//      — ops may pin a default with $OCELOT_ACTIVE_BRANDING (used only when the backend is
+//      unreachable). The chosen <id>/branding.json is loaded + serialised together with its id
+//      (window.__NUXT__.brandingId) so the live-switch plugin can detect a divergence and reload.
 //
 // NOTE: plugins run after the app bundle evaluates, so component/method reads pick up the brand
 // config; module-scope captures in a few constants adapters (links, metadata) resolve at import
@@ -67,10 +68,14 @@ async function loadServerBranding(readFileSync, path) {
   const ids = Array.isArray(manifest) ? manifest.map((m) => m.id) : []
   if (!ids.length) return null
 
-  let active = await fetchActiveBrandingId() // '' explicit vanilla, null = backend unreachable
+  // The active brand is the activeBranding policy value ('' = framework defaults / vanilla, which
+  // is the DEFAULT). Baked-in brandings are only AVAILABLE (listed in the manifest, switchable on
+  // the admin Branding tab), never auto-activated — even a sole brand stays inactive until an admin
+  // switches to it (or ops pins one via $OCELOT_ACTIVE_BRANDING). This keeps a fresh instance on
+  // vanilla while making brands available to switch to.
+  let active = await fetchActiveBrandingId() // '' = vanilla (default), null = backend unreachable
   if (active === null) active = process.env.OCELOT_ACTIVE_BRANDING || ''
-  if (!active && ids.length === 1) active = ids[0] // auto-activate the sole baked-in brand
-  if (!active || !ids.includes(active)) return null // unknown / vanilla → framework defaults
+  if (!active || !ids.includes(active)) return null // vanilla / unknown → framework defaults
 
   const config = JSON.parse(readFileSync(path.join(assetsDir, active, 'branding.json'), 'utf8'))
   return { config, brandingId: active }
