@@ -848,10 +848,10 @@
       "slug": "Унікальне ім'я"
     },
     "membersCount": "Учасник ::: Учасники",
+    "membersListNoFilterResults": "Учасників не знайдено",
     "membersListNotVisibleToNonMembers": "Не-учасники не можуть бачити цей список.",
     "membersListTitle": "Учасники групи",
     "membersListTitleNotAllowedSeeingGroupMembers": "Учасники групи приховані",
-    "membersListNoFilterResults": "Учасників не знайдено",
     "membersListVisibleToNonMembers": "Не-учасники можуть бачити цей список.",
     "modal": {
       "cancel": "Скасувати",
@@ -870,10 +870,10 @@
     "role": "Ваша роль у групі",
     "roles": {
       "admin": "Адміністратор",
+      "members": "Учасники",
       "owner": "Власник",
       "pending": "Очікуючий учасник",
-      "usual": "Учасник",
-      "members": "Учасники"
+      "usual": "Учасник"
     },
     "save": "Створити нову групу",
     "showMembers": "Список учасників видимий для всіх",

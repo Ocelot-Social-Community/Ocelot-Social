@@ -848,10 +848,10 @@
       "slug": "Eindeutiger Name"
     },
     "membersCount": "Mitglied ::: Mitglieder",
+    "membersListNoFilterResults": "Keine Mitglieder gefunden",
     "membersListNotVisibleToNonMembers": "Nicht-Mitglieder können diese Liste nicht sehen.",
     "membersListTitle": "Gruppenmitglieder",
     "membersListTitleNotAllowedSeeingGroupMembers": "Gruppenmitglieder unsichtbar",
-    "membersListNoFilterResults": "Keine Mitglieder gefunden",
     "membersListVisibleToNonMembers": "Nicht-Mitglieder können diese Liste sehen.",
     "modal": {
       "cancel": "Abbrechen",

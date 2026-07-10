@@ -848,10 +848,10 @@
       "slug": "Unieke naam"
     },
     "membersCount": "Lid ::: Leden",
+    "membersListNoFilterResults": "Geen leden gevonden",
     "membersListNotVisibleToNonMembers": "Niet-leden kunnen deze lijst niet zien.",
     "membersListTitle": "Groepsleden",
     "membersListTitleNotAllowedSeeingGroupMembers": "Groepsleden onzichtbaar",
-    "membersListNoFilterResults": "Geen leden gevonden",
     "membersListVisibleToNonMembers": "Niet-leden kunnen deze lijst zien.",
     "modal": {
       "cancel": "Annuleren",
@@ -870,10 +870,10 @@
     "role": "Jouw rol in de groep",
     "roles": {
       "admin": "Beheerder",
+      "members": "Leden",
       "owner": "Eigenaar",
       "pending": "In afwachting",
-      "usual": "Lid",
-      "members": "Leden"
+      "usual": "Lid"
     },
     "save": "Nieuwe groep aanmaken",
     "showMembers": "Ledenlijst zichtbaar voor iedereen",

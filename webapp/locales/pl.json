@@ -848,10 +848,10 @@
       "slug": "Unikalna nazwa"
     },
     "membersCount": "Członek ::: Członkowie",
+    "membersListNoFilterResults": "Nie znaleziono członków",
     "membersListNotVisibleToNonMembers": "Osoby spoza grupy nie mogą zobaczyć tej listy.",
     "membersListTitle": "Członkowie grupy",
     "membersListTitleNotAllowedSeeingGroupMembers": "Członkowie grupy niewidoczni",
-    "membersListNoFilterResults": "Nie znaleziono członków",
     "membersListVisibleToNonMembers": "Osoby spoza grupy mogą zobaczyć tę listę.",
     "modal": {
       "cancel": "Anuluj",
@@ -870,10 +870,10 @@
     "role": "Twoja rola w grupie",
     "roles": {
       "admin": "Administrator",
+      "members": "Członkowie",
       "owner": "Właściciel",
       "pending": "Oczekujący członek",
-      "usual": "Członek",
-      "members": "Członkowie"
+      "usual": "Członek"
     },
     "save": "Utwórz nową grupę",
     "showMembers": "Lista członków widoczna dla wszystkich",

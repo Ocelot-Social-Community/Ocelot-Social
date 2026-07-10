@@ -848,10 +848,10 @@
       "slug": "Nome unico"
     },
     "membersCount": "Membro ::: Membri",
+    "membersListNoFilterResults": "Nessun membro trovato",
     "membersListNotVisibleToNonMembers": "I non membri non possono vedere questa lista.",
     "membersListTitle": "Membri del gruppo",
     "membersListTitleNotAllowedSeeingGroupMembers": "Membri del gruppo invisibili",
-    "membersListNoFilterResults": "Nessun membro trovato",
     "membersListVisibleToNonMembers": "I non membri possono vedere questa lista.",
     "modal": {
       "cancel": "Annulla",
@@ -870,10 +870,10 @@
     "role": "Il tuo ruolo nel gruppo",
     "roles": {
       "admin": "Amministratore",
+      "members": "Membri",
       "owner": "Proprietario",
       "pending": "Membro in attesa",
-      "usual": "Membro",
-      "members": "Membri"
+      "usual": "Membro"
     },
     "save": "Crea nuovo gruppo",
     "showMembers": "Elenco membri visibile a tutti",

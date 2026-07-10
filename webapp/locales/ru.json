@@ -848,10 +848,10 @@
       "slug": "Уникальное имя"
     },
     "membersCount": "Участник ::: Участники",
+    "membersListNoFilterResults": "Участники не найдены",
     "membersListNotVisibleToNonMembers": "Не-участники не могут видеть этот список.",
     "membersListTitle": "Участники группы",
     "membersListTitleNotAllowedSeeingGroupMembers": "Участники группы скрыты",
-    "membersListNoFilterResults": "Участники не найдены",
     "membersListVisibleToNonMembers": "Не-участники могут видеть этот список.",
     "modal": {
       "cancel": "Отмена",
@@ -870,10 +870,10 @@
     "role": "Твоя роль в группе",
     "roles": {
       "admin": "Администратор",
+      "members": "Участники",
       "owner": "Владелец",
       "pending": "Ожидающий участник",
-      "usual": "Участник",
-      "members": "Участники"
+      "usual": "Участник"
     },
     "save": "Создать новую группу",
     "showMembers": "Список участников виден всем",

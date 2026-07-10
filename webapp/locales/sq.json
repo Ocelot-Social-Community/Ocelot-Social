@@ -848,10 +848,10 @@
       "slug": "Emri unik"
     },
     "membersCount": "Anëtar ::: Anëtarë",
+    "membersListNoFilterResults": "Nuk u gjetën anëtarë",
     "membersListNotVisibleToNonMembers": "Jo-anëtarët nuk mund ta shohin këtë listë.",
     "membersListTitle": "Anëtarët e grupit",
     "membersListTitleNotAllowedSeeingGroupMembers": "Anëtarët e grupit të padukshëm",
-    "membersListNoFilterResults": "Nuk u gjetën anëtarë",
     "membersListVisibleToNonMembers": "Jo-anëtarët mund ta shohin këtë listë.",
     "modal": {
       "cancel": "Anulo",
@@ -870,10 +870,10 @@
     "role": "Roli yt në grup",
     "roles": {
       "admin": "Administrator",
+      "members": "Anëtarë",
       "owner": "Pronar",
       "pending": "Anëtar në pritje",
-      "usual": "Anëtar",
-      "members": "Anëtarë"
+      "usual": "Anëtar"
     },
     "save": "Krijo grup të ri",
     "showMembers": "Lista e anëtarëve e dukshme për të gjithë",
