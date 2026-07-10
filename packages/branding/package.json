@@ -5,8 +5,12 @@
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "ocelot-branding-build": "scripts/build-branding.mjs"
+  },
   "files": [
-    "dist"
+    "dist",
+    "scripts"
   ],
   "sideEffects": false,
   "scripts": {

@@ -60,6 +60,7 @@ describe('DEFAULT_ROLES', () => {
     'user.delete.any',
     'post.pin',
     'post.push',
+    'branding.manage',
   ]
 
   // Order-independent exact-set comparison: catches both a missing capability AND

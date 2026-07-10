@@ -135,6 +135,13 @@ export default {
   },
 
   /*
+   ** Dynamic branding assets: serve /branding/* from $OCELOT_BRANDING_ASSETS_DIR at runtime
+   ** (logos, favicon, static-page HTML, CSS, fonts + each brand's branding.json + manifest.json)
+   ** so brandings are bound without being baked into the image. See build-brandings.mjs.
+   */
+  serverMiddleware: [{ path: '/branding', handler: '~/server-middleware/branding-assets.js' }],
+
+  /*
    ** Plugins to load before mounting the App
    */
   plugins: [

@@ -1,0 +1,4 @@
+type Mutation {
+  "Switch the live network branding to the given baked-in brand id (one of /branding/manifest.json), or the empty string for framework defaults. Persisted as the `activeBranding` policy value and broadcast live via the `policyChanged` subscription, so every client reloads the new brand's config without a redeploy. Requires the `branding.manage` permission. Returns the applied id."
+  setActiveBranding(id: String!): String!
+}
