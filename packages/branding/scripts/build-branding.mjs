@@ -13,6 +13,8 @@ import { watch } from 'node:fs'
 import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
+import { defineBranding } from '../dist/index.js'
+
 const [configArg, outArg] = process.argv.slice(2).filter((a) => !a.startsWith('--'))
 const isWatch = process.argv.includes('--watch')
 
@@ -27,7 +29,11 @@ const outPath = resolve(outArg)
 async function build() {
   // Cache-bust the import so --watch picks up edits.
   const mod = await import(`${pathToFileURL(configPath).href}?t=${Date.now()}`)
-  const config = mod.default ?? mod
+  // Two config styles: `export default defineBranding({...})` (needs the package installed) or
+  // `export default (defineBranding) => defineBranding({...})` (defineBranding injected here — no
+  // dependency in the brand/deployment repo).
+  const entry = mod.default ?? mod
+  const config = typeof entry === 'function' ? entry(defineBranding) : entry
   writeFileSync(outPath, `${JSON.stringify(config, null, 2)}\n`)
   // eslint-disable-next-line no-console
   console.log(`[branding] ${configArg} → ${outArg}`)
