@@ -851,6 +851,7 @@
     "membersListNotVisibleToNonMembers": "Niet-leden kunnen deze lijst niet zien.",
     "membersListTitle": "Groepsleden",
     "membersListTitleNotAllowedSeeingGroupMembers": "Groepsleden onzichtbaar",
+    "membersListNoFilterResults": "Geen leden gevonden",
     "membersListVisibleToNonMembers": "Niet-leden kunnen deze lijst zien.",
     "modal": {
       "cancel": "Annuleren",
@@ -871,7 +872,8 @@
       "admin": "Beheerder",
       "owner": "Eigenaar",
       "pending": "In afwachting",
-      "usual": "Lid"
+      "usual": "Lid",
+      "members": "Leden"
     },
     "save": "Nieuwe groep aanmaken",
     "showMembers": "Ledenlijst zichtbaar voor iedereen",

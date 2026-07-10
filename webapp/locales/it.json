@@ -851,6 +851,7 @@
     "membersListNotVisibleToNonMembers": "I non membri non possono vedere questa lista.",
     "membersListTitle": "Membri del gruppo",
     "membersListTitleNotAllowedSeeingGroupMembers": "Membri del gruppo invisibili",
+    "membersListNoFilterResults": "Nessun membro trovato",
     "membersListVisibleToNonMembers": "I non membri possono vedere questa lista.",
     "modal": {
       "cancel": "Annulla",
@@ -871,7 +872,8 @@
       "admin": "Amministratore",
       "owner": "Proprietario",
       "pending": "Membro in attesa",
-      "usual": "Membro"
+      "usual": "Membro",
+      "members": "Membri"
     },
     "save": "Crea nuovo gruppo",
     "showMembers": "Elenco membri visibile a tutti",

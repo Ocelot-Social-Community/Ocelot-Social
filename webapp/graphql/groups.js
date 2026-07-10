@@ -283,8 +283,14 @@ export const groupMembersQuery = () => {
   return gql`
     ${imageUrls}
 
-    query ($id: ID!, $first: Int, $offset: Int, $includePending: Boolean) {
-      GroupMembers(id: $id, first: $first, offset: $offset, includePending: $includePending) {
+    query ($id: ID!, $first: Int, $offset: Int, $includePending: Boolean, $nameFilter: String) {
+      GroupMembers(
+        id: $id
+        first: $first
+        offset: $offset
+        includePending: $includePending
+        nameFilter: $nameFilter
+      ) {
         user {
           id
           name

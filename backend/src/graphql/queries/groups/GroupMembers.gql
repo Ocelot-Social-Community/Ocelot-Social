@@ -1,5 +1,5 @@
-query GroupMembers($id: ID!, $includePending: Boolean) {
-  GroupMembers(id: $id, includePending: $includePending) {
+query GroupMembers($id: ID!, $first: Int, $offset: Int, $includePending: Boolean, $nameFilter: String) {
+  GroupMembers(id: $id, first: $first, offset: $offset, includePending: $includePending, nameFilter: $nameFilter) {
     user {
       id
       name

@@ -6,6 +6,10 @@ const localVue = global.localVue
 const stubs = {
   'os-card': { template: '<div><slot /></div>' },
   'os-spinner': { template: '<div class="os-spinner" />' },
+  'ocelot-input': {
+    template: '<input class="ocelot-input" :placeholder="placeholder" />',
+    props: ['name', 'placeholder', 'value', 'icon', 'size'],
+  },
 }
 
 describe('InfiniteScrollList.vue', () => {
@@ -155,6 +159,73 @@ describe('InfiniteScrollList.vue', () => {
       jest.advanceTimersByTime(800)
       expect(wrapper.vm.$refs.scrollEl.classList.contains('is-scrolling')).toBe(false)
       jest.useRealTimers()
+    })
+  })
+
+  describe('filter', () => {
+    it('does not render filter input when showFilter is false', () => {
+      const wrapper = Wrapper({ showFilter: false })
+      expect(wrapper.find('.ocelot-input').exists()).toBe(false)
+    })
+
+    it('renders filter input when showFilter is true', () => {
+      const wrapper = Wrapper({ showFilter: true })
+      expect(wrapper.find('.ocelot-input').exists()).toBe(true)
+    })
+
+    it('uses filterPlaceholder prop as input placeholder', () => {
+      const wrapper = Wrapper({ showFilter: true, filterPlaceholder: 'Search…' })
+      expect(wrapper.find('.ocelot-input').attributes('placeholder')).toBe('Search…')
+    })
+
+    it('falls back to $t("common.filter") when filterPlaceholder is not set', () => {
+      const wrapper = Wrapper({ showFilter: true })
+      expect(wrapper.find('.ocelot-input').attributes('placeholder')).toBe('common.filter')
+    })
+
+    it('emits filter-change with value when input length meets filterMinLength', () => {
+      jest.useFakeTimers()
+      const wrapper = Wrapper({ showFilter: true, filterMinLength: 3 })
+      wrapper.vm.onFilterInput({ target: { value: 'abc' } })
+      jest.advanceTimersByTime(300)
+      expect(wrapper.emitted('filter-change')).toEqual([['abc']])
+      jest.useRealTimers()
+    })
+
+    it('does not emit filter-change when input is shorter than filterMinLength', () => {
+      jest.useFakeTimers()
+      const wrapper = Wrapper({ showFilter: true, filterMinLength: 3 })
+      wrapper.vm.onFilterInput({ target: { value: 'ab' } })
+      jest.advanceTimersByTime(300)
+      expect(wrapper.emitted('filter-change')).toBeFalsy()
+      jest.useRealTimers()
+    })
+
+    it('emits filter-change with empty string when input is cleared', () => {
+      jest.useFakeTimers()
+      const wrapper = Wrapper({ showFilter: true, filterMinLength: 3 })
+      wrapper.vm.onFilterInput({ target: { value: '' } })
+      jest.advanceTimersByTime(300)
+      expect(wrapper.emitted('filter-change')).toEqual([['']])
+      jest.useRealTimers()
+    })
+
+    it('debounces: only emits once after rapid input', () => {
+      jest.useFakeTimers()
+      const wrapper = Wrapper({ showFilter: true, filterMinLength: 3 })
+      wrapper.vm.onFilterInput({ target: { value: 'ab' } })
+      wrapper.vm.onFilterInput({ target: { value: 'abc' } })
+      wrapper.vm.onFilterInput({ target: { value: 'abcd' } })
+      jest.advanceTimersByTime(300)
+      expect(wrapper.emitted('filter-change')).toHaveLength(1)
+      expect(wrapper.emitted('filter-change')[0]).toEqual(['abcd'])
+      jest.useRealTimers()
+    })
+
+    it('updates internal filterValue on input', () => {
+      const wrapper = Wrapper({ showFilter: true })
+      wrapper.vm.onFilterInput({ target: { value: 'test' } })
+      expect(wrapper.vm.filterValue).toBe('test')
     })
   })
 })

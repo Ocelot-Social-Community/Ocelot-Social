@@ -5,6 +5,7 @@
         {{ title }}
         <span v-if="count !== null" class="count">({{ count }})</span>
       </h5>
+      <p v-if="subtitle" class="subtitle">{{ subtitle }}</p>
       <div ref="scrollEl" class="scroll-container" @scroll="onScroll">
         <slot />
         <p v-if="empty && !loading" class="nobody-message">{{ nobodyMessage }}</p>
@@ -12,16 +13,27 @@
           <os-spinner size="md" />
         </div>
       </div>
+      <ocelot-input
+        v-if="showFilter"
+        :name="`infinite-scroll-filter-${_uid}`"
+        :placeholder="filterPlaceholder || $t('common.filter')"
+        :value="filterValue"
+        icon="filter"
+        size="small"
+        class="filter-input"
+        @input.native="onFilterInput"
+      />
     </div>
   </os-card>
 </template>
 
 <script>
 import { OsCard, OsSpinner } from '@ocelot-social/ui'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export default {
   name: 'InfiniteScrollList',
-  components: { OsCard, OsSpinner },
+  components: { OsCard, OsSpinner, OcelotInput },
   props: {
     title: { type: String, default: null },
     count: { type: Number, default: null },
@@ -29,6 +41,15 @@ export default {
     empty: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     hasMore: { type: Boolean, default: false },
+    subtitle: { type: String, default: null },
+    showFilter: { type: Boolean, default: false },
+    filterPlaceholder: { type: String, default: null },
+    filterMinLength: { type: Number, default: 3 },
+  },
+  data() {
+    return {
+      filterValue: '',
+    }
   },
   mounted() {
     this.$nextTick(this.checkScrollable)
@@ -38,8 +59,19 @@ export default {
   },
   beforeDestroy() {
     clearTimeout(this._scrollTimer)
+    clearTimeout(this._filterTimer)
   },
   methods: {
+    onFilterInput(evt) {
+      const val = evt.target.value
+      this.filterValue = val
+      clearTimeout(this._filterTimer)
+      this._filterTimer = setTimeout(() => {
+        if (val.length === 0 || val.length >= this.filterMinLength) {
+          this.$emit('filter-change', val)
+        }
+      }, 300)
+    },
     onScroll() {
       const el = this.$refs.scrollEl
       if (!el) return
@@ -71,6 +103,7 @@ export default {
 .infinite-scroll-list {
   display: flex;
   flex-direction: column;
+  max-height: 360px;
 
   > .title {
     color: $text-color-soft;
@@ -83,8 +116,20 @@ export default {
   }
 }
 
+.subtitle {
+  font-size: $font-size-small;
+  color: $text-color-soft;
+  margin-top: -$space-x-small;
+  margin-bottom: $space-small;
+}
+
+.filter-input {
+  margin-top: $space-small;
+}
+
 .scroll-container {
-  max-height: 320px;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
 
   /* Standard: Firefox + Safari 18+ */

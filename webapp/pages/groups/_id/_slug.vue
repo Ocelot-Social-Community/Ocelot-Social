@@ -55,7 +55,7 @@
             <div class="ds-flex-item" v-if="isAllowedSeeingGroupMembers">
               <os-number
                 :count="group.membersCount"
-                :label="$t('group.membersCount', {}, groupMembers.length)"
+                :label="$t('group.membersCount', {}, group.membersCount)"
                 :animated="true"
               />
             </div>
@@ -215,34 +215,15 @@
           {{ $t('profile.network.title') }}
         </h3>
         <!-- Group members list -->
-        <profile-list
-          :uniqueName="'groupMembersFilter'"
-          :title="$t('group.membersListTitle')"
+        <group-page-member-list
+          v-if="isAllowedSeeingGroupMembers && group.id"
+          :group-id="group.id"
+          :members-count="group.membersCount || null"
           :subtitle="membersListSubtitle"
-          :titleNobody="
-            !isAllowedSeeingGroupMembers
-              ? $t('group.membersListTitleNotAllowedSeeingGroupMembers')
-              : null
-          "
-          :allProfilesCount="
-            isAllowedSeeingGroupMembers && group.membersCount ? group.membersCount : 0
-          "
-          :profiles="enrichedMembers"
-          :loading="hydrated && $apollo.loading"
-          @fetchAllProfiles="fetchAllMembers"
-        >
-          <template #item="{ item }">
-            <div class="member-teaser">
-              <user-teaser :user="item" class="member-teaser__user" />
-              <os-badge v-if="item.membershipRole === 'owner'" variant="danger" size="sm">
-                {{ $t('group.roles.owner') }}
-              </os-badge>
-              <os-badge v-else-if="item.membershipRole === 'admin'" variant="primary" size="sm">
-                {{ $t('group.roles.admin') }}
-              </os-badge>
-            </div>
-          </template>
-        </profile-list>
+        />
+        <p v-else-if="!isAllowedSeeingGroupMembers" class="nobody-message">
+          {{ $t('group.membersListTitleNotAllowedSeeingGroupMembers') }}
+        </p>
         <!-- <social-media :user-name="groupName" :user="user" /> -->
       </div>
 
@@ -359,7 +340,6 @@ import { profilePagePosts } from '~/graphql/PostQuery'
 import {
   updateGroupMutation,
   groupQuery,
-  groupMembersQuery,
   groupShowMembersChangedSubscription,
 } from '~/graphql/groups'
 import { roomUnreadQuery, roomUpdated } from '~/graphql/Rooms'
@@ -381,8 +361,7 @@ import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
-import ProfileList from '~/components/features/ProfileList/ProfileList'
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import GroupPageMemberList from '~/components/features/ProfileList/GroupPageMemberList'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
 import { mapGetters, mapMutations } from 'vuex'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
@@ -415,8 +394,7 @@ export default {
     LocationInfo,
     PostTeaser,
     ProfileAvatar,
-    ProfileList,
-    UserTeaser,
+    GroupPageMemberList,
     MasonryGrid,
     MasonryGridItem,
     // SocialMedia,
@@ -436,14 +414,12 @@ export default {
     // const filter = tabToFilterMapping({ tab: 'post', id: this.$route.params.id })
     const filter = { group: { id: this.$route.params.id } }
     return {
-      loadGroupMembers: false,
       posts: [],
       hasMore: true,
       offset: 0,
       pageSize: 6,
       // tabActive: 'post',
       filter,
-      membersCountToLoad: 25,
       updateGroupMutation,
       isDescriptionCollapsed: true,
       group: {},
@@ -497,9 +473,6 @@ export default {
     isGroupVisible() {
       return this.group && !(this.group.groupType === 'hidden' && !this.isGroupMemberNonePending)
     },
-    groupMembers() {
-      return this.GroupMembers ? this.GroupMembers : []
-    },
     isAllowedSeeingGroupMembers() {
       if (!this.group) return false
       if (this.group.groupType === 'public') return true
@@ -508,17 +481,6 @@ export default {
       // non-members can see the member list of a closed group when the owner enabled showMembers
       if (this.group.groupType === 'closed' && this.group.showMembers === true) return true
       return false
-    },
-    enrichedMembers() {
-      if (!this.isAllowedSeeingGroupMembers) return []
-      const roleOrder = { owner: 0, admin: 1 }
-      return this.groupMembers
-        .map((d) => ({ ...d.user, membershipRole: d.membership.role }))
-        .sort((a, b) => {
-          const aOrder = roleOrder[a.membershipRole] ?? 2
-          const bOrder = roleOrder[b.membershipRole] ?? 2
-          return aOrder - bOrder
-        })
     },
     membersListSubtitle() {
       if (!this.group || !this.isGroupMemberNonePending) return null
@@ -570,9 +532,6 @@ export default {
     this._groupShowMembersSub?.unsubscribe()
   },
   watch: {
-    isAllowedSeeingGroupMembers(to, _from) {
-      this.loadGroupMembers = to
-    },
     isGroupMemberNonePending(isMember) {
       // Group membership is derived from the Apollo-populated group.myRole, which
       // isn't available synchronously on first visits (no SSR cache). Set up the
@@ -819,17 +778,7 @@ export default {
     //   this.user.followedBy = followedBy
     // },
     async updateJoinLeave() {
-      this.loadGroupMembers = false
-      this.GroupMembers = []
       await this.$apollo.queries.Group.refetch()
-      await this.$nextTick()
-      this.loadGroupMembers = this.isAllowedSeeingGroupMembers
-      if (this.loadGroupMembers) {
-        this.$apollo.queries.GroupMembers.refetch()
-      }
-    },
-    fetchAllMembers() {
-      this.membersCountToLoad = this.group.membersCount
     },
   },
   apollo: {
@@ -861,24 +810,6 @@ export default {
       },
       update({ Group }) {
         this.group = Group && Group[0] ? Group[0] : {}
-      },
-      error(error) {
-        this.$toast.error(error.message)
-      },
-      fetchPolicy: 'cache-and-network',
-    },
-    GroupMembers: {
-      query() {
-        return groupMembersQuery()
-      },
-      variables() {
-        return {
-          id: this.$route.params.id,
-          first: this.membersCountToLoad,
-        }
-      },
-      skip() {
-        return !this.loadGroupMembers
       },
       error(error) {
         this.$toast.error(error.message)

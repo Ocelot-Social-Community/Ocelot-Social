@@ -1,0 +1,162 @@
+<template>
+  <infinite-scroll-list
+    :title="$t('group.membersListTitle')"
+    :count="membersCount || null"
+    :nobody-message="nobodyMessage"
+    :empty="!hasMembers"
+    :loading="loadingInitial || loadingMore"
+    :has-more="!allLoaded"
+    :show-filter="showFilter"
+    :filter-placeholder="$t('common.filter')"
+    :subtitle="subtitle"
+    @load-more="onLoadMore"
+    @filter-change="onFilterChange"
+  >
+    <div v-for="(section, idx) in sectionsWithMembers" :key="section.key">
+      <p class="role-label" :class="{ 'role-label--not-first': idx > 0 }">
+        {{ section.label }}
+      </p>
+      <ul class="member-list">
+        <li v-for="member in section.members" :key="member.id" class="member-item">
+          <user-teaser :user="member" class="member-item__teaser" />
+        </li>
+      </ul>
+    </div>
+  </infinite-scroll-list>
+</template>
+
+<script>
+import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import InfiniteScrollList from './InfiniteScrollList.vue'
+import { groupMembersQuery } from '~/graphql/groups'
+
+const PAGE_SIZE = 25
+
+const ROLE_SECTIONS = [
+  { key: 'owner', roleMatch: (r) => r === 'owner' },
+  { key: 'admin', roleMatch: (r) => r === 'admin' },
+  { key: 'members', roleMatch: (r) => r === 'usual' || r === 'pending' },
+]
+
+export default {
+  name: 'GroupPageMemberList',
+  components: { InfiniteScrollList, UserTeaser },
+  props: {
+    groupId: { type: String, required: true },
+    membersCount: { type: Number, default: null },
+    subtitle: { type: String, default: null },
+  },
+  data() {
+    return {
+      members: [],
+      offset: 0,
+      loadingInitial: true,
+      loadingMore: false,
+      allLoaded: false,
+      showFilter: false,
+      activeFilter: '',
+    }
+  },
+  computed: {
+    hasMembers() {
+      return this.members.length > 0
+    },
+    nobodyMessage() {
+      return this.activeFilter.length >= 3 ? this.$t('group.membersListNoFilterResults') : null
+    },
+    membersByRole() {
+      return ROLE_SECTIONS.reduce((acc, section) => {
+        acc[section.key] = this.members.filter((m) => section.roleMatch(m.membershipRole))
+        return acc
+      }, {})
+    },
+    sectionsWithMembers() {
+      return ROLE_SECTIONS.filter((section) => this.membersByRole[section.key].length > 0).map(
+        (section) => ({
+          key: section.key,
+          label: this.$t(`group.roles.${section.key}`),
+          members: this.membersByRole[section.key],
+        }),
+      )
+    },
+  },
+  async mounted() {
+    await this.loadMembers(true)
+  },
+  methods: {
+    async loadMembers(reset) {
+      if (reset) {
+        this.offset = 0
+        this.allLoaded = false
+        this.loadingInitial = true
+      } else {
+        this.loadingMore = true
+      }
+      try {
+        const { data } = await this.$apollo.query({
+          query: groupMembersQuery(),
+          variables: {
+            id: this.groupId,
+            first: PAGE_SIZE,
+            offset: this.offset,
+            nameFilter: this.activeFilter.length >= 3 ? this.activeFilter : undefined,
+          },
+          fetchPolicy: 'network-only',
+        })
+        const newMembers = (data?.GroupMembers || []).map((d) => ({
+          ...d.user,
+          membershipRole: d.membership.role,
+        }))
+        this.members = reset ? newMembers : [...this.members, ...newMembers]
+        this.offset = reset ? newMembers.length : this.offset + newMembers.length
+        this.allLoaded = newMembers.length < PAGE_SIZE
+      } catch (error) {
+        this.$toast.error(error.message)
+      } finally {
+        this.loadingInitial = false
+        this.loadingMore = false
+      }
+    },
+    onLoadMore() {
+      if (this.loadingMore || this.loadingInitial || this.allLoaded) return
+      if (this.offset >= PAGE_SIZE) this.showFilter = true
+      this.loadMembers(false)
+    },
+    onFilterChange(val) {
+      this.activeFilter = val
+      this.loadMembers(true)
+    },
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+.role-label {
+  font-size: $font-size-small;
+  color: $text-color-soft;
+  margin-bottom: $space-xx-small;
+
+  &--not-first {
+    margin-top: $space-x-small;
+  }
+}
+
+.member-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.member-item {
+  padding: $space-xx-small;
+  border-radius: $border-radius-base;
+
+  &:hover {
+    background-color: $background-color-primary-inverse;
+  }
+
+  &__teaser {
+    width: 100%;
+  }
+}
+</style>

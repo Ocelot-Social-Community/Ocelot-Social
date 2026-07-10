@@ -15,6 +15,7 @@ const stubs = {
   'router-link': true,
   // 'infinite-loading': true,
   'follow-list': true,
+  'group-page-member-list': true,
 }
 
 // Mock Math.random, used in Dropdown

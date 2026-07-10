@@ -851,6 +851,7 @@
     "membersListNotVisibleToNonMembers": "Non-members cannot see this list.",
     "membersListTitle": "Group Members",
     "membersListTitleNotAllowedSeeingGroupMembers": "Group Members invisible",
+    "membersListNoFilterResults": "No members found",
     "membersListVisibleToNonMembers": "Non-members can see this list.",
     "modal": {
       "cancel": "Cancel",
@@ -869,6 +870,7 @@
     "role": "Your role in the group",
     "roles": {
       "admin": "Administrator",
+      "members": "Members",
       "owner": "Owner",
       "pending": "Pending Member",
       "usual": "Member"

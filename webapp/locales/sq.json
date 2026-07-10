@@ -851,6 +851,7 @@
     "membersListNotVisibleToNonMembers": "Jo-anëtarët nuk mund ta shohin këtë listë.",
     "membersListTitle": "Anëtarët e grupit",
     "membersListTitleNotAllowedSeeingGroupMembers": "Anëtarët e grupit të padukshëm",
+    "membersListNoFilterResults": "Nuk u gjetën anëtarë",
     "membersListVisibleToNonMembers": "Jo-anëtarët mund ta shohin këtë listë.",
     "modal": {
       "cancel": "Anulo",
@@ -871,7 +872,8 @@
       "admin": "Administrator",
       "owner": "Pronar",
       "pending": "Anëtar në pritje",
-      "usual": "Anëtar"
+      "usual": "Anëtar",
+      "members": "Anëtarë"
     },
     "save": "Krijo grup të ri",
     "showMembers": "Lista e anëtarëve e dukshme për të gjithë",

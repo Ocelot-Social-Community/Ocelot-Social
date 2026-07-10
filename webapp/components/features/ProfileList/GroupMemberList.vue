@@ -52,7 +52,7 @@ import {
 
 const GROUP_SECTIONS_BY_TYPE = ['public', 'closed', 'hidden']
 const GROUP_SECTIONS_BY_MEMBERSHIP = ['shared', 'other']
-const PAGE_SIZE = 10
+const PAGE_SIZE = 25
 
 export default {
   name: 'GroupMemberList',

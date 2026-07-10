@@ -79,7 +79,7 @@ describe('FollowList.vue', () => {
       await wrapper.vm.$nextTick()
       expect(mockApollo.query).toHaveBeenCalledWith(
         expect.objectContaining({
-          variables: { id: 'user-1', first: 10, offset: 0 },
+          variables: { id: 'user-1', first: 25, offset: 0 },
         }),
       )
     })
@@ -112,10 +112,10 @@ describe('FollowList.vue', () => {
     it('uses offset when loading more', async () => {
       mockApollo.query
         .mockResolvedValueOnce({
-          data: { User: [{ id: 'user-1', following: fakeUsers(10), followingCount: 15 }] },
+          data: { User: [{ id: 'user-1', following: fakeUsers(25), followingCount: 30 }] },
         })
         .mockResolvedValueOnce({
-          data: { User: [{ id: 'user-1', following: fakeUsers(5), followingCount: 15 }] },
+          data: { User: [{ id: 'user-1', following: fakeUsers(5), followingCount: 30 }] },
         })
 
       const wrapper = Wrapper()
@@ -128,7 +128,7 @@ describe('FollowList.vue', () => {
       expect(mockApollo.query).toHaveBeenCalledTimes(2)
       expect(mockApollo.query).toHaveBeenLastCalledWith(
         expect.objectContaining({
-          variables: { id: 'user-1', first: 10, offset: 10 },
+          variables: { id: 'user-1', first: 25, offset: 25 },
         }),
       )
     })

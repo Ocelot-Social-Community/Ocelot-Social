@@ -851,6 +851,7 @@
     "membersListNotVisibleToNonMembers": "Не-учасники не можуть бачити цей список.",
     "membersListTitle": "Учасники групи",
     "membersListTitleNotAllowedSeeingGroupMembers": "Учасники групи приховані",
+    "membersListNoFilterResults": "Учасників не знайдено",
     "membersListVisibleToNonMembers": "Не-учасники можуть бачити цей список.",
     "modal": {
       "cancel": "Скасувати",
@@ -871,7 +872,8 @@
       "admin": "Адміністратор",
       "owner": "Власник",
       "pending": "Очікуючий учасник",
-      "usual": "Учасник"
+      "usual": "Учасник",
+      "members": "Учасники"
     },
     "save": "Створити нову групу",
     "showMembers": "Список учасників видимий для всіх",

@@ -851,6 +851,7 @@
     "membersListNotVisibleToNonMembers": "Не-участники не могут видеть этот список.",
     "membersListTitle": "Участники группы",
     "membersListTitleNotAllowedSeeingGroupMembers": "Участники группы скрыты",
+    "membersListNoFilterResults": "Участники не найдены",
     "membersListVisibleToNonMembers": "Не-участники могут видеть этот список.",
     "modal": {
       "cancel": "Отмена",
@@ -871,7 +872,8 @@
       "admin": "Администратор",
       "owner": "Владелец",
       "pending": "Ожидающий участник",
-      "usual": "Участник"
+      "usual": "Участник",
+      "members": "Участники"
     },
     "save": "Создать новую группу",
     "showMembers": "Список участников виден всем",

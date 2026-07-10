@@ -851,6 +851,7 @@
     "membersListNotVisibleToNonMembers": "Osoby spoza grupy nie mogą zobaczyć tej listy.",
     "membersListTitle": "Członkowie grupy",
     "membersListTitleNotAllowedSeeingGroupMembers": "Członkowie grupy niewidoczni",
+    "membersListNoFilterResults": "Nie znaleziono członków",
     "membersListVisibleToNonMembers": "Osoby spoza grupy mogą zobaczyć tę listę.",
     "modal": {
       "cancel": "Anuluj",
@@ -871,7 +872,8 @@
       "admin": "Administrator",
       "owner": "Właściciel",
       "pending": "Oczekujący członek",
-      "usual": "Członek"
+      "usual": "Członek",
+      "members": "Członkowie"
     },
     "save": "Utwórz nową grupę",
     "showMembers": "Lista członków widoczna dla wszystkich",

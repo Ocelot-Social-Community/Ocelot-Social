@@ -1642,6 +1642,26 @@ describe('in mode', () => {
                 expect(result.data?.GroupMembers.length).toBe(3)
               })
 
+              it('filters members by name when nameFilter has at least 3 characters', async () => {
+                // "Hidden" matches only "Owner Of Hidden Group" (the owner)
+                const result = await query({
+                  query: groupMembersQuery,
+                  variables: { ...variables, nameFilter: 'Hidden' },
+                })
+                expect(result.data?.GroupMembers).toHaveLength(1)
+                expect(result.data?.GroupMembers[0]).toMatchObject({
+                  user: expect.objectContaining({ id: 'owner-of-hidden-group' }),
+                })
+              })
+
+              it('ignores nameFilter shorter than 3 characters and returns all members', async () => {
+                const result = await query({
+                  query: groupMembersQuery,
+                  variables: { ...variables, nameFilter: 'Cl' },
+                })
+                expect(result.data?.GroupMembers).toHaveLength(3)
+              })
+
               it('returns members ordered: owner first, then admin, then usual', async () => {
                 const result = await query({ query: groupMembersQuery, variables })
                 const members = result.data?.GroupMembers
