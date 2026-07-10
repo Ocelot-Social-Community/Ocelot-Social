@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import vuexI18n from 'vuex-i18n/dist/vuex-i18n.umd.js'
-import { isEmpty, find } from 'lodash'
+import { isEmpty, find, merge } from 'lodash'
+import branding from '@ocelot-social/branding'
 import locales from '~/locales'
 import htmlTranslations from '~/locales/html/'
 
@@ -9,7 +10,10 @@ let fallbackLocale
 const registerTranslation = ({ Vue, locale }) => {
   const translation = require(`~/locales/${locale}.json`)
   translation.html = htmlTranslations[locale] || htmlTranslations[fallbackLocale]
-  Vue.i18n.add(locale, translation)
+  // Runtime brand locale overrides (branding.locales[locale]) merged OVER the base strings — the
+  // branding plugin runs before this one, so the injected config is already set. No rebuild.
+  const brandLocale = branding.locales[locale]
+  Vue.i18n.add(locale, brandLocale ? merge({}, translation, brandLocale) : translation)
 }
 
 /**

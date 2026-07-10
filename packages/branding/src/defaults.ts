@@ -98,4 +98,6 @@ export const brandingDefaults: BrandingConfig = {
   termsAndConditions: {
     version: '0.0.4',
   },
+  // No locale overrides by default; a brand adds only the strings it changes.
+  locales: {},
 }

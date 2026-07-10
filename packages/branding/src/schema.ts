@@ -144,6 +144,14 @@ export interface BrandingConfig {
     /** Current T&C version; bumped when the terms change to force re-acceptance. */
     version: string
   }
+  /**
+   * Per-locale translation overrides, merged OVER the app's base strings at runtime (webapp i18n
+   * plugin). Keyed by locale code ('de', 'en', …); each value is a nested translation tree (open
+   * shape, so not strongly typed). A brand ships only the strings it changes. Because it rides in
+   * the branding config, it is injected + serialised to the client with everything else — no
+   * separate locale-file mechanism, no rebuild. See docu/branding-architecture-konzept.md.
+   */
+  locales: Record<string, Record<string, unknown>>
 }
 
 /** A recursive partial — a brand override is sparse, supplying only the keys it changes. */
