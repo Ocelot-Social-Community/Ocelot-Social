@@ -11,6 +11,7 @@
     :subtitle="subtitle"
     @load-more="onLoadMore"
     @filter-change="onFilterChange"
+    @scrolling-change="onScrollingChange"
   >
     <div v-for="(section, idx) in sectionsWithMembers" :key="section.key">
       <p class="role-label" :class="{ 'role-label--not-first': idx > 0 }">
@@ -18,7 +19,12 @@
       </p>
       <ul class="member-list">
         <li v-for="member in section.members" :key="member.id" class="member-item">
-          <user-teaser :user="member" class="member-item__teaser" />
+          <user-teaser
+            :user="member"
+            :show-popover="popoverEnabled"
+            :hover-delay="800"
+            class="member-item__teaser"
+          />
         </li>
       </ul>
     </div>
@@ -55,6 +61,8 @@ export default {
       allLoaded: false,
       showFilter: false,
       activeFilter: '',
+      isScrolling: false,
+      loadingCooldown: false,
     }
   },
   computed: {
@@ -63,6 +71,12 @@ export default {
     },
     nobodyMessage() {
       return this.activeFilter.length >= 3 ? this.$t('group.membersListNoFilterResults') : null
+    },
+    isLoading() {
+      return this.loadingInitial || this.loadingMore
+    },
+    popoverEnabled() {
+      return !this.isScrolling && !this.isLoading && !this.loadingCooldown
     },
     membersByRole() {
       return ROLE_SECTIONS.reduce((acc, section) => {
@@ -80,8 +94,22 @@ export default {
       )
     },
   },
+  watch: {
+    isLoading(newVal, oldVal) {
+      if (oldVal && !newVal) {
+        clearTimeout(this._loadingCooldownTimer)
+        this.loadingCooldown = true
+        this._loadingCooldownTimer = setTimeout(() => {
+          this.loadingCooldown = false
+        }, 600)
+      }
+    },
+  },
   async mounted() {
     await this.loadMembers(true)
+  },
+  beforeDestroy() {
+    clearTimeout(this._loadingCooldownTimer)
   },
   methods: {
     async loadMembers(reset) {
@@ -125,6 +153,9 @@ export default {
     onFilterChange(val) {
       this.activeFilter = val
       this.loadMembers(true)
+    },
+    onScrollingChange(isScrolling) {
+      this.isScrolling = isScrolling
     },
   },
 }

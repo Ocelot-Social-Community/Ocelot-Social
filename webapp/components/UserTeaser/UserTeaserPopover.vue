@@ -1,6 +1,6 @@
 <template>
-  <div class="user-teaser-popover">
-    <div v-if="user" class="user-header">
+  <div v-if="user" class="user-teaser-popover">
+    <div class="user-header">
       <profile-avatar :profile="user" class="popover-avatar" />
       <div class="user-names">
         <span class="user-name">{{ user.name }}</span>
@@ -8,19 +8,19 @@
       </div>
     </div>
     <badges
-      v-if="user && $policy.get('badgesEnabled') && user.badgeVerification"
+      v-if="$policy.get('badgesEnabled') && user.badgeVerification"
       :badges="[user.badgeVerification, ...user.badgeTrophiesSelected]"
     />
     <location-info
-      v-if="user && user.location"
+      v-if="user.location"
       :location-data="user.location"
       :is-owner="userId === $store.getters['auth/user'].id"
       size="small"
       class="location-info"
     />
-    <p v-if="user && user.about" class="user-about">{{ user.about }}</p>
+    <p v-if="user.about" class="user-about">{{ user.about }}</p>
     <!-- No :animated on OsNumber — popover appears on hover, animation would be distracting -->
-    <ul v-if="user" class="statistics">
+    <ul class="statistics">
       <li>
         <os-number :count="user.followedByCount" :label="$t('profile.followers')" />
       </li>

@@ -76,10 +76,14 @@ export default {
       const el = this.$refs.scrollEl
       if (!el) return
 
+      if (!el.classList.contains('is-scrolling')) {
+        this.$emit('scrolling-change', true)
+      }
       el.classList.add('is-scrolling')
       clearTimeout(this._scrollTimer)
       this._scrollTimer = setTimeout(() => {
         el.classList.remove('is-scrolling')
+        this.$emit('scrolling-change', false)
       }, 800)
 
       if (!this.hasMore || this.loading) return
