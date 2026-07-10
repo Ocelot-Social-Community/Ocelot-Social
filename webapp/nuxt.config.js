@@ -331,6 +331,12 @@ export default {
 
       if (ctx.isClient) {
         config.devtool = ctx.isDev ? 'eval-source-map' : 'hidden-source-map'
+        // Node core modules don't exist in the browser. The branding runtime loader
+        // (plugins/branding.js, components/utils/brandingHtml.js) reads config/HTML off disk only
+        // under a `process.server` guard, but webpack still resolves the static require('fs') when
+        // building the client bundle — map it to an empty module so the client compiles; the
+        // guarded code never runs client-side.
+        config.node = { ...config.node, fs: 'empty' }
       }
 
       // Vue 2.7 has built-in Composition API - redirect old imports

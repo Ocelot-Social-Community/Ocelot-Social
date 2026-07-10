@@ -45,13 +45,10 @@ async function fetchActiveBrandingId() {
   }
 }
 
-async function loadServerBranding() {
-  // `fs` is required only in the server branch so it is tree-shaken from the client bundle.
-  // eslint-disable-next-line global-require, import/no-nodejs-modules
-  const { readFileSync } = require('fs')
-  // eslint-disable-next-line global-require, import/no-nodejs-modules
-  const path = require('path')
-
+// `readFileSync` + `path` are passed in from the server-only branch (required there under a bare
+// `process.server` guard) so no Node require lives in this always-bundled function — otherwise
+// webpack would try to resolve 'fs' for the client bundle and fail.
+async function loadServerBranding(readFileSync, path) {
   const brandingPath = process.env.OCELOT_BRANDING_PATH
   if (brandingPath) {
     const config = JSON.parse(readFileSync(brandingPath, 'utf8'))
@@ -81,8 +78,14 @@ async function loadServerBranding() {
 
 export default async (context) => {
   if (process.server) {
+    // Node modules required here, inside the bare `process.server` guard, so Nuxt's DefinePlugin
+    // folds them out of the client bundle. Passed into loadServerBranding (see its note).
+    // eslint-disable-next-line global-require, import/no-nodejs-modules
+    const { readFileSync } = require('fs')
+    // eslint-disable-next-line global-require, import/no-nodejs-modules
+    const path = require('path')
     try {
-      const loaded = await loadServerBranding()
+      const loaded = await loadServerBranding(readFileSync, path)
       if (loaded) {
         setBranding(loaded.config)
         context.beforeNuxtRender(({ nuxtState }) => {

@@ -7,7 +7,10 @@
 export async function fetchBrandingHtml(src) {
   if (!src || typeof src !== 'string' || !src.startsWith('/branding/')) return null
 
-  if (typeof process !== 'undefined' && process.server) {
+  // Bare `process.server` so Nuxt's DefinePlugin folds this whole branch (and its Node requires)
+  // out of the CLIENT bundle — a compound guard like `typeof process !== 'undefined' && …` is not
+  // recognised, so webpack would try to bundle 'fs' for the browser and fail.
+  if (process.server) {
     const base = process.env.OCELOT_BRANDING_ASSETS_DIR
     if (!base) return null
     // eslint-disable-next-line global-require, import/no-nodejs-modules
