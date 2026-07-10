@@ -203,8 +203,18 @@ export default {
     // after the mount fetch) — drives the form/dirty/save logic, which never waits on the
     // policyConfig query. The rendered rows (groups) and highlight set come from policyConfig
     // instead; the two are expected to align, but the highlight no longer depends on it.
+    // Keys managed on a dedicated admin page are not editable in the generic (boolean/integer)
+    // policy editor: the `branding` category (activeBranding, a string switch) lives on
+    // /admin/branding. activeBranding is also named explicitly as a safety net for the brief
+    // window before policyConfig (which carries the category) has loaded.
+    hiddenKeys() {
+      const fromConfig = this.policyConfig
+        .filter((entry) => entry.category === 'branding')
+        .map((entry) => entry.key)
+      return new Set(['activeBranding', ...fromConfig])
+    },
     keys() {
-      return Object.keys(this.snapshot)
+      return Object.keys(this.snapshot).filter((key) => !this.hiddenKeys.has(key))
     },
     // Rows grouped by each key's backend category (policyConfig). policyConfig arrives in the
     // backend's global category display order (categoryRank, from ENV_CATEGORIES), so a Map
@@ -220,6 +230,7 @@ export default {
       }
       const byCategory = new Map()
       for (const entry of this.policyConfig) {
+        if (this.hiddenKeys.has(entry.key)) continue
         const list = byCategory.get(entry.category) ?? []
         list.push(entry.key)
         byCategory.set(entry.category, list)

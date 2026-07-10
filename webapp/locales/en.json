@@ -14,6 +14,17 @@
     "search": "Search"
   },
   "admin": {
+    "branding": {
+      "name": "Branding",
+      "title": "Branding",
+      "description": "Choose which baked-in branding is active network-wide. Switching reloads the app for everyone.",
+      "current": "Currently active",
+      "activate": "Activate",
+      "vanilla": "Framework default (no branding)",
+      "none": "No brandings are baked into this instance.",
+      "loading": "Loading brandings…",
+      "error": "Could not switch the branding."
+    },
     "api-keys": {
       "detail": {
         "active": "Active keys ({count})",

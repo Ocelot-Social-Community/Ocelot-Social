@@ -54,6 +54,15 @@ function resolve() {
     support: built.SUPPORT,
   }
 
+  // Bind each internal page to its brand-shipped, runtime-loaded HTML (branding.assets.html — a
+  // per-locale map, namespaced to /branding/<id>/…). InternalPage fetches it at render and falls
+  // back to the build-bundled i18n html when a page ships none. A fresh internalPage object avoids
+  // mutating the shared page defaults across brand configs.
+  const assetsHtml = (branding.assets && branding.assets.html) || {}
+  for (const [pageKey, pageParams] of Object.entries(byKey)) {
+    pageParams.internalPage = { ...pageParams.internalPage, htmlSrc: assetsHtml[pageKey] || null }
+  }
+
   cache = {
     LANDING_PAGE: landingPage,
     ...built,
