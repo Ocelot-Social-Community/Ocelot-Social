@@ -419,13 +419,16 @@ $color-ribbon-event-shadow: color.adjust($color-ribbon-event, $lightness: -20%);
  * @tokens Chat Color
  */
 
-$chat-message-bg-me: $color-primary-light;
+// Chat brand colours are runtime-overridable (var()) so a brand re-themes vue-advanced-chat live
+// (chat.js exports these token values → the chat sets them as CSS custom properties). Own chat-*
+// var names avoid the -active/-light naming collision between webapp and packages/ui shades.
+$chat-message-bg-me: var(--chat-message-bg-me, #{$color-primary-light});
 $chat-message-color: $text-color-base;
 $chat-message-bg-others: $color-neutral-80;
 $chat-sidemenu-bg: white;
 $chat-sidemenu-background-over: '#f6f6f6';
-$chat-sidemenu-background-active: $color-primary-light;
-$chat-new-message-color: $color-secondary-active;
+$chat-sidemenu-background-active: var(--chat-sidemenu-background-active, #{$color-primary-light});
+$chat-new-message-color: var(--chat-new-message-color, #{$color-secondary-active});
 $chat-message-timestamp: $text-color-soft;
 $chat-message-checkmark-seen: var(--chat-message-checkmark-seen, #{$text-color-secondary});
 $chat-message-checkmark: var(--chat-message-checkmark, #{$text-color-soft});

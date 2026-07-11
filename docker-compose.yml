@@ -55,6 +55,11 @@ services:
       context: .
       dockerfile: ./maintenance/Dockerfile
       target: production
+      # Bake a brand into the maintenance page (directory under deployment/configurations/).
+      # Default is vanilla ocelot.social; uncomment to bake a brand (also drop the ./maintenance/app
+      # bind-mount in docker-compose.override.yml so it isn't shadowed).
+      # args:
+      #   BRAND: ${MAINTENANCE_BRAND:-yunite.me}
 
   neo4j:
     image: ghcr.io/ocelot-social-community/ocelot-social/neo4j:community

@@ -11,12 +11,25 @@ RUN npm ci
 RUN npm run build
 
 # ==============================================================================
+# Stage 1b: Build the shared branding package (tsc -> dist), incl. its scripts + node_modules
+# (typescript), so the maintenance branding generator can resolve the package and load a brand's
+# typed brand.config.ts during the ONBUILD overlay in the build stage.
+# ==============================================================================
+FROM node:26.4.0-alpine AS branding-library
+WORKDIR /app
+COPY packages/branding/package.json ./
+RUN npm install
+COPY packages/branding/. .
+RUN npm run build
+
+# ==============================================================================
 # Stage 2: Install dependencies and copy sources
 # ==============================================================================
 FROM node:26.4.0-alpine AS base
 RUN apk --no-cache add git python3 make g++
 WORKDIR /app
 COPY --from=ui-library /packages/ui/ /packages/ui/
+COPY --from=branding-library /app/ /packages/branding/
 COPY maintenance/package.json maintenance/package-lock.json ./
 RUN npm ci
 COPY maintenance/ .
@@ -25,6 +38,17 @@ COPY maintenance/ .
 # Stage 3: Development (hot-reload with mounted sources)
 # ==============================================================================
 FROM base AS development
+# Bake the selected brand (same as the build stage) so `docker compose up` shows the branded
+# maintenance page in dev too. NOTE: the compose override must NOT bind-mount ./maintenance/app,
+# otherwise the mounted vanilla sources shadow the baked branding. BRAND is passed through from the
+# compose build args (default yunite.me via ${MAINTENANCE_BRAND}); empty = vanilla.
+ARG BRAND=""
+COPY deployment/configurations/ /brands/
+RUN if [ -n "$BRAND" ] && { [ -f "/brands/$BRAND/branding/brand.config.ts" ] || [ -f "/brands/$BRAND/branding/brand.config.mjs" ]; }; then \
+      node /packages/branding/scripts/build-maintenance-branding.mjs "/brands/$BRAND/branding" /app && \
+      echo "[maintenance] baked brand: $BRAND"; \
+    fi \
+    && rm -rf /brands
 ENV NODE_ENV=development
 EXPOSE 3000
 CMD ["npx", "nuxt", "dev"]
@@ -33,16 +57,31 @@ CMD ["npx", "nuxt", "dev"]
 # Stage 4: Generate static site
 # ==============================================================================
 FROM base AS build
-# Branding: reuse existing branding repo structure
-# Static assets (logo, favicon) — Nuxt 4 uses public/ instead of static/
+# Branding is baked at build time from a brand's TYPED config under deployment/configurations/<BRAND>
+# — the generator derives the maintenance colours (:root in branding.css), logo and metadata from it,
+# so a brand defines colours + logo ONCE and both the live app and the maintenance page follow.
+# NOTHING is copied into the committed maintenance/ project; the overlay happens only in this
+# ephemeral build stage. Pick the brand with `--build-arg BRAND=<name>` (a directory name under
+# deployment/configurations/); empty = vanilla ocelot.social.
+ARG BRAND=""
+COPY deployment/configurations/ /brands/
+RUN if [ -n "$BRAND" ] && { [ -f "/brands/$BRAND/branding/brand.config.ts" ] || [ -f "/brands/$BRAND/branding/brand.config.mjs" ]; }; then \
+      node /packages/branding/scripts/build-maintenance-branding.mjs "/brands/$BRAND/branding" /app && \
+      echo "[maintenance] baked brand: $BRAND"; \
+    else \
+      echo "[maintenance] BRAND unset/unknown ('$BRAND') — vanilla ocelot.social"; \
+    fi
+RUN rm -rf /brands
+
+# Legacy: external deploy repos that overlay via `FROM maintenance-build` using the OLD branding
+# layout (branding/static/ + constants/*.js). The `brandin[g]` glob makes each ONBUILD optional.
 ONBUILD COPY brandin[g]/static/ /app/public/
-# Constants — copy JS to TS (Nuxt 4 TypeScript)
 ONBUILD COPY brandin[g]/constants/metadata.j[s] /app/app/constants/metadata.ts
 ONBUILD COPY brandin[g]/constants/emails.j[s] /app/app/constants/emails.ts
-# Locales — merge branding translations into defaults (same mechanism as webapp)
 ONBUILD COPY brandin[g]/locales/*.jso[n] /app/locales/tmp/
 ONBUILD RUN if [ -d locales/tmp ]; then apk add --no-cache jq && tools/merge-locales.sh; fi
 ONBUILD RUN npx nuxt generate
+
 RUN npx nuxt generate
 
 # ==============================================================================

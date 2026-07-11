@@ -27,7 +27,7 @@
       "error": "Could not switch the branding.",
       "buildtime": "rebuild",
       "buildtimeHint": "This value is compiled into the image at build time and does not change on a live switch — it needs a webapp rebuild.",
-      "buildtimeLegend": "Values marked this way are baked in at build time (theme colours, PWA manifest / app name & icons, SEO / Open-Graph meta tags, auth cookie name) and are NOT applied by a live switch — they require rebuilding the webapp image. Everything else (logos, favicon, static-page HTML, footer links, texts and limits) switches live.",
+      "buildtimeLegend": "Values marked this way are baked in at build time — the PWA manifest (app name, icons and the install / browser-bar colour), the SEO / Open-Graph meta tags and the page title, and the auth cookie name — and are NOT applied by a live switch; they need rebuilding the webapp image. Everything else — the page colours, fonts, logos, favicon, static-page HTML, footer links, texts and limits — switches live.",
       "detail": {
         "organization": "Organization",
         "appDescription": "Description",
