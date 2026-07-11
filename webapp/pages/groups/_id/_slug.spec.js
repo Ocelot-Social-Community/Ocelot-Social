@@ -353,12 +353,6 @@ describe('GroupProfileSlug', () => {
                   ...schoolForCitizens,
                   myRole: 'owner',
                 },
-                GroupMembers: [
-                  { user: peterLustig, membership: { role: 'owner' } },
-                  { user: jennyRostock, membership: { role: 'usual' } },
-                  { user: bobDerBaumeister, membership: { role: 'usual' } },
-                  { user: huey, membership: { role: 'usual' } },
-                ],
               }
             })
           })
@@ -377,12 +371,6 @@ describe('GroupProfileSlug', () => {
                   ...schoolForCitizens,
                   myRole: 'usual',
                 },
-                GroupMembers: [
-                  { user: peterLustig, membership: { role: 'owner' } },
-                  { user: jennyRostock, membership: { role: 'usual' } },
-                  { user: bobDerBaumeister, membership: { role: 'usual' } },
-                  { user: huey, membership: { role: 'usual' } },
-                ],
               }
             })
           })
@@ -424,12 +412,6 @@ describe('GroupProfileSlug', () => {
                   ...schoolForCitizens,
                   myRole: 'pending',
                 },
-                GroupMembers: [
-                  { user: peterLustig, membership: { role: 'owner' } },
-                  { user: jennyRostock, membership: { role: 'usual' } },
-                  { user: bobDerBaumeister, membership: { role: 'usual' } },
-                  { user: huey, membership: { role: 'usual' } },
-                ],
               }
             })
           })
@@ -448,12 +430,6 @@ describe('GroupProfileSlug', () => {
                   ...schoolForCitizens,
                   myRole: null,
                 },
-                GroupMembers: [
-                  { user: peterLustig, membership: { role: 'owner' } },
-                  { user: jennyRostock, membership: { role: 'usual' } },
-                  { user: bobDerBaumeister, membership: { role: 'usual' } },
-                  { user: huey, membership: { role: 'usual' } },
-                ],
               }
             })
           })
@@ -476,12 +452,6 @@ describe('GroupProfileSlug', () => {
                   ...investigativeJournalism,
                   myRole: 'owner',
                 },
-                GroupMembers: [
-                  { user: peterLustig, membership: { role: 'owner' } },
-                  { user: jennyRostock, membership: { role: 'usual' } },
-                  { user: bobDerBaumeister, membership: { role: 'usual' } },
-                  { user: huey, membership: { role: 'usual' } },
-                ],
               }
             })
           })
@@ -500,12 +470,6 @@ describe('GroupProfileSlug', () => {
                   ...investigativeJournalism,
                   myRole: 'usual',
                 },
-                GroupMembers: [
-                  { user: peterLustig, membership: { role: 'owner' } },
-                  { user: jennyRostock, membership: { role: 'usual' } },
-                  { user: bobDerBaumeister, membership: { role: 'usual' } },
-                  { user: huey, membership: { role: 'usual' } },
-                ],
               }
             })
           })
@@ -524,12 +488,6 @@ describe('GroupProfileSlug', () => {
                   ...investigativeJournalism,
                   myRole: 'pending',
                 },
-                GroupMembers: [
-                  { user: peterLustig, membership: { role: 'owner' } },
-                  { user: jennyRostock, membership: { role: 'usual' } },
-                  { user: bobDerBaumeister, membership: { role: 'usual' } },
-                  { user: huey, membership: { role: 'usual' } },
-                ],
               }
             })
           })
@@ -548,12 +506,6 @@ describe('GroupProfileSlug', () => {
                   ...investigativeJournalism,
                   myRole: null,
                 },
-                GroupMembers: [
-                  { user: peterLustig, membership: { role: 'owner' } },
-                  { user: jennyRostock, membership: { role: 'usual' } },
-                  { user: bobDerBaumeister, membership: { role: 'usual' } },
-                  { user: huey, membership: { role: 'usual' } },
-                ],
               }
             })
           })
