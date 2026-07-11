@@ -128,11 +128,16 @@ export default {
   methods: {
     async loadPopover(openMenu) {
       this.popoverPending = true
-      // Pre-fetch user data to avoid flickering on first open
-      await this.$apollo.query({
-        query: userTeaserQuery(this.$i18n),
-        variables: { id: this.user.id },
-      })
+      try {
+        // Pre-fetch user data to avoid flickering on first open
+        await this.$apollo.query({
+          query: userTeaserQuery(this.$i18n),
+          variables: { id: this.user.id },
+        })
+      } catch {
+        this.popoverPending = false
+        return
+      }
       if (this.popoverPending) {
         openMenu(false)
       }
