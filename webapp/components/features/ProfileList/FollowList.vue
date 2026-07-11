@@ -7,10 +7,11 @@
     :loading="loadingConnections || loadingMore"
     :has-more="!allLoaded"
     @load-more="loadMore"
+    @scrolling-change="onScrollingChange"
   >
     <ul class="connections">
       <li v-for="connection in connections" :key="connection.id" class="connections__item">
-        <user-teaser :user="connection" />
+        <user-teaser :user="connection" :show-popover="popoverEnabled" :hover-delay="800" />
       </li>
     </ul>
   </infinite-scroll-list>
@@ -45,11 +46,19 @@ export default {
       loadingConnections: true,
       loadingMore: false,
       allLoaded: false,
+      isScrolling: false,
+      loadingCooldown: false,
     }
   },
   computed: {
     hasConnections() {
       return this.connections.length > 0
+    },
+    isLoading() {
+      return this.loadingConnections || this.loadingMore
+    },
+    popoverEnabled() {
+      return !this.isScrolling && !this.isLoading && !this.loadingCooldown
     },
     listTitle() {
       const name = this.$filters.truncate(this.userName, 15)
@@ -60,8 +69,22 @@ export default {
       return `${name} ${this.$t(`profile.network.${this.type}Nobody`)}`
     },
   },
+  watch: {
+    isLoading(newVal, oldVal) {
+      if (oldVal && !newVal) {
+        clearTimeout(this._loadingCooldownTimer)
+        this.loadingCooldown = true
+        this._loadingCooldownTimer = setTimeout(() => {
+          this.loadingCooldown = false
+        }, 600)
+      }
+    },
+  },
   async mounted() {
     await this.loadConnections(0)
+  },
+  beforeDestroy() {
+    clearTimeout(this._loadingCooldownTimer)
   },
   methods: {
     async loadConnections(offset) {
@@ -102,6 +125,9 @@ export default {
     async loadMore() {
       if (this.allLoaded || this.loadingMore || this.loadingConnections) return
       await this.loadConnections(this.connections.length)
+    },
+    onScrollingChange(isScrolling) {
+      this.isScrolling = isScrolling
     },
   },
 }

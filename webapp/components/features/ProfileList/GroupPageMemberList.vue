@@ -3,9 +3,9 @@
     :title="$t('group.membersListTitle')"
     :count="membersCount || null"
     :nobody-message="nobodyMessage"
-    :empty="!hasMembers"
+    :empty="!hasMembers || !allowedToSee"
     :loading="loadingInitial || loadingMore"
-    :has-more="!allLoaded"
+    :has-more="allowedToSee && !allLoaded"
     :show-filter="showFilter"
     :filter-placeholder="$t('common.filter')"
     :subtitle="subtitle"
@@ -51,6 +51,7 @@ export default {
     groupId: { type: String, required: true },
     membersCount: { type: Number, default: null },
     subtitle: { type: String, default: null },
+    allowedToSee: { type: Boolean, default: true },
   },
   data() {
     return {
@@ -70,6 +71,7 @@ export default {
       return this.members.length > 0
     },
     nobodyMessage() {
+      if (!this.allowedToSee) return this.$t('group.membersListTitleNotAllowedSeeingGroupMembers')
       return this.activeFilter.length >= 3 ? this.$t('group.membersListNoFilterResults') : null
     },
     isLoading() {
@@ -106,7 +108,11 @@ export default {
     },
   },
   async mounted() {
-    await this.loadMembers(true)
+    if (this.allowedToSee) {
+      await this.loadMembers(true)
+    } else {
+      this.loadingInitial = false
+    }
   },
   beforeDestroy() {
     clearTimeout(this._loadingCooldownTimer)
@@ -146,11 +152,12 @@ export default {
       }
     },
     onLoadMore() {
-      if (this.loadingMore || this.loadingInitial || this.allLoaded) return
+      if (!this.allowedToSee || this.loadingMore || this.loadingInitial || this.allLoaded) return
       if (this.offset >= PAGE_SIZE) this.showFilter = true
       this.loadMembers(false)
     },
     onFilterChange(val) {
+      if (!this.allowedToSee) return
       this.activeFilter = val
       this.loadMembers(true)
     },

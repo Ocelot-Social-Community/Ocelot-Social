@@ -216,14 +216,12 @@
         </h3>
         <!-- Group members list -->
         <group-page-member-list
-          v-if="isAllowedSeeingGroupMembers && group.id"
+          v-if="group.id"
           :group-id="group.id"
           :members-count="group.membersCount || null"
           :subtitle="membersListSubtitle"
+          :allowed-to-see="isAllowedSeeingGroupMembers"
         />
-        <p v-else-if="!isAllowedSeeingGroupMembers" class="nobody-message">
-          {{ $t('group.membersListTitleNotAllowedSeeingGroupMembers') }}
-        </p>
         <!-- <social-media :user-name="groupName" :user="user" /> -->
       </div>
 
