@@ -71,12 +71,7 @@
               </dd>
             </div>
             <div class="detail">
-              <dt>
-                {{ $t('admin.branding.detail.themeColor') }}
-                <span class="tag-buildtime" :title="$t('admin.branding.buildtimeHint')">
-                  {{ $t('admin.branding.buildtime') }}
-                </span>
-              </dt>
+              <dt>{{ $t('admin.branding.detail.themeColor') }}</dt>
               <dd>
                 <span
                   class="swatch"
@@ -103,11 +98,6 @@
 
       <p v-if="$fetchState.pending" class="hint">{{ $t('admin.branding.loading') }}</p>
       <p v-else-if="!brandings.length" class="hint">{{ $t('admin.branding.noneExtra') }}</p>
-
-      <p class="buildtime-legend">
-        <span class="tag-buildtime">{{ $t('admin.branding.buildtime') }}</span>
-        {{ $t('admin.branding.buildtimeLegend') }}
-      </p>
     </os-card>
   </div>
 </template>
@@ -305,24 +295,7 @@ export default {
   width: 16px;
 }
 
-.tag-buildtime {
-  display: inline-block;
-  font-size: 0.75em;
-  text-transform: uppercase;
-  color: $color-warning;
-  border: 1px solid $color-warning;
-  border-radius: 3px;
-  padding: 0 4px;
-  margin-left: 4px;
-}
-
 .hint {
-  color: $text-color-soft;
-}
-
-.buildtime-legend {
-  margin-top: $space-base;
-  font-size: 0.9em;
   color: $text-color-soft;
 }
 </style>

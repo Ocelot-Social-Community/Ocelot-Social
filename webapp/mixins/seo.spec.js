@@ -17,6 +17,7 @@ describe('seo mixin', () => {
     expect(head.meta).toEqual(
       expect.arrayContaining([
         { hid: 'description', name: 'description', content: metadata.APPLICATION_DESCRIPTION },
+        { hid: 'theme-color', name: 'theme-color', content: metadata.THEME_COLOR },
         { hid: 'og:title', property: 'og:title', content: metadata.APPLICATION_NAME },
         { hid: 'og:site_name', property: 'og:site_name', content: metadata.APPLICATION_NAME },
         { hid: 'og:image', property: 'og:image', content: metadata.OG_IMAGE },

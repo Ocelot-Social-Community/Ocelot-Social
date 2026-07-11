@@ -91,6 +91,11 @@ export default {
         type: 'image/x-icon',
         href: '/favicon.ico',
       },
+      {
+        // Points at the dynamic serverMiddleware route (content per active brand); href is stable.
+        rel: 'manifest',
+        href: '/manifest.webmanifest',
+      },
     ],
   },
 
@@ -139,7 +144,12 @@ export default {
    ** (logos, favicon, static-page HTML, CSS, fonts + each brand's branding.json + manifest.json)
    ** so brandings are bound without being baked into the image. See build-brandings.mjs.
    */
-  serverMiddleware: [{ path: '/branding', handler: '~/server-middleware/branding-assets.js' }],
+  serverMiddleware: [
+    { path: '/branding', handler: '~/server-middleware/branding-assets.js' },
+    // Dynamic PWA manifest generated from the active brand's metadata (replaces the static
+    // @nuxtjs/pwa manifest, disabled below) so app name / theme colour follow a live brand switch.
+    { path: '/manifest.webmanifest', handler: '~/server-middleware/manifest.js' },
+  ],
 
   /*
    ** Plugins to load before mounting the App
@@ -277,9 +287,11 @@ export default {
     config: CONFIG.COMMIT ? { release: CONFIG.COMMIT } : {},
   },
 
-  manifest,
-
   pwa: {
+    // Static manifest disabled — it is served DYNAMICALLY per active brand from
+    // server-middleware/manifest.js (see serverMiddleware + the head.link[rel=manifest] above), so
+    // the installed-app name / theme colour follow a live brand switch without a rebuild.
+    manifest: false,
     meta: {
       // Prevent @nuxtjs/pwa from auto-generating description from package.json;
       // we set description and og:description manually in head.meta above.

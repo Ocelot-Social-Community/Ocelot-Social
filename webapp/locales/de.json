@@ -25,9 +25,6 @@
       "noneExtra": "In dieser Instanz sind keine weiteren Brandings eingebacken — nur der Standard ist verfügbar.",
       "loading": "Brandings werden geladen…",
       "error": "Branding konnte nicht umgeschaltet werden.",
-      "buildtime": "Rebuild",
-      "buildtimeHint": "Dieser Wert wird beim Build ins Image kompiliert und ändert sich beim Live-Wechsel nicht — er braucht einen Webapp-Rebuild.",
-      "buildtimeLegend": "So markierte Werte werden zur Build-Zeit eingebacken — das PWA-Manifest (App-Name, Icons und die Installations-/Browserleisten-Farbe), die SEO-/Open-Graph-Meta-Tags und der Seitentitel, sowie der Auth-Cookie-Name — und werden beim Live-Wechsel NICHT übernommen; sie erfordern einen Rebuild des Webapp-Images. Alles andere — die Seitenfarben, Fonts, Logos, Favicon, statische Seiten-HTML, Footer-Links, Texte und Limits — schaltet live um.",
       "detail": {
         "organization": "Organisation",
         "appDescription": "Beschreibung",

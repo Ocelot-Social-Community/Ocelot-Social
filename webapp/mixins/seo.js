@@ -21,6 +21,8 @@ export default {
       titleTemplate: `%s - ${name}`,
       meta: [
         { hid: 'description', name: 'description', content: description },
+        // Browser-chrome colour (also the PWA manifest theme_color) — runtime so it follows a switch.
+        { hid: 'theme-color', name: 'theme-color', content: metadata.THEME_COLOR },
         { hid: 'og:title', property: 'og:title', content: name },
         { hid: 'og:description', property: 'og:description', content: description },
         { hid: 'og:site_name', property: 'og:site_name', content: name },
