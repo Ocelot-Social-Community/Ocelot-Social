@@ -212,12 +212,14 @@ export default {
 }
 
 .branding-item {
-  padding: $space-small 0;
+  // Left padding is a gutter for the active marker, applied to EVERY item so they all align and
+  // the content never sits under the green bar.
+  padding: $space-small 0 $space-small $space-small;
   border-bottom: 1px solid $border-color-softer;
 
   &.active {
-    border-left: 3px solid $color-success;
-    padding-left: $space-small;
+    // inset shadow marks the active item without taking layout space (no per-item indent).
+    box-shadow: inset 3px 0 0 $color-success;
   }
 }
 
