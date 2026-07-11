@@ -135,6 +135,7 @@
           {{ $t('profile.network.title') }}
         </h3>
         <follow-list
+          ref="followListFollowedBy"
           v-if="user && user.id"
           :user-id="user.id"
           :user-name="userName"
@@ -142,6 +143,7 @@
         />
         <div class="ds-mb-large"></div>
         <follow-list
+          ref="followListFollowing"
           v-if="user && user.id"
           :user-id="user.id"
           :user-name="userName"
@@ -605,6 +607,8 @@ export default {
       if (success) {
         this.user.followedByCount = data.followedByCount
         this.user.followedByCurrentUser = data.followedByCurrentUser
+        this.$refs.followListFollowedBy?.loadConnections(0)
+        this.$refs.followListFollowing?.loadConnections(0)
       } else {
         // rollback optimistic update
         this.$toast.error(this.$t('followButton.error'))

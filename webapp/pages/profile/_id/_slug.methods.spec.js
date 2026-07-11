@@ -258,6 +258,7 @@ describe('pages/profile/_id/_slug.vue — methods', () => {
         followLoading: isFollowing,
         followHovered: true,
         user: { ...baseUser, followedBy: [...baseUser.followedBy] },
+        $refs: {},
         $store: { getters: { 'auth/user': { id: 'me' } } },
         $toast: { error: jest.fn() },
         $t: (k) => k,
