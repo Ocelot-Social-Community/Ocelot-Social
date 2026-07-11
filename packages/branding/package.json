@@ -6,7 +6,6 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "ocelot-branding-build": "scripts/build-branding.mjs",
     "ocelot-brand-archive": "scripts/build-brand-archive.mjs"
   },
   "files": [
@@ -19,6 +18,7 @@
     "build:dev-brandings": "node scripts/build-dev-brandings.mjs"
   },
   "devDependencies": {
+    "@types/node": "^18.18.9",
     "typescript": "^5.6.0"
   }
 }

@@ -23,6 +23,12 @@
             <span class="branding-title">
               {{ entry.label }}
               <code v-if="entry.id">{{ entry.id }}</code>
+              <code
+                v-if="entry.config.metadata && entry.config.metadata.version"
+                class="branding-version"
+              >
+                v{{ entry.config.metadata.version }}
+              </code>
             </span>
             <span v-if="activeId === entry.id" class="badge badge-active">
               ● {{ $t('admin.branding.current') }}
@@ -227,6 +233,11 @@ export default {
 .branding-title {
   flex: 1;
   font-weight: $font-weight-bold;
+}
+
+.branding-version {
+  color: $text-color-soft;
+  font-weight: normal;
 }
 
 .badge-active {

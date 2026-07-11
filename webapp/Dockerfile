@@ -37,6 +37,10 @@ RUN mkdir -p /app
 WORKDIR /app
 COPY --from=ui-library ./app/ /packages/ui/
 COPY --from=branding-library ./app/ /packages/branding/
+# Where the running app reads brand archives (`<id>.tar.gz`) + the baked default marker (DEFAULT).
+# A branding build bakes them here (see the ONBUILD block); a vanilla image leaves it empty (→ the
+# app runs on framework defaults). Ops can override this to a mounted volume of archives.
+ENV OCELOT_BRANDING_ASSETS_DIR="/app/branding-assets"
 CMD ["/bin/bash", "-c", "yarn run start"]
 
 FROM base AS development
@@ -57,6 +61,16 @@ COPY webapp/ .
 ONBUILD COPY webap[p]/brandin[g]/ .
 ONBUILD COPY brandin[g]/ .
 ONBUILD RUN tools/merge-locales.sh
+# Runtime branding (additive to the overlay above): copy the brand UNFLATTENED into /brand and bake
+# its archive (+ DEFAULT marker) into ./branding-assets, so the image ships this brand as its default
+# theme WITHOUT rebuilding the bundle per brand — colours/logos/title/OG/manifest/static pages are
+# applied at runtime from the archive. The overlay copies above still bring in not-yet-ported content
+# (backend middlewares/data etc.). A vanilla build (no brand.config) skips this and stays vanilla.
+ONBUILD COPY webap[p]/brandin[g]/ /brand/
+ONBUILD COPY brandin[g]/ /brand/
+ONBUILD RUN if ls /brand/brand.config.* >/dev/null 2>&1; then \
+      node /packages/branding/scripts/build-brand-archive.mjs /brand ./branding-assets --default; \
+    else echo "[branding] no typed brand.config — runtime archive skipped (vanilla)"; fi
 # node_modules is baked above; with an unchanged lockfile this resolves in seconds
 # (integrity check), not a full reinstall. Kept as a guard in case a branding build
 # ever overrides dependencies (then --frozen-lockfile correctly forces a fresh install).
@@ -67,7 +81,8 @@ ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
 ONBUILD RUN --mount=type=cache,target=/app/node_modules/.cache,sharing=locked \
     yarn run build
 ONBUILD RUN mkdir /build && \
-    cp -r ./.nuxt ./nuxt.config.js ./config ./constants ./static ./locales ./package.json ./yarn.lock ./scripts /build
+    cp -r ./.nuxt ./nuxt.config.js ./config ./constants ./static ./locales ./server-middleware ./package.json ./yarn.lock ./scripts /build && \
+    if [ -d ./branding-assets ]; then cp -r ./branding-assets /build/branding-assets; fi
 ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     cd /build && yarn install --production=true --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 
@@ -81,7 +96,7 @@ COPY webapp/. .
 RUN tools/merge-locales.sh
 RUN yarn run build
 RUN mkdir /build && \
-    cp -r ./.nuxt ./nuxt.config.js ./config ./constants ./static ./locales ./package.json ./yarn.lock ./scripts /build
+    cp -r ./.nuxt ./nuxt.config.js ./config ./constants ./static ./locales ./server-middleware ./package.json ./yarn.lock ./scripts /build
 RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     cd /build && yarn install --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 

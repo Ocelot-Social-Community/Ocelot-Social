@@ -31,6 +31,3 @@ deployment/configurations/
 
 release/
 *~
-
-# local dev branding build (build-brandings.mjs output, served via OCELOT_BRANDING_ASSETS_DIR)
-.branding-dev/

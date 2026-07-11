@@ -1,25 +1,24 @@
 #!/usr/bin/env node
-// Dev auto-load: discover every COMPATIBLE branding under deployment/configurations/* and bake them
-// all into one served folder for the developer, so `yarn dev` can offer them on /admin/branding.
+// Dev auto-load: discover every COMPATIBLE branding under deployment/configurations/* and PUBLISH each
+// into its own `dist/<id>.tar.gz` (same as the brand's own `npm run build`), so `yarn dev` serves them
+// straight from deployment/configurations — no separate aggregate folder.
 //
-//   node scripts/build-dev-brandings.mjs [out-dir]
+//   node scripts/build-dev-brandings.mjs
 //
 // "Compatible" = the config dir has a brand.config.(ts|mjs|js) (the new typed format). Old-format
-// deployment configs (constants/*.js only) are skipped and listed, so it's obvious what was left
-// out. Output defaults to <repo>/.branding-dev (gitignored); point the webapp at it with
-//   OCELOT_BRANDING_ASSETS_DIR=<out-dir>/branding
-// (webapp/.env; relative ../.branding-dev/branding works because `yarn dev` runs in webapp/).
+// deployment configs (constants/*.js only) are skipped and listed, so it's obvious what was left out.
+// Point the apps at the configurations root; archives are found RECURSIVELY (see src/discover.ts):
+//   OCELOT_BRANDING_ASSETS_DIR=../deployment/configurations   (webapp/.env; relative to webapp/)
 import { existsSync, readdirSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { buildBrandings, findConfig } from './lib/build-brandings.mjs'
+import { findConfig, publishBrandArchive } from './lib/build-brandings.mjs'
 
 const scriptDir = dirname(fileURLToPath(import.meta.url))
 // packages/branding/scripts → repo root
 const repoRoot = resolve(scriptDir, '../../..')
 const configurationsRoot = join(repoRoot, 'deployment', 'configurations')
-const outDir = process.argv[2] ? resolve(process.argv[2]) : join(repoRoot, '.branding-dev')
 
 if (!existsSync(configurationsRoot)) {
   console.error(`no deployment/configurations at ${configurationsRoot}`)
@@ -47,6 +46,14 @@ if (!compatible.length) {
   process.exit(1)
 }
 
-await buildBrandings(outDir, compatible)
+for (const brandDir of compatible) {
+  const { id, version, dir, versioned } = await publishBrandArchive(brandDir)
+  // eslint-disable-next-line no-console
+  console.log(
+    `[dev-brandings] ${id}${version ? ` v${version}` : ''} → ${dir}${versioned ? ' (+versioned)' : ''}`,
+  )
+}
 // eslint-disable-next-line no-console
-console.log(`[dev-brandings] set OCELOT_BRANDING_ASSETS_DIR=${join(outDir, 'branding')}`)
+console.log(
+  `[dev-brandings] ${compatible.length} brand(s) built. set OCELOT_BRANDING_ASSETS_DIR=${configurationsRoot} (archives found recursively)`,
+)

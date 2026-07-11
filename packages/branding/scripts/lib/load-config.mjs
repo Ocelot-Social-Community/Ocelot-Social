@@ -1,5 +1,5 @@
-// Shared brand-config loader for the branding build tools (build-branding.mjs single-brand dev
-// artifact; build-brandings.mjs multi-brand served output). A `.ts` config is TYPE-CHECKED against
+// Shared brand-config loader for the branding build tools (build-brand-archive.mjs single-brand
+// archive; build-brandings.mjs multi-brand output). A `.ts` config is TYPE-CHECKED against
 // the branding schema via the TypeScript compiler API before it is evaluated — a wrong key or type
 // FAILS the build (throws), so a brand cannot ship a mistuned config. No install is needed in the
 // brand repo: typescript + the package resolve from wherever the tool runs.

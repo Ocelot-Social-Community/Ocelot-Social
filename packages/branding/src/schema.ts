@@ -133,6 +133,12 @@ export interface BrandingConfig {
     absoluteDateTimeFormat: string
   }
   metadata: {
+    /**
+     * Brand version, injected by the archive build from the brand's package.json `version` — NOT set
+     * by hand in a brand config. Single source = package.json. Surfaced in the admin Branding tab and
+     * carried in the versioned archive filename (`<id>-<version>.tar.gz`).
+     */
+    version?: string
     applicationName: string
     applicationShortName: string
     applicationDescription: string

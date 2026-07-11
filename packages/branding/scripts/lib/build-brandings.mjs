@@ -69,14 +69,29 @@ function namespaceConfig(config, id, brandDir, warnings) {
   return c
 }
 
-export function brandId(brandDir) {
+/** Read the brand's package.json once (or null). */
+function readBrandPkg(brandDir) {
   const pkgPath = join(brandDir, 'package.json')
-  if (existsSync(pkgPath)) {
-    const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'))
-    if (pkg.brandId) return pkg.brandId
-    if (pkg.name) return pkg.name.replace(/-branding$/, '')
+  if (!existsSync(pkgPath)) return null
+  try {
+    return JSON.parse(readFileSync(pkgPath, 'utf8'))
+  } catch {
+    return null
   }
+}
+
+export function brandId(brandDir) {
+  const pkg = readBrandPkg(brandDir)
+  if (pkg?.brandId) return pkg.brandId
+  if (pkg?.name) return pkg.name.replace(/-branding$/, '')
   return basename(brandDir)
+}
+
+/** The brand's published version = its package.json `version` (single source), or null if unset. */
+export function brandVersion(brandDir) {
+  const version = readBrandPkg(brandDir)?.version
+  // '0.0.0' is the unset placeholder in the brand templates — treat it as "no version".
+  return version && version !== '0.0.0' ? version : null
 }
 
 export function findConfig(brandDir) {
@@ -91,11 +106,17 @@ export function findConfig(brandDir) {
 export async function buildBrandArchive(brandDir) {
   const dir = resolve(brandDir)
   const id = brandId(dir)
+  const version = brandVersion(dir)
   const warnings = []
   const configPath = findConfig(dir)
   if (!configPath) throw new Error(`no brand.config.(ts|mjs|js) in ${dir}`)
   const config = await loadConfig(configPath)
   const namespaced = namespaceConfig(config, id, dir, warnings)
+  // Stamp the brand id into branding.json so consumers can discover archives by content (the file
+  // name may be versioned, e.g. `<id>-1.2.3.tar.gz`) — see src/discover.ts.
+  namespaced.id = id
+  // Inject the version from package.json (single source) — surfaced in the admin Branding tab.
+  if (version) namespaced.metadata = { ...namespaced.metadata, version }
 
   const entries = [
     { name: 'branding.json', data: Buffer.from(`${JSON.stringify(namespaced, null, 2)}\n`) },
@@ -104,12 +125,41 @@ export async function buildBrandArchive(brandDir) {
     const src = join(dir, sub)
     if (existsSync(src)) collectFiles(src, sub, entries)
   }
-  return { id, label: config.metadata?.applicationName ?? id, gz: writeTarGz(entries), entries, warnings }
+  return {
+    id,
+    version,
+    label: config.metadata?.applicationName ?? id,
+    gz: writeTarGz(entries),
+    entries,
+    warnings,
+  }
 }
 
 /**
- * Bundle every brand directory in `brandArgs` into `<outArg>/branding/<id>.tar.gz` + a manifest.json.
- * Returns the manifest array ([{ id, label, config, archive }]).
+ * Build ONE brand and PUBLISH it into a dist directory as `<id>.tar.gz` (latest — the name consumers
+ * mount) plus, when the package.json version is set, `<id>-<version>.tar.gz` (immutable history).
+ * `outDir` defaults to `<brandDir>/dist`. `markDefault` additionally writes a `DEFAULT` marker (the
+ * brand id) so an image baking this brand renders branded out of the box.
+ */
+export async function publishBrandArchive(brandDir, { outDir, markDefault = false } = {}) {
+  const built = await buildBrandArchive(brandDir)
+  const dir = outDir ? resolve(outDir) : join(resolve(brandDir), 'dist')
+  mkdirSync(dir, { recursive: true })
+  const latest = join(dir, `${built.id}.tar.gz`)
+  writeFileSync(latest, built.gz)
+  let versioned = null
+  if (built.version) {
+    versioned = join(dir, `${built.id}-${built.version}.tar.gz`)
+    writeFileSync(versioned, built.gz)
+  }
+  if (markDefault) writeFileSync(join(dir, 'DEFAULT'), `${built.id}\n`)
+  return { ...built, dir, latest, versioned }
+}
+
+/**
+ * Bundle every brand directory in `brandArgs` into `<outArg>/branding/<id>.tar.gz`. The served
+ * manifest is derived dynamically from the archives present, so none is written here.
+ * Returns the built list ([{ id, label, config, archive }]).
  */
 export async function buildBrandings(outArg, brandArgs) {
   const brandingRoot = join(resolve(outArg), 'branding')
@@ -131,8 +181,10 @@ export async function buildBrandings(outArg, brandArgs) {
     for (const w of warnings) console.warn(w)
   }
 
-  writeFileSync(join(brandingRoot, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`)
+  // No static manifest.json is written: the served /branding/manifest.json is derived DYNAMICALLY
+  // from the archives actually present (webapp serverMiddleware), so the admin list can never drift
+  // from what was built — even when archives are added/removed/built individually.
   // eslint-disable-next-line no-console
-  console.log(`[brandings] ${manifest.length} brand(s) → ${join(brandingRoot, 'manifest.json')}`)
+  console.log(`[brandings] ${manifest.length} brand(s) → ${brandingRoot}`)
   return manifest
 }

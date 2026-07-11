@@ -13,13 +13,9 @@ export async function fetchBrandingHtml(src) {
   if (process.server) {
     const base = process.env.OCELOT_BRANDING_ASSETS_DIR
     if (!base) return null
-    // eslint-disable-next-line global-require, import/no-nodejs-modules
-    const { readFileSync } = require('fs')
-    // eslint-disable-next-line global-require, import/no-nodejs-modules
-    const path = require('path')
     // eslint-disable-next-line global-require, import/no-unresolved
-    const { readTarGz } = require('@ocelot-social/branding/dist/tar.js')
-    // src is '/branding/<id>/html/<locale>/<file>.html'; read the entry from <id>.tar.gz.
+    const { discoverArchives, readArchive } = require('@ocelot-social/branding/dist/discover.js')
+    // src is '/branding/<id>/html/<locale>/<file>.html'; read the entry from that brand's archive.
     const rel = src.replace(/^\/branding\//, '')
     const slash = rel.indexOf('/')
     if (slash === -1) return null
@@ -27,8 +23,10 @@ export async function fetchBrandingHtml(src) {
     const entry = rel.slice(slash + 1)
     if (!/^[a-z0-9._-]+$/i.test(id)) return null
     try {
-      const files = readTarGz(readFileSync(path.join(base, `${id}.tar.gz`)))
-      const data = files.get(entry)
+      const archive = discoverArchives(base).get(id)
+      if (!archive) return null
+      const files = readArchive(archive.file)
+      const data = files && files.get(entry)
       return data ? data.toString('utf8') : null
     } catch (error) {
       return null

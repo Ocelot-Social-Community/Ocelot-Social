@@ -2,9 +2,10 @@
 // overrides with defineBranding — type errors here fail compilation (and, in a brand repo, CI).
 // The default export is the fully resolved BrandingConfig.
 //
-//   node packages/branding/scripts/build-branding.mjs \
-//     packages/branding/example/brand.config.mjs ./branding.dev.json --watch
-//   OCELOT_BRANDING_PATH=$PWD/branding.dev.json  (in webapp/.env and backend/.env)
+//   node packages/branding/scripts/build-brand-archive.mjs \
+//     packages/branding/example .branding-dev/branding/example.tar.gz --watch
+//   OCELOT_BRANDING_ASSETS_DIR=$PWD/.branding-dev/branding  OCELOT_ACTIVE_BRANDING=example
+//     (in webapp/.env and backend/.env)
 //   yarn dev   → edit this file → refresh the browser (F5). No Docker, no rebuild.
 // In a real BRAND repo this is `import { defineBranding } from '@ocelot-social/branding'` (the
 // installed dependency). Here inside the package the example imports the built dist directly so it
