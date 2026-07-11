@@ -1,12 +1,25 @@
 // Core of the multi-brand build, shared by the CLI (build-brandings.mjs) and the dev scanner
-// (build-dev-brandings.mjs). Bakes N brand directories into ONE served folder, collision-free:
-// per brand it copies the served content (assets/, html/) to <out>/branding/<id>/, namespaces every
-// brand-relative asset path in the resolved config to /branding/<id>/…, writes branding.json, and
-// finally writes <out>/branding/manifest.json. See docu/branding-architecture-konzept.md.
-import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+// (build-dev-brandings.mjs). Bundles each brand into ONE `<id>.tar.gz` under <out>/branding/
+// containing its namespaced branding.json + assets/ + html/, plus a manifest.json listing them.
+// Every consumer (webapp serverMiddleware, branding plugin, maintenance) reads the files back from
+// the archive. See docu/branding-architecture-konzept.md.
+import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
 
+import { writeTarGz } from '../../dist/tar.js'
+
 import { loadConfig } from './load-config.mjs'
+
+// Recursively collect a directory's files as tar entries keyed by their path relative to the brand
+// root (e.g. dir='assets' → 'assets/logo.svg').
+function collectFiles(dir, prefix, entries) {
+  for (const name of readdirSync(dir)) {
+    const full = join(dir, name)
+    const rel = prefix ? `${prefix}/${name}` : name
+    if (statSync(full).isDirectory()) collectFiles(full, rel, entries)
+    else entries.push({ name: rel, data: readFileSync(full) })
+  }
+}
 
 // A brand-relative asset path (namespaced to /branding/<id>/…). Absolute /… and http(s):/data:/
 // mailto: paths are framework/external and left untouched.
@@ -74,43 +87,50 @@ export function findConfig(brandDir) {
   return null
 }
 
+/** Bundle ONE brand directory into a `<id>.tar.gz` buffer (branding.json + assets/ + html/). */
+export async function buildBrandArchive(brandDir) {
+  const dir = resolve(brandDir)
+  const id = brandId(dir)
+  const warnings = []
+  const configPath = findConfig(dir)
+  if (!configPath) throw new Error(`no brand.config.(ts|mjs|js) in ${dir}`)
+  const config = await loadConfig(configPath)
+  const namespaced = namespaceConfig(config, id, dir, warnings)
+
+  const entries = [
+    { name: 'branding.json', data: Buffer.from(`${JSON.stringify(namespaced, null, 2)}\n`) },
+  ]
+  for (const sub of ['assets', 'html']) {
+    const src = join(dir, sub)
+    if (existsSync(src)) collectFiles(src, sub, entries)
+  }
+  return { id, label: config.metadata?.applicationName ?? id, gz: writeTarGz(entries), entries, warnings }
+}
+
 /**
- * Build every brand directory in `brandArgs` into `<outArg>/branding/`.
- * Returns the manifest array ([{ id, label, config }]).
+ * Bundle every brand directory in `brandArgs` into `<outArg>/branding/<id>.tar.gz` + a manifest.json.
+ * Returns the manifest array ([{ id, label, config, archive }]).
  */
 export async function buildBrandings(outArg, brandArgs) {
   const brandingRoot = join(resolve(outArg), 'branding')
+  mkdirSync(brandingRoot, { recursive: true })
   const manifest = []
 
   for (const brandArg of brandArgs) {
-    const brandDir = resolve(brandArg)
-    const id = brandId(brandDir)
-    const outDir = join(brandingRoot, id)
-    const warnings = []
-
-    const configPath = findConfig(brandDir)
-    if (!configPath) throw new Error(`no brand.config.(ts|mjs|js) in ${brandDir}`)
-    const config = await loadConfig(configPath)
-    const namespaced = namespaceConfig(config, id, brandDir, warnings)
-
-    mkdirSync(outDir, { recursive: true })
-    for (const dir of ['assets', 'html']) {
-      const src = join(brandDir, dir)
-      if (existsSync(src)) cpSync(src, join(outDir, dir), { recursive: true })
-    }
-    writeFileSync(join(outDir, 'branding.json'), `${JSON.stringify(namespaced, null, 2)}\n`)
-
+    const { id, label, gz, entries, warnings } = await buildBrandArchive(brandArg)
+    writeFileSync(join(brandingRoot, `${id}.tar.gz`), gz)
     manifest.push({
       id,
-      label: config.metadata?.applicationName ?? id,
+      label,
+      archive: `${id}.tar.gz`,
+      // Served (from the archive) by the branding-assets middleware — the admin UI fetches this.
       config: `/branding/${id}/branding.json`,
     })
     // eslint-disable-next-line no-console
-    console.log(`[brandings] ${basename(brandDir)} → /branding/${id}/ (${id})`)
+    console.log(`[brandings] ${basename(resolve(brandArg))} → ${id}.tar.gz (${entries.length} files, ${gz.length} b)`)
     for (const w of warnings) console.warn(w)
   }
 
-  mkdirSync(brandingRoot, { recursive: true })
   writeFileSync(join(brandingRoot, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`)
   // eslint-disable-next-line no-console
   console.log(`[brandings] ${manifest.length} brand(s) → ${join(brandingRoot, 'manifest.json')}`)

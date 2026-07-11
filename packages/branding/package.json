@@ -6,7 +6,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "ocelot-branding-build": "scripts/build-branding.mjs"
+    "ocelot-branding-build": "scripts/build-branding.mjs",
+    "ocelot-brand-archive": "scripts/build-brand-archive.mjs"
   },
   "files": [
     "dist",

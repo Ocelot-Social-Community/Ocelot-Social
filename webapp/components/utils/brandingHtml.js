@@ -17,13 +17,19 @@ export async function fetchBrandingHtml(src) {
     const { readFileSync } = require('fs')
     // eslint-disable-next-line global-require, import/no-nodejs-modules
     const path = require('path')
-    // The middleware serves $OCELOT_BRANDING_ASSETS_DIR at /branding, so strip that mount prefix.
+    // eslint-disable-next-line global-require, import/no-unresolved
+    const { readTarGz } = require('@ocelot-social/branding/dist/tar.js')
+    // src is '/branding/<id>/html/<locale>/<file>.html'; read the entry from <id>.tar.gz.
     const rel = src.replace(/^\/branding\//, '')
-    const file = path.resolve(base, rel)
-    // Path-traversal guard: stay within the served base dir.
-    if (file !== base && !file.startsWith(path.resolve(base) + path.sep)) return null
+    const slash = rel.indexOf('/')
+    if (slash === -1) return null
+    const id = rel.slice(0, slash)
+    const entry = rel.slice(slash + 1)
+    if (!/^[a-z0-9._-]+$/i.test(id)) return null
     try {
-      return readFileSync(file, 'utf8')
+      const files = readTarGz(readFileSync(path.join(base, `${id}.tar.gz`)))
+      const data = files.get(entry)
+      return data ? data.toString('utf8') : null
     } catch (error) {
       return null
     }

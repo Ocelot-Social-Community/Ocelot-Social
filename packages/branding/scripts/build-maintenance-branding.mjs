@@ -12,10 +12,12 @@
 // var(--color-primary) etc.) and its squared logo, so a brand defines colours + logo ONCE and both
 // the live app and the maintenance page follow. Idempotent (re-runnable): the brand block in
 // branding.css is delimited and regenerated.
-import { copyFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
 
-import { loadConfig } from './lib/load-config.mjs'
+import { readTarGz } from '../dist/tar.js'
+
+import { buildBrandArchive } from './lib/build-brandings.mjs'
 
 const [brandArg, maintenanceArg] = process.argv.slice(2)
 if (!brandArg || !maintenanceArg) {
@@ -25,15 +27,11 @@ if (!brandArg || !maintenanceArg) {
 const brandDir = resolve(brandArg)
 const maintenanceDir = resolve(maintenanceArg)
 
-function findBrandConfig(dir) {
-  for (const name of ['brand.config.ts', 'brand.config.mjs', 'brand.config.js']) {
-    const p = join(dir, name)
-    if (existsSync(p)) return p
-  }
-  throw new Error(`no brand.config.(ts|mjs|js) in ${dir}`)
-}
-
-const config = await loadConfig(findBrandConfig(brandDir))
+// Bundle the brand into its archive and read config + logo back FROM it — the same artifact the live
+// app + serverMiddleware consume, so the maintenance page can't drift from them.
+const { id, gz } = await buildBrandArchive(brandDir)
+const archive = readTarGz(gz)
+const config = JSON.parse(archive.get('branding.json').toString('utf8'))
 const theme = config.theme ?? { cssVars: {}, fontFaces: [] }
 
 // --- 1. Colours: append the brand's :root overrides to the maintenance branding.css --------------
@@ -58,20 +56,22 @@ if (Object.keys(cssVars).length) {
   console.log(`[maintenance] colours → ${cssPath} (${Object.keys(cssVars).length} vars)`)
 }
 
-// --- 2. Logo: copy the brand's squared logo to the maintenance public path -----------------------
-const logoRel = config.logos?.signupPath || config.logos?.passwordResetPath // squared logo
-if (logoRel && !/^(https?:|\/)/.test(logoRel)) {
-  const src = join(brandDir, logoRel)
-  const dest = join(maintenanceDir, 'public/img/custom', basename(logoRel))
-  if (existsSync(src)) {
-    copyFileSync(src, dest)
+// --- 2. Logo: read the brand's squared logo FROM the archive → maintenance public path -----------
+const logoPath = config.logos?.signupPath || config.logos?.passwordResetPath // namespaced /branding/<id>/…
+const prefix = `/branding/${id}/`
+if (logoPath && logoPath.startsWith(prefix)) {
+  const entry = logoPath.slice(prefix.length) // e.g. assets/logo-squared.svg
+  const data = archive.get(entry)
+  if (data) {
+    const dest = join(maintenanceDir, 'public/img/custom', basename(entry))
+    writeFileSync(dest, data)
     // The maintenance app references /img/custom/logo-squared.svg — keep that stable name too.
     const stable = join(maintenanceDir, 'public/img/custom/logo-squared.svg')
-    if (dest !== stable && /\.svg$/.test(src)) copyFileSync(src, stable)
+    if (dest !== stable && /\.svg$/.test(entry)) writeFileSync(stable, data)
     // eslint-disable-next-line no-console
     console.log(`[maintenance] logo → ${dest}`)
   } else {
-    console.warn(`[maintenance] ! logo not found: ${src}`)
+    console.warn(`[maintenance] ! logo entry not in archive: ${entry}`)
   }
 }
 

@@ -49,7 +49,7 @@ async function fetchActiveBrandingId() {
 // `readFileSync` + `path` are passed in from the server-only branch (required there under a bare
 // `process.server` guard) so no Node require lives in this always-bundled function — otherwise
 // webpack would try to resolve 'fs' for the client bundle and fail.
-async function loadServerBranding(readFileSync, path) {
+async function loadServerBranding(readFileSync, path, readTarGz) {
   const brandingPath = process.env.OCELOT_BRANDING_PATH
   if (brandingPath) {
     const config = JSON.parse(readFileSync(brandingPath, 'utf8'))
@@ -77,7 +77,9 @@ async function loadServerBranding(readFileSync, path) {
   if (active === null) active = process.env.OCELOT_ACTIVE_BRANDING || ''
   if (!active || !ids.includes(active)) return null // vanilla / unknown → framework defaults
 
-  const config = JSON.parse(readFileSync(path.join(assetsDir, active, 'branding.json'), 'utf8'))
+  // Read the active brand's branding.json from its archive (<id>.tar.gz).
+  const files = readTarGz(readFileSync(path.join(assetsDir, `${active}.tar.gz`)))
+  const config = JSON.parse(files.get('branding.json').toString('utf8'))
   return { config, brandingId: active }
 }
 
@@ -89,8 +91,12 @@ export default async (context) => {
     const { readFileSync } = require('fs')
     // eslint-disable-next-line global-require, import/no-nodejs-modules
     const path = require('path')
+    // Package subpath (server-only, uses node:zlib) — required under the guard so it stays out of
+    // the client bundle.
+    // eslint-disable-next-line global-require, import/no-unresolved
+    const { readTarGz } = require('@ocelot-social/branding/dist/tar.js')
     try {
-      const loaded = await loadServerBranding(readFileSync, path)
+      const loaded = await loadServerBranding(readFileSync, path, readTarGz)
       if (loaded) {
         setBranding(loaded.config)
         context.beforeNuxtRender(({ nuxtState }) => {

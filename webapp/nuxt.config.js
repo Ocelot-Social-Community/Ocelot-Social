@@ -348,7 +348,7 @@ export default {
         // under a `process.server` guard, but webpack still resolves the static require('fs') when
         // building the client bundle — map it to an empty module so the client compiles; the
         // guarded code never runs client-side.
-        config.node = { ...config.node, fs: 'empty' }
+        config.node = { ...config.node, fs: 'empty', zlib: 'empty' }
       }
 
       // Vue 2.7 has built-in Composition API - redirect old imports
