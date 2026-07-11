@@ -122,7 +122,7 @@
     "rosie": "^2.1.1",
     "spectaql": "^3.0.9",
     "ts-jest": "^29.4.11",
-    "tsc-alias": "^1.8.16",
+    "tsc-alias": "^1.9.0",
     "tsx": "^4.23.0",
     "typescript": "^5.8.3"
   },

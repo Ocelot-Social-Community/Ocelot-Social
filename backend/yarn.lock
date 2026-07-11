@@ -11863,10 +11863,10 @@ ts-jest@^29.4.11:
     type-fest "^4.41.0"
     yargs-parser "^21.1.1"
 
-tsc-alias@^1.8.16:
-  version "1.8.16"
-  resolved "https://registry.yarnpkg.com/tsc-alias/-/tsc-alias-1.8.16.tgz#dbc74e797071801c7284f1a478259de920f852d4"
-  integrity sha512-QjCyu55NFyRSBAl6+MTFwplpFcnm2Pq01rR/uxfqJoLMm6X3O14KEGtaSDZpJYaE1bJBGDjD0eSuiIWPe2T58g==
+tsc-alias@^1.9.0:
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/tsc-alias/-/tsc-alias-1.9.0.tgz#6c8ecae031683d3a530a06f2ccf3d15a35d46476"
+  integrity sha512-IZrCInovKxVCwXyKhcdr/HaxSYugKT0w4zyktOE/4115Nzo6gbp/NhkaEeyOG0/H7QoTeXtv+3UHffBYta9oWw==
   dependencies:
     chokidar "^3.5.3"
     commander "^9.0.0"
