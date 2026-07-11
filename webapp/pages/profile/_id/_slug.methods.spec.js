@@ -279,14 +279,12 @@ describe('pages/profile/_id/_slug.vue — methods', () => {
           data: {
             followedByCount: 5,
             followedByCurrentUser: true,
-            followedBy: [{ id: 'me' }],
           },
         },
       })
       await methods.toggleFollow.call(ctx)
       expect(ctx.user.followedByCurrentUser).toBe(true)
       expect(ctx.user.followedByCount).toBe(5)
-      expect(ctx.user.followedBy).toEqual([{ id: 'me' }])
       expect(ctx.followLoading).toBe(false)
       expect(ctx.followHovered).toBe(false)
     })
@@ -299,14 +297,12 @@ describe('pages/profile/_id/_slug.vue — methods', () => {
           data: {
             followedByCount: 4,
             followedByCurrentUser: false,
-            followedBy: [],
           },
         },
       })
       await methods.toggleFollow.call(ctx)
       expect(ctx.user.followedByCurrentUser).toBe(false)
       expect(ctx.user.followedByCount).toBe(4)
-      expect(ctx.user.followedBy).toEqual([])
     })
 
     it('rolls back the optimistic update on server failure (follow path)', async () => {
