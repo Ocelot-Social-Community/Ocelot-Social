@@ -27,4 +27,33 @@ export default () => {
     link.setAttribute('data-branding-css', href)
     document.head.appendChild(link)
   }
+
+  // Runtime theme: brand @font-face declarations + CSS custom property overrides on :root. Both the
+  // webapp (brandable SCSS tokens read var(--…)) and packages/ui (reads var(--color-*)) pick these
+  // up, so a live switch re-themes without a rebuild. Client-side only: SSR keeps the built (vanilla)
+  // theme, the brand's values apply on mount — a brief flash on first load, acceptable for a rare
+  // admin switch (an SSR-injected <style> would remove it — see the concept's theme layer).
+  const theme = branding.theme || {}
+  const cssVars = theme.cssVars || {}
+  const fontFaces = theme.fontFaces || []
+  if (Object.keys(cssVars).length || fontFaces.length) {
+    const faces = fontFaces
+      .map((f) => {
+        const format = f.format ? ` format('${f.format}')` : ''
+        const weight = f.weight ? ` font-weight: ${f.weight};` : ''
+        const style = f.style ? ` font-style: ${f.style};` : ''
+        return `@font-face { font-family: '${f.family}'; src: url('${f.src}')${format};${weight}${style} }`
+      })
+      .join('\n')
+    const vars = Object.entries(cssVars)
+      .map(([key, value]) => `--${key}: ${value};`)
+      .join(' ')
+    let style = document.getElementById('branding-theme')
+    if (!style) {
+      style = document.createElement('style')
+      style.id = 'branding-theme'
+      document.head.appendChild(style)
+    }
+    style.textContent = `${faces}\n:root { ${vars} }`
+  }
 }

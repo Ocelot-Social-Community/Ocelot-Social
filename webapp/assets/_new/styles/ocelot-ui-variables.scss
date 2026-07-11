@@ -15,16 +15,24 @@
   --color-default-contrast: #{$text-color-base};
   --color-default-contrast-inverse: #{$color-neutral-100}; // weiß für dunkle Hintergründe
 
-  // Primary (grün) - verwendet $text-color-primary-inverse wie ds-button
-  --color-primary: #{$color-primary};
+  // Primary (grün) - verwendet $text-color-primary-inverse wie ds-button.
+  // --color-primary / --color-secondary and the font families are the RUNTIME THEME BASE: literal
+  // defaults here, overridable by a brand at runtime (plugins/branding-head.js sets them on :root).
+  // The webapp's own SCSS tokens read var(--color-primary) (tokens.scss), so BOTH webapp + ui
+  // re-theme on a live switch. (Literal, not #{$color-primary}: that token now IS var(--color-primary)
+  // and would self-reference.) Shades stay literals so the vanilla theme is unchanged; a brand that
+  // wants themed shades supplies them in its theme.cssVars.
+  --color-primary: rgb(23, 181, 63);
   --color-primary-hover: #{$color-primary-light}; // filled buttons hover to lighter color
   --color-primary-active: #{$color-primary-dark}; // active state uses darker color
   --color-primary-contrast: #{$text-color-primary-inverse};
+  --font-family-heading: 'LatoWeb', sans-serif;
+  --font-family-text: 'LatoWeb', sans-serif;
 
   // Secondary (blau)
-  --color-secondary: #{$color-secondary};
+  --color-secondary: rgb(0, 142, 230);
   --color-secondary-hover: #{$color-secondary-active};
-  --color-secondary-active: #{darken($color-secondary, 15%)};
+  --color-secondary-active: color-mix(in srgb, var(--color-secondary), black 15%);
   --color-secondary-contrast: #{$text-color-secondary-inverse};
 
   // Danger (rot)
@@ -46,9 +54,9 @@
   --color-success-contrast: #{$text-color-primary-inverse};
 
   // Info (blau, wie secondary)
-  --color-info: #{$color-secondary};
+  --color-info: var(--color-secondary);
   --color-info-hover: #{$color-secondary-active};
-  --color-info-active: #{darken($color-secondary, 15%)};
+  --color-info-active: color-mix(in srgb, var(--color-secondary), black 15%);
   --color-info-contrast: #{$text-color-secondary-inverse};
 
   // Disabled state

@@ -81,6 +81,34 @@ export interface BrandingConfig {
       note: string
     }
   }
+  /**
+   * Runtime theme: CSS custom properties + web fonts injected on :root at runtime, so a brand's
+   * colours and fonts apply on a live switch WITHOUT rebuilding the webapp image. Both the webapp
+   * (once its brandable SCSS tokens read `var(--…)`) and packages/ui (already reads `var(--color-*)`)
+   * pick these up. The framework default is empty (vanilla keeps its built-in theme). See
+   * docu/branding-architecture-konzept.md (theme layer).
+   */
+  theme: {
+    /**
+     * `--custom-property` overrides applied to :root, keyed WITHOUT the leading `--`
+     * (e.g. { 'color-primary': 'rgb(110,139,135)', 'font-family-text': 'Overpass, sans-serif' }).
+     * A brand supplies the full palette it wants to change (base + shades); shades it omits keep the
+     * framework default value.
+     */
+    cssVars: Record<string, string>
+    /**
+     * @font-face declarations to make brand fonts available at runtime. `src` is a path into the
+     * brand's served assets folder (namespaced like other asset paths), e.g.
+     * 'assets/fonts/Overpass.ttf'.
+     */
+    fontFaces: Array<{
+      family: string
+      src: string
+      weight?: string
+      style?: string
+      format?: string
+    }>
+  }
   group: {
     nameLengthMin: number
     nameLengthMax: number

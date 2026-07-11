@@ -516,7 +516,8 @@ form {
   &--highlight,
   &:target {
     border-left-color: $color-secondary;
-    background: rgba($color-secondary, 0.1);
+    // $color-secondary is a runtime var() now; use color-mix instead of Sass rgba() for the tint.
+    background: color-mix(in srgb, var(--color-secondary) 10%, transparent);
   }
 
   // This field was edited locally AND changed on the server → highlight it.

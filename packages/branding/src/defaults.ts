@@ -13,6 +13,11 @@ export const brandingDefaults: BrandingConfig = {
       note: '',
     },
   },
+  theme: {
+    // Vanilla keeps its built-in (compiled) theme; brands add their own runtime overrides.
+    cssVars: {},
+    fontFaces: [],
+  },
   group: {
     nameLengthMin: 3,
     nameLengthMax: 50,

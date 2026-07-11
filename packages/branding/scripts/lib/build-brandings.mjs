@@ -47,6 +47,12 @@ function namespaceConfig(config, id, brandDir, warnings) {
       for (const locale of Object.keys(locales)) locales[locale] = ns(locales[locale])
     }
   }
+  // Brand web-font files live in the served assets folder too.
+  if (Array.isArray(c.theme?.fontFaces)) {
+    for (const face of c.theme.fontFaces) {
+      if (face.src != null) face.src = ns(face.src)
+    }
+  }
   return c
 }
 
