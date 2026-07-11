@@ -60,6 +60,27 @@ export interface LinkPageOverride {
 }
 
 export interface BrandingConfig {
+  /**
+   * Metadata ABOUT this branding itself (not the app identity) — shown in the admin Branding
+   * detail view so an operator can tell brands apart and knows what they may reuse.
+   */
+  about: {
+    /** Short human description of this branding / theme. */
+    description: string
+    /**
+     * Reuse settings for this branding's assets. NOT a legal document — a quick operator-facing
+     * hint answering "may I reuse this brand's logos / colours in a derived brand?". A brand that
+     * wants to state conditions puts them in `note`.
+     */
+    license: {
+      /** May this branding's logos be reused elsewhere? */
+      logosReusable: boolean
+      /** May this branding's colours / theme be reused elsewhere? */
+      colorsReusable: boolean
+      /** Optional free-text note (attribution, conditions) — still not a legal text. */
+      note: string
+    }
+  }
   group: {
     nameLengthMin: number
     nameLengthMax: number

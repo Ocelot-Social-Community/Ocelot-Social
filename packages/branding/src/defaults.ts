@@ -5,6 +5,14 @@
 import type { BrandingConfig } from './schema'
 
 export const brandingDefaults: BrandingConfig = {
+  about: {
+    description: 'The default ocelot.social branding.',
+    license: {
+      logosReusable: false,
+      colorsReusable: false,
+      note: '',
+    },
+  },
   group: {
     nameLengthMin: 3,
     nameLengthMax: 50,

@@ -18,12 +18,30 @@
       "name": "Branding",
       "title": "Branding",
       "description": "Wähle, welches eingebackene Branding netzwerkweit aktiv ist. Das Umschalten lädt die App für alle neu.",
-      "current": "Aktuell aktiv",
+      "current": "Aktiv",
       "activate": "Aktivieren",
+      "deactivate": "Deaktivieren",
       "vanilla": "Standard (kein Branding)",
       "none": "In dieser Instanz ist kein Branding eingebacken.",
+      "noneExtra": "In dieser Instanz sind keine weiteren Brandings eingebacken — nur der Standard ist verfügbar.",
       "loading": "Brandings werden geladen…",
-      "error": "Branding konnte nicht umgeschaltet werden."
+      "error": "Branding konnte nicht umgeschaltet werden.",
+      "buildtime": "Rebuild",
+      "buildtimeHint": "Dieser Wert wird beim Build ins Image kompiliert und ändert sich beim Live-Wechsel nicht — er braucht einen Webapp-Rebuild.",
+      "buildtimeLegend": "So markierte Werte werden zur Build-Zeit eingebacken (Theme-Farben, PWA-Manifest / App-Name & Icons, SEO-/Open-Graph-Meta-Tags, Auth-Cookie-Name) und werden beim Live-Wechsel NICHT übernommen — sie erfordern einen Rebuild des Webapp-Images. Alles andere (Logos, Favicon, statische Seiten-HTML, Footer-Links, Texte und Limits) schaltet live um.",
+      "detail": {
+        "organization": "Organisation",
+        "appDescription": "Beschreibung",
+        "reuse": "Wiederverwendung",
+        "logos": "Logos",
+        "colors": "Farben",
+        "themeColor": "Theme-Farbe",
+        "footer": "Footer-Seiten",
+        "pages": "Statische Seiten",
+        "favicon": "Favicon",
+        "noPages": "keine",
+        "pagesSummary": "{pages} Seiten ({locales})"
+      }
     },
     "api-keys": {
       "detail": {

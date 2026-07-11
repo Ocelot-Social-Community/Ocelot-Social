@@ -4,37 +4,124 @@
       <h2 class="ds-heading ds-heading-h2">{{ $t('admin.branding.title') }}</h2>
       <p>{{ $t('admin.branding.description') }}</p>
 
-      <ul v-if="brandings.length" class="branding-list">
-        <!-- Framework default (vanilla) — no baked-in brand. -->
-        <li :class="{ active: activeId === '' }">
-          <span class="branding-label">{{ $t('admin.branding.vanilla') }}</span>
-          <span v-if="activeId === ''" class="branding-current">
-            {{ $t('admin.branding.current') }}
-          </span>
-          <button v-else :disabled="!!saving" @click="switchTo('')">
-            {{ $t('admin.branding.activate') }}
-          </button>
-        </li>
-        <li v-for="b in brandings" :key="b.id" :class="{ active: activeId === b.id }">
-          <span class="branding-label">
-            {{ b.label || b.id }}
-            <code>{{ b.id }}</code>
-          </span>
-          <span v-if="activeId === b.id" class="branding-current">
-            {{ $t('admin.branding.current') }}
-          </span>
-          <button v-else :disabled="!!saving" @click="switchTo(b.id)">
-            {{ $t('admin.branding.activate') }}
-          </button>
+      <ul class="branding-list">
+        <!-- The framework default (vanilla) is just the first entry, rendered like any other
+             branding from its resolved config (brandingDefaults). -->
+        <li
+          v-for="entry in entries"
+          :key="entry.id || '(default)'"
+          class="branding-item"
+          :class="{ active: activeId === entry.id }"
+        >
+          <div class="branding-head">
+            <img
+              v-if="entry.config.logos && entry.config.logos.headerPath"
+              class="branding-logo"
+              :src="entry.config.logos.headerPath"
+              :alt="entry.label"
+            />
+            <span class="branding-title">
+              {{ entry.label }}
+              <code v-if="entry.id">{{ entry.id }}</code>
+            </span>
+            <span v-if="activeId === entry.id" class="badge badge-active">
+              ● {{ $t('admin.branding.current') }}
+            </span>
+            <button
+              v-else
+              class="btn btn-activate"
+              :disabled="!!saving"
+              @click="switchTo(entry.id)"
+            >
+              {{ $t('admin.branding.activate') }}
+            </button>
+            <!-- Deactivate only applies to a real brand (switch back to the default); the default
+                 itself has nothing below it to fall back to. -->
+            <button
+              v-if="activeId === entry.id && entry.id"
+              class="btn btn-deactivate"
+              :disabled="!!saving"
+              @click="switchTo('')"
+            >
+              {{ $t('admin.branding.deactivate') }}
+            </button>
+          </div>
+
+          <p v-if="entry.config.about && entry.config.about.description" class="branding-desc">
+            {{ entry.config.about.description }}
+          </p>
+
+          <dl v-if="entry.config.metadata" class="branding-details">
+            <div class="detail">
+              <dt>{{ $t('admin.branding.detail.organization') }}</dt>
+              <dd>
+                {{ entry.config.metadata.organizationName }}
+                <template v-if="entry.config.metadata.organizationJurisdiction">
+                  · {{ entry.config.metadata.organizationJurisdiction }}
+                </template>
+              </dd>
+            </div>
+            <div class="detail">
+              <dt>{{ $t('admin.branding.detail.appDescription') }}</dt>
+              <dd>{{ entry.config.metadata.applicationDescription }}</dd>
+            </div>
+            <div v-if="entry.config.about" class="detail">
+              <dt>{{ $t('admin.branding.detail.reuse') }}</dt>
+              <dd>
+                {{ $t('admin.branding.detail.logos') }}:
+                {{ reusable(entry.config.about.license.logosReusable) }} ·
+                {{ $t('admin.branding.detail.colors') }}:
+                {{ reusable(entry.config.about.license.colorsReusable) }}
+                <template v-if="entry.config.about.license.note">
+                  <br />
+                  <span class="license-note">{{ entry.config.about.license.note }}</span>
+                </template>
+              </dd>
+            </div>
+            <div class="detail">
+              <dt>
+                {{ $t('admin.branding.detail.themeColor') }}
+                <span class="tag-buildtime" :title="$t('admin.branding.buildtimeHint')">
+                  {{ $t('admin.branding.buildtime') }}
+                </span>
+              </dt>
+              <dd>
+                <span
+                  class="swatch"
+                  :style="{ backgroundColor: entry.config.metadata.themeColor }"
+                />
+                <code>{{ entry.config.metadata.themeColor }}</code>
+              </dd>
+            </div>
+            <div v-if="entry.config.links" class="detail">
+              <dt>{{ $t('admin.branding.detail.footer') }}</dt>
+              <dd>{{ entry.config.links.footerOrder.join(', ') }}</dd>
+            </div>
+            <div v-if="entry.config.assets" class="detail">
+              <dt>{{ $t('admin.branding.detail.pages') }}</dt>
+              <dd>{{ pageSummary(entry.config) }}</dd>
+            </div>
+            <div v-if="entry.config.assets && entry.config.assets.favicon" class="detail">
+              <dt>{{ $t('admin.branding.detail.favicon') }}</dt>
+              <dd><img class="favicon" :src="entry.config.assets.favicon" alt="favicon" /></dd>
+            </div>
+          </dl>
         </li>
       </ul>
-      <p v-else-if="$fetchState.pending">{{ $t('admin.branding.loading') }}</p>
-      <p v-else>{{ $t('admin.branding.none') }}</p>
+
+      <p v-if="$fetchState.pending" class="hint">{{ $t('admin.branding.loading') }}</p>
+      <p v-else-if="!brandings.length" class="hint">{{ $t('admin.branding.noneExtra') }}</p>
+
+      <p class="buildtime-legend">
+        <span class="tag-buildtime">{{ $t('admin.branding.buildtime') }}</span>
+        {{ $t('admin.branding.buildtimeLegend') }}
+      </p>
     </os-card>
   </div>
 </template>
 
 <script>
+import { brandingDefaults } from '@ocelot-social/branding'
 import { OsCard } from '@ocelot-social/ui'
 import { setActiveBrandingMutation } from '~/graphql/BrandingMutations'
 
@@ -42,29 +129,71 @@ export default {
   components: { OsCard },
   middleware: ['isAdmin'],
   // The list of baked-in brandings is a served asset (the branding-assets middleware writes
-  // /branding/manifest.json), not a backend query — fetch it client-side.
+  // /branding/manifest.json), not a backend query — fetch it client-side, plus each brand's
+  // resolved config (branding.json) for the detail view.
   fetchOnServer: false,
   data() {
     return {
       brandings: [],
+      details: {},
       saving: null,
     }
   },
   async fetch() {
+    let list = []
     try {
       const res = await fetch('/branding/manifest.json')
-      this.brandings = res.ok ? await res.json() : []
+      list = res.ok ? await res.json() : []
     } catch (error) {
-      this.brandings = []
+      list = []
     }
+    const details = {}
+    await Promise.all(
+      list.map(async (b) => {
+        try {
+          const res = await fetch(b.config)
+          if (res.ok) details[b.id] = await res.json()
+        } catch (error) {
+          // detail view degrades gracefully when a config can't be loaded
+        }
+      }),
+    )
+    this.brandings = list
+    this.details = details
   },
   computed: {
     // The live active branding id ('' = framework default). Kept live by the policy subscription.
     activeId() {
       return this.$policy.get('activeBranding') || ''
     },
+    // The default brand is the first entry and behaves like any other: its resolved config is the
+    // framework defaults (brandingDefaults). Baked brandings follow, each with its fetched config.
+    entries() {
+      return [
+        { id: '', label: this.$t('admin.branding.vanilla'), config: brandingDefaults },
+        ...this.brandings.map((b) => ({
+          id: b.id,
+          label: b.label || b.id,
+          config: this.details[b.id] || {},
+        })),
+      ]
+    },
   },
   methods: {
+    reusable(value) {
+      return value ? '✓' : '✗'
+    },
+    pageSummary(config) {
+      const html = (config.assets && config.assets.html) || {}
+      const pages = Object.keys(html)
+      const locales = new Set()
+      for (const page of pages) Object.keys(html[page] || {}).forEach((l) => locales.add(l))
+      if (!pages.length) return this.$t('admin.branding.detail.noPages')
+      return this.$t('admin.branding.detail.pagesSummary', {
+        pages: pages.length,
+        locales: [...locales].join(', '),
+      })
+    },
     async switchTo(id) {
       this.saving = id || 'vanilla'
       try {
@@ -88,21 +217,122 @@ export default {
 .branding-list {
   list-style: none;
   padding: 0;
+}
 
-  li {
+.branding-item {
+  padding: $space-small 0;
+  border-bottom: 1px solid $border-color-softer;
+
+  &.active {
+    border-left: 3px solid $color-success;
+    padding-left: $space-small;
+  }
+}
+
+.branding-head {
+  display: flex;
+  align-items: center;
+  gap: $space-small;
+}
+
+.branding-logo {
+  height: 24px;
+  width: auto;
+}
+
+.branding-title {
+  flex: 1;
+  font-weight: $font-weight-bold;
+}
+
+.badge-active {
+  color: $color-success;
+  font-weight: $font-weight-bold;
+}
+
+.btn {
+  border: none;
+  border-radius: 4px;
+  padding: 4px 12px;
+  cursor: pointer;
+  color: $color-primary-inverse;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+.btn-activate {
+  background-color: $color-success;
+}
+
+.btn-deactivate {
+  background-color: $color-danger;
+}
+
+.branding-desc {
+  margin: 4px 0 0;
+  color: $text-color-soft;
+}
+
+.license-note {
+  font-style: italic;
+}
+
+.branding-details {
+  margin: $space-small 0 0;
+
+  .detail {
     display: flex;
-    align-items: center;
     gap: $space-small;
-    padding: $space-small 0;
-    border-bottom: 1px solid $border-color-softer;
+    padding: 2px 0;
 
-    &.active {
-      font-weight: $font-weight-bold;
+    dt {
+      flex: 0 0 30%;
+      color: $text-color-soft;
+    }
+
+    dd {
+      flex: 1;
+      margin: 0;
     }
   }
+}
 
-  .branding-label {
-    flex: 1;
-  }
+.swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid $border-color-softer;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+.favicon {
+  height: 16px;
+  width: 16px;
+}
+
+.tag-buildtime {
+  display: inline-block;
+  font-size: 0.75em;
+  text-transform: uppercase;
+  color: $color-warning;
+  border: 1px solid $color-warning;
+  border-radius: 3px;
+  padding: 0 4px;
+  margin-left: 4px;
+}
+
+.hint {
+  color: $text-color-soft;
+}
+
+.buildtime-legend {
+  margin-top: $space-base;
+  font-size: 0.9em;
+  color: $text-color-soft;
 }
 </style>
