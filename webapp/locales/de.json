@@ -20,7 +20,6 @@
       "description": "Wähle, welches eingebackene Branding netzwerkweit aktiv ist. Das Umschalten lädt die App für alle neu.",
       "current": "Aktiv",
       "activate": "Aktivieren",
-      "deactivate": "Deaktivieren",
       "vanilla": "Standard (kein Branding)",
       "none": "In dieser Instanz ist kein Branding eingebacken.",
       "noneExtra": "In dieser Instanz sind keine weiteren Brandings eingebacken — nur der Standard ist verfügbar.",

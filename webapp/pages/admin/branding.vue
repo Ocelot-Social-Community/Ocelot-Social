@@ -27,6 +27,8 @@
             <span v-if="activeId === entry.id" class="badge badge-active">
               ● {{ $t('admin.branding.current') }}
             </span>
+            <!-- No deactivate: switching to the default entry (vanilla) is how you turn a brand off,
+                 so the default behaves exactly like any other brand — active or activatable. -->
             <button
               v-else
               class="btn btn-activate"
@@ -34,16 +36,6 @@
               @click="switchTo(entry.id)"
             >
               {{ $t('admin.branding.activate') }}
-            </button>
-            <!-- Deactivate only applies to a real brand (switch back to the default); the default
-                 itself has nothing below it to fall back to. -->
-            <button
-              v-if="activeId === entry.id && entry.id"
-              class="btn btn-deactivate"
-              :disabled="!!saving"
-              @click="switchTo('')"
-            >
-              {{ $t('admin.branding.deactivate') }}
             </button>
           </div>
 
@@ -265,10 +257,6 @@ export default {
 
 .btn-activate {
   background-color: $color-success;
-}
-
-.btn-deactivate {
-  background-color: $color-danger;
 }
 
 .branding-desc {

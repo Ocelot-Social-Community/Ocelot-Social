@@ -20,7 +20,6 @@
       "description": "Choose which baked-in branding is active network-wide. Switching reloads the app for everyone.",
       "current": "Active",
       "activate": "Activate",
-      "deactivate": "Deactivate",
       "vanilla": "Framework default (no branding)",
       "none": "No brandings are baked into this instance.",
       "noneExtra": "No additional brandings are baked into this instance — only the framework default is available.",
