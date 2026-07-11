@@ -122,6 +122,32 @@ describe('GroupMemberList.vue', () => {
     })
   })
 
+  describe('toggleVisibility', () => {
+    it('optimistically toggles showOnProfile and calls mutate', async () => {
+      mockApollo.mutate.mockResolvedValue({})
+      const group = { id: 'g1', groupType: 'public', myRole: 'usual', showOnProfile: true }
+      const wrapper = Wrapper({}, [group])
+      await wrapper.vm.toggleVisibility(group)
+      expect(group.showOnProfile).toBe(false)
+      expect(mockApollo.mutate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: { groupId: 'g1', showOnProfile: false },
+        }),
+      )
+      expect(wrapper.vm._skipNextSubscriptionReload).toBe(true)
+    })
+
+    it('rolls back showOnProfile and resets _skipNextSubscriptionReload on error', async () => {
+      mockApollo.mutate.mockRejectedValue(new Error('Server error'))
+      const group = { id: 'g1', groupType: 'public', myRole: 'usual', showOnProfile: false }
+      const wrapper = Wrapper({}, [group])
+      await wrapper.vm.toggleVisibility(group)
+      expect(group.showOnProfile).toBe(false)
+      expect(wrapper.vm._skipNextSubscriptionReload).toBe(false)
+      expect(wrapper.vm.$toast.error).toHaveBeenCalledWith('Server error')
+    })
+  })
+
   describe('typesWithGroups', () => {
     describe('when myProfile = false', () => {
       it('returns only "other" when viewer has no shared groups', () => {

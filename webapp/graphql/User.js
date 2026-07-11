@@ -40,6 +40,9 @@ export const profileUserQuery = (i18n) => {
 }
 
 export const followConnectionsQuery = (type, i18n) => {
+  if (!['following', 'followedBy'].includes(type)) {
+    throw new Error(`followConnectionsQuery: invalid type "${type}"`)
+  }
   const lang = i18n.locale().toUpperCase()
   const countField = `${type}Count`
   return gql`

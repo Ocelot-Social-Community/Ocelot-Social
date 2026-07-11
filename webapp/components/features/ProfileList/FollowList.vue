@@ -32,7 +32,11 @@ export default {
   props: {
     userId: { type: String, required: true },
     userName: { type: String, default: '' },
-    type: { type: String, default: 'following' },
+    type: {
+      type: String,
+      default: 'following',
+      validator: (v) => ['following', 'followedBy'].includes(v),
+    },
   },
   data() {
     return {
@@ -65,7 +69,7 @@ export default {
         this.loadingConnections = true
         this.connections = []
         this.allLoaded = false
-        this.totalCount = 0
+        this.totalCount = null
       } else {
         this.loadingMore = true
       }

@@ -158,6 +158,21 @@ describe('FollowList.vue', () => {
     })
   })
 
+  describe('error handling', () => {
+    it('shows toast and resets loading flags on query error', async () => {
+      const wrapper = Wrapper()
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+
+      mockApollo.query.mockRejectedValue(new Error('Network error'))
+      await wrapper.vm.loadConnections(0)
+
+      expect(wrapper.vm.$toast.error).toHaveBeenCalledWith('Network error')
+      expect(wrapper.vm.loadingConnections).toBe(false)
+      expect(wrapper.vm.loadingMore).toBe(false)
+    })
+  })
+
   describe('type=followedBy', () => {
     it('queries the followedBy field', async () => {
       const wrapper = Wrapper(

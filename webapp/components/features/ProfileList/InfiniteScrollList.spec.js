@@ -144,6 +144,24 @@ describe('InfiniteScrollList.vue', () => {
       expect(wrapper.emitted('load-more')).toBeFalsy()
     })
 
+    it('emits scrolling-change true on first scroll', () => {
+      jest.useFakeTimers()
+      const wrapper = Wrapper({ hasMore: false })
+      wrapper.vm.onScroll()
+      expect(wrapper.emitted('scrolling-change')).toEqual([[true]])
+      jest.useRealTimers()
+    })
+
+    it('emits scrolling-change false after 800ms', () => {
+      jest.useFakeTimers()
+      const wrapper = Wrapper({ hasMore: false })
+      wrapper.vm.onScroll()
+      jest.advanceTimersByTime(800)
+      const emitted = wrapper.emitted('scrolling-change')
+      expect(emitted[emitted.length - 1]).toEqual([false])
+      jest.useRealTimers()
+    })
+
     it('adds is-scrolling class on scroll', () => {
       jest.useFakeTimers()
       const wrapper = Wrapper({ hasMore: false })

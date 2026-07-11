@@ -590,14 +590,11 @@ export default {
       this.followHovered = false
       this.followLoading = true
 
-      // optimistic update
-      const currentUser = this.$store.getters['auth/user']
+      // optimistic update — only fields loaded by profileUserQuery
       if (follow) {
         this.user.followedByCount++
-        this.user.followedBy = [currentUser, ...this.user.followedBy]
       } else {
         this.user.followedByCount--
-        this.user.followedBy = this.user.followedBy.filter((u) => u.id !== currentUser.id)
       }
       this.user.followedByCurrentUser = follow
 
@@ -608,17 +605,14 @@ export default {
       if (success) {
         this.user.followedByCount = data.followedByCount
         this.user.followedByCurrentUser = data.followedByCurrentUser
-        this.user.followedBy = data.followedBy
       } else {
         // rollback optimistic update
         this.$toast.error(this.$t('followButton.error'))
         this.user.followedByCurrentUser = !follow
         if (follow) {
           this.user.followedByCount--
-          this.user.followedBy = this.user.followedBy.filter((u) => u.id !== currentUser.id)
         } else {
           this.user.followedByCount++
-          this.user.followedBy = [currentUser, ...this.user.followedBy]
         }
       }
       this.followLoading = false
