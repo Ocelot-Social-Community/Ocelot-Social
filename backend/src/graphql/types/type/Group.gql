@@ -115,7 +115,6 @@ type Query {
   "List a group's members. Visibility depends on the viewer's relation to the group. Set `includePending` to also return unapproved join requests (for admins/owners). Set `nameFilter` (min. 3 chars recommended) to search by display name."
   GroupMembers(id: ID!, first: Int, offset: Int, includePending: Boolean, nameFilter: String): [GroupMember]
   # orderBy: [_UserOrdering] # not implemented yet
-  # filter: _UserFilter # not implemented yet
 
   "Count groups, optionally restricted to the current user's memberships. Requires authentication."
   GroupCount(isMember: Boolean): Int
