@@ -215,7 +215,9 @@ export default {
 
   &.active {
     // inset shadow marks the active item without taking layout space (no per-item indent).
-    box-shadow: inset 3px 0 0 $color-success;
+    // Brand-themed via $color-primary (var(--color-primary)-backed); vanilla stays green
+    // ($color-primary == $color-success there).
+    box-shadow: inset 3px 0 0 $color-primary;
   }
 }
 
@@ -241,7 +243,8 @@ export default {
 }
 
 .badge-active {
-  color: $color-success;
+  // Brand-themed (see .btn-activate) — vanilla unchanged since $color-primary == $color-success.
+  color: $color-primary;
   font-weight: $font-weight-bold;
 }
 
@@ -259,7 +262,10 @@ export default {
 }
 
 .btn-activate {
-  background-color: $color-success;
+  // Brand-themed: $color-primary is var(--color-primary)-backed, so this follows the active brand's
+  // colour. In vanilla ocelot $color-primary == $color-success (both green), so the default is
+  // unchanged; a branded instance gets its own primary instead of the hard success green.
+  background-color: $color-primary;
 }
 
 .branding-desc {

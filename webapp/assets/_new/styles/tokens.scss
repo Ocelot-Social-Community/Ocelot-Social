@@ -410,8 +410,13 @@ $color-toast-green: var(--color-toast-green, #{$color-success});
 
 $color-ribbon-announcement: $background-color-warning;
 $color-ribbon-announcement-shadow: color.adjust($color-ribbon-announcement, $lightness: -20%,);
-$color-ribbon-article: $background-color-secondary-active;
-$color-ribbon-article-shadow: color.adjust($color-ribbon-article, $lightness: -20%);
+// Runtime-themeable (var-backed): a brand sets --color-ribbon-article via theme.cssVars and the
+// article ribbon re-themes without a rebuild; unset → the vanilla literal below (unchanged).
+$color-ribbon-article: var(--color-ribbon-article, #{$background-color-secondary-active});
+$color-ribbon-article-shadow: var(
+  --color-ribbon-article-shadow,
+  #{color.adjust($background-color-secondary-active, $lightness: -20%)}
+);
 $color-ribbon-event: $background-color-third-active;
 $color-ribbon-event-shadow: color.adjust($color-ribbon-event, $lightness: -20%);
 
