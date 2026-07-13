@@ -3,9 +3,9 @@
 // replaces. Array-replace is the intended semantics for branding config (a brand replacing a
 // menu / footer list wants the whole list, not an element-wise merge).
 
-import { brandingDefaults } from './defaults'
+import { brandingDefaults } from './defaults.js'
 
-import type { BrandingConfig, BrandingOverrides } from './schema'
+import type { BrandingConfig, BrandingOverrides } from './schema.js'
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)

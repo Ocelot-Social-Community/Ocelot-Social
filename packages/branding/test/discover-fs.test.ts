@@ -28,7 +28,13 @@ after(() => {
 })
 
 // A real `<id>.tar.gz` buffer: manifest + a theme fragment (primary colour) + identity fragment (name).
-function archiveGz({ id, version = null, primary = 'green', appName = id }) {
+function archiveGz({
+  id,
+  version = null,
+  schemaVersion = '0.0.1',
+  primary = 'green',
+  appName = id,
+}) {
   const instances = [
     { type: 'theme', name: 'default', file: 'fragments/theme.default.json' },
     { type: 'identity', name: 'default', file: 'fragments/identity.default.json' },
@@ -36,7 +42,7 @@ function archiveGz({ id, version = null, primary = 'green', appName = id }) {
   return writeTarGz([
     {
       name: 'manifest.json',
-      data: Buffer.from(JSON.stringify({ id, version, label: appName, instances })),
+      data: Buffer.from(JSON.stringify({ id, version, schemaVersion, label: appName, instances })),
     },
     {
       name: 'fragments/theme.default.json',
@@ -63,6 +69,8 @@ test('discoverArchives finds *.tar.gz recursively and keys them by manifest id',
   const found = discoverArchives(base)
   assert.deepEqual([...found.keys()].sort(), ['acme', 'yunite'])
   assert.equal(found.get('acme').id, 'acme')
+  // the schema version the archive was built with is surfaced for compat checks
+  assert.equal(found.get('acme').schemaVersion, '0.0.1')
 })
 
 test('discoverArchives dedupes duplicate ids to the HIGHEST version', () => {

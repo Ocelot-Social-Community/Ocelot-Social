@@ -10,9 +10,9 @@
 //
 // Pure (no node deps) so both webapp and backend — and the admin composition UI — can import it.
 
-import { brandingDefaults } from './defaults'
+import { brandingDefaults } from './defaults.js'
 
-import type { BrandingConfig, DeepPartial } from './schema'
+import type { BrandingConfig, DeepPartial } from './schema.js'
 
 export type BucketName = 'theme' | 'identity' | 'logos' | 'legal' | 'navigation' | 'behavior'
 

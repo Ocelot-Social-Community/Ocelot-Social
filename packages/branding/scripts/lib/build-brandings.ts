@@ -1,18 +1,18 @@
-// Core of the brand build, shared by build-brand-archive.mts (single-brand CLI + --watch), the dev
-// scanner (build-dev-brandings.mts) and the maintenance generator (build-maintenance-branding.mts).
+// Core of the brand build, shared by build-brand-archive.ts (single-brand CLI + --watch), the dev
+// scanner (build-dev-brandings.ts) and the maintenance generator (build-maintenance-branding.ts).
 // Bundles a brand into ONE `<id>.tar.gz` as a LIBRARY of bucket instances: manifest.json +
 // fragments/<type>.<name>.json (one sparse fragment per instance) + assets/ + html/. Consumers (webapp
 // serverMiddleware, branding plugin, backend bootstrap, maintenance) read the manifest and COMPOSE the
 // effective config (discover.composeArchive). See docu/branding-buckets-konzept.md.
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
 
 import { BUCKET_NAMES, extractBucket, instanceFile, splitConfig } from '../../dist/buckets.js'
 import { brandingDefaults } from '../../dist/defaults.js'
 import { writeTarGz } from '../../dist/tar.js'
+import { SCHEMA_VERSION } from '../../dist/version.js'
 
-import { loadConfig } from './load-config.mts'
+import { loadConfig } from './load-config.ts'
 
 import type { ArchiveInstanceEntry } from '../../dist/buckets.js'
 import type { BrandingConfig } from '../../dist/index.js'
@@ -40,18 +40,6 @@ export interface PublishedArchive extends BuiltArchive {
   latest: string
   versioned: string | null
 }
-
-// Version of THIS @ocelot-social/branding package — baked into every manifest as the schema/API
-// compatibility axis (docu/branding-buckets-konzept.md §11), distinct from the brand's own version.
-// Read from the package.json two dirs up (works from source and from an installed copy).
-const SCHEMA_VERSION: string | null = (() => {
-  try {
-    const pkg = fileURLToPath(new URL('../../package.json', import.meta.url))
-    return (JSON.parse(readFileSync(pkg, 'utf8')) as { version?: string }).version ?? null
-  } catch {
-    return null
-  }
-})()
 
 // Recursively collect a directory's files as tar entries keyed by their path relative to the brand
 // root (e.g. dir='assets' → 'assets/logo.svg').

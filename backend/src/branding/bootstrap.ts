@@ -9,7 +9,7 @@
 // written when a brand is baked in as default theme); neither → framework defaults (vanilla image
 // runs as-is). This lets a pre-built image be branded without a rebuild — see
 // docu/branding-architecture-konzept.md.
-import { setBranding } from '@ocelot-social/branding'
+import { checkSchemaCompat, describeSchemaCompat, setBranding } from '@ocelot-social/branding'
 // eslint-disable-next-line import-x/no-unresolved -- package subpath (server-only, uses node:fs + node:zlib)
 import {
   discoverArchives,
@@ -26,6 +26,16 @@ const active = assetsDir
 if (assetsDir && active) {
   try {
     const archive = discoverArchives(assetsDir).get(active)
+    if (archive) {
+      // Warn when the archive was built against a different branding SCHEMA than this runtime — a
+      // newer archive may reference config this backend doesn't understand; older just misses new
+      // fields (compose falls back to defaults). Never fatal — the config still loads.
+      const compat = checkSchemaCompat(archive.schemaVersion)
+      if (compat !== 'ok') {
+        // eslint-disable-next-line no-console
+        console.warn(`[branding] ${describeSchemaCompat(compat, archive.schemaVersion) ?? ''}`)
+      }
+    }
     // Compose the effective config from the archive's instance fragments (manifest + fragments/).
     const config = archive ? readArchiveConfig(archive.file) : null
     if (config) {

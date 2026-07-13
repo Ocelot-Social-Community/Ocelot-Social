@@ -13,15 +13,17 @@
 // `import branding` unchanged. (Module-scope reads that CAPTURE a value at import time see whatever
 // is current then — see docu/branding-architecture-konzept.md for the build-vs-runtime split.)
 
-import { defineBranding } from './merge'
+import { defineBranding } from './merge.js'
 
-import type { BrandingConfig } from './schema'
+import type { BrandingConfig } from './schema.js'
 
-export type * from './schema'
-export * from './buckets'
-export * from './theme'
-export { brandingDefaults } from './defaults'
-export { defineBranding } from './merge'
+export type * from './schema.js'
+export * from './buckets.js'
+export * from './theme.js'
+export * from './compat.js'
+export { SCHEMA_VERSION } from './version.js'
+export { brandingDefaults } from './defaults.js'
+export { defineBranding } from './merge.js'
 
 const GLOBAL_KEY = '__OCELOT_BRANDING__'
 

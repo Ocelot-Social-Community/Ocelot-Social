@@ -12,7 +12,7 @@ import { existsSync, readdirSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { findConfig, publishBrandArchive } from './lib/build-brandings.mts'
+import { findConfig, publishBrandArchive } from './lib/build-brandings.ts'
 
 const scriptDir = dirname(fileURLToPath(import.meta.url))
 // packages/branding/scripts → repo root

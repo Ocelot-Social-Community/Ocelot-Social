@@ -2,7 +2,7 @@
 // these; a brand overrides a sparse subset. Values previously lived in the per-domain constants
 // files of backend and webapp (which had already drifted apart — the point of one shared source).
 
-import type { BrandingConfig } from './schema'
+import type { BrandingConfig } from './schema.js'
 
 export const brandingDefaults: BrandingConfig = {
   about: {

@@ -18,7 +18,7 @@ import { composeArchive } from '../dist/discover.js'
 import { readTarGz } from '../dist/tar.js'
 import { resolveThemeColor } from '../dist/theme.js'
 
-import { buildBrandArchive } from './lib/build-brandings.mts'
+import { buildBrandArchive } from './lib/build-brandings.ts'
 
 const [brandArg, maintenanceArg] = process.argv.slice(2)
 if (!brandArg || !maintenanceArg) {

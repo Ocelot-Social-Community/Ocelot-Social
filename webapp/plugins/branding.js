@@ -81,6 +81,19 @@ async function loadServerBranding(discover) {
   }
   if (base && !archives.has(base)) base = '' // unknown base id → vanilla base
 
+  // Warn (server log) when the resolved base archive was built against a different branding SCHEMA
+  // than this webapp runtime — a newer archive may reference config the app can't render; older just
+  // misses new fields. Never fatal.
+  if (base) {
+    const compat = discover.checkSchemaCompat(archives.get(base).schemaVersion)
+    if (compat !== 'ok') {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[branding] ${discover.describeSchemaCompat(compat, archives.get(base).schemaVersion) || ''}`,
+      )
+    }
+  }
+
   // Per-slot overrides layered over the base (theme of one brand + identity of another, …).
   const rawComposition = (policy && policy.composition) || ''
   let composition = {}

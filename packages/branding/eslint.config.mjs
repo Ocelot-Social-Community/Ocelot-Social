@@ -32,23 +32,26 @@ export default [
       // The only callbacks here are a synchronous leaf-visitor and fs.watch — no promises involved, so
       // "prefer async/await" does not apply.
       'promise/prefer-await-to-callbacks': 'off',
+      // The package is ESM ("type": "module"), so relative imports MUST carry the explicit `.js`
+      // extension — this rule (which forbids extensions) is the wrong default for an ESM package.
+      'n/file-extension-in-import': 'off',
     },
   },
   {
     // Hoisted function declarations may be referenced above their definition (discover.ts orders its
     // public API before private helpers on purpose). Variables/classes are still guarded. Scoped to a
     // block that registers the tseslint plugin (flat-config requires the plugin in the same object).
-    files: ['**/*.ts', '**/*.mts'],
+    files: ['**/*.ts'],
     plugins: { '@typescript-eslint': tsPlugin },
     rules: {
       '@typescript-eslint/no-use-before-define': ['error', { functions: false }],
     },
   },
   {
-    // Build scripts (.mts, run via Node type-stripping) import the COMPILED `../dist` by explicit path —
+    // Build scripts (.ts, run via Node type-stripping) import the COMPILED `../dist` by explicit path —
     // mandatory for ESM Node, no in-package alias to route through. They are CLIs (stdout is output) and
     // log tiny numbers (file counts / byte sizes) in template literals.
-    files: ['scripts/**/*.mts'],
+    files: ['scripts/**/*.ts'],
     rules: {
       'import-x/no-relative-parent-imports': 'off',
       'import-x/extensions': 'off',
@@ -61,7 +64,7 @@ export default [
     // The brand-config loader is a sandboxed evaluator: it type-checks a brand's `.ts` config against
     // the schema, then transpiles + evaluates it with an injected require. Dynamic require, the Function
     // evaluator and the local CommonJS `module.exports` interop ARE its purpose, not an oversight.
-    files: ['scripts/lib/load-config.mts'],
+    files: ['scripts/lib/load-config.ts'],
     rules: {
       'import-x/no-commonjs': 'off',
       'import-x/no-dynamic-require': 'off',
@@ -78,10 +81,10 @@ export default [
     },
   },
   {
-    // Tests (.mts, run via `node --test` type-stripping) are validated by RUNNING, not by tsc — they are
+    // Tests (.ts, run via `node --test` type-stripping) are validated by RUNNING, not by tsc — they are
     // deliberately outside the type-checked project (see tsconfig.json). Lint them syntactically only,
     // and grant the same dist-import relaxations the scripts get.
-    files: ['test/**/*.mts'],
+    files: ['test/**/*.ts'],
     ...tsConfigs.disableTypeChecked,
     languageOptions: {
       parserOptions: { projectService: false, project: false },

@@ -23,7 +23,7 @@
 import { watch, writeFileSync } from 'node:fs'
 import { basename, resolve } from 'node:path'
 
-import { buildBrandArchive, publishBrandArchive } from './lib/build-brandings.mts'
+import { buildBrandArchive, publishBrandArchive } from './lib/build-brandings.ts'
 
 const rest = process.argv.slice(2)
 const isWatch = rest.includes('--watch')

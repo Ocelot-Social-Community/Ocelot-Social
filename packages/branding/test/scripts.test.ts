@@ -16,7 +16,7 @@ import {
   buildBrandArchive,
   findConfig,
   publishBrandArchive,
-} from '../scripts/lib/build-brandings.mts'
+} from '../scripts/lib/build-brandings.ts'
 
 const roots = []
 after(() => {

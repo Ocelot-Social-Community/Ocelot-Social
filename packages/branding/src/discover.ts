@@ -11,11 +11,15 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { BUCKET_NAMES, composeConfig, parseSource } from './buckets'
-import { readTarGz } from './tar'
+import { BUCKET_NAMES, composeConfig, parseSource } from './buckets.js'
+import { readTarGz } from './tar.js'
 
-import type { ArchiveManifest, BucketName } from './buckets'
-import type { BrandingConfig, DeepPartial } from './schema'
+import type { ArchiveManifest, BucketName } from './buckets.js'
+import type { BrandingConfig, DeepPartial } from './schema.js'
+
+// Re-exported so a server-only consumer that already imports this subpath (webapp plugin) gets the
+// schema-compat check without a second import. compat is pure (no node deps).
+export { checkSchemaCompat, describeSchemaCompat } from './compat.js'
 
 /** A composition map: each bucket slot → a source string (`id[@version][/name]`); `_default` is the
  *  base for unspecified slots (typically the `activeBranding` id). An empty/absent slot → framework
@@ -25,6 +29,8 @@ export type CompositionMap = Partial<Record<BucketName | '_default', string>>
 export interface BrandArchive {
   id: string
   version: string | null
+  /** The @ocelot-social/branding schema version the archive was built with — feed to checkSchemaCompat. */
+  schemaVersion: string | null
   label: string
   file: string
 }
@@ -33,6 +39,7 @@ interface CachedMeta {
   mtimeMs: number
   id: string
   version: string | null
+  schemaVersion: string | null
   label: string
 }
 
@@ -90,6 +97,7 @@ function readMeta(file: string): CachedMeta | null {
       mtimeMs: stat.mtimeMs,
       id: manifest.id,
       version: typeof manifest.version === 'string' ? manifest.version : null,
+      schemaVersion: typeof manifest.schemaVersion === 'string' ? manifest.schemaVersion : null,
       label: typeof manifest.label === 'string' ? manifest.label : manifest.id,
     }
     metaCache.set(file, meta)
@@ -206,7 +214,13 @@ export function discoverArchives(baseDir: string): Map<string, BrandArchive> {
     if (!meta) continue
     const existing = byId.get(meta.id)
     if (!existing || compareVersions(meta.version, existing.version) > 0) {
-      byId.set(meta.id, { id: meta.id, version: meta.version, label: meta.label, file })
+      byId.set(meta.id, {
+        id: meta.id,
+        version: meta.version,
+        schemaVersion: meta.schemaVersion,
+        label: meta.label,
+        file,
+      })
     }
   }
   return byId
