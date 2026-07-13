@@ -123,6 +123,9 @@ test('parseSource / formatSource round-trip the source address grammar', () => {
   assert.deepEqual(parseSource('acme@1.2.0/dark'), { id: 'acme', version: '1.2.0', name: 'dark' })
   assert.equal(parseSource(''), null)
   assert.equal(parseSource(undefined), null)
+  // '@default' (no id, only a version marker) resolves to null → framework default. The admin uses
+  // it as the sentinel slot source for "framework default (vanilla)".
+  assert.equal(parseSource('@default'), null)
   assert.equal(formatSource({ id: 'acme' }), 'acme')
   assert.equal(formatSource({ id: 'acme', name: 'dark' }), 'acme/dark')
   assert.equal(formatSource({ id: 'acme', version: '1.2.0', name: 'dark' }), 'acme@1.2.0/dark')

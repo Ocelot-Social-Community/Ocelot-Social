@@ -43,6 +43,13 @@
         "description": "Configure each bucket's source, layered over the base package ({base}). Changing a bucket reloads the app for everyone.",
         "wholePackage": "Complete package (all buckets)",
         "inherit": "Inherit from package ({base})",
+        "frameworkDefault": "Framework default (vanilla)",
+        "defaultTag": "default",
+        "details": "Show details",
+        "from": "From: {source}",
+        "change": "Change {from} → {to}",
+        "confirm": "Apply",
+        "noDetails": "No values (framework default).",
         "bucket": {
           "theme": "Theme (colours, fonts)",
           "identity": "Identity (name, organisation)",

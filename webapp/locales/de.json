@@ -43,6 +43,13 @@
         "description": "Für jeden Bereich die Quelle festlegen, über dem Gesamtpaket ({base}). Eine Änderung lädt die App für alle neu.",
         "wholePackage": "Gesamtpaket (alle Bereiche)",
         "inherit": "Vom Gesamtpaket erben ({base})",
+        "frameworkDefault": "Framework-Standard (Vanilla)",
+        "defaultTag": "Standard",
+        "details": "Details anzeigen",
+        "from": "Aus: {source}",
+        "change": "Wechsel {from} → {to}",
+        "confirm": "Übernehmen",
+        "noDetails": "Keine Werte (Framework-Standard).",
         "bucket": {
           "theme": "Design (Farben, Schriften)",
           "identity": "Identität (Name, Organisation)",

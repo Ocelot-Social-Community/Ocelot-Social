@@ -8,6 +8,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSy
 import { basename, join, resolve } from 'node:path'
 
 import { BUCKET_NAMES, instanceFile, splitConfig } from '../../dist/buckets.js'
+import { brandingDefaults } from '../../dist/defaults.js'
 import { writeTarGz } from '../../dist/tar.js'
 
 import { loadConfig } from './load-config.mjs'
@@ -113,6 +114,18 @@ export async function buildBrandArchive(brandDir) {
   const configPath = findConfig(dir)
   if (!configPath) throw new Error(`no brand.config.(ts|mjs|js) in ${dir}`)
   const config = await loadConfig(configPath)
+  // OG image: if the brand didn't set its own, follow its squared logo (logos.signupPath). The old
+  // deploy baked the brand's `static/img/custom/logo-squared.*` over the vanilla file; at runtime the
+  // brand's logo lives under /branding/<id>/… instead, so derive the OG image from it — otherwise a
+  // brand's link previews would show the vanilla ocelot logo (the untouched default path).
+  const defaults = brandingDefaults
+  if (
+    config.metadata?.ogImage === defaults.metadata.ogImage &&
+    config.logos?.signupPath &&
+    config.logos.signupPath !== defaults.logos.signupPath
+  ) {
+    config.metadata.ogImage = config.logos.signupPath
+  }
   const namespaced = namespaceConfig(config, id, dir, warnings)
   // Stamp the brand id into branding.json so consumers can discover archives by content (the file
   // name may be versioned, e.g. `<id>-1.2.3.tar.gz`) — see src/discover.ts.

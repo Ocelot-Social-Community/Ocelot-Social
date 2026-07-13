@@ -21,6 +21,7 @@ import type { BrandingConfig } from './schema'
 
 export * from './schema'
 export * from './buckets'
+export * from './theme'
 export { brandingDefaults } from './defaults'
 export { defineBranding } from './merge'
 
