@@ -74,7 +74,24 @@ The breaking axis is the **major** version once ≥ 1.0.0, and the **minor** whi
 | `npm run test`        | `node --test` (TypeScript via native type‑stripping)                      |
 | `npm run test:coverage` | tests with a coverage gate (lines/functions ≥ 95, branches ≥ 82)        |
 | `npm run validate`    | `publint` + `are-the-types-wrong` (published‑package correctness)         |
+| `npm run schema:snapshot` | Regenerate the schema‑shape lock after an intentional schema change   |
 | `npm run check`       | build → lint → typecheck → test:coverage → validate                       |
+
+## Changing the schema
+
+The schema **shape** (the set of config leaf paths + their types + the bucket partition) is locked by a
+committed snapshot (`test/schema-shape.snapshot.json`). Any add/remove/rename/retype of a field, or a
+bucket reassignment, fails the `SCHEMA SHAPE LOCK` test — a shape change cannot ship unnoticed. When the
+change is intentional:
+
+1. Commit it as `feat(branding):` / `fix(branding):` so release-please bumps `SCHEMA_VERSION` (the
+   archive‑compatibility axis surfaced via `checkSchemaCompat`). `SCHEMA_VERSION` (`src/version.ts`) is
+   bumped in lock‑step with `package.json` by release-please (`extra-files`).
+2. Run `npm run schema:snapshot` and commit the updated snapshot (its diff shows exactly which paths
+   changed — useful for review).
+
+A default *value* change (e.g. `group.nameLengthMax` 50 → 60) is **not** a shape change and does not
+trip the lock: old and new archives stay structurally compatible.
 
 ## License
 

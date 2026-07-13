@@ -27,6 +27,7 @@
     "test:coverage": "npm run build && node --test --experimental-test-coverage --test-coverage-lines=95 --test-coverage-functions=95 --test-coverage-branches=82 test/*.test.ts",
     "check": "npm run build && npm run lint && npm run typecheck && npm run test:coverage && npm run validate",
     "build:dev-brandings": "node scripts/build-dev-brandings.ts",
+    "schema:snapshot": "npm run build && node scripts/schema-snapshot.ts",
     "prepack": "npm run build"
   },
   "devDependencies": {

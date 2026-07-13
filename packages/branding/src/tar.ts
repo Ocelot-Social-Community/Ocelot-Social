@@ -10,16 +10,26 @@ import { gunzipSync, gzipSync } from 'node:zlib'
 
 import { createTar, parseTar } from 'nanotar'
 
+// Sanity ceiling on the DECOMPRESSED size of an archive. A brand archive is normally tens of KB to a
+// few MB (logos + fonts + html); this caps a gzip-bomb's blowup (a tiny .gz that inflates to GBs) so a
+// hostile/corrupt archive throws instead of OOMing the process — relevant once archives can be uploaded
+// (docu/branding-buckets-konzept.md §12), harmless for the trusted baked/dev archives of today.
+export const MAX_ARCHIVE_BYTES = 128 * 1024 * 1024
+
 /** Bundle `[{ name, data }]` file entries into a gzipped tar buffer. */
 export function writeTarGz(entries: { name: string; data: Buffer }[]): Buffer {
   return gzipSync(createTar(entries))
 }
 
-/** Read a gzipped tar buffer into a map of `relative/path → file contents`. */
-export function readTarGz(gz: Buffer): Map<string, Buffer> {
+/** Read a gzipped tar buffer into a map of `relative/path → file contents`. Throws when the archive
+ *  decompresses beyond `maxOutputBytes` (gzip-bomb guard). */
+export function readTarGz(
+  gz: Buffer,
+  maxOutputBytes: number = MAX_ARCHIVE_BYTES,
+): Map<string, Buffer> {
   // gunzipSync returns a POOLED Buffer (non-zero byteOffset); nanotar's parseTar reads from the
   // underlying ArrayBuffer's offset 0, so hand it a normalized, offset-0 view or it misreads.
-  const tar = new Uint8Array(gunzipSync(gz))
+  const tar = new Uint8Array(gunzipSync(gz, { maxOutputLength: maxOutputBytes }))
   const files = new Map<string, Buffer>()
   for (const entry of parseTar(tar)) {
     // parseTar yields `data: undefined` for a zero-byte file — preserve it as an empty buffer.

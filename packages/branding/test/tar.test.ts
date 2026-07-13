@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
-import { readTarGz, writeTarGz } from '../dist/tar.js'
+import { MAX_ARCHIVE_BYTES, readTarGz, writeTarGz } from '../dist/tar.js'
 
 test('round-trips a set of entries byte-for-byte, including nested paths', () => {
   const entries = [
@@ -51,4 +51,13 @@ test('handles a payload needing padding (non-block-multiple)', () => {
 
 test('an empty archive yields no files', () => {
   assert.equal(readTarGz(writeTarGz([])).size, 0)
+})
+
+test('readTarGz caps decompression size (gzip-bomb guard), default ceiling is generous', () => {
+  const gz = writeTarGz([{ name: 'big', data: Buffer.alloc(4096, 0x41) }]) // inflates past 512 bytes
+  // a tiny ceiling → throws instead of decompressing (would OOM on a real bomb)
+  assert.throws(() => readTarGz(gz, 100))
+  // the default ceiling reads the same archive fine
+  assert.ok(MAX_ARCHIVE_BYTES > 4096)
+  assert.ok(readTarGz(gz).has('big'))
 })
