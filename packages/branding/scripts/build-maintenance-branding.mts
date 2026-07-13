@@ -18,7 +18,7 @@ import { composeArchive } from '../dist/discover.js'
 import { readTarGz } from '../dist/tar.js'
 import { resolveThemeColor } from '../dist/theme.js'
 
-import { buildBrandArchive } from './lib/build-brandings.mjs'
+import { buildBrandArchive } from './lib/build-brandings.mts'
 
 const [brandArg, maintenanceArg] = process.argv.slice(2)
 if (!brandArg || !maintenanceArg) {
@@ -33,8 +33,10 @@ const maintenanceDir = resolve(maintenanceArg)
 const { id, gz } = await buildBrandArchive(brandDir)
 const archive = readTarGz(gz)
 // Compose the effective config from the archive's instance fragments (no merged branding.json).
+// buildBrandArchive always writes a manifest, so composeArchive is non-null here.
 const config = composeArchive(archive)
-const theme = config?.theme ?? { cssVars: {}, fontFaces: [] }
+if (!config) throw new Error(`could not compose config from archive for ${id}`)
+const cssVars = config.theme.cssVars
 
 // --- 1. Colours: append the brand's :root overrides to the maintenance branding.css --------------
 const cssPath = join(maintenanceDir, 'app/assets/css/branding.css')
@@ -47,7 +49,6 @@ if (at !== -1) css = css.slice(0, at).trimEnd() + '\n' // strip a previous gener
 // Colours only (the maintenance page styles with var(--color-*)); fonts stay the maintenance
 // default (its body uses LatoWeb literally) — a brand font would need the file copied + the body
 // switched to var(--font-family-text), a separate follow-up.
-const cssVars = theme.cssVars ?? {}
 if (Object.keys(cssVars).length) {
   const vars = Object.entries(cssVars)
     .map(([k, v]) => `  --${k}: ${v};`)
@@ -59,9 +60,9 @@ if (Object.keys(cssVars).length) {
 }
 
 // --- 2. Logo: read the brand's squared logo FROM the archive → maintenance public path -----------
-const logoPath = config.logos?.signupPath || config.logos?.passwordResetPath // namespaced /branding/<id>/…
+const logoPath = config.logos.signupPath // the squared logo, namespaced /branding/<id>/…
 const prefix = `/branding/${id}/`
-if (logoPath && logoPath.startsWith(prefix)) {
+if (logoPath.startsWith(prefix)) {
   const entry = logoPath.slice(prefix.length) // e.g. assets/logo-squared.svg
   const data = archive.get(entry)
   if (data) {
@@ -69,7 +70,7 @@ if (logoPath && logoPath.startsWith(prefix)) {
     writeFileSync(dest, data)
     // The maintenance app references /img/custom/logo-squared.svg — keep that stable name too.
     const stable = join(maintenanceDir, 'public/img/custom/logo-squared.svg')
-    if (dest !== stable && /\.svg$/.test(entry)) writeFileSync(stable, data)
+    if (dest !== stable && entry.endsWith('.svg')) writeFileSync(stable, data)
 
     console.log(`[maintenance] logo → ${dest}`)
   } else {
@@ -78,23 +79,25 @@ if (logoPath && logoPath.startsWith(prefix)) {
 }
 
 // --- 3. Metadata: theme-color + app identity for the <head> --------------------------------------
-const m = config.metadata ?? {}
+// `config` is fully merged, so every metadata field is present (the ocelot vanilla defaults when the
+// brand didn't override them) — no per-field fallbacks needed.
+const m = config.metadata
 // Browser-chrome colour = the brand's primary colour (no separate metadata.themeColor field).
 const themeColor = resolveThemeColor(cssVars)
 const metaPath = join(maintenanceDir, 'app/constants/metadata.ts')
 if (existsSync(metaPath)) {
   const meta = {
-    APPLICATION_NAME: m.applicationName ?? 'ocelot.social',
-    APPLICATION_SHORT_NAME: m.applicationShortName ?? 'ocelot.social',
-    APPLICATION_DESCRIPTION: m.applicationDescription ?? 'ocelot.social Community Network',
-    ORGANIZATION_NAME: m.organizationName ?? 'ocelot.social Community',
-    ORGANIZATION_JURISDICTION: m.organizationJurisdiction ?? 'City of Angels',
+    APPLICATION_NAME: m.applicationName,
+    APPLICATION_SHORT_NAME: m.applicationShortName,
+    APPLICATION_DESCRIPTION: m.applicationDescription,
+    ORGANIZATION_NAME: m.organizationName,
+    ORGANIZATION_JURISDICTION: m.organizationJurisdiction,
     THEME_COLOR: themeColor,
-    OG_IMAGE: m.ogImage ?? '/img/custom/logo-squared.png',
-    OG_IMAGE_ALT: m.ogImageAlt ?? 'ocelot.social Logo',
-    OG_IMAGE_WIDTH: m.ogImageWidth ?? '1200',
-    OG_IMAGE_HEIGHT: m.ogImageHeight ?? '1140',
-    OG_IMAGE_TYPE: m.ogImageType ?? 'image/png',
+    OG_IMAGE: m.ogImage,
+    OG_IMAGE_ALT: m.ogImageAlt,
+    OG_IMAGE_WIDTH: m.ogImageWidth,
+    OG_IMAGE_HEIGHT: m.ogImageHeight,
+    OG_IMAGE_TYPE: m.ogImageType,
   }
   const body = Object.entries(meta)
     .map(([k, v]) => `  ${k}: ${JSON.stringify(v)},`)

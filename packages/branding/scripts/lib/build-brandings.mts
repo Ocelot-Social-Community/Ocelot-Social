@@ -1,5 +1,5 @@
-// Core of the brand build, shared by build-brand-archive.mjs (single-brand CLI + --watch), the dev
-// scanner (build-dev-brandings.mjs) and the maintenance generator (build-maintenance-branding.mjs).
+// Core of the brand build, shared by build-brand-archive.mts (single-brand CLI + --watch), the dev
+// scanner (build-dev-brandings.mts) and the maintenance generator (build-maintenance-branding.mts).
 // Bundles a brand into ONE `<id>.tar.gz` as a LIBRARY of bucket instances: manifest.json +
 // fragments/<type>.<name>.json (one sparse fragment per instance) + assets/ + html/. Consumers (webapp
 // serverMiddleware, branding plugin, backend bootstrap, maintenance) read the manifest and COMPOSE the
@@ -12,15 +12,42 @@ import { BUCKET_NAMES, extractBucket, instanceFile, splitConfig } from '../../di
 import { brandingDefaults } from '../../dist/defaults.js'
 import { writeTarGz } from '../../dist/tar.js'
 
-import { loadConfig } from './load-config.mjs'
+import { loadConfig } from './load-config.mts'
+
+import type { ArchiveInstanceEntry } from '../../dist/buckets.js'
+import type { BrandingConfig } from '../../dist/index.js'
+
+interface TarEntry {
+  name: string
+  data: Buffer
+}
+interface BrandPkg {
+  brandId?: string
+  name?: string
+  version?: string
+}
+
+export interface BuiltArchive {
+  id: string
+  version: string | null
+  label: string
+  gz: Buffer
+  entries: TarEntry[]
+  warnings: string[]
+}
+export interface PublishedArchive extends BuiltArchive {
+  dir: string
+  latest: string
+  versioned: string | null
+}
 
 // Version of THIS @ocelot-social/branding package — baked into every manifest as the schema/API
 // compatibility axis (docu/branding-buckets-konzept.md §11), distinct from the brand's own version.
 // Read from the package.json two dirs up (works from source and from an installed copy).
-const SCHEMA_VERSION = (() => {
+const SCHEMA_VERSION: string | null = (() => {
   try {
     const pkg = fileURLToPath(new URL('../../package.json', import.meta.url))
-    return JSON.parse(readFileSync(pkg, 'utf8')).version || null
+    return (JSON.parse(readFileSync(pkg, 'utf8')) as { version?: string }).version ?? null
   } catch {
     return null
   }
@@ -28,7 +55,7 @@ const SCHEMA_VERSION = (() => {
 
 // Recursively collect a directory's files as tar entries keyed by their path relative to the brand
 // root (e.g. dir='assets' → 'assets/logo.svg').
-function collectFiles(dir, prefix, entries) {
+function collectFiles(dir: string, prefix: string, entries: TarEntry[]): void {
   for (const name of readdirSync(dir)) {
     const full = join(dir, name)
     const rel = prefix ? `${prefix}/${name}` : name
@@ -39,10 +66,10 @@ function collectFiles(dir, prefix, entries) {
 
 // A brand-relative asset path (namespaced to /branding/<id>/…). Absolute /… and http(s):/data:/
 // mailto: paths are framework/external and left untouched.
-const isRelativeAsset = (v) =>
+const isRelativeAsset = (v: unknown): v is string =>
   typeof v === 'string' && v.length > 0 && !v.startsWith('/') && !/^(https?:|data:|mailto:)/.test(v)
 
-function namespacePath(value, id, brandDir, warnings) {
+function namespacePath(value: string, id: string, brandDir: string, warnings: string[]): string {
   if (!isRelativeAsset(value)) return value
   if (!existsSync(join(brandDir, value))) {
     warnings.push(`  ! ${id}: referenced asset not found: ${value}`)
@@ -50,53 +77,59 @@ function namespacePath(value, id, brandDir, warnings) {
   return `/branding/${id}/${value}`
 }
 
-/** Rewrite the known asset-path fields of a resolved config to the namespaced served location. */
-function namespaceConfig(config, id, brandDir, warnings) {
-  const ns = (v) => namespacePath(v, id, brandDir, warnings)
+const LOGO_KEYS = [
+  'headerPath',
+  'headerTabletPath',
+  'headerMobilePath',
+  'signupPath',
+  'welcomePath',
+  'logoutPath',
+  'passwordResetPath',
+] as const
+
+/** Rewrite the known asset-path fields of a resolved config to the namespaced served location. The
+ *  dynamic-key writes operate on loose record views (trusted, schema-fixed keys — see eslint config). */
+function namespaceConfig(
+  config: BrandingConfig,
+  id: string,
+  brandDir: string,
+  warnings: string[],
+): BrandingConfig {
+  const ns = (v: string): string => namespacePath(v, id, brandDir, warnings)
   const c = structuredClone(config)
 
-  const LOGO_KEYS = [
-    'headerPath',
-    'headerTabletPath',
-    'headerMobilePath',
-    'signupPath',
-    'welcomePath',
-    'logoutPath',
-    'passwordResetPath',
-  ]
+  const logos = c.logos as unknown as Record<string, string | undefined>
   for (const k of LOGO_KEYS) {
-    if (c.logos?.[k] != null) c.logos[k] = ns(c.logos[k])
+    const val = logos[k]
+    if (val != null) logos[k] = ns(val)
   }
-  if (c.metadata?.ogImage != null) c.metadata.ogImage = ns(c.metadata.ogImage)
-  if (Array.isArray(c.assets?.css)) c.assets.css = c.assets.css.map(ns)
-  if (c.assets?.favicon != null) c.assets.favicon = ns(c.assets.favicon)
-  if (c.assets?.html) {
-    for (const page of Object.keys(c.assets.html)) {
-      const locales = c.assets.html[page]
-      for (const locale of Object.keys(locales)) locales[locale] = ns(locales[locale])
-    }
+  c.metadata.ogImage = ns(c.metadata.ogImage) // ogImage is always set (merged default)
+  if (Array.isArray(c.assets.css)) c.assets.css = c.assets.css.map(ns)
+  if (c.assets.favicon != null) c.assets.favicon = ns(c.assets.favicon)
+  const html = c.assets.html as Record<string, Record<string, string>>
+  for (const page of Object.keys(html)) {
+    const locales = html[page]
+    for (const locale of Object.keys(locales)) locales[locale] = ns(locales[locale])
   }
   // Brand web-font files live in the served assets folder too.
-  if (Array.isArray(c.theme?.fontFaces)) {
-    for (const face of c.theme.fontFaces) {
-      if (face.src != null) face.src = ns(face.src)
-    }
+  if (Array.isArray(c.theme.fontFaces)) {
+    for (const face of c.theme.fontFaces) face.src = ns(face.src)
   }
   return c
 }
 
 /** Read the brand's package.json once (or null). */
-function readBrandPkg(brandDir) {
+function readBrandPkg(brandDir: string): BrandPkg | null {
   const pkgPath = join(brandDir, 'package.json')
   if (!existsSync(pkgPath)) return null
   try {
-    return JSON.parse(readFileSync(pkgPath, 'utf8'))
+    return JSON.parse(readFileSync(pkgPath, 'utf8')) as BrandPkg
   } catch {
     return null
   }
 }
 
-export function brandId(brandDir) {
+export function brandId(brandDir: string): string {
   const pkg = readBrandPkg(brandDir)
   if (pkg?.brandId) return pkg.brandId
   if (pkg?.name) return pkg.name.replace(/-branding$/, '')
@@ -109,11 +142,11 @@ export function brandId(brandDir) {
  * carries the version it declares, so the archive is always versioned. Bump the brand's package.json
  * `version` to give it a real one.
  */
-export function brandVersion(brandDir) {
-  return readBrandPkg(brandDir)?.version || null
+export function brandVersion(brandDir: string): string | null {
+  return readBrandPkg(brandDir)?.version ?? null
 }
 
-export function findConfig(brandDir) {
+export function findConfig(brandDir: string): string | null {
   for (const name of ['brand.config.ts', 'brand.config.mjs', 'brand.config.js']) {
     const p = join(brandDir, name)
     if (existsSync(p)) return p
@@ -122,11 +155,11 @@ export function findConfig(brandDir) {
 }
 
 /** Bundle ONE brand directory into a `<id>.tar.gz` buffer (manifest.json + fragments/ + assets/ + html/). */
-export async function buildBrandArchive(brandDir) {
+export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive> {
   const dir = resolve(brandDir)
   const id = brandId(dir)
   const version = brandVersion(dir)
-  const warnings = []
+  const warnings: string[] = []
   const configPath = findConfig(dir)
   if (!configPath) throw new Error(`no brand.config.(ts|mjs|js) in ${dir}`)
   const config = await loadConfig(configPath)
@@ -136,8 +169,8 @@ export async function buildBrandArchive(brandDir) {
   // brand's link previews would show the vanilla ocelot logo (the untouched default path).
   const defaults = brandingDefaults
   if (
-    config.metadata?.ogImage === defaults.metadata.ogImage &&
-    config.logos?.signupPath &&
+    config.metadata.ogImage === defaults.metadata.ogImage &&
+    config.logos.signupPath &&
     config.logos.signupPath !== defaults.logos.signupPath
   ) {
     config.metadata.ogImage = config.logos.signupPath
@@ -147,16 +180,16 @@ export async function buildBrandArchive(brandDir) {
   // would drop a top-level `id` anyway (it is not a bucket-owned path), and injecting version into
   // metadata would make the identity bucket always look "customised", breaking partial-package
   // detection. Consumers read id/version from the manifest (see src/discover.ts).
-  const label = config.metadata?.applicationName ?? id
+  const label = config.metadata.applicationName // always set (merged default)
 
   // Archive = a LIBRARY of bucket instances (docu/branding-buckets-konzept.md §11): each bucket type's
   // fragment is its own file `fragments/<type>.<name>.json`, indexed by manifest.json. A bucket is
   // emitted ONLY when the brand actually customises it (its owned slice differs from the framework
   // default) — so a package that defines only some buckets is genuinely PARTIAL. Unprovided buckets
   // are inherited from the framework default (or another source) at compose time (composeFromArchives).
-  const entries = []
+  const entries: TarEntry[] = []
   const fragments = splitConfig(namespaced)
-  const instances = []
+  const instances: ArchiveInstanceEntry[] = []
   for (const type of BUCKET_NAMES) {
     const owned = JSON.stringify(extractBucket(namespaced, type))
     const ownedDefault = JSON.stringify(extractBucket(brandingDefaults, type))
@@ -185,13 +218,16 @@ export async function buildBrandArchive(brandDir) {
  * `outDir` defaults to `<brandDir>/dist`. `markDefault` additionally writes a `DEFAULT` marker (the
  * brand id) so an image baking this brand renders branded out of the box.
  */
-export async function publishBrandArchive(brandDir, { outDir, markDefault = false } = {}) {
+export async function publishBrandArchive(
+  brandDir: string,
+  { outDir, markDefault = false }: { outDir?: string; markDefault?: boolean } = {},
+): Promise<PublishedArchive> {
   const built = await buildBrandArchive(brandDir)
   const dir = outDir ? resolve(outDir) : join(resolve(brandDir), 'dist')
   mkdirSync(dir, { recursive: true })
   const latest = join(dir, `${built.id}.tar.gz`)
   writeFileSync(latest, built.gz)
-  let versioned = null
+  let versioned: string | null = null
   if (built.version) {
     versioned = join(dir, `${built.id}-${built.version}.tar.gz`)
     writeFileSync(versioned, built.gz)

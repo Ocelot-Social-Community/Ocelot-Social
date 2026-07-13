@@ -8,7 +8,7 @@
 // this package is — so leaving them on would only produce false positives. Everything genuinely wrong
 // (types, unused code, dead conditions) stays an error via the type-checked TS rules.
 import config from 'eslint-config-it4c'
-import { plugin as tseslintPlugin } from 'typescript-eslint'
+import { configs as tsConfigs, plugin as tsPlugin } from 'typescript-eslint'
 
 export default [
   { ignores: ['dist/', 'node_modules/', 'coverage/', 'example/'] },
@@ -38,34 +38,60 @@ export default [
     // Hoisted function declarations may be referenced above their definition (discover.ts orders its
     // public API before private helpers on purpose). Variables/classes are still guarded. Scoped to a
     // block that registers the tseslint plugin (flat-config requires the plugin in the same object).
-    files: ['**/*.ts'],
-    plugins: { '@typescript-eslint': tseslintPlugin },
+    files: ['**/*.ts', '**/*.mts'],
+    plugins: { '@typescript-eslint': tsPlugin },
     rules: {
       '@typescript-eslint/no-use-before-define': ['error', { functions: false }],
     },
   },
   {
-    // Build scripts + node:test files import the COMPILED `../dist` by explicit path — mandatory for
-    // ESM Node, and there is no in-package alias to route through. (src/*.ts uses extensionless relative
-    // imports and is unaffected.) They also legitimately write to stdout.
-    files: ['scripts/**/*.mjs', 'test/**/*.mjs'],
+    // Build scripts (.mts, run via Node type-stripping) import the COMPILED `../dist` by explicit path —
+    // mandatory for ESM Node, no in-package alias to route through. They are CLIs (stdout is output) and
+    // log tiny numbers (file counts / byte sizes) in template literals.
+    files: ['scripts/**/*.mts'],
     rules: {
       'import-x/no-relative-parent-imports': 'off',
       'import-x/extensions': 'off',
       'n/file-extension-in-import': 'off',
       'no-console': 'off',
+      '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
     },
   },
   {
     // The brand-config loader is a sandboxed evaluator: it type-checks a brand's `.ts` config against
     // the schema, then transpiles + evaluates it with an injected require. Dynamic require, the Function
     // evaluator and the local CommonJS `module.exports` interop ARE its purpose, not an oversight.
-    files: ['scripts/lib/load-config.mjs'],
+    files: ['scripts/lib/load-config.mts'],
     rules: {
       'import-x/no-commonjs': 'off',
       'import-x/no-dynamic-require': 'off',
       'security/detect-non-literal-require': 'off',
       'no-new-func': 'off',
+      // The whole `typescript` module type is needed for the compiler-API calls (typeof the module).
+      'import-x/no-namespace': 'off',
+      '@typescript-eslint/no-implied-eval': 'off',
+      // The evaluated brand module is untyped by nature — the return is cast to ConfigModule.
+      '@typescript-eslint/no-unsafe-call': 'off',
+      // typescript is provided by the environment the tool runs in (brand repo / this package's dev
+      // deps), resolved dynamically — a deliberate external, not a bundled dependency.
+      'n/no-unpublished-import': 'off',
+    },
+  },
+  {
+    // Tests (.mts, run via `node --test` type-stripping) are validated by RUNNING, not by tsc — they are
+    // deliberately outside the type-checked project (see tsconfig.json). Lint them syntactically only,
+    // and grant the same dist-import relaxations the scripts get.
+    files: ['test/**/*.mts'],
+    ...tsConfigs.disableTypeChecked,
+    languageOptions: {
+      parserOptions: { projectService: false, project: false },
+    },
+    rules: {
+      ...tsConfigs.disableTypeChecked.rules,
+      'import-x/no-relative-parent-imports': 'off',
+      'import-x/extensions': 'off',
+      'n/file-extension-in-import': 'off',
+      'no-console': 'off',
     },
   },
 ]

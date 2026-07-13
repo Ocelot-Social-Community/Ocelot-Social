@@ -1,16 +1,18 @@
 {
+  "//": "Tooling config: type-checks the WHOLE package (src + scripts + tests) and is what ESLint's",
+  "//2": "projectService and `npm run typecheck` use. It emits nothing — `tsconfig.build.json` does the",
+  "//3": "CommonJS dist build. nodenext so the .mts scripts/tests (ESM, top-level await, import.meta) are",
+  "//4": "type-checked in their real module format; src stays CommonJS (no package `type`).",
   "compilerOptions": {
-    "target": "ES2019",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "declaration": true,
-    "outDir": "dist",
-    "rootDir": "src",
+    "target": "ES2022",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["dist", "**/*.spec.ts"]
+  "include": ["src/**/*.ts", "scripts/**/*.mts"]
 }

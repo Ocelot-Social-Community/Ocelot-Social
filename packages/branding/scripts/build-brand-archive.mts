@@ -23,21 +23,21 @@
 import { watch, writeFileSync } from 'node:fs'
 import { basename, resolve } from 'node:path'
 
-import { buildBrandArchive, publishBrandArchive } from './lib/build-brandings.mjs'
+import { buildBrandArchive, publishBrandArchive } from './lib/build-brandings.mts'
 
 const rest = process.argv.slice(2)
 const isWatch = rest.includes('--watch')
 const isDefault = rest.includes('--default')
-const [brandArg, outArg] = rest.filter((a) => !a.startsWith('--'))
+const [brandArg, outArg]: (string | undefined)[] = rest.filter((a) => !a.startsWith('--'))
 if (!brandArg) {
   console.error('usage: build-brand-archive.mjs <brand-dir> [out] [--watch] [--default]')
   process.exit(1)
 }
 const brandDir = resolve(brandArg)
 
-async function build() {
+async function build(): Promise<void> {
   // A single explicit .tar.gz target → write just that file (dev/watch into the served dir).
-  if (outArg && outArg.endsWith('.tar.gz')) {
+  if (outArg?.endsWith('.tar.gz')) {
     const { id, gz, entries } = await buildBrandArchive(brandDir)
     const out = resolve(outArg)
     writeFileSync(out, gz)
@@ -61,14 +61,15 @@ await build()
 
 if (isWatch) {
   console.log('[brand] watching for changes…')
-  let timer = null
+  let timer: ReturnType<typeof setTimeout> | undefined
   watch(brandDir, { recursive: true }, (_event, filename) => {
     // Ignore our own output (the .tar.gz files, incl. those under dist/).
-    if (filename && filename.endsWith('.tar.gz')) return
+    if (filename?.endsWith('.tar.gz')) return
     clearTimeout(timer)
-    timer = setTimeout(
-      () => build().catch((error) => console.error('[brand] build failed:', error.message)),
-      150,
-    )
+    timer = setTimeout(() => {
+      build().catch((error: unknown) => {
+        console.error('[brand] build failed:', error instanceof Error ? error.message : error)
+      })
+    }, 150)
   })
 }

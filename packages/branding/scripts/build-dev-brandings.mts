@@ -12,7 +12,7 @@ import { existsSync, readdirSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { findConfig, publishBrandArchive } from './lib/build-brandings.mjs'
+import { findConfig, publishBrandArchive } from './lib/build-brandings.mts'
 
 const scriptDir = dirname(fileURLToPath(import.meta.url))
 // packages/branding/scripts → repo root
@@ -24,8 +24,8 @@ if (!existsSync(configurationsRoot)) {
   process.exit(1)
 }
 
-const compatible = []
-const skipped = []
+const compatible: string[] = []
+const skipped: string[] = []
 for (const entry of readdirSync(configurationsRoot, { withFileTypes: true })) {
   if (!entry.isDirectory()) continue
   const brandDir = join(configurationsRoot, entry.name, 'branding')
