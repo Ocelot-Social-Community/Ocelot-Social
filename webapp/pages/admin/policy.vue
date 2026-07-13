@@ -523,7 +523,7 @@ form {
   // This field was edited locally AND changed on the server → highlight it.
   &--conflict {
     border-left-color: $color-warning;
-    background: rgba($color-warning, 0.1);
+    background: color-mix(in srgb, var(--color-warning) 10%, transparent);
   }
 
   &__checkbox {

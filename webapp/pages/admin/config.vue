@@ -416,7 +416,7 @@ export default {
 
   // A missing hard-requirement secret breaks its feature → flag the whole row.
   &--blocking {
-    background: rgba($color-danger, 0.07);
+    background: color-mix(in srgb, var(--color-danger) 7%, transparent);
 
     th.cell--key {
       border-left-color: $color-danger;

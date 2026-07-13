@@ -113,7 +113,7 @@ export default {
   &.reserve-drag-over {
     border-color: $color-success;
     border-style: dashed;
-    background-color: rgba($color-success, 0.05);
+    background-color: color-mix(in srgb, var(--color-success) 5%, transparent);
   }
 
   .badge-selection-item {

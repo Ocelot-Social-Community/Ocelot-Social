@@ -1019,7 +1019,7 @@ export default {
       margin-top: 2px;
 
       &:hover {
-        color: color.adjust($text-color-danger, $lightness: -10%);
+        color: color-mix(in srgb, var(--color-danger), black 10%);
         background-color: $background-color-soft;
       }
 

@@ -960,11 +960,11 @@ export default {
   // Hover-diff against the active role: the hovered role would add (green) or
   // remove (red) this permission.
   &--added {
-    background: rgba($color-success, 0.16);
+    background: color-mix(in srgb, var(--color-success) 16%, transparent);
     border-left-color: $color-success;
   }
   &--removed {
-    background: rgba($color-danger, 0.16);
+    background: color-mix(in srgb, var(--color-danger) 16%, transparent);
     border-left-color: $color-danger;
   }
   // The permission's feature is not configured/enabled: granting it has no effect,

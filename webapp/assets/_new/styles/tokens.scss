@@ -5,7 +5,9 @@
 
 // Brandable BASE tokens read the runtime CSS custom property (default in ocelot-ui-variables.scss;
 // a brand overrides it live via plugins/branding-head.js). The literal fallback keeps them working
-// where the :root defaults aren't loaded (e.g. Storybook). Shades stay literals (vanilla unchanged).
+// where the :root defaults aren't loaded (e.g. Storybook). ALL semantic color tokens below reference
+// these bases (not re-literalised), so one --color-<base> override propagates everywhere. Shades
+// (-light/-dark/-active/-inverse) stay literals (vanilla unchanged).
 $color-primary: var(--color-primary, rgb(23, 181, 63));
 $color-primary-light: rgb(96, 214, 98);
 $color-primary-dark: rgb(25, 122, 49);
@@ -14,15 +16,15 @@ $color-primary-inverse: rgb(241, 253, 244);
 $color-secondary: var(--color-secondary, rgb(0, 142, 230));
 $color-secondary-active: rgb(10, 161, 255);
 $color-secondary-inverse: rgb(240, 249, 255);
-$color-success: rgb(23, 181, 63);
+$color-success: var(--color-success, rgb(23, 181, 63));
 $color-success-active: rgb(26, 203, 71);
 $color-success-inverse: rgb(241, 253, 244);
-$color-danger: rgb(219, 57, 36);
+$color-danger: var(--color-danger, rgb(219, 57, 36));
 $color-danger-light: rgb(242, 97, 65);
 $color-danger-dark: rgb(158, 43, 28);
 $color-danger-active: rgb(224, 81, 62);
 $color-danger-inverse: rgb(253, 243, 242);
-$color-warning: rgb(230, 121, 25);
+$color-warning: var(--color-warning, rgb(230, 121, 25));
 $color-warning-active: rgb(233, 137, 53);
 $color-warning-inverse: rgb(253, 247, 241);
 $color-yellow: rgb(245, 196, 0);
@@ -58,17 +60,17 @@ $text-color-soft: rgb(112, 103, 126);
 $text-color-softer: rgb(177, 171, 186);
 $text-color-disabled: rgb(177, 171, 186);
 $text-color-inverse: rgb(250, 249, 250);
-$text-color-link: rgb(23, 181, 63);
-$text-color-link-active: rgb(25, 194, 67);
-$text-color-primary: rgb(23, 181, 63);
+$text-color-link: $color-primary;
+$text-color-link-active: $color-primary-active;
+$text-color-primary: $color-primary;
 $text-color-primary-inverse: rgb(241, 253, 244);
-$text-color-secondary: rgb(0, 142, 230);
+$text-color-secondary: $color-secondary;
 $text-color-secondary-inverse: rgb(240, 249, 255);
-$text-color-success: rgb(23, 181, 63);
+$text-color-success: $color-success;
 $text-color-success-inverse: rgb(241, 253, 244);
-$text-color-warning: rgb(230, 121, 25);
+$text-color-warning: $color-warning;
 $text-color-warning-inverse: rgb(253, 247, 241);
-$text-color-danger: rgb(219, 57, 36);
+$text-color-danger: $color-danger;
 $text-color-danger-inverse: rgb(253, 243, 242);
 
 /**
@@ -87,22 +89,22 @@ $background-color-inverse-soft: rgb(40, 37, 45);
 $background-color-inverse-softer: rgb(75, 69, 84);
 $background-color-inverse-softer-active: rgb(100, 92, 112);
 $background-color-disabled: rgb(245, 244, 246);
-$background-color-primary: rgb(23, 181, 63);
+$background-color-primary: $color-primary;
 $background-color-primary-active: rgb(25, 194, 67);
 $background-color-primary-inverse: rgb(241, 253, 244);
-$background-color-secondary: rgb(0, 142, 230);
+$background-color-secondary: $color-secondary;
 $background-color-secondary-active: rgb(10, 161, 255);
 $background-color-secondary-inverse: rgb(240, 249, 255);
 $background-color-third: rgb(126, 82, 204);
 $background-color-third-active: rgb(160, 103, 255);
 $background-color-third-inverse: rgb(239, 230, 255);
-$background-color-success: rgb(23, 181, 63);
+$background-color-success: $color-success;
 $background-color-success-active: rgb(26, 203, 71);
 $background-color-success-inverse: rgb(241, 253, 244);
-$background-color-warning: rgb(230, 121, 25);
+$background-color-warning: $color-warning;
 $background-color-warning-active: rgb(233, 137, 53);
 $background-color-warning-inverse: rgb(253, 247, 241);
-$background-color-danger: rgb(219, 57, 36);
+$background-color-danger: $color-danger;
 $background-color-danger-active: rgb(224, 81, 62);
 $background-color-danger-inverse: rgb(253, 243, 242);
 
@@ -115,11 +117,11 @@ $border-color-base: rgb(177, 171, 186);
 $border-color-soft: rgb(203, 199, 209);
 $border-color-softer: rgb(229, 227, 232);
 $border-color-softest: rgb(245, 244, 246);
-$border-color-active: rgb(23, 181, 63);
-$border-color-primary: rgb(23, 181, 63);
-$border-color-success: rgb(23, 181, 63);
-$border-color-warning: rgb(230, 121, 25);
-$border-color-danger: rgb(219, 57, 36);
+$border-color-active: $color-primary;
+$border-color-primary: $color-primary;
+$border-color-success: $color-success;
+$border-color-warning: $color-warning;
+$border-color-danger: $color-danger;
 
 /**
  * @tokens Border Size
@@ -409,7 +411,9 @@ $color-toast-green: var(--color-toast-green, #{$color-success});
  */
 
 $color-ribbon-announcement: $background-color-warning;
-$color-ribbon-announcement-shadow: color.adjust($color-ribbon-announcement, $lightness: -20%,);
+// $background-color-warning is now var(--color-warning) → compute the shadow with color-mix (CSS),
+// not Sass color.adjust (which cannot operate on a var()). Follows a brand's warning colour live.
+$color-ribbon-announcement-shadow: color-mix(in srgb, var(--color-warning), black 20%);
 // Runtime-themeable (var-backed): a brand sets --color-ribbon-article via theme.cssVars and the
 // article ribbon re-themes without a rebuild; unset → the vanilla literal below (unchanged).
 $color-ribbon-article: var(--color-ribbon-article, #{$background-color-secondary-active});

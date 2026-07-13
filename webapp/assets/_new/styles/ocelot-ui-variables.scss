@@ -35,22 +35,23 @@
   --color-secondary-active: color-mix(in srgb, var(--color-secondary), black 15%);
   --color-secondary-contrast: #{$text-color-secondary-inverse};
 
-  // Danger (rot)
-  --color-danger: #{$color-danger};
+  // Danger (rot) — runtime theme base (literal default; a brand overrides --color-danger live).
+  // Literal, NOT #{$color-danger}: that token now IS var(--color-danger) and would self-reference.
+  --color-danger: rgb(219, 57, 36);
   --color-danger-hover: #{$color-danger-light}; // filled buttons hover to lighter color
   --color-danger-active: #{$color-danger-dark}; // active state uses darker color
   --color-danger-contrast: #{$text-color-danger-inverse};
 
-  // Warning (orange)
-  --color-warning: #{$color-warning};
+  // Warning (orange) — runtime theme base (literal default; a brand overrides --color-warning live).
+  --color-warning: rgb(230, 121, 25);
   --color-warning-hover: #{$color-warning-active};
-  --color-warning-active: #{darken($color-warning, 15%)};
+  --color-warning-active: color-mix(in srgb, var(--color-warning), black 15%);
   --color-warning-contrast: #{$text-color-primary-inverse};
 
-  // Success (grün, wie primary)
-  --color-success: #{$color-success};
+  // Success (grün) — runtime theme base (literal default; a brand overrides --color-success live).
+  --color-success: rgb(23, 181, 63);
   --color-success-hover: #{$color-success-active};
-  --color-success-active: #{darken($color-success, 15%)};
+  --color-success-active: color-mix(in srgb, var(--color-success), black 15%);
   --color-success-contrast: #{$text-color-primary-inverse};
 
   // Info (blau, wie secondary)
