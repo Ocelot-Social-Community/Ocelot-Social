@@ -118,8 +118,8 @@ export const BUCKET_PATHS: Record<BucketName, string[]> = {
     'metadata.themeColor',
   ],
   // WHO the instance is: names, organisation, jurisdiction, OG image, cookie name, version, the
-  // brand's self-description, and per-locale copy overrides.
-  identity: ['metadata', 'about', 'locales'],
+  // brand's self-description. (locales is CROSS-CUTTING — see below — not owned by a bucket.)
+  identity: ['metadata', 'about'],
   // The instance's marks.
   logos: ['logos', 'assets.favicon'],
   // Static / legal content: page HTML, T&C version, per-page link overrides (external URLs).
@@ -165,6 +165,28 @@ function clone<T>(value: T): T {
   return value === undefined ? value : (JSON.parse(JSON.stringify(value)) as T)
 }
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+// Deep-merge `patch` INTO `target` (nested plain objects merge; everything else replaces). Used for
+// the cross-cutting `locales` layer, which accumulates from every source rather than being replaced.
+function deepMerge(
+  target: Record<string, unknown>,
+  patch: Record<string, unknown>,
+): Record<string, unknown> {
+  for (const key of Object.keys(patch)) {
+    const patchValue = patch[key]
+    const targetValue = target[key]
+    if (isPlainObject(targetValue) && isPlainObject(patchValue)) {
+      deepMerge(targetValue, patchValue)
+    } else {
+      target[key] = clone(patchValue)
+    }
+  }
+  return target
+}
+
 function getPath(obj: unknown, path: string): unknown {
   return path.split('.').reduce<unknown>((o, key) => {
     if (o != null && typeof o === 'object') return (o as Record<string, unknown>)[key]
@@ -189,6 +211,10 @@ function setPath(target: Record<string, unknown>, path: string, value: unknown):
  * — so `composeConfig({ theme: brandB })` yields brand B's look on top of vanilla everything else.
  * The caller (the runtime resolver) decides the per-bucket source from the composition map; this
  * function is pure and works the same on server and client.
+ *
+ * `locales` is CROSS-CUTTING: every bucket instance carries the locale strings its source brand
+ * ships (see splitConfig), and they are DEEP-MERGED across all provided sources — so composing e.g.
+ * `navigation` from brand B pulls in B's menu strings even though its identity/locales come from A.
  */
 export function composeConfig(
   bucketSources: Partial<Record<BucketName, DeepPartial<BrandingConfig>>>,
@@ -200,6 +226,13 @@ export function composeConfig(
     const value = getPath(source, path)
     if (value !== undefined) setPath(result, path, clone(value))
   }
+  // Cross-cutting locales: merge (not replace) every source's strings on top of the defaults.
+  const locales = (result.locales as Record<string, unknown>) ?? {}
+  for (const bucket of BUCKET_NAMES) {
+    const sourceLocales = (bucketSources[bucket] as { locales?: unknown } | undefined)?.locales
+    if (isPlainObject(sourceLocales)) deepMerge(locales, sourceLocales)
+  }
+  result.locales = locales
   return result as unknown as BrandingConfig
 }
 
@@ -236,11 +269,17 @@ export function extractBucket(
   return out as DeepPartial<BrandingConfig>
 }
 
-/** Split a full config into one sparse fragment per bucket type (a full-brand → its 6 instances). */
+/**
+ * Split a full config into one sparse fragment per bucket type (a full-brand → its 6 instances).
+ * The brand's `locales` (cross-cutting) are attached to EVERY fragment, so whichever buckets a
+ * composition pulls from this brand, its strings come along and are merged (composeConfig). Duplicate
+ * copies collapse on merge; locale overrides are small.
+ */
 export function splitConfig(
   config: DeepPartial<BrandingConfig>,
 ): Record<BucketName, DeepPartial<BrandingConfig>> {
+  const shared = isPlainObject(config.locales) ? { locales: clone(config.locales) } : {}
   return Object.fromEntries(
-    BUCKET_NAMES.map((bucket) => [bucket, extractBucket(config, bucket)]),
+    BUCKET_NAMES.map((bucket) => [bucket, { ...extractBucket(config, bucket), ...shared }]),
   ) as Record<BucketName, DeepPartial<BrandingConfig>>
 }

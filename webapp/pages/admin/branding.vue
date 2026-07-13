@@ -53,7 +53,9 @@
       <p v-else-if="!brandings.length" class="hint">{{ $t('admin.branding.noneExtra') }}</p>
       <ul v-else class="available-list">
         <li v-for="b in brandings" :key="b.id" class="available-item">
-          <img v-if="logo(b)" class="available-logo" :src="logo(b)" :alt="b.label || b.id" />
+          <span class="available-logo-slot">
+            <img v-if="logo(b)" class="available-logo" :src="logo(b)" :alt="b.label || b.id" />
+          </span>
           <span class="available-name">
             {{ b.label || b.id }}
             <code v-if="b.version" class="branding-version">v{{ b.version }}</code>
@@ -280,11 +282,20 @@ export default {
   }
 }
 
+.available-logo-slot {
+  // Fixed-width column so the brand names line up regardless of each logo's aspect ratio (and stay
+  // aligned for brands without a logo).
+  flex: 0 0 64px;
+  display: flex;
+  align-items: center;
+  height: 24px;
+}
+
 .available-logo {
-  flex: 0 0 auto;
-  height: 20px;
-  width: auto;
-  max-width: 120px;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: left center;
 }
 
 .available-name {

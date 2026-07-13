@@ -83,3 +83,34 @@ test('composeFromArchives selects a named instance for a slot (id/name)', () => 
   const c = composeFromArchives(getFiles, { _default: 'ya', theme: 'ya/dark' })
   assert.equal(c.theme.cssVars['color-primary'], 'black')
 })
+
+test('composeFromArchives merges locales from a PARTIALLY-pulled bucket (the missing-strings fix)', () => {
+  // Archive Y ships a navigation instance whose fragment carries Y's menu strings (locales). Pulling
+  // ONLY navigation from Y must still bring those strings in, or the menu idents resolve to nothing.
+  const Y = new Map()
+  Y.set(
+    'fragments/navigation.default.json',
+    Buffer.from(
+      JSON.stringify({
+        headerMenu: { menu: [{ nameIdent: 'y.home' }] },
+        locales: { de: { y: { home: 'Start' } } },
+      }),
+    ),
+  )
+  Y.set(
+    'manifest.json',
+    Buffer.from(
+      JSON.stringify({
+        id: 'y',
+        version: null,
+        label: 'Y',
+        instances: [{ type: 'navigation', name: 'default', file: 'fragments/navigation.default.json' }],
+      }),
+    ),
+  )
+  const getFiles = (id) => ({ y: Y })[id] ?? null
+
+  const composed = composeFromArchives(getFiles, { navigation: 'y' })
+  assert.equal(composed.headerMenu.menu[0].nameIdent, 'y.home')
+  assert.deepEqual(composed.locales, { de: { y: { home: 'Start' } } })
+})

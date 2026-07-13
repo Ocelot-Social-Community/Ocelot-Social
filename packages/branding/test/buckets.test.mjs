@@ -24,12 +24,37 @@ function leaves(obj, prefix, out) {
   }
 }
 
+// `locales` is cross-cutting (merged from every source, carried on every fragment), not bucket-owned.
+const CROSS_CUTTING = ['locales']
+
 test('taxonomy is a TOTAL partition: every default-config leaf maps to exactly one bucket', () => {
   const paths = []
   leaves(brandingDefaults, '', paths)
-  const unclaimed = paths.filter((p) => bucketOfPath(p) === null)
+  const unclaimed = paths.filter((p) => bucketOfPath(p) === null && !CROSS_CUTTING.includes(p))
   assert.deepEqual(unclaimed, [], `unclaimed leaves (add them to a bucket): ${unclaimed.join(', ')}`)
   assert.ok(paths.length > 0)
+})
+
+test('locales are cross-cutting: merged from every source, owned by no bucket', () => {
+  assert.equal(bucketOfPath('locales'), null)
+  const composed = composeConfig({
+    navigation: { locales: { de: { nav: { home: 'Start' } } } },
+    identity: { locales: { de: { app: { title: 'App' } } } },
+  })
+  assert.deepEqual(composed.locales, { de: { nav: { home: 'Start' }, app: { title: 'App' } } })
+})
+
+test('splitConfig attaches locales to EVERY fragment so they survive a partial load', () => {
+  const brand = defineBranding({
+    locales: { de: { x: '1' } },
+    headerMenu: { menu: [{ nameIdent: 'x' }] },
+  })
+  const frags = splitConfig(brand)
+  for (const bucket of BUCKET_NAMES) {
+    assert.deepEqual(frags[bucket].locales, { de: { x: '1' } })
+  }
+  // composing ONLY navigation from this brand still brings its strings in
+  assert.deepEqual(composeConfig({ navigation: frags.navigation }).locales, { de: { x: '1' } })
 })
 
 test('grenzfall mappings: split domains land in the right bucket', () => {
