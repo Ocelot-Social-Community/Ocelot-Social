@@ -538,7 +538,11 @@ export default {
 }
 
 .composition-select {
-  min-width: 220px;
+  // Fixed identical width so the base (whole-package) select and every per-bucket select line up,
+  // regardless of the selected option's text length.
+  flex: 0 0 auto;
+  width: 280px;
+  max-width: 100%;
   padding: $space-xx-small $space-x-small;
 }
 

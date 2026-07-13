@@ -8,7 +8,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSy
 import { basename, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { BUCKET_NAMES, instanceFile, splitConfig } from '../../dist/buckets.js'
+import { BUCKET_NAMES, extractBucket, instanceFile, splitConfig } from '../../dist/buckets.js'
 import { brandingDefaults } from '../../dist/defaults.js'
 import { writeTarGz } from '../../dist/tar.js'
 
@@ -144,21 +144,25 @@ export async function buildBrandArchive(brandDir) {
   }
   const namespaced = namespaceConfig(config, id, dir, warnings)
   // Stamp the brand id into branding.json so consumers can discover archives by content (the file
-  // name may be versioned, e.g. `<id>-1.2.3.tar.gz`) — see src/discover.ts.
+  // name may be versioned, e.g. `<id>-1.2.3.tar.gz`) — see src/discover.ts. Version lives in the
+  // manifest only (not injected into metadata — no runtime consumer reads it there, and doing so
+  // would make the identity bucket always look "customised", breaking partial-package detection).
   namespaced.id = id
-  // Inject the version from package.json (single source) — surfaced in the admin Branding tab.
-  if (version) namespaced.metadata = { ...namespaced.metadata, version }
 
   const label = config.metadata?.applicationName ?? id
 
   // Archive = a LIBRARY of bucket instances (docu/branding-buckets-konzept.md §11): each bucket type's
-  // fragment is its own file `buckets/<type>.<name>.json`, indexed by manifest.json. A classic full
-  // brand yields one instance per type named `default` (splitConfig). Multiple instances of the same
-  // type (e.g. theme dark/light) are an authoring feature layered on this format later.
+  // fragment is its own file `fragments/<type>.<name>.json`, indexed by manifest.json. A bucket is
+  // emitted ONLY when the brand actually customises it (its owned slice differs from the framework
+  // default) — so a package that defines only some buckets is genuinely PARTIAL. Unprovided buckets
+  // are inherited from the framework default (or another source) at compose time (composeFromArchives).
   const entries = []
   const fragments = splitConfig(namespaced)
   const instances = []
   for (const type of BUCKET_NAMES) {
+    const owned = JSON.stringify(extractBucket(namespaced, type))
+    const ownedDefault = JSON.stringify(extractBucket(brandingDefaults, type))
+    if (owned === ownedDefault) continue // not customised → don't provide this bucket
     const name = 'default'
     const file = instanceFile(type, name)
     entries.push({ name: file, data: Buffer.from(`${JSON.stringify(fragments[type], null, 2)}\n`) })
