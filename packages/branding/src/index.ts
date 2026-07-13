@@ -20,6 +20,7 @@ import { overrides } from './overrides'
 import type { BrandingConfig } from './schema'
 
 export * from './schema'
+export * from './buckets'
 export { brandingDefaults } from './defaults'
 export { defineBranding } from './merge'
 

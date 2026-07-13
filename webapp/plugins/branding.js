@@ -19,10 +19,22 @@
 // time and would need the config set earlier (or lazy adapters) for full effect.
 import { setBranding } from '@ocelot-social/branding'
 
-// Ask the backend for the current activeBranding policy value (public key, so no auth needed).
-// Returns the id string ('' = vanilla), or null when the backend could not be reached (→ the
-// caller falls back to env / single-brand). Server-only.
-async function fetchActiveBrandingId() {
+// Unwrap one policy key's transported value (JSON-encoded); '' when absent/garbled.
+function extractPolicy(policy, key) {
+  const entry = policy.find((e) => e && e.key === key)
+  if (!entry || entry.value == null) return ''
+  try {
+    return JSON.parse(entry.value) // e.g. "\"stage\"" → "stage"
+  } catch (error) {
+    return ''
+  }
+}
+
+// Ask the backend for the branding policy (public keys, no auth): the base brand (`activeBranding`)
+// and the per-slot composition (`brandingComposition`, a JSON string). Returns { active, composition }
+// (composition = the RAW json string as stored), or null when the backend could not be reached (→ the
+// caller falls back to env / baked default). Server-only.
+async function fetchBrandingPolicy() {
   const uri = process.env.GRAPHQL_URI || 'http://localhost:4000'
   const controller = typeof AbortController !== 'undefined' ? new AbortController() : null
   const timer = controller ? setTimeout(() => controller.abort(), 2000) : null
@@ -34,11 +46,11 @@ async function fetchActiveBrandingId() {
       signal: controller ? controller.signal : undefined,
     })
     const json = await res.json()
-    const entry = (json && json.data && json.data.policy ? json.data.policy : []).find(
-      (e) => e && e.key === 'activeBranding',
-    )
-    if (!entry || entry.value == null) return ''
-    return JSON.parse(entry.value) // JSON-encoded string, e.g. "\"stage\"" → "stage"
+    const policy = json && json.data && json.data.policy ? json.data.policy : []
+    return {
+      active: extractPolicy(policy, 'activeBranding') || '',
+      composition: extractPolicy(policy, 'brandingComposition') || '',
+    }
   } catch (error) {
     return null
   } finally {
@@ -57,24 +69,41 @@ async function loadServerBranding(discover) {
   const archives = discover.discoverArchives(assetsDir)
   if (!archives.size) return null
 
-  // Resolve the active brand in order: activeBranding policy value → ops pin
-  // ($OCELOT_ACTIVE_BRANDING) → the image's baked default marker (a brand baked in as default
-  // theme) → '' (framework defaults / vanilla). A non-empty policy value always wins (an admin
-  // switching to another brand takes effect live); '' from the policy falls through to the pin /
-  // baked default, so a default-brand image renders branded out of the box while any brand stays
-  // switchable on the admin Branding tab.
-  const policyId = await fetchActiveBrandingId() // '' = vanilla, id = pinned, null = unreachable
-  let active = policyId && policyId !== '' ? policyId : ''
-  if (!active) {
-    active = process.env.OCELOT_ACTIVE_BRANDING || discover.readDefaultMarker(assetsDir) || ''
+  // Resolve the BASE brand in order: activeBranding policy value → ops pin ($OCELOT_ACTIVE_BRANDING)
+  // → the image's baked default marker → '' (framework defaults / vanilla). A non-empty policy value
+  // wins; '' falls through to the pin / baked default, so a default-brand image renders branded out
+  // of the box while any brand stays switchable on the admin Branding tab.
+  const policy = await fetchBrandingPolicy() // { active, composition } or null (unreachable)
+  const policyActive = policy ? policy.active : ''
+  let base = policyActive && policyActive !== '' ? policyActive : ''
+  if (!base) {
+    base = process.env.OCELOT_ACTIVE_BRANDING || discover.readDefaultMarker(assetsDir) || ''
   }
-  const archive = active && archives.get(active)
-  if (!archive) return null // vanilla / unknown → framework defaults
+  if (base && !archives.has(base)) base = '' // unknown base id → vanilla base
 
-  // Read the active brand's branding.json from its archive.
-  const files = discover.readArchive(archive.file)
-  const config = JSON.parse(files.get('branding.json').toString('utf8'))
-  return { config, brandingId: active }
+  // Per-slot overrides layered over the base (theme of one brand + identity of another, …).
+  const rawComposition = (policy && policy.composition) || ''
+  let composition = {}
+  if (rawComposition) {
+    try {
+      const parsed = JSON.parse(rawComposition)
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) composition = parsed
+    } catch (error) {
+      composition = {}
+    }
+  }
+  const hasComposition = Object.keys(composition).length > 0
+
+  // Nothing to brand → framework defaults (vanilla). Returning null makes the caller setBranding
+  // (undefined) — important so a vanilla request never renders a brand a prior request leaked.
+  if (!base && !hasComposition) return null
+
+  // Compose the effective config across archives: each slot from its map source, `_default` = base.
+  const config = discover.composeComposition(assetsDir, { _default: base, ...composition })
+  if (!config) return null
+  // brandingId = resolved base, brandingComposition = the raw json — together the reload SIGNATURE the
+  // live-switch plugin compares against the current policy to detect a change.
+  return { config, brandingId: base, brandingComposition: rawComposition }
 }
 
 export default async (context) => {
@@ -97,6 +126,7 @@ export default async (context) => {
         context.beforeNuxtRender(({ nuxtState }) => {
           nuxtState.branding = loaded.config
           nuxtState.brandingId = loaded.brandingId
+          nuxtState.brandingComposition = loaded.brandingComposition
         })
       }
     } catch (error) {

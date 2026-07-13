@@ -42,6 +42,10 @@ export interface NetworkPolicy {
   // A string-typed policy key: switched via setActiveBranding (branding.manage), read by the
   // SSR branding loader; not shown in the generic (boolean/integer) policy editor.
   activeBranding: string
+  // Per-bucket branding composition, JSON-encoded object mapping a bucket slot to a source
+  // ('id[@version][/instance]'), layered over activeBranding. '' = no per-slot overrides. String-
+  // typed like activeBranding; set via setBrandingComposition (branding.manage), read by the SSR loader.
+  brandingComposition: string
 }
 
 export type PolicyKey = keyof NetworkPolicy

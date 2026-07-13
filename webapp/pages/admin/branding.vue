@@ -1,131 +1,109 @@
 <template>
   <div>
+    <!-- 1. Composition (top): configure each bucket's source. A "complete package" preset sets the
+         base for all buckets at once; per-bucket dropdowns override individual slots on top. -->
     <os-card>
-      <h2 class="ds-heading ds-heading-h2">{{ $t('admin.branding.title') }}</h2>
-      <p>{{ $t('admin.branding.description') }}</p>
+      <h2 class="ds-heading ds-heading-h2">{{ $t('admin.branding.composition.title') }}</h2>
+      <p>{{ $t('admin.branding.composition.description', { base: baseLabel }) }}</p>
 
-      <ul class="branding-list">
-        <!-- The framework default (vanilla) is just the first entry, rendered like any other
-             branding from its resolved config (brandingDefaults). -->
-        <li
-          v-for="entry in entries"
-          :key="entry.id || '(default)'"
-          class="branding-item"
-          :class="{ active: activeId === entry.id }"
+      <div class="composition-row composition-row--base">
+        <label for="whole-package" class="composition-label">
+          {{ $t('admin.branding.composition.wholePackage') }}
+        </label>
+        <select
+          id="whole-package"
+          class="composition-select"
+          :value="activeId"
+          :disabled="!!saving"
+          @change="switchTo($event.target.value)"
         >
-          <div class="branding-head">
-            <img
-              v-if="entry.config.logos && entry.config.logos.headerPath"
-              class="branding-logo"
-              :src="entry.config.logos.headerPath"
-              :alt="entry.label"
-            />
-            <span class="branding-title">
-              {{ entry.label }}
-              <code v-if="entry.id">{{ entry.id }}</code>
-              <code
-                v-if="entry.config.metadata && entry.config.metadata.version"
-                class="branding-version"
-              >
-                v{{ entry.config.metadata.version }}
-              </code>
-            </span>
-            <span v-if="activeId === entry.id" class="badge badge-active">
-              ● {{ $t('admin.branding.current') }}
-            </span>
-            <!-- No deactivate: switching to the default entry (vanilla) is how you turn a brand off,
-                 so the default behaves exactly like any other brand — active or activatable. -->
-            <button
-              v-else
-              class="btn btn-activate"
-              :disabled="!!saving"
-              @click="switchTo(entry.id)"
-            >
-              {{ $t('admin.branding.activate') }}
-            </button>
-          </div>
+          <option value="">{{ $t('admin.branding.vanilla') }}</option>
+          <option v-for="src in sourceOptions" :key="src.id" :value="src.id">
+            {{ src.label }}
+          </option>
+        </select>
+      </div>
 
-          <p v-if="entry.config.about && entry.config.about.description" class="branding-desc">
-            {{ entry.config.about.description }}
-          </p>
+      <div v-for="bucket in bucketNames" :key="bucket" class="composition-row">
+        <label :for="`bucket-${bucket}`" class="composition-label">
+          {{ $t(`admin.branding.composition.bucket.${bucket}`) }}
+        </label>
+        <select
+          :id="`bucket-${bucket}`"
+          class="composition-select"
+          :value="composition[bucket] || ''"
+          :disabled="!!savingComposition"
+          @change="setSource(bucket, $event.target.value)"
+        >
+          <option value="">
+            {{ $t('admin.branding.composition.inherit', { base: baseLabel }) }}
+          </option>
+          <option v-for="src in sourceOptions" :key="src.id" :value="src.id">
+            {{ src.label }}
+          </option>
+        </select>
+      </div>
+    </os-card>
 
-          <dl v-if="entry.config.metadata" class="branding-details">
-            <div class="detail">
-              <dt>{{ $t('admin.branding.detail.organization') }}</dt>
-              <dd>
-                {{ entry.config.metadata.organizationName }}
-                <template v-if="entry.config.metadata.organizationJurisdiction">
-                  · {{ entry.config.metadata.organizationJurisdiction }}
-                </template>
-              </dd>
-            </div>
-            <div class="detail">
-              <dt>{{ $t('admin.branding.detail.appDescription') }}</dt>
-              <dd>{{ entry.config.metadata.applicationDescription }}</dd>
-            </div>
-            <div v-if="entry.config.about" class="detail">
-              <dt>{{ $t('admin.branding.detail.reuse') }}</dt>
-              <dd>
-                {{ $t('admin.branding.detail.logos') }}:
-                {{ reusable(entry.config.about.license.logosReusable) }} ·
-                {{ $t('admin.branding.detail.colors') }}:
-                {{ reusable(entry.config.about.license.colorsReusable) }}
-                <template v-if="entry.config.about.license.note">
-                  <br />
-                  <span class="license-note">{{ entry.config.about.license.note }}</span>
-                </template>
-              </dd>
-            </div>
-            <div class="detail">
-              <dt>{{ $t('admin.branding.detail.themeColor') }}</dt>
-              <dd>
-                <span
-                  class="swatch"
-                  :style="{ backgroundColor: entry.config.metadata.themeColor }"
-                />
-                <code>{{ entry.config.metadata.themeColor }}</code>
-              </dd>
-            </div>
-            <div v-if="entry.config.links" class="detail">
-              <dt>{{ $t('admin.branding.detail.footer') }}</dt>
-              <dd>{{ entry.config.links.footerOrder.join(', ') }}</dd>
-            </div>
-            <div v-if="entry.config.assets" class="detail">
-              <dt>{{ $t('admin.branding.detail.pages') }}</dt>
-              <dd>{{ pageSummary(entry.config) }}</dd>
-            </div>
-            <div v-if="entry.config.assets && entry.config.assets.favicon" class="detail">
-              <dt>{{ $t('admin.branding.detail.favicon') }}</dt>
-              <dd><img class="favicon" :src="entry.config.assets.favicon" alt="favicon" /></dd>
-            </div>
-          </dl>
-        </li>
-      </ul>
-
+    <!-- 2. Available brandings (bottom): a compact, read-only reference of each baked-in branding and
+         the buckets it provides — brandings are composed above, not activated here. -->
+    <os-card class="available-card">
+      <h2 class="ds-heading ds-heading-h2">{{ $t('admin.branding.available.title') }}</h2>
       <p v-if="$fetchState.pending" class="hint">{{ $t('admin.branding.loading') }}</p>
       <p v-else-if="!brandings.length" class="hint">{{ $t('admin.branding.noneExtra') }}</p>
+      <ul v-else class="available-list">
+        <li v-for="b in brandings" :key="b.id" class="available-item">
+          <img v-if="logo(b)" class="available-logo" :src="logo(b)" :alt="b.label || b.id" />
+          <span class="available-name">
+            {{ b.label || b.id }}
+            <code v-if="b.version" class="branding-version">v{{ b.version }}</code>
+          </span>
+          <span class="available-buckets">
+            <code
+              v-for="inst in providedBuckets[b.id] || []"
+              :key="inst.type + '.' + inst.name"
+              class="bucket-tag"
+            >
+              {{ inst.type }}
+              <template v-if="inst.name !== 'default'">/{{ inst.name }}</template>
+            </code>
+          </span>
+        </li>
+      </ul>
     </os-card>
   </div>
 </template>
 
 <script>
-import { brandingDefaults } from '@ocelot-social/branding'
+import { BUCKET_NAMES } from '@ocelot-social/branding'
 import { OsCard } from '@ocelot-social/ui'
-import { setActiveBrandingMutation } from '~/graphql/BrandingMutations'
+import {
+  setActiveBrandingMutation,
+  setBrandingCompositionMutation,
+} from '~/graphql/BrandingMutations'
 
 export default {
   components: { OsCard },
   middleware: ['isAdmin'],
-  // The list of baked-in brandings is a served asset (the branding-assets middleware writes
-  // /branding/manifest.json), not a backend query — fetch it client-side, plus each brand's
-  // resolved config (branding.json) for the detail view.
+  // The baked-in brandings are served assets (the branding-assets middleware), not a backend query —
+  // fetch the aggregate list plus each brand's own manifest (the buckets it provides) client-side.
   fetchOnServer: false,
   data() {
     return {
       brandings: [],
+      // brand id → its manifest instances ([{ type, name, file }]) = the buckets it provides.
+      providedBuckets: {},
+      // brand id → its composed config (branding.json) — for the favicon & logo preview.
       details: {},
       saving: null,
+      // Local editable copy of the per-slot composition (brandingComposition policy value, parsed).
+      composition: {},
+      savingComposition: false,
     }
+  },
+  mounted() {
+    // Initialise the composition editor from the live policy value (client-only; policy is loaded).
+    this.composition = this.readComposition()
   },
   async fetch() {
     let list = []
@@ -135,53 +113,75 @@ export default {
     } catch (error) {
       list = []
     }
+    const providedBuckets = {}
     const details = {}
     await Promise.all(
-      list.map(async (b) => {
-        try {
-          const res = await fetch(b.config)
-          if (res.ok) details[b.id] = await res.json()
-        } catch (error) {
-          // detail view degrades gracefully when a config can't be loaded
-        }
-      }),
+      list.flatMap((b) => [
+        // the buckets a brand provides (its manifest instances)
+        (async () => {
+          try {
+            const res = await fetch(`/branding/${b.id}/manifest.json`)
+            if (res.ok) {
+              const manifest = await res.json()
+              providedBuckets[b.id] = Array.isArray(manifest.instances) ? manifest.instances : []
+            }
+          } catch (error) {
+            // the bucket list degrades gracefully when a manifest can't be loaded
+          }
+        })(),
+        // its composed config, for the favicon & logo preview
+        (async () => {
+          try {
+            const res = await fetch(b.config)
+            if (res.ok) details[b.id] = await res.json()
+          } catch (error) {
+            // preview degrades gracefully when a config can't be loaded
+          }
+        })(),
+      ]),
     )
     this.brandings = list
+    this.providedBuckets = providedBuckets
     this.details = details
   },
   computed: {
-    // The live active branding id ('' = framework default). Kept live by the policy subscription.
+    // The live base brand id ('' = framework default). Kept live by the policy subscription.
     activeId() {
       return this.$policy.get('activeBranding') || ''
     },
-    // The default brand is the first entry and behaves like any other: its resolved config is the
-    // framework defaults (brandingDefaults). Baked brandings follow, each with its fetched config.
-    entries() {
-      return [
-        { id: '', label: this.$t('admin.branding.vanilla'), config: brandingDefaults },
-        ...this.brandings.map((b) => ({
-          id: b.id,
-          label: b.label || b.id,
-          config: this.details[b.id] || {},
-        })),
-      ]
+    // The six composable bucket slots (theme/identity/logos/legal/navigation/behavior).
+    bucketNames() {
+      return BUCKET_NAMES
+    },
+    // Label of the base brand (the "complete package"), shown as the "inherit" option per slot.
+    baseLabel() {
+      if (!this.activeId) return this.$t('admin.branding.vanilla')
+      const base = this.brandings.find((b) => b.id === this.activeId)
+      return base ? base.label || base.id : this.activeId
+    },
+    // Brands a slot (or the whole package) can be sourced from.
+    sourceOptions() {
+      return this.brandings.map((b) => ({ id: b.id, label: b.label || b.id }))
     },
   },
   methods: {
-    reusable(value) {
-      return value ? '✓' : '✗'
+    // Header logo of a brand (from its composed config), for the available-list preview.
+    logo(b) {
+      const config = this.details[b.id]
+      return (config && config.logos && config.logos.headerPath) || ''
     },
-    pageSummary(config) {
-      const html = (config.assets && config.assets.html) || {}
-      const pages = Object.keys(html)
-      const locales = new Set()
-      for (const page of pages) Object.keys(html[page] || {}).forEach((l) => locales.add(l))
-      if (!pages.length) return this.$t('admin.branding.detail.noPages')
-      return this.$t('admin.branding.detail.pagesSummary', {
-        pages: pages.length,
-        locales: [...locales].join(', '),
-      })
+    // Parse the live brandingComposition policy value ('' or a JSON slot→source object).
+    readComposition() {
+      const raw = this.$policy.get('brandingComposition') || ''
+      if (!raw) return {}
+      try {
+        const parsed = JSON.parse(raw)
+        return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {}
+      } catch (error) {
+        return {}
+      }
     },
+    // The base "complete package" (activeBranding) — presets all buckets to this brand at once.
     async switchTo(id) {
       this.saving = id || 'vanilla'
       try {
@@ -189,12 +189,39 @@ export default {
           mutation: setActiveBrandingMutation(),
           variables: { id },
         })
-        // The switch is broadcast via policyChanged; reload to fully apply the new brand
-        // (config + assets + static-page HTML + build-time theme).
+        // Broadcast via policyChanged; reload to fully apply (config + assets + static HTML + theme).
         window.location.reload()
       } catch (error) {
         this.$toast.error(this.$t('admin.branding.error'))
         this.saving = null
+      }
+    },
+    // Set one slot's source ('' = inherit the base package → remove the override) and persist.
+    setSource(bucket, id) {
+      const next = { ...this.composition }
+      if (id) next[bucket] = id
+      else delete next[bucket]
+      this.composition = next
+      this.saveComposition()
+    },
+    async saveComposition() {
+      // Only keep non-empty slot overrides; an empty map clears the policy value.
+      const map = {}
+      for (const bucket of this.bucketNames) {
+        if (this.composition[bucket]) map[bucket] = this.composition[bucket]
+      }
+      const composition = Object.keys(map).length ? JSON.stringify(map) : ''
+      this.savingComposition = true
+      try {
+        await this.$apollo.mutate({
+          mutation: setBrandingCompositionMutation(),
+          variables: { composition },
+        })
+        // Broadcast via policyChanged; reload to fully apply the recomposed branding.
+        window.location.reload()
+      } catch (error) {
+        this.$toast.error(this.$t('admin.branding.error'))
+        this.savingComposition = false
       }
     },
   },
@@ -202,114 +229,88 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.branding-list {
-  list-style: none;
-  padding: 0;
-}
-
-.branding-item {
-  // Left padding is a gutter for the active marker, applied to EVERY item so they all align and
-  // the content never sits under the green bar.
-  padding: $space-small 0 $space-small $space-small;
-  border-bottom: 1px solid $border-color-softer;
-
-  &.active {
-    // inset shadow marks the active item without taking layout space (no per-item indent).
-    // Brand-themed via $color-primary (var(--color-primary)-backed); vanilla stays green
-    // ($color-primary == $color-success there).
-    box-shadow: inset 3px 0 0 $color-primary;
-  }
-}
-
-.branding-head {
+.composition-row {
   display: flex;
   align-items: center;
   gap: $space-small;
+  padding: $space-x-small 0;
+  border-bottom: 1px solid $border-color-softer;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &--base {
+    // The whole-package preset sits above the per-slot rows, set apart with a heavier divider.
+    border-bottom: 2px solid $border-color-soft;
+    padding-bottom: $space-small;
+    margin-bottom: $space-x-small;
+  }
 }
 
-.branding-logo {
-  height: 24px;
-  width: auto;
-}
-
-.branding-title {
+.composition-label {
   flex: 1;
   font-weight: $font-weight-bold;
+}
+
+.composition-select {
+  min-width: 220px;
+  padding: $space-xx-small $space-x-small;
+}
+
+.available-card {
+  margin-top: $space-base;
+}
+
+.available-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.available-item {
+  display: flex;
+  align-items: baseline;
+  gap: $space-small;
+  padding: $space-x-small 0;
+  border-bottom: 1px solid $border-color-softer;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.available-logo {
+  flex: 0 0 auto;
+  height: 20px;
+  width: auto;
+  max-width: 120px;
+}
+
+.available-name {
+  flex: 0 0 auto;
+  font-weight: $font-weight-bold;
+}
+
+.available-buckets {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-xx-small;
+  justify-content: flex-end;
+}
+
+.bucket-tag {
+  background-color: $background-color-softest;
+  color: $text-color-soft;
+  padding: 1px 6px;
+  border-radius: $border-radius-base;
+  font-size: $font-size-small;
 }
 
 .branding-version {
   color: $text-color-soft;
   font-weight: normal;
-}
-
-.badge-active {
-  // Brand-themed (see .btn-activate) — vanilla unchanged since $color-primary == $color-success.
-  color: $color-primary;
-  font-weight: $font-weight-bold;
-}
-
-.btn {
-  border: none;
-  border-radius: 4px;
-  padding: 4px 12px;
-  cursor: pointer;
-  color: $color-primary-inverse;
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: default;
-  }
-}
-
-.btn-activate {
-  // Brand-themed: $color-primary is var(--color-primary)-backed, so this follows the active brand's
-  // colour. In vanilla ocelot $color-primary == $color-success (both green), so the default is
-  // unchanged; a branded instance gets its own primary instead of the hard success green.
-  background-color: $color-primary;
-}
-
-.branding-desc {
-  margin: 4px 0 0;
-  color: $text-color-soft;
-}
-
-.license-note {
-  font-style: italic;
-}
-
-.branding-details {
-  margin: $space-small 0 0;
-
-  .detail {
-    display: flex;
-    gap: $space-small;
-    padding: 2px 0;
-
-    dt {
-      flex: 0 0 30%;
-      color: $text-color-soft;
-    }
-
-    dd {
-      flex: 1;
-      margin: 0;
-    }
-  }
-}
-
-.swatch {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  border-radius: 3px;
-  border: 1px solid $border-color-softer;
-  vertical-align: middle;
-  margin-right: 4px;
-}
-
-.favicon {
-  height: 16px;
-  width: 16px;
 }
 
 .hint {

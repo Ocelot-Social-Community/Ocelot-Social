@@ -37,6 +37,23 @@
         "favicon": "Favicon",
         "noPages": "none",
         "pagesSummary": "{pages} pages ({locales})"
+      },
+      "composition": {
+        "title": "Branding composition",
+        "description": "Configure each bucket's source, layered over the base package ({base}). Changing a bucket reloads the app for everyone.",
+        "wholePackage": "Complete package (all buckets)",
+        "inherit": "Inherit from package ({base})",
+        "bucket": {
+          "theme": "Theme (colours, fonts)",
+          "identity": "Identity (name, organisation)",
+          "logos": "Logos & favicon",
+          "legal": "Legal & static pages",
+          "navigation": "Navigation & menus",
+          "behavior": "Behaviour (limits, formats)"
+        }
+      },
+      "available": {
+        "title": "Available brandings"
       }
     },
     "api-keys": {

@@ -1,4 +1,6 @@
 type Mutation {
   "Switch the live network branding to the given baked-in brand id (one of /branding/manifest.json), or the empty string for framework defaults. Persisted as the `activeBranding` policy value and broadcast live via the `policyChanged` subscription, so every client reloads the new brand's config without a redeploy. Requires the `branding.manage` permission. Returns the applied id."
   setActiveBranding(id: String!): String!
+  "Set the per-bucket branding composition — a JSON-encoded object mapping a bucket slot (theme/identity/logos/legal/navigation/behavior) to a source 'id[@version][/instance]', layered over `activeBranding`. The empty string clears all per-slot overrides. Persisted as the `brandingComposition` policy value and broadcast live via `policyChanged`, so clients reload the recomposed branding. Requires the `branding.manage` permission. Returns the applied JSON string."
+  setBrandingComposition(composition: String!): String!
 }

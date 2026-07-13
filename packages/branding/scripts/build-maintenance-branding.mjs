@@ -15,6 +15,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
 
+import { composeArchive } from '../dist/discover.js'
 import { readTarGz } from '../dist/tar.js'
 
 import { buildBrandArchive } from './lib/build-brandings.mjs'
@@ -31,8 +32,9 @@ const maintenanceDir = resolve(maintenanceArg)
 // app + serverMiddleware consume, so the maintenance page can't drift from them.
 const { id, gz } = await buildBrandArchive(brandDir)
 const archive = readTarGz(gz)
-const config = JSON.parse(archive.get('branding.json').toString('utf8'))
-const theme = config.theme ?? { cssVars: {}, fontFaces: [] }
+// Compose the effective config from the archive's instance fragments (no merged branding.json).
+const config = composeArchive(archive)
+const theme = config?.theme ?? { cssVars: {}, fontFaces: [] }
 
 // --- 1. Colours: append the brand's :root overrides to the maintenance branding.css --------------
 const cssPath = join(maintenanceDir, 'app/assets/css/branding.css')

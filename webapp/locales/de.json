@@ -37,6 +37,23 @@
         "favicon": "Favicon",
         "noPages": "keine",
         "pagesSummary": "{pages} Seiten ({locales})"
+      },
+      "composition": {
+        "title": "Branding-Zusammenstellung",
+        "description": "Für jeden Bereich die Quelle festlegen, über dem Gesamtpaket ({base}). Eine Änderung lädt die App für alle neu.",
+        "wholePackage": "Gesamtpaket (alle Bereiche)",
+        "inherit": "Vom Gesamtpaket erben ({base})",
+        "bucket": {
+          "theme": "Design (Farben, Schriften)",
+          "identity": "Identität (Name, Organisation)",
+          "logos": "Logos & Favicon",
+          "legal": "Rechtliches & statische Seiten",
+          "navigation": "Navigation & Menüs",
+          "behavior": "Verhalten (Limits, Formate)"
+        }
+      },
+      "available": {
+        "title": "Verfügbare Brandings"
       }
     },
     "api-keys": {

@@ -709,6 +709,7 @@ export default shield(
       // Branding: switch the live branding (stored as the activeBranding policy value, but
       // gated by its own dedicated right rather than the broad policy.manage).
       setActiveBranding: hasPermission('branding.manage'),
+      setBrandingComposition: hasPermission('branding.manage'),
 
       // Cache resync: dev/test recovery hook only (db:reset/seed + e2e). Disabled in
       // production — fleet resyncs there are done via a rolling restart.

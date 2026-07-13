@@ -12,7 +12,11 @@
 // dynamic brandings; the app runs on framework defaults).
 const path = require('path')
 // eslint-disable-next-line import/no-unresolved -- package subpath, server-only (uses node:fs + node:zlib)
-const { discoverArchives, readArchive } = require('@ocelot-social/branding/dist/discover.js')
+const {
+  discoverArchives,
+  readArchive,
+  composeArchive,
+} = require('@ocelot-social/branding/dist/discover.js')
 
 const CONTENT_TYPES = {
   '.svg': 'image/svg+xml',
@@ -75,14 +79,29 @@ module.exports = function brandingAssets(req, res, next) {
   if (!archive) return next()
   const files = readArchive(archive.file)
   if (!files) return next()
+
+  // `branding.json` is VIRTUAL: the archive stores instance fragments, not a merged config, so compose
+  // the effective config on the fly (the admin detail view fetches this). Everything else is a real
+  // archive entry (asset / html / fragment).
+  if (entry === 'branding.json') {
+    const config = composeArchive(files)
+    if (!config) return next()
+    const body = JSON.stringify(config)
+    res.setHeader('Content-Type', 'application/json; charset=utf-8')
+    res.setHeader('Content-Length', Buffer.byteLength(body))
+    res.setHeader('Cache-Control', 'no-cache') // a switch/edit is picked up
+    if (req.method === 'HEAD') return res.end()
+    return res.end(body)
+  }
+
   const data = files.get(entry)
   if (!data) return next()
 
   const type = CONTENT_TYPES[path.extname(entry).toLowerCase()] || 'application/octet-stream'
   res.setHeader('Content-Type', type)
   res.setHeader('Content-Length', data.length)
-  // Keep the compiled config fresh (a switch is picked up); assets are namespaced + safe to cache.
-  res.setHeader('Cache-Control', entry === 'branding.json' ? 'no-cache' : 'public, max-age=3600')
+  // Assets are namespaced + safe to cache.
+  res.setHeader('Cache-Control', 'public, max-age=3600')
   if (req.method === 'HEAD') return res.end()
   res.end(data)
 }

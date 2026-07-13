@@ -8,3 +8,11 @@ export const setActiveBrandingMutation = () => gql`
     setActiveBranding(id: $id)
   }
 `
+
+// Set the per-bucket composition (JSON string mapping a bucket slot → source 'id[@version][/name]',
+// layered over activeBranding; '' clears it). Gated by branding.manage, broadcast via policyChanged.
+export const setBrandingCompositionMutation = () => gql`
+  mutation setBrandingComposition($composition: String!) {
+    setBrandingComposition(composition: $composition)
+  }
+`

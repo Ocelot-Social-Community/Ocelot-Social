@@ -15,7 +15,8 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsc",
-    "build:dev-brandings": "node scripts/build-dev-brandings.mjs"
+    "build:dev-brandings": "node scripts/build-dev-brandings.mjs",
+    "test": "npm run build && node --test test/*.test.mjs"
   },
   "devDependencies": {
     "@types/node": "^18.18.9",

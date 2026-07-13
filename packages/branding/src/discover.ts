@@ -3,7 +3,7 @@
 // bootstrap). ANY `*.tar.gz` found RECURSIVELY under the base dir is treated as a brand archive, so it
 // does not matter whether brands publish to `<base>/<brand>/dist/<id>.tar.gz`, `<base>/<id>.tar.gz`,
 // `<base>/<brand>/build/<id>.tar.gz`, … — all are found and loaded. Each archive carries its brand id
-// + version INSIDE branding.json (injected at build); duplicates of the same id (a versioned file and
+// + version INSIDE manifest.json (injected at build); duplicates of the same id (a versioned file and
 // its latest copy, or several versions) dedupe to the HIGHEST version.
 //
 // Server-only: uses node:fs — do NOT import from the package index (keeps it out of the webapp client
@@ -11,7 +11,16 @@
 import { readdirSync, readFileSync, statSync } from 'fs'
 import { join } from 'path'
 
+import { BUCKET_NAMES, composeConfig, parseSource } from './buckets'
 import { readTarGz } from './tar'
+
+import type { ArchiveManifest, BucketName } from './buckets'
+import type { BrandingConfig, DeepPartial } from './schema'
+
+/** A composition map: each bucket slot → a source string (`id[@version][/name]`); `_default` is the
+ *  base for unspecified slots (typically the `activeBranding` id). An empty/absent slot → framework
+ *  default. */
+export type CompositionMap = Partial<Record<BucketName | '_default', string>>
 
 export interface BrandArchive {
   id: string
@@ -63,8 +72,8 @@ function compareVersions(a: string | null, b: string | null): number {
   return 0
 }
 
-// Read a single archive's id/version/label from its branding.json (mtime-cached). Null if it isn't a
-// readable brand archive (missing/garbled branding.json, or no id — a stray .tar.gz).
+// Read a single archive's id/version/label from its manifest.json (mtime-cached). Null if it isn't a
+// readable brand archive (missing/garbled manifest.json, or no id — a stray .tar.gz).
 function readMeta(file: string): CachedMeta | null {
   let stat
   try {
@@ -75,23 +84,110 @@ function readMeta(file: string): CachedMeta | null {
   const cached = metaCache.get(file)
   if (cached && cached.mtimeMs === stat.mtimeMs) return cached
   try {
-    const files = readTarGz(readFileSync(file))
-    const entry = files.get('branding.json')
-    if (!entry) return null
-    const json = JSON.parse(entry.toString('utf8'))
-    const id: unknown = json.id
-    if (typeof id !== 'string' || !id) return null
+    const manifest = readManifest(readTarGz(readFileSync(file)))
+    if (!manifest || typeof manifest.id !== 'string' || !manifest.id) return null
     const meta: CachedMeta = {
       mtimeMs: stat.mtimeMs,
-      id,
-      version: typeof json.metadata?.version === 'string' ? json.metadata.version : null,
-      label: typeof json.metadata?.applicationName === 'string' ? json.metadata.applicationName : id,
+      id: manifest.id,
+      version: typeof manifest.version === 'string' ? manifest.version : null,
+      label: typeof manifest.label === 'string' ? manifest.label : manifest.id,
     }
     metaCache.set(file, meta)
     return meta
   } catch {
     return null
   }
+}
+
+/** Parse an archive's manifest.json (the library index), or null when missing/garbled. */
+export function readManifest(files: Map<string, Buffer>): ArchiveManifest | null {
+  const entry = files.get('manifest.json')
+  if (!entry) return null
+  try {
+    return JSON.parse(entry.toString('utf8')) as ArchiveManifest
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Compose an archive's effective config from its instance fragments. `selection` maps a bucket type
+ * to the instance NAME to use for that slot; a type without a selection uses its `default` instance.
+ * A type the archive does not provide falls back to the framework default (composeConfig). Returns
+ * null when the archive has no readable manifest. Manifest-level id/version are attached to the result
+ * so consumers keep them (id is not a bucket-owned config leaf).
+ */
+export function composeArchive(
+  files: Map<string, Buffer>,
+  selection: Partial<Record<BucketName, string>> = {},
+): (BrandingConfig & { id?: string }) | null {
+  const manifest = readManifest(files)
+  if (!manifest) return null
+  const sources: Partial<Record<BucketName, DeepPartial<BrandingConfig>>> = {}
+  for (const type of BUCKET_NAMES) {
+    const name = selection[type] ?? 'default'
+    const entry = manifest.instances.find((i) => i.type === type && i.name === name)
+    const raw = entry && files.get(entry.file)
+    if (!raw) continue
+    try {
+      sources[type] = JSON.parse(raw.toString('utf8')) as DeepPartial<BrandingConfig>
+    } catch {
+      // skip an unreadable fragment → that slot falls back to the framework default
+    }
+  }
+  const composed = composeConfig(sources) as BrandingConfig & { id?: string }
+  composed.id = manifest.id
+  return composed
+}
+
+/** Read + compose one archive file's effective config in one call (mtime-cached read). */
+export function readArchiveConfig(
+  file: string,
+  selection: Partial<Record<BucketName, string>> = {},
+): (BrandingConfig & { id?: string }) | null {
+  const files = readArchive(file)
+  return files ? composeArchive(files, selection) : null
+}
+
+/**
+ * Compose an effective config ACROSS archives from a composition map — each of the six bucket slots
+ * is taken from the source (archive + instance) the map assigns it, with `_default` filling the rest.
+ * This is what lets a network run e.g. the THEME of one brand with the IDENTITY of another. Slots with
+ * no (or an unresolvable) source fall back to the framework default. `getFiles(id)` resolves a brand
+ * id to its decompressed archive files (or null) — injected so this core is testable without fs.
+ */
+export function composeFromArchives(
+  getFiles: (id: string) => Map<string, Buffer> | null,
+  map: CompositionMap,
+): BrandingConfig {
+  const sources: Partial<Record<BucketName, DeepPartial<BrandingConfig>>> = {}
+  const filesById = new Map<string, Map<string, Buffer> | null>()
+  for (const slot of BUCKET_NAMES) {
+    const src = parseSource(map[slot] ?? map._default)
+    if (!src) continue // vanilla / unset → framework default for this slot
+    if (!filesById.has(src.id)) filesById.set(src.id, getFiles(src.id))
+    const files = filesById.get(src.id)
+    if (!files) continue
+    const manifest = readManifest(files)
+    const entry = manifest?.instances.find((i) => i.type === slot && i.name === src.name)
+    const raw = entry && files.get(entry.file)
+    if (!raw) continue
+    try {
+      sources[slot] = JSON.parse(raw.toString('utf8')) as DeepPartial<BrandingConfig>
+    } catch {
+      // unreadable fragment → that slot falls back to the framework default
+    }
+  }
+  return composeConfig(sources)
+}
+
+/** Resolve a composition map against the archives discovered under `baseDir` (mtime-cached reads). */
+export function composeComposition(baseDir: string, map: CompositionMap): BrandingConfig {
+  const archives = discoverArchives(baseDir)
+  return composeFromArchives((id) => {
+    const archive = archives.get(id)
+    return archive ? readArchive(archive.file) : null
+  }, map)
 }
 
 /** All brand archives under `baseDir`, keyed by brand id (highest version per id wins). */

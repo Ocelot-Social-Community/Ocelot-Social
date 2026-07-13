@@ -27,5 +27,34 @@ export default {
         throw err
       }
     },
+    // Per-bucket composition (layered over activeBranding). Same PolicyService + branding.manage path;
+    // the value is a JSON-encoded slot→source map ('' clears it).
+    setBrandingComposition: async (
+      _parent: unknown,
+      { composition }: { composition: string },
+      context: Context,
+    ): Promise<string> => {
+      const { policy, user } = context
+      // Validate empty OR a JSON object, so a malformed value can never be persisted and break the
+      // SSR loader (which JSON.parses it). Stored verbatim like activeBranding.
+      if (composition !== '') {
+        let parsed: unknown
+        try {
+          parsed = JSON.parse(composition)
+        } catch {
+          throw new UserInputError('brandingComposition must be empty or a JSON object')
+        }
+        if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+          throw new UserInputError('brandingComposition must be a JSON object')
+        }
+      }
+      try {
+        await policy.set('brandingComposition', composition, user?.id ?? 'unknown')
+        return composition
+      } catch (err) {
+        if (err instanceof PolicyValidationError) throw new UserInputError(err.message)
+        throw err
+      }
+    },
   },
 }

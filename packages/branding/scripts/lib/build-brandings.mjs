@@ -1,11 +1,13 @@
 // Core of the multi-brand build, shared by the CLI (build-brandings.mjs) and the dev scanner
-// (build-dev-brandings.mjs). Bundles each brand into ONE `<id>.tar.gz` under <out>/branding/
-// containing its namespaced branding.json + assets/ + html/, plus a manifest.json listing them.
-// Every consumer (webapp serverMiddleware, branding plugin, maintenance) reads the files back from
-// the archive. See docu/branding-architecture-konzept.md.
+// (build-dev-brandings.mjs). Bundles each brand into ONE `<id>.tar.gz` under <out>/branding/ as a
+// LIBRARY of bucket instances: manifest.json + fragments/<type>.<name>.json (one sparse fragment per
+// instance) + assets/ + html/. Consumers (webapp serverMiddleware, branding plugin, backend bootstrap,
+// maintenance) read the manifest and COMPOSE the effective config (discover.composeArchive). See
+// docu/branding-buckets-konzept.md.
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
 
+import { BUCKET_NAMES, instanceFile, splitConfig } from '../../dist/buckets.js'
 import { writeTarGz } from '../../dist/tar.js'
 
 import { loadConfig } from './load-config.mjs'
@@ -118,21 +120,29 @@ export async function buildBrandArchive(brandDir) {
   // Inject the version from package.json (single source) — surfaced in the admin Branding tab.
   if (version) namespaced.metadata = { ...namespaced.metadata, version }
 
-  const entries = [
-    { name: 'branding.json', data: Buffer.from(`${JSON.stringify(namespaced, null, 2)}\n`) },
-  ]
+  const label = config.metadata?.applicationName ?? id
+
+  // Archive = a LIBRARY of bucket instances (docu/branding-buckets-konzept.md §11): each bucket type's
+  // fragment is its own file `buckets/<type>.<name>.json`, indexed by manifest.json. A classic full
+  // brand yields one instance per type named `default` (splitConfig). Multiple instances of the same
+  // type (e.g. theme dark/light) are an authoring feature layered on this format later.
+  const entries = []
+  const fragments = splitConfig(namespaced)
+  const instances = []
+  for (const type of BUCKET_NAMES) {
+    const name = 'default'
+    const file = instanceFile(type, name)
+    entries.push({ name: file, data: Buffer.from(`${JSON.stringify(fragments[type], null, 2)}\n`) })
+    instances.push({ type, name, file })
+  }
+  const manifest = { id, version: version ?? null, label, instances }
+  entries.push({ name: 'manifest.json', data: Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`) })
+
   for (const sub of ['assets', 'html']) {
     const src = join(dir, sub)
     if (existsSync(src)) collectFiles(src, sub, entries)
   }
-  return {
-    id,
-    version,
-    label: config.metadata?.applicationName ?? id,
-    gz: writeTarGz(entries),
-    entries,
-    warnings,
-  }
+  return { id, version, label, gz: writeTarGz(entries), entries, warnings }
 }
 
 /**

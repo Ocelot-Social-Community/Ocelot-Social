@@ -1,13 +1,14 @@
 import brandingSubscribe from './branding-subscribe.js'
 
-// Drive the plugin: it registers a store watcher on the activeBranding policy snapshot; we capture
-// that watcher's callback and invoke it with successive values to simulate policy changes, asserting
-// whether the plugin triggers a full-page reload.
-function setup(brandingId) {
+// Drive the plugin: it registers a store watcher whose getter returns a combined signature of
+// activeBranding + brandingComposition; we capture the callback and invoke it with signatures (built
+// the same way) to simulate policy changes, asserting whether the plugin triggers a full-page reload.
+// `emit(active, composition)` mirrors the getter; `emit(undefined)` = snapshot still loading.
+function setup(brandingId, brandingComposition = '') {
   if (brandingId === undefined) {
     delete window.__NUXT__
   } else {
-    window.__NUXT__ = { brandingId }
+    window.__NUXT__ = { brandingId, brandingComposition }
   }
   let callback
   const store = {
@@ -16,7 +17,8 @@ function setup(brandingId) {
     },
   }
   brandingSubscribe({ store })
-  return (active) => callback(active)
+  return (active, composition = '') =>
+    callback(active === undefined ? undefined : `${active || ''}\n${composition || ''}`)
 }
 
 describe('plugins/branding-subscribe', () => {
@@ -53,6 +55,18 @@ describe('plugins/branding-subscribe', () => {
     const emit = setup('') // rendered vanilla
     emit('yunite') // admin switches to yunite
     expect(reload).toHaveBeenCalledTimes(1)
+  })
+
+  it('reloads when only the per-slot composition changes (same base brand)', () => {
+    const emit = setup('yunite', '') // rendered yunite, no per-slot overrides
+    emit('yunite', '{"theme":"acme"}') // admin sets a theme override → reload
+    expect(reload).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not reload when base + composition both match the rendered signature', () => {
+    const emit = setup('yunite', '{"identity":"acme"}')
+    emit('yunite', '{"identity":"acme"}')
+    expect(reload).not.toHaveBeenCalled()
   })
 
   it('reloads only ONCE for an unreachable target (baked-default image → vanilla loops otherwise)', () => {

@@ -13,11 +13,9 @@ import { setBranding } from '@ocelot-social/branding'
 // eslint-disable-next-line import-x/no-unresolved -- package subpath (server-only, uses node:fs + node:zlib)
 import {
   discoverArchives,
-  readArchive,
+  readArchiveConfig,
   readDefaultMarker,
 } from '@ocelot-social/branding/dist/discover.js'
-
-import type { BrandingConfig } from '@ocelot-social/branding'
 
 const assetsDir = process.env.OCELOT_BRANDING_ASSETS_DIR
 const active = assetsDir
@@ -28,11 +26,12 @@ const active = assetsDir
 if (assetsDir && active) {
   try {
     const archive = discoverArchives(assetsDir).get(active)
-    const entry = archive ? readArchive(archive.file)?.get('branding.json') : undefined
-    if (entry) {
-      setBranding(JSON.parse(entry.toString('utf8')) as BrandingConfig)
+    // Compose the effective config from the archive's instance fragments (manifest + fragments/).
+    const config = archive ? readArchiveConfig(archive.file) : null
+    if (config) {
+      setBranding(config)
     }
   } catch {
-    // no archive / unreadable / bad JSON → keep framework defaults
+    // no archive / unreadable / bad manifest → keep framework defaults
   }
 }

@@ -4,7 +4,7 @@
 import { setBranding as mockSetBranding } from '@ocelot-social/branding'
 import {
   discoverArchives as mockDiscoverArchives,
-  readArchive as mockReadArchive,
+  composeComposition as mockComposeComposition,
   readDefaultMarker as mockReadDefaultMarker,
 } from '@ocelot-social/branding/dist/discover.js'
 
@@ -15,17 +15,23 @@ jest.mock(
   '@ocelot-social/branding/dist/discover.js',
   () => ({
     discoverArchives: jest.fn(),
-    readArchive: jest.fn(),
+    composeComposition: jest.fn(),
     readDefaultMarker: jest.fn(() => ''),
   }),
   { virtual: true },
 )
 
-// Reply to the SSR fetchActiveBrandingId() GraphQL call with a given activeBranding value.
-function mockPolicy(activeBranding) {
+// Reply to the SSR fetchBrandingPolicy() GraphQL call with activeBranding + brandingComposition
+// (both transported JSON-encoded; brandingComposition is itself a JSON string or '').
+function mockPolicy(activeBranding, brandingComposition = '') {
   global.fetch = jest.fn().mockResolvedValue({
     json: async () => ({
-      data: { policy: [{ key: 'activeBranding', value: JSON.stringify(activeBranding) }] },
+      data: {
+        policy: [
+          { key: 'activeBranding', value: JSON.stringify(activeBranding) },
+          { key: 'brandingComposition', value: JSON.stringify(brandingComposition) },
+        ],
+      },
     }),
   })
 }
@@ -47,24 +53,62 @@ describe('plugins/branding (SSR injection)', () => {
     delete process.env.OCELOT_BRANDING_ASSETS_DIR
   })
 
-  it('injects the resolved brand config and serialises it to the client', async () => {
+  it('injects the composed brand config and serialises it to the client', async () => {
     const config = { id: 'nutrimind', links: { footerOrder: ['imprint'] } }
     mockPolicy('nutrimind')
     mockDiscoverArchives.mockReturnValue(
       new Map([['nutrimind', { id: 'nutrimind', file: '/brands/n.tar.gz' }]]),
     )
-    mockReadArchive.mockReturnValue(
-      new Map([['branding.json', Buffer.from(JSON.stringify(config))]]),
-    )
+    mockComposeComposition.mockReturnValue(config)
 
     await brandingPlugin(context)
 
+    // base brand → composition map with just _default; no per-slot overrides
+    expect(mockComposeComposition).toHaveBeenCalledWith('/brands', { _default: 'nutrimind' })
     expect(mockSetBranding).toHaveBeenCalledWith(config)
-    // serialise to the client so hydration matches
     const nuxtState = {}
     context.beforeNuxtRender.mock.calls[0][0]({ nuxtState })
     expect(nuxtState.branding).toEqual(config)
     expect(nuxtState.brandingId).toBe('nutrimind')
+    expect(nuxtState.brandingComposition).toBe('')
+  })
+
+  it('composes ACROSS brands from the composition map (theme of one, identity of another)', async () => {
+    const config = { id: 'composed' }
+    const composition = JSON.stringify({ identity: 'nutriminds' })
+    mockPolicy('yunite', composition)
+    mockDiscoverArchives.mockReturnValue(
+      new Map([
+        ['yunite', { id: 'yunite', file: '/brands/y.tar.gz' }],
+        ['nutriminds', { id: 'nutriminds', file: '/brands/n.tar.gz' }],
+      ]),
+    )
+    mockComposeComposition.mockReturnValue(config)
+
+    await brandingPlugin(context)
+
+    expect(mockComposeComposition).toHaveBeenCalledWith('/brands', {
+      _default: 'yunite',
+      identity: 'nutriminds',
+    })
+    const nuxtState = {}
+    context.beforeNuxtRender.mock.calls[0][0]({ nuxtState })
+    expect(nuxtState.brandingId).toBe('yunite')
+    expect(nuxtState.brandingComposition).toBe(composition)
+  })
+
+  it('brands from composition alone even when the base is vanilla', async () => {
+    mockPolicy('', JSON.stringify({ theme: 'yunite' }))
+    mockDiscoverArchives.mockReturnValue(new Map([['yunite', { id: 'yunite', file: '/y.tar.gz' }]]))
+    mockComposeComposition.mockReturnValue({ id: 'x' })
+
+    await brandingPlugin(context)
+
+    expect(mockComposeComposition).toHaveBeenCalledWith('/brands', {
+      _default: '',
+      theme: 'yunite',
+    })
+    expect(mockSetBranding).not.toHaveBeenCalledWith(undefined)
   })
 
   it('RESETS to vanilla (setBranding undefined) when the request resolves to no brand — no stale leak', async () => {
