@@ -1,12 +1,12 @@
-// Minimal, dependency-free tar + gzip for brand archives — a brand build bundles its resolved
-// branding.json + assets/ + html/ into ONE `<id>.tar.gz`, and every consumer (webapp serverMiddleware,
-// branding plugin, maintenance generator) reads the files back FROM that archive instead of loose
-// files. Only the file entries we write are supported (no dirs/symlinks); everything is loaded into
+// Minimal, dependency-free tar + gzip for brand archives — a brand build bundles its manifest.json +
+// bucket-instance fragments + assets/ + html/ into ONE `<id>.tar.gz`, and every consumer (webapp
+// serverMiddleware, branding plugin, maintenance generator) reads the files back FROM that archive
+// instead of loose files. Only the file entries we write are supported (no dirs/symlinks); loaded into
 // memory (a brand archive is tiny, ~70 KB). Server-only: uses node:zlib — do NOT import from the
 // package index (keeps it out of the webapp client bundle).
 // Plain 'zlib' (not 'node:zlib') so webpack 4 (Nuxt 2 webapp) can stub it via node:{zlib:'empty'}
 // when this server-only module is referenced from a client-bundled file behind a process.server guard.
-import { gunzipSync, gzipSync } from 'zlib'
+import { gunzipSync, gzipSync } from 'node:zlib'
 
 const BLOCK = 512
 
@@ -59,7 +59,10 @@ export function readTarGz(gz: Buffer): Map<string, Buffer> {
     if (header.every((b) => b === 0)) break // end-of-archive
     const name = header.subarray(0, 100).toString('utf8').replace(/\0.*$/s, '')
     const size = parseInt(
-      header.subarray(124, 136).toString('utf8').replace(/[^0-7]/g, '') || '0',
+      header
+        .subarray(124, 136)
+        .toString('utf8')
+        .replace(/[^0-7]/g, '') || '0',
       8,
     )
     const type = String.fromCharCode(header[156])

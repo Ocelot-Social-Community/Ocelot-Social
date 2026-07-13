@@ -35,6 +35,6 @@ function deepMerge(
 export function defineBranding(overrides: BrandingOverrides): BrandingConfig {
   return deepMerge(
     brandingDefaults as unknown as Record<string, unknown>,
-    overrides as Record<string, unknown>,
+    overrides,
   ) as unknown as BrandingConfig
 }

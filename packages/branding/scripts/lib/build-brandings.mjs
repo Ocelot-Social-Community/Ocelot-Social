@@ -1,9 +1,9 @@
-// Core of the multi-brand build, shared by the CLI (build-brandings.mjs) and the dev scanner
-// (build-dev-brandings.mjs). Bundles each brand into ONE `<id>.tar.gz` under <out>/branding/ as a
-// LIBRARY of bucket instances: manifest.json + fragments/<type>.<name>.json (one sparse fragment per
-// instance) + assets/ + html/. Consumers (webapp serverMiddleware, branding plugin, backend bootstrap,
-// maintenance) read the manifest and COMPOSE the effective config (discover.composeArchive). See
-// docu/branding-buckets-konzept.md.
+// Core of the brand build, shared by build-brand-archive.mjs (single-brand CLI + --watch), the dev
+// scanner (build-dev-brandings.mjs) and the maintenance generator (build-maintenance-branding.mjs).
+// Bundles a brand into ONE `<id>.tar.gz` as a LIBRARY of bucket instances: manifest.json +
+// fragments/<type>.<name>.json (one sparse fragment per instance) + assets/ + html/. Consumers (webapp
+// serverMiddleware, branding plugin, backend bootstrap, maintenance) read the manifest and COMPOSE the
+// effective config (discover.composeArchive). See docu/branding-buckets-konzept.md.
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -121,7 +121,7 @@ export function findConfig(brandDir) {
   return null
 }
 
-/** Bundle ONE brand directory into a `<id>.tar.gz` buffer (branding.json + assets/ + html/). */
+/** Bundle ONE brand directory into a `<id>.tar.gz` buffer (manifest.json + fragments/ + assets/ + html/). */
 export async function buildBrandArchive(brandDir) {
   const dir = resolve(brandDir)
   const id = brandId(dir)
@@ -143,12 +143,10 @@ export async function buildBrandArchive(brandDir) {
     config.metadata.ogImage = config.logos.signupPath
   }
   const namespaced = namespaceConfig(config, id, dir, warnings)
-  // Stamp the brand id into branding.json so consumers can discover archives by content (the file
-  // name may be versioned, e.g. `<id>-1.2.3.tar.gz`) — see src/discover.ts. Version lives in the
-  // manifest only (not injected into metadata — no runtime consumer reads it there, and doing so
-  // would make the identity bucket always look "customised", breaking partial-package detection).
-  namespaced.id = id
-
+  // The brand id + version live in manifest.json only (below), NOT in any config leaf: splitConfig
+  // would drop a top-level `id` anyway (it is not a bucket-owned path), and injecting version into
+  // metadata would make the identity bucket always look "customised", breaking partial-package
+  // detection. Consumers read id/version from the manifest (see src/discover.ts).
   const label = config.metadata?.applicationName ?? id
 
   // Archive = a LIBRARY of bucket instances (docu/branding-buckets-konzept.md §11): each bucket type's
@@ -169,7 +167,10 @@ export async function buildBrandArchive(brandDir) {
     instances.push({ type, name, file })
   }
   const manifest = { id, version: version ?? null, schemaVersion: SCHEMA_VERSION, label, instances }
-  entries.push({ name: 'manifest.json', data: Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`) })
+  entries.push({
+    name: 'manifest.json',
+    data: Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`),
+  })
 
   for (const sub of ['assets', 'html']) {
     const src = join(dir, sub)
@@ -197,37 +198,4 @@ export async function publishBrandArchive(brandDir, { outDir, markDefault = fals
   }
   if (markDefault) writeFileSync(join(dir, 'DEFAULT'), `${built.id}\n`)
   return { ...built, dir, latest, versioned }
-}
-
-/**
- * Bundle every brand directory in `brandArgs` into `<outArg>/branding/<id>.tar.gz`. The served
- * manifest is derived dynamically from the archives present, so none is written here.
- * Returns the built list ([{ id, label, config, archive }]).
- */
-export async function buildBrandings(outArg, brandArgs) {
-  const brandingRoot = join(resolve(outArg), 'branding')
-  mkdirSync(brandingRoot, { recursive: true })
-  const manifest = []
-
-  for (const brandArg of brandArgs) {
-    const { id, label, gz, entries, warnings } = await buildBrandArchive(brandArg)
-    writeFileSync(join(brandingRoot, `${id}.tar.gz`), gz)
-    manifest.push({
-      id,
-      label,
-      archive: `${id}.tar.gz`,
-      // Served (from the archive) by the branding-assets middleware — the admin UI fetches this.
-      config: `/branding/${id}/branding.json`,
-    })
-    // eslint-disable-next-line no-console
-    console.log(`[brandings] ${basename(resolve(brandArg))} → ${id}.tar.gz (${entries.length} files, ${gz.length} b)`)
-    for (const w of warnings) console.warn(w)
-  }
-
-  // No static manifest.json is written: the served /branding/manifest.json is derived DYNAMICALLY
-  // from the archives actually present (webapp serverMiddleware), so the admin list can never drift
-  // from what was built — even when archives are added/removed/built individually.
-  // eslint-disable-next-line no-console
-  console.log(`[brandings] ${manifest.length} brand(s) → ${brandingRoot}`)
-  return manifest
 }

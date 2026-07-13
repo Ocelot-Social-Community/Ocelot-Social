@@ -54,5 +54,8 @@ export const THEME_DEFAULTS: Record<string, string> = {
  * CSS vars), so brands set a literal `theme.cssVars['color-primary']`.
  */
 export function resolveThemeColor(cssVars?: Record<string, string>): string {
-  return (cssVars && cssVars['color-primary']) || THEME_DEFAULTS['color-primary']
+  // Deliberate `||`, not `??`: an empty-string colour is not a usable value either, so it must fall
+  // back to the framework default just like an absent one.
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+  return cssVars?.['color-primary'] || THEME_DEFAULTS['color-primary']
 }

@@ -8,8 +8,8 @@
 //
 // Server-only: uses node:fs — do NOT import from the package index (keeps it out of the webapp client
 // bundle; consumers require it under a `process.server` guard).
-import { readdirSync, readFileSync, statSync } from 'fs'
-import { join } from 'path'
+import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { join } from 'node:path'
 
 import { BUCKET_NAMES, composeConfig, parseSource } from './buckets'
 import { readTarGz } from './tar'
@@ -82,7 +82,7 @@ function readMeta(file: string): CachedMeta | null {
     return null
   }
   const cached = metaCache.get(file)
-  if (cached && cached.mtimeMs === stat.mtimeMs) return cached
+  if (cached?.mtimeMs === stat.mtimeMs) return cached
   try {
     const manifest = readManifest(readTarGz(readFileSync(file)))
     if (!manifest || typeof manifest.id !== 'string' || !manifest.id) return null
@@ -123,10 +123,11 @@ export function composeArchive(
 ): (BrandingConfig & { id?: string }) | null {
   const manifest = readManifest(files)
   if (!manifest) return null
+  const instances = Array.isArray(manifest.instances) ? manifest.instances : []
   const sources: Partial<Record<BucketName, DeepPartial<BrandingConfig>>> = {}
   for (const type of BUCKET_NAMES) {
     const name = selection[type] ?? 'default'
-    const entry = manifest.instances.find((i) => i.type === type && i.name === name)
+    const entry = instances.find((i) => i.type === type && i.name === name)
     const raw = entry && files.get(entry.file)
     if (!raw) continue
     try {
@@ -155,6 +156,10 @@ export function readArchiveConfig(
  * This is what lets a network run e.g. the THEME of one brand with the IDENTITY of another. Slots with
  * no (or an unresolvable) source fall back to the framework default. `getFiles(id)` resolves a brand
  * id to its decompressed archive files (or null) — injected so this core is testable without fs.
+ *
+ * Unlike composeArchive (a single archive → one `id` attached), the result carries NO `id`: a
+ * cross-brand mix has no single brand id. The webapp tracks the primary id separately as the map's
+ * `_default` (see plugins/branding.js `brandingId`).
  */
 export function composeFromArchives(
   getFiles: (id: string) => Map<string, Buffer> | null,
@@ -169,7 +174,8 @@ export function composeFromArchives(
     const files = filesById.get(src.id)
     if (!files) continue
     const manifest = readManifest(files)
-    const entry = manifest?.instances.find((i) => i.type === slot && i.name === src.name)
+    const instances = Array.isArray(manifest?.instances) ? manifest.instances : []
+    const entry = instances.find((i) => i.type === slot && i.name === src.name)
     const raw = entry && files.get(entry.file)
     if (!raw) continue
     try {
@@ -215,7 +221,7 @@ export function readArchive(file: string): Map<string, Buffer> | null {
     return null
   }
   const cached = fileCache.get(file)
-  if (cached && cached.mtimeMs === stat.mtimeMs) return cached.files
+  if (cached?.mtimeMs === stat.mtimeMs) return cached.files
   try {
     const files = readTarGz(readFileSync(file))
     fileCache.set(file, { mtimeMs: stat.mtimeMs, files })

@@ -13,13 +13,11 @@
 // `import branding` unchanged. (Module-scope reads that CAPTURE a value at import time see whatever
 // is current then — see docu/branding-architecture-konzept.md for the build-vs-runtime split.)
 
-import { brandingDefaults } from './defaults'
 import { defineBranding } from './merge'
-import { overrides } from './overrides'
 
 import type { BrandingConfig } from './schema'
 
-export * from './schema'
+export type * from './schema'
 export * from './buckets'
 export * from './theme'
 export { brandingDefaults } from './defaults'
@@ -29,9 +27,9 @@ const GLOBAL_KEY = '__OCELOT_BRANDING__'
 
 type BrandingGlobal = typeof globalThis & { [GLOBAL_KEY]?: BrandingConfig }
 
-// Framework-resolved config (defaults + the vanilla, empty override slot) — the fallback when no
+// Framework-resolved config (the defaults, with no brand override applied) — the fallback when no
 // brand config has been injected at runtime.
-const vanilla: BrandingConfig = defineBranding(overrides)
+const vanilla: BrandingConfig = defineBranding({})
 
 /** The currently effective config: the runtime-injected brand config, else framework defaults. */
 export function getBranding(): BrandingConfig {
@@ -44,11 +42,9 @@ export function getBranding(): BrandingConfig {
  * calls this with it. Pass `undefined` to reset to the framework defaults.
  */
 export function setBranding(config: BrandingConfig | undefined): void {
-  if (config === undefined) {
-    delete (globalThis as BrandingGlobal)[GLOBAL_KEY]
-  } else {
-    ;(globalThis as BrandingGlobal)[GLOBAL_KEY] = config
-  }
+  // Storing `undefined` resets to the framework defaults just as well as deleting the key would:
+  // getBranding()'s `?? vanilla` treats a present-but-undefined slot and an absent one identically.
+  ;(globalThis as BrandingGlobal)[GLOBAL_KEY] = config
 }
 
 const branding = {} as BrandingConfig

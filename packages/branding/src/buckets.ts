@@ -16,26 +16,14 @@ import type { BrandingConfig, DeepPartial } from './schema'
 
 export type BucketName = 'theme' | 'identity' | 'logos' | 'legal' | 'navigation' | 'behavior'
 
-/**
- * One bucket instance inside an archive. An archive is a LIBRARY of these — it may carry several of
- * the SAME type (e.g. theme `dark` and `light`) and need not provide every type. The effective
- * config still has exactly one instance per type; composition picks one instance per slot. A classic
- * full brand archive yields one instance per type named `default`.
- */
-export interface BucketInstance {
-  /** Which of the six bucket types this instance fills. */
-  type: BucketName
-  /** Instance name, unique per (archive, type) — distinguishes several of the same type. */
-  name: string
-  /** The sparse config fragment — only this bucket's owned leaves (see extractBucket). */
-  config: DeepPartial<BrandingConfig>
-}
-
-/** One entry in an archive's manifest: a bucket instance and the archive file its fragment lives in. */
+/** One entry in an archive's manifest: a bucket instance and the archive file its fragment lives in.
+ *  An archive is a LIBRARY of these — it may carry several of the SAME type (e.g. theme `dark` and
+ *  `light`) and need not provide every type; a classic full-brand archive yields one per type named
+ *  `default`. Composition picks one instance per slot; the effective config has exactly one per type. */
 export interface ArchiveInstanceEntry {
   type: BucketName
   name: string
-  /** Path of the instance's fragment file inside the archive, e.g. 'buckets/theme.default.json'. */
+  /** Path of the instance's fragment file inside the archive, e.g. 'fragments/theme.default.json'. */
   file: string
 }
 
@@ -97,7 +85,11 @@ export function parseSource(spec: unknown): BucketSource | null {
 }
 
 /** Inverse of parseSource — build the shortest source string for a source (admin composition UI). */
-export function formatSource({ id, version = null, name = 'default' }: Partial<BucketSource>): string {
+export function formatSource({
+  id,
+  version = null,
+  name = 'default',
+}: Partial<BucketSource>): string {
   if (!id) return ''
   return `${id}${version ? `@${version}` : ''}${name && name !== 'default' ? `/${name}` : ''}`
 }
@@ -138,8 +130,8 @@ export const BUCKET_PATHS: Record<BucketName, string[]> = {
   ],
 }
 
-// (path, bucket) pairs sorted SHALLOW → DEEP, so a more-specific path (e.g. metadata.themeColor)
-// overlays the less-specific one (metadata) when composing.
+// (path, bucket) pairs sorted SHALLOW → DEEP, so a more-specific path (e.g. assets.favicon→logos)
+// overlays the less-specific one (assets.css→theme) when composing.
 const OWNED_PATHS: { path: string; depth: number; bucket: BucketName }[] = BUCKET_NAMES.flatMap(
   (bucket) => BUCKET_PATHS[bucket].map((path) => ({ path, depth: path.split('.').length, bucket })),
 ).sort((a, b) => a.depth - b.depth)
@@ -170,6 +162,10 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 
 // Deep-merge `patch` INTO `target` (nested plain objects merge; everything else replaces). Used for
 // the cross-cutting `locales` layer, which accumulates from every source rather than being replaced.
+// NOTE: deliberately IN-PLACE and clones incoming values (so the accumulator never aliases a source
+// config). This differs from merge.ts's deepMerge, which is immutable (returns a fresh object and
+// shares patch references) because it produces the final defineBranding() result — two contracts, not
+// an accidental duplicate.
 function deepMerge(
   target: Record<string, unknown>,
   patch: Record<string, unknown>,
@@ -225,8 +221,9 @@ export function composeConfig(
     const value = getPath(source, path)
     if (value !== undefined) setPath(result, path, clone(value))
   }
-  // Cross-cutting locales: merge (not replace) every source's strings on top of the defaults.
-  const locales = (result.locales as Record<string, unknown>) ?? {}
+  // Cross-cutting locales: merge (not replace) every source's strings on top of the defaults. The
+  // defaults always carry a `locales` object, so this is present (cloned from brandingDefaults).
+  const locales = result.locales as Record<string, unknown>
   for (const bucket of BUCKET_NAMES) {
     const sourceLocales = (bucketSources[bucket] as { locales?: unknown } | undefined)?.locales
     if (isPlainObject(sourceLocales)) deepMerge(locales, sourceLocales)
@@ -236,14 +233,13 @@ export function composeConfig(
 }
 
 // Visit every leaf of a config tree (empty objects / arrays count as leaves).
-function walkLeaves(obj: unknown, prefix: string, cb: (path: string, value: unknown) => void): void {
-  if (
-    obj !== null &&
-    typeof obj === 'object' &&
-    !Array.isArray(obj) &&
-    Object.keys(obj as object).length
-  ) {
-    for (const key of Object.keys(obj as object)) {
+function walkLeaves(
+  obj: unknown,
+  prefix: string,
+  cb: (path: string, value: unknown) => void,
+): void {
+  if (obj !== null && typeof obj === 'object' && !Array.isArray(obj) && Object.keys(obj).length) {
+    for (const key of Object.keys(obj)) {
       walkLeaves((obj as Record<string, unknown>)[key], prefix ? `${prefix}.${key}` : key, cb)
     }
   } else if (prefix) {
@@ -253,9 +249,9 @@ function walkLeaves(obj: unknown, prefix: string, cb: (path: string, value: unkn
 
 /**
  * Slice ONE bucket's sparse fragment out of a (full or partial) config — keeping only the leaves this
- * bucket owns (respecting carve-outs: extractBucket(config, 'identity') omits metadata.themeColor,
- * which belongs to theme). This is how the build turns a full brand into per-type bucket instances,
- * and the inverse of composeConfig: composing all extracted fragments reproduces the original.
+ * bucket owns (by bucketOfPath, so split domains land in the right slice, e.g. assets.css→theme but
+ * assets.favicon→logos). This is how the build turns a full brand into per-type bucket instances, and
+ * the inverse of composeConfig: composing all extracted fragments reproduces the original.
  */
 export function extractBucket(
   config: DeepPartial<BrandingConfig>,
@@ -265,7 +261,7 @@ export function extractBucket(
   walkLeaves(config, '', (path, value) => {
     if (bucketOfPath(path) === bucket) setPath(out, path, clone(value))
   })
-  return out as DeepPartial<BrandingConfig>
+  return out
 }
 
 /**

@@ -1,8 +1,8 @@
 // Shared brand-config loader for the branding build tools (build-brand-archive.mjs single-brand
-// archive; build-brandings.mjs multi-brand output). A `.ts` config is TYPE-CHECKED against
-// the branding schema via the TypeScript compiler API before it is evaluated — a wrong key or type
-// FAILS the build (throws), so a brand cannot ship a mistuned config. No install is needed in the
-// brand repo: typescript + the package resolve from wherever the tool runs.
+// archive; build-dev-brandings.mjs dev scanner). A `.ts` config is TYPE-CHECKED against the branding
+// schema via the TypeScript compiler API before it is evaluated — a wrong key or type FAILS the build
+// (throws), so a brand cannot ship a mistuned config. No install is needed in the brand repo:
+// typescript + the package resolve from wherever the tool runs.
 import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname } from 'node:path'

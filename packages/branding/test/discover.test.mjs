@@ -3,8 +3,8 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
-import { composeArchive, composeFromArchives, readManifest } from '../dist/discover.js'
 import { brandingDefaults } from '../dist/defaults.js'
+import { composeArchive, composeFromArchives, readManifest } from '../dist/discover.js'
 
 // Build a synthetic archive file map: a manifest + fragment files. `themes` may add extra theme
 // instances (name → cssVars primary colour) to exercise multiple-of-same-type.
@@ -19,10 +19,16 @@ function archive({
   const instances = []
   for (const [name, primary] of Object.entries(themes)) {
     const file = `fragments/theme.${name}.json`
-    files.set(file, Buffer.from(JSON.stringify({ theme: { cssVars: { 'color-primary': primary } } })))
+    files.set(
+      file,
+      Buffer.from(JSON.stringify({ theme: { cssVars: { 'color-primary': primary } } })),
+    )
     instances.push({ type: 'theme', name, file })
   }
-  files.set('fragments/identity.default.json', Buffer.from(JSON.stringify({ metadata: { applicationName: appName } })))
+  files.set(
+    'fragments/identity.default.json',
+    Buffer.from(JSON.stringify({ metadata: { applicationName: appName } })),
+  )
   instances.push({ type: 'identity', name: 'default', file: 'fragments/identity.default.json' })
   files.set(
     'manifest.json',
@@ -112,7 +118,9 @@ test('composeFromArchives merges locales from a PARTIALLY-pulled bucket (the mis
         id: 'y',
         version: null,
         label: 'Y',
-        instances: [{ type: 'navigation', name: 'default', file: 'fragments/navigation.default.json' }],
+        instances: [
+          { type: 'navigation', name: 'default', file: 'fragments/navigation.default.json' },
+        ],
       }),
     ),
   )

@@ -31,7 +31,11 @@ test('taxonomy is a TOTAL partition: every default-config leaf maps to exactly o
   const paths = []
   leaves(brandingDefaults, '', paths)
   const unclaimed = paths.filter((p) => bucketOfPath(p) === null && !CROSS_CUTTING.includes(p))
-  assert.deepEqual(unclaimed, [], `unclaimed leaves (add them to a bucket): ${unclaimed.join(', ')}`)
+  assert.deepEqual(
+    unclaimed,
+    [],
+    `unclaimed leaves (add them to a bucket): ${unclaimed.join(', ')}`,
+  )
   assert.ok(paths.length > 0)
 })
 

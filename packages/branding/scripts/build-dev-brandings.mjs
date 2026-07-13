@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // Dev auto-load: discover every COMPATIBLE branding under deployment/configurations/* and PUBLISH each
 // into its own `dist/<id>.tar.gz` (same as the brand's own `npm run build`), so `yarn dev` serves them
 // straight from deployment/configurations — no separate aggregate folder.
@@ -38,7 +37,6 @@ for (const entry of readdirSync(configurationsRoot, { withFileTypes: true })) {
 }
 
 if (skipped.length) {
-  // eslint-disable-next-line no-console
   console.log(`[dev-brandings] skipped (no brand.config.*): ${skipped.join(', ')}`)
 }
 if (!compatible.length) {
@@ -48,12 +46,12 @@ if (!compatible.length) {
 
 for (const brandDir of compatible) {
   const { id, version, dir, versioned } = await publishBrandArchive(brandDir)
-  // eslint-disable-next-line no-console
+
   console.log(
     `[dev-brandings] ${id}${version ? ` v${version}` : ''} → ${dir}${versioned ? ' (+versioned)' : ''}`,
   )
 }
-// eslint-disable-next-line no-console
+
 console.log(
   `[dev-brandings] ${compatible.length} brand(s) built. set OCELOT_BRANDING_ASSETS_DIR=${configurationsRoot} (archives found recursively)`,
 )

@@ -133,12 +133,10 @@ export interface BrandingConfig {
     absoluteDateTimeFormat: string
   }
   metadata: {
-    /**
-     * Brand version, injected by the archive build from the brand's package.json `version` — NOT set
-     * by hand in a brand config. Single source = package.json. Surfaced in the admin Branding tab and
-     * carried in the versioned archive filename (`<id>-<version>.tar.gz`).
-     */
-    version?: string
+    // NOTE: no brand `version` here — the brand's version lives ONLY in the archive manifest
+    // (manifest.version, from the brand's package.json), surfaced in the admin Branding tab. Injecting
+    // it into metadata would make the identity bucket always look "customised", breaking partial-package
+    // detection (see scripts/lib/build-brandings.mjs).
     applicationName: string
     applicationShortName: string
     applicationDescription: string

@@ -5,14 +5,14 @@
 //
 //   node scripts/build-brand-archive.mjs <brand-dir> [out] [--watch]
 //
-// The archive bundles the resolved (namespaced) branding.json + assets/ + html/, with the brand's
-// package.json `version` injected into branding.json (metadata.version).
+// The archive bundles the brand's bucket-instance fragments + assets/ + html/, indexed by manifest.json
+// (the brand's package.json `version` is recorded as manifest.version, not in any config leaf).
 //
 // Output:
 //   • no [out]             → publish into <brand-dir>/dist as BOTH
 //                              dist/<id>-<version>.tar.gz  (immutable, versioned history)
 //                              dist/<id>.tar.gz            (latest — the name every consumer mounts)
-//                            (the versioned file is skipped when package.json version is unset/0.0.0)
+//                            (the versioned file is skipped only when package.json has no `version`)
 //   • [out] a directory    → the same two files, written there
 //   • [out] ending .tar.gz → that single file (used by --watch pointing straight into the served
 //                            $OCELOT_BRANDING_ASSETS_DIR so the running app picks it up on F5)
@@ -41,7 +41,7 @@ async function build() {
     const { id, gz, entries } = await buildBrandArchive(brandDir)
     const out = resolve(outArg)
     writeFileSync(out, gz)
-    // eslint-disable-next-line no-console
+
     console.log(`[brand] ${id} → ${out} (${entries.length} files, ${gz.length} b)`)
     return
   }
@@ -51,7 +51,7 @@ async function build() {
     outDir: outArg,
     markDefault: isDefault,
   })
-  // eslint-disable-next-line no-console
+
   console.log(
     `[brand] ${id}${version ? ` v${version}` : ''} → ${versioned ? `${basename(versioned)} + ` : ''}${basename(latest)}${isDefault ? ' + DEFAULT' : ''} in ${dir} (${entries.length} files)`,
   )
@@ -60,7 +60,6 @@ async function build() {
 await build()
 
 if (isWatch) {
-  // eslint-disable-next-line no-console
   console.log('[brand] watching for changes…')
   let timer = null
   watch(brandDir, { recursive: true }, (_event, filename) => {
