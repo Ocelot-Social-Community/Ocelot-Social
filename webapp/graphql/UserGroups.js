@@ -8,10 +8,10 @@ export const profileUserGroupsQuery = (i18n) => {
     ${imageUrls}
     ${location('Group', lang)}
 
-    query ProfileUserGroups($id: ID!, $first: Int, $offset: Int) {
+    query ProfileUserGroups($id: ID!, $first: Int, $offset: Int, $nameFilter: String) {
       User(id: $id) {
         id
-        groups(first: $first, offset: $offset) {
+        groups(first: $first, offset: $offset, nameFilter: $nameFilter) {
           id
           name
           slug

@@ -1210,6 +1210,7 @@
       "hidden": "Groupes secrets",
       "hiddenFromOthers": "caché des autres",
       "nobody": "aucun groupe",
+      "noFilterResults": "No groups found for this filter.",
       "other": "Groupes sans moi",
       "public": "Groupes publics",
       "shared": "Groupes partagés",

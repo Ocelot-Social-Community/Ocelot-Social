@@ -592,6 +592,7 @@ export default {
       const isOwnProfile = profileUserId === viewerId
       const first = args.first ?? 10
       const offset = args.offset ?? 0
+      const nameFilter = args.nameFilter ?? ''
       const session = context.driver.session()
       try {
         return await session.readTransaction(async (txc) => {
@@ -600,6 +601,7 @@ export default {
             cypher = `
               MATCH (profileUser:User {id: $profileUserId})-[membership:MEMBER_OF]->(group:Group)
               WHERE membership.role IN ['usual', 'admin', 'owner']
+                AND ($nameFilter = '' OR toLower(group.name) CONTAINS toLower($nameFilter))
               RETURN group {.*, myRole: membership.role, showOnProfile: coalesce(membership.showOnProfile, true)}
               ORDER BY group.groupType ASC, group.createdAt DESC
               SKIP toInteger($offset) LIMIT toInteger($first)
@@ -609,6 +611,7 @@ export default {
               MATCH (profileUser:User {id: $profileUserId})-[membership:MEMBER_OF]->(group:Group)
               WHERE membership.role IN ['usual', 'admin', 'owner']
                 AND coalesce(membership.showOnProfile, true) = true
+                AND ($nameFilter = '' OR toLower(group.name) CONTAINS toLower($nameFilter))
               OPTIONAL MATCH (viewer:User {id: $viewerId})-[viewerMembership:MEMBER_OF]->(group)
               WITH profileUser, membership, group, viewerMembership
               WHERE (
@@ -628,7 +631,7 @@ export default {
               SKIP toInteger($offset) LIMIT toInteger($first)
             `
           }
-          const result = await txc.run(cypher, { profileUserId, viewerId, first, offset })
+          const result = await txc.run(cypher, { profileUserId, viewerId, first, offset, nameFilter })
           return result.records.map((r) => r.get('group'))
         })
       } finally {

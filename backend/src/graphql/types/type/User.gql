@@ -184,7 +184,7 @@ type User {
   activeCategories: [String] @neo4j_ignore
 
   "Groups this user is a member of. Ordered by shared membership with the viewer first."
-  groups(first: Int, offset: Int): [Group] @neo4j_ignore
+  groups(first: Int, offset: Int, nameFilter: String): [Group] @neo4j_ignore
 }
 
 input _UserFilter {

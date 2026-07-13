@@ -1210,6 +1210,7 @@
       "hidden": "Secret groups",
       "hiddenFromOthers": "hidden from others",
       "nobody": "no groups",
+      "noFilterResults": "No groups found for this filter.",
       "other": "Gruppi senza di me",
       "public": "Public groups",
       "shared": "Gruppi condivisi",
