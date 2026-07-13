@@ -6,22 +6,70 @@
       <h2 class="ds-heading ds-heading-h2">{{ $t('admin.branding.composition.title') }}</h2>
       <p>{{ $t('admin.branding.composition.description', { base: baseLabel }) }}</p>
 
-      <div class="composition-row composition-row--base">
-        <label for="whole-package" class="composition-label">
-          {{ $t('admin.branding.composition.wholePackage') }}
-        </label>
-        <select
-          id="whole-package"
-          class="composition-select"
-          :value="activeId"
-          :disabled="!!saving"
-          @change="switchTo($event.target.value)"
-        >
-          <option value="">{{ $t('admin.branding.vanilla') }}</option>
-          <option v-for="src in sourceOptions" :key="src.id" :value="src.id">
-            {{ src.label }}
-          </option>
-        </select>
+      <div class="composition-base">
+        <div class="composition-row composition-row--base">
+          <button
+            v-if="activeId"
+            type="button"
+            class="composition-caret"
+            :aria-expanded="expandedBase"
+            :aria-label="$t('admin.branding.composition.details')"
+            @click="expandedBase = !expandedBase"
+          >
+            {{ expandedBase ? '▾' : '▸' }}
+          </button>
+          <span v-else class="composition-caret-spacer" />
+          <label for="whole-package" class="composition-label">
+            {{ $t('admin.branding.composition.wholePackage') }}
+          </label>
+          <select
+            id="whole-package"
+            class="composition-select"
+            :value="activeId"
+            :disabled="!!saving"
+            @change="switchTo($event.target.value)"
+          >
+            <option value="">{{ $t('admin.branding.vanilla') }}</option>
+            <option v-for="src in sourceOptions" :key="src.id" :value="src.id">
+              {{ src.label }}
+            </option>
+          </select>
+        </div>
+
+        <div v-if="expandedBase && activeId" class="composition-details">
+          <dl class="detail-list">
+            <div class="detail-row">
+              <dt>{{ $t('admin.branding.available.title') }}</dt>
+              <dd>
+                {{ baseLabel }}
+                <code v-if="baseVersion" class="branding-version">v{{ baseVersion }}</code>
+                <code v-if="schemaVersions[activeId]" class="branding-version schema-version">
+                  {{ $t('admin.branding.schema') }} {{ schemaVersions[activeId] }}
+                </code>
+              </dd>
+            </div>
+            <div v-if="baseOrganization" class="detail-row">
+              <dt>{{ $t('admin.branding.detail.organization') }}</dt>
+              <dd>{{ baseOrganization }}</dd>
+            </div>
+            <div class="detail-row">
+              <dt>{{ $t('admin.branding.composition.provides') }}</dt>
+              <dd>
+                <span class="available-buckets">
+                  <code
+                    v-for="inst in providedBuckets[activeId] || []"
+                    :key="inst.type + '.' + inst.name"
+                    class="bucket-tag"
+                  >
+                    {{ inst.type }}
+                    <template v-if="inst.name !== 'default'">/{{ inst.name }}</template>
+                  </code>
+                </span>
+              </dd>
+            </div>
+          </dl>
+          <p class="composition-source">{{ $t('admin.branding.composition.unprovidedInherit') }}</p>
+        </div>
       </div>
 
       <div v-for="bucket in bucketNames" :key="bucket" class="composition-bucket">
@@ -208,6 +256,8 @@ export default {
       savingComposition: false,
       // Which bucket rows are expanded to show the selected source's details.
       expanded: {},
+      // Whether the whole-package (base) row is expanded to show the selected package's details.
+      expandedBase: false,
       // Staged (unconfirmed) per-bucket select changes, awaiting confirmation. bucket → source value.
       pending: {},
     }
@@ -280,6 +330,15 @@ export default {
     // The sentinel select value for "framework default" (exposed to the template).
     vanillaSource() {
       return VANILLA_SOURCE
+    },
+    // Details of the selected whole-package (base brand), for its expandable panel.
+    baseVersion() {
+      const b = this.brandings.find((x) => x.id === this.activeId)
+      return (b && b.version) || null
+    },
+    baseOrganization() {
+      const config = this.details[this.activeId]
+      return (config && config.metadata && config.metadata.organizationName) || ''
     },
   },
   methods: {
@@ -522,13 +581,19 @@ export default {
   }
 }
 
-.composition-caret {
+.composition-caret,
+.composition-caret-spacer {
   flex: 0 0 auto;
+  width: 20px;
+}
+
+.composition-caret {
   border: none;
   background: none;
   cursor: pointer;
   color: $text-color-soft;
-  padding: 0 $space-xx-small;
+  padding: 0;
+  text-align: center;
   font-size: $font-size-small;
 }
 

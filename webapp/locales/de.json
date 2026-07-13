@@ -51,6 +51,8 @@
         "from": "Aus: {source}",
         "change": "Wechsel {from} → {to}",
         "confirm": "Übernehmen",
+        "provides": "Enthält",
+        "unprovidedInherit": "Nicht enthaltene Bereiche erben den Framework-Standard.",
         "noDetails": "Keine Werte (Framework-Standard).",
         "bucket": {
           "theme": "Design (Farben, Schriften)",

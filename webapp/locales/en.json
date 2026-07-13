@@ -51,6 +51,8 @@
         "from": "From: {source}",
         "change": "Change {from} → {to}",
         "confirm": "Apply",
+        "provides": "Provides",
+        "unprovidedInherit": "Buckets not provided inherit the framework default.",
         "noDetails": "No values (framework default).",
         "bucket": {
           "theme": "Theme (colours, fonts)",
