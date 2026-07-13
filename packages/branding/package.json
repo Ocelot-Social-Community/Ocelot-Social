@@ -17,7 +17,7 @@
     "build": "tsc",
     "lint": "eslint --max-warnings 0 .",
     "test": "npm run build && node --test test/*.test.mjs",
-    "test:coverage": "npm run build && node --test --experimental-test-coverage test/*.test.mjs",
+    "test:coverage": "npm run build && node --test --experimental-test-coverage --test-coverage-lines=95 --test-coverage-functions=95 --test-coverage-branches=82 test/*.test.mjs",
     "check": "npm run lint && npm run build && npm run test:coverage",
     "build:dev-brandings": "node scripts/build-dev-brandings.mjs"
   },

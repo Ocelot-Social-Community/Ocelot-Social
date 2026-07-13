@@ -98,6 +98,56 @@ test('composeFromArchives selects a named instance for a slot (id/name)', () => 
   assert.equal(c.theme.cssVars['color-primary'], 'black')
 })
 
+test('readManifest returns null for a garbled manifest.json (never throws)', () => {
+  const files = new Map([['manifest.json', Buffer.from('{ not valid json')]])
+  assert.equal(readManifest(files), null)
+})
+
+test('composeArchive: a garbled fragment falls back to the framework default, not a crash', () => {
+  const files = new Map()
+  files.set('fragments/theme.default.json', Buffer.from('{ broken'))
+  files.set(
+    'manifest.json',
+    Buffer.from(
+      JSON.stringify({
+        id: 'acme',
+        version: null,
+        label: 'Acme',
+        instances: [{ type: 'theme', name: 'default', file: 'fragments/theme.default.json' }],
+      }),
+    ),
+  )
+  const config = composeArchive(files)
+  assert.deepEqual(config.theme.cssVars, brandingDefaults.theme.cssVars) // unreadable → default
+})
+
+test('composeArchive tolerates a manifest with no instances array', () => {
+  const files = new Map([
+    ['manifest.json', Buffer.from(JSON.stringify({ id: 'acme', version: null, label: 'Acme' }))],
+  ])
+  const config = composeArchive(files)
+  assert.equal(config.id, 'acme')
+  assert.deepEqual(config.theme.cssVars, brandingDefaults.theme.cssVars)
+})
+
+test('composeFromArchives: a garbled fragment falls back to the framework default', () => {
+  const A = new Map()
+  A.set('fragments/theme.default.json', Buffer.from('{ broken'))
+  A.set(
+    'manifest.json',
+    Buffer.from(
+      JSON.stringify({
+        id: 'ya',
+        version: null,
+        label: 'Y',
+        instances: [{ type: 'theme', name: 'default', file: 'fragments/theme.default.json' }],
+      }),
+    ),
+  )
+  const composed = composeFromArchives((id) => ({ ya: A })[id] ?? null, { theme: 'ya' })
+  assert.deepEqual(composed.theme.cssVars, brandingDefaults.theme.cssVars)
+})
+
 test('composeFromArchives merges locales from a PARTIALLY-pulled bucket (the missing-strings fix)', () => {
   // Archive Y ships a navigation instance whose fragment carries Y's menu strings (locales). Pulling
   // ONLY navigation from Y must still bring those strings in, or the menu idents resolve to nothing.
