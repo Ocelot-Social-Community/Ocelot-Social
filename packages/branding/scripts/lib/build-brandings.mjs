@@ -6,12 +6,25 @@
 // docu/branding-buckets-konzept.md.
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 import { BUCKET_NAMES, instanceFile, splitConfig } from '../../dist/buckets.js'
 import { brandingDefaults } from '../../dist/defaults.js'
 import { writeTarGz } from '../../dist/tar.js'
 
 import { loadConfig } from './load-config.mjs'
+
+// Version of THIS @ocelot-social/branding package — baked into every manifest as the schema/API
+// compatibility axis (docu/branding-buckets-konzept.md §11), distinct from the brand's own version.
+// Read from the package.json two dirs up (works from source and from an installed copy).
+const SCHEMA_VERSION = (() => {
+  try {
+    const pkg = fileURLToPath(new URL('../../package.json', import.meta.url))
+    return JSON.parse(readFileSync(pkg, 'utf8')).version || null
+  } catch {
+    return null
+  }
+})()
 
 // Recursively collect a directory's files as tar entries keyed by their path relative to the brand
 // root (e.g. dir='assets' → 'assets/logo.svg').
@@ -90,11 +103,14 @@ export function brandId(brandDir) {
   return basename(brandDir)
 }
 
-/** The brand's published version = its package.json `version` (single source), or null if unset. */
+/**
+ * The brand's published version = its package.json `version` (single source) verbatim, or null only
+ * when there is no package.json / no version field. NOTE: `0.0.0` is NOT hidden — a brand always
+ * carries the version it declares, so the archive is always versioned. Bump the brand's package.json
+ * `version` to give it a real one.
+ */
 export function brandVersion(brandDir) {
-  const version = readBrandPkg(brandDir)?.version
-  // '0.0.0' is the unset placeholder in the brand templates — treat it as "no version".
-  return version && version !== '0.0.0' ? version : null
+  return readBrandPkg(brandDir)?.version || null
 }
 
 export function findConfig(brandDir) {
@@ -148,7 +164,7 @@ export async function buildBrandArchive(brandDir) {
     entries.push({ name: file, data: Buffer.from(`${JSON.stringify(fragments[type], null, 2)}\n`) })
     instances.push({ type, name, file })
   }
-  const manifest = { id, version: version ?? null, label, instances }
+  const manifest = { id, version: version ?? null, schemaVersion: SCHEMA_VERSION, label, instances }
   entries.push({ name: 'manifest.json', data: Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`) })
 
   for (const sub of ['assets', 'html']) {

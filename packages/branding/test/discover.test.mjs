@@ -8,7 +8,13 @@ import { brandingDefaults } from '../dist/defaults.js'
 
 // Build a synthetic archive file map: a manifest + fragment files. `themes` may add extra theme
 // instances (name → cssVars primary colour) to exercise multiple-of-same-type.
-function archive({ id = 'acme', version = null, themes = { default: 'green' }, appName = 'Acme' } = {}) {
+function archive({
+  id = 'acme',
+  version = null,
+  schemaVersion = '1.2.3',
+  themes = { default: 'green' },
+  appName = 'Acme',
+} = {}) {
   const files = new Map()
   const instances = []
   for (const [name, primary] of Object.entries(themes)) {
@@ -21,12 +27,19 @@ function archive({ id = 'acme', version = null, themes = { default: 'green' }, a
   }
   files.set('fragments/identity.default.json', Buffer.from(JSON.stringify({ metadata: { applicationName: appName } })))
   instances.push({ type: 'identity', name: 'default', file: 'fragments/identity.default.json' })
-  files.set('manifest.json', Buffer.from(JSON.stringify({ id, version, label: appName, instances })))
+  files.set(
+    'manifest.json',
+    Buffer.from(JSON.stringify({ id, version, schemaVersion, label: appName, instances })),
+  )
   return files
 }
 
 test('readManifest returns null when the manifest is missing', () => {
   assert.equal(readManifest(new Map()), null)
+})
+
+test('readManifest surfaces the schemaVersion (branding package version) baked at build', () => {
+  assert.equal(readManifest(archive({ schemaVersion: '0.0.1' })).schemaVersion, '0.0.1')
 })
 
 test('composeArchive composes the default instances and attaches the manifest id', () => {

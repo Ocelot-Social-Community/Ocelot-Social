@@ -25,6 +25,8 @@
       "noneExtra": "In dieser Instanz sind keine weiteren Brandings eingebacken — nur der Standard ist verfügbar.",
       "loading": "Brandings werden geladen…",
       "error": "Branding konnte nicht umgeschaltet werden.",
+      "schema": "Schema",
+      "schemaTitle": "Die @ocelot-social/branding-Paketversion, mit der dieses Archiv gebaut wurde.",
       "detail": {
         "organization": "Organisation",
         "appDescription": "Beschreibung",

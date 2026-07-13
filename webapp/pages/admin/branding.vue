@@ -145,6 +145,13 @@
           <span class="available-name">
             {{ b.label || b.id }}
             <code v-if="b.version" class="branding-version">v{{ b.version }}</code>
+            <code
+              v-if="schemaVersions[b.id]"
+              class="branding-version schema-version"
+              :title="$t('admin.branding.schemaTitle')"
+            >
+              {{ $t('admin.branding.schema') }} {{ schemaVersions[b.id] }}
+            </code>
           </span>
           <span class="available-buckets">
             <code
@@ -193,6 +200,8 @@ export default {
       providedBuckets: {},
       // brand id → its composed config (branding.json) — for the favicon & logo preview.
       details: {},
+      // brand id → the @ocelot-social/branding package version the archive was built with.
+      schemaVersions: {},
       saving: null,
       // Local editable copy of the per-slot composition (brandingComposition policy value, parsed).
       composition: {},
@@ -217,15 +226,17 @@ export default {
     }
     const providedBuckets = {}
     const details = {}
+    const schemaVersions = {}
     await Promise.all(
       list.flatMap((b) => [
-        // the buckets a brand provides (its manifest instances)
+        // the buckets a brand provides + the branding package version it was built with (its manifest)
         (async () => {
           try {
             const res = await fetch(`/branding/${b.id}/manifest.json`)
             if (res.ok) {
               const manifest = await res.json()
               providedBuckets[b.id] = Array.isArray(manifest.instances) ? manifest.instances : []
+              schemaVersions[b.id] = manifest.schemaVersion || null
             }
           } catch (error) {
             // the bucket list degrades gracefully when a manifest can't be loaded
@@ -245,6 +256,7 @@ export default {
     this.brandings = list
     this.providedBuckets = providedBuckets
     this.details = details
+    this.schemaVersions = schemaVersions
   },
   computed: {
     // The live base brand id ('' = framework default). Kept live by the policy subscription.
@@ -719,6 +731,13 @@ export default {
 .branding-version {
   color: $text-color-soft;
   font-weight: normal;
+}
+
+.schema-version {
+  border: 1px solid $border-color-softer;
+  border-radius: $border-radius-base;
+  padding: 0 4px;
+  font-size: $font-size-small;
 }
 
 .hint {

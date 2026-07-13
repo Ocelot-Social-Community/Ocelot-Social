@@ -25,6 +25,8 @@
       "noneExtra": "No additional brandings are baked into this instance — only the framework default is available.",
       "loading": "Loading brandings…",
       "error": "Could not switch the branding.",
+      "schema": "schema",
+      "schemaTitle": "The @ocelot-social/branding package version this archive was built with.",
       "detail": {
         "organization": "Organization",
         "appDescription": "Description",

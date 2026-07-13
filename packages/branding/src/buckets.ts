@@ -50,6 +50,12 @@ export interface ArchiveManifest {
   version: string | null
   /** Human label (metadata.applicationName of the default identity instance), for the admin list. */
   label: string
+  /**
+   * Version of the `@ocelot-social/branding` package the archive was BUILT with — the schema / API
+   * compatibility axis (see docu/branding-buckets-konzept.md §11), distinct from `version` (the
+   * brand's own iteration). Injected by the build; null when unknown.
+   */
+  schemaVersion: string | null
   instances: ArchiveInstanceEntry[]
 }
 
