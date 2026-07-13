@@ -1227,6 +1227,7 @@
       "followedByNobody": "nikt go nie obserwuje.",
       "following": "obserwuje",
       "followingNobody": "nikogo nie obserwuje.",
+      "followNoFilterResults": "Nie znaleziono użytkowników dla tego filtra.",
       "title": "Sieć"
     },
     "shouted": "Krzyknij",

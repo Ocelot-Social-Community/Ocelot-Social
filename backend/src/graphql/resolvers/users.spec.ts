@@ -16,6 +16,8 @@ import updateOnlineStatus from '@graphql/queries/users/updateOnlineStatus.gql'
 import UpdateUser from '@graphql/queries/users/UpdateUser.gql'
 import userQuery from '@graphql/queries/users/User.gql'
 import UserEmailNotificationSettings from '@graphql/queries/users/UserEmailNotificationSettings.gql'
+import UserFollowedBy from '@graphql/queries/users/UserFollowedBy.gql'
+import UserFollowing from '@graphql/queries/users/UserFollowing.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type User from '@db/models/User'
@@ -1529,6 +1531,124 @@ describe('resetTrophyBadgesSelected', () => {
           },
         }),
       )
+    })
+  })
+})
+
+describe('follow connections with nameFilter', () => {
+  let viewer
+  let userAlice
+  let userAlbert
+  let userBob
+
+  describe('following', () => {
+    beforeEach(async () => {
+      viewer = await Factory.build('user', { id: 'viewer', name: 'Viewer' })
+      userAlice = await Factory.build('user', { id: 'alice', name: 'Alice Smith' })
+      userAlbert = await Factory.build('user', { id: 'albert', name: 'Albert Jones' })
+      userBob = await Factory.build('user', { id: 'bob', name: 'Bob Brown' })
+      await viewer.relateTo(userAlice, 'following')
+      await viewer.relateTo(userAlbert, 'following')
+      await viewer.relateTo(userBob, 'following')
+      authenticatedUser = await viewer.toJson()
+    })
+
+    it('returns all followed users without nameFilter', async () => {
+      const result = await query({
+        query: UserFollowing,
+        variables: { id: 'viewer', first: 25, offset: 0, nameFilter: '' },
+      })
+      expect(result.errors).toBeUndefined()
+      expect(result.data?.User?.[0]?.following).toHaveLength(3)
+    })
+
+    it('filters case-insensitively with lowercase input', async () => {
+      const result = await query({
+        query: UserFollowing,
+        variables: { id: 'viewer', first: 25, offset: 0, nameFilter: 'alic' },
+      })
+      expect(result.errors).toBeUndefined()
+      expect(result.data?.User?.[0]?.following).toEqual([{ id: 'alice', name: 'Alice Smith' }])
+    })
+
+    it('filters case-insensitively with uppercase input', async () => {
+      const result = await query({
+        query: UserFollowing,
+        variables: { id: 'viewer', first: 25, offset: 0, nameFilter: 'ALI' },
+      })
+      expect(result.errors).toBeUndefined()
+      expect(result.data?.User?.[0]?.following).toEqual([{ id: 'alice', name: 'Alice Smith' }])
+    })
+
+    it('returns empty array when nameFilter matches nothing', async () => {
+      const result = await query({
+        query: UserFollowing,
+        variables: { id: 'viewer', first: 25, offset: 0, nameFilter: 'xyz' },
+      })
+      expect(result.errors).toBeUndefined()
+      expect(result.data?.User?.[0]?.following).toHaveLength(0)
+    })
+
+    it('respects offset for pagination', async () => {
+      const page1 = await query({
+        query: UserFollowing,
+        variables: { id: 'viewer', first: 2, offset: 0, nameFilter: '' },
+      })
+      const page2 = await query({
+        query: UserFollowing,
+        variables: { id: 'viewer', first: 2, offset: 2, nameFilter: '' },
+      })
+      expect(page1.errors).toBeUndefined()
+      expect(page2.errors).toBeUndefined()
+      expect(page1.data?.User?.[0]?.following).toHaveLength(2)
+      expect(page2.data?.User?.[0]?.following).toHaveLength(1)
+    })
+  })
+
+  describe('followedBy', () => {
+    beforeEach(async () => {
+      viewer = await Factory.build('user', { id: 'viewer', name: 'Viewer' })
+      userAlice = await Factory.build('user', { id: 'alice', name: 'Alice Smith' })
+      userBob = await Factory.build('user', { id: 'bob', name: 'Bob Brown' })
+      await userAlice.relateTo(viewer, 'following')
+      await userBob.relateTo(viewer, 'following')
+      authenticatedUser = await viewer.toJson()
+    })
+
+    it('returns all followers without nameFilter', async () => {
+      const result = await query({
+        query: UserFollowedBy,
+        variables: { id: 'viewer', first: 25, offset: 0, nameFilter: '' },
+      })
+      expect(result.errors).toBeUndefined()
+      expect(result.data?.User?.[0]?.followedBy).toHaveLength(2)
+    })
+
+    it('filters case-insensitively with lowercase input', async () => {
+      const result = await query({
+        query: UserFollowedBy,
+        variables: { id: 'viewer', first: 25, offset: 0, nameFilter: 'alice' },
+      })
+      expect(result.errors).toBeUndefined()
+      expect(result.data?.User?.[0]?.followedBy).toEqual([{ id: 'alice', name: 'Alice Smith' }])
+    })
+
+    it('filters case-insensitively with uppercase input', async () => {
+      const result = await query({
+        query: UserFollowedBy,
+        variables: { id: 'viewer', first: 25, offset: 0, nameFilter: 'BOB' },
+      })
+      expect(result.errors).toBeUndefined()
+      expect(result.data?.User?.[0]?.followedBy).toEqual([{ id: 'bob', name: 'Bob Brown' }])
+    })
+
+    it('returns empty array when nameFilter matches nothing', async () => {
+      const result = await query({
+        query: UserFollowedBy,
+        variables: { id: 'viewer', first: 25, offset: 0, nameFilter: 'xyz' },
+      })
+      expect(result.errors).toBeUndefined()
+      expect(result.data?.User?.[0]?.followedBy).toHaveLength(0)
     })
   })
 })

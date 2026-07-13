@@ -1227,6 +1227,7 @@
       "followedByNobody": "is not followed by anyone.",
       "following": "is following",
       "followingNobody": "follows nobody.",
+      "followNoFilterResults": "No users found for this filter.",
       "title": "Network"
     },
     "shouted": "Shouted",

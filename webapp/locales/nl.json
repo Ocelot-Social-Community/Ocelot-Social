@@ -1227,6 +1227,7 @@
       "followedByNobody": "wordt door niemand gevolgd.",
       "following": "volgt",
       "followingNobody": "volgt niemand.",
+      "followNoFilterResults": "Geen gebruikers gevonden voor dit filter.",
       "title": "Netwerk"
     },
     "shouted": "Geshout",

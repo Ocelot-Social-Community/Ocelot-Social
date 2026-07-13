@@ -1227,6 +1227,7 @@
       "followedByNobody": "não é seguido por ninguém.",
       "following": "está seguindo",
       "followingNobody": "não segue ninguém.",
+      "followNoFilterResults": "Nenhum usuário encontrado para este filtro.",
       "title": "Rede"
     },
     "shouted": "Aclamou",

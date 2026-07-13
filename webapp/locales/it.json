@@ -1227,6 +1227,7 @@
       "followedByNobody": "non è seguito da nessuno.",
       "following": "segue",
       "followingNobody": "non segue nessuno.",
+      "followNoFilterResults": "Nessun utente trovato per questo filtro.",
       "title": "Rete"
     },
     "shouted": "Gridato",

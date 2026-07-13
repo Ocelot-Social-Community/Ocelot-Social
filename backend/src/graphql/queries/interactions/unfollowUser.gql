@@ -2,7 +2,7 @@ mutation unfollowUser($id: ID!) {
   unfollowUser(id: $id) {
     id
     name
-    followedBy {
+    followedBy(nameFilter: "") {
       id
       name
     }

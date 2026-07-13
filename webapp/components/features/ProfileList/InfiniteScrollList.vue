@@ -1,6 +1,6 @@
 <template>
   <os-card>
-    <div class="infinite-scroll-list">
+    <div class="infinite-scroll-list" :class="{ 'filter-active': filterActive }">
       <h5 v-if="title" class="title">
         {{ title }}
         <span v-if="count !== null" class="count">({{ count }})</span>
@@ -51,6 +51,11 @@ export default {
       filterValue: '',
     }
   },
+  computed: {
+    filterActive() {
+      return this.filterValue.length > 0
+    },
+  },
   mounted() {
     this.$nextTick(this.checkScrollable)
   },
@@ -67,9 +72,7 @@ export default {
       this.filterValue = val
       clearTimeout(this._filterTimer)
       this._filterTimer = setTimeout(() => {
-        if (val.length === 0 || val.length >= this.filterMinLength) {
-          this.$emit('filter-change', val)
-        }
+        this.$emit('filter-change', val.length >= this.filterMinLength ? val : '')
       }, 300)
     },
     onScroll() {
@@ -108,6 +111,10 @@ export default {
   display: flex;
   flex-direction: column;
   max-height: 360px;
+
+  &.filter-active {
+    height: 360px;
+  }
 
   > .title {
     color: $text-color-soft;
