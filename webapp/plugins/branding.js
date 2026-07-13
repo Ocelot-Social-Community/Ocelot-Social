@@ -85,15 +85,24 @@ export default async (context) => {
     const discover = require('@ocelot-social/branding/dist/discover.js')
     try {
       const loaded = await loadServerBranding(discover)
+      // ALWAYS set this request's effective branding — even to undefined (vanilla). The accessor
+      // stores the active brand in a process-global (globalThis.__OCELOT_BRANDING__) shared across
+      // SSR requests, so a vanilla request that skipped setBranding would inherit whatever brand a
+      // PRIOR request left there. After switching the active brand back to default, the server would
+      // then render the stale brand (e.g. its shorter footer link list) while the client, receiving
+      // no serialised branding, renders the framework default → a hydration mismatch that bails
+      // hydration into a full client re-render. Resetting to undefined pins vanilla for this request.
+      setBranding(loaded ? loaded.config : undefined)
       if (loaded) {
-        setBranding(loaded.config)
         context.beforeNuxtRender(({ nuxtState }) => {
           nuxtState.branding = loaded.config
           nuxtState.brandingId = loaded.brandingId
         })
       }
     } catch (error) {
-      // any failure (missing / unreadable / bad JSON) → keep framework defaults
+      // any failure (missing / unreadable / bad JSON) → vanilla, and clear any brand a prior request
+      // may have left in the shared process-global (so SSR doesn't render a stale, leaked brand).
+      setBranding(undefined)
     }
   } else if (window.__NUXT__ && window.__NUXT__.branding) {
     setBranding(window.__NUXT__.branding)
