@@ -848,6 +848,7 @@
       "slug": "Eindeutiger Name"
     },
     "membersCount": "Mitglied ::: Mitglieder",
+    "membersListNoFilterResults": "Keine Mitglieder gefunden",
     "membersListNotVisibleToNonMembers": "Nicht-Mitglieder können diese Liste nicht sehen.",
     "membersListTitle": "Gruppenmitglieder",
     "membersListTitleNotAllowedSeeingGroupMembers": "Gruppenmitglieder unsichtbar",
@@ -869,6 +870,7 @@
     "role": "Deine Rolle in der Gruppe",
     "roles": {
       "admin": "Administrator",
+      "members": "Mitglieder",
       "owner": "Inhaber",
       "pending": "Ausstehendes Mitglied",
       "usual": "Mitglied"

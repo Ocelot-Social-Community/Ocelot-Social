@@ -1587,6 +1587,79 @@ describe('in mode', () => {
                 expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
+
+            describe('by non-member "other-user" when showMembers is enabled', () => {
+              beforeAll(async () => {
+                authenticatedUser = await ownerOfClosedGroupUser.toJson()
+                await mutate({
+                  mutation: UpdateGroup,
+                  variables: { id: 'closed-group', showMembers: true },
+                })
+                authenticatedUser = null
+              })
+
+              afterAll(async () => {
+                authenticatedUser = await ownerOfClosedGroupUser.toJson()
+                await mutate({
+                  mutation: UpdateGroup,
+                  variables: { id: 'closed-group', showMembers: false },
+                })
+                authenticatedUser = null
+              })
+
+              beforeEach(async () => {
+                authenticatedUser = await otherUser.toJson()
+              })
+
+              it('can see non-pending members with showOnProfile=true', async () => {
+                const result = await query({ query: groupMembersQuery, variables })
+                expect(result).toMatchObject({
+                  data: {
+                    GroupMembers: expect.arrayContaining([
+                      expect.objectContaining({
+                        user: expect.objectContaining({ id: 'owner-of-closed-group' }),
+                        membership: expect.objectContaining({ role: 'owner' }),
+                      }),
+                      expect.objectContaining({
+                        user: expect.objectContaining({ id: 'owner-of-hidden-group' }),
+                        membership: expect.objectContaining({ role: 'usual' }),
+                      }),
+                    ]),
+                  },
+                  errors: undefined,
+                })
+                expect(result.data?.GroupMembers.length).toBe(2)
+              })
+
+              it('does not show members who set showOnProfile=false', async () => {
+                authenticatedUser = await ownerOfHiddenGroupUser.toJson()
+                await mutate({
+                  mutation: SetGroupMembershipVisibility,
+                  variables: { groupId: 'closed-group', showOnProfile: false },
+                })
+                authenticatedUser = await otherUser.toJson()
+                const result = await query({ query: groupMembersQuery, variables })
+                authenticatedUser = await ownerOfHiddenGroupUser.toJson()
+                await mutate({
+                  mutation: SetGroupMembershipVisibility,
+                  variables: { groupId: 'closed-group', showOnProfile: true },
+                })
+                authenticatedUser = null
+
+                expect(result).toMatchObject({
+                  data: {
+                    GroupMembers: [
+                      expect.objectContaining({
+                        user: expect.objectContaining({ id: 'owner-of-closed-group' }),
+                        membership: expect.objectContaining({ role: 'owner' }),
+                      }),
+                    ],
+                  },
+                  errors: undefined,
+                })
+                expect(result.data?.GroupMembers.length).toBe(1)
+              })
+            })
           })
         })
 
@@ -1640,6 +1713,43 @@ describe('in mode', () => {
                   errors: undefined,
                 })
                 expect(result.data?.GroupMembers.length).toBe(3)
+              })
+
+              it('filters members by name when nameFilter has at least 3 characters', async () => {
+                // "Hidden" matches only "Owner Of Hidden Group" (the owner)
+                const result = await query({
+                  query: groupMembersQuery,
+                  variables: { ...variables, nameFilter: 'Hidden' },
+                })
+                expect(result.data?.GroupMembers).toHaveLength(1)
+                expect(result.data?.GroupMembers[0]).toMatchObject({
+                  user: expect.objectContaining({ id: 'owner-of-hidden-group' }),
+                })
+              })
+
+              it('ignores nameFilter shorter than 3 characters and returns all members', async () => {
+                const result = await query({
+                  query: groupMembersQuery,
+                  variables: { ...variables, nameFilter: 'Cl' },
+                })
+                expect(result.data?.GroupMembers).toHaveLength(3)
+              })
+
+              it('returns members ordered: owner first, then admin, then usual', async () => {
+                const result = await query({ query: groupMembersQuery, variables })
+                const members = result.data?.GroupMembers
+                expect(members[0]).toMatchObject({
+                  user: expect.objectContaining({ id: 'owner-of-hidden-group' }),
+                  membership: expect.objectContaining({ role: 'owner' }),
+                })
+                expect(members[1]).toMatchObject({
+                  user: expect.objectContaining({ id: 'owner-of-closed-group' }),
+                  membership: expect.objectContaining({ role: 'admin' }),
+                })
+                expect(members[2]).toMatchObject({
+                  user: expect.objectContaining({ id: 'current-user' }),
+                  membership: expect.objectContaining({ role: 'usual' }),
+                })
               })
 
               it('finds all members including pending when includePending is true', async () => {

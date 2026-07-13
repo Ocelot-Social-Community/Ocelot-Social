@@ -4,9 +4,8 @@ import GroupMemberList from './GroupMemberList.vue'
 const localVue = global.localVue
 
 const stubs = {
-  'os-card': { template: '<div><slot /></div>' },
+  'infinite-scroll-list': { template: '<div><slot /></div>' },
   'os-icon': true,
-  'os-spinner': true,
   'group-teaser': true,
 }
 
@@ -120,6 +119,32 @@ describe('GroupMemberList.vue', () => {
         expect(groupsByType.shared.map((g) => g.id)).toEqual(['1', '4'])
         expect(groupsByType.other.map((g) => g.id)).toEqual(['2', '3'])
       })
+    })
+  })
+
+  describe('toggleVisibility', () => {
+    it('optimistically toggles showOnProfile and calls mutate', async () => {
+      mockApollo.mutate.mockResolvedValue({})
+      const group = { id: 'g1', groupType: 'public', myRole: 'usual', showOnProfile: true }
+      const wrapper = Wrapper({}, [group])
+      await wrapper.vm.toggleVisibility(group)
+      expect(group.showOnProfile).toBe(false)
+      expect(mockApollo.mutate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: { groupId: 'g1', showOnProfile: false },
+        }),
+      )
+      expect(wrapper.vm._skipNextSubscriptionReload).toBe(true)
+    })
+
+    it('rolls back showOnProfile and resets _skipNextSubscriptionReload on error', async () => {
+      mockApollo.mutate.mockRejectedValue(new Error('Server error'))
+      const group = { id: 'g1', groupType: 'public', myRole: 'usual', showOnProfile: false }
+      const wrapper = Wrapper({}, [group])
+      await wrapper.vm.toggleVisibility(group)
+      expect(group.showOnProfile).toBe(false)
+      expect(wrapper.vm._skipNextSubscriptionReload).toBe(false)
+      expect(wrapper.vm.$toast.error).toHaveBeenCalledWith('Server error')
     })
   })
 

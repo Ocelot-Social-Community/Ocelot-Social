@@ -848,6 +848,7 @@
       "slug": "Emri unik"
     },
     "membersCount": "Anëtar ::: Anëtarë",
+    "membersListNoFilterResults": "Nuk u gjetën anëtarë",
     "membersListNotVisibleToNonMembers": "Jo-anëtarët nuk mund ta shohin këtë listë.",
     "membersListTitle": "Anëtarët e grupit",
     "membersListTitleNotAllowedSeeingGroupMembers": "Anëtarët e grupit të padukshëm",
@@ -869,6 +870,7 @@
     "role": "Roli yt në grup",
     "roles": {
       "admin": "Administrator",
+      "members": "Anëtarë",
       "owner": "Pronar",
       "pending": "Anëtar në pritje",
       "usual": "Anëtar"

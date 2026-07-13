@@ -1,47 +1,150 @@
 <template>
-  <profile-list
-    :uniqueName="`${type}Filter`"
-    :title="$filters.truncate(userName, 15) + ' ' + $t(`profile.network.${type}`)"
-    :titleNobody="$filters.truncate(userName, 15) + ' ' + $t(`profile.network.${type}Nobody`)"
-    :allProfilesCount="allConnectionsCount"
-    :profiles="connections"
-    :loading="loading"
-    @fetchAllProfiles="$emit('fetchAllConnections', type, allConnectionsCount)"
-  />
+  <infinite-scroll-list
+    :title="listTitle"
+    :count="totalCount"
+    :nobody-message="nobodyMessage"
+    :empty="!hasConnections"
+    :loading="loadingConnections || loadingMore"
+    :has-more="!allLoaded"
+    @load-more="loadMore"
+    @scrolling-change="onScrollingChange"
+  >
+    <ul class="connections">
+      <li v-for="connection in connections" :key="connection.id" class="connections__item">
+        <user-teaser :user="connection" :show-popover="popoverEnabled" :hover-delay="800" />
+      </li>
+    </ul>
+  </infinite-scroll-list>
 </template>
 
 <script>
-import ProfileList, { profileListVisibleCount } from '~/components/features/ProfileList/ProfileList'
+import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import InfiniteScrollList from './InfiniteScrollList.vue'
+import { followConnectionsQuery } from '~/graphql/User'
 
-export const followListVisibleCount = profileListVisibleCount
+const PAGE_SIZE = 25
 
 export default {
-  name: 'FollowerList',
+  name: 'FollowList',
   components: {
-    ProfileList,
+    UserTeaser,
+    InfiniteScrollList,
   },
   props: {
-    user: { type: Object, default: null },
-    type: { type: String, default: 'following' },
-    loading: { type: Boolean, default: false },
+    userId: { type: String, required: true },
+    userName: { type: String, default: '' },
+    type: {
+      type: String,
+      default: 'following',
+      validator: (v) => ['following', 'followedBy'].includes(v),
+    },
+  },
+  data() {
+    return {
+      connections: [],
+      totalCount: null,
+      loadingConnections: true,
+      loadingMore: false,
+      allLoaded: false,
+      isScrolling: false,
+      loadingCooldown: false,
+    }
   },
   computed: {
-    userName() {
-      const { name } = this.user || {}
-      return name || this.$t('profile.userAnonym')
+    hasConnections() {
+      return this.connections.length > 0
     },
-    allConnectionsCount() {
-      return this.user[`${this.type}Count`]
+    isLoading() {
+      return this.loadingConnections || this.loadingMore
     },
-    connections() {
-      const list = this.user[this.type] || []
-      const seen = new Set()
-      return list.filter((u) => {
-        if (!u || !u.id || seen.has(u.id)) return false
-        seen.add(u.id)
-        return true
-      })
+    popoverEnabled() {
+      return !this.isScrolling && !this.isLoading && !this.loadingCooldown
+    },
+    listTitle() {
+      const name = this.$filters.truncate(this.userName, 15)
+      return `${name} ${this.$t(`profile.network.${this.type}`)}`
+    },
+    nobodyMessage() {
+      const name = this.$filters.truncate(this.userName, 15)
+      return `${name} ${this.$t(`profile.network.${this.type}Nobody`)}`
+    },
+  },
+  watch: {
+    isLoading(newVal, oldVal) {
+      if (oldVal && !newVal) {
+        clearTimeout(this._loadingCooldownTimer)
+        this.loadingCooldown = true
+        this._loadingCooldownTimer = setTimeout(() => {
+          this.loadingCooldown = false
+        }, 600)
+      }
+    },
+  },
+  async mounted() {
+    await this.loadConnections(0)
+  },
+  beforeDestroy() {
+    clearTimeout(this._loadingCooldownTimer)
+  },
+  methods: {
+    async loadConnections(offset) {
+      if (offset === 0) {
+        this.loadingConnections = true
+        this.connections = []
+        this.allLoaded = false
+        this.totalCount = null
+      } else {
+        this.loadingMore = true
+      }
+      try {
+        const { data } = await this.$apollo.query({
+          query: followConnectionsQuery(this.type, this.$i18n),
+          variables: { id: this.userId, first: PAGE_SIZE, offset },
+          fetchPolicy: 'network-only',
+        })
+        const userData = data?.User?.[0]
+        if (userData) {
+          this.totalCount = userData[`${this.type}Count`] ?? null
+          const newItems = userData[this.type] || []
+          const merged = [...this.connections, ...newItems]
+          const seen = new Set()
+          this.connections = merged.filter((u) => {
+            if (!u || !u.id || seen.has(u.id)) return false
+            seen.add(u.id)
+            return true
+          })
+          if (newItems.length < PAGE_SIZE) this.allLoaded = true
+        }
+      } catch (error) {
+        this.$toast.error(error.message)
+      } finally {
+        this.loadingConnections = false
+        this.loadingMore = false
+      }
+    },
+    async loadMore() {
+      if (this.allLoaded || this.loadingMore || this.loadingConnections) return
+      await this.loadConnections(this.connections.length)
+    },
+    onScrollingChange(isScrolling) {
+      this.isScrolling = isScrolling
     },
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.connections {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  &__item {
+    padding: $space-xx-small;
+
+    &:hover {
+      background-color: $background-color-primary-inverse;
+    }
+  }
+}
+</style>

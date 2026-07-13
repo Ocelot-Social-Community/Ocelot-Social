@@ -404,7 +404,8 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
          
         <follow-list-stub
           type="followedBy"
-          user="[object Object]"
+          userid="u3"
+          username="Bob the builder"
         />
          
         <div
@@ -413,14 +414,19 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
          
         <follow-list-stub
           type="following"
-          user="[object Object]"
+          userid="u3"
+          username="Bob the builder"
         />
          
         <div
           class="ds-mb-large"
         />
          
-        <!---->
+        <div
+          class="group-member-list"
+          user-id="u3"
+          user-name="Bob the builder"
+        />
          
         <!---->
       </div>
@@ -1116,7 +1122,8 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
          
         <follow-list-stub
           type="followedBy"
-          user="[object Object]"
+          userid="u3"
+          username="Bob the builder"
         />
          
         <div
@@ -1125,14 +1132,19 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
          
         <follow-list-stub
           type="following"
-          user="[object Object]"
+          userid="u3"
+          username="Bob the builder"
         />
          
         <div
           class="ds-mb-large"
         />
          
-        <!---->
+        <div
+          class="group-member-list"
+          user-id="u3"
+          user-name="Bob the builder"
+        />
          
         <!---->
       </div>
@@ -1677,7 +1689,8 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
          
         <follow-list-stub
           type="followedBy"
-          user="[object Object]"
+          userid="u23"
+          username="Bob the builder"
         />
          
         <div
@@ -1686,7 +1699,8 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
          
         <follow-list-stub
           type="following"
-          user="[object Object]"
+          userid="u23"
+          username="Bob the builder"
         />
          
         <div
@@ -1694,28 +1708,11 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
         />
          
         <div
-          class="group-member-list os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-member-list"
-        >
-          <h5
-            class="title spacer-x-small"
-          >
-            profile.groups.title
-          </h5>
-           
-          <div
-            class="group-scroll-container"
-          >
-            <p
-              class="nobody-message"
-            >
-              
-      profile.groups.nobody
-    
-            </p>
-             
-            <!---->
-          </div>
-        </div>
+          class="group-member-list"
+          my-profile="true"
+          user-id="u23"
+          user-name="Bob the builder"
+        />
          
         <!---->
       </div>
@@ -2338,7 +2335,8 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
          
         <follow-list-stub
           type="followedBy"
-          user="[object Object]"
+          userid="u23"
+          username="Bob the builder"
         />
          
         <div
@@ -2347,7 +2345,8 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
          
         <follow-list-stub
           type="following"
-          user="[object Object]"
+          userid="u23"
+          username="Bob the builder"
         />
          
         <div
@@ -2355,28 +2354,11 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
         />
          
         <div
-          class="group-member-list os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-member-list"
-        >
-          <h5
-            class="title spacer-x-small"
-          >
-            profile.groups.title
-          </h5>
-           
-          <div
-            class="group-scroll-container"
-          >
-            <p
-              class="nobody-message"
-            >
-              
-      profile.groups.nobody
-    
-            </p>
-             
-            <!---->
-          </div>
-        </div>
+          class="group-member-list"
+          my-profile="true"
+          user-id="u23"
+          user-name="Bob the builder"
+        />
          
         <!---->
       </div>

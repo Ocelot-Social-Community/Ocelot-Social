@@ -8,7 +8,7 @@
         :user-link="userLink"
         :hover-delay="hoverDelay"
         @open-menu="loadPopover(openMenu)"
-        @close-menu="closeMenu(false)"
+        @close-menu="cancelAndClose(closeMenu)"
         data-test="avatarUserLink"
       >
         <profile-avatar :profile="user" size="small" />
@@ -21,7 +21,7 @@
             :user-link="userLink"
             :hover-delay="hoverDelay"
             @open-menu="loadPopover(openMenu)"
-            @close-menu="closeMenu(false)"
+            @close-menu="cancelAndClose(closeMenu)"
           >
             <span v-if="showSlug" class="slug">{{ userSlug }}</span>
             <span class="name">{{ userName }}</span>
@@ -120,14 +120,31 @@ export default {
   created() {
     this.icons = iconRegistry
   },
+  data() {
+    return {
+      popoverPending: false,
+    }
+  },
   methods: {
     async loadPopover(openMenu) {
-      // Load user data if not already loaded, to avoid flickering
-      await this.$apollo.query({
-        query: userTeaserQuery(this.$i18n),
-        variables: { id: this.user.id },
-      })
-      openMenu(false)
+      this.popoverPending = true
+      try {
+        // Pre-fetch user data to avoid flickering on first open
+        await this.$apollo.query({
+          query: userTeaserQuery(this.$i18n),
+          variables: { id: this.user.id },
+        })
+      } catch {
+        this.popoverPending = false
+        return
+      }
+      if (this.popoverPending) {
+        openMenu(false)
+      }
+    },
+    cancelAndClose(closeMenu) {
+      this.popoverPending = false
+      closeMenu(false)
     },
   },
 }

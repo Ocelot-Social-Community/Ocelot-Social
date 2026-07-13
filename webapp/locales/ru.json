@@ -848,6 +848,7 @@
       "slug": "Уникальное имя"
     },
     "membersCount": "Участник ::: Участники",
+    "membersListNoFilterResults": "Участники не найдены",
     "membersListNotVisibleToNonMembers": "Не-участники не могут видеть этот список.",
     "membersListTitle": "Участники группы",
     "membersListTitleNotAllowedSeeingGroupMembers": "Участники группы скрыты",
@@ -869,6 +870,7 @@
     "role": "Твоя роль в группе",
     "roles": {
       "admin": "Администратор",
+      "members": "Участники",
       "owner": "Владелец",
       "pending": "Ожидающий участник",
       "usual": "Участник"

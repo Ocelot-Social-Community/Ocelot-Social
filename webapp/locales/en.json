@@ -848,6 +848,7 @@
       "slug": "Unique name"
     },
     "membersCount": "Member ::: Members",
+    "membersListNoFilterResults": "No members found",
     "membersListNotVisibleToNonMembers": "Non-members cannot see this list.",
     "membersListTitle": "Group Members",
     "membersListTitleNotAllowedSeeingGroupMembers": "Group Members invisible",
@@ -869,6 +870,7 @@
     "role": "Your role in the group",
     "roles": {
       "admin": "Administrator",
+      "members": "Members",
       "owner": "Owner",
       "pending": "Pending Member",
       "usual": "Member"

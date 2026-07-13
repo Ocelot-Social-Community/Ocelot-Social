@@ -848,6 +848,7 @@
       "slug": "Nombre único"
     },
     "membersCount": "Miembro ::: Miembros",
+    "membersListNoFilterResults": "No se encontraron miembros",
     "membersListNotVisibleToNonMembers": "Los no miembros no pueden ver esta lista.",
     "membersListTitle": "Miembros del grupo",
     "membersListTitleNotAllowedSeeingGroupMembers": "Miembros del grupo invisibles",
@@ -869,6 +870,7 @@
     "role": "Tu rol en el grupo",
     "roles": {
       "admin": "Administrador",
+      "members": "Miembros",
       "owner": "Propietario",
       "pending": "Miembro pendiente",
       "usual": "Miembro"

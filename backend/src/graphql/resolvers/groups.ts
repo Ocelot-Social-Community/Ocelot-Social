@@ -88,8 +88,12 @@ export default {
       }
     },
     GroupMembers: async (_object, params, context: Context, _resolveInfo) => {
-      const { id: groupId, first = 25, offset = 0, includePending = false } = params
+      const { id: groupId, first = 25, offset = 0, includePending = false, nameFilter } = params
       const viewerId = context.user?.id ?? ''
+      const nameFilterClause =
+        nameFilter && nameFilter.length >= 3
+          ? 'AND toLower(user.name) CONTAINS toLower($nameFilter)'
+          : ''
       const session = context.driver.session()
       try {
         return await session.readTransaction(async (txc) => {
@@ -102,12 +106,20 @@ export default {
           const isMember = memberCheckResult.records.length > 0
 
           let cypher: string
+          const roleOrder = `
+            CASE membership.role
+              WHEN 'owner' THEN 0
+              WHEN 'admin' THEN 1
+              WHEN 'usual' THEN 2
+              ELSE 3
+            END, user.name`
           if (isMember) {
             const pendingFilter = includePending ? '' : "AND membership.role <> 'pending'"
             cypher = `
               MATCH (user:User)-[membership:MEMBER_OF]->(:Group {id: $groupId})
-              WHERE true ${pendingFilter}
+              WHERE true ${pendingFilter} ${nameFilterClause}
               RETURN user {.*}, membership {.*}
+              ORDER BY ${roleOrder}
               SKIP toInteger($offset) LIMIT toInteger($first)
             `
           } else {
@@ -120,12 +132,14 @@ export default {
               MATCH (user:User)-[membership:MEMBER_OF]->(group)
               WHERE membership.role <> 'pending'
                 AND coalesce(membership.showOnProfile, true) = true
+                ${nameFilterClause}
               RETURN user {.*}, membership {.*}
+              ORDER BY ${roleOrder}
               SKIP toInteger($offset) LIMIT toInteger($first)
             `
           }
 
-          const result = await txc.run(cypher, { groupId, first, offset })
+          const result = await txc.run(cypher, { groupId, first, offset, nameFilter })
           return result.records.map((record) => ({
             user: record.get('user'),
             membership: record.get('membership'),

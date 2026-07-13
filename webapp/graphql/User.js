@@ -17,7 +17,7 @@ export const profileUserQuery = (i18n) => {
     ${location('User', lang)}
     ${badges}
 
-    query User($id: ID!, $followedByCount: Int!, $followingCount: Int!) {
+    query User($id: ID!) {
       User(id: $id) {
         ...user
         ...userCounts
@@ -29,23 +29,38 @@ export const profileUserQuery = (i18n) => {
         isMuted
         isBlocked
         blocked
-        following(first: $followingCount) {
-          ...user
-          ...userCounts
-          ...locationOnUser
-          ...badges
-        }
-        followedBy(first: $followedByCount) {
-          ...user
-          ...userCounts
-          ...locationOnUser
-          ...badges
-        }
         socialMedia {
           id
           url
         }
         showShoutsPublicly
+      }
+    }
+  `
+}
+
+export const followConnectionsQuery = (type, i18n) => {
+  if (!['following', 'followedBy'].includes(type)) {
+    throw new Error(`followConnectionsQuery: invalid type "${type}"`)
+  }
+  const lang = i18n.locale().toUpperCase()
+  const countField = `${type}Count`
+  return gql`
+    ${user}
+    ${userCounts}
+    ${location('User', lang)}
+    ${badges}
+
+    query FollowConnections($id: ID!, $first: Int!, $offset: Int!) {
+      User(id: $id) {
+        id
+        ${type}(first: $first, offset: $offset) {
+          ...user
+          ...userCounts
+          ...locationOnUser
+          ...badges
+        }
+        ${countField}
       }
     }
   `
@@ -513,11 +528,14 @@ export const userDataQuery = (i18n) => {
 export const userTeaserQuery = (i18n) => {
   const lang = i18n.locale().toUpperCase()
   return gql`
+    ${user}
     ${badges}
     ${location('User', lang)}
 
     query ($id: ID!) {
       User(id: $id) {
+        ...user
+        about
         followedByCount
         contributionsCount
         commentedCount

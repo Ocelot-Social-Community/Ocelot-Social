@@ -848,6 +848,7 @@
       "slug": "Unikalna nazwa"
     },
     "membersCount": "Członek ::: Członkowie",
+    "membersListNoFilterResults": "Nie znaleziono członków",
     "membersListNotVisibleToNonMembers": "Osoby spoza grupy nie mogą zobaczyć tej listy.",
     "membersListTitle": "Członkowie grupy",
     "membersListTitleNotAllowedSeeingGroupMembers": "Członkowie grupy niewidoczni",
@@ -869,6 +870,7 @@
     "role": "Twoja rola w grupie",
     "roles": {
       "admin": "Administrator",
+      "members": "Członkowie",
       "owner": "Właściciel",
       "pending": "Oczekujący członek",
       "usual": "Członek"
