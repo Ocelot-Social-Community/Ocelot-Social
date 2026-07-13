@@ -45,3 +45,14 @@ export const THEME_DEFAULTS: Record<string, string> = {
   'chat-room-color-counter-badge': 'rgb(250, 249, 250)',
   'chat-room-background-counter-badge': 'var(--color-danger)',
 }
+
+/**
+ * The browser-chrome / PWA `theme_color` — the brand's primary colour. It is NOT a separate metadata
+ * field (that used to be a special `metadata.themeColor` carved from identity into theme, which broke
+ * for partial packages that provide identity but not theme). It is simply the `color-primary` theme
+ * token, with the framework default as fallback. A concrete colour (the PWA manifest can't resolve
+ * CSS vars), so brands set a literal `theme.cssVars['color-primary']`.
+ */
+export function resolveThemeColor(cssVars?: Record<string, string>): string {
+  return (cssVars && cssVars['color-primary']) || THEME_DEFAULTS['color-primary']
+}

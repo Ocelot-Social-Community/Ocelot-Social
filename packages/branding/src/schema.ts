@@ -146,8 +146,9 @@ export interface BrandingConfig {
     organizationJurisdiction: string
     /** Auth cookie name (webapp apollo + auth store). */
     cookieName: string
-    /** Primary theme colour (PWA manifest theme_color; $color-primary). */
-    themeColor: string
+    // NOTE: no `themeColor` — the browser-chrome / PWA theme_color is the `color-primary` theme token
+    // (see theme.ts resolveThemeColor). It used to be a metadata field carved into the theme bucket,
+    // which broke for partial packages providing identity but not theme.
     /** Open Graph image (link previews). Path is asset-coupled (served from static/). */
     ogImage: string
     ogImageAlt: string

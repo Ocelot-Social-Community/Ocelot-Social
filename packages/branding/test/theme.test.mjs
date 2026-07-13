@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
-import { THEME_DEFAULTS } from '../dist/theme.js'
+import { THEME_DEFAULTS, resolveThemeColor } from '../dist/theme.js'
 
 test('THEME_DEFAULTS lists the overridable palette with non-empty string defaults', () => {
   const keys = Object.keys(THEME_DEFAULTS)
@@ -15,4 +15,10 @@ test('THEME_DEFAULTS lists the overridable palette with non-empty string default
     // keys are custom-property names WITHOUT the leading '--'
     assert.ok(!key.startsWith('--'), `${key} should not carry the -- prefix`)
   }
+})
+
+test('resolveThemeColor is the primary cssVar, else the framework default (no metadata.themeColor)', () => {
+  assert.equal(resolveThemeColor({ 'color-primary': 'rgb(1, 2, 3)' }), 'rgb(1, 2, 3)')
+  assert.equal(resolveThemeColor({}), THEME_DEFAULTS['color-primary'])
+  assert.equal(resolveThemeColor(undefined), THEME_DEFAULTS['color-primary'])
 })

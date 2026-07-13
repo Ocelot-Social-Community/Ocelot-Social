@@ -17,6 +17,7 @@ import { basename, join, resolve } from 'node:path'
 
 import { composeArchive } from '../dist/discover.js'
 import { readTarGz } from '../dist/tar.js'
+import { resolveThemeColor } from '../dist/theme.js'
 
 import { buildBrandArchive } from './lib/build-brandings.mjs'
 
@@ -79,7 +80,8 @@ if (logoPath && logoPath.startsWith(prefix)) {
 
 // --- 3. Metadata: theme-color + app identity for the <head> --------------------------------------
 const m = config.metadata ?? {}
-const themeColor = cssVars['color-primary'] || m.themeColor || 'rgb(23, 181, 63)'
+// Browser-chrome colour = the brand's primary colour (no separate metadata.themeColor field).
+const themeColor = resolveThemeColor(cssVars)
 const metaPath = join(maintenanceDir, 'app/constants/metadata.ts')
 if (existsSync(metaPath)) {
   const meta = {

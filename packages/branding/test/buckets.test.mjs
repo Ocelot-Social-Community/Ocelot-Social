@@ -58,7 +58,7 @@ test('splitConfig attaches locales to EVERY fragment so they survive a partial l
 })
 
 test('grenzfall mappings: split domains land in the right bucket', () => {
-  assert.equal(bucketOfPath('metadata.themeColor'), 'theme') // carve-out from identity
+  assert.equal(bucketOfPath('metadata.ogImage'), 'identity') // all of metadata is identity now
   assert.equal(bucketOfPath('metadata.applicationName'), 'identity')
   assert.equal(bucketOfPath('metadata.version'), 'identity')
   assert.equal(bucketOfPath('assets.css'), 'theme')
@@ -79,12 +79,12 @@ test('unknown path maps to no bucket', () => {
 })
 
 const brandA = defineBranding({
-  metadata: { applicationName: 'A-app', themeColor: 'red' },
+  metadata: { applicationName: 'A-app' },
   group: { nameLengthMax: 40 },
   theme: { cssVars: { 'color-primary': 'blue' } },
 })
 const brandB = defineBranding({
-  metadata: { applicationName: 'B-app', themeColor: 'green' },
+  metadata: { applicationName: 'B-app' },
   theme: { cssVars: { 'color-primary': 'green' } },
 })
 
@@ -103,7 +103,6 @@ test('cross-brand: theme(B) + everything-else(A) — the headline reuse case', (
     behavior: brandA,
   })
   assert.equal(composed.theme.cssVars['color-primary'], 'green') // look from B
-  assert.equal(composed.metadata.themeColor, 'green') // themeColor rides with the theme bucket
   assert.equal(composed.metadata.applicationName, 'A-app') // identity from A
   assert.equal(composed.group.nameLengthMax, 40) // behavior from A
 })
@@ -111,7 +110,6 @@ test('cross-brand: theme(B) + everything-else(A) — the headline reuse case', (
 test('sparse compose: buckets without a source fall back to framework defaults', () => {
   const composed = composeConfig({ theme: brandB })
   assert.equal(composed.theme.cssVars['color-primary'], 'green')
-  assert.equal(composed.metadata.themeColor, 'green') // theme bucket still applied
   assert.equal(composed.metadata.applicationName, brandingDefaults.metadata.applicationName)
   assert.equal(composed.group.nameLengthMax, brandingDefaults.group.nameLengthMax)
 })
@@ -138,15 +136,13 @@ test('composeConfig does not mutate the source configs', () => {
   assert.equal(JSON.stringify(brandB), before)
 })
 
-test('extractBucket keeps only the bucket’s owned leaves (carve-out respected)', () => {
+test('extractBucket keeps only the bucket’s owned leaves', () => {
   const themeFrag = extractBucket(brandA, 'theme')
   assert.equal(themeFrag.theme.cssVars['color-primary'], 'blue')
-  assert.equal(themeFrag.metadata.themeColor, 'red') // themeColor rides with theme
-  assert.equal(themeFrag.metadata.applicationName, undefined) // identity leaf NOT in theme fragment
+  assert.equal(themeFrag.metadata, undefined) // theme owns no metadata leaves (metadata is identity)
 
   const identityFrag = extractBucket(brandA, 'identity')
   assert.equal(identityFrag.metadata.applicationName, 'A-app')
-  assert.equal(identityFrag.metadata.themeColor, undefined) // carve-out: themeColor is NOT in identity
   assert.equal(identityFrag.theme, undefined) // theme leaves not in identity fragment
 })
 
@@ -162,7 +158,6 @@ test('compose from sparse instance fragments — cross-brand, like an archive li
     behavior: extractBucket(brandA, 'behavior'),
   })
   assert.equal(composed.theme.cssVars['color-primary'], 'green') // B
-  assert.equal(composed.metadata.themeColor, 'green') // B (theme fragment)
   assert.equal(composed.metadata.applicationName, 'A-app') // A (identity fragment)
   assert.equal(composed.group.nameLengthMax, 40) // A (behavior fragment)
   assert.equal(composed.category.max, brandingDefaults.category.max) // unfilled leaf → default

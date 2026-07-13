@@ -19,10 +19,7 @@ function archive({
   const instances = []
   for (const [name, primary] of Object.entries(themes)) {
     const file = `fragments/theme.${name}.json`
-    files.set(
-      file,
-      Buffer.from(JSON.stringify({ theme: { cssVars: { 'color-primary': primary } }, metadata: { themeColor: primary } })),
-    )
+    files.set(file, Buffer.from(JSON.stringify({ theme: { cssVars: { 'color-primary': primary } } })))
     instances.push({ type: 'theme', name, file })
   }
   files.set('fragments/identity.default.json', Buffer.from(JSON.stringify({ metadata: { applicationName: appName } })))
@@ -46,7 +43,6 @@ test('composeArchive composes the default instances and attaches the manifest id
   const config = composeArchive(archive())
   assert.equal(config.id, 'acme')
   assert.equal(config.theme.cssVars['color-primary'], 'green')
-  assert.equal(config.metadata.themeColor, 'green')
   assert.equal(config.metadata.applicationName, 'Acme')
   // a bucket type the archive does not provide → framework default
   assert.equal(config.group.nameLengthMax, brandingDefaults.group.nameLengthMax)
@@ -76,7 +72,6 @@ test('composeFromArchives: theme from one archive, identity from another (the he
 
   const composed = composeFromArchives(getFiles, { _default: 'ya', identity: 'ac' })
   assert.equal(composed.theme.cssVars['color-primary'], 'green') // theme from _default (ya)
-  assert.equal(composed.metadata.themeColor, 'green') // themeColor rides with theme
   assert.equal(composed.metadata.applicationName, 'Acme') // identity slot overridden → ac
 })
 

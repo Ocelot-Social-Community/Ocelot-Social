@@ -5,10 +5,11 @@
 // (/manifest.webmanifest); only the served content is dynamic. Served no-cache so a switch is picked
 // up. (Icons follow the brand's square image via metadata.ogImage; a brand that wants its own PWA
 // icon points ogImage at its squared asset.)
-const { getBranding } = require('@ocelot-social/branding')
+const { getBranding, resolveThemeColor } = require('@ocelot-social/branding')
 
 module.exports = function manifest(req, res) {
-  const { metadata } = getBranding()
+  const branding = getBranding()
+  const { metadata } = branding
   const icon = metadata.ogImage
   const iconType = metadata.ogImageType || 'image/png'
 
@@ -16,7 +17,8 @@ module.exports = function manifest(req, res) {
     name: metadata.applicationName,
     short_name: metadata.applicationShortName,
     description: metadata.applicationDescription,
-    theme_color: metadata.themeColor,
+    // The browser-chrome colour = the brand's primary colour (no separate metadata.themeColor field).
+    theme_color: resolveThemeColor(branding.theme.cssVars),
     background_color: '#ffffff',
     display: 'standalone',
     start_url: '/',

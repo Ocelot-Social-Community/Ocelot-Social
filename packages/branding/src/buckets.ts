@@ -2,11 +2,11 @@
 // slices. This is what lets a brand reuse another brand's content per slice (e.g. the colour THEME
 // of brand B with the IDENTITY of brand A). See docu/branding-buckets-konzept.md §4.
 //
-// Each bucket owns a set of dot-paths into BrandingConfig. Paths may overlap across buckets ONLY as
-// prefix / more-specific pairs — e.g. `identity` owns `metadata` while `theme` owns the more specific
-// `metadata.themeColor`. The LONGEST matching path wins, so the taxonomy stays a clean partition of
-// every leaf (each leaf resolves to exactly one bucket) while the definition stays concise. The
-// exhaustiveness is verified against brandingDefaults in buckets.spec.
+// Each bucket owns a set of dot-paths into BrandingConfig. Split domains are owned at the SUB-PATH
+// level by different buckets (e.g. `assets.css`→theme, `assets.favicon`→logos, `assets.html`→legal;
+// `links.pages`→legal vs `links.footerOrder`→navigation). bucketOfPath uses LONGEST-prefix matching,
+// so a more-specific path could override a broader one if ever needed; today every leaf resolves to
+// exactly one bucket. Exhaustiveness is verified against brandingDefaults in buckets.spec.
 //
 // Pure (no node deps) so both webapp and backend — and the admin composition UI — can import it.
 
@@ -113,16 +113,9 @@ export const BUCKET_NAMES: BucketName[] = [
 
 /** Which config paths each bucket owns. Longest matching path wins (see file header). */
 export const BUCKET_PATHS: Record<BucketName, string[]> = {
-  // The reusable LOOK: colours, fonts, brand stylesheet, PWA/browser-chrome colour, layouts,
-  // donation-bar colour style. This is the headline unit a brand pulls from another.
-  theme: [
-    'theme',
-    'donation',
-    'login.layout',
-    'registration.layout',
-    'assets.css',
-    'metadata.themeColor',
-  ],
+  // The reusable LOOK: colours (incl. the browser-chrome/PWA theme_color, = the color-primary token),
+  // fonts, brand stylesheet, layouts, donation-bar colour style. The headline unit a brand pulls.
+  theme: ['theme', 'donation', 'login.layout', 'registration.layout', 'assets.css'],
   // WHO the instance is: names, organisation, jurisdiction, OG image, cookie name, version, the
   // brand's self-description. (locales is CROSS-CUTTING — see below — not owned by a bucket.)
   identity: ['metadata', 'about'],

@@ -1,5 +1,10 @@
 const manifest = require('./manifest.js')
-const { setBranding, getBranding, brandingDefaults } = require('@ocelot-social/branding')
+const {
+  setBranding,
+  getBranding,
+  brandingDefaults,
+  resolveThemeColor,
+} = require('@ocelot-social/branding')
 
 function run() {
   const res = {
@@ -23,7 +28,7 @@ describe('manifest serverMiddleware', () => {
     expect(res.headers['Content-Type']).toBe('application/manifest+json')
     expect(res.headers['Cache-Control']).toBe('no-cache')
     expect(json.name).toBe(getBranding().metadata.applicationName)
-    expect(json.theme_color).toBe(getBranding().metadata.themeColor)
+    expect(json.theme_color).toBe(resolveThemeColor(getBranding().theme.cssVars))
     expect(json.display).toBe('standalone')
     expect(json.start_url).toBe('/')
     expect(json.icons.length).toBeGreaterThan(0)
@@ -36,8 +41,9 @@ describe('manifest serverMiddleware', () => {
         ...brandingDefaults.metadata,
         applicationName: 'yunite.me',
         applicationShortName: 'yunite',
-        themeColor: 'rgb(110, 139, 135)',
       },
+      // The PWA theme_color is the brand's primary colour (no separate metadata.themeColor).
+      theme: { ...brandingDefaults.theme, cssVars: { 'color-primary': 'rgb(110, 139, 135)' } },
     })
     const { json } = run()
     expect(json.name).toBe('yunite.me')
