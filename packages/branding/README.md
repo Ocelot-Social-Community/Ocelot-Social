@@ -33,6 +33,8 @@ npx ocelot-brand-archive .        # → dist/<id>.tar.gz (+ versioned) + a DEFAU
 
 The archive is a **library of bucket instances** (`manifest.json` + sparse `fragments/<type>.<name>.json` + `assets/` + `html/`), not a merged config — consumers compose the effective config at load time. See [`docu/branding-buckets-konzept.md`](../../docu/branding-buckets-konzept.md).
 
+**i18n overrides** can be authored inline (`locales: { de: { … } }` in the config) or, more conveniently, as conventional per‑locale files `locales/<code>.json` in the brand dir — the build reads those and merges them into `locales` (file wins per leaf). Either way the runtime is identical.
+
 ## Consuming the resolved config (backend / webapp)
 
 `branding` is a **named** export that resolves at *access* time — read a value inside a function/component and it reflects the runtime‑injected brand (or the framework defaults when none is injected):

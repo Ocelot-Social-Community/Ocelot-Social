@@ -142,6 +142,59 @@ export function findConfig(brandDir: string): string | null {
   return null
 }
 
+/** Deep-merge translation trees (nested plain objects merge, leaves replace — `over` wins). */
+function mergeStrings(
+  base: Record<string, unknown>,
+  over: Record<string, unknown>,
+): Record<string, unknown> {
+  const out: Record<string, unknown> = { ...base }
+  for (const [k, v] of Object.entries(over)) {
+    const b = out[k]
+    const bothObjects =
+      b !== null &&
+      typeof b === 'object' &&
+      !Array.isArray(b) &&
+      v !== null &&
+      typeof v === 'object' &&
+      !Array.isArray(v)
+    out[k] = bothObjects
+      ? mergeStrings(b as Record<string, unknown>, v as Record<string, unknown>)
+      : v
+  }
+  return out
+}
+
+/**
+ * Read `<brandDir>/locales/<code>.json` translation files and deep-merge them into `config.locales`
+ * (filename stem = locale code; a file WINS over an inline `config.locales[code]`). This lets a brand
+ * author its i18n overrides as conventional per-locale JSON files instead of inline in brand.config —
+ * the RUNTIME is unchanged (locales still ride in the composed config, merged by the webapp i18n
+ * plugin). Only top-level `*.json` in `locales/` are read; nested folders (the legacy `locales/tmp` /
+ * `locales/html`) are ignored.
+ */
+function loadLocaleFiles(
+  dir: string,
+  id: string,
+  config: BrandingConfig,
+  warnings: string[],
+): void {
+  const localesDir = join(dir, 'locales')
+  if (!existsSync(localesDir)) return
+  for (const entry of readdirSync(localesDir, { withFileTypes: true })) {
+    if (!entry.isFile() || !entry.name.endsWith('.json')) continue
+    const code = basename(entry.name, '.json')
+    try {
+      const strings = JSON.parse(readFileSync(join(localesDir, entry.name), 'utf8')) as Record<
+        string,
+        unknown
+      >
+      config.locales[code] = mergeStrings(config.locales[code] ?? {}, strings)
+    } catch {
+      warnings.push(`  ! ${id}: invalid locale JSON: locales/${entry.name}`)
+    }
+  }
+}
+
 /** Bundle ONE brand directory into a `<id>.tar.gz` buffer (manifest.json + fragments/ + assets/ + html/). */
 export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive> {
   const dir = resolve(brandDir)
@@ -151,6 +204,9 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
   const configPath = findConfig(dir)
   if (!configPath) throw new Error(`no brand.config.(ts|mjs|js) in ${dir}`)
   const config = await loadConfig(configPath)
+  // Brands may author i18n overrides as conventional locales/<code>.json files (in addition to, or
+  // instead of, inline config.locales) — merge those in now. Runtime shape is unchanged.
+  loadLocaleFiles(dir, id, config, warnings)
   // OG image: if the brand didn't set its own, follow its squared logo (logos.signupPath). The old
   // deploy baked the brand's `static/img/custom/logo-squared.*` over the vanilla file; at runtime the
   // brand's logo lives under /branding/<id>/… instead, so derive the OG image from it — otherwise a

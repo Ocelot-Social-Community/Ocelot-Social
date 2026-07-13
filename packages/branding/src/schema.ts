@@ -225,7 +225,11 @@ export interface BrandingConfig {
    * plugin). Keyed by locale code ('de', 'en', …); each value is a nested translation tree (open
    * shape, so not strongly typed). A brand ships only the strings it changes. Because it rides in
    * the branding config, it is injected + serialised to the client with everything else — no
-   * separate locale-file mechanism, no rebuild. See docu/branding-architecture-konzept.md.
+   * separate runtime locale-file mechanism, no rebuild. See docu/branding-architecture-konzept.md.
+   *
+   * AUTHORING: a brand may declare these inline here, OR ship conventional `locales/<code>.json` files
+   * in its brand dir — the build reads those and merges them in (file wins per leaf); see
+   * scripts/lib/build-brandings.ts `loadLocaleFiles`. Either way the runtime shape is identical.
    */
   locales: Record<string, Record<string, unknown>>
   /**

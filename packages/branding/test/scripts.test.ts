@@ -24,8 +24,13 @@ after(() => {
 })
 
 // Create a temp brand dir: package.json (unless pkg===null), a .mjs config with the given overrides,
-// and an assets/ dir holding every file in `assets`.
-function brandDir({ pkg = { name: 'acme-branding', version: '1.2.3' }, config, assets = {} } = {}) {
+// an assets/ dir holding every file in `assets`, and a locales/ dir with a <code>.json per `locales`.
+function brandDir({
+  pkg = { name: 'acme-branding', version: '1.2.3' },
+  config,
+  assets = {},
+  locales = {},
+} = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'ocelot-brand-'))
   roots.push(dir)
   if (pkg) writeFileSync(join(dir, 'package.json'), JSON.stringify(pkg))
@@ -33,6 +38,16 @@ function brandDir({ pkg = { name: 'acme-branding', version: '1.2.3' }, config, a
   const assetDir = join(dir, 'assets')
   mkdirSync(assetDir, { recursive: true })
   for (const [name, body] of Object.entries(assets)) writeFileSync(join(assetDir, name), body)
+  if (Object.keys(locales).length) {
+    const localesDir = join(dir, 'locales')
+    mkdirSync(localesDir, { recursive: true })
+    for (const [code, body] of Object.entries(locales)) {
+      writeFileSync(
+        join(localesDir, `${code}.json`),
+        typeof body === 'string' ? body : JSON.stringify(body),
+      )
+    }
+  }
   return dir
 }
 
@@ -145,6 +160,39 @@ test('brandId / brandVersion degrade gracefully on a malformed package.json', ()
   writeFileSync(join(dir, 'package.json'), '{ not: valid json')
   assert.equal(brandVersion(dir), null) // unparseable → no version
   assert.equal(typeof brandId(dir), 'string') // → basename fallback, never throws
+})
+
+test('buildBrandArchive reads locales/<code>.json files into config.locales', async () => {
+  const dir = brandDir({
+    config: `export default (d) => d({ metadata: { applicationName: 'Acme' } })\n`,
+    locales: { en: { greeting: { hello: 'Hi' } }, de: { greeting: { hello: 'Hallo' } } },
+  })
+  const config = composeArchive(readTarGz((await buildBrandArchive(dir)).gz))
+  assert.equal(config.locales.en.greeting.hello, 'Hi')
+  assert.equal(config.locales.de.greeting.hello, 'Hallo')
+})
+
+test('locales/<code>.json deep-merges with inline config.locales — the FILE wins per leaf', async () => {
+  const dir = brandDir({
+    config: `export default (d) => d({
+      metadata: { applicationName: 'Acme' },
+      locales: { en: { a: 'inline-a', shared: 'inline' } },
+    })\n`,
+    locales: { en: { b: 'file-b', shared: 'file' } },
+  })
+  const config = composeArchive(readTarGz((await buildBrandArchive(dir)).gz))
+  assert.equal(config.locales.en.a, 'inline-a') // inline-only key kept
+  assert.equal(config.locales.en.b, 'file-b') // file-only key added
+  assert.equal(config.locales.en.shared, 'file') // conflict → file wins
+})
+
+test('buildBrandArchive warns on an invalid locale JSON (but still builds)', async () => {
+  const dir = brandDir({
+    config: `export default (d) => d({ metadata: { applicationName: 'Acme' } })\n`,
+    locales: { en: '{ not valid json' },
+  })
+  const built = await buildBrandArchive(dir)
+  assert.match(built.warnings.join('\n'), /invalid locale JSON: locales\/en\.json/)
 })
 
 test('publishBrandArchive writes latest + versioned files and a DEFAULT marker', async () => {
