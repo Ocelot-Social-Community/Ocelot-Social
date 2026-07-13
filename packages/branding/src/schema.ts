@@ -39,6 +39,13 @@ export interface LogoClick {
   internalPath?: { to: { name: string }; scrollTo?: string }
 }
 
+/**
+ * A webapp page-layout name (a file in `webapp/layouts/`), used for the auth pages (login /
+ * registration / password-reset). `error` is Nuxt's dedicated error layout, not a page choice, so it
+ * is excluded. Keep in sync with the layout files if the set changes.
+ */
+export type PageLayout = 'basic' | 'blank' | 'default' | 'no-header'
+
 /** The footer / static pages a brand can point at an external URL or re-order. */
 export type LinkPageKey =
   | 'organization'
@@ -126,10 +133,10 @@ export interface BrandingConfig {
   registration: {
     nonceLength: number
     inviteCodeLength: number
-    layout: string
+    layout: PageLayout
   }
   login: {
-    layout: string
+    layout: PageLayout
   }
   comment: {
     minLength: number
@@ -138,6 +145,11 @@ export interface BrandingConfig {
   }
   dateTime: {
     relativeDateTime: boolean
+    /**
+     * Absolute timestamp format — a date-fns format-token string (e.g. `P` = localized short date,
+     * `PPpp` = long date + time), consumed by the webapp `DateTime` component via date-fns `format`.
+     * An OPEN vocabulary (any token string), so deliberately `string` and not a union.
+     */
     absoluteDateTimeFormat: string
   }
   metadata: {
