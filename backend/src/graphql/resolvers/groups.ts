@@ -631,7 +631,13 @@ export default {
               SKIP toInteger($offset) LIMIT toInteger($first)
             `
           }
-          const result = await txc.run(cypher, { profileUserId, viewerId, first, offset, nameFilter })
+          const result = await txc.run(cypher, {
+            profileUserId,
+            viewerId,
+            first,
+            offset,
+            nameFilter,
+          })
           return result.records.map((r) => r.get('group'))
         })
       } finally {
