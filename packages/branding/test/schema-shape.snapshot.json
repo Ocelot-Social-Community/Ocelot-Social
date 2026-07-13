@@ -44,6 +44,8 @@
     "logos.headerMobilePath: string",
     "logos.headerMobileWidth: string",
     "logos.headerPath: string",
+    "logos.headerTabletPath: null",
+    "logos.headerTabletWidth: null",
     "logos.headerWidth: string",
     "logos.logoutPath: string",
     "logos.passwordResetPath: string",

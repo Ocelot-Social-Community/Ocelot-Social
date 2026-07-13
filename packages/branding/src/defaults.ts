@@ -56,8 +56,10 @@ export const brandingDefaults: BrandingConfig = {
   },
   logos: {
     headerPath: '/img/custom/logo-horizontal.svg',
+    headerTabletPath: null, // → falls back to headerPath
     headerMobilePath: '/img/custom/logo-horizontal.svg',
     headerWidth: '130px',
+    headerTabletWidth: null, // → falls back to headerWidth
     headerMobileWidth: '100px',
     headerClick: {
       externalLink: null,

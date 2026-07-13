@@ -5,6 +5,14 @@
 // criterion (see docu/branding-architecture-konzept.md, "Schicht A konkret"): a key belongs
 // here only if it is a per-network identity / UX / validation choice a brand operator would
 // plausibly change — not runtime admin governance (Policy) and not framework-internal wiring.
+//
+// "NOT SET" CONVENTION: `BrandingConfig` is the RESOLVED config — always complete (brandingDefaults +
+// a sparse override). So a settable value that can be absent / fall back is `T | null` (always present,
+// `null` = not set), NOT optional `?`. Author-sparseness is expressed solely by `BrandingOverrides`
+// (= DeepPartial<BrandingConfig>), never by `?` on the base type. → consumers check one way (`!= null`)
+// and never meet `undefined`. Optional `?` is reserved for the nested DATA shapes below, where it means
+// an either-or variant (MenuEntry: `path` XOR `url`; CustomButton) or a 3-state page override
+// (LinkPageOverride: absent = inherit, `null` = explicitly none) — a different concept from "unset".
 
 /** A single header-menu entry: either an internal `path` or an external `url` (+ target). */
 export interface MenuEntry {
@@ -156,10 +164,12 @@ export interface BrandingConfig {
   }
   logos: {
     headerPath: string
-    headerTabletPath?: string
+    /** Tablet header logo; `null` → fall back to the desktop `headerPath`. */
+    headerTabletPath: string | null
     headerMobilePath: string
     headerWidth: string
-    headerTabletWidth?: string
+    /** Tablet header width; `null` → fall back to `headerWidth`. */
+    headerTabletWidth: string | null
     headerMobileWidth: string
     headerClick: LogoClick
     signupPath: string
