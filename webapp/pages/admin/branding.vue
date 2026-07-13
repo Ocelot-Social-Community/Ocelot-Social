@@ -129,6 +129,11 @@
               <dt>{{ d.path }}</dt>
               <dd>
                 <template v-if="d.status === 'changed'">
+                  <span
+                    v-if="isColor(d.oldValue)"
+                    class="swatch swatch--old"
+                    :style="{ backgroundColor: d.oldValue }"
+                  />
                   <span class="detail-old">{{ display(d.oldValue) }}</span>
                   <span class="detail-arrow">→</span>
                 </template>
@@ -461,7 +466,9 @@ export default {
       return out
     },
     isColor(v) {
-      return typeof v === 'string' && /^(#|rgb|hsl)/i.test(v.trim())
+      // Literal colours plus var()/color-mix() references — the browser resolves the latter for the
+      // swatch's background-color, so a token that defaults to `var(--color-primary)` still shows one.
+      return typeof v === 'string' && /^(#|rgb|hsl|var\(|color-mix\()/i.test(v.trim())
     },
     isImage(v) {
       return typeof v === 'string' && /\.(svg|png|jpe?g|webp|gif|ico)(\?|$)/i.test(v)
@@ -736,6 +743,11 @@ export default {
   border-radius: 2px;
   border: 1px solid $border-color-softer;
   flex: 0 0 auto;
+
+  // The old (replaced) colour of a changed row — dimmed to match its struck-through text.
+  &--old {
+    opacity: 0.6;
+  }
 }
 
 .available-card {
