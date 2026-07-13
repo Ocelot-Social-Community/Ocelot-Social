@@ -51,6 +51,91 @@ describe('GroupMemberList.vue', () => {
     })
   })
 
+  describe('nobodyMessage', () => {
+    it('returns profile.groups.nobody when no filter is active', () => {
+      const wrapper = Wrapper()
+      expect(wrapper.vm.nobodyMessage).toBe('profile.groups.nobody')
+    })
+
+    it('returns profile.groups.nobody when activeFilter has fewer than 3 chars', () => {
+      const wrapper = Wrapper()
+      wrapper.setData({ activeFilter: 'ab' })
+      expect(wrapper.vm.nobodyMessage).toBe('profile.groups.nobody')
+    })
+
+    it('returns profile.groups.noFilterResults when activeFilter has 3+ chars', () => {
+      const wrapper = Wrapper()
+      wrapper.setData({ activeFilter: 'abc' })
+      expect(wrapper.vm.nobodyMessage).toBe('profile.groups.noFilterResults')
+    })
+  })
+
+  describe('isLoading', () => {
+    it('is true when loadingGroups', () => {
+      const wrapper = Wrapper()
+      wrapper.setData({ loadingGroups: true, loadingMore: false })
+      expect(wrapper.vm.isLoading).toBe(true)
+    })
+
+    it('is true when loadingMore', () => {
+      const wrapper = Wrapper()
+      wrapper.setData({ loadingGroups: false, loadingMore: true })
+      expect(wrapper.vm.isLoading).toBe(true)
+    })
+
+    it('is false when neither loading', () => {
+      const wrapper = Wrapper()
+      wrapper.setData({ loadingGroups: false, loadingMore: false })
+      expect(wrapper.vm.isLoading).toBe(false)
+    })
+  })
+
+  describe('popoverEnabled', () => {
+    it('is false when isScrolling', () => {
+      const wrapper = Wrapper()
+      wrapper.setData({
+        isScrolling: true,
+        loadingGroups: false,
+        loadingMore: false,
+        loadingCooldown: false,
+      })
+      expect(wrapper.vm.popoverEnabled).toBe(false)
+    })
+
+    it('is false when isLoading', () => {
+      const wrapper = Wrapper()
+      wrapper.setData({
+        isScrolling: false,
+        loadingGroups: true,
+        loadingMore: false,
+        loadingCooldown: false,
+      })
+      expect(wrapper.vm.popoverEnabled).toBe(false)
+    })
+
+    it('is false when loadingCooldown', () => {
+      const wrapper = Wrapper()
+      wrapper.setData({
+        isScrolling: false,
+        loadingGroups: false,
+        loadingMore: false,
+        loadingCooldown: true,
+      })
+      expect(wrapper.vm.popoverEnabled).toBe(false)
+    })
+
+    it('is true when not scrolling, loading, or in cooldown', () => {
+      const wrapper = Wrapper()
+      wrapper.setData({
+        isScrolling: false,
+        loadingGroups: false,
+        loadingMore: false,
+        loadingCooldown: false,
+      })
+      expect(wrapper.vm.popoverEnabled).toBe(true)
+    })
+  })
+
   describe('groupsByType', () => {
     describe('when myProfile = true', () => {
       it('groups by groupType into public, closed, hidden', () => {
@@ -197,6 +282,179 @@ describe('GroupMemberList.vue', () => {
           'hidden',
         ])
       })
+    })
+  })
+
+  describe('v-if condition', () => {
+    it('does not render when no groups, not myProfile, not loading, and showFilter=false', async () => {
+      const wrapper = Wrapper({ myProfile: false }, [])
+      wrapper.setData({ showFilter: false })
+      await wrapper.vm.$nextTick()
+      expect(wrapper.find('div').exists()).toBe(false)
+    })
+
+    it('renders when showFilter=true even without groups', async () => {
+      const wrapper = Wrapper({ myProfile: false }, [])
+      wrapper.setData({ showFilter: true })
+      await wrapper.vm.$nextTick()
+      expect(wrapper.find('div').exists()).toBe(true)
+    })
+
+    it('renders when myProfile=true even without groups', async () => {
+      const wrapper = Wrapper({ myProfile: true }, [])
+      wrapper.setData({ showFilter: false })
+      await wrapper.vm.$nextTick()
+      expect(wrapper.find('div').exists()).toBe(true)
+    })
+  })
+
+  describe('loadGroups', () => {
+    it('sends empty nameFilter when activeFilter is shorter than 3 chars', async () => {
+      const wrapper = Wrapper()
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+      mockApollo.query.mockClear()
+
+      wrapper.setData({ activeFilter: 'ab' })
+      await wrapper.vm.loadGroups(0)
+
+      expect(mockApollo.query).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: expect.objectContaining({ nameFilter: '' }),
+        }),
+      )
+    })
+
+    it('sends activeFilter as nameFilter when 3+ chars', async () => {
+      const wrapper = Wrapper()
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+      mockApollo.query.mockClear()
+
+      wrapper.setData({ activeFilter: 'abc' })
+      await wrapper.vm.loadGroups(0)
+
+      expect(mockApollo.query).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: expect.objectContaining({ nameFilter: 'abc' }),
+        }),
+      )
+    })
+
+    it('replaces groups on offset=0 after data loads', async () => {
+      const wrapper = Wrapper()
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+
+      mockApollo.query.mockResolvedValueOnce({
+        data: {
+          User: [{ id: 'user-1', groups: [{ id: 'g2', groupType: 'public', myRole: 'usual' }] }],
+        },
+      })
+      await wrapper.vm.loadGroups(0)
+
+      expect(wrapper.vm.groups).toHaveLength(1)
+      expect(wrapper.vm.groups[0].id).toBe('g2')
+    })
+
+    it('appends groups on offset > 0', async () => {
+      const wrapper = Wrapper()
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+
+      wrapper.setData({ groups: [{ id: 'g1', groupType: 'public', myRole: 'usual' }] })
+      mockApollo.query.mockResolvedValueOnce({
+        data: {
+          User: [{ id: 'user-1', groups: [{ id: 'g2', groupType: 'public', myRole: 'usual' }] }],
+        },
+      })
+      await wrapper.vm.loadGroups(1)
+
+      expect(wrapper.vm.groups).toHaveLength(2)
+      expect(wrapper.vm.groups.map((g) => g.id)).toEqual(['g1', 'g2'])
+    })
+  })
+
+  describe('loadMore', () => {
+    it('sets showFilter when groups.length >= PAGE_SIZE', async () => {
+      const groups = Array.from({ length: 25 }, (_, i) => ({
+        id: `g${i}`,
+        groupType: 'public',
+        myRole: 'usual',
+      }))
+      const wrapper = Wrapper({}, groups)
+      wrapper.setData({ allGroupsLoaded: false })
+
+      mockApollo.query.mockResolvedValueOnce({
+        data: { User: [{ id: 'user-1', groups: [] }] },
+      })
+
+      expect(wrapper.vm.showFilter).toBe(false)
+      await wrapper.vm.loadMore()
+      expect(wrapper.vm.showFilter).toBe(true)
+    })
+
+    it('does not set showFilter when groups.length < PAGE_SIZE', async () => {
+      const groups = Array.from({ length: 5 }, (_, i) => ({
+        id: `g${i}`,
+        groupType: 'public',
+        myRole: 'usual',
+      }))
+      const wrapper = Wrapper({}, groups)
+      wrapper.setData({ allGroupsLoaded: false })
+
+      mockApollo.query.mockResolvedValueOnce({
+        data: { User: [{ id: 'user-1', groups: [] }] },
+      })
+
+      await wrapper.vm.loadMore()
+      expect(wrapper.vm.showFilter).toBe(false)
+    })
+
+    it('is a no-op when allGroupsLoaded=true', async () => {
+      const wrapper = Wrapper()
+      mockApollo.query.mockClear()
+
+      wrapper.setData({ allGroupsLoaded: true })
+      await wrapper.vm.loadMore()
+      expect(mockApollo.query).not.toHaveBeenCalled()
+    })
+
+    it('is a no-op when loadingMore=true', async () => {
+      const wrapper = Wrapper()
+      wrapper.setData({ allGroupsLoaded: false, loadingMore: true })
+      mockApollo.query.mockClear()
+
+      await wrapper.vm.loadMore()
+      expect(mockApollo.query).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('onFilterChange', () => {
+    it('updates activeFilter and reloads from offset 0', async () => {
+      const wrapper = Wrapper()
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+      mockApollo.query.mockClear()
+
+      await wrapper.vm.onFilterChange('abc')
+
+      expect(wrapper.vm.activeFilter).toBe('abc')
+      expect(mockApollo.query).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: expect.objectContaining({ offset: 0, nameFilter: 'abc' }),
+        }),
+      )
+    })
+  })
+
+  describe('onScrollingChange', () => {
+    it('updates isScrolling', () => {
+      const wrapper = Wrapper()
+      wrapper.vm.onScrollingChange(true)
+      expect(wrapper.vm.isScrolling).toBe(true)
+      wrapper.vm.onScrollingChange(false)
+      expect(wrapper.vm.isScrolling).toBe(false)
     })
   })
 })
