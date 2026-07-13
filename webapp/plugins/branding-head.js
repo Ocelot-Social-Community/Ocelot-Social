@@ -3,7 +3,7 @@
 // the branding-assets middleware). They are applied here on the client rather than baked into the
 // static nuxt.config head, so a runtime-injected brand (see plugins/branding.js) sets its own icon
 // and CSS without a rebuild. (SSR keeps the default /favicon.ico; the client swaps to the brand's.)
-import branding from '@ocelot-social/branding'
+import { branding } from '@ocelot-social/branding'
 
 export default () => {
   if (typeof document === 'undefined') return

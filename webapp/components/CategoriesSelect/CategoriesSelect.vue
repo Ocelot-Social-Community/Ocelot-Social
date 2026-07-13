@@ -23,7 +23,7 @@
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { resolveIcon } from '~/utils/iconRegistry'
-import branding from '@ocelot-social/branding'
+import { branding } from '@ocelot-social/branding'
 import xor from 'lodash/xor'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
 import GetCategories from '~/mixins/getCategoriesMixin.js'

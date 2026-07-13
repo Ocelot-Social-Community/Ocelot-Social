@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import branding from '@src/branding'
+import { branding } from '@src/branding'
 
 import Resolver from './helpers/Resolver'
 

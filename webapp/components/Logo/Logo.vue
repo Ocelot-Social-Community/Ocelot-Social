@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import branding from '@ocelot-social/branding'
+import { branding } from '@ocelot-social/branding'
 import metadata from '~/constants/metadata.js'
 
 /**

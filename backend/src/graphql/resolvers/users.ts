@@ -10,7 +10,7 @@ import { neo4jgraphql } from 'neo4j-graphql-js'
 import { GROUP_MEMBERSHIP_VISIBILITY_CHANGED } from '@constants/subscriptions'
 import { getNeode } from '@db/neo4j'
 import { UserInputError, ForbiddenError } from '@graphql/errors'
-import branding from '@src/branding'
+import { branding } from '@src/branding'
 
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
 import { filterUsersHasLocation } from './helpers/filterHasLocation'

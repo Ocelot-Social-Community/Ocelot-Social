@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import branding from '@ocelot-social/branding'
+import { branding } from '@ocelot-social/branding'
 import { validateInviteCode } from '~/graphql/InviteCode'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import formValidation from '~/mixins/formValidation'

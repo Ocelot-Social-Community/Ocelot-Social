@@ -22,15 +22,19 @@
     "postbuild": "echo '{ \"type\": \"commonjs\" }' > dist/package.json",
     "lint": "eslint --max-warnings 0 .",
     "typecheck": "tsc -p tsconfig.json",
+    "validate": "publint && attw --pack . --profile node16",
     "test": "npm run build && node --test test/*.test.ts",
     "test:coverage": "npm run build && node --test --experimental-test-coverage --test-coverage-lines=95 --test-coverage-functions=95 --test-coverage-branches=82 test/*.test.ts",
-    "check": "npm run build && npm run lint && npm run typecheck && npm run test:coverage",
-    "build:dev-brandings": "node scripts/build-dev-brandings.ts"
+    "check": "npm run build && npm run lint && npm run typecheck && npm run test:coverage && npm run validate",
+    "build:dev-brandings": "node scripts/build-dev-brandings.ts",
+    "prepack": "npm run build"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.3",
     "@types/node": "^18.18.9",
     "eslint": "^9.27.0",
     "eslint-config-it4c": "^0.12.0",
+    "publint": "^0.3.18",
     "typescript": "^5.6.0",
     "typescript-eslint": "^8.63.0"
   },

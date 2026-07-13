@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import vuexI18n from 'vuex-i18n/dist/vuex-i18n.umd.js'
 import { isEmpty, find, merge } from 'lodash'
-import branding from '@ocelot-social/branding'
+import { branding } from '@ocelot-social/branding'
 import locales from '~/locales'
 import htmlTranslations from '~/locales/html/'
 

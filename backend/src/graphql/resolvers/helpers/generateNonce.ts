@@ -1,4 +1,4 @@
-import branding from '@src/branding'
+import { branding } from '@src/branding'
 
 // TODO: why this is not used in resolver 'requestPasswordReset'?
 export default function generateNonce() {

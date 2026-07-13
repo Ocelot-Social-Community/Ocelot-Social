@@ -16,7 +16,7 @@ import {
 } from '@constants/subscriptions'
 import { ForbiddenError, UserInputError } from '@graphql/errors'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
-import branding from '@src/branding'
+import { branding } from '@src/branding'
 
 import Resolver from './helpers/Resolver'
 import { images } from './images/images'

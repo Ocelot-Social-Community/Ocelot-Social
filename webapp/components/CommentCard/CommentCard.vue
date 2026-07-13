@@ -79,7 +79,7 @@
 import { OsButton, OsCard, OsIcon, OsActionButton } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
-import branding from '@ocelot-social/branding'
+import { branding } from '@ocelot-social/branding'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import ContentViewer from '~/components/Editor/ContentViewer'

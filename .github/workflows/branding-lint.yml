@@ -57,3 +57,8 @@ jobs:
 
       - name: Run TypeScript type check
         run: npm run typecheck
+
+      # publint + are-the-types-wrong: guards the published package's exports/types resolution — catches
+      # ESM/CJS interop regressions (the package is "type": "module" with a CommonJS dist).
+      - name: Validate package
+        run: npm run validate

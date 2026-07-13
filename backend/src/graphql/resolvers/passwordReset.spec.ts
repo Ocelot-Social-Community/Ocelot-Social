@@ -7,7 +7,7 @@ import login from '@graphql/queries/auth/login.gql'
 import requestPasswordReset from '@graphql/queries/auth/requestPasswordReset.gql'
 import resetPassword from '@graphql/queries/auth/resetPassword.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
-import branding from '@src/branding'
+import { branding } from '@src/branding'
 
 import createPasswordReset from './helpers/createPasswordReset'
 

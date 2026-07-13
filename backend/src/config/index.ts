@@ -7,7 +7,7 @@
 /* eslint-disable n/no-process-env */
 import { config } from 'dotenv'
 
-import branding from '@src/branding'
+import { branding } from '@src/branding'
 
 import { resolveLocale } from './locales'
 import { SOFTWARE_DEFAULTS } from './softwareDefaults'

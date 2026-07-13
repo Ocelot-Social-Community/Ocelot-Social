@@ -6,7 +6,7 @@
 import { getDateFnsLocale } from '~/locales'
 import format from 'date-fns/format'
 import formatRelative from 'date-fns/formatRelative'
-import branding from '@ocelot-social/branding'
+import { branding } from '@ocelot-social/branding'
 
 export default {
   name: 'DateTime',

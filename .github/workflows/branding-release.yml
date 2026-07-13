@@ -70,6 +70,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Validate package
+        run: npm run validate
+
       - name: Publish to npm
         run: npm publish --access public
         env:

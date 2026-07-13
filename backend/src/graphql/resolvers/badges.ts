@@ -7,7 +7,7 @@
 /* eslint-disable @typescript-eslint/no-loop-func */
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
-import branding from '@src/branding'
+import { branding } from '@src/branding'
 
 import type { Context } from '@src/context'
 

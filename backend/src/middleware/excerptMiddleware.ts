@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import trunc from 'trunc-html'
 
-import branding from '@src/branding'
+import { branding } from '@src/branding'
 
 import type { IMiddlewareResolver } from 'graphql-middleware/dist/types'
 

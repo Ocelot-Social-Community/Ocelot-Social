@@ -6,7 +6,7 @@
 // descriptors so consumers can still spread / clone `links` (e.g. PageFooter.spec). A brand defines
 // links purely as data; this file (webapp-only, because PageParams is webapp code) turns it into
 // PageParams. Consumers keep importing `~/constants/links` and get the same shape as before.
-import branding, { getBranding } from '@ocelot-social/branding'
+import { branding, getBranding } from '@ocelot-social/branding'
 
 import { defaultPageParamsPages } from '~/components/utils/InternalPages.js'
 

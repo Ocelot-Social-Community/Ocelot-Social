@@ -188,7 +188,7 @@
 
 <script>
 import { OsBadge, OsButton, OsIcon } from '@ocelot-social/ui'
-import branding from '@ocelot-social/branding'
+import { branding } from '@ocelot-social/branding'
 import { iconRegistry } from '~/utils/iconRegistry'
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 import Editor from '~/components/Editor/Editor'

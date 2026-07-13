@@ -7,7 +7,7 @@
 import bcrypt from 'bcryptjs'
 import { v4 as uuid } from 'uuid'
 
-import branding from '@src/branding'
+import { branding } from '@src/branding'
 
 import createPasswordReset from './helpers/createPasswordReset'
 import normalizeEmail from './helpers/normalizeEmail'

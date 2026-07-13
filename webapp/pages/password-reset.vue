@@ -23,7 +23,7 @@
 <script>
 import links from '~/constants/links.js'
 import metadata from '~/constants/metadata.js'
-import branding from '@ocelot-social/branding'
+import { branding } from '@ocelot-social/branding'
 import { OsCard } from '@ocelot-social/ui'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'

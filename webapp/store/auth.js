@@ -1,5 +1,5 @@
 import gql from 'graphql-tag'
-import branding from '@ocelot-social/branding'
+import { branding } from '@ocelot-social/branding'
 import { currentUserQuery } from '~/graphql/User'
 import PermissionsSubscription from '~/graphql/PermissionsSubscription'
 import Cookie from 'universal-cookie'

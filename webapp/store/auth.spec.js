@@ -1,5 +1,5 @@
 import { state as createState, mutations, getters, actions } from './auth.js'
-import branding from '@ocelot-social/branding'
+import { branding } from '@ocelot-social/branding'
 
 // auth.js instantiates `new Cookie()` at module load and reads the auth cookie
 // inside login(). Mock universal-cookie so we can drive that branch (cookie

@@ -148,7 +148,7 @@
 </template>
 
 <script>
-import branding from '@ocelot-social/branding'
+import { branding } from '@ocelot-social/branding'
 import links from '~/constants/links'
 import { SignupVerificationMutation } from '~/graphql/Registration.js'
 import { SweetalertIcon } from 'vue-sweetalert-icons'

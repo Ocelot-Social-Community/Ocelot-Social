@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import branding from '@ocelot-social/branding'
+import { branding } from '@ocelot-social/branding'
 import RegistrationSlider from '~/components/Registration/RegistrationSlider'
 import { validateInviteCodeQuery, redeemInviteCodeMutation } from '~/graphql/inviteCodes'
 

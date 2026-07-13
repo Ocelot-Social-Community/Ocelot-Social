@@ -6,7 +6,7 @@
 // spread / clone `metadata` (e.g. specs, i18n). Consumers + locale strings stay unchanged.
 // NOTE: OG_IMAGE / the PWA manifest / THEME_COLOR are consumed at BUILD time (nuxt.config →
 // head/@nuxtjs/pwa) — those still resolve against the defaults present at build.
-import branding, { resolveThemeColor } from '@ocelot-social/branding'
+import { branding, resolveThemeColor } from '@ocelot-social/branding'
 
 // SCREAMING_CASE consumer key -> branding.metadata camelCase key. THEME_COLOR is special: there is no
 // metadata.themeColor field — the browser-chrome / PWA colour is the `color-primary` theme token

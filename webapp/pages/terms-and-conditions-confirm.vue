@@ -27,7 +27,7 @@
 import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters, mapMutations } from 'vuex'
-import branding from '@ocelot-social/branding'
+import { branding } from '@ocelot-social/branding'
 import { updateUserMutation } from '~/graphql/User.js'
 
 export default {

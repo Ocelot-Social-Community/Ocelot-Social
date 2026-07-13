@@ -18,7 +18,7 @@
 <script>
 import gql from 'graphql-tag'
 import { isEmail } from 'validator'
-import branding from '@ocelot-social/branding'
+import { branding } from '@ocelot-social/branding'
 import formValidation from '~/mixins/formValidation'
 
 import EmailDisplayAndVerify from './EmailDisplayAndVerify'

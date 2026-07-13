@@ -1,17 +1,19 @@
 // @ocelot-social/branding — the shared branding schema, framework defaults and RUNTIME resolver,
 // consumed by both backend and webapp.
 //
-//   import branding from '@ocelot-social/branding'
+//   import { branding } from '@ocelot-social/branding'
 //   branding.group.nameLengthMax
 //
-// `branding` resolves at ACCESS time, not import time: each domain is an enumerable getter over
-// getBranding(), which returns the runtime-injected brand config (globalThis.__OCELOT_BRANDING__)
-// or, when none is injected, the framework defaults. This is what lets a brand be grafted onto a
-// pre-built image WITHOUT a rebuild — a small bootstrap (webapp plugin / backend entry) calls
-// setBranding() with the brand's compiled `defineBranding({...})` before the app reads a value.
-// A value read inside a function / method / component reflects the injected config; consumers keep
-// `import branding` unchanged. (Module-scope reads that CAPTURE a value at import time see whatever
-// is current then — see docu/branding-architecture-konzept.md for the build-vs-runtime split.)
+// NAMED export (no default) — a CJS default export masquerades under strict-ESM interop (attw
+// CJSOnlyExportsDefault); a named `branding` resolves cleanly everywhere. `branding` resolves at
+// ACCESS time, not import time: each domain is an enumerable getter over getBranding(), which returns
+// the runtime-injected brand config (globalThis.__OCELOT_BRANDING__) or, when none is injected, the
+// framework defaults. This is what lets a brand be grafted onto a pre-built image WITHOUT a rebuild —
+// a small bootstrap (webapp plugin / backend entry) calls setBranding() with the brand's compiled
+// `defineBranding({...})` before the app reads a value. A value read inside a function / method /
+// component reflects the injected config; consumers keep `import { branding }` unchanged. (Module-scope
+// reads that CAPTURE a value at import time see whatever is current then — see
+// docu/branding-architecture-konzept.md for the build-vs-runtime split.)
 
 import { defineBranding } from './merge.js'
 
@@ -59,4 +61,3 @@ for (const domain of Object.keys(vanilla) as (keyof BrandingConfig)[]) {
 }
 
 export { branding }
-export default branding

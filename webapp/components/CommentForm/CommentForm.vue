@@ -33,7 +33,7 @@
 import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import HcEditor from '~/components/Editor/Editor'
-import branding from '@ocelot-social/branding'
+import { branding } from '@ocelot-social/branding'
 import { minimisedUserQuery } from '~/graphql/User'
 import CommentMutations from '~/graphql/CommentMutations'
 

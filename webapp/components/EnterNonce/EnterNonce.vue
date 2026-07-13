@@ -28,7 +28,7 @@
 
 <script>
 import { OsButton } from '@ocelot-social/ui'
-import branding from '@ocelot-social/branding'
+import { branding } from '@ocelot-social/branding'
 import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
