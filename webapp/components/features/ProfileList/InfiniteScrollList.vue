@@ -1,6 +1,6 @@
 <template>
   <os-card>
-    <div class="infinite-scroll-list" :class="{ 'filter-active': filterActive }">
+    <div class="infinite-scroll-list" :class="{ 'filter-active': showFilter }">
       <h5 v-if="title" class="title">
         {{ title }}
         <span v-if="count !== null" class="count">({{ count }})</span>
@@ -13,27 +13,43 @@
           <os-spinner size="md" />
         </div>
       </div>
-      <ocelot-input
-        v-if="showFilter"
-        :name="`infinite-scroll-filter-${_uid}`"
-        :placeholder="filterPlaceholder || $t('common.filter')"
-        :value="filterValue"
-        icon="filter"
-        size="small"
-        class="filter-input"
-        @input.native="onFilterInput"
-      />
+      <div v-if="showFilter" class="filter-wrap">
+        <ocelot-input
+          :name="`infinite-scroll-filter-${_uid}`"
+          :placeholder="filterPlaceholder || $t('common.filter')"
+          :value="filterValue"
+          icon="filter"
+          size="small"
+          class="filter-input"
+          @input.native="onFilterInput"
+        />
+        <span class="filter-clear-wrap" :class="{ 'filter-clear-wrap--hidden': !filterValue }">
+          <os-button
+            variant="primary"
+            appearance="ghost"
+            circle
+            size="sm"
+            :aria-label="$t('actions.clear')"
+            @click="clearFilter"
+          >
+            <template #icon>
+              <os-icon :icon="icons.close" />
+            </template>
+          </os-button>
+        </span>
+      </div>
     </div>
   </os-card>
 </template>
 
 <script>
-import { OsCard, OsSpinner } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon, OsSpinner } from '@ocelot-social/ui'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
+import { iconRegistry } from '~/utils/iconRegistry'
 
 export default {
   name: 'InfiniteScrollList',
-  components: { OsCard, OsSpinner, OcelotInput },
+  components: { OsButton, OsCard, OsIcon, OsSpinner, OcelotInput },
   props: {
     title: { type: String, default: null },
     count: { type: Number, default: null },
@@ -51,10 +67,8 @@ export default {
       filterValue: '',
     }
   },
-  computed: {
-    filterActive() {
-      return this.filterValue.length > 0
-    },
+  created() {
+    this.icons = iconRegistry
   },
   mounted() {
     this.$nextTick(this.checkScrollable)
@@ -67,6 +81,11 @@ export default {
     clearTimeout(this._filterTimer)
   },
   methods: {
+    clearFilter() {
+      this.filterValue = ''
+      clearTimeout(this._filterTimer)
+      this.$emit('filter-change', '')
+    },
     onFilterInput(evt) {
       const val = evt.target.value
       this.filterValue = val
@@ -134,8 +153,39 @@ export default {
   margin-bottom: $space-small;
 }
 
-.filter-input {
+.filter-wrap {
+  flex-shrink: 0;
+  position: relative;
   margin-top: $space-small;
+
+  .filter-input {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .filter-clear-wrap {
+    position: absolute;
+    right: $space-xx-small;
+    top: 50%;
+    transform: translateY(-50%);
+
+    &--hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    ::v-deep button {
+      width: 20px !important;
+      height: 20px !important;
+      min-width: unset !important;
+      padding: 0 !important;
+
+      svg {
+        width: 10px !important;
+        height: 10px !important;
+      }
+    }
+  }
 }
 
 .scroll-container {

@@ -97,7 +97,6 @@ export default {
       if (offset === 0) {
         this.loadingConnections = true
         this.allLoaded = false
-        this.totalCount = null
       } else {
         this.loadingMore = true
       }
