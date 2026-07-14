@@ -1210,6 +1210,7 @@
       "hidden": "Secret groups",
       "hiddenFromOthers": "hidden from others",
       "nobody": "no groups",
+      "noFilterResults": "Nessun gruppo trovato per questo filtro.",
       "other": "Gruppi senza di me",
       "public": "Public groups",
       "shared": "Gruppi condivisi",
@@ -1227,6 +1228,7 @@
       "followedByNobody": "non è seguito da nessuno.",
       "following": "segue",
       "followingNobody": "non segue nessuno.",
+      "followNoFilterResults": "Nessun utente trovato per questo filtro.",
       "title": "Rete"
     },
     "shouted": "Gridato",

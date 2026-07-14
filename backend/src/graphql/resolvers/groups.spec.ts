@@ -4152,6 +4152,99 @@ describe('in mode', () => {
         expect(notShared?.myRole).toBeNull()
       })
     })
+
+    describe('User.groups nameFilter', () => {
+      beforeEach(async () => {
+        authenticatedUser = await user.toJson()
+        for (const [id, name] of [
+          ['group-alpha', 'Alpha Group'],
+          ['group-beta', 'Beta Group'],
+          ['group-gamma', 'Gamma Group'],
+        ]) {
+          await mutate({
+            mutation: CreateGroup,
+            variables: {
+              id,
+              name,
+              about: 'Test group',
+              description:
+                'A test group with enough description length to pass the validation requirement check',
+              groupType: 'public',
+              actionRadius: 'national',
+              categoryIds: ['cat9'],
+            },
+          })
+        }
+      })
+
+      it('returns all groups when nameFilter is empty string', async () => {
+        const result = await query({
+          query: UserGroups,
+          variables: { id: 'current-user', first: 10, offset: 0, nameFilter: '' },
+        })
+        const groups: Array<{ id: string }> = result.data?.User?.[0]?.groups ?? []
+        expect(groups).toHaveLength(3)
+      })
+
+      it('filters groups by name substring (case-insensitive)', async () => {
+        const result = await query({
+          query: UserGroups,
+          variables: { id: 'current-user', first: 10, offset: 0, nameFilter: 'alp' },
+        })
+        const groups: Array<{ id: string }> = result.data?.User?.[0]?.groups ?? []
+        expect(groups).toHaveLength(1)
+        expect(groups[0].id).toBe('group-alpha')
+      })
+
+      it('returns all groups when nameFilter matches a common substring', async () => {
+        const result = await query({
+          query: UserGroups,
+          variables: { id: 'current-user', first: 10, offset: 0, nameFilter: 'Group' },
+        })
+        const groups: Array<{ id: string }> = result.data?.User?.[0]?.groups ?? []
+        expect(groups).toHaveLength(3)
+      })
+
+      it('returns no groups when nameFilter matches nothing', async () => {
+        const result = await query({
+          query: UserGroups,
+          variables: { id: 'current-user', first: 10, offset: 0, nameFilter: 'XYZ' },
+        })
+        const groups: Array<{ id: string }> = result.data?.User?.[0]?.groups ?? []
+        expect(groups).toHaveLength(0)
+      })
+
+      it('returns all groups for a visitor when nameFilter is empty', async () => {
+        const viewerUser = await Factory.build(
+          'user',
+          { id: 'name-filter-viewer', name: 'Filter Viewer' },
+          { email: 'filter-viewer@example.org', password: '1234' },
+        )
+        authenticatedUser = await viewerUser.toJson()
+        const result = await query({
+          query: UserGroups,
+          variables: { id: 'current-user', first: 10, offset: 0, nameFilter: '' },
+        })
+        const groups: Array<{ id: string }> = result.data?.User?.[0]?.groups ?? []
+        expect(groups).toHaveLength(3)
+      })
+
+      it('filters groups by name for a visitor', async () => {
+        const viewerUser = await Factory.build(
+          'user',
+          { id: 'name-filter-viewer', name: 'Filter Viewer' },
+          { email: 'filter-viewer@example.org', password: '1234' },
+        )
+        authenticatedUser = await viewerUser.toJson()
+        const result = await query({
+          query: UserGroups,
+          variables: { id: 'current-user', first: 10, offset: 0, nameFilter: 'bet' },
+        })
+        const groups: Array<{ id: string }> = result.data?.User?.[0]?.groups ?? []
+        expect(groups).toHaveLength(1)
+        expect(groups[0].id).toBe('group-beta')
+      })
+    })
   })
 })
 

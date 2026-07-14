@@ -1210,6 +1210,7 @@
       "hidden": "Secret groups",
       "hiddenFromOthers": "hidden from others",
       "nobody": "no groups",
+      "noFilterResults": "Группы по этому фильтру не найдены.",
       "other": "Группы без меня",
       "public": "Public groups",
       "shared": "Общие группы",
@@ -1227,6 +1228,7 @@
       "followedByNobody": "у вас нет подписчиков.",
       "following": "подписан на",
       "followingNobody": "ни на кого не подписан.",
+      "followNoFilterResults": "Пользователи по этому фильтру не найдены.",
       "title": "Сеть"
     },
     "shouted": "С выкриками",

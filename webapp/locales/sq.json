@@ -1210,6 +1210,7 @@
       "hidden": "Secret groups",
       "hiddenFromOthers": "hidden from others",
       "nobody": "no groups",
+      "noFilterResults": "Nuk u gjetën grupe për këtë filtër.",
       "other": "Grupe pa mua",
       "public": "Public groups",
       "shared": "Grupe të ndara",
@@ -1227,6 +1228,7 @@
       "followedByNobody": "nuk ndiqet nga askush.",
       "following": "po ndjek",
       "followingNobody": "nuk ndjek askënd.",
+      "followNoFilterResults": "Nuk u gjetën përdorues për këtë filtër.",
       "title": "Rrjeti"
     },
     "shouted": "Rekomanduar",

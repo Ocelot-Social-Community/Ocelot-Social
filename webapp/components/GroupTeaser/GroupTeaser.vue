@@ -4,7 +4,8 @@
       <user-teaser-helper
         :link-to-profile="true"
         :user-link="groupLink"
-        :show-popover="true"
+        :show-popover="showPopover"
+        :hover-delay="hoverDelay"
         @open-menu="openMenu(false)"
         @close-menu="closeMenu(false)"
       >
@@ -34,6 +35,8 @@ export default {
   },
   props: {
     group: { type: Object, required: true },
+    showPopover: { type: Boolean, default: true },
+    hoverDelay: { type: Number, default: 500 },
   },
   computed: {
     groupLink() {

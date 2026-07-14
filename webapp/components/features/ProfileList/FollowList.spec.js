@@ -71,6 +71,78 @@ describe('FollowList.vue', () => {
       const wrapper = Wrapper({ type: 'followedBy' })
       expect(wrapper.vm.nobodyMessage).toContain('profile.network.followedByNobody')
     })
+
+    it('nobodyMessage returns followNoFilterResults when activeFilter has 3+ chars', () => {
+      const wrapper = Wrapper()
+      wrapper.setData({ activeFilter: 'abc' })
+      expect(wrapper.vm.nobodyMessage).toBe('profile.network.followNoFilterResults')
+    })
+  })
+
+  describe('isLoading', () => {
+    it('is true when loadingConnections', () => {
+      const wrapper = Wrapper()
+      wrapper.setData({ loadingConnections: true, loadingMore: false })
+      expect(wrapper.vm.isLoading).toBe(true)
+    })
+
+    it('is true when loadingMore', () => {
+      const wrapper = Wrapper()
+      wrapper.setData({ loadingConnections: false, loadingMore: true })
+      expect(wrapper.vm.isLoading).toBe(true)
+    })
+
+    it('is false when neither loading', () => {
+      const wrapper = Wrapper()
+      wrapper.setData({ loadingConnections: false, loadingMore: false })
+      expect(wrapper.vm.isLoading).toBe(false)
+    })
+  })
+
+  describe('popoverEnabled', () => {
+    it('is false when isScrolling', () => {
+      const wrapper = Wrapper()
+      wrapper.setData({
+        isScrolling: true,
+        loadingConnections: false,
+        loadingMore: false,
+        loadingCooldown: false,
+      })
+      expect(wrapper.vm.popoverEnabled).toBe(false)
+    })
+
+    it('is false when isLoading', () => {
+      const wrapper = Wrapper()
+      wrapper.setData({
+        isScrolling: false,
+        loadingConnections: true,
+        loadingMore: false,
+        loadingCooldown: false,
+      })
+      expect(wrapper.vm.popoverEnabled).toBe(false)
+    })
+
+    it('is false when loadingCooldown', () => {
+      const wrapper = Wrapper()
+      wrapper.setData({
+        isScrolling: false,
+        loadingConnections: false,
+        loadingMore: false,
+        loadingCooldown: true,
+      })
+      expect(wrapper.vm.popoverEnabled).toBe(false)
+    })
+
+    it('is true when not scrolling, loading, or in cooldown', () => {
+      const wrapper = Wrapper()
+      wrapper.setData({
+        isScrolling: false,
+        loadingConnections: false,
+        loadingMore: false,
+        loadingCooldown: false,
+      })
+      expect(wrapper.vm.popoverEnabled).toBe(true)
+    })
   })
 
   describe('loadConnections', () => {
@@ -79,7 +151,39 @@ describe('FollowList.vue', () => {
       await wrapper.vm.$nextTick()
       expect(mockApollo.query).toHaveBeenCalledWith(
         expect.objectContaining({
-          variables: { id: 'user-1', first: 25, offset: 0 },
+          variables: expect.objectContaining({ id: 'user-1', first: 25, offset: 0 }),
+        }),
+      )
+    })
+
+    it('sends empty nameFilter when activeFilter is shorter than 3 chars', async () => {
+      const wrapper = Wrapper()
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+      mockApollo.query.mockClear()
+
+      wrapper.setData({ activeFilter: 'ab' })
+      await wrapper.vm.loadConnections(0)
+
+      expect(mockApollo.query).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: expect.objectContaining({ nameFilter: '' }),
+        }),
+      )
+    })
+
+    it('sends activeFilter as nameFilter when 3+ chars', async () => {
+      const wrapper = Wrapper()
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+      mockApollo.query.mockClear()
+
+      wrapper.setData({ activeFilter: 'abc' })
+      await wrapper.vm.loadConnections(0)
+
+      expect(mockApollo.query).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: expect.objectContaining({ nameFilter: 'abc' }),
         }),
       )
     })
@@ -98,15 +202,31 @@ describe('FollowList.vue', () => {
       expect(wrapper.vm.allLoaded).toBe(true)
     })
 
-    it('deduplicates connections by id', async () => {
-      const u = fakeUser('u1')
-      const wrapper = Wrapper(
-        {},
-        { data: { User: [{ id: 'user-1', following: [u, { ...u }], followingCount: 2 }] } },
-      )
+    it('deduplicates connections by id when appending', async () => {
+      mockApollo.query
+        .mockResolvedValueOnce({
+          data: { User: [{ id: 'user-1', following: fakeUsers(25), followingCount: 30 }] },
+        })
+        .mockResolvedValueOnce({
+          data: {
+            User: [
+              {
+                id: 'user-1',
+                following: [fakeUser('u1'), fakeUser('u26')],
+                followingCount: 30,
+              },
+            ],
+          },
+        })
+
+      const wrapper = Wrapper()
       await wrapper.vm.$nextTick()
       await wrapper.vm.$nextTick()
-      expect(wrapper.vm.connections).toHaveLength(1)
+
+      await wrapper.vm.loadMore()
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.vm.connections).toHaveLength(26)
     })
 
     it('uses offset when loading more', async () => {
@@ -128,7 +248,7 @@ describe('FollowList.vue', () => {
       expect(mockApollo.query).toHaveBeenCalledTimes(2)
       expect(mockApollo.query).toHaveBeenLastCalledWith(
         expect.objectContaining({
-          variables: { id: 'user-1', first: 25, offset: 25 },
+          variables: expect.objectContaining({ id: 'user-1', first: 25, offset: 25 }),
         }),
       )
     })
@@ -155,6 +275,69 @@ describe('FollowList.vue', () => {
       wrapper.setData({ loadingMore: true })
       await wrapper.vm.loadMore()
       expect(mockApollo.query).not.toHaveBeenCalled()
+    })
+
+    it('sets showFilter when connections.length >= PAGE_SIZE', async () => {
+      mockApollo.query
+        .mockResolvedValueOnce({
+          data: { User: [{ id: 'user-1', following: fakeUsers(25), followingCount: 30 }] },
+        })
+        .mockResolvedValueOnce({
+          data: { User: [{ id: 'user-1', following: fakeUsers(5), followingCount: 30 }] },
+        })
+
+      const wrapper = Wrapper()
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.vm.connections).toHaveLength(25)
+      expect(wrapper.vm.showFilter).toBe(false)
+
+      await wrapper.vm.loadMore()
+      expect(wrapper.vm.showFilter).toBe(true)
+    })
+
+    it('does not set showFilter when connections.length < PAGE_SIZE', async () => {
+      const wrapper = Wrapper()
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+      jest.clearAllMocks()
+
+      wrapper.setData({ allLoaded: false, connections: fakeUsers(5) })
+      mockApollo.query.mockResolvedValueOnce({
+        data: { User: [{ id: 'user-1', following: [], followingCount: 5 }] },
+      })
+
+      await wrapper.vm.loadMore()
+      expect(wrapper.vm.showFilter).toBe(false)
+    })
+  })
+
+  describe('onFilterChange', () => {
+    it('updates activeFilter and reloads from offset 0', async () => {
+      const wrapper = Wrapper()
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+      mockApollo.query.mockClear()
+
+      await wrapper.vm.onFilterChange('abc')
+
+      expect(wrapper.vm.activeFilter).toBe('abc')
+      expect(mockApollo.query).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: expect.objectContaining({ offset: 0, nameFilter: 'abc' }),
+        }),
+      )
+    })
+  })
+
+  describe('onScrollingChange', () => {
+    it('updates isScrolling', () => {
+      const wrapper = Wrapper()
+      wrapper.vm.onScrollingChange(true)
+      expect(wrapper.vm.isScrolling).toBe(true)
+      wrapper.vm.onScrollingChange(false)
+      expect(wrapper.vm.isScrolling).toBe(false)
     })
   })
 

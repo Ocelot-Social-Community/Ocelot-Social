@@ -1210,6 +1210,7 @@
       "hidden": "Secret groups",
       "hiddenFromOthers": "hidden from others",
       "nobody": "no groups",
+      "noFilterResults": "Nie znaleziono grup dla tego filtra.",
       "other": "Grupy beze mnie",
       "public": "Public groups",
       "shared": "Wspólne grupy",
@@ -1227,6 +1228,7 @@
       "followedByNobody": "nikt go nie obserwuje.",
       "following": "obserwuje",
       "followingNobody": "nikogo nie obserwuje.",
+      "followNoFilterResults": "Nie znaleziono użytkowników dla tego filtra.",
       "title": "Sieć"
     },
     "shouted": "Krzyknij",

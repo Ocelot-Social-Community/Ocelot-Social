@@ -9,7 +9,7 @@ query currentUser {
     email
     roleName
     activeCategories
-    following {
+    following(nameFilter: "") {
       id
       name
     }

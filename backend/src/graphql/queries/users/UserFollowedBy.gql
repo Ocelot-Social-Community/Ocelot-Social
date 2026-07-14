@@ -1,0 +1,10 @@
+query UserFollowedBy($id: ID!, $nameFilter: String, $first: Int, $offset: Int) {
+  User(id: $id) {
+    id
+    followedBy(nameFilter: $nameFilter, first: $first, offset: $offset) {
+      id
+      name
+    }
+    followedByCount
+  }
+}

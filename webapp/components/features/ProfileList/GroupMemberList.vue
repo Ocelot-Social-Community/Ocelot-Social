@@ -1,13 +1,17 @@
 <template>
   <infinite-scroll-list
-    v-if="hasGroups || myProfile || loadingGroups"
+    v-if="hasGroups || myProfile || loadingGroups || showFilter"
     :title="$t('profile.groups.title', { name: userName })"
     :count="allGroupsLoaded ? groups.length : null"
-    :nobody-message="$t('profile.groups.nobody')"
+    :nobody-message="nobodyMessage"
     :empty="!hasGroups"
     :loading="loadingGroups || loadingMore"
     :has-more="!allGroupsLoaded"
+    :show-filter="showFilter"
+    :filter-placeholder="$t('common.filter')"
     @load-more="loadMore"
+    @filter-change="onFilterChange"
+    @scrolling-change="onScrollingChange"
   >
     <div v-for="(type, idx) in typesWithGroups" :key="type">
       <p class="type-label" :class="{ 'type-label--not-first': idx > 0 }">
@@ -15,7 +19,12 @@
       </p>
       <ul class="group-list">
         <li v-for="group in groupsByType[type]" :key="group.id" class="group-item">
-          <group-teaser :group="group" class="group-item__teaser" />
+          <group-teaser
+            :group="group"
+            :show-popover="popoverEnabled"
+            :hover-delay="800"
+            class="group-item__teaser"
+          />
           <button
             v-if="myProfile"
             class="group-item__visibility-btn"
@@ -72,10 +81,25 @@ export default {
       loadingGroups: true,
       loadingMore: false,
       allGroupsLoaded: false,
+      activeFilter: '',
+      showFilter: false,
+      isScrolling: false,
+      loadingCooldown: false,
     }
   },
   created() {
     this.icons = iconRegistry
+  },
+  watch: {
+    isLoading(newVal, oldVal) {
+      if (oldVal && !newVal) {
+        clearTimeout(this._loadingCooldownTimer)
+        this.loadingCooldown = true
+        this._loadingCooldownTimer = setTimeout(() => {
+          this.loadingCooldown = false
+        }, 600)
+      }
+    },
   },
   async mounted() {
     const observer = this.$apollo.subscribe({
@@ -99,10 +123,21 @@ export default {
     if (this._groupVisibilitySubscription) {
       this._groupVisibilitySubscription.unsubscribe()
     }
+    clearTimeout(this._loadingCooldownTimer)
   },
   computed: {
     hasGroups() {
       return this.groups && this.groups.length > 0
+    },
+    isLoading() {
+      return this.loadingGroups || this.loadingMore
+    },
+    popoverEnabled() {
+      return !this.isScrolling && !this.isLoading && !this.loadingCooldown
+    },
+    nobodyMessage() {
+      if (this.activeFilter.length >= 3) return this.$t('profile.groups.noFilterResults')
+      return this.$t('profile.groups.nobody')
     },
     groupsByType() {
       if (this.myProfile) {
@@ -125,7 +160,6 @@ export default {
     async loadGroups(offset) {
       if (offset === 0) {
         this.loadingGroups = true
-        this.groups = []
         this.allGroupsLoaded = false
       } else {
         this.loadingMore = true
@@ -133,11 +167,20 @@ export default {
       try {
         const { data } = await this.$apollo.query({
           query: profileUserGroupsQuery(this.$i18n),
-          variables: { id: this.userId, first: PAGE_SIZE, offset },
+          variables: {
+            id: this.userId,
+            first: PAGE_SIZE,
+            offset,
+            nameFilter: this.activeFilter.length >= 3 ? this.activeFilter : '',
+          },
           fetchPolicy: 'network-only',
         })
         const newGroups = data?.User?.[0]?.groups || []
-        this.groups = [...this.groups, ...newGroups]
+        if (offset === 0) {
+          this.groups = newGroups
+        } else {
+          this.groups = [...this.groups, ...newGroups]
+        }
         if (newGroups.length < PAGE_SIZE) this.allGroupsLoaded = true
       } catch (error) {
         this.$toast.error(error.message)
@@ -148,10 +191,18 @@ export default {
     },
     async loadMore() {
       if (this.allGroupsLoaded || this.loadingMore || this.loadingGroups) return
+      if (this.groups.length >= PAGE_SIZE) this.showFilter = true
       await this.loadGroups(this.groups.length)
     },
     reloadGroups() {
       this.loadGroups(0)
+    },
+    onFilterChange(val) {
+      this.activeFilter = val
+      this.loadGroups(0)
+    },
+    onScrollingChange(isScrolling) {
+      this.isScrolling = isScrolling
     },
     async toggleVisibility(group) {
       const newValue = !group.showOnProfile

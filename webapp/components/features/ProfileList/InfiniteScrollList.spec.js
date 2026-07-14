@@ -210,12 +210,12 @@ describe('InfiniteScrollList.vue', () => {
       jest.useRealTimers()
     })
 
-    it('does not emit filter-change when input is shorter than filterMinLength', () => {
+    it('emits filter-change with empty string when input is below filterMinLength', () => {
       jest.useFakeTimers()
       const wrapper = Wrapper({ showFilter: true, filterMinLength: 3 })
       wrapper.vm.onFilterInput({ target: { value: 'ab' } })
       jest.advanceTimersByTime(300)
-      expect(wrapper.emitted('filter-change')).toBeFalsy()
+      expect(wrapper.emitted('filter-change')).toEqual([['']])
       jest.useRealTimers()
     })
 
