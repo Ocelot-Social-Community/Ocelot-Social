@@ -14,9 +14,9 @@ RUN npm run build
 FROM node:25.9.0-alpine AS branding-library
 RUN mkdir -p /app
 WORKDIR /app
-COPY packages/branding/package.json ./
+COPY packages/branding/package.json packages/branding/package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm,sharing=locked \
-    npm install
+    npm ci
 COPY packages/branding/. .
 RUN npm run build
 
