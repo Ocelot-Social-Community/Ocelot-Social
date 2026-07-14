@@ -164,13 +164,25 @@ function mergeStrings(
   return out
 }
 
+// A locale-code directory name (2–3 letters + optional region), e.g. 'en', 'de', 'pt-BR'. Plus a
+// denylist for the legacy non-locale folders some brands still carry under locales/ (tmp/, html/).
+// (Fully bounded + anchored quantifiers → no catastrophic backtracking; the heuristic is a false alarm.)
+// eslint-disable-next-line security/detect-unsafe-regex
+const LOCALE_CODE = /^[a-z]{2,3}(-[A-Za-z0-9]{2,8})?$/
+const LEGACY_LOCALE_DIRS = new Set(['tmp', 'html'])
+
 /**
- * Read `<brandDir>/locales/<code>.json` translation files and deep-merge them into `config.locales`
- * (filename stem = locale code; a file WINS over an inline `config.locales[code]`). This lets a brand
- * author its i18n overrides as conventional per-locale JSON files instead of inline in brand.config —
- * the RUNTIME is unchanged (locales still ride in the composed config, merged by the webapp i18n
- * plugin). Only top-level `*.json` in `locales/` are read; nested folders (the legacy `locales/tmp` /
- * `locales/html`) are ignored.
+ * Read a brand's i18n override files under `<brandDir>/locales/` and deep-merge them into
+ * `config.locales` — so a brand can author overrides as conventional JSON instead of inline in
+ * brand.config. Two layouts, both supported and mergeable:
+ *   • `locales/<code>.json`            — the whole locale in one file.
+ *   • `locales/<code>/<feature>.json`  — MODULAR: a locale split into per-feature namespace files, all
+ *                                        merged into that locale's tree (filename organisational; the
+ *                                        content uses the app's real key paths). Lets a feature own its
+ *                                        locale slice; the build "links" them via deep-merge.
+ * A file WINS over an inline `config.locales[code]`; within a locale, files merge in sorted order (deep,
+ * later wins). The RUNTIME is unchanged (locales still ride in the composed config). Non-locale folders
+ * (legacy `locales/tmp` / `locales/html`, or anything not matching a locale code) are ignored.
  */
 function loadLocaleFiles(
   dir: string,
@@ -180,17 +192,30 @@ function loadLocaleFiles(
 ): void {
   const localesDir = join(dir, 'locales')
   if (!existsSync(localesDir)) return
-  for (const entry of readdirSync(localesDir, { withFileTypes: true })) {
-    if (!entry.isFile() || !entry.name.endsWith('.json')) continue
-    const code = basename(entry.name, '.json')
+  const merge = (code: string, file: string, label: string): void => {
     try {
-      const strings = JSON.parse(readFileSync(join(localesDir, entry.name), 'utf8')) as Record<
-        string,
-        unknown
-      >
+      const strings = JSON.parse(readFileSync(file, 'utf8')) as Record<string, unknown>
       config.locales[code] = mergeStrings(config.locales[code] ?? {}, strings)
     } catch {
-      warnings.push(`  ! ${id}: invalid locale JSON: locales/${entry.name}`)
+      warnings.push(`  ! ${id}: invalid locale JSON: ${label}`)
+    }
+  }
+  const entries = readdirSync(localesDir, { withFileTypes: true }).sort((a, b) =>
+    a.name < b.name ? -1 : 1,
+  )
+  for (const entry of entries) {
+    if (entry.isFile() && entry.name.endsWith('.json')) {
+      merge(basename(entry.name, '.json'), join(localesDir, entry.name), `locales/${entry.name}`)
+    } else if (
+      entry.isDirectory() &&
+      LOCALE_CODE.test(entry.name) &&
+      !LEGACY_LOCALE_DIRS.has(entry.name)
+    ) {
+      const code = entry.name
+      const featureFiles = readdirSync(join(localesDir, code))
+        .filter((n) => n.endsWith('.json'))
+        .sort()
+      for (const f of featureFiles) merge(code, join(localesDir, code, f), `locales/${code}/${f}`)
     }
   }
 }

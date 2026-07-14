@@ -33,7 +33,7 @@ npx ocelot-brand-archive .        # → dist/<id>.tar.gz (+ versioned) + a DEFAU
 
 The archive is a **library of bucket instances** (`manifest.json` + sparse `fragments/<type>.<name>.json` + `assets/` + `html/`), not a merged config — consumers compose the effective config at load time. See [`docu/branding-buckets-konzept.md`](../../docu/branding-buckets-konzept.md).
 
-**i18n overrides** can be authored inline (`locales: { de: { … } }` in the config) or, more conveniently, as conventional per‑locale files `locales/<code>.json` in the brand dir — the build reads those and merges them into `locales` (file wins per leaf). Either way the runtime is identical.
+**i18n overrides** can be authored inline (`locales: { de: { … } }` in the config) or, more conveniently, as conventional JSON files in the brand dir: `locales/<code>.json` (whole locale) and/or `locales/<code>/<feature>.json` (modular — a locale split into per‑feature namespace files so a feature owns its slice). The build deep‑merges them all into `locales` (file wins per leaf). Either way the runtime is identical — the modular split is authoring‑only, not runtime tree‑shaking.
 
 ## Consuming the resolved config (backend / webapp)
 

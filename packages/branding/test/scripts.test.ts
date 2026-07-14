@@ -195,6 +195,29 @@ test('buildBrandArchive warns on an invalid locale JSON (but still builds)', asy
   assert.match(built.warnings.join('\n'), /invalid locale JSON: locales\/en\.json/)
 })
 
+test('MODULAR locales/<code>/<feature>.json files merge into the locale; legacy dirs ignored', async () => {
+  const dir = brandDir({
+    config: `export default (d) => d({ metadata: { applicationName: 'Acme' } })\n`,
+    locales: { en: '{ "whole": "file" }' }, // whole-locale file coexists with the per-feature dir
+  })
+  // per-feature namespace files for 'en' (a feature owns its slice)
+  mkdirSync(join(dir, 'locales/en'), { recursive: true })
+  writeFileSync(
+    join(dir, 'locales/en/registration.json'),
+    JSON.stringify({ registration: { title: 'Join' } }),
+  )
+  writeFileSync(join(dir, 'locales/en/groups.json'), JSON.stringify({ groups: { name: 'Group' } }))
+  // a legacy non-locale folder must be ignored (else it would leak into config.locales.tmp)
+  mkdirSync(join(dir, 'locales/tmp'), { recursive: true })
+  writeFileSync(join(dir, 'locales/tmp/en.json'), JSON.stringify({ leaked: true }))
+
+  const config = composeArchive(readTarGz((await buildBrandArchive(dir)).gz))
+  assert.equal(config.locales.en.registration.title, 'Join') // feature file 1
+  assert.equal(config.locales.en.groups.name, 'Group') // feature file 2
+  assert.equal(config.locales.en.whole, 'file') // whole-locale file merged too
+  assert.equal(config.locales.tmp, undefined) // legacy dir ignored, no bogus locale
+})
+
 test('publishBrandArchive writes latest + versioned files and a DEFAULT marker', async () => {
   const dir = brandDir({ config: ACME_CONFIG, assets: { 'logo-squared.svg': '<svg/>' } })
   const out = mkdtempSync(join(tmpdir(), 'ocelot-out-'))

@@ -227,9 +227,11 @@ export interface BrandingConfig {
    * the branding config, it is injected + serialised to the client with everything else — no
    * separate runtime locale-file mechanism, no rebuild. See docu/branding-architecture-konzept.md.
    *
-   * AUTHORING: a brand may declare these inline here, OR ship conventional `locales/<code>.json` files
-   * in its brand dir — the build reads those and merges them in (file wins per leaf); see
-   * scripts/lib/build-brandings.ts `loadLocaleFiles`. Either way the runtime shape is identical.
+   * AUTHORING: a brand may declare these inline here, OR ship conventional JSON files in its brand dir —
+   * `locales/<code>.json` (whole locale) and/or `locales/<code>/<feature>.json` (MODULAR: a locale split
+   * into per-feature namespace files, all merged so a feature owns its slice). The build reads and
+   * deep-merges them (file wins per leaf); see scripts/lib/build-brandings.ts `loadLocaleFiles`. Either
+   * way the runtime shape is identical — modularity is authoring-only, not runtime tree-shaking.
    */
   locales: Record<string, Record<string, unknown>>
   /**
