@@ -22,8 +22,10 @@ export default {
     }),
   },
   asyncData({ store, redirect }) {
+    // The auth/user getter returns {} when logged out (so this is safe today); `?.` keeps it safe even
+    // if that contract ever changes to null — an anonymous /login visit must never crash on this check.
     if (
-      store.getters['auth/user'].termsAndConditionsAgreedVersion ===
+      store.getters['auth/user']?.termsAndConditionsAgreedVersion ===
       branding.termsAndConditions.version
     ) {
       redirect('/')
