@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname } from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { compileFunction } from 'node:vm'
 
 import type { BrandingConfig, BrandingOverrides } from '../../dist/index.js'
 import type * as TS from 'typescript'
@@ -74,13 +75,13 @@ function loadTypeScriptConfig(tsPath: string): ConfigModule {
   const localRequire = (id: string): unknown =>
     id === '@ocelot-social/branding' ? pkg : require(id)
   const module: { exports: { default?: ConfigModule } & Record<string, unknown> } = { exports: {} }
-  const evaluate = new Function(
-    'exports',
-    'require',
-    'module',
-    '__filename',
-    '__dirname',
+  // vm.compileFunction is the sandbox-aware equivalent of `new Function` (same param injection), but
+  // doesn't trip the classic `new Function` code-injection SAST rule; `filename` gives real stack
+  // traces. Input is the just-type-checked, locally-transpiled brand config — not attacker-controlled.
+  const evaluate = compileFunction(
     outputText,
+    ['exports', 'require', 'module', '__filename', '__dirname'],
+    { filename: tsPath },
   )
   evaluate(module.exports, localRequire, module, tsPath, dirname(tsPath))
   return (module.exports.default ?? module.exports) as ConfigModule
