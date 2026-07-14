@@ -116,7 +116,10 @@ test('buildBrandArchive packs the raw emails/ and public/ trees into the archive
   )
   const archive = readTarGz(built.gz)
   // Consumed at backend bootstrap by overlayBrandRuntimeFiles (e-mail templates/locales + public badges).
-  assert.equal(archive.get('emails/templates/registration/html.pug').toString(), 'p brand registration')
+  assert.equal(
+    archive.get('emails/templates/registration/html.pug').toString(),
+    'p brand registration',
+  )
   assert.equal(archive.get('emails/locales/en.json').toString(), '{"greeting":"hi"}')
   assert.equal(archive.get('public/img/badges/default_trophy.svg').toString(), '<svg>brand</svg>')
 })
