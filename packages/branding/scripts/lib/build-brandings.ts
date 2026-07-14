@@ -9,7 +9,9 @@ import { basename, join, resolve } from 'node:path'
 
 import { BUCKET_NAMES, extractBucket, instanceFile, splitConfig } from '../../dist/buckets.js'
 import { brandingDefaults } from '../../dist/defaults.js'
+import { deepMerge } from '../../dist/internal.js'
 import { writeTarGz } from '../../dist/tar.js'
+import { THEME_DEFAULTS } from '../../dist/theme.js'
 import { SCHEMA_VERSION } from '../../dist/version.js'
 
 import { loadConfig } from './load-config.ts'
@@ -142,28 +144,6 @@ export function findConfig(brandDir: string): string | null {
   return null
 }
 
-/** Deep-merge translation trees (nested plain objects merge, leaves replace — `over` wins). */
-function mergeStrings(
-  base: Record<string, unknown>,
-  over: Record<string, unknown>,
-): Record<string, unknown> {
-  const out: Record<string, unknown> = { ...base }
-  for (const [k, v] of Object.entries(over)) {
-    const b = out[k]
-    const bothObjects =
-      b !== null &&
-      typeof b === 'object' &&
-      !Array.isArray(b) &&
-      v !== null &&
-      typeof v === 'object' &&
-      !Array.isArray(v)
-    out[k] = bothObjects
-      ? mergeStrings(b as Record<string, unknown>, v as Record<string, unknown>)
-      : v
-  }
-  return out
-}
-
 // A locale-code directory name (2–3 letters + optional region), e.g. 'en', 'de', 'pt-BR'. Plus a
 // denylist for the legacy non-locale folders some brands still carry under locales/ (tmp/, html/).
 // (Fully bounded + anchored quantifiers → no catastrophic backtracking; the heuristic is a false alarm.)
@@ -195,7 +175,7 @@ function loadLocaleFiles(
   const merge = (code: string, file: string, label: string): void => {
     try {
       const strings = JSON.parse(readFileSync(file, 'utf8')) as Record<string, unknown>
-      config.locales[code] = mergeStrings(config.locales[code] ?? {}, strings)
+      config.locales[code] = deepMerge(config.locales[code] ?? {}, strings)
     } catch {
       warnings.push(`  ! ${id}: invalid locale JSON: ${label}`)
     }
@@ -220,6 +200,41 @@ function loadLocaleFiles(
   }
 }
 
+// Levenshtein edit distance (single-row rolling — bounded, build-time only).
+function editDistance(a: string, b: string): number {
+  const row = Array.from({ length: b.length + 1 }, (_, j) => j)
+  for (let i = 1; i <= a.length; i++) {
+    let prev = row[0]
+    row[0] = i
+    for (let j = 1; j <= b.length; j++) {
+      const tmp = row[j]
+      row[j] = Math.min(row[j] + 1, row[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1))
+      prev = tmp
+    }
+  }
+  return row[b.length]
+}
+
+/**
+ * Warn on a `theme.cssVars` key that is a near-miss of a known theme token (likely a typo → a silent
+ * no-op at runtime). cssVars is intentionally OPEN — a brand may define custom `--vars` for its own CSS
+ * — so only CLOSE matches are flagged (edit distance ≤ 2, similar length), never every unknown key.
+ */
+function warnThemeTokenTypos(config: BrandingConfig, id: string, warnings: string[]): void {
+  const known = Object.keys(THEME_DEFAULTS)
+  for (const key of Object.keys(config.theme.cssVars)) {
+    if (known.includes(key)) continue
+    const near = known.find(
+      (k) => Math.abs(k.length - key.length) <= 1 && editDistance(key, k) <= 2,
+    )
+    if (near) {
+      warnings.push(
+        `  ! ${id}: theme.cssVars['${key}'] is not a known theme token — did you mean '${near}'?`,
+      )
+    }
+  }
+}
+
 /** Bundle ONE brand directory into a `<id>.tar.gz` buffer (manifest.json + fragments/ + assets/ + html/). */
 export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive> {
   const dir = resolve(brandDir)
@@ -232,6 +247,7 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
   // Brands may author i18n overrides as conventional locales/<code>.json files (in addition to, or
   // instead of, inline config.locales) — merge those in now. Runtime shape is unchanged.
   loadLocaleFiles(dir, id, config, warnings)
+  warnThemeTokenTypos(config, id, warnings)
   // OG image: if the brand didn't set its own, follow its squared logo (logos.signupPath). The old
   // deploy baked the brand's `static/img/custom/logo-squared.*` over the vanilla file; at runtime the
   // brand's logo lives under /branding/<id>/… instead, so derive the OG image from it — otherwise a

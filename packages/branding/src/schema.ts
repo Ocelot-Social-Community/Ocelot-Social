@@ -58,9 +58,17 @@ export type LinkPageKey =
   | 'support'
 
 /**
- * A brand's sparse override for one static page. Only what differs from the framework page
- * defaults (see webapp InternalPages) — usually just `externalLink`. `null` externalLink means
- * "use the internal page". `internalPage` idents override localized strings when set.
+ * A brand's sparse override for one static page. Only what differs from the framework page defaults
+ * (see webapp InternalPages, applied via `defaultPageParamsPages.X.overwrite(pages.x)`).
+ *
+ * Its fields are deliberately 3-STATE — `absent | null | value` are three distinct meanings, and the
+ * config merge (defineBranding's deep-merge) preserves them, so the webapp adapter can act on each:
+ *   • absent    → inherit the framework page default (a sparse override doesn't touch this field);
+ *   • `null`    → explicitly clear it (e.g. `externalLink: null` forces the INTERNAL page, overriding a
+ *                 default external link);
+ *   • a value   → set it (e.g. an `{ url, target }` external link, or an override ident).
+ * This is why these use optional `?` AND `| null` — NOT the `T | null` scalar convention of the resolved
+ * BrandingConfig (see the file header); an override shape genuinely needs the third "inherit" state.
  */
 export interface LinkPageOverride {
   externalLink?: { url: string; target: '_blank' | '_self' } | null

@@ -195,6 +195,18 @@ test('buildBrandArchive warns on an invalid locale JSON (but still builds)', asy
   assert.match(built.warnings.join('\n'), /invalid locale JSON: locales\/en\.json/)
 })
 
+test('buildBrandArchive warns on a likely theme.cssVars token typo, not on custom vars', async () => {
+  const dir = brandDir({
+    config: `export default (d) => d({
+      metadata: { applicationName: 'Acme' },
+      theme: { cssVars: { 'color-primry': 'red', 'my-brand-var': 'x' } },
+    })\n`,
+  })
+  const w = (await buildBrandArchive(dir)).warnings.join('\n')
+  assert.match(w, /theme\.cssVars\['color-primry'\].*did you mean 'color-primary'/) // typo flagged
+  assert.doesNotMatch(w, /my-brand-var/) // intentional custom var → no warning
+})
+
 test('MODULAR locales/<code>/<feature>.json files merge into the locale; legacy dirs ignored', async () => {
   const dir = brandDir({
     config: `export default (d) => d({ metadata: { applicationName: 'Acme' } })\n`,

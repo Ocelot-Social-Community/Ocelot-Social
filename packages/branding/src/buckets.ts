@@ -11,6 +11,7 @@
 // Pure (no node deps) so both webapp and backend — and the admin composition UI — can import it.
 
 import { brandingDefaults } from './defaults.js'
+import { clone, isPlainObject } from './internal.js'
 
 import type { BrandingConfig, DeepPartial } from './schema.js'
 
@@ -152,21 +153,12 @@ export function bucketOfPath(path: string): BucketName | null {
   return best ? best.bucket : null
 }
 
-function clone<T>(value: T): T {
-  return value === undefined ? value : (JSON.parse(JSON.stringify(value)) as T)
-}
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
-}
-
 // Deep-merge `patch` INTO `target` (nested plain objects merge; everything else replaces). Used for
 // the cross-cutting `locales` layer, which accumulates from every source rather than being replaced.
 // NOTE: deliberately IN-PLACE and clones incoming values (so the accumulator never aliases a source
-// config). This differs from merge.ts's deepMerge, which is immutable (returns a fresh object and
-// shares patch references) because it produces the final defineBranding() result — two contracts, not
-// an accidental duplicate.
-function deepMerge(
+// config). This differs from internal.ts's immutable `deepMerge` (fresh object, shares patch refs) —
+// two contracts, not an accidental duplicate; `clone`/`isPlainObject` are shared from internal.ts.
+function deepMergeInto(
   target: Record<string, unknown>,
   patch: Record<string, unknown>,
 ): Record<string, unknown> {
@@ -174,7 +166,7 @@ function deepMerge(
     const patchValue = patch[key]
     const targetValue = target[key]
     if (isPlainObject(targetValue) && isPlainObject(patchValue)) {
-      deepMerge(targetValue, patchValue)
+      deepMergeInto(targetValue, patchValue)
     } else {
       target[key] = clone(patchValue)
     }
@@ -226,7 +218,7 @@ export function composeConfig(
   const locales = result.locales as Record<string, unknown>
   for (const bucket of BUCKET_NAMES) {
     const sourceLocales = (bucketSources[bucket] as { locales?: unknown } | undefined)?.locales
-    if (isPlainObject(sourceLocales)) deepMerge(locales, sourceLocales)
+    if (isPlainObject(sourceLocales)) deepMergeInto(locales, sourceLocales)
   }
   result.locales = locales
   return result as unknown as BrandingConfig
