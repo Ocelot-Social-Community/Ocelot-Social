@@ -40,16 +40,13 @@ CMD ["/bin/sh", "-c", "yarn install && yarn run dev"]
 FROM base AS build
 # Repo-root build context now (for /packages/branding): copy only the backend subtree to /app.
 COPY backend/ .
-# copy categories to brand them (use yarn prod:db:data:categories)
-ONBUILD COPY ./branding/constants/ src/constants/
-ONBUILD RUN tools/replace-constants.sh
 ONBUILD COPY ./branding/middlewares/ src/middleware/branding/
 ONBUILD COPY ./branding/data/ src/db/data
 # Runtime branding: copy the brand UNFLATTENED into /brand and bake its archive (+ DEFAULT marker) into
 # ./branding-assets. At startup src/branding/bootstrap.ts injects this brand's config AND overlays its
 # raw runtime files from the archive (e-mail templates/locales, public/badge assets) — no per-brand
-# rebuild. The overlay copies above still bring in not-yet-ported content (categories, middlewares,
-# seed data). A vanilla build (no brand.config) skips this and stays vanilla.
+# rebuild. The overlay copies above still bring in not-yet-ported content (brand middlewares + seed
+# data — code/data, not config). A vanilla build (no brand.config) skips this and stays vanilla.
 ONBUILD COPY brandin[g]/ /brand/
 ONBUILD RUN if ls /brand/brand.config.* >/dev/null 2>&1; then \
       node /packages/branding/scripts/build-brand-archive.mjs /brand ./branding-assets --default; \
