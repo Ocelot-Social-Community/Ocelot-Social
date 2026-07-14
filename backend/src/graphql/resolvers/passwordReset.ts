@@ -19,7 +19,11 @@ export default {
     requestPasswordReset: async (_parent, { email }, context: Context) => {
       const { driver } = context
       email = normalizeEmail(email)
-      // TODO: why this is generated differntly from 'backend/src/schema/resolvers/helpers/generateNonce.js'?
+      // Password-reset nonce = a crypto-random uuid v4 substring ([0-9a-f], may include a '-').
+      // Deliberately NOT generateNonce(), which emits Math.random() DIGITS for the registration /
+      // email-change confirmation codes (registration.ts, emails.ts) — a different alphabet AND entropy
+      // source (crypto here vs Math.random there). Unifying both on a single crypto helper is a possible
+      // follow-up; kept separate for now so neither flow's token format or strength changes silently.
       const nonce = uuid().substring(0, branding.registration.nonceLength)
       return createPasswordReset({ driver, nonce, email })
     },
