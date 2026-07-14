@@ -12,6 +12,7 @@ $color-neutral-85: rgb(239, 238, 241);
 $color-neutral-90: rgb(245, 244, 246);
 $color-neutral-95: rgb(250, 249, 250);
 $color-neutral-100: rgb(255, 255, 255);
+
 // Brandable base tokens → runtime CSS custom property (see tokens.scss / ocelot-ui-variables.scss).
 // Literal fallback keeps Storybook (which loads this file directly) working.
 $color-primary: var(--color-primary, rgb(23, 181, 63));

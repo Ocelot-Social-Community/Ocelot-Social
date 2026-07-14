@@ -411,9 +411,11 @@ $color-toast-green: var(--color-toast-green, #{$color-success});
  */
 
 $color-ribbon-announcement: $background-color-warning;
+
 // $background-color-warning is now var(--color-warning) → compute the shadow with color-mix (CSS),
 // not Sass color.adjust (which cannot operate on a var()). Follows a brand's warning colour live.
 $color-ribbon-announcement-shadow: color-mix(in srgb, var(--color-warning), black 20%);
+
 // Runtime-themeable (var-backed): a brand sets --color-ribbon-article via theme.cssVars and the
 // article ribbon re-themes without a rebuild; unset → the vanilla literal below (unchanged).
 $color-ribbon-article: var(--color-ribbon-article, #{$background-color-secondary-active});
