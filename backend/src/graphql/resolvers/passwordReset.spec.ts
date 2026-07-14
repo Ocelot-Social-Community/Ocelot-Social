@@ -7,7 +7,7 @@ import login from '@graphql/queries/auth/login.gql'
 import requestPasswordReset from '@graphql/queries/auth/requestPasswordReset.gql'
 import resetPassword from '@graphql/queries/auth/resetPassword.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
-import { branding } from '@src/branding'
+import { getBranding, setBranding } from '@src/branding'
 
 import createPasswordReset from './helpers/createPasswordReset'
 
@@ -108,12 +108,25 @@ describe('passwordReset', () => {
           expect(resets).toHaveLength(1)
         })
 
-        it('creates a reset nonce', async () => {
-          await mutate({ mutation: requestPasswordReset, variables })
-          const resets = await getAllPasswordResets()
-          const [reset] = resets
-          const { nonce } = reset.properties
-          expect(nonce).toHaveLength(branding.registration.nonceLength)
+        it('creates a reset nonce of the branding-configured length', async () => {
+          // Use a NON-default length so this proves requestPasswordReset reads branding.registration
+          // .nonceLength rather than a hardcoded value that happens to equal the default. Restore the
+          // original config afterwards so other tests keep the framework default.
+          const original = getBranding()
+          const customLength = original.registration.nonceLength === 7 ? 8 : 7
+          setBranding({
+            ...original,
+            registration: { ...original.registration, nonceLength: customLength },
+          })
+          try {
+            await mutate({ mutation: requestPasswordReset, variables })
+            const resets = await getAllPasswordResets()
+            const [reset] = resets
+            const { nonce } = reset.properties
+            expect(nonce).toHaveLength(customLength)
+          } finally {
+            setBranding(original)
+          }
         })
       })
     })
