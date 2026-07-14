@@ -25,6 +25,8 @@ export default defineBranding({
 })
 ```
 
+`defineBranding` is the gate: a wrong **shape** is a TypeScript compile error, and a well‑typed but nonsensical **value** (e.g. `group.nameLengthMin > nameLengthMax`, a zero‑length nonce, an empty `applicationName`) throws at build time via `validateBranding` — so a brand can't ship a broken config.
+
 Build it into a distributable archive with the bundled CLI (needs **Node ≥ 23** — it runs the TypeScript sources via native type‑stripping):
 
 ```bash
