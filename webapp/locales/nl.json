@@ -79,6 +79,59 @@
       "trophyBadges": "Trofeeën",
       "verificationBadges": "Verificaties"
     },
+    "branding": {
+      "activate": null,
+      "available": {
+        "title": null
+      },
+      "composition": {
+        "bucket": {
+          "behavior": null,
+          "identity": null,
+          "legal": null,
+          "logos": null,
+          "navigation": null,
+          "theme": null
+        },
+        "change": null,
+        "confirm": null,
+        "defaultTag": null,
+        "description": null,
+        "details": null,
+        "frameworkDefault": null,
+        "from": null,
+        "inherit": null,
+        "noDetails": null,
+        "provides": null,
+        "title": null,
+        "unprovidedInherit": null,
+        "wholePackage": null
+      },
+      "current": null,
+      "description": null,
+      "detail": {
+        "appDescription": null,
+        "colors": null,
+        "favicon": null,
+        "footer": null,
+        "logos": null,
+        "noPages": null,
+        "organization": null,
+        "pages": null,
+        "pagesSummary": null,
+        "reuse": null,
+        "themeColor": null
+      },
+      "error": null,
+      "loading": null,
+      "name": null,
+      "none": null,
+      "noneExtra": null,
+      "schema": null,
+      "schemaTitle": null,
+      "title": null,
+      "vanilla": null
+    },
     "categories": {
       "categoryName": "Naam",
       "empty": "Geen categorieën gevonden.",
