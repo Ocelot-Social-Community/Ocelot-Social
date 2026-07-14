@@ -35,13 +35,31 @@ if (assetsDir && active) {
         // eslint-disable-next-line no-console
         console.warn(`[branding] ${describeSchemaCompat(compat, archive.schemaVersion) ?? ''}`)
       }
+    } else {
+      // A brand was requested (env / DEFAULT marker) but no matching archive was discovered — log it
+      // so an unexpectedly unbranded backend is traceable instead of failing silently.
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[branding] active brand "${active}" not found under ${assetsDir} — running on framework defaults.`,
+      )
     }
     // Compose the effective config from the archive's instance fragments (manifest + fragments/).
     const config = archive ? readArchiveConfig(archive.file) : null
     if (config) {
       setBranding(config)
+    } else if (archive) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[branding] archive for "${active}" (${archive.file}) has no readable config — running on framework defaults.`,
+      )
     }
-  } catch {
-    // no archive / unreadable / bad manifest → keep framework defaults
+  } catch (error) {
+    // Never fatal — branding injection must not crash startup; fall back to framework defaults. Log
+    // so a corrupt/unreadable archive (bad manifest, I/O error) is diagnosable in production.
+    // eslint-disable-next-line no-console
+    console.error(
+      `[branding] failed to load active brand "${active}" — running on framework defaults:`,
+      error,
+    )
   }
 }
