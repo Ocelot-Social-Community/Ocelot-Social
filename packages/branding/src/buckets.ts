@@ -211,7 +211,19 @@ export function composeConfig(
     const source = bucketSources[bucket]
     if (!source) continue // no source for this bucket → keep the framework default
     const value = getPath(source, path)
-    if (value !== undefined) setPath(result, path, clone(value))
+    if (value === undefined) continue
+    // A plain-object owned value is MERGED onto the default subtree so a source that only carries some
+    // sibling leaves (a sparse fragment) doesn't wipe the defaults for the rest — e.g. a navigation
+    // source with just `headerMenu.menu` keeps the default `headerMenu.customButton`. The build's
+    // fragments are full (defineBranding merges defaults first), for which merge == replace; this only
+    // matters for hand-composed / future sparse sources. Arrays & scalars still replace wholesale — a
+    // brand replacing a menu / footer list wants the whole list, not an element-wise merge.
+    const current = getPath(result, path)
+    if (isPlainObject(current) && isPlainObject(value)) {
+      deepMergeInto(current, value)
+    } else {
+      setPath(result, path, clone(value))
+    }
   }
   // Cross-cutting locales: merge (not replace) every source's strings on top of the defaults. The
   // defaults always carry a `locales` object, so this is present (cloned from brandingDefaults).
