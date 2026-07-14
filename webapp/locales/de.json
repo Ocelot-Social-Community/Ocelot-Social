@@ -1106,7 +1106,7 @@
     "reason": {
       "changed_group_member_role": "Hat deine Rolle in der Gruppe geändert",
       "commented_on_post": "Hat einen Beitrag den du beobachtest kommentiert",
-      "followed_user_posted": "Hat einen neuen Betrag geschrieben",
+      "followed_user_posted": "Hat einen neuen Beitrag geschrieben",
       "mentioned_in_comment": "Hat dich in einem Kommentar erwähnt",
       "mentioned_in_post": "Hat dich in einem Beitrag erwähnt",
       "on_date": "am",
