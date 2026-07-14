@@ -117,7 +117,9 @@ export default {
         !rewardedBadges.find((item) => item.id === badgeId) && // badge was not rewarded yet
         usedSlots.length < branding.badges.trophyBadgesSelectedMax // there is free slots left
       ) {
-        for (slot = 0; slot <= branding.badges.trophyBadgesSelectedMax; slot++) {
+        // slots are 0-indexed and valid in [0, max-1] (see users.ts slot validation), so the bound is
+        // strictly `< max` — never assign slot === max, which that validation rejects.
+        for (slot = 0; slot < branding.badges.trophyBadgesSelectedMax; slot++) {
           if (!usedSlots.find((item) => parseInt(item) === slot)) {
             break
           }
