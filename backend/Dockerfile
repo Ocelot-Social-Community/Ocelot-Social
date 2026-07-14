@@ -11,6 +11,9 @@ RUN --mount=type=cache,target=/root/.npm,sharing=locked \
     npm ci
 COPY packages/branding/. .
 RUN npm run build
+# Drop devDeps (typescript/eslint/publint/…) before this stage is copied into the runtime image — only
+# nanotar + tslib are needed at runtime and for build-brand-archive; keeps the image small.
+RUN npm prune --omit=dev
 
 FROM node:25.9.0-alpine AS base
 LABEL org.label-schema.name="ocelot.social:backend"
