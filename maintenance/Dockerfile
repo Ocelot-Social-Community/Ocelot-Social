@@ -7,18 +7,20 @@ FROM node:26.4.0-alpine AS ui-library
 RUN apk --no-cache add git python3 make g++
 WORKDIR /packages/ui
 COPY packages/ui/ .
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm,sharing=locked \
+    npm ci
 RUN npm run build
 
 # ==============================================================================
 # Stage 1b: Build the shared branding package (tsc -> dist), incl. its scripts + node_modules
 # (typescript), so the maintenance branding generator can resolve the package and load a brand's
-# typed brand.config.ts during the ONBUILD overlay in the build stage.
+# typed brand.config.ts when baking the brand in the build stage.
 # ==============================================================================
 FROM node:26.4.0-alpine AS branding-library
 WORKDIR /app
 COPY packages/branding/package.json packages/branding/package-lock.json ./
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm,sharing=locked \
+    npm ci
 COPY packages/branding/. .
 RUN npm run build
 
@@ -31,7 +33,8 @@ WORKDIR /app
 COPY --from=ui-library /packages/ui/ /packages/ui/
 COPY --from=branding-library /app/ /packages/branding/
 COPY maintenance/package.json maintenance/package-lock.json ./
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm,sharing=locked \
+    npm ci
 COPY maintenance/ .
 
 # ==============================================================================
