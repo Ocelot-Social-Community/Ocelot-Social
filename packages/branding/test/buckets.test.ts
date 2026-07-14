@@ -137,6 +137,21 @@ test('sparse owned-path source: arrays replace wholesale, sibling default still 
   assert.deepEqual(composed.headerMenu.customButton, brandingDefaults.headerMenu.customButton)
 })
 
+test('composeConfig ignores __proto__ in a source — no prototype pollution (locales + owned path)', () => {
+  // A malicious source (e.g. an uploaded brand fragment / locale file) carrying a top-level __proto__.
+  // deepMergeInto must drop it, not recurse into Object.prototype.
+  composeConfig({ navigation: { locales: JSON.parse('{"__proto__":{"POLLUTED_LOC":"y"}}') } })
+  composeConfig({ behavior: { group: JSON.parse('{"__proto__":{"POLLUTED_OWN":"y"}}') } })
+  assert.equal({}.POLLUTED_LOC, undefined)
+  assert.equal({}.POLLUTED_OWN, undefined)
+  // A __proto__ key alongside real data: the real sibling survives, __proto__ is dropped.
+  const composed = composeConfig({
+    navigation: { locales: JSON.parse('{"de":{"greet":"hi"},"__proto__":{"P":"y"}}') },
+  })
+  assert.equal(composed.locales.de.greet, 'hi')
+  assert.deepEqual(Object.keys(composed.locales), ['de'])
+})
+
 test('parseSource / formatSource round-trip the source address grammar', () => {
   assert.deepEqual(parseSource('acme'), { id: 'acme', version: null, name: 'default' })
   assert.deepEqual(parseSource('acme@1.2.0'), { id: 'acme', version: '1.2.0', name: 'default' })

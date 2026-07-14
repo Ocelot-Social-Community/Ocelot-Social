@@ -3,9 +3,28 @@
 // and the immutable deep-merge cannot drift across merge.ts / buckets.ts / the build script. Pure (no
 // node deps) so it stays client-bundle-safe like its importers.
 
-/** A plain (non-null, non-array) object. */
+/**
+ * A plain object: a non-null object whose prototype is Object.prototype. The prototype check (rather
+ * than a loose `typeof === 'object' && !Array`) rules out arrays, Date / RegExp / class instances AND
+ * `Object.prototype` itself — so the merge helpers only ever recurse into DATA, never into a built-in
+ * prototype. Config + locale trees are plain JSON, so this never rejects a legitimate value.
+ */
 export function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
+  return (
+    value !== null && typeof value === 'object' && Object.getPrototypeOf(value) === Object.prototype
+  )
+}
+
+/**
+ * Keys that must NEVER be copied from merge input: writing to / recursing through `__proto__` (and,
+ * defensively, `constructor` / `prototype`) mutates a prototype instead of the data — prototype
+ * pollution when the input is attacker-controlled JSON (a locale file, an uploaded brand fragment).
+ * `__proto__` is the exploitable one here (`target.__proto__` is an object → would recurse), the other
+ * two are belt-and-suspenders. Config + locale trees never legitimately carry these keys.
+ */
+const FORBIDDEN_MERGE_KEYS = new Set(['__proto__', 'constructor', 'prototype'])
+export function isForbiddenMergeKey(key: string): boolean {
+  return FORBIDDEN_MERGE_KEYS.has(key)
 }
 
 /** Deep clone via JSON (config trees are JSON-safe); `undefined` passes through unchanged. */
@@ -25,6 +44,7 @@ export function deepMerge(
 ): Record<string, unknown> {
   const result: Record<string, unknown> = { ...base }
   for (const key of Object.keys(patch)) {
+    if (isForbiddenMergeKey(key)) continue // prototype-pollution guard
     const baseValue = result[key]
     const patchValue = patch[key]
     result[key] =

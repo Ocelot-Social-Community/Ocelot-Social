@@ -11,7 +11,7 @@
 // Pure (no node deps) so both webapp and backend — and the admin composition UI — can import it.
 
 import { brandingDefaults } from './defaults.js'
-import { clone, isPlainObject } from './internal.js'
+import { clone, isForbiddenMergeKey, isPlainObject } from './internal.js'
 
 import type { BrandingConfig, DeepPartial } from './schema.js'
 
@@ -163,6 +163,7 @@ function deepMergeInto(
   patch: Record<string, unknown>,
 ): Record<string, unknown> {
   for (const key of Object.keys(patch)) {
+    if (isForbiddenMergeKey(key)) continue // prototype-pollution guard
     const patchValue = patch[key]
     const targetValue = target[key]
     if (isPlainObject(targetValue) && isPlainObject(patchValue)) {
