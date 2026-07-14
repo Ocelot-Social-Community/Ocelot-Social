@@ -58,10 +58,8 @@ export function overlayBrandRuntimeFiles(
 ): void {
   for (const [entry, data] of files) {
     if (entry.startsWith('emails/locales/') && entry.endsWith('.json')) {
-      const target = safeJoin(
-        dirs.emailsDir,
-        join('locales', entry.slice('emails/locales/'.length)),
-      )
+      // strip the `emails/` prefix → `locales/<file>` relative to emailsDir (safeJoin guards traversal).
+      const target = safeJoin(dirs.emailsDir, entry.slice('emails/'.length))
       if (!target) continue
       let brand: Json
       try {
@@ -77,10 +75,8 @@ export function overlayBrandRuntimeFiles(
         Buffer.from(`${JSON.stringify(deepMerge(current, brand), null, 2)}\n`),
       )
     } else if (entry.startsWith('emails/templates/')) {
-      const target = safeJoin(
-        dirs.emailsDir,
-        join('templates', entry.slice('emails/templates/'.length)),
-      )
+      // strip the `emails/` prefix → `templates/<…>` relative to emailsDir.
+      const target = safeJoin(dirs.emailsDir, entry.slice('emails/'.length))
       if (target) writeFileEnsured(target, data)
     } else if (entry.startsWith('public/')) {
       const target = safeJoin(dirs.publicDir, entry.slice('public/'.length))
