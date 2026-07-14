@@ -705,11 +705,11 @@ export default {
     height: calc(1.625rem + 18px);
     padding: 8px 8px;
     background-color: #faf9fa;
-    border-color: #c8c8c8;
+    border-color: #e5e3e8;
     color: #4b4554;
   }
   .mx-datepicker input:hover {
-    border-color: #c8c8c8;
+    border-color: #e5e3e8;
   }
   .mx-datepicker input:focus {
     border-color: #17b53f;
