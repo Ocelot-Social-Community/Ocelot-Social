@@ -14,59 +14,6 @@
     "search": "Suchen"
   },
   "admin": {
-    "branding": {
-      "name": "Branding",
-      "title": "Branding",
-      "description": "Wähle, welches eingebackene Branding netzwerkweit aktiv ist. Das Umschalten lädt die App für alle neu.",
-      "current": "Aktiv",
-      "activate": "Aktivieren",
-      "vanilla": "Standard (kein Branding)",
-      "none": "In dieser Instanz ist kein Branding eingebacken.",
-      "noneExtra": "In dieser Instanz sind keine weiteren Brandings eingebacken — nur der Standard ist verfügbar.",
-      "loading": "Brandings werden geladen…",
-      "error": "Branding konnte nicht umgeschaltet werden.",
-      "schema": "Schema",
-      "schemaTitle": "Die @ocelot-social/branding-Paketversion, mit der dieses Archiv gebaut wurde.",
-      "detail": {
-        "organization": "Organisation",
-        "appDescription": "Beschreibung",
-        "reuse": "Wiederverwendung",
-        "logos": "Logos",
-        "colors": "Farben",
-        "themeColor": "Theme-Farbe",
-        "footer": "Footer-Seiten",
-        "pages": "Statische Seiten",
-        "favicon": "Favicon",
-        "noPages": "keine",
-        "pagesSummary": "{pages} Seiten ({locales})"
-      },
-      "composition": {
-        "title": "Branding-Zusammenstellung",
-        "description": "Für jeden Bereich die Quelle festlegen, über dem Gesamtpaket ({base}). Eine Änderung lädt die App für alle neu.",
-        "wholePackage": "Gesamtpaket (alle Bereiche)",
-        "inherit": "Vom Gesamtpaket erben ({base})",
-        "frameworkDefault": "Framework-Standard (Vanilla)",
-        "defaultTag": "Standard",
-        "details": "Details anzeigen",
-        "from": "Aus: {source}",
-        "change": "Wechsel {from} → {to}",
-        "confirm": "Übernehmen",
-        "provides": "Enthält",
-        "unprovidedInherit": "Nicht enthaltene Bereiche erben den Framework-Standard.",
-        "noDetails": "Keine Werte (Framework-Standard).",
-        "bucket": {
-          "theme": "Design (Farben, Schriften)",
-          "identity": "Identität (Name, Organisation)",
-          "logos": "Logos & Favicon",
-          "legal": "Rechtliches & statische Seiten",
-          "navigation": "Navigation & Menüs",
-          "behavior": "Verhalten (Limits, Formate)"
-        }
-      },
-      "available": {
-        "title": "Verfügbare Brandings"
-      }
-    },
     "api-keys": {
       "detail": {
         "active": "Aktive Keys ({count})",
@@ -131,6 +78,59 @@
       "title": "Auszeichnungen",
       "trophyBadges": "Trophäen",
       "verificationBadges": "Verifizierungen"
+    },
+    "branding": {
+      "activate": "Aktivieren",
+      "available": {
+        "title": "Verfügbare Brandings"
+      },
+      "composition": {
+        "bucket": {
+          "behavior": "Verhalten (Limits, Formate)",
+          "identity": "Identität (Name, Organisation)",
+          "legal": "Rechtliches & statische Seiten",
+          "logos": "Logos & Favicon",
+          "navigation": "Navigation & Menüs",
+          "theme": "Design (Farben, Schriften)"
+        },
+        "change": "Wechsel {from} → {to}",
+        "confirm": "Übernehmen",
+        "defaultTag": "Standard",
+        "description": "Für jeden Bereich die Quelle festlegen, über dem Gesamtpaket ({base}). Eine Änderung lädt die App für alle neu.",
+        "details": "Details anzeigen",
+        "frameworkDefault": "Framework-Standard (Vanilla)",
+        "from": "Aus: {source}",
+        "inherit": "Vom Gesamtpaket erben ({base})",
+        "noDetails": "Keine Werte (Framework-Standard).",
+        "provides": "Enthält",
+        "title": "Branding-Zusammenstellung",
+        "unprovidedInherit": "Nicht enthaltene Bereiche erben den Framework-Standard.",
+        "wholePackage": "Gesamtpaket (alle Bereiche)"
+      },
+      "current": "Aktiv",
+      "description": "Wähle, welches eingebackene Branding netzwerkweit aktiv ist. Das Umschalten lädt die App für alle neu.",
+      "detail": {
+        "appDescription": "Beschreibung",
+        "colors": "Farben",
+        "favicon": "Favicon",
+        "footer": "Footer-Seiten",
+        "logos": "Logos",
+        "noPages": "keine",
+        "organization": "Organisation",
+        "pages": "Statische Seiten",
+        "pagesSummary": "{pages} Seiten ({locales})",
+        "reuse": "Wiederverwendung",
+        "themeColor": "Theme-Farbe"
+      },
+      "error": "Branding konnte nicht umgeschaltet werden.",
+      "loading": "Brandings werden geladen…",
+      "name": "Branding",
+      "none": "In dieser Instanz ist kein Branding eingebacken.",
+      "noneExtra": "In dieser Instanz sind keine weiteren Brandings eingebacken — nur der Standard ist verfügbar.",
+      "schema": "Schema",
+      "schemaTitle": "Die @ocelot-social/branding-Paketversion, mit der dieses Archiv gebaut wurde.",
+      "title": "Branding",
+      "vanilla": "Standard (kein Branding)"
     },
     "categories": {
       "categoryName": "Name",

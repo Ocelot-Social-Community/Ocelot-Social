@@ -14,59 +14,6 @@
     "search": "Search"
   },
   "admin": {
-    "branding": {
-      "name": "Branding",
-      "title": "Branding",
-      "description": "Choose which baked-in branding is active network-wide. Switching reloads the app for everyone.",
-      "current": "Active",
-      "activate": "Activate",
-      "vanilla": "Framework default (no branding)",
-      "none": "No brandings are baked into this instance.",
-      "noneExtra": "No additional brandings are baked into this instance — only the framework default is available.",
-      "loading": "Loading brandings…",
-      "error": "Could not switch the branding.",
-      "schema": "schema",
-      "schemaTitle": "The @ocelot-social/branding package version this archive was built with.",
-      "detail": {
-        "organization": "Organization",
-        "appDescription": "Description",
-        "reuse": "Reuse",
-        "logos": "Logos",
-        "colors": "Colours",
-        "themeColor": "Theme colour",
-        "footer": "Footer pages",
-        "pages": "Static pages",
-        "favicon": "Favicon",
-        "noPages": "none",
-        "pagesSummary": "{pages} pages ({locales})"
-      },
-      "composition": {
-        "title": "Branding composition",
-        "description": "Configure each bucket's source, layered over the base package ({base}). Changing a bucket reloads the app for everyone.",
-        "wholePackage": "Complete package (all buckets)",
-        "inherit": "Inherit from package ({base})",
-        "frameworkDefault": "Framework default (vanilla)",
-        "defaultTag": "default",
-        "details": "Show details",
-        "from": "From: {source}",
-        "change": "Change {from} → {to}",
-        "confirm": "Apply",
-        "provides": "Provides",
-        "unprovidedInherit": "Buckets not provided inherit the framework default.",
-        "noDetails": "No values (framework default).",
-        "bucket": {
-          "theme": "Theme (colours, fonts)",
-          "identity": "Identity (name, organisation)",
-          "logos": "Logos & favicon",
-          "legal": "Legal & static pages",
-          "navigation": "Navigation & menus",
-          "behavior": "Behaviour (limits, formats)"
-        }
-      },
-      "available": {
-        "title": "Available brandings"
-      }
-    },
     "api-keys": {
       "detail": {
         "active": "Active keys ({count})",
@@ -131,6 +78,59 @@
       "title": "Badges",
       "trophyBadges": "Trophies",
       "verificationBadges": "Verifications"
+    },
+    "branding": {
+      "activate": "Activate",
+      "available": {
+        "title": "Available brandings"
+      },
+      "composition": {
+        "bucket": {
+          "behavior": "Behaviour (limits, formats)",
+          "identity": "Identity (name, organisation)",
+          "legal": "Legal & static pages",
+          "logos": "Logos & favicon",
+          "navigation": "Navigation & menus",
+          "theme": "Theme (colours, fonts)"
+        },
+        "change": "Change {from} → {to}",
+        "confirm": "Apply",
+        "defaultTag": "default",
+        "description": "Configure each bucket's source, layered over the base package ({base}). Changing a bucket reloads the app for everyone.",
+        "details": "Show details",
+        "frameworkDefault": "Framework default (vanilla)",
+        "from": "From: {source}",
+        "inherit": "Inherit from package ({base})",
+        "noDetails": "No values (framework default).",
+        "provides": "Provides",
+        "title": "Branding composition",
+        "unprovidedInherit": "Buckets not provided inherit the framework default.",
+        "wholePackage": "Complete package (all buckets)"
+      },
+      "current": "Active",
+      "description": "Choose which baked-in branding is active network-wide. Switching reloads the app for everyone.",
+      "detail": {
+        "appDescription": "Description",
+        "colors": "Colours",
+        "favicon": "Favicon",
+        "footer": "Footer pages",
+        "logos": "Logos",
+        "noPages": "none",
+        "organization": "Organization",
+        "pages": "Static pages",
+        "pagesSummary": "{pages} pages ({locales})",
+        "reuse": "Reuse",
+        "themeColor": "Theme colour"
+      },
+      "error": "Could not switch the branding.",
+      "loading": "Loading brandings…",
+      "name": "Branding",
+      "none": "No brandings are baked into this instance.",
+      "noneExtra": "No additional brandings are baked into this instance — only the framework default is available.",
+      "schema": "schema",
+      "schemaTitle": "The @ocelot-social/branding package version this archive was built with.",
+      "title": "Branding",
+      "vanilla": "Framework default (no branding)"
     },
     "categories": {
       "categoryName": "Name",
