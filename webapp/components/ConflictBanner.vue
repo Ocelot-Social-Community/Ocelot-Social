@@ -56,8 +56,6 @@ export default {
   padding: $space-x-small $space-small;
   border-radius: $border-radius-base;
   border-left: 3px solid $color-warning;
-  // rgba() fallback first for browsers without color-mix() (chrome <111, ios_saf <16.2, …)
-  background: rgba($color-warning, 0.14);
   background: color-mix(in srgb, var(--color-warning) 14%, transparent);
   font-size: 0.9em;
 
