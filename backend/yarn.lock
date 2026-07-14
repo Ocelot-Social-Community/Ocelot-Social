@@ -2501,6 +2501,9 @@
 
 "@ocelot-social/branding@file:../packages/branding":
   version "0.0.1"
+  dependencies:
+    nanotar "^0.3.0"
+    tslib "^2.8.1"
 
 "@one-ini/wasm@0.1.1":
   version "0.1.1"
@@ -9550,6 +9553,11 @@ nanoid@^3.3.12:
   version "3.3.15"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.15.tgz#36c490fad8c6e86c824c940dfdde999b69ed4316"
   integrity sha512-y7Wygv/7mEOvxTuEQDB8StXdMRBWf1kR/tlhAzBRUFkB2jfcLOAxO/SHmOO2zgz1pVgK29/kyupn059/bCHdjA==
+
+nanotar@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/nanotar/-/nanotar-0.3.0.tgz#0a1839731ecbdd910129244a563f73183eb80c6a"
+  integrity sha512-Kv2JYYiCzt16Kt5QwAc9BFG89xfPNBx+oQL4GQXD9nLqPkZBiNaqaCWtwnbk/q7UVsTYevvM1b0UF8zmEI4pCg==
 
 napi-postinstall@^0.3.0:
   version "0.3.4"

@@ -344,12 +344,15 @@ export default {
 
       if (ctx.isClient) {
         config.devtool = ctx.isDev ? 'eval-source-map' : 'hidden-source-map'
-        // Node core modules don't exist in the browser. The branding runtime loader
-        // (plugins/branding.js, components/utils/brandingHtml.js) reads config/HTML off disk only
-        // under a `process.server` guard, but webpack still resolves the static require('fs') when
-        // building the client bundle — map it to an empty module so the client compiles; the
-        // guarded code never runs client-side.
-        config.node = { ...config.node, fs: 'empty', zlib: 'empty' }
+        // The branding runtime loader (plugins/branding.js, components/utils/brandingHtml.js) reads
+        // brand archives off disk under a `process.server` guard, but webpack still resolves the static
+        // require('@ocelot-social/branding/dist/discover.js') when building the CLIENT bundle. That
+        // server-only chain (discover.js → tar.js → nanotar) uses `node:`-scheme built-ins (unresolvable
+        // in webpack 4) and nanotar's ESM optional chaining (unparseable by webpack 4). Alias those two
+        // submodules to an empty stub for the client — the guarded code never runs in the browser.
+        const brandingServerStub = path.resolve(__dirname, 'webpack/branding-server-stub.js')
+        config.resolve.alias['@ocelot-social/branding/dist/discover.js$'] = brandingServerStub
+        config.resolve.alias['@ocelot-social/branding/dist/tar.js$'] = brandingServerStub
       }
 
       // Vue 2.7 has built-in Composition API - redirect old imports
