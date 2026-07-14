@@ -54,11 +54,17 @@ COPY webapp/scripts ./scripts/
 RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 COPY webapp/ .
-# Branding baked at BUILD time from a brand's TYPED config under deployment/configurations/<BRAND>
-# (bind-mounted, so no brand data lands in a layer — and no ONBUILD / downstream `FROM webapp-build`
-# needed). build-brand-archive bakes <id>.tar.gz + a DEFAULT marker into ./branding-assets; the app
-# applies colours/logos/title/OG/manifest/static pages/locales AND the backend's e-mail/public overlays
-# at runtime from the archive. Pick the brand with `--build-arg BRAND=<name>`; empty = vanilla.
+# The nuxt bundle is BRAND-AGNOSTIC — branding is applied at RUNTIME from the archive — so build it
+# BEFORE `ARG BRAND`. This (expensive) layer is then cached across EVERY branded build; only the cheap
+# archive-bake + assembly below re-run when BRAND changes. (The cache mount also persists the
+# webpack/babel cache for incremental rebuilds when the webapp source itself changes.)
+RUN --mount=type=cache,target=/app/node_modules/.cache,sharing=locked \
+    yarn run build
+# Per-brand, AFTER the cached build: bake <id>.tar.gz + DEFAULT marker into ./branding-assets from the
+# brand's TYPED config under deployment/configurations/<BRAND> (bind-mounted, so no brand data lands in
+# a layer; no ONBUILD / downstream `FROM webapp-build` needed). The app applies colours/logos/title/OG/
+# manifest/static pages/locales (and the backend's e-mail/public overlays) at runtime from the archive.
+# Pick the brand with `--build-arg BRAND=<name>`; empty = vanilla.
 ARG BRAND=""
 RUN --mount=type=bind,source=deployment/configurations,target=/brands \
     if [ -n "$BRAND" ] && ls "/brands/$BRAND/branding/brand.config."* >/dev/null 2>&1; then \
@@ -67,9 +73,6 @@ RUN --mount=type=bind,source=deployment/configurations,target=/brands \
     else \
       echo "[branding] BRAND unset/unknown ('$BRAND') — vanilla ocelot.social"; \
     fi
-# Persist the webpack/babel cache (nuxt build.cache + babel cacheDirectory write to node_modules/.cache).
-RUN --mount=type=cache,target=/app/node_modules/.cache,sharing=locked \
-    yarn run build
 RUN mkdir /build && \
     cp -r ./.nuxt ./nuxt.config.js ./config ./constants ./static ./locales ./server-middleware ./package.json ./yarn.lock ./scripts /build && \
     if [ -d ./branding-assets ]; then cp -r ./branding-assets /build/branding-assets; fi
