@@ -52,6 +52,10 @@ export default {
       const manifest = res.ok ? await res.json() : []
       this.hasBrandings = Array.isArray(manifest) && manifest.length > 0
     } catch (error) {
+      // res.ok already handles the expected "no manifest" case above, so this only fires on real
+      // network/parse errors — surface them instead of failing silently. Fallback stays unchanged.
+      // eslint-disable-next-line no-console
+      console.error('admin: failed to load /branding/manifest.json', error)
       this.hasBrandings = false
     }
   },
