@@ -108,13 +108,21 @@ export default {
     width: 20%;
   }
   &.strength-1 {
-    background: color-mix(in srgb, color-mix(in srgb, var(--color-warning), rgb(245, 196, 0)), black 30%);
+    background: color-mix(
+      in srgb,
+      color-mix(in srgb, var(--color-warning), rgb(245, 196, 0)),
+      black 30%
+    );
     width: 40%;
   }
   &.strength-2 {
     // Brand-linked like the other steps (was static darken($color-yellow)): the warning→yellow blend
     // darkened 20%, mirroring strength-1 (black 30%) so the scale follows a brand switch without a jump.
-    background: color-mix(in srgb, color-mix(in srgb, var(--color-warning), rgb(245, 196, 0)), black 20%);
+    background: color-mix(
+      in srgb,
+      color-mix(in srgb, var(--color-warning), rgb(245, 196, 0)),
+      black 20%
+    );
     width: 60%;
   }
   &.strength-3 {
