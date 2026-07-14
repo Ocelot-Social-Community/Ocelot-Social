@@ -35,8 +35,7 @@ export interface BrandArchive {
   file: string
 }
 
-interface CachedMeta {
-  mtimeMs: number
+interface ArchiveMeta {
   id: string
   version: string | null
   schemaVersion: string | null
@@ -44,9 +43,36 @@ interface CachedMeta {
 }
 
 // path → decompressed meta, so an archive is read+decompressed at most once per change (by mtime).
-const metaCache = new Map<string, CachedMeta>()
+const metaCache = new Map<string, { mtimeMs: number; value: ArchiveMeta }>()
 // path → decompressed file map, for serving entries (same mtime-keyed reuse).
-const fileCache = new Map<string, { mtimeMs: number; files: Map<string, Buffer> }>()
+const fileCache = new Map<string, { mtimeMs: number; value: Map<string, Buffer> }>()
+
+// mtime-keyed read-through cache: stat the file, return the cached value while unchanged, otherwise
+// (re)compute + cache. Returns null when the file can't be statted, or when compute returns/throws
+// null — neither is cached, so a later fix is picked up. The one place the stat→hit→read→cache→catch
+// pattern lives, so readMeta and readArchive can't drift apart.
+function statCached<T>(
+  file: string,
+  cache: Map<string, { mtimeMs: number; value: T }>,
+  compute: () => T | null,
+): T | null {
+  let stat
+  try {
+    stat = statSync(file)
+  } catch {
+    return null
+  }
+  const cached = cache.get(file)
+  if (cached?.mtimeMs === stat.mtimeMs) return cached.value
+  try {
+    const value = compute()
+    if (value === null) return null
+    cache.set(file, { mtimeMs: stat.mtimeMs, value })
+    return value
+  } catch {
+    return null
+  }
+}
 
 // Recursively collect `*.tar.gz` paths, skipping dotdirs (.git) and node_modules.
 function walk(dir: string, out: string[]): void {
@@ -81,30 +107,17 @@ function compareVersions(a: string | null, b: string | null): number {
 
 // Read a single archive's id/version/label from its manifest.json (mtime-cached). Null if it isn't a
 // readable brand archive (missing/garbled manifest.json, or no id — a stray .tar.gz).
-function readMeta(file: string): CachedMeta | null {
-  let stat
-  try {
-    stat = statSync(file)
-  } catch {
-    return null
-  }
-  const cached = metaCache.get(file)
-  if (cached?.mtimeMs === stat.mtimeMs) return cached
-  try {
+function readMeta(file: string): ArchiveMeta | null {
+  return statCached(file, metaCache, () => {
     const manifest = readManifest(readTarGz(readFileSync(file)))
     if (!manifest || typeof manifest.id !== 'string' || !manifest.id) return null
-    const meta: CachedMeta = {
-      mtimeMs: stat.mtimeMs,
+    return {
       id: manifest.id,
       version: typeof manifest.version === 'string' ? manifest.version : null,
       schemaVersion: typeof manifest.schemaVersion === 'string' ? manifest.schemaVersion : null,
       label: typeof manifest.label === 'string' ? manifest.label : manifest.id,
     }
-    metaCache.set(file, meta)
-    return meta
-  } catch {
-    return null
-  }
+  })
 }
 
 /** Parse an archive's manifest.json (the library index), or null when missing/garbled. */
@@ -228,21 +241,7 @@ export function discoverArchives(baseDir: string): Map<string, BrandArchive> {
 
 /** The decompressed entries of one archive file (mtime-cached), or null when unreadable. */
 export function readArchive(file: string): Map<string, Buffer> | null {
-  let stat
-  try {
-    stat = statSync(file)
-  } catch {
-    return null
-  }
-  const cached = fileCache.get(file)
-  if (cached?.mtimeMs === stat.mtimeMs) return cached.files
-  try {
-    const files = readTarGz(readFileSync(file))
-    fileCache.set(file, { mtimeMs: stat.mtimeMs, files })
-    return files
-  } catch {
-    return null
-  }
+  return statCached(file, fileCache, () => readTarGz(readFileSync(file)))
 }
 
 /** The image's baked default brand id (a `DEFAULT` marker file at the served root), or '' when none. */
