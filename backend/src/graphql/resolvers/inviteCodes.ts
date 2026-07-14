@@ -8,7 +8,8 @@ import Resolver from './helpers/Resolver'
 import type { Context } from '@src/context'
 
 export const generateInviteCode = () => {
-  // 6 random numbers in [ 0, 35 ] are 36 possible numbers (10 [0-9] + 26 [A-Z])
+  // branding.registration.inviteCodeLength random numbers, each in [ 0, 35 ] → 36 possibilities
+  // (10 [0-9] + 26 [A-Z])
   return Array.from(
     { length: branding.registration.inviteCodeLength },
     // eslint-disable-next-line @typescript-eslint/no-useless-default-assignment
