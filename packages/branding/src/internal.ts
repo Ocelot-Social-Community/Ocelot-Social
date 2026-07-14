@@ -33,24 +33,32 @@ export function clone<T>(value: T): T {
 }
 
 /**
- * IMMUTABLE deep-merge: returns a NEW object; nested plain objects merge, everything else (scalars,
- * arrays) is replaced by `patch` — whose references are SHARED into the result. This is the semantics
- * for producing a final config (defineBranding) and for merging freshly-parsed locale files. For the
- * accumulate-IN-PLACE-and-clone variant (locales layer) see buckets.ts `deepMergeInto`.
+ * IMMUTABLE deep-merge: returns a NEW object that shares NO references with `base` or `patch`; nested
+ * plain objects merge, everything else (scalars, arrays) is replaced by `patch`. Every carried-over
+ * value is deep-CLONED — critical because `defineBranding`'s base is the shared `brandingDefaults`
+ * singleton and callers MUTATE the result downstream (the build sets ogImage / merges locale files in
+ * place): a shallow `{ ...base }` would alias non-overridden branches and let one brand's build corrupt
+ * the defaults (→ the next brand in the same process). For the accumulate-IN-PLACE variant (locales
+ * layer) see buckets.ts `deepMergeInto`; it likewise clones, for the same aliasing reason.
  */
 export function deepMerge(
   base: Record<string, unknown>,
   patch: Record<string, unknown>,
 ): Record<string, unknown> {
-  const result: Record<string, unknown> = { ...base }
-  for (const key of Object.keys(patch)) {
+  const result: Record<string, unknown> = {}
+  const patchKeys = new Set(Object.keys(patch))
+  for (const key of Object.keys(base)) {
+    if (isForbiddenMergeKey(key) || patchKeys.has(key)) continue
+    result[key] = clone(base[key]) // base-only branch → own copy, never alias base
+  }
+  for (const key of patchKeys) {
     if (isForbiddenMergeKey(key)) continue // prototype-pollution guard
-    const baseValue = result[key]
+    const baseValue = base[key]
     const patchValue = patch[key]
     result[key] =
       isPlainObject(baseValue) && isPlainObject(patchValue)
-        ? deepMerge(baseValue, patchValue)
-        : patchValue
+        ? deepMerge(baseValue, patchValue) // recursion clones both sides
+        : clone(patchValue) // patch wins → own copy, never alias patch
   }
   return result
 }

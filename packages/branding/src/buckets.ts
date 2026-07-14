@@ -155,9 +155,10 @@ export function bucketOfPath(path: string): BucketName | null {
 
 // Deep-merge `patch` INTO `target` (nested plain objects merge; everything else replaces). Used for
 // the cross-cutting `locales` layer, which accumulates from every source rather than being replaced.
-// NOTE: deliberately IN-PLACE and clones incoming values (so the accumulator never aliases a source
-// config). This differs from internal.ts's immutable `deepMerge` (fresh object, shares patch refs) —
-// two contracts, not an accidental duplicate; `clone`/`isPlainObject` are shared from internal.ts.
+// NOTE: deliberately IN-PLACE (so it can accumulate the locales layer across sources), whereas
+// internal.ts's `deepMerge` returns a fresh object. Both CLONE incoming values so neither aliases a
+// source — two contracts (in-place vs immutable), not an accidental duplicate; `clone`/`isPlainObject`
+// are shared from internal.ts.
 function deepMergeInto(
   target: Record<string, unknown>,
   patch: Record<string, unknown>,

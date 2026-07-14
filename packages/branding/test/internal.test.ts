@@ -49,6 +49,34 @@ test('deepMerge: nested objects merge, arrays/scalars replace', () => {
   assert.deepEqual(merged, { a: { x: 1, y: 9, z: 3 }, list: [2, 3], scalar: 'new' })
 })
 
+test('deepMerge: result shares NO references with base or patch (fully immutable)', () => {
+  const base = { a: { x: 1 }, keepArr: [1, 2], baseOnly: { deep: 1 } }
+  const patch = { a: { y: 2 }, newArr: [9], newObj: { deep: 1 } }
+  const merged = deepMerge(base, patch)
+  // Not the same object references as either input's nested values…
+  assert.notEqual(merged.baseOnly, base.baseOnly) // base-only branch is cloned
+  assert.notEqual(merged.keepArr, base.keepArr) // base-only array cloned
+  assert.notEqual(merged.newArr, patch.newArr) // patch array cloned
+  assert.notEqual(merged.newObj, patch.newObj) // patch object cloned
+  // …so mutating the result cannot leak back into base or patch.
+  ;(merged.baseOnly as { deep: number }).deep = 99
+  ;(merged.newObj as { deep: number }).deep = 99
+  ;(merged.keepArr as number[]).push(3)
+  assert.deepEqual(base.baseOnly, { deep: 1 })
+  assert.deepEqual(base.keepArr, [1, 2])
+  assert.deepEqual(patch.newObj, { deep: 1 })
+})
+
+test('deepMerge: mutating the result does not corrupt a shared base (the defineBranding case)', () => {
+  const sharedDefaults = { locales: {}, metadata: { ogImage: '/vanilla.png' } }
+  const cfgA = deepMerge(sharedDefaults, { theme: { color: 'red' } }) // no locales/metadata override
+  ;(cfgA.locales as Record<string, unknown>).de = { greeting: 'A' } // like loadLocaleFiles
+  ;(cfgA.metadata as { ogImage: string }).ogImage = '/a.png' // like ogImage-follows-logo
+  // The shared "defaults" (and thus the next brand built in the same process) stay pristine.
+  assert.deepEqual(sharedDefaults.locales, {})
+  assert.equal(sharedDefaults.metadata.ogImage, '/vanilla.png')
+})
+
 test('deepMerge: drops a __proto__ key instead of polluting Object.prototype', () => {
   const patch = JSON.parse('{"a":1,"__proto__":{"POLLUTED_MERGE":"yes"}}')
   const merged = deepMerge({}, patch)
