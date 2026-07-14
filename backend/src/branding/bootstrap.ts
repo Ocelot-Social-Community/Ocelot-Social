@@ -9,12 +9,17 @@
 // written when a brand is baked in as default theme); neither → framework defaults (vanilla image
 // runs as-is). This lets a pre-built image be branded without a rebuild — see
 // docu/branding-architecture-konzept.md.
+import path from 'node:path'
+
 import { checkSchemaCompat, describeSchemaCompat, setBranding } from '@ocelot-social/branding'
 import {
   discoverArchives,
+  readArchive,
   readArchiveConfig,
   readDefaultMarker,
 } from '@ocelot-social/branding/dist/discover.js'
+
+import { overlayBrandRuntimeFiles } from './overlayRuntimeFiles'
 
 const assetsDir = process.env.OCELOT_BRANDING_ASSETS_DIR
 const active = assetsDir
@@ -51,6 +56,19 @@ if (assetsDir && active) {
       console.warn(
         `[branding] archive for "${active}" (${archive.file}) has no readable config — running on framework defaults.`,
       )
+    }
+    // Overlay the brand's RAW runtime files from the same archive: e-mail templates/locales and public
+    // assets (badge SVGs) — replaces the old ONBUILD build-time overlay + merge-email-locales.sh. Dirs
+    // are resolved relative to this module so it works in both the ts-node (src/) and compiled (build/)
+    // layouts: bootstrap is at <root>/branding, e-mails at <root>/emails, public at <root>/../public.
+    if (archive) {
+      const files = readArchive(archive.file)
+      if (files) {
+        overlayBrandRuntimeFiles(files, {
+          emailsDir: path.join(__dirname, '..', 'emails'),
+          publicDir: path.join(__dirname, '..', '..', 'public'),
+        })
+      }
     }
   } catch (error) {
     // Never fatal — branding injection must not crash startup; fall back to framework defaults. Log

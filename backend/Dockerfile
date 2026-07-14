@@ -43,20 +43,13 @@ COPY backend/ .
 # copy categories to brand them (use yarn prod:db:data:categories)
 ONBUILD COPY ./branding/constants/ src/constants/
 ONBUILD RUN tools/replace-constants.sh
-# Email templates: optionally overlay branding pug templates onto src/emails/templates/
-ONBUILD COPY brandin[g]/emails/templates/ src/emails/templates/
-# Email locales: optionally deep-merge branding translations into src/emails/locales/*.json
-ONBUILD COPY brandin[g]/emails/locales/*.jso[n] src/emails/locales/tmp/
-ONBUILD RUN if [ -d src/emails/locales/tmp ]; then apk add --no-cache jq bash && tools/merge-email-locales.sh; fi
 ONBUILD COPY ./branding/middlewares/ src/middleware/branding/
 ONBUILD COPY ./branding/data/ src/db/data
-ONBUILD COPY ./branding/public/ public/
-# Runtime branding (additive to the overlays above): copy the brand UNFLATTENED into /brand and bake
-# its archive (+ DEFAULT marker) into ./branding-assets, so the backend picks up this brand's config
-# (group limits / e-mail identity) at startup via src/branding/bootstrap.ts — no per-brand rebuild.
-# The overlay copies above still bring in not-yet-ported content (categories, e-mail templates/locales,
-# middlewares, seed data).
-# A vanilla build (no brand.config) skips this and stays vanilla.
+# Runtime branding: copy the brand UNFLATTENED into /brand and bake its archive (+ DEFAULT marker) into
+# ./branding-assets. At startup src/branding/bootstrap.ts injects this brand's config AND overlays its
+# raw runtime files from the archive (e-mail templates/locales, public/badge assets) — no per-brand
+# rebuild. The overlay copies above still bring in not-yet-ported content (categories, middlewares,
+# seed data). A vanilla build (no brand.config) skips this and stays vanilla.
 ONBUILD COPY brandin[g]/ /brand/
 ONBUILD RUN if ls /brand/brand.config.* >/dev/null 2>&1; then \
       node /packages/branding/scripts/build-brand-archive.mjs /brand ./branding-assets --default; \

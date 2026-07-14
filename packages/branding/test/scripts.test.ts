@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict'
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { after, test } from 'node:test'
 
 import { composeArchive, readManifest } from '../dist/discover.js'
@@ -30,11 +30,18 @@ function brandDir({
   config,
   assets = {},
   locales = {},
+  files = {},
 } = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'ocelot-brand-'))
   roots.push(dir)
   if (pkg) writeFileSync(join(dir, 'package.json'), JSON.stringify(pkg))
   if (config) writeFileSync(join(dir, 'brand.config.mjs'), config)
+  // Arbitrary nested files (e.g. emails/, public/) written verbatim under the brand dir.
+  for (const [rel, body] of Object.entries(files)) {
+    const p = join(dir, rel)
+    mkdirSync(dirname(p), { recursive: true })
+    writeFileSync(p, body)
+  }
   const assetDir = join(dir, 'assets')
   mkdirSync(assetDir, { recursive: true })
   for (const [name, body] of Object.entries(assets)) writeFileSync(join(assetDir, name), body)
@@ -94,6 +101,24 @@ test('buildBrandArchive: manifest carries id/version/schemaVersion/label', async
   assert.equal(manifest.label, 'Acme')
   // schemaVersion = THIS @ocelot-social/branding package version (baked from its package.json).
   assert.equal(typeof manifest.schemaVersion, 'string')
+})
+
+test('buildBrandArchive packs the raw emails/ and public/ trees into the archive', async () => {
+  const built = await buildBrandArchive(
+    brandDir({
+      config: ACME_CONFIG,
+      files: {
+        'emails/templates/registration/html.pug': 'p brand registration',
+        'emails/locales/en.json': '{"greeting":"hi"}',
+        'public/img/badges/default_trophy.svg': '<svg>brand</svg>',
+      },
+    }),
+  )
+  const archive = readTarGz(built.gz)
+  // Consumed at backend bootstrap by overlayBrandRuntimeFiles (e-mail templates/locales + public badges).
+  assert.equal(archive.get('emails/templates/registration/html.pug').toString(), 'p brand registration')
+  assert.equal(archive.get('emails/locales/en.json').toString(), '{"greeting":"hi"}')
+  assert.equal(archive.get('public/img/badges/default_trophy.svg').toString(), '<svg>brand</svg>')
 })
 
 test('buildBrandArchive emits a PARTIAL library: only customised buckets get a fragment', async () => {

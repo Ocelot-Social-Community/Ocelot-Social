@@ -9,6 +9,7 @@ const DISCOVER = '@ocelot-social/branding/dist/discover.js'
 interface LoadMocks {
   discoverArchives?: jest.Mock
   readArchiveConfig?: jest.Mock
+  readArchive?: jest.Mock
   readDefaultMarker?: jest.Mock
   setBranding?: jest.Mock
   checkSchemaCompat?: jest.Mock
@@ -18,6 +19,7 @@ const ORIGINAL_ENV = process.env
 
 function loadBootstrap(mocks: LoadMocks) {
   const setBranding = mocks.setBranding ?? jest.fn()
+  const overlayBrandRuntimeFiles = jest.fn()
   jest.doMock(BRANDING, () => ({
     setBranding,
     checkSchemaCompat: mocks.checkSchemaCompat ?? jest.fn(() => 'ok'),
@@ -26,13 +28,16 @@ function loadBootstrap(mocks: LoadMocks) {
   jest.doMock(DISCOVER, () => ({
     discoverArchives: mocks.discoverArchives ?? jest.fn(() => new Map()),
     readArchiveConfig: mocks.readArchiveConfig ?? jest.fn(() => null),
+    readArchive: mocks.readArchive ?? jest.fn(() => null),
     readDefaultMarker: mocks.readDefaultMarker ?? jest.fn(() => ''),
   }))
+  // Mock the on-disk overlay so bootstrap doesn't write brand files into the test's real dirs.
+  jest.doMock('./overlayRuntimeFiles', () => ({ overlayBrandRuntimeFiles }))
   jest.isolateModules(() => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports, n/global-require, import-x/no-unassigned-import
     require('./bootstrap')
   })
-  return { setBranding }
+  return { setBranding, overlayBrandRuntimeFiles }
 }
 
 describe('branding bootstrap', () => {
@@ -74,6 +79,25 @@ describe('branding bootstrap', () => {
     expect(setBranding).toHaveBeenCalledWith(config)
     expect(warnSpy).not.toHaveBeenCalled()
     expect(errorSpy).not.toHaveBeenCalled()
+  })
+
+  it('overlays the brand runtime files (e-mails/public) from the archive', () => {
+    process.env.OCELOT_BRANDING_ASSETS_DIR = '/assets'
+    process.env.OCELOT_ACTIVE_BRANDING = 'acme'
+    const archive = { file: '/assets/acme.tar.gz', schemaVersion: '0.0.1' }
+    const files = new Map([['emails/templates/registration/html.pug', Buffer.from('p brand')]])
+    const { overlayBrandRuntimeFiles } = loadBootstrap({
+      discoverArchives: jest.fn(() => new Map([['acme', archive]])),
+      readArchiveConfig: jest.fn(() => ({ metadata: {} })),
+      readArchive: jest.fn(() => files),
+    })
+    const calls = overlayBrandRuntimeFiles.mock.calls as Array<
+      [Map<string, Buffer>, { emailsDir: string; publicDir: string }]
+    >
+    expect(calls).toHaveLength(1)
+    expect(calls[0][0]).toBe(files)
+    expect(calls[0][1].emailsDir).toContain('emails')
+    expect(calls[0][1].publicDir).toContain('public')
   })
 
   it('warns and keeps defaults when the active brand is not found', () => {
