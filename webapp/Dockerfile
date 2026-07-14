@@ -57,15 +57,10 @@ COPY webapp/scripts ./scripts/
 RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 COPY webapp/ .
-# branding is unified in /branding in branding repositories
-ONBUILD COPY webap[p]/brandin[g]/ .
-ONBUILD COPY brandin[g]/ .
-ONBUILD RUN tools/merge-locales.sh
-# Runtime branding (additive to the overlay above): copy the brand UNFLATTENED into /brand and bake
-# its archive (+ DEFAULT marker) into ./branding-assets, so the image ships this brand as its default
-# theme WITHOUT rebuilding the bundle per brand — colours/logos/title/OG/manifest/static pages are
-# applied at runtime from the archive. The overlay copies above still bring in not-yet-ported content
-# (backend middlewares/data etc.). A vanilla build (no brand.config) skips this and stays vanilla.
+# Runtime branding: copy the brand UNFLATTENED into /brand and bake its archive (+ DEFAULT marker) into
+# ./branding-assets, so the image ships this brand as its default theme WITHOUT rebuilding the bundle
+# per brand — colours/logos/title/OG/manifest/static pages/locales are all applied at runtime from the
+# archive. A vanilla build (no brand.config) skips this and stays vanilla.
 ONBUILD COPY webap[p]/brandin[g]/ /brand/
 ONBUILD COPY brandin[g]/ /brand/
 ONBUILD RUN if ls /brand/brand.config.* >/dev/null 2>&1; then \

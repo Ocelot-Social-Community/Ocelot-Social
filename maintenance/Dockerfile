@@ -75,15 +75,6 @@ RUN --mount=type=bind,source=deployment/configurations,target=/brands \
       echo "[maintenance] BRAND unset/unknown ('$BRAND') — vanilla ocelot.social"; \
     fi
 
-# Legacy: external deploy repos that overlay via `FROM maintenance-build` using the OLD branding
-# layout (branding/static/ + constants/*.js). The `brandin[g]` glob makes each ONBUILD optional.
-ONBUILD COPY brandin[g]/static/ /app/public/
-ONBUILD COPY brandin[g]/constants/metadata.j[s] /app/app/constants/metadata.ts
-ONBUILD COPY brandin[g]/constants/emails.j[s] /app/app/constants/emails.ts
-ONBUILD COPY brandin[g]/locales/*.jso[n] /app/locales/tmp/
-ONBUILD RUN if [ -d locales/tmp ]; then apk add --no-cache jq && tools/merge-locales.sh; fi
-ONBUILD RUN npx nuxt generate
-
 RUN npx nuxt generate
 
 # ==============================================================================
