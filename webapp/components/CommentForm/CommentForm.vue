@@ -81,11 +81,7 @@ export default {
     updateEditorContent(value) {
       const sanitizedContent = this.$filters.removeHtml(value, false)
       if (!this.update) {
-        if (sanitizedContent.length < branding.comment.minLength) {
-          this.disabled = true
-        } else {
-          this.disabled = false
-        }
+        this.disabled = sanitizedContent.length < branding.comment.minLength
       } else {
         this.disabled =
           value === this.comment.content || sanitizedContent.length < branding.comment.minLength
