@@ -6,6 +6,8 @@ import {
   discoverArchives as mockDiscoverArchives,
   composeComposition as mockComposeComposition,
   readDefaultMarker as mockReadDefaultMarker,
+  checkSchemaCompat as mockCheckSchemaCompat,
+  describeSchemaCompat as mockDescribeSchemaCompat,
 } from '@ocelot-social/branding/dist/discover.js'
 
 import brandingPlugin from './branding.js'
@@ -17,6 +19,10 @@ jest.mock(
     discoverArchives: jest.fn(),
     composeComposition: jest.fn(),
     readDefaultMarker: jest.fn(() => ''),
+    // The plugin warns (never fatal) when the resolved base archive's schema diverges from the
+    // runtime; default to 'ok' so the happy path skips the warning branch.
+    checkSchemaCompat: jest.fn(() => 'ok'),
+    describeSchemaCompat: jest.fn(() => ''),
   }),
   { virtual: true },
 )
@@ -45,6 +51,7 @@ describe('plugins/branding (SSR injection)', () => {
     process.env.OCELOT_BRANDING_ASSETS_DIR = '/brands'
     delete process.env.OCELOT_ACTIVE_BRANDING
     mockReadDefaultMarker.mockReturnValue('')
+    mockCheckSchemaCompat.mockReturnValue('ok')
     context = { beforeNuxtRender: jest.fn() }
   })
 
@@ -95,6 +102,26 @@ describe('plugins/branding (SSR injection)', () => {
     context.beforeNuxtRender.mock.calls[0][0]({ nuxtState })
     expect(nuxtState.brandingId).toBe('yunite')
     expect(nuxtState.brandingComposition).toBe(composition)
+  })
+
+  it('still brands (never fatal) but WARNS when the base archive schema diverges from the runtime', async () => {
+    const config = { id: 'nutrimind' }
+    mockPolicy('nutrimind')
+    mockDiscoverArchives.mockReturnValue(
+      new Map([['nutrimind', { id: 'nutrimind', file: '/brands/n.tar.gz', schemaVersion: 99 }]]),
+    )
+    mockCheckSchemaCompat.mockReturnValue('newer')
+    mockDescribeSchemaCompat.mockReturnValue('archive schema 99 is newer than runtime')
+    mockComposeComposition.mockReturnValue(config)
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+
+    await brandingPlugin(context)
+
+    expect(mockCheckSchemaCompat).toHaveBeenCalledWith(99)
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('archive schema 99 is newer than runtime'))
+    // still branded despite the mismatch
+    expect(mockSetBranding).toHaveBeenCalledWith(config)
+    warn.mockRestore()
   })
 
   it('brands from composition alone even when the base is vanilla', async () => {
