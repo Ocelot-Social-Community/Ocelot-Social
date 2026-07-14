@@ -26,7 +26,7 @@
             id="whole-package"
             class="composition-select"
             :value="activeId"
-            :disabled="!!saving"
+            :disabled="!!saving || !!savingComposition"
             @change="switchTo($event.target.value)"
           >
             <option value="">{{ $t('admin.branding.vanilla') }}</option>
@@ -90,7 +90,7 @@
             :id="`bucket-${bucket}`"
             class="composition-select"
             :value="selectValue(bucket)"
-            :disabled="!!savingComposition"
+            :disabled="!!savingComposition || !!saving"
             @change="onBucketChange(bucket, $event.target.value)"
           >
             <option value="">
@@ -166,7 +166,7 @@
             <button
               type="button"
               class="btn btn-confirm"
-              :disabled="!!savingComposition"
+              :disabled="!!savingComposition || !!saving"
               @click="confirm(bucket)"
             >
               {{ $t('admin.branding.composition.confirm') }}
@@ -174,7 +174,7 @@
             <button
               type="button"
               class="btn btn-cancel"
-              :disabled="!!savingComposition"
+              :disabled="!!savingComposition || !!saving"
               @click="cancel(bucket)"
             >
               {{ $t('actions.cancel') }}
