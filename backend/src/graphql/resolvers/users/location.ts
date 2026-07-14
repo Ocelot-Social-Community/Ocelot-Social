@@ -175,7 +175,7 @@ const ALLOWED_LOCATION_TYPES = new Set([
 ])
 const DEFAULT_LOCATION_TYPES = 'region,place,country'
 
-export const queryLocations = async ({ place, lang, types }, context: Context) => {
+export const queryLocations = async ({ place, lang, types, proximity }, context: Context) => {
   const safeTypes = types
     ? types
         .split(',')
@@ -183,8 +183,15 @@ export const queryLocations = async ({ place, lang, types }, context: Context) =
         .filter((t: string) => ALLOWED_LOCATION_TYPES.has(t))
         .join(',') || DEFAULT_LOCATION_TYPES
     : DEFAULT_LOCATION_TYPES
+  const proximityParts = proximity ? proximity.split(',') : []
+  const proximityParam =
+    proximityParts.length === 2 &&
+    !Number.isNaN(parseFloat(proximityParts[0])) &&
+    !Number.isNaN(parseFloat(proximityParts[1]))
+      ? `&proximity=${encodeURIComponent(proximity)}`
+      : ''
   const res: any = await fetch(
-    `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(place)}.json?access_token=${context.config.MAPBOX_TOKEN}&types=${safeTypes}&language=${encodeURIComponent(lang)}`,
+    `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(place)}.json?access_token=${context.config.MAPBOX_TOKEN}&types=${safeTypes}&language=${encodeURIComponent(lang)}&limit=10${proximityParam}`,
     {
       signal: AbortSignal.timeout(REQUEST_TIMEOUT),
     },

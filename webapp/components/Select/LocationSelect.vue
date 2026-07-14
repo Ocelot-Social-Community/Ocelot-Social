@@ -93,6 +93,17 @@ export default {
     currentLocale() {
       return this.$store && this.$store.state.i18n && this.$store.state.i18n.locale
     },
+    userProximity() {
+      const loc =
+        this.$store &&
+        this.$store.state.auth &&
+        this.$store.state.auth.user &&
+        this.$store.state.auth.user.location
+      if (loc && loc.lng != null && loc.lat != null) {
+        return `${loc.lng},${loc.lat}`
+      }
+      return null
+    },
   },
   watch: {
     currentValue() {
@@ -142,6 +153,19 @@ export default {
 
       return result
     },
+    getProximityFromBrowser() {
+      return new Promise((resolve) => {
+        if (!navigator.geolocation) {
+          resolve(null)
+          return
+        }
+        navigator.geolocation.getCurrentPosition(
+          (pos) => resolve(`${pos.coords.longitude},${pos.coords.latitude}`),
+          () => resolve(null),
+          { timeout: 3000, maximumAge: 300000 },
+        )
+      })
+    },
     async requestGeoData(value) {
       if (value === '') {
         this.cities = []
@@ -155,12 +179,13 @@ export default {
 
         const place = encodeURIComponent(value)
         const lang = this.$i18n.locale()
+        const proximity = this.userProximity || (await this.getProximityFromBrowser())
 
         const {
           data: { queryLocations: result },
         } = await this.$apollo.query({
           query: queryLocations(),
-          variables: { place, lang, types: this.types },
+          variables: { place, lang, types: this.types, proximity },
           fetchPolicy: 'network-only',
         })
 
