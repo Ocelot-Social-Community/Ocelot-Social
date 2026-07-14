@@ -43,12 +43,13 @@ FROM base AS development
 # otherwise the mounted vanilla sources shadow the baked branding. BRAND is passed through from the
 # compose build args (default yunite.me via ${MAINTENANCE_BRAND}); empty = vanilla.
 ARG BRAND=""
-COPY deployment/configurations/ /brands/
-RUN if [ -n "$BRAND" ] && { [ -f "/brands/$BRAND/branding/brand.config.ts" ] || [ -f "/brands/$BRAND/branding/brand.config.mjs" ]; }; then \
+# Bind-mount the brand configs only for THIS step (BuildKit) so no brand data — least of all the
+# other, non-selected brands — is baked into the dev image layer. Read-only: the generator only reads.
+RUN --mount=type=bind,source=deployment/configurations,target=/brands \
+    if [ -n "$BRAND" ] && { [ -f "/brands/$BRAND/branding/brand.config.ts" ] || [ -f "/brands/$BRAND/branding/brand.config.mjs" ]; }; then \
       node /packages/branding/scripts/build-maintenance-branding.mjs "/brands/$BRAND/branding" /app && \
       echo "[maintenance] baked brand: $BRAND"; \
-    fi \
-    && rm -rf /brands
+    fi
 ENV NODE_ENV=development
 EXPOSE 3000
 CMD ["npx", "nuxt", "dev"]
@@ -64,14 +65,15 @@ FROM base AS build
 # ephemeral build stage. Pick the brand with `--build-arg BRAND=<name>` (a directory name under
 # deployment/configurations/); empty = vanilla ocelot.social.
 ARG BRAND=""
-COPY deployment/configurations/ /brands/
-RUN if [ -n "$BRAND" ] && { [ -f "/brands/$BRAND/branding/brand.config.ts" ] || [ -f "/brands/$BRAND/branding/brand.config.mjs" ]; }; then \
+# Bind-mount the brand configs only for THIS step (BuildKit) so no brand data lands in a build-stage
+# layer/cache — the generator writes the chosen brand into /app and reads nothing else afterwards.
+RUN --mount=type=bind,source=deployment/configurations,target=/brands \
+    if [ -n "$BRAND" ] && { [ -f "/brands/$BRAND/branding/brand.config.ts" ] || [ -f "/brands/$BRAND/branding/brand.config.mjs" ]; }; then \
       node /packages/branding/scripts/build-maintenance-branding.mjs "/brands/$BRAND/branding" /app && \
       echo "[maintenance] baked brand: $BRAND"; \
     else \
       echo "[maintenance] BRAND unset/unknown ('$BRAND') — vanilla ocelot.social"; \
     fi
-RUN rm -rf /brands
 
 # Legacy: external deploy repos that overlay via `FROM maintenance-build` using the OLD branding
 # layout (branding/static/ + constants/*.js). The `brandin[g]` glob makes each ONBUILD optional.
