@@ -38,7 +38,7 @@ WORKDIR /app
 COPY --from=ui-library ./app/ /packages/ui/
 COPY --from=branding-library ./app/ /packages/branding/
 # Where the running app reads brand archives (`<id>.tar.gz`) + the baked default marker (DEFAULT).
-# A branding build bakes them here (see the ONBUILD block); a vanilla image leaves it empty (→ the
+# A branded build (--build-arg BRAND=<name>) bakes them here; a vanilla image leaves it empty (→ the
 # app runs on framework defaults). Ops can override this to a mounted volume of archives.
 ENV OCELOT_BRANDING_ASSETS_DIR="/app/branding-assets"
 CMD ["/bin/bash", "-c", "yarn run start"]
@@ -47,38 +47,33 @@ FROM base AS development
 CMD ["/bin/bash", "-c", "yarn install && yarn run dev"]
 
 FROM base AS build
-# package.json-first: bake the dev-dependency install into the webapp-build base image
-# as its own cacheable layer (mirrors the test_build stage). Branding overlays are
-# build-time assets/config/locales only and never change dependencies, so node_modules
-# baked here stays valid for every downstream branding build — turning the per-build
-# ONBUILD install from a cold ~2min install into a fast integrity check.
+# package.json-first: cache the dev-dependency install as its own layer (branding is config/assets only
+# and never changes dependencies, so this layer stays valid across brands).
 COPY webapp/package.json webapp/yarn.lock ./
 COPY webapp/scripts ./scripts/
 RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 COPY webapp/ .
-# Runtime branding: copy the brand UNFLATTENED into /brand and bake its archive (+ DEFAULT marker) into
-# ./branding-assets, so the image ships this brand as its default theme WITHOUT rebuilding the bundle
-# per brand — colours/logos/title/OG/manifest/static pages/locales are all applied at runtime from the
-# archive. A vanilla build (no brand.config) skips this and stays vanilla.
-ONBUILD COPY webap[p]/brandin[g]/ /brand/
-ONBUILD COPY brandin[g]/ /brand/
-ONBUILD RUN if ls /brand/brand.config.* >/dev/null 2>&1; then \
-      node /packages/branding/scripts/build-brand-archive.mjs /brand ./branding-assets --default; \
-    else echo "[branding] no typed brand.config — runtime archive skipped (vanilla)"; fi
-# node_modules is baked above; with an unchanged lockfile this resolves in seconds
-# (integrity check), not a full reinstall. Kept as a guard in case a branding build
-# ever overrides dependencies (then --frozen-lockfile correctly forces a fresh install).
-ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
-    yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
-# Persist the webpack/babel cache (nuxt build.cache + babel cacheDirectory write to
-# node_modules/.cache) so incremental rebuilds on a durable builder reuse it.
-ONBUILD RUN --mount=type=cache,target=/app/node_modules/.cache,sharing=locked \
+# Branding baked at BUILD time from a brand's TYPED config under deployment/configurations/<BRAND>
+# (bind-mounted, so no brand data lands in a layer — and no ONBUILD / downstream `FROM webapp-build`
+# needed). build-brand-archive bakes <id>.tar.gz + a DEFAULT marker into ./branding-assets; the app
+# applies colours/logos/title/OG/manifest/static pages/locales AND the backend's e-mail/public overlays
+# at runtime from the archive. Pick the brand with `--build-arg BRAND=<name>`; empty = vanilla.
+ARG BRAND=""
+RUN --mount=type=bind,source=deployment/configurations,target=/brands \
+    if [ -n "$BRAND" ] && ls "/brands/$BRAND/branding/brand.config."* >/dev/null 2>&1; then \
+      node /packages/branding/scripts/build-brand-archive.mjs "/brands/$BRAND/branding" ./branding-assets --default && \
+      echo "[branding] baked brand: $BRAND"; \
+    else \
+      echo "[branding] BRAND unset/unknown ('$BRAND') — vanilla ocelot.social"; \
+    fi
+# Persist the webpack/babel cache (nuxt build.cache + babel cacheDirectory write to node_modules/.cache).
+RUN --mount=type=cache,target=/app/node_modules/.cache,sharing=locked \
     yarn run build
-ONBUILD RUN mkdir /build && \
+RUN mkdir /build && \
     cp -r ./.nuxt ./nuxt.config.js ./config ./constants ./static ./locales ./server-middleware ./package.json ./yarn.lock ./scripts /build && \
     if [ -d ./branding-assets ]; then cp -r ./branding-assets /build/branding-assets; fi
-ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
+RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     cd /build && yarn install --production=true --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 
 FROM base AS test_build
