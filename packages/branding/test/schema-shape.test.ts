@@ -3,10 +3,12 @@
 // paths + types + bucket partition) diverges from the committed snapshot — forcing a deliberate update
 // that is meant to accompany a feat(branding)/fix(branding) commit (→ release-please bumps the version).
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { test } from 'node:test'
 
-import { computeSchemaShape } from '../scripts/schema-snapshot.ts'
+import { computeSchemaShape, writeSnapshot } from '../scripts/schema-snapshot.ts'
 
 test('SCHEMA SHAPE LOCK: config shape matches the committed snapshot', () => {
   const committed = JSON.parse(
@@ -19,4 +21,14 @@ test('SCHEMA SHAPE LOCK: config shape matches the committed snapshot', () => {
       'was reassigned) — a COMPAT-relevant change. Do BOTH: (1) commit it as feat(branding)/fix(branding) ' +
       'so release-please bumps SCHEMA_VERSION, and (2) run `npm run schema:snapshot` to update this lock.',
   )
+})
+
+test('writeSnapshot serialises the current shape to the given file', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ocelot-snap-'))
+  try {
+    const out = writeSnapshot(join(dir, 'snap.json'))
+    assert.deepEqual(JSON.parse(readFileSync(out, 'utf8')), computeSchemaShape())
+  } finally {
+    rmSync(dir, { recursive: true, force: true })
+  }
 })

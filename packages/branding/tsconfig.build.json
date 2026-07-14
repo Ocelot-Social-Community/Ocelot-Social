@@ -9,7 +9,11 @@
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    // importHelpers → tsc emits `require('tslib')` for the `export *` interop helpers instead of inlining
+    // them. The inlined version has an `Object.create ? … : …` dead-code fallback that is unreachable in
+    // Node, which blocked 100% coverage of the compiled dist. tslib is excluded from coverage (node_modules).
+    "importHelpers": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["dist", "**/*.spec.ts"]
