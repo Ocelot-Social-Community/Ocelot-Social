@@ -47,8 +47,8 @@ export default {
       formSchema: {
         nonce: {
           type: 'string',
-          min: 5,
-          max: 5,
+          min: branding.registration.nonceLength,
+          max: branding.registration.nonceLength,
           required: true,
           message: this.$t('components.registration.email-nonce.form.validations.length', {
             nonceLength: branding.registration.nonceLength,
