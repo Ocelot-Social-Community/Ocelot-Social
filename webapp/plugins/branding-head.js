@@ -5,6 +5,16 @@
 // and CSS without a rebuild. (SSR keeps the default /favicon.ico; the client swaps to the brand's.)
 import { branding } from '@ocelot-social/branding'
 
+// Defense-in-depth against CSS injection: brand theme values are interpolated into a generated CSS
+// string (@font-face / :root). A value containing `'`, `;`, `{` or `}` could otherwise break out of the
+// string/rule block and inject arbitrary CSS (hide UI, phishing overlays). Brand configs are admin-
+// managed AND the package schema does NOT validate these free-form values (theme.cssVars is an open
+// map), so this strips the breakout characters here. Legit values (colors, `rgb()`, `10px`, `1px solid
+// red`, …) keep every character they need; only string/block delimiters are removed.
+const cssSafeValue = (value) => String(value).replace(/["'`;{}\\<>\r\n]/g, '')
+// A CSS custom-property / identifier name: letters, digits, hyphen only.
+const cssSafeIdent = (name) => String(name).replace(/[^a-zA-Z0-9-]/g, '')
+
 export default () => {
   if (typeof document === 'undefined') return
   const assets = branding.assets || {}
@@ -39,14 +49,16 @@ export default () => {
   if (Object.keys(cssVars).length || fontFaces.length) {
     const faces = fontFaces
       .map((f) => {
-        const format = f.format ? ` format('${f.format}')` : ''
-        const weight = f.weight ? ` font-weight: ${f.weight};` : ''
-        const style = f.style ? ` font-style: ${f.style};` : ''
-        return `@font-face { font-family: '${f.family}'; src: url('${f.src}')${format};${weight}${style} }`
+        const format = f.format ? ` format('${cssSafeValue(f.format)}')` : ''
+        const weight = f.weight ? ` font-weight: ${cssSafeValue(f.weight)};` : ''
+        const style = f.style ? ` font-style: ${cssSafeValue(f.style)};` : ''
+        return `@font-face { font-family: '${cssSafeValue(f.family)}'; src: url('${cssSafeValue(
+          f.src,
+        )}')${format};${weight}${style} }`
       })
       .join('\n')
     const vars = Object.entries(cssVars)
-      .map(([key, value]) => `--${key}: ${value};`)
+      .map(([key, value]) => `--${cssSafeIdent(key)}: ${cssSafeValue(value)};`)
       .join(' ')
     let style = document.getElementById('branding-theme')
     if (!style) {
