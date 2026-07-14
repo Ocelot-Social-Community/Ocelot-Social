@@ -1,0 +1,273 @@
+// The branding override schema — the typed contract between framework code and a brand.
+//
+// ALLOW-LIST: only keys here are brand-overridable. Framework-internal constants (editor type
+// ids, keycodes, GraphQL-enum mirrors, chat SCSS theme) are deliberately NOT here. Curation
+// criterion (see docu/branding-architecture-konzept.md, "Schicht A konkret"): a key belongs
+// here only if it is a per-network identity / UX / validation choice a brand operator would
+// plausibly change — not runtime admin governance (Policy) and not framework-internal wiring.
+//
+// "NOT SET" CONVENTION: `BrandingConfig` is the RESOLVED config — always complete (brandingDefaults +
+// a sparse override). So a settable value that can be absent / fall back is `T | null` (always present,
+// `null` = not set), NOT optional `?`. Author-sparseness is expressed solely by `BrandingOverrides`
+// (= DeepPartial<BrandingConfig>), never by `?` on the base type. → consumers check one way (`!= null`)
+// and never meet `undefined`. Optional `?` is reserved for the nested DATA shapes below, where it means
+// an either-or variant (MenuEntry: `path` XOR `url`; CustomButton) or a 3-state page override
+// (LinkPageOverride: absent = inherit, `null` = explicitly none) — a different concept from "unset".
+
+/** A single header-menu entry: either an internal `path` or an external `url` (+ target). */
+export interface MenuEntry {
+  nameIdent?: string
+  path?: string
+  url?: string
+  target?: '_blank' | '_self'
+}
+
+/** Optional custom button in the header menu. */
+export interface CustomButton {
+  iconPath?: string
+  iconWidth?: string
+  iconAltText?: string
+  toolTipIdent?: string
+  path?: string
+  url?: string
+  target?: '_blank' | '_self'
+}
+
+/** Click behaviour of the header logo: either an external link or an internal route. */
+export interface LogoClick {
+  externalLink: { url: string; target: '_blank' | '_self' } | null
+  internalPath?: { to: { name: string }; scrollTo?: string }
+}
+
+/**
+ * A webapp page-layout name (a file in `webapp/layouts/`), used for the auth pages (login /
+ * registration / password-reset). `error` is Nuxt's dedicated error layout, not a page choice, so it
+ * is excluded. Keep in sync with the layout files if the set changes.
+ */
+export type PageLayout = 'basic' | 'blank' | 'default' | 'no-header'
+
+/** The footer / static pages a brand can point at an external URL or re-order. */
+export type LinkPageKey =
+  | 'organization'
+  | 'donate'
+  | 'imprint'
+  | 'termsAndConditions'
+  | 'codeOfConduct'
+  | 'dataPrivacy'
+  | 'faq'
+  | 'support'
+
+/**
+ * A brand's sparse override for one static page. Only what differs from the framework page defaults
+ * (see webapp InternalPages, applied via `defaultPageParamsPages.X.overwrite(pages.x)`).
+ *
+ * Its fields are deliberately 3-STATE — `absent | null | value` are three distinct meanings, and the
+ * config merge (defineBranding's deep-merge) preserves them, so the webapp adapter can act on each:
+ *   • absent    → inherit the framework page default (a sparse override doesn't touch this field);
+ *   • `null`    → explicitly clear it (e.g. `externalLink: null` forces the INTERNAL page, overriding a
+ *                 default external link);
+ *   • a value   → set it (e.g. an `{ url, target }` external link, or an override ident).
+ * This is why these use optional `?` AND `| null` — NOT the `T | null` scalar convention of the resolved
+ * BrandingConfig (see the file header); an override shape genuinely needs the third "inherit" state.
+ */
+export interface LinkPageOverride {
+  externalLink?: { url: string; target: '_blank' | '_self' } | null
+  internalPage?: {
+    footerIdent?: string | null
+    headTitleIdent?: string | null
+    headlineIdent?: string | null
+    hasContainer?: boolean
+    hasBaseCard?: boolean
+    hasLoginInHeader?: boolean
+  }
+}
+
+export interface BrandingConfig {
+  /**
+   * Metadata ABOUT this branding itself (not the app identity) — shown in the admin Branding
+   * detail view so an operator can tell brands apart and knows what they may reuse.
+   */
+  about: {
+    /** Short human description of this branding / theme. */
+    description: string
+    /**
+     * Reuse settings for this branding's assets. NOT a legal document — a quick operator-facing
+     * hint answering "may I reuse this brand's logos / colours in a derived brand?". A brand that
+     * wants to state conditions puts them in `note`.
+     */
+    license: {
+      /** May this branding's logos be reused elsewhere? */
+      logosReusable: boolean
+      /** May this branding's colours / theme be reused elsewhere? */
+      colorsReusable: boolean
+      /** Optional free-text note (attribution, conditions) — still not a legal text. */
+      note: string
+    }
+  }
+  /**
+   * Runtime theme: CSS custom properties + web fonts injected on :root at runtime, so a brand's
+   * colours and fonts apply on a live switch WITHOUT rebuilding the webapp image. Both the webapp
+   * (once its brandable SCSS tokens read `var(--…)`) and packages/ui (already reads `var(--color-*)`)
+   * pick these up. The framework default is empty (vanilla keeps its built-in theme). See
+   * docu/branding-architecture-konzept.md (theme layer).
+   */
+  theme: {
+    /**
+     * `--custom-property` overrides applied to :root, keyed WITHOUT the leading `--`
+     * (e.g. { 'color-primary': 'rgb(110,139,135)', 'font-family-text': 'Overpass, sans-serif' }).
+     * A brand supplies the full palette it wants to change (base + shades); shades it omits keep the
+     * framework default value.
+     */
+    cssVars: Record<string, string>
+    /**
+     * @font-face declarations to make brand fonts available at runtime. `src` is a path into the
+     * brand's served assets folder (namespaced like other asset paths), e.g.
+     * 'assets/fonts/Overpass.ttf'.
+     */
+    fontFaces: Array<{
+      family: string
+      src: string
+      weight?: string
+      style?: string
+      format?: string
+    }>
+  }
+  group: {
+    nameLengthMin: number
+    nameLengthMax: number
+    descriptionMinLength: number
+    descriptionExcerptLength: number
+  }
+  registration: {
+    nonceLength: number
+    inviteCodeLength: number
+    layout: PageLayout
+  }
+  login: {
+    layout: PageLayout
+  }
+  comment: {
+    minLength: number
+    maxUntruncatedLength: number
+    truncateToLength: number
+  }
+  dateTime: {
+    relativeDateTime: boolean
+    /**
+     * Absolute timestamp format — a date-fns format-token string (e.g. `P` = localized short date,
+     * `PPpp` = long date + time), consumed by the webapp `DateTime` component via date-fns `format`.
+     * An OPEN vocabulary (any token string), so deliberately `string` and not a union.
+     */
+    absoluteDateTimeFormat: string
+  }
+  metadata: {
+    // NOTE: no brand `version` here — the brand's version lives ONLY in the archive manifest
+    // (manifest.version, from the brand's package.json), surfaced in the admin Branding tab. Injecting
+    // it into metadata would make the identity bucket always look "customised", breaking partial-package
+    // detection (see scripts/lib/build-brandings.mjs).
+    applicationName: string
+    applicationShortName: string
+    applicationDescription: string
+    organizationName: string
+    organizationJurisdiction: string
+    /** Auth cookie name (webapp apollo + auth store). */
+    cookieName: string
+    // NOTE: no `themeColor` — the browser-chrome / PWA theme_color is the `color-primary` theme token
+    // (see theme.ts resolveThemeColor). It used to be a metadata field carved into the theme bucket,
+    // which broke for partial packages providing identity but not theme.
+    /** Open Graph image (link previews). Path is asset-coupled (served from static/). */
+    ogImage: string
+    ogImageAlt: string
+    ogImageWidth: string
+    ogImageHeight: string
+    ogImageType: string
+  }
+  logos: {
+    headerPath: string
+    /** Tablet header logo; `null` → fall back to the desktop `headerPath`. */
+    headerTabletPath: string | null
+    headerMobilePath: string
+    headerWidth: string
+    /** Tablet header width; `null` → fall back to `headerWidth`. */
+    headerTabletWidth: string | null
+    headerMobileWidth: string
+    headerClick: LogoClick
+    signupPath: string
+    /** Welcome logo, also embedded in e-mails (backend). */
+    welcomePath: string
+    logoutPath: string
+    passwordResetPath: string
+  }
+  headerMenu: {
+    customButton: CustomButton
+    menu: MenuEntry[]
+  }
+  donation: {
+    progressBarColorType: 'gradient' | 'uni'
+  }
+  badges: {
+    /** Maximum number of trophy badges a user may select for display. */
+    trophyBadgesSelectedMax: number
+  }
+  category: {
+    /** Min / max number of categories required on a post / group. (The category LIST itself is
+     * seeded to the DB per brand, not part of this config.) */
+    min: number
+    max: number
+  }
+  links: {
+    /** Route (or external URL) the landing page redirects to, e.g. '/login'. */
+    landingPage: string
+    /** Per static-page overrides (raw data; the webapp's ~/constants/links adapter builds the
+     * PageParams from these via InternalPages). */
+    pages: Record<LinkPageKey, LinkPageOverride>
+    /** Static pages shown in the footer, in order. */
+    footerOrder: LinkPageKey[]
+  }
+  termsAndConditions: {
+    /** Current T&C version; bumped when the terms change to force re-acceptance. */
+    version: string
+  }
+  /**
+   * Per-locale translation overrides, merged OVER the app's base strings at runtime (webapp i18n
+   * plugin). Keyed by locale code ('de', 'en', …); each value is a nested translation tree (open
+   * shape, so not strongly typed). A brand ships only the strings it changes. Because it rides in
+   * the branding config, it is injected + serialised to the client with everything else — no
+   * separate runtime locale-file mechanism, no rebuild. See docu/branding-architecture-konzept.md.
+   *
+   * AUTHORING: a brand may declare these inline here, OR ship conventional JSON files in its brand dir —
+   * `locales/<code>.json` (whole locale) and/or `locales/<code>/<feature>.json` (MODULAR: a locale split
+   * into per-feature namespace files, all merged so a feature owns its slice). The build reads and
+   * deep-merges them (file wins per leaf); see scripts/lib/build-brandings.ts `loadLocaleFiles`. Either
+   * way the runtime shape is identical — modularity is authoring-only, not runtime tree-shaking.
+   */
+  locales: Record<string, Record<string, unknown>>
+  /**
+   * References into the brand's ONE served assets folder (`<brand>/assets/`, served at
+   * `/branding/<brand>/…`). All content links a brand ships are defined here as data. Paths are
+   * written by the brand relative to its assets folder; the build namespaces them to
+   * `/branding/<brand>/…` so multiple brands never collide. (Logo & OG-image paths in `logos` /
+   * `metadata.ogImage` are asset paths too and are namespaced the same way.)
+   */
+  assets: {
+    /** Extra stylesheets, injected as <link> at runtime (CSS custom properties, fonts via
+     * @font-face pointing at files in the same served folder), e.g. ['css/custom.css']. */
+    css: string[]
+    /** Static-page HTML per page per locale code, e.g. `html.imprint.de = 'html/de/imprint.html'`.
+     * Loaded at runtime by the InternalPage view (replaces the build-bundled html i18n). */
+    html: Partial<Record<LinkPageKey, Record<string, string>>>
+    /** Favicon path, e.g. 'favicon.ico'. */
+    favicon: string | null
+  }
+}
+
+/** A recursive partial — a brand override is sparse, supplying only the keys it changes. */
+export type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends Array<infer U>
+    ? Array<U>
+    : T[P] extends object
+      ? DeepPartial<T[P]>
+      : T[P]
+}
+
+export type BrandingOverrides = DeepPartial<BrandingConfig>
