@@ -1,0 +1,88 @@
+name: Branding Build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+# Least privilege. pull-requests:read is required by dorny/paths-filter, which lists a PR's changed
+# files via the API (the fetch-depth:1 checkout has no base history for a local diff).
+permissions:
+  contents: read
+  pull-requests: read
+
+defaults:
+  run:
+    working-directory: packages/branding
+
+jobs:
+  files-changed:
+    name: Detect File Changes
+    runs-on: ubuntu-latest
+    outputs:
+      branding: ${{ steps.changes.outputs.branding }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Check for file changes
+        uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4.0.1
+        id: changes
+        with:
+          token: ${{ github.token }}
+          filters: .github/file-filters.yml
+
+  build:
+    name: Build
+    if: needs.files-changed.outputs.branding == 'true'
+    needs: files-changed
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: 'packages/branding/.tool-versions'
+          cache: 'npm'
+          cache-dependency-path: packages/branding/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (CommonJS dist + .d.ts)
+        run: npm run build
+
+      - name: Verify build output
+        run: |
+          echo "Checking build output..."
+          FILES=(
+            "dist/index.js"
+            "dist/index.d.ts"
+            "dist/discover.js"
+            "dist/tar.js"
+            "dist/buckets.js"
+            "dist/schema.d.ts"
+          )
+          for file in "${FILES[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "::error::Missing required file: $file"
+              exit 1
+            fi
+            echo "✓ $file"
+          done
+          echo "All build outputs verified!"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: branding-dist
+          path: packages/branding/dist/
+          retention-days: 7

@@ -1,0 +1,63 @@
+name: Branding Test
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+# Least privilege. pull-requests:read is required by dorny/paths-filter, which lists a PR's changed
+# files via the API (the fetch-depth:1 checkout has no base history for a local diff).
+permissions:
+  contents: read
+  pull-requests: read
+
+defaults:
+  run:
+    working-directory: packages/branding
+
+jobs:
+  files-changed:
+    name: Detect File Changes
+    runs-on: ubuntu-latest
+    outputs:
+      branding: ${{ steps.changes.outputs.branding }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Check for file changes
+        uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4.0.1
+        id: changes
+        with:
+          token: ${{ github.token }}
+          filters: .github/file-filters.yml
+
+  test:
+    name: Unit Tests (node --test, coverage-gated)
+    if: needs.files-changed.outputs.branding == 'true'
+    needs: files-changed
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: 'packages/branding/.tool-versions'
+          cache: 'npm'
+          cache-dependency-path: packages/branding/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Builds the CJS dist, then runs the .mts tests via Node type-stripping with the coverage gate
+      # (--test-coverage-lines/functions/branches). Requires Node >= 23 (see .tool-versions).
+      - name: Run tests with coverage
+        run: npm run test:coverage

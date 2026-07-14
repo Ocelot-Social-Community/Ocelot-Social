@@ -1,0 +1,8 @@
+# Dependencies
+node_modules/
+
+# Build output (generated from src/ by `tsc`; built in CI/Docker + on install via `prepare`)
+dist/
+
+# OS
+.DS_Store
