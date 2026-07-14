@@ -901,6 +901,7 @@
       "slug": "Eindeutiger Name"
     },
     "membersCount": "Mitglied ::: Mitglieder",
+    "membersListNoFilterResults": "Keine Mitglieder gefunden",
     "membersListNotVisibleToNonMembers": "Nicht-Mitglieder können diese Liste nicht sehen.",
     "membersListTitle": "Gruppenmitglieder",
     "membersListTitleNotAllowedSeeingGroupMembers": "Gruppenmitglieder unsichtbar",
@@ -922,6 +923,7 @@
     "role": "Deine Rolle in der Gruppe",
     "roles": {
       "admin": "Administrator",
+      "members": "Mitglieder",
       "owner": "Inhaber",
       "pending": "Ausstehendes Mitglied",
       "usual": "Mitglied"
@@ -1261,6 +1263,7 @@
       "hidden": "Geheime Gruppen",
       "hiddenFromOthers": "für andere verborgen",
       "nobody": "keine Gruppen",
+      "noFilterResults": "Keine Gruppen für diesen Filter gefunden.",
       "other": "Gruppen ohne mich",
       "public": "Öffentliche Gruppen",
       "shared": "Gemeinsame Gruppen",
@@ -1278,6 +1281,7 @@
       "followedByNobody": "wird von niemandem gefolgt.",
       "following": "folgt",
       "followingNobody": "folgt niemandem.",
+      "followNoFilterResults": "Keine Nutzer für diesen Filter gefunden.",
       "title": "Netzwerk"
     },
     "shouted": "Empfohlen",

@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [master]
 
+# Least privilege. pull-requests:read is required by dorny/paths-filter, which lists a PR's changed
+# files via the API (the fetch-depth:1 checkout has no base history for a local diff).
+permissions:
+  contents: read
+  pull-requests: read
+
 defaults:
   run:
     working-directory: packages/branding
@@ -19,6 +25,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Check for file changes
         uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4.0.1
@@ -36,6 +44,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v6

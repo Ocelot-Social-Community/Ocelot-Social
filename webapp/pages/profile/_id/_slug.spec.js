@@ -15,6 +15,7 @@ const stubs = {
   'v-popover': true,
   'nuxt-link': true,
   'follow-list': true,
+  'group-member-list': { template: '<div class="group-member-list"></div>' },
   'router-link': true,
 }
 

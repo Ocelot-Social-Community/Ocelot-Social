@@ -37,6 +37,15 @@ export default {
       isHovering: false,
     }
   },
+  watch: {
+    showPopover(enabled) {
+      if (!enabled) {
+        this.isHovering = false
+        this.clearHoverTimer()
+        this.closeMenu()
+      }
+    },
+  },
   methods: {
     handleMouseEnter() {
       if (!this.showPopover) return

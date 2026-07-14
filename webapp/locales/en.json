@@ -901,6 +901,7 @@
       "slug": "Unique name"
     },
     "membersCount": "Member ::: Members",
+    "membersListNoFilterResults": "No members found",
     "membersListNotVisibleToNonMembers": "Non-members cannot see this list.",
     "membersListTitle": "Group Members",
     "membersListTitleNotAllowedSeeingGroupMembers": "Group Members invisible",
@@ -922,6 +923,7 @@
     "role": "Your role in the group",
     "roles": {
       "admin": "Administrator",
+      "members": "Members",
       "owner": "Owner",
       "pending": "Pending Member",
       "usual": "Member"
@@ -1261,6 +1263,7 @@
       "hidden": "Secret groups",
       "hiddenFromOthers": "hidden from others",
       "nobody": "no groups",
+      "noFilterResults": "No groups found for this filter.",
       "other": "Groups without me",
       "public": "Public groups",
       "shared": "Shared groups",
@@ -1278,6 +1281,7 @@
       "followedByNobody": "is not followed by anyone.",
       "following": "is following",
       "followingNobody": "follows nobody.",
+      "followNoFilterResults": "No users found for this filter.",
       "title": "Network"
     },
     "shouted": "Shouted",

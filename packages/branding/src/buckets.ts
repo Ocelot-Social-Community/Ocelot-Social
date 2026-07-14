@@ -11,7 +11,7 @@
 // Pure (no node deps) so both webapp and backend — and the admin composition UI — can import it.
 
 import { brandingDefaults } from './defaults.js'
-import { clone, isPlainObject } from './internal.js'
+import { clone, isForbiddenMergeKey, isPlainObject } from './internal.js'
 
 import type { BrandingConfig, DeepPartial } from './schema.js'
 
@@ -155,14 +155,16 @@ export function bucketOfPath(path: string): BucketName | null {
 
 // Deep-merge `patch` INTO `target` (nested plain objects merge; everything else replaces). Used for
 // the cross-cutting `locales` layer, which accumulates from every source rather than being replaced.
-// NOTE: deliberately IN-PLACE and clones incoming values (so the accumulator never aliases a source
-// config). This differs from internal.ts's immutable `deepMerge` (fresh object, shares patch refs) —
-// two contracts, not an accidental duplicate; `clone`/`isPlainObject` are shared from internal.ts.
+// NOTE: deliberately IN-PLACE (so it can accumulate the locales layer across sources), whereas
+// internal.ts's `deepMerge` returns a fresh object. Both CLONE incoming values so neither aliases a
+// source — two contracts (in-place vs immutable), not an accidental duplicate; `clone`/`isPlainObject`
+// are shared from internal.ts.
 function deepMergeInto(
   target: Record<string, unknown>,
   patch: Record<string, unknown>,
 ): Record<string, unknown> {
   for (const key of Object.keys(patch)) {
+    if (isForbiddenMergeKey(key)) continue // prototype-pollution guard
     const patchValue = patch[key]
     const targetValue = target[key]
     if (isPlainObject(targetValue) && isPlainObject(patchValue)) {
@@ -211,7 +213,19 @@ export function composeConfig(
     const source = bucketSources[bucket]
     if (!source) continue // no source for this bucket → keep the framework default
     const value = getPath(source, path)
-    if (value !== undefined) setPath(result, path, clone(value))
+    if (value === undefined) continue
+    // A plain-object owned value is MERGED onto the default subtree so a source that only carries some
+    // sibling leaves (a sparse fragment) doesn't wipe the defaults for the rest — e.g. a navigation
+    // source with just `headerMenu.menu` keeps the default `headerMenu.customButton`. The build's
+    // fragments are full (defineBranding merges defaults first), for which merge == replace; this only
+    // matters for hand-composed / future sparse sources. Arrays & scalars still replace wholesale — a
+    // brand replacing a menu / footer list wants the whole list, not an element-wise merge.
+    const current = getPath(result, path)
+    if (isPlainObject(current) && isPlainObject(value)) {
+      deepMergeInto(current, value)
+    } else {
+      setPath(result, path, clone(value))
+    }
   }
   // Cross-cutting locales: merge (not replace) every source's strings on top of the defaults. The
   // defaults always carry a `locales` object, so this is present (cloned from brandingDefaults).

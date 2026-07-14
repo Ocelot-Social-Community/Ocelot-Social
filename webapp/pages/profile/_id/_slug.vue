@@ -135,17 +135,19 @@
           {{ $t('profile.network.title') }}
         </h3>
         <follow-list
-          :loading="$apollo.loading"
-          :user="user"
+          ref="followListFollowedBy"
+          v-if="user && user.id"
+          :user-id="user.id"
+          :user-name="userName"
           type="followedBy"
-          @fetchAllConnections="fetchAllConnections"
         />
         <div class="ds-mb-large"></div>
         <follow-list
-          :loading="$apollo.loading"
-          :user="user"
+          ref="followListFollowing"
+          v-if="user && user.id"
+          :user-id="user.id"
+          :user-name="userName"
           type="following"
-          @fetchAllConnections="fetchAllConnections"
         />
         <div class="ds-mb-large"></div>
         <group-member-list
@@ -303,7 +305,7 @@ import postListActions from '~/mixins/postListActions'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 import { useFollowUser } from '~/composables/useFollowUser'
 import HcBadges from '~/components/Badges.vue'
-import FollowList, { followListVisibleCount } from '~/components/features/ProfileList/FollowList'
+import FollowList from '~/components/features/ProfileList/FollowList'
 import GroupMemberList from '~/components/features/ProfileList/GroupMemberList'
 import HcEmpty from '~/components/Empty/Empty'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
@@ -395,8 +397,6 @@ export default {
       pageSize: 6,
       tabActive: 'post',
       filter,
-      followedByCount: followListVisibleCount,
-      followingCount: followListVisibleCount,
       updateUserMutation,
       showDeleteModal: false,
       deleteUserData: null,
@@ -592,14 +592,11 @@ export default {
       this.followHovered = false
       this.followLoading = true
 
-      // optimistic update
-      const currentUser = this.$store.getters['auth/user']
+      // optimistic update — only fields loaded by profileUserQuery
       if (follow) {
         this.user.followedByCount++
-        this.user.followedBy = [currentUser, ...this.user.followedBy]
       } else {
         this.user.followedByCount--
-        this.user.followedBy = this.user.followedBy.filter((u) => u.id !== currentUser.id)
       }
       this.user.followedByCurrentUser = follow
 
@@ -610,24 +607,19 @@ export default {
       if (success) {
         this.user.followedByCount = data.followedByCount
         this.user.followedByCurrentUser = data.followedByCurrentUser
-        this.user.followedBy = data.followedBy
+        this.$refs.followListFollowedBy?.loadConnections(0)
+        this.$refs.followListFollowing?.loadConnections(0)
       } else {
         // rollback optimistic update
         this.$toast.error(this.$t('followButton.error'))
         this.user.followedByCurrentUser = !follow
         if (follow) {
           this.user.followedByCount--
-          this.user.followedBy = this.user.followedBy.filter((u) => u.id !== currentUser.id)
         } else {
           this.user.followedByCount++
-          this.user.followedBy = [currentUser, ...this.user.followedBy]
         }
       }
       this.followLoading = false
-    },
-    fetchAllConnections(type, count) {
-      if (type === 'following') this.followingCount = count
-      if (type === 'followedBy') this.followedByCount = count
     },
     showOrChangeChat(userId) {
       if (this.getShowChat.showChat && this.getShowChat.chatUserId === userId) {
@@ -662,8 +654,6 @@ export default {
       variables() {
         return {
           id: this.$route.params.id,
-          followedByCount: this.followedByCount,
-          followingCount: this.followingCount,
         }
       },
       fetchPolicy: 'cache-and-network',

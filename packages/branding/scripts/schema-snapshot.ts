@@ -8,7 +8,7 @@
 // Deliberately EXCLUDES default VALUES — a value change (e.g. group.nameLengthMax 50→60) is not a shape
 // change and does not affect compat; only add/remove/rename/retype of a field, or a bucket reassignment.
 import { writeFileSync } from 'node:fs'
-import { fileURLToPath, pathToFileURL } from 'node:url'
+import { fileURLToPath } from 'node:url'
 
 import { BUCKET_PATHS } from '../dist/buckets.js'
 import { brandingDefaults } from '../dist/defaults.js'
@@ -40,9 +40,11 @@ export function computeSchemaShape(): SchemaShape {
   return { leaves, buckets: BUCKET_PATHS }
 }
 
-// When run directly (`node scripts/schema-snapshot.ts`): (re)write the committed snapshot.
-if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
-  const out = fileURLToPath(new URL('../test/schema-shape.snapshot.json', import.meta.url))
+/** Write the schema-shape snapshot JSON (defaults to the committed test fixture). The CLI runner lives
+ *  in schema-snapshot.run.ts. */
+export function writeSnapshot(outPath?: string): string {
+  const out =
+    outPath ?? fileURLToPath(new URL('../test/schema-shape.snapshot.json', import.meta.url))
   writeFileSync(out, `${JSON.stringify(computeSchemaShape(), null, 2)}\n`)
-  console.log(`wrote ${out}`)
+  return out
 }

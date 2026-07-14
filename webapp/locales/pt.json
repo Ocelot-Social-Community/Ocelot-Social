@@ -848,6 +848,7 @@
       "slug": "Nome único"
     },
     "membersCount": "Membro ::: Membros",
+    "membersListNoFilterResults": "Nenhum membro encontrado",
     "membersListNotVisibleToNonMembers": "Não-membros não podem ver esta lista.",
     "membersListTitle": "Membros do grupo",
     "membersListTitleNotAllowedSeeingGroupMembers": "Membros do grupo invisíveis",
@@ -869,6 +870,7 @@
     "role": "Seu papel no grupo",
     "roles": {
       "admin": "Administrador",
+      "members": "Membros",
       "owner": "Proprietário",
       "pending": "Membro pendente",
       "usual": "Membro"
@@ -1208,6 +1210,7 @@
       "hidden": "Secret groups",
       "hiddenFromOthers": "hidden from others",
       "nobody": "no groups",
+      "noFilterResults": "Nenhum grupo encontrado para este filtro.",
       "other": "Grupos sem mim",
       "public": "Public groups",
       "shared": "Grupos compartilhados",
@@ -1225,6 +1228,7 @@
       "followedByNobody": "não é seguido por ninguém.",
       "following": "está seguindo",
       "followingNobody": "não segue ninguém.",
+      "followNoFilterResults": "Nenhum usuário encontrado para este filtro.",
       "title": "Rede"
     },
     "shouted": "Aclamou",

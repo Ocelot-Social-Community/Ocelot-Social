@@ -848,6 +848,7 @@
       "slug": "Nombre único"
     },
     "membersCount": "Miembro ::: Miembros",
+    "membersListNoFilterResults": "No se encontraron miembros",
     "membersListNotVisibleToNonMembers": "Los no miembros no pueden ver esta lista.",
     "membersListTitle": "Miembros del grupo",
     "membersListTitleNotAllowedSeeingGroupMembers": "Miembros del grupo invisibles",
@@ -869,6 +870,7 @@
     "role": "Tu rol en el grupo",
     "roles": {
       "admin": "Administrador",
+      "members": "Miembros",
       "owner": "Propietario",
       "pending": "Miembro pendiente",
       "usual": "Miembro"
@@ -1208,6 +1210,7 @@
       "hidden": "Grupos secretos",
       "hiddenFromOthers": "oculto para los demás",
       "nobody": "sin grupos",
+      "noFilterResults": "No se encontraron grupos para este filtro.",
       "other": "Grupos sin mí",
       "public": "Grupos públicos",
       "shared": "Grupos compartidos",
@@ -1225,6 +1228,7 @@
       "followedByNobody": "no es seguido por nadie.",
       "following": "está siguiendo",
       "followingNobody": "no sigue a nadie.",
+      "followNoFilterResults": "No se encontraron usuarios para este filtro.",
       "title": "Red"
     },
     "shouted": "Recomendado",

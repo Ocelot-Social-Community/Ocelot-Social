@@ -965,6 +965,401 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       variables: { groupId: 'g15', userId: 'u6', roleInGroup: 'usual' },
     })
 
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g16',
+        name: 'pack&satt – der Einpott',
+        about: 'Bio-vegane Fertigmahlzeit in Papierverpackung: satt in 5 Minuten, überall.',
+        description: `<h3>Was ist pack&satt?</h3><p>Der Einpott macht dich in 5 Minuten satt – egal ob im Büro, unterwegs oder zu Hause. Alles bio, alles vegan, alles in Papier verpackt.</p><h3>Unser Ansatz</h3><p>Nachhaltige Ernährung muss praktisch sein. Wir verzichten auf Plastik und setzen auf regionale Bio-Zutaten. Der Einpott ist fertig in wenigen Minuten und hinterlässt keine ökologische Schuld.</p>`,
+        groupType: 'public',
+        actionRadius: 'national',
+        categoryIds: ['cat12', 'cat14', 'cat9'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g16', userId: 'u4' } })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g16', userId: 'u4', roleInGroup: 'usual' },
+    })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g17',
+        name: 'Ocelot.Social – Plattform',
+        about:
+          'Freie Open-Source-Plattform für selbstverwaltete soziale Netzwerke von Gruppen und Initiativen.',
+        description: `<h3>Was ist Ocelot.Social?</h3><p>Ocelot.Social ist eine freie Open-Source-Plattform, die es Gruppen und Initiativen ermöglicht, eigene soziale Netzwerke zu betreiben – selbstgehostet, transparent und unabhängig von kommerziellen Anbietern.</p><h3>Unsere Werte</h3><p>Digitale Souveränität, Datenschutz und demokratische Strukturen stehen im Mittelpunkt. Der Code ist öffentlich zugänglich, die Weiterentwicklung erfolgt kollaborativ.</p>`,
+        groupType: 'public',
+        actionRadius: 'global',
+        categoryIds: ['cat15', 'cat0', 'cat13'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g17', userId: 'u1' } })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g17', userId: 'u4' } })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g17', userId: 'u1', roleInGroup: 'admin' },
+    })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g17', userId: 'u4', roleInGroup: 'usual' },
+    })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g18',
+        name: 'Die Regionalgesellschaft',
+        about: 'Erfahrungsaustausch für Energiewendedörfer und erfolgreiche Regionalprojekte.',
+        description: `<h3>Peter Schmucks Regionalgesellschaft</h3><p>In dieser Initiative werden Erfahrungen rund um Energiewendedörfer und erfolgreiche regionale Projekte geteilt. Der Fokus liegt auf dem praktischen Erfahrungsaustausch zwischen Gemeinden, die Energie- und Versorgungsprojekte umsetzen.</p><h3>Aktivitäten</h3><p>Regelmäßige Treffen, Vorträge und Exkursionen in Modellregionen. Ziel ist die Übertragbarkeit gelungener Projekte auf andere Gemeinschaften.</p>`,
+        groupType: 'public',
+        actionRadius: 'national',
+        categoryIds: ['cat2', 'cat9', 'cat0'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g18', userId: 'u5' } })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g18', userId: 'u5', roleInGroup: 'usual' },
+    })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g19',
+        name: 'Geflügelhof Schubert',
+        about:
+          'Bio-Lebensmittel – ursprünglich, biologisch und regional aus bäuerlicher Landwirtschaft.',
+        description: `<h3>Unsere Philosophie</h3><p>Der Geflügelhof Schubert steht für „ursprünglich, biologisch und regional". Artgerechte Haltung, kurze Transportwege und transparente Produktion sind keine Versprechen, sondern gelebte Praxis.</p><h3>Produkte</h3><p>Freilandeier, Geflügel und saisonale Bio-Produkte direkt vom Hof. Einkauf ab Hof und regionale Lieferung für Gemeinschaftsinitiativen.</p>`,
+        groupType: 'public',
+        actionRadius: 'regional',
+        categoryIds: ['cat12', 'cat9'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g19', userId: 'u6' } })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g19', userId: 'u6', roleInGroup: 'usual' },
+    })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g20',
+        name: 'Menschliche Werte Medien',
+        about:
+          'Alternatives Mediennetzwerk für gemeinschaftsorientierte Inhalte und Netzwerkjournalismus.',
+        description: `<h3>MWM – Menschliche Werte Medien</h3><p>Ein alternatives Mediennetzwerk, das Netzwerkjournalisten und gemeinschaftsorientierte Inhalte verbindet. Die MWM-Onlinezeitung veröffentlicht Beiträge aus der Perspektive einer menschlicheren Wirtschaft.</p><h3>Mitmachen</h3><p>Autorinnen und Autoren, die über Initiativen, Projekte und Persönlichkeiten aus dem Umfeld von Menschlich Wirtschaften berichten möchten, sind herzlich eingeladen.</p>`,
+        groupType: 'closed',
+        actionRadius: 'national',
+        categoryIds: ['cat15', 'cat11'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g20', userId: 'u1' } })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g20', userId: 'u5' } })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g20', userId: 'u1', roleInGroup: 'usual' },
+    })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g20', userId: 'u5', roleInGroup: 'usual' },
+    })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g21',
+        name: 'Natürlich gesund!',
+        about:
+          'Forum für Gesundheitskultur mit Expertenvorträgen und Austausch zu ganzheitlichem Wohlbefinden.',
+        description: `<h3>Die Initiative</h3><p>„Natürlich gesund!" ist ein Forum, das Expertenvorträge und offene Diskussionen zu ganzheitlicher Gesundheitskultur anbietet. Im Mittelpunkt stehen natürliche Heilmethoden, Prävention und das Zusammenspiel von Körper, Geist und Seele.</p><h3>Angebote</h3><p>Regelmäßige Vortragsabende, Workshops und Gesprächsrunden mit Heilpraktikerinnen, Ärzten und Forschenden aus dem Bereich integrativer Medizin.</p>`,
+        groupType: 'public',
+        actionRadius: 'regional',
+        categoryIds: ['cat14', 'cat16'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g21', userId: 'u4' } })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g21', userId: 'u6' } })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g21', userId: 'u4', roleInGroup: 'usual' },
+    })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g21', userId: 'u6', roleInGroup: 'usual' },
+    })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g22',
+        name: 'Unsere kleine Burderei',
+        about:
+          'Tiere stärken Menschen – tiergestützte Persönlichkeitsentwicklung für Kinder und Erwachsene.',
+        description: `<h3>Tiere stärken Menschen</h3><p>Die „kleine Burderei" verbindet Menschen mit Tieren, um persönliche Stärken zu entfalten. Im Zentrum stehen tiergestützte Angebote für Kinder, Jugendliche und Erwachsene in Bereichen wie Selbstvertrauen, Teamfähigkeit und emotionale Resilienz.</p><h3>Programm</h3><p>Einzel- und Gruppenangebote mit Eseln, Ziegen und anderen Hoftieren. Die Tiere spiegeln ohne Urteil – und helfen dabei, zu sich selbst zu finden.</p>`,
+        groupType: 'public',
+        actionRadius: 'regional',
+        categoryIds: ['cat3', 'cat7'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g22', userId: 'u4' } })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g22', userId: 'u4', roleInGroup: 'usual' },
+    })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g23',
+        name: 'Naturwahrnehmung & Gemeinschaftsbildung',
+        about:
+          'Ausbildung für naturverbundene Gärten und Landschaften durch sinnliche Wahrnehmung.',
+        description: `<h3>Über die Initiative</h3><p>Dieses Angebot verbindet Naturwahrnehmung mit Gemeinschaftsbildung. In Ausbildungskursen lernen Teilnehmende, naturverbundene Gärten und Landschaften durch sinnliche Erfahrung zu gestalten und zu beleben.</p><h3>Inhalte</h3><p>Phänomenologisches Beobachten in der Natur, Pflanzenwahrnehmung, gemeinschaftliche Gestaltungsprozesse und die Verbindung von innerem Erleben und äußerer Landschaftsgestaltung.</p>`,
+        groupType: 'closed',
+        actionRadius: 'national',
+        categoryIds: ['cat12', 'cat3', 'cat1'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g23', userId: 'u5' } })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g23', userId: 'u5', roleInGroup: 'usual' },
+    })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g24',
+        name: 'Konstitutionstherapie',
+        about: 'Ganzheitliche Heilkunde mit Planetenmetallen: Akademie und Vortragsreihe.',
+        description: `<h3>Was ist Konstitutionstherapie?</h3><p>Die Konstitutionstherapie verbindet traditionelles Heilwissen mit modernen ganzheitlichen Ansätzen. Im Mittelpunkt stehen die sieben Planetenmetalle der klassischen Alchemie und ihre Bedeutung für Körper, Seele und Geist.</p><h3>Akademie & Vorträge</h3><p>Regelmäßige Vortragsreihen und Ausbildungsangebote für Heilpraktikerinnen, Therapeuten und Interessierte. Ziel ist die Erneuerung einer umfassenden Heilkultur.</p>`,
+        groupType: 'public',
+        actionRadius: 'national',
+        categoryIds: ['cat14', 'cat16'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g24', userId: 'u4' } })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g24', userId: 'u4', roleInGroup: 'usual' },
+    })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g25',
+        name: 'Aufgabe Führung',
+        about: 'Führungskräfteentwicklung mit Selbstführung als Grundlage wirksamer Organisation.',
+        description: `<h3>Die Initiative</h3><p>„Aufgabe Führung" ist ein Ausbildungs- und Beratungsangebot für Menschen in Führungspositionen. Kernthese: Wirksame Führung beginnt mit der Fähigkeit zur Selbstführung.</p><h3>Inhalte</h3><p>Workshops und Coachings zu Selbstwahrnehmung, Kommunikation, Entscheidungskultur und der Frage, was Führung in einer sich wandelnden Welt bedeutet. Der Ansatz verbindet systemisches Denken mit persönlicher Reifung.</p>`,
+        groupType: 'closed',
+        actionRadius: 'national',
+        categoryIds: ['cat3', 'cat0'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g25', userId: 'u1' } })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g25', userId: 'u5' } })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g25', userId: 'u1', roleInGroup: 'usual' },
+    })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g25', userId: 'u5', roleInGroup: 'usual' },
+    })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g26',
+        name: 'Berge versetzen',
+        about:
+          'Coaching zur Potenzialentfaltung: begrenzende Glaubenssätze erkennen und transformieren.',
+        description: `<h3>Über das Angebot</h3><p>„Berge versetzen" ist ein Coaching-Angebot, das persönliche Ressourcen erkundet und begrenzende Überzeugungen durch stärkende Haltungen ersetzt. Der Name ist Programm: Was unmöglich scheint, wird mit dem richtigen Werkzeug möglich.</p><h3>Methoden</h3><p>Systemisches Coaching, lösungsorientierte Gesprächsführung und Körperwahrnehmung helfen dabei, eingefahrene Muster zu erkennen und neue Wege zu gehen.</p>`,
+        groupType: 'public',
+        actionRadius: 'regional',
+        categoryIds: ['cat3', 'cat16'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g26', userId: 'u6' } })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g26', userId: 'u6', roleInGroup: 'usual' },
+    })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g27',
+        name: 'Naturerlebnis Zingst',
+        about:
+          'Außerschulischer Lernort mit Aktivem Artenschutz, regionalem Honig und Bienenlehrpfad in Zingst.',
+        description: `<h3>Naturerlebnis in Zingst</h3><p>Auf der Halbinsel Zingst entstand ein außerschulischer Lernort, der Naturerlebnis mit aktivem Artenschutz verbindet. Herzstück ist ein Bienenlehrpfad, der Besucher aller Altersgruppen für die Bedeutung der Biene im Ökosystem sensibilisiert.</p><h3>Produkte & Aktivitäten</h3><p>Regionaler Honig aus artgerechter Bienenhaltung, Schulklassenbesuche, Familienführungen und Workshops zu Imkerei und Artenvielfalt.</p>`,
+        groupType: 'public',
+        actionRadius: 'regional',
+        categoryIds: ['cat12', 'cat7'],
+        locationName: 'Zingst, Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g27', userId: 'u4' } })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g27', userId: 'u4', roleInGroup: 'usual' },
+    })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g28',
+        name: 'Eisenfeustel – Handwerk & Versorgung',
+        about:
+          'Qualitäts-Handwerkserzeugnisse für Bestellgruppen und Wanderjahr-Teilnehmende aus Dresden.',
+        description: `<h3>Eisenfeustel aus Dresden</h3><p>Eisenfeustel beliefert Bestellgruppen und Wanderjahr-Teilnehmende mit hochwertigen Handwerkserzeugnissen. Der Name steht für Handwerksqualität, Verlässlichkeit und eine Verbindung zur handwerklichen Tradition Sachsens.</p><h3>Sortiment</h3><p>Selbst hergestellte Produkte aus Holz, Metall und anderen Naturmaterialien sowie Vermittlung zu regionalen Handwerksbetrieben im Netzwerk.</p>`,
+        groupType: 'public',
+        actionRadius: 'regional',
+        categoryIds: ['cat9', 'cat18'],
+        locationName: 'Dresden, Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g28', userId: 'u5' } })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g28', userId: 'u5', roleInGroup: 'usual' },
+    })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g29',
+        name: 'Landladen Rullstorf',
+        about:
+          'Regionaler Hofladen mit saisonalen Bio-Produkten: regional – ökologisch – nachhaltig.',
+        description: `<h3>Der Landladen in Rullstorf</h3><p>Der Landladen Rullstorf steht für das Motto „regional – ökologisch – nachhaltig". Saisonale Produkte aus der Region werden direkt vermarktet und kurze Lieferketten bewusst gefördert.</p><h3>Sortiment</h3><p>Gemüse, Obst, Molkereiprodukte und Eingemachtes von lokalen Höfen. Regelmäßige Hofmarkttage und Möglichkeiten zur Mitgliedschaft in einer Solidarischen Landwirtschaft.</p>`,
+        groupType: 'public',
+        actionRadius: 'regional',
+        categoryIds: ['cat12', 'cat9'],
+        locationName: 'Rullstorf, Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g29', userId: 'u6' } })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g29', userId: 'u6', roleInGroup: 'usual' },
+    })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g30',
+        name: 'Hofgemeinschaft Seelenschatz',
+        about: 'Gemeinschaftshof nach Naturprinzipien mit intergenerationeller Nachhaltigkeit.',
+        description: `<h3>Die Hofgemeinschaft</h3><p>Der Seelenschatz ist eine Hofgemeinschaft, die nach natürlichen Prinzipien und intergenerationeller Nachhaltigkeit gestaltet ist. Menschen unterschiedlicher Generationen leben und wirtschaften hier gemeinsam.</p><h3>Leben auf dem Hof</h3><p>Gemüseanbau, Tierhaltung, gemeinsames Kochen und Feiern. Besondere Bedeutung haben Feste im Jahreskreis und das Bewusstsein für die Verbundenheit von Mensch, Tier und Erde.</p>`,
+        groupType: 'public',
+        actionRadius: 'regional',
+        categoryIds: ['cat1', 'cat12', 'cat16'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g30', userId: 'u4' } })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g30', userId: 'u6' } })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g30', userId: 'u4', roleInGroup: 'usual' },
+    })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g30', userId: 'u6', roleInGroup: 'usual' },
+    })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g31',
+        name: 'AllmendeLand rettet Bauernhöfe',
+        about:
+          'Gemeinschaftliche Sicherung wertvoller Landflächen für biologische Bewirtschaftung.',
+        description: `<h3>Was ist AllmendeLand?</h3><p>AllmendeLand sichert gemeinschaftlich wertvolle landwirtschaftliche Flächen für biologische Bewirtschaftung – als moderne Form des Allmendeprinzips. Höfe, die aufgegeben werden müssten, werden durch kollektives Engagement dauerhaft gerettet.</p><h3>Funktionsweise</h3><p>Interessierte beteiligen sich finanziell und erhalten dafür Rechte zur Nutzung oder Mitentscheidung. Die Flächen bleiben dauerhaft ökologisch bewirtschaftet und dem Spekulationsmarkt entzogen.</p>`,
+        groupType: 'public',
+        actionRadius: 'national',
+        categoryIds: ['cat12', 'cat9', 'cat11'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g31', userId: 'u1' } })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g31', userId: 'u4' } })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g31', userId: 'u1', roleInGroup: 'usual' },
+    })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g31', userId: 'u4', roleInGroup: 'usual' },
+    })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g32',
+        name: 'Wanderjahr – Innovationsprojekt',
+        about:
+          'Ein Projekt von Menschen für Menschen: Innovationsjahr für junge Menschen zwischen Schule und Beruf.',
+        description: `<h3>Das Wanderjahr</h3><p>Das Wanderjahr ist ein Innovationsprojekt, das jungen Menschen nach der Schule ermöglicht, sich in Praxisprojekten, Gemeinschaften und Initiativen zu erproben – bevor sie den klassischen Ausbildungs- oder Studienweg einschlagen.</p><h3>Ziele</h3><p>Selbstwirksamkeit erfahren, Netzwerke aufbauen und die eigene Berufung erkunden. Das Wanderjahr verbindet praktische Arbeit mit persönlicher Entwicklung und gemeinschaftlichem Erleben.</p>`,
+        groupType: 'closed',
+        actionRadius: 'national',
+        categoryIds: ['cat7', 'cat3', 'cat17'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g32', userId: 'u4' } })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g32', userId: 'u5' } })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g32', userId: 'u4', roleInGroup: 'usual' },
+    })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g32', userId: 'u5', roleInGroup: 'usual' },
+    })
+
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g33',
+        name: 'Unterstützung von Hebammen',
+        about:
+          'Liebevolle und professionelle Begleitung rund um Schwangerschaft, Geburt und Wochenbett.',
+        description: `<h3>Worum geht es?</h3><p>Diese Initiative setzt sich für eine umfassende Unterstützung von Hebammen und für eine menschliche Geburtskultur ein. Ziel ist eine „liebevolle und professionelle Begleitung – nicht nur während der Geburt", sondern entlang des gesamten Weges rund um Schwangerschaft und Wochenbett.</p><h3>Aktivitäten</h3><p>Vernetzung von Hebammen, Beratungsangebote für werdende Eltern, Aufklärung über Geburtsrechte und Advocacy für bessere Rahmenbedingungen im Hebammenwesen.</p>`,
+        groupType: 'public',
+        actionRadius: 'national',
+        categoryIds: ['cat14', 'cat7'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g33', userId: 'u4' } })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g33', userId: 'u6' } })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g33', userId: 'u4', roleInGroup: 'usual' },
+    })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g33', userId: 'u6', roleInGroup: 'usual' },
+    })
+
     // eslint-disable-next-line no-console
     console.log('seed', 'group avatars')
     for (const { groupId, url, alt, aspectRatio } of [
@@ -1045,6 +1440,102 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         url: 'https://menschlichwirtschaften.de/wp-content/uploads/82tpeld0_e4-e1741358592420.jpg',
         alt: 'Treffpunkt Genossenschaft',
         aspectRatio: 1.5,
+      },
+      {
+        groupId: 'g16',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/packsatt-Grafik-Menschlich-Wirtschaften.jpg',
+        alt: 'pack&satt Einpott',
+        aspectRatio: 1.5,
+      },
+      {
+        groupId: 'g17',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/ocelot.social-Logo-Text-normal-v02-945x630-2.webp',
+        alt: 'Ocelot.Social Logo',
+        aspectRatio: 1.5,
+      },
+      {
+        groupId: 'g18',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/Peter-Schmuck-Initiative.jpg',
+        alt: 'Die Regionalgesellschaft',
+        aspectRatio: 1.5,
+      },
+      {
+        groupId: 'g19',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/Gefluegelhof-Schubert-Bild3.jpg',
+        alt: 'Geflügelhof Schubert',
+        aspectRatio: 1.5,
+      },
+      {
+        groupId: 'g20',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/Logo_MWM_Star_4C_Schutzraum.jpg',
+        alt: 'Menschliche Werte Medien Logo',
+        aspectRatio: 1.0,
+      },
+      {
+        groupId: 'g21',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/isgbjkz9erg-e1741360891578.jpg',
+        alt: 'Natürlich gesund!',
+        aspectRatio: 1.5,
+      },
+      {
+        groupId: 'g22',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/Andrea-Hauser-Home-Page-e1740239845438.jpg',
+        alt: 'Unsere kleine Burderei',
+        aspectRatio: 1.5,
+      },
+      {
+        groupId: 'g23',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/Sonja_Schuerger_IMG_Abb_11_2.jpg',
+        alt: 'Naturwahrnehmung und Gemeinschaftsbildung',
+        aspectRatio: 1.33,
+      },
+      {
+        groupId: 'g24',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/Hermesstab-schwarzweisseFluegel-v01-clip-3-2.jpg',
+        alt: 'Konstitutionstherapie Hermesstab',
+        aspectRatio: 1.0,
+      },
+      {
+        groupId: 'g27',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/Natur-und-Imkerhof-Zingst.jpg',
+        alt: 'Naturerlebnis Zingst Imkerhof',
+        aspectRatio: 1.5,
+      },
+      {
+        groupId: 'g28',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/ef_logo_primary-1.png',
+        alt: 'Eisenfeustel Logo',
+        aspectRatio: 1.0,
+      },
+      {
+        groupId: 'g29',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/Landladen-Rullstorf.jpg',
+        alt: 'Landladen Rullstorf',
+        aspectRatio: 1.5,
+      },
+      {
+        groupId: 'g30',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/Seelenschatz_ScheuneWohnhaus-1.jpg',
+        alt: 'Hofgemeinschaft Seelenschatz Scheune',
+        aspectRatio: 1.5,
+      },
+      {
+        groupId: 'g31',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/AllmendeLand-Felder-Beispiel-2.jpg',
+        alt: 'AllmendeLand Felder',
+        aspectRatio: 1.5,
+      },
+      {
+        groupId: 'g32',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/Foto-Jugend-scaled.jpg',
+        alt: 'Wanderjahr Jugendliche',
+        aspectRatio: 1.33,
+      },
+      {
+        groupId: 'g33',
+        url: 'https://menschlichwirtschaften.de/wp-content/uploads/pregnant-6189040_640.jpg',
+        alt: 'Unterstützung von Hebammen',
+        aspectRatio: 1.0,
       },
     ]) {
       await database.write({

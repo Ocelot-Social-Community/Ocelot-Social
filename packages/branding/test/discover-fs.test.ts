@@ -3,7 +3,7 @@
 // composeComposition and readDefaultMarker. Exercised against REAL archives written to a temp dir —
 // the compose core is unit-tested separately (discover.test.mjs) with an in-memory file map.
 import assert from 'node:assert/strict'
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { after, test } from 'node:test'
@@ -83,6 +83,21 @@ test('discoverArchives dedupes duplicate ids to the HIGHEST version', () => {
   assert.equal(found.get('wir').version, '1.2')
   // and the winning file composes to the 1.2 theme
   assert.equal(readArchiveConfig(found.get('wir').file).theme.cssVars['color-primary'], 'v12')
+})
+
+test('discoverArchives treats numerically-equal versions as equal (1.2 == 1.2.0 → deduped)', () => {
+  const base = tmp()
+  writeArchive(base, 'a/x-1.2.tar.gz', { id: 'x', version: '1.2' })
+  writeArchive(base, 'b/x-1.2.0.tar.gz', { id: 'x', version: '1.2.0' })
+  // compareVersions runs its full loop (no early `a===b`) and returns 0 → the first-seen wins, size 1
+  assert.equal(discoverArchives(base).size, 1)
+})
+
+test('discoverArchives skips a broken symlink named *.tar.gz (stat throws → treated as absent)', () => {
+  const base = tmp()
+  writeArchive(base, 'good.tar.gz', { id: 'good' })
+  symlinkSync(join(base, 'does-not-exist'), join(base, 'broken.tar.gz')) // dangling → statSync throws
+  assert.deepEqual([...discoverArchives(base).keys()], ['good'])
 })
 
 test('discoverArchives skips node_modules, dotdirs and stray/garbled .tar.gz files', () => {

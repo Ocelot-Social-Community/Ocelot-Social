@@ -95,12 +95,14 @@ type User {
     @cypher(statement: "MATCH (this)<-[:FRIENDS]->(r:User) RETURN COUNT(DISTINCT r)")
 
   "Users this user follows."
-  following: [User]! @relation(name: "FOLLOWS", direction: "OUT")
+  following(nameFilter: String = "", first: Int, offset: Int): [User]!
+    @relation(name: "FOLLOWS", direction: "OUT")
   followingCount: Int!
     @cypher(statement: "MATCH (this)-[:FOLLOWS]->(r:User) RETURN COUNT(DISTINCT r)")
 
   "Users who follow this user."
-  followedBy: [User]! @relation(name: "FOLLOWS", direction: "IN")
+  followedBy(nameFilter: String = "", first: Int, offset: Int): [User]!
+    @relation(name: "FOLLOWS", direction: "IN")
   followedByCount: Int!
     @cypher(statement: "MATCH (this)<-[:FOLLOWS]-(r:User) RETURN COUNT(DISTINCT r)")
 
@@ -182,7 +184,7 @@ type User {
   activeCategories: [String] @neo4j_ignore
 
   "Groups this user is a member of. Ordered by shared membership with the viewer first."
-  groups(first: Int, offset: Int): [Group] @neo4j_ignore
+  groups(first: Int, offset: Int, nameFilter: String): [Group] @neo4j_ignore
 }
 
 input _UserFilter {

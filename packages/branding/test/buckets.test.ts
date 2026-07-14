@@ -118,6 +118,40 @@ test('sparse compose: buckets without a source fall back to framework defaults',
   assert.equal(composed.group.nameLengthMax, brandingDefaults.group.nameLengthMax)
 })
 
+test('sparse owned-path source keeps the default sibling leaves (deep-merge, not replace)', () => {
+  // A behavior source carrying ONLY group.nameLengthMax: the other group.* leaves must stay at their
+  // framework defaults, not be wiped when the `group` owned path is composed. (Build fragments are
+  // full so this can't happen through them, but the DeepPartial contract + cross-brand mixing allow
+  // sparse sources — this guards composeConfig against silently dropping siblings.)
+  const composed = composeConfig({ behavior: { group: { nameLengthMax: 99 } } })
+  assert.equal(composed.group.nameLengthMax, 99) // provided leaf wins
+  assert.equal(composed.group.nameLengthMin, brandingDefaults.group.nameLengthMin) // sibling default kept
+  assert.equal(composed.group.descriptionMinLength, brandingDefaults.group.descriptionMinLength)
+})
+
+test('sparse owned-path source: arrays replace wholesale, sibling default still kept', () => {
+  // headerMenu.menu (array) replaces the whole list — no element-wise merge — while the sibling
+  // headerMenu.customButton keeps its framework default.
+  const composed = composeConfig({ navigation: { headerMenu: { menu: [{ nameIdent: 'only' }] } } })
+  assert.deepEqual(composed.headerMenu.menu, [{ nameIdent: 'only' }]) // whole list replaced
+  assert.deepEqual(composed.headerMenu.customButton, brandingDefaults.headerMenu.customButton)
+})
+
+test('composeConfig ignores __proto__ in a source — no prototype pollution (locales + owned path)', () => {
+  // A malicious source (e.g. an uploaded brand fragment / locale file) carrying a top-level __proto__.
+  // deepMergeInto must drop it, not recurse into Object.prototype.
+  composeConfig({ navigation: { locales: JSON.parse('{"__proto__":{"POLLUTED_LOC":"y"}}') } })
+  composeConfig({ behavior: { group: JSON.parse('{"__proto__":{"POLLUTED_OWN":"y"}}') } })
+  assert.equal({}.POLLUTED_LOC, undefined)
+  assert.equal({}.POLLUTED_OWN, undefined)
+  // A __proto__ key alongside real data: the real sibling survives, __proto__ is dropped.
+  const composed = composeConfig({
+    navigation: { locales: JSON.parse('{"de":{"greet":"hi"},"__proto__":{"P":"y"}}') },
+  })
+  assert.equal(composed.locales.de.greet, 'hi')
+  assert.deepEqual(Object.keys(composed.locales), ['de'])
+})
+
 test('parseSource / formatSource round-trip the source address grammar', () => {
   assert.deepEqual(parseSource('acme'), { id: 'acme', version: null, name: 'default' })
   assert.deepEqual(parseSource('acme@1.2.0'), { id: 'acme', version: '1.2.0', name: 'default' })

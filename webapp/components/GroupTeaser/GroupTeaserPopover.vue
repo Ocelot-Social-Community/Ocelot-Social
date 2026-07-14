@@ -1,7 +1,7 @@
 <template>
   <div class="group-teaser-popover">
     <div class="group-header">
-      <profile-avatar :profile="group" size="medium" />
+      <profile-avatar :profile="group" class="popover-avatar" />
       <div class="group-names">
         <span class="group-name">{{ group.name }}</span>
         <span class="group-slug ds-text-soft">&amp;{{ group.slug }}</span>
@@ -145,5 +145,11 @@ export default {
 
 .open-link {
   margin-top: 4px;
+}
+
+.popover-avatar {
+  width: 64px;
+  height: 64px;
+  font-size: 1.5rem;
 }
 </style>

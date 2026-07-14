@@ -15,6 +15,7 @@ const stubs = {
   'router-link': true,
   // 'infinite-loading': true,
   'follow-list': true,
+  'group-page-member-list': true,
 }
 
 // Mock Math.random, used in Dropdown
@@ -258,12 +259,6 @@ describe('GroupProfileSlug', () => {
                 ...yogaPractice,
                 myRole: 'owner',
               },
-              GroupMembers: [
-                { user: peterLustig, membership: { role: 'owner' } },
-                { user: jennyRostock, membership: { role: 'usual' } },
-                { user: bobDerBaumeister, membership: { role: 'usual' } },
-                { user: huey, membership: { role: 'usual' } },
-              ],
             }
           })
         })
@@ -301,12 +296,6 @@ describe('GroupProfileSlug', () => {
                 ...yogaPractice,
                 myRole: 'usual',
               },
-              GroupMembers: [
-                { user: peterLustig, membership: { role: 'owner' } },
-                { user: jennyRostock, membership: { role: 'usual' } },
-                { user: bobDerBaumeister, membership: { role: 'usual' } },
-                { user: huey, membership: { role: 'usual' } },
-              ],
             }
           })
         })
@@ -325,12 +314,6 @@ describe('GroupProfileSlug', () => {
                 ...yogaPractice,
                 myRole: 'pending',
               },
-              GroupMembers: [
-                { user: peterLustig, membership: { role: 'owner' } },
-                { user: jennyRostock, membership: { role: 'usual' } },
-                { user: bobDerBaumeister, membership: { role: 'usual' } },
-                { user: huey, membership: { role: 'usual' } },
-              ],
             }
           })
         })
@@ -349,12 +332,6 @@ describe('GroupProfileSlug', () => {
                 ...yogaPractice,
                 myRole: null,
               },
-              GroupMembers: [
-                { user: peterLustig, membership: { role: 'owner' } },
-                { user: jennyRostock, membership: { role: 'usual' } },
-                { user: bobDerBaumeister, membership: { role: 'usual' } },
-                { user: huey, membership: { role: 'usual' } },
-              ],
             }
           })
         })
@@ -376,12 +353,6 @@ describe('GroupProfileSlug', () => {
                   ...schoolForCitizens,
                   myRole: 'owner',
                 },
-                GroupMembers: [
-                  { user: peterLustig, membership: { role: 'owner' } },
-                  { user: jennyRostock, membership: { role: 'usual' } },
-                  { user: bobDerBaumeister, membership: { role: 'usual' } },
-                  { user: huey, membership: { role: 'usual' } },
-                ],
               }
             })
           })
@@ -400,12 +371,6 @@ describe('GroupProfileSlug', () => {
                   ...schoolForCitizens,
                   myRole: 'usual',
                 },
-                GroupMembers: [
-                  { user: peterLustig, membership: { role: 'owner' } },
-                  { user: jennyRostock, membership: { role: 'usual' } },
-                  { user: bobDerBaumeister, membership: { role: 'usual' } },
-                  { user: huey, membership: { role: 'usual' } },
-                ],
               }
             })
           })
@@ -447,12 +412,6 @@ describe('GroupProfileSlug', () => {
                   ...schoolForCitizens,
                   myRole: 'pending',
                 },
-                GroupMembers: [
-                  { user: peterLustig, membership: { role: 'owner' } },
-                  { user: jennyRostock, membership: { role: 'usual' } },
-                  { user: bobDerBaumeister, membership: { role: 'usual' } },
-                  { user: huey, membership: { role: 'usual' } },
-                ],
               }
             })
           })
@@ -471,12 +430,6 @@ describe('GroupProfileSlug', () => {
                   ...schoolForCitizens,
                   myRole: null,
                 },
-                GroupMembers: [
-                  { user: peterLustig, membership: { role: 'owner' } },
-                  { user: jennyRostock, membership: { role: 'usual' } },
-                  { user: bobDerBaumeister, membership: { role: 'usual' } },
-                  { user: huey, membership: { role: 'usual' } },
-                ],
               }
             })
           })
@@ -499,12 +452,6 @@ describe('GroupProfileSlug', () => {
                   ...investigativeJournalism,
                   myRole: 'owner',
                 },
-                GroupMembers: [
-                  { user: peterLustig, membership: { role: 'owner' } },
-                  { user: jennyRostock, membership: { role: 'usual' } },
-                  { user: bobDerBaumeister, membership: { role: 'usual' } },
-                  { user: huey, membership: { role: 'usual' } },
-                ],
               }
             })
           })
@@ -523,12 +470,6 @@ describe('GroupProfileSlug', () => {
                   ...investigativeJournalism,
                   myRole: 'usual',
                 },
-                GroupMembers: [
-                  { user: peterLustig, membership: { role: 'owner' } },
-                  { user: jennyRostock, membership: { role: 'usual' } },
-                  { user: bobDerBaumeister, membership: { role: 'usual' } },
-                  { user: huey, membership: { role: 'usual' } },
-                ],
               }
             })
           })
@@ -547,12 +488,6 @@ describe('GroupProfileSlug', () => {
                   ...investigativeJournalism,
                   myRole: 'pending',
                 },
-                GroupMembers: [
-                  { user: peterLustig, membership: { role: 'owner' } },
-                  { user: jennyRostock, membership: { role: 'usual' } },
-                  { user: bobDerBaumeister, membership: { role: 'usual' } },
-                  { user: huey, membership: { role: 'usual' } },
-                ],
               }
             })
           })
@@ -571,12 +506,6 @@ describe('GroupProfileSlug', () => {
                   ...investigativeJournalism,
                   myRole: null,
                 },
-                GroupMembers: [
-                  { user: peterLustig, membership: { role: 'owner' } },
-                  { user: jennyRostock, membership: { role: 'usual' } },
-                  { user: bobDerBaumeister, membership: { role: 'usual' } },
-                  { user: huey, membership: { role: 'usual' } },
-                ],
               }
             })
           })
@@ -634,7 +563,7 @@ describe('GroupProfileSlug', () => {
             queries: { chatRoom: { refetch: jest.fn() } },
           },
         },
-        data: () => ({ group, GroupMembers: [] }),
+        data: () => ({ group }),
       })
     }
 
@@ -704,7 +633,7 @@ describe('GroupProfileSlug', () => {
             queries: { chatRoom: { refetch: jest.fn() }, Group: { refetch: jest.fn() } },
           },
         },
-        data: () => ({ group: { ...yogaPractice, myRole: 'usual' }, GroupMembers: [] }),
+        data: () => ({ group: { ...yogaPractice, myRole: 'usual' } }),
       })
       // subscribe is called twice: roomUpdated (index 0) and groupShowMembers (index 1)
       const groupShowMembersError = capturedCallbacks[1]?.error
@@ -779,7 +708,7 @@ describe('GroupProfileSlug', () => {
             queries: { chatRoom: { refetch: jest.fn() } },
           },
         },
-        data: () => ({ group, GroupMembers: [] }),
+        data: () => ({ group }),
       })
     }
 
@@ -952,7 +881,7 @@ describe('GroupProfileSlug', () => {
             queries: { chatRoom: { refetch: jest.fn() } },
           },
         },
-        data: () => ({ group: { ...yogaPractice, myRole: 'usual' }, GroupMembers: [] }),
+        data: () => ({ group: { ...yogaPractice, myRole: 'usual' } }),
       })
       expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(false)
     })

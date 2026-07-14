@@ -55,7 +55,7 @@
             <div class="ds-flex-item" v-if="isAllowedSeeingGroupMembers">
               <os-number
                 :count="group.membersCount"
-                :label="$t('group.membersCount', {}, groupMembers.length)"
+                :label="$t('group.membersCount', {}, group.membersCount)"
                 :animated="true"
               />
             </div>
@@ -215,21 +215,12 @@
           {{ $t('profile.network.title') }}
         </h3>
         <!-- Group members list -->
-        <profile-list
-          :uniqueName="'groupMembersFilter'"
-          :title="$t('group.membersListTitle')"
+        <group-page-member-list
+          v-if="group.id"
+          :group-id="group.id"
+          :members-count="group.membersCount || null"
           :subtitle="membersListSubtitle"
-          :titleNobody="
-            !isAllowedSeeingGroupMembers
-              ? $t('group.membersListTitleNotAllowedSeeingGroupMembers')
-              : null
-          "
-          :allProfilesCount="
-            isAllowedSeeingGroupMembers && group.membersCount ? group.membersCount : 0
-          "
-          :profiles="isAllowedSeeingGroupMembers ? groupMembers.map((d) => d.user) : []"
-          :loading="hydrated && $apollo.loading"
-          @fetchAllProfiles="fetchAllMembers"
+          :allowed-to-see="isAllowedSeeingGroupMembers"
         />
         <!-- <social-media :user-name="groupName" :user="user" /> -->
       </div>
@@ -347,7 +338,6 @@ import { profilePagePosts } from '~/graphql/PostQuery'
 import {
   updateGroupMutation,
   groupQuery,
-  groupMembersQuery,
   groupShowMembersChangedSubscription,
 } from '~/graphql/groups'
 import { roomUnreadQuery, roomUpdated } from '~/graphql/Rooms'
@@ -369,7 +359,7 @@ import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
-import ProfileList from '~/components/features/ProfileList/ProfileList'
+import GroupPageMemberList from '~/components/features/ProfileList/GroupPageMemberList'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
 import { mapGetters, mapMutations } from 'vuex'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
@@ -402,7 +392,7 @@ export default {
     LocationInfo,
     PostTeaser,
     ProfileAvatar,
-    ProfileList,
+    GroupPageMemberList,
     MasonryGrid,
     MasonryGridItem,
     // SocialMedia,
@@ -422,14 +412,12 @@ export default {
     // const filter = tabToFilterMapping({ tab: 'post', id: this.$route.params.id })
     const filter = { group: { id: this.$route.params.id } }
     return {
-      loadGroupMembers: false,
       posts: [],
       hasMore: true,
       offset: 0,
       pageSize: 6,
       // tabActive: 'post',
       filter,
-      membersCountToLoad: 25,
       updateGroupMutation,
       isDescriptionCollapsed: true,
       group: {},
@@ -482,9 +470,6 @@ export default {
     },
     isGroupVisible() {
       return this.group && !(this.group.groupType === 'hidden' && !this.isGroupMemberNonePending)
-    },
-    groupMembers() {
-      return this.GroupMembers ? this.GroupMembers : []
     },
     isAllowedSeeingGroupMembers() {
       if (!this.group) return false
@@ -545,9 +530,6 @@ export default {
     this._groupShowMembersSub?.unsubscribe()
   },
   watch: {
-    isAllowedSeeingGroupMembers(to, _from) {
-      this.loadGroupMembers = to
-    },
     isGroupMemberNonePending(isMember) {
       // Group membership is derived from the Apollo-populated group.myRole, which
       // isn't available synchronously on first visits (no SSR cache). Set up the
@@ -794,17 +776,7 @@ export default {
     //   this.user.followedBy = followedBy
     // },
     async updateJoinLeave() {
-      this.loadGroupMembers = false
-      this.GroupMembers = []
       await this.$apollo.queries.Group.refetch()
-      await this.$nextTick()
-      this.loadGroupMembers = this.isAllowedSeeingGroupMembers
-      if (this.loadGroupMembers) {
-        this.$apollo.queries.GroupMembers.refetch()
-      }
-    },
-    fetchAllMembers() {
-      this.membersCountToLoad = this.group.membersCount
     },
   },
   apollo: {
@@ -836,24 +808,6 @@ export default {
       },
       update({ Group }) {
         this.group = Group && Group[0] ? Group[0] : {}
-      },
-      error(error) {
-        this.$toast.error(error.message)
-      },
-      fetchPolicy: 'cache-and-network',
-    },
-    GroupMembers: {
-      query() {
-        return groupMembersQuery()
-      },
-      variables() {
-        return {
-          id: this.$route.params.id,
-          first: this.membersCountToLoad,
-        }
-      },
-      skip() {
-        return !this.loadGroupMembers
       },
       error(error) {
         this.$toast.error(error.message)
@@ -968,6 +922,17 @@ export default {
 }
 .word-break-all {
   overflow-wrap: anywhere;
+}
+.member-teaser {
+  display: flex;
+  align-items: center;
+  gap: $space-x-small;
+  width: 100%;
+
+  .member-teaser__user {
+    flex: 1;
+    min-width: 0;
+  }
 }
 .collaps-button {
   align-self: flex-end;
