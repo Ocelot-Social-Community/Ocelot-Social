@@ -8,9 +8,10 @@ on:
       - 'release-please-config.json'
       - '.release-please-manifest.json'
 
+# The default GITHUB_TOKEN needs no write scope: release-please uses the it4c-release-bot app token
+# (see below) and publish uses NPM_TOKEN. Least privilege — no write for any job's default token.
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   release-please:
@@ -53,6 +54,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
