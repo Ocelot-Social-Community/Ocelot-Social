@@ -43,8 +43,13 @@ CMD ["/bin/sh", "-c", "yarn install && yarn run dev"]
 FROM base AS build
 # Repo-root build context now (for /packages/branding): copy only the backend subtree to /app.
 COPY backend/ .
-ONBUILD COPY ./branding/middlewares/ src/middleware/branding/
-ONBUILD COPY ./branding/data/ src/db/data
+# Optional per-brand overlays (code/seed data not yet ported to the runtime archive). The `[g]` glob
+# makes them optional so the SAME image serves two contexts: a downstream brand build (`FROM
+# backend-build`, context = brand repo root → `./branding/` present → copied) and ocelot's own
+# vanilla self-build (`FROM build AS test`, context = repo root → no `./branding/` → skipped; the
+# committed src/ defaults stay). Same idiom as `brandin[g]/` below and the e-mail overlays on master.
+ONBUILD COPY brandin[g]/middlewares/ src/middleware/branding/
+ONBUILD COPY brandin[g]/data/ src/db/data
 # Runtime branding: copy the brand UNFLATTENED into /brand and bake its archive (+ DEFAULT marker) into
 # ./branding-assets. At startup src/branding/bootstrap.ts injects this brand's config AND overlays its
 # raw runtime files from the archive (e-mail templates/locales, public/badge assets) — no per-brand
