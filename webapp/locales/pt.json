@@ -1210,6 +1210,7 @@
       "hidden": "Secret groups",
       "hiddenFromOthers": "hidden from others",
       "nobody": "no groups",
+      "noFilterResults": "Nenhum grupo encontrado para este filtro.",
       "other": "Grupos sem mim",
       "public": "Public groups",
       "shared": "Grupos compartilhados",
@@ -1227,6 +1228,7 @@
       "followedByNobody": "não é seguido por ninguém.",
       "following": "está seguindo",
       "followingNobody": "não segue ninguém.",
+      "followNoFilterResults": "Nenhum usuário encontrado para este filtro.",
       "title": "Rede"
     },
     "shouted": "Aclamou",

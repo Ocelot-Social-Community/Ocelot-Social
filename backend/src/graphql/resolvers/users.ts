@@ -743,8 +743,6 @@ export default {
         redeemedInviteCode: '-[:REDEEMED]->(related:InviteCode)',
       },
       hasMany: {
-        followedBy: '<-[:FOLLOWS]-(related:User)',
-        following: '-[:FOLLOWS]->(related:User)',
         friends: '-[:FRIENDS]-(related:User)',
         contributions: '-[:WROTE]->(related:Post)',
         comments: '-[:WROTE]->(related:Comment)',
@@ -753,5 +751,61 @@ export default {
         badgeTrophies: '<-[:REWARDED]-(related:Badge)',
       },
     }),
+    following: async (
+      parent,
+      params: { nameFilter?: string | null; first?: number | null; offset?: number | null },
+      { driver },
+    ) => {
+      const { nameFilter, first, offset } = params
+      const session = driver.session()
+      try {
+        return await session.readTransaction(async (txc) => {
+          const result = await txc.run(
+            `MATCH (u:User {id: $id})-[:FOLLOWS]->(r:User)
+            WHERE $nameFilter = '' OR toLower(r.name) CONTAINS toLower($nameFilter)
+            WITH DISTINCT r
+            RETURN r {.*}
+            SKIP toInteger(coalesce($offset, 0)) LIMIT toInteger(coalesce($first, 25))`,
+            {
+              id: parent.id,
+              nameFilter: nameFilter ?? '',
+              first: first ?? 25,
+              offset: offset ?? 0,
+            },
+          )
+          return result.records.map((r) => r.get('r'))
+        })
+      } finally {
+        await session.close()
+      }
+    },
+    followedBy: async (
+      parent,
+      params: { nameFilter?: string | null; first?: number | null; offset?: number | null },
+      { driver },
+    ) => {
+      const { nameFilter, first, offset } = params
+      const session = driver.session()
+      try {
+        return await session.readTransaction(async (txc) => {
+          const result = await txc.run(
+            `MATCH (u:User {id: $id})<-[:FOLLOWS]-(r:User)
+            WHERE $nameFilter = '' OR toLower(r.name) CONTAINS toLower($nameFilter)
+            WITH DISTINCT r
+            RETURN r {.*}
+            SKIP toInteger(coalesce($offset, 0)) LIMIT toInteger(coalesce($first, 25))`,
+            {
+              id: parent.id,
+              nameFilter: nameFilter ?? '',
+              first: first ?? 25,
+              offset: offset ?? 0,
+            },
+          )
+          return result.records.map((r) => r.get('r'))
+        })
+      } finally {
+        await session.close()
+      }
+    },
   },
 }

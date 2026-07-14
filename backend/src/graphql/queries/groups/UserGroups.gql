@@ -1,7 +1,7 @@
-query UserGroups($id: ID!, $first: Int, $offset: Int) {
+query UserGroups($id: ID!, $first: Int, $offset: Int, $nameFilter: String) {
   User(id: $id) {
     id
-    groups(first: $first, offset: $offset) {
+    groups(first: $first, offset: $offset, nameFilter: $nameFilter) {
       id
       name
       groupType

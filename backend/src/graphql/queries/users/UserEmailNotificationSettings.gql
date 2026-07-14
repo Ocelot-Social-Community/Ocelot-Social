@@ -14,11 +14,11 @@ query UserEmailNotificationSettings($id: ID, $name: String, $email: String) {
       id
       isDefault
     }
-    followedBy {
+    followedBy(nameFilter: "") {
       id
     }
     followedByCurrentUser
-    following {
+    following(nameFilter: "") {
       id
       name
       slug

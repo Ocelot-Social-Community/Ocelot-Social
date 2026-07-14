@@ -51,10 +51,10 @@ export const followConnectionsQuery = (type, i18n) => {
     ${location('User', lang)}
     ${badges}
 
-    query FollowConnections($id: ID!, $first: Int!, $offset: Int!) {
+    query FollowConnections($id: ID!, $first: Int!, $offset: Int!, $nameFilter: String) {
       User(id: $id) {
         id
-        ${type}(first: $first, offset: $offset) {
+        ${type}(first: $first, offset: $offset, nameFilter: $nameFilter) {
           ...user
           ...userCounts
           ...locationOnUser
@@ -318,7 +318,7 @@ export const followUserMutation = (i18n) => {
         ...userCounts
         followedByCount
         followedByCurrentUser
-        followedBy(first: 7) {
+        followedBy(first: 7, nameFilter: "") {
           ...user
           ...userCounts
         }
@@ -338,7 +338,7 @@ export const unfollowUserMutation = (i18n) => {
         ...userCounts
         followedByCount
         followedByCurrentUser
-        followedBy(first: 7) {
+        followedBy(first: 7, nameFilter: "") {
           ...user
           ...userCounts
         }

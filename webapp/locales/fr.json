@@ -1210,6 +1210,7 @@
       "hidden": "Groupes secrets",
       "hiddenFromOthers": "caché des autres",
       "nobody": "aucun groupe",
+      "noFilterResults": "Aucun groupe trouvé pour ce filtre.",
       "other": "Groupes sans moi",
       "public": "Groupes publics",
       "shared": "Groupes partagés",
@@ -1227,6 +1228,7 @@
       "followedByNobody": "n'est suivi par personne.",
       "following": "suit",
       "followingNobody": "ne suit personne.",
+      "followNoFilterResults": "Aucun utilisateur trouvé pour ce filtre.",
       "title": "Réseau"
     },
     "shouted": "Recommandé",

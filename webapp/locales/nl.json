@@ -1210,6 +1210,7 @@
       "hidden": "Secret groups",
       "hiddenFromOthers": "hidden from others",
       "nobody": "no groups",
+      "noFilterResults": "Geen groepen gevonden voor dit filter.",
       "other": "Groepen zonder mij",
       "public": "Public groups",
       "shared": "Gedeelde groepen",
@@ -1227,6 +1228,7 @@
       "followedByNobody": "wordt door niemand gevolgd.",
       "following": "volgt",
       "followingNobody": "volgt niemand.",
+      "followNoFilterResults": "Geen gebruikers gevonden voor dit filter.",
       "title": "Netwerk"
     },
     "shouted": "Geshout",
