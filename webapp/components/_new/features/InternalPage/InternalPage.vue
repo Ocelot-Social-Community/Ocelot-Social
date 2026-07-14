@@ -43,6 +43,9 @@ export default {
     }
   },
   async fetch() {
+    // Clear first so a language/page switch doesn't keep showing the previous locale's HTML while the
+    // new file loads — content() falls back to the bundled i18n html (correct language) meanwhile.
+    this.brandingHtml = null
     this.brandingHtml = await fetchBrandingHtml(this.htmlSrc)
   },
   computed: {
@@ -65,8 +68,11 @@ export default {
     },
   },
   watch: {
-    // Re-load the localized HTML when the UI language changes (client-side navigation).
-    currentLocale() {
+    // Re-load when the resolved HTML source changes: covers a UI language switch AND navigating
+    // between internal pages (e.g. Impressum ↔ Datenschutz) that reuses this component instance.
+    // Watching htmlSrc (derived from currentLocale + pageParams) also skips a needless refetch when
+    // the source is unchanged.
+    htmlSrc() {
       this.$fetch()
     },
   },
