@@ -1,5 +1,5 @@
 import { state as createState, mutations, getters, actions } from './auth.js'
-import { branding } from '@ocelot-social/branding'
+import { getBranding, setBranding } from '@ocelot-social/branding'
 
 // auth.js instantiates `new Cookie()` at module load and reads the auth cookie
 // inside login(). Mock universal-cookie so we can drive that branch (cookie
@@ -194,15 +194,28 @@ describe('auth store', () => {
     })
 
     it('termsAndConditionsAgreed compares against the current VERSION', () => {
-      expect(getters.termsAndConditionsAgreed({ user: null })).toBeFalsy()
-      expect(
-        getters.termsAndConditionsAgreed({ user: { termsAndConditionsAgreedVersion: '0.0.0' } }),
-      ).toBe(false)
-      expect(
-        getters.termsAndConditionsAgreed({
-          user: { termsAndConditionsAgreedVersion: branding.termsAndConditions.version },
-        }),
-      ).toBe(true)
+      // Inject a fixed T&C version so the assertion is independent of the real branding default
+      // (auth.js compares against branding.termsAndConditions.version). setBranding is the runtime
+      // injection API — cleaner than mocking the whole module, which auth.js also uses transitively
+      // (constants/metadata → branding.metadata) in the login tests.
+      const original = getBranding()
+      setBranding({
+        ...original,
+        termsAndConditions: { ...original.termsAndConditions, version: 'test-tac-version' },
+      })
+      try {
+        expect(getters.termsAndConditionsAgreed({ user: null })).toBeFalsy()
+        expect(
+          getters.termsAndConditionsAgreed({ user: { termsAndConditionsAgreedVersion: '0.0.0' } }),
+        ).toBe(false)
+        expect(
+          getters.termsAndConditionsAgreed({
+            user: { termsAndConditionsAgreedVersion: 'test-tac-version' },
+          }),
+        ).toBe(true)
+      } finally {
+        setBranding(original)
+      }
     })
   })
 
