@@ -111,13 +111,19 @@ export default {
       return `width: ${width};`
     },
     tabletLogoWidthStyle() {
+      // tabletWidthDefault is only defined for the `header` type; other types fall back to widthDefault
+      // so non-header logos never emit an invalid `width: undefined;`.
       const width =
-        this.tabletLogoWidth === null ? this.logo.tabletWidthDefault : this.tabletLogoWidth
+        this.tabletLogoWidth === null
+          ? this.logo.tabletWidthDefault || this.logo.widthDefault
+          : this.tabletLogoWidth
       return `width: ${width};`
     },
     mobileLogoWidthStyle() {
       const width =
-        this.mobileLogoWidth === null ? this.logo.mobileWidthDefault : this.mobileLogoWidth
+        this.mobileLogoWidth === null
+          ? this.logo.mobileWidthDefault || this.logo.widthDefault
+          : this.mobileLogoWidth
       return `width: ${width};`
     },
   },
