@@ -118,7 +118,9 @@ describe('plugins/branding (SSR injection)', () => {
     await brandingPlugin(context)
 
     expect(mockCheckSchemaCompat).toHaveBeenCalledWith(99)
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('archive schema 99 is newer than runtime'))
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('archive schema 99 is newer than runtime'),
+    )
     // still branded despite the mismatch
     expect(mockSetBranding).toHaveBeenCalledWith(config)
     warn.mockRestore()
