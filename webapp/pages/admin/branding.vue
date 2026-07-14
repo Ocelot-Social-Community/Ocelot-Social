@@ -533,19 +533,20 @@ export default {
       const next = { ...this.composition }
       if (value) next[bucket] = value
       else delete next[bucket]
-      this.composition = next
-      this.clearPending(bucket)
-      this.saveComposition()
+      // Persist FIRST; the local state (composition + pending) is committed only on success (see
+      // saveComposition) so a failed mutation leaves the pending change intact for retry/cancel
+      // instead of showing it as applied.
+      this.saveComposition(next, bucket)
     },
     // Discard the pending change; the select reverts to the saved value on re-render.
     cancel(bucket) {
       this.clearPending(bucket)
     },
-    async saveComposition() {
+    async saveComposition(next, bucket) {
       // Only keep non-empty slot overrides; an empty map clears the policy value.
       const map = {}
-      for (const bucket of this.bucketNames) {
-        if (this.composition[bucket]) map[bucket] = this.composition[bucket]
+      for (const b of this.bucketNames) {
+        if (next[b]) map[b] = next[b]
       }
       const composition = Object.keys(map).length ? JSON.stringify(map) : ''
       this.savingComposition = true
@@ -554,9 +555,12 @@ export default {
           mutation: setBrandingCompositionMutation(),
           variables: { composition },
         })
-        // Broadcast via policyChanged; reload to fully apply the recomposed branding.
+        // Server accepted it → commit locally, then reload to fully apply the recomposed branding.
+        this.composition = next
+        this.clearPending(bucket)
         window.location.reload()
       } catch (error) {
+        // Leave this.composition + pending untouched so the failed change stays pending (retry/cancel).
         this.$toast.error(this.$t('admin.branding.error'))
         this.savingComposition = false
       }
