@@ -66,7 +66,10 @@ function resolve() {
   cache = {
     LANDING_PAGE: landingPage,
     ...built,
-    FOOTER_LINK_LIST: footerOrder.map((k) => byKey[k]),
+    // filter(Boolean): a footerOrder key that isn't a known page (typo / stale or admin-edited brand
+    // config) resolves to undefined — drop it so PageFooter doesn't read footerIdent off undefined and
+    // crash the whole footer. Brand configs are runtime-editable now, so this is a real input.
+    FOOTER_LINK_LIST: footerOrder.map((k) => byKey[k]).filter(Boolean),
   }
   cacheKey = key
   return cache
