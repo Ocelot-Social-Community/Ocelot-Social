@@ -10,7 +10,6 @@
 // runs as-is). This lets a pre-built image be branded without a rebuild — see
 // docu/branding-architecture-konzept.md.
 import { checkSchemaCompat, describeSchemaCompat, setBranding } from '@ocelot-social/branding'
-// eslint-disable-next-line import-x/no-unresolved -- package subpath (server-only, uses node:fs + node:zlib)
 import {
   discoverArchives,
   readArchiveConfig,

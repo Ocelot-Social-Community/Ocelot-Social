@@ -9,7 +9,11 @@ describe('branding resolvers', () => {
   let set: jest.Mock
   let context: Context
 
-  const call = (name: 'setActiveBranding' | 'setBrandingComposition', args: Record<string, string>) =>
+  const call = async (
+    name: 'setActiveBranding' | 'setBrandingComposition',
+    args: Record<string, string>,
+  ) =>
+    // eslint-disable-next-line security/detect-object-injection -- name is a strict resolver-name union
     (brandingResolver.Mutation[name] as (p: unknown, a: unknown, c: Context) => Promise<string>)(
       null,
       args,
