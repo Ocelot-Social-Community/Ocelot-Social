@@ -416,6 +416,8 @@ export default {
 
   // A missing hard-requirement secret breaks its feature → flag the whole row.
   &--blocking {
+    // rgba() fallback first for browsers without color-mix() (chrome <111, ios_saf <16.2, …)
+    background: rgba($color-danger, 0.07);
     background: color-mix(in srgb, var(--color-danger) 7%, transparent);
 
     th.cell--key {
@@ -428,6 +430,8 @@ export default {
   // --blocking so a highlighted row reads as the navigation target.
   &--highlight {
     // $color-secondary is a runtime var() now; color-mix instead of Sass rgba() for the tint.
+    // rgba() fallback first for browsers without color-mix() (chrome <111, ios_saf <16.2, …).
+    background: rgba($color-secondary, 0.1);
     background: color-mix(in srgb, var(--color-secondary) 10%, transparent);
 
     th.cell--key {

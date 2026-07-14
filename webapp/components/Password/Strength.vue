@@ -104,10 +104,13 @@ export default {
 
 .password-strength-meter-inner {
   &.strength-0 {
+    // darken() fallback first for browsers without color-mix() (chrome <111, ios_saf <16.2, …)
+    background: darken($color-warning, 40%);
     background: color-mix(in srgb, var(--color-warning), black 40%);
     width: 20%;
   }
   &.strength-1 {
+    background: darken(mix($color-warning, $color-yellow, 50%), 30%);
     background: color-mix(in srgb, color-mix(in srgb, var(--color-warning), rgb(245, 196, 0)), black 30%);
     width: 40%;
   }
@@ -116,6 +119,7 @@ export default {
     width: 60%;
   }
   &.strength-3 {
+    background: darken($color-success, 10%);
     background: color-mix(in srgb, var(--color-success), black 10%);
     width: 80%;
   }

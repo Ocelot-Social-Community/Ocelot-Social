@@ -113,6 +113,8 @@ export default {
   &.reserve-drag-over {
     border-color: $color-success;
     border-style: dashed;
+    // rgba() fallback first for browsers without color-mix() (chrome <111, ios_saf <16.2, …)
+    background-color: rgba($color-success, 0.05);
     background-color: color-mix(in srgb, var(--color-success) 5%, transparent);
   }
 
