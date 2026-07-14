@@ -157,7 +157,7 @@ export default {
    */
   plugins: [
     { src: '~/plugins/branding.js', ssr: true },
-    { src: '~/plugins/branding-head.js', mode: 'client' },
+    { src: '~/plugins/branding-head.js', ssr: false },
     { src: '~/plugins/policy.js', ssr: true },
     { src: '~/plugins/policy-subscribe.js', ssr: false },
     // Live branding switch: reload when the activeBranding policy value diverges from the
