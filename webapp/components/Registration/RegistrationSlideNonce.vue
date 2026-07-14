@@ -73,7 +73,7 @@ export default {
       return this.sliderData.sliderIndex // to have a shorter notation
     },
     validInput() {
-      return this.formData.nonce.length === 5
+      return this.formData.nonce.length === branding.registration.nonceLength
     },
     isEmailFormat() {
       return isEmail(this.sliderData.collectedInputData.email)

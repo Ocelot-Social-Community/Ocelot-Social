@@ -89,7 +89,7 @@ export default {
       return this.sliderData.sliderIndex // to have a shorter notation
     },
     validInput() {
-      return this.formData.inviteCode.length === 6
+      return this.formData.inviteCode.length === branding.registration.inviteCodeLength
     },
     invitedBy() {
       return this.validInput &&
