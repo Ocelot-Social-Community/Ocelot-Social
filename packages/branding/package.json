@@ -19,7 +19,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "postbuild": "echo '{ \"type\": \"commonjs\" }' > dist/package.json",
+    "postbuild": "node -e \"require('fs').writeFileSync('dist/package.json', JSON.stringify({ type: 'commonjs' }))\"",
     "lint": "eslint --max-warnings 0 .",
     "typecheck": "tsc -p tsconfig.json",
     "validate": "publint && attw --pack . --profile node16",
