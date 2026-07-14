@@ -50,4 +50,29 @@ describe('manifest serverMiddleware', () => {
     expect(json.short_name).toBe('yunite')
     expect(json.theme_color).toBe('rgb(110, 139, 135)')
   })
+
+  it('returns an empty icons array when the brand has no ogImage', () => {
+    setBranding({
+      ...brandingDefaults,
+      metadata: { ...brandingDefaults.metadata, ogImage: '' },
+    })
+    const { json } = run()
+    expect(json.icons).toEqual([])
+  })
+
+  it('derives the 192/512 PWA icons from the brand ogImage + ogImageType', () => {
+    setBranding({
+      ...brandingDefaults,
+      metadata: {
+        ...brandingDefaults.metadata,
+        ogImage: '/branding/acme/assets/logo-squared.svg',
+        ogImageType: 'image/svg+xml',
+      },
+    })
+    const { json } = run()
+    expect(json.icons).toEqual([
+      { src: '/branding/acme/assets/logo-squared.svg', sizes: '192x192', type: 'image/svg+xml' },
+      { src: '/branding/acme/assets/logo-squared.svg', sizes: '512x512', type: 'image/svg+xml' },
+    ])
+  })
 })
