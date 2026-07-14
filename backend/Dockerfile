@@ -64,11 +64,9 @@ ONBUILD RUN if ls /brand/brand.config.* >/dev/null 2>&1; then \
 ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 ONBUILD RUN yarn run build
-ONBUILD RUN mkdir /build
-ONBUILD RUN cp -r ./build /build
-ONBUILD RUN cp -r ./public /build
-ONBUILD RUN if [ -d ./branding-assets ]; then cp -r ./branding-assets /build/branding-assets; fi
-ONBUILD RUN cp -r ./package.json yarn.lock /build
+ONBUILD RUN mkdir /build && \
+    cp -r ./build ./public ./package.json ./yarn.lock /build && \
+    if [ -d ./branding-assets ]; then cp -r ./branding-assets /build/branding-assets; fi
 ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     cd /build && yarn install --production=true --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 
