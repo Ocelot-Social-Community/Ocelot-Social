@@ -6,8 +6,11 @@ on:
   pull_request:
     branches: [master]
 
+# Least privilege. pull-requests:read is required by dorny/paths-filter, which lists a PR's changed
+# files via the API (the fetch-depth:1 checkout has no base history for a local diff).
 permissions:
   contents: read
+  pull-requests: read
 
 defaults:
   run:
