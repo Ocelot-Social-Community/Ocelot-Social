@@ -86,18 +86,6 @@
                     <os-icon :icon="icons.warning" />
                   </os-badge>
                 </div>
-                <div v-if="eventStartIsInPast" class="event-date-hint-row">
-                  <p class="event-date-hint event-date-hint--warning">
-                    {{ $t('post.viewEvent.eventStartInPast') }}
-                  </p>
-                  <os-badge
-                    role="alert"
-                    aria-live="assertive"
-                    class="event-date-hint-badge--warning"
-                  >
-                    <os-icon :icon="icons.questionCircle" />
-                  </os-badge>
-                </div>
               </div>
               <div class="event-grid-item">
                 <!-- <label>Ende (optional)</label> -->
@@ -111,10 +99,31 @@
                   :seconds-step="0"
                   format="DD.MM.YYYY HH:mm"
                   :placeholder="$t('post.viewEvent.eventEnd')"
-                  class="event-grid-item-font-helper"
+                  :class="[
+                    'event-grid-item-font-helper',
+                    { 'mx-datepicker-error': formErrors && formErrors.eventEnd },
+                  ]"
                   :show-second="false"
                   @change="changeEventEnd($event)"
                 ></date-picker>
+              </div>
+            </div>
+            <div class="event-date-hints-zone">
+              <div class="event-date-hint-cell">
+                <div v-if="eventStartIsInPast" class="event-date-hint-row">
+                  <p class="event-date-hint event-date-hint--warning">
+                    {{ $t('post.viewEvent.eventStartInPast') }}
+                  </p>
+                  <os-badge
+                    role="alert"
+                    aria-live="assertive"
+                    class="event-date-hint-badge--warning"
+                  >
+                    <os-icon :icon="icons.questionCircle" />
+                  </os-badge>
+                </div>
+              </div>
+              <div class="event-date-hint-cell">
                 <div v-if="formErrors && formErrors.eventEnd" class="event-date-hint-row">
                   <p class="event-date-hint event-date-hint--error">
                     {{ $t('post.viewEvent.eventEndBeforeStart') }}
@@ -125,7 +134,6 @@
                 </div>
               </div>
             </div>
-            <div class="event-date-hints-zone"></div>
             <div class="ds-grid event-location-grid">
               <div class="event-grid-item">
                 <ocelot-input
@@ -604,7 +612,9 @@ export default {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: $space-small;
-    padding: $space-x-small 0 $space-base;
+    height: $space-base;
+    align-items: center;
+    margin-bottom: $space-x-small;
   }
 
   .event-date-hint-row {
@@ -612,7 +622,6 @@ export default {
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    margin-top: $space-xx-small;
   }
 
   .event-date-hint {
@@ -772,8 +781,8 @@ export default {
     border-color: #17b53f;
     background-color: #fff;
   }
-  .mx-datepicker-error {
-    border-color: #cf2619;
+  .mx-datepicker-error input {
+    border-color: $color-danger;
   }
 }
 </style>
