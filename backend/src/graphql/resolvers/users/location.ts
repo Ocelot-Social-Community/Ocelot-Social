@@ -162,7 +162,7 @@ export const createOrUpdateLocations = async (
   })
 }
 
-const ALLOWED_LOCATION_TYPES = new Set([
+const ALLOWED_LOCATION_TYPES = [
   'country',
   'region',
   'postcode',
@@ -172,34 +172,33 @@ const ALLOWED_LOCATION_TYPES = new Set([
   'neighborhood',
   'address',
   'poi',
-])
-const DEFAULT_LOCATION_TYPES = 'region,place,country'
+]
+const DEFAULT_LOCATION_TYPES = 'country,region,place,address'
 
 export const queryLocations = async ({ place, lang, types, proximity }, context: Context) => {
-  const safeTypes = types
+  const locationTypes = types
     ? types
         .split(',')
-        .map((t: string) => t.trim())
-        .filter((t: string) => ALLOWED_LOCATION_TYPES.has(t))
-        .join(',') || DEFAULT_LOCATION_TYPES
+        .filter((t) => ALLOWED_LOCATION_TYPES.includes(t))
+        .join(',')
     : DEFAULT_LOCATION_TYPES
-  const proximityParts = proximity ? proximity.split(',') : []
-  const proximityParam =
-    proximityParts.length === 2 &&
-    !Number.isNaN(parseFloat(proximityParts[0])) &&
-    !Number.isNaN(parseFloat(proximityParts[1]))
-      ? `&proximity=${encodeURIComponent(proximity)}`
-      : ''
-  const res: any = await fetch(
-    `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(place)}.json?access_token=${context.config.MAPBOX_TOKEN}&types=${safeTypes}&language=${encodeURIComponent(lang)}&limit=10${proximityParam}`,
-    {
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT),
-    },
-  )
-  const response = await res.json()
-  // Return empty array if no location found or error occurred
-  if (!response?.features) {
-    return []
+
+  let url =
+    `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(decodeURIComponent(place))}.json` +
+    `?access_token=${context.config.MAPBOX_TOKEN}&types=${locationTypes}&language=${lang}&limit=10`
+
+  if (proximity) {
+    url += `&proximity=${proximity}`
   }
-  return response.features
+
+  const res: any = await fetch(url, {
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT),
+  })
+  const response = await res.json()
+  return (
+    response?.features?.map((item: any) => ({
+      place_name: item.place_name,
+      id: item.id,
+    })) ?? []
+  )
 }

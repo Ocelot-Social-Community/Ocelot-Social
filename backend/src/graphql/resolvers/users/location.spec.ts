@@ -24,55 +24,24 @@ const mockJsonResponse = (body: unknown) =>
     json: async () => Promise.resolve(body),
   }) as unknown as Response
 
-const berlinFeaturesEn = {
+// Mapbox mock responses for queryLocations
+const berlinMapboxEn = {
   features: [
-    { id: 'place.115770', place_name: 'Berlin, Germany', place_type: ['place'] },
-    {
-      id: 'place.25995500',
-      place_name: 'Berlin, Maryland, United States',
-      place_type: ['place'],
-    },
-    {
-      id: 'place.26036460',
-      place_name: 'Berlin, Connecticut, United States',
-      place_type: ['place'],
-    },
-    {
-      id: 'place.500697324',
-      place_name: 'Berlin, New Jersey, United States',
-      place_type: ['place'],
-    },
-    {
-      id: 'place.25952876',
-      place_name: 'Berlin Heights, Ohio, United States',
-      place_type: ['place'],
-    },
+    { id: 'place.berlin-de', place_name: 'Berlin, Germany' },
+    { id: 'place.berlin-md', place_name: 'Berlin, Maryland, United States' },
+    { id: 'place.berlin-ct', place_name: 'Berlin, Connecticut, United States' },
+    { id: 'place.berlin-nj', place_name: 'Berlin, New Jersey, United States' },
+    { id: 'place.berlin-oh', place_name: 'Berlin Heights, Ohio, United States' },
   ],
 }
 
-const berlinFeaturesDe = {
+const berlinMapboxDe = {
   features: [
-    { id: 'place.115770', place_name: 'Berlin, Deutschland', place_type: ['place'] },
-    {
-      id: 'place.25995500',
-      place_name: 'Berlin, Maryland, Vereinigte Staaten',
-      place_type: ['place'],
-    },
-    {
-      id: 'place.500697324',
-      place_name: 'Berlin, New Jersey, Vereinigte Staaten',
-      place_type: ['place'],
-    },
-    {
-      id: 'place.25952876',
-      place_name: 'Berlin Heights, Ohio, Vereinigte Staaten',
-      place_type: ['place'],
-    },
-    {
-      id: 'place.25983916',
-      place_name: 'Berlin, Massachusetts, Vereinigte Staaten',
-      place_type: ['place'],
-    },
+    { id: 'place.berlin-de', place_name: 'Berlin, Deutschland' },
+    { id: 'place.berlin-md', place_name: 'Berlin, Maryland, Vereinigte Staaten' },
+    { id: 'place.berlin-nj', place_name: 'Berlin, New Jersey, Vereinigte Staaten' },
+    { id: 'place.berlin-oh', place_name: 'Berlin Heights, Ohio, Vereinigte Staaten' },
+    { id: 'place.berlin-ma', place_name: 'Berlin, Massachusetts, Vereinigte Staaten' },
   ],
 }
 
@@ -163,14 +132,19 @@ beforeEach(() => {
   fetchSpy = jest.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
     const path = decodeURIComponent(url)
-    if (path.includes('/Berlin.json')) {
-      if (path.includes('language=de')) return Promise.resolve(mockJsonResponse(berlinFeaturesDe))
-      return Promise.resolve(mockJsonResponse(berlinFeaturesEn))
+
+    // Mapbox requests
+    if (path.includes('api.mapbox.com')) {
+      if (path.includes('Berlin')) {
+        if (path.includes('language=de')) return Promise.resolve(mockJsonResponse(berlinMapboxDe))
+        return Promise.resolve(mockJsonResponse(berlinMapboxEn))
+      }
+      if (path.includes('Welzheim')) {
+        return Promise.resolve(mockJsonResponse(welzheimFeature))
+      }
+      return Promise.resolve(mockJsonResponse({ features: [] }))
     }
-    if (path.includes('Welzheim')) {
-      return Promise.resolve(mockJsonResponse(welzheimFeature))
-    }
-    // Unknown place — mimic Mapbox "no results"
+
     return Promise.resolve(mockJsonResponse({ features: [] }))
   })
 })
@@ -199,23 +173,11 @@ describe('Location Service', () => {
     const result = await query({ query: queryLocations, variables })
     expect(result.data.queryLocations).toEqual(
       expect.arrayContaining([
-        { id: expect.stringMatching(/^place\.[0-9a-z-]+$/), place_name: 'Berlin, Germany' },
-        {
-          id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
-          place_name: 'Berlin, Maryland, United States',
-        },
-        {
-          id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
-          place_name: 'Berlin, Connecticut, United States',
-        },
-        {
-          id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
-          place_name: 'Berlin, New Jersey, United States',
-        },
-        {
-          id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
-          place_name: 'Berlin Heights, Ohio, United States',
-        },
+        { id: 'place.berlin-de', place_name: 'Berlin, Germany' },
+        { id: 'place.berlin-md', place_name: 'Berlin, Maryland, United States' },
+        { id: 'place.berlin-ct', place_name: 'Berlin, Connecticut, United States' },
+        { id: 'place.berlin-nj', place_name: 'Berlin, New Jersey, United States' },
+        { id: 'place.berlin-oh', place_name: 'Berlin Heights, Ohio, United States' },
       ]),
     )
   })
@@ -227,23 +189,11 @@ describe('Location Service', () => {
     }
     const result = await query({ query: queryLocations, variables })
     expect(result.data.queryLocations).toEqual([
-      { id: expect.stringMatching(/^place\.[0-9a-z-]+$/), place_name: 'Berlin, Deutschland' },
-      {
-        id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
-        place_name: 'Berlin, Maryland, Vereinigte Staaten',
-      },
-      {
-        id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
-        place_name: 'Berlin, New Jersey, Vereinigte Staaten',
-      },
-      {
-        id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
-        place_name: 'Berlin Heights, Ohio, Vereinigte Staaten',
-      },
-      {
-        id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
-        place_name: 'Berlin, Massachusetts, Vereinigte Staaten',
-      },
+      { id: 'place.berlin-de', place_name: 'Berlin, Deutschland' },
+      { id: 'place.berlin-md', place_name: 'Berlin, Maryland, Vereinigte Staaten' },
+      { id: 'place.berlin-nj', place_name: 'Berlin, New Jersey, Vereinigte Staaten' },
+      { id: 'place.berlin-oh', place_name: 'Berlin Heights, Ohio, Vereinigte Staaten' },
+      { id: 'place.berlin-ma', place_name: 'Berlin, Massachusetts, Vereinigte Staaten' },
     ])
   })
 
