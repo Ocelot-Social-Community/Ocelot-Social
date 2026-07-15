@@ -1184,9 +1184,11 @@
     },
     "viewEvent": {
       "eventEnd": "End",
+      "eventEndBeforeStart": "The end date must be after the start date.",
       "eventIsOnline": "Online",
       "eventLocationName": "Adress for navi — e.g. Example Street 1, 12345 City",
       "eventStart": "Start",
+      "eventStartInPast": "The event start is in the past.",
       "eventVenue": "Location description — e.g. backyard, 1st floor, …",
       "title": "Event"
     },

@@ -1184,9 +1184,11 @@
     },
     "viewEvent": {
       "eventEnd": "Fin",
+      "eventEndBeforeStart": "La date de fin doit être postérieure à la date de début.",
       "eventIsOnline": "En ligne",
       "eventLocationName": "Adresse pour navigation — p. ex. Rue Exemple 1, 12345 Ville",
       "eventStart": "Début",
+      "eventStartInPast": "La date de début est dans le passé.",
       "eventVenue": "Description du lieu — p. ex. cour arrière, 1er étage, …",
       "title": "Événement"
     },

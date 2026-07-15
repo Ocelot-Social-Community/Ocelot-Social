@@ -71,8 +71,6 @@
                   :minute-step="15"
                   format="DD.MM.YYYY HH:mm"
                   :placeholder="$t('post.viewEvent.eventStart')"
-                  :disabled-date="notBeforeToday"
-                  :disabled-time="notBeforeNow"
                   :show-second="false"
                   @change="changeEventStart($event)"
                 ></date-picker>
@@ -88,6 +86,9 @@
                     <os-icon :icon="icons.warning" />
                   </os-badge>
                 </div>
+                <p v-if="eventStartIsInPast" class="event-date-hint event-date-hint--warning">
+                  {{ $t('post.viewEvent.eventStartInPast') }}
+                </p>
               </div>
               <div class="event-grid-item">
                 <!-- <label>Ende (optional)</label> -->
@@ -102,13 +103,20 @@
                   format="DD.MM.YYYY HH:mm"
                   :placeholder="$t('post.viewEvent.eventEnd')"
                   class="event-grid-item-font-helper"
-                  :disabled-date="notBeforeEventDay"
-                  :disabled-time="notBeforeEvent"
                   :show-second="false"
                   @change="changeEventEnd($event)"
                 ></date-picker>
+                <div v-if="formErrors && formErrors.eventEnd" class="event-date-hint-row">
+                  <p class="event-date-hint event-date-hint--error">
+                    {{ $t('post.viewEvent.eventEndBeforeStart') }}
+                  </p>
+                  <os-badge role="alert" aria-live="assertive" variant="danger">
+                    <os-icon :icon="icons.warning" />
+                  </os-badge>
+                </div>
               </div>
             </div>
+            <div class="event-date-hints-zone"></div>
             <div class="ds-grid event-location-grid">
               <div class="event-grid-item">
                 <ocelot-input
@@ -308,6 +316,19 @@ export default {
           },
         },
         eventStart: { required: !!this.createEvent },
+        eventEnd: {
+          validator: (_, value, callback) => {
+            if (!this.createEvent || !value || !this.formData.eventStart) {
+              callback()
+              return
+            }
+            if (new Date(value) <= new Date(this.formData.eventStart)) {
+              callback(new Error(this.$t('post.viewEvent.eventEndBeforeStart')))
+              return
+            }
+            callback()
+          },
+        },
         eventVenue: {
           required: !!this.createEvent,
           min: 3,
@@ -345,6 +366,13 @@ export default {
           },
         },
       }
+    },
+    eventStartIsInPast() {
+      return (
+        this.createEvent &&
+        this.formData.eventStart &&
+        new Date(this.formData.eventStart) < new Date()
+      )
     },
     eventInput() {
       if (this.createEvent) {
@@ -436,18 +464,6 @@ export default {
         eventVenue: eventVenue || '',
         eventIsOnline: eventIsOnline || false,
       }
-    },
-    notBeforeToday(date) {
-      return date < new Date().setHours(0, 0, 0, 0)
-    },
-    notBeforeNow(date) {
-      return date < new Date()
-    },
-    notBeforeEventDay(date) {
-      return date < new Date(this.formData.eventStart).setHours(0, 0, 0, 0)
-    },
-    notBeforeEvent(date) {
-      return date <= new Date(this.formData.eventStart)
     },
     onSubmit() {
       // Block creating a post without permission (editing stays allowed). The button is
@@ -575,6 +591,33 @@ export default {
 
 <style lang="scss">
 .eventDatas {
+  .event-date-hints-zone {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-small;
+    padding: $space-x-small 0 $space-base;
+  }
+
+  .event-date-hint-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: $space-xx-small;
+  }
+
+  .event-date-hint {
+    font-size: 0.75rem;
+
+    &--warning {
+      color: $color-warning;
+    }
+
+    &--error {
+      color: $color-danger;
+    }
+  }
+
   .chipbox {
     display: flex;
     justify-content: flex-end;

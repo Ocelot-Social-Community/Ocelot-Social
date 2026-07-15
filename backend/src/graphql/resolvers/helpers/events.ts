@@ -41,10 +41,6 @@ const validateEventDate = (dateString) => {
     throw new UserInputError('Event start date must be a valid date!')
   if (date.toISOString() !== dateString)
     throw new UserInputError('Event start date must be in ISO format!')
-  const now = new Date()
-  if (date.getTime() < now.getTime()) {
-    throw new UserInputError('Event start date must be in the future!')
-  }
 }
 
 const validateEventEnd = (start, end) => {

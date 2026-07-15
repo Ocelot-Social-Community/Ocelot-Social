@@ -1184,9 +1184,11 @@
     },
     "viewEvent": {
       "eventEnd": "Koniec",
+      "eventEndBeforeStart": "Data zakończenia musi być późniejsza niż data rozpoczęcia.",
       "eventIsOnline": "Online",
       "eventLocationName": "Adres do nawigacji — np. Przykładowa 1, 00-000 Miasto",
       "eventStart": "Początek",
+      "eventStartInPast": "Data rozpoczęcia jest w przeszłości.",
       "eventVenue": "Opis lokalizacji — np. podwórko, 1. piętro, …",
       "title": "Wydarzenie"
     },
