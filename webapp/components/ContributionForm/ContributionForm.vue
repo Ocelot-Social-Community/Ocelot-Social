@@ -86,9 +86,18 @@
                     <os-icon :icon="icons.warning" />
                   </os-badge>
                 </div>
-                <p v-if="eventStartIsInPast" class="event-date-hint event-date-hint--warning">
-                  {{ $t('post.viewEvent.eventStartInPast') }}
-                </p>
+                <div v-if="eventStartIsInPast" class="event-date-hint-row">
+                  <p class="event-date-hint event-date-hint--warning">
+                    {{ $t('post.viewEvent.eventStartInPast') }}
+                  </p>
+                  <os-badge
+                    role="alert"
+                    aria-live="assertive"
+                    class="event-date-hint-badge--warning"
+                  >
+                    <os-icon :icon="icons.questionCircle" />
+                  </os-badge>
+                </div>
               </div>
               <div class="event-grid-item">
                 <!-- <label>Ende (optional)</label> -->
@@ -616,6 +625,11 @@ export default {
     &--error {
       color: $color-danger;
     }
+  }
+
+  .event-date-hint-badge--warning {
+    --color-default: #{$color-warning};
+    --color-default-contrast: white;
   }
 
   .chipbox {
