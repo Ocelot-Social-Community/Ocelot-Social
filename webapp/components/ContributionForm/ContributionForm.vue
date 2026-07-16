@@ -548,7 +548,10 @@ export default {
       this.updateFormField('eventEnd', event)
     },
     changeEventStart(event) {
-      this.updateFormField('eventStart', event)
+      this.$set(this.formData, 'eventStart', event)
+      if (!event || this.formData.eventEnd) {
+        this.$validateForm()
+      }
     },
     addHeroImage(file) {
       this.formData.image = null

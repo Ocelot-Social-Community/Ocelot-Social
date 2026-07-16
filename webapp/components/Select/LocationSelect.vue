@@ -9,6 +9,7 @@
       :options="cities"
       icon="map-marker"
       :icon-right="null"
+      :prefill-on-open="true"
       :placeholder="placeholder !== null ? placeholder : $t('settings.data.labelCity') + ' …'"
       @input.native="handleCityInput"
     >
