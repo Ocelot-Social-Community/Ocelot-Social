@@ -425,12 +425,14 @@
     "takeAction": "Tomar uma ação",
     "user": "Usuário ::: Usuários",
     "validations": {
-      "categories": "pelo menos um e no máximo três tópicos devem ser selecionados",
-      "email": "deve ser um endereço de e-mail válido",
-      "eventLocationNameLength": "mínimo {min} ou máximo {max} caracteres",
-      "eventLocationNameNotEmpty": "apenas caracteres vazios não são permitidos",
-      "eventVenueLength": "mínimo {min} ou máximo {max} caracteres",
-      "eventVenueNotEmpty": "apenas caracteres vazios não são permitidos",
+      "categories": "Por favor, selecione entre um e três tópicos.",
+      "email": "Por favor, insira um endereço de e-mail válido.",
+      "eventLocationNameLength": "O endereço deve ter entre {min} e {max} caracteres.",
+      "eventLocationNameNotEmpty": "Por favor, insira um endereço.",
+      "eventVenueLength": "A descrição do local deve ter entre {min} e {max} caracteres.",
+      "eventVenueNotEmpty": "Por favor, insira uma descrição do local.",
+      "titleLength": "O título deve ter entre {min} e {max} caracteres.",
+      "titleNotEmpty": "Por favor, insira um título.",
       "url": "deve ser uma URL válida"
     },
     "versus": "Contra"

@@ -425,12 +425,14 @@
     "takeAction": "Podejmij działania",
     "user": "Użytkownik ::: Użytkownicy",
     "validations": {
-      "categories": "należy wybrać co najmniej jeden i maksymalnie trzy tematy",
-      "email": "musi być ważny adres e-mail.",
-      "eventLocationNameLength": "minimum {min} lub maksimum {max} znaków",
-      "eventLocationNameNotEmpty": "same puste znaki nie są dozwolone",
-      "eventVenueLength": "minimum {min} lub maksimum {max} znaków",
-      "eventVenueNotEmpty": "same puste znaki nie są dozwolone",
+      "categories": "Proszę wybrać od jednego do trzech tematów.",
+      "email": "Proszę podać prawidłowy adres e-mail.",
+      "eventLocationNameLength": "Adres musi mieć od {min} do {max} znaków.",
+      "eventLocationNameNotEmpty": "Proszę podać adres.",
+      "eventVenueLength": "Opis miejsca musi mieć od {min} do {max} znaków.",
+      "eventVenueNotEmpty": "Proszę podać opis miejsca.",
+      "titleLength": "Tytuł musi mieć od {min} do {max} znaków.",
+      "titleNotEmpty": "Proszę podać tytuł.",
       "url": "musi być poprawnym adresem URL"
     },
     "versus": "werset"

@@ -130,17 +130,16 @@
                   model="eventVenue"
                   name="eventVenue"
                   :placeholder="$t('post.viewEvent.eventVenue')"
+                  hide-error
                 />
-                <div class="chipbox">
-                  <os-badge
-                    role="status"
-                    aria-live="polite"
-                    :variant="formErrors && formErrors.eventVenue ? 'danger' : undefined"
-                  >
-                    {{ formData.eventVenue.length }}/{{ formSchema.eventVenue.max }}
-                    <os-icon v-if="formErrors && formErrors.eventVenue" :icon="icons.warning" />
-                  </os-badge>
-                </div>
+                <validation-hint
+                  :count="
+                    !(formErrors && formErrors.eventVenue) ? formData.eventVenue.length : null
+                  "
+                  :max="!(formErrors && formErrors.eventVenue) ? formSchema.eventVenue.max : null"
+                  :variant="formErrors && formErrors.eventVenue ? 'error' : null"
+                  :text="formErrors && formErrors.eventVenue ? formErrors.eventVenue : null"
+                />
               </div>
               <div
                 v-if="showEventLocationName"
@@ -312,7 +311,18 @@ export default {
     }),
     formSchema() {
       return {
-        title: { required: true, min: 3, max: 100 },
+        title: {
+          max: 100,
+          validator: (_, value = '') => {
+            if (!value.trim()) {
+              return [new Error(this.$t('common.validations.titleNotEmpty'))]
+            }
+            if (value.length < 3 || value.length > 100) {
+              return [new Error(this.$t('common.validations.titleLength', { min: 3, max: 100 }))]
+            }
+            return []
+          },
+        },
         content: { required: true },
         imageBlurred: { required: false },
         categoryIds: {
@@ -638,6 +648,10 @@ export default {
 
   .event-grid-item {
     grid-row-end: span 3;
+
+    > .ds-form-item {
+      margin-bottom: 0;
+    }
   }
   .event-grid-item-margin-helper {
     margin-top: 10px;

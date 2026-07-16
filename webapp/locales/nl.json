@@ -425,12 +425,14 @@
     "takeAction": "Onderneem actie",
     "user": "Gebruiker ::: Gebruikers",
     "validations": {
-      "categories": "er moet minstens één en maximaal drie onderwerpen geselecteerd zijn",
-      "email": "moet een geldig e-mailadres zijn",
-      "eventLocationNameLength": "minimaal {min} of maximaal {max} tekens",
-      "eventLocationNameNotEmpty": "alleen lege tekens zijn niet toegestaan",
-      "eventVenueLength": "minimaal {min} of maximaal {max} tekens",
-      "eventVenueNotEmpty": "alleen lege tekens zijn niet toegestaan",
+      "categories": "Selecteer tussen één en drie onderwerpen.",
+      "email": "Voer een geldig e-mailadres in.",
+      "eventLocationNameLength": "Het adres moet tussen {min} en {max} tekens lang zijn.",
+      "eventLocationNameNotEmpty": "Voer een adres in.",
+      "eventVenueLength": "De plaatsbeschrijving moet tussen {min} en {max} tekens lang zijn.",
+      "eventVenueNotEmpty": "Voer een plaatsbeschrijving in.",
+      "titleLength": "De titel moet tussen {min} en {max} tekens lang zijn.",
+      "titleNotEmpty": "Voer een titel in.",
       "url": "moet een geldige URL zijn"
     },
     "versus": "Versus"

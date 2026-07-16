@@ -425,12 +425,14 @@
     "takeAction": "Take Action",
     "user": "User ::: Users",
     "validations": {
-      "categories": "at least one and at most three topics must be selected",
-      "email": "must be a valid e-mail address",
-      "eventLocationNameLength": "minimum {min} or maximum {max} characters",
-      "eventLocationNameNotEmpty": "only empty characters are not allowed",
-      "eventVenueLength": "minimum {min} or maximum {max} characters",
-      "eventVenueNotEmpty": "only empty characters are not allowed",
+      "categories": "Please select between one and three topics.",
+      "email": "Please enter a valid e-mail address.",
+      "eventLocationNameLength": "The address must be between {min} and {max} characters long.",
+      "eventLocationNameNotEmpty": "Please enter an address.",
+      "eventVenueLength": "The venue description must be between {min} and {max} characters long.",
+      "eventVenueNotEmpty": "Please enter a venue description.",
+      "titleLength": "The title must be between {min} and {max} characters.",
+      "titleNotEmpty": "Please enter a title.",
       "url": "must be a valid URL"
     },
     "versus": "Versus"

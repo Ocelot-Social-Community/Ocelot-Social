@@ -425,12 +425,14 @@
     "takeAction": "Merr masa",
     "user": "Përdorues ::: Përdorues",
     "validations": {
-      "categories": "duhet të zgjidhet të paktën një dhe maksimumi tre tema",
-      "email": "duhet të jetë një adresë e vlefshme e-maili",
-      "eventLocationNameLength": "minimumi {min} ose maksimumi {max} karaktere",
-      "eventLocationNameNotEmpty": "vetëm karaktere boshe nuk lejohen",
-      "eventVenueLength": "minimumi {min} ose maksimumi {max} karaktere",
-      "eventVenueNotEmpty": "vetëm karaktere boshe nuk lejohen",
+      "categories": "Ju lutem zgjidhni midis një dhe tre temave.",
+      "email": "Ju lutem shkruani një adresë e-mail të vlefshme.",
+      "eventLocationNameLength": "Adresa duhet të ketë midis {min} dhe {max} karaktere.",
+      "eventLocationNameNotEmpty": "Ju lutem shkruani një adresë.",
+      "eventVenueLength": "Përshkrimi i vendit duhet të ketë midis {min} dhe {max} karaktere.",
+      "eventVenueNotEmpty": "Ju lutem shkruani një përshkrim të vendit.",
+      "titleLength": "Titulli duhet të ketë midis {min} dhe {max} karaktere.",
+      "titleNotEmpty": "Ju lutem shkruani një titull.",
       "url": "duhet të jetë një URL e vlefshme"
     },
     "versus": "Kundër"

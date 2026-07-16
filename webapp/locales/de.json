@@ -425,12 +425,14 @@
     "takeAction": "Aktiv werden",
     "user": "Nutzer ::: Nutzer",
     "validations": {
-      "categories": "es müssen eine bis drei Themen ausgewählt werden",
-      "email": "muss eine gültige E-Mail-Adresse sein",
-      "eventLocationNameLength": "Minimum {min}, Maximum {max} Zeichen",
-      "eventLocationNameNotEmpty": "es dürfen nicht nur Freizeichen eingetragen werden",
-      "eventVenueLength": "Minimum {min}, Maximum {max} Zeichen",
-      "eventVenueNotEmpty": "es dürfen nicht nur Freizeichen eingetragen werden",
+      "categories": "Bitte ein bis drei Themen auswählen.",
+      "email": "Bitte eine gültige E-Mail-Adresse eingeben.",
+      "eventLocationNameLength": "Die Adresse muss zwischen {min} und {max} Zeichen lang sein.",
+      "eventLocationNameNotEmpty": "Bitte eine Adresse eingeben.",
+      "eventVenueLength": "Die Ortsbeschreibung muss zwischen {min} und {max} Zeichen lang sein.",
+      "eventVenueNotEmpty": "Bitte eine Ortsbeschreibung eingeben.",
+      "titleLength": "Der Titel muss zwischen {min} und {max} Zeichen lang sein.",
+      "titleNotEmpty": "Bitte einen Titel eingeben.",
       "url": "muss eine gültige URL sein"
     },
     "versus": "Versus"

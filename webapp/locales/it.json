@@ -425,12 +425,14 @@
     "takeAction": "Agire",
     "user": "Utente ::: Utenti",
     "validations": {
-      "categories": "deve essere selezionato almeno uno e al massimo tre argomenti",
-      "email": "deve essere un indirizzo e-mail valido",
-      "eventLocationNameLength": "minimo {min} o massimo {max} caratteri",
-      "eventLocationNameNotEmpty": "solo caratteri vuoti non sono ammessi",
-      "eventVenueLength": "minimo {min} o massimo {max} caratteri",
-      "eventVenueNotEmpty": "solo caratteri vuoti non sono ammessi",
+      "categories": "Selezionare tra uno e tre argomenti.",
+      "email": "Inserire un indirizzo e-mail valido.",
+      "eventLocationNameLength": "L'indirizzo deve essere compreso tra {min} e {max} caratteri.",
+      "eventLocationNameNotEmpty": "Inserire un indirizzo.",
+      "eventVenueLength": "La descrizione del luogo deve essere compresa tra {min} e {max} caratteri.",
+      "eventVenueNotEmpty": "Inserire una descrizione del luogo.",
+      "titleLength": "Il titolo deve essere compreso tra {min} e {max} caratteri.",
+      "titleNotEmpty": "Inserire un titolo.",
       "url": "deve essere un URL valido"
     },
     "versus": "Verso"

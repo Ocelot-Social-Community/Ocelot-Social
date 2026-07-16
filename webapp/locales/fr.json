@@ -425,12 +425,14 @@
     "takeAction": "Passer à l'action",
     "user": "Utilisateur ::: Utilisateurs",
     "validations": {
-      "categories": "au moins une et au maximum trois catégories doivent être sélectionnées",
-      "email": "Doit être une adresse mail valide",
-      "eventLocationNameLength": "minimum {min} ou maximum {max} caractères",
-      "eventLocationNameNotEmpty": "les caractères vides uniquement ne sont pas autorisés",
-      "eventVenueLength": "minimum {min} ou maximum {max} caractères",
-      "eventVenueNotEmpty": "les caractères vides uniquement ne sont pas autorisés",
+      "categories": "Veuillez sélectionner entre un et trois sujets.",
+      "email": "Veuillez saisir une adresse e-mail valide.",
+      "eventLocationNameLength": "L'adresse doit comporter entre {min} et {max} caractères.",
+      "eventLocationNameNotEmpty": "Veuillez saisir une adresse.",
+      "eventVenueLength": "La description du lieu doit comporter entre {min} et {max} caractères.",
+      "eventVenueNotEmpty": "Veuillez saisir une description du lieu.",
+      "titleLength": "Le titre doit comporter entre {min} et {max} caractères.",
+      "titleNotEmpty": "Veuillez saisir un titre.",
       "url": "doit être une URL valide"
     },
     "versus": "Versus"

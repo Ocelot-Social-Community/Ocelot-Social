@@ -82,6 +82,9 @@ export default {
   &__text {
     font-size: 0.75rem;
     line-height: 1;
+    margin: 0;
+    flex: 1;
+    min-width: 0;
   }
 
   &--warning .validation-hint__text {
