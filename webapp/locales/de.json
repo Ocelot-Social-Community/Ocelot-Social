@@ -1187,6 +1187,7 @@
       "eventEndBeforeStart": "Das Enddatum muss nach dem Startdatum liegen.",
       "eventIsOnline": "Online",
       "eventLocationName": "Adresse für Navi — z.B. Musterstraße 1, 12345 Musterstadt",
+      "eventLocationRequired": "Wenn nicht online, ist eine Adresse erforderlich.",
       "eventStart": "Beginn",
       "eventStartInPast": "Der Starttermin liegt in der Vergangenheit.",
       "eventVenue": "Ortsbeschreibung — z.B. Hinterhof, 1. OG, …",

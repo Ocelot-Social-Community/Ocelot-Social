@@ -110,28 +110,18 @@
             </div>
             <div class="event-date-hints-zone">
               <div class="event-date-hint-cell">
-                <div v-if="eventStartIsInPast" class="event-date-hint-row">
-                  <p class="event-date-hint event-date-hint--warning">
-                    {{ $t('post.viewEvent.eventStartInPast') }}
-                  </p>
-                  <os-badge
-                    role="alert"
-                    aria-live="assertive"
-                    class="event-date-hint-badge--warning"
-                  >
-                    <os-icon :icon="icons.questionCircle" />
-                  </os-badge>
-                </div>
+                <validation-hint
+                  v-if="eventStartIsInPast"
+                  variant="warning"
+                  :text="$t('post.viewEvent.eventStartInPast')"
+                />
               </div>
               <div class="event-date-hint-cell">
-                <div v-if="formErrors && formErrors.eventEnd" class="event-date-hint-row">
-                  <p class="event-date-hint event-date-hint--error">
-                    {{ $t('post.viewEvent.eventEndBeforeStart') }}
-                  </p>
-                  <os-badge role="alert" aria-live="assertive" variant="danger">
-                    <os-icon :icon="icons.warning" />
-                  </os-badge>
-                </div>
+                <validation-hint
+                  v-if="formErrors && formErrors.eventEnd"
+                  variant="error"
+                  :text="$t('post.viewEvent.eventEndBeforeStart')"
+                />
               </div>
             </div>
             <div class="ds-grid event-location-grid">
@@ -152,7 +142,11 @@
                   </os-badge>
                 </div>
               </div>
-              <div v-if="showEventLocationName" class="event-grid-item">
+              <div
+                v-if="showEventLocationName"
+                class="event-grid-item"
+                :class="{ 'ds-input-has-error': formErrors && formErrors.eventLocationName }"
+              >
                 <location-select
                   v-model="formData.eventLocationName"
                   types="country,region,postcode,district,place,locality,neighborhood,address,poi"
@@ -160,14 +154,11 @@
                   :show-label="false"
                   :placeholder="$t('post.viewEvent.eventLocationName')"
                 />
-                <os-badge
+                <validation-hint
                   v-if="formErrors && formErrors.eventLocationName"
-                  role="status"
-                  aria-live="polite"
-                  variant="danger"
-                >
-                  <os-icon :icon="icons.warning" />
-                </os-badge>
+                  variant="error"
+                  :text="$t('post.viewEvent.eventLocationRequired')"
+                />
               </div>
             </div>
 
@@ -260,6 +251,7 @@ import GetCategories from '~/mixins/getCategoriesMixin.js'
 import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 import LocationSelect from '~/components/Select/LocationSelect'
+import ValidationHint from '~/components/ValidationHint/ValidationHint.vue'
 
 export default {
   mixins: [GetCategories, formValidation],
@@ -275,6 +267,7 @@ export default {
     PageParamsLink,
     OcelotInput,
     LocationSelect,
+    ValidationHint,
   },
   props: {
     contribution: {
@@ -618,30 +611,10 @@ export default {
     height: $space-base;
     align-items: center;
     margin-bottom: $space-x-small;
-  }
 
-  .event-date-hint-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-  }
-
-  .event-date-hint {
-    font-size: 0.75rem;
-
-    &--warning {
-      color: $color-warning;
+    .validation-hint {
+      margin-top: 0;
     }
-
-    &--error {
-      color: $color-danger;
-    }
-  }
-
-  .event-date-hint-badge--warning {
-    --color-default: #{$color-warning};
-    --color-default-contrast: white;
   }
 
   .chipbox {
@@ -657,6 +630,10 @@ export default {
     grid-template-columns: repeat(2, 1fr);
     grid-auto-rows: auto;
     gap: $space-small;
+  }
+
+  .event-location-grid .validation-hint {
+    margin-top: 3px;
   }
 
   .event-grid-item {

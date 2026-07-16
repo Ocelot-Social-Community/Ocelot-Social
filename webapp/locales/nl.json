@@ -1187,6 +1187,7 @@
       "eventEndBeforeStart": "De einddatum moet na de startdatum liggen.",
       "eventIsOnline": "Online",
       "eventLocationName": "Adres voor navigatie — bijv. Voorbeeldstraat 1, 1234 AB Stad",
+      "eventLocationRequired": "Als het evenement niet online is, moet een locatie worden ingevoerd.",
       "eventStart": "Start",
       "eventStartInPast": "De startdatum ligt in het verleden.",
       "eventVenue": "Locatiebeschrijving — bijv. achtertuin, 1e verdieping, …",

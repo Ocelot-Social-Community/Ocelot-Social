@@ -1187,6 +1187,7 @@
       "eventEndBeforeStart": "Data e mbarimit duhet të jetë pas datës së fillimit.",
       "eventIsOnline": "Online",
       "eventLocationName": "Adresa për navigim — p.sh. Rruga Shembull 1, 12345 Qytet",
+      "eventLocationRequired": "Nëse ngjarja nuk është online, duhet të futet një vendndodhje.",
       "eventStart": "Fillimi",
       "eventStartInPast": "Data e fillimit është në të kaluarën.",
       "eventVenue": "Përshkrimi i vendndodhjes — p.sh. oborri, kati 1, …",

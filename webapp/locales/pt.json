@@ -1187,6 +1187,7 @@
       "eventEndBeforeStart": "A data de término deve ser posterior à data de início.",
       "eventIsOnline": "Online",
       "eventLocationName": "Endereço para navegação — ex.: Rua Exemplo 1, 12345 Cidade",
+      "eventLocationRequired": "Se o evento não for online, uma localização deve ser inserida.",
       "eventStart": "Início",
       "eventStartInPast": "A data de início está no passado.",
       "eventVenue": "Descrição do local — ex.: quintal, 1º andar, …",
