@@ -133,44 +133,42 @@
                   hide-error
                 />
                 <validation-hint
-                  :count="
-                    !(formErrors && formErrors.eventVenue) ? formData.eventVenue.length : null
-                  "
-                  :max="!(formErrors && formErrors.eventVenue) ? formSchema.eventVenue.max : null"
+                  :count="formData.eventVenue.length"
+                  :max="formSchema.eventVenue.max"
                   :variant="formErrors && formErrors.eventVenue ? 'error' : null"
                   :text="formErrors && formErrors.eventVenue ? formErrors.eventVenue : null"
                 />
               </div>
-              <div
-                v-if="showEventLocationName"
-                class="event-grid-item"
-                :class="{ 'ds-input-has-error': formErrors && formErrors.eventLocationName }"
-              >
-                <location-select
-                  v-model="formData.eventLocationName"
-                  types="country,region,postcode,district,place,locality,neighborhood,address,poi"
-                  :show-previous-location="false"
-                  :show-label="false"
-                  :placeholder="$t('post.viewEvent.eventLocationName')"
-                />
-                <validation-hint
-                  v-if="formErrors && formErrors.eventLocationName"
-                  variant="error"
-                  :text="$t('post.viewEvent.eventLocationRequired')"
-                />
+              <div class="event-grid-item">
+                <div
+                  v-if="showEventLocationName"
+                  :class="{ 'ds-input-has-error': formErrors && formErrors.eventLocationName }"
+                >
+                  <location-select
+                    v-model="formData.eventLocationName"
+                    types="country,region,postcode,district,place,locality,neighborhood,address,poi"
+                    :show-previous-location="false"
+                    :show-label="false"
+                    :placeholder="$t('post.viewEvent.eventLocationName')"
+                  />
+                  <validation-hint
+                    v-if="formErrors && formErrors.eventLocationName"
+                    variant="error"
+                    :text="$t('post.viewEvent.eventLocationRequired')"
+                  />
+                </div>
+                <div class="event-online-checkbox">
+                  <input
+                    type="checkbox"
+                    v-model="formData.eventIsOnline"
+                    model="eventIsOnline"
+                    name="eventIsOnline"
+                    class="event-grid-item-font-helper"
+                    @change="changeEventIsOnline($event)"
+                  />
+                  {{ $t('post.viewEvent.eventIsOnline') }}
+                </div>
               </div>
-            </div>
-
-            <div>
-              <input
-                type="checkbox"
-                v-model="formData.eventIsOnline"
-                model="eventIsOnline"
-                name="eventIsOnline"
-                class="event-grid-item-font-helper"
-                @change="changeEventIsOnline($event)"
-              />
-              {{ $t('post.viewEvent.eventIsOnline') }}
             </div>
           </div>
           <div class="ds-mt-x-small ds-mb-large"></div>
@@ -644,6 +642,10 @@ export default {
 
   .event-location-grid .validation-hint {
     margin-top: 3px;
+  }
+
+  .event-online-checkbox {
+    margin-top: $space-x-small;
   }
 
   .event-grid-item {

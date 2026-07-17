@@ -1,7 +1,13 @@
 <template>
-  <div class="validation-hint" :class="rootClasses">
+  <div v-if="hasContent" class="validation-hint" :class="rootClasses">
     <p v-if="text" class="validation-hint__text">{{ text }}</p>
-    <os-badge :variant="badgeVariant" :class="badgeClasses" role="alert" aria-live="assertive">
+    <os-badge
+      v-if="hasCount || variant"
+      :variant="badgeVariant"
+      :class="badgeClasses"
+      role="alert"
+      aria-live="assertive"
+    >
       <span v-if="hasCount">
         {{ count }}
         <template v-if="max != null">/ {{ max }}</template>
@@ -41,6 +47,9 @@ export default {
     hasCount() {
       return this.count != null
     },
+    hasContent() {
+      return !!(this.text || this.hasCount || this.variant)
+    },
     resolvedIcon() {
       return this.variant === 'warning' ? iconRegistry.questionCircle : iconRegistry.warning
     },
@@ -73,10 +82,6 @@ export default {
   &--badge {
     display: flex;
     justify-content: flex-end;
-
-    > .os-badge {
-      margin-top: -10px;
-    }
   }
 
   &__text {
