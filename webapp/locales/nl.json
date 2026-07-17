@@ -1192,6 +1192,7 @@
       "eventLocationRequired": "Als het evenement niet online is, moet een locatie worden ingevoerd.",
       "eventStart": "Start",
       "eventStartInPast": "De startdatum ligt in het verleden.",
+      "eventStartNotEmpty": "Voer een startdatum in.",
       "eventVenue": "Locatiebeschrijving — bijv. achtertuin, 1e verdieping, …",
       "title": "Evenement"
     },

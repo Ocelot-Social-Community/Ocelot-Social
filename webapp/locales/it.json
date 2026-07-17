@@ -1192,6 +1192,7 @@
       "eventLocationRequired": "Se l'evento non è online, è necessario inserire una posizione.",
       "eventStart": "Inizio",
       "eventStartInPast": "La data di inizio è nel passato.",
+      "eventStartNotEmpty": "Inserire una data di inizio.",
       "eventVenue": "Descrizione del luogo — es. cortile, 1° piano, …",
       "title": "Evento"
     },

@@ -1192,6 +1192,7 @@
       "eventLocationRequired": "Si l'événement n'est pas en ligne, une adresse doit être saisie.",
       "eventStart": "Début",
       "eventStartInPast": "La date de début est dans le passé.",
+      "eventStartNotEmpty": "Veuillez saisir une date de début.",
       "eventVenue": "Description du lieu — p. ex. cour arrière, 1er étage, …",
       "title": "Événement"
     },

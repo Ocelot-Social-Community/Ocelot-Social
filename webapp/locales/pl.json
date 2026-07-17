@@ -1192,6 +1192,7 @@
       "eventLocationRequired": "Jeśli wydarzenie nie jest online, należy podać lokalizację.",
       "eventStart": "Początek",
       "eventStartInPast": "Data rozpoczęcia jest w przeszłości.",
+      "eventStartNotEmpty": "Proszę podać datę rozpoczęcia.",
       "eventVenue": "Opis lokalizacji — np. podwórko, 1. piętro, …",
       "title": "Wydarzenie"
     },

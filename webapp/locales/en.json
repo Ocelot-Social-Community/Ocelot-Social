@@ -1192,6 +1192,7 @@
       "eventLocationRequired": "If the event is not online, a location must be entered.",
       "eventStart": "Start",
       "eventStartInPast": "The event start is in the past.",
+      "eventStartNotEmpty": "Please enter a start date.",
       "eventVenue": "Location description — e.g. backyard, 1st floor, …",
       "title": "Event"
     },

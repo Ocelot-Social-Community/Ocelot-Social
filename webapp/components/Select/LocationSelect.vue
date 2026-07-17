@@ -11,6 +11,7 @@
       :icon-right="null"
       :prefill-on-open="true"
       :placeholder="placeholder !== null ? placeholder : $t('settings.data.labelCity') + ' …'"
+      :disabled="disabled"
       @input.native="handleCityInput"
     >
       <template v-if="(locationName !== '' && canBeCleared) || loadingGeo" #icon-right>
@@ -69,6 +70,11 @@ export default {
       type: Boolean,
       required: false,
       default: true,
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   async created() {

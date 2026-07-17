@@ -71,21 +71,10 @@
                   :minute-step="15"
                   format="DD.MM.YYYY HH:mm"
                   :placeholder="$t('post.viewEvent.eventStart')"
+                  :class="{ 'mx-datepicker-error': formErrors && formErrors.eventStart }"
                   :show-second="false"
                   @change="changeEventStart($event)"
                 ></date-picker>
-                <div
-                  v-if="formErrors && formErrors.eventStart"
-                  class="chipbox event-grid-item-margin-helper"
-                >
-                  <os-badge
-                    role="alert"
-                    aria-live="assertive"
-                    :variant="formErrors && formErrors.eventStart ? 'danger' : undefined"
-                  >
-                    <os-icon :icon="icons.warning" />
-                  </os-badge>
-                </div>
               </div>
               <div class="event-grid-item">
                 <!-- <label>Ende (optional)</label> -->
@@ -111,7 +100,12 @@
             <div class="event-date-hints-zone">
               <div class="event-date-hint-cell">
                 <validation-hint
-                  v-if="eventStartIsInPast"
+                  v-if="formErrors && formErrors.eventStart"
+                  variant="error"
+                  :text="$t('post.viewEvent.eventStartNotEmpty')"
+                />
+                <validation-hint
+                  v-else-if="eventStartIsInPast"
                   variant="warning"
                   :text="$t('post.viewEvent.eventStartInPast')"
                 />
@@ -141,8 +135,10 @@
               </div>
               <div class="event-grid-item">
                 <div
-                  v-if="showEventLocationName"
-                  :class="{ 'ds-input-has-error': formErrors && formErrors.eventLocationName }"
+                  :class="{
+                    'ds-input-has-error':
+                      !locationSelectDisabled && formErrors && formErrors.eventLocationName,
+                  }"
                 >
                   <location-select
                     v-model="formData.eventLocationName"
@@ -150,9 +146,10 @@
                     :show-previous-location="false"
                     :show-label="false"
                     :placeholder="$t('post.viewEvent.eventLocationName')"
+                    :disabled="locationSelectDisabled"
                   />
                   <validation-hint
-                    v-if="formErrors && formErrors.eventLocationName"
+                    v-if="!locationSelectDisabled && formErrors && formErrors.eventLocationName"
                     variant="error"
                     :text="$t('post.viewEvent.eventLocationRequired')"
                   />
@@ -333,7 +330,15 @@ export default {
             return []
           },
         },
-        eventStart: { required: !!this.createEvent },
+        eventStart: {
+          validator: (_, value, callback) => {
+            if (this.createEvent && !value) {
+              callback(new Error(this.$t('post.viewEvent.eventStartNotEmpty')))
+              return
+            }
+            callback()
+          },
+        },
         eventEnd: {
           validator: (_, value, callback) => {
             if (!this.createEvent || !value || !this.formData.eventStart) {
@@ -425,8 +430,8 @@ export default {
     groupCategories() {
       return this.group && this.group.categories
     },
-    showEventLocationName() {
-      return !this.formData.eventIsOnline
+    locationSelectDisabled() {
+      return this.formData.eventIsOnline
     },
   },
   watch: {
@@ -550,9 +555,7 @@ export default {
     },
     changeEventStart(event) {
       this.$set(this.formData, 'eventStart', event)
-      if (!event || this.formData.eventEnd) {
-        this.$validateForm()
-      }
+      this.$validateForm()
     },
     addHeroImage(file) {
       this.formData.image = null

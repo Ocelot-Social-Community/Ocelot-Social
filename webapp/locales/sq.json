@@ -1192,6 +1192,7 @@
       "eventLocationRequired": "Nëse ngjarja nuk është online, duhet të futet një vendndodhje.",
       "eventStart": "Fillimi",
       "eventStartInPast": "Data e fillimit është në të kaluarën.",
+      "eventStartNotEmpty": "Ju lutem shkruani një datë fillimi.",
       "eventVenue": "Përshkrimi i vendndodhjes — p.sh. oborri, kati 1, …",
       "title": "Ngjarje"
     },
