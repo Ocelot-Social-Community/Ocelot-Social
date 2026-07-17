@@ -170,15 +170,13 @@
             model="categoryIds"
             :existingCategoryIds="formData.categoryIds"
           />
-          <os-badge
+          <validation-hint
             v-if="categoriesActive"
-            role="status"
-            aria-live="polite"
-            :variant="formErrors && formErrors.categoryIds ? 'danger' : undefined"
-          >
-            {{ formData.categoryIds.length }} / 3
-            <os-icon v-if="formErrors && formErrors.categoryIds" :icon="icons.warning" />
-          </os-badge>
+            :count="formData.categoryIds.length"
+            :max="3"
+            :variant="formErrors && formErrors.categoryIds ? 'error' : null"
+            :text="formErrors && formErrors.categoryIds ? formErrors.categoryIds : null"
+          />
           <div class="ds-flex ds-flex-gap-xxx-small buttons-footer">
             <div style="flex: 3.5 0 0" class="buttons-footer-helper">
               <!-- TODO => remove v-html! only text ! no html! security first! -->
