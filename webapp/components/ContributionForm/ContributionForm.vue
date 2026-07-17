@@ -46,14 +46,11 @@
             :hashtags="hashtags"
             @input="updateEditorContent"
           />
-          <os-badge
-            role="status"
-            aria-live="polite"
-            :variant="formErrors && formErrors.content ? 'danger' : undefined"
-          >
-            {{ contentLength }}
-            <os-icon v-if="formErrors && formErrors.content" :icon="icons.warning" />
-          </os-badge>
+          <validation-hint
+            :count="contentLength"
+            :variant="formErrors && formErrors.content ? 'error' : null"
+            :text="formErrors && formErrors.content ? formErrors.content : null"
+          />
 
           <!-- Eventdata -->
           <div v-if="createEvent" class="eventDatas">
