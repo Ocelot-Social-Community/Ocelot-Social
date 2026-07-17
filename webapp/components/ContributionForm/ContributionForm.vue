@@ -223,7 +223,7 @@
   </div>
 </template>
 <script>
-import { OsBadge, OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import gql from 'graphql-tag'
 import { mapGetters } from 'vuex'
@@ -248,7 +248,6 @@ export default {
     DatePicker,
     Editor,
     ImageUploader,
-    OsBadge,
     OsButton,
     OsCard,
     OsIcon,
