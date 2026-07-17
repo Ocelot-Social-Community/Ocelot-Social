@@ -32,15 +32,14 @@
             name="title"
             autofocus
             size="large"
+            hide-error
           />
-          <os-badge
-            role="status"
-            aria-live="polite"
-            :variant="formErrors && formErrors.title ? 'danger' : undefined"
-          >
-            {{ formData.title.length }}/{{ formSchema.title.max }}
-            <os-icon v-if="formErrors && formErrors.title" :icon="icons.warning" />
-          </os-badge>
+          <validation-hint
+            :count="formData.title.length"
+            :max="formSchema.title.max"
+            :variant="formErrors && formErrors.title ? 'error' : null"
+            :text="formErrors && formErrors.title ? formErrors.title : null"
+          />
           <editor
             :users="users"
             :value="formData.content"
@@ -696,6 +695,12 @@ export default {
     > .os-badge {
       align-self: flex-end;
       margin: $space-xx-small 0 $space-base;
+      cursor: default;
+    }
+
+    > .validation-hint {
+      align-self: flex-end;
+      margin: 3px 0 $space-base;
       cursor: default;
     }
 
