@@ -14242,10 +14242,10 @@ listr@0.14.3:
     p-map "^2.0.0"
     rxjs "^6.3.3"
 
-livekit-client@^2.20.0:
-  version "2.20.0"
-  resolved "https://registry.yarnpkg.com/livekit-client/-/livekit-client-2.20.0.tgz#e7459a7aba0670a217f2f219d7b4dbf1e5548773"
-  integrity sha512-RIJcpvBmOmwz3jTj3rmdY6Dzr55HrhcaJjMgY+HSmoEM+yIRyA40m7r8UKv0hnZWM3z/AYhP1q8C8ciz5UWFKQ==
+livekit-client@^2.20.1:
+  version "2.20.1"
+  resolved "https://registry.yarnpkg.com/livekit-client/-/livekit-client-2.20.1.tgz#b6be743972a790d2f66ace0401f84564f679e9b9"
+  integrity sha512-JxooxLFMkdwqTo4XLer+DCij6S3//Z/GuHSjqdhlj94Vtbh1Eayd7Lyq47qkIE86+xVJhqxIdYnq53lg4oPH9w==
   dependencies:
     "@livekit/mutex" "1.1.1"
     "@livekit/protocol" "1.46.6"
@@ -14255,7 +14255,7 @@ livekit-client@^2.20.0:
     sdp-transform "^2.15.0"
     tslib "2.8.1"
     typed-emitter "^2.1.0"
-    webrtc-adapter "9.0.5"
+    webrtc-adapter "9.0.6"
 
 load-json-file@^1.0.0:
   version "1.1.0"
@@ -21720,10 +21720,10 @@ webpackbar@^6.0.1:
     std-env "^3.7.0"
     wrap-ansi "^7.0.0"
 
-webrtc-adapter@9.0.5:
-  version "9.0.5"
-  resolved "https://registry.yarnpkg.com/webrtc-adapter/-/webrtc-adapter-9.0.5.tgz#fb036c3db06e1a0d86c264da649e130187783b3f"
-  integrity sha512-U9vjByy/sK2OMXu5mmfuZFKTMIUQe34c0JXRO+oDrxJTsntdYT2iIFwYMOV7HhMTuktcZLGf2W1N/OcSf9ssWg==
+webrtc-adapter@9.0.6:
+  version "9.0.6"
+  resolved "https://registry.yarnpkg.com/webrtc-adapter/-/webrtc-adapter-9.0.6.tgz#d89ce0d7b6b8b49f07bdbd1273074006744905a6"
+  integrity sha512-CHbl2ZQbxx164IgWRgzJno4hWtM4tFbRam1QfI3Yxhs3w/DvqluVxVWeXs3oL5/fbGkSNLKo0Ty5MgUWceNhog==
   dependencies:
     sdp "^3.2.0"
 
