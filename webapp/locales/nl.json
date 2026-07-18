@@ -426,6 +426,7 @@
     "user": "Gebruiker ::: Gebruikers",
     "validations": {
       "categories": "Selecteer tussen één en drie onderwerpen.",
+      "contentNotEmpty": "Voer inhoud in.",
       "email": "Voer een geldig e-mailadres in.",
       "eventLocationNameLength": "Het adres moet tussen {min} en {max} tekens lang zijn.",
       "eventLocationNameNotEmpty": "Voer een adres in.",

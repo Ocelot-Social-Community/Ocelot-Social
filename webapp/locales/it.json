@@ -426,6 +426,7 @@
     "user": "Utente ::: Utenti",
     "validations": {
       "categories": "Selezionare tra uno e tre argomenti.",
+      "contentNotEmpty": "Inserire del contenuto.",
       "email": "Inserire un indirizzo e-mail valido.",
       "eventLocationNameLength": "L'indirizzo deve essere compreso tra {min} e {max} caratteri.",
       "eventLocationNameNotEmpty": "Inserire un indirizzo.",

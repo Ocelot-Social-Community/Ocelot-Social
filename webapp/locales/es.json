@@ -426,6 +426,7 @@
     "user": "Usuario ::: Usuarios",
     "validations": {
       "categories": "Por favor, seleccione entre uno y tres temas.",
+      "contentNotEmpty": "Por favor, ingrese algún contenido.",
       "email": "Por favor, ingrese una dirección de correo electrónico válida.",
       "eventLocationNameLength": "La dirección debe tener entre {min} y {max} caracteres.",
       "eventLocationNameNotEmpty": "Por favor, ingrese una dirección.",

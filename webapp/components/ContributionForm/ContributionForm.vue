@@ -38,18 +38,22 @@
             :count="formData.title.length"
             :max="formSchema.title.max"
             :variant="formErrors && formErrors.title ? 'error' : null"
-            :text="formErrors && formErrors.title ? formErrors.title : null"
+            :text="titleErrorText"
           />
-          <editor
-            :users="users"
-            :value="formData.content"
-            :hashtags="hashtags"
-            @input="updateEditorContent"
-          />
+          <div :class="{ 'ds-input-has-error': formErrors && formErrors.content }">
+            <editor
+              :users="users"
+              :value="formData.content"
+              :hashtags="hashtags"
+              @input="updateEditorContent"
+            />
+          </div>
           <validation-hint
             :count="contentLength"
             :variant="formErrors && formErrors.content ? 'error' : null"
-            :text="formErrors && formErrors.content ? formErrors.content : null"
+            :text="
+              formErrors && formErrors.content ? $t('common.validations.contentNotEmpty') : null
+            "
           />
 
           <!-- Eventdata -->
@@ -126,7 +130,7 @@
                   :count="formData.eventVenue.length"
                   :max="formSchema.eventVenue.max"
                   :variant="formErrors && formErrors.eventVenue ? 'error' : null"
-                  :text="formErrors && formErrors.eventVenue ? formErrors.eventVenue : null"
+                  :text="venueErrorText"
                 />
               </div>
               <div class="event-grid-item">
@@ -175,7 +179,9 @@
             :count="formData.categoryIds.length"
             :max="3"
             :variant="formErrors && formErrors.categoryIds ? 'error' : null"
-            :text="formErrors && formErrors.categoryIds ? formErrors.categoryIds : null"
+            :text="
+              formErrors && formErrors.categoryIds ? $t('common.validations.categories') : null
+            "
           />
           <div class="ds-flex ds-flex-gap-xxx-small buttons-footer">
             <div style="flex: 3.5 0 0" class="buttons-footer-helper">
@@ -311,7 +317,15 @@ export default {
             return []
           },
         },
-        content: { required: true },
+        content: {
+          validator: (_, value, callback) => {
+            if (!value || this.$filters.removeHtml(value).trim().length === 0) {
+              callback(new Error(this.$t('common.validations.contentNotEmpty')))
+              return
+            }
+            callback()
+          },
+        },
         imageBlurred: { required: false },
         categoryIds: {
           type: 'array',
@@ -406,6 +420,21 @@ export default {
     },
     contentLength() {
       return this.$filters.removeHtml(this.formData.content).length
+    },
+    titleErrorText() {
+      if (!this.formErrors?.title) return null
+      return !this.formData.title.trim()
+        ? this.$t('common.validations.titleNotEmpty')
+        : this.$t('common.validations.titleLength', { min: 3, max: this.formSchema.title.max })
+    },
+    venueErrorText() {
+      if (!this.formErrors?.eventVenue) return null
+      return !this.formData.eventVenue.trim()
+        ? this.$t('common.validations.eventVenueNotEmpty')
+        : this.$t('common.validations.eventVenueLength', {
+            min: 3,
+            max: this.formSchema.eventVenue.max,
+          })
     },
     groupId() {
       // formData.groupId (from the create-flow draft) is the authoritative

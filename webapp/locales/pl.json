@@ -426,6 +426,7 @@
     "user": "Użytkownik ::: Użytkownicy",
     "validations": {
       "categories": "Proszę wybrać od jednego do trzech tematów.",
+      "contentNotEmpty": "Proszę podać treść.",
       "email": "Proszę podać prawidłowy adres e-mail.",
       "eventLocationNameLength": "Adres musi mieć od {min} do {max} znaków.",
       "eventLocationNameNotEmpty": "Proszę podać adres.",

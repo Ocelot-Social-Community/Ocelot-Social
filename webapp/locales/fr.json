@@ -426,6 +426,7 @@
     "user": "Utilisateur ::: Utilisateurs",
     "validations": {
       "categories": "Veuillez sélectionner entre un et trois sujets.",
+      "contentNotEmpty": "Veuillez saisir du contenu.",
       "email": "Veuillez saisir une adresse e-mail valide.",
       "eventLocationNameLength": "L'adresse doit comporter entre {min} et {max} caractères.",
       "eventLocationNameNotEmpty": "Veuillez saisir une adresse.",

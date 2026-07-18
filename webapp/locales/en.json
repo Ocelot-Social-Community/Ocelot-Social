@@ -426,6 +426,7 @@
     "user": "User ::: Users",
     "validations": {
       "categories": "Please select between one and three topics.",
+      "contentNotEmpty": "Please enter some content.",
       "email": "Please enter a valid e-mail address.",
       "eventLocationNameLength": "The address must be between {min} and {max} characters long.",
       "eventLocationNameNotEmpty": "Please enter an address.",

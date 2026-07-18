@@ -426,6 +426,7 @@
     "user": "Përdorues ::: Përdorues",
     "validations": {
       "categories": "Ju lutem zgjidhni midis një dhe tre temave.",
+      "contentNotEmpty": "Ju lutem shkruani përmbajtje.",
       "email": "Ju lutem shkruani një adresë e-mail të vlefshme.",
       "eventLocationNameLength": "Adresa duhet të ketë midis {min} dhe {max} karaktere.",
       "eventLocationNameNotEmpty": "Ju lutem shkruani një adresë.",
