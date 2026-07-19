@@ -147,6 +147,7 @@
                     :show-label="false"
                     :placeholder="$t('post.viewEvent.eventLocationName')"
                     :disabled="locationSelectDisabled"
+                    @input="$validateForm()"
                   />
                   <validation-hint
                     v-if="!locationSelectDisabled && formErrors && formErrors.eventLocationName"
