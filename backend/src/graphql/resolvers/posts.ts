@@ -325,10 +325,10 @@ export default {
             updatePostVariables,
           )
           const [post] = updatePostTransactionResponse.records.map((record) => record.get('post'))
-          await images(context.config).mergeImage(post, 'HERO_IMAGE', imageInput, { transaction })
           return post
         })
         const post = await writeTxResultPromise
+        await images(context.config).mergeImage(post, 'HERO_IMAGE', imageInput)
         if (locationName) {
           await createOrUpdateLocations('Post', post.id, locationName, session, context)
         }
