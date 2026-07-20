@@ -11,7 +11,7 @@
         @close-menu="cancelAndClose(closeMenu)"
         data-test="avatarUserLink"
       >
-        <profile-avatar :profile="user" size="small" />
+        <profile-avatar :profile="user" size="small" :show-profile-name-title="false" />
       </user-teaser-helper>
       <div class="info flex-direction-column">
         <div :class="wide ? 'flex-direction-row' : 'flex-direction-column'">
