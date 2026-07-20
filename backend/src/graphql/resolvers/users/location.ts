@@ -184,7 +184,7 @@ export const queryLocations = async ({ place, lang, types, proximity }, context:
     : DEFAULT_LOCATION_TYPES
 
   let url =
-    `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(decodeURIComponent(place))}.json` +
+    `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(place)}.json` +
     `?access_token=${context.config.MAPBOX_TOKEN}&types=${locationTypes}&language=${lang}&limit=10`
 
   if (proximity) {

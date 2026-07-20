@@ -4,6 +4,7 @@
       {{ `${$t('settings.data.labelCity')}` + locationNameLabelAddOnOldName }}
     </label>
     <ocelot-select
+      ref="select"
       id="city"
       v-model="currentValue"
       :options="cities"
@@ -81,6 +82,14 @@ export default {
     this.icons = iconRegistry
     this._cityQueryId = 0
     await this.resolveLocalizedLocation()
+  },
+  mounted() {
+    this.$watch(
+      () => this.$refs.select && this.$refs.select.isOpen,
+      (isOpen) => {
+        if (isOpen) this.onSelectOpen()
+      },
+    )
   },
   data() {
     return {
@@ -184,7 +193,6 @@ export default {
       try {
         this.loadingGeo = true
 
-        const place = encodeURIComponent(value)
         const lang = this.$i18n.locale()
         const proximity = this.userProximity || (await this.getProximityFromBrowser())
 
@@ -192,7 +200,7 @@ export default {
           data: { queryLocations: result },
         } = await this.$apollo.query({
           query: queryLocations(),
-          variables: { place, lang, types: this.types, proximity },
+          variables: { place: value, lang, types: this.types, proximity },
           fetchPolicy: 'network-only',
         })
 
@@ -214,6 +222,11 @@ export default {
       this.$nextTick(() => {
         this.currentValue = result || (this.cities.length ? this.cities[0] : this.locationName)
       })
+    },
+    onSelectOpen() {
+      if (this.locationName && !this.cities.some((c) => c.value === this.locationName)) {
+        this.requestGeoData(this.locationName)
+      }
     },
     clearLocationName() {
       this.currentValue = ''
