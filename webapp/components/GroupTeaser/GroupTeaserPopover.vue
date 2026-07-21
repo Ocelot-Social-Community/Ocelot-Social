@@ -1,57 +1,66 @@
 <template>
   <div class="group-teaser-popover">
-    <div class="group-header">
-      <profile-avatar :profile="group" class="popover-avatar" />
-      <div class="group-names">
-        <span class="group-name">{{ group.name }}</span>
-        <span class="group-slug ds-text-soft">&amp;{{ group.slug }}</span>
+    <div v-if="!showContent" class="loading-state">
+      <os-spinner size="md" />
+    </div>
+    <template v-else-if="showContent">
+      <div class="group-header">
+        <profile-avatar :profile="resolvedGroup" class="popover-avatar" />
+        <div class="group-names">
+          <span class="group-name">{{ resolvedGroup.name }}</span>
+          <span class="group-slug ds-text-soft">&amp;{{ resolvedGroup.slug }}</span>
+        </div>
       </div>
-    </div>
-    <location-info
-      v-if="group.location"
-      :location-data="group.location"
-      :is-owner="false"
-      size="small"
-      class="location-info"
-    />
-    <div class="chips">
-      <os-badge variant="primary">{{ $t(`group.types.${group.groupType}`) }}</os-badge>
-      <os-badge v-if="group.myRole" variant="primary">
-        {{ $t(`group.roles.${group.myRole}`) }}
-      </os-badge>
-      <os-badge v-if="group.actionRadius" variant="primary">
-        {{ $t(`group.actionRadii.${group.actionRadius}`) }}
-      </os-badge>
-    </div>
-    <p v-if="group.about" class="group-about">{{ group.about }}</p>
-    <ul class="statistics">
-      <li>
-        <os-number
-          :count="group.membersCount"
-          :label="$t('group.membersCount', {}, group.membersCount)"
-        />
-      </li>
-      <li v-if="group.postsCount !== undefined">
-        <os-number :count="group.postsCount" :label="$t('common.post', null, group.postsCount)" />
-      </li>
-    </ul>
-    <os-button
-      v-if="isTouchDevice && groupLink"
-      as="nuxt-link"
-      :to="groupLink"
-      class="open-link"
-      variant="primary"
-    >
-      {{ $t('group.teaser.openGroup') }}
-    </os-button>
+      <location-info
+        v-if="resolvedGroup.location"
+        :location-data="resolvedGroup.location"
+        :is-owner="false"
+        size="small"
+        class="location-info"
+      />
+      <div class="chips">
+        <os-badge variant="primary">{{ $t(`group.types.${resolvedGroup.groupType}`) }}</os-badge>
+        <os-badge v-if="resolvedGroup.myRole" variant="primary">
+          {{ $t(`group.roles.${resolvedGroup.myRole}`) }}
+        </os-badge>
+        <os-badge v-if="resolvedGroup.actionRadius" variant="primary">
+          {{ $t(`group.actionRadii.${resolvedGroup.actionRadius}`) }}
+        </os-badge>
+      </div>
+      <p v-if="resolvedGroup.about" class="group-about">{{ resolvedGroup.about }}</p>
+      <ul class="statistics">
+        <li>
+          <os-number
+            :count="resolvedGroup.membersCount"
+            :label="$t('group.membersCount', {}, resolvedGroup.membersCount)"
+          />
+        </li>
+        <li v-if="resolvedGroup.postsCount !== undefined">
+          <os-number
+            :count="resolvedGroup.postsCount"
+            :label="$t('common.post', null, resolvedGroup.postsCount)"
+          />
+        </li>
+      </ul>
+      <os-button
+        v-if="isTouchDevice && groupLink"
+        as="nuxt-link"
+        :to="groupLink"
+        class="open-link"
+        variant="primary"
+      >
+        {{ $t('group.teaser.openGroup') }}
+      </os-button>
+    </template>
   </div>
 </template>
 
 <script>
-import { OsBadge, OsButton, OsNumber } from '@ocelot-social/ui'
+import { OsBadge, OsButton, OsNumber, OsSpinner } from '@ocelot-social/ui'
 import LocationInfo from '~/components/LocationInfo/LocationInfo'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import touchDevice from '~/mixins/touchDevice'
+import { groupTeaserQuery } from '~/graphql/groups'
 
 export default {
   name: 'GroupTeaserPopover',
@@ -61,11 +70,56 @@ export default {
     OsBadge,
     OsButton,
     OsNumber,
+    OsSpinner,
     ProfileAvatar,
   },
   props: {
-    group: { type: Object, required: true },
+    group: { type: Object, default: null },
+    groupId: { type: String, default: null },
     groupLink: { type: Object, default: null },
+  },
+  data() {
+    return {
+      showContent: false,
+      minSpinnerDone: false,
+      spinnerTimer: null,
+    }
+  },
+  mounted() {
+    if (this.resolvedGroup) {
+      this.showContent = true
+      return
+    }
+    this.spinnerTimer = setTimeout(() => {
+      this.minSpinnerDone = true
+      if (this.resolvedGroup) this.showContent = true
+    }, 400)
+  },
+  beforeDestroy() {
+    if (this.spinnerTimer) clearTimeout(this.spinnerTimer)
+  },
+  computed: {
+    resolvedGroup() {
+      return this.group || (this.Group && this.Group[0]) || null
+    },
+  },
+  watch: {
+    resolvedGroup(group) {
+      if (group && this.minSpinnerDone) this.showContent = true
+    },
+  },
+  apollo: {
+    Group: {
+      query() {
+        return groupTeaserQuery(this.$i18n)
+      },
+      variables() {
+        return { id: this.groupId }
+      },
+      skip() {
+        return !this.groupId || !!this.group
+      },
+    },
   },
 }
 </script>
@@ -80,6 +134,14 @@ export default {
   min-width: 200px;
   max-width: 280px;
   width: 280px;
+  min-height: 260px;
+}
+
+.loading-state {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .group-header {

@@ -21,7 +21,9 @@ export default {
         const result = await transaction.run(
           `
             MATCH (loc:Location {id: $parent.id})
+            WHERE loc.lat IS NOT NULL AND loc.lng IS NOT NULL
             MATCH (me:User {id: $user.id})-[:IS_IN]->(meLoc:Location)
+            WHERE meLoc.lat IS NOT NULL AND meLoc.lng IS NOT NULL
             WITH
               point({latitude: loc.lat, longitude: loc.lng}) as locPoint,
               point({latitude: meLoc.lat, longitude: meLoc.lng}) as mePoint

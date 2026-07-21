@@ -29,9 +29,23 @@
           <span v-if="wide">&nbsp;</span>
           <span v-if="group" class="group-info">
             <span class="text">{{ $t('group.in') }}</span>
-            <nuxt-link :to="groupLink" class="group-link" :title="groupName">
-              {{ groupName }}
-            </nuxt-link>
+            <dropdown placement="top-start">
+              <template #default="{ openMenu, closeMenu }">
+                <user-teaser-helper
+                  :link-to-profile="true"
+                  :user-link="groupLink"
+                  :show-popover="true"
+                  :hover-delay="hoverDelay"
+                  @open-menu="loadGroupPopover(openMenu)"
+                  @close-menu="cancelAndCloseGroup(closeMenu)"
+                >
+                  <span class="group-link">{{ groupName }}</span>
+                </user-teaser-helper>
+              </template>
+              <template #popover="{ isOpen }">
+                <group-teaser-popover v-if="isOpen" :group-id="group.id" :group-link="groupLink" />
+              </template>
+            </dropdown>
           </span>
           <!-- eslint-disable-next-line prettier/prettier -->
           <span>{{ injectedText }}<span v-if="injectedText && injectedDate && !userOnly && dateTime"> {{$t('notifications.reason.on_date')}} <date-time :date-time="dateTime" /></span></span>
@@ -58,8 +72,10 @@ import { OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 
 import { userTeaserQuery } from '~/graphql/User.js'
+import { groupTeaserQuery } from '~/graphql/groups'
 import DateTime from '~/components/DateTime'
 import Dropdown from '~/components/Dropdown'
+import GroupTeaserPopover from '~/components/GroupTeaser/GroupTeaserPopover'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import UserTeaserPopover from './UserTeaserPopover'
 import UserTeaserHelper from './UserTeaserHelper.vue'
@@ -69,6 +85,7 @@ export default {
   components: {
     DateTime,
     Dropdown,
+    GroupTeaserPopover,
     OsIcon,
     ProfileAvatar,
     UserTeaserHelper,
@@ -120,9 +137,17 @@ export default {
   created() {
     this.icons = iconRegistry
   },
+  mounted() {
+    if (this.group?.id) {
+      this.$apollo
+        .query({ query: groupTeaserQuery(this.$i18n), variables: { id: this.group.id } })
+        .catch(() => {})
+    }
+  },
   data() {
     return {
       popoverPending: false,
+      groupPopoverPending: false,
     }
   },
   methods: {
@@ -145,6 +170,25 @@ export default {
     cancelAndClose(closeMenu) {
       this.popoverPending = false
       closeMenu(false)
+    },
+    async loadGroupPopover(openMenu) {
+      this.groupPopoverPending = true
+      try {
+        await this.$apollo.query({
+          query: groupTeaserQuery(this.$i18n),
+          variables: { id: this.group.id },
+        })
+      } catch {
+        this.groupPopoverPending = false
+        return
+      }
+      if (this.groupPopoverPending) {
+        openMenu(false)
+      }
+    },
+    cancelAndCloseGroup(closeMenu) {
+      this.groupPopoverPending = false
+      closeMenu(true)
     },
   },
 }
