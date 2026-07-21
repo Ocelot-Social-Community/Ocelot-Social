@@ -198,7 +198,7 @@ exports[`UserTeaser given an user user is disabled current user is a moderator r
               sizes="320px"
               src="/avatars/tilda-swinton"
               srcset="/avatars/tilda-swinton-w320 320w, /avatars/tilda-swinton-w640 640w, /avatars/tilda-swinton-w1024 1024w"
-              title="Tilda Swinton"
+              title=""
             />
           </div>
         </a>
@@ -332,7 +332,7 @@ exports[`UserTeaser given an user with linkToProfile, on desktop renders 1`] = `
               sizes="320px"
               src="/avatars/tilda-swinton"
               srcset="/avatars/tilda-swinton-w320 320w, /avatars/tilda-swinton-w640 640w, /avatars/tilda-swinton-w1024 1024w"
-              title="Tilda Swinton"
+              title=""
             />
           </div>
         </a>
@@ -425,7 +425,7 @@ exports[`UserTeaser given an user with linkToProfile, on desktop when hovering t
               sizes="320px"
               src="/avatars/tilda-swinton"
               srcset="/avatars/tilda-swinton-w320 320w, /avatars/tilda-swinton-w640 640w, /avatars/tilda-swinton-w1024 1024w"
-              title="Tilda Swinton"
+              title=""
             />
           </div>
         </a>
@@ -518,7 +518,7 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen renders 1`
               sizes="320px"
               src="/avatars/tilda-swinton"
               srcset="/avatars/tilda-swinton-w320 320w, /avatars/tilda-swinton-w640 640w, /avatars/tilda-swinton-w1024 1024w"
-              title="Tilda Swinton"
+              title=""
             />
           </div>
         </button>
@@ -612,7 +612,7 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen when click
               sizes="320px"
               src="/avatars/tilda-swinton"
               srcset="/avatars/tilda-swinton-w320 320w, /avatars/tilda-swinton-w640 640w, /avatars/tilda-swinton-w1024 1024w"
-              title="Tilda Swinton"
+              title=""
             />
           </div>
         </button>
@@ -710,7 +710,7 @@ exports[`UserTeaser given an user without linkToProfile, on desktop renders 1`] 
               sizes="320px"
               src="/avatars/tilda-swinton"
               srcset="/avatars/tilda-swinton-w320 320w, /avatars/tilda-swinton-w640 640w, /avatars/tilda-swinton-w1024 1024w"
-              title="Tilda Swinton"
+              title=""
             />
           </div>
         </span>
@@ -803,7 +803,7 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
               sizes="320px"
               src="/avatars/tilda-swinton"
               srcset="/avatars/tilda-swinton-w320 320w, /avatars/tilda-swinton-w640 640w, /avatars/tilda-swinton-w1024 1024w"
-              title="Tilda Swinton"
+              title=""
             />
           </div>
         </span>
@@ -896,7 +896,7 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
               sizes="320px"
               src="/avatars/tilda-swinton"
               srcset="/avatars/tilda-swinton-w320 320w, /avatars/tilda-swinton-w640 640w, /avatars/tilda-swinton-w1024 1024w"
-              title="Tilda Swinton"
+              title=""
             />
           </div>
         </span>
@@ -989,7 +989,7 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen renders
               sizes="320px"
               src="/avatars/tilda-swinton"
               srcset="/avatars/tilda-swinton-w320 320w, /avatars/tilda-swinton-w640 640w, /avatars/tilda-swinton-w1024 1024w"
-              title="Tilda Swinton"
+              title=""
             />
           </div>
         </button>
@@ -1083,7 +1083,7 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
               sizes="320px"
               src="/avatars/tilda-swinton"
               srcset="/avatars/tilda-swinton-w320 320w, /avatars/tilda-swinton-w640 640w, /avatars/tilda-swinton-w1024 1024w"
-              title="Tilda Swinton"
+              title=""
             />
           </div>
         </button>
@@ -1181,7 +1181,7 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
               sizes="320px"
               src="/avatars/tilda-swinton"
               srcset="/avatars/tilda-swinton-w320 320w, /avatars/tilda-swinton-w640 640w, /avatars/tilda-swinton-w1024 1024w"
-              title="Tilda Swinton"
+              title=""
             />
           </div>
         </button>

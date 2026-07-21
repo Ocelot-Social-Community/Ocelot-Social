@@ -195,9 +195,17 @@ describe('ContributionForm.vue', () => {
           spy.mockRestore()
         })
 
-        it('content is valid with just a link', async () => {
+        it('content with only an HTML tag and no visible text is invalid', async () => {
           await wrapper.vm.updateEditorContent(
             '<a href="https://www.youtube.com/watch?v=smoEelV6FUk" target="_blank"></a>',
+          )
+          wrapper.find('form').trigger('submit')
+          expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(0)
+        })
+
+        it('content with a link and visible text is valid', async () => {
+          await wrapper.vm.updateEditorContent(
+            '<a href="https://www.youtube.com/watch?v=smoEelV6FUk" target="_blank">YouTube</a>',
           )
           wrapper.find('form').trigger('submit')
           expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
@@ -240,6 +248,22 @@ describe('ContributionForm.vue', () => {
           await wrapper.find('form').trigger('submit')
           await mocks.$apollo.mutate
           await expect(mocks.$toast.error).toHaveBeenCalledWith('Not Authorized!')
+        })
+      })
+
+      describe('contentLength', () => {
+        it('returns 0 for HTML without visible text', async () => {
+          await wrapper.vm.updateEditorContent(
+            '<a href="https://www.youtube.com/watch?v=smoEelV6FUk" target="_blank"></a>',
+          )
+          expect(wrapper.vm.contentLength).toBe(0)
+        })
+
+        it('returns the visible text length, ignoring HTML tags', async () => {
+          await wrapper.vm.updateEditorContent(
+            '<a href="https://www.youtube.com/watch?v=smoEelV6FUk" target="_blank">YouTube</a>',
+          )
+          expect(wrapper.vm.contentLength).toBe('YouTube'.length)
         })
       })
     })
@@ -337,8 +361,8 @@ describe('ContributionForm.vue', () => {
             wrapper.find('input[name="eventIsOnline"]').setChecked(true)
           })
 
-          it('has no input for event location', () => {
-            expect(wrapper.findComponent({ name: 'LocationSelect' }).exists()).toBe(false)
+          it('event location input is disabled', () => {
+            expect(wrapper.findComponent({ name: 'LocationSelect' }).props('disabled')).toBe(true)
           })
         })
 

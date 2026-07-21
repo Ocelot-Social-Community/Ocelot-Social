@@ -59,6 +59,7 @@ describe('LocationSelect', () => {
           place: 'nowhere',
           lang: 'en',
           types: 'region,place,country',
+          proximity: null,
         },
         fetchPolicy: 'network-only',
       })
@@ -115,6 +116,7 @@ describe('LocationSelect', () => {
             place: 'nowhere',
             lang: 'en',
             types: 'address',
+            proximity: null,
           },
           fetchPolicy: 'network-only',
         })
