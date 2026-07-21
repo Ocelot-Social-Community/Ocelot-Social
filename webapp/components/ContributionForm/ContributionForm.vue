@@ -56,13 +56,13 @@
             "
           />
 
-          <!-- Eventdata -->
+          <!-- event data -->
           <div v-if="createEvent" class="eventDatas">
             <hr />
             <div class="ds-mt-x-small ds-mb-large"></div>
             <div class="ds-grid event-date-grid">
               <div class="event-grid-item">
-                <!-- <label>Beginn</label> -->
+                <!-- <label>Begin</label> -->
                 <date-picker
                   name="eventStart"
                   v-model="formData.eventStart"
@@ -77,8 +77,7 @@
                 ></date-picker>
               </div>
               <div class="event-grid-item">
-                <!-- <label>Ende (optional)</label> -->
-
+                <!-- <label>End (optional)</label> -->
                 <date-picker
                   v-model="formData.eventEnd"
                   name="eventEnd"
@@ -283,7 +282,6 @@ export default {
       default: null,
     },
   },
-
   data() {
     return {
       links,
