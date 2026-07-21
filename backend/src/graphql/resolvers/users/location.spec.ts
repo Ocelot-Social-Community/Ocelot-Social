@@ -27,21 +27,49 @@ const mockJsonResponse = (body: unknown) =>
 // Mapbox mock responses for queryLocations
 const berlinMapboxEn = {
   features: [
-    { id: 'place.berlin-de', place_name: 'Berlin, Germany' },
-    { id: 'place.berlin-md', place_name: 'Berlin, Maryland, United States' },
-    { id: 'place.berlin-ct', place_name: 'Berlin, Connecticut, United States' },
-    { id: 'place.berlin-nj', place_name: 'Berlin, New Jersey, United States' },
-    { id: 'place.berlin-oh', place_name: 'Berlin Heights, Ohio, United States' },
+    { id: 'place.berlin-de', place_name: 'Berlin, Germany', place_type: ['place'] },
+    { id: 'place.berlin-md', place_name: 'Berlin, Maryland, United States', place_type: ['place'] },
+    {
+      id: 'place.berlin-ct',
+      place_name: 'Berlin, Connecticut, United States',
+      place_type: ['place'],
+    },
+    {
+      id: 'place.berlin-nj',
+      place_name: 'Berlin, New Jersey, United States',
+      place_type: ['place'],
+    },
+    {
+      id: 'place.berlin-oh',
+      place_name: 'Berlin Heights, Ohio, United States',
+      place_type: ['place'],
+    },
   ],
 }
 
 const berlinMapboxDe = {
   features: [
-    { id: 'place.berlin-de', place_name: 'Berlin, Deutschland' },
-    { id: 'place.berlin-md', place_name: 'Berlin, Maryland, Vereinigte Staaten' },
-    { id: 'place.berlin-nj', place_name: 'Berlin, New Jersey, Vereinigte Staaten' },
-    { id: 'place.berlin-oh', place_name: 'Berlin Heights, Ohio, Vereinigte Staaten' },
-    { id: 'place.berlin-ma', place_name: 'Berlin, Massachusetts, Vereinigte Staaten' },
+    { id: 'place.berlin-de', place_name: 'Berlin, Deutschland', place_type: ['place'] },
+    {
+      id: 'place.berlin-md',
+      place_name: 'Berlin, Maryland, Vereinigte Staaten',
+      place_type: ['place'],
+    },
+    {
+      id: 'place.berlin-nj',
+      place_name: 'Berlin, New Jersey, Vereinigte Staaten',
+      place_type: ['place'],
+    },
+    {
+      id: 'place.berlin-oh',
+      place_name: 'Berlin Heights, Ohio, Vereinigte Staaten',
+      place_type: ['place'],
+    },
+    {
+      id: 'place.berlin-ma',
+      place_name: 'Berlin, Massachusetts, Vereinigte Staaten',
+      place_type: ['place'],
+    },
   ],
 }
 
@@ -145,6 +173,7 @@ beforeEach(() => {
       return Promise.resolve(mockJsonResponse({ features: [] }))
     }
 
+    // Unknown place — mimic Mapbox "no results"
     return Promise.resolve(mockJsonResponse({ features: [] }))
   })
 })
@@ -173,11 +202,23 @@ describe('Location Service', () => {
     const result = await query({ query: queryLocations, variables })
     expect(result.data.queryLocations).toEqual(
       expect.arrayContaining([
-        { id: 'place.berlin-de', place_name: 'Berlin, Germany' },
-        { id: 'place.berlin-md', place_name: 'Berlin, Maryland, United States' },
-        { id: 'place.berlin-ct', place_name: 'Berlin, Connecticut, United States' },
-        { id: 'place.berlin-nj', place_name: 'Berlin, New Jersey, United States' },
-        { id: 'place.berlin-oh', place_name: 'Berlin Heights, Ohio, United States' },
+        { id: expect.stringMatching(/^place\.[0-9a-z-]+$/), place_name: 'Berlin, Germany' },
+        {
+          id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
+          place_name: 'Berlin, Maryland, United States',
+        },
+        {
+          id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
+          place_name: 'Berlin, Connecticut, United States',
+        },
+        {
+          id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
+          place_name: 'Berlin, New Jersey, United States',
+        },
+        {
+          id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
+          place_name: 'Berlin Heights, Ohio, United States',
+        },
       ]),
     )
   })
@@ -189,11 +230,23 @@ describe('Location Service', () => {
     }
     const result = await query({ query: queryLocations, variables })
     expect(result.data.queryLocations).toEqual([
-      { id: 'place.berlin-de', place_name: 'Berlin, Deutschland' },
-      { id: 'place.berlin-md', place_name: 'Berlin, Maryland, Vereinigte Staaten' },
-      { id: 'place.berlin-nj', place_name: 'Berlin, New Jersey, Vereinigte Staaten' },
-      { id: 'place.berlin-oh', place_name: 'Berlin Heights, Ohio, Vereinigte Staaten' },
-      { id: 'place.berlin-ma', place_name: 'Berlin, Massachusetts, Vereinigte Staaten' },
+      { id: expect.stringMatching(/^place\.[0-9a-z-]+$/), place_name: 'Berlin, Deutschland' },
+      {
+        id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
+        place_name: 'Berlin, Maryland, Vereinigte Staaten',
+      },
+      {
+        id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
+        place_name: 'Berlin, New Jersey, Vereinigte Staaten',
+      },
+      {
+        id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
+        place_name: 'Berlin Heights, Ohio, Vereinigte Staaten',
+      },
+      {
+        id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
+        place_name: 'Berlin, Massachusetts, Vereinigte Staaten',
+      },
     ])
   })
 
