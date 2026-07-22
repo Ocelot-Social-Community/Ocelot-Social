@@ -281,6 +281,27 @@ describe('distanceToMe', () => {
       })
     })
 
+    describe('when the current user has no coordinates', () => {
+      it('returns null', async () => {
+        authenticatedUser = await noCordsPlaceUser.toJson()
+        const targetUser = await myPlaceUser.toJson()
+        await expect(
+          query({ query: User, variables: { id: targetUser.id } }),
+        ).resolves.toMatchObject({
+          data: {
+            User: [
+              expect.objectContaining({
+                location: expect.objectContaining({
+                  distanceToMe: null,
+                }),
+              }),
+            ],
+          },
+          errors: undefined,
+        })
+      })
+    })
+
     describe('for noCordsPlaceUser', () => {
       it('returns null', async () => {
         authenticatedUser = await user.toJson()

@@ -194,6 +194,13 @@ describe('Location Service', () => {
     authenticatedUser = await user.toJson()
   })
 
+  it('passes proximity to the Mapbox URL when provided', async () => {
+    variables = { place: 'Berlin', lang: 'en', proximity: '10.0,53.55' }
+    await query({ query: queryLocations, variables })
+    const calledUrl = decodeURIComponent(fetchSpy.mock.calls[0][0] as string)
+    expect(calledUrl).toContain('proximity=10.0,53.55')
+  })
+
   it('query Location existing', async () => {
     variables = {
       place: 'Berlin',
