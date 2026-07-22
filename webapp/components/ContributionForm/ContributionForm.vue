@@ -796,16 +796,16 @@ export default {
     font-size: 1rem;
     height: calc(1.625rem + 18px);
     padding: 8px 8px;
-    background-color: #faf9fa;
-    border-color: #e5e3e8;
-    color: #4b4554;
+    background-color: $background-color-soft;
+    border-color: $border-color-softer;
+    color: $text-color-base;
   }
   .mx-datepicker input:hover {
-    border-color: #e5e3e8;
+    border-color: $border-color-softer;
   }
   .mx-datepicker input:focus {
-    border-color: #17b53f;
-    background-color: #fff;
+    border-color: $border-color-active;
+    background-color: $background-color-base;
   }
   .mx-datepicker-error input {
     border-color: $color-danger;
