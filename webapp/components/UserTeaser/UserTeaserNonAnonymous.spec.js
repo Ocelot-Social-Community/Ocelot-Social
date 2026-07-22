@@ -42,7 +42,9 @@ describe('UserTeaserNonAnonymous', () => {
     it('pre-fetches group data when group has an id', () => {
       const apolloQuery = makeApolloMock()
       Wrapper({ apolloQuery, groupProp: group })
-      expect(apolloQuery).toHaveBeenCalledWith(expect.objectContaining({ variables: { id: 'g1' } }))
+      expect(apolloQuery).toHaveBeenCalledWith(
+        expect.objectContaining({ variables: { id: 'g1' } }),
+      )
     })
 
     it('does not query when group prop is absent', () => {
@@ -102,6 +104,20 @@ describe('UserTeaserNonAnonymous', () => {
       const wrapper = Wrapper({ apolloQuery, groupProp: group })
       const openMenu = jest.fn()
       await wrapper.vm.loadGroupPopover(openMenu)
+      expect(openMenu).not.toHaveBeenCalled()
+      expect(wrapper.vm.groupPopoverPending).toBe(false)
+    })
+
+    it('does not call openMenu when cancelled before query resolves', async () => {
+      let resolveQuery
+      const apolloQuery = jest.fn(() => new Promise((resolve) => (resolveQuery = resolve)))
+      const wrapper = Wrapper({ apolloQuery, groupProp: group })
+      const openMenu = jest.fn()
+      const closeMenu = jest.fn()
+      const loading = wrapper.vm.loadGroupPopover(openMenu)
+      wrapper.vm.cancelAndCloseGroup(closeMenu)
+      resolveQuery({ data: {} })
+      await loading
       expect(openMenu).not.toHaveBeenCalled()
       expect(wrapper.vm.groupPopoverPending).toBe(false)
     })

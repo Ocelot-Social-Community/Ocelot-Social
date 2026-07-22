@@ -199,7 +199,7 @@ describe('ContributionForm.vue', () => {
           await wrapper.vm.updateEditorContent(
             '<a href="https://www.youtube.com/watch?v=smoEelV6FUk" target="_blank"></a>',
           )
-          wrapper.find('form').trigger('submit')
+          await wrapper.find('form').trigger('submit')
           expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(0)
         })
 
@@ -207,7 +207,7 @@ describe('ContributionForm.vue', () => {
           await wrapper.vm.updateEditorContent(
             '<a href="https://www.youtube.com/watch?v=smoEelV6FUk" target="_blank">YouTube</a>',
           )
-          wrapper.find('form').trigger('submit')
+          await wrapper.find('form').trigger('submit')
           expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
         })
 
