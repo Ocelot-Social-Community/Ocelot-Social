@@ -109,7 +109,7 @@ describe('ContributionForm.vue', () => {
         })
 
         it('has no event data block', () => {
-          expect(wrapper.find('div.eventDatas').exists()).toBe(false)
+          expect(wrapper.find('div.eventData').exists()).toBe(false)
         })
 
         it('title cannot be empty', async () => {
@@ -339,12 +339,12 @@ describe('ContributionForm.vue', () => {
 
     describe('Events', () => {
       beforeEach(() => {
-        propsData.createEvent = true
+        propsData.postType = 'Event'
         wrapper = Wrapper()
       })
 
       it('has event data block', () => {
-        expect(wrapper.find('div.eventDatas').exists()).toBe(true)
+        expect(wrapper.find('div.eventData').exists()).toBe(true)
       })
 
       describe('is online event', () => {
@@ -450,13 +450,13 @@ describe('ContributionForm.vue', () => {
         jest.useRealTimers()
       })
 
-      it('re-runs validation when createEvent flips from false to true', async () => {
+      it('re-runs validation when postType flips from Article to Event', async () => {
         wrapper = Wrapper()
         wrapper.find('.ds-input').setValue(postTitle)
         await wrapper.vm.updateEditorContent(postContent)
         expect(wrapper.vm.formErrors).toBeNull()
 
-        wrapper.setProps({ createEvent: true })
+        wrapper.setProps({ postType: 'Event' })
         // async-validator resolves via microtasks; flush Vue's reactive tick
         // and the validator promise queue.
         await wrapper.vm.$nextTick()

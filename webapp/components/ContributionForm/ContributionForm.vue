@@ -57,7 +57,7 @@
           />
 
           <!-- event data -->
-          <div v-if="createEvent" class="eventDatas">
+          <div v-if="postType === 'Event'" class="eventData">
             <hr />
             <div class="ds-mt-x-small ds-mb-large"></div>
             <div class="ds-grid event-date-grid">
@@ -271,9 +271,9 @@ export default {
       type: Object,
       default: () => null,
     },
-    createEvent: {
-      type: Boolean,
-      default: false,
+    postType: {
+      type: String,
+      default: 'Article',
     },
     // When provided, the form uses this object as its source of truth (by reference).
     // Lets callers hoist form state so it survives remounts (e.g. type switch).
@@ -338,7 +338,7 @@ export default {
         },
         eventStart: {
           validator: (_, value, callback) => {
-            if (this.createEvent && !value) {
+            if (this.postType === 'Event' && !value) {
               callback(new Error(this.$t('post.viewEvent.eventStartNotEmpty')))
               return
             }
@@ -347,7 +347,7 @@ export default {
         },
         eventEnd: {
           validator: (_, value, callback) => {
-            if (!this.createEvent || !value || !this.formData.eventStart) {
+            if (this.postType !== 'Event' || !value || !this.formData.eventStart) {
               callback()
               return
             }
@@ -359,11 +359,11 @@ export default {
           },
         },
         eventVenue: {
-          required: !!this.createEvent,
+          required: this.postType === 'Event',
           min: 3,
           max: 100,
           validator: (_, value = '') => {
-            if (!this.createEvent) return []
+            if (this.postType !== 'Event') return []
             if (!value.trim()) {
               return [new Error(this.$t('common.validations.eventVenueNotEmpty'))]
             }
@@ -376,9 +376,9 @@ export default {
           },
         },
         eventLocationName: {
-          required: !!this.createEvent && !this.formData.eventIsOnline,
+          required: this.postType === 'Event' && !this.formData.eventIsOnline,
           validator: (_, value = '') => {
-            if (!this.createEvent) return []
+            if (this.postType !== 'Event') return []
             if (this.formData.eventIsOnline) return []
             const name = typeof value === 'object' ? value?.value : value
             if (!name?.trim()) {
@@ -398,13 +398,13 @@ export default {
     },
     eventStartIsInPast() {
       return (
-        this.createEvent &&
+        this.postType === 'Event' &&
         this.formData.eventStart &&
         new Date(this.formData.eventStart) < new Date()
       )
     },
     eventInput() {
-      if (this.createEvent) {
+      if (this.postType === 'Event') {
         return {
           eventStart: new Date(this.formData.eventStart).toISOString(),
           eventVenue: this.formData.eventVenue,
@@ -463,7 +463,7 @@ export default {
     // Re-validate when the schema-shaping inputs change so newly-required
     // fields (e.g. eventStart when switching to "event") surface errors
     // immediately rather than hiding behind a stale "green" state.
-    createEvent() {
+    postType() {
       this.$validateForm()
     },
     groupId() {
@@ -546,7 +546,7 @@ export default {
             id: this.contribution.id || null,
             image,
             groupId: this.groupId,
-            postType: !this.createEvent ? 'Article' : 'Event',
+            postType: this.postType,
             eventInput: this.eventInput,
           },
         })
@@ -635,7 +635,7 @@ export default {
 </script>
 
 <style lang="scss">
-.eventDatas {
+.eventData {
   .event-date-hints-zone {
     display: grid;
     grid-template-columns: repeat(2, 1fr);

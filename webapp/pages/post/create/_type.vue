@@ -51,7 +51,7 @@
         <transition name="slide-up" appear>
           <contribution-form
             :group="selectedGroup"
-            :createEvent="createEvent"
+            :post-type="type === 'event' ? 'Event' : 'Article'"
             :externalFormData="draft"
           />
         </transition>
@@ -164,7 +164,7 @@ export default {
       )
     },
     heading() {
-      return !this.createEvent
+      return this.type !== 'event'
         ? this.$t('post.createNewArticle.title')
         : this.$t('post.createNewEvent.title')
     },
@@ -185,9 +185,6 @@ export default {
           type: 'event',
         },
       ]
-    },
-    createEvent() {
-      return this.type === 'event'
     },
   },
   apollo: {

@@ -27,7 +27,7 @@
         <contribution-form
           :contribution="contribution"
           :group="contribution && contribution.group ? contribution.group : null"
-          :createEvent="contribution && contribution.postType[0] === 'Event'"
+          :post-type="contribution && contribution.postType[0]"
         />
       </div>
       <div class="post-edit-layout__aside"></div>
