@@ -6,7 +6,7 @@
 import { UserInputError } from '@graphql/errors'
 
 export const validateEventParams = (params) => {
-  let locationName = null
+  let locationName: string | null | undefined
   if (params.postType && params.postType === 'Event') {
     const { eventInput } = params
     validateEventDate(eventInput.eventStart)
@@ -28,6 +28,7 @@ export const validateEventParams = (params) => {
       locationName = params.eventLocationName
     } else {
       params.eventLocationName = null
+      locationName = null
     }
     params.eventIsOnline = !!eventInput.eventIsOnline
   }

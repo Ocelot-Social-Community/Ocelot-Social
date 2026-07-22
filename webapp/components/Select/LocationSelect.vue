@@ -91,6 +91,9 @@ export default {
       },
     )
   },
+  beforeDestroy() {
+    clearTimeout(this.debounceTimeout)
+  },
   data() {
     return {
       currentValue: this.value,
@@ -175,9 +178,23 @@ export default {
           resolve(null)
           return
         }
+        let resolved = false
+        const fallbackTimer = setTimeout(() => {
+          if (!resolved) {
+            resolved = true
+            resolve(null)
+          }
+        }, 3000)
+        const done = (value) => {
+          if (!resolved) {
+            resolved = true
+            clearTimeout(fallbackTimer)
+            resolve(value)
+          }
+        }
         navigator.geolocation.getCurrentPosition(
-          (pos) => resolve(`${pos.coords.longitude},${pos.coords.latitude}`),
-          () => resolve(null),
+          (pos) => done(`${pos.coords.longitude},${pos.coords.latitude}`),
+          () => done(null),
           { timeout: 3000, maximumAge: 300000 },
         )
       })

@@ -881,7 +881,8 @@
     "save": "Krijo grup të ri",
     "showMembers": "Lista e anëtarëve e dukshme për të gjithë",
     "teaser": {
-      "openGroup": "Hap grupin"
+      "openGroup": "Hap grupin",
+      "unavailable": "Grupi nuk është më i disponueshëm"
     },
     "type": "Dukshmëria e grupit",
     "types": {

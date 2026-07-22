@@ -341,6 +341,7 @@ export const groupTeaserQuery = (i18n) => {
         actionRadius
         myRole
         membersCount
+        postsCount
         avatar {
           ...imageUrls
         }

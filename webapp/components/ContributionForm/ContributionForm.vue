@@ -310,7 +310,7 @@ export default {
             if (!value.trim()) {
               return [new Error(this.$t('common.validations.titleNotEmpty'))]
             }
-            if (value.length < 3 || value.length > 100) {
+            if (value.trim().length < 3 || value.trim().length > 100) {
               return [new Error(this.$t('common.validations.titleLength', { min: 3, max: 100 }))]
             }
             return []

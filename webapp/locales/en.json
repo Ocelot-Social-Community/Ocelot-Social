@@ -881,7 +881,8 @@
     "save": "Create new group",
     "showMembers": "Member list visible to everyone",
     "teaser": {
-      "openGroup": "Open group"
+      "openGroup": "Open group",
+      "unavailable": "Group no longer available"
     },
     "type": "Visibility of the group",
     "types": {
@@ -1189,7 +1190,7 @@
       "eventEnd": "End",
       "eventEndBeforeStart": "The end date must be after the start date.",
       "eventIsOnline": "Online",
-      "eventLocationName": "Adress for navi — e.g. Example Street 1, 12345 City",
+      "eventLocationName": "Address for navi — e.g. Example Street 1, 12345 City",
       "eventLocationRequired": "If the event is not online, a location must be entered.",
       "eventStart": "Start",
       "eventStartInPast": "The event start is in the past.",

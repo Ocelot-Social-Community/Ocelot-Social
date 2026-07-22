@@ -881,7 +881,8 @@
     "save": "Nieuwe groep aanmaken",
     "showMembers": "Ledenlijst zichtbaar voor iedereen",
     "teaser": {
-      "openGroup": "Groep openen"
+      "openGroup": "Groep openen",
+      "unavailable": "Groep niet meer beschikbaar"
     },
     "type": "Zichtbaarheid van de groep",
     "types": {

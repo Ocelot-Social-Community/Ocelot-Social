@@ -3,7 +3,7 @@
     <div v-if="!showContent" class="loading-state">
       <os-spinner size="md" />
     </div>
-    <template v-else-if="showContent">
+    <template v-else-if="showContent && resolvedGroup">
       <div class="group-header">
         <profile-avatar :profile="resolvedGroup" class="popover-avatar" />
         <div class="group-names">
@@ -52,6 +52,9 @@
         {{ $t('group.teaser.openGroup') }}
       </os-button>
     </template>
+    <template v-else-if="showContent">
+      <p class="group-unavailable">{{ $t('group.teaser.unavailable') }}</p>
+    </template>
   </div>
 </template>
 
@@ -82,6 +85,7 @@ export default {
     return {
       showContent: false,
       minSpinnerDone: false,
+      querySettled: false,
       spinnerTimer: null,
     }
   },
@@ -92,7 +96,7 @@ export default {
     }
     this.spinnerTimer = setTimeout(() => {
       this.minSpinnerDone = true
-      if (this.resolvedGroup) this.showContent = true
+      if (this.resolvedGroup || this.querySettled) this.showContent = true
     }, 400)
   },
   beforeDestroy() {
@@ -108,6 +112,15 @@ export default {
       if (group && this.minSpinnerDone) this.showContent = true
     },
   },
+  methods: {
+    onQuerySettled() {
+      if (this.minSpinnerDone) {
+        this.showContent = true
+      } else {
+        this.querySettled = true
+      }
+    },
+  },
   apollo: {
     Group: {
       query() {
@@ -118,6 +131,12 @@ export default {
       },
       skip() {
         return !this.groupId || !!this.group
+      },
+      result() {
+        this.onQuerySettled()
+      },
+      error() {
+        this.onQuerySettled()
       },
     },
   },

@@ -188,7 +188,7 @@ export const queryLocations = async ({ place, lang, types, proximity }, context:
     `?access_token=${context.config.MAPBOX_TOKEN}&types=${locationTypes}&language=${lang}&limit=10`
 
   if (proximity) {
-    url += `&proximity=${proximity}`
+    url += `&proximity=${encodeURIComponent(proximity)}`
   }
 
   const res: any = await fetch(url, {

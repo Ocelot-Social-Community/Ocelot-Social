@@ -881,7 +881,8 @@
     "save": "Crear nuevo grupo",
     "showMembers": "Lista de miembros visible para todos",
     "teaser": {
-      "openGroup": "Abrir grupo"
+      "openGroup": "Abrir grupo",
+      "unavailable": "Grupo no disponible"
     },
     "type": "Visibilidad del grupo",
     "types": {
@@ -1193,7 +1194,7 @@
       "eventLocationRequired": "Si el evento no es en línea, se debe ingresar una ubicación.",
       "eventStart": "Inicio",
       "eventStartInPast": "La fecha de inicio está en el pasado.",
-      "eventStartNotEmpty": "Por favor, introduce una fecha de inicio.",
+      "eventStartNotEmpty": "Por favor, introduzca una fecha de inicio.",
       "eventVenue": "Descripción del lugar — p. ej. patio trasero, 1er piso, …",
       "title": "Evento"
     },

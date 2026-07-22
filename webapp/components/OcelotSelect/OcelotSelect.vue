@@ -354,7 +354,6 @@ export default {
     openAndFocus() {
       if (this.isInteractionBlocked) return
       this.open()
-      if (!this.prefillOnOpen && this.autoResetSearch) this.resetSearch()
       if (!this.focus || this.multiple) {
         this.$refs.search.focus()
         this.handleFocus()

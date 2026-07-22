@@ -329,7 +329,7 @@ export default {
         })
         const post = await writeTxResultPromise
         await images(context.config).mergeImage(post, 'HERO_IMAGE', imageInput)
-        if (locationName) {
+        if (locationName !== undefined) {
           await createOrUpdateLocations('Post', post.id, locationName, session, context)
         }
         return post

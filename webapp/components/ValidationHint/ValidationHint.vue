@@ -5,8 +5,8 @@
       v-if="hasCount || variant"
       :variant="badgeVariant"
       :class="badgeClasses"
-      role="alert"
-      aria-live="assertive"
+      :role="variant ? 'alert' : null"
+      :aria-live="variant ? 'assertive' : 'polite'"
     >
       <span v-if="hasCount">
         {{ count }}

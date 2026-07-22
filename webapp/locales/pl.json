@@ -881,7 +881,8 @@
     "save": "Utwórz nową grupę",
     "showMembers": "Lista członków widoczna dla wszystkich",
     "teaser": {
-      "openGroup": "Otwórz grupę"
+      "openGroup": "Otwórz grupę",
+      "unavailable": "Grupa niedostępna"
     },
     "type": "Widoczność grupy",
     "types": {
