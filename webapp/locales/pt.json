@@ -1133,6 +1133,7 @@
     "deniedHint": "Não tens permissão para isto."
   },
   "post": {
+    "article": "Artigo",
     "comment": {
       "joinGroup": "Entrou no grupo „<b>{name}</b>“",
       "noPermission": "Os comentários não estão ativados para a tua função.",
@@ -1153,7 +1154,7 @@
       "forGroup": {
         "title": "Para o grupo "
       },
-      "title": "Editar sua publicação"
+      "title": "Editar seu artigo"
     },
     "event": "Evento",
     "menu": {
@@ -1177,7 +1178,6 @@
       "unpush": "Cancelar subida",
       "unpushedSuccessfully": "A subida da publicação foi cancelada!"
     },
-    "name": "Postar",
     "pinned": "Anúncio",
     "sensitiveContent": {
       "hide": "Ocultar conteúdo sensível",

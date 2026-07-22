@@ -1133,6 +1133,7 @@
     "deniedHint": "You don't have permission for this."
   },
   "post": {
+    "article": "Article",
     "comment": {
       "joinGroup": "Joined group „<b>{name}</b>“",
       "noPermission": "Commenting is not enabled for your role.",
@@ -1153,7 +1154,7 @@
       "forGroup": {
         "title": "For The Group "
       },
-      "title": "Edit Your Post"
+      "title": "Edit Your Article"
     },
     "event": "Event",
     "menu": {
@@ -1177,7 +1178,6 @@
       "unpush": "Cancel push",
       "unpushedSuccessfully": "Post push has been canceled!"
     },
-    "name": "Article",
     "pinned": "Announcement",
     "sensitiveContent": {
       "hide": "Hide sensitive content",

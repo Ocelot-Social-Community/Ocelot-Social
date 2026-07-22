@@ -1133,6 +1133,7 @@
     "deniedHint": "Vous n'avez pas la permission pour cela."
   },
   "post": {
+    "article": "Article",
     "comment": {
       "joinGroup": "A rejoint le groupe „<b>{name}</b>“",
       "noPermission": "Les commentaires ne sont pas activés pour votre rôle.",
@@ -1153,7 +1154,7 @@
       "forGroup": {
         "title": "Pour le groupe "
       },
-      "title": "Modifier ta publication"
+      "title": "Modifier ton article"
     },
     "event": "Événement",
     "menu": {
@@ -1177,7 +1178,6 @@
       "unpush": "Annuler la remontée",
       "unpushedSuccessfully": "La remontée de la publication a été annulée !"
     },
-    "name": "Post",
     "pinned": "Annonce",
     "sensitiveContent": {
       "hide": "Masquer le contenu sensible",

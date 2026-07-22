@@ -1133,6 +1133,7 @@
     "deniedHint": "Je hebt hiervoor geen rechten."
   },
   "post": {
+    "article": "Artikel",
     "comment": {
       "joinGroup": "Lid geworden van groep „<b>{name}</b>“",
       "noPermission": "Reageren is niet ingeschakeld voor jouw rol.",
@@ -1153,7 +1154,7 @@
       "forGroup": {
         "title": "Voor de groep "
       },
-      "title": "Je bericht bewerken"
+      "title": "Je artikel bewerken"
     },
     "event": "Evenement",
     "menu": {
@@ -1177,7 +1178,6 @@
       "unpush": "Naar boven duwen annuleren",
       "unpushedSuccessfully": "Naar boven duwen is geannuleerd!"
     },
-    "name": "Post",
     "pinned": "Aankondiging",
     "sensitiveContent": {
       "hide": "Gevoelige inhoud verbergen",

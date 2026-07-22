@@ -175,7 +175,7 @@ export default {
       const query = this.draft.groupId ? `?groupId=${this.draft.groupId}` : ''
       return [
         {
-          name: this.$t('post.name'),
+          name: this.$t('post.article'),
           path: `/post/create/article${query}`,
           type: 'article',
         },

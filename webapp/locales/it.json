@@ -1133,6 +1133,7 @@
     "deniedHint": "Non hai il permesso per questo."
   },
   "post": {
+    "article": "Articolo",
     "comment": {
       "joinGroup": "Si è unito al gruppo „<b>{name}</b>“",
       "noPermission": "I commenti non sono abilitati per il tuo ruolo.",
@@ -1153,7 +1154,7 @@
       "forGroup": {
         "title": "Per il gruppo "
       },
-      "title": "Modifica la tua pubblicazione"
+      "title": "Modifica il tuo articolo"
     },
     "event": "Evento",
     "menu": {
@@ -1177,7 +1178,6 @@
       "unpush": "Annulla la spinta",
       "unpushedSuccessfully": "La spinta della pubblicazione è stata annullata!"
     },
-    "name": "Messaggio",
     "pinned": "Annuncio",
     "sensitiveContent": {
       "hide": "Nascondi contenuto sensibile",

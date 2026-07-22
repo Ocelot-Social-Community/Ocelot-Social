@@ -250,7 +250,7 @@ export default {
       if (this.post && (this.post.pinned || (this.showGroupPinned && this.post.groupPinned)))
         return this.$t('post.pinned')
       if (this.post.postType[0] === 'Event') return this.$t('post.event')
-      return this.$t('post.name')
+      return this.$t('post.article')
     },
   },
   created() {

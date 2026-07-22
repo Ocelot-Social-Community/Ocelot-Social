@@ -1133,6 +1133,7 @@
     "deniedHint": "Nie masz do tego uprawnień."
   },
   "post": {
+    "article": "Artykuł",
     "comment": {
       "joinGroup": "Dołączył/a do grupy „<b>{name}</b>“",
       "noPermission": "Komentowanie nie jest włączone dla Twojej roli.",
@@ -1153,7 +1154,7 @@
       "forGroup": {
         "title": "Dla grupy "
       },
-      "title": "Edytuj swój wpis"
+      "title": "Edytuj swój artykuł"
     },
     "event": "Wydarzenie",
     "menu": {
@@ -1177,7 +1178,6 @@
       "unpush": "Anuluj wypchnięcie",
       "unpushedSuccessfully": "Wypchnięcie wpisu zostało anulowane!"
     },
-    "name": "Poczta",
     "pinned": "Ogłoszenie",
     "sensitiveContent": {
       "hide": "Ukryj wrażliwą treść",

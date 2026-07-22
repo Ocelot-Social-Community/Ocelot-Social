@@ -69,7 +69,7 @@ export default {
     },
     routes() {
       return [
-        { name: this.$t('post.name'), path: '#', type: 'Article' },
+        { name: this.$t('post.article'), path: '#', type: 'Article' },
         { name: this.$t('post.event'), path: '#', type: 'Event' },
       ]
     },

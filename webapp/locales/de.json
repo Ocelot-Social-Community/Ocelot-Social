@@ -1133,6 +1133,7 @@
     "deniedHint": "Dir fehlt die Berechtigung dafür."
   },
   "post": {
+    "article": "Artikel",
     "comment": {
       "joinGroup": "Gruppe „<b>{name}</b>“ beigetreten",
       "noPermission": "Kommentieren ist für deine Rolle nicht freigeschaltet.",
@@ -1142,7 +1143,7 @@
       "updated": "Änderungen gespeichert"
     },
     "createNewArticle": {
-      "title": "Erstelle einen Beitrag"
+      "title": "Erstelle einen Artikel"
     },
     "createNewEvent": {
       "title": "Erstelle eine Veranstaltung"
@@ -1153,7 +1154,7 @@
       "forGroup": {
         "title": "Für die Gruppe "
       },
-      "title": "Bearbeite deinen Beitrag"
+      "title": "Bearbeite deinen Artikel"
     },
     "event": "Veranstaltung",
     "menu": {
@@ -1177,7 +1178,6 @@
       "unpush": "Beitrag hochschieben aufheben",
       "unpushedSuccessfully": "Hochschieben des Beitrags erfolgreich rückgängig gemacht!"
     },
-    "name": "Beitrag",
     "pinned": "Meldung",
     "sensitiveContent": {
       "hide": "Sensiblen Inhalt verbergen",

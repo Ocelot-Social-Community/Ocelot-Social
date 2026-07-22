@@ -1133,6 +1133,7 @@
     "deniedHint": "Nuk ke leje për këtë."
   },
   "post": {
+    "article": "Artikull",
     "comment": {
       "joinGroup": "U bashkua me grupin „<b>{name}</b>“",
       "noPermission": "Komentimi nuk është aktivizuar për rolin tënd.",
@@ -1153,7 +1154,7 @@
       "forGroup": {
         "title": "Për grupin "
       },
-      "title": "Ndrysho postimin tënd"
+      "title": "Ndrysho artikullin tënd"
     },
     "event": "Ngjarje",
     "menu": {
@@ -1177,7 +1178,6 @@
       "unpush": "Anulo shtytjen",
       "unpushedSuccessfully": "Shtytja e postimit u anulua!"
     },
-    "name": "Artikull",
     "pinned": "Njoftim",
     "sensitiveContent": {
       "hide": "Fshih përmbajtjen e ndjeshme",
