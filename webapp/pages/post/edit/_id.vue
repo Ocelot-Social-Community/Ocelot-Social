@@ -22,20 +22,32 @@
       </h2>
     </div>
     <div class="ds-my-large"></div>
-    <div class="ds-flex ds-flex-gap-base post-edit-layout">
+    <div class="ds-flex ds-flex-gap-small post-edit-layout">
+      <div class="post-edit-layout__sidebar">
+        <os-menu :routes="routes" link-tag="a" :matcher="postTypeMatcher">
+          <os-menu-item
+            @click.prevent="switchPostType($event, item)"
+            slot="menuitem"
+            slot-scope="item"
+            :route="item.route"
+          >
+            {{ item.route.name }}
+          </os-menu-item>
+        </os-menu>
+      </div>
       <div class="post-edit-layout__main">
         <contribution-form
           :contribution="contribution"
           :group="contribution && contribution.group ? contribution.group : null"
-          :post-type="contribution && contribution.postType[0]"
+          :post-type="currentPostType"
         />
       </div>
-      <div class="post-edit-layout__aside"></div>
     </div>
   </div>
 </template>
 
 <script>
+import { OsMenu, OsMenuItem } from '@ocelot-social/ui'
 import ContributionForm from '~/components/ContributionForm/ContributionForm.vue'
 import PostQuery from '~/graphql/PostQuery'
 import { mapGetters } from 'vuex'
@@ -43,15 +55,27 @@ import { mapGetters } from 'vuex'
 export default {
   components: {
     ContributionForm,
+    OsMenu,
+    OsMenuItem,
   },
   computed: {
     ...mapGetters({
       user: 'auth/user',
     }),
     heading() {
-      return this.contribution && this.contribution.postType[0] === 'Event'
+      return this.currentPostType === 'Event'
         ? this.$t('post.editPost.event')
         : this.$t('post.editPost.title')
+    },
+    routes() {
+      return [
+        { name: this.$t('post.name'), path: '#', type: 'Article' },
+        { name: this.$t('post.event'), path: '#', type: 'Event' },
+      ]
+    },
+    postTypeMatcher() {
+      const current = this.currentPostType
+      return (_url, route) => route.type === current
     },
   },
   data() {
@@ -59,6 +83,7 @@ export default {
       contribution: {
         postType: ['Article'],
       },
+      currentPostType: 'Article',
     }
   },
   async asyncData(context) {
@@ -80,7 +105,12 @@ export default {
     if (contribution.author.id !== store.getters['auth/user'].id) {
       error({ statusCode: 403, message: 'error-pages.cannot-edit-post' })
     }
-    return { contribution }
+    return { contribution, currentPostType: contribution.postType[0] || 'Article' }
+  },
+  methods: {
+    switchPostType(_event, item) {
+      this.currentPostType = item.route.type
+    },
   },
 }
 </script>
@@ -90,16 +120,17 @@ export default {
   margin-top: 0;
 }
 
-.post-edit-layout__main,
-.post-edit-layout__aside {
+.post-edit-layout__sidebar,
+.post-edit-layout__main {
   flex: 0 0 100%;
   width: 100%;
 }
 @media #{$media-query-medium} {
-  .post-edit-layout__main {
-    flex: 3 0 0;
+  .post-edit-layout__sidebar {
+    flex: 0 0 200px;
+    width: 200px;
   }
-  .post-edit-layout__aside {
+  .post-edit-layout__main {
     flex: 1 0 0;
   }
 }

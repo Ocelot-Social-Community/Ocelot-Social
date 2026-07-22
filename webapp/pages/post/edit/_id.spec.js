@@ -4,7 +4,14 @@ import _id from './_id.vue'
 
 const localVue = global.localVue
 
-describe('post/_id.vue', () => {
+const stubs = {
+  ContributionForm: true,
+  'os-menu': true,
+  'os-menu-item': true,
+  'nuxt-link': true,
+}
+
+describe('post/edit/_id.vue', () => {
   let wrapper
   let mocks
   let store
@@ -13,70 +20,63 @@ describe('post/_id.vue', () => {
   let userId
   let authorId
 
+  const makeQuery = (postType = 'Article') =>
+    jest.fn().mockResolvedValue({
+      data: {
+        Post: [{ author: { id: authorId }, postType: [postType] }],
+      },
+    })
+
   beforeEach(() => {
     asyncData = false
     error = jest.fn()
+    authorId = 'some-author'
+    userId = 'some-author'
   })
 
-  describe('mount', () => {
-    const Wrapper = async () => {
-      mocks = {
-        $t: jest.fn(),
-        $i18n: {
-          locale: () => 'en',
-        },
-        apolloProvider: {
-          defaultClient: {
-            query: jest.fn().mockResolvedValue({
-              data: {
-                Post: [
-                  {
-                    author: { id: authorId },
-                    postType: ['Article'],
-                  },
-                ],
-              },
-            }),
-          },
-        },
-      }
-      store = new Vuex.Store({
-        getters: {
-          'auth/user': () => {
-            return { id: userId }
-          },
-          'categories/categories': jest.fn(() => []),
-        },
-        actions: {
-          'categories/init': jest.fn(),
-        },
-      })
-      if (asyncData) {
-        const data = _id.data ? _id.data() : {}
-        const aData = await _id.asyncData({
-          app: mocks,
-          store,
-          error,
-          params: { id: '123' },
-        })
-        _id.data = function () {
-          return { ...data, ...aData }
-        }
-      }
-      return mount(_id, { store, mocks, localVue })
+  const buildWrapper = async ({ query } = {}) => {
+    mocks = {
+      $t: jest.fn((key) => key),
+      $i18n: { locale: () => 'en' },
+      apolloProvider: {
+        defaultClient: { query: query || makeQuery() },
+      },
     }
+    store = new Vuex.Store({
+      getters: {
+        'auth/user': () => ({ id: userId }),
+        'categories/categories': jest.fn(() => []),
+      },
+      actions: {
+        'categories/init': jest.fn(),
+      },
+    })
+    if (asyncData) {
+      const data = _id.data ? _id.data() : {}
+      const aData = await _id.asyncData({
+        app: mocks,
+        store,
+        error,
+        params: { id: '123' },
+      })
+      _id.data = function () {
+        return { ...data, ...aData }
+      }
+    }
+    return mount(_id, { store, mocks, localVue, stubs })
+  }
 
+  describe('mount', () => {
     it('renders', async () => {
-      asyncData = false
-      wrapper = await Wrapper()
-      expect(wrapper.findAll('.contribution-form')).toHaveLength(1)
+      wrapper = await buildWrapper()
+      expect(wrapper.findComponent({ name: 'ContributionForm' }).exists()).toBe(true)
     })
 
     it('renders with asyncData of different users', async () => {
       asyncData = true
       authorId = 'some-author'
       userId = 'some-user'
-      wrapper = await Wrapper()
+      wrapper = await buildWrapper()
       expect(error).toHaveBeenCalledWith({
         message: 'error-pages.cannot-edit-post',
         statusCode: 403,
@@ -85,10 +85,76 @@ describe('post/_id.vue', () => {
 
     it('renders with asyncData of same user', async () => {
       asyncData = true
-      authorId = 'some-author'
-      userId = 'some-author'
-      wrapper = await Wrapper()
+      wrapper = await buildWrapper()
       expect(error).not.toHaveBeenCalled()
+    })
+
+    it('sets currentPostType from contribution.postType[0] via asyncData', async () => {
+      asyncData = true
+      wrapper = await buildWrapper({ query: makeQuery('Event') })
+      expect(wrapper.vm.currentPostType).toBe('Event')
+    })
+
+    it('defaults currentPostType to Article when contribution has no postType', async () => {
+      asyncData = true
+      const query = jest.fn().mockResolvedValue({
+        data: { Post: [{ author: { id: authorId }, postType: [] }] },
+      })
+      wrapper = await buildWrapper({ query })
+      expect(wrapper.vm.currentPostType).toBe('Article')
+    })
+  })
+
+  describe('switchPostType', () => {
+    it('updates currentPostType when switching to Event', async () => {
+      wrapper = await buildWrapper()
+      wrapper.vm.switchPostType(null, { route: { type: 'Event' } })
+      expect(wrapper.vm.currentPostType).toBe('Event')
+    })
+
+    it('can switch back to Article', async () => {
+      wrapper = await buildWrapper()
+      wrapper.vm.switchPostType(null, { route: { type: 'Event' } })
+      wrapper.vm.switchPostType(null, { route: { type: 'Article' } })
+      expect(wrapper.vm.currentPostType).toBe('Article')
+    })
+  })
+
+  describe('postTypeMatcher', () => {
+    it('returns true for the current type and false for the other', async () => {
+      wrapper = await buildWrapper()
+      expect(wrapper.vm.postTypeMatcher('', { type: 'Article' })).toBe(true)
+      expect(wrapper.vm.postTypeMatcher('', { type: 'Event' })).toBe(false)
+    })
+
+    it('reflects changes to currentPostType', async () => {
+      wrapper = await buildWrapper()
+      wrapper.vm.switchPostType(null, { route: { type: 'Event' } })
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.postTypeMatcher('', { type: 'Event' })).toBe(true)
+      expect(wrapper.vm.postTypeMatcher('', { type: 'Article' })).toBe(false)
+    })
+  })
+
+  describe('heading', () => {
+    it('shows the article heading by default', async () => {
+      wrapper = await buildWrapper()
+      expect(wrapper.vm.heading).toBe('post.editPost.title')
+    })
+
+    it('shows the event heading when currentPostType is Event', async () => {
+      wrapper = await buildWrapper()
+      wrapper.vm.switchPostType(null, { route: { type: 'Event' } })
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.heading).toBe('post.editPost.event')
+    })
+
+    it('reverts to article heading when switching back', async () => {
+      wrapper = await buildWrapper()
+      wrapper.vm.switchPostType(null, { route: { type: 'Event' } })
+      wrapper.vm.switchPostType(null, { route: { type: 'Article' } })
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.heading).toBe('post.editPost.title')
     })
   })
 })
