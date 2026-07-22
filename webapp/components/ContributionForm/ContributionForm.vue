@@ -274,6 +274,7 @@ export default {
     postType: {
       type: String,
       default: 'Article',
+      validator: (v) => ['Article', 'Event'].includes(v),
     },
     // When provided, the form uses this object as its source of truth (by reference).
     // Lets callers hoist form state so it survives remounts (e.g. type switch).
@@ -364,10 +365,11 @@ export default {
           max: 100,
           validator: (_, value = '') => {
             if (this.postType !== 'Event') return []
-            if (!value.trim()) {
+            const trimmed = value.trim()
+            if (!trimmed) {
               return [new Error(this.$t('common.validations.eventVenueNotEmpty'))]
             }
-            if (value.length < 3 || value.length > 100) {
+            if (trimmed.length < 3 || trimmed.length > 100) {
               return [
                 new Error(this.$t('common.validations.eventVenueLength', { min: 3, max: 100 })),
               ]
@@ -380,8 +382,8 @@ export default {
           validator: (_, value = '') => {
             if (this.postType !== 'Event') return []
             if (this.formData.eventIsOnline) return []
-            const name = typeof value === 'object' ? value?.value : value
-            if (!name?.trim()) {
+            const name = (typeof value === 'object' ? value?.value : value)?.trim() ?? ''
+            if (!name) {
               return [new Error(this.$t('common.validations.eventLocationNameNotEmpty'))]
             }
             if (name.length < 3 || name.length > 100) {

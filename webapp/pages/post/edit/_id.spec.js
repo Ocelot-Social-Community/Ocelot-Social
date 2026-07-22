@@ -51,7 +51,9 @@ describe('post/edit/_id.vue', () => {
         'categories/init': jest.fn(),
       },
     })
+    let originalData
     if (asyncData) {
+      originalData = _id.data
       const data = _id.data ? _id.data() : {}
       const aData = await _id.asyncData({
         app: mocks,
@@ -63,7 +65,9 @@ describe('post/edit/_id.vue', () => {
         return { ...data, ...aData }
       }
     }
-    return mount(_id, { store, mocks, localVue, stubs })
+    const w = mount(_id, { store, mocks, localVue, stubs })
+    if (originalData !== undefined) _id.data = originalData
+    return w
   }
 
   describe('mount', () => {
