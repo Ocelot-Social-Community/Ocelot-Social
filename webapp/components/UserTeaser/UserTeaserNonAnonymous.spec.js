@@ -42,9 +42,7 @@ describe('UserTeaserNonAnonymous', () => {
     it('pre-fetches group data when group has an id', () => {
       const apolloQuery = makeApolloMock()
       Wrapper({ apolloQuery, groupProp: group })
-      expect(apolloQuery).toHaveBeenCalledWith(
-        expect.objectContaining({ variables: { id: 'g1' } }),
-      )
+      expect(apolloQuery).toHaveBeenCalledWith(expect.objectContaining({ variables: { id: 'g1' } }))
     })
 
     it('does not query when group prop is absent', () => {
