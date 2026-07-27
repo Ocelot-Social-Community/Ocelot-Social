@@ -72,6 +72,7 @@ FROM base AS build
 # NOTHING is copied into the committed maintenance/ project; the overlay happens only in this
 # ephemeral build stage. Pick the brand with `--build-arg BRAND=<name>` (a directory name under
 # deployment/configurations/); empty = vanilla ocelot.social.
+# Path 1 — MONOREPO build (docker compose, ocelot's own branded images).
 ARG BRAND=""
 # Bind-mount the brand configs only for THIS step (BuildKit) so no brand data lands in a build-stage
 # layer/cache — the generator writes the chosen brand into /app and reads nothing else afterwards.
@@ -83,7 +84,23 @@ RUN --mount=type=bind,source=deployment/configurations,target=/brands \
       echo "[maintenance] BRAND unset/unknown ('$BRAND') — vanilla ocelot.social"; \
     fi
 
-RUN npx nuxt generate
+# Path 2 — TWO-REPO build (a brand repo doing `FROM maintenance-build`, context = brand repo root, the
+# brand in ./branding/, no BRAND arg). Only ONBUILD triggers re-run downstream, so both the bake and
+# `nuxt generate` must be ONBUILD: the generator rewrites branding.css / logo assets / metadata.ts IN
+# THE SOURCES, so generating before it would freeze the vanilla theme into the static output. Unlike
+# webapp there is no runtime fallback — the output is static files served by nginx, and the page is
+# shown precisely when the backend is unreachable, so its branding cannot be fetched at runtime.
+ONBUILD COPY brandin[g]/ /brand/
+ONBUILD RUN if [ -f /brand/brand.config.ts ] || [ -f /brand/brand.config.mjs ]; then \
+      node /brand-tools/scripts/build-maintenance-branding.ts /brand /app; \
+    else echo "[maintenance] no typed brand.config — vanilla ocelot.social"; fi
+ONBUILD RUN npx nuxt generate
+
+# ==============================================================================
+# Stage 4b: Fire the ONBUILD triggers for ocelot's OWN build. They only run when `build` is used as a
+# base, which for an in-repo target means a derived stage — mirrors backend's production_build.
+# ==============================================================================
+FROM build AS production_build
 
 # ==============================================================================
 # Stage 5: Production (static site served by nginx)
@@ -98,6 +115,6 @@ LABEL org.label-schema.vendor="ocelot.social Community"
 LABEL org.label-schema.schema-version="1.0"
 LABEL maintainer="devops@ocelot.social"
 
-COPY --from=build /app/.output/public/ /usr/share/nginx/html/
+COPY --from=production_build /app/.output/public/ /usr/share/nginx/html/
 COPY maintenance/nginx/custom.conf /etc/nginx/conf.d/default.conf
 EXPOSE 8080

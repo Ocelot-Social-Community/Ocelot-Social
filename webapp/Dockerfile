@@ -73,14 +73,15 @@ COPY webapp/ .
 # webpack/babel cache for incremental rebuilds when the webapp source itself changes.)
 RUN --mount=type=cache,target=/app/node_modules/.cache,sharing=locked \
     yarn run build
-# Per-brand, AFTER the cached build: bake <id>.tar.gz + DEFAULT marker into ./branding-assets from the
-# brand's TYPED config under deployment/configurations/<BRAND> (bind-mounted, so no brand data lands in
-# a layer; no ONBUILD / downstream `FROM webapp-build` needed). The app applies colours/logos/title/OG/
-# manifest/static pages/locales (and the backend's e-mail/public overlays) at runtime from the archive.
-# Pick the brand with `--build-arg BRAND=<name>`; empty = vanilla.
+# Per-brand, AFTER the cached build: bake <id>.tar.gz + DEFAULT marker into ./branding-assets. The app
+# applies colours/logos/title/OG/manifest/static pages/locales (and the backend's e-mail/public
+# overlays) at RUNTIME from that archive, so the nuxt bundle above stays brand-agnostic and cached.
 # The builder is copied in AFTER the nuxt build so it cannot invalidate that expensive cached layer;
 # it stays in this stage only — `production` is FROM base + COPY /build and never inherits it.
 COPY --from=branding-tools ./app/ /brand-tools/
+# Path 1 — MONOREPO build (docker compose, ocelot's own branded images): the brand's TYPED config is
+# read from deployment/configurations/<BRAND>, bind-mounted so no brand data lands in a layer. Pick it
+# with `--build-arg BRAND=<name>`; empty = vanilla. A plain RUN: it executes HERE and never downstream.
 ARG BRAND=""
 RUN --mount=type=bind,source=deployment/configurations,target=/brands \
     if [ -n "$BRAND" ] && ls "/brands/$BRAND/branding/brand.config."* >/dev/null 2>&1; then \
@@ -89,10 +90,20 @@ RUN --mount=type=bind,source=deployment/configurations,target=/brands \
     else \
       echo "[branding] BRAND unset/unknown ('$BRAND') — vanilla ocelot.social"; \
     fi
-RUN mkdir /build && \
+# Path 2 — TWO-REPO build (a brand repo doing `FROM webapp-build`, context = brand repo root, where the
+# brand lives in ./branding/ and no BRAND arg is passed). Only ONBUILD triggers re-run in that child
+# build, so the bake AND the assembly below must be ONBUILD — a plain RUN would leave the brand image
+# with the vanilla /build that ocelot CI assembled. Same idiom as backend/Dockerfile; the `[g]` glob
+# makes it optional so ocelot's own self-build (`FROM build AS production_build`, no ./branding/ at the
+# repo root) skips it and keeps whatever path 1 produced.
+ONBUILD COPY brandin[g]/ /brand/
+ONBUILD RUN if ls /brand/brand.config.* >/dev/null 2>&1; then \
+      node /brand-tools/scripts/build-brand-archive.ts /brand ./branding-assets --default; \
+    else echo "[branding] no typed brand.config — runtime archive skipped (vanilla)"; fi
+ONBUILD RUN mkdir /build && \
     cp -r ./.nuxt ./nuxt.config.js ./config ./constants ./static ./locales ./server-middleware ./package.json ./yarn.lock ./scripts /build && \
     if [ -d ./branding-assets ]; then cp -r ./branding-assets /build/branding-assets; fi
-RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
+ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     cd /build && yarn install --production=true --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 
 FROM base AS test_build
