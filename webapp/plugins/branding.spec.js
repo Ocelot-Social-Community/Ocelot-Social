@@ -171,6 +171,43 @@ describe('plugins/branding (SSR injection)', () => {
     expect(mockSetBranding).toHaveBeenCalledWith(undefined)
   })
 
+  // webpack's DefinePlugin compiles `process.env.GRAPHQL_URI` into the bundle at BUILD time (nuxt's
+  // `env` option), so in a container it is frozen to the localhost fallback no matter what the
+  // orchestrator sets. The URI therefore has to come from privateRuntimeConfig, resolved at server
+  // start — this is exactly what made SSR silently query localhost in production.
+  describe('backend URI resolution', () => {
+    it('uses the RUNTIME config, not the value compiled into the bundle', async () => {
+      process.env.GRAPHQL_URI = 'http://compiled-in-at-build-time:4000'
+      mockPolicy('nutrimind')
+      mockDiscoverArchives.mockReturnValue(
+        new Map([['nutrimind', { id: 'nutrimind', file: '/n.tar.gz' }]]),
+      )
+      mockComposeComposition.mockReturnValue({ id: 'nutrimind' })
+
+      await brandingPlugin({
+        ...context,
+        $config: { graphqlUri: 'http://release-backend:4000' },
+      })
+
+      expect(global.fetch).toHaveBeenCalledWith('http://release-backend:4000', expect.anything())
+      delete process.env.GRAPHQL_URI
+    })
+
+    it('falls back to the env var when no runtime config is present', async () => {
+      process.env.GRAPHQL_URI = 'http://from-env:4000'
+      mockPolicy('nutrimind')
+      mockDiscoverArchives.mockReturnValue(
+        new Map([['nutrimind', { id: 'nutrimind', file: '/n.tar.gz' }]]),
+      )
+      mockComposeComposition.mockReturnValue({ id: 'nutrimind' })
+
+      await brandingPlugin(context)
+
+      expect(global.fetch).toHaveBeenCalledWith('http://from-env:4000', expect.anything())
+      delete process.env.GRAPHQL_URI
+    })
+  })
+
   // An unreachable backend is INDISTINGUISHABLE in the rendered page from "nothing switched": the
   // loader falls through to the baked DEFAULT marker and serves the image's brand, silently overriding
   // every admin choice. That is how a misconfigured GRAPHQL_URI stayed hidden — so it has to be loud.

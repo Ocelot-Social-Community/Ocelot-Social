@@ -34,8 +34,7 @@ function extractPolicy(policy, key) {
 // and the per-slot composition (`brandingComposition`, a JSON string). Returns { active, composition }
 // (composition = the RAW json string as stored), or null when the backend could not be reached (→ the
 // caller falls back to env / baked default). Server-only.
-async function fetchBrandingPolicy() {
-  const uri = process.env.GRAPHQL_URI || 'http://localhost:4000'
+async function fetchBrandingPolicy(uri) {
   const controller = typeof AbortController !== 'undefined' ? new AbortController() : null
   const timeout = Number(process.env.OCELOT_BRANDING_POLICY_TIMEOUT_MS || 2000)
   const timer = controller ? setTimeout(() => controller.abort(), timeout) : null
@@ -76,7 +75,7 @@ async function fetchBrandingPolicy() {
 // `discover` (the package's server-only archive discovery) is passed in from the server-only branch
 // (required there under a bare `process.server` guard) so no Node require lives in this always-bundled
 // function — otherwise webpack would try to resolve 'fs' for the client bundle and fail.
-async function loadServerBranding(discover) {
+async function loadServerBranding(discover, graphqlUri) {
   const assetsDir = process.env.OCELOT_BRANDING_ASSETS_DIR
   if (!assetsDir) return null
 
@@ -88,7 +87,7 @@ async function loadServerBranding(discover) {
   // → the image's baked default marker → '' (framework defaults / vanilla). A non-empty policy value
   // wins; '' falls through to the pin / baked default, so a default-brand image renders branded out
   // of the box while any brand stays switchable on the admin Branding tab.
-  const policy = await fetchBrandingPolicy() // { active, composition } or null (unreachable)
+  const policy = await fetchBrandingPolicy(graphqlUri) // { active, composition } or null (unreachable)
   const policyActive = policy ? policy.active : ''
   let base = policyActive && policyActive !== '' ? policyActive : ''
   if (!base) {
@@ -141,7 +140,13 @@ export default async (context) => {
     // eslint-disable-next-line global-require, import/no-unresolved
     const discover = require('@ocelot-social/branding/dist/discover.js')
     try {
-      const loaded = await loadServerBranding(discover)
+      // From privateRuntimeConfig (evaluated at server START), NOT from process.env: the latter is
+      // frozen into the bundle by DefinePlugin at build time and would always be the localhost default.
+      const graphqlUri =
+        (context.$config && context.$config.graphqlUri) ||
+        process.env.GRAPHQL_URI ||
+        'http://localhost:4000'
+      const loaded = await loadServerBranding(discover, graphqlUri)
       // ALWAYS set this request's effective branding — even to undefined (vanilla). The accessor
       // stores the active brand in a process-global (globalThis.__OCELOT_BRANDING__) shared across
       // SSR requests, so a vanilla request that skipped setBranding would inherit whatever brand a

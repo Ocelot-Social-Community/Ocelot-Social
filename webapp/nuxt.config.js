@@ -33,6 +33,15 @@ export default {
     mode: 'out-in',
   },
 
+  // RUNTIME (server-only), unlike `env` below: `env` is compiled into the bundle by webpack's
+  // DefinePlugin, so every `process.env.GRAPHQL_URI` in application code is frozen to whatever was set
+  // when `nuxt build` ran — in the Docker build: nothing, i.e. the localhost fallback. Anything the
+  // SERVER must resolve per deployment has to come from here instead. (The proxy targets below read
+  // CONFIG directly and are fine: nuxt.config.js is evaluated at server start, not at build time.)
+  privateRuntimeConfig: {
+    graphqlUri: process.env.GRAPHQL_URI || CONFIG.GRAPHQL_URI,
+  },
+
   env: {
     ...CONFIG,
     // pages which do NOT require a login
