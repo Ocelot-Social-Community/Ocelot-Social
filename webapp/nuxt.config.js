@@ -237,8 +237,6 @@ export default {
       toProxy: true, // cloudflare needs that
       headers: {
         Accept: 'application/json',
-        'X-UI-Request': true,
-        'X-API-TOKEN': CONFIG.BACKEND_TOKEN,
       },
     },
     '/activitypub': {
@@ -247,8 +245,6 @@ export default {
       toProxy: true, // cloudflare needs that
       headers: {
         Accept: 'application/json',
-        'X-UI-Request': true,
-        'X-API-TOKEN': CONFIG.BACKEND_TOKEN,
       },
     },
     '/api': {
@@ -260,8 +256,6 @@ export default {
       toProxy: true, // cloudflare needs that
       headers: {
         Accept: 'application/json',
-        'X-UI-Request': true,
-        'X-API-TOKEN': CONFIG.BACKEND_TOKEN,
       },
     },
   },
