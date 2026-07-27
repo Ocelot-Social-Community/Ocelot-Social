@@ -82,6 +82,8 @@
     "branding": {
       "activate": null,
       "available": {
+        "active": "Aktywna baza",
+        "default": "Domyślne",
         "title": null
       },
       "composition": {

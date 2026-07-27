@@ -82,6 +82,8 @@
     "branding": {
       "activate": null,
       "available": {
+        "active": "Baza aktive",
+        "default": "Parazgjedhje",
         "title": null
       },
       "composition": {
