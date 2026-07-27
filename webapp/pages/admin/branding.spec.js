@@ -48,3 +48,47 @@ describe('admin/branding saveComposition failure handling', () => {
     expect(sent).toEqual({ theme: 'acme' }) // identity removed, theme kept
   })
 })
+
+// The list is the admin's map of what is deployed: the baked default is the brand every unswitched
+// visitor sees, so it leads the list, and the brand the page is currently composed from is marked.
+describe('admin/branding available list', () => {
+  const manifest = [
+    { id: 'other', label: 'Other', version: '1.0.0', isDefault: false, config: '/c/other' },
+    { id: 'stage', label: 'Stage', version: '2.0.0', isDefault: true, config: '/c/stage' },
+    { id: 'third', label: 'Third', version: '3.0.0', isDefault: false, config: '/c/third' },
+  ]
+
+  const loadList = async () => {
+    global.fetch = jest.fn((url) =>
+      Promise.resolve(
+        url === '/branding/manifest.json'
+          ? { ok: true, json: () => Promise.resolve(manifest) }
+          : { ok: false },
+      ),
+    )
+    const ctx = { brandings: [], providedBuckets: {}, details: {}, schemaVersions: {} }
+    await BrandingPage.fetch.call(ctx)
+    return ctx
+  }
+
+  it('puts the baked default first and keeps the manifest order otherwise', async () => {
+    const ctx = await loadList()
+
+    expect(ctx.brandings.map((b) => b.id)).toEqual(['stage', 'other', 'third'])
+  })
+
+  it('keeps every brand in the list, not just the default', async () => {
+    const ctx = await loadList()
+
+    expect(ctx.brandings).toHaveLength(manifest.length)
+  })
+
+  it('marks the brand currently used as base', () => {
+    // activeId comes from the live policy, so the badge follows a switch without a refetch.
+    const activeId = BrandingPage.computed.activeId.call({
+      $policy: { get: (key) => (key === 'activeBranding' ? 'other' : '') },
+    })
+
+    expect(activeId).toBe('other')
+  })
+})

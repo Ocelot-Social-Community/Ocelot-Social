@@ -1,4 +1,5 @@
 import {
+  readDefaultMarker as mockReadDefaultMarker,
   discoverArchives as mockDiscoverArchives,
   readArchive as mockReadArchive,
   composeArchive as mockComposeArchive,
@@ -12,6 +13,7 @@ jest.mock(
     discoverArchives: jest.fn(),
     readArchive: jest.fn(),
     composeArchive: jest.fn(),
+    readDefaultMarker: jest.fn(() => ''),
   }),
   { virtual: true },
 )
@@ -106,14 +108,41 @@ describe('server-middleware/branding-assets', () => {
       expect(res.headers['Content-Type']).toBe('application/json; charset=utf-8')
       expect(res.headers['Cache-Control']).toBe('no-cache')
       expect(JSON.parse(res.body)).toEqual([
-        { id: 'wir', label: 'wir.social', version: '1.0.0', config: '/branding/wir/branding.json' },
+        {
+          id: 'wir',
+          label: 'wir.social',
+          version: '1.0.0',
+          isDefault: false,
+          config: '/branding/wir/branding.json',
+        },
         {
           id: 'yunite',
           label: 'yunite.me',
           version: '2.0.0',
+          isDefault: false,
           config: '/branding/yunite/branding.json',
         },
       ])
+    })
+
+    // The admin list sorts and labels by this flag, so it has to name the DEPLOYMENT's baked brand.
+    it('flags the brand named by the DEFAULT marker', () => {
+      mockReadDefaultMarker.mockReturnValue('yunite')
+
+      brandingAssets({ method: 'GET', url: '/manifest.json' }, res, next)
+
+      const byId = Object.fromEntries(JSON.parse(res.body).map((b) => [b.id, b.isDefault]))
+      expect(byId).toEqual({ wir: false, yunite: true })
+    })
+
+    it('flags nothing when the marker is unreadable', () => {
+      mockReadDefaultMarker.mockImplementation(() => {
+        throw new Error('EACCES')
+      })
+
+      brandingAssets({ method: 'GET', url: '/manifest.json' }, res, next)
+
+      expect(JSON.parse(res.body).every((b) => b.isDefault === false)).toBe(true)
     })
 
     it('answers HEAD without a body', () => {

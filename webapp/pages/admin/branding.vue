@@ -197,6 +197,14 @@
           </span>
           <span class="available-name">
             {{ b.label || b.id }}
+            <!-- The brand this page is currently composed from, and the deployment's baked fallback.
+                 Both can apply to the same entry. -->
+            <span v-if="b.id === activeId" class="branding-badge branding-badge-active">
+              {{ $t('admin.branding.available.active') }}
+            </span>
+            <span v-if="b.isDefault" class="branding-badge">
+              {{ $t('admin.branding.available.default') }}
+            </span>
             <code v-if="b.version" class="branding-version">v{{ b.version }}</code>
             <code
               v-if="schemaVersions[b.id]"
@@ -308,7 +316,9 @@ export default {
         })(),
       ]),
     )
-    this.brandings = list
+    // The deployment's baked default first — it is the brand every unswitched visitor sees, so it is
+    // the reference point for the rest of the list. Everything else keeps the manifest's own order.
+    this.brandings = [...list].sort((a, b) => Number(!!b.isDefault) - Number(!!a.isDefault))
     this.providedBuckets = providedBuckets
     this.details = details
     this.schemaVersions = schemaVersions
@@ -816,6 +826,23 @@ export default {
 .branding-version {
   color: $text-color-soft;
   font-weight: normal;
+}
+
+.branding-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 6px;
+  border: 1px solid $border-color-softer;
+  border-radius: $border-radius-base;
+  font-size: $font-size-small;
+  font-weight: normal;
+  color: $text-color-soft;
+  vertical-align: middle;
+}
+
+.branding-badge-active {
+  border-color: $color-primary;
+  color: $color-primary;
 }
 
 .schema-version {

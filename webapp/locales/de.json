@@ -82,6 +82,8 @@
     "branding": {
       "activate": "Aktivieren",
       "available": {
+        "active": "Aktive Basis",
+        "default": "Standard",
         "title": "Verfügbare Brandings"
       },
       "composition": {
