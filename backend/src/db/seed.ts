@@ -6,6 +6,8 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 
+import '@graphql/gql-register'
+
 import { faker } from '@faker-js/faker'
 import sample from 'lodash/sample'
 
