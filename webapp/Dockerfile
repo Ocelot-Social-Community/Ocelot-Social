@@ -90,16 +90,14 @@ RUN --mount=type=bind,source=deployment/configurations,target=/brands \
     else \
       echo "[branding] BRAND unset/unknown ('$BRAND') — vanilla ocelot.social"; \
     fi
-# Path 2 — TWO-REPO build (a brand repo doing `FROM webapp-build`, context = brand repo root, where the
-# brand lives in ./branding/ and no BRAND arg is passed). Only ONBUILD triggers re-run in that child
-# build, so the bake AND the assembly below must be ONBUILD — a plain RUN would leave the brand image
-# with the vanilla /build that ocelot CI assembled. Same idiom as backend/Dockerfile; the `[g]` glob
-# makes it optional so ocelot's own self-build (`FROM build AS production_build`, no ./branding/ at the
-# repo root) skips it and keeps whatever path 1 produced.
-ONBUILD COPY brandin[g]/ /brand/
-ONBUILD RUN if ls /brand/brand.config.* >/dev/null 2>&1; then \
-      node /brand-tools/scripts/build-brand-archive.ts /brand ./branding-assets --default; \
-    else echo "[branding] no typed brand.config — runtime archive skipped (vanilla)"; fi
+# A brand repo doing `FROM webapp-build` gets NO archive baked in — deliberately. The running webapp
+# acquires the archives (and the DEFAULT marker) from the backend over GET /branding/… and mirrors
+# them into $OCELOT_BRANDING_ASSETS_DIR (server-middleware/branding-sync.js), so a brand is deployed
+# in ONE place: the backend. Baking a second copy here would also let a stale sibling out-rank the
+# synced one — discovery keeps one archive per id and breaks a version tie by walk order.
+#
+# The assembly below still has to be ONBUILD: only ONBUILD triggers re-run in the child build, and a
+# plain RUN would leave the brand image with the /build that ocelot CI assembled.
 ONBUILD RUN mkdir /build && \
     cp -r ./.nuxt ./nuxt.config.js ./config ./constants ./static ./locales ./server-middleware ./package.json ./yarn.lock ./scripts /build && \
     if [ -d ./branding-assets ]; then cp -r ./branding-assets /build/branding-assets; fi

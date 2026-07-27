@@ -146,6 +146,9 @@ export default {
    ** package (packages/branding: scripts/build-brand-archive.ts); see server-middleware/branding-assets.js.
    */
   serverMiddleware: [
+    // FIRST: mirror the brand archives from the backend into $OCELOT_BRANDING_ASSETS_DIR, so the
+    // archive is deployed once (backend side) and everything below still reads it off disk.
+    '~/server-middleware/branding-sync.js',
     { path: '/branding', handler: '~/server-middleware/branding-assets.js' },
     // Dynamic PWA manifest generated from the active brand's metadata (replaces the static
     // @nuxtjs/pwa manifest, disabled below) so app name / theme colour follow a live brand switch.
