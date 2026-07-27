@@ -2,7 +2,7 @@
 // overrides with defineBranding — type errors here fail compilation (and, in a brand repo, CI).
 // The default export is the fully resolved BrandingConfig.
 //
-//   node packages/branding/scripts/build-brand-archive.mjs \
+//   node packages/branding/scripts/build-brand-archive.ts \
 //     packages/branding/example .branding-dev/branding/example.tar.gz --watch
 //   OCELOT_BRANDING_ASSETS_DIR=$PWD/.branding-dev/branding  OCELOT_ACTIVE_BRANDING=example
 //     (in webapp/.env and backend/.env)

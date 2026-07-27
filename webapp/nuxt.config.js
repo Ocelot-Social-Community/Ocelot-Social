@@ -143,7 +143,7 @@ export default {
    ** Dynamic branding assets: serve /branding/* from $OCELOT_BRANDING_ASSETS_DIR at runtime
    ** (logos, favicon, static-page HTML, CSS, fonts + each brand's virtual branding.json + manifest.json)
    ** so brandings are bound without being baked into the image. Archives are built by the branding
-   ** package (packages/branding: scripts/build-brand-archive.mjs); see server-middleware/branding-assets.js.
+   ** package (packages/branding: scripts/build-brand-archive.ts); see server-middleware/branding-assets.js.
    */
   serverMiddleware: [
     { path: '/branding', handler: '~/server-middleware/branding-assets.js' },

@@ -15,17 +15,19 @@ RUN npm run build
 # Stage 1b: Build the shared branding package (tsc -> dist), incl. its scripts + node_modules
 # (typescript), so the maintenance branding generator can resolve the package and load a brand's
 # typed brand.config.ts when baking the brand in the build stage.
+#
+# Unlike backend/webapp, maintenance uses this package PURELY as a build tool: it has no
+# `file:../packages/branding` dependency and its production stage is nginx serving the generated
+# static output, so nothing of it can reach a runtime image. Hence no pruned runtime counterpart —
+# the devDeps (typescript, needed to type-check + evaluate a brand's brand.config.ts) simply stay.
 # ==============================================================================
-FROM node:26.4.0-alpine AS branding-library
+FROM node:26.4.0-alpine AS branding-tools
 WORKDIR /app
 COPY packages/branding/package.json packages/branding/package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm,sharing=locked \
     npm ci
 COPY packages/branding/. .
 RUN npm run build
-# Drop devDeps (typescript/eslint/publint/…) before this stage is copied into the runtime image — only
-# nanotar + tslib are needed at runtime and for build-brand-archive; keeps the image small.
-RUN npm prune --omit=dev
 
 # ==============================================================================
 # Stage 2: Install dependencies and copy sources
@@ -34,7 +36,7 @@ FROM node:26.4.0-alpine AS base
 RUN apk --no-cache add git python3 make g++
 WORKDIR /app
 COPY --from=ui-library /packages/ui/ /packages/ui/
-COPY --from=branding-library /app/ /packages/branding/
+COPY --from=branding-tools /app/ /brand-tools/
 COPY maintenance/package.json maintenance/package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm,sharing=locked \
     npm ci
@@ -53,7 +55,7 @@ ARG BRAND=""
 # other, non-selected brands — is baked into the dev image layer. Read-only: the generator only reads.
 RUN --mount=type=bind,source=deployment/configurations,target=/brands \
     if [ -n "$BRAND" ] && { [ -f "/brands/$BRAND/branding/brand.config.ts" ] || [ -f "/brands/$BRAND/branding/brand.config.mjs" ]; }; then \
-      node /packages/branding/scripts/build-maintenance-branding.mjs "/brands/$BRAND/branding" /app && \
+      node /brand-tools/scripts/build-maintenance-branding.ts "/brands/$BRAND/branding" /app && \
       echo "[maintenance] baked brand: $BRAND"; \
     fi
 ENV NODE_ENV=development
@@ -75,7 +77,7 @@ ARG BRAND=""
 # layer/cache — the generator writes the chosen brand into /app and reads nothing else afterwards.
 RUN --mount=type=bind,source=deployment/configurations,target=/brands \
     if [ -n "$BRAND" ] && { [ -f "/brands/$BRAND/branding/brand.config.ts" ] || [ -f "/brands/$BRAND/branding/brand.config.mjs" ]; }; then \
-      node /packages/branding/scripts/build-maintenance-branding.mjs "/brands/$BRAND/branding" /app && \
+      node /brand-tools/scripts/build-maintenance-branding.ts "/brands/$BRAND/branding" /app && \
       echo "[maintenance] baked brand: $BRAND"; \
     else \
       echo "[maintenance] BRAND unset/unknown ('$BRAND') — vanilla ocelot.social"; \

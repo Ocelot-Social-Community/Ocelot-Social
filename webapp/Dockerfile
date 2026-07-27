@@ -19,8 +19,18 @@ RUN --mount=type=cache,target=/root/.npm,sharing=locked \
     npm ci
 COPY packages/branding/. .
 RUN npm run build
-# Drop devDeps (typescript/eslint/publint/…) before this stage is copied into the runtime image — only
-# nanotar + tslib are needed at runtime and for build-brand-archive; keeps the image small.
+
+# The package has TWO disjoint roles, split into separate stages so the TypeScript compiler (~23 MB —
+# needed ONLY to type-check and evaluate a brand's `brand.config.ts`, see scripts/lib/load-config.ts)
+# never reaches a runtime image:
+#   • branding-tools   — the brand-archive BUILDER (scripts/ + devDeps incl. typescript). Copied into
+#                        `build` only, which is where the archive bake runs.
+#   • branding-runtime — what the RUNNING app imports (dist/ + nanotar/tslib: the branding plugin and
+#                        the branding-assets server middleware). devDeps pruned.
+# `production` derives FROM base and copies only /build, so it inherits the runtime half alone.
+FROM branding-library AS branding-tools
+
+FROM branding-library AS branding-runtime
 RUN npm prune --omit=dev
 
 FROM node:25.9.0-alpine AS base
@@ -39,7 +49,7 @@ RUN apk --no-cache add git python3 make g++ bash jq
 RUN mkdir -p /app
 WORKDIR /app
 COPY --from=ui-library ./app/ /packages/ui/
-COPY --from=branding-library ./app/ /packages/branding/
+COPY --from=branding-runtime ./app/ /packages/branding/
 # Where the running app reads brand archives (`<id>.tar.gz`) + the baked default marker (DEFAULT).
 # A branded build (--build-arg BRAND=<name>) bakes them here; a vanilla image leaves it empty (→ the
 # app runs on framework defaults). Ops can override this to a mounted volume of archives.
@@ -68,10 +78,13 @@ RUN --mount=type=cache,target=/app/node_modules/.cache,sharing=locked \
 # a layer; no ONBUILD / downstream `FROM webapp-build` needed). The app applies colours/logos/title/OG/
 # manifest/static pages/locales (and the backend's e-mail/public overlays) at runtime from the archive.
 # Pick the brand with `--build-arg BRAND=<name>`; empty = vanilla.
+# The builder is copied in AFTER the nuxt build so it cannot invalidate that expensive cached layer;
+# it stays in this stage only — `production` is FROM base + COPY /build and never inherits it.
+COPY --from=branding-tools ./app/ /brand-tools/
 ARG BRAND=""
 RUN --mount=type=bind,source=deployment/configurations,target=/brands \
     if [ -n "$BRAND" ] && ls "/brands/$BRAND/branding/brand.config."* >/dev/null 2>&1; then \
-      node /packages/branding/scripts/build-brand-archive.mjs "/brands/$BRAND/branding" ./branding-assets --default && \
+      node /brand-tools/scripts/build-brand-archive.ts "/brands/$BRAND/branding" ./branding-assets --default && \
       echo "[branding] baked brand: $BRAND"; \
     else \
       echo "[branding] BRAND unset/unknown ('$BRAND') — vanilla ocelot.social"; \
