@@ -356,9 +356,14 @@ export default {
       const base = this.brandings.find((b) => b.id === this.activeId)
       return base ? base.label || base.id : this.activeId
     },
-    // Brands a slot (or the whole package) can be sourced from.
+    // Brands a slot (or the whole package) can be sourced from — ARCHIVES only. The framework default
+    // is listed below for reference but must not appear here: both selects already offer it as their
+    // own fixed option (the whole-package select as `value=""`, a slot select additionally as the
+    // vanilla sentinel), so including it would render a duplicate entry with the same value.
     sourceOptions() {
-      return this.brandings.map((b) => ({ id: b.id, label: b.label || b.id }))
+      return this.brandings
+        .filter((b) => !b.isVanilla)
+        .map((b) => ({ id: b.id, label: b.label || b.id }))
     },
     // The sentinel select value for "framework default" (exposed to the template).
     vanillaSource() {

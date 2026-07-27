@@ -103,6 +103,16 @@ describe('admin/branding available list', () => {
     expect(ctx.providedBuckets['']).not.toHaveLength(0)
   })
 
+  // Both selects carry their own fixed vanilla option, so the reference entry must not be offered
+  // again as a source — that produced two identical entries in "whole package".
+  it('offers only archives as composition sources, not the framework-default entry', async () => {
+    const ctx = await loadList()
+
+    const options = BrandingPage.computed.sourceOptions.call(ctx)
+    expect(options.map((o) => o.id)).toEqual(['stage', 'other', 'third'])
+    expect(options.filter((o) => o.id === '')).toHaveLength(0)
+  })
+
   it('marks the brand currently used as base', () => {
     // activeId comes from the live policy, so the badge follows a switch without a refetch.
     const activeId = BrandingPage.computed.activeId.call({
