@@ -83,7 +83,7 @@
       "activate": null,
       "available": {
         "active": "Actieve basis",
-        "default": "Standaard",
+        "default": "Terugval",
         "title": null
       },
       "composition": {

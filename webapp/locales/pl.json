@@ -83,7 +83,7 @@
       "activate": null,
       "available": {
         "active": "Aktywna baza",
-        "default": "Domyślne",
+        "default": "Zapasowe",
         "title": null
       },
       "composition": {

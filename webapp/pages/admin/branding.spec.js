@@ -66,7 +66,13 @@ describe('admin/branding available list', () => {
           : { ok: false },
       ),
     )
-    const ctx = { brandings: [], providedBuckets: {}, details: {}, schemaVersions: {} }
+    const ctx = {
+      brandings: [],
+      providedBuckets: {},
+      details: {},
+      schemaVersions: {},
+      $t: (key) => key,
+    }
     await BrandingPage.fetch.call(ctx)
     return ctx
   }
@@ -74,13 +80,27 @@ describe('admin/branding available list', () => {
   it('puts the baked default first and keeps the manifest order otherwise', async () => {
     const ctx = await loadList()
 
-    expect(ctx.brandings.map((b) => b.id)).toEqual(['stage', 'other', 'third'])
+    // The framework default leads; then the baked default; then the manifest's own order.
+    expect(ctx.brandings.map((b) => b.id)).toEqual(['', 'stage', 'other', 'third'])
   })
 
   it('keeps every brand in the list, not just the default', async () => {
     const ctx = await loadList()
 
-    expect(ctx.brandings).toHaveLength(manifest.length)
+    expect(ctx.brandings).toHaveLength(manifest.length + 1)
+  })
+
+  // The framework default has no archive, so discovery can never report it — it would silently be
+  // missing from the list although it is a real, selectable source.
+  it('lists the framework default even though it has no archive', async () => {
+    const ctx = await loadList()
+
+    const [first] = ctx.brandings
+    expect(first.isVanilla).toBe(true)
+    expect(first.label).toBe('admin.branding.vanilla')
+    // Its preview + bucket tags come from the framework defaults, not from a fetched manifest.
+    expect(ctx.details['']).toBeDefined()
+    expect(ctx.providedBuckets['']).not.toHaveLength(0)
   })
 
   it('marks the brand currently used as base', () => {

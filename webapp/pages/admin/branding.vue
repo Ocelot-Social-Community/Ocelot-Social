@@ -316,9 +316,27 @@ export default {
         })(),
       ]),
     )
-    // The deployment's baked default first — it is the brand every unswitched visitor sees, so it is
-    // the reference point for the rest of the list. Everything else keeps the manifest's own order.
-    this.brandings = [...list].sort((a, b) => Number(!!b.isDefault) - Number(!!a.isDefault))
+    // The framework default is NOT an archive — it has no `.tar.gz`, so discovery can never report it
+    // and the manifest never contains it. It is nevertheless a real, selectable source (every bucket
+    // falls back to it, and the composition editor offers it per slot), so list it explicitly as the
+    // first entry instead of leaving the admin to infer it. Synthesised here, with the same shape the
+    // real entries have: id '' matches `activeId` when no brand is switched on, so it gets the
+    // "active base" badge exactly when it IS the base.
+    const vanilla = {
+      id: '',
+      label: this.$t('admin.branding.vanilla'),
+      version: null,
+      isDefault: false,
+      isVanilla: true,
+    }
+    details[vanilla.id] = brandingDefaults
+    // Vanilla backs every slot by definition — that is what "framework default" means.
+    providedBuckets[vanilla.id] = BUCKET_NAMES.map((type) => ({ type, name: 'default' }))
+
+    // Then the deployment's baked default — the brand every unswitched visitor actually sees. The
+    // rest keeps the manifest's own order.
+    const archives = [...list].sort((a, b) => Number(!!b.isDefault) - Number(!!a.isDefault))
+    this.brandings = [vanilla, ...archives]
     this.providedBuckets = providedBuckets
     this.details = details
     this.schemaVersions = schemaVersions

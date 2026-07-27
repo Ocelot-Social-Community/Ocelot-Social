@@ -83,7 +83,7 @@
       "activate": "Aktivieren",
       "available": {
         "active": "Aktive Basis",
-        "default": "Standard",
+        "default": "Fallback",
         "title": "Verfügbare Brandings"
       },
       "composition": {

@@ -83,7 +83,7 @@
       "activate": null,
       "available": {
         "active": "Активна основа",
-        "default": "За замовчуванням",
+        "default": "Запасний",
         "title": null
       },
       "composition": {
