@@ -32,7 +32,7 @@ jobs:
       - name: Backend | Build image
         uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
         with:
-          context: backend
+          context: .
           file: backend/Dockerfile
           target: test
           load: true
@@ -121,6 +121,9 @@ jobs:
           sudo wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-amd64"
           echo "66a2ef158866c3ecb3d8e49a7189814a485bddca43e133e4ca5735b8d3951bf7  /opt/cucumber-json-formatter" | sha256sum -c -
           sudo chmod +x /opt/cucumber-json-formatter
+          # Build the @ocelot-social/branding file: dependency first so the backend `yarn build` (tsc)
+          # can resolve its types.
+          cd packages/branding && npm ci && npm run build && cd ../..
           cd backend
           yarn install
           yarn build

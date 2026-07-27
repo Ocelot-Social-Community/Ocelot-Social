@@ -145,8 +145,10 @@ describe('policy visibility', () => {
   describe('visibleKeys()', () => {
     it('returns only public keys for anonymous viewers', () => {
       expect(visibleKeys(null).sort()).toEqual([
+        'activeBranding',
         'askForRealName',
         'badgesEnabled',
+        'brandingComposition',
         'categoriesActive',
         'groupsEnabled',
         'inviteRegistration',
@@ -161,10 +163,12 @@ describe('policy visibility', () => {
 
     it('returns all keys for a logged-in viewer', () => {
       expect(visibleKeys({ authenticated: true }).sort()).toEqual([
+        'activeBranding',
         'apiKeysEnabled',
         'apiKeysMaxPerUser',
         'askForRealName',
         'badgesEnabled',
+        'brandingComposition',
         'categoriesActive',
         'groupsEnabled',
         'inviteCodesGroupPerUser',

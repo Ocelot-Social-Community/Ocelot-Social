@@ -91,6 +91,11 @@ export default {
         type: 'image/x-icon',
         href: '/favicon.ico',
       },
+      {
+        // Points at the dynamic serverMiddleware route (content per active brand); href is stable.
+        rel: 'manifest',
+        href: '/manifest.webmanifest',
+      },
     ],
   },
 
@@ -135,11 +140,29 @@ export default {
   },
 
   /*
+   ** Dynamic branding assets: serve /branding/* from $OCELOT_BRANDING_ASSETS_DIR at runtime
+   ** (logos, favicon, static-page HTML, CSS, fonts + each brand's virtual branding.json + manifest.json)
+   ** so brandings are bound without being baked into the image. Archives are built by the branding
+   ** package (packages/branding: scripts/build-brand-archive.mjs); see server-middleware/branding-assets.js.
+   */
+  serverMiddleware: [
+    { path: '/branding', handler: '~/server-middleware/branding-assets.js' },
+    // Dynamic PWA manifest generated from the active brand's metadata (replaces the static
+    // @nuxtjs/pwa manifest, disabled below) so app name / theme colour follow a live brand switch.
+    { path: '/manifest.webmanifest', handler: '~/server-middleware/manifest.js' },
+  ],
+
+  /*
    ** Plugins to load before mounting the App
    */
   plugins: [
+    { src: '~/plugins/branding.js', ssr: true },
+    { src: '~/plugins/branding-head.js', ssr: false },
     { src: '~/plugins/policy.js', ssr: true },
     { src: '~/plugins/policy-subscribe.js', ssr: false },
+    // Live branding switch: reload when the activeBranding policy value diverges from the
+    // server-rendered brand. After policy-subscribe so the policy store is live.
+    { src: '~/plugins/branding-subscribe.js', ssr: false },
     { src: '~/plugins/permissions.js', ssr: true },
     { src: '~/plugins/permissions-subscribe.js', ssr: false },
     { src: '~/plugins/i18n.js', ssr: true },
@@ -265,9 +288,11 @@ export default {
     config: CONFIG.COMMIT ? { release: CONFIG.COMMIT } : {},
   },
 
-  manifest,
-
   pwa: {
+    // Static manifest disabled — it is served DYNAMICALLY per active brand from
+    // server-middleware/manifest.js (see serverMiddleware + the head.link[rel=manifest] above), so
+    // the installed-app name / theme colour follow a live brand switch without a rebuild.
+    manifest: false,
     meta: {
       // Prevent @nuxtjs/pwa from auto-generating description from package.json;
       // we set description and og:description manually in head.meta above.
@@ -319,6 +344,15 @@ export default {
 
       if (ctx.isClient) {
         config.devtool = ctx.isDev ? 'eval-source-map' : 'hidden-source-map'
+        // The branding runtime loader (plugins/branding.js, components/utils/brandingHtml.js) reads
+        // brand archives off disk under a `process.server` guard, but webpack still resolves the static
+        // require('@ocelot-social/branding/dist/discover.js') when building the CLIENT bundle. That
+        // server-only chain (discover.js → tar.js → nanotar) uses `node:`-scheme built-ins (unresolvable
+        // in webpack 4) and nanotar's ESM optional chaining (unparseable by webpack 4). Alias those two
+        // submodules to an empty stub for the client — the guarded code never runs in the browser.
+        const brandingServerStub = path.resolve(__dirname, 'webpack/branding-server-stub.js')
+        config.resolve.alias['@ocelot-social/branding/dist/discover.js$'] = brandingServerStub
+        config.resolve.alias['@ocelot-social/branding/dist/tar.js$'] = brandingServerStub
       }
 
       // Vue 2.7 has built-in Composition API - redirect old imports

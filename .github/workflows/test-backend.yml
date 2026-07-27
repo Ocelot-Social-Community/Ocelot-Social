@@ -69,7 +69,7 @@ jobs:
       - name: backend | Build 'test' image
         uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
         with:
-          context: backend
+          context: .
           file: backend/Dockerfile
           target: test
           load: true
@@ -102,6 +102,13 @@ jobs:
           node-version-file: 'backend/.nvmrc'
           cache: 'yarn'
           cache-dependency-path: 'backend/yarn.lock'
+
+      # The backend depends on @ocelot-social/branding via `file:../packages/branding`; its dist/ (built
+      # output + .d.ts) must exist BEFORE `yarn` copies the file: dependency, otherwise the types don't
+      # resolve and the type-aware lint fails. (The unit-test job runs in Docker, whose Dockerfile builds
+      # this stage already.)
+      - name: Build @ocelot-social/branding
+        run: cd packages/branding && npm ci && npm run build
 
       - name: backend | Lint
         run: cd backend && yarn --frozen-lockfile && yarn run lint

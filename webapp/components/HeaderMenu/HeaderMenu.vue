@@ -580,13 +580,12 @@ import isEmpty from 'lodash/isEmpty'
 import orderBy from 'lodash/orderBy'
 import throttle from 'lodash/throttle'
 import locales from '~/locales'
-import LOGOS from '~/constants/logosBranded.js'
+import { branding } from '@ocelot-social/branding'
 import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
 import ChatNotificationMenu from '~/components/ChatNotificationMenu/ChatNotificationMenu'
 import CustomButton from '~/components/CustomButton/CustomButton'
 import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
 import FilterMenuComponent from '~/components/FilterMenu/FilterMenuComponent'
-import headerMenuBranded from '~/constants/headerMenuBranded.js'
 import Dropdown from '~/components/Dropdown'
 import InviteCodeList from '~/components/_new/features/Invitations/InviteCodeList.vue'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
@@ -625,10 +624,13 @@ export default {
       navbarRevealedByHover: false,
       isEmpty,
       links,
-      LOGOS,
-      isHeaderMenu: headerMenuBranded.MENU.length > 0,
-      customButton: headerMenuBranded.CUSTOM_BUTTON,
-      menu: headerMenuBranded.MENU,
+      LOGOS: {
+        LOGO_HEADER_CLICK: branding.logos.headerClick,
+        LOGO_HEADER_WIDTH: branding.logos.headerWidth,
+      },
+      isHeaderMenu: branding.headerMenu.menu.length > 0,
+      customButton: branding.headerMenu.customButton,
+      menu: branding.headerMenu.menu,
       toggleMobileMenu: false,
       mobileAvatarMenuToggled: null,
       mobileMoreMenuToggled: null,
@@ -1017,7 +1019,7 @@ export default {
       margin-top: 2px;
 
       &:hover {
-        color: color.adjust($text-color-danger, $lightness: -10%);
+        color: color-mix(in srgb, var(--color-danger), black 10%);
         background-color: $background-color-soft;
       }
 

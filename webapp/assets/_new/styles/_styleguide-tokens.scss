@@ -12,10 +12,13 @@ $color-neutral-85: rgb(239, 238, 241);
 $color-neutral-90: rgb(245, 244, 246);
 $color-neutral-95: rgb(250, 249, 250);
 $color-neutral-100: rgb(255, 255, 255);
-$color-primary: rgb(23, 181, 63);
+
+// Brandable base tokens → runtime CSS custom property (see tokens.scss / ocelot-ui-variables.scss).
+// Literal fallback keeps Storybook (which loads this file directly) working.
+$color-primary: var(--color-primary, rgb(23, 181, 63));
 $color-primary-active: rgb(25, 194, 67);
 $color-primary-inverse: rgb(241, 253, 244);
-$color-secondary: rgb(0, 142, 230);
+$color-secondary: var(--color-secondary, rgb(0, 142, 230));
 $color-secondary-active: rgb(10, 161, 255);
 $color-secondary-inverse: rgb(240, 249, 255);
 $color-success: rgb(23, 181, 63);
@@ -110,8 +113,8 @@ $font-space-small: 0.4em;
 $font-space-x-small: 0.3em;
 $font-space-xx-small: 0.2em;
 $font-space-xxx-small: 0.1em;
-$font-family-heading: 'LatoWeb', sans-serif;
-$font-family-text: 'LatoWeb', sans-serif;
+$font-family-heading: var(--font-family-heading, 'LatoWeb', sans-serif);
+$font-family-text: var(--font-family-text, 'LatoWeb', sans-serif);
 $font-family-serif: 'Gentium Basic', serif;
 $font-family-code: inconsolata, monospace;
 $font-weight-regular: normal;

@@ -1,5 +1,6 @@
 import { shallowMount } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
+import { getBranding, setBranding } from '@ocelot-social/branding'
 import RegistrationSlideInvite from './RegistrationSlideInvite.vue'
 
 const localVue = global.localVue
@@ -54,6 +55,24 @@ describe('RegistrationSlideInvite', () => {
       expect(wrapper.vm.validInput).toBe(false)
       await wrapper.setData({ formData: { inviteCode: 'ABCDEF' } })
       expect(wrapper.vm.validInput).toBe(true)
+    })
+
+    it('validInput follows the branding inviteCodeLength, not a hardcoded 6', async () => {
+      // Inject a non-default length so a regression to the old hardcoded 6 is caught.
+      const original = getBranding()
+      setBranding({
+        ...original,
+        registration: { ...original.registration, inviteCodeLength: 4 },
+      })
+      try {
+        const wrapper = Wrapper()
+        await wrapper.setData({ formData: { inviteCode: 'ABCD' } }) // 4 chars → matches branding
+        expect(wrapper.vm.validInput).toBe(true)
+        await wrapper.setData({ formData: { inviteCode: 'ABCDEF' } }) // 6 chars → too long now
+        expect(wrapper.vm.validInput).toBe(false)
+      } finally {
+        setBranding(original)
+      }
     })
 
     it('invitedBy / invitedTo are null without a valid code', () => {

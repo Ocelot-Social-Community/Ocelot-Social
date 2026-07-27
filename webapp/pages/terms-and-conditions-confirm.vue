@@ -27,7 +27,7 @@
 import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters, mapMutations } from 'vuex'
-import { VERSION } from '~/constants/terms-and-conditions-version.js'
+import { branding } from '@ocelot-social/branding'
 import { updateUserMutation } from '~/graphql/User.js'
 
 export default {
@@ -67,7 +67,7 @@ export default {
           mutation: updateUserMutation(),
           variables: {
             id: this.currentUser.id,
-            termsAndConditionsAgreedVersion: VERSION,
+            termsAndConditionsAgreedVersion: branding.termsAndConditions.version,
           },
           update: (store, { data: { UpdateUser } }) => {
             const { termsAndConditionsAgreedVersion } = UpdateUser

@@ -18,10 +18,20 @@ import { createApolloTestSetup } from '@root/test/helpers'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
-jest.mock('@constants/groups', () => {
+// Keep the full resolved branding (config/index.ts reads branding.metadata.* transitively);
+// only tighten the group description minimum for this suite.
+jest.mock('@src/branding', () => {
+  // @src/branding re-exports the package's NAMED `branding` (per-domain getters), not a default.
+  const actual = jest.requireActual('@ocelot-social/branding')
   return {
     __esModule: true,
-    DESCRIPTION_WITHOUT_HTML_LENGTH_MIN: 5,
+    branding: {
+      ...actual.branding, // snapshot every domain (via its getter), then tighten only `group`
+      group: { ...actual.branding.group, descriptionMinLength: 5 },
+    },
+    brandingDefaults: actual.brandingDefaults,
+    setBranding: actual.setBranding,
+    getBranding: actual.getBranding,
   }
 })
 

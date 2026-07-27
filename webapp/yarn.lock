@@ -3852,6 +3852,9 @@
     mustache "^2.3.0"
     stack-trace "0.0.10"
 
+"@ocelot-social/branding@file:../packages/branding":
+  version "0.0.1"
+
 "@ocelot-social/ui@file:../packages/ui":
   version "0.0.1"
   dependencies:

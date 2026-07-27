@@ -38,12 +38,20 @@ export interface NetworkPolicy {
   apiKeysMaxPerUser: number
   maxPinnedPosts: number
   maxGroupPinnedPosts: number
+  // Id of the live baked-in branding (see /branding/manifest.json); '' = framework defaults.
+  // A string-typed policy key: switched via setActiveBranding (branding.manage), read by the
+  // SSR branding loader; not shown in the generic (boolean/integer) policy editor.
+  activeBranding: string
+  // Per-bucket branding composition, JSON-encoded object mapping a bucket slot to a source
+  // ('id[@version][/instance]'), layered over activeBranding. '' = no per-slot overrides. String-
+  // typed like activeBranding; set via setBrandingComposition (branding.manage), read by the SSR loader.
+  brandingComposition: string
 }
 
 export type PolicyKey = keyof NetworkPolicy
 
-// The value a policy key can hold across all keys (boolean toggles and integer
-// limits today; string-typed keys are supported by the schema/service for later).
+// The value a policy key can hold across all keys: boolean toggles, integer limits, and now
+// string-typed keys (activeBranding) — the schema/service already supported strings.
 export type PolicyValue = NetworkPolicy[PolicyKey]
 
 // Presence state of an env var: set (defined, non-empty), empty (defined but blank), or

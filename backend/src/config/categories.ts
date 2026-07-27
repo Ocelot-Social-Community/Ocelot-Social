@@ -29,6 +29,9 @@ export const ENV_CATEGORIES = [
   'features',
   'layout',
   'video',
+  // appearance: the activeBranding policy key (managed on the dedicated admin Branding page,
+  // not the generic policy editor).
+  'branding',
   // diagnostics / catch-all
   'monitoring',
   'general',

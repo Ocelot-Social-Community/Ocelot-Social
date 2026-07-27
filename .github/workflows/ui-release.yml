@@ -22,10 +22,22 @@ jobs:
       version: ${{ steps.release.outputs['packages/ui--version'] }}
 
     steps:
+      # Mint a token from the it4c-release-bot GitHub App (vars.RELEASE_APP_ID +
+      # secrets.RELEASE_APP_PRIVATE_KEY) instead of the default GITHUB_TOKEN — a GITHUB_TOKEN-created
+      # release PR/tag does NOT trigger other workflows, so the ui build/lint/test checks would never
+      # run on the release PR. The app token lets them run.
+      - name: Generate it4c-release-bot token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
       - name: Release Please
         id: release
         uses: googleapis/release-please-action@v5
         with:
+          token: ${{ steps.app-token.outputs.token }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 

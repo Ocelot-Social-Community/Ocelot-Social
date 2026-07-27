@@ -8,12 +8,11 @@
 
 <script>
 import LoginForm from '~/components/LoginForm/LoginForm.vue'
-import loginConstants from '~/constants/loginBranded.js'
-import { VERSION } from '~/constants/terms-and-conditions-version.js'
+import { branding } from '@ocelot-social/branding'
 import { mapGetters } from 'vuex'
 
 export default {
-  layout: loginConstants.LAYOUT,
+  layout: branding.login.layout,
   components: {
     LoginForm,
   },
@@ -23,7 +22,12 @@ export default {
     }),
   },
   asyncData({ store, redirect }) {
-    if (store.getters['auth/user'].termsAndConditionsAgreedVersion === VERSION) {
+    // The auth/user getter returns {} when logged out (so this is safe today); `?.` keeps it safe even
+    // if that contract ever changes to null — an anonymous /login visit must never crash on this check.
+    if (
+      store.getters['auth/user']?.termsAndConditionsAgreedVersion ===
+      branding.termsAndConditions.version
+    ) {
       redirect('/')
     }
   },

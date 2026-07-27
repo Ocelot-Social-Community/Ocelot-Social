@@ -40,6 +40,23 @@ export default {
   data() {
     return {
       errorIconPath: '/img/svg/emoji/cry.svg',
+      // Whether at least one branding is baked in (served /branding/manifest.json). The Branding
+      // tab only appears when there is something to view/switch. Fetched client-side.
+      hasBrandings: false,
+    }
+  },
+  fetchOnServer: false,
+  async fetch() {
+    try {
+      const res = await fetch('/branding/manifest.json')
+      const manifest = res.ok ? await res.json() : []
+      this.hasBrandings = Array.isArray(manifest) && manifest.length > 0
+    } catch (error) {
+      // res.ok already handles the expected "no manifest" case above, so this only fires on real
+      // network/parse errors — surface them instead of failing silently. Fallback stays unchanged.
+      // eslint-disable-next-line no-console
+      console.error('admin: failed to load /branding/manifest.json', error)
+      this.hasBrandings = false
     }
   },
   computed: {
@@ -105,6 +122,16 @@ export default {
           permissions: ['apiKey.administer'],
           policy: 'apiKeysEnabled',
         },
+        // Only when at least one branding is baked in (hasBrandings, from the manifest).
+        ...(this.hasBrandings
+          ? [
+              {
+                name: this.$t('admin.branding.name'),
+                path: '/admin/branding',
+                permissions: ['branding.manage'],
+              },
+            ]
+          : []),
       ]
     },
   },

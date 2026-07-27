@@ -88,6 +88,12 @@ jobs:
           cache: 'yarn'
           cache-dependency-path: 'webapp/yarn.lock'
 
+      # The webapp depends on @ocelot-social/branding via `file:../packages/branding`; its dist/ must
+      # exist BEFORE `yarn` copies the file: dependency, otherwise `import/no-unresolved` fails on the
+      # branding imports. (The unit-test job runs in Docker, whose Dockerfile builds this stage already.)
+      - name: Build @ocelot-social/branding
+        run: cd packages/branding && npm ci && npm run build
+
       - name: webapp | Lint
         run: cd webapp && yarn --frozen-lockfile && yarn run lint
 

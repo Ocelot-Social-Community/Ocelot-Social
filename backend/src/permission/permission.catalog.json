@@ -105,6 +105,10 @@
       "group": "account",
       "gatedBy": "apiKeysEnabled",
       "description": "Create personal API keys for backend access (managing/revoking existing keys stays available)."
+    },
+    "branding.manage": {
+      "group": "administration",
+      "description": "View the available baked-in brandings and switch the active branding network-wide."
     }
   }
 }

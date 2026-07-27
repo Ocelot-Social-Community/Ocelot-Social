@@ -17,12 +17,12 @@
 </template>
 
 <script>
-import registrationConstants from '~/constants/registrationBranded.js'
+import { branding } from '@ocelot-social/branding'
 import RegistrationSlider from '~/components/Registration/RegistrationSlider'
 import { validateInviteCodeQuery, redeemInviteCodeMutation } from '~/graphql/inviteCodes'
 
 export default {
-  layout: registrationConstants.LAYOUT,
+  layout: branding.registration.layout,
   name: 'Registration',
   components: {
     RegistrationSlider,

@@ -327,7 +327,7 @@ export default {
 
 .empty-reserve-drop-zone.reserve-drag-over {
   border-color: $color-success;
-  background-color: rgba($color-success, 0.05);
+  background-color: color-mix(in srgb, var(--color-success) 5%, transparent);
   color: $color-success;
 }
 </style>

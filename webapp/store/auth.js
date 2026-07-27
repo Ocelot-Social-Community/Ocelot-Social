@@ -1,5 +1,5 @@
 import gql from 'graphql-tag'
-import { VERSION } from '~/constants/terms-and-conditions-version.js'
+import { branding } from '@ocelot-social/branding'
 import { currentUserQuery } from '~/graphql/User'
 import PermissionsSubscription from '~/graphql/PermissionsSubscription'
 import Cookie from 'universal-cookie'
@@ -150,7 +150,10 @@ export const getters = {
     return state.token
   },
   termsAndConditionsAgreed(state) {
-    return state.user && state.user.termsAndConditionsAgreedVersion === VERSION
+    return (
+      state.user &&
+      state.user.termsAndConditionsAgreedVersion === branding.termsAndConditions.version
+    )
   },
 }
 

@@ -18,6 +18,8 @@ backend: &backend
   - 'backend/**/*'
   - 'neo4j/**/*'
   - 'package.json'
+  # backend consumes @ocelot-social/branding (file: dep) → a branding change can break it
+  - *branding
 
 docker: &docker
   - 'docker-compose.*'
@@ -28,6 +30,8 @@ webapp: &webapp
   - 'styleguide/**/*'
   - 'package.json'
   - *ui
+  # webapp consumes @ocelot-social/branding (file: dep) → a branding change can break it
+  - *branding
 
 docs-check: &docs-check
   - '.github/workflows/check-documentation.yml'

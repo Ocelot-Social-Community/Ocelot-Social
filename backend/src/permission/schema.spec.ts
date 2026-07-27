@@ -39,6 +39,7 @@ const EXPECTED_KEYS: PermissionKey[] = [
   'videoCall.create_closed',
   'videoCall.create_hidden',
   'apiKey.create',
+  'branding.manage',
 ]
 
 describe('permission catalog', () => {
