@@ -16,6 +16,9 @@
 // a detached node). We therefore reload at most ONCE per requested target: if we already reloaded
 // for this exact target and the render still didn't honour it, the server cannot reach it — stop.
 const RELOAD_TARGET_KEY = 'ocelot-branding-reload-target'
+// Explicit "framework defaults" as a base (see plugins/branding.js). Resolves to the same empty base
+// the server reports as brandingId, so it must be normalised before comparing.
+const VANILLA_BASE = '@default'
 
 function readAttemptedTarget() {
   try {
@@ -59,7 +62,14 @@ export default ({ store }) => {
       // undefined = the policy snapshot has not loaded yet (every real value, incl. '' for vanilla,
       // is defined once loaded) — return undefined so the watcher does nothing until it is known.
       if (snapshot.activeBranding === undefined) return undefined
-      return signature(snapshot.activeBranding, snapshot.brandingComposition)
+      const active = snapshot.activeBranding
+      // '' means NOTHING was chosen: the server then resolves the base through $OCELOT_ACTIVE_BRANDING
+      // and the baked DEFAULT marker, neither of which the client can see. Comparing '' against the
+      // rendered id would look like a divergence on every single page load of a default-baked image
+      // and burn the one reload attempt. Adopt the rendered id instead — there is nothing to switch to.
+      if (!active) return signature(nuxt.brandingId, snapshot.brandingComposition)
+      // The explicit-vanilla sentinel resolves to the same empty base the server reports.
+      return signature(active === VANILLA_BASE ? '' : active, snapshot.brandingComposition)
     },
     (target) => {
       if (target === undefined) return

@@ -25,11 +25,11 @@
           <select
             id="whole-package"
             class="composition-select"
-            :value="activeId"
+            :value="activeSelect"
             :disabled="!!saving || !!savingComposition"
             @change="switchTo($event.target.value)"
           >
-            <option value="">{{ $t('admin.branding.vanilla') }}</option>
+            <option :value="vanillaSource">{{ $t('admin.branding.vanilla') }}</option>
             <option v-for="src in sourceOptions" :key="src.id" :value="src.id">
               {{ src.label }}
             </option>
@@ -342,9 +342,17 @@ export default {
     this.schemaVersions = schemaVersions
   },
   computed: {
-    // The live base brand id ('' = framework default). Kept live by the policy subscription.
-    activeId() {
+    // The raw stored value — '' (never chosen) or the vanilla sentinel or a brand id. Only the
+    // whole-package select needs it, so its option can round-trip the sentinel.
+    activeSelect() {
       return this.$policy.get('activeBranding') || ''
+    },
+    // The live base brand id, normalised: '' means framework defaults, whether that is because
+    // nothing was ever chosen or because vanilla was chosen explicitly. Everything that looks a brand
+    // up by id (labels, badges, config preview) uses this.
+    activeId() {
+      const raw = this.activeSelect
+      return raw === VANILLA_SOURCE ? '' : raw
     },
     // The six composable bucket slots (theme/identity/logos/legal/navigation/behavior).
     bucketNames() {

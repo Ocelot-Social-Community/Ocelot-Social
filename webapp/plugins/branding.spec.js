@@ -171,6 +171,59 @@ describe('plugins/branding (SSR injection)', () => {
     expect(mockSetBranding).toHaveBeenCalledWith(undefined)
   })
 
+  // An admin choosing "no branding" writes the '@default' sentinel, NOT '' — '' also means "never
+  // chosen" and has to keep falling through to the ops pin / baked marker. Without the distinction the
+  // choice is unreachable on any image that bakes a default brand.
+  describe('explicit vanilla as the base', () => {
+    beforeEach(() => {
+      mockDiscoverArchives.mockReturnValue(
+        new Map([['stage', { id: 'stage', file: '/brands/stage.tar.gz' }]]),
+      )
+      mockReadDefaultMarker.mockReturnValue('stage')
+    })
+
+    it('does NOT fall through to the baked default when vanilla was chosen explicitly', async () => {
+      mockPolicy('@default')
+
+      await brandingPlugin(context)
+
+      expect(mockSetBranding).toHaveBeenCalledWith(undefined)
+      expect(mockComposeComposition).not.toHaveBeenCalled()
+    })
+
+    it('still honours a per-slot override on top of an explicitly vanilla base', async () => {
+      mockPolicy('@default', JSON.stringify({ theme: 'stage' }))
+      mockComposeComposition.mockReturnValue({ id: 'composed' })
+
+      await brandingPlugin(context)
+
+      expect(mockComposeComposition).toHaveBeenCalledWith('/brands', {
+        _default: '',
+        theme: 'stage',
+      })
+    })
+
+    it('DOES fall through to the baked default when nothing was ever chosen', async () => {
+      mockPolicy('')
+      mockComposeComposition.mockReturnValue({ id: 'stage' })
+
+      await brandingPlugin(context)
+
+      expect(mockComposeComposition).toHaveBeenCalledWith('/brands', { _default: 'stage' })
+    })
+
+    it('lets the ops pin win over the baked marker when nothing was chosen', async () => {
+      process.env.OCELOT_ACTIVE_BRANDING = 'stage'
+      mockPolicy('')
+      mockComposeComposition.mockReturnValue({ id: 'stage' })
+
+      await brandingPlugin(context)
+
+      expect(mockComposeComposition).toHaveBeenCalledWith('/brands', { _default: 'stage' })
+      delete process.env.OCELOT_ACTIVE_BRANDING
+    })
+  })
+
   // webpack's DefinePlugin compiles `process.env.GRAPHQL_URI` into the bundle at BUILD time (nuxt's
   // `env` option), so in a container it is frozen to the localhost fallback no matter what the
   // orchestrator sets. The URI therefore has to come from privateRuntimeConfig, resolved at server

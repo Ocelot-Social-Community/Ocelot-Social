@@ -114,11 +114,24 @@ describe('admin/branding available list', () => {
   })
 
   it('marks the brand currently used as base', () => {
-    // activeId comes from the live policy, so the badge follows a switch without a refetch.
-    const activeId = BrandingPage.computed.activeId.call({
-      $policy: { get: (key) => (key === 'activeBranding' ? 'other' : '') },
-    })
+    // activeSelect carries the RAW policy value (so the select can round-trip it); activeId is the
+    // effective brand id everything else looks up by.
+    const ctx = { $policy: { get: (key) => (key === 'activeBranding' ? 'other' : '') } }
+    const activeSelect = BrandingPage.computed.activeSelect.call(ctx)
 
-    expect(activeId).toBe('other')
+    expect(activeSelect).toBe('other')
+    expect(BrandingPage.computed.activeId.call({ activeSelect })).toBe('other')
+  })
+
+  // "No branding" is stored as the '@default' sentinel so the server can tell it apart from "never
+  // chosen". Everything that resolves a brand by id must still see it as vanilla.
+  it('normalises the explicit-vanilla sentinel to the empty brand id', () => {
+    const ctx = { $policy: { get: (key) => (key === 'activeBranding' ? '@default' : '') } }
+    const activeSelect = BrandingPage.computed.activeSelect.call(ctx)
+
+    // The select keeps the sentinel so its vanilla option stays selected...
+    expect(activeSelect).toBe('@default')
+    // ...while lookups by id see plain vanilla.
+    expect(BrandingPage.computed.activeId.call({ activeSelect })).toBe('')
   })
 })

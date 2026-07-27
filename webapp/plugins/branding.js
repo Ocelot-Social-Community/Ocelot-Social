@@ -19,6 +19,11 @@
 // time and would need the config set earlier (or lazy adapters) for full effect.
 import { setBranding } from '@ocelot-social/branding'
 
+// Explicit "framework defaults" as a BASE. '' cannot express it: an unset policy value is also '',
+// and that has to keep falling through to the ops pin / baked DEFAULT marker. Same sentinel the
+// per-slot composition already uses (the package's parseSource() resolves it to "no source").
+const VANILLA_BASE = '@default'
+
 // Unwrap one policy key's transported value (JSON-encoded); '' when absent/garbled.
 function extractPolicy(policy, key) {
   const entry = policy.find((e) => e && e.key === key)
@@ -89,8 +94,16 @@ async function loadServerBranding(discover, graphqlUri) {
   // of the box while any brand stays switchable on the admin Branding tab.
   const policy = await fetchBrandingPolicy(graphqlUri) // { active, composition } or null (unreachable)
   const policyActive = policy ? policy.active : ''
-  let base = policyActive && policyActive !== '' ? policyActive : ''
-  if (!base) {
+  let base
+  if (policyActive === VANILLA_BASE) {
+    // An admin explicitly chose "no branding". This must NOT fall through: on an image that bakes a
+    // default brand the marker would win every time, making the choice unreachable — the page would
+    // reload once and keep rendering the baked brand.
+    base = ''
+  } else if (policyActive) {
+    base = policyActive
+  } else {
+    // Nothing chosen (yet) → ops pin, then the image's baked default, then vanilla.
     base = process.env.OCELOT_ACTIVE_BRANDING || discover.readDefaultMarker(assetsDir) || ''
   }
   if (base && !archives.has(base)) base = '' // unknown base id → vanilla base
