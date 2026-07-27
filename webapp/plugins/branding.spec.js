@@ -31,6 +31,8 @@ jest.mock(
 // (both transported JSON-encoded; brandingComposition is itself a JSON string or '').
 function mockPolicy(activeBranding, brandingComposition = '') {
   global.fetch = jest.fn().mockResolvedValue({
+    ok: true,
+    status: 200,
     json: async () => ({
       data: {
         policy: [
@@ -167,6 +169,68 @@ describe('plugins/branding (SSR injection)', () => {
     })
     await brandingPlugin(context)
     expect(mockSetBranding).toHaveBeenCalledWith(undefined)
+  })
+
+  // An unreachable backend is INDISTINGUISHABLE in the rendered page from "nothing switched": the
+  // loader falls through to the baked DEFAULT marker and serves the image's brand, silently overriding
+  // every admin choice. That is how a misconfigured GRAPHQL_URI stayed hidden — so it has to be loud.
+  describe('when the policy cannot be fetched', () => {
+    let warn
+
+    beforeEach(() => {
+      warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+      process.env.GRAPHQL_URI = 'http://backend:4000'
+      // The ops pin the loader falls through to when the policy is unavailable.
+      process.env.OCELOT_ACTIVE_BRANDING = 'stage'
+      mockDiscoverArchives.mockReturnValue(
+        new Map([['stage', { id: 'stage', file: '/brands/stage.tar.gz' }]]),
+      )
+      mockComposeComposition.mockReturnValue({ id: 'stage' })
+    })
+
+    afterEach(() => {
+      warn.mockRestore()
+      delete process.env.GRAPHQL_URI
+      delete process.env.OCELOT_ACTIVE_BRANDING
+    })
+
+    it('warns and names the consequence when the request fails', async () => {
+      global.fetch = jest.fn().mockRejectedValue(new Error('ECONNREFUSED'))
+
+      await brandingPlugin(context)
+
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining('policy query to http://backend:4000 failed (ECONNREFUSED)'),
+      )
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('will be IGNORED'))
+    })
+
+    it('reports a timeout as such rather than as an opaque abort', async () => {
+      const abort = new Error('aborted')
+      abort.name = 'AbortError'
+      global.fetch = jest.fn().mockRejectedValue(abort)
+
+      await brandingPlugin(context)
+
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('no answer within 2000ms'))
+    })
+
+    it('warns on a non-2xx answer instead of parsing it as a policy', async () => {
+      global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 502, json: async () => ({}) })
+
+      await brandingPlugin(context)
+
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('answered HTTP 502'))
+    })
+
+    it('still renders the fallback brand rather than failing the request', async () => {
+      global.fetch = jest.fn().mockRejectedValue(new Error('ECONNREFUSED'))
+
+      await brandingPlugin(context)
+
+      // $OCELOT_ACTIVE_BRANDING pins 'stage' — the page stays branded, just not by the policy.
+      expect(mockComposeComposition).toHaveBeenCalledWith('/brands', { _default: 'stage' })
+    })
   })
 
   it('on the client, replays the SSR-serialised branding', async () => {

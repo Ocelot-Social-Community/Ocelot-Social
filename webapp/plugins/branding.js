@@ -37,7 +37,8 @@ function extractPolicy(policy, key) {
 async function fetchBrandingPolicy() {
   const uri = process.env.GRAPHQL_URI || 'http://localhost:4000'
   const controller = typeof AbortController !== 'undefined' ? new AbortController() : null
-  const timer = controller ? setTimeout(() => controller.abort(), 2000) : null
+  const timeout = Number(process.env.OCELOT_BRANDING_POLICY_TIMEOUT_MS || 2000)
+  const timer = controller ? setTimeout(() => controller.abort(), timeout) : null
   try {
     const res = await fetch(uri, {
       method: 'POST',
@@ -45,6 +46,11 @@ async function fetchBrandingPolicy() {
       body: JSON.stringify({ query: '{ policy { key value } }' }),
       signal: controller ? controller.signal : undefined,
     })
+    if (!res.ok) {
+      // eslint-disable-next-line no-console
+      console.warn(`[branding] policy query to ${uri} answered HTTP ${res.status} — using fallback`)
+      return null
+    }
     const json = await res.json()
     const policy = json && json.data && json.data.policy ? json.data.policy : []
     return {
@@ -52,6 +58,15 @@ async function fetchBrandingPolicy() {
       composition: extractPolicy(policy, 'brandingComposition') || '',
     }
   } catch (error) {
+    // MUST be loud. A failure here is indistinguishable in the rendered page from "no brand switched":
+    // the caller falls through to $OCELOT_ACTIVE_BRANDING / the baked DEFAULT marker and serves the
+    // image's brand, so an unreachable backend silently overrides every admin branding choice. That is
+    // exactly how a misconfigured GRAPHQL_URI hid itself: the browser reaches the backend through the
+    // ingress and shows the real policy, while SSR never got it.
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[branding] policy query to ${uri} failed (${error && error.name === 'AbortError' ? `no answer within ${timeout}ms` : (error && error.message) || error}) — falling back to $OCELOT_ACTIVE_BRANDING / the baked default; the active branding and its composition will be IGNORED`,
+    )
     return null
   } finally {
     if (timer) clearTimeout(timer)
