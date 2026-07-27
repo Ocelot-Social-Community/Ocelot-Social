@@ -19,6 +19,7 @@ import helmet from 'helmet'
 import { SubscriptionServer } from 'subscriptions-transport-ws'
 import { WebSocketServer } from 'ws'
 
+import { brandingRouter } from './branding/routes'
 import CONFIG from './config'
 import { getContext } from './context'
 import schema from './graphql/schema'
@@ -144,6 +145,9 @@ const createServer = async (options?: CreateServerOptions) => {
     ) as any,
   )
   app.use(express.static('public'))
+  // Brand archives this backend has on disk, served read-only so the webapp can acquire them instead
+  // of shipping its own copy. Mounted before the body parsers — these are plain GETs with no body.
+  app.use('/branding', brandingRouter())
   if (!options?.skipLiveKitBoot) {
     // LiveKit webhook must be registered before the global JSON body parser so
     // the raw payload is preserved for HMAC signature verification.
