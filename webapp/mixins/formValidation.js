@@ -21,6 +21,7 @@ export default {
     }
   },
   beforeCreate() {
+    this._validateGen = 0
     const vm = this
     const subscribers = []
     this.$formProxy = {
@@ -86,6 +87,8 @@ export default {
       }, onInvalid)
     },
     $validateForm(cb, onInvalid) {
+      // Increment generation so callbacks from superseded runs are discarded.
+      const gen = ++this._validateGen
       const schema = this.formSchema
       if (!schema || Object.keys(schema).length === 0) {
         this.formErrors = null
@@ -97,6 +100,7 @@ export default {
       }
       const validator = new Schema(schema)
       validator.validate(this.formData, (errors) => {
+        if (gen !== this._validateGen) return
         if (errors) {
           this.formErrors = errors.reduce((errorObj, error) => {
             const result = { ...errorObj }

@@ -23,6 +23,11 @@ const neodeInstance = getNeode()
 // (resyncCaches returns true; it errors only if a service reload itself fails) — fail
 // loudly here instead of letting a green-but-stale setup produce flaky test failures.
 beforeEach(() => {
+  // Force English locale for all tests so i18n-dependent assertions in feature
+  // files match English strings regardless of host system language or any
+  // stale locale cookie left by a previous run.
+  cy.clearCookies()
+  cy.setCookie('locale', 'en')
   cy.then(() => cleanDatabase())
   cy.request({
     method: 'POST',

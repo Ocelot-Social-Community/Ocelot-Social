@@ -371,11 +371,12 @@ export default {
           },
         },
         eventVenue: {
-          required: this.postType === 'Event',
+          required: this.postType === 'Event' && !this.formData.eventIsOnline,
           min: 3,
           max: 100,
           validator: (_, value = '') => {
             if (this.postType !== 'Event') return []
+            if (this.formData.eventIsOnline) return []
             const trimmed = value.trim()
             if (!trimmed) {
               return [new Error(this.$t('common.validations.eventVenueNotEmpty'))]
@@ -525,10 +526,6 @@ export default {
       }
     },
     onSubmit() {
-      // Block creating a post without permission (editing stays allowed). The button is
-      // grayed (permission-denied + aria-disabled + tooltip); this also guards keyboard
-      // Enter and direct navigation. Surface the reason via a toast instead of a silent
-      // no-op so a click/Enter isn't swallowed without feedback.
       if (!this.contribution.id && !this.$can('post.create')) {
         this.$toast.error(this.$t('permissions.deniedHint'))
         return

@@ -139,6 +139,15 @@ export default {
         clearTimeout(throttleInputEvent)
         throttleInputEvent = setTimeout(() => this.onUpdate(e), 300)
       },
+      onBlur: () => {
+        // Flush any pending throttled update immediately so formData is
+        // in sync before the form validates on submit.
+        if (throttleInputEvent !== undefined) {
+          clearTimeout(throttleInputEvent)
+          throttleInputEvent = undefined
+          this.$emit('input', this.editor.getHTML())
+        }
+      },
     })
   },
   beforeDestroy() {
