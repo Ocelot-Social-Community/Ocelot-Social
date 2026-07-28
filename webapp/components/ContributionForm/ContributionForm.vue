@@ -33,26 +33,30 @@
             autofocus
             size="large"
             hide-error
+            @blur="dirtyFields.title && touchField('title')"
           />
           <validation-hint
             :count="formData.title.length"
             :max="formSchema.title.max"
-            :variant="formErrors && formErrors.title ? 'error' : null"
+            :variant="visibleErrors && visibleErrors.title ? 'error' : null"
             :text="titleErrorText"
           />
-          <div :class="{ 'ds-input-has-error': formErrors && formErrors.content }">
+          <div :class="{ 'ds-input-has-error': visibleErrors && visibleErrors.content }">
             <editor
               :users="users"
               :value="formData.content"
               :hashtags="hashtags"
               @input="updateEditorContent"
+              @blur.native.capture="dirtyFields.content && touchField('content')"
             />
           </div>
           <validation-hint
             :count="contentLength"
-            :variant="formErrors && formErrors.content ? 'error' : null"
+            :variant="visibleErrors && visibleErrors.content ? 'error' : null"
             :text="
-              formErrors && formErrors.content ? $t('common.validations.contentNotEmpty') : null
+              visibleErrors && visibleErrors.content
+                ? $t('common.validations.contentNotEmpty')
+                : null
             "
           />
 
@@ -71,7 +75,7 @@
                   :minute-step="15"
                   format="DD.MM.YYYY HH:mm"
                   :placeholder="$t('post.viewEvent.eventStart')"
-                  :class="{ 'mx-datepicker-error': formErrors && formErrors.eventStart }"
+                  :class="{ 'mx-datepicker-error': visibleErrors && visibleErrors.eventStart }"
                   :show-second="false"
                   @change="changeEventStart($event)"
                 ></date-picker>
@@ -89,7 +93,7 @@
                   :placeholder="$t('post.viewEvent.eventEnd')"
                   :class="[
                     'event-grid-item-font-helper',
-                    { 'mx-datepicker-error': formErrors && formErrors.eventEnd },
+                    { 'mx-datepicker-error': visibleErrors && visibleErrors.eventEnd },
                   ]"
                   :show-second="false"
                   @change="changeEventEnd($event)"
@@ -99,7 +103,7 @@
             <div class="event-date-hints-zone">
               <div class="event-date-hint-cell">
                 <validation-hint
-                  v-if="formErrors && formErrors.eventStart"
+                  v-if="visibleErrors && visibleErrors.eventStart"
                   variant="error"
                   :text="$t('post.viewEvent.eventStartNotEmpty')"
                 />
@@ -111,7 +115,7 @@
               </div>
               <div class="event-date-hint-cell">
                 <validation-hint
-                  v-if="formErrors && formErrors.eventEnd"
+                  v-if="visibleErrors && visibleErrors.eventEnd"
                   variant="error"
                   :text="$t('post.viewEvent.eventEndBeforeStart')"
                 />
@@ -124,11 +128,12 @@
                   name="eventVenue"
                   :placeholder="$t('post.viewEvent.eventVenue')"
                   hide-error
+                  @blur="dirtyFields.eventVenue && touchField('eventVenue')"
                 />
                 <validation-hint
                   :count="formData.eventVenue.length"
                   :max="formSchema.eventVenue.max"
-                  :variant="formErrors && formErrors.eventVenue ? 'error' : null"
+                  :variant="visibleErrors && visibleErrors.eventVenue ? 'error' : null"
                   :text="venueErrorText"
                 />
               </div>
@@ -136,7 +141,7 @@
                 <div
                   :class="{
                     'ds-input-has-error':
-                      !locationSelectDisabled && formErrors && formErrors.eventLocationName,
+                      !locationSelectDisabled && visibleErrors && visibleErrors.eventLocationName,
                   }"
                 >
                   <location-select
@@ -146,10 +151,15 @@
                     :show-label="false"
                     :placeholder="$t('post.viewEvent.eventLocationName')"
                     :disabled="locationSelectDisabled"
-                    @input="$validateForm()"
+                    @input="
+                      touchField('eventLocationName')
+                      $validateForm()
+                    "
                   />
                   <validation-hint
-                    v-if="!locationSelectDisabled && formErrors && formErrors.eventLocationName"
+                    v-if="
+                      !locationSelectDisabled && visibleErrors && visibleErrors.eventLocationName
+                    "
                     variant="error"
                     :text="$t('post.viewEvent.eventLocationRequired')"
                   />
@@ -178,9 +188,11 @@
             v-if="categoriesActive"
             :count="formData.categoryIds.length"
             :max="3"
-            :variant="formErrors && formErrors.categoryIds ? 'error' : null"
+            :variant="visibleErrors && visibleErrors.categoryIds ? 'error' : null"
             :text="
-              formErrors && formErrors.categoryIds ? $t('common.validations.categories') : null
+              visibleErrors && visibleErrors.categoryIds
+                ? $t('common.validations.categories')
+                : null
             "
           />
           <div class="ds-flex ds-flex-gap-xxx-small buttons-footer">
@@ -208,7 +220,6 @@
                 appearance="filled"
                 type="submit"
                 :loading="loading"
-                :disabled="!!formErrors"
                 :class="{ 'permission-denied': !contribution.id && !$can('post.create') }"
                 :aria-disabled="!contribution.id && !$can('post.create')"
                 v-tooltip="{
@@ -423,13 +434,13 @@ export default {
       return this.$filters.removeHtml(this.formData.content).length
     },
     titleErrorText() {
-      if (!this.formErrors?.title) return null
+      if (!this.visibleErrors?.title) return null
       return !this.formData.title.trim()
         ? this.$t('common.validations.titleNotEmpty')
         : this.$t('common.validations.titleLength', { min: 3, max: this.formSchema.title.max })
     },
     venueErrorText() {
-      if (!this.formErrors?.eventVenue) return null
+      if (!this.visibleErrors?.eventVenue) return null
       return !this.formData.eventVenue.trim()
         ? this.$t('common.validations.eventVenueNotEmpty')
         : this.$t('common.validations.eventVenueLength', {
@@ -466,6 +477,8 @@ export default {
     // fields (e.g. eventStart when switching to "event") surface errors
     // immediately rather than hiding behind a stale "green" state.
     postType() {
+      this.touchedFields = {}
+      this.submitAttempted = false
       this.$validateForm()
     },
     groupId() {
@@ -520,7 +533,9 @@ export default {
         this.$toast.error(this.$t('permissions.deniedHint'))
         return
       }
-      this.formSubmit(this.submit)
+      this.formSubmit(this.submit, () => {
+        this.$toast.error(this.$t('common.validations.formHasErrors'))
+      })
     },
     submit() {
       let image = null
@@ -574,9 +589,11 @@ export default {
       this.updateFormField('eventIsOnline', this.formData.eventIsOnline)
     },
     changeEventEnd(event) {
+      this.touchField('eventEnd')
       this.updateFormField('eventEnd', event)
     },
     changeEventStart(event) {
+      this.touchField('eventStart')
       this.$set(this.formData, 'eventStart', event)
       this.$validateForm()
     },

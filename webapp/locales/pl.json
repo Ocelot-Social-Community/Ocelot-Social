@@ -432,6 +432,7 @@
       "eventLocationNameNotEmpty": "Proszę podać adres.",
       "eventVenueLength": "Opis miejsca musi mieć od {min} do {max} znaków.",
       "eventVenueNotEmpty": "Proszę podać opis miejsca.",
+      "formHasErrors": "Proszę wypełnić wszystkie wymagane pola.",
       "titleLength": "Tytuł musi mieć od {min} do {max} znaków.",
       "titleNotEmpty": "Proszę podać tytuł.",
       "url": "musi być poprawnym adresem URL"

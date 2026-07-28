@@ -432,6 +432,7 @@
       "eventLocationNameNotEmpty": "Veuillez saisir une adresse.",
       "eventVenueLength": "La description du lieu doit comporter entre {min} et {max} caractères.",
       "eventVenueNotEmpty": "Veuillez saisir une description du lieu.",
+      "formHasErrors": "Veuillez remplir tous les champs obligatoires.",
       "titleLength": "Le titre doit comporter entre {min} et {max} caractères.",
       "titleNotEmpty": "Veuillez saisir un titre.",
       "url": "doit être une URL valide"

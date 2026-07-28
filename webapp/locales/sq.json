@@ -432,6 +432,7 @@
       "eventLocationNameNotEmpty": "Ju lutem shkruani një adresë.",
       "eventVenueLength": "Përshkrimi i vendit duhet të ketë midis {min} dhe {max} karaktere.",
       "eventVenueNotEmpty": "Ju lutem shkruani një përshkrim të vendit.",
+      "formHasErrors": "Ju lutem plotësoni të gjitha fushat e detyrueshme.",
       "titleLength": "Titulli duhet të ketë midis {min} dhe {max} karaktere.",
       "titleNotEmpty": "Ju lutem shkruani një titull.",
       "url": "duhet të jetë një URL e vlefshme"

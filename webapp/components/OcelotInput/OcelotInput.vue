@@ -222,6 +222,7 @@ export default {
     },
     handleBlur() {
       this.focus = false
+      this.$emit('blur')
     },
   },
 }

@@ -15,6 +15,9 @@ export default {
   data() {
     return {
       formErrors: null,
+      touchedFields: {},
+      dirtyFields: {},
+      submitAttempted: false,
     }
   },
   beforeCreate() {
@@ -39,16 +42,31 @@ export default {
     }
     this.$formSubscribers = subscribers
   },
+  computed: {
+    visibleErrors() {
+      if (!this.formErrors) return null
+      if (this.submitAttempted) return this.formErrors
+      const filtered = Object.fromEntries(
+        Object.entries(this.formErrors).filter(([field]) => this.touchedFields[field]),
+      )
+      return Object.keys(filtered).length ? filtered : null
+    },
+  },
   watch: {
     formData: {
       handler(value) {
-        this.$notifyFormSubscribers(value, this.formErrors)
+        this.$notifyFormSubscribers(value, this.visibleErrors)
       },
       deep: true,
     },
   },
   methods: {
+    touchField(field) {
+      this.$set(this.touchedFields, field, true)
+      this.$notifyFormSubscribers(this.formData, this.visibleErrors)
+    },
     updateFormField(model, value) {
+      this.$set(this.dirtyFields, model, true)
       this.$set(this.formData, model, value)
       if (typeof this.handleInput === 'function') {
         this.handleInput(cloneDeep(this.formData))
@@ -59,14 +77,15 @@ export default {
         }
       })
     },
-    formSubmit(callback) {
+    formSubmit(callback, onInvalid) {
+      this.submitAttempted = true
       this.$validateForm(() => {
         if (callback && typeof callback === 'function') {
           callback(cloneDeep(this.formData))
         }
-      })
+      }, onInvalid)
     },
-    $validateForm(cb) {
+    $validateForm(cb, onInvalid) {
       const schema = this.formSchema
       if (!schema || Object.keys(schema).length === 0) {
         this.formErrors = null
@@ -87,9 +106,11 @@ export default {
         } else {
           this.formErrors = null
         }
-        this.$notifyFormSubscribers(this.formData, this.formErrors)
+        this.$notifyFormSubscribers(this.formData, this.visibleErrors)
         if (!errors && cb && typeof cb === 'function') {
           cb()
+        } else if (errors && onInvalid && typeof onInvalid === 'function') {
+          onInvalid()
         }
       })
     },

@@ -432,6 +432,7 @@
       "eventLocationNameNotEmpty": "Por favor, insira um endereço.",
       "eventVenueLength": "A descrição do local deve ter entre {min} e {max} caracteres.",
       "eventVenueNotEmpty": "Por favor, insira uma descrição do local.",
+      "formHasErrors": "Por favor, preencha todos os campos obrigatórios.",
       "titleLength": "O título deve ter entre {min} e {max} caracteres.",
       "titleNotEmpty": "Por favor, insira um título.",
       "url": "deve ser uma URL válida"
