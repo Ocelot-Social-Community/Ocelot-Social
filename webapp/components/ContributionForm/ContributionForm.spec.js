@@ -135,6 +135,13 @@ describe('ContributionForm.vue', () => {
           await wrapper.find('form').trigger('submit')
           expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
         })
+
+        it('shows error toast when submitting with invalid form', async () => {
+          postTitleInput.setValue('')
+          wrapper.find('form').trigger('submit')
+          await wrapper.vm.$nextTick()
+          expect(mocks.$toast.error).toHaveBeenCalledWith('common.validations.formHasErrors')
+        })
       })
 
       describe('valid form submission', () => {
@@ -347,6 +354,13 @@ describe('ContributionForm.vue', () => {
         expect(wrapper.find('div.eventData').exists()).toBe(true)
       })
 
+      it('shows past-start warning immediately when editing an event with a past start date', () => {
+        const pastDate = new Date(Date.now() - 24 * 60 * 60 * 1000) // yesterday
+        propsData.contribution = { eventStart: pastDate.toISOString() }
+        wrapper = Wrapper()
+        expect(wrapper.vm.eventStartIsInPast).toBe(true)
+      })
+
       describe('is online event', () => {
         it('has false as default', () => {
           expect(wrapper.vm.formData.eventIsOnline).toBe(false)
@@ -364,6 +378,12 @@ describe('ContributionForm.vue', () => {
           it('event location input is disabled', () => {
             expect(wrapper.findComponent({ name: 'LocationSelect' }).props('disabled')).toBe(true)
           })
+
+          it('does not show location error immediately after unchecking online', async () => {
+            wrapper.find('input[name="eventIsOnline"]').setChecked(false)
+            await wrapper.vm.$nextTick()
+            expect(wrapper.vm.visibleErrors?.eventLocationName).toBeFalsy()
+          })
         })
 
         describe('invalid form', () => {
@@ -372,8 +392,8 @@ describe('ContributionForm.vue', () => {
             wrapper.vm.updateEditorContent('Elli hat Geburtstag!')
           })
 
-          it('has submit button disabled', () => {
-            expect(wrapper.find('button[type="submit"]').attributes('disabled')).toBe('disabled')
+          it('has submit button enabled before submit attempt', () => {
+            expect(wrapper.find('button[type="submit"]').attributes('disabled')).toBeUndefined()
           })
         })
 
@@ -477,6 +497,37 @@ describe('ContributionForm.vue', () => {
         wrapper.setProps({ group: { id: 'g1', groupType: 'public' } })
         await wrapper.vm.$nextTick()
         expect(spy).toHaveBeenCalled()
+      })
+    })
+
+    describe('validation visibility', () => {
+      beforeEach(() => {
+        jest.useRealTimers()
+        wrapper = Wrapper()
+      })
+
+      it('shows no title error when blurring without having typed', async () => {
+        wrapper.find('input[name="title"]').trigger('blur')
+        await wrapper.vm.$nextTick()
+        expect(wrapper.vm.visibleErrors?.title).toBeFalsy()
+      })
+
+      it('shows title error after user types an invalid value and blurs', async () => {
+        wrapper.find('.ds-input').setValue('x') // too short — marks field dirty
+        await wrapper.vm.$nextTick()
+        await Promise.resolve()
+        wrapper.find('input[name="title"]').trigger('blur')
+        await wrapper.vm.$nextTick()
+        expect(wrapper.vm.visibleErrors?.title).toBeTruthy()
+      })
+
+      it('makes all errors visible after a failed submit attempt', async () => {
+        wrapper.find('form').trigger('submit')
+        await wrapper.vm.$nextTick()
+        await Promise.resolve()
+        expect(wrapper.vm.submitAttempted).toBe(true)
+        expect(wrapper.vm.visibleErrors?.title).toBeTruthy()
+        expect(wrapper.vm.visibleErrors?.content).toBeTruthy()
       })
     })
 
