@@ -6,7 +6,7 @@
 import { getDateFnsLocale } from '~/locales'
 import format from 'date-fns/format'
 import formatRelative from 'date-fns/formatRelative'
-import dateTimeConstants from '~/constants/dateTime'
+import { branding } from '@ocelot-social/branding'
 
 export default {
   name: 'DateTime',
@@ -18,12 +18,12 @@ export default {
   },
   computed: {
     dateTimeString() {
-      if (dateTimeConstants.RELATIVE_DATETIME) {
+      if (branding.dateTime.relativeDateTime) {
         return formatRelative(new Date(this.dateTime), new Date(), {
           locale: getDateFnsLocale(this),
         })
       } else {
-        return format(new Date(this.dateTime), dateTimeConstants.ABSOLUT_DATETIME_FORMAT, {
+        return format(new Date(this.dateTime), branding.dateTime.absoluteDateTimeFormat, {
           locale: getDateFnsLocale(this),
         })
       }

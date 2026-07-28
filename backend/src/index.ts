@@ -1,3 +1,6 @@
+// eslint-disable-next-line import-x/no-unassigned-import -- MUST be first: inject a runtime brand config before anything reads `branding`
+import './branding/bootstrap'
+
 import CONFIG from './config'
 import pubsubContext from './context/pubsub'
 import { closeDriver } from './db/neo4j'

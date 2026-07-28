@@ -188,14 +188,9 @@
 
 <script>
 import { OsBadge, OsButton, OsIcon } from '@ocelot-social/ui'
+import { branding } from '@ocelot-social/branding'
 import { iconRegistry } from '~/utils/iconRegistry'
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
-import { CATEGORIES_MIN, CATEGORIES_MAX } from '~/constants/categories.js'
-import {
-  NAME_LENGTH_MIN,
-  NAME_LENGTH_MAX,
-  DESCRIPTION_WITHOUT_HTML_LENGTH_MIN,
-} from '~/constants/groups.js'
 import Editor from '~/components/Editor/Editor'
 import ActionRadiusSelect from '~/components/Select/ActionRadiusSelect'
 import LocationSelect from '~/components/Select/LocationSelect'
@@ -272,14 +267,18 @@ export default {
         showMembers: showMembers ?? false,
       },
       formSchema: {
-        name: { required: true, min: NAME_LENGTH_MIN, max: NAME_LENGTH_MAX },
-        slug: { required: false, min: NAME_LENGTH_MIN },
+        name: {
+          required: true,
+          min: branding.group.nameLengthMin,
+          max: branding.group.nameLengthMax,
+        },
+        slug: { required: false, min: branding.group.nameLengthMin },
         groupType: { required: true, min: 1 },
         about: { required: false },
         description: {
           type: 'string',
           required: true,
-          min: DESCRIPTION_WITHOUT_HTML_LENGTH_MIN,
+          min: branding.group.descriptionMinLength,
           validator: (_, value = '') => {
             if (this.$filters.removeHtml(value).length < this.formSchema.description.min) {
               return [new Error()]
@@ -295,7 +294,7 @@ export default {
           validator: (_, value = []) => {
             if (
               this.categoriesActive &&
-              (value.length < CATEGORIES_MIN || value.length > CATEGORIES_MAX)
+              (value.length < branding.category.min || value.length > branding.category.max)
             ) {
               return [new Error(this.$t('common.validations.categories'))]
             }

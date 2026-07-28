@@ -33,7 +33,7 @@
 import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import HcEditor from '~/components/Editor/Editor'
-import { COMMENT_MIN_LENGTH } from '~/constants/comment'
+import { branding } from '@ocelot-social/branding'
 import { minimisedUserQuery } from '~/graphql/User'
 import CommentMutations from '~/graphql/CommentMutations'
 
@@ -81,14 +81,10 @@ export default {
     updateEditorContent(value) {
       const sanitizedContent = this.$filters.removeHtml(value, false)
       if (!this.update) {
-        if (sanitizedContent.length < COMMENT_MIN_LENGTH) {
-          this.disabled = true
-        } else {
-          this.disabled = false
-        }
+        this.disabled = sanitizedContent.length < branding.comment.minLength
       } else {
         this.disabled =
-          value === this.comment.content || sanitizedContent.length < COMMENT_MIN_LENGTH
+          value === this.comment.content || sanitizedContent.length < branding.comment.minLength
       }
       this.form.content = value
     },

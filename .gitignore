@@ -17,7 +17,10 @@ cypress/videos
 cypress/screenshots/
 cypress/reports/
 cypress.env.json
-deployment/configurations/
+# Private brand configs stay untracked, but keep the directory itself (.gitkeep, see below) so the
+# Docker `--mount=type=bind,source=deployment/configurations` in the webapp/maintenance builds finds
+# its source dir even on a clean checkout (CI, vanilla build with BRAND="").
+deployment/configurations/*
 
 .vuepress/.cache/
 .vuepress/.temp/

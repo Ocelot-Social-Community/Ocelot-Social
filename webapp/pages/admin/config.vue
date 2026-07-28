@@ -416,7 +416,7 @@ export default {
 
   // A missing hard-requirement secret breaks its feature → flag the whole row.
   &--blocking {
-    background: rgba($color-danger, 0.07);
+    background: color-mix(in srgb, var(--color-danger) 7%, transparent);
 
     th.cell--key {
       border-left-color: $color-danger;
@@ -427,7 +427,8 @@ export default {
   // anchored row so the admin sees which env var the link pointed at. Placed after
   // --blocking so a highlighted row reads as the navigation target.
   &--highlight {
-    background: rgba($color-secondary, 0.1);
+    // $color-secondary is a runtime var() now; color-mix instead of Sass rgba() for the tint.
+    background: color-mix(in srgb, var(--color-secondary) 10%, transparent);
 
     th.cell--key {
       border-left-color: $color-secondary;

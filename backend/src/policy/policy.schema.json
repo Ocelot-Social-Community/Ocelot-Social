@@ -164,6 +164,20 @@
       "envSeed": "MAX_GROUP_PINNED_POSTS",
       "category": "features",
       "description": "Maximum number of posts that can be pinned within a group (0 disables pinning). Only relevant to logged-in users, so visible to 'authenticated' (and admin)."
+    },
+    "activeBranding": {
+      "type": "string",
+      "default": "",
+      "visibility": ["public"],
+      "category": "branding",
+      "description": "Id of the baked-in branding that is currently live (one of /branding/manifest.json). Empty string = framework defaults (vanilla). Switched via the dedicated admin Branding page (setActiveBranding, gated by branding.manage) rather than the generic policy editor, which only renders boolean/integer keys. Public so the SSR branding loader can read it before login."
+    },
+    "brandingComposition": {
+      "type": "string",
+      "default": "",
+      "visibility": ["public"],
+      "category": "branding",
+      "description": "Per-bucket branding composition, JSON-encoded object mapping a bucket slot (theme/identity/logos/legal/navigation/behavior) to a source string 'id[@version][/instance]'. Layered OVER activeBranding (the base for unspecified slots), so a network can run e.g. the theme of one brand with the identity of another. Empty string = no per-slot overrides (activeBranding alone). Set via setBrandingComposition (branding.manage); public so the SSR loader can read it before login."
     }
   }
 }

@@ -7,7 +7,7 @@
 import bcrypt from 'bcryptjs'
 import { v4 as uuid } from 'uuid'
 
-import registrationConstants from '@constants/registrationBranded'
+import { branding } from '@src/branding'
 
 import createPasswordReset from './helpers/createPasswordReset'
 import normalizeEmail from './helpers/normalizeEmail'
@@ -19,8 +19,12 @@ export default {
     requestPasswordReset: async (_parent, { email }, context: Context) => {
       const { driver } = context
       email = normalizeEmail(email)
-      // TODO: why this is generated differntly from 'backend/src/schema/resolvers/helpers/generateNonce.js'?
-      const nonce = uuid().substring(0, registrationConstants.NONCE_LENGTH)
+      // Password-reset nonce = a crypto-random uuid v4 substring ([0-9a-f], may include a '-').
+      // Deliberately NOT generateNonce(), which emits Math.random() DIGITS for the registration /
+      // email-change confirmation codes (registration.ts, emails.ts) — a different alphabet AND entropy
+      // source (crypto here vs Math.random there). Unifying both on a single crypto helper is a possible
+      // follow-up; kept separate for now so neither flow's token format or strength changes silently.
+      const nonce = uuid().substring(0, branding.registration.nonceLength)
       return createPasswordReset({ driver, nonce, email })
     },
     resetPassword: async (_parent, { email, nonce, newPassword }, { driver }) => {

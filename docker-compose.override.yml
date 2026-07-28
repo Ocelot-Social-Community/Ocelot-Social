@@ -12,6 +12,7 @@ services:
       - ./webapp:/app
       - ./packages/ui:/packages/ui
       - /packages/ui/node_modules
+      - ./packages/branding:/packages/branding
 
   backend:
     image: ghcr.io/ocelot-social-community/ocelot-social/backend:local-development
@@ -40,6 +41,7 @@ services:
       - PROXY_S3=http://minio:9000
     volumes:
       - ./backend:/app
+      - ./packages/branding:/packages/branding
 
   neo4j:
     ports:
@@ -109,6 +111,9 @@ services:
     ports:
       - "3001:3000"
     volumes:
+      # Hot-reload for vanilla maintenance dev. When baking a brand (uncomment the BRAND build arg in
+      # docker-compose.yml), COMMENT OUT the ./maintenance/app mount below too — otherwise the vanilla
+      # host sources shadow the baked branding.css / metadata.ts.
       - ./maintenance/app:/app/app
       - ./maintenance/nuxt.config.ts:/app/nuxt.config.ts
       - ./packages/ui:/packages/ui

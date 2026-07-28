@@ -10,7 +10,8 @@ services:
     image: ghcr.io/ocelot-social-community/ocelot-social/backend-base:${OCELOT_VERSION:-latest}
     build:
       target: base
-      context: backend
+      context: .
+      dockerfile: backend/Dockerfile
 
   maintenance:
     image: ghcr.io/ocelot-social-community/ocelot-social/maintenance-base:${OCELOT_VERSION:-latest}

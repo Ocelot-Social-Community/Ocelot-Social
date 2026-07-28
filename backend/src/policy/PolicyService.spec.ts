@@ -157,10 +157,12 @@ describe('PolicyService', () => {
 
   describe('getVisibleSnapshot()', () => {
     const ALL_KEYS = [
+      'activeBranding',
       'apiKeysEnabled',
       'apiKeysMaxPerUser',
       'askForRealName',
       'badgesEnabled',
+      'brandingComposition',
       'categoriesActive',
       'groupsEnabled',
       'inviteCodesGroupPerUser',

@@ -1,15 +1,24 @@
 import Vue from 'vue'
 import vuexI18n from 'vuex-i18n/dist/vuex-i18n.umd.js'
-import { isEmpty, find } from 'lodash'
+import { isEmpty, find, merge } from 'lodash'
+import { branding } from '@ocelot-social/branding'
 import locales from '~/locales'
 import htmlTranslations from '~/locales/html/'
 
 let fallbackLocale
 
-const registerTranslation = ({ Vue, locale }) => {
-  const translation = require(`~/locales/${locale}.json`)
+// Add a locale to i18n: base translation + its html strings + runtime brand locale overrides
+// (branding.locales[locale]) merged OVER the base. The ONE place both the initial load and the dynamic
+// language-switch load apply branding, so the two paths can't drift (a switch keeps the brand's texts).
+// The branding plugin runs before this one, so the injected config is already set — no rebuild.
+export const addTranslation = ({ i18n, locale, translation }) => {
   translation.html = htmlTranslations[locale] || htmlTranslations[fallbackLocale]
-  Vue.i18n.add(locale, translation)
+  const brandLocale = branding.locales[locale]
+  i18n.add(locale, brandLocale ? merge({}, translation, brandLocale) : translation)
+}
+
+const registerTranslation = ({ Vue, locale }) => {
+  addTranslation({ i18n: Vue.i18n, locale, translation: require(`~/locales/${locale}.json`) })
 }
 
 /**
@@ -47,9 +56,7 @@ export default ({ app, req, cookie, store }) => {
     })
     if (!app.$i18n.localeExists(localeInStore)) {
       import(`~/locales/${localeInStore}.json`).then((res) => {
-        const translation = res.default
-        translation.html = htmlTranslations[localeInStore] || htmlTranslations[fallbackLocale]
-        app.$i18n.add(localeInStore, translation)
+        addTranslation({ i18n: app.$i18n, locale: localeInStore, translation: res.default })
       })
     }
 

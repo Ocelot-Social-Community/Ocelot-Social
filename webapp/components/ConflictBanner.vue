@@ -56,7 +56,7 @@ export default {
   padding: $space-x-small $space-small;
   border-radius: $border-radius-base;
   border-left: 3px solid $color-warning;
-  background: rgba($color-warning, 0.14);
+  background: color-mix(in srgb, var(--color-warning) 14%, transparent);
   font-size: 0.9em;
 
   &__text {

@@ -33,6 +33,7 @@ export type PermissionKey =
   | 'videoCall.create_closed'
   | 'videoCall.create_hidden'
   | 'apiKey.create'
+  | 'branding.manage'
 
 // Grouping for the admin UI. Open string (the JSON is the source of truth); the
 // known groups today are 'administration' | 'moderation' | 'content' | 'membership'

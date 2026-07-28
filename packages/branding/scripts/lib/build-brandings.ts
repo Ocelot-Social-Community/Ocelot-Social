@@ -290,7 +290,12 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
     data: Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`),
   })
 
-  for (const sub of ['assets', 'html']) {
+  // Raw brand file trees packed verbatim into the archive for runtime consumers to extract:
+  //   assets/  served brand assets (logos, favicon, fonts, css) — namespaced /branding/<id>/…
+  //   html/    brand static-page HTML (per locale)
+  //   emails/  backend e-mail templates (pug) + locales, overlaid onto the defaults at bootstrap
+  //   public/  backend public assets (e.g. badge SVGs), overlaid onto the defaults at bootstrap
+  for (const sub of ['assets', 'html', 'emails', 'public']) {
     const src = join(dir, sub)
     if (existsSync(src)) collectFiles(src, sub, entries)
   }

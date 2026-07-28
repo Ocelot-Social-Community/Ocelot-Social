@@ -72,6 +72,7 @@ export const DEFAULT_ROLES: RoleDefinition[] = [
       'user.delete.any',
       'post.pin',
       'post.push',
+      'branding.manage',
     ],
   },
   {

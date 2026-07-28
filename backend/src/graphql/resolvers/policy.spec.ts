@@ -81,6 +81,9 @@ describe('Query.policy', () => {
         showContentFilterHeaderMenu: true,
         showContentFilterMasonryGrid: false,
         showGroupButtonInHeader: true,
+        // public string keys the SSR branding loader reads before login → visible, default '' (vanilla)
+        activeBranding: '',
+        brandingComposition: '',
         // authenticated-only keys → null for an anonymous viewer
         apiKeysEnabled: null,
         apiKeysMaxPerUser: null,

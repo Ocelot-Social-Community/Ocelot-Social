@@ -1,0 +1,9 @@
+# Root build context is now the repo root for BOTH webapp and backend (both need /packages/*).
+# Keep the context small and avoid copying host deps/artifacts (rebuilt inside the image).
+**/node_modules
+**/dist
+**/.nuxt
+**/coverage
+**/*.log
+.git
+.github

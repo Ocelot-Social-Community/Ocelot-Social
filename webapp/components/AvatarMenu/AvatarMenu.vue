@@ -184,7 +184,7 @@ export default {
     color: $text-color-danger;
     padding-top: $space-xx-small;
     &:hover {
-      color: color.adjust($text-color-danger, $lightness: -10%);
+      color: color-mix(in srgb, var(--color-danger), black 10%);
     }
   }
 }
