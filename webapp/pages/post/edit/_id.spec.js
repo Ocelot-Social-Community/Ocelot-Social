@@ -109,6 +109,24 @@ describe('post/edit/_id.vue', () => {
       wrapper = await buildWrapper({ query })
       expect(wrapper.vm.currentPostType).toBe('Article')
     })
+
+    it('defaults currentPostType to Article when postType is null', async () => {
+      asyncData = true
+      const query = jest.fn().mockResolvedValue({
+        data: { Post: [{ author: { id: authorId }, postType: null }] },
+      })
+      wrapper = await buildWrapper({ query })
+      expect(wrapper.vm.currentPostType).toBe('Article')
+    })
+
+    it('defaults currentPostType to Article when postType is undefined', async () => {
+      asyncData = true
+      const query = jest.fn().mockResolvedValue({
+        data: { Post: [{ author: { id: authorId }, postType: undefined }] },
+      })
+      wrapper = await buildWrapper({ query })
+      expect(wrapper.vm.currentPostType).toBe('Article')
+    })
   })
 
   describe('switchPostType', () => {

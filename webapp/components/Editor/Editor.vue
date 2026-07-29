@@ -136,7 +136,10 @@ export default {
       ],
       onUpdate: (e) => {
         clearTimeout(this._throttleTimer)
-        this._throttleTimer = setTimeout(() => this.onUpdate(e), 300)
+        this._throttleTimer = setTimeout(() => {
+          this._throttleTimer = undefined
+          this.onUpdate(e)
+        }, 300)
       },
       onBlur: () => {
         // Flush any pending throttled update immediately so formData is

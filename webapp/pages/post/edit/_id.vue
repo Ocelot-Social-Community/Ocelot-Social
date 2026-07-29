@@ -105,7 +105,7 @@ export default {
     if (contribution.author.id !== store.getters['auth/user'].id) {
       error({ statusCode: 403, message: 'error-pages.cannot-edit-post' })
     }
-    return { contribution, currentPostType: contribution.postType[0] || 'Article' }
+    return { contribution, currentPostType: contribution.postType?.[0] || 'Article' }
   },
   methods: {
     switchPostType(_event, item) {

@@ -179,6 +179,7 @@ export const queryLocations = async ({ place, lang, types, proximity }, context:
   const locationTypes =
     types
       ?.split(',')
+      .map((t) => t.trim())
       .filter((t) => ALLOWED_LOCATION_TYPES.includes(t))
       .join(',') || DEFAULT_LOCATION_TYPES
 

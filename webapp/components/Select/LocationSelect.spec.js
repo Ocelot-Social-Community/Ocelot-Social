@@ -145,8 +145,18 @@ describe('LocationSelect', () => {
   })
 
   describe('proximity from user store coordinates', () => {
+    let getCurrentPositionSpy
+    let originalGeolocation
+
     beforeEach(() => {
       queryMock.mockClear()
+      originalGeolocation = global.navigator.geolocation
+      getCurrentPositionSpy = jest.fn()
+      Object.defineProperty(global.navigator, 'geolocation', {
+        value: { getCurrentPosition: getCurrentPositionSpy },
+        writable: true,
+        configurable: true,
+      })
       wrapper = mount(LocationSelect, {
         mocks: {
           ...mocks,
@@ -156,6 +166,14 @@ describe('LocationSelect', () => {
         },
         localVue,
         propsData: { value: 'nowhere' },
+      })
+    })
+
+    afterEach(() => {
+      Object.defineProperty(global.navigator, 'geolocation', {
+        value: originalGeolocation,
+        writable: true,
+        configurable: true,
       })
     })
 
@@ -170,6 +188,10 @@ describe('LocationSelect', () => {
         },
         fetchPolicy: 'network-only',
       })
+    })
+
+    it('does not request browser geolocation when user coordinates are available', () => {
+      expect(getCurrentPositionSpy).not.toHaveBeenCalled()
     })
   })
 
@@ -208,6 +230,31 @@ describe('LocationSelect', () => {
           lang: 'en',
           types: 'region,place,country',
           proximity: '8.7,50.1',
+        },
+        fetchPolicy: 'network-only',
+      })
+    })
+
+    it('uses proximity: null when browser geolocation is denied', async () => {
+      Object.defineProperty(global.navigator, 'geolocation', {
+        value: {
+          getCurrentPosition: jest.fn((_success, error) => {
+            error({ code: 1, message: 'Permission denied' })
+          }),
+        },
+        writable: true,
+        configurable: true,
+      })
+      queryMock.mockClear()
+      const w = mount(LocationSelect, { mocks, localVue, propsData: { value: 'nowhere' } })
+      await w.vm.$nextTick()
+      expect(queryMock).toBeCalledWith({
+        query: queryLocations(),
+        variables: {
+          place: 'nowhere',
+          lang: 'en',
+          types: 'region,place,country',
+          proximity: null,
         },
         fetchPolicy: 'network-only',
       })
