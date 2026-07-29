@@ -36,5 +36,5 @@ type LocationMapBox {
 
 type Query {
   "Search for places via the MapBox geocoder, to attach a location to a profile, group or event. Public."
-  queryLocations(place: String!, lang: String!, types: String): [LocationMapBox]!
+  queryLocations(place: String!, lang: String!, types: String, proximity: String): [LocationMapBox]!
 }

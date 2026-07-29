@@ -36,7 +36,7 @@
       </div>
     </div>
     <transition name="ds-input-error">
-      <div class="ds-input-error" v-show="!!error">
+      <div class="ds-input-error" v-show="!!error && !hideError">
         {{ error }}
       </div>
     </transition>
@@ -133,6 +133,10 @@ export default {
       type: String,
       default: null,
     },
+    hideError: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -218,6 +222,7 @@ export default {
     },
     handleBlur() {
       this.focus = false
+      this.$emit('blur')
     },
   },
 }

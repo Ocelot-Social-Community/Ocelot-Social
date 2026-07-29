@@ -478,12 +478,16 @@
     "takeAction": "Podejmij działania",
     "user": "Użytkownik ::: Użytkownicy",
     "validations": {
-      "categories": "należy wybrać co najmniej jeden i maksymalnie trzy tematy",
-      "email": "musi być ważny adres e-mail.",
-      "eventLocationNameLength": "minimum {min} lub maksimum {max} znaków",
-      "eventLocationNameNotEmpty": "same puste znaki nie są dozwolone",
-      "eventVenueLength": "minimum {min} lub maksimum {max} znaków",
-      "eventVenueNotEmpty": "same puste znaki nie są dozwolone",
+      "categories": "Proszę wybrać od jednego do trzech tematów.",
+      "contentNotEmpty": "Proszę podać treść.",
+      "email": "Proszę podać prawidłowy adres e-mail.",
+      "eventLocationNameLength": "Adres musi mieć od {min} do {max} znaków.",
+      "eventLocationNameNotEmpty": "Proszę podać adres.",
+      "eventVenueLength": "Opis miejsca musi mieć od {min} do {max} znaków.",
+      "eventVenueNotEmpty": "Proszę podać opis miejsca.",
+      "formHasErrors": "Proszę wypełnić wszystkie wymagane pola.",
+      "titleLength": "Tytuł musi mieć od {min} do {max} znaków.",
+      "titleNotEmpty": "Proszę podać tytuł.",
       "url": "musi być poprawnym adresem URL"
     },
     "versus": "werset"
@@ -931,7 +935,8 @@
     "save": "Utwórz nową grupę",
     "showMembers": "Lista członków widoczna dla wszystkich",
     "teaser": {
-      "openGroup": "Otwórz grupę"
+      "openGroup": "Otwórz grupę",
+      "unavailable": "Grupa niedostępna"
     },
     "type": "Widoczność grupy",
     "types": {
@@ -1182,6 +1187,7 @@
     "deniedHint": "Nie masz do tego uprawnień."
   },
   "post": {
+    "article": "Artykuł",
     "comment": {
       "joinGroup": "Dołączył/a do grupy „<b>{name}</b>“",
       "noPermission": "Komentowanie nie jest włączone dla Twojej roli.",
@@ -1202,7 +1208,7 @@
       "forGroup": {
         "title": "Dla grupy "
       },
-      "title": "Edytuj swój wpis"
+      "title": "Edytuj swój artykuł"
     },
     "event": "Wydarzenie",
     "menu": {
@@ -1226,7 +1232,6 @@
       "unpush": "Anuluj wypchnięcie",
       "unpushedSuccessfully": "Wypchnięcie wpisu zostało anulowane!"
     },
-    "name": "Poczta",
     "pinned": "Ogłoszenie",
     "sensitiveContent": {
       "hide": "Ukryj wrażliwą treść",
@@ -1237,9 +1242,13 @@
     },
     "viewEvent": {
       "eventEnd": "Koniec",
+      "eventEndBeforeStart": "Data zakończenia musi być późniejsza niż data rozpoczęcia.",
       "eventIsOnline": "Online",
       "eventLocationName": "Adres do nawigacji — np. Przykładowa 1, 00-000 Miasto",
+      "eventLocationRequired": "Jeśli wydarzenie nie jest online, należy podać lokalizację.",
       "eventStart": "Początek",
+      "eventStartInPast": "Data rozpoczęcia jest w przeszłości.",
+      "eventStartNotEmpty": "Proszę podać datę rozpoczęcia.",
       "eventVenue": "Opis lokalizacji — np. podwórko, 1. piętro, …",
       "title": "Wydarzenie"
     },

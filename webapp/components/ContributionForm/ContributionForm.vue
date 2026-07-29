@@ -32,37 +32,41 @@
             name="title"
             autofocus
             size="large"
+            hide-error
+            @blur="dirtyFields.title && touchField('title')"
           />
-          <os-badge
-            role="status"
-            aria-live="polite"
-            :variant="formErrors && formErrors.title ? 'danger' : undefined"
-          >
-            {{ formData.title.length }}/{{ formSchema.title.max }}
-            <os-icon v-if="formErrors && formErrors.title" :icon="icons.warning" />
-          </os-badge>
-          <editor
-            :users="users"
-            :value="formData.content"
-            :hashtags="hashtags"
-            @input="updateEditorContent"
+          <validation-hint
+            :count="formData.title.length"
+            :max="formSchema.title.max"
+            :variant="visibleErrors && visibleErrors.title ? 'error' : null"
+            :text="titleErrorText"
           />
-          <os-badge
-            role="status"
-            aria-live="polite"
-            :variant="formErrors && formErrors.content ? 'danger' : undefined"
-          >
-            {{ contentLength }}
-            <os-icon v-if="formErrors && formErrors.content" :icon="icons.warning" />
-          </os-badge>
+          <div :class="{ 'ds-input-has-error': visibleErrors && visibleErrors.content }">
+            <editor
+              :users="users"
+              :value="formData.content"
+              :hashtags="hashtags"
+              @input="updateEditorContent"
+              @blur.native.capture="dirtyFields.content && touchField('content')"
+            />
+          </div>
+          <validation-hint
+            :count="contentLength"
+            :variant="visibleErrors && visibleErrors.content ? 'error' : null"
+            :text="
+              visibleErrors && visibleErrors.content
+                ? $t('common.validations.contentNotEmpty')
+                : null
+            "
+          />
 
-          <!-- Eventdata -->
-          <div v-if="createEvent" class="eventDatas">
+          <!-- event data -->
+          <div v-if="postType === 'Event'" class="eventData">
             <hr />
             <div class="ds-mt-x-small ds-mb-large"></div>
             <div class="ds-grid event-date-grid">
               <div class="event-grid-item">
-                <!-- <label>Beginn</label> -->
+                <!-- <label>Begin</label> -->
                 <date-picker
                   name="eventStart"
                   v-model="formData.eventStart"
@@ -71,27 +75,13 @@
                   :minute-step="15"
                   format="DD.MM.YYYY HH:mm"
                   :placeholder="$t('post.viewEvent.eventStart')"
-                  :disabled-date="notBeforeToday"
-                  :disabled-time="notBeforeNow"
+                  :class="{ 'mx-datepicker-error': visibleErrors && visibleErrors.eventStart }"
                   :show-second="false"
                   @change="changeEventStart($event)"
                 ></date-picker>
-                <div
-                  v-if="formErrors && formErrors.eventStart"
-                  class="chipbox event-grid-item-margin-helper"
-                >
-                  <os-badge
-                    role="alert"
-                    aria-live="assertive"
-                    :variant="formErrors && formErrors.eventStart ? 'danger' : undefined"
-                  >
-                    <os-icon :icon="icons.warning" />
-                  </os-badge>
-                </div>
               </div>
               <div class="event-grid-item">
-                <!-- <label>Ende (optional)</label> -->
-
+                <!-- <label>End (optional)</label> -->
                 <date-picker
                   v-model="formData.eventEnd"
                   name="eventEnd"
@@ -101,12 +91,34 @@
                   :seconds-step="0"
                   format="DD.MM.YYYY HH:mm"
                   :placeholder="$t('post.viewEvent.eventEnd')"
-                  class="event-grid-item-font-helper"
-                  :disabled-date="notBeforeEventDay"
-                  :disabled-time="notBeforeEvent"
+                  :class="[
+                    'event-grid-item-font-helper',
+                    { 'mx-datepicker-error': visibleErrors && visibleErrors.eventEnd },
+                  ]"
                   :show-second="false"
                   @change="changeEventEnd($event)"
                 ></date-picker>
+              </div>
+            </div>
+            <div class="event-date-hints-zone">
+              <div class="event-date-hint-cell">
+                <validation-hint
+                  v-if="visibleErrors && visibleErrors.eventStart"
+                  variant="error"
+                  :text="$t('post.viewEvent.eventStartNotEmpty')"
+                />
+                <validation-hint
+                  v-else-if="eventStartIsInPast"
+                  variant="warning"
+                  :text="$t('post.viewEvent.eventStartInPast')"
+                />
+              </div>
+              <div class="event-date-hint-cell">
+                <validation-hint
+                  v-if="visibleErrors && visibleErrors.eventEnd"
+                  variant="error"
+                  :text="$t('post.viewEvent.eventEndBeforeStart')"
+                />
               </div>
             </div>
             <div class="ds-grid event-location-grid">
@@ -115,47 +127,55 @@
                   model="eventVenue"
                   name="eventVenue"
                   :placeholder="$t('post.viewEvent.eventVenue')"
+                  hide-error
+                  @blur="dirtyFields.eventVenue && touchField('eventVenue')"
                 />
-                <div class="chipbox">
-                  <os-badge
-                    role="status"
-                    aria-live="polite"
-                    :variant="formErrors && formErrors.eventVenue ? 'danger' : undefined"
-                  >
-                    {{ formData.eventVenue.length }}/{{ formSchema.eventVenue.max }}
-                    <os-icon v-if="formErrors && formErrors.eventVenue" :icon="icons.warning" />
-                  </os-badge>
+                <validation-hint
+                  :count="formData.eventVenue.length"
+                  :max="formSchema.eventVenue.max"
+                  :variant="visibleErrors && visibleErrors.eventVenue ? 'error' : null"
+                  :text="venueErrorText"
+                />
+              </div>
+              <div class="event-grid-item">
+                <div
+                  :class="{
+                    'ds-input-has-error':
+                      !locationSelectDisabled && visibleErrors && visibleErrors.eventLocationName,
+                  }"
+                >
+                  <location-select
+                    v-model="formData.eventLocationName"
+                    types="country,region,postcode,district,place,locality,neighborhood,address,poi"
+                    :show-previous-location="false"
+                    :show-label="false"
+                    :placeholder="$t('post.viewEvent.eventLocationName')"
+                    :disabled="locationSelectDisabled"
+                    @input="
+                      touchField('eventLocationName')
+                      $validateForm()
+                    "
+                  />
+                  <validation-hint
+                    v-if="
+                      !locationSelectDisabled && visibleErrors && visibleErrors.eventLocationName
+                    "
+                    variant="error"
+                    :text="$t('post.viewEvent.eventLocationRequired')"
+                  />
+                </div>
+                <div class="event-online-checkbox">
+                  <input
+                    type="checkbox"
+                    v-model="formData.eventIsOnline"
+                    model="eventIsOnline"
+                    name="eventIsOnline"
+                    class="event-grid-item-font-helper"
+                    @change="changeEventIsOnline($event)"
+                  />
+                  {{ $t('post.viewEvent.eventIsOnline') }}
                 </div>
               </div>
-              <div v-if="showEventLocationName" class="event-grid-item">
-                <location-select
-                  v-model="formData.eventLocationName"
-                  types="region,place,country,address"
-                  :show-previous-location="false"
-                  :show-label="false"
-                  :placeholder="$t('post.viewEvent.eventLocationName')"
-                />
-                <os-badge
-                  v-if="formErrors && formErrors.eventLocationName"
-                  role="status"
-                  aria-live="polite"
-                  variant="danger"
-                >
-                  <os-icon :icon="icons.warning" />
-                </os-badge>
-              </div>
-            </div>
-
-            <div>
-              <input
-                type="checkbox"
-                v-model="formData.eventIsOnline"
-                model="eventIsOnline"
-                name="eventIsOnline"
-                class="event-grid-item-font-helper"
-                @change="changeEventIsOnline($event)"
-              />
-              {{ $t('post.viewEvent.eventIsOnline') }}
             </div>
           </div>
           <div class="ds-mt-x-small ds-mb-large"></div>
@@ -164,15 +184,17 @@
             model="categoryIds"
             :existingCategoryIds="formData.categoryIds"
           />
-          <os-badge
+          <validation-hint
             v-if="categoriesActive"
-            role="status"
-            aria-live="polite"
-            :variant="formErrors && formErrors.categoryIds ? 'danger' : undefined"
-          >
-            {{ formData.categoryIds.length }} / 3
-            <os-icon v-if="formErrors && formErrors.categoryIds" :icon="icons.warning" />
-          </os-badge>
+            :count="formData.categoryIds.length"
+            :max="3"
+            :variant="visibleErrors && visibleErrors.categoryIds ? 'error' : null"
+            :text="
+              visibleErrors && visibleErrors.categoryIds
+                ? $t('common.validations.categories')
+                : null
+            "
+          />
           <div class="ds-flex ds-flex-gap-xxx-small buttons-footer">
             <div style="flex: 3.5 0 0" class="buttons-footer-helper">
               <!-- TODO => remove v-html! only text ! no html! security first! -->
@@ -198,7 +220,6 @@
                 appearance="filled"
                 type="submit"
                 :loading="loading"
-                :disabled="!!formErrors"
                 :class="{ 'permission-denied': !contribution.id && !$can('post.create') }"
                 :aria-disabled="!contribution.id && !$can('post.create')"
                 v-tooltip="{
@@ -219,7 +240,7 @@
   </div>
 </template>
 <script>
-import { OsBadge, OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import gql from 'graphql-tag'
 import { mapGetters } from 'vuex'
@@ -235,6 +256,7 @@ import GetCategories from '~/mixins/getCategoriesMixin.js'
 import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 import LocationSelect from '~/components/Select/LocationSelect'
+import ValidationHint from '~/components/ValidationHint/ValidationHint.vue'
 
 export default {
   mixins: [GetCategories, formValidation],
@@ -243,13 +265,13 @@ export default {
     DatePicker,
     Editor,
     ImageUploader,
-    OsBadge,
     OsButton,
     OsCard,
     OsIcon,
     PageParamsLink,
     OcelotInput,
     LocationSelect,
+    ValidationHint,
   },
   props: {
     contribution: {
@@ -260,9 +282,10 @@ export default {
       type: Object,
       default: () => null,
     },
-    createEvent: {
-      type: Boolean,
-      default: false,
+    postType: {
+      type: String,
+      default: 'Article',
+      validator: (v) => ['Article', 'Event'].includes(v),
     },
     // When provided, the form uses this object as its source of truth (by reference).
     // Lets callers hoist form state so it survives remounts (e.g. type switch).
@@ -271,7 +294,6 @@ export default {
       default: null,
     },
   },
-
   data() {
     return {
       links,
@@ -294,8 +316,27 @@ export default {
     }),
     formSchema() {
       return {
-        title: { required: true, min: 3, max: 100 },
-        content: { required: true },
+        title: {
+          max: 100,
+          validator: (_, value = '') => {
+            if (!value.trim()) {
+              return [new Error(this.$t('common.validations.titleNotEmpty'))]
+            }
+            if (value.trim().length < 3 || value.trim().length > 100) {
+              return [new Error(this.$t('common.validations.titleLength', { min: 3, max: 100 }))]
+            }
+            return []
+          },
+        },
+        content: {
+          validator: (_, value, callback) => {
+            if (!value || this.$filters.removeHtml(value).trim().length === 0) {
+              callback(new Error(this.$t('common.validations.contentNotEmpty')))
+              return
+            }
+            callback()
+          },
+        },
         imageBlurred: { required: false },
         categoryIds: {
           type: 'array',
@@ -307,17 +348,40 @@ export default {
             return []
           },
         },
-        eventStart: { required: !!this.createEvent },
+        eventStart: {
+          validator: (_, value, callback) => {
+            if (this.postType === 'Event' && !value) {
+              callback(new Error(this.$t('post.viewEvent.eventStartNotEmpty')))
+              return
+            }
+            callback()
+          },
+        },
+        eventEnd: {
+          validator: (_, value, callback) => {
+            if (this.postType !== 'Event' || !value || !this.formData.eventStart) {
+              callback()
+              return
+            }
+            if (new Date(value) <= new Date(this.formData.eventStart)) {
+              callback(new Error(this.$t('post.viewEvent.eventEndBeforeStart')))
+              return
+            }
+            callback()
+          },
+        },
         eventVenue: {
-          required: !!this.createEvent,
+          required: this.postType === 'Event' && !this.formData.eventIsOnline,
           min: 3,
           max: 100,
           validator: (_, value = '') => {
-            if (!this.createEvent) return []
-            if (!value.trim()) {
+            if (this.postType !== 'Event') return []
+            if (this.formData.eventIsOnline) return []
+            const trimmed = value.trim()
+            if (!trimmed) {
               return [new Error(this.$t('common.validations.eventVenueNotEmpty'))]
             }
-            if (value.length < 3 || value.length > 100) {
+            if (trimmed.length < 3 || trimmed.length > 100) {
               return [
                 new Error(this.$t('common.validations.eventVenueLength', { min: 3, max: 100 })),
               ]
@@ -326,12 +390,12 @@ export default {
           },
         },
         eventLocationName: {
-          required: !!this.createEvent && !this.formData.eventIsOnline,
+          required: this.postType === 'Event' && !this.formData.eventIsOnline,
           validator: (_, value = '') => {
-            if (!this.createEvent) return []
+            if (this.postType !== 'Event') return []
             if (this.formData.eventIsOnline) return []
-            const name = typeof value === 'object' ? value?.value : value
-            if (!name?.trim()) {
+            const name = (typeof value === 'object' ? value?.value : value)?.trim() ?? ''
+            if (!name) {
               return [new Error(this.$t('common.validations.eventLocationNameNotEmpty'))]
             }
             if (name.length < 3 || name.length > 100) {
@@ -346,8 +410,15 @@ export default {
         },
       }
     },
+    eventStartIsInPast() {
+      return (
+        this.postType === 'Event' &&
+        this.formData.eventStart &&
+        new Date(this.formData.eventStart) < new Date()
+      )
+    },
     eventInput() {
-      if (this.createEvent) {
+      if (this.postType === 'Event') {
         return {
           eventStart: new Date(this.formData.eventStart).toISOString(),
           eventVenue: this.formData.eventVenue,
@@ -362,6 +433,21 @@ export default {
     },
     contentLength() {
       return this.$filters.removeHtml(this.formData.content).length
+    },
+    titleErrorText() {
+      if (!this.visibleErrors?.title) return null
+      return !this.formData.title.trim()
+        ? this.$t('common.validations.titleNotEmpty')
+        : this.$t('common.validations.titleLength', { min: 3, max: this.formSchema.title.max })
+    },
+    venueErrorText() {
+      if (!this.visibleErrors?.eventVenue) return null
+      return !this.formData.eventVenue.trim()
+        ? this.$t('common.validations.eventVenueNotEmpty')
+        : this.$t('common.validations.eventVenueLength', {
+            min: 3,
+            max: this.formSchema.eventVenue.max,
+          })
     },
     groupId() {
       // formData.groupId (from the create-flow draft) is the authoritative
@@ -379,8 +465,8 @@ export default {
     groupCategories() {
       return this.group && this.group.categories
     },
-    showEventLocationName() {
-      return !this.formData.eventIsOnline
+    locationSelectDisabled() {
+      return this.formData.eventIsOnline
     },
   },
   watch: {
@@ -391,7 +477,9 @@ export default {
     // Re-validate when the schema-shaping inputs change so newly-required
     // fields (e.g. eventStart when switching to "event") surface errors
     // immediately rather than hiding behind a stale "green" state.
-    createEvent() {
+    postType() {
+      this.touchedFields = {}
+      this.submitAttempted = false
       this.$validateForm()
     },
     groupId() {
@@ -437,28 +525,14 @@ export default {
         eventIsOnline: eventIsOnline || false,
       }
     },
-    notBeforeToday(date) {
-      return date < new Date().setHours(0, 0, 0, 0)
-    },
-    notBeforeNow(date) {
-      return date < new Date()
-    },
-    notBeforeEventDay(date) {
-      return date < new Date(this.formData.eventStart).setHours(0, 0, 0, 0)
-    },
-    notBeforeEvent(date) {
-      return date <= new Date(this.formData.eventStart)
-    },
     onSubmit() {
-      // Block creating a post without permission (editing stays allowed). The button is
-      // grayed (permission-denied + aria-disabled + tooltip); this also guards keyboard
-      // Enter and direct navigation. Surface the reason via a toast instead of a silent
-      // no-op so a click/Enter isn't swallowed without feedback.
       if (!this.contribution.id && !this.$can('post.create')) {
         this.$toast.error(this.$t('permissions.deniedHint'))
         return
       }
-      this.formSubmit(this.submit)
+      this.formSubmit(this.submit, () => {
+        this.$toast.error(this.$t('common.validations.formHasErrors'))
+      })
     },
     submit() {
       let image = null
@@ -486,7 +560,7 @@ export default {
             id: this.contribution.id || null,
             image,
             groupId: this.groupId,
-            postType: !this.createEvent ? 'Article' : 'Event',
+            postType: this.postType,
             eventInput: this.eventInput,
           },
         })
@@ -512,10 +586,13 @@ export default {
       this.updateFormField('eventIsOnline', this.formData.eventIsOnline)
     },
     changeEventEnd(event) {
+      this.touchField('eventEnd')
       this.updateFormField('eventEnd', event)
     },
     changeEventStart(event) {
-      this.updateFormField('eventStart', event)
+      this.touchField('eventStart')
+      this.$set(this.formData, 'eventStart', event)
+      this.$validateForm()
     },
     addHeroImage(file) {
       this.formData.image = null
@@ -574,7 +651,20 @@ export default {
 </script>
 
 <style lang="scss">
-.eventDatas {
+.eventData {
+  .event-date-hints-zone {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-small;
+    height: $space-base;
+    align-items: center;
+    margin-bottom: $space-x-small;
+
+    .validation-hint {
+      margin-top: 0;
+    }
+  }
+
   .chipbox {
     display: flex;
     justify-content: flex-end;
@@ -590,8 +680,20 @@ export default {
     gap: $space-small;
   }
 
+  .event-location-grid .validation-hint {
+    margin-top: 3px;
+  }
+
+  .event-online-checkbox {
+    margin-top: $space-x-small;
+  }
+
   .event-grid-item {
     grid-row-end: span 3;
+
+    > .ds-form-item {
+      margin-bottom: 0;
+    }
   }
   .event-grid-item-margin-helper {
     margin-top: 10px;
@@ -631,6 +733,12 @@ export default {
     > .os-badge {
       align-self: flex-end;
       margin: $space-xx-small 0 $space-base;
+      cursor: default;
+    }
+
+    > .validation-hint {
+      align-self: flex-end;
+      margin: 3px 0 $space-base;
       cursor: default;
     }
 
@@ -704,19 +812,19 @@ export default {
     font-size: 1rem;
     height: calc(1.625rem + 18px);
     padding: 8px 8px;
-    background-color: #faf9fa;
-    border-color: #c8c8c8;
-    color: #4b4554;
+    background-color: $background-color-soft;
+    border-color: $border-color-softer;
+    color: $text-color-base;
   }
   .mx-datepicker input:hover {
-    border-color: #c8c8c8;
+    border-color: $border-color-softer;
   }
   .mx-datepicker input:focus {
-    border-color: #17b53f;
-    background-color: #fff;
+    border-color: $border-color-active;
+    background-color: $background-color-base;
   }
-  .mx-datepicker-error {
-    border-color: #cf2619;
+  .mx-datepicker-error input {
+    border-color: $color-danger;
   }
 }
 </style>

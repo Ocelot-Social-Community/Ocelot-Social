@@ -478,12 +478,16 @@
     "takeAction": "Passer à l'action",
     "user": "Utilisateur ::: Utilisateurs",
     "validations": {
-      "categories": "au moins une et au maximum trois catégories doivent être sélectionnées",
-      "email": "Doit être une adresse mail valide",
-      "eventLocationNameLength": "minimum {min} ou maximum {max} caractères",
-      "eventLocationNameNotEmpty": "les caractères vides uniquement ne sont pas autorisés",
-      "eventVenueLength": "minimum {min} ou maximum {max} caractères",
-      "eventVenueNotEmpty": "les caractères vides uniquement ne sont pas autorisés",
+      "categories": "Veuillez sélectionner entre un et trois sujets.",
+      "contentNotEmpty": "Veuillez saisir du contenu.",
+      "email": "Veuillez saisir une adresse e-mail valide.",
+      "eventLocationNameLength": "L'adresse doit comporter entre {min} et {max} caractères.",
+      "eventLocationNameNotEmpty": "Veuillez saisir une adresse.",
+      "eventVenueLength": "La description du lieu doit comporter entre {min} et {max} caractères.",
+      "eventVenueNotEmpty": "Veuillez saisir une description du lieu.",
+      "formHasErrors": "Veuillez remplir tous les champs obligatoires.",
+      "titleLength": "Le titre doit comporter entre {min} et {max} caractères.",
+      "titleNotEmpty": "Veuillez saisir un titre.",
       "url": "doit être une URL valide"
     },
     "versus": "Versus"
@@ -931,7 +935,8 @@
     "save": "Créer un nouveau groupe",
     "showMembers": "Liste des membres visible par tous",
     "teaser": {
-      "openGroup": "Ouvrir le groupe"
+      "openGroup": "Ouvrir le groupe",
+      "unavailable": "Groupe non disponible"
     },
     "type": "Visibilité du groupe",
     "types": {
@@ -1182,6 +1187,7 @@
     "deniedHint": "Vous n'avez pas la permission pour cela."
   },
   "post": {
+    "article": "Article",
     "comment": {
       "joinGroup": "A rejoint le groupe „<b>{name}</b>“",
       "noPermission": "Les commentaires ne sont pas activés pour votre rôle.",
@@ -1202,7 +1208,7 @@
       "forGroup": {
         "title": "Pour le groupe "
       },
-      "title": "Modifier ta publication"
+      "title": "Modifier ton article"
     },
     "event": "Événement",
     "menu": {
@@ -1226,7 +1232,6 @@
       "unpush": "Annuler la remontée",
       "unpushedSuccessfully": "La remontée de la publication a été annulée !"
     },
-    "name": "Post",
     "pinned": "Annonce",
     "sensitiveContent": {
       "hide": "Masquer le contenu sensible",
@@ -1237,9 +1242,13 @@
     },
     "viewEvent": {
       "eventEnd": "Fin",
+      "eventEndBeforeStart": "La date de fin doit être postérieure à la date de début.",
       "eventIsOnline": "En ligne",
       "eventLocationName": "Adresse pour navigation — p. ex. Rue Exemple 1, 12345 Ville",
+      "eventLocationRequired": "Si l'événement n'est pas en ligne, une adresse doit être saisie.",
       "eventStart": "Début",
+      "eventStartInPast": "La date de début est dans le passé.",
+      "eventStartNotEmpty": "Veuillez saisir une date de début.",
       "eventVenue": "Description du lieu — p. ex. cour arrière, 1er étage, …",
       "title": "Événement"
     },

@@ -162,7 +162,7 @@ export const createOrUpdateLocations = async (
   })
 }
 
-const ALLOWED_LOCATION_TYPES = new Set([
+const ALLOWED_LOCATION_TYPES = [
   'country',
   'region',
   'postcode',
@@ -172,27 +172,33 @@ const ALLOWED_LOCATION_TYPES = new Set([
   'neighborhood',
   'address',
   'poi',
-])
-const DEFAULT_LOCATION_TYPES = 'region,place,country'
+]
+const DEFAULT_LOCATION_TYPES = 'country,region,place,address'
 
-export const queryLocations = async ({ place, lang, types }, context: Context) => {
-  const safeTypes = types
-    ? types
-        .split(',')
-        .map((t: string) => t.trim())
-        .filter((t: string) => ALLOWED_LOCATION_TYPES.has(t))
-        .join(',') || DEFAULT_LOCATION_TYPES
-    : DEFAULT_LOCATION_TYPES
-  const res: any = await fetch(
-    `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(place)}.json?access_token=${context.config.MAPBOX_TOKEN}&types=${safeTypes}&language=${encodeURIComponent(lang)}`,
-    {
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT),
-    },
-  )
-  const response = await res.json()
-  // Return empty array if no location found or error occurred
-  if (!response?.features) {
-    return []
+export const queryLocations = async ({ place, lang, types, proximity }, context: Context) => {
+  const locationTypes =
+    types
+      ?.split(',')
+      .map((t) => t.trim())
+      .filter((t) => ALLOWED_LOCATION_TYPES.includes(t))
+      .join(',') || DEFAULT_LOCATION_TYPES
+
+  let url =
+    `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(place)}.json` +
+    `?access_token=${context.config.MAPBOX_TOKEN}&types=${locationTypes}&language=${encodeURIComponent(lang)}&limit=10`
+
+  if (proximity) {
+    url += `&proximity=${encodeURIComponent(proximity)}`
   }
-  return response.features
+
+  const res: any = await fetch(url, {
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT),
+  })
+  const response = await res.json()
+  return (
+    response?.features?.map((item: any) => ({
+      place_name: item.place_name,
+      id: item.id,
+    })) ?? []
+  )
 }

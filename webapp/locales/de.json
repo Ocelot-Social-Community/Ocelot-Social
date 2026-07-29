@@ -478,12 +478,16 @@
     "takeAction": "Aktiv werden",
     "user": "Nutzer ::: Nutzer",
     "validations": {
-      "categories": "es müssen eine bis drei Themen ausgewählt werden",
-      "email": "muss eine gültige E-Mail-Adresse sein",
-      "eventLocationNameLength": "Minimum {min}, Maximum {max} Zeichen",
-      "eventLocationNameNotEmpty": "es dürfen nicht nur Freizeichen eingetragen werden",
-      "eventVenueLength": "Minimum {min}, Maximum {max} Zeichen",
-      "eventVenueNotEmpty": "es dürfen nicht nur Freizeichen eingetragen werden",
+      "categories": "Bitte ein bis drei Themen auswählen.",
+      "contentNotEmpty": "Bitte einen Inhalt eingeben.",
+      "email": "Bitte eine gültige E-Mail-Adresse eingeben.",
+      "eventLocationNameLength": "Die Adresse muss zwischen {min} und {max} Zeichen lang sein.",
+      "eventLocationNameNotEmpty": "Bitte eine Adresse eingeben.",
+      "eventVenueLength": "Die Ortsbeschreibung muss zwischen {min} und {max} Zeichen lang sein.",
+      "eventVenueNotEmpty": "Bitte eine Ortsbeschreibung eingeben.",
+      "formHasErrors": "Bitte alle Pflichtfelder ausfüllen.",
+      "titleLength": "Der Titel muss zwischen {min} und {max} Zeichen lang sein.",
+      "titleNotEmpty": "Bitte einen Titel eingeben.",
       "url": "muss eine gültige URL sein"
     },
     "versus": "Versus"
@@ -931,7 +935,8 @@
     "save": "Neue Gruppe anlegen",
     "showMembers": "Mitgliederliste für alle sichtbar",
     "teaser": {
-      "openGroup": "Gruppe öffnen"
+      "openGroup": "Gruppe öffnen",
+      "unavailable": "Gruppe nicht mehr verfügbar"
     },
     "type": "Öffentlichkeit der Gruppe",
     "types": {
@@ -1159,7 +1164,7 @@
     "reason": {
       "changed_group_member_role": "Hat deine Rolle in der Gruppe geändert",
       "commented_on_post": "Hat einen Beitrag den du beobachtest kommentiert",
-      "followed_user_posted": "Hat einen neuen Betrag geschrieben",
+      "followed_user_posted": "Hat einen neuen Beitrag geschrieben",
       "mentioned_in_comment": "Hat dich in einem Kommentar erwähnt",
       "mentioned_in_post": "Hat dich in einem Beitrag erwähnt",
       "on_date": "am",
@@ -1182,6 +1187,7 @@
     "deniedHint": "Dir fehlt die Berechtigung dafür."
   },
   "post": {
+    "article": "Artikel",
     "comment": {
       "joinGroup": "Gruppe „<b>{name}</b>“ beigetreten",
       "noPermission": "Kommentieren ist für deine Rolle nicht freigeschaltet.",
@@ -1191,7 +1197,7 @@
       "updated": "Änderungen gespeichert"
     },
     "createNewArticle": {
-      "title": "Erstelle einen Beitrag"
+      "title": "Erstelle einen Artikel"
     },
     "createNewEvent": {
       "title": "Erstelle eine Veranstaltung"
@@ -1202,7 +1208,7 @@
       "forGroup": {
         "title": "Für die Gruppe "
       },
-      "title": "Bearbeite deinen Beitrag"
+      "title": "Bearbeite deinen Artikel"
     },
     "event": "Veranstaltung",
     "menu": {
@@ -1226,7 +1232,6 @@
       "unpush": "Beitrag hochschieben aufheben",
       "unpushedSuccessfully": "Hochschieben des Beitrags erfolgreich rückgängig gemacht!"
     },
-    "name": "Beitrag",
     "pinned": "Meldung",
     "sensitiveContent": {
       "hide": "Sensiblen Inhalt verbergen",
@@ -1237,9 +1242,13 @@
     },
     "viewEvent": {
       "eventEnd": "Ende",
+      "eventEndBeforeStart": "Das Enddatum muss nach dem Startdatum liegen.",
       "eventIsOnline": "Online",
       "eventLocationName": "Adresse für Navi — z.B. Musterstraße 1, 12345 Musterstadt",
+      "eventLocationRequired": "Wenn nicht online, ist eine Adresse erforderlich.",
       "eventStart": "Beginn",
+      "eventStartInPast": "Der Starttermin liegt in der Vergangenheit.",
+      "eventStartNotEmpty": "Bitte ein Startdatum angeben.",
       "eventVenue": "Ortsbeschreibung — z.B. Hinterhof, 1. OG, …",
       "title": "Veranstaltung"
     },

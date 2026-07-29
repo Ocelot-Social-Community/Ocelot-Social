@@ -478,12 +478,16 @@
     "takeAction": "Merr masa",
     "user": "Përdorues ::: Përdorues",
     "validations": {
-      "categories": "duhet të zgjidhet të paktën një dhe maksimumi tre tema",
-      "email": "duhet të jetë një adresë e vlefshme e-maili",
-      "eventLocationNameLength": "minimumi {min} ose maksimumi {max} karaktere",
-      "eventLocationNameNotEmpty": "vetëm karaktere boshe nuk lejohen",
-      "eventVenueLength": "minimumi {min} ose maksimumi {max} karaktere",
-      "eventVenueNotEmpty": "vetëm karaktere boshe nuk lejohen",
+      "categories": "Ju lutem zgjidhni midis një dhe tre temave.",
+      "contentNotEmpty": "Ju lutem shkruani përmbajtje.",
+      "email": "Ju lutem shkruani një adresë e-mail të vlefshme.",
+      "eventLocationNameLength": "Adresa duhet të ketë midis {min} dhe {max} karaktere.",
+      "eventLocationNameNotEmpty": "Ju lutem shkruani një adresë.",
+      "eventVenueLength": "Përshkrimi i vendit duhet të ketë midis {min} dhe {max} karaktere.",
+      "eventVenueNotEmpty": "Ju lutem shkruani një përshkrim të vendit.",
+      "formHasErrors": "Ju lutem plotësoni të gjitha fushat e detyrueshme.",
+      "titleLength": "Titulli duhet të ketë midis {min} dhe {max} karaktere.",
+      "titleNotEmpty": "Ju lutem shkruani një titull.",
       "url": "duhet të jetë një URL e vlefshme"
     },
     "versus": "Kundër"
@@ -931,7 +935,8 @@
     "save": "Krijo grup të ri",
     "showMembers": "Lista e anëtarëve e dukshme për të gjithë",
     "teaser": {
-      "openGroup": "Hap grupin"
+      "openGroup": "Hap grupin",
+      "unavailable": "Grupi nuk është më i disponueshëm"
     },
     "type": "Dukshmëria e grupit",
     "types": {
@@ -1182,6 +1187,7 @@
     "deniedHint": "Nuk ke leje për këtë."
   },
   "post": {
+    "article": "Artikull",
     "comment": {
       "joinGroup": "U bashkua me grupin „<b>{name}</b>“",
       "noPermission": "Komentimi nuk është aktivizuar për rolin tënd.",
@@ -1202,7 +1208,7 @@
       "forGroup": {
         "title": "Për grupin "
       },
-      "title": "Ndrysho postimin tënd"
+      "title": "Ndrysho artikullin tënd"
     },
     "event": "Ngjarje",
     "menu": {
@@ -1226,7 +1232,6 @@
       "unpush": "Anulo shtytjen",
       "unpushedSuccessfully": "Shtytja e postimit u anulua!"
     },
-    "name": "Artikull",
     "pinned": "Njoftim",
     "sensitiveContent": {
       "hide": "Fshih përmbajtjen e ndjeshme",
@@ -1237,9 +1242,13 @@
     },
     "viewEvent": {
       "eventEnd": "Fundi",
+      "eventEndBeforeStart": "Data e mbarimit duhet të jetë pas datës së fillimit.",
       "eventIsOnline": "Online",
       "eventLocationName": "Adresa për navigim — p.sh. Rruga Shembull 1, 12345 Qytet",
+      "eventLocationRequired": "Nëse ngjarja nuk është online, duhet të futet një vendndodhje.",
       "eventStart": "Fillimi",
+      "eventStartInPast": "Data e fillimit është në të kaluarën.",
+      "eventStartNotEmpty": "Ju lutem shkruani një datë fillimi.",
       "eventVenue": "Përshkrimi i vendndodhjes — p.sh. oborri, kati 1, …",
       "title": "Ngjarje"
     },

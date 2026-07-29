@@ -478,12 +478,16 @@
     "takeAction": "Agire",
     "user": "Utente ::: Utenti",
     "validations": {
-      "categories": "deve essere selezionato almeno uno e al massimo tre argomenti",
-      "email": "deve essere un indirizzo e-mail valido",
-      "eventLocationNameLength": "minimo {min} o massimo {max} caratteri",
-      "eventLocationNameNotEmpty": "solo caratteri vuoti non sono ammessi",
-      "eventVenueLength": "minimo {min} o massimo {max} caratteri",
-      "eventVenueNotEmpty": "solo caratteri vuoti non sono ammessi",
+      "categories": "Selezionare tra uno e tre argomenti.",
+      "contentNotEmpty": "Inserire del contenuto.",
+      "email": "Inserire un indirizzo e-mail valido.",
+      "eventLocationNameLength": "L'indirizzo deve essere compreso tra {min} e {max} caratteri.",
+      "eventLocationNameNotEmpty": "Inserire un indirizzo.",
+      "eventVenueLength": "La descrizione del luogo deve essere compresa tra {min} e {max} caratteri.",
+      "eventVenueNotEmpty": "Inserire una descrizione del luogo.",
+      "formHasErrors": "Si prega di compilare tutti i campi obbligatori.",
+      "titleLength": "Il titolo deve essere compreso tra {min} e {max} caratteri.",
+      "titleNotEmpty": "Inserire un titolo.",
       "url": "deve essere un URL valido"
     },
     "versus": "Verso"
@@ -931,7 +935,8 @@
     "save": "Crea nuovo gruppo",
     "showMembers": "Elenco membri visibile a tutti",
     "teaser": {
-      "openGroup": "Apri gruppo"
+      "openGroup": "Apri gruppo",
+      "unavailable": "Gruppo non disponibile"
     },
     "type": "Visibilità del gruppo",
     "types": {
@@ -1182,6 +1187,7 @@
     "deniedHint": "Non hai il permesso per questo."
   },
   "post": {
+    "article": "Articolo",
     "comment": {
       "joinGroup": "Si è unito al gruppo „<b>{name}</b>“",
       "noPermission": "I commenti non sono abilitati per il tuo ruolo.",
@@ -1202,7 +1208,7 @@
       "forGroup": {
         "title": "Per il gruppo "
       },
-      "title": "Modifica la tua pubblicazione"
+      "title": "Modifica il tuo articolo"
     },
     "event": "Evento",
     "menu": {
@@ -1226,7 +1232,6 @@
       "unpush": "Annulla la spinta",
       "unpushedSuccessfully": "La spinta della pubblicazione è stata annullata!"
     },
-    "name": "Messaggio",
     "pinned": "Annuncio",
     "sensitiveContent": {
       "hide": "Nascondi contenuto sensibile",
@@ -1237,9 +1242,13 @@
     },
     "viewEvent": {
       "eventEnd": "Fine",
+      "eventEndBeforeStart": "La data di fine deve essere successiva alla data di inizio.",
       "eventIsOnline": "Online",
       "eventLocationName": "Indirizzo per la navigazione — es. Via Esempio 1, 12345 Città",
+      "eventLocationRequired": "Se l'evento non è online, è necessario inserire una posizione.",
       "eventStart": "Inizio",
+      "eventStartInPast": "La data di inizio è nel passato.",
+      "eventStartNotEmpty": "Inserire una data di inizio.",
       "eventVenue": "Descrizione del luogo — es. cortile, 1° piano, …",
       "title": "Evento"
     },

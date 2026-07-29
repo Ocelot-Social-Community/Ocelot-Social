@@ -4,15 +4,21 @@
       {{ `${$t('settings.data.labelCity')}` + locationNameLabelAddOnOldName }}
     </label>
     <ocelot-select
+      ref="select"
       id="city"
       v-model="currentValue"
       :options="cities"
       icon="map-marker"
       :icon-right="null"
+      :prefill-on-open="true"
       :placeholder="placeholder !== null ? placeholder : $t('settings.data.labelCity') + ' …'"
+      :disabled="disabled"
       @input.native="handleCityInput"
     >
-      <template v-if="(locationName !== '' && canBeCleared) || loadingGeo" #icon-right>
+      <template
+        v-if="((locationName !== '' && canBeCleared) || loadingGeo) && !disabled"
+        #icon-right
+      >
         <os-button
           data-test="clear-location-button"
           variant="primary"
@@ -69,11 +75,28 @@ export default {
       required: false,
       default: true,
     },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   async created() {
     this.icons = iconRegistry
     this._cityQueryId = 0
+    this._proximityPromise = null
     await this.resolveLocalizedLocation()
+  },
+  mounted() {
+    this.$watch(
+      () => this.$refs.select && this.$refs.select.isOpen,
+      (isOpen) => {
+        if (isOpen) this.onSelectOpen()
+      },
+    )
+  },
+  beforeDestroy() {
+    clearTimeout(this.debounceTimeout)
   },
   data() {
     return {
@@ -92,6 +115,17 @@ export default {
     },
     currentLocale() {
       return this.$store && this.$store.state.i18n && this.$store.state.i18n.locale
+    },
+    userProximity() {
+      const loc =
+        this.$store &&
+        this.$store.state.auth &&
+        this.$store.state.auth.user &&
+        this.$store.state.auth.user.location
+      if (loc && loc.lng != null && loc.lat != null) {
+        return `${loc.lng},${loc.lat}`
+      }
+      return null
     },
   },
   watch: {
@@ -142,6 +176,33 @@ export default {
 
       return result
     },
+    getProximityFromBrowser() {
+      return new Promise((resolve) => {
+        if (typeof navigator === 'undefined' || !navigator.geolocation) {
+          resolve(null)
+          return
+        }
+        let resolved = false
+        const fallbackTimer = setTimeout(() => {
+          if (!resolved) {
+            resolved = true
+            resolve(null)
+          }
+        }, 3000)
+        const done = (value) => {
+          if (!resolved) {
+            resolved = true
+            clearTimeout(fallbackTimer)
+            resolve(value)
+          }
+        }
+        navigator.geolocation.getCurrentPosition(
+          (pos) => done(`${pos.coords.longitude},${pos.coords.latitude}`),
+          () => done(null),
+          { timeout: 3000, maximumAge: 300000 },
+        )
+      })
+    },
     async requestGeoData(value) {
       if (value === '') {
         this.cities = []
@@ -153,14 +214,17 @@ export default {
       try {
         this.loadingGeo = true
 
-        const place = encodeURIComponent(value)
         const lang = this.$i18n.locale()
+        if (!this.userProximity && !this._proximityPromise) {
+          this._proximityPromise = this.getProximityFromBrowser()
+        }
+        const proximity = this.userProximity || (await this._proximityPromise)
 
         const {
           data: { queryLocations: result },
         } = await this.$apollo.query({
           query: queryLocations(),
-          variables: { place, lang, types: this.types },
+          variables: { place: value, lang, types: this.types, proximity },
           fetchPolicy: 'network-only',
         })
 
@@ -182,6 +246,11 @@ export default {
       this.$nextTick(() => {
         this.currentValue = result || (this.cities.length ? this.cities[0] : this.locationName)
       })
+    },
+    onSelectOpen() {
+      if (this.locationName && !this.cities.some((c) => c.value === this.locationName)) {
+        this.requestGeoData(this.locationName)
+      }
     },
     clearLocationName() {
       this.currentValue = ''

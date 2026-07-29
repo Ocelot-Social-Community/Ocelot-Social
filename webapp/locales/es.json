@@ -478,12 +478,16 @@
     "takeAction": "Tomar acción",
     "user": "Usuario ::: Usuarios",
     "validations": {
-      "categories": "deben seleccionarse al menos una y como máximo tres categorías",
-      "email": "debe ser una dirección de correo electrónico válida",
-      "eventLocationNameLength": "mínimo {min} o máximo {max} caracteres",
-      "eventLocationNameNotEmpty": "no se permiten solo caracteres vacíos",
-      "eventVenueLength": "mínimo {min} o máximo {max} caracteres",
-      "eventVenueNotEmpty": "no se permiten solo caracteres vacíos",
+      "categories": "Por favor, seleccione entre uno y tres temas.",
+      "contentNotEmpty": "Por favor, ingrese algún contenido.",
+      "email": "Por favor, ingrese una dirección de correo electrónico válida.",
+      "eventLocationNameLength": "La dirección debe tener entre {min} y {max} caracteres.",
+      "eventLocationNameNotEmpty": "Por favor, ingrese una dirección.",
+      "eventVenueLength": "La descripción del lugar debe tener entre {min} y {max} caracteres.",
+      "eventVenueNotEmpty": "Por favor, ingrese una descripción del lugar.",
+      "formHasErrors": "Por favor, rellene todos los campos obligatorios.",
+      "titleLength": "El título debe tener entre {min} y {max} caracteres.",
+      "titleNotEmpty": "Por favor, ingrese un título.",
       "url": "debe ser una URL válida"
     },
     "versus": "Versus"
@@ -931,7 +935,8 @@
     "save": "Crear nuevo grupo",
     "showMembers": "Lista de miembros visible para todos",
     "teaser": {
-      "openGroup": "Abrir grupo"
+      "openGroup": "Abrir grupo",
+      "unavailable": "Grupo no disponible"
     },
     "type": "Visibilidad del grupo",
     "types": {
@@ -1182,6 +1187,7 @@
     "deniedHint": "No tienes permiso para esto."
   },
   "post": {
+    "article": "Artículo",
     "comment": {
       "joinGroup": "Se unió al grupo „<b>{name}</b>“",
       "noPermission": "Los comentarios no están habilitados para tu rol.",
@@ -1202,7 +1208,7 @@
       "forGroup": {
         "title": "Para el grupo "
       },
-      "title": "Editar tu publicación"
+      "title": "Editar tu artículo"
     },
     "event": "Evento",
     "menu": {
@@ -1226,7 +1232,6 @@
       "unpush": "Cancelar subida",
       "unpushedSuccessfully": "¡La subida de la publicación ha sido cancelada!"
     },
-    "name": "Contribución",
     "pinned": "Anuncio",
     "sensitiveContent": {
       "hide": "Ocultar contenido sensible",
@@ -1237,9 +1242,13 @@
     },
     "viewEvent": {
       "eventEnd": "Fin",
+      "eventEndBeforeStart": "La fecha de finalización debe ser posterior a la fecha de inicio.",
       "eventIsOnline": "En línea",
       "eventLocationName": "Dirección para navegación — p. ej. Calle Ejemplo 1, 12345 Ciudad",
+      "eventLocationRequired": "Si el evento no es en línea, se debe ingresar una ubicación.",
       "eventStart": "Inicio",
+      "eventStartInPast": "La fecha de inicio está en el pasado.",
+      "eventStartNotEmpty": "Por favor, introduzca una fecha de inicio.",
       "eventVenue": "Descripción del lugar — p. ej. patio trasero, 1er piso, …",
       "title": "Evento"
     },
