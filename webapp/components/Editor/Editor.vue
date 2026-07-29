@@ -42,8 +42,6 @@ import ContextMenu from './ContextMenu'
 import SuggestionList from './SuggestionList'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
-let throttleInputEvent
-
 export default {
   components: {
     ContextMenu,
@@ -124,6 +122,7 @@ export default {
     },
   },
   mounted() {
+    this._throttleTimer = undefined
     this.editor = new Editor({
       content: this.value || '',
       doc: this.doc,
@@ -136,21 +135,22 @@ export default {
         new History(),
       ],
       onUpdate: (e) => {
-        clearTimeout(throttleInputEvent)
-        throttleInputEvent = setTimeout(() => this.onUpdate(e), 300)
+        clearTimeout(this._throttleTimer)
+        this._throttleTimer = setTimeout(() => this.onUpdate(e), 300)
       },
       onBlur: () => {
         // Flush any pending throttled update immediately so formData is
         // in sync before the form validates on submit.
-        if (throttleInputEvent !== undefined) {
-          clearTimeout(throttleInputEvent)
-          throttleInputEvent = undefined
+        if (this._throttleTimer !== undefined) {
+          clearTimeout(this._throttleTimer)
+          this._throttleTimer = undefined
           this.$emit('input', this.editor.getHTML())
         }
       },
     })
   },
   beforeDestroy() {
+    clearTimeout(this._throttleTimer)
     this.editor.destroy()
   },
   methods: {

@@ -1,13 +1,13 @@
 <template>
-  <div v-if="hasContent" class="validation-hint" :class="rootClasses">
+  <div
+    v-if="hasContent"
+    class="validation-hint"
+    :class="rootClasses"
+    :role="variant ? 'alert' : null"
+    :aria-live="variant ? 'assertive' : 'polite'"
+  >
     <p v-if="text" class="validation-hint__text">{{ text }}</p>
-    <os-badge
-      v-if="hasCount || variant"
-      :variant="badgeVariant"
-      :class="badgeClasses"
-      :role="variant ? 'alert' : null"
-      :aria-live="variant ? 'assertive' : 'polite'"
-    >
+    <os-badge v-if="hasCount || variant" :variant="badgeVariant" :class="badgeClasses">
       <span v-if="hasCount">
         {{ count }}
         <template v-if="max != null">/ {{ max }}</template>

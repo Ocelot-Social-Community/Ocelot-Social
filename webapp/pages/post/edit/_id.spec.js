@@ -65,9 +65,11 @@ describe('post/edit/_id.vue', () => {
         return { ...data, ...aData }
       }
     }
-    const w = mount(_id, { store, mocks, localVue, stubs })
-    if (originalData !== undefined) _id.data = originalData
-    return w
+    try {
+      return mount(_id, { store, mocks, localVue, stubs })
+    } finally {
+      if (originalData !== undefined) _id.data = originalData
+    }
   }
 
   describe('mount', () => {

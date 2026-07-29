@@ -176,12 +176,11 @@ const ALLOWED_LOCATION_TYPES = [
 const DEFAULT_LOCATION_TYPES = 'country,region,place,address'
 
 export const queryLocations = async ({ place, lang, types, proximity }, context: Context) => {
-  const locationTypes = types
-    ? types
-        .split(',')
-        .filter((t) => ALLOWED_LOCATION_TYPES.includes(t))
-        .join(',')
-    : DEFAULT_LOCATION_TYPES
+  const locationTypes =
+    types
+      ?.split(',')
+      .filter((t) => ALLOWED_LOCATION_TYPES.includes(t))
+      .join(',') || DEFAULT_LOCATION_TYPES
 
   let url =
     `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(place)}.json` +

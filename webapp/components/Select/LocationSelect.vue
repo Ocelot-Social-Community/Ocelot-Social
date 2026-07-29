@@ -81,6 +81,7 @@ export default {
   async created() {
     this.icons = iconRegistry
     this._cityQueryId = 0
+    this._proximityPromise = null
     await this.resolveLocalizedLocation()
   },
   mounted() {
@@ -174,7 +175,7 @@ export default {
     },
     getProximityFromBrowser() {
       return new Promise((resolve) => {
-        if (!navigator.geolocation) {
+        if (typeof navigator === 'undefined' || !navigator.geolocation) {
           resolve(null)
           return
         }
@@ -211,7 +212,10 @@ export default {
         this.loadingGeo = true
 
         const lang = this.$i18n.locale()
-        const proximity = this.userProximity || (await this.getProximityFromBrowser())
+        if (!this._proximityPromise) {
+          this._proximityPromise = this.getProximityFromBrowser()
+        }
+        const proximity = this.userProximity || (await this._proximityPromise)
 
         const {
           data: { queryLocations: result },

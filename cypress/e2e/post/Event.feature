@@ -34,7 +34,7 @@ Feature: Event posts
       """
       Join us for our online community meetup.
       """
-    And I enter the date "15.08.2026 10:00" in the event start date picker
+    And I enter a future date in the event start date picker
     And I check the online event checkbox
     And I click on "save button"
     Then I am on page "/post/.*/community-meetup-online"
@@ -44,6 +44,6 @@ Feature: Event posts
     Given location search returns "Köln, Deutschland" for "Köln"
     When I navigate to page "/post/create/event"
     And I type "Köln" in the location search field
-    And I wait for 600 milliseconds
+    And I wait for the location search results
     And I select "Köln, Deutschland" from the location dropdown
     Then I see "Köln, Deutschland" selected in the location field
