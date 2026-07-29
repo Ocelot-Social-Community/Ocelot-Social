@@ -197,8 +197,8 @@ describe('Location Service', () => {
   it('passes proximity to the Mapbox URL when provided', async () => {
     variables = { place: 'Berlin', lang: 'en', proximity: '10.0,53.55' }
     await query({ query: queryLocations, variables })
-    const calledUrl = decodeURIComponent(fetchSpy.mock.calls[0][0] as string)
-    expect(calledUrl).toContain('proximity=10.0,53.55')
+    const calledUrl = fetchSpy.mock.calls[0][0] as string
+    expect(calledUrl).toContain(`proximity=${encodeURIComponent(variables.proximity as string)}`)
   })
 
   it('encodes place names with umlauts exactly once in the Mapbox URL', async () => {

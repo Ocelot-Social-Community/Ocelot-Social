@@ -143,4 +143,73 @@ describe('LocationSelect', () => {
       })
     })
   })
+
+  describe('proximity from user store coordinates', () => {
+    beforeEach(() => {
+      queryMock.mockClear()
+      wrapper = mount(LocationSelect, {
+        mocks: {
+          ...mocks,
+          $store: {
+            state: { auth: { user: { location: { lng: 13.4, lat: 52.5 } } } },
+          },
+        },
+        localVue,
+        propsData: { value: 'nowhere' },
+      })
+    })
+
+    it('passes user coordinates as proximity to the apollo query', () => {
+      expect(queryMock).toBeCalledWith({
+        query: queryLocations(),
+        variables: {
+          place: 'nowhere',
+          lang: 'en',
+          types: 'region,place,country',
+          proximity: '13.4,52.5',
+        },
+        fetchPolicy: 'network-only',
+      })
+    })
+  })
+
+  describe('proximity from browser geolocation', () => {
+    let originalGeolocation
+
+    beforeEach(() => {
+      queryMock.mockClear()
+      originalGeolocation = global.navigator.geolocation
+      Object.defineProperty(global.navigator, 'geolocation', {
+        value: {
+          getCurrentPosition: jest.fn((success) => {
+            success({ coords: { longitude: 8.7, latitude: 50.1 } })
+          }),
+        },
+        writable: true,
+        configurable: true,
+      })
+      wrapper = mount(LocationSelect, { mocks, localVue, propsData: { value: 'nowhere' } })
+    })
+
+    afterEach(() => {
+      Object.defineProperty(global.navigator, 'geolocation', {
+        value: originalGeolocation,
+        writable: true,
+        configurable: true,
+      })
+    })
+
+    it('passes browser geolocation coordinates as proximity to the apollo query', () => {
+      expect(queryMock).toBeCalledWith({
+        query: queryLocations(),
+        variables: {
+          place: 'nowhere',
+          lang: 'en',
+          types: 'region,place,country',
+          proximity: '8.7,50.1',
+        },
+        fetchPolicy: 'network-only',
+      })
+    })
+  })
 })

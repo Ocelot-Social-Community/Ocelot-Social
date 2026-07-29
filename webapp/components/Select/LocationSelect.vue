@@ -15,7 +15,10 @@
       :disabled="disabled"
       @input.native="handleCityInput"
     >
-      <template v-if="(locationName !== '' && canBeCleared) || loadingGeo" #icon-right>
+      <template
+        v-if="((locationName !== '' && canBeCleared) || loadingGeo) && !disabled"
+        #icon-right
+      >
         <os-button
           data-test="clear-location-button"
           variant="primary"
@@ -212,7 +215,7 @@ export default {
         this.loadingGeo = true
 
         const lang = this.$i18n.locale()
-        if (!this._proximityPromise) {
+        if (!this.userProximity && !this._proximityPromise) {
           this._proximityPromise = this.getProximityFromBrowser()
         }
         const proximity = this.userProximity || (await this._proximityPromise)
