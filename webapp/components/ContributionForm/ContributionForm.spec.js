@@ -476,10 +476,7 @@ describe('ContributionForm.vue', () => {
         await wrapper.vm.updateEditorContent(postContent)
         expect(wrapper.vm.formErrors).toBeNull()
 
-        wrapper.setProps({ postType: 'Event' })
-        // async-validator resolves via microtasks; flush Vue's reactive tick
-        // and the validator promise queue.
-        await wrapper.vm.$nextTick()
+        await wrapper.setProps({ postType: 'Event' })
         await Promise.resolve()
 
         expect(wrapper.vm.formErrors).not.toBeNull()

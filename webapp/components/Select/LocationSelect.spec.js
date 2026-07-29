@@ -199,7 +199,8 @@ describe('LocationSelect', () => {
       })
     })
 
-    it('passes browser geolocation coordinates as proximity to the apollo query', () => {
+    it('passes browser geolocation coordinates as proximity to the apollo query', async () => {
+      await wrapper.vm.$nextTick()
       expect(queryMock).toBeCalledWith({
         query: queryLocations(),
         variables: {

@@ -103,6 +103,6 @@ export default {
 
 .validation-hint__badge--warning {
   --color-default: #{$color-warning};
-  --color-default-contrast: white;
+  --color-default-contrast: #{$color-neutral-100};
 }
 </style>

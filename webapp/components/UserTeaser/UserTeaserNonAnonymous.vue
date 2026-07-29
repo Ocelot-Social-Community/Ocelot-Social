@@ -188,7 +188,7 @@ export default {
     },
     cancelAndCloseGroup(closeMenu) {
       this.groupPopoverPending = false
-      closeMenu(true)
+      closeMenu(false)
     },
   },
 }

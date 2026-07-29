@@ -79,13 +79,13 @@ describe('UserTeaserNonAnonymous', () => {
   })
 
   describe('cancelAndCloseGroup()', () => {
-    it('resets groupPopoverPending and calls closeMenu(true)', () => {
+    it('resets groupPopoverPending and calls closeMenu(false)', () => {
       const wrapper = Wrapper({ groupProp: group })
       wrapper.vm.groupPopoverPending = true
       const closeMenu = jest.fn()
       wrapper.vm.cancelAndCloseGroup(closeMenu)
       expect(wrapper.vm.groupPopoverPending).toBe(false)
-      expect(closeMenu).toHaveBeenCalledWith(true)
+      expect(closeMenu).toHaveBeenCalledWith(false)
     })
   })
 
