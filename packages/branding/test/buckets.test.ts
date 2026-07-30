@@ -176,6 +176,13 @@ test('isValidBrandId accepts brand ids and rejects anything that could escape a 
   assert.equal(isValidBrandId('../etc/passwd'), false)
   assert.equal(isValidBrandId('acme/dark'), false)
   assert.equal(isValidBrandId('acme brand'), false)
+  // The two path segments that must never pass as a name — `join(dir, '..', x)` leaves `dir`.
+  assert.equal(isValidBrandId('.'), false)
+  assert.equal(isValidBrandId('..'), false)
+  // …while an id that merely CONTAINS or starts with dots stays valid (`stage.ocelot.social`).
+  assert.equal(isValidBrandId('stage.ocelot.social'), true)
+  assert.equal(isValidBrandId('...'), true)
+  assert.equal(isValidBrandId('.hidden'), true)
   assert.equal(isValidBrandId(''), false)
   assert.equal(isValidBrandId(undefined), false)
   assert.equal(isValidBrandId(42), false)

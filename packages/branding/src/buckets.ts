@@ -59,8 +59,15 @@ export function instanceFile(type: BucketName, name: string): string {
  * and archive sync) checks it against this pattern before use, so a `../` can never reach the
  * filesystem. Kept here — with parseSource, which extracts the id — so the guard has ONE definition
  * instead of a copy per consumer that a later tightening could miss.
+ *
+ * The leading lookahead rejects `.` and `..`, which the character class would otherwise accept. No
+ * brand is called that, and they are the two segments that must never be treated as a name: a consumer
+ * joining the id into a path (`join(dir, id, …)`) lands on `dir` itself with `.` and OUTSIDE it with
+ * `..`. Today's consumers all look the id up as a Map key and would merely miss, but a guard whose
+ * stated job is "this id cannot escape" has to hold for the next call site too, not just for the
+ * current ones.
  */
-export const BRAND_ID_PATTERN = /^[a-z0-9._-]+$/i
+export const BRAND_ID_PATTERN = /^(?!\.{1,2}$)[a-z0-9._-]+$/i
 
 /** Whether `id` is a well-formed brand id (see BRAND_ID_PATTERN). */
 export function isValidBrandId(id: unknown): id is string {
