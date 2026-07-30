@@ -24,52 +24,49 @@ const mockJsonResponse = (body: unknown) =>
     json: async () => Promise.resolve(body),
   }) as unknown as Response
 
-const berlinFeaturesEn = {
+// Mapbox mock responses for queryLocations
+const berlinMapboxEn = {
   features: [
-    { id: 'place.115770', place_name: 'Berlin, Germany', place_type: ['place'] },
+    { id: 'place.berlin-de', place_name: 'Berlin, Germany', place_type: ['place'] },
+    { id: 'place.berlin-md', place_name: 'Berlin, Maryland, United States', place_type: ['place'] },
     {
-      id: 'place.25995500',
-      place_name: 'Berlin, Maryland, United States',
-      place_type: ['place'],
-    },
-    {
-      id: 'place.26036460',
+      id: 'place.berlin-ct',
       place_name: 'Berlin, Connecticut, United States',
       place_type: ['place'],
     },
     {
-      id: 'place.500697324',
+      id: 'place.berlin-nj',
       place_name: 'Berlin, New Jersey, United States',
       place_type: ['place'],
     },
     {
-      id: 'place.25952876',
+      id: 'place.berlin-oh',
       place_name: 'Berlin Heights, Ohio, United States',
       place_type: ['place'],
     },
   ],
 }
 
-const berlinFeaturesDe = {
+const berlinMapboxDe = {
   features: [
-    { id: 'place.115770', place_name: 'Berlin, Deutschland', place_type: ['place'] },
+    { id: 'place.berlin-de', place_name: 'Berlin, Deutschland', place_type: ['place'] },
     {
-      id: 'place.25995500',
+      id: 'place.berlin-md',
       place_name: 'Berlin, Maryland, Vereinigte Staaten',
       place_type: ['place'],
     },
     {
-      id: 'place.500697324',
+      id: 'place.berlin-nj',
       place_name: 'Berlin, New Jersey, Vereinigte Staaten',
       place_type: ['place'],
     },
     {
-      id: 'place.25952876',
+      id: 'place.berlin-oh',
       place_name: 'Berlin Heights, Ohio, Vereinigte Staaten',
       place_type: ['place'],
     },
     {
-      id: 'place.25983916',
+      id: 'place.berlin-ma',
       place_name: 'Berlin, Massachusetts, Vereinigte Staaten',
       place_type: ['place'],
     },
@@ -163,13 +160,19 @@ beforeEach(() => {
   fetchSpy = jest.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
     const path = decodeURIComponent(url)
-    if (path.includes('/Berlin.json')) {
-      if (path.includes('language=de')) return Promise.resolve(mockJsonResponse(berlinFeaturesDe))
-      return Promise.resolve(mockJsonResponse(berlinFeaturesEn))
+
+    // Mapbox requests
+    if (path.includes('api.mapbox.com')) {
+      if (path.includes('Berlin')) {
+        if (path.includes('language=de')) return Promise.resolve(mockJsonResponse(berlinMapboxDe))
+        return Promise.resolve(mockJsonResponse(berlinMapboxEn))
+      }
+      if (path.includes('Welzheim')) {
+        return Promise.resolve(mockJsonResponse(welzheimFeature))
+      }
+      return Promise.resolve(mockJsonResponse({ features: [] }))
     }
-    if (path.includes('Welzheim')) {
-      return Promise.resolve(mockJsonResponse(welzheimFeature))
-    }
+
     // Unknown place — mimic Mapbox "no results"
     return Promise.resolve(mockJsonResponse({ features: [] }))
   })
@@ -189,6 +192,21 @@ describe('Location Service', () => {
       id: 'location-user',
     })
     authenticatedUser = await user.toJson()
+  })
+
+  it('passes proximity to the Mapbox URL when provided', async () => {
+    variables = { place: 'Berlin', lang: 'en', proximity: '10.0,53.55' }
+    await query({ query: queryLocations, variables })
+    const calledUrl = fetchSpy.mock.calls[0][0] as string
+    expect(calledUrl).toContain(`proximity=${encodeURIComponent(variables.proximity as string)}`)
+  })
+
+  it('encodes place names with umlauts exactly once in the Mapbox URL', async () => {
+    variables = { place: 'Köln', lang: 'en' }
+    await query({ query: queryLocations, variables })
+    const calledUrl = fetchSpy.mock.calls[0][0] as string
+    expect(calledUrl).toContain(encodeURIComponent('Köln')) // 'K%C3%B6ln'
+    expect(calledUrl).not.toContain(encodeURIComponent(encodeURIComponent('Köln'))) // not 'K%25C3%25B6ln'
   })
 
   it('query Location existing', async () => {

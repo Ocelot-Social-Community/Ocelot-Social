@@ -324,3 +324,29 @@ export const groupCountQuery = () => {
     }
   `
 }
+
+export const groupTeaserQuery = (i18n) => {
+  const lang = i18n ? i18n.locale().toUpperCase() : 'EN'
+  return gql`
+    ${location('Group', lang)}
+    ${imageUrls}
+
+    query ($id: ID!) {
+      Group(id: $id) {
+        id
+        name
+        slug
+        about
+        groupType
+        actionRadius
+        myRole
+        membersCount
+        postsCount
+        avatar {
+          ...imageUrls
+        }
+        ...locationOnGroup
+      }
+    }
+  `
+}

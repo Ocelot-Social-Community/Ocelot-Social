@@ -463,6 +463,10 @@ export const currentUserQuery = gql`
       roleName
       about
       locationName
+      location {
+        lat
+        lng
+      }
       locale
       allowEmbedIframes
       showShoutsPublicly

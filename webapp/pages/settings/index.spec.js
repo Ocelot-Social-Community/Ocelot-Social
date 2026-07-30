@@ -277,6 +277,7 @@ describe('index.vue', () => {
         wrapper.find('#city').setValue('Ber')
 
         jest.runAllTimers()
+        await flushPromises()
 
         expect(mocks.$apollo.query).toHaveBeenCalledWith(
           expect.objectContaining({

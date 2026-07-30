@@ -480,12 +480,16 @@
     "takeAction": "Take Action",
     "user": "User ::: Users",
     "validations": {
-      "categories": "at least one and at most three topics must be selected",
-      "email": "must be a valid e-mail address",
-      "eventLocationNameLength": "minimum {min} or maximum {max} characters",
-      "eventLocationNameNotEmpty": "only empty characters are not allowed",
-      "eventVenueLength": "minimum {min} or maximum {max} characters",
-      "eventVenueNotEmpty": "only empty characters are not allowed",
+      "categories": "Please select between one and three topics.",
+      "contentNotEmpty": "Please enter some content.",
+      "email": "Please enter a valid e-mail address.",
+      "eventLocationNameLength": "The address must be between {min} and {max} characters long.",
+      "eventLocationNameNotEmpty": "Please enter an address.",
+      "eventVenueLength": "The venue description must be between {min} and {max} characters long.",
+      "eventVenueNotEmpty": "Please enter a venue description.",
+      "formHasErrors": "Please fill in all required fields.",
+      "titleLength": "The title must be between {min} and {max} characters.",
+      "titleNotEmpty": "Please enter a title.",
       "url": "must be a valid URL"
     },
     "versus": "Versus"
@@ -933,7 +937,8 @@
     "save": "Create new group",
     "showMembers": "Member list visible to everyone",
     "teaser": {
-      "openGroup": "Open group"
+      "openGroup": "Open group",
+      "unavailable": "Group no longer available"
     },
     "type": "Visibility of the group",
     "types": {
@@ -1184,6 +1189,7 @@
     "deniedHint": "You don't have permission for this."
   },
   "post": {
+    "article": "Article",
     "comment": {
       "joinGroup": "Joined group „<b>{name}</b>“",
       "noPermission": "Commenting is not enabled for your role.",
@@ -1204,7 +1210,7 @@
       "forGroup": {
         "title": "For The Group "
       },
-      "title": "Edit Your Post"
+      "title": "Edit Your Article"
     },
     "event": "Event",
     "menu": {
@@ -1228,7 +1234,6 @@
       "unpush": "Cancel push",
       "unpushedSuccessfully": "Post push has been canceled!"
     },
-    "name": "Article",
     "pinned": "Announcement",
     "sensitiveContent": {
       "hide": "Hide sensitive content",
@@ -1239,9 +1244,13 @@
     },
     "viewEvent": {
       "eventEnd": "End",
+      "eventEndBeforeStart": "The end date must be after the start date.",
       "eventIsOnline": "Online",
-      "eventLocationName": "Adress for navi — e.g. Example Street 1, 12345 City",
+      "eventLocationName": "Address for navi — e.g. Example Street 1, 12345 City",
+      "eventLocationRequired": "If the event is not online, a location must be entered.",
       "eventStart": "Start",
+      "eventStartInPast": "The event start is in the past.",
+      "eventStartNotEmpty": "Please enter a start date.",
       "eventVenue": "Location description — e.g. backyard, 1st floor, …",
       "title": "Event"
     },

@@ -83,6 +83,9 @@ async function setupNodeEvents(on, config) {
       // Headless Chromium needs --autoplay-policy=no-user-gesture-required so
       // PreJoin's AudioContext can resume without a synthetic user gesture.
       launchOptions.args.push('--autoplay-policy=no-user-gesture-required')
+      // Force English locale so i18n-dependent assertions in feature files
+      // match English strings regardless of the host system language.
+      launchOptions.args.push('--lang=en-US')
     }
     return launchOptions
   })

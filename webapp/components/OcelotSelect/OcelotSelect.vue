@@ -201,6 +201,10 @@ export default {
       type: Boolean,
       default: true,
     },
+    prefillOnOpen: {
+      type: Boolean,
+      default: false,
+    },
     loading: {
       type: Boolean,
       default: false,
@@ -350,14 +354,19 @@ export default {
     openAndFocus() {
       if (this.isInteractionBlocked) return
       this.open()
-      if (this.autoResetSearch) this.resetSearch()
       if (!this.focus || this.multiple) {
         this.$refs.search.focus()
         this.handleFocus()
       }
     },
     open() {
-      if (this.autoResetSearch || this.multiple) this.resetSearch()
+      if (this.prefillOnOpen) {
+        this.searchString = this.innerValue
+          ? String(this.innerValue[this.labelProp] || this.innerValue)
+          : ''
+      } else if (this.autoResetSearch || this.multiple) {
+        this.resetSearch()
+      }
       this.isOpen = true
     },
     close() {

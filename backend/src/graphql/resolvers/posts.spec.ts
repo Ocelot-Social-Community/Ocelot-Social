@@ -378,7 +378,7 @@ describe('CreatePost', () => {
       })
 
       describe('with event start date in the past', () => {
-        it('throws an error', async () => {
+        it('is accepted', async () => {
           const now = new Date()
           await expect(
             mutate({
@@ -392,11 +392,8 @@ describe('CreatePost', () => {
               },
             }),
           ).resolves.toMatchObject({
-            errors: [
-              {
-                message: 'Event start date must be in the future!',
-              },
-            ],
+            data: { CreatePost: { postType: ['Event'] } },
+            errors: undefined,
           })
         })
       })
@@ -777,7 +774,7 @@ describe('UpdatePost', () => {
       })
 
       describe('with event start date in the past', () => {
-        it('throws an error', async () => {
+        it('is accepted', async () => {
           const now = new Date()
           await expect(
             mutate({
@@ -791,11 +788,8 @@ describe('UpdatePost', () => {
               },
             }),
           ).resolves.toMatchObject({
-            errors: [
-              {
-                message: 'Event start date must be in the future!',
-              },
-            ],
+            data: { UpdatePost: { postType: ['Event'] } },
+            errors: undefined,
           })
         })
       })
