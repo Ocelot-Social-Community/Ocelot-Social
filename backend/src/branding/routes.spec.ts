@@ -7,30 +7,26 @@ import { PassThrough, Readable } from 'node:stream'
 import { finished } from 'node:stream/promises'
 import { setImmediate as tick } from 'node:timers/promises'
 
-import { discoverArchives, readDefaultMarker } from '@ocelot-social/branding/dist/discover.js'
-
 import { brandingRouter } from './routes'
 
+import type { BrandingRouterDeps } from './routes'
 import type { Request, Response } from 'express'
 
-jest.mock(
-  '@ocelot-social/branding/dist/discover.js',
-  () => ({
-    discoverArchives: jest.fn(),
-    readDefaultMarker: jest.fn(),
-    // The id guard is pure and security-relevant — take the REAL one, so a tightening of
-    // BRAND_ID_PATTERN is exercised here instead of being shadowed by a stub.
-    isValidBrandId: jest.requireActual<{ isValidBrandId: (id: unknown) => boolean }>(
-      '@ocelot-social/branding/dist/buckets.js',
-    ).isValidBrandId,
-  }),
-  { virtual: true },
-)
 jest.mock('node:fs', () => ({ createReadStream: jest.fn() }))
 jest.mock('node:fs/promises', () => ({ stat: jest.fn() }))
 
-const mockDiscover = discoverArchives as jest.Mock
-const mockDefaultMarker = readDefaultMarker as jest.Mock
+// The two disk readers are INJECTED, not module-mocked. `@ocelot-social/branding/dist/discover.js` is
+// a subpath of a `file:` dependency, and whether jest bound a mock of it to routes.ts depended on the
+// environment: green here, silently ignored in the CI container, where the router then read the real
+// filesystem and every fixture-based expectation failed. Passing the fakes in removes the question.
+// The id guard is NOT faked — routes.ts keeps importing the real one, so a tightening of
+// BRAND_ID_PATTERN is exercised here instead of being shadowed by a stub.
+const mockDiscover = jest.fn() as jest.MockedFunction<BrandingRouterDeps['discoverArchives']>
+const mockDefaultMarker = jest.fn() as jest.MockedFunction<BrandingRouterDeps['readDefaultMarker']>
+const deps: BrandingRouterDeps = {
+  discoverArchives: mockDiscover,
+  readDefaultMarker: mockDefaultMarker,
+}
 const mockStat = stat as jest.Mock
 const mockCreateReadStream = createReadStream as jest.Mock
 
@@ -132,7 +128,7 @@ describe('branding/routes', () => {
       // eslint-disable-next-line n/no-process-env -- the ambient environment IS what this pins
       process.env.OCELOT_BRANDING_ASSETS_DIR = '/app/branding-assets'
 
-      const { res } = await call(brandingRouter(undefined), '/manifest.json')
+      const { res } = await call(brandingRouter(undefined, deps), '/manifest.json')
 
       expect(parseManifest(res.body)).toEqual({ default: '', brands: [] })
       expect(mockDiscover).not.toHaveBeenCalled()
@@ -144,18 +140,46 @@ describe('branding/routes', () => {
     // reaches the GraphQL middleware mounted at '/' (server.ts), which logs the poll as a malformed
     // operation — and the webapp reads the resulting HTTP 400 as a failed sync and retries forever.
     it('answers an empty manifest instead of falling through to the GraphQL handler', async () => {
-      const { res, next } = await call(brandingRouter(undefined), '/manifest.json')
+      const { res, next } = await call(brandingRouter(undefined, deps), '/manifest.json')
 
       expect(parseManifest(res.body)).toEqual({ default: '', brands: [] })
       expect(next).not.toHaveBeenCalled()
     })
 
     it('answers 404 for an archive instead of falling through', async () => {
-      const { res, next } = await call(brandingRouter(undefined), '/archives/stage')
+      const { res, next } = await call(brandingRouter(undefined, deps), '/archives/stage')
 
       expect(res.statusCode).toBe(404)
       expect(next).not.toHaveBeenCalled()
     })
+  })
+
+  // The injected fakes cover every other test, so the DEFAULTS — what production actually runs with —
+  // would otherwise never be exercised: a wrong import there would ship unnoticed.
+  it('falls back to the real disk readers when none are injected', async () => {
+    const { res, next } = await call(brandingRouter('/does-not-exist'), '/manifest.json')
+
+    // The real readers on a directory that is not there: no brands, no marker, and no throw.
+    expect(parseManifest(res.body)).toEqual({ default: '', brands: [] })
+    expect(next).not.toHaveBeenCalled()
+    expect(mockDiscover).not.toHaveBeenCalled() // the fakes are genuinely out of the picture
+  })
+
+  // A broken assets dir must degrade to "unknown brand", never to a 500.
+  it('answers 404 when discovery throws while resolving an archive', async () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+    mockDiscover.mockImplementation(() => {
+      throw new Error('EACCES')
+    })
+
+    const { res } = await call(brandingRouter('/brands', deps), '/archives/stage')
+
+    expect(res.statusCode).toBe(404)
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('cannot read /brands'),
+      expect.anything(),
+    )
+    warn.mockRestore()
   })
 
   // Same reason: nothing under /branding may reach the GraphQL handler behind it.
@@ -163,7 +187,7 @@ describe('branding/routes', () => {
     it.each(['/nope', '/archives', '/manifest.json/extra'])(
       'answers 404 for %p rather than handing it on',
       async (path) => {
-        const { res, next } = await call(brandingRouter('/brands'), path)
+        const { res, next } = await call(brandingRouter('/brands', deps), path)
 
         expect(res.statusCode).toBe(404)
         expect(next).not.toHaveBeenCalled()
@@ -173,7 +197,7 @@ describe('branding/routes', () => {
 
   describe('GET /manifest.json', () => {
     it('lists the discovered archives without leaking their file paths', async () => {
-      const { res } = await call(brandingRouter('/brands'), '/manifest.json')
+      const { res } = await call(brandingRouter('/brands', deps), '/manifest.json')
 
       expect(parseManifest(res.body)).toEqual({
         default: 'stage',
@@ -188,7 +212,7 @@ describe('branding/routes', () => {
     it('carries the baked default so a client knows which brand to activate', async () => {
       mockDefaultMarker.mockReturnValue('stage')
 
-      const { res } = await call(brandingRouter('/brands'), '/manifest.json')
+      const { res } = await call(brandingRouter('/brands', deps), '/manifest.json')
 
       expect(parseManifest(res.body).default).toBe('stage')
       expect(mockDefaultMarker).toHaveBeenCalledWith('/brands')
@@ -197,7 +221,7 @@ describe('branding/routes', () => {
     it('reports an empty default for a vanilla deployment with archives but no marker', async () => {
       mockDefaultMarker.mockReturnValue('')
 
-      const { res } = await call(brandingRouter('/brands'), '/manifest.json')
+      const { res } = await call(brandingRouter('/brands', deps), '/manifest.json')
 
       expect(parseManifest(res.body)).toEqual({
         default: '',
@@ -210,7 +234,7 @@ describe('branding/routes', () => {
         throw new Error('EACCES')
       })
 
-      const { res } = await call(brandingRouter('/brands'), '/manifest.json')
+      const { res } = await call(brandingRouter('/brands', deps), '/manifest.json')
 
       expect(parseManifest(res.body).default).toBe('')
       expect(parseManifest(res.body).brands).toHaveLength(1)
@@ -222,7 +246,7 @@ describe('branding/routes', () => {
       })
       const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined)
 
-      const { res } = await call(brandingRouter('/brands'), '/manifest.json')
+      const { res } = await call(brandingRouter('/brands', deps), '/manifest.json')
 
       expect(res.statusCode).toBe(503)
       expect(parseManifest(res.body)).toEqual({ default: '', brands: [] })
@@ -234,7 +258,7 @@ describe('branding/routes', () => {
     it('streams the archive of a known brand', async () => {
       mockCreateReadStream.mockReturnValue(Readable.from(['tar-bytes']))
 
-      const { res } = await call(brandingRouter('/brands'), '/archives/stage')
+      const { res } = await call(brandingRouter('/brands', deps), '/archives/stage')
       await settled(res)
 
       expect(mockCreateReadStream).toHaveBeenCalledWith(ARCHIVE.file)
@@ -251,7 +275,7 @@ describe('branding/routes', () => {
       source.push('first-chunk')
       mockCreateReadStream.mockReturnValue(source)
 
-      const { res } = await call(brandingRouter('/brands'), '/archives/stage')
+      const { res } = await call(brandingRouter('/brands', deps), '/archives/stage')
       res.destroy()
       await settled(res)
       await tick()
@@ -267,7 +291,7 @@ describe('branding/routes', () => {
       })
       mockCreateReadStream.mockReturnValue(source)
 
-      const { res } = await call(brandingRouter('/brands'), '/archives/stage')
+      const { res } = await call(brandingRouter('/brands', deps), '/archives/stage')
       await settled(res)
       await tick()
 
@@ -279,7 +303,7 @@ describe('branding/routes', () => {
     it('accepts the .tar.gz suffix the archives are named with', async () => {
       mockCreateReadStream.mockReturnValue(Readable.from(['tar-bytes']))
 
-      const { res } = await call(brandingRouter('/brands'), '/archives/stage.tar.gz')
+      const { res } = await call(brandingRouter('/brands', deps), '/archives/stage.tar.gz')
       await settled(res)
 
       expect(mockCreateReadStream).toHaveBeenCalledWith(ARCHIVE.file)
@@ -299,7 +323,7 @@ describe('branding/routes', () => {
       )
       mockCreateReadStream.mockReturnValue(Readable.from(['tar-bytes']))
 
-      const { res } = await call(brandingRouter('/brands'), '/archives/stage.tar.gz')
+      const { res } = await call(brandingRouter('/brands', deps), '/archives/stage.tar.gz')
       await settled(res)
 
       expect(mockCreateReadStream).toHaveBeenCalledWith(literal.file)
@@ -308,7 +332,7 @@ describe('branding/routes', () => {
     })
 
     it('answers 304 when the client already has that exact archive', async () => {
-      const { res } = await call(brandingRouter('/brands'), '/archives/stage', {
+      const { res } = await call(brandingRouter('/brands', deps), '/archives/stage', {
         'if-none-match': 'W/"stage-4096-1700000000123"',
       })
 
@@ -320,7 +344,7 @@ describe('branding/routes', () => {
       mockStat.mockResolvedValue({ size: 5000, mtimeMs: 1_700_000_999_000 })
       mockCreateReadStream.mockReturnValue(Readable.from(['tar-bytes']))
 
-      const { res } = await call(brandingRouter('/brands'), '/archives/stage', {
+      const { res } = await call(brandingRouter('/brands', deps), '/archives/stage', {
         'if-none-match': 'W/"stage-4096-1700000000123"',
       })
 
@@ -329,7 +353,7 @@ describe('branding/routes', () => {
     })
 
     it('answers 404 for a brand that is not deployed', async () => {
-      const { res } = await call(brandingRouter('/brands'), '/archives/unknown')
+      const { res } = await call(brandingRouter('/brands', deps), '/archives/unknown')
 
       expect(res.statusCode).toBe(404)
       expect(mockCreateReadStream).not.toHaveBeenCalled()
@@ -341,7 +365,7 @@ describe('branding/routes', () => {
     it.each(['../../etc/passwd', 'a%2Fb', 'has space', '.', '..'])(
       'never reaches the disk for the malformed id %p',
       async (id) => {
-        const { res } = await call(brandingRouter('/brands'), `/archives/${id}`)
+        const { res } = await call(brandingRouter('/brands', deps), `/archives/${id}`)
 
         expect(mockCreateReadStream).not.toHaveBeenCalled()
         expect(res.statusCode).not.toBe(200)
@@ -352,14 +376,14 @@ describe('branding/routes', () => {
     it('answers 404 when the discovered file vanished between listing and read', async () => {
       mockStat.mockRejectedValue(new Error('ENOENT'))
 
-      const { res } = await call(brandingRouter('/brands'), '/archives/stage')
+      const { res } = await call(brandingRouter('/brands', deps), '/archives/stage')
 
       expect(res.statusCode).toBe(404)
       expect(mockCreateReadStream).not.toHaveBeenCalled()
     })
 
     it('sends only headers for HEAD', async () => {
-      const { res } = await call(brandingRouter('/brands'), '/archives/stage', {}, 'HEAD')
+      const { res } = await call(brandingRouter('/brands', deps), '/archives/stage', {}, 'HEAD')
 
       expect(res.headers.etag).toBe('W/"stage-4096-1700000000123"')
       expect(mockCreateReadStream).not.toHaveBeenCalled()

@@ -20,24 +20,26 @@ import { stat } from 'node:fs/promises'
 import { pipeline } from 'node:stream/promises'
 
 import {
-  discoverArchives,
+  discoverArchives as discoverArchivesFromDisk,
   isValidBrandId,
-  readDefaultMarker,
+  readDefaultMarker as readDefaultMarkerFromDisk,
 } from '@ocelot-social/branding/dist/discover.js'
 import { Router } from 'express'
 
 import type { BrandArchive } from '@ocelot-social/branding/dist/discover.js'
 import type { Request, Response } from 'express'
 
-/** The archive of `id`, or undefined when it is unknown or the assets dir is unreadable. */
-function findArchive(assetsDir: string, id: string): BrandArchive | undefined {
-  try {
-    return discoverArchives(assetsDir).get(id)
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.warn(`[branding] cannot read ${assetsDir}:`, error)
-    return undefined
-  }
+/**
+ * The two disk readers this router is built on. Injectable so a test can hand in fakes DIRECTLY
+ * instead of mocking the package subpath: `@ocelot-social/branding/dist/discover.js` is a subpath of a
+ * `file:` dependency, and whether jest binds a mock of it to this module turned out to depend on the
+ * environment — green locally, silently ignored in the CI container, where the router then read the
+ * real filesystem and every fixture-based assertion failed. Production passes nothing and keeps the
+ * real readers.
+ */
+export interface BrandingRouterDeps {
+  discoverArchives: typeof discoverArchivesFromDisk
+  readDefaultMarker: typeof readDefaultMarkerFromDisk
 }
 
 /**
@@ -55,11 +57,30 @@ function findArchive(assetsDir: string, id: string): BrandArchive | undefined {
  *
  * `assetsDir` is passed in, never defaulted from $OCELOT_BRANDING_ASSETS_DIR here: the image sets that
  * variable, so a default would make the router — and every test of it — depend on the ambient
- * environment rather than on its argument. server.ts reads the env once and hands it over.
+ * environment rather than on its argument. server.ts reads the env once and hands it over. `deps`
+ * follows the same principle for the disk readers (see BrandingRouterDeps).
  */
-export function brandingRouter(assetsDir: string | undefined): Router {
+export function brandingRouter(
+  assetsDir: string | undefined,
+  deps: Partial<BrandingRouterDeps> = {},
+): Router {
+  const {
+    discoverArchives = discoverArchivesFromDisk,
+    readDefaultMarker = readDefaultMarkerFromDisk,
+  } = deps
   const router = Router()
   const dir = assetsDir
+
+  /** The archive of `id`, or undefined when it is unknown or the assets dir is unreadable. */
+  const findArchive = (assetsDirectory: string, id: string): BrandArchive | undefined => {
+    try {
+      return discoverArchives(assetsDirectory).get(id)
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.warn(`[branding] cannot read ${assetsDirectory}:`, error)
+      return undefined
+    }
+  }
 
   router.get('/manifest.json', (_req: Request, res: Response) => {
     // No assets dir configured → a vanilla deployment, which HAS no brands: the empty answer below is
