@@ -30,8 +30,20 @@ export default () => {
   // and with `build.extractCSS: false` (Nuxt 2's default) the app CSS is injected by vue-style-loader
   // during hydration — after everything the server put in <head>. appendChild MOVES an existing node,
   // so this restores the end-of-head position for both paths without re-fetching the stylesheet.
+  //
+  // The already-rendered links are indexed by their attribute VALUE rather than looked up with a
+  // `link[…="${href}"]` selector: an href is brand-authored config (assets.css is an unvalidated
+  // string[]), and a single `"` in it would make that selector invalid — querySelector throws a
+  // DOMException, which would abort this plugin before the theme block below ever runs. Same
+  // defense-in-depth reasoning as the CSS sanitizers in utils/brandingHead.js.
+  const rendered = new Map(
+    [...document.head.querySelectorAll(`link[${CSS_LINK_ATTR}]`)].map((el) => [
+      el.getAttribute(CSS_LINK_ATTR),
+      el,
+    ]),
+  )
   for (const href of brandingCssHrefs(branding)) {
-    let link = document.querySelector(`link[${CSS_LINK_ATTR}="${href}"]`)
+    let link = rendered.get(href)
     if (!link) {
       link = document.createElement('link')
       link.rel = 'stylesheet'

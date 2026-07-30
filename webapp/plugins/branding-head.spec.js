@@ -104,6 +104,38 @@ describe('branding-head plugin', () => {
     expect(document.querySelectorAll(`#${THEME_STYLE_ID}`)).toHaveLength(1)
   })
 
+  // `assets.css` is an unvalidated string[] in the schema, so a brand can put a `"` in an href.
+  // Building `link[data-branding-css="${href}"]` from it yields an INVALID selector; querySelector
+  // then throws a DOMException and the plugin dies before it ever applies the theme.
+  describe('an href containing a quote', () => {
+    const HOSTILE = '/branding/acme/assets/a".css'
+    const original = BRAND.assets.css
+
+    beforeEach(() => {
+      BRAND.assets.css = [HOSTILE]
+    })
+    afterEach(() => {
+      BRAND.assets.css = original
+    })
+
+    it('does not throw, and still applies the theme', () => {
+      expect(() => brandingHead()).not.toThrow()
+
+      expect(document.querySelector(`link[${CSS_LINK_ATTR}]`).getAttribute('href')).toBe(HOSTILE)
+      expect(document.getElementById(THEME_STYLE_ID)).not.toBeNull()
+    })
+
+    // The SSR hook escapes the href for the HTML attribute; parsing gives the raw value back, so the
+    // client has to recognise its own server-rendered link and not add a duplicate.
+    it('recognises the link the server rendered for it', () => {
+      document.head.innerHTML = brandingHeadHtml(BRAND)
+
+      brandingHead()
+
+      expect(document.querySelectorAll(`link[${CSS_LINK_ATTR}]`)).toHaveLength(1)
+    })
+  })
+
   // Server and client must resolve the cascade identically, so both have to produce the SAME theme
   // CSS and the SAME stylesheet links, in the same order.
   it('produces the same markup the SSR hook renders', () => {
