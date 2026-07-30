@@ -106,14 +106,22 @@ export function brandingRouter(assetsDir: string | undefined): Router {
   // express 4 handlers must return void, so the async body is a named function the route only kicks
   // off; every failure path inside it answers the request itself.
   async function sendArchive(req: Request, res: Response): Promise<void> {
-    const id = req.params.id.replace(/\.tar\.gz$/, '')
-    if (!isValidBrandId(id)) {
+    const requested = req.params.id
+    if (!isValidBrandId(requested)) {
       res.status(400).end()
       return
     }
 
-    // Without an assets dir nothing is deployed here, so every id is unknown.
-    const archive = dir ? findArchive(dir, id) : undefined
+    // The EXACT id first. `<id>.tar.gz` is only an alias — the archives are named that way on disk, so
+    // the suffix is accepted for convenience — but a brand id may legitimately contain dots (this
+    // network runs `stage.ocelot.social`), so one that ends in `.tar.gz` must not be silently rewritten
+    // into a different brand's id. Only when nothing is deployed under the exact id does the alias
+    // apply. Without an assets dir nothing is deployed at all, so every id is unknown.
+    const lookUp = (candidate: string): BrandArchive | undefined =>
+      dir ? findArchive(dir, candidate) : undefined
+    const archive =
+      lookUp(requested) ??
+      (requested.endsWith('.tar.gz') ? lookUp(requested.slice(0, -'.tar.gz'.length)) : undefined)
     if (!archive) {
       res.status(404).end()
       return
@@ -125,10 +133,11 @@ export function brandingRouter(assetsDir: string | undefined): Router {
     let etag: string
     try {
       // Not caller-supplied: the path comes from discovery under `dir`, reached only via an exact
-      // Map-key lookup of `id`.
+      // Map-key lookup. The RESOLVED brand names the validator, so both spellings of the same archive
+      // share one ETag instead of revalidating against each other.
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const { size, mtimeMs } = await stat(archive.file)
-      etag = `W/"${id}-${String(size)}-${String(Math.floor(mtimeMs))}"`
+      etag = `W/"${archive.id}-${String(size)}-${String(Math.floor(mtimeMs))}"`
     } catch {
       // Discovered a moment ago but gone now — treat exactly like an unknown brand.
       res.status(404).end()

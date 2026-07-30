@@ -282,7 +282,29 @@ describe('branding/routes', () => {
       const { res } = await call(brandingRouter('/brands'), '/archives/stage.tar.gz')
       await settled(res)
 
+      expect(mockCreateReadStream).toHaveBeenCalledWith(ARCHIVE.file)
       expect(res.headers.etag).toBe('W/"stage-4096-1700000000123"')
+    })
+
+    // Brand ids may contain dots (this network runs `stage.ocelot.social`), so one that ends in
+    // `.tar.gz` is a legitimate id — and must beat the convenience alias, which would otherwise hand
+    // out a DIFFERENT brand's archive under its name.
+    it('prefers a brand whose id itself ends in .tar.gz over the suffix alias', async () => {
+      const literal = { ...ARCHIVE, id: 'stage.tar.gz', file: '/brands/literal.tar.gz' }
+      mockDiscover.mockReturnValue(
+        new Map([
+          [ARCHIVE.id, ARCHIVE],
+          [literal.id, literal],
+        ]),
+      )
+      mockCreateReadStream.mockReturnValue(Readable.from(['tar-bytes']))
+
+      const { res } = await call(brandingRouter('/brands'), '/archives/stage.tar.gz')
+      await settled(res)
+
+      expect(mockCreateReadStream).toHaveBeenCalledWith(literal.file)
+      // The validator names the RESOLVED brand, so the two do not revalidate against each other.
+      expect(res.headers.etag).toBe('W/"stage.tar.gz-4096-1700000000123"')
     })
 
     it('answers 304 when the client already has that exact archive', async () => {
