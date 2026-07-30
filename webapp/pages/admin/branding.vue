@@ -93,13 +93,15 @@
             :disabled="!!savingComposition || !!saving"
             @change="onBucketChange(bucket, $event.target.value)"
           >
-            <option value="">
+            <!-- Inheriting is only offered when the base package actually carries this bucket;
+                 otherwise the slot runs the framework default and says so. -->
+            <option v-if="providesBucket(activeId, bucket)" value="">
               {{ $t('admin.branding.composition.inherit', { base: baseLabel }) }}
             </option>
             <option :value="vanillaSource">
               {{ $t('admin.branding.composition.frameworkDefault') }}
             </option>
-            <option v-for="src in sourceOptions" :key="src.id" :value="src.id">
+            <option v-for="src in sourceOptionsFor(bucket)" :key="src.id" :value="src.id">
               {{ src.label }}
             </option>
           </select>
@@ -413,7 +415,7 @@ export default {
       return b ? b.label || b.id : id
     },
     sourceLabelFor(bucket) {
-      return this.labelForSelect(this.composition[bucket] || '')
+      return this.labelForSelect(this.effectiveSelect(bucket))
     },
     pendingLabelFor(bucket) {
       return this.labelForSelect(this.pending[bucket])
@@ -463,11 +465,11 @@ export default {
 
       const newSelect = this.hasPending(bucket)
         ? this.pending[bucket]
-        : this.composition[bucket] || ''
+        : this.effectiveSelect(bucket)
       const newRows = this.bucketRows(newSelect, bucket)
       if (!this.hasPending(bucket)) return mark(newRows.map((r) => ({ ...r, status: 'same' })))
 
-      const oldRows = this.bucketRows(this.composition[bucket] || '', bucket)
+      const oldRows = this.bucketRows(this.effectiveSelect(bucket), bucket)
       const oldMap = {}
       oldRows.forEach((r) => {
         oldMap[r.path] = r.value
@@ -546,9 +548,37 @@ export default {
         this.saving = null
       }
     },
-    // The value the select shows: the pending (unsaved) choice if any, else the saved override.
+    // Whether `id` ships a fragment for this bucket. An archive only carries the buckets its brand
+    // actually customises (build-brandings skips a bucket whose slice equals the framework default),
+    // so "provides" is what the archive manifest lists — not "is a brand". Vanilla is synthesised
+    // with all six in fetch(): the framework default backs every slot by definition.
+    providesBucket(id, bucket) {
+      return (this.providedBuckets[id] || []).some((inst) => inst && inst.type === bucket)
+    },
+    // Sources selectable for THIS slot: only brands that actually carry the bucket. Offering the rest
+    // was misleading — picking one changed nothing, because an absent fragment composes to the
+    // framework default. The currently stored source stays listed even when it does not provide the
+    // bucket (an older composition, or a brand that dropped it since), so the select keeps showing the
+    // state instead of falling back to a blank entry.
+    sourceOptionsFor(bucket) {
+      const stored = this.composition[bucket] || ''
+      return this.sourceOptions.filter(
+        (src) => this.providesBucket(src.id, bucket) || src.id === stored,
+      )
+    },
+    // The source a slot RUNS on. Normally the stored override ('' = inherit the base package), but
+    // when inheriting from a package without this bucket the slot effectively runs the framework
+    // default — and since that row is not offered, the select would otherwise show a blank value.
+    // Only the DISPLAY resolves this way: '' stays stored, so switching the base package later to one
+    // that does carry the bucket still pulls this slot along.
+    effectiveSelect(bucket) {
+      const stored = this.composition[bucket] || ''
+      if (stored) return stored
+      return this.providesBucket(this.activeId, bucket) ? '' : VANILLA_SOURCE
+    },
+    // The value the select shows: the pending (unsaved) choice if any, else the effective source.
     selectValue(bucket) {
-      return bucket in this.pending ? this.pending[bucket] : this.composition[bucket] || ''
+      return bucket in this.pending ? this.pending[bucket] : this.effectiveSelect(bucket)
     },
     hasPending(bucket) {
       return bucket in this.pending

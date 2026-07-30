@@ -113,6 +113,65 @@ describe('admin/branding available list', () => {
     expect(options.filter((o) => o.id === '')).toHaveLength(0)
   })
 
+  // A brand's archive only carries the buckets it customises, so offering every brand for every slot
+  // promised changes that could not happen: picking a themeless brand for `theme` composes to the
+  // framework default, exactly like not picking it.
+  describe('per-slot source filtering', () => {
+    const ctx = (overrides = {}) => ({
+      activeId: 'stage',
+      composition: {},
+      pending: {},
+      providedBuckets: {
+        '': [{ type: 'theme' }, { type: 'identity' }],
+        stage: [{ type: 'identity' }], // no theme
+        other: [{ type: 'theme' }, { type: 'identity' }],
+      },
+      sourceOptions: [
+        { id: 'stage', label: 'Stage' },
+        { id: 'other', label: 'Other' },
+      ],
+      providesBucket: BrandingPage.methods.providesBucket,
+      effectiveSelect: BrandingPage.methods.effectiveSelect,
+      ...overrides,
+    })
+
+    it('offers only brands that actually carry the bucket', () => {
+      const c = ctx()
+
+      const theme = BrandingPage.methods.sourceOptionsFor.call(c, 'theme')
+      const identity = BrandingPage.methods.sourceOptionsFor.call(c, 'identity')
+
+      expect(theme.map((o) => o.id)).toEqual(['other'])
+      expect(identity.map((o) => o.id)).toEqual(['stage', 'other'])
+    })
+
+    // Otherwise the select would show a blank entry and the admin could not see — let alone undo —
+    // what the slot is pinned to.
+    it('keeps a stored source listed even when it no longer carries the bucket', () => {
+      const c = ctx({ composition: { theme: 'stage' } })
+
+      const theme = BrandingPage.methods.sourceOptionsFor.call(c, 'theme')
+
+      expect(theme.map((o) => o.id)).toEqual(['stage', 'other'])
+    })
+
+    // Inheriting from a package without the bucket IS the framework default — the select says so,
+    // while the stored '' keeps following a later base-package switch.
+    it('shows the framework default where the base package has no such bucket', () => {
+      const c = ctx()
+
+      expect(BrandingPage.methods.effectiveSelect.call(c, 'theme')).toBe('@default')
+      expect(BrandingPage.methods.effectiveSelect.call(c, 'identity')).toBe('')
+      expect(c.composition.theme).toBeUndefined() // display only — nothing was pinned
+    })
+
+    it('leaves an explicit override untouched', () => {
+      const c = ctx({ composition: { theme: 'other' } })
+
+      expect(BrandingPage.methods.effectiveSelect.call(c, 'theme')).toBe('other')
+    })
+  })
+
   it('marks the brand currently used as base', () => {
     // activeSelect carries the RAW policy value (so the select can round-trip it); activeId is the
     // effective brand id everything else looks up by.
