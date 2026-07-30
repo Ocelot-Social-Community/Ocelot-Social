@@ -18,6 +18,7 @@
 // id is looked up as a Map KEY in the discovered set, so traversal cannot reach outside the archives.
 import { createReadStream } from 'node:fs'
 import { stat } from 'node:fs/promises'
+import { pipeline } from 'node:stream/promises'
 
 import {
   discoverArchives,
@@ -135,11 +136,19 @@ export function brandingRouter(
       return
     }
     // Streamed: an archive is small (tens of KB) but this keeps it off the heap and lets express
-    // handle backpressure. A read error after the headers are out can only be aborted.
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- same discovered path as above
-    createReadStream(archive.file)
-      .on('error', () => res.destroy())
-      .pipe(res)
+    // handle backpressure.
+    //
+    // pipeline(), not .pipe(): pipe only tears down the DESTINATION. A client that aborts mid-transfer
+    // (or a read that fails) would leave the file descriptor open until the read finishes on its own —
+    // one leaked fd per aborted download, on an endpoint anyone can call. pipeline destroys both ends.
+    try {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename -- same discovered path as above
+      await pipeline(createReadStream(archive.file), res)
+    } catch {
+      // The headers are already out, so there is nothing left to tell the client. pipeline has torn
+      // both ends down; destroying the response is the only way to end a half-sent body.
+      res.destroy()
+    }
   }
 
   router.get('/archives/:id', (req: Request, res: Response) => {

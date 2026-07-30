@@ -3,6 +3,8 @@
 // and that revalidation actually saves the transfer.
 import { createReadStream } from 'node:fs'
 import { stat } from 'node:fs/promises'
+import { PassThrough, Readable } from 'node:stream'
+import { finished } from 'node:stream/promises'
 import { setImmediate as tick } from 'node:timers/promises'
 
 import { discoverArchives, readDefaultMarker } from '@ocelot-social/branding/dist/discover.js'
@@ -47,38 +49,56 @@ interface Manifest {
 
 const parseManifest = (body: string | undefined): Manifest => JSON.parse(body ?? '') as Manifest
 
-interface MockRes {
+interface MockRes extends PassThrough {
   statusCode?: number
   headers: Record<string, string>
   body?: string
   status: jest.Mock
   setHeader: jest.Mock
   json: jest.Mock
-  end: jest.Mock
-  destroy: jest.Mock
 }
 
+// A REAL Writable, not a bag of jest.fn()s: the archive route hands the response to
+// stream.pipeline(), which only accepts an actual stream and whose whole point (tearing the file
+// stream down when the response dies) is unobservable against a fake. Everything a stream does not
+// provide — status/setHeader/json — is bolted on the way express does.
 function makeRes(): MockRes {
-  const res: MockRes = {
-    headers: {},
-    status: jest.fn(function status(this: MockRes, code: number) {
-      this.statusCode = code
-      return this
-    }),
-    setHeader: jest.fn(function setHeader(this: MockRes, k: string, v: string) {
-      this.headers[k.toLowerCase()] = v
-    }),
-    json: jest.fn(function json(this: MockRes, value: unknown) {
-      this.body = JSON.stringify(value)
-      return this
-    }),
-    end: jest.fn(function end(this: MockRes, body?: string) {
-      if (body !== undefined) this.body = body
-      return this
-    }),
-    destroy: jest.fn(),
-  }
+  const chunks: Buffer[] = []
+  const res = new PassThrough() as MockRes
+  res.on('data', (chunk: Buffer) => chunks.push(Buffer.from(chunk)))
+  res.headers = {}
+  Object.defineProperty(res, 'body', {
+    get: () => (chunks.length ? Buffer.concat(chunks).toString('utf8') : undefined),
+    set: (value: string) => {
+      chunks.length = 0
+      chunks.push(Buffer.from(value, 'utf8'))
+    },
+    configurable: true,
+  })
+  res.status = jest.fn(function status(this: MockRes, code: number) {
+    this.statusCode = code
+    return this
+  })
+  res.setHeader = jest.fn(function setHeader(this: MockRes, k: string, v: string) {
+    this.headers[k.toLowerCase()] = v
+  }) as unknown as jest.Mock
+  res.json = jest.fn(function json(this: MockRes, value: unknown) {
+    this.body = JSON.stringify(value)
+    return this
+  })
+  jest.spyOn(res, 'end')
+  jest.spyOn(res, 'destroy')
+  // pipeline propagates a source failure by destroying the response WITH that error; an unhandled
+  // 'error' on a stream would take the process down instead of failing the test.
+  res.on('error', () => {})
   return res
+}
+
+// Settle once the response is done, however it ended — pipeline finishes it on success and destroys
+// it on abort/read failure, and both count as "the request is over".
+async function settled(res: MockRes): Promise<void> {
+  // Aborted or failed mid-transfer rejects — that IS the terminal state the test waits for.
+  await finished(res).catch(() => undefined)
 }
 
 // express defers the terminal `next()` through setImmediate, so drain the macrotask queue before
@@ -173,21 +193,55 @@ describe('branding/routes', () => {
 
   describe('GET /archives/:id', () => {
     it('streams the archive of a known brand', async () => {
-      const stream = { on: jest.fn().mockReturnThis(), pipe: jest.fn() }
-      mockCreateReadStream.mockReturnValue(stream)
+      mockCreateReadStream.mockReturnValue(Readable.from(['tar-bytes']))
 
       const { res } = await call(brandingRouter('/brands'), '/archives/stage')
+      await settled(res)
 
       expect(mockCreateReadStream).toHaveBeenCalledWith(ARCHIVE.file)
-      expect(stream.pipe).toHaveBeenCalledWith(res)
+      expect(res.body).toBe('tar-bytes')
       expect(res.headers['content-type']).toBe('application/gzip')
       expect(res.headers.etag).toBe('W/"stage-4096-1700000000123"')
     })
 
+    // A download nobody finishes must not pin the file descriptor: `.pipe()` only unpipes when the
+    // destination dies, so the read stream would stay open — one leaked fd per aborted request.
+    it('tears the file stream down when the client aborts mid-transfer', async () => {
+      // Never ends on its own, so the transfer is still in flight when the client goes away.
+      const source = new Readable({ read() {} })
+      source.push('first-chunk')
+      mockCreateReadStream.mockReturnValue(source)
+
+      const { res } = await call(brandingRouter('/brands'), '/archives/stage')
+      res.destroy()
+      await settled(res)
+      await tick()
+
+      expect(source.destroyed).toBe(true)
+    })
+
+    it('aborts the response when the read fails after the headers are out', async () => {
+      const source = new Readable({
+        read() {
+          this.destroy(new Error('EIO'))
+        },
+      })
+      mockCreateReadStream.mockReturnValue(source)
+
+      const { res } = await call(brandingRouter('/brands'), '/archives/stage')
+      await settled(res)
+      await tick()
+
+      // Status and headers are already on the wire — killing the socket is all that is left.
+      expect(res.destroyed).toBe(true)
+      expect(res.body).not.toBe('')
+    })
+
     it('accepts the .tar.gz suffix the archives are named with', async () => {
-      mockCreateReadStream.mockReturnValue({ on: jest.fn().mockReturnThis(), pipe: jest.fn() })
+      mockCreateReadStream.mockReturnValue(Readable.from(['tar-bytes']))
 
       const { res } = await call(brandingRouter('/brands'), '/archives/stage.tar.gz')
+      await settled(res)
 
       expect(res.headers.etag).toBe('W/"stage-4096-1700000000123"')
     })
@@ -203,7 +257,7 @@ describe('branding/routes', () => {
 
     it('re-transfers when the archive changed without a version bump', async () => {
       mockStat.mockResolvedValue({ size: 5000, mtimeMs: 1_700_000_999_000 })
-      mockCreateReadStream.mockReturnValue({ on: jest.fn().mockReturnThis(), pipe: jest.fn() })
+      mockCreateReadStream.mockReturnValue(Readable.from(['tar-bytes']))
 
       const { res } = await call(brandingRouter('/brands'), '/archives/stage', {
         'if-none-match': 'W/"stage-4096-1700000000123"',
