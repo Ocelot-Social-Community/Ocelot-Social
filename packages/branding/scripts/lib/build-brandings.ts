@@ -105,6 +105,10 @@ function namespaceConfig(
   if (Array.isArray(c.theme.fontFaces)) {
     for (const face of c.theme.fontFaces) face.src = ns(face.src)
   }
+  // The header's custom-button icon is a brand asset like any logo (it used to be a framework-served
+  // /img/custom/… path, which is why it was missed here at first).
+  const customButton = c.headerMenu.customButton as unknown as Record<string, string | undefined>
+  if (customButton.iconPath != null) customButton.iconPath = ns(customButton.iconPath)
   return c
 }
 
@@ -235,6 +239,29 @@ function warnThemeTokenTypos(config: BrandingConfig, id: string, warnings: strin
   }
 }
 
+// Stylesheet SOURCE formats. The archive packs assets/ verbatim and the runtime only ever injects the
+// files listed in `assets.css` as <link rel=stylesheet> — nothing compiles. So a source stylesheet in
+// a brand is always dead weight.
+const STYLE_SOURCE_EXT = /\.(scss|sass|less|styl)$/i
+
+/**
+ * Warn on a SOURCE stylesheet under assets/. Brands migrated from the old mechanism still carry the
+ * build-time `assets/styles/imports/_branding.scss` overlay, which the webapp Dockerfile used to copy
+ * over webapp/ before `yarn build`. The nuxt bundle is brand-agnostic now — that file is packed into
+ * the archive but NEVER compiled or served, so every rule in it silently stopped applying. Port it to
+ * plain CSS (resolving SCSS variables to literals / `var(--…)` theme tokens) and list it in
+ * `assets.css`, which IS injected at runtime.
+ */
+function warnUncompiledStylesheets(entries: TarEntry[], id: string, warnings: string[]): void {
+  for (const entry of entries) {
+    if (!entry.name.startsWith('assets/') || !STYLE_SOURCE_EXT.test(entry.name)) continue
+    warnings.push(
+      `  ! ${id}: ${entry.name} is a SOURCE stylesheet — it is packed but NEVER compiled or served. ` +
+        `Port it to plain CSS and list it in assets.css.`,
+    )
+  }
+}
+
 /** Bundle ONE brand directory into a `<id>.tar.gz` buffer (manifest.json + fragments/ + assets/ + html/). */
 export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive> {
   const dir = resolve(brandDir)
@@ -299,6 +326,7 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
     const src = join(dir, sub)
     if (existsSync(src)) collectFiles(src, sub, entries)
   }
+  warnUncompiledStylesheets(entries, id, warnings)
   return { id, version, label, gz: writeTarGz(entries), entries, warnings }
 }
 

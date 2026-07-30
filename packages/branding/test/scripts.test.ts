@@ -167,9 +167,10 @@ test('buildBrandArchive namespaces css, favicon, html-per-locale and font-face s
           html: { imprint: { en: 'html/imprint.en.html' } },
         },
         theme: { fontFaces: [{ family: 'Brand', src: 'assets/brand.woff2' }] },
+        headerMenu: { customButton: { iconPath: 'assets/button.svg', url: 'https://example.test' } },
       })
 `,
-    assets: { 'extra.css': 'x', 'favicon.ico': 'x', 'brand.woff2': 'x' },
+    assets: { 'extra.css': 'x', 'favicon.ico': 'x', 'brand.woff2': 'x', 'button.svg': 'x' },
   })
   // the html/ referenced file lives outside assets/ — create it so no warning is emitted
   mkdirSync(join(dir, 'html'), { recursive: true })
@@ -180,6 +181,29 @@ test('buildBrandArchive namespaces css, favicon, html-per-locale and font-face s
   assert.equal(config.assets.favicon, '/branding/acme/assets/favicon.ico')
   assert.equal(config.assets.html.imprint.en, '/branding/acme/html/imprint.en.html')
   assert.equal(config.theme.fontFaces[0].src, '/branding/acme/assets/brand.woff2')
+  // The header custom-button icon is a brand asset too — it is served from the brand folder, not from
+  // the framework's /img/custom/.
+  assert.equal(config.headerMenu.customButton.iconPath, '/branding/acme/assets/button.svg')
+})
+
+test('buildBrandArchive warns on a SOURCE stylesheet in assets/ (packed but never compiled)', async () => {
+  const dir = brandDir({
+    config: `export default (d) => d({
+      metadata: { applicationName: 'Acme' },
+      assets: { css: ['assets/branding.css'] },
+    })\n`,
+    assets: { 'branding.css': 'a { color: red }' },
+  })
+  // the legacy build-time overlay a migrated brand still carries
+  mkdirSync(join(dir, 'assets/styles/imports'), { recursive: true })
+  writeFileSync(join(dir, 'assets/styles/imports/_branding.scss'), '$c: red;')
+
+  const built = await buildBrandArchive(dir)
+  const w = built.warnings.join('\n')
+  assert.match(w, /assets\/styles\/imports\/_branding\.scss is a SOURCE stylesheet/)
+  assert.doesNotMatch(w, /branding\.css is a SOURCE/) // plain CSS is fine — it IS served
+  // it still builds, and the file is still packed (removing it is the brand's call)
+  assert.ok(readTarGz(built.gz).has('assets/styles/imports/_branding.scss'))
 })
 
 test('brandId / brandVersion degrade gracefully on a malformed package.json', () => {

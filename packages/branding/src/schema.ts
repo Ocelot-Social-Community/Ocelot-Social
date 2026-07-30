@@ -243,20 +243,25 @@ export interface BrandingConfig {
    */
   locales: Record<string, Record<string, unknown>>
   /**
-   * References into the brand's ONE served assets folder (`<brand>/assets/`, served at
+   * References into the brand's served file trees (`<brand>/assets/` and `<brand>/html/`, served at
    * `/branding/<brand>/…`). All content links a brand ships are defined here as data. Paths are
-   * written by the brand relative to its assets folder; the build namespaces them to
-   * `/branding/<brand>/…` so multiple brands never collide. (Logo & OG-image paths in `logos` /
-   * `metadata.ogImage` are asset paths too and are namespaced the same way.)
+   * written relative to the BRAND ROOT — i.e. they include the `assets/` (or `html/`) prefix; the
+   * build namespaces them to `/branding/<brand>/…` so multiple brands never collide, and warns when
+   * the referenced file does not exist. (Logo & OG-image paths in `logos` / `metadata.ogImage` are
+   * asset paths too and are namespaced the same way.)
    */
   assets: {
-    /** Extra stylesheets, injected as <link> at runtime (CSS custom properties, fonts via
-     * @font-face pointing at files in the same served folder), e.g. ['css/custom.css']. */
+    /** Extra stylesheets, injected as <link> at runtime (bespoke component rules, fonts via
+     * @font-face pointing at files in the same served folder), e.g. ['assets/css/branding.css'].
+     * PLAIN CSS only — nothing in the pipeline compiles SCSS/LESS (the build warns about a source
+     * stylesheet under assets/), and the nuxt bundle is brand-agnostic, so this is the ONLY way a
+     * brand ships custom rules. Prefer `theme.cssVars` for anything that has a theme token: those
+     * re-theme the webapp AND packages/ui at once, and rules here can read them back via var(--…). */
     css: string[]
     /** Static-page HTML per page per locale code, e.g. `html.imprint.de = 'html/de/imprint.html'`.
      * Loaded at runtime by the InternalPage view (replaces the build-bundled html i18n). */
     html: Partial<Record<LinkPageKey, Record<string, string>>>
-    /** Favicon path, e.g. 'favicon.ico'. */
+    /** Favicon path, e.g. 'assets/favicon.ico'. */
     favicon: string | null
   }
 }
