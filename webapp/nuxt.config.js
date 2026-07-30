@@ -33,6 +33,15 @@ export default {
     mode: 'out-in',
   },
 
+  // RUNTIME (server-only), unlike `env` below: `env` is compiled into the bundle by webpack's
+  // DefinePlugin, so every `process.env.GRAPHQL_URI` in application code is frozen to whatever was set
+  // when `nuxt build` ran — in the Docker build: nothing, i.e. the localhost fallback. Anything the
+  // SERVER must resolve per deployment has to come from here instead. (The proxy targets below read
+  // CONFIG directly and are fine: nuxt.config.js is evaluated at server start, not at build time.)
+  privateRuntimeConfig: {
+    graphqlUri: process.env.GRAPHQL_URI || CONFIG.GRAPHQL_URI,
+  },
+
   env: {
     ...CONFIG,
     // pages which do NOT require a login
@@ -143,9 +152,12 @@ export default {
    ** Dynamic branding assets: serve /branding/* from $OCELOT_BRANDING_ASSETS_DIR at runtime
    ** (logos, favicon, static-page HTML, CSS, fonts + each brand's virtual branding.json + manifest.json)
    ** so brandings are bound without being baked into the image. Archives are built by the branding
-   ** package (packages/branding: scripts/build-brand-archive.mjs); see server-middleware/branding-assets.js.
+   ** package (packages/branding: scripts/build-brand-archive.ts); see server-middleware/branding-assets.js.
    */
   serverMiddleware: [
+    // FIRST: mirror the brand archives from the backend into $OCELOT_BRANDING_ASSETS_DIR, so the
+    // archive is deployed once (backend side) and everything below still reads it off disk.
+    '~/server-middleware/branding-sync.js',
     { path: '/branding', handler: '~/server-middleware/branding-assets.js' },
     // Dynamic PWA manifest generated from the active brand's metadata (replaces the static
     // @nuxtjs/pwa manifest, disabled below) so app name / theme colour follow a live brand switch.
@@ -225,8 +237,6 @@ export default {
       toProxy: true, // cloudflare needs that
       headers: {
         Accept: 'application/json',
-        'X-UI-Request': true,
-        'X-API-TOKEN': CONFIG.BACKEND_TOKEN,
       },
     },
     '/activitypub': {
@@ -235,8 +245,6 @@ export default {
       toProxy: true, // cloudflare needs that
       headers: {
         Accept: 'application/json',
-        'X-UI-Request': true,
-        'X-API-TOKEN': CONFIG.BACKEND_TOKEN,
       },
     },
     '/api': {
@@ -248,8 +256,6 @@ export default {
       toProxy: true, // cloudflare needs that
       headers: {
         Accept: 'application/json',
-        'X-UI-Request': true,
-        'X-API-TOKEN': CONFIG.BACKEND_TOKEN,
       },
     },
   },

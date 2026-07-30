@@ -82,6 +82,8 @@
     "branding": {
       "activate": null,
       "available": {
+        "active": "Активна основа",
+        "default": "Запасний",
         "title": null
       },
       "composition": {

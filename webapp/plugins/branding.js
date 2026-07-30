@@ -19,6 +19,11 @@
 // time and would need the config set earlier (or lazy adapters) for full effect.
 import { setBranding } from '@ocelot-social/branding'
 
+// Explicit "framework defaults" as a BASE. '' cannot express it: an unset policy value is also '',
+// and that has to keep falling through to the ops pin / baked DEFAULT marker. Same sentinel the
+// per-slot composition already uses (the package's parseSource() resolves it to "no source").
+const VANILLA_BASE = '@default'
+
 // Unwrap one policy key's transported value (JSON-encoded); '' when absent/garbled.
 function extractPolicy(policy, key) {
   const entry = policy.find((e) => e && e.key === key)
@@ -34,10 +39,39 @@ function extractPolicy(policy, key) {
 // and the per-slot composition (`brandingComposition`, a JSON string). Returns { active, composition }
 // (composition = the RAW json string as stored), or null when the backend could not be reached (→ the
 // caller falls back to env / baked default). Server-only.
-async function fetchBrandingPolicy() {
-  const uri = process.env.GRAPHQL_URI || 'http://localhost:4000'
+// A mistyped bound must not silently DISABLE what it configures. setTimeout coerces both NaN
+// (`Number('2s')`) and a negative delay to 0, so the abort would fire before the request is even sent
+// and EVERY server render would fall back to the ops pin — indistinguishable in the page from "no
+// brand switched". Anything that is not a finite, non-negative number is therefore ignored in favour
+// of the default; 0 stays meaningful and means "no bound" (same reading as the sync middleware's
+// $OCELOT_BRANDING_SYNC_TIMEOUT_MS).
+function boundMs(raw, fallback) {
+  const value = Number(raw)
+  return Number.isFinite(value) && value >= 0 ? value : fallback
+}
+
+// What of the endpoint may appear in a log line. The endpoint itself STAYS — it is the point of these
+// warnings, a GRAPHQL_URI pointing at the wrong host is invisible without it — but the two parts that
+// can carry a credential are dropped: userinfo (https://user:pass@host) and the query/fragment. A
+// value that does not parse as a URL is logged verbatim: it cannot have been sent anywhere, and
+// hiding it would hide the very misconfiguration being reported.
+function safeUri(uri) {
+  try {
+    const parsed = new URL(uri)
+    // Rebuilt from the safe parts rather than blanked on the URL object, so the line reads exactly
+    // like the configured value (`toString()` would normalise a bare origin to a trailing slash).
+    const path = parsed.pathname === '/' ? '' : parsed.pathname
+    return `${parsed.protocol}//${parsed.host}${path}`
+  } catch (error) {
+    return uri
+  }
+}
+
+async function fetchBrandingPolicy(uri) {
+  const endpoint = safeUri(uri)
   const controller = typeof AbortController !== 'undefined' ? new AbortController() : null
-  const timer = controller ? setTimeout(() => controller.abort(), 2000) : null
+  const timeout = boundMs(process.env.OCELOT_BRANDING_POLICY_TIMEOUT_MS, 2000)
+  const timer = controller && timeout ? setTimeout(() => controller.abort(), timeout) : null
   try {
     const res = await fetch(uri, {
       method: 'POST',
@@ -45,6 +79,13 @@ async function fetchBrandingPolicy() {
       body: JSON.stringify({ query: '{ policy { key value } }' }),
       signal: controller ? controller.signal : undefined,
     })
+    if (!res.ok) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[branding] policy query to ${endpoint} answered HTTP ${res.status} — using fallback`,
+      )
+      return null
+    }
     const json = await res.json()
     const policy = json && json.data && json.data.policy ? json.data.policy : []
     return {
@@ -52,6 +93,15 @@ async function fetchBrandingPolicy() {
       composition: extractPolicy(policy, 'brandingComposition') || '',
     }
   } catch (error) {
+    // MUST be loud. A failure here is indistinguishable in the rendered page from "no brand switched":
+    // the caller falls through to $OCELOT_ACTIVE_BRANDING / the baked DEFAULT marker and serves the
+    // image's brand, so an unreachable backend silently overrides every admin branding choice. That is
+    // exactly how a misconfigured GRAPHQL_URI hid itself: the browser reaches the backend through the
+    // ingress and shows the real policy, while SSR never got it.
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[branding] policy query to ${endpoint} failed (${error && error.name === 'AbortError' ? `no answer within ${timeout}ms` : (error && error.message) || error}) — falling back to $OCELOT_ACTIVE_BRANDING / the baked default; the active branding and its composition will be IGNORED`,
+    )
     return null
   } finally {
     if (timer) clearTimeout(timer)
@@ -61,7 +111,7 @@ async function fetchBrandingPolicy() {
 // `discover` (the package's server-only archive discovery) is passed in from the server-only branch
 // (required there under a bare `process.server` guard) so no Node require lives in this always-bundled
 // function — otherwise webpack would try to resolve 'fs' for the client bundle and fail.
-async function loadServerBranding(discover) {
+async function loadServerBranding(discover, graphqlUri) {
   const assetsDir = process.env.OCELOT_BRANDING_ASSETS_DIR
   if (!assetsDir) return null
 
@@ -73,10 +123,18 @@ async function loadServerBranding(discover) {
   // → the image's baked default marker → '' (framework defaults / vanilla). A non-empty policy value
   // wins; '' falls through to the pin / baked default, so a default-brand image renders branded out
   // of the box while any brand stays switchable on the admin Branding tab.
-  const policy = await fetchBrandingPolicy() // { active, composition } or null (unreachable)
+  const policy = await fetchBrandingPolicy(graphqlUri) // { active, composition } or null (unreachable)
   const policyActive = policy ? policy.active : ''
-  let base = policyActive && policyActive !== '' ? policyActive : ''
-  if (!base) {
+  let base
+  if (policyActive === VANILLA_BASE) {
+    // An admin explicitly chose "no branding". This must NOT fall through: on an image that bakes a
+    // default brand the marker would win every time, making the choice unreachable — the page would
+    // reload once and keep rendering the baked brand.
+    base = ''
+  } else if (policyActive) {
+    base = policyActive
+  } else {
+    // Nothing chosen (yet) → ops pin, then the image's baked default, then vanilla.
     base = process.env.OCELOT_ACTIVE_BRANDING || discover.readDefaultMarker(assetsDir) || ''
   }
   if (base && !archives.has(base)) base = '' // unknown base id → vanilla base
@@ -126,7 +184,13 @@ export default async (context) => {
     // eslint-disable-next-line global-require, import/no-unresolved
     const discover = require('@ocelot-social/branding/dist/discover.js')
     try {
-      const loaded = await loadServerBranding(discover)
+      // From privateRuntimeConfig (evaluated at server START), NOT from process.env: the latter is
+      // frozen into the bundle by DefinePlugin at build time and would always be the localhost default.
+      const graphqlUri =
+        (context.$config && context.$config.graphqlUri) ||
+        process.env.GRAPHQL_URI ||
+        'http://localhost:4000'
+      const loaded = await loadServerBranding(discover, graphqlUri)
       // ALWAYS set this request's effective branding — even to undefined (vanilla). The accessor
       // stores the active brand in a process-global (globalThis.__OCELOT_BRANDING__) shared across
       // SSR requests, so a vanilla request that skipped setBranding would inherit whatever brand a

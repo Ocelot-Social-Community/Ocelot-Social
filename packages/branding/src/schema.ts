@@ -164,7 +164,7 @@ export interface BrandingConfig {
     // NOTE: no brand `version` here — the brand's version lives ONLY in the archive manifest
     // (manifest.version, from the brand's package.json), surfaced in the admin Branding tab. Injecting
     // it into metadata would make the identity bucket always look "customised", breaking partial-package
-    // detection (see scripts/lib/build-brandings.mjs).
+    // detection (see scripts/lib/build-brandings.ts).
     applicationName: string
     applicationShortName: string
     applicationDescription: string

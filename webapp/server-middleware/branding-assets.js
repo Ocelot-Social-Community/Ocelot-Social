@@ -16,6 +16,8 @@ const {
   discoverArchives,
   readArchive,
   composeArchive,
+  readDefaultMarker,
+  isValidBrandId,
 } = require('@ocelot-social/branding/dist/discover.js')
 
 const CONTENT_TYPES = {
@@ -52,10 +54,20 @@ module.exports = function brandingAssets(req, res, next) {
   if (urlPath === 'manifest.json') {
     let manifest
     try {
+      // `isDefault` marks this deployment's baked brand (the DEFAULT marker) — the admin list sorts it
+      // first and labels it, so the fallback every unswitched visitor sees is identifiable. Kept as a
+      // per-entry flag rather than a sibling field so the manifest stays a plain array.
+      let defaultId = ''
+      try {
+        defaultId = readDefaultMarker(base)
+      } catch (error) {
+        defaultId = ''
+      }
       manifest = [...discoverArchives(base).values()].map((a) => ({
         id: a.id,
         label: a.label,
         version: a.version,
+        isDefault: a.id === defaultId,
         config: `/branding/${a.id}/branding.json`,
       }))
     } catch (error) {
@@ -73,7 +85,7 @@ module.exports = function brandingAssets(req, res, next) {
   const id = urlPath.slice(0, slash)
   const entry = urlPath.slice(slash + 1)
   // Guard the brand id (the entry lookup is a Map key, so path traversal cannot escape the archive).
-  if (!/^[a-z0-9._-]+$/i.test(id)) return next()
+  if (!isValidBrandId(id)) return next()
 
   const archive = discoverArchives(base).get(id)
   if (!archive) return next()

@@ -82,6 +82,8 @@
     "branding": {
       "activate": null,
       "available": {
+        "active": "Baza aktive",
+        "default": "Rezervë",
         "title": null
       },
       "composition": {

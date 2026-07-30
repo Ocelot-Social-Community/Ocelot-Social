@@ -11,8 +11,17 @@ RUN --mount=type=cache,target=/root/.npm,sharing=locked \
     npm ci
 COPY packages/branding/. .
 RUN npm run build
-# Drop devDeps (typescript/eslint/publint/…) before this stage is copied into the runtime image — only
-# nanotar + tslib are needed at runtime and for build-brand-archive; keeps the image small.
+
+# The package has TWO disjoint roles, split into separate stages so the TypeScript compiler (~23 MB —
+# needed ONLY to type-check and evaluate a brand's `brand.config.ts`, see scripts/lib/load-config.ts)
+# never reaches a runtime image:
+#   • branding-tools   — the brand-archive BUILDER (scripts/ + devDeps incl. typescript). Copied into
+#                        `build` only, which is where the ONBUILD bake runs.
+#   • branding-runtime — what the RUNNING backend imports (dist/ + nanotar/tslib). devDeps pruned.
+# `production` derives FROM base and copies only /build, so it inherits the runtime half alone.
+FROM branding-library AS branding-tools
+
+FROM branding-library AS branding-runtime
 RUN npm prune --omit=dev
 
 FROM node:25.9.0-alpine AS base
@@ -30,7 +39,7 @@ EXPOSE ${PORT}
 RUN apk --no-cache add git python3 make g++ bash linux-headers
 RUN mkdir -p /app
 WORKDIR /app
-COPY --from=branding-library ./app/ /packages/branding/
+COPY --from=branding-runtime ./app/ /packages/branding/
 # Where the running backend reads the deployed brand's archive (`<id>.tar.gz`) + baked default marker
 # (DEFAULT). A branding build bakes them here (see ONBUILD); vanilla leaves it empty (→ framework
 # defaults). Ops can override to a mounted volume, or pin a brand with $OCELOT_ACTIVE_BRANDING.
@@ -41,6 +50,9 @@ FROM base AS development
 CMD ["/bin/sh", "-c", "yarn install && yarn run dev"]
 
 FROM base AS build
+# The brand-archive builder, used by the ONBUILD bake below. Lives ONLY in this stage (published as
+# backend-build) — the runtime image is FROM base + COPY /build and never inherits it.
+COPY --from=branding-tools ./app/ /brand-tools/
 # Repo-root build context now (for /packages/branding): copy only the backend subtree to /app.
 COPY backend/ .
 # Optional per-brand overlays (code/seed data not yet ported to the runtime archive). The `[g]` glob
@@ -57,7 +69,7 @@ ONBUILD COPY brandin[g]/data/ src/db/data
 # data — code/data, not config). A vanilla build (no brand.config) skips this and stays vanilla.
 ONBUILD COPY brandin[g]/ /brand/
 ONBUILD RUN if ls /brand/brand.config.* >/dev/null 2>&1; then \
-      node /packages/branding/scripts/build-brand-archive.mjs /brand ./branding-assets --default; \
+      node /brand-tools/scripts/build-brand-archive.ts /brand ./branding-assets --default; \
     else echo "[branding] no typed brand.config — runtime archive skipped (vanilla)"; fi
 ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache

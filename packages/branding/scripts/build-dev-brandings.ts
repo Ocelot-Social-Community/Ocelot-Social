@@ -2,7 +2,7 @@
 // into its own `dist/<id>.tar.gz` (same as the brand's own `npm run build`), so `yarn dev` serves them
 // straight from deployment/configurations — no separate aggregate folder.
 //
-//   node scripts/build-dev-brandings.mjs
+//   node scripts/build-dev-brandings.ts
 //
 // "Compatible" = the config dir has a brand.config.(ts|mjs|js) (the new typed format). Old-format
 // deployment configs (constants/*.js only) are skipped and listed, so it's obvious what was left out.

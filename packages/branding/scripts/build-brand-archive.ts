@@ -3,7 +3,7 @@
 // from (webapp serverMiddleware, branding plugin, backend bootstrap, maintenance). A brand's own
 // `npm run build` runs this (see the brand package.json).
 //
-//   node scripts/build-brand-archive.mjs <brand-dir> [out] [--watch]
+//   node scripts/build-brand-archive.ts <brand-dir> [out] [--watch]
 //
 // The archive bundles the brand's bucket-instance fragments + assets/ + html/, indexed by manifest.json
 // (the brand's package.json `version` is recorded as manifest.version, not in any config leaf).
@@ -30,7 +30,7 @@ const isWatch = rest.includes('--watch')
 const isDefault = rest.includes('--default')
 const [brandArg, outArg]: (string | undefined)[] = rest.filter((a) => !a.startsWith('--'))
 if (!brandArg) {
-  console.error('usage: build-brand-archive.mjs <brand-dir> [out] [--watch] [--default]')
+  console.error('usage: build-brand-archive.ts <brand-dir> [out] [--watch] [--default]')
   process.exit(1)
 }
 const brandDir = resolve(brandArg)

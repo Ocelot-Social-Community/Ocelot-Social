@@ -25,11 +25,11 @@
           <select
             id="whole-package"
             class="composition-select"
-            :value="activeId"
+            :value="baseSelect"
             :disabled="!!saving || !!savingComposition"
             @change="switchTo($event.target.value)"
           >
-            <option value="">{{ $t('admin.branding.vanilla') }}</option>
+            <option :value="vanillaSource">{{ $t('admin.branding.vanilla') }}</option>
             <option v-for="src in sourceOptions" :key="src.id" :value="src.id">
               {{ src.label }}
             </option>
@@ -93,13 +93,15 @@
             :disabled="!!savingComposition || !!saving"
             @change="onBucketChange(bucket, $event.target.value)"
           >
-            <option value="">
+            <!-- Inheriting is only offered when the base package actually carries this bucket;
+                 otherwise the slot runs the framework default and says so. -->
+            <option v-if="providesBucket(activeId, bucket)" value="">
               {{ $t('admin.branding.composition.inherit', { base: baseLabel }) }}
             </option>
             <option :value="vanillaSource">
               {{ $t('admin.branding.composition.frameworkDefault') }}
             </option>
-            <option v-for="src in sourceOptions" :key="src.id" :value="src.id">
+            <option v-for="src in sourceOptionsFor(bucket)" :key="src.id" :value="src.id">
               {{ src.label }}
             </option>
           </select>
@@ -197,6 +199,14 @@
           </span>
           <span class="available-name">
             {{ b.label || b.id }}
+            <!-- The brand this page is currently composed from, and the deployment's baked fallback.
+                 Both can apply to the same entry. -->
+            <span v-if="b.id === activeId" class="branding-badge branding-badge-active">
+              {{ $t('admin.branding.available.active') }}
+            </span>
+            <span v-if="b.isDefault" class="branding-badge">
+              {{ $t('admin.branding.available.default') }}
+            </span>
             <code v-if="b.version" class="branding-version">v{{ b.version }}</code>
             <code
               v-if="schemaVersions[b.id]"
@@ -265,11 +275,17 @@ export default {
       expandedBase: false,
       // Staged (unconfirmed) per-bucket select changes, awaiting confirmation. bucket → source value.
       pending: {},
+      // The base this page was ACTUALLY server-rendered with (window.__NUXT__.brandingId, stamped by
+      // plugins/branding.js). Needed because an empty `activeBranding` policy does NOT mean vanilla:
+      // the SSR loader then resolves $OCELOT_ACTIVE_BRANDING → the baked DEFAULT marker → vanilla, and
+      // neither of the first two is visible to the client. Same reasoning as plugins/branding-subscribe.
+      renderedId: '',
     }
   },
   mounted() {
     // Initialise the composition editor from the live policy value (client-only; policy is loaded).
     this.composition = this.readComposition()
+    this.renderedId = (window.__NUXT__ && window.__NUXT__.brandingId) || ''
   },
   async fetch() {
     let list = []
@@ -308,15 +324,55 @@ export default {
         })(),
       ]),
     )
-    this.brandings = list
+    // The framework default is NOT an archive — it has no `.tar.gz`, so discovery can never report it
+    // and the manifest never contains it. It is nevertheless a real, selectable source (every bucket
+    // falls back to it, and the composition editor offers it per slot), so list it explicitly as the
+    // first entry instead of leaving the admin to infer it. Synthesised here, with the same shape the
+    // real entries have: id '' matches `activeId` when no brand is switched on, so it gets the
+    // "active base" badge exactly when it IS the base.
+    const vanilla = {
+      id: '',
+      label: this.$t('admin.branding.vanilla'),
+      version: null,
+      isDefault: false,
+      isVanilla: true,
+    }
+    details[vanilla.id] = brandingDefaults
+    // Vanilla backs every slot by definition — that is what "framework default" means.
+    providedBuckets[vanilla.id] = BUCKET_NAMES.map((type) => ({ type, name: 'default' }))
+
+    // Then the deployment's baked default — the brand every unswitched visitor actually sees. The
+    // rest keeps the manifest's own order.
+    const archives = [...list].sort((a, b) => Number(!!b.isDefault) - Number(!!a.isDefault))
+    this.brandings = [vanilla, ...archives]
     this.providedBuckets = providedBuckets
     this.details = details
     this.schemaVersions = schemaVersions
   },
   computed: {
-    // The live base brand id ('' = framework default). Kept live by the policy subscription.
-    activeId() {
+    // The raw stored value — '' (never chosen) or the vanilla sentinel or a brand id. Only the
+    // whole-package select needs it, so its option can round-trip the sentinel.
+    activeSelect() {
       return this.$policy.get('activeBranding') || ''
+    },
+    // The base brand actually IN EFFECT. Three cases, and only the first two come from the policy:
+    // the vanilla sentinel is an explicit "framework defaults"; a non-empty value is an explicit brand;
+    // an EMPTY value means nothing was ever chosen, and the server then resolved the base itself
+    // ($OCELOT_ACTIVE_BRANDING → baked DEFAULT marker → vanilla). Reading '' as vanilla — as this did —
+    // put the "active base" badge on the framework-default row and labelled the composition after it,
+    // while the deployment was rendering its baked brand. Everything that looks a brand up by id
+    // (labels, badges, config preview, which buckets the base provides) uses this.
+    activeId() {
+      const raw = this.activeSelect
+      if (raw === VANILLA_SOURCE) return ''
+      return raw || this.renderedId
+    },
+    // What the whole-package select shows. The unset policy has no option of its own, so it shows the
+    // brand that IS rendered; picking that same entry is a no-op (no change event), but switching away
+    // and back pins it explicitly — an accepted trade-off for not carrying a fourth select state.
+    baseSelect() {
+      if (this.activeSelect === VANILLA_SOURCE) return VANILLA_SOURCE
+      return this.activeId || VANILLA_SOURCE
     },
     // The six composable bucket slots (theme/identity/logos/legal/navigation/behavior).
     bucketNames() {
@@ -328,9 +384,14 @@ export default {
       const base = this.brandings.find((b) => b.id === this.activeId)
       return base ? base.label || base.id : this.activeId
     },
-    // Brands a slot (or the whole package) can be sourced from.
+    // Brands a slot (or the whole package) can be sourced from — ARCHIVES only. The framework default
+    // is listed below for reference but must not appear here: both selects already offer it as their
+    // own fixed option (the vanilla sentinel), so including it would render a duplicate entry with the
+    // same value.
     sourceOptions() {
-      return this.brandings.map((b) => ({ id: b.id, label: b.label || b.id }))
+      return this.brandings
+        .filter((b) => !b.isVanilla)
+        .map((b) => ({ id: b.id, label: b.label || b.id }))
     },
     // The sentinel select value for "framework default" (exposed to the template).
     vanillaSource() {
@@ -372,7 +433,7 @@ export default {
       return b ? b.label || b.id : id
     },
     sourceLabelFor(bucket) {
-      return this.labelForSelect(this.composition[bucket] || '')
+      return this.labelForSelect(this.effectiveSelect(bucket))
     },
     pendingLabelFor(bucket) {
       return this.labelForSelect(this.pending[bucket])
@@ -422,11 +483,11 @@ export default {
 
       const newSelect = this.hasPending(bucket)
         ? this.pending[bucket]
-        : this.composition[bucket] || ''
+        : this.effectiveSelect(bucket)
       const newRows = this.bucketRows(newSelect, bucket)
       if (!this.hasPending(bucket)) return mark(newRows.map((r) => ({ ...r, status: 'same' })))
 
-      const oldRows = this.bucketRows(this.composition[bucket] || '', bucket)
+      const oldRows = this.bucketRows(this.effectiveSelect(bucket), bucket)
       const oldMap = {}
       oldRows.forEach((r) => {
         oldMap[r.path] = r.value
@@ -505,9 +566,37 @@ export default {
         this.saving = null
       }
     },
-    // The value the select shows: the pending (unsaved) choice if any, else the saved override.
+    // Whether `id` ships a fragment for this bucket. An archive only carries the buckets its brand
+    // actually customises (build-brandings skips a bucket whose slice equals the framework default),
+    // so "provides" is what the archive manifest lists — not "is a brand". Vanilla is synthesised
+    // with all six in fetch(): the framework default backs every slot by definition.
+    providesBucket(id, bucket) {
+      return (this.providedBuckets[id] || []).some((inst) => inst && inst.type === bucket)
+    },
+    // Sources selectable for THIS slot: only brands that actually carry the bucket. Offering the rest
+    // was misleading — picking one changed nothing, because an absent fragment composes to the
+    // framework default. The currently stored source stays listed even when it does not provide the
+    // bucket (an older composition, or a brand that dropped it since), so the select keeps showing the
+    // state instead of falling back to a blank entry.
+    sourceOptionsFor(bucket) {
+      const stored = this.composition[bucket] || ''
+      return this.sourceOptions.filter(
+        (src) => this.providesBucket(src.id, bucket) || src.id === stored,
+      )
+    },
+    // The source a slot RUNS on. Normally the stored override ('' = inherit the base package), but
+    // when inheriting from a package without this bucket the slot effectively runs the framework
+    // default — and since that row is not offered, the select would otherwise show a blank value.
+    // Only the DISPLAY resolves this way: '' stays stored, so switching the base package later to one
+    // that does carry the bucket still pulls this slot along.
+    effectiveSelect(bucket) {
+      const stored = this.composition[bucket] || ''
+      if (stored) return stored
+      return this.providesBucket(this.activeId, bucket) ? '' : VANILLA_SOURCE
+    },
+    // The value the select shows: the pending (unsaved) choice if any, else the effective source.
     selectValue(bucket) {
-      return bucket in this.pending ? this.pending[bucket] : this.composition[bucket] || ''
+      return bucket in this.pending ? this.pending[bucket] : this.effectiveSelect(bucket)
     },
     hasPending(bucket) {
       return bucket in this.pending
@@ -816,6 +905,23 @@ export default {
 .branding-version {
   color: $text-color-soft;
   font-weight: normal;
+}
+
+.branding-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 6px;
+  border: 1px solid $border-color-softer;
+  border-radius: $border-radius-base;
+  font-size: $font-size-small;
+  font-weight: normal;
+  color: $text-color-soft;
+  vertical-align: middle;
+}
+
+.branding-badge-active {
+  border-color: $color-primary;
+  color: $color-primary;
 }
 
 .schema-version {

@@ -32,7 +32,6 @@ const environment = {
 
 const server = {
   GRAPHQL_URI: process.env.GRAPHQL_URI || 'http://localhost:4000',
-  BACKEND_TOKEN: process.env.BACKEND_TOKEN || 'NULL',
   WEBSOCKETS_URI: process.env.WEBSOCKETS_URI || 'ws://localhost:3000/api/graphql',
 }
 

@@ -10,6 +10,9 @@ jest.mock(
   () => ({
     discoverArchives: jest.fn(),
     readArchive: jest.fn(),
+    // The id guard is pure and security-relevant — take the REAL one, so a tightening of
+    // BRAND_ID_PATTERN is exercised here instead of being shadowed by a stub.
+    isValidBrandId: jest.requireActual('@ocelot-social/branding/dist/buckets.js').isValidBrandId,
   }),
   { virtual: true },
 )

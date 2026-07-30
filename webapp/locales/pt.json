@@ -82,6 +82,8 @@
     "branding": {
       "activate": null,
       "available": {
+        "active": "Base ativa",
+        "default": "Reserva",
         "title": null
       },
       "composition": {

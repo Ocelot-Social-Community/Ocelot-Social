@@ -117,3 +117,65 @@ describe('plugins/branding-subscribe', () => {
     Object.defineProperty(window, 'sessionStorage', original)
   })
 })
+
+// The tests above drive the CALLBACK with a hand-built signature; these drive the GETTER itself,
+// because the normalisation of the stored base into the rendered one happens there.
+function setupGetter(brandingId, brandingComposition = '') {
+  window.__NUXT__ = { brandingId, brandingComposition }
+  let getter, callback
+  brandingSubscribe({
+    store: {
+      watch: (g, cb) => {
+        getter = g
+        callback = cb
+      },
+    },
+  })
+  return (snapshot) => callback(getter({}, { 'policy/snapshot': snapshot }))
+}
+
+describe('plugins/branding-subscribe (base normalisation)', () => {
+  let reload
+
+  beforeEach(() => {
+    window.sessionStorage.clear()
+    reload = jest.fn()
+    Object.defineProperty(window, 'location', { configurable: true, value: { reload } })
+  })
+
+  // '@default' is how an explicit "no branding" is stored; the server reports the RESOLVED base ('').
+  it('treats the vanilla sentinel as already applied when the page rendered vanilla', () => {
+    const emit = setupGetter('')
+
+    emit({ activeBranding: '@default', brandingComposition: '' })
+
+    expect(reload).not.toHaveBeenCalled()
+  })
+
+  it('reloads when vanilla is chosen while a brand is rendered', () => {
+    const emit = setupGetter('stage')
+
+    emit({ activeBranding: '@default', brandingComposition: '' })
+
+    expect(reload).toHaveBeenCalledTimes(1)
+  })
+
+  // Nothing chosen: the server resolves through the ops pin / baked marker, which the client cannot
+  // see. Treating that as a divergence reloaded on the FIRST page load of every default-baked image
+  // and burned the single reload attempt.
+  it('never reloads for an unset base, whatever the page was rendered with', () => {
+    const emit = setupGetter('stage')
+
+    emit({ activeBranding: '', brandingComposition: '' })
+
+    expect(reload).not.toHaveBeenCalled()
+  })
+
+  it('still reloads for a composition change while the base is unset', () => {
+    const emit = setupGetter('stage', '')
+
+    emit({ activeBranding: '', brandingComposition: '{"logos":"@default"}' })
+
+    expect(reload).toHaveBeenCalledTimes(1)
+  })
+})

@@ -1,4 +1,4 @@
-// The brand-build library (scripts/lib/build-brandings.mjs): id/version resolution and the archive
+// The brand-build library (scripts/lib/build-brandings.ts): id/version resolution and the archive
 // bundler that turns a brand directory into a partial `<id>.tar.gz` (only customised buckets emit a
 // fragment) with asset paths namespaced under /branding/<id>/. Runs against real temp brand dirs and a
 // `.mjs` config (no TypeScript compiler needed).
