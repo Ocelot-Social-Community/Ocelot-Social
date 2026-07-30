@@ -91,7 +91,9 @@ describe('server-middleware/branding-sync', () => {
 
     const next = await run()
 
-    expect(global.fetch).toHaveBeenNthCalledWith(1, 'http://backend:4000/branding/manifest.json')
+    expect(global.fetch).toHaveBeenNthCalledWith(1, 'http://backend:4000/branding/manifest.json', {
+      signal: expect.any(AbortSignal),
+    })
     expect(global.fetch).toHaveBeenNthCalledWith(
       2,
       'http://backend:4000/branding/archives/stage',
@@ -126,6 +128,7 @@ describe('server-middleware/branding-sync', () => {
 
     expect(global.fetch).toHaveBeenNthCalledWith(2, 'http://backend:4000/branding/archives/stage', {
       headers: { 'if-none-match': 'W/"stage-1-2"' },
+      signal: expect.any(AbortSignal),
     })
     expect(fs.rename).not.toHaveBeenCalledWith(expect.any(String), '/cache/stage.tar.gz')
     delete process.env.OCELOT_BRANDING_SYNC_TTL_MS
@@ -154,8 +157,51 @@ describe('server-middleware/branding-sync', () => {
 
     expect(global.fetch).toHaveBeenNthCalledWith(2, 'http://backend:4000/branding/archives/stage', {
       headers: {},
+      signal: expect.any(AbortSignal),
     })
     delete process.env.OCELOT_BRANDING_SYNC_TTL_MS
+  })
+
+  // A backend that accepts the connection and then goes quiet is worse than one that refuses: without
+  // a bound on the request itself, the sync promise never settles and every later request queues
+  // behind that same dead socket.
+  describe('a backend that hangs instead of answering', () => {
+    // Never resolves — the socket is open and silent.
+    const hang = () => new Promise(() => {})
+
+    it('aborts the backend request itself, not just the wait for it', async () => {
+      process.env.OCELOT_BRANDING_SYNC_TIMEOUT_MS = '20'
+      let captured
+      global.fetch = jest.fn((_url, options) => {
+        captured = options.signal
+        return hang()
+      })
+
+      await run()
+
+      // Usually already aborted by the time the middleware returns; otherwise wait for the event. If
+      // it never fires, jest fails on its own timeout — no sleep, so there is nothing to tune.
+      if (!captured.aborted) {
+        await new Promise((resolve) => captured.addEventListener('abort', resolve))
+      }
+      expect(captured.aborted).toBe(true)
+      delete process.env.OCELOT_BRANDING_SYNC_TIMEOUT_MS
+    })
+
+    it('charges only the first request for the wait, not every later one', async () => {
+      process.env.OCELOT_BRANDING_SYNC_TIMEOUT_MS = '20'
+      global.fetch = jest.fn(hang)
+
+      await run()
+      await run()
+      await run()
+
+      // One 'sync not ready' means exactly one request waited out the bound; a second would mean the
+      // blocking boot path ran again and made another visitor pay for the same dead backend.
+      const waited = warn.mock.calls.filter((c) => String(c[0]).includes('sync not ready'))
+      expect(waited).toHaveLength(1)
+      delete process.env.OCELOT_BRANDING_SYNC_TIMEOUT_MS
+    })
   })
 
   it('keeps serving from the existing cache when the backend is unreachable', async () => {

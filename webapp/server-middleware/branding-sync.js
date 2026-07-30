@@ -23,17 +23,37 @@ const { discoverArchives, isValidBrandId } = require('@ocelot-social/branding/di
 // capturing the env here would freeze whatever was set at import time.
 // How long a completed sync is trusted before the next request triggers a background refresh.
 const ttlMs = () => Number(process.env.OCELOT_BRANDING_SYNC_TTL_MS || 60_000)
-// Bound on the FIRST (blocking) sync — a slow or dead backend must not hold the first page render.
-const bootTimeoutMs = () => Number(process.env.OCELOT_BRANDING_SYNC_TIMEOUT_MS || 5_000)
+// Two bounds, one knob. It caps (a) the FIRST (blocking) sync, so a slow or dead backend cannot hold
+// the first page render, and (b) every INDIVIDUAL backend request, so a socket that opens and then
+// goes quiet cannot pin the sync forever. Both are needed: (a) alone only stops the WAITING — the
+// request underneath keeps hanging, and since it stays the in-flight sync every later request would
+// queue behind the same dead socket. Node's fetch has no timeout of its own.
+const timeoutMs = () => Number(process.env.OCELOT_BRANDING_SYNC_TIMEOUT_MS || 5_000)
 
 // id → ETag of the archive currently on disk, so a refresh transfers nothing while it is unchanged.
 const etags = new Map()
 let lastSync = 0
 let inFlight = null
+// Whether the one blocking boot attempt has been spent (see the middleware).
+let bootBlockSpent = false
 
 function backendUrl() {
   // Same origin the branding plugin already talks to for the activeBranding policy.
   return (process.env.GRAPHQL_URI || 'http://localhost:4000').replace(/\/+$/, '')
+}
+
+// Run one backend request under its own AbortController, so the abort covers the RESPONSE BODY too,
+// not just the headers — a transfer that stalls halfway is the same dead socket. The timer is cleared
+// once the body has been consumed, never before.
+async function withRequestTimeout(run) {
+  const controller = new AbortController()
+  const ms = timeoutMs()
+  const timer = ms ? setTimeout(() => controller.abort(), ms) : null
+  try {
+    return await run(controller.signal)
+  } finally {
+    if (timer) clearTimeout(timer)
+  }
 }
 
 async function withTimeout(promise, ms) {
@@ -82,15 +102,24 @@ async function fetchArchive(base, dir, id) {
   // cache file plus a stale ETag would yield 304 and leave the brand missing.
   if (known && (await exists(target))) headers['if-none-match'] = known
 
-  const res = await fetch(`${base}/branding/archives/${encodeURIComponent(id)}`, { headers })
-  if (res.status === 304) return 'unchanged'
-  if (!res.ok) throw new Error(`archive ${id}: HTTP ${res.status}`)
+  const buffer = await withRequestTimeout(async (signal) => {
+    const res = await fetch(`${base}/branding/archives/${encodeURIComponent(id)}`, {
+      headers,
+      signal,
+    })
+    if (res.status === 304) return null
+    if (!res.ok) throw new Error(`archive ${id}: HTTP ${res.status}`)
 
-  const buffer = Buffer.from(await res.arrayBuffer())
+    // Read the body INSIDE the bound: a response whose headers arrived promptly can still stall.
+    const body = Buffer.from(await res.arrayBuffer())
+    const etag = res.headers.get('etag')
+    if (etag) etags.set(id, etag)
+    else etags.delete(id)
+    return body
+  })
+  if (!buffer) return 'unchanged'
+
   await writeAtomic(target, buffer)
-  const etag = res.headers.get('etag')
-  if (etag) etags.set(id, etag)
-  else etags.delete(id)
   await evictShadowingArchives(dir, id, target)
   return 'updated'
 }
@@ -148,9 +177,11 @@ async function writeDefaultMarker(dir, id) {
 
 async function sync(dir) {
   const base = backendUrl()
-  const res = await fetch(`${base}/branding/manifest.json`)
-  if (!res.ok) throw new Error(`manifest: HTTP ${res.status}`)
-  const manifest = await res.json()
+  const manifest = await withRequestTimeout(async (signal) => {
+    const res = await fetch(`${base}/branding/manifest.json`, { signal })
+    if (!res.ok) throw new Error(`manifest: HTTP ${res.status}`)
+    return res.json()
+  })
   if (!manifest || !Array.isArray(manifest.brands)) throw new Error('manifest: no brands array')
 
   await fs.mkdir(dir, { recursive: true })
@@ -200,20 +231,24 @@ module.exports = async function brandingSync(req, res, next) {
   if (!dir) return next()
 
   try {
-    if (!lastSync) {
+    if (!lastSync && !bootBlockSpent) {
       // First request after boot: block, but bounded — a dead backend falls through to the baked
       // archive (if any) instead of hanging the render.
-      await withTimeout(runSync(dir), bootTimeoutMs())
+      await withTimeout(runSync(dir), timeoutMs())
       // `>=`, not `>`: a TTL of 0 must mean "revalidate on every request", which `>` would turn into
       // "never" whenever two requests land in the same millisecond.
     } else if (Date.now() - lastSync >= ttlMs()) {
-      // Warm: refresh in the background so no request pays for it. An admin's brand switch is picked
-      // up within the TTL without a restart. Deliberately not awaited — runSync catches internally,
-      // so this promise never rejects.
+      // Warm — or booting with the block already spent: refresh in the background so no request pays
+      // for it. An admin's brand switch is picked up within the TTL without a restart. Deliberately
+      // not awaited — runSync catches internally, so this promise never rejects.
       runSync(dir)
     }
   } catch (error) {
-    // withTimeout rejected — the sync keeps running and will land for a later request.
+    // withTimeout rejected. The block is a ONE-SHOT: this deployment has just demonstrated it cannot
+    // deliver within the bound, and charging every later visitor the same wait would turn a slow
+    // backend into a slow site. The sync keeps running in the background and lands for a later
+    // request; until then the render uses whatever the cache dir already holds.
+    bootBlockSpent = true
     // eslint-disable-next-line no-console
     console.warn('[branding] sync not ready:', error && error.message)
   }
@@ -225,6 +260,7 @@ module.exports._reset = () => {
   etags.clear()
   lastSync = 0
   inFlight = null
+  bootBlockSpent = false
 }
 /** Await the background refresh a warm request kicked off (no-op when none is running). */
 module.exports._flush = () => inFlight || Promise.resolve()
