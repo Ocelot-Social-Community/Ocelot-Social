@@ -1,4 +1,13 @@
 // jest.mock is hoisted above the import, so branding-head sees this malicious brand config.
+//
+// The fixture is deliberately NOT named `mockBrand`. babel-plugin-jest-hoist allows a `mock*`-prefixed
+// out-of-scope variable in the factory but does NOT hoist its declaration; the factory here runs during
+// the (already hoisted) `import brandingHead from './branding-head.js'`, so the const would still be in
+// its temporal dead zone → "Cannot access 'mockBrand' before initialization", suite fails to run.
+// A plain `const` with a PURE initializer takes the other allowance in that plugin, which hoists the
+// declaration TOGETHER with the jest.mock call — which is exactly what makes this work. Keep it pure:
+// wrapping the literal in any call (e.g. a builder or deepFreeze) fails the purity check and throws
+// "not allowed to reference any out-of-scope variables" at transform time.
 import { CSS_LINK_ATTR, THEME_STYLE_ID, brandingHeadHtml } from '~/utils/brandingHead.js'
 
 import brandingHead from './branding-head.js'
