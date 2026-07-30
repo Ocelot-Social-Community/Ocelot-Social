@@ -305,6 +305,97 @@ describe('plugins/branding (SSR injection)', () => {
       expect(warn).toHaveBeenCalledWith(expect.stringContaining('no answer within 2000ms'))
     })
 
+    // setTimeout coerces NaN and negative delays to 0, so a mistyped bound would abort the request
+    // before it is sent and silently un-brand every render. The default has to survive the typo.
+    it.each([
+      ['garbage', 'two seconds'],
+      ['a negative delay', '-1'],
+      ['an empty value', ''],
+    ])('ignores %s for the policy timeout and keeps the default bound', async (_case, value) => {
+      process.env.OCELOT_BRANDING_POLICY_TIMEOUT_MS = value
+      const config = { id: 'nutrimind' }
+      mockDiscoverArchives.mockReturnValue(
+        new Map([['nutrimind', { id: 'nutrimind', file: '/brands/n.tar.gz' }]]),
+      )
+      mockComposeComposition.mockReturnValue(config)
+      // Answers a tick later — a bound of 0 fires first, a bound of 2000ms does not.
+      global.fetch = jest.fn(
+        (_uri, options) =>
+          new Promise((resolve, reject) => {
+            options.signal.addEventListener('abort', () => {
+              const aborted = new Error('aborted')
+              aborted.name = 'AbortError'
+              reject(aborted)
+            })
+            setTimeout(
+              () =>
+                resolve({
+                  ok: true,
+                  status: 200,
+                  json: async () => ({
+                    data: {
+                      policy: [
+                        { key: 'activeBranding', value: JSON.stringify('nutrimind') },
+                        { key: 'brandingComposition', value: JSON.stringify('') },
+                      ],
+                    },
+                  }),
+                }),
+              5,
+            )
+          }),
+      )
+
+      await brandingPlugin(context)
+
+      expect(warn).not.toHaveBeenCalled()
+      expect(mockComposeComposition).toHaveBeenCalledWith('/brands', { _default: 'nutrimind' })
+      delete process.env.OCELOT_BRANDING_POLICY_TIMEOUT_MS
+    })
+
+    it('treats a bound of 0 as "no bound" rather than "abort at once"', async () => {
+      jest.useFakeTimers()
+      process.env.OCELOT_BRANDING_POLICY_TIMEOUT_MS = '0'
+      mockDiscoverArchives.mockReturnValue(
+        new Map([['nutrimind', { id: 'nutrimind', file: '/brands/n.tar.gz' }]]),
+      )
+      mockComposeComposition.mockReturnValue({ id: 'nutrimind' })
+      // Answers only after FIVE times the default bound: if 0 armed a timer — its own or the default
+      // one — the request would be aborted long before this resolves.
+      global.fetch = jest.fn(
+        (_uri, options) =>
+          new Promise((resolve, reject) => {
+            options.signal.addEventListener('abort', () => {
+              const aborted = new Error('aborted')
+              aborted.name = 'AbortError'
+              reject(aborted)
+            })
+            setTimeout(
+              () =>
+                resolve({
+                  ok: true,
+                  status: 200,
+                  json: async () => ({
+                    data: {
+                      policy: [{ key: 'activeBranding', value: JSON.stringify('nutrimind') }],
+                    },
+                  }),
+                }),
+              10_000,
+            )
+          }),
+      )
+
+      const pending = brandingPlugin(context)
+      await jest.advanceTimersByTimeAsync(10_000)
+      await pending
+
+      expect(warn).not.toHaveBeenCalled()
+      expect(mockComposeComposition).toHaveBeenCalledWith('/brands', { _default: 'nutrimind' })
+      jest.useRealTimers()
+      delete process.env.OCELOT_BRANDING_POLICY_TIMEOUT_MS
+    })
+
     it('warns on a non-2xx answer instead of parsing it as a policy', async () => {
       global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 502, json: async () => ({}) })
 

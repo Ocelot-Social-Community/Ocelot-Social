@@ -19,16 +19,27 @@ const path = require('path')
 // eslint-disable-next-line import/no-unresolved -- package subpath, server-only (uses node:fs)
 const { discoverArchives, isValidBrandId } = require('@ocelot-social/branding/dist/discover.js')
 
+// A mistyped bound must not silently disable what it configures: `Number('2s')` is NaN and a negative
+// value is just as meaningless, and both would collapse to 0 — "revalidate on every request" for the
+// TTL, "abort immediately" for the timeout. Anything that is not a finite, non-negative number falls
+// back to the default; 0 itself stays meaningful (no TTL / no bound) and is passed through.
+// Duplicated in plugins/branding.js rather than shared: this file is loaded by Node as CommonJS
+// serverMiddleware, the plugin is bundled by webpack for both server and client.
+function boundMs(raw, fallback) {
+  const value = Number(raw)
+  return Number.isFinite(value) && value >= 0 ? value : fallback
+}
+
 // Read per call, not at module load: the webapp's server middleware is loaded once per process, and
 // capturing the env here would freeze whatever was set at import time.
 // How long a completed sync is trusted before the next request triggers a background refresh.
-const ttlMs = () => Number(process.env.OCELOT_BRANDING_SYNC_TTL_MS || 60_000)
+const ttlMs = () => boundMs(process.env.OCELOT_BRANDING_SYNC_TTL_MS, 60_000)
 // Two bounds, one knob. It caps (a) the FIRST (blocking) sync, so a slow or dead backend cannot hold
 // the first page render, and (b) every INDIVIDUAL backend request, so a socket that opens and then
 // goes quiet cannot pin the sync forever. Both are needed: (a) alone only stops the WAITING — the
 // request underneath keeps hanging, and since it stays the in-flight sync every later request would
 // queue behind the same dead socket. Node's fetch has no timeout of its own.
-const timeoutMs = () => Number(process.env.OCELOT_BRANDING_SYNC_TIMEOUT_MS || 5_000)
+const timeoutMs = () => boundMs(process.env.OCELOT_BRANDING_SYNC_TIMEOUT_MS, 5_000)
 
 // id → ETag of the archive currently on disk, so a refresh transfers nothing while it is unchanged.
 const etags = new Map()

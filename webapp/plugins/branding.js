@@ -39,10 +39,21 @@ function extractPolicy(policy, key) {
 // and the per-slot composition (`brandingComposition`, a JSON string). Returns { active, composition }
 // (composition = the RAW json string as stored), or null when the backend could not be reached (→ the
 // caller falls back to env / baked default). Server-only.
+// A mistyped bound must not silently DISABLE what it configures. setTimeout coerces both NaN
+// (`Number('2s')`) and a negative delay to 0, so the abort would fire before the request is even sent
+// and EVERY server render would fall back to the ops pin — indistinguishable in the page from "no
+// brand switched". Anything that is not a finite, non-negative number is therefore ignored in favour
+// of the default; 0 stays meaningful and means "no bound" (same reading as the sync middleware's
+// $OCELOT_BRANDING_SYNC_TIMEOUT_MS).
+function boundMs(raw, fallback) {
+  const value = Number(raw)
+  return Number.isFinite(value) && value >= 0 ? value : fallback
+}
+
 async function fetchBrandingPolicy(uri) {
   const controller = typeof AbortController !== 'undefined' ? new AbortController() : null
-  const timeout = Number(process.env.OCELOT_BRANDING_POLICY_TIMEOUT_MS || 2000)
-  const timer = controller ? setTimeout(() => controller.abort(), timeout) : null
+  const timeout = boundMs(process.env.OCELOT_BRANDING_POLICY_TIMEOUT_MS, 2000)
+  const timer = controller && timeout ? setTimeout(() => controller.abort(), timeout) : null
   try {
     const res = await fetch(uri, {
       method: 'POST',

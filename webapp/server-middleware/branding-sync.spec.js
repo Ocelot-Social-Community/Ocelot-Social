@@ -204,6 +204,34 @@ describe('server-middleware/branding-sync', () => {
     })
   })
 
+  // Same trap as the plugin's policy bound. '-1' is the case that BITES here: it arms a timer that
+  // fires at once, so the request is aborted before the backend can answer and the sync never lands.
+  // 'one minute' collapses to NaN, which happens to read as "no bound" today — the case is kept so a
+  // future change cannot start arming a timer for it either.
+  it.each([
+    ['a negative delay', '-1'],
+    ['garbage', 'one minute'],
+  ])('ignores %s for the sync timeout and keeps the default bound', async (_case, value) => {
+    process.env.OCELOT_BRANDING_SYNC_TIMEOUT_MS = value
+    let captured
+    // Answers a macrotask later, so a bound that fires "immediately" gets there first.
+    global.fetch = jest.fn((_url, options) => {
+      captured = options.signal
+      return new Promise((resolve, reject) => {
+        options.signal.addEventListener('abort', () => {
+          reject(Object.assign(new Error('aborted'), { name: 'AbortError' }))
+        })
+        setTimeout(() => resolve(jsonResponse({ default: '', brands: [] })), 5)
+      })
+    })
+
+    await run()
+
+    expect(captured.aborted).toBe(false)
+    expect(warn).not.toHaveBeenCalled()
+    delete process.env.OCELOT_BRANDING_SYNC_TIMEOUT_MS
+  })
+
   it('keeps serving from the existing cache when the backend is unreachable', async () => {
     global.fetch = jest.fn().mockRejectedValue(new Error('ECONNREFUSED'))
 
