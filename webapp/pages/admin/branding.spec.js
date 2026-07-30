@@ -173,13 +173,47 @@ describe('admin/branding available list', () => {
   })
 
   it('marks the brand currently used as base', () => {
-    // activeSelect carries the RAW policy value (so the select can round-trip it); activeId is the
-    // effective brand id everything else looks up by.
+    // activeSelect carries the RAW policy value; activeId is the effective brand id everything else
+    // looks up by.
     const ctx = { $policy: { get: (key) => (key === 'activeBranding' ? 'other' : '') } }
     const activeSelect = BrandingPage.computed.activeSelect.call(ctx)
 
     expect(activeSelect).toBe('other')
-    expect(BrandingPage.computed.activeId.call({ activeSelect })).toBe('other')
+    expect(BrandingPage.computed.activeId.call({ activeSelect, renderedId: '' })).toBe('other')
+  })
+
+  // An empty policy is NOT vanilla: the SSR loader resolves it through $OCELOT_ACTIVE_BRANDING and the
+  // baked DEFAULT marker, neither of which the client can see. Reading it as vanilla put the "active
+  // base" badge on the framework-default row while the deployment rendered its baked brand.
+  describe('an unset policy on a deployment that bakes a default', () => {
+    const unset = { activeSelect: '', renderedId: 'stage' }
+
+    it('treats the brand the page was rendered with as the active base', () => {
+      expect(BrandingPage.computed.activeId.call(unset)).toBe('stage')
+    })
+
+    it('shows that brand in the whole-package select rather than the framework default', () => {
+      expect(BrandingPage.computed.baseSelect.call({ ...unset, activeId: 'stage' })).toBe('stage')
+    })
+
+    it('still shows the framework default when nothing is baked in either', () => {
+      const vanilla = { activeSelect: '', renderedId: '' }
+      expect(BrandingPage.computed.activeId.call(vanilla)).toBe('')
+      expect(BrandingPage.computed.baseSelect.call({ ...vanilla, activeId: '' })).toBe('@default')
+    })
+
+    // An explicit choice must never be overridden by what happens to be rendered.
+    it('keeps an explicit brand and the explicit-vanilla sentinel', () => {
+      expect(
+        BrandingPage.computed.activeId.call({ activeSelect: 'other', renderedId: 'stage' }),
+      ).toBe('other')
+      expect(
+        BrandingPage.computed.activeId.call({ activeSelect: '@default', renderedId: 'stage' }),
+      ).toBe('')
+      expect(
+        BrandingPage.computed.baseSelect.call({ activeSelect: '@default', activeId: '' }),
+      ).toBe('@default')
+    })
   })
 
   // "No branding" is stored as the '@default' sentinel so the server can tell it apart from "never
@@ -191,6 +225,6 @@ describe('admin/branding available list', () => {
     // The select keeps the sentinel so its vanilla option stays selected...
     expect(activeSelect).toBe('@default')
     // ...while lookups by id see plain vanilla.
-    expect(BrandingPage.computed.activeId.call({ activeSelect })).toBe('')
+    expect(BrandingPage.computed.activeId.call({ activeSelect, renderedId: 'stage' })).toBe('')
   })
 })

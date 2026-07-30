@@ -25,7 +25,7 @@
           <select
             id="whole-package"
             class="composition-select"
-            :value="activeSelect"
+            :value="baseSelect"
             :disabled="!!saving || !!savingComposition"
             @change="switchTo($event.target.value)"
           >
@@ -275,11 +275,17 @@ export default {
       expandedBase: false,
       // Staged (unconfirmed) per-bucket select changes, awaiting confirmation. bucket → source value.
       pending: {},
+      // The base this page was ACTUALLY server-rendered with (window.__NUXT__.brandingId, stamped by
+      // plugins/branding.js). Needed because an empty `activeBranding` policy does NOT mean vanilla:
+      // the SSR loader then resolves $OCELOT_ACTIVE_BRANDING → the baked DEFAULT marker → vanilla, and
+      // neither of the first two is visible to the client. Same reasoning as plugins/branding-subscribe.
+      renderedId: '',
     }
   },
   mounted() {
     // Initialise the composition editor from the live policy value (client-only; policy is loaded).
     this.composition = this.readComposition()
+    this.renderedId = (window.__NUXT__ && window.__NUXT__.brandingId) || ''
   },
   async fetch() {
     let list = []
@@ -349,12 +355,24 @@ export default {
     activeSelect() {
       return this.$policy.get('activeBranding') || ''
     },
-    // The live base brand id, normalised: '' means framework defaults, whether that is because
-    // nothing was ever chosen or because vanilla was chosen explicitly. Everything that looks a brand
-    // up by id (labels, badges, config preview) uses this.
+    // The base brand actually IN EFFECT. Three cases, and only the first two come from the policy:
+    // the vanilla sentinel is an explicit "framework defaults"; a non-empty value is an explicit brand;
+    // an EMPTY value means nothing was ever chosen, and the server then resolved the base itself
+    // ($OCELOT_ACTIVE_BRANDING → baked DEFAULT marker → vanilla). Reading '' as vanilla — as this did —
+    // put the "active base" badge on the framework-default row and labelled the composition after it,
+    // while the deployment was rendering its baked brand. Everything that looks a brand up by id
+    // (labels, badges, config preview, which buckets the base provides) uses this.
     activeId() {
       const raw = this.activeSelect
-      return raw === VANILLA_SOURCE ? '' : raw
+      if (raw === VANILLA_SOURCE) return ''
+      return raw || this.renderedId
+    },
+    // What the whole-package select shows. The unset policy has no option of its own, so it shows the
+    // brand that IS rendered; picking that same entry is a no-op (no change event), but switching away
+    // and back pins it explicitly — an accepted trade-off for not carrying a fourth select state.
+    baseSelect() {
+      if (this.activeSelect === VANILLA_SOURCE) return VANILLA_SOURCE
+      return this.activeId || VANILLA_SOURCE
     },
     // The six composable bucket slots (theme/identity/logos/legal/navigation/behavior).
     bucketNames() {
@@ -368,8 +386,8 @@ export default {
     },
     // Brands a slot (or the whole package) can be sourced from — ARCHIVES only. The framework default
     // is listed below for reference but must not appear here: both selects already offer it as their
-    // own fixed option (the whole-package select as `value=""`, a slot select additionally as the
-    // vanilla sentinel), so including it would render a duplicate entry with the same value.
+    // own fixed option (the vanilla sentinel), so including it would render a duplicate entry with the
+    // same value.
     sourceOptions() {
       return this.brandings
         .filter((b) => !b.isVanilla)
