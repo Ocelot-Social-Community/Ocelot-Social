@@ -50,7 +50,25 @@ function boundMs(raw, fallback) {
   return Number.isFinite(value) && value >= 0 ? value : fallback
 }
 
+// What of the endpoint may appear in a log line. The endpoint itself STAYS — it is the point of these
+// warnings, a GRAPHQL_URI pointing at the wrong host is invisible without it — but the two parts that
+// can carry a credential are dropped: userinfo (https://user:pass@host) and the query/fragment. A
+// value that does not parse as a URL is logged verbatim: it cannot have been sent anywhere, and
+// hiding it would hide the very misconfiguration being reported.
+function safeUri(uri) {
+  try {
+    const parsed = new URL(uri)
+    // Rebuilt from the safe parts rather than blanked on the URL object, so the line reads exactly
+    // like the configured value (`toString()` would normalise a bare origin to a trailing slash).
+    const path = parsed.pathname === '/' ? '' : parsed.pathname
+    return `${parsed.protocol}//${parsed.host}${path}`
+  } catch (error) {
+    return uri
+  }
+}
+
 async function fetchBrandingPolicy(uri) {
+  const endpoint = safeUri(uri)
   const controller = typeof AbortController !== 'undefined' ? new AbortController() : null
   const timeout = boundMs(process.env.OCELOT_BRANDING_POLICY_TIMEOUT_MS, 2000)
   const timer = controller && timeout ? setTimeout(() => controller.abort(), timeout) : null
@@ -63,7 +81,9 @@ async function fetchBrandingPolicy(uri) {
     })
     if (!res.ok) {
       // eslint-disable-next-line no-console
-      console.warn(`[branding] policy query to ${uri} answered HTTP ${res.status} — using fallback`)
+      console.warn(
+        `[branding] policy query to ${endpoint} answered HTTP ${res.status} — using fallback`,
+      )
       return null
     }
     const json = await res.json()
@@ -80,7 +100,7 @@ async function fetchBrandingPolicy(uri) {
     // ingress and shows the real policy, while SSR never got it.
     // eslint-disable-next-line no-console
     console.warn(
-      `[branding] policy query to ${uri} failed (${error && error.name === 'AbortError' ? `no answer within ${timeout}ms` : (error && error.message) || error}) — falling back to $OCELOT_ACTIVE_BRANDING / the baked default; the active branding and its composition will be IGNORED`,
+      `[branding] policy query to ${endpoint} failed (${error && error.name === 'AbortError' ? `no answer within ${timeout}ms` : (error && error.message) || error}) — falling back to $OCELOT_ACTIVE_BRANDING / the baked default; the active branding and its composition will be IGNORED`,
     )
     return null
   } finally {

@@ -396,6 +396,36 @@ describe('plugins/branding (SSR injection)', () => {
       delete process.env.OCELOT_BRANDING_POLICY_TIMEOUT_MS
     })
 
+    // The endpoint stays in the log (that is what makes a wrong GRAPHQL_URI visible), but nothing that
+    // could be a credential does — userinfo and the query string are dropped on both warning paths.
+    it.each([
+      [
+        'a non-2xx answer',
+        () => {
+          global.fetch = jest
+            .fn()
+            .mockResolvedValue({ ok: false, status: 502, json: async () => ({}) })
+        },
+      ],
+      [
+        'a transport failure',
+        () => {
+          global.fetch = jest.fn().mockRejectedValue(new Error('ECONNREFUSED'))
+        },
+      ],
+    ])('keeps credentials out of the log when reporting %s', async (_case, arrange) => {
+      process.env.GRAPHQL_URI = 'http://svc:s3cr3t@backend:4000/graphql?token=leaked'
+      arrange()
+
+      await brandingPlugin(context)
+
+      const logged = warn.mock.calls.map((c) => String(c[0])).join('\n')
+      expect(logged).toContain('http://backend:4000/graphql')
+      expect(logged).not.toContain('s3cr3t')
+      expect(logged).not.toContain('leaked')
+      expect(logged).not.toContain('svc:')
+    })
+
     it('warns on a non-2xx answer instead of parsing it as a policy', async () => {
       global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 502, json: async () => ({}) })
 
