@@ -67,10 +67,14 @@ describe('server-middleware/branding-sync', () => {
     warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
   })
 
+  // Undone HERE, not at the end of the test that set it: a failing assertion aborts the test body, so
+  // trailing cleanup never runs and the next test inherits a foreign TTL/bound.
   afterEach(() => {
     warn.mockRestore()
     delete process.env.OCELOT_BRANDING_ASSETS_DIR
     delete process.env.GRAPHQL_URI
+    delete process.env.OCELOT_BRANDING_SYNC_TTL_MS
+    delete process.env.OCELOT_BRANDING_SYNC_TIMEOUT_MS
   })
 
   it('does nothing without a cache dir configured', async () => {
@@ -131,7 +135,6 @@ describe('server-middleware/branding-sync', () => {
       signal: expect.any(AbortSignal),
     })
     expect(fs.rename).not.toHaveBeenCalledWith(expect.any(String), '/cache/stage.tar.gz')
-    delete process.env.OCELOT_BRANDING_SYNC_TTL_MS
   })
 
   it('does not send a stale validator when the cached file is gone', async () => {
@@ -159,7 +162,6 @@ describe('server-middleware/branding-sync', () => {
       headers: {},
       signal: expect.any(AbortSignal),
     })
-    delete process.env.OCELOT_BRANDING_SYNC_TTL_MS
   })
 
   // A backend that accepts the connection and then goes quiet is worse than one that refuses: without
@@ -185,7 +187,6 @@ describe('server-middleware/branding-sync', () => {
         await new Promise((resolve) => captured.addEventListener('abort', resolve))
       }
       expect(captured.aborted).toBe(true)
-      delete process.env.OCELOT_BRANDING_SYNC_TIMEOUT_MS
     })
 
     it('charges only the first request for the wait, not every later one', async () => {
@@ -200,7 +201,6 @@ describe('server-middleware/branding-sync', () => {
       // blocking boot path ran again and made another visitor pay for the same dead backend.
       const waited = warn.mock.calls.filter((c) => String(c[0]).includes('sync not ready'))
       expect(waited).toHaveLength(1)
-      delete process.env.OCELOT_BRANDING_SYNC_TIMEOUT_MS
     })
   })
 
@@ -229,7 +229,6 @@ describe('server-middleware/branding-sync', () => {
 
     expect(captured.aborted).toBe(false)
     expect(warn).not.toHaveBeenCalled()
-    delete process.env.OCELOT_BRANDING_SYNC_TIMEOUT_MS
   })
 
   it('keeps serving from the existing cache when the backend is unreachable', async () => {

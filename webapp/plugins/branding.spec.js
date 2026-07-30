@@ -57,9 +57,16 @@ describe('plugins/branding (SSR injection)', () => {
     context = { beforeNuxtRender: jest.fn() }
   })
 
+  // Every env var and timer mode this file touches is undone HERE, not at the end of the test that
+  // set it: a failing assertion aborts the test body, so trailing cleanup never runs and the next test
+  // inherits a foreign bound — one real failure turns into a cascade that hides its own cause.
   afterEach(() => {
     delete process.server
     delete process.env.OCELOT_BRANDING_ASSETS_DIR
+    delete process.env.OCELOT_ACTIVE_BRANDING
+    delete process.env.GRAPHQL_URI
+    delete process.env.OCELOT_BRANDING_POLICY_TIMEOUT_MS
+    jest.useRealTimers()
   })
 
   it('injects the composed brand config and serialises it to the client', async () => {
@@ -220,7 +227,6 @@ describe('plugins/branding (SSR injection)', () => {
       await brandingPlugin(context)
 
       expect(mockComposeComposition).toHaveBeenCalledWith('/brands', { _default: 'stage' })
-      delete process.env.OCELOT_ACTIVE_BRANDING
     })
   })
 
@@ -243,7 +249,6 @@ describe('plugins/branding (SSR injection)', () => {
       })
 
       expect(global.fetch).toHaveBeenCalledWith('http://release-backend:4000', expect.anything())
-      delete process.env.GRAPHQL_URI
     })
 
     it('falls back to the env var when no runtime config is present', async () => {
@@ -257,7 +262,6 @@ describe('plugins/branding (SSR injection)', () => {
       await brandingPlugin(context)
 
       expect(global.fetch).toHaveBeenCalledWith('http://from-env:4000', expect.anything())
-      delete process.env.GRAPHQL_URI
     })
   })
 
@@ -280,8 +284,6 @@ describe('plugins/branding (SSR injection)', () => {
 
     afterEach(() => {
       warn.mockRestore()
-      delete process.env.GRAPHQL_URI
-      delete process.env.OCELOT_ACTIVE_BRANDING
     })
 
     it('warns and names the consequence when the request fails', async () => {
@@ -350,7 +352,6 @@ describe('plugins/branding (SSR injection)', () => {
 
       expect(warn).not.toHaveBeenCalled()
       expect(mockComposeComposition).toHaveBeenCalledWith('/brands', { _default: 'nutrimind' })
-      delete process.env.OCELOT_BRANDING_POLICY_TIMEOUT_MS
     })
 
     it('treats a bound of 0 as "no bound" rather than "abort at once"', async () => {
@@ -392,8 +393,6 @@ describe('plugins/branding (SSR injection)', () => {
 
       expect(warn).not.toHaveBeenCalled()
       expect(mockComposeComposition).toHaveBeenCalledWith('/brands', { _default: 'nutrimind' })
-      jest.useRealTimers()
-      delete process.env.OCELOT_BRANDING_POLICY_TIMEOUT_MS
     })
 
     // The endpoint stays in the log (that is what makes a wrong GRAPHQL_URI visible), but nothing that
