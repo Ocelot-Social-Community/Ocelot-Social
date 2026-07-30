@@ -3,6 +3,7 @@ import fs from 'fs'
 import manifest from './constants/manifest.js'
 import metadata from './constants/metadata.js'
 import locales from './locales/index.js'
+import { brandingHeadHtml } from './utils/brandingHead.js'
 
 const CONFIG = require('./config').default // we need to use require since this is only evaluated at compile time.
 
@@ -163,6 +164,27 @@ export default {
     // @nuxtjs/pwa manifest, disabled below) so app name / theme colour follow a live brand switch.
     { path: '/manifest.webmanifest', handler: '~/server-middleware/manifest.js' },
   ],
+
+  /*
+   ** Render hooks
+   */
+  hooks: {
+    // Brand the FIRST paint. plugins/branding.js resolves the active brand during SSR and stores it in
+    // the nuxt state; without this hook its theme (CSS custom properties + @font-face) and stylesheets
+    // were only applied by plugins/branding-head.js after hydration, so the page flashed vanilla
+    // colours and fonts before switching — most visibly in the footer, whose link colour is
+    // $color-footer-link → $color-primary → var(--color-primary).
+    //
+    // It has to be THIS hook and not vue-meta: the renderer builds the head as
+    // `meta.link + meta.style + … + renderResourceHints() + renderStyles()`, so anything vue-meta
+    // contributes precedes the app's CSS bundles and loses the cascade on equal specificity (`:root`
+    // vs `:root`). templateParams runs after renderStyles(), which is exactly where the client plugin
+    // appends its tags too — one cascade for both paths.
+    'vue-renderer:ssr:templateParams'(templateParams, renderContext) {
+      const branding = renderContext && renderContext.nuxt && renderContext.nuxt.branding
+      if (branding) templateParams.HEAD += brandingHeadHtml(branding)
+    },
+  },
 
   /*
    ** Plugins to load before mounting the App
