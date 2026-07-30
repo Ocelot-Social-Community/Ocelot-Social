@@ -1,13 +1,17 @@
-import fs from 'fs'
+import { promises as fs } from 'fs'
 
 import brandingSync from './branding-sync.js'
 
+// The middleware talks to the promise API only (a sync write would stall the event loop the TTL
+// refresh is supposed to run beside) — `access` resolving means "the file is there".
 jest.mock('fs', () => ({
-  mkdirSync: jest.fn(),
-  writeFileSync: jest.fn(),
-  renameSync: jest.fn(),
-  unlinkSync: jest.fn(),
-  existsSync: jest.fn(() => true),
+  promises: {
+    mkdir: jest.fn(() => Promise.resolve()),
+    writeFile: jest.fn(() => Promise.resolve()),
+    rename: jest.fn(() => Promise.resolve()),
+    unlink: jest.fn(() => Promise.resolve()),
+    access: jest.fn(() => Promise.resolve()),
+  },
 }))
 
 jest.mock(
@@ -94,14 +98,11 @@ describe('server-middleware/branding-sync', () => {
       expect.anything(),
     )
     // Written to a temp name first, then renamed — a half-transferred archive is never discoverable.
-    expect(fs.writeFileSync).toHaveBeenCalledWith(
+    expect(fs.writeFile).toHaveBeenCalledWith(
       expect.stringMatching(/^\/cache\/stage\.tar\.gz\.\d+\.tmp$/),
       expect.any(Buffer),
     )
-    expect(fs.renameSync).toHaveBeenCalledWith(
-      expect.stringMatching(/\.tmp$/),
-      '/cache/stage.tar.gz',
-    )
+    expect(fs.rename).toHaveBeenCalledWith(expect.stringMatching(/\.tmp$/), '/cache/stage.tar.gz')
     expect(next).toHaveBeenCalled()
   })
 
@@ -126,7 +127,7 @@ describe('server-middleware/branding-sync', () => {
     expect(global.fetch).toHaveBeenNthCalledWith(2, 'http://backend:4000/branding/archives/stage', {
       headers: { 'if-none-match': 'W/"stage-1-2"' },
     })
-    expect(fs.renameSync).not.toHaveBeenCalledWith(expect.any(String), '/cache/stage.tar.gz')
+    expect(fs.rename).not.toHaveBeenCalledWith(expect.any(String), '/cache/stage.tar.gz')
     delete process.env.OCELOT_BRANDING_SYNC_TTL_MS
   })
 
@@ -137,19 +138,24 @@ describe('server-middleware/branding-sync', () => {
       .mockResolvedValueOnce(archiveResponse('tarbytes'))
     await run()
 
-    fs.existsSync.mockReturnValue(false)
-    brandingSync._reset()
     jest.clearAllMocks()
+
+    // KEEP the stored ETag (no _reset) — the point is that a known validator is withheld because the
+    // file it describes is gone; resetting would clear the ETag and the assertion would hold anyway.
+    fs.access.mockRejectedValue(Object.assign(new Error('ENOENT'), { code: 'ENOENT' }))
+    process.env.OCELOT_BRANDING_SYNC_TTL_MS = '0'
     global.fetch = jest
       .fn()
       .mockResolvedValueOnce(jsonResponse(MANIFEST))
       .mockResolvedValueOnce(archiveResponse('tarbytes'))
 
     await run()
+    await brandingSync._flush()
 
     expect(global.fetch).toHaveBeenNthCalledWith(2, 'http://backend:4000/branding/archives/stage', {
       headers: {},
     })
+    delete process.env.OCELOT_BRANDING_SYNC_TTL_MS
   })
 
   it('keeps serving from the existing cache when the backend is unreachable', async () => {
@@ -157,7 +163,7 @@ describe('server-middleware/branding-sync', () => {
 
     const next = await run()
 
-    expect(fs.renameSync).not.toHaveBeenCalled()
+    expect(fs.rename).not.toHaveBeenCalled()
     expect(next).toHaveBeenCalled()
     expect(warn).toHaveBeenCalledWith(
       '[branding] sync from backend failed:',
@@ -176,7 +182,7 @@ describe('server-middleware/branding-sync', () => {
 
     await run()
 
-    expect(fs.renameSync).toHaveBeenCalledWith(expect.any(String), '/cache/stage.tar.gz')
+    expect(fs.rename).toHaveBeenCalledWith(expect.any(String), '/cache/stage.tar.gz')
   })
 
   it('ignores manifest entries whose id could escape the cache dir', async () => {
@@ -190,7 +196,7 @@ describe('server-middleware/branding-sync', () => {
 
     // Only the manifest was fetched — no id survived the guard.
     expect(global.fetch).toHaveBeenCalledTimes(1)
-    expect(fs.writeFileSync).not.toHaveBeenCalled()
+    expect(fs.writeFile).not.toHaveBeenCalled()
   })
 
   // Brand resolution ends at this marker, so an archive without it renders vanilla.
@@ -202,11 +208,11 @@ describe('server-middleware/branding-sync', () => {
 
     await run()
 
-    expect(fs.writeFileSync).toHaveBeenCalledWith(
+    expect(fs.writeFile).toHaveBeenCalledWith(
       expect.stringMatching(/^\/cache\/DEFAULT\.\d+\.tmp$/),
       Buffer.from('stage\n', 'utf8'),
     )
-    expect(fs.renameSync).toHaveBeenCalledWith(expect.stringMatching(/\.tmp$/), '/cache/DEFAULT')
+    expect(fs.rename).toHaveBeenCalledWith(expect.stringMatching(/\.tmp$/), '/cache/DEFAULT')
   })
 
   it('clears a stale marker when the backend has no default', async () => {
@@ -214,7 +220,7 @@ describe('server-middleware/branding-sync', () => {
 
     await run()
 
-    expect(fs.unlinkSync).toHaveBeenCalledWith('/cache/DEFAULT')
+    expect(fs.unlink).toHaveBeenCalledWith('/cache/DEFAULT')
   })
 
   it('refuses a default id that could escape the cache dir', async () => {
@@ -222,8 +228,8 @@ describe('server-middleware/branding-sync', () => {
 
     await run()
 
-    expect(fs.writeFileSync).not.toHaveBeenCalled()
-    expect(fs.unlinkSync).toHaveBeenCalledWith('/cache/DEFAULT')
+    expect(fs.writeFile).not.toHaveBeenCalled()
+    expect(fs.unlink).toHaveBeenCalledWith('/cache/DEFAULT')
   })
 
   it('survives a manifest that is not an array', async () => {
@@ -232,7 +238,7 @@ describe('server-middleware/branding-sync', () => {
     const next = await run()
 
     expect(next).toHaveBeenCalled()
-    expect(fs.writeFileSync).not.toHaveBeenCalled()
+    expect(fs.writeFile).not.toHaveBeenCalled()
   })
 
   // A baked brand lands as both `<id>.tar.gz` and `<id>-<version>.tar.gz`; discovery keeps one file
@@ -248,7 +254,7 @@ describe('server-middleware/branding-sync', () => {
 
     await run()
 
-    expect(fs.unlinkSync).toHaveBeenCalledWith('/cache/stage-1.0.0.tar.gz')
+    expect(fs.unlink).toHaveBeenCalledWith('/cache/stage-1.0.0.tar.gz')
   })
 
   it('leaves the directory alone when the synced archive already wins', async () => {
@@ -260,7 +266,7 @@ describe('server-middleware/branding-sync', () => {
 
     await run()
 
-    expect(fs.unlinkSync).not.toHaveBeenCalled()
+    expect(fs.unlink).not.toHaveBeenCalled()
   })
 
   it('reports a partial failure but keeps the archives that arrived', async () => {
@@ -274,7 +280,7 @@ describe('server-middleware/branding-sync', () => {
 
     await run()
 
-    expect(fs.renameSync).toHaveBeenCalledWith(expect.any(String), '/cache/stage.tar.gz')
+    expect(fs.rename).toHaveBeenCalledWith(expect.any(String), '/cache/stage.tar.gz')
     expect(warn).toHaveBeenCalledWith(
       expect.stringContaining('1/2 archive(s) failed to sync'),
       expect.stringContaining('HTTP 500'),

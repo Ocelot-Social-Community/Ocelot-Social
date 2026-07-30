@@ -13,7 +13,7 @@
 //
 // Registered FIRST in nuxt.config.js `serverMiddleware`, so the initial sync completes before the
 // branding-assets middleware or SSR read the directory.
-const fs = require('fs')
+const fs = require('fs').promises
 const path = require('path')
 
 // eslint-disable-next-line import/no-unresolved -- package subpath, server-only (uses node:fs)
@@ -51,12 +51,27 @@ async function withTimeout(promise, ms) {
   }
 }
 
+/** Whether `file` is there — the promise-API stand-in for existsSync. */
+async function exists(file) {
+  try {
+    await fs.access(file)
+    return true
+  } catch (error) {
+    return false
+  }
+}
+
 // Write via a temp file + rename so a half-transferred archive is never discoverable: readers only
 // ever see a complete file, and rename is atomic within the same directory.
-function writeAtomic(target, buffer) {
+//
+// The promise API, not the *Sync one: the TTL refresh runs unawaited BESIDE the request that kicked
+// it off ("no request pays for it"), and a sync write would stall the single event loop — and with it
+// every request in flight — for as long as the archive takes to hit the disk. Atomicity is unaffected:
+// it comes from the rename, not from the write being synchronous.
+async function writeAtomic(target, buffer) {
   const tmp = `${target}.${process.pid}.tmp`
-  fs.writeFileSync(tmp, buffer)
-  fs.renameSync(tmp, target)
+  await fs.writeFile(tmp, buffer)
+  await fs.rename(tmp, target)
 }
 
 async function fetchArchive(base, dir, id) {
@@ -65,18 +80,18 @@ async function fetchArchive(base, dir, id) {
   const target = path.join(dir, `${id}.tar.gz`)
   // Only send the validator when the file it describes is actually still there — otherwise a deleted
   // cache file plus a stale ETag would yield 304 and leave the brand missing.
-  if (known && fs.existsSync(target)) headers['if-none-match'] = known
+  if (known && (await exists(target))) headers['if-none-match'] = known
 
   const res = await fetch(`${base}/branding/archives/${encodeURIComponent(id)}`, { headers })
   if (res.status === 304) return 'unchanged'
   if (!res.ok) throw new Error(`archive ${id}: HTTP ${res.status}`)
 
   const buffer = Buffer.from(await res.arrayBuffer())
-  writeAtomic(target, buffer)
+  await writeAtomic(target, buffer)
   const etag = res.headers.get('etag')
   if (etag) etags.set(id, etag)
   else etags.delete(id)
-  evictShadowingArchives(dir, id, target)
+  await evictShadowingArchives(dir, id, target)
   return 'updated'
 }
 
@@ -85,7 +100,11 @@ async function fetchArchive(base, dir, id) {
 // brand usually keeps its version, the stale baked sibling can therefore out-rank what we just synced
 // and the backend's copy would silently never take effect. Once a brand has been fetched, the baked
 // duplicate is redundant, so drop whatever else still claims that id.
-function evictShadowingArchives(dir, id, target) {
+//
+// discoverArchives is deliberately still SYNCHRONOUS here — it is the same call every downstream
+// reader (assets middleware, SSR plugin, brandingHtml) makes, mtime-cached in the package, and making
+// only this one caller async would buy nothing while forking the read path.
+async function evictShadowingArchives(dir, id, target) {
   for (let guard = 0; guard < 8; guard++) {
     let winner
     try {
@@ -96,7 +115,7 @@ function evictShadowingArchives(dir, id, target) {
     }
     if (!winner || path.resolve(winner) === path.resolve(target)) return
     try {
-      fs.unlinkSync(winner)
+      await fs.unlink(winner)
     } catch (error) {
       // Read-only layer or already gone — nothing more we can do; discovery keeps its current winner.
       // eslint-disable-next-line no-console
@@ -110,14 +129,14 @@ function evictShadowingArchives(dir, id, target) {
 // $OCELOT_ACTIVE_BRANDING → DEFAULT → vanilla), so without it a deployment that never switched brands
 // would hold every archive and still render unbranded. Mirrored exactly: no default on the backend
 // means the local marker is removed, not left to go stale.
-function writeDefaultMarker(dir, id) {
+async function writeDefaultMarker(dir, id) {
   const target = path.join(dir, 'DEFAULT')
   if (isValidBrandId(id)) {
-    writeAtomic(target, Buffer.from(`${id}\n`, 'utf8'))
+    await writeAtomic(target, Buffer.from(`${id}\n`, 'utf8'))
     return
   }
   try {
-    fs.unlinkSync(target)
+    await fs.unlink(target)
   } catch (error) {
     // Nothing to clear (the common case) — only a real failure is worth a word.
     if (error && error.code !== 'ENOENT') {
@@ -134,11 +153,11 @@ async function sync(dir) {
   const manifest = await res.json()
   if (!manifest || !Array.isArray(manifest.brands)) throw new Error('manifest: no brands array')
 
-  fs.mkdirSync(dir, { recursive: true })
+  await fs.mkdir(dir, { recursive: true })
   // A malformed id would become a file name — reject it rather than sanitising, the backend derives
   // ids from its own archives and never legitimately produces one outside this set.
   const ids = manifest.brands.map((entry) => entry && entry.id).filter(isValidBrandId)
-  writeDefaultMarker(dir, manifest.default)
+  await writeDefaultMarker(dir, manifest.default)
 
   const results = await Promise.allSettled(ids.map((id) => fetchArchive(base, dir, id)))
   const failed = results.filter((r) => r.status === 'rejected')
