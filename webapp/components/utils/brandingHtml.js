@@ -14,14 +14,18 @@ export async function fetchBrandingHtml(src) {
     const base = process.env.OCELOT_BRANDING_ASSETS_DIR
     if (!base) return null
     // eslint-disable-next-line global-require, import/no-unresolved
-    const { discoverArchives, readArchive } = require('@ocelot-social/branding/dist/discover.js')
+    const {
+      discoverArchives,
+      readArchive,
+      isValidBrandId,
+    } = require('@ocelot-social/branding/dist/discover.js')
     // src is '/branding/<id>/html/<locale>/<file>.html'; read the entry from that brand's archive.
     const rel = src.replace(/^\/branding\//, '')
     const slash = rel.indexOf('/')
     if (slash === -1) return null
     const id = rel.slice(0, slash)
     const entry = rel.slice(slash + 1)
-    if (!/^[a-z0-9._-]+$/i.test(id)) return null
+    if (!isValidBrandId(id)) return null
     try {
       const archive = discoverArchives(base).get(id)
       if (!archive) return null

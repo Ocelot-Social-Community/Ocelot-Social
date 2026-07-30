@@ -17,6 +17,7 @@ const {
   readArchive,
   composeArchive,
   readDefaultMarker,
+  isValidBrandId,
 } = require('@ocelot-social/branding/dist/discover.js')
 
 const CONTENT_TYPES = {
@@ -84,7 +85,7 @@ module.exports = function brandingAssets(req, res, next) {
   const id = urlPath.slice(0, slash)
   const entry = urlPath.slice(slash + 1)
   // Guard the brand id (the entry lookup is a Map key, so path traversal cannot escape the archive).
-  if (!/^[a-z0-9._-]+$/i.test(id)) return next()
+  if (!isValidBrandId(id)) return next()
 
   const archive = discoverArchives(base).get(id)
   if (!archive) return next()

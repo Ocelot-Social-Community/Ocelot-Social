@@ -13,7 +13,15 @@ import type { Request, Response } from 'express'
 
 jest.mock(
   '@ocelot-social/branding/dist/discover.js',
-  () => ({ discoverArchives: jest.fn(), readDefaultMarker: jest.fn() }),
+  () => ({
+    discoverArchives: jest.fn(),
+    readDefaultMarker: jest.fn(),
+    // The id guard is pure and security-relevant — take the REAL one, so a tightening of
+    // BRAND_ID_PATTERN is exercised here instead of being shadowed by a stub.
+    isValidBrandId: jest.requireActual<{ isValidBrandId: (id: unknown) => boolean }>(
+      '@ocelot-social/branding/dist/buckets.js',
+    ).isValidBrandId,
+  }),
   { virtual: true },
 )
 jest.mock('node:fs', () => ({ createReadStream: jest.fn() }))

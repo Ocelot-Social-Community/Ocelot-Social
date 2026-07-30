@@ -19,14 +19,15 @@
 import { createReadStream } from 'node:fs'
 import { stat } from 'node:fs/promises'
 
-import { discoverArchives, readDefaultMarker } from '@ocelot-social/branding/dist/discover.js'
+import {
+  discoverArchives,
+  isValidBrandId,
+  readDefaultMarker,
+} from '@ocelot-social/branding/dist/discover.js'
 import { Router } from 'express'
 
 import type { BrandArchive } from '@ocelot-social/branding/dist/discover.js'
 import type { Request, Response } from 'express'
-
-// Mirrors the guard the webapp middleware applies to the same ids.
-const ID_PATTERN = /^[a-z0-9._-]+$/i
 
 /** The archive of `id`, or undefined when it is unknown or the assets dir is unreadable. */
 function findArchive(assetsDir: string, id: string): BrandArchive | undefined {
@@ -95,7 +96,7 @@ export function brandingRouter(
   // off; every failure path inside it answers the request itself.
   async function sendArchive(req: Request, res: Response): Promise<void> {
     const id = req.params.id.replace(/\.tar\.gz$/, '')
-    if (!ID_PATTERN.test(id)) {
+    if (!isValidBrandId(id)) {
       res.status(400).end()
       return
     }

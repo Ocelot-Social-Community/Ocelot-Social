@@ -53,6 +53,20 @@ export function instanceFile(type: BucketName, name: string): string {
   return `fragments/${type}.${name}.json`
 }
 
+/**
+ * What a brand id may consist of. SECURITY-RELEVANT: every server-side consumer that turns a
+ * caller-supplied id into a lookup (backend `/branding/archives/<id>`, the webapp's asset middleware
+ * and archive sync) checks it against this pattern before use, so a `../` can never reach the
+ * filesystem. Kept here — with parseSource, which extracts the id — so the guard has ONE definition
+ * instead of a copy per consumer that a later tightening could miss.
+ */
+export const BRAND_ID_PATTERN = /^[a-z0-9._-]+$/i
+
+/** Whether `id` is a well-formed brand id (see BRAND_ID_PATTERN). */
+export function isValidBrandId(id: unknown): id is string {
+  return typeof id === 'string' && BRAND_ID_PATTERN.test(id)
+}
+
 /** A parsed per-slot composition source: which archive id (+ optional version) + instance name. */
 export interface BucketSource {
   id: string

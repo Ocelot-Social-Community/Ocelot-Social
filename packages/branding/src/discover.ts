@@ -20,6 +20,9 @@ import type { BrandingConfig, DeepPartial } from './schema.js'
 // Re-exported so a server-only consumer that already imports this subpath (webapp plugin) gets the
 // schema-compat check without a second import. compat is pure (no node deps).
 export { checkSchemaCompat, describeSchemaCompat } from './compat.js'
+// Same reason: every consumer of this subpath serves archives BY ID and must validate the id first
+// (see BRAND_ID_PATTERN) — re-exported so none of them has to keep its own copy of the guard.
+export { BRAND_ID_PATTERN, isValidBrandId } from './buckets.js'
 
 /** A composition map: each bucket slot → a source string (`id[@version][/name]`); `_default` is the
  *  base for unspecified slots (typically the `activeBranding` id). An empty/absent slot → framework

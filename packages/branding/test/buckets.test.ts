@@ -10,6 +10,7 @@ import {
   splitConfig,
   parseSource,
   formatSource,
+  isValidBrandId,
   BUCKET_NAMES,
 } from '../dist/buckets.js'
 import { brandingDefaults } from '../dist/defaults.js'
@@ -166,6 +167,18 @@ test('parseSource / formatSource round-trip the source address grammar', () => {
   assert.equal(formatSource({ id: 'acme', name: 'dark' }), 'acme/dark')
   assert.equal(formatSource({ id: 'acme', version: '1.2.0', name: 'dark' }), 'acme@1.2.0/dark')
   assert.equal(formatSource({ id: '' }), '')
+})
+
+test('isValidBrandId accepts brand ids and rejects anything that could escape a path', () => {
+  assert.equal(isValidBrandId('acme'), true)
+  assert.equal(isValidBrandId('Acme_2.0-beta'), true)
+  // The guard every server-side consumer applies before an id reaches the filesystem.
+  assert.equal(isValidBrandId('../etc/passwd'), false)
+  assert.equal(isValidBrandId('acme/dark'), false)
+  assert.equal(isValidBrandId('acme brand'), false)
+  assert.equal(isValidBrandId(''), false)
+  assert.equal(isValidBrandId(undefined), false)
+  assert.equal(isValidBrandId(42), false)
 })
 
 test('composeConfig does not mutate the source configs', () => {

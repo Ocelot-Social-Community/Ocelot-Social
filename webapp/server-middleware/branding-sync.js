@@ -17,7 +17,7 @@ const fs = require('fs')
 const path = require('path')
 
 // eslint-disable-next-line import/no-unresolved -- package subpath, server-only (uses node:fs)
-const { discoverArchives } = require('@ocelot-social/branding/dist/discover.js')
+const { discoverArchives, isValidBrandId } = require('@ocelot-social/branding/dist/discover.js')
 
 // Read per call, not at module load: the webapp's server middleware is loaded once per process, and
 // capturing the env here would freeze whatever was set at import time.
@@ -25,7 +25,6 @@ const { discoverArchives } = require('@ocelot-social/branding/dist/discover.js')
 const ttlMs = () => Number(process.env.OCELOT_BRANDING_SYNC_TTL_MS || 60_000)
 // Bound on the FIRST (blocking) sync — a slow or dead backend must not hold the first page render.
 const bootTimeoutMs = () => Number(process.env.OCELOT_BRANDING_SYNC_TIMEOUT_MS || 5_000)
-const ID_PATTERN = /^[a-z0-9._-]+$/i
 
 // id → ETag of the archive currently on disk, so a refresh transfers nothing while it is unchanged.
 const etags = new Map()
@@ -113,7 +112,7 @@ function evictShadowingArchives(dir, id, target) {
 // means the local marker is removed, not left to go stale.
 function writeDefaultMarker(dir, id) {
   const target = path.join(dir, 'DEFAULT')
-  if (id && ID_PATTERN.test(id)) {
+  if (isValidBrandId(id)) {
     writeAtomic(target, Buffer.from(`${id}\n`, 'utf8'))
     return
   }
@@ -138,9 +137,7 @@ async function sync(dir) {
   fs.mkdirSync(dir, { recursive: true })
   // A malformed id would become a file name — reject it rather than sanitising, the backend derives
   // ids from its own archives and never legitimately produces one outside this set.
-  const ids = manifest.brands
-    .map((entry) => entry && entry.id)
-    .filter((id) => id && ID_PATTERN.test(id))
+  const ids = manifest.brands.map((entry) => entry && entry.id).filter(isValidBrandId)
   writeDefaultMarker(dir, manifest.default)
 
   const results = await Promise.allSettled(ids.map((id) => fetchArchive(base, dir, id)))
