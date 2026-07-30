@@ -147,7 +147,8 @@ const createServer = async (options?: CreateServerOptions) => {
   app.use(express.static('public'))
   // Brand archives this backend has on disk, served read-only so the webapp can acquire them instead
   // of shipping its own copy. Mounted before the body parsers — these are plain GETs with no body.
-  app.use('/branding', brandingRouter())
+  // eslint-disable-next-line n/no-process-env -- the deployment's assets dir, read once and passed in
+  app.use('/branding', brandingRouter(process.env.OCELOT_BRANDING_ASSETS_DIR))
   if (!options?.skipLiveKitBoot) {
     // LiveKit webhook must be registered before the global JSON body parser so
     // the raw payload is preserved for HMAC signature verification.

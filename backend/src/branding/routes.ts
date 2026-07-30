@@ -1,4 +1,3 @@
-/* eslint-disable n/no-process-env */ // reads the branding env (like bootstrap.ts / config/index.ts)
 /* eslint-disable no-catch-all/no-catch-all */ // a broken assets dir degrades to "no brands", never a 500
 // Read-only HTTP access to the brand archives this backend has on disk, so the webapp no longer needs
 // its own copy: the archive is deployed ONCE (baked into the backend image, or mounted into
@@ -47,10 +46,12 @@ function findArchive(assetsDir: string, id: string): BrandArchive | undefined {
  * `assetsDir` undefined/empty (a vanilla deployment) yields an EMPTY router: the routes are not
  * registered at all, so the requests 404 through the normal chain instead of reporting an empty
  * manifest — an unbranded backend and a backend with zero archives are the same thing to a client.
+ *
+ * Passed in, never defaulted from $OCELOT_BRANDING_ASSETS_DIR here: the image sets that variable, so a
+ * default would make the router — and every test of it — depend on the ambient environment rather than
+ * on its argument. server.ts reads the env once and hands it over.
  */
-export function brandingRouter(
-  assetsDir: string | undefined = process.env.OCELOT_BRANDING_ASSETS_DIR,
-): Router {
+export function brandingRouter(assetsDir: string | undefined): Router {
   const router = Router()
   if (!assetsDir) return router
   const dir = assetsDir
