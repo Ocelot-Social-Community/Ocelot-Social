@@ -132,19 +132,43 @@ describe('branding/routes', () => {
       // eslint-disable-next-line n/no-process-env -- the ambient environment IS what this pins
       process.env.OCELOT_BRANDING_ASSETS_DIR = '/app/branding-assets'
 
-      const { res, next } = await call(brandingRouter(undefined), '/manifest.json')
+      const { res } = await call(brandingRouter(undefined), '/manifest.json')
 
-      expect(next).toHaveBeenCalled()
-      expect(res.end).not.toHaveBeenCalled()
+      expect(parseManifest(res.body)).toEqual({ default: '', brands: [] })
+      expect(mockDiscover).not.toHaveBeenCalled()
       // eslint-disable-next-line n/no-process-env -- see above
       delete process.env.OCELOT_BRANDING_ASSETS_DIR
     })
 
-    it('registers no routes, so requests fall through', async () => {
+    // A vanilla backend has no brands; that is an ANSWER, not a missing endpoint. Falling through
+    // reaches the GraphQL middleware mounted at '/' (server.ts), which logs the poll as a malformed
+    // operation — and the webapp reads the resulting HTTP 400 as a failed sync and retries forever.
+    it('answers an empty manifest instead of falling through to the GraphQL handler', async () => {
       const { res, next } = await call(brandingRouter(undefined), '/manifest.json')
-      expect(next).toHaveBeenCalled()
-      expect(res.end).not.toHaveBeenCalled()
+
+      expect(parseManifest(res.body)).toEqual({ default: '', brands: [] })
+      expect(next).not.toHaveBeenCalled()
     })
+
+    it('answers 404 for an archive instead of falling through', async () => {
+      const { res, next } = await call(brandingRouter(undefined), '/archives/stage')
+
+      expect(res.statusCode).toBe(404)
+      expect(next).not.toHaveBeenCalled()
+    })
+  })
+
+  // Same reason: nothing under /branding may reach the GraphQL handler behind it.
+  describe('unknown paths under the mount', () => {
+    it.each(['/nope', '/archives', '/manifest.json/extra'])(
+      'answers 404 for %p rather than handing it on',
+      async (path) => {
+        const { res, next } = await call(brandingRouter('/brands'), path)
+
+        expect(res.statusCode).toBe(404)
+        expect(next).not.toHaveBeenCalled()
+      },
+    )
   })
 
   describe('GET /manifest.json', () => {

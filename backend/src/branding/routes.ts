@@ -43,37 +43,46 @@ function findArchive(assetsDir: string, id: string): BrandArchive | undefined {
 /**
  * Router for the brand archives under `assetsDir`.
  *
- * `assetsDir` undefined/empty (a vanilla deployment) yields an EMPTY router: the routes are not
- * registered at all, so the requests 404 through the normal chain instead of reporting an empty
- * manifest — an unbranded backend and a backend with zero archives are the same thing to a client.
+ * `assetsDir` undefined/empty (a vanilla deployment) still serves the manifest — as an EMPTY one. An
+ * unbranded backend and a backend with zero archives are the same thing to a client, so they get the
+ * same answer rather than one of them getting no answer at all.
  *
- * Passed in, never defaulted from $OCELOT_BRANDING_ASSETS_DIR here: the image sets that variable, so a
- * default would make the router — and every test of it — depend on the ambient environment rather than
- * on its argument. server.ts reads the env once and hands it over.
+ * This mount is TERMINAL: nothing under /branding may fall through. Apollo is mounted at '/' behind it
+ * (see server.ts), so a fall-through does not 404 — it reaches the GraphQL handler, which rejects the
+ * path as an operation without a query and logs a BAD_REQUEST error. That turned the webapp's routine
+ * manifest poll on a vanilla deployment into a stream of GraphQL errors, and made the webapp treat a
+ * successful "no brands" answer as a failed sync (HTTP 400 → retry on the next request, forever).
+ *
+ * `assetsDir` is passed in, never defaulted from $OCELOT_BRANDING_ASSETS_DIR here: the image sets that
+ * variable, so a default would make the router — and every test of it — depend on the ambient
+ * environment rather than on its argument. server.ts reads the env once and hands it over.
  */
 export function brandingRouter(assetsDir: string | undefined): Router {
   const router = Router()
-  if (!assetsDir) return router
   const dir = assetsDir
 
   router.get('/manifest.json', (_req: Request, res: Response) => {
-    let archives: BrandArchive[]
-    try {
-      archives = [...discoverArchives(dir).values()]
-    } catch (error) {
-      // A broken assets dir must not take the backend down — report "no brands" and let the caller
-      // fall back to whatever it already has.
-      // eslint-disable-next-line no-console
-      console.warn(`[branding] cannot read ${dir}:`, error)
-      // Same shape as the success case, so a client parses one contract rather than two.
-      res.status(503).json({ default: '', brands: [] })
-      return
+    // No assets dir configured → a vanilla deployment, which HAS no brands: the empty answer below is
+    // the correct one, and nothing is read from disk.
+    let archives: BrandArchive[] = []
+    if (dir) {
+      try {
+        archives = [...discoverArchives(dir).values()]
+      } catch (error) {
+        // A broken assets dir must not take the backend down — report "no brands" and let the caller
+        // fall back to whatever it already has.
+        // eslint-disable-next-line no-console
+        console.warn(`[branding] cannot read ${dir}:`, error)
+        // Same shape as the success case, so a client parses one contract rather than two.
+        res.status(503).json({ default: '', brands: [] })
+        return
+      }
     }
     // The baked default of THIS deployment. Empty when no brand was baked in — a client then falls
     // through to its own env pin or to vanilla, exactly as it would without a marker on disk.
     let defaultId = ''
     try {
-      defaultId = readDefaultMarker(dir)
+      defaultId = dir ? readDefaultMarker(dir) : ''
     } catch {
       defaultId = ''
     }
@@ -103,7 +112,8 @@ export function brandingRouter(assetsDir: string | undefined): Router {
       return
     }
 
-    const archive = findArchive(dir, id)
+    // Without an assets dir nothing is deployed here, so every id is unknown.
+    const archive = dir ? findArchive(dir, id) : undefined
     if (!archive) {
       res.status(404).end()
       return
@@ -154,6 +164,12 @@ export function brandingRouter(assetsDir: string | undefined): Router {
 
   router.get('/archives/:id', (req: Request, res: Response) => {
     void sendArchive(req, res)
+  })
+
+  // Terminal, for the reason in the header: an unmatched /branding path must 404 HERE. Handing it on
+  // means handing it to the GraphQL middleware at '/', which reports it as a malformed operation.
+  router.use((_req: Request, res: Response) => {
+    res.status(404).end()
   })
 
   return router
