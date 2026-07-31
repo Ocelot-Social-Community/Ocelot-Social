@@ -5,16 +5,17 @@
     :srcset="srcset"
     :class="{ 'responsive-image--loaded': loaded }"
     class="responsive-image"
-    loading="lazy"
+    :loading="loading"
     fetchpriority="low"
     @load="onLoad"
+    @error="onError"
   />
 </template>
 
 <script>
 export default {
   name: 'ResponsiveImage',
-  emits: ['loaded'],
+  emits: ['loaded', 'error'],
   props: {
     image: {
       type: Object,
@@ -23,6 +24,15 @@ export default {
     sizes: {
       type: String,
       required: true,
+    },
+    loading: {
+      // Native <img> lazy loading. Deferring is right for images far down a
+      // feed, but wrong wherever the image starts inside a `display: none`
+      // subtree (it never gets fetched, and the opacity transition below then
+      // leaves an invisible box behind) — those callers pass 'eager'.
+      type: String,
+      default: 'lazy',
+      validator: (value) => /^(lazy|eager)$/.test(value),
     },
   },
   data() {
@@ -43,6 +53,11 @@ export default {
     onLoad() {
       this.loaded = true
       this.$emit('loaded')
+    },
+    onError() {
+      // Native error events don't bubble, so a parent listening with @error
+      // would never hear about a broken image without this re-emit.
+      this.$emit('error')
     },
   },
 }

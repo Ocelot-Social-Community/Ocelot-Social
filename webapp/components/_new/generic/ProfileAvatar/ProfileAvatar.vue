@@ -1,15 +1,16 @@
 <template>
-  <div :class="['profile-avatar', size && `--${size}`, !isAvatar && '--no-image']">
+  <div :class="['profile-avatar', size && `--${size}`, !showImage && '--no-image']">
     <!-- '--no-image' is neccessary, because otherwise we still have a little unwanted boarder araund the image for images with white backgrounds -->
     <span class="initials">{{ profileInitials }}</span>
     <os-icon v-if="isAnonymous" :icon="icons.eyeSlash" />
     <responsive-image
-      v-if="isAvatar"
+      v-if="showImage"
       :image="profile.avatar"
       class="image"
       :alt="profile.name"
       :title="showProfileNameTitle ? profile.name : ''"
-      @error="$event.target.style.display = 'none'"
+      :loading="loading"
+      @error="imageFailed = true"
       sizes="320px"
     />
   </div>
@@ -42,14 +43,40 @@ export default {
       type: Boolean,
       default: true,
     },
+    loading: {
+      // Forwarded to ResponsiveImage — see its prop docs for when 'eager' is
+      // the right call.
+      type: String,
+      default: 'lazy',
+      validator: (value) => /^(lazy|eager)$/.test(value),
+    },
+  },
+  data() {
+    return {
+      imageFailed: false,
+    }
+  },
+  watch: {
+    'profile.avatar.url'() {
+      // A new URL deserves a fresh attempt — otherwise one broken avatar would
+      // permanently pin this instance to the initials fallback even after the
+      // component is reused for a different profile.
+      this.imageFailed = false
+    },
   },
   computed: {
     isAnonymous() {
       return !this.profile || !this.profile.name || this.profile.name.toLowerCase() === 'anonymous'
     },
     isAvatar() {
-      // TODO may we could test as well if the image is reachable? otherwise the background gets white and the initails can not be read
       return this.profile && this.profile.avatar
+    },
+    showImage() {
+      // An unreachable avatar URL must fall back to the initials treatment.
+      // Dropping only the <img> is not enough: '--no-image' also supplies the
+      // dark background the initials are legible against, so without this the
+      // avatar renders as light-on-light and reads as broken.
+      return !!this.isAvatar && !this.imageFailed
     },
     profileInitials() {
       if (this.isAnonymous) return ''

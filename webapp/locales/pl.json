@@ -1755,6 +1755,7 @@
       "unsupportedBrowser": "Twoja przeglądarka nie obsługuje audio/wideo."
     },
     "screenShare": "Ekran",
+    "screenShareEnded": "Zakończono udostępnianie ekranu",
     "spotlightExit": "Wyjdź z trybu spotlight",
     "startScreenShare": "Udostępnij ekran",
     "stopScreenShare": "Zakończ udostępnianie",

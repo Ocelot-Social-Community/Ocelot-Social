@@ -1755,6 +1755,7 @@
       "unsupportedBrowser": "Ваш браузер не підтримує аудіо/відео."
     },
     "screenShare": "Екран",
+    "screenShareEnded": "Демонстрацію екрана завершено",
     "spotlightExit": "Вийти зі спотлайту",
     "startScreenShare": "Поділитися екраном",
     "stopScreenShare": "Припинити демонстрацію",

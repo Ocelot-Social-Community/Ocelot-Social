@@ -25,8 +25,19 @@
         {{ $t('videoCall.youAreSharingScreen') }}
       </span>
     </div>
-    <div v-else-if="!hasVideo && !tile.isScreen" class="video-tile__fallback">
-      <profile-avatar :profile="tile.profile" :size="avatarSize" />
+    <div
+      v-else-if="!hasVideo && tile.isScreen"
+      class="video-tile__fallback video-tile__fallback--own-screen"
+    >
+      <os-icon :icon="icons.desktop" class="video-tile__fallback-icon" />
+      <span class="video-tile__fallback-text">
+        {{ $t('videoCall.screenShareEnded') }}
+      </span>
+    </div>
+    <div v-else-if="!hasVideo" class="video-tile__fallback">
+      <!-- Tiles outside the minimized window's primary slot are display:none,
+           where a lazy image never gets fetched — load avatars eagerly. -->
+      <profile-avatar :profile="tile.profile" :size="avatarSize" loading="eager" />
       <span v-if="tile.isLocal && avatarSize !== 'small'" class="video-tile__fallback-text">
         {{ $t('videoCall.prejoin.cameraDisabled') }}
       </span>
@@ -87,10 +98,15 @@ export default {
     return {
       attachedVideo: null,
       attachedAudio: null,
+      videoEnded: false,
     }
   },
   created() {
     this.icons = iconRegistry
+    // Non-reactive bookkeeping for the 'ended' listener — nothing renders off
+    // these, so keeping them out of data() avoids needless reactivity.
+    this.endedTrack = null
+    this.onTrackEnded = null
   },
   computed: {
     showOwnScreenPlaceholder() {
@@ -102,13 +118,16 @@ export default {
     },
     hasVideo() {
       if (this.showOwnScreenPlaceholder) return false
-      return !!this.tile.videoTrack
+      return !!this.tile.videoTrack && !this.videoEnded
     },
   },
   watch: {
     'tile.videoTrack': {
       immediate: true,
       handler() {
+        // A new track earns a clean slate — the previous one having ended says
+        // nothing about this one.
+        this.videoEnded = false
         this.$nextTick(this.attachVideo)
       },
     },
@@ -157,17 +176,49 @@ export default {
           /* noop */
         }
       }
+      this.stopObservingTrackEnd()
       // Local screen share is never attached locally to avoid the mirror loop.
       if (this.tile.videoTrack && !this.showOwnScreenPlaceholder) {
         try {
           this.tile.videoTrack.attach(el)
           this.attachedVideo = this.tile.videoTrack
+          this.observeTrackEnd()
         } catch (_e) {
           /* noop */
         }
       } else {
         this.attachedVideo = null
       }
+    },
+    observeTrackEnd() {
+      // Stopping a screen share from the browser's own "Stop sharing" bar ends
+      // the MediaStreamTrack right away, while the unpublish message needs
+      // another round trip. In that window the <video> keeps painting its last
+      // decoded frame — for a share that just ended, a black rectangle. Watch
+      // the underlying track so the placeholder takes over immediately.
+      const track = this.attachedVideo
+      const mediaTrack = track && track.mediaStreamTrack
+      if (!mediaTrack || typeof mediaTrack.addEventListener !== 'function') return
+      if (mediaTrack.readyState === 'ended') {
+        this.videoEnded = true
+        return
+      }
+      this.onTrackEnded = () => {
+        this.videoEnded = true
+      }
+      this.endedTrack = mediaTrack
+      mediaTrack.addEventListener('ended', this.onTrackEnded)
+    },
+    stopObservingTrackEnd() {
+      if (this.endedTrack && this.onTrackEnded) {
+        try {
+          this.endedTrack.removeEventListener('ended', this.onTrackEnded)
+        } catch (_e) {
+          /* noop */
+        }
+      }
+      this.endedTrack = null
+      this.onTrackEnded = null
     },
     attachAudio() {
       const el = this.$refs.audioEl
@@ -192,6 +243,7 @@ export default {
       }
     },
     detachAll() {
+      this.stopObservingTrackEnd()
       const v = this.$refs.videoEl
       const a = this.$refs.audioEl
       if (this.attachedVideo && v) {
@@ -218,6 +270,11 @@ export default {
 <style lang="scss" scoped>
 .video-tile {
   position: relative;
+  // Confine the speaking frame and the pin badge to this tile. Without an own
+  // stacking context their z-indexes compete with the call's overlays (the
+  // active-speaker chips), where a tie is decided by DOM order — and the tiles
+  // come last, so the frame would paint over the chips.
+  isolation: isolate;
   background: $color-neutral-0;
   overflow: hidden;
   display: flex;

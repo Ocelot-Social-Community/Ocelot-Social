@@ -90,6 +90,48 @@ describe('ProfileAvatar', () => {
       it('but because the avatar is so small, it will always ask the browser to render w320 size', () => {
         expect(wrapper.find('.image').attributes('sizes')).toBe('320px')
       })
+
+      it('defers loading unless told otherwise', () => {
+        expect(wrapper.find('.image').attributes('loading')).toBe('lazy')
+      })
+
+      it('loads eagerly on request', () => {
+        propsData = { ...propsData, loading: 'eager' }
+        wrapper = Wrapper()
+        expect(wrapper.find('.image').attributes('loading')).toBe('eager')
+      })
+
+      describe('when the image cannot be loaded', () => {
+        beforeEach(async () => {
+          await wrapper.find('.image').trigger('error')
+        })
+
+        it('falls back to the initials', () => {
+          expect(wrapper.find('img').exists()).toBe(false)
+          expect(wrapper.find('.initials').text()).toEqual('NA')
+        })
+
+        it('switches to the no-image styling so the initials stay legible', () => {
+          // Hiding just the <img> would leave light initials on the light
+          // default background — the avatar then reads as broken.
+          expect(wrapper.classes()).toContain('--no-image')
+        })
+
+        it('retries for a different profile', async () => {
+          await wrapper.setProps({
+            profile: {
+              name: 'Someone Else',
+              avatar: {
+                url: 'http://localhost:8000//other.jpg',
+                w320: 'http://localhost:8000//other-w320.jpg',
+                w640: 'http://localhost:8000//other-w640.jpg',
+                w1024: 'http://localhost:8000//other-w1024.jpg',
+              },
+            },
+          })
+          expect(wrapper.find('img').exists()).toBe(true)
+        })
+      })
     })
   })
 })

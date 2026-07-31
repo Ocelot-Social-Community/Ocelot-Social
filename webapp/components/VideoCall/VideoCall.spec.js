@@ -1,4 +1,5 @@
 import Vuex from 'vuex'
+import VTooltip from 'v-tooltip'
 import { mount, createLocalVue } from '@vue/test-utils'
 import VideoCall from './VideoCall.vue'
 
@@ -10,6 +11,7 @@ jest.mock('livekit-client', () => {
     ParticipantDisconnected: 'ParticipantDisconnected',
     TrackSubscribed: 'TrackSubscribed',
     TrackUnsubscribed: 'TrackUnsubscribed',
+    TrackUnpublished: 'TrackUnpublished',
     TrackMuted: 'TrackMuted',
     TrackUnmuted: 'TrackUnmuted',
     ParticipantMetadataChanged: 'ParticipantMetadataChanged',
@@ -51,6 +53,7 @@ jest.mock('livekit-client', () => {
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
+localVue.use(VTooltip)
 
 const Stub = (name, opts = {}) => ({
   name,
@@ -304,19 +307,247 @@ describe('VideoCall', () => {
   })
 
   describe('tileAvatarSize', () => {
+    // A cell with room to spare for the 114px avatar plus its caption.
+    const roomy = { width: 640, height: 360 }
+
     it('returns small for non-spotlight tiles when a spotlight exists', () => {
-      const ctx = { spotlightTile: { key: 'a' } }
+      const ctx = { spotlightTile: { key: 'a' }, cellSize: roomy }
       expect(VideoCall.methods.tileAvatarSize.call(ctx, { key: 'b' })).toBe('small')
     })
 
     it('returns large for the spotlight tile itself', () => {
-      const ctx = { spotlightTile: { key: 'a' } }
+      const ctx = { spotlightTile: { key: 'a' }, cellSize: roomy }
       expect(VideoCall.methods.tileAvatarSize.call(ctx, { key: 'a' })).toBe('large')
     })
 
     it('returns large when no spotlight tile exists', () => {
-      const ctx = { spotlightTile: null }
+      const ctx = { spotlightTile: null, cellSize: roomy }
       expect(VideoCall.methods.tileAvatarSize.call(ctx, { key: 'b' })).toBe('large')
+    })
+
+    it('returns small in a cell too short for the large avatar', () => {
+      const ctx = { spotlightTile: null, cellSize: { width: 640, height: 150 } }
+      expect(VideoCall.methods.tileAvatarSize.call(ctx, { key: 'b' })).toBe('small')
+    })
+
+    it('returns small in a cell too narrow for the large avatar', () => {
+      const ctx = { spotlightTile: null, cellSize: { width: 120, height: 360 } }
+      expect(VideoCall.methods.tileAvatarSize.call(ctx, { key: 'b' })).toBe('small')
+    })
+
+    it('returns large while the stage is still unmeasured', () => {
+      // No ResizeObserver / pre-paint: zero sizes must not be read as "tiny".
+      const ctx = { spotlightTile: null, cellSize: { width: 0, height: 0 } }
+      expect(VideoCall.methods.tileAvatarSize.call(ctx, { key: 'b' })).toBe('large')
+    })
+  })
+
+  describe('gridDimensions', () => {
+    const dimensions = (tileCount, stageWidth, stageHeight) =>
+      VideoCall.computed.gridDimensions.call({
+        tiles: Array.from({ length: tileCount }, (_, i) => ({ key: `t${i}` })),
+        stageWidth,
+        stageHeight,
+      })
+
+    it('falls back to a square-ish grid while the stage is unmeasured', () => {
+      expect(dimensions(4, 0, 0)).toEqual({ columns: 2, rows: 2 })
+      expect(dimensions(3, 0, 0)).toEqual({ columns: 2, rows: 2 })
+    })
+
+    it('puts two participants side by side on a wide stage', () => {
+      expect(dimensions(2, 1600, 900)).toEqual({ columns: 2, rows: 1 })
+    })
+
+    it('stacks two participants on a tall, narrow stage', () => {
+      // Phone in portrait: side by side would leave two slivers, and cover
+      // would crop each face down to a vertical strip.
+      expect(dimensions(2, 400, 700)).toEqual({ columns: 1, rows: 2 })
+    })
+
+    it('arranges four participants two by two on a wide stage', () => {
+      expect(dimensions(4, 1600, 900)).toEqual({ columns: 2, rows: 2 })
+    })
+
+    it('gives three participants a 2x2 grid rather than one long row', () => {
+      expect(dimensions(3, 1600, 900)).toEqual({ columns: 2, rows: 2 })
+    })
+
+    it('treats an empty tile list as a single cell', () => {
+      expect(dimensions(0, 1600, 900)).toEqual({ columns: 1, rows: 1 })
+    })
+  })
+
+  describe('cellSize / gridStyle', () => {
+    it('reports nothing while the stage is unmeasured', () => {
+      const ctx = { stageWidth: 0, stageHeight: 0 }
+      expect(VideoCall.computed.cellSize.call(ctx)).toEqual({ width: 0, height: 0 })
+    })
+
+    it('gives the whole stage to the single tile of the parked window', () => {
+      const ctx = { stageWidth: 355, stageHeight: 200, isFullscreen: false, spotlightTile: null }
+      expect(VideoCall.computed.cellSize.call(ctx)).toEqual({ width: 355, height: 200 })
+    })
+
+    it('gives the whole stage to a spotlighted tile', () => {
+      const ctx = {
+        stageWidth: 1600,
+        stageHeight: 900,
+        isFullscreen: true,
+        spotlightTile: { key: 'a' },
+      }
+      expect(VideoCall.computed.cellSize.call(ctx)).toEqual({ width: 1600, height: 900 })
+    })
+
+    it('divides the stage by the grid in the regular view', () => {
+      const ctx = {
+        stageWidth: 1600,
+        stageHeight: 900,
+        isFullscreen: true,
+        spotlightTile: null,
+        gridDimensions: { columns: 2, rows: 2 },
+      }
+      expect(VideoCall.computed.cellSize.call(ctx)).toEqual({ width: 800, height: 450 })
+    })
+
+    it('spells out rows as well as columns', () => {
+      const style = VideoCall.computed.gridStyle.call({
+        gridDimensions: { columns: 3, rows: 2 },
+      })
+      expect(style).toEqual({
+        'grid-template-columns': 'repeat(3, 1fr)',
+        // Without explicit rows the implicit ones size to content and the
+        // tiles never share the stage height evenly.
+        'grid-template-rows': 'repeat(2, 1fr)',
+      })
+    })
+  })
+
+  describe('stage measurement', () => {
+    const withResizeObserver = () => {
+      const observe = jest.fn()
+      const disconnect = jest.fn()
+      let trigger = null
+      global.ResizeObserver = class {
+        constructor(cb) {
+          trigger = cb
+          this.observe = observe
+          this.disconnect = disconnect
+        }
+      }
+      return { observe, disconnect, fire: () => trigger && trigger() }
+    }
+
+    afterEach(() => {
+      delete global.ResizeObserver
+    })
+
+    it('measures the stage and re-measures on resize', () => {
+      const { observe, fire } = withResizeObserver()
+      const { wrapper } = factory({ show: true })
+      const el = { clientWidth: 1600, clientHeight: 900 }
+      wrapper.vm.$refs.stageEl = el
+      wrapper.vm.observeStage()
+      expect(observe).toHaveBeenCalledWith(el)
+      expect(wrapper.vm.stageWidth).toBe(1600)
+
+      // The chat sidebar opening narrows the stage without a window resize.
+      el.clientWidth = 1200
+      fire()
+      expect(wrapper.vm.stageWidth).toBe(1200)
+    })
+
+    it('re-observes only when the element actually changed', () => {
+      const { observe } = withResizeObserver()
+      const { wrapper } = factory({ show: true })
+      wrapper.vm.$refs.stageEl = { clientWidth: 800, clientHeight: 600 }
+      wrapper.vm.observeStage()
+      wrapper.vm.observeStage()
+      // Guards against the observer's own updates re-entering through updated().
+      expect(observe).toHaveBeenCalledTimes(1)
+    })
+
+    it('clears the measurements when the stage goes away', () => {
+      const { disconnect } = withResizeObserver()
+      const { wrapper } = factory({ show: true })
+      wrapper.vm.$refs.stageEl = { clientWidth: 800, clientHeight: 600 }
+      wrapper.vm.observeStage()
+      wrapper.vm.$refs.stageEl = null
+      wrapper.vm.observeStage()
+      expect(disconnect).toHaveBeenCalled()
+      expect(wrapper.vm.stageWidth).toBe(0)
+      expect(wrapper.vm.stageHeight).toBe(0)
+    })
+
+    it('still measures once without ResizeObserver support', () => {
+      const { wrapper } = factory({ show: true })
+      wrapper.vm.$refs.stageEl = { clientWidth: 640, clientHeight: 480 }
+      wrapper.vm.observeStage()
+      expect(wrapper.vm.stageWidth).toBe(640)
+      expect(wrapper.vm.stageHeight).toBe(480)
+    })
+
+    it('measureStage is a no-op without an observed element', () => {
+      const { wrapper } = factory({ show: true })
+      wrapper.vm.measureStage()
+      expect(wrapper.vm.stageWidth).toBe(0)
+    })
+
+    it('treats missing client dimensions as zero', () => {
+      const { wrapper } = factory({ show: true })
+      wrapper.vm.$refs.stageEl = {}
+      wrapper.vm.observeStage()
+      expect(wrapper.vm.stageWidth).toBe(0)
+    })
+  })
+
+  describe('button labels and tooltips', () => {
+    it('names each control after its current effect', () => {
+      const { wrapper } = factory({ show: true, groupId: 'g1' })
+      wrapper.setData({ micEnabled: true, cameraEnabled: true, screenShareEnabled: false })
+      expect(wrapper.vm.micLabel).toBe('videoCall.muteMic')
+      expect(wrapper.vm.cameraLabel).toBe('videoCall.disableCamera')
+      expect(wrapper.vm.screenShareLabel).toBe('videoCall.startScreenShare')
+      expect(wrapper.vm.chatLabel).toBe('videoCall.openChat')
+      expect(wrapper.vm.leaveLabel).toBe('videoCall.leave')
+
+      wrapper.setData({ micEnabled: false, cameraEnabled: false, screenShareEnabled: true })
+      expect(wrapper.vm.micLabel).toBe('videoCall.unmuteMic')
+      expect(wrapper.vm.cameraLabel).toBe('videoCall.enableCamera')
+      expect(wrapper.vm.screenShareLabel).toBe('videoCall.stopScreenShare')
+    })
+
+    it('labels the header buttons by call state', () => {
+      const parked = factory({ show: true, minimized: true })
+      expect(parked.wrapper.vm.minimizeLabel).toBe('videoCall.maximize')
+      const open = factory({ show: true, minimized: false })
+      expect(open.wrapper.vm.minimizeLabel).toBe('videoCall.minimize')
+
+      open.wrapper.setData({ phase: 'in-call' })
+      expect(open.wrapper.vm.closeLabel).toBe('videoCall.leave')
+      open.wrapper.setData({ phase: 'prejoin' })
+      expect(open.wrapper.vm.closeLabel).toBe('videoCall.prejoin.cancel')
+    })
+
+    it('shows the chat button as closing while that chat is open', () => {
+      const { wrapper } = factory({
+        show: true,
+        groupId: 'g1',
+        chat: { showChat: true, chatUserId: null, groupId: 'g1' },
+      })
+      expect(wrapper.vm.chatLabel).toBe('videoCall.closeChat')
+    })
+
+    it('tooltips only the buttons that lost their caption', () => {
+      const { wrapper } = factory({ show: true, minimized: true })
+      wrapper.setData({ phase: 'in-call' })
+      expect(wrapper.vm.iconOnly).toBe(true)
+      expect(wrapper.vm.iconOnlyTooltip('Mute')).toBe('Mute')
+
+      const open = factory({ show: true, minimized: false })
+      open.wrapper.setData({ phase: 'in-call' })
+      // Caption is right there next to the icon — a tooltip would just repeat it.
+      expect(open.wrapper.vm.iconOnlyTooltip('Mute')).toBe('')
     })
   })
 
@@ -734,7 +965,19 @@ describe('VideoCall', () => {
       expect(wrapper.vm.screenShareEnabled).toBe(false)
     })
 
-    it('throttles active-speaker updates', () => {
+    it('rebuilds the tiles when a remote participant withdraws a track', async () => {
+      const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+      withApollo(wrapper)
+      await wrapper.vm.connect()
+      const room = wrapper.vm.room
+      const refreshTiles = jest.spyOn(wrapper.vm, 'refreshTiles')
+      // Ending a screen share is the visible case: without this the tile can
+      // outlive its track and keep showing the last decoded frame.
+      room.handlers.TrackUnpublished()
+      expect(refreshTiles).toHaveBeenCalled()
+    })
+
+    it('holds the speaking highlight across the pauses between words', () => {
       jest.useFakeTimers()
       const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
       withApollo(wrapper)
@@ -744,12 +987,19 @@ describe('VideoCall', () => {
           .then(() => {
             const room = wrapper.vm.room
             room.handlers.ActiveSpeakersChanged([{ identity: 'a' }, { identity: 'b' }])
-            jest.advanceTimersByTime(200)
+            // Picking someone up is immediate — only letting go is delayed.
             expect(wrapper.vm.activeSpeakerIds).toEqual(['a', 'b'])
-            // Identical set within the next window is a no-op.
-            room.handlers.ActiveSpeakersChanged([{ identity: 'a' }, { identity: 'b' }])
-            jest.advanceTimersByTime(200)
+
+            // LiveKit drops 'b' mid-sentence. Reflecting that straight away is
+            // what made the chip row strobe, so the hold keeps them listed.
+            room.handlers.ActiveSpeakersChanged([{ identity: 'a' }])
+            jest.advanceTimersByTime(1000)
+            room.handlers.ActiveSpeakersChanged([{ identity: 'a' }])
             expect(wrapper.vm.activeSpeakerIds).toEqual(['a', 'b'])
+
+            // Only real silence past the hold window drops them.
+            jest.advanceTimersByTime(600)
+            expect(wrapper.vm.activeSpeakerIds).toEqual(['a'])
           })
           // Restore real timers even if an assertion above throws, so leaked fake
           // timers can't make later tests flaky.
@@ -757,6 +1007,26 @@ describe('VideoCall', () => {
             jest.useRealTimers()
           })
       )
+    })
+
+    it('leaves the speaker array untouched when nothing changed', () => {
+      jest.useFakeTimers()
+      const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+      withApollo(wrapper)
+      return wrapper.vm
+        .connect()
+        .then(() => {
+          const room = wrapper.vm.room
+          room.handlers.ActiveSpeakersChanged([{ identity: 'a' }])
+          const first = wrapper.vm.activeSpeakerIds
+          room.handlers.ActiveSpeakersChanged([{ identity: 'a' }])
+          // Same identity, same order — reassigning would re-render every
+          // tile several times a second for nothing.
+          expect(wrapper.vm.activeSpeakerIds).toBe(first)
+        })
+        .finally(() => {
+          jest.useRealTimers()
+        })
     })
 
     it('routes a server-side disconnect through leave(), ignoring our own disconnect', async () => {
@@ -784,6 +1054,34 @@ describe('VideoCall', () => {
       wrapper.vm.$apollo = { mutate: jest.fn().mockResolvedValue({ data: {} }) }
       await wrapper.vm.connect()
       expect(wrapper.vm.phase).toBe('error')
+    })
+
+    it('stringifies a rejection that carries no message', async () => {
+      const { wrapper } = factory({ show: false, groupId: 'g1' })
+      wrapper.vm.$apollo = { mutate: jest.fn().mockRejectedValue('websocket closed') }
+      await wrapper.vm.connect()
+      expect(wrapper.vm.error).toBe('websocket closed')
+      expect(wrapper.vm.phase).toBe('error')
+    })
+
+    it('toasts and closes instead of erroring full screen when parked mid-handshake', async () => {
+      // The user navigated away while the handshake was still running, so the
+      // window is minimized. The error phase would blow it back up to full
+      // screen over the page they moved to.
+      const { wrapper, close } = factory({ show: true, minimized: true, groupId: null })
+      const $toast = { error: jest.fn() }
+      wrapper.vm.$toast = $toast
+      await wrapper.vm.connect()
+      expect($toast.error).toHaveBeenCalledWith('Missing group id')
+      expect(wrapper.vm.phase).toBe('idle')
+      expect(close).toHaveBeenCalled()
+    })
+
+    it('still closes when parked mid-handshake without a $toast plugin', async () => {
+      const { wrapper, close } = factory({ show: true, minimized: true, groupId: null })
+      await wrapper.vm.connect()
+      expect(wrapper.vm.phase).toBe('idle')
+      expect(close).toHaveBeenCalled()
     })
   })
 
@@ -850,12 +1148,14 @@ describe('VideoCall', () => {
         videoTrackPublications: new Map([['v', { track: null }]]),
       }
       wrapper.vm.room = { localParticipant: lp, disconnect: jest.fn().mockResolvedValue() }
-      wrapper.vm._activeSpeakersTimer = 123
+      wrapper.vm.speakerHoldTimer = 123
+      wrapper.vm.speakerSeenAt.set('u1', 1)
       const clearSpy = jest.spyOn(global, 'clearTimeout')
       await wrapper.vm.cleanup()
       expect(stop).toHaveBeenCalled()
       expect(mediaStop).toHaveBeenCalled()
       expect(clearSpy).toHaveBeenCalledWith(123)
+      expect(wrapper.vm.speakerSeenAt.size).toBe(0)
       expect(wrapper.vm.room).toBeNull()
       clearSpy.mockRestore()
     })
@@ -978,6 +1278,28 @@ describe('VideoCall', () => {
       const { wrapper, setMinimized } = factory({ show: false })
       wrapper.vm.$options.watch.$route.call(wrapper.vm, { name: 'call-id-slug' })
       expect(setMinimized).not.toHaveBeenCalled()
+    })
+
+    it('$route watcher closes a failed call when navigating away', async () => {
+      const { wrapper, close, setMinimized } = factory({ show: true, groupId: 'g1' })
+      wrapper.setData({ phase: 'error', error: 'invalid api key' })
+      const replace = jest.fn()
+      wrapper.vm.$router.replace = replace
+      await wrapper.vm.$options.watch.$route.call(wrapper.vm, { name: 'groups-id-slug' })
+      expect(close).toHaveBeenCalled()
+      expect(wrapper.vm.phase).toBe('idle')
+      // Parking the error card would leave litter in the corner…
+      expect(setMinimized).not.toHaveBeenCalled()
+      // …and redirecting would hijack the navigation already in flight.
+      expect(replace).not.toHaveBeenCalled()
+    })
+
+    it('$route watcher keeps a failed call on the call route', async () => {
+      const { wrapper, close } = factory({ show: true, groupId: 'g1' })
+      wrapper.setData({ phase: 'error', error: 'invalid api key' })
+      await wrapper.vm.$options.watch.$route.call(wrapper.vm, { name: 'call-id-slug' })
+      expect(close).not.toHaveBeenCalled()
+      expect(wrapper.vm.phase).toBe('error')
     })
   })
 
