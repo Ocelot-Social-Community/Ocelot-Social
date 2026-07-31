@@ -58,6 +58,9 @@ COPY --from=branding-runtime ./app/ /packages/branding/
 #   ./deployment/configurations  READ-only fallback: what a branded build BAKED in (see ONBUILD), used
 #                                until the first sync lands, so the image never flashes vanilla when
 #                                the backend is slow or down. Absent on a vanilla image.
+# DEFAULT_ROOTS also carries `../deployment/configurations`, the same directory as seen from a repo
+# checkout — one directory up from /app, so it simply does not exist here and is skipped. Listing both
+# is what lets ONE default be right in the image and under `yarn dev`.
 # Ops replace the read side with $OCELOT_BRANDING_ASSETS_DIR (`:`-separated, an earlier root shadows a
 # later one per brand id) and move the cache with $OCELOT_BRANDING_CACHE_DIR. The cache stays first
 # either way; it is not part of the configurable path.
