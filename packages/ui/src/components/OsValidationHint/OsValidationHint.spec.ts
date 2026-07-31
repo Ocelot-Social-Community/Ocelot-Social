@@ -101,6 +101,7 @@ describe('osValidationHint', () => {
       })
 
       const p = wrapper.find('p.os-validation-hint__text')
+
       expect(p.exists()).toBe(true)
       expect(p.text()).toBe('Validation message')
     })
@@ -111,6 +112,7 @@ describe('osValidationHint', () => {
       })
 
       const p = wrapper.find('p.os-validation-hint__text')
+
       expect(p.classes()).toContain('text-[var(--color-warning)]')
     })
 
@@ -120,6 +122,7 @@ describe('osValidationHint', () => {
       })
 
       const p = wrapper.find('p.os-validation-hint__text')
+
       expect(p.classes()).toContain('text-[var(--color-danger)]')
     })
   })
@@ -131,6 +134,7 @@ describe('osValidationHint', () => {
       })
 
       const badge = wrapper.find('.os-badge')
+
       expect(badge.exists()).toBe(true)
       expect(badge.classes()).toContain('bg-[var(--color-danger)]')
     })
@@ -141,6 +145,7 @@ describe('osValidationHint', () => {
       })
 
       const badge = wrapper.find('.os-badge')
+
       expect(badge.exists()).toBe(true)
       expect(badge.classes()).toContain('bg-[var(--color-default)]')
     })
@@ -151,6 +156,7 @@ describe('osValidationHint', () => {
       })
 
       const badge = wrapper.find('.os-badge')
+
       expect((badge.element as HTMLElement).style.getPropertyValue('--color-default')).toBe(
         'var(--color-warning)',
       )

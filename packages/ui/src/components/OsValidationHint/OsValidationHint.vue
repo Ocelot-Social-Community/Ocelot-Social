@@ -3,10 +3,8 @@
 
   import OsBadge from '#src/components/OsBadge/OsBadge.vue'
   import OsIcon from '#src/components/OsIcon/OsIcon.vue'
+  import { ocelotIcons } from '#src/ocelot'
   import { cn } from '#src/utils'
-
-  import IconQuestionCircle from '../../ocelot/icons/svgs/question-circle.svg?icon'
-  import IconWarning from '../../ocelot/icons/svgs/warning.svg?icon'
 
   import type { Component, PropType } from 'vue-demi'
 
@@ -43,7 +41,7 @@
       const hasCount = computed(() => props.count != null)
       const hasContent = computed(() => !!(props.text || hasCount.value || props.variant))
       const resolvedIcon = computed<Component>(() =>
-        props.variant === 'warning' ? IconQuestionCircle : IconWarning,
+        props.variant === 'warning' ? ocelotIcons.questionCircle : ocelotIcons.warning,
       )
       const badgeVariant = computed(() => (props.variant === 'error' ? 'danger' : undefined))
 
@@ -52,9 +50,7 @@
 
         const rootClasses = cn(
           'os-validation-hint',
-          props.text
-            ? 'flex items-center justify-between w-full mt-[2px]'
-            : 'flex justify-end',
+          props.text ? 'flex items-center justify-between w-full mt-[2px]' : 'flex justify-end',
         )
 
         const textClass = cn(
