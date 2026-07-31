@@ -158,6 +158,10 @@ describe('build-maintenance-branding', () => {
     assert.equal(readText(to, 'public/img/brand/logo-squared.svg'), '<svg id="brand"/>')
     assert.equal(meta.LOGO, '/img/brand/logo-squared.svg')
     assert.equal(meta.APPLICATION_NAME, 'Acme')
+    // The one DERIVED value in the overlay: the browser-chrome colour is the brand's primary token,
+    // there being no metadata.themeColor field. resolveThemeColor is unit-tested elsewhere; what is
+    // only observable here is that its result actually reaches the overlay.
+    assert.equal(meta.THEME_COLOR, 'rebeccapurple')
     // The composed ogImage is a /branding/<id>/… path this static site never serves — it has to be
     // rewritten to the copy that IS served, or every link preview 404s.
     assert.equal(meta.OG_IMAGE, '/img/brand/logo-squared.svg')
