@@ -352,11 +352,21 @@ describe('build-maintenance-branding', () => {
     assert.equal(existsSync(join(to, 'public/brand')), false)
   })
 
-  test('refuses to run without both arguments', () => {
-    assert.throws(
-      () => execFileSync('node', [GENERATOR], { stdio: 'pipe' }),
-      /usage: build-maintenance-branding/,
-    )
+  // Both arguments are checked, so both misses are worth pinning: dropping the second one is the
+  // likelier slip at a prompt, and it is the case that would otherwise fail LATER and less clearly —
+  // `resolve(undefined)` throws a TypeError, not a usage line.
+  describe('missing arguments', () => {
+    for (const [name, argv] of [
+      ['none at all', []],
+      ['only the brand dir', ['/some/brand']],
+    ] as [string, string[]][]) {
+      test(`reports usage for ${name}`, () => {
+        assert.throws(
+          () => execFileSync('node', [GENERATOR, ...argv], { stdio: 'pipe' }),
+          /usage: build-maintenance-branding/,
+        )
+      })
+    }
   })
 
   // An asset a brand references but never ships is a build-time mistake in the BRAND, not here: say so
