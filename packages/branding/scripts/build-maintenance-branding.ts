@@ -67,6 +67,28 @@ const config = composeArchive(archive)
 if (!config) throw new Error(`could not compose config from archive for ${id}`)
 const cssVars = config.theme.cssVars
 
+/**
+ * Copy an archive entry under `dir` and return the URL it is served from, KEEPING the entry's own
+ * path. Reducing it to its basename would let two entries collide: `assets/logo.png` (the logo) and
+ * `assets/og/logo.png` (the OG image) would land on one file, the second silently overwriting the
+ * first — as would two font weights filed under `fonts/regular/` and `fonts/bold/`.
+ *
+ * The entry becomes a filesystem path here, so it must not escape `dir`. It cannot: an entry only
+ * exists if `archive.get()` returned data for it, and the archive is built by collectFiles from the
+ * brand directory, which names every entry relative to it (`assets/…`). A `../` path is therefore not
+ * a key of that map — archiveEntry rejects it as "not in archive" before this is reached. (A symlink
+ * inside assets/ can point anywhere, but its CONTENT is what travels; the entry name stays relative.)
+ */
+function serveEntry(dir: string, entry: string, data: Buffer): string {
+  // Served brand files all live under `assets/` in the archive; carrying that segment into the URL
+  // would only repeat what the target directory already says. What follows it is kept as-is, and that
+  // is what keeps two entries distinct.
+  const rel = entry.replace(/^assets\//, '')
+  mkdirSync(dirname(resolve(maintenanceDir, 'public', dir, rel)), { recursive: true })
+  writeFileSync(resolve(maintenanceDir, 'public', dir, rel), data)
+  return `/${dir}/${rel}`
+}
+
 /** An archive entry for a `/branding/<id>/…` path, or null when the path is external/absent. */
 function archiveEntry(namespaced: string): { entry: string; data: Buffer } | null {
   const prefix = `/branding/${id}/`
@@ -87,9 +109,8 @@ const fontRules: string[] = []
 for (const face of config.theme.fontFaces) {
   const found = archiveEntry(face.src)
   // An absolute or external src (https:, /fonts/…) is already servable — reference it as given.
-  const url = found ? `/fonts/brand/${basename(found.entry)}` : face.src
-  if (found) writeFileSync(out(`public/fonts/brand/${basename(found.entry)}`), found.data)
-  else if (face.src.startsWith(`/branding/${id}/`)) continue // warned above; nothing to reference
+  if (!found && face.src.startsWith(`/branding/${id}/`)) continue // warned above; nothing to serve
+  const url = found ? serveEntry('fonts/brand', found.entry, found.data) : face.src
   const src = face.format ? `url("${url}") format("${face.format}")` : `url("${url}")`
   fontRules.push(
     [
@@ -131,11 +152,10 @@ console.log(
 function serveImage(namespaced: string, label: string): string | null {
   const found = archiveEntry(namespaced)
   if (!found) return null
-  const file = basename(found.entry)
-  writeFileSync(out(`public/img/brand/${file}`), found.data)
+  const url = serveEntry('img/brand', found.entry, found.data)
 
-  console.log(`[maintenance] ${label} → public/img/brand/${file}`)
-  return `/img/brand/${file}`
+  console.log(`[maintenance] ${label} → public${url}`)
+  return url
 }
 
 const logoUrl = serveImage(config.logos.signupPath, 'logo')

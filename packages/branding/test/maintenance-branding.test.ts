@@ -122,7 +122,7 @@ describe('build-maintenance-branding', () => {
       'app/constants/metadata.brand.json',
       'app/locales/de.json',
       'public/img/brand/logo-squared.svg',
-      'public/fonts/brand/acme.woff2',
+      'public/fonts/brand/fonts/acme.woff2',
     ]) {
       assert.ok(existsSync(join(to, rel)), `expected ${rel}`)
     }
@@ -135,9 +135,9 @@ describe('build-maintenance-branding', () => {
     const css = readText(to, 'app/assets/css/brand.css')
     // The font FILE is served from the maintenance app, not from /branding/<id>/… (that route only
     // exists in the live webapp, which is down whenever this page is shown).
-    assert.equal(readText(to, 'public/fonts/brand/acme.woff2'), 'woff2-bytes')
+    assert.equal(readText(to, 'public/fonts/brand/fonts/acme.woff2'), 'woff2-bytes')
     assert.match(css, /@font-face \{[^}]*font-family: "Acme Sans";/)
-    assert.match(css, /src: url\("\/fonts\/brand\/acme\.woff2"\) format\("woff2"\);/)
+    assert.match(css, /src: url\("\/fonts\/brand\/fonts\/acme\.woff2"\) format\("woff2"\);/)
     assert.match(css, /font-weight: 400;/)
     // …and the token that names it, so `body { font-family: var(--font-family-text) }` resolves.
     assert.match(css, /--font-family-text: 'Acme Sans', sans-serif;/)
@@ -163,6 +163,66 @@ describe('build-maintenance-branding', () => {
     assert.equal(meta.OG_IMAGE, '/img/brand/logo-squared.svg')
   })
 
+  // Reducing an archive entry to its basename would put two of them on one file. Both cases are
+  // plausible: an OG image filed under its own directory, and font weights split by cut.
+  describe('entries that share a basename', () => {
+    test('keeps the logo and the OG image apart', () => {
+      const to = maintenanceDir()
+      const from = tmp('ocelot-brand-')
+      write(join(from, 'package.json'), JSON.stringify({ name: 'twin-branding' }))
+      write(
+        join(from, 'brand.config.mjs'),
+        `export default (defineBranding) =>
+  defineBranding({
+    logos: { signupPath: 'assets/logo.png' },
+    metadata: { ogImage: 'assets/og/logo.png' },
+  })
+`,
+      )
+      write(join(from, 'assets/logo.png'), 'THE-LOGO')
+      write(join(from, 'assets/og/logo.png'), 'THE-OG-IMAGE')
+
+      brand(from, to)
+
+      const meta = readJson(to, 'app/constants/metadata.brand.json') as unknown as Record<
+        string,
+        string
+      >
+      assert.notEqual(meta.LOGO, meta.OG_IMAGE)
+      assert.equal(readText(to, join('public', meta.LOGO)), 'THE-LOGO')
+      assert.equal(readText(to, join('public', meta.OG_IMAGE)), 'THE-OG-IMAGE')
+    })
+
+    test('keeps two font files apart', () => {
+      const to = maintenanceDir()
+      const from = tmp('ocelot-brand-')
+      write(join(from, 'package.json'), JSON.stringify({ name: 'cuts-branding' }))
+      write(
+        join(from, 'brand.config.mjs'),
+        `export default (defineBranding) =>
+  defineBranding({
+    theme: {
+      fontFaces: [
+        { family: 'Cuts', src: 'assets/fonts/regular/Cuts.woff2', weight: '400' },
+        { family: 'Cuts', src: 'assets/fonts/bold/Cuts.woff2', weight: '700' },
+      ],
+    },
+  })
+`,
+      )
+      write(join(from, 'assets/fonts/regular/Cuts.woff2'), 'REGULAR')
+      write(join(from, 'assets/fonts/bold/Cuts.woff2'), 'BOLD')
+
+      brand(from, to)
+
+      const css = readText(to, 'app/assets/css/brand.css')
+      const urls = [...css.matchAll(/url\("([^"]+)"\)/g)].map((m) => m[1])
+      assert.equal(new Set(urls).size, 2, `expected two distinct font urls, got ${urls.join(', ')}`)
+      assert.equal(readText(to, join('public', urls[0])), 'REGULAR')
+      assert.equal(readText(to, join('public', urls[1])), 'BOLD')
+    })
+  })
+
   test('overlays only the locale namespaces the maintenance page renders', () => {
     const to = maintenanceDir()
     brand(brandDir(), to)
@@ -186,7 +246,7 @@ describe('build-maintenance-branding', () => {
     test('drops the artifacts of the brand built before it', () => {
       const to = maintenanceDir()
       brand(brandDir(), to)
-      assert.ok(existsSync(join(to, 'public/fonts/brand/acme.woff2')))
+      assert.ok(existsSync(join(to, 'public/fonts/brand/fonts/acme.woff2')))
       assert.ok(existsSync(join(to, 'app/locales/de.json')))
 
       // A second brand, same maintenance tree: different font, no locales, no logo.
@@ -208,7 +268,7 @@ describe('build-maintenance-branding', () => {
       brand(other, to)
 
       assert.ok(existsSync(join(to, 'public/fonts/brand/other.woff2')))
-      assert.equal(existsSync(join(to, 'public/fonts/brand/acme.woff2')), false)
+      assert.equal(existsSync(join(to, 'public/fonts/brand/fonts/acme.woff2')), false)
       assert.equal(existsSync(join(to, 'app/locales/de.json')), false)
       assert.equal(existsSync(join(to, 'public/img/brand')), false)
     })
