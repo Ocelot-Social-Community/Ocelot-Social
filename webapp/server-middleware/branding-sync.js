@@ -229,33 +229,36 @@ async function writeDefaultMarker(dir, id) {
 // there has to vanish here too — otherwise discovery keeps finding it, and it stays in the admin's
 // brand list and stays selectable for the whole life of the pod.
 //
-// Scoped to `<id>.tar.gz` directly in the cache ROOT: that is the exact name fetchArchive writes, so
-// it is the only thing this middleware can have put there. Anything else in the directory is not ours
-// to delete — the lesson from the eviction this replaced, which removed files it did not own. Reading
-// each archive's internal id instead would be costlier AND broader, and a file we did not name is a
-// file we did not write.
+// Identified by the archive's OWN id, not by its filename: the only file this middleware writes for a
+// brand is `<id>.tar.gz` in the cache root, so an archive found under any other name — a versioned
+// `<id>-<version>.tar.gz` (what publishBrandArchive calls immutable history), a copy in a
+// subdirectory — is not ours to delete. Matching on the name alone would read `stage-1.0.0.tar.gz` as
+// the brand `stage-1.0.0` and remove it, which is the eviction this replaced, back by another route.
+//
+// discoverArchives also settles the malformed cases for free: a file that is not a readable archive
+// (`..evil.tar.gz`, a truncated download) carries no id and is never a candidate.
 async function removeOrphans(dir, ids) {
-  const keep = new Set(ids.map((id) => `${id}.tar.gz`))
-  let entries
+  const listed = new Set(ids)
+  let discovered
   try {
-    entries = await fs.readdir(dir)
+    discovered = discoverArchives(dir)
   } catch (error) {
-    return // unreadable cache: the sync already worked with what it could, this is only tidying
+    return // unreadable cache: the sync already did its work, this is only tidying
   }
-  for (const name of entries) {
-    if (!name.endsWith('.tar.gz') || keep.has(name)) continue
-    const id = name.slice(0, -'.tar.gz'.length)
-    if (!isValidBrandId(id)) continue
+  for (const [id, archive] of discovered) {
+    if (listed.has(id)) continue
+    const ours = path.join(dir, `${id}.tar.gz`)
+    if (path.resolve(archive.file) !== path.resolve(ours)) continue
     try {
-      await fs.unlink(path.join(dir, name))
+      await fs.unlink(ours)
       // Forget the validator too, or a brand that comes BACK would be revalidated against the ETag of
       // a file that is no longer there — a 304 with nothing on disk.
       etags.delete(id)
       // eslint-disable-next-line no-console
-      console.warn(`[branding] dropped ${name}: the backend no longer lists that brand`)
+      console.warn(`[branding] dropped ${id}.tar.gz: the backend no longer lists that brand`)
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.warn(`[branding] cannot drop the orphaned ${name}:`, error && error.message)
+      console.warn(`[branding] cannot drop the orphaned ${id}.tar.gz:`, error && error.message)
     }
   }
 }
