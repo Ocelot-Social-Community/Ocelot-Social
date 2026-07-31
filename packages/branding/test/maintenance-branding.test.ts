@@ -91,8 +91,13 @@ function brandDir(): string {
   return dir
 }
 
-/** A maintenance tree: only the VANILLA locales matter as input — they decide which codes get an
- *  overlay. Everything else the generator produces is a file of its own. */
+/**
+ * A maintenance tree. The VANILLA locales are the only real input — they decide which codes get an
+ * overlay. The rest stands in for the committed sources the generator must not touch, and is chosen
+ * deliberately: `app/assets/css/branding.css` and `app/constants/metadata.ts` are exactly the two the
+ * generator used to OVERWRITE before the overlays existed, and `public/favicon.ico` sits in the same
+ * tree as the served brand files.
+ */
 function maintenanceDir(): string {
   const dir = tmp('ocelot-maintenance-')
   write(
@@ -106,13 +111,22 @@ function maintenanceDir(): string {
     join(dir, 'locales/en.json'),
     JSON.stringify({ maintenance: { explanation: 'Back soon.' } }),
   )
+  write(join(dir, 'app/assets/css/branding.css'), ':root { --color-primary: green; }\n')
+  write(join(dir, 'app/constants/metadata.ts'), 'export default { APPLICATION_NAME: "ocelot" };\n')
+  write(join(dir, 'public/favicon.ico'), Buffer.from('icon-bytes'))
   return dir
 }
 
-/** The committed sources a brand must NEVER be written into. */
-const COMMITTED = ['locales/de.json', 'locales/en.json']
-function snapshot(dir: string): string[] {
-  return COMMITTED.map((rel) => readText(dir, rel))
+/** Every file under `dir`, path → contents. base64 so a binary asset compares as reliably as text. */
+function snapshot(dir: string): Map<string, string> {
+  return new Map(walk(dir).map((rel) => [rel, readFileSync(join(dir, rel)).toString('base64')]))
+}
+
+/** Whether a path is one the generator declares as its own (see maintenance-generated-paths.json). */
+function declaredPaths(): { servedDir: string; paths: string[] } {
+  return JSON.parse(
+    readFileSync(new URL('../scripts/maintenance-generated-paths.json', import.meta.url), 'utf8'),
+  ) as { servedDir: string; paths: string[] }
 }
 
 function brand(brandPath: string, maintenancePath: string): void {
@@ -135,7 +149,11 @@ describe('build-maintenance-branding', () => {
 
     brand(brandDir(), to)
 
-    assert.deepEqual(snapshot(to), before)
+    // Byte-for-byte, not just "still present": overwriting a committed file in place is precisely the
+    // behaviour the overlays replaced.
+    for (const [rel, content] of before) {
+      assert.equal(snapshot(to).get(rel), content, `${rel} was modified or removed`)
+    }
     for (const rel of [
       'app/assets/css/brand.css',
       'app/constants/metadata.brand.json',
@@ -151,19 +169,31 @@ describe('build-maintenance-branding', () => {
   // work from. Sharing the file stops the two from drifting apart, but not from being INCOMPLETE — a
   // new output path added to the code and not to the list would still survive every reset. So this
   // walks what was actually written and holds it against the list.
-  test('writes nothing outside the paths it declares', () => {
+  test('touches nothing outside the paths it declares', () => {
     const to = maintenanceDir()
-    const before = new Set(walk(to))
+    const before = snapshot(to)
 
     brand(brandDir(), to)
 
-    const declared = JSON.parse(
-      readFileSync(new URL('../scripts/maintenance-generated-paths.json', import.meta.url), 'utf8'),
-    ) as { servedDir: string; paths: string[] }
-    const undeclared = walk(to)
-      .filter((rel) => !before.has(rel))
-      .filter((rel) => !declared.paths.some((p) => rel === p || rel.startsWith(`${p}/`)))
-    assert.deepEqual(undeclared, [], 'these were written but no reset would remove them')
+    const declared = declaredPaths()
+    const managed = (rel: string): boolean =>
+      declared.paths.some((p) => rel === p || rel.startsWith(`${p}/`))
+    const afterRun = snapshot(to)
+
+    // Added: anything new outside the declared paths would survive every reset and leak into the
+    // next brand — the exact failure the shared path list exists to prevent.
+    assert.deepEqual(
+      [...afterRun.keys()].filter((rel) => !before.has(rel) && !managed(rel)),
+      [],
+      'written but no reset would remove them',
+    )
+    // Changed or removed: a path list cannot catch either, so compare the files themselves. Tracking
+    // only names would miss a committed file being overwritten in place.
+    for (const [rel, content] of before) {
+      if (managed(rel)) continue
+      assert.ok(afterRun.has(rel), `${rel} was removed`)
+      assert.equal(afterRun.get(rel), content, `${rel} was modified`)
+    }
     // The served directory travels in the same file; the generator must not invent a second one.
     assert.ok(declared.paths.includes(`public/${declared.servedDir}`))
   })
