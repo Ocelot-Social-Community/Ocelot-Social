@@ -210,6 +210,41 @@ async function writeDefaultMarker(dir, id) {
   }
 }
 
+// Drop archives for brands the backend no longer lists. The cache is a MIRROR, so a brand deleted
+// there has to vanish here too — otherwise discovery keeps finding it, and it stays in the admin's
+// brand list and stays selectable for the whole life of the pod.
+//
+// Scoped to `<id>.tar.gz` directly in the cache ROOT: that is the exact name fetchArchive writes, so
+// it is the only thing this middleware can have put there. Anything else in the directory is not ours
+// to delete — the lesson from the eviction this replaced, which removed files it did not own. Reading
+// each archive's internal id instead would be costlier AND broader, and a file we did not name is a
+// file we did not write.
+async function removeOrphans(dir, ids) {
+  const keep = new Set(ids.map((id) => `${id}.tar.gz`))
+  let entries
+  try {
+    entries = await fs.readdir(dir)
+  } catch (error) {
+    return // unreadable cache: the sync already worked with what it could, this is only tidying
+  }
+  for (const name of entries) {
+    if (!name.endsWith('.tar.gz') || keep.has(name)) continue
+    const id = name.slice(0, -'.tar.gz'.length)
+    if (!isValidBrandId(id)) continue
+    try {
+      await fs.unlink(path.join(dir, name))
+      // Forget the validator too, or a brand that comes BACK would be revalidated against the ETag of
+      // a file that is no longer there — a 304 with nothing on disk.
+      etags.delete(id)
+      // eslint-disable-next-line no-console
+      console.warn(`[branding] dropped ${name}: the backend no longer lists that brand`)
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.warn(`[branding] cannot drop the orphaned ${name}:`, error && error.message)
+    }
+  }
+}
+
 async function sync(dir) {
   const base = backendUrl()
   const manifest = await withRequestTimeout(async (signal) => {
@@ -232,6 +267,9 @@ async function sync(dir) {
   await writeDefaultMarker(dir, manifest.default)
 
   const results = await Promise.allSettled(ids.map((id) => fetchArchive(base, dir, id)))
+  // AFTER fetching, not before: the new state is on disk first, so a transfer that fails cannot leave
+  // the cache emptier than it started.
+  await removeOrphans(dir, ids)
   const failed = results.filter((r) => r.status === 'rejected')
   if (failed.length) {
     // Partial success is still progress — the brands that arrived are usable. Report the rest.
