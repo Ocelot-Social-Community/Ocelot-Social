@@ -785,6 +785,34 @@ describe('VideoCall', () => {
       await wrapper.vm.connect()
       expect(wrapper.vm.phase).toBe('error')
     })
+
+    it('stringifies a rejection that carries no message', async () => {
+      const { wrapper } = factory({ show: false, groupId: 'g1' })
+      wrapper.vm.$apollo = { mutate: jest.fn().mockRejectedValue('websocket closed') }
+      await wrapper.vm.connect()
+      expect(wrapper.vm.error).toBe('websocket closed')
+      expect(wrapper.vm.phase).toBe('error')
+    })
+
+    it('toasts and closes instead of erroring full screen when parked mid-handshake', async () => {
+      // The user navigated away while the handshake was still running, so the
+      // window is minimized. The error phase would blow it back up to full
+      // screen over the page they moved to.
+      const { wrapper, close } = factory({ show: true, minimized: true, groupId: null })
+      const $toast = { error: jest.fn() }
+      wrapper.vm.$toast = $toast
+      await wrapper.vm.connect()
+      expect($toast.error).toHaveBeenCalledWith('Missing group id')
+      expect(wrapper.vm.phase).toBe('idle')
+      expect(close).toHaveBeenCalled()
+    })
+
+    it('still closes when parked mid-handshake without a $toast plugin', async () => {
+      const { wrapper, close } = factory({ show: true, minimized: true, groupId: null })
+      await wrapper.vm.connect()
+      expect(wrapper.vm.phase).toBe('idle')
+      expect(close).toHaveBeenCalled()
+    })
   })
 
   describe('refreshTiles (full tile build)', () => {
@@ -978,6 +1006,28 @@ describe('VideoCall', () => {
       const { wrapper, setMinimized } = factory({ show: false })
       wrapper.vm.$options.watch.$route.call(wrapper.vm, { name: 'call-id-slug' })
       expect(setMinimized).not.toHaveBeenCalled()
+    })
+
+    it('$route watcher closes a failed call when navigating away', async () => {
+      const { wrapper, close, setMinimized } = factory({ show: true, groupId: 'g1' })
+      wrapper.setData({ phase: 'error', error: 'invalid api key' })
+      const replace = jest.fn()
+      wrapper.vm.$router.replace = replace
+      await wrapper.vm.$options.watch.$route.call(wrapper.vm, { name: 'groups-id-slug' })
+      expect(close).toHaveBeenCalled()
+      expect(wrapper.vm.phase).toBe('idle')
+      // Parking the error card would leave litter in the corner…
+      expect(setMinimized).not.toHaveBeenCalled()
+      // …and redirecting would hijack the navigation already in flight.
+      expect(replace).not.toHaveBeenCalled()
+    })
+
+    it('$route watcher keeps a failed call on the call route', async () => {
+      const { wrapper, close } = factory({ show: true, groupId: 'g1' })
+      wrapper.setData({ phase: 'error', error: 'invalid api key' })
+      await wrapper.vm.$options.watch.$route.call(wrapper.vm, { name: 'call-id-slug' })
+      expect(close).not.toHaveBeenCalled()
+      expect(wrapper.vm.phase).toBe('error')
     })
   })
 

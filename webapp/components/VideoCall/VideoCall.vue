@@ -425,12 +425,22 @@ export default {
         this.spotlightKey = null
       }
     },
-    $route(to) {
+    async $route(to) {
       // Keep the minimized/maximized state in sync with the URL when the user
       // navigates via links, browser back/forward, or our own routing helpers.
       if (!this.show) return
-      if (this.phase !== 'connecting' && this.phase !== 'in-call') return
       const onCall = to.name === 'call-id-slug'
+      // A failed connect holds no session worth preserving — minimizing only
+      // exists so a *live* room survives navigation. Parking an error card in
+      // the corner would be litter the user still has to dismiss, and leaving
+      // it full screen blocks the page they just navigated to. Close instead.
+      // Deliberately not leave(): its router.replace would hijack the
+      // navigation that is running right now.
+      if (this.phase === 'error') {
+        if (!onCall) await this.closeAfterError()
+        return
+      }
+      if (this.phase !== 'connecting' && this.phase !== 'in-call') return
       if (onCall && this.minimized) this.setMinimized(false)
       else if (!onCall && !this.minimized) this.setMinimized(true)
     },
@@ -617,12 +627,31 @@ export default {
         this.refreshTiles()
         this.phase = 'in-call'
       } catch (err) {
-        this.error = (err && err.message) || String(err)
+        const message = (err && err.message) || String(err)
+        // The user navigated away while the handshake was still running, so
+        // the window is parked in the corner. Since isFullscreen treats every
+        // non-'in-call' phase as full screen, showing the error block here
+        // would blow the parked window back up over the page they moved to.
+        // There is no session to park either — toast the reason and close.
+        if (this.minimized) {
+          if (this.$toast && typeof this.$toast.error === 'function') {
+            this.$toast.error(message)
+          }
+          await this.closeAfterError()
+          return
+        }
+        this.error = message
         // Distinct phase so the header stops pretending there's a live room
         // (no participant counter, no minimize button, no in-call controls)
         // while the error block is shown.
         this.phase = 'error'
       }
+    },
+    async closeAfterError() {
+      // No navigation here — unlike leave(), every caller either is already
+      // navigating or was never on the call route to begin with.
+      await this.cleanup()
+      this.close()
     },
     refreshTiles() {
       const room = this.room
