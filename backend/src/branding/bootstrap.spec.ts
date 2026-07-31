@@ -74,20 +74,26 @@ describe('branding bootstrap', () => {
     expect(warnSpy).not.toHaveBeenCalled()
   })
 
-  // …and the marker is looked for in the conventional locations, unconfigured.
+  // …and BOTH readers are handed the same resolved list. Asserting only on the marker would leave the
+  // handover to discoverArchives untested — the mocks ignore their argument, so passing it the raw
+  // (unset) env instead of the resolved path would still return an archive here while finding nothing
+  // in production.
   it('activates the brand a DEFAULT marker names without any env set', () => {
+    const CONVENTIONAL = [
+      resolve('deployment/configurations'),
+      resolve('../deployment/configurations'),
+    ]
     const archive = { file: 'acme.tar.gz', schemaVersion: '0.0.1' }
     const config = { metadata: { applicationName: 'Acme' } }
     const readDefaultMarker = jest.fn(() => 'acme')
+    const discoverArchives = jest.fn(() => new Map([['acme', archive]]))
     const { setBranding } = loadBootstrap({
       readDefaultMarker,
-      discoverArchives: jest.fn(() => new Map([['acme', archive]])),
+      discoverArchives,
       readArchiveConfig: jest.fn(() => config),
     })
-    expect(readDefaultMarker).toHaveBeenCalledWith([
-      resolve('deployment/configurations'),
-      resolve('../deployment/configurations'),
-    ])
+    expect(readDefaultMarker).toHaveBeenCalledWith(CONVENTIONAL)
+    expect(discoverArchives).toHaveBeenCalledWith(CONVENTIONAL)
     expect(setBranding).toHaveBeenCalledWith(config)
   })
 
