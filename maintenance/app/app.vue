@@ -32,15 +32,19 @@
 import { OsCard } from "@ocelot-social/ui";
 
 import LocaleSwitch from "~/components/LocaleSwitch.vue";
-import emails from "~/constants/emails";
+import emails, { SUPPORT_EMAIL_PLACEHOLDER } from "~/constants/emails";
 import metadata from "~/constants/metadata";
 
 const { t } = useI18n();
 
-// $SUPPORT_EMAIL as baked in at build time (see nuxt.config.ts), else the vanilla address. It is
-// deployment config rather than branding, so it does NOT come from the brand archive.
+// $SUPPORT_EMAIL, injected at build time or by the nginx entrypoint (see constants/emails.ts). A
+// placeholder that is still there means neither happened — `nuxt dev` without the env, or a preview
+// of the built files without nginx — so fall back rather than render the token.
+const configured = useRuntimeConfig().public.supportEmail;
 const supportEmail =
-  useRuntimeConfig().public.supportEmail || emails.SUPPORT_EMAIL;
+  !configured || configured === SUPPORT_EMAIL_PLACEHOLDER
+    ? emails.SUPPORT_EMAIL
+    : configured;
 // From the metadata, not hard-coded: a brand's logo has its own filename and extension, and the
 // generator points LOGO at the copy it serves from /img/brand/ (vanilla → /img/custom/…).
 const logoUrl = metadata.LOGO;

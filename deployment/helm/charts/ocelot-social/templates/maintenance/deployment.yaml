@@ -20,5 +20,13 @@ spec:
         env:
           - name: HOST
             value: 0.0.0.0
+          # The support address the page shows. Same value the backend gets — the page is static, so
+          # its nginx entrypoint substitutes it into the built files at startup
+          # (maintenance/nginx/40-support-email.sh) rather than it being baked in per brand image.
+          # Unset → the vanilla ocelot address.
+          {{- with .Values.maintenance.supportEmail | default (.Values.backend.env).SUPPORT_EMAIL }}
+          - name: SUPPORT_EMAIL
+            value: {{ quote . }}
+          {{- end }}
         ports:
           - containerPort: 8080

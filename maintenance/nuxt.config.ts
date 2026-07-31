@@ -3,6 +3,8 @@ import { fileURLToPath } from "node:url";
 
 import tailwindcss from "@tailwindcss/vite";
 
+import { SUPPORT_EMAIL_PLACEHOLDER } from "./app/constants/emails";
+
 // Branding is applied at BUILD time by build-maintenance-branding.ts (the page is static and is shown
 // precisely when the backend is unreachable, so it cannot fetch anything at runtime). Everything the
 // generator writes is a SEPARATE, git-ignored file that this config picks up only when present — no
@@ -26,11 +28,11 @@ export default defineNuxtConfig({
   ssr: false,
   runtimeConfig: {
     public: {
-      // Deployment config, not branding — the backend and webapp read $SUPPORT_EMAIL at runtime and
-      // each network sets it in its helmfile. This page is static (nginx serves it when everything
-      // else is down), so there is no runtime env to read: the value is frozen in at BUILD time.
-      // Empty → app.vue falls back to the vanilla address in constants/emails.ts.
-      supportEmail: process.env.SUPPORT_EMAIL ?? "",
+      // Deployment config, not branding (see app/constants/emails.ts). $SUPPORT_EMAIL at build time
+      // wins; otherwise the PLACEHOLDER goes into the payload for nginx/40-support-email.sh to
+      // replace when the container starts — that is the production path, and it keeps the value in
+      // the helm chart instead of a build arg in every brand repo's CI.
+      supportEmail: process.env.SUPPORT_EMAIL || SUPPORT_EMAIL_PLACEHOLDER,
     },
   },
   devServer: { host: "0.0.0.0" },

@@ -130,4 +130,9 @@ LABEL maintainer="devops@ocelot.social"
 
 COPY --from=production_build /app/.output/public/ /usr/share/nginx/html/
 COPY maintenance/nginx/custom.conf /etc/nginx/conf.d/default.conf
+# Substitutes $SUPPORT_EMAIL into the built page when the container starts. It lives in THIS stage on
+# purpose: this stage is published as `maintenance-base`, which every brand image builds `FROM` (see
+# deployment/configurations/*/docker/maintenance.Dockerfile) — so the address stays deployment config
+# (helm chart) and not one build arg per brand repo's CI.
+COPY --chmod=755 maintenance/nginx/40-support-email.sh /docker-entrypoint.d/40-support-email.sh
 EXPOSE 8080
