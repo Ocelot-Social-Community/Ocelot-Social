@@ -18,8 +18,11 @@
 //   • WEBAPP  — mirrors the backend into its own cache, and cacheFirstSearchPath PREPENDS that cache
 //     to the configured path. The roots after it keep the order you give them; only the first slot is
 //     taken. So putting this tree first does NOT make a local build out-rank the sync, and appending
-//     the cache changes nothing (it is already there). The rebuild still arrives — via the backend,
-//     within $OCELOT_BRANDING_SYNC_TTL_MS (60s; set it to 0 to see every change on the next refresh).
+//     the cache changes nothing (it is already there). The rebuild still arrives via the backend, but
+//     the TTL is a CHECK INTERVAL, not a deadline: the first request once
+//     $OCELOT_BRANDING_SYNC_TTL_MS (60s) has elapsed only STARTS the sync, in the background, and
+//     that request still renders the old state. The change shows on a later one — so with the TTL at
+//     0, refresh twice.
 //
 // What DOES matter: never point $OCELOT_BRANDING_CACHE_DIR at this tree. The sync owns that directory
 // and deletes in it; aimed here it would compete with your brand builds. Its default (`.branding-cache`
@@ -70,6 +73,7 @@ for (const brandDir of compatible) {
 
 console.log(
   `[dev-brandings] ${compatible.length} brand(s) built into their dist/ under ${configurationsRoot} — ` +
-    `both apps search there by default, no env needed (the webapp picks a rebuild up from the backend ` +
-    `within OCELOT_BRANDING_SYNC_TTL_MS, 60s by default)`,
+    `both apps search there by default, no env needed. The backend serves a rebuild at once; the ` +
+    `webapp syncs it from there — the first request after OCELOT_BRANDING_SYNC_TTL_MS (60s) starts ` +
+    `that sync in the background, so the change appears on a later request`,
 )

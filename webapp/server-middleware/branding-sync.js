@@ -336,7 +336,8 @@ module.exports = async function brandingSync(req, res, next) {
       // "never" whenever two requests land in the same millisecond.
     } else if (Date.now() - lastSync >= ttlMs()) {
       // Warm — or booting with the block already spent: refresh in the background so no request pays
-      // for it. An admin's brand switch is picked up within the TTL without a restart. Deliberately
+      // for it. An admin's brand switch is therefore picked up without a restart — but on a LATER
+      // request, not this one: the TTL says when to go looking, not when the result is in. Deliberately
       // not awaited — runSync catches internally, so this promise never rejects.
       runSync(dir)
     }
