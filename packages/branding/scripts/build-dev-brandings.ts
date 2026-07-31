@@ -11,14 +11,15 @@
 // conventional locations both apps search by default (src/discover.ts DEFAULT_ROOTS), and archives are
 // found RECURSIVELY under it, so each brand's own `dist/` is enough.
 //
-// How a rebuild reaches the two apps differs, and only one of them is ordered by that search path:
+// How a rebuild reaches the two apps differs. $OCELOT_BRANDING_ASSETS_DIR orders the roots in BOTH —
+// what differs is whether this tree can be put in front of everything:
 //   • BACKEND — reads the tree directly (searchPath, no cache), so a rebuilt archive is served on the
-//     next request. This is the one where $OCELOT_BRANDING_ASSETS_DIR decides precedence.
-//   • WEBAPP  — mirrors the backend into its own cache, and that cache is ALWAYS searched first
-//     (cacheFirstSearchPath); it is not part of the configurable path. Appending the cache to
-//     $OCELOT_BRANDING_ASSETS_DIR therefore changes nothing, and putting this tree first does NOT
-//     make a local build out-rank the sync. The rebuild still arrives — via the backend, within
-//     $OCELOT_BRANDING_SYNC_TTL_MS (60s; set it to 0 to see every change on the next refresh).
+//     next request and the configured order decides outright.
+//   • WEBAPP  — mirrors the backend into its own cache, and cacheFirstSearchPath PREPENDS that cache
+//     to the configured path. The roots after it keep the order you give them; only the first slot is
+//     taken. So putting this tree first does NOT make a local build out-rank the sync, and appending
+//     the cache changes nothing (it is already there). The rebuild still arrives — via the backend,
+//     within $OCELOT_BRANDING_SYNC_TTL_MS (60s; set it to 0 to see every change on the next refresh).
 //
 // What DOES matter: never point $OCELOT_BRANDING_CACHE_DIR at this tree. The sync owns that directory
 // and deletes in it; aimed here it would compete with your brand builds. Its default (`.branding-cache`

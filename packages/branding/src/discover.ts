@@ -150,10 +150,11 @@ export function cacheDir(spec: string | string[] | null | undefined): string {
  * The search path for a service that MIRRORS its archives from elsewhere — the webapp, which syncs
  * them from the backend (server-middleware/branding-sync.js).
  *
- * The cache is FIRST and is not part of the configurable path: it holds the freshest copy of the
- * single source of truth, so it has to out-rank anything found locally, and making its position
- * configurable would only let a deployment break that. Everything after it is a fallback for when the
- * backend has not answered (yet): the archive baked into the image, a mounted volume.
+ * The cache is PREPENDED, not merged in: it holds the freshest copy of the single source of truth, so
+ * it has to out-rank anything found locally, and letting a deployment move it would only break that.
+ * Only that first slot is reserved — the roots behind it keep the order `spec` gives them and shadow
+ * each other as usual. They are the fallback for when the backend has not answered (yet): the archive
+ * baked into the image, a mounted volume.
  */
 export function cacheFirstSearchPath(
   cacheSpec: string | string[] | null | undefined,
