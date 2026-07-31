@@ -191,7 +191,7 @@ describe('build-maintenance-branding', () => {
       const other = tmp('ocelot-brand-')
       write(join(other, 'package.json'), JSON.stringify({ name: 'other-branding' }))
       write(
-        other + '/brand.config.mjs',
+        join(other, 'brand.config.mjs'),
         `export default (defineBranding) =>
   defineBranding({
     theme: {
