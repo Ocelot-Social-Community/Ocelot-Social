@@ -35,7 +35,7 @@
             hide-error
             @blur="dirtyFields.title && touchField('title')"
           />
-          <validation-hint
+          <os-validation-hint
             :count="formData.title.length"
             :max="formSchema.title.max"
             :variant="visibleErrors && visibleErrors.title ? 'error' : null"
@@ -50,7 +50,7 @@
               @blur.native.capture="dirtyFields.content && touchField('content')"
             />
           </div>
-          <validation-hint
+          <os-validation-hint
             :count="contentLength"
             :variant="visibleErrors && visibleErrors.content ? 'error' : null"
             :text="
@@ -102,19 +102,19 @@
             </div>
             <div class="event-date-hints-zone">
               <div class="event-date-hint-cell">
-                <validation-hint
+                <os-validation-hint
                   v-if="visibleErrors && visibleErrors.eventStart"
                   variant="error"
                   :text="$t('post.viewEvent.eventStartNotEmpty')"
                 />
-                <validation-hint
+                <os-validation-hint
                   v-else-if="eventStartIsInPast"
                   variant="warning"
                   :text="$t('post.viewEvent.eventStartInPast')"
                 />
               </div>
               <div class="event-date-hint-cell">
-                <validation-hint
+                <os-validation-hint
                   v-if="visibleErrors && visibleErrors.eventEnd"
                   variant="error"
                   :text="$t('post.viewEvent.eventEndBeforeStart')"
@@ -130,7 +130,7 @@
                   hide-error
                   @blur="dirtyFields.eventVenue && touchField('eventVenue')"
                 />
-                <validation-hint
+                <os-validation-hint
                   :count="formData.eventVenue.length"
                   :max="formSchema.eventVenue.max"
                   :variant="visibleErrors && visibleErrors.eventVenue ? 'error' : null"
@@ -156,7 +156,7 @@
                       $validateForm()
                     "
                   />
-                  <validation-hint
+                  <os-validation-hint
                     v-if="
                       !locationSelectDisabled && visibleErrors && visibleErrors.eventLocationName
                     "
@@ -184,7 +184,7 @@
             model="categoryIds"
             :existingCategoryIds="formData.categoryIds"
           />
-          <validation-hint
+          <os-validation-hint
             v-if="categoriesActive"
             :count="formData.categoryIds.length"
             :max="3"
@@ -240,7 +240,7 @@
   </div>
 </template>
 <script>
-import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon, OsValidationHint } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import gql from 'graphql-tag'
 import { mapGetters } from 'vuex'
@@ -256,7 +256,6 @@ import GetCategories from '~/mixins/getCategoriesMixin.js'
 import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 import LocationSelect from '~/components/Select/LocationSelect'
-import ValidationHint from '~/components/ValidationHint/ValidationHint.vue'
 
 export default {
   mixins: [GetCategories, formValidation],
@@ -271,7 +270,7 @@ export default {
     PageParamsLink,
     OcelotInput,
     LocationSelect,
-    ValidationHint,
+    OsValidationHint,
   },
   props: {
     contribution: {
@@ -660,7 +659,7 @@ export default {
     align-items: center;
     margin-bottom: $space-x-small;
 
-    .validation-hint {
+    .os-validation-hint {
       margin-top: 0;
     }
   }
@@ -680,7 +679,7 @@ export default {
     gap: $space-small;
   }
 
-  .event-location-grid .validation-hint {
+  .event-location-grid .os-validation-hint {
     margin-top: 3px;
   }
 
@@ -736,7 +735,7 @@ export default {
       cursor: default;
     }
 
-    > .validation-hint {
+    > .os-validation-hint {
       align-self: flex-end;
       margin: 3px 0 $space-base;
       cursor: default;
