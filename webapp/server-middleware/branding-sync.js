@@ -1,11 +1,19 @@
 // Acquire the brand archives from the BACKEND instead of shipping them in this image: the backend
 // serves what it has on disk (GET /branding/manifest.json + /branding/archives/<id>, see
-// backend/src/branding/routes.ts) and this middleware mirrors them into $OCELOT_BRANDING_ASSETS_DIR.
+// backend/src/branding/routes.ts) and this middleware mirrors them into $OCELOT_BRANDING_CACHE_DIR.
 //
 // Everything downstream is unchanged and SYNCHRONOUS — the branding-assets middleware, the SSR
-// branding plugin and brandingHtml keep reading `<dir>/*.tar.gz` off disk. That is the whole point of
+// branding plugin and brandingHtml keep reading `*.tar.gz` off disk. That is the whole point of
 // mirroring to a file instead of holding the archives in memory: one deployed copy (the backend's),
 // no async rewrite of every consumer.
+//
+// TWO DIRECTORIES, ONE OWNER. $OCELOT_BRANDING_ASSETS_DIR is the ordered READ search path (see
+// src/discover.ts); $OCELOT_BRANDING_CACHE_DIR is the single directory this middleware WRITES, and it
+// owns that directory exclusively — it overwrites and removes files there. Neither needs setting:
+// both have defaults (`.branding-cache` next to the process, the conventional archive locations),
+// and the cache is always the FIRST root of the read path without being part of it, because it holds
+// the freshest copy of the source of truth. What must NOT happen is pointing the cache at a directory
+// something else writes — a brand's build output, a read-only mount, the image's baked archive.
 //
 // The local copy is a CACHE, never the source of truth. It is rebuilt from the backend on boot and
 // refreshed on a TTL; if the backend is unreachable, whatever is already on disk stays valid (a baked
@@ -17,7 +25,12 @@ const fs = require('fs').promises
 const path = require('path')
 
 // eslint-disable-next-line import/no-unresolved -- package subpath, server-only (uses node:fs)
-const { discoverArchives, isValidBrandId } = require('@ocelot-social/branding/dist/discover.js')
+const {
+  cacheDir: resolveCacheDir,
+  discoverArchives,
+  isValidBrandId,
+  resolveRoots,
+} = require('@ocelot-social/branding/dist/discover.js')
 
 // A mistyped bound must not silently disable what it configures: `Number('2s')` is NaN and a negative
 // value is just as meaningless, and both would collapse to 0 — "revalidate on every request" for the
@@ -47,6 +60,28 @@ let lastSync = 0
 let inFlight = null
 // Whether the one blocking boot attempt has been spent (see the middleware).
 let bootBlockSpent = false
+// Ids already reported as shadowed — a standing configuration fault that would otherwise be reprinted
+// on every refresh.
+const shadowWarned = new Set()
+// Same reason: a mistyped cache dir is a standing fault, and this runs per request.
+let multiPathWarned = false
+
+/** The directory this middleware writes into: $OCELOT_BRANDING_CACHE_DIR, else the package default. */
+function cacheDir() {
+  const configured = process.env.OCELOT_BRANDING_CACHE_DIR
+  // The cache has ONE destination, so resolveCacheDir keeps only the first entry. Its neighbour
+  // $OCELOT_BRANDING_ASSETS_DIR *is* a `:`-separated search path, which makes pasting a multi-path
+  // value in here easy — and silently half-effective. Say it once rather than let the extra paths
+  // look configured.
+  if (!multiPathWarned && resolveRoots(configured).length > 1) {
+    multiPathWarned = true
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[branding] $OCELOT_BRANDING_CACHE_DIR is one directory, not a search path — using ${resolveCacheDir(configured)} and ignoring the rest of "${configured}".`,
+    )
+  }
+  return resolveCacheDir(configured)
+}
 
 function backendUrl() {
   // Same origin the branding plugin already talks to for the activeBranding policy.
@@ -131,38 +166,42 @@ async function fetchArchive(base, dir, id) {
   if (!buffer) return 'unchanged'
 
   await writeAtomic(target, buffer)
-  await evictShadowingArchives(dir, id, target)
+  reportIfShadowedInCache(dir, id, target)
   return 'updated'
 }
 
-// A brand baked into this image lands as BOTH `<id>.tar.gz` and `<id>-<version>.tar.gz`. Discovery
-// keeps ONE archive per id — the highest version, and on a TIE the first file walked. Since a rebuilt
-// brand usually keeps its version, the stale baked sibling can therefore out-rank what we just synced
-// and the backend's copy would silently never take effect. Once a brand has been fetched, the baked
-// duplicate is redundant, so drop whatever else still claims that id.
+// Whether the copy just written is the one discovery will actually serve. It normally is: within a
+// root the highest version wins and `<id>.tar.gz` — the name written here — beats a same-version
+// `<id>-<version>.tar.gz` sibling (see discover.ts `outranks`). What can still lose is a file in the
+// CACHE DIRECTORY carrying a HIGHER version, which only happens when the cache is shared with
+// something that publishes there — the directory contract this middleware relies on, broken.
 //
-// discoverArchives is deliberately still SYNCHRONOUS here — it is the same call every downstream
-// reader (assets middleware, SSR plugin, brandingHtml) makes, mtime-cached in the package, and making
-// only this one caller async would buy nothing while forking the read path.
-async function evictShadowingArchives(dir, id, target) {
-  for (let guard = 0; guard < 8; guard++) {
-    let winner
-    try {
-      const found = discoverArchives(dir).get(id)
-      winner = found && found.file
-    } catch (error) {
-      return
-    }
-    if (!winner || path.resolve(winner) === path.resolve(target)) return
-    try {
-      await fs.unlink(winner)
-    } catch (error) {
-      // Read-only layer or already gone — nothing more we can do; discovery keeps its current winner.
-      // eslint-disable-next-line no-console
-      console.warn(`[branding] cannot evict shadowing archive ${winner}:`, error && error.message)
-      return
-    }
+// This used to DELETE the offender. It no longer does: the cache is the only thing this middleware
+// owns, and when the loser is someone else's file (a brand's build output, a mounted archive) deleting
+// it destroys data to fix a lookup. Precedence is settled by the search path now; all that is left
+// here is to name a misconfiguration that would otherwise be invisible.
+//
+// Scoped to the cache dir alone, NOT the whole search path: an archive in another root out-ranking
+// this one is the documented precedence rule (a developer's freshly built brand beating the cache),
+// not a fault, and must stay silent.
+//
+// discoverArchives is deliberately SYNCHRONOUS here — the same call every downstream reader (assets
+// middleware, SSR plugin, brandingHtml) makes, mtime-cached in the package.
+function reportIfShadowedInCache(dir, id, target) {
+  if (shadowWarned.has(id)) return
+  let winner
+  try {
+    const found = discoverArchives(dir).get(id)
+    winner = found && found.file
+  } catch (error) {
+    return
   }
+  if (!winner || path.resolve(winner) === path.resolve(target)) return
+  shadowWarned.add(id)
+  // eslint-disable-next-line no-console
+  console.warn(
+    `[branding] ${winner} shadows the synced ${target} inside the cache dir — the backend's "${id}" will not be served. The cache must not be shared with baked or published archives; point $OCELOT_BRANDING_CACHE_DIR at a directory of its own.`,
+  )
 }
 
 // Mirror the backend's DEFAULT marker. Brand resolution ends at this file (activeBranding policy →
@@ -186,6 +225,44 @@ async function writeDefaultMarker(dir, id) {
   }
 }
 
+// Drop archives for brands the backend no longer lists. The cache is a MIRROR, so a brand deleted
+// there has to vanish here too — otherwise discovery keeps finding it, and it stays in the admin's
+// brand list and stays selectable for the whole life of the pod.
+//
+// Identified by the archive's OWN id, not by its filename: the only file this middleware writes for a
+// brand is `<id>.tar.gz` in the cache root, so an archive found under any other name — a versioned
+// `<id>-<version>.tar.gz` (what publishBrandArchive calls immutable history), a copy in a
+// subdirectory — is not ours to delete. Matching on the name alone would read `stage-1.0.0.tar.gz` as
+// the brand `stage-1.0.0` and remove it, which is the eviction this replaced, back by another route.
+//
+// discoverArchives also settles the malformed cases for free: a file that is not a readable archive
+// (`..evil.tar.gz`, a truncated download) carries no id and is never a candidate.
+async function removeOrphans(dir, ids) {
+  const listed = new Set(ids)
+  let discovered
+  try {
+    discovered = discoverArchives(dir)
+  } catch (error) {
+    return // unreadable cache: the sync already did its work, this is only tidying
+  }
+  for (const [id, archive] of discovered) {
+    if (listed.has(id)) continue
+    const ours = path.join(dir, `${id}.tar.gz`)
+    if (path.resolve(archive.file) !== path.resolve(ours)) continue
+    try {
+      await fs.unlink(ours)
+      // Forget the validator too, or a brand that comes BACK would be revalidated against the ETag of
+      // a file that is no longer there — a 304 with nothing on disk.
+      etags.delete(id)
+      // eslint-disable-next-line no-console
+      console.warn(`[branding] dropped ${id}.tar.gz: the backend no longer lists that brand`)
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.warn(`[branding] cannot drop the orphaned ${id}.tar.gz:`, error && error.message)
+    }
+  }
+}
+
 async function sync(dir) {
   const base = backendUrl()
   const manifest = await withRequestTimeout(async (signal) => {
@@ -195,13 +272,22 @@ async function sync(dir) {
   })
   if (!manifest || !Array.isArray(manifest.brands)) throw new Error('manifest: no brands array')
 
-  await fs.mkdir(dir, { recursive: true })
   // A malformed id would become a file name — reject it rather than sanitising, the backend derives
   // ids from its own archives and never legitimately produces one outside this set.
   const ids = manifest.brands.map((entry) => entry && entry.id).filter(isValidBrandId)
+  // Nothing to mirror AND nothing mirrored before → don't create the directory at all. The sync needs
+  // no configuration to run, so a VANILLA deployment reaches this point on every boot and would
+  // otherwise be left with an empty cache directory it never asked for. Guarded on the directory
+  // EXISTING rather than on the empty manifest alone: once there is a cache, an empty manifest means
+  // "the brands were removed" and has to be mirrored like any other change (the marker is cleared).
+  if (!ids.length && !isValidBrandId(manifest.default) && !(await exists(dir))) return 0
+  await fs.mkdir(dir, { recursive: true })
   await writeDefaultMarker(dir, manifest.default)
 
   const results = await Promise.allSettled(ids.map((id) => fetchArchive(base, dir, id)))
+  // AFTER fetching, not before: the new state is on disk first, so a transfer that fails cannot leave
+  // the cache emptier than it started.
+  await removeOrphans(dir, ids)
   const failed = results.filter((r) => r.status === 'rejected')
   if (failed.length) {
     // Partial success is still progress — the brands that arrived are usable. Report the rest.
@@ -237,9 +323,9 @@ function runSync(dir) {
 }
 
 module.exports = async function brandingSync(req, res, next) {
-  const dir = process.env.OCELOT_BRANDING_ASSETS_DIR
-  // No cache dir configured → nothing to mirror into; the app runs on framework defaults.
-  if (!dir) return next()
+  // Always a directory (the package supplies the default), so the sync runs unconfigured — a vanilla
+  // backend simply answers "no brands" and nothing is written. Branding is opt-OUT, not opt-in.
+  const dir = cacheDir()
 
   try {
     if (!lastSync && !bootBlockSpent) {
@@ -250,7 +336,8 @@ module.exports = async function brandingSync(req, res, next) {
       // "never" whenever two requests land in the same millisecond.
     } else if (Date.now() - lastSync >= ttlMs()) {
       // Warm — or booting with the block already spent: refresh in the background so no request pays
-      // for it. An admin's brand switch is picked up within the TTL without a restart. Deliberately
+      // for it. An admin's brand switch is therefore picked up without a restart — but on a LATER
+      // request, not this one: the TTL says when to go looking, not when the result is in. Deliberately
       // not awaited — runSync catches internally, so this promise never rejects.
       runSync(dir)
     }
@@ -272,6 +359,8 @@ module.exports._reset = () => {
   lastSync = 0
   inFlight = null
   bootBlockSpent = false
+  shadowWarned.clear()
+  multiPathWarned = false
 }
 /** Await the background refresh a warm request kicked off (no-op when none is running). */
 module.exports._flush = () => inFlight || Promise.resolve()

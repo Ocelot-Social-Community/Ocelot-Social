@@ -40,10 +40,12 @@ RUN apk --no-cache add git python3 make g++ bash linux-headers
 RUN mkdir -p /app
 WORKDIR /app
 COPY --from=branding-runtime ./app/ /packages/branding/
-# Where the running backend reads the deployed brand's archive (`<id>.tar.gz`) + baked default marker
-# (DEFAULT). A branding build bakes them here (see ONBUILD); vanilla leaves it empty (→ framework
-# defaults). Ops can override to a mounted volume, or pin a brand with $OCELOT_ACTIVE_BRANDING.
-ENV OCELOT_BRANDING_ASSETS_DIR="/app/branding-assets"
+# Brand archives (`<id>.tar.gz`) + the default marker (DEFAULT) live in ./deployment/configurations —
+# the SAME path they have in a repo checkout, which is why no env var is needed: the code default
+# covers both (see @ocelot-social/branding discover.DEFAULT_ROOTS). A branding build bakes them there
+# (see ONBUILD); vanilla leaves the directory absent (→ framework defaults). Ops override the search
+# path with $OCELOT_BRANDING_ASSETS_DIR (`:`-separated, e.g. a mounted volume of uploaded archives),
+# or pin a brand with $OCELOT_ACTIVE_BRANDING.
 CMD ["/bin/bash", "-c", "yarn run start"]
 
 FROM base AS development
@@ -63,20 +65,26 @@ COPY backend/ .
 ONBUILD COPY brandin[g]/middlewares/ src/middleware/branding/
 ONBUILD COPY brandin[g]/data/ src/db/data
 # Runtime branding: copy the brand UNFLATTENED into /brand and bake its archive (+ DEFAULT marker) into
-# ./branding-assets. At startup src/branding/bootstrap.ts injects this brand's config AND overlays its
-# raw runtime files from the archive (e-mail templates/locales, public/badge assets) — no per-brand
-# rebuild. The overlay copies above still bring in not-yet-ported content (brand middlewares + seed
-# data — code/data, not config). A vanilla build (no brand.config) skips this and stays vanilla.
+# ./deployment/configurations — the discovery root, named exactly as in a repo checkout so the running
+# code finds it without being told where to look. At startup src/branding/bootstrap.ts injects this
+# brand's config AND overlays its raw runtime files from the archive (e-mail templates/locales,
+# public/badge assets) — no per-brand rebuild. The overlay copies above still bring in not-yet-ported
+# content (brand middlewares + seed data — code/data, not config). A vanilla build (no brand.config)
+# skips this and stays vanilla.
+#
+# Flat inside the root (`<id>.tar.gz` + `<id>-<version>.tar.gz` + DEFAULT), not nested per brand: an
+# image holds exactly ONE brand, discovery is recursive either way, and the DEFAULT marker is read from
+# the root itself. A checkout nests (`<brand>/branding/dist/`) because it holds many.
 ONBUILD COPY brandin[g]/ /brand/
 ONBUILD RUN if ls /brand/brand.config.* >/dev/null 2>&1; then \
-      node /brand-tools/scripts/build-brand-archive.ts /brand ./branding-assets --default; \
+      node /brand-tools/scripts/build-brand-archive.ts /brand ./deployment/configurations --default; \
     else echo "[branding] no typed brand.config — runtime archive skipped (vanilla)"; fi
 ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 ONBUILD RUN yarn run build
 ONBUILD RUN mkdir /build && \
     cp -r ./build ./public ./package.json ./yarn.lock /build && \
-    if [ -d ./branding-assets ]; then cp -r ./branding-assets /build/branding-assets; fi
+    if [ -d ./deployment ]; then cp -r ./deployment /build/deployment; fi
 ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     cd /build && yarn install --production=true --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 

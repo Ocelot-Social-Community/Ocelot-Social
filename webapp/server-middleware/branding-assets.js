@@ -1,15 +1,16 @@
-// Dynamic branding-asset server: serves /branding/* from $OCELOT_BRANDING_ASSETS_DIR at runtime,
-// reading every brand file FROM its archive so nothing is copied into the image — mount a volume /
-// configMap of `<id>.tar.gz` archives and the running webapp picks them up. Archives are discovered
-// RECURSIVELY (any `*.tar.gz` under the base dir; see src/discover.ts), so the served dir may be a
-// flat folder of archives OR the deployment/configurations tree (`<brand>/dist/<id>.tar.gz`):
+// Dynamic branding-asset server: serves /branding/* from the brand archives at runtime, reading every
+// brand file FROM its archive so nothing is copied into the image — mount a volume / configMap of
+// `<id>.tar.gz` archives and the running webapp picks them up. Archives are discovered RECURSIVELY
+// under each root of the ordered search path (any `*.tar.gz`; see src/discover.ts), so a root may be a
+// flat folder of archives OR the deployment/configurations tree (`<brand>/dist/<id>.tar.gz`), and an
+// earlier root shadows a later one for the ids it provides:
 //
 //   /branding/manifest.json → DERIVED from the archives present (never lists a missing brand, never
 //                             misses a present one); each brand id + label comes from its branding.json
 //   /branding/<id>/<entry>  → read from that brand's archive
 //
-// Archives are decompressed once and cached (re-read only on mtime change). Env unset → next() (no
-// dynamic brandings; the app runs on framework defaults).
+// Archives are decompressed once and cached (re-read only on mtime change). No archive under any root
+// → next() for every path (no dynamic brandings; the app runs on framework defaults).
 const path = require('path')
 // eslint-disable-next-line import/no-unresolved -- package subpath, server-only (uses node:fs + node:zlib)
 const {
@@ -18,7 +19,15 @@ const {
   composeArchive,
   readDefaultMarker,
   isValidBrandId,
+  cacheFirstSearchPath,
 } = require('@ocelot-social/branding/dist/discover.js')
+
+/** The roots this middleware serves from: the sync cache, then the baked/mounted archives. */
+const roots = () =>
+  cacheFirstSearchPath(
+    process.env.OCELOT_BRANDING_CACHE_DIR,
+    process.env.OCELOT_BRANDING_ASSETS_DIR,
+  )
 
 const CONTENT_TYPES = {
   '.svg': 'image/svg+xml',
@@ -40,14 +49,15 @@ const CONTENT_TYPES = {
 }
 
 module.exports = function brandingAssets(req, res, next) {
-  const baseDir = process.env.OCELOT_BRANDING_ASSETS_DIR
-  if (!baseDir) return next()
   if (req.method !== 'GET' && req.method !== 'HEAD') return next()
+  // Resolved per request, not once at module load: the env is read at RUNTIME (this file is loaded
+  // by Node as CommonJS serverMiddleware) and there is always a search path — unset means the
+  // conventional locations, not "no branding".
+  const baseDir = roots()
 
   // Registered at path '/branding', so req.url is prefix-stripped: '/manifest.json' or
   // '/<id>/assets/logo.svg'. Normalise to 'manifest.json' / '<id>/assets/logo.svg'.
   const urlPath = decodeURIComponent((req.url || '').split('?')[0]).replace(/^\/+/, '')
-  const base = path.resolve(baseDir)
 
   // The manifest is DERIVED from the archives actually discovered — so it can never list a brand
   // whose archive is missing (or miss one that is present).
@@ -59,11 +69,11 @@ module.exports = function brandingAssets(req, res, next) {
       // per-entry flag rather than a sibling field so the manifest stays a plain array.
       let defaultId = ''
       try {
-        defaultId = readDefaultMarker(base)
+        defaultId = readDefaultMarker(baseDir)
       } catch (error) {
         defaultId = ''
       }
-      manifest = [...discoverArchives(base).values()].map((a) => ({
+      manifest = [...discoverArchives(baseDir).values()].map((a) => ({
         id: a.id,
         label: a.label,
         version: a.version,
@@ -87,7 +97,7 @@ module.exports = function brandingAssets(req, res, next) {
   // Guard the brand id (the entry lookup is a Map key, so path traversal cannot escape the archive).
   if (!isValidBrandId(id)) return next()
 
-  const archive = discoverArchives(base).get(id)
+  const archive = discoverArchives(baseDir).get(id)
   if (!archive) return next()
   const files = readArchive(archive.file)
   if (!files) return next()

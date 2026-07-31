@@ -1,4 +1,5 @@
 import { promises as fs } from 'fs'
+import path from 'path'
 
 import brandingSync from './branding-sync.js'
 
@@ -11,9 +12,14 @@ jest.mock('fs', () => ({
     rename: jest.fn(() => Promise.resolve()),
     unlink: jest.fn(() => Promise.resolve()),
     access: jest.fn(() => Promise.resolve()),
+    readdir: jest.fn(() => Promise.resolve([])),
   },
 }))
 
+// The `dist/discover.js` SUBPATH, not the package index: discover is server-only (node:fs, and
+// node:zlib through tar.js), which is why the index does not re-export it and why nuxt.config.js
+// aliases this exact specifier to a stub for the CLIENT bundle. Mocking it here mirrors how the
+// middleware requires it.
 jest.mock(
   '@ocelot-social/branding/dist/discover.js',
   () => ({
@@ -21,6 +27,10 @@ jest.mock(
     // The id guard is pure and security-relevant — take the REAL one, so a tightening of
     // BRAND_ID_PATTERN is exercised here instead of being shadowed by a stub.
     isValidBrandId: jest.requireActual('@ocelot-social/branding/dist/buckets.js').isValidBrandId,
+    // Real too: it decides WHICH directory is written, including the default when nothing is
+    // configured — a stub would make every path assertion below vacuous. Pure (path only, no fs).
+    cacheDir: jest.requireActual('@ocelot-social/branding/dist/discover.js').cacheDir,
+    resolveRoots: jest.requireActual('@ocelot-social/branding/dist/discover.js').resolveRoots,
   }),
   { virtual: true },
 )
@@ -61,8 +71,19 @@ describe('server-middleware/branding-sync', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    // clearAllMocks drops recorded CALLS, not implementations — a `mockRejectedValue` set by one test
+    // would otherwise make every later test see a failing filesystem. Restore the happy path here so
+    // no test depends on the order it runs in.
+    for (const fn of [fs.mkdir, fs.writeFile, fs.rename, fs.unlink, fs.access]) {
+      fn.mockResolvedValue(undefined)
+    }
+    // Same reason: an empty cache is the neutral starting point, and a Map left behind by one test
+    // would otherwise have the next one delete archives it never set up.
+    discoverArchives.mockReset()
+    discoverArchives.mockReturnValue(new Map())
+    fs.readdir.mockResolvedValue([])
     brandingSync._reset()
-    process.env.OCELOT_BRANDING_ASSETS_DIR = '/cache'
+    process.env.OCELOT_BRANDING_CACHE_DIR = '/cache'
     process.env.GRAPHQL_URI = 'http://backend:4000'
     warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
   })
@@ -72,19 +93,52 @@ describe('server-middleware/branding-sync', () => {
   afterEach(() => {
     warn.mockRestore()
     delete process.env.OCELOT_BRANDING_ASSETS_DIR
+    delete process.env.OCELOT_BRANDING_CACHE_DIR
     delete process.env.GRAPHQL_URI
     delete process.env.OCELOT_BRANDING_SYNC_TTL_MS
     delete process.env.OCELOT_BRANDING_SYNC_TIMEOUT_MS
   })
 
-  it('does nothing without a cache dir configured', async () => {
+  // Branding is opt-OUT: unconfigured, the sync still runs and mirrors into the default cache. A
+  // vanilla backend simply answers "no brands" (covered below), so nothing is written.
+  it('runs unconfigured, mirroring into the default cache dir', async () => {
     delete process.env.OCELOT_BRANDING_ASSETS_DIR
-    global.fetch = jest.fn()
+    delete process.env.OCELOT_BRANDING_CACHE_DIR
+    global.fetch = jest
+      .fn()
+      .mockResolvedValueOnce(jsonResponse(MANIFEST))
+      .mockResolvedValueOnce(archiveResponse('tarbytes'))
 
     const next = await run()
 
-    expect(global.fetch).not.toHaveBeenCalled()
+    expect(fs.rename).toHaveBeenCalledWith(
+      expect.stringMatching(/\.tmp$/),
+      path.resolve('.branding-cache', 'stage.tar.gz'),
+    )
     expect(next).toHaveBeenCalled()
+  })
+
+  // Running unconfigured means every vanilla deployment reaches the sync on boot; it must not leave a
+  // directory behind for a brand set that is empty and was always empty.
+  it('creates no cache directory when there is nothing to mirror and none exists', async () => {
+    fs.access.mockRejectedValue(Object.assign(new Error('ENOENT'), { code: 'ENOENT' }))
+    global.fetch = jest.fn().mockResolvedValue(jsonResponse({ default: '', brands: [] }))
+
+    await run()
+
+    expect(fs.mkdir).not.toHaveBeenCalled()
+    expect(fs.unlink).not.toHaveBeenCalled()
+  })
+
+  // …but once a cache exists, an empty manifest is a CHANGE ("the brands were removed") and has to be
+  // mirrored like any other, marker included.
+  it('still clears the marker when a cache exists and the brands are gone', async () => {
+    global.fetch = jest.fn().mockResolvedValue(jsonResponse({ default: '', brands: [] }))
+
+    await run()
+
+    expect(fs.mkdir).toHaveBeenCalledWith('/cache', { recursive: true })
+    expect(fs.unlink).toHaveBeenCalledWith('/cache/DEFAULT')
   })
 
   it('mirrors every archive the backend lists into the cache dir', async () => {
@@ -135,6 +189,37 @@ describe('server-middleware/branding-sync', () => {
       signal: expect.any(AbortSignal),
     })
     expect(fs.rename).not.toHaveBeenCalledWith(expect.any(String), '/cache/stage.tar.gz')
+  })
+
+  // A validator is only as good as the response it came from: once the backend stops sending one, the
+  // remembered ETag describes nothing, and replaying it would let a 304 confirm a copy nobody vouched
+  // for. Forget it instead.
+  it('forgets the stored ETag when a later answer carries none', async () => {
+    global.fetch = jest
+      .fn()
+      .mockResolvedValueOnce(jsonResponse(MANIFEST))
+      .mockResolvedValueOnce(archiveResponse('tarbytes', 'W/"stage-1-2"'))
+    await run()
+
+    process.env.OCELOT_BRANDING_SYNC_TTL_MS = '0'
+    global.fetch = jest
+      .fn()
+      .mockResolvedValueOnce(jsonResponse(MANIFEST))
+      .mockResolvedValueOnce(archiveResponse('tarbytes', null))
+    await run()
+    await brandingSync._flush()
+
+    global.fetch = jest
+      .fn()
+      .mockResolvedValueOnce(jsonResponse(MANIFEST))
+      .mockResolvedValueOnce(archiveResponse('tarbytes'))
+    await run()
+    await brandingSync._flush()
+
+    expect(global.fetch).toHaveBeenNthCalledWith(2, 'http://backend:4000/branding/archives/stage', {
+      headers: {},
+      signal: expect.any(AbortSignal),
+    })
   })
 
   it('does not send a stale validator when the cached file is gone', async () => {
@@ -296,6 +381,22 @@ describe('server-middleware/branding-sync', () => {
     expect(fs.unlink).toHaveBeenCalledWith('/cache/DEFAULT')
   })
 
+  // "Nothing to clear" is the ordinary case and stays quiet; a marker that cannot be removed is not —
+  // the deployment keeps activating a brand the backend no longer names.
+  it('reports a marker it cannot clear, but not a missing one', async () => {
+    global.fetch = jest.fn().mockResolvedValue(jsonResponse({ default: '', brands: [] }))
+    fs.unlink.mockRejectedValueOnce(Object.assign(new Error('ENOENT'), { code: 'ENOENT' }))
+    await run()
+    expect(warn).not.toHaveBeenCalled()
+
+    brandingSync._reset()
+    fs.unlink.mockRejectedValueOnce(Object.assign(new Error('read-only fs'), { code: 'EROFS' }))
+
+    await run()
+
+    expect(warn).toHaveBeenCalledWith('[branding] cannot clear the DEFAULT marker:', 'read-only fs')
+  })
+
   it('refuses a default id that could escape the cache dir', async () => {
     global.fetch = jest.fn().mockResolvedValueOnce(jsonResponse({ default: '../evil', brands: [] }))
 
@@ -314,32 +415,221 @@ describe('server-middleware/branding-sync', () => {
     expect(fs.writeFile).not.toHaveBeenCalled()
   })
 
-  // A baked brand lands as both `<id>.tar.gz` and `<id>-<version>.tar.gz`; discovery keeps one file
-  // per id and breaks a version TIE by walk order, so the stale sibling could out-rank the sync.
-  it('evicts a baked sibling that would out-rank the freshly synced archive', async () => {
-    global.fetch = jest
-      .fn()
-      .mockResolvedValueOnce(jsonResponse(MANIFEST))
-      .mockResolvedValueOnce(archiveResponse('tarbytes'))
-    discoverArchives
-      .mockReturnValueOnce(new Map([['stage', { file: '/cache/stage-1.0.0.tar.gz' }]]))
-      .mockReturnValueOnce(new Map([['stage', { file: '/cache/stage.tar.gz' }]]))
+  // $OCELOT_BRANDING_ASSETS_DIR next door IS a `:`-separated search path, so pasting a multi-path
+  // value into the cache variable is an easy slip — and one that half-works, since only the first
+  // entry is ever used.
+  it('warns once when the cache dir is given as a search path', async () => {
+    process.env.OCELOT_BRANDING_CACHE_DIR = `/cache${path.delimiter}/also-cache`
+    global.fetch = jest.fn().mockResolvedValue(jsonResponse({ default: '', brands: [] }))
 
     await run()
+    process.env.OCELOT_BRANDING_SYNC_TTL_MS = '0'
+    await run()
+    await brandingSync._flush()
 
-    expect(fs.unlink).toHaveBeenCalledWith('/cache/stage-1.0.0.tar.gz')
+    const notes = warn.mock.calls.filter((c) =>
+      String(c[0]).includes('one directory, not a search'),
+    )
+    expect(notes).toHaveLength(1)
+    expect(notes[0][0]).toContain('/cache')
   })
 
-  it('leaves the directory alone when the synced archive already wins', async () => {
+  it('says nothing for a single cache dir', async () => {
+    global.fetch = jest.fn().mockResolvedValue(jsonResponse({ default: '', brands: [] }))
+
+    await run()
+
+    expect(warn).not.toHaveBeenCalled()
+  })
+
+  // The cache MIRRORS the backend, so a brand removed there has to disappear here too — otherwise
+  // discovery keeps finding the stale archive and the admin keeps being offered a brand that is gone.
+  describe('archives the backend no longer lists', () => {
+    /** What discovery reports for the cache: brand id → the file it was found in. */
+    const inCache = (entries) =>
+      discoverArchives.mockReturnValue(
+        new Map(Object.entries(entries).map(([id, file]) => [id, { id, file }])),
+      )
+
+    it('drops them, and forgets their validators', async () => {
+      global.fetch = jest
+        .fn()
+        .mockResolvedValueOnce(jsonResponse(MANIFEST))
+        .mockResolvedValueOnce(archiveResponse('tarbytes'))
+      inCache({ stage: '/cache/stage.tar.gz', gone: '/cache/gone.tar.gz' })
+
+      await run()
+
+      expect(fs.unlink).toHaveBeenCalledWith('/cache/gone.tar.gz')
+      expect(fs.unlink).not.toHaveBeenCalledWith('/cache/stage.tar.gz')
+
+      // A brand that comes back must be fetched, not revalidated against the ETag of a deleted file.
+      jest.clearAllMocks()
+      process.env.OCELOT_BRANDING_SYNC_TTL_MS = '0'
+      inCache({ stage: '/cache/stage.tar.gz' })
+      global.fetch = jest
+        .fn()
+        .mockResolvedValueOnce(
+          jsonResponse({ default: 'stage', brands: [{ id: 'stage' }, { id: 'gone' }] }),
+        )
+        .mockResolvedValue(archiveResponse('tarbytes'))
+      await run()
+      await brandingSync._flush()
+
+      const goneRequest = global.fetch.mock.calls.find(([url]) => url.endsWith('/gone'))
+      expect(goneRequest?.[1].headers).toEqual({})
+    })
+
+    // An empty manifest is a legitimate answer ("this deployment went vanilla"), not a reason to keep
+    // serving whatever the cache still holds.
+    it('empties the cache when the backend lists no brands at all', async () => {
+      global.fetch = jest.fn().mockResolvedValue(jsonResponse({ default: '', brands: [] }))
+      inCache({ stage: '/cache/stage.tar.gz', other: '/cache/other.tar.gz' })
+
+      await run()
+
+      expect(fs.unlink).toHaveBeenCalledWith('/cache/stage.tar.gz')
+      expect(fs.unlink).toHaveBeenCalledWith('/cache/other.tar.gz')
+    })
+
+    // `<id>.tar.gz` in the cache root is the ONLY name this middleware writes. An archive found under
+    // any other one was put there by something else — deleting it would be the eviction this replaced,
+    // back by another route. Named by its ARCHIVE id, so `stage-1.0.0.tar.gz` is the brand `stage`,
+    // not a brand called `stage-1.0.0`.
+    it('leaves an archive it did not write alone, even for an unlisted brand', async () => {
+      global.fetch = jest.fn().mockResolvedValue(jsonResponse({ default: '', brands: [] }))
+      inCache({
+        stage: '/cache/stage-1.0.0.tar.gz', // versioned history, published not synced
+        nested: '/cache/vendor/nested.tar.gz', // someone else's tree under the cache
+      })
+
+      await run()
+
+      expect(fs.unlink).not.toHaveBeenCalledWith('/cache/stage-1.0.0.tar.gz')
+      expect(fs.unlink).not.toHaveBeenCalledWith('/cache/vendor/nested.tar.gz')
+      expect(fs.unlink).not.toHaveBeenCalledWith('/cache/stage.tar.gz')
+    })
+
+    // A file that is not a readable archive carries no id, so discovery never offers it as a
+    // candidate — which is what keeps `..evil.tar.gz` and friends out of an unlink() call.
+    it('never considers files discovery does not recognise as archives', async () => {
+      global.fetch = jest.fn().mockResolvedValue(jsonResponse({ default: '', brands: [] }))
+      inCache({}) // garbled/oddly-named files yield nothing
+
+      await run()
+
+      expect(fs.unlink).not.toHaveBeenCalledWith(expect.stringContaining('.tar.gz'))
+    })
+
+    it('survives an unreadable cache directory', async () => {
+      global.fetch = jest
+        .fn()
+        .mockResolvedValueOnce(jsonResponse(MANIFEST))
+        .mockResolvedValueOnce(archiveResponse('tarbytes'))
+      discoverArchives.mockImplementation(() => {
+        throw new Error('EACCES')
+      })
+
+      const next = await run()
+
+      expect(fs.rename).toHaveBeenCalledWith(expect.stringMatching(/\.tmp$/), '/cache/stage.tar.gz')
+      expect(next).toHaveBeenCalled()
+    })
+
+    it('reports one it cannot delete instead of failing the sync', async () => {
+      global.fetch = jest
+        .fn()
+        .mockResolvedValueOnce(jsonResponse(MANIFEST))
+        .mockResolvedValueOnce(archiveResponse('tarbytes'))
+      inCache({ gone: '/cache/gone.tar.gz' })
+      fs.unlink.mockRejectedValue(Object.assign(new Error('read-only fs'), { code: 'EROFS' }))
+
+      const next = await run()
+
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining('cannot drop the orphaned gone.tar.gz'),
+        'read-only fs',
+      )
+      expect(next).toHaveBeenCalled()
+    })
+  })
+
+  // The cache is the ONE directory this middleware writes, and the READ search path never decides
+  // where that is — the two are deliberately independent.
+  it('writes to $OCELOT_BRANDING_CACHE_DIR, not to a root of the read search path', async () => {
+    process.env.OCELOT_BRANDING_ASSETS_DIR = `/baked${path.delimiter}/mounted`
+    process.env.OCELOT_BRANDING_CACHE_DIR = '/cache'
     global.fetch = jest
       .fn()
       .mockResolvedValueOnce(jsonResponse(MANIFEST))
       .mockResolvedValueOnce(archiveResponse('tarbytes'))
-    discoverArchives.mockReturnValue(new Map([['stage', { file: '/cache/stage.tar.gz' }]]))
 
     await run()
 
-    expect(fs.unlink).not.toHaveBeenCalled()
+    expect(fs.rename).toHaveBeenCalledWith(expect.stringMatching(/\.tmp$/), '/cache/stage.tar.gz')
+    expect(warn).not.toHaveBeenCalled()
+  })
+
+  // Precedence is settled by the search path now (discover.ts), so nothing is deleted to make room —
+  // an archive out-ranking the sync from ANOTHER root is the documented rule, not a fault. Only a file
+  // inside the cache itself means the directory contract was broken, and that is reported, not fixed.
+  describe('an archive shadowing the synced copy', () => {
+    // Once per brand, not once per refresh: the fault is a standing configuration problem, and the TTL
+    // would otherwise reprint it for as long as the deployment runs.
+    it('reports one inside the cache dir WITHOUT deleting it, once', async () => {
+      const answers = () =>
+        jest
+          .fn()
+          .mockResolvedValueOnce(jsonResponse(MANIFEST))
+          .mockResolvedValueOnce(archiveResponse('tarbytes', null))
+      discoverArchives.mockReturnValue(new Map([['stage', { file: '/cache/stage-9.9.9.tar.gz' }]]))
+
+      global.fetch = answers()
+      await run()
+      process.env.OCELOT_BRANDING_SYNC_TTL_MS = '0'
+      global.fetch = answers()
+      await run()
+      await brandingSync._flush()
+
+      expect(fs.unlink).not.toHaveBeenCalledWith('/cache/stage-9.9.9.tar.gz')
+      const shadow = warn.mock.calls.filter((c) => String(c[0]).includes('shadows the synced'))
+      expect(shadow).toHaveLength(1)
+      expect(shadow[0][0]).toContain(
+        '/cache/stage-9.9.9.tar.gz shadows the synced /cache/stage.tar.gz',
+      )
+      // Scoped to the cache alone — a root of the wider search path is never inspected here.
+      expect(discoverArchives).toHaveBeenCalledWith('/cache')
+    })
+
+    // The check is diagnostic only — an unreadable cache dir must not turn a successful transfer into
+    // a failed sync.
+    it('stays silent when the cache cannot be read', async () => {
+      global.fetch = jest
+        .fn()
+        .mockResolvedValueOnce(jsonResponse(MANIFEST))
+        .mockResolvedValueOnce(archiveResponse('tarbytes'))
+      discoverArchives.mockImplementation(() => {
+        throw new Error('EACCES')
+      })
+
+      await run()
+
+      expect(fs.rename).toHaveBeenCalledWith(expect.stringMatching(/\.tmp$/), '/cache/stage.tar.gz')
+      expect(warn).not.toHaveBeenCalled()
+    })
+
+    it('stays silent when the synced archive wins', async () => {
+      global.fetch = jest
+        .fn()
+        .mockResolvedValueOnce(jsonResponse(MANIFEST))
+        .mockResolvedValueOnce(archiveResponse('tarbytes'))
+      discoverArchives.mockReturnValue(new Map([['stage', { file: '/cache/stage.tar.gz' }]]))
+
+      await run()
+
+      expect(fs.unlink).not.toHaveBeenCalled()
+      expect(warn).not.toHaveBeenCalled()
+    })
   })
 
   it('reports a partial failure but keeps the archives that arrived', async () => {

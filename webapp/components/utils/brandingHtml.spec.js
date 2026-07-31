@@ -1,3 +1,5 @@
+import { resolve } from 'path'
+
 import {
   discoverArchives as mockDiscoverArchives,
   readArchive as mockReadArchive,
@@ -13,6 +15,10 @@ jest.mock(
     // The id guard is pure and security-relevant — take the REAL one, so a tightening of
     // BRAND_ID_PATTERN is exercised here instead of being shadowed by a stub.
     isValidBrandId: jest.requireActual('@ocelot-social/branding/dist/buckets.js').isValidBrandId,
+    // Real too: it decides WHICH roots are read (cache first, then baked/mounted). A stub would let a
+    // regression in that order pass unnoticed here. Pure (path only, no fs).
+    cacheFirstSearchPath: jest.requireActual('@ocelot-social/branding/dist/discover.js')
+      .cacheFirstSearchPath,
   }),
   { virtual: true },
 )
@@ -41,10 +47,20 @@ describe('fetchBrandingHtml', () => {
       process.server = true
     })
 
-    it('returns null when no assets dir is configured', async () => {
+    // No env needed: the sync cache is always searched first, then the conventional archive locations.
+    // An SSR read that used different roots than the assets middleware would serve HTML from one brand
+    // and assets from another.
+    it('searches the cache first, then the conventional locations, when nothing is configured', async () => {
       delete process.env.OCELOT_BRANDING_ASSETS_DIR
-      expect(await fetchBrandingHtml('/branding/wir/html/en/imprint.html')).toBeNull()
-      expect(mockDiscoverArchives).not.toHaveBeenCalled()
+      mockDiscoverArchives.mockReturnValue(new Map())
+
+      await fetchBrandingHtml('/branding/wir/html/en/imprint.html')
+
+      expect(mockDiscoverArchives).toHaveBeenCalledWith([
+        resolve('.branding-cache'),
+        resolve('deployment/configurations'),
+        resolve('../deployment/configurations'),
+      ])
     })
 
     it('reads the requested entry from the resolved brand archive', async () => {
@@ -57,7 +73,8 @@ describe('fetchBrandingHtml', () => {
       const html = await fetchBrandingHtml('/branding/wir/html/en/imprint.html')
 
       expect(html).toBe('<h1>Imprint</h1>')
-      expect(mockDiscoverArchives).toHaveBeenCalledWith('/brands')
+      // A configured path REPLACES the conventional locations — but never the cache, which stays first.
+      expect(mockDiscoverArchives).toHaveBeenCalledWith([resolve('.branding-cache'), '/brands'])
       expect(mockReadArchive).toHaveBeenCalledWith('/brands/wir.tar.gz')
     })
 

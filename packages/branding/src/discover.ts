@@ -1,15 +1,21 @@
-// Discover brand archives under a served directory — the ONE place that defines the archive layout,
+// Discover brand archives under a served SEARCH PATH — the ONE place that defines the archive layout,
 // used by every server-side consumer (webapp serverMiddleware, branding plugin, brandingHtml, backend
-// bootstrap). ANY `*.tar.gz` found RECURSIVELY under the base dir is treated as a brand archive, so it
-// does not matter whether brands publish to `<base>/<brand>/dist/<id>.tar.gz`, `<base>/<id>.tar.gz`,
-// `<base>/<brand>/build/<id>.tar.gz`, … — all are found and loaded. Each archive carries its brand id
-// + version INSIDE manifest.json (injected at build); duplicates of the same id (a versioned file and
-// its latest copy, or several versions) dedupe to the HIGHEST version.
+// bootstrap). ANY `*.tar.gz` found RECURSIVELY under a root is treated as a brand archive, so it does
+// not matter whether brands publish to `<root>/<brand>/dist/<id>.tar.gz`, `<root>/<id>.tar.gz`,
+// `<root>/<brand>/build/<id>.tar.gz`, … — all are found and loaded. Each archive carries its brand id
+// + version INSIDE manifest.json (injected at build).
+//
+// The search path is ORDERED (`path.delimiter`-separated, like $PATH): a root SHADOWS every later one
+// for the ids it provides. That is what lets a writable sync cache out-rank read-only baked archives
+// without deleting them, and a developer's freshly built `deployment/configurations/*/branding/dist`
+// out-rank the cache — precedence is a LOOKUP rule here, never a filesystem mutation. Duplicates of one
+// id WITHIN a root still dedupe: highest version, then the unversioned `<id>.tar.gz` ("current") over
+// its `<id>-<version>.tar.gz` history sibling (see outranks).
 //
 // Server-only: uses node:fs — do NOT import from the package index (keeps it out of the webapp client
 // bundle; consumers require it under a `process.server` guard).
 import { readdirSync, readFileSync, statSync } from 'node:fs'
-import { join } from 'node:path'
+import { basename, delimiter, join, resolve } from 'node:path'
 
 import { BUCKET_NAMES, composeConfig, parseSource } from './buckets.js'
 import { readTarGz } from './tar.js'
@@ -77,7 +83,90 @@ function statCached<T>(
   }
 }
 
-// Recursively collect `*.tar.gz` paths, skipping dotdirs (.git) and node_modules.
+/**
+ * Split a search path into its ordered, absolute roots. Takes either a `path.delimiter`-separated
+ * string (an env var — `$OCELOT_BRANDING_ASSETS_DIR`, so every consumer stays a plain
+ * `discoverArchives(process.env.…)`) or an already-split array. Blank segments are dropped and a
+ * repeated root collapses onto its FIRST occurrence, so each root is walked once and keeps the
+ * earliest precedence it was given.
+ */
+export function resolveRoots(spec: string | string[] | null | undefined): string[] {
+  const raw = Array.isArray(spec) ? spec : typeof spec === 'string' ? spec.split(delimiter) : []
+  const roots: string[] = []
+  for (const entry of raw) {
+    const trimmed = typeof entry === 'string' ? entry.trim() : ''
+    if (!trimmed) continue
+    // Absolute, so the dedupe below compares like for like and callers can prefix-test a path
+    // against a root (the sync middleware does, to spot an archive shadowing its own cache).
+    const full = resolve(trimmed)
+    if (!roots.includes(full)) roots.push(full)
+  }
+  return roots
+}
+
+/**
+ * Where brand archives live when nothing is configured. BOTH entries are always tried, because a
+ * non-existent root costs one failed readdir and is skipped (walk swallows ENOENT) — which is what
+ * lets ONE default serve two layouts:
+ *
+ *   <cwd>/deployment/configurations      an image: the build bakes the brand's archive here
+ *   <cwd>/../deployment/configurations   a repo checkout: `yarn dev` runs from backend/ or webapp/
+ *
+ * Same directory name on both sides on purpose. The brand tree IS the archive store, so there is no
+ * second layout to learn and no env var to set before branding works. A deployment that keeps its
+ * archives elsewhere (a mounted volume, and later the S3 bucket users upload into) sets
+ * $OCELOT_BRANDING_ASSETS_DIR and replaces this list wholesale.
+ */
+export const DEFAULT_ROOTS = ['deployment/configurations', '../deployment/configurations']
+
+/**
+ * The effective search path: what was configured, or the conventional locations when nothing was.
+ * Every consumer resolves its roots through this, so "unset" means "the usual places" rather than
+ * "no branding at all".
+ */
+export function searchPath(spec: string | string[] | null | undefined): string[] {
+  const configured = resolveRoots(spec)
+  return configured.length ? configured : resolveRoots(DEFAULT_ROOTS)
+}
+
+/** Where a mirroring service keeps its copy of the archives when nothing is configured. */
+export const DEFAULT_CACHE_DIR = '.branding-cache'
+
+/**
+ * The one directory a mirroring service WRITES (see cacheFirstSearchPath), absolute.
+ *
+ * ONE, not a search path: a mirror has a single destination, so only the FIRST entry of `spec` is
+ * used and any further ones are ignored. That is worth knowing because the neighbouring variable
+ * ($OCELOT_BRANDING_ASSETS_DIR) IS delimiter-separated, which makes pasting a multi-path value in
+ * here an easy mistake — the extra paths then do nothing. Callers that read this from configuration
+ * should say so when it happens; the webapp middleware does, once per process, because this function
+ * itself runs per request and is not a place to log from.
+ */
+export function cacheDir(spec: string | string[] | null | undefined): string {
+  return resolveRoots(spec)[0] ?? resolveRoots(DEFAULT_CACHE_DIR)[0]
+}
+
+/**
+ * The search path for a service that MIRRORS its archives from elsewhere — the webapp, which syncs
+ * them from the backend (server-middleware/branding-sync.js).
+ *
+ * The cache is PREPENDED, not merged in: it holds the freshest copy of the single source of truth, so
+ * it has to out-rank anything found locally, and letting a deployment move it would only break that.
+ * Only that first slot is reserved — the roots behind it keep the order `spec` gives them and shadow
+ * each other as usual. They are the fallback for when the backend has not answered (yet): the archive
+ * baked into the image, a mounted volume.
+ */
+export function cacheFirstSearchPath(
+  cacheSpec: string | string[] | null | undefined,
+  spec: string | string[] | null | undefined,
+): string[] {
+  // resolveRoots dedupes, so a root that repeats the cache collapses onto the cache's position.
+  return resolveRoots([cacheDir(cacheSpec), ...searchPath(spec)])
+}
+
+// Recursively collect `*.tar.gz` paths, skipping dotdirs (.git) and node_modules. Entries are walked
+// in NAME order so the traversal is reproducible: without it the winner of a full tie would follow
+// readdir order, which is filesystem- and creation-order dependent.
 function walk(dir: string, out: string[]): void {
   let entries
   try {
@@ -85,7 +174,7 @@ function walk(dir: string, out: string[]): void {
   } catch {
     return
   }
-  for (const entry of entries) {
+  for (const entry of [...entries].sort((a, b) => (a.name < b.name ? -1 : 1))) {
     if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue
     const full = join(dir, entry.name)
     if (entry.isDirectory()) walk(full, out)
@@ -211,32 +300,65 @@ export function composeFromArchives(
   return composeConfig(sources)
 }
 
-/** Resolve a composition map against the archives discovered under `baseDir` (mtime-cached reads). */
-export function composeComposition(baseDir: string, map: CompositionMap): BrandingConfig {
-  const archives = discoverArchives(baseDir)
+/** Resolve a composition map against the archives discovered on the search path (mtime-cached reads). */
+export function composeComposition(roots: string | string[], map: CompositionMap): BrandingConfig {
+  const archives = discoverArchives(roots)
   return composeFromArchives((id) => {
     const archive = archives.get(id)
     return archive ? readArchive(archive.file) : null
   }, map)
 }
 
-/** All brand archives under `baseDir`, keyed by brand id (highest version per id wins). */
-export function discoverArchives(baseDir: string): Map<string, BrandArchive> {
+/**
+ * Rank two archives of the SAME id found in the SAME root. Higher version wins. On a version tie the
+ * unversioned `<id>.tar.gz` beats a `<id>-<version>.tar.gz` sibling: by the publish convention (see
+ * scripts/lib/build-brandings.ts) the bare name is the CURRENT copy — what a rebuild or a backend sync
+ * overwrites — while the versioned one is immutable history. Without this rule a rebuilt brand that
+ * kept its version would be silently out-ranked by the older history file it sits next to, which is
+ * exactly the ambiguity the sync middleware used to resolve by DELETING the loser.
+ */
+function outranks(candidate: BrandArchive, incumbent: BrandArchive): boolean {
+  const byVersion = compareVersions(candidate.version, incumbent.version)
+  if (byVersion !== 0) return byVersion > 0
+  const isCurrent = (a: BrandArchive): boolean => basename(a.file) === `${a.id}.tar.gz`
+  if (isCurrent(candidate) !== isCurrent(incumbent)) return isCurrent(candidate)
+  // Fully tied (same version, same kind of name) → keep the incumbent; walk order is sorted, so which
+  // one that is stays reproducible across machines.
+  return false
+}
+
+/** The best archive per brand id within ONE root (see outranks). */
+function discoverInRoot(root: string): Map<string, BrandArchive> {
   const paths: string[] = []
-  walk(baseDir, paths)
+  walk(root, paths)
   const byId = new Map<string, BrandArchive>()
   for (const file of paths) {
     const meta = readMeta(file)
     if (!meta) continue
+    const archive: BrandArchive = {
+      id: meta.id,
+      version: meta.version,
+      schemaVersion: meta.schemaVersion,
+      label: meta.label,
+      file,
+    }
     const existing = byId.get(meta.id)
-    if (!existing || compareVersions(meta.version, existing.version) > 0) {
-      byId.set(meta.id, {
-        id: meta.id,
-        version: meta.version,
-        schemaVersion: meta.schemaVersion,
-        label: meta.label,
-        file,
-      })
+    if (!existing || outranks(archive, existing)) byId.set(meta.id, archive)
+  }
+  return byId
+}
+
+/**
+ * All brand archives across the search path, keyed by brand id. An EARLIER root wins outright for the
+ * ids it provides — a later root's copy of the same id is shadowed regardless of its version, which is
+ * what makes precedence configurable (cache before baked assets in a deployment; brand sources before
+ * the cache in dev). Within one root the highest version wins (see outranks).
+ */
+export function discoverArchives(roots: string | string[]): Map<string, BrandArchive> {
+  const byId = new Map<string, BrandArchive>()
+  for (const root of resolveRoots(roots)) {
+    for (const [id, archive] of discoverInRoot(root)) {
+      if (!byId.has(id)) byId.set(id, archive)
     }
   }
   return byId
@@ -247,11 +369,20 @@ export function readArchive(file: string): Map<string, Buffer> | null {
   return statCached(file, fileCache, () => readTarGz(readFileSync(file)))
 }
 
-/** The image's baked default brand id (a `DEFAULT` marker file at the served root), or '' when none. */
-export function readDefaultMarker(baseDir: string): string {
-  try {
-    return readFileSync(join(baseDir, 'DEFAULT'), 'utf8').trim()
-  } catch {
-    return ''
+/**
+ * The deployment's default brand id (a `DEFAULT` marker file at a root), or '' when none. Follows the
+ * same precedence as the archives: the FIRST root that carries a non-empty marker answers. So a synced
+ * marker (the backend's, mirrored into the cache root) wins over the one baked into the image, and an
+ * image that bakes a default still falls back to it when the backend names none.
+ */
+export function readDefaultMarker(roots: string | string[]): string {
+  for (const root of resolveRoots(roots)) {
+    try {
+      const id = readFileSync(join(root, 'DEFAULT'), 'utf8').trim()
+      if (id) return id
+    } catch {
+      // no (readable) marker in this root → try the next
+    }
   }
+  return ''
 }

@@ -42,8 +42,13 @@ export interface BrandingRouterDeps {
   readDefaultMarker: typeof readDefaultMarkerFromDisk
 }
 
+/** A search path (or single root) as one readable string for a log line. */
+const describeRoots = (roots: string | string[]): string =>
+  Array.isArray(roots) ? roots.join(', ') : roots
+
 /**
- * Router for the brand archives under `assetsDir`.
+ * Router for the brand archives under `assetsDir` — a single root, or the ordered search path the
+ * caller resolved (server.ts passes `searchPath($OCELOT_BRANDING_ASSETS_DIR)`).
  *
  * `assetsDir` undefined/empty (a vanilla deployment) still serves the manifest — as an EMPTY one. An
  * unbranded backend and a backend with zero archives are the same thing to a client, so they get the
@@ -61,7 +66,7 @@ export interface BrandingRouterDeps {
  * follows the same principle for the disk readers (see BrandingRouterDeps).
  */
 export function brandingRouter(
-  assetsDir: string | undefined,
+  assetsDir: string | string[] | undefined,
   deps: Partial<BrandingRouterDeps> = {},
 ): Router {
   const {
@@ -69,15 +74,21 @@ export function brandingRouter(
     readDefaultMarker = readDefaultMarkerFromDisk,
   } = deps
   const router = Router()
-  const dir = assetsDir
+  // Passed to the readers VERBATIM (they split a `path.delimiter`-separated string themselves); only
+  // "did the caller name any root at all?" is decided here.
+  const dir = assetsDir ?? []
+  const hasRoots = dir.length > 0 // a string root or a non-empty search path
 
   /** The archive of `id`, or undefined when it is unknown or the assets dir is unreadable. */
-  const findArchive = (assetsDirectory: string, id: string): BrandArchive | undefined => {
+  const findArchive = (
+    assetsDirectory: string | string[],
+    id: string,
+  ): BrandArchive | undefined => {
     try {
       return discoverArchives(assetsDirectory).get(id)
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.warn(`[branding] cannot read ${assetsDirectory}:`, error)
+      console.warn(`[branding] cannot read ${describeRoots(assetsDirectory)}:`, error)
       return undefined
     }
   }
@@ -86,14 +97,14 @@ export function brandingRouter(
     // No assets dir configured → a vanilla deployment, which HAS no brands: the empty answer below is
     // the correct one, and nothing is read from disk.
     let archives: BrandArchive[] = []
-    if (dir) {
+    if (hasRoots) {
       try {
         archives = [...discoverArchives(dir).values()]
       } catch (error) {
         // A broken assets dir must not take the backend down — report "no brands" and let the caller
         // fall back to whatever it already has.
         // eslint-disable-next-line no-console
-        console.warn(`[branding] cannot read ${dir}:`, error)
+        console.warn(`[branding] cannot read ${describeRoots(dir)}:`, error)
         // Same shape as the success case, so a client parses one contract rather than two.
         res.status(503).json({ default: '', brands: [] })
         return
@@ -103,7 +114,7 @@ export function brandingRouter(
     // through to its own env pin or to vanilla, exactly as it would without a marker on disk.
     let defaultId = ''
     try {
-      defaultId = dir ? readDefaultMarker(dir) : ''
+      defaultId = hasRoots ? readDefaultMarker(dir) : ''
     } catch {
       defaultId = ''
     }
@@ -139,7 +150,7 @@ export function brandingRouter(
     // into a different brand's id. Only when nothing is deployed under the exact id does the alias
     // apply. Without an assets dir nothing is deployed at all, so every id is unknown.
     const lookUp = (candidate: string): BrandArchive | undefined =>
-      dir ? findArchive(dir, candidate) : undefined
+      hasRoots ? findArchive(dir, candidate) : undefined
     const archive =
       lookUp(requested) ??
       (requested.endsWith('.tar.gz') ? lookUp(requested.slice(0, -'.tar.gz'.length)) : undefined)

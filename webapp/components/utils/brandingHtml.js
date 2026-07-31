@@ -2,8 +2,8 @@
 // the build-bundled i18n html (`$t('html.<page>')`). The path comes from branding.assets.html
 // (namespaced to /branding/<id>/… by the multi-brand build) — only such absolute /branding/ paths
 // are loaded; anything else (e.g. a non-namespaced dev path, or none) returns null so the caller
-// falls back to the i18n html. Server-side reads the file straight off disk from
-// $OCELOT_BRANDING_ASSETS_DIR (no self-HTTP); client-side fetches the served URL.
+// falls back to the i18n html. Server-side reads the file straight off disk from the discovered
+// archives (no self-HTTP); client-side fetches the served URL.
 export async function fetchBrandingHtml(src) {
   if (!src || typeof src !== 'string' || !src.startsWith('/branding/')) return null
 
@@ -11,14 +11,19 @@ export async function fetchBrandingHtml(src) {
   // out of the CLIENT bundle — a compound guard like `typeof process !== 'undefined' && …` is not
   // recognised, so webpack would try to bundle 'fs' for the browser and fail.
   if (process.server) {
-    const base = process.env.OCELOT_BRANDING_ASSETS_DIR
-    if (!base) return null
     // eslint-disable-next-line global-require, import/no-unresolved
     const {
       discoverArchives,
       readArchive,
       isValidBrandId,
+      cacheFirstSearchPath,
     } = require('@ocelot-social/branding/dist/discover.js')
+    // Sync cache first, then the baked/mounted archives — the same roots the assets middleware serves
+    // from, so an SSR read and the browser's later fetch of the same path cannot disagree.
+    const base = cacheFirstSearchPath(
+      process.env.OCELOT_BRANDING_CACHE_DIR,
+      process.env.OCELOT_BRANDING_ASSETS_DIR,
+    )
     // src is '/branding/<id>/html/<locale>/<file>.html'; read the entry from that brand's archive.
     const rel = src.replace(/^\/branding\//, '')
     const slash = rel.indexOf('/')

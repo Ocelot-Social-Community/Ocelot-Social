@@ -17,17 +17,18 @@ import {
   readArchive,
   readArchiveConfig,
   readDefaultMarker,
+  searchPath,
 } from '@ocelot-social/branding/dist/discover.js'
 
 import { overlayBrandRuntimeFiles } from './overlayRuntimeFiles'
 
-const assetsDir = process.env.OCELOT_BRANDING_ASSETS_DIR
-const active = assetsDir
-  ? // `||` (not `??`) on purpose: an empty $OCELOT_ACTIVE_BRANDING must fall through to the marker.
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-    process.env.OCELOT_ACTIVE_BRANDING || readDefaultMarker(assetsDir)
-  : undefined
-if (assetsDir && active) {
+// No env needed: unset falls back to the conventional archive locations (deployment/configurations,
+// in the image and in a repo checkout — see discover.DEFAULT_ROOTS). Setting the var replaces them.
+const assetsDir = searchPath(process.env.OCELOT_BRANDING_ASSETS_DIR)
+// `||` (not `??`) on purpose: an empty $OCELOT_ACTIVE_BRANDING must fall through to the marker.
+// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+const active = process.env.OCELOT_ACTIVE_BRANDING || readDefaultMarker(assetsDir)
+if (active) {
   try {
     const archive = discoverArchives(assetsDir).get(active)
     if (archive) {
@@ -44,7 +45,7 @@ if (assetsDir && active) {
       // so an unexpectedly unbranded backend is traceable instead of failing silently.
       // eslint-disable-next-line no-console
       console.warn(
-        `[branding] active brand "${active}" not found under ${assetsDir} — running on framework defaults.`,
+        `[branding] active brand "${active}" not found under ${assetsDir.join(', ')} — running on framework defaults.`,
       )
     }
     // Compose the effective config from the archive's instance fragments (manifest + fragments/).

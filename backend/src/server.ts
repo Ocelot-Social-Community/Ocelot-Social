@@ -10,6 +10,7 @@ import http from 'node:http'
 import { ApolloServer } from '@apollo/server'
 import { expressMiddleware } from '@apollo/server/express4'
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
+import { searchPath } from '@ocelot-social/branding/dist/discover.js'
 import bodyParser from 'body-parser'
 import express from 'express'
 import { execute, subscribe } from 'graphql'
@@ -147,8 +148,10 @@ const createServer = async (options?: CreateServerOptions) => {
   app.use(express.static('public'))
   // Brand archives this backend has on disk, served read-only so the webapp can acquire them instead
   // of shipping its own copy. Mounted before the body parsers — these are plain GETs with no body.
+  // The search path is resolved HERE (env, else the conventional locations) and handed over, so the
+  // router itself stays free of ambient configuration.
   // eslint-disable-next-line n/no-process-env -- the deployment's assets dir, read once and passed in
-  app.use('/branding', brandingRouter(process.env.OCELOT_BRANDING_ASSETS_DIR))
+  app.use('/branding', brandingRouter(searchPath(process.env.OCELOT_BRANDING_ASSETS_DIR)))
   if (!options?.skipLiveKitBoot) {
     // LiveKit webhook must be registered before the global JSON body parser so
     // the raw payload is preserved for HMAC signature verification.

@@ -13,6 +13,12 @@ services:
       - ./packages/ui:/packages/ui
       - /packages/ui/node_modules
       - ./packages/branding:/packages/branding
+      # The brand archives, at the path the code looks in by default (no env needed — see
+      # @ocelot-social/branding discover.DEFAULT_ROOTS). Build them with
+      # `npm --prefix packages/branding run build:dev-brandings`, then pick one in the admin
+      # Branding tab. READ-ONLY: the only thing the webapp writes is its sync cache, which lives in
+      # ./webapp/.branding-cache — pointing it here would have it compete with your brand builds.
+      - ./deployment/configurations:/app/deployment/configurations:ro
 
   backend:
     image: ghcr.io/ocelot-social-community/ocelot-social/backend:local-development
@@ -42,6 +48,10 @@ services:
     volumes:
       - ./backend:/app
       - ./packages/branding:/packages/branding
+      # Same archives, same default path (see the webapp service). The backend reads them only — it is
+      # where every other service acquires them from, over GET /branding/…. Pin one for the backend
+      # (its group limits / e-mail identity don't live-switch) with $OCELOT_ACTIVE_BRANDING.
+      - ./deployment/configurations:/app/deployment/configurations:ro
 
   neo4j:
     ports:
@@ -110,11 +120,25 @@ services:
       target: development
     ports:
       - "3001:3000"
+    environment:
+      # The support address on the page. Deployment config, not branding — each network sets it in its
+      # helmfile, and the brand archives deliberately carry no e-mail. `nuxt dev` reads it here; a
+      # static build bakes it in (see the Dockerfile's SUPPORT_EMAIL build arg).
+      - SUPPORT_EMAIL=${SUPPORT_EMAIL:-hello@ocelot.social}
     volumes:
-      # Hot-reload for vanilla maintenance dev. When baking a brand (uncomment the BRAND build arg in
-      # docker-compose.yml), COMMENT OUT the ./maintenance/app mount below too — otherwise the vanilla
-      # host sources shadow the baked branding.css / metadata.ts.
+      # Hot-reload against the host sources — including whatever `npm run brand -- <name>` generated
+      # there (app/assets/css/brand.css, app/constants/metadata.brand.json, app/locales/,
+      # public/img|fonts/brand/ — all git-ignored, all optional).
+      #
+      # In dev, brand on the HOST, not via the image's BRAND build arg: a bind mount REPLACES the
+      # directory, so a baked brand under /app/app would be hidden by this mount anyway. `npm run
+      # brand` gives the same result and reloads without a rebuild.
+      #
+      # public/ is mounted for the same reason app/ is: without it the logo and web fonts came from
+      # the image while colours and metadata came from the host — which rendered a branded page still
+      # carrying the vanilla ocelot logo.
       - ./maintenance/app:/app/app
+      - ./maintenance/public:/app/public
       - ./maintenance/nuxt.config.ts:/app/nuxt.config.ts
       - ./packages/ui:/packages/ui
       - /packages/ui/node_modules
