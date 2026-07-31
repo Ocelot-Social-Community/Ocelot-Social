@@ -22,9 +22,14 @@ PLACEHOLDER='__OCELOT_SUPPORT_EMAIL__' # keep in step with app/constants/emails.
 ROOT="${NGINX_ROOT:-/usr/share/nginx/html}"
 EMAIL="${SUPPORT_EMAIL:-devops@ocelot.social}"
 
-# `|` as the sed delimiter: an e-mail address cannot contain one, while `/` and `&` are plausible in
-# neither address nor path but cost nothing to avoid.
+# Escape the value before it becomes part of a sed expression. RFC 5322 allows `&`, `|` and `\` in an
+# address's local part, and all three are special here: `&` stands for the whole match (so
+# `help&team@example.org` would write the PLACEHOLDER back into the page), `|` would close the
+# expression, `\` starts an escape. Substituting them for their literal selves is the only way the
+# output equals the address.
+ESCAPED=$(printf '%s' "$EMAIL" | sed -e 's/[\\&|]/\\&/g')
+
 find "$ROOT" -type f \( -name '*.html' -o -name '*.js' -o -name '*.json' \) \
-  -exec sed -i "s|${PLACEHOLDER}|${EMAIL}|g" {} +
+  -exec sed -i "s|${PLACEHOLDER}|${ESCAPED}|g" {} +
 
 echo "[maintenance] support e-mail: ${EMAIL}"
