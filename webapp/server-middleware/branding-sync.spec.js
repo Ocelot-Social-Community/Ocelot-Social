@@ -16,6 +16,10 @@ jest.mock('fs', () => ({
   },
 }))
 
+// The `dist/discover.js` SUBPATH, not the package index: discover is server-only (node:fs, and
+// node:zlib through tar.js), which is why the index does not re-export it and why nuxt.config.js
+// aliases this exact specifier to a stub for the CLIENT bundle. Mocking it here mirrors how the
+// middleware requires it.
 jest.mock(
   '@ocelot-social/branding/dist/discover.js',
   () => ({
