@@ -121,8 +121,8 @@ describe('build-maintenance-branding', () => {
       'app/assets/css/brand.css',
       'app/constants/metadata.brand.json',
       'app/locales/de.json',
-      'public/img/brand/logo-squared.svg',
-      'public/fonts/brand/fonts/acme.woff2',
+      'public/brand/logo-squared.svg',
+      'public/brand/fonts/acme.woff2',
     ]) {
       assert.ok(existsSync(join(to, rel)), `expected ${rel}`)
     }
@@ -135,9 +135,9 @@ describe('build-maintenance-branding', () => {
     const css = readText(to, 'app/assets/css/brand.css')
     // The font FILE is served from the maintenance app, not from /branding/<id>/… (that route only
     // exists in the live webapp, which is down whenever this page is shown).
-    assert.equal(readText(to, 'public/fonts/brand/fonts/acme.woff2'), 'woff2-bytes')
+    assert.equal(readText(to, 'public/brand/fonts/acme.woff2'), 'woff2-bytes')
     assert.match(css, /@font-face \{[^}]*font-family: "Acme Sans";/)
-    assert.match(css, /src: url\("\/fonts\/brand\/fonts\/acme\.woff2"\) format\("woff2"\);/)
+    assert.match(css, /src: url\("\/brand\/fonts\/acme\.woff2"\) format\("woff2"\);/)
     assert.match(css, /font-weight: 400;/)
     // …and the token that names it, so `body { font-family: var(--font-family-text) }` resolves.
     assert.match(css, /--font-family-text: 'Acme Sans', sans-serif;/)
@@ -155,8 +155,8 @@ describe('build-maintenance-branding', () => {
       string,
       string
     >
-    assert.equal(readText(to, 'public/img/brand/logo-squared.svg'), '<svg id="brand"/>')
-    assert.equal(meta.LOGO, '/img/brand/logo-squared.svg')
+    assert.equal(readText(to, 'public/brand/logo-squared.svg'), '<svg id="brand"/>')
+    assert.equal(meta.LOGO, '/brand/logo-squared.svg')
     assert.equal(meta.APPLICATION_NAME, 'Acme')
     // The one DERIVED value in the overlay: the browser-chrome colour is the brand's primary token,
     // there being no metadata.themeColor field. resolveThemeColor is unit-tested elsewhere; what is
@@ -164,7 +164,7 @@ describe('build-maintenance-branding', () => {
     assert.equal(meta.THEME_COLOR, 'rebeccapurple')
     // The composed ogImage is a /branding/<id>/… path this static site never serves — it has to be
     // rewritten to the copy that IS served, or every link preview 404s.
-    assert.equal(meta.OG_IMAGE, '/img/brand/logo-squared.svg')
+    assert.equal(meta.OG_IMAGE, '/brand/logo-squared.svg')
   })
 
   // Reducing an archive entry to its basename would put two of them on one file. Both cases are
@@ -250,7 +250,7 @@ describe('build-maintenance-branding', () => {
     test('drops the artifacts of the brand built before it', () => {
       const to = maintenanceDir()
       brand(brandDir(), to)
-      assert.ok(existsSync(join(to, 'public/fonts/brand/fonts/acme.woff2')))
+      assert.ok(existsSync(join(to, 'public/brand/fonts/acme.woff2')))
       assert.ok(existsSync(join(to, 'app/locales/de.json')))
 
       // A second brand, same maintenance tree: different font, no locales, no logo.
@@ -271,10 +271,12 @@ describe('build-maintenance-branding', () => {
 
       brand(other, to)
 
-      assert.ok(existsSync(join(to, 'public/fonts/brand/other.woff2')))
-      assert.equal(existsSync(join(to, 'public/fonts/brand/fonts/acme.woff2')), false)
+      assert.ok(existsSync(join(to, 'public/brand/other.woff2')))
+      assert.equal(existsSync(join(to, 'public/brand/fonts/acme.woff2')), false)
       assert.equal(existsSync(join(to, 'app/locales/de.json')), false)
-      assert.equal(existsSync(join(to, 'public/img/brand')), false)
+      // The second brand ships no logo, so the first one's must be gone. Asserted on the FILE, not on
+      // the directory: logo and fonts now share public/brand, which this brand's font keeps alive.
+      assert.equal(existsSync(join(to, 'public/brand/logo-squared.svg')), false)
     })
 
     test('is idempotent for the same brand', () => {
@@ -307,8 +309,7 @@ describe('build-maintenance-branding', () => {
     const css = readText(to, 'app/assets/css/brand.css')
     assert.equal(css.includes('@font-face'), false)
     assert.equal(css.includes('rebeccapurple'), false)
-    assert.equal(existsSync(join(to, 'public/fonts/brand')), false)
-    assert.equal(existsSync(join(to, 'public/img/brand')), false)
+    assert.equal(existsSync(join(to, 'public/brand')), false)
   })
 
   test('refuses to run without both arguments', () => {
@@ -383,6 +384,6 @@ describe('build-maintenance-branding', () => {
 
     const css = readText(to, 'app/assets/css/brand.css')
     assert.match(css, /src: url\("https:\/\/cdn\.example\/remote\.woff2"\) format\("woff2"\);/)
-    assert.equal(existsSync(join(to, 'public/fonts/brand')), false)
+    assert.equal(existsSync(join(to, 'public/brand')), false)
   })
 })

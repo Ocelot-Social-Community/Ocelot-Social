@@ -33,8 +33,7 @@ const GENERATED = [
   "app/assets/css/brand.css",
   "app/constants/metadata.brand.json",
   "app/locales",
-  "public/img/brand",
-  "public/fonts/brand",
+  "public/brand",
 ];
 
 function fail(message) {

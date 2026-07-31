@@ -15,8 +15,8 @@
 //   app/assets/css/brand.css          @font-face rules + the :root token overrides
 //   app/constants/metadata.brand.json identity/OG overlay (+ LOGO, the served logo path)
 //   app/locales/<code>.json           the `maintenance` strings this brand translates
-//   public/img/brand/<logo>           the squared logo
-//   public/fonts/brand/<file>         the web fonts brand.css references
+//   public/brand/<path>               the brand's served files — logo, OG image, web fonts — each
+//                                     keeping its path from the archive (minus the `assets/` prefix)
 //
 // Idempotent: the whole generated tree is removed before it is rewritten, so a rebuild for a different
 // brand — or for one that has since dropped its fonts/colours — leaves nothing of the previous run.
@@ -37,13 +37,17 @@ if (!brandArg || !maintenanceArg) {
 const brandDir = resolve(brandArg)
 const maintenanceDir = resolve(maintenanceArg)
 
+/** The ONE directory the brand's served files go into, under the app's public/ root. Logo, OG image
+ *  and fonts share it: the archive's own structure below it already tells them apart, and a single
+ *  root means one thing to clean up rather than two. */
+const SERVED_DIR = 'brand'
+
 /** Every path this script owns. Exported shape for the app + tooling: see GENERATED in tools/brand.mjs. */
 const GENERATED = [
   'app/assets/css/brand.css',
   'app/constants/metadata.brand.json',
   'app/locales',
-  'public/img/brand',
-  'public/fonts/brand',
+  `public/${SERVED_DIR}`,
 ] as const
 
 // Clear first: this is the ONLY cleanup step there is. Without it a brand that dropped a font (or a
@@ -79,14 +83,16 @@ const cssVars = config.theme.cssVars
  * a key of that map — archiveEntry rejects it as "not in archive" before this is reached. (A symlink
  * inside assets/ can point anywhere, but its CONTENT is what travels; the entry name stays relative.)
  */
-function serveEntry(dir: string, entry: string, data: Buffer): string {
-  // Served brand files all live under `assets/` in the archive; carrying that segment into the URL
-  // would only repeat what the target directory already says. What follows it is kept as-is, and that
-  // is what keeps two entries distinct.
+function serveEntry(entry: string, data: Buffer): string {
+  // Only the `assets/` prefix goes: it says nothing the target directory does not already say. What
+  // follows is kept verbatim, and that is what keeps two entries distinct. Stripping more — a leading
+  // segment matching the directory, say — would put `assets/Inter.woff2` and `assets/fonts/Inter.woff2`
+  // back on one file.
   const rel = entry.replace(/^assets\//, '')
-  mkdirSync(dirname(resolve(maintenanceDir, 'public', dir, rel)), { recursive: true })
-  writeFileSync(resolve(maintenanceDir, 'public', dir, rel), data)
-  return `/${dir}/${rel}`
+  const target = resolve(maintenanceDir, 'public', SERVED_DIR, rel)
+  mkdirSync(dirname(target), { recursive: true })
+  writeFileSync(target, data)
+  return `/${SERVED_DIR}/${rel}`
 }
 
 /** An archive entry for a `/branding/<id>/…` path, or null when the path is external/absent. */
@@ -110,7 +116,7 @@ for (const face of config.theme.fontFaces) {
   const found = archiveEntry(face.src)
   // An absolute or external src (https:, /fonts/…) is already servable — reference it as given.
   if (!found && face.src.startsWith(`/branding/${id}/`)) continue // warned above; nothing to serve
-  const url = found ? serveEntry('fonts/brand', found.entry, found.data) : face.src
+  const url = found ? serveEntry(found.entry, found.data) : face.src
   const src = face.format ? `url("${url}") format("${face.format}")` : `url("${url}")`
   fontRules.push(
     [
@@ -152,7 +158,7 @@ console.log(
 function serveImage(namespaced: string, label: string): string | null {
   const found = archiveEntry(namespaced)
   if (!found) return null
-  const url = serveEntry('img/brand', found.entry, found.data)
+  const url = serveEntry(found.entry, found.data)
 
   console.log(`[maintenance] ${label} → public${url}`)
   return url
