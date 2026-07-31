@@ -1755,6 +1755,7 @@
       "unsupportedBrowser": "Votre navigateur ne prend pas en charge l'audio/vidéo."
     },
     "screenShare": "Écran",
+    "screenShareEnded": "Partage d'écran terminé",
     "spotlightExit": "Quitter le focus",
     "startScreenShare": "Partager l'écran",
     "stopScreenShare": "Arrêter le partage",

@@ -207,6 +207,94 @@ describe('VideoTile', () => {
     })
   })
 
+  describe('ended video tracks', () => {
+    // A live MediaStreamTrack, plus the listener bookkeeping tests need.
+    const buildMediaTrack = (readyState = 'live') => {
+      const listeners = {}
+      return {
+        readyState,
+        addEventListener: jest.fn((event, cb) => {
+          listeners[event] = cb
+        }),
+        removeEventListener: jest.fn(),
+        end: () => listeners.ended && listeners.ended(),
+      }
+    }
+
+    it('replaces an ended screen share with a placeholder instead of a black box', async () => {
+      const mediaStreamTrack = buildMediaTrack()
+      const videoTrack = { ...buildTrack(), mediaStreamTrack }
+      const wrapper = factory({ tile: buildTile({ videoTrack, isScreen: true }) })
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.hasVideo).toBe(true)
+
+      // The sharer hits the browser's own "Stop sharing" bar: the track ends
+      // before the unpublish message lands, and the <video> would otherwise
+      // keep painting its last decoded frame.
+      mediaStreamTrack.end()
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.hasVideo).toBe(false)
+      expect(wrapper.html()).toContain('videoCall.screenShareEnded')
+    })
+
+    it('detects a track that had already ended before attaching', async () => {
+      const videoTrack = { ...buildTrack(), mediaStreamTrack: buildMediaTrack('ended') }
+      const wrapper = factory({ tile: buildTile({ videoTrack, isScreen: true }) })
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.hasVideo).toBe(false)
+    })
+
+    it('gives a replacement track a clean slate', async () => {
+      const first = buildMediaTrack()
+      const wrapper = factory({
+        tile: buildTile({ videoTrack: { ...buildTrack(), mediaStreamTrack: first } }),
+      })
+      await wrapper.vm.$nextTick()
+      first.end()
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.hasVideo).toBe(false)
+
+      await wrapper.setProps({
+        tile: buildTile({ videoTrack: { ...buildTrack(), mediaStreamTrack: buildMediaTrack() } }),
+      })
+      await wrapper.vm.$nextTick()
+      // The old track ending says nothing about the new one.
+      expect(wrapper.vm.hasVideo).toBe(true)
+      expect(first.removeEventListener).toHaveBeenCalledWith('ended', expect.any(Function))
+    })
+
+    it('drops the listener on unmount', async () => {
+      const mediaStreamTrack = buildMediaTrack()
+      const wrapper = factory({
+        tile: buildTile({ videoTrack: { ...buildTrack(), mediaStreamTrack } }),
+      })
+      await wrapper.vm.$nextTick()
+      wrapper.destroy()
+      expect(mediaStreamTrack.removeEventListener).toHaveBeenCalledWith(
+        'ended',
+        expect.any(Function),
+      )
+    })
+
+    it('copes with tracks that expose no MediaStreamTrack', async () => {
+      const wrapper = factory({ tile: buildTile({ videoTrack: buildTrack() }) })
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.hasVideo).toBe(true)
+    })
+
+    it('swallows removeEventListener errors', async () => {
+      const mediaStreamTrack = buildMediaTrack()
+      mediaStreamTrack.removeEventListener = jest.fn(() => {
+        throw new Error('gone')
+      })
+      const wrapper = factory({
+        tile: buildTile({ videoTrack: { ...buildTrack(), mediaStreamTrack } }),
+      })
+      await wrapper.vm.$nextTick()
+      expect(() => wrapper.destroy()).not.toThrow()
+    })
+  })
+
   describe('sink id', () => {
     it('calls setSinkId on the audio element when changed', async () => {
       const wrapper = factory({ sinkId: 'speaker-1' })

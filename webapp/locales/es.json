@@ -1755,6 +1755,7 @@
       "unsupportedBrowser": "Tu navegador no admite audio/vídeo."
     },
     "screenShare": "Pantalla",
+    "screenShareEnded": "Uso compartido de pantalla finalizado",
     "spotlightExit": "Salir del foco",
     "startScreenShare": "Compartir pantalla",
     "stopScreenShare": "Detener uso compartido",

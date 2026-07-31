@@ -30,11 +30,12 @@
           <div class="video-call__header-actions">
             <os-button
               v-if="canMinimize && phase === 'in-call'"
+              v-tooltip="minimizeLabel"
               variant="primary"
               appearance="outline"
               size="sm"
               circle
-              :aria-label="minimized ? $t('videoCall.maximize') : $t('videoCall.minimize')"
+              :aria-label="minimizeLabel"
               @click="toggleMinimize"
             >
               <template #icon>
@@ -42,13 +43,12 @@
               </template>
             </os-button>
             <os-button
-              variant="primary"
+              v-tooltip="closeLabel"
+              variant="danger"
               appearance="outline"
               size="sm"
               circle
-              :aria-label="
-                phase === 'in-call' ? $t('videoCall.leave') : $t('videoCall.prejoin.cancel')
-              "
+              :aria-label="closeLabel"
               @click="leave"
             >
               <template #icon>
@@ -99,7 +99,11 @@
               </span>
             </span>
           </div>
-          <div :class="['video-call__stage', stageLayoutClass]" :style="gridStyleConditional">
+          <div
+            ref="stageEl"
+            :class="['video-call__stage', stageLayoutClass]"
+            :style="gridStyleConditional"
+          >
             <!--
             All tiles are always mounted so every participant's audio track stays
             attached to a DOM <audio> element. CSS Grid (in spotlight mode)
@@ -135,89 +139,95 @@
         </template>
       </div>
 
+      <!--
+        Every control collapses to an icon-only button in the parked window, so
+        each one carries a tooltip fed from the same label as its aria-label —
+        one source, no drift between what a screen reader announces and what a
+        sighted user reads. The tooltip is suppressed while the label is
+        already spelled out next to the icon.
+      -->
       <div v-if="phase === 'in-call' && !error" class="video-call__controls">
         <os-button
+          v-tooltip="iconOnlyTooltip(micLabel)"
           :variant="micEnabled ? 'default' : 'danger'"
           appearance="outline"
           :size="iconOnly ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="micEnabled ? $t('videoCall.muteMic') : $t('videoCall.unmuteMic')"
+          :aria-label="micLabel"
           @click="toggleMic"
         >
           <template #icon>
             <os-icon :icon="micEnabled ? icons.microphone : icons.microphoneSlash" />
           </template>
           <template v-if="!iconOnly">
-            {{ micEnabled ? $t('videoCall.muteMic') : $t('videoCall.unmuteMic') }}
+            {{ micLabel }}
           </template>
         </os-button>
         <os-button
+          v-tooltip="iconOnlyTooltip(cameraLabel)"
           :variant="cameraEnabled ? 'default' : 'danger'"
           appearance="outline"
           :size="iconOnly ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="cameraEnabled ? $t('videoCall.disableCamera') : $t('videoCall.enableCamera')"
+          :aria-label="cameraLabel"
           @click="toggleCamera"
         >
           <template #icon>
             <os-icon :icon="icons.videoCamera" />
           </template>
           <template v-if="!iconOnly">
-            {{ cameraEnabled ? $t('videoCall.disableCamera') : $t('videoCall.enableCamera') }}
+            {{ cameraLabel }}
           </template>
         </os-button>
         <os-button
           v-if="screenShareSupported"
+          v-tooltip="iconOnlyTooltip(screenShareLabel)"
           :variant="screenShareEnabled ? 'primary' : 'default'"
           appearance="outline"
           :size="iconOnly ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="
-            screenShareEnabled ? $t('videoCall.stopScreenShare') : $t('videoCall.startScreenShare')
-          "
+          :aria-label="screenShareLabel"
           @click="toggleScreenShare"
         >
           <template #icon>
             <os-icon :icon="icons.desktop" />
           </template>
           <template v-if="!iconOnly">
-            {{
-              screenShareEnabled
-                ? $t('videoCall.stopScreenShare')
-                : $t('videoCall.startScreenShare')
-            }}
+            {{ screenShareLabel }}
           </template>
         </os-button>
         <os-button
           v-if="!isMobile"
+          v-tooltip="iconOnlyTooltip(chatLabel)"
           :variant="chatOpenForThisGroup ? 'primary' : 'default'"
           appearance="outline"
           :size="iconOnly ? 'sm' : 'md'"
           :circle="iconOnly"
-          :aria-label="chatOpenForThisGroup ? $t('videoCall.closeChat') : $t('videoCall.openChat')"
+          :aria-label="chatLabel"
           @click="toggleChat"
         >
           <template #icon>
             <os-icon :icon="icons.chatBubble" />
           </template>
           <template v-if="!iconOnly">
-            {{ chatOpenForThisGroup ? $t('videoCall.closeChat') : $t('videoCall.openChat') }}
+            {{ chatLabel }}
           </template>
         </os-button>
         <os-button
+          v-tooltip="iconOnlyTooltip(leaveLabel)"
           variant="danger"
           appearance="filled"
           :size="iconOnly ? 'sm' : 'md'"
           :circle="iconOnly"
           class="video-call__leave"
-          :aria-label="$t('videoCall.leave')"
+          :aria-label="leaveLabel"
           @click="leave"
         >
           <template #icon>
             <os-icon :icon="icons.phone" />
           </template>
           <template v-if="!iconOnly">
-            {{ $t('videoCall.leave') }}
+            {{ leaveLabel }}
           </template>
         </os-button>
       </div>
@@ -236,6 +246,21 @@ import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar
 import RoomTitleLink from '~/components/_new/generic/RoomTitleLink/RoomTitleLink'
 import VideoTile from './VideoTile.vue'
 import PreJoin from './PreJoin.vue'
+
+// How long a participant keeps the speaking treatment after LiveKit drops them
+// from the active-speaker list. LiveKit reports raw audio activity, so it lets
+// go during the pauses between words — without a hold the chips and frames
+// strobe while someone is simply talking.
+const SPEAKER_HOLD_MS = 1500
+
+// Cameras publish 16:9, so the grid aims for cells of that shape: the closer a
+// cell matches, the less `object-fit: cover` has to crop off the sides.
+const TILE_ASPECT_RATIO = 16 / 9
+
+// Below this the 114px large avatar plus its caption no longer fits the cell
+// and the flex column starts squashing.
+const LARGE_AVATAR_MIN_CELL_HEIGHT = 200
+const LARGE_AVATAR_MIN_CELL_WIDTH = 160
 
 export default {
   name: 'VideoCall',
@@ -264,6 +289,8 @@ export default {
       Track: null,
       activeSpeakerIds: [],
       spotlightKey: null,
+      stageWidth: 0,
+      stageHeight: 0,
     }
   },
   computed: {
@@ -297,6 +324,35 @@ export default {
       return (
         this.phase === 'in-call' && this.chatOpenForThisGroup && !this.iconOnly && !this.isMobile
       )
+    },
+    micLabel() {
+      return this.micEnabled ? this.$t('videoCall.muteMic') : this.$t('videoCall.unmuteMic')
+    },
+    cameraLabel() {
+      return this.cameraEnabled
+        ? this.$t('videoCall.disableCamera')
+        : this.$t('videoCall.enableCamera')
+    },
+    screenShareLabel() {
+      return this.screenShareEnabled
+        ? this.$t('videoCall.stopScreenShare')
+        : this.$t('videoCall.startScreenShare')
+    },
+    chatLabel() {
+      return this.chatOpenForThisGroup
+        ? this.$t('videoCall.closeChat')
+        : this.$t('videoCall.openChat')
+    },
+    leaveLabel() {
+      return this.$t('videoCall.leave')
+    },
+    minimizeLabel() {
+      return this.minimized ? this.$t('videoCall.maximize') : this.$t('videoCall.minimize')
+    },
+    closeLabel() {
+      return this.phase === 'in-call'
+        ? this.$t('videoCall.leave')
+        : this.$t('videoCall.prejoin.cancel')
     },
     titleLabel() {
       const name = this.groupName || this.$t('videoCall.title')
@@ -389,10 +445,54 @@ export default {
       const anyRemote = this.tiles.find((t) => !t.isLocal)
       return anyRemote || this.tiles[0]
     },
+    gridDimensions() {
+      // Pick the column count whose resulting cells waste the least space on a
+      // 16:9 video. The old `ceil(sqrt(n))` ignored the stage's own shape, so
+      // two participants on a wide monitor got two tall, narrow cells — and
+      // `object-fit: cover` then cropped everything but a vertical strip of
+      // each face, which is what reads as "stretched".
+      const count = Math.max(1, this.tiles.length)
+      if (!this.stageWidth || !this.stageHeight) {
+        // Nothing measured yet (SSR, first paint, no ResizeObserver): keep the
+        // square-ish heuristic rather than collapsing to a single column.
+        const columns = Math.ceil(Math.sqrt(count))
+        return { columns, rows: Math.ceil(count / columns) }
+      }
+      let best = { columns: 1, rows: count, area: -1 }
+      for (let columns = 1; columns <= count; columns++) {
+        const rows = Math.ceil(count / columns)
+        const cellWidth = this.stageWidth / columns
+        const cellHeight = this.stageHeight / rows
+        // Largest 16:9 rectangle that fits this cell — maximising it maximises
+        // the visible video area.
+        const fittedWidth = Math.min(cellWidth, cellHeight * TILE_ASPECT_RATIO)
+        const area = (fittedWidth * fittedWidth) / TILE_ASPECT_RATIO
+        // `>=` so a tie goes to the wider arrangement: two people on a 16:9
+        // stage fit equally well side by side or stacked, and side by side is
+        // what every other call app does.
+        if (area >= best.area) best = { columns, rows, area }
+      }
+      return { columns: best.columns, rows: best.rows }
+    },
+    cellSize() {
+      if (!this.stageWidth || !this.stageHeight) return { width: 0, height: 0 }
+      // Outside the regular grid a tile owns the whole stage: the minimized
+      // window shows exactly one, and the spotlight tile fills the wide cell
+      // (its thumbnails are sized separately in tileAvatarSize).
+      if (!this.isFullscreen || this.spotlightTile) {
+        return { width: this.stageWidth, height: this.stageHeight }
+      }
+      const { columns, rows } = this.gridDimensions
+      return { width: this.stageWidth / columns, height: this.stageHeight / rows }
+    },
     gridStyle() {
-      const n = Math.max(1, this.tiles.length)
-      const cols = Math.ceil(Math.sqrt(n))
-      return { 'grid-template-columns': `repeat(${cols}, 1fr)` }
+      const { columns, rows } = this.gridDimensions
+      return {
+        'grid-template-columns': `repeat(${columns}, 1fr)`,
+        // Explicit rows: without them the implicit rows size to content and
+        // the tiles never share the stage height evenly.
+        'grid-template-rows': `repeat(${rows}, 1fr)`,
+      }
     },
   },
   watch: {
@@ -447,8 +547,26 @@ export default {
   },
   created() {
     this.icons = iconRegistry
+    // Non-reactive bookkeeping: identity -> timestamp of the last report from
+    // LiveKit. Insertion order doubles as a stable display order, so a speaker
+    // who keeps talking never jumps around the chip row.
+    this.speakerSeenAt = new Map()
+    this.speakerHoldTimer = null
+    this.stageObserver = null
+    this.observedStage = null
+  },
+  mounted() {
+    this.observeStage()
+  },
+  updated() {
+    // The stage only exists in some phases, so re-check after every render
+    // rather than wiring this up once. observeStage() bails out when the
+    // element is unchanged, which also keeps the observer's own updates from
+    // looping.
+    this.observeStage()
   },
   beforeDestroy() {
+    this.disconnectStageObserver()
     this.cleanup()
   },
   methods: {
@@ -459,6 +577,74 @@ export default {
       setStorePhase: 'videoCall/SET_PHASE',
       setShowChat: 'chat/SET_OPEN_CHAT',
     }),
+    observeStage() {
+      const el = this.$refs.stageEl || null
+      if (el === this.observedStage) return
+      this.disconnectStageObserver()
+      this.observedStage = el
+      if (!el) {
+        this.stageWidth = 0
+        this.stageHeight = 0
+        return
+      }
+      this.measureStage()
+      if (typeof ResizeObserver === 'undefined') return
+      // Window resize alone would miss the cases that matter most here: the
+      // in-call chat sidebar opening, or minimize/maximize resizing the panel.
+      this.stageObserver = new ResizeObserver(() => this.measureStage())
+      this.stageObserver.observe(el)
+    },
+    measureStage() {
+      const el = this.observedStage
+      if (!el) return
+      const width = el.clientWidth || 0
+      const height = el.clientHeight || 0
+      if (width === this.stageWidth && height === this.stageHeight) return
+      this.stageWidth = width
+      this.stageHeight = height
+    },
+    disconnectStageObserver() {
+      if (this.stageObserver) {
+        this.stageObserver.disconnect()
+        this.stageObserver = null
+      }
+      this.observedStage = null
+    },
+    noteActiveSpeakers(identities) {
+      const now = Date.now()
+      for (const identity of identities) this.speakerSeenAt.set(identity, now)
+      this.applyActiveSpeakers()
+    },
+    applyActiveSpeakers() {
+      const now = Date.now()
+      const next = []
+      let soonestExpiry = null
+      for (const [identity, seenAt] of this.speakerSeenAt) {
+        const remaining = SPEAKER_HOLD_MS - (now - seenAt)
+        if (remaining > 0) {
+          next.push(identity)
+          if (soonestExpiry === null || remaining < soonestExpiry) soonestExpiry = remaining
+        } else {
+          this.speakerSeenAt.delete(identity)
+        }
+      }
+      const prev = this.activeSpeakerIds
+      if (prev.length !== next.length || !prev.every((id, i) => id === next[i])) {
+        this.activeSpeakerIds = next
+      }
+      if (this.speakerHoldTimer) {
+        clearTimeout(this.speakerHoldTimer)
+        this.speakerHoldTimer = null
+      }
+      // Falling out of the list is driven by the clock, not by an event —
+      // LiveKit has nothing more to report once someone stops talking.
+      if (soonestExpiry !== null) {
+        this.speakerHoldTimer = setTimeout(() => {
+          this.speakerHoldTimer = null
+          this.applyActiveSpeakers()
+        }, soonestExpiry)
+      }
+    },
     toggleChat() {
       if (this.chatOpenForThisGroup) {
         this.setShowChat({ showChat: false, chatUserId: null, groupId: null })
@@ -476,7 +662,17 @@ export default {
       // Spotlight thumbnails are too short for the large avatar — it gets
       // visually squished into an oval. Use the small avatar there instead.
       if (this.spotlightTile && tile.key !== this.spotlightTile.key) return 'small'
+      // Same reasoning for any cramped cell: a 3x3 grid on a phone, or the
+      // parked window, leaves nowhere near enough room for the 114px avatar.
+      const { width, height } = this.cellSize
+      if (height && height < LARGE_AVATAR_MIN_CELL_HEIGHT) return 'small'
+      if (width && width < LARGE_AVATAR_MIN_CELL_WIDTH) return 'small'
       return 'large'
+    },
+    iconOnlyTooltip(label) {
+      // v-tooltip renders nothing for an empty string — exactly what we want
+      // once the button spells its label out next to the icon.
+      return this.iconOnly ? label : ''
     },
     onTileSelect(tile) {
       if (!tile) return
@@ -562,6 +758,10 @@ export default {
         room.on(RoomEvent.ParticipantDisconnected, onAny)
         room.on(RoomEvent.TrackSubscribed, onAny)
         room.on(RoomEvent.TrackUnsubscribed, onAny)
+        // A remote participant withdrawing a track — most visibly, ending a
+        // screen share. Without this the tile can outlive its track and keep
+        // painting the last decoded frame.
+        room.on(RoomEvent.TrackUnpublished, onAny)
         // LiveKit's setCameraEnabled(false) mutes the track instead of
         // unpublishing it. Re-render so the avatar fallback kicks in.
         room.on(RoomEvent.TrackMuted, onAny)
@@ -570,20 +770,11 @@ export default {
         // changes so the avatar updates without a reconnect.
         room.on(RoomEvent.ParticipantMetadataChanged, onAny)
         room.on(RoomEvent.ActiveSpeakersChanged, (speakers) => {
-          // LiveKit fires this potentially many times per second; throttle so
-          // we don't re-render every tile on every micro-change. Trailing-only
-          // is fine — the latest array always wins.
-          this._pendingActiveSpeakers = (speakers || []).map((p) => p.identity)
-          if (this._activeSpeakersTimer) return
-          this._activeSpeakersTimer = setTimeout(() => {
-            this._activeSpeakersTimer = null
-            const next = this._pendingActiveSpeakers
-            if (!next) return
-            this._pendingActiveSpeakers = null
-            const prev = this.activeSpeakerIds
-            if (prev.length === next.length && prev.every((id, i) => id === next[i])) return
-            this.activeSpeakerIds = next
-          }, 200)
+          // Feed the hold window rather than mirroring LiveKit directly: it
+          // fires many times per second and drops people during the gaps
+          // between words. Highlighting is applied at once, removal waits out
+          // SPEAKER_HOLD_MS.
+          this.noteActiveSpeakers((speakers || []).map((p) => p.identity))
         })
         room.on(RoomEvent.LocalTrackPublished, () => {
           this.screenShareEnabled = !!room.localParticipant.isScreenShareEnabled
@@ -924,11 +1115,11 @@ export default {
         }
         this.room = null
       }
-      if (this._activeSpeakersTimer) {
-        clearTimeout(this._activeSpeakersTimer)
-        this._activeSpeakersTimer = null
+      if (this.speakerHoldTimer) {
+        clearTimeout(this.speakerHoldTimer)
+        this.speakerHoldTimer = null
       }
-      this._pendingActiveSpeakers = null
+      this.speakerSeenAt.clear()
       this.tiles = []
       this.activeSpeakerIds = []
       this.spotlightKey = null
