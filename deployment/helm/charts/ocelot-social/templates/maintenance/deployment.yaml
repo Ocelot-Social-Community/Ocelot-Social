@@ -20,10 +20,14 @@ spec:
         env:
           - name: HOST
             value: 0.0.0.0
-          # The support address the page shows. Same value the backend gets — the page is static, so
-          # its nginx entrypoint substitutes it into the built files at startup
-          # (maintenance/nginx/40-support-email.sh) rather than it being baked in per brand image.
-          # Unset → the vanilla ocelot address.
+          # The support address the page shows. The page is static, so its nginx entrypoint
+          # substitutes this into the built files at startup (maintenance/nginx/40-support-email.sh)
+          # rather than it being baked into a per-brand image.
+          #
+          # It follows the backend's value so the two cannot disagree. Deliberately NOT defaulted in
+          # values.yaml: with neither set, both sides already fall back to the same software default
+          # (backend/src/config/softwareDefaults.ts SUPPORT_EMAIL, mirrored in the maintenance app) —
+          # a chart-level default would add a second place to state it and a second place to forget.
           {{- with .Values.maintenance.supportEmail | default (.Values.backend.env).SUPPORT_EMAIL }}
           - name: SUPPORT_EMAIL
             value: {{ quote . }}

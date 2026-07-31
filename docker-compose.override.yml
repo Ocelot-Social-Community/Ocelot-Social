@@ -124,7 +124,7 @@ services:
       # The support address on the page. Deployment config, not branding — each network sets it in its
       # helmfile, and the brand archives deliberately carry no e-mail. `nuxt dev` reads it here; a
       # static build bakes it in (see the Dockerfile's SUPPORT_EMAIL build arg).
-      - SUPPORT_EMAIL=${SUPPORT_EMAIL:-devops@ocelot.social}
+      - SUPPORT_EMAIL=${SUPPORT_EMAIL:-hello@ocelot.social}
     volumes:
       # Hot-reload against the host sources — including whatever `npm run brand -- <name>` generated
       # there (app/assets/css/brand.css, app/constants/metadata.brand.json, app/locales/,

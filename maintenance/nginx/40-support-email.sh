@@ -20,7 +20,9 @@ set -eu
 
 PLACEHOLDER='__OCELOT_SUPPORT_EMAIL__' # keep in step with app/constants/emails.ts (guarded by a test)
 ROOT="${NGINX_ROOT:-/usr/share/nginx/html}"
-EMAIL="${SUPPORT_EMAIL:-devops@ocelot.social}"
+# Same software default as the backend (config/softwareDefaults.ts) — guarded by a test
+# against app/constants/emails.ts, which carries it for the paths nginx never sees.
+EMAIL="${SUPPORT_EMAIL:-hello@ocelot.social}"
 
 # Escape the value before it becomes part of a sed expression. RFC 5322 allows `&`, `|` and `\` in an
 # address's local part, and all three are special here: `&` stands for the whole match (so

@@ -11,9 +11,11 @@
 //                                      production: the value lives in the helm chart, so no brand
 //                                      repo has to thread a build arg through its CI.
 //
-// Neither → the vanilla address below.
+// Neither → the vanilla address below, which is the SAME software default the backend falls back to
+// (backend/src/config/softwareDefaults.ts SUPPORT_EMAIL) and the webapp ships in its .env.template.
+// An unconfigured deployment must not show a different address here than everywhere else.
 export const SUPPORT_EMAIL_PLACEHOLDER = "__OCELOT_SUPPORT_EMAIL__";
 
 export default {
-  SUPPORT_EMAIL: "devops@ocelot.social",
+  SUPPORT_EMAIL: "hello@ocelot.social",
 };
