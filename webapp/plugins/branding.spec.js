@@ -1,6 +1,8 @@
 // The mock factories create the jest.fns (they cannot reference an outer const, so we grab the same
 // fns back via these imports). jest.mock is hoisted above the imports by babel-jest, so the modules
 // resolve to the mocks below despite the source order.
+import { resolve } from 'path'
+
 import { setBranding as mockSetBranding } from '@ocelot-social/branding'
 import {
   discoverArchives as mockDiscoverArchives,
@@ -11,6 +13,10 @@ import {
 } from '@ocelot-social/branding/dist/discover.js'
 
 import brandingPlugin from './branding.js'
+
+// What the plugin resolves $OCELOT_BRANDING_ASSETS_DIR to: the sync cache is always searched FIRST
+// (it mirrors the backend, the source of truth), then the configured roots.
+const ROOTS = [resolve('.branding-cache'), '/brands']
 
 jest.mock('@ocelot-social/branding', () => ({ setBranding: jest.fn() }))
 jest.mock(
@@ -23,6 +29,10 @@ jest.mock(
     // runtime; default to 'ok' so the happy path skips the warning branch.
     checkSchemaCompat: jest.fn(() => 'ok'),
     describeSchemaCompat: jest.fn(() => ''),
+    // Real: it decides WHICH roots SSR resolves the brand from (sync cache first, then the
+    // baked/mounted archives). A stub would make that order untested here. Pure (path only, no fs).
+    cacheFirstSearchPath: jest.requireActual('@ocelot-social/branding/dist/discover.js')
+      .cacheFirstSearchPath,
   }),
   { virtual: true },
 )
@@ -80,7 +90,7 @@ describe('plugins/branding (SSR injection)', () => {
     await brandingPlugin(context)
 
     // base brand → composition map with just _default; no per-slot overrides
-    expect(mockComposeComposition).toHaveBeenCalledWith('/brands', { _default: 'nutrimind' })
+    expect(mockComposeComposition).toHaveBeenCalledWith(ROOTS, { _default: 'nutrimind' })
     expect(mockSetBranding).toHaveBeenCalledWith(config)
     const nuxtState = {}
     context.beforeNuxtRender.mock.calls[0][0]({ nuxtState })
@@ -103,7 +113,7 @@ describe('plugins/branding (SSR injection)', () => {
 
     await brandingPlugin(context)
 
-    expect(mockComposeComposition).toHaveBeenCalledWith('/brands', {
+    expect(mockComposeComposition).toHaveBeenCalledWith(ROOTS, {
       _default: 'yunite',
       identity: 'nutriminds',
     })
@@ -142,7 +152,7 @@ describe('plugins/branding (SSR injection)', () => {
 
     await brandingPlugin(context)
 
-    expect(mockComposeComposition).toHaveBeenCalledWith('/brands', {
+    expect(mockComposeComposition).toHaveBeenCalledWith(ROOTS, {
       _default: '',
       theme: 'yunite',
     })
@@ -163,10 +173,20 @@ describe('plugins/branding (SSR injection)', () => {
     expect(context.beforeNuxtRender).not.toHaveBeenCalled()
   })
 
-  it('RESETS to vanilla when no assets dir is configured', async () => {
+  // Unset is not "no branding" — the conventional locations are searched. Vanilla is the result of
+  // finding no archive there, not of an unset variable.
+  it('RESETS to vanilla when the conventional locations hold no archive', async () => {
     delete process.env.OCELOT_BRANDING_ASSETS_DIR
+    mockDiscoverArchives.mockReturnValue(new Map())
+
     await brandingPlugin(context)
+
     expect(mockSetBranding).toHaveBeenCalledWith(undefined)
+    expect(mockDiscoverArchives).toHaveBeenCalledWith([
+      resolve('.branding-cache'),
+      resolve('deployment/configurations'),
+      resolve('../deployment/configurations'),
+    ])
   })
 
   it('RESETS to vanilla on any failure (never renders a leaked brand)', async () => {
@@ -204,7 +224,7 @@ describe('plugins/branding (SSR injection)', () => {
 
       await brandingPlugin(context)
 
-      expect(mockComposeComposition).toHaveBeenCalledWith('/brands', {
+      expect(mockComposeComposition).toHaveBeenCalledWith(ROOTS, {
         _default: '',
         theme: 'stage',
       })
@@ -216,7 +236,7 @@ describe('plugins/branding (SSR injection)', () => {
 
       await brandingPlugin(context)
 
-      expect(mockComposeComposition).toHaveBeenCalledWith('/brands', { _default: 'stage' })
+      expect(mockComposeComposition).toHaveBeenCalledWith(ROOTS, { _default: 'stage' })
     })
 
     it('lets the ops pin win over the baked marker when nothing was chosen', async () => {
@@ -226,7 +246,7 @@ describe('plugins/branding (SSR injection)', () => {
 
       await brandingPlugin(context)
 
-      expect(mockComposeComposition).toHaveBeenCalledWith('/brands', { _default: 'stage' })
+      expect(mockComposeComposition).toHaveBeenCalledWith(ROOTS, { _default: 'stage' })
     })
   })
 
@@ -351,7 +371,7 @@ describe('plugins/branding (SSR injection)', () => {
       await brandingPlugin(context)
 
       expect(warn).not.toHaveBeenCalled()
-      expect(mockComposeComposition).toHaveBeenCalledWith('/brands', { _default: 'nutrimind' })
+      expect(mockComposeComposition).toHaveBeenCalledWith(ROOTS, { _default: 'nutrimind' })
     })
 
     it('treats a bound of 0 as "no bound" rather than "abort at once"', async () => {
@@ -392,7 +412,7 @@ describe('plugins/branding (SSR injection)', () => {
       await pending
 
       expect(warn).not.toHaveBeenCalled()
-      expect(mockComposeComposition).toHaveBeenCalledWith('/brands', { _default: 'nutrimind' })
+      expect(mockComposeComposition).toHaveBeenCalledWith(ROOTS, { _default: 'nutrimind' })
     })
 
     // The endpoint stays in the log (that is what makes a wrong GRAPHQL_URI visible), but nothing that
@@ -439,7 +459,7 @@ describe('plugins/branding (SSR injection)', () => {
       await brandingPlugin(context)
 
       // $OCELOT_ACTIVE_BRANDING pins 'stage' — the page stays branded, just not by the policy.
-      expect(mockComposeComposition).toHaveBeenCalledWith('/brands', { _default: 'stage' })
+      expect(mockComposeComposition).toHaveBeenCalledWith(ROOTS, { _default: 'stage' })
     })
   })
 

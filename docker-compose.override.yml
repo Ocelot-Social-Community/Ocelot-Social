@@ -13,6 +13,12 @@ services:
       - ./packages/ui:/packages/ui
       - /packages/ui/node_modules
       - ./packages/branding:/packages/branding
+      # The brand archives, at the path the code looks in by default (no env needed — see
+      # @ocelot-social/branding discover.DEFAULT_ROOTS). Build them with
+      # `npm --prefix packages/branding run build:dev-brandings`, then pick one in the admin
+      # Branding tab. READ-ONLY: the only thing the webapp writes is its sync cache, which lives in
+      # ./webapp/.branding-cache — pointing it here would have it compete with your brand builds.
+      - ./deployment/configurations:/app/deployment/configurations:ro
 
   backend:
     image: ghcr.io/ocelot-social-community/ocelot-social/backend:local-development
@@ -42,6 +48,10 @@ services:
     volumes:
       - ./backend:/app
       - ./packages/branding:/packages/branding
+      # Same archives, same default path (see the webapp service). The backend reads them only — it is
+      # where every other service acquires them from, over GET /branding/…. Pin one for the backend
+      # (its group limits / e-mail identity don't live-switch) with $OCELOT_ACTIVE_BRANDING.
+      - ./deployment/configurations:/app/deployment/configurations:ro
 
   neo4j:
     ports:

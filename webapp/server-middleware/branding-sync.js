@@ -9,11 +9,11 @@
 //
 // TWO DIRECTORIES, ONE OWNER. $OCELOT_BRANDING_ASSETS_DIR is the ordered READ search path (see
 // src/discover.ts); $OCELOT_BRANDING_CACHE_DIR is the single directory this middleware WRITES, and it
-// owns that directory exclusively — it overwrites and removes files there. Put it on the search path
-// (ahead of the baked archives, so a synced brand out-ranks them) but do NOT point it at a directory
-// anything else writes: a brand's build output, a read-only mount of archives, or the image's baked
-// `branding-assets`. It defaults to the FIRST root of the search path, which is right when that root
-// is a dedicated cache and wrong the moment it is shared.
+// owns that directory exclusively — it overwrites and removes files there. Neither needs setting:
+// both have defaults (`.branding-cache` next to the process, the conventional archive locations),
+// and the cache is always the FIRST root of the read path without being part of it, because it holds
+// the freshest copy of the source of truth. What must NOT happen is pointing the cache at a directory
+// something else writes — a brand's build output, a read-only mount, the image's baked archive.
 //
 // The local copy is a CACHE, never the source of truth. It is rebuilt from the backend on boot and
 // refreshed on a TTL; if the backend is unreachable, whatever is already on disk stays valid (a baked
@@ -26,9 +26,9 @@ const path = require('path')
 
 // eslint-disable-next-line import/no-unresolved -- package subpath, server-only (uses node:fs)
 const {
+  cacheDir: resolveCacheDir,
   discoverArchives,
   isValidBrandId,
-  resolveRoots,
 } = require('@ocelot-social/branding/dist/discover.js')
 
 // A mistyped bound must not silently disable what it configures: `Number('2s')` is NaN and a negative
@@ -59,33 +59,13 @@ let lastSync = 0
 let inFlight = null
 // Whether the one blocking boot attempt has been spent (see the middleware).
 let bootBlockSpent = false
-// Ids already reported as shadowed, and whether the "cache is off the search path" note has been made
-// — both are configuration faults that would otherwise repeat on every refresh.
+// Ids already reported as shadowed — a standing configuration fault that would otherwise be reprinted
+// on every refresh.
 const shadowWarned = new Set()
-let offPathWarned = false
 
-/**
- * The directory this middleware writes into. Explicit via $OCELOT_BRANDING_CACHE_DIR; otherwise the
- * FIRST root of the read search path, which keeps a single-directory deployment working unchanged.
- * '' (no directory at all) → nothing to mirror into.
- */
+/** The directory this middleware writes into: $OCELOT_BRANDING_CACHE_DIR, else the package default. */
 function cacheDir() {
-  const explicit = resolveRoots(process.env.OCELOT_BRANDING_CACHE_DIR)[0]
-  if (explicit) return explicit
-  return resolveRoots(process.env.OCELOT_BRANDING_ASSETS_DIR)[0] || ''
-}
-
-// A cache that is not on the read search path is written and never read — the sync appears to work
-// (files land, no error) while the app keeps rendering whatever it had. Say so once.
-function warnIfOffSearchPath(dir) {
-  if (offPathWarned) return
-  const roots = resolveRoots(process.env.OCELOT_BRANDING_ASSETS_DIR)
-  if (roots.includes(dir)) return
-  offPathWarned = true
-  // eslint-disable-next-line no-console
-  console.warn(
-    `[branding] the sync cache ${dir} is not on $OCELOT_BRANDING_ASSETS_DIR (${roots.join(path.delimiter) || 'unset'}) — mirrored archives will never be read. Add it to the search path, ahead of any baked archives.`,
-  )
+  return resolveCacheDir(process.env.OCELOT_BRANDING_CACHE_DIR)
 }
 
 function backendUrl() {
@@ -231,7 +211,6 @@ async function writeDefaultMarker(dir, id) {
 }
 
 async function sync(dir) {
-  warnIfOffSearchPath(dir)
   const base = backendUrl()
   const manifest = await withRequestTimeout(async (signal) => {
     const res = await fetch(`${base}/branding/manifest.json`, { signal })
@@ -240,10 +219,16 @@ async function sync(dir) {
   })
   if (!manifest || !Array.isArray(manifest.brands)) throw new Error('manifest: no brands array')
 
-  await fs.mkdir(dir, { recursive: true })
   // A malformed id would become a file name — reject it rather than sanitising, the backend derives
   // ids from its own archives and never legitimately produces one outside this set.
   const ids = manifest.brands.map((entry) => entry && entry.id).filter(isValidBrandId)
+  // Nothing to mirror AND nothing mirrored before → don't create the directory at all. The sync needs
+  // no configuration to run, so a VANILLA deployment reaches this point on every boot and would
+  // otherwise be left with an empty cache directory it never asked for. Guarded on the directory
+  // EXISTING rather than on the empty manifest alone: once there is a cache, an empty manifest means
+  // "the brands were removed" and has to be mirrored like any other change (the marker is cleared).
+  if (!ids.length && !isValidBrandId(manifest.default) && !(await exists(dir))) return 0
+  await fs.mkdir(dir, { recursive: true })
   await writeDefaultMarker(dir, manifest.default)
 
   const results = await Promise.allSettled(ids.map((id) => fetchArchive(base, dir, id)))
@@ -282,9 +267,9 @@ function runSync(dir) {
 }
 
 module.exports = async function brandingSync(req, res, next) {
+  // Always a directory (the package supplies the default), so the sync runs unconfigured — a vanilla
+  // backend simply answers "no brands" and nothing is written. Branding is opt-OUT, not opt-in.
   const dir = cacheDir()
-  // No cache dir configured → nothing to mirror into; the app runs on framework defaults.
-  if (!dir) return next()
 
   try {
     if (!lastSync && !bootBlockSpent) {
@@ -318,7 +303,6 @@ module.exports._reset = () => {
   inFlight = null
   bootBlockSpent = false
   shadowWarned.clear()
-  offPathWarned = false
 }
 /** Await the background refresh a warm request kicked off (no-op when none is running). */
 module.exports._flush = () => inFlight || Promise.resolve()

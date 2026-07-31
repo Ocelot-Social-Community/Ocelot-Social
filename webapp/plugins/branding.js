@@ -112,8 +112,12 @@ async function fetchBrandingPolicy(uri) {
 // (required there under a bare `process.server` guard) so no Node require lives in this always-bundled
 // function — otherwise webpack would try to resolve 'fs' for the client bundle and fail.
 async function loadServerBranding(discover, graphqlUri) {
-  const assetsDir = process.env.OCELOT_BRANDING_ASSETS_DIR
-  if (!assetsDir) return null
+  // Sync cache first, then the baked/mounted archives; neither env var needs setting (see
+  // discover.cacheFirstSearchPath) — unset means the conventional locations, not "no branding".
+  const assetsDir = discover.cacheFirstSearchPath(
+    process.env.OCELOT_BRANDING_CACHE_DIR,
+    process.env.OCELOT_BRANDING_ASSETS_DIR,
+  )
 
   // Available brands = the archives actually discovered (recursively; no static manifest to drift).
   const archives = discover.discoverArchives(assetsDir)

@@ -3,6 +3,8 @@
 // isolation with mocked branding + discover modules and a controlled env, then asserts the observable
 // behaviour: setBranding on success, and a warn/error log on the silent-fallback paths.
 
+import { resolve } from 'node:path'
+
 const BRANDING = '@ocelot-social/branding'
 const DISCOVER = '@ocelot-social/branding/dist/discover.js'
 
@@ -30,6 +32,9 @@ function loadBootstrap(mocks: LoadMocks) {
     readArchiveConfig: mocks.readArchiveConfig ?? jest.fn(() => null),
     readArchive: mocks.readArchive ?? jest.fn(() => null),
     readDefaultMarker: mocks.readDefaultMarker ?? jest.fn(() => ''),
+    // Real: it turns an unset $OCELOT_BRANDING_ASSETS_DIR into the conventional archive locations, so
+    // a stub would hide whether bootstrap still resolves a brand without configuration. Pure (paths).
+    searchPath: jest.requireActual<{ searchPath: unknown }>(DISCOVER).searchPath,
   }))
   // Mock the on-disk overlay so bootstrap doesn't write brand files into the test's real dirs.
   jest.doMock('./overlayRuntimeFiles', () => ({ overlayBrandRuntimeFiles }))
@@ -59,12 +64,31 @@ describe('branding bootstrap', () => {
     process.env = ORIGINAL_ENV
   })
 
-  it('does nothing when no assets dir is configured', () => {
+  // No env needed to find archives (the search path defaults), but a brand still has to be ACTIVE —
+  // pinned by $OCELOT_ACTIVE_BRANDING or named by a DEFAULT marker. Neither → vanilla, silently.
+  it('does nothing when no brand is active', () => {
     const discoverArchives = jest.fn()
     const { setBranding } = loadBootstrap({ discoverArchives })
     expect(discoverArchives).not.toHaveBeenCalled()
     expect(setBranding).not.toHaveBeenCalled()
     expect(warnSpy).not.toHaveBeenCalled()
+  })
+
+  // …and the marker is looked for in the conventional locations, unconfigured.
+  it('activates the brand a DEFAULT marker names without any env set', () => {
+    const archive = { file: 'acme.tar.gz', schemaVersion: '0.0.1' }
+    const config = { metadata: { applicationName: 'Acme' } }
+    const readDefaultMarker = jest.fn(() => 'acme')
+    const { setBranding } = loadBootstrap({
+      readDefaultMarker,
+      discoverArchives: jest.fn(() => new Map([['acme', archive]])),
+      readArchiveConfig: jest.fn(() => config),
+    })
+    expect(readDefaultMarker).toHaveBeenCalledWith([
+      resolve('deployment/configurations'),
+      resolve('../deployment/configurations'),
+    ])
+    expect(setBranding).toHaveBeenCalledWith(config)
   })
 
   it('injects the composed config when the active archive resolves', () => {

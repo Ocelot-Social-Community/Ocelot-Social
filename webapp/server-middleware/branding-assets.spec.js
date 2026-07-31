@@ -1,3 +1,5 @@
+import { resolve } from 'path'
+
 import {
   readDefaultMarker as mockReadDefaultMarker,
   discoverArchives as mockDiscoverArchives,
@@ -16,6 +18,10 @@ jest.mock(
     readDefaultMarker: jest.fn(() => ''),
     // The id guard is pure and security-relevant — take the REAL one (see branding-sync.spec).
     isValidBrandId: jest.requireActual('@ocelot-social/branding/dist/buckets.js').isValidBrandId,
+    // Real too: it decides WHICH roots are served (cache first, then baked/mounted), and a stub would
+    // make every root assertion below vacuous. Pure (path only, no fs).
+    cacheFirstSearchPath: jest.requireActual('@ocelot-social/branding/dist/discover.js')
+      .cacheFirstSearchPath,
   }),
   { virtual: true },
 )
@@ -48,11 +54,20 @@ describe('server-middleware/branding-assets', () => {
   })
 
   describe('pass-through to next()', () => {
-    it('when no assets dir is configured', () => {
+    // Unset is NOT "no branding": the conventional locations are searched, and only an empty result
+    // falls through. Nothing has to be configured for a deployment to serve its brands.
+    it('when nothing is configured and the conventional locations hold no archive', () => {
       delete process.env.OCELOT_BRANDING_ASSETS_DIR
-      brandingAssets({ method: 'GET', url: '/manifest.json' }, res, next)
+      mockDiscoverArchives.mockReturnValue(new Map())
+
+      brandingAssets({ method: 'GET', url: '/wir/assets/logo.svg' }, res, next)
+
       expect(next).toHaveBeenCalled()
-      expect(mockDiscoverArchives).not.toHaveBeenCalled()
+      expect(mockDiscoverArchives).toHaveBeenCalledWith([
+        resolve('.branding-cache'),
+        resolve('deployment/configurations'),
+        resolve('../deployment/configurations'),
+      ])
     })
 
     it('for non-GET/HEAD methods', () => {

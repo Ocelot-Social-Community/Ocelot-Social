@@ -121,12 +121,12 @@ describe('branding/routes', () => {
   })
 
   describe('without an assets dir (vanilla deployment)', () => {
-    // The image sets $OCELOT_BRANDING_ASSETS_DIR (see backend/Dockerfile), so a router that defaulted
+    // A deployment may set $OCELOT_BRANDING_ASSETS_DIR, so a router that defaulted
     // to it would serve archives here — and every assertion about a vanilla deployment would depend on
     // where the suite happens to run. The dir is an argument; the env is read once in server.ts.
     it('ignores an ambient $OCELOT_BRANDING_ASSETS_DIR', async () => {
       // eslint-disable-next-line n/no-process-env -- the ambient environment IS what this pins
-      process.env.OCELOT_BRANDING_ASSETS_DIR = '/app/branding-assets'
+      process.env.OCELOT_BRANDING_ASSETS_DIR = '/app/deployment/configurations'
 
       const { res } = await call(brandingRouter(undefined, deps), '/manifest.json')
 

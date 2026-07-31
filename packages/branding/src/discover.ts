@@ -104,6 +104,56 @@ export function resolveRoots(spec: string | string[] | null | undefined): string
   return roots
 }
 
+/**
+ * Where brand archives live when nothing is configured. BOTH entries are always tried, because a
+ * non-existent root costs one failed readdir and is skipped (walk swallows ENOENT) — which is what
+ * lets ONE default serve two layouts:
+ *
+ *   <cwd>/deployment/configurations      an image: the build bakes the brand's archive here
+ *   <cwd>/../deployment/configurations   a repo checkout: `yarn dev` runs from backend/ or webapp/
+ *
+ * Same directory name on both sides on purpose. The brand tree IS the archive store, so there is no
+ * second layout to learn and no env var to set before branding works. A deployment that keeps its
+ * archives elsewhere (a mounted volume, and later the S3 bucket users upload into) sets
+ * $OCELOT_BRANDING_ASSETS_DIR and replaces this list wholesale.
+ */
+export const DEFAULT_ROOTS = ['deployment/configurations', '../deployment/configurations']
+
+/**
+ * The effective search path: what was configured, or the conventional locations when nothing was.
+ * Every consumer resolves its roots through this, so "unset" means "the usual places" rather than
+ * "no branding at all".
+ */
+export function searchPath(spec: string | string[] | null | undefined): string[] {
+  const configured = resolveRoots(spec)
+  return configured.length ? configured : resolveRoots(DEFAULT_ROOTS)
+}
+
+/** Where a mirroring service keeps its copy of the archives when nothing is configured. */
+export const DEFAULT_CACHE_DIR = '.branding-cache'
+
+/** The one directory a mirroring service WRITES (see cacheFirstSearchPath), absolute. */
+export function cacheDir(spec: string | string[] | null | undefined): string {
+  return resolveRoots(spec)[0] ?? resolveRoots(DEFAULT_CACHE_DIR)[0]
+}
+
+/**
+ * The search path for a service that MIRRORS its archives from elsewhere — the webapp, which syncs
+ * them from the backend (server-middleware/branding-sync.js).
+ *
+ * The cache is FIRST and is not part of the configurable path: it holds the freshest copy of the
+ * single source of truth, so it has to out-rank anything found locally, and making its position
+ * configurable would only let a deployment break that. Everything after it is a fallback for when the
+ * backend has not answered (yet): the archive baked into the image, a mounted volume.
+ */
+export function cacheFirstSearchPath(
+  cacheSpec: string | string[] | null | undefined,
+  spec: string | string[] | null | undefined,
+): string[] {
+  // resolveRoots dedupes, so a root that repeats the cache collapses onto the cache's position.
+  return resolveRoots([cacheDir(cacheSpec), ...searchPath(spec)])
+}
+
 // Recursively collect `*.tar.gz` paths, skipping dotdirs (.git) and node_modules. Entries are walked
 // in NAME order so the traversal is reproducible: without it the winner of a full tie would follow
 // readdir order, which is filesystem- and creation-order dependent.

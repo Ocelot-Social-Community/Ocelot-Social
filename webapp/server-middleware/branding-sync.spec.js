@@ -22,9 +22,9 @@ jest.mock(
     // The id guard is pure and security-relevant — take the REAL one, so a tightening of
     // BRAND_ID_PATTERN is exercised here instead of being shadowed by a stub.
     isValidBrandId: jest.requireActual('@ocelot-social/branding/dist/buckets.js').isValidBrandId,
-    // Real too: it decides which directory is written and whether the cache is on the read path, so a
-    // stub would make both assertions vacuous. It is pure (path only, no fs).
-    resolveRoots: jest.requireActual('@ocelot-social/branding/dist/discover.js').resolveRoots,
+    // Real too: it decides WHICH directory is written, including the default when nothing is
+    // configured — a stub would make every path assertion below vacuous. Pure (path only, no fs).
+    cacheDir: jest.requireActual('@ocelot-social/branding/dist/discover.js').cacheDir,
   }),
   { virtual: true },
 )
@@ -65,8 +65,14 @@ describe('server-middleware/branding-sync', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    // clearAllMocks drops recorded CALLS, not implementations — a `mockRejectedValue` set by one test
+    // would otherwise make every later test see a failing filesystem. Restore the happy path here so
+    // no test depends on the order it runs in.
+    for (const fn of [fs.mkdir, fs.writeFile, fs.rename, fs.unlink, fs.access]) {
+      fn.mockResolvedValue(undefined)
+    }
     brandingSync._reset()
-    process.env.OCELOT_BRANDING_ASSETS_DIR = '/cache'
+    process.env.OCELOT_BRANDING_CACHE_DIR = '/cache'
     process.env.GRAPHQL_URI = 'http://backend:4000'
     warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
   })
@@ -82,15 +88,46 @@ describe('server-middleware/branding-sync', () => {
     delete process.env.OCELOT_BRANDING_SYNC_TIMEOUT_MS
   })
 
-  it('does nothing without a cache dir configured', async () => {
+  // Branding is opt-OUT: unconfigured, the sync still runs and mirrors into the default cache. A
+  // vanilla backend simply answers "no brands" (covered below), so nothing is written.
+  it('runs unconfigured, mirroring into the default cache dir', async () => {
     delete process.env.OCELOT_BRANDING_ASSETS_DIR
     delete process.env.OCELOT_BRANDING_CACHE_DIR
-    global.fetch = jest.fn()
+    global.fetch = jest
+      .fn()
+      .mockResolvedValueOnce(jsonResponse(MANIFEST))
+      .mockResolvedValueOnce(archiveResponse('tarbytes'))
 
     const next = await run()
 
-    expect(global.fetch).not.toHaveBeenCalled()
+    expect(fs.rename).toHaveBeenCalledWith(
+      expect.stringMatching(/\.tmp$/),
+      path.resolve('.branding-cache', 'stage.tar.gz'),
+    )
     expect(next).toHaveBeenCalled()
+  })
+
+  // Running unconfigured means every vanilla deployment reaches the sync on boot; it must not leave a
+  // directory behind for a brand set that is empty and was always empty.
+  it('creates no cache directory when there is nothing to mirror and none exists', async () => {
+    fs.access.mockRejectedValue(Object.assign(new Error('ENOENT'), { code: 'ENOENT' }))
+    global.fetch = jest.fn().mockResolvedValue(jsonResponse({ default: '', brands: [] }))
+
+    await run()
+
+    expect(fs.mkdir).not.toHaveBeenCalled()
+    expect(fs.unlink).not.toHaveBeenCalled()
+  })
+
+  // …but once a cache exists, an empty manifest is a CHANGE ("the brands were removed") and has to be
+  // mirrored like any other, marker included.
+  it('still clears the marker when a cache exists and the brands are gone', async () => {
+    global.fetch = jest.fn().mockResolvedValue(jsonResponse({ default: '', brands: [] }))
+
+    await run()
+
+    expect(fs.mkdir).toHaveBeenCalledWith('/cache', { recursive: true })
+    expect(fs.unlink).toHaveBeenCalledWith('/cache/DEFAULT')
   })
 
   it('mirrors every archive the backend lists into the cache dir', async () => {
@@ -367,38 +404,20 @@ describe('server-middleware/branding-sync', () => {
     expect(fs.writeFile).not.toHaveBeenCalled()
   })
 
-  // The cache is the ONE directory this middleware writes; everything else it reads is someone else's.
-  describe('cache directory', () => {
-    it('writes to $OCELOT_BRANDING_CACHE_DIR rather than the first search-path root', async () => {
-      process.env.OCELOT_BRANDING_ASSETS_DIR = `/cache${path.delimiter}/baked`
-      process.env.OCELOT_BRANDING_CACHE_DIR = '/cache'
-      global.fetch = jest
-        .fn()
-        .mockResolvedValueOnce(jsonResponse(MANIFEST))
-        .mockResolvedValueOnce(archiveResponse('tarbytes'))
+  // The cache is the ONE directory this middleware writes, and the READ search path never decides
+  // where that is — the two are deliberately independent.
+  it('writes to $OCELOT_BRANDING_CACHE_DIR, not to a root of the read search path', async () => {
+    process.env.OCELOT_BRANDING_ASSETS_DIR = `/baked${path.delimiter}/mounted`
+    process.env.OCELOT_BRANDING_CACHE_DIR = '/cache'
+    global.fetch = jest
+      .fn()
+      .mockResolvedValueOnce(jsonResponse(MANIFEST))
+      .mockResolvedValueOnce(archiveResponse('tarbytes'))
 
-      await run()
+    await run()
 
-      expect(fs.rename).toHaveBeenCalledWith(expect.stringMatching(/\.tmp$/), '/cache/stage.tar.gz')
-      expect(warn).not.toHaveBeenCalled()
-    })
-
-    // Written and never read: the files land, no error is raised, and the app keeps rendering whatever
-    // it had — the failure mode a silent misconfiguration would produce.
-    it('warns once when the cache is not on the read search path', async () => {
-      process.env.OCELOT_BRANDING_ASSETS_DIR = '/baked'
-      process.env.OCELOT_BRANDING_CACHE_DIR = '/elsewhere'
-      global.fetch = jest.fn().mockResolvedValue(jsonResponse({ default: '', brands: [] }))
-
-      await run()
-      process.env.OCELOT_BRANDING_SYNC_TTL_MS = '0'
-      await run()
-      await brandingSync._flush()
-
-      const offPath = warn.mock.calls.filter((c) => String(c[0]).includes('is not on'))
-      expect(offPath).toHaveLength(1)
-      expect(offPath[0][0]).toContain('/elsewhere')
-    })
+    expect(fs.rename).toHaveBeenCalledWith(expect.stringMatching(/\.tmp$/), '/cache/stage.tar.gz')
+    expect(warn).not.toHaveBeenCalled()
   })
 
   // Precedence is settled by the search path now (discover.ts), so nothing is deleted to make room —

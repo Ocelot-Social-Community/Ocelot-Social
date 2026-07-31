@@ -50,16 +50,17 @@ RUN mkdir -p /app
 WORKDIR /app
 COPY --from=ui-library ./app/ /packages/ui/
 COPY --from=branding-runtime ./app/ /packages/branding/
-# Brand archives (`<id>.tar.gz`) + the default marker (DEFAULT) are READ from an ordered search path
-# (`:`-separated, like $PATH — an earlier root shadows a later one per brand id) and WRITTEN to exactly
-# one directory, the sync cache. Split on purpose: the cache is owned and overwritten by
-# server-middleware/branding-sync.js, while /app/branding-assets holds what the image BAKED
-# (--build-arg BRAND=<name>; empty on a vanilla image → framework defaults) and may be mounted
-# read-only. Cache first, so a brand synced from the backend out-ranks the baked copy WITHOUT anything
-# being deleted to make room for it. Ops can prepend/append further roots (a mounted volume of
-# archives); keep the cache on the path or the sync is written and never read.
-ENV OCELOT_BRANDING_CACHE_DIR="/app/branding-cache"
-ENV OCELOT_BRANDING_ASSETS_DIR="/app/branding-cache:/app/branding-assets"
+# No branding env is set here, deliberately — the code defaults cover this image AND a repo checkout
+# (see @ocelot-social/branding discover.DEFAULT_ROOTS / DEFAULT_CACHE_DIR):
+#   ./.branding-cache            WRITTEN by server-middleware/branding-sync.js, which owns it alone;
+#                                always the FIRST place read, because it mirrors the backend — the
+#                                single source of truth for which brands exist.
+#   ./deployment/configurations  READ-only fallback: what a branded build BAKED in (see ONBUILD), used
+#                                until the first sync lands, so the image never flashes vanilla when
+#                                the backend is slow or down. Absent on a vanilla image.
+# Ops replace the read side with $OCELOT_BRANDING_ASSETS_DIR (`:`-separated, an earlier root shadows a
+# later one per brand id) and move the cache with $OCELOT_BRANDING_CACHE_DIR. The cache stays first
+# either way; it is not part of the configurable path.
 CMD ["/bin/bash", "-c", "yarn run start"]
 
 FROM base AS development
@@ -79,11 +80,17 @@ COPY webapp/ .
 # webpack/babel cache for incremental rebuilds when the webapp source itself changes.)
 RUN --mount=type=cache,target=/app/node_modules/.cache,sharing=locked \
     yarn run build
-# Per-brand, AFTER the cached build: bake <id>.tar.gz + DEFAULT marker into ./branding-assets. The app
-# applies colours/logos/title/OG/manifest/static pages/locales (and the backend's e-mail/public
-# overlays) at RUNTIME from that archive, so the nuxt bundle above stays brand-agnostic and cached.
-# The builder is copied in AFTER the nuxt build so it cannot invalidate that expensive cached layer;
-# it stays in this stage only — `production` is FROM base + COPY /build and never inherits it.
+# Per-brand, AFTER the cached build: bake <id>.tar.gz + DEFAULT marker into ./deployment/configurations
+# — the discovery root, named exactly as in a repo checkout so the running code finds it without being
+# told where to look. The app applies colours/logos/title/OG/manifest/static pages/locales at RUNTIME
+# from that archive, so the nuxt bundle above stays brand-agnostic and cached. The builder is copied in
+# AFTER the nuxt build so it cannot invalidate that expensive cached layer; it stays in this stage only
+# — `production` is FROM base + COPY /build and never inherits it.
+#
+# The baked copy is a FALLBACK, not the delivery route: at runtime the webapp mirrors the backend's
+# archives into its cache, which precedes this directory on the search path, so the synced brand always
+# wins and the baked one only covers the window before the first successful sync. That is its whole
+# purpose — a brand image must never render vanilla because the backend is slow or down.
 COPY --from=branding-tools ./app/ /brand-tools/
 # Path 1 — MONOREPO build (docker compose, ocelot's own branded images): the brand's TYPED config is
 # read from deployment/configurations/<BRAND>, bind-mounted so no brand data lands in a layer. Pick it
@@ -91,23 +98,30 @@ COPY --from=branding-tools ./app/ /brand-tools/
 ARG BRAND=""
 RUN --mount=type=bind,source=deployment/configurations,target=/brands \
     if [ -n "$BRAND" ] && ls "/brands/$BRAND/branding/brand.config."* >/dev/null 2>&1; then \
-      node /brand-tools/scripts/build-brand-archive.ts "/brands/$BRAND/branding" ./branding-assets --default && \
+      node /brand-tools/scripts/build-brand-archive.ts "/brands/$BRAND/branding" ./deployment/configurations --default && \
       echo "[branding] baked brand: $BRAND"; \
     else \
       echo "[branding] BRAND unset/unknown ('$BRAND') — vanilla ocelot.social"; \
     fi
-# A brand repo doing `FROM webapp-build` gets NO archive baked in — deliberately. The running webapp
-# acquires the archives (and the DEFAULT marker) from the backend over GET /branding/… and mirrors
-# them into $OCELOT_BRANDING_CACHE_DIR (server-middleware/branding-sync.js), so a brand is deployed in
-# ONE place: the backend. A baked copy is no longer a hazard — the cache root precedes
-# /app/branding-assets on the search path, so the synced archive wins without the baked one being
-# touched — but a second copy is still a second thing to keep in step, which is why this stays out.
+# Path 2 — BRAND REPO build (`FROM webapp-build`, context = brand repo root): same bake, from the
+# repo's own ./branding/. ONBUILD because only ONBUILD re-runs in the child build. The `[g]` glob makes
+# the copy optional, so ocelot's own vanilla self-build (no ./branding/) skips it — the same idiom the
+# backend uses.
 #
-# The assembly below still has to be ONBUILD: only ONBUILD triggers re-run in the child build, and a
-# plain RUN would leave the brand image with the /build that ocelot CI assembled.
+# This is what keeps a brand image branded on its own: without it the webapp would start vanilla and
+# only become branded once the backend answered, which is exactly the flash a down backend turns
+# permanent. The second copy costs a stale-archive risk, and that is contained by the search path: the
+# cache out-ranks this directory the moment a sync lands, so a brand that changed only ever shows the
+# baked version until the backend has been reached — never after.
+ONBUILD COPY brandin[g]/ /brand/
+ONBUILD RUN if ls /brand/brand.config.* >/dev/null 2>&1; then \
+      node /brand-tools/scripts/build-brand-archive.ts /brand ./deployment/configurations --default; \
+    else echo "[branding] no typed brand.config — runtime archive skipped (vanilla)"; fi
+# The assembly below also has to be ONBUILD: a plain RUN would leave the brand image with the /build
+# that ocelot CI assembled.
 ONBUILD RUN mkdir /build && \
     cp -r ./.nuxt ./nuxt.config.js ./config ./constants ./static ./locales ./server-middleware ./package.json ./yarn.lock ./scripts /build && \
-    if [ -d ./branding-assets ]; then cp -r ./branding-assets /build/branding-assets; fi
+    if [ -d ./deployment ]; then cp -r ./deployment /build/deployment; fi
 ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     cd /build && yarn install --production=true --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 

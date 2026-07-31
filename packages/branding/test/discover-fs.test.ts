@@ -9,12 +9,15 @@ import { delimiter, join, resolve } from 'node:path'
 import { after, describe, test } from 'node:test'
 
 import {
+  cacheDir,
+  cacheFirstSearchPath,
   composeComposition,
   discoverArchives,
   readArchive,
   readArchiveConfig,
   readDefaultMarker,
   resolveRoots,
+  searchPath,
 } from '../dist/discover.js'
 import { writeTarGz } from '../dist/tar.js'
 
@@ -225,6 +228,50 @@ describe('search path', () => {
     // Once the sync mirrors the backend's default, it wins.
     writeFileSync(join(cache, 'DEFAULT'), 'synced\n')
     assert.equal(readDefaultMarker([cache, baked]), 'synced')
+  })
+
+  // Nothing has to be configured for branding to work: the same directory name is used in an image
+  // (baked next to the app) and in a repo checkout (one level up), and both are always tried — a root
+  // that does not exist costs one failed readdir.
+  test('searchPath falls back to the conventional locations, and a configured path replaces them', () => {
+    assert.deepEqual(searchPath(''), [
+      resolve('deployment/configurations'),
+      resolve('../deployment/configurations'),
+    ])
+    assert.deepEqual(searchPath(undefined), searchPath(''))
+    assert.deepEqual(searchPath('/mnt/brands'), [resolve('/mnt/brands')])
+  })
+
+  // The cache mirrors the backend — the single source of truth for which brands exist — so it has to
+  // out-rank anything found locally, and its position is deliberately NOT configurable.
+  test('cacheFirstSearchPath puts the cache first, whatever the read path says', () => {
+    assert.deepEqual(cacheFirstSearchPath('', ''), [
+      resolve('.branding-cache'),
+      resolve('deployment/configurations'),
+      resolve('../deployment/configurations'),
+    ])
+    assert.deepEqual(cacheFirstSearchPath('/var/cache', '/mnt/brands'), [
+      resolve('/var/cache'),
+      resolve('/mnt/brands'),
+    ])
+    // A read path that repeats the cache does not demote it — dedupe keeps the first position.
+    assert.deepEqual(cacheFirstSearchPath('/var/cache', `/mnt/brands${delimiter}/var/cache`), [
+      resolve('/var/cache'),
+      resolve('/mnt/brands'),
+    ])
+    assert.equal(cacheDir(''), resolve('.branding-cache'))
+    assert.equal(cacheDir('/var/cache'), resolve('/var/cache'))
+  })
+
+  test('the cache genuinely shadows a baked archive of the same id', () => {
+    const cache = tmp()
+    const baked = tmp()
+    writeArchive(cache, 'acme.tar.gz', { id: 'acme', version: '1.0.0', primary: 'synced' })
+    writeArchive(baked, 'acme.tar.gz', { id: 'acme', version: '2.0.0', primary: 'baked' })
+
+    const found = discoverArchives(cacheFirstSearchPath(cache, baked))
+
+    assert.equal(readArchiveConfig(found.get('acme').file).theme.cssVars['color-primary'], 'synced')
   })
 
   test('composeComposition resolves slots across roots', () => {
