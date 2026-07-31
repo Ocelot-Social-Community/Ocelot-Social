@@ -29,6 +29,7 @@ const {
   cacheDir: resolveCacheDir,
   discoverArchives,
   isValidBrandId,
+  resolveRoots,
 } = require('@ocelot-social/branding/dist/discover.js')
 
 // A mistyped bound must not silently disable what it configures: `Number('2s')` is NaN and a negative
@@ -62,10 +63,24 @@ let bootBlockSpent = false
 // Ids already reported as shadowed — a standing configuration fault that would otherwise be reprinted
 // on every refresh.
 const shadowWarned = new Set()
+// Same reason: a mistyped cache dir is a standing fault, and this runs per request.
+let multiPathWarned = false
 
 /** The directory this middleware writes into: $OCELOT_BRANDING_CACHE_DIR, else the package default. */
 function cacheDir() {
-  return resolveCacheDir(process.env.OCELOT_BRANDING_CACHE_DIR)
+  const configured = process.env.OCELOT_BRANDING_CACHE_DIR
+  // The cache has ONE destination, so resolveCacheDir keeps only the first entry. Its neighbour
+  // $OCELOT_BRANDING_ASSETS_DIR *is* a `:`-separated search path, which makes pasting a multi-path
+  // value in here easy — and silently half-effective. Say it once rather than let the extra paths
+  // look configured.
+  if (!multiPathWarned && resolveRoots(configured).length > 1) {
+    multiPathWarned = true
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[branding] $OCELOT_BRANDING_CACHE_DIR is one directory, not a search path — using ${resolveCacheDir(configured)} and ignoring the rest of "${configured}".`,
+    )
+  }
+  return resolveCacheDir(configured)
 }
 
 function backendUrl() {
@@ -341,6 +356,7 @@ module.exports._reset = () => {
   inFlight = null
   bootBlockSpent = false
   shadowWarned.clear()
+  multiPathWarned = false
 }
 /** Await the background refresh a warm request kicked off (no-op when none is running). */
 module.exports._flush = () => inFlight || Promise.resolve()

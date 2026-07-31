@@ -132,7 +132,16 @@ export function searchPath(spec: string | string[] | null | undefined): string[]
 /** Where a mirroring service keeps its copy of the archives when nothing is configured. */
 export const DEFAULT_CACHE_DIR = '.branding-cache'
 
-/** The one directory a mirroring service WRITES (see cacheFirstSearchPath), absolute. */
+/**
+ * The one directory a mirroring service WRITES (see cacheFirstSearchPath), absolute.
+ *
+ * ONE, not a search path: a mirror has a single destination, so only the FIRST entry of `spec` is
+ * used and any further ones are ignored. That is worth knowing because the neighbouring variable
+ * ($OCELOT_BRANDING_ASSETS_DIR) IS delimiter-separated, which makes pasting a multi-path value in
+ * here an easy mistake — the extra paths then do nothing. Callers that read this from configuration
+ * should say so when it happens; the webapp middleware does, once per process, because this function
+ * itself runs per request and is not a place to log from.
+ */
 export function cacheDir(spec: string | string[] | null | undefined): string {
   return resolveRoots(spec)[0] ?? resolveRoots(DEFAULT_CACHE_DIR)[0]
 }

@@ -26,6 +26,7 @@ jest.mock(
     // Real too: it decides WHICH directory is written, including the default when nothing is
     // configured — a stub would make every path assertion below vacuous. Pure (path only, no fs).
     cacheDir: jest.requireActual('@ocelot-social/branding/dist/discover.js').cacheDir,
+    resolveRoots: jest.requireActual('@ocelot-social/branding/dist/discover.js').resolveRoots,
   }),
   { virtual: true },
 )
@@ -404,6 +405,33 @@ describe('server-middleware/branding-sync', () => {
 
     expect(next).toHaveBeenCalled()
     expect(fs.writeFile).not.toHaveBeenCalled()
+  })
+
+  // $OCELOT_BRANDING_ASSETS_DIR next door IS a `:`-separated search path, so pasting a multi-path
+  // value into the cache variable is an easy slip — and one that half-works, since only the first
+  // entry is ever used.
+  it('warns once when the cache dir is given as a search path', async () => {
+    process.env.OCELOT_BRANDING_CACHE_DIR = `/cache${path.delimiter}/also-cache`
+    global.fetch = jest.fn().mockResolvedValue(jsonResponse({ default: '', brands: [] }))
+
+    await run()
+    process.env.OCELOT_BRANDING_SYNC_TTL_MS = '0'
+    await run()
+    await brandingSync._flush()
+
+    const notes = warn.mock.calls.filter((c) =>
+      String(c[0]).includes('one directory, not a search'),
+    )
+    expect(notes).toHaveLength(1)
+    expect(notes[0][0]).toContain('/cache')
+  })
+
+  it('says nothing for a single cache dir', async () => {
+    global.fetch = jest.fn().mockResolvedValue(jsonResponse({ default: '', brands: [] }))
+
+    await run()
+
+    expect(warn).not.toHaveBeenCalled()
   })
 
   // The cache MIRRORS the backend, so a brand removed there has to disappear here too — otherwise
