@@ -340,12 +340,21 @@ describe('build-maintenance-branding', () => {
     assert.match(stderr, /entry not in archive: assets\/nowhere\.woff2/)
     assert.match(stderr, /entry not in archive: assets\/nowhere\.svg/)
     assert.match(readText(to, 'app/assets/css/brand.css'), /--color-primary: teal;/)
-    // No logo copied → the overlay names none, so app.vue keeps the vanilla one.
     const meta = readJson(to, 'app/constants/metadata.brand.json') as unknown as Record<
       string,
       string
     >
-    assert.equal(meta.LOGO, undefined)
+    // A present overlay key WINS, so one the brand cannot back with a file must be ABSENT, not null —
+    // null would blank the vanilla value out instead of falling back to it.
+    assert.ok(!('LOGO' in meta))
+    assert.ok(!('OG_IMAGE' in meta))
+    // …and the dimensions go with it: describing the vanilla image with the brand's numbers would be
+    // a WRONG link preview rather than a missing one.
+    for (const key of ['OG_IMAGE_ALT', 'OG_IMAGE_WIDTH', 'OG_IMAGE_HEIGHT', 'OG_IMAGE_TYPE']) {
+      assert.ok(!(key in meta), `expected ${key} to be omitted`)
+    }
+    // What the brand CAN back is still there.
+    assert.equal(meta.APPLICATION_NAME, 'Gap')
   })
 
   // A brand may point at a font it serves itself (a CDN). There is nothing to copy out of the archive

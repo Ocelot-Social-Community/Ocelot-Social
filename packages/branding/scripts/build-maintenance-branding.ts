@@ -160,6 +160,13 @@ function serveImage(namespaced: string, label: string): string | null {
 
 const logoUrl = serveImage(config.logos.signupPath, 'logo')
 const ogImageUrl = serveImage(config.metadata.ogImage, 'og image')
+// The composed ogImage is a `/branding/<id>/…` path — served by the live webapp, never by this static
+// site — so it has to become the copy just made. Falling back to the logo covers the usual case, where
+// a brand sets no separate OG image and the build derived it from the squared logo. null means the
+// brand referenced an image it does not ship: see the omission below.
+const ogImage =
+  ogImageUrl ??
+  (config.metadata.ogImage.startsWith(`/branding/${id}/`) ? logoUrl : config.metadata.ogImage)
 
 // --- 4. Metadata: identity + OG for the <head>, as an overlay the app deep-merges ------------------
 // `config` is fully merged, so every field is present (the ocelot vanilla defaults when the brand
@@ -176,13 +183,19 @@ writeFileSync(
       ORGANIZATION_JURISDICTION: m.organizationJurisdiction,
       // Browser-chrome colour = the brand's primary colour (no separate metadata.themeColor field).
       THEME_COLOR: resolveThemeColor(cssVars),
-      // The composed ogImage is a `/branding/<id>/…` path — served by the live webapp, never by this
-      // static site. Use the copy just made; only an external/absolute URL passes through as-is.
-      OG_IMAGE: ogImageUrl ?? (m.ogImage.startsWith(`/branding/${id}/`) ? logoUrl : m.ogImage),
-      OG_IMAGE_ALT: m.ogImageAlt,
-      OG_IMAGE_WIDTH: m.ogImageWidth,
-      OG_IMAGE_HEIGHT: m.ogImageHeight,
-      OG_IMAGE_TYPE: m.ogImageType,
+      // An overlay key that is present WINS, so a value the brand cannot back with a file must be
+      // omitted rather than written as null — null would blank out the vanilla one. The OG fields go
+      // in as a SET for the same reason: keeping the brand's dimensions while the image fell back to
+      // vanilla would describe the wrong picture, which is worse than describing none.
+      ...(ogImage
+        ? {
+            OG_IMAGE: ogImage,
+            OG_IMAGE_ALT: m.ogImageAlt,
+            OG_IMAGE_WIDTH: m.ogImageWidth,
+            OG_IMAGE_HEIGHT: m.ogImageHeight,
+            OG_IMAGE_TYPE: m.ogImageType,
+          }
+        : {}),
       ...(logoUrl ? { LOGO: logoUrl } : {}),
     },
     null,
