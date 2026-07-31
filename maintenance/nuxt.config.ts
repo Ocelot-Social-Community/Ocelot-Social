@@ -24,6 +24,15 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   ssr: false,
+  runtimeConfig: {
+    public: {
+      // Deployment config, not branding — the backend and webapp read $SUPPORT_EMAIL at runtime and
+      // each network sets it in its helmfile. This page is static (nginx serves it when everything
+      // else is down), so there is no runtime env to read: the value is frozen in at BUILD time.
+      // Empty → app.vue falls back to the vanilla address in constants/emails.ts.
+      supportEmail: process.env.SUPPORT_EMAIL ?? "",
+    },
+  },
   devServer: { host: "0.0.0.0" },
   modules: ["@nuxt/eslint", "@nuxtjs/i18n"],
   css: [

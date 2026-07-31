@@ -37,7 +37,10 @@ import metadata from "~/constants/metadata";
 
 const { t } = useI18n();
 
-const supportEmail = emails.SUPPORT_EMAIL;
+// $SUPPORT_EMAIL as baked in at build time (see nuxt.config.ts), else the vanilla address. It is
+// deployment config rather than branding, so it does NOT come from the brand archive.
+const supportEmail =
+  useRuntimeConfig().public.supportEmail || emails.SUPPORT_EMAIL;
 // From the metadata, not hard-coded: a brand's logo has its own filename and extension, and the
 // generator points LOGO at the copy it serves from /img/brand/ (vanilla → /img/custom/…).
 const logoUrl = metadata.LOGO;

@@ -60,6 +60,11 @@ RUN --mount=type=bind,source=deployment/configurations,target=/brands \
       node /brand-tools/scripts/build-maintenance-branding.ts "/brands/$BRAND/branding" /app && \
       echo "[maintenance] baked brand: $BRAND"; \
     fi
+# The support address shown on the page. Deployment config, not branding (the backend/webapp read
+# $SUPPORT_EMAIL at runtime; a static page has to bake it in) — pass it with
+# `--build-arg SUPPORT_EMAIL=support@example.org`; unset keeps the vanilla ocelot address.
+ARG SUPPORT_EMAIL=""
+ENV SUPPORT_EMAIL=${SUPPORT_EMAIL}
 ENV NODE_ENV=development
 EXPOSE 3000
 CMD ["npx", "nuxt", "dev"]
@@ -97,6 +102,11 @@ ONBUILD COPY brandin[g]/ /brand/
 ONBUILD RUN if [ -f /brand/brand.config.ts ] || [ -f /brand/brand.config.mjs ]; then \
       node /brand-tools/scripts/build-maintenance-branding.ts /brand /app; \
     else echo "[maintenance] no typed brand.config — vanilla ocelot.social"; fi
+# The support address shown on the page: deployment config, not branding (backend and webapp read
+# $SUPPORT_EMAIL at runtime, a static page has to bake it in). ONBUILD, because the value belongs to
+# the DOWNSTREAM build — `--build-arg SUPPORT_EMAIL=support@example.org`; unset keeps the vanilla
+# ocelot address. No ENV needed: a build ARG is already in the environment of the RUN below.
+ONBUILD ARG SUPPORT_EMAIL=""
 ONBUILD RUN npx nuxt generate
 
 # ==============================================================================

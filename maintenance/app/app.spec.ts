@@ -2,6 +2,7 @@ import { mountSuspended } from "@nuxt/test-utils/runtime";
 import { describe, expect, it } from "vitest";
 
 import App from "./app.vue";
+import emails from "./constants/emails";
 import metadata from "./constants/metadata";
 
 describe("app", () => {
@@ -15,11 +16,27 @@ describe("app", () => {
     expect(wrapper.text()).toContain("scheduled maintenance");
   });
 
-  it("renders support email link", async () => {
+  // The address is deployment config baked in at build time ($SUPPORT_EMAIL → runtimeConfig), NOT
+  // branding — no brand archive carries an e-mail. Unset, the vanilla constant answers.
+  it("renders the vanilla support email when none is configured", async () => {
     const wrapper = await mountSuspended(App);
-    const link = wrapper.find('a[href="mailto:devops@ocelot.social"]');
+    const link = wrapper.find(`a[href="mailto:${emails.SUPPORT_EMAIL}"]`);
     expect(link.exists()).toBe(true);
-    expect(link.text()).toBe("devops@ocelot.social");
+    expect(link.text()).toBe(emails.SUPPORT_EMAIL);
+  });
+
+  it("prefers the configured support email over the vanilla one", async () => {
+    const config = useRuntimeConfig();
+    const original = config.public.supportEmail;
+    config.public.supportEmail = "support@example.org";
+    try {
+      const wrapper = await mountSuspended(App);
+      const link = wrapper.find('a[href="mailto:support@example.org"]');
+      expect(link.exists()).toBe(true);
+      expect(link.text()).toBe("support@example.org");
+    } finally {
+      config.public.supportEmail = original;
+    }
   });
 
   it("renders the logo the metadata names", async () => {
