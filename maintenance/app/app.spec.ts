@@ -2,6 +2,7 @@ import { mountSuspended } from "@nuxt/test-utils/runtime";
 import { describe, expect, it } from "vitest";
 
 import App from "./app.vue";
+import metadata from "./constants/metadata";
 
 describe("app", () => {
   it("renders maintenance heading", async () => {
@@ -21,11 +22,13 @@ describe("app", () => {
     expect(link.text()).toBe("devops@ocelot.social");
   });
 
-  it("renders logo", async () => {
+  it("renders the logo the metadata names", async () => {
     const wrapper = await mountSuspended(App);
     const img = wrapper.find("img.logo");
     expect(img.exists()).toBe(true);
-    expect(img.attributes("src")).toBe("/img/custom/logo-squared.svg");
+    // Against metadata.LOGO, not a literal: a brand overlay repoints it at its own file, and this
+    // suite has to pass on a branded working copy too. Vanilla LOGO is /img/custom/logo-squared.svg.
+    expect(img.attributes("src")).toBe(metadata.LOGO);
   });
 
   it("renders OsCard component", async () => {

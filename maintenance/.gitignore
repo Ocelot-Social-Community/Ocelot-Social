@@ -9,6 +9,15 @@ dist
 # Node dependencies
 node_modules
 
+# Branding artifacts (build-maintenance-branding.ts). Every one of them is GENERATED and optional:
+# the app loads each as an overlay and renders vanilla without it, so branding never shows up as a
+# change to a committed file and `npm run brand:reset` just deletes these.
+app/assets/css/brand.css
+app/constants/metadata.brand.json
+app/locales
+public/img/brand
+public/fonts/brand
+
 # Logs
 logs
 *.log

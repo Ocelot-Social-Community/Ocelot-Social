@@ -38,7 +38,9 @@ import metadata from "~/constants/metadata";
 const { t } = useI18n();
 
 const supportEmail = emails.SUPPORT_EMAIL;
-const logoUrl = "/img/custom/logo-squared.svg";
+// From the metadata, not hard-coded: a brand's logo has its own filename and extension, and the
+// generator points LOGO at the copy it serves from /img/brand/ (vanilla → /img/custom/…).
+const logoUrl = metadata.LOGO;
 
 const pageTitle = computed(() => t("maintenance.title", metadata));
 

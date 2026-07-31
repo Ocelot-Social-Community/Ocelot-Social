@@ -11,7 +11,9 @@
     "postinstall": "nuxt prepare",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "brand": "node tools/brand.mjs",
+    "brand:reset": "node tools/brand.mjs --reset"
   },
   "dependencies": {
     "@nuxtjs/i18n": "^10.4.0",

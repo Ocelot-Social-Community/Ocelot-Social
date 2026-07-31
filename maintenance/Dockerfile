@@ -47,9 +47,11 @@ COPY maintenance/ .
 # ==============================================================================
 FROM base AS development
 # Bake the selected brand (same as the build stage) so `docker compose up` shows the branded
-# maintenance page in dev too. NOTE: the compose override must NOT bind-mount ./maintenance/app,
-# otherwise the mounted vanilla sources shadow the baked branding. BRAND is passed through from the
-# compose build args (default yunite.me via ${MAINTENANCE_BRAND}); empty = vanilla.
+# maintenance page in dev too. NOTE: a bind mount REPLACES the directory it covers, so the compose
+# override's ./maintenance/app + ./maintenance/public mounts hide anything baked here — with those
+# mounts in place, brand on the host instead (`npm run brand -- <name>` in maintenance/, same
+# generator, no rebuild). BRAND is passed through from the compose build args (default yunite.me via
+# ${MAINTENANCE_BRAND}); empty = vanilla.
 ARG BRAND=""
 # Bind-mount the brand configs only for THIS step (BuildKit) so no brand data — least of all the
 # other, non-selected brands — is baked into the dev image layer. Read-only: the generator only reads.
@@ -67,10 +69,11 @@ CMD ["npx", "nuxt", "dev"]
 # ==============================================================================
 FROM base AS build
 # Branding is baked at build time from a brand's TYPED config under deployment/configurations/<BRAND>
-# — the generator derives the maintenance colours (:root in branding.css), logo and metadata from it,
-# so a brand defines colours + logo ONCE and both the live app and the maintenance page follow.
-# NOTHING is copied into the committed maintenance/ project; the overlay happens only in this
-# ephemeral build stage. Pick the brand with `--build-arg BRAND=<name>` (a directory name under
+# — the generator derives the maintenance colours, web fonts, logo, metadata and `maintenance` strings
+# from it, so a brand defines each ONCE and both the live app and the maintenance page follow. It
+# writes only NEW files (app/assets/css/brand.css, app/constants/metadata.brand.json, app/locales/,
+# public/img|fonts/brand/), each loaded as an optional overlay — no committed source is edited, here
+# or in a working copy. Pick the brand with `--build-arg BRAND=<name>` (a directory name under
 # deployment/configurations/); empty = vanilla ocelot.social.
 # Path 1 — MONOREPO build (docker compose, ocelot's own branded images).
 ARG BRAND=""
@@ -86,8 +89,8 @@ RUN --mount=type=bind,source=deployment/configurations,target=/brands \
 
 # Path 2 — TWO-REPO build (a brand repo doing `FROM maintenance-build`, context = brand repo root, the
 # brand in ./branding/, no BRAND arg). Only ONBUILD triggers re-run downstream, so both the bake and
-# `nuxt generate` must be ONBUILD: the generator rewrites branding.css / logo assets / metadata.ts IN
-# THE SOURCES, so generating before it would freeze the vanilla theme into the static output. Unlike
+# `nuxt generate` must be ONBUILD: nuxt.config.ts decides at BUILD time which overlays exist, so
+# generating before the bake would freeze the vanilla theme into the static output. Unlike
 # webapp there is no runtime fallback — the output is static files served by nginx, and the page is
 # shown precisely when the backend is unreachable, so its branding cannot be fetched at runtime.
 ONBUILD COPY brandin[g]/ /brand/
