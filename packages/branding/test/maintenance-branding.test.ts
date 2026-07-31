@@ -1,10 +1,12 @@
 // The maintenance-page generator (scripts/build-maintenance-branding.ts), run END TO END as the
-// Dockerfile and `npm run brand` run it: a real brand dir in, a real maintenance tree overwritten.
+// Dockerfile and `npm run brand` run it: a real brand dir in, a real maintenance tree written into.
 //
-// It earns an integration test rather than unit coverage because what can go wrong is precisely what
-// it does to OTHER trees — it rewrites committed sources and empties a directory. A mistake there is
-// destructive, and only an end-to-end run exercises the argument handling, the archive round-trip and
-// the file writes together.
+// It earns an integration test rather than unit coverage because of what it does to a tree it does
+// not own: it recursively REMOVES its five generated paths there and writes them back. That list is
+// the entire safety boundary — one wrong entry and it deletes committed sources instead of its own
+// output — and the first assertion below is precisely that the committed files come out unchanged.
+// Only an end-to-end run exercises the argument handling, the archive round-trip and the file writes
+// together.
 import assert from 'node:assert/strict'
 import { execFileSync, spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'

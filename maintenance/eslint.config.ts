@@ -107,7 +107,7 @@ export default withNuxt(
     files: ['tools/**'],
     rules: {
       // Build/branding CLIs, not app code: their stdout IS the user interface, and they operate on
-      // paths the caller names (a brand directory, the generated files they back up and restore).
+      // paths the caller names (a brand directory, the generated files they write and delete).
       'no-console': 'off',
       'security/detect-non-literal-fs-filename': 'off',
     },
