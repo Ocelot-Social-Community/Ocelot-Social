@@ -21,6 +21,10 @@ cypress.env.json
 # Docker `--mount=type=bind,source=deployment/configurations` in the webapp/maintenance builds finds
 # its source dir even on a clean checkout (CI, vanilla build with BRAND="").
 deployment/configurations/*
+# Brand archives the webapp mirrors from the backend ($OCELOT_BRANDING_CACHE_DIR). A cache, owned and
+# overwritten by server-middleware/branding-sync.js — keep it OUT of the config tree above, so a sync
+# never competes with a brand's own build output.
+.branding-cache/
 
 .vuepress/.cache/
 .vuepress/.temp/

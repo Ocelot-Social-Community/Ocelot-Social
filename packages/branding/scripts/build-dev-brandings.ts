@@ -8,6 +8,11 @@
 // deployment configs (constants/*.js only) are skipped and listed, so it's obvious what was left out.
 // Point the apps at the configurations root; archives are found RECURSIVELY (see src/discover.ts):
 //   OCELOT_BRANDING_ASSETS_DIR=../deployment/configurations   (webapp/.env; relative to webapp/)
+//
+// The search path is ORDERED and the configurations root belongs FIRST, so what you just built beats
+// the webapp's backend sync. Give that sync a directory of its OWN — never this tree:
+//   OCELOT_BRANDING_ASSETS_DIR=../deployment/configurations:.branding-cache
+//   OCELOT_BRANDING_CACHE_DIR=.branding-cache
 import { existsSync, readdirSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'

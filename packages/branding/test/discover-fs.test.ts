@@ -5,8 +5,8 @@
 import assert from 'node:assert/strict'
 import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
-import { after, test } from 'node:test'
+import { delimiter, join, resolve } from 'node:path'
+import { after, describe, test } from 'node:test'
 
 import {
   composeComposition,
@@ -14,6 +14,7 @@ import {
   readArchive,
   readArchiveConfig,
   readDefaultMarker,
+  resolveRoots,
 } from '../dist/discover.js'
 import { writeTarGz } from '../dist/tar.js'
 
@@ -85,6 +86,20 @@ test('discoverArchives dedupes duplicate ids to the HIGHEST version', () => {
   assert.equal(readArchiveConfig(found.get('wir').file).theme.cssVars['color-primary'], 'v12')
 })
 
+// The publish convention: `<id>.tar.gz` is the CURRENT copy (a rebuild or a backend sync overwrites
+// it), `<id>-<version>.tar.gz` is immutable history. A brand rebuilt without a version bump would
+// otherwise be out-ranked by the history file sitting next to it — the ambiguity the webapp's sync
+// used to resolve by DELETING the loser.
+test('discoverArchives prefers the current `<id>.tar.gz` over a same-version history sibling', () => {
+  const base = tmp()
+  // Written history-first AND named so a plain walk (sorted: '-' < '.') would reach it first.
+  writeArchive(base, 'acme-1.0.0.tar.gz', { id: 'acme', version: '1.0.0', primary: 'stale' })
+  writeArchive(base, 'acme.tar.gz', { id: 'acme', version: '1.0.0', primary: 'fresh' })
+  const found = discoverArchives(base)
+  assert.equal(found.get('acme').file, join(base, 'acme.tar.gz'))
+  assert.equal(readArchiveConfig(found.get('acme').file).theme.cssVars['color-primary'], 'fresh')
+})
+
 test('discoverArchives treats numerically-equal versions as equal (1.2 == 1.2.0 → deduped)', () => {
   const base = tmp()
   writeArchive(base, 'a/x-1.2.tar.gz', { id: 'x', version: '1.2' })
@@ -148,4 +163,82 @@ test('readDefaultMarker returns the baked default id, or "" when absent', () => 
   assert.equal(readDefaultMarker(base), '')
   writeFileSync(join(base, 'DEFAULT'), 'acme\n')
   assert.equal(readDefaultMarker(base), 'acme')
+})
+
+// The ORDERED search path. Precedence is a lookup rule: an earlier root shadows a later one, so a
+// writable sync cache can out-rank read-only baked archives (and a developer's freshly built brand can
+// out-rank the cache) without anything being deleted to make room.
+describe('search path', () => {
+  test('resolveRoots splits, trims, absolutises and collapses repeats to the first position', () => {
+    assert.deepEqual(resolveRoots(`  a ${delimiter}${delimiter}b${delimiter}a `), [
+      resolve('a'),
+      resolve('b'),
+    ])
+    assert.deepEqual(resolveRoots(['a', 'b']), [resolve('a'), resolve('b')])
+    // Nothing configured (or a non-string) is not an error — it is "no roots".
+    assert.deepEqual(resolveRoots(undefined), [])
+    assert.deepEqual(resolveRoots(''), [])
+    assert.deepEqual(resolveRoots([null, 42, 'a']), [resolve('a')])
+  })
+
+  test('an earlier root wins for its ids EVEN with a lower version, and both stay on disk', () => {
+    const cache = tmp()
+    const baked = tmp()
+    writeArchive(cache, 'acme.tar.gz', { id: 'acme', version: '1.0.0', primary: 'synced' })
+    const bakedFile = writeArchive(baked, 'acme-9.9.9.tar.gz', {
+      id: 'acme',
+      version: '9.9.9',
+      primary: 'baked',
+    })
+
+    const found = discoverArchives(`${cache}${delimiter}${baked}`)
+
+    assert.equal(found.get('acme').version, '1.0.0')
+    assert.equal(readArchiveConfig(found.get('acme').file).theme.cssVars['color-primary'], 'synced')
+    // The shadowed archive is untouched — precedence never mutates the filesystem.
+    assert.ok(readArchive(bakedFile))
+  })
+
+  test('a later root still contributes the ids no earlier root provides', () => {
+    const first = tmp()
+    const second = tmp()
+    writeArchive(first, 'acme.tar.gz', { id: 'acme' })
+    writeArchive(second, 'acme.tar.gz', { id: 'acme' })
+    writeArchive(second, 'yunite.tar.gz', { id: 'yunite' })
+
+    const found = discoverArchives([first, second])
+
+    assert.deepEqual([...found.keys()].sort(), ['acme', 'yunite'])
+    assert.equal(found.get('acme').file, join(first, 'acme.tar.gz'))
+    assert.equal(found.get('yunite').file, join(second, 'yunite.tar.gz'))
+  })
+
+  test('readDefaultMarker answers from the first root that carries a NON-EMPTY marker', () => {
+    const cache = tmp()
+    const baked = tmp()
+    writeFileSync(join(baked, 'DEFAULT'), 'baked\n')
+    // No marker in the cache yet → the image's baked default still answers.
+    assert.equal(readDefaultMarker([cache, baked]), 'baked')
+    // A blank marker is not an answer either (it names no brand) — keep looking.
+    writeFileSync(join(cache, 'DEFAULT'), '\n')
+    assert.equal(readDefaultMarker([cache, baked]), 'baked')
+    // Once the sync mirrors the backend's default, it wins.
+    writeFileSync(join(cache, 'DEFAULT'), 'synced\n')
+    assert.equal(readDefaultMarker([cache, baked]), 'synced')
+  })
+
+  test('composeComposition resolves slots across roots', () => {
+    const first = tmp()
+    const second = tmp()
+    writeArchive(first, 'ya.tar.gz', { id: 'ya', primary: 'green', appName: 'Yunite' })
+    writeArchive(second, 'ac.tar.gz', { id: 'ac', primary: 'blue', appName: 'Acme' })
+
+    const config = composeComposition(`${first}${delimiter}${second}`, {
+      _default: 'ya',
+      identity: 'ac',
+    })
+
+    assert.equal(config.theme.cssVars['color-primary'], 'green')
+    assert.equal(config.metadata.applicationName, 'Acme')
+  })
 })
