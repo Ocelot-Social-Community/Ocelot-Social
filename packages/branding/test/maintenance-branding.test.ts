@@ -9,7 +9,15 @@
 // together.
 import assert from 'node:assert/strict'
 import { execFileSync, spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { after, describe, test } from 'node:test'
@@ -28,6 +36,17 @@ function tmp(prefix: string): string {
   const dir = mkdtempSync(join(tmpdir(), prefix))
   roots.push(dir)
   return dir
+}
+
+/** Every file under `dir`, as paths relative to it. */
+function walk(dir: string, prefix = ''): string[] {
+  const out: string[] = []
+  for (const entry of readdirSync(join(dir, prefix), { withFileTypes: true })) {
+    const rel = prefix ? `${prefix}/${entry.name}` : entry.name
+    if (entry.isDirectory()) out.push(...walk(dir, rel))
+    else out.push(rel)
+  }
+  return out.sort()
 }
 
 function write(file: string, body: string | Buffer): void {
@@ -126,6 +145,27 @@ describe('build-maintenance-branding', () => {
     ]) {
       assert.ok(existsSync(join(to, rel)), `expected ${rel}`)
     }
+  })
+
+  // The list in maintenance-generated-paths.json is what BOTH the generator and `npm run brand:reset`
+  // work from. Sharing the file stops the two from drifting apart, but not from being INCOMPLETE — a
+  // new output path added to the code and not to the list would still survive every reset. So this
+  // walks what was actually written and holds it against the list.
+  test('writes nothing outside the paths it declares', () => {
+    const to = maintenanceDir()
+    const before = new Set(walk(to))
+
+    brand(brandDir(), to)
+
+    const declared = JSON.parse(
+      readFileSync(new URL('../scripts/maintenance-generated-paths.json', import.meta.url), 'utf8'),
+    ) as { servedDir: string; paths: string[] }
+    const undeclared = walk(to)
+      .filter((rel) => !before.has(rel))
+      .filter((rel) => !declared.paths.some((p) => rel === p || rel.startsWith(`${p}/`)))
+    assert.deepEqual(undeclared, [], 'these were written but no reset would remove them')
+    // The served directory travels in the same file; the generator must not invent a second one.
+    assert.ok(declared.paths.includes(`public/${declared.servedDir}`))
   })
 
   test('emits the theme as its own stylesheet: font faces, then the tokens', () => {

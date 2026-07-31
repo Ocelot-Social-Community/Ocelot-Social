@@ -20,7 +20,7 @@
 //
 // Idempotent: the whole generated tree is removed before it is rewritten, so a rebuild for a different
 // brand — or for one that has since dropped its fonts/colours — leaves nothing of the previous run.
-import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { basename, dirname, join, resolve } from 'node:path'
 
 import { composeArchive } from '../dist/discover.js'
@@ -37,18 +37,13 @@ if (!brandArg || !maintenanceArg) {
 const brandDir = resolve(brandArg)
 const maintenanceDir = resolve(maintenanceArg)
 
-/** The ONE directory the brand's served files go into, under the app's public/ root. Logo, OG image
- *  and fonts share it: the archive's own structure below it already tells them apart, and a single
- *  root means one thing to clean up rather than two. */
-const SERVED_DIR = 'brand'
-
-/** Every path this script owns. Exported shape for the app + tooling: see GENERATED in tools/brand.mjs. */
-const GENERATED = [
-  'app/assets/css/brand.css',
-  'app/constants/metadata.brand.json',
-  'app/locales',
-  `public/${SERVED_DIR}`,
-] as const
+// The paths this script owns, read from the file that is their SINGLE source — maintenance's
+// tools/brand.mjs deletes the same list for `npm run brand:reset`, and a path that reached only one of
+// the two would survive the reset and contaminate the next brand. A JSON file rather than an export so
+// the reset keeps working without this package's dist/ being built.
+const { servedDir: SERVED_DIR, paths: GENERATED } = JSON.parse(
+  readFileSync(new URL('./maintenance-generated-paths.json', import.meta.url), 'utf8'),
+) as { servedDir: string; paths: string[] }
 
 // Clear first: this is the ONLY cleanup step there is. Without it a brand that dropped a font (or a
 // rebuild for a different brand) would leave the previous one behind, and the app would keep loading

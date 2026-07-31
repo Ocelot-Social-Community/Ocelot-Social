@@ -18,7 +18,7 @@
 // published yet, and a `file:` dependency is COPIED into node_modules, so every package edit would
 // need a reinstall before it showed up here. Once the package is on npm this becomes a devDependency.
 import { execFileSync } from "node:child_process";
-import { existsSync, rmSync } from "node:fs";
+import { existsSync, readFileSync, rmSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -27,14 +27,16 @@ const repoRoot = resolve(maintenanceDir, "..");
 const packageDir = join(repoRoot, "packages", "branding");
 const generator = join(packageDir, "scripts", "build-maintenance-branding.ts");
 
-// Everything build-maintenance-branding.ts produces. Kept in step with the GENERATED list there — a
-// path added on that side and forgotten here would survive `brand:reset` and leak into the next brand.
-const GENERATED = [
-  "app/assets/css/brand.css",
-  "app/constants/metadata.brand.json",
-  "app/locales",
-  "public/brand",
-];
+// The paths the generator produces, read from ITS file rather than copied: a path that reached only
+// one of the two lists would survive this reset and contaminate the next brand. Plain JSON, so the
+// reset also works when the package's dist/ is not built — which is exactly when you most want to be
+// able to get back to vanilla.
+const GENERATED = JSON.parse(
+  readFileSync(
+    join(packageDir, "scripts", "maintenance-generated-paths.json"),
+    "utf8",
+  ),
+).paths;
 
 function fail(message) {
   console.error(`[brand] ${message}`);
