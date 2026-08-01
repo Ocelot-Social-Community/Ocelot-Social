@@ -45,7 +45,7 @@
     "linkify-it": "~5.0.2",
     "livekit-client": "^2.21.0",
     "mapbox-gl": "1.13.3",
-    "nuxt": "^2.18.1",
+    "nuxt": "^4.5.1",
     "nuxt-dropzone": "^1.0.4",
     "nuxt-env": "~0.1.0",
     "sass": "1.77.6",
