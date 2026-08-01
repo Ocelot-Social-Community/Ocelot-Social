@@ -123,7 +123,7 @@ ONBUILD RUN if ls /brand/brand.config.* >/dev/null 2>&1; then \
 # The assembly below also has to be ONBUILD: a plain RUN would leave the brand image with the /build
 # that ocelot CI assembled.
 ONBUILD RUN mkdir /build && \
-    cp -r ./.nuxt ./nuxt.config.js ./config ./constants ./static ./locales ./server-middleware ./package.json ./yarn.lock ./scripts /build && \
+    cp -r ./.nuxt ./nuxt.config.js ./config ./constants ./static ./locales ./server-middleware ./utils ./package.json ./yarn.lock ./scripts /build && \
     if [ -d ./deployment ]; then cp -r ./deployment /build/deployment; fi
 ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     cd /build && yarn install --production=true --frozen-lockfile --non-interactive --cache-folder /yarn-cache
@@ -137,7 +137,7 @@ RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
 COPY webapp/. .
 RUN yarn run build
 RUN mkdir /build && \
-    cp -r ./.nuxt ./nuxt.config.js ./config ./constants ./static ./locales ./server-middleware ./package.json ./yarn.lock ./scripts /build
+    cp -r ./.nuxt ./nuxt.config.js ./config ./constants ./static ./locales ./server-middleware ./utils ./package.json ./yarn.lock ./scripts /build
 RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     cd /build && yarn install --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 
