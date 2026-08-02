@@ -88,9 +88,12 @@ committed snapshot (`test/schema-shape.snapshot.json`). Any add/remove/rename/re
 bucket reassignment, fails the `SCHEMA SHAPE LOCK` test — a shape change cannot ship unnoticed. When the
 change is intentional:
 
-1. Commit it as `feat(branding):` / `fix(branding):` so release-please bumps `SCHEMA_VERSION` (the
-   archive‑compatibility axis surfaced via `checkSchemaCompat`). `SCHEMA_VERSION` (`src/version.ts`) is
-   bumped in lock‑step with `package.json` by release-please (`extra-files`).
+1. Title the PR `feat(package/branding):` / `fix(package/branding):` so release-please bumps
+   `SCHEMA_VERSION` (the archive‑compatibility axis surfaced via `checkSchemaCompat`). `SCHEMA_VERSION`
+   (`src/version.ts`) is bumped in lock‑step with `package.json` by release-please (`extra-files`) — in
+   its own release PR, *after* yours is merged. Step 1 is therefore **not** enforced by the lock test:
+   at the time it runs the version is unchanged by construction, and the test cannot see the diff that
+   would tell it a shape change is in flight. Only step 2 is mechanically checked.
 2. Run `npm run schema:snapshot` and commit the updated snapshot (its diff shows exactly which paths
    changed — useful for review).
 
