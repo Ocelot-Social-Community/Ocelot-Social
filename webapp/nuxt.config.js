@@ -307,15 +307,18 @@ export default {
     // them into the generated plugin as literals when the bundle is built, so on the ONE pre-built
     // image every deployment shares they can only ever be the build-time defaults. They are kept in
     // sync with the real settings so a future caller cannot silently get a different cookie.
-    tokenName: CONFIG.COOKIE_NAME, // optional, default: apollo-token
+    // The defaults noted below are OURS (webapp/config/index.js), not the module's: looking for the
+    // module's `apollo-token` while debugging a session would send you after a cookie that never
+    // exists here.
+    tokenName: CONFIG.COOKIE_NAME, // $COOKIE_NAME, default 'ocelot-social-token'
     cookieAttributes: {
-      expires: CONFIG.COOKIE_EXPIRE_TIME, // optional, default: 7 (days)
+      expires: CONFIG.COOKIE_EXPIRE_TIME, // $COOKIE_EXPIRE_TIME, default 730 (days)
       /** * Define the path where the cookie is available. Defaults to '/' */
       // For some reason this can vary - lets see if setting this helps.
       path: '/', // optional
       /** * A Boolean indicating if the cookie transmission requires a
-       * secure protocol (https). Defaults to false. */
-      secure: CONFIG.COOKIE_HTTPS_ONLY,
+       * secure protocol (https). */
+      secure: CONFIG.COOKIE_HTTPS_ONLY, // $COOKIE_HTTPS_ONLY, default true in production
       sameSite: 'lax', // for the meaning see https://www.thinktecture.com/de/identity/samesite/samesite-in-a-nutshell/
     },
     // includeNodeModules: true, // optional, default: false (this includes graphql-tag for node_modules folder)
