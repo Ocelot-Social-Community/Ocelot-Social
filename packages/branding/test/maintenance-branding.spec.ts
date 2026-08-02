@@ -150,9 +150,11 @@ describe('build-maintenance-branding', () => {
     brand(brandDir(), to)
 
     // Byte-for-byte, not just "still present": overwriting a committed file in place is precisely the
-    // behaviour the overlays replaced.
+    // behaviour the overlays replaced. Snapshot ONCE — it walks the whole tree and base64s every file,
+    // so taking it per entry would be quadratic I/O over a state that no longer changes anyway.
+    const afterRun = snapshot(to)
     for (const [rel, content] of before) {
-      assert.equal(snapshot(to).get(rel), content, `${rel} was modified or removed`)
+      assert.equal(afterRun.get(rel), content, `${rel} was modified or removed`)
     }
     for (const rel of [
       'app/assets/css/brand.css',
