@@ -97,7 +97,7 @@ export default withNuxt(
     },
   },
   {
-    files: ['**/*.spec.ts', '**/*.test.ts'],
+    files: ['**/*.spec.ts'],
     rules: {
       // Test helpers use dynamic file paths
       'security/detect-non-literal-fs-filename': 'off',

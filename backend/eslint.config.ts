@@ -15,7 +15,10 @@ import { derivedEnumSDLs } from './src/graphql/derivedEnums'
 
 export default [
   {
-    ignores: ['node_modules/', 'build/', 'coverage/'],
+    // public-docs/ is generated (spectaql, see the root `docs:api` script) and gitignored, so it only
+    // exists on a machine that ran the generator — where its minified bundle made `yarn lint` fail
+    // while CI, which never generates it, stayed green.
+    ignores: ['node_modules/', 'build/', 'coverage/', 'public-docs/'],
   },
   ...config,
   ...jest,

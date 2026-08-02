@@ -10,6 +10,8 @@ Most code editors offer an ESLint plugin which helps detect mistakes already whi
 
 We write unit tests with the help of [Jest](https://jestjs.io/) and [Vue Test Utils](https://vue-test-utils.vuejs.org/) to make sure our components work in the way they should. In these tests we usually check that a certain input leads to the expected output. They are used to test _functionality_.
 
+Test files are named `<subject>.spec.<ext>` and live next to their subject — repo-wide, in every package. `*.test.*` is rejected by ESLint: Jest still *runs* both suffixes (so a mis-named file fails loudly at lint time rather than being silently skipped), and letting both live was how one module ended up with two half-overlapping suites.
+
 To run all tests use the command `yarn test` in the `/webapp` directory. Other useful commands are:
 - `yarn test -t test-name` to run tests including `test-name` in their file or test names
 - `yarn test -o` to run tests related to files that have been changed since the latest commit
