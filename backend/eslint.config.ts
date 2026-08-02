@@ -110,4 +110,20 @@ export default [
       'n/no-unpublished-require': 'off',
     },
   },
+  {
+    // NAMING LOCK: test files are `*.spec.*` across the whole repo. Both suffixes used to be picked
+    // up (and jest's testMatch still accepts either — DELIBERATELY, so a mis-named file fails loudly
+    // here instead of being silently skipped), which is how store/auth.test.js and store/auth.spec.js
+    // ended up as two half-overlapping suites for the same module. Wrong suffix = lint error now.
+    files: ['**/*.test.{js,jsx,mjs,cjs,ts,tsx,mts,cts,vue}'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'Program',
+          message: 'Rename this file to *.spec.* — test files use the .spec suffix in this repo.',
+        },
+      ],
+    },
+  },
 ]

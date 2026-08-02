@@ -455,6 +455,20 @@ describe('auth store', () => {
         expect(result).toBe('logged-out')
         expect(commit).not.toHaveBeenCalled()
       })
+
+      it('logs out when the query itself fails — an unusable session must not linger', async () => {
+        // e.g. the token was revoked server-side: the query rejects, and staying "logged in" with a
+        // dead token would leave the UI in a state where every action fails.
+        const query = jest.fn().mockRejectedValue(new Error('unauthenticated'))
+        const commit = jest.fn()
+        const dispatch = jest.fn().mockResolvedValue('logged-out')
+        const result = await actions.fetchCurrentUser.call(
+          { app: { apolloProvider: { defaultClient: { query } } } },
+          { commit, dispatch },
+        )
+        expect(dispatch).toHaveBeenCalledWith('logout')
+        expect(result).toBe('logged-out')
+      })
     })
 
     describe('login', () => {
@@ -493,10 +507,16 @@ describe('auth store', () => {
         )
         expect(context.app.apolloProvider.defaultClient.resetStore).toHaveBeenCalled()
         expect(commit).toHaveBeenCalledWith('SET_TOKEN', 'jwt')
-        expect(dispatch).toHaveBeenCalledWith('fetchCurrentUser')
-        expect(dispatch).toHaveBeenCalledWith('categories/init', null, { root: true })
-        expect(dispatch).toHaveBeenCalledWith('policy/init', null, { root: true })
-        expect(dispatch).toHaveBeenCalledWith('policy/resubscribe', null, { root: true })
+        // Exact and ORDERED: the two resubscribes re-open the subscriptions the session switch
+        // above just dropped, and they have to run after the authenticated policy/init has replaced
+        // the anonymous snapshot. A swap would leave stale data with a live handler on top.
+        expect(dispatch.mock.calls).toEqual([
+          ['fetchCurrentUser'],
+          ['categories/init', null, { root: true }],
+          ['policy/init', null, { root: true }],
+          ['policy/resubscribe', null, { root: true }],
+          ['resubscribePermissions'],
+        ])
         // finally{} always clears pending
         expect(commit).toHaveBeenLastCalledWith('SET_PENDING', false)
       })
@@ -581,8 +601,13 @@ describe('auth store', () => {
         expect(cookie.remove).toHaveBeenCalled()
         expect(restartWebsockets).toHaveBeenCalled()
         expect(context.app.apolloProvider.defaultClient.resetStore).toHaveBeenCalled()
-        expect(dispatch).toHaveBeenCalledWith('policy/init', null, { root: true })
-        expect(dispatch).toHaveBeenCalledWith('policy/resubscribe', null, { root: true })
+        // Same ordering guard as in login: resubscribe re-opens the subscription the session
+        // restart dropped, and must run after the anonymous policy/init reset the snapshot.
+        expect(dispatch.mock.calls).toEqual([
+          ['policy/init', null, { root: true }],
+          ['policy/resubscribe', null, { root: true }],
+          ['resubscribePermissions'],
+        ])
       })
     })
   })

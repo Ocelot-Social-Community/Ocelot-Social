@@ -29,4 +29,22 @@ module.exports = {
     ],
     // 'newline-per-chained-call': [2]
   },
+  overrides: [
+    {
+      // NAMING LOCK: test files are `*.spec.*` across the whole repo. Both suffixes used to be picked
+      // up (and jest.config.js testMatch still accepts either — DELIBERATELY, so a mis-named file
+      // fails loudly here instead of being silently skipped), which is how store/auth.test.js and
+      // store/auth.spec.js ended up as two half-overlapping suites for the same module.
+      files: ['**/*.test.js', '**/*.test.jsx', '**/*.test.vue'],
+      rules: {
+        'no-restricted-syntax': [
+          'error',
+          {
+            selector: 'Program',
+            message: 'Rename this file to *.spec.* — test files use the .spec suffix in this repo.',
+          },
+        ],
+      },
+    },
+  ],
 }
