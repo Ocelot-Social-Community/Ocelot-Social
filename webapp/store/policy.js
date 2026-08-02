@@ -125,7 +125,7 @@ const apolloClient = (ctx) => ctx.app.apolloProvider.defaultClient
 
 // The live policyChanged subscription handle (one client per browser tab). Kept
 // at module scope so a forced websocket restart can tear it down and re-open a
-// fresh one: $apolloHelpers.onLogin/onLogout call restartWebsockets(), which
+// fresh one: the auth store's login/logout call restartWebsockets(), which
 // closes the socket and *resends the operation without its handler* — so the old
 // observable goes silent and live updates stop arriving until a full page
 // reload. Only a brand-new apolloClient.subscribe() re-registers a live handler

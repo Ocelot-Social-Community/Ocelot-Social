@@ -21,6 +21,18 @@ backend:
 webapp:
   image:
     repository: ghcr.io/ocelot-social-community/ocelot-social/webapp
+  # Rendered into the webapp ConfigMap as-is (see templates/webapp/configmap.yml).
+  #
+  #   COOKIE_NAME         name of the auth cookie holding the JWT (default: "ocelot-social-token").
+  #                       Set it to keep an instance's established sessions alive when its cookie used
+  #                       to be named differently — nothing else depends on the name, cookies are
+  #                       host-only. NOT a branding value: it is deliberately not switchable at
+  #                       runtime, because renaming it mid-flight would end every session.
+  #   COOKIE_NAME_LEGACY  comma-separated predecessor name(s) whose sessions are ADOPTED instead of
+  #                       dropped (default: "ocelot-social-token"). Set "" to switch that off.
+  #   COOKIE_EXPIRE_TIME  session lifetime in days (default: 730).
+  #   COOKIE_HTTPS_ONLY   send the cookie over HTTPS only (default: true in production images).
+  env: {}
 
 maintenance:
   image:

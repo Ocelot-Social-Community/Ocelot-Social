@@ -171,11 +171,12 @@ export interface BrandingConfig {
     organizationName: string
     organizationJurisdiction: string
     // NOTE: no `cookieName` — the auth cookie name is INFRA, not branding (see
-    // docu/branding-buckets-konzept.md). @nuxtjs/apollo bakes its token name into the generated
-    // plugin at BUILD time, so a runtime-injected brand could never reach it: the cookie was always
-    // written under the framework default while the auth store checked for the branded name — a
-    // login that worked but reported "no cookie". It is `COOKIE_NAME` in the webapp's build config
-    // now, with the apollo module as its single consumer.
+    // docu/branding-buckets-konzept.md). It was unreachable here in the first place: @nuxtjs/apollo
+    // bakes its token name into the generated plugin at BUILD time, so the cookie was always written
+    // under the framework default while the auth store checked for the branded name — a login that
+    // worked but reported "no cookie". It is the webapp's `COOKIE_NAME` deployment variable now
+    // (webapp/utils/authCookie.js), settable per instance without a rebuild but NOT switchable while
+    // the app runs — renaming it mid-flight would end every session.
     // NOTE: no `themeColor` — the browser-chrome / PWA theme_color is the `color-primary` theme token
     // (see theme.ts resolveThemeColor). It used to be a metadata field carved into the theme bucket,
     // which broke for partial packages providing identity but not theme.

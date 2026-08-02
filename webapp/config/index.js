@@ -23,6 +23,17 @@ const BUILD_VERSION = (() => {
   }
 })()
 
+// Env vars are strings; these give the two typed cookie settings their real type (see below).
+const toPositiveNumber = (value, fallback) => {
+  const number = Number(value)
+  return Number.isFinite(number) && number > 0 ? number : fallback
+}
+
+const toBoolean = (value, fallback) => {
+  if (value === undefined || value === '') return fallback
+  return !['false', '0', 'no', 'off'].includes(String(value).toLowerCase())
+}
+
 const environment = {
   NODE_ENV: process.env.NODE_ENV,
   DEBUG: process.env.NODE_ENV !== 'production' || false,
@@ -47,15 +58,27 @@ const options = {
     (metadata.default || metadata).APPLICATION_DESCRIPTION ||
     pkg.description,
   MAPBOX_TOKEN: process.env.MAPBOX_TOKEN,
-  // Cookies
-  // Name of the auth cookie holding the JWT. BUILD TIME only: @nuxtjs/apollo renders it into the
-  // generated plugin as a string literal (see its templates/plugin.js — AUTH_TOKEN_NAME), so setting
-  // it in the deploy environment of a pre-built image has no effect. It is deliberately NOT a
-  // branding value for exactly that reason (a runtime-injected brand cannot reach a baked literal);
-  // cookies here are host-only (no `domain` attribute), so the name needs no per-brand namespacing.
+  // Cookies. These three reach the app through publicRuntimeConfig (see nuxt.config.js), NOT through
+  // the DefinePlugin-inlined `env` — nuxt.config.js is re-evaluated when the server starts, so they
+  // are DEPLOYMENT values: settable per instance (Helm `webapp.env.*` → pod env) on the shared,
+  // pre-built webapp image. utils/authCookie.js explains why the cookie cannot use @nuxtjs/apollo's
+  // own (build-baked) token name.
+  //
+  // Name of the auth cookie holding the JWT. Deliberately NOT a branding value: it is infra, and a
+  // brand switched at runtime must not invalidate every session. Cookies are host-only here (no
+  // `domain` attribute), so no per-instance namespacing is needed — the default fits everyone.
   COOKIE_NAME: process.env.COOKIE_NAME || 'ocelot-social-token',
-  COOKIE_EXPIRE_TIME: process.env.COOKIE_EXPIRE_TIME || 730, // Two years by default
-  COOKIE_HTTPS_ONLY: process.env.COOKIE_HTTPS_ONLY || process.env.NODE_ENV === 'production', // ensure true in production if not set explicitly
+  // Comma-separated predecessor name(s): a session found under one of these is ADOPTED instead of
+  // dropped, so renaming COOKIE_NAME does not log everyone out. Defaults to the framework name;
+  // set to "" to switch the adoption off.
+  COOKIE_NAME_LEGACY: process.env.COOKIE_NAME_LEGACY,
+  // Numbers/booleans, not strings: an env var arrives as a string, and `expires: '30'` would produce
+  // a session cookie while COOKIE_HTTPS_ONLY="false" would be truthy and force Secure on plain HTTP.
+  COOKIE_EXPIRE_TIME: toPositiveNumber(process.env.COOKIE_EXPIRE_TIME, 730), // Two years by default
+  COOKIE_HTTPS_ONLY: toBoolean(
+    process.env.COOKIE_HTTPS_ONLY,
+    process.env.NODE_ENV === 'production',
+  ), // ensure true in production if not set explicitly
   // The network-policy flags (BADGES_ENABLED, ASK_FOR_REAL_NAME, REQUIRE_LOCATION,
   // INVITE_LINK_LIMIT, INVITE_CODES_*, MAX_PINNED_POSTS, MAX_GROUP_PINNED_POSTS,
   // API_KEYS_MAX_PER_USER) moved to the runtime network policy (read via $policy.get).

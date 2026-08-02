@@ -43,6 +43,18 @@ export default {
     graphqlUri: process.env.GRAPHQL_URI || CONFIG.GRAPHQL_URI,
   },
 
+  // RUNTIME and reaches the BROWSER (serialised as window.__NUXT__.config), which `env` above cannot:
+  // the auth cookie is written and read client-side, so its name and attributes have to survive into
+  // the bundle-independent config. That is what makes them deployment values (Helm `webapp.env.*` →
+  // pod env) on a pre-built image — see utils/authCookie.js for why @nuxtjs/apollo's own token name
+  // could never be one.
+  publicRuntimeConfig: {
+    cookieName: CONFIG.COOKIE_NAME,
+    cookieLegacyNames: CONFIG.COOKIE_NAME_LEGACY,
+    cookieExpireDays: CONFIG.COOKIE_EXPIRE_TIME,
+    cookieHttpsOnly: CONFIG.COOKIE_HTTPS_ONLY,
+  },
+
   env: {
     ...CONFIG,
     // pages which do NOT require a login
@@ -190,6 +202,8 @@ export default {
    ** Plugins to load before mounting the App
    */
   plugins: [
+    // First: $authCookie is what the auth store reads/writes the session with.
+    { src: '~/plugins/auth-cookie.js', ssr: true },
     { src: '~/plugins/branding.js', ssr: true },
     { src: '~/plugins/branding-head.js', ssr: false },
     { src: '~/plugins/policy.js', ssr: true },
@@ -232,8 +246,11 @@ export default {
         duration: 1000,
       },
     ],
-    'cookie-universal-nuxt',
     '@nuxtjs/apollo',
+    // AFTER @nuxtjs/apollo on purpose: nuxt's addPlugin UNSHIFTS, so module plugins run in REVERSE
+    // registration order — this is what puts $cookies in place before the apollo client config is
+    // built, which needs it to resolve the auth cookie (plugins/apollo-config.js getAuth).
+    'cookie-universal-nuxt',
     '@nuxtjs/axios',
     '@nuxtjs/style-resources',
     '@nuxtjs/sentry',
@@ -284,10 +301,12 @@ export default {
 
   // Give apollo module options
   apollo: {
-    // SINGLE SOURCE for the auth cookie name. The module bakes this into the generated plugin as a
-    // string literal, and every read/write of the cookie goes through $apolloHelpers (onLogin /
-    // onLogout / getToken), so nothing else may hold a second copy of the name — a copy resolved at
-    // RUNTIME (as the branded `metadata.cookieName` was) inevitably disagrees with this baked one.
+    // NOT the auth cookie's configuration — utils/authCookie.js is, and plugins/apollo-config.js
+    // hands the module a `getAuth` that uses it. These values only feed the module's own
+    // $apolloHelpers (onLogin / onLogout / getToken), which nothing calls any more: the module bakes
+    // them into the generated plugin as literals when the bundle is built, so on the ONE pre-built
+    // image every deployment shares they can only ever be the build-time defaults. They are kept in
+    // sync with the real settings so a future caller cannot silently get a different cookie.
     tokenName: CONFIG.COOKIE_NAME, // optional, default: apollo-token
     cookieAttributes: {
       expires: CONFIG.COOKIE_EXPIRE_TIME, // optional, default: 7 (days)

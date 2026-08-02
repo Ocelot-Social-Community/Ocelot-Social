@@ -1,5 +1,9 @@
 import { getters, actions } from './auth.js'
 
+// The store performs the session switch itself now (the auth cookie is ours — see
+// utils/authCookie.js), so the websocket restart @nuxtjs/apollo used to do is mocked here.
+jest.mock('vue-cli-plugin-apollo/graphql-client', () => ({ restartWebsockets: jest.fn() }))
+
 let state
 let commit
 let dispatch
@@ -63,9 +67,7 @@ describe('actions', () => {
     const theAction = () => {
       const module = {
         app: {
-          $apolloHelpers: {
-            getToken: () => token,
-          },
+          $authCookie: { get: () => token },
         },
       }
       action = actions.init.bind(module)
@@ -148,12 +150,10 @@ describe('actions', () => {
             apolloProvider: {
               defaultClient: {
                 mutate: jest.fn(() => Promise.resolve(successfulLoginResponse)),
+                resetStore: jest.fn(() => Promise.resolve()),
               },
             },
-            $apolloHelpers: {
-              onLogin: jest.fn(() => Promise.resolve()),
-              getToken: jest.fn(() => token),
-            },
+            $authCookie: { set: jest.fn(), get: jest.fn(() => token), remove: jest.fn() },
           },
         }
         action = actions.login.bind(module)
@@ -190,22 +190,20 @@ describe('actions', () => {
 
     describe('given the auth cookie did not stick', () => {
       // The browser rejected the cookie onLogin tried to write (blocked / third-party settings), so
-      // the very next read comes back empty. Reading it back through $apolloHelpers.getToken() — the
-      // same helper that wrote it — is what keeps this from mistaking a NAME mismatch for a blocked
-      // cookie: that is exactly what a branded `metadata.cookieName` used to do, failing every login
-      // on a branded instance while the session was in fact established.
+      // the very next read comes back empty. Reading it back through $authCookie — the same accessor
+      // that wrote it — is what keeps this from mistaking a NAME mismatch for a blocked cookie: that
+      // is exactly what the branded `metadata.cookieName` used to do, failing every login on a
+      // branded instance while the session was in fact established.
       it('rejects with no-cookie so the login form can ask the user to accept cookies', async () => {
         const module = {
           app: {
             apolloProvider: {
               defaultClient: {
                 mutate: jest.fn(() => Promise.resolve(successfulLoginResponse)),
+                resetStore: jest.fn(() => Promise.resolve()),
               },
             },
-            $apolloHelpers: {
-              onLogin: jest.fn(() => Promise.resolve()),
-              getToken: jest.fn(() => undefined),
-            },
+            $authCookie: { set: jest.fn(), get: jest.fn(() => undefined), remove: jest.fn() },
           },
         }
         action = actions.login.bind(module)
@@ -222,16 +220,16 @@ describe('actions', () => {
     })
 
     describe('given invalid credentials and incorrect password response', () => {
-      let onLogin
+      let authCookie
       let mutate
 
       beforeEach(() => {
         mutate = jest.fn(() => Promise.reject('This error is expected.')) // eslint-disable-line prefer-promise-reject-errors
-        onLogin = jest.fn(() => Promise.resolve())
+        authCookie = { set: jest.fn(), get: jest.fn(), remove: jest.fn() }
         const module = {
           app: {
-            apolloProvider: { defaultClient: { mutate } },
-            $apolloHelpers: { onLogin },
+            apolloProvider: { defaultClient: { mutate, resetStore: jest.fn() } },
+            $authCookie: authCookie,
           },
         }
         action = actions.login.bind(module)
@@ -246,7 +244,7 @@ describe('actions', () => {
           action({ commit }, { email: 'user@example.org', password: 'wrong' }),
         ).rejects.toThrowError('This error is expected.')
         expect(mutate).toHaveBeenCalled()
-        expect(onLogin).not.toHaveBeenCalled()
+        expect(authCookie.set).not.toHaveBeenCalled()
       })
 
       it('saves pending flags in order', async () => {
@@ -264,11 +262,16 @@ describe('actions', () => {
   })
 
   describe('logout', () => {
-    let onLogout
+    let removeCookie
 
     beforeEach(async () => {
-      onLogout = jest.fn(() => Promise.resolve())
-      const module = { app: { $apolloHelpers: { onLogout } } }
+      removeCookie = jest.fn()
+      const module = {
+        app: {
+          apolloProvider: { defaultClient: { resetStore: jest.fn(() => Promise.resolve()) } },
+          $authCookie: { set: jest.fn(), get: jest.fn(), remove: removeCookie },
+        },
+      }
       const action = actions.logout.bind(module)
       await action({ commit, dispatch })
     })
@@ -282,8 +285,8 @@ describe('actions', () => {
       )
     })
 
-    it('calls onLogout', () => {
-      expect(onLogout).toHaveBeenCalled()
+    it('clears the auth cookie', () => {
+      expect(removeCookie).toHaveBeenCalled()
     })
 
     it('refetches the policy as anonymous, then re-subscribes — in that order', () => {
