@@ -33,8 +33,8 @@ module.exports = {
     {
       // NAMING LOCK: test files are `*.spec.*` across the whole repo. Both suffixes used to be picked
       // up (and jest.config.js testMatch still accepts either — DELIBERATELY, so a mis-named file
-      // fails loudly here instead of being silently skipped), which is how store/auth.test.js and
-      // store/auth.spec.js ended up as two half-overlapping suites for the same module.
+      // fails loudly here instead of being silently skipped), which is how the auth store once
+      // carried TWO half-overlapping suites — an auth.test.js beside auth.spec.js, since merged.
       files: ['**/*.test.js', '**/*.test.jsx', '**/*.test.vue'],
       rules: {
         'no-restricted-syntax': [

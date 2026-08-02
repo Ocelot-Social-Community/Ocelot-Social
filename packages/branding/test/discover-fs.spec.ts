@@ -1,7 +1,7 @@
 // The fs-touching half of discover.ts: walk (recursive discovery), readMeta (manifest read + mtime
 // cache), compareVersions (highest-version-per-id dedupe), readArchive, readArchiveConfig,
 // composeComposition and readDefaultMarker. Exercised against REAL archives written to a temp dir —
-// the compose core is unit-tested separately (discover.test.ts) with an in-memory file map.
+// the compose core is unit-tested separately (discover.spec.ts) with an in-memory file map.
 import assert from 'node:assert/strict'
 import { mkdirSync, mkdtempSync, rmSync, symlinkSync, utimesSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
