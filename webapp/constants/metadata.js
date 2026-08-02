@@ -6,6 +6,9 @@
 // spread / clone `metadata` (e.g. specs, i18n). Consumers + locale strings stay unchanged.
 // NOTE: OG_IMAGE / the PWA manifest / THEME_COLOR are consumed at BUILD time (nuxt.config →
 // head/@nuxtjs/pwa) — those still resolve against the defaults present at build.
+// NOTE: no COOKIE_NAME. The auth cookie name is build-baked infra (CONFIG.COOKIE_NAME → the apollo
+// module's tokenName), not brandable — a lazy read here would resolve to the branded name while the
+// cookie itself was written under the baked one. See nuxt.config.js `apollo.tokenName`.
 import { branding, resolveThemeColor } from '@ocelot-social/branding'
 
 // SCREAMING_CASE consumer key -> branding.metadata camelCase key. THEME_COLOR is special: there is no
@@ -15,7 +18,6 @@ const KEY_MAP = {
   APPLICATION_NAME: 'applicationName',
   APPLICATION_SHORT_NAME: 'applicationShortName',
   APPLICATION_DESCRIPTION: 'applicationDescription',
-  COOKIE_NAME: 'cookieName',
   ORGANIZATION_NAME: 'organizationName',
   ORGANIZATION_JURISDICTION: 'organizationJurisdiction',
   OG_IMAGE: 'ogImage',

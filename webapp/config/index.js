@@ -48,6 +48,12 @@ const options = {
     pkg.description,
   MAPBOX_TOKEN: process.env.MAPBOX_TOKEN,
   // Cookies
+  // Name of the auth cookie holding the JWT. BUILD TIME only: @nuxtjs/apollo renders it into the
+  // generated plugin as a string literal (see its templates/plugin.js — AUTH_TOKEN_NAME), so setting
+  // it in the deploy environment of a pre-built image has no effect. It is deliberately NOT a
+  // branding value for exactly that reason (a runtime-injected brand cannot reach a baked literal);
+  // cookies here are host-only (no `domain` attribute), so the name needs no per-brand namespacing.
+  COOKIE_NAME: process.env.COOKIE_NAME || 'ocelot-social-token',
   COOKIE_EXPIRE_TIME: process.env.COOKIE_EXPIRE_TIME || 730, // Two years by default
   COOKIE_HTTPS_ONLY: process.env.COOKIE_HTTPS_ONLY || process.env.NODE_ENV === 'production', // ensure true in production if not set explicitly
   // The network-policy flags (BADGES_ENABLED, ASK_FOR_REAL_NAME, REQUIRE_LOCATION,

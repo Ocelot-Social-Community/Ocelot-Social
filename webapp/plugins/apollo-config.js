@@ -1,6 +1,5 @@
 import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory'
 import introspectionQueryResultData from './apollo-config/fragmentTypes.json'
-import metadata from '~/constants/metadata'
 
 const fragmentMatcher = new IntrospectionFragmentMatcher({
   introspectionQueryResultData,
@@ -17,7 +16,9 @@ export default ({ req, nuxtState }) => {
       credentials: 'same-origin',
     },
     credentials: true,
-    tokenName: metadata.COOKIE_NAME,
+    // No `tokenName` here: the module overwrites whatever a client config returns with the name baked
+    // from nuxt.config's `apollo.tokenName` (its templates/plugin.js assigns clientConfig.tokenName
+    // after calling this factory), so a value set here is silently dead. See nuxt.config.js.
     persisting: false,
     websocketsOnly: false,
     cache: new InMemoryCache({ fragmentMatcher }),

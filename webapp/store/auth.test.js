@@ -1,13 +1,5 @@
 import { getters, actions } from './auth.js'
 
-jest.mock('universal-cookie', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      get: (arg) => 'my-cookie-name',
-    }
-  })
-})
-
 let state
 let commit
 let dispatch
@@ -160,6 +152,7 @@ describe('actions', () => {
             },
             $apolloHelpers: {
               onLogin: jest.fn(() => Promise.resolve()),
+              getToken: jest.fn(() => token),
             },
           },
         }
@@ -186,6 +179,39 @@ describe('actions', () => {
       })
 
       it('saves pending flags in order', () => {
+        expect(commit.mock.calls).toEqual(
+          expect.arrayContaining([
+            ['SET_PENDING', true],
+            ['SET_PENDING', false],
+          ]),
+        )
+      })
+    })
+
+    describe('given the auth cookie did not stick', () => {
+      // The browser rejected the cookie onLogin tried to write (blocked / third-party settings), so
+      // the very next read comes back empty. Reading it back through $apolloHelpers.getToken() — the
+      // same helper that wrote it — is what keeps this from mistaking a NAME mismatch for a blocked
+      // cookie: that is exactly what a branded `metadata.cookieName` used to do, failing every login
+      // on a branded instance while the session was in fact established.
+      it('rejects with no-cookie so the login form can ask the user to accept cookies', async () => {
+        const module = {
+          app: {
+            apolloProvider: {
+              defaultClient: {
+                mutate: jest.fn(() => Promise.resolve(successfulLoginResponse)),
+              },
+            },
+            $apolloHelpers: {
+              onLogin: jest.fn(() => Promise.resolve()),
+              getToken: jest.fn(() => undefined),
+            },
+          },
+        }
+        action = actions.login.bind(module)
+        await expect(
+          action({ commit, dispatch }, { email: 'user@example.org', password: '1234' }),
+        ).rejects.toThrow('no-cookie')
         expect(commit.mock.calls).toEqual(
           expect.arrayContaining([
             ['SET_PENDING', true],

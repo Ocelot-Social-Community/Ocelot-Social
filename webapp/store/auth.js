@@ -2,10 +2,6 @@ import gql from 'graphql-tag'
 import { branding } from '@ocelot-social/branding'
 import { currentUserQuery } from '~/graphql/User'
 import PermissionsSubscription from '~/graphql/PermissionsSubscription'
-import Cookie from 'universal-cookie'
-import metadata from '~/constants/metadata'
-
-const cookies = new Cookie()
 
 // Just the viewer's effective permissions — used to refetch live (on a permissionsChanged
 // event) without re-pulling the whole currentUser, and without the logout-on-error of
@@ -260,7 +256,10 @@ export const actions = {
       // Re-open the permissionsChanged subscription on the new (authenticated) socket
       // so role/permission changes apply live without a reload.
       dispatch('resubscribePermissions')
-      if (cookies.get(metadata.COOKIE_NAME) === undefined) {
+      // Did onLogin's cookie actually stick (cookies blocked / rejected)? Asked through the SAME
+      // helper that wrote it, so this can never look up a different cookie name than the one apollo
+      // uses — it is the only holder of that name (see nuxt.config.js `apollo.tokenName`).
+      if (!this.app.$apolloHelpers.getToken()) {
         throw new Error('no-cookie')
       }
     } catch (err) {

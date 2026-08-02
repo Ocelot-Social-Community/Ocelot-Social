@@ -284,7 +284,11 @@ export default {
 
   // Give apollo module options
   apollo: {
-    tokenName: metadata.COOKIE_NAME, // optional, default: apollo-token
+    // SINGLE SOURCE for the auth cookie name. The module bakes this into the generated plugin as a
+    // string literal, and every read/write of the cookie goes through $apolloHelpers (onLogin /
+    // onLogout / getToken), so nothing else may hold a second copy of the name — a copy resolved at
+    // RUNTIME (as the branded `metadata.cookieName` was) inevitably disagrees with this baked one.
+    tokenName: CONFIG.COOKIE_NAME, // optional, default: apollo-token
     cookieAttributes: {
       expires: CONFIG.COOKIE_EXPIRE_TIME, // optional, default: 7 (days)
       /** * Define the path where the cookie is available. Defaults to '/' */
