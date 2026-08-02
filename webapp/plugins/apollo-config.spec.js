@@ -45,16 +45,34 @@ describe('apollo client config', () => {
     expect(config.getAuth()).toBe('Bearer later-jwt')
   })
 
-  it('points the browser at the proxy and the server at the backend', () => {
+  it('points the browser at the /api proxy, never at the backend host directly', () => {
+    // process.server is falsy under jest, so this is the browser branch. The proxy indirection is
+    // what keeps the backend host out of the bundle and requests same-origin.
     const config = apolloConfig(context())
     expect(config.wsEndpoint).toBe('ws://backend/graphql')
-    // process.server is falsy under jest → the browser branch
     expect(config.httpEndpoint).toBe('/api')
   })
 
-  it('falls back to localhost when no backend URI is configured', () => {
-    const ctx = context()
-    delete ctx.req.env.GRAPHQL_URI
-    expect(apolloConfig(ctx).httpEndpoint).toBe('/api')
+  describe('during SSR', () => {
+    // The server branch has to be entered deliberately — without this, `httpEndpoint` is '/api' no
+    // matter what the environment says, and any assertion about the backend URL passes vacuously.
+    let previousServer
+    beforeEach(() => {
+      previousServer = process.server
+      process.server = true
+    })
+    afterEach(() => {
+      process.server = previousServer
+    })
+
+    it('talks to the backend directly — there is no proxy in front of the nuxt server', () => {
+      expect(apolloConfig(context()).httpEndpoint).toBe('http://backend:4000')
+    })
+
+    it('falls back to localhost when no backend URI is configured', () => {
+      const ctx = context()
+      delete ctx.req.env.GRAPHQL_URI
+      expect(apolloConfig(ctx).httpEndpoint).toBe('http://localhost:4000')
+    })
   })
 })
