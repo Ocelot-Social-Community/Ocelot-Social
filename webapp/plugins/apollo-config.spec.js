@@ -2,7 +2,13 @@ import apolloConfig from './apollo-config.js'
 
 const context = ({ cookies = {}, $config = {}, env = {} } = {}) => ({
   req: {
-    env: { GRAPHQL_URI: 'http://backend:4000', WEBSOCKETS_URI: 'ws://backend/graphql', ...env },
+    env: {
+      GRAPHQL_URI: 'http://backend:4000',
+      // Shaped like the real deployment: the helm chart sets wss://<domain>/api/graphql — the
+      // ingress, not the backend host (templates/webapp/deployment.yaml).
+      WEBSOCKETS_URI: 'wss://ocelot.test/api/graphql',
+      ...env,
+    },
   },
   app: {
     $config,
@@ -45,12 +51,13 @@ describe('apollo client config', () => {
     expect(config.getAuth()).toBe('Bearer later-jwt')
   })
 
-  it('points the browser at the /api proxy, never at the backend host directly', () => {
-    // process.server is falsy under jest, so this is the browser branch. The proxy indirection is
-    // what keeps the backend host out of the bundle and requests same-origin.
+  it('routes browser HTTP through the /api proxy and subscriptions to the configured WEBSOCKETS_URI', () => {
+    // process.server is falsy under jest, so this is the browser branch. Two DIFFERENT contracts:
+    // httpEndpoint is rewritten to the nuxt proxy (same-origin, backend host out of the bundle),
+    // while wsEndpoint is passed through verbatim — ops decide where the socket goes.
     const config = apolloConfig(context())
-    expect(config.wsEndpoint).toBe('ws://backend/graphql')
     expect(config.httpEndpoint).toBe('/api')
+    expect(config.wsEndpoint).toBe('wss://ocelot.test/api/graphql')
   })
 
   describe('during SSR', () => {
