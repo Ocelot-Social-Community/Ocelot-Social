@@ -55,8 +55,15 @@ test('an empty archive yields no files', () => {
 
 test('readTarGz caps decompression size (gzip-bomb guard), default ceiling is generous', () => {
   const gz = writeTarGz([{ name: 'big', data: Buffer.alloc(4096, 0x41) }]) // inflates past 512 bytes
-  // a tiny ceiling → throws instead of decompressing (would OOM on a real bomb)
-  assert.throws(() => readTarGz(gz, 100))
+  // a tiny ceiling → throws instead of decompressing (would OOM on a real bomb). Pinned to the guard's
+  // actual failure, not just "something threw": a bare assert.throws would pass just as happily on a
+  // TypeError from a changed signature. The ceiling in the message proves the value PASSED IN is the
+  // one enforced rather than the default.
+  assert.throws(() => readTarGz(gz, 100), {
+    name: 'RangeError',
+    code: 'ERR_BUFFER_TOO_LARGE', // zlib's maxOutputLength, which the guard delegates to
+    message: /100 bytes/,
+  })
   // the default ceiling reads the same archive fine
   assert.ok(MAX_ARCHIVE_BYTES > 4096)
   assert.ok(readTarGz(gz).has('big'))
