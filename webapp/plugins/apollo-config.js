@@ -21,9 +21,13 @@ export default (context) => {
       credentials: 'same-origin',
     },
     credentials: true,
-    // No `tokenName` here: the module overwrites whatever a client config returns with the name baked
-    // from nuxt.config's `apollo.tokenName` (its templates/plugin.js assigns clientConfig.tokenName
-    // after calling this factory), so a value set here is silently dead. See nuxt.config.js.
+    // No `tokenName` here — it belongs in exactly ONE place, `apollo.tokenName` in nuxt.config.js,
+    // which is the module's GLOBAL default. In @nuxtjs/apollo ^4.0.0-rc19 (not the v5 `clients` API)
+    // a client-level value takes precedence over that global — its generated plugin renders
+    // `clientTokenName = '<clientConfigs[key].tokenName>' || AUTH_TOKEN_NAME` — so setting one here
+    // could only ever make the two diverge when the central value is changed later. It would not even
+    // take effect: for a client config passed as a FILE PATH (ours) that option is undefined, and the
+    // plugin assigns `clientConfig.tokenName` AFTER calling this factory, dropping what we returned.
     //
     // Defining `getAuth` is what actually takes the auth header off that baked name: the module only
     // falls back to its own cookie read when a client config provides none. Used for HTTP requests
