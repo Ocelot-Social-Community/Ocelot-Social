@@ -163,8 +163,16 @@ start the pod with a broken credential and the problem only surfaces on the next
 ```bash
 kubectl -n <namespace> run pulltest --rm -it --restart=Never \
   --image=ghcr.io/<org>/<private-image>:<tag> \
-  --overrides='{"spec":{"imagePullPolicy":"Always"}}'
+  --image-pull-policy=Always \
+  --overrides='{"spec":{"imagePullSecrets":[{"name":"<release>-image-pull"}]}}'
 ```
+
+Both flags matter. `imagePullPolicy` lives on the container (`spec.containers[].imagePullPolicy`),
+not on the pod, so passing it through `--overrides` would be silently ignored — `kubectl run` has
+`--image-pull-policy` for it. And the pull Secret has to be named explicitly: this chart attaches it
+to the pod specs it renders, not to the namespace's ServiceAccount, so an ad-hoc `kubectl run` pod
+carries no credential at all and would fail against a private image even when the deployment itself
+is configured correctly. Substitute the release name, or the name of an `existingSecrets` entry.
 
 `kubectl describe pod` distinguishes the two common failures: 401 points at the token or a missing
 SSO authorization, 403 at missing package access.
