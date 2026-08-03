@@ -11,6 +11,31 @@ global:
     pullPolicy: IfNotPresent
     tag:
 
+# Credentials for pulling images from private registries. Public images need none — leave this empty
+# unless a repository the instance pulls from is actually private.
+#
+# `registries` generates a `kubernetes.io/dockerconfigjson` Secret and references it from every pod.
+# Scope each entry to "host/path" rather than the bare host, so that several GHCR organizations with
+# DIFFERENT tokens can coexist (see the "imagePullSecretDockerConfigJson" helper):
+#
+#   registries:
+#     - registry: ghcr.io/it4change
+#       username: ocelot-bot
+#       password: ghp_...            # classic PAT, scope `read:packages` only
+#     - registry: ghcr.io/ocelot-social-community
+#       username: ocelot-bot
+#       password: ghp_...
+#
+# Never put these into a plaintext values file — they come from the sops-encrypted
+# `helmfile/environments/*.secrets.yaml` of a configuration, see deployment/deployment-values.md.
+#
+# `existingSecrets` references pull Secrets created outside this chart, additionally to the
+# generated one. Use it to share a single Secret between the ocelot-social and ocelot-neo4j releases
+# instead of having each chart generate its own copy.
+imagePullCredentials:
+  registries: []
+  existingSecrets: []
+
 backend:
   image:
     repository: ghcr.io/ocelot-social-community/ocelot-social/backend

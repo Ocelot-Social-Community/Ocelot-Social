@@ -13,6 +13,7 @@ spec:
         app: {{ .Release.Name }}-imagor
     spec:
       restartPolicy: Always
+      {{- include "imagePullSecrets" . | indent 6 }}
       containers:
       - name: {{ .Release.Name }}-imagor
         image: "{{ .Values.imagor.image.repository }}:{{ .Values.imagor.image.tag | default (include "defaultTag" .)  }}"

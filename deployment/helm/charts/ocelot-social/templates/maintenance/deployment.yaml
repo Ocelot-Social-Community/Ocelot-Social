@@ -12,6 +12,7 @@ spec:
         app: {{ .Release.Name }}-maintenance
     spec:
       restartPolicy: Always
+      {{- include "imagePullSecrets" . | indent 6 }}
       containers:
       - name: {{ .Release.Name }}-maintenance
         image: "{{ .Values.maintenance.image.repository }}:{{ .Values.maintenance.image.tag | default (include "defaultTag" .)  }}"

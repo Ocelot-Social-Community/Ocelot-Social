@@ -4,6 +4,14 @@ global:
   image:
     tag:
 
+# Credentials for pulling images from private registries — see the identically named block in the
+# ocelot-social chart. Both releases share one values file per configuration, so setting it there
+# covers this chart as well. Each chart generates its own Secret; set `existingSecrets` here and
+# leave `registries` empty to reuse the one from the ocelot-social release instead.
+imagePullCredentials:
+  registries: []
+  existingSecrets: []
+
 neo4j:
   image:
     repository: ghcr.io/ocelot-social-community/ocelot-social/neo4j
