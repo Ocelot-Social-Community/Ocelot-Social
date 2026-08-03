@@ -16,6 +16,7 @@ spec:
         app: {{ .Release.Name }}-neo4j
     spec:
       restartPolicy: Always
+      {{- include "imagePullSecrets" . | indent 6 }}
       containers:
       - name: container-{{ .Release.Name }}-neo4j
         image: "{{ .Values.neo4j.image.repository }}:{{ .Values.neo4j.image.tag | default (include "defaultTag" .)  }}"

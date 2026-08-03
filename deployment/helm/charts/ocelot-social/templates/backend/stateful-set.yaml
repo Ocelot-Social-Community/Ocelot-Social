@@ -14,6 +14,7 @@ spec:
         app: {{ .Release.Name }}-backend
     spec:
       restartPolicy: Always
+      {{- include "imagePullSecrets" . | indent 6 }}
       initContainers:
         - name: {{ .Release.Name }}-backend-migrations
           image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default (include "defaultTag" .) }}"
