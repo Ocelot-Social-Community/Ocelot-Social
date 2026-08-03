@@ -1,0 +1,122 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name:  {{ .Release.Name }}-backend
+spec:
+  # Deliberately not configurable. The backend is stateless with respect to FILES (uploads live in S3
+  # since migration 20250502230521-migrate-to-s3), but not with respect to SUBSCRIPTIONS: without
+  # Redis configured, backend/src/context/pubsub.ts falls back to a process-local PubSub, so a second
+  # pod would only reach the clients whose websocket happens to hang on it. The LiveKit poller
+  # (server.ts, startLiveKitPoller) would likewise run once per pod. Both have to be solved before
+  # this may exceed 1 — see docu/backend-zero-downtime-konzept.md.
+  #
+  # It is also what keeps the migration initContainer below safe: at one pod there is exactly one
+  # migration run at a time, so no locking is needed.
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      # Same reason: a surge would briefly run two pods and split the subscriptions. Raise to
+      # maxSurge 1 / maxUnavailable 0 only once Redis is wired up AND schema migrations follow
+      # expand-and-contract, since a surge runs old and new code side by side.
+      maxSurge: 0
+      maxUnavailable: 1
+  # Must outlast the database wait below, otherwise a slow Neo4j makes the Deployment report
+  # ProgressDeadlineExceeded (and `kubectl rollout status` fail) while the pod is still waiting
+  # perfectly legitimately.
+  progressDeadlineSeconds: {{ add .Values.backend.migrations.waitForDatabaseSeconds 600 }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-backend
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-backend
+    spec:
+      restartPolicy: Always
+      {{- include "imagePullSecrets" . | indent 6 }}
+      initContainers:
+        # Split in two on purpose. Neo4j is a separate release and regularly comes up minutes after
+        # the backend, which is EXPECTED and must not look like a failure — this container absorbs
+        # that silently. A migration that is genuinely broken then fails in the NEXT container and
+        # shows up as CrashLoopBackOff right away, instead of hiding inside a long retry loop.
+        - name: {{ .Release.Name }}-backend-wait-db
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default (include "defaultTag" .) }}"
+          imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -eu
+              rest="${NEO4J_URI#*://}"
+              host="${rest%%:*}"
+              port="${rest##*:}"
+              if [ "$port" = "$host" ]; then port=7687; fi
+              deadline=$(( $(date +%s) + {{ .Values.backend.migrations.waitForDatabaseSeconds }} ))
+              # node rather than nc: busybox's nc has no portable -z, node is guaranteed to be here.
+              probe='const net=require("net")
+              const s=net.connect(Number(process.argv[2]),process.argv[1])
+              s.on("connect",()=>{s.end();process.exit(0)})
+              s.on("error",()=>process.exit(1))
+              setTimeout(()=>process.exit(1),5000)'
+              until node -e "$probe" "$host" "$port"; do
+                if [ "$(date +%s)" -ge "$deadline" ]; then
+                  echo "neo4j at $host:$port unreachable after {{ .Values.backend.migrations.waitForDatabaseSeconds }}s, giving up"
+                  exit 1
+                fi
+                echo "waiting for neo4j at $host:$port ..."
+                sleep 5
+              done
+              echo "neo4j at $host:$port is reachable"
+          envFrom:
+          - configMapRef:
+              name: {{ .Release.Name }}-backend-env
+          - secretRef:
+              name: {{ .Release.Name }}-backend-secret-env
+          {{- include "resources" .Values.backend.resources | indent 10 }}
+        - name: {{ .Release.Name }}-backend-migrations
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default (include "defaultTag" .) }}"
+          imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
+          command: ["/bin/sh", "-c", "yarn prod:migrate init && yarn prod:migrate up"]
+          {{- include "resources" .Values.backend.resources | indent 10 }}
+          env:
+          - name: IMAGOR_PUBLIC_URL
+            value: "https://{{ .Values.domain }}/imagor"
+          envFrom:
+          - configMapRef:
+              name: {{ .Release.Name }}-backend-env
+          - secretRef:
+              name: {{ .Release.Name }}-backend-secret-env
+      containers:
+        - name: {{ .Release.Name }}-backend
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default (include "defaultTag" .) }}"
+          imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
+          {{- include "resources" .Values.backend.resources | indent 10 }}
+          env:
+          - name: GRAPHQL_URI
+            value: "http://{{ .Release.Name }}-backend:4000"
+          - name: CLIENT_URI
+            value: "https://{{ .Values.domain }}"
+          - name: IMAGOR_PUBLIC_URL
+            value: "https://{{ .Values.domain }}/imagor"
+          envFrom:
+          - configMapRef:
+              name: {{ .Release.Name }}-backend-env
+          - secretRef:
+              name: {{ .Release.Name }}-backend-secret-env
+          ports:
+          - containerPort: 4000
+            protocol: TCP
+          # tcpSocket rather than httpGet because the backend has no health endpoint yet. It only
+          # proves the listener is up, not that Neo4j is reachable — replace with httpGet on a real
+          # /healthz once one exists.
+          readinessProbe:
+            tcpSocket:
+              port: 4000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 4000
+            initialDelaySeconds: 30
+            periodSeconds: 20
