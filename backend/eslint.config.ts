@@ -15,7 +15,10 @@ import { derivedEnumSDLs } from './src/graphql/derivedEnums'
 
 export default [
   {
-    ignores: ['node_modules/', 'build/', 'coverage/'],
+    // public-docs/ is generated (spectaql, see the root `docs:api` script) and gitignored, so it only
+    // exists on a machine that ran the generator — where its minified bundle made `yarn lint` fail
+    // while CI, which never generates it, stayed green.
+    ignores: ['node_modules/', 'build/', 'coverage/', 'public-docs/'],
   },
   ...config,
   ...jest,
@@ -108,6 +111,23 @@ export default [
     files: ['*.config.{js,mjs,cjs,ts,mts,cts}'],
     rules: {
       'n/no-unpublished-require': 'off',
+    },
+  },
+  {
+    // NAMING LOCK: test files are `*.spec.*` across the whole repo. Both suffixes used to be picked
+    // up (and jest's testMatch still accepts either — DELIBERATELY, so a mis-named file fails loudly
+    // here instead of being silently skipped), which is how the webapp's auth store once carried TWO
+    // half-overlapping suites — an auth.test.js beside auth.spec.js, since merged into the latter.
+    // Wrong suffix = lint error now.
+    files: ['**/*.test.{js,jsx,mjs,cjs,ts,tsx,mts,cts,vue}'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'Program',
+          message: 'Rename this file to *.spec.* — test files use the .spec suffix in this repo.',
+        },
+      ],
     },
   },
 ]

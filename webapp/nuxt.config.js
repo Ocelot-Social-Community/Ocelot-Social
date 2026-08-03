@@ -43,6 +43,18 @@ export default {
     graphqlUri: process.env.GRAPHQL_URI || CONFIG.GRAPHQL_URI,
   },
 
+  // RUNTIME and reaches the BROWSER (serialised as window.__NUXT__.config), which `env` above cannot:
+  // the auth cookie is written and read client-side, so its name and attributes have to survive into
+  // the bundle-independent config. That is what makes them deployment values (Helm `webapp.env.*` →
+  // pod env) on a pre-built image — see utils/authCookie.js for why @nuxtjs/apollo's own token name
+  // could never be one.
+  publicRuntimeConfig: {
+    cookieName: CONFIG.COOKIE_NAME,
+    cookieLegacyNames: CONFIG.COOKIE_NAME_LEGACY,
+    cookieExpireDays: CONFIG.COOKIE_EXPIRE_TIME,
+    cookieHttpsOnly: CONFIG.COOKIE_HTTPS_ONLY,
+  },
+
   env: {
     ...CONFIG,
     // pages which do NOT require a login
@@ -190,6 +202,8 @@ export default {
    ** Plugins to load before mounting the App
    */
   plugins: [
+    // First: $authCookie is what the auth store reads/writes the session with.
+    { src: '~/plugins/auth-cookie.js', ssr: true },
     { src: '~/plugins/branding.js', ssr: true },
     { src: '~/plugins/branding-head.js', ssr: false },
     { src: '~/plugins/policy.js', ssr: true },
@@ -232,8 +246,11 @@ export default {
         duration: 1000,
       },
     ],
-    'cookie-universal-nuxt',
     '@nuxtjs/apollo',
+    // AFTER @nuxtjs/apollo on purpose: nuxt's addPlugin UNSHIFTS, so module plugins run in REVERSE
+    // registration order — this is what puts $cookies in place before the apollo client config is
+    // built, which needs it to resolve the auth cookie (plugins/apollo-config.js getAuth).
+    'cookie-universal-nuxt',
     '@nuxtjs/axios',
     '@nuxtjs/style-resources',
     '@nuxtjs/sentry',
@@ -284,15 +301,24 @@ export default {
 
   // Give apollo module options
   apollo: {
-    tokenName: metadata.COOKIE_NAME, // optional, default: apollo-token
+    // NOT the auth cookie's configuration — utils/authCookie.js is, and plugins/apollo-config.js
+    // hands the module a `getAuth` that uses it. These values only feed the module's own
+    // $apolloHelpers (onLogin / onLogout / getToken), which nothing calls any more: the module bakes
+    // them into the generated plugin as literals when the bundle is built, so on the ONE pre-built
+    // image every deployment shares they can only ever be the build-time defaults. They are kept in
+    // sync with the real settings so a future caller cannot silently get a different cookie.
+    // The defaults noted below are OURS (webapp/config/index.js), not the module's: looking for the
+    // module's `apollo-token` while debugging a session would send you after a cookie that never
+    // exists here.
+    tokenName: CONFIG.COOKIE_NAME, // $COOKIE_NAME, default 'ocelot-social-token'
     cookieAttributes: {
-      expires: CONFIG.COOKIE_EXPIRE_TIME, // optional, default: 7 (days)
+      expires: CONFIG.COOKIE_EXPIRE_TIME, // $COOKIE_EXPIRE_TIME, default 730 (days)
       /** * Define the path where the cookie is available. Defaults to '/' */
       // For some reason this can vary - lets see if setting this helps.
       path: '/', // optional
       /** * A Boolean indicating if the cookie transmission requires a
-       * secure protocol (https). Defaults to false. */
-      secure: CONFIG.COOKIE_HTTPS_ONLY,
+       * secure protocol (https). */
+      secure: CONFIG.COOKIE_HTTPS_ONLY, // $COOKIE_HTTPS_ONLY, default true in production
       sameSite: 'lax', // for the meaning see https://www.thinktecture.com/de/identity/samesite/samesite-in-a-nutshell/
     },
     // includeNodeModules: true, // optional, default: false (this includes graphql-tag for node_modules folder)

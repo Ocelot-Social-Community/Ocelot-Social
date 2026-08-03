@@ -1,9 +1,9 @@
 // The fs-touching half of discover.ts: walk (recursive discovery), readMeta (manifest read + mtime
 // cache), compareVersions (highest-version-per-id dedupe), readArchive, readArchiveConfig,
 // composeComposition and readDefaultMarker. Exercised against REAL archives written to a temp dir —
-// the compose core is unit-tested separately (discover.test.ts) with an in-memory file map.
+// the compose core is unit-tested separately (discover.spec.ts) with an in-memory file map.
 import assert from 'node:assert/strict'
-import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, utimesSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { delimiter, join, resolve } from 'node:path'
 import { after, describe, test } from 'node:test'
@@ -134,10 +134,33 @@ test('discoverArchives returns an empty map for a missing base dir (walk swallow
 
 test('a second discover of the same dir hits the mtime cache (same metadata)', () => {
   const base = tmp()
-  writeArchive(base, 'acme.tar.gz', { id: 'acme', version: '2.0', primary: 'x' })
+  const file = writeArchive(base, 'acme.tar.gz', { id: 'acme', version: '2.0', primary: 'x' })
+  // Pinned, so both stats compare EXACTLY equal whatever timestamp resolution the filesystem has.
+  const stamp = new Date(1700000000000)
+  utimesSync(file, stamp, stamp)
   const first = discoverArchives(base).get('acme')
+
+  // The only way to tell a cache HIT from a silent re-read is to make a re-read give a different
+  // answer: same path, different content, mtime put back. Comparing two reads of an unchanged file
+  // would pass either way.
+  writeArchive(base, 'acme.tar.gz', { id: 'acme', version: '9.9', primary: 'x' })
+  utimesSync(file, stamp, stamp)
   const second = discoverArchives(base).get('acme')
-  assert.deepEqual(second, first)
+
+  assert.equal(first?.version, '2.0')
+  assert.deepEqual(second, first) // 9.9 on disk was never read — the cache answered
+})
+
+test('a discover after a real change MISSES the cache (mtime is the invalidator)', () => {
+  // The other half of the contract: caching that never invalidates would pass the test above too.
+  const base = tmp()
+  const file = writeArchive(base, 'stale.tar.gz', { id: 'stale', version: '2.0', primary: 'x' })
+  utimesSync(file, new Date(1700000000000), new Date(1700000000000))
+  assert.equal(discoverArchives(base).get('stale')?.version, '2.0')
+
+  writeArchive(base, 'stale.tar.gz', { id: 'stale', version: '9.9', primary: 'x' })
+  utimesSync(file, new Date(1700000001000), new Date(1700000001000))
+  assert.equal(discoverArchives(base).get('stale')?.version, '9.9')
 })
 
 test('readArchive returns the decompressed entries, or null for a missing file', () => {

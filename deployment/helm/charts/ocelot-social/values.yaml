@@ -21,6 +21,23 @@ backend:
 webapp:
   image:
     repository: ghcr.io/ocelot-social-community/ocelot-social/webapp
+  # Rendered into the webapp ConfigMap VERBATIM (see templates/webapp/configmap.yml), so every value
+  # has to be a QUOTED STRING: a ConfigMap's `data` is map[string]string, and an unquoted `true` or
+  # `730` arrives as a YAML bool/int — the API server then rejects the whole manifest. The values shown
+  # are the defaults; set only what differs.
+  #
+  #   env:
+  #     # Name of the auth cookie holding the JWT. Set it to keep an instance's established sessions
+  #     # alive when its cookie used to be named differently — nothing else depends on the name, and
+  #     # cookies are host-only. NOT a branding value: deliberately not switchable while the app runs,
+  #     # because renaming it mid-flight would end every session.
+  #     COOKIE_NAME: "ocelot-social-token"
+  #     # Comma-separated predecessor name(s) whose sessions are ADOPTED instead of dropped.
+  #     # "" switches the adoption off.
+  #     COOKIE_NAME_LEGACY: "ocelot-social-token"
+  #     COOKIE_EXPIRE_TIME: "730" # session lifetime in days
+  #     COOKIE_HTTPS_ONLY: "true" # send the cookie over HTTPS only (production default)
+  env: {}
 
 maintenance:
   image:

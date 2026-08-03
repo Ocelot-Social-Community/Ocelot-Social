@@ -1,5 +1,5 @@
 {
-  "//": "Every path build-maintenance-branding.ts writes into a maintenance app, relative to its root. THE source: the generator clears these before it writes, and maintenance/tools/brand.mjs deletes them for `npm run brand:reset`. A path that reached only one of the two would survive the reset and contaminate the next brand, which is why it is a file rather than a constant in each. JSON so the reset works without the package's dist/ being built. Keep in step with maintenance/.gitignore; test/maintenance-branding.test.ts asserts the generator writes nothing outside this list.",
+  "//": "Every path build-maintenance-branding.ts writes into a maintenance app, relative to its root. THE source: the generator clears these before it writes, and maintenance/tools/brand.mjs deletes them for `npm run brand:reset`. A path that reached only one of the two would survive the reset and contaminate the next brand, which is why it is a file rather than a constant in each. JSON so the reset works without the package's dist/ being built. Keep in step with maintenance/.gitignore; test/maintenance-branding.spec.ts asserts the generator writes nothing outside this list.",
   "servedDir": "brand",
   "paths": [
     "app/assets/css/brand.css",

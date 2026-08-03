@@ -1,24 +1,14 @@
 import { state as createState, mutations, getters, actions } from './auth.js'
 import { getBranding, setBranding } from '@ocelot-social/branding'
+import { restartWebsockets } from 'vue-cli-plugin-apollo/graphql-client'
 
-// auth.js instantiates `new Cookie()` at module load and reads the auth cookie
-// inside login(). Mock universal-cookie so we can drive that branch (cookie
-// present → success, cookie missing → 'no-cookie' throw). `get` reads the value
-// lazily so the mock survives the construction that happens during import.
-let mockCookieValue
-jest.mock('universal-cookie', () =>
-  jest.fn().mockImplementation(() => ({ get: () => mockCookieValue })),
-)
+// login/logout switch identity themselves now (the auth cookie is ours — see utils/authCookie.js):
+// the websocket has to reconnect so its connectionParams carry the new token. Mocked to observe it.
+jest.mock('vue-cli-plugin-apollo/graphql-client', () => ({ restartWebsockets: jest.fn() }))
 
 const noop = () => {}
 
 describe('auth store', () => {
-  // Reset the shared cookie-mock state so each test starts deterministically
-  // (login tests set it explicitly; everything else gets a clean "no cookie").
-  beforeEach(() => {
-    mockCookieValue = undefined
-  })
-
   describe('initial state', () => {
     it('starts logged out', () => {
       expect(createState()).toEqual({
@@ -220,10 +210,21 @@ describe('auth store', () => {
   })
 
   describe('actions', () => {
-    const apolloHelpers = (token = null) => ({
-      getToken: jest.fn(() => token),
-      onLogin: jest.fn().mockResolvedValue(),
-      onLogout: jest.fn().mockResolvedValue('logged-out'),
+    // The token handed in doubles as "the cookie the browser kept" — that is what init/check read
+    // and what login()'s no-cookie guard checks after writing it.
+    const authCookie = (token = null) => ({
+      get: jest.fn(() => token),
+      set: jest.fn(),
+      remove: jest.fn(),
+    })
+
+    // A defaultClient carrying just what the session switch touches.
+    const apolloProvider = (defaultClient = {}) => ({
+      defaultClient: {
+        resetStore: jest.fn().mockResolvedValue(),
+        wsClient: { id: 'ws' },
+        ...defaultClient,
+      },
     })
 
     describe('init', () => {
@@ -234,7 +235,7 @@ describe('auth store', () => {
         process.server = false
         try {
           await actions.init.call(
-            { app: { $apolloHelpers: apolloHelpers('jwt') } },
+            { app: { $authCookie: authCookie('jwt') } },
             {
               commit,
               dispatch,
@@ -254,7 +255,7 @@ describe('auth store', () => {
         process.server = true
         try {
           await actions.init.call(
-            { app: { $apolloHelpers: apolloHelpers(null) } },
+            { app: { $authCookie: authCookie(null) } },
             {
               commit,
               dispatch,
@@ -273,7 +274,7 @@ describe('auth store', () => {
         process.server = true
         try {
           await actions.init.call(
-            { app: { $apolloHelpers: apolloHelpers('jwt') } },
+            { app: { $authCookie: authCookie('jwt') } },
             {
               commit,
               dispatch,
@@ -295,10 +296,7 @@ describe('auth store', () => {
           dispatch,
           getters: { isLoggedIn: false },
         }
-        const result = await actions.check.call(
-          { app: { $apolloHelpers: apolloHelpers(null) } },
-          ctx,
-        )
+        const result = await actions.check.call({ app: { $authCookie: authCookie(null) } }, ctx)
         expect(dispatch).toHaveBeenCalledWith('logout')
         expect(result).toBe(false)
       })
@@ -310,10 +308,7 @@ describe('auth store', () => {
           dispatch,
           getters: { isLoggedIn: true },
         }
-        const result = await actions.check.call(
-          { app: { $apolloHelpers: apolloHelpers('jwt') } },
-          ctx,
-        )
+        const result = await actions.check.call({ app: { $authCookie: authCookie('jwt') } }, ctx)
         expect(dispatch).not.toHaveBeenCalled()
         expect(result).toBe(true)
       })
@@ -460,24 +455,39 @@ describe('auth store', () => {
         expect(result).toBe('logged-out')
         expect(commit).not.toHaveBeenCalled()
       })
+
+      it('logs out when the query itself fails — an unusable session must not linger', async () => {
+        // e.g. the token was revoked server-side: the query rejects, and staying "logged in" with a
+        // dead token would leave the UI in a state where every action fails.
+        const query = jest.fn().mockRejectedValue(new Error('unauthenticated'))
+        const commit = jest.fn()
+        const dispatch = jest.fn().mockResolvedValue('logged-out')
+        const result = await actions.fetchCurrentUser.call(
+          { app: { apolloProvider: { defaultClient: { query } } } },
+          { commit, dispatch },
+        )
+        expect(dispatch).toHaveBeenCalledWith('logout')
+        expect(result).toBe('logged-out')
+      })
     })
 
     describe('login', () => {
-      const makeLoginThis = (mutate, helpers) => ({
+      const makeLoginThis = (mutate, cookie) => ({
         app: {
-          apolloProvider: { defaultClient: { mutate } },
-          $apolloHelpers: helpers,
+          apolloProvider: apolloProvider({ mutate }),
+          $authCookie: cookie,
         },
       })
 
-      it('runs the full happy path: mutate, onLogin, token, user, categories/policy, pending toggle', async () => {
-        mockCookieValue = 'cookie-present'
+      it('runs the full happy path: mutate, cookie, token, user, categories/policy, pending toggle', async () => {
+        restartWebsockets.mockClear()
         const mutate = jest.fn().mockResolvedValue({ data: { login: 'jwt' } })
-        const helpers = apolloHelpers()
+        const cookie = authCookie('jwt') // the cookie just written reads back
         const commit = jest.fn()
         const dispatch = jest.fn().mockResolvedValue()
+        const context = makeLoginThis(mutate, cookie)
         await actions.login.call(
-          makeLoginThis(mutate, helpers),
+          context,
           { commit, dispatch },
           {
             email: 'a@b.c',
@@ -489,24 +499,61 @@ describe('auth store', () => {
         expect(mutate).toHaveBeenCalledWith(
           expect.objectContaining({ variables: { email: 'a@b.c', password: 'pw' } }),
         )
-        expect(helpers.onLogin).toHaveBeenCalledWith('jwt')
+        expect(cookie.set).toHaveBeenCalledWith('jwt')
+        // the session switch @nuxtjs/apollo's onLogin used to perform: authenticated socket, no
+        // cache left over from the anonymous session
+        expect(restartWebsockets).toHaveBeenCalledWith(
+          context.app.apolloProvider.defaultClient.wsClient,
+        )
+        expect(context.app.apolloProvider.defaultClient.resetStore).toHaveBeenCalled()
         expect(commit).toHaveBeenCalledWith('SET_TOKEN', 'jwt')
-        expect(dispatch).toHaveBeenCalledWith('fetchCurrentUser')
-        expect(dispatch).toHaveBeenCalledWith('categories/init', null, { root: true })
-        expect(dispatch).toHaveBeenCalledWith('policy/init', null, { root: true })
-        expect(dispatch).toHaveBeenCalledWith('policy/resubscribe', null, { root: true })
+        // Exact and ORDERED: the two resubscribes re-open the subscriptions the session switch
+        // above just dropped, and they have to run after the authenticated policy/init has replaced
+        // the anonymous snapshot. A swap would leave stale data with a live handler on top.
+        expect(dispatch.mock.calls).toEqual([
+          ['fetchCurrentUser'],
+          ['categories/init', null, { root: true }],
+          ['policy/init', null, { root: true }],
+          ['policy/resubscribe', null, { root: true }],
+          ['resubscribePermissions'],
+        ])
         // finally{} always clears pending
         expect(commit).toHaveBeenLastCalledWith('SET_PENDING', false)
       })
 
+      it('survives a resetStore that rejects — the session switch already happened', async () => {
+        const mutate = jest.fn().mockResolvedValue({ data: { login: 'jwt' } })
+        const context = makeLoginThis(mutate, authCookie('jwt'))
+        context.app.apolloProvider.defaultClient.resetStore = jest
+          .fn()
+          .mockRejectedValue(new Error('refetch failed'))
+        const commit = jest.fn()
+        const dispatch = jest.fn().mockResolvedValue()
+        await actions.login.call(context, { commit, dispatch }, { email: 'a@b.c', password: 'pw' })
+        expect(commit).toHaveBeenCalledWith('SET_TOKEN', 'jwt')
+      })
+
+      it('does not touch the websocket when there is none (SSR / not connected)', async () => {
+        restartWebsockets.mockClear()
+        const mutate = jest.fn().mockResolvedValue({ data: { login: 'jwt' } })
+        const context = makeLoginThis(mutate, authCookie('jwt'))
+        context.app.apolloProvider.defaultClient.wsClient = undefined
+        await actions.login.call(
+          context,
+          { commit: jest.fn(), dispatch: jest.fn().mockResolvedValue() },
+          { email: 'a@b.c', password: 'pw' },
+        )
+        expect(restartWebsockets).not.toHaveBeenCalled()
+      })
+
       it('throws (and still clears pending) when the auth cookie is missing afterwards', async () => {
-        mockCookieValue = undefined
+        // authCookie() → get returns null: the browser did not keep the cookie login just wrote.
         const mutate = jest.fn().mockResolvedValue({ data: { login: 'jwt' } })
         const commit = jest.fn()
         const dispatch = jest.fn().mockResolvedValue()
         await expect(
           actions.login.call(
-            makeLoginThis(mutate, apolloHelpers()),
+            makeLoginThis(mutate, authCookie()),
             { commit, dispatch },
             {
               email: 'a@b.c',
@@ -519,11 +566,12 @@ describe('auth store', () => {
 
       it('throws (and still clears pending) when the login mutation fails', async () => {
         const mutate = jest.fn().mockRejectedValue(new Error('bad-credentials'))
+        const cookie = authCookie()
         const commit = jest.fn()
         const dispatch = jest.fn().mockResolvedValue()
         await expect(
           actions.login.call(
-            makeLoginThis(mutate, apolloHelpers()),
+            makeLoginThis(mutate, cookie),
             { commit, dispatch },
             {
               email: 'a@b.c',
@@ -532,6 +580,7 @@ describe('auth store', () => {
           ),
         ).rejects.toThrow('bad-credentials')
         // bailed out before persisting the session
+        expect(cookie.set).not.toHaveBeenCalled()
         expect(commit).not.toHaveBeenCalledWith('SET_TOKEN', expect.anything())
         expect(dispatch).not.toHaveBeenCalledWith('fetchCurrentUser')
         expect(commit).toHaveBeenLastCalledWith('SET_PENDING', false)
@@ -539,17 +588,26 @@ describe('auth store', () => {
     })
 
     describe('logout', () => {
-      it('resets user/token, calls onLogout and re-inits the anonymous policy', async () => {
+      it('resets user/token, clears the cookie, restarts the session and re-inits the anonymous policy', async () => {
+        restartWebsockets.mockClear()
         const commit = jest.fn()
         const dispatch = jest.fn().mockResolvedValue()
-        const helpers = apolloHelpers('jwt')
-        await actions.logout.call({ app: { $apolloHelpers: helpers } }, { commit, dispatch })
+        const cookie = authCookie('jwt')
+        const context = { app: { apolloProvider: apolloProvider(), $authCookie: cookie } }
+        await actions.logout.call(context, { commit, dispatch })
         expect(commit).toHaveBeenCalledWith('SET_USER', null)
         expect(commit).toHaveBeenCalledWith('SET_TOKEN', null)
         expect(commit).toHaveBeenCalledWith('SET_PERMISSIONS', [])
-        expect(helpers.onLogout).toHaveBeenCalled()
-        expect(dispatch).toHaveBeenCalledWith('policy/init', null, { root: true })
-        expect(dispatch).toHaveBeenCalledWith('policy/resubscribe', null, { root: true })
+        expect(cookie.remove).toHaveBeenCalled()
+        expect(restartWebsockets).toHaveBeenCalled()
+        expect(context.app.apolloProvider.defaultClient.resetStore).toHaveBeenCalled()
+        // Same ordering guard as in login: resubscribe re-opens the subscription the session
+        // restart dropped, and must run after the anonymous policy/init reset the snapshot.
+        expect(dispatch.mock.calls).toEqual([
+          ['policy/init', null, { root: true }],
+          ['policy/resubscribe', null, { root: true }],
+          ['resubscribePermissions'],
+        ])
       })
     })
   })

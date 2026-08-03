@@ -1,11 +1,22 @@
 import gql from 'graphql-tag'
+import { restartWebsockets } from 'vue-cli-plugin-apollo/graphql-client'
 import { branding } from '@ocelot-social/branding'
 import { currentUserQuery } from '~/graphql/User'
 import PermissionsSubscription from '~/graphql/PermissionsSubscription'
-import Cookie from 'universal-cookie'
-import metadata from '~/constants/metadata'
 
-const cookies = new Cookie()
+// The side effects @nuxtjs/apollo's onLogin/onLogout performed AROUND their cookie write. The cookie
+// is ours now ($authCookie — it is the only layer that can honour a deployment's COOKIE_NAME, see
+// utils/authCookie.js), so the rest has to be done here: reconnect the websocket so its
+// connectionParams carry the new identity, and drop the cache the old one filled.
+async function restartSession(client) {
+  if (client.wsClient) restartWebsockets(client.wsClient)
+  try {
+    await client.resetStore()
+  } catch {
+    // resetStore() rejects when a watched query fails to refetch. The identity switch already
+    // happened at that point, so this must not fail the login/logout around it.
+  }
+}
 
 // Just the viewer's effective permissions — used to refetch live (on a permissionsChanged
 // event) without re-pulling the whole currentUser, and without the logout-on-error of
@@ -162,7 +173,7 @@ export const actions = {
     if (!process.server) {
       return
     }
-    const token = this.app.$apolloHelpers.getToken()
+    const token = this.app.$authCookie.get()
     if (!token) {
       return
     }
@@ -171,7 +182,7 @@ export const actions = {
   },
 
   async check({ commit, dispatch, getters }) {
-    if (!this.app.$apolloHelpers.getToken()) {
+    if (!this.app.$authCookie.get()) {
       await dispatch('logout')
     }
     return getters.isLoggedIn
@@ -245,7 +256,8 @@ export const actions = {
           password,
         },
       })
-      await this.app.$apolloHelpers.onLogin(login)
+      this.app.$authCookie.set(login)
+      await restartSession(client)
       commit('SET_TOKEN', login)
       await dispatch('fetchCurrentUser')
       await dispatch('categories/init', null, { root: true })
@@ -253,14 +265,16 @@ export const actions = {
       // returns the viewer-scoped keys (e.g. apiKeysEnabled) that were null
       // while anonymous — no full page reload needed.
       await dispatch('policy/init', null, { root: true })
-      // onLogin() restarted the websocket (restartWebsockets), which drops the
-      // policyChanged subscription's handler. Re-open it so live updates keep
-      // arriving without a full page reload.
+      // restartSession() restarted the websocket, which drops the policyChanged
+      // subscription's handler. Re-open it so live updates keep arriving without
+      // a full page reload.
       await dispatch('policy/resubscribe', null, { root: true })
       // Re-open the permissionsChanged subscription on the new (authenticated) socket
       // so role/permission changes apply live without a reload.
       dispatch('resubscribePermissions')
-      if (cookies.get(metadata.COOKIE_NAME) === undefined) {
+      // Did the cookie actually stick (cookies blocked / rejected)? Read back through the SAME
+      // accessor that wrote it, so this can never look for a different name than the one in use.
+      if (!this.app.$authCookie.get()) {
         throw new Error('no-cookie')
       }
     } catch (err) {
@@ -274,12 +288,15 @@ export const actions = {
     commit('SET_USER', null)
     commit('SET_TOKEN', null)
     commit('SET_PERMISSIONS', [])
-    await this.app.$apolloHelpers.onLogout()
+    // Clears any legacy-named cookie too, so the read fallback cannot adopt the
+    // session again on the next visit.
+    this.app.$authCookie.remove()
+    await restartSession(this.app.apolloProvider.defaultClient)
     // Refetch as anonymous so authenticated-only keys (e.g. apiKeysEnabled)
     // reset to their defaults instead of lingering from the logged-in session.
     await dispatch('policy/init', null, { root: true })
-    // onLogout() restarted the websocket too; re-open the subscription on the
-    // now-anonymous connection so public-key changes still arrive live.
+    // restartSession() restarted the websocket too; re-open the subscription on
+    // the now-anonymous connection so public-key changes still arrive live.
     await dispatch('policy/resubscribe', null, { root: true })
     dispatch('resubscribePermissions')
   },

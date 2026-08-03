@@ -54,7 +54,6 @@
     "metadata.applicationDescription: string",
     "metadata.applicationName: string",
     "metadata.applicationShortName: string",
-    "metadata.cookieName: string",
     "metadata.ogImage: string",
     "metadata.ogImageAlt: string",
     "metadata.ogImageHeight: string",
