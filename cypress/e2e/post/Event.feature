@@ -35,6 +35,7 @@ Feature: Event posts
       Join us for our online community meetup.
       """
     And I enter a future date in the event start date picker
+    And I enter "BigBlueButton" as the venue description
     And I check the online event checkbox
     And I click on "save button"
     Then I am on page "/post/.*/community-meetup-online"
