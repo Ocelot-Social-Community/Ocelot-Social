@@ -20,20 +20,20 @@
     name: 'OsValidationHint',
     props: {
       variant: {
-        type: String as PropType<'warning' | 'error'>,
+        type: String as PropType<'warning' | 'error' | null>,
         default: null,
         validator: (v: string) => v === null || v === 'warning' || v === 'error',
       },
       text: {
-        type: String,
+        type: String as PropType<string | null>,
         default: null,
       },
       count: {
-        type: [Number, String] as PropType<number | string>,
+        type: [Number, String] as PropType<number | string | null>,
         default: null,
       },
       max: {
-        type: [Number, String] as PropType<number | string>,
+        type: [Number, String] as PropType<number | string | null>,
         default: null,
       },
     },
