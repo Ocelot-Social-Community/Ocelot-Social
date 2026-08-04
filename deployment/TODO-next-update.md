@@ -2,6 +2,76 @@
 
 When you introduce a new version and branding and deploy it on your network, you need to consider the following changes and actions:
 
+## ⚠️ Backend is a Deployment now — the uploads PVC is deleted on upgrade
+
+The backend used to be a `StatefulSet` with a `<release>-uploads` PersistentVolumeClaim. It is a
+plain `Deployment` now and the PVC template is gone from the chart. Uploads have lived in S3 since
+migration `20250502230521-migrate-to-s3`, so the volume is a leftover — but **removing it is
+destructive if you skip the steps below.**
+
+The PVC was a regular Helm template without `helm.sh/resource-policy: keep`. Helm therefore
+**deletes it by itself** on the first upgrade with the new chart, and if your StorageClass uses
+`reclaimPolicy: Delete` (the default for `hcloud-volumes`, among others) the contents are gone in
+the same second. There is no undo.
+
+**Action — in this order, before you upgrade:**
+
+1. Verify no database record still points at the old on-disk path. Expected: `0` everywhere.
+
+   ```cypher
+   MATCH (i:Image)      WHERE i.url STARTS WITH '/uploads' RETURN count(i);
+   MATCH (a:Attachment) WHERE a.url STARTS WITH '/uploads' RETURN count(a);
+   ```
+
+   If it is not `0`, run the S3 migration for that instance first.
+
+2. Copy the volume contents off the cluster **while the old pod is still running** — the volume is
+   `ReadWriteOnce`, so once the workload is gone you cannot mount it a second time to reach the
+   data:
+
+   ```sh
+   deployment/scripts/backup-uploads-pvcs.sh --dry-run          # see what would be copied
+   deployment/scripts/backup-uploads-pvcs.sh -o ./uploads-backup
+   ```
+
+   The script is read-only against the cluster and verifies every archive against the file count in
+   the pod.
+
+3. Keep the underlying volume even after Helm drops the claim:
+
+   ```sh
+   PV=$(kubectl -n <namespace> get pvc <release>-uploads -o jsonpath='{.spec.volumeName}')
+   kubectl patch pv $PV -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'
+   ```
+
+4. Scale the old workload down manually. Helm cannot change the `kind` of a resource in place, so
+   this first upgrade **needs a maintenance window** — the StatefulSet and its pod are deleted
+   before the Deployment creates a new one:
+
+   ```sh
+   kubectl -n <namespace> scale statefulset <release>-backend --replicas=0
+   ```
+
+5. Upgrade, then verify that images still load. Afterwards the `Released` PV can be deleted by hand.
+
+**Action — values:**
+
+- Remove `backend.storage` from your `values.yaml`. The key sized the uploads PVC and no longer does
+  anything.
+- Optional new key `backend.migrations.waitForDatabaseSeconds` (default `1500`). A starting pod now
+  waits that long for Neo4j to accept connections before giving up, in an init container, instead of
+  crash-looping while the database is still coming up. Raising it also raises the Deployment's
+  `progressDeadlineSeconds`, which is derived from it.
+- If your instance keeps its own copy of the chart, port
+  `templates/backend/deployment.yaml` and the removal of
+  `templates/backend/persistent-volume-claim.yaml` into it.
+
+**What this does and does not buy you:** no more `ReadWriteOnce` lock, a late-starting Neo4j is
+waited out silently, and a pod stuck in `Init` no longer blocks the next rollout. It is **not**
+zero-downtime yet: `replicas` is pinned to `1` and `maxSurge` to `0`, because without Redis the
+backend's GraphQL subscriptions are process-local. See
+[backend-zero-downtime-konzept.md](../docu/backend-zero-downtime-konzept.md).
+
 ## ⚠️ Branding: the `public/` bucket is gone — badges move to `assets/badges/`
 
 A branding package used to have a `public/` folder whose contents were copied onto the **backend's**
