@@ -194,12 +194,14 @@ Solange ihr noch **destruktive** Migrationen habt (Beispiel: `20260327120000-rem
 
 ### Schritt 4 — Erste Umstellung enthält ein einmaliges Wartungsfenster
 
-Helm kann das `kind` einer Ressource nicht in-place ändern: beim ersten `helm upgrade` mit dem neuen Chart wird der alte StatefulSet (samt Pod) gelöscht **bevor** das neue Deployment Pods erzeugt. Empfehlung:
+Helm kann das `kind` einer Ressource nicht in-place ändern. StatefulSet und Deployment sind trotz gleichen Namens zwei verschiedene Objekte, und Helm wendet beim `upgrade` **zuerst** das Zielmanifest an und löscht erst danach, was nur noch im alten Release steht. Der Wechsel ist also kein Rolling Update, sondern ein kurzer Parallelzustand: das neue Deployment startet seinen Pod, während der alte StatefulSet-Pod noch läuft — zwei Backends gegen dieselbe Datenbank, jedes mit eigenem Migrations-InitContainer. Genau das soll das manuelle Herunterskalieren verhindern; das Wartungsfenster ist der Preis dafür, nicht die Folge einer Helm-Löschung. Empfehlung:
 
 - Wartungsfenster ankündigen.
 - Manuell vorab: `kubectl scale statefulset <release>-backend --replicas=0`.
 - `helm upgrade` mit neuem Chart.
 - Danach läuft nur noch das Deployment, ab da ist zero-downtime möglich.
+
+Die Reihenfolge (erst anlegen, dann verwaiste Ressourcen löschen) ist Helm-Verhalten, kein Vertrag — auf einer Stage-Instanz mit der real eingesetzten Helm-Version einmal beobachten, bevor eine Produktionsinstanz drankommt.
 
 ### Schritt 5 — PVC: Achtung, Helm löscht ihn selbst
 

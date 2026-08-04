@@ -44,13 +44,19 @@ the same second. There is no undo.
    kubectl patch pv $PV -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'
    ```
 
-4. Scale the old workload down manually. Helm cannot change the `kind` of a resource in place, so
-   this first upgrade **needs a maintenance window** — the StatefulSet and its pod are deleted
-   before the Deployment creates a new one:
+4. Scale the old workload down manually. Helm cannot change the `kind` of a resource in place, and a
+   StatefulSet and a Deployment of the same name are two distinct objects: Helm applies the new
+   manifest **first** and only then deletes what is left over from the old one. For a moment both
+   exist, so **two backend pods run against the same database** — each with its own migration init
+   container. Scaling to zero beforehand prevents that, at the price of a **maintenance window** for
+   this one upgrade:
 
    ```sh
    kubectl -n <namespace> scale statefulset <release>-backend --replicas=0
    ```
+
+   Verify the order on a stage instance with the Helm version you actually deploy with before you
+   do this in production.
 
 5. Upgrade, then verify that images still load. Afterwards the `Released` PV can be deleted by hand.
 
