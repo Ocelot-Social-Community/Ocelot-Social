@@ -89,7 +89,6 @@ Notes:
 - The backend's HTTP surface under `/api/*` is unchanged; it was reachable the same way through the
   proxy. This exposes nothing new.
 - Rollback is deleting the `/api` path from the ingress: the webapp proxy then takes over again.
-
 ## Network policy: registration & feature flags moved to runtime config
 
 The following flags are now part of the **runtime network policy** (bucket B): they

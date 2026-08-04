@@ -280,7 +280,7 @@ Gewinn: kein RWO-Lock mehr; eine verspätet startende Datenbank wird bis zu 25 M
 - **HTTP-Health-Endpoint:** Die Probes prüfen per `tcpSocket`, das beweist nur einen offenen Listener — nicht, dass Neo4j erreichbar oder das Bootstrapping fertig ist. Ein `/healthz` wäre semantisch ehrlich.
 - **Bolt-Port ≠ Datenbank bereit:** `wait-db` prüft nur, ob der Port annimmt. Neo4j kann kurz danach noch Indizes aufbauen. Der Migrations-Container fängt das über den Pod-Restart ab, aber ein Cypher-Ping (`RETURN 1`) wäre die ehrlichere Prüfung.
 - **Ordering ≠ Readiness:** `needs: [ocelot-neo4j]` ist in allen neun Konfigurationen gesetzt, ordnet aber nur die *Helm-Operationen*. Es wartet **nicht**, bis die Datenbank bereit ist — das bleibt Aufgabe des `wait-db`-initContainers. Ein `wait: true` am neo4j-Release würde echtes Warten erzwingen, aber genau die blockierende Deploy-Pipeline zurückholen, die schon den Hook-Job gekippt hat. Deshalb bewusst nicht gesetzt.
-- **Rückwärtskompatibilität für Branding-Forks:** Forks, die das Chart kopiert haben, müssen nachziehen — insbesondere wegen des automatisch gelöschten PVCs. Im CHANGELOG prominent erwähnen.
+- ~~**Rückwärtskompatibilität für Branding-Forks:** Forks, die das Chart kopiert haben, müssen nachziehen — insbesondere wegen des automatisch gelöschten PVCs. Im CHANGELOG prominent erwähnen.~~ Erledigt, aber **nicht** im CHANGELOG: der wird von `auto-changelog` aus PR-Titeln generiert und taugt nicht für eine Handlungsanweisung. Stattdessen steht die vollständige Cutover-Anleitung jetzt oben in `deployment/TODO-next-update.md` — der Datei, die Betreiber und Forks beim Update lesen.
 
 ### Beantwortet
 
