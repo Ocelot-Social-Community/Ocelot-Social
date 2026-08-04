@@ -57,6 +57,14 @@ spec:
               field='const u=new URL(process.env.NEO4J_URI);process.stdout.write(u[process.argv[1]]||"")'
               host=$(node -e "$field" hostname)
               host=${host#[}; host=${host%]}   # net.connect wants ::1, not [::1]
+              # An authority-less URI such as `bolt:/database` parses FINE and yields an empty
+              # hostname, and net.connect() treats an empty host as localhost — the probe would then
+              # happily wait 25 minutes on a port nothing serves, or worse, succeed against whatever
+              # else might listen there. Reject it here, where the message can still say why.
+              if [ -z "$host" ]; then
+                echo "NEO4J_URI has no host: '$NEO4J_URI' — expected bolt://<host>[:<port>]"
+                exit 1
+              fi
               port=$(node -e "$field" port)
               [ -n "$port" ] || port=7687
               deadline=$(( $(date +%s) + {{ .Values.backend.migrations.waitForDatabaseSeconds }} ))
