@@ -103,25 +103,39 @@ test('buildBrandArchive: manifest carries id/version/schemaVersion/label', async
   assert.equal(typeof manifest.schemaVersion, 'string')
 })
 
-test('buildBrandArchive packs the raw emails/ and public/ trees into the archive', async () => {
+test('buildBrandArchive packs the raw emails/ and assets/ trees into the archive', async () => {
   const built = await buildBrandArchive(
     brandDir({
       config: ACME_CONFIG,
       files: {
         'emails/templates/registration/html.pug': 'p brand registration',
         'emails/locales/en.json': '{"greeting":"hi"}',
-        'public/img/badges/default_trophy.svg': '<svg>brand</svg>',
+        'assets/badges/trophy_bear.svg': '<svg>brand</svg>',
       },
     }),
   )
   const archive = readTarGz(built.gz)
-  // Consumed at backend bootstrap by overlayBrandRuntimeFiles (e-mail templates/locales + public badges).
+  // emails/ is overlaid onto the backend's disk at bootstrap (email-templates reads files);
+  // assets/ is served straight from the archive at /branding/<id>/assets/… — badges included.
   assert.equal(
     archive.get('emails/templates/registration/html.pug').toString(),
     'p brand registration',
   )
   assert.equal(archive.get('emails/locales/en.json').toString(), '{"greeting":"hi"}')
-  assert.equal(archive.get('public/img/badges/default_trophy.svg').toString(), '<svg>brand</svg>')
+  assert.equal(archive.get('assets/badges/trophy_bear.svg').toString(), '<svg>brand</svg>')
+})
+
+test('buildBrandArchive drops a legacy public/ tree and warns about it', async () => {
+  const built = await buildBrandArchive(
+    brandDir({
+      config: ACME_CONFIG,
+      files: { 'public/img/badges/association_apt.svg': '<svg>legacy</svg>' },
+    }),
+  )
+  // Not packed at all: the bucket that used to be copied onto the backend's disk is gone, so a brand
+  // left behind on the old layout must FAIL LOUDLY rather than ship icons nothing can serve.
+  assert.equal(readTarGz(built.gz).has('public/img/badges/association_apt.svg'), false)
+  assert.ok(built.warnings.some((w) => w.includes('public/ is NO LONGER PACKED')))
 })
 
 test('buildBrandArchive emits a PARTIAL library: only customised buckets get a fragment', async () => {

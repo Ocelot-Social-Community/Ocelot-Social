@@ -262,6 +262,21 @@ function warnUncompiledStylesheets(entries: TarEntry[], id: string, warnings: st
   }
 }
 
+/**
+ * Warn on a leftover `public/` folder. That bucket used to be overlaid onto the BACKEND's on-disk
+ * `public/` at bootstrap, and every brand used it for exactly one thing: badge SVGs. It is gone —
+ * badges are served brand files like logos, so they belong in `assets/badges/` and are read straight
+ * from the archive. A brand that still ships `public/` would silently lose those icons (they are no
+ * longer packed at all), so say so loudly at build time.
+ */
+function warnRemovedPublicBucket(dir: string, id: string, warnings: string[]): void {
+  if (!existsSync(join(dir, 'public'))) return
+  warnings.push(
+    `  ! ${id}: public/ is NO LONGER PACKED — move its files to assets/badges/ and point the badge ` +
+      `seed data at /branding/${id}/assets/badges/<file>.svg.`,
+  )
+}
+
 /** Bundle ONE brand directory into a `<id>.tar.gz` buffer (manifest.json + fragments/ + assets/ + html/). */
 export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive> {
   const dir = resolve(brandDir)
@@ -318,15 +333,19 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
   })
 
   // Raw brand file trees packed verbatim into the archive for runtime consumers to extract:
-  //   assets/  served brand assets (logos, favicon, fonts, css) — namespaced /branding/<id>/…
-  //   html/    brand static-page HTML (per locale)
+  //   assets/  served brand files (logos, favicon, fonts, css, badge SVGs) — /branding/<id>/assets/…
+  //   html/    brand static-page HTML (per locale), served the same way
   //   emails/  backend e-mail templates (pug) + locales, overlaid onto the defaults at bootstrap
-  //   public/  backend public assets (e.g. badge SVGs), overlaid onto the defaults at bootstrap
-  for (const sub of ['assets', 'html', 'emails', 'public']) {
+  //
+  // Only `emails/` is written to disk at runtime: email-templates reads from the filesystem, so HTTP
+  // is not an option there. Everything else is served straight FROM the archive by the webapp's
+  // branding-assets middleware — nothing is copied into an image.
+  for (const sub of ['assets', 'html', 'emails']) {
     const src = join(dir, sub)
     if (existsSync(src)) collectFiles(src, sub, entries)
   }
   warnUncompiledStylesheets(entries, id, warnings)
+  warnRemovedPublicBucket(dir, id, warnings)
   return { id, version, label, gz: writeTarGz(entries), entries, warnings }
 }
 
