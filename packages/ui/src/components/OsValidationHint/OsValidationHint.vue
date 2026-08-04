@@ -49,8 +49,8 @@
         if (!hasContent.value) return null
 
         const rootClasses = cn(
-          'os-validation-hint',
-          props.text ? 'flex items-center justify-between w-full mt-[2px]' : 'flex justify-end',
+          'os-validation-hint mt-[4px]',
+          props.text ? 'flex items-center justify-between w-full' : 'flex justify-end',
         )
 
         const textClass = cn(

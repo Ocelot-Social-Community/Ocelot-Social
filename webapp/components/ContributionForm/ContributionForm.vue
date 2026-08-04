@@ -370,12 +370,11 @@ export default {
           },
         },
         eventVenue: {
-          required: this.postType === 'Event' && !this.formData.eventIsOnline,
+          required: this.postType === 'Event',
           min: 3,
           max: 100,
           validator: (_, value = '') => {
             if (this.postType !== 'Event') return []
-            if (this.formData.eventIsOnline) return []
             const trimmed = value.trim()
             if (!trimmed) {
               return [new Error(this.$t('common.validations.eventVenueNotEmpty'))]
@@ -655,13 +654,7 @@ export default {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: $space-small;
-    height: $space-base;
-    align-items: center;
     margin-bottom: $space-x-small;
-
-    .os-validation-hint {
-      margin-top: 0;
-    }
   }
 
   .chipbox {
@@ -677,10 +670,6 @@ export default {
     grid-template-columns: repeat(2, 1fr);
     grid-auto-rows: auto;
     gap: $space-small;
-  }
-
-  .event-location-grid .os-validation-hint {
-    margin-top: 3px;
   }
 
   .event-online-checkbox {
@@ -737,7 +726,7 @@ export default {
 
     > .os-validation-hint {
       align-self: flex-end;
-      margin: 3px 0 $space-base;
+      margin-bottom: $space-base;
       cursor: default;
     }
 
