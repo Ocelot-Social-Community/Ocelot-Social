@@ -2,6 +2,33 @@
 
 When you introduce a new version and branding and deploy it on your network, you need to consider the following changes and actions:
 
+## `/api` is routed to the backend by the ingress, not by the webapp
+
+Browser GraphQL (and the subscription websocket) used to be proxied by the **webapp**: the browser
+called `https://<domain>/api/…`, the Nuxt server forwarded it to the backend. The chart now routes
+`/api` straight to the backend service at the ingress, with the same `stripPrefix` middleware that
+already serves `/imagor`.
+
+Nothing changes for the browser — still the same origin, same URL, same cookie. What changes is that
+the request no longer passes through the Nuxt process, which renders pages server-side in a single
+event loop. Measured against a local stack (same query, backend answering in ~2 ms regardless): the
+proxied call cost +2 ms while the webapp was idle, but **470 ms** at 8 concurrent server-side
+renders. Over the ingress it stayed at 10 ms.
+
+**Action:** none if you deploy the chart as shipped. If you maintain your own copy of
+`templates/ingress.yaml`, add the `/api` path (and the `/api` prefix on the stripPrefix middleware)
+from the chart, or you keep the old behaviour.
+
+Notes:
+
+- The `proxy` block in `webapp/nuxt.config.js` stays and is still what serves `/api` in local
+  development, where there is no ingress. In the cluster the request never reaches it.
+- Under `underMaintenance: true` the `/api` route is deliberately **not** rendered, so the API goes
+  to the maintenance service together with the UI — exactly as before.
+- The backend's HTTP surface under `/api/*` is unchanged; it was reachable the same way through the
+  proxy. This exposes nothing new.
+- Rollback is deleting the `/api` path from the ingress: the webapp proxy then takes over again.
+
 ## Network policy: registration & feature flags moved to runtime config
 
 The following flags are now part of the **runtime network policy** (bucket B): they

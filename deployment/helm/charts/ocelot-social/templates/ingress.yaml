@@ -73,6 +73,9 @@ spec:
   stripPrefix:
     prefixes:
       - /imagor
+      # `/api` -> `/`: the backend mounts Apollo at the root (server.ts). stripPrefix removes the
+      # FIRST matching prefix, so one middleware serves both routes.
+      - /api
 
 ---
 apiVersion: networking.k8s.io/v1
@@ -93,3 +96,35 @@ spec:
             name: {{ .Release.Name }}-imagor
             port:
               number: 8000
+      {{- if not .Values.underMaintenance }}
+      # Browser GraphQL (and the subscription websocket, `wss://<domain>/api/graphql`) goes STRAIGHT
+      # to the backend instead of through the webapp's Nuxt proxy.
+      #
+      # Why: the webapp only proxies /api so the call stays SAME-ORIGIN — the auth cookie is
+      # SameSite=lax and apollo sends `credentials: 'same-origin'` (webapp/plugins/apollo-config.js).
+      # Routing here keeps that property (the browser still calls https://<domain>/api/…) while
+      # taking the request out of the Nuxt process. That matters because Nuxt renders server-side in
+      # ONE single-threaded event loop: a proxied API call has to queue behind whatever page is being
+      # rendered. Measured locally against this stack, same query, backend answering in ~3 ms
+      # throughout: +2 ms through the proxy while idle, but +75 ms at 2 concurrent renders and
+      # +459 ms at 8 — while the direct path stayed flat. Traefik is a separate process, so the
+      # coupling disappears.
+      #
+      # The Nuxt `proxy` block in nuxt.config.js STAYS: it is what serves /api in local development,
+      # where there is no ingress. In the cluster the request never reaches Nuxt, so the two cannot
+      # conflict — which also makes this safe to roll back by deleting this path.
+      #
+      # SSR-time queries are unaffected either way: they already bypass the proxy and talk to
+      # $GRAPHQL_URI directly.
+      #
+      # Skipped under maintenance ON PURPOSE: /api then falls through to the `/` rule and lands on
+      # the maintenance service, exactly as it does today. Taking the UI down while leaving the API
+      # up would be a behaviour change, and migrations are the usual reason for the switch.
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Release.Name }}-backend
+            port:
+              number: 4000
+      {{- end }}
