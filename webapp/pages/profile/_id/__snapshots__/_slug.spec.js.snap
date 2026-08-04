@@ -940,7 +940,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
               >
                 <img
                   class="hc-badge"
-                  src="/api/path/to/icon-bv1"
+                  src="/path/to/icon-bv1"
                   title="verified"
                 />
               </div>
@@ -950,7 +950,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
               >
                 <img
                   class="hc-badge"
-                  src="/api/path/to/icon-bt1"
+                  src="/path/to/icon-bt1"
                   title="a trophy"
                 />
               </div>
@@ -960,7 +960,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
               >
                 <img
                   class="hc-badge"
-                  src="/api/path/to/icon-bt2"
+                  src="/path/to/icon-bt2"
                   title="no trophy"
                 />
               </div>
@@ -2232,7 +2232,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                 >
                   <img
                     class="hc-badge"
-                    src="/api/path/to/icon-bv1"
+                    src="/path/to/icon-bv1"
                     title="verified"
                   />
                 </div>
@@ -2242,7 +2242,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                 >
                   <img
                     class="hc-badge"
-                    src="/api/path/to/icon-bt1"
+                    src="/path/to/icon-bt1"
                     title="a trophy"
                   />
                 </div>
@@ -2252,7 +2252,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                 >
                   <img
                     class="hc-badge"
-                    src="/api/path/to/icon-bt2"
+                    src="/path/to/icon-bt2"
                     title="no trophy"
                   />
                 </div>
