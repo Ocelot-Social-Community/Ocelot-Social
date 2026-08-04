@@ -39,7 +39,15 @@ imagePullCredentials:
 backend:
   image:
     repository: ghcr.io/ocelot-social-community/ocelot-social/backend
-  storage: "10Gi"
+  # `storage` used to size an uploads PVC. Uploads live in S3 since migration
+  # 20250502230521-migrate-to-s3, the backend no longer touches disk, and the volume is gone — the
+  # key is obsolete and safe to drop from an instance's values.
+  migrations:
+    # How long a starting pod waits for Neo4j to accept connections before it gives up. Neo4j is a
+    # separate release and routinely needs several minutes; the default covers a 25 minute cold
+    # start. The pod sits in Init during that time and costs nothing. Raising this also raises the
+    # Deployment's progressDeadlineSeconds, which is derived from it.
+    waitForDatabaseSeconds: 1500
   env:
     NEO4J_URI: "bolt://ocelot-social-neo4j:7687"
 

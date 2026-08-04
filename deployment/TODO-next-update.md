@@ -2,6 +2,92 @@
 
 When you introduce a new version and branding and deploy it on your network, you need to consider the following changes and actions:
 
+## ⚠️ Backend is a Deployment now — the uploads PVC is deleted on upgrade
+
+The backend used to be a `StatefulSet` with a `<release>-uploads` PersistentVolumeClaim. It is a
+plain `Deployment` now and the PVC template is gone from the chart. Uploads have lived in S3 since
+migration `20250502230521-migrate-to-s3`, so the volume is a leftover — but **removing it is
+destructive if you skip the steps below.**
+
+The PVC was a regular Helm template without `helm.sh/resource-policy: keep`. Helm therefore
+**deletes it by itself** on the first upgrade with the new chart, and if your StorageClass uses
+`reclaimPolicy: Delete` (the default for `hcloud-volumes`, among others) the contents are gone in
+the same second. There is no undo.
+
+**Action — in this order, before you upgrade:**
+
+1. Verify no database record still points at the old on-disk path. Expected: `0` everywhere.
+
+   ```cypher
+   MATCH (i:Image)      WHERE i.url STARTS WITH '/uploads' RETURN count(i);
+   MATCH (a:Attachment) WHERE a.url STARTS WITH '/uploads' RETURN count(a);
+   ```
+
+   If it is not `0`, run the S3 migration for that instance first.
+
+2. Copy the volume contents off the cluster **while the old pod is still running** — the volume is
+   `ReadWriteOnce`, so once the workload is gone you cannot mount it a second time to reach the
+   data:
+
+   ```sh
+   deployment/scripts/backup-uploads-pvcs.sh --dry-run          # see what would be copied
+   deployment/scripts/backup-uploads-pvcs.sh -o ./uploads-backup
+   ```
+
+   The script is read-only against the cluster and verifies every archive against the file count in
+   the pod.
+
+3. Keep the underlying volume even after Helm drops the claim:
+
+   ```sh
+   PV=$(kubectl -n <namespace> get pvc <release>-uploads -o jsonpath='{.spec.volumeName}')
+   kubectl patch pv $PV -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'
+   ```
+
+4. Scale the old workload down manually. Helm cannot change the `kind` of a resource in place, and a
+   StatefulSet and a Deployment of the same name are two distinct objects: Helm applies the new
+   manifest **first** and only then deletes what is left over from the old one. For a moment both
+   exist, so **two backend pods run against the same database** — each with its own migration init
+   container. Scaling to zero beforehand prevents that, at the price of a **maintenance window** for
+   this one upgrade:
+
+   ```sh
+   kubectl -n <namespace> scale statefulset <release>-backend --replicas=0
+   kubectl -n <namespace> wait --for=delete pod -l app=<release>-backend --timeout=10m
+   ```
+
+   The `wait` is not optional. `scale` only writes the desired replica count and returns
+   immediately; the pod is still terminating while you type the next command, and a `helm upgrade`
+   that starts in that window puts you back in exactly the parallel state this step exists to
+   avoid. `no matching resources found` means the pod is already gone — that is the state you want.
+
+   Verify the order on a stage instance with the Helm version you actually deploy with before you
+   do this in production.
+
+5. Upgrade, then verify that images still load. Afterwards the `Released` PV can be deleted by hand.
+
+**Action — values:**
+
+- Remove `backend.storage` from your `values.yaml`. The key sized the uploads PVC and no longer does
+  anything.
+- Optional new key `backend.migrations.waitForDatabaseSeconds` (default `1500`). A starting pod now
+  waits that long for Neo4j to accept connections before giving up, in an init container, instead of
+  crash-looping while the database is still coming up. Raising it also raises the Deployment's
+  `progressDeadlineSeconds`, which is derived from it.
+- If your instance keeps its own copy of the chart, port
+  `templates/backend/deployment.yaml` and the removal of
+  `templates/backend/persistent-volume-claim.yaml` into it.
+
+**What this does and does not buy you:** no more `ReadWriteOnce` lock, a late-starting Neo4j is
+waited out silently, and a pod stuck in `Init` no longer has to be deleted by hand before the *next*
+rollout can start — a new rollout creates a new ReplicaSet and terminates the stuck pod along with
+the old one, where the StatefulSet's `OrderedReady` waited for it to become `Ready` forever. The
+rollout it is stuck in still counts as unfinished until `progressDeadlineSeconds` runs out. It is
+**not**
+zero-downtime yet: `replicas` is pinned to `1` and `maxSurge` to `0`, because without Redis the
+backend's GraphQL subscriptions are process-local. See
+[backend-zero-downtime-konzept.md](../docu/backend-zero-downtime-konzept.md).
+
 ## ⚠️ Branding: the `public/` bucket is gone — badges move to `assets/badges/`
 
 A branding package used to have a `public/` folder whose contents were copied onto the **backend's**
@@ -89,7 +175,6 @@ Notes:
 - The backend's HTTP surface under `/api/*` is unchanged; it was reachable the same way through the
   proxy. This exposes nothing new.
 - Rollback is deleting the `/api` path from the ingress: the webapp proxy then takes over again.
-
 ## Network policy: registration & feature flags moved to runtime config
 
 The following flags are now part of the **runtime network policy** (bucket B): they
