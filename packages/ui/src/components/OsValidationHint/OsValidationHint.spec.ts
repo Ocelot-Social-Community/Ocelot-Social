@@ -227,4 +227,14 @@ describe('osValidationHint', () => {
       expect(wrapper.find('.os-icon').exists()).toBe(true)
     })
   })
+
+  describe('keyboard accessibility', () => {
+    it('is not focusable (non-interactive element)', () => {
+      const wrapper = mount(OsValidationHint, {
+        props: { text: 'Validation message', variant: 'error' },
+      })
+
+      expect(wrapper.attributes('tabindex')).toBeUndefined()
+    })
+  })
 })
