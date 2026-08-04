@@ -58,17 +58,16 @@ if (active) {
         `[branding] archive for "${active}" (${archive.file}) has no readable config — running on framework defaults.`,
       )
     }
-    // Overlay the brand's RAW runtime files from the same archive: e-mail templates/locales and public
-    // assets (badge SVGs) — replaces the old ONBUILD build-time overlay + merge-email-locales.sh. Dirs
-    // are resolved relative to this module so it works in both the ts-node (src/) and compiled (build/)
-    // layouts: bootstrap is at <root>/branding, e-mails at <root>/emails, public at <root>/../public.
+    // Overlay the brand's e-mail templates/locales from the same archive — replaces the old ONBUILD
+    // build-time overlay + merge-email-locales.sh. Resolved relative to THIS module, which holds in
+    // both the ts-node (src/) and compiled (build/src/) layouts because both keep branding/ and
+    // emails/ as siblings. Nothing else is written to disk: every served brand file (badge SVGs
+    // included) is read from the archive by the webapp, so no path here can drift out of sync with
+    // whatever serves it.
     if (archive) {
       const files = readArchive(archive.file)
       if (files) {
-        overlayBrandRuntimeFiles(files, {
-          emailsDir: path.join(__dirname, '..', 'emails'),
-          publicDir: path.join(__dirname, '..', '..', 'public'),
-        })
+        overlayBrandRuntimeFiles(files, { emailsDir: path.join(__dirname, '..', 'emails') })
       }
     }
   } catch (error) {

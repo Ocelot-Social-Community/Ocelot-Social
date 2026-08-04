@@ -565,6 +565,7 @@ export default shield(
       searchGroups: groupsEnabled,
       searchHashtags: allow,
       embed: allow,
+      embedProviders: allow,
       Category: allow,
       Tag: allow,
       reports: hasPermission('content.moderate'),

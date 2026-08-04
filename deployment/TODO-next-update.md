@@ -2,6 +2,67 @@
 
 When you introduce a new version and branding and deploy it on your network, you need to consider the following changes and actions:
 
+## ⚠️ Branding: the `public/` bucket is gone — badges move to `assets/badges/`
+
+A branding package used to have a `public/` folder whose contents were copied onto the **backend's**
+on-disk `public/` at startup. Every brand used it for exactly one thing: badge icons. That bucket is
+removed. Badge icons are ordinary served brand files now — they live in `assets/`, like logos and
+fonts, and are read straight from the brand archive by the webapp
+(`server-middleware/branding-assets.js`), so nothing is copied into an image any more.
+
+`public/` is **no longer packed into the archive at all**. A brand that still ships one gets a build
+warning and its badge icons simply stop existing.
+
+**Action** in your branding package:
+
+1. Move the files:
+
+   ```sh
+   git mv branding/public/img/badges branding/assets/badges
+   rm -rf branding/public
+   ```
+
+2. Repoint the `icon` of every badge in `branding/data/badges-branding.ts` from the old backend path
+   to the served brand path — `<id>` is the `brandId` from your `branding/package.json`:
+
+   ```diff
+   -    icon: '/img/badges/association_apt.svg',
+   +    icon: '/branding/<id>/assets/badges/association_apt.svg',
+   ```
+
+3. Rebuild the image and re-run the badge sync so the new URLs reach the database — until you do,
+   the DB still holds the old paths and the icons stay broken:
+
+   ```sh
+   kubectl exec -n <namespace> deploy/<release>-backend -- yarn prod:db:data:branding
+   ```
+
+If you generate your badges with a script, fix the path there too, not just in the generated file.
+
+**Note on overriding FRAMEWORK badge icons:** the old bucket also let a brand replace a core icon
+(e.g. `default_verification.svg`) by shadowing the file on the backend's disk. That is no longer
+possible — the framework's own badge icons ship with the **webapp** now (see below) and are not
+brand-namespaced. Brand badges are unaffected; only overrides of built-in icons are.
+
+## The backend serves no static files any more
+
+`backend/public/` is gone and with it the `express.static` mount. The backend answers GraphQL and the
+`/branding/…` archive routes, nothing else. Two things moved:
+
+- **Framework badge icons** → `webapp/static/img/badges/`. The URLs are unchanged
+  (`/img/badges/trophy_bear.svg`), they are just served by the webapp instead of proxied to the
+  backend, so **no database migration and no action** is required. Existing badge rows keep working.
+- **`providers.json`** → `backend/src/graphql/resolvers/embeds/`, where the resolver that uses it
+  lives. The settings page reads the list through the new public `embedProviders` query.
+
+**Action:** only if you did one of these:
+
+- You called `https://<domain>/api/providers.json` from your own code — it is gone; use the
+  `embedProviders` GraphQL query.
+- You put custom files into `backend/public/` in your fork to have them served — that path no longer
+  exists. Put them in `webapp/static/` (served at `/`) or, for brand-specific files, into your
+  branding's `assets/` (served at `/branding/<id>/assets/…`).
+
 ## `/api` is routed to the backend by the ingress, not by the webapp
 
 Browser GraphQL (and the subscription websocket) used to be proxied by the **webapp**: the browser

@@ -38,14 +38,10 @@
       <h3>{{ $t('settings.embeds.info-description') }}</h3>
       <div class="ds-my-small">
         <ul>
-          <li
-            v-for="provider in providers"
-            :key="provider.provider_name"
-            class="provider-list-item"
-          >
+          <li v-for="provider in providers" :key="provider.name" class="provider-list-item">
             <p class="ds-text">
-              {{ provider.provider_name }},
-              <small>{{ provider.provider_url }}</small>
+              {{ provider.name }},
+              <small>{{ provider.url }}</small>
             </p>
           </li>
         </ul>
@@ -56,8 +52,8 @@
 
 <script>
 import { OsButton, OsCard } from '@ocelot-social/ui'
-import axios from 'axios'
 import { mapGetters, mapMutations } from 'vuex'
+import embedProvidersQuery from '~/graphql/EmbedProvidersQuery.js'
 import { updateUserMutation } from '~/graphql/User.js'
 import scrollToContent from './scroll-to-content.js'
 
@@ -80,10 +76,17 @@ export default {
       providers: [],
     }
   },
+  apollo: {
+    embedProviders: {
+      query() {
+        return embedProvidersQuery()
+      },
+      update({ embedProviders }) {
+        this.providers = embedProviders
+      },
+    },
+  },
   mounted() {
-    axios.get('/api/providers.json').then((response) => {
-      this.providers = response.data
-    })
     if (this.currentUser.allowEmbedIframes) this.disabled = this.currentUser.allowEmbedIframes
   },
   methods: {

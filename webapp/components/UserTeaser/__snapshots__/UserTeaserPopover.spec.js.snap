@@ -156,7 +156,7 @@ exports[`UserTeaserPopover given a non-touch device does not show button when us
       >
         <img
           class="hc-badge"
-          src="/api/icons/verified"
+          src="/icons/verified"
           title="Verified"
         />
       </div>
@@ -166,7 +166,7 @@ exports[`UserTeaserPopover given a non-touch device does not show button when us
       >
         <img
           class="hc-badge"
-          src="/api/icons/trophy1"
+          src="/icons/trophy1"
           title="Trophy 1"
         />
       </div>
@@ -176,7 +176,7 @@ exports[`UserTeaserPopover given a non-touch device does not show button when us
       >
         <img
           class="hc-badge"
-          src="/api/icons/trophy2"
+          src="/icons/trophy2"
           title="Trophy 2"
         />
       </div>
@@ -186,7 +186,7 @@ exports[`UserTeaserPopover given a non-touch device does not show button when us
       >
         <img
           class="hc-badge"
-          src="/api/icons/empty"
+          src="/icons/empty"
           title="Empty"
         />
       </div>
@@ -307,7 +307,7 @@ exports[`UserTeaserPopover given a touch device does not show button when userLi
       >
         <img
           class="hc-badge"
-          src="/api/icons/verified"
+          src="/icons/verified"
           title="Verified"
         />
       </div>
@@ -317,7 +317,7 @@ exports[`UserTeaserPopover given a touch device does not show button when userLi
       >
         <img
           class="hc-badge"
-          src="/api/icons/trophy1"
+          src="/icons/trophy1"
           title="Trophy 1"
         />
       </div>
@@ -327,7 +327,7 @@ exports[`UserTeaserPopover given a touch device does not show button when userLi
       >
         <img
           class="hc-badge"
-          src="/api/icons/trophy2"
+          src="/icons/trophy2"
           title="Trophy 2"
         />
       </div>
@@ -337,7 +337,7 @@ exports[`UserTeaserPopover given a touch device does not show button when userLi
       >
         <img
           class="hc-badge"
-          src="/api/icons/empty"
+          src="/icons/empty"
           title="Empty"
         />
       </div>
@@ -458,7 +458,7 @@ exports[`UserTeaserPopover given a touch device shows button when userLink is pr
       >
         <img
           class="hc-badge"
-          src="/api/icons/verified"
+          src="/icons/verified"
           title="Verified"
         />
       </div>
@@ -468,7 +468,7 @@ exports[`UserTeaserPopover given a touch device shows button when userLink is pr
       >
         <img
           class="hc-badge"
-          src="/api/icons/trophy1"
+          src="/icons/trophy1"
           title="Trophy 1"
         />
       </div>
@@ -478,7 +478,7 @@ exports[`UserTeaserPopover given a touch device shows button when userLink is pr
       >
         <img
           class="hc-badge"
-          src="/api/icons/trophy2"
+          src="/icons/trophy2"
           title="Trophy 2"
         />
       </div>
@@ -488,7 +488,7 @@ exports[`UserTeaserPopover given a touch device shows button when userLink is pr
       >
         <img
           class="hc-badge"
-          src="/api/icons/empty"
+          src="/icons/empty"
           title="Empty"
         />
       </div>
@@ -621,7 +621,7 @@ exports[`UserTeaserPopover renders correctly for a fresh user with zero counts 1
       >
         <img
           class="hc-badge"
-          src="/api/icons/verified"
+          src="/icons/verified"
           title="Verified"
         />
       </div>
@@ -631,7 +631,7 @@ exports[`UserTeaserPopover renders correctly for a fresh user with zero counts 1
       >
         <img
           class="hc-badge"
-          src="/api/icons/trophy1"
+          src="/icons/trophy1"
           title="Trophy 1"
         />
       </div>
@@ -641,7 +641,7 @@ exports[`UserTeaserPopover renders correctly for a fresh user with zero counts 1
       >
         <img
           class="hc-badge"
-          src="/api/icons/trophy2"
+          src="/icons/trophy2"
           title="Trophy 2"
         />
       </div>
@@ -651,7 +651,7 @@ exports[`UserTeaserPopover renders correctly for a fresh user with zero counts 1
       >
         <img
           class="hc-badge"
-          src="/api/icons/empty"
+          src="/icons/empty"
           title="Empty"
         />
       </div>
@@ -772,7 +772,7 @@ exports[`UserTeaserPopover shows badges when enabled 1`] = `
       >
         <img
           class="hc-badge"
-          src="/api/icons/verified"
+          src="/icons/verified"
           title="Verified"
         />
       </div>
@@ -782,7 +782,7 @@ exports[`UserTeaserPopover shows badges when enabled 1`] = `
       >
         <img
           class="hc-badge"
-          src="/api/icons/trophy1"
+          src="/icons/trophy1"
           title="Trophy 1"
         />
       </div>
@@ -792,7 +792,7 @@ exports[`UserTeaserPopover shows badges when enabled 1`] = `
       >
         <img
           class="hc-badge"
-          src="/api/icons/trophy2"
+          src="/icons/trophy2"
           title="Trophy 2"
         />
       </div>
@@ -802,7 +802,7 @@ exports[`UserTeaserPopover shows badges when enabled 1`] = `
       >
         <img
           class="hc-badge"
-          src="/api/icons/empty"
+          src="/icons/empty"
           title="Empty"
         />
       </div>

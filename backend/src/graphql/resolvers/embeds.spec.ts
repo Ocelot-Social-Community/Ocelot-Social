@@ -9,6 +9,7 @@ import path from 'node:path'
 import fetch from 'node-fetch'
 
 import embed from '@graphql/queries/embed.gql'
+import embedProviders from '@graphql/queries/embedProviders.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
@@ -74,6 +75,25 @@ const babyLovesCatEmbedResponse = new Response(
 )
 
 describe('Query', () => {
+  describe('embedProviders', () => {
+    // Public and unauthenticated (the shield lists it next to `embed`): the settings page reads the
+    // list this way since the backend stopped serving public/providers.json over HTTP.
+    it('returns the oEmbed provider list', async () => {
+      const result = (await query({ query: embedProviders, variables: {} })) as {
+        errors?: unknown
+        data?: { embedProviders: Array<{ name: string; url: string }> }
+      }
+      expect(result.errors).toBeUndefined()
+      const providers = result.data?.embedProviders ?? []
+      // The curated list this instance actually matches against, not the full oembed.com registry.
+      expect(providers).toContainEqual({ name: 'YouTube', url: 'https://www.youtube.com/' })
+      expect(providers).toContainEqual({ name: 'Vimeo', url: 'https://vimeo.com/' })
+      expect(providers).toHaveLength(16)
+      // Identity only — the matching endpoints stay server-side.
+      expect(Object.keys(providers[0]).sort()).toEqual(['name', 'url'])
+    })
+  })
+
   describe('embed', () => {
     let embedAction
 

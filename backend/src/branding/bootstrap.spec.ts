@@ -111,7 +111,7 @@ describe('branding bootstrap', () => {
     expect(errorSpy).not.toHaveBeenCalled()
   })
 
-  it('overlays the brand runtime files (e-mails/public) from the archive', () => {
+  it('overlays the brand e-mail files from the archive', () => {
     process.env.OCELOT_BRANDING_ASSETS_DIR = '/assets'
     process.env.OCELOT_ACTIVE_BRANDING = 'acme'
     const archive = { file: '/assets/acme.tar.gz', schemaVersion: '0.0.1' }
@@ -122,12 +122,15 @@ describe('branding bootstrap', () => {
       readArchive: jest.fn(() => files),
     })
     const calls = overlayBrandRuntimeFiles.mock.calls as Array<
-      [Map<string, Buffer>, { emailsDir: string; publicDir: string }]
+      [Map<string, Buffer>, { emailsDir: string }]
     >
     expect(calls).toHaveLength(1)
     expect(calls[0][0]).toBe(files)
-    expect(calls[0][1].emailsDir).toContain('emails')
-    expect(calls[0][1].publicDir).toContain('public')
+    // The RESOLVED path, not a substring: bootstrap derives it from its own location, and this spec
+    // sits next to bootstrap, so both land on the same sibling directory. A substring check ("contains
+    // 'emails'") would pass for any wrong level of the tree — which is exactly how the old public/
+    // overlay shipped a path nothing served.
+    expect(calls[0][1].emailsDir).toBe(resolve(__dirname, '..', 'emails'))
   })
 
   it('warns and keeps defaults when the active brand is not found', () => {

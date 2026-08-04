@@ -1,0 +1,6 @@
+query embedProviders {
+  embedProviders {
+    name
+    url
+  }
+}

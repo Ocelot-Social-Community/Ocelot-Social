@@ -45,7 +45,7 @@ exports[`UserBadges renders 1`] = `
             >
               <img
                 alt="description-v-1"
-                src="/api/icon1"
+                src="icon1"
                 title="description-v-1"
               />
             </button>
@@ -54,7 +54,7 @@ exports[`UserBadges renders 1`] = `
             >
               <img
                 alt="description-v-2"
-                src="/api/icon2"
+                src="icon2"
                 title="description-v-2"
               />
             </button>
@@ -76,7 +76,7 @@ exports[`UserBadges renders 1`] = `
             >
               <img
                 alt="description-t-1"
-                src="/api/icon3"
+                src="icon3"
                 title="description-t-1"
               />
             </button>
@@ -85,7 +85,7 @@ exports[`UserBadges renders 1`] = `
             >
               <img
                 alt="description-t-2"
-                src="/api/icon4"
+                src="icon4"
                 title="description-t-2"
               />
             </button>

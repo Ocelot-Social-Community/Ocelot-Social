@@ -1,8 +1,5 @@
 #!/bin/sh
 
-# public
-cp -r public/ build/public/
-
 # email files
 mkdir -p build/src/emails/templates/
 cp -r src/emails/templates/ build/src/emails/
@@ -30,3 +27,7 @@ cp src/policy/policy.schema.json build/src/policy/
 # permission catalog
 mkdir -p build/src/permission/
 cp src/permission/permission.catalog.json build/src/permission/
+
+# oEmbed provider list (read by resolvers/embeds/findProvider.ts relative to its own directory)
+mkdir -p build/src/graphql/resolvers/embeds/
+cp src/graphql/resolvers/embeds/providers.json build/src/graphql/resolvers/embeds/

@@ -8,7 +8,7 @@
         @click="toggleBadge(badge)"
         :class="{ badge, inactive: !badge.isActive }"
       >
-        <img :src="backendPath(badge.icon)" :alt="badge.description" :title="badge.description" />
+        <img :src="badge.icon" :alt="badge.description" :title="badge.description" />
       </button>
     </div>
     <div v-else>
@@ -18,7 +18,6 @@
 </template>
 
 <script>
-import { backendPath } from '~/helpers/backendPath'
 export default {
   props: {
     title: {
@@ -29,7 +28,6 @@ export default {
     },
   },
   methods: {
-    backendPath,
     toggleBadge(badge) {
       this.$emit('toggleBadge', badge)
     },

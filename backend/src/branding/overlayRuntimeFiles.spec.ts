@@ -1,6 +1,14 @@
 /* eslint-disable n/no-sync */ // test drives the sync overlay against a real temp dir
 /* eslint-disable security/detect-non-literal-fs-filename */ // temp-dir paths built in-test
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 
@@ -9,15 +17,12 @@ import { overlayBrandRuntimeFiles } from './overlayRuntimeFiles'
 describe('overlayBrandRuntimeFiles', () => {
   let root: string
   let emailsDir: string
-  let publicDir: string
 
   beforeEach(() => {
     root = mkdtempSync(path.join(tmpdir(), 'ocelot-overlay-'))
     emailsDir = path.join(root, 'emails')
-    publicDir = path.join(root, 'public')
     mkdirSync(path.join(emailsDir, 'locales'), { recursive: true })
     mkdirSync(path.join(emailsDir, 'templates'), { recursive: true })
-    mkdirSync(publicDir, { recursive: true })
   })
 
   afterEach(() => {
@@ -25,10 +30,7 @@ describe('overlayBrandRuntimeFiles', () => {
   })
 
   const run = (entries: [string, string][]) => {
-    overlayBrandRuntimeFiles(new Map(entries.map(([k, v]) => [k, Buffer.from(v)])), {
-      emailsDir,
-      publicDir,
-    })
+    overlayBrandRuntimeFiles(new Map(entries.map(([k, v]) => [k, Buffer.from(v)])), { emailsDir })
   }
 
   it('overlays e-mail templates (replacing the default)', () => {
@@ -52,29 +54,46 @@ describe('overlayBrandRuntimeFiles', () => {
     expect(merged).toEqual({ greeting: { hello: 'Welcome', bye: 'Bye' }, keep: 'z', extra: 'x' })
   })
 
-  it('overlays public assets (e.g. brand badge SVGs)', () => {
-    run([['public/img/badges/default_trophy.svg', '<svg>brand</svg>']])
-    expect(readFileSync(path.join(publicDir, 'img/badges/default_trophy.svg'), 'utf8')).toBe(
-      '<svg>brand</svg>',
-    )
-  })
-
-  it('skips path-traversal entries (no write outside the target dirs)', () => {
+  it('skips path-traversal entries (no write outside the target dir)', () => {
     run([
-      ['public/../evil.txt', 'x'],
       ['emails/templates/../../evil.pug', 'x'],
+      ['emails/locales/../../evil.json', '{}'],
     ])
-    expect(existsSync(path.join(root, 'evil.txt'))).toBe(false)
+    expect(existsSync(path.join(root, 'evil.pug'))).toBe(false)
+    expect(existsSync(path.join(root, 'evil.json'))).toBe(false)
     expect(existsSync(path.join(root, 'emails/evil.pug'))).toBe(false)
   })
 
-  it('ignores entries outside the known prefixes (assets/html/manifest)', () => {
+  it('writes a brand locale the framework has no default for', () => {
+    run([['emails/locales/eo.json', JSON.stringify({ greeting: 'Saluton' })]])
+    const written = JSON.parse(
+      readFileSync(path.join(emailsDir, 'locales/eo.json'), 'utf8'),
+    ) as unknown
+    expect(written).toEqual({ greeting: 'Saluton' })
+  })
+
+  it('keeps the default locale when the brand ships unreadable JSON', () => {
+    const target = path.join(emailsDir, 'locales/en.json')
+    writeFileSync(target, JSON.stringify({ greeting: 'Hi' }))
+    run([['emails/locales/en.json', '{ not json']])
+    // Clobbering the default with a broken file would take every e-mail down; skipping keeps the
+    // instance sending in its own language, just without the brand's overrides.
+    expect(JSON.parse(readFileSync(target, 'utf8')) as unknown).toEqual({ greeting: 'Hi' })
+  })
+
+  it('writes nothing for served buckets — they are read from the archive, not from disk', () => {
+    // Badge SVGs in particular: they used to be copied into the backend's public/ and are now served
+    // from the archive at /branding/<id>/assets/badges/…. A write here would resurrect the two-copies
+    // problem this overlay was trimmed down to avoid.
     run([
+      ['assets/badges/trophy_bear.svg', 'x'],
       ['assets/logo.svg', 'x'],
       ['html/en/imprint.html', 'x'],
+      ['public/img/badges/legacy.svg', 'x'],
       ['manifest.json', '{}'],
     ])
-    expect(existsSync(path.join(emailsDir, 'assets'))).toBe(false)
-    expect(existsSync(path.join(publicDir, 'logo.svg'))).toBe(false)
+    expect(readdirSync(root)).toEqual(['emails'])
+    expect(readdirSync(emailsDir).sort()).toEqual(['locales', 'templates'])
+    expect(readdirSync(path.join(emailsDir, 'templates'))).toEqual([])
   })
 })

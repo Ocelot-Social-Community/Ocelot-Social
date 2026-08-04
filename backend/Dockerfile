@@ -67,10 +67,11 @@ ONBUILD COPY brandin[g]/data/ src/db/data
 # Runtime branding: copy the brand UNFLATTENED into /brand and bake its archive (+ DEFAULT marker) into
 # ./deployment/configurations — the discovery root, named exactly as in a repo checkout so the running
 # code finds it without being told where to look. At startup src/branding/bootstrap.ts injects this
-# brand's config AND overlays its raw runtime files from the archive (e-mail templates/locales,
-# public/badge assets) — no per-brand rebuild. The overlay copies above still bring in not-yet-ported
-# content (brand middlewares + seed data — code/data, not config). A vanilla build (no brand.config)
-# skips this and stays vanilla.
+# brand's config AND overlays the archive's e-mail templates/locales onto the defaults — no per-brand
+# rebuild. Served brand files (logos, fonts, css, badge SVGs) are NOT copied anywhere: the webapp
+# reads them straight from the archive at /branding/<id>/…. The overlay copies above still bring in
+# not-yet-ported content (brand middlewares + seed data — code/data, not config). A vanilla build (no
+# brand.config) skips this and stays vanilla.
 #
 # Flat inside the root (`<id>.tar.gz` + `<id>-<version>.tar.gz` + DEFAULT), not nested per brand: an
 # image holds exactly ONE brand, discovery is recursive either way, and the DEFAULT marker is read from
@@ -83,7 +84,7 @@ ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 ONBUILD RUN yarn run build
 ONBUILD RUN mkdir /build && \
-    cp -r ./build ./public ./package.json ./yarn.lock /build && \
+    cp -r ./build ./package.json ./yarn.lock /build && \
     if [ -d ./deployment ]; then cp -r ./deployment /build/deployment; fi
 ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     cd /build && yarn install --production=true --frozen-lockfile --non-interactive --cache-folder /yarn-cache

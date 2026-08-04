@@ -12,7 +12,7 @@ exports[`Badges.vue with badges in presentation mode renders 1`] = `
     >
       <img
         class="hc-badge"
-        src="/api/path/to/some/icon"
+        src="/path/to/some/icon"
         title="Some description"
       />
     </div>
@@ -22,7 +22,7 @@ exports[`Badges.vue with badges in presentation mode renders 1`] = `
     >
       <img
         class="hc-badge"
-        src="/api/path/to/another/icon"
+        src="/path/to/another/icon"
         title="Another description"
       />
     </div>
@@ -32,7 +32,7 @@ exports[`Badges.vue with badges in presentation mode renders 1`] = `
     >
       <img
         class="hc-badge"
-        src="/api/path/to/third/icon"
+        src="/path/to/third/icon"
         title="Third description"
       />
     </div>
@@ -52,7 +52,7 @@ exports[`Badges.vue with badges in selection mode clicking on second badge selec
     >
       <img
         class="hc-badge"
-        src="/api/path/to/some/icon"
+        src="/path/to/some/icon"
         title="Some description"
       />
     </div>
@@ -62,7 +62,7 @@ exports[`Badges.vue with badges in selection mode clicking on second badge selec
     >
       <img
         class="hc-badge"
-        src="/api/path/to/another/icon"
+        src="/path/to/another/icon"
         title="Another description"
       />
     </button>
@@ -72,7 +72,7 @@ exports[`Badges.vue with badges in selection mode clicking on second badge selec
     >
       <img
         class="hc-badge"
-        src="/api/path/to/third/icon"
+        src="/path/to/third/icon"
         title="Third description"
       />
     </button>
@@ -92,7 +92,7 @@ exports[`Badges.vue with badges in selection mode clicking twice on second badge
     >
       <img
         class="hc-badge"
-        src="/api/path/to/some/icon"
+        src="/path/to/some/icon"
         title="Some description"
       />
     </div>
@@ -102,7 +102,7 @@ exports[`Badges.vue with badges in selection mode clicking twice on second badge
     >
       <img
         class="hc-badge"
-        src="/api/path/to/another/icon"
+        src="/path/to/another/icon"
         title="Another description"
       />
     </button>
@@ -112,7 +112,7 @@ exports[`Badges.vue with badges in selection mode clicking twice on second badge
     >
       <img
         class="hc-badge"
-        src="/api/path/to/third/icon"
+        src="/path/to/third/icon"
         title="Third description"
       />
     </button>
@@ -132,7 +132,7 @@ exports[`Badges.vue with badges in selection mode renders 1`] = `
     >
       <img
         class="hc-badge"
-        src="/api/path/to/some/icon"
+        src="/path/to/some/icon"
         title="Some description"
       />
     </div>
@@ -142,7 +142,7 @@ exports[`Badges.vue with badges in selection mode renders 1`] = `
     >
       <img
         class="hc-badge"
-        src="/api/path/to/another/icon"
+        src="/path/to/another/icon"
         title="Another description"
       />
     </button>
@@ -152,7 +152,7 @@ exports[`Badges.vue with badges in selection mode renders 1`] = `
     >
       <img
         class="hc-badge"
-        src="/api/path/to/third/icon"
+        src="/path/to/third/icon"
         title="Third description"
       />
     </button>

@@ -14,7 +14,7 @@ exports[`Badges.vue with badges renders 1`] = `
       >
         <img
           alt="1"
-          src="/api/path/to/some/icon"
+          src="/path/to/some/icon"
         />
       </div>
        
@@ -37,7 +37,7 @@ exports[`Badges.vue with badges renders 1`] = `
       >
         <img
           alt="2"
-          src="/api/path/to/another/icon"
+          src="/path/to/another/icon"
         />
       </div>
        
@@ -60,7 +60,7 @@ exports[`Badges.vue with badges renders 1`] = `
       >
         <img
           alt="3"
-          src="/api/path/to/third/icon"
+          src="/path/to/third/icon"
         />
       </div>
        

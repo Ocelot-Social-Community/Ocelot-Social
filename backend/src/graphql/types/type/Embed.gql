@@ -19,7 +19,17 @@ type Embed {
   sources: [String]
 }
 
+"An oEmbed provider this instance can resolve link previews for."
+type EmbedProvider {
+  "Display name, e.g. \"YouTube\"."
+  name: String!
+  "The provider's own site, e.g. \"https://youtube.com\"."
+  url: String!
+}
+
 type Query {
   "Fetch link-preview metadata for a URL. Public."
   embed(url: String!): Embed
+  "The oEmbed providers this instance resolves link previews for. Public."
+  embedProviders: [EmbedProvider!]!
 }
