@@ -145,7 +145,10 @@ const createServer = async (options?: CreateServerOptions) => {
       (CONFIG.DEBUG && { contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }) || {},
     ) as any,
   )
-  app.use(express.static('public'))
+  // No static file mount: the backend serves GraphQL and the brand archives below, nothing else.
+  // Badge icons live in the webapp's static/ (same /img/badges/… URLs), brand assets are read from the
+  // archive by the webapp, and providers.json became the `embedProviders` query.
+  //
   // Brand archives this backend has on disk, served read-only so the webapp can acquire them instead
   // of shipping its own copy. Mounted before the body parsers — these are plain GETs with no body.
   // The search path is resolved HERE (env, else the conventional locations) and handed over, so the

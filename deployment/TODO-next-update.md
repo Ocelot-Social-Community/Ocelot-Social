@@ -41,8 +41,27 @@ If you generate your badges with a script, fix the path there too, not just in t
 
 **Note on overriding FRAMEWORK badge icons:** the old bucket also let a brand replace a core icon
 (e.g. `default_verification.svg`) by shadowing the file on the backend's disk. That is no longer
-possible — the framework's own badge icons are served from the backend image under `/img/badges/…`
-and are not brand-namespaced. Brand badges are unaffected; only overrides of built-in icons are.
+possible — the framework's own badge icons ship with the **webapp** now (see below) and are not
+brand-namespaced. Brand badges are unaffected; only overrides of built-in icons are.
+
+## The backend serves no static files any more
+
+`backend/public/` is gone and with it the `express.static` mount. The backend answers GraphQL and the
+`/branding/…` archive routes, nothing else. Two things moved:
+
+- **Framework badge icons** → `webapp/static/img/badges/`. The URLs are unchanged
+  (`/img/badges/trophy_bear.svg`), they are just served by the webapp instead of proxied to the
+  backend, so **no database migration and no action** is required. Existing badge rows keep working.
+- **`providers.json`** → `backend/src/graphql/resolvers/embeds/`, where the resolver that uses it
+  lives. The settings page reads the list through the new public `embedProviders` query.
+
+**Action:** only if you did one of these:
+
+- You called `https://<domain>/api/providers.json` from your own code — it is gone; use the
+  `embedProviders` GraphQL query.
+- You put custom files into `backend/public/` in your fork to have them served — that path no longer
+  exists. Put them in `webapp/static/` (served at `/`) or, for brand-specific files, into your
+  branding's `assets/` (served at `/branding/<id>/assets/…`).
 
 ## `/api` is routed to the backend by the ingress, not by the webapp
 

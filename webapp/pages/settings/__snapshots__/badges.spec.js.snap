@@ -30,7 +30,7 @@ exports[`badge settings with badges more badges available selecting an empty slo
           >
             <img
               class="hc-badge"
-              src="/api/verification/icon"
+              src="/verification/icon"
               title="Verification description"
             />
           </div>
@@ -40,7 +40,7 @@ exports[`badge settings with badges more badges available selecting an empty slo
           >
             <img
               class="hc-badge"
-              src="/api/path/to/some/icon"
+              src="/path/to/some/icon"
               title="Some description"
             />
           </button>
@@ -50,7 +50,7 @@ exports[`badge settings with badges more badges available selecting an empty slo
           >
             <img
               class="hc-badge"
-              src="/api/path/to/empty/icon"
+              src="/path/to/empty/icon"
               title="Empty"
             />
           </button>
@@ -60,7 +60,7 @@ exports[`badge settings with badges more badges available selecting an empty slo
           >
             <img
               class="hc-badge"
-              src="/api/path/to/third/icon"
+              src="/path/to/third/icon"
               title="Third description"
             />
           </button>
@@ -110,7 +110,7 @@ exports[`badge settings with badges more badges available selecting an empty slo
             >
               <img
                 alt="4"
-                src="/api/path/to/fourth/icon"
+                src="/path/to/fourth/icon"
               />
             </div>
              
@@ -133,7 +133,7 @@ exports[`badge settings with badges more badges available selecting an empty slo
             >
               <img
                 alt="5"
-                src="/api/path/to/fifth/icon"
+                src="/path/to/fifth/icon"
               />
             </div>
              
@@ -186,7 +186,7 @@ exports[`badge settings with badges no more badges available selecting an empty 
           >
             <img
               class="hc-badge"
-              src="/api/verification/icon"
+              src="/verification/icon"
               title="Verification description"
             />
           </div>
@@ -196,7 +196,7 @@ exports[`badge settings with badges no more badges available selecting an empty 
           >
             <img
               class="hc-badge"
-              src="/api/path/to/some/icon"
+              src="/path/to/some/icon"
               title="Some description"
             />
           </button>
@@ -206,7 +206,7 @@ exports[`badge settings with badges no more badges available selecting an empty 
           >
             <img
               class="hc-badge"
-              src="/api/path/to/empty/icon"
+              src="/path/to/empty/icon"
               title="Empty"
             />
           </button>
@@ -216,7 +216,7 @@ exports[`badge settings with badges no more badges available selecting an empty 
           >
             <img
               class="hc-badge"
-              src="/api/path/to/third/icon"
+              src="/path/to/third/icon"
               title="Third description"
             />
           </button>
@@ -279,7 +279,7 @@ exports[`badge settings with badges renders 1`] = `
           >
             <img
               class="hc-badge"
-              src="/api/verification/icon"
+              src="/verification/icon"
               title="Verification description"
             />
           </div>
@@ -289,7 +289,7 @@ exports[`badge settings with badges renders 1`] = `
           >
             <img
               class="hc-badge"
-              src="/api/path/to/some/icon"
+              src="/path/to/some/icon"
               title="Some description"
             />
           </button>
@@ -299,7 +299,7 @@ exports[`badge settings with badges renders 1`] = `
           >
             <img
               class="hc-badge"
-              src="/api/path/to/empty/icon"
+              src="/path/to/empty/icon"
               title="Empty"
             />
           </button>
@@ -309,7 +309,7 @@ exports[`badge settings with badges renders 1`] = `
           >
             <img
               class="hc-badge"
-              src="/api/path/to/third/icon"
+              src="/path/to/third/icon"
               title="Third description"
             />
           </button>
@@ -359,7 +359,7 @@ exports[`badge settings with badges renders 1`] = `
             >
               <img
                 alt="4"
-                src="/api/path/to/fourth/icon"
+                src="/path/to/fourth/icon"
               />
             </div>
              
@@ -382,7 +382,7 @@ exports[`badge settings with badges renders 1`] = `
             >
               <img
                 alt="5"
-                src="/api/path/to/fifth/icon"
+                src="/path/to/fifth/icon"
               />
             </div>
              
@@ -435,7 +435,7 @@ exports[`badge settings without badges renders 1`] = `
           >
             <img
               class="hc-badge"
-              src="/api/verification/icon"
+              src="/verification/icon"
               title="Verification description"
             />
           </div>

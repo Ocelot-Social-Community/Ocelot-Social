@@ -1,9 +1,6 @@
 import Vuex from 'vuex'
 import { mount } from '@vue/test-utils'
 import Embeds from './embeds.vue'
-import axios from 'axios'
-
-jest.mock('axios')
 
 const localVue = global.localVue
 
@@ -13,9 +10,6 @@ describe('embeds.vue', () => {
   let store
 
   beforeEach(() => {
-    axios.get.mockResolvedValue({
-      data: [{ provider_name: 'YouTube', provider_url: 'https://youtube.com' }],
-    })
     mocks = {
       $t: jest.fn((v) => v),
       $apollo: {
@@ -57,8 +51,15 @@ describe('embeds.vue', () => {
       })
     })
 
-    it('loads providers on mount', () => {
-      expect(axios.get).toHaveBeenCalledWith('/api/providers.json')
+    it('lists the providers the backend reports', async () => {
+      // The apollo option is inert without a provider, so drive its update handler directly — that
+      // is the whole mapping from the query result to what the page renders.
+      wrapper.vm.$options.apollo.embedProviders.update.call(wrapper.vm, {
+        embedProviders: [{ name: 'YouTube', url: 'https://youtube.com' }],
+      })
+      await wrapper.vm.$nextTick()
+      expect(wrapper.text()).toContain('YouTube')
+      expect(wrapper.text()).toContain('https://youtube.com')
     })
 
     it('sets disabled from currentUser.allowEmbedIframes', () => {

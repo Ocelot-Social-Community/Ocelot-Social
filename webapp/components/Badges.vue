@@ -19,13 +19,12 @@
       @dragleave="handleDragLeave(index)"
       @drop.prevent="handleDrop($event, index)"
     >
-      <img :title="badge.description" :src="backendPath(badge.icon)" class="hc-badge" />
+      <img :title="badge.description" :src="badge.icon" class="hc-badge" />
     </component>
   </div>
 </template>
 
 <script>
-import { backendPath } from '~/helpers/backendPath'
 export default {
   name: 'Badges',
   props: {
@@ -50,7 +49,6 @@ export default {
     }
   },
   methods: {
-    backendPath,
     isDraggable(index, badge) {
       if (!this.dragEnabled || index === 0) return false
       if (badge.isDefault) return false
