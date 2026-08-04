@@ -53,7 +53,13 @@ the same second. There is no undo.
 
    ```sh
    kubectl -n <namespace> scale statefulset <release>-backend --replicas=0
+   kubectl -n <namespace> wait --for=delete pod -l app=<release>-backend --timeout=10m
    ```
+
+   The `wait` is not optional. `scale` only writes the desired replica count and returns
+   immediately; the pod is still terminating while you type the next command, and a `helm upgrade`
+   that starts in that window puts you back in exactly the parallel state this step exists to
+   avoid. `no matching resources found` means the pod is already gone — that is the state you want.
 
    Verify the order on a stage instance with the Helm version you actually deploy with before you
    do this in production.
@@ -73,7 +79,11 @@ the same second. There is no undo.
   `templates/backend/persistent-volume-claim.yaml` into it.
 
 **What this does and does not buy you:** no more `ReadWriteOnce` lock, a late-starting Neo4j is
-waited out silently, and a pod stuck in `Init` no longer blocks the next rollout. It is **not**
+waited out silently, and a pod stuck in `Init` no longer has to be deleted by hand before the *next*
+rollout can start — a new rollout creates a new ReplicaSet and terminates the stuck pod along with
+the old one, where the StatefulSet's `OrderedReady` waited for it to become `Ready` forever. The
+rollout it is stuck in still counts as unfinished until `progressDeadlineSeconds` runs out. It is
+**not**
 zero-downtime yet: `replicas` is pinned to `1` and `maxSurge` to `0`, because without Redis the
 backend's GraphQL subscriptions are process-local. See
 [backend-zero-downtime-konzept.md](../docu/backend-zero-downtime-konzept.md).

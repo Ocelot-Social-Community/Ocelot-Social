@@ -48,10 +48,17 @@ spec:
             - -c
             - |
               set -eu
-              rest="${NEO4J_URI#*://}"
-              host="${rest%%:*}"
-              port="${rest##*:}"
-              if [ "$port" = "$host" ]; then port=7687; fi
+              # A real URL parser, not ${NEO4J_URI#*://}: shell-side splitting silently picks the
+              # wrong host or port as soon as the URI carries userinfo (bolt://u:p@host), a path, a
+              # routing-policy query (neo4j://host:7687?policy=eu) or an IPv6 literal
+              # (bolt://[::1]:7687) — and this container would then wait out the full timeout
+              # against something that was never the database. An unparsable URI fails here, loudly
+              # and immediately, because of `set -e`.
+              field='const u=new URL(process.env.NEO4J_URI);process.stdout.write(u[process.argv[1]]||"")'
+              host=$(node -e "$field" hostname)
+              host=${host#[}; host=${host%]}   # net.connect wants ::1, not [::1]
+              port=$(node -e "$field" port)
+              [ -n "$port" ] || port=7687
               deadline=$(( $(date +%s) + {{ .Values.backend.migrations.waitForDatabaseSeconds }} ))
               # node rather than nc: busybox's nc has no portable -z, node is guaranteed to be here.
               probe='const net=require("net")

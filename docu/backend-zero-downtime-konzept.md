@@ -170,10 +170,12 @@ Neo4j ist ein eigener Helm-Release und startet regelmäßig deutlich später als
 
 Die Migration bleibt deshalb im Pod, aber aufgeteilt auf **zwei** initContainer:
 
-1. `<release>-backend-wait-db` — pollt den Bolt-Port aus `NEO4J_URI` alle 5 s, bis er annimmt, längstens `backend.migrations.waitForDatabaseSeconds` (Default 1500 s / 25 min). Der Pod steht währenddessen in `Init` und kostet nichts. Die Verbindungsprüfung nutzt `node`, nicht `nc` — busybox' `nc` hat kein portables `-z`, `node` ist im Image garantiert vorhanden.
+1. `<release>-backend-wait-db` — pollt den Bolt-Port aus `NEO4J_URI` alle 5 s, bis er annimmt, längstens `backend.migrations.waitForDatabaseSeconds` (Default 1500 s / 25 min). Der Pod steht währenddessen in `Init` und kostet nichts. Sowohl das Zerlegen der URI als auch die Verbindungsprüfung nutzen `node`, nicht Shell-Bordmittel: busybox' `nc` hat kein portables `-z`, und `${NEO4J_URI#*://}` greift bei Userinfo, Pfad, Routing-Query (`neo4j://host:7687?policy=eu`) oder IPv6-Literal daneben — mit dem Ergebnis, dass der Container den vollen Timeout gegen den falschen Host wartet. `new URL()` deckt alle Fälle ab, eine unparsbare URI bricht per `set -e` sofort ab.
 2. `<release>-backend-migrations` — führt `yarn prod:migrate init && yarn prod:migrate up` genau einmal aus.
 
-Die Aufteilung ist der Punkt: Eine *verspätete* Datenbank ist erwartetes Verhalten und wird lautlos abgefangen. Eine *kaputte* Migration schlägt dagegen sofort im zweiten Container fehl und ist als `CrashLoopBackOff` unmittelbar sichtbar, statt in einer langen Retry-Schleife zu verschwinden. Ein Retry-Loop um die Migration selbst würde beide Fälle vermischen.
+Die Aufteilung ist der Punkt: Eine *verspätete* Datenbank ist erwartetes Verhalten und wird lautlos abgefangen. Eine *kaputte* Migration schlägt dagegen sofort im zweiten Container fehl, statt in einer langen Retry-Schleife zu verschwinden. Ein Retry-Loop um die Migration selbst würde beide Fälle vermischen.
+
+Wie sich das im Cluster zeigt: Ein fehlschlagender initContainer beendet nicht den Pod, sondern wird bei `restartPolicy: Always` wiederholt gestartet — `kubectl get pods` zeigt `Init:CrashLoopBackOff` (bzw. `Init:Error` zwischen den Versuchen), nicht den gewöhnlichen `CrashLoopBackOff` eines App-Containers. Der Fehler steht in `.status.initContainerStatuses`, die Logs holt man gezielt mit `kubectl logs <pod> -c <release>-backend-migrations`; ohne `-c` fragt man den Hauptcontainer ab, der noch gar nicht gestartet ist.
 
 Warum der Race-Einwand aus dem Entwurf hier nicht greift: Bei `replicas: 1` und `maxSurge: 0` läuft zu keinem Zeitpunkt mehr als ein Pod, also auch nur eine Migration. Das ist bewusst gekoppelt — wer `replicas` erhöht, muss die Migration vorher aus dem Pod herausziehen (Job plus Gate über die Job-Completion, dafür RBAC nötig).
 
@@ -197,7 +199,14 @@ Solange ihr noch **destruktive** Migrationen habt (Beispiel: `20260327120000-rem
 Helm kann das `kind` einer Ressource nicht in-place ändern. StatefulSet und Deployment sind trotz gleichen Namens zwei verschiedene Objekte, und Helm wendet beim `upgrade` **zuerst** das Zielmanifest an und löscht erst danach, was nur noch im alten Release steht. Der Wechsel ist also kein Rolling Update, sondern ein kurzer Parallelzustand: das neue Deployment startet seinen Pod, während der alte StatefulSet-Pod noch läuft — zwei Backends gegen dieselbe Datenbank, jedes mit eigenem Migrations-InitContainer. Genau das soll das manuelle Herunterskalieren verhindern; das Wartungsfenster ist der Preis dafür, nicht die Folge einer Helm-Löschung. Empfehlung:
 
 - Wartungsfenster ankündigen.
-- Manuell vorab: `kubectl scale statefulset <release>-backend --replicas=0`.
+- Manuell vorab herunterskalieren **und auf den tatsächlich verschwundenen Pod warten** — `scale` schreibt nur den Sollzustand und kehrt sofort zurück; startet das Upgrade in diesem Fenster, ist der Parallelzustand wieder da, den der Schritt gerade verhindern soll:
+
+  ```sh
+  kubectl -n <namespace> scale statefulset <release>-backend --replicas=0
+  kubectl -n <namespace> wait --for=delete pod -l app=<release>-backend --timeout=10m
+  ```
+
+  `no matching resources found` heißt: schon weg — der gewünschte Zustand.
 - `helm upgrade` mit neuem Chart.
 - Danach läuft nur noch das Deployment, ab da ist zero-downtime möglich.
 
@@ -273,7 +282,7 @@ Gewinn: kein RWO-Lock mehr; eine verspätet startende Datenbank wird bis zu 25 M
 
 1. DB-Audit: keine `/uploads`-URLs mehr in Neo4j (Schritt 1).
 2. PV auf `Retain` patchen und mit `deployment/scripts/backup-uploads-pvcs.sh` sichern (Schritt 5 und 2 — **vor** dem Upgrade, solange der alte Pod das Volume noch mountet!).
-3. `kubectl scale statefulset <release>-backend --replicas=0` (Schritt 4).
+3. `kubectl scale statefulset <release>-backend --replicas=0`, dann `kubectl wait --for=delete pod -l app=<release>-backend --timeout=10m` — erst weitermachen, wenn der alte Pod wirklich weg ist (Schritt 4).
 4. `helmfile apply`, verifizieren.
 5. Zuerst auf einer Stage-Instanz durchspielen, Produktion einzeln nachziehen.
 
