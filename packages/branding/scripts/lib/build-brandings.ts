@@ -8,11 +8,12 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSy
 import { basename, join, resolve } from 'node:path'
 
 import { BUCKET_NAMES, extractBucket, instanceFile, splitConfig } from '../../dist/buckets.js'
+import { customPropertiesIn } from '../../dist/css.js'
 import { brandingDefaults } from '../../dist/defaults.js'
 import { deepMerge } from '../../dist/internal.js'
 import { writeTarGz } from '../../dist/tar.js'
-import { THEME_DEFAULTS } from '../../dist/theme.js'
 import { SCHEMA_VERSION } from '../../dist/version.js'
+import { catalogAvailable, computeCatalog } from '../theme-catalog.ts'
 
 import { loadConfig } from './load-config.ts'
 
@@ -102,9 +103,6 @@ function namespaceConfig(
     for (const locale of Object.keys(locales)) locales[locale] = ns(locales[locale])
   }
   // Brand web-font files live in the served assets folder too.
-  if (Array.isArray(c.theme.fontFaces)) {
-    for (const face of c.theme.fontFaces) face.src = ns(face.src)
-  }
   // The header's custom-button icon is a brand asset like any logo (it used to be a framework-served
   // /img/custom/… path, which is why it was missed here at first).
   const customButton = c.headerMenu.customButton as unknown as Record<string, string | undefined>
@@ -168,6 +166,42 @@ const LEGACY_LOCALE_DIRS = new Set(['tmp', 'html'])
  * later wins). The RUNTIME is unchanged (locales still ride in the composed config). Non-locale folders
  * (legacy `locales/tmp` / `locales/html`, or anything not matching a locale code) are ignored.
  */
+/**
+ * A brand authors its theme as CSS. This reads the stylesheets it lists under `assets.css` for two
+ * purposes, and stores nothing else about the theme:
+ *
+ *  1. `theme.themeColor` — the resolved `--color-primary`. The PWA manifest is generated per request
+ *     and cannot resolve `var()`, so this one value has to travel as a concrete colour.
+ *  2. The specificity guarantee. A brand's `:root` only outranks the framework's `:root` by being
+ *     loaded later, and it is not: with `build.extractCSS: false` the app CSS is injected by
+ *     vue-style-loader during hydration, AFTER anything the server put in <head>. So the packed copy
+ *     of each stylesheet has its `:root` selectors rewritten to `:root:root`, which wins on
+ *     specificity no matter the order. The brand's source file is untouched — only what ships changes.
+ */
+function loadThemeFromStylesheets(
+  dir: string,
+  id: string,
+  config: BrandingConfig,
+  warnings: string[],
+): Record<string, string> {
+  const declared: Record<string, string> = {}
+  for (const rel of config.assets.css) {
+    const file = join(dir, rel)
+    if (!existsSync(file)) {
+      warnings.push(`  ! ${id}: assets.css lists '${rel}', which does not exist`)
+      continue
+    }
+    Object.assign(declared, customPropertiesIn(readFileSync(file, 'utf8')))
+  }
+  if (declared['color-primary']) config.theme.themeColor = declared['color-primary']
+  return declared
+}
+
+/** `:root` → `:root:root` in a packed stylesheet — see loadThemeFromStylesheets for why. */
+export function outSpecifyRoot(css: string): string {
+  return css.replace(/(^|[{};,]|\*\/)(\s*):root(?!:root)(?=\s*[,{])/g, '$1$2:root:root')
+}
+
 function loadLocaleFiles(
   dir: string,
   id: string,
@@ -220,21 +254,26 @@ function editDistance(a: string, b: string): number {
 }
 
 /**
- * Warn on a `theme.cssVars` key that is a near-miss of a known theme token (likely a typo → a silent
- * no-op at runtime). cssVars is intentionally OPEN — a brand may define custom `--vars` for its own CSS
+ * Warn on a declared custom property that is a near-miss of a known theme token (likely a typo → a
+ * silent no-op at runtime). The set is intentionally OPEN — a brand may define custom `--vars` for its CSS
  * — so only CLOSE matches are flagged (edit distance ≤ 2, similar length), never every unknown key.
  */
-function warnThemeTokenTypos(config: BrandingConfig, id: string, warnings: string[]): void {
-  const known = Object.keys(THEME_DEFAULTS)
-  for (const key of Object.keys(config.theme.cssVars)) {
+function warnThemeTokenTypos(
+  declared: Record<string, string>,
+  id: string,
+  warnings: string[],
+): void {
+  // Live from the webapp's stylesheets. Where they are not reachable (a brand's own repo) there is
+  // nothing to compare against, and a guess would produce false warnings — so skip the check.
+  if (!catalogAvailable()) return
+  const known = Object.keys(computeCatalog())
+  for (const key of Object.keys(declared)) {
     if (known.includes(key)) continue
     const near = known.find(
       (k) => Math.abs(k.length - key.length) <= 1 && editDistance(key, k) <= 2,
     )
     if (near) {
-      warnings.push(
-        `  ! ${id}: theme.cssVars['${key}'] is not a known theme token — did you mean '${near}'?`,
-      )
+      warnings.push(`  ! ${id}: --${key} is not a known theme token — did you mean --${near}?`)
     }
   }
 }
@@ -289,7 +328,10 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
   // Brands may author i18n overrides as conventional locales/<code>.json files (in addition to, or
   // instead of, inline config.locales) — merge those in now. Runtime shape is unchanged.
   loadLocaleFiles(dir, id, config, warnings)
-  warnThemeTokenTypos(config, id, warnings)
+  // Theme authored as CSS: the brand's stylesheets are the single source. Only the PWA colour is
+  // lifted out of them into the config; the declarations themselves stay in the files.
+  const declaredTokens = loadThemeFromStylesheets(dir, id, config, warnings)
+  warnThemeTokenTypos(declaredTokens, id, warnings)
   // OG image: if the brand didn't set its own, follow its squared logo (logos.signupPath). The old
   // deploy baked the brand's `static/img/custom/logo-squared.*` over the vanilla file; at runtime the
   // brand's logo lives under /branding/<id>/… instead, so derive the OG image from it — otherwise a
@@ -343,6 +385,17 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
   for (const sub of ['assets', 'html', 'emails']) {
     const src = join(dir, sub)
     if (existsSync(src)) collectFiles(src, sub, entries)
+  }
+
+  // The brand's own stylesheets ship with their `:root` raised to `:root:root` — see
+  // loadThemeFromStylesheets. Applied to the PACKED copy only; the file in the brand repo stays as the
+  // author wrote it.
+  const sheetEntries = new Set(
+    config.assets.css.map((href) => href.replace(/^\/branding\/[^/]+\//, '')),
+  )
+  for (const entry of entries) {
+    if (!sheetEntries.has(entry.name)) continue
+    entry.data = Buffer.from(outSpecifyRoot(entry.data.toString('utf8')))
   }
   warnUncompiledStylesheets(entries, id, warnings)
   warnRemovedPublicBucket(dir, id, warnings)

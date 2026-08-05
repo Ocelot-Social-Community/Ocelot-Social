@@ -2,6 +2,8 @@
 // these; a brand overrides a sparse subset. Values previously lived in the per-domain constants
 // files of backend and webapp (which had already drifted apart — the point of one shared source).
 
+import { DEFAULT_COLOR_PRIMARY } from './theme.js'
+
 import type { BrandingConfig } from './schema.js'
 
 export const brandingDefaults: BrandingConfig = {
@@ -14,9 +16,9 @@ export const brandingDefaults: BrandingConfig = {
     },
   },
   theme: {
-    // Vanilla keeps its built-in (compiled) theme; brands add their own runtime overrides.
-    cssVars: {},
-    fontFaces: [],
+    // The framework's own --color-primary. A brand overrides it by declaring the property in one of
+    // its stylesheets; the build reads it back out into this field (see loadThemeFromStylesheets).
+    themeColor: DEFAULT_COLOR_PRIMARY,
   },
   group: {
     nameLengthMin: 3,

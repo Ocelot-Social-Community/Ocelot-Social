@@ -7,7 +7,7 @@
 // SSR deliberately leaves alone — see brandingHead.js).
 import { branding } from '@ocelot-social/branding'
 
-import { CSS_LINK_ATTR, THEME_STYLE_ID, brandingCssHrefs, themeCss } from '~/utils/brandingHead.js'
+import { CSS_LINK_ATTR, brandingCssHrefs } from '~/utils/brandingHead.js'
 
 export default () => {
   if (typeof document === 'undefined') return
@@ -53,18 +53,7 @@ export default () => {
     document.head.appendChild(link)
   }
 
-  // Runtime theme: brand @font-face declarations + CSS custom property overrides on the root element.
-  // Both the webapp (brandable SCSS tokens read var(--…)) and packages/ui read these, so a live switch
-  // re-themes without a rebuild. Re-appended last for the same reason as the stylesheets above —
-  // though the theme block does not depend on it: themeCss() out-specifies the framework defaults.
-  const css = themeCss(branding.theme)
-  if (css) {
-    let style = document.getElementById(THEME_STYLE_ID)
-    if (!style) {
-      style = document.createElement('style')
-      style.id = THEME_STYLE_ID
-    }
-    style.textContent = css
-    document.head.appendChild(style)
-  }
+  // No separate theme <style> any more: a brand's custom properties live in its own stylesheet, which
+  // the links above already carry. The build raises that sheet's `:root` to `:root:root`, so the tokens
+  // win on specificity — the re-append above then only has to matter for its component rules.
 }

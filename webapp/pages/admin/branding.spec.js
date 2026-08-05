@@ -228,3 +228,116 @@ describe('admin/branding available list', () => {
     expect(BrandingPage.computed.activeId.call({ activeSelect, renderedId: 'stage' })).toBe('')
   })
 })
+
+// Every helper the TEMPLATE calls must exist on the component. The stylesheet-summary rows were
+// shipped with their two label methods missing — eslint cannot see that (a template reference is not
+// a scope reference) and the method-level tests above never render, so it only surfaced in the browser
+// as "_vm.themeVarLabel is not a function". This closes that gap without a full mount.
+describe('admin/branding template contract', () => {
+  const template = BrandingPage.options ? BrandingPage.options.__file : null
+
+  it('defines every method the template invokes', () => {
+    const src = require('fs').readFileSync(require('path').join(__dirname, 'branding.vue'), 'utf8')
+    // lastIndexOf: the SFC contains nested <template #slot> blocks, so the first closing tag
+    // would cut the block short — which is exactly how the first version of this test passed
+    // while the method it was meant to guard was missing.
+    const tpl = src.slice(src.indexOf('<template>'), src.lastIndexOf('</template>'))
+    const defined = new Set([
+      ...Object.keys(BrandingPage.methods || {}),
+      ...Object.keys(BrandingPage.computed || {}),
+      ...Object.keys(BrandingPage.data ? BrandingPage.data.call({ $t: () => '' }) : {}),
+    ])
+    // `name(` inside a mustache or a binding — the shape that fails at runtime when undefined.
+    const called = new Set(
+      [...tpl.matchAll(/[{(\s|]([a-zA-Z_$][\w$]*)\(/g)]
+        .map((m) => m[1])
+        .filter(
+          (n) => !['if', 'return', 'typeof', 'Object', 'Array', 'String', 'Number'].includes(n),
+        ),
+    )
+    const missing = [...called].filter((n) => !defined.has(n) && !n.startsWith('$'))
+    expect({ missing, template }).toEqual({ missing: [], template })
+  })
+})
+
+// Regression: the theme rows are built from the brand's OWN stylesheets, and the slot they come from
+// is a select value — not a brand id. Indexing the stylesheet map with it directly returned {} for an
+// inheriting slot, so every token equalled the framework default and the whole bucket rendered as
+// "unchanged" even for a brand that overrides half the palette.
+describe('admin/branding theme rows resolve the select value', () => {
+  const ctx = {
+    activeId: 'yunite',
+    stylesheets: {
+      yunite: [{ customProperties: { 'color-primary': 'teal', 'color-secondary': 'lime' } }],
+    },
+    declaredTokensOf: BrandingPage.methods.declaredTokensOf,
+  }
+
+  // ctx carries the method, so a plain call already binds `this` to it.
+  it('reads the base brand when the slot inherits (empty select)', () => {
+    expect(ctx.declaredTokensOf('')).toEqual({
+      'color-primary': 'teal',
+      'color-secondary': 'lime',
+    })
+  })
+
+  it('reads the named brand when the slot names one', () => {
+    expect(ctx.declaredTokensOf('yunite')['color-primary']).toBe('teal')
+  })
+
+  it('yields nothing for the explicit-vanilla sentinel', () => {
+    expect(ctx.declaredTokensOf('@default')).toEqual({})
+  })
+
+  it('yields nothing without a base and for an unknown brand', () => {
+    const noBase = { ...ctx, activeId: '' }
+    expect(BrandingPage.methods.declaredTokensOf.call(noBase, '')).toEqual({})
+    expect(ctx.declaredTokensOf('other-brand')).toEqual({})
+  })
+})
+
+// The stylesheet list is rendered as the VALUE of the assets.css row, so it must resolve the same
+// slot as that bucket's other rows — an inheriting slot means "the base package's sheets".
+describe('admin/branding bucket stylesheets follow the slot', () => {
+  const sheets = [
+    { href: '/branding/yunite/assets/css/theme.css', customProperties: { a: '1', b: '2' } },
+    { href: '/branding/yunite/assets/css/branding.css', customProperties: {} },
+  ]
+  const make = (select, over = {}) => {
+    const ctx = {
+      activeId: 'yunite',
+      stylesheets: { yunite: sheets },
+      effectiveSelect: () => select,
+      bucketStylesheets: BrandingPage.methods.bucketStylesheets,
+      sheetFor: BrandingPage.methods.sheetFor,
+      asArray: BrandingPage.methods.asArray,
+      ...over,
+    }
+    return ctx
+  }
+
+  it('uses the base package when the slot inherits', () => {
+    expect(make('').bucketStylesheets('theme')).toEqual(sheets)
+  })
+
+  it('is empty for explicit vanilla and for an unknown brand', () => {
+    expect(make('@default').bucketStylesheets('theme')).toEqual([])
+    expect(make('other').bucketStylesheets('theme')).toEqual([])
+  })
+
+  it('matches a listed href to its summary, and tolerates one it has not read', () => {
+    const ctx = make('yunite')
+    expect(ctx.sheetFor('theme', '/branding/yunite/assets/css/theme.css').customProperties).toEqual(
+      {
+        a: '1',
+        b: '2',
+      },
+    )
+    expect(ctx.sheetFor('theme', '/branding/yunite/assets/css/missing.css')).toBeNull()
+  })
+
+  it('renders nothing for a non-array value', () => {
+    expect(make('yunite').asArray('not-an-array')).toEqual([])
+    expect(make('yunite').asArray(undefined)).toEqual([])
+  })
+})

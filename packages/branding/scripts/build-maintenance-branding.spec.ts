@@ -23,9 +23,7 @@ import { dirname, join } from 'node:path'
 import { after, describe, test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 
-const GENERATOR = fileURLToPath(
-  new URL('../scripts/build-maintenance-branding.ts', import.meta.url),
-)
+const GENERATOR = fileURLToPath(new URL('./build-maintenance-branding.ts', import.meta.url))
 
 const roots: string[] = []
 after(() => {
@@ -67,18 +65,22 @@ function brandDir(): string {
     `export default (defineBranding) =>
   defineBranding({
     metadata: { applicationName: 'Acme' },
-    theme: {
-      cssVars: { 'color-primary': 'rebeccapurple', 'font-family-text': "'Acme Sans', sans-serif" },
-      fontFaces: [
-        { family: 'Acme Sans', src: 'assets/fonts/acme.woff2', format: 'woff2', weight: '400' },
-      ],
-    },
+
+    assets: { css: ['assets/brand.css'] },
     logos: { signupPath: 'assets/logo-squared.svg' },
   })
 `,
   )
   write(join(dir, 'assets/logo-squared.svg'), '<svg id="brand"/>')
   write(join(dir, 'assets/fonts/acme.woff2'), Buffer.from('woff2-bytes'))
+  // The font lives in the brand's own stylesheet; url() is relative to THAT file (assets/…).
+  write(
+    join(dir, 'assets/brand.css'),
+    [
+      "@font-face { font-family: 'Acme Sans'; src: url('fonts/acme.woff2') format('woff2'); font-weight: 400; }",
+      ":root { --color-primary: rebeccapurple; --font-family-text: 'Acme Sans', sans-serif; }",
+    ].join('\n'),
+  )
   write(
     join(dir, 'locales/de.json'),
     JSON.stringify({
@@ -125,7 +127,7 @@ function snapshot(dir: string): Map<string, string> {
 /** Whether a path is one the generator declares as its own (see maintenance-generated-paths.json). */
 function declaredPaths(): { servedDir: string; paths: string[] } {
   return JSON.parse(
-    readFileSync(new URL('../scripts/maintenance-generated-paths.json', import.meta.url), 'utf8'),
+    readFileSync(new URL('./maintenance-generated-paths.json', import.meta.url), 'utf8'),
   ) as { servedDir: string; paths: string[] }
 }
 
@@ -200,21 +202,22 @@ describe('build-maintenance-branding', () => {
     assert.ok(declared.paths.includes(`public/${declared.servedDir}`))
   })
 
-  test('emits the theme as its own stylesheet: font faces, then the tokens', () => {
+  test('imports the brand stylesheets, then declares the tokens', () => {
     const to = maintenanceDir()
     brand(brandDir(), to)
 
     const css = readText(to, 'app/assets/css/brand.css')
-    // The font FILE is served from the maintenance app, not from /branding/<id>/… (that route only
-    // exists in the live webapp, which is down whenever this page is shown).
+    // The brand's own sheet is served from the maintenance app, not from /branding/<id>/… (that route
+    // only exists in the live webapp, which is down whenever this page is shown) …
+    assert.match(readText(to, 'public/brand/brand.css'), /@font-face/)
+    // … and its @font-face url resolves relative to THAT file, which is why the font travels too.
     assert.equal(readText(to, 'public/brand/fonts/acme.woff2'), 'woff2-bytes')
-    assert.match(css, /@font-face \{[^}]*font-family: "Acme Sans";/)
-    assert.match(css, /src: url\("\/brand\/fonts\/acme\.woff2"\) format\("woff2"\);/)
-    assert.match(css, /font-weight: 400;/)
-    // …and the token that names it, so `body { font-family: var(--font-family-text) }` resolves.
-    assert.match(css, /--font-family-text: 'Acme Sans', sans-serif;/)
-    assert.match(css, /--color-primary: rebeccapurple;/)
-    assert.ok(css.indexOf('@font-face') < css.indexOf(':root'))
+    assert.match(css, /@import url\("\/brand\/brand\.css"\);/)
+    // The tokens live in the imported sheet — brand.css only points at it. And the packed sheet ships
+    // with :root:root, so it outranks the maintenance page's own defaults too.
+    const sheet = readText(to, 'public/brand/brand.css')
+    assert.match(sheet, /:root:root \{[^}]*--color-primary: rebeccapurple/)
+    assert.match(sheet, /--font-family-text: 'Acme Sans', sans-serif/)
   })
 
   // The logo travels as a metadata KEY because its filename and extension vary per brand — app.vue
@@ -269,7 +272,7 @@ describe('build-maintenance-branding', () => {
       assert.equal(readText(to, join('public', meta.OG_IMAGE)), 'THE-OG-IMAGE')
     })
 
-    test('keeps two font files apart', () => {
+    test('keeps two font files with the same basename apart', () => {
       const to = maintenanceDir()
       const from = tmp('ocelot-brand-')
       write(join(from, 'package.json'), JSON.stringify({ name: 'cuts-branding' }))
@@ -277,25 +280,26 @@ describe('build-maintenance-branding', () => {
         join(from, 'brand.config.mjs'),
         `export default (defineBranding) =>
   defineBranding({
-    theme: {
-      fontFaces: [
-        { family: 'Cuts', src: 'assets/fonts/regular/Cuts.woff2', weight: '400' },
-        { family: 'Cuts', src: 'assets/fonts/bold/Cuts.woff2', weight: '700' },
-      ],
-    },
+    assets: { css: ['assets/brand.css'] },
   })
 `,
       )
       write(join(from, 'assets/fonts/regular/Cuts.woff2'), 'REGULAR')
       write(join(from, 'assets/fonts/bold/Cuts.woff2'), 'BOLD')
+      write(
+        join(from, 'assets/brand.css'),
+        [
+          "@font-face { font-family: 'Cuts'; src: url('fonts/regular/Cuts.woff2'); font-weight: 400; }",
+          "@font-face { font-family: 'Cuts'; src: url('fonts/bold/Cuts.woff2'); font-weight: 700; }",
+        ].join('\n'),
+      )
 
       brand(from, to)
 
-      const css = readText(to, 'app/assets/css/brand.css')
-      const urls = [...css.matchAll(/url\("([^"]+)"\)/g)].map((m) => m[1])
-      assert.equal(new Set(urls).size, 2, `expected two distinct font urls, got ${urls.join(', ')}`)
-      assert.equal(readText(to, join('public', urls[0])), 'REGULAR')
-      assert.equal(readText(to, join('public', urls[1])), 'BOLD')
+      // Unpacking keeps the archive's directory structure, which is exactly what keeps two files of
+      // the same name apart — and what lets the stylesheet's own relative urls keep working.
+      assert.equal(readText(to, 'public/brand/fonts/regular/Cuts.woff2'), 'REGULAR')
+      assert.equal(readText(to, 'public/brand/fonts/bold/Cuts.woff2'), 'BOLD')
     })
   })
 
@@ -332,14 +336,15 @@ describe('build-maintenance-branding', () => {
         join(other, 'brand.config.mjs'),
         `export default (defineBranding) =>
   defineBranding({
-    theme: {
-      cssVars: { 'font-family-text': "'Other', sans-serif" },
-      fontFaces: [{ family: 'Other', src: 'assets/other.woff2', format: 'woff2' }],
-    },
+    assets: { css: ['assets/brand.css'] },
   })
 `,
       )
       write(join(other, 'assets/other.woff2'), Buffer.from('other-bytes'))
+      write(
+        join(other, 'assets/brand.css'),
+        "@font-face { font-family: 'Other'; src: url('other.woff2') format('woff2'); }",
+      )
 
       brand(other, to)
 
@@ -412,21 +417,24 @@ describe('build-maintenance-branding', () => {
       `export default (defineBranding) =>
   defineBranding({
     metadata: { applicationName: 'Gap' },
-    theme: {
-      cssVars: { 'color-primary': 'teal' },
-      fontFaces: [{ family: 'Nowhere', src: 'assets/nowhere.woff2', format: 'woff2' }],
-    },
+    assets: { css: ['assets/brand.css'] },
     logos: { signupPath: 'assets/nowhere.svg' },
   })
 `,
+    )
+    write(
+      join(from, 'assets/brand.css'),
+      ":root { --color-primary: teal }\n@font-face { font-family: 'Nowhere'; src: url('nowhere.woff2') format('woff2'); }",
     )
 
     const { status, stderr } = run(from, to)
 
     assert.equal(status, 0) // a missing asset is a warning, never a failed build
-    assert.match(stderr, /entry not in archive: assets\/nowhere\.woff2/)
     assert.match(stderr, /entry not in archive: assets\/nowhere\.svg/)
-    assert.match(readText(to, 'app/assets/css/brand.css'), /--color-primary: teal;/)
+    assert.match(stderr, /entry not in archive: assets\/nowhere\.svg/)
+    // The token lives in the imported sheet now; brand.css only points at it.
+    assert.match(readText(to, 'public/brand/brand.css'), /--color-primary: teal/)
+    assert.match(readText(to, 'app/assets/css/brand.css'), /@import url\("\/brand\/brand\.css"\);/)
     const meta = readJson(to, 'app/constants/metadata.brand.json') as unknown as Record<
       string,
       string
@@ -446,7 +454,7 @@ describe('build-maintenance-branding', () => {
 
   // A brand may point at a font it serves itself (a CDN). There is nothing to copy out of the archive
   // then — reference it as given.
-  test('passes an absolute or external font src through untouched', () => {
+  test('leaves an external font url alone — the sheet travels verbatim', () => {
     const to = maintenanceDir()
     const from = tmp('ocelot-brand-')
     write(join(from, 'package.json'), JSON.stringify({ name: 'cdn-branding' }))
@@ -454,18 +462,22 @@ describe('build-maintenance-branding', () => {
       join(from, 'brand.config.mjs'),
       `export default (defineBranding) =>
   defineBranding({
-    theme: {
-      cssVars: { 'font-family-text': "'Remote', sans-serif" },
-      fontFaces: [{ family: 'Remote', src: 'https://cdn.example/remote.woff2', format: 'woff2' }],
-    },
+    assets: { css: ['assets/brand.css'] },
   })
 `,
+    )
+    write(
+      join(from, 'assets/brand.css'),
+      "@font-face { font-family: 'Remote'; src: url('https://cdn.example/remote.woff2') format('woff2'); }",
     )
 
     brand(from, to)
 
-    const css = readText(to, 'app/assets/css/brand.css')
-    assert.match(css, /src: url\("https:\/\/cdn\.example\/remote\.woff2"\) format\("woff2"\);/)
-    assert.equal(existsSync(join(to, 'public/brand')), false)
+    // Nothing rewrites the sheet, so an external src stays exactly as authored.
+    assert.match(
+      readText(to, 'public/brand/brand.css'),
+      /url\('https:\/\/cdn\.example\/remote\.woff2'\)/,
+    )
+    assert.match(readText(to, 'app/assets/css/brand.css'), /@import url\("\/brand\/brand\.css"\);/)
   })
 })
