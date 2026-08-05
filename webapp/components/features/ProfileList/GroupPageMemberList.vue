@@ -168,15 +168,15 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .role-label {
-  font-size: $font-size-small;
-  color: $text-color-soft;
-  margin-bottom: $space-xx-small;
+  font-size: var(--font-size-small);
+  color: var(--text-color-soft);
+  margin-bottom: var(--space-xx-small);
+}
 
-  &--not-first {
-    margin-top: $space-x-small;
-  }
+.role-label--not-first {
+  margin-top: var(--space-x-small);
 }
 
 .member-list {
@@ -186,15 +186,15 @@ export default {
 }
 
 .member-item {
-  padding: $space-xx-small;
-  border-radius: $border-radius-base;
+  padding: var(--space-xx-small);
+  border-radius: var(--border-radius-base);
 
   &:hover {
-    background-color: $background-color-primary-inverse;
+    background-color: var(--background-color-primary-inverse);
   }
+}
 
-  &__teaser {
-    width: 100%;
-  }
+.member-item__teaser {
+  width: 100%;
 }
 </style>

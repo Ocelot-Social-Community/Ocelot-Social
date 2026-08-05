@@ -97,7 +97,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .badge-selection {
   width: 100%;
   max-width: 600px;
@@ -109,7 +109,7 @@ export default {
     background-color 0.2s ease;
 
   &.reserve-drag-over {
-    border-color: $color-success;
+    border-color: var(--color-success);
     border-style: dashed;
     background-color: color-mix(in srgb, var(--color-success) 5%, transparent);
   }

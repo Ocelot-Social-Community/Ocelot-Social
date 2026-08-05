@@ -108,19 +108,20 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .Sliders {
-  &__slider-selection {
-    .selection-dot {
-      margin-right: 2px;
-      height: 18px !important;
-      width: 18px !important;
-      min-height: 18px !important;
-      min-width: 18px !important;
-    }
-    &.--unconfirmed {
-      opacity: $opacity-disabled;
-    }
+}
+
+.Sliders__slider-selection {
+  .selection-dot {
+    margin-right: 2px;
+    height: 18px !important;
+    width: 18px !important;
+    min-height: 18px !important;
+    min-width: 18px !important;
+  }
+  &.--unconfirmed {
+    opacity: var(--opacity-disabled);
   }
 }
 </style>

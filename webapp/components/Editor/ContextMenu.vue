@@ -64,32 +64,32 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .tippy-tooltip.ocelot-social-theme {
-  background-color: $color-primary;
+  background-color: var(--color-primary);
   padding: 0;
   font-size: 1rem;
   text-align: inherit;
-  color: $color-neutral-100;
+  color: var(--color-neutral-100);
 
   .tippy-backdrop {
     display: none;
   }
 
   .tippy-roundarrow {
-    fill: $color-primary;
+    fill: var(--color-primary);
   }
   .tippy-popper[x-placement^='top'] & .tippy-arrow {
-    border-top-color: $color-primary;
+    border-top-color: var(--color-primary);
   }
   .tippy-popper[x-placement^='bottom'] & .tippy-arrow {
-    border-bottom-color: $color-primary;
+    border-bottom-color: var(--color-primary);
   }
   .tippy-popper[x-placement^='left'] & .tippy-arrow {
-    border-left-color: $color-primary;
+    border-left-color: var(--color-primary);
   }
   .tippy-popper[x-placement^='right'] & .tippy-arrow {
-    border-right-color: $color-primary;
+    border-right-color: var(--color-primary);
   }
 }
 </style>

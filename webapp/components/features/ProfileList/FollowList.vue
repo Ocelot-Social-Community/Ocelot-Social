@@ -151,18 +151,18 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .connections {
   list-style: none;
   padding: 0;
   margin: 0;
+}
 
-  &__item {
-    padding: $space-xx-small;
+.connections__item {
+  padding: var(--space-xx-small);
 
-    &:hover {
-      background-color: $background-color-primary-inverse;
-    }
+  &:hover {
+    background-color: var(--background-color-primary-inverse);
   }
 }
 </style>

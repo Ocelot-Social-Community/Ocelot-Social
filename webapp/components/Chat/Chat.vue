@@ -1179,7 +1179,7 @@ export default {
   },
 }
 </script>
-<style lang="scss" scoped>
+<style scoped>
 .vac-avatar-profile {
   margin-right: 15px;
 }
@@ -1225,11 +1225,11 @@ export default {
   min-width: 0;
   overflow: hidden;
 
-  // Match the video call header — RoomTitleLink defaults to font-weight: 500
-  // for in-chat usage, but the room header is a dialog-level heading and
-  // should read bold to mirror the call modal.
+  /*  Match the video call header — RoomTitleLink defaults to font-weight: 500 */
+  /*  for in-chat usage, but the room header is a dialog-level heading and */
+  /*  should read bold to mirror the call modal. */
   ::v-deep .room-title-link {
-    font-weight: $font-weight-bold;
+    font-weight: var(--text-weight-bold);
   }
 }
 
@@ -1245,7 +1245,7 @@ export default {
   white-space: nowrap !important;
 
   &:hover {
-    color: $color-primary !important;
+    color: var(--color-primary) !important;
   }
 }
 </style>

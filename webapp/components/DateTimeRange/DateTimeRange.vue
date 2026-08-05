@@ -96,7 +96,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .date-time-range {
   display: flex;
   flex-direction: column;

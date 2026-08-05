@@ -180,10 +180,10 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .add-chat-room-by-user-search {
   background-color: white;
-  padding: $space-base;
+  padding: var(--space-base);
   scroll-margin-top: 7rem;
 }
 .ds-flex.headline {
@@ -198,14 +198,14 @@ export default {
   width: 100%;
 }
 .chat-search-result-info {
-  margin-left: $space-x-small;
+  margin-left: var(--space-x-small);
   display: flex;
   flex-direction: column;
   flex: 1;
   min-width: 0;
 }
 .chat-search-result-name {
-  font-weight: $font-weight-bold;
+  font-weight: var(--text-weight-bold);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -215,15 +215,15 @@ export default {
   margin-right: 0;
 }
 .chat-search-result-detail {
-  font-size: $font-size-small;
-  color: $text-color-soft;
+  font-size: var(--font-size-small);
+  color: var(--text-color-soft);
 }
 .chat-search-result-badge {
   margin-left: auto;
   flex-shrink: 0;
   white-space: nowrap;
-  // Tailwind @layer utilities have lower specificity than unlayered CSS,
-  // so we need to explicitly set the badge styles here.
+  /*  Tailwind @layer utilities have lower specificity than unlayered CSS, */
+  /*  so we need to explicitly set the badge styles here. */
   font-size: 0.75rem;
   padding: 0.2em 0.8em;
   border-radius: 2em;

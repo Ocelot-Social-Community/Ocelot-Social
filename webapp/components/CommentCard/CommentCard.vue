@@ -247,11 +247,11 @@ export default {
   },
 }
 </script>
-<style lang="scss">
+<style>
 .comment-card {
   display: flex;
   flex-direction: column;
-  margin-bottom: $space-small;
+  margin-bottom: var(--space-small);
 
   &.--target {
     animation: highlight 4s ease;
@@ -260,27 +260,27 @@ export default {
   > .header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: $space-small;
+    margin-bottom: var(--space-small);
   }
 }
 
 @keyframes highlight {
   0% {
-    border: $border-size-base solid $color-primary;
+    border: var(--border-size-base) solid var(--color-primary);
   }
   100% {
-    border: $border-size-base solid transparent;
+    border: var(--border-size-base) solid transparent;
   }
 }
 </style>
 
-<style lang="scss" scoped>
+<style scoped>
 .actions {
-  margin-top: $space-x-small;
+  margin-top: var(--space-x-small);
   display: flex;
   align-items: center;
   justify-content: right;
-  gap: calc($space-base * 0.5);
+  gap: calc(var(--space-base) * 0.5);
 }
 
 .shout-button {

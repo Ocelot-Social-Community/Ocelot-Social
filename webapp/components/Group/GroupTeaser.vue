@@ -124,14 +124,14 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .group-teaser,
 .group-teaser:hover,
 .group-teaser:active {
   position: relative;
   display: block;
   height: 100%;
-  color: $text-color-base;
+  color: var(--text-color-base);
 
   > .ribbon {
     position: absolute;
@@ -151,16 +151,16 @@ export default {
 
   > .slug-location {
     display: flex;
-    margin-bottom: $space-small;
+    margin-bottom: var(--space-small);
 
     > .location-item {
-      margin-left: $space-small;
+      margin-left: var(--space-small);
     }
   }
 
   > .content {
     flex-grow: 1;
-    margin-bottom: $space-small;
+    margin-bottom: var(--space-small);
   }
 
   > .footer {
@@ -173,10 +173,10 @@ export default {
     }
 
     > .labeled-chip {
-      margin-top: $space-xx-small;
+      margin-top: var(--space-xx-small);
 
       > .chip {
-        margin-top: -$space-small + $space-x-small;
+        margin-top: calc(-1 * var(--space-small) + var(--space-x-small));
       }
     }
 
@@ -186,7 +186,7 @@ export default {
   }
 
   .user-teaser {
-    margin-bottom: $space-small;
+    margin-bottom: var(--space-small);
   }
 }
 </style>

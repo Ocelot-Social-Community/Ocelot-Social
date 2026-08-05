@@ -50,7 +50,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .custom-button {
   margin-left: 4px;
   margin-right: 4px;

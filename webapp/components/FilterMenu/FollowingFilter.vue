@@ -91,14 +91,14 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .follower-filter-list {
   display: flex;
-  margin-left: $space-xx-small;
+  margin-left: var(--space-xx-small);
 
   & button {
-    margin-right: $space-xx-small;
-    margin-bottom: $space-xx-small;
+    margin-right: var(--space-xx-small);
+    margin-bottom: var(--space-xx-small);
   }
 }
 </style>

@@ -125,7 +125,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .infinite-scroll-list {
   display: flex;
   flex-direction: column;
@@ -136,9 +136,9 @@ export default {
   }
 
   > .title {
-    color: $text-color-soft;
-    font-size: $font-size-base;
-    margin-bottom: $space-small;
+    color: var(--text-color-soft);
+    font-size: var(--font-size-base);
+    margin-bottom: var(--space-small);
 
     .count {
       font-weight: normal;
@@ -147,16 +147,16 @@ export default {
 }
 
 .subtitle {
-  font-size: $font-size-small;
-  color: $text-color-soft;
-  margin-top: -$space-x-small;
-  margin-bottom: $space-small;
+  font-size: var(--font-size-small);
+  color: var(--text-color-soft);
+  margin-top: calc(-1 * var(--space-x-small));
+  margin-bottom: var(--space-small);
 }
 
 .filter-wrap {
   flex-shrink: 0;
   position: relative;
-  margin-top: $space-small;
+  margin-top: var(--space-small);
 
   .filter-input {
     margin-top: 0;
@@ -165,14 +165,9 @@ export default {
 
   .filter-clear-wrap {
     position: absolute;
-    right: $space-xx-small;
+    right: var(--space-xx-small);
     top: 50%;
     transform: translateY(-50%);
-
-    &--hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
 
     ::v-deep button {
       width: 20px !important;
@@ -185,6 +180,11 @@ export default {
         height: 10px !important;
       }
     }
+  }
+
+  .filter-clear-wrap--hidden {
+    opacity: 0;
+    pointer-events: none;
   }
 }
 
@@ -226,13 +226,13 @@ export default {
 
 .nobody-message {
   text-align: center;
-  color: $text-color-soft;
-  padding: $space-x-small 0;
+  color: var(--text-color-soft);
+  padding: var(--space-x-small) 0;
 }
 
 .loading-indicator {
   display: flex;
   justify-content: center;
-  padding: $space-x-small 0;
+  padding: var(--space-x-small) 0;
 }
 </style>
