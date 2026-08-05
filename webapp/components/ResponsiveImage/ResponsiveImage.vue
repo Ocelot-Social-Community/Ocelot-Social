@@ -63,13 +63,13 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .responsive-image {
   opacity: 0;
   transition: opacity 0.3s ease;
+}
 
-  &--loaded {
-    opacity: 1;
-  }
+.responsive-image--loaded {
+  opacity: 1;
 }
 </style>

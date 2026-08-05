@@ -40,11 +40,11 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .hashtags-filter.os-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: $space-x-small $space-base !important;
+  padding: var(--space-x-small) var(--space-base) !important;
 }
 </style>

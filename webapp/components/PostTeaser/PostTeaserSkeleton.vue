@@ -31,7 +31,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 @keyframes skeleton-pulse {
   0% {
     opacity: 0.15;
@@ -46,8 +46,8 @@ export default {
 
 .post-teaser-skeleton {
   background: #fff;
-  border-radius: $border-radius-base;
-  box-shadow: $box-shadow-base;
+  border-radius: var(--border-radius-base);
+  box-shadow: var(--box-shadow-base);
   overflow: hidden;
   height: 100%;
 }
@@ -110,18 +110,21 @@ export default {
   background: currentColor;
   animation: skeleton-pulse 1.5s ease-in-out infinite;
   width: 100%;
+}
 
-  &--xshort {
-    width: 25%;
-  }
-  &--short {
-    width: 40%;
-  }
-  &--medium {
-    width: 65%;
-  }
-  &--long {
-    width: 85%;
-  }
+.skeleton-line--xshort {
+  width: 25%;
+}
+
+.skeleton-line--short {
+  width: 40%;
+}
+
+.skeleton-line--medium {
+  width: 65%;
+}
+
+.skeleton-line--long {
+  width: 85%;
 }
 </style>

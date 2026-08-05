@@ -193,9 +193,9 @@ export default {
   },
 }
 </script>
-<style lang="scss">
+<style>
 .notification-status {
-  opacity: $opacity-soft;
+  opacity: var(--opacity-soft);
 }
 /* fix to override flex-wrap style of ds flex component */
 .notification-grid .content-section {
@@ -213,7 +213,7 @@ export default {
   background-color: white;
 
   &:nth-child(odd) {
-    background-color: $color-neutral-90;
+    background-color: var(--color-neutral-90);
   }
 
   > .ds-grid > div {

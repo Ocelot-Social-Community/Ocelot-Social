@@ -168,25 +168,25 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .invite-code-list__title {
-  margin-bottom: $space-small;
+  margin-bottom: var(--space-small);
 }
 
 .invite-code-list__count {
   font-weight: normal;
-  color: $text-color-soft;
+  color: var(--text-color-soft);
 }
 
 .invite-code-list__invited-summary {
-  margin-top: $space-base;
-  color: $text-color-soft;
-  font-size: $font-size-base;
+  margin-top: var(--space-base);
+  color: var(--text-color-soft);
+  font-size: var(--font-size-base);
 }
 
 .invite-code-list__profile-list.profile-list.os-card {
   padding: 0 !important;
-  margin: $space-large 0 0;
+  margin: var(--space-large) 0 0;
   box-shadow: none !important;
   border: none;
   border-radius: 0;
@@ -194,27 +194,27 @@ export default {
 }
 
 .invite-code-list__expired {
-  margin-top: $space-large;
+  margin-top: var(--space-large);
 }
 
 .invite-code-list__expired-toggle {
   display: flex;
   align-items: center;
-  gap: $space-x-small;
+  gap: var(--space-x-small);
   background: none;
   border: none;
   cursor: pointer;
-  color: $text-color-soft;
-  padding: $space-x-small 0;
-  font-size: $font-size-base;
+  color: var(--text-color-soft);
+  padding: var(--space-x-small) 0;
+  font-size: var(--font-size-base);
 
   &:hover {
-    color: $text-color-base;
+    color: var(--text-color-base);
   }
 }
 
 .invite-code-list__expired-chevron {
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
   transition: transform 0.2s;
 
   &.open {
@@ -231,10 +231,10 @@ export default {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: $space-x-small;
-  padding: $space-x-small 0;
+  gap: var(--space-x-small);
+  padding: var(--space-x-small) 0;
   border-bottom: 1px dotted #e5e3e8;
-  color: $text-color-soft;
+  color: var(--text-color-soft);
 }
 
 .invite-code-list__expired-code-text {
@@ -246,6 +246,6 @@ export default {
 }
 
 .invite-code-list__expired-code-redeemed {
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
 }
 </style>

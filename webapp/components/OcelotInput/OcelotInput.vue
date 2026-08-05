@@ -228,7 +228,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 /* Styles inherited from global styleguide CSS (ds-input, ds-form-item classes).
  * Once ds-input is fully removed from the styleguide, move the styles here. */
 </style>

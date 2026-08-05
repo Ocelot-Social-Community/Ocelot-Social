@@ -202,10 +202,10 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .divider {
   opacity: 0.4;
-  padding: 0 $space-small;
+  padding: 0 var(--space-small);
 }
 
 .list-item--high {

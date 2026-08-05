@@ -24,7 +24,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .icon-wrapper {
   margin-right: 2px;
 }
@@ -32,17 +32,17 @@ export default {
 .click-wrapper {
   padding: 8px;
   align-content: center;
-  color: $text-color-disabled;
+  color: var(--text-color-disabled);
   cursor: pointer;
 }
 
 .click-wrapper:hover {
   &:focus-within {
-    background-color: $background-color-base;
-    border: $input-border-size solid $border-color-active;
+    background-color: var(--background-color-base);
+    border: var(--input-border-size) solid var(--border-color-active);
 
     .toggle-icon {
-      color: $text-color-base;
+      color: var(--text-color-base);
     }
   }
 }

@@ -180,18 +180,18 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .enter-invite {
   display: flex;
   flex-direction: column;
-  margin: $space-large 0 $space-xxx-small 0;
+  margin: var(--space-large) 0 var(--space-xxx-small) 0;
 }
 
 .invitation-info {
   display: flex;
   align-items: center;
-  margin-bottom: $space-x-small;
-  gap: $space-small;
+  margin-bottom: var(--space-x-small);
+  gap: var(--space-small);
 
   > * {
     flex-shrink: 0;
