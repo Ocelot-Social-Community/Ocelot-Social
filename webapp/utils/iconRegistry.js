@@ -8,8 +8,8 @@ export function toCamelCase(str) {
     .join('')
 }
 
-// Branding icons from assets/_new/icons/svgs/ (loaded as Vue components via vue-svg-loader)
-const svgContext = require.context('~/assets/_new/icons/svgs', false, /\.svg$/)
+// Branding icons from assets/icons/svgs/ (loaded as Vue components via vue-svg-loader)
+const svgContext = require.context('~/assets/icons/svgs', false, /\.svg$/)
 const brandingIcons = {}
 svgContext.keys().forEach((fileName) => {
   const component = svgContext(fileName).default || svgContext(fileName)
