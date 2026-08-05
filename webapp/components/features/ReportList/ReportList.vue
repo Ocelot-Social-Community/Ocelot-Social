@@ -171,15 +171,15 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .reports-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: $space-small;
+  margin-bottom: var(--space-small);
 
   > .title {
     margin: 0;
-    font-size: $font-size-large;
+    font-size: var(--font-size-large);
   }
 }
 </style>

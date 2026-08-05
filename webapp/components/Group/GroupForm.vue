@@ -429,7 +429,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .appearance--auto {
   -webkit-appearance: auto;
   -moz-appearance: auto;
@@ -455,9 +455,9 @@ export default {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: $space-x-small;
-    margin-top: -$space-base - $space-x-small;
-    margin-bottom: $space-x-large;
+    gap: var(--space-x-small);
+    margin-top: calc(-1 * var(--space-base) - var(--space-x-small));
+    margin-bottom: var(--space-x-large);
 
     label.is-disabled {
       opacity: 0.5;
@@ -470,7 +470,7 @@ export default {
 
   > .os-badge {
     align-self: flex-end;
-    margin: $space-xx-small 0 $space-base;
+    margin: var(--space-xx-small) 0 var(--space-base);
     cursor: default;
   }
 
@@ -480,7 +480,7 @@ export default {
 
     > .os-badge {
       align-self: flex-end;
-      margin: $space-xx-small 0 $space-base;
+      margin: var(--space-xx-small) 0 var(--space-base);
       cursor: default;
     }
   }
@@ -491,11 +491,11 @@ export default {
 
   > .buttons {
     align-self: flex-end;
-    margin-top: $space-base;
+    margin-top: var(--space-base);
   }
 
   > .location-hint {
-    margin-top: -$space-base + $space-xxx-small;
+    margin-top: calc(-1 * var(--space-base) + var(--space-xxx-small));
   }
 }
 </style>

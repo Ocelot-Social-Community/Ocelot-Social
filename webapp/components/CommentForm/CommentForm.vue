@@ -165,10 +165,10 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .comment-form {
   .editor {
-    margin-bottom: $space-small;
+    margin-bottom: var(--space-small);
   }
 
   .buttons {
@@ -176,7 +176,7 @@ export default {
     justify-content: flex-end;
 
     > button {
-      margin-left: $space-x-small;
+      margin-left: var(--space-x-small);
     }
   }
 }

@@ -14,21 +14,21 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .search-group {
   display: flex;
 
   > .label {
     flex-grow: 1;
-    padding: 0 $space-x-small;
+    padding: 0 var(--space-x-small);
   }
 
   > .metadata {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    color: $text-color-softer;
-    font-size: $font-size-small;
+    color: var(--text-color-softer);
+    font-size: var(--font-size-small);
   }
 }
 </style>

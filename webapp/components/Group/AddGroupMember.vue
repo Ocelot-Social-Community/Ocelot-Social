@@ -110,9 +110,9 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .add-group-member {
   background-color: white;
-  padding: $space-base;
+  padding: var(--space-base);
 }
 </style>

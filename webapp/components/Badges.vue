@@ -114,30 +114,30 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .hc-badges {
   position: relative;
 
   transform: scale(var(--badges-scale, 1));
 
-  $badge-size-x: 30px;
-  $badge-size-y: 26px;
-  $main-badge-size-x: 60px;
-  $main-badge-size-y: 52px;
-  $gap-x: -6px;
-  $gap-y: 1px;
-  $slot-x: $badge-size-x + $gap-x;
-  $slot-y: $badge-size-y + $gap-y;
-  $offset-y: calc($badge-size-y / 2) - 2 * $gap-x;
+  --badge-size-x: 30px;
+  --badge-size-y: 26px;
+  --main-badge-size-x: 60px;
+  --main-badge-size-y: 52px;
+  --gap-x: -6px;
+  --gap-y: 1px;
+  --slot-x: calc(var(--badge-size-x) + var(--gap-x));
+  --slot-y: calc(var(--badge-size-y) + var(--gap-y));
+  --offset-y: calc(calc(var(--badge-size-y) / 2) - 2 * var(--gap-x));
 
-  width: $main-badge-size-x + 4 * $badge-size-x + 4 * $gap-x;
-  height: $offset-y + 3 * $badge-size-y + 4 * $gap-y;
+  width: calc(var(--main-badge-size-x) + 4 * var(--badge-size-x) + 4 * var(--gap-x));
+  height: calc(var(--offset-y) + 3 * var(--badge-size-y) + 4 * var(--gap-y));
   margin: auto;
 
   .hc-badge-container {
     position: absolute;
-    width: $badge-size-x;
-    height: $badge-size-y;
+    width: var(--badge-size-x);
+    height: var(--badge-size-y);
 
     clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
 
@@ -154,7 +154,7 @@ export default {
     }
 
     &.selected {
-      filter: drop-shadow(0 0 0 $color-primary);
+      filter: drop-shadow(0 0 0 var(--color-primary));
       img {
         opacity: 0.6;
       }
@@ -165,7 +165,7 @@ export default {
     }
 
     &.drag-over {
-      filter: drop-shadow(0 0 4px $color-success);
+      filter: drop-shadow(0 0 4px var(--color-success));
       transform: scale(1.15);
       transition: transform 0.15s ease;
     }
@@ -178,9 +178,9 @@ export default {
   }
 
   .hc-badge-container:nth-child(1) {
-    width: $main-badge-size-x;
-    height: $main-badge-size-y;
-    top: $offset-y + calc($gap-y / 2) - 1px;
+    width: var(--main-badge-size-x);
+    height: var(--main-badge-size-y);
+    top: calc(var(--offset-y) + calc(var(--gap-y) / 2) - 1px);
     left: 0;
   }
 
@@ -198,48 +198,50 @@ export default {
   }
 
   .hc-badge-container:nth-child(2) {
-    top: $offset-y + calc(-1 * $gap-y / 2) - 1px;
-    left: $main-badge-size-x + $gap-x;
+    top: calc(var(--offset-y) + calc(-1 * var(--gap-y) / 2) - 1px);
+    left: calc(var(--main-badge-size-x) + var(--gap-x));
   }
 
   .hc-badge-container:nth-child(3) {
-    top: $offset-y + $slot-y + calc($gap-y / 2) - 1px;
-    left: $main-badge-size-x + $gap-x;
+    top: calc(var(--offset-y) + var(--slot-y) + calc(var(--gap-y) / 2) - 1px);
+    left: calc(var(--main-badge-size-x) + var(--gap-x));
   }
 
   .hc-badge-container:nth-child(4) {
-    top: $offset-y + calc(-1 * $badge-size-y / 2) - (2 * $gap-y) - 0.5px;
-    left: $main-badge-size-x + $gap-x + $slot-x;
+    top: calc(var(--offset-y) + calc(-1 * var(--badge-size-y) / 2) - (2 * var(--gap-y)) - 0.5px);
+    left: calc(var(--main-badge-size-x) + var(--gap-x) + var(--slot-x));
   }
 
   .hc-badge-container:nth-child(5) {
-    top: $offset-y + calc($badge-size-y / 2) - 0.5px;
-    left: $main-badge-size-x + $gap-x + $slot-x;
+    top: calc(var(--offset-y) + calc(var(--badge-size-y) / 2) - 0.5px);
+    left: calc(var(--main-badge-size-x) + var(--gap-x) + var(--slot-x));
   }
 
   .hc-badge-container:nth-child(6) {
-    top: $offset-y + (1.5 * $badge-size-y) + (2 * $gap-y) - 0.5px;
-    left: $main-badge-size-x + $gap-x + $slot-x;
+    top: calc(var(--offset-y) + (1.5 * var(--badge-size-y)) + (2 * var(--gap-y)) - 0.5px);
+    left: calc(var(--main-badge-size-x) + var(--gap-x) + var(--slot-x));
   }
 
   .hc-badge-container:nth-child(7) {
-    top: $offset-y + calc(-1 * $gap-y / 2) - 1px;
-    left: $main-badge-size-x + $gap-x + (2 * $slot-x);
+    top: calc(var(--offset-y) + calc(-1 * var(--gap-y) / 2) - 1px);
+    left: calc(var(--main-badge-size-x) + var(--gap-x) + (2 * var(--slot-x)));
   }
 
   .hc-badge-container:nth-child(8) {
-    top: $offset-y + $slot-y + calc($gap-y / 2) - 1px;
-    left: $main-badge-size-x + $gap-x + (2 * $slot-x);
+    top: calc(var(--offset-y) + var(--slot-y) + calc(var(--gap-y) / 2) - 1px);
+    left: calc(var(--main-badge-size-x) + var(--gap-x) + (2 * var(--slot-x)));
   }
 
   .hc-badge-container:nth-child(9) {
-    top: $offset-y + $slot-y - calc($badge-size-y / 2) - $gap-y - 0.5px;
-    left: $main-badge-size-x + $gap-x + (3 * $slot-x);
+    top: calc(
+      var(--offset-y) + var(--slot-y) - calc(var(--badge-size-y) / 2) - var(--gap-y) - 0.5px
+    );
+    left: calc(var(--main-badge-size-x) + var(--gap-x) + (3 * var(--slot-x)));
   }
 
   .hc-badge-container:nth-child(10) {
-    top: $offset-y + ($badge-size-y * 1.5) + (2 * $gap-y) - 0.5px;
-    left: $main-badge-size-x + $gap-x + (3 * $slot-x);
+    top: calc(var(--offset-y) + (var(--badge-size-y) * 1.5) + (2 * var(--gap-y)) - 0.5px);
+    left: calc(var(--main-badge-size-x) + var(--gap-x) + (3 * var(--slot-x)));
   }
 }
 </style>

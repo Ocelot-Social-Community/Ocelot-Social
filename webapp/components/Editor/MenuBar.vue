@@ -168,7 +168,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .legend-button {
   display: inline;
   position: relative;

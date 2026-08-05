@@ -77,10 +77,10 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .enter-nonce {
   display: flex;
   flex-direction: column;
-  margin: $space-large 0 $space-xxx-small 0;
+  margin: var(--space-large) 0 var(--space-xxx-small) 0;
 }
 </style>

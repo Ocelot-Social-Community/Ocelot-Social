@@ -66,7 +66,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .post-type-filter {
   & .item {
     min-width: 80px;

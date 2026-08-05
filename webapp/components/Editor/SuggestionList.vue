@@ -63,12 +63,12 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .suggestion-list {
   list-style-type: none;
   padding: 0.2rem;
   border-radius: 5px;
-  border: 2px solid $color-primary;
+  border: 2px solid var(--color-primary);
   font-size: 0.8rem;
   font-weight: bold;
 }
@@ -85,11 +85,12 @@ export default {
 
   &.is-selected,
   &:hover {
-    background-color: rgba($color-neutral-100, 0.3);
+    /*  color-mix, not rgba(): var(--color-neutral-100) is a var() and Sass cannot decompose one. */
+    background-color: color-mix(in srgb, var(--color-neutral-100) 30%, transparent);
   }
 
   &.hint {
-    opacity: $opacity-soft;
+    opacity: var(--opacity-soft);
     pointer-events: none;
   }
 }
