@@ -83,10 +83,61 @@ waited out silently, and a pod stuck in `Init` no longer has to be deleted by ha
 rollout can start — a new rollout creates a new ReplicaSet and terminates the stuck pod along with
 the old one, where the StatefulSet's `OrderedReady` waited for it to become `Ready` forever. The
 rollout it is stuck in still counts as unfinished until `progressDeadlineSeconds` runs out. It is
-**not**
-zero-downtime yet: `replicas` is pinned to `1` and `maxSurge` to `0`, because without Redis the
+**not** zero-downtime yet: `replicas` is pinned to `1` and `maxSurge` to `0`, because without Redis the
 backend's GraphQL subscriptions are process-local. See
 [backend-zero-downtime-konzept.md](../docu/backend-zero-downtime-konzept.md).
+
+## Config changes now cause a rollout — including one restart on this upgrade
+
+Every workload took its configuration through `envFrom`, which Kubernetes resolves **once**, when
+the container starts. Changing a value in `backend.env`, `webapp.env` or `neo4j.env` therefore
+updated the ConfigMap and stopped there: the pod template stayed byte-identical, Helm saw nothing to
+do, and the running pod kept serving the old value until something unrelated happened to restart it.
+Every pod template now carries a `checksum/config` (and `checksum/secret`) annotation over the
+rendered manifests, so a changed value is a changed pod template and Helm rolls it out.
+
+**Action:** none — but be aware of two consequences.
+
+- **This upgrade restarts every pod once**, because the annotations themselves are new. For the
+  Neo4j StatefulSet that is a short database restart. It happens inside the maintenance window you
+  already need for the StatefulSet-to-Deployment switch above, so plan them together.
+- **From now on, editing `neo4j.env` restarts the database.** That is the honest behaviour — the
+  setting was never live before — but treat a heap-size or page-cache change as the restart it is.
+
+Neo4j's `terminationGracePeriodSeconds` is raised to `120` in the same step: the default 30 s can
+cut a flush short on a larger graph, and a SIGKILL mid-flush turns the next start into a recovery
+run.
+
+## The Neo4j volumes are protected against Helm now
+
+`<release>-neo4j-data` and `<release>-neo4j-backups` carry `helm.sh/resource-policy: keep`. They
+were ordinary templates before, which is the same setup that lets Helm delete the uploads PVC in the
+section above — only here the volume holds the entire instance database, and a `helm uninstall`, a
+rename or a dropped template would have taken it along on a `reclaimPolicy: Delete` StorageClass.
+
+**Action:** none for an upgrade. Note for a deliberate teardown: the claims now survive
+`helm uninstall` and have to be removed by hand
+(`kubectl -n <namespace> delete pvc <release>-neo4j-data <release>-neo4j-backups`).
+
+`<release>-neo4j-backups` is mounted by no workload — the backup job that used it has not been part
+of the chart for a long time. It is kept and protected rather than removed, so that any dumps an
+instance still holds survive until the backup story is decided. If you know yours is empty, you can
+delete the claim by hand to save the storage.
+
+## Readiness probes for webapp, imagor and maintenance
+
+Only the backend had probes. Without a `readinessProbe` a pod counts as Ready the moment its
+container process starts — for Nuxt that is seconds before it listens, so Traefik routed into a 502
+for the whole surge window of every webapp rollout. Webapp, imagor and Neo4j now have readiness
+probes (`tcpSocket`), maintenance an `httpGet` on `/`, and webapp and imagor a `preStop` sleep that
+covers the gap between endpoint removal and SIGTERM.
+
+Neo4j gets **no** liveness probe on purpose: a database busy with recovery or a long GC pause is not
+one that should be killed and restarted.
+
+**Action:** none. If your instance keeps its own copy of the chart, port the probes from
+`templates/webapp/deployment.yaml`, `templates/imagor/deployment.yaml`,
+`templates/maintenance/deployment.yaml` and the neo4j chart's `stateful-set.yaml`.
 
 ## ⚠️ Branding: the `public/` bucket is gone — badges move to `assets/badges/`
 

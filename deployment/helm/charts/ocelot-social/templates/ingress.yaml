@@ -1,4 +1,3 @@
----
 {{- define "joinRedirectMiddlewares" -}}
 {{- $local := dict "first" true -}}
 {{- range $k, $v := .Values.redirect_domains -}}{{- if not $local.first -}},{{- end -}}{{$.Release.Namespace}}-redirect-{{- $v | replace "." "-" -}}@kubernetescrd{{- $_ := set $local "first" false -}}{{- end -}}
