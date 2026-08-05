@@ -384,6 +384,13 @@ describe('ContributionForm.vue', () => {
             await wrapper.vm.$nextTick()
             expect(wrapper.vm.visibleErrors?.eventLocationName).toBeFalsy()
           })
+
+          it('still requires venue description even when online is checked', async () => {
+            await wrapper.find('form').trigger('submit')
+            await Promise.resolve()
+            expect(wrapper.vm.visibleErrors?.eventVenue).toBeTruthy()
+            expect(wrapper.vm.visibleErrors?.eventLocationName).toBeFalsy()
+          })
         })
 
         describe('invalid form', () => {

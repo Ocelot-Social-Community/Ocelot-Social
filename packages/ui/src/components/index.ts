@@ -30,3 +30,4 @@ export {
 export { OsNumber, numberVariants, type NumberVariants } from './OsNumber'
 export { OsModal, modalPanelVariants } from './OsModal'
 export { OsMenu, OsMenuItem, menuItemVariants, type MenuItemVariants } from './OsMenu'
+export { OsValidationHint } from './OsValidationHint'
