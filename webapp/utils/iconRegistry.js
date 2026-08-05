@@ -1,20 +1,19 @@
 import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 
-export function toCamelCase(str) {
-  return str
-    .split('-')
-    .filter(Boolean)
-    .map((s, i) => (i === 0 ? s : s[0].toUpperCase() + s.slice(1)))
-    .join('')
-}
+import { iconKeyFromFile, toCamelCase } from '~/utils/iconName'
 
-// Branding icons from assets/_new/icons/svgs/ (loaded as Vue components via vue-svg-loader)
-const svgContext = require.context('~/assets/_new/icons/svgs', false, /\.svg$/)
+// Re-exported for callers that had it from here; the implementation lives in utils/iconName.js so
+// that it is shared with test/__mocks__/iconRegistry.js instead of copied into it.
+export { toCamelCase }
+
+// Branding icons from assets/icons/svgs/ (loaded as Vue components via vue-svg-loader). The context
+// is flat and its filter anchored — `svgs/` has no subdirectories, and `/\.svg/` unanchored would
+// also match something like `icon.svg.js`.
+const svgContext = require.context('~/assets/icons/svgs', false, /\.svg$/)
 const brandingIcons = {}
 svgContext.keys().forEach((fileName) => {
   const component = svgContext(fileName).default || svgContext(fileName)
-  const kebabName = fileName.replace('./', '').replace(/\.svg$/, '')
-  brandingIcons[toCamelCase(kebabName)] = component
+  brandingIcons[iconKeyFromFile(fileName)] = component
 })
 
 // Branding icons override/extend ocelotIcons
