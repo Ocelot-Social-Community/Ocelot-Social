@@ -17,7 +17,7 @@ const stubs = {
     template: '<button class="stub-button" @click="$emit(\'click\')"><slot /></button>',
   }),
   OsIcon: Stub('OsIcon'),
-  ProfileAvatar: Stub('ProfileAvatar'),
+  AvatarImage: Stub('AvatarImage'),
 }
 
 // Most tests don't care about the mounted hook — they exercise methods/

@@ -1,18 +1,18 @@
 <template>
   <div class="ds-flex group-list">
     <div v-for="group in groups" :key="group.id" class="group-list__item group-item">
-      <group-teaser :group="group" />
+      <group-avatar :group="group" />
     </div>
   </div>
 </template>
 
 <script>
-import GroupTeaser from '~/components/Group/GroupTeaser'
+import GroupAvatar from '~/components/Group/GroupAvatar'
 
 export default {
   name: 'GroupList',
   components: {
-    GroupTeaser,
+    GroupAvatar,
   },
   props: {
     groups: { type: Array, default: () => [] },

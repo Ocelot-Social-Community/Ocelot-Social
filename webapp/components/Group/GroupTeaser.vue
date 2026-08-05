@@ -1,6 +1,6 @@
 <template>
   <nuxt-link
-    class="group-teaser"
+    class="group-avatar"
     :to="{ name: 'groups-id-slug', params: { id: group.id, slug: group.slug } }"
     @click.native.capture="guardNavigation"
   >
@@ -87,7 +87,7 @@ import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
-  name: 'GroupTeaser',
+  name: 'GroupAvatar',
   mixins: [GetCategories],
   components: {
     Category,
@@ -125,9 +125,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.group-teaser,
-.group-teaser:hover,
-.group-teaser:active {
+.group-avatar,
+.group-avatar:hover,
+.group-avatar:active {
   position: relative;
   display: block;
   height: 100%;
@@ -140,7 +140,7 @@ export default {
   }
 }
 
-.group-teaser > .os-card {
+.group-avatar > .os-card {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -185,7 +185,7 @@ export default {
     }
   }
 
-  .user-teaser {
+  .user-avatar {
     margin-bottom: $space-small;
   }
 }

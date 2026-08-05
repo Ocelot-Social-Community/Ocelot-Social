@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { RouterLinkStub } from '@vue/test-utils'
-import UserTeaser from './UserTeaser.vue'
+import UserAvatar from './UserAvatar.vue'
 import Vuex from 'vuex'
 
 const localVue = global.localVue
@@ -56,7 +56,7 @@ const userTilda = {
   ],
 }
 
-describe('UserTeaser', () => {
+describe('UserAvatar', () => {
   const Wrapper = ({
     isModerator = false,
     withLinkToProfile = true,
@@ -80,7 +80,7 @@ describe('UserTeaser', () => {
         'auth/isModerator': () => isModerator,
       },
     })
-    return render(UserTeaser, {
+    return render(UserAvatar, {
       localVue,
       store,
       propsData: {
@@ -92,7 +92,7 @@ describe('UserTeaser', () => {
       },
       stubs: {
         NuxtLink: RouterLinkStub,
-        'user-teaser-popover': true,
+        'user-avatar-popover': true,
         'v-popover': true,
         'client-only': true,
       },

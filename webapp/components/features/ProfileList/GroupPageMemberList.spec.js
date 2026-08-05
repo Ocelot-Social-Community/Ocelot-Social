@@ -5,7 +5,7 @@ const localVue = global.localVue
 
 const stubs = {
   'infinite-scroll-list': { template: '<div><slot /></div>' },
-  'user-teaser': true,
+  'user-avatar': true,
 }
 
 const makeQueryResult = (members) => ({

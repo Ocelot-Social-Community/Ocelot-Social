@@ -59,14 +59,14 @@
         <div v-if="activeTab === 'User'" class="search-results-list">
           <div v-for="user in activeResources" :key="user.id" class="search-results-list__item">
             <os-card>
-              <user-teaser :user="user" />
+              <user-avatar :user="user" />
             </os-card>
           </div>
         </div>
         <!-- groups -->
         <div v-if="activeTab === 'Group'" class="search-results-list">
           <div v-for="group in activeResources" :key="group.id" class="search-results-list__item">
-            <group-teaser :group="{ ...group, name: group.groupName }" />
+            <group-avatar :group="{ ...group, name: group.groupName }" />
           </div>
         </div>
         <!-- hashtags -->
@@ -118,8 +118,8 @@ import MasonryGrid from '~/components/MasonryGrid/MasonryGrid'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem'
 import PostTeaser from '~/components/PostTeaser/PostTeaser'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
-import GroupTeaser from '~/components/Group/GroupTeaser'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
+import GroupAvatar from '~/components/Group/GroupAvatar'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
 import HcHashtag from '~/components/Hashtag/Hashtag'
 
@@ -133,8 +133,8 @@ export default {
     MasonryGridItem,
     PostTeaser,
     PaginationButtons,
-    UserTeaser,
-    GroupTeaser,
+    UserAvatar,
+    GroupAvatar,
     HcHashtag,
   },
   mixins: [postListActions],
@@ -486,7 +486,7 @@ export default {
     }
   }
 
-  .group-teaser-card-wrapper {
+  .group-avatar-card-wrapper {
     padding: 0;
   }
 }

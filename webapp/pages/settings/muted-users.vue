@@ -42,7 +42,7 @@
                     params: { id: user.id, slug: user.slug },
                   }"
                 >
-                  <profile-avatar :profile="user" size="small" />
+                  <avatar-image :profile="user" size="small" />
                 </nuxt-link>
               </td>
               <td class="ds-table-col">
@@ -103,7 +103,7 @@
 import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mutedUsers, unmuteUser } from '~/graphql/settings/MutedUsers'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import scrollToContent from './scroll-to-content.js'
 
 export default {
@@ -112,7 +112,7 @@ export default {
     OsButton,
     OsCard,
     OsIcon,
-    ProfileAvatar,
+    AvatarImage,
   },
   created() {
     this.icons = iconRegistry

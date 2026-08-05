@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils'
 import Vuex from 'vuex'
-import UserTeaserNonAnonymous from './UserTeaserNonAnonymous.vue'
+import UserAvatarNonAnonymous from './UserAvatarNonAnonymous.vue'
 
 const localVue = global.localVue
 
@@ -25,7 +25,7 @@ const makeApolloMock = (resolveOrReject = 'resolve') => {
 }
 
 const Wrapper = ({ apolloQuery = makeApolloMock(), groupProp = null, authUser = {} } = {}) =>
-  shallowMount(UserTeaserNonAnonymous, {
+  shallowMount(UserAvatarNonAnonymous, {
     localVue,
     store: makeStore(authUser),
     propsData: { user, group: groupProp },
@@ -37,7 +37,7 @@ const Wrapper = ({ apolloQuery = makeApolloMock(), groupProp = null, authUser = 
     stubs: { NuxtLink: true },
   })
 
-describe('UserTeaserNonAnonymous', () => {
+describe('UserAvatarNonAnonymous', () => {
   describe('mounted()', () => {
     it('pre-fetches group data when group has an id', () => {
       const apolloQuery = makeApolloMock()

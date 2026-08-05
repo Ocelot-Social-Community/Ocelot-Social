@@ -5,7 +5,7 @@ defineStep('the search should contain the annoying user', () => {
     .should($li => {
       expect($li).to.have.length(1)
     })
-  cy.get('.ds-select-dropdown .user-teaser .slug')
+  cy.get('.ds-select-dropdown .user-avatar .slug')
     .should('contain', '@annoying-user')
   cy.get('.searchable-input .ds-select input')
     .focus()

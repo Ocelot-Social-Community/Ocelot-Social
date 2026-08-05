@@ -23,7 +23,7 @@ const stubs = {
   'nuxt-link': { template: '<a><slot /></a>', props: ['to'] },
   'os-button': { template: '<button><slot /><slot name="icon" /></button>' },
   'os-icon': { template: '<span />' },
-  'profile-avatar': { template: '<div />' },
+  'avatar-image': { template: '<div />' },
 }
 
 const mockRoom = (overrides = {}) => ({

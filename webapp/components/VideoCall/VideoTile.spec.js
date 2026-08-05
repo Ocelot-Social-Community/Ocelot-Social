@@ -6,7 +6,7 @@ const localVue = createLocalVue()
 const Stub = (name) => ({ name, template: `<div class="${name.toLowerCase()}" />` })
 const stubs = {
   OsIcon: Stub('OsIcon'),
-  ProfileAvatar: Stub('ProfileAvatar'),
+  AvatarImage: Stub('AvatarImage'),
 }
 
 const buildTrack = () => {

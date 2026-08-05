@@ -34,7 +34,7 @@
             <template v-for="entry in apiKeyUsers">
               <tr :key="entry.user.id">
                 <td class="ds-table-col">
-                  <user-teaser :user="entry.user" :show-slug="true" />
+                  <user-avatar :user="entry.user" :show-slug="true" />
                 </td>
                 <td class="ds-table-col ds-table-col-right">{{ entry.activeCount }}</td>
                 <td class="ds-table-col ds-table-col-right">{{ entry.revokedCount }}</td>
@@ -193,7 +193,7 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
 import DateTime from '~/components/DateTime'
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import {
   apiKeyUsersQuery,
   apiKeysForUserQuery,
@@ -210,7 +210,7 @@ export default {
     PaginationButtons,
     ConfirmModal,
     DateTime,
-    UserTeaser,
+    UserAvatar,
   },
   created() {
     this.icons = iconRegistry

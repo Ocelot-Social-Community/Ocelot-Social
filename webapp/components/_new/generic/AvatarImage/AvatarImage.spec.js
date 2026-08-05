@@ -1,10 +1,10 @@
 import { mount } from '@vue/test-utils'
-import ProfileAvatar from './ProfileAvatar'
+import AvatarImage from './AvatarImage'
 import { OsIcon } from '@ocelot-social/ui'
 
 const localVue = global.localVue
 
-describe('ProfileAvatar', () => {
+describe('AvatarImage', () => {
   let propsData, wrapper
   beforeEach(() => {
     propsData = {}
@@ -12,7 +12,7 @@ describe('ProfileAvatar', () => {
   })
 
   const Wrapper = () => {
-    return mount(ProfileAvatar, { propsData, localVue })
+    return mount(AvatarImage, { propsData, localVue })
   }
 
   it('renders no image', () => {

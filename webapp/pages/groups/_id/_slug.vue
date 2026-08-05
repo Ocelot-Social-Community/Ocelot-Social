@@ -12,9 +12,9 @@
             :profile="group"
             :updateMutation="updateGroupMutation"
           >
-            <profile-avatar :profile="group" class="profile-page-avatar" size="large" />
+            <avatar-image :profile="group" class="profile-page-avatar" size="large" />
           </avatar-uploader>
-          <profile-avatar v-else :profile="group" class="profile-page-avatar" size="large" />
+          <avatar-image v-else :profile="group" class="profile-page-avatar" size="large" />
           <!-- Menu -->
           <client-only>
             <group-content-menu
@@ -358,7 +358,7 @@ import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import GroupPageMemberList from '~/components/features/ProfileList/GroupPageMemberList'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
 import { mapGetters, mapMutations } from 'vuex'
@@ -391,7 +391,7 @@ export default {
     JoinLeaveButton,
     LocationInfo,
     PostTeaser,
-    ProfileAvatar,
+    AvatarImage,
     GroupPageMemberList,
     MasonryGrid,
     MasonryGridItem,
@@ -849,7 +849,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-::v-deep .profile-page-avatar.profile-avatar {
+::v-deep .profile-page-avatar.avatar-image {
   margin: auto;
   margin-top: -60px;
 }

@@ -6,7 +6,7 @@ const localVue = global.localVue
 const stubs = {
   'infinite-scroll-list': { template: '<div><slot /></div>' },
   'os-icon': true,
-  'group-teaser': true,
+  'group-avatar': true,
 }
 
 const mockSubscription = { unsubscribe: jest.fn() }

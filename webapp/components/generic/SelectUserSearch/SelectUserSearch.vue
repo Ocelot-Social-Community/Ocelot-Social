@@ -23,7 +23,7 @@
   >
     <template #option="{ option }">
       <p>
-        <user-teaser :user="option" :showPopover="false" :linkToProfile="false" />
+        <user-avatar :user="option" :showPopover="false" :linkToProfile="false" />
       </p>
     </template>
   </ocelot-select>
@@ -32,13 +32,13 @@
 <script>
 import { isEmpty } from 'lodash'
 import { searchUsers } from '~/graphql/Search.js'
-import UserTeaser from '~/components/UserTeaser/UserTeaser.vue'
+import UserAvatar from '~/components/UserAvatar/UserAvatar.vue'
 import OcelotSelect from '~/components/OcelotSelect/OcelotSelect.vue'
 
 export default {
   name: 'SelectUserSearch',
   components: {
-    UserTeaser,
+    UserAvatar,
     OcelotSelect,
   },
   props: {

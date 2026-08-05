@@ -1,6 +1,6 @@
 import { render, waitFor, fireEvent } from '@testing-library/vue'
 import { RouterLinkStub } from '@vue/test-utils'
-import UserTeaserHelper from './UserTeaserHelper.vue'
+import UserAvatarHelper from './UserAvatarHelper.vue'
 
 let mockMatchMediaMatches = false
 const mockMatchMediaListeners = []
@@ -19,7 +19,7 @@ const userLink = {
   params: { slug: 'slug', id: 'id' },
 }
 
-describe('UserTeaserHelper', () => {
+describe('UserAvatarHelper', () => {
   const Wrapper = ({
     withLinkToProfile = true,
     onTouchScreen = false,
@@ -28,7 +28,7 @@ describe('UserTeaserHelper', () => {
   }) => {
     mockMatchMediaMatches = onTouchScreen
 
-    return render(UserTeaserHelper, {
+    return render(UserAvatarHelper, {
       localVue,
       propsData: {
         userLink,

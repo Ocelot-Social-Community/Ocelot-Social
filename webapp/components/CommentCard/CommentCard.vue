@@ -7,11 +7,11 @@
   </os-card>
   <os-card as="article" v-else :class="commentClass" :id="anchor">
     <header class="header">
-      <user-teaser :user="comment.author" :date-time="comment.createdAt">
+      <user-avatar :user="comment.author" :date-time="comment.createdAt">
         <template v-if="wasEdited" #dateTime>
           <span>({{ $t('comment.edited') }})</span>
         </template>
-      </user-teaser>
+      </user-avatar>
       <client-only>
         <content-menu
           v-show="!editingComment"
@@ -80,7 +80,7 @@ import { OsButton, OsCard, OsIcon, OsActionButton } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
 import { branding } from '@ocelot-social/branding'
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import CommentForm from '~/components/CommentForm/CommentForm'
@@ -93,7 +93,7 @@ export default {
     OsButton,
     OsCard,
     OsIcon,
-    UserTeaser,
+    UserAvatar,
     ContentMenu,
     ContentViewer,
     CommentForm,

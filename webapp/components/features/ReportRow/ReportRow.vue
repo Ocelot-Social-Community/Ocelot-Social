@@ -27,7 +27,7 @@
       <!-- Content Column -->
       <td class="ds-table-col" data-test="report-content">
         <client-only v-if="isUser">
-          <user-teaser :user="report.resource" :showAvatar="false" :showPopover="false" />
+          <user-avatar :user="report.resource" :showAvatar="false" :showPopover="false" />
         </client-only>
         <nuxt-link v-else class="title" :to="linkTarget">
           {{ $filters.truncate(linkText, 50) }}
@@ -37,7 +37,7 @@
       <!-- Author Column -->
       <td class="ds-table-col" data-test="report-author">
         <client-only v-if="!isUser">
-          <user-teaser :user="report.resource.author" :showAvatar="false" :showPopover="false" />
+          <user-avatar :user="report.resource.author" :showAvatar="false" :showPopover="false" />
         </client-only>
         <span v-else>—</span>
       </td>
@@ -49,7 +49,7 @@
           {{ statusText }}
         </span>
         <client-only v-if="isReviewed">
-          <user-teaser
+          <user-avatar
             :user="moderatorOfLatestReview"
             :showAvatar="false"
             :date-time="report.updatedAt"
@@ -91,14 +91,14 @@
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import FiledReportsTable from '~/components/features/FiledReportsTable/FiledReportsTable'
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 
 export default {
   components: {
     OsButton,
     OsIcon,
     FiledReportsTable,
-    UserTeaser,
+    UserAvatar,
   },
   emits: ['confirm-report'],
   props: {

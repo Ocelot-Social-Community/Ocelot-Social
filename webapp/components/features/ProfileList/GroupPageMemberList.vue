@@ -19,7 +19,7 @@
       </p>
       <ul class="member-list">
         <li v-for="member in section.members" :key="member.id" class="member-item">
-          <user-teaser
+          <user-avatar
             :user="member"
             :show-popover="popoverEnabled"
             :hover-delay="800"
@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import InfiniteScrollList from './InfiniteScrollList.vue'
 import { groupMembersQuery } from '~/graphql/groups'
 
@@ -46,7 +46,7 @@ const ROLE_SECTIONS = [
 
 export default {
   name: 'GroupPageMemberList',
-  components: { InfiniteScrollList, UserTeaser },
+  components: { InfiniteScrollList, UserAvatar },
   props: {
     groupId: { type: String, required: true },
     membersCount: { type: Number, default: null },

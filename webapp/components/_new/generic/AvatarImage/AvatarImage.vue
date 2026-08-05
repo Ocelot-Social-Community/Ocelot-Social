@@ -1,5 +1,5 @@
 <template>
-  <div :class="['profile-avatar', size && `--${size}`, !showImage && '--no-image']">
+  <div :class="['avatar-image', size && `--${size}`, !showImage && '--no-image']">
     <!-- '--no-image' is neccessary, because otherwise we still have a little unwanted boarder araund the image for images with white backgrounds -->
     <span class="initials">{{ profileInitials }}</span>
     <os-icon v-if="isAnonymous" :icon="icons.eyeSlash" />
@@ -22,7 +22,7 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
 
 export default {
-  name: 'ProfileAvatar',
+  name: 'AvatarImage',
   components: {
     OsIcon,
     ResponsiveImage,
@@ -91,7 +91,7 @@ export default {
 </script>
 
 <style lang="scss">
-.profile-avatar {
+.avatar-image {
   position: relative;
   height: $size-avatar-base;
   width: $size-avatar-base;

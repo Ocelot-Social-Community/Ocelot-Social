@@ -1,6 +1,6 @@
 import { render } from '@testing-library/vue'
 import { RouterLinkStub } from '@vue/test-utils'
-import UserTeaserPopover from './UserTeaserPopover.vue'
+import UserAvatarPopover from './UserAvatarPopover.vue'
 
 const mockMatchMedia = (matches = false) => {
   window.matchMedia = jest.fn().mockImplementation(() => ({
@@ -53,7 +53,7 @@ const userLink = {
   params: { slug: 'slug', id: 'id' },
 }
 
-describe('UserTeaserPopover', () => {
+describe('UserAvatarPopover', () => {
   const Wrapper = ({
     badgesEnabled = true,
     withUserLink = true,
@@ -61,7 +61,7 @@ describe('UserTeaserPopover', () => {
     userData = user,
   }) => {
     mockMatchMedia(onTouchScreen)
-    return render(UserTeaserPopover, {
+    return render(UserAvatarPopover, {
       localVue,
       propsData: {
         userId: 'id',

@@ -69,7 +69,7 @@
         :to="roomHeaderLink"
         class="chat-header-profile-link"
       >
-        <profile-avatar
+        <avatar-image
           v-if="selectedRoom"
           :profile="selectedRoomProfile"
           size="small"
@@ -100,14 +100,14 @@
     </div>
 
     <div v-for="room in rooms" :slot="'room-list-avatar_' + room.id" :key="room.id">
-      <profile-avatar
+      <avatar-image
         :profile="room.isGroupRoom ? room.groupProfile : room.userProfile"
         class="vac-avatar-profile"
       />
     </div>
 
     <template v-for="msg in messages">
-      <profile-avatar
+      <avatar-image
         v-if="msg.avatar"
         :slot="'message-avatar_' + msg._id"
         :key="'avatar-' + msg._id"
@@ -123,7 +123,7 @@
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import RoomTitleLink from '~/components/_new/generic/RoomTitleLink/RoomTitleLink'
 import locales from '~/locales/index.js'
 import { roomQuery, createGroupRoom, unreadRoomsQuery, userProfileQuery } from '~/graphql/Rooms'
@@ -143,7 +143,7 @@ const MESSAGE_PAGE_SIZE = 20
 
 export default {
   name: 'Chat',
-  components: { OsButton, OsIcon, ProfileAvatar, RoomTitleLink },
+  components: { OsButton, OsIcon, AvatarImage, RoomTitleLink },
   props: {
     theme: {
       type: String,
@@ -955,7 +955,7 @@ export default {
       const fixedRoom = {
         ...room,
         isGroupRoom,
-        // Profile data for ProfileAvatar component
+        // Profile data for AvatarImage component
         groupProfile: isGroupRoom
           ? {
               id: room.group?.id,

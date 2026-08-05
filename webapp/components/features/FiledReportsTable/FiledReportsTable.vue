@@ -22,7 +22,7 @@
       <tbody>
         <tr v-for="report in filed" :key="report.id">
           <td class="ds-table-col">
-            <user-teaser
+            <user-avatar
               :user="report.submitter"
               :showAvatar="false"
               :showPopover="false"
@@ -50,12 +50,12 @@
   </div>
 </template>
 <script>
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import DateTime from '~/components/DateTime'
 
 export default {
   components: {
-    UserTeaser,
+    UserAvatar,
     DateTime,
   },
   props: {

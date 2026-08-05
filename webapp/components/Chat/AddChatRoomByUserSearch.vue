@@ -40,7 +40,7 @@
       >
         <template #option="{ option }">
           <div class="chat-search-result-item">
-            <profile-avatar :profile="option" size="small" />
+            <avatar-image :profile="option" size="small" />
             <div class="chat-search-result-info">
               <span class="chat-search-result-name">
                 <os-icon
@@ -73,7 +73,7 @@ import { OsButton, OsIcon, OsBadge } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { isEmpty } from 'lodash'
 import { searchChatTargets } from '~/graphql/Search.js'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import OcelotSelect from '~/components/OcelotSelect/OcelotSelect.vue'
 
 export default {
@@ -82,7 +82,7 @@ export default {
     OsButton,
     OsIcon,
     OsBadge,
-    ProfileAvatar,
+    AvatarImage,
     OcelotSelect,
   },
   data() {

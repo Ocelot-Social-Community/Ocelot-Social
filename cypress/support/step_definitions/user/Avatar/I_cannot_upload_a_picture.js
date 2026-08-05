@@ -4,5 +4,5 @@ defineStep('I cannot upload a picture', () => {
   cy.get('.os-card')
     .children()
     .should('not.have.id', 'customdropzone')
-    .should('have.class', 'profile-avatar')
+    .should('have.class', 'avatar-image')
 })

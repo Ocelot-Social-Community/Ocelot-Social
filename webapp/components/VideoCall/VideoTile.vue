@@ -37,7 +37,7 @@
     <div v-else-if="!hasVideo" class="video-tile__fallback">
       <!-- Tiles outside the minimized window's primary slot are display:none,
            where a lazy image never gets fetched — load avatars eagerly. -->
-      <profile-avatar :profile="tile.profile" :size="avatarSize" loading="eager" />
+      <avatar-image :profile="tile.profile" :size="avatarSize" loading="eager" />
       <span v-if="tile.isLocal && avatarSize !== 'small'" class="video-tile__fallback-text">
         {{ $t('videoCall.prejoin.cameraDisabled') }}
       </span>
@@ -58,11 +58,11 @@
 <script>
 import { OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 
 export default {
   name: 'VideoTile',
-  components: { ProfileAvatar, OsIcon },
+  components: { AvatarImage, OsIcon },
   props: {
     tile: {
       type: Object,
@@ -85,7 +85,7 @@ export default {
       default: false,
     },
     avatarSize: {
-      // Forwarded to ProfileAvatar. 'small' renders the round avatar at the
+      // Forwarded to AvatarImage. 'small' renders the round avatar at the
       // round 40-ish px size, 'large' at the much larger one. Pass 'small'
       // for tightly-packed thumbnails so the avatar doesn't get squished.
       type: String,
@@ -371,7 +371,7 @@ export default {
 
   // Don't let the flex column squish the avatar into an oval when the tile is
   // narrower than the avatar's intrinsic size (thumbnail strip in spotlight).
-  > .profile-avatar {
+  > .avatar-image {
     flex-shrink: 0;
   }
 }

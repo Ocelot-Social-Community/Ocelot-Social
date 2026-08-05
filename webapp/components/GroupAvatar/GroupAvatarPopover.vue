@@ -1,11 +1,11 @@
 <template>
-  <div class="group-teaser-popover">
+  <div class="group-avatar-popover">
     <div v-if="!showContent" class="loading-state">
       <os-spinner size="md" />
     </div>
     <template v-else-if="showContent && resolvedGroup">
       <div class="group-header">
-        <profile-avatar :profile="resolvedGroup" class="popover-avatar" />
+        <avatar-image :profile="resolvedGroup" class="popover-avatar" />
         <div class="group-names">
           <span class="group-name">{{ resolvedGroup.name }}</span>
           <span class="group-slug ds-text-soft">&amp;{{ resolvedGroup.slug }}</span>
@@ -61,12 +61,12 @@
 <script>
 import { OsBadge, OsButton, OsNumber, OsSpinner } from '@ocelot-social/ui'
 import LocationInfo from '~/components/LocationInfo/LocationInfo'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import touchDevice from '~/mixins/touchDevice'
 import { groupTeaserQuery } from '~/graphql/groups'
 
 export default {
-  name: 'GroupTeaserPopover',
+  name: 'GroupAvatarPopover',
   mixins: [touchDevice],
   components: {
     LocationInfo,
@@ -74,7 +74,7 @@ export default {
     OsButton,
     OsNumber,
     OsSpinner,
-    ProfileAvatar,
+    AvatarImage,
   },
   props: {
     group: { type: Object, default: null },
@@ -144,7 +144,7 @@ export default {
 </script>
 
 <style scoped>
-.group-teaser-popover {
+.group-avatar-popover {
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -8,9 +8,9 @@
           style="position: relative; height: auto; overflow: visible"
         >
           <avatar-uploader v-if="myProfile" :profile="user" :updateMutation="updateUserMutation">
-            <profile-avatar :profile="user" class="profile-page-avatar" size="large" />
+            <avatar-image :profile="user" class="profile-page-avatar" size="large" />
           </avatar-uploader>
-          <profile-avatar v-else :profile="user" class="profile-page-avatar" size="large" />
+          <avatar-image v-else :profile="user" class="profile-page-avatar" size="large" />
           <!-- Menu -->
           <client-only>
             <content-menu
@@ -244,7 +244,7 @@
       <p>{{ $t('settings.deleteUserAccount.infoAdmin') }}</p>
       <div class="ds-flex" style="margin-top: 0.75rem">
         <div style="flex: 0 0 50%; width: 50%">
-          <user-teaser :user="deleteUserData" :link-to-profile="false" :show-popover="false" />
+          <user-avatar :user="deleteUserData" :link-to-profile="false" :show-popover="false" />
         </div>
         <div style="flex: 0 0 20%; width: 20%">
           <p class="ds-text ds-text-size-small">
@@ -310,7 +310,7 @@ import GroupMemberList from '~/components/features/ProfileList/GroupMemberList'
 import HcEmpty from '~/components/Empty/Empty'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import AvatarUploader from '~/components/Uploader/AvatarUploader'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
@@ -322,7 +322,7 @@ import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
 import UpdateQuery from '~/components/utils/UpdateQuery'
 import SocialMedia from '~/components/SocialMedia/SocialMedia'
 import DateTime from '~/components/DateTime'
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
 
 const tabToFilterMapping = ({ tab, id }) => {
@@ -346,11 +346,11 @@ export default {
     PostTeaser,
     HcBadges,
     HcEmpty,
-    ProfileAvatar,
+    AvatarImage,
     ContentMenu,
     AvatarUploader,
     DateTime,
-    UserTeaser,
+    UserAvatar,
     MasonryGrid,
     MasonryGridItem,
     FollowList,
@@ -678,7 +678,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-::v-deep .profile-page-avatar.profile-avatar {
+::v-deep .profile-page-avatar.avatar-image {
   margin: auto;
   margin-top: -60px;
 }

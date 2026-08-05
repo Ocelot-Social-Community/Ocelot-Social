@@ -22,7 +22,7 @@
       >
         <div class="connections__item">
           <slot name="item" :item="item">
-            <user-teaser :user="item" />
+            <user-avatar :user="item" />
           </slot>
         </div>
       </recycle-scroller>
@@ -35,7 +35,7 @@
           class="connections__item"
         >
           <slot name="item" :item="connection">
-            <user-teaser :user="connection" />
+            <user-avatar :user="connection" />
           </slot>
         </li>
       </ul>
@@ -65,7 +65,7 @@ import { escape } from 'xregexp/xregexp-all.js'
 // @ts-ignore
 import { RecycleScroller } from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export const profileListVisibleCount = 6
@@ -77,7 +77,7 @@ export default {
   components: {
     OsCard,
     OsSpinner,
-    UserTeaser,
+    UserAvatar,
     RecycleScroller,
     OcelotInput,
   },

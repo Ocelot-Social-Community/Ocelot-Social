@@ -7,11 +7,11 @@ import MasonryGrid from '~/components/MasonryGrid/MasonryGrid'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem'
 import PostTeaser from '~/components/PostTeaser/PostTeaser'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import HcHashtag from '~/components/Hashtag/Hashtag'
 import helpers from '~/storybook/helpers'
 import { post } from '~/components/PostTeaser/PostTeaser.story.js'
-import { user } from '~/components/UserTeaser/UserTeaser.story.js'
+import { user } from '~/components/UserAvatar/UserAvatar.story.js'
 
 helpers.init()
 
@@ -71,7 +71,7 @@ storiesOf('TabNavigator', module)
       MasonryGrid,
       MasonryGridItem,
       PostTeaser,
-      UserTeaser,
+      UserAvatar,
       HcHashtag,
       OsCard,
     },
@@ -163,7 +163,7 @@ storiesOf('TabNavigator', module)
               <template v-if="activeTab === 'User'">
                 <div v-for="user in activeResources" :key="user.id" style="grid-row-end: span 2;">
                   <os-card>
-                    <user-teaser :user="user" />
+                    <user-avatar :user="user" />
                   </os-card>
                 </div>
               </template>
