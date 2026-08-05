@@ -765,6 +765,30 @@ describe('PostSlug', () => {
       })
     })
 
+    describe('post edited indicator (dateTime slot)', () => {
+      beforeEach(() => {
+        backendData.post = {
+          ...backendData.post,
+          author: { id: '1stUser', slug: '1st-user' },
+        }
+        stubs['user-avatar'] = { template: '<div><slot name="dateTime" /></div>' }
+      })
+
+      it('shows the edited indicator when createdAt !== updatedAt', async () => {
+        backendData.post.createdAt = '2024-01-01T10:00:00Z'
+        backendData.post.updatedAt = '2024-01-01T11:00:00Z'
+        wrapper = await Wrapper()
+        expect(wrapper.text()).toContain('post.edited')
+      })
+
+      it('does not show the edited indicator when createdAt === updatedAt', async () => {
+        backendData.post.createdAt = '2024-01-01T10:00:00Z'
+        backendData.post.updatedAt = '2024-01-01T10:00:00Z'
+        wrapper = await Wrapper()
+        expect(wrapper.text()).not.toContain('post.edited')
+      })
+    })
+
     describe('apollo options', () => {
       const postOpts = PostSlug.apollo.Post
       const groupOpts = PostSlug.apollo.Group

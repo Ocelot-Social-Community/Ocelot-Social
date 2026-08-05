@@ -131,4 +131,30 @@ describe('UserAvatarNonAnonymous', () => {
       expect(wrapper.vm.popoverPending).toBe(false)
     })
   })
+
+  describe('dateTime slot', () => {
+    const mountWithSlot = (dateTimeProp) =>
+      shallowMount(UserAvatarNonAnonymous, {
+        localVue,
+        store: makeStore(),
+        propsData: { user, group: null, dateTime: dateTimeProp },
+        mocks: {
+          $t: jest.fn((t) => t),
+          $i18n: { locale: jest.fn(() => 'en') },
+          $apollo: { query: makeApolloMock() },
+        },
+        stubs: { NuxtLink: true },
+        slots: { dateTime: '<span class="edit-hint">edited</span>' },
+      })
+
+    it('renders slot content when dateTime prop is provided', () => {
+      const wrapper = mountWithSlot('2024-01-01T00:00:00Z')
+      expect(wrapper.find('.edit-hint').exists()).toBe(true)
+    })
+
+    it('does not render the dateTime area when dateTime prop is absent', () => {
+      const wrapper = mountWithSlot(null)
+      expect(wrapper.find('.edit-hint').exists()).toBe(false)
+    })
+  })
 })
