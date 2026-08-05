@@ -98,7 +98,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .message {
   display: flex;
   justify-content: space-around;

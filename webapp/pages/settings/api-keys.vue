@@ -389,73 +389,73 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 .secret-banner {
-  background-color: $color-warning-inverse;
-  border: 1px solid $color-warning;
+  background-color: var(--color-warning-inverse);
+  border: 1px solid var(--color-warning);
 }
 
 .secret-display {
   display: flex;
   align-items: center;
-  gap: $space-x-small;
-  margin: $space-x-small 0;
+  gap: var(--space-x-small);
+  margin: var(--space-x-small) 0;
 }
 
 .secret-code {
   flex: 1;
-  padding: $space-x-small;
-  background: $background-color-base;
-  border: 1px solid $color-neutral-80;
-  border-radius: $border-radius-base;
+  padding: var(--space-x-small);
+  background: var(--background-color-base);
+  border: 1px solid var(--color-neutral-80);
+  border-radius: var(--border-radius-base);
   word-break: break-all;
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
 }
 
 .secret-warning {
-  color: $color-warning;
+  color: var(--color-warning);
   font-style: italic;
 }
 
 .key-counter {
   font-weight: normal;
-  font-size: $font-size-base;
-  color: $color-neutral-50;
+  font-size: var(--font-size-base);
+  color: var(--color-neutral-50);
 }
 
 .limit-warning {
-  color: $color-warning;
-  margin-bottom: $space-x-small;
+  color: var(--color-warning);
+  margin-bottom: var(--space-x-small);
 }
 
 .status-label {
-  font-size: $font-size-small;
-  color: $text-color-soft;
+  font-size: var(--font-size-small);
+  color: var(--text-color-soft);
   font-style: italic;
 }
 
 .revoked-section {
-  margin-top: $space-large;
+  margin-top: var(--space-large);
 }
 
 .revoked-toggle {
   display: flex;
   align-items: center;
-  gap: $space-x-small;
+  gap: var(--space-x-small);
   background: none;
   border: none;
   cursor: pointer;
-  color: $text-color-soft;
-  padding: $space-x-small 0;
-  font-size: $font-size-base;
+  color: var(--text-color-soft);
+  padding: var(--space-x-small) 0;
+  font-size: var(--font-size-base);
 
   &:hover {
-    color: $text-color-base;
+    color: var(--text-color-base);
   }
 }
 
 .revoked-chevron {
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
   transition: transform 0.2s;
 
   &.open {
@@ -471,7 +471,7 @@ tr > th:last-child,
 tr > td:last-child {
   position: sticky;
   right: 0;
-  background-color: $background-color-base;
+  background-color: var(--background-color-base);
   text-align: center;
 }
 
@@ -481,10 +481,10 @@ tr > td:last-child {
 
 .settings-select {
   width: 100%;
-  padding: $space-x-small;
-  font-size: $font-size-base;
-  border: 1px solid $color-neutral-80;
-  border-radius: $border-radius-base;
-  background-color: $background-color-base;
+  padding: var(--space-x-small);
+  font-size: var(--font-size-base);
+  border: 1px solid var(--color-neutral-80);
+  border-radius: var(--border-radius-base);
+  background-color: var(--background-color-base);
 }
 </style>

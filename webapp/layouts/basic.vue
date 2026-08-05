@@ -94,7 +94,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .main-navigation-right {
   display: flex;
   justify-content: flex-end;
@@ -114,18 +114,18 @@ export default {
 }
 
 .login-button {
-  color: $color-secondary;
+  color: var(--color-secondary);
 }
 
 .login-button-menu-popover {
-  padding-top: $space-x-small;
-  padding-bottom: $space-x-small;
+  padding-top: var(--space-x-small);
+  padding-bottom: var(--space-x-small);
 
   .login-link {
-    color: $text-color-link;
-    padding-top: $space-xx-small;
+    color: var(--text-color-link);
+    padding-top: var(--space-xx-small);
     &:hover {
-      color: $text-color-link-active;
+      color: var(--text-color-link-active);
     }
   }
 }

@@ -142,12 +142,12 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .location-hint {
-  margin-top: -$space-x-small - $space-xxx-small - $space-xxx-small;
+  margin-top: calc(-1 * var(--space-x-small) - var(--space-xxx-small) - var(--space-xxx-small));
 }
 
 .location-selet {
-  margin-bottom: $space-small;
+  margin-bottom: var(--space-small);
 }
 </style>

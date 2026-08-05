@@ -27,16 +27,16 @@ export default {
   },
 }
 </script>
-<style lang="scss">
+<style>
 .error-container {
   text-align: center;
-  padding: $space-small;
+  padding: var(--space-small);
 }
 .error-message {
-  font-size: $font-size-x-large;
-  font-weight: $font-weight-bold;
-  color: $text-color-softer;
-  margin: $space-base;
+  font-size: var(--font-size-x-large);
+  font-weight: var(--text-weight-bold);
+  color: var(--text-color-softer);
+  margin: var(--space-base);
 }
 .error-image {
   width: 30%;

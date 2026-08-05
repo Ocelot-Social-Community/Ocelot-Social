@@ -401,20 +401,20 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .hide-filter {
   display: none;
 }
 
 @media (max-width: 810px) {
   .feed-top-row {
-    padding-top: $space-small;
+    padding-top: var(--space-small);
   }
 }
 
 .hashtag-filter-bar {
-  margin-top: -$space-x-small;
-  margin-bottom: $space-small;
+  margin-top: calc(-1 * var(--space-x-small));
+  margin-bottom: var(--space-small);
 }
 
 .feed-top-row {
@@ -438,10 +438,10 @@ export default {
   min-height: 54px !important;
   min-width: 54px !important;
   font-size: 26px !important;
-  box-shadow: $box-shadow-x-large !important;
-  z-index: $z-index-sticky-float !important;
+  box-shadow: var(--box-shadow-x-large) !important;
+  z-index: var(--z-index-sticky-float) !important;
   position: fixed !important;
-  right: max(20px, calc((100vw - $container-max-width-x-large) / 2 + 52px)) !important;
+  right: max(20px, calc((100vw - var(--container-max-width-x-large)) / 2 + 52px)) !important;
   top: 88px !important;
   transition: top 0.3s ease !important;
 }
@@ -480,7 +480,7 @@ export default {
   max-height: 950px;
   overflow: auto;
   padding-bottom: 0px;
-  z-index: $z-index-page-submenu;
+  z-index: var(--z-index-page-submenu);
 }
 .grid-margin-top {
   margin-top: 4px;

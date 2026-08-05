@@ -176,8 +176,8 @@ export default {
   },
 }
 </script>
-<style lang="scss">
-@media #{$media-query-large} {
+<style>
+@media (min-width: 1024px) {
   .notifications-layout__title {
     flex: 0 0 85%;
     width: 85%;
