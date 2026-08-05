@@ -20,7 +20,11 @@
         :injected-date="injectedDate"
         :hover-delay="hoverDelay"
         @close="closeMenu"
-      />
+      >
+        <template v-if="$slots.dateTime" #dateTime>
+          <slot name="dateTime"></slot>
+        </template>
+      </user-avatar-non-anonymous>
     </client-only>
   </div>
 </template>

@@ -31,47 +31,47 @@ storiesOf('AvatarImage', module)
     data: () => ({
       user: userWithAvatar,
     }),
-    template: '<profile-avatar :profile="user" />',
+    template: '<avatar-image :profile="user" />',
   }))
   .add('normal without image, anonymous user', () => ({
     components: { AvatarImage },
     data: () => ({
       user: anonymousUser,
     }),
-    template: '<profile-avatar :profile="user" />',
+    template: '<avatar-image :profile="user" />',
   }))
   .add('normal without image, user initials', () => ({
     components: { AvatarImage },
     data: () => ({
       user: userWithoutAvatar,
     }),
-    template: '<profile-avatar :profile="user" />',
+    template: '<avatar-image :profile="user" />',
   }))
   .add('small, with image', () => ({
     components: { AvatarImage },
     data: () => ({
       user: userWithAvatar,
     }),
-    template: '<profile-avatar :profile="user" size="small"/>',
+    template: '<avatar-image :profile="user" size="small"/>',
   }))
   .add('small', () => ({
     components: { AvatarImage },
     data: () => ({
       user: userWithoutAvatar,
     }),
-    template: '<profile-avatar :profile="user" size="small"/>',
+    template: '<avatar-image :profile="user" size="small"/>',
   }))
   .add('large, with image', () => ({
     components: { AvatarImage },
     data: () => ({
       user: userWithAvatar,
     }),
-    template: '<profile-avatar :profile="user" size="large"/>',
+    template: '<avatar-image :profile="user" size="large"/>',
   }))
   .add('large', () => ({
     components: { AvatarImage },
     data: () => ({
       user: userWithoutAvatar,
     }),
-    template: '<profile-avatar :profile="user" size="large"/>',
+    template: '<avatar-image :profile="user" size="large"/>',
   }))
