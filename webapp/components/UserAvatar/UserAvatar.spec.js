@@ -290,7 +290,11 @@ describe('UserAvatar', () => {
         },
         stubs: {
           NuxtLink: RouterLinkStub,
-          'client-only': { render(h) { return h('div', this.$slots.default) } },
+          'client-only': {
+            render(h) {
+              return h('div', this.$slots.default)
+            },
+          },
           'user-avatar-non-anonymous': {
             render(h) {
               return h('div', this.$slots.dateTime)
