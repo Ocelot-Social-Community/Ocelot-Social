@@ -86,11 +86,11 @@ test('unknown path maps to no bucket', () => {
 const brandA = defineBranding({
   metadata: { applicationName: 'A-app' },
   group: { nameLengthMax: 40 },
-  theme: { cssVars: { 'color-primary': 'blue' } },
+  theme: { themeColor: 'blue' },
 })
 const brandB = defineBranding({
   metadata: { applicationName: 'B-app' },
-  theme: { cssVars: { 'color-primary': 'green' } },
+  theme: { themeColor: 'green' },
 })
 
 test('composeConfig round-trips: all buckets from one brand equals that brand', () => {
@@ -107,14 +107,14 @@ test('cross-brand: theme(B) + everything-else(A) — the headline reuse case', (
     navigation: brandA,
     behavior: brandA,
   })
-  assert.equal(composed.theme.cssVars['color-primary'], 'green') // look from B
+  assert.equal(composed.theme.themeColor, 'green') // look from B
   assert.equal(composed.metadata.applicationName, 'A-app') // identity from A
   assert.equal(composed.group.nameLengthMax, 40) // behavior from A
 })
 
 test('sparse compose: buckets without a source fall back to framework defaults', () => {
   const composed = composeConfig({ theme: brandB })
-  assert.equal(composed.theme.cssVars['color-primary'], 'green')
+  assert.equal(composed.theme.themeColor, 'green')
   assert.equal(composed.metadata.applicationName, brandingDefaults.metadata.applicationName)
   assert.equal(composed.group.nameLengthMax, brandingDefaults.group.nameLengthMax)
 })
@@ -196,7 +196,7 @@ test('composeConfig does not mutate the source configs', () => {
 
 test('extractBucket keeps only the bucket’s owned leaves', () => {
   const themeFrag = extractBucket(brandA, 'theme')
-  assert.equal(themeFrag.theme.cssVars['color-primary'], 'blue')
+  assert.equal(themeFrag.theme.themeColor, 'blue')
   assert.equal(themeFrag.metadata, undefined) // theme owns no metadata leaves (metadata is identity)
 
   const identityFrag = extractBucket(brandA, 'identity')
@@ -215,7 +215,7 @@ test('compose from sparse instance fragments — cross-brand, like an archive li
     identity: extractBucket(brandA, 'identity'),
     behavior: extractBucket(brandA, 'behavior'),
   })
-  assert.equal(composed.theme.cssVars['color-primary'], 'green') // B
+  assert.equal(composed.theme.themeColor, 'green') // B
   assert.equal(composed.metadata.applicationName, 'A-app') // A (identity fragment)
   assert.equal(composed.group.nameLengthMax, 40) // A (behavior fragment)
   assert.equal(composed.category.max, brandingDefaults.category.max) // unfilled leaf → default

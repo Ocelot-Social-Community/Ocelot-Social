@@ -118,19 +118,18 @@ export interface BrandingConfig {
      * A brand supplies the full palette it wants to change (base + shades); shades it omits keep the
      * framework default value.
      */
-    cssVars: Record<string, string>
     /**
-     * @font-face declarations to make brand fonts available at runtime. `src` is a path into the
-     * brand's served assets folder (namespaced like other asset paths), e.g.
-     * 'assets/fonts/Overpass.ttf'.
+     * The browser-chrome / PWA colour, as a CONCRETE value — a manifest cannot resolve `var()`.
+     *
+     * Derived, never authored: the build evaluates `--color-primary` from the stylesheets the brand
+     * lists under `assets.css` and stores the result here. Everything else about the theme lives in
+     * those stylesheets and nowhere else; this single field exists because the PWA manifest is
+     * generated per request, without a browser to resolve custom properties for it.
+     *
+     * It sits in the `theme` bucket rather than in `metadata` on purpose: a partial package that
+     * provides identity but no theme would otherwise carry a colour it does not define.
      */
-    fontFaces: Array<{
-      family: string
-      src: string
-      weight?: string
-      style?: string
-      format?: string
-    }>
+    themeColor: string
   }
   group: {
     nameLengthMin: number
@@ -260,7 +259,7 @@ export interface BrandingConfig {
      * @font-face pointing at files in the same served folder), e.g. ['assets/css/branding.css'].
      * PLAIN CSS only — nothing in the pipeline compiles SCSS/LESS (the build warns about a source
      * stylesheet under assets/), and the nuxt bundle is brand-agnostic, so this is the ONLY way a
-     * brand ships custom rules. Prefer `theme.cssVars` for anything that has a theme token: those
+     * brand ships custom rules. Declare anything that has a theme token as a `:root` property: those
      * re-theme the webapp AND packages/ui at once, and rules here can read them back via var(--…). */
     css: string[]
     /** Static-page HTML per page per locale code, e.g. `html.imprint.de = 'html/de/imprint.html'`.

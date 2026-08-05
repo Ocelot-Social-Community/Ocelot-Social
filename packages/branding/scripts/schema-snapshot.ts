@@ -1,6 +1,6 @@
 // Schema-shape LOCK generator. Computes a structural fingerprint of the branding schema that matters
 // for archive COMPATIBILITY — every config leaf path + its value type, plus the bucket→paths partition
-// — and (when run directly) writes it to test/schema-shape.snapshot.json. The matching test asserts the
+// — and (when run directly) writes it to schema-shape.snapshot.json next to this file. The matching test asserts the
 // live shape equals the committed snapshot, so a shape change cannot ship unnoticed: it forces a
 // deliberate `npm run schema:snapshot` update, which is meant to accompany a feat/fix commit so
 // release-please bumps SCHEMA_VERSION.
@@ -43,8 +43,7 @@ export function computeSchemaShape(): SchemaShape {
 /** Write the schema-shape snapshot JSON (defaults to the committed test fixture). The CLI runner lives
  *  in schema-snapshot.run.ts. */
 export function writeSnapshot(outPath?: string): string {
-  const out =
-    outPath ?? fileURLToPath(new URL('../test/schema-shape.snapshot.json', import.meta.url))
+  const out = outPath ?? fileURLToPath(new URL('./schema-shape.snapshot.json', import.meta.url))
   writeFileSync(out, `${JSON.stringify(computeSchemaShape(), null, 2)}\n`)
   return out
 }

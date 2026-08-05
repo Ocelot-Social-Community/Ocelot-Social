@@ -145,7 +145,18 @@
                   :style="{ backgroundColor: d.value }"
                 />
                 <img v-if="isImage(d.value)" class="detail-img" :src="d.value" alt="" />
+                <!-- The stylesheet list IS this row's value: one line per file with what it
+                     declares, instead of a JSON array that says only the paths. -->
+                <ul v-if="d.path === 'assets.css'" class="brand-stylesheets">
+                  <li v-for="href in asArray(d.value)" :key="href">
+                    <code class="bucket-tag">{{ href.split('/').pop() }}</code>
+                    <span v-if="sheetFor(bucket, href)" class="ds-text-soft">
+                      {{ themeVarLabel(sheetFor(bucket, href)) }}
+                    </span>
+                  </li>
+                </ul>
                 <span
+                  v-else
                   class="detail-value"
                   :class="{
                     'detail-value--removed': d.status === 'removed',
@@ -233,17 +244,33 @@
 </template>
 
 <script>
-import {
-  BUCKET_NAMES,
-  brandingDefaults,
-  extractBucket,
-  THEME_DEFAULTS,
-} from '@ocelot-social/branding'
+import { BUCKET_NAMES, brandingDefaults, extractBucket } from '@ocelot-social/branding'
 import { OsCard } from '@ocelot-social/ui'
 import {
   setActiveBrandingMutation,
   setBrandingCompositionMutation,
 } from '~/graphql/BrandingMutations'
+import { discoverThemeTokens, summarizeStylesheet } from '~/utils/themeTokens.js'
+
+/**
+ * Fetches a brand's own stylesheets (config.assets.css, already namespaced to /branding/<id>/…) and
+ * reduces each to what it declares. A file that cannot be read is reported as such rather than
+ * omitted — silently showing nothing would look like "this stylesheet changes nothing".
+ */
+async function summarizeBrandCss(config) {
+  const hrefs = (config && config.assets && config.assets.css) || []
+  return Promise.all(
+    hrefs.map(async (href) => {
+      try {
+        const res = await fetch(href)
+        if (!res.ok) return { href, unreadable: true }
+        return { href, ...summarizeStylesheet(await res.text()) }
+      } catch (error) {
+        return { href, unreadable: true }
+      }
+    }),
+  )
+}
 
 // Sentinel slot source meaning "use the framework default (vanilla)" for THIS bucket — distinct from
 // "" (inherit the base package). Stored verbatim in the composition; the SSR resolver's parseSource
@@ -259,6 +286,12 @@ export default {
   data() {
     return {
       brandings: [],
+      // brand id → what each of its own stylesheets (assets.css) actually declares. Without this the
+      // page could only name the file; the rules inside it were invisible.
+      stylesheets: {},
+      // The brandable theme surface, discovered from the loaded stylesheets in mounted(). Client-only:
+      // there is no CSSOM during SSR, and an empty map simply means "no theme rows yet".
+      themeTokens: {},
       // brand id → its manifest instances ([{ type, name, file }]) = the buckets it provides.
       providedBuckets: {},
       // brand id → its composed config (branding.json) — for the favicon & logo preview.
@@ -286,6 +319,9 @@ export default {
     // Initialise the composition editor from the live policy value (client-only; policy is loaded).
     this.composition = this.readComposition()
     this.renderedId = (window.__NUXT__ && window.__NUXT__.brandingId) || ''
+    // Read the framework's own :root defaults off the live stylesheets rather than a table shipped
+    // with the branding package — that table was hand-maintained and had fallen far behind.
+    this.themeTokens = discoverThemeTokens()
   },
   async fetch() {
     let list = []
@@ -297,6 +333,7 @@ export default {
     }
     const providedBuckets = {}
     const details = {}
+    const stylesheets = {}
     const schemaVersions = {}
     await Promise.all(
       list.flatMap((b) => [
@@ -317,7 +354,10 @@ export default {
         (async () => {
           try {
             const res = await fetch(b.config)
-            if (res.ok) details[b.id] = await res.json()
+            if (res.ok) {
+              details[b.id] = await res.json()
+              stylesheets[b.id] = await summarizeBrandCss(details[b.id])
+            }
           } catch (error) {
             // preview degrades gracefully when a config can't be loaded
           }
@@ -347,6 +387,7 @@ export default {
     this.brandings = [vanilla, ...archives]
     this.providedBuckets = providedBuckets
     this.details = details
+    this.stylesheets = stylesheets
     this.schemaVersions = schemaVersions
   },
   computed: {
@@ -439,36 +480,76 @@ export default {
       return this.labelForSelect(this.pending[bucket])
     },
     // path → framework-default value for a bucket, to flag rows the source doesn't actually set.
-    // For `theme`, the overridable colour/font palette lives in :root SCSS (not theme.cssVars), so
-    // seed it from THEME_DEFAULTS — otherwise vanilla/most brands would show no colours at all.
+    // The theme's palette is not a config field at all any more — it lives in the brand's stylesheets.
+    // Its defaults are the framework's own `:root`, discovered from the loaded CSS in mounted().
     defaultsMap(bucket) {
       const map = {}
       this.flatten(extractBucket(brandingDefaults, bucket)).forEach((r) => {
         map[r.path] = r.value
       })
       if (bucket === 'theme') {
-        for (const [key, value] of Object.entries(THEME_DEFAULTS)) {
-          map[`theme.cssVars.${key}`] = value
+        for (const [key, value] of Object.entries(this.themeTokens)) {
+          map[`--${key}`] = value
         }
       }
       return map
     },
+    // Counts for a brand stylesheet's summary row (see summarizeBrandCss). vuex-i18n has no $tc —
+    // pluralisation is `$t(key, count)` against a 'singular ::: plural' string, the convention the
+    // rest of the locales already use.
+    themeVarLabel(sheet) {
+      const count = Object.keys(sheet.customProperties).length
+      return this.$t('admin.branding.stylesheetVars', { count }, count)
+    },
+    // Every custom property a brand's own stylesheets declare, merged in listing order (a later sheet
+    // wins, as in the cascade). The CSS is the only source — the admin reads it rather than a copy
+    // the CSS rather than a copy of it in the config.
+    asArray(value) {
+      return Array.isArray(value) ? value : []
+    },
+    // The summary for one stylesheet of this bucket's source, matched by its href.
+    sheetFor(bucket, href) {
+      return this.bucketStylesheets(bucket).find((s) => s.href === href) || null
+    },
+    // The stylesheets behind a bucket's currently selected source — same slot resolution as its rows.
+    bucketStylesheets(bucket) {
+      const select = this.effectiveSelect(bucket)
+      if (select === VANILLA_SOURCE) return []
+      const id = select || this.activeId
+      return (id && this.stylesheets[id]) || []
+    },
+    declaredTokensOf(select) {
+      // Resolve the SELECT VALUE the same way configForSelect does — indexing this.stylesheets with it
+      // directly silently returned {} for the two non-id cases, which made every token look like the
+      // framework default: an empty slot means "inherit from the base", and the vanilla sentinel is
+      // not a brand at all.
+      if (select === VANILLA_SOURCE) return {}
+      const id = select || this.activeId
+      const out = {}
+      for (const sheet of (id && this.stylesheets[id]) || []) {
+        Object.assign(out, sheet.customProperties || {})
+      }
+      return out
+    },
     eqv(a, b) {
       return JSON.stringify(a) === JSON.stringify(b)
     },
-    // Flatten a source config's bucket slice; for `theme`, ADD every overridable palette token that
-    // the source doesn't set (with its framework default) so all colours are always listed.
+    // Flatten a source config's bucket slice; for `theme`, ADD every overridable palette token — the
+    // brand's own value where its stylesheets declare one, the framework default otherwise — so all
+    // colours are listed even though none of them is a config field.
     bucketRows(select, bucket) {
       const config = this.configForSelect(select)
       const rows = this.flatten(extractBucket(config, bucket))
       if (bucket !== 'theme') return rows
-      const cssVars = (config.theme && config.theme.cssVars) || {}
+      const declared = this.declaredTokensOf(select)
       const present = new Set(rows.map((r) => r.path))
-      for (const key of Object.keys(THEME_DEFAULTS)) {
-        const path = `theme.cssVars.${key}`
+      for (const key of Object.keys(this.themeTokens)) {
+        const path = `--${key}`
         if (present.has(path)) continue
-        const value = cssVars[key] !== undefined ? cssVars[key] : THEME_DEFAULTS[key]
-        rows.push({ path, value })
+        rows.push({
+          path,
+          value: declared[key] !== undefined ? declared[key] : this.themeTokens[key],
+        })
       }
       return rows
     },
@@ -658,9 +739,9 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .composition-bucket {
-  border-bottom: 1px solid $border-color-softer;
+  border-bottom: 1px solid var(--border-color-softer);
 
   &:last-child {
     border-bottom: none;
@@ -670,15 +751,15 @@ export default {
 .composition-row {
   display: flex;
   align-items: center;
-  gap: $space-small;
-  padding: $space-x-small 0;
+  gap: var(--space-small);
+  padding: var(--space-x-small) 0;
+}
 
-  &--base {
-    // The whole-package preset sits above the per-slot rows, set apart with a heavier divider.
-    border-bottom: 2px solid $border-color-soft;
-    padding-bottom: $space-small;
-    margin-bottom: $space-x-small;
-  }
+.composition-row--base {
+  /*  The whole-package preset sits above the per-slot rows, set apart with a heavier divider. */
+  border-bottom: 2px solid var(--border-color-soft);
+  padding-bottom: var(--space-small);
+  margin-bottom: var(--space-x-small);
 }
 
 .composition-caret,
@@ -691,34 +772,34 @@ export default {
   border: none;
   background: none;
   cursor: pointer;
-  color: $text-color-soft;
+  color: var(--text-color-soft);
   padding: 0;
   text-align: center;
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
 }
 
 .composition-label {
   flex: 1;
-  font-weight: $font-weight-bold;
+  font-weight: var(--text-weight-bold);
 }
 
 .composition-select {
-  // Fixed identical width so the base (whole-package) select and every per-bucket select line up,
-  // regardless of the selected option's text length.
+  /*  Fixed identical width so the base (whole-package) select and every per-bucket select line up, */
+  /*  regardless of the selected option's text length. */
   flex: 0 0 auto;
   width: 280px;
   max-width: 100%;
-  padding: $space-xx-small $space-x-small;
+  padding: var(--space-xx-small) var(--space-x-small);
 }
 
 .composition-details {
-  padding: 0 0 $space-small $space-base;
+  padding: 0 0 var(--space-small) var(--space-base);
 }
 
 .composition-source {
-  margin: 0 0 $space-x-small;
-  color: $text-color-soft;
-  font-size: $font-size-small;
+  margin: 0 0 var(--space-x-small);
+  color: var(--text-color-soft);
+  font-size: var(--font-size-small);
 }
 
 .detail-list {
@@ -728,13 +809,13 @@ export default {
 .detail-row {
   display: flex;
   align-items: center;
-  gap: $space-small;
+  gap: var(--space-small);
   padding: 1px 0;
 
   dt {
     flex: 0 0 40%;
-    color: $text-color-soft;
-    font-size: $font-size-small;
+    color: var(--text-color-soft);
+    font-size: var(--font-size-small);
     word-break: break-all;
   }
 
@@ -743,62 +824,64 @@ export default {
     margin: 0;
     display: flex;
     align-items: center;
-    gap: $space-x-small;
-    font-size: $font-size-small;
+    gap: var(--space-x-small);
+    font-size: var(--font-size-small);
   }
 
-  // Diff highlighting for a staged (pending) change: changed / added / removed.
-  &--changed {
-    background-color: color-mix(in srgb, var(--color-warning) 12%, transparent);
-  }
+  /*  Diff highlighting for a staged (pending) change: changed / added / removed. */
+}
 
-  &--added {
-    background-color: color-mix(in srgb, var(--color-success) 12%, transparent);
-  }
+.detail-row--changed {
+  background-color: color-mix(in srgb, var(--color-warning) 12%, transparent);
+}
 
-  &--removed {
-    background-color: color-mix(in srgb, var(--color-danger) 10%, transparent);
-  }
+.detail-row--added {
+  background-color: color-mix(in srgb, var(--color-success) 12%, transparent);
+}
+
+.detail-row--removed {
+  background-color: color-mix(in srgb, var(--color-danger) 10%, transparent);
 }
 
 .detail-value {
   word-break: break-word;
 
-  &--removed {
-    text-decoration: line-through;
-    color: $text-color-soft;
-  }
+  /*  A value the source does not actually set (equals the framework default) — greyed out. */
+}
 
-  // A value the source does not actually set (equals the framework default) — greyed out.
-  &--default {
-    color: $text-color-softer;
-  }
+.detail-value--removed {
+  text-decoration: line-through;
+  color: var(--text-color-soft);
+}
+
+.detail-value--default {
+  color: var(--text-color-softer);
 }
 
 .detail-default-tag {
-  color: $text-color-softer;
-  font-size: $font-size-x-small;
+  color: var(--text-color-softer);
+  font-size: var(--font-size-x-small);
   font-style: italic;
 }
 
 .detail-old {
-  color: $text-color-soft;
+  color: var(--text-color-soft);
   text-decoration: line-through;
 }
 
 .detail-arrow {
-  color: $text-color-soft;
+  color: var(--text-color-soft);
 }
 
 .detail-actions {
   display: flex;
-  gap: $space-x-small;
-  margin-top: $space-small;
+  gap: var(--space-x-small);
+  margin-top: var(--space-small);
 }
 
 .btn {
   border: none;
-  border-radius: $border-radius-base;
+  border-radius: var(--border-radius-base);
   padding: 4px 12px;
   cursor: pointer;
 
@@ -809,17 +892,17 @@ export default {
 }
 
 .btn-confirm {
-  background-color: $color-primary;
-  color: $color-primary-inverse;
+  background-color: var(--color-primary);
+  color: var(--color-primary-inverse);
 }
 
 .btn-cancel {
-  background-color: $background-color-softest;
-  color: $text-color-base;
+  background-color: var(--background-color-softest);
+  color: var(--text-color-base);
 }
 
 .detail-empty {
-  color: $text-color-soft;
+  color: var(--text-color-soft);
   font-style: italic;
 }
 
@@ -834,17 +917,18 @@ export default {
   width: 14px;
   height: 14px;
   border-radius: 2px;
-  border: 1px solid $border-color-softer;
+  border: 1px solid var(--border-color-softer);
   flex: 0 0 auto;
 
-  // The old (replaced) colour of a changed row — dimmed to match its struck-through text.
-  &--old {
-    opacity: 0.6;
-  }
+  /*  The old (replaced) colour of a changed row — dimmed to match its struck-through text. */
+}
+
+.swatch--old {
+  opacity: 0.6;
 }
 
 .available-card {
-  margin-top: $space-base;
+  margin-top: var(--space-base);
 }
 
 .available-list {
@@ -856,9 +940,9 @@ export default {
 .available-item {
   display: flex;
   align-items: baseline;
-  gap: $space-small;
-  padding: $space-x-small 0;
-  border-bottom: 1px solid $border-color-softer;
+  gap: var(--space-small);
+  padding: var(--space-x-small) 0;
+  border-bottom: 1px solid var(--border-color-softer);
 
   &:last-child {
     border-bottom: none;
@@ -866,8 +950,8 @@ export default {
 }
 
 .available-logo-slot {
-  // Fixed-width column so the brand names line up regardless of each logo's aspect ratio (and stay
-  // aligned for brands without a logo).
+  /*  Fixed-width column so the brand names line up regardless of each logo's aspect ratio (and stay */
+  /*  aligned for brands without a logo). */
   flex: 0 0 64px;
   display: flex;
   align-items: center;
@@ -883,27 +967,27 @@ export default {
 
 .available-name {
   flex: 0 0 auto;
-  font-weight: $font-weight-bold;
+  font-weight: var(--text-weight-bold);
 }
 
 .available-buckets {
   flex: 1;
   display: flex;
   flex-wrap: wrap;
-  gap: $space-xx-small;
+  gap: var(--space-xx-small);
   justify-content: flex-end;
 }
 
 .bucket-tag {
-  background-color: $background-color-softest;
-  color: $text-color-soft;
+  background-color: var(--background-color-softest);
+  color: var(--text-color-soft);
   padding: 1px 6px;
-  border-radius: $border-radius-base;
-  font-size: $font-size-small;
+  border-radius: var(--border-radius-base);
+  font-size: var(--font-size-small);
 }
 
 .branding-version {
-  color: $text-color-soft;
+  color: var(--text-color-soft);
   font-weight: normal;
 }
 
@@ -911,27 +995,27 @@ export default {
   display: inline-block;
   margin-left: 6px;
   padding: 0 6px;
-  border: 1px solid $border-color-softer;
-  border-radius: $border-radius-base;
-  font-size: $font-size-small;
+  border: 1px solid var(--border-color-softer);
+  border-radius: var(--border-radius-base);
+  font-size: var(--font-size-small);
   font-weight: normal;
-  color: $text-color-soft;
+  color: var(--text-color-soft);
   vertical-align: middle;
 }
 
 .branding-badge-active {
-  border-color: $color-primary;
-  color: $color-primary;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .schema-version {
-  border: 1px solid $border-color-softer;
-  border-radius: $border-radius-base;
+  border: 1px solid var(--border-color-softer);
+  border-radius: var(--border-radius-base);
   padding: 0 4px;
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
 }
 
 .hint {
-  color: $text-color-soft;
+  color: var(--text-color-soft);
 }
 </style>

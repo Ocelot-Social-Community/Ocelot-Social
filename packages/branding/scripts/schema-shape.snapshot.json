@@ -65,8 +65,7 @@
     "registration.layout: string",
     "registration.nonceLength: number",
     "termsAndConditions.version: string",
-    "theme.cssVars: object",
-    "theme.fontFaces: array"
+    "theme.themeColor: string"
   ],
   "buckets": {
     "theme": [
