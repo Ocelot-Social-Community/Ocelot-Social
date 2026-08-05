@@ -9,6 +9,11 @@ spec:
       app: {{ .Release.Name }}-webapp
   template:
     metadata:
+      annotations:
+        # See the backend deployment: `envFrom` is resolved once at container start, so without
+        # these hashes a pure config change never reaches a running pod.
+        checksum/config: {{ include (print $.Template.BasePath "/webapp/configmap.yml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/webapp/secret.yaml") . | sha256sum }}
       labels:
         app: {{ .Release.Name }}-webapp
     spec:
@@ -19,8 +24,30 @@ spec:
         image: "{{ .Values.webapp.image.repository }}:{{ .Values.webapp.image.tag | default (include "defaultTag" .)  }}"
         imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
         {{- include "resources" .Values.webapp.resources | indent 8 }}
+        lifecycle:
+          # Endpoint removal and SIGTERM reach the pod at the same time, so Traefik can still route
+          # here for a moment after Nuxt has begun shutting down. Sleeping through that window is
+          # the whole job of this hook — the container keeps serving normally while it runs.
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 5"]
         ports:
         - containerPort: 3000
+        # Without a readinessProbe a pod counts as Ready the moment its container starts, which for
+        # Nuxt is seconds before it listens — Traefik then routes into a 502 for the whole surge
+        # window of every rollout. tcpSocket rather than httpGet on `/`: Nuxt opens the port only
+        # once the server is up, so it answers the question, and probing `/` would put a full SSR
+        # render into the single-threaded event loop every few seconds for no gain.
+        readinessProbe:
+          tcpSocket:
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        livenessProbe:
+          tcpSocket:
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 20
         env:
         - name: WEBSOCKETS_URI
           value: "wss://{{ .Values.domain }}/api/graphql"

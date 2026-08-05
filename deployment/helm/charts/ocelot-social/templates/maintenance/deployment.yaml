@@ -35,3 +35,20 @@ spec:
           {{- end }}
         ports:
           - containerPort: 8080
+        # httpGet here, unlike the other workloads: this is nginx serving a static page, so a real
+        # request is cheap and proves more than an open socket — namely that the entrypoint has
+        # finished substituting SUPPORT_EMAIL into the built files. No checksum/* annotation is
+        # needed either, because this deployment's env is inline in the template rather than in a
+        # ConfigMap: changing it already changes the pod template.
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 20

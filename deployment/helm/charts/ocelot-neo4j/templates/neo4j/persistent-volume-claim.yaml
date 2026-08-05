@@ -1,8 +1,26 @@
+{{/*
+Both claims carry `helm.sh/resource-policy: keep` DELIBERATELY. Without it
+these are ordinary Helm templates, and Helm deletes a template it no longer
+renders — a `helm uninstall`, a rename, or dropping the template would take
+`<release>-neo4j-data` with it. On a StorageClass with `reclaimPolicy:
+Delete` (the default for hcloud-volumes, among others) the volume's contents
+are gone in the same second, and this one holds the entire instance database.
+Exactly that mechanism removed the backend's uploads PVC on the
+StatefulSet-to-Deployment upgrade — there it was harmless because the volume
+was empty since the S3 migration.
+
+The price is that an intentional teardown now leaves the PVCs behind and they
+have to be deleted by hand (`kubectl delete pvc <release>-neo4j-data
+<release>-neo4j-backups`). That is the right way round: an orphaned volume
+costs storage, a deleted one costs the instance.
+*/}}
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: {{ .Release.Name }}-neo4j-data
+  annotations:
+    helm.sh/resource-policy: keep
 spec:
   accessModes:
     - ReadWriteOnce
@@ -13,7 +31,13 @@ spec:
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
+  # Currently mounted by NO workload: the only consumer is `old/job.yaml`,
+  # which lives outside `templates/` and is never rendered. Kept (and
+  # protected) until the backup story is decided, so that whatever dumps an
+  # instance may still hold survive that decision.
   name: {{ .Release.Name }}-neo4j-backups
+  annotations:
+    helm.sh/resource-policy: keep
 spec:
   accessModes:
     - ReadWriteOnce

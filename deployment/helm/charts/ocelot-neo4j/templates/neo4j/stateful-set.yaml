@@ -12,10 +12,19 @@ spec:
       name: neo4j
       annotations:
         backup.velero.io/backup-volumes: neo4j-data
+        # `envFrom` is resolved once at container start, so a changed heap size or page cache would
+        # otherwise sit in the ConfigMap without ever reaching the running database. NOTE that this
+        # makes such a change a real restart of the database — which is the honest behaviour, but
+        # plan it like one.
+        checksum/config: {{ include (print $.Template.BasePath "/neo4j/configmap.yml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/neo4j/secret.yaml") . | sha256sum }}
       labels:
         app: {{ .Release.Name }}-neo4j
     spec:
       restartPolicy: Always
+      # Neo4j flushes and closes its store files on SIGTERM. The default 30 s can cut that short on
+      # a larger graph, and a SIGKILL mid-flush turns the next start into a recovery run.
+      terminationGracePeriodSeconds: 120
       {{- include "imagePullSecrets" . | indent 6 }}
       containers:
       - name: container-{{ .Release.Name }}-neo4j
@@ -25,6 +34,20 @@ spec:
         ports:
         - containerPort: 7687
         - containerPort: 7474
+        # Readiness only, on Bolt — deliberately NO livenessProbe. A database that is busy with
+        # recovery or a long GC pause is not a database that should be killed and restarted, which
+        # is precisely what a liveness probe would do at the worst possible moment.
+        #
+        # This is also what makes the backend's `wait-db` initContainer honest: it polls the same
+        # port, so "the service has endpoints" and "the backend can proceed" now mean the same
+        # thing. It still only proves the listener is up, not that Neo4j finished building indexes
+        # — a Cypher `RETURN 1` would, and needs credentials this probe does not have.
+        readinessProbe:
+          tcpSocket:
+            port: 7687
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          failureThreshold: 6
         envFrom:
         - configMapRef:
             name: {{ .Release.Name }}-neo4j-env

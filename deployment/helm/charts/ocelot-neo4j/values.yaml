@@ -2,6 +2,11 @@ underMaintenance: false
 
 global:
   image:
+    # Same default as the ocelot-social chart. Without it the templates rendered
+    # `imagePullPolicy: ""` and left the choice to the API server's defaulting rules — which pick
+    # `Always` for a `:latest` tag and `IfNotPresent` otherwise, i.e. silently something else than
+    # the sibling chart does.
+    pullPolicy: IfNotPresent
     tag:
 
 # Credentials for pulling images from private registries — see the identically named block in the

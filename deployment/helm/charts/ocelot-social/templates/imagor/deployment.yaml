@@ -9,6 +9,11 @@ spec:
       app: {{ .Release.Name }}-imagor
   template:
     metadata:
+      annotations:
+        # See the backend deployment: `envFrom` is resolved once at container start. imagor takes
+        # its S3 credentials and signing key this way, so without this a rotated key would sit in
+        # the Secret while the running pod keeps signing with the old one.
+        checksum/secret: {{ include (print $.Template.BasePath "/imagor/secret.yaml") . | sha256sum }}
       labels:
         app: {{ .Release.Name }}-imagor
     spec:
@@ -19,8 +24,26 @@ spec:
         image: "{{ .Values.imagor.image.repository }}:{{ .Values.imagor.image.tag | default (include "defaultTag" .)  }}"
         imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
         {{- include "resources" .Values.imagor.resources | indent 8 }}
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 5"]
         ports:
         - containerPort: 8000
+        # tcpSocket, not httpGet: imagor documents a `/healthcheck` endpoint, but this chart pins a
+        # third-party image and a probe pointing at a path that does not exist would keep every pod
+        # permanently un-Ready — i.e. break image serving outright. Switch to
+        # `httpGet: /healthcheck` once it has been confirmed against the pinned tag.
+        readinessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        livenessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 20
         env:
         - name: S3_FORCE_PATH_STYLE
           value: "1"

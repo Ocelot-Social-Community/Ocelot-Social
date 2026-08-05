@@ -30,6 +30,14 @@ spec:
       app: {{ .Release.Name }}-backend
   template:
     metadata:
+      annotations:
+        # Config reaches the pod through `envFrom`, which Kubernetes resolves ONCE at container
+        # start. Changing a value therefore updates the ConfigMap but leaves this pod template
+        # byte-identical, Helm sees no diff, and the running pod keeps the old value until something
+        # unrelated happens to restart it. Hashing the rendered manifests in here makes the change
+        # visible to Helm and turns it into a rollout.
+        checksum/config: {{ include (print $.Template.BasePath "/backend/configmap.yml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/backend/secret.yaml") . | sha256sum }}
       labels:
         app: {{ .Release.Name }}-backend
     spec:
@@ -122,6 +130,10 @@ spec:
           ports:
           - containerPort: 4000
             protocol: TCP
+          # No preStop sleep here, unlike webapp and imagor. Those surge: a second pod is already
+          # serving while the old one drains, so sleeping through the endpoint-removal window buys
+          # real requests. With `maxSurge: 0` there is no such pod — the sleep would only lengthen
+          # the gap it is meant to hide. Add one together with the surge, not before.
           # tcpSocket rather than httpGet because the backend has no health endpoint yet. It only
           # proves the listener is up, not that Neo4j is reachable — replace with httpGet on a real
           # /healthz once one exists.
