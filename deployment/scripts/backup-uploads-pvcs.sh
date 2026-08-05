@@ -313,18 +313,29 @@ while IFS=$'\t' read -r ns pvc pv phase; do
   plan="$stage/plan.tsv"
   if [ ! -f "$stamp_file" ] || [ "$(cat "$stamp_file")" != "$plan_stamp" ]; then
     if [ -f "$plan" ]; then
-      if [ -f "$stamp_file" ] && [ "$(cut -d' ' -f1 "$stamp_file")" = "$listing_sum" ]; then
+      if [ ! -f "$stamp_file" ]; then
+        echo "   incomplete state from an interrupted run — discarding cached chunks"
+      elif [ "$(cut -d' ' -f1 "$stamp_file")" = "$listing_sum" ]; then
         echo "   chunk sizing changed since the last run — discarding cached chunks"
       else
         echo "   volume changed since the last run — discarding cached chunks"
       fi
     fi
+    # The stamp is dropped FIRST and rewritten LAST. While it is absent the staging directory is by
+    # definition not resumable, so a run interrupted anywhere in between is cleaned up by the next
+    # one rather than mistaken for valid state.
+    rm -f "$stamp_file"
     rm -rf "$stage/chunks" "$plan" "$stage/listing.sha256"
     mkdir -p "$stage/chunks"
-    printf '%s' "$plan_stamp" > "$stamp_file"
   fi
 
   # Everything after the FIRST tab is the path, so paths containing tabs survive the round trip.
+  #
+  # Built aside and moved into place, so `plan.tsv` is either absent or complete. A plan truncated
+  # by an interrupted awk would define fewer chunks than the volume needs; because a matching stamp
+  # makes it look reusable, every later run would rebuild the same short transfer and fail the merge
+  # check again, with only --force to escape. `set -e` makes that reachable through any awk error,
+  # not just a kill.
   if [ ! -f "$plan" ]; then
     awk -v max_kib="$CHUNK_KIB" -v max_files="$CHUNK_FILES" '
       BEGIN { idx = 0; acc = 0; n = 0 }
@@ -335,8 +346,10 @@ while IFS=$'\t' read -r ns pvc pv phase; do
         if (n > 0 && (acc + size > max_kib || n >= max_files)) { idx++; acc = 0; n = 0 }
         acc += size; n++
         printf "%d\t%s\n", idx, path
-      }' "$listing" > "$plan"
+      }' "$listing" > "$plan.part"
+    mv "$plan.part" "$plan"
   fi
+  printf '%s' "$plan_stamp" > "$stamp_file"
 
   chunks=0
   [ -s "$plan" ] && chunks=$(( $(cut -f1 "$plan" | tail -n 1) + 1 ))
