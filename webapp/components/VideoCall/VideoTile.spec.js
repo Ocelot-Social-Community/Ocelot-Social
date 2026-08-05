@@ -64,7 +64,7 @@ describe('VideoTile', () => {
 
     it('renders the avatar fallback when no video track is attached', () => {
       const wrapper = factory({ tile: buildTile() })
-      expect(wrapper.find('.profileavatar').exists()).toBe(true)
+      expect(wrapper.find('.avatarimage').exists()).toBe(true)
     })
 
     it('shows the camera-disabled hint for the local user when large avatar', () => {

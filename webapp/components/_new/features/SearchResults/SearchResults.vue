@@ -66,7 +66,7 @@
         <!-- groups -->
         <div v-if="activeTab === 'Group'" class="search-results-list">
           <div v-for="group in activeResources" :key="group.id" class="search-results-list__item">
-            <group-avatar :group="{ ...group, name: group.groupName }" />
+            <group-teaser :group="{ ...group, name: group.groupName }" />
           </div>
         </div>
         <!-- hashtags -->
@@ -119,7 +119,7 @@ import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem'
 import PostTeaser from '~/components/PostTeaser/PostTeaser'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
-import GroupAvatar from '~/components/Group/GroupAvatar'
+import GroupTeaser from '~/components/Group/GroupTeaser'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
 import HcHashtag from '~/components/Hashtag/Hashtag'
 
@@ -134,7 +134,7 @@ export default {
     PostTeaser,
     PaginationButtons,
     UserAvatar,
-    GroupAvatar,
+    GroupTeaser,
     HcHashtag,
   },
   mixins: [postListActions],
@@ -486,7 +486,7 @@ export default {
     }
   }
 
-  .group-avatar-card-wrapper {
+  .group-teaser-card-wrapper {
     padding: 0;
   }
 }
