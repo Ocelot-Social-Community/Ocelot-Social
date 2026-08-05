@@ -118,12 +118,12 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 button + button {
-  margin-left: $space-x-small;
+  margin-left: var(--space-x-small);
 }
 .provider-list-item {
-  margin-top: $space-xx-small;
-  margin-bottom: $space-xx-small;
+  margin-top: var(--space-xx-small);
+  margin-bottom: var(--space-xx-small);
 }
 </style>

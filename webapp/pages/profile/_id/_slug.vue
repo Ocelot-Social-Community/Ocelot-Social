@@ -677,14 +677,14 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 ::v-deep .profile-page-avatar.profile-avatar {
   margin: auto;
   margin-top: -60px;
 }
 @media (max-width: 810px) {
   .profile-layout {
-    padding-top: $space-large;
+    padding-top: var(--space-large);
   }
 }
 .badge-edit-link {
@@ -695,8 +695,8 @@ export default {
 }
 .profile-layout__sidebar ::v-deep .content-menu {
   position: absolute;
-  top: $space-x-small;
-  right: $space-x-small;
+  top: var(--space-x-small);
+  right: var(--space-x-small);
 }
 .profile-layout__sidebar,
 .profile-layout__main {
@@ -704,7 +704,7 @@ export default {
   width: 100%;
   min-width: 0;
 }
-@media #{$media-query-small} {
+@media (min-width: 600px) {
   .profile-layout__sidebar {
     flex: 2 0 0;
   }
@@ -712,7 +712,7 @@ export default {
     flex: 3 0 0;
   }
 }
-@media #{$media-query-medium} {
+@media (min-width: 768px) {
   .profile-layout__sidebar {
     flex: 2 0 0;
   }
@@ -720,7 +720,7 @@ export default {
     flex: 5 0 0;
   }
 }
-@media #{$media-query-large} {
+@media (min-width: 1024px) {
   .profile-layout__sidebar {
     flex: 1 0 0;
   }
@@ -731,15 +731,15 @@ export default {
 .profile-post-add-button-container {
   display: flex;
   justify-content: center;
-  margin: $space-small 0;
+  margin: var(--space-small) 0;
 }
 ::v-deep .profile-post-add-button {
-  box-shadow: $box-shadow-x-large !important;
+  box-shadow: var(--box-shadow-x-large) !important;
 }
 .action-buttons {
   display: flex;
   flex-direction: column;
-  gap: $space-x-small;
-  margin: $space-small 0;
+  gap: var(--space-x-small);
+  margin: var(--space-small) 0;
 }
 </style>

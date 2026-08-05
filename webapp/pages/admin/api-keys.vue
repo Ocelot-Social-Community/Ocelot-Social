@@ -367,21 +367,21 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 .table-no-clip {
   overflow: visible;
 }
 
 .action-buttons {
   display: flex;
-  gap: $space-xx-small;
+  gap: var(--space-xx-small);
   align-items: center;
   justify-content: flex-end;
 }
 
 .detail-cell {
-  background-color: $color-neutral-90;
-  padding: $space-small;
+  background-color: var(--color-neutral-90);
+  padding: var(--space-small);
 }
 
 .revoked-table {
@@ -389,6 +389,6 @@ export default {
 }
 
 .revoked-heading {
-  color: $text-color-soft;
+  color: var(--text-color-soft);
 }
 </style>

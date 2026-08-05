@@ -149,14 +149,14 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .notifcation-settings-section {
-  margin-left: $space-x-small;
+  margin-left: var(--space-x-small);
 }
 .label {
-  margin-left: $space-xx-small;
+  margin-left: var(--space-xx-small);
 }
 button + button {
-  margin-left: $space-x-small;
+  margin-left: var(--space-x-small);
 }
 </style>

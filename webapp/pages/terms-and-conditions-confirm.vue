@@ -87,7 +87,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .terms-and-conditions-confirm > .os-card {
   height: 280px;
   display: flex;
@@ -96,7 +96,7 @@ export default {
   justify-content: space-between;
 
   > .os-icon {
-    font-size: $font-size-xxx-large;
+    font-size: var(--font-size-xxx-large);
   }
 }
 </style>

@@ -105,17 +105,17 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .show-donations-checkbox {
-  margin-top: $space-base;
-  margin-bottom: $space-small;
+  margin-top: var(--space-base);
+  margin-bottom: var(--space-small);
 }
 
 .donations-data {
-  margin-left: $space-small;
+  margin-left: var(--space-small);
 }
 
 .donations-info-button {
-  margin-top: $space-small;
+  margin-top: var(--space-small);
 }
 </style>

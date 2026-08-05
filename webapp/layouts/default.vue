@@ -128,9 +128,9 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .main-navigation {
-  background-color: $color-header-background;
+  background-color: var(--color-header-background);
 }
 .main-container {
   padding-top: 6rem;
@@ -140,7 +140,7 @@ export default {
 @media (max-width: 810px) {
   .main-container {
     padding-top: 4rem;
-    padding-bottom: $space-x-small;
+    padding-bottom: var(--space-x-small);
   }
 
   .desktop-footer {
@@ -148,8 +148,8 @@ export default {
   }
 
   .ds-container {
-    padding-left: $space-x-small !important;
-    padding-right: $space-x-small !important;
+    padding-left: var(--space-x-small) !important;
+    padding-right: var(--space-x-small) !important;
   }
 }
 
@@ -159,9 +159,9 @@ export default {
   position: fixed;
   bottom: 45px;
   right: 0;
-  // Below the global tooltip/popover stack ($z-index-modal - 2 = 9997) so header
-  // dropdowns (avatar menu, notifications) remain clickable on top of the chat.
-  z-index: $z-index-overlay;
+  /*  Below the global tooltip/popover stack (var(--z-index-modal) - 2 = 9997) so header */
+  /*  dropdowns (avatar menu, notifications) remain clickable on top of the chat. */
+  z-index: var(--z-index-overlay);
   .close {
     padding: 10px;
     color: blue;
@@ -169,13 +169,13 @@ export default {
   }
 }
 
-// When a minimized video call is anchored above the footer, lift the chat
-// above the video so both fit without overlap. Minimized video sits at
-// bottom: 45px (matching the chat's footer offset) and is 280px tall.
-// The inner chat content keeps its own height; whatever extends above the
-// viewport gets clipped by the browser, leaving the message input and the
-// latest messages visible — which is what the user interacts with.
+/*  When a minimized video call is anchored above the footer, lift the chat */
+/*  above the video so both fit without overlap. Minimized video sits at */
+/*  bottom: 45px (matching the chat's footer offset) and is 280px tall. */
+/*  The inner chat content keeps its own height; whatever extends above the */
+/*  viewport gets clipped by the browser, leaving the message input and the */
+/*  latest messages visible — which is what the user interacts with. */
 .chat-modul--with-video {
-  bottom: 333px; // 45 (video bottom) + 280 (video height) + 8 (gap)
+  bottom: 333px; /*  45 (video bottom) + 280 (video height) + 8 (gap) */
 }
 </style>

@@ -29,7 +29,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .layout-blank {
   min-height: 100vh;
   display: flex;
