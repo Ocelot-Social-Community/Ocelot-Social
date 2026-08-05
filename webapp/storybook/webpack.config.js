@@ -23,6 +23,12 @@ module.exports = async ({ config, mode }) => {
         loader: 'style-resources-loader',
         options: {
           patterns: [
+            // FIRST, and not optional: tokens.scss calls `color.adjust(...)`, which needs the
+            // `@use 'sass:color'` that only this file carries — and `@use` has to precede every
+            // other rule, which is the whole reason it is a separate file. Without it the prelude
+            // fails with «There is no module with the namespace "color"». nuxt.config.js has always
+            // listed it first; Storybook did not, so its SCSS pipeline was broken on its own terms.
+            path.resolve(__dirname, '../assets/_new/styles/uses.scss'),
             path.resolve(__dirname, '../assets/_new/styles/_styleguide-tokens.scss'),
             path.resolve(__dirname, '../assets/_new/styles/tokens.scss'),
           ],
