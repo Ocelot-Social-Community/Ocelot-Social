@@ -89,18 +89,23 @@ backend's GraphQL subscriptions are process-local. See
 
 ## Config changes now cause a rollout — including one restart on this upgrade
 
-Every workload took its configuration through `envFrom`, which Kubernetes resolves **once**, when
-the container starts. Changing a value in `backend.env`, `webapp.env` or `neo4j.env` therefore
-updated the ConfigMap and stopped there: the pod template stayed byte-identical, Helm saw nothing to
-do, and the running pod kept serving the old value until something unrelated happened to restart it.
-Every pod template now carries a `checksum/config` (and `checksum/secret`) annotation over the
-rendered manifests, so a changed value is a changed pod template and Helm rolls it out.
+Backend, webapp and Neo4j take their configuration through `envFrom`, which Kubernetes resolves
+**once**, when the container starts. Changing a value in `backend.env`, `webapp.env` or `neo4j.env`
+therefore updated the ConfigMap and stopped there: the pod template stayed byte-identical, Helm saw
+nothing to do, and the running pod kept serving the old value until something unrelated happened to
+restart it. Those three pod templates now carry `checksum/config` and `checksum/secret` annotations
+over the rendered manifests, so a changed value is a changed pod template and Helm rolls it out.
+
+The two remaining workloads differ: imagor has no ConfigMap — it takes everything from its secret —
+so it carries `checksum/secret` alone, and maintenance carries no `checksum/*` at all because its
+env is inline in the pod template, where a change is already a template change.
 
 **Action:** none — but be aware of two consequences.
 
-- **This upgrade restarts every pod once**, because the annotations themselves are new. For the
-  Neo4j StatefulSet that is a short database restart. It happens inside the maintenance window you
-  already need for the StatefulSet-to-Deployment switch above, so plan them together.
+- **This upgrade restarts backend, webapp, imagor and Neo4j once** (maintenance is untouched),
+  because the annotations themselves are new. For the Neo4j StatefulSet that is a short database
+  restart. It happens inside the maintenance window you already need for the
+  StatefulSet-to-Deployment switch above, so plan them together.
 - **From now on, editing `neo4j.env` restarts the database.** That is the honest behaviour — the
   setting was never live before — but treat a heap-size or page-cache change as the restart it is.
 
