@@ -3,7 +3,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import { action } from '@storybook/addon-actions'
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import '!style-loader!css-loader!sass-loader!../assets/_new/styles/resets.scss'
+import '!style-loader!css-loader!../assets/css/resets.css'
 
 Vue.use(Vuex)
 Vue.component('nuxt-link', {
@@ -35,16 +35,16 @@ componentFiles.keys().forEach((fileName) => {
   Vue.component(componentName, componentConfig)
 })
 
-// Setup design token addon
-const scssReq = require.context('!!raw-loader!~/assets/_new/styles', true, /.\.scss$/)
-const scssTokenFiles = scssReq
+// Setup design token addon — the tokens live in plain CSS custom properties now
+const cssReq = require.context('!!raw-loader!~/assets/css', true, /.\.css$/)
+const cssTokenFiles = cssReq
   .keys()
-  .map((filename) => ({ filename, content: scssReq(filename).default }))
+  .map((filename) => ({ filename, content: cssReq(filename).default }))
 
 addParameters({
   designToken: {
     files: {
-      scss: scssTokenFiles,
+      css: cssTokenFiles,
     },
   },
 })

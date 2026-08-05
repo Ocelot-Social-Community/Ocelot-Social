@@ -1,19 +1,16 @@
-@import './imports/_tooltip.scss';
-@import './imports/_toast.scss';
+@import './tooltip.css';
+@import './toast.css';
 
 html {
   scrollbar-gutter: stable;
 }
 
-// Transition Easing
-$easeOut: cubic-bezier(0.19, 1, 0.22, 1);
-
 .disabled-content {
   position: relative;
 
   &::before {
-    @include border-radius($border-radius-x-large);
-    box-shadow: inset 0 0 0 5px $color-danger;
+    border-radius: var(--border-radius-x-large);
+    box-shadow: inset 0 0 0 5px var(--color-danger);
     content: '';
     display: block;
     position: absolute;
@@ -38,9 +35,10 @@ $easeOut: cubic-bezier(0.19, 1, 0.22, 1);
   opacity: 0;
 }
 
-// slide up ease
+/*  slide up ease */
 .slide-up-enter-active {
-  transition: all 500ms $easeOut;
+  /* was the local $easeOut variable; inlined at its single call site */
+  transition: all 500ms cubic-bezier(0.19, 1, 0.22, 1);
   transition-delay: 20ms;
   opacity: 1;
   transform: translate3d(0, 0, 0);
@@ -63,22 +61,22 @@ blockquote {
   position: relative;
 
   /*Font*/
-  font-size: $font-size-base;
+  font-size: var(--font-size-base);
   line-height: 1.2;
-  color: $color-neutral-40;
-  font-family: $font-family-serif;
+  color: var(--color-neutral-40);
+  font-family: var(--font-family-serif);
   font-style: italic;
 
-  border-left: 3px dotted $color-neutral-70;
+  border-left: 3px dotted var(--color-neutral-70);
 
   &::before {
     content: '\201C';
     /*Unicode for Left Double Quote*/
 
     /*Font*/
-    font-size: $font-size-xxxx-large;
+    font-size: var(--font-size-xxxx-large);
     font-weight: bold;
-    color: $color-neutral-50;
+    color: var(--color-neutral-50);
 
     /*Positioning*/
     position: absolute;
@@ -91,10 +89,10 @@ blockquote {
   }
 }
 .main-navigation {
-  box-shadow: $box-shadow-base;
+  box-shadow: var(--box-shadow-base);
   position: fixed;
   width: 100%;
-  z-index: $z-index-page-submenu;
+  z-index: var(--z-index-page-submenu);
 
   a {
     outline: none;
@@ -104,8 +102,8 @@ blockquote {
 hr {
   border: 0;
   width: 100%;
-  color: $color-neutral-80;
-  background-color: $color-neutral-80;
+  color: var(--color-neutral-80);
+  background-color: var(--color-neutral-80);
   height: 1px !important;
 }
 
@@ -130,7 +128,7 @@ hr {
   left: 0;
   position: fixed;
   background: rgba(0, 0, 0, 0.15);
-  z-index: $z-index-overlay;
+  z-index: var(--z-index-overlay);
   pointer-events: none;
   transition: opacity 150ms ease-out;
   transition-delay: 50ms;
@@ -153,15 +151,16 @@ body.dropdown-open {
 
 .os-card > .ds-section,
 .os-card > .os-card__content > .ds-section {
-  padding: $space-base;
-  margin: -$space-base;
+  padding: var(--space-base);
+  /*  calc(), not -var(--space-base): var(--space-base) is a var() now and Sass cannot negate one. */
+  margin: calc(-1 * var(--space-base));
 }
 
 .os-card {
   > .title,
   > .content-column > .title {
-    font-size: $font-size-large;
-    margin-bottom: $space-x-small;
+    font-size: var(--font-size-large);
+    margin-bottom: var(--space-x-small);
   }
 
   > .os-card__hero-image > .image {
@@ -177,7 +176,7 @@ body.dropdown-open {
       display: flex;
       justify-content: center;
       align-items: center;
-      padding-right: $space-base;
+      padding-right: var(--space-base);
 
       .image {
         width: 100%;
@@ -191,8 +190,8 @@ body.dropdown-open {
 
     > .top-menu {
       position: absolute;
-      top: $space-small;
-      left: $space-small;
+      top: var(--space-small);
+      left: var(--space-small);
     }
   }
 }
@@ -203,7 +202,7 @@ body.dropdown-open {
 
     > .image-column {
       padding-right: 0;
-      margin-bottom: $space-base;
+      margin-bottom: var(--space-base);
     }
   }
 }
@@ -217,13 +216,13 @@ body.dropdown-open {
     align-items: center;
 
     .os-icon {
-      padding-right: $space-xx-small;
+      padding-right: var(--space-xx-small);
     }
   }
 }
 
 .v-popover.open .trigger a {
-  color: $text-color-link-active;
+  color: var(--text-color-link-active);
 }
 
 .hyphenate-text {
@@ -233,7 +232,7 @@ body.dropdown-open {
 }
 
 .dropdown-arrow {
-  font-size: $font-size-xx-small;
+  font-size: var(--font-size-xx-small);
 }
 
 /* Prevent ds-select overflow */

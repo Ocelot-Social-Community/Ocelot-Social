@@ -8,26 +8,8 @@ module.exports = async ({ config, mode }) => {
   // You can change the configuration based on that.
   // 'PRODUCTION' is used when building the static version of storybook.
 
-  // Make whatever fine-grained changes you need
-  config.module.rules.push({
-    test: /\.scss$/,
-    use: [
-      { loader: 'style-loader' },
-      { loader: 'css-loader', options: { sourceMap: true } },
-      { loader: 'sass-loader', options: { sourceMap: true } },
-      {
-        loader: 'style-resources-loader',
-        options: {
-          patterns: [
-            path.resolve(__dirname, '../assets/_new/styles/_styleguide-tokens.scss'),
-            path.resolve(__dirname, '../assets/_new/styles/tokens.scss'),
-          ],
-          injector: 'prepend',
-        },
-      },
-    ],
-    include: path.resolve(__dirname, '../'),
-  })
+  // (Es gibt keine .scss-Dateien mehr — die frühere sass-loader-Regel ist entfallen.
+  //  Stylesheets sind reines CSS und laufen über Storybooks eigenen CSS-Pfad.)
 
   // load svgs with vue-svg-loader instead of file-loader
   const rule = config.module.rules.find(
