@@ -152,7 +152,7 @@ describe('UserAvatarNonAnonymous', () => {
       expect(wrapper.find('.edit-hint').exists()).toBe(true)
     })
 
-    it('does not render the dateTime area when dateTime prop is absent', () => {
+    it('does not render slot content when dateTime prop is absent', () => {
       const wrapper = mountWithSlot(null)
       expect(wrapper.find('.edit-hint').exists()).toBe(false)
     })
