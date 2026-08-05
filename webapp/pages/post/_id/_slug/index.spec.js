@@ -766,25 +766,80 @@ describe('PostSlug', () => {
     })
 
     describe('post edited indicator (dateTime slot)', () => {
-      beforeEach(() => {
-        backendData.post = {
-          ...backendData.post,
-          author: { id: '1stUser', slug: '1st-user' },
-        }
-        stubs['user-avatar'] = { template: '<div><slot name="dateTime" /></div>' }
-      })
+      const basePost = {
+        id: '1',
+        postType: ['Article'],
+        shoutedCount: 0,
+        shoutedByCurrentUser: false,
+        observingUsersCount: 0,
+        isObservedByMe: false,
+        author: { id: '1stUser', slug: '1st-user' },
+        comments: [],
+      }
+
+      const makeWrapper = async (post) => {
+        jest.useFakeTimers()
+        const store = new Vuex.Store({
+          getters: {
+            'auth/user': () => ({ id: '1stUser' }),
+            'auth/isModerator': () => false,
+            'auth/isAdmin': () => false,
+          },
+          actions: {
+            'categories/init': jest.fn(),
+            'pinnedPosts/fetch': jest.fn(),
+          },
+        })
+        const w = mount(PostSlug, {
+          localVue,
+          store,
+          propsData: {},
+          stubs: {
+            'client-only': true,
+            'nuxt-link': true,
+            'router-link': true,
+            HcEditor: { render: () => {} },
+            ContentViewer: true,
+            'user-avatar': {
+              render(h) {
+                return h('div', this.$slots.dateTime)
+              },
+            },
+          },
+          mocks: {
+            $t: jest.fn((t) => t),
+            $can: () => false,
+            $filters: { truncate: (a) => a, removeHtml: (a) => a },
+            $route: { hash: '', params: { slug: 'slug', id: 'id' } },
+            $router: { push: jest.fn() },
+            $toast: { success: jest.fn(), error: jest.fn() },
+            $apollo: {
+              mutate: jest.fn().mockResolvedValue(),
+              query: jest.fn().mockResolvedValue({ data: { PostEmotionsCountByEmotion: {} } }),
+            },
+            $scrollTo: jest.fn(),
+          },
+        })
+        w.setData({ ready: true, post })
+        await Vue.nextTick()
+        return w
+      }
 
       it('shows the edited indicator when createdAt !== updatedAt', async () => {
-        backendData.post.createdAt = '2024-01-01T10:00:00Z'
-        backendData.post.updatedAt = '2024-01-01T11:00:00Z'
-        wrapper = await Wrapper()
+        wrapper = await makeWrapper({
+          ...basePost,
+          createdAt: '2024-01-01T10:00:00Z',
+          updatedAt: '2024-01-01T11:00:00Z',
+        })
         expect(wrapper.text()).toContain('post.edited')
       })
 
       it('does not show the edited indicator when createdAt === updatedAt', async () => {
-        backendData.post.createdAt = '2024-01-01T10:00:00Z'
-        backendData.post.updatedAt = '2024-01-01T10:00:00Z'
-        wrapper = await Wrapper()
+        wrapper = await makeWrapper({
+          ...basePost,
+          createdAt: '2024-01-01T10:00:00Z',
+          updatedAt: '2024-01-01T10:00:00Z',
+        })
         expect(wrapper.text()).not.toContain('post.edited')
       })
     })
