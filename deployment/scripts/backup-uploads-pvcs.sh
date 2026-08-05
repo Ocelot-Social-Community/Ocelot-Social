@@ -99,9 +99,13 @@ for tool in kubectl jq tar gzip sha256sum timeout awk diff; do
   command -v "$tool" >/dev/null 2>&1 || { echo "missing required tool: $tool" >&2; exit 1; }
 done
 
-# kubectl picks the exec transport itself; pinning it is worth a try when one of them misbehaves,
-# because SPDY and WebSockets have independent timeout handling.
-export KUBECTL_REMOTE_COMMAND_WEBSOCKETS="$WEBSOCKETS"
+# Left to kubectl by default, and deliberately so: modern kubectl prefers WebSockets where the API
+# server supports it, which is the transport we want. SPDY multiplexes stdout and stderr onto one
+# connection, which is precisely the failure described at the top of this file — exporting `false`
+# unconditionally would pin every run to it. Only pin when the caller explicitly asks.
+if [ "$WEBSOCKETS" = true ]; then
+  export KUBECTL_REMOTE_COMMAND_WEBSOCKETS=true
+fi
 
 CONTEXT=$(kubectl config current-context)
 echo "cluster context : $CONTEXT"
@@ -285,23 +289,39 @@ while IFS=$'\t' read -r ns pvc pv phase; do
 
   # Size-annotated listing, one `<kib>\t<path>` per line. `du -k` reports allocated blocks, so the
   # sum overshoots for many small files — that errs towards smaller chunks, which is the safe side.
+  #
+  # `-l` is load-bearing, not a tuning knob: without it du counts each inode ONCE, so the second and
+  # every further hard link to a file is omitted from the listing entirely. Those paths would never
+  # reach the plan, never be transferred, and the run would die at the merge check ("holds N of M
+  # files") with nothing pointing at the cause. Counting the payload repeatedly is the harmless
+  # direction — it only makes chunks smaller. Verified on both GNU coreutils and BusyBox.
   listing="$stage/listing.tsv"
   if [ "$files" != "0" ]; then
-    pod_sh "$ns" "$pod" "$container" "cd '$mount' && find . -type f -exec du -k {} +" > "$listing"
+    pod_sh "$ns" "$pod" "$container" "cd '$mount' && find . -type f -exec du -kl {} +" > "$listing"
   else
     : > "$listing"
   fi
 
-  # The chunk plan is only reusable while the volume still looks the way it did when the plan was
-  # made. Any added, removed or grown file invalidates every chunk, because chunk N's contents are
-  # defined by the plan, not by its own name.
+  # A cached chunk is only reusable while a fresh plan would assign it the same contents, because
+  # chunk N is defined by the plan and not by its own name. That depends on the volume (any added,
+  # removed or grown file) AND on the chunk boundaries — so both go into the stamp. Hashing only the
+  # listing would make the advice printed on failure a trap: re-running with a smaller --chunk-kib
+  # would keep the old, too-large chunks and walk into exactly the same timeout.
   listing_sum=$(sha256sum "$listing" | cut -d' ' -f1)
+  plan_stamp="$listing_sum $CHUNK_KIB $CHUNK_FILES"
+  stamp_file="$stage/plan.stamp"
   plan="$stage/plan.tsv"
-  if [ ! -f "$stage/listing.sha256" ] || [ "$(cat "$stage/listing.sha256")" != "$listing_sum" ]; then
-    [ -f "$plan" ] && echo "   volume changed since the last run — discarding cached chunks"
-    rm -rf "$stage/chunks" "$plan"
+  if [ ! -f "$stamp_file" ] || [ "$(cat "$stamp_file")" != "$plan_stamp" ]; then
+    if [ -f "$plan" ]; then
+      if [ -f "$stamp_file" ] && [ "$(cut -d' ' -f1 "$stamp_file")" = "$listing_sum" ]; then
+        echo "   chunk sizing changed since the last run — discarding cached chunks"
+      else
+        echo "   volume changed since the last run — discarding cached chunks"
+      fi
+    fi
+    rm -rf "$stage/chunks" "$plan" "$stage/listing.sha256"
     mkdir -p "$stage/chunks"
-    printf '%s' "$listing_sum" > "$stage/listing.sha256"
+    printf '%s' "$plan_stamp" > "$stamp_file"
   fi
 
   # Everything after the FIRST tab is the path, so paths containing tabs survive the round trip.
