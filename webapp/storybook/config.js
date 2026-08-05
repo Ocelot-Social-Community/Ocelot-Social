@@ -35,8 +35,13 @@ componentFiles.keys().forEach((fileName) => {
   Vue.component(componentName, componentConfig)
 })
 
-// Setup design token addon — the tokens live in plain CSS custom properties now
-const cssReq = require.context('!!raw-loader!~/assets/css', true, /.\.css$/)
+// Setup design token addon — the tokens live in plain CSS custom properties now.
+//
+// Deliberately just the token file, not everything under assets/css/. The addon groups what it reads
+// by `@tokens` annotations, and root-tokens.css is the only file carrying them; main.css, resets.css,
+// tooltip.css and friends are component rules and would arrive as ungrouped noise in the token tab.
+// The dot is escaped, unlike the `/.\.css$/` this replaces, where it matched any character.
+const cssReq = require.context('!!raw-loader!~/assets/css', false, /^\.\/root-tokens\.css$/)
 const cssTokenFiles = cssReq
   .keys()
   .map((filename) => ({ filename, content: cssReq(filename).default }))

@@ -230,10 +230,10 @@
   --input-border-size: var(--border-size-base);
   --input-font-size-base: var(--font-size-base);
   --input-padding-vertical: var(--space-x-small);
-  --input-height: calc(var(--font-size-base) * var(--line-height-base) + (var(--input-padding-vertical) + var(--input-border-size)) * 2);
+  --input-height: calc(var(--input-font-size-base) * var(--line-height-base) + (var(--input-padding-vertical) + var(--input-border-size)) * 2);
   --input-font-size-small: var(--font-size-base);
   --input-padding-vertical-small: var(--space-xxx-small);
-  --input-height-small: calc(var(--font-size-base) * var(--line-height-base) + (var(--input-padding-vertical-small) + var(--input-border-size)) * 2);
+  --input-height-small: calc(var(--input-font-size-small) * var(--line-height-base) + (var(--input-padding-vertical-small) + var(--input-border-size)) * 2);
   --input-font-size-large: var(--font-size-large);
   --input-padding-vertical-large: var(--space-x-small);
   --input-height-large: calc(var(--input-font-size-large) * var(--line-height-base) + (var(--input-padding-vertical-large) + var(--input-border-size)) * 2);
@@ -375,6 +375,10 @@
   --chat-message-color: var(--text-color-base);
   --chat-message-bg-others: var(--color-neutral-80);
   --chat-sidemenu-bg: white;
+  /* The hover partner of --chat-sidemenu-bg. Carried over as a literal because the SCSS side had it
+     as one too ($chat-sidemenu-background-over); it is a token rather than a value inlined in
+     constants/chatTokens.js so a brand can actually reach it, like every other chat token. */
+  --chat-sidemenu-background-over: #f6f6f6;
   --chat-message-timestamp: var(--text-color-soft);
   --chat-icon-add: var(--color-primary);
   --chat-icon-send: var(--color-primary);

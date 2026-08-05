@@ -24,7 +24,7 @@ export default {
   backgroundColorPrimary: 'var(--background-color-primary)',
   colorNeutral30: 'var(--color-neutral-30)',
   chatSidemenuBg: 'var(--chat-sidemenu-bg)',
-  chatSidemenuBackgroundOver: '#f6f6f6',
+  chatSidemenuBackgroundOver: 'var(--chat-sidemenu-background-over)',
   chatSidemenuBackgroundActive: 'var(--chat-sidemenu-background-active)',
   chatMessageColor: 'var(--chat-message-color)',
   chatMessageBgMe: 'var(--chat-message-bg-me)',
