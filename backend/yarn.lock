@@ -9086,7 +9086,7 @@ lru_map@^0.3.3:
   resolved "https://registry.yarnpkg.com/lru_map/-/lru_map-0.3.3.tgz#b5c8351b9464cbd750335a79650a0ec0e56118dd"
   integrity sha512-Pn9cox5CsMYngeDbmChANltQl+5pi6XmTrraMSzhPmMBbmgcxmqWry0U3PGapCU1yB4/LqCcom7qhHZiF/jGfQ==
 
-mailparser@^3.9.6:
+mailparser@3.9.8:
   version "3.9.8"
   resolved "https://registry.yarnpkg.com/mailparser/-/mailparser-3.9.8.tgz#882ebde0f8b2d535dc6f8954b040f011e2a774a4"
   integrity sha512-7jSlFGXiianVnhnb6wdutJFloD34488nrHY7r6FNqwXAhZ7YiJDYrKKTxZJ0oSrXcAPHm8YoYnh97xyGtrBQ3w==
@@ -9740,15 +9740,10 @@ nodemailer@^7.0.12:
   resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-7.0.13.tgz#74acaa55f0c6f9476384c29f27f53e467e8483cd"
   integrity sha512-PNDFSJdP+KFgdsG3ZzMXCgquO7I6McjY2vlqILjtJd0hy8wEvtugS9xKRF2NWlPNGxvLCXlTNIae4serI7dinw==
 
-nodemailer@^8.0.4:
-  version "8.0.6"
-  resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-8.0.6.tgz#543aad27439a2a9a43dfa3434376456b3aa2d1e5"
-  integrity sha512-Nm2XeuDwwy2wi5A+8jPWwQwNzcjNjhWdE3pVLoXEusxJqCnAPAgnBGkSmiLknbnWuOF9qraRpYZjfxqtKZ4tPw==
-
-nodemailer@^9.0.3:
-  version "9.0.3"
-  resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-9.0.3.tgz#ce84f8046977b616847ad56130aa30bdb3c67c1f"
-  integrity sha512-n+YP+NKwR5zRWa60k3GiQ6Q3B4KXCoAw40dAKeCtYn020iNN74aWK2liXIC3ZEATeGql7we3tE3t8QwhY0eskw==
+nodemailer@^9.0.1, nodemailer@^9.0.3:
+  version "9.0.4"
+  resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-9.0.4.tgz#c60694827361820fc9921da6f3346eef75b894cf"
+  integrity sha512-LmJNRVRtfSCULxcZpy0Cpg4WWenlUZ9+zbmTO+S7v9wD6XreYLjXRFtDjtV/4F0HT5p1GyZfA0Ux/myxHb18CQ==
 
 nodemon@~3.1.14:
   version "3.1.14"
@@ -10402,22 +10397,21 @@ pretty-ms@~7.0.1:
   dependencies:
     parse-ms "^2.1.0"
 
-preview-email@^3.0.17, preview-email@^3.1.3:
-  version "3.1.3"
-  resolved "https://registry.yarnpkg.com/preview-email/-/preview-email-3.1.3.tgz#50e7538c1a50c344df5b366803359e1004aa86eb"
-  integrity sha512-M/R82S5iYDpNJIPcrtc3OToNbUATXmuV3b3bEcyOnTFzThjkChJqpoOwlm7AXvpEKZ9OFaglOsl/RxU5cnMC6g==
+preview-email@^3.0.17, preview-email@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/preview-email/-/preview-email-3.3.0.tgz#79e9982c53da1e216d8d31de398587ef44f3dc7f"
+  integrity sha512-9KxwH7IRm1hcn7GU7YNJFTIa/cMUTcphDfQdB1qZRMC5OOmMAb/heTQtztbTLyMGVdfy+I2u0Zznu0gUiwDLww==
   dependencies:
     ci-info "^3.8.0"
     display-notification "^3.0.0"
     fixpack "^4.0.0"
     get-port "5.1.1"
-    mailparser "^3.9.6"
-    nodemailer "^8.0.4"
+    mailparser "3.9.8"
+    nodemailer "^9.0.1"
     open "7"
     p-event "4.2.0"
     p-wait-for "3.2.0"
     pug "^3.0.3"
-    uuid "^9.0.1"
 
 proc-log@^6.0.0:
   version "6.1.0"
@@ -12197,7 +12191,7 @@ uuid@^3.1.0, uuid@^3.4.0:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
   integrity sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==
 
-uuid@^9.0.0, uuid@^9.0.1, uuid@~9.0.1:
+uuid@^9.0.0, uuid@~9.0.1:
   version "9.0.1"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-9.0.1.tgz#e188d4c8853cc722220392c424cd637f32293f30"
   integrity sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==
