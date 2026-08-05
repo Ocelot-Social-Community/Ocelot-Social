@@ -92,19 +92,19 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 nav.locale-menu-popover {
-  margin-left: -$space-small !important;
-  margin-right: -$space-small !important;
+  margin-left: calc(-1 * var(--space-small)) !important;
+  margin-right: calc(-1 * var(--space-small)) !important;
 
   a {
-    padding: $space-x-small $space-small;
-    padding-right: $space-base;
+    padding: var(--space-x-small) var(--space-small);
+    padding-right: var(--space-base);
   }
 }
 
 .locale-flag {
-  margin-right: $space-xx-small;
+  margin-right: var(--space-xx-small);
   font-size: 1.2em;
   line-height: 1;
 }

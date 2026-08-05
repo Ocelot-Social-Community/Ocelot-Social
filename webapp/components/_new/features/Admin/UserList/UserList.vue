@@ -520,9 +520,9 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .admin-users > .os-card:first-child {
-  margin-bottom: $space-small;
+  margin-bottom: var(--space-small);
 }
 .user-role-select {
   font-size: 0.85em;

@@ -35,7 +35,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .room-title-link {
   color: inherit;
   text-decoration: none;
@@ -50,7 +50,7 @@ export default {
 
   &:hover,
   &:focus-visible {
-    color: $color-primary;
+    color: var(--color-primary);
   }
 }
 

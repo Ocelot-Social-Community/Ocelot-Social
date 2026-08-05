@@ -53,7 +53,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .location-teaser {
   display: flex;
   align-items: center;

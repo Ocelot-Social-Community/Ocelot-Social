@@ -28,7 +28,7 @@ import { OsMenu } from '@ocelot-social/ui'
 
 // Responsive navigation for the permission-gated areas (settings, admin, moderation):
 // an OsMenu sidebar on wide viewports that collapses into a native <select> below
-// $media-query-small, so the menu never eats vertical space on narrow screens.
+// 600px, so the menu never eats vertical space on narrow screens.
 // `routes` is the already-filtered list ([{ name, path }]); `matcher`/`isExact` are
 // passed straight through to OsMenu (left undefined to inherit OsMenu's own defaults).
 export default {
@@ -69,7 +69,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .area-menu {
   width: 100%;
 }
@@ -81,26 +81,26 @@ export default {
 .area-menu__select {
   display: block;
   width: 100%;
-  margin-bottom: $space-small;
-  padding: $space-x-small $space-large $space-x-small $space-small;
-  font-size: $font-size-base;
-  border: 1px solid $color-neutral-80;
-  border-radius: $border-radius-base;
+  margin-bottom: var(--space-small);
+  padding: var(--space-x-small) var(--space-large) var(--space-x-small) var(--space-small);
+  font-size: var(--font-size-base);
+  border: 1px solid var(--color-neutral-80);
+  border-radius: var(--border-radius-base);
   background-color: white;
-  color: $text-color-base;
+  color: var(--text-color-base);
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%234b4554' d='M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right $space-small center;
+  background-position: right var(--space-small) center;
   cursor: pointer;
 
   &:focus {
-    outline: 1px dashed $color-primary;
+    outline: 1px dashed var(--color-primary);
     outline-offset: -1px;
   }
 }
 
-@media #{$media-query-small} {
+@media (min-width: 600px) {
   .area-menu {
     flex: 0 0 200px;
     width: 200px;

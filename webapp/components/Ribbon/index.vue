@@ -20,39 +20,41 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 .ribbon {
-  padding: $size-ribbon $size-ribbon;
-  border-radius: $border-radius-small 0 0 $border-radius-small;
-  color: $color-neutral-100;
-  background-color: $color-ribbon-article;
-  font-size: $font-size-x-small;
-  font-weight: $font-weight-bold;
+  padding: var(--size-ribbon) var(--size-ribbon);
+  border-radius: var(--border-radius-small) 0 0 var(--border-radius-small);
+  color: var(--color-neutral-100);
+  background-color: var(--color-ribbon-article);
+  font-size: var(--font-size-x-small);
+  font-weight: var(--text-weight-bold);
 
   &::before {
     content: ' ';
     position: absolute;
     right: 0;
-    bottom: -$size-ribbon;
-    border-width: $border-size-large 4px $border-size-large $border-size-large;
+    bottom: calc(-1 * var(--size-ribbon));
+    border-width: var(--border-size-large) 4px var(--border-size-large) var(--border-size-large);
     border-style: solid;
-    border-color: $color-ribbon-article-shadow transparent transparent $color-ribbon-article-shadow;
+    border-color: var(--color-ribbon-article-shadow) transparent transparent
+      var(--color-ribbon-article-shadow);
   }
 
   &.--pinned {
-    background-color: $color-ribbon-announcement;
+    background-color: var(--color-ribbon-announcement);
 
     &::before {
-      border-color: $color-ribbon-announcement-shadow transparent transparent
-        $color-ribbon-announcement-shadow;
+      border-color: var(--color-ribbon-announcement-shadow) transparent transparent
+        var(--color-ribbon-announcement-shadow);
     }
   }
 }
 .eventBg {
-  background-color: $color-ribbon-event;
+  background-color: var(--color-ribbon-event);
 
   &::before {
-    border-color: $color-ribbon-event-shadow transparent transparent $color-ribbon-event-shadow;
+    border-color: var(--color-ribbon-event-shadow) transparent transparent
+      var(--color-ribbon-event-shadow);
   }
 }
 </style>

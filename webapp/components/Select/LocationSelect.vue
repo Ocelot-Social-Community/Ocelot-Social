@@ -259,7 +259,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 ::v-deep .ocelot-select-icon-right {
   right: 4px;
 }

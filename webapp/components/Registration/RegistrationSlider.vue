@@ -259,7 +259,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .registration-slider {
   width: 80vw;
   max-width: 620px;
