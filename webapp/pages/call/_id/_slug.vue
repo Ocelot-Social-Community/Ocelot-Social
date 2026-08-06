@@ -110,10 +110,10 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .call-page {
-  // The video overlay covers this page entirely — the host page is just
-  // here so the call has its own URL.
+  /*  The video overlay covers this page entirely — the host page is just */
+  /*  here so the call has its own URL. */
   position: absolute;
   inset: 0;
 }

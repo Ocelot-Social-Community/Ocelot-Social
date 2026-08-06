@@ -451,134 +451,146 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .title {
-  margin-bottom: $space-xx-small;
+  margin-bottom: var(--space-xx-small);
 }
 .description {
   margin-bottom: 0;
-  color: $text-color-soft;
+  color: var(--text-color-soft);
 }
 .last-changed {
-  margin: $space-xxx-small 0 0;
-  color: $text-color-soft;
+  margin: var(--space-xxx-small) 0 0;
+  color: var(--text-color-soft);
   font-size: 0.85em;
   font-style: italic;
 }
-// Consistent gap before the first heading, whether or not the "last changed"
-// line is present.
+/*  Consistent gap before the first heading, whether or not the "last changed" */
+/*  line is present. */
 form {
-  margin-top: $space-base;
+  margin-top: var(--space-base);
 }
 .policy-group {
   border: none;
   padding: 0;
-  margin: 0 0 $space-small 0;
+  margin: 0 0 var(--space-small) 0;
 
-  // Set the heading off with an underline only as wide as the text itself.
-  &__title {
-    padding: 0 0 $space-xxx-small 0;
-    margin-bottom: $space-xx-small;
-    border-bottom: 1px solid $border-color-softer;
-    color: $text-color-soft;
-    font-weight: bold;
-    font-size: 0.9em;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
-  }
+  /*  Set the heading off with an underline only as wide as the text itself. */
 }
-// Outer spacing for the shared conflict banner (its appearance lives in ConflictBanner.vue).
+
+.policy-group__title {
+  padding: 0 0 var(--space-xxx-small) 0;
+  margin-bottom: var(--space-xx-small);
+  border-bottom: 1px solid var(--border-color-softer);
+  color: var(--text-color-soft);
+  font-weight: bold;
+  font-size: 0.9em;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+/*  Outer spacing for the shared conflict banner (its appearance lives in ConflictBanner.vue). */
 .policy-conflict {
-  margin-top: $space-small;
+  margin-top: var(--space-small);
 }
 .policy-row {
   display: flex;
   align-items: flex-start;
-  gap: $space-x-small;
-  margin: $space-xx-small 0;
+  gap: var(--space-x-small);
+  margin: var(--space-xx-small) 0;
   line-height: 1.3;
   border-left: 3px solid transparent;
-  padding-left: $space-xx-small;
-  // Keep the row clear of the sticky header when navigated to via #key from the config tab.
-  scroll-margin-top: $space-base;
-  // Animate the deep-link highlight fading back out (applyHashHighlight clears the key
-  // after a moment). Only when the user hasn't asked for reduced motion.
+  padding-left: var(--space-xx-small);
+  /*  Keep the row clear of the sticky header when navigated to via #key from the config tab. */
+  scroll-margin-top: var(--space-base);
+  /*  Animate the deep-link highlight fading back out (applyHashHighlight clears the key */
+  /*  after a moment). Only when the user hasn't asked for reduced motion. */
   @media (prefers-reduced-motion: no-preference) {
     transition:
       background-color 0.6s ease,
       border-left-color 0.6s ease;
   }
 
-  // Navigated to from the config tab (/admin/policy#<key>) → highlight the target row so
-  // the admin sees which policy the config link pointed at. The class is driven from the
-  // route hash (see applyHashHighlight) because history-mode pushState navigations don't
-  // update :target; the :target rule stays as a fallback for a real full-page load/reload.
-  &--highlight,
-  &:target {
-    border-left-color: $color-secondary;
-    // $color-secondary is a runtime var() now; use color-mix instead of Sass rgba() for the tint.
-    background: color-mix(in srgb, var(--color-secondary) 10%, transparent);
-  }
+  /*  Navigated to from the config tab (/admin/policy#<key>) → highlight the target row so */
+  /*  the admin sees which policy the config link pointed at. The class is driven from the */
+  /*  route hash (see applyHashHighlight) because history-mode pushState navigations don't */
+  /*  update :target; the :target rule stays as a fallback for a real full-page load/reload. */
 
-  // This field was edited locally AND changed on the server → highlight it.
-  &--conflict {
-    border-left-color: $color-warning;
-    background: color-mix(in srgb, var(--color-warning) 10%, transparent);
-  }
+  /*  This field was edited locally AND changed on the server → highlight it. */
 
-  &__checkbox {
-    margin-top: 0.15em;
-    flex-shrink: 0;
-  }
-  &__number {
-    width: 4.5em;
-    margin-top: -0.1em;
-    flex-shrink: 0;
-  }
-  &__label {
-    display: flex;
-    flex-direction: column;
-    cursor: pointer;
-  }
-  &__name {
-    font-weight: 600;
-  }
-  &__current {
-    margin-left: $space-xx-small;
-    color: $text-color-soft;
-    font-family: monospace;
-    font-size: 0.8em;
-    font-weight: normal;
-  }
-  &__description {
-    color: $text-color-soft;
-    font-size: 0.85em;
-    line-height: 1.25;
-  }
-  &__conflict {
-    margin-top: 0.15em;
-    color: $color-warning-active;
-    font-size: 0.8em;
-    font-weight: 600;
-  }
-  &__env {
-    color: $color-danger;
-    font-size: 0.85em;
-    line-height: 1.25;
-  }
-  &__env-link {
-    white-space: nowrap;
-  }
+  /*  Hard env requirement unmet: the stored flag has no effect, so dim the row and */
+  /*  disable its input (the env note + config link explain why). */
+}
 
-  // Hard env requirement unmet: the stored flag has no effect, so dim the row and
-  // disable its input (the env note + config link explain why).
-  &--unavailable {
-    opacity: 0.6;
-  }
+.policy-row--highlight,
+.policy-row:target {
+  border-left-color: var(--color-secondary);
+  /*  var(--color-secondary) is a runtime var() now; use color-mix instead of Sass rgba() for the tint. */
+  background: color-mix(in srgb, var(--color-secondary) 10%, transparent);
+}
+
+.policy-row--conflict {
+  border-left-color: var(--color-warning);
+  background: color-mix(in srgb, var(--color-warning) 10%, transparent);
+}
+
+.policy-row__checkbox {
+  margin-top: 0.15em;
+  flex-shrink: 0;
+}
+
+.policy-row__number {
+  width: 4.5em;
+  margin-top: -0.1em;
+  flex-shrink: 0;
+}
+
+.policy-row__label {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.policy-row__name {
+  font-weight: 600;
+}
+
+.policy-row__current {
+  margin-left: var(--space-xx-small);
+  color: var(--text-color-soft);
+  font-family: monospace;
+  font-size: 0.8em;
+  font-weight: normal;
+}
+
+.policy-row__description {
+  color: var(--text-color-soft);
+  font-size: 0.85em;
+  line-height: 1.25;
+}
+
+.policy-row__conflict {
+  margin-top: 0.15em;
+  color: var(--color-warning-highlight);
+  font-size: 0.8em;
+  font-weight: 600;
+}
+
+.policy-row__env {
+  color: var(--color-danger);
+  font-size: 0.85em;
+  line-height: 1.25;
+}
+
+.policy-row__env-link {
+  white-space: nowrap;
+}
+
+.policy-row--unavailable {
+  opacity: 0.6;
 }
 .actions {
-  margin-top: $space-small;
+  margin-top: var(--space-small);
   display: flex;
-  gap: $space-small;
+  gap: var(--space-small);
 }
 </style>

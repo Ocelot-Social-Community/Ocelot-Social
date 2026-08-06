@@ -728,9 +728,9 @@ export default {
 </script>
 <!-- eslint-enable vue/no-reserved-component-names -->
 
-<style lang="scss">
-// description: https: //github.com/geospoc/v-mapbox/tree/v1.11.2/docs
-//   code example: https: //codesandbox.io/embed/v-mapbox-map-demo-k1l1n?autoresize=1&fontsize=14&hidenavigation=1&theme=dark
+<style>
+/*  description: https: //github.com/geospoc/v-mapbox/tree/v1.11.2/docs */
+/*    code example: https: //codesandbox.io/embed/v-mapbox-map-demo-k1l1n?autoresize=1&fontsize=14&hidenavigation=1&theme=dark */
 @import 'mapbox-gl/dist/mapbox-gl.css';
 @import 'v-mapbox/dist/v-mapbox.css';
 
@@ -744,8 +744,8 @@ export default {
   flex-direction: column;
   overflow: hidden;
   z-index: 1;
-  font-family: $font-family-text;
-  font-size: $font-size-base;
+  font-family: var(--font-family-text);
+  font-size: var(--font-size-base);
 }
 
 .mgl-map-wrapper {
@@ -772,7 +772,7 @@ export default {
   max-height: 40vh;
   overflow: hidden;
   padding: 10px;
-  border-radius: $border-radius-x-large;
+  border-radius: var(--border-radius-x-large);
 }
 
 .map-popup-container {
@@ -783,14 +783,14 @@ export default {
 }
 
 .mapboxgl-popup-close-button {
-  font-size: $font-size-large;
+  font-size: var(--font-size-large);
   padding: 2px 6px;
   z-index: 1;
 }
 
 .map-popup-header {
   font-weight: bold;
-  font-size: $font-size-large;
+  font-size: var(--font-size-large);
   margin-bottom: 4px;
   padding-right: 16px;
   flex-shrink: 0;
@@ -802,7 +802,7 @@ export default {
   min-height: 0;
 }
 
-// Smaller geocoder on mobile (expanded)
+/*  Smaller geocoder on mobile (expanded) */
 @media (max-width: 810px) {
   .mapboxgl-ctrl-geocoder {
     font-size: 13px;
@@ -840,7 +840,7 @@ export default {
     height: 29px;
     min-width: 29px;
     background-color: white;
-    border-radius: $border-radius-x-large;
+    border-radius: var(--border-radius-x-large);
     box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 
@@ -868,10 +868,10 @@ export default {
   left: 10px;
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(4px);
-  border-radius: $border-radius-x-large;
+  border-radius: var(--border-radius-x-large);
   z-index: 1;
-  font-size: $font-size-base;
-  color: $color-neutral-10;
+  font-size: var(--font-size-base);
+  color: var(--color-neutral-10);
 }
 
 .map-legend-toggle {
@@ -880,10 +880,10 @@ export default {
   padding: 4px 8px;
   border: none;
   background: rgba(0, 0, 0, 0.05);
-  color: $color-neutral-10;
-  border-radius: $border-radius-x-large;
+  color: var(--color-neutral-10);
+  border-radius: var(--border-radius-x-large);
   cursor: pointer;
-  font-size: $font-size-base;
+  font-size: var(--font-size-base);
   text-align: left;
   order: 1;
   align-items: center;
@@ -896,7 +896,7 @@ export default {
 }
 
 .map-legend-arrow {
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
   line-height: 1;
 }
 
@@ -944,7 +944,7 @@ export default {
 .map-style-switcher {
   position: relative;
   background: white;
-  border-radius: $border-radius-x-large;
+  border-radius: var(--border-radius-x-large);
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
 }
 
@@ -972,14 +972,14 @@ export default {
   right: 100%;
   margin-right: 6px;
   background: white;
-  border-radius: $border-radius-x-large;
+  border-radius: var(--border-radius-x-large);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
   white-space: nowrap;
   overflow: hidden;
+}
 
-  &--open {
-    display: block;
-  }
+.map-style-popover--open {
+  display: block;
 }
 
 .map-style-popover-btn {
@@ -989,7 +989,7 @@ export default {
   border: none;
   background: none;
   cursor: pointer;
-  font-size: $font-size-base;
+  font-size: var(--font-size-base);
   text-align: left;
 
   &:not(:last-child) {
@@ -999,10 +999,10 @@ export default {
   &:hover {
     background: rgba(0, 0, 0, 0.05);
   }
+}
 
-  &--active {
-    font-weight: bold;
-    background: rgba(0, 0, 0, 0.08);
-  }
+.map-style-popover-btn--active {
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.08);
 }
 </style>

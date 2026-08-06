@@ -16,7 +16,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .layout-blank > .ds-container > div {
   padding: 5rem 2rem;
 }

@@ -145,11 +145,11 @@ export default {
 }
 </script>
 
-<style lang="scss">
-// AreaMenu owns its own responsive width (full-width select on narrow viewports,
-// 200px sidebar from $media-query-small up). min-width: 0 lets the main column shrink
-// below its content's intrinsic width (e.g. the wide users table), so it stays beside
-// the menu instead of wrapping to a second row under it; the content can then scroll/wrap.
+<style>
+/*  AreaMenu owns its own responsive width (full-width select on narrow viewports, */
+/*  200px sidebar from 600px up). min-width: 0 lets the main column shrink */
+/*  below its content's intrinsic width (e.g. the wide users table), so it stays beside */
+/*  the menu instead of wrapping to a second row under it; the content can then scroll/wrap. */
 .admin-layout__main {
   flex: 1 1 0;
   min-width: 0;

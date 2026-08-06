@@ -84,13 +84,13 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .group-create-layout__main,
 .group-create-layout__aside {
   flex: 0 0 100%;
   width: 100%;
 }
-@media #{$media-query-medium} {
+@media (min-width: 768px) {
   .group-create-layout__main {
     flex: 5 0 0;
   }

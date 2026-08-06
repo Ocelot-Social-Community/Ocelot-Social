@@ -51,7 +51,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .back-link {
   height: 35px;
 }

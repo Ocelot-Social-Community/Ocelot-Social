@@ -99,16 +99,16 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 .settings-header {
-  margin-top: $space-base;
-  margin-bottom: $space-x-small;
+  margin-top: var(--space-base);
+  margin-bottom: var(--space-x-small);
 }
 
 .settings-layout {
   display: flex;
   flex-direction: column;
-  gap: $space-xx-small;
+  gap: var(--space-xx-small);
 }
 
 .settings-content {
@@ -116,18 +116,18 @@ export default {
   min-width: 0;
 }
 
-@media #{$media-query-small} {
+@media (min-width: 600px) {
   .settings-header {
-    margin-bottom: $space-small;
+    margin-bottom: var(--space-small);
   }
 
   .settings-layout {
     flex-direction: row;
-    gap: $space-small;
+    gap: var(--space-small);
   }
 
   .settings-content {
-    padding: 0 $space-base;
+    padding: 0 var(--space-base);
   }
 }
 </style>
