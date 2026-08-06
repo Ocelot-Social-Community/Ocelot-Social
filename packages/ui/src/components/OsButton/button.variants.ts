@@ -38,7 +38,8 @@ export const buttonVariants = cva(
       appearance: {
         filled: [
           'shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]',
-          // Disabled: gray background with white text (matches buttonStates mixin)
+          // Disabled: gray background with white text, as the webapp's retired
+          // buttonStates SCSS mixin rendered it
           // Keep inset shadow to prevent layout shift
           'disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)]',
           'disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent]',

@@ -17,9 +17,6 @@ const ogLocaleAlternates = locales
   .filter((l) => l.enabled && l.code !== CONFIG.LANGUAGE_DEFAULT)
   .map((l) => l.iso.replace('-', '_'))
 
-// Design tokens (SCSS variables) — originally from styleguide, now local
-const designTokenStyles = ['~assets/_new/styles/_styleguide-tokens.scss']
-
 export default {
   buildDir: CONFIG.NUXT_BUILD,
   mode: 'universal',
@@ -134,13 +131,14 @@ export default {
    ** Global CSS
    */
   css: [
-    '~assets/_new/styles/resets.scss',
-    '~assets/styles/main.scss',
-    '~assets/styles/imports/_branding.scss',
+    // Design token defaults (:root custom properties) — must load once, globally
+    '~assets/css/root-tokens.css',
+    '~assets/css/resets.css',
+    '~assets/css/main.css',
     // @ocelot-social/ui CSS variables
-    '~assets/_new/styles/ocelot-ui-variables.scss',
+    '~assets/css/ocelot-ui-variables.css',
     // Utility classes replacing ds-* Vue components
-    '~assets/_new/styles/_ds-compat.scss',
+    '~assets/css/ds-compat.css',
     // UI library component styles (Tailwind utilities + OsMenu CSS)
     '../packages/ui/dist/style.css',
     // Ocelot composite component styles (ActionButton, LabeledButton)
@@ -149,11 +147,16 @@ export default {
 
   /*
    ** Global processed styles
+   **
+   ** TRANSITIONAL. The `:root` custom properties above are the real source of design tokens now.
+   ** These SCSS resources only stay alive so that components not yet converted to plain CSS keep
+   ** resolving their `$token` references; both define the same values. Removed, together with
+   ** sass itself, once the last `lang="scss"` block is gone.
    */
   styleResources: {
     scss: [
       '~assets/_new/styles/uses.scss',
-      ...designTokenStyles,
+      '~assets/_new/styles/_styleguide-tokens.scss',
       '~assets/_new/styles/tokens.scss',
       '~assets/styles/imports/_branding.scss',
       '~assets/_new/styles/export.scss',
@@ -252,6 +255,7 @@ export default {
     // built, which needs it to resolve the auth cookie (plugins/apollo-config.js getAuth).
     'cookie-universal-nuxt',
     '@nuxtjs/axios',
+    // transitional, see styleResources above
     '@nuxtjs/style-resources',
     '@nuxtjs/sentry',
     '@nuxtjs/pwa',

@@ -1,0 +1,32 @@
+.iziToast-target, .iziToast {
+  &,
+  &:after,
+  &.iziToast-color-dark:after {
+    box-shadow: none !important;
+  }
+}
+
+.iziToast .iziToast-message {
+  font-weight: 400 !important;
+}
+
+.iziToast.iziToast-color-red {
+  background: var(--color-toast-red) !important;
+  border-color: var(--color-toast-red) !important;
+}
+.iziToast.iziToast-color-orange {
+  background: var(--color-toast-orange) !important;
+  border-color: var(--color-toast-orange) !important;
+}
+.iziToast.iziToast-color-yellow {
+  background: var(--color-toast-yellow)  !important;
+  border-color: var(--color-toast-yellow)  !important;
+}
+.iziToast.iziToast-color-blue {
+  background: var(--color-toast-blue) !important;
+  border-color: var(--color-toast-blue) !important;
+}
+.iziToast.iziToast-color-green {
+  background: var(--color-toast-green) !important;
+  border-color: var(--color-toast-green) !important;
+}
