@@ -57,7 +57,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .join-leave-button {
   width: auto;
   margin: auto !important;

@@ -57,8 +57,8 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .hc-empty-icon {
-  padding-bottom: $font-space-large;
+  padding-bottom: var(--font-space-large);
 }
 </style>

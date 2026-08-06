@@ -251,7 +251,7 @@ import ImageUploader from '~/components/Uploader/ImageUploader'
 import links from '~/constants/links.js'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 import DatePicker from 'vue2-datepicker'
-import 'vue2-datepicker/scss/index.scss'
+import 'vue2-datepicker/index.css'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
@@ -648,13 +648,13 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .eventData {
   .event-date-hints-zone {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: $space-small;
-    margin-bottom: $space-x-small;
+    gap: var(--space-small);
+    margin-bottom: var(--space-x-small);
   }
 
   .chipbox {
@@ -669,11 +669,11 @@ export default {
   .event-location-grid {
     grid-template-columns: repeat(2, 1fr);
     grid-auto-rows: auto;
-    gap: $space-small;
+    gap: var(--space-small);
   }
 
   .event-online-checkbox {
-    margin-top: $space-x-small;
+    margin-top: var(--space-x-small);
   }
 
   .event-grid-item {
@@ -697,7 +697,7 @@ export default {
 
   > .os-card__hero-image {
     position: relative;
-    max-height: $size-image-max-height;
+    max-height: var(--size-image-max-height);
     overflow: hidden;
 
     > .image {
@@ -707,7 +707,7 @@ export default {
   }
 
   .image.--blur-image {
-    filter: blur($blur-radius);
+    filter: blur(var(--blur-radius));
   }
 
   > .os-card__content {
@@ -720,13 +720,13 @@ export default {
 
     > .os-badge {
       align-self: flex-end;
-      margin: $space-xx-small 0 $space-base;
+      margin: var(--space-xx-small) 0 var(--space-base);
       cursor: default;
     }
 
     > .os-validation-hint {
       align-self: flex-end;
-      margin-bottom: $space-base;
+      margin-bottom: var(--space-base);
       cursor: default;
     }
 
@@ -738,7 +738,7 @@ export default {
       justify-content: flex-end;
       align-self: flex-end;
       width: 100%;
-      margin-top: $space-base;
+      margin-top: var(--space-base);
 
       > .action-buttons-group {
         margin-left: auto;
@@ -753,7 +753,7 @@ export default {
 
       > .buttons-footer-helper {
         margin-right: 16px;
-        // important needed because of component inline style
+        /*  important needed because of component inline style */
         margin-bottom: 6px !important;
       }
     }
@@ -761,7 +761,7 @@ export default {
 
   .blur-toggle {
     text-align: right;
-    margin-bottom: $space-base;
+    margin-bottom: var(--space-base);
 
     > .link {
       display: block;
@@ -800,19 +800,19 @@ export default {
     font-size: 1rem;
     height: calc(1.625rem + 18px);
     padding: 8px 8px;
-    background-color: $background-color-soft;
-    border-color: $border-color-softer;
-    color: $text-color-base;
+    background-color: var(--background-color-soft);
+    border-color: var(--border-color-softer);
+    color: var(--text-color-base);
   }
   .mx-datepicker input:hover {
-    border-color: $border-color-softer;
+    border-color: var(--border-color-softer);
   }
   .mx-datepicker input:focus {
-    border-color: $border-color-active;
-    background-color: $background-color-base;
+    border-color: var(--border-color-active);
+    background-color: var(--background-color-base);
   }
   .mx-datepicker-error input {
-    border-color: $color-danger;
+    border-color: var(--color-danger);
   }
 }
 </style>

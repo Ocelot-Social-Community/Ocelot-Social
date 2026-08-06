@@ -32,48 +32,48 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .filter-menu-section {
   display: flex;
   flex-wrap: wrap;
-  margin-top: $space-small;
+  margin-top: var(--space-small);
 
   > .title {
     width: 100%;
-    margin-bottom: $space-small;
-    font-size: $font-size-base;
+    margin-bottom: var(--space-small);
+    font-size: var(--font-size-base);
   }
 
-  // > .sidebar {
-  //   display: flex;
-  //   flex-wrap: wrap;
-  //   flex-basis: 80%;
-  //   flex-grow: 1;
-  //   max-width: $size-width-filter-sidebar;
-  // }
+  /*  > .sidebar { */
+  /*    display: flex; */
+  /*    flex-wrap: wrap; */
+  /*    flex-basis: 80%; */
+  /*    flex-grow: 1; */
+  /*    max-width: var(--size-width-filter-sidebar); */
+  /*  } */
 
-  // > .divider {
-  //   // border-left: $border-size-base solid $border-color-soft;
-  //   margin: $space-small;
-  //   margin-left: 0;
-  //   border-top: $border-size-base solid $border-color-soft;
-  // }
+  /*  > .divider { */
+  /*    // border-left: var(--border-size-base) solid var(--border-color-soft); */
+  /*    margin: var(--space-small); */
+  /*    margin-left: 0; */
+  /*    border-top: var(--border-size-base) solid var(--border-color-soft); */
+  /*  } */
 
   > .filter-list {
     display: flex;
     flex-wrap: wrap;
     flex-basis: 100%;
     flex-grow: 1;
-    padding-left: $space-base;
+    padding-left: var(--space-base);
 
     > .item {
-      // width: 30%;
-      padding: 0 $space-xx-small;
-      margin-bottom: $space-small;
+      /*  width: 30%; */
+      padding: 0 var(--space-xx-small);
+      margin-bottom: var(--space-small);
       text-align: center;
 
       @media only screen and (min-width: 800px) {
-        // width: 15%;
+        /*  width: 15%; */
       }
     }
   }
@@ -81,14 +81,14 @@ export default {
   @media only screen and (max-width: 630px) {
     flex-direction: column;
 
-    // > .sidebar {
-    //   max-width: none;
-    // }
+    /*  > .sidebar { */
+    /*    max-width: none; */
+    /*  } */
 
-    // > .divider {
-    //   border-top: $border-size-base solid $border-color-soft;
-    //   margin: $space-small;
-    // }
+    /*  > .divider { */
+    /*    border-top: var(--border-size-base) solid var(--border-color-soft); */
+    /*    margin: var(--space-small); */
+    /*  } */
   }
 }
 </style>

@@ -49,19 +49,19 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .donation-info {
   display: flex;
   flex: 1;
-  margin-bottom: $space-x-small;
+  margin-bottom: var(--space-x-small);
   margin-top: 16px;
   cursor: pointer;
-  color: $text-color-base;
+  color: var(--text-color-base);
   text-decoration: none !important;
 
   &:hover {
     text-decoration: none !important;
-    color: $text-color-base !important;
+    color: var(--text-color-base) !important;
   }
 
   .os-button {

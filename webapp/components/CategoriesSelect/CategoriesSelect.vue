@@ -85,14 +85,14 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .categories-select {
   display: flex;
   flex-wrap: wrap;
 
   > button {
-    margin-right: $space-xx-small;
-    margin-bottom: $space-xx-small;
+    margin-right: var(--space-xx-small);
+    margin-bottom: var(--space-xx-small);
   }
 }
 </style>

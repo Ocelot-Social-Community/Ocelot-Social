@@ -307,12 +307,12 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .editor p.is-empty:first-child::before {
   content: attr(data-empty-text);
   float: left;
-  color: $text-color-disabled;
-  padding-left: $space-xx-small;
+  color: var(--text-color-disabled);
+  padding-left: var(--space-xx-small);
   pointer-events: none;
   height: 0;
 }
@@ -322,8 +322,8 @@ export default {
 }
 
 li > p {
-  margin-top: $space-xx-small;
-  margin-bottom: $space-xx-small;
+  margin-top: var(--space-xx-small);
+  margin-bottom: var(--space-xx-small);
 }
 
 .editor {
@@ -331,24 +331,24 @@ li > p {
   flex-direction: column;
 
   .hashtag {
-    color: $color-primary;
+    color: var(--color-primary);
   }
   .hashtag-suggestion {
-    color: $color-primary;
+    color: var(--color-primary);
   }
   .mention-suggestion {
-    color: $color-primary;
+    color: var(--color-primary);
   }
 }
 
 .editor-content {
   flex-grow: 1;
-  margin-top: $space-small;
+  margin-top: var(--space-small);
   height: auto;
 
   &:focus-within {
-    border-color: $color-primary;
-    background-color: $color-neutral-100;
+    border-color: var(--color-primary);
+    background-color: var(--color-neutral-100);
   }
 }
 
@@ -360,46 +360,46 @@ li > p {
   }
 
   p {
-    margin: 0 0 $space-x-small;
+    margin: 0 0 var(--space-x-small);
   }
 
   ul {
-    padding-left: $space-x-large;
+    padding-left: var(--space-x-large);
 
     li {
       display: block;
-      text-indent: -$space-large;
+      text-indent: calc(-1 * var(--space-large));
 
       p:first-child:before {
         content: '•';
-        padding: $space-none $space-x-small;
-        margin-right: $space-x-small;
+        padding: var(--space-none) var(--space-x-small);
+        margin-right: var(--space-x-small);
       }
 
       p:not(:first-child) {
-        padding-left: $space-base;
+        padding-left: var(--space-base);
       }
     }
   }
 
   ol {
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Lists_and_Counters/Using_CSS_counters
+    /*  https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Lists_and_Counters/Using_CSS_counters */
     counter-reset: item;
-    padding-left: $space-x-large + 4px;
+    padding-left: calc(var(--space-x-large) + 4px);
 
     li {
       display: block;
-      text-indent: -$space-large - 4px;
+      text-indent: calc(-1 * var(--space-large) - 4px);
 
       p:first-child:before {
         content: counters(item, '.') '.';
         counter-increment: item;
-        padding: $space-none $space-x-small;
-        margin-right: $space-x-small;
+        padding: var(--space-none) var(--space-x-small);
+        margin-right: var(--space-x-small);
       }
 
       p:not(:first-child) {
-        padding-left: $space-base;
+        padding-left: var(--space-base);
       }
     }
   }

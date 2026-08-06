@@ -19,12 +19,12 @@ export default {
   },
 }
 </script>
-<style lang="scss" scoped>
+<style scoped>
 .group-list__item {
   flex: 0 0 98%;
   width: 98%;
 }
-@media #{$media-query-medium} {
+@media (min-width: 768px) {
   .group-list__item {
     flex: 0 0 48%;
     width: 48%;

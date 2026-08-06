@@ -171,35 +171,35 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .report-row {
   &:nth-child(2n + 1) {
-    background-color: $color-neutral-95;
+    background-color: var(--color-neutral-95);
   }
 
   .title {
-    font-weight: $font-weight-bold;
+    font-weight: var(--text-weight-bold);
   }
 
   .status-line {
     display: inline-flex;
 
     > .os-icon {
-      margin-right: $space-xx-small;
+      margin-right: var(--space-xx-small);
     }
   }
 
   .user-count {
     display: block;
-    margin-bottom: $space-xx-small;
+    margin-bottom: var(--space-xx-small);
   }
 
   .--disabled {
-    color: $color-danger;
+    color: var(--color-danger);
   }
 
   .--enabled {
-    color: $color-success;
+    color: var(--color-success);
   }
 }
 </style>

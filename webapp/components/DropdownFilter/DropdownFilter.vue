@@ -56,17 +56,17 @@ export default {
   },
 }
 </script>
-<style lang="scss">
+<style>
 .dropdown-filter {
   user-select: none;
   display: flex;
   align-items: center;
   height: 100%;
-  padding: $space-xx-small;
-  color: $text-color-soft;
+  padding: var(--space-xx-small);
+  color: var(--text-color-soft);
 
   > .label {
-    margin: 0 $space-xx-small;
+    margin: 0 var(--space-xx-small);
   }
 }
 
@@ -75,14 +75,14 @@ export default {
   display: flex;
   align-items: center;
   height: 100%;
-  padding: $space-xx-small;
-  color: $text-color-soft;
+  padding: var(--space-xx-small);
+  color: var(--text-color-soft);
 }
 
 .dropdown-menu-popover {
   a {
-    padding: $space-x-small $space-small;
-    padding-right: $space-base;
+    padding: var(--space-x-small) var(--space-small);
+    padding-right: var(--space-base);
   }
 }
 </style>

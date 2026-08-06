@@ -178,44 +178,44 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .embed-component {
   position: relative;
   padding: 0;
-  margin: $space-small auto;
+  margin: var(--space-small) auto;
   overflow: hidden;
-  border-radius: $border-radius-base;
-  border: 1px solid $color-neutral-70;
-  background-color: $color-neutral-90;
+  border-radius: var(--border-radius-base);
+  border: 1px solid var(--color-neutral-70);
+  background-color: var(--color-neutral-90);
 
   > .content {
     width: 100%;
     height: 100%;
 
     h4 {
-      margin: $space-small 0 0 $space-small;
+      margin: var(--space-small) 0 0 var(--space-small);
     }
 
     p,
     a {
       display: block;
-      margin: 0 0 0 $space-small;
+      margin: 0 0 0 var(--space-small);
     }
 
     .html {
-      // width: 100%;
-      // height: 100%;
+      /*  width: 100%; */
+      /*  height: 100%; */
 
-      // see this working solution here: https://stackoverflow.com/questions/35814653/automatic-height-when-embedding-a-youtube-video
+      /*  see this working solution here: https://stackoverflow.com/questions/35814653/automatic-height-when-embedding-a-youtube-video */
       position: relative;
       padding-bottom: 56.25%; /* 16:9 */
       height: 0;
 
       iframe {
-        // width: 100%;
-        // height: auto;
+        /*  width: 100%; */
+        /*  height: auto; */
 
-        // same solution example as above
+        /*  same solution example as above */
         position: absolute;
         top: 0;
         left: 0;
@@ -242,12 +242,12 @@ export default {
     left: 0;
     right: 0;
 
-    padding: $space-large;
-    background-color: $color-neutral-100;
+    padding: var(--space-large);
+    background-color: var(--color-neutral-100);
 
     > .buttons {
       button {
-        margin-right: $space-small;
+        margin-right: var(--space-small);
       }
     }
 
@@ -255,15 +255,15 @@ export default {
       display: flex;
 
       input {
-        margin-right: $space-small;
+        margin-right: var(--space-small);
       }
     }
   }
 
   > .close-button {
     position: absolute !important;
-    top: $space-x-small !important;
-    right: $space-x-small !important;
+    top: var(--space-x-small) !important;
+    right: var(--space-x-small) !important;
   }
 }
 

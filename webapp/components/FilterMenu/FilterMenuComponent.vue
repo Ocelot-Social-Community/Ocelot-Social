@@ -82,7 +82,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .filter-header {
   display: flex;
   justify-content: space-between;
@@ -91,11 +91,11 @@ export default {
   }
 }
 .filter-menu-options {
-  max-width: $size-max-width-filter-menu;
-  padding: $space-small $space-x-small;
+  max-width: var(--size-max-width-filter-menu);
+  padding: var(--space-small) var(--space-x-small);
 
   > .title {
-    font-size: $font-size-large;
+    font-size: var(--font-size-large);
   }
 }
 </style>

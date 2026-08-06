@@ -25,18 +25,18 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .category-tag {
   &.language {
     float: right;
   }
 
   > .os-icon {
-    font-size: $font-size-base;
+    font-size: var(--font-size-base);
   }
 }
 .filterActive {
-  color: $color-primary-inverse;
-  background-color: $color-primary-active;
+  color: var(--color-primary-inverse);
+  background-color: var(--color-primary-highlight);
 }
 </style>

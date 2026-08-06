@@ -141,42 +141,42 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .delete-data {
   display: flex;
   flex-direction: column;
 
   > .title > .os-icon {
-    color: $color-danger;
+    color: var(--color-danger);
   }
 
   > .ds-form-item {
     align-self: flex-start;
-    margin-top: $space-xxx-small;
+    margin-top: var(--space-xxx-small);
   }
 
   > .notice {
-    font-weight: $font-weight-bold;
-    margin-bottom: $space-small;
+    font-weight: var(--text-weight-bold);
+    margin-bottom: var(--space-small);
   }
 
   > .checkbox {
-    margin-left: $space-base;
-    margin-bottom: $space-x-small;
+    margin-left: var(--space-base);
+    margin-bottom: var(--space-x-small);
 
     &:last-of-type {
-      margin-bottom: $space-small;
+      margin-bottom: var(--space-small);
     }
   }
 
   > .warning {
-    padding: $space-large;
-    margin-bottom: $space-small;
-    border-radius: $border-radius-base;
+    padding: var(--space-large);
+    margin-bottom: var(--space-small);
+    border-radius: var(--border-radius-base);
 
-    color: $color-danger;
-    background-color: $color-danger-inverse;
-    border-left: 4px solid $color-danger;
+    color: var(--color-danger);
+    background-color: var(--color-danger-inverse);
+    border-left: 4px solid var(--color-danger);
   }
 
   > button {

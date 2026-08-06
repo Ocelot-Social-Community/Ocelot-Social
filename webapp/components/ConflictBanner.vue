@@ -44,27 +44,28 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-// Margin is deliberately omitted — each parent sets its own outer spacing (via a class on
-// the component root) so the tabs keep their own vertical rhythm.
+<style scoped>
+/*  Margin is deliberately omitted — each parent sets its own outer spacing (via a class on */
+/*  the component root) so the tabs keep their own vertical rhythm. */
 .conflict-banner {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: $space-x-small;
-  padding: $space-x-small $space-small;
-  border-radius: $border-radius-base;
-  border-left: 3px solid $color-warning;
+  gap: var(--space-x-small);
+  padding: var(--space-x-small) var(--space-small);
+  border-radius: var(--border-radius-base);
+  border-left: 3px solid var(--color-warning);
   background: color-mix(in srgb, var(--color-warning) 14%, transparent);
   font-size: 0.9em;
+}
 
-  &__text {
-    flex: 1 1 16rem;
-  }
-  &__actions {
-    display: inline-flex;
-    gap: $space-x-small;
-  }
+.conflict-banner__text {
+  flex: 1 1 16rem;
+}
+
+.conflict-banner__actions {
+  display: inline-flex;
+  gap: var(--space-x-small);
 }
 </style>

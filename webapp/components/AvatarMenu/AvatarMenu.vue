@@ -159,30 +159,30 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .avatar-menu {
-  margin: $space-xxx-small 0px 0px $space-xx-small;
+  margin: var(--space-xxx-small) 0px 0px var(--space-xx-small);
 }
 .avatar-menu-trigger {
   user-select: none;
   display: flex;
   align-items: center;
-  padding-left: $space-xx-small;
+  padding-left: var(--space-xx-small);
 
   > .profile-avatar {
-    margin-right: $space-xx-small;
+    margin-right: var(--space-xx-small);
   }
 }
 .avatar-menu-popover {
-  padding-top: $space-x-small;
-  padding-bottom: $space-x-small;
+  padding-top: var(--space-x-small);
+  padding-bottom: var(--space-x-small);
   hr {
-    color: $color-neutral-90;
-    background-color: $color-neutral-90;
+    color: var(--color-neutral-90);
+    background-color: var(--color-neutral-90);
   }
   .logout-link {
-    color: $text-color-danger;
-    padding-top: $space-xx-small;
+    color: var(--text-color-danger);
+    padding-top: var(--space-xx-small);
     &:hover {
       color: color-mix(in srgb, var(--color-danger), black 10%);
     }
