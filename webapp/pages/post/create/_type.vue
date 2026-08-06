@@ -250,7 +250,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .ds-heading {
   margin-top: 0;
 }
@@ -259,18 +259,18 @@ export default {
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
-  gap: $space-x-small;
+  gap: var(--space-x-small);
 }
 
 .post-in-trigger {
   font: inherit;
-  color: $color-primary;
+  color: var(--color-primary);
   display: inline-flex;
-  // Text (.post-in-link) aligns on the text baseline with the surrounding
-  // "Veröffentlichen in" prefix; icons use align-self: center so they are
-  // vertically centered next to the text instead of floating above it.
+  /*  Text (.post-in-link) aligns on the text baseline with the surrounding */
+  /*  "Veröffentlichen in" prefix; icons use align-self: center so they are */
+  /*  vertically centered next to the text instead of floating above it. */
   align-items: baseline;
-  gap: $space-xx-small;
+  gap: var(--space-xx-small);
   pointer-events: none;
   transition: color 0.15s ease;
 }
@@ -315,16 +315,16 @@ export default {
   border: 0;
   background: transparent;
   font: inherit;
-  // Firefox needs a color so options inherit something readable when opened
-  color: $text-color-base;
+  /*  Firefox needs a color so options inherit something readable when opened */
+  color: var(--text-color-base);
 }
 
-// Hover + keyboard focus both highlight the trigger via the wrapper.
-// :focus-within (not `+ .post-in-trigger`) because the trigger sits before
-// the select in DOM order — a sibling combinator would never match.
+/*  Hover + keyboard focus both highlight the trigger via the wrapper. */
+/*  :focus-within (not `+ .post-in-trigger`) because the trigger sits before */
+/*  the select in DOM order — a sibling combinator would never match. */
 .post-in-select-wrapper:hover .post-in-trigger,
 .post-in-select-wrapper:focus-within .post-in-trigger {
-  color: $color-primary-active;
+  color: var(--color-primary-highlight);
 }
 
 .post-create-layout__sidebar,
@@ -332,7 +332,7 @@ export default {
   flex: 0 0 100%;
   width: 100%;
 }
-@media #{$media-query-medium} {
+@media (min-width: 768px) {
   .post-create-layout__sidebar {
     flex: 0 0 200px;
     width: 200px;

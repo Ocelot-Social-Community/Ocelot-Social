@@ -115,7 +115,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .ds-heading {
   margin-top: 0;
 }
@@ -125,7 +125,7 @@ export default {
   flex: 0 0 100%;
   width: 100%;
 }
-@media #{$media-query-medium} {
+@media (min-width: 768px) {
   .post-edit-layout__sidebar {
     flex: 0 0 200px;
     width: 200px;

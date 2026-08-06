@@ -278,23 +278,31 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .title {
-  margin-bottom: $space-xx-small;
+  margin-bottom: var(--space-xx-small);
 }
 .description {
-  margin: 0 0 $space-base;
-  color: $text-color-soft;
+  margin: 0 0 var(--space-base);
+  color: var(--text-color-soft);
 }
-// Screen-reader-only text: the table caption and the accessible name of an em-dashed
-// ("not set") cell, so assistive tech never reads a bare dash.
+/*  Screen-reader-only text: the table caption and the accessible name of an em-dashed */
+/*  ("not set") cell, so assistive tech never reads a bare dash. */
 .config-caption {
-  @include visually-hidden;
+  /*  Visually hidden, but still exposed to assistive technology. */
+  position: absolute !important;
+  top: 0;
+  clip: rect(1px, 1px, 1px, 1px) !important;
+  overflow: hidden !important;
+  height: 1px !important;
+  width: 1px !important;
+  padding: 0 !important;
+  border: 0 !important;
 }
-// No horizontal scroll box (it would break the viewport-sticky header). Instead the
-// table is fixed-layout at width:100%, so it is ALWAYS exactly as wide as the card —
-// never wider (no desktop overflow past the card, no mobile page-fill). Long values are
-// clipped to their column (see .truncate), keys/headers wrap.
+/*  No horizontal scroll box (it would break the viewport-sticky header). Instead the */
+/*  table is fixed-layout at width:100%, so it is ALWAYS exactly as wide as the card — */
+/*  never wider (no desktop overflow past the card, no mobile page-fill). Long values are */
+/*  clipped to their column (see .truncate), keys/headers wrap. */
 .config-table-wrap {
   overflow: visible;
 }
@@ -304,9 +312,9 @@ export default {
   border-collapse: collapse;
   font-size: 0.9em;
 
-  // Mobile-first: show only the three most important columns (key / effective state /
-  // policy override). The env value and software default are hidden so the narrow table
-  // stays readable; the desktop media query below re-adds them.
+  /*  Mobile-first: show only the three most important columns (key / effective state / */
+  /*  policy override). The env value and software default are hidden so the narrow table */
+  /*  stays readable; the desktop media query below re-adds them. */
   .col--key {
     width: 46%;
   }
@@ -325,38 +333,38 @@ export default {
 
   th,
   td {
-    padding: $space-xx-small $space-x-small;
+    padding: var(--space-xx-small) var(--space-x-small);
     text-align: left;
     vertical-align: top;
-    border-bottom: 1px solid $border-color-softer;
-    // Keys and headers wrap within their fixed column instead of overflowing it; value
-    // cells opt out via .truncate (single line + ellipsis).
+    border-bottom: 1px solid var(--border-color-softer);
+    /*  Keys and headers wrap within their fixed column instead of overflowing it; value */
+    /*  cells opt out via .truncate (single line + ellipsis). */
     overflow-wrap: anywhere;
   }
   thead th {
-    // Dark (not soft-grey) so the bold weight actually reads as bold — matching the key
-    // column / category sub-headings. The app font (Lato) only ships 400/700, so a grey
-    // 700 header otherwise looks lighter than the dark key names. Same font size as the
-    // body cells (no shrinking) — it inherits the table's 0.9em.
-    color: $text-color-base;
+    /*  Dark (not soft-grey) so the bold weight actually reads as bold — matching the key */
+    /*  column / category sub-headings. The app font (Lato) only ships 400/700, so a grey */
+    /*  700 header otherwise looks lighter than the dark key names. Same font size as the */
+    /*  body cells (no shrinking) — it inherits the table's 0.9em. */
+    color: var(--text-color-base);
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 0.03em;
-    // Freeze the column header just below the fixed app header (its height is exposed as
-    // --header-height) so it stays visible while the page scrolls. A SINGLE divider via an
-    // inset shadow (no border-bottom, which would double it at rest and is anyway dropped
-    // by border-collapse while scrolling); opaque background so scrolled rows don't show through.
+    /*  Freeze the column header just below the fixed app header (its height is exposed as */
+    /*  --header-height) so it stays visible while the page scrolls. A SINGLE divider via an */
+    /*  inset shadow (no border-bottom, which would double it at rest and is anyway dropped */
+    /*  by border-collapse while scrolling); opaque background so scrolled rows don't show through. */
     border-bottom: none;
     position: sticky;
     top: var(--header-height, 6rem);
-    z-index: $z-index-sticky;
-    background: $background-color-base;
-    box-shadow: inset 0 -2px 0 $border-color-softer;
+    z-index: var(--z-index-sticky);
+    background: var(--background-color-base);
+    box-shadow: inset 0 -2px 0 var(--border-color-softer);
   }
 }
 
-// Desktop: room for all five columns (env value + software default are re-added).
-@media #{$media-query-medium} {
+/*  Desktop: room for all five columns (env value + software default are re-added). */
+@media (min-width: 768px) {
   .config-table {
     .col--key {
       width: 24%;
@@ -381,31 +389,31 @@ export default {
     }
   }
 }
-// Category sub-heading spanning the whole width, introducing each row group. The
-// leading gap separates one group from the previous one, so the very first group
-// (directly under the table head) drops it.
+/*  Category sub-heading spanning the whole width, introducing each row group. The */
+/*  leading gap separates one group from the previous one, so the very first group */
+/*  (directly under the table head) drops it. */
 .config-group-head th {
-  padding-top: $space-base;
-  color: $text-color-base;
+  padding-top: var(--space-base);
+  color: var(--text-color-base);
   font-size: 0.85em;
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  border-bottom: 2px solid $border-color-soft;
+  border-bottom: 2px solid var(--border-color-soft);
 }
 .config-table tbody:first-of-type .config-group-head th {
-  padding-top: calc($space-base / 2);
+  padding-top: calc(var(--space-base) / 2);
 }
 .config-row {
-  // Reserve the accent gutter on every row so the layout doesn't shift when a row
-  // becomes blocking; only a blocking row colours it.
+  /*  Reserve the accent gutter on every row so the layout doesn't shift when a row */
+  /*  becomes blocking; only a blocking row colours it. */
   th.cell--key {
     border-left: 3px solid transparent;
   }
-  // Keep the row clear of the sticky admin header when scrolled to via #key.
-  scroll-margin-top: $space-base;
-  // Animate the deep-link highlight fading back out (applyHashHighlight clears the key
-  // after a moment). Only when the user hasn't asked for reduced motion.
+  /*  Keep the row clear of the sticky admin header when scrolled to via #key. */
+  scroll-margin-top: var(--space-base);
+  /*  Animate the deep-link highlight fading back out (applyHashHighlight clears the key */
+  /*  after a moment). Only when the user hasn't asked for reduced motion. */
   @media (prefers-reduced-motion: no-preference) {
     transition: background-color 0.6s ease;
 
@@ -414,86 +422,92 @@ export default {
     }
   }
 
-  // A missing hard-requirement secret breaks its feature → flag the whole row.
-  &--blocking {
-    background: color-mix(in srgb, var(--color-danger) 7%, transparent);
+  /*  A missing hard-requirement secret breaks its feature → flag the whole row. */
 
-    th.cell--key {
-      border-left-color: $color-danger;
-    }
+  /*  Deep-linked to from the policy/roles tabs (/admin/config#<key>) → highlight the */
+  /*  anchored row so the admin sees which env var the link pointed at. Placed after */
+  /*  --blocking so a highlighted row reads as the navigation target. */
+}
+
+.config-row--blocking {
+  background: color-mix(in srgb, var(--color-danger) 7%, transparent);
+
+  th.cell--key {
+    border-left-color: var(--color-danger);
   }
+}
 
-  // Deep-linked to from the policy/roles tabs (/admin/config#<key>) → highlight the
-  // anchored row so the admin sees which env var the link pointed at. Placed after
-  // --blocking so a highlighted row reads as the navigation target.
-  &--highlight {
-    // $color-secondary is a runtime var() now; color-mix instead of Sass rgba() for the tint.
-    background: color-mix(in srgb, var(--color-secondary) 10%, transparent);
+.config-row--highlight {
+  /*  var(--color-secondary) is a runtime var() now; color-mix instead of Sass rgba() for the tint. */
+  background: color-mix(in srgb, var(--color-secondary) 10%, transparent);
 
-    th.cell--key {
-      border-left-color: $color-secondary;
-    }
+  th.cell--key {
+    border-left-color: var(--color-secondary);
   }
 }
 .cell {
-  &--key code {
-    font-weight: 600;
-  }
-  &--effective .value {
-    font-weight: 600;
-  }
-  &__blocks {
-    display: block;
-    margin-top: $space-xxx-small;
-    color: $color-danger;
-    font-size: 0.85em;
-  }
+}
+
+.cell--key code {
+  font-weight: 600;
+}
+
+.cell--effective .value {
+  font-weight: 600;
+}
+
+.cell__blocks {
+  display: block;
+  margin-top: var(--space-xxx-small);
+  color: var(--color-danger);
+  font-size: 0.85em;
 }
 .cell-empty {
-  color: $text-color-soft;
+  color: var(--text-color-soft);
 }
-// Values are clipped to their fixed column on a single line (no wrapping, no widening
-// the table). refreshTruncation() flags the CELLS whose value is actually clipped.
+/*  Values are clipped to their fixed column on a single line (no wrapping, no widening */
+/*  the table). refreshTruncation() flags the CELLS whose value is actually clipped. */
 .truncate {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-// A clipped cell reveals the full value as an overlay tooltip on hover / tap / keyboard
-// focus — an ::after on the cell (whose overflow is visible, unlike the clipped .truncate)
-// so it floats above the table WITHOUT growing the row (no layout shift). The value comes
-// from data-full; the cell is the positioning context.
+/*  A clipped cell reveals the full value as an overlay tooltip on hover / tap / keyboard */
+/*  focus — an ::after on the cell (whose overflow is visible, unlike the clipped .truncate) */
+/*  so it floats above the table WITHOUT growing the row (no layout shift). The value comes */
+/*  from data-full; the cell is the positioning context. */
 .cell.is-clipped {
   position: relative;
   cursor: help;
 }
 .cell.is-clipped:hover,
 .cell.is-clipped:focus {
-  // Lift above sibling cells so the tooltip is never covered by later rows.
+  /*  Lift above sibling cells so the tooltip is never covered by later rows. */
   z-index: 10;
 }
 .cell.is-clipped:focus {
-  outline: 2px solid $color-secondary;
+  outline: 2px solid var(--color-secondary);
   outline-offset: -2px;
 }
 .cell.is-clipped:hover::after,
 .cell.is-clipped:focus::after {
   content: attr(data-full);
   position: absolute;
-  top: calc(100% - #{$space-xxx-small});
-  // Anchored to the cell's right edge and extending left — there is always room to the
-  // left (earlier columns), so the tooltip stays on screen.
-  right: $space-x-small;
+  top: calc(100% - var(--space-xxx-small));
+  /*  Anchored to the cell's right edge and extending left — there is always room to the */
+  /*  left (earlier columns), so the tooltip stays on screen. */
+  right: var(--space-x-small);
   z-index: 20;
   width: max-content;
   max-width: min(50ch, calc(100vw - 1rem));
-  padding: $space-xx-small $space-x-small;
-  background: $background-color-inverse;
-  color: $text-color-inverse;
-  border-radius: $border-radius-base;
-  box-shadow: 0 2px 10px rgba($color-neutral-0, 0.25);
-  // Undo the header/cell text styling for a plain, readable tooltip.
+  padding: var(--space-xx-small) var(--space-x-small);
+  background: var(--background-color-inverse);
+  color: var(--text-color-inverse);
+  border-radius: var(--border-radius-base);
+  /*  color-mix, not rgba(): var(--color-neutral-0) is a var() and Sass cannot decompose one. */
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--color-neutral-0) 25%, transparent);
+  /*  Undo the header/cell text styling for a plain, readable tooltip. */
   white-space: normal;
   overflow-wrap: anywhere;
   font-weight: normal;
@@ -503,40 +517,42 @@ export default {
   line-height: 1.4;
   pointer-events: none;
 }
-// A set secret: shown as masked dots (present, value withheld) rather than a value or
-// a misleading "not set" dash.
+/*  A set secret: shown as masked dots (present, value withheld) rather than a value or */
+/*  a misleading "not set" dash. */
 .value--masked {
-  color: $text-color-soft;
+  color: var(--text-color-soft);
   letter-spacing: 0.15em;
 }
-// Link from an overridable value to its policy on the policy tab.
+/*  Link from an overridable value to its policy on the policy tab. */
 .override-link {
   .value {
     font-weight: 600;
   }
-  // No override set yet: muted, but still a clear affordance to go set one.
-  &--empty {
-    color: $text-color-soft;
-    font-size: 0.85em;
-    font-style: italic;
-  }
+  /*  No override set yet: muted, but still a clear affordance to go set one. */
+}
+
+.override-link--empty {
+  color: var(--text-color-soft);
+  font-size: 0.85em;
+  font-style: italic;
 }
 .badge {
   display: inline-block;
   padding: 0.1em 0.5em;
-  border-radius: $border-radius-base;
+  border-radius: var(--border-radius-base);
   font-size: 0.8em;
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 0.03em;
+}
 
-  &--ok {
-    background-color: $color-success;
-    color: $color-success-inverse;
-  }
-  &--error {
-    background-color: $color-danger;
-    color: $color-danger-inverse;
-  }
+.badge--ok {
+  background-color: var(--color-success);
+  color: var(--color-success-inverse);
+}
+
+.badge--error {
+  background-color: var(--color-danger);
+  color: var(--color-danger-inverse);
 }
 </style>

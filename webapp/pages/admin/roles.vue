@@ -772,234 +772,258 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .title {
-  margin-bottom: $space-xx-small;
+  margin-bottom: var(--space-xx-small);
 }
 .description {
-  margin-bottom: $space-base;
-  color: $text-color-soft;
+  margin-bottom: var(--space-base);
+  color: var(--text-color-soft);
 }
 .role-tabs {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: $space-x-small;
-  padding-bottom: $space-small;
-  border-bottom: 1px solid $border-color-softer;
+  gap: var(--space-x-small);
+  padding-bottom: var(--space-small);
+  border-bottom: 1px solid var(--border-color-softer);
 }
 .role-tab {
   display: inline-flex;
   align-items: center;
-  gap: $space-xxx-small;
-  padding: $space-xx-small $space-small;
-  border: 1px solid $border-color-soft;
-  border-radius: $border-radius-x-large;
-  background: $background-color-base;
-  color: $text-color-base;
+  gap: var(--space-xxx-small);
+  padding: var(--space-xx-small) var(--space-small);
+  border: 1px solid var(--border-color-soft);
+  border-radius: var(--border-radius-x-large);
+  background: var(--background-color-base);
+  color: var(--text-color-base);
   font-size: 0.9em;
   line-height: 1.4;
   cursor: pointer;
 
   &:hover {
-    background: $background-color-softer;
+    background: var(--background-color-softer);
   }
-  &--active {
-    border-color: $color-primary;
-    background: $color-primary;
-    color: $color-primary-inverse;
-    font-weight: bold;
+}
 
-    &:hover {
-      background: $color-primary;
-    }
+.role-tab--active {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-primary-inverse);
+  font-weight: bold;
+
+  &:hover {
+    background: var(--color-primary);
   }
-  &--add {
-    font-weight: bold;
-    border-style: dashed;
+}
+
+.role-tab--add {
+  font-weight: bold;
+  border-style: dashed;
+}
+
+.role-tab--input {
+  padding: var(--space-xxx-small) var(--space-xx-small);
+  cursor: default;
+}
+
+.role-tab__badge {
+  font-size: 0.8em;
+}
+
+.role-tab__input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  min-width: 8rem;
+}
+
+.role-tab__confirm,
+.role-tab__cancel {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0 var(--space-xxx-small);
+  color: var(--text-color-soft);
+
+  &:hover {
+    color: var(--text-color-base);
   }
-  &--input {
-    padding: $space-xxx-small $space-xx-small;
+  &:disabled {
+    opacity: 0.4;
     cursor: default;
-  }
-  &__badge {
-    font-size: 0.8em;
-  }
-  &__input {
-    border: none;
-    outline: none;
-    background: transparent;
-    font: inherit;
-    min-width: 8rem;
-  }
-  &__confirm,
-  &__cancel {
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    padding: 0 $space-xxx-small;
-    color: $text-color-soft;
-
-    &:hover {
-      color: $text-color-base;
-    }
-    &:disabled {
-      opacity: 0.4;
-      cursor: default;
-    }
   }
 }
 .role {
-  padding-top: $space-base;
-  &__header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: $space-small;
-    // Set the role identity apart from its permission groups with a clear gap, so the
-    // (possibly terse, e.g. "ra") role name reads as its own header rather than crowding
-    // the first group title.
-    margin-bottom: $space-base;
-  }
-  &__name {
-    margin: 0;
-  }
-  // "Role:" prefix before the name, so a poorly-named role (ra, rb) still reads as the
-  // role name. Softer + lighter than the name it labels.
-  &__label {
-    color: $text-color-soft;
-    font-weight: normal;
-  }
-  &__badge {
-    margin-left: $space-xx-small;
-    font-size: 0.7em;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: $text-color-soft;
-  }
-  // Pencil affordance next to the role name; reveals the inline rename input.
-  &__rename {
-    margin-left: $space-xx-small;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    font-size: 0.7em;
-    color: $text-color-soft;
+  padding-top: var(--space-base);
+  /*  "Role:" prefix before the name, so a poorly-named role (ra, rb) still reads as the */
+  /*  role name. Softer + lighter than the name it labels. */
+  /*  Pencil affordance next to the role name; reveals the inline rename input. */
+  /*  Outer spacing for the shared conflict banner (its appearance lives in ConflictBanner.vue). */
+  /*  Wrapper so the title hint shows even while the button inside is disabled. */
+}
 
-    &:hover {
-      color: $color-primary;
-    }
-  }
-  &__members {
-    color: $text-color-soft;
-    font-size: 0.85em;
-    text-decoration: none;
+.role__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-small);
+  /*  Set the role identity apart from its permission groups with a clear gap, so the */
+  /*  (possibly terse, e.g. "ra") role name reads as its own header rather than crowding */
+  /*  the first group title. */
+  margin-bottom: var(--space-base);
+}
 
-    &:hover {
-      color: $color-primary;
-      text-decoration: underline;
-    }
-  }
-  &__protected-note {
-    color: $text-color-soft;
-    font-style: italic;
-  }
-  // Outer spacing for the shared conflict banner (its appearance lives in ConflictBanner.vue).
-  &__conflict {
-    margin: $space-x-small 0;
-  }
-  &__actions {
-    margin-top: $space-x-small;
-    display: flex;
-    gap: $space-small;
-  }
-  // Wrapper so the title hint shows even while the button inside is disabled.
-  &__action {
-    display: inline-flex;
+.role__name {
+  margin: 0;
+}
+
+.role__label {
+  color: var(--text-color-soft);
+  font-weight: normal;
+}
+
+.role__badge {
+  margin-left: var(--space-xx-small);
+  font-size: 0.7em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-color-soft);
+}
+
+.role__rename {
+  margin-left: var(--space-xx-small);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.7em;
+  color: var(--text-color-soft);
+
+  &:hover {
+    color: var(--color-primary);
   }
 }
-// Desktop (>=1024px): pack the permission groups into two columns for a more
-// compact overview. Mobile/tablet stay single-column (the default). column-* is
-// used (rather than grid/flex) so unequal-height groups fill the space tightly.
+
+.role__members {
+  color: var(--text-color-soft);
+  font-size: 0.85em;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+}
+
+.role__protected-note {
+  color: var(--text-color-soft);
+  font-style: italic;
+}
+
+.role__conflict {
+  margin: var(--space-x-small) 0;
+}
+
+.role__actions {
+  margin-top: var(--space-x-small);
+  display: flex;
+  gap: var(--space-small);
+}
+
+.role__action {
+  display: inline-flex;
+}
+/*  Desktop (>=1024px): pack the permission groups into two columns for a more */
+/*  compact overview. Mobile/tablet stay single-column (the default). column-* is */
+/*  used (rather than grid/flex) so unequal-height groups fill the space tightly. */
 .perm-groups {
-  @media #{$media-query-large} {
+  @media (min-width: 1024px) {
     column-count: 2;
-    column-gap: $space-large;
+    column-gap: var(--space-large);
   }
 }
 .perm-group {
   border: none;
   padding: 0;
-  margin: $space-x-small 0;
-  // Keep a group (title + its rows) from splitting across the two columns.
+  margin: var(--space-x-small) 0;
+  /*  Keep a group (title + its rows) from splitting across the two columns. */
   break-inside: avoid;
-  // The first group's top margin would otherwise misalign the two column tops.
+  /*  The first group's top margin would otherwise misalign the two column tops. */
   &:first-child {
     margin-top: 0;
   }
+}
 
-  &__title {
-    color: $text-color-soft;
-    font-weight: bold;
-    font-size: 0.85em;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-  }
+.perm-group__title {
+  color: var(--text-color-soft);
+  font-weight: bold;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 .perm-row {
   display: flex;
   align-items: flex-start;
-  gap: $space-x-small;
-  margin: $space-xxx-small 0;
-  padding: $space-xxx-small $space-xx-small;
-  border-radius: $border-radius-small;
+  gap: var(--space-x-small);
+  margin: var(--space-xxx-small) 0;
+  padding: var(--space-xxx-small) var(--space-xx-small);
+  border-radius: var(--border-radius-small);
   border-left: 3px solid transparent;
   cursor: pointer;
   transition: background-color 0.1s ease;
 
-  // Hover-diff against the active role: the hovered role would add (green) or
-  // remove (red) this permission.
-  &--added {
-    background: color-mix(in srgb, var(--color-success) 16%, transparent);
-    border-left-color: $color-success;
-  }
-  &--removed {
-    background: color-mix(in srgb, var(--color-danger) 16%, transparent);
-    border-left-color: $color-danger;
-  }
-  // The permission's feature is not configured/enabled: granting it has no effect,
-  // so the row is dimmed and the checkbox disabled (with an explanatory note).
-  &--unavailable {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
+  /*  Hover-diff against the active role: the hovered role would add (green) or */
+  /*  remove (red) this permission. */
+  /*  The permission's feature is not configured/enabled: granting it has no effect, */
+  /*  so the row is dimmed and the checkbox disabled (with an explanatory note). */
   input:disabled {
     cursor: default;
   }
 
-  &__text {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.25;
-  }
-  &__key {
-    font-family: monospace;
-    font-size: 0.85em;
-  }
-  &__desc {
-    color: $text-color-soft;
-    font-size: 0.8em;
-  }
-  &__gate {
-    color: $color-danger;
-    font-size: 0.75em;
-    font-style: italic;
-  }
-  // The deep-link to the policy tab. Colour/affordance come from the global `a` reset
-  // ($color-primary, no underline — the app-wide link convention, matching the policy tab's
-  // env-link); only keep it from wrapping mid-phrase inside the italic gate note.
-  &__gate-link {
-    white-space: nowrap;
-  }
+  /*  The deep-link to the policy tab. Colour/affordance come from the global `a` reset */
+  /*  (var(--color-primary), no underline — the app-wide link convention, matching the policy tab's */
+  /*  env-link); only keep it from wrapping mid-phrase inside the italic gate note. */
+}
+
+.perm-row--added {
+  background: color-mix(in srgb, var(--color-success) 16%, transparent);
+  border-left-color: var(--color-success);
+}
+
+.perm-row--removed {
+  background: color-mix(in srgb, var(--color-danger) 16%, transparent);
+  border-left-color: var(--color-danger);
+}
+
+.perm-row--unavailable {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.perm-row__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.perm-row__key {
+  font-family: monospace;
+  font-size: 0.85em;
+}
+
+.perm-row__desc {
+  color: var(--text-color-soft);
+  font-size: 0.8em;
+}
+
+.perm-row__gate {
+  color: var(--color-danger);
+  font-size: 0.75em;
+  font-style: italic;
+}
+
+.perm-row__gate-link {
+  white-space: nowrap;
 }
 </style>
