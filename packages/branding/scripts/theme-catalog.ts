@@ -8,7 +8,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { customPropertiesIn } from '../dist/css.js'
+import { customPropertiesIn } from './lib/css.ts'
 
 const here = fileURLToPath(new URL('.', import.meta.url))
 export const CSS_DIR = join(here, '..', '..', '..', 'webapp', 'assets', 'css')

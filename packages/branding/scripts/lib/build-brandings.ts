@@ -8,13 +8,13 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSy
 import { basename, join, resolve } from 'node:path'
 
 import { BUCKET_NAMES, extractBucket, instanceFile, splitConfig } from '../../dist/buckets.js'
-import { customPropertiesIn } from '../../dist/css.js'
 import { brandingDefaults } from '../../dist/defaults.js'
 import { deepMerge } from '../../dist/internal.js'
 import { writeTarGz } from '../../dist/tar.js'
 import { SCHEMA_VERSION } from '../../dist/version.js'
 import { catalogAvailable, computeCatalog } from '../theme-catalog.ts'
 
+import { customPropertiesIn } from './css.ts'
 import { loadConfig } from './load-config.ts'
 
 import type { ArchiveInstanceEntry } from '../../dist/buckets.js'
@@ -171,7 +171,9 @@ const LEGACY_LOCALE_DIRS = new Set(['tmp', 'html'])
  * purposes, and stores nothing else about the theme:
  *
  *  1. `theme.themeColor` — the resolved `--color-primary`. The PWA manifest is generated per request
- *     and cannot resolve `var()`, so this one value has to travel as a concrete colour.
+ *     and cannot resolve `var()`, so this one value has to travel as a concrete colour. It is read
+ *     from an UNCONDITIONAL `:root` only: a manifest has no media queries, so a value that holds just
+ *     inside `@media (prefers-color-scheme: dark)` would be shipped as if it always applied.
  *  2. The specificity guarantee. A brand's `:root` only outranks the framework's `:root` by being
  *     loaded later, and it is not: with `build.extractCSS: false` the app CSS is injected by
  *     vue-style-loader during hydration, AFTER anything the server put in <head>. So the packed copy
@@ -185,15 +187,31 @@ function loadThemeFromStylesheets(
   warnings: string[],
 ): Record<string, string> {
   const declared: Record<string, string> = {}
+  const unconditional: Record<string, string> = {}
   for (const rel of config.assets.css) {
     const file = join(dir, rel)
     if (!existsSync(file)) {
       warnings.push(`  ! ${id}: assets.css lists '${rel}', which does not exist`)
       continue
     }
-    Object.assign(declared, customPropertiesIn(readFileSync(file, 'utf8')))
+    const css = readFileSync(file, 'utf8')
+    try {
+      Object.assign(declared, customPropertiesIn(css))
+      Object.assign(unconditional, customPropertiesIn(css, { topLevelOnly: true }))
+    } catch (err) {
+      // A brand's own file — warn and carry on with what the other sheets declared, rather than
+      // failing everyone else's build over one unparseable stylesheet.
+      warnings.push(
+        `  ! ${id}: assets.css '${rel}' is not parseable CSS — ${(err as Error).message}`,
+      )
+    }
   }
-  if (declared['color-primary']) config.theme.themeColor = declared['color-primary']
+  if (unconditional['color-primary']) config.theme.themeColor = unconditional['color-primary']
+  else if (declared['color-primary'])
+    warnings.push(
+      `  ! ${id}: --color-primary is only declared inside an at-rule, so it cannot become the PWA` +
+        ` theme colour — declare it on a plain ':root' as well`,
+    )
   return declared
 }
 

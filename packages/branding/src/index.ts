@@ -21,7 +21,6 @@ import type { BrandingConfig } from './schema.js'
 
 export type * from './schema.js'
 export * from './buckets.js'
-export * from './css.js'
 export * from './theme.js'
 export * from './compat.js'
 export * from './validate.js'

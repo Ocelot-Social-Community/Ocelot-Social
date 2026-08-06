@@ -377,6 +377,45 @@ test('the PWA colour is evaluated from --color-primary in a listed stylesheet', 
   assert.equal(built.warnings.join('\n').includes('theme.css'), false)
 })
 
+// A manifest has no media queries: whatever travels as themeColor is shown unconditionally, so it has
+// to be the value that applies unconditionally.
+test('a dark-mode override does not become the PWA colour', async () => {
+  const dir = brandDir({
+    config: `export default (d) => d({ assets: { css: ['assets/theme.css'] } })\n`,
+    assets: {
+      'theme.css':
+        ':root { --color-primary: rgb(1, 2, 3) }\n' +
+        '@media (prefers-color-scheme: dark) { :root { --color-primary: black } }\n',
+    },
+  })
+
+  const built = await buildBrandArchive(dir)
+  const theme = JSON.parse(readTarGz(built.gz).get('fragments/theme.default.json'))
+  assert.equal(theme.theme.themeColor, 'rgb(1, 2, 3)')
+})
+
+test('a --color-primary that only holds inside an at-rule is reported', async () => {
+  const dir = brandDir({
+    config: `export default (d) => d({ assets: { css: ['assets/theme.css'] } })\n`,
+    assets: {
+      'theme.css': '@media (prefers-color-scheme: dark) { :root { --color-primary: black } }\n',
+    },
+  })
+
+  const built = await buildBrandArchive(dir)
+  assert.match(built.warnings.join('\n'), /--color-primary is only declared inside an at-rule/)
+})
+
+test('an unparseable stylesheet is reported instead of failing the build', async () => {
+  const dir = brandDir({
+    config: `export default (d) => d({ assets: { css: ['assets/theme.css'] } })\n`,
+    assets: { 'theme.css': ':root { --color-primary: red' },
+  })
+
+  const built = await buildBrandArchive(dir)
+  assert.match(built.warnings.join('\n'), /'assets\/theme\.css' is not parseable CSS/)
+})
+
 test('the packed stylesheet ships with :root raised to :root:root', async () => {
   const dir = brandDir({
     config: `export default (d) => d({ assets: { css: ['assets/theme.css'] } })\n`,

@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
 
-import { customPropertiesIn, DEFAULT_COLOR_PRIMARY } from '../dist/index.js'
+import { DEFAULT_COLOR_PRIMARY } from '../dist/index.js'
 
 import { catalogAvailable, computeCatalog } from './theme-catalog.ts'
 
@@ -30,21 +30,6 @@ test('DEFAULT_COLOR_PRIMARY still matches what the stylesheets declare', () => {
 test('an unreachable stylesheet directory means "cannot check", not "no tokens"', () => {
   assert.equal(catalogAvailable('/definitely/not/here'), false)
   assert.deepEqual(computeCatalog('/definitely/not/here'), {})
-})
-
-test('only :root declarations count — component-scoped properties stay private', () => {
-  const css = `
-    :root { --a: 1px; }
-    .card { --private: 2px; }
-    :root:root { --b: 3px; }
-    @media (min-width: 600px) { .x { --nope: 5px } }
-  `
-  assert.deepEqual(customPropertiesIn(css), { a: '1px', b: '3px' })
-})
-
-test('later declarations win, comments and non-custom properties are ignored', () => {
-  const css = `:root { --a: 1px; color: red; /* --fake: 9px; */ }\n:root { --a: 2px; }`
-  assert.deepEqual(customPropertiesIn(css), { a: '2px' })
 })
 
 test('computeCatalog reads every stylesheet in the directory', () => {
