@@ -5,6 +5,26 @@ import {
   summarizeStylesheet,
 } from './themeTokens.js'
 
+/**
+ * Runs `fn` with no global `document`, which is the only way to reach the SSR branch of these helpers:
+ * jest-environment-jsdom always provides one, so passing `null` merely falls through to the real
+ * `document` and the assertion then holds for the wrong reason — an empty `styleSheets` list, or
+ * whatever `getComputedStyle` returns for an unknown property. Verified by deleting the
+ * `typeof document === 'undefined'` guard from the source: both "no document" tests stayed green.
+ *
+ * The guards use `typeof document`, not a bare reference, precisely so this stays a ReferenceError-free
+ * check once the global is gone.
+ */
+function withoutDocument(fn) {
+  const descriptor = Object.getOwnPropertyDescriptor(global, 'document')
+  delete global.document
+  try {
+    fn()
+  } finally {
+    Object.defineProperty(global, 'document', descriptor)
+  }
+}
+
 // Minimal CSSOM stand-ins: a rule exposes `selectorText`, and `style` is both iterable over its
 // property names and answers getPropertyValue — the two things the collector touches.
 const styleOf = (decls) => {
@@ -78,12 +98,24 @@ describe('discoverThemeTokens', () => {
   })
 
   it('returns an empty map when there is no document (SSR)', () => {
-    expect(discoverThemeTokens(null)).toEqual({})
+    withoutDocument(() => {
+      expect(discoverThemeTokens(null)).toEqual({})
+    })
+  })
+
+  it('tolerates a document without styleSheets', () => {
     expect(discoverThemeTokens(doc(null))).toEqual({})
   })
 })
 
 describe('effectiveThemeValue', () => {
+  // Restored rather than left behind: a leaked stub answers '' for every unknown property, which is
+  // exactly the value the SSR test below asserts — it would then pass with or without the guard.
+  const realGetComputedStyle = global.getComputedStyle
+  afterEach(() => {
+    global.getComputedStyle = realGetComputedStyle
+  })
+
   it('reads the resolved value from the element', () => {
     const el = {}
     global.getComputedStyle = jest.fn(() => ({
@@ -94,7 +126,14 @@ describe('effectiveThemeValue', () => {
   })
 
   it('is safe without a document', () => {
-    expect(effectiveThemeValue('x', null)).toBe('')
+    withoutDocument(() => {
+      expect(effectiveThemeValue('x', null)).toBe('')
+    })
+  })
+
+  it('is safe where getComputedStyle does not exist', () => {
+    global.getComputedStyle = undefined
+    expect(effectiveThemeValue('x', {})).toBe('')
   })
 })
 
