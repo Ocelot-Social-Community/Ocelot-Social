@@ -131,6 +131,9 @@
       "noneExtra": "In dieser Instanz sind keine weiteren Brandings eingebacken — nur der Standard ist verfügbar.",
       "schema": "Schema",
       "schemaTitle": "Die @ocelot-social/branding-Paketversion, mit der dieses Archiv gebaut wurde.",
+      "stylesheets": "Eigene Stylesheets",
+      "stylesheetUnreadable": "nicht lesbar",
+      "stylesheetVars": "{count} Theme-Eigenschaft ::: {count} Theme-Eigenschaften",
       "title": "Branding",
       "vanilla": "Standard (kein Branding)"
     },
@@ -1670,7 +1673,7 @@
     "termsAndConditionsNewConfirm": "Ich habe die neuen Nutzungsbedingungen durchgelesen und stimme zu.",
     "termsAndConditionsNewConfirmText": "Bitte lies Dir die neuen Nutzungsbedingungen jetzt durch!"
   },
-  "user-teaser": {
+  "user-avatar": {
     "popover": {
       "open-profile": "Profil öffnen"
     }

@@ -8,30 +8,13 @@
 // declaration TOGETHER with the jest.mock call — which is exactly what makes this work. Keep it pure:
 // wrapping the literal in any call (e.g. a builder or deepFreeze) fails the purity check and throws
 // "not allowed to reference any out-of-scope variables" at transform time.
-import { CSS_LINK_ATTR, THEME_STYLE_ID, brandingHeadHtml } from '~/utils/brandingHead.js'
+import { CSS_LINK_ATTR, brandingHeadHtml } from '~/utils/brandingHead.js'
 
 import brandingHead from './branding-head.js'
 
 const BRAND = {
   assets: { favicon: '/branding/acme/assets/favicon.ico', css: ['/branding/acme/assets/b.css'] },
-  theme: {
-    cssVars: {
-      // value tries to close :root and inject a rule; key tries to break the property name
-      'color-primary': 'red; } body { display: none } :root {',
-      'evil}key': 'blue',
-      // a legit value must survive untouched (parens, commas, spaces, %)
-      'color-legit': 'rgb(1, 2, 3)',
-    },
-    fontFaces: [
-      {
-        family: "Eco'; } body { display: none } @font-face { font-family: 'x",
-        src: "/f.woff2') } body { display: none } @font-face { src: url('x",
-        format: 'woff2',
-        weight: '400',
-        style: 'normal',
-      },
-    ],
-  },
+  theme: {},
 }
 
 jest.mock('@ocelot-social/branding', () => ({ branding: BRAND }))
@@ -39,30 +22,6 @@ jest.mock('@ocelot-social/branding', () => ({ branding: BRAND }))
 describe('branding-head plugin', () => {
   beforeEach(() => {
     document.head.innerHTML = ''
-  })
-
-  it('emits a #branding-theme style element', () => {
-    brandingHead()
-    expect(document.getElementById(THEME_STYLE_ID)).not.toBeNull()
-  })
-
-  it('strips CSS breakout characters so brand values cannot inject rules', () => {
-    brandingHead()
-    const css = document.getElementById(THEME_STYLE_ID).textContent
-    // We generate exactly two blocks: one @font-face and one :root. A successful breakout via a
-    // malicious value would add more `{`/`}` — the brace count is the security invariant.
-    expect((css.match(/{/g) || []).length).toBe(2)
-    expect((css.match(/}/g) || []).length).toBe(2)
-    expect(css).not.toMatch(/body\s*{/) // no injected `body { … }` rule
-  })
-
-  it('keeps legitimate values (and sanitizes only unsafe keys)', () => {
-    brandingHead()
-    const css = document.getElementById(THEME_STYLE_ID).textContent
-    expect(css).toContain('--color-legit: rgb(1, 2, 3);') // parens/commas/spaces preserved
-    expect(css).toContain('--color-primary:') // still emitted, just with the breakout chars removed
-    expect(css).toContain('--evilkey:') // `evil}key` → `evilkey`
-    expect(css).not.toContain('}key')
   })
 
   it('adds the brand stylesheet and retargets the favicon', () => {
@@ -87,7 +46,6 @@ describe('branding-head plugin', () => {
 
     // nothing duplicated, and the SSR markup is still there verbatim
     expect(document.querySelectorAll(`link[${CSS_LINK_ATTR}]`)).toHaveLength(1)
-    expect(document.querySelectorAll(`#${THEME_STYLE_ID}`)).toHaveLength(1)
     expect(document.head.innerHTML).toContain(rendered)
     // the favicon is the ONE thing SSR leaves alone (it retargets nuxt's link instead of adding a
     // second icon), so this is the only mutation the plugin still makes.
@@ -107,10 +65,8 @@ describe('branding-head plugin', () => {
 
     const ids = [...document.head.children].map((el) => el.id || el.getAttribute(CSS_LINK_ATTR))
     expect(ids.indexOf('app-css')).toBeLessThan(ids.indexOf('/branding/acme/assets/b.css'))
-    expect(ids[ids.length - 1]).toBe(THEME_STYLE_ID)
     // still exactly one of each — moved, not duplicated
     expect(document.querySelectorAll(`link[${CSS_LINK_ATTR}]`)).toHaveLength(1)
-    expect(document.querySelectorAll(`#${THEME_STYLE_ID}`)).toHaveLength(1)
   })
 
   // `assets.css` is an unvalidated string[] in the schema, so a brand can put a `"` in an href.
@@ -131,7 +87,6 @@ describe('branding-head plugin', () => {
       expect(() => brandingHead()).not.toThrow()
 
       expect(document.querySelector(`link[${CSS_LINK_ATTR}]`).getAttribute('href')).toBe(HOSTILE)
-      expect(document.getElementById(THEME_STYLE_ID)).not.toBeNull()
     })
 
     // The SSR hook escapes the href for the HTML attribute; parsing gives the raw value back, so the
@@ -153,8 +108,9 @@ describe('branding-head plugin', () => {
     const ssr = document.createElement('div')
     ssr.innerHTML = brandingHeadHtml(BRAND)
 
-    expect(document.head.querySelector(`#${THEME_STYLE_ID}`).textContent).toBe(
-      ssr.querySelector(`#${THEME_STYLE_ID}`).textContent,
+    // Both paths emit the same <link> set; there is no theme <style> to compare any more.
+    expect(document.head.querySelectorAll(`[${CSS_LINK_ATTR}]`)).toHaveLength(
+      ssr.querySelectorAll(`[${CSS_LINK_ATTR}]`).length,
     )
     const hrefs = (root) =>
       [...root.querySelectorAll(`link[${CSS_LINK_ATTR}]`)].map((l) => l.getAttribute('href'))

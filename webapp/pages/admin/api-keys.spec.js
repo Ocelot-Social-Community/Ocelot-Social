@@ -90,7 +90,7 @@ describe('admin/api-keys.vue', () => {
         'nuxt-link': true,
         'confirm-modal': true,
         'pagination-buttons': true,
-        'user-teaser': { template: '<span>@{{ user.slug }}</span>', props: ['user'] },
+        'user-avatar': { template: '<span>@{{ user.slug }}</span>', props: ['user'] },
         'date-time': { template: '<span>{{ dateTime }}</span>', props: ['dateTime'] },
         'os-spinner': true,
       },

@@ -230,15 +230,15 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .notifications-menu-popover {
   max-width: 500px;
 }
 .notifications-link-container {
-  background-color: $background-color-softer-active;
+  background-color: var(--background-color-softer-active);
   text-align: right;
-  padding: $space-x-small 0;
-  padding-top: $space-x-small;
+  padding: var(--space-x-small) 0;
+  padding-top: var(--space-x-small);
   flex-direction: row;
 }
 </style>

@@ -10,7 +10,7 @@
     >
       <div class="video-call__header">
         <div class="video-call__header-info">
-          <profile-avatar :profile="groupProfile" size="small" class="video-call__avatar" />
+          <avatar-image :profile="groupProfile" size="small" class="video-call__avatar" />
           <room-title-link
             :name="titleLabel"
             :to="groupRoute"
@@ -242,7 +242,7 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import mobile from '~/mixins/mobile'
 import { joinGroupVideoCallMutation } from '~/graphql/VideoCalls'
 import Chat from '~/components/Chat/Chat.vue'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import RoomTitleLink from '~/components/_new/generic/RoomTitleLink/RoomTitleLink'
 import VideoTile from './VideoTile.vue'
 import PreJoin from './PreJoin.vue'
@@ -270,7 +270,7 @@ export default {
     OsButton,
     OsIcon,
     Chat,
-    ProfileAvatar,
+    AvatarImage,
     RoomTitleLink,
   },
   mixins: [mobile()],
@@ -892,7 +892,7 @@ export default {
         return {
           id: (meta && meta.userId) || participant.identity,
           name: participant.name || participant.identity,
-          // ResponsiveImage (used by ProfileAvatar) expects url + responsive
+          // ResponsiveImage (used by AvatarImage) expects url + responsive
           // variants. We only have one URL from the metadata — reuse it for
           // every variant so the srcset stays valid; the browser will load
           // the available image regardless of the requested size.
@@ -1141,78 +1141,79 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .video-call__backdrop {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
-  z-index: $z-index-overlay;
+  z-index: var(--z-index-overlay);
 }
 
 .video-call {
   position: fixed;
-  background: $background-color-base;
-  color: $text-color-base;
+  background: var(--background-color-base);
+  color: var(--text-color-base);
   display: flex;
   flex-direction: column;
-  z-index: $z-index-overlay;
-  box-shadow: $box-shadow-large;
-  font-family: $font-family-text;
+  z-index: var(--z-index-overlay);
+  box-shadow: var(--box-shadow-large);
+  font-family: var(--font-family-text);
 }
 
 .video-call--maximized {
-  // Match the map page's layering pattern (see pages/map.vue): cover the full
-  // viewport (top: 0, bottom: 0) and sit at $z-index-surface so the page
-  // header (.main-navigation, z-index: $z-index-page-submenu = 2500) and the
-  // sticky footer (.ds-footer, z-index: 10) both stack on top — their own
-  // box-shadows then naturally fall onto the call surface from above and
-  // below. Padding (not offset) keeps the call's internal header and
-  // controls below the page header / above the page footer.
-  // HeaderMenu sets --header-height; PageFooter sets --footer-height (0 on
-  // mobile where the footer is hidden).
+  /*  Match the map page's layering pattern (see pages/map.vue): cover the full */
+  /*  viewport (top: 0, bottom: 0) and sit at var(--z-index-surface) so the page */
+  /*  header (.main-navigation, z-index: var(--z-index-page-submenu) = 2500) and the */
+  /*  sticky footer (.ds-footer, z-index: 10) both stack on top — their own */
+  /*  box-shadows then naturally fall onto the call surface from above and */
+  /*  below. Padding (not offset) keeps the call's internal header and */
+  /*  controls below the page header / above the page footer. */
+  /*  HeaderMenu sets --header-height; PageFooter sets --footer-height (0 on */
+  /*  mobile where the footer is hidden). */
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
   padding-top: var(--header-height, 6rem);
   padding-bottom: var(--footer-height, 0px);
-  z-index: $z-index-surface;
-  // The base .video-call rule paints a $box-shadow-large around the panel.
-  // When the panel covers the full viewport that shadow has nowhere to land
-  // — and worse, the panel's own shadow competes with the header/footer
-  // shadows along the top and bottom seams. Drop it in the maximized state.
+  z-index: var(--z-index-surface);
+  /*  The base .video-call rule paints a var(--box-shadow-large) around the panel. */
+  /*  When the panel covers the full viewport that shadow has nowhere to land */
+  /*  — and worse, the panel's own shadow competes with the header/footer */
+  /*  shadows along the top and bottom seams. Drop it in the maximized state. */
   box-shadow: none;
 }
 
 .video-call--minimized {
-  // Match the chat's footer offset so the minimized window sits above the
-  // desktop footer instead of flush with the viewport edge.
+  /*  Match the chat's footer offset so the minimized window sits above the */
+  /*  desktop footer instead of flush with the viewport edge. */
   bottom: 45px;
   right: 0;
   width: 355px;
   height: 280px;
-  border-top-left-radius: $border-radius-base;
-  border-top-right-radius: $border-radius-base;
+  border-top-left-radius: var(--border-radius-base);
+  border-top-right-radius: var(--border-radius-base);
   overflow: hidden;
 }
 
 .video-call--modal {
-  // Centered popover over the underlying page — the user can still see the
-  // group context behind the dimmed backdrop.
+  /*  Centered popover over the underlying page — the user can still see the */
+  /*  group context behind the dimmed backdrop. */
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: min(900px, calc(100vw - #{$space-base * 2}));
-  height: min(560px, calc(100vh - #{$space-large * 2}));
-  border-radius: $border-radius-base;
+  width: min(900px, calc(100vw - var(--space-base) * 2));
+  height: min(560px, calc(100vh - var(--space-large) * 2));
+  border-radius: var(--border-radius-base);
   overflow: hidden;
-  z-index: $z-index-overlay + 1;
+  /*  calc(), not Sass '+': the tokens are var() now and Sass cannot add those. */
+  z-index: calc(var(--z-index-overlay) + 1);
 }
 
 @media (max-width: 810px) {
   .video-call--modal {
-    // Use the full viewport on mobile — the split layout already collapses
-    // vertically inside PreJoin.vue at this breakpoint.
+    /*  Use the full viewport on mobile — the split layout already collapses */
+    /*  vertically inside PreJoin.vue at this breakpoint. */
     inset: 0;
     top: 0;
     left: 0;
@@ -1226,28 +1227,28 @@ export default {
 .video-call__header {
   display: flex;
   align-items: center;
-  gap: $space-x-small;
-  padding: $space-x-small $space-small;
-  // Keep the header field at its pre-existing visual height even though the
-  // avatar shrank from base (44px) to small (34px) — matches the chat header.
-  min-height: $size-avatar-base + 2 * $space-x-small;
-  background: $color-header-background;
-  border-bottom: 1px solid $color-neutral-85;
-  font-weight: $font-weight-bold;
-  color: $text-color-base;
+  gap: var(--space-x-small);
+  padding: var(--space-x-small) var(--space-small);
+  /*  Keep the header field at its pre-existing visual height even though the */
+  /*  avatar shrank from base (44px) to small (34px) — matches the chat header. */
+  min-height: calc(var(--size-avatar-base) + 2 * var(--space-x-small));
+  background: var(--color-header-background);
+  border-bottom: 1px solid var(--color-neutral-85);
+  font-weight: var(--text-weight-bold);
+  color: var(--text-color-base);
 
-  // The RoomTitleLink ships with font-weight: 500 (medium) for its in-chat
-  // usage; inside the call modal we want the group name to read as a proper
-  // dialog heading, so override with the heading bold weight.
+  /*  The RoomTitleLink ships with font-weight: 500 (medium) for its in-chat */
+  /*  usage; inside the call modal we want the group name to read as a proper */
+  /*  dialog heading, so override with the heading bold weight. */
   ::v-deep .room-title-link {
-    font-weight: $font-weight-bold;
+    font-weight: var(--text-weight-bold);
   }
 }
 
 .video-call__header-info {
   display: flex;
   align-items: center;
-  gap: $space-x-small;
+  gap: var(--space-x-small);
   flex: 1 1 0;
   min-width: 0;
   overflow: hidden;
@@ -1260,38 +1261,38 @@ export default {
 .video-call__header-right {
   display: flex;
   align-items: center;
-  gap: $space-xx-small;
+  gap: var(--space-xx-small);
   margin-left: auto;
   flex-shrink: 0;
 }
 
 .video-call__count {
-  background: $color-primary;
-  color: $color-primary-inverse;
-  padding: 2px $space-x-small;
-  border-radius: $border-radius-rounded;
-  font-size: $font-size-small;
+  background: var(--color-primary);
+  color: var(--color-primary-inverse);
+  padding: 2px var(--space-x-small);
+  border-radius: var(--border-radius-rounded);
+  font-size: var(--font-size-small);
   min-width: 28px;
   text-align: center;
 }
 
 .video-call__header-actions {
   display: flex;
-  gap: $space-xxx-small;
+  gap: var(--space-xxx-small);
   align-items: center;
 }
 
 .video-call--minimized .video-call__header {
-  // Compact padding so avatar + title + count + buttons all fit in 355px.
-  padding: $space-xxx-small $space-x-small;
-  gap: $space-xx-small;
+  /*  Compact padding so avatar + title + count + buttons all fit in 355px. */
+  padding: var(--space-xxx-small) var(--space-x-small);
+  gap: var(--space-xx-small);
 }
 
 .video-call__body {
   flex: 1;
   display: flex;
   overflow: hidden;
-  background: $color-neutral-10;
+  background: var(--color-neutral-10);
   position: relative;
   min-height: 0;
 }
@@ -1304,28 +1305,28 @@ export default {
 
 .video-call__grid {
   display: grid;
-  gap: $space-xxx-small;
-  padding: $space-xxx-small;
+  gap: var(--space-xxx-small);
+  padding: var(--space-xxx-small);
 }
 
 .video-call__single {
   display: flex;
 }
 
-// Spotlight: big tile fills the left column, the others auto-flow as a
-// narrow column of thumbnails on the right. All tiles stay in the same
-// container so audio tracks stay attached when toggling spotlight.
-//
-// `repeat(auto-fill, minmax(90px, 1fr))` creates as many explicit rows as
-// fit in the container at ~90 px each. The spotlight tile then spans every
-// row via `grid-row: 1 / -1`, while the thumbnails auto-place into the
-// narrow right column, one per row.
+/*  Spotlight: big tile fills the left column, the others auto-flow as a */
+/*  narrow column of thumbnails on the right. All tiles stay in the same */
+/*  container so audio tracks stay attached when toggling spotlight. */
+/**/
+/*  `repeat(auto-fill, minmax(90px, 1fr))` creates as many explicit rows as */
+/*  fit in the container at ~90 px each. The spotlight tile then spans every */
+/*  row via `grid-row: 1 / -1`, while the thumbnails auto-place into the */
+/*  narrow right column, one per row. */
 .video-call__stage--spotlight {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 160px;
   grid-template-rows: repeat(auto-fill, minmax(90px, 1fr));
-  gap: $space-xxx-small;
-  padding: $space-xxx-small;
+  gap: var(--space-xxx-small);
+  padding: var(--space-xxx-small);
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -1342,32 +1343,32 @@ export default {
 
 .video-call__speakers {
   position: absolute;
-  top: $space-x-small;
+  top: var(--space-x-small);
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-wrap: wrap;
-  gap: $space-xx-small;
+  gap: var(--space-xx-small);
   justify-content: center;
-  max-width: calc(100% - #{$space-base});
+  max-width: calc(100% - var(--space-base));
   pointer-events: none;
   z-index: 2;
 }
 
 .video-call__speaker-chip {
   background: rgba(0, 0, 0, 0.65);
-  color: $text-color-inverse;
-  padding: 2px $space-x-small;
-  border-radius: $border-radius-rounded;
-  font-size: $font-size-small;
-  font-weight: $font-weight-bold;
+  color: var(--text-color-inverse);
+  padding: 2px var(--space-x-small);
+  border-radius: var(--border-radius-rounded);
+  font-size: var(--font-size-small);
+  font-weight: var(--text-weight-bold);
   display: inline-flex;
   align-items: center;
 }
 
 .video-call__speaker-chip-self {
-  font-weight: $font-weight-regular;
-  margin-left: $space-xxx-small;
+  font-weight: var(--text-weight-regular);
+  margin-left: var(--space-xxx-small);
   opacity: 0.85;
 }
 
@@ -1376,8 +1377,8 @@ export default {
   max-width: 40%;
   display: flex;
   flex-direction: column;
-  background: $background-color-base;
-  border-left: 1px solid $color-neutral-85;
+  background: var(--background-color-base);
+  border-left: 1px solid var(--color-neutral-85);
   overflow: hidden;
 }
 
@@ -1392,16 +1393,16 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: $space-small;
+  padding: var(--space-small);
   text-align: center;
-  color: $text-color-inverse;
+  color: var(--text-color-inverse);
 }
 
 .video-call__error {
-  color: $color-danger-inverse;
-  background: $color-danger;
+  color: var(--color-danger-inverse);
+  background: var(--color-danger);
   flex-direction: column;
-  gap: $space-small;
+  gap: var(--space-small);
 }
 
 .video-call__error-message {
@@ -1410,25 +1411,25 @@ export default {
 
 .video-call__error-actions {
   display: flex;
-  gap: $space-x-small;
+  gap: var(--space-x-small);
   flex-wrap: wrap;
   justify-content: center;
 }
 
 .video-call__controls {
   display: flex;
-  gap: $space-x-small;
-  padding: $space-x-small $space-small;
-  background: $background-color-soft;
-  border-top: 1px solid $color-neutral-85;
+  gap: var(--space-x-small);
+  padding: var(--space-x-small) var(--space-small);
+  background: var(--background-color-soft);
+  border-top: 1px solid var(--color-neutral-85);
   flex-wrap: wrap;
   justify-content: center;
 }
 
 .video-call--minimized .video-call__controls {
-  // Tighter spacing for the icon-only row in the parked window.
-  padding: $space-xxx-small $space-x-small;
-  gap: $space-xxx-small;
+  /*  Tighter spacing for the icon-only row in the parked window. */
+  padding: var(--space-xxx-small) var(--space-x-small);
+  gap: var(--space-xxx-small);
 }
 
 @media (max-width: 810px) {

@@ -207,8 +207,8 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .group-add-button {
-  box-shadow: $box-shadow-x-large !important;
+  box-shadow: var(--box-shadow-x-large) !important;
 }
 </style>

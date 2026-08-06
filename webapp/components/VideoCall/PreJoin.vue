@@ -3,7 +3,7 @@
     <div class="prejoin__preview">
       <video v-show="hasVideo" ref="previewEl" autoplay muted playsinline class="prejoin__video" />
       <div v-if="!hasVideo" class="prejoin__placeholder">
-        <profile-avatar :profile="currentUser" size="large" class="prejoin__avatar" />
+        <avatar-image :profile="currentUser" size="large" class="prejoin__avatar" />
         <span class="prejoin__placeholder-text">
           {{
             cameraActive ? $t('videoCall.prejoin.noCamera') : $t('videoCall.prejoin.cameraDisabled')
@@ -160,11 +160,11 @@
 import { mapGetters } from 'vuex'
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 
 export default {
   name: 'PreJoin',
-  components: { OsButton, OsIcon, ProfileAvatar },
+  components: { OsButton, OsIcon, AvatarImage },
   data() {
     return {
       cameras: [],
@@ -650,22 +650,22 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .prejoin {
-  // Flex into whatever vertical space the parent leaves after the header.
+  /*  Flex into whatever vertical space the parent leaves after the header. */
   flex: 1;
   display: flex;
-  background: $background-color-base;
-  color: $text-color-base;
+  background: var(--background-color-base);
+  color: var(--text-color-base);
   overflow: auto;
-  font-family: $font-family-text;
+  font-family: var(--font-family-text);
   min-height: 0;
 }
 
 .prejoin__preview {
   position: relative;
   flex: 1 1 60%;
-  background: $color-neutral-10;
+  background: var(--color-neutral-10);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -686,9 +686,9 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: $space-small;
-  color: $color-neutral-70;
-  padding: $space-small;
+  gap: var(--space-small);
+  color: var(--color-neutral-70);
+  padding: var(--space-small);
   text-align: center;
   pointer-events: none;
 }
@@ -698,49 +698,49 @@ export default {
 }
 
 .prejoin__placeholder-text {
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
 }
 
 .prejoin__panel {
   flex: 1 1 40%;
   max-width: 460px;
-  padding: $space-base;
+  padding: var(--space-base);
   display: flex;
   flex-direction: column;
-  gap: $space-small;
-  background: $background-color-soft;
-  border-left: 1px solid $color-neutral-85;
+  gap: var(--space-small);
+  background: var(--background-color-soft);
+  border-left: 1px solid var(--color-neutral-85);
 }
 
 .prejoin__title {
-  margin: 0 0 $space-xxx-small;
-  font-size: $font-size-large;
-  font-family: $font-family-heading;
-  font-weight: $font-weight-bold;
-  color: $text-color-base;
+  margin: 0 0 var(--space-xxx-small);
+  font-size: var(--font-size-large);
+  font-family: var(--font-family-heading);
+  font-weight: var(--text-weight-bold);
+  color: var(--text-color-base);
 }
 
 .prejoin__description {
-  margin: 0 0 $space-x-small;
-  font-size: $font-size-small;
-  color: $text-color-soft;
+  margin: 0 0 var(--space-x-small);
+  font-size: var(--font-size-small);
+  color: var(--text-color-soft);
   line-height: 1.4;
 }
 
 .prejoin__row {
   display: flex;
   flex-direction: column;
-  gap: $space-xxx-small;
+  gap: var(--space-xxx-small);
 
   select {
-    background: $background-color-base;
-    color: $text-color-base;
-    border: 1px solid $color-neutral-70;
-    padding: $space-xx-small $space-x-small;
-    border-radius: $border-radius-base;
+    background: var(--background-color-base);
+    color: var(--text-color-base);
+    border: 1px solid var(--color-neutral-70);
+    padding: var(--space-xx-small) var(--space-x-small);
+    border-radius: var(--border-radius-base);
     width: 100%;
-    font-family: $font-family-text;
-    font-size: $font-size-base;
+    font-family: var(--font-family-text);
+    font-size: var(--font-size-base);
   }
 }
 
@@ -748,54 +748,62 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-weight: $font-weight-bold;
-  font-size: $font-size-base;
-  color: $text-color-base;
+  font-weight: var(--text-weight-bold);
+  font-size: var(--font-size-base);
+  color: var(--text-color-base);
 }
 
 .prejoin__status {
-  font-weight: $font-weight-regular;
-  font-size: $font-size-x-small;
-  padding: 2px $space-x-small;
-  border-radius: $border-radius-rounded;
-  background: $color-neutral-80;
-  color: $text-color-base;
+  font-weight: var(--text-weight-regular);
+  font-size: var(--font-size-x-small);
+  padding: 2px var(--space-x-small);
+  border-radius: var(--border-radius-rounded);
+  background: var(--color-neutral-80);
+  color: var(--text-color-base);
+}
 
-  &--granted {
-    background: $color-primary;
-    color: $color-primary-inverse;
-  }
-  &--prompt {
-    background: $color-warning;
-    color: $color-warning-inverse;
-  }
-  &--denied {
-    background: $color-danger;
-    color: $color-danger-inverse;
-  }
-  &--unsupported,
-  &--info {
-    background: transparent;
-    color: $text-color-softer;
-  }
+.prejoin__status--granted {
+  background: var(--color-primary);
+  color: var(--color-primary-inverse);
+}
+
+.prejoin__status--prompt {
+  background: var(--color-warning);
+  color: var(--color-warning-inverse);
+}
+
+.prejoin__status--denied {
+  background: var(--color-danger);
+  color: var(--color-danger-inverse);
+}
+
+.prejoin__status--unsupported,
+.prejoin__status--info {
+  background: transparent;
+  color: var(--text-color-softer);
 }
 
 .prejoin__meter {
   height: 6px;
-  background: $color-neutral-85;
-  border-radius: $border-radius-rounded;
+  background: var(--color-neutral-85);
+  border-radius: var(--border-radius-rounded);
   overflow: hidden;
 }
 
 .prejoin__meter-fill {
   height: 100%;
-  background: linear-gradient(90deg, $color-primary 0%, $color-warning 70%, $color-danger 100%);
+  background: linear-gradient(
+    90deg,
+    var(--color-primary) 0%,
+    var(--color-warning) 70%,
+    var(--color-danger) 100%
+  );
   transition: width 80ms linear;
 }
 
 .prejoin__speaker-row {
   display: flex;
-  gap: $space-x-small;
+  gap: var(--space-x-small);
   align-items: center;
 
   select {
@@ -805,18 +813,18 @@ export default {
 
 .prejoin__device-toggles {
   display: flex;
-  gap: $space-x-small;
+  gap: var(--space-x-small);
   flex-wrap: wrap;
   justify-content: center;
-  padding: $space-x-small 0;
-  border-top: 1px solid $color-neutral-85;
-  border-bottom: 1px solid $color-neutral-85;
+  padding: var(--space-x-small) 0;
+  border-top: 1px solid var(--color-neutral-85);
+  border-bottom: 1px solid var(--color-neutral-85);
 }
 
 .prejoin__hint {
   margin: 0;
-  font-size: $font-size-small;
-  color: $text-color-soft;
+  font-size: var(--font-size-small);
+  color: var(--text-color-soft);
   min-height: 1.2em;
   text-align: center;
 }
@@ -824,13 +832,13 @@ export default {
 .prejoin__error {
   display: flex;
   align-items: center;
-  gap: $space-x-small;
-  color: $text-color-danger;
-  background: $color-danger-inverse;
-  border: 1px solid $color-danger-light;
-  padding: $space-x-small $space-small;
-  border-radius: $border-radius-base;
-  font-size: $font-size-small;
+  gap: var(--space-x-small);
+  color: var(--text-color-danger);
+  background: var(--color-danger-inverse);
+  border: 1px solid var(--color-danger-light);
+  padding: var(--space-x-small) var(--space-small);
+  border-radius: var(--border-radius-base);
+  font-size: var(--font-size-small);
 }
 
 .prejoin__error-text {
@@ -840,7 +848,7 @@ export default {
 .prejoin__actions {
   display: flex;
   justify-content: flex-end;
-  gap: $space-x-small;
+  gap: var(--space-x-small);
   margin-top: auto;
 }
 
@@ -858,7 +866,7 @@ export default {
     max-width: none;
     flex: 1 1 auto;
     border-left: none;
-    border-top: 1px solid $color-neutral-85;
+    border-top: 1px solid var(--color-neutral-85);
   }
 }
 </style>

@@ -10,7 +10,7 @@ const stubs = {
   },
   'os-icon': { template: '<span />' },
   'os-badge': { template: '<span><slot /></span>' },
-  'profile-avatar': { template: '<div />' },
+  'avatar-image': { template: '<div />' },
   'ocelot-select': {
     template:
       '<div class="ocelot-select"><slot /><slot name="option" :option="{ name: \'test\' }" /></div>',

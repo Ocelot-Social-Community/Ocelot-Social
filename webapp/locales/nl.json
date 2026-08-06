@@ -80,59 +80,62 @@
       "verificationBadges": "Verificaties"
     },
     "branding": {
-      "activate": null,
+      "activate": "Activeren",
       "available": {
         "active": "Actieve basis",
         "default": "Terugval",
-        "title": null
+        "title": "Beschikbare brandings"
       },
       "composition": {
         "bucket": {
-          "behavior": null,
-          "identity": null,
-          "legal": null,
-          "logos": null,
-          "navigation": null,
-          "theme": null
+          "behavior": "Gedrag (limieten, formaten)",
+          "identity": "Identiteit (naam, organisatie)",
+          "legal": "Juridisch en statische pagina's",
+          "logos": "Logo's en favicon",
+          "navigation": "Navigatie en menu's",
+          "theme": "Thema (kleuren, lettertypen)"
         },
-        "change": null,
-        "confirm": null,
-        "defaultTag": null,
-        "description": null,
-        "details": null,
-        "frameworkDefault": null,
-        "from": null,
-        "inherit": null,
-        "noDetails": null,
-        "provides": null,
-        "title": null,
-        "unprovidedInherit": null,
-        "wholePackage": null
+        "change": "Wijziging {from} → {to}",
+        "confirm": "Toepassen",
+        "defaultTag": "standaard",
+        "description": "Stel per gebied de bron in, over het basispakket ({base}) heen. Een wijziging herlaadt de app voor iedereen.",
+        "details": "Details tonen",
+        "frameworkDefault": "Framework-standaard (vanilla)",
+        "from": "Van: {source}",
+        "inherit": "Overnemen van pakket ({base})",
+        "noDetails": "Geen waarden (framework-standaard).",
+        "provides": "Bevat",
+        "title": "Branding-samenstelling",
+        "unprovidedInherit": "Gebieden die niet meegeleverd worden, nemen de framework-standaard over.",
+        "wholePackage": "Volledig pakket (alle gebieden)"
       },
-      "current": null,
-      "description": null,
+      "current": "Actief",
+      "description": "Kies welke ingebakken branding netwerkbreed actief is. Omschakelen herlaadt de app voor iedereen.",
       "detail": {
-        "appDescription": null,
-        "colors": null,
-        "favicon": null,
-        "footer": null,
-        "logos": null,
-        "noPages": null,
-        "organization": null,
-        "pages": null,
-        "pagesSummary": null,
-        "reuse": null,
-        "themeColor": null
+        "appDescription": "Beschrijving",
+        "colors": "Kleuren",
+        "favicon": "Favicon",
+        "footer": "Footerpagina's",
+        "logos": "Logo's",
+        "noPages": "geen",
+        "organization": "Organisatie",
+        "pages": "Statische pagina's",
+        "pagesSummary": "{pages} pagina's ({locales})",
+        "reuse": "Hergebruik",
+        "themeColor": "Themakleur"
       },
-      "error": null,
-      "loading": null,
-      "name": null,
-      "none": null,
-      "noneExtra": null,
-      "schema": null,
-      "schemaTitle": null,
-      "title": null,
-      "vanilla": null
+      "error": "De branding kon niet worden omgeschakeld.",
+      "loading": "Brandings laden…",
+      "name": "Branding",
+      "none": "In deze instantie is geen branding ingebakken.",
+      "noneExtra": "In deze instantie zijn geen extra brandings ingebakken — alleen de framework-standaard is beschikbaar.",
+      "schema": "schema",
+      "schemaTitle": "De versie van het @ocelot-social/branding-pakket waarmee dit archief is gebouwd.",
+      "stylesheets": "Eigen stylesheets",
+      "stylesheetUnreadable": "niet leesbaar",
+      "stylesheetVars": "{count} thema-eigenschap ::: {count} thema-eigenschappen",
+      "title": "Branding",
+      "vanilla": "Framework-standaard (geen branding)"
     },
     "categories": {
       "categoryName": "Naam",
@@ -1670,7 +1673,7 @@
     "termsAndConditionsNewConfirm": "Ik heb de nieuwe algemene voorwaarden gelezen en ga ermee akkoord.",
     "termsAndConditionsNewConfirmText": "Lees nu de nieuwe gebruiksvoorwaarden!"
   },
-  "user-teaser": {
+  "user-avatar": {
     "popover": {
       "open-profile": "Profiel openen"
     }

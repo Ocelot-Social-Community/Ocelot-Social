@@ -71,17 +71,17 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 .create-invitation {
   display: flex;
   flex-direction: column;
-  gap: $space-small;
+  gap: var(--space-small);
 }
 
 .generate-invite-code-form {
   display: flex;
   align-items: center;
-  gap: $space-x-small;
+  gap: var(--space-x-small);
 }
 
 ::v-deep .ds-form-item {
@@ -90,7 +90,7 @@ export default {
 }
 
 ::v-deep .ds-input-error {
-  margin-top: $space-xx-small;
-  margin-left: $space-x-small;
+  margin-top: var(--space-xx-small);
+  margin-left: var(--space-x-small);
 }
 </style>

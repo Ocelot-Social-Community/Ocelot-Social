@@ -12,9 +12,9 @@
             :profile="group"
             :updateMutation="updateGroupMutation"
           >
-            <profile-avatar :profile="group" class="profile-page-avatar" size="large" />
+            <avatar-image :profile="group" class="profile-page-avatar" size="large" />
           </avatar-uploader>
-          <profile-avatar v-else :profile="group" class="profile-page-avatar" size="large" />
+          <avatar-image v-else :profile="group" class="profile-page-avatar" size="large" />
           <!-- Menu -->
           <client-only>
             <group-content-menu
@@ -358,7 +358,7 @@ import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import GroupPageMemberList from '~/components/features/ProfileList/GroupPageMemberList'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
 import { mapGetters, mapMutations } from 'vuex'
@@ -391,7 +391,7 @@ export default {
     JoinLeaveButton,
     LocationInfo,
     PostTeaser,
-    ProfileAvatar,
+    AvatarImage,
     GroupPageMemberList,
     MasonryGrid,
     MasonryGridItem,
@@ -848,20 +848,20 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
-::v-deep .profile-page-avatar.profile-avatar {
+<style scoped>
+::v-deep .profile-page-avatar.avatar-image {
   margin: auto;
   margin-top: -60px;
 }
 @media (max-width: 810px) {
   .group-profile {
-    padding-top: $space-large;
+    padding-top: var(--space-large);
   }
 }
 .group-layout__sidebar ::v-deep .group-profile-content-menu {
   position: absolute;
-  top: $space-x-small;
-  right: $space-x-small;
+  top: var(--space-x-small);
+  right: var(--space-x-small);
 }
 .group-layout__sidebar,
 .group-layout__main {
@@ -869,7 +869,7 @@ export default {
   width: 100%;
   min-width: 0;
 }
-@media #{$media-query-small} {
+@media (min-width: 600px) {
   .group-layout__sidebar {
     flex: 2 0 0;
   }
@@ -877,7 +877,7 @@ export default {
     flex: 3 0 0;
   }
 }
-@media #{$media-query-medium} {
+@media (min-width: 768px) {
   .group-layout__sidebar {
     flex: 2 0 0;
   }
@@ -885,7 +885,7 @@ export default {
     flex: 5 0 0;
   }
 }
-@media #{$media-query-large} {
+@media (min-width: 1024px) {
   .group-layout__sidebar {
     flex: 1 0 0;
   }
@@ -894,30 +894,30 @@ export default {
   }
 }
 ::v-deep .profile-post-add-button {
-  box-shadow: $box-shadow-x-large;
+  box-shadow: var(--box-shadow-x-large);
 }
 .action-buttons {
   display: flex;
   flex-direction: column;
-  gap: $space-x-small;
-  margin: $space-small 0;
+  gap: var(--space-x-small);
+  margin: var(--space-small) 0;
 }
 .centered-text {
   text-align: center;
-  margin-bottom: $space-xxx-small;
+  margin-bottom: var(--space-xxx-small);
 }
 .chip {
-  margin-bottom: $space-x-small;
+  margin-bottom: var(--space-x-small);
 }
 ::v-deep .group-description.os-card {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding-bottom: $space-base !important;
+  padding-bottom: var(--space-base) !important;
 
   .content {
     flex-grow: 1;
-    margin-bottom: $space-small;
+    margin-bottom: var(--space-small);
   }
 }
 .word-break-all {
@@ -926,7 +926,7 @@ export default {
 .member-teaser {
   display: flex;
   align-items: center;
-  gap: $space-x-small;
+  gap: var(--space-x-small);
   width: 100%;
 
   .member-teaser__user {

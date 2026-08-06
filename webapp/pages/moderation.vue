@@ -61,10 +61,10 @@ export default {
 }
 </script>
 
-<style lang="scss">
-// AreaMenu owns its own responsive width (full-width select on narrow viewports,
-// 200px sidebar from $media-query-small up); the main column just fills the rest
-// and shrinks below its content's intrinsic width instead of wrapping under the menu.
+<style>
+/*  AreaMenu owns its own responsive width (full-width select on narrow viewports, */
+/*  200px sidebar from 600px up); the main column just fills the rest */
+/*  and shrinks below its content's intrinsic width instead of wrapping under the menu. */
 .moderation-layout__main {
   flex: 1 1 0;
   min-width: 0;

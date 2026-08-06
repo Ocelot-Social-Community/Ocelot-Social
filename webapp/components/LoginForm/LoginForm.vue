@@ -148,15 +148,15 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .login-form {
   width: 80vw;
   max-width: 620px;
   margin: auto;
 
   button[type='submit'] {
-    margin-top: $space-large;
-    margin-bottom: $space-small;
+    margin-top: var(--space-large);
+    margin-bottom: var(--space-small);
   }
 }
 
@@ -164,26 +164,26 @@ export default {
   display: flex;
   width: 100%;
   align-items: center;
-  padding: $input-padding-vertical $space-x-small;
+  padding: var(--input-padding-vertical) var(--space-x-small);
   padding-left: 0;
   padding-right: 0;
-  height: $input-height;
+  height: var(--input-height);
   margin-bottom: 10px;
 
-  color: $text-color-base;
-  background: $background-color-disabled;
+  color: var(--text-color-base);
+  background: var(--background-color-disabled);
 
-  border: $input-border-size solid $border-color-softer;
-  border-radius: $border-radius-base;
+  border: var(--input-border-size) solid var(--border-color-softer);
+  border-radius: var(--border-radius-base);
   outline: none;
-  transition: all $duration-short $ease-out;
+  transition: all var(--duration-short) var(--ease-out);
 
   &:focus-within {
-    background-color: $background-color-base;
-    border: $input-border-size solid $border-color-active;
+    background-color: var(--background-color-base);
+    border: var(--input-border-size) solid var(--border-color-active);
 
     .toggle-icon {
-      color: $text-color-base;
+      color: var(--text-color-base);
     }
   }
 

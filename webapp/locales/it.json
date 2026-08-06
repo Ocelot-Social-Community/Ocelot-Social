@@ -80,59 +80,62 @@
       "verificationBadges": "Verifiche"
     },
     "branding": {
-      "activate": null,
+      "activate": "Attiva",
       "available": {
         "active": "Base attiva",
         "default": "Riserva",
-        "title": null
+        "title": "Branding disponibili"
       },
       "composition": {
         "bucket": {
-          "behavior": null,
-          "identity": null,
-          "legal": null,
-          "logos": null,
-          "navigation": null,
-          "theme": null
+          "behavior": "Comportamento (limiti, formati)",
+          "identity": "Identità (nome, organizzazione)",
+          "legal": "Note legali e pagine statiche",
+          "logos": "Loghi e favicon",
+          "navigation": "Navigazione e menu",
+          "theme": "Tema (colori, caratteri)"
         },
-        "change": null,
-        "confirm": null,
-        "defaultTag": null,
-        "description": null,
-        "details": null,
-        "frameworkDefault": null,
-        "from": null,
-        "inherit": null,
-        "noDetails": null,
-        "provides": null,
-        "title": null,
-        "unprovidedInherit": null,
-        "wholePackage": null
+        "change": "Cambio {from} → {to}",
+        "confirm": "Applica",
+        "defaultTag": "predefinito",
+        "description": "Imposta la fonte di ogni area, sovrapposta al pacchetto di base ({base}). Modificare un'area ricarica l'app per tutti.",
+        "details": "Mostra dettagli",
+        "frameworkDefault": "Predefinito del framework (vanilla)",
+        "from": "Da: {source}",
+        "inherit": "Eredita dal pacchetto ({base})",
+        "noDetails": "Nessun valore (predefinito del framework).",
+        "provides": "Contiene",
+        "title": "Composizione del branding",
+        "unprovidedInherit": "Le aree non incluse ereditano il predefinito del framework.",
+        "wholePackage": "Pacchetto completo (tutte le aree)"
       },
-      "current": null,
-      "description": null,
+      "current": "Attivo",
+      "description": "Scegli quale branding integrato è attivo per tutta la rete. Il cambio ricarica l'app per tutti.",
       "detail": {
-        "appDescription": null,
-        "colors": null,
-        "favicon": null,
-        "footer": null,
-        "logos": null,
-        "noPages": null,
-        "organization": null,
-        "pages": null,
-        "pagesSummary": null,
-        "reuse": null,
-        "themeColor": null
+        "appDescription": "Descrizione",
+        "colors": "Colori",
+        "favicon": "Favicon",
+        "footer": "Pagine del footer",
+        "logos": "Loghi",
+        "noPages": "nessuna",
+        "organization": "Organizzazione",
+        "pages": "Pagine statiche",
+        "pagesSummary": "{pages} pagine ({locales})",
+        "reuse": "Riutilizzo",
+        "themeColor": "Colore del tema"
       },
-      "error": null,
-      "loading": null,
-      "name": null,
-      "none": null,
-      "noneExtra": null,
-      "schema": null,
-      "schemaTitle": null,
-      "title": null,
-      "vanilla": null
+      "error": "Impossibile cambiare il branding.",
+      "loading": "Caricamento dei branding…",
+      "name": "Branding",
+      "none": "In questa istanza non è integrato alcun branding.",
+      "noneExtra": "In questa istanza non sono integrati altri branding — è disponibile solo il predefinito del framework.",
+      "schema": "schema",
+      "schemaTitle": "La versione del pacchetto @ocelot-social/branding con cui è stato creato questo archivio.",
+      "stylesheets": "Fogli di stile propri",
+      "stylesheetUnreadable": "non leggibile",
+      "stylesheetVars": "{count} proprietà del tema ::: {count} proprietà del tema",
+      "title": "Branding",
+      "vanilla": "Predefinito del framework (nessun branding)"
     },
     "categories": {
       "categoryName": "Nome",
@@ -1670,7 +1673,7 @@
     "termsAndConditionsNewConfirm": "Ho letto e accetto le nuove condizioni generali di contratto.",
     "termsAndConditionsNewConfirmText": "Si prega di leggere le nuove condizioni d'uso ora!"
   },
-  "user-teaser": {
+  "user-avatar": {
     "popover": {
       "open-profile": "Apri profilo"
     }

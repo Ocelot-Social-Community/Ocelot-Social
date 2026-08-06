@@ -1,6 +1,6 @@
 {
   "//": "Tooling config: type-checks src + scripts and is what ESLint's projectService and",
-  "//2": "`npm run typecheck` use. It emits nothing — `tsconfig.build.json` does the CommonJS dist build.",
+  "//2": "`npm run typecheck` use. It emits nothing \u2014 `tsconfig.build.json` does the CommonJS dist build.",
   "//3": "nodenext + the package's `\"type\": \"module\"` mean every .ts here is ESM (top-level await,",
   "//4": "import.meta, explicit .js import extensions); the CJS dist is marked via dist/package.json.",
   "compilerOptions": {
@@ -14,5 +14,12 @@
     "noEmit": true,
     "allowImportingTsExtensions": true
   },
-  "include": ["src/**/*.ts", "scripts/**/*.ts"]
+  "include": [
+    "src/**/*.ts",
+    "scripts/**/*.ts"
+  ],
+  "exclude": [
+    "dist",
+    "**/*.spec.ts"
+  ]
 }

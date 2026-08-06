@@ -47,13 +47,13 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .progress-bar-component {
   height: 100%;
   position: relative;
   flex: 1;
   display: flex;
-  top: $space-xx-small;
+  top: var(--space-xx-small);
 }
 
 .progress-bar {
@@ -64,32 +64,32 @@ export default {
 
 .progress-bar__goal {
   position: relative;
-  height: 26px; // styleguide-button-size
-  border: 1px solid $color-primary;
-  background: repeating-linear-gradient(120deg, $color-neutral-80, $color-neutral-70);
-  border-radius: $border-radius-base;
+  height: 26px; /*  styleguide-button-size */
+  border: 1px solid var(--color-primary);
+  background: repeating-linear-gradient(120deg, var(--color-neutral-80), var(--color-neutral-70));
+  border-radius: var(--border-radius-base);
 }
 
 .progress-bar__progress {
   position: absolute;
   top: 0px;
   left: 0px;
-  height: 26px; // styleguide-button-size
+  height: 26px; /*  styleguide-button-size */
   max-width: 100%;
-  border-radius: $border-radius-base;
+  border-radius: var(--border-radius-base);
 
   &.color-uni {
-    background: $color-donation-bar;
+    background: var(--color-donation-bar);
   }
 
   &.color-repeating-linear-gradient {
     background: repeating-linear-gradient(
       120deg,
-      $color-donation-bar 0px,
-      $color-donation-bar 30px,
-      $color-donation-bar-light 50px,
-      $color-donation-bar-light 75px,
-      $color-donation-bar 95px
+      var(--color-donation-bar) 0px,
+      var(--color-donation-bar) 30px,
+      var(--color-donation-bar-light) 50px,
+      var(--color-donation-bar-light) 75px,
+      var(--color-donation-bar) 95px
     );
   }
 }
@@ -98,25 +98,25 @@ export default {
   position: absolute;
   top: 0px;
   left: 0px;
-  height: 26px; // styleguide-button-size
+  height: 26px; /*  styleguide-button-size */
   max-width: 100%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: $border-radius-base;
+  border-radius: var(--border-radius-base);
 }
 
 .progress-bar__label {
   position: relative;
 
   @media (max-width: 350px) {
-    font-size: $font-size-small;
+    font-size: var(--font-size-small);
   }
 }
 
 .progress-bar-button {
   position: relative;
-  margin-left: $space-x-small;
+  margin-left: var(--space-x-small);
 }
 
 @media (max-width: 639px) {

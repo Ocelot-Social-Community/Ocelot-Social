@@ -66,7 +66,7 @@ const stubs = {
     template: '<button class="stub-button" @click="$emit(\'click\')"><slot /></button>',
   }),
   OsIcon: Stub('OsIcon'),
-  ProfileAvatar: Stub('ProfileAvatar'),
+  AvatarImage: Stub('AvatarImage'),
   PreJoin: Stub('PreJoin'),
   VideoTile: Stub('VideoTile'),
   Chat: Stub('Chat'),

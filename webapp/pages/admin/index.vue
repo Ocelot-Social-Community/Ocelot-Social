@@ -66,7 +66,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .admin-stats__item {
   flex: 0 0 100%;
   width: 100%;
@@ -75,13 +75,13 @@ export default {
     text-transform: uppercase;
   }
 }
-@media #{$media-query-small} {
+@media (min-width: 600px) {
   .admin-stats__item {
     flex: 0 0 50%;
     width: 50%;
   }
 }
-@media #{$media-query-medium} {
+@media (min-width: 768px) {
   .admin-stats__item {
     flex: 0 0 33.333%;
     width: 33.333%;

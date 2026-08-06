@@ -70,12 +70,12 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 .invitation-list {
   display: flex;
   flex-flow: column;
-  gap: $space-base;
-  padding-bottom: $space-base;
+  gap: var(--space-base);
+  padding-bottom: var(--space-base);
 
   ul {
     list-style: none;
@@ -83,6 +83,6 @@ export default {
 }
 
 .create-invitation {
-  margin-top: $space-base;
+  margin-top: var(--space-base);
 }
 </style>

@@ -12,7 +12,7 @@
       {{ $t('components.registration.invite-code.form.description') }}
     </p>
     <div class="invitation-info" v-if="invitedBy">
-      <profile-avatar :profile="invitedBy" size="small" />
+      <avatar-image :profile="invitedBy" size="small" />
       <span v-if="invitedTo && invitedTo.groupType === 'hidden'">
         {{
           $t('components.registration.invite-code.invited-to-hidden-group', {
@@ -40,7 +40,7 @@
 <script>
 import { branding } from '@ocelot-social/branding'
 import { validateInviteCode } from '~/graphql/InviteCode'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
@@ -51,7 +51,7 @@ export default {
     sliderData: { type: Object, required: true },
   },
   components: {
-    ProfileAvatar,
+    AvatarImage,
     OcelotInput,
   },
   data() {
@@ -180,18 +180,18 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .enter-invite {
   display: flex;
   flex-direction: column;
-  margin: $space-large 0 $space-xxx-small 0;
+  margin: var(--space-large) 0 var(--space-xxx-small) 0;
 }
 
 .invitation-info {
   display: flex;
   align-items: center;
-  margin-bottom: $space-x-small;
-  gap: $space-small;
+  margin-bottom: var(--space-x-small);
+  gap: var(--space-small);
 
   > * {
     flex-shrink: 0;

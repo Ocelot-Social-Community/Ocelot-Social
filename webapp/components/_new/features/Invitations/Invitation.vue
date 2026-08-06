@@ -114,16 +114,16 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 .invitation {
   display: flex;
-  padding: calc($space-base / 2);
+  padding: calc(var(--space-base) / 2);
   border-bottom: 1px dotted #e5e3e8;
   align-items: center;
 }
 
 .invitation:nth-child(odd) {
-  background-color: $color-neutral-90;
+  background-color: var(--color-neutral-90);
 }
 
 .invitation:nth-child(even) {
@@ -134,7 +134,7 @@ export default {
   flex: auto;
   display: flex;
   flex-flow: column;
-  gap: $space-xx-small;
+  gap: var(--space-xx-small);
   max-width: var(--invitation-column-max-width, 100%);
 }
 
@@ -151,10 +151,10 @@ export default {
 
 .actions {
   display: inline-flex;
-  gap: $space-x-small;
+  gap: var(--space-x-small);
 }
 
 .mdash {
-  margin-inline: $space-x-small;
+  margin-inline: var(--space-x-small);
 }
 </style>

@@ -34,7 +34,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                   class="dz-message"
                 >
                   <div
-                    class="profile-page-avatar profile-avatar --large --no-image"
+                    class="profile-page-avatar avatar-image --large --no-image"
                   >
                     <span
                       class="initials"
@@ -851,7 +851,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
-            class="profile-page-avatar profile-avatar --large --no-image"
+            class="profile-page-avatar avatar-image --large --no-image"
           >
             <span
               class="initials"
@@ -1358,7 +1358,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
-            class="profile-page-avatar profile-avatar --large --no-image"
+            class="profile-page-avatar avatar-image --large --no-image"
           >
             <span
               class="initials"
@@ -1884,7 +1884,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
-            class="profile-page-avatar profile-avatar --large --no-image"
+            class="profile-page-avatar avatar-image --large --no-image"
           >
             <span
               class="initials"
@@ -2648,7 +2648,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                   class="dz-message"
                 >
                   <div
-                    class="profile-page-avatar profile-avatar --large --no-image"
+                    class="profile-page-avatar avatar-image --large --no-image"
                   >
                     <span
                       class="initials"
@@ -3398,7 +3398,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
-            class="profile-page-avatar profile-avatar --large --no-image"
+            class="profile-page-avatar avatar-image --large --no-image"
           >
             <span
               class="initials"
@@ -3866,7 +3866,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
-            class="profile-page-avatar profile-avatar --large --no-image"
+            class="profile-page-avatar avatar-image --large --no-image"
           >
             <span
               class="initials"
@@ -4353,7 +4353,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
-            class="profile-page-avatar profile-avatar --large --no-image"
+            class="profile-page-avatar avatar-image --large --no-image"
           >
             <span
               class="initials"
@@ -5050,7 +5050,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                   class="dz-message"
                 >
                   <div
-                    class="profile-page-avatar profile-avatar --large --no-image"
+                    class="profile-page-avatar avatar-image --large --no-image"
                   >
                     <span
                       class="initials"
@@ -5895,7 +5895,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
-            class="profile-page-avatar profile-avatar --large --no-image"
+            class="profile-page-avatar avatar-image --large --no-image"
           >
             <span
               class="initials"

@@ -100,7 +100,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .layout-default:has(.chat-page) {
   > .ds-container {
     padding-left: 0 !important;

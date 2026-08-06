@@ -22,47 +22,16 @@ module.exports = {
 
     // The builder's own default `.css$` rule (added before webpackFinal runs) has the same problem —
     // and vue-loader clones it for `<style lang="css">` blocks in every component, so it has to be
-    // patched here rather than only covering the scss handling below.
-    //
-    // TRANSITIONAL, and it has to stay exactly as long as nuxt.config.js keeps its `styleResources`:
-    // the components rendered in stories still carry `<style lang="scss">` and resolve `$token`
-    // references through this prelude. Dropping the rule while they exist does not degrade the styling,
-    // it fails the Storybook build outright. Removed together with sass, once the last such block is
-    // gone — the plain-CSS stylesheets already go through Storybook's own CSS pipeline.
-    //
-    // Extending the builder's own `.css$` rule in place — rather than pushing a parallel `.scss$` rule
-    // — is deliberate: vue-loader clones whichever rule it finds via its own resolution for a given
-    // `lang`, and a separately-pushed rule silently never got picked for non-scoped `<style lang="scss">`
-    // blocks (scoped ones worked). Reusing the rule vue-loader already resolves correctly sidesteps that.
+    // patched here. No .scss files remain in the project (dropped along with sass project-wide), so
+    // this rule only ever needs to handle plain CSS.
     const defaultCssRule = config.module.rules.find((r) => String(r.test) === String(/\.css$/))
     if (defaultCssRule) {
-      defaultCssRule.test = /\.(css|scss)$/
-      defaultCssRule.include = path.resolve(__dirname, '../')
       const cssLoaderUse = defaultCssRule.use.find(
         (u) => u.loader && u.loader.includes('css-loader'),
       )
       if (cssLoaderUse) {
         cssLoaderUse.options = { ...cssLoaderUse.options, url: passThroughAbsoluteUrls }
       }
-      defaultCssRule.use.push(
-        { loader: 'sass-loader', options: { sourceMap: true } },
-        {
-          loader: 'style-resources-loader',
-          options: {
-            patterns: [
-              // FIRST, and not optional: tokens.scss calls `color.adjust(...)`, which needs the
-              // `@use 'sass:color'` that only this file carries — and `@use` has to precede every
-              // other rule, which is the whole reason it is a separate file. Without it the prelude
-              // fails with «There is no module with the namespace "color"». nuxt.config.js has always
-              // listed it first; Storybook did not, so its SCSS pipeline was broken on its own terms.
-              path.resolve(__dirname, '../assets/_new/styles/uses.scss'),
-              path.resolve(__dirname, '../assets/_new/styles/_styleguide-tokens.scss'),
-              path.resolve(__dirname, '../assets/_new/styles/tokens.scss'),
-            ],
-            injector: 'prepend',
-          },
-        },
-      )
     }
 
     // load svgs with vue-svg-loader instead of the builder's default asset/resource rule

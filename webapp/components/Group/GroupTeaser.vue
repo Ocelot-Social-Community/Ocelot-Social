@@ -185,7 +185,7 @@ export default {
     }
   }
 
-  .user-teaser {
+  .user-avatar {
     margin-bottom: var(--space-small);
   }
 }

@@ -5,7 +5,7 @@ const localVue = global.localVue
 
 const stubs = {
   'infinite-scroll-list': { template: '<div><slot /></div>' },
-  'user-teaser': { template: '<div class="user-teaser"></div>' },
+  'user-avatar': { template: '<div class="user-avatar"></div>' },
 }
 
 const fakeUser = (id) => ({ id, name: `User ${id}`, slug: `user-${id}` })

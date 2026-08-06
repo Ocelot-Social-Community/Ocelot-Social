@@ -52,13 +52,13 @@
               </aside>
             </template>
             <section class="menu">
-              <user-teaser :user="post.author" :group="post.group" wide :date-time="post.createdAt">
+              <user-avatar :user="post.author" :group="post.group" wide :date-time="post.createdAt">
                 <template #dateTime>
                   <p class="ds-text" v-if="post.createdAt !== post.updatedAt">
                     ({{ $t('post.edited') }})
                   </p>
                 </template>
-              </user-teaser>
+              </user-avatar>
               <client-only>
                 <content-menu
                   placement="bottom-end"
@@ -200,7 +200,7 @@ import HcHashtag from '~/components/Hashtag/Hashtag'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
 import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
 import { useShout } from '~/composables/useShout'
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import {
   postMenuModalsData,
   deletePostMutation,
@@ -239,7 +239,7 @@ export default {
     LocationTeaser,
     OsActionButton,
     ResponsiveImage,
-    UserTeaser,
+    UserAvatar,
   },
   mixins: [GetCategories, postListActions, SortCategories],
   beforeCreate() {
@@ -549,22 +549,22 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .post-detail-layout__main {
   flex: 0 0 100%;
   width: 100%;
 }
-@media #{$media-query-small} {
+@media (min-width: 600px) {
   .post-detail-layout__main {
     flex: 2 0 0;
   }
 }
-@media #{$media-query-medium} {
+@media (min-width: 768px) {
   .post-detail-layout__main {
     flex: 2 0 0;
   }
 }
-@media #{$media-query-large} {
+@media (min-width: 1024px) {
   .post-detail-layout__main {
     flex: 1 0 0;
   }
@@ -602,7 +602,7 @@ export default {
   }
 
   &.--blur-image > .os-card__hero-image > .image {
-    filter: blur($blur-radius);
+    filter: blur(var(--blur-radius));
   }
 
   .blur-toggle {
@@ -623,7 +623,7 @@ export default {
   }
 
   .comments {
-    margin-top: $space-small;
+    margin-top: var(--space-small);
 
     .ProseMirror {
       min-height: 0px;
@@ -632,14 +632,14 @@ export default {
 }
 </style>
 
-<style lang="scss" scoped>
+<style scoped>
 .actions {
   display: flex;
   align-items: center;
   justify-content: right;
-  gap: $space-small;
-  margin-top: $space-small;
-  margin-bottom: calc($space-base * 2);
+  gap: var(--space-small);
+  margin-top: var(--space-small);
+  margin-bottom: calc(var(--space-base) * 2);
 }
 
 .ds-heading {

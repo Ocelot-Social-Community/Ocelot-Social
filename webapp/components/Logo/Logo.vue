@@ -130,17 +130,19 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .ds-logo {
-  @include reset;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  color: $text-color-primary;
+  color: var(--text-color-primary);
 }
 
 .ds-logo-inverse {
-  color: $text-color-primary-inverse;
+  color: var(--text-color-primary-inverse);
 }
 
 .ds-logo-svg {

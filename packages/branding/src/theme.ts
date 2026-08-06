@@ -1,61 +1,35 @@
-// The overridable runtime THEME tokens (CSS custom properties applied on :root) and their framework
-// default values. A brand overrides a subset via `theme.cssVars` (keyed WITHOUT the leading `--`);
-// plugins/branding-head.js writes them onto :root, and both the webapp SCSS tokens and packages/ui
-// read them (see the SCSS→CSS-custom-property theme layer). Vanilla's `theme.cssVars` is EMPTY (the
-// compiled SCSS already carries these values), so the admin has no other place to learn the full
-// overridable palette + defaults — hence this list.
+// The brandable theme surface is the set of CSS custom properties the webapp declares on `:root`. It is
+// deliberately NOT enumerated here any more: a hand-maintained copy had fallen ~160 properties behind,
+// and a generated copy was still a second definition of values that already exist in the stylesheets.
 //
-// It MIRRORS the :root defaults in webapp/assets/_new/styles/ocelot-ui-variables.scss (+ tokens.scss
-// shades). Display/contract only — not injected at runtime; keep it in sync with the SCSS if those
-// defaults change. The runtime-derived `-active` shades (color-mix on the base var) are intentionally
-// omitted: a brand rarely overrides them, they follow the base automatically.
-export const THEME_DEFAULTS: Record<string, string> = {
-  'color-primary': 'rgb(23, 181, 63)',
-  'color-primary-hover': 'rgb(96, 214, 98)',
-  'color-primary-active': 'rgb(25, 122, 49)',
-  'color-primary-contrast': 'rgb(241, 253, 244)',
-  'color-secondary': 'rgb(0, 142, 230)',
-  'color-secondary-hover': 'rgb(10, 161, 255)',
-  'color-secondary-contrast': 'rgb(240, 249, 255)',
-  'color-success': 'rgb(23, 181, 63)',
-  'color-success-hover': 'rgb(26, 203, 71)',
-  'color-success-contrast': 'rgb(241, 253, 244)',
-  'color-danger': 'rgb(219, 57, 36)',
-  'color-danger-hover': 'rgb(242, 97, 65)',
-  'color-danger-active': 'rgb(158, 43, 28)',
-  'color-danger-contrast': 'rgb(253, 243, 242)',
-  'color-warning': 'rgb(230, 121, 25)',
-  'color-warning-hover': 'rgb(233, 137, 53)',
-  'color-warning-contrast': 'rgb(241, 253, 244)',
-  'color-secondary-active': 'color-mix(in srgb, var(--color-secondary), black 15%)',
-  'font-family-heading': "'LatoWeb', sans-serif",
-  'font-family-text': "'LatoWeb', sans-serif",
-  // Semantic surface tokens (also var()-backed in tokens.scss). Defaults that follow another token
-  // are given as that var(), so their swatch tracks it (browsers resolve var()/color-mix()).
-  'color-header-background': 'rgb(255, 255, 255)',
-  'color-donation-bar': 'var(--color-primary)',
-  'color-toast-green': 'var(--color-success)',
-  'color-ribbon-article': 'rgb(10, 161, 255)',
-  // Chat colours (vue-advanced-chat), overridable via theme.cssVars — see tokens.scss chat section.
-  'chat-message-bg-me': 'rgb(96, 214, 98)',
-  'chat-sidemenu-background-active': 'rgb(96, 214, 98)',
-  'chat-new-message-color': 'rgb(10, 161, 255)',
-  'chat-message-checkmark': 'rgb(112, 103, 126)',
-  'chat-message-checkmark-seen': 'var(--color-secondary)',
-  'chat-room-color-counter-badge': 'rgb(250, 249, 250)',
-  'chat-room-background-counter-badge': 'var(--color-danger)',
-}
+// Who answers "which properties exist?" now:
+//   • the admin UI — utils/themeTokens.js reads them from the loaded stylesheets (always current, and
+//     it also knows what the ACTIVE brand resolved them to);
+//   • the brand build — scripts/theme-catalog.ts reads webapp/assets/css/*.css when that directory is
+//     reachable, which is how the typo warning works in this repo. A brand packaged in its own repo has
+//     no webapp next to it, so there the check simply does not run.
+//
+// A brand overrides them by declaring `:root { --x: y }` in one of the stylesheets it lists under
+// `assets.css`. The build raises that sheet's `:root` to `:root:root` when packing, so the brand wins
+// where they win on specificity rather than on load order.
+
+/**
+ * The framework's own primary colour. The one value that must exist WITHOUT reading any stylesheet:
+ * the PWA manifest needs a literal colour (it cannot resolve `var()`), and it is generated for brands
+ * that never set `color-primary`. Kept honest by test/theme.spec.ts, which compares it against the
+ * value the webapp's CSS actually declares.
+ */
+export const DEFAULT_COLOR_PRIMARY = 'rgb(23, 181, 63)'
 
 /**
  * The browser-chrome / PWA `theme_color` — the brand's primary colour. It is NOT a separate metadata
  * field (that used to be a special `metadata.themeColor` carved from identity into theme, which broke
  * for partial packages that provide identity but not theme). It is simply the `color-primary` theme
- * token, with the framework default as fallback. A concrete colour (the PWA manifest can't resolve
- * CSS vars), so brands set a literal `theme.cssVars['color-primary']`.
+ * token, with the framework default as fallback.
  */
-export function resolveThemeColor(cssVars?: Record<string, string>): string {
+export function resolveThemeColor(theme?: { themeColor?: string }): string {
   // Deliberate `||`, not `??`: an empty-string colour is not a usable value either, so it must fall
   // back to the framework default just like an absent one.
   // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-  return cssVars?.['color-primary'] || THEME_DEFAULTS['color-primary']
+  return theme?.themeColor || DEFAULT_COLOR_PRIMARY
 }

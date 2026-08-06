@@ -84,7 +84,10 @@ export default [
     // Tests (.ts, run via `node --test` type-stripping) are validated by RUNNING, not by tsc — they are
     // deliberately outside the type-checked project (see tsconfig.json). Lint them syntactically only,
     // and grant the same dist-import relaxations the scripts get.
-    files: ['test/**/*.ts'],
+    //
+    // Matched by FILENAME, not by directory: specs sit next to the file they test (foo.ts / foo.spec.ts),
+    // so there is no folder to scope this to.
+    files: ['**/*.spec.ts'],
     ...tsConfigs.disableTypeChecked,
     languageOptions: {
       parserOptions: { projectService: false, project: false },

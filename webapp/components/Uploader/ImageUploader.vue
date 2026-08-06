@@ -184,10 +184,10 @@ export default {
   },
 }
 </script>
-<style lang="scss">
+<style>
 .image-uploader {
   position: relative;
-  min-height: $size-image-uploader-min-height;
+  min-height: var(--size-image-uploader-min-height);
 
   .image + & {
     position: absolute;
@@ -198,7 +198,7 @@ export default {
   }
 
   &:only-child {
-    background-color: $color-neutral-85;
+    background-color: var(--color-neutral-85);
   }
 
   &:disabled {
@@ -208,9 +208,9 @@ export default {
   > .crop-overlay {
     width: 100%;
     height: 100%;
-    min-height: $size-image-cropper-min-height;
-    max-height: $size-image-cropper-max-height;
-    font-size: $font-size-base;
+    min-height: var(--size-image-cropper-min-height);
+    max-height: var(--size-image-cropper-max-height);
+    font-size: var(--font-size-base);
 
     > .img {
       display: block;
@@ -219,24 +219,24 @@ export default {
 
     > .crop-confirm {
       position: absolute !important;
-      left: $space-x-small;
-      top: $space-x-small;
-      z-index: $z-index-surface;
+      left: var(--space-x-small);
+      top: var(--space-x-small);
+      z-index: var(--z-index-surface);
     }
 
     > .crop-cancel {
       position: absolute !important;
-      right: $space-x-small !important;
-      top: $space-x-small !important;
-      z-index: $z-index-surface;
+      right: var(--space-x-small) !important;
+      top: var(--space-x-small) !important;
+      z-index: var(--z-index-surface);
     }
   }
 
   .delete-image-button {
     position: absolute !important;
-    top: $space-small !important;
-    right: $space-small !important;
-    z-index: $z-index-surface;
+    top: var(--space-small) !important;
+    right: var(--space-small) !important;
+    z-index: var(--z-index-surface);
     cursor: pointer;
   }
 
@@ -247,23 +247,23 @@ export default {
     align-items: center;
     width: 100%;
     height: 100%;
-    z-index: $z-index-surface;
+    z-index: var(--z-index-surface);
     cursor: pointer;
 
     &:hover {
       > .os-icon {
-        opacity: $opacity-base;
+        opacity: var(--opacity-base);
       }
     }
 
     > .os-icon {
       position: absolute;
-      padding: $space-small;
+      padding: var(--space-small);
       border-radius: 100%;
-      border: $border-size-base dashed $color-neutral-20;
-      background-color: $color-neutral-95;
-      font-size: $size-icon-large;
-      opacity: $opacity-soft;
+      border: var(--border-size-base) dashed var(--color-neutral-20);
+      background-color: var(--color-neutral-95);
+      font-size: var(--size-icon-large);
+      opacity: var(--opacity-soft);
     }
 
     > .supported-formats {

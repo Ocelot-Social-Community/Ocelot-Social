@@ -445,7 +445,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 /* Styles inherited from global styleguide CSS (ds-select, ds-form-item classes).
  * Once ds-select is fully removed from the styleguide, move the styles here. */
 

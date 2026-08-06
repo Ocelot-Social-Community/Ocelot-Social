@@ -46,9 +46,9 @@ describe('AvatarMenu.vue', () => {
       wrapper = Wrapper()
     })
 
-    it('renders the ProfileAvatar component', () => {
+    it('renders the AvatarImage component', () => {
       wrapper.find('.avatar-menu-trigger').trigger('click')
-      expect(wrapper.find('.profile-avatar').exists()).toBe(true)
+      expect(wrapper.find('.avatar-image').exists()).toBe(true)
     })
 
     describe('given a userName', () => {

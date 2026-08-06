@@ -8,9 +8,9 @@
           style="position: relative; height: auto; overflow: visible"
         >
           <avatar-uploader v-if="myProfile" :profile="user" :updateMutation="updateUserMutation">
-            <profile-avatar :profile="user" class="profile-page-avatar" size="large" />
+            <avatar-image :profile="user" class="profile-page-avatar" size="large" />
           </avatar-uploader>
-          <profile-avatar v-else :profile="user" class="profile-page-avatar" size="large" />
+          <avatar-image v-else :profile="user" class="profile-page-avatar" size="large" />
           <!-- Menu -->
           <client-only>
             <content-menu
@@ -244,7 +244,7 @@
       <p>{{ $t('settings.deleteUserAccount.infoAdmin') }}</p>
       <div class="ds-flex" style="margin-top: 0.75rem">
         <div style="flex: 0 0 50%; width: 50%">
-          <user-teaser :user="deleteUserData" :link-to-profile="false" :show-popover="false" />
+          <user-avatar :user="deleteUserData" :link-to-profile="false" :show-popover="false" />
         </div>
         <div style="flex: 0 0 20%; width: 20%">
           <p class="ds-text ds-text-size-small">
@@ -310,7 +310,7 @@ import GroupMemberList from '~/components/features/ProfileList/GroupMemberList'
 import HcEmpty from '~/components/Empty/Empty'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import AvatarUploader from '~/components/Uploader/AvatarUploader'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
@@ -322,7 +322,7 @@ import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
 import UpdateQuery from '~/components/utils/UpdateQuery'
 import SocialMedia from '~/components/SocialMedia/SocialMedia'
 import DateTime from '~/components/DateTime'
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
 
 const tabToFilterMapping = ({ tab, id }) => {
@@ -346,11 +346,11 @@ export default {
     PostTeaser,
     HcBadges,
     HcEmpty,
-    ProfileAvatar,
+    AvatarImage,
     ContentMenu,
     AvatarUploader,
     DateTime,
-    UserTeaser,
+    UserAvatar,
     MasonryGrid,
     MasonryGridItem,
     FollowList,
@@ -677,14 +677,14 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
-::v-deep .profile-page-avatar.profile-avatar {
+<style scoped>
+::v-deep .profile-page-avatar.avatar-image {
   margin: auto;
   margin-top: -60px;
 }
 @media (max-width: 810px) {
   .profile-layout {
-    padding-top: $space-large;
+    padding-top: var(--space-large);
   }
 }
 .badge-edit-link {
@@ -695,8 +695,8 @@ export default {
 }
 .profile-layout__sidebar ::v-deep .content-menu {
   position: absolute;
-  top: $space-x-small;
-  right: $space-x-small;
+  top: var(--space-x-small);
+  right: var(--space-x-small);
 }
 .profile-layout__sidebar,
 .profile-layout__main {
@@ -704,7 +704,7 @@ export default {
   width: 100%;
   min-width: 0;
 }
-@media #{$media-query-small} {
+@media (min-width: 600px) {
   .profile-layout__sidebar {
     flex: 2 0 0;
   }
@@ -712,7 +712,7 @@ export default {
     flex: 3 0 0;
   }
 }
-@media #{$media-query-medium} {
+@media (min-width: 768px) {
   .profile-layout__sidebar {
     flex: 2 0 0;
   }
@@ -720,7 +720,7 @@ export default {
     flex: 5 0 0;
   }
 }
-@media #{$media-query-large} {
+@media (min-width: 1024px) {
   .profile-layout__sidebar {
     flex: 1 0 0;
   }
@@ -731,15 +731,15 @@ export default {
 .profile-post-add-button-container {
   display: flex;
   justify-content: center;
-  margin: $space-small 0;
+  margin: var(--space-small) 0;
 }
 ::v-deep .profile-post-add-button {
-  box-shadow: $box-shadow-x-large !important;
+  box-shadow: var(--box-shadow-x-large) !important;
 }
 .action-buttons {
   display: flex;
   flex-direction: column;
-  gap: $space-x-small;
-  margin: $space-small 0;
+  gap: var(--space-x-small);
+  margin: var(--space-small) 0;
 }
 </style>

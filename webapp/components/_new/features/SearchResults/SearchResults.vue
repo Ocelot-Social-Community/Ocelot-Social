@@ -59,7 +59,7 @@
         <div v-if="activeTab === 'User'" class="search-results-list">
           <div v-for="user in activeResources" :key="user.id" class="search-results-list__item">
             <os-card>
-              <user-teaser :user="user" />
+              <user-avatar :user="user" />
             </os-card>
           </div>
         </div>
@@ -118,7 +118,7 @@ import MasonryGrid from '~/components/MasonryGrid/MasonryGrid'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem'
 import PostTeaser from '~/components/PostTeaser/PostTeaser'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import GroupTeaser from '~/components/Group/GroupTeaser'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
 import HcHashtag from '~/components/Hashtag/Hashtag'
@@ -133,7 +133,7 @@ export default {
     MasonryGridItem,
     PostTeaser,
     PaginationButtons,
-    UserTeaser,
+    UserAvatar,
     GroupTeaser,
     HcHashtag,
   },
@@ -435,31 +435,31 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .search-results__content {
   flex: 0 0 100%;
   width: 100%;
 }
-@media #{$media-query-small} {
+@media (min-width: 600px) {
   .search-results__content {
     flex: 3 0 0;
   }
 }
-@media #{$media-query-medium} {
+@media (min-width: 768px) {
   .search-results__content {
     flex: 5 0 0;
   }
 }
-@media #{$media-query-large} {
+@media (min-width: 1024px) {
   .search-results__content {
     flex: 3 0 0;
   }
 }
 .search-results {
   > .results {
-    padding: $space-small;
-    background-color: $color-neutral-80;
-    border-radius: 0 $border-radius-base $border-radius-base $border-radius-base;
+    padding: var(--space-small);
+    background-color: var(--color-neutral-80);
+    border-radius: 0 var(--border-radius-base) var(--border-radius-base) var(--border-radius-base);
 
     &.--user {
       width: 100%;
@@ -470,7 +470,7 @@ export default {
       width: 100%;
       max-width: 600px;
       background-color: transparent;
-      border: $border-size-base solid $color-neutral-80;
+      border: var(--border-size-base) solid var(--color-neutral-80);
     }
   }
 
@@ -478,7 +478,7 @@ export default {
     transition: opacity 0.1s;
 
     &:not(:last-child) {
-      margin-bottom: $space-small;
+      margin-bottom: var(--space-small);
     }
 
     &:hover {
@@ -497,32 +497,32 @@ export default {
 }
 
 .search-results-empty {
-  padding-top: $space-small;
+  padding-top: var(--space-small);
 
   @media (max-width: 810px) {
-    padding-top: $space-x-small;
+    padding-top: var(--space-x-small);
   }
 }
 
 .search-results-pagination {
-  padding-top: $space-small;
+  padding-top: var(--space-small);
   display: flex;
   justify-content: center;
 
   @media (max-width: 810px) {
-    padding-top: $space-x-small;
+    padding-top: var(--space-x-small);
   }
 }
 
 .search-results-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
-  gap: $space-small;
-  padding-top: $space-small;
+  gap: var(--space-small);
+  padding-top: var(--space-small);
 
   @media (max-width: 810px) {
-    gap: $space-x-small;
-    padding-top: $space-x-small;
+    gap: var(--space-x-small);
+    padding-top: var(--space-x-small);
   }
 }
 </style>

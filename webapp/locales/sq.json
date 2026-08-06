@@ -80,59 +80,62 @@
       "verificationBadges": "Verifikimet"
     },
     "branding": {
-      "activate": null,
+      "activate": "Aktivizo",
       "available": {
         "active": "Baza aktive",
         "default": "Rezervë",
-        "title": null
+        "title": "Brandingje të disponueshme"
       },
       "composition": {
         "bucket": {
-          "behavior": null,
-          "identity": null,
-          "legal": null,
-          "logos": null,
-          "navigation": null,
-          "theme": null
+          "behavior": "Sjellja (kufij, formate)",
+          "identity": "Identiteti (emri, organizata)",
+          "legal": "Çështje ligjore dhe faqe statike",
+          "logos": "Logot dhe favicon",
+          "navigation": "Navigimi dhe menutë",
+          "theme": "Tema (ngjyra, shkronja)"
         },
-        "change": null,
-        "confirm": null,
-        "defaultTag": null,
-        "description": null,
-        "details": null,
-        "frameworkDefault": null,
-        "from": null,
-        "inherit": null,
-        "noDetails": null,
-        "provides": null,
-        "title": null,
-        "unprovidedInherit": null,
-        "wholePackage": null
+        "change": "Ndryshim {from} → {to}",
+        "confirm": "Zbato",
+        "defaultTag": "parazgjedhje",
+        "description": "Cakto burimin për çdo fushë, mbi paketën bazë ({base}). Ndryshimi i një fushe e ringarkon aplikacionin për të gjithë.",
+        "details": "Shfaq detajet",
+        "frameworkDefault": "Parazgjedhja e framework-ut (vanilla)",
+        "from": "Nga: {source}",
+        "inherit": "Trashëgo nga paketa ({base})",
+        "noDetails": "Pa vlera (parazgjedhja e framework-ut).",
+        "provides": "Përmban",
+        "title": "Përbërja e brandingut",
+        "unprovidedInherit": "Fushat që nuk përfshihen trashëgojnë parazgjedhjen e framework-ut.",
+        "wholePackage": "Paketa e plotë (të gjitha fushat)"
       },
-      "current": null,
-      "description": null,
+      "current": "Aktiv",
+      "description": "Zgjidh cili branding i integruar është aktiv në të gjithë rrjetin. Ndërrimi e ringarkon aplikacionin për të gjithë.",
       "detail": {
-        "appDescription": null,
-        "colors": null,
-        "favicon": null,
-        "footer": null,
-        "logos": null,
-        "noPages": null,
-        "organization": null,
-        "pages": null,
-        "pagesSummary": null,
-        "reuse": null,
-        "themeColor": null
+        "appDescription": "Përshkrimi",
+        "colors": "Ngjyrat",
+        "favicon": "Favicon",
+        "footer": "Faqet e fundit",
+        "logos": "Logot",
+        "noPages": "asnjë",
+        "organization": "Organizata",
+        "pages": "Faqe statike",
+        "pagesSummary": "{pages} faqe ({locales})",
+        "reuse": "Ripërdorim",
+        "themeColor": "Ngjyra e temës"
       },
-      "error": null,
-      "loading": null,
-      "name": null,
-      "none": null,
-      "noneExtra": null,
-      "schema": null,
-      "schemaTitle": null,
-      "title": null,
-      "vanilla": null
+      "error": "Brandingu nuk u ndërrua dot.",
+      "loading": "Po ngarkohen brandingjet…",
+      "name": "Branding",
+      "none": "Në këtë instancë nuk është integruar asnjë branding.",
+      "noneExtra": "Në këtë instancë nuk janë integruar brandingje të tjera — disponohet vetëm parazgjedhja e framework-ut.",
+      "schema": "skema",
+      "schemaTitle": "Versioni i paketës @ocelot-social/branding me të cilin u ndërtua ky arkiv.",
+      "stylesheets": "Fletë stili të veta",
+      "stylesheetUnreadable": "nuk mund të lexohet",
+      "stylesheetVars": "{count} veti e temës ::: {count} veti të temës",
+      "title": "Branding",
+      "vanilla": "Parazgjedhja e framework-ut (pa branding)"
     },
     "categories": {
       "categoryName": "Emri",
@@ -1670,7 +1673,7 @@
     "termsAndConditionsNewConfirm": "Kam lexuar dhe pranoj kushtet dhe rregullat e reja.",
     "termsAndConditionsNewConfirmText": "Ju lutem lexoni tani kushtet e reja të përdorimit!"
   },
-  "user-teaser": {
+  "user-avatar": {
     "popover": {
       "open-profile": "Hap profilin"
     }

@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UserAvatarHelper with linkToProfile and popover enabled, on touch screen renders button 1`] = `
+<div>
+  <button>
+    <div>
+      Test Content
+    </div>
+  </button>
+</div>
+`;
+
+exports[`UserAvatarHelper with linkToProfile, on desktop renders link 1`] = `
+<div>
+  <a>
+    <div>
+      Test Content
+    </div>
+  </a>
+</div>
+`;
+
+exports[`UserAvatarHelper without linkToProfile renders span 1`] = `
+<div>
+  <span>
+    <div>
+      Test Content
+    </div>
+  </span>
+</div>
+`;
