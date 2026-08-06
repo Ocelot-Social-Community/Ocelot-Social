@@ -2,6 +2,13 @@ name: ocelot.social end-to-end test CI
 
 on: push
 
+# One run per workflow and branch. A newer push makes the older run's result irrelevant, so it is
+# cancelled instead of holding a runner. `event_name` is part of the group on purpose: a branch
+# push and its pull_request run are separate required checks — they must not cancel each other.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   prepare_backend_environment:
     name: Fullstack | prepare backend environment
@@ -46,24 +53,27 @@ jobs:
           docker pull quay.io/minio/mc:latest
           docker pull maildev/maildev:latest
 
+      # gzip on the way out: `docker save` writes UNCOMPRESSED layer tars, and every byte here is
+      # paid 40 times over on the matrix side. `docker load` detects the gzip itself.
       - name: Save all images
         run: |
-          docker save "ghcr.io/ocelot-social-community/ocelot-social/backend:test" > /tmp/backend.tar
-          docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j:community" > /tmp/neo4j.tar
-          docker save "quay.io/minio/minio:latest" > /tmp/minio.tar
-          docker save "quay.io/minio/mc:latest" > /tmp/minio-mc.tar
-          docker save "maildev/maildev:latest" > /tmp/mailserver.tar
+          docker save "ghcr.io/ocelot-social-community/ocelot-social/backend:test" | gzip -1 > /tmp/backend.tar.gz
+          docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j:community" | gzip -1 > /tmp/neo4j.tar.gz
+          docker save "quay.io/minio/minio:latest" | gzip -1 > /tmp/minio.tar.gz
+          docker save "quay.io/minio/mc:latest" | gzip -1 > /tmp/minio-mc.tar.gz
+          docker save "maildev/maildev:latest" | gzip -1 > /tmp/mailserver.tar.gz
 
-      - name: Cache docker images
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v4.0.2
+      # ARTIFACT, not cache. These are run-scoped hand-offs between jobs, which is what artifacts are
+      # for; `actions/cache` with a `run_id` key can never hit on a later run, yet it occupies the
+      # repo's 10 GB cache budget and evicts by LRU the caches that COULD hit — the buildx `type=gha`
+      # scopes and the yarn cache. `compression-level: 0` because the payload is already gzipped.
+      - name: Upload images for the test jobs
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
-          path: |
-            /tmp/backend.tar
-            /tmp/neo4j.tar
-            /tmp/minio.tar
-            /tmp/minio-mc.tar
-            /tmp/mailserver.tar
-          key: ${{ github.run_id }}-e2e-backend-environment-cache
+          name: e2e-backend-environment
+          path: /tmp/*.tar.gz
+          retention-days: 1
+          compression-level: 0
 
   prepare_webapp_image:
     name: Fullstack | prepare webapp image
@@ -87,13 +97,15 @@ jobs:
           cache-to: type=gha,mode=max,scope=webapp-test
 
       - name: Save image for test jobs
-        run: docker save "ghcr.io/ocelot-social-community/ocelot-social/webapp:test" > /tmp/webapp.tar
+        run: docker save "ghcr.io/ocelot-social-community/ocelot-social/webapp:test" | gzip -1 > /tmp/webapp.tar.gz
 
-      - name: Cache docker image
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v4.0.2
+      - name: Upload image for the test jobs
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
-          path: /tmp/webapp.tar
-          key: ${{ github.run_id }}-e2e-webapp-cache
+          name: e2e-webapp-image
+          path: /tmp/webapp.tar.gz
+          retention-days: 1
+          compression-level: 0
 
   prepare_cypress:
     name: Fullstack | prepare cypress
@@ -130,15 +142,18 @@ jobs:
           cd ..
           yarn install
       
-      - name: Cache docker image
-        
+      # Stays a CACHE (unlike the images above) — but keyed by the lockfiles instead of the run id, so
+      # it actually hits on the next run. Same content, same key; a dependency bump misses and rebuilds.
+      - name: Cache cypress + installed workspace
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v4.0.2
         with:
           path: |
             /opt/cucumber-json-formatter
             /home/runner/.cache/Cypress
             /home/runner/work/Ocelot-Social/Ocelot-Social
-          key: ${{ github.run_id }}-e2e-cypress
+          key: e2e-cypress-${{ hashFiles('yarn.lock', 'backend/yarn.lock', 'packages/branding/package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            e2e-cypress-${{ hashFiles('yarn.lock', 'backend/yarn.lock', 'packages/branding/package-lock.json') }}-
 
   list_features:
     name: List Feature Files
@@ -184,25 +199,16 @@ jobs:
             /opt/cucumber-json-formatter
             /home/runner/.cache/Cypress
             /home/runner/work/Ocelot-Social/Ocelot-Social
-          key: ${{ github.run_id }}-e2e-cypress
-          restore-keys: ${{ github.run_id }}-e2e-cypress
+          key: e2e-cypress-${{ hashFiles('yarn.lock', 'backend/yarn.lock', 'packages/branding/package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            e2e-cypress-${{ hashFiles('yarn.lock', 'backend/yarn.lock', 'packages/branding/package-lock.json') }}-
 
-      - name: Restore backend environment cache
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v4.0.2
+      - name: Download images
+        uses: actions/download-artifact@v8
         with:
-          path: |
-            /tmp/backend.tar
-            /tmp/neo4j.tar
-            /tmp/minio.tar
-            /tmp/minio-mc.tar
-            /tmp/mailserver.tar
-          key: ${{ github.run_id }}-e2e-backend-environment-cache
-
-      - name: Restore webapp cache
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v4.0.2
-        with:
-          path: /tmp/webapp.tar
-          key: ${{ github.run_id }}-e2e-webapp-cache
+          pattern: e2e-*
+          merge-multiple: true
+          path: /tmp
           
       - name: Copy env files
         run: |
@@ -220,12 +226,12 @@ jobs:
 
       - name: Boot up test system | docker compose
         run: |
-          docker load < /tmp/neo4j.tar
-          docker load < /tmp/backend.tar
-          docker load < /tmp/minio.tar
-          docker load < /tmp/minio-mc.tar
-          docker load < /tmp/mailserver.tar
-          docker load < /tmp/webapp.tar
+          docker load < /tmp/neo4j.tar.gz
+          docker load < /tmp/backend.tar.gz
+          docker load < /tmp/minio.tar.gz
+          docker load < /tmp/minio-mc.tar.gz
+          docker load < /tmp/mailserver.tar.gz
+          docker load < /tmp/webapp.tar.gz
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp
 
           echo "Waiting for backend (max 120s)..."

@@ -8,6 +8,13 @@ on:
 
 # Least privilege. pull-requests:read is required by dorny/paths-filter, which lists a PR's changed
 # files via the API (the fetch-depth:1 checkout has no base history for a local diff).
+# One run per workflow and branch. A newer push makes the older run's result irrelevant, so it is
+# cancelled instead of holding a runner. `event_name` is part of the group on purpose: a branch
+# push and its pull_request run are separate required checks — they must not cancel each other.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   pull-requests: read

@@ -55,6 +55,14 @@ FROM base AS build
 # The brand-archive builder, used by the ONBUILD bake below. Lives ONLY in this stage (published as
 # backend-build) — the runtime image is FROM base + COPY /build and never inherits it.
 COPY --from=branding-tools ./app/ /brand-tools/
+# MANIFEST FIRST, sources second — the layer order is the whole point. The dependency install below
+# may only depend on package.json + yarn.lock, so it survives every commit that touches src/ only.
+# Copying the subtree first (as this did) invalidated the install on ANY backend change: the yarn
+# CACHE mount saved the downloads, but node_modules was still relinked and the native modules
+# (python3/make/g++ sit in `base` for exactly them) recompiled on every push.
+COPY backend/package.json backend/yarn.lock ./
+RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
+    yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 # Repo-root build context now (for /packages/branding): copy only the backend subtree to /app.
 COPY backend/ .
 # Optional per-brand overlays (code/seed data not yet ported to the runtime archive). The `[g]` glob
@@ -80,8 +88,11 @@ ONBUILD COPY brandin[g]/ /brand/
 ONBUILD RUN if ls /brand/brand.config.* >/dev/null 2>&1; then \
       node /brand-tools/scripts/build-brand-archive.ts /brand ./deployment/configurations --default; \
     else echo "[branding] no typed brand.config — runtime archive skipped (vanilla)"; fi
-ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
-    yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
+# No dev install here any more — the `build` stage above already did it, before the sources landed.
+# Nothing an ONBUILD trigger copies can change the dependency set: the overlays go to
+# src/middleware/branding/, src/db/data and /brand, never to /app/package.json or yarn.lock. Re-running
+# a frozen-lockfile install against a warm node_modules only cost time, in this repo's own build AND in
+# every downstream brand build.
 ONBUILD RUN yarn run build
 ONBUILD RUN mkdir /build && \
     cp -r ./build ./package.json ./yarn.lock /build && \
@@ -89,9 +100,26 @@ ONBUILD RUN mkdir /build && \
 ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     cd /build && yarn install --production=true --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 
-FROM build AS test
-# required for the migrations
-# ONBUILD RUN cp -r ./src /src
+# Deliberately NOT `FROM build`: the test image runs `yarn dev` → `nodemon --exec tsx src/index.ts`,
+# straight off the sources. Everything `build` adds on top — `yarn run build` (tsc), the /build copy and
+# the `--production=true` install into it — is never read by this image, and it is not cheap: 107 s for
+# the production install and 10 s for tsc, on a build that the e2e matrix then downloads 40 times.
+# The db migrations do not need it either; the workflow calls `yarn db:migrate`, which compiles the TS
+# migrations on the fly (`--compiler ts:./src/db/compiler.ts`) — `prod:migrate` is the compiled variant
+# and is not used here.
+#
+# It cannot share a parent with `build` to avoid the duplicated three lines below, and that is a
+# property of ONBUILD rather than an oversight: a trigger fires ONCE, when the stage carrying it is used
+# as a base, and is NOT re-exported to the resulting image. Putting the branding triggers on a shared
+# parent would fire them here — against ocelot's own context, where `branding/` does not exist, so they
+# are no-ops — and `backend-build` would then reach the brand repos WITHOUT them. The brand's
+# middlewares, seed data and archive would silently not be copied and the build would still go green.
+# Hence: `build` keeps the untouched trigger chain for downstream, `test` gets its own lean path.
+FROM base AS test
+COPY backend/package.json backend/yarn.lock ./
+RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
+    yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
+COPY backend/ .
 CMD ["/bin/bash", "-c", "yarn run dev"]
 
 FROM build AS production_build
