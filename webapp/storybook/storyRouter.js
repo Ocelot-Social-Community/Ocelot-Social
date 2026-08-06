@@ -21,50 +21,34 @@ const storyRouterDecorator = (links = {}, routerProps = {}) => {
       return location
     }
 
-    let replaced
-
-    const originalPush = router.push.bind(router)
-    router.push = (location, success, abort) => {
-      replaced = false
-      const result = originalPush(location, success, abort)
-      if (!replaced) {
-        action('PUSH')(getLocation(location))
+    // Resolves the target and decides synchronously, before the (asynchronous) navigation is even
+    // kicked off, rather than the original's `afterEach` + shared `replaced` flag — that ran the
+    // "was this target handled by `links`?" check only after `push`/`replace` had already logged the
+    // generic action, since `afterEach` fires once navigation resolves, well after the synchronous
+    // `if (!replaced)` check that immediately followed the (async) call. The suppression never worked.
+    const wrapNavigation = (original, actionName) => (location, success, abort) => {
+      const target = getLocation(location)
+      const linkHandler = links[target]
+      if (linkHandler) {
+        linkHandler(target)
+      } else {
+        action(actionName)(target)
       }
-      return result
+      return original(location, success, abort)
     }
 
-    const originalReplace = router.replace.bind(router)
-    router.replace = (location, success, abort) => {
-      replaced = false
-      const result = originalReplace(location, success, abort)
-      if (!replaced) {
-        action('REPLACE')(getLocation(location))
-      }
-      return result
-    }
+    router.push = wrapNavigation(router.push.bind(router), 'PUSH')
+    router.replace = wrapNavigation(router.replace.bind(router), 'REPLACE')
 
     if (routerProps.globalBeforeEach) {
       router.beforeEach(routerProps.globalBeforeEach)
     }
-
-    router.afterEach((to) => {
-      for (const link in links) {
-        if (to.fullPath === link) {
-          links[link](to.fullPath)
-          replaced = true
-          return
-        }
-      }
-    })
 
     const WrappedComponent = story()
     return Vue.extend({
       router,
       components: { WrappedComponent },
       template: '<wrapped-component/>',
-      beforeDestroy() {
-        this.$options.router.afterHooks = []
-      },
     })
   }
 }
