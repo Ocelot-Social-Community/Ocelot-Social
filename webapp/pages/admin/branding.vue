@@ -150,8 +150,12 @@
                 <ul v-if="d.path === 'assets.css'" class="brand-stylesheets">
                   <li v-for="href in asArray(d.value)" :key="href">
                     <code class="bucket-tag">{{ href.split('/').pop() }}</code>
-                    <span v-if="sheetFor(bucket, href)" class="ds-text-soft">
-                      {{ themeVarLabel(sheetFor(bucket, href)) }}
+                    <span
+                      v-if="sheetFor(bucket, href)"
+                      class="ds-text-soft"
+                      :class="{ 'sheet-unreadable': sheetFor(bucket, href).unreadable }"
+                    >
+                      {{ sheetLabel(sheetFor(bucket, href)) }}
                     </span>
                   </li>
                 </ul>
@@ -256,17 +260,23 @@ import { discoverThemeTokens, summarizeStylesheet } from '~/utils/themeTokens.js
  * Fetches a brand's own stylesheets (config.assets.css, already namespaced to /branding/<id>/…) and
  * reduces each to what it declares. A file that cannot be read is reported as such rather than
  * omitted — silently showing nothing would look like "this stylesheet changes nothing".
+ *
+ * Every entry carries `customProperties`, readable or not: the summary row reads it unconditionally,
+ * and a missing key there is a render-time TypeError that takes the whole admin page down — for the
+ * one case (a stylesheet that 404s) where the page is most needed.
  */
+const UNREADABLE_SHEET = { unreadable: true, customProperties: {} }
+
 async function summarizeBrandCss(config) {
   const hrefs = (config && config.assets && config.assets.css) || []
   return Promise.all(
     hrefs.map(async (href) => {
       try {
         const res = await fetch(href)
-        if (!res.ok) return { href, unreadable: true }
+        if (!res.ok) return { href, ...UNREADABLE_SHEET }
         return { href, ...summarizeStylesheet(await res.text()) }
       } catch (error) {
-        return { href, unreadable: true }
+        return { href, ...UNREADABLE_SHEET }
       }
     }),
   )
@@ -494,10 +504,13 @@ export default {
       }
       return map
     },
-    // Counts for a brand stylesheet's summary row (see summarizeBrandCss). vuex-i18n has no $tc —
-    // pluralisation is `$t(key, count)` against a 'singular ::: plural' string, the convention the
-    // rest of the locales already use.
-    themeVarLabel(sheet) {
+    // The summary for a brand stylesheet's row (see summarizeBrandCss). A file that could not be read
+    // says so instead of reporting "0 theme properties" — that reads like a successful scan of a
+    // stylesheet which happens to declare nothing, which is a different and far less urgent thing.
+    // vuex-i18n has no $tc — pluralisation is `$t(key, count)` against a 'singular ::: plural' string,
+    // the convention the rest of the locales already use.
+    sheetLabel(sheet) {
+      if (sheet.unreadable) return this.$t('admin.branding.stylesheetUnreadable')
       const count = Object.keys(sheet.customProperties).length
       return this.$t('admin.branding.stylesheetVars', { count }, count)
     },
@@ -984,6 +997,12 @@ export default {
   padding: 1px 6px;
   border-radius: var(--border-radius-base);
   font-size: var(--font-size-small);
+}
+
+/*  A stylesheet the admin could not fetch is a broken brand, not an empty one — it should not read
+    like the neutral "n theme properties" next to it. */
+.sheet-unreadable {
+  color: var(--color-danger);
 }
 
 .branding-version {

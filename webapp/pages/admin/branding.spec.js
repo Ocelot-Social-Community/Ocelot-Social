@@ -341,3 +341,64 @@ describe('admin/branding bucket stylesheets follow the slot', () => {
     expect(make('yunite').asArray(undefined)).toEqual([])
   })
 })
+
+// A stylesheet the browser cannot fetch (404, offline, CORS) is the state in which the admin most
+// needs this page — so it must not be the state that breaks it. The summary row reads
+// `customProperties` unconditionally, so an entry without that key is a render-time TypeError that
+// blanks the whole page.
+describe('admin/branding unreadable stylesheets', () => {
+  const CONFIG = { assets: { css: ['/branding/acme/assets/css/theme.css'] } }
+
+  const loadWith = async (sheetResponse) => {
+    global.fetch = jest.fn((url) => {
+      if (url === '/branding/manifest.json') {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve([
+              { id: 'acme', label: 'Acme', version: '1.0.0', isDefault: true, config: '/c/acme' },
+            ]),
+        })
+      }
+      if (url === '/c/acme')
+        return Promise.resolve({ ok: true, json: () => Promise.resolve(CONFIG) })
+      if (url === '/branding/acme/assets/css/theme.css') return sheetResponse()
+      return Promise.resolve({ ok: false })
+    })
+    const ctx = {
+      brandings: [],
+      providedBuckets: {},
+      details: {},
+      schemaVersions: {},
+      stylesheets: {},
+      $t: (key) => key,
+    }
+    await BrandingPage.fetch.call(ctx)
+    return ctx
+  }
+
+  it.each([
+    ['a non-ok response', () => Promise.resolve({ ok: false })],
+    ['a rejected fetch', () => Promise.reject(new Error('offline'))],
+  ])('reports %s as unreadable, still carrying customProperties', async (_name, sheetResponse) => {
+    const ctx = await loadWith(sheetResponse)
+
+    expect(ctx.stylesheets.acme).toEqual([
+      { href: '/branding/acme/assets/css/theme.css', unreadable: true, customProperties: {} },
+    ])
+  })
+
+  it('labels an unreadable sheet as such rather than as "0 theme properties"', () => {
+    const t = jest.fn((key) => key)
+    const unreadable = { href: '/x.css', unreadable: true, customProperties: {} }
+
+    expect(() => BrandingPage.methods.sheetLabel.call({ $t: t }, unreadable)).not.toThrow()
+    expect(BrandingPage.methods.sheetLabel.call({ $t: t }, unreadable)).toBe(
+      'admin.branding.stylesheetUnreadable',
+    )
+    // An empty but READ stylesheet keeps the neutral count — the two states must stay distinguishable.
+    expect(BrandingPage.methods.sheetLabel.call({ $t: t }, { customProperties: {} })).toBe(
+      'admin.branding.stylesheetVars',
+    )
+  })
+})
