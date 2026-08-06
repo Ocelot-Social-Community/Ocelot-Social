@@ -94,7 +94,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .layout-toggle {
   display: inline-flex;
   gap: 4px;

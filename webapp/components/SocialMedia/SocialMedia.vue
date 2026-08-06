@@ -49,15 +49,15 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .social-media-bc {
   position: relative;
   height: auto;
 
   > .title {
-    color: $text-color-soft;
-    font-size: $font-size-base;
-    margin-bottom: $space-small;
+    color: var(--text-color-soft);
+    font-size: var(--font-size-base);
+    margin-bottom: var(--space-small);
   }
 }
 </style>

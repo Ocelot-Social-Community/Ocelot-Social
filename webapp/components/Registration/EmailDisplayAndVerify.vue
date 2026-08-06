@@ -31,8 +31,8 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .email-warning {
-  color: $text-color-danger;
+  color: var(--text-color-danger);
 }
 </style>

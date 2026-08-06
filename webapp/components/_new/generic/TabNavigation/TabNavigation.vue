@@ -54,7 +54,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .pointer {
   cursor: pointer;
 }
@@ -66,31 +66,31 @@ export default {
   margin: 0;
   padding: 0;
   list-style: none;
+}
 
-  &__tab {
-    text-align: center;
-    height: 100%;
-    flex-grow: 1;
+.Tabs__tab {
+  text-align: center;
+  height: 100%;
+  flex-grow: 1;
 
+  &:hover {
+    border-bottom: 2px solid #c9c6ce;
+  }
+
+  &.--active {
+    border-bottom: 2px solid #17b53f;
+  }
+  &.--disabled {
+    opacity: var(--opacity-disabled);
     &:hover {
-      border-bottom: 2px solid #c9c6ce;
-    }
-
-    &.--active {
-      border-bottom: 2px solid #17b53f;
-    }
-    &.--disabled {
-      opacity: $opacity-disabled;
-      &:hover {
-        border-bottom: none;
-      }
+      border-bottom: none;
     }
   }
 }
 .tab-navigation {
   position: sticky;
   top: var(--header-height, 53px);
-  z-index: $z-index-sticky;
+  z-index: var(--z-index-sticky);
   transition: top 0.15s ease;
 
   @media (prefers-reduced-motion: reduce) {
@@ -104,10 +104,10 @@ export default {
     &.ds-tab-nav-item-active {
       border-bottom: 3px solid #17b53f;
       &:first-child {
-        border-bottom-left-radius: $border-radius-x-large;
+        border-bottom-left-radius: var(--border-radius-x-large);
       }
       &:last-child {
-        border-bottom-right-radius: $border-radius-x-large;
+        border-bottom-right-radius: var(--border-radius-x-large);
       }
     }
   }
@@ -118,7 +118,7 @@ export default {
     container-name: tab-nav;
   }
   .ds-tab-nav.os-card {
-    border-radius: $border-radius-x-large $border-radius-x-large 0 0 !important;
+    border-radius: var(--border-radius-x-large) var(--border-radius-x-large) 0 0 !important;
     transition: border-radius 0.15s ease;
 
     @media (prefers-reduced-motion: reduce) {

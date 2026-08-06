@@ -828,11 +828,11 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 #navbar {
   padding: 10px 10px;
 
-  // Show correct layout immediately via CSS (no FOUC)
+  /*  Show correct layout immediately via CSS (no FOUC) */
   .desktop-menu {
     display: flex;
   }
@@ -906,18 +906,18 @@ export default {
   gap: 4px;
 }
 
-// Mobile Header mit verbessertem Layout
+/*  Mobile Header mit verbessertem Layout */
 .mobil-header-box {
   &.mobil-header-box--open {
     display: flex;
     flex-direction: column;
     height: calc(100dvh - 20px);
-    margin: 0 -10px; // extend to screen edge
+    margin: 0 -10px; /*  extend to screen edge */
     background-color: #fff;
 
     > .mobile-header-row {
       flex: 0 0 auto;
-      padding: 0 10px; // compensate negative margin
+      padding: 0 10px; /*  compensate negative margin */
     }
 
     .mobile-user-header {
@@ -976,10 +976,10 @@ export default {
   .mobile-collapse-toggle {
     margin-left: auto;
     flex-shrink: 0;
-    pointer-events: none; // Parent handles click
+    pointer-events: none; /*  Parent handles click */
   }
 
-  // Consistent icon column width across all menu items
+  /*  Consistent icon column width across all menu items */
   .mobile-icon-col {
     min-width: 36px;
     display: inline-flex;
@@ -997,41 +997,41 @@ export default {
     align-items: center;
     gap: 8px;
     padding: 2px 10px;
-    color: $text-color-base;
+    color: var(--text-color-base);
     min-height: 36px;
 
     &:hover {
-      color: $text-color-link-active;
-      background-color: $background-color-soft;
+      color: var(--text-color-link-active);
+      background-color: var(--background-color-soft);
     }
 
     &.nuxt-link-active,
     &.router-link-active {
-      color: $text-color-link;
-      background-color: $background-color-soft;
-      box-shadow: inset 3px 0 0 $color-primary;
+      color: var(--text-color-link);
+      background-color: var(--background-color-soft);
+      box-shadow: inset 3px 0 0 var(--color-primary);
     }
 
     &.mobile-logout-item {
-      color: $text-color-danger;
-      border-top: 1px solid $color-neutral-90;
+      color: var(--text-color-danger);
+      border-top: 1px solid var(--color-neutral-90);
       padding-top: 4px;
       margin-top: 2px;
 
       &:hover {
         color: color-mix(in srgb, var(--color-danger), black 10%);
-        background-color: $background-color-soft;
+        background-color: var(--background-color-soft);
       }
 
       &.nuxt-link-active,
       &.router-link-active {
-        color: $text-color-danger;
+        color: var(--text-color-danger);
         box-shadow: none;
         background-color: transparent;
       }
     }
 
-    // Flatten embedded component buttons to plain icons
+    /*  Flatten embedded component buttons to plain icons */
     .chat-notification-menu,
     .notifications-menu,
     .mobile-nav-icon-button {
@@ -1045,7 +1045,7 @@ export default {
       min-height: auto;
       width: auto;
       height: auto;
-      pointer-events: none; // Let parent nuxt-link handle navigation
+      pointer-events: none; /*  Let parent nuxt-link handle navigation */
 
       &:hover,
       &:focus {
@@ -1075,7 +1075,7 @@ export default {
 
   .mobile-user-info {
     padding: 6px 0;
-    border-bottom: 1px solid $color-neutral-90;
+    border-bottom: 1px solid var(--color-neutral-90);
   }
 
   .mobile-avatar.avatar-image {
@@ -1091,7 +1091,7 @@ export default {
     cursor: pointer;
 
     &:hover {
-      background-color: $background-color-soft;
+      background-color: var(--background-color-soft);
     }
   }
 
@@ -1110,16 +1110,16 @@ export default {
   }
 
   .mobile-user-role {
-    font-size: $font-size-small;
-    color: $text-color-softer;
+    font-size: var(--font-size-small);
+    color: var(--text-color-softer);
   }
 
   .mobile-avatar-menu-items {
     padding: 4px 0 0 0;
 
     hr {
-      color: $color-neutral-90;
-      background-color: $color-neutral-90;
+      color: var(--color-neutral-90);
+      background-color: var(--color-neutral-90);
       margin: 2px 0;
     }
   }
@@ -1130,18 +1130,18 @@ export default {
     gap: 8px;
     padding: 2px 10px;
     min-height: 32px;
-    color: $text-color-base;
+    color: var(--text-color-base);
 
     &:hover {
-      color: $text-color-link-active;
-      background-color: $background-color-soft;
+      color: var(--text-color-link-active);
+      background-color: var(--background-color-soft);
     }
 
     &.nuxt-link-active,
     &.router-link-active {
-      color: $text-color-link;
-      background-color: $background-color-soft;
-      box-shadow: inset 3px 0 0 $color-primary;
+      color: var(--text-color-link);
+      background-color: var(--background-color-soft);
+      box-shadow: inset 3px 0 0 var(--color-primary);
     }
   }
 
@@ -1159,7 +1159,7 @@ export default {
 
   .mobile-more-section {
     padding: 2px 0;
-    border-top: 1px solid $color-neutral-90;
+    border-top: 1px solid var(--color-neutral-90);
   }
 
   .mobile-more-header {
@@ -1171,8 +1171,8 @@ export default {
     min-height: 36px;
 
     &:hover {
-      color: $text-color-link-active;
-      background-color: $background-color-soft;
+      color: var(--text-color-link-active);
+      background-color: var(--background-color-soft);
     }
   }
 
@@ -1180,8 +1180,8 @@ export default {
     padding: 0;
 
     hr {
-      color: $color-neutral-90;
-      background-color: $color-neutral-90;
+      color: var(--color-neutral-90);
+      background-color: var(--color-neutral-90);
       margin: 2px 0;
     }
   }
@@ -1192,18 +1192,18 @@ export default {
     gap: 8px;
     padding: 2px 10px;
     min-height: 32px;
-    color: $text-color-base;
+    color: var(--text-color-base);
 
     &:hover {
-      color: $text-color-link-active;
-      background-color: $background-color-soft;
+      color: var(--text-color-link-active);
+      background-color: var(--background-color-soft);
     }
 
     &.nuxt-link-active,
     &.router-link-active {
-      color: $text-color-link;
-      background-color: $background-color-soft;
-      box-shadow: inset 3px 0 0 $color-primary;
+      color: var(--text-color-link);
+      background-color: var(--background-color-soft);
+      box-shadow: inset 3px 0 0 var(--color-primary);
     }
   }
 
@@ -1225,23 +1225,23 @@ export default {
     gap: 8px;
     padding: 2px 10px;
     min-height: 32px;
-    color: $text-color-base;
+    color: var(--text-color-base);
 
     &:hover {
-      color: $text-color-link-active;
-      background-color: $background-color-soft;
+      color: var(--text-color-link-active);
+      background-color: var(--background-color-soft);
     }
 
     &.--active {
       font-weight: bold;
-      color: $text-color-link;
-      background-color: $background-color-soft;
-      box-shadow: inset 3px 0 0 $color-primary;
+      color: var(--text-color-link);
+      background-color: var(--background-color-soft);
+      box-shadow: inset 3px 0 0 var(--color-primary);
     }
   }
 
   .mobile-locale-flag {
-    margin-left: $space-xxx-small;
+    margin-left: var(--space-xxx-small);
   }
 }
 .map-button {
@@ -1255,11 +1255,11 @@ export default {
 
 .invite-list {
   max-width: min(400px, 90vw);
-  padding: $space-small;
-  margin-top: $space-base;
+  padding: var(--space-small);
+  margin-top: var(--space-base);
   display: flex;
   flex-flow: column;
-  gap: $space-small;
+  gap: var(--space-small);
   --invitation-column-max-width: 75%;
 }
 </style>

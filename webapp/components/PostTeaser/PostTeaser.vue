@@ -310,14 +310,14 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .post-teaser,
 .post-teaser:hover,
 .post-teaser:active {
   position: relative;
   display: block;
   height: 100%;
-  color: $text-color-base;
+  color: var(--text-color-base);
   padding-top: 16px;
 
   @media (max-width: 810px) {
@@ -365,12 +365,8 @@ export default {
 
   .image-placeholder {
     width: 100%;
-    background-color: $background-color-softer;
+    background-color: var(--background-color-softer);
     animation: image-placeholder-pulse 1.5s ease-in-out infinite;
-
-    &--loaded {
-      animation: none;
-    }
 
     > .image {
       display: block;
@@ -380,8 +376,12 @@ export default {
     }
   }
 
+  .image-placeholder--loaded {
+    animation: none;
+  }
+
   &.--blur-image > .os-card__hero-image .image {
-    filter: blur($blur-radius);
+    filter: blur(var(--blur-radius));
   }
 
   > .os-card__content {
@@ -391,11 +391,11 @@ export default {
     padding-bottom: 0 !important;
   }
 
-  padding-bottom: $space-x-small !important;
+  padding-bottom: var(--space-x-small) !important;
 
   .content {
     flex-grow: 1;
-    margin-bottom: $space-small;
+    margin-bottom: var(--space-small);
     display: -webkit-box;
     -webkit-line-clamp: 6;
     -webkit-box-orient: vertical;
@@ -414,8 +414,8 @@ export default {
 
     > .os-counter-icon {
       display: block;
-      margin-right: $space-small;
-      opacity: $opacity-disabled;
+      margin-right: var(--space-small);
+      opacity: var(--opacity-disabled);
     }
 
     > .content-menu {
@@ -424,18 +424,18 @@ export default {
 
     .os-badge {
       margin: 0;
-      margin-right: $space-xx-small;
+      margin-right: var(--space-xx-small);
     }
   }
 
   .user-avatar {
-    margin-bottom: $space-small;
+    margin-bottom: var(--space-small);
   }
 
   .user-avatar-placeholder {
     display: flex;
     align-items: center;
-    margin-bottom: $space-small;
+    margin-bottom: var(--space-small);
 
     .placeholder-avatar {
       width: 36px;
@@ -459,20 +459,21 @@ export default {
       border-radius: 5px;
       background: currentColor;
       opacity: 0.15;
+    }
 
-      &--name {
-        width: 120px;
-      }
-      &--date {
-        width: 80px;
-      }
+    .placeholder-line--name {
+      width: 120px;
+    }
+
+    .placeholder-line--date {
+      width: 80px;
     }
   }
 
   .date-row {
     display: flex;
     justify-content: flex-end;
-    margin-top: $space-small;
+    margin-top: var(--space-small);
 
     > .placeholder-line--date-footer {
       width: 100px;
@@ -485,12 +486,12 @@ export default {
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
-      color: $text-color-soft;
-      font-size: $font-size-small;
+      color: var(--text-color-soft);
+      font-size: var(--font-size-small);
 
       > .pushed-icon {
-        margin-right: $space-xx-small;
-        vertical-align: middle !important; // Override OsIcon's Tailwind align-bottom
+        margin-right: var(--space-xx-small);
+        vertical-align: middle !important; /*  Override OsIcon's Tailwind align-bottom */
       }
 
       > .ds-text {
@@ -525,7 +526,7 @@ export default {
     > .os-card__content {
       flex: 1;
       min-width: 0;
-      padding-bottom: $space-x-small !important;
+      padding-bottom: var(--space-x-small) !important;
     }
 
     .post-ribbon-w-img {

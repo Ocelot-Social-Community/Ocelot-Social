@@ -102,7 +102,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .hc-modal-success {
   pointer-events: none;
   position: absolute;
@@ -112,7 +112,7 @@ export default {
   left: 0;
   background-color: #fff;
   opacity: 1;
-  z-index: $z-index-modal;
-  border-radius: $border-radius-x-large;
+  z-index: var(--z-index-modal);
+  border-radius: var(--border-radius-x-large);
 }
 </style>

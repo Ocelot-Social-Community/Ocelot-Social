@@ -66,11 +66,11 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .ds-footer {
   text-align: center;
   z-index: 10;
-  background-color: $color-footer-background;
+  background-color: var(--color-footer-background);
   width: 100%;
   padding: 10px 10px;
   box-shadow: 0px -6px 12px -4px rgba(0, 0, 0, 0.1);
@@ -81,7 +81,7 @@ export default {
   }
 }
 .ds-footer a {
-  color: $color-footer-link;
+  color: var(--color-footer-link);
 }
 .division-space {
   margin-left: 0.4rem;

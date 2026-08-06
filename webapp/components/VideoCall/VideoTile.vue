@@ -267,26 +267,26 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .video-tile {
   position: relative;
-  // Confine the speaking frame and the pin badge to this tile. Without an own
-  // stacking context their z-indexes compete with the call's overlays (the
-  // active-speaker chips), where a tie is decided by DOM order — and the tiles
-  // come last, so the frame would paint over the chips.
+  /*  Confine the speaking frame and the pin badge to this tile. Without an own */
+  /*  stacking context their z-indexes compete with the call's overlays (the */
+  /*  active-speaker chips), where a tie is decided by DOM order — and the tiles */
+  /*  come last, so the frame would paint over the chips. */
   isolation: isolate;
-  background: $color-neutral-0;
+  background: var(--color-neutral-0);
   overflow: hidden;
   display: flex;
-  // Fill the flex/grid parent so a single tile occupies the full body in the
-  // minimized window. In a grid container, `flex` is ignored — width: 100% +
-  // height: 100% would not cascade reliably, so we use flex sizing here.
+  /*  Fill the flex/grid parent so a single tile occupies the full body in the */
+  /*  minimized window. In a grid container, `flex` is ignored — width: 100% + */
+  /*  height: 100% would not cascade reliably, so we use flex sizing here. */
   flex: 1;
   min-width: 0;
   min-height: 0;
   width: 100%;
   height: 100%;
-  border-radius: $border-radius-base;
+  border-radius: var(--border-radius-base);
 
   video {
     width: 100%;
@@ -296,21 +296,21 @@ export default {
 }
 
 .video-tile--screen {
-  background: $color-neutral-10;
+  background: var(--color-neutral-10);
 
   video {
     object-fit: contain;
   }
 }
 
-// Overlay sits above the video element (which has object-fit: cover and would
-// otherwise clip an inset box-shadow). Works for both the camera-on case and
-// the avatar fallback when the camera is off.
+/*  Overlay sits above the video element (which has object-fit: cover and would */
+/*  otherwise clip an inset box-shadow). Works for both the camera-on case and */
+/*  the avatar fallback when the camera is off. */
 .video-tile--speaking::after {
   content: '';
   position: absolute;
   inset: 0;
-  border: 3px solid $color-primary;
+  border: 3px solid var(--color-primary);
   border-radius: inherit;
   pointer-events: none;
   z-index: 2;
@@ -320,22 +320,22 @@ export default {
   cursor: pointer;
 
   &:focus-visible {
-    outline: 2px solid $color-primary;
+    outline: 2px solid var(--color-primary);
     outline-offset: -2px;
   }
 }
 
 .video-tile__pin {
   position: absolute;
-  top: $space-xxx-small;
-  right: $space-xxx-small;
+  top: var(--space-xxx-small);
+  right: var(--space-xxx-small);
   width: 24px;
   height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: $color-primary;
-  color: $color-primary-inverse;
+  background: var(--color-primary);
+  color: var(--color-primary-inverse);
   border-radius: 50%;
   z-index: 3;
   pointer-events: none;
@@ -346,15 +346,15 @@ export default {
   }
 }
 
-// Hidden tiles stay in the DOM so their <audio> element keeps playing the
-// participant's voice while the user is in the minimized view.
+/*  Hidden tiles stay in the DOM so their <audio> element keeps playing the */
+/*  participant's voice while the user is in the minimized view. */
 .video-tile--hidden {
   display: none;
 }
 
 .video-tile__screen-tag {
   opacity: 0.85;
-  margin-left: $space-xxx-small;
+  margin-left: var(--space-xxx-small);
 }
 
 .video-tile__fallback {
@@ -364,21 +364,21 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: $space-x-small;
-  color: $text-color-inverse;
+  gap: var(--space-x-small);
+  color: var(--text-color-inverse);
   pointer-events: none;
-  padding: $space-small;
+  padding: var(--space-small);
 
-  // Don't let the flex column squish the avatar into an oval when the tile is
-  // narrower than the avatar's intrinsic size (thumbnail strip in spotlight).
+  /*  Don't let the flex column squish the avatar into an oval when the tile is */
+  /*  narrower than the avatar's intrinsic size (thumbnail strip in spotlight). */
   > .avatar-image {
     flex-shrink: 0;
   }
 }
 
 .video-tile__fallback--own-screen {
-  background: $color-neutral-10;
-  color: $color-neutral-70;
+  background: var(--color-neutral-10);
+  color: var(--color-neutral-70);
 }
 
 .video-tile__fallback-icon {
@@ -388,25 +388,25 @@ export default {
 }
 
 .video-tile__fallback-text {
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
   opacity: 0.85;
 }
 
 .video-tile__label {
   position: absolute;
-  bottom: $space-xxx-small;
-  left: $space-xxx-small;
+  bottom: var(--space-xxx-small);
+  left: var(--space-xxx-small);
   background: rgba(0, 0, 0, 0.6);
-  color: $text-color-inverse;
-  padding: 2px $space-x-small;
-  border-radius: $border-radius-base;
-  font-family: $font-family-text;
-  font-size: $font-size-small;
+  color: var(--text-color-inverse);
+  padding: 2px var(--space-x-small);
+  border-radius: var(--border-radius-base);
+  font-family: var(--font-family-text);
+  font-size: var(--font-size-small);
   pointer-events: none;
 }
 
 .video-tile__local-tag {
   opacity: 0.75;
-  margin-left: $space-xxx-small;
+  margin-left: var(--space-xxx-small);
 }
 </style>

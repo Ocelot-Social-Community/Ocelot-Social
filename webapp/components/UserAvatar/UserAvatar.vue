@@ -66,7 +66,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .user-avatar {
   display: flex;
   flex-wrap: nowrap;
@@ -91,17 +91,17 @@ export default {
     white-space: break-spaces;
 
     &.anonymous {
-      font-size: $font-size-base;
+      font-size: var(--font-size-base);
     }
 
     .slug {
-      color: $color-primary;
-      font-size: calc(1.15 * $font-size-base);
+      color: var(--color-primary);
+      font-size: calc(1.15 * var(--font-size-base));
     }
 
     .name {
-      color: $text-color-soft;
-      font-size: $font-size-base;
+      color: var(--text-color-soft);
+      font-size: var(--font-size-base);
     }
   }
 
@@ -149,8 +149,8 @@ export default {
   }
 
   .group-link {
-    color: $text-color-soft;
-    font-size: $font-size-base;
+    color: var(--text-color-soft);
+    font-size: var(--font-size-base);
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
