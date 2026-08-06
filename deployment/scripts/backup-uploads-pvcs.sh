@@ -6,12 +6,33 @@
 # are leftovers. Before the backend chart drops the PVC (see docu/backend-zero-downtime-konzept.md)
 # we want one verifiable copy of whatever is still on them.
 #
-# The script is READ-ONLY against the cluster: it never deletes a PVC, a PV or any file. Deleting is
-# a separate, deliberate step — see the end of this file.
+# The script is READ-ONLY against the cluster: it never deletes a PVC, a PV or any file, and it never
+# writes inside the pod. Deleting is a separate, deliberate step — see the end of this file.
 #
 # Data is streamed out of the container that already mounts the volume (`tar` over `kubectl exec`),
-# so nothing is written inside the pod and no extra volume attachment is needed. RWO volumes cannot
-# be mounted twice, which is exactly why a helper pod is NOT the default.
+# so no extra volume attachment is needed. RWO volumes cannot be mounted twice, which is exactly why
+# a helper pod is NOT the default.
+#
+# ---------------------------------------------------------------------------------------------
+# Why this transfers in chunks
+#
+# A single `kubectl exec | tar` stream dies after roughly 60 seconds of wall clock against at least
+# one of our API servers, regardless of how much data is still in flight. The multiplexed SPDY
+# connection carries stdin/stdout/stderr over ONE TCP connection, so a read deadline on it kills the
+# transfer wholesale — the observed error is an i/o timeout on the *stderr* stream while stdout was
+# happily streaming. Volumes below ~100 MB finish inside that window and look perfectly healthy;
+# the first volume that does not (yunite-me-production, ~977 MiB at ~1.8 MB/s ≈ 9 min) can never
+# succeed, and retrying a whole-volume stream just walks into the same wall from the start again.
+#
+# So the unit of transfer is a batch of files sized to finish in well under the timeout, not the
+# volume. Each batch is streamed, verified and kept on its own; a run that dies at 80% resumes at
+# 80%. Only after every batch is verified are they merged into one archive locally, so the on-disk
+# result is identical in shape to a single-shot backup.
+#
+# Two consequences of merging locally, both harmless for uploads but worth knowing: directory mtimes
+# and modes are recreated rather than transferred (file metadata is preserved, tar carries it), and
+# only regular files travel — symlinks and device nodes are counted and reported, never archived.
+# ---------------------------------------------------------------------------------------------
 
 set -euo pipefail
 
@@ -20,43 +41,130 @@ SUFFIX="-uploads"
 NAMESPACE=""
 DRY_RUN=false
 FORCE=false
+# 32 MiB is ~18 s at the slowest throughput we have measured (1.8 MB/s) — a third of the budget
+# before the connection is torn down. Lower it if a cluster is slower still.
+CHUNK_KIB=32768
+CHUNK_FILES=200
+ATTEMPTS=5
+# Per-attempt wall clock. Generous compared to the expected ~20 s so that a slow-but-alive transfer
+# is not killed, but low enough that a wedged stream does not stall the run for good.
+ATTEMPT_TIMEOUT=180
+WEBSOCKETS=false
+KEEP_STAGING=false
 
 usage() {
   cat <<'USAGE'
 Usage: backup-uploads-pvcs.sh [options]
 
-  -o, --output-dir DIR   where to write archives (default: ./uploads-backup)
-  -n, --namespace NS     restrict to a single namespace (default: all)
-  -s, --suffix SUFFIX    PVC name suffix to match (default: -uploads)
-      --dry-run          list what would be backed up, transfer nothing
-      --force            overwrite archives that already exist
-  -h, --help             this text
+  -o, --output-dir DIR     where to write archives (default: ./uploads-backup)
+  -n, --namespace NS       restrict to a single namespace (default: all)
+  -s, --suffix SUFFIX      PVC name suffix to match (default: -uploads)
+      --chunk-kib N        target payload per transfer, in KiB (default: 32768)
+      --chunk-files N      hard cap on files per transfer (default: 200)
+      --attempts N         retries per chunk (default: 5)
+      --attempt-timeout S  seconds before a single chunk transfer is killed (default: 180)
+      --websockets         use the WebSocket exec transport instead of SPDY
+      --keep-staging       keep per-chunk archives and the extracted tree after success
+      --dry-run            list what would be backed up, transfer nothing
+      --force              re-transfer from scratch, overwriting existing archives
+  -h, --help               this text
 
-Requires: kubectl (with a working context), jq, tar, gzip, sha256sum.
+Resuming: an interrupted run is resumed simply by running the same command again. Verified chunks
+are kept under <output-dir>/.staging and are not fetched twice, as long as the file listing on the
+volume still matches. Use --force to discard that state.
+
+Requires: kubectl (with a working context), jq, tar, gzip, sha256sum, timeout, awk, diff.
 USAGE
 }
 
 while [ $# -gt 0 ]; do
   case "$1" in
-    -o|--output-dir) OUT_DIR="$2"; shift 2 ;;
-    -n|--namespace)  NAMESPACE="$2"; shift 2 ;;
-    -s|--suffix)     SUFFIX="$2"; shift 2 ;;
-    --dry-run)       DRY_RUN=true; shift ;;
-    --force)         FORCE=true; shift ;;
-    -h|--help)       usage; exit 0 ;;
+    -o|--output-dir)     OUT_DIR="$2"; shift 2 ;;
+    -n|--namespace)      NAMESPACE="$2"; shift 2 ;;
+    -s|--suffix)         SUFFIX="$2"; shift 2 ;;
+    --chunk-kib)         CHUNK_KIB="$2"; shift 2 ;;
+    --chunk-files)       CHUNK_FILES="$2"; shift 2 ;;
+    --attempts)          ATTEMPTS="$2"; shift 2 ;;
+    --attempt-timeout)   ATTEMPT_TIMEOUT="$2"; shift 2 ;;
+    --websockets)        WEBSOCKETS=true; shift ;;
+    --keep-staging)      KEEP_STAGING=true; shift ;;
+    --dry-run)           DRY_RUN=true; shift ;;
+    --force)             FORCE=true; shift ;;
+    -h|--help)           usage; exit 0 ;;
     *) echo "unknown argument: $1" >&2; usage >&2; exit 2 ;;
   esac
 done
 
-for tool in kubectl jq tar gzip sha256sum; do
+for tool in kubectl jq tar gzip sha256sum timeout awk diff; do
   command -v "$tool" >/dev/null 2>&1 || { echo "missing required tool: $tool" >&2; exit 1; }
 done
+
+# Left to kubectl by default, and deliberately so: modern kubectl prefers WebSockets where the API
+# server supports it, which is the transport we want. SPDY multiplexes stdout and stderr onto one
+# connection, which is precisely the failure described at the top of this file — exporting `false`
+# unconditionally would pin every run to it. Only pin when the caller explicitly asks.
+if [ "$WEBSOCKETS" = true ]; then
+  export KUBECTL_REMOTE_COMMAND_WEBSOCKETS=true
+fi
 
 CONTEXT=$(kubectl config current-context)
 echo "cluster context : $CONTEXT"
 echo "output directory: $OUT_DIR"
 echo "matching PVCs   : *$SUFFIX${NAMESPACE:+ in namespace $NAMESPACE}"
+echo "chunking        : ${CHUNK_KIB} KiB / ${CHUNK_FILES} files per transfer, ${ATTEMPTS} attempts"
 echo
+
+# ------------------------------------------------------------------------------------ pod helpers
+#
+# Two shapes of remote call, and the difference matters.
+#
+# `pod_sh` runs a small shell snippet and captures its text output — listings, counters. Cheap and
+# short-lived, so the 60 s ceiling is irrelevant here.
+#
+# `pod_tar` streams binary. The file names are passed as POSITIONAL PARAMETERS to `sh`, never
+# interpolated into the snippet, so no amount of quoting weirdness in a filename can turn into shell
+# syntax. The trailing `sleep` is not cosmetic: when tar exits, kubectl can tear the connection down
+# before the last buffered blocks have crossed it, which produces an archive that ends just short of
+# its end-of-archive marker. Keeping the remote command alive briefly lets the stream drain.
+#
+# stdin is redirected from /dev/null throughout. Without it kubectl either hangs on "waiting for
+# server to close stdin", or — worse — the loop below silently eats the PVC list on stdin.
+pod_sh() {
+  local ns=$1 pod=$2 container=$3 snippet=$4
+  kubectl -n "$ns" exec "$pod" -c "$container" --request-timeout=0 -- sh -c "$snippet" </dev/null
+}
+
+pod_tar() {
+  local ns=$1 pod=$2 container=$3 mount=$4; shift 4
+  timeout "$ATTEMPT_TIMEOUT" \
+    kubectl -n "$ns" exec "$pod" -c "$container" --request-timeout=0 \
+      -- sh -c 'dir=$1; shift; tar -C "$dir" -cf - -- "$@"; sleep 2' sh "$mount" "$@" </dev/null
+}
+
+# A chunk counts as good only if it lists exactly the paths the plan assigned to it. A truncated
+# stream can still decompress and can still contain plausible files, so `gzip -t` alone would happily
+# wave through a chunk that lost its tail — which is precisely the failure mode we are working
+# around. Comparing the full sorted path set costs nothing and leaves no room for that.
+chunk_ok() {
+  local chunk=$1 expected=$2
+  gzip -t "$chunk" 2>/dev/null || return 1
+  tar -tzf "$chunk" 2>/dev/null | grep -v '/$' | LC_ALL=C sort | diff -q - "$expected" >/dev/null 2>&1
+}
+
+# A volume of a few hundred chunks would scroll a terminal for no good reason, so progress
+# overwrites a single line there. Redirected into a log file that same trick produces one endless
+# unreadable line, so fall back to one line per state change.
+progress() {
+  if [ -t 1 ]; then
+    printf '\r   %-58s' "$1"
+  else
+    printf '   %s\n' "$1"
+  fi
+}
+
+progress_clear() {
+  [ -t 1 ] && printf '\r%*s\r' 62 '' || true
+}
 
 # ---------------------------------------------------------------- discover PVCs
 if [ -n "$NAMESPACE" ]; then
@@ -120,16 +228,7 @@ while IFS=$'\t' read -r ns pvc pv phase; do
   IFS=$'\t' read -r pod container mount <<< "$target"
   echo "   source: pod/$pod [$container] : $mount"
 
-  files=$(kubectl -n "$ns" exec "$pod" -c "$container" -- sh -c "find '$mount' -type f 2>/dev/null | wc -l" | tr -d '[:space:]')
-  size_kib=$(kubectl -n "$ns" exec "$pod" -c "$container" -- sh -c "du -sk '$mount' 2>/dev/null | cut -f1" | tr -d '[:space:]')
-  echo "   content: $files files, ${size_kib} KiB"
-
   archive="$OUT_DIR/${ns}__${pvc}.tar.gz"
-
-  if [ "$DRY_RUN" = true ]; then
-    echo "   DRY-RUN: would write $archive"
-    continue
-  fi
 
   if [ -f "$archive" ] && [ "$FORCE" != true ]; then
     echo "   SKIP: $archive exists (use --force to overwrite)"
@@ -137,61 +236,225 @@ while IFS=$'\t' read -r ns pvc pv phase; do
     continue
   fi
 
-  # Plain tar in the pod, gzip locally: busybox tar's -z is not guaranteed, local gzip is.
-  #
-  # `exec -i < /dev/null` is deliberate and both halves matter. Without -i kubectl can exit 0 while
-  # the stdout stream was silently truncated — corrupt archives that look successful. With -i but
-  # an inherited terminal on stdin, kubectl instead hangs on "waiting for server to close stdin",
-  # because tar never reads it. Redirecting from /dev/null gives a stdin that closes immediately.
-  # No -t under any circumstances, otherwise the stream is not binary safe.
-  #
-  # Every attempt is verified end to end and NOTHING is promoted to the final filename unless it
-  # passes. A partial transfer is retried, because on volumes of a few hundred MB a truncated
-  # stream is a transport hiccup, not a permanent condition.
-  tmp="$archive.part"
-  errlog="$archive.err"
-  attempts=3
-  attempt=1
-  verified=false
+  # One round trip for all the counters. Counting the NUL separators of `-print0` is the only file
+  # count that is immune to newlines in filenames — translating NUL to newline is not, because the
+  # embedded newline survives the translation and inflates the count exactly like the plain listing
+  # does. The plain line count is here purely as the comparison partner: if the two disagree, some
+  # filename contains a newline and every listing this script parses would be silently wrong.
+  # `! -type f ! -type d` catches symlinks, sockets and devices, which the transfer below ignores —
+  # better to say so than to hand over an archive that quietly dropped them.
+  counters=$(pod_sh "$ns" "$pod" "$container" "cd '$mount' 2>/dev/null || exit 1
+    find . -type f -print0 | tr -dc '\0' | wc -c
+    find . -type f | wc -l
+    find . ! -type f ! -type d | wc -l
+    du -sk . | cut -f1")
+  { read -r files; read -r files_lines; read -r others; read -r size_kib; } <<< "$(tr -d '[:blank:]' <<< "$counters")"
 
-  while [ "$attempt" -le "$attempts" ]; do
-    # The trailing `sleep` is not cosmetic. Observed failures always lost the LAST few files
-    # (108/111, 206/212, 1319/1326): when tar exits, kubectl tears the connection down before the
-    # final buffered blocks have crossed it, so the archive ends just short of its end-of-archive
-    # marker. Keeping the remote command alive for a moment lets the stream drain.
-    if kubectl -n "$ns" exec -i "$pod" -c "$container" \
-         -- sh -c "tar -C '$mount' -cf - . ; sleep 5" </dev/null 2>"$errlog" | gzip > "$tmp"; then
-      if ! gzip -t "$tmp" 2>/dev/null; then
-        echo "   attempt $attempt/$attempts: gzip stream is truncated"
-      else
-        # Directory entries end in '/', everything else counts as a file. `|| true` keeps the
-        # partial count when tar aborts, instead of masking it as 0.
-        in_archive=$(tar -tzf "$tmp" 2>/dev/null | grep -cv '/$' || true)
-        if [ "$in_archive" = "$files" ]; then
-          verified=true
-          break
-        fi
-        echo "   attempt $attempt/$attempts: archive holds $in_archive of $files files"
-      fi
-    else
-      echo "   attempt $attempt/$attempts: transfer error"
-      [ -s "$errlog" ] && sed 's/^/     /' "$errlog" | tail -3
-    fi
-    attempt=$((attempt + 1))
-    # Streaming a few hundred MB through the API server is what fails here, and it fails
-    # intermittently. A short pause costs nothing and avoids hammering a server that just reset us.
-    [ "$attempt" -le "$attempts" ] && sleep 5
-  done
+  echo "   content: $files files, ${size_kib} KiB"
 
-  if [ "$verified" != true ]; then
-    echo "   FAILED: no complete archive after $attempts attempts"
-    echo "           partial file kept for inspection: $tmp"
+  if [ "$files" != "$files_lines" ]; then
+    echo "   FAILED: filenames containing newlines are present ($files_lines listed lines for"
+    echo "           $files files). Chunked transfer cannot address those safely — pull this"
+    echo "           volume with a single-shot tar, or rename the offenders first."
     failed=$((failed + 1))
     continue
   fi
-  rm -f "$errlog"
+
+  if [ "$others" != "0" ]; then
+    echo "   WARNING: $others entries are neither regular files nor directories (symlinks, devices)"
+    echo "            and will NOT be part of the archive."
+  fi
+
+  if [ "$DRY_RUN" = true ]; then
+    echo "   DRY-RUN: would write $archive"
+    continue
+  fi
+
+  # Chunks, the extracted tree and the final archive coexist for a moment, so budget roughly 2.5x
+  # the volume. Running out of space cannot corrupt a backup — every stage is verified — but it
+  # wastes a long transfer, so say it up front.
+  avail_kib=$(df -Pk "$OUT_DIR" | awk 'NR == 2 { print $4 }')
+  if [ "$((size_kib * 5 / 2))" -gt "$avail_kib" ]; then
+    echo "   WARNING: ~$((size_kib * 5 / 2 / 1024)) MiB needed during assembly, $((avail_kib / 1024)) MiB free on $OUT_DIR"
+  fi
+
+  stage="$OUT_DIR/.staging/${ns}__${pvc}"
+  [ "$FORCE" = true ] && rm -rf "$stage"
+  mkdir -p "$stage/chunks"
+
+  # Directory entries travel separately: tar only ever gets regular files (passing a directory
+  # would make it recurse and duplicate payload across chunks), so directories that hold no files
+  # would otherwise vanish from the archive.
+  pod_sh "$ns" "$pod" "$container" "cd '$mount' && find . -type d" > "$stage/dirs.txt"
+
+  # Size-annotated listing, one `<kib>\t<path>` per line. `du -k` reports allocated blocks, so the
+  # sum overshoots for many small files — that errs towards smaller chunks, which is the safe side.
+  #
+  # `-l` is load-bearing, not a tuning knob: without it du counts each inode ONCE, so the second and
+  # every further hard link to a file is omitted from the listing entirely. Those paths would never
+  # reach the plan, never be transferred, and the run would die at the merge check ("holds N of M
+  # files") with nothing pointing at the cause. Counting the payload repeatedly is the harmless
+  # direction — it only makes chunks smaller. Verified on both GNU coreutils and BusyBox.
+  listing="$stage/listing.tsv"
+  if [ "$files" != "0" ]; then
+    pod_sh "$ns" "$pod" "$container" "cd '$mount' && find . -type f -exec du -kl {} +" > "$listing"
+  else
+    : > "$listing"
+  fi
+
+  # A cached chunk is only reusable while a fresh plan would assign it the same contents, because
+  # chunk N is defined by the plan and not by its own name. That depends on the volume (any added,
+  # removed or grown file) AND on the chunk boundaries — so both go into the stamp. Hashing only the
+  # listing would make the advice printed on failure a trap: re-running with a smaller --chunk-kib
+  # would keep the old, too-large chunks and walk into exactly the same timeout.
+  listing_sum=$(sha256sum "$listing" | cut -d' ' -f1)
+  plan_stamp="$listing_sum $CHUNK_KIB $CHUNK_FILES"
+  stamp_file="$stage/plan.stamp"
+  plan="$stage/plan.tsv"
+  if [ ! -f "$stamp_file" ] || [ "$(cat "$stamp_file")" != "$plan_stamp" ]; then
+    if [ -f "$plan" ]; then
+      if [ ! -f "$stamp_file" ]; then
+        echo "   incomplete state from an interrupted run — discarding cached chunks"
+      elif [ "$(cut -d' ' -f1 "$stamp_file")" = "$listing_sum" ]; then
+        echo "   chunk sizing changed since the last run — discarding cached chunks"
+      else
+        echo "   volume changed since the last run — discarding cached chunks"
+      fi
+    fi
+    # The stamp is dropped FIRST and rewritten LAST. While it is absent the staging directory is by
+    # definition not resumable, so a run interrupted anywhere in between is cleaned up by the next
+    # one rather than mistaken for valid state.
+    rm -f "$stamp_file"
+    rm -rf "$stage/chunks" "$plan" "$stage/listing.sha256"
+    mkdir -p "$stage/chunks"
+  fi
+
+  # Everything after the FIRST tab is the path, so paths containing tabs survive the round trip.
+  #
+  # Built aside and moved into place, so `plan.tsv` is either absent or complete. A plan truncated
+  # by an interrupted awk would define fewer chunks than the volume needs; because a matching stamp
+  # makes it look reusable, every later run would rebuild the same short transfer and fail the merge
+  # check again, with only --force to escape. `set -e` makes that reachable through any awk error,
+  # not just a kill.
+  if [ ! -f "$plan" ]; then
+    awk -v max_kib="$CHUNK_KIB" -v max_files="$CHUNK_FILES" '
+      BEGIN { idx = 0; acc = 0; n = 0 }
+      {
+        cut = index($0, "\t")
+        size = substr($0, 1, cut - 1) + 0
+        path = substr($0, cut + 1)
+        if (n > 0 && (acc + size > max_kib || n >= max_files)) { idx++; acc = 0; n = 0 }
+        acc += size; n++
+        printf "%d\t%s\n", idx, path
+      }' "$listing" > "$plan.part"
+    mv "$plan.part" "$plan"
+  fi
+  printf '%s' "$plan_stamp" > "$stamp_file"
+
+  chunks=0
+  [ -s "$plan" ] && chunks=$(( $(cut -f1 "$plan" | tail -n 1) + 1 ))
+
+  if [ "$chunks" -gt 0 ]; then
+    echo "   transfer: $chunks chunks"
+  fi
+
+  # ------------------------------------------------------------------- fetch chunks
+  chunk_failed=false
+  ci=0
+  while [ "$ci" -lt "$chunks" ]; do
+    chunk=$(printf '%s/chunks/chunk-%04d.tar.gz' "$stage" "$ci")
+    expected="$chunk.expected"
+
+    mapfile -t batch < <(awk -v c="$ci" '
+      { cut = index($0, "\t"); if (substr($0, 1, cut - 1) + 0 == c) print substr($0, cut + 1) }' "$plan")
+    printf '%s\n' "${batch[@]}" | LC_ALL=C sort > "$expected"
+
+    # A chunk on disk is only trusted after it has proven it holds exactly the paths the plan
+    # assigned to it — not merely that it is a readable gzip.
+    if [ -f "$chunk" ] && chunk_ok "$chunk" "$expected"; then
+      progress "chunk $((ci + 1))/$chunks: cached"
+      ci=$((ci + 1))
+      continue
+    fi
+
+    attempt=1
+    ok=false
+    while [ "$attempt" -le "$ATTEMPTS" ]; do
+      progress "chunk $((ci + 1))/$chunks: attempt $attempt/$ATTEMPTS (${#batch[@]} files)"
+      if pod_tar "$ns" "$pod" "$container" "$mount" "${batch[@]}" 2>"$chunk.err" | gzip > "$chunk.part"; then
+        if mv "$chunk.part" "$chunk" && chunk_ok "$chunk" "$expected"; then
+          ok=true
+          rm -f "$chunk.err"
+          break
+        fi
+      fi
+      rm -f "$chunk.part" "$chunk"
+      attempt=$((attempt + 1))
+      # Back off a little: a connection that was just reset rarely does better if hit immediately.
+      [ "$attempt" -le "$ATTEMPTS" ] && sleep $((attempt * 3))
+    done
+
+    if [ "$ok" != true ]; then
+      progress_clear
+      echo "   chunk $((ci + 1))/$chunks FAILED after $ATTEMPTS attempts"
+      [ -s "$chunk.err" ] && sed 's/^/     /' "$chunk.err" | tail -3
+      echo "     files in this chunk: ${batch[0]} ... (${#batch[@]} entries, see $expected)"
+      chunk_failed=true
+      break
+    fi
+    ci=$((ci + 1))
+  done
+  progress_clear
+
+  if [ "$chunk_failed" = true ]; then
+    echo "   FAILED: incomplete transfer — $ci of $chunks chunks are on disk."
+    echo "           Re-run to resume; they will not be fetched again. If it keeps failing on the"
+    echo "           same chunk, retry with a smaller --chunk-kib or --websockets."
+    failed=$((failed + 1))
+    continue
+  fi
+
+  # ------------------------------------------------------------------- assemble locally
+  tree="$stage/tree"
+  rm -rf "$tree"
+  mkdir -p "$tree"
+  while IFS= read -r d; do
+    [ -n "$d" ] && mkdir -p "$tree/$d"
+  done < "$stage/dirs.txt"
+
+  ci=0
+  while [ "$ci" -lt "$chunks" ]; do
+    tar -xzf "$(printf '%s/chunks/chunk-%04d.tar.gz' "$stage" "$ci")" -C "$tree"
+    ci=$((ci + 1))
+  done
+
+  # The whole point of the exercise: the merged tree must hold every file the volume reported.
+  # Anything else and nothing gets promoted to the final filename.
+  merged=$(find "$tree" -type f -print0 | tr -dc '\0' | wc -c | tr -d '[:blank:]')
+  if [ "$merged" != "$files" ]; then
+    echo "   FAILED: merged tree holds $merged of $files files — refusing to write $archive"
+    echo "           staging kept for inspection: $stage"
+    failed=$((failed + 1))
+    continue
+  fi
+
+  # `-n` keeps the run's timestamp out of the gzip header. That alone does not make the archive
+  # bit-reproducible — the directory entries are recreated locally during assembly and carry
+  # today's mtime — so do not read the manifest sha256 as a content fingerprint across runs. It
+  # identifies this archive, which is all step 1 of the checklist below needs.
+  tmp="$archive.part"
+  tar -C "$tree" -cf - . | gzip -n > "$tmp"
+  in_archive=$(tar -tzf "$tmp" 2>/dev/null | grep -cv '/$' || true)
+  if ! gzip -t "$tmp" 2>/dev/null || [ "$in_archive" != "$files" ]; then
+    echo "   FAILED: final archive holds $in_archive of $files files"
+    rm -f "$tmp"
+    failed=$((failed + 1))
+    continue
+  fi
 
   mv "$tmp" "$archive"
+  [ "$KEEP_STAGING" = true ] || rm -rf "$stage"
+
   sha=$(sha256sum "$archive" | cut -d' ' -f1)
   # Append-only: a re-run with --force adds a new row rather than replacing the old one, so the
   # manifest doubles as a log of when a volume held what.

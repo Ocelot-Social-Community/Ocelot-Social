@@ -64,10 +64,10 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .nested-table {
-  padding: $space-small;
-  border-top: $border-size-base solid $color-neutral-60;
-  border-bottom: $border-size-base solid $color-neutral-60;
+  padding: var(--space-small);
+  border-top: var(--border-size-base) solid var(--color-neutral-60);
+  border-bottom: var(--border-size-base) solid var(--color-neutral-60);
 }
 </style>

@@ -1,0 +1,75 @@
+/**
+ * CSS Custom Properties für @ocelot-social/ui
+ *
+ * Diese Datei mappt die bestehenden SCSS-Variablen auf die CSS Custom Properties,
+ * die von der UI-Library erwartet werden.
+ *
+ * Hinweis: Diese Datei hält die Basisfarben und Schriftfamilien, die Webapp und UI-Library
+ * gemeinsam nutzen. Alle übrigen Design-Tokens stehen in root-tokens.css. Beide werden einmal
+ * global über `css:` in nuxt.config.js geladen — es gibt keinen SCSS-Prolog mehr.
+ */
+
+:root {
+  /*  Default (grau) - entspricht ds-button ohne Modifier */
+  --color-default: var(--background-color-softer); /*  neutral-90: rgb(245, 244, 246) */
+  --color-default-hover: var(--color-neutral-70); /*  rgb(203, 199, 209) - deutlich dunkler */
+  --color-default-active: var(--color-neutral-60); /*  rgb(177, 171, 186) - noch dunkler */
+  --color-default-contrast: var(--text-color-base);
+  --color-default-contrast-inverse: var(--color-neutral-100); /*  weiß für dunkle Hintergründe */
+
+  /*  Primary (grün) - verwendet var(--text-color-primary-inverse) wie ds-button. */
+  /*  --color-primary / --color-secondary and the font families are the RUNTIME THEME BASE: literal */
+  /*  defaults here, overridable by a brand at runtime (plugins/branding-head.js sets them on :root). */
+  /*  The webapp's own SCSS tokens read var(--color-primary) (tokens.scss), so BOTH webapp + ui */
+  /*  re-theme on a live switch. (Literal, not var(--color-primary): that token now IS var(--color-primary) */
+  /*  and would self-reference.) Shades stay literals so the vanilla theme is unchanged; a brand that */
+  /*  wants themed shades supplies them in its theme.cssVars. */
+  --color-primary: rgb(23, 181, 63);
+  --color-primary-hover: var(--color-primary-light); /*  filled buttons hover to lighter color */
+  --color-primary-active: var(--color-primary-dark); /*  active state uses darker color */
+  --color-primary-contrast: var(--text-color-primary-inverse);
+  --font-family-heading: 'LatoWeb', sans-serif;
+  --font-family-text: 'LatoWeb', sans-serif;
+
+  /*  Secondary (blau) */
+  --color-secondary: rgb(0, 142, 230);
+  --color-secondary-hover: rgb(10, 161, 255);
+  --color-secondary-active: color-mix(in srgb, var(--color-secondary), black 15%);
+  --color-secondary-contrast: var(--text-color-secondary-inverse);
+
+  /*  Danger (rot) — runtime theme base (literal default; a brand overrides --color-danger live). */
+  /*  Literal, NOT var(--color-danger): that token now IS var(--color-danger) and would self-reference. */
+  --color-danger: rgb(219, 57, 36);
+  --color-danger-hover: var(--color-danger-light); /*  filled buttons hover to lighter color */
+  --color-danger-active: var(--color-danger-dark); /*  active state uses darker color */
+  --color-danger-contrast: var(--text-color-danger-inverse);
+
+  /*  Warning (orange) — runtime theme base (literal default; a brand overrides --color-warning live). */
+  --color-warning: rgb(230, 121, 25);
+  --color-warning-hover: var(--color-warning-highlight);
+  --color-warning-active: color-mix(in srgb, var(--color-warning), black 15%);
+  --color-warning-contrast: var(--text-color-primary-inverse);
+
+  /*  Success (grün) — runtime theme base (literal default; a brand overrides --color-success live). */
+  --color-success: rgb(23, 181, 63);
+  --color-success-hover: rgb(26, 203, 71);
+  --color-success-active: color-mix(in srgb, var(--color-success), black 15%);
+  --color-success-contrast: var(--text-color-primary-inverse);
+
+  /*  Info (blau, wie secondary) */
+  --color-info: var(--color-secondary);
+  --color-info-hover: rgb(10, 161, 255);
+  --color-info-active: color-mix(in srgb, var(--color-secondary), black 15%);
+  --color-info-contrast: var(--text-color-secondary-inverse);
+
+  /*  Disabled state */
+  --color-disabled: var(--color-neutral-60); /*  rgb(177, 171, 186) */
+  --color-disabled-contrast: var(--color-neutral-100); /*  weiß */
+
+  /*  Text */
+  --color-text-soft: var(--text-color-soft); /*  rgb(112, 103, 126) */
+
+  /*  Ocelot ActionButton badge */
+  --os-action-button-color: var(--color-primary-dark);
+  --os-action-button-bg: var(--color-secondary-inverse);
+}

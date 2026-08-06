@@ -194,7 +194,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .searchable-input {
   position: relative;
   display: flex;
@@ -208,17 +208,17 @@ export default {
 
   .ds-select-dropdown {
     max-height: 70vh;
-    box-shadow: $box-shadow-x-large;
+    box-shadow: var(--box-shadow-x-large);
   }
 
   .option-with-heading {
-    margin-top: $space-x-small;
-    padding-top: $space-xx-small;
+    margin-top: var(--space-x-small);
+    padding-top: var(--space-xx-small);
   }
 
   > button {
     position: absolute !important;
-    right: $space-xx-small !important;
+    right: var(--space-xx-small) !important;
   }
 }
 </style>

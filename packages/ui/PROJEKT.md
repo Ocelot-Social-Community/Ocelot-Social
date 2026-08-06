@@ -196,7 +196,7 @@ ds-number → OsNumber (UI-Library): ✅
 ├─ Styling: tabular-nums + min-width für stabile Breite, --color-text-soft Label-Farbe
 ├─ ds-number + CountTo: 5 Dateien → <os-number> (UserTeaserPopover, TabNavigation, admin, profile, groups)
 ├─ vue-count-to Dependency entfernt, CountTo.vue gelöscht
-├─ CSS-Variable: --color-text-soft in requiredCssVariables + ocelot-ui-variables.scss
+├─ CSS-Variable: --color-text-soft in requiredCssVariables + ocelot-ui-variables.css
 ├─ 11 Unit-Tests, 5 Stories, 5 Visual Tests + 1 Keyboard Test
 └─ 0 ds-number/CountTo Nutzungen verbleibend
 
@@ -257,7 +257,7 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 - [x] Props: count (required), label (optional), animated (optional, 1500ms ease-out)
 - [x] Animation: requestAnimationFrame-Loop, watch(count) re-animiert von oldVal→newVal
 - [x] Stabile Breite: `tabular-nums` + `min-width: Nch` basierend auf Zielwert-Ziffernanzahl
-- [x] CSS-Variable `--color-text-soft` in tailwind.preset.ts (requiredCssVariables), Storybook-Theme, ocelot-ui-variables.scss
+- [x] CSS-Variable `--color-text-soft` in tailwind.preset.ts (requiredCssVariables), Storybook-Theme, ocelot-ui-variables.css
 - [x] 5 Webapp-Dateien migriert: UserTeaserPopover (statisch), TabNavigation (animated), admin/index (animated), profile/_slug (animated), groups/_slug (animated)
 - [x] CountTo.vue gelöscht, `vue-count-to` Dependency aus package.json entfernt
 - [x] `followedByCountStartValue` / `membersCountStartValue` Pattern entfernt (OsNumber watch-basiert)
@@ -274,7 +274,7 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 
 **Zuvor abgeschlossen (Session 30 - OsBadge Code-Review Fixes):**
 - [x] `--color-default-contrast` zu `requiredCssVariables` in tailwind.preset.ts hinzugefügt
-- [x] Doppelte `--color-default`-Deklaration in ocelot-ui-variables.scss entfernt (softest → softer konsolidiert)
+- [x] Doppelte `--color-default`-Deklaration in ocelot-ui-variables.css entfernt (softest → softer konsolidiert)
 - [x] Redundante Ternär-Ausdrücke entfernt: GroupTeaser.vue + groups/_slug.vue (`group ? group.about : ''` → `group.about`)
 - [x] `BadgeVariant` Typ hinzugefügt und in OsBadge.vue verwendet (statt `NonNullable<BadgeVariants['variant']>`)
 - [x] Exports erweitert: BadgeVariant in index.ts + components/index.ts
@@ -512,7 +512,7 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 - [x] vue-demi zur Webapp hinzugefügt (für Vue 2.7 Kompatibilität)
 - [x] Webpack-Alias für vue-demi (nutzt Webapp's Vue 2.7)
 - [x] Webpack-Alias für @ocelot-social/ui$ und style.css$
-- [x] CSS Custom Properties in Webapp definieren (ocelot-ui-variables.scss)
+- [x] CSS Custom Properties in Webapp definieren (ocelot-ui-variables.css)
 - [x] CSS-Reihenfolge angepasst (UI-Library nach Styleguide)
 - [x] Import-Pfade testen
 - [x] Docker Build Stage für UI-Library (Dockerfile + Dockerfile.maintenance)
@@ -1661,7 +1661,7 @@ Bei der Migration werden:
 | 2026-02-08 | **Storybook Grayscale Theme** | Vollständige CSS-Variablen: default, active-states, contrast-inverse |
 | 2026-02-08 | **Tailwind Source Filter** | `@import "tailwindcss" source(none)` - verhindert Markdown-Scanning |
 | 2026-02-08 | **Button Variants Konsistenz** | Alle 21 compound variants mit korrekten active-states (`--color-*-active`) |
-| 2026-02-08 | **CSS-Variablen erweitert** | `--color-secondary/warning/success/info-active` in ocelot-ui-variables.scss |
+| 2026-02-08 | **CSS-Variablen erweitert** | `--color-secondary/warning/success/info-active` in ocelot-ui-variables.css |
 | 2026-02-08 | **Story Dokumentation** | "Medium (37.5px)" → "Medium (36px)" korrigiert |
 | 2026-02-08 | **Playwright Toleranz** | `maxDiffPixelRatio: 0.03` für Cross-Platform Font-Rendering |
 | 2026-02-09 | **Disabled-Styles korrigiert** | CSS-Variablen `--color-disabled`, filled: grauer Hintergrund statt opacity |
@@ -1861,7 +1861,7 @@ Bei der Migration werden:
 | 2026-02-20 | **ds-number + CountTo → OsNumber** | 5 Dateien: UserTeaserPopover, TabNavigation, admin/index, profile/_slug, groups/_slug |
 | 2026-02-20 | **Animation-Stabilität** | `tabular-nums` + `min-width: Nch` für stabile Breite während Count-up Animation |
 | 2026-02-20 | **CountTo.vue gelöscht** | vue-count-to Dependency entfernt, followedByCountStartValue/membersCountStartValue Pattern entfernt |
-| 2026-02-20 | **CSS-Variable --color-text-soft** | Neuer Contract-Eintrag in tailwind.preset.ts + ocelot-ui-variables.scss (Label-Farbe) |
+| 2026-02-20 | **CSS-Variable --color-text-soft** | Neuer Contract-Eintrag in tailwind.preset.ts + ocelot-ui-variables.css (Label-Farbe) |
 | 2026-02-20 | **Admin-Label uppercase** | `.admin-stats__item .os-number-label { text-transform: uppercase }` per CSS statt neuem Prop |
 | 2026-03-13 | **OsModal Komponente** | Neue Tier 2 Komponente: h() Render-Function, Vue 2/3 via vue-demi, Focus-Trap, Body Scroll-Lock, ESC-Key, Backdrop-Click, A11y (role=dialog, aria-modal, aria-labelledby/aria-label), 37 Unit-Tests, 5 Visual Tests, 100% Coverage |
 | 2026-03-13 | **OsModal Features** | open Prop (v-model:open), title, cancelLabel/confirmLabel, ariaLabel Fallback, footer Scoped-Slot ({confirm, cancel}), Scroll-Fade (top gradient), tabindex=0 auf scrollbarem Content |

@@ -424,8 +424,8 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .tooltip-inner.popover-inner .os-menu {
-  margin: (-$space-xx-small) (-$space-small) !important;
+  margin: calc(-1 * var(--space-xx-small)) calc(-1 * var(--space-small)) !important;
 }
 </style>

@@ -1,5 +1,4 @@
-import tokens from './../assets/_new/styles/tokens.scss'
-// import branding from './../assets/styles/imports/_branding.scss'
+import tokens from './chatTokens.js'
 
 const styleData = tokens
 

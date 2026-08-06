@@ -196,7 +196,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .profile-list.os-card {
   display: flex;
   flex-direction: column;
@@ -204,13 +204,13 @@ export default {
   width: auto;
 
   > .title {
-    color: $text-color-soft;
-    font-size: $font-size-base;
+    color: var(--text-color-soft);
+    font-size: var(--font-size-base);
   }
 
   .profiles {
-    height: $size-height-connections;
-    padding: $space-none;
+    height: var(--size-height-connections);
+    padding: var(--space-none);
     list-style-type: none;
 
     &.--overflow {
@@ -218,48 +218,48 @@ export default {
     }
 
     > .connections__item {
-      padding: $space-xx-small;
+      padding: var(--space-xx-small);
 
       &.is-selected,
       &:hover {
-        background-color: $background-color-primary-inverse;
+        background-color: var(--background-color-primary-inverse);
       }
     }
   }
 
   .profiles-virtual {
-    height: $size-height-connections;
-    padding: $space-none;
+    height: var(--size-height-connections);
+    padding: var(--space-none);
 
     &.--overflow {
       overflow-y: auto;
     }
 
     .connections__item {
-      padding: $space-xx-small;
+      padding: var(--space-xx-small);
       height: 56px;
       display: flex;
       align-items: center;
 
       &:hover {
-        background-color: $background-color-primary-inverse;
+        background-color: var(--background-color-primary-inverse);
       }
     }
   }
 
   .nobody-message {
     text-align: center;
-    color: $text-color-soft;
+    color: var(--text-color-soft);
   }
 
   .loading-more {
     display: flex;
     justify-content: center;
-    padding: $space-x-small 0;
+    padding: var(--space-x-small) 0;
   }
 
   > :nth-child(n):not(:last-child) {
-    margin-bottom: $space-small;
+    margin-bottom: var(--space-small);
   }
 }
 

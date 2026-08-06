@@ -68,13 +68,13 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .comment-list {
   > .title {
     margin-top: 0;
 
     > .os-counter-icon {
-      margin-right: $space-small;
+      margin-right: var(--space-small);
     }
   }
 }

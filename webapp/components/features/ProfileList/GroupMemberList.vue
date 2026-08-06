@@ -223,15 +223,15 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .type-label {
-  font-size: $font-size-small;
-  color: $text-color-soft;
-  margin-bottom: $space-xx-small;
+  font-size: var(--font-size-small);
+  color: var(--text-color-soft);
+  margin-bottom: var(--space-xx-small);
+}
 
-  &--not-first {
-    margin-top: $space-small;
-  }
+.type-label--not-first {
+  margin-top: var(--space-small);
 }
 
 .group-list {
@@ -243,30 +243,30 @@ export default {
 .group-item {
   display: flex;
   align-items: center;
-  padding: $space-xx-small;
-  border-radius: $border-radius-base;
+  padding: var(--space-xx-small);
+  border-radius: var(--border-radius-base);
 
   &:hover {
-    background-color: $background-color-primary-inverse;
+    background-color: var(--background-color-primary-inverse);
   }
+}
 
-  &__teaser {
-    flex: 1;
-    min-width: 0;
-  }
+.group-item__teaser {
+  flex: 1;
+  min-width: 0;
+}
 
-  &__visibility-btn {
-    flex-shrink: 0;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: $text-color-soft;
-    padding: $space-xx-small;
-    border-radius: $border-radius-base;
+.group-item__visibility-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-color-soft);
+  padding: var(--space-xx-small);
+  border-radius: var(--border-radius-base);
 
-    &:hover {
-      color: $text-color-base;
-    }
+  &:hover {
+    color: var(--text-color-base);
   }
 }
 </style>

@@ -48,7 +48,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .group-avatar {
   display: flex;
   align-items: center;
@@ -65,22 +65,22 @@ export default {
     > span {
       display: flex !important;
       align-items: center;
-      gap: $space-x-small;
+      gap: var(--space-x-small);
       min-width: 0;
       overflow: hidden;
     }
   }
+}
 
-  &__avatar {
-    flex-shrink: 0;
-  }
+.group-avatar__avatar {
+  flex-shrink: 0;
+}
 
-  &__name {
-    font-size: $font-size-base;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color: $text-color-soft;
-  }
+.group-avatar__name {
+  font-size: var(--font-size-base);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-color-soft);
 }
 </style>
