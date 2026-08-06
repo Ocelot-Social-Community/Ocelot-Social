@@ -25,7 +25,9 @@ module.exports = {
     // patched here rather than only covering the scss rule below.
     const defaultCssRule = config.module.rules.find((r) => String(r.test) === String(/\.css$/))
     if (defaultCssRule) {
-      const cssLoaderUse = defaultCssRule.use.find((u) => u.loader && u.loader.includes('css-loader'))
+      const cssLoaderUse = defaultCssRule.use.find(
+        (u) => u.loader && u.loader.includes('css-loader'),
+      )
       if (cssLoaderUse) {
         cssLoaderUse.options = { ...cssLoaderUse.options, url: passThroughAbsoluteUrls }
       }
@@ -70,7 +72,8 @@ module.exports = {
     // load svgs with vue-svg-loader instead of the builder's default asset/resource rule
     const imageRule = config.module.rules.find((r) => r.test && r.test.toString().includes('svg'))
     if (imageRule) {
-      imageRule.test = /\.(ico|jpg|jpeg|png|apng|gif|eot|otf|webp|ttf|woff|woff2|cur|ani|pdf)(\?.*)?$/
+      imageRule.test =
+        /\.(ico|jpg|jpeg|png|apng|gif|eot|otf|webp|ttf|woff|woff2|cur|ani|pdf)(\?.*)?$/
     }
 
     config.module.rules.push({

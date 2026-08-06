@@ -2,39 +2,11 @@ import { storiesOf } from '@storybook/vue'
 import { action } from '@storybook/addon-actions'
 import Vuex from 'vuex'
 import helpers from '~/storybook/helpers'
-import Vue from 'vue'
 import RegistrationSlider from './RegistrationSlider.vue'
 
-const plugins = [
-  (app = {}) => {
-    app.$apollo = {
-      mutate: (data) => {
-        if (JSON.stringify(data).includes('UpdateUser')) {
-          return { data: { UpdateUser: { id: data.variables.id, locale: data.variables.locale } } }
-        }
-        if (JSON.stringify(data).includes('Signup')) {
-          return { data: { Signup: { email: data.variables.email } } }
-        }
-        if (JSON.stringify(data).includes('SignupVerification')) {
-          return { data: { SignupVerification: { ...data.variables } } }
-        }
-        throw new Error(`Mutation name not found!`)
-      },
-      query: (data) => {
-        if (JSON.stringify(data).includes('isValidInviteCode')) {
-          return { data: { isValidInviteCode: true } }
-        }
-        if (JSON.stringify(data).includes('VerifyNonce')) {
-          return { data: { VerifyNonce: true } }
-        }
-        throw new Error(`Query name not found!`)
-      },
-    }
-    Vue.prototype.$apollo = app.$apollo
-    return app
-  },
-]
-helpers.init({ plugins })
+// $apollo (isValidInviteCode / VerifyNonce / UpdateUser / Signup / SignupVerification) is mocked
+// globally in storybook/helpers.js — see the comment there for why it isn't set up per-file.
+helpers.init()
 
 const createStore = ({ loginSuccess }) => {
   return new Vuex.Store({

@@ -14,6 +14,7 @@ const commentMock = (fields) => {
     updatedAt: faker.date.recent(),
     deleted: false,
     disabled: false,
+    author: helpers.fakeUser(1)[0],
     ...fields,
   }
 }
@@ -37,7 +38,7 @@ storiesOf('CommentList', module)
     components: { HcCommentList },
     store: helpers.store,
     data: () => ({
-      post: { comments },
+      post: { id: 'p1', comments },
     }),
     template: `<hc-comment-list :post="post" />`,
   }))

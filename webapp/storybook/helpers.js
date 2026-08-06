@@ -43,6 +43,58 @@ const helpers = {
       get: (key) => helpers.store.getters['policy/getEffective'](key),
       snapshot: () => helpers.store.getters['policy/snapshot'],
     }
+    // Nuxt-env normally injects $env from config/index.js at build time. That file itself is
+    // Node-only (dotenv, execSync git describe), so it isn't imported here — just its defaults,
+    // matched by hand, enough for components whose data()/mounted() read $env.* unconditionally.
+    Vue.prototype.$env = {
+      SUPPORT_EMAIL: 'hello@ocelot.social',
+      NETWORK_NAME: 'Ocelot.social',
+      LANGUAGE_DEFAULT: 'en',
+      LANGUAGE_FALLBACK: 'en',
+      NODE_ENV: 'development',
+      VERSION: 'storybook',
+      COOKIE_EXPIRE_TIME: 356,
+      MAPBOX_TOKEN: '',
+    }
+    // Shared across every story, on purpose: `helpers.init()` runs at module-load time for every
+    // *.story.js file, and since they all land in one bundle, whichever file's plugins ran last used
+    // to overwrite Vue.prototype.$apollo for everyone — a component two stories away could inherit a
+    // mock that only recognizes another component's query names and throws "Query name not found!"
+    // on its own. One mock, covering every query/mutation actually used by a story, replaces that
+    // whack-a-mole. It also always returns a Promise — callers that `.catch()` the result (several
+    // do) get a real rejection to catch instead of a synchronous throw skipping past their `.catch`.
+    Vue.prototype.$apollo = {
+      query: async (data) => {
+        const key = JSON.stringify(data)
+        if (key.includes('isValidInviteCode')) return { data: { isValidInviteCode: true } }
+        if (key.includes('VerifyNonce')) return { data: { VerifyNonce: true } }
+        if (key.includes('embed')) {
+          return {
+            data: {
+              embed: {
+                image: 'https://i.ytimg.com/vi/ptCcgLM-p8k/maxresdefault_live.jpg',
+                title: 'Video Titel',
+                description: 'Video Description',
+                url: 'https://www.youtube.com/watch?v=qkdXAtO40Fo',
+                html: '<iframe width="auto" height="250" src="https://www.youtube.com/embed/qkdXAtO40Fo?feature=oembed" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
+              },
+            },
+          }
+        }
+        return { data: {} }
+      },
+      mutate: async (data) => {
+        const key = JSON.stringify(data)
+        if (key.includes('UpdateUser')) {
+          return { data: { UpdateUser: { id: data.variables.id, locale: data.variables.locale } } }
+        }
+        if (key.includes('SignupVerification')) {
+          return { data: { SignupVerification: { ...data.variables } } }
+        }
+        if (key.includes('Signup')) return { data: { Signup: { email: data.variables.email } } }
+        return { data: {} }
+      },
+    }
 
     const { plugins = [] } = options
     plugins.forEach((plugin) => Vue.use(plugin))
