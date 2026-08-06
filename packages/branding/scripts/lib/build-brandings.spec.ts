@@ -8,15 +8,17 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { after, test } from 'node:test'
 
-import { composeArchive, readManifest } from '../dist/discover.js'
-import { readTarGz } from '../dist/tar.js'
+import { composeArchive, readManifest } from '../../dist/discover.js'
+import { readTarGz } from '../../dist/tar.js'
+
 import {
   brandId,
   brandVersion,
   buildBrandArchive,
   findConfig,
+  outSpecifyRoot,
   publishBrandArchive,
-} from '../scripts/lib/build-brandings.ts'
+} from './build-brandings.ts'
 
 const roots = []
 after(() => {
@@ -61,7 +63,7 @@ function brandDir({
 const ACME_CONFIG = `export default (defineBranding) =>
   defineBranding({
     metadata: { applicationName: 'Acme' },
-    theme: { cssVars: { 'color-primary': 'red' } },
+    theme: { themeColor: 'red' },
     logos: { signupPath: 'assets/logo-squared.svg' },
   })
 `
@@ -85,7 +87,7 @@ test('findConfig locates brand.config.mjs, or null when there is none', () => {
 })
 
 test('buildBrandArchive throws when the brand has no config file', async () => {
-  await assert.rejects(() => buildBrandArchive(brandDir({})), /no brand\.config/)
+  await assert.rejects(async () => buildBrandArchive(brandDir({})), /no brand\.config/)
 })
 
 test('buildBrandArchive: manifest carries id/version/schemaVersion/label', async () => {
@@ -145,7 +147,7 @@ test('buildBrandArchive emits a PARTIAL library: only customised buckets get a f
   const types = readManifest(readTarGz(built.gz))
     .instances.map((i) => i.type)
     .sort()
-  // theme (cssVars), identity (applicationName + derived ogImage), logos (signupPath) customised;
+  // theme (themeColor), identity (applicationName + derived ogImage), logos (signupPath) customised;
   // legal / navigation / behavior untouched → NOT emitted.
   assert.deepEqual(types, ['identity', 'logos', 'theme'])
 })
@@ -170,7 +172,7 @@ test('buildBrandArchive warns when a referenced asset is missing (but still buil
   assert.match(built.warnings.join('\n'), /logo-squared\.svg/)
 })
 
-test('buildBrandArchive namespaces css, favicon, html-per-locale and font-face src paths', async () => {
+test('buildBrandArchive namespaces css, favicon and html-per-locale paths', async () => {
   const dir = brandDir({
     config: `export default (defineBranding) =>
       defineBranding({
@@ -180,11 +182,10 @@ test('buildBrandArchive namespaces css, favicon, html-per-locale and font-face s
           favicon: 'assets/favicon.ico',
           html: { imprint: { en: 'html/imprint.en.html' } },
         },
-        theme: { fontFaces: [{ family: 'Brand', src: 'assets/brand.woff2' }] },
         headerMenu: { customButton: { iconPath: 'assets/button.svg', url: 'https://example.test' } },
       })
 `,
-    assets: { 'extra.css': 'x', 'favicon.ico': 'x', 'brand.woff2': 'x', 'button.svg': 'x' },
+    assets: { 'extra.css': 'x', 'favicon.ico': 'x', 'button.svg': 'x' },
   })
   // the html/ referenced file lives outside assets/ — create it so no warning is emitted
   mkdirSync(join(dir, 'html'), { recursive: true })
@@ -194,8 +195,6 @@ test('buildBrandArchive namespaces css, favicon, html-per-locale and font-face s
   assert.deepEqual(config.assets.css, ['/branding/acme/assets/extra.css'])
   assert.equal(config.assets.favicon, '/branding/acme/assets/favicon.ico')
   assert.equal(config.assets.html.imprint.en, '/branding/acme/html/imprint.en.html')
-  assert.equal(config.theme.fontFaces[0].src, '/branding/acme/assets/brand.woff2')
-  // The header custom-button icon is a brand asset too — it is served from the brand folder, not from
   // the framework's /img/custom/.
   assert.equal(config.headerMenu.customButton.iconPath, '/branding/acme/assets/button.svg')
 })
@@ -261,15 +260,16 @@ test('buildBrandArchive warns on an invalid locale JSON (but still builds)', asy
   assert.match(built.warnings.join('\n'), /invalid locale JSON: locales\/en\.json/)
 })
 
-test('buildBrandArchive warns on a likely theme.cssVars token typo, not on custom vars', async () => {
+test('buildBrandArchive warns on a likely theme token typo in the CSS, not on custom vars', async () => {
   const dir = brandDir({
     config: `export default (d) => d({
       metadata: { applicationName: 'Acme' },
-      theme: { cssVars: { 'color-primry': 'red', 'my-brand-var': 'x' } },
+      assets: { css: ['assets/theme.css'] },
     })\n`,
+    assets: { 'theme.css': ':root { --color-primry: red; --my-brand-var: x }' },
   })
   const w = (await buildBrandArchive(dir)).warnings.join('\n')
-  assert.match(w, /theme\.cssVars\['color-primry'\].*did you mean 'color-primary'/) // typo flagged
+  assert.match(w, /--color-primry is not a known theme token — did you mean --color-primary/)
   assert.doesNotMatch(w, /my-brand-var/) // intentional custom var → no warning
 })
 
@@ -335,7 +335,7 @@ test('buildBrandArchive type-checks and evaluates a valid .ts config', async () 
 
 test('buildBrandArchive REJECTS a .ts config with a schema type error', async () => {
   await assert.rejects(
-    () =>
+    async () =>
       buildBrandArchive(
         tsBrandDir(
           `import { defineBranding } from '@ocelot-social/branding'
@@ -358,4 +358,108 @@ test('publishBrandArchive writes no versioned file when the brand has no version
   const res = await publishBrandArchive(dir, { outDir: out })
   assert.equal(res.versioned, null)
   assert.ok(existsSync(res.latest))
+})
+
+test('the PWA colour is evaluated from --color-primary in a listed stylesheet', async () => {
+  const dir = brandDir({
+    config: `export default (d) => d({ metadata: { applicationName: 'Acme' }, assets: { css: ['assets/theme.css'] } })\n`,
+    assets: {
+      'theme.css':
+        ':root {\n  --color-primary: rgb(1, 2, 3);\n  --font-family-text: Inter, sans-serif;\n}\n',
+    },
+  })
+
+  const built = await buildBrandArchive(dir)
+  const files = readTarGz(built.gz)
+  const theme = JSON.parse(files.get('fragments/theme.default.json'))
+  assert.equal(theme.theme.themeColor, 'rgb(1, 2, 3)')
+  // The declarations themselves stay in the stylesheet — only the PWA colour is lifted into config.
+  assert.match(String(files.get('assets/theme.css')), /--font-family-text: Inter, sans-serif/)
+  assert.equal(built.warnings.join('\n').includes('theme.css'), false)
+})
+
+// A manifest has no media queries: whatever travels as themeColor is shown unconditionally, so it has
+// to be the value that applies unconditionally.
+test('a dark-mode override does not become the PWA colour', async () => {
+  const dir = brandDir({
+    config: `export default (d) => d({ assets: { css: ['assets/theme.css'] } })\n`,
+    assets: {
+      'theme.css':
+        ':root { --color-primary: rgb(1, 2, 3) }\n' +
+        '@media (prefers-color-scheme: dark) { :root { --color-primary: black } }\n',
+    },
+  })
+
+  const built = await buildBrandArchive(dir)
+  const theme = JSON.parse(readTarGz(built.gz).get('fragments/theme.default.json'))
+  assert.equal(theme.theme.themeColor, 'rgb(1, 2, 3)')
+})
+
+test('a --color-primary that only holds inside an at-rule is reported', async () => {
+  const dir = brandDir({
+    config: `export default (d) => d({ assets: { css: ['assets/theme.css'] } })\n`,
+    assets: {
+      'theme.css': '@media (prefers-color-scheme: dark) { :root { --color-primary: black } }\n',
+    },
+  })
+
+  const built = await buildBrandArchive(dir)
+  assert.match(built.warnings.join('\n'), /--color-primary is only declared inside an at-rule/)
+})
+
+test('an unparseable stylesheet is reported instead of failing the build', async () => {
+  const dir = brandDir({
+    config: `export default (d) => d({ assets: { css: ['assets/theme.css'] } })\n`,
+    assets: { 'theme.css': ':root { --color-primary: red' },
+  })
+
+  const built = await buildBrandArchive(dir)
+  assert.match(built.warnings.join('\n'), /'assets\/theme\.css' is not parseable CSS/)
+})
+
+test('the packed stylesheet ships with :root raised to :root:root', async () => {
+  const dir = brandDir({
+    config: `export default (d) => d({ assets: { css: ['assets/theme.css'] } })\n`,
+    assets: { 'theme.css': ':root { --color-primary: new }\n.footer { color: red }' },
+  })
+
+  const built = await buildBrandArchive(dir)
+  const packed = String(readTarGz(built.gz).get('assets/theme.css'))
+  // Specificity, not load order: with build.extractCSS false the app CSS lands after anything the
+  // server put in <head>, so a plain :root would lose.
+  assert.match(packed, /:root:root \{ --color-primary: new \}/)
+  assert.match(packed, /\.footer \{ color: red \}/)
+})
+
+test('raising :root leaves selectors it does not own alone', () => {
+  assert.equal(outSpecifyRoot('.a, :root { --a: 1 }'), '.a, :root:root { --a: 1 }')
+  assert.equal(
+    outSpecifyRoot('@media (min-width: 600px) { :root { --a: 1 } }'),
+    '@media (min-width: 600px) { :root:root { --a: 1 } }',
+  )
+  assert.equal(outSpecifyRoot(':root:root { --a: 1 }'), ':root:root { --a: 1 }')
+})
+
+// A `}` inside a value or a comment reads like the end of a rule to a regex, which used to rewrite
+// straight into the string.
+test('raising :root does not reach into strings or comments', () => {
+  assert.equal(outSpecifyRoot('.x { content: "}:root {" }'), '.x { content: "}:root {" }')
+  assert.equal(
+    outSpecifyRoot('/* }:root { */ .y { color: red }'),
+    '/* }:root { */ .y { color: red }',
+  )
+})
+
+test('an unparseable stylesheet ships unchanged rather than failing the pack', () => {
+  const broken = ':root { --a: 1px'
+  assert.equal(outSpecifyRoot(broken), broken)
+})
+
+test('a stylesheet listed in assets.css that does not exist is reported', async () => {
+  const dir = brandDir({
+    config: `export default (d) => d({ assets: { css: ['missing.css'] } })\n`,
+  })
+
+  const built = await buildBrandArchive(dir)
+  assert.match(built.warnings.join('\n'), /assets\.css lists 'missing\.css', which does not exist/)
 })

@@ -8,36 +8,8 @@ module.exports = async ({ config, mode }) => {
   // You can change the configuration based on that.
   // 'PRODUCTION' is used when building the static version of storybook.
 
-  // TRANSITIONAL, and it has to stay exactly as long as nuxt.config.js keeps its `styleResources`:
-  // the components rendered in stories still carry `<style lang="scss">` and resolve `$token`
-  // references through this prelude. Dropping the rule while they exist does not degrade the styling,
-  // it fails the Storybook build outright. Removed together with sass, once the last such block is
-  // gone — the plain-CSS stylesheets already go through Storybook's own CSS pipeline.
-  config.module.rules.push({
-    test: /\.scss$/,
-    use: [
-      { loader: 'style-loader' },
-      { loader: 'css-loader', options: { sourceMap: true } },
-      { loader: 'sass-loader', options: { sourceMap: true } },
-      {
-        loader: 'style-resources-loader',
-        options: {
-          patterns: [
-            // FIRST, and not optional: tokens.scss calls `color.adjust(...)`, which needs the
-            // `@use 'sass:color'` that only this file carries — and `@use` has to precede every
-            // other rule, which is the whole reason it is a separate file. Without it the prelude
-            // fails with «There is no module with the namespace "color"». nuxt.config.js has always
-            // listed it first; Storybook did not, so its SCSS pipeline was broken on its own terms.
-            path.resolve(__dirname, '../assets/_new/styles/uses.scss'),
-            path.resolve(__dirname, '../assets/_new/styles/_styleguide-tokens.scss'),
-            path.resolve(__dirname, '../assets/_new/styles/tokens.scss'),
-          ],
-          injector: 'prepend',
-        },
-      },
-    ],
-    include: path.resolve(__dirname, '../'),
-  })
+  // No .scss files remain, so the former sass-loader rule is gone with them — the stylesheets are
+  // plain CSS and go through Storybook's own CSS pipeline.
 
   // load svgs with vue-svg-loader instead of file-loader
   const rule = config.module.rules.find(

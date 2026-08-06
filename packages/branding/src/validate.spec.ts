@@ -21,14 +21,14 @@ test('validateBranding collects ALL invariant violations, not just the first', (
   }
   const v = validateBranding(bad)
   assert.ok(
-    v.some((x) => /group\.nameLengthMin \(60\) must be ≤ group\.nameLengthMax \(50\)/.test(x)),
+    v.some((x) => x.includes('group.nameLengthMin (60) must be ≤ group.nameLengthMax (50)')),
   )
-  assert.ok(v.some((x) => /registration\.nonceLength must be ≥ 1/.test(x)))
+  assert.ok(v.some((x) => x.includes('registration.nonceLength must be ≥ 1')))
   assert.ok(
     v.some((x) => /comment\.truncateToLength .* must be ≤ comment\.maxUntruncatedLength/.test(x)),
   )
-  assert.ok(v.some((x) => /category\.min \(5\) must be ≤ category\.max \(3\)/.test(x)))
-  assert.ok(v.some((x) => /metadata\.applicationName must not be empty/.test(x)))
+  assert.ok(v.some((x) => x.includes('category.min (5) must be ≤ category.max (3)')))
+  assert.ok(v.some((x) => x.includes('metadata.applicationName must not be empty')))
   assert.ok(v.length >= 5)
 })
 

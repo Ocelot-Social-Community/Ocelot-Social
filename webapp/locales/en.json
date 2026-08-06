@@ -131,6 +131,9 @@
       "noneExtra": "No additional brandings are baked into this instance — only the framework default is available.",
       "schema": "schema",
       "schemaTitle": "The @ocelot-social/branding package version this archive was built with.",
+      "stylesheets": "Own stylesheets",
+      "stylesheetUnreadable": "could not be read",
+      "stylesheetVars": "{count} theme property ::: {count} theme properties",
       "title": "Branding",
       "vanilla": "Framework default (no branding)"
     },
