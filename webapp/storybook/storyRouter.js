@@ -26,19 +26,21 @@ const storyRouterDecorator = (links = {}, routerProps = {}) => {
     const originalPush = router.push.bind(router)
     router.push = (location, success, abort) => {
       replaced = false
-      originalPush(location, success, abort)
+      const result = originalPush(location, success, abort)
       if (!replaced) {
         action('PUSH')(getLocation(location))
       }
+      return result
     }
 
     const originalReplace = router.replace.bind(router)
     router.replace = (location, success, abort) => {
       replaced = false
-      originalReplace(location, success, abort)
+      const result = originalReplace(location, success, abort)
       if (!replaced) {
         action('REPLACE')(getLocation(location))
       }
+      return result
     }
 
     if (routerProps.globalBeforeEach) {

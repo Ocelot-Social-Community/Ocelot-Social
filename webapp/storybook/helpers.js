@@ -11,11 +11,6 @@ import locales from '~/locales/index.js'
 import '~/plugins/v-tooltip'
 
 Vue.use(VueRouter)
-// Shared across every story via `layout()` below — Nuxt always provides a router, so components
-// that read `this.$route` (directly, or transitively through data()) assume it exists. Without this,
-// data() throws before ever reaching its other fields, which is why unrelated props show up as
-// "not defined on the instance" — Vue swallows the data() error and continues with an empty object.
-const router = new VueRouter()
 
 const helpers = {
   init(options = {}) {
@@ -148,7 +143,14 @@ const helpers = {
   layout(storyFn) {
     const ctx = storyFn()
     return {
-      router,
+      // A fresh instance per story rather than one shared module-level singleton — Storybook is an
+      // SPA, so switching stories re-renders a new root without a page reload; sharing one router
+      // across root instances would carry navigation state from a previous story into the next.
+      // Nuxt always provides a router, so components that read `this.$route` (directly, or
+      // transitively through data()) assume it exists. Without this, data() throws before ever
+      // reaching its other fields, which is why unrelated props show up as "not defined on the
+      // instance" — Vue swallows the data() error and continues with an empty object.
+      router: new VueRouter(),
       components: { ctx, layout },
       template: `
       <layout>
