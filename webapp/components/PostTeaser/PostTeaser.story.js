@@ -68,7 +68,12 @@ storiesOf('PostTeaser', module)
     data: () => ({
       post: {
         ...post,
-        image: 'https://unsplash.com/photos/R4y_E5ZQDPg/download',
+        image: {
+          url: 'https://picsum.photos/id/1015/800/450',
+          w320: 'https://picsum.photos/id/1015/320/180',
+          w640: 'https://picsum.photos/id/1015/640/360',
+          w1024: 'https://picsum.photos/id/1015/1024/576',
+        },
       },
     }),
     template: `
