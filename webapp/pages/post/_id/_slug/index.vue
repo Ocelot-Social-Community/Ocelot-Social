@@ -52,13 +52,13 @@
               </aside>
             </template>
             <section class="menu">
-              <user-teaser :user="post.author" :group="post.group" wide :date-time="post.createdAt">
+              <user-avatar :user="post.author" :group="post.group" wide :date-time="post.createdAt">
                 <template #dateTime>
                   <p class="ds-text" v-if="post.createdAt !== post.updatedAt">
                     ({{ $t('post.edited') }})
                   </p>
                 </template>
-              </user-teaser>
+              </user-avatar>
               <client-only>
                 <content-menu
                   placement="bottom-end"
@@ -200,7 +200,7 @@ import HcHashtag from '~/components/Hashtag/Hashtag'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
 import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
 import { useShout } from '~/composables/useShout'
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import {
   postMenuModalsData,
   deletePostMutation,
@@ -239,7 +239,7 @@ export default {
     LocationTeaser,
     OsActionButton,
     ResponsiveImage,
-    UserTeaser,
+    UserAvatar,
   },
   mixins: [GetCategories, postListActions, SortCategories],
   beforeCreate() {

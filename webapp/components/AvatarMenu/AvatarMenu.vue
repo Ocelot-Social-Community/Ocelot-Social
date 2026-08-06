@@ -11,7 +11,7 @@
         "
         @click.prevent="toggleMenu"
       >
-        <profile-avatar
+        <avatar-image
           :profile="user"
           size="small"
           :showProfileNameTitle="false"
@@ -63,7 +63,7 @@ import { OsIcon, OsMenu, OsMenuItem } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
 import Dropdown from '~/components/Dropdown'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 
 export default {
   components: {
@@ -71,7 +71,7 @@ export default {
     OsIcon,
     OsMenu,
     OsMenuItem,
-    ProfileAvatar,
+    AvatarImage,
   },
   props: {
     placement: { type: String, default: 'top-end' },
@@ -169,7 +169,7 @@ export default {
   align-items: center;
   padding-left: var(--space-xx-small);
 
-  > .profile-avatar {
+  > .avatar-image {
     margin-right: var(--space-xx-small);
   }
 }

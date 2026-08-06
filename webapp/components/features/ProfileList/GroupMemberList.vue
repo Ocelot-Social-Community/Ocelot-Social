@@ -19,7 +19,7 @@
       </p>
       <ul class="group-list">
         <li v-for="group in groupsByType[type]" :key="group.id" class="group-item">
-          <group-teaser
+          <group-avatar
             :group="group"
             :show-popover="popoverEnabled"
             :hover-delay="800"
@@ -51,7 +51,7 @@
 <script>
 import { OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import GroupTeaser from '~/components/GroupTeaser/GroupTeaser'
+import GroupAvatar from '~/components/GroupAvatar/GroupAvatar'
 import InfiniteScrollList from './InfiniteScrollList.vue'
 import {
   profileUserGroupsQuery,
@@ -67,7 +67,7 @@ export default {
   name: 'GroupMemberList',
   components: {
     OsIcon,
-    GroupTeaser,
+    GroupAvatar,
     InfiniteScrollList,
   },
   props: {

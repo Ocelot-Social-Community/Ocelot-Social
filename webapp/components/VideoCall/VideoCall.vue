@@ -10,7 +10,7 @@
     >
       <div class="video-call__header">
         <div class="video-call__header-info">
-          <profile-avatar :profile="groupProfile" size="small" class="video-call__avatar" />
+          <avatar-image :profile="groupProfile" size="small" class="video-call__avatar" />
           <room-title-link
             :name="titleLabel"
             :to="groupRoute"
@@ -242,7 +242,7 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import mobile from '~/mixins/mobile'
 import { joinGroupVideoCallMutation } from '~/graphql/VideoCalls'
 import Chat from '~/components/Chat/Chat.vue'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import RoomTitleLink from '~/components/_new/generic/RoomTitleLink/RoomTitleLink'
 import VideoTile from './VideoTile.vue'
 import PreJoin from './PreJoin.vue'
@@ -270,7 +270,7 @@ export default {
     OsButton,
     OsIcon,
     Chat,
-    ProfileAvatar,
+    AvatarImage,
     RoomTitleLink,
   },
   mixins: [mobile()],
@@ -892,7 +892,7 @@ export default {
         return {
           id: (meta && meta.userId) || participant.identity,
           name: participant.name || participant.identity,
-          // ResponsiveImage (used by ProfileAvatar) expects url + responsive
+          // ResponsiveImage (used by AvatarImage) expects url + responsive
           // variants. We only have one URL from the metadata — reuse it for
           // every variant so the srcset stays valid; the browser will load
           // the available image regardless of the requested size.

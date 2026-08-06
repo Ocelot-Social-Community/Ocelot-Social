@@ -144,7 +144,7 @@ describe('SearchResults', () => {
         it('displays 8 users after clicking on user tab', async () => {
           wrapper.find('[data-test="User-tab-click"]').trigger('click')
           await wrapper.vm.$nextTick()
-          await expect(wrapper.findAll('.user-teaser')).toHaveLength(8)
+          await expect(wrapper.findAll('.user-avatar')).toHaveLength(8)
         })
 
         it('shows the pagination buttons for posts', () => {

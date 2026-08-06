@@ -23,7 +23,7 @@ describe('NotificationMenu.vue', () => {
     }
     stubs = {
       NuxtLink: RouterLinkStub,
-      UserTeaser: true,
+      UserAvatar: true,
       'client-only': true,
     }
   })

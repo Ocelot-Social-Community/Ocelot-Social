@@ -14,14 +14,14 @@
   >
     <ul class="connections">
       <li v-for="connection in connections" :key="connection.id" class="connections__item">
-        <user-teaser :user="connection" :show-popover="popoverEnabled" :hover-delay="800" />
+        <user-avatar :user="connection" :show-popover="popoverEnabled" :hover-delay="800" />
       </li>
     </ul>
   </infinite-scroll-list>
 </template>
 
 <script>
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import InfiniteScrollList from './InfiniteScrollList.vue'
 import { followConnectionsQuery } from '~/graphql/User'
 
@@ -30,7 +30,7 @@ const PAGE_SIZE = 25
 export default {
   name: 'FollowList',
   components: {
-    UserTeaser,
+    UserAvatar,
     InfiniteScrollList,
   },
   props: {

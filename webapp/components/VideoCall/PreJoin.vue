@@ -3,7 +3,7 @@
     <div class="prejoin__preview">
       <video v-show="hasVideo" ref="previewEl" autoplay muted playsinline class="prejoin__video" />
       <div v-if="!hasVideo" class="prejoin__placeholder">
-        <profile-avatar :profile="currentUser" size="large" class="prejoin__avatar" />
+        <avatar-image :profile="currentUser" size="large" class="prejoin__avatar" />
         <span class="prejoin__placeholder-text">
           {{
             cameraActive ? $t('videoCall.prejoin.noCamera') : $t('videoCall.prejoin.cameraDisabled')
@@ -160,11 +160,11 @@
 import { mapGetters } from 'vuex'
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 
 export default {
   name: 'PreJoin',
-  components: { OsButton, OsIcon, ProfileAvatar },
+  components: { OsButton, OsIcon, AvatarImage },
   data() {
     return {
       cameras: [],

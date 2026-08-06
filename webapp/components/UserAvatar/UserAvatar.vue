@@ -1,12 +1,12 @@
 <template>
-  <div class="user-teaser" v-if="displayAnonymous">
-    <profile-avatar v-if="showAvatar" size="small" />
+  <div class="user-avatar" v-if="displayAnonymous">
+    <avatar-image v-if="showAvatar" size="small" />
     <span class="info anonymous">{{ $t('profile.userAnonym') }}</span>
   </div>
   <div v-else :class="[{ 'disabled-content': user.disabled }]" placement="top-start">
     <!-- isTouchDevice only supported on client-->
     <client-only>
-      <user-teaser-non-anonymous
+      <user-avatar-non-anonymous
         v-if="user"
         :link-to-profile="linkToProfile"
         :user="user"
@@ -20,20 +20,24 @@
         :injected-date="injectedDate"
         :hover-delay="hoverDelay"
         @close="closeMenu"
-      />
+      >
+        <template v-if="$slots.dateTime" #dateTime>
+          <slot name="dateTime"></slot>
+        </template>
+      </user-avatar-non-anonymous>
     </client-only>
   </div>
 </template>
 
 <script>
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
-import UserTeaserNonAnonymous from './UserTeaserNonAnonymous'
+import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
+import UserAvatarNonAnonymous from './UserAvatarNonAnonymous'
 
 export default {
-  name: 'UserTeaser',
+  name: 'UserAvatar',
   components: {
-    ProfileAvatar,
-    UserTeaserNonAnonymous,
+    AvatarImage,
+    UserAvatarNonAnonymous,
   },
   props: {
     linkToProfile: { type: Boolean, default: true },
@@ -63,7 +67,7 @@ export default {
 </script>
 
 <style>
-.user-teaser {
+.user-avatar {
   display: flex;
   flex-wrap: nowrap;
 
@@ -74,7 +78,7 @@ export default {
     align-items: center;
   }
 
-  .profile-avatar {
+  .avatar-image {
     flex-shrink: 0;
   }
 

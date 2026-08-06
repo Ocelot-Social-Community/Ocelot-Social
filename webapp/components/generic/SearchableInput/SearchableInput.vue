@@ -27,7 +27,7 @@
           v-if="option.__typename === 'User'"
           :class="{ 'option-with-heading': isFirstOfType(option) }"
         >
-          <user-teaser :user="option" :showPopover="false" />
+          <user-avatar :user="option" :showPopover="false" />
         </p>
         <p
           v-if="option.__typename === 'Post'"
@@ -75,7 +75,7 @@ import SearchHeading from '~/components/generic/SearchHeading/SearchHeading.vue'
 import SearchPost from '~/components/generic/SearchPost/SearchPost.vue'
 import SearchGroup from '~/components/generic/SearchGroup/SearchGroup.vue'
 import HcHashtag from '~/components/Hashtag/Hashtag.vue'
-import UserTeaser from '~/components/UserTeaser/UserTeaser.vue'
+import UserAvatar from '~/components/UserAvatar/UserAvatar.vue'
 
 export default {
   name: 'SearchableInput',
@@ -87,7 +87,7 @@ export default {
     SearchGroup,
     SearchPost,
     HcHashtag,
-    UserTeaser,
+    UserAvatar,
   },
   props: {
     id: { type: String },

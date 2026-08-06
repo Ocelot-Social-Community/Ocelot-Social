@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`UserTeaser given an user avatar is disabled does not render the avatar 1`] = `
+exports[`UserAvatar given an user avatar is disabled does not render the avatar 1`] = `
 <div>
   <div
     class=""
@@ -10,7 +10,7 @@ exports[`UserTeaser given an user avatar is disabled does not render the avatar 
       <v-popover-stub
         autohide="true"
         boundarieselement="viewport"
-        class="user-teaser"
+        class="user-avatar"
         container="body"
         delay="0"
         handleresize="true"
@@ -68,13 +68,13 @@ exports[`UserTeaser given an user avatar is disabled does not render the avatar 
 </div>
 `;
 
-exports[`UserTeaser given an user user is deleted even if the current user is a moderator renders anonymous user 1`] = `
+exports[`UserAvatar given an user user is deleted even if the current user is a moderator renders anonymous user 1`] = `
 <div>
   <div
-    class="user-teaser"
+    class="user-avatar"
   >
     <div
-      class="profile-avatar --small --no-image"
+      class="avatar-image --small --no-image"
     >
       <span
         class="initials"
@@ -109,13 +109,13 @@ exports[`UserTeaser given an user user is deleted even if the current user is a 
 </div>
 `;
 
-exports[`UserTeaser given an user user is deleted renders anonymous user 1`] = `
+exports[`UserAvatar given an user user is deleted renders anonymous user 1`] = `
 <div>
   <div
-    class="user-teaser"
+    class="user-avatar"
   >
     <div
-      class="profile-avatar --small --no-image"
+      class="avatar-image --small --no-image"
     >
       <span
         class="initials"
@@ -150,7 +150,7 @@ exports[`UserTeaser given an user user is deleted renders anonymous user 1`] = `
 </div>
 `;
 
-exports[`UserTeaser given an user user is disabled current user is a moderator renders user name 1`] = `
+exports[`UserAvatar given an user user is disabled current user is a moderator renders user name 1`] = `
 <div>
   <div
     class="disabled-content"
@@ -160,7 +160,7 @@ exports[`UserTeaser given an user user is disabled current user is a moderator r
       <v-popover-stub
         autohide="true"
         boundarieselement="viewport"
-        class="user-teaser"
+        class="user-avatar"
         container="body"
         delay="0"
         handleresize="true"
@@ -180,7 +180,7 @@ exports[`UserTeaser given an user user is disabled current user is a moderator r
           data-test="avatarUserLink"
         >
           <div
-            class="profile-avatar --small"
+            class="avatar-image --small"
           >
             <span
               class="initials"
@@ -243,13 +243,13 @@ exports[`UserTeaser given an user user is disabled current user is a moderator r
 </div>
 `;
 
-exports[`UserTeaser given an user user is disabled renders anonymous user 1`] = `
+exports[`UserAvatar given an user user is disabled renders anonymous user 1`] = `
 <div>
   <div
-    class="user-teaser"
+    class="user-avatar"
   >
     <div
-      class="profile-avatar --small --no-image"
+      class="avatar-image --small --no-image"
     >
       <span
         class="initials"
@@ -284,7 +284,7 @@ exports[`UserTeaser given an user user is disabled renders anonymous user 1`] = 
 </div>
 `;
 
-exports[`UserTeaser given an user with linkToProfile, on desktop renders 1`] = `
+exports[`UserAvatar given an user with linkToProfile, on desktop renders 1`] = `
 <div>
   <div
     class=""
@@ -294,7 +294,7 @@ exports[`UserTeaser given an user with linkToProfile, on desktop renders 1`] = `
       <v-popover-stub
         autohide="true"
         boundarieselement="viewport"
-        class="user-teaser"
+        class="user-avatar"
         container="body"
         delay="0"
         handleresize="true"
@@ -314,7 +314,7 @@ exports[`UserTeaser given an user with linkToProfile, on desktop renders 1`] = `
           data-test="avatarUserLink"
         >
           <div
-            class="profile-avatar --small"
+            class="avatar-image --small"
           >
             <span
               class="initials"
@@ -377,7 +377,7 @@ exports[`UserTeaser given an user with linkToProfile, on desktop renders 1`] = `
 </div>
 `;
 
-exports[`UserTeaser given an user with linkToProfile, on desktop when hovering the user name renders the popover 1`] = `
+exports[`UserAvatar given an user with linkToProfile, on desktop when hovering the user name renders the popover 1`] = `
 <div>
   <div
     class=""
@@ -387,7 +387,7 @@ exports[`UserTeaser given an user with linkToProfile, on desktop when hovering t
       <v-popover-stub
         autohide="true"
         boundarieselement="viewport"
-        class="user-teaser"
+        class="user-avatar"
         container="body"
         delay="0"
         handleresize="true"
@@ -407,7 +407,7 @@ exports[`UserTeaser given an user with linkToProfile, on desktop when hovering t
           data-test="avatarUserLink"
         >
           <div
-            class="profile-avatar --small"
+            class="avatar-image --small"
           >
             <span
               class="initials"
@@ -470,7 +470,7 @@ exports[`UserTeaser given an user with linkToProfile, on desktop when hovering t
 </div>
 `;
 
-exports[`UserTeaser given an user with linkToProfile, on touch screen renders 1`] = `
+exports[`UserAvatar given an user with linkToProfile, on touch screen renders 1`] = `
 <div>
   <div
     class=""
@@ -480,7 +480,7 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen renders 1`
       <v-popover-stub
         autohide="true"
         boundarieselement="viewport"
-        class="user-teaser"
+        class="user-avatar"
         container="body"
         delay="0"
         handleresize="true"
@@ -500,7 +500,7 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen renders 1`
           data-test="avatarUserLink"
         >
           <div
-            class="profile-avatar --small"
+            class="avatar-image --small"
           >
             <span
               class="initials"
@@ -563,7 +563,7 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen renders 1`
 </div>
 `;
 
-exports[`UserTeaser given an user with linkToProfile, on touch screen when clicking the user name renders the popover 1`] = `
+exports[`UserAvatar given an user with linkToProfile, on touch screen when clicking the user name renders the popover 1`] = `
 <div>
   <div
     class=""
@@ -573,7 +573,7 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen when click
       <v-popover-stub
         autohide="true"
         boundarieselement="viewport"
-        class="user-teaser"
+        class="user-avatar"
         container="body"
         delay="0"
         handleresize="true"
@@ -594,7 +594,7 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen when click
           data-test="avatarUserLink"
         >
           <div
-            class="profile-avatar --small"
+            class="avatar-image --small"
           >
             <span
               class="initials"
@@ -651,7 +651,7 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen when click
         </div>
          
         <div>
-          <user-teaser-popover-stub
+          <user-avatar-popover-stub
             user-id="user1"
             user-link="[object Object]"
           />
@@ -662,7 +662,7 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen when click
 </div>
 `;
 
-exports[`UserTeaser given an user without linkToProfile, on desktop renders 1`] = `
+exports[`UserAvatar given an user without linkToProfile, on desktop renders 1`] = `
 <div>
   <div
     class=""
@@ -672,7 +672,7 @@ exports[`UserTeaser given an user without linkToProfile, on desktop renders 1`] 
       <v-popover-stub
         autohide="true"
         boundarieselement="viewport"
-        class="user-teaser"
+        class="user-avatar"
         container="body"
         delay="0"
         handleresize="true"
@@ -692,7 +692,7 @@ exports[`UserTeaser given an user without linkToProfile, on desktop renders 1`] 
           data-test="avatarUserLink"
         >
           <div
-            class="profile-avatar --small"
+            class="avatar-image --small"
           >
             <span
               class="initials"
@@ -755,7 +755,7 @@ exports[`UserTeaser given an user without linkToProfile, on desktop renders 1`] 
 </div>
 `;
 
-exports[`UserTeaser given an user without linkToProfile, on desktop when hovering the user avatar renders the popover 1`] = `
+exports[`UserAvatar given an user without linkToProfile, on desktop when hovering the user avatar renders the popover 1`] = `
 <div>
   <div
     class=""
@@ -765,7 +765,7 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
       <v-popover-stub
         autohide="true"
         boundarieselement="viewport"
-        class="user-teaser"
+        class="user-avatar"
         container="body"
         delay="0"
         handleresize="true"
@@ -785,7 +785,7 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
           data-test="avatarUserLink"
         >
           <div
-            class="profile-avatar --small"
+            class="avatar-image --small"
           >
             <span
               class="initials"
@@ -848,7 +848,7 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
 </div>
 `;
 
-exports[`UserTeaser given an user without linkToProfile, on desktop when hovering the user name renders the popover 1`] = `
+exports[`UserAvatar given an user without linkToProfile, on desktop when hovering the user name renders the popover 1`] = `
 <div>
   <div
     class=""
@@ -858,7 +858,7 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
       <v-popover-stub
         autohide="true"
         boundarieselement="viewport"
-        class="user-teaser"
+        class="user-avatar"
         container="body"
         delay="0"
         handleresize="true"
@@ -878,7 +878,7 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
           data-test="avatarUserLink"
         >
           <div
-            class="profile-avatar --small"
+            class="avatar-image --small"
           >
             <span
               class="initials"
@@ -941,7 +941,7 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
 </div>
 `;
 
-exports[`UserTeaser given an user without linkToProfile, on touch screen renders 1`] = `
+exports[`UserAvatar given an user without linkToProfile, on touch screen renders 1`] = `
 <div>
   <div
     class=""
@@ -951,7 +951,7 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen renders
       <v-popover-stub
         autohide="true"
         boundarieselement="viewport"
-        class="user-teaser"
+        class="user-avatar"
         container="body"
         delay="0"
         handleresize="true"
@@ -971,7 +971,7 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen renders
           data-test="avatarUserLink"
         >
           <div
-            class="profile-avatar --small"
+            class="avatar-image --small"
           >
             <span
               class="initials"
@@ -1034,7 +1034,7 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen renders
 </div>
 `;
 
-exports[`UserTeaser given an user without linkToProfile, on touch screen when clicking the user avatar renders the popover 1`] = `
+exports[`UserAvatar given an user without linkToProfile, on touch screen when clicking the user avatar renders the popover 1`] = `
 <div>
   <div
     class=""
@@ -1044,7 +1044,7 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
       <v-popover-stub
         autohide="true"
         boundarieselement="viewport"
-        class="user-teaser"
+        class="user-avatar"
         container="body"
         delay="0"
         handleresize="true"
@@ -1065,7 +1065,7 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
           data-test="avatarUserLink"
         >
           <div
-            class="profile-avatar --small"
+            class="avatar-image --small"
           >
             <span
               class="initials"
@@ -1122,7 +1122,7 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
         </div>
          
         <div>
-          <user-teaser-popover-stub
+          <user-avatar-popover-stub
             user-id="user1"
           />
         </div>
@@ -1132,7 +1132,7 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
 </div>
 `;
 
-exports[`UserTeaser given an user without linkToProfile, on touch screen when clicking the user name renders the popover 1`] = `
+exports[`UserAvatar given an user without linkToProfile, on touch screen when clicking the user name renders the popover 1`] = `
 <div>
   <div
     class=""
@@ -1142,7 +1142,7 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
       <v-popover-stub
         autohide="true"
         boundarieselement="viewport"
-        class="user-teaser"
+        class="user-avatar"
         container="body"
         delay="0"
         handleresize="true"
@@ -1163,7 +1163,7 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
           data-test="avatarUserLink"
         >
           <div
-            class="profile-avatar --small"
+            class="avatar-image --small"
           >
             <span
               class="initials"
@@ -1220,7 +1220,7 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
         </div>
          
         <div>
-          <user-teaser-popover-stub
+          <user-avatar-popover-stub
             user-id="user1"
           />
         </div>
@@ -1230,13 +1230,13 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
 </div>
 `;
 
-exports[`UserTeaser renders anonymous user 1`] = `
+exports[`UserAvatar renders anonymous user 1`] = `
 <div>
   <div
-    class="user-teaser"
+    class="user-avatar"
   >
     <div
-      class="profile-avatar --small --no-image"
+      class="avatar-image --small --no-image"
     >
       <span
         class="initials"

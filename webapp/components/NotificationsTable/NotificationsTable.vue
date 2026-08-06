@@ -18,7 +18,7 @@
           <div>
             <div class="ds-flex user-section">
               <div class="ds-flex-item">
-                <user-teaser
+                <user-avatar
                   :user="
                     isGroup(notification.from) ? notification.relatedUser : notification.from.author
                   "
@@ -110,7 +110,7 @@
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import HcEmpty from '~/components/Empty/Empty'
 import mobile from '~/mixins/mobile'
 
@@ -121,7 +121,7 @@ export default {
   components: {
     OsButton,
     OsIcon,
-    UserTeaser,
+    UserAvatar,
     HcEmpty,
   },
   props: {

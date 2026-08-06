@@ -23,7 +23,7 @@
 import touchDevice from '~/mixins/touchDevice'
 
 export default {
-  name: 'UserTeaserHelper',
+  name: 'UserAvatarHelper',
   mixins: [touchDevice],
   props: {
     userLink: { type: Object, default: null },

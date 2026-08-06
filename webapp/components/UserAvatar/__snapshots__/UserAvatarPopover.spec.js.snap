@@ -1,15 +1,15 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`UserTeaserPopover does not show badges when disabled 1`] = `
+exports[`UserAvatarPopover does not show badges when disabled 1`] = `
 <div>
   <div
-    class="user-teaser-popover"
+    class="user-avatar-popover"
   >
     <div
       class="user-header"
     >
       <div
-        class="popover-avatar profile-avatar --no-image"
+        class="popover-avatar avatar-image --no-image"
       >
         <span
           class="initials"
@@ -108,167 +108,16 @@ exports[`UserTeaserPopover does not show badges when disabled 1`] = `
 </div>
 `;
 
-exports[`UserTeaserPopover given a non-touch device does not show button when userLink is provided 1`] = `
+exports[`UserAvatarPopover given a non-touch device does not show button when userLink is provided 1`] = `
 <div>
   <div
-    class="user-teaser-popover"
+    class="user-avatar-popover"
   >
     <div
       class="user-header"
     >
       <div
-        class="popover-avatar profile-avatar --no-image"
-      >
-        <span
-          class="initials"
-        >
-          TS
-        </span>
-         
-        <!---->
-         
-        <!---->
-      </div>
-       
-      <div
-        class="user-names"
-      >
-        <span
-          class="user-name"
-        >
-          Tilda Swinton
-        </span>
-         
-        <span
-          class="user-slug ds-text-soft"
-        >
-          @tilda-swinton
-        </span>
-      </div>
-    </div>
-     
-    <div
-      class="hc-badges"
-    >
-      <div
-        class="hc-badge-container"
-        draggable="false"
-      >
-        <img
-          class="hc-badge"
-          src="/icons/verified"
-          title="Verified"
-        />
-      </div>
-      <div
-        class="hc-badge-container"
-        draggable="false"
-      >
-        <img
-          class="hc-badge"
-          src="/icons/trophy1"
-          title="Trophy 1"
-        />
-      </div>
-      <div
-        class="hc-badge-container"
-        draggable="false"
-      >
-        <img
-          class="hc-badge"
-          src="/icons/trophy2"
-          title="Trophy 2"
-        />
-      </div>
-      <div
-        class="hc-badge-container"
-        draggable="false"
-      >
-        <img
-          class="hc-badge"
-          src="/icons/empty"
-          title="Empty"
-        />
-      </div>
-    </div>
-     
-    <!---->
-     
-    <!---->
-     
-    <ul
-      class="statistics"
-    >
-      <li>
-        <div
-          class="os-number flex flex-col items-center text-center"
-        >
-          <span
-            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
-            style="min-width: 2ch;"
-          >
-            42
-          </span>
-          <span
-            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
-          >
-            profile.followers
-          </span>
-        </div>
-      </li>
-       
-      <li>
-        <div
-          class="os-number flex flex-col items-center text-center"
-        >
-          <span
-            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
-            style="min-width: 1ch;"
-          >
-            7
-          </span>
-          <span
-            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
-          >
-            common.post
-          </span>
-        </div>
-      </li>
-       
-      <li>
-        <div
-          class="os-number flex flex-col items-center text-center"
-        >
-          <span
-            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
-            style="min-width: 2ch;"
-          >
-            13
-          </span>
-          <span
-            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
-          >
-            common.comment
-          </span>
-        </div>
-      </li>
-    </ul>
-     
-    <!---->
-  </div>
-</div>
-`;
-
-exports[`UserTeaserPopover given a touch device does not show button when userLink is not provided 1`] = `
-<div>
-  <div
-    class="user-teaser-popover"
-  >
-    <div
-      class="user-header"
-    >
-      <div
-        class="popover-avatar profile-avatar --no-image"
+        class="popover-avatar avatar-image --no-image"
       >
         <span
           class="initials"
@@ -410,16 +259,167 @@ exports[`UserTeaserPopover given a touch device does not show button when userLi
 </div>
 `;
 
-exports[`UserTeaserPopover given a touch device shows button when userLink is provided 1`] = `
+exports[`UserAvatarPopover given a touch device does not show button when userLink is not provided 1`] = `
 <div>
   <div
-    class="user-teaser-popover"
+    class="user-avatar-popover"
   >
     <div
       class="user-header"
     >
       <div
-        class="popover-avatar profile-avatar --no-image"
+        class="popover-avatar avatar-image --no-image"
+      >
+        <span
+          class="initials"
+        >
+          TS
+        </span>
+         
+        <!---->
+         
+        <!---->
+      </div>
+       
+      <div
+        class="user-names"
+      >
+        <span
+          class="user-name"
+        >
+          Tilda Swinton
+        </span>
+         
+        <span
+          class="user-slug ds-text-soft"
+        >
+          @tilda-swinton
+        </span>
+      </div>
+    </div>
+     
+    <div
+      class="hc-badges"
+    >
+      <div
+        class="hc-badge-container"
+        draggable="false"
+      >
+        <img
+          class="hc-badge"
+          src="/icons/verified"
+          title="Verified"
+        />
+      </div>
+      <div
+        class="hc-badge-container"
+        draggable="false"
+      >
+        <img
+          class="hc-badge"
+          src="/icons/trophy1"
+          title="Trophy 1"
+        />
+      </div>
+      <div
+        class="hc-badge-container"
+        draggable="false"
+      >
+        <img
+          class="hc-badge"
+          src="/icons/trophy2"
+          title="Trophy 2"
+        />
+      </div>
+      <div
+        class="hc-badge-container"
+        draggable="false"
+      >
+        <img
+          class="hc-badge"
+          src="/icons/empty"
+          title="Empty"
+        />
+      </div>
+    </div>
+     
+    <!---->
+     
+    <!---->
+     
+    <ul
+      class="statistics"
+    >
+      <li>
+        <div
+          class="os-number flex flex-col items-center text-center"
+        >
+          <span
+            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+            style="min-width: 2ch;"
+          >
+            42
+          </span>
+          <span
+            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
+          >
+            profile.followers
+          </span>
+        </div>
+      </li>
+       
+      <li>
+        <div
+          class="os-number flex flex-col items-center text-center"
+        >
+          <span
+            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+            style="min-width: 1ch;"
+          >
+            7
+          </span>
+          <span
+            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
+          >
+            common.post
+          </span>
+        </div>
+      </li>
+       
+      <li>
+        <div
+          class="os-number flex flex-col items-center text-center"
+        >
+          <span
+            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+            style="min-width: 2ch;"
+          >
+            13
+          </span>
+          <span
+            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
+          >
+            common.comment
+          </span>
+        </div>
+      </li>
+    </ul>
+     
+    <!---->
+  </div>
+</div>
+`;
+
+exports[`UserAvatarPopover given a touch device shows button when userLink is provided 1`] = `
+<div>
+  <div
+    class="user-avatar-popover"
+  >
+    <div
+      class="user-header"
+    >
+      <div
+        class="popover-avatar avatar-image --no-image"
       >
         <span
           class="initials"
@@ -565,7 +565,7 @@ exports[`UserTeaserPopover given a touch device shows button when userLink is pr
         class="inline-flex items-center"
       >
         
-    user-teaser.popover.open-profile
+    user-avatar.popover.open-profile
   
       </span>
     </a>
@@ -573,16 +573,16 @@ exports[`UserTeaserPopover given a touch device shows button when userLink is pr
 </div>
 `;
 
-exports[`UserTeaserPopover renders correctly for a fresh user with zero counts 1`] = `
+exports[`UserAvatarPopover renders correctly for a fresh user with zero counts 1`] = `
 <div>
   <div
-    class="user-teaser-popover"
+    class="user-avatar-popover"
   >
     <div
       class="user-header"
     >
       <div
-        class="popover-avatar profile-avatar --no-image"
+        class="popover-avatar avatar-image --no-image"
       >
         <span
           class="initials"
@@ -724,16 +724,16 @@ exports[`UserTeaserPopover renders correctly for a fresh user with zero counts 1
 </div>
 `;
 
-exports[`UserTeaserPopover shows badges when enabled 1`] = `
+exports[`UserAvatarPopover shows badges when enabled 1`] = `
 <div>
   <div
-    class="user-teaser-popover"
+    class="user-avatar-popover"
   >
     <div
       class="user-header"
     >
       <div
-        class="popover-avatar profile-avatar --no-image"
+        class="popover-avatar avatar-image --no-image"
       >
         <span
           class="initials"

@@ -1,7 +1,7 @@
 <template>
-  <div v-if="user" class="user-teaser-popover">
+  <div v-if="user" class="user-avatar-popover">
     <div class="user-header">
-      <profile-avatar :profile="user" class="popover-avatar" />
+      <avatar-image :profile="user" class="popover-avatar" />
       <div class="user-names">
         <span class="user-name">{{ user.name }}</span>
         <span class="user-slug ds-text-soft">@{{ user.slug }}</span>
@@ -44,7 +44,7 @@
       class="open-link"
       variant="primary"
     >
-      {{ $t('user-teaser.popover.open-profile') }}
+      {{ $t('user-avatar.popover.open-profile') }}
     </os-button>
   </div>
 </template>
@@ -53,19 +53,19 @@
 import { OsButton, OsNumber } from '@ocelot-social/ui'
 import Badges from '~/components/Badges.vue'
 import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import touchDevice from '~/mixins/touchDevice'
 import { userTeaserQuery } from '~/graphql/User.js'
 
 export default {
-  name: 'UserTeaserPopover',
+  name: 'UserAvatarPopover',
   mixins: [touchDevice],
   components: {
     Badges,
     LocationInfo,
     OsButton,
     OsNumber,
-    ProfileAvatar,
+    AvatarImage,
   },
   props: {
     userId: { type: String, required: true },
@@ -90,7 +90,7 @@ export default {
 </script>
 
 <style scoped>
-.user-teaser-popover {
+.user-avatar-popover {
   display: flex;
   flex-direction: column;
   align-items: center;

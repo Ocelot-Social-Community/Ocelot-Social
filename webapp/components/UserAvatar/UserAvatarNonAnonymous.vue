@@ -1,7 +1,7 @@
 <template>
-  <dropdown class="user-teaser">
+  <dropdown class="user-avatar">
     <template #default="{ openMenu, closeMenu }">
-      <user-teaser-helper
+      <user-avatar-helper
         v-if="showAvatar"
         :link-to-profile="linkToProfile"
         :show-popover="showPopover"
@@ -11,11 +11,11 @@
         @close-menu="cancelAndClose(closeMenu)"
         data-test="avatarUserLink"
       >
-        <profile-avatar :profile="user" size="small" :show-profile-name-title="false" />
-      </user-teaser-helper>
+        <avatar-image :profile="user" size="small" :show-profile-name-title="false" />
+      </user-avatar-helper>
       <div class="info flex-direction-column">
         <div :class="wide ? 'flex-direction-row' : 'flex-direction-column'">
-          <user-teaser-helper
+          <user-avatar-helper
             :link-to-profile="linkToProfile"
             :show-popover="showPopover"
             :user-link="userLink"
@@ -25,13 +25,13 @@
           >
             <span v-if="showSlug" class="slug">{{ userSlug }}</span>
             <span class="name">{{ userName }}</span>
-          </user-teaser-helper>
+          </user-avatar-helper>
           <span v-if="wide">&nbsp;</span>
           <span v-if="group" class="group-info">
             <span class="text">{{ $t('group.in') }}</span>
             <dropdown placement="top-start">
               <template #default="{ openMenu, closeMenu }">
-                <user-teaser-helper
+                <user-avatar-helper
                   :link-to-profile="true"
                   :user-link="groupLink"
                   :show-popover="true"
@@ -40,10 +40,10 @@
                   @close-menu="cancelAndCloseGroup(closeMenu)"
                 >
                   <span class="group-link">{{ groupName }}</span>
-                </user-teaser-helper>
+                </user-avatar-helper>
               </template>
               <template #popover="{ isOpen }">
-                <group-teaser-popover v-if="isOpen" :group-id="group.id" :group-link="groupLink" />
+                <group-avatar-popover v-if="isOpen" :group-id="group.id" :group-link="groupLink" />
               </template>
             </dropdown>
           </span>
@@ -58,7 +58,7 @@
       </div>
     </template>
     <template #popover="{ isOpen }" v-if="showPopover">
-      <user-teaser-popover
+      <user-avatar-popover
         v-if="isOpen"
         :user-id="user.id"
         :user-link="linkToProfile ? userLink : null"
@@ -75,21 +75,21 @@ import { userTeaserQuery } from '~/graphql/User.js'
 import { groupTeaserQuery } from '~/graphql/groups'
 import DateTime from '~/components/DateTime'
 import Dropdown from '~/components/Dropdown'
-import GroupTeaserPopover from '~/components/GroupTeaser/GroupTeaserPopover'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
-import UserTeaserPopover from './UserTeaserPopover'
-import UserTeaserHelper from './UserTeaserHelper.vue'
+import GroupAvatarPopover from '~/components/GroupAvatar/GroupAvatarPopover'
+import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
+import UserAvatarPopover from './UserAvatarPopover'
+import UserAvatarHelper from './UserAvatarHelper.vue'
 
 export default {
-  name: 'UserTeaserNonAnonymous',
+  name: 'UserAvatarNonAnonymous',
   components: {
     DateTime,
     Dropdown,
-    GroupTeaserPopover,
+    GroupAvatarPopover,
     OsIcon,
-    ProfileAvatar,
-    UserTeaserHelper,
-    UserTeaserPopover,
+    AvatarImage,
+    UserAvatarHelper,
+    UserAvatarPopover,
   },
   props: {
     linkToProfile: { type: Boolean, default: true },

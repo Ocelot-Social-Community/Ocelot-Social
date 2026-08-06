@@ -1,7 +1,7 @@
 <template>
-  <dropdown class="group-teaser" placement="top-start">
+  <dropdown class="group-avatar" placement="top-start">
     <template #default="{ openMenu, closeMenu }">
-      <user-teaser-helper
+      <user-avatar-helper
         :link-to-profile="true"
         :user-link="groupLink"
         :show-popover="showPopover"
@@ -9,29 +9,29 @@
         @open-menu="openMenu(false)"
         @close-menu="closeMenu(false)"
       >
-        <profile-avatar :profile="group" size="small" class="group-teaser__avatar" />
-        <span class="group-teaser__name">{{ group.name }}</span>
-      </user-teaser-helper>
+        <avatar-image :profile="group" size="small" class="group-avatar__avatar" />
+        <span class="group-avatar__name">{{ group.name }}</span>
+      </user-avatar-helper>
     </template>
     <template #popover>
-      <group-teaser-popover :group="group" :group-link="groupLink" />
+      <group-avatar-popover :group="group" :group-link="groupLink" />
     </template>
   </dropdown>
 </template>
 
 <script>
 import Dropdown from '~/components/Dropdown'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
-import UserTeaserHelper from '~/components/UserTeaser/UserTeaserHelper'
-import GroupTeaserPopover from './GroupTeaserPopover'
+import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
+import UserAvatarHelper from '~/components/UserAvatar/UserAvatarHelper'
+import GroupAvatarPopover from './GroupAvatarPopover'
 
 export default {
-  name: 'GroupTeaser',
+  name: 'GroupAvatar',
   components: {
     Dropdown,
-    GroupTeaserPopover,
-    ProfileAvatar,
-    UserTeaserHelper,
+    GroupAvatarPopover,
+    AvatarImage,
+    UserAvatarHelper,
   },
   props: {
     group: { type: Object, required: true },
@@ -49,7 +49,7 @@ export default {
 </script>
 
 <style>
-.group-teaser {
+.group-avatar {
   display: flex;
   align-items: center;
   min-width: 0;
@@ -72,11 +72,11 @@ export default {
   }
 }
 
-.group-teaser__avatar {
+.group-avatar__avatar {
   flex-shrink: 0;
 }
 
-.group-teaser__name {
+.group-avatar__name {
   font-size: var(--font-size-base);
   white-space: nowrap;
   overflow: hidden;

@@ -233,6 +233,38 @@ describe('CommentCard.vue', () => {
           ])
         })
       })
+
+      describe('which was edited (createdAt !== updatedAt)', () => {
+        beforeEach(() => {
+          propsData.comment = {
+            ...propsData.comment,
+            createdAt: '2024-01-01T10:00:00Z',
+            updatedAt: '2024-01-01T11:00:00Z',
+          }
+          stubs['user-avatar'] = { template: '<div><slot name="dateTime" /></div>' }
+        })
+
+        it('shows the edited indicator', () => {
+          wrapper = Wrapper()
+          expect(wrapper.text()).toContain('comment.edited')
+        })
+      })
+
+      describe('which was not edited (createdAt === updatedAt)', () => {
+        beforeEach(() => {
+          propsData.comment = {
+            ...propsData.comment,
+            createdAt: '2024-01-01T10:00:00Z',
+            updatedAt: '2024-01-01T10:00:00Z',
+          }
+          stubs['user-avatar'] = { template: '<div><slot name="dateTime" /></div>' }
+        })
+
+        it('does not show the edited indicator', () => {
+          wrapper = Wrapper()
+          expect(wrapper.text()).not.toContain('comment.edited')
+        })
+      })
     })
   })
 })

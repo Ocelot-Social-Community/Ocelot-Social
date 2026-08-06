@@ -29,7 +29,7 @@
       </template>
       <client-only>
         <div class="post-user-row">
-          <user-teaser :user="post.author" :group="post.group" />
+          <user-avatar :user="post.author" :group="post.group" />
           <hc-ribbon
             :class="[isPinned ? '--pinned' : '', post.image ? 'post-ribbon-w-img' : 'post-ribbon']"
             :text="ribbonText"
@@ -38,7 +38,7 @@
         </div>
         <template #placeholder>
           <div class="post-user-row">
-            <div class="user-teaser-placeholder">
+            <div class="user-avatar-placeholder">
               <div class="placeholder-avatar" />
               <div class="placeholder-text">
                 <div class="placeholder-line placeholder-line--name" />
@@ -174,7 +174,7 @@ import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
 import HcRibbon from '~/components/Ribbon'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
 import DateTime from '~/components/DateTime'
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
 import { mapGetters } from 'vuex'
 import PostMutations from '~/graphql/PostMutations'
@@ -194,7 +194,7 @@ export default {
     HcRibbon,
     LocationTeaser,
     DateTime,
-    UserTeaser,
+    UserAvatar,
     ResponsiveImage,
   },
   props: {
@@ -428,11 +428,11 @@ export default {
     }
   }
 
-  .user-teaser {
+  .user-avatar {
     margin-bottom: var(--space-small);
   }
 
-  .user-teaser-placeholder {
+  .user-avatar-placeholder {
     display: flex;
     align-items: center;
     margin-bottom: var(--space-small);

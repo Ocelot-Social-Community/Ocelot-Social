@@ -98,6 +98,7 @@ describe('PostSlug', () => {
         'router-link': true,
         HcEditor: { render: () => {}, methods: { insertReply: jest.fn(() => null) } },
         ContentViewer: true,
+        ...opts.stubs,
       }
       const defaults = {
         store,
@@ -109,6 +110,7 @@ describe('PostSlug', () => {
       const wrapper = mount(PostSlug, {
         ...defaults,
         ...opts,
+        stubs,
       })
       wrapper.setData(backendData)
       await Vue.nextTick()
@@ -762,6 +764,28 @@ describe('PostSlug', () => {
         wrapper.vm.updateJoinLeave()
         expect(mocks.$apollo.queries.Group.refetch).toHaveBeenCalled()
         expect(mocks.$toast.success).toHaveBeenCalled()
+      })
+    })
+
+    describe('post edited indicator (dateTime slot)', () => {
+      const userAvatarSlotStub = {
+        render(h) {
+          return h('div', this.$slots.dateTime)
+        },
+      }
+
+      it('shows the edited indicator when createdAt !== updatedAt', async () => {
+        backendData.post.createdAt = '2024-01-01T10:00:00Z'
+        backendData.post.updatedAt = '2024-01-01T11:00:00Z'
+        wrapper = await Wrapper({ stubs: { 'user-avatar': userAvatarSlotStub } })
+        expect(wrapper.text()).toContain('post.edited')
+      })
+
+      it('does not show the edited indicator when createdAt === updatedAt', async () => {
+        backendData.post.createdAt = '2024-01-01T10:00:00Z'
+        backendData.post.updatedAt = '2024-01-01T10:00:00Z'
+        wrapper = await Wrapper({ stubs: { 'user-avatar': userAvatarSlotStub } })
+        expect(wrapper.text()).not.toContain('post.edited')
       })
     })
 

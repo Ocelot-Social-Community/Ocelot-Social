@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils'
 import Vuex from 'vuex'
-import UserTeaserNonAnonymous from './UserTeaserNonAnonymous.vue'
+import UserAvatarNonAnonymous from './UserAvatarNonAnonymous.vue'
 
 const localVue = global.localVue
 
@@ -25,7 +25,7 @@ const makeApolloMock = (resolveOrReject = 'resolve') => {
 }
 
 const Wrapper = ({ apolloQuery = makeApolloMock(), groupProp = null, authUser = {} } = {}) =>
-  shallowMount(UserTeaserNonAnonymous, {
+  shallowMount(UserAvatarNonAnonymous, {
     localVue,
     store: makeStore(authUser),
     propsData: { user, group: groupProp },
@@ -37,7 +37,7 @@ const Wrapper = ({ apolloQuery = makeApolloMock(), groupProp = null, authUser = 
     stubs: { NuxtLink: true },
   })
 
-describe('UserTeaserNonAnonymous', () => {
+describe('UserAvatarNonAnonymous', () => {
   describe('mounted()', () => {
     it('pre-fetches group data when group has an id', () => {
       const apolloQuery = makeApolloMock()
@@ -129,6 +129,32 @@ describe('UserTeaserNonAnonymous', () => {
       await wrapper.vm.loadPopover(openMenu)
       expect(openMenu).not.toHaveBeenCalled()
       expect(wrapper.vm.popoverPending).toBe(false)
+    })
+  })
+
+  describe('dateTime slot', () => {
+    const mountWithSlot = (dateTimeProp) =>
+      shallowMount(UserAvatarNonAnonymous, {
+        localVue,
+        store: makeStore(),
+        propsData: { user, group: null, dateTime: dateTimeProp },
+        mocks: {
+          $t: jest.fn((t) => t),
+          $i18n: { locale: jest.fn(() => 'en') },
+          $apollo: { query: makeApolloMock() },
+        },
+        stubs: { NuxtLink: true },
+        slots: { dateTime: '<span class="edit-hint">edited</span>' },
+      })
+
+    it('renders slot content when dateTime prop is provided', () => {
+      const wrapper = mountWithSlot('2024-01-01T00:00:00Z')
+      expect(wrapper.find('.edit-hint').exists()).toBe(true)
+    })
+
+    it('does not render slot content when dateTime prop is absent', () => {
+      const wrapper = mountWithSlot(null)
+      expect(wrapper.find('.edit-hint').exists()).toBe(false)
     })
   })
 })

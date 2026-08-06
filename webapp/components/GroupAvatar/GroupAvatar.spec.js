@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils'
-import GroupTeaser from './GroupTeaser.vue'
+import GroupAvatar from './GroupAvatar.vue'
 
 const localVue = global.localVue
 
@@ -7,16 +7,16 @@ const stubs = {
   dropdown: {
     template: '<div><slot :open-menu="() => {}" :close-menu="() => {}" /></div>',
   },
-  'user-teaser-helper': true,
-  'profile-avatar': true,
-  'group-teaser-popover': true,
+  'user-avatar-helper': true,
+  'avatar-image': true,
+  'group-avatar-popover': true,
 }
 
 const fakeGroup = { id: 'g1', slug: 'test-group', name: 'Test Group' }
 
-describe('GroupTeaser.vue', () => {
+describe('GroupAvatar.vue', () => {
   const Wrapper = (props = {}) =>
-    shallowMount(GroupTeaser, {
+    shallowMount(GroupAvatar, {
       propsData: { group: fakeGroup, ...props },
       localVue,
       stubs,

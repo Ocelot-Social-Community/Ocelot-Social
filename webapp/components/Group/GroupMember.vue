@@ -30,7 +30,7 @@
                   params: { id: member.user.id, slug: member.user.slug },
                 }"
               >
-                <profile-avatar :profile="member.user" size="small" />
+                <avatar-image :profile="member.user" size="small" />
               </nuxt-link>
             </td>
             <td class="ds-table-col">
@@ -119,7 +119,7 @@
 import { OsBadge, OsButton, OsIcon, OsModal } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { changeGroupMemberRoleMutation, removeUserFromGroupMutation } from '~/graphql/groups.js'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 
 const GROUP_ROLES = ['pending', 'usual', 'admin', 'owner']
 
@@ -130,7 +130,7 @@ export default {
     OsButton,
     OsIcon,
     OsModal,
-    ProfileAvatar,
+    AvatarImage,
   },
   props: {
     groupId: {

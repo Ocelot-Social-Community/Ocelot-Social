@@ -83,7 +83,7 @@ describe('NotificationsTable.vue', () => {
         })
 
         it('renders the author', () => {
-          const userinfo = firstRowNotification.find('.user-teaser .info')
+          const userinfo = firstRowNotification.find('.user-avatar .info')
           expect(userinfo.text()).toContain(postNotification.from.author.name)
         })
 
@@ -116,7 +116,7 @@ describe('NotificationsTable.vue', () => {
         })
 
         it('renders the author', () => {
-          const userinfo = secondRowNotification.find('.user-teaser .info')
+          const userinfo = secondRowNotification.find('.user-avatar .info')
           expect(userinfo.text()).toContain(commentNotification.from.author.name)
         })
 

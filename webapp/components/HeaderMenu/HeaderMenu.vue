@@ -258,7 +258,7 @@
               @keydown.enter.prevent="mobileAvatarMenuOpen = !mobileAvatarMenuOpen"
               @keydown.space.prevent="mobileAvatarMenuOpen = !mobileAvatarMenuOpen"
             >
-              <profile-avatar :profile="user" size="small" class="mobile-avatar" />
+              <avatar-image :profile="user" size="small" class="mobile-avatar" />
               <div class="mobile-user-details">
                 <b>{{ userName }}</b>
                 <span v-if="user.roleName && user.roleName !== 'user'" class="mobile-user-role">
@@ -594,7 +594,7 @@ import SearchField from '~/components/features/SearchField/SearchField.vue'
 import NotificationMenu from '~/components/NotificationMenu/NotificationMenu'
 import links from '~/constants/links.js'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 import localeUpdate from '~/mixins/localeUpdate.js'
 
@@ -614,7 +614,7 @@ export default {
     Logo,
     NotificationMenu,
     PageParamsLink,
-    ProfileAvatar,
+    AvatarImage,
     SearchField,
   },
   data() {
@@ -1078,7 +1078,7 @@ export default {
     border-bottom: 1px solid var(--color-neutral-90);
   }
 
-  .mobile-avatar.profile-avatar {
+  .mobile-avatar.avatar-image {
     width: 42px;
     height: 42px;
   }

@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { RouterLinkStub } from '@vue/test-utils'
-import UserTeaser from './UserTeaser.vue'
+import UserAvatar from './UserAvatar.vue'
 import Vuex from 'vuex'
 
 const localVue = global.localVue
@@ -56,7 +56,7 @@ const userTilda = {
   ],
 }
 
-describe('UserTeaser', () => {
+describe('UserAvatar', () => {
   const Wrapper = ({
     isModerator = false,
     withLinkToProfile = true,
@@ -80,7 +80,7 @@ describe('UserTeaser', () => {
         'auth/isModerator': () => isModerator,
       },
     })
-    return render(UserTeaser, {
+    return render(UserAvatar, {
       localVue,
       store,
       propsData: {
@@ -92,7 +92,7 @@ describe('UserTeaser', () => {
       },
       stubs: {
         NuxtLink: RouterLinkStub,
-        'user-teaser-popover': true,
+        'user-avatar-popover': true,
         'v-popover': true,
         'client-only': true,
       },
@@ -267,6 +267,46 @@ describe('UserTeaser', () => {
           expect(wrapper.container).toMatchSnapshot()
         })
       })
+    })
+  })
+
+  describe('dateTime slot forwarding', () => {
+    it('forwards slot content to UserAvatarNonAnonymous', () => {
+      const store = new Vuex.Store({
+        getters: {
+          'auth/user': () => ({}),
+          'auth/isModerator': () => false,
+        },
+      })
+      const { container } = render(UserAvatar, {
+        localVue,
+        store,
+        propsData: {
+          user: userTilda,
+          dateTime: '2024-01-01T00:00:00Z',
+        },
+        slots: {
+          dateTime: '<span class="edit-hint">edited</span>',
+        },
+        stubs: {
+          NuxtLink: RouterLinkStub,
+          'client-only': {
+            render(h) {
+              return h('div', this.$slots.default)
+            },
+          },
+          'user-avatar-non-anonymous': {
+            render(h) {
+              return h('div', this.$slots.dateTime)
+            },
+          },
+        },
+        mocks: {
+          $t: jest.fn((t) => t),
+          $can: () => false,
+        },
+      })
+      expect(container.querySelector('.edit-hint')).not.toBeNull()
     })
   })
 })

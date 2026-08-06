@@ -18,7 +18,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
-            class="profile-page-avatar profile-avatar --large --no-image"
+            class="profile-page-avatar avatar-image --large --no-image"
           >
             <span
               class="initials"
@@ -697,7 +697,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
-            class="profile-page-avatar profile-avatar --large --no-image"
+            class="profile-page-avatar avatar-image --large --no-image"
           >
             <span
               class="initials"
@@ -1429,7 +1429,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                   class="dz-message"
                 >
                   <div
-                    class="profile-page-avatar profile-avatar --large --no-image"
+                    class="profile-page-avatar avatar-image --large --no-image"
                   >
                     <span
                       class="initials"
@@ -2031,7 +2031,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                   class="dz-message"
                 >
                   <div
-                    class="profile-page-avatar profile-avatar --large --no-image"
+                    class="profile-page-avatar avatar-image --large --no-image"
                   >
                     <span
                       class="initials"

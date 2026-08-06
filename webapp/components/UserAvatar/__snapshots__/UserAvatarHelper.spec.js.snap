@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`UserTeaserHelper with linkToProfile and popover enabled, on touch screen renders button 1`] = `
+exports[`UserAvatarHelper with linkToProfile and popover enabled, on touch screen renders button 1`] = `
 <div>
   <button>
     <div>
@@ -10,7 +10,7 @@ exports[`UserTeaserHelper with linkToProfile and popover enabled, on touch scree
 </div>
 `;
 
-exports[`UserTeaserHelper with linkToProfile, on desktop renders link 1`] = `
+exports[`UserAvatarHelper with linkToProfile, on desktop renders link 1`] = `
 <div>
   <a>
     <div>
@@ -20,7 +20,7 @@ exports[`UserTeaserHelper with linkToProfile, on desktop renders link 1`] = `
 </div>
 `;
 
-exports[`UserTeaserHelper without linkToProfile renders span 1`] = `
+exports[`UserAvatarHelper without linkToProfile renders span 1`] = `
 <div>
   <span>
     <div>

@@ -59,7 +59,7 @@
         <div v-if="activeTab === 'User'" class="search-results-list">
           <div v-for="user in activeResources" :key="user.id" class="search-results-list__item">
             <os-card>
-              <user-teaser :user="user" />
+              <user-avatar :user="user" />
             </os-card>
           </div>
         </div>
@@ -118,7 +118,7 @@ import MasonryGrid from '~/components/MasonryGrid/MasonryGrid'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem'
 import PostTeaser from '~/components/PostTeaser/PostTeaser'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import GroupTeaser from '~/components/Group/GroupTeaser'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
 import HcHashtag from '~/components/Hashtag/Hashtag'
@@ -133,7 +133,7 @@ export default {
     MasonryGridItem,
     PostTeaser,
     PaginationButtons,
-    UserTeaser,
+    UserAvatar,
     GroupTeaser,
     HcHashtag,
   },

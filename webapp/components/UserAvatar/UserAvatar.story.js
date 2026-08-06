@@ -1,6 +1,6 @@
 import { storiesOf } from '@storybook/vue'
 import { withA11y } from '@storybook/addon-a11y'
-import UserTeaser from '~/components/UserTeaser/UserTeaser.vue'
+import UserAvatar from '~/components/UserAvatar/UserAvatar.vue'
 import helpers from '~/storybook/helpers'
 
 helpers.init()
@@ -92,64 +92,64 @@ export const group = {
   location: null,
 }
 
-storiesOf('UserTeaser', module)
+storiesOf('UserAvatar', module)
   .addDecorator(withA11y)
   .addDecorator(helpers.layout)
   .add('user only', () => ({
-    components: { UserTeaser },
+    components: { UserAvatar },
     store: helpers.store,
     data: () => ({
       user,
     }),
-    template: '<user-teaser :user="user" :show-slug="true" />',
+    template: '<user-avatar :user="user" :show-slug="true" />',
   }))
   .add('with date', () => ({
-    components: { UserTeaser },
+    components: { UserAvatar },
     store: helpers.store,
     data: () => ({
       user,
     }),
-    template: '<user-teaser :user="user" :show-slug="true" :date-time="new Date()" />',
+    template: '<user-avatar :user="user" :show-slug="true" :date-time="new Date()" />',
   }))
   .add('has edited something', () => ({
-    components: { UserTeaser },
+    components: { UserAvatar },
     store: helpers.store,
     data: () => ({
       user,
     }),
     template: `
-    <user-teaser :user="user" :show-slug="true" :date-time="new Date()">
+    <user-avatar :user="user" :show-slug="true" :date-time="new Date()">
       <template #dateTime>
         - HEY! I'm edited
       </template>
-    </user-teaser>
+    </user-avatar>
     `,
   }))
   .add('anonymous', () => ({
-    components: { UserTeaser },
+    components: { UserAvatar },
     store: helpers.store,
     data: () => ({
       user: null,
     }),
-    template: '<user-teaser :user="user" :show-slug="true" :date-time="new Date()" />',
+    template: '<user-avatar :user="user" :show-slug="true" :date-time="new Date()" />',
   }))
   .add('with group and date', () => ({
-    components: { UserTeaser },
+    components: { UserAvatar },
     store: helpers.store,
     data: () => ({
       user,
       group,
     }),
     template:
-      '<user-teaser :user="user" :show-slug="true" :group="group" :date-time="new Date()" />',
+      '<user-avatar :user="user" :show-slug="true" :group="group" :date-time="new Date()" />',
   }))
   .add('with group and date – wide', () => ({
-    components: { UserTeaser },
+    components: { UserAvatar },
     store: helpers.store,
     data: () => ({
       user,
       group,
     }),
     template:
-      '<user-teaser :user="user" :show-slug="true" :group="group" wide :date-time="new Date()" />',
+      '<user-avatar :user="user" :show-slug="true" :group="group" wide :date-time="new Date()" />',
   }))
