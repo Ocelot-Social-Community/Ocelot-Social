@@ -394,7 +394,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .password-strength {
   margin-bottom: 14px;
 }
@@ -404,7 +404,7 @@ export default {
   width: 100%;
   align-items: center;
   padding: 0;
-  height: $input-height;
+  height: var(--input-height);
   margin-top: 40px;
   margin-bottom: 16px;
 
@@ -420,7 +420,7 @@ export default {
 }
 
 .full-name {
-  padding-bottom: $space-small;
+  padding-bottom: var(--space-small);
 }
 
 .checkbox-group {
@@ -432,12 +432,12 @@ export default {
   align-items: flex-start;
   margin-bottom: 16px;
   padding: 16px;
-  background-color: #f8f9fa; // Light gray background
+  background-color: #f8f9fa; /*  Light gray background */
   border-radius: 8px;
   transition: background-color 0.2s ease;
 
   &:hover {
-    background-color: #f0f2f5; // Slightly darker on hover
+    background-color: #f0f2f5; /*  Slightly darker on hover */
   }
 
   &:last-child {
@@ -450,7 +450,7 @@ export default {
   width: 18px;
   height: 18px;
   margin-right: 12px;
-  margin-top: 2px; // Align with first line of text
+  margin-top: 2px; /*  Align with first line of text */
   cursor: pointer;
 }
 
@@ -458,7 +458,7 @@ export default {
   flex: 1;
   cursor: pointer;
   line-height: 1.5;
-  color: #374151; // Dark gray text
+  color: #374151; /*  Dark gray text */
 }
 
 .checkbox-text {
@@ -472,10 +472,10 @@ export default {
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
-  font-size: 0.875rem; // Slightly smaller text for links
+  font-size: 0.875rem; /*  Slightly smaller text for links */
 
   .separator {
-    color: #9ca3af; // Light gray separator
+    color: #9ca3af; /*  Light gray separator */
     font-size: 0.75rem;
   }
 }

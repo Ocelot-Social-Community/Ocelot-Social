@@ -52,11 +52,11 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .password-strength-meter {
   position: relative;
   height: 3px;
-  background: $color-neutral-85;
+  background: var(--color-neutral-85);
   margin: 10px auto 6px;
   border-radius: 3px;
 
@@ -86,7 +86,7 @@ export default {
 .help {
   .insecure {
     strong {
-      color: $color-danger;
+      color: var(--color-danger);
     }
   }
 }
@@ -116,8 +116,8 @@ export default {
     width: 40%;
   }
   &.strength-2 {
-    // Brand-linked like the other steps (was static darken($color-yellow)): the warning→yellow blend
-    // darkened 20%, mirroring strength-1 (black 30%) so the scale follows a brand switch without a jump.
+    /*  Brand-linked like the other steps (was static darken(var(--color-yellow))): the warning→yellow blend */
+    /*  darkened 20%, mirroring strength-1 (black 30%) so the scale follows a brand switch without a jump. */
     background: color-mix(
       in srgb,
       color-mix(in srgb, var(--color-warning), rgb(245, 196, 0)),
@@ -130,7 +130,7 @@ export default {
     width: 80%;
   }
   &.strength-4 {
-    background: $color-success;
+    background: var(--color-success);
     width: 100%;
   }
 }

@@ -196,7 +196,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .report-modal.os-modal {
   width: 700px !important;
   max-width: 700px !important;
@@ -208,7 +208,7 @@ export default {
 }
 .report-modal .report-radio-group legend {
   font-weight: bold;
-  margin-bottom: $space-xx-small;
+  margin-bottom: var(--space-xx-small);
 }
 .report-modal .report-radio-option {
   display: flex;
@@ -224,8 +224,8 @@ export default {
   width: 16px;
   height: 16px;
   min-width: 16px;
-  border: 2px solid $border-color-base;
-  background-color: $background-color-base;
+  border: 2px solid var(--border-color-base);
+  background-color: var(--background-color-base);
   border-radius: 50%;
   margin-right: 8px;
 }
@@ -239,7 +239,7 @@ export default {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: $text-color-primary;
+  background-color: var(--text-color-primary);
   transition: all 0.1s ease-in;
 }
 .report-modal .report-radio-option-selected .report-radio-option-mark::before {
@@ -251,8 +251,8 @@ export default {
   flex: 1;
 }
 .report-modal .reason-description {
-  margin-top: $space-x-small !important;
-  margin-bottom: $space-xx-small !important;
+  margin-top: var(--space-x-small) !important;
+  margin-bottom: var(--space-xx-small) !important;
 }
 .report-modal .smallTag {
   width: 100%;
@@ -268,7 +268,7 @@ export default {
   left: 0;
   background-color: #fff;
   opacity: 1;
-  z-index: $z-index-modal;
-  border-radius: $border-radius-x-large;
+  z-index: var(--z-index-modal);
+  border-radius: var(--border-radius-x-large);
 }
 </style>

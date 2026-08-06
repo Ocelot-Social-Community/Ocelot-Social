@@ -57,12 +57,12 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .pagination-buttons {
   display: flex;
   justify-content: space-around;
-  width: $size-width-paginate;
-  margin: $space-x-small auto;
+  width: var(--size-width-paginate);
+  margin: var(--space-x-small) auto;
 }
 
 .pagination-pageCount {

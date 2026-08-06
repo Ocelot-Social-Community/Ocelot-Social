@@ -92,7 +92,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .ds-grid {
   grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
   column-gap: 16px;

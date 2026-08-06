@@ -97,7 +97,7 @@ export default {
   },
 }
 </script>
-<style lang="scss">
+<style>
 #customdropzone .dz-preview {
   transition: all 0.2s ease-out;
   width: 160px;

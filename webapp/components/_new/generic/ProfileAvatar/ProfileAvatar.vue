@@ -90,29 +90,29 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .profile-avatar {
   position: relative;
-  height: $size-avatar-base;
-  width: $size-avatar-base;
+  height: var(--size-avatar-base);
+  width: var(--size-avatar-base);
   border-radius: 50%;
   overflow: hidden;
-  background-color: $background-color-base;
-  color: $text-color-primary-inverse;
+  background-color: var(--background-color-base);
+  color: var(--text-color-primary-inverse);
 
   &.--small {
-    width: $size-avatar-small;
-    height: $size-avatar-small;
+    width: var(--size-avatar-small);
+    height: var(--size-avatar-small);
   }
 
   &.--large {
-    width: $size-avatar-large;
-    height: $size-avatar-large;
-    font-size: $font-size-xx-large;
+    width: var(--size-avatar-large);
+    height: var(--size-avatar-large);
+    font-size: var(--font-size-xx-large);
   }
 
   &.--no-image {
-    background-color: $color-primary-dark;
+    background-color: var(--color-primary-dark);
   }
 
   > .initials,
@@ -129,7 +129,7 @@ export default {
     height: 100%;
     object-fit: cover;
     object-position: center;
-    background-color: $background-color-base;
+    background-color: var(--background-color-base);
   }
 }
 </style>
