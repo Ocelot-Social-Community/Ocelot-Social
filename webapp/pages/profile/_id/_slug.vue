@@ -677,7 +677,7 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 ::v-deep .profile-page-avatar.avatar-image {
   margin: auto;
   margin-top: -60px;
