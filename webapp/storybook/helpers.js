@@ -13,6 +13,10 @@ import '~/plugins/v-tooltip'
 Vue.use(VueRouter)
 
 const helpers = {
+  // Populated by story files before mount (e.g. FollowList.story.js), keyed by the fake userId each
+  // story uses: { [userId]: [{ id, name, slug, ... }, ...] }. Read by the $apollo mock's
+  // FollowConnections handler below.
+  followListConnections: {},
   init(options = {}) {
     Vue.use(Vuex)
     // `~/plugins/vue-filters` is a Nuxt plugin — it expects `({ app })`, not the `Vue` constructor
@@ -29,6 +33,10 @@ const helpers = {
 
     Vue.i18n.set('en')
     Vue.i18n.fallback('en')
+    // Mirrors plugins/i18n.js's `app.$i18n = Vue.i18n` — Nuxt turns that into `this.$i18n` on every
+    // component. Without it, the handful of callers that read `this.$i18n` directly (rather than the
+    // usual `$t`/`$tc`) get undefined and throw the moment they call `.locale()` on it.
+    Vue.prototype.$i18n = Vue.i18n
 
     // Mirrors ~/plugins/permissions.js and ~/plugins/policy.js, which inject $can/$policy via the
     // Nuxt plugin context — a mechanism storybook never runs. Stories get the permissive default
@@ -63,6 +71,34 @@ const helpers = {
         const key = JSON.stringify(data)
         if (key.includes('isValidInviteCode')) return { data: { isValidInviteCode: true } }
         if (key.includes('VerifyNonce')) return { data: { VerifyNonce: true } }
+        // FollowList.vue self-fetches via this query (id/first/offset/nameFilter variables) and only
+        // sets `allLoaded` once a response's item count is under the page size. Falling through to
+        // the generic `{ data: {} }` below left `allLoaded` permanently false, and InfiniteScrollList's
+        // auto-load-more (fires on every render while the list doesn't fill its container) turned that
+        // into an unbroken fetch → re-render → fetch loop — a real, tab-freezing infinite loop, not a
+        // slow one. Paginating `helpers.followListConnections[id]` for real is what actually ends it.
+        if (key.includes('FollowConnections')) {
+          const { id, first, offset, nameFilter } = data.variables
+          let all = helpers.followListConnections[id] || []
+          if (nameFilter) {
+            const q = nameFilter.toLowerCase()
+            all = all.filter((u) => u.name.toLowerCase().includes(q))
+          }
+          const page = all.slice(offset, offset + first)
+          return {
+            data: {
+              User: [
+                {
+                  id,
+                  followingCount: all.length,
+                  following: page,
+                  followedByCount: all.length,
+                  followedBy: page,
+                },
+              ],
+            },
+          }
+        }
         if (key.includes('embed')) {
           return {
             data: {
