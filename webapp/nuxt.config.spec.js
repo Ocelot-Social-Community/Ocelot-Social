@@ -6,7 +6,7 @@ import { brandingHeadHtml } from './utils/brandingHead.js'
 
 const BRAND = {
   assets: { css: ['/branding/acme/assets/css/branding.css'] },
-  theme: { cssVars: { 'color-primary': 'rgb(1, 2, 3)' } },
+  theme: { themeColor: 'rgb(1, 2, 3)' },
 }
 
 const render = (nuxtState) => {
@@ -22,9 +22,10 @@ describe('nuxt.config ssr branding head hook', () => {
     const head = render({ branding: BRAND })
 
     expect(head).toContain(brandingHeadHtml(BRAND))
-    // AFTER the bundle: `:root { --color-primary }` from ocelot-ui-variables.scss has the same
-    // specificity, so losing this order means the brand theme silently does not apply.
-    expect(head.indexOf('/_nuxt/app.css')).toBeLessThan(head.indexOf('branding-theme'))
+    // AFTER the bundle: the brand's stylesheet carries rules that match framework selectors on equal
+    // specificity, so losing this order means the brand's component rules silently do not apply.
+    // (Its theme TOKENS survive either way — the build ships them as `:root:root`.)
+    expect(head.indexOf('/_nuxt/app.css')).toBeLessThan(head.indexOf('data-branding-css'))
   })
 
   it('leaves the head untouched for a vanilla render', () => {

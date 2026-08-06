@@ -9,7 +9,9 @@ import { brandingDefaults } from '../dist/defaults.js'
 import { branding, getBranding, setBranding } from '../dist/index.js'
 import { defineBranding } from '../dist/merge.js'
 
-beforeEach(() => setBranding(undefined))
+beforeEach(() => {
+  setBranding(undefined)
+})
 
 test('getBranding returns the framework defaults when nothing is injected', () => {
   assert.deepEqual(getBranding(), brandingDefaults)

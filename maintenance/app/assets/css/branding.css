@@ -7,7 +7,7 @@
  * Branding repositories can override this file.
  */
 
-/* Fonts — same as webapp/assets/_new/styles/resets.scss */
+/* Fonts — same as webapp/assets/_new/styles/resets.css */
 @font-face {
   font-family: LatoWeb;
   src:

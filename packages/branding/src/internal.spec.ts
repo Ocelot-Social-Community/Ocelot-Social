@@ -81,6 +81,6 @@ test('deepMerge: drops a __proto__ key instead of polluting Object.prototype', (
   const patch = JSON.parse('{"a":1,"__proto__":{"POLLUTED_MERGE":"yes"}}')
   const merged = deepMerge({}, patch)
   assert.deepEqual(Object.keys(merged), ['a']) // __proto__ dropped
-  assert.equal({}.POLLUTED_MERGE, undefined) // global prototype untouched
+  assert.equal('POLLUTED_MERGE' in {}, false) // global prototype untouched
   assert.equal(Object.getPrototypeOf(merged), Object.prototype) // accumulator not reparented
 })

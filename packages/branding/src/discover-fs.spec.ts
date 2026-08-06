@@ -50,7 +50,7 @@ function archiveGz({
     },
     {
       name: 'fragments/theme.default.json',
-      data: Buffer.from(JSON.stringify({ theme: { cssVars: { 'color-primary': primary } } })),
+      data: Buffer.from(JSON.stringify({ theme: { themeColor: primary } })),
     },
     {
       name: 'fragments/identity.default.json',
@@ -86,7 +86,7 @@ test('discoverArchives dedupes duplicate ids to the HIGHEST version', () => {
   assert.equal(found.size, 1)
   assert.equal(found.get('wir').version, '1.2')
   // and the winning file composes to the 1.2 theme
-  assert.equal(readArchiveConfig(found.get('wir').file).theme.cssVars['color-primary'], 'v12')
+  assert.equal(readArchiveConfig(found.get('wir').file).theme.themeColor, 'v12')
 })
 
 // The publish convention: `<id>.tar.gz` is the CURRENT copy (a rebuild or a backend sync overwrites
@@ -100,7 +100,7 @@ test('discoverArchives prefers the current `<id>.tar.gz` over a same-version his
   writeArchive(base, 'acme.tar.gz', { id: 'acme', version: '1.0.0', primary: 'fresh' })
   const found = discoverArchives(base)
   assert.equal(found.get('acme').file, join(base, 'acme.tar.gz'))
-  assert.equal(readArchiveConfig(found.get('acme').file).theme.cssVars['color-primary'], 'fresh')
+  assert.equal(readArchiveConfig(found.get('acme').file).theme.themeColor, 'fresh')
 })
 
 test('discoverArchives treats numerically-equal versions as equal (1.2 == 1.2.0 → deduped)', () => {
@@ -180,7 +180,7 @@ test('composeComposition resolves a cross-archive map against the discovered lib
   writeArchive(base, 'ac/ac.tar.gz', { id: 'ac', primary: 'blue', appName: 'Acme' })
   // theme from _default (ya), identity slot overridden to ac
   const config = composeComposition(base, { _default: 'ya', identity: 'ac' })
-  assert.equal(config.theme.cssVars['color-primary'], 'green')
+  assert.equal(config.theme.themeColor, 'green')
   assert.equal(config.metadata.applicationName, 'Acme')
 })
 
@@ -220,7 +220,7 @@ describe('search path', () => {
     const found = discoverArchives(`${cache}${delimiter}${baked}`)
 
     assert.equal(found.get('acme').version, '1.0.0')
-    assert.equal(readArchiveConfig(found.get('acme').file).theme.cssVars['color-primary'], 'synced')
+    assert.equal(readArchiveConfig(found.get('acme').file).theme.themeColor, 'synced')
     // The shadowed archive is untouched — precedence never mutates the filesystem.
     assert.ok(readArchive(bakedFile))
   })
@@ -294,7 +294,7 @@ describe('search path', () => {
 
     const found = discoverArchives(cacheFirstSearchPath(cache, baked))
 
-    assert.equal(readArchiveConfig(found.get('acme').file).theme.cssVars['color-primary'], 'synced')
+    assert.equal(readArchiveConfig(found.get('acme').file).theme.themeColor, 'synced')
   })
 
   test('composeComposition resolves slots across roots', () => {
@@ -308,7 +308,7 @@ describe('search path', () => {
       identity: 'ac',
     })
 
-    assert.equal(config.theme.cssVars['color-primary'], 'green')
+    assert.equal(config.theme.themeColor, 'green')
     assert.equal(config.metadata.applicationName, 'Acme')
   })
 })

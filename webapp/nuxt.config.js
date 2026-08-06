@@ -147,23 +147,7 @@ export default {
 
   /*
    ** Global processed styles
-   **
-   ** TRANSITIONAL. The `:root` custom properties above are the real source of design tokens now.
-   ** These SCSS resources only stay alive so that components not yet converted to plain CSS keep
-   ** resolving their `$token` references; both define the same values. Removed, together with
-   ** sass itself, once the last `lang="scss"` block is gone.
    */
-  styleResources: {
-    scss: [
-      '~assets/_new/styles/uses.scss',
-      '~assets/_new/styles/_styleguide-tokens.scss',
-      '~assets/_new/styles/tokens.scss',
-      '~assets/styles/imports/_branding.scss',
-      '~assets/_new/styles/export.scss',
-    ],
-    hoistUseStatements: true,
-  },
-
   /*
    ** Dynamic branding assets: serve /branding/* from $OCELOT_BRANDING_ASSETS_DIR at runtime
    ** (logos, favicon, static-page HTML, CSS, fonts + each brand's virtual branding.json + manifest.json)
@@ -255,8 +239,6 @@ export default {
     // built, which needs it to resolve the auth cookie (plugins/apollo-config.js getAuth).
     'cookie-universal-nuxt',
     '@nuxtjs/axios',
-    // transitional, see styleResources above
-    '@nuxtjs/style-resources',
     '@nuxtjs/sentry',
     '@nuxtjs/pwa',
   ],

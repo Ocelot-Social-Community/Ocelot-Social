@@ -32,7 +32,7 @@ const KEYS = [...Object.keys(KEY_MAP), 'THEME_COLOR']
 
 // Resolve one SCREAMING_CASE key against the runtime branding config.
 function resolve(prop) {
-  if (prop === 'THEME_COLOR') return resolveThemeColor(branding.theme.cssVars)
+  if (prop === 'THEME_COLOR') return resolveThemeColor(branding.theme)
   return prop in KEY_MAP ? branding.metadata[KEY_MAP[prop]] : undefined
 }
 
