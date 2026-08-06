@@ -26,7 +26,7 @@ const defaults = {
   OG_IMAGE_HEIGHT: "1140",
   OG_IMAGE_TYPE: "image/png",
   // The squared logo on the page. A brand points this at the copy of its own logo that the generator
-  // serves from /img/brand/ — the filename varies (.svg / .png), so it travels as a key, not a
+  // serves from /brand/ — the filename varies (.svg / .png), so it travels as a key, not a
   // hard-coded path in app.vue.
   LOGO: "/img/custom/logo-squared.svg",
 };

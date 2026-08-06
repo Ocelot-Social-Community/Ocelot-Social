@@ -127,8 +127,8 @@ services:
       - SUPPORT_EMAIL=${SUPPORT_EMAIL:-hello@ocelot.social}
     volumes:
       # Hot-reload against the host sources — including whatever `npm run brand -- <name>` generated
-      # there (app/assets/css/brand.css, app/constants/metadata.brand.json, app/locales/,
-      # public/img|fonts/brand/ — all git-ignored, all optional).
+      # there (app/constants/stylesheets.brand.json + metadata.brand.json, app/locales/,
+      # public/brand/ — all git-ignored, all optional).
       #
       # In dev, brand on the HOST, not via the image's BRAND build arg: a bind mount REPLACES the
       # directory, so a baked brand under /app/app would be hidden by this mount anyway. `npm run
