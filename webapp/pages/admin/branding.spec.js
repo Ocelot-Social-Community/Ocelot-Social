@@ -1,5 +1,14 @@
 import BrandingPage from './branding.vue'
 
+// Both fetch-driven suites below install their own URL fixture on the global. Restoring it after every
+// test keeps a later one from silently answering out of an earlier one's fixture — the failure mode is
+// a test that passes for the wrong reason, which is worse than one that fails. File-scoped on purpose:
+// it covers every suite here, including ones added later that forget to clean up after themselves.
+const realFetch = global.fetch
+afterEach(() => {
+  global.fetch = realFetch
+})
+
 // Method-level test (no full mount): confirm() → saveComposition() must NOT commit the optimistic
 // composition when the mutation fails, so the change stays pending for retry/cancel instead of being
 // shown as applied. The success path reloads the page, so only the failure path is unit-tested here.
