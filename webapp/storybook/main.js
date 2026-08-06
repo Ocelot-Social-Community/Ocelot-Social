@@ -67,6 +67,15 @@ module.exports = {
       ...config.resolve.alias,
       '~~': path.resolve(__dirname, '../'),
       '~': path.resolve(__dirname, '../'),
+      // The full build compiles the inline `template:` strings every story here still uses — the
+      // plain package resolves to the runtime-only build, which can't and errors on them.
+      vue$: require.resolve('vue/dist/vue.esm.js'),
+      // @ocelot-social/ui ships its own nested node_modules/vue — Vue 3, not this project's Vue 2.7.
+      // Its bundled vue-demi (same version, but resolved from that nested node_modules) detects that
+      // copy and renders everything Vue-3-shaped: every <os-icon> came out as a blank <svg><path/></svg>
+      // instead of an error, since vue-demi degrades silently rather than throwing on the mismatch.
+      // nuxt.config.js hits the identical problem and fixes it the same way — see the comment there.
+      'vue-demi': require.resolve('vue-demi'),
     }
 
     return config
