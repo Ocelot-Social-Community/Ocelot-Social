@@ -22,32 +22,29 @@ module.exports = {
 
     // The builder's own default `.css$` rule (added before webpackFinal runs) has the same problem —
     // and vue-loader clones it for `<style lang="css">` blocks in every component, so it has to be
-    // patched here rather than only covering the scss rule below.
+    // patched here rather than only covering the scss handling below.
+    //
+    // TRANSITIONAL, and it has to stay exactly as long as nuxt.config.js keeps its `styleResources`:
+    // the components rendered in stories still carry `<style lang="scss">` and resolve `$token`
+    // references through this prelude. Dropping the rule while they exist does not degrade the styling,
+    // it fails the Storybook build outright. Removed together with sass, once the last such block is
+    // gone — the plain-CSS stylesheets already go through Storybook's own CSS pipeline.
+    //
+    // Extending the builder's own `.css$` rule in place — rather than pushing a parallel `.scss$` rule
+    // — is deliberate: vue-loader clones whichever rule it finds via its own resolution for a given
+    // `lang`, and a separately-pushed rule silently never got picked for non-scoped `<style lang="scss">`
+    // blocks (scoped ones worked). Reusing the rule vue-loader already resolves correctly sidesteps that.
     const defaultCssRule = config.module.rules.find((r) => String(r.test) === String(/\.css$/))
     if (defaultCssRule) {
+      defaultCssRule.test = /\.(css|scss)$/
+      defaultCssRule.include = path.resolve(__dirname, '../')
       const cssLoaderUse = defaultCssRule.use.find(
         (u) => u.loader && u.loader.includes('css-loader'),
       )
       if (cssLoaderUse) {
         cssLoaderUse.options = { ...cssLoaderUse.options, url: passThroughAbsoluteUrls }
       }
-    }
-
-    // TRANSITIONAL, and it has to stay exactly as long as nuxt.config.js keeps its `styleResources`:
-    // the components rendered in stories still carry `<style lang="scss">` and resolve `$token`
-    // references through this prelude. Dropping the rule while they exist does not degrade the styling,
-    // it fails the Storybook build outright. Removed together with sass, once the last such block is
-    // gone — the plain-CSS stylesheets already go through Storybook's own CSS pipeline.
-    config.module.rules.push({
-      test: /\.scss$/,
-      use: [
-        { loader: 'style-loader' },
-        // The project's own css-loader (v4, resolved here instead of the builder's nested v6) takes
-        // the `url` filter as a plain function rather than v6's `{ filter }` object.
-        {
-          loader: 'css-loader',
-          options: { sourceMap: true, url: (url) => !url.startsWith('/') },
-        },
+      defaultCssRule.use.push(
         { loader: 'sass-loader', options: { sourceMap: true } },
         {
           loader: 'style-resources-loader',
@@ -65,9 +62,8 @@ module.exports = {
             injector: 'prepend',
           },
         },
-      ],
-      include: path.resolve(__dirname, '../'),
-    })
+      )
+    }
 
     // load svgs with vue-svg-loader instead of the builder's default asset/resource rule
     const imageRule = config.module.rules.find((r) => r.test && r.test.toString().includes('svg'))

@@ -20428,11 +20428,6 @@ storybook-design-token@^3.3.0:
     prettier "^2.8.5"
     raw-loader "^4.0.2"
 
-storybook-vue-router@^1.0.7:
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/storybook-vue-router/-/storybook-vue-router-1.0.7.tgz#366451212149d9d0a32557545b244667bb01768e"
-  integrity sha512-R+DYARQ40YVbMbV5moLDmQvodJX5FQPVy5cULb782P1gD5rAkulWtgt8yrM7pmjYru+LTPdLS4blrFPnWlb0sQ==
-
 storybook@7.6.17:
   version "7.6.17"
   resolved "https://registry.yarnpkg.com/storybook/-/storybook-7.6.17.tgz#d7fdbbf57d61d386b3ccc6721285bc914f54269b"
