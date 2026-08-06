@@ -1,9 +1,7 @@
-import { addParameters, configure } from '@storybook/vue'
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { action } from '@storybook/addon-actions'
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import '!style-loader!css-loader!../assets/css/resets.css'
+import '../assets/css/resets.css'
 
 Vue.use(Vuex)
 Vue.component('nuxt-link', {
@@ -46,27 +44,14 @@ const cssTokenFiles = cssReq
   .keys()
   .map((filename) => ({ filename, content: cssReq(filename).default }))
 
-addParameters({
+export const parameters = {
   designToken: {
     files: {
       css: cssTokenFiles,
     },
   },
-})
-
-// Automatically import all files ending in *.stories.js
-const req = require.context('../components', true, /.story.js$/)
-
-function loadStories() {
-  req.keys().forEach(req)
-}
-
-// sort stories alphabetically
-addParameters({
   options: {
     storySort: (a, b) =>
       a[1].kind === b[1].kind ? 0 : a[1].id.localeCompare(b[1].id, { numeric: true }),
   },
-})
-
-configure(loadStories, module)
+}

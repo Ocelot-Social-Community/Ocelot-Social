@@ -1,5 +1,4 @@
 import { storiesOf } from '@storybook/vue'
-import { withA11y } from '@storybook/addon-a11y'
 import SearchableInput from './SearchableInput.vue'
 import helpers from '~/storybook/helpers'
 
@@ -117,7 +116,6 @@ export const searchResults = [
 ]
 
 storiesOf('SearchableInput', module)
-  .addDecorator(withA11y)
   .addDecorator(helpers.layout)
   .add('test', () => ({
     components: { SearchableInput },

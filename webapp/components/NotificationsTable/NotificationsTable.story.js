@@ -1,5 +1,4 @@
 import { storiesOf } from '@storybook/vue'
-import { withA11y } from '@storybook/addon-a11y'
 import { action } from '@storybook/addon-actions'
 import NotificationsTable from '~/components/NotificationsTable/NotificationsTable'
 import helpers from '~/storybook/helpers'
@@ -59,7 +58,6 @@ export const notifications = [
   },
 ]
 storiesOf('NotificationsTable', module)
-  .addDecorator(withA11y)
   .addDecorator(helpers.layout)
   .add('with notifications', () => ({
     components: { NotificationsTable },

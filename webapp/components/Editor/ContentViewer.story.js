@@ -1,5 +1,4 @@
 import { storiesOf } from '@storybook/vue'
-import { withA11y } from '@storybook/addon-a11y'
 import ContentViewer from '~/components/Editor/ContentViewer.vue'
 import { OsCard } from '@ocelot-social/ui'
 import helpers from '~/storybook/helpers'
@@ -7,7 +6,6 @@ import helpers from '~/storybook/helpers'
 helpers.init()
 
 storiesOf('ContentViewer', module)
-  .addDecorator(withA11y)
   .addDecorator((storyFn) => {
     const ctx = storyFn()
     return {

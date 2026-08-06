@@ -1,6 +1,5 @@
 import { faker } from '@faker-js/faker'
 import { storiesOf } from '@storybook/vue'
-import { withA11y } from '@storybook/addon-a11y'
 import { OsCard } from '@ocelot-social/ui'
 import HcEmpty from '~/components/Empty/Empty'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid'
@@ -62,7 +61,6 @@ const users = [
 ]
 
 storiesOf('TabNavigator', module)
-  .addDecorator(withA11y)
   .addDecorator(helpers.layout)
   .add('given search results of posts, users, hashtags', () => ({
     components: {

@@ -1,5 +1,4 @@
 import { storiesOf } from '@storybook/vue'
-import { withA11y } from '@storybook/addon-a11y'
 import UserTeaser from '~/components/UserTeaser/UserTeaser.vue'
 import helpers from '~/storybook/helpers'
 
@@ -93,7 +92,6 @@ export const group = {
 }
 
 storiesOf('UserTeaser', module)
-  .addDecorator(withA11y)
   .addDecorator(helpers.layout)
   .add('user only', () => ({
     components: { UserTeaser },

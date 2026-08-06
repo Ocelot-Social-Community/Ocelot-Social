@@ -1,5 +1,4 @@
 import { storiesOf } from '@storybook/vue'
-import { withA11y } from '@storybook/addon-a11y'
 import HcEditor from '~/components/Editor/Editor.vue'
 import { OsCard } from '@ocelot-social/ui'
 import helpers from '~/storybook/helpers'
@@ -34,7 +33,6 @@ const users = [
 ]
 
 storiesOf('Editor', module)
-  .addDecorator(withA11y)
   .addDecorator((storyFn) => {
     const ctx = storyFn()
     return {

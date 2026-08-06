@@ -1,5 +1,4 @@
 import { storiesOf } from '@storybook/vue'
-import { withA11y } from '@storybook/addon-a11y'
 import PostTeaser from './PostTeaser.vue'
 import helpers from '~/storybook/helpers'
 
@@ -48,7 +47,6 @@ export const post = {
 }
 
 storiesOf('PostTeaser', module)
-  .addDecorator(withA11y)
   .addDecorator(helpers.layout)
   .add('without image', () => ({
     components: { PostTeaser },

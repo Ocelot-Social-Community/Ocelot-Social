@@ -1,6 +1,5 @@
 import { faker } from '@faker-js/faker'
 import { storiesOf } from '@storybook/vue'
-import { withA11y } from '@storybook/addon-a11y'
 import HcCommentList from './CommentList.vue'
 import helpers from '~/storybook/helpers'
 
@@ -33,7 +32,6 @@ const comments = [
 ]
 
 storiesOf('CommentList', module)
-  .addDecorator(withA11y)
   .addDecorator(helpers.layout)
   .add('given 10 comments', () => ({
     components: { HcCommentList },

@@ -1,5 +1,4 @@
 import { storiesOf } from '@storybook/vue'
-import { withA11y } from '@storybook/addon-a11y'
 import { action } from '@storybook/addon-actions'
 
 import helpers from '~/storybook/helpers'
@@ -41,7 +40,6 @@ const noConnectionsUser = {
 }
 
 storiesOf('FollowList', module)
-  .addDecorator(withA11y)
   .addDecorator(helpers.layout)
   .add('without connections', () => {
     return {
