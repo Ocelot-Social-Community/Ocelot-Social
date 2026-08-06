@@ -19,7 +19,7 @@ const userWithoutAvatar = {
 const userWithAvatar = {
   ...user,
   name: 'Jochen Image',
-  avatar: { url: imageFile },
+  avatar: helpers.avatarImage(imageFile),
 }
 storiesOf('AvatarImage', module)
   .addDecorator(helpers.layout)

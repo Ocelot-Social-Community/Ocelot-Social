@@ -160,6 +160,13 @@ const helpers = {
       </layout>`,
     }
   },
+  // ResponsiveImage.vue (used by AvatarImage, PostTeaser, ...) builds its `srcset` from
+  // image.w320/w640/w1024 — a bare `{ url }` fixture renders `srcset="undefined 320w, ..."`, which
+  // the browser prefers over `src` and then 404s. None of the fixed test images below are served in
+  // multiple sizes, so every breakpoint just points at the same url.
+  avatarImage(url) {
+    return { url, w320: url, w640: url, w1024: url }
+  },
   fakeUser(n) {
     return new Array(n || 1).fill(0).map(() => {
       const name = faker.person.fullName()
