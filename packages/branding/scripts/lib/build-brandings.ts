@@ -7,6 +7,8 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
 
+import postcss from 'postcss'
+
 import { BUCKET_NAMES, extractBucket, instanceFile, splitConfig } from '../../dist/buckets.js'
 import { brandingDefaults } from '../../dist/defaults.js'
 import { deepMerge } from '../../dist/internal.js'
@@ -215,9 +217,29 @@ function loadThemeFromStylesheets(
   return declared
 }
 
-/** `:root` → `:root:root` in a packed stylesheet — see loadThemeFromStylesheets for why. */
+/**
+ * `:root` → `:root:root` in a packed stylesheet — see loadThemeFromStylesheets for why.
+ *
+ * Rewrites SELECTORS, which is why it parses rather than replaces text: to a regex a `}` inside a
+ * string or a comment looks exactly like the end of a rule, so `content: "}:root {"` used to come out
+ * of the build silently altered. Everything postcss did not touch is re-serialised from its original
+ * raws, so the packed file keeps the author's formatting verbatim.
+ *
+ * An unparseable stylesheet is shipped unchanged: it loses the specificity boost, which is a styling
+ * problem for that one brand, rather than failing a build that may cover many. loadThemeFromStylesheets
+ * has already warned about the same file by the time we get here.
+ */
 export function outSpecifyRoot(css: string): string {
-  return css.replace(/(^|[{};,]|\*\/)(\s*):root(?!:root)(?=\s*[,{])/g, '$1$2:root:root')
+  let root
+  try {
+    root = postcss.parse(css)
+  } catch {
+    return css
+  }
+  root.walkRules((rule) => {
+    rule.selectors = rule.selectors.map((s) => s.replace(/^:root(?!:root)/, ':root:root'))
+  })
+  return root.toString()
 }
 
 function loadLocaleFiles(

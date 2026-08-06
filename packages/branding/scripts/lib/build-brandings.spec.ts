@@ -16,6 +16,7 @@ import {
   brandVersion,
   buildBrandArchive,
   findConfig,
+  outSpecifyRoot,
   publishBrandArchive,
 } from './build-brandings.ts'
 
@@ -428,6 +429,30 @@ test('the packed stylesheet ships with :root raised to :root:root', async () => 
   // server put in <head>, so a plain :root would lose.
   assert.match(packed, /:root:root \{ --color-primary: new \}/)
   assert.match(packed, /\.footer \{ color: red \}/)
+})
+
+test('raising :root leaves selectors it does not own alone', () => {
+  assert.equal(outSpecifyRoot('.a, :root { --a: 1 }'), '.a, :root:root { --a: 1 }')
+  assert.equal(
+    outSpecifyRoot('@media (min-width: 600px) { :root { --a: 1 } }'),
+    '@media (min-width: 600px) { :root:root { --a: 1 } }',
+  )
+  assert.equal(outSpecifyRoot(':root:root { --a: 1 }'), ':root:root { --a: 1 }')
+})
+
+// A `}` inside a value or a comment reads like the end of a rule to a regex, which used to rewrite
+// straight into the string.
+test('raising :root does not reach into strings or comments', () => {
+  assert.equal(outSpecifyRoot('.x { content: "}:root {" }'), '.x { content: "}:root {" }')
+  assert.equal(
+    outSpecifyRoot('/* }:root { */ .y { color: red }'),
+    '/* }:root { */ .y { color: red }',
+  )
+})
+
+test('an unparseable stylesheet ships unchanged rather than failing the pack', () => {
+  const broken = ':root { --a: 1px'
+  assert.equal(outSpecifyRoot(broken), broken)
 })
 
 test('a stylesheet listed in assets.css that does not exist is reported', async () => {
