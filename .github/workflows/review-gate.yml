@@ -1,0 +1,154 @@
+name: "review gate CI"
+
+# Enforces that CodeRabbit has reviewed the *current* head commit of a pull request.
+#
+# Why this exists instead of requiring CodeRabbit's own check directly: CodeRabbit is a GitHub App,
+# not a workflow. When it stays silent — bot authored pull requests, path filters swallowing a
+# lockfile-only diff, paused incremental reviews — no status is ever reported and the required check
+# hangs on "Expected — Waiting for status to be reported" forever. A workflow job can be *skipped*,
+# and a skipped job counts as satisfied for branch protection. That gives us a deliberate escape
+# hatch for bots while keeping the gate strict for humans.
+#
+# Make the job below ("CodeRabbit Review") the required status check, not CodeRabbit's own one.
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+      - converted_to_draft
+  pull_request_review:
+    types:
+      - submitted
+      - dismissed
+
+# Deliberately NOT keyed by `event_name` (unlike the other workflows here): the pull_request run and
+# the pull_request_review run report the *same* check name. Letting both live would mean a run that
+# times out waiting for the review can land after the review-triggered run that already passed, and
+# the newest result wins. One group, cancel-in-progress: the review event supersedes the waiting run.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+  checks: read
+
+jobs:
+  coderabbit-review:
+    name: CodeRabbit Review
+    # Skipped -> counts as satisfied for branch protection. Bots (dependabot, renovate,
+    # github-actions, release bots) get a free pass because CodeRabbit does not reliably review them.
+    # Pull requests that do not target a branch CodeRabbit watches (see `base_branches` in
+    # .coderabbit.yaml) are skipped too, otherwise stacked pull requests would never go green.
+    if: >-
+      github.event.pull_request.user.type != 'Bot' &&
+      contains(fromJSON('["master", "main"]'), github.event.pull_request.base.ref)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Login of the reviewing app and the slug it publishes its check run under.
+      REVIEWER_LOGIN: "coderabbitai[bot]"
+      REVIEWER_APP_SLUG: "coderabbitai"
+      # How long to wait for the review before failing, and how often to look.
+      TIMEOUT_MINUTES: "15"
+      POLL_INTERVAL_SECONDS: "30"
+    steps:
+      - name: Draft pull request
+        # Drafts intentionally fail instead of skipping: skipping would report green and let a draft
+        # satisfy the gate. Drafts are not mergeable anyway, so red here is honest, not blocking.
+        if: github.event.pull_request.draft
+        run: |
+          echo "::error::Draft pull request — CodeRabbit does not review drafts (drafts: false). Mark it ready for review."
+          exit 1
+
+      - name: Wait for review of the head commit
+        if: ${{ !github.event.pull_request.draft }}
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const reviewerLogin = process.env.REVIEWER_LOGIN
+            const reviewerAppSlug = process.env.REVIEWER_APP_SLUG
+            const pollIntervalMs = Number(process.env.POLL_INTERVAL_SECONDS) * 1000
+            const deadline = Date.now() + Number(process.env.TIMEOUT_MINUTES) * 60 * 1000
+
+            const { owner, repo } = context.repo
+            const pullNumber = context.payload.pull_request.number
+
+            const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+            // Re-read the pull request on every attempt: a push during the wait moves the head and
+            // an older review must not satisfy the gate.
+            const findReview = async () => {
+              const { data: pullRequest } = await github.rest.pulls.get({
+                owner,
+                repo,
+                pull_number: pullNumber,
+              })
+              const headSha = pullRequest.head.sha
+
+              const reviews = await github.paginate(github.rest.pulls.listReviews, {
+                owner,
+                repo,
+                pull_number: pullNumber,
+                per_page: 100,
+              })
+              const review = reviews.find(
+                (candidate) =>
+                  candidate.user?.login === reviewerLogin &&
+                  candidate.commit_id === headSha &&
+                  candidate.state !== 'PENDING',
+              )
+              if (review) {
+                return { headSha, evidence: `review ${review.state} (${review.html_url})` }
+              }
+
+              // Second signal: CodeRabbit publishes a check run even when it has nothing to say in a
+              // review (empty diff after path filters, for example).
+              const { data: checks } = await github.rest.checks.listForRef({
+                owner,
+                repo,
+                ref: headSha,
+                per_page: 100,
+              })
+              const checkRun = checks.check_runs.find(
+                (candidate) =>
+                  candidate.app?.slug === reviewerAppSlug && candidate.status === 'completed',
+              )
+              if (checkRun) {
+                return { headSha, evidence: `check run "${checkRun.name}" (${checkRun.conclusion})` }
+              }
+
+              return { headSha, evidence: null }
+            }
+
+            let headSha
+            for (;;) {
+              const attempt = await findReview()
+              headSha = attempt.headSha
+              if (attempt.evidence) {
+                core.info(`${reviewerLogin} reviewed ${headSha}: ${attempt.evidence}`)
+                await core.summary
+                  .addHeading('CodeRabbit review found', 3)
+                  .addRaw(`Head commit \`${headSha}\` — ${attempt.evidence}`)
+                  .write()
+                return
+              }
+
+              const remainingMs = deadline - Date.now()
+              if (remainingMs <= 0) break
+              core.info(
+                `No review by ${reviewerLogin} on ${headSha} yet, retrying in ` +
+                  `${pollIntervalMs / 1000}s (${Math.ceil(remainingMs / 1000)}s left).`,
+              )
+              await sleep(Math.min(pollIntervalMs, remainingMs))
+            }
+
+            core.setFailed(
+              `${reviewerLogin} has not reviewed head commit ${headSha}. ` +
+                'Comment "@coderabbitai review" on the pull request to trigger one — CodeRabbit ' +
+                'pauses incremental reviews after several commits (auto_pause_after_reviewed_commits).',
+            )
