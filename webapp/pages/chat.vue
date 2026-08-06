@@ -108,7 +108,7 @@ export default {
   }
 
   .main-container {
-    padding-top: var(--header-height, 66px) !important;
+    padding-top: var(--header-height) !important;
     padding-bottom: 0 !important;
   }
 }
@@ -117,7 +117,7 @@ export default {
   --footer-height: 40px;
   display: flex;
   flex-direction: column;
-  height: calc(100dvh - var(--header-height, 66px) - var(--footer-height));
+  height: calc(100dvh - var(--header-height) - var(--footer-height));
   overflow: hidden;
 
   > * {

@@ -66,7 +66,7 @@ export default {
     height: inherit;
     background: transparent;
     display: block;
-    border-color: #fff;
+    border-color: var(--color-neutral-100);
     border-style: solid;
     border-width: 0 6px 0 6px;
     box-sizing: border-box;

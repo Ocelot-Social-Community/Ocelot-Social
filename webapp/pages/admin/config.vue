@@ -12,7 +12,9 @@
          value masked (present, but the value is never sent to the client). -->
     <div class="config-table-wrap">
       <table class="config-table" data-test="config-table">
-        <caption class="config-caption">{{ $t('admin.config.tableCaption') }}</caption>
+        <caption class="config-caption">
+          {{ $t('admin.config.tableCaption') }}
+        </caption>
         <colgroup>
           <col class="col--key" />
           <col class="col--effective" />
@@ -356,7 +358,7 @@ export default {
     /*  by border-collapse while scrolling); opaque background so scrolled rows don't show through. */
     border-bottom: none;
     position: sticky;
-    top: var(--header-height, 6rem);
+    top: var(--header-height);
     z-index: var(--z-index-sticky);
     background: var(--background-color-base);
     box-shadow: inset 0 -2px 0 var(--border-color-softer);
@@ -364,7 +366,7 @@ export default {
 }
 
 /*  Desktop: room for all five columns (env value + software default are re-added). */
-@media (min-width: 768px) {
+@media (--vp-tablet-up) {
   .config-table {
     .col--key {
       width: 24%;

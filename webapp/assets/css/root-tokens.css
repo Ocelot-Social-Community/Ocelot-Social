@@ -19,7 +19,7 @@
  */
 
 :root {
-/**
+  /**
  * @tokens Color Brand
  * @presenter Color
  */
@@ -40,7 +40,7 @@
   --color-danger-inverse: rgb(253, 243, 242);
   --color-warning-inverse: rgb(253, 247, 241);
   --color-yellow: rgb(245, 196, 0);
-/**
+  /**
  * @tokens Color Neutral
  * @presenter Color
  */
@@ -58,60 +58,60 @@
   --color-neutral-90: rgb(245, 244, 246);
   --color-neutral-95: rgb(250, 249, 250);
   --color-neutral-100: rgb(255, 255, 255);
-/**
+  /**
  * @tokens Color Text
  * @presenter Color
  */
 
-  --text-color-base: rgb(75, 69, 84);
-  --text-color-soft: rgb(112, 103, 126);
-  --text-color-softer: rgb(177, 171, 186);
-  --text-color-disabled: rgb(177, 171, 186);
-  --text-color-inverse: rgb(250, 249, 250);
+  --text-color-base: var(--color-neutral-20);
+  --text-color-soft: var(--color-neutral-40);
+  --text-color-softer: var(--color-neutral-60);
+  --text-color-disabled: var(--color-neutral-60);
+  --text-color-inverse: var(--color-neutral-95);
   --text-color-link: var(--color-primary);
   --text-color-link-active: var(--color-primary-highlight);
   --text-color-primary: var(--color-primary);
-  --text-color-primary-inverse: rgb(241, 253, 244);
+  --text-color-primary-inverse: var(--color-primary-inverse);
   --text-color-secondary: var(--color-secondary);
-  --text-color-secondary-inverse: rgb(240, 249, 255);
+  --text-color-secondary-inverse: var(--color-secondary-inverse);
   --text-color-success: var(--color-success);
   --text-color-warning: var(--color-warning);
   --text-color-danger: var(--color-danger);
-  --text-color-danger-inverse: rgb(253, 243, 242);
-/**
+  --text-color-danger-inverse: var(--color-danger-inverse);
+  /**
  * @tokens Color Background
  * @presenter Color
  */
 
-  --background-color-base: rgb(255, 255, 255);
-  --background-color-soft: rgb(250, 249, 250);
-  --background-color-softer: rgb(245, 244, 246);
-  --background-color-softer-active: rgb(250, 249, 250);
-  --background-color-softest: rgb(239, 238, 241);
-  --background-color-inverse: rgb(25, 23, 28);
-  --background-color-inverse-soft: rgb(40, 37, 45);
-  --background-color-disabled: rgb(245, 244, 246);
+  --background-color-base: var(--color-neutral-100);
+  --background-color-soft: var(--color-neutral-95);
+  --background-color-softer: var(--color-neutral-90);
+  --background-color-softer-active: var(--color-neutral-95);
+  --background-color-softest: var(--color-neutral-85);
+  --background-color-inverse: var(--color-neutral-0);
+  --background-color-inverse-soft: var(--color-neutral-10);
+  --background-color-disabled: var(--color-neutral-90);
   --background-color-primary: var(--color-primary);
-  --background-color-primary-inverse: rgb(241, 253, 244);
+  --background-color-primary-inverse: var(--color-primary-inverse);
   --background-color-warning: var(--color-warning);
-/**
+  /**
  * @tokens Color Border
  * @presenter Color
  */
 
-  --border-color-base: rgb(177, 171, 186);
-  --border-color-soft: rgb(203, 199, 209);
-  --border-color-softer: rgb(229, 227, 232);
+  --border-color-base: var(--color-neutral-60);
+  --border-color-soft: var(--color-neutral-70);
+  --border-color-softer: var(--color-neutral-80);
   --border-color-active: var(--color-primary);
   --border-color-danger: var(--color-danger);
-/**
+  /**
  * @tokens Border Size
  * @presenter Border
  */
 
   --border-size-base: 1px;
   --border-size-large: 3px;
-/**
+  /**
  * @tokens Border Radius
  * @presenter BorderRadius
  */
@@ -120,7 +120,7 @@
   --border-radius-base: 4px;
   --border-radius-small: 2px;
   --border-radius-rounded: 2em;
-/**
+  /**
  * @tokens Font Size
  * @presenter FontSize
  */
@@ -134,20 +134,20 @@
   --font-size-small: 0.8rem;
   --font-size-x-small: 0.7rem;
   --font-size-xx-small: 0.6rem;
-/**
+  /**
  * @tokens Font Space
  * @presenter Spacing
  */
 
   --font-space-x-large: 1em;
   --font-space-large: 0.6em;
-/**
+  /**
  * @tokens Font Family
  * @presenter FontFamily
  */
 
   --font-family-serif: 'Gentium Basic', serif;
-/**
+  /**
  * @tokens Font Weight
  * @presenter FontWeight
  */
@@ -158,18 +158,18 @@
   --text-weight-regular: normal;
   --text-weight-bold: 600;
 
-/**
+  /**
  * @tokens Line Height
  * @presenter LineHeight
  */
 
   --line-height-base: 1.3;
-/**
+  /**
  * @tokens Letter Spacing
  * @presenter Spacing
  */
 
-/**
+  /**
  * @tokens Opacity
  * @presenter Opacity
  */
@@ -177,7 +177,7 @@
   --opacity-base: 1;
   --opacity-soft: 0.7;
   --opacity-disabled: 0.5;
-/**
+  /**
  * @tokens Space
  * @presenter Spacing
  */
@@ -191,14 +191,22 @@
   --space-xx-small: 4px;
   --space-xxx-small: 2px;
   --space-none: 0;
-/**
+  /**
  * @tokens Size Height
  * @presenter Spacing
  */
 
   --size-height-connections: 315px;
   --size-ribbon: 6px;
-/**
+  /* Chrome heights, MEASURED AND OVERWRITTEN AT RUNTIME: HeaderMenu.updateHeaderOffset() and
+     PageFooter both write these onto document.documentElement, and an inline style on <html> outranks
+     this rule, so what stands here is only the value that applies before hydration — during SSR and
+     on the first paint. It lives here so there is ONE such value: the consumers used to carry it as a
+     var() fallback each, and had drifted to three different numbers (6rem, 53px, 66px) for the same
+     header. Consumers now reference the token bare. */
+  --header-height: 66px;
+  --footer-height: 0px;
+  /**
  * @tokens Size Width
  * @presenter Spacing
  */
@@ -206,7 +214,7 @@
   --size-width-filter-sidebar: 85px;
   --size-width-paginate: 200px;
   --size-max-width-filter-menu: 1026px;
-/**
+  /**
  * @tokens Size Avatar
  * @presenter Spacing
  */
@@ -214,30 +222,39 @@
   --size-avatar-small: 34px;
   --size-avatar-base: 44px;
   --size-avatar-large: 114px;
-/**
+  /**
  * @tokens Size Buttons
  * @presenter Spacing
  */
 
-/**
+  /**
  * @tokens Size Input
  * @presenter Spacing
  */
 
-/*  Derived so that an input's box height always follows its own font size, padding and */
-/*  border. Moved here from _styleguide-tokens.scss; the unused x-large step was dropped */
-/*  (it was derived from $input-font-size-large, not from an x-large font size). */
+  /*  Derived so that an input's box height always follows its own font size, padding and */
+  /*  border. Moved here from _styleguide-tokens.scss; the unused x-large step was dropped */
+  /*  (it was derived from $input-font-size-large, not from an x-large font size). */
   --input-border-size: var(--border-size-base);
   --input-font-size-base: var(--font-size-base);
   --input-padding-vertical: var(--space-x-small);
-  --input-height: calc(var(--input-font-size-base) * var(--line-height-base) + (var(--input-padding-vertical) + var(--input-border-size)) * 2);
+  --input-height: calc(
+    var(--input-font-size-base) * var(--line-height-base) +
+      (var(--input-padding-vertical) + var(--input-border-size)) * 2
+  );
   --input-font-size-small: var(--font-size-base);
   --input-padding-vertical-small: var(--space-xxx-small);
-  --input-height-small: calc(var(--input-font-size-small) * var(--line-height-base) + (var(--input-padding-vertical-small) + var(--input-border-size)) * 2);
+  --input-height-small: calc(
+    var(--input-font-size-small) * var(--line-height-base) +
+      (var(--input-padding-vertical-small) + var(--input-border-size)) * 2
+  );
   --input-font-size-large: var(--font-size-large);
   --input-padding-vertical-large: var(--space-x-small);
-  --input-height-large: calc(var(--input-font-size-large) * var(--line-height-base) + (var(--input-padding-vertical-large) + var(--input-border-size)) * 2);
-/**
+  --input-height-large: calc(
+    var(--input-font-size-large) * var(--line-height-base) +
+      (var(--input-padding-vertical-large) + var(--input-border-size)) * 2
+  );
+  /**
  * @tokens Size Images
  * @presenter Spacing
  */
@@ -246,38 +263,38 @@
   --size-image-cropper-max-height: 600px;
   --size-image-cropper-min-height: 400px;
   --size-image-uploader-min-height: 250px;
-/**
+  /**
  * @tokens Size Icons
  * @presenter Spacing
  */
 
   --size-icon-large: 60px;
-/**
+  /**
  * @tokens Shadow
  * @presenter Shadow
  */
 
-  --box-shadow-x-large: 0 15px 30px 0 rgba(0,0,0,.11),0 5px 15px 0 rgba(0,0,0,.08);
-  --box-shadow-large: 0 10px 20px 0 rgba(0,0,0,.11),0 3px 10px 0 rgba(0,0,0,.08);
-  --box-shadow-base: 0px 12px 26px -4px rgba(0, 0, 0, .1);
-/**
+  --box-shadow-x-large: 0 15px 30px 0 rgba(0, 0, 0, 0.11), 0 5px 15px 0 rgba(0, 0, 0, 0.08);
+  --box-shadow-large: 0 10px 20px 0 rgba(0, 0, 0, 0.11), 0 3px 10px 0 rgba(0, 0, 0, 0.08);
+  --box-shadow-base: 0px 12px 26px -4px rgba(0, 0, 0, 0.1);
+  /**
  * @tokens Effects
  */
 
   --blur-radius: 22px;
-/**
+  /**
  * @tokens Animation Duration
  */
 
   --duration-short: 0.08s;
   --duration-base: 0.5s;
-/**
+  /**
  * @tokens Animation Ease
  * @presenter Easing
  */
 
   --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-/**
+  /**
  * @tokens Z-Index
  */
 
@@ -288,16 +305,16 @@
   --z-index-sticky-float: 150;
   --z-index-sticky: 100;
   --z-index-surface: 1;
-/**
+  /**
  * @tokens Media Query
  */
 
   --container-max-width-x-large: 1200px;
-/**
+  /**
  * @tokens Background Images
  */
 
-/**
+  /**
  * @tokens Header Color
  */
 
@@ -306,17 +323,17 @@
      here — one visible source instead of a value hidden in a fallback. */
   --color-header-background: var(--color-neutral-100);
 
-/**
+  /**
  * @tokens Footer Color
  */
 
   --color-footer-background: var(--color-neutral-100);
   --color-footer-link: var(--color-primary);
-/**
+  /**
  * @tokens Locale Menu Color
  */
 
-/**
+  /**
  * @tokens Donation Bar Color
  */
 
@@ -326,7 +343,7 @@
   --color-donation-bar: var(--color-primary);
 
   --color-donation-bar-light: var(--color-primary-light);
-/**
+  /**
  * @tokens Toast Color
  */
 
@@ -339,7 +356,7 @@
   --color-toast-orange: var(--color-warning);
   --color-toast-yellow: var(--color-yellow);
   --color-toast-blue: var(--color-secondary);
-/**
+  /**
  * @tokens Ribbon Color
  */
 
@@ -357,7 +374,7 @@
   /*  Literal, not derived: this used to be a build-time color.adjust() of --color-ribbon-event. */
   /*  Kept at its exact vanilla value — a color-mix() approximation would have shifted the colour. */
   --color-ribbon-event-shadow: #6001ff;
-/**
+  /**
  * @tokens Chat Color
  */
 
@@ -371,10 +388,15 @@
   --chat-message-checkmark: var(--text-color-soft);
   --chat-room-color-counter-badge: var(--text-color-inverse);
   --chat-room-background-counter-badge: var(--color-danger);
+  /* The room name next to its icon (Chat.vue .room-name-with-icon). Was referenced without ever being
+     declared and without a fallback, so `color` resolved to nothing and the browser dropped the whole
+     declaration — the name rendered in the inherited colour. Same family and same value as
+     --chat-message-color, which is what it visually pairs with. */
+  --chat-room-color-username: var(--text-color-base);
 
   --chat-message-color: var(--text-color-base);
   --chat-message-bg-others: var(--color-neutral-80);
-  --chat-sidemenu-bg: white;
+  --chat-sidemenu-bg: var(--color-neutral-100);
   /* The hover partner of --chat-sidemenu-bg. Carried over as a literal because the SCSS side had it
      as one too ($chat-sidemenu-background-over); it is a token rather than a value inlined in
      constants/chatTokens.js so a brand can actually reach it, like every other chat token. */
@@ -382,4 +404,5 @@
   --chat-message-timestamp: var(--text-color-soft);
   --chat-icon-add: var(--color-primary);
   --chat-icon-send: var(--color-primary);
-  --chat-icon-emoji: var(--color-primary);}
+  --chat-icon-emoji: var(--color-primary);
+}

@@ -75,13 +75,13 @@ export default {
     text-transform: uppercase;
   }
 }
-@media (min-width: 600px) {
+@media (--vp-small-up) {
   .admin-stats__item {
     flex: 0 0 50%;
     width: 50%;
   }
 }
-@media (min-width: 768px) {
+@media (--vp-tablet-up) {
   .admin-stats__item {
     flex: 0 0 33.333%;
     width: 33.333%;

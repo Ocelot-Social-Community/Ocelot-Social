@@ -182,7 +182,7 @@ export default {
 
 <style>
 .add-chat-room-by-user-search {
-  background-color: white;
+  background-color: var(--color-neutral-100);
   padding: var(--space-base);
   scroll-margin-top: 7rem;
 }

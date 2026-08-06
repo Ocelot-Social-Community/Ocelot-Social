@@ -1174,8 +1174,8 @@ export default {
   right: 0;
   bottom: 0;
   left: 0;
-  padding-top: var(--header-height, 6rem);
-  padding-bottom: var(--footer-height, 0px);
+  padding-top: var(--header-height);
+  padding-bottom: var(--footer-height);
   z-index: var(--z-index-surface);
   /*  The base .video-call rule paints a var(--box-shadow-large) around the panel. */
   /*  When the panel covers the full viewport that shadow has nowhere to land */
@@ -1210,7 +1210,7 @@ export default {
   z-index: calc(var(--z-index-overlay) + 1);
 }
 
-@media (max-width: 810px) {
+@media (--vp-mobile) {
   .video-call--modal {
     /*  Use the full viewport on mobile — the split layout already collapses */
     /*  vertically inside PreJoin.vue at this breakpoint. */
@@ -1432,7 +1432,7 @@ export default {
   gap: var(--space-xxx-small);
 }
 
-@media (max-width: 810px) {
+@media (--vp-mobile) {
   .video-call--minimized {
     inset: 0;
     width: auto;
