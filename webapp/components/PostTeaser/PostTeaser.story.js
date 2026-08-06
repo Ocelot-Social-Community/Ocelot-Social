@@ -41,6 +41,7 @@ export const post = {
   },
   commentsCount: 12,
   categories: [],
+  postType: ['Article'],
   shoutedCount: 421,
   viewedTeaserCount: 1584,
   __typename: 'Post',

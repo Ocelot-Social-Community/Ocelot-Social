@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import VueRouter from 'vue-router'
 import vuexI18n from 'vuex-i18n/dist/vuex-i18n.umd.js'
 import { faker } from '@faker-js/faker'
 import Filters from '~/plugins/vue-filters'
@@ -9,10 +10,20 @@ import layout from './layout.vue'
 import locales from '~/locales/index.js'
 import '~/plugins/v-tooltip'
 
+Vue.use(VueRouter)
+// Shared across every story via `layout()` below — Nuxt always provides a router, so components
+// that read `this.$route` (directly, or transitively through data()) assume it exists. Without this,
+// data() throws before ever reaching its other fields, which is why unrelated props show up as
+// "not defined on the instance" — Vue swallows the data() error and continues with an empty object.
+const router = new VueRouter()
+
 const helpers = {
   init(options = {}) {
     Vue.use(Vuex)
-    Vue.use(Filters)
+    // `~/plugins/vue-filters` is a Nuxt plugin — it expects `({ app })`, not the `Vue` constructor
+    // `Vue.use` would hand it. Called wrong, `getDateFnsLocale` closes over an app without `$i18n`
+    // and throws the moment `date`/`dateTime` filters actually run.
+    Filters({ app: { $i18n: { locale: () => 'en' } } })
     Vue.use(IziToast)
     Vue.use(Directives)
 
@@ -23,6 +34,15 @@ const helpers = {
 
     Vue.i18n.set('en')
     Vue.i18n.fallback('en')
+
+    // Mirrors ~/plugins/permissions.js and ~/plugins/policy.js, which inject $can/$policy via the
+    // Nuxt plugin context — a mechanism storybook never runs. Stories get the permissive default
+    // (everything allowed) rather than every gated template throwing on an undefined method.
+    Vue.prototype.$can = (permission) => helpers.store.getters['auth/can'](permission)
+    Vue.prototype.$policy = {
+      get: (key) => helpers.store.getters['policy/getEffective'](key),
+      snapshot: () => helpers.store.getters['policy/snapshot'],
+    }
 
     const { plugins = [] } = options
     plugins.forEach((plugin) => Vue.use(plugin))
@@ -44,6 +64,31 @@ const helpers = {
           user() {
             return { id: '1', name: 'admin', slug: 'admin' }
           },
+          can() {
+            return () => true
+          },
+        },
+      },
+      policy: {
+        namespaced: true,
+        getters: {
+          getEffective: () => () => true,
+          snapshot: () => ({}),
+        },
+      },
+      categories: {
+        namespaced: true,
+        state: () => ({ categories: [], isInitialized: false }),
+        mutations: {
+          SET_CATEGORIES() {},
+          SET_INIZIALIZED() {},
+        },
+        actions: {
+          init() {},
+        },
+        getters: {
+          categories: (state) => state.categories,
+          isInitialized: (state) => state.isInitialized,
         },
       },
     },
@@ -51,6 +96,7 @@ const helpers = {
   layout(storyFn) {
     const ctx = storyFn()
     return {
+      router,
       components: { ctx, layout },
       template: `
       <layout>
