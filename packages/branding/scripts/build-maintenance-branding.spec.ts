@@ -220,6 +220,38 @@ describe('build-maintenance-branding', () => {
     assert.match(sheet, /--font-family-text: 'Acme Sans', sans-serif/)
   })
 
+  // @import order is cascade order. The archive is walked with readdirSync (filesystem order), so
+  // taking the sheets as they come out of it would let the filesystem decide which of two brand
+  // stylesheets wins — here it would invert the brand's choice, since 'a-override' sorts before
+  // 'z-base'. Deliberately non-alphabetical config order is the whole point of the fixture.
+  test('imports the stylesheets in the order assets.css lists them', () => {
+    const dir = tmp('ocelot-brand-order-')
+    write(join(dir, 'package.json'), JSON.stringify({ name: 'acme-branding', version: '1.0.0' }))
+    write(
+      join(dir, 'brand.config.mjs'),
+      `export default (defineBranding) =>
+  defineBranding({
+    metadata: { applicationName: 'Acme' },
+    assets: { css: ['assets/z-base.css', 'assets/a-override.css'] },
+  })
+`,
+    )
+    write(join(dir, 'assets/z-base.css'), ':root { --color-primary: from-z-base }')
+    write(join(dir, 'assets/a-override.css'), ':root { --color-primary: from-a-override }')
+
+    const to = maintenanceDir()
+    brand(dir, to)
+
+    const css = readText(to, 'app/assets/css/brand.css')
+    assert.match(
+      css,
+      /@import url\("\/brand\/z-base\.css"\);[\s\S]*@import url\("\/brand\/a-override\.css"\);/,
+    )
+    // Both are still unpacked — a sheet's url() has to resolve whatever its place in the cascade.
+    assert.ok(existsSync(join(to, 'public/brand/z-base.css')))
+    assert.ok(existsSync(join(to, 'public/brand/a-override.css')))
+  })
+
   // The logo travels as a metadata KEY because its filename and extension vary per brand — app.vue
   // reads metadata.LOGO instead of hard-coding a path.
   test('serves the logo from its own directory and names it in the metadata overlay', () => {

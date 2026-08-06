@@ -109,14 +109,20 @@ function archiveEntry(namespaced: string): { entry: string; data: Buffer } | nul
 // (@font-face, background images) resolves without anything rewriting it. An earlier version parsed
 // @font-face out of the CSS and rewrote each src by hand; unpacking makes that unnecessary, and it
 // also carries rules this page never knew about.
-const servedSheets: string[] = []
+const servedUrls = new Map<string, string>()
 for (const [entry, data] of archive) {
   if (!entry.startsWith('assets/')) continue
-  const url = serveEntry(entry, data)
-  if (config.assets.css.some((href) => href.endsWith(`/${entry}`) || href === entry)) {
-    servedSheets.push(url)
-  }
+  servedUrls.set(entry, serveEntry(entry, data))
 }
+
+// The sheets are taken in the order the BRAND configured them, not in the order they happen to sit in
+// the archive (collectFiles walks readdirSync, which is filesystem order — not even sorted). @import
+// order IS cascade order, so where two sheets set the same property at equal specificity, iterating the
+// archive would hand the win to whichever file the filesystem listed last. `assets.css` is where the
+// brand says which sheet wins; the live webapp loads them in exactly that order.
+const servedSheets = config.assets.css
+  .map((href) => servedUrls.get(href.replace(/^\/branding\/[^/]+\//, '')))
+  .filter((url): url is string => Boolean(url))
 
 // @import rather than inlining: an inlined rule would resolve its url() against THIS file instead of
 // against the stylesheet it came from. No :root block is generated any more — the brand's own sheet
