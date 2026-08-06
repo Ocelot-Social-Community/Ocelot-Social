@@ -131,6 +131,9 @@
       "noneExtra": null,
       "schema": null,
       "schemaTitle": null,
+      "stylesheets": "Власні таблиці стилів",
+      "stylesheetUnreadable": "не вдалося прочитати",
+      "stylesheetVars": "{count} властивість теми ::: {count} властивості теми",
       "title": null,
       "vanilla": null
     },

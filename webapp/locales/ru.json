@@ -131,6 +131,9 @@
       "noneExtra": null,
       "schema": null,
       "schemaTitle": null,
+      "stylesheets": "Собственные таблицы стилей",
+      "stylesheetUnreadable": "не удалось прочитать",
+      "stylesheetVars": "{count} свойство темы ::: {count} свойства темы ::: {count} свойств темы",
       "title": null,
       "vanilla": null
     },

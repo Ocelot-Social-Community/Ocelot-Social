@@ -131,6 +131,9 @@
       "noneExtra": null,
       "schema": null,
       "schemaTitle": null,
+      "stylesheets": "Eigen stylesheets",
+      "stylesheetUnreadable": "niet leesbaar",
+      "stylesheetVars": "{count} thema-eigenschap ::: {count} thema-eigenschappen",
       "title": null,
       "vanilla": null
     },

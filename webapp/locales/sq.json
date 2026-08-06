@@ -131,6 +131,9 @@
       "noneExtra": null,
       "schema": null,
       "schemaTitle": null,
+      "stylesheets": "Fletë stili të veta",
+      "stylesheetUnreadable": "nuk mund të lexohet",
+      "stylesheetVars": "{count} veti e temës ::: {count} veti të temës",
       "title": null,
       "vanilla": null
     },

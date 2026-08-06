@@ -131,6 +131,9 @@
       "noneExtra": null,
       "schema": null,
       "schemaTitle": null,
+      "stylesheets": "Własne arkusze stylów",
+      "stylesheetUnreadable": "nie można odczytać",
+      "stylesheetVars": "{count} właściwość motywu ::: {count} właściwości motywu",
       "title": null,
       "vanilla": null
     },
