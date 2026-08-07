@@ -42,8 +42,8 @@ describe('manifest serverMiddleware', () => {
         applicationName: 'yunite.me',
         applicationShortName: 'yunite',
       },
-      // The PWA theme_color is the brand's primary colour (no separate metadata.themeColor).
-      theme: { ...brandingDefaults.theme, themeColor: 'rgb(110, 139, 135)' },
+      // The PWA theme_color is the brand's own `color-primary` theme token — no field of its own.
+      theme: { ...brandingDefaults.theme, tokens: { 'color-primary': 'rgb(110, 139, 135)' } },
     })
     const { json } = run()
     expect(json.name).toBe('yunite.me')

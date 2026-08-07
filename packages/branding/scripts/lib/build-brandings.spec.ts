@@ -63,7 +63,7 @@ function brandDir({
 const ACME_CONFIG = `export default (defineBranding) =>
   defineBranding({
     metadata: { applicationName: 'Acme' },
-    theme: { themeColor: 'red' },
+    
     logos: { signupPath: 'assets/logo-squared.svg' },
   })
 `
@@ -147,9 +147,10 @@ test('buildBrandArchive emits a PARTIAL library: only customised buckets get a f
   const types = readManifest(readTarGz(built.gz))
     .instances.map((i) => i.type)
     .sort()
-  // theme (themeColor), identity (applicationName + derived ogImage), logos (signupPath) customised;
-  // legal / navigation / behavior untouched → NOT emitted.
-  assert.deepEqual(types, ['identity', 'logos', 'theme'])
+  // identity (applicationName + derived ogImage) and logos (signupPath) customised; legal /
+  // navigation / behavior untouched → NOT emitted. NOR theme: it is derived from the brand's
+  // stylesheets, and this fixture ships none (the stylesheet path is covered further down).
+  assert.deepEqual(types, ['identity', 'logos'])
 })
 
 test('buildBrandArchive namespaces asset paths and derives ogImage from the squared logo', async () => {
@@ -201,6 +202,57 @@ test('buildBrandArchive namespaces css, favicon, icon and html-per-locale paths'
   assert.equal(config.assets.html.imprint.en, '/branding/acme/html/imprint.en.html')
   // the framework's /img/custom/.
   assert.equal(config.headerMenu.customButton.iconPath, '/branding/acme/assets/button.svg')
+})
+
+// A brand's theme reaches its e-mails through ONE generated file, overlaid onto the framework's empty
+// placeholder at backend bootstrap. Nothing else connects assets.css to a mail.
+describe('the e-mail stylesheet', () => {
+  const EMAIL_CSS = 'emails/templates/includes/branding.css'
+
+  const themed = (css: string, files = {}) =>
+    brandDir({
+      config: `export default (d) => d({
+        metadata: { applicationName: 'Acme' },
+        assets: { css: ['assets/theme.css'] },
+      })
+`,
+      assets: { 'theme.css': css },
+      files,
+    })
+
+  test('is generated from the tokens the brand overrides', async () => {
+    const dir = themed(':root { --color-primary: rgb(239, 124, 0); }')
+
+    const css = readTarGz((await buildBrandArchive(dir)).gz)
+      .get(EMAIL_CSS)
+      .toString()
+
+    // Literals, never var(): no mail client resolves custom properties (see lib/emailTheme.ts).
+    assert.equal(css.includes('var('), false)
+    assert.match(css, /a \{\n {2}color: rgb\(239, 124, 0\);\n\}/)
+    assert.match(css, /background: rgb\(239, 124, 0\);/)
+  })
+
+  // Otherwise every archive would carry a stylesheet restating the framework's own values, and a
+  // later change to the framework's mail styling would be silently overridden by all of them.
+  test('is omitted for a brand that overrides nothing a mail renders', async () => {
+    const dir = themed(':root { --color-neutral-50: pink; }')
+
+    assert.equal(readTarGz((await buildBrandArchive(dir)).gz).has(EMAIL_CSS), false)
+  })
+
+  // A hand-written file is a deliberate choice and has to win over anything derived.
+  test('never overwrites one the brand wrote itself', async () => {
+    const dir = themed(':root { --color-primary: rgb(239, 124, 0); }', {
+      [EMAIL_CSS]: 'a { color: hotpink; }',
+    })
+
+    const css = readTarGz((await buildBrandArchive(dir)).gz)
+      .get(EMAIL_CSS)
+      .toString()
+
+    assert.equal(css, 'a { color: hotpink; }')
+  })
 })
 
 test('buildBrandArchive warns on a SOURCE stylesheet in assets/ (packed but never compiled)', async () => {
@@ -376,14 +428,19 @@ test('the PWA colour is evaluated from --color-primary in a listed stylesheet', 
   const built = await buildBrandArchive(dir)
   const files = readTarGz(built.gz)
   const theme = JSON.parse(files.get('fragments/theme.default.json'))
-  assert.equal(theme.theme.themeColor, 'rgb(1, 2, 3)')
-  // The declarations themselves stay in the stylesheet — only the PWA colour is lifted into config.
+  assert.equal(theme.theme.tokens['color-primary'], 'rgb(1, 2, 3)')
+  // Every token the brand declares travels, not just the PWA colour — and the declarations themselves
+  // stay in the stylesheet, which is what the webapp actually renders from.
+  assert.equal(theme.theme.tokens['font-family-text'], 'Inter, sans-serif')
   assert.match(String(files.get('assets/theme.css')), /--font-family-text: Inter, sans-serif/)
+  // Framework tokens the brand did NOT touch stay out: storing them would freeze the framework's
+  // palette into this archive, to go stale the next time a default moves.
+  assert.equal('color-danger' in theme.theme.tokens, false)
   assert.equal(built.warnings.join('\n').includes('theme.css'), false)
 })
 
-// A manifest has no media queries: whatever travels as themeColor is shown unconditionally, so it has
-// to be the value that applies unconditionally.
+// A manifest has no media queries: whatever travels in theme.tokens is applied unconditionally, so it
+// has to be the value that holds unconditionally.
 test('a dark-mode override does not become the PWA colour', async () => {
   const dir = brandDir({
     config: `export default (d) => d({ assets: { css: ['assets/theme.css'] } })\n`,
@@ -396,7 +453,7 @@ test('a dark-mode override does not become the PWA colour', async () => {
 
   const built = await buildBrandArchive(dir)
   const theme = JSON.parse(readTarGz(built.gz).get('fragments/theme.default.json'))
-  assert.equal(theme.theme.themeColor, 'rgb(1, 2, 3)')
+  assert.equal(theme.theme.tokens['color-primary'], 'rgb(1, 2, 3)')
 })
 
 test('a --color-primary that only holds inside an at-rule is reported', async () => {

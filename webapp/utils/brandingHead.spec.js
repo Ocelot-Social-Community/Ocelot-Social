@@ -13,7 +13,7 @@ describe('brandingCssHrefs', () => {
 describe('brandingHeadHtml', () => {
   const branding = {
     assets: { css: ['/branding/acme/assets/css/branding.css'] },
-    theme: { themeColor: 'rgb(1, 2, 3)' },
+    theme: { tokens: { 'color-primary': 'rgb(1, 2, 3)' } },
   }
 
   // There is no separate theme <style> any more: a brand's custom properties live in its own
@@ -36,6 +36,6 @@ describe('brandingHeadHtml', () => {
 
   it('emits nothing for a brand that customises neither theme nor stylesheets', () => {
     expect(brandingHeadHtml({})).toBe('')
-    expect(brandingHeadHtml({ assets: { css: [] }, theme: { themeColor: '' } })).toBe('')
+    expect(brandingHeadHtml({ assets: { css: [] }, theme: { tokens: {} } })).toBe('')
   })
 })

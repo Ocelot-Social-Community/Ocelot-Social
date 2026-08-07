@@ -19,7 +19,10 @@ function archive({
   const instances = []
   for (const [name, primary] of Object.entries(themes)) {
     const file = `fragments/theme.${name}.json`
-    files.set(file, Buffer.from(JSON.stringify({ theme: { themeColor: primary } })))
+    files.set(
+      file,
+      Buffer.from(JSON.stringify({ theme: { tokens: { 'color-primary': primary } } })),
+    )
     instances.push({ type: 'theme', name, file })
   }
   files.set(
@@ -45,7 +48,7 @@ test('readManifest surfaces the schemaVersion (branding package version) baked a
 test('composeArchive composes the default instances and attaches the manifest id', () => {
   const config = composeArchive(archive())
   assert.equal(config.id, 'acme')
-  assert.equal(config.theme.themeColor, 'green')
+  assert.equal(config.theme.tokens['color-primary'], 'green')
   assert.equal(config.metadata.applicationName, 'Acme')
   // a bucket type the archive does not provide → framework default
   assert.equal(config.group.nameLengthMax, brandingDefaults.group.nameLengthMax)
@@ -53,15 +56,18 @@ test('composeArchive composes the default instances and attaches the manifest id
 
 test('composeArchive selection picks a non-default instance of the same type', () => {
   const files = archive({ themes: { default: 'green', dark: 'black', light: 'white' } })
-  assert.equal(composeArchive(files).theme.themeColor, 'green') // default
-  assert.equal(composeArchive(files, { theme: 'dark' }).theme.themeColor, 'black')
-  assert.equal(composeArchive(files, { theme: 'light' }).theme.themeColor, 'white')
+  assert.equal(composeArchive(files).theme.tokens['color-primary'], 'green') // default
+  assert.equal(composeArchive(files, { theme: 'dark' }).theme.tokens['color-primary'], 'black')
+  assert.equal(composeArchive(files, { theme: 'light' }).theme.tokens['color-primary'], 'white')
 })
 
 test('composeArchive falls back to default when a selected instance is absent', () => {
   const config = composeArchive(archive(), { theme: 'nonexistent' })
   // no matching instance → that slot uses the framework default (empty theme), NOT a crash
-  assert.deepEqual(config.theme.themeColor, brandingDefaults.theme.themeColor)
+  assert.deepEqual(
+    config.theme.tokens['color-primary'],
+    brandingDefaults.theme.tokens['color-primary'],
+  )
 })
 
 test('composeArchive returns null for an archive without a manifest', () => {
@@ -74,7 +80,7 @@ test('composeFromArchives: theme from one archive, identity from another (the he
   const getFiles = (id) => ({ ya: A, ac: B })[id] ?? null
 
   const composed = composeFromArchives(getFiles, { _default: 'ya', identity: 'ac' })
-  assert.equal(composed.theme.themeColor, 'green') // theme from _default (ya)
+  assert.equal(composed.theme.tokens['color-primary'], 'green') // theme from _default (ya)
   assert.equal(composed.metadata.applicationName, 'Acme') // identity slot overridden → ac
 })
 
@@ -84,7 +90,7 @@ test('composeFromArchives: _default fills unspecified slots; an unknown id → f
 
   const c = composeFromArchives(getFiles, { _default: 'ya', theme: 'missing' })
   assert.equal(c.metadata.applicationName, 'Yunite') // identity from _default
-  assert.deepEqual(c.theme.themeColor, brandingDefaults.theme.themeColor) // unknown theme id → default
+  assert.deepEqual(c.theme.tokens['color-primary'], brandingDefaults.theme.tokens['color-primary']) // unknown theme id → default
 })
 
 test('composeFromArchives selects a named instance for a slot (id/name)', () => {
@@ -92,7 +98,7 @@ test('composeFromArchives selects a named instance for a slot (id/name)', () => 
   const getFiles = (id) => ({ ya: A })[id] ?? null
 
   const c = composeFromArchives(getFiles, { _default: 'ya', theme: 'ya/dark' })
-  assert.equal(c.theme.themeColor, 'black')
+  assert.equal(c.theme.tokens['color-primary'], 'black')
 })
 
 test('readManifest returns null for a garbled manifest.json (never throws)', () => {
@@ -115,7 +121,10 @@ test('composeArchive: a garbled fragment falls back to the framework default, no
     ),
   )
   const config = composeArchive(files)
-  assert.deepEqual(config.theme.themeColor, brandingDefaults.theme.themeColor) // unreadable → default
+  assert.deepEqual(
+    config.theme.tokens['color-primary'],
+    brandingDefaults.theme.tokens['color-primary'],
+  ) // unreadable → default
 })
 
 test('composeArchive tolerates a manifest with no instances array', () => {
@@ -124,7 +133,10 @@ test('composeArchive tolerates a manifest with no instances array', () => {
   ])
   const config = composeArchive(files)
   assert.equal(config.id, 'acme')
-  assert.deepEqual(config.theme.themeColor, brandingDefaults.theme.themeColor)
+  assert.deepEqual(
+    config.theme.tokens['color-primary'],
+    brandingDefaults.theme.tokens['color-primary'],
+  )
 })
 
 test('composeFromArchives: a garbled fragment falls back to the framework default', () => {
@@ -142,7 +154,10 @@ test('composeFromArchives: a garbled fragment falls back to the framework defaul
     ),
   )
   const composed = composeFromArchives((id) => ({ ya: A })[id] ?? null, { theme: 'ya' })
-  assert.deepEqual(composed.theme.themeColor, brandingDefaults.theme.themeColor)
+  assert.deepEqual(
+    composed.theme.tokens['color-primary'],
+    brandingDefaults.theme.tokens['color-primary'],
+  )
 })
 
 test('composeFromArchives merges locales from a PARTIALLY-pulled bucket (the missing-strings fix)', () => {

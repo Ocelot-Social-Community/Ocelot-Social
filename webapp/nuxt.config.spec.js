@@ -6,7 +6,7 @@ import { brandingHeadHtml } from './utils/brandingHead.js'
 
 const BRAND = {
   assets: { css: ['/branding/acme/assets/css/branding.css'] },
-  theme: { themeColor: 'rgb(1, 2, 3)' },
+  theme: { tokens: { 'color-primary': 'rgb(1, 2, 3)' } },
 }
 
 const render = (nuxtState) => {

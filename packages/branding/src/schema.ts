@@ -119,17 +119,28 @@ export interface BrandingConfig {
      * framework default value.
      */
     /**
-     * The browser-chrome / PWA colour, as a CONCRETE value — a manifest cannot resolve `var()`.
+     * The brand's theme tokens as CONCRETE values, keyed WITHOUT the leading `--`.
      *
-     * Derived, never authored: the build evaluates `--color-primary` from the stylesheets the brand
-     * lists under `assets.css` and stores the result here. Everything else about the theme lives in
-     * those stylesheets and nowhere else; this single field exists because the PWA manifest is
-     * generated per request, without a browser to resolve custom properties for it.
+     * Derived, never authored: the build reads the `:root` declarations out of the stylesheets the
+     * brand lists under `assets.css`, flattens every `var()` reference against the framework palette,
+     * and stores the result here. The declarations themselves stay in the stylesheets — this is the
+     * escape hatch for the consumers that have no browser to resolve custom properties for them: the
+     * PWA manifest (generated per request), the `<meta name="theme-color">` tag, the maintenance page
+     * and the e-mail stylesheet.
+     *
+     * Only what the brand ITSELF declares, not the whole resolved palette. Storing all ~200 tokens
+     * would bake the framework's values into every archive, where they would go stale the moment a
+     * framework default changed; consumers that need a token the brand did not touch read it from
+     * FRAMEWORK_TOKENS, which ships with the package and is always current.
+     *
+     * Only UNCONDITIONAL declarations: a token that holds just inside
+     * `@media (prefers-color-scheme: dark)` would be shipped here as if it always applied, and a
+     * manifest has no media queries.
      *
      * It sits in the `theme` bucket rather than in `metadata` on purpose: a partial package that
-     * provides identity but no theme would otherwise carry a colour it does not define.
+     * provides identity but no theme would otherwise carry colours it does not define.
      */
-    themeColor: string
+    tokens: Record<string, string>
   }
   group: {
     nameLengthMin: number
