@@ -8,6 +8,11 @@ spec:
       app: {{ .Release.Name }}-maintenance
   template:
     metadata:
+      annotations:
+        # See the backend deployment: `envFrom` is resolved once at container start, so without this
+        # a changed SUPPORT_EMAIL would update the ConfigMap while the running pod keeps serving the
+        # old address — and the page is static, so nothing else would ever restart it.
+        checksum/config: {{ include (print $.Template.BasePath "/maintenance/configmap.yml") . | sha256sum }}
       labels:
         app: {{ .Release.Name }}-maintenance
     spec:
@@ -21,34 +26,35 @@ spec:
         env:
           - name: HOST
             value: 0.0.0.0
-          # The support address the page shows. The page is static, so its nginx entrypoint
-          # substitutes this into the built files at startup (maintenance/nginx/40-support-email.sh)
-          # rather than it being baked into a per-brand image.
-          #
-          # It follows the backend's value so the two cannot disagree. Deliberately NOT defaulted in
-          # values.yaml: with neither set, both sides already fall back to the same software default
-          # (backend/src/config/softwareDefaults.ts SUPPORT_EMAIL, mirrored in the maintenance app) —
-          # a chart-level default would add a second place to state it and a second place to forget.
-          {{- with .Values.maintenance.supportEmail | default (.Values.backend.env).SUPPORT_EMAIL }}
-          - name: SUPPORT_EMAIL
-            value: {{ quote . }}
-          {{- end }}
+        # `maintenance.env`, the same route every other workload takes. It carries SUPPORT_EMAIL: the
+        # page is static, so its nginx entrypoint substitutes the address into the built files at
+        # startup (maintenance/nginx/40-support-email.sh) rather than it being baked into a per-brand
+        # image — which is what keeps the value deployment config in this chart.
+        envFrom:
+          - configMapRef:
+              name: {{ .Release.Name }}-maintenance-env
         ports:
           - containerPort: 8080
-        # httpGet here, unlike the other workloads: this is nginx serving a static page, so a real
-        # request is cheap and proves more than an open socket — namely that the entrypoint has
-        # finished substituting SUPPORT_EMAIL into the built files. No checksum/* annotation is
-        # needed either, because this deployment's env is inline in the template rather than in a
-        # ConfigMap: changing it already changes the pod template.
+        # tcpSocket, like every other workload — an httpGet here CANNOT work: the maintenance page
+        # answers 503 to every page request on purpose (maintenance/nginx/custom.conf), and kubelet
+        # counts only 2xx/3xx as success. Probing `/` therefore left the pod permanently unready and
+        # restarting, while the previous ReplicaSet — the one still holding the Service endpoint —
+        # went on serving a page built before SUPPORT_EMAIL existed.
+        #
+        # The socket proves everything an httpGet would prove here anyway: nginx execs only after
+        # /docker-entrypoint.d/40-support-email.sh has substituted SUPPORT_EMAIL into the built
+        # files, and it refuses to start at all on a config it cannot parse.
+        #
+        # Keep this independent of the image: brands pin their maintenance image to an OCELOT_VERSION
+        # but pull this chart from master, so a probe that needs a location added here today would
+        # break every brand whose image predates it.
         readinessProbe:
-          httpGet:
-            path: /
+          tcpSocket:
             port: 8080
           initialDelaySeconds: 3
           periodSeconds: 5
         livenessProbe:
-          httpGet:
-            path: /
+          tcpSocket:
             port: 8080
           initialDelaySeconds: 15
           periodSeconds: 20

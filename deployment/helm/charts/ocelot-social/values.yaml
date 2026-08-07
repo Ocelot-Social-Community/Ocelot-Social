@@ -75,10 +75,15 @@ webapp:
 maintenance:
   image:
     repository: ghcr.io/ocelot-social-community/ocelot-social/maintenance
-  # The support address shown on the maintenance page. Defaults to backend.env.SUPPORT_EMAIL — the
-  # page is static, so its nginx entrypoint substitutes the value at startup instead of it being baked
-  # into a per-brand image. Set this only to show a DIFFERENT address than the backend uses.
-  supportEmail: ""
+  # Environment of the maintenance container, like backend.env and webapp.env.
+  #
+  #   env:
+  #     # The support address the page shows. The page is static, so its nginx entrypoint substitutes
+  #     # this into the built files at startup instead of it being baked into a per-brand image.
+  #     # Unset it follows backend.env.SUPPORT_EMAIL, so the two cannot disagree — state it here only
+  #     # to show a DIFFERENT address than the backend uses.
+  #     SUPPORT_EMAIL: "hello@ocelot.social"
+  env: {}
 
 imagor:
   image:
