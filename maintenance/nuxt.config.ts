@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 import tailwindcss from "@tailwindcss/vite";
@@ -9,12 +9,20 @@ import { SUPPORT_EMAIL_PLACEHOLDER } from "./app/constants/emails";
 // precisely when the backend is unreachable, so it cannot fetch anything at runtime). Everything the
 // generator writes is a SEPARATE, git-ignored file that this config picks up only when present — no
 // committed source is ever edited, and removing the files is a complete reset.
-const has = (rel: string): boolean =>
-  existsSync(fileURLToPath(new URL(rel, import.meta.url)));
+const file = (rel: string): string => fileURLToPath(new URL(rel, import.meta.url));
+const has = (rel: string): boolean => existsSync(file(rel));
 
-// The brand's :root tokens + @font-face rules. LAST in the css list so its :root wins over the
-// vanilla one — same reason the generated block used to sit at the end of branding.css.
-const brandCss = has("app/assets/css/brand.css") ? ["~/assets/css/brand.css"] : [];
+// The brand's own stylesheets (:root tokens + @font-face rules), LINKED rather than bundled: the
+// generator unpacks them under public/brand/ and lists the URLs they are served from. A relative
+// url() inside such a sheet then resolves against the sheet itself, and vite never has to resolve a
+// publicDir path at build time (which it cannot — an `@import url("/brand/…")` from a bundled
+// stylesheet fails with ENOENT). The tokens do not depend on the cascade — the archive raises the
+// brand's `:root` to `:root:root`, so they outrank the vanilla ones in assets/css/branding.css
+// whatever the order — but a brand's plain rules do, which is why the links go LAST (see tagPriority).
+const BRAND_STYLESHEETS = "app/constants/stylesheets.brand.json";
+const brandStylesheets: string[] = has(BRAND_STYLESHEETS)
+  ? (JSON.parse(readFileSync(file(BRAND_STYLESHEETS), "utf8")) as string[])
+  : [];
 
 // Per-locale overlays holding just the namespaces this page renders. `files` is a merge list: the
 // vanilla file first, the brand's on top, so an untranslated key keeps its default.
@@ -37,12 +45,19 @@ export default defineNuxtConfig({
   },
   devServer: { host: "0.0.0.0" },
   modules: ["@nuxt/eslint", "@nuxtjs/i18n"],
-  css: [
-    "~/assets/css/branding.css",
-    "~/assets/css/main.css",
-    "@ocelot-social/ui/style.css",
-    ...brandCss,
-  ],
+  css: ["~/assets/css/branding.css", "~/assets/css/main.css", "@ocelot-social/ui/style.css"],
+  app: {
+    head: {
+      // `tagPriority: "low"` puts these AFTER the bundled css above — the position the brand sheet
+      // held while it was the last entry in `css`. Without it unhead emits config head tags before
+      // the build's own stylesheet links, and a brand rule would lose every tie on specificity.
+      link: brandStylesheets.map((href) => ({
+        rel: "stylesheet",
+        href,
+        tagPriority: "low" as const,
+      })),
+    },
+  },
   i18n: {
     locales: [
       { code: "en", name: "English", files: localeFiles("en") },

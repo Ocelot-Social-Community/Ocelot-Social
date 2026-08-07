@@ -96,22 +96,43 @@ nothing to do, and the running pod kept serving the old value until something un
 restart it. Those three pod templates now carry `checksum/config` and `checksum/secret` annotations
 over the rendered manifests, so a changed value is a changed pod template and Helm rolls it out.
 
-The two remaining workloads differ: imagor has no ConfigMap — it takes everything from its secret —
-so it carries `checksum/secret` alone, and maintenance carries no `checksum/*` at all because its
-env is inline in the pod template, where a change is already a template change.
+imagor differs: it has no ConfigMap — it takes everything from its secret — so it carries
+`checksum/secret` alone. Maintenance follows the same route as backend and webapp now, see below.
 
 **Action:** none — but be aware of two consequences.
 
-- **This upgrade restarts backend, webapp, imagor and Neo4j once** (maintenance is untouched),
-  because the annotations themselves are new. For the Neo4j StatefulSet that is a short database
-  restart. It happens inside the maintenance window you already need for the
-  StatefulSet-to-Deployment switch above, so plan them together.
+- **This upgrade restarts backend, webapp, imagor, maintenance and Neo4j once**, because the
+  annotations themselves are new. For the Neo4j StatefulSet that is a short database restart. It
+  happens inside the maintenance window you already need for the StatefulSet-to-Deployment switch
+  above, so plan them together.
 - **From now on, editing `neo4j.env` restarts the database.** That is the honest behaviour — the
   setting was never live before — but treat a heap-size or page-cache change as the restart it is.
 
 Neo4j's `terminationGracePeriodSeconds` is raised to `120` in the same step: the default 30 s can
 cut a flush short on a larger graph, and a SIGKILL mid-flush turns the next start into a recovery
 run.
+
+## `maintenance.supportEmail` is `maintenance.env.SUPPORT_EMAIL`
+
+The maintenance container took its one setting through a chart field of its own, while every other
+workload takes its environment through `<component>.env` → ConfigMap → `envFrom`. It follows the
+convention now: there is a `maintenance.env` map and a `<release>-maintenance-env` ConfigMap, and the
+pod template carries a `checksum/config` annotation like the others (without it a changed address
+would sit in the ConfigMap while the pod keeps serving the old one — nothing else ever restarts a
+static page).
+
+`SUPPORT_EMAIL` still **defaults to `backend.env.SUPPORT_EMAIL`**, so the address on the page and the
+one the backend uses cannot disagree.
+
+**Action:** only if you set `maintenance.supportEmail` explicitly — it is ignored now. Write
+
+```yaml
+maintenance:
+  env:
+    SUPPORT_EMAIL: "support@example.org"
+```
+
+If you never set it, there is nothing to do: the backend fallback is unchanged.
 
 ## The Neo4j volumes are protected against Helm now
 
@@ -133,9 +154,14 @@ delete the claim by hand to save the storage.
 
 Only the backend had probes. Without a `readinessProbe` a pod counts as Ready the moment its
 container process starts — for Nuxt that is seconds before it listens, so Traefik routed into a 502
-for the whole surge window of every webapp rollout. Webapp, imagor and Neo4j now have readiness
-probes (`tcpSocket`), maintenance an `httpGet` on `/`, and webapp and imagor a `preStop` sleep that
-covers the gap between endpoint removal and SIGTERM.
+for the whole surge window of every webapp rollout. Webapp, imagor, maintenance and Neo4j now have
+readiness probes (all `tcpSocket`), and webapp and imagor a `preStop` sleep that covers the gap
+between endpoint removal and SIGTERM.
+
+Maintenance is `tcpSocket` like the rest, and must stay that way: the page answers **503** to every
+page request on purpose, and kubelet counts only 2xx/3xx as probe success — an `httpGet` on `/`
+leaves the pod permanently unready and restarting, and the rollout then silently stalls on the
+previous ReplicaSet (see `templates/maintenance/deployment.yaml`).
 
 Neo4j gets **no** liveness probe on purpose: a database busy with recovery or a long GC pause is not
 one that should be killed and restarted.
