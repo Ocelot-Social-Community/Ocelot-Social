@@ -118,7 +118,7 @@ export default {
 .invitation {
   display: flex;
   padding: calc(var(--space-base) / 2);
-  border-bottom: 1px dotted #e5e3e8;
+  border-bottom: 1px dotted var(--color-neutral-80);
   align-items: center;
 }
 
@@ -127,7 +127,7 @@ export default {
 }
 
 .invitation:nth-child(even) {
-  background-color: white;
+  background-color: var(--color-neutral-100);
 }
 
 .column1 {

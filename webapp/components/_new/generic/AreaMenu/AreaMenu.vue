@@ -86,7 +86,7 @@ export default {
   font-size: var(--font-size-base);
   border: 1px solid var(--color-neutral-80);
   border-radius: var(--border-radius-base);
-  background-color: white;
+  background-color: var(--color-neutral-100);
   color: var(--text-color-base);
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%234b4554' d='M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z'/%3E%3C/svg%3E");
@@ -100,7 +100,7 @@ export default {
   }
 }
 
-@media (min-width: 600px) {
+@media (--vp-small-up) {
   .area-menu {
     flex: 0 0 200px;
     width: 200px;

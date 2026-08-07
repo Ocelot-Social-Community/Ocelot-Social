@@ -209,8 +209,8 @@ export default {
 }
 .notification-grid-row {
   padding: 10px;
-  border-bottom: 1px dotted #e5e3e8;
-  background-color: white;
+  border-bottom: 1px dotted var(--color-neutral-80);
+  background-color: var(--color-neutral-100);
 
   &:nth-child(odd) {
     background-color: var(--color-neutral-90);
@@ -225,7 +225,7 @@ export default {
     grid-template-columns: 1fr !important;
   }
   .notification-grid .content-section {
-    border-top: 1px dotted #e5e3e8;
+    border-top: 1px dotted var(--color-neutral-80);
   }
 }
 
@@ -252,7 +252,7 @@ export default {
 }
 
 /* Desktop icon size */
-@media (min-width: 768px) {
+@media (--vp-tablet-up) {
   .notification-icon {
     width: 18px;
   }

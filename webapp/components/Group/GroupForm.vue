@@ -439,7 +439,7 @@ export default {
 .select-label {
   margin-bottom: 0;
   padding-bottom: 4px;
-  color: #70677e;
+  color: var(--color-neutral-40);
   font-size: 1rem;
 }
 

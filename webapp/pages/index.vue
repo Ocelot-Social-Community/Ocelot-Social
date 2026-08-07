@@ -406,7 +406,7 @@ export default {
   display: none;
 }
 
-@media (max-width: 810px) {
+@media (--vp-mobile) {
   .feed-top-row {
     padding-top: var(--space-small);
   }
@@ -475,7 +475,7 @@ export default {
 
 #my-filter {
   max-width: 1028px;
-  background-color: white;
+  background-color: var(--color-neutral-100);
   box-shadow: rgb(189 189 189) 1px 9px 15px 1px;
   max-height: 950px;
   overflow: auto;

@@ -364,6 +364,28 @@ export default {
       css: ({ isDev }) => (isDev ? '[name].css' : `css/[contenthash:7]_${CONFIG.VERSION}.css`),
     },
     cache: true,
+    /*
+     ** PostCSS: only ADDING a plugin, never replacing the defaults.
+     **
+     ** Given as an object (not an array), Nuxt merges it into its own plugin set — postcss-import,
+     ** postcss-url, postcss-preset-env, cssnano all stay. `order: 'presetEnvAndCssnanoLast'` (Nuxt's
+     ** default) then guarantees the sequence we need: global-data runs BEFORE preset-env, which is the
+     ** whole point — it prepends the @custom-media definitions to every stylesheet PostCSS sees, and
+     ** preset-env expands them right after.
+     **
+     ** Why it has to be injected rather than imported: Nuxt 2 processes each component's <style> block
+     ** as its own PostCSS unit. A definition in a globally loaded stylesheet is not in scope there, so
+     ** `@media (--vp-mobile)` would pass through to the browser unresolved and the rule would be dead.
+     */
+    postcss: {
+      postcssOptions: {
+        plugins: {
+          '@csstools/postcss-global-data': {
+            files: ['./assets/css/breakpoints.css'],
+          },
+        },
+      },
+    },
     // babel config
     babel: {
       // To prevent  ERROR  [BABEL] Note: The code generator has deoptimised the styling of [..] as it exceeds the max of 500KB.

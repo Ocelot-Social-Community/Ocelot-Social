@@ -24,7 +24,7 @@ export default {
   flex: 0 0 98%;
   width: 98%;
 }
-@media (min-width: 768px) {
+@media (--vp-tablet-up) {
   .group-list__item {
     flex: 0 0 48%;
     width: 48%;

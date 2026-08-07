@@ -177,7 +177,7 @@ export default {
 }
 </script>
 <style>
-@media (min-width: 1024px) {
+@media (--vp-desktop-up) {
   .notifications-layout__title {
     flex: 0 0 85%;
     width: 85%;

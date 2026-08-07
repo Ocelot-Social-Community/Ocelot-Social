@@ -74,11 +74,11 @@ export default {
   flex-grow: 1;
 
   &:hover {
-    border-bottom: 2px solid #c9c6ce;
+    border-bottom: 2px solid var(--color-neutral-70);
   }
 
   &.--active {
-    border-bottom: 2px solid #17b53f;
+    border-bottom: 2px solid var(--color-primary);
   }
   &.--disabled {
     opacity: var(--opacity-disabled);
@@ -89,7 +89,7 @@ export default {
 }
 .tab-navigation {
   position: sticky;
-  top: var(--header-height, 53px);
+  top: var(--header-height);
   z-index: var(--z-index-sticky);
   transition: top 0.15s ease;
 
@@ -102,7 +102,7 @@ export default {
 
   .ds-tab-nav-item {
     &.ds-tab-nav-item-active {
-      border-bottom: 3px solid #17b53f;
+      border-bottom: 3px solid var(--color-primary);
       &:first-child {
         border-bottom-left-radius: var(--border-radius-x-large);
       }

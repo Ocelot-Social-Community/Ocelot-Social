@@ -803,7 +803,7 @@ export default {
 }
 
 /*  Smaller geocoder on mobile (expanded) */
-@media (max-width: 810px) {
+@media (--vp-mobile) {
   .mapboxgl-ctrl-geocoder {
     font-size: 13px;
     line-height: 18px;
@@ -839,7 +839,7 @@ export default {
     width: 29px;
     height: 29px;
     min-width: 29px;
-    background-color: white;
+    background-color: var(--color-neutral-100);
     border-radius: var(--border-radius-x-large);
     box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
     overflow: hidden;
@@ -943,7 +943,7 @@ export default {
 
 .map-style-switcher {
   position: relative;
-  background: white;
+  background: var(--color-neutral-100);
   border-radius: var(--border-radius-x-large);
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
 }
@@ -971,7 +971,7 @@ export default {
   top: 0;
   right: 100%;
   margin-right: 6px;
-  background: white;
+  background: var(--color-neutral-100);
   border-radius: var(--border-radius-x-large);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
   white-space: nowrap;

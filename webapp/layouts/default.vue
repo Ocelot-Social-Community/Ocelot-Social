@@ -137,7 +137,7 @@ export default {
   padding-bottom: 8rem;
 }
 
-@media (max-width: 810px) {
+@media (--vp-mobile) {
   .main-container {
     padding-top: 4rem;
     padding-bottom: var(--space-x-small);
