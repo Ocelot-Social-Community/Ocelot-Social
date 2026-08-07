@@ -15,17 +15,36 @@ import { branding } from '@src/branding'
 
 import type { UserDbProperties } from '@db/types/User'
 
-const welcomeImageUrl = new URL(branding.logos.welcomePath, CONFIG.CLIENT_URI)
 const settingsUrl = new URL('/settings/notifications', CONFIG.CLIENT_URI)
 
+/**
+ * The locals every mail starts from. Spread into `locals` at send time (`...defaultParams`), which is
+ * what evaluates the getters below — so the brand is read when a mail is RENDERED, not when this
+ * module happens to be imported.
+ *
+ * That distinction is the whole point. `branding` is built as an access-time accessor (each domain is
+ * a getter over getBranding(); see @ocelot-social/branding index.ts), and reading it into a plain
+ * property here would freeze whatever was set at import time. It works today only because
+ * src/index.ts imports ./branding/bootstrap FIRST — an ordering nothing enforces. Any other way in
+ * (a test, a script, a worker or cron sender that does not go through src/index.ts) would silently
+ * render the framework defaults: an ocelot-green logo at /img/custom/… on a branded network, which
+ * is exactly the kind of failure nobody reports as a bug because the mail still looks like a mail.
+ *
+ * The CONFIG values stay plain properties: they come from the environment, are fixed for the process,
+ * and SUPPORT_EMAIL is deliberately writable/deletable — the mails render a "with support" and a
+ * "without support" variant, and the tests reach the latter via `delete defaultParams.SUPPORT_EMAIL`.
+ */
 export const defaultParams = {
-  welcomeImageUrl,
+  get welcomeImageUrl(): URL {
+    return new URL(branding.logos.welcomePath, CONFIG.CLIENT_URI)
+  },
   APPLICATION_NAME: CONFIG.APPLICATION_NAME,
-  ORGANIZATION_NAME: branding.metadata.organizationName,
+  get ORGANIZATION_NAME(): string {
+    return branding.metadata.organizationName
+  },
   ORGANIZATION_URL: CONFIG.ORGANIZATION_URL,
-  // Optional at the template level: the mails render a "with support" and a "without support"
-  // variant (the latter reachable in tests via `delete defaultParams.SUPPORT_EMAIL`). CONFIG
-  // always supplies a value now (software default), so widen the type to keep that path valid.
+  // CONFIG always supplies a value now (software default), so widen the type to keep the
+  // "without support" path valid.
   SUPPORT_EMAIL: CONFIG.SUPPORT_EMAIL as string | undefined,
   supportUrl: CONFIG.SUPPORT_URL,
   settingsUrl,
