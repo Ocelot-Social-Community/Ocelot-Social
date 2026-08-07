@@ -12,9 +12,10 @@
 // build-baked one — every login on a branded instance reported "no cookie".
 import { branding, resolveThemeColor } from '@ocelot-social/branding'
 
-// SCREAMING_CASE consumer key -> branding.metadata camelCase key. THEME_COLOR is special: there is no
-// metadata.themeColor field — the browser-chrome / PWA colour is the `color-primary` theme token
-// (see resolveThemeColor), so it can't break for partial packages the way the old carve-out did.
+// SCREAMING_CASE consumer key -> branding.metadata camelCase key. THEME_COLOR is special: it has no
+// metadata field — the browser-chrome / PWA colour is the brand's `color-primary` theme token, read
+// out of theme.tokens (see resolveThemeColor), so it can't break for partial packages the way the old
+// metadata carve-out did.
 const KEY_MAP = {
   APPLICATION_NAME: 'applicationName',
   APPLICATION_SHORT_NAME: 'applicationShortName',

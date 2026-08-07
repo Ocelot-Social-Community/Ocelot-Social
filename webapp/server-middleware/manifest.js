@@ -17,7 +17,7 @@ module.exports = function manifest(req, res) {
     name: metadata.applicationName,
     short_name: metadata.applicationShortName,
     description: metadata.applicationDescription,
-    // The browser-chrome colour = the brand's primary colour (no separate metadata.themeColor field).
+    // The browser-chrome colour = the brand's `color-primary` theme token (no field of its own).
     theme_color: resolveThemeColor(branding.theme),
     background_color: '#ffffff',
     display: 'standalone',

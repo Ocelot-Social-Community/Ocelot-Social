@@ -21,8 +21,8 @@ test('the catalogue comes from the webapp stylesheets and covers the palette', (
   }
 })
 
-// The single value the package cannot derive (the PWA manifest needs a literal colour). This is the
-// drift guard that replaces the 193-entry generated file.
+// DEFAULT_COLOR_PRIMARY is derived from the committed snapshot now, so this asserts the snapshot is
+// current by proxy — the same thing framework-tokens.spec.ts checks for the map as a whole.
 test('DEFAULT_COLOR_PRIMARY still matches what the stylesheets declare', () => {
   assert.equal(DEFAULT_COLOR_PRIMARY, computeCatalog()['color-primary'])
 })
