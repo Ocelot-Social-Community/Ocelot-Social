@@ -26,6 +26,7 @@ docker: &docker
 
 webapp: &webapp
   - '.github/workflows/test-webapp.yml'
+  - '.github/workflows/webapp-visual.yml'
   - 'webapp/**/*'
   - 'styleguide/**/*'
   - 'package.json'
