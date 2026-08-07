@@ -31,7 +31,27 @@ EMAIL="${SUPPORT_EMAIL:-hello@ocelot.social}"
 # output equals the address.
 ESCAPED=$(printf '%s' "$EMAIL" | sed -e 's/[\\&|]/\\&/g')
 
-find "$ROOT" -type f \( -name '*.html' -o -name '*.js' -o -name '*.json' \) \
-  -exec sed -i "s|${PLACEHOLDER}|${ESCAPED}|g" {} +
+# *.html ONLY. The token appears in the build in two roles, and just one of them is a value:
+#
+#   index.html / 200.html / 404.html   window.__NUXT__.config.public.supportEmail — THE VALUE
+#   _nuxt/*.js                         a plain string constant in the app bundle
+#
+# Rewriting both is what broke this page: whatever the bundle compared the runtime config against
+# became the configured address too, so the guard fired precisely when the substitution had worked
+# and every configured deployment showed the vanilla address. app/constants/emails.ts no longer
+# compares against the token — but the bundle is still no place to write a deployment's address into,
+# and narrowing this to the file that actually carries the value is what keeps the two independent.
+MATCHED=$(find "$ROOT" -type f -name '*.html' -exec grep -lF "$PLACEHOLDER" {} + || true)
+
+if [ -z "$MATCHED" ]; then
+  # Not fatal — the page must come up even so, and it then shows the built-in address. But it is the
+  # failure mode nothing else reports: the page renders, looks fine, and carries the wrong contact.
+  # Nuxt moving the runtime config out of the HTML would land exactly here.
+  echo "[maintenance] WARNING: ${PLACEHOLDER} not found under ${ROOT} — serving the built-in address" >&2
+else
+  printf '%s\n' "$MATCHED" | while IFS= read -r file; do
+    sed -i "s|${PLACEHOLDER}|${ESCAPED}|g" "$file"
+  done
+fi
 
 echo "[maintenance] support e-mail: ${EMAIL}"
