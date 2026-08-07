@@ -43,9 +43,7 @@ spec:
         #
         # The socket proves everything an httpGet would prove here anyway: nginx execs only after
         # /docker-entrypoint.d/40-support-email.sh has substituted SUPPORT_EMAIL into the built
-        # files, and it refuses to start at all on a config it cannot parse. No checksum/* annotation
-        # is needed either, because this deployment's env is inline in the template rather than in a
-        # ConfigMap: changing it already changes the pod template.
+        # files, and it refuses to start at all on a config it cannot parse.
         #
         # Keep this independent of the image: brands pin their maintenance image to an OCELOT_VERSION
         # but pull this chart from master, so a probe that needs a location added here today would
