@@ -110,7 +110,7 @@ export default {
   &.strength-1 {
     background: color-mix(
       in srgb,
-      color-mix(in srgb, var(--color-warning), rgb(245, 196, 0)),
+      color-mix(in srgb, var(--color-warning), var(--color-yellow)),
       black 30%
     );
     width: 40%;
@@ -120,7 +120,7 @@ export default {
     /*  darkened 20%, mirroring strength-1 (black 30%) so the scale follows a brand switch without a jump. */
     background: color-mix(
       in srgb,
-      color-mix(in srgb, var(--color-warning), rgb(245, 196, 0)),
+      color-mix(in srgb, var(--color-warning), var(--color-yellow)),
       black 20%
     );
     width: 60%;

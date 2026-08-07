@@ -72,62 +72,98 @@ function walk(dir, out = []) {
   return out
 }
 
-const tokens = readTokens()
-const byRgb = {}
-for (const [name, value] of Object.entries(tokens)) {
-  const rgb = toRgb(value)
-  // First name wins: the primitives (--color-neutral-*) are declared before the semantic aliases, and
-  // the primitive is what a literal should point at.
-  if (rgb && !byRgb[rgb]) byRgb[rgb] = name
+/** Maps `r,g,b` → the token that holds it, so a literal can be pointed at its token. */
+function indexByRgb(tokens) {
+  const byRgb = {}
+  for (const [name, value] of Object.entries(tokens)) {
+    const rgb = toRgb(value)
+    // First name wins: the primitives (--color-neutral-*) are declared before the semantic aliases,
+    // and the primitive is what a literal should point at.
+    if (rgb && !byRgb[rgb]) byRgb[rgb] = name
+  }
+  return byRgb
 }
 
 const COLOUR = /(#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?\b|rgba?\([^)]*\)|\bwhite\b|\bblack\b)/g
-const DECLARATION = /^(\s*[-a-zA-Z][-a-zA-Z0-9]*\s*:\s*)(.+?)(;?\s*)$/
 
-const errors = []
-let untokenised = 0
+/**
+ * Every `prop: value` in a CSS body, as declarations rather than as lines.
+ *
+ * Splitting on newlines was the earlier approach and it read past anything wrapped — a `box-shadow`
+ * or `transition` broken over two lines hid every colour after the first one, which is precisely
+ * where multi-line values occur. So the value runs to the `;` (or the closing `}` of the last
+ * declaration in a block) however many lines that takes.
+ *
+ * Requiring that terminator is also what keeps selectors out: `a:hover {` looks like `prop: value`
+ * until you notice it ends in `{`, and `@media (min-width: 768px) {` likewise.
+ */
+function declarations(body) {
+  const found = []
+  for (const [, prop, value] of body
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .matchAll(/([-a-zA-Z][-a-zA-Z0-9]*)\s*:\s*([^;{}]*)(?=[;}])/g)) {
+    found.push({ prop, value: value.trim() })
+  }
+  return found
+}
 
-for (const file of walk(ROOT)) {
-  const rel = relative(ROOT, file)
-  const src = readFileSync(file, 'utf8')
-  for (const block of src.match(/<style[^>]*>[\s\S]*?<\/style>/g) || []) {
-    if (/<style[^>]*\blang=["']s[ac]ss["']/.test(block)) continue
-    const body = block.replace(/\/\*[\s\S]*?\*\//g, '')
-    body.split('\n').forEach((line, i) => {
-      const decl = DECLARATION.exec(line)
-      if (!decl) return
-      const prop = decl[1].trim().replace(/:$/, '').trim()
-      if (prop.startsWith('white-space')) return
-      const value = decl[2]
+/** The plain-CSS `<style>` bodies of a .vue file — `lang="scss"` blocks are somebody else's problem. */
+function styleBodies(src) {
+  return (src.match(/<style[^>]*>[\s\S]*?<\/style>/g) || []).filter(
+    (block) => !/<style[^>]*\blang=["']s[ac]ss["']/.test(block),
+  )
+}
+
+/** Both rules, over one file's source. `untokenised` counts literals that have no token to suggest. */
+function checkSource(src, byRgb, rel) {
+  const errors = []
+  let untokenised = 0
+  for (const body of styleBodies(src)) {
+    for (const { prop, value } of declarations(body)) {
+      if (prop.startsWith('white-space')) continue
 
       for (const [, name] of value.matchAll(/\$([a-z][a-z0-9-]*)/gi)) {
         errors.push(`${rel}: $${name} — SCSS variable in a plain CSS block, resolves to nothing`)
       }
-      if (prop.startsWith('--')) return // declaring a token is allowed to use a literal
+      if (prop.startsWith('--')) continue // declaring a token is allowed to use a literal
       for (const [raw] of value.matchAll(COLOUR)) {
         const rgb = toRgb(raw)
         if (!rgb) continue
-        if (byRgb[rgb]) {
-          errors.push(`${rel}: ${raw} — use var(--${byRgb[rgb]}) instead`)
-        } else {
-          untokenised += 1
-        }
+        if (byRgb[rgb]) errors.push(`${rel}: ${raw} — use var(--${byRgb[rgb]}) instead`)
+        else untokenised += 1
       }
-    })
+    }
   }
+  return { errors, untokenised }
 }
 
-if (errors.length) {
-  console.error(`✖ ${errors.length} problem(s):\n`)
-  for (const e of errors) console.error(`  ${e}`)
-  console.error(
-    `\n${untokenised} further colour literal(s) have no token yet — those are not an error, ` +
-      `they need a token defined first.`,
+function main() {
+  const byRgb = indexByRgb(readTokens())
+  const errors = []
+  let untokenised = 0
+
+  for (const file of walk(ROOT)) {
+    const result = checkSource(readFileSync(file, 'utf8'), byRgb, relative(ROOT, file))
+    errors.push(...result.errors)
+    untokenised += result.untokenised
+  }
+
+  if (errors.length) {
+    console.error(`✖ ${errors.length} problem(s):\n`)
+    for (const e of errors) console.error(`  ${e}`)
+    console.error(
+      `\n${untokenised} further colour literal(s) have no token yet — those are not an error, ` +
+        `they need a token defined first.`,
+    )
+    process.exit(1)
+  }
+
+  console.log(
+    `✓ no hard-coded colours with a token equivalent, no SCSS leftovers ` +
+      `(${untokenised} literal(s) without a token — see assets/css/root-tokens.css)`,
   )
-  process.exit(1)
 }
 
-console.log(
-  `✓ no hard-coded colours with a token equivalent, no SCSS leftovers ` +
-    `(${untokenised} literal(s) without a token — see assets/css/root-tokens.css)`,
-)
+if (require.main === module) main()
+
+module.exports = { toRgb, readTokens, indexByRgb, declarations, styleBodies, checkSource }
