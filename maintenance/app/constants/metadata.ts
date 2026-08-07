@@ -29,6 +29,11 @@ const defaults = {
   // serves from /brand/ — the filename varies (.svg / .png), so it travels as a key, not a
   // hard-coded path in app.vue.
   LOGO: "/img/custom/logo-squared.svg",
+  // The browser-tab icon. Vanilla is the committed public/favicon.ico; a brand points this at the copy
+  // the generator serves from /brand/. nuxt.config.ts reads the same overlay to emit the <link> at
+  // BUILD time — with `ssr: false` nothing from useHead reaches the prerendered index.html, so a
+  // runtime-only link would leave the browser to its implicit /favicon.ico request in the meantime.
+  FAVICON: "/favicon.ico",
 };
 
 export default {

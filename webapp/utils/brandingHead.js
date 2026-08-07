@@ -14,8 +14,11 @@
 // renderStyles(), which puts these tags at the END of <head> — the same position the client plugin
 // appends them to, so one cascade for both paths.
 //
-// NOT handled here: the favicon. The client plugin retargets the <link rel="icon"> that nuxt.config
-// already renders; emitting a second one from SSR would leave two competing icon links.
+// NOT handled here: the favicon. Appending one from this hook would leave two competing icon links
+// next to the one nuxt.config renders, so it goes through vue-meta instead — see
+// plugins/branding-favicon.js, which REWRITES that link via its `hid` and therefore brands the first
+// paint without duplicating anything. The cascade argument above is what keeps the stylesheets out of
+// vue-meta; an icon link takes part in no cascade, so it does not apply to them.
 
 // The marker attribute both paths use, so each recognises what the other already emitted and
 // nothing is applied twice.

@@ -99,6 +99,7 @@ function namespaceConfig(
   c.metadata.ogImage = ns(c.metadata.ogImage) // ogImage is always set (merged default)
   if (Array.isArray(c.assets.css)) c.assets.css = c.assets.css.map(ns)
   if (c.assets.favicon != null) c.assets.favicon = ns(c.assets.favicon)
+  if (c.assets.icon != null) c.assets.icon = ns(c.assets.icon)
   const html = c.assets.html as Record<string, Record<string, string>>
   for (const page of Object.keys(html)) {
     const locales = html[page]
