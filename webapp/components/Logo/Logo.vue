@@ -162,7 +162,7 @@ export default {
   display: none;
 }
 
-@media (max-width: 810px) {
+@media (--vp-mobile) {
   .ds-logo-desktop {
     display: none;
   }

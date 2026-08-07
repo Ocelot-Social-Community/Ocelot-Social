@@ -80,19 +80,19 @@ export default {
 
 <style scoped>
 .legend-question-button {
-  color: #70677e !important;
+  color: var(--color-neutral-40) !important;
   font-size: 1.2rem !important;
 }
 .legend-question-button:hover {
   background: none !important;
-  color: #70677e !important;
+  color: var(--color-neutral-40) !important;
 }
 .legend-question-button:focus {
   outline: none !important;
 }
 .legend {
   padding: 0rem;
-  border: 1px solid #e5e3e8;
+  border: 1px solid var(--color-neutral-80);
 }
 .legend-container {
   display: flex;

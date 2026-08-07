@@ -853,7 +853,7 @@ export default {
   margin: auto;
   margin-top: -60px;
 }
-@media (max-width: 810px) {
+@media (--vp-mobile) {
   .group-profile {
     padding-top: var(--space-large);
   }
@@ -869,7 +869,7 @@ export default {
   width: 100%;
   min-width: 0;
 }
-@media (min-width: 600px) {
+@media (--vp-small-up) {
   .group-layout__sidebar {
     flex: 2 0 0;
   }
@@ -877,7 +877,7 @@ export default {
     flex: 3 0 0;
   }
 }
-@media (min-width: 768px) {
+@media (--vp-tablet-up) {
   .group-layout__sidebar {
     flex: 2 0 0;
   }
@@ -885,7 +885,7 @@ export default {
     flex: 5 0 0;
   }
 }
-@media (min-width: 1024px) {
+@media (--vp-desktop-up) {
   .group-layout__sidebar {
     flex: 1 0 0;
   }

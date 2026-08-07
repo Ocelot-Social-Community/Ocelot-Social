@@ -99,7 +99,7 @@ export default {
   min-width: 0;
   max-width: 100%;
 
-  @media (max-width: 810px) {
+  @media (--vp-mobile) {
     column-gap: 8px;
   }
 

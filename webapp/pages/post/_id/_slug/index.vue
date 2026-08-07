@@ -554,17 +554,17 @@ export default {
   flex: 0 0 100%;
   width: 100%;
 }
-@media (min-width: 600px) {
+@media (--vp-small-up) {
   .post-detail-layout__main {
     flex: 2 0 0;
   }
 }
-@media (min-width: 768px) {
+@media (--vp-tablet-up) {
   .post-detail-layout__main {
     flex: 2 0 0;
   }
 }
-@media (min-width: 1024px) {
+@media (--vp-desktop-up) {
   .post-detail-layout__main {
     flex: 1 0 0;
   }

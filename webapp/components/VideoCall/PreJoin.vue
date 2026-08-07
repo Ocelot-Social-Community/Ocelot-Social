@@ -852,7 +852,7 @@ export default {
   margin-top: auto;
 }
 
-@media (max-width: 810px) {
+@media (--vp-mobile) {
   .prejoin {
     flex-direction: column;
   }

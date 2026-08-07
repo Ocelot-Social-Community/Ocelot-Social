@@ -97,6 +97,11 @@ jobs:
       - name: webapp | Lint
         run: cd webapp && yarn --frozen-lockfile && yarn run lint
 
+      # Separate step so a token regression reads as one in the log, rather than as "lint failed".
+      # Needs no install of its own — it only reads files (see webapp/scripts/check-css-tokens.js).
+      - name: webapp | Design tokens
+        run: cd webapp && yarn run lint:css-tokens
+
   unit_test_webapp:
     name: Unit Tests - Webapp
     if: needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webapp == 'true'

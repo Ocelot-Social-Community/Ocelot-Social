@@ -1,0 +1,29 @@
+/**
+ * Viewport breakpoints as named `@custom-media` queries — the one thing a design token CANNOT be.
+ *
+ * A media query condition is evaluated before the cascade exists, so `@media (max-width: var(--x))`
+ * never works: custom properties are resolved per element, at use time. `@custom-media` closes that
+ * gap at BUILD time — postcss-preset-env expands each name to its literal condition, so what ships is
+ * an ordinary `@media (max-width: 810px)`.
+ *
+ * NOT loaded via nuxt.config's `css:` array. It is injected into every processed stylesheet by
+ * @csstools/postcss-global-data (see nuxt.config.js → build.postcss), because Nuxt 2 hands each
+ * component's <style> block to PostCSS on its own — a definition living in a global stylesheet would
+ * simply not be in scope there, and the name would pass through unresolved into the browser.
+ *
+ * The values are the ones already in use, unchanged: this file names them, it does not re-decide them.
+ * The long tail (565, 630, 639, 640, 656, 800, 960 px) is deliberately NOT here — those are one-off
+ * values that need a design decision before they get a name, not a mechanical alias.
+ */
+
+/* The main mobile/desktop split — by far the most used condition in the app. */
+@custom-media --vp-mobile (max-width: 810px);
+
+/* Tablet and up. */
+@custom-media --vp-tablet-up (min-width: 768px);
+
+/* The narrow-layout threshold used by the smaller components. */
+@custom-media --vp-small-up (min-width: 600px);
+
+/* Wide desktop. */
+@custom-media --vp-desktop-up (min-width: 1024px);

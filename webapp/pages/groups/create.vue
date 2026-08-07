@@ -90,7 +90,7 @@ export default {
   flex: 0 0 100%;
   width: 100%;
 }
-@media (min-width: 768px) {
+@media (--vp-tablet-up) {
   .group-create-layout__main {
     flex: 5 0 0;
   }

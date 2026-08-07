@@ -116,7 +116,7 @@ export default {
   min-width: 0;
 }
 
-@media (min-width: 600px) {
+@media (--vp-small-up) {
   .settings-header {
     margin-bottom: var(--space-small);
   }

@@ -938,7 +938,7 @@ export default {
 /*  compact overview. Mobile/tablet stay single-column (the default). column-* is */
 /*  used (rather than grid/flex) so unequal-height groups fill the space tightly. */
 .perm-groups {
-  @media (min-width: 1024px) {
+  @media (--vp-desktop-up) {
     column-count: 2;
     column-gap: var(--space-large);
   }

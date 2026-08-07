@@ -19,7 +19,8 @@
     "test": "cross-env NODE_ENV=test jest --coverage",
     "test:unit:update": "yarn test -- --updateSnapshot",
     "test:unit:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --no-cache --runInBand  --forceExit --detectOpenHandles",
-    "postinstall": "node scripts/fix-vue2-jest.js && node scripts/fix-v-mapbox.js"
+    "postinstall": "node scripts/fix-vue2-jest.js && node scripts/fix-v-mapbox.js",
+    "lint:css-tokens": "node scripts/check-css-tokens.js"
   },
   "dependencies": {
     "@mapbox/mapbox-gl-geocoder": "^5.0.2",
@@ -73,6 +74,7 @@
     "@babel/core": "^7.25.8",
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
     "@babel/preset-env": "^7.25.8",
+    "@csstools/postcss-global-data": "^4.0.0",
     "@faker-js/faker": "9.9.0",
     "@storybook/addon-a11y": "^8.0.8",
     "@storybook/addon-actions": "^5.3.21",

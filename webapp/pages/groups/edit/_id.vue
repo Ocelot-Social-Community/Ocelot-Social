@@ -99,7 +99,7 @@ export default {
   flex: 0 0 100%;
   width: 100%;
 }
-@media (min-width: 768px) {
+@media (--vp-tablet-up) {
   .group-edit-layout__sidebar {
     flex: 0 0 200px;
     width: 200px;

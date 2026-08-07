@@ -320,7 +320,7 @@ export default {
   color: var(--text-color-base);
   padding-top: 16px;
 
-  @media (max-width: 810px) {
+  @media (--vp-mobile) {
     padding-top: 8px;
   }
 }

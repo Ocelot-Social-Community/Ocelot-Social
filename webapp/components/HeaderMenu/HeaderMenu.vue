@@ -839,7 +839,7 @@ export default {
   .mobile-menu {
     display: none;
   }
-  @media (max-width: 810px) {
+  @media (--vp-mobile) {
     .desktop-menu {
       display: none !important;
     }
@@ -879,7 +879,7 @@ export default {
   gap: 20px;
   min-width: 0;
 }
-@media (max-width: 810px) {
+@media (--vp-mobile) {
   .main-navigation-flex {
     gap: 10px;
   }
@@ -913,7 +913,7 @@ export default {
     flex-direction: column;
     height: calc(100dvh - 20px);
     margin: 0 -10px; /*  extend to screen edge */
-    background-color: #fff;
+    background-color: var(--color-neutral-100);
 
     > .mobile-header-row {
       flex: 0 0 auto;
