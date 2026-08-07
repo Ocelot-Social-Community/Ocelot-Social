@@ -172,7 +172,7 @@ test('buildBrandArchive warns when a referenced asset is missing (but still buil
   assert.match(built.warnings.join('\n'), /logo-squared\.svg/)
 })
 
-test('buildBrandArchive namespaces css, favicon and html-per-locale paths', async () => {
+test('buildBrandArchive namespaces css, favicon, icon and html-per-locale paths', async () => {
   const dir = brandDir({
     config: `export default (defineBranding) =>
       defineBranding({
@@ -180,12 +180,13 @@ test('buildBrandArchive namespaces css, favicon and html-per-locale paths', asyn
         assets: {
           css: ['assets/extra.css'],
           favicon: 'assets/favicon.ico',
+          icon: 'assets/icon.png',
           html: { imprint: { en: 'html/imprint.en.html' } },
         },
         headerMenu: { customButton: { iconPath: 'assets/button.svg', url: 'https://example.test' } },
       })
 `,
-    assets: { 'extra.css': 'x', 'favicon.ico': 'x', 'button.svg': 'x' },
+    assets: { 'extra.css': 'x', 'favicon.ico': 'x', 'icon.png': 'x', 'button.svg': 'x' },
   })
   // the html/ referenced file lives outside assets/ — create it so no warning is emitted
   mkdirSync(join(dir, 'html'), { recursive: true })
@@ -194,6 +195,9 @@ test('buildBrandArchive namespaces css, favicon and html-per-locale paths', asyn
   const config = composeArchive(readTarGz((await buildBrandArchive(dir)).gz))
   assert.deepEqual(config.assets.css, ['/branding/acme/assets/extra.css'])
   assert.equal(config.assets.favicon, '/branding/acme/assets/favicon.ico')
+  // The apple-touch / PWA icon travels the same way — a favicon cannot stand in for it (.ico is not
+  // an apple-touch-icon format), so it is a slot of its own rather than a derived path.
+  assert.equal(config.assets.icon, '/branding/acme/assets/icon.png')
   assert.equal(config.assets.html.imprint.en, '/branding/acme/html/imprint.en.html')
   // the framework's /img/custom/.
   assert.equal(config.headerMenu.customButton.iconPath, '/branding/acme/assets/button.svg')

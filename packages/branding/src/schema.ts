@@ -265,8 +265,19 @@ export interface BrandingConfig {
     /** Static-page HTML per page per locale code, e.g. `html.imprint.de = 'html/de/imprint.html'`.
      * Loaded at runtime by the InternalPage view (replaces the build-bundled html i18n). */
     html: Partial<Record<LinkPageKey, Record<string, string>>>
-    /** Favicon path, e.g. 'assets/favicon.ico'. */
+    /** Favicon path, e.g. 'assets/favicon.ico'. The browser-tab icon; `.ico` is what every brand
+     * ships and what the vanilla fallback is, but any format a browser accepts works — the consumer
+     * derives the `type` attribute from the extension. */
     favicon: string | null
+    /** Square raster icon, e.g. 'assets/icon.png'. Used where a favicon will not do: the iOS
+     * home-screen icon (`apple-touch-icon`, which ignores .ico) and the PWA manifest's install icon.
+     * Must be a raster format and reasonably large (512px square is the useful size — the manifest
+     * declares it at both 192 and 512, and browsers downscale).
+     *
+     * Every brand already ships `assets/icon.png`: the pre-runtime build copied it over the
+     * framework's own webapp/static/icon.png at image-build time. Runtime branding cannot do that, so
+     * the file sat unread in every brand repo until this slot named it. */
+    icon: string | null
   }
 }
 

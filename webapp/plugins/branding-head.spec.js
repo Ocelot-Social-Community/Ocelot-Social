@@ -24,22 +24,32 @@ describe('branding-head plugin', () => {
     document.head.innerHTML = ''
   })
 
-  it('adds the brand stylesheet and retargets the favicon', () => {
-    document.head.innerHTML = '<link rel="icon" href="/favicon.ico">'
+  it('adds the brand stylesheet', () => {
     brandingHead()
 
-    expect(document.querySelector('link[rel="icon"]').getAttribute('href')).toBe(
-      '/branding/acme/assets/favicon.ico',
-    )
     expect(document.querySelectorAll(`link[${CSS_LINK_ATTR}]`)).toHaveLength(1)
+  })
+
+  // The favicon moved to plugins/branding-favicon.js, which brands it through vue-meta on both render
+  // paths. This plugin must not touch the icon link any more — doing both would mean two mechanisms
+  // writing the same tag, and the DOM one would win over the server-rendered value after hydration.
+  it('leaves the icon link to the vue-meta slot', () => {
+    document.head.innerHTML = '<link rel="icon" href="/branding/acme/assets/favicon.ico">'
+
+    brandingHead()
+
+    expect(
+      [...document.querySelectorAll('link[rel="icon"]')].map((l) => l.getAttribute('href')),
+    ).toEqual(['/branding/acme/assets/favicon.ico'])
   })
 
   // The SSR hook (nuxt.config.js) writes the same tags into the rendered HEAD. Running the plugin on
   // top of a server-branded page must be a no-op — otherwise every hydration would duplicate the
   // stylesheet and rewrite the theme block.
   it('leaves the tags the server already rendered untouched', () => {
-    // a server-rendered page: nuxt.config's favicon link, then what the SSR hook appended
-    document.head.innerHTML = `<link rel="icon" href="/favicon.ico">${brandingHeadHtml(BRAND)}`
+    // a server-rendered page: the vue-meta icon link (already branded), then what the SSR hook appended
+    const icon = '<link rel="icon" href="/branding/acme/assets/favicon.ico">'
+    document.head.innerHTML = `${icon}${brandingHeadHtml(BRAND)}`
     const rendered = brandingHeadHtml(BRAND)
 
     brandingHead()
@@ -47,12 +57,7 @@ describe('branding-head plugin', () => {
     // nothing duplicated, and the SSR markup is still there verbatim
     expect(document.querySelectorAll(`link[${CSS_LINK_ATTR}]`)).toHaveLength(1)
     expect(document.head.innerHTML).toContain(rendered)
-    // the favicon is the ONE thing SSR leaves alone (it retargets nuxt's link instead of adding a
-    // second icon), so this is the only mutation the plugin still makes.
-    expect(document.querySelectorAll('link[rel="icon"]')).toHaveLength(1)
-    expect(document.querySelector('link[rel="icon"]').getAttribute('href')).toBe(
-      '/branding/acme/assets/favicon.ico',
-    )
+    expect(document.head.innerHTML).toContain(icon)
   })
 
   // A brand's own rules mostly match framework selectors on equal specificity and win by being LAST.

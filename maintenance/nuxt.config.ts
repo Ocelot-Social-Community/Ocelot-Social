@@ -24,6 +24,32 @@ const brandStylesheets: string[] = has(BRAND_STYLESHEETS)
   ? (JSON.parse(readFileSync(file(BRAND_STYLESHEETS), "utf8")) as string[])
   : [];
 
+// The favicon is read HERE rather than declared via useHead in app.vue, because with `ssr: false`
+// useHead contributes nothing to the prerendered index.html — the link would only appear once the
+// bundle has run, and until then the browser issues its implicit /favicon.ico request and gets the
+// vanilla icon. Emitting it from the config puts it in the built markup, where it belongs.
+//
+// The same overlay app/constants/metadata.ts reads, so there is one artifact and no second file to
+// keep in step; the default below matches its own FAVICON default.
+const BRAND_METADATA = "app/constants/metadata.brand.json";
+const brandMetadata: Record<string, string> = has(BRAND_METADATA)
+  ? (JSON.parse(readFileSync(file(BRAND_METADATA), "utf8")) as Record<string, string>)
+  : {};
+const favicon = brandMetadata.FAVICON ?? "/favicon.ico";
+
+// A wrong type can make a browser discard the icon outright, so an extension we do not recognise is
+// announced as nothing at all and left to sniffing.
+const ICON_TYPES: Record<string, string> = {
+  ico: "image/x-icon",
+  png: "image/png",
+  svg: "image/svg+xml",
+  gif: "image/gif",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  webp: "image/webp",
+};
+const faviconType = ICON_TYPES[/\.([a-z0-9]+)(?:[?#]|$)/i.exec(favicon)?.[1]?.toLowerCase() ?? ""];
+
 // Per-locale overlays holding just the namespaces this page renders. `files` is a merge list: the
 // vanilla file first, the brand's on top, so an untranslated key keeps its default.
 const localeFiles = (code: string): string[] =>
@@ -51,11 +77,14 @@ export default defineNuxtConfig({
       // `tagPriority: "low"` puts these AFTER the bundled css above — the position the brand sheet
       // held while it was the last entry in `css`. Without it unhead emits config head tags before
       // the build's own stylesheet links, and a brand rule would lose every tie on specificity.
-      link: brandStylesheets.map((href) => ({
-        rel: "stylesheet",
-        href,
-        tagPriority: "low" as const,
-      })),
+      link: [
+        { rel: "icon", href: favicon, ...(faviconType ? { type: faviconType } : {}) },
+        ...brandStylesheets.map((href) => ({
+          rel: "stylesheet",
+          href,
+          tagPriority: "low" as const,
+        })),
+      ],
     },
   },
   i18n: {

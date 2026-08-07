@@ -120,5 +120,6 @@ export const brandingDefaults: BrandingConfig = {
     css: [],
     html: {},
     favicon: null,
+    icon: null,
   },
 }
