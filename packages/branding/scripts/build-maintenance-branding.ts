@@ -163,6 +163,15 @@ function serveImage(namespaced: string, label: string): string | null {
 
 const logoUrl = serveImage(config.logos.signupPath, 'logo')
 const ogImageUrl = serveImage(config.metadata.ogImage, 'og image')
+// The browser-tab icon. It travels exactly like the logo — and it has to travel at all, because this
+// page ships its own vanilla public/favicon.ico and nothing else would ever replace it: the built
+// index.html carries no icon link (Nuxt 4 adds none, and useHead cannot help with `ssr: false`), so
+// the browser falls back to its implicit /favicon.ico request. Every brand's maintenance page showed
+// the ocelot icon until this was wired up.
+//
+// Only `assets.favicon`, not `assets.icon`: apple-touch and PWA install icons exist for a site being
+// added to a home screen, which is not something anyone does with a maintenance page.
+const faviconUrl = config.assets.favicon ? serveImage(config.assets.favicon, 'favicon') : null
 // The composed ogImage is a `/branding/<id>/…` path — served by the live webapp, never by this static
 // site — so it has to become the copy just made. Falling back to the logo covers the usual case, where
 // a brand sets no separate OG image and the build derived it from the squared logo. null means the
@@ -200,6 +209,9 @@ writeFileSync(
           }
         : {}),
       ...(logoUrl ? { LOGO: logoUrl } : {}),
+      // Same omit-rather-than-null rule as above: a present key WINS, so a brand whose favicon is not
+      // in the archive must fall through to the vanilla one instead of blanking it out.
+      ...(faviconUrl ? { FAVICON: faviconUrl } : {}),
     },
     null,
     2,
