@@ -160,12 +160,13 @@
   padding: 0;
   margin: 0;
   margin-bottom: var(--font-space-x-large);
-  &:last-child {
-    margin-bottom: 0;
-  }
   font-family: var(--font-family-text);
   line-height: var(--line-height-base);
   display: block;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
 .ds-text-bold {
@@ -228,6 +229,7 @@
 .ds-table-col {
   vertical-align: top;
   padding: var(--space-small) var(--space-xx-small);
+
   &:last-child {
     padding-right: 0;
   }
