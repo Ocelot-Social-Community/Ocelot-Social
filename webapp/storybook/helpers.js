@@ -18,6 +18,12 @@ const helpers = {
   // FollowConnections handler below.
   followListConnections: {},
   init(options = {}) {
+    // Re-seeded on every call, i.e. fresh at the top of every *.story.js file (each calls
+    // helpers.init() before generating its own fixtures) — so names/ids/dates from faker.person /
+    // faker.string.uuid / faker.date etc. come out the same on every run regardless of what other
+    // story files did first. Visual-regression screenshots need that: a random name or date baked
+    // into a component render would fail the pixel diff on every single run, not just real changes.
+    faker.seed(20260101)
     Vue.use(Vuex)
     // `~/plugins/vue-filters` is a Nuxt plugin — it expects `({ app })`, not the `Vue` constructor
     // `Vue.use` would hand it. Called wrong, `getDateFnsLocale` closes over an app without `$i18n`

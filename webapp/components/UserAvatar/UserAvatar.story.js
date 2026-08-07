@@ -104,17 +104,21 @@ storiesOf('UserAvatar', module)
     store: helpers.store,
     data: () => ({
       user,
+      // Fixed rather than `new Date()` — a relative "time ago" label would otherwise render a
+      // different string on every run (and every visual-regression screenshot) than the last.
+      fixedDate: '2024-01-15T10:00:00.000Z',
     }),
-    template: '<user-avatar :user="user" :show-slug="true" :date-time="new Date()" />',
+    template: '<user-avatar :user="user" :show-slug="true" :date-time="fixedDate" />',
   }))
   .add('has edited something', () => ({
     components: { UserAvatar },
     store: helpers.store,
     data: () => ({
       user,
+      fixedDate: '2024-01-15T10:00:00.000Z',
     }),
     template: `
-    <user-avatar :user="user" :show-slug="true" :date-time="new Date()">
+    <user-avatar :user="user" :show-slug="true" :date-time="fixedDate">
       <template #dateTime>
         - HEY! I'm edited
       </template>
@@ -126,8 +130,9 @@ storiesOf('UserAvatar', module)
     store: helpers.store,
     data: () => ({
       user: null,
+      fixedDate: '2024-01-15T10:00:00.000Z',
     }),
-    template: '<user-avatar :user="user" :show-slug="true" :date-time="new Date()" />',
+    template: '<user-avatar :user="user" :show-slug="true" :date-time="fixedDate" />',
   }))
   .add('with group and date', () => ({
     components: { UserAvatar },
@@ -135,9 +140,10 @@ storiesOf('UserAvatar', module)
     data: () => ({
       user,
       group,
+      fixedDate: '2024-01-15T10:00:00.000Z',
     }),
     template:
-      '<user-avatar :user="user" :show-slug="true" :group="group" :date-time="new Date()" />',
+      '<user-avatar :user="user" :show-slug="true" :group="group" :date-time="fixedDate" />',
   }))
   .add('with group and date – wide', () => ({
     components: { UserAvatar },
@@ -145,7 +151,8 @@ storiesOf('UserAvatar', module)
     data: () => ({
       user,
       group,
+      fixedDate: '2024-01-15T10:00:00.000Z',
     }),
     template:
-      '<user-avatar :user="user" :show-slug="true" :group="group" wide :date-time="new Date()" />',
+      '<user-avatar :user="user" :show-slug="true" :group="group" wide :date-time="fixedDate" />',
   }))
