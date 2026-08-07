@@ -76,8 +76,8 @@ FROM base AS build
 # Branding is baked at build time from a brand's TYPED config under deployment/configurations/<BRAND>
 # — the generator derives the maintenance colours, web fonts, logo, metadata and `maintenance` strings
 # from it, so a brand defines each ONCE and both the live app and the maintenance page follow. It
-# writes only NEW files (app/assets/css/brand.css, app/constants/metadata.brand.json, app/locales/,
-# public/img|fonts/brand/), each loaded as an optional overlay — no committed source is edited, here
+# writes only NEW files (app/constants/stylesheets.brand.json + metadata.brand.json, app/locales/,
+# public/brand/), each loaded as an optional overlay — no committed source is edited, here
 # or in a working copy. Pick the brand with `--build-arg BRAND=<name>` (a directory name under
 # deployment/configurations/); empty = vanilla ocelot.social.
 # Path 1 — MONOREPO build (docker compose, ocelot's own branded images).
