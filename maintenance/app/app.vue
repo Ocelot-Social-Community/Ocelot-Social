@@ -32,19 +32,22 @@
 import { OsCard } from "@ocelot-social/ui";
 
 import LocaleSwitch from "~/components/LocaleSwitch.vue";
-import emails, { SUPPORT_EMAIL_PLACEHOLDER } from "~/constants/emails";
+import emails, { isSupportAddress } from "~/constants/emails";
 import metadata from "~/constants/metadata";
 
 const { t } = useI18n();
 
-// $SUPPORT_EMAIL, injected at build time or by the nginx entrypoint (see constants/emails.ts). A
-// placeholder that is still there means neither happened — `nuxt dev` without the env, or a preview
-// of the built files without nginx — so fall back rather than render the token.
+// $SUPPORT_EMAIL, injected at build time or by the nginx entrypoint (see constants/emails.ts).
+// Anything that is not an address means neither happened — `nuxt dev` without the env, or a preview
+// of the built files without nginx — so fall back rather than render a raw token.
+//
+// Asking what the value IS, not whether it equals the placeholder: the token also lives in this
+// bundle, so a comparison against it turns a SUCCESSFUL substitution into a fallback. See
+// isSupportAddress().
 const configured = useRuntimeConfig().public.supportEmail;
-const supportEmail =
-  !configured || configured === SUPPORT_EMAIL_PLACEHOLDER
-    ? emails.SUPPORT_EMAIL
-    : configured;
+const supportEmail = isSupportAddress(configured)
+  ? configured
+  : emails.SUPPORT_EMAIL;
 // From the metadata, not hard-coded: a brand's logo has its own filename and extension, and the
 // generator points LOGO at the copy it serves from /img/brand/ (vanilla → /img/custom/…).
 const logoUrl = metadata.LOGO;
