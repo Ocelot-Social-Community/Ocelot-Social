@@ -1,0 +1,20 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-maintenance-env
+# `maintenance.env` like every other workload's `<component>.env`, with one default folded in:
+# SUPPORT_EMAIL follows the backend's value unless the brand states its own, so the address the
+# maintenance page shows and the one the backend uses cannot disagree, and a brand that already
+# configures the backend gets a correctly addressed maintenance page without a second entry.
+#
+# Deliberately no default in values.yaml: with neither side set, both fall back to the same software
+# default (backend/src/config/softwareDefaults.ts SUPPORT_EMAIL, mirrored in the maintenance app) —
+# a chart-level default would add a second place to state it and a second place to forget.
+{{- $env := deepCopy (.Values.maintenance.env | default dict) }}
+{{- if not (hasKey $env "SUPPORT_EMAIL") }}
+{{- with (.Values.backend.env).SUPPORT_EMAIL }}
+{{- $_ := set $env "SUPPORT_EMAIL" . }}
+{{- end }}
+{{- end }}
+data:
+{{ $env | toYaml | indent 2 }}

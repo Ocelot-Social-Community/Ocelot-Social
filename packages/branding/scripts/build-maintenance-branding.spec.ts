@@ -55,6 +55,9 @@ function write(file: string, body: string | Buffer): void {
 const readText = (dir: string, rel: string): string => readFileSync(join(dir, rel), 'utf8')
 const readJson = (dir: string, rel: string): Record<string, Record<string, string>> =>
   JSON.parse(readText(dir, rel))
+/** The generated list of served stylesheet URLs — what nuxt.config turns into <head> links. */
+const readSheets = (dir: string): string[] =>
+  JSON.parse(readText(dir, 'app/constants/stylesheets.brand.json')) as string[]
 
 /** A brand dir with a squared logo, one web font and a locale carrying maintenance + webapp strings. */
 function brandDir(): string {
@@ -159,7 +162,7 @@ describe('build-maintenance-branding', () => {
       assert.equal(afterRun.get(rel), content, `${rel} was modified or removed`)
     }
     for (const rel of [
-      'app/assets/css/brand.css',
+      'app/constants/stylesheets.brand.json',
       'app/constants/metadata.brand.json',
       'app/locales/de.json',
       'public/brand/logo-squared.svg',
@@ -202,29 +205,32 @@ describe('build-maintenance-branding', () => {
     assert.ok(declared.paths.includes(`public/${declared.servedDir}`))
   })
 
-  test('imports the brand stylesheets, then declares the tokens', () => {
+  test('lists the brand stylesheets by the url they are served from', () => {
     const to = maintenanceDir()
     brand(brandDir(), to)
 
-    const css = readText(to, 'app/assets/css/brand.css')
     // The brand's own sheet is served from the maintenance app, not from /branding/<id>/… (that route
     // only exists in the live webapp, which is down whenever this page is shown) …
     assert.match(readText(to, 'public/brand/brand.css'), /@font-face/)
     // … and its @font-face url resolves relative to THAT file, which is why the font travels too.
     assert.equal(readText(to, 'public/brand/fonts/acme.woff2'), 'woff2-bytes')
-    assert.match(css, /@import url\("\/brand\/brand\.css"\);/)
-    // The tokens live in the imported sheet — brand.css only points at it. And the packed sheet ships
-    // with :root:root, so it outranks the maintenance page's own defaults too.
+    // A URL, not a filesystem path: nuxt.config links it in the <head> and the browser fetches it
+    // from public/. An @import from a BUNDLED stylesheet could not resolve it — vite resolves
+    // @import at build time and never looks in publicDir.
+    assert.deepEqual(readSheets(to), ['/brand/brand.css'])
+    // The tokens live in the linked sheet — nothing generates a :root block any more. And the packed
+    // sheet ships with :root:root, so it outranks the maintenance page's own defaults whatever the
+    // link order.
     const sheet = readText(to, 'public/brand/brand.css')
     assert.match(sheet, /:root:root \{[^}]*--color-primary: rebeccapurple/)
     assert.match(sheet, /--font-family-text: 'Acme Sans', sans-serif/)
   })
 
-  // @import order is cascade order. The archive is walked with readdirSync (filesystem order), so
+  // Link order is cascade order. The archive is walked with readdirSync (filesystem order), so
   // taking the sheets as they come out of it would let the filesystem decide which of two brand
   // stylesheets wins — here it would invert the brand's choice, since 'a-override' sorts before
   // 'z-base'. Deliberately non-alphabetical config order is the whole point of the fixture.
-  test('imports the stylesheets in the order assets.css lists them', () => {
+  test('lists the stylesheets in the order assets.css lists them', () => {
     const dir = tmp('ocelot-brand-order-')
     write(join(dir, 'package.json'), JSON.stringify({ name: 'acme-branding', version: '1.0.0' }))
     write(
@@ -242,11 +248,7 @@ describe('build-maintenance-branding', () => {
     const to = maintenanceDir()
     brand(dir, to)
 
-    const css = readText(to, 'app/assets/css/brand.css')
-    assert.match(
-      css,
-      /@import url\("\/brand\/z-base\.css"\);[\s\S]*@import url\("\/brand\/a-override\.css"\);/,
-    )
+    assert.deepEqual(readSheets(to), ['/brand/z-base.css', '/brand/a-override.css'])
     // Both are still unpacked — a sheet's url() has to resolve whatever its place in the cascade.
     assert.ok(existsSync(join(to, 'public/brand/z-base.css')))
     assert.ok(existsSync(join(to, 'public/brand/a-override.css')))
@@ -392,11 +394,11 @@ describe('build-maintenance-branding', () => {
       const to = maintenanceDir()
       const from = brandDir()
       brand(from, to)
-      const first = readText(to, 'app/assets/css/brand.css')
+      const first = readText(to, 'app/constants/stylesheets.brand.json')
 
       brand(from, to)
 
-      assert.equal(readText(to, 'app/assets/css/brand.css'), first)
+      assert.equal(readText(to, 'app/constants/stylesheets.brand.json'), first)
     })
   })
 
@@ -415,9 +417,9 @@ describe('build-maintenance-branding', () => {
 
     brand(plain, to)
 
-    const css = readText(to, 'app/assets/css/brand.css')
-    assert.equal(css.includes('@font-face'), false)
-    assert.equal(css.includes('rebeccapurple'), false)
+    // No sheets to link, and — just as importantly — the previous brand's are gone from the list
+    // rather than pointing at files that no longer exist.
+    assert.deepEqual(readSheets(to), [])
     assert.equal(existsSync(join(to, 'public/brand')), false)
   })
 
@@ -464,9 +466,9 @@ describe('build-maintenance-branding', () => {
     assert.equal(status, 0) // a missing asset is a warning, never a failed build
     assert.match(stderr, /entry not in archive: assets\/nowhere\.svg/)
     assert.match(stderr, /entry not in archive: assets\/nowhere\.svg/)
-    // The token lives in the imported sheet now; brand.css only points at it.
+    // The token lives in the linked sheet now; the generated list only points at it.
     assert.match(readText(to, 'public/brand/brand.css'), /--color-primary: teal/)
-    assert.match(readText(to, 'app/assets/css/brand.css'), /@import url\("\/brand\/brand\.css"\);/)
+    assert.deepEqual(readSheets(to), ['/brand/brand.css'])
     const meta = readJson(to, 'app/constants/metadata.brand.json') as unknown as Record<
       string,
       string
@@ -510,6 +512,6 @@ describe('build-maintenance-branding', () => {
       readText(to, 'public/brand/brand.css'),
       /url\('https:\/\/cdn\.example\/remote\.woff2'\)/,
     )
-    assert.match(readText(to, 'app/assets/css/brand.css'), /@import url\("\/brand\/brand\.css"\);/)
+    assert.deepEqual(readSheets(to), ['/brand/brand.css'])
   })
 })
