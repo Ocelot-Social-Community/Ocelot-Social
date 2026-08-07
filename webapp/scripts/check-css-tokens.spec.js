@@ -62,8 +62,19 @@ describe('styleBodies', () => {
     expect(styleBodies(style('.a { color: red; }'))).toHaveLength(1)
   })
 
-  it.each(['scss', 'sass'])('skips lang="%s" blocks — those still have a preprocessor', (lang) => {
-    expect(styleBodies(style('.a { color: $red; }', ` lang="${lang}"`))).toEqual([])
+  it.each([
+    ['lang="scss"', ' lang="scss"'],
+    ["lang='scss'", " lang='scss'"],
+    ['lang=scss', ' lang=scss'],
+    ['lang="sass"', ' lang="sass"'],
+    ['lang=sass', ' lang=sass'],
+    ['lang=scss scoped', ' lang=scss scoped'],
+  ])('skips %s blocks — those still have a preprocessor', (_name, attrs) => {
+    expect(styleBodies(style('.a { color: $red; }', attrs))).toEqual([])
+  })
+
+  it('does not mistake a lang it has never heard of for scss', () => {
+    expect(styleBodies(style('.a { color: red; }', ' lang=scssish'))).toHaveLength(1)
   })
 
   it('returns nothing for a file without a style block', () => {

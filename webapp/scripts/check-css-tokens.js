@@ -107,10 +107,18 @@ function declarations(body) {
   return found
 }
 
-/** The plain-CSS `<style>` bodies of a .vue file — `lang="scss"` blocks are somebody else's problem. */
+/**
+ * The plain-CSS `<style>` bodies of a .vue file — `lang="scss"` blocks are somebody else's problem.
+ *
+ * The quotes are optional because HTML and the Vue SFC parser both accept `lang=scss` bare. Nothing in
+ * this repo writes it that way and prettier would requote it, but missing one is the expensive
+ * direction: the block would be read as plain CSS and every `$variable` in it reported as a leftover.
+ */
+const SCSS_BLOCK = /<style[^>]*\blang=(?:"s[ac]ss"|'s[ac]ss'|s[ac]ss(?=[\s/>]|$))/
+
 function styleBodies(src) {
   return (src.match(/<style[^>]*>[\s\S]*?<\/style>/g) || []).filter(
-    (block) => !/<style[^>]*\blang=["']s[ac]ss["']/.test(block),
+    (block) => !SCSS_BLOCK.test(block),
   )
 }
 
