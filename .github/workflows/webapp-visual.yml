@@ -1,0 +1,80 @@
+name: Webapp Visual
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+# Least privilege. pull-requests:read is required by dorny/paths-filter, which lists a PR's changed
+# files via the API (the fetch-depth:1 checkout has no base history for a local diff).
+permissions:
+  contents: read
+  pull-requests: read
+
+defaults:
+  run:
+    working-directory: webapp
+
+jobs:
+  files-changed:
+    name: Detect File Changes
+    runs-on: ubuntu-latest
+    outputs:
+      webapp: ${{ steps.changes.outputs.webapp }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Check for file changes
+        uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4.0.2
+        id: changes
+        with:
+          token: ${{ github.token }}
+          filters: .github/file-filters.yml
+
+  visual:
+    name: Visual Regression
+    if: needs.files-changed.outputs.webapp == 'true'
+    needs: files-changed
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        with:
+          node-version-file: 'webapp/.nvmrc'
+          cache: 'yarn'
+          cache-dependency-path: 'webapp/yarn.lock'
+
+      # The webapp depends on @ocelot-social/branding via `file:../packages/branding`; its dist/ must
+      # exist BEFORE `yarn` copies the file: dependency, otherwise the install fails.
+      - name: Build @ocelot-social/branding
+        working-directory: packages/branding
+        run: npm ci && npm run build
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Run visual tests
+        run: yarn test:visual
+
+      - name: Upload test results
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        if: failure()
+        with:
+          name: webapp-visual-test-results
+          path: |
+            webapp/test-results/
+            webapp/playwright-report/
+          retention-days: 7

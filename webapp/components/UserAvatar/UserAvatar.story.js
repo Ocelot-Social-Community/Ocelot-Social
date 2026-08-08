@@ -1,5 +1,4 @@
 import { storiesOf } from '@storybook/vue'
-import { withA11y } from '@storybook/addon-a11y'
 import UserAvatar from '~/components/UserAvatar/UserAvatar.vue'
 import helpers from '~/storybook/helpers'
 
@@ -9,9 +8,7 @@ export const user = {
   id: 'u6',
   slug: 'louie',
   name: 'Louie',
-  avatar: {
-    url: 'https://s3.amazonaws.com/uifaces/faces/twitter/designervzm/128.jpg',
-  },
+  avatar: helpers.avatarImage('https://s3.amazonaws.com/uifaces/faces/twitter/designervzm/128.jpg'),
   about:
     'Illum in et velit soluta voluptatem architecto consequuntur enim placeat. Eum excepturi est ratione rerum in voluptatum corporis. Illum consequatur minus. Modi incidunt velit.',
   disabled: false,
@@ -30,9 +27,9 @@ export const user = {
       id: 'u3',
       slug: 'jenny-rostock',
       name: 'Jenny Rostock',
-      avatar: {
-        url: 'https://s3.amazonaws.com/uifaces/faces/twitter/bowbrick/128.jpg',
-      },
+      avatar: helpers.avatarImage(
+        'https://s3.amazonaws.com/uifaces/faces/twitter/bowbrick/128.jpg',
+      ),
       disabled: false,
       deleted: false,
       followedByCount: 2,
@@ -93,7 +90,6 @@ export const group = {
 }
 
 storiesOf('UserAvatar', module)
-  .addDecorator(withA11y)
   .addDecorator(helpers.layout)
   .add('user only', () => ({
     components: { UserAvatar },
@@ -108,17 +104,21 @@ storiesOf('UserAvatar', module)
     store: helpers.store,
     data: () => ({
       user,
+      // Fixed rather than `new Date()` — a relative "time ago" label would otherwise render a
+      // different string on every run (and every visual-regression screenshot) than the last.
+      fixedDate: '2024-01-15T10:00:00.000Z',
     }),
-    template: '<user-avatar :user="user" :show-slug="true" :date-time="new Date()" />',
+    template: '<user-avatar :user="user" :show-slug="true" :date-time="fixedDate" />',
   }))
   .add('has edited something', () => ({
     components: { UserAvatar },
     store: helpers.store,
     data: () => ({
       user,
+      fixedDate: '2024-01-15T10:00:00.000Z',
     }),
     template: `
-    <user-avatar :user="user" :show-slug="true" :date-time="new Date()">
+    <user-avatar :user="user" :show-slug="true" :date-time="fixedDate">
       <template #dateTime>
         - HEY! I'm edited
       </template>
@@ -130,8 +130,9 @@ storiesOf('UserAvatar', module)
     store: helpers.store,
     data: () => ({
       user: null,
+      fixedDate: '2024-01-15T10:00:00.000Z',
     }),
-    template: '<user-avatar :user="user" :show-slug="true" :date-time="new Date()" />',
+    template: '<user-avatar :user="user" :show-slug="true" :date-time="fixedDate" />',
   }))
   .add('with group and date', () => ({
     components: { UserAvatar },
@@ -139,9 +140,10 @@ storiesOf('UserAvatar', module)
     data: () => ({
       user,
       group,
+      fixedDate: '2024-01-15T10:00:00.000Z',
     }),
     template:
-      '<user-avatar :user="user" :show-slug="true" :group="group" :date-time="new Date()" />',
+      '<user-avatar :user="user" :show-slug="true" :group="group" :date-time="fixedDate" />',
   }))
   .add('with group and date – wide', () => ({
     components: { UserAvatar },
@@ -149,7 +151,8 @@ storiesOf('UserAvatar', module)
     data: () => ({
       user,
       group,
+      fixedDate: '2024-01-15T10:00:00.000Z',
     }),
     template:
-      '<user-avatar :user="user" :show-slug="true" :group="group" wide :date-time="new Date()" />',
+      '<user-avatar :user="user" :show-slug="true" :group="group" wide :date-time="fixedDate" />',
   }))

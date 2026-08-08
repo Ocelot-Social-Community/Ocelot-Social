@@ -1,6 +1,5 @@
 import { storiesOf } from '@storybook/vue'
-import { withA11y } from '@storybook/addon-a11y'
-import StoryRouter from 'storybook-vue-router'
+import StoryRouter from '~/storybook/storyRouter'
 import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import helpers from '~/storybook/helpers'
 import { user } from '~/components/UserAvatar/UserAvatar.story.js'
@@ -20,10 +19,9 @@ const userWithoutAvatar = {
 const userWithAvatar = {
   ...user,
   name: 'Jochen Image',
-  avatar: { url: imageFile },
+  avatar: helpers.avatarImage(imageFile),
 }
 storiesOf('AvatarImage', module)
-  .addDecorator(withA11y)
   .addDecorator(helpers.layout)
   .addDecorator(StoryRouter())
   .add('normal, with image', () => ({

@@ -1,5 +1,4 @@
 import { storiesOf } from '@storybook/vue'
-import { withA11y } from '@storybook/addon-a11y'
 import CommentCard from './CommentCard'
 import helpers from '~/storybook/helpers'
 
@@ -17,9 +16,9 @@ const comment = {
   disabled: false,
   author: {
     id: '1',
-    avatar: {
-      url: 'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/db/dbc9e03ebcc384b920c31542af2d27dd8eea9dc2_full.jpg',
-    },
+    avatar: helpers.avatarImage(
+      'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/db/dbc9e03ebcc384b920c31542af2d27dd8eea9dc2_full.jpg',
+    ),
     slug: 'jenny-rostock',
     name: 'Rainer Unsinn',
     disabled: false,
@@ -43,7 +42,6 @@ const comment = {
 }
 
 storiesOf('CommentCard', module)
-  .addDecorator(withA11y)
   .addDecorator(helpers.layout)
   .add('Basic comment', () => ({
     components: { CommentCard },
