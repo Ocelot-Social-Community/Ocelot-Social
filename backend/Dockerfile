@@ -3,7 +3,7 @@
 # Build the shared branding package (tsc -> dist). Placed at /packages/branding in `base` so the
 # backend's `file:../packages/branding` dependency resolves. Requires the repo-root build context
 # (see docker-compose*.yml / .github/workflows — backend now builds with `context: .`).
-FROM node:25.9.0-alpine AS branding-library
+FROM node:26.6.0-alpine AS branding-library
 RUN mkdir -p /app
 WORKDIR /app
 COPY packages/branding/package.json packages/branding/package-lock.json ./
@@ -24,7 +24,7 @@ FROM branding-library AS branding-tools
 FROM branding-library AS branding-runtime
 RUN npm prune --omit=dev
 
-FROM node:25.9.0-alpine AS base
+FROM node:26.6.0-alpine AS base
 LABEL org.label-schema.name="ocelot.social:backend"
 LABEL org.label-schema.description="Backend of the Social Network Software ocelot.social"
 LABEL org.label-schema.usage="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md"
