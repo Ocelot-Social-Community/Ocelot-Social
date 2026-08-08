@@ -1,6 +1,5 @@
 import { faker } from '@faker-js/faker'
 import { storiesOf } from '@storybook/vue'
-import { withA11y } from '@storybook/addon-a11y'
 import { OsCard } from '@ocelot-social/ui'
 import HcEmpty from '~/components/Empty/Empty'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid'
@@ -8,10 +7,11 @@ import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem'
 import PostTeaser from '~/components/PostTeaser/PostTeaser'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
+import GroupTeaser from '~/components/Group/GroupTeaser'
 import HcHashtag from '~/components/Hashtag/Hashtag'
 import helpers from '~/storybook/helpers'
 import { post } from '~/components/PostTeaser/PostTeaser.story.js'
-import { user } from '~/components/UserAvatar/UserAvatar.story.js'
+import { user, group } from '~/components/UserAvatar/UserAvatar.story.js'
 
 helpers.init()
 
@@ -41,6 +41,16 @@ const userMock = (fields) => {
   }
 }
 
+const groupMock = (fields) => {
+  return {
+    ...group,
+    id: faker.string.uuid(),
+    disabled: false,
+    typename: 'Group',
+    ...fields,
+  }
+}
+
 const posts = [
   postMock(),
   postMock({ author: user }),
@@ -61,10 +71,15 @@ const users = [
   userMock({ slug: 'louanna', name: 'Louanna' }),
 ]
 
+const groups = [
+  groupMock(),
+  groupMock({ slug: 'louie-book-club', name: 'Louie Book Club' }),
+  groupMock({ slug: 'louicinda-choir', name: 'Louicinda Choir' }),
+]
+
 storiesOf('TabNavigator', module)
-  .addDecorator(withA11y)
   .addDecorator(helpers.layout)
-  .add('given search results of posts, users, hashtags', () => ({
+  .add('given search results of posts, users, groups, hashtags', () => ({
     components: {
       TabNavigation,
       HcEmpty,
@@ -72,6 +87,7 @@ storiesOf('TabNavigator', module)
       MasonryGridItem,
       PostTeaser,
       UserAvatar,
+      GroupTeaser,
       HcHashtag,
       OsCard,
     },
@@ -79,10 +95,12 @@ storiesOf('TabNavigator', module)
     data: () => ({
       posts: posts,
       users: users,
+      groups: groups,
       hashtags: [],
 
       postCount: posts.length,
       userCount: users.length,
+      groupCount: groups.length,
       hashtagCount: 0,
 
       activeTab: 'Post',
@@ -91,15 +109,19 @@ storiesOf('TabNavigator', module)
       activeResources() {
         if (this.activeTab === 'Post') return this.posts
         if (this.activeTab === 'User') return this.users
+        if (this.activeTab === 'Group') return this.groups
         if (this.activeTab === 'Hashtag') return this.hashtags
         return []
       },
       activeResourceCount() {
         if (this.activeTab === 'Post') return this.postCount
         if (this.activeTab === 'User') return this.userCount
+        if (this.activeTab === 'Group') return this.groupCount
         if (this.activeTab === 'Hashtag') return this.hashtagCount
         return 0
       },
+      // Mirrors ~/components/_new/features/SearchResults/SearchResults.vue's tabOptions/searchCount —
+      // same tab set (Post/User/Group/Hashtag) so the story matches what search actually renders.
       tabOptions() {
         return [
           {
@@ -115,6 +137,12 @@ storiesOf('TabNavigator', module)
             disabled: this.userCount === 0,
           },
           {
+            type: 'Group',
+            title: this.$t('search.heading.Group', {}, this.groupCount),
+            count: this.groupCount,
+            disabled: this.groupCount === 0,
+          },
+          {
             type: 'Hashtag',
             title: this.$t('search.heading.Tag', {}, this.hashtagCount),
             count: this.hashtagCount,
@@ -123,7 +151,7 @@ storiesOf('TabNavigator', module)
         ]
       },
       searchCount() {
-        return this.postCount + this.userCount + this.hashtagCount
+        return this.postCount + this.userCount + this.groupCount + this.hashtagCount
       },
     },
     methods: {
@@ -135,56 +163,67 @@ storiesOf('TabNavigator', module)
     },
     template: `
       <div id="search-results" class="search-results">
-        <ds-flex-item :width="{ base: '100%', sm: 3, md: 5, lg: 3 }">
-          <masonry-grid>
-            <!-- tabs -->
-            <tab-navigation :tabs="tabOptions" :activeTab="activeTab" @switch-tab="switchTab" />
+        <!-- tabs — a sibling of the results grid, not an item inside it (it was previously placed
+             inside masonry-grid, where the masonry algorithm treated it as just another brick) -->
+        <tab-navigation :tabs="tabOptions" :activeTab="activeTab" @switch-tab="switchTab" />
 
-            <!-- search results -->
-
-            <template v-if="!(!activeResourceCount || searchCount === 0)">
-              <!-- posts -->
-              <template v-if="activeTab === 'Post'">
-                <masonry-grid-item
-                  v-for="post in activeResources"
-                  :key="post.id"
-                  :imageAspectRatio="post.image && post.image.aspectRatio"
-                >
-                  <post-teaser
-                    :post="post"
-                    :width="{ base: '100%', md: '100%', xl: '50%' }"
-                    @removePostFromList="posts = removePostFromList(post, posts)"
-                    @pinPost="pinPost(post, refetchPostList)"
-                    @unpinPost="unpinPost(post, refetchPostList)"
-                  />
-                </masonry-grid-item>
-              </template>
-              <!-- users -->
-              <template v-if="activeTab === 'User'">
-                <div v-for="user in activeResources" :key="user.id" style="grid-row-end: span 2;">
-                  <os-card>
-                    <user-avatar :user="user" />
-                  </os-card>
-                </div>
-              </template>
-              <!-- hashtags -->
-              <template v-if="activeTab === 'Hashtag'">
-                <div v-for="hashtag in activeResources" :key="hashtag.id" style="grid-row-end: span 2;">
-                  <os-card>
-                    <hc-hashtag :id="hashtag.id" />
-                  </os-card>
-                </div>
-              </template>
-            </template>
-
-            <!-- no results -->
-            <div v-else style="grid-row-end: span 7; grid-column: 1 / -1;">
-              <div class="ds-mb-large ds-space-centered">
-                <hc-empty icon="tasks" :message="$t('search.no-results', { search })" />
-              </div>
-            </div>
+        <!-- search results -->
+        <template v-if="!(!activeResourceCount || searchCount === 0)">
+          <!-- posts -->
+          <masonry-grid v-if="activeTab === 'Post'">
+            <masonry-grid-item
+              v-for="post in activeResources"
+              :key="post.id"
+              :imageAspectRatio="post.image && post.image.aspectRatio"
+            >
+              <post-teaser
+                :post="post"
+                :width="{ base: '100%', md: '100%', xl: '50%' }"
+                @removePostFromList="posts = removePostFromList(post, posts)"
+                @pinPost="pinPost(post, refetchPostList)"
+                @unpinPost="unpinPost(post, refetchPostList)"
+              />
+            </masonry-grid-item>
           </masonry-grid>
-        </ds-flex-item>
+          <!-- users -->
+          <div
+            v-if="activeTab === 'User'"
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: var(--space-small); padding-top: var(--space-small);"
+          >
+            <div v-for="user in activeResources" :key="user.id">
+              <os-card>
+                <user-avatar :user="user" />
+              </os-card>
+            </div>
+          </div>
+          <!-- groups -->
+          <div
+            v-if="activeTab === 'Group'"
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: var(--space-small); padding-top: var(--space-small);"
+          >
+            <div v-for="group in activeResources" :key="group.id">
+              <group-teaser :group="group" />
+            </div>
+          </div>
+          <!-- hashtags -->
+          <div
+            v-if="activeTab === 'Hashtag'"
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: var(--space-small); padding-top: var(--space-small);"
+          >
+            <div v-for="hashtag in activeResources" :key="hashtag.id">
+              <os-card>
+                <hc-hashtag :id="hashtag.id" />
+              </os-card>
+            </div>
+          </div>
+        </template>
+
+        <!-- no results -->
+        <div v-else>
+          <div class="ds-mb-large ds-space-centered">
+            <hc-empty icon="tasks" :message="$t('search.no-results', { search })" />
+          </div>
+        </div>
       </div>
     `,
   }))

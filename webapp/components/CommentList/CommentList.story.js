@@ -1,6 +1,5 @@
 import { faker } from '@faker-js/faker'
 import { storiesOf } from '@storybook/vue'
-import { withA11y } from '@storybook/addon-a11y'
 import HcCommentList from './CommentList.vue'
 import helpers from '~/storybook/helpers'
 
@@ -15,6 +14,7 @@ const commentMock = (fields) => {
     updatedAt: faker.date.recent(),
     deleted: false,
     disabled: false,
+    author: helpers.fakeUser(1)[0],
     ...fields,
   }
 }
@@ -33,13 +33,12 @@ const comments = [
 ]
 
 storiesOf('CommentList', module)
-  .addDecorator(withA11y)
   .addDecorator(helpers.layout)
   .add('given 10 comments', () => ({
     components: { HcCommentList },
     store: helpers.store,
     data: () => ({
-      post: { comments },
+      post: { id: 'p1', comments },
     }),
     template: `<hc-comment-list :post="post" />`,
   }))

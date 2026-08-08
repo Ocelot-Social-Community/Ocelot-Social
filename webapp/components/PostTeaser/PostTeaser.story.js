@@ -1,5 +1,4 @@
 import { storiesOf } from '@storybook/vue'
-import { withA11y } from '@storybook/addon-a11y'
 import PostTeaser from './PostTeaser.vue'
 import helpers from '~/storybook/helpers'
 
@@ -16,9 +15,9 @@ export const post = {
   image: null,
   author: {
     id: 'u3',
-    avatar: {
-      url: 'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/db/dbc9e03ebcc384b920c31542af2d27dd8eea9dc2_full.jpg',
-    },
+    avatar: helpers.avatarImage(
+      'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/db/dbc9e03ebcc384b920c31542af2d27dd8eea9dc2_full.jpg',
+    ),
     slug: 'jenny-rostock',
     name: 'Rainer Unsinn',
     disabled: false,
@@ -42,13 +41,13 @@ export const post = {
   },
   commentsCount: 12,
   categories: [],
+  postType: ['Article'],
   shoutedCount: 421,
   viewedTeaserCount: 1584,
   __typename: 'Post',
 }
 
 storiesOf('PostTeaser', module)
-  .addDecorator(withA11y)
   .addDecorator(helpers.layout)
   .add('without image', () => ({
     components: { PostTeaser },
@@ -69,7 +68,12 @@ storiesOf('PostTeaser', module)
     data: () => ({
       post: {
         ...post,
-        image: 'https://unsplash.com/photos/R4y_E5ZQDPg/download',
+        image: {
+          url: 'https://picsum.photos/id/1015/800/450',
+          w320: 'https://picsum.photos/id/1015/320/180',
+          w640: 'https://picsum.photos/id/1015/640/360',
+          w1024: 'https://picsum.photos/id/1015/1024/576',
+        },
       },
     }),
     template: `
