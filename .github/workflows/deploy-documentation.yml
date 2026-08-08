@@ -5,6 +5,13 @@ on:
     branches:
       - master
 
+# One run per workflow and branch. A newer push makes the older run's result irrelevant, so it is
+# cancelled instead of holding a runner. Publishing runs are queued, not cancelled: a half-pushed release is worse than a slow one. `event_name` is part of the group on purpose: a branch
+# push and its pull_request run are separate required checks — they must not cancel each other.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: false
+
 jobs:
   files-changed:
     name: Detect File Changes - Markdown and Vuepress files
