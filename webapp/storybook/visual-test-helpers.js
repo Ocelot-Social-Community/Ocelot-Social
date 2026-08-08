@@ -13,7 +13,7 @@ const FREEZE_ANIMATIONS_SCRIPT = () => {
       caret-color: transparent !important;
     }
   `
-  document.head.appendChild(style)
+  ;(document.head || document.documentElement).appendChild(style)
 }
 
 // Waits until #storybook-root has gone quietMs without a DOM mutation (hard-capped at timeoutMs so

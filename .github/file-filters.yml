@@ -25,6 +25,7 @@ docker: &docker
   - 'docker-compose.*'
 
 webapp: &webapp
+  - '.github/file-filters.yml'
   - '.github/workflows/test-webapp.yml'
   - '.github/workflows/webapp-visual.yml'
   - 'webapp/**/*'
