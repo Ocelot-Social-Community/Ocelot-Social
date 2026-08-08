@@ -83,7 +83,7 @@
     "vue-demi": "^0.14.10"
   },
   "devDependencies": {
-    "@arethetypeswrong/cli": "^0.18.3",
+    "@arethetypeswrong/cli": "^0.18.5",
     "@axe-core/playwright": "^4.11.2",
     "@fontsource-variable/inter": "^5.2.8",
     "@playwright/test": "^1.59.1",
