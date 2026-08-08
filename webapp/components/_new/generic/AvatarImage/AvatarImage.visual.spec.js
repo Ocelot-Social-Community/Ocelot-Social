@@ -22,7 +22,7 @@ test.describe('AvatarImage visual regression', () => {
     await expect(root).toHaveScreenshot('small-with-image.png')
   })
 
-  test('small', async ({ page }) => {
+  test('small, without image, user initials', async ({ page }) => {
     const root = await gotoStory(page, 'avatarimage--small')
     await expect(root).toHaveScreenshot('small.png')
   })
@@ -32,7 +32,7 @@ test.describe('AvatarImage visual regression', () => {
     await expect(root).toHaveScreenshot('large-with-image.png')
   })
 
-  test('large', async ({ page }) => {
+  test('large, without image, user initials', async ({ page }) => {
     const root = await gotoStory(page, 'avatarimage--large')
     await expect(root).toHaveScreenshot('large.png')
   })
