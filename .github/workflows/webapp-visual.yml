@@ -54,10 +54,15 @@ jobs:
           cache: 'yarn'
           cache-dependency-path: 'webapp/yarn.lock'
 
-      # The webapp depends on @ocelot-social/branding via `file:../packages/branding`; its dist/ must
-      # exist BEFORE `yarn` copies the file: dependency, otherwise the install fails.
+      # The webapp depends on @ocelot-social/branding and @ocelot-social/ui via file: links; their
+      # dist/ directories are not committed, so they must be built BEFORE `yarn` copies the
+      # file: dependencies into node_modules — otherwise the install resolves an empty package.
       - name: Build @ocelot-social/branding
         working-directory: packages/branding
+        run: npm ci && npm run build
+
+      - name: Build @ocelot-social/ui
+        working-directory: packages/ui
         run: npm ci && npm run build
 
       - name: Install dependencies
