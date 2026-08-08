@@ -183,6 +183,7 @@ const helpers = {
     },
   }),
   layout(storyFn) {
+    Vue.use(VueRouter)
     const ctx = storyFn()
     return {
       // A fresh instance per story rather than one shared module-level singleton — Storybook is an
