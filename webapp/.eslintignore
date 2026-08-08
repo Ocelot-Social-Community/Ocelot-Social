@@ -3,9 +3,3 @@ dist
 .nuxt
 **/*.min.js
 static/sw.js
-
-# Playwright visual-regression build/test artifacts (playwright.config.js) — not source, and the
-# built storybook-static/ bundle in particular is large enough to make a project-wide lint hang.
-storybook-static
-test-results
-playwright-report

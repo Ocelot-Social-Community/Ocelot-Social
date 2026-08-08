@@ -20,8 +20,6 @@
     "test": "cross-env NODE_ENV=test jest --coverage",
     "test:unit:update": "yarn test -- --updateSnapshot",
     "test:unit:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --no-cache --runInBand  --forceExit --detectOpenHandles",
-    "test:visual": "playwright test",
-    "test:visual:update": "playwright test --update-snapshots",
     "postinstall": "node scripts/fix-vue2-jest.js && node scripts/fix-v-mapbox.js",
     "lint:css-tokens": "node scripts/check-css-tokens.js"
   },
@@ -79,7 +77,6 @@
     "@babel/preset-env": "^7.25.8",
     "@csstools/postcss-global-data": "^4.0.0",
     "@faker-js/faker": "9.9.0",
-    "@playwright/test": "~1.61.1",
     "@storybook/addon-a11y": "7.6.24",
     "@storybook/addon-actions": "7.6.24",
     "@storybook/vue": "7.6.24",

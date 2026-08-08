@@ -85,9 +85,3 @@ cypress.env.json
 .DS_Store
 
 sw.*
-
-# Playwright visual-regression testing (playwright.config.js) — baseline images under
-# __screenshots__/ are committed, everything else here is a rebuildable artifact.
-storybook-static/
-test-results/
-playwright-report/
