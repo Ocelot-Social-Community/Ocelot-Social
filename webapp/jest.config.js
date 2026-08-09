@@ -43,6 +43,7 @@ module.exports = {
   // which is already CommonJS and doesn't need transformation
   transformIgnorePatterns: ['node_modules/(?!(vue-demi)/)', '<rootDir>/../packages/ui/'],
   testMatch: ['**/?(*.)+(spec|test).js?(x)'],
+  testPathIgnorePatterns: ['/node_modules/', '\\.visual\\.spec\\.js$'],
   modulePathIgnorePatterns: ['<rootDir>/dist/'],
   moduleNameMapper: {
     // IMPORTANT: vue-demi must be mapped BEFORE @ocelot-social/ui
