@@ -17,6 +17,7 @@ module.exports = {
     '!**/nuxt.config.js',
     // Tooling / build-time patch scripts — not shipped app code.
     '!**/jest.config.js',
+    '!**/playwright.config.js',
     '!scripts/**',
     // Webpack alias targets (e.g. branding-server-stub.js) — build-time stubs, never run as app code.
     '!**/webpack/**',
