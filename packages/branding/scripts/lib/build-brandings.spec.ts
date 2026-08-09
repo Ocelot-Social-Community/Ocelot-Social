@@ -6,7 +6,7 @@ import assert from 'node:assert/strict'
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
-import { after, test } from 'node:test'
+import { after, describe, test } from 'node:test'
 
 import { composeArchive, readManifest } from '../../dist/discover.js'
 import { readTarGz } from '../../dist/tar.js'
@@ -172,7 +172,7 @@ test('buildBrandArchive warns when a referenced asset is missing (but still buil
   assert.match(built.warnings.join('\n'), /logo-squared\.svg/)
 })
 
-test('buildBrandArchive namespaces css, favicon and html-per-locale paths', async () => {
+test('buildBrandArchive namespaces css, favicon, icon and html-per-locale paths', async () => {
   const dir = brandDir({
     config: `export default (defineBranding) =>
       defineBranding({
@@ -180,12 +180,13 @@ test('buildBrandArchive namespaces css, favicon and html-per-locale paths', asyn
         assets: {
           css: ['assets/extra.css'],
           favicon: 'assets/favicon.ico',
+          icon: 'assets/icon.png',
           html: { imprint: { en: 'html/imprint.en.html' } },
         },
         headerMenu: { customButton: { iconPath: 'assets/button.svg', url: 'https://example.test' } },
       })
 `,
-    assets: { 'extra.css': 'x', 'favicon.ico': 'x', 'button.svg': 'x' },
+    assets: { 'extra.css': 'x', 'favicon.ico': 'x', 'icon.png': 'x', 'button.svg': 'x' },
   })
   // the html/ referenced file lives outside assets/ — create it so no warning is emitted
   mkdirSync(join(dir, 'html'), { recursive: true })
@@ -194,6 +195,9 @@ test('buildBrandArchive namespaces css, favicon and html-per-locale paths', asyn
   const config = composeArchive(readTarGz((await buildBrandArchive(dir)).gz))
   assert.deepEqual(config.assets.css, ['/branding/acme/assets/extra.css'])
   assert.equal(config.assets.favicon, '/branding/acme/assets/favicon.ico')
+  // The apple-touch / PWA icon travels the same way — a favicon cannot stand in for it (.ico is not
+  // an apple-touch-icon format), so it is a slot of its own rather than a derived path.
+  assert.equal(config.assets.icon, '/branding/acme/assets/icon.png')
   assert.equal(config.assets.html.imprint.en, '/branding/acme/html/imprint.en.html')
   // the framework's /img/custom/.
   assert.equal(config.headerMenu.customButton.iconPath, '/branding/acme/assets/button.svg')
@@ -462,4 +466,97 @@ test('a stylesheet listed in assets.css that does not exist is reported', async 
 
   const built = await buildBrandArchive(dir)
   assert.match(built.warnings.join('\n'), /assets\.css lists 'missing\.css', which does not exist/)
+})
+
+// assets.icon is consumed as a fixed-size square bitmap by the PWA manifest and the iOS home screen,
+// and NEITHER reports back: a wrong file surfaces as a stretched, blurred or absent icon on someone
+// else's phone. The build is the last place it is cheap to notice. (See lib/imageSize.spec.ts for the
+// header reading itself; what these pin is which files draw which warning.)
+describe('assets.icon', () => {
+  /** A minimal but genuine PNG header — enough for the check, which reads only the IHDR chunk. */
+  function pngBytes(width, height) {
+    const data = Buffer.alloc(24)
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]).copy(data)
+    data.write('IHDR', 12, 'ascii')
+    data.writeUInt32BE(width, 16)
+    data.writeUInt32BE(height, 20)
+    return data
+  }
+
+  const withIcon = (body, name = 'icon.png') =>
+    brandDir({
+      config: `export default (d) => d({ assets: { icon: 'assets/${name}' } })\n`,
+      assets: { [name]: body },
+    })
+
+  const iconWarnings = async (dir) =>
+    (await buildBrandArchive(dir)).warnings.filter((w) => w.includes('assets.icon')).join('\n')
+
+  test('a square icon at the declared size passes without comment', async () => {
+    assert.equal(await iconWarnings(withIcon(pngBytes(512, 512))), '')
+    // Larger is fine too — the manifest declares 192 and 512, and browsers downscale.
+    assert.equal(await iconWarnings(withIcon(pngBytes(1024, 1024))), '')
+  })
+
+  // The trap the extension-derived MIME type sets: nothing downstream inspects the file, so the
+  // manifest announces `image/svg+xml` and a browser that will not rasterise it drops the icon.
+  test('warns that an svg is not a raster image', async () => {
+    const warning = await iconWarnings(withIcon('<svg viewBox="0 0 512 512"></svg>', 'icon.svg'))
+
+    assert.match(warning, /is SVG, not a raster image/)
+  })
+
+  // .ico is the FAVICON format, and the two slots exist separately precisely because iOS ignores it.
+  test('warns that an ico is not a raster image', async () => {
+    const warning = await iconWarnings(
+      withIcon(Buffer.from([0x00, 0x00, 0x01, 0x00, 0x01, 0x00]), 'icon.ico'),
+    )
+
+    assert.match(warning, /is ICO, not a raster image/)
+  })
+
+  test('warns about a non-square icon, naming both dimensions', async () => {
+    const warning = await iconWarnings(withIcon(pngBytes(512, 300)))
+
+    assert.match(warning, /is 512×300, not square/)
+  })
+
+  test('warns about an icon smaller than the size the manifest declares', async () => {
+    const warning = await iconWarnings(withIcon(pngBytes(192, 192)))
+
+    assert.match(warning, /is 192px — the manifest declares it at 512px/)
+  })
+
+  test('warns about a file that is not an image at all', async () => {
+    const warning = await iconWarnings(withIcon('not an image'))
+
+    assert.match(warning, /is not an image format this build recognises/)
+  })
+
+  // Reported apart from "not an image": the file IS a PNG, it just got cut off — which points at the
+  // brand's own packaging (a truncated copy, a bad LFS checkout) rather than at the wrong file.
+  test('warns about a truncated image separately from an unrecognised one', async () => {
+    const warning = await iconWarnings(withIcon(pngBytes(512, 512).subarray(0, 12)))
+
+    assert.match(warning, /is a truncated PNG file/)
+  })
+
+  // A brand may ship no icon, or point at one it hosts itself. Neither is this check's business —
+  // and a missing file is already reported by the namespacing pass, so saying it twice is noise.
+  test('says nothing when there is no local file to inspect', async () => {
+    assert.equal(await iconWarnings(brandDir({ config: ACME_CONFIG })), '')
+    assert.equal(
+      await iconWarnings(
+        brandDir({
+          config: `export default (d) => d({ assets: { icon: 'https://cdn.example/icon.png' } })\n`,
+        }),
+      ),
+      '',
+    )
+    const missing = brandDir({
+      config: `export default (d) => d({ assets: { icon: 'assets/nowhere.png' } })\n`,
+    })
+    assert.equal(await iconWarnings(missing), '')
+    assert.match((await buildBrandArchive(missing)).warnings.join('\n'), /asset not found/)
+  })
 })

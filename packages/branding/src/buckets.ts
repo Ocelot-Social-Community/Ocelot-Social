@@ -134,7 +134,7 @@ export const BUCKET_PATHS: Record<BucketName, string[]> = {
   // brand's self-description. (locales is CROSS-CUTTING — see below — not owned by a bucket.)
   identity: ['metadata', 'about'],
   // The instance's marks.
-  logos: ['logos', 'assets.favicon'],
+  logos: ['logos', 'assets.favicon', 'assets.icon'],
   // Static / legal content: page HTML, T&C version, per-page link overrides (external URLs).
   legal: ['termsAndConditions', 'assets.html', 'links.pages'],
   // Menus and footer ordering / landing target.

@@ -69,12 +69,13 @@ function brandDir(): string {
   defineBranding({
     metadata: { applicationName: 'Acme' },
 
-    assets: { css: ['assets/brand.css'] },
+    assets: { css: ['assets/brand.css'], favicon: 'assets/favicon.ico' },
     logos: { signupPath: 'assets/logo-squared.svg' },
   })
 `,
   )
   write(join(dir, 'assets/logo-squared.svg'), '<svg id="brand"/>')
+  write(join(dir, 'assets/favicon.ico'), Buffer.from('ico-bytes'))
   write(join(dir, 'assets/fonts/acme.woff2'), Buffer.from('woff2-bytes'))
   // The font lives in the brand's own stylesheet; url() is relative to THAT file (assets/…).
   write(
@@ -166,6 +167,7 @@ describe('build-maintenance-branding', () => {
       'app/constants/metadata.brand.json',
       'app/locales/de.json',
       'public/brand/logo-squared.svg',
+      'public/brand/favicon.ico',
       'public/brand/fonts/acme.woff2',
     ]) {
       assert.ok(existsSync(join(to, rel)), `expected ${rel}`)
@@ -274,6 +276,44 @@ describe('build-maintenance-branding', () => {
     // The composed ogImage is a /branding/<id>/… path this static site never serves — it has to be
     // rewritten to the copy that IS served, or every link preview 404s.
     assert.equal(meta.OG_IMAGE, '/brand/logo-squared.svg')
+  })
+
+  // Without this the page kept its own committed public/favicon.ico — the vanilla ocelot icon — for
+  // every brand, permanently: the built index.html carries no icon link (Nuxt 4 adds none, and
+  // `ssr: false` keeps useHead out of the prerendered markup), so the browser falls back to its
+  // implicit /favicon.ico request and nothing ever pointed it elsewhere.
+  test('serves the favicon and names it in the metadata overlay', () => {
+    const to = maintenanceDir()
+    brand(brandDir(), to)
+
+    const meta = readJson(to, 'app/constants/metadata.brand.json') as unknown as Record<
+      string,
+      string
+    >
+    assert.equal(readText(to, 'public/brand/favicon.ico'), 'ico-bytes')
+    assert.equal(meta.FAVICON, '/brand/favicon.ico')
+    // The committed vanilla file is left alone — the overlay redirects the link, it does not
+    // overwrite a tracked file (that is the whole point of the overlay design).
+    assert.ok(existsSync(join(to, 'public/favicon.ico')))
+  })
+
+  // A present overlay key WINS over the vanilla default, so a brand that declares no favicon must
+  // yield no key at all — writing null would blank out the working vanilla icon.
+  test('omits FAVICON entirely for a brand that ships none', () => {
+    const to = maintenanceDir()
+    const from = tmp('ocelot-brand-')
+    write(join(from, 'package.json'), JSON.stringify({ name: 'bare-branding' }))
+    write(
+      join(from, 'brand.config.mjs'),
+      `export default (d) => d({ metadata: { applicationName: 'Bare' } })\n`,
+    )
+    brand(from, to)
+
+    const meta = readJson(to, 'app/constants/metadata.brand.json') as unknown as Record<
+      string,
+      string
+    >
+    assert.equal('FAVICON' in meta, false)
   })
 
   // Reducing an archive entry to its basename would put two of them on one file. Both cases are
@@ -484,6 +524,64 @@ describe('build-maintenance-branding', () => {
     }
     // What the brand CAN back is still there.
     assert.equal(meta.APPLICATION_NAME, 'Gap')
+  })
+
+  // The build only namespaces paths a brand writes relative to its own root; absolute and external
+  // ones reach the generator verbatim. What each kind can mean differs HERE and nowhere else, because
+  // this page is served with the webapp down — so all three are pinned together.
+  describe('asset paths the build does not namespace', () => {
+    /** A brand whose logo, OG image, favicon and stylesheet are all set to `path`. */
+    function brandPointingAt(path: string): string {
+      const from = tmp('ocelot-brand-external-')
+      write(join(from, 'package.json'), JSON.stringify({ name: 'external-branding' }))
+      write(
+        join(from, 'brand.config.mjs'),
+        `export default (d) =>
+  d({
+    metadata: { applicationName: 'Ext', ogImage: ${JSON.stringify(path)} },
+    assets: { css: [${JSON.stringify(path)}], favicon: ${JSON.stringify(path)} },
+    logos: { signupPath: ${JSON.stringify(path)} },
+  })
+`,
+      )
+      return from
+    }
+
+    const overlay = (dir: string): Record<string, string> =>
+      readJson(dir, 'app/constants/metadata.brand.json') as unknown as Record<string, string>
+
+    // An external URL is the one non-archive path that still WORKS here: a CDN stays up while the
+    // webapp is down. Dropping it would replace a perfectly good asset with the vanilla one.
+    test('keeps an external url verbatim, for every slot alike', () => {
+      const to = maintenanceDir()
+      const { status, stderr } = run(brandPointingAt('https://cdn.example/brand.ico'), to)
+
+      assert.equal(status, 0)
+      const meta = overlay(to)
+      assert.equal(meta.FAVICON, 'https://cdn.example/brand.ico')
+      assert.equal(meta.LOGO, 'https://cdn.example/brand.ico')
+      assert.equal(meta.OG_IMAGE, 'https://cdn.example/brand.ico')
+      assert.deepEqual(readSheets(to), ['https://cdn.example/brand.ico'])
+      assert.equal(stderr, '')
+    })
+
+    // An absolute path into the framework's own tree is served BY THE WEBAPP. This page renders
+    // precisely when that is down, so linking it would 404 on every request — the vanilla asset is
+    // the better outcome, and the warning is what stops it being a mystery.
+    test('drops a webapp-served path with a warning and keeps the vanilla asset', () => {
+      const to = maintenanceDir()
+      const { status, stderr } = run(brandPointingAt('/img/custom/logo.svg'), to)
+
+      assert.equal(status, 0) // never fatal: one bad path must not cost a deployment its page
+      const meta = overlay(to)
+      // Omitted, not null — a present overlay key wins, so null would blank the vanilla value out
+      // instead of falling through to it.
+      for (const key of ['FAVICON', 'LOGO', 'OG_IMAGE']) assert.ok(!(key in meta), key)
+      assert.deepEqual(readSheets(to), [])
+      assert.ok(existsSync(join(to, 'public/favicon.ico'))) // the vanilla icon still answers
+      assert.match(stderr, /favicon: \/img\/custom\/logo\.svg is served by the webapp/)
+      assert.match(stderr, /stylesheet: \/img\/custom\/logo\.svg is served by the webapp/)
+    })
   })
 
   // A brand may point at a font it serves itself (a CDN). There is nothing to copy out of the archive

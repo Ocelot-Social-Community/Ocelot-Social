@@ -253,6 +253,13 @@ export interface BrandingConfig {
    * build namespaces them to `/branding/<brand>/…` so multiple brands never collide, and warns when
    * the referenced file does not exist. (Logo & OG-image paths in `logos` / `metadata.ogImage` are
    * asset paths too and are namespaced the same way.)
+   *
+   * A path that is NOT brand-relative is left exactly as written — an `http(s):`/`data:` URL (a brand
+   * hosting an asset itself) and an absolute `/…` path into the framework's own tree both survive the
+   * build untouched. The live webapp serves either. The MAINTENANCE page cannot: it is a static site
+   * nginx serves while the webapp is down, so an external URL still resolves there but a `/…` webapp
+   * path answers nothing — its generator drops those with a warning and keeps the vanilla asset
+   * (scripts/build-maintenance-branding.ts `servedUrl`).
    */
   assets: {
     /** Extra stylesheets, injected as <link> at runtime (bespoke component rules, fonts via
@@ -265,8 +272,25 @@ export interface BrandingConfig {
     /** Static-page HTML per page per locale code, e.g. `html.imprint.de = 'html/de/imprint.html'`.
      * Loaded at runtime by the InternalPage view (replaces the build-bundled html i18n). */
     html: Partial<Record<LinkPageKey, Record<string, string>>>
-    /** Favicon path, e.g. 'assets/favicon.ico'. */
+    /** Favicon path, e.g. 'assets/favicon.ico'. The browser-tab icon; `.ico` is what every brand
+     * ships and what the vanilla fallback is, but any format a browser accepts works — the consumer
+     * derives the `type` attribute from the extension. */
     favicon: string | null
+    /** Square raster icon, e.g. 'assets/icon.png'. Used where a favicon will not do: the iOS
+     * home-screen icon (`apple-touch-icon`, which ignores .ico) and the PWA manifest's install icon.
+     * Must be a raster format and reasonably large (512px square is the useful size — the manifest
+     * declares it at both 192 and 512, and browsers downscale).
+     *
+     * The build CHECKS this (a warning, never fatal — see build-brandings.ts `warnIconAsset`), by
+     * reading the file's own header rather than trusting its extension. It has to: both consumers
+     * derive the `type` they announce from the PATH (webapp/utils/iconType.js), so an SVG here is
+     * published as `image/svg+xml` and a browser that will not rasterise it drops the install icon
+     * altogether — a failure that otherwise first appears on someone's phone.
+     *
+     * Every brand already ships `assets/icon.png`: the pre-runtime build copied it over the
+     * framework's own webapp/static/icon.png at image-build time. Runtime branding cannot do that, so
+     * the file sat unread in every brand repo until this slot named it. */
+    icon: string | null
   }
 }
 
