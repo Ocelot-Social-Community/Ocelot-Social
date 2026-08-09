@@ -18,6 +18,23 @@ import entrypoint from "../../nginx/40-support-email.sh?raw";
 
 import emails, { isSupportAddress, SUPPORT_EMAIL_PLACEHOLDER } from "./emails";
 
+// Values shaped enough like an address to reach the substitution, and hostile once they arrive: the
+// page is prerendered, so the runtime config sits in a double-quoted JS string inside a <script>
+// block of index.html, and sed writes bytes. Used TWICE below — once against the TypeScript guard,
+// once against the shell script — because either half accepting one of these is the same hole.
+const HOSTILE = [
+  // Closes the string, then the block: everything after it is code the visitor's browser runs.
+  'x"</script><script>alert(1)</script>@example.org',
+  // Only the string has to go for the surrounding object literal to become attacker-controlled.
+  'x",evil:"1@example.org',
+  // A template literal needs no quote of its own.
+  "x`${alert(1)}`@example.org",
+  // No quote, no backtick — an injected tag is enough on its own.
+  "x<img src=x onerror=alert(1)>@example.org",
+  // grep works a line at a time, so a shape check alone would pass on the first line.
+  'ok@example.org\nx"</script><script>alert(1)</script>@example.org',
+];
+
 describe("support e-mail placeholder", () => {
   // The token exists in TS (payload) and in sh (substitution). Nothing at runtime would fail loudly
   // if they drifted — the page would just render a raw `__OCELOT_SUPPORT_EMAIL__` to every visitor,
@@ -36,9 +53,10 @@ describe("support e-mail placeholder", () => {
 
   it("falls back to an address the entrypoint agrees with", () => {
     // Both sides carry the vanilla default: the app for `nuxt dev`/preview, the script for a
-    // deployment that sets no SUPPORT_EMAIL. Divergence would show a different address depending on
-    // how the page happened to be served.
-    expect(entrypoint).toContain(`SUPPORT_EMAIL:-${emails.SUPPORT_EMAIL}`);
+    // deployment that sets no SUPPORT_EMAIL — or one that sets a value the script refuses.
+    // Divergence would show a different address depending on how the page happened to be served.
+    const declared = /DEFAULT_EMAIL='([^']+)'/.exec(entrypoint);
+    expect(declared?.[1]).toBe(emails.SUPPORT_EMAIL);
   });
 });
 
@@ -72,6 +90,12 @@ describe("isSupportAddress", () => {
     ["an empty domain label", "support@example..org"],
     ["a trailing dot", "support@example.org."],
     ["a leading dot", "support@.example.org"],
+    // The value is substituted into a JS string in a <script> block — see the entrypoint. These are
+    // refused rather than encoded; no address needs them.
+    ...HOSTILE.map((value, index): [string, string] => [
+      `a markup break-out (${index})`,
+      value,
+    ]),
   ])("rejects %s", (_case, value) => {
     expect(isSupportAddress(value)).toBe(false);
   });
@@ -118,6 +142,75 @@ describe("nginx entrypoint substitution", () => {
 
   it("falls back to the vanilla address when the env is unset", () => {
     expect(substitute("")).toBe(emails.SUPPORT_EMAIL);
+  });
+
+  // The value comes from the helm chart rather than from a visitor, but nothing between the chart and
+  // the browser looked at it: sed put it in the page as given, and the page is what a visitor sees
+  // when every other check in the system is already unavailable.
+  describe("a value that would break out of the markup", () => {
+    /** Run the entrypoint over a fixture holding the placeholder; return the page and the log. */
+    function run(email: string): {
+      page: string;
+      stderr: string;
+      code: number;
+    } {
+      const root = mkdtempSync(join(tmpdir(), "ocelot-entrypoint-hostile-"));
+      roots.push(root);
+      writeFileSync(
+        join(root, "index.html"),
+        `<script>window.__NUXT__={config:{public:{supportEmail:"${SUPPORT_EMAIL_PLACEHOLDER}"}}}</script>`,
+      );
+      const result = spawnSync(script, [], {
+        env: { ...process.env, NGINX_ROOT: root, SUPPORT_EMAIL: email },
+        encoding: "utf8",
+      });
+      return {
+        page: readFileSync(join(root, "index.html"), "utf8"),
+        stderr: result.stderr,
+        code: result.status ?? -1,
+      };
+    }
+
+    it.each(HOSTILE.map((value, index): [number, string] => [index, value]))(
+      "serves the vanilla address instead of value %i",
+      (_index, email) => {
+        const { page, stderr, code } = run(email);
+
+        // Not `not.toContain("<script>")` — the fixture legitimately has one. What must not appear is
+        // anything the value brought with it.
+        expect(page).toBe(
+          `<script>window.__NUXT__={config:{public:{supportEmail:"${emails.SUPPORT_EMAIL}"}}}</script>`,
+        );
+        // Loud, and without echoing the value back into the log.
+        expect(stderr).toContain("WARNING");
+        expect(stderr).toContain("SUPPORT_EMAIL");
+        expect(stderr).not.toContain("alert(1)");
+        // Never fatal: this page comes up even when its own configuration is wrong.
+        expect(code).toBe(0);
+      },
+    );
+
+    // The two halves decide the same question in two languages — sh at container start, TypeScript in
+    // the browser — and only agreement makes either one meaningful: what the script lets through is
+    // exactly what app.vue will render.
+    it.each([
+      "support@example.org",
+      "help&team@example.org",
+      "a|b@example.org",
+      "back\\slash@example.org",
+      "a/b@example.org",
+      "post@mail.example.co.uk",
+      "support@example..org",
+      "support@example.org.",
+      "support@localhost",
+      ...HOSTILE,
+    ])("agrees with isSupportAddress about %j", (email) => {
+      const substituted = /supportEmail:"([^"]*)"/.exec(run(email).page)?.[1];
+
+      expect(substituted).toBe(
+        isSupportAddress(email) ? email : emails.SUPPORT_EMAIL,
+      );
+    });
   });
 
   // The regression. `nuxt generate` puts the token in the output TWICE, in two roles:

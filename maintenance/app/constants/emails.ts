@@ -35,7 +35,15 @@ export const SUPPORT_EMAIL_PLACEHOLDER = "__OCELOT_SUPPORT_EMAIL__";
  * empty label: `example..org` and `example.org.` both satisfy that shape, and a value this function
  * accepts is one app.vue renders instead of falling back.
  */
-const SUPPORT_ADDRESS = /^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)+$/;
+// Quotes, backticks and angle brackets are excluded for the same reason nginx/40-support-email.sh
+// refuses them (guarded by a test that runs the script): the value reaches the page through that
+// script, substituted into a double-quoted JavaScript string inside a <script> block, where `"` ends
+// the string and `</script>` ends the block. Nothing an address needs is lost — unlike `&`, `|`, `\`
+// and `/`, which a local part may carry and which stay accepted here.
+const FORBIDDEN = "\\s\"'`<>";
+const SUPPORT_ADDRESS = new RegExp(
+  `^[^${FORBIDDEN}@]+@[^${FORBIDDEN}@.]+(?:\\.[^${FORBIDDEN}@.]+)+$`,
+);
 
 export function isSupportAddress(value: unknown): value is string {
   return typeof value === "string" && SUPPORT_ADDRESS.test(value);
