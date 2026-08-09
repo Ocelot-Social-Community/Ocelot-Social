@@ -13,6 +13,9 @@ module.exports = defineConfig({
   testMatch: '**/*.visual.spec.js',
 
   fullyParallel: true,
+  // CI runners have limited CPU/memory; a single worker avoids resource contention between
+  // parallel browser instances and the http-server, which caused networkidle timeouts.
+  workers: process.env.CI ? 1 : undefined,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? [['github'], ['html']] : [['html']],
