@@ -8,6 +8,7 @@ module.exports = {
     '!**/node_modules/**',
     '!**/.nuxt/**',
     '!**/storybook/**',
+    '!**/storybook-static/**',
     '!**/coverage/**',
     '!**/config/**',
     '!**/maintenance/**',
