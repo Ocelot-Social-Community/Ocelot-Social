@@ -39,6 +39,52 @@ describe('resolveTokens', () => {
     assert.equal(resolveTokens({ x: 'green', a: 'var(--x, blue)' }).a, 'green')
   })
 
+  // A fallback may be a function call, so a var() expression ends at its BALANCED paren. Stopping at
+  // the first one substituted all but the last character and left it stranded: `rgb(23, 181, 63))`,
+  // which reached the generated stylesheet and made every mail client drop the declaration.
+  describe('a fallback that is itself a function', () => {
+    test('substitutes the whole expression when the token resolves', () => {
+      const out = resolveTokens({
+        'color-primary': 'rgb(23, 181, 63)',
+        a: 'var(--color-primary, rgb(1, 2, 3))',
+      })
+
+      assert.equal(out.a, 'rgb(23, 181, 63)')
+    })
+
+    // The unresolvable direction happened to come out right — the `)` the truncated fallback lost was
+    // the same one left over — so only asserting this case would have missed the bug entirely.
+    test('uses the whole function as the fallback when the token does not exist', () => {
+      assert.equal(resolveTokens({ a: 'var(--nope, rgb(1, 2, 3))' }).a, 'rgb(1, 2, 3)')
+    })
+
+    test('handles nested parens deeper than one level', () => {
+      assert.equal(
+        resolveTokens({ a: 'var(--nope, calc(1px + max(2px, 3px)))' }).a,
+        'calc(1px + max(2px, 3px))',
+      )
+    })
+
+    // The scan resumes AFTER the expression it replaced, so a second reference alongside a function
+    // fallback is still found — and not searched for inside the text just substituted.
+    test('keeps resolving further references after one', () => {
+      const out = resolveTokens({ x: '1px', a: 'var(--x) var(--nope, rgb(1, 2, 3))' })
+
+      assert.equal(out.a, '1px rgb(1, 2, 3)')
+    })
+
+    // The whole point of dropping a token: what a mail client cannot use must not be written at all.
+    test('never leaves a stray paren in the generated stylesheet', () => {
+      const css = buildEmailBrandingCss(
+        { 'color-primary': 'rgb(23, 181, 63)' },
+        { 'text-color-base': 'var(--color-primary, rgb(1, 2, 3))' },
+      )
+
+      assert.match(css, /color: rgb\(23, 181, 63\);/)
+      assert.equal(css.includes('63))'), false)
+    })
+  })
+
   // Dropped, not passed through: `color: var(--x)` in a client without custom properties is an
   // invalid declaration, so the framework's own value is the better outcome.
   describe('drops what it cannot flatten', () => {
@@ -130,6 +176,35 @@ describe('resolveTokens', () => {
 
     test('but keeps the tokens around the unresolvable one', () => {
       assert.deepEqual(resolveTokens({ good: 'red', bad: 'var(--nope)' }), { good: 'red' })
+    })
+
+    // A `var(` whose expression never closes. The scan has to end at the buffer and report it, not
+    // return a reference reaching to the end of the string and splice past it.
+    test('a var() that is missing its closing paren', () => {
+      assert.deepEqual(resolveTokens({ good: 'red', bad: 'var(--good, rgb(1, 2' }), { good: 'red' })
+    })
+
+    // Not valid var() syntax, so the substitution pass has nothing to replace and skips it — and the
+    // value would have been stored, and written into the mail, still saying `var(`. That is the one
+    // thing this module exists to prevent, whatever the reason the reference could not be flattened.
+    test('a reference the substitution pass cannot parse, rather than emitting it verbatim', () => {
+      assert.deepEqual(resolveTokens({ b: 'red', a: 'var(--b c)' }), { b: 'red' })
+      assert.equal(buildEmailBrandingCss({}, { 'text-color-base': 'var(--b c)' }), '')
+    })
+  })
+
+  // Neither is a reference, and neither is an error: the scan skips it and keeps looking, which is
+  // what the pattern it replaced did. Treating them as malformed would drop tokens that are fine.
+  describe('text that only looks like a reference', () => {
+    test('another function whose name happens to end in var', () => {
+      assert.equal(resolveTokens({ a: 'myvar(x)' }).a, 'myvar(x)')
+      assert.equal(resolveTokens({ x: 'red', a: 'myvar(1) var(--x)' }).a, 'myvar(1) red')
+    })
+
+    // `var(1px)` names no custom property, so it is not a reference by any of this module's rules and
+    // travels like the arbitrary text it is. A client makes no more or less of it than of `foo(1px)`.
+    test('a var() that names no custom property', () => {
+      assert.equal(resolveTokens({ a: 'var(1px)' }).a, 'var(1px)')
     })
   })
 })

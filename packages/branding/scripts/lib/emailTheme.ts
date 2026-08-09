@@ -49,17 +49,62 @@ export const EMAIL_THEME: readonly Mapping[] = [
 ]
 
 /**
- * `var(--name)` / `var(--name, fallback)`.
+ * One `var(…)` expression located in a declaration: where it starts, where its OWN closing paren is,
+ * which token it names and what it falls back to.
  *
- * The fallback is `[^)]*`, so a NESTED `var()` inside it does not match as one reference — the group
- * would stop at the inner closing paren and replacing it would leave a stray `)` behind, i.e. corrupt
- * CSS. Such a token is treated as unresolvable instead (see below). Deliberately not `[\s\S]*`, which
- * would need to backtrack over the rest of the declaration to find its closing paren.
+ * `end` is why this is a scan and not a regular expression. A fallback may itself be a function call —
+ * `var(--color-primary, rgb(1, 2, 3))` is ordinary CSS — so the expression ends at a BALANCED paren,
+ * something a regular language cannot express. The pattern this replaced stopped at the first `)` and
+ * substituted `var(--color-primary, rgb(1, 2, 3)`, leaving the final `)` stranded: a resolvable token
+ * came out as `rgb(23, 181, 63))` and travelled all the way into the generated stylesheet, where every
+ * mail client drops the declaration.
  */
-// (`[^)]*` cannot match the `\)` that follows it, so there is nothing to backtrack over — the
-// heuristic reads the optional group as ambiguous. Same false alarm as LOCALE_CODE above.)
-// eslint-disable-next-line security/detect-unsafe-regex
-const VAR_REF = /var\(\s*--([a-zA-Z0-9-]+)\s*(?:,([^)]*))?\)/
+type VarScan =
+  | { kind: 'none' }
+  /** A `var(` whose expression never closes — the declaration is broken, so the token is unusable. */
+  | { kind: 'malformed' }
+  | { kind: 'ref'; start: number; end: number; name: string; fallback: string | null }
+
+/** The custom-property name inside `var(`, applied STICKY at the position just past the paren. */
+const VAR_NAME = /\s*--([a-zA-Z0-9-]+)\s*/y
+
+/**
+ * The first `var(…)` in `value`, delimited by the paren that closes it.
+ *
+ * Not quote-aware: a `)` inside a quoted string (`var(--x, ")")`) would be counted as structure. That
+ * is knowingly left out — a paren inside a quoted CSS value is vanishingly rare next to the fallback
+ * function this exists for, and handling it properly means a tokeniser, not a counter.
+ */
+function findVarRef(value: string): VarScan {
+  for (let open = value.indexOf('var('); open !== -1; open = value.indexOf('var(', open + 4)) {
+    VAR_NAME.lastIndex = open + 4
+    const named = VAR_NAME.exec(value)
+    // Those four characters also end other identifiers (`myvar(x)`), and `var(--a b)` is not a
+    // reference either. Neither is an error — keep looking for a real one, as the old pattern did.
+    if (!named) continue
+    const afterName = VAR_NAME.lastIndex
+    if (value[afterName] === ')') {
+      return { kind: 'ref', start: open, end: afterName + 1, name: named[1], fallback: null }
+    }
+    if (value[afterName] !== ',') continue
+
+    let depth = 1 // the `var(` itself
+    for (let i = afterName + 1; i < value.length; i++) {
+      if (value[i] === '(') depth++
+      else if (value[i] === ')' && --depth === 0) {
+        return {
+          kind: 'ref',
+          start: open,
+          end: i + 1,
+          name: named[1],
+          fallback: value.slice(afterName + 1, i),
+        }
+      }
+    }
+    return { kind: 'malformed' } // ran off the end: a `)` is missing
+  }
+  return { kind: 'none' }
+}
 
 /**
  * Every `var(--x)` a declaration mentions, matched by its OPENING only — so a reference nested inside
@@ -67,9 +112,9 @@ const VAR_REF = /var\(\s*--([a-zA-Z0-9-]+)\s*(?:,([^)]*))?\)/
  * value of a custom property prop contains a var() function referring to the property var (including
  * in the fallback argument of var()), add an edge" (css-variables-1 §3).
  *
- * Deliberately not VAR_REF: that one matches whole `var(…)` expressions in order to REPLACE them, and
- * it stops at the first `)`, which is exactly why a nested reference is invisible to it. Edges and
- * substitutions are different questions and the answer to one is not the answer to the other.
+ * Deliberately not findVarRef: that one delimits whole expressions in order to REPLACE them and yields
+ * the outermost first, while an edge is owed to every reference at any depth. Edges and substitutions
+ * are different questions and the answer to one is not the answer to the other.
  */
 const VAR_REFS = /var\(\s*--([a-zA-Z0-9-]+)/g
 
@@ -177,19 +222,32 @@ export function resolveTokens(raw: Record<string, string>): Record<string, strin
     let out: string | null = raw[name]
     // A single declaration can hold several references (`0 1px var(--a), 0 2px var(--b)`), so this
     // loops until none is left rather than replacing once.
-    for (let match = VAR_REF.exec(out); match !== null; match = VAR_REF.exec(out)) {
-      const whole = match[0]
-      const fallback = match.at(2)
-      // `match.at`, not destructuring: an optional group is absent at RUNTIME, while the type of an
-      // index into RegExpExecArray is a plain string. `.at()` is the accessor that admits it.
+    for (let ref = findVarRef(out); ref.kind !== 'none'; ref = findVarRef(out)) {
+      // A declaration missing its closing paren is not CSS anyone can substitute into; drop the token
+      // rather than emit half of it.
+      if (ref.kind === 'malformed') {
+        out = null
+        break
+      }
       const replacement =
-        fallback?.includes('var(') === true ? null : (resolve(match[1]) ?? fallback?.trim() ?? null)
+        ref.fallback?.includes('var(') === true
+          ? null
+          : (resolve(ref.name) ?? ref.fallback?.trim() ?? null)
       if (replacement === null) {
         out = null
         break
       }
-      out = out.replace(whole, replacement)
+      // Spliced by INDEX, not String.replace: a replacement is a literal, and `replace` would read
+      // `$&` / `$'` in a token's value as substitution patterns.
+      out = out.slice(0, ref.start) + replacement + out.slice(ref.end)
     }
+    // Last guard, and the one that makes the promise in this function's contract literal: nothing that
+    // still NAMES a custom property may be stored. The loop above only substitutes references it can
+    // parse, so a construct that is not valid var() syntax — `var(--b c)` — is skipped by it and would
+    // otherwise be written into the stylesheet verbatim: precisely the declaration a mail client
+    // discards. Phrased with referencesIn, so "is a reference" means the same thing here as it does to
+    // the dependency graph.
+    if (out !== null && referencesIn(out).length > 0) out = null
     if (out !== null) resolved[name] = out.trim().replace(/\s+/g, ' ')
     return out
   }
