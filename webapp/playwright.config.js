@@ -33,8 +33,8 @@ module.exports = defineConfig({
     // In CI the Storybook is pre-built by a dedicated workflow step; only the static file server
     // needs to start here. Locally the full build + serve runs so `yarn test:visual` is self-contained.
     command: process.env.CI
-      ? 'npx http-server storybook-static -p 6007 -s'
-      : 'yarn build-storybook && npx http-server storybook-static -p 6007 -s',
+      ? 'yarn exec http-server storybook-static -p 6007 -s'
+      : 'yarn build-storybook && yarn exec http-server storybook-static -p 6007 -s',
     url: 'http://localhost:6007',
     reuseExistingServer: !process.env.CI,
     timeout: 180000,
