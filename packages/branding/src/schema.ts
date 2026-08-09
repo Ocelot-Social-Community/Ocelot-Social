@@ -281,6 +281,12 @@ export interface BrandingConfig {
      * Must be a raster format and reasonably large (512px square is the useful size — the manifest
      * declares it at both 192 and 512, and browsers downscale).
      *
+     * The build CHECKS this (a warning, never fatal — see build-brandings.ts `warnIconAsset`), by
+     * reading the file's own header rather than trusting its extension. It has to: both consumers
+     * derive the `type` they announce from the PATH (webapp/utils/iconType.js), so an SVG here is
+     * published as `image/svg+xml` and a browser that will not rasterise it drops the install icon
+     * altogether — a failure that otherwise first appears on someone's phone.
+     *
      * Every brand already ships `assets/icon.png`: the pre-runtime build copied it over the
      * framework's own webapp/static/icon.png at image-build time. Runtime branding cannot do that, so
      * the file sat unread in every brand repo until this slot named it. */

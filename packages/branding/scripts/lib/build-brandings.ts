@@ -17,6 +17,7 @@ import { SCHEMA_VERSION } from '../../dist/version.js'
 import { catalogAvailable, computeCatalog } from '../theme-catalog.ts'
 
 import { customPropertiesIn } from './css.ts'
+import { readImage } from './imageSize.ts'
 import { loadConfig } from './load-config.ts'
 
 import type { ArchiveInstanceEntry } from '../../dist/buckets.js'
@@ -343,6 +344,64 @@ function warnUncompiledStylesheets(entries: TarEntry[], id: string, warnings: st
 }
 
 /**
+ * The size `assets.icon` is DECLARED at — the PWA manifest lists it as both 192×192 and 512×512
+ * (webapp/server-middleware/manifest.js), so anything smaller is upscaled by the browser to fill the
+ * larger slot.
+ */
+const ICON_MIN_PX = 512
+
+/**
+ * Warn when `assets.icon` cannot do the job the slot exists for: the iOS home-screen icon and the PWA
+ * install icon. Both consume it as a fixed-size square bitmap, and neither reports back — a wrong file
+ * shows up as a stretched or blurred icon on someone's phone, or as no icon at all, long after the
+ * build that accepted it.
+ *
+ * Warnings only, like every other check here: a brand's icon is not worth failing a deployment over,
+ * and the slot is optional to begin with.
+ */
+function warnIconAsset(dir: string, id: string, config: BrandingConfig, warnings: string[]): void {
+  const rel = config.assets.icon
+  // Only a brand-relative path names a file this build can read; an external URL or an absolute
+  // framework path is not ours to inspect (see namespacePath).
+  if (!isRelativeAsset(rel)) return
+  const file = join(dir, rel)
+  if (!existsSync(file)) return // already reported by namespacePath as "referenced asset not found"
+
+  const image = readImage(readFileSync(file))
+  if (!image) {
+    warnings.push(`  ! ${id}: assets.icon '${rel}' is not an image format this build recognises`)
+    return
+  }
+  if (!image.raster) {
+    // The consumers label the icon by EXTENSION, so this travels into the manifest as
+    // `type: image/svg+xml` — and a browser that took the declared type at its word drops an install
+    // icon it will not rasterise, rather than falling back to sniffing the file.
+    warnings.push(
+      `  ! ${id}: assets.icon '${rel}' is ${image.format.toUpperCase()}, not a raster image — the PWA ` +
+        `manifest and apple-touch-icon need a bitmap; ship a ${ICON_MIN_PX}px square PNG`,
+    )
+    return
+  }
+  if (image.width === null || image.height === null) {
+    warnings.push(
+      `  ! ${id}: assets.icon '${rel}' is a truncated ${image.format.toUpperCase()} file`,
+    )
+    return
+  }
+  if (image.width !== image.height) {
+    warnings.push(
+      `  ! ${id}: assets.icon '${rel}' is ${image.width}×${image.height}, not square — a home-screen ` +
+        `tile stretches it to fit`,
+    )
+  } else if (image.width < ICON_MIN_PX) {
+    warnings.push(
+      `  ! ${id}: assets.icon '${rel}' is ${image.width}px — the manifest declares it at ` +
+        `${ICON_MIN_PX}px, so it will be upscaled`,
+    )
+  }
+}
+
+/**
  * Warn on a leftover `public/` folder. That bucket used to be overlaid onto the BACKEND's on-disk
  * `public/` at bootstrap, and every brand used it for exactly one thing: badge SVGs. It is gone —
  * badges are served brand files like logos, so they belong in `assets/badges/` and are read straight
@@ -440,6 +499,7 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
   }
   warnUncompiledStylesheets(entries, id, warnings)
   warnRemovedPublicBucket(dir, id, warnings)
+  warnIconAsset(dir, id, config, warnings)
   return { id, version, label, gz: writeTarGz(entries), entries, warnings }
 }
 
