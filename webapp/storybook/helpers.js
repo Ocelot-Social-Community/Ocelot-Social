@@ -10,8 +10,6 @@ import layout from './layout.vue'
 import locales from '~/locales/index.js'
 import '~/plugins/v-tooltip'
 
-Vue.use(VueRouter)
-
 const helpers = {
   // Populated by story files before mount (e.g. FollowList.story.js), keyed by the fake userId each
   // story uses: { [userId]: [{ id, name, slug, ... }, ...] }. Read by the $apollo mock's
