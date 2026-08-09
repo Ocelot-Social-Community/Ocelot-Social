@@ -127,11 +127,11 @@ function referencesIn(value: string): string[] {
  * The tokens lying ON a dependency cycle — the ones CSS makes invalid at computed-value time, so that
  * `--a: var(--b, red); --b: var(--a)` yields no colour at all rather than red.
  *
- * Answered BEFORE any value is substituted, and separately from it. Deriving cycle membership from the
- * substitution walk instead is what kept getting this wrong: that walk cannot see into a nested
- * fallback (it has no way to replace one, so it gives up at the first), and a dependency it never
- * traverses is a dependency it cannot report — `--a: var(--missing, var(--b)); --b: var(--a, red)` is a
- * cycle in the graph while being two dead ends in the walk.
+ * Answered BEFORE any value is substituted, and separately from it. The substitution walk is not a
+ * usable source for this even now that it handles nested fallbacks: it only ever descends into the
+ * branch it TAKES, so a reference in a fallback that never gets used is never traversed — and an edge
+ * exists whether or not the fallback is reached. `--a: var(--missing, var(--b)); --b: var(--a, red)` is
+ * a cycle for that reason, while the walk resolves each of the two by a route that avoids the other.
  *
  * Tarjan, rather than "did the walk re-enter a node": membership in a cycle is membership in a
  * strongly connected component, and only an SCC pass answers that for every node in one traversal.
@@ -194,18 +194,21 @@ function cyclicTokens(raw: Record<string, string>): Set<string> {
  * put in a mail, and `style="color: var(--color-primary)"` in a client that cannot resolve it is not a
  * degraded colour — it is an invalid declaration, i.e. no colour at all. Better to leave the framework
  * value in place than to emit one the client throws away. Four ways to be unresolvable, none of them
- * worth failing a build over: a reference to a token nobody declares, membership in a cycle
- * (`--a: var(--b); --b: var(--a)` — every token on the cycle, fallbacks notwithstanding, and counting
- * references nested inside a fallback), a reference whose own target is unresolvable, and a nested
- * var() in a fallback.
+ * worth failing a build over: a reference to a token nobody declares AND carrying no fallback,
+ * membership in a cycle (`--a: var(--b); --b: var(--a)` — every token on the cycle, fallbacks
+ * notwithstanding, and counting references nested inside a fallback), a reference whose own target is
+ * unresolvable, and a declaration that is not parseable CSS (a `var(` that never closes, or one whose
+ * contents are not a custom-property name).
  *
- * The last two are worth keeping apart. A nested fallback makes a token unresolvable as a VALUE (no
- * replacement can be written without corrupting the CSS) while still contributing its EDGE to the
- * dependency graph — which is why the two phases below answer to different rules.
+ * A NESTED fallback is not among them. `--a: var(--nope, var(--x))` resolves to `--x`'s value, exactly
+ * as a browser resolves it: the outer reference falls back to its second argument, which is itself a
+ * reference. It used to be dropped, but for a reason that was never about CSS — the pattern that found
+ * references stopped at the first `)` and could not have replaced the outer expression without leaving
+ * a stray paren behind. Delimiting the expression properly removed the obstacle, not just its symptom.
  *
- * A token merely POINTING AT one of those still gets its own fallback: `--c: var(--a, blue)` is blue
- * when `--a` is unresolvable, which is what a browser does too — the fallback is only forfeited by the
- * tokens inside the cycle.
+ * A token merely POINTING AT an unresolvable one still gets its own fallback: `--c: var(--a, blue)` is
+ * blue when `--a` is unresolvable, which is what a browser does too — the fallback is only forfeited by
+ * the tokens inside the cycle.
  */
 export function resolveTokens(raw: Record<string, string>): Record<string, string> {
   // Phase 1 — the graph. Every token on a cycle is invalid before a single value is looked at, which
@@ -229,10 +232,12 @@ export function resolveTokens(raw: Record<string, string>): Record<string, strin
         out = null
         break
       }
-      const replacement =
-        ref.fallback?.includes('var(') === true
-          ? null
-          : (resolve(ref.name) ?? ref.fallback?.trim() ?? null)
+      // A fallback goes in AS TEXT, references and all. Nothing special is needed for a nested one:
+      // splicing it in leaves it as the next `var(…)` in `out`, which this same loop then picks up —
+      // `var(--nope, var(--x))` becomes `var(--x)` becomes the value of `--x`. Each pass removes one
+      // reference (a resolved value carries none, and a fallback is shorter by its own `var(`), so the
+      // loop still terminates on the DAG phase 1 left behind.
+      const replacement = resolve(ref.name) ?? ref.fallback?.trim() ?? null
       if (replacement === null) {
         out = null
         break

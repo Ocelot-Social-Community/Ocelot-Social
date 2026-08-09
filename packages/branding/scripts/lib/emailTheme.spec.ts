@@ -39,6 +39,37 @@ describe('resolveTokens', () => {
     assert.equal(resolveTokens({ x: 'green', a: 'var(--x, blue)' }).a, 'green')
   })
 
+  // A fallback is spliced in AS TEXT, so a reference inside one is simply the next reference the same
+  // loop finds. This used to be dropped — not because CSS says so (a browser resolves it to `--x`'s
+  // value) but because the pattern that found references stopped at the first `)` and could not have
+  // replaced the outer expression without stranding a paren. That obstacle is gone.
+  describe('a fallback that is itself a reference', () => {
+    test('resolves to the nested target when the outer token is missing', () => {
+      assert.deepEqual(resolveTokens({ x: 'red', a: 'var(--nope, var(--x))' }), {
+        x: 'red',
+        a: 'red',
+      })
+    })
+
+    test('follows a chain of fallbacks, not just one level', () => {
+      assert.equal(resolveTokens({ x: 'red', a: 'var(--n1, var(--n2, var(--x)))' }).a, 'red')
+    })
+
+    // The nested reference carries a function fallback of its own — the two features have to compose,
+    // since the paren scan is what made the nesting resolvable in the first place.
+    test('resolves a nested reference that carries a function fallback', () => {
+      assert.equal(resolveTokens({ a: 'var(--nope, var(--gone, rgb(1, 2, 3)))' }).a, 'rgb(1, 2, 3)')
+    })
+
+    // The fallback is NOT taken here, so its reference is never substituted — but phase 1 still counts
+    // it as an edge, which is what the cycle tests below rely on.
+    test('leaves the fallback untouched when the outer token resolves', () => {
+      const out = resolveTokens({ x: 'green', y: 'red', a: 'var(--x, var(--y))' })
+
+      assert.equal(out.a, 'green')
+    })
+  })
+
   // A fallback may be a function call, so a var() expression ends at its BALANCED paren. Stopping at
   // the first one substituted all but the last character and left it stranded: `rgb(23, 181, 63))`,
   // which reached the generated stylesheet and made every mail client drop the declaration.
@@ -128,18 +159,19 @@ describe('resolveTokens', () => {
     })
 
     // A reference NESTED in a fallback is an edge like any other (css-variables-1 §3 counts them
-    // "including in the fallback argument of var()"). It is invisible to the substitution pass — that
-    // one cannot replace a nested var() at all and gives up at the first — so a cycle running through
-    // one is only a cycle in the GRAPH. Reading membership off the substitution walk instead resolved
-    // `b` to red here: two dead ends that never met, rather than the ring they actually form.
+    // "including in the fallback argument of var()") — and an edge whether or not that fallback is
+    // ever taken, which is why the graph and not the substitution walk has to answer this. Left to the
+    // walk, each of these two resolves by a route that avoids the other: `--missing` is undeclared, so
+    // `a` reaches for `--b`, which reaches back and finds red. Two paths that never meet, rather than
+    // the ring they form.
     test('a cycle that closes through a nested fallback', () => {
       assert.deepEqual(resolveTokens({ a: 'var(--missing, var(--b))', b: 'var(--a, red)' }), {})
     })
 
-    // The nested reference must count as an edge WITHOUT the token becoming resolvable by it: `a` is
-    // still dropped for the value reason (no replacement can be written), while `x` is untouched.
-    test('still drops a nested fallback that is not in a cycle, and keeps its target', () => {
-      assert.deepEqual(resolveTokens({ x: 'red', a: 'var(--nope, var(--x))' }), { x: 'red' })
+    // …and the cycle is what drops these, not the nesting: the same shape without a ring resolves
+    // (see 'a fallback that is itself a reference' above).
+    test('a self-reference reached only through a fallback', () => {
+      assert.deepEqual(resolveTokens({ a: 'var(--nope, var(--a))' }), {})
     })
 
     // Entered from OUTSIDE: nothing walks into the b→c→b ring until `a` leads there, so the first
@@ -170,8 +202,10 @@ describe('resolveTokens', () => {
     })
 
     // Replacing this would leave the inner `)` behind — corrupt CSS is worse than no declaration.
-    test('a nested var() inside a fallback', () => {
-      assert.deepEqual(resolveTokens({ x: 'red', a: 'var(--nope, var(--x))' }), { x: 'red' })
+    // A nested fallback whose own target is missing too: the chain runs out, and there is nothing left
+    // to fall back to.
+    test('a nested var() whose target is unresolvable as well', () => {
+      assert.deepEqual(resolveTokens({ a: 'var(--nope, var(--also-nope))' }), {})
     })
 
     test('but keeps the tokens around the unresolvable one', () => {
