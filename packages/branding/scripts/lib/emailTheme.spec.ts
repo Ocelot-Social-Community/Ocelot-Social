@@ -81,6 +81,44 @@ describe('resolveTokens', () => {
       })
     })
 
+    // A reference NESTED in a fallback is an edge like any other (css-variables-1 §3 counts them
+    // "including in the fallback argument of var()"). It is invisible to the substitution pass — that
+    // one cannot replace a nested var() at all and gives up at the first — so a cycle running through
+    // one is only a cycle in the GRAPH. Reading membership off the substitution walk instead resolved
+    // `b` to red here: two dead ends that never met, rather than the ring they actually form.
+    test('a cycle that closes through a nested fallback', () => {
+      assert.deepEqual(resolveTokens({ a: 'var(--missing, var(--b))', b: 'var(--a, red)' }), {})
+    })
+
+    // The nested reference must count as an edge WITHOUT the token becoming resolvable by it: `a` is
+    // still dropped for the value reason (no replacement can be written), while `x` is untouched.
+    test('still drops a nested fallback that is not in a cycle, and keeps its target', () => {
+      assert.deepEqual(resolveTokens({ x: 'red', a: 'var(--nope, var(--x))' }), { x: 'red' })
+    })
+
+    // Entered from OUTSIDE: nothing walks into the b→c→b ring until `a` leads there, so the first
+    // traversal reaches its members mid-path. Membership is a property of the graph, not of where a
+    // walk happened to start — an SCC pass says so for every node in one pass, while "what sat on the
+    // path when it re-entered" depends on the entry point.
+    test('every member of a cycle reached only through another token', () => {
+      assert.deepEqual(resolveTokens({ a: 'var(--b)', b: 'var(--c)', c: 'var(--b)' }), {})
+    })
+
+    // Two disjoint rings plus a token depending on neither: the pass must not spill from one
+    // component into the other, nor collect an innocent bystander.
+    test('marks two separate rings without touching what lies between them', () => {
+      assert.deepEqual(
+        resolveTokens({
+          a: 'var(--b)',
+          b: 'var(--a)',
+          fine: 'green',
+          y: 'var(--z)',
+          z: 'var(--y)',
+        }),
+        { fine: 'green' },
+      )
+    })
+
     test('a token whose target is itself unresolvable', () => {
       assert.deepEqual(resolveTokens({ a: 'var(--nope)', b: 'var(--a)' }), {})
     })

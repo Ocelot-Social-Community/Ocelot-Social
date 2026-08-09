@@ -62,6 +62,87 @@ export const EMAIL_THEME: readonly Mapping[] = [
 const VAR_REF = /var\(\s*--([a-zA-Z0-9-]+)\s*(?:,([^)]*))?\)/
 
 /**
+ * Every `var(--x)` a declaration mentions, matched by its OPENING only — so a reference nested inside
+ * another one's fallback counts like any other. That is the dependency-graph rule verbatim: "if the
+ * value of a custom property prop contains a var() function referring to the property var (including
+ * in the fallback argument of var()), add an edge" (css-variables-1 §3).
+ *
+ * Deliberately not VAR_REF: that one matches whole `var(…)` expressions in order to REPLACE them, and
+ * it stops at the first `)`, which is exactly why a nested reference is invisible to it. Edges and
+ * substitutions are different questions and the answer to one is not the answer to the other.
+ */
+const VAR_REFS = /var\(\s*--([a-zA-Z0-9-]+)/g
+
+function referencesIn(value: string): string[] {
+  // `matchAll` clones the regex, so the shared `g` literal carries no lastIndex between calls.
+  return [...value.matchAll(VAR_REFS)].map((match) => match[1])
+}
+
+/**
+ * The tokens lying ON a dependency cycle — the ones CSS makes invalid at computed-value time, so that
+ * `--a: var(--b, red); --b: var(--a)` yields no colour at all rather than red.
+ *
+ * Answered BEFORE any value is substituted, and separately from it. Deriving cycle membership from the
+ * substitution walk instead is what kept getting this wrong: that walk cannot see into a nested
+ * fallback (it has no way to replace one, so it gives up at the first), and a dependency it never
+ * traverses is a dependency it cannot report — `--a: var(--missing, var(--b)); --b: var(--a, red)` is a
+ * cycle in the graph while being two dead ends in the walk.
+ *
+ * Tarjan, rather than "did the walk re-enter a node": membership in a cycle is membership in a
+ * strongly connected component, and only an SCC pass answers that for every node in one traversal.
+ * Marking whatever sat on the current path at the moment of re-entry gets the common cases right and
+ * quietly misses nodes whose cycle is entered from elsewhere.
+ */
+function cyclicTokens(raw: Record<string, string>): Set<string> {
+  const names = Object.keys(raw)
+  const idOf = new Map(names.map((name, i) => [name, i]))
+  // Edges to DECLARED tokens only: a reference to a token nobody declares is a dead end, not a node.
+  const edges = names.map((name) =>
+    referencesIn(raw[name])
+      .map((ref) => idOf.get(ref))
+      .filter((id): id is number => id !== undefined),
+  )
+
+  const index = new Array<number>(names.length).fill(-1)
+  const lowLink = new Array<number>(names.length).fill(0)
+  const onStack = new Array<boolean>(names.length).fill(false)
+  const stack: number[] = []
+  const cyclic = new Set<string>()
+  let counter = 0
+
+  const visit = (v: number): void => {
+    index[v] = counter
+    lowLink[v] = counter
+    counter++
+    stack.push(v)
+    onStack[v] = true
+    for (const w of edges[v]) {
+      // A self-reference is a cycle of one; an SCC of size 1 cannot say so on its own.
+      if (w === v) cyclic.add(names[v])
+      if (index[w] === -1) {
+        visit(w)
+        lowLink[v] = Math.min(lowLink[v], lowLink[w])
+      } else if (onStack[w]) {
+        lowLink[v] = Math.min(lowLink[v], index[w])
+      }
+    }
+    if (lowLink[v] !== index[v]) return
+    // v roots an SCC: everything above it on the stack belongs to the same component.
+    const component: number[] = []
+    let member = -1
+    do {
+      member = stack.pop() ?? -1
+      onStack[member] = false
+      component.push(member)
+    } while (member !== v)
+    if (component.length > 1) for (const m of component) cyclic.add(names[m])
+  }
+
+  for (let v = 0; v < names.length; v++) if (index[v] === -1) visit(v)
+  return cyclic
+}
+
+/**
  * Flattens a token map: every `var(--other)` replaced by the value it points at, recursively.
  *
  * A token that cannot be flattened is DROPPED rather than passed through. The callers want values to
@@ -69,37 +150,30 @@ const VAR_REF = /var\(\s*--([a-zA-Z0-9-]+)\s*(?:,([^)]*))?\)/
  * degraded colour — it is an invalid declaration, i.e. no colour at all. Better to leave the framework
  * value in place than to emit one the client throws away. Four ways to be unresolvable, none of them
  * worth failing a build over: a reference to a token nobody declares, membership in a cycle
- * (`--a: var(--b); --b: var(--a)` — every token on the cycle, fallbacks notwithstanding), a reference
- * whose own target is unresolvable, and a nested var() in a fallback.
+ * (`--a: var(--b); --b: var(--a)` — every token on the cycle, fallbacks notwithstanding, and counting
+ * references nested inside a fallback), a reference whose own target is unresolvable, and a nested
+ * var() in a fallback.
+ *
+ * The last two are worth keeping apart. A nested fallback makes a token unresolvable as a VALUE (no
+ * replacement can be written without corrupting the CSS) while still contributing its EDGE to the
+ * dependency graph — which is why the two phases below answer to different rules.
  *
  * A token merely POINTING AT one of those still gets its own fallback: `--c: var(--a, blue)` is blue
  * when `--a` is unresolvable, which is what a browser does too — the fallback is only forfeited by the
  * tokens inside the cycle.
  */
 export function resolveTokens(raw: Record<string, string>): Record<string, string> {
+  // Phase 1 — the graph. Every token on a cycle is invalid before a single value is looked at, which
+  // is also what makes phase 2 terminate: with the cycles already short-circuited, what is left to
+  // walk is a DAG, so the substitution needs no re-entry guard of its own.
+  const cyclic = cyclicTokens(raw)
   const resolved: Record<string, string> = {}
-  // The resolution path, as a STACK rather than a set: on re-entry the members of the cycle are the
-  // entries from the repeat point down, and a set cannot say where that point is.
-  const path: string[] = []
-  const cyclic = new Set<string>()
 
+  // Phase 2 — the values.
   const resolve = (name: string): string | null => {
     if (cyclic.has(name)) return null
     if (Object.hasOwn(resolved, name)) return resolved[name]
     if (!Object.hasOwn(raw, name)) return null
-    const repeat = path.indexOf(name)
-    if (repeat !== -1) {
-      // Every token from the repeat point down is IN the cycle, and CSS makes all of them invalid at
-      // computed-value time — a fallback on one of them does not rescue it, because the dependency
-      // graph is built from the references themselves, "including in the fallback argument of var()"
-      // (css-variables-1 §3). Marking only the re-entered token would let `--a: var(--b, red);
-      // --b: var(--a)` resolve BOTH to red: a takes its fallback once b comes back unresolvable, and
-      // b then reads a's memoised value. That is a colour the source theme never effectively defines,
-      // travelling into a mail where nobody can compare it against the site.
-      for (const member of path.slice(repeat)) cyclic.add(member)
-      return null
-    }
-    path.push(name)
     let out: string | null = raw[name]
     // A single declaration can hold several references (`0 1px var(--a), 0 2px var(--b)`), so this
     // loops until none is left rather than replacing once.
@@ -116,10 +190,6 @@ export function resolveTokens(raw: Record<string, string>): Record<string, strin
       }
       out = out.replace(whole, replacement)
     }
-    path.pop()
-    // Checked AFTER the loop, not before it: a token learns it is in a cycle only by walking into
-    // one, which happens while its own value is being substituted.
-    if (cyclic.has(name)) return null
     if (out !== null) resolved[name] = out.trim().replace(/\s+/g, ' ')
     return out
   }
