@@ -65,7 +65,12 @@ async function gotoStory(page, storyId) {
   // only on fonts caught the text but not those, so the very first screenshot after a fresh
   // navigation could still be taken mid-layout-shift as they popped in a moment later. Networkidle
   // (no more than 0 connections for 500ms) covers that without hardcoding a component-specific wait.
-  await page.waitForLoadState('networkidle')
+  // Best-effort: Storybook 7's static bundle retains a WebSocket/HMR reconnect loop that keeps at
+  // least one pending connection alive indefinitely in CI (no dev-server to connect to). A hard wait
+  // would always time out on those stories; a short-timeout catch lets the test continue once lazy
+  // chunks have had a reasonable window to arrive. The DOM-quiet pass below catches any remaining
+  // layout instability, so the screenshot is still stable.
+  await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {})
   // Let tiptap/ProseMirror actually finish building the document (deeply nested list/heading trees
   // took long enough under some runs that a fixed frame-count poll gave up early) and, by now
   // needing them, request its fonts.
