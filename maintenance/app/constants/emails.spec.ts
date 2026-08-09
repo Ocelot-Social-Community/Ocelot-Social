@@ -67,6 +67,11 @@ describe("isSupportAddress", () => {
     ["a domain without a dot", "support@localhost"],
     ["an address with whitespace", "support @example.org"],
     ["two addresses", "a@example.org b@example.org"],
+    // A dot with nothing on one side of it is not a label. Both shapes pass a naive
+    // `[^\s@]+\.[^\s@]+` domain, and would then be rendered in place of the fallback.
+    ["an empty domain label", "support@example..org"],
+    ["a trailing dot", "support@example.org."],
+    ["a leading dot", "support@.example.org"],
   ])("rejects %s", (_case, value) => {
     expect(isSupportAddress(value)).toBe(false);
   });

@@ -30,9 +30,15 @@ export const SUPPORT_EMAIL_PLACEHOLDER = "__OCELOT_SUPPORT_EMAIL__";
  * and an unsubstituted token or an empty runtime config on the other; a shape this coarse does that
  * while accepting the `&`, `|`, `\` and `/` a local part may legally carry (see the entrypoint's
  * escaping, and the cases in emails.spec.ts).
+ *
+ * The domain is spelled out as a chain of labels rather than `[^\s@]+\.[^\s@]+`, which accepts an
+ * empty label: `example..org` and `example.org.` both satisfy that shape, and a value this function
+ * accepts is one app.vue renders instead of falling back.
  */
+const SUPPORT_ADDRESS = /^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)+$/;
+
 export function isSupportAddress(value: unknown): value is string {
-  return typeof value === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  return typeof value === "string" && SUPPORT_ADDRESS.test(value);
 }
 
 export default {
