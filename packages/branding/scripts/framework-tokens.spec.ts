@@ -63,18 +63,32 @@ describe('framework tokens snapshot', () => {
       )
       assert.equal(committed, renderFrameworkTokens(computeCatalog()))
     })
+
+    // The write path itself: it has to land on disk, at the path it reports, carrying the catalog.
+    // Gated with the rest — writeFrameworkTokens() sources computeCatalog(), which is `{}` without a
+    // webapp beside this package, and an ungated version of this test would fail in exactly the
+    // checkouts the snapshot exists for.
+    test('writes the catalog to the path it returns', () => {
+      const dir = mkdtempSync(join(tmpdir(), 'ocelot-tokens-'))
+      dirs.push(dir)
+      const out = join(dir, 'tokens.ts')
+
+      assert.equal(writeFrameworkTokens(out), out)
+      assert.equal(readFileSync(out, 'utf8'), renderFrameworkTokens(computeCatalog()))
+    })
   }
 
-  test('writes sorted entries, so a regenerated file diffs by value and not by readdir order', () => {
-    const dir = mkdtempSync(join(tmpdir(), 'ocelot-tokens-'))
-    dirs.push(dir)
-    const out = join(dir, 'tokens.ts')
+  // Sorted rendering, checked against the RENDERER — a pure function of its argument, so this holds
+  // wherever the package is checked out. Feeding it an already-sorted map would prove nothing.
+  test('renders entries sorted, so a regenerated file diffs by value and not by readdir order', () => {
+    const rendered = renderFrameworkTokens({
+      'color-primary': 'red',
+      'background-color-base': 'white',
+      'text-color-base': 'black',
+    })
 
-    assert.equal(writeFrameworkTokens(out), out)
-
-    const names = [...readFileSync(out, 'utf8').matchAll(/^ {2}'([^']+)':/gm)].map((m) => m[1])
-    assert.ok(names.length > 50)
-    assert.deepEqual(names, [...names].sort())
+    const names = [...rendered.matchAll(/^ {2}'([^']+)':/gm)].map((m) => m[1])
+    assert.deepEqual(names, ['background-color-base', 'color-primary', 'text-color-base'])
   })
 
   // A value carrying an apostrophe (font stacks: `'LatoWeb', sans-serif`) must not end the string it
