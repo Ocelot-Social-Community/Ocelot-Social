@@ -11,9 +11,13 @@ describe('iconType', () => {
     expect(iconType(href)).toBe(type)
   })
 
-  it('ignores a cache-busting query', () => {
-    expect(iconType('/a/favicon.ico?v=2')).toBe('image/x-icon')
-  })
+  // Both suffixes the extension match accepts, so neither can be dropped from the pattern unnoticed.
+  it.each(['/a/favicon.ico?v=2', '/a/favicon.ico#v=2', '/a/favicon.ico?v=2#top'])(
+    'ignores what follows the extension in %s',
+    (href) => {
+      expect(iconType(href)).toBe('image/x-icon')
+    },
+  )
 
   // A dot in a directory name must not be mistaken for the file's extension.
   it('reads the extension of the FILE, not of a folder on the way there', () => {
