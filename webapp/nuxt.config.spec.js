@@ -4,10 +4,10 @@
 import config from './nuxt.config.js'
 import { brandingHeadHtml } from './utils/brandingHead.js'
 
-const BRAND = {
-  assets: { css: ['/branding/acme/assets/css/branding.css'] },
-  theme: { tokens: { 'color-primary': 'rgb(1, 2, 3)' } },
-}
+// Stylesheets only: this hook delegates to brandingHeadHtml, which reads `assets.css` and nothing
+// else. A `theme.tokens` entry here would suggest the hook resolves tokens — it does not; the token
+// path is exercised where it is actually read (server-middleware/manifest.spec.js).
+const BRAND = { assets: { css: ['/branding/acme/assets/css/branding.css'] } }
 
 const render = (nuxtState) => {
   // What @nuxt/vue-renderer hands the hook: HEAD already assembled, ending with the app's CSS bundles
