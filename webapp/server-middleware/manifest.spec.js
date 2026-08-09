@@ -4,6 +4,7 @@ const {
   getBranding,
   brandingDefaults,
   resolveThemeColor,
+  DEFAULT_COLOR_PRIMARY,
 } = require('@ocelot-social/branding')
 
 function run() {
@@ -49,6 +50,20 @@ describe('manifest serverMiddleware', () => {
     expect(json.name).toBe('yunite.me')
     expect(json.short_name).toBe('yunite')
     expect(json.theme_color).toBe('rgb(110, 139, 135)')
+  })
+
+  // resolveThemeColor's own fallback ladder is pinned where it lives (packages/branding theme.spec.ts).
+  // What these pin is the WIRING: the manifest hands it `branding.theme`, so a brand that carries no
+  // usable `color-primary` — a partial package with identity but no theme, or a pre-0.1.2 archive still
+  // mounted from a volume — serves a real colour rather than `""`/`undefined` into the browser chrome.
+  it.each([
+    ['no tokens at all (partial package)', {}, DEFAULT_COLOR_PRIMARY],
+    ['other tokens but not this one', { tokens: { 'color-danger': 'red' } }, DEFAULT_COLOR_PRIMARY],
+    ['an empty color-primary', { tokens: { 'color-primary': '' } }, DEFAULT_COLOR_PRIMARY],
+    ['the legacy pre-0.1.2 themeColor', { themeColor: 'rgb(1, 2, 3)' }, 'rgb(1, 2, 3)'],
+  ])('resolves the theme_color of a brand with %s', (_name, theme, expected) => {
+    setBranding({ ...brandingDefaults, theme })
+    expect(run().json.theme_color).toBe(expected)
   })
 
   it('returns an empty icons array when the brand has no ogImage', () => {
