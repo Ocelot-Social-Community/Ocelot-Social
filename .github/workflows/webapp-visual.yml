@@ -65,6 +65,14 @@ jobs:
         working-directory: packages/ui
         run: npm ci && npm run build
 
+      # The repo root node_modules/ (webpack@5, etc.) must exist so that vue-loader's
+      # plugin-webpack5.js can resolve webpack/lib/rules/BasicEffectRulePlugin via Node's
+      # directory-walk — it is present in root/node_modules/webpack but absent from
+      # webapp/node_modules/webpack (which is v4).
+      - name: Install root dependencies
+        working-directory: .
+        run: yarn --frozen-lockfile --ignore-scripts
+
       - name: Install dependencies
         run: yarn --frozen-lockfile
 
