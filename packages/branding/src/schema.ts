@@ -253,6 +253,13 @@ export interface BrandingConfig {
    * build namespaces them to `/branding/<brand>/…` so multiple brands never collide, and warns when
    * the referenced file does not exist. (Logo & OG-image paths in `logos` / `metadata.ogImage` are
    * asset paths too and are namespaced the same way.)
+   *
+   * A path that is NOT brand-relative is left exactly as written — an `http(s):`/`data:` URL (a brand
+   * hosting an asset itself) and an absolute `/…` path into the framework's own tree both survive the
+   * build untouched. The live webapp serves either. The MAINTENANCE page cannot: it is a static site
+   * nginx serves while the webapp is down, so an external URL still resolves there but a `/…` webapp
+   * path answers nothing — its generator drops those with a warning and keeps the vanilla asset
+   * (scripts/build-maintenance-branding.ts `servedUrl`).
    */
   assets: {
     /** Extra stylesheets, injected as <link> at runtime (bespoke component rules, fonts via
