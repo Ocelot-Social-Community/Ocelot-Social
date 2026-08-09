@@ -7,7 +7,7 @@
 //
 //   1. $SUPPORT_EMAIL at BUILD time  → baked into the payload (nuxt.config.ts runtimeConfig)
 //   2. $SUPPORT_EMAIL at START time  → nginx/40-support-email.sh replaces PLACEHOLDER in the built
-//                                      files (see maintenance/Dockerfile). This is the path used in
+//                                      HTML (see maintenance/Dockerfile). This is the path used in
 //                                      production: the value lives in the helm chart, so no brand
 //                                      repo has to thread a build arg through its CI.
 //
@@ -15,6 +15,39 @@
 // (backend/src/config/softwareDefaults.ts SUPPORT_EMAIL) and the webapp ships in its .env.template.
 // An unconfigured deployment must not show a different address here than everywhere else.
 export const SUPPORT_EMAIL_PLACEHOLDER = "__OCELOT_SUPPORT_EMAIL__";
+
+/**
+ * Is `value` something the page can put in front of a visitor as an address?
+ *
+ * Shape-based ON PURPOSE, rather than `value === SUPPORT_EMAIL_PLACEHOLDER`. That comparison was the
+ * bug: the token is a string in the CLIENT BUNDLE too (the sentinel this function replaces), the
+ * entrypoint rewrote every occurrence it found, and so the sentinel became the configured address
+ * alongside the runtime config. `configured === PLACEHOLDER` was then true exactly when the
+ * substitution had SUCCEEDED — every correctly configured deployment rendered the vanilla address,
+ * and only an unconfigured one looked right. Nothing here may depend on the token surviving anywhere.
+ *
+ * Not RFC 5322 — it does not need to be. The only inputs to separate are a real address on one side
+ * and an unsubstituted token or an empty runtime config on the other; a shape this coarse does that
+ * while accepting the `&`, `|`, `\` and `/` a local part may legally carry (see the entrypoint's
+ * escaping, and the cases in emails.spec.ts).
+ *
+ * The domain is spelled out as a chain of labels rather than `[^\s@]+\.[^\s@]+`, which accepts an
+ * empty label: `example..org` and `example.org.` both satisfy that shape, and a value this function
+ * accepts is one app.vue renders instead of falling back.
+ */
+// Quotes, backticks and angle brackets are excluded for the same reason nginx/40-support-email.sh
+// refuses them (guarded by a test that runs the script): the value reaches the page through that
+// script, substituted into a double-quoted JavaScript string inside a <script> block, where `"` ends
+// the string and `</script>` ends the block. Nothing an address needs is lost — unlike `&`, `|`, `\`
+// and `/`, which a local part may carry and which stay accepted here.
+const FORBIDDEN = "\\s\"'`<>";
+const SUPPORT_ADDRESS = new RegExp(
+  `^[^${FORBIDDEN}@]+@[^${FORBIDDEN}@.]+(?:\\.[^${FORBIDDEN}@.]+)+$`,
+);
+
+export function isSupportAddress(value: unknown): value is string {
+  return typeof value === "string" && SUPPORT_ADDRESS.test(value);
+}
 
 export default {
   SUPPORT_EMAIL: "hello@ocelot.social",
