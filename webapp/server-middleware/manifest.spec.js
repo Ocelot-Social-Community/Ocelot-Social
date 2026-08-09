@@ -4,6 +4,7 @@ const {
   getBranding,
   brandingDefaults,
   resolveThemeColor,
+  DEFAULT_COLOR_PRIMARY,
 } = require('@ocelot-social/branding')
 
 function run() {
@@ -42,13 +43,27 @@ describe('manifest serverMiddleware', () => {
         applicationName: 'yunite.me',
         applicationShortName: 'yunite',
       },
-      // The PWA theme_color is the brand's primary colour (no separate metadata.themeColor).
-      theme: { ...brandingDefaults.theme, themeColor: 'rgb(110, 139, 135)' },
+      // The PWA theme_color is the brand's own `color-primary` theme token — no field of its own.
+      theme: { ...brandingDefaults.theme, tokens: { 'color-primary': 'rgb(110, 139, 135)' } },
     })
     const { json } = run()
     expect(json.name).toBe('yunite.me')
     expect(json.short_name).toBe('yunite')
     expect(json.theme_color).toBe('rgb(110, 139, 135)')
+  })
+
+  // resolveThemeColor's own fallback ladder is pinned where it lives (packages/branding theme.spec.ts).
+  // What these pin is the WIRING: the manifest hands it `branding.theme`, so a brand that carries no
+  // usable `color-primary` — a partial package with identity but no theme, or a pre-0.1.2 archive still
+  // mounted from a volume — serves a real colour rather than `""`/`undefined` into the browser chrome.
+  it.each([
+    ['no tokens at all (partial package)', {}, DEFAULT_COLOR_PRIMARY],
+    ['other tokens but not this one', { tokens: { 'color-danger': 'red' } }, DEFAULT_COLOR_PRIMARY],
+    ['an empty color-primary', { tokens: { 'color-primary': '' } }, DEFAULT_COLOR_PRIMARY],
+    ['the legacy pre-0.1.2 themeColor', { themeColor: 'rgb(1, 2, 3)' }, 'rgb(1, 2, 3)'],
+  ])('resolves the theme_color of a brand with %s', (_name, theme, expected) => {
+    setBranding({ ...brandingDefaults, theme })
+    expect(run().json.theme_color).toBe(expected)
   })
 
   it('returns an empty icons array when the brand has no ogImage', () => {
@@ -60,7 +75,7 @@ describe('manifest serverMiddleware', () => {
     expect(json.icons).toEqual([])
   })
 
-  it('derives the 192/512 PWA icons from the brand ogImage + ogImageType', () => {
+  it('falls back to the 192/512 PWA icons from the brand ogImage + ogImageType', () => {
     setBranding({
       ...brandingDefaults,
       metadata: {
@@ -73,6 +88,27 @@ describe('manifest serverMiddleware', () => {
     expect(json.icons).toEqual([
       { src: '/branding/acme/assets/logo-squared.svg', sizes: '192x192', type: 'image/svg+xml' },
       { src: '/branding/acme/assets/logo-squared.svg', sizes: '512x512', type: 'image/svg+xml' },
+    ])
+  })
+
+  // ogImage is a SHARE image — 1200×1140 by default and often an .svg, which several browsers refuse
+  // in a manifest. `assets.icon` is the square raster icon a brand ships for installing, so it wins.
+  it('prefers the brand assets.icon over the ogImage', () => {
+    setBranding({
+      ...brandingDefaults,
+      assets: { ...brandingDefaults.assets, icon: '/branding/acme/assets/icon.png' },
+      metadata: {
+        ...brandingDefaults.metadata,
+        ogImage: '/branding/acme/assets/logo-squared.svg',
+        ogImageType: 'image/svg+xml',
+      },
+    })
+    const { json } = run()
+    // The type follows the ICON's own extension — carrying ogImageType across would label the png
+    // image/svg+xml and browsers do reject on that mismatch.
+    expect(json.icons).toEqual([
+      { src: '/branding/acme/assets/icon.png', sizes: '192x192', type: 'image/png' },
+      { src: '/branding/acme/assets/icon.png', sizes: '512x512', type: 'image/png' },
     ])
   })
 })

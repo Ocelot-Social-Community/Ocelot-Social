@@ -103,6 +103,32 @@ function archiveEntry(namespaced: string): { entry: string; data: Buffer } | nul
   return { entry, data }
 }
 
+/**
+ * Where a configured asset path can point, and what each kind means for a page nginx serves from a
+ * static root WHILE THE WEBAPP IS DOWN. The build only namespaces paths a brand writes relative to
+ * its own root (build-brandings.ts `isRelativeAsset`); absolute and external ones survive composition
+ * verbatim, so all three kinds reach this script and each needs an answer:
+ *
+ *   • `/branding/<id>/…` — the brand's own archived file. Copied out, and the served copy's URL is
+ *     what travels; the live route serving it does not exist here.
+ *   • `http(s):` / `data:` — reachable (or self-contained) with the webapp down, so kept VERBATIM,
+ *     exactly as the live app uses it. A brand hosting its logo on a CDN is the case this exists for.
+ *   • any other absolute `/…` — a path the WEBAPP serves (`/img/custom/…`). It is precisely what this
+ *     static site cannot answer, so it is dropped: a `<link>` to it would 404 on every request.
+ *
+ * Dropping is a WARNING and a null, never a written null — callers omit the overlay key, which lets
+ * the vanilla value survive (a present key wins; see the metadata overlay below).
+ */
+function servedUrl(path: string | null | undefined, label: string): string | null {
+  if (!path) return null
+  if (/^(?:https?:|data:)/.test(path)) return path
+  if (path.startsWith(`/branding/${id}/`)) return serveArchived(path, label)
+  console.warn(
+    `[maintenance] ! ${label}: ${path} is served by the webapp, which is down whenever this page shows — omitted`,
+  )
+  return null
+}
+
 // --- 1+2. Theme: unpack the brand's assets and link its own stylesheets ---------------------------
 // The maintenance page is standalone — /branding/<id>/… does not exist while the webapp is down — so
 // the brand's assets are unpacked here under public/<SERVED_DIR>/ with their directory structure
@@ -110,10 +136,12 @@ function archiveEntry(namespaced: string): { entry: string; data: Buffer } | nul
 // (@font-face, background images) resolves without anything rewriting it. An earlier version parsed
 // @font-face out of the CSS and rewrote each src by hand; unpacking makes that unnecessary, and it
 // also carries rules this page never knew about.
-const servedUrls = new Map<string, string>()
+//
+// EVERY asset entry, not just the referenced ones: a stylesheet's url() targets (fonts, background
+// images) are named inside the CSS, which nothing here parses.
 for (const [entry, data] of archive) {
   if (!entry.startsWith('assets/')) continue
-  servedUrls.set(entry, serveEntry(entry, data))
+  serveEntry(entry, data)
 }
 
 // The sheets are taken in the order the BRAND configured them, not in the order they happen to sit in
@@ -121,9 +149,14 @@ for (const [entry, data] of archive) {
 // order IS cascade order, so where two sheets set the same property at equal specificity, iterating the
 // archive would hand the win to whichever file the filesystem listed last. `assets.css` is where the
 // brand says which sheet wins; the live webapp loads them in exactly that order.
+//
+// Through the same path classifier as the images below, so `assets.css` answers the external-URL
+// question the same way everything else does: a brand's CDN stylesheet is linked as authored, and one
+// pointing into the webapp's own tree is dropped with a warning instead of silently vanishing from the
+// list. (The archived ones are already unpacked by the loop above; re-serving writes identical bytes.)
 const servedSheets = config.assets.css
-  .map((href) => servedUrls.get(href.replace(/^\/branding\/[^/]+\//, '')))
-  .filter((url): url is string => Boolean(url))
+  .map((href) => servedUrl(href, 'stylesheet'))
+  .filter((url): url is string => url !== null)
 
 // A LIST of served URLs rather than a stylesheet that pulls them in: nuxt.config turns each into a
 // <head> <link>, so the browser loads it straight from public/ — the same way the live webapp injects
@@ -152,7 +185,7 @@ console.log(
 // .svg or .png, and app.vue falls back to the vanilla one when there is no overlay. Both come out of
 // the archive as `/branding/<id>/…`, which resolves in the live webapp but NOT here — copying them and
 // rewriting the path is what makes them show up at all.
-function serveImage(namespaced: string, label: string): string | null {
+function serveArchived(namespaced: string, label: string): string | null {
   const found = archiveEntry(namespaced)
   if (!found) return null
   const url = serveEntry(found.entry, found.data)
@@ -161,15 +194,21 @@ function serveImage(namespaced: string, label: string): string | null {
   return url
 }
 
-const logoUrl = serveImage(config.logos.signupPath, 'logo')
-const ogImageUrl = serveImage(config.metadata.ogImage, 'og image')
-// The composed ogImage is a `/branding/<id>/…` path — served by the live webapp, never by this static
-// site — so it has to become the copy just made. Falling back to the logo covers the usual case, where
-// a brand sets no separate OG image and the build derived it from the squared logo. null means the
-// brand referenced an image it does not ship: see the omission below.
-const ogImage =
-  ogImageUrl ??
-  (config.metadata.ogImage.startsWith(`/branding/${id}/`) ? logoUrl : config.metadata.ogImage)
+const logoUrl = servedUrl(config.logos.signupPath, 'logo')
+const ogImageUrl = servedUrl(config.metadata.ogImage, 'og image')
+// The browser-tab icon. It travels exactly like the logo — and it has to travel at all, because this
+// page ships its own vanilla public/favicon.ico and nothing else would ever replace it: the built
+// index.html carries no icon link (Nuxt 4 adds none, and useHead cannot help with `ssr: false`), so
+// the browser falls back to its implicit /favicon.ico request. Every brand's maintenance page showed
+// the ocelot icon until this was wired up.
+//
+// Only `assets.favicon`, not `assets.icon`: apple-touch and PWA install icons exist for a site being
+// added to a home screen, which is not something anyone does with a maintenance page.
+const faviconUrl = servedUrl(config.assets.favicon, 'favicon')
+// Falling back to the logo covers the usual case, where a brand sets no separate OG image and the
+// build derived it from the squared logo. null means the brand's OG image is unusable here — not in
+// the archive, or a webapp path — and the logo could not stand in either: see the omission below.
+const ogImage = ogImageUrl ?? logoUrl
 
 // --- 4. Metadata: identity + OG for the <head>, as an overlay the app deep-merges ------------------
 // `config` is fully merged, so every field is present (the ocelot vanilla defaults when the brand
@@ -200,6 +239,9 @@ writeFileSync(
           }
         : {}),
       ...(logoUrl ? { LOGO: logoUrl } : {}),
+      // Same omit-rather-than-null rule as above: a present key WINS, so a brand whose favicon is not
+      // in the archive must fall through to the vanilla one instead of blanking it out.
+      ...(faviconUrl ? { FAVICON: faviconUrl } : {}),
     },
     null,
     2,

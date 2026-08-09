@@ -6,7 +6,7 @@ import assert from 'node:assert/strict'
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
-import { after, test } from 'node:test'
+import { after, describe, test } from 'node:test'
 
 import { composeArchive, readManifest } from '../../dist/discover.js'
 import { readTarGz } from '../../dist/tar.js'
@@ -63,7 +63,7 @@ function brandDir({
 const ACME_CONFIG = `export default (defineBranding) =>
   defineBranding({
     metadata: { applicationName: 'Acme' },
-    theme: { themeColor: 'red' },
+    
     logos: { signupPath: 'assets/logo-squared.svg' },
   })
 `
@@ -147,9 +147,10 @@ test('buildBrandArchive emits a PARTIAL library: only customised buckets get a f
   const types = readManifest(readTarGz(built.gz))
     .instances.map((i) => i.type)
     .sort()
-  // theme (themeColor), identity (applicationName + derived ogImage), logos (signupPath) customised;
-  // legal / navigation / behavior untouched → NOT emitted.
-  assert.deepEqual(types, ['identity', 'logos', 'theme'])
+  // identity (applicationName + derived ogImage) and logos (signupPath) customised; legal /
+  // navigation / behavior untouched → NOT emitted. NOR theme: it is derived from the brand's
+  // stylesheets, and this fixture ships none (the stylesheet path is covered further down).
+  assert.deepEqual(types, ['identity', 'logos'])
 })
 
 test('buildBrandArchive namespaces asset paths and derives ogImage from the squared logo', async () => {
@@ -172,7 +173,7 @@ test('buildBrandArchive warns when a referenced asset is missing (but still buil
   assert.match(built.warnings.join('\n'), /logo-squared\.svg/)
 })
 
-test('buildBrandArchive namespaces css, favicon and html-per-locale paths', async () => {
+test('buildBrandArchive namespaces css, favicon, icon and html-per-locale paths', async () => {
   const dir = brandDir({
     config: `export default (defineBranding) =>
       defineBranding({
@@ -180,12 +181,13 @@ test('buildBrandArchive namespaces css, favicon and html-per-locale paths', asyn
         assets: {
           css: ['assets/extra.css'],
           favicon: 'assets/favicon.ico',
+          icon: 'assets/icon.png',
           html: { imprint: { en: 'html/imprint.en.html' } },
         },
         headerMenu: { customButton: { iconPath: 'assets/button.svg', url: 'https://example.test' } },
       })
 `,
-    assets: { 'extra.css': 'x', 'favicon.ico': 'x', 'button.svg': 'x' },
+    assets: { 'extra.css': 'x', 'favicon.ico': 'x', 'icon.png': 'x', 'button.svg': 'x' },
   })
   // the html/ referenced file lives outside assets/ — create it so no warning is emitted
   mkdirSync(join(dir, 'html'), { recursive: true })
@@ -194,9 +196,63 @@ test('buildBrandArchive namespaces css, favicon and html-per-locale paths', asyn
   const config = composeArchive(readTarGz((await buildBrandArchive(dir)).gz))
   assert.deepEqual(config.assets.css, ['/branding/acme/assets/extra.css'])
   assert.equal(config.assets.favicon, '/branding/acme/assets/favicon.ico')
+  // The apple-touch / PWA icon travels the same way — a favicon cannot stand in for it (.ico is not
+  // an apple-touch-icon format), so it is a slot of its own rather than a derived path.
+  assert.equal(config.assets.icon, '/branding/acme/assets/icon.png')
   assert.equal(config.assets.html.imprint.en, '/branding/acme/html/imprint.en.html')
   // the framework's /img/custom/.
   assert.equal(config.headerMenu.customButton.iconPath, '/branding/acme/assets/button.svg')
+})
+
+// A brand's theme reaches its e-mails through ONE generated file, overlaid onto the framework's empty
+// placeholder at backend bootstrap. Nothing else connects assets.css to a mail.
+describe('the e-mail stylesheet', () => {
+  const EMAIL_CSS = 'emails/templates/includes/branding.css'
+
+  const themed = (css: string, files = {}) =>
+    brandDir({
+      config: `export default (d) => d({
+        metadata: { applicationName: 'Acme' },
+        assets: { css: ['assets/theme.css'] },
+      })
+`,
+      assets: { 'theme.css': css },
+      files,
+    })
+
+  test('is generated from the tokens the brand overrides', async () => {
+    const dir = themed(':root { --color-primary: rgb(239, 124, 0); }')
+
+    const css = readTarGz((await buildBrandArchive(dir)).gz)
+      .get(EMAIL_CSS)
+      .toString()
+
+    // Literals, never var(): no mail client resolves custom properties (see lib/emailTheme.ts).
+    assert.equal(css.includes('var('), false)
+    assert.match(css, /a \{\n {2}color: rgb\(239, 124, 0\);\n\}/)
+    assert.match(css, /background: rgb\(239, 124, 0\);/)
+  })
+
+  // Otherwise every archive would carry a stylesheet restating the framework's own values, and a
+  // later change to the framework's mail styling would be silently overridden by all of them.
+  test('is omitted for a brand that overrides nothing a mail renders', async () => {
+    const dir = themed(':root { --color-neutral-50: pink; }')
+
+    assert.equal(readTarGz((await buildBrandArchive(dir)).gz).has(EMAIL_CSS), false)
+  })
+
+  // A hand-written file is a deliberate choice and has to win over anything derived.
+  test('never overwrites one the brand wrote itself', async () => {
+    const dir = themed(':root { --color-primary: rgb(239, 124, 0); }', {
+      [EMAIL_CSS]: 'a { color: hotpink; }',
+    })
+
+    const css = readTarGz((await buildBrandArchive(dir)).gz)
+      .get(EMAIL_CSS)
+      .toString()
+
+    assert.equal(css, 'a { color: hotpink; }')
+  })
 })
 
 test('buildBrandArchive warns on a SOURCE stylesheet in assets/ (packed but never compiled)', async () => {
@@ -372,14 +428,19 @@ test('the PWA colour is evaluated from --color-primary in a listed stylesheet', 
   const built = await buildBrandArchive(dir)
   const files = readTarGz(built.gz)
   const theme = JSON.parse(files.get('fragments/theme.default.json'))
-  assert.equal(theme.theme.themeColor, 'rgb(1, 2, 3)')
-  // The declarations themselves stay in the stylesheet — only the PWA colour is lifted into config.
+  assert.equal(theme.theme.tokens['color-primary'], 'rgb(1, 2, 3)')
+  // Every token the brand declares travels, not just the PWA colour — and the declarations themselves
+  // stay in the stylesheet, which is what the webapp actually renders from.
+  assert.equal(theme.theme.tokens['font-family-text'], 'Inter, sans-serif')
   assert.match(String(files.get('assets/theme.css')), /--font-family-text: Inter, sans-serif/)
+  // Framework tokens the brand did NOT touch stay out: storing them would freeze the framework's
+  // palette into this archive, to go stale the next time a default moves.
+  assert.equal('color-danger' in theme.theme.tokens, false)
   assert.equal(built.warnings.join('\n').includes('theme.css'), false)
 })
 
-// A manifest has no media queries: whatever travels as themeColor is shown unconditionally, so it has
-// to be the value that applies unconditionally.
+// A manifest has no media queries: whatever travels in theme.tokens is applied unconditionally, so it
+// has to be the value that holds unconditionally.
 test('a dark-mode override does not become the PWA colour', async () => {
   const dir = brandDir({
     config: `export default (d) => d({ assets: { css: ['assets/theme.css'] } })\n`,
@@ -392,7 +453,7 @@ test('a dark-mode override does not become the PWA colour', async () => {
 
   const built = await buildBrandArchive(dir)
   const theme = JSON.parse(readTarGz(built.gz).get('fragments/theme.default.json'))
-  assert.equal(theme.theme.themeColor, 'rgb(1, 2, 3)')
+  assert.equal(theme.theme.tokens['color-primary'], 'rgb(1, 2, 3)')
 })
 
 test('a --color-primary that only holds inside an at-rule is reported', async () => {
@@ -462,4 +523,97 @@ test('a stylesheet listed in assets.css that does not exist is reported', async 
 
   const built = await buildBrandArchive(dir)
   assert.match(built.warnings.join('\n'), /assets\.css lists 'missing\.css', which does not exist/)
+})
+
+// assets.icon is consumed as a fixed-size square bitmap by the PWA manifest and the iOS home screen,
+// and NEITHER reports back: a wrong file surfaces as a stretched, blurred or absent icon on someone
+// else's phone. The build is the last place it is cheap to notice. (See lib/imageSize.spec.ts for the
+// header reading itself; what these pin is which files draw which warning.)
+describe('assets.icon', () => {
+  /** A minimal but genuine PNG header — enough for the check, which reads only the IHDR chunk. */
+  function pngBytes(width, height) {
+    const data = Buffer.alloc(24)
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]).copy(data)
+    data.write('IHDR', 12, 'ascii')
+    data.writeUInt32BE(width, 16)
+    data.writeUInt32BE(height, 20)
+    return data
+  }
+
+  const withIcon = (body, name = 'icon.png') =>
+    brandDir({
+      config: `export default (d) => d({ assets: { icon: 'assets/${name}' } })\n`,
+      assets: { [name]: body },
+    })
+
+  const iconWarnings = async (dir) =>
+    (await buildBrandArchive(dir)).warnings.filter((w) => w.includes('assets.icon')).join('\n')
+
+  test('a square icon at the declared size passes without comment', async () => {
+    assert.equal(await iconWarnings(withIcon(pngBytes(512, 512))), '')
+    // Larger is fine too — the manifest declares 192 and 512, and browsers downscale.
+    assert.equal(await iconWarnings(withIcon(pngBytes(1024, 1024))), '')
+  })
+
+  // The trap the extension-derived MIME type sets: nothing downstream inspects the file, so the
+  // manifest announces `image/svg+xml` and a browser that will not rasterise it drops the icon.
+  test('warns that an svg is not a raster image', async () => {
+    const warning = await iconWarnings(withIcon('<svg viewBox="0 0 512 512"></svg>', 'icon.svg'))
+
+    assert.match(warning, /is SVG, not a raster image/)
+  })
+
+  // .ico is the FAVICON format, and the two slots exist separately precisely because iOS ignores it.
+  test('warns that an ico is not a raster image', async () => {
+    const warning = await iconWarnings(
+      withIcon(Buffer.from([0x00, 0x00, 0x01, 0x00, 0x01, 0x00]), 'icon.ico'),
+    )
+
+    assert.match(warning, /is ICO, not a raster image/)
+  })
+
+  test('warns about a non-square icon, naming both dimensions', async () => {
+    const warning = await iconWarnings(withIcon(pngBytes(512, 300)))
+
+    assert.match(warning, /is 512×300, not square/)
+  })
+
+  test('warns about an icon smaller than the size the manifest declares', async () => {
+    const warning = await iconWarnings(withIcon(pngBytes(192, 192)))
+
+    assert.match(warning, /is 192px — the manifest declares it at 512px/)
+  })
+
+  test('warns about a file that is not an image at all', async () => {
+    const warning = await iconWarnings(withIcon('not an image'))
+
+    assert.match(warning, /is not an image format this build recognises/)
+  })
+
+  // Reported apart from "not an image": the file IS a PNG, it just got cut off — which points at the
+  // brand's own packaging (a truncated copy, a bad LFS checkout) rather than at the wrong file.
+  test('warns about a truncated image separately from an unrecognised one', async () => {
+    const warning = await iconWarnings(withIcon(pngBytes(512, 512).subarray(0, 12)))
+
+    assert.match(warning, /is a truncated PNG file/)
+  })
+
+  // A brand may ship no icon, or point at one it hosts itself. Neither is this check's business —
+  // and a missing file is already reported by the namespacing pass, so saying it twice is noise.
+  test('says nothing when there is no local file to inspect', async () => {
+    assert.equal(await iconWarnings(brandDir({ config: ACME_CONFIG })), '')
+    assert.equal(
+      await iconWarnings(
+        brandDir({
+          config: `export default (d) => d({ assets: { icon: 'https://cdn.example/icon.png' } })\n`,
+        }),
+      ),
+      '',
+    )
+    const missing = brandDir({
+      config: `export default (d) => d({ assets: { icon: 'assets/nowhere.png' } })\n`,
+    })
+    assert.equal(await iconWarnings(missing), '')
+    assert.match((await buildBrandArchive(missing)).warnings.join('\n'), /asset not found/)
+  })
 })

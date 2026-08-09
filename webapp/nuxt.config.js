@@ -106,9 +106,22 @@ export default {
     ],
     link: [
       {
+        // `hid` is what makes this a SLOT rather than a fixed tag: plugins/branding-favicon.js
+        // rewrites this entry per request, so a branded instance server-renders its own icon instead
+        // of shipping the vanilla one and swapping it after hydration. Everything below is the
+        // fallback for an unbranded (vanilla) instance.
+        hid: 'icon',
         rel: 'icon',
         type: 'image/x-icon',
         href: '/favicon.ico',
+      },
+      {
+        // Declared here rather than by @nuxtjs/pwa (`icon: false` below): the module bakes the hash of
+        // a build-time static/icon.png into the href and adds no `hid`, which makes it impossible to
+        // retarget per brand. branding-favicon.js points it at the brand's `assets.icon`; iOS only.
+        hid: 'apple-touch-icon',
+        rel: 'apple-touch-icon',
+        href: '/icon.png',
       },
       {
         // Points at the dynamic serverMiddleware route (content per active brand); href is stable.
@@ -192,6 +205,10 @@ export default {
     // First: $authCookie is what the auth store reads/writes the session with.
     { src: '~/plugins/auth-cookie.js', ssr: true },
     { src: '~/plugins/branding.js', ssr: true },
+    // Directly after branding.js — it reads the accessor that one sets. Runs on BOTH sides on purpose:
+    // the server renders the branded <link rel="icon"> and the client resolves the same value, so
+    // there is no vanilla icon to swap out after hydration.
+    '~/plugins/branding-favicon.js',
     { src: '~/plugins/branding-head.js', ssr: false },
     { src: '~/plugins/policy.js', ssr: true },
     { src: '~/plugins/policy-subscribe.js', ssr: false },
@@ -333,6 +350,16 @@ export default {
     // server-middleware/manifest.js (see serverMiddleware + the head.link[rel=manifest] above), so
     // the installed-app name / theme colour follow a live brand switch without a rebuild.
     manifest: false,
+    // Icon module disabled — with `manifest: false` its only remaining output was two head links
+    // generated from the build-time static/icon.png:
+    //   <link rel="shortcut icon" href="/_nuxt/icons/icon_64.<hash>.png">
+    //   <link rel="apple-touch-icon" href="/_nuxt/icons/icon_512.<hash>.png" sizes="512x512">
+    // `shortcut icon` is a legacy alias of `icon`, so that vanilla 64px PNG COMPETED with the brand's
+    // favicon — and since the module adds no `hid` and hashes the href at build time, neither vue-meta
+    // nor the client plugin could retarget it. A branded instance kept the ocelot icon in the tab
+    // whichever candidate the browser happened to prefer. The two links are declared in head.link
+    // above instead, with hids, so branding-favicon.js can rewrite them.
+    icon: false,
     meta: {
       // Prevent @nuxtjs/pwa from auto-generating description from package.json;
       // we set description and og:description manually in head.meta above.

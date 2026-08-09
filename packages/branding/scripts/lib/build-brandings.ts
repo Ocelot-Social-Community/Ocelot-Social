@@ -11,12 +11,15 @@ import postcss from 'postcss'
 
 import { BUCKET_NAMES, extractBucket, instanceFile, splitConfig } from '../../dist/buckets.js'
 import { brandingDefaults } from '../../dist/defaults.js'
+import { FRAMEWORK_TOKENS } from '../../dist/frameworkTokens.js'
 import { deepMerge } from '../../dist/internal.js'
 import { writeTarGz } from '../../dist/tar.js'
 import { SCHEMA_VERSION } from '../../dist/version.js'
 import { catalogAvailable, computeCatalog } from '../theme-catalog.ts'
 
 import { customPropertiesIn } from './css.ts'
+import { buildEmailBrandingCss, resolveTokens } from './emailTheme.ts'
+import { readImage } from './imageSize.ts'
 import { loadConfig } from './load-config.ts'
 
 import type { ArchiveInstanceEntry } from '../../dist/buckets.js'
@@ -45,6 +48,9 @@ export interface PublishedArchive extends BuiltArchive {
   latest: string
   versioned: string | null
 }
+
+/** Where the backend expects a brand's e-mail stylesheet (overlayRuntimeFiles strips the `emails/`). */
+const EMAIL_BRANDING_CSS = 'emails/templates/includes/branding.css'
 
 // Recursively collect a directory's files as tar entries keyed by their path relative to the brand
 // root (e.g. dir='assets' → 'assets/logo.svg').
@@ -99,6 +105,7 @@ function namespaceConfig(
   c.metadata.ogImage = ns(c.metadata.ogImage) // ogImage is always set (merged default)
   if (Array.isArray(c.assets.css)) c.assets.css = c.assets.css.map(ns)
   if (c.assets.favicon != null) c.assets.favicon = ns(c.assets.favicon)
+  if (c.assets.icon != null) c.assets.icon = ns(c.assets.icon)
   const html = c.assets.html as Record<string, Record<string, string>>
   for (const page of Object.keys(html)) {
     const locales = html[page]
@@ -172,10 +179,11 @@ const LEGACY_LOCALE_DIRS = new Set(['tmp', 'html'])
  * A brand authors its theme as CSS. This reads the stylesheets it lists under `assets.css` for two
  * purposes, and stores nothing else about the theme:
  *
- *  1. `theme.themeColor` — the resolved `--color-primary`. The PWA manifest is generated per request
- *     and cannot resolve `var()`, so this one value has to travel as a concrete colour. It is read
- *     from an UNCONDITIONAL `:root` only: a manifest has no media queries, so a value that holds just
- *     inside `@media (prefers-color-scheme: dark)` would be shipped as if it always applied.
+ *  1. `theme.tokens` — the brand's own `:root` declarations with every `var()` flattened against the
+ *     framework palette. Those consumers have no browser to resolve custom properties for them (the
+ *     PWA manifest is generated per request; the maintenance page is static HTML), so the values have
+ *     to travel as literals. Read from an UNCONDITIONAL `:root` only: a value that holds just inside
+ *     `@media (prefers-color-scheme: dark)` would be shipped as if it always applied.
  *  2. The specificity guarantee. A brand's `:root` only outranks the framework's `:root` by being
  *     loaded later, and it is not: with `build.extractCSS: false` the app CSS is injected by
  *     vue-style-loader during hydration, AFTER anything the server put in <head>. So the packed copy
@@ -208,8 +216,16 @@ function loadThemeFromStylesheets(
       )
     }
   }
-  if (unconditional['color-primary']) config.theme.themeColor = unconditional['color-primary']
-  else if (declared['color-primary'])
+  // Resolved against the FRAMEWORK palette, then narrowed back to the brand's own keys: a brand may
+  // well write `--color-primary: var(--color-neutral-0)`, which only means something with the
+  // framework's map at hand — but storing what that map contributed would freeze it into the archive.
+  const resolved = resolveTokens({ ...FRAMEWORK_TOKENS, ...unconditional })
+  config.theme.tokens = Object.fromEntries(
+    Object.keys(unconditional)
+      .filter((name) => Object.hasOwn(resolved, name))
+      .map((name) => [name, resolved[name]]),
+  )
+  if (!unconditional['color-primary'] && declared['color-primary'])
     warnings.push(
       `  ! ${id}: --color-primary is only declared inside an at-rule, so it cannot become the PWA` +
         ` theme colour — declare it on a plain ':root' as well`,
@@ -342,6 +358,64 @@ function warnUncompiledStylesheets(entries: TarEntry[], id: string, warnings: st
 }
 
 /**
+ * The size `assets.icon` is DECLARED at — the PWA manifest lists it as both 192×192 and 512×512
+ * (webapp/server-middleware/manifest.js), so anything smaller is upscaled by the browser to fill the
+ * larger slot.
+ */
+const ICON_MIN_PX = 512
+
+/**
+ * Warn when `assets.icon` cannot do the job the slot exists for: the iOS home-screen icon and the PWA
+ * install icon. Both consume it as a fixed-size square bitmap, and neither reports back — a wrong file
+ * shows up as a stretched or blurred icon on someone's phone, or as no icon at all, long after the
+ * build that accepted it.
+ *
+ * Warnings only, like every other check here: a brand's icon is not worth failing a deployment over,
+ * and the slot is optional to begin with.
+ */
+function warnIconAsset(dir: string, id: string, config: BrandingConfig, warnings: string[]): void {
+  const rel = config.assets.icon
+  // Only a brand-relative path names a file this build can read; an external URL or an absolute
+  // framework path is not ours to inspect (see namespacePath).
+  if (!isRelativeAsset(rel)) return
+  const file = join(dir, rel)
+  if (!existsSync(file)) return // already reported by namespacePath as "referenced asset not found"
+
+  const image = readImage(readFileSync(file))
+  if (!image) {
+    warnings.push(`  ! ${id}: assets.icon '${rel}' is not an image format this build recognises`)
+    return
+  }
+  if (!image.raster) {
+    // The consumers label the icon by EXTENSION, so this travels into the manifest as
+    // `type: image/svg+xml` — and a browser that took the declared type at its word drops an install
+    // icon it will not rasterise, rather than falling back to sniffing the file.
+    warnings.push(
+      `  ! ${id}: assets.icon '${rel}' is ${image.format.toUpperCase()}, not a raster image — the PWA ` +
+        `manifest and apple-touch-icon need a bitmap; ship a ${ICON_MIN_PX}px square PNG`,
+    )
+    return
+  }
+  if (image.width === null || image.height === null) {
+    warnings.push(
+      `  ! ${id}: assets.icon '${rel}' is a truncated ${image.format.toUpperCase()} file`,
+    )
+    return
+  }
+  if (image.width !== image.height) {
+    warnings.push(
+      `  ! ${id}: assets.icon '${rel}' is ${image.width}×${image.height}, not square — a home-screen ` +
+        `tile stretches it to fit`,
+    )
+  } else if (image.width < ICON_MIN_PX) {
+    warnings.push(
+      `  ! ${id}: assets.icon '${rel}' is ${image.width}px — the manifest declares it at ` +
+        `${ICON_MIN_PX}px, so it will be upscaled`,
+    )
+  }
+}
+
+/**
  * Warn on a leftover `public/` folder. That bucket used to be overlaid onto the BACKEND's on-disk
  * `public/` at bootstrap, and every brand used it for exactly one thing: badge SVGs. It is gone —
  * badges are served brand files like logos, so they belong in `assets/badges/` and are read straight
@@ -427,6 +501,22 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
     if (existsSync(src)) collectFiles(src, sub, entries)
   }
 
+  // The brand's theme, translated into the one stylesheet the e-mails load (backend
+  // templates/includes/branding.css — an empty placeholder in the framework, overlaid from here by
+  // branding/overlayRuntimeFiles at bootstrap). Without it a branded network sends ocelot-green
+  // buttons: nothing else connects `assets.css` to a mail, and none of the brands ship the file
+  // themselves.
+  //
+  // Added AFTER the raw `emails/` tree above, and only when the brand did not put a file there
+  // itself: a hand-written one is a deliberate choice and outranks anything generated.
+  if (!entries.some((entry) => entry.name === EMAIL_BRANDING_CSS)) {
+    // From `theme.tokens`, not from the raw declarations: those are already resolved AND already
+    // narrowed to unconditional ones, which is what a mail needs too — no client evaluates a media
+    // query in a <style> block reliably enough to hang a brand's colour on it.
+    const css = buildEmailBrandingCss(FRAMEWORK_TOKENS, config.theme.tokens)
+    if (css) entries.push({ name: EMAIL_BRANDING_CSS, data: Buffer.from(css) })
+  }
+
   // The brand's own stylesheets ship with their `:root` raised to `:root:root` — see
   // loadThemeFromStylesheets. Applied to the PACKED copy only; the file in the brand repo stays as the
   // author wrote it.
@@ -439,6 +529,7 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
   }
   warnUncompiledStylesheets(entries, id, warnings)
   warnRemovedPublicBucket(dir, id, warnings)
+  warnIconAsset(dir, id, config, warnings)
   return { id, version, label, gz: writeTarGz(entries), entries, warnings }
 }
 
