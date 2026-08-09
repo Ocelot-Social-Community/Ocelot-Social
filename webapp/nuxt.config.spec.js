@@ -65,3 +65,36 @@ describe('nuxt.config head icons', () => {
     expect(links('manifest')).toEqual([{ rel: 'manifest', href: '/manifest.webmanifest' }])
   })
 })
+
+// The other half of that contract, and the half nothing else can catch: branding-favicon.js reads the
+// runtime accessor at plugin-EXECUTION time, and plugins/branding.js is what sets it. Nuxt runs the
+// list in order and awaits the async one, so reordering these two costs nothing at build time and
+// leaves every brand on the vanilla icon at run time — on deployments with a brand archive only, i.e.
+// never on a developer's machine.
+describe('nuxt.config branding plugin order', () => {
+  // Entries are either a bare path or `{ src, ssr | mode }`; both forms are in this list.
+  const entryFor = (src) =>
+    config.plugins.map((p) => (typeof p === 'string' ? { src: p } : p)).find((p) => p.src === src)
+  const indexOf = (src) =>
+    config.plugins.findIndex((p) => (typeof p === 'string' ? p : p.src) === src)
+
+  it('registers branding-favicon.js after the branding.js that sets the accessor', () => {
+    const branding = indexOf('~/plugins/branding.js')
+    const favicon = indexOf('~/plugins/branding-favicon.js')
+
+    // Asserted separately: `favicon > branding` alone also holds when branding.js is absent (-1),
+    // which is the more thorough way to break the same thing.
+    expect(branding).toBeGreaterThanOrEqual(0)
+    expect(favicon).toBeGreaterThan(branding)
+  })
+
+  // Both render paths on purpose. Restricting this one to the client would put the vanilla icon in the
+  // server's first byte and swap it after hydration — the exact behaviour the hid slot removed.
+  it('leaves branding-favicon.js running on the server as well as the client', () => {
+    const entry = entryFor('~/plugins/branding-favicon.js')
+
+    expect(entry).toBeDefined()
+    expect(entry.ssr).not.toBe(false)
+    expect(entry.mode).not.toBe('client')
+  })
+})
