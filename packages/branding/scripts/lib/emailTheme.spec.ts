@@ -54,6 +54,33 @@ describe('resolveTokens', () => {
       assert.deepEqual(resolveTokens({ a: 'var(--a)' }), {})
     })
 
+    // A fallback does NOT lift a token out of its cycle: CSS builds the dependency graph from the
+    // references themselves, "including in the fallback argument of var()" (css-variables-1 §3), and
+    // every property on a cycle is invalid at computed-value time. Resolving `a` to red here would
+    // put a colour in a mail that the source theme never effectively defines — and `b` inherited it
+    // too, by reading a's memoised value on the next pass.
+    test('a cycle whose members carry fallbacks', () => {
+      assert.deepEqual(resolveTokens({ a: 'var(--b, red)', b: 'var(--a)' }), {})
+      assert.deepEqual(resolveTokens({ a: 'var(--a, red)' }), {})
+    })
+
+    // The whole cycle, not just the token the walk happened to re-enter — the entry point is an
+    // artefact of key order, so a three-token ring must drop identically whichever end it starts at.
+    test('every member of a longer ring, whichever end resolution starts from', () => {
+      const ring = { a: 'var(--b, red)', b: 'var(--c)', c: 'var(--a)' }
+
+      assert.deepEqual(resolveTokens(ring), {})
+      assert.deepEqual(resolveTokens({ c: ring.c, b: ring.b, a: ring.a }), {})
+    })
+
+    // A token OUTSIDE the cycle keeps its fallback: the cycle members are guaranteed-invalid, and a
+    // var() pointing at an invalid property substitutes its fallback exactly as a browser would.
+    test('but leaves a fallback outside the cycle intact', () => {
+      assert.deepEqual(resolveTokens({ a: 'var(--b)', b: 'var(--a)', c: 'var(--a, blue)' }), {
+        c: 'blue',
+      })
+    })
+
     test('a token whose target is itself unresolvable', () => {
       assert.deepEqual(resolveTokens({ a: 'var(--nope)', b: 'var(--a)' }), {})
     })

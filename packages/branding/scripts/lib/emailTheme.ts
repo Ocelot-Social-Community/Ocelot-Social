@@ -68,19 +68,38 @@ const VAR_REF = /var\(\s*--([a-zA-Z0-9-]+)\s*(?:,([^)]*))?\)/
  * put in a mail, and `style="color: var(--color-primary)"` in a client that cannot resolve it is not a
  * degraded colour — it is an invalid declaration, i.e. no colour at all. Better to leave the framework
  * value in place than to emit one the client throws away. Four ways to be unresolvable, none of them
- * worth failing a build over: a reference to a token nobody declares, a cycle
- * (`--a: var(--b); --b: var(--a)`), a reference whose own target is unresolvable, and a nested var()
- * in a fallback.
+ * worth failing a build over: a reference to a token nobody declares, membership in a cycle
+ * (`--a: var(--b); --b: var(--a)` — every token on the cycle, fallbacks notwithstanding), a reference
+ * whose own target is unresolvable, and a nested var() in a fallback.
+ *
+ * A token merely POINTING AT one of those still gets its own fallback: `--c: var(--a, blue)` is blue
+ * when `--a` is unresolvable, which is what a browser does too — the fallback is only forfeited by the
+ * tokens inside the cycle.
  */
 export function resolveTokens(raw: Record<string, string>): Record<string, string> {
   const resolved: Record<string, string> = {}
-  const resolving = new Set<string>()
+  // The resolution path, as a STACK rather than a set: on re-entry the members of the cycle are the
+  // entries from the repeat point down, and a set cannot say where that point is.
+  const path: string[] = []
+  const cyclic = new Set<string>()
 
   const resolve = (name: string): string | null => {
+    if (cyclic.has(name)) return null
     if (Object.hasOwn(resolved, name)) return resolved[name]
     if (!Object.hasOwn(raw, name)) return null
-    if (resolving.has(name)) return null // cycle
-    resolving.add(name)
+    const repeat = path.indexOf(name)
+    if (repeat !== -1) {
+      // Every token from the repeat point down is IN the cycle, and CSS makes all of them invalid at
+      // computed-value time — a fallback on one of them does not rescue it, because the dependency
+      // graph is built from the references themselves, "including in the fallback argument of var()"
+      // (css-variables-1 §3). Marking only the re-entered token would let `--a: var(--b, red);
+      // --b: var(--a)` resolve BOTH to red: a takes its fallback once b comes back unresolvable, and
+      // b then reads a's memoised value. That is a colour the source theme never effectively defines,
+      // travelling into a mail where nobody can compare it against the site.
+      for (const member of path.slice(repeat)) cyclic.add(member)
+      return null
+    }
+    path.push(name)
     let out: string | null = raw[name]
     // A single declaration can hold several references (`0 1px var(--a), 0 2px var(--b)`), so this
     // loops until none is left rather than replacing once.
@@ -97,7 +116,10 @@ export function resolveTokens(raw: Record<string, string>): Record<string, strin
       }
       out = out.replace(whole, replacement)
     }
-    resolving.delete(name)
+    path.pop()
+    // Checked AFTER the loop, not before it: a token learns it is in a cycle only by walking into
+    // one, which happens while its own value is being substituted.
+    if (cyclic.has(name)) return null
     if (out !== null) resolved[name] = out.trim().replace(/\s+/g, ' ')
     return out
   }
