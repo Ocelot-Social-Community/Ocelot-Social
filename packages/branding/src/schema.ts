@@ -289,10 +289,10 @@ export interface BrandingConfig {
     favicon: string | null
     /** Square raster icon, e.g. 'assets/icon.png'. Used where a favicon will not do: the iOS
      * home-screen icon (`apple-touch-icon`, which ignores .ico) and the PWA manifest's install icon.
-     * Must be a raster format and reasonably large (512px square is the useful size — the manifest
-     * declares it at both 192 and 512, and browsers downscale).
+     * Must be a raster format and reasonably large (512px square is the useful size — browsers pick
+     * an install/splash icon at up to that, and downscale from it).
      *
-     * The build CHECKS this (a warning, never fatal — see build-brandings.ts `warnIconAsset`), by
+     * The build CHECKS this (a warning, never fatal — see build-brandings.ts `resolveIconAsset`), by
      * reading the file's own header rather than trusting its extension. It has to: both consumers
      * derive the `type` they announce from the PATH (webapp/utils/iconType.js), so an SVG here is
      * published as `image/svg+xml` and a browser that will not rasterise it drops the install icon
@@ -302,6 +302,16 @@ export interface BrandingConfig {
      * framework's own webapp/static/icon.png at image-build time. Runtime branding cannot do that, so
      * the file sat unread in every brand repo until this slot named it. */
     icon: string | null
+    /** BUILD-DERIVED, not authored: `icon`'s true pixel size as a manifest `sizes` value ('225x225'),
+     * measured from the file's own header, or null when it cannot be measured (no icon, an externally
+     * hosted one, a non-raster file).
+     *
+     * It exists because the PWA manifest has to DECLARE a size, and the only honest source for one is
+     * the file. The manifest used to list every icon twice, as 192×192 and 512×512, whatever the file
+     * actually was — and a browser that checks the decoded dimensions against the declaration drops a
+     * candidate that contradicts it, which leaves a brand shipping a 225px icon with no install icon
+     * at all. Anything a brand sets here is overwritten by the measurement. */
+    iconSizes: string | null
   }
 }
 

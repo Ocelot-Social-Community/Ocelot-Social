@@ -4,6 +4,7 @@ import manifest from './constants/manifest.js'
 import metadata from './constants/metadata.js'
 import locales from './locales/index.js'
 import { brandingHeadHtml } from './utils/brandingHead.js'
+import brandIcons from './server-middleware/brand-icons.js'
 
 const CONFIG = require('./config').default // we need to use require since this is only evaluated at compile time.
 
@@ -195,6 +196,18 @@ export default {
     'vue-renderer:ssr:templateParams'(templateParams, renderContext) {
       const branding = renderContext && renderContext.nuxt && renderContext.nuxt.branding
       if (branding) templateParams.HEAD += brandingHeadHtml(branding)
+    },
+
+    // Brand the WELL-KNOWN icon paths (/favicon.ico, /icon.png, /apple-touch-icon*.png) — the ones a
+    // browser or bot requests without reading <head> at all.
+    //
+    // A hook rather than a `serverMiddleware` entry, because ORDER is the whole point: Nuxt mounts
+    // serve-static over webapp/static/ before it mounts the configured serverMiddleware list, and
+    // static/favicon.ico + static/icon.png both exist — so an entry in that list would never be
+    // reached for either path. This hook runs at the start of setupMiddleware, ahead of serve-static;
+    // the handler falls through to it whenever the active brand has no file for the slot.
+    'render:setupMiddleware'(app) {
+      app.use(brandIcons)
     },
   },
 

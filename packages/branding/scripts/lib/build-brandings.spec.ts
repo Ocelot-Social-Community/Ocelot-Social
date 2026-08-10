@@ -164,7 +164,12 @@ test('buildBrandArchive namespaces asset paths and derives ogImage from the squa
   assert.equal(config.metadata.ogImage, '/branding/acme/assets/logo-squared.svg')
   // the referenced asset is bundled into the archive
   assert.ok(files.has('assets/logo-squared.svg'))
-  assert.equal(built.warnings.length, 0)
+  // The one warning this fixture draws is about the icon slot it leaves empty — pinned in the
+  // `assets.icon` block below, and orthogonal to the namespacing this test is about.
+  assert.deepEqual(
+    built.warnings.filter((w) => !w.includes('assets.icon')),
+    [],
+  )
 })
 
 test('buildBrandArchive warns when a referenced asset is missing (but still builds)', async () => {
@@ -578,10 +583,10 @@ describe('assets.icon', () => {
     assert.match(warning, /is 512×300, not square/)
   })
 
-  test('warns about an icon smaller than the size the manifest declares', async () => {
+  test('warns about an icon smaller than browsers install at', async () => {
     const warning = await iconWarnings(withIcon(pngBytes(192, 192)))
 
-    assert.match(warning, /is 192px — the manifest declares it at 512px/)
+    assert.match(warning, /is 192px — browsers pick an install icon at up to 512px/)
   })
 
   test('warns about a file that is not an image at all', async () => {
@@ -598,10 +603,10 @@ describe('assets.icon', () => {
     assert.match(warning, /is a truncated PNG file/)
   })
 
-  // A brand may ship no icon, or point at one it hosts itself. Neither is this check's business —
-  // and a missing file is already reported by the namespacing pass, so saying it twice is noise.
+  // A brand may point at an icon it hosts itself, or name one that is not there. Neither is this
+  // check's business — and a missing file is already reported by the namespacing pass, so saying it
+  // twice is noise.
   test('says nothing when there is no local file to inspect', async () => {
-    assert.equal(await iconWarnings(brandDir({ config: ACME_CONFIG })), '')
     assert.equal(
       await iconWarnings(
         brandDir({
@@ -615,5 +620,70 @@ describe('assets.icon', () => {
     })
     assert.equal(await iconWarnings(missing), '')
     assert.match((await buildBrandArchive(missing)).warnings.join('\n'), /asset not found/)
+  })
+
+  // existsSync only says the path resolves. A DIRECTORY passes it and then throws EISDIR on read — and
+  // an exception here would abort the whole archive over an optional slot, which is exactly what every
+  // other verdict in this check is written to avoid.
+  test('warns instead of throwing when the path cannot be read as a file', async () => {
+    const dir = brandDir({
+      config: `export default (d) => d({ assets: { icon: 'assets' } })\n`,
+    })
+
+    const warning = await iconWarnings(dir)
+
+    assert.match(warning, /assets\.icon 'assets' cannot be read — EISDIR/)
+  })
+
+  // The case that used to pass in silence, and the reason every brand shipped an unread
+  // assets/icon.png: with the slot empty, the apple-touch-icon and the PWA install icon both resolve
+  // to the framework's own file, so a fully branded instance installs under the vanilla ocelot.
+  test('warns when the slot is empty altogether', async () => {
+    const warning = await iconWarnings(brandDir({ config: ACME_CONFIG }))
+
+    assert.match(warning, /no assets\.icon —/)
+    assert.match(warning, /installs under the vanilla icon/)
+  })
+
+  // What the manifest DECLARES has to be what the file IS: a browser that checks the decoded size
+  // against `sizes` drops a candidate that contradicts it, and the manifest has no other source for
+  // the number (webapp/server-middleware/manifest.js reads exactly this field).
+  describe('iconSizes', () => {
+    const iconSizes = async (dir) =>
+      composeArchive(readTarGz((await buildBrandArchive(dir)).gz)).assets.iconSizes
+
+    test('carries the measured pixel size of the icon', async () => {
+      assert.equal(await iconSizes(withIcon(pngBytes(512, 512))), '512x512')
+      // Measured even when the size draws a warning — 225px is what every ocelot brand actually
+      // ships, and reporting it truthfully is what lets the browser scale it itself.
+      assert.equal(await iconSizes(withIcon(pngBytes(225, 225))), '225x225')
+      // A non-square icon is warned about, not silently squared off.
+      assert.equal(await iconSizes(withIcon(pngBytes(512, 300))), '512x300')
+    })
+
+    test('stays null when the file cannot be measured', async () => {
+      assert.equal(await iconSizes(brandDir({ config: ACME_CONFIG })), null) // no icon at all
+      assert.equal(await iconSizes(withIcon('<svg viewBox="0 0 512 512"></svg>', 'icon.svg')), null)
+      assert.equal(await iconSizes(withIcon(pngBytes(512, 512).subarray(0, 12))), null) // truncated
+      assert.equal(
+        await iconSizes(
+          brandDir({
+            config: `export default (d) => d({ assets: { icon: 'https://cdn.example/icon.png' } })\n`,
+          }),
+        ),
+        null, // hosted elsewhere — not ours to read
+      )
+    })
+
+    // Authored values are overwritten, not merged: the field describes the file this build read, and a
+    // stale hand-written number is exactly the drift it exists to remove.
+    test('overrides whatever the brand wrote', async () => {
+      const dir = brandDir({
+        config: `export default (d) => d({ assets: { icon: 'assets/icon.png', iconSizes: '512x512' } })\n`,
+        assets: { 'icon.png': pngBytes(225, 225) },
+      })
+
+      assert.equal(await iconSizes(dir), '225x225')
+    })
   })
 })
