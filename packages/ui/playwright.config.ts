@@ -45,7 +45,9 @@ export default defineConfig({
 
   /* Run Storybook before starting the tests */
   webServer: {
-    command: 'npm run storybook:build && npx http-server storybook-static -p 6006 -s',
+    command: process.env.CI
+      ? 'npx http-server storybook-static -p 6006 -s'
+      : 'npm run storybook:build && npx http-server storybook-static -p 6006 -s',
     url: 'http://localhost:6006',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
