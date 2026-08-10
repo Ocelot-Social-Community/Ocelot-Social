@@ -9,6 +9,21 @@ RUN --mount=type=cache,target=/root/.npm,sharing=locked \
 COPY packages/ui/. .
 RUN npm run build
 
+# Same split as branding below, for the same reason: the FULL dev install (typescript, storybook,
+# playwright, api-extractor — ~470 MB) BUILDS dist/ and is needed for nothing afterwards. Without this
+# stage that tree shipped TWICE in the production image, ~900 MB of a 1.94 GB total: once as
+# /packages/ui, and again inside /app/node_modules/@ocelot-social/ui, because yarn copies a `file:`
+# dependency's directory VERBATIM — `"files": ["dist"]` governs `npm publish`, not a `file:` install.
+# What actually has to survive is what nuxt.config.js looks for (`/packages/ui/dist`) plus the four
+# runtime deps npm keeps. src/ and examples/ are build inputs only; they cannot go in .dockerignore
+# because `npm run build` above reads src/.
+#
+# `--omit=optional` is not cosmetic: typescript (23 MB, over half of what `--omit=dev` alone leaves)
+# is marked devOptional in the lockfile, because Vue 3 declares it as an OPTIONAL peer — so `--omit=dev`
+# keeps it. Nothing here consumes optional deps at runtime; the webapp only ever reads dist/.
+FROM ui-library AS ui-runtime
+RUN npm prune --omit=dev --omit=optional && rm -rf src examples
+
 # Build the shared branding package (tsc -> dist). Placed at /packages/branding in `base` so the
 # webapp's `file:../packages/branding` dependency resolves (context is already the repo root).
 FROM node:25.9.0-alpine AS branding-library
@@ -45,10 +60,15 @@ LABEL maintainer="devops@ocelot.social"
 ENV NODE_ENV="production"
 ENV PORT="3000"
 EXPOSE ${PORT}
-RUN apk --no-cache add git python3 make g++ bash jq
+# `bash` only — this is the RUNTIME base (`production` derives FROM it), and the CMD below is the sole
+# thing that needs it. The node-gyp toolchain lives in `base-build` instead: python3 + gcc were 319 MB
+# of a 1.94 GB runtime image and are used by `yarn install` alone. `git` and `jq` are gone entirely —
+# no dependency in yarn.lock resolves from a git URL, and the only jq consumers are the host-side
+# scripts/translations/*.sh, which are not in this image.
+RUN apk --no-cache add bash
 RUN mkdir -p /app
 WORKDIR /app
-COPY --from=ui-library ./app/ /packages/ui/
+COPY --from=ui-runtime ./app/ /packages/ui/
 COPY --from=branding-runtime ./app/ /packages/branding/
 # No branding env is set here, deliberately — the code defaults cover this image AND a repo checkout
 # (see @ocelot-social/branding discover.DEFAULT_ROOTS / DEFAULT_CACHE_DIR):
@@ -66,10 +86,17 @@ COPY --from=branding-runtime ./app/ /packages/branding/
 # either way; it is not part of the configurable path.
 CMD ["/bin/bash", "-c", "yarn run start"]
 
-FROM base AS development
+# Everything that RUNS `yarn install` derives from here rather than from `base`: node-pre-gyp compiles
+# native addons and needs python3/make/g++. `production` deliberately does NOT — it only ever receives
+# the finished /build, so the toolchain never reaches a running image.
+FROM base AS base-build
+RUN apk --no-cache add python3 make g++
+
+# Installs at container START, hence the toolchain.
+FROM base-build AS development
 CMD ["/bin/bash", "-c", "yarn install && yarn run dev"]
 
-FROM base AS build
+FROM base-build AS build
 # package.json-first: cache the dev-dependency install as its own layer (branding is config/assets only
 # and never changes dependencies, so this layer stays valid across brands).
 COPY webapp/package.json webapp/yarn.lock ./
@@ -128,7 +155,7 @@ ONBUILD RUN mkdir /build && \
 ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     cd /build && yarn install --production=true --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 
-FROM base AS test_build
+FROM base-build AS test_build
 ENV NODE_ENV=test
 COPY webapp/package.json webapp/yarn.lock ./
 COPY webapp/scripts ./scripts/
