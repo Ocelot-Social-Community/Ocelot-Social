@@ -108,6 +108,13 @@ jobs:
 
               // Second signal: CodeRabbit publishes a check run even when it has nothing to say in a
               // review (empty diff after path filters, for example).
+              //
+              // `completed` alone is NOT evidence — it only says the run ended. It also covers
+              // `cancelled`, `timed_out`, `stale`, `skipped`, `failure` and `action_required`, and a
+              // cancelled CodeRabbit run would turn the gate green on an unreviewed commit. Hence
+              // `success` only. Nothing legitimate is lost by that: this branch exists solely for the
+              // "reviewed, nothing to report" case, and whenever CodeRabbit *does* have something to
+              // report it submits a review, which the first signal above already matches.
               const { data: checks } = await github.rest.checks.listForRef({
                 owner,
                 repo,
@@ -116,7 +123,9 @@ jobs:
               })
               const checkRun = checks.check_runs.find(
                 (candidate) =>
-                  candidate.app?.slug === reviewerAppSlug && candidate.status === 'completed',
+                  candidate.app?.slug === reviewerAppSlug &&
+                  candidate.status === 'completed' &&
+                  candidate.conclusion === 'success',
               )
               if (checkRun) {
                 return { headSha, evidence: `check run "${checkRun.name}" (${checkRun.conclusion})` }
