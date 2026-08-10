@@ -8,7 +8,7 @@
   "private": false,
   "scripts": {
     "dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt",
-    "storybook": "cross-env NODE_OPTIONS=--openssl-legacy-provider storybook dev -p 3002 -c storybook/",
+    "storybook": "cross-env NODE_OPTIONS=--openssl-legacy-provider storybook dev -p 3002 -c storybook/ --host 0.0.0.0",
     "build-storybook": "cross-env NODE_OPTIONS=--openssl-legacy-provider storybook build -c storybook/",
     "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt build",
     "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt-start",

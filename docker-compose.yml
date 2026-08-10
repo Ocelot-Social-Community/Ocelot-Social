@@ -14,8 +14,6 @@ services:
       - backend
     ports:
       - 3000:3000
-      # Storybook: Todo externalize, its not working anyways
-      # - 3002:3002
     environment:
       # Envs used in Dockerfile
       # - DOCKER_WORKDIR="/app"

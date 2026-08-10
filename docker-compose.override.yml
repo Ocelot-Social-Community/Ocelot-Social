@@ -143,6 +143,24 @@ services:
       - ./packages/ui:/packages/ui
       - /packages/ui/node_modules
 
+  webapp-storybook:
+    image: ghcr.io/ocelot-social-community/ocelot-social/webapp:local-development-storybook
+    build:
+      context: .
+      dockerfile: ./webapp/Dockerfile
+      target: development
+    command: /bin/sh -c "yarn install && node scripts/fix-storybook-webpack.js && yarn storybook"
+    ports:
+      - 3002:3002
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./webapp:/app
+      - webapp_storybook_node_modules:/app/node_modules
+      - ./packages/ui:/packages/ui
+      - /packages/ui/node_modules
+      - ./packages/branding:/packages/branding
+
   ui:
     image: ghcr.io/ocelot-social-community/ocelot-social/ui:local-development
     build:
@@ -167,3 +185,4 @@ services:
 
 volumes:
   minio_data:
+  webapp_storybook_node_modules:
