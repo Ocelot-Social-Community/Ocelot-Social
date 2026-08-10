@@ -121,5 +121,7 @@ export const brandingDefaults: BrandingConfig = {
     html: {},
     favicon: null,
     icon: null,
+    // Derived by the build from `icon`'s own header — never authored (see schema.ts).
+    iconSizes: null,
   },
 }
