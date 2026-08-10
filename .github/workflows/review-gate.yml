@@ -42,12 +42,14 @@ on:
       - submitted
       - dismissed
 
-# No cancelling. Superseding buys nothing here — the job polls, so a run that is waiting finds an
-# incoming review by itself — while a cancelled run is exactly what wedged the gate before. Runs are
-# short now (TIMEOUT_MINUTES below), so serialising them costs almost nothing.
+# Cancelling is SAFE again, and now necessary. Safe, because the verdict no longer travels on the run's
+# own conclusion: a cancelled run simply writes nothing and the published gate keeps its last state —
+# that is the whole point of the indirection above. Necessary, because a poll can now run for hours
+# (TIMEOUT_MINUTES below), and without cancelling a push during that wait would queue behind it instead
+# of taking over. The newest run always wins and always publishes.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -62,7 +64,9 @@ jobs:
     # which leaves branch protection waiting forever. Exemptions are decided in the script instead and
     # publish a passing check.
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # Slightly above TIMEOUT_MINUTES so the script always reaches its own verdict and publishes it,
+    # rather than being killed by the runner while the gate still says "in progress".
+    timeout-minutes: 190
     env:
       # Login of the reviewing app and the slug it publishes its check run under.
       REVIEWER_LOGIN: "coderabbitai[bot]"
@@ -72,10 +76,21 @@ jobs:
       # Base branches CodeRabbit watches (see `base_branches` in .coderabbit.yaml). Pull requests
       # targeting anything else are exempt, otherwise stacked pull requests could never go green.
       REVIEWED_BASE_BRANCHES: '["master", "main"]'
-      # Only a safety net now: `pull_request_review` already wakes the gate the moment CodeRabbit
-      # reports, so this covers the window between a push and the review landing.
-      TIMEOUT_MINUTES: "3"
-      POLL_INTERVAL_SECONDS: "15"
+      # How long the gate stays PENDING before it gives up and calls it a failure. Sized after how long
+      # CodeRabbit actually takes, which is hours under its rate limits — not after how long we would
+      # like to wait. Too low is not a harmless default here: it flips a review that is merely slow into
+      # a red required check.
+      #
+      # The wait is nearly free: this repository is public, so GitHub-hosted runner minutes are not
+      # billed, and the poll only has to survive until CodeRabbit reports — a submitted review fires
+      # `pull_request_review`, which supersedes this run within seconds. The long poll exists for the
+      # one case that emits no event at all: CodeRabbit publishing only a check run because it had
+      # nothing to say. On a private repository, lower this and lean on the review event.
+      TIMEOUT_MINUTES: "180"
+      # Deliberately slow. Latency is covered by the review event, so this only paces the fallback, and
+      # each attempt costs three API calls against the 1000/hour GITHUB_TOKEN budget shared by every
+      # workflow in the repository.
+      POLL_INTERVAL_SECONDS: "120"
     steps:
       - name: Publish review gate status
         uses: actions/github-script@v8
@@ -100,18 +115,56 @@ jobs:
 
             // The gate itself. Always written against the head commit as read in THIS moment, so a run
             // that started before a push still reports about what is actually on the branch now.
+            //
+            // `conclusion === null` means PENDING: the check run stays `in_progress`, which branch
+            // protection treats as "not satisfied yet" and shows as a waiting check. That is the honest
+            // state while CodeRabbit is merely slow — a `failure` there would paint a red cross on a
+            // review that is going to arrive.
+            //
+            // One row per commit: an earlier run on the same commit may have left a check run behind
+            // (cancelled mid-poll, so still `in_progress`), and creating a second one would leave the
+            // merge box showing a stale pending entry next to the real verdict. So reuse the newest
+            // existing row and update it; only create when there is none.
+            let gateCheck = { sha: null, id: null }
             const publish = async (headSha, conclusion, title, summary) => {
+              const status = conclusion ? 'completed' : 'in_progress'
               try {
-                await github.rest.checks.create({
-                  owner,
-                  repo,
-                  name: gateCheckName,
-                  head_sha: headSha,
-                  status: 'completed',
-                  conclusion,
-                  output: { title, summary },
-                })
-                core.info(`Published "${gateCheckName}" = ${conclusion} on ${headSha}: ${title}`)
+                if (gateCheck.sha !== headSha) {
+                  const { data } = await github.rest.checks.listForRef({
+                    owner,
+                    repo,
+                    ref: headSha,
+                    check_name: gateCheckName,
+                    per_page: 100,
+                  })
+                  const newest = data.check_runs.sort((a, b) =>
+                    String(b.started_at).localeCompare(String(a.started_at)),
+                  )[0]
+                  gateCheck = { sha: headSha, id: newest?.id ?? null }
+                }
+
+                if (gateCheck.id) {
+                  await github.rest.checks.update({
+                    owner,
+                    repo,
+                    check_run_id: gateCheck.id,
+                    status,
+                    ...(conclusion ? { conclusion } : {}),
+                    output: { title, summary },
+                  })
+                } else {
+                  const { data } = await github.rest.checks.create({
+                    owner,
+                    repo,
+                    name: gateCheckName,
+                    head_sha: headSha,
+                    status,
+                    ...(conclusion ? { conclusion } : {}),
+                    output: { title, summary },
+                  })
+                  gateCheck.id = data.id
+                }
+                core.info(`Published "${gateCheckName}" = ${conclusion ?? status} on ${headSha}: ${title}`)
               } catch (error) {
                 // Pull requests from a FORK get a read-only GITHUB_TOKEN regardless of `permissions:`,
                 // so the gate cannot be published for them and branch protection would wait forever.
@@ -203,9 +256,23 @@ jobs:
             }
 
             let headSha
+            let pendingSha = null
             for (;;) {
               const attempt = await findReview()
               headSha = attempt.headSha
+              // Mark the gate PENDING before the first sleep, and again whenever a push moved the head
+              // mid-wait: until this lands, the merge box would still show the verdict for the previous
+              // state of the branch.
+              if (!attempt.evidence && pendingSha !== headSha) {
+                pendingSha = headSha
+                await publish(
+                  headSha,
+                  null,
+                  'Waiting for CodeRabbit review',
+                  `Head commit \`${headSha}\` has not been reviewed yet. CodeRabbit can take hours ` +
+                    'under its rate limits; this check goes green on its own once the review lands.',
+                )
+              }
               if (attempt.evidence) {
                 await publish(
                   headSha,
@@ -225,12 +292,15 @@ jobs:
               await sleep(Math.min(pollIntervalMs, remainingMs))
             }
 
+            // Only NOW does this become a failure: the gate waited out the full TIMEOUT_MINUTES, so this
+            // is no longer "slow" but "not coming without help".
             const message =
-              `${reviewerLogin} has not reviewed head commit ${headSha}. ` +
-              'Comment "@coderabbitai review" on the pull request to trigger one — CodeRabbit ' +
-              'pauses incremental reviews after several commits (auto_pause_after_reviewed_commits). ' +
-              'This check turns green on its own as soon as the review lands; no re-run needed.'
-            await publish(headSha, 'failure', 'Waiting for CodeRabbit', message)
+              `${reviewerLogin} has not reviewed head commit ${headSha} within ` +
+              `${process.env.TIMEOUT_MINUTES} minutes. Comment "@coderabbitai review" on the pull ` +
+              'request to trigger one — CodeRabbit pauses incremental reviews after several commits ' +
+              '(auto_pause_after_reviewed_commits). This check turns green on its own as soon as the ' +
+              'review lands; no re-run needed.'
+            await publish(headSha, 'failure', 'CodeRabbit review missing', message)
             // Mirrored onto the job conclusion as well, so the gate keeps working while branch
             // protection still requires this job rather than the published check.
             core.setFailed(message)
