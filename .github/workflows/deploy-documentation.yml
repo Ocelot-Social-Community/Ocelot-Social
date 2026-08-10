@@ -6,10 +6,17 @@ on:
       - master
 
 # `cancel-in-progress: false` so a deploy that is already writing is never torn in half — but
-# deliberately WITHOUT the `queue: max` the release workflows use. This publishes the CURRENT state
-# of master rather than one commit's artifacts, so a superseded pending run has nothing left to
-# contribute; letting the newer commit replace it (the default `queue: single`) is exactly right,
-# and queueing them all would only redeploy the same content several times over.
+# deliberately WITHOUT the `queue: max` the release workflows use. Those publish one commit's
+# artifacts, where a dropped pending run means a version is never shipped. This one rebuilds the
+# docs from whatever master looks like and force-replaces the gh-pages branch with the result, so a
+# superseded pending run has nothing left to contribute: the newer run publishes its content too.
+# Letting it replace the older pending run (the default `queue: single`) is therefore right, and
+# `queue: max` would only redeploy the same site several times in a row.
+#
+# What makes that safe is that `build-and-deploy` runs UNCONDITIONALLY — it has no `if:` on the
+# files-changed output. Gate it on that output and this reasoning breaks: a docs commit whose
+# pending run is replaced by a docs-unrelated one would then never be published at all, and this
+# group would need `queue: max`.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: false
