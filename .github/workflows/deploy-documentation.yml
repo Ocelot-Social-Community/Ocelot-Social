@@ -11,7 +11,7 @@ on:
 # contribute; letting the newer commit replace it (the default `queue: single`) is exactly right,
 # and queueing them all would only redeploy the same content several times over.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: false
 
 jobs:

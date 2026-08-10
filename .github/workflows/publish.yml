@@ -11,10 +11,10 @@ on:
 # pending run means one master commit silently never gets tagged or shipped. `queue: max` keeps a
 # real backlog instead (up to 100 runs, processed in order). The two settings are coupled: pairing
 # `queue: max` with cancelling is a workflow validation error.
-# `event_name`/`head_ref` stay in the group to match the CI workflows here; this one only triggers
-# on push, so both are constant today.
+# The group matches the CI workflows here (pull request number, falling back to `github.ref`); this
+# one only triggers on push, so it always resolves to refs/heads/master.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: false
   queue: max
 
