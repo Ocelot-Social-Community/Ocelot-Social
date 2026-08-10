@@ -176,6 +176,32 @@ describe('manifest serverMiddleware', () => {
     expect(run().json.icons[0].type).toBe('image/webp')
   })
 
+  // Neither source says anything: an extension-less ogImage the brand never typed. PNG is the assumption
+  // of last resort here — unlike the icon slot below, the ogImage IS what ogImageType is about, so a
+  // brand leaving it blank has declined to correct the guess rather than been asked about a second file.
+  it('assumes PNG for an extension-less ogImage the brand declared no type for', () => {
+    setBranding({
+      ...brandingDefaults,
+      metadata: { ...brandingDefaults.metadata, ogImage: '/api/brand-image', ogImageType: '' },
+    })
+
+    expect(run().json.icons[0].type).toBe('image/png')
+  })
+
+  // ...but ONLY for the file it describes. With the icon slot filled by a route of its own, the two
+  // are different files, and announcing the OG image's type for the icon is how a browser ends up
+  // dropping a perfectly good PNG for contradicting its declaration. No type is the honest answer —
+  // the field is optional and the browser sniffs.
+  it('declares no type for an extension-less assets.icon rather than the ogImage type', () => {
+    setBranding({
+      ...brandingDefaults,
+      assets: { ...brandingDefaults.assets, icon: '/api/brand-icon', iconSizes: '512x512' },
+      metadata: { ...brandingDefaults.metadata, ogImageType: 'image/jpeg' },
+    })
+
+    expect(run().json.icons).toEqual([{ src: '/api/brand-icon', sizes: '512x512' }])
+  })
+
   // The measurement belongs to `assets.icon` alone. A brand with a size but no icon falls back to its
   // ogImage — a DIFFERENT file — and carrying the number across would declare one file's dimensions
   // for another's.
