@@ -128,6 +128,7 @@ jobs:
             let gateCheck = { sha: null, id: null }
             const publish = async (headSha, conclusion, title, summary) => {
               const status = conclusion ? 'completed' : 'in_progress'
+              let publishError = null
               try {
                 if (gateCheck.sha !== headSha) {
                   const { data } = await github.rest.checks.listForRef({
@@ -167,9 +168,10 @@ jobs:
                 core.info(`Published "${gateCheckName}" = ${conclusion ?? status} on ${headSha}: ${title}`)
               } catch (error) {
                 // Pull requests from a FORK get a read-only GITHUB_TOKEN regardless of `permissions:`,
-                // so the gate cannot be published for them and branch protection would wait forever.
-                // Surfaced loudly rather than swallowed: the fix is switching the trigger to
-                // `pull_request_target` (safe here — this workflow never checks out the head code).
+                // so the gate cannot be published for them and branch protection would wait forever on
+                // a check that never appears. The fix is switching the trigger to `pull_request_target`
+                // (safe here — this workflow never checks out the head code).
+                publishError = error
                 core.error(
                   `Could not publish "${gateCheckName}" (HTTP ${error.status}). For a fork pull ` +
                     'request the token is read-only; the required check will never appear. See the ' +
@@ -177,6 +179,17 @@ jobs:
                 )
               }
               await core.summary.addHeading(title, 3).addRaw(summary).write()
+              // Rethrow only AFTER the summary is written, so the run still explains what it wanted to
+              // report. Failing here is the point: an unpublished gate must never leave a green job
+              // behind, or a broken gate looks exactly like a healthy one — the job would pass while
+              // the required check silently stays "Expected". Failing fast also stops the poll, which
+              // would otherwise burn TIMEOUT_MINUTES writing a verdict it cannot deliver.
+              if (publishError) {
+                throw new Error(
+                  `Could not publish the required check "${gateCheckName}" on ${headSha} ` +
+                    `(HTTP ${publishError.status}): ${publishError.message}`,
+                )
+              }
             }
 
             // Re-read the pull request on every attempt: a push during the wait moves the head and an
