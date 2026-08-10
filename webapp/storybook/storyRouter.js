@@ -12,7 +12,11 @@ Vue.use(VueRouter)
 const storyRouterDecorator = (links = {}, routerProps = {}) => {
   return (story) => {
     const router = new VueRouter(routerProps)
-    router.replace(routerProps.initialEntry ? routerProps.initialEntry : '/')
+    if (routerProps.initialEntry) {
+      router.replace(routerProps.initialEntry).catch((err) => {
+        if (err.name !== 'NavigationDuplicated') throw err
+      })
+    }
 
     const getLocation = (location) => {
       if (typeof location === 'object') {
@@ -27,12 +31,12 @@ const storyRouterDecorator = (links = {}, routerProps = {}) => {
     // generic action, since `afterEach` fires once navigation resolves, well after the synchronous
     // `if (!replaced)` check that immediately followed the (async) call. The suppression never worked.
     const wrapNavigation = (original, actionName) => (location, success, abort) => {
-      const target = getLocation(location)
-      const linkHandler = links[target]
+      const resolved = router.resolve(location).route.fullPath
+      const linkHandler = links[resolved]
       if (linkHandler) {
-        linkHandler(target)
+        linkHandler(resolved)
       } else {
-        action(actionName)(target)
+        action(actionName)(getLocation(location))
       }
       return original(location, success, abort)
     }

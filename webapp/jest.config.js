@@ -8,6 +8,7 @@ module.exports = {
     '!**/node_modules/**',
     '!**/.nuxt/**',
     '!**/storybook/**',
+    '!**/storybook-static/**',
     '!**/coverage/**',
     '!**/config/**',
     '!**/maintenance/**',
@@ -17,6 +18,7 @@ module.exports = {
     '!**/nuxt.config.js',
     // Tooling / build-time patch scripts — not shipped app code.
     '!**/jest.config.js',
+    '!**/playwright.config.js',
     '!scripts/**',
     // Webpack alias targets (e.g. branding-server-stub.js) — build-time stubs, never run as app code.
     '!**/webpack/**',
@@ -43,6 +45,7 @@ module.exports = {
   // which is already CommonJS and doesn't need transformation
   transformIgnorePatterns: ['node_modules/(?!(vue-demi)/)', '<rootDir>/../packages/ui/'],
   testMatch: ['**/?(*.)+(spec|test).js?(x)'],
+  testPathIgnorePatterns: ['/node_modules/', '\\.visual\\.spec\\.js$'],
   modulePathIgnorePatterns: ['<rootDir>/dist/'],
   moduleNameMapper: {
     // IMPORTANT: vue-demi must be mapped BEFORE @ocelot-social/ui
