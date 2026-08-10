@@ -17,7 +17,7 @@
 
 x-visual-base: &visual-base
   image: mcr.microsoft.com/playwright:v1.61.1-noble
-  platform: linux/arm64
+  platform: linux/amd64
   working_dir: /app
   shm_size: '2gb'
   environment:
