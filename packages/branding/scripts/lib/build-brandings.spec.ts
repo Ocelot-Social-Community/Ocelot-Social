@@ -622,6 +622,19 @@ describe('assets.icon', () => {
     assert.match((await buildBrandArchive(missing)).warnings.join('\n'), /asset not found/)
   })
 
+  // existsSync only says the path resolves. A DIRECTORY passes it and then throws EISDIR on read — and
+  // an exception here would abort the whole archive over an optional slot, which is exactly what every
+  // other verdict in this check is written to avoid.
+  test('warns instead of throwing when the path cannot be read as a file', async () => {
+    const dir = brandDir({
+      config: `export default (d) => d({ assets: { icon: 'assets' } })\n`,
+    })
+
+    const warning = await iconWarnings(dir)
+
+    assert.match(warning, /assets\.icon 'assets' cannot be read — EISDIR/)
+  })
+
   // The case that used to pass in silence, and the reason every brand shipped an unread
   // assets/icon.png: with the slot empty, the apple-touch-icon and the PWA install icon both resolve
   // to the framework's own file, so a fully branded instance installs under the vanilla ocelot.

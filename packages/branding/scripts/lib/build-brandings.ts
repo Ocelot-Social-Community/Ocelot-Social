@@ -406,7 +406,19 @@ function resolveIconAsset(
   const file = join(dir, rel)
   if (!existsSync(file)) return // already reported by namespacePath as "referenced asset not found"
 
-  const image = readImage(readFileSync(file))
+  // existsSync says a path RESOLVES, not that it can be read as a file: a directory passes it and then
+  // throws EISDIR here, as does an unreadable file (EACCES) or a mid-build I/O error. Every other
+  // verdict in this function is a warning, and the slot is optional to begin with — a brand's icon must
+  // not be the one thing that aborts the archive.
+  let bytes
+  try {
+    bytes = readFileSync(file)
+  } catch (err) {
+    warnings.push(`  ! ${id}: assets.icon '${rel}' cannot be read — ${(err as Error).message}`)
+    return
+  }
+
+  const image = readImage(bytes)
   if (!image) {
     warnings.push(`  ! ${id}: assets.icon '${rel}' is not an image format this build recognises`)
     return
