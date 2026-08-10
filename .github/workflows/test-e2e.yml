@@ -152,8 +152,17 @@ jobs:
           cd ..
           yarn install
       
-      # Stays a CACHE (unlike the images above) — but keyed by the lockfiles instead of the run id, so
-      # it actually hits on the next run. Same content, same key; a dependency bump misses and rebuilds.
+      # This is a HAND-OFF to the matrix jobs below, not a dependency cache: the path includes the whole
+      # workspace (sources, cypress specs, the backend `yarn build` output), so it is only ever valid
+      # for the commit that produced it. Hence `github.sha` in the key and deliberately NO
+      # `restore-keys`.
+      #
+      # A lockfile-only fallback would be actively wrong here. `actions/cache` extracts over the
+      # existing tree, so it runs AFTER `actions/checkout` and overwrites what checkout just put there.
+      # A fallback key matches any earlier commit with the same lockfiles — which is most commits, since
+      # most do not touch dependencies — and the end-to-end suite would then silently exercise an older
+      # revision and report green for it. Missing the cache outright is the far better failure: the
+      # matrix job finds no node_modules and fails loudly.
       - name: Cache cypress + installed workspace
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v4.0.2
         with:
@@ -162,8 +171,6 @@ jobs:
             /home/runner/.cache/Cypress
             /home/runner/work/Ocelot-Social/Ocelot-Social
           key: e2e-cypress-${{ hashFiles('yarn.lock', 'backend/yarn.lock', 'packages/branding/package-lock.json') }}-${{ github.sha }}
-          restore-keys: |
-            e2e-cypress-${{ hashFiles('yarn.lock', 'backend/yarn.lock', 'packages/branding/package-lock.json') }}-
 
   list_features:
     name: List Feature Files
@@ -202,16 +209,18 @@ jobs:
           node-version-file: 'backend/.nvmrc'
           cache: 'yarn'
 
+      # Exact key only — see the note in `prepare_cypress`. This step restores over the checkout above,
+      # so anything but this commit's own workspace would mean testing a different revision than the
+      # one the run reports on.
       - name: Restore cypress cache
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v4.0.2
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v4.0.2
         with:
           path: |
             /opt/cucumber-json-formatter
             /home/runner/.cache/Cypress
             /home/runner/work/Ocelot-Social/Ocelot-Social
           key: e2e-cypress-${{ hashFiles('yarn.lock', 'backend/yarn.lock', 'packages/branding/package-lock.json') }}-${{ github.sha }}
-          restore-keys: |
-            e2e-cypress-${{ hashFiles('yarn.lock', 'backend/yarn.lock', 'packages/branding/package-lock.json') }}-
+          fail-on-cache-miss: true
 
       - name: Download images
         uses: actions/download-artifact@v8
