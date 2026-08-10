@@ -21,6 +21,14 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# Least privilege for GITHUB_TOKEN: without this block the jobs inherit whatever the repository or
+# organisation default is, which may be read-write. Read-only is all this workflow does — the token
+# is handed to dorny/paths-filter, which needs `pull-requests: read` to list a pull request's
+# changed files.
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   files-changed:
     name: Detect File Changes

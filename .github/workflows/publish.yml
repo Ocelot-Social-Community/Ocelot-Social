@@ -18,6 +18,13 @@ concurrency:
   cancel-in-progress: false
   queue: max
 
+# `contents: write` is required: this workflow creates a git tag and a GitHub release with
+# GITHUB_TOKEN. The repository dispatches below authenticate with OCELOT_PUBLISH_EVENT_PAT, not with
+# GITHUB_TOKEN, so they need no scope here. Nothing beyond contents is granted, rather than
+# inheriting the repository or organisation default.
+permissions:
+  contents: write
+
 jobs:
   ##############################################################################
   # JOB: GITHUB TAG LATEST VERSION #############################################

@@ -13,6 +13,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# Least privilege for GITHUB_TOKEN: without this block the jobs inherit whatever the repository or
+# organisation default is, which may be read-write. This workflow only checks out and inspects the
+# repository, so read is enough.
+permissions:
+  contents: read
+
 jobs:
   prepare_backend_environment:
     name: Fullstack | prepare backend environment

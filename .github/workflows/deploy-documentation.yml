@@ -21,6 +21,14 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: false
 
+# `contents: write` is genuinely needed here and nowhere else in this workflow: the deploy step
+# force-pushes the built site to the gh-pages branch with GITHUB_TOKEN. `pull-requests: read` is for
+# dorny/paths-filter. Everything else stays unavailable rather than inherited from the repository or
+# organisation default.
+permissions:
+  contents: write
+  pull-requests: read
+
 jobs:
   files-changed:
     name: Detect File Changes - Markdown and Vuepress files

@@ -14,6 +14,13 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# Workflow-wide floor for GITHUB_TOKEN, so no job silently inherits the repository or organisation
+# default. A job that needs more overrides it locally — note that a job-level block REPLACES this one
+# rather than adding to it, which is why the escalating job below re-states everything it needs.
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   files-changed:
     name: Detect File Changes - Backend
@@ -129,7 +136,11 @@ jobs:
     if: needs.files-changed.outputs.backend == 'true' || needs.files-changed.outputs.docker == 'true'
     needs: [files-changed, build_test_neo4j, build_test_backend]
     runs-on: ubuntu-latest
-    permissions: 
+    permissions:
+      # A job-level block REPLACES the workflow-level one, so `contents: read` has to be repeated
+      # here — this job checks out the repository. It works today without it only because the
+      # repository is public.
+      contents: read
       checks: write
     steps:
       - name: Checkout code

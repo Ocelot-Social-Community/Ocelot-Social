@@ -13,6 +13,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# Workflow-wide floor for GITHUB_TOKEN, so no job silently inherits the repository or organisation
+# default. A job that needs more overrides it locally — note that a job-level block REPLACES this one
+# rather than adding to it, which is why the escalating job below re-states everything it needs.
+permissions:
+  contents: read
+
 jobs:
   build-and-push-images:
     strategy:
