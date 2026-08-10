@@ -46,8 +46,11 @@ module.exports = function brandIcons(req, res, next) {
   const branding = getBranding()
   const href = (branding.assets || {})[slot]
   // A brand pointing a slot back at the well-known path itself would otherwise redirect to itself
-  // forever.
-  if (!href || href === url) return next()
+  // forever. Compared as PATHS, because the request's own query string is stripped above: a
+  // cache-busted '/favicon.ico?v=2' is the same file, and left unstripped it would slip past this
+  // guard and loop until the browser gave up on the icon entirely. An absolute URL keeps its scheme
+  // and host through the split, so it can never collide with a well-known path.
+  if (!href || href.split(/[?#]/)[0] === url) return next()
 
   res.statusCode = 302
   res.setHeader('Location', href)

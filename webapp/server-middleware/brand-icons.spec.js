@@ -90,6 +90,29 @@ describe('brand-icons serverMiddleware', () => {
     expect(res.statusCode).toBe(200)
   })
 
+  // The same self-redirect, cache-busted. The request's query string is stripped before the slot
+  // lookup, so an href that only differs by one still names the path we are answering — and each hop
+  // would hand the browser the identical Location back.
+  it.each([['/favicon.ico?v=2'], ['/favicon.ico#top']])(
+    'falls through for %s, which points a slot onto itself with a query or fragment',
+    (href) => {
+      branded({ favicon: href })
+
+      const { res, next } = run('/favicon.ico')
+
+      expect(next).toHaveBeenCalled()
+      expect(res.statusCode).toBe(200)
+    },
+  )
+
+  // An absolute URL survives the same stripping with its scheme and host attached, so a CDN-hosted
+  // icon at the same path is a different resource and still redirects.
+  it('redirects to an externally hosted icon at the same path', () => {
+    branded({ favicon: 'https://cdn.example/favicon.ico?v=2' })
+
+    expect(run('/favicon.ico').res.headers.Location).toBe('https://cdn.example/favicon.ico?v=2')
+  })
+
   // Nothing guarantees a request carries a url (connect hands on what the server parsed), and an
   // icon path is not worth a 500.
   it('falls through for a request with no url', () => {
