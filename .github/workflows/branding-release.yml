@@ -44,6 +44,17 @@ jobs:
         with:
           app-id: ${{ vars.RELEASE_APP_ID }}
           private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          # Narrow the minted token to what release-please actually does. Without these inputs "the
+          # token inherits all the installation's permissions" — the workflow-level `permissions:`
+          # block above governs GITHUB_TOKEN only and does not constrain this one, so whatever the
+          # app happens to be installed with would reach every later step in this job.
+          #   contents      — commits, branches, tags and the GitHub release
+          #   pull-requests — the release pull request itself
+          #   issues        — its `autorelease: pending`/`tagged` labels; labelling a pull request
+          #                   goes through the issues API, so it is a separate scope
+          permission-contents: write
+          permission-pull-requests: write
+          permission-issues: write
 
       - name: Release Please
         id: release
