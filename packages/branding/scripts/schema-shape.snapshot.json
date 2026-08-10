@@ -8,6 +8,7 @@
     "assets.favicon: null",
     "assets.html: object",
     "assets.icon: null",
+    "assets.iconSizes: null",
     "badges.trophyBadgesSelectedMax: number",
     "category.max: number",
     "category.min: number",
@@ -83,7 +84,8 @@
     "logos": [
       "logos",
       "assets.favicon",
-      "assets.icon"
+      "assets.icon",
+      "assets.iconSizes"
     ],
     "legal": [
       "termsAndConditions",
