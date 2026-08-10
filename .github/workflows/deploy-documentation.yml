@@ -5,9 +5,11 @@ on:
     branches:
       - master
 
-# One run per workflow and branch. A newer push makes the older run's result irrelevant, so it is
-# cancelled instead of holding a runner. Publishing runs are queued, not cancelled: a half-pushed release is worse than a slow one. `event_name` is part of the group on purpose: a branch
-# push and its pull_request run are separate required checks — they must not cancel each other.
+# `cancel-in-progress: false` so a deploy that is already writing is never torn in half — but
+# deliberately WITHOUT the `queue: max` the release workflows use. This publishes the CURRENT state
+# of master rather than one commit's artifacts, so a superseded pending run has nothing left to
+# contribute; letting the newer commit replace it (the default `queue: single`) is exactly right,
+# and queueing them all would only redeploy the same content several times over.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: false
