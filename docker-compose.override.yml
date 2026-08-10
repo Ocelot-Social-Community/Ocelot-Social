@@ -156,7 +156,7 @@ services:
       - NODE_ENV=development
     volumes:
       - ./webapp:/app
-      - /app/node_modules
+      - webapp_storybook_node_modules:/app/node_modules
       - ./packages/ui:/packages/ui
       - /packages/ui/node_modules
       - ./packages/branding:/packages/branding
@@ -185,3 +185,4 @@ services:
 
 volumes:
   minio_data:
+  webapp_storybook_node_modules:
