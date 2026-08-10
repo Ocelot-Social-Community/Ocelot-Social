@@ -21,12 +21,11 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: false
 
-# `contents: write` is genuinely needed here and nowhere else in this workflow: the deploy step
-# force-pushes the built site to the gh-pages branch with GITHUB_TOKEN. `pull-requests: read` is for
-# dorny/paths-filter. Everything else stays unavailable rather than inherited from the repository or
-# organisation default.
+# Read-only floor, so no job silently inherits the repository or organisation default.
+# `pull-requests: read` is for dorny/paths-filter. Write access is granted per job, to the ONE that
+# needs it — see build-and-deploy below.
 permissions:
-  contents: write
+  contents: read
   pull-requests: read
 
 jobs:
@@ -49,6 +48,13 @@ jobs:
 
   build-and-deploy:
     runs-on: ubuntu-latest
+    # The only job that writes: the deploy step below force-pushes the built site to the gh-pages
+    # branch with GITHUB_TOKEN. Kept here rather than workflow-wide so `files-changed` — which hands
+    # the token to a third-party action — stays read-only. A job-level block REPLACES the workflow
+    # one, so this is the complete set for this job; it needs no pull-requests scope, the paths
+    # filter runs in the other job.
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2

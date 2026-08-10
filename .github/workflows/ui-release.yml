@@ -21,14 +21,24 @@ concurrency:
   cancel-in-progress: false
   queue: max
 
+# Read-only floor; write is granted to the one job below that might use it. See the note there —
+# branding-release.yml runs the identical release-please setup with `contents: read` alone.
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
+  pull-requests: read
 
 jobs:
   release-please:
     name: Release Please
     runs-on: ubuntu-latest
+    # Kept only for this job, so the `publish` job below — which needs nothing but the checkout, it
+    # authenticates to npm with NPM_TOKEN — stops inheriting write. Whether even THIS job needs it is
+    # doubtful: release-please is handed the app token above, not GITHUB_TOKEN, and the sibling
+    # branding-release.yml does the same thing with `contents: read`. Left as-is rather than tightened
+    # blind, because getting it wrong breaks a release.
+    permissions:
+      contents: write
+      pull-requests: write
     outputs:
       release_created: ${{ steps.release.outputs['packages/ui--release_created'] }}
       tag_name: ${{ steps.release.outputs['packages/ui--tag_name'] }}
