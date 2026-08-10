@@ -7,3 +7,8 @@
 **/*.log
 .git
 .github
+# Local test/build artifacts. These reached the images purely because they were sitting in a working
+# copy — packages/ui/storybook-static alone was 7 MB of the webapp production image.
+**/storybook-static
+**/playwright-report
+**/test-results
