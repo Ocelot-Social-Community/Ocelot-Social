@@ -21,24 +21,23 @@ concurrency:
   cancel-in-progress: false
   queue: max
 
-# Read-only floor; write is granted to the one job below that might use it. See the note there —
-# branding-release.yml runs the identical release-please setup with `contents: read` alone.
+# Read-only throughout, because nothing here writes with GITHUB_TOKEN: release-please authenticates
+# with the it4c-release-bot app token minted below, and `publish` authenticates to npm with
+# NPM_TOKEN. Set explicitly rather than inheriting the repository or organisation default.
 permissions:
   contents: read
-  pull-requests: read
 
 jobs:
   release-please:
     name: Release Please
     runs-on: ubuntu-latest
-    # Kept only for this job, so the `publish` job below — which needs nothing but the checkout, it
-    # authenticates to npm with NPM_TOKEN — stops inheriting write. Whether even THIS job needs it is
-    # doubtful: release-please is handed the app token above, not GITHUB_TOKEN, and the sibling
-    # branding-release.yml does the same thing with `contents: read`. Left as-is rather than tightened
-    # blind, because getting it wrong breaks a release.
-    permissions:
-      contents: write
-      pull-requests: write
+    # Deliberately no `permissions:` block. Neither step here uses GITHUB_TOKEN: there is no
+    # checkout, `create-github-app-token` authenticates with the app id and private key, and
+    # release-please-action takes its credentials solely from its `token` input (src/index.ts reads
+    # `core.getInput('token')` and hands that to the GitHub client — `process.env` is only consulted
+    # for GITHUB_REPOSITORY, never as an auth fallback). Granting write here would have widened
+    # GITHUB_TOKEN without any step asking for it. What release-please is actually allowed to do is
+    # governed by the app token's scopes below.
     outputs:
       release_created: ${{ steps.release.outputs['packages/ui--release_created'] }}
       tag_name: ${{ steps.release.outputs['packages/ui--tag_name'] }}
