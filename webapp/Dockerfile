@@ -66,6 +66,12 @@ EXPOSE ${PORT}
 # no dependency in yarn.lock resolves from a git URL, and the only jq consumers are the host-side
 # scripts/translations/*.sh, which are not in this image.
 RUN apk --no-cache add bash
+# NOTE for anyone tempted to `rm -rf /usr/local/lib/node_modules/npm` here to reclaim its 16 MB (plus
+# 6.7 MB of node-gyp headers in /usr/local/include): it reclaims NOTHING. Those bytes belong to a layer
+# of node:25.9.0-alpine itself, and a delete in a descendant layer only adds a whiteout on top. The one
+# construction that would actually drop them is assembling the runtime from plain `alpine` + a COPYed
+# node binary + yarn — worth ~12 MB of a ~495 MB image, at the price of owning musl/libgcc/entrypoint
+# details the official image handles. Measured and deliberately not done.
 RUN mkdir -p /app
 WORKDIR /app
 COPY --from=ui-runtime ./app/ /packages/ui/
@@ -152,6 +158,12 @@ ONBUILD RUN if ls /brand/brand.config.* >/dev/null 2>&1; then \
 ONBUILD RUN mkdir /build && \
     cp -r ./.nuxt ./nuxt.config.js ./config ./constants ./static ./locales ./server-middleware ./utils ./package.json ./yarn.lock ./scripts /build && \
     if [ -d ./deployment ]; then cp -r ./deployment /build/deployment; fi
+# Drop the CLIENT source maps — they were 45 MB of a 67 MB .nuxt. Sentry has already consumed them:
+# publishRelease uploads during `yarn run build` above (nuxt.config.js `sentry.publishRelease`), so
+# symbolication survives; what goes is only the copy webpack would otherwise serve under /_nuxt/, i.e.
+# the browser-readable mirror of our sources. The SERVER maps stay — they are small and are what turns
+# an SSR stack trace into something readable.
+ONBUILD RUN find /build/.nuxt/dist/client -name '*.map' -delete
 ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     cd /build && yarn install --production=true --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 
