@@ -75,20 +75,38 @@ describe('manifest serverMiddleware', () => {
     expect(json.icons).toEqual([])
   })
 
+  // Nothing measured the ogImage — it is not the icon slot — so the historical pair is still the best
+  // guess available for it.
   it('falls back to the 192/512 PWA icons from the brand ogImage + ogImageType', () => {
     setBranding({
       ...brandingDefaults,
       metadata: {
         ...brandingDefaults.metadata,
-        ogImage: '/branding/acme/assets/logo-squared.svg',
-        ogImageType: 'image/svg+xml',
+        ogImage: '/branding/acme/assets/og.png',
+        ogImageType: 'image/png',
       },
     })
     const { json } = run()
     expect(json.icons).toEqual([
-      { src: '/branding/acme/assets/logo-squared.svg', sizes: '192x192', type: 'image/svg+xml' },
-      { src: '/branding/acme/assets/logo-squared.svg', sizes: '512x512', type: 'image/svg+xml' },
+      { src: '/branding/acme/assets/og.png', sizes: '192x192', type: 'image/png' },
+      { src: '/branding/acme/assets/og.png', sizes: '512x512', type: 'image/png' },
     ])
+  })
+
+  // A manifest icon has to be a bitmap. The type is derived from the path, so an .svg is published as
+  // image/svg+xml — and a browser that will not rasterise a manifest icon drops it. Listing it anyway
+  // only makes the manifest claim an install icon that no installer can use.
+  it('drops a non-raster icon rather than publishing one browsers refuse', () => {
+    setBranding({
+      ...brandingDefaults,
+      metadata: {
+        ...brandingDefaults.metadata,
+        // The default ogImage fallback for a brand that sets none: its own squared logo, an svg.
+        ogImage: '/branding/acme/assets/logo-squared.svg',
+        ogImageType: 'image/svg+xml',
+      },
+    })
+    expect(run().json.icons).toEqual([])
   })
 
   // ogImage is a SHARE image — 1200×1140 by default and often an .svg, which several browsers refuse
@@ -109,6 +127,93 @@ describe('manifest serverMiddleware', () => {
     expect(json.icons).toEqual([
       { src: '/branding/acme/assets/icon.png', sizes: '192x192', type: 'image/png' },
       { src: '/branding/acme/assets/icon.png', sizes: '512x512', type: 'image/png' },
+    ])
+  })
+
+  // The branding build measures the icon it packs (assets.iconSizes). One honest entry beats two
+  // contradicting ones: a browser scales a single candidate to whatever slot it needs, while a file
+  // whose decoded size contradicts its `sizes` can be discarded outright — which is how every ocelot
+  // brand, all shipping 225px icons declared at 512, ended up installable under no icon of its own.
+  it('declares the measured size of assets.icon as a single icon entry', () => {
+    setBranding({
+      ...brandingDefaults,
+      assets: {
+        ...brandingDefaults.assets,
+        icon: '/branding/acme/assets/icon.png',
+        iconSizes: '225x225',
+      },
+    })
+    expect(run().json.icons).toEqual([
+      { src: '/branding/acme/assets/icon.png', sizes: '225x225', type: 'image/png' },
+    ])
+  })
+
+  // A partial brand package (identity but no logos bucket, or a pre-0.1.2 archive still mounted from
+  // a volume) composes to a config with no assets slice at all.
+  it('survives a brand that carries no assets at all', () => {
+    setBranding({ ...brandingDefaults, assets: undefined })
+    const { json } = run()
+
+    // Still installable: the ogImage default is a raster file, so the fallback pair applies.
+    expect(json.icons).toEqual([
+      { src: brandingDefaults.metadata.ogImage, sizes: '192x192', type: 'image/png' },
+      { src: brandingDefaults.metadata.ogImage, sizes: '512x512', type: 'image/png' },
+    ])
+  })
+
+  // An icon served by a route rather than a file has no extension to read a type from — then, and only
+  // then, the brand's declared ogImageType is the better guess than assuming PNG.
+  it('falls back to ogImageType when the path names no extension', () => {
+    setBranding({
+      ...brandingDefaults,
+      metadata: {
+        ...brandingDefaults.metadata,
+        ogImage: '/api/brand-image',
+        ogImageType: 'image/webp',
+      },
+    })
+
+    expect(run().json.icons[0].type).toBe('image/webp')
+  })
+
+  // Neither source says anything: an extension-less ogImage the brand never typed. PNG is the assumption
+  // of last resort here — unlike the icon slot below, the ogImage IS what ogImageType is about, so a
+  // brand leaving it blank has declined to correct the guess rather than been asked about a second file.
+  it('assumes PNG for an extension-less ogImage the brand declared no type for', () => {
+    setBranding({
+      ...brandingDefaults,
+      metadata: { ...brandingDefaults.metadata, ogImage: '/api/brand-image', ogImageType: '' },
+    })
+
+    expect(run().json.icons[0].type).toBe('image/png')
+  })
+
+  // ...but ONLY for the file it describes. With the icon slot filled by a route of its own, the two
+  // are different files, and announcing the OG image's type for the icon is how a browser ends up
+  // dropping a perfectly good PNG for contradicting its declaration. No type is the honest answer —
+  // the field is optional and the browser sniffs.
+  it('declares no type for an extension-less assets.icon rather than the ogImage type', () => {
+    setBranding({
+      ...brandingDefaults,
+      assets: { ...brandingDefaults.assets, icon: '/api/brand-icon', iconSizes: '512x512' },
+      metadata: { ...brandingDefaults.metadata, ogImageType: 'image/jpeg' },
+    })
+
+    expect(run().json.icons).toEqual([{ src: '/api/brand-icon', sizes: '512x512' }])
+  })
+
+  // The measurement belongs to `assets.icon` alone. A brand with a size but no icon falls back to its
+  // ogImage — a DIFFERENT file — and carrying the number across would declare one file's dimensions
+  // for another's.
+  it('does not apply the measured size to the ogImage fallback', () => {
+    setBranding({
+      ...brandingDefaults,
+      assets: { ...brandingDefaults.assets, icon: null, iconSizes: '225x225' },
+      metadata: { ...brandingDefaults.metadata, ogImage: '/branding/acme/assets/og.png' },
+    })
+    expect(run().json.icons).toEqual([
+      { src: '/branding/acme/assets/og.png', sizes: '192x192', type: 'image/png' },
+      { src: '/branding/acme/assets/og.png', sizes: '512x512', type: 'image/png' },
     ])
   })
 })

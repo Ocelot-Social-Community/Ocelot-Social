@@ -36,7 +36,12 @@ LABEL maintainer="devops@ocelot.social"
 ENV NODE_ENV="production"
 ENV PORT="4000"
 EXPOSE ${PORT}
-RUN apk --no-cache add git python3 make g++ bash linux-headers
+# `bash` only — this stage is published as `backend-base` and is the RUNTIME image, both for `production`
+# here and for every brand image (deployment/configurations/*/docker/backend.Dockerfile does
+# `FROM backend-base` + `COPY --from=build /build .`). The node-gyp toolchain moved to `base-build`
+# below: python3 + gcc + linux-headers measured 324 MB of a 732 MB image and are used by `yarn install`
+# alone. `git` is gone entirely — nothing in backend/yarn.lock resolves from a git URL.
+RUN apk --no-cache add bash
 RUN mkdir -p /app
 WORKDIR /app
 COPY --from=branding-runtime ./app/ /packages/branding/
@@ -48,10 +53,21 @@ COPY --from=branding-runtime ./app/ /packages/branding/
 # or pin a brand with $OCELOT_ACTIVE_BRANDING.
 CMD ["/bin/bash", "-c", "yarn run start"]
 
-FROM base AS development
+# Everything that RUNS `yarn install` or `yarn run build` derives from here rather than from `base`:
+# node-gyp compiles native addons, and the ONBUILD chain below type-checks the brand's middlewares with
+# tsc. `production` and `backend-base` deliberately do NOT inherit it — they only ever receive the
+# finished /build.
+FROM base AS base-build
+RUN apk --no-cache add python3 make g++ linux-headers
+
+# Installs at container START, hence the toolchain.
+FROM base-build AS development
 CMD ["/bin/sh", "-c", "yarn install && yarn run dev"]
 
-FROM base AS build
+# Published as `backend-build`. This is where a BRAND build runs: its ONBUILD triggers copy the brand's
+# middlewares into src/middleware/branding/ and recompile the whole backend, so the toolchain has to be
+# present HERE — and only here.
+FROM base-build AS build
 # The brand-archive builder, used by the ONBUILD bake below. Lives ONLY in this stage (published as
 # backend-build) — the runtime image is FROM base + COPY /build and never inherits it.
 COPY --from=branding-tools ./app/ /brand-tools/

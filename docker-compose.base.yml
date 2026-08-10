@@ -4,7 +4,11 @@ services:
     image: ghcr.io/ocelot-social-community/ocelot-social/webapp-base:${OCELOT_VERSION:-latest}
     build:
       target: base
-      context: webapp
+      # Repo root, like backend below and like .github/workflows/docker-push.yml already does: the
+      # webapp's `base` stage pulls /packages/ui and /packages/branding, which a `webapp` context
+      # cannot see. With `context: webapp` this target does not build at all.
+      context: .
+      dockerfile: webapp/Dockerfile
 
   backend:
     image: ghcr.io/ocelot-social-community/ocelot-social/backend-base:${OCELOT_VERSION:-latest}
