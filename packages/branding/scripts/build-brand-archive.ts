@@ -25,6 +25,19 @@ import { basename, resolve } from 'node:path'
 
 import { buildBrandArchive, publishBrandArchive } from './lib/build-brandings.ts'
 
+/**
+ * Put the build's findings on stderr. The checks in build-brandings.ts (missing referenced assets, an
+ * uncompiled stylesheet, a legacy public/ tree, an icon that cannot serve as one) all describe damage
+ * that is INVISIBLE in the artifact — the archive builds either way and the fault first appears in a
+ * browser. Collecting them and dropping them on the floor, which is what every entry point did, made
+ * the whole apparatus inert: that is how nine brands shipped an `assets/icon.png` no config named.
+ *
+ * stderr, not stdout: the one line stdout carries is the artifact path, which callers pipe.
+ */
+function report(warnings: string[]): void {
+  for (const warning of warnings) console.error(warning)
+}
+
 const rest = process.argv.slice(2)
 const isWatch = rest.includes('--watch')
 const isDefault = rest.includes('--default')
@@ -38,20 +51,22 @@ const brandDir = resolve(brandArg)
 async function build(): Promise<void> {
   // A single explicit .tar.gz target → write just that file (dev/watch into the served dir).
   if (outArg?.endsWith('.tar.gz')) {
-    const { id, gz, entries } = await buildBrandArchive(brandDir)
+    const { id, gz, entries, warnings } = await buildBrandArchive(brandDir)
     const out = resolve(outArg)
     writeFileSync(out, gz)
 
+    report(warnings)
     console.log(`[brand] ${id} → ${out} (${entries.length} files, ${gz.length} b)`)
     return
   }
 
   // Otherwise publish into a dist directory: latest + versioned artifact (+ DEFAULT marker).
-  const { id, version, entries, dir, latest, versioned } = await publishBrandArchive(brandDir, {
-    outDir: outArg,
-    markDefault: isDefault,
-  })
+  const { id, version, entries, dir, latest, versioned, warnings } = await publishBrandArchive(
+    brandDir,
+    { outDir: outArg, markDefault: isDefault },
+  )
 
+  report(warnings)
   console.log(
     `[brand] ${id}${version ? ` v${version}` : ''} → ${versioned ? `${basename(versioned)} + ` : ''}${basename(latest)}${isDefault ? ' + DEFAULT' : ''} in ${dir} (${entries.length} files)`,
   )

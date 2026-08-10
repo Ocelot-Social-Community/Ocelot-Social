@@ -358,23 +358,48 @@ function warnUncompiledStylesheets(entries: TarEntry[], id: string, warnings: st
 }
 
 /**
- * The size `assets.icon` is DECLARED at — the PWA manifest lists it as both 192×192 and 512×512
- * (webapp/server-middleware/manifest.js), so anything smaller is upscaled by the browser to fill the
- * larger slot.
+ * The size an install icon is USEFUL at: browsers pick the PWA install / splash icon at up to 512px
+ * square, so anything smaller is upscaled to fill that slot. The manifest no longer *claims* this size
+ * for a smaller file (it declares the measured one — `assets.iconSizes`), which is why the check below
+ * reads as advice about the artwork rather than as a mismatch with a declaration.
  */
 const ICON_MIN_PX = 512
 
 /**
- * Warn when `assets.icon` cannot do the job the slot exists for: the iOS home-screen icon and the PWA
- * install icon. Both consume it as a fixed-size square bitmap, and neither reports back — a wrong file
- * shows up as a stretched or blurred icon on someone's phone, or as no icon at all, long after the
- * build that accepted it.
+ * Measure `assets.icon` into `assets.iconSizes` and warn when the file cannot do the job the slot
+ * exists for: the iOS home-screen icon and the PWA install icon. Both consume it as a fixed-size square
+ * bitmap, and neither reports back — a wrong file shows up as a stretched or blurred icon on someone's
+ * phone, or as no icon at all, long after the build that accepted it.
+ *
+ * MUTATES the config, so it has to run BEFORE namespaceConfig: what it writes travels into the archive
+ * as data the manifest reads back (webapp/server-middleware/manifest.js). A size that cannot be
+ * measured stays null and the manifest then declares none, which is the honest answer — better than
+ * the fixed 192/512 pair it used to assert about every file.
  *
  * Warnings only, like every other check here: a brand's icon is not worth failing a deployment over,
  * and the slot is optional to begin with.
  */
-function warnIconAsset(dir: string, id: string, config: BrandingConfig, warnings: string[]): void {
+function resolveIconAsset(
+  dir: string,
+  id: string,
+  config: BrandingConfig,
+  warnings: string[],
+): void {
+  // Never inherited from an author: the whole point is that it describes the file this build read.
+  config.assets.iconSizes = null
+
   const rel = config.assets.icon
+  if (rel == null) {
+    // The slot being empty is the ONE case with no file to point at, and it is also the one that used
+    // to pass silently while every brand shipped an unreferenced assets/icon.png — the vanilla ocelot
+    // then served as apple-touch-icon and PWA icon on every branded instance. Say so.
+    warnings.push(
+      `  ! ${id}: no assets.icon — the iOS home-screen and PWA install icons fall back to the ` +
+        `framework's own, so a branded instance installs under the vanilla icon; ship a ` +
+        `${ICON_MIN_PX}px square PNG and name it here`,
+    )
+    return
+  }
   // Only a brand-relative path names a file this build can read; an external URL or an absolute
   // framework path is not ours to inspect (see namespacePath).
   if (!isRelativeAsset(rel)) return
@@ -402,6 +427,9 @@ function warnIconAsset(dir: string, id: string, config: BrandingConfig, warnings
     )
     return
   }
+  // Declared even when the shape or size draws a warning below: the dimensions are what they are, and
+  // a manifest that reports them truthfully is what lets the browser scale the icon itself.
+  config.assets.iconSizes = `${image.width}x${image.height}`
   if (image.width !== image.height) {
     warnings.push(
       `  ! ${id}: assets.icon '${rel}' is ${image.width}×${image.height}, not square — a home-screen ` +
@@ -409,7 +437,7 @@ function warnIconAsset(dir: string, id: string, config: BrandingConfig, warnings
     )
   } else if (image.width < ICON_MIN_PX) {
     warnings.push(
-      `  ! ${id}: assets.icon '${rel}' is ${image.width}px — the manifest declares it at ` +
+      `  ! ${id}: assets.icon '${rel}' is ${image.width}px — browsers pick an install icon at up to ` +
         `${ICON_MIN_PX}px, so it will be upscaled`,
     )
   }
@@ -458,6 +486,9 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
   ) {
     config.metadata.ogImage = config.logos.signupPath
   }
+  // Before namespacing: this READS a brand-relative path off disk and WRITES the measured size back
+  // into the config, so it has to see the authored path and be seen by the config that gets packed.
+  resolveIconAsset(dir, id, config, warnings)
   const namespaced = namespaceConfig(config, id, dir, warnings)
   // The brand id + version live in manifest.json only (below), NOT in any config leaf: splitConfig
   // would drop a top-level `id` anyway (it is not a bucket-owned path), and injecting version into
@@ -529,7 +560,6 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
   }
   warnUncompiledStylesheets(entries, id, warnings)
   warnRemovedPublicBucket(dir, id, warnings)
-  warnIconAsset(dir, id, config, warnings)
   return { id, version, label, gz: writeTarGz(entries), entries, warnings }
 }
 
