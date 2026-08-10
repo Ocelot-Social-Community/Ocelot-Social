@@ -19,6 +19,16 @@ concurrency:
 permissions:
   contents: read
 
+# Naming the shell explicitly is what turns on `pipefail`: an unspecified `run:` gets
+# `bash -e {0}`, where only the LAST command of a pipeline decides the exit code. `docker save X |
+# gzip` would then report success even when the save failed — gzip happily writes a valid, empty
+# archive and exits 0 — and the failure would only surface 40 matrix jobs later at `docker load`.
+# `shell: bash` runs `bash --noprofile --norc -eo pipefail {0}` instead, so any stage of a pipeline
+# fails the step. Set once here rather than per block, so pipelines added later are covered too.
+defaults:
+  run:
+    shell: bash
+
 jobs:
   prepare_backend_environment:
     name: Fullstack | prepare backend environment
