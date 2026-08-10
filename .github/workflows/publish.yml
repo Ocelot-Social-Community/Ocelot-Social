@@ -18,10 +18,10 @@ concurrency:
   cancel-in-progress: false
   queue: max
 
-# `contents: write` is required: this workflow creates a git tag and a GitHub release with
-# GITHUB_TOKEN. The repository dispatches below authenticate with OCELOT_PUBLISH_EVENT_PAT, not with
-# GITHUB_TOKEN, so they need no scope here. Nothing beyond contents is granted, rather than
-# inheriting the repository or organisation default.
+# Read-only floor, so no job silently inherits the repository or organisation default. Write is
+# granted per job, to the ONE that needs it — see github_tag below, which creates the git tag and
+# the GitHub release with GITHUB_TOKEN. The repository dispatches in build_trigger authenticate
+# with OCELOT_PUBLISH_EVENT_PAT rather than GITHUB_TOKEN, so that job needs no scope at all.
 permissions:
   contents: read
 
@@ -96,6 +96,9 @@ jobs:
           echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
           echo "BUILD_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
       - run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
+      # Unlike the two dispatches below, this one uses GITHUB_TOKEN instead of the PAT. Reactivating
+      # it therefore needs `permissions: contents: write` on this job — a repository dispatch is a
+      # write operation, and the job runs read-only.
       #- name: Repository Dispatch
       #  uses: peter-evans/repository-dispatch@831550845b9842397c9b90c366a610d53f2b846b # v3.0.0
       #  with:
