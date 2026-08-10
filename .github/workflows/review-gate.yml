@@ -191,11 +191,17 @@ jobs:
                 pull_number: pullNumber,
                 per_page: 100,
               })
+              // An allowlist, not `!== 'PENDING'`: that also let `DISMISSED` through, and a dismissed
+              // review is a retracted one — dismissing CodeRabbit's approval to force a fresh look
+              // would have left the gate green on the very evidence that was just withdrawn. Only
+              // states that represent a submitted, still-standing review count. (`dismissed` is in the
+              // `pull_request_review` triggers above, so the gate drops back to pending immediately.)
+              const acceptedReviewStates = ['APPROVED', 'CHANGES_REQUESTED', 'COMMENTED']
               const review = reviews.find(
                 (candidate) =>
                   candidate.user?.login === reviewerLogin &&
                   candidate.commit_id === headSha &&
-                  candidate.state !== 'PENDING',
+                  acceptedReviewStates.includes(candidate.state),
               )
               if (review) {
                 return { headSha, evidence: `review ${review.state} (${review.html_url})` }
