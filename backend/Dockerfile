@@ -59,6 +59,11 @@ CMD ["/bin/bash", "-c", "yarn run start"]
 # finished /build.
 FROM base AS base-build
 RUN apk --no-cache add python3 make g++ linux-headers
+# `strip` comes along with g++ (binutils), so this needs no package of its own. The helper is used
+# after every `yarn install` below — see the script for what it removes and why it has to share the
+# install's layer.
+COPY backend/scripts/prune-native-build-artifacts.sh /usr/local/bin/prune-native-build-artifacts
+RUN chmod +x /usr/local/bin/prune-native-build-artifacts
 
 # Installs at container START, hence the toolchain.
 FROM base-build AS development
@@ -78,7 +83,8 @@ COPY --from=branding-tools ./app/ /brand-tools/
 # (python3/make/g++ sit in `base` for exactly them) recompiled on every push.
 COPY backend/package.json backend/yarn.lock ./
 RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
-    yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
+    yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache && \
+    prune-native-build-artifacts
 # Repo-root build context now (for /packages/branding): copy only the backend subtree to /app.
 COPY backend/ .
 # Optional per-brand overlays (code/seed data not yet ported to the runtime archive). The `[g]` glob
@@ -114,7 +120,8 @@ ONBUILD RUN mkdir /build && \
     cp -r ./build ./package.json ./yarn.lock /build && \
     if [ -d ./deployment ]; then cp -r ./deployment /build/deployment; fi
 ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
-    cd /build && yarn install --production=true --frozen-lockfile --non-interactive --cache-folder /yarn-cache
+    cd /build && yarn install --production=true --frozen-lockfile --non-interactive --cache-folder /yarn-cache && \
+    prune-native-build-artifacts
 
 # Deliberately NOT `FROM build`: the test image runs `yarn dev` → `nodemon --exec tsx src/index.ts`,
 # straight off the sources. Everything `build` adds on top — `yarn run build` (tsc), the /build copy and
@@ -141,7 +148,8 @@ ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
 FROM base-build AS test-modules
 COPY backend/package.json backend/yarn.lock ./
 RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
-    yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
+    yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache && \
+    prune-native-build-artifacts
 
 FROM base AS test
 # Before the sources, so a src/ change does not invalidate the dependency layer.

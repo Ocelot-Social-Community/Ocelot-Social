@@ -73,15 +73,18 @@ jobs:
           docker pull quay.io/minio/mc:latest
           docker pull maildev/maildev:latest
 
-      # gzip on the way out: `docker save` writes UNCOMPRESSED layer tars, and every byte here is
-      # paid 40 times over on the matrix side. `docker load` detects the gzip itself.
+      # Compressed on the way out: `docker save` writes UNCOMPRESSED layer tars, and every byte here is
+      # paid 40 times over on the matrix side. zstd rather than gzip -1 — smaller AND faster on both
+      # ends, and `-T0` uses all the runner's cores, which gzip cannot. It is preinstalled on
+      # ubuntu-latest. The matrix side pipes it through `zstd -dc` explicitly instead of relying on
+      # `docker load` sniffing the format.
       - name: Save all images
         run: |
-          docker save "ghcr.io/ocelot-social-community/ocelot-social/backend:test" | gzip -1 > /tmp/backend.tar.gz
-          docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j:community" | gzip -1 > /tmp/neo4j.tar.gz
-          docker save "quay.io/minio/minio:latest" | gzip -1 > /tmp/minio.tar.gz
-          docker save "quay.io/minio/mc:latest" | gzip -1 > /tmp/minio-mc.tar.gz
-          docker save "maildev/maildev:latest" | gzip -1 > /tmp/mailserver.tar.gz
+          docker save "ghcr.io/ocelot-social-community/ocelot-social/backend:test" | zstd -T0 -3 > /tmp/backend.tar.zst
+          docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j:community" | zstd -T0 -3 > /tmp/neo4j.tar.zst
+          docker save "quay.io/minio/minio:latest" | zstd -T0 -3 > /tmp/minio.tar.zst
+          docker save "quay.io/minio/mc:latest" | zstd -T0 -3 > /tmp/minio-mc.tar.zst
+          docker save "maildev/maildev:latest" | zstd -T0 -3 > /tmp/mailserver.tar.zst
 
       # ARTIFACT, not cache. These are run-scoped hand-offs between jobs, which is what artifacts are
       # for; `actions/cache` with a `run_id` key can never hit on a later run, yet it occupies the
@@ -91,7 +94,7 @@ jobs:
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: e2e-backend-environment
-          path: /tmp/*.tar.gz
+          path: /tmp/*.tar.zst
           retention-days: 1
           compression-level: 0
 
@@ -105,25 +108,34 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
 
-      - name: Webapp | Build 'test' image
+      # `e2e`, not `test`: same build, but assembled `FROM base` around the finished /build and started
+      # with nuxt-start instead of the dev server (see webapp/Dockerfile). `test` stays what the webapp
+      # UNIT tests in test-webapp.yml need — sources plus devDependencies for Jest — and is far too fat
+      # for an image that gets shipped to 40 runners.
+      #
+      # Tagged `:test` regardless, because docker-compose.test.yml names that image for the `webapp`
+      # service and this workflow feeds compose from `docker load` alone. The two workflows never share
+      # a machine, so the tag collision is not one. The buildx cache scope IS separate — the two stages
+      # differ only in their final layers, but mixing their manifests under one scope buys nothing.
+      - name: Webapp | Build 'e2e' image
         uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
         with:
           context: .
           file: webapp/Dockerfile
-          target: test
+          target: e2e
           load: true
           tags: ghcr.io/ocelot-social-community/ocelot-social/webapp:test
-          cache-from: type=gha,scope=webapp-test
-          cache-to: type=gha,mode=max,scope=webapp-test
+          cache-from: type=gha,scope=webapp-e2e
+          cache-to: type=gha,mode=max,scope=webapp-e2e
 
       - name: Save image for test jobs
-        run: docker save "ghcr.io/ocelot-social-community/ocelot-social/webapp:test" | gzip -1 > /tmp/webapp.tar.gz
+        run: docker save "ghcr.io/ocelot-social-community/ocelot-social/webapp:test" | zstd -T0 -3 > /tmp/webapp.tar.zst
 
       - name: Upload image for the test jobs
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: e2e-webapp-image
-          path: /tmp/webapp.tar.gz
+          path: /tmp/webapp.tar.zst
           retention-days: 1
           compression-level: 0
 
@@ -213,11 +225,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
+      # Deliberately WITHOUT `cache: 'yarn'`, unlike `prepare_cypress`: this job never runs an install.
+      # The restore below brings the whole workspace INCLUDING every node_modules tree, so downloading
+      # and unpacking the yarn download cache on top of it is a few hundred megabytes that nothing
+      # reads — 40 times per run.
       - name: Setup Node.js
         uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
         with:
           node-version-file: 'backend/.nvmrc'
-          cache: 'yarn'
 
       # Exact key only — see the note in `prepare_cypress`. This step restores over the checkout above,
       # so anything but this commit's own workspace would mean testing a different revision than the
@@ -255,21 +270,33 @@ jobs:
 
       - name: Boot up test system | docker compose
         run: |
-          docker load < /tmp/neo4j.tar.gz
-          docker load < /tmp/backend.tar.gz
-          docker load < /tmp/minio.tar.gz
-          docker load < /tmp/minio-mc.tar.gz
-          docker load < /tmp/mailserver.tar.gz
-          docker load < /tmp/webapp.tar.gz
+          for image in neo4j backend minio minio-mc mailserver webapp; do
+            zstd -dc "/tmp/${image}.tar.zst" | docker load
+          done
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp
 
-          echo "Waiting for backend (max 120s)..."
-          timeout 120 bash -c 'until curl -sf -X POST -H "Content-Type: application/json" -d "{\"query\":\"{__typename}\"}" http://localhost:4000 > /dev/null 2>&1; do sleep 5; done'
-          echo "Backend is ready."
-
-          echo "Waiting for webapp (max 120s)..."
-          timeout 120 bash -c 'until curl -sf http://localhost:3000 > /dev/null 2>&1; do sleep 5; done'
-          echo "Webapp is ready."
+          # A service that never comes up used to fail this step as a bare `exit 124` with nothing to
+          # go on — the same empty result whether the image was broken, the port wrong or the boot
+          # merely slow, times 40 identical matrix jobs. Dump the compose state and logs on timeout
+          # instead; a container that dies on a missing module says so in its own log.
+          #
+          # `sleep 1`, not 5: the loop costs one curl per second against a local port, and the wait is
+          # paid in every matrix job. A 5 s step wasted 2.5 s per service on average for nothing.
+          compose() { docker compose -f docker-compose.yml -f docker-compose.test.yml "$@"; }
+          await() {
+            local name="$1" seconds="$2"; shift 2
+            echo "Waiting for ${name} (max ${seconds}s)..."
+            if timeout "$seconds" bash -c "until $*; do sleep 1; done"; then
+              echo "${name} is ready."
+            else
+              echo "::error::${name} did not become ready within ${seconds}s"
+              compose ps
+              compose logs --tail=100
+              return 1
+            fi
+          }
+          await backend 120 'curl -sf -X POST -H "Content-Type: application/json" -d "{\"query\":\"{__typename}\"}" http://localhost:4000 > /dev/null 2>&1'
+          await webapp 120 'curl -sf http://localhost:3000 > /dev/null 2>&1'
 
       - name: Initialize database
         run: docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend yarn db:migrate init
