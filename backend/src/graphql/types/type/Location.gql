@@ -32,6 +32,10 @@ type Location {
 type LocationMapBox {
   id: ID!
   place_name: String!
+  "Latitude in decimal degrees (WGS84), if known."
+  lat: Float
+  "Longitude in decimal degrees (WGS84), if known."
+  lng: Float
 }
 
 type Query {

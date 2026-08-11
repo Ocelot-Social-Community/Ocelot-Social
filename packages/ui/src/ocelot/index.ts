@@ -5,3 +5,8 @@ export { ocelotIcons } from './icons'
 export { OsActionButton } from './components/OsActionButton'
 export { OsCounterIcon } from './components/OsCounterIcon'
 export { OsLabeledButton } from './components/OsLabeledButton'
+export { OsLocationMap } from './components/OsLocationMap'
+export type {
+  OsLocationMapSearchResult,
+  OsLocationMapStyle,
+} from './components/OsLocationMap'

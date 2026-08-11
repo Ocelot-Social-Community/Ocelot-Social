@@ -5,6 +5,8 @@ export const queryLocations = () => gql`
     queryLocations(place: $place, lang: $lang, types: $types, proximity: $proximity) {
       place_name
       id
+      lat
+      lng
     }
   }
 `

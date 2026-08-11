@@ -1,0 +1,184 @@
+<template>
+  <div class="event-location-map">
+    <client-only v-if="!isEmpty($env.MAPBOX_TOKEN)">
+      <os-location-map
+        :mapbox-gl="mapboxgl"
+        :access-token="$env.MAPBOX_TOKEN"
+        :lat="lat"
+        :lng="lng"
+        :initial-center="defaultCenter"
+        :initial-zoom="4"
+        editable
+        show-search
+        :search-placeholder="$t('post.viewEvent.eventLocationName')"
+        :search-aria-label="$t('post.viewEvent.eventLocationName')"
+        :search-clear-label="$t('actions.clear')"
+        :search-results="searchResults"
+        :styles="styles"
+        :style-switcher-label="$t('map.styles.title')"
+        @pin-change="onPinChange"
+        @search-input="onSearchInput"
+        @search-select="onSearchSelect"
+      />
+    </client-only>
+    <empty v-else icon="alert" :message="$t('map.alertMessage')" margin="small" />
+  </div>
+</template>
+
+<script>
+import { isEmpty } from 'lodash'
+import mapboxgl from 'mapbox-gl'
+import { OsLocationMap } from '@ocelot-social/ui/ocelot'
+import Empty from '~/components/Empty/Empty'
+import { queryLocations } from '~/graphql/location'
+
+const SEARCH_MIN_LENGTH = 3
+const REVERSE_GEOCODE_TYPES = 'address,poi,place'
+const FORWARD_GEOCODE_TYPES =
+  'country,region,postcode,district,place,locality,neighborhood,address,poi'
+
+export default {
+  name: 'EventLocationMap',
+  components: { OsLocationMap, Empty },
+  props: {
+    // Either a plain string (not yet geocoded) or an object as produced by
+    // LocationSelect / this component: { label, value, id, lat, lng }.
+    location: {
+      type: [String, Object],
+      default: null,
+    },
+  },
+  data() {
+    return {
+      isEmpty,
+      mapboxgl,
+      defaultCenter: [10.452764, 51.165707], // center of Germany
+      searchResults: [],
+      searchRequestId: 0,
+    }
+  },
+  computed: {
+    lat() {
+      return this.hasCoordinates ? this.location.lat : null
+    },
+    lng() {
+      return this.hasCoordinates ? this.location.lng : null
+    },
+    hasCoordinates() {
+      return (
+        typeof this.location === 'object' &&
+        this.location !== null &&
+        typeof this.location.lat === 'number' &&
+        typeof this.location.lng === 'number'
+      )
+    },
+    styles() {
+      return [
+        {
+          id: 'outdoors',
+          url: 'mapbox://styles/mapbox/outdoors-v12?optimize=true',
+          label: this.$t('map.styles.outdoors'),
+        },
+        {
+          id: 'streets',
+          url: 'mapbox://styles/mapbox/streets-v11?optimize=true',
+          label: this.$t('map.styles.streets'),
+        },
+        {
+          id: 'satellite',
+          url: 'mapbox://styles/mapbox/satellite-streets-v11?optimize=true',
+          label: this.$t('map.styles.satellite'),
+        },
+        {
+          id: 'dark',
+          url: 'mapbox://styles/mapbox/dark-v10?optimize=true',
+          label: this.$t('map.styles.dark'),
+        },
+      ]
+    },
+  },
+  methods: {
+    async onPinChange({ lat, lng }) {
+      // Mapbox forward-geocoding endpoint auto-detects a "lng,lat" search
+      // string and reverse-geocodes it — same endpoint the address search
+      // already uses, no separate backend resolver needed.
+      try {
+        const {
+          data: { queryLocations: results },
+        } = await this.$apollo.query({
+          query: queryLocations(),
+          variables: {
+            place: `${lng},${lat}`,
+            lang: this.$i18n.locale(),
+            types: REVERSE_GEOCODE_TYPES,
+          },
+          fetchPolicy: 'network-only',
+        })
+        const match = results && results[0]
+        this.$emit(
+          'input',
+          match
+            ? {
+                label: match.place_name,
+                value: match.place_name,
+                id: match.id,
+                lat: match.lat ?? lat,
+                lng: match.lng ?? lng,
+              }
+            : { label: null, value: null, id: null, lat, lng },
+        )
+      } catch (error) {
+        this.$toast.error(error.message)
+      }
+    },
+    async onSearchInput(text) {
+      const requestId = ++this.searchRequestId
+      if (!text || text.trim().length < SEARCH_MIN_LENGTH) {
+        this.searchResults = []
+        return
+      }
+      try {
+        const {
+          data: { queryLocations: results },
+        } = await this.$apollo.query({
+          query: queryLocations(),
+          variables: {
+            place: text,
+            lang: this.$i18n.locale(),
+            types: FORWARD_GEOCODE_TYPES,
+          },
+          fetchPolicy: 'network-only',
+        })
+        if (requestId !== this.searchRequestId) return
+        this.searchResults = (results || [])
+          .filter((result) => result.lat != null && result.lng != null)
+          .map((result) => ({
+            id: result.id,
+            label: result.place_name,
+            lat: result.lat,
+            lng: result.lng,
+          }))
+      } catch (error) {
+        if (requestId === this.searchRequestId) this.$toast.error(error.message)
+      }
+    },
+    onSearchSelect(result) {
+      this.$emit('input', {
+        label: result.label,
+        value: result.label,
+        id: result.id,
+        lat: result.lat,
+        lng: result.lng,
+      })
+    },
+  },
+}
+</script>
+
+<style>
+@import 'mapbox-gl/dist/mapbox-gl.css';
+
+.event-location-map {
+  height: 260px;
+}
+</style>

@@ -171,6 +171,8 @@ export default {
           label: place.place_name,
           value: place.place_name,
           id: place.id,
+          lat: place.lat,
+          lng: place.lng,
         })
       })
 

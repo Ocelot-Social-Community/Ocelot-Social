@@ -199,6 +199,8 @@ export const queryLocations = async ({ place, lang, types, proximity }, context:
     response?.features?.map((item: any) => ({
       place_name: item.place_name,
       id: item.id,
+      lng: item.center?.length ? item.center[0] : null,
+      lat: item.center?.length ? item.center[1] : null,
     })) ?? []
   )
 }

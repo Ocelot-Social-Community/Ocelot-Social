@@ -164,6 +164,12 @@
                     :text="$t('post.viewEvent.eventLocationRequired')"
                   />
                 </div>
+                <event-location-map
+                  v-if="!locationSelectDisabled"
+                  :location="formData.eventLocationName"
+                  class="event-location-map-field"
+                  @input="onEventLocationMapInput"
+                />
                 <div class="event-online-checkbox">
                   <input
                     type="checkbox"
@@ -256,6 +262,7 @@ import GetCategories from '~/mixins/getCategoriesMixin.js'
 import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 import LocationSelect from '~/components/Select/LocationSelect'
+import EventLocationMap from '~/components/Map/EventLocationMap'
 
 export default {
   mixins: [GetCategories, formValidation],
@@ -270,6 +277,7 @@ export default {
     PageParamsLink,
     OcelotInput,
     LocationSelect,
+    EventLocationMap,
     OsValidationHint,
   },
   props: {
@@ -583,6 +591,11 @@ export default {
     changeEventIsOnline() {
       this.updateFormField('eventIsOnline', this.formData.eventIsOnline)
     },
+    onEventLocationMapInput(location) {
+      this.formData.eventLocationName = location
+      this.touchField('eventLocationName')
+      this.$validateForm()
+    },
     changeEventEnd(event) {
       this.touchField('eventEnd')
       this.updateFormField('eventEnd', event)
@@ -673,6 +686,10 @@ export default {
   }
 
   .event-online-checkbox {
+    margin-top: var(--space-x-small);
+  }
+
+  .event-location-map-field {
     margin-top: var(--space-x-small);
   }
 
