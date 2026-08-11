@@ -177,13 +177,16 @@ COPY webapp/. .
 RUN yarn run build
 RUN mkdir /build && \
     cp -r ./.nuxt ./nuxt.config.js ./config ./constants ./static ./locales ./server-middleware ./utils ./package.json ./yarn.lock ./scripts /build
-# FULL install, deliberately — do NOT add `--production=true` here the way the `build` stage above
-# does. Nuxt 2 does not bundle node_modules into the SSR build; it externalises them and `require`s
-# them at request time. `vue-template-compiler` is one of those (grep the built .nuxt/dist/server/
-# server.js), it arrives only as a transitive dependency of `nuxt` — a devDependency — and it is
-# needed on the code path that renders /groups/:id/:slug. With a production install that route
-# answers 500 while /login and /profile/* still render fine, so the failure looks like a broken page
-# rather than a missing module. Measured: production install → 500, full install → 302, same commit.
+# Production install — which is only safe because `vue-template-compiler` is now a real dependency in
+# webapp/package.json. Nuxt 2 does not bundle node_modules into the SSR build; it externalises them
+# and `require`s them at request time (grep the built .nuxt/dist/server/server.js). That compiler
+# arrived only as a transitive dependency of `nuxt`, a devDependency, so a production install dropped
+# it — and the route that needs it, /groups/:id/:slug, answered 500 while /login and /profile/*
+# rendered fine. The container logs nothing in that case, so it reads as a broken page rather than a
+# missing module. Before adding a `--production` flag anywhere in this file, re-run the check that
+# found it: extract every bare `require("…")` from .nuxt/dist/server/ and diff against node_modules/.
+RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
+    cd /build && yarn install --production=true --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 
 # The test image has TWO consumers with opposite needs, hence two stages off the same build:
 #   • test — the webapp UNIT tests (.github/workflows/test-webapp.yml runs `docker compose exec webapp
