@@ -8,8 +8,19 @@ on:
       - 'release-please-config.json'
       - '.release-please-manifest.json'
 
-# The default GITHUB_TOKEN needs no write scope: release-please uses the it4c-release-bot app token
-# (see below) and publish uses NPM_TOKEN. Least privilege — no write for any job's default token.
+# One run at a time, and never drop one. `cancel-in-progress: false` alone does NOT achieve that:
+# the default `queue: single` holds exactly ONE pending run, and the next arrival cancels it. Three
+# pushes in quick succession would therefore skip the middle one's release outright — no release PR,
+# no publish, and nothing saying so. `queue: max` keeps a real backlog instead (up to 100 runs,
+# processed in order), so every release commit gets its run. The two settings are coupled: pairing
+# `queue: max` with cancelling is a workflow validation error.
+# The group matches the CI workflows here (pull request number, falling back to `github.ref`); this
+# one only triggers on push, so it always resolves to refs/heads/master.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+  queue: max
+
 permissions:
   contents: read
 
@@ -29,14 +40,25 @@ jobs:
       # never run on the release PR. The app token lets them run.
       - name: Generate it4c-release-bot token
         id: app-token
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2.2.2
         with:
           app-id: ${{ vars.RELEASE_APP_ID }}
           private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          # Narrow the minted token to what release-please actually does. Without these inputs "the
+          # token inherits all the installation's permissions" — the workflow-level `permissions:`
+          # block above governs GITHUB_TOKEN only and does not constrain this one, so whatever the
+          # app happens to be installed with would reach every later step in this job.
+          #   contents      — commits, branches, tags and the GitHub release
+          #   pull-requests — the release pull request itself
+          #   issues        — its `autorelease: pending`/`tagged` labels; labelling a pull request
+          #                   goes through the issues API, so it is a separate scope
+          permission-contents: write
+          permission-pull-requests: write
+          permission-issues: write
 
       - name: Release Please
         id: release
-        uses: googleapis/release-please-action@v5
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
         with:
           token: ${{ steps.app-token.outputs.token }}
           config-file: release-please-config.json
@@ -53,12 +75,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: 'packages/branding/.tool-versions'
           registry-url: 'https://registry.npmjs.org'
