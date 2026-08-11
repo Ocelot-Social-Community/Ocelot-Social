@@ -217,22 +217,35 @@ describe('Location Service', () => {
     const result = await query({ query: queryLocations, variables })
     expect(result.data.queryLocations).toEqual(
       expect.arrayContaining([
-        { id: expect.stringMatching(/^place\.[0-9a-z-]+$/), place_name: 'Berlin, Germany' },
+        {
+          id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
+          place_name: 'Berlin, Germany',
+          lat: null,
+          lng: null,
+        },
         {
           id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
           place_name: 'Berlin, Maryland, United States',
+          lat: null,
+          lng: null,
         },
         {
           id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
           place_name: 'Berlin, Connecticut, United States',
+          lat: null,
+          lng: null,
         },
         {
           id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
           place_name: 'Berlin, New Jersey, United States',
+          lat: null,
+          lng: null,
         },
         {
           id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
           place_name: 'Berlin Heights, Ohio, United States',
+          lat: null,
+          lng: null,
         },
       ]),
     )
@@ -245,22 +258,35 @@ describe('Location Service', () => {
     }
     const result = await query({ query: queryLocations, variables })
     expect(result.data.queryLocations).toEqual([
-      { id: expect.stringMatching(/^place\.[0-9a-z-]+$/), place_name: 'Berlin, Deutschland' },
+      {
+        id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
+        place_name: 'Berlin, Deutschland',
+        lat: null,
+        lng: null,
+      },
       {
         id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
         place_name: 'Berlin, Maryland, Vereinigte Staaten',
+        lat: null,
+        lng: null,
       },
       {
         id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
         place_name: 'Berlin, New Jersey, Vereinigte Staaten',
+        lat: null,
+        lng: null,
       },
       {
         id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
         place_name: 'Berlin Heights, Ohio, Vereinigte Staaten',
+        lat: null,
+        lng: null,
       },
       {
         id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
         place_name: 'Berlin, Massachusetts, Vereinigte Staaten',
+        lat: null,
+        lng: null,
       },
     ])
   })
@@ -272,6 +298,45 @@ describe('Location Service', () => {
     }
     const result = await query({ query: queryLocations, variables })
     expect(result.data.queryLocations).toEqual([])
+  })
+
+  it('reverse-geocodes a "lng,lat" search string by trying types one at a time', async () => {
+    fetchSpy.mockImplementation(async (input: RequestInfo | URL) => {
+      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+      const path = decodeURIComponent(url)
+      if (path.includes('9.993,53.551') && path.includes('types=address')) {
+        return Promise.resolve(mockJsonResponse({ features: [] }))
+      }
+      if (path.includes('9.993,53.551') && path.includes('types=poi')) {
+        return Promise.resolve(
+          mockJsonResponse({
+            features: [
+              { id: 'poi.hagenbeck', place_name: 'Tierpark Hagenbeck', center: [9.993, 53.551] },
+            ],
+          }),
+        )
+      }
+      return Promise.resolve(mockJsonResponse({ features: [] }))
+    })
+
+    variables = { place: '9.993,53.551', lang: 'en', types: 'address,poi,place' }
+    const result = await query({ query: queryLocations, variables })
+
+    expect(result.data.queryLocations).toEqual([
+      { id: 'poi.hagenbeck', place_name: 'Tierpark Hagenbeck', lat: 53.551, lng: 9.993 },
+    ])
+    const calledUrls = fetchSpy.mock.calls.map(([input]) => input as string)
+    expect(calledUrls[0]).toContain('types=address')
+    expect(calledUrls[0]).toContain('limit=1')
+    expect(calledUrls[1]).toContain('types=poi')
+  })
+
+  it('returns an empty array when reverse geocoding finds no match for any type', async () => {
+    variables = { place: '0.0,0.0', lang: 'en', types: 'address,poi' }
+    const result = await query({ query: queryLocations, variables })
+
+    expect(result.data.queryLocations).toEqual([])
+    expect(fetchSpy).toHaveBeenCalledTimes(2)
   })
 
   it('query Location without a place name given', async () => {

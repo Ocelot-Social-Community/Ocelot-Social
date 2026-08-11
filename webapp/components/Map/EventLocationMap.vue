@@ -37,6 +37,12 @@ const REVERSE_GEOCODE_TYPES = 'address,poi,place'
 const FORWARD_GEOCODE_TYPES =
   'country,region,postcode,district,place,locality,neighborhood,address,poi'
 
+// Fallback label when reverse-geocoding finds no address for a clicked/dragged
+// point — shows the raw coordinates instead of leaving the field empty/null.
+function formatCoordinates(lat, lng) {
+  return `${lat.toFixed(5)}, ${lng.toFixed(5)}`
+}
+
 export default {
   name: 'EventLocationMap',
   components: { OsLocationMap, Empty },
@@ -115,18 +121,14 @@ export default {
           fetchPolicy: 'network-only',
         })
         const match = results && results[0]
-        this.$emit(
-          'input',
-          match
-            ? {
-                label: match.place_name,
-                value: match.place_name,
-                id: match.id,
-                lat: match.lat ?? lat,
-                lng: match.lng ?? lng,
-              }
-            : { label: null, value: null, id: null, lat, lng },
-        )
+        const label = match ? match.place_name : formatCoordinates(lat, lng)
+        this.$emit('input', {
+          label,
+          value: label,
+          id: match ? match.id : null,
+          lat: match ? (match.lat ?? lat) : lat,
+          lng: match ? (match.lng ?? lng) : lng,
+        })
       } catch (error) {
         this.$toast.error(error.message)
       }
