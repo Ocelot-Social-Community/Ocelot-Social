@@ -481,6 +481,16 @@
           map.addControl(buildStyleSwitcher(), 'top-right')
         }
 
+        // A <button> with no explicit `type` defaults to type="submit". Inside
+        // a host app's <form> (e.g. an event's create/edit form), clicking
+        // mapbox-gl's own built-in controls — the attribution "i" toggle in
+        // particular — would otherwise submit that form. All of this
+        // component's own buttons already set type="button" explicitly.
+        map
+          .getContainer()
+          .querySelectorAll('button:not([type])')
+          .forEach((button) => button.setAttribute('type', 'button'))
+
         map.on('click', onMapClick)
         updateMarker()
 

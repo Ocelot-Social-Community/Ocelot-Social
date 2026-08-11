@@ -14,8 +14,12 @@ function createMockMapboxGl() {
   // addControl(), which is what actually creates/mounts its DOM (e.g. the
   // pick-location toggle). Replicate that here so tests can find it.
   const controlContainers: HTMLElement[] = []
+  // A stable container (mapbox-gl-js reuses the same element across calls)
+  // so tests can pre-populate it, e.g. to simulate mapbox-gl's own
+  // untyped-button controls (like the attribution "i" toggle).
+  const mapContainer = document.createElement('div')
   const mapInstance = {
-    addControl: vi.fn((control?: MapboxControl) => {
+    addControl: vi.fn((control?: MapboxControl, _position?: string) => {
       if (typeof control?.onAdd === 'function') {
         controlContainers.push(control.onAdd())
       }
@@ -26,7 +30,7 @@ function createMockMapboxGl() {
     flyTo: vi.fn(),
     setStyle: vi.fn(),
     remove: vi.fn(),
-    getContainer: vi.fn(() => document.createElement('div')),
+    getContainer: vi.fn(() => mapContainer),
     getCanvas: vi.fn(() => ({ style: {} }) as HTMLCanvasElement),
   }
 
@@ -238,6 +242,17 @@ describe('osLocationMap', () => {
 
     ctx.mapHandlers.click({ lngLat: { lat: 1, lng: 2 } })
     expect(wrapper.emitted('pin-change')).toBeUndefined()
+  })
+
+  it('sets type="button" on mapbox-gl\'s own untyped buttons, so they cannot submit a host form', () => {
+    const untypedButton = document.createElement('button')
+    ctx.mapInstance.getContainer().appendChild(untypedButton)
+
+    mount(OsLocationMap, {
+      props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token' },
+    })
+
+    expect(untypedButton.getAttribute('type')).toBe('button')
   })
 
   it('does not add the pick-location tool when not editable', () => {
