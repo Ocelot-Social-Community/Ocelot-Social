@@ -39,3 +39,22 @@ jobs:
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Satisfies "Require a pull request before merging → at least 1 approving review". Putting a
+      # ruleset bypass on Dependabot did NOT cover this: auto-merge is armed by github-actions[bot],
+      # and a classic branch protection rule is evaluated on top of any ruleset regardless. The
+      # approval here comes from github-actions[bot], a different actor than the pull request's
+      # author, which is what makes it count — GitHub rejects self-approval.
+      #
+      # Be honest about what this is: it turns a human gate into a formality, so the review of every
+      # dependency bump now rests entirely on the required status checks. Delete this step the moment
+      # the bypass works on its own — it is a workaround, not the design.
+      #
+      # Runs on every `synchronize` too, not just `opened`, so that an approval dismissed by
+      # "Dismiss stale pull request approvals when new commits are pushed" is re-issued after
+      # Dependabot force-pushes a rebase.
+      - name: Approve
+        run: gh pr review --approve "${PR_URL}"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
