@@ -294,17 +294,22 @@
             })
             document.body.appendChild(popoverEl)
 
+            // Listens on the whole document (not just the map) since the
+            // popover itself now lives outside the map's DOM subtree — a
+            // click anywhere else on the page should close it. Clicks on the
+            // toggle/option buttons never reach this handler; they call
+            // stopPropagation() in their own listeners above.
             outsideHandler = () => {
               popoverEl.classList.remove('os-location-map-style-popover--open')
               toggle.setAttribute('aria-expanded', 'false')
             }
-            map.getContainer().addEventListener('click', outsideHandler)
+            document.addEventListener('click', outsideHandler)
 
             return container
           },
           onRemove: () => {
-            if (outsideHandler && map) {
-              map.getContainer().removeEventListener('click', outsideHandler)
+            if (outsideHandler) {
+              document.removeEventListener('click', outsideHandler)
               outsideHandler = null
             }
             popoverEl?.remove()
