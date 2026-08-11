@@ -1,0 +1,41 @@
+name: Dependabot auto-merge
+
+# `pull_request`, NOT `pull_request_target`. The distinction matters for a workflow that reacts to
+# bot-authored pull requests: `pull_request_target` runs in the context of the base branch with full
+# secret access, which is what makes it dangerous, and it buys nothing here — this job checks out no
+# code and reads no secret beyond GITHUB_TOKEN. A Dependabot-triggered run gets a READ-ONLY
+# GITHUB_TOKEN by default; the `permissions:` block below raises it, which is exactly the mechanism
+# GitHub's own auto-merge example uses. Note that regular Actions secrets are NOT available in these
+# runs (they live in Dependabot secrets instead) — another reason to need none.
+on: pull_request
+
+# contents: write performs the merge, pull-requests: write flags the pull request for it. Nothing
+# else is granted; the workflow-level block replaces whatever the repository default is.
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    name: Enable auto-merge
+    # `pull_request.user.login`, not `github.actor`: the actor changes when a human re-runs the
+    # workflow, the author of the pull request does not. Without this guard the job would arm
+    # auto-merge on every contributor's pull request.
+    if: ${{ github.event.pull_request.user.login == 'dependabot[bot]' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      # `--auto` does NOT merge now — it marks the pull request, and GitHub merges it by itself once
+      # every REQUIRED status check has passed. Two consequences worth spelling out:
+      #
+      #   • The branch protection rule is the actual gate, not this file. With no required checks
+      #     configured on master, `--auto` merges the pull request IMMEDIATELY, unreviewed and
+      #     untested. Whoever removes the last required check removes the review of every dependency
+      #     bump along with it.
+      #   • `--squash` matches how these have been landing so far (see the `build(deps): bump …(#…)`
+      #     commits on master), which keeps the conventional-commit prefix that release-please reads.
+      - name: Enable auto-merge
+        run: gh pr merge --auto --squash "${PR_URL}"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
