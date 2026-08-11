@@ -248,6 +248,30 @@ describe('osLocationMap', () => {
     expect(findControlWithOnAdd()).toBeUndefined()
   })
 
+  it('places the pick-location tool top-left when search is hidden, top-right otherwise', () => {
+    mount(OsLocationMap, {
+      props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', editable: true },
+    })
+    const withoutSearchCall = ctx.mapInstance.addControl.mock.calls.find(
+      ([control]) => typeof control?.onAdd === 'function',
+    )
+    expect(withoutSearchCall?.[1]).toBe('top-left')
+
+    ctx = createMockMapboxGl()
+    mount(OsLocationMap, {
+      props: {
+        mapboxGl: ctx.mapboxGl,
+        accessToken: 'test-token',
+        editable: true,
+        showSearch: true,
+      },
+    })
+    const withSearchCall = ctx.mapInstance.addControl.mock.calls.find(
+      ([control]) => typeof control?.onAdd === 'function',
+    )
+    expect(withSearchCall?.[1]).toBe('top-right')
+  })
+
   it('does not emit pin-change on map click when not editable', () => {
     const wrapper = mount(OsLocationMap, {
       props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', editable: false },
@@ -343,6 +367,79 @@ describe('osLocationMap', () => {
       const searchInputEvents = wrapper.emitted('search-input') ?? []
 
       expect(searchInputEvents[searchInputEvents.length - 1]).toEqual([''])
+    })
+
+    describe('searchCollapsible', () => {
+      it('starts as an icon-only toggle instead of the full input', () => {
+        const wrapper = mount(OsLocationMap, {
+          props: {
+            mapboxGl: ctx.mapboxGl,
+            accessToken: 'test-token',
+            showSearch: true,
+            searchCollapsible: true,
+          },
+        })
+
+        expect(wrapper.find('.os-location-map__search-toggle').exists()).toBe(true)
+        expect(wrapper.find('.os-location-map__search-input').exists()).toBe(false)
+      })
+
+      it('expands to the full input when the toggle is clicked', async () => {
+        const wrapper = mount(OsLocationMap, {
+          props: {
+            mapboxGl: ctx.mapboxGl,
+            accessToken: 'test-token',
+            showSearch: true,
+            searchCollapsible: true,
+          },
+        })
+
+        await wrapper.find('.os-location-map__search-toggle').trigger('click')
+
+        expect(wrapper.find('.os-location-map__search-toggle').exists()).toBe(false)
+        expect(wrapper.find('.os-location-map__search-input').exists()).toBe(true)
+      })
+
+      it('collapses again on blur once the input is empty', async () => {
+        vi.useFakeTimers()
+        const wrapper = mount(OsLocationMap, {
+          props: {
+            mapboxGl: ctx.mapboxGl,
+            accessToken: 'test-token',
+            showSearch: true,
+            searchCollapsible: true,
+          },
+        })
+
+        await wrapper.find('.os-location-map__search-toggle').trigger('click')
+        await wrapper.find('.os-location-map__search-input').trigger('blur')
+        vi.advanceTimersByTime(150)
+        await wrapper.vm.$nextTick()
+
+        expect(wrapper.find('.os-location-map__search-toggle').exists()).toBe(true)
+        vi.useRealTimers()
+      })
+
+      it('stays expanded on blur while the input still has text', async () => {
+        vi.useFakeTimers()
+        const wrapper = mount(OsLocationMap, {
+          props: {
+            mapboxGl: ctx.mapboxGl,
+            accessToken: 'test-token',
+            showSearch: true,
+            searchCollapsible: true,
+          },
+        })
+
+        await wrapper.find('.os-location-map__search-toggle').trigger('click')
+        await wrapper.find('.os-location-map__search-input').setValue('Berlin')
+        await wrapper.find('.os-location-map__search-input').trigger('blur')
+        vi.advanceTimersByTime(150)
+        await wrapper.vm.$nextTick()
+
+        expect(wrapper.find('.os-location-map__search-input').exists()).toBe(true)
+        vi.useRealTimers()
+      })
     })
   })
 })

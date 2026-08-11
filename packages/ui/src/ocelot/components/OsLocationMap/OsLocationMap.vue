@@ -5,6 +5,7 @@
     getCurrentInstance,
     h,
     isVue2,
+    nextTick,
     onBeforeUnmount,
     onMounted,
     ref,
@@ -158,6 +159,15 @@
         type: Number,
         default: 400,
       },
+      /**
+       * Starts the search as a collapsed icon-only button (like the main
+       * map page's mobile search) that expands to the full input on click,
+       * and collapses again once it loses focus while empty.
+       */
+      searchCollapsible: {
+        type: Boolean,
+        default: false,
+      },
     },
     emits: ['pin-change', 'search-input', 'search-select'],
     setup(props, { emit, attrs }) {
@@ -184,8 +194,27 @@
       }
 
       const containerRef = ref<HTMLElement | null>(null)
+      const searchInputRef = ref<HTMLInputElement | null>(null)
       const searchQuery = ref('')
       const showResults = ref(false)
+      const searchExpanded = ref(!props.searchCollapsible)
+
+      function expandSearch() {
+        searchExpanded.value = true
+        void nextTick(() => searchInputRef.value?.focus())
+      }
+
+      function onSearchInputBlur() {
+        if (!props.searchCollapsible) return
+        // Delayed so a click on a result/clear button (which blurs the
+        // input first) still gets to run before the search collapses away.
+        setTimeout(() => {
+          if (!searchQuery.value) {
+            searchExpanded.value = false
+            showResults.value = false
+          }
+        }, 150)
+      }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let map: any = null
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -441,7 +470,9 @@
         map.addControl(new props.mapboxGl.ScaleControl(), 'bottom-left')
 
         if (props.editable) {
-          map.addControl(buildLocationPicker(), 'top-right')
+          // Takes over the search's usual top-left spot when there's no
+          // search box to collide with — it's the primary control then.
+          map.addControl(buildLocationPicker(), props.showSearch ? 'top-right' : 'top-left')
           document.addEventListener('keydown', onDocumentKeydown)
           setPicking(!hasPin.value)
         }
@@ -524,7 +555,28 @@
           }),
         ]
 
-        if (props.showSearch) {
+        if (props.showSearch && props.searchCollapsible && !searchExpanded.value) {
+          children.unshift(
+            h('button', {
+              type: 'button',
+              class: 'os-location-map__search-toggle',
+              'aria-label': props.searchAriaLabel,
+              // Set imperatively via the DOM ref (rather than Vue's innerHTML
+              // prop passthrough) since that isn't handled identically by
+              // Vue 2's and Vue 3's h() — this is guaranteed version-safe.
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              ref: (el: any) => {
+                if (!el) return
+                el.innerHTML =
+                  '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" ' +
+                  'stroke-width="2" stroke-linecap="round" aria-hidden="true">' +
+                  '<circle cx="10" cy="10" r="7"/><line x1="20.5" y1="20.5" x2="15.5" y2="15.5"/>' +
+                  '</svg>'
+              },
+              ...eventProps({ click: () => expandSearch() }),
+            }),
+          )
+        } else if (props.showSearch) {
           const resultItems =
             showResults.value && props.searchResults.length
               ? [
@@ -571,11 +623,16 @@
                 placeholder: props.searchPlaceholder,
                 'aria-label': props.searchAriaLabel,
                 value: searchQuery.value,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                ref: (el: any) => {
+                  searchInputRef.value = el
+                },
                 ...eventProps({
                   input: onSearchInput as (...args: unknown[]) => void,
                   focus: () => {
                     if (props.searchResults.length) showResults.value = true
                   },
+                  blur: onSearchInputBlur,
                 }),
               }),
               clearButton,
@@ -645,6 +702,29 @@
     background: white;
     border-radius: 4px;
     box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .os-location-map__search-toggle {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 29px;
+    height: 29px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: white;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    color: #333;
+  }
+
+  .os-location-map__search-toggle:hover {
+    background: rgba(0, 0, 0, 0.05);
   }
 
   .os-location-map__search-input {

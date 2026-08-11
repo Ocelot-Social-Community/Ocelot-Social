@@ -10,16 +10,9 @@
         :initial-zoom="4"
         editable
         :pick-location-label="$t('post.viewEvent.pickLocationOnMap')"
-        show-search
-        :search-placeholder="$t('post.viewEvent.eventLocationName')"
-        :search-aria-label="$t('post.viewEvent.eventLocationName')"
-        :search-clear-label="$t('actions.clear')"
-        :search-results="searchResults"
         :styles="styles"
         :style-switcher-label="$t('map.styles.title')"
         @pin-change="onPinChange"
-        @search-input="onSearchInput"
-        @search-select="onSearchSelect"
       />
     </client-only>
     <empty v-else icon="alert" :message="$t('map.alertMessage')" margin="small" />
@@ -33,10 +26,7 @@ import { OsLocationMap } from '@ocelot-social/ui/ocelot'
 import Empty from '~/components/Empty/Empty'
 import { queryLocations } from '~/graphql/location'
 
-const SEARCH_MIN_LENGTH = 3
 const REVERSE_GEOCODE_TYPES = 'address,poi,place'
-const FORWARD_GEOCODE_TYPES =
-  'country,region,postcode,district,place,locality,neighborhood,address,poi'
 
 // Fallback label when reverse-geocoding finds no address for a clicked/dragged
 // point — shows the raw coordinates instead of leaving the field empty/null.
@@ -60,8 +50,6 @@ export default {
       isEmpty,
       mapboxgl,
       defaultCenter: [10.452764, 51.165707], // center of Germany
-      searchResults: [],
-      searchRequestId: 0,
     }
   },
   computed: {
@@ -133,46 +121,6 @@ export default {
       } catch (error) {
         this.$toast.error(error.message)
       }
-    },
-    async onSearchInput(text) {
-      const requestId = ++this.searchRequestId
-      if (!text || text.trim().length < SEARCH_MIN_LENGTH) {
-        this.searchResults = []
-        return
-      }
-      try {
-        const {
-          data: { queryLocations: results },
-        } = await this.$apollo.query({
-          query: queryLocations(),
-          variables: {
-            place: text,
-            lang: this.$i18n.locale(),
-            types: FORWARD_GEOCODE_TYPES,
-          },
-          fetchPolicy: 'network-only',
-        })
-        if (requestId !== this.searchRequestId) return
-        this.searchResults = (results || [])
-          .filter((result) => result.lat != null && result.lng != null)
-          .map((result) => ({
-            id: result.id,
-            label: result.place_name,
-            lat: result.lat,
-            lng: result.lng,
-          }))
-      } catch (error) {
-        if (requestId === this.searchRequestId) this.$toast.error(error.message)
-      }
-    },
-    onSearchSelect(result) {
-      this.$emit('input', {
-        label: result.label,
-        value: result.label,
-        id: result.id,
-        lat: result.lat,
-        lng: result.lng,
-      })
     },
   },
 }
