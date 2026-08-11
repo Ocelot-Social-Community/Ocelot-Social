@@ -8,6 +8,7 @@
         :lng="lng"
         :initial-center="defaultCenter"
         :initial-zoom="4"
+        :map-style="defaultStyleUrl"
         editable
         :pick-location-label="$t('post.viewEvent.pickLocationOnMap')"
         :styles="styles"
@@ -27,6 +28,12 @@ import Empty from '~/components/Empty/Empty'
 import { queryLocations } from '~/graphql/location'
 
 const REVERSE_GEOCODE_TYPES = 'address,poi,place'
+
+// Must exactly match the "outdoors" entry's URL in the `styles` computed
+// below — the style-switcher marks a style "active" by string-comparing
+// this value against each entry's url, so a mismatch (e.g. a missing/extra
+// query param) leaves none of them highlighted until the user clicks one.
+const OUTDOORS_STYLE_URL = 'mapbox://styles/mapbox/outdoors-v12?optimize=true'
 
 // Fallback label when reverse-geocoding finds no address for a clicked/dragged
 // point — shows the raw coordinates instead of leaving the field empty/null.
@@ -67,11 +74,14 @@ export default {
         typeof this.location.lng === 'number'
       )
     },
+    defaultStyleUrl() {
+      return OUTDOORS_STYLE_URL
+    },
     styles() {
       return [
         {
           id: 'outdoors',
-          url: 'mapbox://styles/mapbox/outdoors-v12?optimize=true',
+          url: OUTDOORS_STYLE_URL,
           label: this.$t('map.styles.outdoors'),
         },
         {
