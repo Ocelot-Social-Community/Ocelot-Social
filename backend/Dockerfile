@@ -131,10 +131,21 @@ ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
 # are no-ops — and `backend-build` would then reach the brand repos WITHOUT them. The brand's
 # middlewares, seed data and archive would silently not be copied and the build would still go green.
 # Hence: `build` keeps the untouched trigger chain for downstream, `test` gets its own lean path.
-FROM base AS test
+#
+# The install therefore needs its own toolchain-bearing stage: `re2` ships no prebuilt binary for this
+# runtime (node 25 / musl / ABI 141), so yarn falls through to `node-gyp rebuild` and dies with
+# "Could not find any Python installation to use" on a plain `base`. Installing INTO the test image
+# (`FROM base-build`) would fix that too, but this image is `docker save`d and handed to the e2e matrix
+# as an artifact — python3 + gcc + linux-headers are 324 MB that every one of those jobs would then
+# download. So compile here, ship only node_modules.
+FROM base-build AS test-modules
 COPY backend/package.json backend/yarn.lock ./
 RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
+
+FROM base AS test
+# Before the sources, so a src/ change does not invalidate the dependency layer.
+COPY --from=test-modules /app/node_modules ./node_modules
 COPY backend/ .
 CMD ["/bin/bash", "-c", "yarn run dev"]
 
