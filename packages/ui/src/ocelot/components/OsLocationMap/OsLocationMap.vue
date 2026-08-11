@@ -29,6 +29,25 @@
     label: string
   }
 
+  // The native `crosshair` cursor renders quite small in most browsers. A
+  // custom cursor image (white outline + black fill, so it stays visible
+  // over both light and dark map styles) is easier to spot while the
+  // pick-location tool is armed. Hotspot is the exact center (16, 16).
+  const PICKER_CURSOR_SVG =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">' +
+    '<g fill="none" stroke="white" stroke-width="4" stroke-linecap="round">' +
+    '<line x1="16" y1="2" x2="16" y2="12"/><line x1="16" y1="20" x2="16" y2="30"/>' +
+    '<line x1="2" y1="16" x2="12" y2="16"/><line x1="20" y1="16" x2="30" y2="16"/>' +
+    '<circle cx="16" cy="16" r="7"/>' +
+    '</g>' +
+    '<g fill="none" stroke="black" stroke-width="2" stroke-linecap="round">' +
+    '<line x1="16" y1="2" x2="16" y2="12"/><line x1="16" y1="20" x2="16" y2="30"/>' +
+    '<line x1="2" y1="16" x2="12" y2="16"/><line x1="20" y1="16" x2="30" y2="16"/>' +
+    '<circle cx="16" cy="16" r="7"/>' +
+    '</g>' +
+    '</svg>'
+  const PICKER_CURSOR = `url("data:image/svg+xml,${encodeURIComponent(PICKER_CURSOR_SVG)}") 16 16, crosshair`
+
   /**
    * Interactive map preview with a single, optionally movable pin.
    *
@@ -229,7 +248,7 @@
 
       function setPicking(value: boolean) {
         isPicking = value
-        if (map) map.getCanvas().style.cursor = value ? 'crosshair' : ''
+        if (map) map.getCanvas().style.cursor = value ? PICKER_CURSOR : ''
         if (pickerToggleEl) {
           pickerToggleEl.classList.toggle('os-location-map-picker-toggle--active', value)
           pickerToggleEl.setAttribute('aria-pressed', String(value))
