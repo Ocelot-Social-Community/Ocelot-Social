@@ -21,6 +21,17 @@ cd "${1:-.}"
 
 [ -d node_modules ] || exit 0
 
+# Assert the toolchain up front. Without this, a missing binutils would make the `readelf` probe below
+# fail for EVERY addon, each one would be classified as "not an ELF object" and skipped, and the
+# script would report success having stripped nothing — the exact silent pass this script must not
+# have. Both binaries come from binutils, which `base-build` gets via g++.
+for tool in strip readelf du; do
+  command -v "$tool" >/dev/null || {
+    echo "prune-native: required tool '$tool' not found" >&2
+    exit 1
+  }
+done
+
 before=$(du -sk node_modules | cut -f1)
 
 # Object files and the vendored sources. `-prune` so find does not descend into what it is removing.
