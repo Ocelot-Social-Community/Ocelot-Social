@@ -221,8 +221,24 @@
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       function buildStyleSwitcher(): any {
+        // The popover is appended to <body> (not the control tree) and uses
+        // position:fixed, computed from the toggle's own rect. The map
+        // container intentionally clips its own content (tiles, markers,
+        // controls) via mapbox-gl's own overflow:hidden — a dropdown that
+        // needs to visually escape those bounds can't live inside it, and
+        // mapbox-gl.css's `.mapboxgl-ctrl { transform: translate(0) }` would
+        // otherwise turn an ancestor into a new containing block, trapping
+        // position:fixed right back inside the clipped area anyway.
         let popoverEl: HTMLElement
         let outsideHandler: (() => void) | null = null
+
+        function positionPopover(toggle: HTMLElement) {
+          const rect = toggle.getBoundingClientRect()
+          popoverEl.style.top = `${rect.top}px`
+          popoverEl.style.left = `${rect.left - 6}px`
+          popoverEl.style.transform = 'translateX(-100%)'
+        }
+
         return {
           onAdd: () => {
             const container = document.createElement('div')
@@ -242,6 +258,7 @@
               e.stopPropagation()
               const isOpen = popoverEl.classList.toggle('os-location-map-style-popover--open')
               toggle.setAttribute('aria-expanded', String(isOpen))
+              if (isOpen) positionPopover(toggle)
             })
             container.appendChild(toggle)
 
@@ -275,7 +292,7 @@
               })
               popoverEl.appendChild(btn)
             })
-            container.appendChild(popoverEl)
+            document.body.appendChild(popoverEl)
 
             outsideHandler = () => {
               popoverEl.classList.remove('os-location-map-style-popover--open')
@@ -290,6 +307,7 @@
               map.getContainer().removeEventListener('click', outsideHandler)
               outsideHandler = null
             }
+            popoverEl?.remove()
           },
         }
       }
@@ -339,6 +357,12 @@
         if (typeof ResizeObserver !== 'undefined') {
           resizeObserver = new ResizeObserver(() => {
             map?.resize()
+            // The marker's screen position is computed once, from the
+            // transform in effect at the time it was placed. A later
+            // resize() doesn't reliably re-trigger that projection, so
+            // force it explicitly — otherwise the pin can stay stuck at a
+            // position computed from a stale (e.g. 0-height) container size.
+            updateMarker()
           })
           resizeObserver.observe(containerRef.value)
         }
@@ -488,13 +512,16 @@
     min-height: 200px;
     background: #e5e5e5;
     border-radius: 4px;
-    overflow: hidden;
+    /* No overflow:hidden here — it would clip overlaid UI that intentionally
+       extends past the map bounds, e.g. the style-switcher popover below. */
   }
 
-  /* Higher specificity than mapbox-gl's own `.mapboxgl-map { position: relative }`
+  /* Higher specificity than mapbox-gl's own `.mapboxgl-map { position: relative; ... }`
      rule — mapbox-gl adds that class to this exact element, and at equal
      specificity it can win the cascade depending on stylesheet load order,
-     breaking the `inset: 0` fill-parent sizing below. */
+     breaking the `inset: 0` fill-parent sizing below. mapbox-gl's own
+     `overflow: hidden` is intentionally left standing here — it's what
+     clips tiles/markers to the map bounds when panning, same as any map. */
   .os-location-map .os-location-map__container {
     position: absolute;
     inset: 0;
@@ -586,15 +613,14 @@
 
   .os-location-map-style-popover {
     display: none;
-    position: absolute;
-    top: 0;
-    right: 100%;
-    margin-right: 6px;
+    /* top/left/transform are set inline in JS from the toggle's own rect. */
+    position: fixed;
     background: white;
     border-radius: 4px;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
     white-space: nowrap;
     overflow: hidden;
+    z-index: 10000;
   }
 
   .os-location-map-style-popover--open {
