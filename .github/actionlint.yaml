@@ -1,0 +1,11 @@
+# actionlint configuration
+# https://github.com/rhysd/actionlint/blob/main/docs/config.md
+
+# `concurrency.queue` is a real GitHub Actions key, but actionlint's workflow schema (as of v1.7.12)
+# still rejects it as unknown. The release workflows rely on `queue: max` so that no release run is
+# ever dropped from the backlog, so the finding is a false positive and is suppressed here rather
+# than fixed in the workflows. Drop this block once actionlint knows the key.
+paths:
+  .github/workflows/**/*.yml:
+    ignore:
+      - 'unexpected key "queue" for "concurrency" section'
