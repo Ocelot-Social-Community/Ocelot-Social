@@ -1255,6 +1255,7 @@
       "eventStartInPast": "A data de início está no passado.",
       "eventStartNotEmpty": "Por favor, insira uma data de início.",
       "eventVenue": "Descrição do local — ex.: quintal, 1º andar, …",
+      "pickLocationOnMap": "Escolher localização no mapa",
       "title": "Evento"
     },
     "viewPost": {

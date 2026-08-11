@@ -3,6 +3,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import OsLocationMap from './OsLocationMap.vue'
 
+interface MapboxControl {
+  onAdd: () => HTMLElement
+  onRemove?: () => void
+}
+
 function createMockMapboxGl() {
   const mapHandlers: Record<string, (...args: unknown[]) => void> = {}
   const mapInstance = {
@@ -14,6 +19,7 @@ function createMockMapboxGl() {
     setStyle: vi.fn(),
     remove: vi.fn(),
     getContainer: vi.fn(() => document.createElement('div')),
+    getCanvas: vi.fn(() => ({ style: {} }) as HTMLCanvasElement),
   }
 
   const markerHandlers: Record<string, (...args: unknown[]) => void> = {}
@@ -134,14 +140,67 @@ describe('osLocationMap', () => {
     expect(ctx.markerInstance.remove).toHaveBeenCalledTimes(1)
   })
 
-  it('emits pin-change on map click only when editable', () => {
+  function findControlWithOnAdd() {
+    return ctx.mapInstance.addControl.mock.calls
+      .map(([control]) => control as MapboxControl | undefined)
+      .find((control) => typeof control?.onAdd === 'function')
+  }
+
+  function getPickerToggle() {
+    const pickerControl = findControlWithOnAdd()
+    if (!pickerControl) throw new Error('pick-location control was not added to the map')
+    const container = pickerControl.onAdd()
+    return container.querySelector('.os-location-map-picker-toggle') as HTMLButtonElement
+  }
+
+  it('ignores a bare map click until the pick-location tool is armed', () => {
     const wrapper = mount(OsLocationMap, {
       props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', editable: true },
     })
 
     ctx.mapHandlers.click({ lngLat: { lat: 1, lng: 2 } })
 
+    expect(wrapper.emitted('pin-change')).toBeUndefined()
+  })
+
+  it('emits pin-change on the next map click once armed, then disarms itself', () => {
+    const wrapper = mount(OsLocationMap, {
+      props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', editable: true },
+    })
+
+    const toggle = getPickerToggle()
+    toggle.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    expect(toggle.classList.contains('os-location-map-picker-toggle--active')).toBe(true)
+
+    ctx.mapHandlers.click({ lngLat: { lat: 1, lng: 2 } })
     expect(wrapper.emitted('pin-change')).toEqual([[{ lat: 1, lng: 2 }]])
+    expect(toggle.classList.contains('os-location-map-picker-toggle--active')).toBe(false)
+
+    // Disarmed again — a further click doesn't emit anything else.
+    ctx.mapHandlers.click({ lngLat: { lat: 3, lng: 4 } })
+    expect(wrapper.emitted('pin-change')).toEqual([[{ lat: 1, lng: 2 }]])
+  })
+
+  it('disarms the pick-location tool on a second toggle click without setting the pin', () => {
+    const wrapper = mount(OsLocationMap, {
+      props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', editable: true },
+    })
+
+    const toggle = getPickerToggle()
+    toggle.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    toggle.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    expect(toggle.classList.contains('os-location-map-picker-toggle--active')).toBe(false)
+
+    ctx.mapHandlers.click({ lngLat: { lat: 1, lng: 2 } })
+    expect(wrapper.emitted('pin-change')).toBeUndefined()
+  })
+
+  it('does not add the pick-location tool when not editable', () => {
+    mount(OsLocationMap, {
+      props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', editable: false },
+    })
+
+    expect(findControlWithOnAdd()).toBeUndefined()
   })
 
   it('does not emit pin-change on map click when not editable', () => {

@@ -1255,6 +1255,7 @@
       "eventStartInPast": "Data e fillimit është në të kaluarën.",
       "eventStartNotEmpty": "Ju lutem shkruani një datë fillimi.",
       "eventVenue": "Përshkrimi i vendndodhjes — p.sh. oborri, kati 1, …",
+      "pickLocationOnMap": "Zgjidh vendndodhjen në hartë",
       "title": "Ngjarje"
     },
     "viewPost": {

@@ -97,10 +97,15 @@
         type: String,
         default: 'Map style',
       },
-      /** Enables click/drag on the map to set the pin. */
+      /** Enables the pick-location tool and dragging the pin to move it. */
       editable: {
         type: Boolean,
         default: false,
+      },
+      /** Accessible label for the pick-location-on-map toggle (i18n via prop). */
+      pickLocationLabel: {
+        type: String,
+        default: 'Pick location on map',
       },
       /** Shows the built-in (controlled) search input. */
       showSearch: {
@@ -213,10 +218,69 @@
         },
       )
 
+      // A plain map click never sets the pin on its own — the pan cursor and
+      // the "click to place" cursor look identical, so a bare click-to-place
+      // is easy to trigger by accident while just looking around the map.
+      // The pick-location tool below must be explicitly armed first; it
+      // disarms itself again after the next click (or a second toggle click,
+      // or Escape) so the map goes back to plain panning.
+      let isPicking = false
+      let pickerToggleEl: HTMLButtonElement | null = null
+
+      function setPicking(value: boolean) {
+        isPicking = value
+        if (map) map.getCanvas().style.cursor = value ? 'crosshair' : ''
+        if (pickerToggleEl) {
+          pickerToggleEl.classList.toggle('os-location-map-picker-toggle--active', value)
+          pickerToggleEl.setAttribute('aria-pressed', String(value))
+        }
+      }
+
+      function onDocumentKeydown(e: KeyboardEvent) {
+        if (e.key === 'Escape' && isPicking) setPicking(false)
+      }
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       function onMapClick(e: any) {
-        if (!props.editable) return
+        if (!props.editable || !isPicking) return
         emit('pin-change', { lat: e.lngLat.lat, lng: e.lngLat.lng })
+        setPicking(false)
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      function buildLocationPicker(): any {
+        return {
+          onAdd: () => {
+            const container = document.createElement('div')
+            container.className = 'mapboxgl-ctrl os-location-map-picker'
+
+            const toggle = document.createElement('button')
+            toggle.type = 'button'
+            toggle.className = 'os-location-map-picker-toggle'
+            toggle.title = props.pickLocationLabel
+            toggle.setAttribute('aria-label', props.pickLocationLabel)
+            toggle.setAttribute('aria-pressed', 'false')
+            toggle.innerHTML =
+              '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" ' +
+              'stroke-width="2" stroke-linecap="round" aria-hidden="true">' +
+              '<circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/>' +
+              '<line x1="12" y1="1.5" x2="12" y2="4.5"/><line x1="12" y1="19.5" x2="12" y2="22.5"/>' +
+              '<line x1="1.5" y1="12" x2="4.5" y2="12"/><line x1="19.5" y1="12" x2="22.5" y2="12"/>' +
+              '</svg>'
+            toggle.addEventListener('click', (e) => {
+              e.stopPropagation()
+              setPicking(!isPicking)
+            })
+            pickerToggleEl = toggle
+            container.appendChild(toggle)
+
+            return container
+          },
+          onRemove: () => {
+            setPicking(false)
+            pickerToggleEl = null
+          },
+        }
       }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -346,6 +410,11 @@
         )
         map.addControl(new props.mapboxGl.ScaleControl(), 'bottom-left')
 
+        if (props.editable) {
+          map.addControl(buildLocationPicker(), 'top-right')
+          document.addEventListener('keydown', onDocumentKeydown)
+        }
+
         if (props.styles.length > 1) {
           map.addControl(buildStyleSwitcher(), 'top-right')
         }
@@ -379,6 +448,9 @@
         if (resizeObserver) {
           resizeObserver.disconnect()
           resizeObserver = null
+        }
+        if (props.editable) {
+          document.removeEventListener('keydown', onDocumentKeydown)
         }
         if (map) {
           map.remove()
@@ -590,6 +662,34 @@
 
   .os-location-map__search-result:hover {
     background: rgba(0, 0, 0, 0.05);
+  }
+
+  .os-location-map-picker {
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .os-location-map-picker-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 29px;
+    height: 29px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #333;
+  }
+
+  .os-location-map-picker-toggle:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .os-location-map-picker-toggle--active {
+    background: rgba(0, 0, 0, 0.1);
+    color: #1a73e8;
   }
 
   .os-location-map-style-switcher {

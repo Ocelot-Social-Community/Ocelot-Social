@@ -9,6 +9,7 @@
         :initial-center="defaultCenter"
         :initial-zoom="4"
         editable
+        :pick-location-label="$t('post.viewEvent.pickLocationOnMap')"
         show-search
         :search-placeholder="$t('post.viewEvent.eventLocationName')"
         :search-aria-label="$t('post.viewEvent.eventLocationName')"
