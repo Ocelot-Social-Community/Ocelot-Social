@@ -177,11 +177,13 @@ COPY webapp/. .
 RUN yarn run build
 RUN mkdir /build && \
     cp -r ./.nuxt ./nuxt.config.js ./config ./constants ./static ./locales ./server-middleware ./utils ./package.json ./yarn.lock ./scripts /build
-# `--production=true`, like the `build` stage above: what runs below is `nuxt-start` (a dependency),
-# not `nuxt` (a devDependency), so the 45 devDeps are dead weight in an image the e2e matrix
-# downloads once per feature file.
-RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
-    cd /build && yarn install --production=true --frozen-lockfile --non-interactive --cache-folder /yarn-cache
+# FULL install, deliberately — do NOT add `--production=true` here the way the `build` stage above
+# does. Nuxt 2 does not bundle node_modules into the SSR build; it externalises them and `require`s
+# them at request time. `vue-template-compiler` is one of those (grep the built .nuxt/dist/server/
+# server.js), it arrives only as a transitive dependency of `nuxt` — a devDependency — and it is
+# needed on the code path that renders /groups/:id/:slug. With a production install that route
+# answers 500 while /login and /profile/* still render fine, so the failure looks like a broken page
+# rather than a missing module. Measured: production install → 500, full install → 302, same commit.
 
 # The test image has TWO consumers with opposite needs, hence two stages off the same build:
 #   • test — the webapp UNIT tests (.github/workflows/test-webapp.yml runs `docker compose exec webapp
