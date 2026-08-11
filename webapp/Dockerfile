@@ -177,11 +177,34 @@ COPY webapp/. .
 RUN yarn run build
 RUN mkdir /build && \
     cp -r ./.nuxt ./nuxt.config.js ./config ./constants ./static ./locales ./server-middleware ./utils ./package.json ./yarn.lock ./scripts /build
+# `--production=true`, like the `build` stage above: what runs below is `nuxt-start` (a dependency),
+# not `nuxt` (a devDependency), so the 45 devDeps are dead weight in an image the e2e matrix
+# downloads once per feature file.
 RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
-    cd /build && yarn install --frozen-lockfile --non-interactive --cache-folder /yarn-cache
+    cd /build && yarn install --production=true --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 
+# The test image has TWO consumers with opposite needs, hence two stages off the same build:
+#   • test — the webapp UNIT tests (.github/workflows/test-webapp.yml runs `docker compose exec webapp
+#            yarn test`). Jest needs the sources and all 45 devDependencies, so this one keeps the whole
+#            /app tree. Its CMD only has to keep the container alive for the `exec`.
+#   • e2e  — the CYPRESS matrix (.github/workflows/test-e2e.yml). That workflow `docker save`s the image
+#            and pulls it down again in EVERY one of the 40 matrix jobs, so nothing that only the build
+#            needed may ride along.
 FROM test_build AS test
 CMD ["/bin/bash", "-c", "yarn run dev"]
+
+# Same shape as `production` below — `FROM base` + the assembled /build — and for the same reason.
+# Deriving this from `test_build` shipped the node-gyp toolchain, the webapp sources and a second,
+# complete node_modules tree to all 40 jobs.
+#
+# It also inherits base's `yarn run start` (nuxt-start) instead of `yarn run dev`. The dev server
+# rebuilt the entire webpack bundle at container start — in every matrix job, while the workflow sat in
+# its `until curl localhost:3000` loop — and then ignored the `.nuxt` that `yarn run build` above had
+# already produced. Nothing in the e2e run needs it: coverage is not instrumented in this build (no
+# babel-plugin-istanbul in nuxt.config.js — the ./coverage mount in docker-compose.test.yml is Jest's),
+# and HMR has no consumer when the client is Cypress.
+FROM base AS e2e
+COPY --from=test_build /build .
 
 FROM build AS production_build
 
