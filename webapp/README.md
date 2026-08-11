@@ -1,6 +1,6 @@
 # Webapp
 
-![UI Screenshot](../.gitbook/assets/screenshot.png)
+![UI Screenshot](../docu/gitbook/screenshot.png)
 
 ## Installation
 

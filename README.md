@@ -308,7 +308,7 @@ Locale Icons made by [Freepik](http://www.freepik.com/) from [www.flaticon.com](
 Browser compatibility testing with [BrowserStack](https://www.browserstack.com/).
 
 <!-- markdownlint-disable MD033 -->
-<img alt="BrowserStack Logo" src="https://raw.githubusercontent.com/Ocelot-Social-Community/Ocelot-Social/master/.gitbook/assets/browserstack-logo.svg" width="256">
+<img alt="BrowserStack Logo" src="https://raw.githubusercontent.com/Ocelot-Social-Community/Ocelot-Social/master/docu/gitbook/browserstack-logo.svg" width="256">
 <!-- markdownlint-enable MD033 -->
 
 ### License

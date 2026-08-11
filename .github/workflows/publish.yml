@@ -5,6 +5,26 @@ on:
     branches:
       - master
 
+# One run at a time, and never drop one. `cancel-in-progress: false` alone does NOT achieve that:
+# the default `queue: single` holds exactly ONE pending run, and the next arrival cancels it. This
+# workflow tags a version, cuts a GitHub release and dispatches the downstream deploys — a dropped
+# pending run means one master commit silently never gets tagged or shipped. `queue: max` keeps a
+# real backlog instead (up to 100 runs, processed in order). The two settings are coupled: pairing
+# `queue: max` with cancelling is a workflow validation error.
+# The group matches the CI workflows here (pull request number, falling back to `github.ref`); this
+# one only triggers on push, so it always resolves to refs/heads/master.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+  queue: max
+
+# Read-only floor, so no job silently inherits the repository or organisation default. Write is
+# granted per job, to the ONE that needs it — see github_tag below, which creates the git tag and
+# the GitHub release with GITHUB_TOKEN. The repository dispatches in build_trigger authenticate
+# with OCELOT_PUBLISH_EVENT_PAT rather than GITHUB_TOKEN, so that job needs no scope at all.
+permissions:
+  contents: read
+
 jobs:
   ##############################################################################
   # JOB: GITHUB TAG LATEST VERSION #############################################
@@ -12,6 +32,11 @@ jobs:
   github_tag:
     name: Tag latest version on Github
     runs-on: ubuntu-latest
+    # The only job that writes: it creates the git tag and the GitHub release with GITHUB_TOKEN.
+    # `build_trigger` below deliberately does not inherit this — its repository dispatches
+    # authenticate with OCELOT_PUBLISH_EVENT_PAT, so reading the checkout is all it needs.
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -28,7 +53,7 @@ jobs:
           echo "BUILD_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
       - run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
       - name: package-version-to-git-tag + build number
-        uses: pkgdeps/git-tag-action@v3.0.0 # v3.0.0
+        uses: pkgdeps/git-tag-action@ef111413f44ebe5cc05994e7f5b5b9edaaada08d # v3.0.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           github_repo: ${{ github.repository }}
@@ -71,6 +96,9 @@ jobs:
           echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
           echo "BUILD_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
       - run: echo "BUILD_VERSION=${VERSION}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
+      # Unlike the two dispatches below, this one uses GITHUB_TOKEN instead of the PAT. Reactivating
+      # it therefore needs `permissions: contents: write` on this job — a repository dispatch is a
+      # write operation, and the job runs read-only.
       #- name: Repository Dispatch
       #  uses: peter-evans/repository-dispatch@831550845b9842397c9b90c366a610d53f2b846b # v3.0.0
       #  with:

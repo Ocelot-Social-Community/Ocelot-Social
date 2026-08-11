@@ -8,6 +8,17 @@ on:
 
 # Least privilege. pull-requests:read is required by dorny/paths-filter, which lists a PR's changed
 # files via the API (the fetch-depth:1 checkout has no base history for a local diff).
+# One run per workflow and branch. A newer push makes the older run's result irrelevant, so it is
+# cancelled instead of holding a runner. `event_name` is part of the group on purpose: a branch
+# push and its pull_request run are separate required checks — they must not cancel each other.
+# Keyed by pull request NUMBER, not `head_ref`: head_ref is only the branch NAME, which is unique
+# within this repository but not across forks — two contributors using GitHub's "edit this file"
+# flow both get `patch-1`, and their pull requests would then cancel each other's runs. `github.ref`
+# stays as the fallback for events that carry no pull request (a push gives refs/heads/<branch>).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   pull-requests: read
@@ -24,7 +35,7 @@ jobs:
       branding: ${{ steps.changes.outputs.branding }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
 
@@ -43,12 +54,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: 'packages/branding/.tool-versions'
           cache: 'npm'
@@ -81,7 +92,7 @@ jobs:
           echo "All build outputs verified!"
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: branding-dist
           path: packages/branding/dist/

@@ -3,6 +3,24 @@ name: ocelot.social webapp test CI
 
 on: push
 
+# One run per workflow and branch. A newer push makes the older run's result irrelevant, so it is
+# cancelled instead of holding a runner. `event_name` is part of the group on purpose: a branch
+# push and its pull_request run are separate required checks — they must not cancel each other.
+# Keyed by pull request NUMBER, not `head_ref`: head_ref is only the branch NAME, which is unique
+# within this repository but not across forks — two contributors using GitHub's "edit this file"
+# flow both get `patch-1`, and their pull requests would then cancel each other's runs. `github.ref`
+# stays as the fallback for events that carry no pull request (a push gives refs/heads/<branch>).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+# Workflow-wide floor for GITHUB_TOKEN, so no job silently inherits the repository or organisation
+# default. A job that needs more overrides it locally — note that a job-level block REPLACES this one
+# rather than adding to it, which is why the escalating job below re-states everything it needs.
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   files-changed:
     name: Detect File Changes - Webapp
@@ -107,7 +125,11 @@ jobs:
     if: needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webapp == 'true'
     needs: [files-changed, build_test_webapp]
     runs-on: ubuntu-latest
-    permissions: 
+    permissions:
+      # A job-level block REPLACES the workflow-level one, so `contents: read` has to be repeated
+      # here — this job checks out the repository. It works today without it only because the
+      # repository is public.
+      contents: read
       checks: write
     steps:
       - name: Checkout code
