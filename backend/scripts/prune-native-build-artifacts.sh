@@ -21,9 +21,27 @@ cd "${1:-.}"
 
 [ -d node_modules ] || exit 0
 
-# Object files and the vendored sources. `-prune` so find does not descend into what it just removed.
-find node_modules -type d -name obj.target -prune -exec rm -rf {} + 2>/dev/null || true
+before=$(du -sk node_modules | cut -f1)
+
+# Object files and the vendored sources. `-prune` so find does not descend into what it is removing.
+# No error suppression anywhere below: `set -e` plus a missing `2>/dev/null` is what keeps a failure
+# here — a read-only layer, a `strip` that is not installed — from silently shipping a fat image.
+find node_modules -type d -name obj.target -prune -exec rm -rf {} +
 rm -rf node_modules/re2/vendor
 
 # Debug symbols. Applies to every addon, not just re2, so a future native dependency is covered too.
-find node_modules -name '*.node' -exec strip --strip-unneeded {} + 2>/dev/null || true
+#
+# A `.node` that is not an ELF object is the ONE expected failure — packages do ship such files as
+# fixtures, and `strip` rejects them. That case is detected and skipped explicitly; everything else
+# still fails the build. `readelf` ships in the same binutils package as `strip`, so testing with it
+# costs no extra dependency.
+find node_modules -name '*.node' -type f | while IFS= read -r addon; do
+  if readelf -h "$addon" >/dev/null 2>&1; then
+    strip --strip-unneeded "$addon"
+  else
+    echo "prune-native: not an ELF object, left alone: $addon"
+  fi
+done
+
+after=$(du -sk node_modules | cut -f1)
+echo "prune-native: node_modules $((before / 1024)) MB -> $((after / 1024)) MB"
