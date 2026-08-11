@@ -10,8 +10,16 @@ interface MapboxControl {
 
 function createMockMapboxGl() {
   const mapHandlers: Record<string, (...args: unknown[]) => void> = {}
+  // Real mapbox-gl-js calls a custom control's onAdd() synchronously inside
+  // addControl(), which is what actually creates/mounts its DOM (e.g. the
+  // pick-location toggle). Replicate that here so tests can find it.
+  const controlContainers: HTMLElement[] = []
   const mapInstance = {
-    addControl: vi.fn(),
+    addControl: vi.fn((control?: MapboxControl) => {
+      if (typeof control?.onAdd === 'function') {
+        controlContainers.push(control.onAdd())
+      }
+    }),
     on: vi.fn((event: string, handler: (...args: unknown[]) => void) => {
       mapHandlers[event] = handler
     }),
@@ -52,7 +60,7 @@ function createMockMapboxGl() {
     ScaleControl: vi.fn(),
   }
 
-  return { mapboxGl, mapInstance, markerInstance, mapHandlers, markerHandlers }
+  return { mapboxGl, mapInstance, markerInstance, mapHandlers, markerHandlers, controlContainers }
 }
 
 describe('osLocationMap', () => {
@@ -142,34 +150,24 @@ describe('osLocationMap', () => {
 
   function findControlWithOnAdd() {
     return ctx.mapInstance.addControl.mock.calls
-      .map(([control]) => control as MapboxControl | undefined)
+      .map(([control]) => control)
       .find((control) => typeof control?.onAdd === 'function')
   }
 
   function getPickerToggle() {
-    const pickerControl = findControlWithOnAdd()
-    if (!pickerControl) throw new Error('pick-location control was not added to the map')
-    const container = pickerControl.onAdd()
-    return container.querySelector('.os-location-map-picker-toggle') as HTMLButtonElement
+    const toggle = ctx.controlContainers
+      .map((container) => container.querySelector('.os-location-map-picker-toggle'))
+      .find((el): el is HTMLButtonElement => el !== null)
+    if (!toggle) throw new Error('pick-location toggle was not found')
+    return toggle
   }
 
-  it('ignores a bare map click until the pick-location tool is armed', () => {
-    const wrapper = mount(OsLocationMap, {
-      props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', editable: true },
-    })
-
-    ctx.mapHandlers.click({ lngLat: { lat: 1, lng: 2 } })
-
-    expect(wrapper.emitted('pin-change')).toBeUndefined()
-  })
-
-  it('emits pin-change on the next map click once armed, then disarms itself', () => {
+  it('arms the pick-location tool by default when there is no pin yet', () => {
     const wrapper = mount(OsLocationMap, {
       props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', editable: true },
     })
 
     const toggle = getPickerToggle()
-    toggle.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     expect(toggle.classList.contains('os-location-map-picker-toggle--active')).toBe(true)
 
     ctx.mapHandlers.click({ lngLat: { lat: 1, lng: 2 } })
@@ -181,9 +179,56 @@ describe('osLocationMap', () => {
     expect(wrapper.emitted('pin-change')).toEqual([[{ lat: 1, lng: 2 }]])
   })
 
+  it('ignores a bare map click once a pin already exists, until re-armed', () => {
+    const wrapper = mount(OsLocationMap, {
+      props: {
+        mapboxGl: ctx.mapboxGl,
+        accessToken: 'test-token',
+        editable: true,
+        lat: 52.5,
+        lng: 13.4,
+      },
+    })
+
+    const toggle = getPickerToggle()
+    expect(toggle.classList.contains('os-location-map-picker-toggle--active')).toBe(false)
+
+    ctx.mapHandlers.click({ lngLat: { lat: 1, lng: 2 } })
+    expect(wrapper.emitted('pin-change')).toBeUndefined()
+
+    toggle.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    ctx.mapHandlers.click({ lngLat: { lat: 1, lng: 2 } })
+    expect(wrapper.emitted('pin-change')).toEqual([[{ lat: 1, lng: 2 }]])
+  })
+
+  it('re-arms the tool automatically once the pin is cleared', async () => {
+    const wrapper = mount(OsLocationMap, {
+      props: {
+        mapboxGl: ctx.mapboxGl,
+        accessToken: 'test-token',
+        editable: true,
+        lat: 52.5,
+        lng: 13.4,
+      },
+    })
+
+    const toggle = getPickerToggle()
+    expect(toggle.classList.contains('os-location-map-picker-toggle--active')).toBe(false)
+
+    await wrapper.setProps({ lat: null, lng: null })
+
+    expect(toggle.classList.contains('os-location-map-picker-toggle--active')).toBe(true)
+  })
+
   it('disarms the pick-location tool on a second toggle click without setting the pin', () => {
     const wrapper = mount(OsLocationMap, {
-      props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', editable: true },
+      props: {
+        mapboxGl: ctx.mapboxGl,
+        accessToken: 'test-token',
+        editable: true,
+        lat: 52.5,
+        lng: 13.4,
+      },
     })
 
     const toggle = getPickerToggle()

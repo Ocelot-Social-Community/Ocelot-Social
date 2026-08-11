@@ -261,6 +261,15 @@
         if (e.key === 'Escape' && isPicking) setPicking(false)
       }
 
+      // With no pin yet, there's nothing an accidental click could disturb —
+      // arm the tool automatically. As soon as a pin exists (picked here,
+      // dragged, or set from outside via search/props), require it to be
+      // re-armed explicitly again; and re-arm automatically if the pin is
+      // cleared (e.g. the location field is emptied or "online" is toggled).
+      watch(hasPin, (has) => {
+        if (props.editable) setPicking(!has)
+      })
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       function onMapClick(e: any) {
         if (!props.editable || !isPicking) return
@@ -434,6 +443,7 @@
         if (props.editable) {
           map.addControl(buildLocationPicker(), 'top-right')
           document.addEventListener('keydown', onDocumentKeydown)
+          setPicking(!hasPin.value)
         }
 
         if (props.styles.length > 1) {
