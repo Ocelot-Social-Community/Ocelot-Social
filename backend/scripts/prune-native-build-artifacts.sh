@@ -21,11 +21,10 @@ cd "${1:-.}"
 
 [ -d node_modules ] || exit 0
 
-# Assert the toolchain up front. Without this, a missing binutils would make the `readelf` probe below
-# fail for EVERY addon, each one would be classified as "not an ELF object" and skipped, and the
-# script would report success having stripped nothing — the exact silent pass this script must not
-# have. Both binaries come from binutils, which `base-build` gets via g++.
-for tool in strip readelf du; do
+# Assert the toolchain up front. Without this a missing binutils would be indistinguishable from
+# "nothing to strip": the script would report success having stripped nothing, which is the silent
+# pass it exists to prevent. `strip` comes from binutils, which `base-build` gets via g++.
+for tool in strip od du; do
   command -v "$tool" >/dev/null || {
     echo "prune-native: required tool '$tool' not found" >&2
     exit 1
@@ -42,17 +41,26 @@ rm -rf node_modules/re2/vendor
 
 # Debug symbols. Applies to every addon, not just re2, so a future native dependency is covered too.
 #
-# A `.node` that is not an ELF object is the ONE expected failure — packages do ship such files as
-# fixtures, and `strip` rejects them. That case is detected and skipped explicitly; everything else
-# still fails the build. `readelf` ships in the same binutils package as `strip`, so testing with it
-# costs no extra dependency.
-find node_modules -name '*.node' -type f | while IFS= read -r addon; do
-  if readelf -h "$addon" >/dev/null 2>&1; then
-    strip --strip-unneeded "$addon"
-  else
-    echo "prune-native: not an ELF object, left alone: $addon"
-  fi
-done
+# Deliberately `-exec … +` and NOT `find … | while read`: a pipeline reports the status of its LAST
+# command, so a failing `find` would pass unnoticed. POSIX requires find to exit non-zero when an
+# `-exec … +` invocation does, which — combined with `set -e` here and `sh -e` in the child — makes
+# every failure below fatal.
+#
+# The ELF magic decides, rather than asking a tool whether the file parses. Packages do ship .node
+# files that are fixtures rather than addons, and skipping those is legitimate; a file that HAS the
+# magic but cannot be stripped is a broken build artefact and must fail. A probe like `readelf -h`
+# cannot tell those two apart — it exits non-zero for both, and inside an `if` condition `set -e`
+# does not fire, so the broken case would silently take the "skip" path.
+find node_modules -name '*.node' -type f -exec sh -ec '
+  for addon do
+    [ -r "$addon" ] || { echo "prune-native: cannot read $addon" >&2; exit 1; }
+    if [ "$(od -An -tx1 -N4 "$addon" | tr -d " \n")" = "7f454c46" ]; then
+      strip --strip-unneeded "$addon"
+    else
+      echo "prune-native: not an ELF object, left alone: $addon"
+    fi
+  done
+' _ {} +
 
 after=$(du -sk node_modules | cut -f1)
 echo "prune-native: node_modules $((before / 1024)) MB -> $((after / 1024)) MB"
