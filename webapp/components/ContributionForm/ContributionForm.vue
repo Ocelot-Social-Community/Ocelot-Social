@@ -62,8 +62,7 @@
 
           <!-- event data -->
           <div v-if="postType === 'Event'" class="eventData">
-            <hr />
-            <div class="ds-mt-x-small ds-mb-large"></div>
+            <div class="ds-mt-x-small ds-mb-small"></div>
             <div class="event-online-checkbox">
               <input
                 type="checkbox"
@@ -676,7 +675,8 @@ export default {
   }
 
   .event-location-map-field {
-    margin-top: var(--space-x-small);
+    margin-top: var(--space-small);
+    margin-bottom: var(--space-x-small);
   }
 
   .event-grid-item {
