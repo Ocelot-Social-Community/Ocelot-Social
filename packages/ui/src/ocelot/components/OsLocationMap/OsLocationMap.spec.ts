@@ -131,6 +131,20 @@ describe('osLocationMap', () => {
     expect(ctx.markerInstance.setLngLat).toHaveBeenCalledWith([13.4, 52.5])
   })
 
+  it('passes pinColor through to the mapbox-gl Marker', () => {
+    mount(OsLocationMap, {
+      props: {
+        mapboxGl: ctx.mapboxGl,
+        accessToken: 'test-token',
+        lat: 52.5,
+        lng: 13.4,
+        pinColor: '#7753eb',
+      },
+    })
+
+    expect(ctx.mapboxGl.Marker).toHaveBeenCalledWith(expect.objectContaining({ color: '#7753eb' }))
+  })
+
   it('flies to and (re)places the pin when lat/lng change', async () => {
     const wrapper = mount(OsLocationMap, {
       props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token' },
@@ -172,14 +186,17 @@ describe('osLocationMap', () => {
     })
 
     const toggle = getPickerToggle()
+
     expect(toggle.classList.contains('os-location-map-picker-toggle--active')).toBe(true)
 
     ctx.mapHandlers.click({ lngLat: { lat: 1, lng: 2 } })
+
     expect(wrapper.emitted('pin-change')).toEqual([[{ lat: 1, lng: 2 }]])
     expect(toggle.classList.contains('os-location-map-picker-toggle--active')).toBe(false)
 
     // Disarmed again — a further click doesn't emit anything else.
     ctx.mapHandlers.click({ lngLat: { lat: 3, lng: 4 } })
+
     expect(wrapper.emitted('pin-change')).toEqual([[{ lat: 1, lng: 2 }]])
   })
 
@@ -195,13 +212,16 @@ describe('osLocationMap', () => {
     })
 
     const toggle = getPickerToggle()
+
     expect(toggle.classList.contains('os-location-map-picker-toggle--active')).toBe(false)
 
     ctx.mapHandlers.click({ lngLat: { lat: 1, lng: 2 } })
+
     expect(wrapper.emitted('pin-change')).toBeUndefined()
 
     toggle.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     ctx.mapHandlers.click({ lngLat: { lat: 1, lng: 2 } })
+
     expect(wrapper.emitted('pin-change')).toEqual([[{ lat: 1, lng: 2 }]])
   })
 
@@ -217,6 +237,7 @@ describe('osLocationMap', () => {
     })
 
     const toggle = getPickerToggle()
+
     expect(toggle.classList.contains('os-location-map-picker-toggle--active')).toBe(false)
 
     await wrapper.setProps({ lat: null, lng: null })
@@ -238,9 +259,11 @@ describe('osLocationMap', () => {
     const toggle = getPickerToggle()
     toggle.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     toggle.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
     expect(toggle.classList.contains('os-location-map-picker-toggle--active')).toBe(false)
 
     ctx.mapHandlers.click({ lngLat: { lat: 1, lng: 2 } })
+
     expect(wrapper.emitted('pin-change')).toBeUndefined()
   })
 
@@ -270,6 +293,7 @@ describe('osLocationMap', () => {
     const withoutSearchCall = ctx.mapInstance.addControl.mock.calls.find(
       ([control]) => typeof control?.onAdd === 'function',
     )
+
     expect(withoutSearchCall?.[1]).toBe('top-left')
 
     ctx = createMockMapboxGl()
@@ -284,6 +308,7 @@ describe('osLocationMap', () => {
     const withSearchCall = ctx.mapInstance.addControl.mock.calls.find(
       ([control]) => typeof control?.onAdd === 'function',
     )
+
     expect(withSearchCall?.[1]).toBe('top-right')
   })
 
@@ -432,6 +457,7 @@ describe('osLocationMap', () => {
         await wrapper.vm.$nextTick()
 
         expect(wrapper.find('.os-location-map__search-toggle').exists()).toBe(true)
+
         vi.useRealTimers()
       })
 
@@ -453,6 +479,7 @@ describe('osLocationMap', () => {
         await wrapper.vm.$nextTick()
 
         expect(wrapper.find('.os-location-map__search-input').exists()).toBe(true)
+
         vi.useRealTimers()
       })
     })

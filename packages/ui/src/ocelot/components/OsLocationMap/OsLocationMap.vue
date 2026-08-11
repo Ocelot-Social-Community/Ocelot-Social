@@ -89,6 +89,11 @@
         type: Number as PropType<number | null>,
         default: null,
       },
+      /** CSS color for the pin (mapbox-gl Marker's own `color` option). */
+      pinColor: {
+        type: String,
+        default: '#3FB1CE',
+      },
       /** `[lng, lat]` used while no pin is set. */
       initialCenter: {
         type: Array as unknown as PropType<[number, number]>,
@@ -235,7 +240,7 @@
         }
         const lngLat: [number, number] = [props.lng as number, props.lat as number]
         if (!marker) {
-          marker = new props.mapboxGl.Marker({ draggable: props.editable })
+          marker = new props.mapboxGl.Marker({ draggable: props.editable, color: props.pinColor })
             .setLngLat(lngLat)
             .addTo(map)
           marker.on('dragend', () => {
@@ -489,7 +494,7 @@
         map
           .getContainer()
           .querySelectorAll('button:not([type])')
-          .forEach((button) => button.setAttribute('type', 'button'))
+          .forEach((button: Element) => button.setAttribute('type', 'button'))
 
         map.on('click', onMapClick)
         updateMarker()

@@ -9,6 +9,7 @@
         :initial-center="defaultCenter"
         :initial-zoom="4"
         :map-style="defaultStyleUrl"
+        :pin-color="pinColor"
         editable
         :pick-location-label="$t('post.viewEvent.pickLocationOnMap')"
         :styles="styles"
@@ -34,6 +35,10 @@ const REVERSE_GEOCODE_TYPES = 'address,poi,place'
 // this value against each entry's url, so a mismatch (e.g. a missing/extra
 // query param) leaves none of them highlighted until the user clicks one.
 const OUTDOORS_STYLE_URL = 'mapbox://styles/mapbox/outdoors-v12?optimize=true'
+
+// Same value as --color-map-marker-event in root-tokens.css, used only if that
+// custom property can't be read yet (e.g. before the stylesheet is applied).
+const EVENT_MARKER_COLOR_FALLBACK = 'rgb(119, 83, 235)'
 
 // Fallback label when reverse-geocoding finds no address for a clicked/dragged
 // point — shows the raw coordinates instead of leaving the field empty/null.
@@ -76,6 +81,19 @@ export default {
     },
     defaultStyleUrl() {
       return OUTDOORS_STYLE_URL
+    },
+    // Same purple as the "event" markers on pages/map.vue — read from the
+    // shared CSS token (--color-map-marker-event, root-tokens.css) at
+    // runtime rather than duplicating the literal, so a brand override of
+    // that token is picked up here too. mapbox-gl's Marker needs a resolved
+    // color, not a live var() reference, hence getComputedStyle() instead of
+    // just passing "var(--color-map-marker-event)" straight through.
+    pinColor() {
+      if (typeof window === 'undefined') return EVENT_MARKER_COLOR_FALLBACK
+      const value = getComputedStyle(document.documentElement)
+        .getPropertyValue('--color-map-marker-event')
+        .trim()
+      return value || EVENT_MARKER_COLOR_FALLBACK
     },
     styles() {
       return [
