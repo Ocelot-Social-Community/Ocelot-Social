@@ -292,7 +292,7 @@ jobs:
       # it therefore needs `permissions: contents: write` on this job — a repository dispatch is a
       # write operation, and the job runs read-only.
       #- name: Repository Dispatch
-      #  uses: peter-evans/repository-dispatch@831550845b9842397c9b90c366a610d53f2b846b # v3.0.0
+      #  uses: peter-evans/repository-dispatch@73ca9d9f4f806f6470bf0a2c4245a7d14df16b37 # v3.0.0
       #  with:
       #    token: ${{ github.token }}
       #    event-type: trigger-ocelot-build-success
@@ -300,7 +300,7 @@ jobs:
       #    client-payload: ${{ steps.payload.outputs.payload }}
 
       - name: Repository Dispatch stage.ocelot.social
-        uses: peter-evans/repository-dispatch@831550845b9842397c9b90c366a610d53f2b846b # v3.0.0
+        uses: peter-evans/repository-dispatch@73ca9d9f4f806f6470bf0a2c4245a7d14df16b37 # v3.0.0
         with:
           token: ${{ secrets.OCELOT_PUBLISH_EVENT_PAT }} # this token is required to access the other repository
           event-type: trigger-ocelot-build-success
@@ -308,7 +308,7 @@ jobs:
           client-payload: ${{ steps.payload.outputs.payload }}
 
       - name: Repository Dispatch stage.yunite.me
-        uses: peter-evans/repository-dispatch@831550845b9842397c9b90c366a610d53f2b846b # v3.0.0
+        uses: peter-evans/repository-dispatch@73ca9d9f4f806f6470bf0a2c4245a7d14df16b37 # v3.0.0
         with:
           token: ${{ secrets.OCELOT_PUBLISH_EVENT_PAT }} # this token is required to access the other repository
           event-type: trigger-ocelot-build-success
