@@ -89,13 +89,17 @@ jobs:
       # ARTIFACT, not cache. These are run-scoped hand-offs between jobs, which is what artifacts are
       # for; `actions/cache` with a `run_id` key can never hit on a later run, yet it occupies the
       # repo's 10 GB cache budget and evicts by LRU the caches that COULD hit — the buildx `type=gha`
-      # scopes and the yarn cache. `compression-level: 0` because the payload is already gzipped.
+      # scopes and the yarn cache. `compression-level: 0` because the payload is already zstd-compressed.
       - name: Upload images for the test jobs
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: e2e-backend-environment
           path: /tmp/*.tar.zst
-          retention-days: 1
+          # 7, not 1: "Re-run failed jobs" does NOT re-run the prepare jobs, so the matrix jobs
+          # download an artifact produced by the original run. At one day, any re-run attempted
+          # later fails on a missing artifact — which reads like an infrastructure fault rather
+          # than an expiry. 7 days matches what a cache would have offered.
+          retention-days: 7
           compression-level: 0
 
   prepare_webapp_image:
@@ -136,7 +140,11 @@ jobs:
         with:
           name: e2e-webapp-image
           path: /tmp/webapp.tar.zst
-          retention-days: 1
+          # 7, not 1: "Re-run failed jobs" does NOT re-run the prepare jobs, so the matrix jobs
+          # download an artifact produced by the original run. At one day, any re-run attempted
+          # later fails on a missing artifact — which reads like an infrastructure fault rather
+          # than an expiry. 7 days matches what a cache would have offered.
+          retention-days: 7
           compression-level: 0
 
   prepare_cypress:
