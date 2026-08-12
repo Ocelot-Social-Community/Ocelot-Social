@@ -28,6 +28,7 @@ export default (i18n) => {
         eventVenue
         eventLocationName
         eventLocation {
+          id
           lat
           lng
         }

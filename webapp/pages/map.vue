@@ -52,12 +52,18 @@
                 />
               </span>
               {{ $t('map.legend.' + type.id) }}
-            </div>
-            <div class="map-legend-item">
-              <label class="map-legend-past-events-toggle">
-                <input type="checkbox" v-model="showPastEvents" />
-                {{ $t('map.legend.showPastEvents') }}
-              </label>
+              <button
+                v-if="type.id === 'event'"
+                type="button"
+                class="map-legend-past-events-toggle"
+                :class="{ 'map-legend-past-events-toggle--active': showPastEvents }"
+                :aria-pressed="String(showPastEvents)"
+                :aria-label="$t('map.legend.showPastEvents')"
+                :title="$t('map.legend.showPastEvents')"
+                @click="toggleShowPastEvents"
+              >
+                <os-icon :icon="icons.clock" size="md" />
+              </button>
             </div>
           </div>
         </div>
@@ -97,14 +103,22 @@ export default {
   },
   data() {
     mapboxgl.accessToken = this.$env.MAPBOX_TOKEN
+    // Read once at page load, deliberately NOT reactive to later route
+    // changes (e.g. toggling "show past events" also touches $route.query,
+    // and v-mapbox's `center` watcher calls map.setCenter() on ANY new
+    // array reference — a reactive computed here would re-snap the map to
+    // this point on every unrelated query-param change, fighting the user's
+    // own panning/zooming).
+    const query = this.$route?.query || {}
+    const lat = parseFloat(query.lat)
+    const lng = parseFloat(query.lng)
+    const initialCoordinates = Number.isFinite(lat) && Number.isFinite(lng) ? [lng, lat] : null
     return {
       isEmpty,
       mapboxgl,
       legendOpen: false,
-      // Auto-enabled when deep-linking from a past event (its own pin would
-      // otherwise be filtered out entirely); user-toggleable afterwards.
-      showPastEvents: this.$route?.query?.showPastEvents === '1',
       activeStyle: null,
+      initialCoordinates,
       defaultCenter: [10.452764, 51.165707], // center of Germany: https://www.gpskoordinaten.de/karte/land/DE
       currentUserLocation: null,
       currentUserCoordinates: null,
@@ -221,21 +235,19 @@ export default {
         // projection: 'globe', // the package is probably to old, because of Vue2: https://docs.mapbox.com/mapbox-gl-js/example/globe/
       }
     },
-    // Deep-link support, e.g. "view on main map" from an event's own
-    // read-only location map: /map?lat=..&lng=.. centers here instead of on
-    // the current user (or the country-wide default) on first load.
-    queryCoordinates() {
-      const query = this.$route?.query || {}
-      const lat = parseFloat(query.lat)
-      const lng = parseFloat(query.lng)
-      return Number.isFinite(lat) && Number.isFinite(lng) ? [lng, lat] : null
-    },
     mapCenter() {
-      return this.queryCoordinates || this.currentUserCoordinates || this.defaultCenter
+      return this.initialCoordinates || this.currentUserCoordinates || this.defaultCenter
     },
     mapZoom() {
-      if (this.queryCoordinates) return 15
+      if (this.initialCoordinates) return 15
       return this.currentUserCoordinates ? 10 : 4
+    },
+    // Driven by the route (not local data) so toggling it is a real
+    // navigation — reliably reactive for the apollo `variables()` watcher,
+    // bookmarkable/shareable, and consistent with the deep-link query params
+    // above. Auto-enabled when deep-linking from a past event.
+    showPastEvents() {
+      return this.$route?.query?.showPastEvents === '1'
     },
   },
   watch: {
@@ -246,6 +258,15 @@ export default {
     },
   },
   methods: {
+    toggleShowPastEvents() {
+      const query = { ...this.$route.query }
+      if (this.showPastEvents) {
+        delete query.showPastEvents
+      } else {
+        query.showPastEvents = '1'
+      }
+      this.$router.replace({ path: '/map', query })
+    },
     addGeocoder() {
       this.geocoder = new MapboxGeocoder({
         accessToken: this.$env.MAPBOX_TOKEN,
@@ -621,7 +642,11 @@ export default {
             name: post.title,
             locationName: post.eventLocation.name,
             description: this.$filters.removeHtml(post.content),
-            isPast: !!post.eventStart && new Date(post.eventStart) < new Date(),
+            // Mirrors the backend's own "past" definition (filterEventDates in
+            // posts.ts): an event still counts as current while EITHER its
+            // start or its end is in the future — i.e. it's only "past" once
+            // both have elapsed. A still-running event must not render pale.
+            isPast: this.isEventPast(post),
           },
           geometry: {
             type: 'Point',
@@ -725,6 +750,15 @@ export default {
     },
     getCoordinates(location) {
       return [location.lng, location.lat]
+    },
+    // Mirrors filterEventDates() in backend/src/graphql/resolvers/posts.ts:
+    // the backend keeps an event while EITHER eventStart or eventEnd is
+    // still in the future, so a still-running event is only truly "past"
+    // once both have elapsed.
+    isEventPast(post) {
+      if (!post.eventStart || !post.eventEnd) return false
+      const now = new Date()
+      return new Date(post.eventStart) < now && new Date(post.eventEnd) < now
     },
     async getUserLocation(id) {
       try {
@@ -962,10 +996,33 @@ export default {
 }
 
 .map-legend-past-events-toggle {
-  display: flex;
+  position: relative;
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  margin-left: 2px;
+  padding: 2px;
+  border: none;
+  border-radius: var(--border-radius-base, 4px);
+  background: none;
+  color: inherit;
   cursor: pointer;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+}
+
+/* Struck through = the time filter is off, i.e. past events are included. */
+.map-legend-past-events-toggle--active::after {
+  content: '';
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 50%;
+  height: 2px;
+  background: currentColor;
+  transform: rotate(-45deg);
 }
 
 @media (max-width: 639px) {

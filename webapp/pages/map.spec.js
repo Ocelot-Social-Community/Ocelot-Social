@@ -174,7 +174,8 @@ describe('map', () => {
     mocks = {
       $t: (t) => t,
       $i18n: { locale: () => 'en' },
-      $route: { query: {} },
+      $route: { path: '/map', query: {} },
+      $router: { replace: jest.fn() },
       $env: {
         MAPBOX_TOKEN: 'MY_MAPBOX_TOKEN',
       },
@@ -238,10 +239,8 @@ describe('map', () => {
       expect(items.length).toBe(4)
     })
 
-    it('renders a "show past events" toggle in the legend', () => {
-      expect(wrapper.find('.map-legend-past-events-toggle input[type="checkbox"]').exists()).toBe(
-        true,
-      )
+    it('renders a "show past events" toggle button in the legend', () => {
+      expect(wrapper.find('.map-legend-past-events-toggle').exists()).toBe(true)
     })
 
     it('legend is closed by default on mobile', () => {
@@ -1068,9 +1067,10 @@ describe('map', () => {
         expect(vars.postFilter.eventStart_gte).toBeInstanceOf(Date)
       })
 
-      it('variables omits eventStart_gte when showPastEvents is true', async () => {
-        await wrapper.setData({ showPastEvents: true })
-        const variablesFn = wrapper.vm.$options.apollo.mapData.variables.bind(wrapper.vm)
+      it('variables omits eventStart_gte when showPastEvents is true', () => {
+        mocks.$route = { path: '/map', query: { showPastEvents: '1' } }
+        const w = createWrapper()
+        const variablesFn = w.vm.$options.apollo.mapData.variables.bind(w.vm)
         const vars = variablesFn()
         expect(vars.postFilter.eventStart_gte).toBeUndefined()
       })
@@ -1103,36 +1103,69 @@ describe('map', () => {
       })
 
       it('is enabled by the ?showPastEvents=1 deep-link query param', () => {
-        mocks.$route = { query: { showPastEvents: '1' } }
+        mocks.$route = { path: '/map', query: { showPastEvents: '1' } }
         const w = createWrapper()
         expect(w.vm.showPastEvents).toBe(true)
       })
 
-      it('is reflected by the legend checkbox and can be toggled by it', async () => {
-        const checkbox = wrapper.find('.map-legend-past-events-toggle input[type="checkbox"]')
-        expect(checkbox.element.checked).toBe(false)
-        await checkbox.setChecked(true)
-        expect(wrapper.vm.showPastEvents).toBe(true)
+      it('shows the struck-through "active" state when the route has showPastEvents=1', () => {
+        mocks.$route = { path: '/map', query: { showPastEvents: '1' } }
+        const w = createWrapper()
+        expect(w.find('.map-legend-past-events-toggle').classes()).toContain(
+          'map-legend-past-events-toggle--active',
+        )
+      })
+
+      it('adds showPastEvents=1 to the route on click, keeping other query params', async () => {
+        mocks.$route = { path: '/map', query: { lat: '52.5' } }
+        const w = createWrapper()
+        await w.find('.map-legend-past-events-toggle').trigger('click')
+        expect(mocks.$router.replace).toHaveBeenCalledWith({
+          path: '/map',
+          query: { lat: '52.5', showPastEvents: '1' },
+        })
+      })
+
+      it('removes showPastEvents from the route on click when already enabled', async () => {
+        mocks.$route = { path: '/map', query: { lat: '52.5', showPastEvents: '1' } }
+        const w = createWrapper()
+        await w.find('.map-legend-past-events-toggle').trigger('click')
+        expect(mocks.$router.replace).toHaveBeenCalledWith({
+          path: '/map',
+          query: { lat: '52.5' },
+        })
       })
     })
 
     describe('buildMarkersGeoJSON isPast flag', () => {
-      it('marks events with an eventStart in the past as isPast', async () => {
-        const pastPost = {
-          ...posts[0],
-          eventStart: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-        }
+      const hoursFromNow = (h) => new Date(Date.now() + h * 60 * 60 * 1000).toISOString()
+
+      it('marks events with both eventStart and eventEnd in the past as isPast', async () => {
+        const pastPost = { ...posts[0], eventStart: hoursFromNow(-48), eventEnd: hoursFromNow(-24) }
         await wrapper.setData({ users: [], groups: [], posts: [pastPost] })
         const geoJSON = wrapper.vm.buildMarkersGeoJSON()
         expect(geoJSON.find((f) => f.properties.type === 'event').properties.isPast).toBe(true)
       })
 
-      it('does not mark future or dateless events as isPast', async () => {
-        const futurePost = {
-          ...posts[0],
-          eventStart: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-        }
+      it('does not mark a still-running event (eventStart past, eventEnd future) as isPast', async () => {
+        // Mirrors the backend's filterEventDates(): an event stays "current"
+        // while either boundary is still ahead.
+        const ongoingPost = { ...posts[0], eventStart: hoursFromNow(-1), eventEnd: hoursFromNow(1) }
+        await wrapper.setData({ users: [], groups: [], posts: [ongoingPost] })
+        const geoJSON = wrapper.vm.buildMarkersGeoJSON()
+        expect(geoJSON.find((f) => f.properties.type === 'event').properties.isPast).toBe(false)
+      })
+
+      it('does not mark future events as isPast', async () => {
+        const futurePost = { ...posts[0], eventStart: hoursFromNow(24), eventEnd: hoursFromNow(48) }
         await wrapper.setData({ users: [], groups: [], posts: [futurePost] })
+        const geoJSON = wrapper.vm.buildMarkersGeoJSON()
+        expect(geoJSON.find((f) => f.properties.type === 'event').properties.isPast).toBe(false)
+      })
+
+      it('does not mark dateless events as isPast', async () => {
+        const datelessPost = { ...posts[0], eventStart: undefined, eventEnd: undefined }
+        await wrapper.setData({ users: [], groups: [], posts: [datelessPost] })
         const geoJSON = wrapper.vm.buildMarkersGeoJSON()
         expect(geoJSON.find((f) => f.properties.type === 'event').properties.isPast).toBe(false)
       })
