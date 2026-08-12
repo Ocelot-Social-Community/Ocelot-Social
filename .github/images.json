@@ -1,0 +1,72 @@
+[
+  {
+    "name": "neo4j",
+    "context": "neo4j",
+    "file": "neo4j/Dockerfile",
+    "target": "community",
+    "release": true
+  },
+  {
+    "name": "backend-base",
+    "context": ".",
+    "file": "backend/Dockerfile",
+    "target": "base",
+    "release": false
+  },
+  {
+    "name": "backend-build",
+    "context": ".",
+    "file": "backend/Dockerfile",
+    "target": "build",
+    "release": false
+  },
+  {
+    "name": "backend",
+    "context": ".",
+    "file": "backend/Dockerfile",
+    "target": "production",
+    "release": true
+  },
+  {
+    "name": "webapp-base",
+    "context": ".",
+    "file": "webapp/Dockerfile",
+    "target": "base",
+    "release": false
+  },
+  {
+    "name": "webapp-build",
+    "context": ".",
+    "file": "webapp/Dockerfile",
+    "target": "build",
+    "release": false
+  },
+  {
+    "name": "webapp",
+    "context": ".",
+    "file": "webapp/Dockerfile",
+    "target": "production",
+    "release": true
+  },
+  {
+    "name": "maintenance-base",
+    "context": ".",
+    "file": "maintenance/Dockerfile",
+    "target": "production",
+    "release": false
+  },
+  {
+    "name": "maintenance-build",
+    "context": ".",
+    "file": "maintenance/Dockerfile",
+    "target": "build",
+    "release": false
+  },
+  {
+    "name": "maintenance",
+    "context": ".",
+    "file": "maintenance/Dockerfile",
+    "target": "production",
+    "release": true
+  }
+]

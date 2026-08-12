@@ -9,9 +9,15 @@ on: push
 # within this repository but not across forks — two contributors using GitHub's "edit this file"
 # flow both get `patch-1`, and their pull requests would then cancel each other's runs. `github.ref`
 # stays as the fallback for events that carry no pull request (a push gives refs/heads/<branch>).
+#
+# master is the exception and is NEVER cancelled: its images are the release artefacts. The
+# `publish` workflow retags them by commit sha (`sha-<40 hex>` below) into the version tags, so a
+# cancelled master build leaves a commit whose images never exist and a `publish` run that waits
+# for them in vain. Two master merges in quick succession are exactly the case that would trigger
+# it, which is why the cost of a few extra runner minutes is the cheaper side of this trade.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
 # Workflow-wide floor for GITHUB_TOKEN, so no job silently inherits the repository or organisation
 # default. A job that needs more overrides it locally — note that a job-level block REPLACES this one
@@ -20,50 +26,37 @@ permissions:
   contents: read
 
 jobs:
+  ##############################################################################
+  # JOB: LOAD THE IMAGE DEFINITIONS ############################################
+  ##############################################################################
+  # The matrix lives in `.github/images.json` rather than inline here, because a second workflow
+  # needs the same list: `publish` retags every one of these images with the release version. An
+  # inline matrix would silently leave a newly added image untagged forever — the failure mode is
+  # invisible, which is what makes it worth a job. `strategy.matrix` cannot read a file itself, so
+  # one cheap job reads it and hands the parsed JSON to the matrix below.
+  images:
+    name: Load image definitions
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.load.outputs.matrix }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Load image definitions
+        id: load
+        run: echo "matrix=$(jq -c . .github/images.json)" >> "$GITHUB_OUTPUT"
+
+  ##############################################################################
+  # JOB: BUILD AND PUSH THE IMAGES #############################################
+  ##############################################################################
   build-and-push-images:
+    # Named explicitly instead of letting GitHub derive it from the matrix entry: the derived name
+    # interpolates every matrix key, so adding a field to images.json would rename all ten checks.
+    name: build-and-push-images (${{ matrix.app.name }})
+    needs: images
     strategy:
       matrix:
-        app:
-          - name: neo4j
-            context: neo4j
-            file: neo4j/Dockerfile
-            target: community
-          - name: backend-base
-            context: .
-            file: backend/Dockerfile
-            target: base
-          - name: backend-build
-            context: .
-            file: backend/Dockerfile
-            target: build
-          - name: backend
-            context: .
-            file: backend/Dockerfile
-            target: production
-          - name: webapp-base
-            context: .
-            file: webapp/Dockerfile
-            target: base
-          - name: webapp-build
-            context: .
-            file: webapp/Dockerfile
-            target: build
-          - name: webapp
-            context: .
-            file: webapp/Dockerfile
-            target: production
-          - name: maintenance-base
-            context: .
-            file: maintenance/Dockerfile
-            target: production
-          - name: maintenance-build
-            context: .
-            file: maintenance/Dockerfile
-            target: build
-          - name: maintenance
-            context: .
-            file: maintenance/Dockerfile
-            target: production
+        app: ${{ fromJSON(needs.images.outputs.matrix) }}
     runs-on: ubuntu-latest
     env:
       REGISTRY: ghcr.io
@@ -90,6 +83,17 @@ jobs:
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          # The `semver` rules only fire on a tag push. The version tags are created by the
+          # `publish` workflow with GITHUB_TOKEN, and events raised by GITHUB_TOKEN do not trigger
+          # workflows — so this workflow never sees them and the rules never match. They are kept
+          # because they cost nothing and would do the right thing if a tag were ever pushed by a
+          # human or an app token; the version tags that actually reach the registry are applied
+          # by the retag job in `publish`, which copies the manifest of `sha-<40 hex>` below.
+          #
+          # `type=sha` is listed twice on purpose: the short form is what a human reads in the
+          # registry UI, the long form is what a deployment references. Helm charts get the full
+          # commit sha from the dispatch payload, not an abbreviated one, and abbreviating it in
+          # the chart is not something a template can do.
           tags: |
             type=schedule
             type=semver,pattern={{version}}
@@ -98,6 +102,7 @@ jobs:
             type=ref,event=branch
             type=ref,event=pr
             type=sha
+            type=sha,format=long
       - name: Build and push Docker images
         id: push
         uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0

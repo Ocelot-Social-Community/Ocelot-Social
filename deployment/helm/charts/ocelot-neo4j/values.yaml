@@ -7,6 +7,8 @@ global:
     # `Always` for a `:latest` tag and `IfNotPresent` otherwise, i.e. silently something else than
     # the sibling chart does.
     pullPolicy: IfNotPresent
+    # Empty falls back to this chart's `appVersion`. See the identically named block in the
+    # ocelot-social chart for the tags the release workflows publish.
     tag:
 
 # Credentials for pulling images from private registries — see the identically named block in the
