@@ -182,25 +182,44 @@ jobs:
           cd ..
           yarn install
       
-      # This is a HAND-OFF to the matrix jobs below, not a dependency cache: the path includes the whole
-      # workspace (sources, cypress specs, the backend `yarn build` output), so it is only ever valid
-      # for the commit that produced it. Hence `github.sha` in the key and deliberately NO
-      # `restore-keys`.
+      # ARTIFACT, not cache — for the same reason as the images above, which this step used to
+      # contradict. It is a HAND-OFF to the matrix jobs: the payload is the whole installed workspace
+      # (sources, cypress specs, every node_modules, the backend `yarn build` output), so it is only
+      # ever valid for the commit that produced it. Its cache key therefore ended in `github.sha`,
+      # which can never hit on a later run — a write-once entry of roughly a gigabyte, produced by
+      # EVERY push to EVERY branch, evicting by LRU the caches that could actually hit. It also
+      # evicted itself: with the budget full, entries of newer runs displaced this one before all 40
+      # matrix jobs had restored it, and `fail-on-cache-miss` turned that into a red run.
       #
-      # A lockfile-only fallback would be actively wrong here. `actions/cache` extracts over the
-      # existing tree, so it runs AFTER `actions/checkout` and overwrites what checkout just put there.
-      # A fallback key matches any earlier commit with the same lockfiles — which is most commits, since
-      # most do not touch dependencies — and the end-to-end suite would then silently exercise an older
-      # revision and report green for it. Missing the cache outright is the far better failure: the
-      # matrix job finds no node_modules and fails loudly.
-      - name: Cache cypress + installed workspace
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v4.0.2
+      # A lockfile-only fallback key would have been actively wrong, which is why none existed: it
+      # matches any earlier commit with the same lockfiles — most commits, since most do not touch
+      # dependencies — and the suite would then silently exercise an older revision and report green
+      # for it. An artifact has no such fallback to get wrong, and unlike a cache entry it cannot be
+      # evicted mid-run.
+      #
+      # `.git` is left out: the matrix job checks out the same commit before extracting this over it,
+      # so its own .git is already correct and shipping a second copy to 40 runners buys nothing.
+      # /opt/cucumber-json-formatter is left out too — the matrix job re-downloads it when missing.
+      - name: Pack installed workspace for the test jobs
+        run: |
+          set -euo pipefail
+          tar -I 'zstd -T0 -3' -cf /tmp/e2e-workspace.tar.zst \
+            -C / \
+            --exclude="${GITHUB_WORKSPACE#/}/.git" \
+            "${GITHUB_WORKSPACE#/}" \
+            "${HOME#/}/.cache/Cypress"
+
+      - name: Upload installed workspace for the test jobs
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          path: |
-            /opt/cucumber-json-formatter
-            /home/runner/.cache/Cypress
-            /home/runner/work/Ocelot-Social/Ocelot-Social
-          key: e2e-cypress-${{ hashFiles('yarn.lock', 'backend/yarn.lock', 'packages/branding/package-lock.json') }}-${{ github.sha }}
+          name: e2e-cypress-workspace
+          path: /tmp/e2e-workspace.tar.zst
+          # 7, not 1: "Re-run failed jobs" does NOT re-run the prepare jobs, so the matrix jobs
+          # download an artifact produced by the original run. At one day, any re-run attempted
+          # later fails on a missing artifact — which reads like an infrastructure fault rather
+          # than an expiry. 7 days matches what a cache would have offered.
+          retention-days: 7
+          compression-level: 0
 
   list_features:
     name: List Feature Files
@@ -242,26 +261,22 @@ jobs:
         with:
           node-version-file: 'backend/.nvmrc'
 
-      # Exact key only — see the note in `prepare_cypress`. This step restores over the checkout above,
-      # so anything but this commit's own workspace would mean testing a different revision than the
-      # one the run reports on.
-      - name: Restore cypress cache
-        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v4.0.2
-        with:
-          path: |
-            /opt/cucumber-json-formatter
-            /home/runner/.cache/Cypress
-            /home/runner/work/Ocelot-Social/Ocelot-Social
-          key: e2e-cypress-${{ hashFiles('yarn.lock', 'backend/yarn.lock', 'packages/branding/package-lock.json') }}-${{ github.sha }}
-          fail-on-cache-miss: true
-
-      - name: Download images
+      - name: Download images and installed workspace
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: e2e-*
           merge-multiple: true
           path: /tmp
-          
+
+      # Extracts over the checkout above, exactly as the cache this replaced did — see the note in
+      # `prepare_cypress` for why only this commit's own workspace may ever land here. No guard is
+      # needed for a missing archive: `zstd -dc` on an absent file fails the step, which is the same
+      # loud failure `fail-on-cache-miss: true` used to provide.
+      - name: Unpack installed workspace
+        run: |
+          set -euo pipefail
+          zstd -dc /tmp/e2e-workspace.tar.zst | tar -x -C /
+
       - name: Copy env files
         run: |
           cp webapp/.env.template webapp/.env
