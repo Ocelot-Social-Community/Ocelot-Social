@@ -23,7 +23,7 @@ concurrency:
 # which create the git tags and the GitHub release with GITHUB_TOKEN, and `packages: write` for
 # docker_retag, which pushes the version tags to the registry. The repository dispatches in
 # build_trigger authenticate with OCELOT_PUBLISH_EVENT_PAT rather than GITHUB_TOKEN, so that job
-# needs no scope at all.
+# needs no scope at all and says so with `permissions: {}`.
 permissions:
   contents: read
 
@@ -233,6 +233,11 @@ jobs:
     # this registry, so the tags have to exist before they are told to go. github_tag is listed as
     # well because a job's outputs are only readable through `needs`.
     needs: [github_tag, docker_retag]
+    # GITHUB_TOKEN is unused here: both dispatches authenticate with OCELOT_PUBLISH_EVENT_PAT, and
+    # since the payload no longer comes from package.json there is not even a checkout left to grant
+    # `contents: read` for. Stated explicitly so that adding a step which does need a scope has to
+    # say so — see the commented-out dispatch below, which would need `contents: write`.
+    permissions: {}
     steps:
       # The payload used to be assembled inline in each dispatch as `"VERSION": "${VERSION}"`. That
       # is shell syntax in a `with:` string, which Actions does not expand — the stage repositories
