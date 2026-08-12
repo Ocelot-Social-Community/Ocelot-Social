@@ -171,6 +171,7 @@ describe('map', () => {
     mocks = {
       $t: (t) => t,
       $i18n: { locale: () => 'en' },
+      $route: { query: {} },
       $env: {
         MAPBOX_TOKEN: 'MY_MAPBOX_TOKEN',
       },
@@ -293,6 +294,25 @@ describe('map', () => {
 
       it('isPreparedForMarkers is false initially', () => {
         expect(wrapper.vm.isPreparedForMarkers).toBe(false)
+      })
+    })
+
+    describe('lat/lng query params (deep link, e.g. from an event map)', () => {
+      it('centers on the query coordinates, taking priority over the user location', async () => {
+        mocks.$route = { query: { lat: '52.52', lng: '13.38' } }
+        wrapper = createWrapper()
+        await wrapper.setData({ currentUserCoordinates: [9.63, 48.87] })
+
+        expect(wrapper.vm.mapCenter).toEqual([13.38, 52.52])
+        expect(wrapper.vm.mapZoom).toBe(15)
+      })
+
+      it('falls back to the user location / default center when absent or invalid', () => {
+        mocks.$route = { query: { lat: 'not-a-number', lng: '13.38' } }
+        wrapper = createWrapper()
+
+        expect(wrapper.vm.mapCenter).toEqual([10.452764, 51.165707])
+        expect(wrapper.vm.mapZoom).toBe(4)
       })
     })
 

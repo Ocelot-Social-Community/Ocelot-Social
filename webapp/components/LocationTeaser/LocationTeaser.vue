@@ -4,14 +4,21 @@
     :class="size && 'ds-text-size-' + size"
   >
     <os-icon :icon="icons.mapMarker" data-test="map-marker" />
-    <span v-if="venue">{{ venue }}</span>
-    <span v-if="venue">&nbsp;&mdash;&nbsp;</span>
-    <span v-if="!isOnline">
-      {{ locationName }}
-    </span>
-    <span v-else>
-      {{ $t('post.viewEvent.eventIsOnline') }}
-    </span>
+    <component
+      :is="to ? 'nuxt-link' : 'span'"
+      :to="to"
+      :class="{ 'location-teaser__link': to }"
+      data-test="location-teaser-text"
+    >
+      <span v-if="venue">{{ venue }}</span>
+      <span v-if="venue">&nbsp;&mdash;&nbsp;</span>
+      <span v-if="!isOnline">
+        {{ locationName }}
+      </span>
+      <span v-else>
+        {{ $t('post.viewEvent.eventIsOnline') }}
+      </span>
+    </component>
   </p>
 </template>
 
@@ -46,6 +53,12 @@ export default {
       type: Boolean,
       default: false,
     },
+    // nuxt-link target (e.g. { path: '/map', query: { lat, lng } }). When
+    // set, the venue/location text becomes clickable; otherwise plain text.
+    to: {
+      type: [String, Object],
+      default: null,
+    },
   },
   created() {
     this.icons = iconRegistry
@@ -58,5 +71,14 @@ export default {
   display: flex;
   align-items: center;
   gap: 2px;
+}
+
+.location-teaser__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.location-teaser__link:hover {
+  text-decoration: underline;
 }
 </style>

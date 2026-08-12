@@ -1256,7 +1256,8 @@
       "eventStartNotEmpty": "Voer een startdatum in.",
       "eventVenue": "Locatiebeschrijving — bijv. achtertuin, 1e verdieping, …",
       "pickLocationOnMap": "Locatie op de kaart kiezen",
-      "title": "Evenement"
+      "title": "Evenement",
+      "viewOnMainMap": "Bekijken op hoofdkaart"
     },
     "viewPost": {
       "forGroup": {

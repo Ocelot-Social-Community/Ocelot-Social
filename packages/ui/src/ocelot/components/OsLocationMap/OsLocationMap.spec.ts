@@ -14,6 +14,9 @@ function createMockMapboxGl() {
   // addControl(), which is what actually creates/mounts its DOM (e.g. the
   // pick-location toggle). Replicate that here so tests can find it.
   const controlContainers: HTMLElement[] = []
+  // Every custom control added via addControl(), tracked so remove() below
+  // can replicate real mapbox-gl-js behaviour on teardown.
+  const controls: MapboxControl[] = []
   // A stable container (mapbox-gl-js reuses the same element across calls)
   // so tests can pre-populate it, e.g. to simulate mapbox-gl's own
   // untyped-button controls (like the attribution "i" toggle).
@@ -21,6 +24,7 @@ function createMockMapboxGl() {
   const mapInstance = {
     addControl: vi.fn((control?: MapboxControl, _position?: string) => {
       if (typeof control?.onAdd === 'function') {
+        controls.push(control)
         controlContainers.push(control.onAdd())
       }
     }),
@@ -29,12 +33,22 @@ function createMockMapboxGl() {
     }),
     flyTo: vi.fn(),
     setStyle: vi.fn(),
-    remove: vi.fn(),
+    // Real mapbox-gl-js calls control.onRemove() unconditionally for every
+    // added control when the map is destroyed — a control missing onRemove
+    // throws "onRemove is not a function" there. Replicate that here so a
+    // control forgetting to define one fails a test instead of only
+    // surfacing live, on navigating away from the page.
+    remove: vi.fn(() => {
+      controls.forEach((control) => {
+        ;(control.onRemove as () => void)()
+      })
+    }),
     getContainer: vi.fn(() => mapContainer),
     getCanvas: vi.fn(() => ({ style: {} }) as HTMLCanvasElement),
   }
 
   const markerHandlers: Record<string, (...args: unknown[]) => void> = {}
+  const markerElement = document.createElement('div')
   const markerInstance = {
     setLngLat: vi.fn(function (this: typeof markerInstance) {
       return this
@@ -48,6 +62,7 @@ function createMockMapboxGl() {
     remove: vi.fn(),
     setDraggable: vi.fn(),
     getLngLat: vi.fn(() => ({ lng: 13.4, lat: 52.5 })),
+    getElement: vi.fn(() => markerElement),
   }
 
   const mapboxGl = {
@@ -64,7 +79,15 @@ function createMockMapboxGl() {
     ScaleControl: vi.fn(),
   }
 
-  return { mapboxGl, mapInstance, markerInstance, mapHandlers, markerHandlers, controlContainers }
+  return {
+    mapboxGl,
+    mapInstance,
+    markerInstance,
+    markerElement,
+    mapHandlers,
+    markerHandlers,
+    controlContainers,
+  }
 }
 
 describe('osLocationMap', () => {
@@ -336,6 +359,77 @@ describe('osLocationMap', () => {
     ctx.markerHandlers.dragend()
 
     expect(wrapper.emitted('pin-change')).toEqual([[{ lat: 52.5, lng: 13.4 }]])
+  })
+
+  describe('viewOnMap', () => {
+    it('does not add a view-on-map control or clickable pin by default', () => {
+      mount(OsLocationMap, {
+        props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', lat: 52.5, lng: 13.4 },
+      })
+
+      const control = ctx.controlContainers
+        .map((container) => container.querySelector('.os-location-map-view-on-map-toggle'))
+        .find((el) => el !== null)
+      expect(control).toBeUndefined()
+      expect(ctx.markerElement.style.cursor).not.toBe('pointer')
+    })
+
+    it('adds a view-on-map control that emits the current coordinates when clicked', () => {
+      const wrapper = mount(OsLocationMap, {
+        props: {
+          mapboxGl: ctx.mapboxGl,
+          accessToken: 'test-token',
+          lat: 52.5,
+          lng: 13.4,
+          viewOnMap: true,
+          viewOnMapLabel: 'View on map',
+        },
+      })
+
+      const button = ctx.controlContainers
+        .map((container) => container.querySelector('.os-location-map-view-on-map-toggle'))
+        .find((el): el is HTMLButtonElement => el !== null)
+      expect(button).toBeDefined()
+      expect(button?.getAttribute('aria-label')).toBe('View on map')
+
+      button?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+      expect(wrapper.emitted('view-on-map')).toEqual([[{ lat: 52.5, lng: 13.4 }]])
+    })
+
+    it('makes the pin itself clickable and emits view-on-map on click', () => {
+      const wrapper = mount(OsLocationMap, {
+        props: {
+          mapboxGl: ctx.mapboxGl,
+          accessToken: 'test-token',
+          lat: 52.5,
+          lng: 13.4,
+          viewOnMap: true,
+        },
+      })
+
+      expect(ctx.markerElement.style.cursor).toBe('pointer')
+
+      ctx.markerElement.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+      expect(wrapper.emitted('view-on-map')).toEqual([[{ lat: 52.5, lng: 13.4 }]])
+    })
+
+    it('unmounts cleanly (the view-on-map control must define onRemove)', () => {
+      const wrapper = mount(OsLocationMap, {
+        props: {
+          mapboxGl: ctx.mapboxGl,
+          accessToken: 'test-token',
+          lat: 52.5,
+          lng: 13.4,
+          viewOnMap: true,
+        },
+      })
+
+      expect(() => {
+        wrapper.unmount()
+      }).not.toThrow()
+    })
   })
 
   it('removes the map on unmount', () => {

@@ -27,6 +27,10 @@ export default (i18n) => {
         eventEnd
         eventVenue
         eventLocationName
+        eventLocation {
+          lat
+          lng
+        }
         eventIsOnline
         ...post
         ...postCounts

@@ -1256,7 +1256,8 @@
       "eventStartNotEmpty": "Proszę podać datę rozpoczęcia.",
       "eventVenue": "Opis lokalizacji — np. podwórko, 1. piętro, …",
       "pickLocationOnMap": "Wybierz lokalizację na mapie",
-      "title": "Wydarzenie"
+      "title": "Wydarzenie",
+      "viewOnMainMap": "Zobacz na głównej mapie"
     },
     "viewPost": {
       "forGroup": {

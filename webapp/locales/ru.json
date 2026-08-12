@@ -1256,7 +1256,8 @@
       "eventStartNotEmpty": "Пожалуйста, укажите дату начала.",
       "eventVenue": "Описание места — например, задний двор, 1-й этаж, …",
       "pickLocationOnMap": "Выбрать место на карте",
-      "title": "Событие"
+      "title": "Событие",
+      "viewOnMainMap": "Посмотреть на главной карте"
     },
     "viewPost": {
       "forGroup": {

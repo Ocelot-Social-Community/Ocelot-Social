@@ -81,19 +81,28 @@
             <!-- event data -->
             <div
               v-if="post && post.postType[0] === 'Event'"
-              class="ds-mb-small"
-              style="padding: 10px"
+              class="ds-mb-small event-data"
+              :class="{ 'event-data--with-map': showEventMap }"
             >
-              <location-teaser
-                class="event-info"
-                :venue="post.eventVenue"
-                :locationName="post.eventLocationName"
-                :isOnline="post.eventIsOnline"
-              />
-              <date-time-range
-                class="event-info"
-                :startDate="post.eventStart"
-                :endDate="post.eventEnd"
+              <div class="event-data__info" style="padding: 10px">
+                <location-teaser
+                  class="event-info"
+                  :venue="post.eventVenue"
+                  :locationName="post.eventLocationName"
+                  :isOnline="post.eventIsOnline"
+                  :to="mapLinkTo"
+                />
+                <date-time-range
+                  class="event-info"
+                  :startDate="post.eventStart"
+                  :endDate="post.eventEnd"
+                />
+              </div>
+              <event-location-map
+                v-if="showEventMap"
+                class="event-data__map"
+                :location="eventMapLocation"
+                :editable="false"
               />
             </div>
             <div class="ds-mb-small"></div>
@@ -194,6 +203,7 @@ import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import CtaUnblockAuthor from '~/components/Empty/CallToAction/CtaUnblockAuthor.vue'
 import CtaJoinLeaveGroup from '~/components/Empty/CallToAction/CtaJoinLeaveGroup.vue'
 import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
+import EventLocationMap from '~/components/Map/EventLocationMap'
 import HcCategory from '~/components/Category'
 import HcEmpty from '~/components/Empty/Empty'
 import HcHashtag from '~/components/Hashtag/Hashtag'
@@ -233,6 +243,7 @@ export default {
     CtaUnblockAuthor,
     CtaJoinLeaveGroup,
     DateTimeRange,
+    EventLocationMap,
     HcCategory,
     HcEmpty,
     HcHashtag,
@@ -360,6 +371,34 @@ export default {
     },
     commentingAllowedByGroupRole() {
       return this.group && ['usual', 'admin', 'owner'].includes(this.group.myRole)
+    },
+    hasEventCoordinates() {
+      return (
+        !!this.post?.eventLocation &&
+        typeof this.post.eventLocation.lat === 'number' &&
+        typeof this.post.eventLocation.lng === 'number'
+      )
+    },
+    // Read-only map only makes sense for in-person events with a resolved pin.
+    showEventMap() {
+      return (
+        this.post?.postType[0] === 'Event' && !this.post.eventIsOnline && this.hasEventCoordinates
+      )
+    },
+    eventMapLocation() {
+      return this.hasEventCoordinates
+        ? { lat: this.post.eventLocation.lat, lng: this.post.eventLocation.lng }
+        : null
+    },
+    // Lets the venue/address text (LocationTeaser's `to` prop) deep-link into
+    // the main map, same coordinates the read-only pin uses.
+    mapLinkTo() {
+      return this.hasEventCoordinates
+        ? {
+            path: '/map',
+            query: { lat: this.post.eventLocation.lat, lng: this.post.eventLocation.lng },
+          }
+        : null
     },
     // Network permission to comment at all (separate from group membership / blocking).
     canComment() {
@@ -633,6 +672,20 @@ export default {
 </style>
 
 <style scoped>
+.event-data {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-small);
+}
+
+.event-data--with-map .event-data__info {
+  flex: 1 1 260px;
+}
+
+.event-data__map {
+  flex: 1 1 300px;
+}
+
 .actions {
   display: flex;
   align-items: center;

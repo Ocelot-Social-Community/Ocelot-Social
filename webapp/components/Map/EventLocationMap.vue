@@ -10,11 +10,14 @@
         :initial-zoom="4"
         :map-style="defaultStyleUrl"
         :pin-color="pinColor"
-        editable
+        :editable="editable"
         :pick-location-label="$t('post.viewEvent.pickLocationOnMap')"
+        :view-on-map="!editable"
+        :view-on-map-label="$t('post.viewEvent.viewOnMainMap')"
         :styles="styles"
         :style-switcher-label="$t('map.styles.title')"
         @pin-change="onPinChange"
+        @view-on-map="onViewOnMap"
       />
     </client-only>
     <empty v-else icon="alert" :message="$t('map.alertMessage')" margin="small" />
@@ -55,6 +58,13 @@ export default {
     location: {
       type: [String, Object],
       default: null,
+    },
+    // true (default): create/edit flow — pick-location tool, draggable pin.
+    // false: read-only display (e.g. the post detail page) — no editing,
+    // adds a "view on the main map" control/clickable pin instead.
+    editable: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {
@@ -149,6 +159,9 @@ export default {
       } catch (error) {
         this.$toast.error(error.message)
       }
+    },
+    onViewOnMap({ lat, lng }) {
+      this.$router.push({ path: '/map', query: { lat, lng } })
     },
   },
 }

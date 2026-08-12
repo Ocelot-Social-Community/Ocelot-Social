@@ -207,10 +207,20 @@ export default {
         // projection: 'globe', // the package is probably to old, because of Vue2: https://docs.mapbox.com/mapbox-gl-js/example/globe/
       }
     },
+    // Deep-link support, e.g. "view on main map" from an event's own
+    // read-only location map: /map?lat=..&lng=.. centers here instead of on
+    // the current user (or the country-wide default) on first load.
+    queryCoordinates() {
+      const query = this.$route?.query || {}
+      const lat = parseFloat(query.lat)
+      const lng = parseFloat(query.lng)
+      return Number.isFinite(lat) && Number.isFinite(lng) ? [lng, lat] : null
+    },
     mapCenter() {
-      return this.currentUserCoordinates ? this.currentUserCoordinates : this.defaultCenter
+      return this.queryCoordinates || this.currentUserCoordinates || this.defaultCenter
     },
     mapZoom() {
+      if (this.queryCoordinates) return 15
       return this.currentUserCoordinates ? 10 : 4
     },
   },

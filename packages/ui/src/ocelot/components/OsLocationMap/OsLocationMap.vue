@@ -134,6 +134,21 @@
         type: String,
         default: 'Pick location on map',
       },
+      /**
+       * Adds a control (and makes the pin itself clickable) for jumping to
+       * this location elsewhere — e.g. a host app's own full-page map. The
+       * component never navigates itself: it only emits `view-on-map` with
+       * the current coordinates; the host app decides what "elsewhere" means.
+       */
+      viewOnMap: {
+        type: Boolean,
+        default: false,
+      },
+      /** Accessible label for the view-on-map control and pin (i18n via prop). */
+      viewOnMapLabel: {
+        type: String,
+        default: 'View on map',
+      },
       /** Shows the built-in (controlled) search input. */
       showSearch: {
         type: Boolean,
@@ -174,7 +189,7 @@
         default: false,
       },
     },
-    emits: ['pin-change', 'search-input', 'search-select'],
+    emits: ['pin-change', 'search-input', 'search-select', 'view-on-map'],
     setup(props, { emit, attrs }) {
       /* v8 ignore start -- Vue 2 only */
       const instance = isVue2 ? getCurrentInstance() : null
@@ -247,6 +262,17 @@
             const { lng, lat } = marker.getLngLat()
             emit('pin-change', { lat, lng })
           })
+          if (props.viewOnMap) {
+            const el = marker.getElement()
+            el.style.cursor = 'pointer'
+            el.title = props.viewOnMapLabel
+            el.setAttribute('aria-label', props.viewOnMapLabel)
+            el.addEventListener('click', (e: MouseEvent) => {
+              e.stopPropagation()
+              const { lng, lat } = marker.getLngLat()
+              emit('view-on-map', { lat, lng })
+            })
+          }
         } else {
           marker.setLngLat(lngLat)
           marker.setDraggable(props.editable)
@@ -344,6 +370,37 @@
             setPicking(false)
             pickerToggleEl = null
           },
+        }
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      function buildViewOnMapControl(): any {
+        return {
+          onAdd: () => {
+            const container = document.createElement('div')
+            container.className = 'mapboxgl-ctrl os-location-map-view-on-map'
+
+            const button = document.createElement('button')
+            button.type = 'button'
+            button.className = 'os-location-map-view-on-map-toggle'
+            button.title = props.viewOnMapLabel
+            button.setAttribute('aria-label', props.viewOnMapLabel)
+            button.innerHTML =
+              '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" ' +
+              'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+              '<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>' +
+              '<polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>' +
+              '</svg>'
+            button.addEventListener('click', (e) => {
+              e.stopPropagation()
+              if (!hasPin.value) return
+              emit('view-on-map', { lat: props.lat, lng: props.lng })
+            })
+            container.appendChild(button)
+
+            return container
+          },
+          onRemove: () => {},
         }
       }
 
@@ -484,6 +541,12 @@
 
         if (props.styles.length > 1) {
           map.addControl(buildStyleSwitcher(), 'top-right')
+        }
+
+        if (props.viewOnMap) {
+          // Same corner the pick-location tool would use — the two are not
+          // meant to be active at once (editable vs. read-only display).
+          map.addControl(buildViewOnMapControl(), 'top-left')
         }
 
         // A <button> with no explicit `type` defaults to type="submit". Inside
@@ -816,6 +879,29 @@
   .os-location-map-picker-toggle--active {
     background: rgba(0, 0, 0, 0.1);
     color: #1a73e8;
+  }
+
+  .os-location-map-view-on-map {
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .os-location-map-view-on-map-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 29px;
+    height: 29px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #333;
+  }
+
+  .os-location-map-view-on-map-toggle:hover {
+    background: rgba(0, 0, 0, 0.05);
   }
 
   .os-location-map-style-switcher {

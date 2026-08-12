@@ -1256,7 +1256,8 @@
       "eventStartNotEmpty": "Будь ласка, введіть дату початку.",
       "eventVenue": "Опис місця — напр. подвір'я, 1-й поверх, …",
       "pickLocationOnMap": "Вибрати місце на карті",
-      "title": "Подія"
+      "title": "Подія",
+      "viewOnMainMap": "Переглянути на головній карті"
     },
     "viewPost": {
       "forGroup": {
