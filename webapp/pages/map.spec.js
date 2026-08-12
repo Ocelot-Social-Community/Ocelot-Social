@@ -48,6 +48,8 @@ const mapOnMock = jest.fn((key, ...args) => {
 const mapAddControlMock = jest.fn()
 const mapAddSourceMock = jest.fn()
 const mapAddLayerMock = jest.fn()
+const mapSetDataMock = jest.fn()
+const mapGetSourceMock = jest.fn(() => ({ setData: mapSetDataMock }))
 const mapAddImageMock = jest.fn()
 const mapSetStyleMock = jest.fn()
 const mapSetLayoutPropertyMock = jest.fn()
@@ -76,6 +78,7 @@ const mapMock = {
   addControl: mapAddControlMock,
   addSource: mapAddSourceMock,
   addLayer: mapAddLayerMock,
+  getSource: mapGetSourceMock,
   addImage: mapAddImageMock,
   loadImage: mapLoadImageMock,
   setStyle: mapSetStyleMock,
@@ -231,8 +234,14 @@ describe('map', () => {
     })
 
     it('renders legend with all marker types', () => {
-      const items = wrapper.findAll('.map-legend-item')
+      const items = wrapper.findAll('[data-test="marker-type-item"]')
       expect(items.length).toBe(4)
+    })
+
+    it('renders a "show past events" toggle in the legend', () => {
+      expect(wrapper.find('.map-legend-past-events-toggle input[type="checkbox"]').exists()).toBe(
+        true,
+      )
     })
 
     it('legend is closed by default on mobile', () => {
@@ -860,6 +869,16 @@ describe('map', () => {
           )
         })
 
+        it('renders past events paler via icon-opacity', () => {
+          const [layerArg] = mapAddLayerMock.mock.calls[0]
+          expect(layerArg.paint['icon-opacity']).toEqual([
+            'case',
+            ['boolean', ['get', 'isPast'], false],
+            0.4,
+            1,
+          ])
+        })
+
         it('calls flyTo', () => {
           expect(mapFlyToMock).toHaveBeenCalledWith({
             center: [13.38333, 52.51667],
@@ -1046,6 +1065,14 @@ describe('map', () => {
         expect(vars.groupHasLocation).toBe(true)
         expect(vars.postFilter.postType_in).toEqual(['Event'])
         expect(vars.postFilter.hasLocation).toBe(true)
+        expect(vars.postFilter.eventStart_gte).toBeInstanceOf(Date)
+      })
+
+      it('variables omits eventStart_gte when showPastEvents is true', async () => {
+        await wrapper.setData({ showPastEvents: true })
+        const variablesFn = wrapper.vm.$options.apollo.mapData.variables.bind(wrapper.vm)
+        const vars = variablesFn()
+        expect(vars.postFilter.eventStart_gte).toBeUndefined()
       })
 
       it('update sets users, groups, posts and calls addMarkersOnCheckPrepared', () => {
@@ -1056,6 +1083,58 @@ describe('map', () => {
         expect(wrapper.vm.groups).toBe(groups)
         expect(wrapper.vm.posts).toBe(posts)
         expect(spy).toHaveBeenCalled()
+      })
+
+      it('update refreshes the existing source instead of re-adding it once already added', () => {
+        wrapper.vm.onMapLoad({ map: mapMock })
+        wrapper.vm.markers.isSourceAndLayerAdded = true
+        const spy = jest.spyOn(wrapper.vm, 'refreshMarkersData')
+        const addSpy = jest.spyOn(wrapper.vm, 'addMarkersOnCheckPrepared')
+        const updateFn = wrapper.vm.$options.apollo.mapData.update.bind(wrapper.vm)
+        updateFn({ User: otherUsers, Group: groups, Post: posts })
+        expect(spy).toHaveBeenCalled()
+        expect(addSpy).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('showPastEvents', () => {
+      it('defaults to false without a query param', () => {
+        expect(wrapper.vm.showPastEvents).toBe(false)
+      })
+
+      it('is enabled by the ?showPastEvents=1 deep-link query param', () => {
+        mocks.$route = { query: { showPastEvents: '1' } }
+        const w = createWrapper()
+        expect(w.vm.showPastEvents).toBe(true)
+      })
+
+      it('is reflected by the legend checkbox and can be toggled by it', async () => {
+        const checkbox = wrapper.find('.map-legend-past-events-toggle input[type="checkbox"]')
+        expect(checkbox.element.checked).toBe(false)
+        await checkbox.setChecked(true)
+        expect(wrapper.vm.showPastEvents).toBe(true)
+      })
+    })
+
+    describe('buildMarkersGeoJSON isPast flag', () => {
+      it('marks events with an eventStart in the past as isPast', async () => {
+        const pastPost = {
+          ...posts[0],
+          eventStart: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        }
+        await wrapper.setData({ users: [], groups: [], posts: [pastPost] })
+        const geoJSON = wrapper.vm.buildMarkersGeoJSON()
+        expect(geoJSON.find((f) => f.properties.type === 'event').properties.isPast).toBe(true)
+      })
+
+      it('does not mark future or dateless events as isPast', async () => {
+        const futurePost = {
+          ...posts[0],
+          eventStart: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        }
+        await wrapper.setData({ users: [], groups: [], posts: [futurePost] })
+        const geoJSON = wrapper.vm.buildMarkersGeoJSON()
+        expect(geoJSON.find((f) => f.properties.type === 'event').properties.isPast).toBe(false)
       })
     })
 

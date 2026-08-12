@@ -103,6 +103,7 @@
                 class="event-data__map"
                 :location="eventMapLocation"
                 :editable="false"
+                :is-past-event="isPastEvent"
               />
             </div>
             <div class="ds-mb-small"></div>
@@ -379,6 +380,11 @@ export default {
         typeof this.post.eventLocation.lng === 'number'
       )
     },
+    // Same definition the main map itself uses to hide events (eventStart in
+    // the past) — deep-linking from one tells the map to include past pins.
+    isPastEvent() {
+      return !!this.post?.eventStart && new Date(this.post.eventStart) < new Date()
+    },
     // Read-only map only makes sense for in-person events with a resolved pin.
     showEventMap() {
       return (
@@ -393,12 +399,15 @@ export default {
     // Lets the venue/address text (LocationTeaser's `to` prop) deep-link into
     // the main map, same coordinates the read-only pin uses.
     mapLinkTo() {
-      return this.hasEventCoordinates
-        ? {
-            path: '/map',
-            query: { lat: this.post.eventLocation.lat, lng: this.post.eventLocation.lng },
-          }
-        : null
+      if (!this.hasEventCoordinates) return null
+      return {
+        path: '/map',
+        query: {
+          lat: this.post.eventLocation.lat,
+          lng: this.post.eventLocation.lng,
+          ...(this.isPastEvent ? { showPastEvents: '1' } : {}),
+        },
+      }
     },
     // Network permission to comment at all (separate from group membership / blocking).
     canComment() {

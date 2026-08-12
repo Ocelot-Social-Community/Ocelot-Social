@@ -66,6 +66,14 @@ export default {
       type: Boolean,
       default: true,
     },
+    // Whether the event this map belongs to already lies in the past. When
+    // navigating to the main map, this asks it to include past-event pins
+    // too (it hides them by default) — otherwise the linked event's own pin
+    // (and any other past ones) wouldn't show up there at all.
+    isPastEvent: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -161,7 +169,9 @@ export default {
       }
     },
     onViewOnMap({ lat, lng }) {
-      this.$router.push({ path: '/map', query: { lat, lng } })
+      const query = { lat, lng }
+      if (this.isPastEvent) query.showPastEvents = '1'
+      this.$router.push({ path: '/map', query })
     },
   },
 }

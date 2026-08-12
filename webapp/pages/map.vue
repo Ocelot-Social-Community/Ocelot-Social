@@ -38,7 +38,12 @@
             role="region"
             :aria-label="$t('map.legend.title')"
           >
-            <div v-for="type in markers.types" :key="type.id" class="map-legend-item">
+            <div
+              v-for="type in markers.types"
+              :key="type.id"
+              class="map-legend-item"
+              data-test="marker-type-item"
+            >
               <span :style="{ color: type.color }">
                 <os-icon
                   :icon="icons.mapPinFilled"
@@ -47,6 +52,12 @@
                 />
               </span>
               {{ $t('map.legend.' + type.id) }}
+            </div>
+            <div class="map-legend-item">
+              <label class="map-legend-past-events-toggle">
+                <input type="checkbox" v-model="showPastEvents" />
+                {{ $t('map.legend.showPastEvents') }}
+              </label>
             </div>
           </div>
         </div>
@@ -90,6 +101,9 @@ export default {
       isEmpty,
       mapboxgl,
       legendOpen: false,
+      // Auto-enabled when deep-linking from a past event (its own pin would
+      // otherwise be filtered out entirely); user-toggleable afterwards.
+      showPastEvents: this.$route?.query?.showPastEvents === '1',
       activeStyle: null,
       defaultCenter: [10.452764, 51.165707], // center of Germany: https://www.gpskoordinaten.de/karte/land/DE
       currentUserLocation: null,
@@ -526,119 +540,127 @@ export default {
         this.addMarkersOnCheckPrepared()
       })
     },
-    addMarkersOnCheckPrepared() {
-      // set geoJSON for markers
-      if (this.isPreparedForMarkers) {
-        // add markers for "users"
-        this.users.forEach((user) => {
-          if (user.id !== this.currentUser.id) {
-            this.markers.geoJSON.push({
-              type: 'Feature',
-              properties: {
-                type: 'user',
-                iconName: 'marker-green',
-                iconRotate: 0.0,
-                id: user.id,
-                slug: user.slug,
-                name: user.name,
-                locationName: user.location.name,
-                description: user.about ? user.about : undefined,
-              },
-              geometry: {
-                type: 'Point',
-                coordinates: this.getCoordinates(user.location),
-              },
-            })
-          }
-        })
-        // add marker for "currentUser"
-        if (this.currentUserCoordinates) {
-          this.markers.geoJSON.push({
+    // Pure function of users/groups/posts/currentUser — reused for the
+    // initial build and to refresh an already-added source (e.g. after the
+    // "show past events" filter changes and new posts arrive).
+    buildMarkersGeoJSON() {
+      const geoJSON = []
+      // add markers for "users"
+      this.users.forEach((user) => {
+        if (user.id !== this.currentUser.id) {
+          geoJSON.push({
             type: 'Feature',
             properties: {
-              type: 'theUser',
-              iconName: 'marker-orange',
-              iconRotate: 45.0,
-              id: this.currentUser.id,
-              slug: this.currentUser.slug,
-              name: this.currentUser.name,
-              locationName: this.currentUserLocation.name,
-              description: this.currentUser.about ? this.currentUser.about : undefined,
+              type: 'user',
+              iconName: 'marker-green',
+              iconRotate: 0.0,
+              id: user.id,
+              slug: user.slug,
+              name: user.name,
+              locationName: user.location.name,
+              description: user.about ? user.about : undefined,
             },
             geometry: {
               type: 'Point',
-              coordinates: this.currentUserCoordinates,
+              coordinates: this.getCoordinates(user.location),
             },
           })
         }
-        // add markers for "groups"
-        this.groups.forEach((group) => {
-          this.markers.geoJSON.push({
-            type: 'Feature',
-            properties: {
-              type: 'group',
-              iconName: 'marker-red',
-              iconRotate: 0.0,
-              id: group.id,
-              slug: group.slug,
-              name: group.name,
-              locationName: group.location.name,
-              description: group.about ? group.about : undefined,
-            },
-            geometry: {
-              type: 'Point',
-              coordinates: this.getCoordinates(group.location),
-            },
-          })
+      })
+      // add marker for "currentUser"
+      if (this.currentUserCoordinates) {
+        geoJSON.push({
+          type: 'Feature',
+          properties: {
+            type: 'theUser',
+            iconName: 'marker-orange',
+            iconRotate: 45.0,
+            id: this.currentUser.id,
+            slug: this.currentUser.slug,
+            name: this.currentUser.name,
+            locationName: this.currentUserLocation.name,
+            description: this.currentUser.about ? this.currentUser.about : undefined,
+          },
+          geometry: {
+            type: 'Point',
+            coordinates: this.currentUserCoordinates,
+          },
         })
-        // add markers for "posts", post type "Event" with location coordinates
-        this.posts.forEach((post) => {
-          if (!post.eventLocation) return
-          this.markers.geoJSON.push({
-            type: 'Feature',
-            properties: {
-              type: 'event',
-              iconName: 'marker-purple',
-              iconRotate: 0.0,
-              id: post.id,
-              slug: post.slug,
-              name: post.title,
-              locationName: post.eventLocation.name,
-              description: this.$filters.removeHtml(post.content),
-            },
-            geometry: {
-              type: 'Point',
-              coordinates: this.getCoordinates(post.eventLocation),
-            },
-          })
+      }
+      // add markers for "groups"
+      this.groups.forEach((group) => {
+        geoJSON.push({
+          type: 'Feature',
+          properties: {
+            type: 'group',
+            iconName: 'marker-red',
+            iconRotate: 0.0,
+            id: group.id,
+            slug: group.slug,
+            name: group.name,
+            locationName: group.location.name,
+            description: group.about ? group.about : undefined,
+          },
+          geometry: {
+            type: 'Point',
+            coordinates: this.getCoordinates(group.location),
+          },
         })
+      })
+      // add markers for "posts", post type "Event" with location coordinates
+      this.posts.forEach((post) => {
+        if (!post.eventLocation) return
+        geoJSON.push({
+          type: 'Feature',
+          properties: {
+            type: 'event',
+            iconName: 'marker-purple',
+            iconRotate: 0.0,
+            id: post.id,
+            slug: post.slug,
+            name: post.title,
+            locationName: post.eventLocation.name,
+            description: this.$filters.removeHtml(post.content),
+            isPast: !!post.eventStart && new Date(post.eventStart) < new Date(),
+          },
+          geometry: {
+            type: 'Point',
+            coordinates: this.getCoordinates(post.eventLocation),
+          },
+        })
+      })
 
-        // Nudge markers of different types sharing the same coordinates
-        const coordGroups = {}
-        this.markers.geoJSON.forEach((feature) => {
-          const key = feature.geometry.coordinates.join(',')
-          if (!coordGroups[key]) coordGroups[key] = []
-          coordGroups[key].push(feature)
+      // Nudge markers of different types sharing the same coordinates
+      const coordGroups = {}
+      geoJSON.forEach((feature) => {
+        const key = feature.geometry.coordinates.join(',')
+        if (!coordGroups[key]) coordGroups[key] = []
+        coordGroups[key].push(feature)
+      })
+      const lngOffset = 0.0002 // small longitude offset (~15m at mid-latitudes)
+      Object.values(coordGroups).forEach((group) => {
+        // Deduplicate by type — only offset distinct types
+        const uniqueTypes = [...new Set(group.map((f) => f.properties.type))]
+        if (uniqueTypes.length <= 1) return
+        const totalWidth = (uniqueTypes.length - 1) * lngOffset
+        uniqueTypes.forEach((type, index) => {
+          const offset = -totalWidth / 2 + index * lngOffset
+          group
+            .filter((f) => f.properties.type === type)
+            .forEach((feature) => {
+              feature.geometry.coordinates = [
+                feature.geometry.coordinates[0] + offset,
+                feature.geometry.coordinates[1],
+              ]
+            })
         })
-        const lngOffset = 0.0002 // small longitude offset (~15m at mid-latitudes)
-        Object.values(coordGroups).forEach((group) => {
-          // Deduplicate by type — only offset distinct types
-          const uniqueTypes = [...new Set(group.map((f) => f.properties.type))]
-          if (uniqueTypes.length <= 1) return
-          const totalWidth = (uniqueTypes.length - 1) * lngOffset
-          uniqueTypes.forEach((type, index) => {
-            const offset = -totalWidth / 2 + index * lngOffset
-            group
-              .filter((f) => f.properties.type === type)
-              .forEach((feature) => {
-                feature.geometry.coordinates = [
-                  feature.geometry.coordinates[0] + offset,
-                  feature.geometry.coordinates[1],
-                ]
-              })
-          })
-        })
+      })
 
+      return geoJSON
+    },
+    addMarkersOnCheckPrepared() {
+      if (this.isPreparedForMarkers) {
+        this.markers.geoJSON = this.buildMarkersGeoJSON()
         this.markers.isGeoJSON = true
       }
 
@@ -666,6 +688,11 @@ export default {
             // 'text-anchor': 'top',
             // 'text-allow-overlap': true,
           },
+          paint: {
+            // Past events (only fetched at all when "show past events" is
+            // on) render paler than everything else.
+            'icon-opacity': ['case', ['boolean', ['get', 'isPast'], false], 0.4, 1],
+          },
         })
 
         this.markers.isSourceAndLayerAdded = true
@@ -676,6 +703,16 @@ export default {
         this.mapFlyToCenter()
         this.markers.isFlyToCenter = true
       }
+    },
+    // Called when users/groups/posts change after the initial load (e.g. the
+    // "show past events" filter re-triggered the apollo query) — updates the
+    // already-added source in place instead of re-adding it.
+    refreshMarkersData() {
+      this.markers.geoJSON = this.buildMarkersGeoJSON()
+      this.map.getSource('markers').setData({
+        type: 'FeatureCollection',
+        features: this.markers.geoJSON,
+      })
     },
     mapFlyToCenter() {
       if (this.map) {
@@ -719,7 +756,7 @@ export default {
           groupHasLocation: true,
           postFilter: {
             postType_in: ['Event'],
-            eventStart_gte: new Date(),
+            ...(this.showPastEvents ? {} : { eventStart_gte: new Date() }),
             hasLocation: true,
             skipPinnedFilter: true,
           },
@@ -729,7 +766,11 @@ export default {
         this.users = User
         this.groups = Group
         this.posts = Post
-        this.addMarkersOnCheckPrepared()
+        if (this.markers.isSourceAndLayerAdded) {
+          this.refreshMarkersData()
+        } else {
+          this.addMarkersOnCheckPrepared()
+        }
       },
       fetchPolicy: 'cache-and-network',
     },
@@ -918,6 +959,13 @@ export default {
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+.map-legend-past-events-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
 }
 
 @media (max-width: 639px) {

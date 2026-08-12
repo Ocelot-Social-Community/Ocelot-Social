@@ -1056,6 +1056,7 @@
     "legend": {
       "event": "Ngjarje",
       "group": "Grup",
+      "showPastEvents": "Shfaq ngjarjet e kaluara",
       "theUser": "Pozicioni im",
       "title": "Legjenda",
       "user": "Përdorues"

@@ -1056,6 +1056,7 @@
     "legend": {
       "event": "Événement",
       "group": "Groupe",
+      "showPastEvents": "Afficher les événements passés",
       "theUser": "Ma position",
       "title": "Légende",
       "user": "Utilisateur"

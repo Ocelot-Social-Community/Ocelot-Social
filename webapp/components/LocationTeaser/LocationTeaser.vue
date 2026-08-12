@@ -3,13 +3,14 @@
     class="ds-text ds-text-left ds-text-soft location-teaser"
     :class="size && 'ds-text-size-' + size"
   >
-    <os-icon :icon="icons.mapMarker" data-test="map-marker" />
     <component
       :is="to ? 'nuxt-link' : 'span'"
       :to="to"
+      class="location-teaser__content"
       :class="{ 'location-teaser__link': to }"
       data-test="location-teaser-text"
     >
+      <os-icon :icon="icons.mapMarker" data-test="map-marker" />
       <span v-if="venue">{{ venue }}</span>
       <span v-if="venue">&nbsp;&mdash;&nbsp;</span>
       <span v-if="!isOnline">
@@ -69,6 +70,11 @@ export default {
 <style>
 .location-teaser {
   display: flex;
+  align-items: center;
+}
+
+.location-teaser__content {
+  display: inline-flex;
   align-items: center;
   gap: 2px;
 }

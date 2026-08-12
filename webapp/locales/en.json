@@ -1056,6 +1056,7 @@
     "legend": {
       "event": "Event",
       "group": "Group",
+      "showPastEvents": "Show past events",
       "theUser": "My position",
       "title": "Legend",
       "user": "User"
