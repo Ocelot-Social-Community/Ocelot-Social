@@ -46,23 +46,22 @@ if (!sourceDir) {
   console.warn(
     'fix-storybook-webpack: webpack/lib/rules/ not found in any nested storybook webpack — storybook dev may fail',
   )
-  return
-}
+} else {
+  fs.mkdirSync(destDir, { recursive: true })
 
-fs.mkdirSync(destDir, { recursive: true })
-
-let copied = 0
-for (const file of fs.readdirSync(sourceDir)) {
-  const dest = path.join(destDir, file)
-  if (!fs.existsSync(dest)) {
-    fs.copyFileSync(path.join(sourceDir, file), dest)
-    copied++
+  let copied = 0
+  for (const file of fs.readdirSync(sourceDir)) {
+    const dest = path.join(destDir, file)
+    if (!fs.existsSync(dest)) {
+      fs.copyFileSync(path.join(sourceDir, file), dest)
+      copied++
+    }
   }
-}
 
-if (copied > 0) {
-  // eslint-disable-next-line no-console
-  console.log(
-    `Copied ${copied} file(s) into top-level webpack/lib/rules/ for vue-loader compatibility`,
-  )
+  if (copied > 0) {
+    // eslint-disable-next-line no-console
+    console.log(
+      `Copied ${copied} file(s) into top-level webpack/lib/rules/ for vue-loader compatibility`,
+    )
+  }
 }

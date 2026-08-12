@@ -45,8 +45,9 @@ module.exports = defineConfig({
 
   expect: {
     toHaveScreenshot: {
-      // Allow slight differences from font rendering/OS-level rendering across machines.
-      maxDiffPixelRatio: 0.03,
+      // Baselines are rendered on Linux (docker-compose.visual.yml) — same platform as CI.
+      // 0.1 % gives a tiny buffer for sub-pixel antialiasing while catching real regressions.
+      maxDiffPixelRatio: 0.001,
     },
   },
 

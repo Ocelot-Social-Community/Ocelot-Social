@@ -1,0 +1,85 @@
+# Visual regression baseline update — renders screenshots on Linux so they match CI.
+#
+# webapp — New component (missing baseline):
+#   docker compose -f docker-compose.visual.yml run --rm webapp-visual-update
+# webapp — Existing component changed:
+#   docker compose -f docker-compose.visual.yml run --rm webapp-visual-update-changed
+#
+# packages/ui — New component (missing baseline):
+#   docker compose -f docker-compose.visual.yml run --rm ui-visual-update
+# packages/ui — Existing component changed:
+#   docker compose -f docker-compose.visual.yml run --rm ui-visual-update-changed
+#
+# Filter to specific component: -e TEST=OsValidationHint
+#
+# First run: storybook build is cached in named volume; subsequent runs are much faster.
+# After the run, commit the updated __screenshots__/ files.
+
+x-visual-base: &visual-base
+  image: mcr.microsoft.com/playwright:v1.61.1-noble
+  platform: linux/arm64
+  working_dir: /app
+  shm_size: '2gb'
+  environment:
+    - NODE_ENV=development
+    - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+    - PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+    # TEST filters which spec files Playwright runs — empty = all tests.
+    # Override via: docker compose ... run --rm -e TEST=CommentCard webapp-visual-update-changed
+    - TEST=
+  volumes:
+    - ./webapp:/app
+    - webapp_visual_node_modules:/app/node_modules
+    - ./packages/ui:/packages/ui
+    - ./packages/branding:/packages/branding
+
+services:
+  webapp-visual-update:
+    <<: *visual-base
+    command: >
+      /bin/bash -c "
+        npm install -g yarn@1.22.22 &&
+        PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 yarn install &&
+        node scripts/fix-storybook-webpack.js &&
+        ([ -d storybook-static ] || yarn build-storybook) &&
+        CI=true ./node_modules/.bin/playwright test --update-snapshots=missing $${TEST:-}
+      "
+
+  webapp-visual-update-changed:
+    <<: *visual-base
+    command: >
+      /bin/bash -c "
+        npm install -g yarn@1.22.22 &&
+        PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 yarn install &&
+        node scripts/fix-storybook-webpack.js &&
+        ([ -d storybook-static ] || yarn build-storybook) &&
+        CI=true ./node_modules/.bin/playwright test --update-snapshots=changed $${TEST:-}
+      "
+
+  ui-visual-update:
+    <<: *visual-base
+    volumes:
+      - ./packages/ui:/app
+      - ui_visual_node_modules:/app/node_modules
+    command: >
+      /bin/bash -c "
+        npm install &&
+        ([ -d storybook-static ] || npm run storybook:build) &&
+        CI=true npx playwright test --update-snapshots=missing $${TEST:-}
+      "
+
+  ui-visual-update-changed:
+    <<: *visual-base
+    volumes:
+      - ./packages/ui:/app
+      - ui_visual_node_modules:/app/node_modules
+    command: >
+      /bin/bash -c "
+        npm install &&
+        ([ -d storybook-static ] || npm run storybook:build) &&
+        CI=true npx playwright test --update-snapshots=changed $${TEST:-}
+      "
+
+volumes:
+  webapp_visual_node_modules:
+  ui_visual_node_modules:
