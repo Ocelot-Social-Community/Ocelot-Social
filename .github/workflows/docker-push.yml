@@ -136,5 +136,12 @@ jobs:
           # the three matrix jobs run concurrently, and the losers fail with "cache already exists"
           # after mixing up the index. Hence `cacheTo` on the one target that subsumes the others —
           # see .github/images.json, which also documents which target that is per Dockerfile.
+          #
+          # `ignore-error=true` because the export runs as part of the same solve as the push and
+          # defaults to being fatal: a throttled or briefly unavailable Actions cache service would
+          # turn a run whose images are ALREADY IN THE REGISTRY into a red one. On master that is
+          # not just noise — `publish` waits for this workflow to succeed before it retags those
+          # images into the version tags, so a cache hiccup would hold up a release. A failed export
+          # only costs the next build its cache hits, which is the cheaper failure by a wide margin.
           cache-from: type=gha,scope=${{ matrix.app.cacheScope }}
-          cache-to: ${{ matrix.app.cacheTo && format('type=gha,mode=max,scope={0}', matrix.app.cacheScope) || '' }}
+          cache-to: ${{ matrix.app.cacheTo && format('type=gha,mode=max,ignore-error=true,scope={0}', matrix.app.cacheScope) || '' }}
