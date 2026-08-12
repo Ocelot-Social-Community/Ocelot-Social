@@ -129,10 +129,15 @@ jobs:
         run: |
           set -euo pipefail
 
-          # github.repository keeps the owner's capitalisation, registry paths are lowercase only.
+          # GITHUB_REPOSITORY and GITHUB_SHA rather than the matching Actions expressions: an
+          # expression is substituted into the script text, the runner defaults arrive as data. Same
+          # reason as in the changelog step of github_release, applied uniformly so the rule does
+          # not read as if these two were exceptions.
+          #
+          # GITHUB_REPOSITORY keeps the owner's capitalisation, registry paths are lowercase only.
           # docker/metadata-action does this downcasing for the build; here it is done by hand.
-          REPOSITORY="$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')"
-          SOURCE_TAG="sha-${{ github.sha }}"
+          REPOSITORY="$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')"
+          SOURCE_TAG="sha-${GITHUB_SHA}"
           MAJOR="${VERSION%%.*}"
           MINOR="${VERSION%.*}"
           DEADLINE=$(( $(date +%s) + WAIT_SECONDS ))
@@ -142,7 +147,7 @@ jobs:
 
             until docker buildx imagetools inspect "${IMAGE}:${SOURCE_TAG}" > /dev/null 2>&1; do
               if [ "$(date +%s)" -ge "${DEADLINE}" ]; then
-                echo "::error::${IMAGE}:${SOURCE_TAG} never appeared — check the docker-push run for ${{ github.sha }}"
+                echo "::error::${IMAGE}:${SOURCE_TAG} never appeared — check the docker-push run for ${GITHUB_SHA}"
                 exit 1
               fi
               echo "waiting for ${IMAGE}:${SOURCE_TAG}"
@@ -186,15 +191,19 @@ jobs:
         uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
         with:
           node-version-file: '.nvmrc'
+      # `"${VERSION}"` and not `${{ env.VERSION }}`: an expression is pasted into the script text
+      # before the shell starts, so the version string from package.json would be parsed as shell
+      # source. It reaches here through a merged pull request, which is review-gated but not a
+      # trust boundary. Reading it from the environment hands it over as data.
       - name: Generate changelog
         run: |
           yarn install
-          yarn auto-changelog --latest-version ${{ env.VERSION }} --unreleased-only
+          yarn auto-changelog --latest-version "${VERSION}" --unreleased-only
       - name: Compose release notes
         run: |
           set -euo pipefail
 
-          REPOSITORY="$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')"
+          REPOSITORY="$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')"
           MAJOR="${VERSION%%.*}"
           MINOR="${VERSION%.*}"
 
