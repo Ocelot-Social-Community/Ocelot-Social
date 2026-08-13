@@ -11362,10 +11362,10 @@ tslog@^4.10.2:
   resolved "https://registry.yarnpkg.com/tslog/-/tslog-4.10.2.tgz#45c870d7fe9558d59ce288eeb86ba49eaaf25e1e"
   integrity sha512-XuELoRpMR+sq8fuWwX7P0bcj+PRNiicOKDEb3fGNURhxWVyykCi9BNq7c4uVz7h7P0sj8qgBsr5SWS6yBClq3g==
 
-tsx@^4.23.0:
-  version "4.23.0"
-  resolved "https://registry.yarnpkg.com/tsx/-/tsx-4.23.0.tgz#5393ae8bfce5a9c34db9c00d1353e3d8c3fd3de6"
-  integrity sha512-eUdUIaCr963q2h5u3+QwvYp0+eqPvn+egeqZUm0hwERCqqx1E3kK5ehbGCvqSE5MQAULr67ww0cA3jKc3YkM1w==
+tsx@^4.23.12:
+  version "4.23.12"
+  resolved "https://registry.yarnpkg.com/tsx/-/tsx-4.23.12.tgz#3a4919591cd9b9e00011b75e596c8ab8db23c09c"
+  integrity sha512-FDf4L4sYzKtzWYhU/Xm0AQFdTjdIxNo9ElTf2mxXM6k8YMHXzYUe4yODVaXP4V9uMFbVg8c0qyBccK2OOxb45Q==
   dependencies:
     esbuild "~0.28.0"
   optionalDependencies:
