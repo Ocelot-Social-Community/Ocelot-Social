@@ -1169,6 +1169,22 @@ describe('map', () => {
         const geoJSON = wrapper.vm.buildMarkersGeoJSON()
         expect(geoJSON.find((f) => f.properties.type === 'event').properties.isPast).toBe(false)
       })
+
+      it('does not mark an event without eventEnd as isPast while still within its start day', async () => {
+        // No eventEnd was ever given (legacy posts) — assumed to run through
+        // the rest of the day it started, mirroring the backend fallback.
+        const noEndTodayPost = { ...posts[0], eventStart: hoursFromNow(-1), eventEnd: null }
+        await wrapper.setData({ users: [], groups: [], posts: [noEndTodayPost] })
+        const geoJSON = wrapper.vm.buildMarkersGeoJSON()
+        expect(geoJSON.find((f) => f.properties.type === 'event').properties.isPast).toBe(false)
+      })
+
+      it('marks an event without eventEnd as isPast once its start day has fully elapsed', async () => {
+        const noEndOldPost = { ...posts[0], eventStart: hoursFromNow(-30), eventEnd: null }
+        await wrapper.setData({ users: [], groups: [], posts: [noEndOldPost] })
+        const geoJSON = wrapper.vm.buildMarkersGeoJSON()
+        expect(geoJSON.find((f) => f.properties.type === 'event').properties.isPast).toBe(true)
+      })
     })
 
     describe('beforeDestroy', () => {

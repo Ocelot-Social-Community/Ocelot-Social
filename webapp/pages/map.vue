@@ -754,11 +754,17 @@ export default {
     // Mirrors filterEventDates() in backend/src/graphql/resolvers/posts.ts:
     // the backend keeps an event while EITHER eventStart or eventEnd is
     // still in the future, so a still-running event is only truly "past"
-    // once both have elapsed.
+    // once both have elapsed. Events without an eventEnd (never set by the
+    // author) are assumed to run through the rest of the day they started.
     isEventPast(post) {
-      if (!post.eventStart || !post.eventEnd) return false
+      if (!post.eventStart) return false
       const now = new Date()
-      return new Date(post.eventStart) < now && new Date(post.eventEnd) < now
+      if (post.eventEnd) {
+        return new Date(post.eventStart) < now && new Date(post.eventEnd) < now
+      }
+      const endOfStartDate = new Date(post.eventStart)
+      endOfStartDate.setHours(23, 59, 59, 999)
+      return endOfStartDate < now
     },
     async getUserLocation(id) {
       try {

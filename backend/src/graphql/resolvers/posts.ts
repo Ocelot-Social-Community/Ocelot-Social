@@ -93,7 +93,20 @@ const filterEventDates = (params) => {
   if (params.filter?.eventStart_gte) {
     const date = params.filter.eventStart_gte
     delete params.filter.eventStart_gte
-    params.filter = { ...params.filter, OR: [{ eventStart_gte: date }, { eventEnd_gte: date }] }
+    // Posts saved before eventEnd defaulting existed (see ContributionForm's
+    // fallback) may still have no eventEnd at all. Treat those as running
+    // through the rest of the day they started, rather than dropping them
+    // the instant eventStart passes.
+    const startOfStartDate = new Date(date)
+    startOfStartDate.setHours(0, 0, 0, 0)
+    params.filter = {
+      ...params.filter,
+      OR: [
+        { eventStart_gte: date },
+        { eventEnd_gte: date },
+        { eventEnd: null, eventStart_gte: startOfStartDate.toISOString() },
+      ],
+    }
   }
   return params
 }
