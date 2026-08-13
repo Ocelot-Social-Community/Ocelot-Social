@@ -153,8 +153,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          # Trusted publishing needs npm >= 11.5.1; the pinned Node in .tool-versions (25.5.0)
-          # bundles 11.8.0. Downgrading Node below 24.x silently drops OIDC support here.
+          # Trusted publishing needs npm >= 11.5.1, whose own floor is Node >= 22.14.0. npm is
+          # taken from Node's bundle here, and that is the tighter of the two constraints: Node 22
+          # LTS ships npm 10.9.x to this day, and the first Node bundling >= 11.5.1 is 24.5.0. The
+          # version pinned in .tool-versions (25.5.0) brings npm 11.8.0. Below that, OIDC drops out
+          # silently unless a step installs a newer npm explicitly.
           node-version-file: 'packages/branding/.tool-versions'
           # Still required without a token: it writes the .npmrc that points npm at the public
           # registry, which is where the OIDC exchange happens. No `cache:` — nothing is installed.
