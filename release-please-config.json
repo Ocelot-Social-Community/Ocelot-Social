@@ -10,7 +10,8 @@
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true,
       "draft": false,
-      "prerelease": false
+      "prerelease": false,
+      "pull-request-title-pattern": "chore(package/ui): release ${version}"
     },
     "packages/branding": {
       "release-type": "node",
@@ -22,10 +23,12 @@
       "bump-patch-for-minor-pre-major": true,
       "draft": false,
       "prerelease": false,
-      "extra-files": ["src/version.ts"]
+      "extra-files": ["src/version.ts"],
+      "pull-request-title-pattern": "chore(package/branding): release ${version}"
     }
   },
   "separate-pull-requests": true,
-  "pull-request-title-pattern": "chore(${component}): release ${version}",
+  "pull-request-title-pattern": "chore(release): ${component} ${version}",
+  "component-no-space": true,
   "include-v-in-tag": true
 }
