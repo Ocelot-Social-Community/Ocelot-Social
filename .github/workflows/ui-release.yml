@@ -21,9 +21,10 @@ concurrency:
   cancel-in-progress: false
   queue: max
 
-# Read-only throughout, because nothing here writes with GITHUB_TOKEN: release-please authenticates
-# with the it4c-release-bot app token minted below, and `publish` authenticates to npm with
-# NPM_TOKEN. Set explicitly rather than inheriting the repository or organisation default.
+# Read-only default, because nothing here writes with GITHUB_TOKEN: release-please authenticates
+# with the it4c-release-bot app token minted below, and `publish` authenticates to npm over OIDC.
+# Set explicitly rather than inheriting the repository or organisation default; the `publish` job
+# widens it to `id-token: write` for itself.
 permissions:
   contents: read
 
@@ -79,6 +80,17 @@ jobs:
     needs: release-please
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     runs-on: ubuntu-latest
+    # Job-level block, and it REPLACES the workflow-level one rather than adding to it — hence
+    # `contents: read` is repeated here for the checkout below.
+    #   id-token: write — mints the OIDC token that npm trusted publishing authenticates with. No
+    #                     NPM_TOKEN anywhere: the registry verifies the OIDC claims (repository,
+    #                     workflow filename, ref) against the trusted publisher configured on the
+    #                     package, so there is no long-lived credential to store or rotate. This
+    #                     also makes npm attach a provenance attestation automatically — `id-token`
+    #                     is what signs it, and `--provenance` is therefore not passed below.
+    permissions:
+      contents: read
+      id-token: write
     defaults:
       run:
         working-directory: packages/ui
@@ -92,7 +104,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
+          # Trusted publishing needs npm >= 11.5.1; the pinned Node in .tool-versions (25.5.0)
+          # bundles 11.8.0. Downgrading Node below 24.x silently drops OIDC support here.
           node-version-file: 'packages/ui/.tool-versions'
+          # Still required without a token: it writes the .npmrc that points npm at the public
+          # registry, which is where the OIDC exchange happens.
           registry-url: 'https://registry.npmjs.org'
           cache: 'npm'
           cache-dependency-path: packages/ui/package-lock.json
@@ -106,7 +122,8 @@ jobs:
       - name: Validate package
         run: npm run validate
 
+      # Authenticated by the OIDC token, not by a secret. The trusted publisher on npm pins the
+      # workflow FILENAME (`ui-release.yml`), so moving or renaming this file breaks publishing
+      # with a 404 until the configuration on npmjs.com is updated to match.
       - name: Publish to npm
         run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
