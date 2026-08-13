@@ -122,5 +122,26 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=${{ matrix.app.name }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.app.name }}
+          # One cache scope per DOCKERFILE, not per image, and only one image per scope writes it.
+          #
+          # `mode=max` exports every stage a build touched. The three images built from one Dockerfile
+          # are nested — for backend, `production` is `FROM base` plus a COPY out of `production_build`
+          # (`FROM build`), so building it involves base, base-build, build and production_build. Its
+          # cache therefore already CONTAINS everything the `base` and `build` images would export;
+          # writing all three meant storing the same layers under three keys. A cache key of a step in
+          # `base` does not depend on which target the build was aiming for, so the two readers hit the
+          # writer's entries exactly as they hit their own before.
+          #
+          # Letting all three WRITE one shared scope would not work: Actions cache keys are immutable,
+          # the three matrix jobs run concurrently, and the losers fail with "cache already exists"
+          # after mixing up the index. Hence `cacheTo` on the one target that subsumes the others —
+          # see .github/images.json, which also documents which target that is per Dockerfile.
+          #
+          # `ignore-error=true` because the export runs as part of the same solve as the push and
+          # defaults to being fatal: a throttled or briefly unavailable Actions cache service would
+          # turn a run whose images are ALREADY IN THE REGISTRY into a red one. On master that is
+          # not just noise — `publish` waits for this workflow to succeed before it retags those
+          # images into the version tags, so a cache hiccup would hold up a release. A failed export
+          # only costs the next build its cache hits, which is the cheaper failure by a wide margin.
+          cache-from: type=gha,scope=${{ matrix.app.cacheScope }}
+          cache-to: ${{ matrix.app.cacheTo && format('type=gha,mode=max,ignore-error=true,scope={0}', matrix.app.cacheScope) || '' }}
