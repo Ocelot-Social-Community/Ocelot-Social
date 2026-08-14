@@ -870,12 +870,12 @@ describe('map', () => {
           )
         })
 
-        it('renders past events paler via icon-opacity', () => {
+        it('renders past events paler via icon-opacity, from the --opacity-soft token (falls back to 0.7 in jsdom, where the token is unset)', () => {
           const [layerArg] = mapAddLayerMock.mock.calls[0]
           expect(layerArg.paint['icon-opacity']).toEqual([
             'case',
             ['boolean', ['get', 'isPast'], false],
-            0.4,
+            0.7,
             1,
           ])
         })

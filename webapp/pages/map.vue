@@ -109,6 +109,10 @@ import Empty from '~/components/Empty/Empty'
 
 const maxMobileWidth = 639 // on this width and smaller the mapbox 'MapboxGeocoder' search gets bigger
 
+// Same value as --opacity-soft in root-tokens.css, used only if that custom
+// property can't be read yet (e.g. before the stylesheet is applied).
+const PAST_EVENT_OPACITY_FALLBACK = 0.7
+
 export default {
   name: 'Map',
   mixins: [mobile(maxMobileWidth)],
@@ -224,6 +228,18 @@ export default {
         this.groups &&
         this.posts
       )
+    },
+    // Mapbox's icon-opacity paint property needs a resolved number, not a
+    // live var() reference, hence getComputedStyle() instead of just passing
+    // "var(--opacity-soft)" straight through — mirrors how EventLocationMap
+    // resolves --color-map-marker-event for the pin color.
+    pastEventOpacity() {
+      if (typeof window === 'undefined') return PAST_EVENT_OPACITY_FALLBACK
+      const value = getComputedStyle(document.documentElement)
+        .getPropertyValue('--opacity-soft')
+        .trim()
+      const parsed = parseFloat(value)
+      return Number.isFinite(parsed) ? parsed : PAST_EVENT_OPACITY_FALLBACK
     },
     availableStyles() {
       // https://docs.mapbox.com/api/maps/styles/
@@ -760,7 +776,12 @@ export default {
           paint: {
             // Past events (only fetched at all when "show past events" is
             // on) render paler than everything else.
-            'icon-opacity': ['case', ['boolean', ['get', 'isPast'], false], 0.4, 1],
+            'icon-opacity': [
+              'case',
+              ['boolean', ['get', 'isPast'], false],
+              this.pastEventOpacity,
+              1,
+            ],
           },
         })
 
