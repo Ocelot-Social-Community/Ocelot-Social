@@ -9,6 +9,19 @@ underMaintenance: false
 global:
   image:
     pullPolicy: IfNotPresent
+    # Image tag for every component, overridable per component below. Empty falls back to the
+    # chart's `appVersion`, which is the released version — the safest default and immutable.
+    # These are the tags the `publish` and `docker-push` workflows put on the images:
+    #
+    #   3.18.4                 released version, immutable
+    #   3.18 / 3               newest release of that minor / major, moves forward
+    #   b3.18.4-2077           one specific master commit, immutable, matches the git tag
+    #   sha-<40 hex>           one specific commit by full sha, immutable
+    #   sha-<7 hex>            same, abbreviated
+    #   master                 head of master, moves with every merge
+    #
+    # Deployments that pin a commit want the 40 character form: a webhook payload carries the full
+    # sha and a Helm template cannot abbreviate it.
     tag:
 
 # Credentials for pulling images from private registries. Public images need none — leave this empty

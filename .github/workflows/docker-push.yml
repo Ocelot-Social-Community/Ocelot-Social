@@ -2,51 +2,68 @@ name: docker-push
 
 on: push
 
+# One run per workflow and branch. A newer push makes the older run's result irrelevant, so it is
+# cancelled instead of holding a runner. `event_name` is part of the group on purpose: a branch
+# push and its pull_request run are separate required checks — they must not cancel each other.
+# Keyed by pull request NUMBER, not `head_ref`: head_ref is only the branch NAME, which is unique
+# within this repository but not across forks — two contributors using GitHub's "edit this file"
+# flow both get `patch-1`, and their pull requests would then cancel each other's runs. `github.ref`
+# stays as the fallback for events that carry no pull request (a push gives refs/heads/<branch>).
+#
+# master is the exception and is NEVER cancelled: its images are the release artefacts. The
+# `publish` workflow retags them by commit sha (`sha-<40 hex>` below) into the version tags, so a
+# cancelled master build leaves a commit whose images never exist and a `publish` run that waits
+# for them in vain. Two master merges in quick succession are exactly the case that would trigger
+# it, which is why the cost of a few extra runner minutes is the cheaper side of this trade.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
+# Workflow-wide floor for GITHUB_TOKEN, so no job silently inherits the repository or organisation
+# default. A job that needs more overrides it locally — note that a job-level block REPLACES this one
+# rather than adding to it, which is why the escalating job below re-states everything it needs.
+permissions:
+  contents: read
+
 jobs:
+  ##############################################################################
+  # JOB: LOAD THE IMAGE DEFINITIONS ############################################
+  ##############################################################################
+  # The matrix lives in `.github/images.json` rather than inline here, because a second workflow
+  # needs the same list: `publish` retags every one of these images with the release version. An
+  # inline matrix would silently leave a newly added image untagged forever — the failure mode is
+  # invisible, which is what makes it worth a job. `strategy.matrix` cannot read a file itself, so
+  # one cheap job reads it and hands the parsed JSON to the matrix below.
+  images:
+    name: Load image definitions
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.load.outputs.matrix }}
+    steps:
+      - name: Checkout repository
+        # actions/checkout leaves GITHUB_TOKEN in the workspace's .git/config unless told not to.
+        # No job in this workflow runs an authenticated git operation, so there is nothing to keep
+        # it for. The build context below excludes .git through .dockerignore and the token would
+        # therefore not reach an image layer either way — not persisting it is the cheaper of the
+        # two guarantees, and it does not depend on .dockerignore staying correct.
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Load image definitions
+        id: load
+        run: echo "matrix=$(jq -c . .github/images.json)" >> "$GITHUB_OUTPUT"
+
+  ##############################################################################
+  # JOB: BUILD AND PUSH THE IMAGES #############################################
+  ##############################################################################
   build-and-push-images:
+    # Named explicitly instead of letting GitHub derive it from the matrix entry: the derived name
+    # interpolates every matrix key, so adding a field to images.json would rename all ten checks.
+    name: build-and-push-images (${{ matrix.app.name }})
+    needs: images
     strategy:
       matrix:
-        app:
-          - name: neo4j
-            context: neo4j
-            file: neo4j/Dockerfile
-            target: community
-          - name: backend-base
-            context: .
-            file: backend/Dockerfile
-            target: base
-          - name: backend-build
-            context: .
-            file: backend/Dockerfile
-            target: build
-          - name: backend
-            context: .
-            file: backend/Dockerfile
-            target: production
-          - name: webapp-base
-            context: .
-            file: webapp/Dockerfile
-            target: base
-          - name: webapp-build
-            context: .
-            file: webapp/Dockerfile
-            target: build
-          - name: webapp
-            context: .
-            file: webapp/Dockerfile
-            target: production
-          - name: maintenance-base
-            context: .
-            file: maintenance/Dockerfile
-            target: production
-          - name: maintenance-build
-            context: .
-            file: maintenance/Dockerfile
-            target: build
-          - name: maintenance
-            context: .
-            file: maintenance/Dockerfile
-            target: production
+        app: ${{ fromJSON(needs.images.outputs.matrix) }}
     runs-on: ubuntu-latest
     env:
       REGISTRY: ghcr.io
@@ -59,11 +76,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
       - name: Log in to the Container registry
-        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -73,6 +92,17 @@ jobs:
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          # The `semver` rules only fire on a tag push. The version tags are created by the
+          # `publish` workflow with GITHUB_TOKEN, and events raised by GITHUB_TOKEN do not trigger
+          # workflows — so this workflow never sees them and the rules never match. They are kept
+          # because they cost nothing and would do the right thing if a tag were ever pushed by a
+          # human or an app token; the version tags that actually reach the registry are applied
+          # by the retag job in `publish`, which copies the manifest of `sha-<40 hex>` below.
+          #
+          # `type=sha` is listed twice on purpose: the short form is what a human reads in the
+          # registry UI, the long form is what a deployment references. Helm charts get the full
+          # commit sha from the dispatch payload, not an abbreviated one, and abbreviating it in
+          # the chart is not something a template can do.
           tags: |
             type=schedule
             type=semver,pattern={{version}}
@@ -81,6 +111,7 @@ jobs:
             type=ref,event=branch
             type=ref,event=pr
             type=sha
+            type=sha,format=long
       - name: Build and push Docker images
         id: push
         uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
@@ -91,5 +122,26 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=${{ matrix.app.name }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.app.name }}
+          # One cache scope per DOCKERFILE, not per image, and only one image per scope writes it.
+          #
+          # `mode=max` exports every stage a build touched. The three images built from one Dockerfile
+          # are nested — for backend, `production` is `FROM base` plus a COPY out of `production_build`
+          # (`FROM build`), so building it involves base, base-build, build and production_build. Its
+          # cache therefore already CONTAINS everything the `base` and `build` images would export;
+          # writing all three meant storing the same layers under three keys. A cache key of a step in
+          # `base` does not depend on which target the build was aiming for, so the two readers hit the
+          # writer's entries exactly as they hit their own before.
+          #
+          # Letting all three WRITE one shared scope would not work: Actions cache keys are immutable,
+          # the three matrix jobs run concurrently, and the losers fail with "cache already exists"
+          # after mixing up the index. Hence `cacheTo` on the one target that subsumes the others —
+          # see .github/images.json, which also documents which target that is per Dockerfile.
+          #
+          # `ignore-error=true` because the export runs as part of the same solve as the push and
+          # defaults to being fatal: a throttled or briefly unavailable Actions cache service would
+          # turn a run whose images are ALREADY IN THE REGISTRY into a red one. On master that is
+          # not just noise — `publish` waits for this workflow to succeed before it retags those
+          # images into the version tags, so a cache hiccup would hold up a release. A failed export
+          # only costs the next build its cache hits, which is the cheaper failure by a wide margin.
+          cache-from: type=gha,scope=${{ matrix.app.cacheScope }}
+          cache-to: ${{ matrix.app.cacheTo && format('type=gha,mode=max,ignore-error=true,scope={0}', matrix.app.cacheScope) || '' }}

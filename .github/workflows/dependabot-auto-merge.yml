@@ -1,0 +1,107 @@
+name: Dependabot auto-merge
+
+# `pull_request_target`, NOT `pull_request` — the reason is the app token minted below. A
+# Dependabot-triggered `pull_request` run gets a READ-ONLY GITHUB_TOKEN and, the part that decides
+# it here, NO access to regular Actions secrets: Dependabot runs read from a separate Dependabot
+# secret store. `secrets.RELEASE_APP_PRIVATE_KEY` would silently resolve to an empty string and the
+# token step would fail. `pull_request_target` runs in the context of the base branch and therefore
+# sees the normal secret store.
+#
+# What makes `pull_request_target` dangerous in general is running UNTRUSTED code with those
+# secrets — it defaults to the base branch, but a workflow that explicitly checks out the pull
+# request's head and then builds it hands a contributor the repository's secrets. This job checks
+# out nothing, installs nothing and runs nothing from the branch. The single value it reads out of
+# the event payload is `html_url`, which GitHub composes rather than the pull request's author, and
+# it reaches the shell through an env var rather than expression interpolation. There is no path
+# from pull request content into a run step, which is exactly the case the trigger is meant for.
+#
+# The workflow definition that executes is always the one on the BASE branch, so a pull request
+# cannot edit this file to arm a merge for itself.
+on: pull_request_target
+
+# Deliberately empty: nothing in this workflow uses GITHUB_TOKEN any more. The app token below
+# carries the rights, narrowed at the point it is minted, and leaving GITHUB_TOKEN at the
+# repository or organisation default would grant every step permissions nothing here needs.
+permissions: {}
+
+jobs:
+  auto-merge:
+    name: Enable auto-merge
+    # `pull_request.user.login`, not `github.actor`: the actor changes when a human re-runs the
+    # workflow, the author of the pull request does not. Without this guard the job would arm
+    # auto-merge on every contributor's pull request.
+    if: ${{ github.event.pull_request.user.login == 'dependabot[bot]' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      # Mint a token from the it4c-release-bot GitHub App (vars.RELEASE_APP_ID +
+      # secrets.RELEASE_APP_PRIVATE_KEY) instead of using the default GITHUB_TOKEN, for the same
+      # reason `branding-release` does it: a GITHUB_TOKEN-authored event does not start a workflow
+      # run. That rule is what governs the merge below, and it is easy to miss because the merge is
+      # not performed by this job — see the step's own note.
+      - name: Generate it4c-release-bot token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          # Narrow the minted token to the two things this job does. Without these inputs the token
+          # inherits ALL of the installation's permissions — the `permissions:` block above governs
+          # GITHUB_TOKEN only and does not constrain this one.
+          #   contents      — performs the merge commit on master
+          #   pull-requests — flags the pull request for auto-merge, and approves it
+          permission-contents: write
+          permission-pull-requests: write
+
+      # `--auto` does NOT merge now — it marks the pull request, and GitHub merges it by itself once
+      # every REQUIRED status check has passed. Three consequences worth spelling out:
+      #
+      #   • The branch protection rule is the actual gate, not this file. With no required checks
+      #     configured on master, `--auto` merges the pull request IMMEDIATELY, unreviewed and
+      #     untested. Whoever removes the last required check removes the review of every dependency
+      #     bump along with it.
+      #   • `--squash` matches how these have been landing so far (see the `build(deps): bump …(#…)`
+      #     commits on master), which keeps the conventional-commit prefix that release-please reads.
+      #   • GitHub performs that later merge ON BEHALF OF THE ACTOR THAT ARMED IT, so the identity
+      #     used here decides who pushes to master — and with GITHUB_TOKEN that pusher was
+      #     github-actions[bot], whose pushes create no workflow runs. The bumps therefore landed on
+      #     master with ZERO checks: no `docker-push`, so those commits have no images in the
+      #     registry at all and `publish` has nothing to retag for them; no `publish`; no
+      #     documentation deploy; and no test run against master itself, only the one against the
+      #     pull request's pre-merge state. The app token makes the pusher it4c-release-bot, which
+      #     is an ordinary actor as far as the trigger rules are concerned, so master gets its full
+      #     run again.
+      - name: Enable auto-merge
+        run: gh pr merge --auto --squash "${PR_URL}"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+
+      # Satisfies "Require a pull request before merging → at least 1 approving review".
+      #
+      # A ruleset bypass for Dependabot does NOT cover this, which was established by elimination:
+      # the repository has no classic branch protection rules at all, the bypass entry was present
+      # and active, and the pull request still reported "Review required". What is left is that the
+      # bypass is evaluated against the actor performing the merge — now it4c-release-bot, which
+      # arms auto-merge in the step above — and not against the pull request's author. Adding that
+      # actor to the bypass list would fix it, at the price of letting anything holding the app's
+      # credentials around the rule; not worth it, especially once Dependabot starts merging
+      # github-actions bumps on its own.
+      #
+      # The approval below counts because it4c-release-bot is a different actor than the author.
+      # GitHub only rejects self-approval. It does NOT satisfy a CODEOWNERS requirement, which is
+      # not evaluated against app installations — if one is ever added to master, this step stops
+      # being enough and the merge simply waits, which is the safe direction to fail in.
+      #
+      # Be honest about what this is: it turns a human gate into a formality, so the review of every
+      # dependency bump now rests entirely on the required status checks. Delete this step the moment
+      # the bypass works on its own — it is a workaround, not the design.
+      #
+      # Runs on every `synchronize` too, not just `opened`, so that an approval dismissed by
+      # "Dismiss stale pull request approvals when new commits are pushed" is re-issued after
+      # Dependabot force-pushes a rebase.
+      - name: Approve
+        run: gh pr review --approve "${PR_URL}"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}

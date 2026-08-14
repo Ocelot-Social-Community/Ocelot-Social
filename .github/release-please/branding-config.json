@@ -1,0 +1,21 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "packages": {
+    "packages/branding": {
+      "release-type": "node",
+      "package-name": "@ocelot-social/branding",
+      "changelog-path": "CHANGELOG.md",
+      "include-component-in-tag": true,
+      "component": "branding",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true,
+      "draft": false,
+      "prerelease": false,
+      "extra-files": ["src/version.ts"]
+    }
+  },
+  "separate-pull-requests": true,
+  "pull-request-title-pattern": "chore(package/${component}): release ${version}",
+  "component-no-space": true,
+  "include-v-in-tag": true
+}

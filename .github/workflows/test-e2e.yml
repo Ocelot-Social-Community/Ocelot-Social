@@ -2,13 +2,40 @@ name: ocelot.social end-to-end test CI
 
 on: push
 
+# One run per workflow and branch. A newer push makes the older run's result irrelevant, so it is
+# cancelled instead of holding a runner. `event_name` is part of the group on purpose: a branch
+# push and its pull_request run are separate required checks — they must not cancel each other.
+# Keyed by pull request NUMBER, not `head_ref`: head_ref is only the branch NAME, which is unique
+# within this repository but not across forks — two contributors using GitHub's "edit this file"
+# flow both get `patch-1`, and their pull requests would then cancel each other's runs. `github.ref`
+# stays as the fallback for events that carry no pull request (a push gives refs/heads/<branch>).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+# Least privilege for GITHUB_TOKEN: without this block the jobs inherit whatever the repository or
+# organisation default is, which may be read-write. This workflow only checks out and inspects the
+# repository, so read is enough.
+permissions:
+  contents: read
+
+# Naming the shell explicitly is what turns on `pipefail`: an unspecified `run:` gets
+# `bash -e {0}`, where only the LAST command of a pipeline decides the exit code. `docker save X |
+# gzip` would then report success even when the save failed — gzip happily writes a valid, empty
+# archive and exits 0 — and the failure would only surface 40 matrix jobs later at `docker load`.
+# `shell: bash` runs `bash --noprofile --norc -eo pipefail {0}` instead, so any stage of a pipeline
+# fails the step. Set once here rather than per block, so pipelines added later are covered too.
+defaults:
+  run:
+    shell: bash
+
 jobs:
   prepare_backend_environment:
     name: Fullstack | prepare backend environment
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
@@ -46,54 +73,79 @@ jobs:
           docker pull quay.io/minio/mc:latest
           docker pull maildev/maildev:latest
 
+      # Compressed on the way out: `docker save` writes UNCOMPRESSED layer tars, and every byte here is
+      # paid 40 times over on the matrix side. zstd rather than gzip -1 — smaller AND faster on both
+      # ends, and `-T0` uses all the runner's cores, which gzip cannot. It is preinstalled on
+      # ubuntu-latest. The matrix side pipes it through `zstd -dc` explicitly instead of relying on
+      # `docker load` sniffing the format.
       - name: Save all images
         run: |
-          docker save "ghcr.io/ocelot-social-community/ocelot-social/backend:test" > /tmp/backend.tar
-          docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j:community" > /tmp/neo4j.tar
-          docker save "quay.io/minio/minio:latest" > /tmp/minio.tar
-          docker save "quay.io/minio/mc:latest" > /tmp/minio-mc.tar
-          docker save "maildev/maildev:latest" > /tmp/mailserver.tar
+          docker save "ghcr.io/ocelot-social-community/ocelot-social/backend:test" | zstd -T0 -3 > /tmp/backend.tar.zst
+          docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j:community" | zstd -T0 -3 > /tmp/neo4j.tar.zst
+          docker save "quay.io/minio/minio:latest" | zstd -T0 -3 > /tmp/minio.tar.zst
+          docker save "quay.io/minio/mc:latest" | zstd -T0 -3 > /tmp/minio-mc.tar.zst
+          docker save "maildev/maildev:latest" | zstd -T0 -3 > /tmp/mailserver.tar.zst
 
-      - name: Cache docker images
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v4.0.2
+      # ARTIFACT, not cache. These are run-scoped hand-offs between jobs, which is what artifacts are
+      # for; `actions/cache` with a `run_id` key can never hit on a later run, yet it occupies the
+      # repo's 10 GB cache budget and evicts by LRU the caches that COULD hit — the buildx `type=gha`
+      # scopes and the yarn cache. `compression-level: 0` because the payload is already zstd-compressed.
+      - name: Upload images for the test jobs
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          path: |
-            /tmp/backend.tar
-            /tmp/neo4j.tar
-            /tmp/minio.tar
-            /tmp/minio-mc.tar
-            /tmp/mailserver.tar
-          key: ${{ github.run_id }}-e2e-backend-environment-cache
+          name: e2e-backend-environment
+          path: /tmp/*.tar.zst
+          # 7, not 1: "Re-run failed jobs" does NOT re-run the prepare jobs, so the matrix jobs
+          # download an artifact produced by the original run. At one day, any re-run attempted
+          # later fails on a missing artifact — which reads like an infrastructure fault rather
+          # than an expiry. 7 days matches what a cache would have offered.
+          retention-days: 7
+          compression-level: 0
 
   prepare_webapp_image:
     name: Fullstack | prepare webapp image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
 
-      - name: Webapp | Build 'test' image
+      # `e2e`, not `test`: same build, but assembled `FROM base` around the finished /build and started
+      # with nuxt-start instead of the dev server (see webapp/Dockerfile). `test` stays what the webapp
+      # UNIT tests in test-webapp.yml need — sources plus devDependencies for Jest — and is far too fat
+      # for an image that gets shipped to 40 runners.
+      #
+      # Tagged `:test` regardless, because docker-compose.test.yml names that image for the `webapp`
+      # service and this workflow feeds compose from `docker load` alone. The two workflows never share
+      # a machine, so the tag collision is not one. The buildx cache scope IS separate — the two stages
+      # differ only in their final layers, but mixing their manifests under one scope buys nothing.
+      - name: Webapp | Build 'e2e' image
         uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
         with:
           context: .
           file: webapp/Dockerfile
-          target: test
+          target: e2e
           load: true
           tags: ghcr.io/ocelot-social-community/ocelot-social/webapp:test
-          cache-from: type=gha,scope=webapp-test
-          cache-to: type=gha,mode=max,scope=webapp-test
+          cache-from: type=gha,scope=webapp-e2e
+          cache-to: type=gha,mode=max,scope=webapp-e2e
 
       - name: Save image for test jobs
-        run: docker save "ghcr.io/ocelot-social-community/ocelot-social/webapp:test" > /tmp/webapp.tar
+        run: docker save "ghcr.io/ocelot-social-community/ocelot-social/webapp:test" | zstd -T0 -3 > /tmp/webapp.tar.zst
 
-      - name: Cache docker image
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v4.0.2
+      - name: Upload image for the test jobs
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          path: /tmp/webapp.tar
-          key: ${{ github.run_id }}-e2e-webapp-cache
+          name: e2e-webapp-image
+          path: /tmp/webapp.tar.zst
+          # 7, not 1: "Re-run failed jobs" does NOT re-run the prepare jobs, so the matrix jobs
+          # download an artifact produced by the original run. At one day, any re-run attempted
+          # later fails on a missing artifact — which reads like an infrastructure fault rather
+          # than an expiry. 7 days matches what a cache would have offered.
+          retention-days: 7
+          compression-level: 0
 
   prepare_cypress:
     name: Fullstack | prepare cypress
@@ -103,10 +155,10 @@ jobs:
         run: rm -rf /opt/hostedtoolcache
 
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: 'backend/.nvmrc'
           cache: 'yarn'
@@ -130,15 +182,44 @@ jobs:
           cd ..
           yarn install
       
-      - name: Cache docker image
-        
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v4.0.2
+      # ARTIFACT, not cache — for the same reason as the images above, which this step used to
+      # contradict. It is a HAND-OFF to the matrix jobs: the payload is the whole installed workspace
+      # (sources, cypress specs, every node_modules, the backend `yarn build` output), so it is only
+      # ever valid for the commit that produced it. Its cache key therefore ended in `github.sha`,
+      # which can never hit on a later run — a write-once entry of roughly a gigabyte, produced by
+      # EVERY push to EVERY branch, evicting by LRU the caches that could actually hit. It also
+      # evicted itself: with the budget full, entries of newer runs displaced this one before all 40
+      # matrix jobs had restored it, and `fail-on-cache-miss` turned that into a red run.
+      #
+      # A lockfile-only fallback key would have been actively wrong, which is why none existed: it
+      # matches any earlier commit with the same lockfiles — most commits, since most do not touch
+      # dependencies — and the suite would then silently exercise an older revision and report green
+      # for it. An artifact has no such fallback to get wrong, and unlike a cache entry it cannot be
+      # evicted mid-run.
+      #
+      # `.git` is left out: the matrix job checks out the same commit before extracting this over it,
+      # so its own .git is already correct and shipping a second copy to 40 runners buys nothing.
+      # /opt/cucumber-json-formatter is left out too — the matrix job re-downloads it when missing.
+      - name: Pack installed workspace for the test jobs
+        run: |
+          set -euo pipefail
+          tar -I 'zstd -T0 -3' -cf /tmp/e2e-workspace.tar.zst \
+            -C / \
+            --exclude="${GITHUB_WORKSPACE#/}/.git" \
+            "${GITHUB_WORKSPACE#/}" \
+            "${HOME#/}/.cache/Cypress"
+
+      - name: Upload installed workspace for the test jobs
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          path: |
-            /opt/cucumber-json-formatter
-            /home/runner/.cache/Cypress
-            /home/runner/work/Ocelot-Social/Ocelot-Social
-          key: ${{ github.run_id }}-e2e-cypress
+          name: e2e-cypress-workspace
+          path: /tmp/e2e-workspace.tar.zst
+          # 7, not 1: "Re-run failed jobs" does NOT re-run the prepare jobs, so the matrix jobs
+          # download an artifact produced by the original run. At one day, any re-run attempted
+          # later fails on a missing artifact — which reads like an infrastructure fault rather
+          # than an expiry. 7 days matches what a cache would have offered.
+          retention-days: 7
+          compression-level: 0
 
   list_features:
     name: List Feature Files
@@ -147,7 +228,7 @@ jobs:
       features: ${{ steps.list.outputs.features }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: List feature files
         id: list
@@ -169,41 +250,33 @@ jobs:
         run: rm -rf /opt/hostedtoolcache
 
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      # Deliberately WITHOUT `cache: 'yarn'`, unlike `prepare_cypress`: this job never runs an install.
+      # The restore below brings the whole workspace INCLUDING every node_modules tree, so downloading
+      # and unpacking the yarn download cache on top of it is a few hundred megabytes that nothing
+      # reads — 40 times per run.
       - name: Setup Node.js
-        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: 'backend/.nvmrc'
-          cache: 'yarn'
 
-      - name: Restore cypress cache
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v4.0.2
+      - name: Download images and installed workspace
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          path: |
-            /opt/cucumber-json-formatter
-            /home/runner/.cache/Cypress
-            /home/runner/work/Ocelot-Social/Ocelot-Social
-          key: ${{ github.run_id }}-e2e-cypress
-          restore-keys: ${{ github.run_id }}-e2e-cypress
+          pattern: e2e-*
+          merge-multiple: true
+          path: /tmp
 
-      - name: Restore backend environment cache
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v4.0.2
-        with:
-          path: |
-            /tmp/backend.tar
-            /tmp/neo4j.tar
-            /tmp/minio.tar
-            /tmp/minio-mc.tar
-            /tmp/mailserver.tar
-          key: ${{ github.run_id }}-e2e-backend-environment-cache
+      # Extracts over the checkout above, exactly as the cache this replaced did — see the note in
+      # `prepare_cypress` for why only this commit's own workspace may ever land here. No guard is
+      # needed for a missing archive: `zstd -dc` on an absent file fails the step, which is the same
+      # loud failure `fail-on-cache-miss: true` used to provide.
+      - name: Unpack installed workspace
+        run: |
+          set -euo pipefail
+          zstd -dc /tmp/e2e-workspace.tar.zst | tar -x -C /
 
-      - name: Restore webapp cache
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v4.0.2
-        with:
-          path: /tmp/webapp.tar
-          key: ${{ github.run_id }}-e2e-webapp-cache
-          
       - name: Copy env files
         run: |
           cp webapp/.env.template webapp/.env
@@ -220,21 +293,33 @@ jobs:
 
       - name: Boot up test system | docker compose
         run: |
-          docker load < /tmp/neo4j.tar
-          docker load < /tmp/backend.tar
-          docker load < /tmp/minio.tar
-          docker load < /tmp/minio-mc.tar
-          docker load < /tmp/mailserver.tar
-          docker load < /tmp/webapp.tar
+          for image in neo4j backend minio minio-mc mailserver webapp; do
+            zstd -dc "/tmp/${image}.tar.zst" | docker load
+          done
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp
 
-          echo "Waiting for backend (max 120s)..."
-          timeout 120 bash -c 'until curl -sf -X POST -H "Content-Type: application/json" -d "{\"query\":\"{__typename}\"}" http://localhost:4000 > /dev/null 2>&1; do sleep 5; done'
-          echo "Backend is ready."
-
-          echo "Waiting for webapp (max 120s)..."
-          timeout 120 bash -c 'until curl -sf http://localhost:3000 > /dev/null 2>&1; do sleep 5; done'
-          echo "Webapp is ready."
+          # A service that never comes up used to fail this step as a bare `exit 124` with nothing to
+          # go on — the same empty result whether the image was broken, the port wrong or the boot
+          # merely slow, times 40 identical matrix jobs. Dump the compose state and logs on timeout
+          # instead; a container that dies on a missing module says so in its own log.
+          #
+          # `sleep 1`, not 5: the loop costs one curl per second against a local port, and the wait is
+          # paid in every matrix job. A 5 s step wasted 2.5 s per service on average for nothing.
+          compose() { docker compose -f docker-compose.yml -f docker-compose.test.yml "$@"; }
+          await() {
+            local name="$1" seconds="$2"; shift 2
+            echo "Waiting for ${name} (max ${seconds}s)..."
+            if timeout "$seconds" bash -c "until $*; do sleep 1; done"; then
+              echo "${name} is ready."
+            else
+              echo "::error::${name} did not become ready within ${seconds}s"
+              compose ps
+              compose logs --tail=100
+              return 1
+            fi
+          }
+          await backend 120 'curl -sf -X POST -H "Content-Type: application/json" -d "{\"query\":\"{__typename}\"}" http://localhost:4000 > /dev/null 2>&1'
+          await webapp 120 'curl -sf http://localhost:3000 > /dev/null 2>&1'
 
       - name: Initialize database
         run: docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend yarn db:migrate init
@@ -260,7 +345,7 @@ jobs:
       - name: Full stack tests | if tests failed, upload report
         id: e2e-report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ steps.artifact-name.outputs.name }}
           path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report

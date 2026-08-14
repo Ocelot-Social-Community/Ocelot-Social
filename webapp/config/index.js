@@ -98,6 +98,18 @@ const organization = {
   SUPPORT_EMAIL: process.env.SUPPORT_EMAIL || 'hello@ocelot.social',
 }
 
+// How long a toast stays on screen, in milliseconds (iziToast's own default is 5000). In CONFIG so
+// nuxt-env exposes it at runtime as `$env.TOAST_TIMEOUT` — same channel as SUPPORT_EMAIL — which is
+// what lets the e2e stack raise it on the pre-built image (docker-compose.test.yml).
+//
+// It has to be raisable because a toast is the only evidence some Cypress steps have that an action
+// succeeded, and asserting on it is a race against this timeout: any wait between the action and the
+// assertion (`cy.waitForNetworkIdle` in the policy steps, for instance) eats into the window, and a
+// toast that has already auto-dismissed is indistinguishable from one that never appeared.
+const notifications = {
+  TOAST_TIMEOUT: toPositiveNumber(process.env.TOAST_TIMEOUT, 5000),
+}
+
 const CONFIG = {
   ...environment,
   ...server,
@@ -105,6 +117,7 @@ const CONFIG = {
   ...options,
   ...language,
   ...organization,
+  ...notifications,
 }
 
 // override process.env with the values here since they contain default values

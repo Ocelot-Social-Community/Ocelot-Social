@@ -35,6 +35,6 @@ With the right addons, Storybook also gives immediate feedback on how well the c
 
 To run Storybook, first start the app, then enter the following command in a new terminal window: `yarn storybook`. The output should look similar to this:
 
-![Storybook output](../.gitbook/assets/storybook-output.png)
+![Storybook output](../docu/gitbook/storybook-output.png)
 
 The ocelot.social Storybook will then be available on `http://localhost:3002`.

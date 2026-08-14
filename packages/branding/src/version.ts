@@ -4,5 +4,6 @@
 // so this stays a plain constant that BOTH the CommonJS dist and the type-checker can read — no
 // import.meta (unavailable in the CJS emit) or __dirname (unavailable in the ESM source).
 // The trailing marker lets release-please bump this in lock-step with package.json (see
-// release-please-config.json `extra-files`), so the drift guard in version.spec never trips on a release.
-export const SCHEMA_VERSION = '0.1.3' // x-release-please-version
+// .github/release-please/branding-config.json `extra-files`), so the drift guard in version.spec never
+// trips on a release.
+export const SCHEMA_VERSION = '0.1.4' // x-release-please-version

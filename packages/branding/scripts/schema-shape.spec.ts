@@ -7,8 +7,8 @@
 // (src/version.ts carries the `x-release-please-version` marker and is listed under `extra-files`), but
 // its workflow does not run — the release-bot credentials are not configured — so nothing bumps on its
 // own. Until that is set up, a schema change means editing THREE places together: package.json,
-// src/version.ts (compat.spec.ts asserts they match) and .release-please-manifest.json (so the bot, once
-// it runs, does not compute a version BELOW what archives already carry).
+// src/version.ts (compat.spec.ts asserts they match) and .github/release-please/branding-manifest.json
+// (so the bot, once it runs, does not compute a version BELOW what archives already carry).
 //
 // And mind the axis: while the version is < 1.0, compat.ts reads the MINOR (see generation()). A patch
 // bump does NOT separate generations — 0.0.1 and 0.0.2 both compare as `ok`. A breaking schema change

@@ -9,6 +9,13 @@ services:
       - NODE_ENV=test
       - API_KEYS_ENABLED=true
       - API_KEYS_MAX_PER_USER=5
+      # Toasts live 15 s instead of iziToast's 5 s. Several Cypress steps assert on a toast AFTER a
+      # wait (see cypress/support/step_definitions/admin/NetworkPolicy/I_save_the_policy_form.js,
+      # which calls waitForNetworkIdle first), and with the default the assertion loses that race
+      # whenever the action triggers enough follow-up traffic — it then retries for 60 s against an
+      # element that has already dismissed itself. Not raised further on purpose: the toasts sit
+      # bottom-right, and one that outlives the scenario could cover an element a later step clicks.
+      - TOAST_TIMEOUT=15000
     volumes:
       - ./coverage:/app/coverage
 

@@ -5,6 +5,29 @@ on:
     branches:
       - master
 
+# `cancel-in-progress: false` so a deploy that is already writing is never torn in half — but
+# deliberately WITHOUT the `queue: max` the release workflows use. Those publish one commit's
+# artifacts, where a dropped pending run means a version is never shipped. This one rebuilds the
+# docs from whatever master looks like and force-replaces the gh-pages branch with the result, so a
+# superseded pending run has nothing left to contribute: the newer run publishes its content too.
+# Letting it replace the older pending run (the default `queue: single`) is therefore right, and
+# `queue: max` would only redeploy the same site several times in a row.
+#
+# What makes that safe is that `build-and-deploy` runs UNCONDITIONALLY — it has no `if:` on the
+# files-changed output. Gate it on that output and this reasoning breaks: a docs commit whose
+# pending run is replaced by a docs-unrelated one would then never be published at all, and this
+# group would need `queue: max`.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+# Read-only floor, so no job silently inherits the repository or organisation default.
+# `pull-requests: read` is for dorny/paths-filter. Write access is granted per job, to the ONE that
+# needs it — see build-and-deploy below.
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   files-changed:
     name: Detect File Changes - Markdown and Vuepress files
@@ -13,10 +36,10 @@ jobs:
       documentation: ${{ steps.changes.outputs.documentation }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Check for file changes
-        uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4.0.2
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: changes
         with:
           token: ${{ github.token }}
@@ -25,16 +48,23 @@ jobs:
 
   build-and-deploy:
     runs-on: ubuntu-latest
+    # The only job that writes: the deploy step below force-pushes the built site to the gh-pages
+    # branch with GITHUB_TOKEN. Kept here rather than workflow-wide so `files-changed` — which hands
+    # the token to a third-party action — stays read-only. A job-level block REPLACES the workflow
+    # one, so this is the complete set for this job; it needs no pull-requests scope, the paths
+    # filter runs in the other job.
+    permissions:
+      contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # The embedded API reference is generated with the backend toolchain, which
       # needs the backend's Node (metascraper requires >= 22, and tsx's require-hook
       # mis-resolves on Node 22.x — schema:print runs cleanly only on the backend's
       # Node 25). So generate it here on the backend's Node, into .vuepress/public/api.
       - name: Setup backend Node (for the GraphQL API reference)
-        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: 'backend/.nvmrc'
 
@@ -45,7 +75,7 @@ jobs:
       # .vuepress/public/api into the site. Keep these as separate steps so each
       # tool runs on the Node version it supports.
       - name: Setup Node 20 (for VuePress)
-        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 20
 
