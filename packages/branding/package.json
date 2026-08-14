@@ -1,6 +1,6 @@
 {
   "name": "@ocelot-social/branding",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Shared branding override schema, framework defaults and resolver — consumed by both backend and webapp so brand-tunable constants (group limits, registration lengths, metadata, logo paths, menu, …) cannot drift between the two. Authored in TypeScript, built to dist/ (CommonJS + .d.ts).",
   "license": "MIT",
   "repository": {
