@@ -3,10 +3,15 @@ name: Branding Release
 on:
   push:
     branches: [master]
+    # branding's own sources, and branding's own release-please files — nothing shared with ui. The
+    # shared root config that used to be listed here is what made this workflow run on ui's release
+    # merges (that merge touches the shared manifest) and then release the ui package itself, since
+    # release-please-action processes every package its config file lists regardless of which
+    # workflow invoked it. The full post-mortem is in the matching comment in ui-release.yml.
     paths:
       - 'packages/branding/**'
-      - 'release-please-config.json'
-      - '.release-please-manifest.json'
+      - '.github/release-please/branding-config.json'
+      - '.github/release-please/branding-manifest.json'
 
 # One run at a time, and never drop one. `cancel-in-progress: false` alone does NOT achieve that:
 # the default `queue: single` holds exactly ONE pending run, and the next arrival cancels it. Three
@@ -61,8 +66,12 @@ jobs:
         uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
         with:
           token: ${{ steps.app-token.outputs.token }}
-          config-file: release-please-config.json
-          manifest-file: .release-please-manifest.json
+          # Scoped to packages/branding alone — see the `on: paths` comment above. Paths inside the
+          # config stay repository-root relative; only the config file itself moved. The step
+          # outputs are keyed by those paths, so `packages/branding--release_created` below is
+          # unaffected by the move.
+          config-file: .github/release-please/branding-config.json
+          manifest-file: .github/release-please/branding-manifest.json
 
   # Everything that runs third-party code lives HERE, in a job that cannot mint an OIDC token.
   # `ACTIONS_ID_TOKEN_REQUEST_URL`/`_TOKEN` are job-wide environment variables, readable by every

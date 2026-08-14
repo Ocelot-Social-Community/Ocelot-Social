@@ -3,10 +3,23 @@ name: UI Release
 on:
   push:
     branches: [master]
+    # ui's own sources, and ui's own release-please files — nothing shared with branding. A single
+    # root `release-please-config.json`/`.release-please-manifest.json` used to be listed here AND in
+    # branding-release.yml, and that is what broke the 0.0.2 release: merging a release pull request
+    # always touches the shared manifest, so every merge started BOTH workflows on the same commit,
+    # and release-please-action processes whatever its config file lists — the whole monorepo, no
+    # matter which workflow invoked it. The two runs then raced for one tag. One won and created
+    # ui-v0.0.2; the other logged `Duplicate release tag: ui-v0.0.2` and died removing the
+    # `autorelease: pending` label the winner had already removed (`Label does not exist`).
+    # `release_created` is only true in the run that actually creates the release — that was the
+    # branding run, whose output key is `packages/branding--release_created` and therefore false —
+    # so 0.0.2 got a tag and a GitHub release but never reached npm, and no re-run can fix that: an
+    # existing release is not created twice. Per-package configs make the race impossible; this run
+    # cannot see packages/branding at all.
     paths:
       - 'packages/ui/**'
-      - 'release-please-config.json'
-      - '.release-please-manifest.json'
+      - '.github/release-please/ui-config.json'
+      - '.github/release-please/ui-manifest.json'
 
 # One run at a time, and never drop one. `cancel-in-progress: false` alone does NOT achieve that:
 # the default `queue: single` holds exactly ONE pending run, and the next arrival cancels it. Three
@@ -72,8 +85,12 @@ jobs:
         uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
         with:
           token: ${{ steps.app-token.outputs.token }}
-          config-file: release-please-config.json
-          manifest-file: .release-please-manifest.json
+          # Scoped to packages/ui alone — see the `on: paths` comment above for why this is no
+          # longer the shared root config. Paths inside the config stay repository-root relative;
+          # only the config file itself moved. The step outputs are keyed by those paths, so
+          # `packages/ui--release_created` below is unaffected by the move.
+          config-file: .github/release-please/ui-config.json
+          manifest-file: .github/release-please/ui-manifest.json
 
   # Everything that runs third-party code lives HERE, in a job that cannot mint an OIDC token.
   # `ACTIONS_ID_TOKEN_REQUEST_URL`/`_TOKEN` are job-wide environment variables, readable by every
