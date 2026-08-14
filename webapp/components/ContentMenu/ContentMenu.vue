@@ -175,7 +175,7 @@ export default {
             callback: () => {
               this.$emit('toggleObservePost', this.resource.id, false)
             },
-            icon: this.icons.bellSlashed,
+            icon: this.icons.bellSlash,
           })
         } else {
           routes.push({

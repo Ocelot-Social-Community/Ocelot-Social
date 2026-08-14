@@ -1056,7 +1056,9 @@
     "legend": {
       "event": "Подія",
       "group": "Група",
+      "hideType": "Приховати {type}",
       "showPastEvents": "Показати минулі події",
+      "showType": "Показати {type}",
       "theUser": "Моя позиція",
       "title": "Легенда",
       "user": "Користувач"

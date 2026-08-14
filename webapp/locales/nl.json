@@ -1056,7 +1056,9 @@
     "legend": {
       "event": "Evenement",
       "group": "Groep",
+      "hideType": "{type} verbergen",
       "showPastEvents": "Afgelopen evenementen tonen",
+      "showType": "{type} tonen",
       "theUser": "Mijn positie",
       "title": "Legenda",
       "user": "Gebruiker"

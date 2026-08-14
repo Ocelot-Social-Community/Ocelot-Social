@@ -1056,7 +1056,9 @@
     "legend": {
       "event": "Event",
       "group": "Group",
+      "hideType": "Hide {type}",
       "showPastEvents": "Show past events",
+      "showType": "Show {type}",
       "theUser": "My position",
       "title": "Legend",
       "user": "User"

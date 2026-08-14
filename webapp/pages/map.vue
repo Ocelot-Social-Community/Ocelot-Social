@@ -53,16 +53,36 @@
               </span>
               {{ $t('map.legend.' + type.id) }}
               <button
+                type="button"
+                class="map-legend-visibility-toggle"
+                :aria-pressed="String(!isMarkerTypeHidden(type.id))"
+                :aria-label="
+                  $t(isMarkerTypeHidden(type.id) ? 'map.legend.showType' : 'map.legend.hideType', {
+                    type: $t('map.legend.' + type.id),
+                  })
+                "
+                :title="
+                  $t(isMarkerTypeHidden(type.id) ? 'map.legend.showType' : 'map.legend.hideType', {
+                    type: $t('map.legend.' + type.id),
+                  })
+                "
+                @click="toggleMarkerTypeVisibility(type.id)"
+              >
+                <os-icon
+                  :icon="isMarkerTypeHidden(type.id) ? icons.eyeSlash : icons.eye"
+                  size="md"
+                />
+              </button>
+              <button
                 v-if="type.id === 'event'"
                 type="button"
                 class="map-legend-past-events-toggle"
-                :class="{ 'map-legend-past-events-toggle--active': showPastEvents }"
                 :aria-pressed="String(showPastEvents)"
                 :aria-label="$t('map.legend.showPastEvents')"
                 :title="$t('map.legend.showPastEvents')"
                 @click="toggleShowPastEvents"
               >
-                <os-icon :icon="icons.clock" size="md" />
+                <os-icon :icon="showPastEvents ? icons.clockSlash : icons.clock" size="md" />
               </button>
             </div>
           </div>
@@ -119,6 +139,9 @@ export default {
       legendOpen: false,
       activeStyle: null,
       initialCoordinates,
+      // ids from markers.types.id that the user hid via the legend's eye
+      // toggle. Purely a local display preference (not deep-linked).
+      hiddenMarkerTypes: [],
       defaultCenter: [10.452764, 51.165707], // center of Germany: https://www.gpskoordinaten.de/karte/land/DE
       currentUserLocation: null,
       currentUserCoordinates: null,
@@ -256,8 +279,29 @@ export default {
         this.addMarkersOnCheckPrepared()
       }
     },
+    hiddenMarkerTypes() {
+      this.applyMarkerTypeFilter()
+    },
   },
   methods: {
+    isMarkerTypeHidden(typeId) {
+      return this.hiddenMarkerTypes.includes(typeId)
+    },
+    toggleMarkerTypeVisibility(typeId) {
+      this.hiddenMarkerTypes = this.isMarkerTypeHidden(typeId)
+        ? this.hiddenMarkerTypes.filter((id) => id !== typeId)
+        : [...this.hiddenMarkerTypes, typeId]
+    },
+    // Hides marker types purely via the layer's own filter — hidden
+    // features are then simply not "rendered features", so hover/click
+    // popups (queryRenderedFeatures) automatically skip them too.
+    applyMarkerTypeFilter() {
+      if (!this.map || !this.markers.isSourceAndLayerAdded) return
+      const visibleTypes = this.markers.types
+        .map((type) => type.id)
+        .filter((id) => !this.isMarkerTypeHidden(id))
+      this.map.setFilter('markers', ['in', ['get', 'type'], ['literal', visibleTypes]])
+    },
     toggleShowPastEvents() {
       const query = { ...this.$route.query }
       if (this.showPastEvents) {
@@ -721,6 +765,9 @@ export default {
         })
 
         this.markers.isSourceAndLayerAdded = true
+        // Re-applies any already-toggled hidden types — needed after a style
+        // switch too, since that re-adds the layer without a filter.
+        this.applyMarkerTypeFilter()
       }
 
       // fly to center if never done
@@ -1001,8 +1048,8 @@ export default {
   gap: 4px;
 }
 
+.map-legend-visibility-toggle,
 .map-legend-past-events-toggle {
-  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1017,18 +1064,6 @@ export default {
   &:hover {
     background: rgba(0, 0, 0, 0.05);
   }
-}
-
-/* Struck through = the time filter is off, i.e. past events are included. */
-.map-legend-past-events-toggle--active::after {
-  content: '';
-  position: absolute;
-  left: 10%;
-  right: 10%;
-  top: 50%;
-  height: 2px;
-  background: currentColor;
-  transform: rotate(-45deg);
 }
 
 @media (max-width: 639px) {

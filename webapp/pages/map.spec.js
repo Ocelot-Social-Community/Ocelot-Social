@@ -48,6 +48,7 @@ const mapOnMock = jest.fn((key, ...args) => {
 const mapAddControlMock = jest.fn()
 const mapAddSourceMock = jest.fn()
 const mapAddLayerMock = jest.fn()
+const mapSetFilterMock = jest.fn()
 const mapSetDataMock = jest.fn()
 const mapGetSourceMock = jest.fn(() => ({ setData: mapSetDataMock }))
 const mapAddImageMock = jest.fn()
@@ -78,6 +79,7 @@ const mapMock = {
   addControl: mapAddControlMock,
   addSource: mapAddSourceMock,
   addLayer: mapAddLayerMock,
+  setFilter: mapSetFilterMock,
   getSource: mapGetSourceMock,
   addImage: mapAddImageMock,
   loadImage: mapLoadImageMock,
@@ -878,6 +880,14 @@ describe('map', () => {
           ])
         })
 
+        it('applies a marker-type filter showing every type once the layer is added', () => {
+          expect(mapSetFilterMock).toHaveBeenCalledWith('markers', [
+            'in',
+            ['get', 'type'],
+            ['literal', ['theUser', 'user', 'group', 'event']],
+          ])
+        })
+
         it('calls flyTo', () => {
           expect(mapFlyToMock).toHaveBeenCalledWith({
             center: [13.38333, 52.51667],
@@ -1108,12 +1118,10 @@ describe('map', () => {
         expect(w.vm.showPastEvents).toBe(true)
       })
 
-      it('shows the struck-through "active" state when the route has showPastEvents=1', () => {
+      it('reflects showPastEvents=1 via aria-pressed on the toggle', () => {
         mocks.$route = { path: '/map', query: { showPastEvents: '1' } }
         const w = createWrapper()
-        expect(w.find('.map-legend-past-events-toggle').classes()).toContain(
-          'map-legend-past-events-toggle--active',
-        )
+        expect(w.find('.map-legend-past-events-toggle').attributes('aria-pressed')).toBe('true')
       })
 
       it('adds showPastEvents=1 to the route on click, keeping other query params', async () => {
@@ -1134,6 +1142,52 @@ describe('map', () => {
           path: '/map',
           query: { lat: '52.5' },
         })
+      })
+    })
+
+    describe('marker type visibility toggle', () => {
+      it('renders a visibility toggle for each marker type', () => {
+        const toggles = wrapper.findAll('.map-legend-visibility-toggle')
+        expect(toggles.length).toBe(4)
+      })
+
+      it('toggles a type in and out of hiddenMarkerTypes', () => {
+        expect(wrapper.vm.isMarkerTypeHidden('user')).toBe(false)
+        wrapper.vm.toggleMarkerTypeVisibility('user')
+        expect(wrapper.vm.isMarkerTypeHidden('user')).toBe(true)
+        wrapper.vm.toggleMarkerTypeVisibility('user')
+        expect(wrapper.vm.isMarkerTypeHidden('user')).toBe(false)
+      })
+
+      it('reflects the hidden state via aria-pressed and toggles it on click', async () => {
+        // Marker order in the legend matches markers.types: theUser, user, group, event.
+        const userToggle = wrapper.findAll('.map-legend-visibility-toggle').at(1)
+        expect(userToggle.attributes('aria-pressed')).toBe('true')
+
+        await userToggle.trigger('click')
+
+        expect(userToggle.attributes('aria-pressed')).toBe('false')
+        expect(wrapper.vm.isMarkerTypeHidden('user')).toBe(true)
+      })
+
+      it('does not touch the map filter before the layer has been added', async () => {
+        wrapper.vm.toggleMarkerTypeVisibility('group')
+        await wrapper.vm.$nextTick()
+        expect(mapSetFilterMock).not.toHaveBeenCalled()
+      })
+
+      it('applies a mapbox layer filter excluding hidden types once the layer exists', async () => {
+        wrapper.vm.onMapLoad({ map: mapMock })
+        wrapper.vm.markers.isSourceAndLayerAdded = true
+
+        wrapper.vm.toggleMarkerTypeVisibility('group')
+        await wrapper.vm.$nextTick()
+
+        expect(mapSetFilterMock).toHaveBeenCalledWith('markers', [
+          'in',
+          ['get', 'type'],
+          ['literal', ['theUser', 'user', 'event']],
+        ])
       })
     })
 
