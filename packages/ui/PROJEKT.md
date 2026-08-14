@@ -1204,9 +1204,9 @@ cn('h-10 px-4', 'h-12 px-8')  // → 'h-12 px-8' (letzte gewinnt)
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**Konfigurationsdateien:**
-- `.release-please-manifest.json` - Versionen
-- `release-please-config.json` - Paket-Konfiguration
+**Konfigurationsdateien:** (pro Paket getrennt, siehe `.github/release-please/README.md`)
+- `.github/release-please/ui-manifest.json` - Versionen
+- `.github/release-please/ui-config.json` - Paket-Konfiguration
 
 ### GitHub Workflows
 
