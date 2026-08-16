@@ -1,0 +1,4104 @@
+directive @MutationMeta(from: String, relationship: String, to: String) on FIELD_DEFINITION
+
+directive @additionalLabels(labels: [String]) on OBJECT
+
+directive @cypher(statement: String) on FIELD_DEFINITION
+
+directive @neo4j_ignore on FIELD_DEFINITION
+
+directive @relation(direction: String, from: String, name: String, to: String) on FIELD_DEFINITION | OBJECT
+
+"""
+A personal API key that authenticates programmatic access on behalf of its owner. Only a non-secret prefix and metadata are stored; the secret itself is shown exactly once, at creation.
+"""
+type ApiKey {
+  createdAt: String!
+
+  """True once the key has been revoked."""
+  disabled: Boolean!
+  disabledAt: String
+
+  """When the key expires, or null if it never expires."""
+  expiresAt: String
+  id: ID!
+
+  """
+  Non-secret leading segment of the key, used to identify it in listings.
+  """
+  keyPrefix: String!
+
+  """When the key last authenticated a request, or null if never used."""
+  lastUsedAt: String
+
+  """Human-readable label chosen by the owner."""
+  name: String!
+  owner(filter: _UserFilter): User
+}
+
+"""Aggregated per-user API-key usage, for the administration overview."""
+type ApiKeyUserSummary {
+  """Number of the user's currently active (non-revoked) keys."""
+  activeCount: Int!
+  commentsCount: Int!
+
+  """Most recent time any of the user's keys was used, or null."""
+  lastActivity: String
+  postsCount: Int!
+
+  """Number of the user's revoked keys."""
+  revokedCount: Int!
+  user(filter: _UserFilter): User!
+}
+
+"""
+Returned exactly once, on creation — the only moment the full secret is exposed.
+"""
+type ApiKeyWithSecret {
+  apiKey: ApiKey!
+
+  """The full API key secret. Store it now; it cannot be retrieved again."""
+  secret: String!
+}
+
+"""
+A badge that can be attached to users — either a verification mark or an awardable trophy.
+"""
+type Badge {
+  createdAt: String
+  description: String!
+
+  """Identifier/URL of the badge's icon asset."""
+  icon: String!
+  id: ID!
+
+  """Whether this badge is the instance-wide default of its type."""
+  isDefault: Boolean!
+
+  """Users currently wearing this trophy badge."""
+  rewarded(filter: _UserFilter, first: Int, offset: Int, orderBy: [_UserOrdering]): [User]!
+  type: BadgeType!
+
+  """Users whose verification this badge represents."""
+  verifies(filter: _UserFilter, first: Int, offset: Int, orderBy: [_UserOrdering]): [User]!
+}
+
+"""The purpose of a badge."""
+enum BadgeType {
+  """An achievement a user can be awarded and choose to display."""
+  trophy
+
+  """Marks a user as verified."""
+  verification
+}
+
+"""
+A topical category that posts and groups can be filed under. Categories are a fixed, instance-configured taxonomy (unlike free-form tags).
+"""
+type Category {
+  _id: String
+  createdAt: String
+
+  """Identifier of the category's icon."""
+  icon: String!
+  id: ID!
+  name: String!
+
+  """Number of posts filed under this category."""
+  postCount: Int!
+  posts(filter: _PostFilter, first: Int, offset: Int, orderBy: [_PostOrdering]): [Post]!
+  slug: String
+  updatedAt: String
+}
+
+"""Real-time delivery/seen-status update for messages in a room."""
+type ChatMessageStatusPayload {
+  _id: String
+  messageIds: [String!]!
+  roomId: ID!
+  status: String!
+}
+
+"""A candidate recipient when starting a chat: a user or a group."""
+union ChatTarget = Group | User
+
+"""A comment written by a user in reply to a post."""
+type Comment {
+  _id: String
+
+  """ActivityPub activity id, for federated comments."""
+  activityId: String
+  author(filter: _UserFilter): User
+
+  """Comment body as rich text (HTML)."""
+  content: String!
+  createdAt: String
+
+  """True once the comment has been moderated away."""
+  deleted: Boolean
+
+  """True once the comment has been disabled by a moderator."""
+  disabled: Boolean
+  id: ID!
+
+  """Whether the current user observes the post this comment belongs to."""
+  isPostObservedByMe: Boolean!
+
+  """The post this comment belongs to."""
+  post(filter: _PostFilter): Post
+
+  """Number of users observing the post this comment belongs to."""
+  postObservingUsersCount: Int!
+
+  """Whether the current user has shouted (endorsed) this comment."""
+  shoutedByCurrentUser: Boolean!
+
+  """Number of users who have shouted (endorsed) this comment."""
+  shoutedCount: Int!
+  updatedAt: String
+}
+
+enum ConfigKeyState {
+  empty
+  missing
+  set
+}
+
+"""Resources that can be deleted along with a user account."""
+enum Deletable {
+  Comment
+  Post
+}
+
+"""
+Instance-wide donation campaign state, shown in the donation progress widget.
+"""
+type Donations {
+  _id: String
+  createdAt: String!
+
+  """Fundraising target amount."""
+  goal: Int!
+  id: ID!
+
+  """Amount raised so far."""
+  progress: Int!
+
+  """Whether the donation widget is shown to users."""
+  showDonations: Boolean!
+  updatedAt: String!
+}
+
+"""Relationship representing a user's emotional reaction to a post."""
+type EMOTED {
+  createdAt: String
+  emotion: Emotion
+
+  """The reacting user."""
+  from: User
+
+  """The post reacted to."""
+  to: Post
+  updatedAt: String
+}
+
+"""
+A permission the current viewer effectively holds, carrying its catalog group so the webapp can gate UI areas by group (e.g. show the admin area for ANY administration-group permission) without a hard-coded key list.
+"""
+type EffectivePermission {
+  _id: String
+  group: String!
+  key: String!
+}
+
+"""An email address belonging to a user, with its verification state."""
+type EmailAddress {
+  createdAt: String
+  email: ID!
+
+  """When the address was verified, or null if still unverified."""
+  verifiedAt: String
+}
+
+"""
+A user's email notification toggles for one category (post, chat or group).
+"""
+type EmailNotificationSettings {
+  settings: [EmailNotificationSettingsOption]
+  type: EmailNotificationSettingsType
+}
+
+"""Input toggling a single email notification setting on or off."""
+input EmailNotificationSettingsInput {
+  name: EmailNotificationSettingsName
+  value: Boolean
+}
+
+"""
+An individual email-notification toggle, identifying the event that triggers an email.
+"""
+enum EmailNotificationSettingsName {
+  """The user received a direct chat message."""
+  chatMessage
+
+  """Someone commented on a post the user observes."""
+  commentOnObservedPost
+
+  """A user the current user follows published a post."""
+  followingUsers
+
+  """A user joined a group the user administrates."""
+  groupMemberJoined
+
+  """A user left a group the user administrates."""
+  groupMemberLeft
+
+  """A member was removed from a group the user administrates."""
+  groupMemberRemoved
+
+  """A member's role changed in a group the user administrates."""
+  groupMemberRoleChanged
+
+  """The user was mentioned in a post or comment."""
+  mention
+
+  """A new post was created in a group the user is a member of."""
+  postInGroup
+}
+
+"""A single email notification toggle and its current value."""
+type EmailNotificationSettingsOption {
+  name: EmailNotificationSettingsName
+  value: Boolean
+}
+
+"""The category a set of email-notification toggles belongs to."""
+enum EmailNotificationSettingsType {
+  """Notifications about direct chat messages."""
+  chat
+
+  """Notifications about group membership events."""
+  group
+
+  """Notifications about posts and comments."""
+  post
+}
+
+"""
+oEmbed-style metadata scraped from an external URL, used to render link previews.
+"""
+type Embed {
+  audio: String
+  author: String
+  date: String
+  description: String
+
+  """
+  Embeddable HTML fragment (e.g. a player iframe), when the provider offers one.
+  """
+  html: String
+
+  """URL of a representative preview image."""
+  image: String
+
+  """Detected content language."""
+  lang: String
+  publisher: String
+  sources: [String]
+  title: String
+
+  """The oEmbed resource type (e.g. link, video, photo, rich)."""
+  type: String
+  url: String
+  video: String
+}
+
+"""An oEmbed provider this instance can resolve link previews for."""
+type EmbedProvider {
+  _id: String
+
+  """Display name, e.g. "YouTube"."""
+  name: String!
+
+  """The provider's own site, e.g. "https://youtube.com"."""
+  url: String!
+}
+
+"""An emotional reaction a user can leave on a post."""
+enum Emotion {
+  angry
+  cry
+  funny
+  happy
+  surprised
+}
+
+enum EnvCategory {
+  auth
+  branding
+  database
+  features
+  general
+  layout
+  mail
+  maps
+  monitoring
+  redis
+  registration
+  server
+  storage
+  video
+}
+
+type EnvKeyStatus {
+  _id: String
+
+  """The environment variable name (e.g. LIVEKIT_API_SECRET)."""
+  name: String!
+
+  """Presence state — the only thing reported; a value is never returned."""
+  state: ConfigKeyState!
+}
+
+"""
+Relationship recording that a user filed a moderation report against a resource, with the stated reason.
+"""
+type FILED {
+  createdAt: String!
+  reasonCategory: ReasonCategory!
+
+  """Free-text explanation the reporter provided."""
+  reasonDescription: String!
+
+  """The user who filed the report."""
+  submitter(filter: _UserFilter): User
+}
+
+"""A file attached to a chat message."""
+type File {
+  _id: String
+
+  """Duration in seconds for audio/video files."""
+  duration: Float
+  extension: String
+  name: String
+
+  """MIME type of the file."""
+  type: String
+
+  """The file's URL, which also serves as its identifier."""
+  url: ID!
+}
+
+"""
+Input for a file to attach to a chat message. The file itself must be provided as `upload` (attaching without it is rejected); the remaining fields are its metadata.
+"""
+input FileInput {
+  duration: Float
+  extension: String
+  name: String
+  type: String
+
+  """
+  The file to upload. Required — the resolver rejects an attachment without it.
+  """
+  upload: Upload
+}
+
+"""
+The result of filing a report, echoing the reason and linking to the created report.
+"""
+type FiledReport {
+  _id: String
+  createdAt: String!
+  reasonCategory: ReasonCategory!
+  reasonDescription: String!
+  reportId: ID!
+  resource: ReportedResource!
+}
+
+"""
+A group: a space where members share posts, chat and optionally hold video calls. Discoverability and joining are governed by its groupType.
+"""
+type Group {
+  """Short statement of the group's goal."""
+  about: String
+  actionRadius: GroupActionRadius!
+  avatar(filter: _ImageFilter): Image
+  categories(filter: _CategoryFilter, first: Int, offset: Int, orderBy: [_CategoryOrdering]): [Category]
+
+  """ISO 8601 date-time string of creation."""
+  createdAt: String!
+
+  """Number of posts currently pinned within this group."""
+  currentlyPinnedPostsCount: Int!
+  deleted: Boolean
+
+  """Full group description (rich text)."""
+  description: String!
+
+  """Plain-text excerpt of the description, for previews."""
+  descriptionExcerpt: String!
+  disabled: Boolean
+  groupType: GroupType!
+  id: ID!
+
+  """Invite codes to this group the current user has generated."""
+  inviteCodes: [InviteCode]!
+
+  """Whether the current user has muted this group."""
+  isMutedByMe: Boolean!
+  location: Location
+  locationName: String
+
+  """Number of members, excluding those with a pending join request."""
+  membersCount: Int!
+
+  """
+  The current user's role in this group, or null if they are not a member.
+  """
+  myRole: GroupMemberRole
+
+  """The group's title."""
+  name: String!
+  posts(filter: _PostFilter, first: Int, offset: Int, orderBy: [_PostOrdering]): [Post]
+
+  """Total number of non-deleted, non-disabled posts in this group."""
+  postsCount: Int!
+
+  """For closed groups: whether non-members can see the member list."""
+  showMembers: Boolean
+
+  """
+  Whether the profile owner has chosen to show this group on their public profile.
+  """
+  showOnProfile: Boolean
+
+  """URL-safe unique handle for the group."""
+  slug: String!
+
+  """ISO 8601 date-time string of the last update."""
+  updatedAt: String!
+}
+
+"""The geographic reach a group intends its activities to have."""
+enum GroupActionRadius {
+  continental
+  global
+
+  """Tongue-in-cheek maximum reach: beyond planet Earth."""
+  interplanetary
+  national
+  regional
+}
+
+"""
+A group member paired with their membership relationship (role, join date).
+"""
+type GroupMember {
+  _id: String
+  membership(filter: _MEMBER_OFFilter): MEMBER_OF
+  user(filter: _UserFilter): User
+}
+
+"""A user's role within a group, in ascending order of privilege."""
+enum GroupMemberRole {
+  """Can manage members and group settings."""
+  admin
+
+  """
+  Full control over the group, including deleting it; there is exactly one owner.
+  """
+  owner
+
+  """
+  Membership requested but not yet approved (closed groups); not counted as a member.
+  """
+  pending
+
+  """Regular member."""
+  usual
+}
+
+type GroupMembershipVisibilityChanged {
+  _id: String
+  userId: ID!
+}
+
+type GroupShowMembersChanged {
+  _id: String
+  groupId: ID!
+}
+
+"""Determines a group's discoverability and how users become members."""
+enum GroupType {
+  """
+  Anyone can find the group, but joining requires approval by a group admin/owner.
+  """
+  closed
+
+  """The group is unlisted; it can only be found and joined via invite."""
+  hidden
+
+  """Anyone can find the group and join without approval."""
+  public
+}
+
+"""An image asset (avatar, hero image, etc.) with rendering metadata."""
+type Image {
+  _id: String
+
+  """Alternative text for accessibility."""
+  alt: String
+
+  """Width-to-height ratio, used to reserve layout space before load."""
+  aspectRatio: Float
+
+  """
+  Whether the image is flagged as sensitive and should be blurred by default.
+  """
+  sensitive: Boolean
+
+  """URL of a variant resized to the requested width/height."""
+  transform(height: Int, width: Int): String
+
+  """MIME type of the image."""
+  type: String
+
+  """The image's URL, which also serves as its identifier."""
+  url: ID!
+}
+
+"""
+Input for uploading or updating an image. Provide `upload` to set a new file.
+"""
+input ImageInput {
+  alt: String
+  aspectRatio: Float
+  sensitive: Boolean
+  type: String
+  upload: Upload
+}
+
+"""
+An invite code. A personal code lets its holder register on the instance; a group code additionally grants membership in a specific group. May be limited by an expiry and a redemption limit.
+"""
+type InviteCode {
+  _id: String
+
+  """The code string, which also serves as its identifier."""
+  code: ID!
+
+  """Free-form note the issuer attached to the code."""
+  comment: String
+  createdAt: String!
+
+  """When the code expires, or null if it never expires."""
+  expiresAt: String
+
+  """The user who issued the code."""
+  generatedBy(filter: _UserFilter): User
+
+  """
+  The group this code invites into, or null for a personal (registration-only) code.
+  """
+  invitedTo: Group
+
+  """
+  Whether the code can still be redeemed (not expired, invalidated, or over its redemption limit).
+  """
+  isValid: Boolean!
+
+  """Users who have redeemed this code."""
+  redeemedBy(filter: _UserFilter, first: Int, offset: Int, orderBy: [_UserOrdering]): [User]
+  redeemedByCount: Int!
+}
+
+"""
+A geographic place (city, region, country, …) linked to users, groups and events. Places nest via `parent`, forming a hierarchy up to the country level.
+"""
+type Location {
+  """
+  Distance in kilometres from the current user's location. Requires authentication.
+  """
+  distanceToMe: Int
+  id: ID!
+
+  """Latitude in decimal degrees (WGS84)."""
+  lat: Float
+
+  """Longitude in decimal degrees (WGS84)."""
+  lng: Float
+
+  """
+  Localized place name. Falls back through the requested `lang`, the instance default language, and finally the raw name/id.
+  """
+  name(lang: String = ""): String!
+
+  """The enclosing place one level up in the hierarchy."""
+  parent: Location
+
+  """The place's granularity (e.g. country, region, place)."""
+  type: String!
+}
+
+"""A geocoding suggestion returned by the MapBox-backed place search."""
+type LocationMapBox {
+  _id: String
+  id: ID!
+  place_name: String!
+}
+
+"""
+Relationship carrying a user's membership in a group, including their role and when it began.
+"""
+type MEMBER_OF {
+  _id: String
+  createdAt: String!
+  role: GroupMemberRole!
+  showOnProfile: Boolean
+  updatedAt: String!
+}
+
+"""A single chat message within a room."""
+type Message {
+  _id: String
+  author(filter: _UserFilter): User!
+
+  """Avatar URL of the sending user."""
+  avatar: String
+  content: String
+  createdAt: String
+
+  """Alias of createdAt; prefer createdAt in new code."""
+  date: String!
+
+  """
+  Whether the message has been distributed to recipients (delivery-status flag).
+  """
+  distributed: Boolean
+
+  """Files attached to the message."""
+  files(filter: _FileFilter, first: Int, offset: Int, orderBy: [_FileOrdering]): [File]!
+  id: ID!
+
+  """
+  Monotonically increasing index of the message within its room, used for ordering and paging.
+  """
+  indexId: Int!
+  room(filter: _RoomFilter): Room!
+
+  """Whether the message has been persisted (delivery-status flag)."""
+  saved: Boolean
+
+  """
+  Whether the current user has seen the message (always true for messages they sent).
+  """
+  seen: Boolean
+
+  """Id of the sending user."""
+  senderId: String!
+  updatedAt: String
+
+  """Display name of the sending user."""
+  username: String!
+}
+
+type Mutation {
+  """
+  Add a further email address to the current account, sending a verification nonce. Requires authentication.
+  """
+  AddEmailAddress(email: String!): EmailAddress
+
+  """
+  Add the current user's emotional reaction to a post. Requires authentication.
+  """
+  AddPostEmotions(data: _EMOTEDInput!, to: _PostInput!): EMOTED
+
+  """
+  Change a member's role in a group. Restricted to admins/owners, subject to the role hierarchy.
+  """
+  ChangeGroupMemberRole(groupId: ID!, roleInGroup: GroupMemberRole!, userId: ID!): GroupMember
+
+  """
+  Write a comment on a post. Requires authentication, the `comment.create` permission, and permission to comment on that post.
+  """
+  CreateComment(content: String!, id: ID, postId: ID!): Comment
+
+  """
+  Create a group. Requires authentication and the `group.create_<type>` permission matching the chosen groupType.
+  """
+  CreateGroup(
+    about: String
+    actionRadius: GroupActionRadius!
+    categoryIds: [ID]
+    description: String!
+    groupType: GroupType!
+    id: ID
+
+    """Empty string '' clears the location (sets it to null)."""
+    locationName: String
+    name: String!
+    showMembers: Boolean
+    slug: String
+  ): Group
+
+  """Create (or fetch) the chat room for a group. Requires authentication."""
+  CreateGroupRoom(groupId: ID!): Room
+
+  """
+  Send a message to a room (by `roomId`) or to a user (by `userId`, opening a direct room). Requires authentication.
+  """
+  CreateMessage(content: String, files: [FileInput], roomId: ID, userId: ID): Message
+
+  """
+  Create a post. Requires authentication and the `post.create` permission; posting into a group additionally requires membership of that group.
+  """
+  CreatePost(
+    categoryIds: [ID]
+    content: String!
+
+    """Event details; required when postType is Event."""
+    eventInput: _EventInput
+
+    """Post into this group; omit for a public/timeline post."""
+    groupId: ID
+    id: ID
+    image: ImageInput
+    language: String
+    postType: PostType = Article
+    slug: String
+    title: String!
+    visibility: Visibility
+  ): Post
+
+  """
+  Add a social-media link to your profile. Requires the `socialMedia.create` permission.
+  """
+  CreateSocialMedia(id: ID, url: String!): SocialMedia
+
+  """Delete one of your own comments. Restricted to the author."""
+  DeleteComment(id: ID!): Comment
+
+  """Delete one of your own posts. Restricted to the author."""
+  DeletePost(id: ID!): Post
+
+  """Remove one of your own social-media links. Restricted to the owner."""
+  DeleteSocialMedia(id: ID!): SocialMedia
+
+  """
+  Delete a user account. Allowed for the account owner, or with user.delete.any subject to the act-on hierarchy. Optionally also delete the user's posts and/or comments via `resource`.
+  """
+  DeleteUser(id: ID!, resource: [Deletable]): User
+
+  """
+  Join a group, or accept/approve a pending membership. Allowed per the group's join rules; joining on behalf of another user requires the appropriate rights.
+  """
+  JoinGroup(groupId: ID!, userId: ID!): GroupMember
+
+  """Leave a group, or (for admins/owners) let a member leave."""
+  LeaveGroup(groupId: ID!, userId: ID!): GroupMember
+
+  """
+  Mark the given messages as seen by the current user. Requires authentication.
+  """
+  MarkMessagesAsSeen(messageIds: [String!]): Boolean
+
+  """
+  Remove the current user's emotional reaction from a post. Requires authentication.
+  """
+  RemovePostEmotions(data: _EMOTEDInput!, to: _PostInput!): EMOTED
+
+  """
+  Remove a user from a group. Restricted to those allowed to manage the group's members.
+  """
+  RemoveUserFromGroup(groupId: ID!, userId: ID!): GroupMember
+
+  """
+  Begin registration for an email address, sending a verification nonce. Allowed when public or invite registration is enabled (or by an admin with `role.manage`); an inviteCode is required for invite-only registration.
+  """
+  Signup(email: String!, inviteCode: String = null, locale: String!): EmailAddress
+
+  """
+  Complete registration by confirming the nonce and creating the user account. Public.
+  """
+  SignupVerification(about: String, email: String!, inviteCode: String = null, locale: String, locationName: String = null, name: String!, nonce: String!, password: String!, slug: String, termsAndConditionsAgreedVersion: String!): User
+
+  """Edit one of your own comments. Restricted to the author."""
+  UpdateComment(content: String!, id: ID!): Comment
+
+  """
+  Update the donation campaign settings. Requires the `donation.manage` permission.
+  """
+  UpdateDonations(goal: Int, progress: Int, showDonations: Boolean): Donations
+
+  """Update a group's settings. Restricted to admins/owners of the group."""
+  UpdateGroup(
+    about: String
+    actionRadius: GroupActionRadius
+    avatar: ImageInput
+    categoryIds: [ID]
+    description: String
+    groupType: GroupType
+    id: ID!
+
+    """Empty string '' clears the location (sets it to null)."""
+    locationName: String
+    name: String
+    showMembers: Boolean
+    slug: String
+  ): Group
+
+  """Update one of your own posts. Restricted to the author."""
+  UpdatePost(categoryIds: [ID], content: String!, eventInput: _EventInput, id: ID!, image: ImageInput, language: String, postType: PostType, slug: String, title: String!, visibility: Visibility): Post
+
+  """Update one of your own social-media links. Restricted to the owner."""
+  UpdateSocialMedia(id: ID!, url: String!): SocialMedia
+
+  """Update your own profile. Restricted to the account owner."""
+  UpdateUser(
+    about: String
+    allowEmbedIframes: Boolean
+    avatar: ImageInput
+    email: String
+    emailNotificationSettings: [EmailNotificationSettingsInput]
+    id: ID!
+    locale: String
+
+    """Empty string '' clears the location (sets it to null)."""
+    locationName: String
+    name: String
+    showClosedGroupsOnProfile: Boolean
+    showHiddenGroupsOnProfile: Boolean
+    showPublicGroupsOnProfile: Boolean
+    showShoutsPublicly: Boolean
+    slug: String
+    termsAndConditionsAgreedAt: String
+    termsAndConditionsAgreedVersion: String
+  ): User
+
+  """
+  Confirm a pending email address via its nonce. Requires authentication.
+  """
+  VerifyEmailAddress(email: String!, nonce: String!): EmailAddress
+
+  """
+  Revoke any user's API key (administration). Requires the `apiKey.administer` permission.
+  """
+  adminRevokeApiKey(id: ID!): Boolean!
+
+  """
+  Revoke all of a user's API keys and return how many were revoked. Requires the `apiKey.administer` permission.
+  """
+  adminRevokeUserApiKeys(userId: ID!): Int!
+
+  """
+  Block a user, cutting off interaction in both directions. Requires authentication.
+  """
+  blockUser(id: ID!): User
+
+  """Change the current user's password. Requires authentication."""
+  changePassword(newPassword: String!, oldPassword: String!): String!
+
+  """
+  Create a new API key and return its secret (shown only here). Requires the `apiKey.create` permission (gated by the apiKeysEnabled policy).
+  """
+  createApiKey(expiresInDays: Int, name: String!): ApiKeyWithSecret!
+
+  """
+  Create a new role with the given permission bundle. Requires the `role.manage` permission.
+  """
+  createRole(name: String!, permissions: [String!]!): Role!
+
+  """
+  Delete a role. Returns the deleted role's name (the input name echoed back on success). Requires the `role.manage` permission.
+  """
+  deleteRole(name: String!): String!
+
+  """
+  Reversibly deactivate (disable: true) or reactivate (disable: false) a user account. Moderator-grade, subject to the act-on hierarchy.
+  """
+  disableUser(disable: Boolean!, id: ID!): User
+
+  """
+  File a moderation report against a user, post or comment. Requires authentication.
+  """
+  fileReport(reasonCategory: ReasonCategory!, reasonDescription: String!, resourceId: ID!): FiledReport
+
+  """Follow a user. Requires authentication."""
+  followUser(id: ID!): User
+
+  """
+  Issue an invite code granting membership in a group. Restricted to admins/owners of that group.
+  """
+  generateGroupInviteCode(comment: String = null, expiresAt: String = null, groupId: ID!): InviteCode!
+
+  """
+  Issue a personal invite code for registering new users. Requires authentication and the `user.invite` permission.
+  """
+  generatePersonalInviteCode(comment: String = null, expiresAt: String = null): InviteCode!
+
+  """
+  Invalidate one of your invite codes so it can no longer be redeemed. Requires authentication.
+  """
+  invalidateInviteCode(code: String!): InviteCode
+
+  """
+  Join a group's video call, returning the credentials to connect. Requires authentication.
+  """
+  joinGroupVideoCall(groupId: ID!): VideoCallJoinPayload!
+
+  """Get a JWT Token for the given Email and password"""
+  login(email: String!, password: String!): String!
+
+  """
+  Mark all of the current user's notifications as read. Requires authentication.
+  """
+  markAllAsRead: [NOTIFIED]
+
+  """Mark a notification as read. Requires authentication."""
+  markAsRead(id: ID!): NOTIFIED
+
+  """Mark a notification as unread. Requires authentication."""
+  markAsUnread(id: ID!): NOTIFIED
+
+  """Mark a post's teaser as viewed by the current user. Public."""
+  markTeaserAsViewed(id: ID!): Post
+
+  """
+  Mute a group so its posts no longer appear in the current user's feed. Requires membership.
+  """
+  muteGroup(groupId: ID!): Group
+
+  """
+  Mute a user, hiding their content from the current user. Requires authentication.
+  """
+  muteUser(id: ID!): User
+
+  """
+  Pin a post within its group. Restricted to those allowed to pin in that group.
+  """
+  pinGroupPost(id: ID!): Post
+
+  """Pin a post instance-wide. Requires the `post.pin` permission."""
+  pinPost(id: ID!): Post
+
+  """
+  Push (boost) a post to the top of feeds. Requires the `post.push` permission.
+  """
+  pushPost(id: ID!): Post!
+
+  """
+  Redeem an invite code for the current user (registration and/or group membership). Requires authentication.
+  """
+  redeemInviteCode(code: String!): Boolean!
+
+  """
+  Rename a role, keeping its permission bundle and all its members (its HAS_ROLE edges are preserved). The mandatory owner and user roles cannot be renamed. Requires the `role.manage` permission.
+  """
+  renameRole(name: String!, newName: String!): Role!
+
+  """Request a password-reset email for the given address. Public."""
+  requestPasswordReset(email: String!, locale: String!): Boolean!
+
+  """Reset a password using the nonce from the reset email. Public."""
+  resetPassword(email: String!, newPassword: String!, nonce: String!): Boolean!
+
+  """
+  Reset several policy keys to their configured defaults in one request (only keys that diverge actually change). Requires the `policy.manage` permission.
+  """
+  resetPolicies(keys: [PolicyKey!]!): [PolicyChangeEvent!]!
+
+  """
+  Reset a single policy key to its configured default. Requires the `policy.manage` permission.
+  """
+  resetPolicy(key: PolicyKey!): PolicyChangeEvent!
+
+  """Clear all displayed trophy badges. Requires authentication."""
+  resetTrophyBadgesSelected: User
+
+  """
+  Resynchronise the in-memory role & policy caches from the database. Dev/test-only recovery hook for when an out-of-process change (db:reset / db:seed, the e2e harness) leaves a running server's caches stale; it needs no auth outside production so it works even when no users exist yet (right after a wipe). Disabled in production — there a rolling restart re-reads the DB on each instance's boot.
+  """
+  resyncCaches: Boolean!
+
+  """
+  Record a moderation decision on a reported resource: optionally disable (hide) it and/or close the report. Requires the `content.moderate` permission and must respect the act-on hierarchy for the target user.
+  """
+  review(closed: Boolean, disable: Boolean, resourceId: ID!): REVIEWED
+
+  """Revoke one of your own API keys. Requires authentication."""
+  revokeApiKey(id: ID!): Boolean!
+
+  """Remove a badge from a user. Requires the `badge.manage` permission."""
+  revokeBadge(badgeId: ID!, userId: ID!): User
+
+  """
+  Award a trophy badge to a user. Requires the `badge.manage` permission.
+  """
+  rewardTrophyBadge(badgeId: ID!, userId: ID!): User
+
+  """
+  Set the current user's active content-filter categories. Requires authentication.
+  """
+  saveCategorySettings(activeCategories: [String]): Boolean
+
+  """
+  Switch the live network branding to the given baked-in brand id (one of /branding/manifest.json), or the empty string for framework defaults. Persisted as the `activeBranding` policy value and broadcast live via the `policyChanged` subscription, so every client reloads the new brand's config without a redeploy. Requires the `branding.manage` permission. Returns the applied id.
+  """
+  setActiveBranding(id: String!): String!
+
+  """
+  Set the per-bucket branding composition — a JSON-encoded object mapping a bucket slot (theme/identity/logos/legal/navigation/behavior) to a source 'id[@version][/instance]', layered over `activeBranding`. The empty string clears all per-slot overrides. Persisted as the `brandingComposition` policy value and broadcast live via `policyChanged`, so clients reload the recomposed branding. Requires the `branding.manage` permission. Returns the applied JSON string.
+  """
+  setBrandingComposition(composition: String!): String!
+
+  """
+  Toggle whether a group membership is shown on the current user's profile.
+  """
+  setGroupMembershipVisibility(groupId: ID!, showOnProfile: Boolean!): MEMBER_OF
+
+  """
+  Set a single policy key to a value. Requires the `policy.manage` permission.
+  """
+  setPolicy(key: PolicyKey!, value: String!): PolicyChangeEvent!
+
+  """
+  Choose which trophy badge to display in a given slot (null clears the slot). Requires authentication.
+  """
+  setTrophyBadgeSelected(badgeId: ID, slot: Int!): User
+
+  """
+  Set a user's single role (replaces their current role). Requires the `role.manage` permission.
+  """
+  setUserRole(roleName: String!, userId: ID!): User!
+
+  """
+  Assign a verification badge to a user. Requires the `badge.manage` permission.
+  """
+  setVerificationBadge(badgeId: ID!, userId: ID!): User
+
+  """Shout (endorse) the given post or comment. Requires authentication."""
+  shout(id: ID!, type: ShoutTypeEnum!): Boolean!
+
+  """
+  Start or stop observing a post (to receive notifications about its comments). Requires authentication.
+  """
+  toggleObservePost(id: ID!, value: Boolean!): Post!
+
+  """Unblock a previously blocked user. Requires authentication."""
+  unblockUser(id: ID!): User
+
+  """Unfollow a user. Requires authentication."""
+  unfollowUser(id: ID!): User
+
+  """Unmute a previously muted group. Requires membership."""
+  unmuteGroup(groupId: ID!): Group
+
+  """Unmute a previously muted user. Requires authentication."""
+  unmuteUser(id: ID!): User
+
+  """Remove a group pin. Restricted to those allowed to pin in that group."""
+  unpinGroupPost(id: ID!): Post
+
+  """Remove an instance-wide pin. Requires the `post.pin` permission."""
+  unpinPost(id: ID!): Post
+
+  """Remove a post's push/boost. Requires the `post.push` permission."""
+  unpushPost(id: ID!): Post!
+
+  """
+  Withdraw a shout from the given post or comment. Requires authentication.
+  """
+  unshout(id: ID!, type: ShoutTypeEnum!): Boolean!
+
+  """Rename one of your own API keys. Requires authentication."""
+  updateApiKey(id: ID!, name: String!): ApiKey!
+
+  """Update the current user's online/away status. Requires authentication."""
+  updateOnlineStatus(status: OnlineStatus!): Boolean!
+
+  """
+  Replace an existing role's permission bundle. Requires the `role.manage` permission.
+  """
+  updateRole(name: String!, permissions: [String!]!): Role!
+}
+
+"""
+Relationship representing a notification delivered to a user about some source activity.
+"""
+type NOTIFIED {
+  createdAt: String!
+
+  """The post, comment or group the notification is about."""
+  from: NotificationSource
+  id: ID!
+
+  """Whether the recipient has read the notification."""
+  read: Boolean
+  reason: NotificationReason
+
+  """The user who triggered the notification, when applicable."""
+  relatedUser(filter: _UserFilter): User
+
+  """The recipient of the notification."""
+  to(filter: _UserFilter): User
+  updatedAt: String!
+}
+
+"""Ordering options for the notifications query."""
+enum NotificationOrdering {
+  createdAt_asc
+  createdAt_desc
+  updatedAt_asc
+  updatedAt_desc
+}
+
+"""Why a notification was created."""
+enum NotificationReason {
+  changed_group_member_role
+  commented_on_post
+
+  """A user the recipient follows published a post."""
+  followed_user_posted
+  mentioned_in_comment
+  mentioned_in_post
+
+  """A new post was created in a group the recipient belongs to."""
+  post_in_group
+  removed_user_from_group
+  user_joined_group
+  user_left_group
+}
+
+"""The kind of node a notification originates from."""
+union NotificationSource = Comment | Group | Post
+
+"""A user's self-reported presence state."""
+enum OnlineStatus {
+  away
+  online
+}
+
+"""
+A single entry in the permission catalog: a grantable right and its metadata.
+"""
+type Permission {
+  _id: String
+
+  """
+  Whether the permission is effective right now for the requesting viewer's config/policy. False ⇒ the feature is not configured/enabled; the admin UI disables granting it.
+  """
+  available: Boolean!
+  description: String!
+
+  """
+  The runtime feature gate this permission depends on (e.g. videoCall, apiKeys), or null when it is always effective.
+  """
+  gatedBy: String
+  group: String!
+  key: String!
+}
+
+"""
+A signal that effective permissions may have changed (a role's permission set, or a user's role assignment). Clients refetch their own myPermissions on receipt — the payload carries only the affected role name, no actor (Datensparsamkeit).
+"""
+type PermissionsChanged {
+  _id: String
+
+  """
+  Set only for a rename: the role's former name, so an admin roles view with this role selected can follow the selection to its new name.
+  """
+  previousRoleName: String
+  roleName: String
+}
+
+"""Instance-wide pinned-post counters."""
+type PinnedPostCounts {
+  _id: String
+  currentlyPinnedPosts: Int!
+}
+
+"""An applied change to a single policy key, with audit metadata."""
+type PolicyChangeEvent {
+  _id: String
+  actor: String!
+  key: PolicyKey!
+  timestamp: String!
+  value: String!
+}
+
+type PolicyConfigEntry {
+  _id: String
+
+  """
+  Whether all hard env requirements are met (always true when there are none). Policy→policy dependencies (requiresPolicy on the policy query) are folded live in the client, not here, so re-enabling a dependency un-greys the dependent key without a refetch.
+  """
+  available: Boolean!
+
+  """
+  Admin display group the key belongs to (e.g. registration, features, layout, video).
+  """
+  category: String!
+
+  """
+  The configured default = env seed if set, else the software default, JSON-encoded.
+  """
+  configuredDefault: String!
+
+  """
+  Effective value (env-folded), JSON-encoded. This is what the permission gates read.
+  """
+  effective: String!
+
+  """Name of the env var that SEEDS the default (soft), or null."""
+  envSeed: String
+
+  """Presence of the envSeed var, or null when the key has no envSeed."""
+  envSeedState: ConfigKeyState
+
+  """The policy key (e.g. videoConference, apiKeysEnabled)."""
+  key: String!
+
+  """
+  Hard env requirements with their presence state (empty when the key needs no env).
+  """
+  requiresEnv(filter: _EnvKeyStatusFilter, first: Int, offset: Int, orderBy: [_EnvKeyStatusOrdering]): [EnvKeyStatus!]!
+
+  """The software default baked into the schema, JSON-encoded."""
+  softwareDefault: String!
+
+  """Value type: boolean | integer."""
+  type: String!
+}
+
+"""
+The configured policy defaults together with audit info about the last change.
+"""
+type PolicyDefaults {
+  _id: String
+  defaults(filter: _PolicyEntryFilter, first: Int, offset: Int, orderBy: [_PolicyEntryOrdering]): [PolicyEntry!]!
+  lastChange(filter: _PolicyLastChangeFilter): PolicyLastChange
+}
+
+"""
+A single policy key with its current (or default) value, JSON-encoded (heterogeneous types: boolean / integer). The value is null for a key the viewer may not see, or a genuinely unset value (e.g. an unlimited limit).
+"""
+type PolicyEntry {
+  _id: String
+  key: PolicyKey!
+
+  """
+  Other policy keys this one depends on (policy→policy gate): the key is only effective while every listed key is effectively on. Static schema metadata (empty for most keys); the client re-folds it so a layout toggle respects its feature gate (e.g. showGroupButtonInHeader depends on groupsEnabled).
+  """
+  requiresPolicy: [PolicyKey!]!
+  value: String
+}
+
+enum PolicyKey {
+  activeBranding
+  apiKeysEnabled
+  apiKeysMaxPerUser
+  askForRealName
+  badgesEnabled
+  brandingComposition
+  categoriesActive
+  groupsEnabled
+  inviteCodesGroupPerUser
+  inviteCodesPersonalPerUser
+  inviteLinkLimit
+  inviteRegistration
+  maxGroupPinnedPosts
+  maxPinnedPosts
+  publicRegistration
+  requireLocation
+  showContentFilterHeaderMenu
+  showContentFilterMasonryGrid
+  showGroupButtonInHeader
+  socialMediaEnabled
+  videoConference
+}
+
+"""Who last changed a policy value, and when."""
+type PolicyLastChange {
+  _id: String
+  actor: String!
+  timestamp: String!
+}
+
+"""A policy key/value change, broadcast to subscribers."""
+type PolicyValueChanged {
+  _id: String
+  key: PolicyKey!
+  value: String!
+}
+
+"""
+A contribution — an article or event — written by a user, optionally within a group.
+"""
+type Post {
+  _id: String
+
+  """ActivityPub activity id, for federated posts."""
+  activityId: String
+  author(filter: _UserFilter): User
+  categories(filter: _CategoryFilter, first: Int, offset: Int, orderBy: [_CategoryOrdering]): [Category]
+
+  """Number of times the post has been opened."""
+  clickedCount: Int!
+  comments(filter: _CommentFilter, first: Int, offset: Int, orderBy: [_CommentOrdering]): [Comment]!
+
+  """Number of visible (non-deleted, non-disabled) comments."""
+  commentsCount: Int!
+
+  """Post body as rich text (HTML)."""
+  content: String!
+
+  """ISO 8601 date-time string of creation."""
+  createdAt: String
+
+  """True once the post has been moderated away."""
+  deleted: Boolean
+
+  """True once the post has been disabled by a moderator."""
+  disabled: Boolean
+  emotions(filter: _PostEMOTEDFilter): [_PostEmotions]
+
+  """Total number of emotional reactions on the post."""
+  emotionsCount: Int!
+
+  """Event end time (Event posts)."""
+  eventEnd: String
+
+  """Whether the event takes place online (Event posts)."""
+  eventIsOnline: Boolean
+
+  """Structured location of the event (Event posts)."""
+  eventLocation: Location
+
+  """Name of the event's location (Event posts)."""
+  eventLocationName: String
+
+  """Event start time (Event posts)."""
+  eventStart: String
+
+  """Venue/room of the event (Event posts)."""
+  eventVenue: String
+
+  """The group this post belongs to, or null for a public/timeline post."""
+  group: Group
+
+  """Whether the post is pinned within its group."""
+  groupPinned: Boolean
+  id: ID!
+
+  """The post's hero image."""
+  image(filter: _ImageFilter): Image
+
+  """
+  Whether the current user observes this post (receives notifications about its comments).
+  """
+  isObservedByMe: Boolean!
+
+  """Content language as an IETF/ISO code (e.g. `en`, `de`)."""
+  language: String
+
+  """ActivityPub object id, for federated posts."""
+  objectId: String
+
+  """Number of users observing this post."""
+  observingUsersCount: Int!
+
+  """Whether the post is pinned instance-wide."""
+  pinned: Boolean
+
+  """When the post was pinned instance-wide, or null if not pinned."""
+  pinnedAt: String
+
+  """The user who pinned the post instance-wide."""
+  pinnedBy(filter: _UserFilter): User
+
+  """
+  The post's type(s), derived from its Neo4j labels (e.g. Article, Event).
+  """
+  postType: [PostType]
+
+  """Up to 10 other posts sharing a tag or category with this one."""
+  relatedContributions(first: Int, offset: Int, orderBy: [_PostOrdering]): [Post]!
+  shoutedBy(filter: _UserFilter, first: Int, offset: Int, orderBy: [_UserOrdering]): [User]!
+
+  """Has the currently logged in user shouted that post?"""
+  shoutedByCurrentUser: Boolean!
+
+  """Number of users who have shouted (endorsed) this post."""
+  shoutedCount: Int!
+
+  """URL-safe unique handle for the post."""
+  slug: String!
+
+  """
+  Date used to sort the post in feeds (may differ from createdAt, e.g. for events).
+  """
+  sortDate: String
+  tags(filter: _TagFilter, first: Int, offset: Int, orderBy: [_TagOrdering]): [Tag]!
+  title: String!
+
+  """
+  Unread notifications for comments in this post targeting the currently logged in user.
+  """
+  unreadCommentNotificationsByCurrentUser: [NOTIFIED!]!
+
+  """
+  Unread notification for this post targeting the currently logged in user, or null.
+  """
+  unreadNotificationByCurrentUser: NOTIFIED
+
+  """ISO 8601 date-time string of the last update."""
+  updatedAt: String
+
+  """Whether the current user has viewed the post's teaser."""
+  viewedTeaserByCurrentUser: Boolean!
+
+  """Number of times the post's teaser has been viewed."""
+  viewedTeaserCount: Int!
+  visibility: Visibility
+}
+
+"""
+The kind of content a post represents. Stored as an additional Neo4j node label.
+"""
+enum PostType {
+  """A regular text article."""
+  Article
+
+  """An event with a date, and optionally a location or online link."""
+  Event
+}
+
+type Query {
+  """List all available badges. Public."""
+  Badge: [Badge]
+
+  """List categories. Public."""
+  Category(createdAt: String, filter: _CategoryFilter, first: Int, icon: String, id: ID, name: String, offset: Int, orderBy: [_CategoryOrdering], slug: String, updatedAt: String): [Category]
+  ChatMessageStatusPayload(_id: String, filter: _ChatMessageStatusPayloadFilter, first: Int, messageIds: String, offset: Int, orderBy: [_ChatMessageStatusPayloadOrdering], roomId: ID, status: String): [ChatMessageStatusPayload]
+
+  """List comments. Public."""
+  Comment(content: String, createdAt: String, filter: _CommentFilter, first: Int, id: ID, offset: Int, orderBy: [_CommentOrdering], updatedAt: String): [Comment]
+
+  """The current donation campaign state. Requires authentication."""
+  Donations(filter: _DonationsFilter): Donations
+  EffectivePermission(_id: String, filter: _EffectivePermissionFilter, first: Int, group: String, key: String, offset: Int, orderBy: [_EffectivePermissionOrdering]): [EffectivePermission]
+  EmbedProvider(_id: String, filter: _EmbedProviderFilter, first: Int, name: String, offset: Int, orderBy: [_EmbedProviderOrdering], url: String): [EmbedProvider]
+  EnvKeyStatus(_id: String, filter: _EnvKeyStatusFilter, first: Int, name: String, offset: Int, orderBy: [_EnvKeyStatusOrdering], state: ConfigKeyState): [EnvKeyStatus]
+  File(_id: String, duration: Float, extension: String, filter: _FileFilter, first: Int, name: String, offset: Int, orderBy: [_FileOrdering], type: String, url: ID): [File]
+  FiledReport(_id: String, createdAt: String, filter: _FiledReportFilter, first: Int, offset: Int, orderBy: [_FiledReportOrdering], reasonCategory: ReasonCategory, reasonDescription: String, reportId: ID): [FiledReport]
+
+  """
+  List groups. Requires authentication. Filter to the current user's memberships with `isMember`, or to located groups with `hasLocation`.
+  """
+  Group(
+    first: Int
+
+    """If true, only groups that have a location."""
+    hasLocation: Boolean
+    id: ID
+
+    """
+    Null/undefined returns all groups; true only the user's groups; false only groups they are not in.
+    """
+    isMember: Boolean
+    offset: Int
+    slug: String
+  ): [Group]
+
+  """
+  Count groups, optionally restricted to the current user's memberships. Requires authentication.
+  """
+  GroupCount(isMember: Boolean): Int
+  GroupMember(_id: String, filter: _GroupMemberFilter, first: Int, offset: Int, orderBy: [_GroupMemberOrdering]): [GroupMember]
+
+  """
+  List a group's members. Visibility depends on the viewer's relation to the group. Set `includePending` to also return unapproved join requests (for admins/owners). Set `nameFilter` (min. 3 chars recommended) to search by display name.
+  """
+  GroupMembers(filter: _GroupMemberFilter, first: Int, id: ID!, includePending: Boolean, nameFilter: String, offset: Int, orderBy: [_GroupMemberOrdering]): [GroupMember]
+  GroupMembershipVisibilityChanged(_id: String, filter: _GroupMembershipVisibilityChangedFilter, first: Int, offset: Int, orderBy: [_GroupMembershipVisibilityChangedOrdering], userId: ID): [GroupMembershipVisibilityChanged]
+  GroupShowMembersChanged(_id: String, filter: _GroupShowMembersChangedFilter, first: Int, groupId: ID, offset: Int, orderBy: [_GroupShowMembersChangedOrdering]): [GroupShowMembersChanged]
+  Image(_id: String, alt: String, aspectRatio: Float, filter: _ImageFilter, first: Int, offset: Int, orderBy: [_ImageOrdering], sensitive: Boolean, transform: String, type: String, url: ID): [Image]
+  InviteCode(_id: String, code: ID, comment: String, createdAt: String, expiresAt: String, filter: _InviteCodeFilter, first: Int, offset: Int, orderBy: [_InviteCodeOrdering], redeemedByCount: Int): [InviteCode]
+  LocationMapBox(_id: String, filter: _LocationMapBoxFilter, first: Int, id: ID, offset: Int, orderBy: [_LocationMapBoxOrdering], place_name: String): [LocationMapBox]
+  MEMBER_OF(_id: String, createdAt: String, filter: _MEMBER_OFFilter, first: Int, offset: Int, orderBy: [_MEMBER_OFOrdering], role: GroupMemberRole, showOnProfile: Boolean, updatedAt: String): [MEMBER_OF]
+
+  """
+  List messages in a room, newest first, with index-based paging. Requires authentication.
+  """
+  Message(beforeIndex: Int, filter: _MessageFilter, first: Int, offset: Int, orderBy: [_MessageOrdering], roomId: ID!): [Message]
+  Permission(_id: String, available: Boolean, description: String, filter: _PermissionFilter, first: Int, gatedBy: String, group: String, key: String, offset: Int, orderBy: [_PermissionOrdering]): [Permission]
+  PermissionsChanged(_id: String, filter: _PermissionsChangedFilter, first: Int, offset: Int, orderBy: [_PermissionsChangedOrdering], previousRoleName: String, roleName: String): [PermissionsChanged]
+  PinnedPostCounts(_id: String, currentlyPinnedPosts: Int, filter: _PinnedPostCountsFilter, first: Int, offset: Int, orderBy: [_PinnedPostCountsOrdering]): [PinnedPostCounts]
+  PolicyChangeEvent(_id: String, actor: String, filter: _PolicyChangeEventFilter, first: Int, key: PolicyKey, offset: Int, orderBy: [_PolicyChangeEventOrdering], timestamp: String, value: String): [PolicyChangeEvent]
+  PolicyConfigEntry(_id: String, available: Boolean, category: String, configuredDefault: String, effective: String, envSeed: String, envSeedState: ConfigKeyState, filter: _PolicyConfigEntryFilter, first: Int, key: String, offset: Int, orderBy: [_PolicyConfigEntryOrdering], softwareDefault: String, type: String): [PolicyConfigEntry]
+  PolicyDefaults(_id: String, filter: _PolicyDefaultsFilter, first: Int, offset: Int, orderBy: [_PolicyDefaultsOrdering]): [PolicyDefaults]
+  PolicyEntry(_id: String, filter: _PolicyEntryFilter, first: Int, key: PolicyKey, offset: Int, orderBy: [_PolicyEntryOrdering], requiresPolicy: PolicyKey, value: String): [PolicyEntry]
+  PolicyLastChange(_id: String, actor: String, filter: _PolicyLastChangeFilter, first: Int, offset: Int, orderBy: [_PolicyLastChangeOrdering], timestamp: String): [PolicyLastChange]
+  PolicyValueChanged(_id: String, filter: _PolicyValueChangedFilter, first: Int, key: PolicyKey, offset: Int, orderBy: [_PolicyValueChangedOrdering], value: String): [PolicyValueChanged]
+
+  """
+  List posts (the main feed query). Public. Combine with `filter`, `orderBy` and paging for feeds, profiles and groups.
+  """
+  Post(content: String, createdAt: String, filter: _PostFilter, first: Int, id: ID, imageAspectRatio: Float, imageBlurred: Boolean, language: String, offset: Int, orderBy: [_PostOrdering], pinned: Boolean, slug: String, title: String, updatedAt: String, visibility: Visibility): [Post]
+
+  """
+  The emotions the current user has left on a post. Requires authentication.
+  """
+  PostsEmotionsByCurrentUser(postId: ID!): [String]
+
+  """Count of a single emotion on a post. Public."""
+  PostsEmotionsCountByEmotion(data: _EMOTEDInput!, postId: ID!): Int!
+
+  """Instance-wide pinned-post counts. Requires the `post.pin` permission."""
+  PostsPinnedCounts(filter: _PinnedPostCountsFilter): PinnedPostCounts!
+  Role(_id: String, filter: _RoleFilter, first: Int, memberCount: Int, name: String, offset: Int, orderBy: [_RoleOrdering], permissions: String, protected: Boolean): [Role]
+
+  """
+  List the current user's chat rooms. Direct rooms are looked up by `userId`, group rooms by `groupId`. Requires authentication.
+  """
+  Room(before: String, filter: _RoomFilter, first: Int, groupId: ID, id: ID, offset: Int, orderBy: [_RoomOrdering], search: String, userId: ID): [Room]
+  SystemConfigEntry(_id: String, blocking: Boolean, category: EnvCategory, effective: String, envKey: String, envValue: String, filter: _SystemConfigEntryFilter, first: Int, offset: Int, orderBy: [_SystemConfigEntryOrdering], overridable: Boolean, override: String, policyKey: String, secret: Boolean, softwareDefault: String, state: ConfigKeyState): [SystemConfigEntry]
+
+  """List hashtags, e.g. for a trending-tags widget. Public."""
+  Tag(filter: _TagFilter, first: Int, id: ID, offset: Int, orderBy: [_TagOrdering]): [Tag]
+
+  """
+  Number of the current user's rooms with unread messages. Requires authentication.
+  """
+  UnreadRooms: Int
+
+  """
+  Look up users. Requires authentication; filtering by `email` additionally requires the user.email.readAny permission (used for admin user search).
+  """
+  User(
+    about: String
+    createdAt: String
+    email: String
+    filter: _UserFilter
+    first: Int
+    id: ID
+    locationName: String
+    name: String
+    offset: Int
+    orderBy: [_UserOrdering]
+
+    """
+    Admin user search: filter by single role (HAS_ROLE) and/or a free-text term (name/slug/about/email). Combinable; requires role.manage.
+    """
+    roleName: String
+
+    """Free-text search over name/slug/about (and email for admins)."""
+    search: String
+    slug: String
+    updatedAt: String
+  ): [User]
+  UserData(_id: String, filter: _UserDataFilter, first: Int, offset: Int, orderBy: [_UserDataOrdering]): [UserData]
+
+  """
+  Check whether a signup/verification nonce is valid for the given email. Public.
+  """
+  VerifyNonce(email: String!, nonce: String!): Boolean!
+
+  """
+  Administration overview of API-key usage per user. Requires the `apiKey.administer` permission.
+  """
+  apiKeyUsers(first: Int, offset: Int): [ApiKeyUserSummary!]!
+
+  """
+  All API keys belonging to a given user. Requires the `apiKey.administer` permission.
+  """
+  apiKeysForUser(userId: ID!): [ApiKey!]!
+
+  """Users the current user has blocked. Requires authentication."""
+  blockedUsers(filter: _UserFilter, first: Int, offset: Int, orderBy: [_UserOrdering]): [User]
+
+  """The currently authenticated user. Requires authentication."""
+  currentUser(filter: _UserFilter): User!
+
+  """Fetch link-preview metadata for a URL. Public."""
+  embed(url: String!): Embed
+
+  """The oEmbed providers this instance resolves link previews for. Public."""
+  embedProviders(filter: _EmbedProviderFilter, first: Int, offset: Int, orderBy: [_EmbedProviderOrdering]): [EmbedProvider!]!
+  groupSearchResults(_id: String, filter: _groupSearchResultsFilter, first: Int, groupCount: Int, offset: Int, orderBy: [_groupSearchResultsOrdering]): [groupSearchResults]
+  hashtagSearchResults(_id: String, filter: _hashtagSearchResultsFilter, first: Int, hashtagCount: Int, offset: Int, orderBy: [_hashtagSearchResultsOrdering]): [hashtagSearchResults]
+
+  """Users the current user has muted. Requires authentication."""
+  mutedUsers(filter: _UserFilter, first: Int, offset: Int, orderBy: [_UserOrdering]): [User]
+
+  """
+  The requesting user's own API keys. Requires authentication and the apiKeysEnabled policy.
+  """
+  myApiKeys: [ApiKey!]!
+
+  """
+  The current viewer's effective permissions, each carrying its catalog group — drives the webapp can() and group-based area gating.
+  """
+  myPermissions(filter: _EffectivePermissionFilter, first: Int, offset: Int, orderBy: [_EffectivePermissionOrdering]): [EffectivePermission!]!
+
+  """The current user's notifications. Requires authentication."""
+  notifications(first: Int, offset: Int, orderBy: NotificationOrdering, read: Boolean): [NOTIFIED]
+
+  """The closed permission catalog (admin / role.manage)."""
+  permissionCatalog(filter: _PermissionFilter, first: Int, offset: Int, orderBy: [_PermissionOrdering]): [Permission!]!
+
+  """
+  The instance's network policy as a key/value list — every recognised policy key, so a client needs no per-key field selection and the set stays in sync with the backend automatically. Public — anonymous viewers (login/register screen) need it. Per-key visibility is enforced in the resolver: a key the viewer may not see carries a null value.
+  """
+  policy(filter: _PolicyEntryFilter, first: Int, offset: Int, orderBy: [_PolicyEntryOrdering]): [PolicyEntry!]!
+
+  """
+  Per-policy configuration with its software/env-seed/effective value layers and hard env requirements (policy.manage). Secret values are never returned — only env presence state.
+  """
+  policyConfig(filter: _PolicyConfigEntryFilter, first: Int, offset: Int, orderBy: [_PolicyConfigEntryOrdering]): [PolicyConfigEntry!]!
+
+  """
+  The configured policy defaults plus last-change audit info. Requires the `policy.manage` permission.
+  """
+  policyDefaults(filter: _PolicyDefaultsFilter): PolicyDefaults!
+  postSearchResults(_id: String, filter: _postSearchResultsFilter, first: Int, offset: Int, orderBy: [_postSearchResultsOrdering], postCount: Int): [postSearchResults]
+
+  """Posts for a user's profile page. Public."""
+  profilePagePosts(filter: _PostFilter, first: Int, offset: Int, orderBy: [_PostOrdering]): [Post]
+
+  """
+  Search for places via the MapBox geocoder, to attach a location to a profile, group or event. Public.
+  """
+  queryLocations(filter: _LocationMapBoxFilter, first: Int, lang: String!, offset: Int, orderBy: [_LocationMapBoxOrdering], place: String!, proximity: String, types: String): [LocationMapBox]!
+
+  """
+  List moderation reports for the moderation queue. Requires the `content.moderate` permission.
+  """
+  reports(
+    """Filter by whether the report is closed."""
+    closed: Boolean
+    first: Int
+    offset: Int
+    orderBy: ReportOrdering
+
+    """Filter by whether the report has been reviewed."""
+    reviewed: Boolean
+  ): [Report]
+
+  """
+  All roles with their permission bundles and member counts (role.manage).
+  """
+  roles(filter: _RoleFilter, first: Int, offset: Int, orderBy: [_RoleOrdering]): [Role!]!
+
+  """
+  Search for users and groups to start a chat with. Requires authentication.
+  """
+  searchChatTargets(limit: Int = 10, query: String!): [ChatTarget]!
+
+  """Search groups by name/description. Public."""
+  searchGroups(filter: _groupSearchResultsFilter, firstGroups: Int, groupsOffset: Int, query: String!): groupSearchResults!
+
+  """Search hashtags. Public."""
+  searchHashtags(filter: _hashtagSearchResultsFilter, firstHashtags: Int, hashtagsOffset: Int, query: String!): hashtagSearchResults!
+
+  """Search posts by title/content. Public."""
+  searchPosts(filter: _postSearchResultsFilter, firstPosts: Int, postsOffset: Int, query: String!): postSearchResults!
+
+  """
+  Combined search across posts, users, tags and groups, for the global search box. Public.
+  """
+  searchResults(limit: Int = 5, query: String!): [SearchResult]!
+
+  """Search users by name/slug. Public."""
+  searchUsers(filter: _userSearchResultsFilter, firstUsers: Int, query: String!, usersOffset: Int): userSearchResults!
+
+  """
+  Instance-wide usage counters. Requires the `network.statistics.read` permission.
+  """
+  statistics: Statistics!
+
+  """
+  Every environment variable the deployment recognises, with its effective/override/env-value/software-default layers and presence state (policy.manage). Secret values are never returned — only presence state.
+  """
+  systemConfig(filter: _SystemConfigEntryFilter, first: Int, offset: Int, orderBy: [_SystemConfigEntryOrdering]): [SystemConfigEntry!]!
+
+  """
+  Fetch a user together with their posts. Defaults to the current user when no id is given. Requires authentication.
+  """
+  userData(filter: _UserDataFilter, id: ID): UserData
+
+  """
+  The roles assigned to a specific user (role.manage) — for the admin UI.
+  """
+  userRoles(filter: _RoleFilter, first: Int, offset: Int, orderBy: [_RoleOrdering], userId: ID!): [Role!]!
+  userSearchResults(_id: String, filter: _userSearchResultsFilter, first: Int, offset: Int, orderBy: [_userSearchResultsOrdering], userCount: Int): [userSearchResults]
+
+  """
+  Look up an invite code and its validity, e.g. on the registration screen. Public.
+  """
+  validateInviteCode(code: String!, filter: _InviteCodeFilter): InviteCode
+
+  """Whether video calls are enabled on this instance. Public."""
+  videoCallConfig: VideoCallConfig!
+
+  """
+  Current number of participants in a group's video call. Requires authentication.
+  """
+  videoCallParticipantCount(groupId: ID!): Int!
+}
+
+"""Relationship recording a moderator's decision on a report."""
+type REVIEWED {
+  """Whether the moderator closed the report."""
+  closed: Boolean!
+  createdAt: String!
+
+  """Whether the moderator disabled (hid) the reported resource."""
+  disable: Boolean!
+
+  """The moderator who made the decision."""
+  moderator(filter: _UserFilter): User
+  report: Report
+  resource: ReviewedResource
+  updatedAt: String!
+}
+
+"""
+Reason a report was filed. This list equals the strings of an array in file `webapp/constants/modals.js`.
+"""
+enum ReasonCategory {
+  """Unsolicited advertising of products, services or commercial offers."""
+  advert_products_services_commercial
+
+  """Criminal behaviour or violation of (German) law."""
+  criminal_behavior_violation_german_law
+
+  """Discrimination, racism, sexism and the like."""
+  discrimination_etc
+
+  """Publishing private/identifying information (doxing)."""
+  doxing
+
+  """Glorification or trivialisation of cruel or inhuman acts."""
+  glorific_trivia_of_cruel_inhuman_acts
+
+  """Intentional intimidation, stalking or persecution."""
+  intentional_intimidation_stalking_persecution
+
+  """None of the listed categories fits."""
+  other
+
+  """Pornographic content or links to it."""
+  pornographic_content_links
+}
+
+"""
+A moderation report about a user, post or comment, aggregating all filings and reviews for that resource.
+"""
+type Report {
+  """Whether the report has been closed by a moderator."""
+  closed: Boolean!
+  createdAt: String!
+
+  """Whether the reported resource is currently disabled (hidden)."""
+  disable: Boolean!
+
+  """All filings submitted against the resource."""
+  filed: [FILED]!
+  id: ID!
+  resource: ReportedResource!
+
+  """All moderator reviews of the report."""
+  reviewed: [REVIEWED]!
+  rule: ReportRule!
+  updatedAt: String!
+}
+
+"""Ordering options for the reports query."""
+enum ReportOrdering {
+  createdAt_asc
+  createdAt_desc
+}
+
+"""The rule set by which a report's aggregate state is derived."""
+enum ReportRule {
+  latestReviewUpdatedAtRules
+}
+
+"""The kind of node a report can target."""
+union ReportedResource = Comment | Post | User
+
+"""The kind of node a moderation decision can apply to."""
+union ReviewedResource = Comment | Post | User
+
+"""A named bundle of permissions that can be assigned to users."""
+type Role {
+  _id: String
+
+  """Number of users currently assigned this role."""
+  memberCount: Int
+  name: String!
+
+  """The permission keys granted by this role."""
+  permissions: [String!]!
+
+  """Whether the role is a protected built-in that cannot be deleted."""
+  protected: Boolean!
+}
+
+"""
+A chat room, either a one-to-one direct conversation between two users or the shared chat room of a group.
+"""
+type Room {
+  _id: String
+
+  """
+  Display avatar URL: the group's avatar for a group room, otherwise the other participant's avatar.
+  """
+  avatar: String
+  createdAt: String
+
+  """The group this room belongs to, or null for a direct room."""
+  group: Group
+  id: ID!
+
+  """True if this is a group room, false for a direct room."""
+  isGroupRoom: Boolean!
+
+  """The most recent message in the room."""
+  lastMessage: Message
+
+  """Timestamp of the most recent message, for sorting the room list."""
+  lastMessageAt: String
+
+  """Alias of id; prefer id in new code."""
+  roomId: String!
+
+  """
+  Display name: the group's name for a group room, otherwise the other participant's name.
+  """
+  roomName: String!
+
+  """Count unread messages, excluding those from blocked/muted senders."""
+  unreadCount: Int
+  updatedAt: String
+
+  """Participants of the room."""
+  users(filter: _UserFilter, first: Int, offset: Int, orderBy: [_UserOrdering]): [User]!
+}
+
+"""A single hit in the global search, which can be any searchable entity."""
+union SearchResult = Group | Post | Tag | User
+
+"""The kind of node that can be shouted (endorsed/boosted)."""
+enum ShoutTypeEnum {
+  Comment
+  Post
+}
+
+"""A link to an external social-media profile, shown on a user's profile."""
+type SocialMedia {
+  id: ID!
+  ownedBy(filter: _UserFilter): User!
+  url: String
+}
+
+"""Aggregate counts describing the whole instance."""
+type Statistics {
+  """Number of trophy badges users have chosen to display."""
+  badgesDisplayed: Int!
+  badgesRewarded: Int!
+  chatMessages: Int!
+  chatRooms: Int!
+  comments: Int!
+
+  """Number of registered email addresses."""
+  emails: Int!
+  follows: Int!
+  groups: Int!
+  inviteCodes: Int!
+  inviteCodesExpired: Int!
+  inviteCodesRedeemed: Int!
+  invites: Int!
+  locations: Int!
+  notifications: Int!
+  posts: Int!
+  reports: Int!
+  shouts: Int!
+  tags: Int!
+
+  """Number of active (non-deleted) user accounts."""
+  users: Int!
+  usersDeleted: Int!
+  usersVerified: Int!
+}
+
+type Subscription {
+  """Pushes newly added messages in the current user's rooms."""
+  chatMessageAdded: Message
+
+  """Pushes delivery/seen status changes for messages."""
+  chatMessageStatusUpdated: ChatMessageStatusPayload
+
+  """
+  Fires when a user changes which group memberships are visible on their profile.
+  """
+  groupMembershipVisibilityChanged(userId: ID!): GroupMembershipVisibilityChanged!
+
+  """Fires when a closed group's showMembers setting changes."""
+  groupShowMembersChanged(groupId: ID!): GroupShowMembersChanged!
+
+  """Pushes newly created notifications for the current user in real time."""
+  notificationAdded: NOTIFIED
+
+  """Fires when a role's permissions or a user's role assignment changes."""
+  permissionsChanged: PermissionsChanged!
+
+  """Fires whenever a policy value changes, so clients can update live."""
+  policyChanged: PolicyValueChanged!
+
+  """Pushes a room whenever its state changes (e.g. a new message arrives)."""
+  roomUpdated: Room
+
+  """
+  Pushes the updated participant count as users join or leave a group's video call.
+  """
+  videoCallParticipantCountChanged(groupId: ID!): VideoCallParticipantCount!
+}
+
+type SystemConfigEntry {
+  _id: String
+
+  """
+  An unmet hard env requirement that breaks its feature regardless of the policy flag.
+  """
+  blocking: Boolean!
+
+  """
+  Display grouping. Enum derived from the shared category vocabulary (config/categories).
+  """
+  category: EnvCategory!
+
+  """
+  Effective (in-operation) value as a display string (JSON-encoded for policy values, raw otherwise); null ⇒ show presence badge.
+  """
+  effective: String
+
+  """The environment variable name (e.g. NEO4J_URI, LIVEKIT_API_SECRET)."""
+  envKey: String!
+
+  """
+  Value the env var itself provides when set (JSON-encoded for seed vars, raw otherwise); null for secrets/unset/hard-requirement rows.
+  """
+  envValue: String
+
+  """Whether an admin can override this via a policy (deep-link target)."""
+  overridable: Boolean!
+
+  """
+  Admin override value when it diverges from the configured default (policy rows only), else null.
+  """
+  override: String
+
+  """
+  The policy key to deep-link to on the policy tab (set for policy rows), else null.
+  """
+  policyKey: String
+
+  """
+  Whether the value is sensitive — reported by presence only, its value is never returned.
+  """
+  secret: Boolean!
+
+  """The software default the value falls back to, or null (none / secret)."""
+  softwareDefault: String
+
+  """Presence of the env var."""
+  state: ConfigKeyState!
+}
+
+"""
+A free-form hashtag. The tag's text is its id. Tags are created implicitly from post content (unlike the curated Category taxonomy).
+"""
+type Tag {
+  _id: String
+  deleted: Boolean
+  disabled: Boolean
+  id: ID!
+
+  """Total number of posts carrying this tag."""
+  taggedCount: Int!
+
+  """Number of distinct authors who have used this tag."""
+  taggedCountUnique: Int!
+  taggedPosts(filter: _PostFilter, first: Int, offset: Int, orderBy: [_PostOrdering]): [Post]!
+}
+
+"""
+The `Upload` scalar type represents a file upload, sent as multipart/form-data per the GraphQL multipart request spec.
+"""
+scalar Upload
+
+"""
+A person's account. Most fields are readable by any authenticated user; a few (email, notification and invite settings) are restricted to the owner or to admins.
+"""
+type User {
+  _id: String
+
+  """The user's profile bio."""
+  about: String
+
+  """Category slugs the user has activated as their content filter."""
+  activeCategories: [String]
+
+  """ActivityPub actor id, for federated users."""
+  actorId: String
+
+  """Whether the user permits embedded iframes in content they view."""
+  allowEmbedIframes: Boolean
+  avatar(filter: _ImageFilter): Image
+
+  """All trophy badges awarded to the user."""
+  badgeTrophies: [Badge]!
+  badgeTrophiesCount: Int!
+
+  """Trophy badges the user has chosen to display, in slot order."""
+  badgeTrophiesSelected: [Badge!]!
+
+  """Awarded trophy badges the user is not currently displaying."""
+  badgeTrophiesUnused: [Badge]!
+  badgeTrophiesUnusedCount: Int!
+
+  """The user's verification badge."""
+  badgeVerification: Badge!
+
+  """
+  Whether there is a block in either direction between this user and the current user.
+  """
+  blocked: Boolean!
+  categories(filter: _CategoryFilter, first: Int, offset: Int, orderBy: [_CategoryOrdering]): [Category]
+  commentedCount: Int!
+
+  """Comments written by this user."""
+  comments(filter: _CommentFilter, first: Int, offset: Int, orderBy: [_CommentOrdering]): [Comment]!
+
+  """Posts written by this user."""
+  contributions(filter: _PostFilter, first: Int, offset: Int, orderBy: [_PostOrdering]): [Post]!
+  contributionsCount: Int!
+
+  """ISO 8601 date-time string of registration."""
+  createdAt: String
+
+  """True once the account has been deleted (soft delete)."""
+  deleted: Boolean
+
+  """True while the account is disabled/deactivated."""
+  disabled: Boolean
+
+  """
+  The user's primary email address. Visible only to the owner or with user.email.readAny.
+  """
+  email: String!
+
+  """The user's email notification settings. Visible only to the owner."""
+  emailNotificationSettings: [EmailNotificationSettings]!
+  emotions(filter: _UserEMOTEDFilter): [_UserEmotions]
+
+  """Users who follow this user."""
+  followedBy(filter: _UserFilter, first: Int, nameFilter: String = "", offset: Int, orderBy: [_UserOrdering]): [User]!
+  followedByCount: Int!
+
+  """Is the currently logged in user following that user?"""
+  followedByCurrentUser: Boolean!
+
+  """Users this user follows."""
+  following(filter: _UserFilter, first: Int, nameFilter: String = "", offset: Int, orderBy: [_UserOrdering]): [User]!
+  followingCount: Int!
+  friends(filter: _UserFilter, first: Int, offset: Int, orderBy: [_UserOrdering]): [User]!
+  friendsCount: Int!
+
+  """
+  Groups this user is a member of. Ordered by shared membership with the viewer first.
+  """
+  groups(first: Int, nameFilter: String, offset: Int): [Group]
+  id: ID!
+
+  """personal inviteCodes the user has generated"""
+  inviteCodes: [InviteCode]!
+
+  """Users this user has invited."""
+  invited(filter: _UserFilter, first: Int, offset: Int, orderBy: [_UserOrdering]): [User]
+
+  """The user who invited this user, if any."""
+  invitedBy(filter: _UserFilter): User
+
+  """Whether this user is blocked by the current user."""
+  isBlocked: Boolean!
+
+  """Whether this user is muted by the current user."""
+  isMuted: Boolean!
+
+  """The user's preferred UI language."""
+  locale: String
+  location: Location
+  locationName: String
+  name: String
+
+  """The user's public key, for federation/verification."""
+  publicKey: String
+
+  """The invite code this user redeemed on registration, if any."""
+  redeemedInviteCode(filter: _InviteCodeFilter): InviteCode
+
+  """
+  The user's single dynamic role name (HAS_ROLE), incl. custom roles. Visible with role.manage.
+  """
+  roleName: String
+
+  """Posts this user has shouted (endorsed)."""
+  shouted(filter: _PostFilter, first: Int, offset: Int, orderBy: [_PostOrdering]): [Post]!
+  shoutedCount: Int!
+
+  """
+  Whether the user's closed group memberships are shown on their profile.
+  """
+  showClosedGroupsOnProfile: Boolean
+
+  """
+  Whether the user's hidden group memberships are shown on their profile.
+  """
+  showHiddenGroupsOnProfile: Boolean
+
+  """
+  Whether the user's public group memberships are shown on their profile.
+  """
+  showPublicGroupsOnProfile: Boolean
+
+  """Whether the user's shouts are shown publicly on their profile."""
+  showShoutsPublicly: Boolean
+
+  """URL-safe unique handle for the user."""
+  slug: String!
+  socialMedia: [SocialMedia]!
+
+  """When the user last agreed to the terms & conditions."""
+  termsAndConditionsAgreedAt: String
+
+  """Version of the terms & conditions the user last agreed to."""
+  termsAndConditionsAgreedVersion: String
+
+  """ISO 8601 date-time string of the last update."""
+  updatedAt: String
+}
+
+"""
+A bundle of a user together with their posts, used for GDPR-style data export/inspection.
+"""
+type UserData {
+  _id: String
+  posts(filter: _PostFilter, first: Int, offset: Int, orderBy: [_PostOrdering]): [Post]
+  user(filter: _UserFilter): User!
+}
+
+"""Whether group video calls are available on this instance."""
+type VideoCallConfig {
+  enabled: Boolean!
+}
+
+"""
+Credentials for connecting to a group's video-call room on the media server.
+"""
+type VideoCallJoinPayload {
+  """Name of the room to join."""
+  roomName: String!
+
+  """Access token authorising the current user to join the room."""
+  token: String!
+
+  """WebSocket URL of the media server."""
+  url: String!
+}
+
+"""Live participant count for a group's video call."""
+type VideoCallParticipantCount {
+  count: Int!
+  groupId: ID!
+}
+
+"""Who is allowed to see a post."""
+enum Visibility {
+  """Visible only to the author's friends."""
+  friends
+
+  """Visible only to the author."""
+  private
+
+  """
+  Visible to everyone, including logged-out visitors and federated instances.
+  """
+  public
+}
+
+input _CategoryFilter {
+  AND: [_CategoryFilter!]
+  OR: [_CategoryFilter!]
+  id_in: [ID!]
+}
+
+enum _CategoryOrdering {
+  createdAt_asc
+  createdAt_desc
+  icon_asc
+  icon_desc
+  id_asc
+  id_desc
+  name_asc
+  name_desc
+  postCount_asc
+  postCount_desc
+  slug_asc
+  slug_desc
+  updatedAt_asc
+  updatedAt_desc
+}
+
+input _ChatMessageStatusPayloadFilter {
+  AND: [_ChatMessageStatusPayloadFilter!]
+  OR: [_ChatMessageStatusPayloadFilter!]
+  roomId: ID
+  roomId_contains: ID
+  roomId_ends_with: ID
+  roomId_in: [ID!]
+  roomId_not: ID
+  roomId_not_contains: ID
+  roomId_not_ends_with: ID
+  roomId_not_in: [ID!]
+  roomId_not_starts_with: ID
+  roomId_starts_with: ID
+  status: String
+  status_contains: String
+  status_ends_with: String
+  status_in: [String!]
+  status_not: String
+  status_not_contains: String
+  status_not_ends_with: String
+  status_not_in: [String!]
+  status_not_starts_with: String
+  status_starts_with: String
+}
+
+enum _ChatMessageStatusPayloadOrdering {
+  _id_asc
+  _id_desc
+  roomId_asc
+  roomId_desc
+  status_asc
+  status_desc
+}
+
+input _CommentFilter {
+  AND: [_CommentFilter!]
+  OR: [_CommentFilter!]
+  author: _UserFilter
+  author_in: [_UserFilter!]
+  author_not: _UserFilter
+  author_not_in: [_UserFilter!]
+  content: String
+  content_contains: String
+  content_ends_with: String
+  content_in: [String!]
+  content_not: String
+  content_not_contains: String
+  content_not_ends_with: String
+  content_not_in: [String!]
+  content_not_starts_with: String
+  content_starts_with: String
+  id: ID
+  id_in: [ID!]
+  id_not: ID
+  id_not_in: [ID!]
+  post: _PostFilter
+  post_in: [_PostFilter!]
+  post_not: _PostFilter
+  post_not_in: [_PostFilter!]
+}
+
+enum _CommentOrdering {
+  content_asc
+  content_desc
+  createdAt_asc
+  createdAt_desc
+  id_asc
+  id_desc
+  updatedAt_asc
+  updatedAt_desc
+}
+
+input _DonationsFilter {
+  AND: [_DonationsFilter!]
+  OR: [_DonationsFilter!]
+  createdAt: String
+  createdAt_contains: String
+  createdAt_ends_with: String
+  createdAt_in: [String!]
+  createdAt_not: String
+  createdAt_not_contains: String
+  createdAt_not_ends_with: String
+  createdAt_not_in: [String!]
+  createdAt_not_starts_with: String
+  createdAt_starts_with: String
+  goal: Int
+  goal_gt: Int
+  goal_gte: Int
+  goal_in: [Int!]
+  goal_lt: Int
+  goal_lte: Int
+  goal_not: Int
+  goal_not_in: [Int!]
+  id: ID
+  id_contains: ID
+  id_ends_with: ID
+  id_in: [ID!]
+  id_not: ID
+  id_not_contains: ID
+  id_not_ends_with: ID
+  id_not_in: [ID!]
+  id_not_starts_with: ID
+  id_starts_with: ID
+  progress: Int
+  progress_gt: Int
+  progress_gte: Int
+  progress_in: [Int!]
+  progress_lt: Int
+  progress_lte: Int
+  progress_not: Int
+  progress_not_in: [Int!]
+  showDonations: Boolean
+  showDonations_not: Boolean
+  updatedAt: String
+  updatedAt_contains: String
+  updatedAt_ends_with: String
+  updatedAt_in: [String!]
+  updatedAt_not: String
+  updatedAt_not_contains: String
+  updatedAt_not_ends_with: String
+  updatedAt_not_in: [String!]
+  updatedAt_not_starts_with: String
+  updatedAt_starts_with: String
+}
+
+enum _DonationsOrdering {
+  _id_asc
+  _id_desc
+  createdAt_asc
+  createdAt_desc
+  goal_asc
+  goal_desc
+  id_asc
+  id_desc
+  progress_asc
+  progress_desc
+  showDonations_asc
+  showDonations_desc
+  updatedAt_asc
+  updatedAt_desc
+}
+
+"""Selects which emotion to add or remove on a post."""
+input _EMOTEDInput {
+  createdAt: String
+  emotion: Emotion
+  updatedAt: String
+}
+
+input _EffectivePermissionFilter {
+  AND: [_EffectivePermissionFilter!]
+  OR: [_EffectivePermissionFilter!]
+  group: String
+  group_contains: String
+  group_ends_with: String
+  group_in: [String!]
+  group_not: String
+  group_not_contains: String
+  group_not_ends_with: String
+  group_not_in: [String!]
+  group_not_starts_with: String
+  group_starts_with: String
+  key: String
+  key_contains: String
+  key_ends_with: String
+  key_in: [String!]
+  key_not: String
+  key_not_contains: String
+  key_not_ends_with: String
+  key_not_in: [String!]
+  key_not_starts_with: String
+  key_starts_with: String
+}
+
+enum _EffectivePermissionOrdering {
+  _id_asc
+  _id_desc
+  group_asc
+  group_desc
+  key_asc
+  key_desc
+}
+
+input _EmbedProviderFilter {
+  AND: [_EmbedProviderFilter!]
+  OR: [_EmbedProviderFilter!]
+  name: String
+  name_contains: String
+  name_ends_with: String
+  name_in: [String!]
+  name_not: String
+  name_not_contains: String
+  name_not_ends_with: String
+  name_not_in: [String!]
+  name_not_starts_with: String
+  name_starts_with: String
+  url: String
+  url_contains: String
+  url_ends_with: String
+  url_in: [String!]
+  url_not: String
+  url_not_contains: String
+  url_not_ends_with: String
+  url_not_in: [String!]
+  url_not_starts_with: String
+  url_starts_with: String
+}
+
+enum _EmbedProviderOrdering {
+  _id_asc
+  _id_desc
+  name_asc
+  name_desc
+  url_asc
+  url_desc
+}
+
+input _EnvKeyStatusFilter {
+  AND: [_EnvKeyStatusFilter!]
+  OR: [_EnvKeyStatusFilter!]
+  name: String
+  name_contains: String
+  name_ends_with: String
+  name_in: [String!]
+  name_not: String
+  name_not_contains: String
+  name_not_ends_with: String
+  name_not_in: [String!]
+  name_not_starts_with: String
+  name_starts_with: String
+  state: ConfigKeyState
+  state_in: [ConfigKeyState!]
+  state_not: ConfigKeyState
+  state_not_in: [ConfigKeyState!]
+}
+
+enum _EnvKeyStatusOrdering {
+  _id_asc
+  _id_desc
+  name_asc
+  name_desc
+  state_asc
+  state_desc
+}
+
+"""Event details supplied when a post is of type Event."""
+input _EventInput {
+  eventEnd: String
+  eventIsOnline: Boolean
+  eventLocationName: String
+  eventStart: String!
+  eventVenue: String
+}
+
+input _FileFilter {
+  AND: [_FileFilter!]
+  OR: [_FileFilter!]
+  duration: Float
+  duration_gt: Float
+  duration_gte: Float
+  duration_in: [Float!]
+  duration_lt: Float
+  duration_lte: Float
+  duration_not: Float
+  duration_not_in: [Float!]
+  extension: String
+  extension_contains: String
+  extension_ends_with: String
+  extension_in: [String!]
+  extension_not: String
+  extension_not_contains: String
+  extension_not_ends_with: String
+  extension_not_in: [String!]
+  extension_not_starts_with: String
+  extension_starts_with: String
+  name: String
+  name_contains: String
+  name_ends_with: String
+  name_in: [String!]
+  name_not: String
+  name_not_contains: String
+  name_not_ends_with: String
+  name_not_in: [String!]
+  name_not_starts_with: String
+  name_starts_with: String
+  type: String
+  type_contains: String
+  type_ends_with: String
+  type_in: [String!]
+  type_not: String
+  type_not_contains: String
+  type_not_ends_with: String
+  type_not_in: [String!]
+  type_not_starts_with: String
+  type_starts_with: String
+  url: ID
+  url_contains: ID
+  url_ends_with: ID
+  url_in: [ID!]
+  url_not: ID
+  url_not_contains: ID
+  url_not_ends_with: ID
+  url_not_in: [ID!]
+  url_not_starts_with: ID
+  url_starts_with: ID
+}
+
+enum _FileOrdering {
+  _id_asc
+  _id_desc
+  duration_asc
+  duration_desc
+  extension_asc
+  extension_desc
+  name_asc
+  name_desc
+  type_asc
+  type_desc
+  url_asc
+  url_desc
+}
+
+input _FiledReportFilter {
+  AND: [_FiledReportFilter!]
+  OR: [_FiledReportFilter!]
+  createdAt: String
+  createdAt_contains: String
+  createdAt_ends_with: String
+  createdAt_in: [String!]
+  createdAt_not: String
+  createdAt_not_contains: String
+  createdAt_not_ends_with: String
+  createdAt_not_in: [String!]
+  createdAt_not_starts_with: String
+  createdAt_starts_with: String
+  reasonCategory: ReasonCategory
+  reasonCategory_in: [ReasonCategory!]
+  reasonCategory_not: ReasonCategory
+  reasonCategory_not_in: [ReasonCategory!]
+  reasonDescription: String
+  reasonDescription_contains: String
+  reasonDescription_ends_with: String
+  reasonDescription_in: [String!]
+  reasonDescription_not: String
+  reasonDescription_not_contains: String
+  reasonDescription_not_ends_with: String
+  reasonDescription_not_in: [String!]
+  reasonDescription_not_starts_with: String
+  reasonDescription_starts_with: String
+  reportId: ID
+  reportId_contains: ID
+  reportId_ends_with: ID
+  reportId_in: [ID!]
+  reportId_not: ID
+  reportId_not_contains: ID
+  reportId_not_ends_with: ID
+  reportId_not_in: [ID!]
+  reportId_not_starts_with: ID
+  reportId_starts_with: ID
+}
+
+enum _FiledReportOrdering {
+  _id_asc
+  _id_desc
+  createdAt_asc
+  createdAt_desc
+  reasonCategory_asc
+  reasonCategory_desc
+  reasonDescription_asc
+  reasonDescription_desc
+  reportId_asc
+  reportId_desc
+}
+
+input _GroupFilter {
+  AND: [_GroupFilter!]
+  OR: [_GroupFilter!]
+  about_contains: String
+  actionRadius_in: [GroupActionRadius!]
+  description_contains: String
+  groupType_in: [GroupType!]
+  id: ID
+  id_in: [ID!]
+  id_not: ID
+  id_not_in: [ID!]
+  myRole_in: [GroupMemberRole!]
+  name_contains: String
+  slug_contains: String
+}
+
+input _GroupMemberFilter {
+  AND: [_GroupMemberFilter!]
+  OR: [_GroupMemberFilter!]
+}
+
+enum _GroupMemberOrdering {
+  _id_asc
+  _id_desc
+}
+
+input _GroupMembershipVisibilityChangedFilter {
+  AND: [_GroupMembershipVisibilityChangedFilter!]
+  OR: [_GroupMembershipVisibilityChangedFilter!]
+  userId: ID
+  userId_contains: ID
+  userId_ends_with: ID
+  userId_in: [ID!]
+  userId_not: ID
+  userId_not_contains: ID
+  userId_not_ends_with: ID
+  userId_not_in: [ID!]
+  userId_not_starts_with: ID
+  userId_starts_with: ID
+}
+
+enum _GroupMembershipVisibilityChangedOrdering {
+  _id_asc
+  _id_desc
+  userId_asc
+  userId_desc
+}
+
+input _GroupShowMembersChangedFilter {
+  AND: [_GroupShowMembersChangedFilter!]
+  OR: [_GroupShowMembersChangedFilter!]
+  groupId: ID
+  groupId_contains: ID
+  groupId_ends_with: ID
+  groupId_in: [ID!]
+  groupId_not: ID
+  groupId_not_contains: ID
+  groupId_not_ends_with: ID
+  groupId_not_in: [ID!]
+  groupId_not_starts_with: ID
+  groupId_starts_with: ID
+}
+
+enum _GroupShowMembersChangedOrdering {
+  _id_asc
+  _id_desc
+  groupId_asc
+  groupId_desc
+}
+
+input _ImageFilter {
+  AND: [_ImageFilter!]
+  OR: [_ImageFilter!]
+  alt: String
+  alt_contains: String
+  alt_ends_with: String
+  alt_in: [String!]
+  alt_not: String
+  alt_not_contains: String
+  alt_not_ends_with: String
+  alt_not_in: [String!]
+  alt_not_starts_with: String
+  alt_starts_with: String
+  aspectRatio: Float
+  aspectRatio_gt: Float
+  aspectRatio_gte: Float
+  aspectRatio_in: [Float!]
+  aspectRatio_lt: Float
+  aspectRatio_lte: Float
+  aspectRatio_not: Float
+  aspectRatio_not_in: [Float!]
+  sensitive: Boolean
+  sensitive_not: Boolean
+  transform: String
+  transform_contains: String
+  transform_ends_with: String
+  transform_in: [String!]
+  transform_not: String
+  transform_not_contains: String
+  transform_not_ends_with: String
+  transform_not_in: [String!]
+  transform_not_starts_with: String
+  transform_starts_with: String
+  type: String
+  type_contains: String
+  type_ends_with: String
+  type_in: [String!]
+  type_not: String
+  type_not_contains: String
+  type_not_ends_with: String
+  type_not_in: [String!]
+  type_not_starts_with: String
+  type_starts_with: String
+  url: ID
+  url_contains: ID
+  url_ends_with: ID
+  url_in: [ID!]
+  url_not: ID
+  url_not_contains: ID
+  url_not_ends_with: ID
+  url_not_in: [ID!]
+  url_not_starts_with: ID
+  url_starts_with: ID
+}
+
+enum _ImageOrdering {
+  _id_asc
+  _id_desc
+  alt_asc
+  alt_desc
+  aspectRatio_asc
+  aspectRatio_desc
+  sensitive_asc
+  sensitive_desc
+  transform_asc
+  transform_desc
+  type_asc
+  type_desc
+  url_asc
+  url_desc
+}
+
+input _InviteCodeFilter {
+  AND: [_InviteCodeFilter!]
+  OR: [_InviteCodeFilter!]
+  code: ID
+  code_contains: ID
+  code_ends_with: ID
+  code_in: [ID!]
+  code_not: ID
+  code_not_contains: ID
+  code_not_ends_with: ID
+  code_not_in: [ID!]
+  code_not_starts_with: ID
+  code_starts_with: ID
+  comment: String
+  comment_contains: String
+  comment_ends_with: String
+  comment_in: [String!]
+  comment_not: String
+  comment_not_contains: String
+  comment_not_ends_with: String
+  comment_not_in: [String!]
+  comment_not_starts_with: String
+  comment_starts_with: String
+  createdAt: String
+  createdAt_contains: String
+  createdAt_ends_with: String
+  createdAt_in: [String!]
+  createdAt_not: String
+  createdAt_not_contains: String
+  createdAt_not_ends_with: String
+  createdAt_not_in: [String!]
+  createdAt_not_starts_with: String
+  createdAt_starts_with: String
+  expiresAt: String
+  expiresAt_contains: String
+  expiresAt_ends_with: String
+  expiresAt_in: [String!]
+  expiresAt_not: String
+  expiresAt_not_contains: String
+  expiresAt_not_ends_with: String
+  expiresAt_not_in: [String!]
+  expiresAt_not_starts_with: String
+  expiresAt_starts_with: String
+  generatedBy: _UserFilter
+  generatedBy_in: [_UserFilter!]
+  generatedBy_not: _UserFilter
+  generatedBy_not_in: [_UserFilter!]
+  redeemedBy: _UserFilter
+  redeemedBy_every: _UserFilter
+  redeemedBy_in: [_UserFilter!]
+  redeemedBy_none: _UserFilter
+  redeemedBy_not: _UserFilter
+  redeemedBy_not_in: [_UserFilter!]
+  redeemedBy_single: _UserFilter
+  redeemedBy_some: _UserFilter
+}
+
+enum _InviteCodeOrdering {
+  _id_asc
+  _id_desc
+  code_asc
+  code_desc
+  comment_asc
+  comment_desc
+  createdAt_asc
+  createdAt_desc
+  expiresAt_asc
+  expiresAt_desc
+  redeemedByCount_asc
+  redeemedByCount_desc
+}
+
+input _LocationMapBoxFilter {
+  AND: [_LocationMapBoxFilter!]
+  OR: [_LocationMapBoxFilter!]
+  id: ID
+  id_contains: ID
+  id_ends_with: ID
+  id_in: [ID!]
+  id_not: ID
+  id_not_contains: ID
+  id_not_ends_with: ID
+  id_not_in: [ID!]
+  id_not_starts_with: ID
+  id_starts_with: ID
+  place_name: String
+  place_name_contains: String
+  place_name_ends_with: String
+  place_name_in: [String!]
+  place_name_not: String
+  place_name_not_contains: String
+  place_name_not_ends_with: String
+  place_name_not_in: [String!]
+  place_name_not_starts_with: String
+  place_name_starts_with: String
+}
+
+enum _LocationMapBoxOrdering {
+  _id_asc
+  _id_desc
+  id_asc
+  id_desc
+  place_name_asc
+  place_name_desc
+}
+
+input _MEMBER_OFFilter {
+  AND: [_MEMBER_OFFilter!]
+  OR: [_MEMBER_OFFilter!]
+  createdAt: String
+  createdAt_contains: String
+  createdAt_ends_with: String
+  createdAt_in: [String!]
+  createdAt_not: String
+  createdAt_not_contains: String
+  createdAt_not_ends_with: String
+  createdAt_not_in: [String!]
+  createdAt_not_starts_with: String
+  createdAt_starts_with: String
+  role: GroupMemberRole
+  role_in: [GroupMemberRole!]
+  role_not: GroupMemberRole
+  role_not_in: [GroupMemberRole!]
+  showOnProfile: Boolean
+  showOnProfile_not: Boolean
+  updatedAt: String
+  updatedAt_contains: String
+  updatedAt_ends_with: String
+  updatedAt_in: [String!]
+  updatedAt_not: String
+  updatedAt_not_contains: String
+  updatedAt_not_ends_with: String
+  updatedAt_not_in: [String!]
+  updatedAt_not_starts_with: String
+  updatedAt_starts_with: String
+}
+
+enum _MEMBER_OFOrdering {
+  _id_asc
+  _id_desc
+  createdAt_asc
+  createdAt_desc
+  role_asc
+  role_desc
+  showOnProfile_asc
+  showOnProfile_desc
+  updatedAt_asc
+  updatedAt_desc
+}
+
+input _MessageFilter {
+  AND: [_MessageFilter!]
+  OR: [_MessageFilter!]
+  author: _UserFilter
+  author_in: [_UserFilter!]
+  author_not: _UserFilter
+  author_not_in: [_UserFilter!]
+  content: String
+  content_contains: String
+  content_ends_with: String
+  content_in: [String!]
+  content_not: String
+  content_not_contains: String
+  content_not_ends_with: String
+  content_not_in: [String!]
+  content_not_starts_with: String
+  content_starts_with: String
+  createdAt: String
+  createdAt_contains: String
+  createdAt_ends_with: String
+  createdAt_in: [String!]
+  createdAt_not: String
+  createdAt_not_contains: String
+  createdAt_not_ends_with: String
+  createdAt_not_in: [String!]
+  createdAt_not_starts_with: String
+  createdAt_starts_with: String
+  distributed: Boolean
+  distributed_not: Boolean
+  files: _FileFilter
+  files_every: _FileFilter
+  files_in: [_FileFilter!]
+  files_none: _FileFilter
+  files_not: _FileFilter
+  files_not_in: [_FileFilter!]
+  files_single: _FileFilter
+  files_some: _FileFilter
+  id: ID
+  id_contains: ID
+  id_ends_with: ID
+  id_in: [ID!]
+  id_not: ID
+  id_not_contains: ID
+  id_not_ends_with: ID
+  id_not_in: [ID!]
+  id_not_starts_with: ID
+  id_starts_with: ID
+  indexId: Int
+  indexId_gt: Int
+  indexId_gte: Int
+  indexId_in: [Int!]
+  indexId_lt: Int
+  indexId_lte: Int
+  indexId_not: Int
+  indexId_not_in: [Int!]
+  room: _RoomFilter
+  room_in: [_RoomFilter!]
+  room_not: _RoomFilter
+  room_not_in: [_RoomFilter!]
+  saved: Boolean
+  saved_not: Boolean
+  updatedAt: String
+  updatedAt_contains: String
+  updatedAt_ends_with: String
+  updatedAt_in: [String!]
+  updatedAt_not: String
+  updatedAt_not_contains: String
+  updatedAt_not_ends_with: String
+  updatedAt_not_in: [String!]
+  updatedAt_not_starts_with: String
+  updatedAt_starts_with: String
+}
+
+enum _MessageOrdering {
+  indexId_desc
+}
+
+type _Neo4jDate {
+  day: Int
+  formatted: String
+  month: Int
+  year: Int
+}
+
+input _Neo4jDateInput {
+  day: Int
+  formatted: String
+  month: Int
+  year: Int
+}
+
+type _Neo4jDateTime {
+  day: Int
+  formatted: String
+  hour: Int
+  microsecond: Int
+  millisecond: Int
+  minute: Int
+  month: Int
+  nanosecond: Int
+  second: Int
+  timezone: String
+  year: Int
+}
+
+input _Neo4jDateTimeInput {
+  day: Int
+  formatted: String
+  hour: Int
+  microsecond: Int
+  millisecond: Int
+  minute: Int
+  month: Int
+  nanosecond: Int
+  second: Int
+  timezone: String
+  year: Int
+}
+
+type _Neo4jLocalDateTime {
+  day: Int
+  formatted: String
+  hour: Int
+  microsecond: Int
+  millisecond: Int
+  minute: Int
+  month: Int
+  nanosecond: Int
+  second: Int
+  year: Int
+}
+
+input _Neo4jLocalDateTimeInput {
+  day: Int
+  formatted: String
+  hour: Int
+  microsecond: Int
+  millisecond: Int
+  minute: Int
+  month: Int
+  nanosecond: Int
+  second: Int
+  year: Int
+}
+
+type _Neo4jLocalTime {
+  formatted: String
+  hour: Int
+  microsecond: Int
+  millisecond: Int
+  minute: Int
+  nanosecond: Int
+  second: Int
+}
+
+input _Neo4jLocalTimeInput {
+  formatted: String
+  hour: Int
+  microsecond: Int
+  millisecond: Int
+  minute: Int
+  nanosecond: Int
+  second: Int
+}
+
+type _Neo4jPoint {
+  crs: String
+  height: Float
+  latitude: Float
+  longitude: Float
+  srid: Int
+  x: Float
+  y: Float
+  z: Float
+}
+
+input _Neo4jPointDistanceFilter {
+  distance: Float!
+  point: _Neo4jPointInput!
+}
+
+input _Neo4jPointInput {
+  crs: String
+  height: Float
+  latitude: Float
+  longitude: Float
+  srid: Int
+  x: Float
+  y: Float
+  z: Float
+}
+
+type _Neo4jTime {
+  formatted: String
+  hour: Int
+  microsecond: Int
+  millisecond: Int
+  minute: Int
+  nanosecond: Int
+  second: Int
+  timezone: String
+}
+
+input _Neo4jTimeInput {
+  formatted: String
+  hour: Int
+  microsecond: Int
+  millisecond: Int
+  minute: Int
+  nanosecond: Int
+  second: Int
+  timezone: String
+}
+
+input _PermissionFilter {
+  AND: [_PermissionFilter!]
+  OR: [_PermissionFilter!]
+  available: Boolean
+  available_not: Boolean
+  description: String
+  description_contains: String
+  description_ends_with: String
+  description_in: [String!]
+  description_not: String
+  description_not_contains: String
+  description_not_ends_with: String
+  description_not_in: [String!]
+  description_not_starts_with: String
+  description_starts_with: String
+  gatedBy: String
+  gatedBy_contains: String
+  gatedBy_ends_with: String
+  gatedBy_in: [String!]
+  gatedBy_not: String
+  gatedBy_not_contains: String
+  gatedBy_not_ends_with: String
+  gatedBy_not_in: [String!]
+  gatedBy_not_starts_with: String
+  gatedBy_starts_with: String
+  group: String
+  group_contains: String
+  group_ends_with: String
+  group_in: [String!]
+  group_not: String
+  group_not_contains: String
+  group_not_ends_with: String
+  group_not_in: [String!]
+  group_not_starts_with: String
+  group_starts_with: String
+  key: String
+  key_contains: String
+  key_ends_with: String
+  key_in: [String!]
+  key_not: String
+  key_not_contains: String
+  key_not_ends_with: String
+  key_not_in: [String!]
+  key_not_starts_with: String
+  key_starts_with: String
+}
+
+enum _PermissionOrdering {
+  _id_asc
+  _id_desc
+  available_asc
+  available_desc
+  description_asc
+  description_desc
+  gatedBy_asc
+  gatedBy_desc
+  group_asc
+  group_desc
+  key_asc
+  key_desc
+}
+
+input _PermissionsChangedFilter {
+  AND: [_PermissionsChangedFilter!]
+  OR: [_PermissionsChangedFilter!]
+  previousRoleName: String
+  previousRoleName_contains: String
+  previousRoleName_ends_with: String
+  previousRoleName_in: [String!]
+  previousRoleName_not: String
+  previousRoleName_not_contains: String
+  previousRoleName_not_ends_with: String
+  previousRoleName_not_in: [String!]
+  previousRoleName_not_starts_with: String
+  previousRoleName_starts_with: String
+  roleName: String
+  roleName_contains: String
+  roleName_ends_with: String
+  roleName_in: [String!]
+  roleName_not: String
+  roleName_not_contains: String
+  roleName_not_ends_with: String
+  roleName_not_in: [String!]
+  roleName_not_starts_with: String
+  roleName_starts_with: String
+}
+
+enum _PermissionsChangedOrdering {
+  _id_asc
+  _id_desc
+  previousRoleName_asc
+  previousRoleName_desc
+  roleName_asc
+  roleName_desc
+}
+
+input _PinnedPostCountsFilter {
+  AND: [_PinnedPostCountsFilter!]
+  OR: [_PinnedPostCountsFilter!]
+  currentlyPinnedPosts: Int
+  currentlyPinnedPosts_gt: Int
+  currentlyPinnedPosts_gte: Int
+  currentlyPinnedPosts_in: [Int!]
+  currentlyPinnedPosts_lt: Int
+  currentlyPinnedPosts_lte: Int
+  currentlyPinnedPosts_not: Int
+  currentlyPinnedPosts_not_in: [Int!]
+}
+
+enum _PinnedPostCountsOrdering {
+  _id_asc
+  _id_desc
+  currentlyPinnedPosts_asc
+  currentlyPinnedPosts_desc
+}
+
+input _PolicyChangeEventFilter {
+  AND: [_PolicyChangeEventFilter!]
+  OR: [_PolicyChangeEventFilter!]
+  actor: String
+  actor_contains: String
+  actor_ends_with: String
+  actor_in: [String!]
+  actor_not: String
+  actor_not_contains: String
+  actor_not_ends_with: String
+  actor_not_in: [String!]
+  actor_not_starts_with: String
+  actor_starts_with: String
+  key: PolicyKey
+  key_in: [PolicyKey!]
+  key_not: PolicyKey
+  key_not_in: [PolicyKey!]
+  timestamp: String
+  timestamp_contains: String
+  timestamp_ends_with: String
+  timestamp_in: [String!]
+  timestamp_not: String
+  timestamp_not_contains: String
+  timestamp_not_ends_with: String
+  timestamp_not_in: [String!]
+  timestamp_not_starts_with: String
+  timestamp_starts_with: String
+  value: String
+  value_contains: String
+  value_ends_with: String
+  value_in: [String!]
+  value_not: String
+  value_not_contains: String
+  value_not_ends_with: String
+  value_not_in: [String!]
+  value_not_starts_with: String
+  value_starts_with: String
+}
+
+enum _PolicyChangeEventOrdering {
+  _id_asc
+  _id_desc
+  actor_asc
+  actor_desc
+  key_asc
+  key_desc
+  timestamp_asc
+  timestamp_desc
+  value_asc
+  value_desc
+}
+
+input _PolicyConfigEntryFilter {
+  AND: [_PolicyConfigEntryFilter!]
+  OR: [_PolicyConfigEntryFilter!]
+  available: Boolean
+  available_not: Boolean
+  category: String
+  category_contains: String
+  category_ends_with: String
+  category_in: [String!]
+  category_not: String
+  category_not_contains: String
+  category_not_ends_with: String
+  category_not_in: [String!]
+  category_not_starts_with: String
+  category_starts_with: String
+  configuredDefault: String
+  configuredDefault_contains: String
+  configuredDefault_ends_with: String
+  configuredDefault_in: [String!]
+  configuredDefault_not: String
+  configuredDefault_not_contains: String
+  configuredDefault_not_ends_with: String
+  configuredDefault_not_in: [String!]
+  configuredDefault_not_starts_with: String
+  configuredDefault_starts_with: String
+  effective: String
+  effective_contains: String
+  effective_ends_with: String
+  effective_in: [String!]
+  effective_not: String
+  effective_not_contains: String
+  effective_not_ends_with: String
+  effective_not_in: [String!]
+  effective_not_starts_with: String
+  effective_starts_with: String
+  envSeed: String
+  envSeedState: ConfigKeyState
+  envSeedState_in: [ConfigKeyState!]
+  envSeedState_not: ConfigKeyState
+  envSeedState_not_in: [ConfigKeyState!]
+  envSeed_contains: String
+  envSeed_ends_with: String
+  envSeed_in: [String!]
+  envSeed_not: String
+  envSeed_not_contains: String
+  envSeed_not_ends_with: String
+  envSeed_not_in: [String!]
+  envSeed_not_starts_with: String
+  envSeed_starts_with: String
+  key: String
+  key_contains: String
+  key_ends_with: String
+  key_in: [String!]
+  key_not: String
+  key_not_contains: String
+  key_not_ends_with: String
+  key_not_in: [String!]
+  key_not_starts_with: String
+  key_starts_with: String
+  softwareDefault: String
+  softwareDefault_contains: String
+  softwareDefault_ends_with: String
+  softwareDefault_in: [String!]
+  softwareDefault_not: String
+  softwareDefault_not_contains: String
+  softwareDefault_not_ends_with: String
+  softwareDefault_not_in: [String!]
+  softwareDefault_not_starts_with: String
+  softwareDefault_starts_with: String
+  type: String
+  type_contains: String
+  type_ends_with: String
+  type_in: [String!]
+  type_not: String
+  type_not_contains: String
+  type_not_ends_with: String
+  type_not_in: [String!]
+  type_not_starts_with: String
+  type_starts_with: String
+}
+
+enum _PolicyConfigEntryOrdering {
+  _id_asc
+  _id_desc
+  available_asc
+  available_desc
+  category_asc
+  category_desc
+  configuredDefault_asc
+  configuredDefault_desc
+  effective_asc
+  effective_desc
+  envSeedState_asc
+  envSeedState_desc
+  envSeed_asc
+  envSeed_desc
+  key_asc
+  key_desc
+  softwareDefault_asc
+  softwareDefault_desc
+  type_asc
+  type_desc
+}
+
+input _PolicyDefaultsFilter {
+  AND: [_PolicyDefaultsFilter!]
+  OR: [_PolicyDefaultsFilter!]
+}
+
+enum _PolicyDefaultsOrdering {
+  _id_asc
+  _id_desc
+}
+
+input _PolicyEntryFilter {
+  AND: [_PolicyEntryFilter!]
+  OR: [_PolicyEntryFilter!]
+  key: PolicyKey
+  key_in: [PolicyKey!]
+  key_not: PolicyKey
+  key_not_in: [PolicyKey!]
+  value: String
+  value_contains: String
+  value_ends_with: String
+  value_in: [String!]
+  value_not: String
+  value_not_contains: String
+  value_not_ends_with: String
+  value_not_in: [String!]
+  value_not_starts_with: String
+  value_starts_with: String
+}
+
+enum _PolicyEntryOrdering {
+  _id_asc
+  _id_desc
+  key_asc
+  key_desc
+  value_asc
+  value_desc
+}
+
+input _PolicyLastChangeFilter {
+  AND: [_PolicyLastChangeFilter!]
+  OR: [_PolicyLastChangeFilter!]
+  actor: String
+  actor_contains: String
+  actor_ends_with: String
+  actor_in: [String!]
+  actor_not: String
+  actor_not_contains: String
+  actor_not_ends_with: String
+  actor_not_in: [String!]
+  actor_not_starts_with: String
+  actor_starts_with: String
+  timestamp: String
+  timestamp_contains: String
+  timestamp_ends_with: String
+  timestamp_in: [String!]
+  timestamp_not: String
+  timestamp_not_contains: String
+  timestamp_not_ends_with: String
+  timestamp_not_in: [String!]
+  timestamp_not_starts_with: String
+  timestamp_starts_with: String
+}
+
+enum _PolicyLastChangeOrdering {
+  _id_asc
+  _id_desc
+  actor_asc
+  actor_desc
+  timestamp_asc
+  timestamp_desc
+}
+
+input _PolicyValueChangedFilter {
+  AND: [_PolicyValueChangedFilter!]
+  OR: [_PolicyValueChangedFilter!]
+  key: PolicyKey
+  key_in: [PolicyKey!]
+  key_not: PolicyKey
+  key_not_in: [PolicyKey!]
+  value: String
+  value_contains: String
+  value_ends_with: String
+  value_in: [String!]
+  value_not: String
+  value_not_contains: String
+  value_not_ends_with: String
+  value_not_in: [String!]
+  value_not_starts_with: String
+  value_starts_with: String
+}
+
+enum _PolicyValueChangedOrdering {
+  _id_asc
+  _id_desc
+  key_asc
+  key_desc
+  value_asc
+  value_desc
+}
+
+input _PostEMOTEDFilter {
+  createdAt: String
+  emotion_in: [Emotion]
+  updatedAt: String
+}
+
+type _PostEmotions {
+  User: User
+  createdAt: String
+  emotion: Emotion
+  updatedAt: String
+}
+
+input _PostFilter {
+  AND: [_PostFilter!]
+  OR: [_PostFilter!]
+  author: _UserFilter
+  author_in: [_UserFilter!]
+  author_not: _UserFilter
+  author_not_in: [_UserFilter!]
+  categories: _CategoryFilter
+  categories_every: _CategoryFilter
+  categories_in: [_CategoryFilter!]
+  categories_none: _CategoryFilter
+  categories_not: _CategoryFilter
+  categories_not_in: [_CategoryFilter!]
+  categories_single: _CategoryFilter
+  categories_some: _CategoryFilter
+  comments: _CommentFilter
+  comments_every: _CommentFilter
+  comments_in: [_CommentFilter!]
+  comments_none: _CommentFilter
+  comments_not: _CommentFilter
+  comments_not_in: [_CommentFilter!]
+  comments_single: _CommentFilter
+  comments_some: _CommentFilter
+  content: String
+  content_contains: String
+  content_ends_with: String
+  content_in: [String!]
+  content_not: String
+  content_not_contains: String
+  content_not_ends_with: String
+  content_not_in: [String!]
+  content_not_starts_with: String
+  content_starts_with: String
+  emotions: _PostEMOTEDFilter
+  emotions_every: _PostEMOTEDFilter
+  emotions_in: [_PostEMOTEDFilter!]
+  emotions_none: _PostEMOTEDFilter
+  emotions_not: _PostEMOTEDFilter
+  emotions_not_in: [_PostEMOTEDFilter!]
+  emotions_single: _PostEMOTEDFilter
+  emotions_some: _PostEMOTEDFilter
+  eventEnd_gte: String
+  eventStart_gte: String
+  group: _GroupFilter
+  groupPinned: Boolean
+  hasLocation: Boolean
+  id: ID
+  id_in: [ID!]
+  id_not: ID
+  id_not_in: [ID!]
+  language: String
+  language_in: [String!]
+  language_not: String
+  language_not_in: [String!]
+  pinned: Boolean
+  postType_in: [PostType]
+  postsInMyGroups: Boolean
+  shoutedBy_some: _UserFilter
+  skipPinnedFilter: Boolean
+  slug: String
+  slug_contains: String
+  slug_ends_with: String
+  slug_in: [String!]
+  slug_not: String
+  slug_not_contains: String
+  slug_not_ends_with: String
+  slug_not_in: [String!]
+  slug_not_starts_with: String
+  slug_starts_with: String
+  tags: _TagFilter
+  tags_every: _TagFilter
+  tags_in: [_TagFilter!]
+  tags_none: _TagFilter
+  tags_not: _TagFilter
+  tags_not_in: [_TagFilter!]
+  tags_single: _TagFilter
+  tags_some: _TagFilter
+  title: String
+  title_contains: String
+  title_ends_with: String
+  title_in: [String!]
+  title_not: String
+  title_not_contains: String
+  title_not_ends_with: String
+  title_not_in: [String!]
+  title_not_starts_with: String
+  title_starts_with: String
+  visibility: Visibility
+  visibility_in: [Visibility!]
+  visibility_not: Visibility
+  visibility_not_in: [Visibility!]
+}
+
+"""References a post by id."""
+input _PostInput {
+  id: ID!
+}
+
+enum _PostOrdering {
+  content_asc
+  content_desc
+  createdAt_asc
+  createdAt_desc
+  eventStart_asc
+  eventStart_desc
+  groupPinned_asc
+  groupPinned_desc
+  id_asc
+  id_desc
+  language_asc
+  language_desc
+  pinned_asc
+  pinned_desc
+  slug_asc
+  slug_desc
+  sortDate_asc
+  sortDate_desc
+  title_asc
+  title_desc
+  updatedAt_asc
+  updatedAt_desc
+  visibility_asc
+  visibility_desc
+}
+
+enum _RelationDirections {
+  IN
+  OUT
+}
+
+input _RoleFilter {
+  AND: [_RoleFilter!]
+  OR: [_RoleFilter!]
+  memberCount: Int
+  memberCount_gt: Int
+  memberCount_gte: Int
+  memberCount_in: [Int!]
+  memberCount_lt: Int
+  memberCount_lte: Int
+  memberCount_not: Int
+  memberCount_not_in: [Int!]
+  name: String
+  name_contains: String
+  name_ends_with: String
+  name_in: [String!]
+  name_not: String
+  name_not_contains: String
+  name_not_ends_with: String
+  name_not_in: [String!]
+  name_not_starts_with: String
+  name_starts_with: String
+  protected: Boolean
+  protected_not: Boolean
+}
+
+enum _RoleOrdering {
+  _id_asc
+  _id_desc
+  memberCount_asc
+  memberCount_desc
+  name_asc
+  name_desc
+  protected_asc
+  protected_desc
+}
+
+input _RoomFilter {
+  AND: [_RoomFilter!]
+  OR: [_RoomFilter!]
+  createdAt: String
+  createdAt_contains: String
+  createdAt_ends_with: String
+  createdAt_in: [String!]
+  createdAt_not: String
+  createdAt_not_contains: String
+  createdAt_not_ends_with: String
+  createdAt_not_in: [String!]
+  createdAt_not_starts_with: String
+  createdAt_starts_with: String
+  id: ID
+  id_contains: ID
+  id_ends_with: ID
+  id_in: [ID!]
+  id_not: ID
+  id_not_contains: ID
+  id_not_ends_with: ID
+  id_not_in: [ID!]
+  id_not_starts_with: ID
+  id_starts_with: ID
+  lastMessageAt: String
+  lastMessageAt_contains: String
+  lastMessageAt_ends_with: String
+  lastMessageAt_in: [String!]
+  lastMessageAt_not: String
+  lastMessageAt_not_contains: String
+  lastMessageAt_not_ends_with: String
+  lastMessageAt_not_in: [String!]
+  lastMessageAt_not_starts_with: String
+  lastMessageAt_starts_with: String
+  unreadCount: Int
+  unreadCount_gt: Int
+  unreadCount_gte: Int
+  unreadCount_in: [Int!]
+  unreadCount_lt: Int
+  unreadCount_lte: Int
+  unreadCount_not: Int
+  unreadCount_not_in: [Int!]
+  updatedAt: String
+  updatedAt_contains: String
+  updatedAt_ends_with: String
+  updatedAt_in: [String!]
+  updatedAt_not: String
+  updatedAt_not_contains: String
+  updatedAt_not_ends_with: String
+  updatedAt_not_in: [String!]
+  updatedAt_not_starts_with: String
+  updatedAt_starts_with: String
+  users: _UserFilter
+  users_every: _UserFilter
+  users_in: [_UserFilter!]
+  users_none: _UserFilter
+  users_not: _UserFilter
+  users_not_in: [_UserFilter!]
+  users_single: _UserFilter
+  users_some: _UserFilter
+}
+
+enum _RoomOrdering {
+  createdAt_desc
+  lastMessageAt_desc
+}
+
+input _SystemConfigEntryFilter {
+  AND: [_SystemConfigEntryFilter!]
+  OR: [_SystemConfigEntryFilter!]
+  blocking: Boolean
+  blocking_not: Boolean
+  category: EnvCategory
+  category_in: [EnvCategory!]
+  category_not: EnvCategory
+  category_not_in: [EnvCategory!]
+  effective: String
+  effective_contains: String
+  effective_ends_with: String
+  effective_in: [String!]
+  effective_not: String
+  effective_not_contains: String
+  effective_not_ends_with: String
+  effective_not_in: [String!]
+  effective_not_starts_with: String
+  effective_starts_with: String
+  envKey: String
+  envKey_contains: String
+  envKey_ends_with: String
+  envKey_in: [String!]
+  envKey_not: String
+  envKey_not_contains: String
+  envKey_not_ends_with: String
+  envKey_not_in: [String!]
+  envKey_not_starts_with: String
+  envKey_starts_with: String
+  envValue: String
+  envValue_contains: String
+  envValue_ends_with: String
+  envValue_in: [String!]
+  envValue_not: String
+  envValue_not_contains: String
+  envValue_not_ends_with: String
+  envValue_not_in: [String!]
+  envValue_not_starts_with: String
+  envValue_starts_with: String
+  overridable: Boolean
+  overridable_not: Boolean
+  override: String
+  override_contains: String
+  override_ends_with: String
+  override_in: [String!]
+  override_not: String
+  override_not_contains: String
+  override_not_ends_with: String
+  override_not_in: [String!]
+  override_not_starts_with: String
+  override_starts_with: String
+  policyKey: String
+  policyKey_contains: String
+  policyKey_ends_with: String
+  policyKey_in: [String!]
+  policyKey_not: String
+  policyKey_not_contains: String
+  policyKey_not_ends_with: String
+  policyKey_not_in: [String!]
+  policyKey_not_starts_with: String
+  policyKey_starts_with: String
+  secret: Boolean
+  secret_not: Boolean
+  softwareDefault: String
+  softwareDefault_contains: String
+  softwareDefault_ends_with: String
+  softwareDefault_in: [String!]
+  softwareDefault_not: String
+  softwareDefault_not_contains: String
+  softwareDefault_not_ends_with: String
+  softwareDefault_not_in: [String!]
+  softwareDefault_not_starts_with: String
+  softwareDefault_starts_with: String
+  state: ConfigKeyState
+  state_in: [ConfigKeyState!]
+  state_not: ConfigKeyState
+  state_not_in: [ConfigKeyState!]
+}
+
+enum _SystemConfigEntryOrdering {
+  _id_asc
+  _id_desc
+  blocking_asc
+  blocking_desc
+  category_asc
+  category_desc
+  effective_asc
+  effective_desc
+  envKey_asc
+  envKey_desc
+  envValue_asc
+  envValue_desc
+  overridable_asc
+  overridable_desc
+  override_asc
+  override_desc
+  policyKey_asc
+  policyKey_desc
+  secret_asc
+  secret_desc
+  softwareDefault_asc
+  softwareDefault_desc
+  state_asc
+  state_desc
+}
+
+input _TagFilter {
+  AND: [_TagFilter!]
+  OR: [_TagFilter!]
+  id: ID
+  id_in: [ID!]
+  id_not: ID
+  id_not_in: [ID!]
+  taggedPosts: _PostFilter
+  taggedPosts_every: _PostFilter
+  taggedPosts_in: [_PostFilter!]
+  taggedPosts_none: _PostFilter
+  taggedPosts_not: _PostFilter
+  taggedPosts_not_in: [_PostFilter!]
+  taggedPosts_single: _PostFilter
+  taggedPosts_some: _PostFilter
+}
+
+enum _TagOrdering {
+  id_asc
+  id_desc
+  taggedCountUnique_asc
+  taggedCountUnique_desc
+  taggedCount_asc
+  taggedCount_desc
+}
+
+input _UserDataFilter {
+  AND: [_UserDataFilter!]
+  OR: [_UserDataFilter!]
+}
+
+enum _UserDataOrdering {
+  _id_asc
+  _id_desc
+}
+
+input _UserEMOTEDFilter {
+  AND: [_UserEMOTEDFilter!]
+  OR: [_UserEMOTEDFilter!]
+  Post: _PostFilter
+  createdAt: String
+  createdAt_contains: String
+  createdAt_ends_with: String
+  createdAt_in: [String!]
+  createdAt_not: String
+  createdAt_not_contains: String
+  createdAt_not_ends_with: String
+  createdAt_not_in: [String!]
+  createdAt_not_starts_with: String
+  createdAt_starts_with: String
+  emotion: Emotion
+  emotion_in: [Emotion!]
+  emotion_not: Emotion
+  emotion_not_in: [Emotion!]
+  updatedAt: String
+  updatedAt_contains: String
+  updatedAt_ends_with: String
+  updatedAt_in: [String!]
+  updatedAt_not: String
+  updatedAt_not_contains: String
+  updatedAt_not_ends_with: String
+  updatedAt_not_in: [String!]
+  updatedAt_not_starts_with: String
+  updatedAt_starts_with: String
+}
+
+type _UserEmotions {
+  Post: Post
+  createdAt: String
+  emotion: Emotion
+  updatedAt: String
+}
+
+input _UserFilter {
+  AND: [_UserFilter!]
+  OR: [_UserFilter!]
+  about_contains: String
+  followedBy: _UserFilter
+  followedBy_every: _UserFilter
+  followedBy_in: [_UserFilter!]
+  followedBy_none: _UserFilter
+  followedBy_not: _UserFilter
+  followedBy_not_in: [_UserFilter!]
+  followedBy_single: _UserFilter
+  followedBy_some: _UserFilter
+  following: _UserFilter
+  following_every: _UserFilter
+  following_in: [_UserFilter!]
+  following_none: _UserFilter
+  following_not: _UserFilter
+  following_not_in: [_UserFilter!]
+  following_single: _UserFilter
+  following_some: _UserFilter
+  friends: _UserFilter
+  friends_every: _UserFilter
+  friends_in: [_UserFilter!]
+  friends_none: _UserFilter
+  friends_not: _UserFilter
+  friends_not_in: [_UserFilter!]
+  friends_single: _UserFilter
+  friends_some: _UserFilter
+  hasLocation: Boolean
+  id: ID
+  id_in: [ID!]
+  id_not: ID
+  id_not_in: [ID!]
+  name_contains: String
+  slug_contains: String
+}
+
+enum _UserOrdering {
+  about_asc
+  about_desc
+  createdAt_asc
+  createdAt_desc
+  id_asc
+  id_desc
+  locale_asc
+  locale_desc
+  locationName_asc
+  locationName_desc
+  name_asc
+  name_desc
+  slug_asc
+  slug_desc
+  updatedAt_asc
+  updatedAt_desc
+}
+
+input _groupSearchResultsFilter {
+  AND: [_groupSearchResultsFilter!]
+  OR: [_groupSearchResultsFilter!]
+  groupCount: Int
+  groupCount_gt: Int
+  groupCount_gte: Int
+  groupCount_in: [Int!]
+  groupCount_lt: Int
+  groupCount_lte: Int
+  groupCount_not: Int
+  groupCount_not_in: [Int!]
+}
+
+enum _groupSearchResultsOrdering {
+  _id_asc
+  _id_desc
+  groupCount_asc
+  groupCount_desc
+}
+
+input _hashtagSearchResultsFilter {
+  AND: [_hashtagSearchResultsFilter!]
+  OR: [_hashtagSearchResultsFilter!]
+  hashtagCount: Int
+  hashtagCount_gt: Int
+  hashtagCount_gte: Int
+  hashtagCount_in: [Int!]
+  hashtagCount_lt: Int
+  hashtagCount_lte: Int
+  hashtagCount_not: Int
+  hashtagCount_not_in: [Int!]
+}
+
+enum _hashtagSearchResultsOrdering {
+  _id_asc
+  _id_desc
+  hashtagCount_asc
+  hashtagCount_desc
+}
+
+input _postSearchResultsFilter {
+  AND: [_postSearchResultsFilter!]
+  OR: [_postSearchResultsFilter!]
+  postCount: Int
+  postCount_gt: Int
+  postCount_gte: Int
+  postCount_in: [Int!]
+  postCount_lt: Int
+  postCount_lte: Int
+  postCount_not: Int
+  postCount_not_in: [Int!]
+}
+
+enum _postSearchResultsOrdering {
+  _id_asc
+  _id_desc
+  postCount_asc
+  postCount_desc
+}
+
+input _userSearchResultsFilter {
+  AND: [_userSearchResultsFilter!]
+  OR: [_userSearchResultsFilter!]
+  userCount: Int
+  userCount_gt: Int
+  userCount_gte: Int
+  userCount_in: [Int!]
+  userCount_lt: Int
+  userCount_lte: Int
+  userCount_not: Int
+  userCount_not_in: [Int!]
+}
+
+enum _userSearchResultsOrdering {
+  _id_asc
+  _id_desc
+  userCount_asc
+  userCount_desc
+}
+
+"""A page of group search results with the total match count."""
+type groupSearchResults {
+  _id: String
+  groupCount: Int
+  groups: [Group]!
+}
+
+"""A page of hashtag search results with the total match count."""
+type hashtagSearchResults {
+  _id: String
+  hashtagCount: Int
+  hashtags(filter: _TagFilter, first: Int, offset: Int, orderBy: [_TagOrdering]): [Tag]!
+}
+
+"""A page of post search results with the total match count."""
+type postSearchResults {
+  _id: String
+  postCount: Int
+  posts(filter: _PostFilter, first: Int, offset: Int, orderBy: [_PostOrdering]): [Post]!
+}
+
+"""A page of user search results with the total match count."""
+type userSearchResults {
+  _id: String
+  userCount: Int
+  users(filter: _UserFilter, first: Int, offset: Int, orderBy: [_UserOrdering]): [User]!
+}
