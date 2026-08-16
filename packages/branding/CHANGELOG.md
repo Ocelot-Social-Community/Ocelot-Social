@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.5](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/branding-v0.1.4...branding-v0.1.5) (2026-08-14)
+
+
+### Bug Fixes
+
+* **workflow:** fix release please ([#10054](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10054)) ([9b0249c](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/9b0249c55bb0f2a97834ee2ecfdc5d9434f06c54))
+
 ## [0.1.4](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/branding-v0.1.3...branding-v0.1.4) (2026-08-13)
 
 
