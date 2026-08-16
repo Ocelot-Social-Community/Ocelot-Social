@@ -26,7 +26,7 @@
     "lint:css-tokens": "node scripts/check-css-tokens.js"
   },
   "dependencies": {
-    "@mapbox/mapbox-gl-geocoder": "^5.0.2",
+    "@mapbox/mapbox-gl-geocoder": "^5.1.2",
     "@nuxtjs/apollo": "^4.0.0-rc19",
     "@nuxtjs/axios": "~5.13.6",
     "@nuxtjs/dotenv": "~1.4.2",
@@ -54,7 +54,7 @@
     "tiptap": "~1.26.6",
     "tiptap-extensions": "~1.28.8",
     "trunc-html": "^1.1.2",
-    "v-mapbox": "^1.11.2",
+    "v-mapbox": "^5.1.0",
     "v-tooltip": "~2.1.3",
     "validator": "^13.15.35",
     "vue": "~2.7.16",
