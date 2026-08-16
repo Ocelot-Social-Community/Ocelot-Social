@@ -46,7 +46,7 @@ jobs:
           cp webapp/.env.template webapp/.env
 
       - name: Neo4J | Build image
-        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
           context: neo4j
           file: neo4j/Dockerfile
@@ -57,7 +57,7 @@ jobs:
           cache-to: type=gha,mode=max,scope=neo4j
 
       - name: Backend | Build image
-        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
           context: .
           file: backend/Dockerfile
@@ -122,7 +122,7 @@ jobs:
       # a machine, so the tag collision is not one. The buildx cache scope IS separate — the two stages
       # differ only in their final layers, but mixing their manifests under one scope buys nothing.
       - name: Webapp | Build 'e2e' image
-        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
           context: .
           file: webapp/Dockerfile
