@@ -17,6 +17,7 @@ import {
 import { ForbiddenError } from '@graphql/errors'
 
 import { attachments } from './attachments/attachments'
+import cypherFields from './helpers/cypherField'
 import Resolver from './helpers/Resolver'
 import { getRoomProperties, groupChatGated, roomIsGroupRoom } from './rooms'
 
@@ -319,6 +320,23 @@ export default {
       hasMany: {
         files: '-[:ATTACHMENT]-(related:File)',
       },
+    }),
+    // Verbatim from the @cypher directives in Message.gql. senderId/username/date are
+    // non-null, so an unresolved one kills the chatMessageAdded payload it appears in.
+    ...cypherFields('Message', {
+      senderId: 'MATCH (this)<-[:CREATED]-(user:User) RETURN user.id',
+      username: 'MATCH (this)<-[:CREATED]-(user:User) RETURN user.name',
+      avatar: 'MATCH (this)<-[:CREATED]-(:User)-[:AVATAR_IMAGE]->(image:Image) RETURN image.url',
+      date: 'RETURN this.createdAt',
+      seen: `
+        MATCH (this)<-[:CREATED]-(author:User)
+        OPTIONAL MATCH (unseer:User)-[:HAS_NOT_SEEN]->(this)
+        WHERE CASE
+          WHEN author.id = $cypherParams.currentUserId THEN true
+          ELSE unseer.id = $cypherParams.currentUserId
+        END
+        RETURN count(unseer) = 0
+      `,
     }),
   },
   File: {

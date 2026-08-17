@@ -11,6 +11,7 @@ import { v4 as uuid } from 'uuid'
 
 import { UserInputError } from '@graphql/errors'
 
+import cypherFields from './helpers/cypherField'
 import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
 import { filterPostsHasLocation } from './helpers/filterHasLocation'
@@ -680,6 +681,11 @@ export default {
     },
   },
   Post: {
+    // Verbatim from Post.gql. postType is derived from the node's Neo4j labels, so it has
+    // no equivalent as a stored property — it must stay a query.
+    ...cypherFields('Post', {
+      postType: "RETURN [l IN labels(this) WHERE NOT l = 'Post']",
+    }),
     ...Resolver('Post', {
       undefinedToNull: [
         'activityId',

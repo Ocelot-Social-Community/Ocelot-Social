@@ -10,6 +10,7 @@ import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import { ROOM_UPDATED } from '@constants/subscriptions'
 
+import cypherFields from './helpers/cypherField'
 import Resolver from './helpers/Resolver'
 
 // excludeGroupRooms: when the groups feature is off, group rooms must not count towards the
@@ -265,6 +266,38 @@ export default {
       hasOne: {
         group: '-[:ROOM_FOR]->(related:Group)',
       },
+    }),
+    // Statements lifted verbatim from the @cypher directives in Room.gql. Without these,
+    // a Room that did not come from a neo4jgraphql() translation — every roomUpdated
+    // subscription payload, for one — leaves roomId/isGroupRoom/roomName unresolved, and
+    // being non-null they take the whole payload down with them.
+    ...cypherFields('Room', {
+      roomId: 'RETURN this.id',
+      isGroupRoom: `
+        OPTIONAL MATCH (this)-[:ROOM_FOR]->(g:Group)
+        RETURN g IS NOT NULL
+      `,
+      roomName: `
+        OPTIONAL MATCH (this)-[:ROOM_FOR]->(g:Group)
+        WITH this, g
+        OPTIONAL MATCH (this)<-[:CHATS_IN]-(user:User)
+        WHERE g IS NULL AND NOT user.id = $cypherParams.currentUserId
+        RETURN COALESCE(g.name, user.name)
+      `,
+      avatar: `
+        OPTIONAL MATCH (this)-[:ROOM_FOR]->(g:Group)
+        OPTIONAL MATCH (g)-[:AVATAR_IMAGE]->(groupImg:Image)
+        WITH this, g, groupImg
+        OPTIONAL MATCH (this)<-[:CHATS_IN]-(user:User)
+        WHERE g IS NULL AND NOT user.id = $cypherParams.currentUserId
+        OPTIONAL MATCH (user)-[:AVATAR_IMAGE]->(userImg:Image)
+        RETURN COALESCE(groupImg.url, userImg.url)
+      `,
+      lastMessage: `
+        MATCH (this)<-[:INSIDE]-(message:Message)
+        WITH message ORDER BY message.indexId DESC LIMIT 1
+        RETURN message
+      `,
     }),
     // Batched: a chat list of N rooms resolves in ONE Cypher statement instead of N.
     // The loader is request-scoped and already bound to the current user (context/loaders).

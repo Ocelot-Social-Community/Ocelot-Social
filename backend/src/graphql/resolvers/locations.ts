@@ -5,12 +5,34 @@
 /* eslint-disable @typescript-eslint/return-await */
 import { UserInputError } from '@graphql/errors'
 
+import cypherFields from './helpers/cypherField'
 import { queryLocations } from './users/location'
 
 import type { Context } from '@src/context'
 
 export default {
   Location: {
+    // Verbatim from the @cypher directives in Location.gql. `name` takes a `lang` argument,
+    // which cypherFields passes through as a query parameter, so the localisation fallback
+    // chain (requested lang → instance default → raw name → id) is unchanged.
+    ...cypherFields('Location', {
+      name: {
+        // `lang` defaults to "" in the SDL (Location.gql). Repeat it here: a resolver
+        // invoked outside a GraphQL field selection gets no arguments, and a missing
+        // Cypher parameter is a hard error rather than a null.
+        defaults: { lang: '' },
+        statement: `
+          RETURN COALESCE(
+            CASE WHEN $lang <> '' THEN this['name' + toUpper($lang)] END,
+            this['name' + $cypherParams.languageDefault],
+            this.name,
+            this.nameEN,
+            this.id
+          )
+        `,
+      },
+      parent: 'MATCH (this)-[:IS_IN]->(l:Location) RETURN l',
+    }),
     distanceToMe: async (parent, _params, context: Context, _resolveInfo) => {
       if (!parent.id) {
         throw new Error('Can not identify selected Location!')

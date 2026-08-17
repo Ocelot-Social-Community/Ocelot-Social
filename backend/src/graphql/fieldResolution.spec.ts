@@ -38,6 +38,9 @@ import type { Context } from '@src/context'
 let setup: ApolloTestSetup
 let authenticatedUser: Context['user']
 
+// The social-media fixture is matched by URL, not id — see parentFor() below.
+const SOCIAL_MEDIA_URL = 'https://mastodon.social/@probe'
+
 // Fixtures shared by every probe, filled in beforeAll.
 const ids = {
   user: '',
@@ -50,6 +53,8 @@ const ids = {
   tag: '',
   comment: '',
   message: '',
+  location: '',
+  socialMedia: '',
 }
 
 /** How to reach instances of a type, and how to select its directive fields. */
@@ -215,9 +220,13 @@ beforeAll(async () => {
     Factory.build('location'),
     // Tag's primary key is `id`; the factory's `name` default is not a model field.
     Factory.build('tag', { id: 'probe-tag' }),
-    Factory.build('socialMedia'),
+    // The SocialMedia model defaults `id` to a uuid, but the factory does not surface it,
+    // so set it explicitly — the fallback test needs a parent id to match on.
+    Factory.build('socialMedia', { url: SOCIAL_MEDIA_URL }),
   ])
   ids.tag = tag.get('id')
+  ids.location = location.get('id')
+  ids.socialMedia = (await socialMedia.toJson()).id
   await Promise.all([
     user.relateTo(location, 'isIn'),
     socialMedia.relateTo(user, 'ownedBy'),
@@ -301,26 +310,25 @@ describe('@cypher / @relation field resolution', () => {
   // the library installs resolvers for root fields only — so any such field a subscriber
   // selects comes back unresolved, and a NON-NULL one takes the whole payload down with it.
   //
-  // These tests state the target: an explicit field resolver, which is exactly what stage B
-  // of the migration adds. They are marked `failing` because that work is not done yet;
-  // when a field gains its resolver, its test flips to passing and must be un-marked. That
-  // makes them a progress marker rather than a permanently red build.
-  describe('subscription-payload safety (stage B target)', () => {
+  // Stage B3 closed this: every non-null field on a payload type now has its own resolver,
+  // so the values survive on a plain-properties parent. These tests were `failing` markers
+  // while the work was outstanding; they are now regular tests guarding the result.
+  //
+  // The list is derived from the registry, so a NEW non-null directive field on Room or
+  // Message is covered automatically — and fails until it, too, gets a resolver.
+  describe('subscription-payload safety', () => {
     const payloadTypes = ['Room', 'Message']
 
-    const nonNullDirectiveFields = payloadTypes.flatMap((typeName) =>
+    const nonNullPayloadFields = payloadTypes.flatMap((typeName) =>
       workList[typeName]
-        .filter((field) => field.type.endsWith('!') && field.directives.includes('cypher'))
+        .filter((field) => field.type.endsWith('!'))
         .map((field) => [typeName, field.name] as const),
     )
 
-    it.failing.each(nonNullDirectiveFields)(
-      '%s.%s has an explicit field resolver',
-      (typeName, fieldName) => {
-        const typeResolvers = (resolvers as Record<string, Record<string, unknown>>)[typeName]
-        expect(typeResolvers?.[fieldName]).toBeInstanceOf(Function)
-      },
-    )
+    it.each(nonNullPayloadFields)('%s.%s has an explicit field resolver', (typeName, fieldName) => {
+      const typeResolvers = (resolvers as Record<string, Record<string, unknown>>)[typeName]
+      expect(typeResolvers?.[fieldName]).toBeInstanceOf(Function)
+    })
   })
 
   // The tests above go through a root query, so neo4jgraphql() translates the whole
@@ -333,18 +341,22 @@ describe('@cypher / @relation field resolution', () => {
   // will look like once the library is gone. This is the pass that actually exercises the
   // hand-written Cypher, so it is the one that makes stage B verifiable.
   describe('field resolvers without a neo4jgraphql translation', () => {
-    // Types whose fixture id is known here. Others (Location, SocialMedia, InviteCode,
-    // ApiKey) are reached through their owner and have no standalone id in this spec.
-    const parentIdFor = (): Record<string, string> => ({
-      User: ids.user,
-      Post: ids.post,
-      Group: ids.group,
-      Room: ids.room,
-      Message: ids.message,
-      Comment: ids.comment,
-      Badge: ids.badge,
-      Category: ids.category,
-      Tag: ids.tag,
+    // The bare parent each type's resolvers are called with. Note the KEY matters: most
+    // resolvers match on `id`, but SocialMedia is registered with `idAttribute: 'url'`
+    // (socialMedia.ts), so an `{ id }` parent would silently find nothing. Types absent
+    // here (InviteCode, ApiKey) are covered by their own specs.
+    const parentFor = (): Record<string, Record<string, string>> => ({
+      User: { id: ids.user },
+      Post: { id: ids.post },
+      Group: { id: ids.group },
+      Room: { id: ids.room },
+      Message: { id: ids.message },
+      Comment: { id: ids.comment },
+      Badge: { id: ids.badge },
+      Category: { id: ids.category },
+      Tag: { id: ids.tag },
+      Location: { id: ids.location },
+      SocialMedia: { url: SOCIAL_MEDIA_URL },
     })
 
     const explicitlyResolved = Object.entries(MIGRATION_FIELD_REGISTRY).flatMap(
@@ -373,7 +385,7 @@ describe('@cypher / @relation field resolution', () => {
 
     it.each(
       explicitlyResolved.filter(
-        ([typeName]) => parentIdFor()[typeName] !== undefined && PROBES[typeName],
+        ([typeName]) => parentFor()[typeName] !== undefined && PROBES[typeName],
       ),
     )(
       '%s.%s resolves from a bare { id } parent, matching the library',
@@ -402,7 +414,7 @@ describe('@cypher / @relation field resolution', () => {
           loaders: createLoaders(setup.database.driver, ids.user),
         }
 
-        const viaResolver = await resolver({ id: parentIdFor()[typeName] }, {}, context, {})
+        const viaResolver = await resolver(parentFor()[typeName], {}, context, {})
 
         // The same field through the root query, i.e. resolved by neo4j-graphql-js.
         const probe = PROBES[typeName]
