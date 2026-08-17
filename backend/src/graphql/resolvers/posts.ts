@@ -134,9 +134,9 @@ export default {
     Post: async (_object, params, context: Context, _resolveInfo) => {
       const skipPinnedFilter = !!params.filter?.skipPinnedFilter
       if (params.filter) delete params.filter.skipPinnedFilter
-      params = await filterPostsOfMyGroups(params, context)
+      params = filterPostsOfMyGroups(params, context)
       params = filterInvisiblePosts(params, context)
-      params = await filterForMutedUsers(params, context)
+      params = filterForMutedUsers(params, context)
       params = filterEventDates(params)
       if (!skipPinnedFilter) {
         params = await maintainPinnedPosts(params)
@@ -144,9 +144,9 @@ export default {
       return queryPosts(params, context)
     },
     profilePagePosts: async (_object, params, context: Context, _resolveInfo) => {
-      params = await filterPostsOfMyGroups(params, context)
+      params = filterPostsOfMyGroups(params, context)
       params = filterInvisiblePosts(params, context)
-      params = await filterForMutedUsers(params, context)
+      params = filterForMutedUsers(params, context)
       params = await maintainGroupPinnedPosts(params)
       return queryPosts(params, context)
     },

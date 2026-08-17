@@ -143,6 +143,36 @@ const translate = (
         continue
       }
 
+      // Access control: posts written by someone the viewer muted.
+      case 'mutedBy': {
+        const viewerId = value as string | null
+        if (!viewerId) continue
+        fragments.push({
+          where: `NOT EXISTS { MATCH (${alias})<-[:WROTE]-(:User)<-[:MUTED]-(:User { id: $${parameter} }) }`,
+          params: { [parameter]: viewerId },
+        })
+        continue
+      }
+
+      // Posts in groups the viewer is an active member of. The roles mirror what
+      // filterPostsOfMyGroups used to query for before handing over an id list.
+      case 'inGroupsOf': {
+        const viewerId = value as string | null
+        // No viewer ⇒ no groups ⇒ nothing matches, rather than "no restriction".
+        if (!viewerId) {
+          fragments.push({ where: 'false', params: {} })
+          continue
+        }
+        fragments.push({
+          where: `EXISTS {
+            MATCH (${alias})-[:IN]->(:Group)<-[membership:MEMBER_OF]-(:User { id: $${parameter} })
+            WHERE membership.role IN ['usual', 'admin', 'owner']
+          }`,
+          params: { [parameter]: viewerId },
+        })
+        continue
+      }
+
       case 'hasLocation':
         if (!value) continue
         fragments.push({
