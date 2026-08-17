@@ -30,7 +30,7 @@ type Group {
   deleted: Boolean
   disabled: Boolean
 
-  avatar: Image @relation(name: "AVATAR_IMAGE", direction: "OUT")
+  avatar: Image
 
   "Short statement of the group's goal."
   about: String
@@ -42,15 +42,12 @@ type Group {
   actionRadius: GroupActionRadius!
 
   locationName: String
-  location: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
+  location: Location
 
-  categories: [Category] @relation(name: "CATEGORIZED", direction: "OUT")
+  categories: [Category]
 
   "Number of members, excluding those with a pending join request."
   membersCount: Int!
-    @cypher(
-      statement: "MATCH (this)<-[membership:MEMBER_OF]-(:User) WHERE membership.role <> 'pending' RETURN COUNT(membership)"
-    )
 
   "The current user's role in this group, or null if they are not a member."
   myRole: GroupMemberRole
@@ -58,21 +55,18 @@ type Group {
   showOnProfile: Boolean
   "For closed groups: whether non-members can see the member list."
   showMembers: Boolean
-  posts: [Post] @relation(name: "IN", direction: "IN")
+  posts: [Post]
 
   "Whether the current user has muted this group."
   isMutedByMe: Boolean!
-    @cypher(
-      statement: "MATCH (this) RETURN EXISTS( (this)<-[:MUTED]-(:User {id: $cypherParams.currentUserId}) )"
-    )
 
   "Invite codes to this group the current user has generated."
-  inviteCodes: [InviteCode]! @neo4j_ignore
+  inviteCodes: [InviteCode]!
 
   "Number of posts currently pinned within this group."
-  currentlyPinnedPostsCount: Int! @neo4j_ignore
+  currentlyPinnedPostsCount: Int!
   "Total number of non-deleted, non-disabled posts in this group."
-  postsCount: Int! @neo4j_ignore
+  postsCount: Int!
 }
 
 "A group member paired with their membership relationship (role, join date)."

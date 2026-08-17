@@ -7,7 +7,6 @@ mutation CreateGroupRoom($groupId: ID!) {
     lastMessageAt
     unreadCount
     users {
-      _id
       id
       name
     }

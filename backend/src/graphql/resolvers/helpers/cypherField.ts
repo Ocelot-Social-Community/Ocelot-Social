@@ -68,10 +68,13 @@ interface CypherFieldOptions {
  * through GraphQL — a subscription payload or another resolver passes no arguments at all,
  * so the schema's own default never gets applied. Mirror the SDL default here.
  */
-type FieldStatement = string | { statement: string; defaults: Record<string, unknown> }
+type FieldStatement =
+  string | { statement: string; defaults?: Record<string, unknown>; always?: boolean }
 
 const normalise = (spec: FieldStatement) =>
-  typeof spec === 'string' ? { statement: spec, defaults: {} } : spec
+  typeof spec === 'string'
+    ? { statement: spec, defaults: {}, always: false }
+    : { defaults: {}, always: false, ...spec }
 
 /**
  * Builds field resolvers from `{ fieldName: cypherStatement }`, where the statement is the
@@ -90,10 +93,15 @@ export default function cypherFields(
   const resolvers: Record<string, unknown> = {}
 
   for (const [key, spec] of Object.entries(statements)) {
-    const { statement, defaults } = normalise(spec)
+    const { statement, defaults, always } = normalise(spec)
 
     resolvers[key] = async (parent: any, params: any, context: Context) => {
-      if (typeof parent?.[key] !== 'undefined') return parent[key]
+      // `always` disables the pass-through for fields whose NAME collides with a node
+      // property that means something else. Post.postType is a list derived from labels
+      // while the node also carries a `postType` string; Location.name is localised while
+      // the node's `name` is the raw one. Trusting the parent there yields the wrong type
+      // or the wrong language — silently, since both look plausible.
+      if (!always && typeof parent?.[key] !== 'undefined') return parent[key]
       if (!parent?.[idAttribute]) return null
 
       const session = context.driver.session()

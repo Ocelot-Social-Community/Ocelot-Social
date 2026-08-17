@@ -17,6 +17,8 @@ export default {
     // chain (requested lang → instance default → raw name → id) is unchanged.
     ...cypherFields('Location', {
       name: {
+        // The node's own `name` is the untranslated one, so the pass-through must not win.
+        always: true,
         // `lang` defaults to "" in the SDL (Location.gql). Repeat it here: a resolver
         // invoked outside a GraphQL field selection gets no arguments, and a missing
         // Cypher parameter is a hard error rather than a null.

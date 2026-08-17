@@ -2078,8 +2078,8 @@ describe('emotions', () => {
             Post: [
               {
                 emotions: expect.arrayContaining([
-                  { emotion: 'happy', User: { id: 'current-user' } },
-                  { emotion: 'surprised', User: { id: 'current-user' } },
+                  { emotion: 'happy', from: { id: 'current-user' } },
+                  { emotion: 'surprised', from: { id: 'current-user' } },
                 ]),
               },
             ],
@@ -2184,7 +2184,7 @@ describe('emotions', () => {
         })
 
         it('removes only the requested emotion, not all emotions', async () => {
-          const expectedEmotions = [{ emotion: 'happy', User: { id: 'u257' } }]
+          const expectedEmotions = [{ emotion: 'happy', from: { id: 'u257' } }]
           const expectedResponse = {
             data: { Post: [{ emotions: expect.arrayContaining(expectedEmotions) }] },
           }

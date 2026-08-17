@@ -211,10 +211,20 @@ export default {
         'createdAt',
         'updatedAt',
       ]
+      // softDeleteMiddleware sets these as top-level args (deleted always, disabled unless
+      // the viewer may moderate). They must constrain the query — otherwise deleted and
+      // disabled accounts are served to everyone. coalesce() also covers nodes that never
+      // had the property, matching the admin search path above.
+      const softDeleteFields = ['deleted', 'disabled']
       const conditions = equalityFields
         .filter((field) => args[field] !== undefined && args[field] !== null)
         // Field names come from this literal list, never from input.
         .map((field) => `user.${field} = $${field}`)
+      conditions.push(
+        ...softDeleteFields
+          .filter((field) => args[field] !== undefined && args[field] !== null)
+          .map((field) => `coalesce(user.${field}, false) = $${field}`),
+      )
       if (args.filter?.id_in) conditions.push('user.id IN $filterIdIn')
 
       const session = context.driver.session()
@@ -230,7 +240,12 @@ export default {
               ${args.first ? 'LIMIT toInteger($first)' : ''}
             `,
             {
-              ...Object.fromEntries(equalityFields.map((field) => [field, args[field] ?? null])),
+              ...Object.fromEntries(
+                [...equalityFields, ...softDeleteFields].map((field) => [
+                  field,
+                  args[field] ?? null,
+                ]),
+              ),
               filterIdIn: args.filter?.id_in ?? [],
               offset: args.offset ?? 0,
               first: args.first ?? 0,

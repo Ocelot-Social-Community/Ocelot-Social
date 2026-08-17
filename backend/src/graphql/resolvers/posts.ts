@@ -10,7 +10,7 @@ import { v4 as uuid } from 'uuid'
 
 import { UserInputError } from '@graphql/errors'
 
-import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
+import cypherFields, { unwrap } from './helpers/cypherField'
 import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
 import { filterPostsHasLocation } from './helpers/filterHasLocation'
@@ -712,9 +712,8 @@ export default {
     },
   },
   Post: {
-    // Verbatim from Post.gql. postType is derived from the node's Neo4j labels, so it has
-    // no equivalent as a stored property — it must stay a query.
-    ...underscoreIdResolver,
+    // No `_id` here: unlike Room/Message/User it is not selected by the chat frontend, so
+    // stage D dropped the field from Post rather than carrying the alias forward.
     ...Resolver('Post', {
       undefinedToNull: [
         'activityId',
@@ -782,7 +781,11 @@ export default {
     // that the parent is plain node properties (stage C2) instead of a neo4jgraphql
     // projection that carried these values along.
     ...cypherFields('Post', {
-      postType: "RETURN [l IN labels(this) WHERE NOT l = 'Post']",
+      postType: {
+        // The node also has a `postType` STRING property; this field is the label list.
+        always: true,
+        statement: "RETURN [l IN labels(this) WHERE NOT l = 'Post']",
+      },
       // Verbatim from Post.gql — both read relationship data, so neither is a node property.
       pinnedAt:
         'MATCH (this)<-[pinned:PINNED]-(:User) WHERE NOT this.deleted = true AND NOT this.disabled = true RETURN pinned.createdAt',
@@ -795,7 +798,7 @@ export default {
       // never ran while the library supplied the field.)
       emotions: `
         MATCH (this)<-[emoted:EMOTED]-(user:User)
-        RETURN collect(emoted { .*, User: properties(user) })
+        RETURN collect(emoted { .*, User: properties(user), from: properties(user), to: properties(this) })
       `,
     }),
     unreadNotificationByCurrentUser: async (parent, _params, context: Context, _resolveInfo) => {

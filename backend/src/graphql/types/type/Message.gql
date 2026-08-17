@@ -8,6 +8,8 @@ enum _MessageOrdering {
 
 "A single chat message within a room."
 type Message {
+  "Alias of `id`, kept for the chat frontend (vue-advanced-chat keys objects by `_id`)."
+  _id: String @deprecated(reason: "Use `id`.")
   id: ID!
   "Monotonically increasing index of the message within its room, used for ordering and paging."
   indexId: Int!
@@ -16,20 +18,17 @@ type Message {
 
   content: String
 
-  author: User! @relation(name: "CREATED", direction: "IN")
-  room: Room! @relation(name: "INSIDE", direction: "OUT")
+  author: User!
+  room: Room!
 
   "Id of the sending user."
-  senderId: String! @cypher(statement: "MATCH (this)<-[:CREATED]-(user:User) RETURN user.id")
+  senderId: String!
   "Display name of the sending user."
-  username: String! @cypher(statement: "MATCH (this)<-[:CREATED]-(user:User) RETURN user.name")
+  username: String!
   "Avatar URL of the sending user."
   avatar: String
-    @cypher(
-      statement: "MATCH (this)<-[:CREATED]-(:User)-[:AVATAR_IMAGE]->(image:Image) RETURN image.url"
-    )
   "Alias of createdAt; prefer createdAt in new code."
-  date: String! @cypher(statement: "RETURN this.createdAt")
+  date: String!
 
   "Whether the message has been persisted (delivery-status flag)."
   saved: Boolean
@@ -37,19 +36,8 @@ type Message {
   distributed: Boolean
   "Whether the current user has seen the message (always true for messages they sent)."
   seen: Boolean
-    @cypher(
-      statement: """
-      MATCH (this)<-[:CREATED]-(author:User)
-      OPTIONAL MATCH (unseer:User)-[:HAS_NOT_SEEN]->(this)
-      WHERE CASE
-        WHEN author.id = $cypherParams.currentUserId THEN true
-        ELSE unseer.id = $cypherParams.currentUserId
-      END
-      RETURN count(unseer) = 0
-      """
-    )
   "Files attached to the message."
-  files: [File]! @relation(name: "ATTACHMENT", direction: "OUT")
+  files: [File]!
 }
 
 type Mutation {

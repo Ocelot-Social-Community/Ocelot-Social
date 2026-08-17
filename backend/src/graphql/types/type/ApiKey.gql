@@ -13,7 +13,7 @@ type ApiKey {
   "True once the key has been revoked."
   disabled: Boolean!
   disabledAt: String
-  owner: User @relation(name: "HAS_API_KEY", direction: "IN")
+  owner: User
 }
 
 "Returned exactly once, on creation — the only moment the full secret is exposed."

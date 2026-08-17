@@ -4,21 +4,21 @@ type InviteCode {
   code: ID!
   createdAt: String!
   "The user who issued the code."
-  generatedBy: User @relation(name: "GENERATED", direction: "IN")
+  generatedBy: User
   "Users who have redeemed this code."
-  redeemedBy: [User] @relation(name: "REDEEMED", direction: "IN")
-  redeemedByCount: Int! @cypher(statement: "MATCH (this)<-[:REDEEMED]-(related:User)")
+  redeemedBy: [User]
+  redeemedByCount: Int!
   "When the code expires, or null if it never expires."
   expiresAt: String
   "Free-form note the issuer attached to the code."
   comment: String
 
   "The group this code invites into, or null for a personal (registration-only) code."
-  invitedTo: Group @neo4j_ignore
-  # invitedFrom: User! @neo4j_ignore # -> see generatedBy
+  invitedTo: Group
+  # invitedFrom: User! # -> see generatedBy
 
   "Whether the code can still be redeemed (not expired, invalidated, or over its redemption limit)."
-  isValid: Boolean! @neo4j_ignore
+  isValid: Boolean!
 }
 
 type Query {

@@ -26,6 +26,15 @@ interface CypherFragment {
 
 const EMPTY: CypherFragment = { where: null, params: {} }
 
+/**
+ * Soft-delete flags. They get their own handling because softDeleteMiddleware sets them as
+ * TOP-LEVEL arguments (`args.deleted = false`, and `args.disabled = false` for anyone
+ * without content.moderate) rather than inside `filter`. Missing them here means deleted
+ * and disabled posts are served to everyone — so they are matched through coalesce(),
+ * which also covers nodes that never had the property set.
+ */
+const SOFT_DELETE_FIELDS = ['deleted', 'disabled']
+
 /** Scalar post properties usable as an equality match, both as filter keys and query args. */
 const EQUALITY_FIELDS = [
   'id',
@@ -90,6 +99,14 @@ const translate = (
     }
 
     const parameter = next()
+
+    if (SOFT_DELETE_FIELDS.includes(key)) {
+      fragments.push({
+        where: `coalesce(${alias}.${key}, false) = $${parameter}`,
+        params: { [parameter]: value },
+      })
+      continue
+    }
 
     // --- scalar equality -----------------------------------------------------------
     if (EQUALITY_FIELDS.includes(key)) {
@@ -228,9 +245,9 @@ export const postFilterToCypher = (
   const next = () => `pf${String(counter++)}`
 
   const scalarArgs = Object.fromEntries(
-    EQUALITY_FIELDS.filter((field) => params[field] !== undefined && params[field] !== null).map(
-      (field) => [field, params[field]],
-    ),
+    [...EQUALITY_FIELDS, ...SOFT_DELETE_FIELDS]
+      .filter((field) => params[field] !== undefined && params[field] !== null)
+      .map((field) => [field, params[field]]),
   )
 
   return combine(

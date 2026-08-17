@@ -18,12 +18,11 @@ input _TagFilter {
 "A free-form hashtag. The tag's text is its id. Tags are created implicitly from post content (unlike the curated Category taxonomy)."
 type Tag {
   id: ID!
-  taggedPosts: [Post]! @relation(name: "TAGGED", direction: "IN")
+  taggedPosts: [Post]!
   "Total number of posts carrying this tag."
-  taggedCount: Int! @cypher(statement: "MATCH (this)<-[:TAGGED]-(p) RETURN COUNT(DISTINCT p)")
+  taggedCount: Int!
   "Number of distinct authors who have used this tag."
   taggedCountUnique: Int!
-    @cypher(statement: "MATCH (this)<-[:TAGGED]-(p)<-[:WROTE]-(u:User) RETURN COUNT(DISTINCT u)")
   deleted: Boolean
   disabled: Boolean
 }
