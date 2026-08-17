@@ -8,8 +8,8 @@ import { UserInputError } from '@graphql/errors'
 //
 // Scope is deliberately the operators this codebase actually produces: the ones the webapp
 // sends (store/posts.js, MapQuery.js) plus the ones the filter wrappers add
-// (filterInvisiblePosts, filterForMutedUsers, filterPostsOfMyGroups, filterHasLocation,
-// maintainPinnedPosts). Everything else THROWS.
+// (filterInvisiblePosts, filterForMutedUsers, filterPostsOfMyGroups, maintainPinnedPosts).
+// Everything else THROWS.
 //
 // Rejecting beats ignoring here, and not only for tidiness: two of these operators are
 // access control. `id_not_in` carries the posts the viewer must not see, and `author_not`
@@ -121,7 +121,7 @@ const translate = (
         continue
       // Access control, evaluated in the graph instead of as an id list.
       //
-      // These two replace what filterInvisiblePosts and filterHasLocation used to do by
+      // These two replace what filterInvisiblePosts and the location helper used to do by
       // COLLECTING every matching id and passing it in as a parameter array. For an
       // anonymous visitor that meant every post in a non-public group — an unbounded list
       // sent with each request, growing with the database. The library could not filter on

@@ -13,7 +13,6 @@ import { UserInputError } from '@graphql/errors'
 import cypherFields, { unwrap } from './helpers/cypherField'
 import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
-import { filterPostsHasLocation } from './helpers/filterHasLocation'
 import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
 import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
 import { postFilterToCypher, postOrderClause } from './helpers/postFilter'
@@ -139,7 +138,6 @@ export default {
       params = filterInvisiblePosts(params, context)
       params = await filterForMutedUsers(params, context)
       params = filterEventDates(params)
-      params = filterPostsHasLocation(params)
       if (!skipPinnedFilter) {
         params = await maintainPinnedPosts(params)
       }
@@ -149,7 +147,6 @@ export default {
       params = await filterPostsOfMyGroups(params, context)
       params = filterInvisiblePosts(params, context)
       params = await filterForMutedUsers(params, context)
-      params = filterPostsHasLocation(params)
       params = await maintainGroupPinnedPosts(params)
       return queryPosts(params, context)
     },

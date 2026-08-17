@@ -15,7 +15,6 @@ import { branding } from '@src/branding'
 
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
 import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
-import { filterUsersHasLocation } from './helpers/filterHasLocation'
 import normalizeEmail from './helpers/normalizeEmail'
 import Resolver from './helpers/Resolver'
 import { images } from './images/images'
@@ -183,18 +182,14 @@ export default {
           await session.close()
         }
       }
-      // Stage C2: the general User lookup in hand-written Cypher.
-      //
-      // `filterUsersHasLocation` still runs first — it turns `filter.hasLocation` into an
-      // `id_in` list, and keeping that shared helper means the User and Post queries treat
-      // the location filter identically.
-      args = await filterUsersHasLocation(args, context)
+      // Stage C2: the general User lookup in hand-written Cypher. `hasLocation` is handled
+      // below as an EXISTS pattern, like the Post query does it.
 
       // The scalar arguments are equality matches, exactly as the generated query did.
       // Anything else the schema advertises but this path does not implement is REJECTED
       // rather than ignored — silently dropping a filter would widen a result set the
       // caller believes to be narrowed. Same reasoning as the roleName/search path above.
-      const supportedFilterKeys = ['id_in']
+      const supportedFilterKeys = ['id', 'id_in', 'hasLocation']
       const unsupported = Object.keys(args.filter ?? {}).filter(
         (key) => !supportedFilterKeys.includes(key),
       )
@@ -225,7 +220,14 @@ export default {
           .filter((field) => args[field] !== undefined && args[field] !== null)
           .map((field) => `coalesce(user.${field}, false) = $${field}`),
       )
-      if (args.filter?.id_in) conditions.push('user.id IN $filterIdIn')
+      // `id` is an alias for a single-element `id_in`, so both go through one condition.
+      const filterIds = args.filter?.id_in ?? (args.filter?.id ? [args.filter.id] : null)
+      if (filterIds) conditions.push('user.id IN $filterIdIn')
+      // Asked of the graph rather than resolved into an id list first — the previous
+      // helper collected the id of EVERY user with a location on each request.
+      if (args.filter?.hasLocation) {
+        conditions.push('EXISTS { MATCH (user)-[:IS_IN]->(:Location) }')
+      }
 
       const session = context.driver.session()
       try {
@@ -246,7 +248,7 @@ export default {
                   args[field] ?? null,
                 ]),
               ),
-              filterIdIn: args.filter?.id_in ?? [],
+              filterIdIn: filterIds ?? [],
               offset: args.offset ?? 0,
               first: args.first ?? 0,
             },

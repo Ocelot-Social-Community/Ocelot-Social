@@ -158,6 +158,8 @@ type User {
 
 "Filter for the User query. Scoped to what users.ts implements; anything not listed is rejected at validation time."
 input _UserFilter {
+  "A single user id; shorthand for a one-element `id_in`."
+  id: ID
   "Restrict to these user ids."
   id_in: [ID!]
   "Only users that have a location attached."

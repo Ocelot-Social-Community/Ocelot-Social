@@ -5,6 +5,7 @@ input _PostFilter {
   "Combine filters; at least one branch must match."
   OR: [_PostFilter!]
 
+  "A single post id; shorthand for a one-element `id_in`."
   id: ID
   id_in: [ID!]
   id_not_in: [ID!]
