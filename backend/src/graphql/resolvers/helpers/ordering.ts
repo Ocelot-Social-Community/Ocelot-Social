@@ -60,5 +60,18 @@ export const orderClause = (orderBy: unknown, options: OrderingOptions): string 
     return `${expression} ${direction}`
   })
 
-  return clauses.length > 0 ? clauses.join(', ') : fallback
+  const ordered = clauses.length > 0 ? clauses.join(', ') : fallback
+
+  // Every clause ends on the node's id, so the ordering is TOTAL.
+  //
+  // Cypher leaves rows that tie on the requested key in no particular order, and each of
+  // these queries is paged with SKIP/LIMIT. Over an order that is only partial, the same row
+  // can come back on two consecutive pages while another never appears — a bug that surfaces
+  // as "a post I already saw" or "a post that vanished", never as an error. Ties are not
+  // exotic here: `createdAt` is second-resolution in seed and import data, and `pinned` or
+  // `language` tie almost everywhere by construction.
+  //
+  // Skipped when the caller already sorts by id, which is total on its own.
+  const tiebreaker = `${alias}.id ASC`
+  return ordered.includes(`${alias}.id `) ? ordered : `${ordered}, ${tiebreaker}`
 }
