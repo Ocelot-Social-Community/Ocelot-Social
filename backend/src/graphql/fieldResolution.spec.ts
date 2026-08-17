@@ -321,11 +321,22 @@ describe('@cypher / @relation field resolution', () => {
   describe('subscription-payload safety', () => {
     const payloadTypes = ['Room', 'Message']
 
-    const nonNullPayloadFields = payloadTypes.flatMap((typeName) =>
-      workList[typeName]
+    const nonNullPayloadFields = payloadTypes.flatMap((typeName) => {
+      const fields = workList[typeName]
+      // Named explicitly, because this runs while jest is COLLECTING tests: an unguarded
+      // `undefined.filter` here aborts the whole file with a message that mentions neither
+      // the type nor the registry, and the other 200-odd cases never get to run.
+      if (!fields) {
+        throw new Error(
+          `${typeName} is missing from MIGRATION_FIELD_REGISTRY, so its non-null payload ` +
+            'fields cannot be checked. It is a subscription payload type; if it really was ' +
+            'removed from the schema, drop it from payloadTypes here as well.',
+        )
+      }
+      return fields
         .filter((field) => field.type.endsWith('!'))
-        .map((field) => [typeName, field.name] as const),
-    )
+        .map((field) => [typeName, field.name] as const)
+    })
 
     it.each(nonNullPayloadFields)('%s.%s has an explicit field resolver', (typeName, fieldName) => {
       const typeResolvers = (resolvers as Record<string, Record<string, unknown>>)[typeName]
