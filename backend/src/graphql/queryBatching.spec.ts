@@ -85,10 +85,24 @@ const countRoundTrips = async (
       )
   }
 
+  // Statements sent straight through the session, bypassing a transaction function. No
+  // resolver does this today (only a migration does), but the count is the whole claim of
+  // this test: a resolver written with `session.run` would issue real round trips that the
+  // transaction wrappers above cannot see, and an N+1 introduced that way would sit behind a
+  // green test.
+  const instrumentDirectRun = (session: any) => {
+    const run = session.run.bind(session)
+    session.run = (...runArgs: any[]) => {
+      runs += 1
+      return run(...runArgs)
+    }
+  }
+
   const spy = jest.spyOn(driver, 'session').mockImplementation(((...args: any[]) => {
     const session = openSession(...args)
     instrument(session, 'readTransaction')
     instrument(session, 'writeTransaction')
+    instrumentDirectRun(session)
     return session
   }) as any)
 
