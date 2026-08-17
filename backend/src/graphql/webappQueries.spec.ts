@@ -71,7 +71,11 @@ const collectTemplates = (): { file: string; body: string }[] => {
   const templates: { file: string; body: string }[] = []
   for (const file of files) {
     const source = fs.readFileSync(file, 'utf-8')
-    const relative = path.relative(WEBAPP_ROOT, file)
+    // Normalised to forward slashes: path.relative uses the platform separator, so on Windows
+    // the key would read `graphql\User.js` and miss the map below. The miss would be silent
+    // and misleading — `${type}` gets blanked instead of substituted, and the file then fails
+    // validation as though the SCHEMA were wrong.
+    const relative = path.relative(WEBAPP_ROOT, file).split(path.sep).join('/')
     const identifiers = IDENTIFIER_INTERPOLATIONS[relative]
 
     for (const match of source.matchAll(/gql`([\s\S]*?)`/g)) {
