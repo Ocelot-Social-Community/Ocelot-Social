@@ -50,6 +50,7 @@ const stripInterpolations = (template: string) => template.replace(/\$\{[^}]*\}/
  */
 const IDENTIFIER_INTERPOLATIONS: Record<string, { placeholder: string; values: string[] }> = {
   // User.js:43 restricts `type` to exactly these two.
+  // eslint-disable-next-line no-template-curly-in-string -- a literal to search for, not a template
   'graphql/User.js': { placeholder: '${type}', values: ['following', 'followedBy'] },
 }
 
