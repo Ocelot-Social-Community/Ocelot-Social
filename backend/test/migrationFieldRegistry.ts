@@ -9,8 +9,10 @@
  * in the schema and must still resolve.
  *
  * Maintenance rules:
- *  - ADD an entry when a .gql file gains a @cypher/@relation field.
- *    `directiveInventory.spec` fails until you do.
+ *  - ADD an entry if a .gql file ever gains a @cypher/@relation field again. The
+ *    'registers every field that still carries a directive' case in
+ *    src/graphql/fieldResolution.spec.ts fails until you do. No directive is left today,
+ *    so that case now works as a guard against one being reintroduced unnoticed.
  *  - REMOVE an entry only when the FIELD itself is removed from the schema — never merely
  *    because its directive was replaced. That is the whole point.
  */
