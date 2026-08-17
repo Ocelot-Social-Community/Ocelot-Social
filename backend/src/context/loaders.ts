@@ -85,9 +85,34 @@ const roomUnreadCountLoader = (driver: Driver, currentUserId: string | null) =>
 /**
  * Builds the loader set for one context. Called from getContext; see the note above on why
  * these batch but do not cache.
+ *
+ * `forField` is the generic half: helpers/Resolver.ts and helpers/cypherField.ts register a
+ * loader per (type, field) on first use, so every field resolver batches without each one
+ * having to be written by hand. Removing neo4j-graphql-js turned one Cypher statement per
+ * QUERY into one per FIELD PER ROW — a 12-post feed went from 3 round trips to 171. The
+ * registry brings it back to one statement per field, regardless of row count.
  */
-export const createLoaders = (driver: Driver, currentUserId: string | null) => ({
-  roomUnreadCount: roomUnreadCountLoader(driver, currentUserId),
-})
+export const createLoaders = (driver: Driver, currentUserId: string | null) => {
+  const fieldLoaders = new Map<string, DataLoader<string, unknown>>()
+
+  return {
+    roomUnreadCount: roomUnreadCountLoader(driver, currentUserId),
+
+    /**
+     * A per-field loader, created on first use and kept for the rest of this context.
+     * `batch` must return one entry per key, in key order.
+     */
+    forField(key: string, batch: (ids: readonly string[]) => Promise<unknown[]>) {
+      let loader = fieldLoaders.get(key)
+      if (!loader) {
+        // cache: false for the same reason as above — a context can outlive one resolution
+        // pass, and a memoised field would then go stale. Batching is unaffected.
+        loader = new DataLoader(batch, { cache: false })
+        fieldLoaders.set(key, loader)
+      }
+      return loader
+    },
+  }
+}
 
 export type Loaders = ReturnType<typeof createLoaders>

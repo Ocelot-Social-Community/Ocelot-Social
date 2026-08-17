@@ -104,28 +104,46 @@ export default function cypherFields(
       if (!always && typeof parent?.[key] !== 'undefined') return parent[key]
       if (!parent?.[idAttribute]) return null
 
-      const session = context.driver.session()
-      try {
-        return await session.readTransaction(async (transaction) => {
-          const result = await transaction.run(
-            `MATCH (this:${type} { ${idAttribute}: $id })\n${statement}`,
-            {
-              // Defaults first, then the actual arguments; `id` and `cypherParams` are ours
-              // and must win a name clash.
-              ...defaults,
-              ...(params ?? {}),
-              id: parent[idAttribute],
-              cypherParams: context.cypherParams ?? {},
-            },
-          )
-          const record = result.records[0]
-          // No row at all (e.g. an unmatched MATCH) is a legitimate empty answer; this is
-          // also what the directive produced.
-          return record ? unwrap(record.get(0)) : null
+      const args = { ...defaults, ...(params ?? {}) }
+
+      // Batched per (type, field, arguments). The arguments belong in the key because they
+      // go into the statement: Location.name(lang) must not answer a "ru" request from a
+      // batch that ran with "en". Same arguments batch together, different ones do not.
+      const loaderKey = `${type}.${key}:${JSON.stringify(args)}`
+
+      return context.loaders
+        .forField(loaderKey, async (ids) => {
+          const session = context.driver.session()
+          try {
+            return await session.readTransaction(async (transaction) => {
+              // The statement runs unchanged inside a CALL subquery, with only `this` bound.
+              // That avoids parsing or rewriting its body — the statements come from the old
+              // @cypher directives and range from `RETURN this.id` to multi-clause queries
+              // with WITH/ORDER BY/LIMIT.
+              const result = await transaction.run(
+                `
+                UNWIND $ids AS __id
+                CALL {
+                  WITH __id
+                  MATCH (this:${type} { ${idAttribute}: __id })
+                  ${statement} AS __value
+                }
+                RETURN __id AS __id, __value AS __value
+              `,
+                { ...args, ids, cypherParams: context.cypherParams ?? {} },
+              )
+              const byId = new Map<unknown, unknown>()
+              for (const record of result.records)
+                byId.set(record.get('__id'), record.get('__value'))
+              // An id with no row is a legitimate empty answer — what the directive produced
+              // too — but DataLoader still needs one entry per key, in key order.
+              return ids.map((id) => (byId.has(id) ? unwrap(byId.get(id)) : null))
+            })
+          } finally {
+            await session.close()
+          }
         })
-      } finally {
-        await session.close()
-      }
+        .load(parent[idAttribute] as string)
     }
   }
 

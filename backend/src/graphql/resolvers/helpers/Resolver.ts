@@ -6,9 +6,89 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+
 /* eslint-disable security/detect-object-injection */
 import { unwrap } from './cypherField'
+
+// ---------------------------------------------------------------------------------------
+// Batch loaders behind the Resolver() factory.
+//
+// The generated statements are the single-row ones with the parent bound through UNWIND
+// instead of a literal parameter, so the semantics are unchanged — only the number of round
+// trips is. Two details matter:
+//
+//   * OPTIONAL MATCH, not MATCH: a plain MATCH drops parents with no related node, and the
+//     result would then be shorter than the key list. DataLoader requires one entry per key
+//     in key order, so every id has to survive the query.
+//   * The `connection` fragments may carry their own WHERE (see the count configs). Appended
+//     to an OPTIONAL MATCH that WHERE stays part of it, which is what the single-row version
+//     did too.
+// ---------------------------------------------------------------------------------------
+
+const runBatch = async ({ context, cypher, ids }) => {
+  const session = context.driver.session()
+  try {
+    return await session.readTransaction(async (txc) => {
+      const result = await txc.run(cypher, { ids, cypherParams: context.cypherParams ?? {} })
+      const byId = new Map()
+      for (const record of result.records) byId.set(record.get('__id'), record.get('__value'))
+      return { byId }
+    })
+  } finally {
+    await session.close()
+  }
+}
+
+const batchRelated = async ({ context, type, idAttribute, connection, ids }) => {
+  const { byId } = await runBatch({
+    context,
+    ids,
+    cypher: `
+      UNWIND $ids AS __id
+      MATCH (parent:${type} { ${idAttribute}: __id })
+      OPTIONAL MATCH (parent)${connection}
+      RETURN __id AS __id, collect(related {.*}) AS __value
+    `,
+  })
+  // collect() skips nulls, so a parent with no match yields [] rather than [null].
+  return ids.map((id) => unwrap(byId.get(id) ?? []))
+}
+
+const batchCount = async ({ context, type, idAttribute, connection, ids }) => {
+  const { byId } = await runBatch({
+    context,
+    ids,
+    cypher: `
+      UNWIND $ids AS __id
+      MATCH (parent:${type} { ${idAttribute}: __id })
+      OPTIONAL MATCH (parent)${connection}
+      RETURN __id AS __id, COUNT(DISTINCT related) AS __value
+    `,
+  })
+  return ids.map((id) => {
+    const value = byId.get(id)
+    return typeof value?.toNumber === 'function' ? value.toNumber() : (value ?? 0)
+  })
+}
+
+const batchBoolean = async ({ context, condition, key, ids }) => {
+  // The condition is a complete `MATCH (this)… RETURN <expr>` statement. A CALL subquery
+  // runs it per parent without having to parse or rewrite its body; only `this` is bound.
+  const bound = condition.replace('this', 'this { id: __id }')
+  const { byId } = await runBatch({
+    context,
+    ids,
+    cypher: `
+      UNWIND $ids AS __id
+      CALL {
+        WITH __id
+        ${bound} AS ${key}
+      }
+      RETURN __id AS __id, ${key} AS __value
+    `,
+  })
+  return ids.map((id) => byId.get(id) ?? false)
+}
 
 export const undefinedToNullResolver = (list) => {
   const resolvers = {}
@@ -32,28 +112,20 @@ export default function Resolver(type, options: any = {}) {
   } = options
 
   const _hasResolver = (_resolvers, { key, connection }, { returnType }) => {
-    return async (parent, _params, { driver, cypherParams }, _resolveInfo) => {
+    return async (parent, _params, context, _resolveInfo) => {
       if (typeof parent[key] !== 'undefined') return parent[key]
       const id = parent[idAttribute]
-      const session = driver.session()
-      try {
-        let response = await session.readTransaction(async (txc) => {
-          const cypher = `
-          MATCH(:${type} {${idAttribute}: $id})${connection}
-          RETURN related {.*} as related
-          `
-          const result = await txc.run(cypher, { id, cypherParams })
-          // unwrap: `related { .* }` hands back raw Bolt values, and an integer property
-          // among them ({low, high}) fails GraphQL's Int serialiser. While neo4j-graphql-js
-          // still translates the parent query this branch rarely runs, but it is the only
-          // path left once the library is gone.
-          return result.records.map((r) => unwrap(r.get('related')))
-        })
-        if (returnType === 'object') response = response[0] || null
-        return response
-      } finally {
-        await session.close()
-      }
+      if (id === undefined || id === null) return returnType === 'object' ? null : []
+
+      // Batched across every parent of this field in the current request: one statement
+      // for a whole list instead of one per row (see context/loaders.ts).
+      const rows = (await context.loaders
+        .forField(`${type}.${key}`, async (ids) =>
+          batchRelated({ context, type, idAttribute, connection, ids }),
+        )
+        .load(id)) as unknown[]
+
+      return returnType === 'object' ? (rows[0] ?? null) : rows
     }
   }
 
@@ -61,21 +133,14 @@ export default function Resolver(type, options: any = {}) {
   const booleanResolver = (obj: any[]) => {
     const resolvers = {}
     for (const [key, condition] of Object.entries(obj)) {
-      resolvers[key] = async (parent, _params, { cypherParams, driver }, _resolveInfo) => {
+      resolvers[key] = async (parent, _params, context, _resolveInfo) => {
         if (typeof parent[key] !== 'undefined') return parent[key]
         const id = parent[idAttribute]
-        const session = driver.session()
-        try {
-          return await session.readTransaction(async (txc) => {
-            const nodeCondition = condition.replace('this', 'this {id: $id}')
-            const cypher = `${nodeCondition} as ${key}`
-            const result = await txc.run(cypher, { id, cypherParams })
-            const [response] = result.records.map((r) => r.get(key))
-            return response
-          })
-        } finally {
-          await session.close()
-        }
+        if (id === undefined || id === null) return false
+
+        return context.loaders
+          .forField(`${type}.${key}`, async (ids) => batchBoolean({ context, condition, key, ids }))
+          .load(id)
       }
     }
     return resolvers
@@ -84,23 +149,16 @@ export default function Resolver(type, options: any = {}) {
   const countResolver = (obj) => {
     const resolvers = {}
     for (const [key, connection] of Object.entries(obj)) {
-      resolvers[key] = async (parent, _params, { driver, cypherParams }, _resolveInfo) => {
+      resolvers[key] = async (parent, _params, context, _resolveInfo) => {
         if (typeof parent[key] !== 'undefined') return parent[key]
-        const session = driver.session()
-        try {
-          return await session.readTransaction(async (txc) => {
-            const id = parent[idAttribute]
-            const cypher = `
-              MATCH(u:${type} {${idAttribute}: $id})${connection}
-              RETURN COUNT(DISTINCT(related)) as count
-            `
-            const result = await txc.run(cypher, { id, cypherParams })
-            const [response] = result.records.map((r) => r.get('count').toNumber())
-            return response
-          })
-        } finally {
-          await session.close()
-        }
+        const id = parent[idAttribute]
+        if (id === undefined || id === null) return 0
+
+        return context.loaders
+          .forField(`${type}.${key}`, async (ids) =>
+            batchCount({ context, type, idAttribute, connection, ids }),
+          )
+          .load(id)
       }
     }
     return resolvers
