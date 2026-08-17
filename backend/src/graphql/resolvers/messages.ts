@@ -17,6 +17,7 @@ import { ForbiddenError } from '@graphql/errors'
 
 import { attachments } from './attachments/attachments'
 import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
+import { pagingClause } from './helpers/paging'
 import Resolver from './helpers/Resolver'
 import { getRoomProperties, groupChatGated, roomIsGroupRoom } from './rooms'
 
@@ -112,12 +113,7 @@ export default {
         // Ordering is fixed to indexId DESC — the only value _MessageOrdering offers, and
         // what the beforeIndex cursor assumes. Previously an omitted orderBy left the order
         // undefined; pinning it is strictly more predictable.
-        const pagingClause = [
-          params.offset ? 'SKIP toInteger($offset)' : '',
-          params.first ? 'LIMIT toInteger($first)' : '',
-        ]
-          .filter(Boolean)
-          .join(' ')
+        const paging = pagingClause(params)
 
         resolved = await messageSession.readTransaction(async (transaction) => {
           const result = await transaction.run(
@@ -127,7 +123,7 @@ export default {
               ${beforeIndexClause}
               WITH message
               ORDER BY message.indexId DESC
-              ${pagingClause}
+              ${paging.clause}
               RETURN message {
                 .*,
                 senderId: head([(message)<-[:CREATED]-(sender:User) | sender.id])
@@ -137,8 +133,7 @@ export default {
               currentUserId: context.user.id,
               roomId,
               beforeIndex: beforeIndex ?? null,
-              offset: params.offset ?? 0,
-              first: params.first ?? 0,
+              ...paging.params,
             },
           )
           // unwrap: indexId is a Bolt integer and would fail GraphQL's Int serialiser.

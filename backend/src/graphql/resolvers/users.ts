@@ -17,6 +17,7 @@ import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
 import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
 import normalizeEmail from './helpers/normalizeEmail'
 import { orderClause } from './helpers/ordering'
+import { pagingClause } from './helpers/paging'
 import Resolver from './helpers/Resolver'
 import { images } from './images/images'
 import { createOrUpdateLocations } from './users/location'
@@ -206,6 +207,8 @@ export default {
         conditions.push('EXISTS { MATCH (user)-[:IS_IN]->(:Location) }')
       }
 
+      const paging = pagingClause(args)
+
       const session = context.driver.session()
       try {
         return await session.readTransaction(async (transaction) => {
@@ -215,8 +218,7 @@ export default {
               ${conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''}
               RETURN user { .* } AS user
               ORDER BY ${userOrderClause(args.orderBy, 'user.createdAt DESC')}
-              ${args.offset ? 'SKIP toInteger($offset)' : ''}
-              ${args.first ? 'LIMIT toInteger($first)' : ''}
+              ${paging.clause}
             `,
             {
               ...Object.fromEntries(
@@ -226,8 +228,7 @@ export default {
                 ]),
               ),
               filterIdIn: filterIds ?? [],
-              offset: args.offset ?? 0,
-              first: args.first ?? 0,
+              ...paging.params,
             },
           )
           return result.records.map((record) => unwrap(record.get('user')))

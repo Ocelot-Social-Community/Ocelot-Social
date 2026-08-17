@@ -16,6 +16,7 @@ import { filterForMutedUsers } from './helpers/filterForMutedUsers'
 import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
 import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
 import { orderClause } from './helpers/ordering'
+import { pagingClause } from './helpers/paging'
 import { postFilterToCypher, postOrderClause } from './helpers/postFilter'
 import Resolver from './helpers/Resolver'
 import { images } from './images/images'
@@ -118,6 +119,7 @@ const commentOrderClause = (orderBy: unknown): string =>
 // localise. postFilterToCypher translates the tree they build.
 const queryPosts = async (params, context: Context) => {
   const { where, params: whereParams } = postFilterToCypher(params)
+  const paging = pagingClause(params)
   const session = context.driver.session()
   try {
     return await session.readTransaction(async (transaction) => {
@@ -127,10 +129,9 @@ const queryPosts = async (params, context: Context) => {
           ${where ? `WHERE ${where}` : ''}
           RETURN post { .* } AS post
           ORDER BY ${postOrderClause(params.orderBy)}
-          ${params.offset ? 'SKIP toInteger($offset)' : ''}
-          ${params.first ? 'LIMIT toInteger($first)' : ''}
+          ${paging.clause}
         `,
-        { ...whereParams, offset: params.offset ?? 0, first: params.first ?? 0 },
+        { ...whereParams, ...paging.params },
       )
       return result.records.map((record) => unwrap(record.get('post')))
     })

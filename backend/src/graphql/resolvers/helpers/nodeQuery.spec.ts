@@ -67,3 +67,48 @@ describe('Tag filter', () => {
     expect(data?.Tag).toBeFalsy()
   })
 })
+
+describe('Tag paging', () => {
+  const pagedQuery = parse(`
+    query ($first: Int, $offset: Int) {
+      Tag(first: $first, offset: $offset) {
+        id
+      }
+    }
+  `)
+
+  const run = async (variables: Record<string, unknown>) =>
+    setup.query({ query: pagedQuery, variables })
+
+  it('returns an empty page for first: 0', async () => {
+    // 0 is a page size, not an absent argument. Reading it as "unset" drops the LIMIT and
+    // answers the narrowest request with every row — the failure this asserts against.
+    const { data, errors } = await run({ first: 0 })
+
+    expect(errors).toBeUndefined()
+    expect(data?.Tag).toEqual([])
+  })
+
+  it('still returns everything when first is omitted', async () => {
+    const { data } = await run({})
+
+    expect(data?.Tag).toHaveLength(3)
+  })
+
+  it('pages with offset', async () => {
+    const { data } = await run({ first: 1, offset: 1 })
+
+    expect(data?.Tag).toEqual([{ id: 'nodequery-beta' }])
+  })
+
+  it.each([
+    ['first', { first: -1 }],
+    ['offset', { offset: -1 }],
+  ])('rejects a negative %s', async (argument, variables) => {
+    // Neo4j answers a negative SKIP/LIMIT with an internal error, which would reach the
+    // client as a 500 for what is plainly a bad request.
+    const { errors } = await run(variables)
+
+    expect(errors?.[0].message).toContain(`Argument "${argument}" must not be negative`)
+  })
+})

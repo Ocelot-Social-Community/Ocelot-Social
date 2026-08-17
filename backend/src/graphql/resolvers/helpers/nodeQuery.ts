@@ -3,6 +3,7 @@ import { UserInputError } from '@graphql/errors'
 
 import { unwrap } from './cypherField'
 import { orderClause } from './ordering'
+import { pagingClause } from './paging'
 
 import type { Context } from '@src/context'
 
@@ -120,6 +121,8 @@ export const nodeQuery =
       computed: config.computedOrder,
     })
 
+    const paging = pagingClause(params)
+
     const session = context.driver.session()
     try {
       return await session.readTransaction(async (transaction) => {
@@ -129,10 +132,9 @@ export const nodeQuery =
             ${conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''}
             RETURN ${alias} { .* } AS node
             ORDER BY ${order}
-            ${params.offset ? 'SKIP toInteger($offset)' : ''}
-            ${params.first ? 'LIMIT toInteger($first)' : ''}
+            ${paging.clause}
           `,
-          { ...queryParams, offset: params.offset ?? 0, first: params.first ?? 0 },
+          { ...queryParams, ...paging.params },
         )
         return result.records.map((record) => unwrap(record.get('node')))
       })
