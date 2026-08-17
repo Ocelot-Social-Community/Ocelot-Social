@@ -149,6 +149,11 @@ afterAll(async () => {
   setup.database.neode.close()
 })
 
+// Why the comparisons below can be EXACT rather than approximate: the fixtures are
+// deliberately uniform — every post carries the same relations, every room the same single
+// message. A field present on some rows but not others would not be batched any worse, yet
+// could still shift the count, because a loader that no row triggers is never flushed at
+// all. Keep new fixtures uniform, or compare with the per-row ceiling below instead.
 describe('Cypher round trips', () => {
   it('stay constant as the feed grows', async () => {
     const one = await countRoundTrips(FEED_QUERY, { first: 1 })
