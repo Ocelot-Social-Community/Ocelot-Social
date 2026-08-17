@@ -43,6 +43,12 @@ input _PostFilter {
   categories_some: _PostCategoriesFilter
   "Posts carrying any of these emotions."
   emotions_some: _PostEMOTEDFilter
+  "Posts carrying any of these hashtags."
+  tags_some: _PostTagsFilter
+  "Posts commented on by the given user."
+  comments_some: _PostCommentsFilter
+  "Posts shouted by the given user."
+  shoutedBy_some: _PostShoutedByFilter
   "Filter by the post's author."
   author: _PostAuthorFilter
   "Exclude posts by these authors."
@@ -54,6 +60,27 @@ input _PostFilter {
 "Selects categories by id."
 input _PostCategoriesFilter {
   id_in: [ID!]
+}
+
+"Selects hashtags. A tag's text is its id."
+input _PostTagsFilter {
+  id: ID
+  id_in: [ID!]
+}
+
+"Selects posts by who commented on them."
+input _PostCommentsFilter {
+  author: _PostCommentsAuthorFilter
+}
+
+"Selects a comment author by id."
+input _PostCommentsAuthorFilter {
+  id: ID
+}
+
+"Selects posts by who shouted them."
+input _PostShoutedByFilter {
+  id: ID
 }
 
 "Selects an author, either directly or by who follows them."

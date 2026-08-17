@@ -2266,6 +2266,16 @@ input _PostCategoriesFilter {
   id_in: [ID!]
 }
 
+"""Selects a comment author by id."""
+input _PostCommentsAuthorFilter {
+  id: ID
+}
+
+"""Selects posts by who commented on them."""
+input _PostCommentsFilter {
+  author: _PostCommentsAuthorFilter
+}
+
 input _PostEMOTEDFilter {
   createdAt: String
   emotion_in: [Emotion]
@@ -2290,6 +2300,9 @@ input _PostFilter {
 
   """Posts filed under any of these categories."""
   categories_some: _PostCategoriesFilter
+
+  """Posts commented on by the given user."""
+  comments_some: _PostCommentsFilter
   content: String
   createdAt: String
   deleted: Boolean
@@ -2330,7 +2343,13 @@ input _PostFilter {
 
   """Posts in the groups the current user belongs to."""
   postsInMyGroups: Boolean
+
+  """Posts shouted by the given user."""
+  shoutedBy_some: _PostShoutedByFilter
   slug: String
+
+  """Posts carrying any of these hashtags."""
+  tags_some: _PostTagsFilter
   title: String
   updatedAt: String
   visibility: Visibility
@@ -2372,6 +2391,17 @@ enum _PostOrdering {
   updatedAt_desc
   visibility_asc
   visibility_desc
+}
+
+"""Selects posts by who shouted them."""
+input _PostShoutedByFilter {
+  id: ID
+}
+
+"""Selects hashtags. A tag's text is its id."""
+input _PostTagsFilter {
+  id: ID
+  id_in: [ID!]
 }
 
 enum _RoomOrdering {

@@ -240,6 +240,54 @@ const translate = (
         continue
       }
 
+      // The hashtag filter on the start page — pages/index.vue passes `{ id: <hashtag> }`.
+      case 'tags_some': {
+        const tag = value as { id?: string; id_in?: string[] }
+        if (tag.id_in) {
+          fragments.push({
+            where: `EXISTS { MATCH (${alias})-[:TAGGED]->(t:Tag) WHERE t.id IN $${parameter} }`,
+            params: { [parameter]: tag.id_in },
+          })
+          continue
+        }
+        if (tag.id) {
+          fragments.push({
+            where: `EXISTS { MATCH (${alias})-[:TAGGED]->(:Tag { id: $${parameter} }) }`,
+            params: { [parameter]: tag.id },
+          })
+          continue
+        }
+        throw new UserInputError('tags_some supports only `id` and `id_in`.')
+      }
+
+      // The profile page's "comments" tab: posts the given user has commented on.
+      //
+      // Deliberately does NOT exclude deleted or disabled comments. Post.commentsCount does,
+      // but adding it here would change which posts the tab lists — a behaviour change
+      // smuggled into a migration whose job was to reproduce the generated filter.
+      case 'comments_some': {
+        const authorId = (value as { author?: { id?: string } }).author?.id
+        if (!authorId) throw new UserInputError('comments_some supports only `author.id`.')
+        fragments.push({
+          where: `EXISTS {
+            MATCH (${alias})<-[:COMMENTS]-(:Comment)<-[:WROTE]-(:User { id: $${parameter} })
+          }`,
+          params: { [parameter]: authorId },
+        })
+        continue
+      }
+
+      // The profile page's "shouts" tab.
+      case 'shoutedBy_some': {
+        const shouterId = (value as { id?: string }).id
+        if (!shouterId) throw new UserInputError('shoutedBy_some supports only `id`.')
+        fragments.push({
+          where: `EXISTS { MATCH (${alias})<-[:SHOUTED]-(:User { id: $${parameter} }) }`,
+          params: { [parameter]: shouterId },
+        })
+        continue
+      }
+
       case 'author': {
         const author = value as { followedBy_some?: { id?: string }; id?: string }
         if (author.followedBy_some?.id) {
