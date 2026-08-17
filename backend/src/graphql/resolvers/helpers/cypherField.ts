@@ -117,7 +117,10 @@ export default function cypherFields(
       // while the node also carries a `postType` string; Location.name is localised while
       // the node's `name` is the raw one. Trusting the parent there yields the wrong type
       // or the wrong language — silently, since both look plausible.
-      if (!always && typeof parent?.[key] !== 'undefined') return parent[key]
+      // The fallback applies here too: a parent can carry the key with a NULL value — a
+      // projection that coalesced to nothing, or a constructed subscription payload — and
+      // returning that unchanged would fail a non-null field exactly like an unresolved one.
+      if (!always && typeof parent?.[key] !== 'undefined') return parent[key] ?? fallback ?? null
       if (!parent?.[idAttribute]) return null
 
       const args = { ...defaults, ...(params ?? {}) }

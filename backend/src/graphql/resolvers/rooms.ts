@@ -176,7 +176,11 @@ export default {
             WITH room, g, COALESCE(room.lastMessageAt, room.createdAt) AS sortDate,
                  COALESCE(g.name, otherUser.name) AS roomName
             ${whereClause}
-            RETURN room { .* } AS room
+            // roomName is projected, not just computed: this query already derives it for
+            // the search filter, and the projection lets Room.roomName's pass-through use it
+            // instead of asking again. Its expression MUST stay identical to the statement in
+            // cypherFields below — rooms.roomName.spec.ts holds the two to that.
+            RETURN room { .*, roomName: roomName } AS room
             ORDER BY sortDate DESC
             LIMIT toInteger($first)
           `
@@ -292,8 +296,10 @@ export default {
     // a Room that did not come from a neo4jgraphql() translation — every roomUpdated
     // subscription payload, for one — leaves roomId/isGroupRoom/roomName unresolved, and
     // being non-null they take the whole payload down with them.
+    // The room's own id under the name the chat frontend keys on. Resolved locally: asking
+    // the database to hand back an id we already hold cost a round trip per chat list.
+    roomId: (parent: { roomId?: string; id?: string }) => parent.roomId ?? parent.id ?? null,
     ...cypherFields('Room', {
-      roomId: 'RETURN this.id',
       isGroupRoom: `
         OPTIONAL MATCH (this)-[:ROOM_FOR]->(g:Group)
         RETURN g IS NOT NULL

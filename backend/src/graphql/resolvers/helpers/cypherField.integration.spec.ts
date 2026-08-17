@@ -96,4 +96,25 @@ describe('non-null fields with missing data', () => {
     // nothing is a caller error, and answering it with '' would dress it up as data.
     await expect(resolve('Room', 'lastMessage', { id: 'no-such-room' })).resolves.toBeNull()
   })
+
+  it('applies the fallback when the parent carries an explicit null', async () => {
+    // The pass-through path, which skips the query entirely. A parent reaches it carrying a
+    // null either from a projection that coalesced to nothing or from a hand-built
+    // subscription payload — CreateGroupRoom projects `roomName: group.name` that way. Left
+    // unchanged, that null fails the non-null field exactly like an unresolved one, so the
+    // shortcut must not be a hole in the guarantee.
+    await expect(resolve('Room', 'roomName', { id: 'lonely-room', roomName: null })).resolves.toBe(
+      '',
+    )
+    await expect(
+      resolve('Message', 'senderId', { id: 'orphan-message', senderId: null }),
+    ).resolves.toBe('')
+  })
+
+  it('still prefers a real value carried by the parent', async () => {
+    // The fallback must not shadow the pass-through's actual job.
+    await expect(
+      resolve('Room', 'roomName', { id: 'lonely-room', roomName: 'Projected' }),
+    ).resolves.toBe('Projected')
+  })
 })
