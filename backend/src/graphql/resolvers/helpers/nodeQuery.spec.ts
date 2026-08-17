@@ -53,19 +53,35 @@ describe('Tag filter', () => {
     expect(data?.Tag).toEqual([{ id: 'nodequery-alpha' }, { id: 'nodequery-gamma' }])
   })
 
-  it.each(['id', 'id_not', 'id_not_in'])('rejects the unimplemented operator %s', async (key) => {
-    const value = key.endsWith('_in') ? ['nodequery-alpha'] : 'nodequery-alpha'
-
+  it('treats id as a one-element id_in', async () => {
     const { data, errors } = await setup.query({
       query: tagQuery,
-      variables: { filter: { [key]: value } },
+      variables: { filter: { id: 'nodequery-beta' } },
     })
 
-    // The failure mode this guards against is the quiet one: no error, and every tag
-    // returned as though no filter had been passed.
-    expect(errors?.[0].message).toContain('Unsupported Tag filter')
-    expect(data?.Tag).toBeFalsy()
+    expect(errors).toBeUndefined()
+    expect(data?.Tag).toEqual([{ id: 'nodequery-beta' }])
   })
+
+  it.each(['id_not', 'id_not_in', 'taggedPosts_some'])(
+    'rejects the undeclared operator %s',
+    async (key) => {
+      const value = key.endsWith('_in') ? ['nodequery-alpha'] : 'nodequery-alpha'
+
+      const { data, errors } = await setup.query({
+        query: tagQuery,
+        variables: { filter: { [key]: value } },
+      })
+
+      // These used to be declared on _TagFilter while only id_in was implemented, so they
+      // reached the resolver and died there. Scoping the input to what nodeQuery implements
+      // moves the rejection into variable coercion — the same answer, one layer earlier and
+      // without touching the database. What must never happen is the quiet outcome: no
+      // error, and every tag returned as though no filter had been passed.
+      expect(errors?.[0].message).toMatch(/is not defined by type|Unsupported Tag filter/)
+      expect(data?.Tag).toBeFalsy()
+    },
+  )
 })
 
 describe('Tag paging', () => {

@@ -78,6 +78,12 @@ const FILTER_HANDLERS: Record<string, FilterHandler> = {
     condition: `${alias}.id IN $filterIdIn`,
     params: { filterIdIn: value },
   }),
+  // `id` is a one-element `id_in`. Selecting a single node by id is the most ordinary filter
+  // there is, and the User query already treats the two as the same thing.
+  id: (value, alias) => ({
+    condition: `${alias}.id IN $filterIdIn`,
+    params: { filterIdIn: [value] },
+  }),
 }
 
 export const nodeQuery =
