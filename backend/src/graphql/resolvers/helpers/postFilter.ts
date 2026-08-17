@@ -3,6 +3,8 @@
 /* eslint-disable security/detect-object-injection */
 import { UserInputError } from '@graphql/errors'
 
+import { orderClause } from './ordering'
+
 // Translates the `_PostFilter` tree into a Cypher WHERE clause — the part neo4j-graphql-js
 // used to do for the Post and profilePagePosts queries (migration stage C2).
 //
@@ -321,45 +323,10 @@ export const postFilterToCypher = (
   )
 }
 
-/**
- * ORDER BY clause from `_PostOrdering`. Whitelisted because the field name is interpolated;
- * an unknown value is rejected rather than ignored, so paging never silently changes shape.
- */
-export const postOrderClause = (orderBy: unknown, alias = 'post'): string => {
-  const orderable = [
-    'id',
-    'title',
-    'slug',
-    'content',
-    'contentExcerpt',
-    'createdAt',
-    'updatedAt',
-    'visibility',
-    'deleted',
-    'imageBlurred',
-    'imageAspectRatio',
-    'clickedCount',
-    'viewedTeaserCount',
-    'eventStart',
-    'eventEnd',
-    'pinned',
-    'groupPinned',
-    // Feed position, set by the push/unpush moderation actions.
-    'sortDate',
-  ]
-  const entries = orderBy == null ? [] : Array.isArray(orderBy) ? orderBy : [orderBy]
-
-  const clauses = entries.map((entry) => {
-    const raw = String(entry)
-    const direction = raw.endsWith('_desc') ? 'DESC' : 'ASC'
-    const field = raw.replace(/_(asc|desc)$/, '')
-    if (!orderable.includes(field)) {
-      throw new UserInputError(`Unsupported orderBy '${raw}' for posts.`)
-    }
-    return `${alias}.${field} ${direction}`
+/** ORDER BY from `_PostOrdering`; the allowed fields come from the enum itself. */
+export const postOrderClause = (orderBy: unknown, alias = 'post'): string =>
+  orderClause(orderBy, {
+    enumName: '_PostOrdering',
+    alias,
+    fallback: `${alias}.createdAt DESC`,
   })
-
-  // Pinned posts first mirrors what maintainPinnedPosts expresses in the filter; the
-  // secondary key keeps the order stable when the primary one ties.
-  return clauses.length > 0 ? clauses.join(', ') : `${alias}.createdAt DESC`
-}

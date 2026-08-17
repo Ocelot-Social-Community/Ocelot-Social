@@ -16,6 +16,7 @@ import { branding } from '@src/branding'
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
 import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
 import normalizeEmail from './helpers/normalizeEmail'
+import { orderClause } from './helpers/ordering'
 import Resolver from './helpers/Resolver'
 import { images } from './images/images'
 import { createOrUpdateLocations } from './users/location'
@@ -42,34 +43,10 @@ export const getMutedUsers = async (context) => {
   return mutedUsers
 }
 
-// Honour orderBy via a whitelist — field names are interpolated into Cypher, so they must
-// never come from raw input (Map.get avoids that injection sink). Shared by the admin
-// search path and the general User query (stage C2), so both accept exactly the values
-// _UserOrdering advertises and reject anything else instead of ignoring it.
-const USER_ORDERING = new Map<string, string>([
-  ['id_asc', 'user.id ASC'],
-  ['id_desc', 'user.id DESC'],
-  ['slug_asc', 'user.slug ASC'],
-  ['slug_desc', 'user.slug DESC'],
-  ['name_asc', 'user.name ASC'],
-  ['name_desc', 'user.name DESC'],
-  ['createdAt_asc', 'user.createdAt ASC'],
-  ['createdAt_desc', 'user.createdAt DESC'],
-  ['updatedAt_asc', 'user.updatedAt ASC'],
-  ['updatedAt_desc', 'user.updatedAt DESC'],
-])
-
-const userOrderClause = (orderBy: unknown, fallback: string): string => {
-  const entries = orderBy == null ? [] : Array.isArray(orderBy) ? orderBy : [orderBy]
-  const clauses = entries.map((entry) => {
-    const clause = USER_ORDERING.get(String(entry))
-    if (!clause) {
-      throw new UserInputError(`Unsupported orderBy '${String(entry)}' for the user search.`)
-    }
-    return clause
-  })
-  return clauses.length > 0 ? clauses.join(', ') : fallback
-}
+// ORDER BY from `_UserOrdering`; the allowed fields come from the enum itself, so the
+// admin search and the general User query cannot drift apart from the schema.
+const userOrderClause = (orderBy: unknown, fallback: string): string =>
+  orderClause(orderBy, { enumName: '_UserOrdering', alias: 'user', fallback })
 
 export default {
   Query: {

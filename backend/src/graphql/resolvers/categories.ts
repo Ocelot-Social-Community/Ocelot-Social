@@ -8,7 +8,10 @@ import type { Context } from '@src/context'
 const categoryQuery = nodeQuery({
   label: 'Category',
   equalityFields: ['id', 'name', 'slug', 'icon', 'createdAt', 'updatedAt'],
-  orderable: ['id', 'name', 'slug', 'icon', 'createdAt', 'updatedAt'],
+  orderingEnum: '_CategoryOrdering',
+  // postCount is a @cypher field, not a stored property — sorting by `category.postCount`
+  // would compare nulls and quietly do nothing.
+  computedOrder: { postCount: 'size([(category)<-[:CATEGORIZED]-(p:Post) | p])' },
   defaultOrder: 'category.name ASC',
 })
 

@@ -2,6 +2,7 @@
 import { UserInputError } from '@graphql/errors'
 
 import { unwrap } from './cypherField'
+import { orderClause } from './ordering'
 
 import type { Context } from '@src/context'
 
@@ -37,10 +38,12 @@ interface NodeQueryConfig {
    * match `false`. softDeleteMiddleware injects `deleted`/`disabled` as top-level args.
    */
   softDeleteFields?: string[]
-  /** Sortable property names; the `_*Ordering` enum values minus their _asc/_desc suffix. */
-  orderable: string[]
+  /** The `_*Ordering` enum defining what callers may sort by. */
+  orderingEnum: string
   /** ORDER BY used when the caller passes none. */
   defaultOrder: string
+  /** Sortable fields that are NOT stored properties, mapped to their expression. */
+  computedOrder?: Record<string, string>
   /** Filter keys understood here — everything else raises. */
   filterFields?: string[]
 }
@@ -48,7 +51,7 @@ interface NodeQueryConfig {
 export const nodeQuery =
   (config: NodeQueryConfig) =>
   async (params: NodeQueryParams, context: Context): Promise<unknown[]> => {
-    const { label, equalityFields, softDeleteFields = [], orderable, defaultOrder } = config
+    const { label, equalityFields, softDeleteFields = [], orderingEnum, defaultOrder } = config
     const alias = label.toLowerCase()
 
     const unsupported = Object.keys(params.filter ?? {}).filter(
@@ -77,20 +80,11 @@ export const nodeQuery =
       queryParams.filterIdIn = params.filter.id_in
     }
 
-    const entries =
-      params.orderBy == null
-        ? []
-        : Array.isArray(params.orderBy)
-          ? params.orderBy
-          : [params.orderBy]
-    const orderClauses = entries.map((entry) => {
-      const raw = String(entry)
-      const direction = raw.endsWith('_desc') ? 'DESC' : 'ASC'
-      const field = raw.replace(/_(asc|desc)$/, '')
-      if (!orderable.includes(field)) {
-        throw new UserInputError(`Unsupported orderBy '${raw}' for ${label}.`)
-      }
-      return `${alias}.${field} ${direction}`
+    const order = orderClause(params.orderBy, {
+      enumName: orderingEnum,
+      alias,
+      fallback: defaultOrder,
+      computed: config.computedOrder,
     })
 
     const session = context.driver.session()
@@ -101,7 +95,7 @@ export const nodeQuery =
             MATCH (${alias}:${label})
             ${conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''}
             RETURN ${alias} { .* } AS node
-            ORDER BY ${orderClauses.length > 0 ? orderClauses.join(', ') : defaultOrder}
+            ORDER BY ${order}
             ${params.offset ? 'SKIP toInteger($offset)' : ''}
             ${params.first ? 'LIMIT toInteger($first)' : ''}
           `,

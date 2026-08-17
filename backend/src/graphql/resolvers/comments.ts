@@ -18,7 +18,7 @@ const commentQuery = nodeQuery({
   label: 'Comment',
   equalityFields: ['id', 'content', 'createdAt', 'updatedAt'],
   softDeleteFields: ['deleted', 'disabled'],
-  orderable: ['id', 'content', 'createdAt', 'updatedAt'],
+  orderingEnum: '_CommentOrdering',
   defaultOrder: 'comment.createdAt ASC',
   filterFields: ['id_in'],
 })

@@ -225,12 +225,25 @@ describe('User', () => {
       expect(desc.data.User.map((u) => u.name)).toEqual(['Bob', 'Anna'])
     })
 
-    it('rejects an orderBy it does not support', async () => {
+    // `about_asc` IS part of _UserOrdering, so it has to work. The resolver used to keep its
+    // own hand-written whitelist which happened to omit about, locale and locationName —
+    // the schema offered them, the resolver rejected them, and this test cemented that.
+    // The allowed set is now read from the enum itself (helpers/ordering.ts).
+    it('honours an orderBy the schema advertises', async () => {
       const { errors } = await query({
         query: searchQuery,
         variables: { roleName: 'moderator', orderBy: ['about_asc'] },
       })
-      expect(errors?.[0].message).toContain('Unsupported orderBy')
+      expect(errors).toBeUndefined()
+    })
+
+    it('rejects an orderBy the schema does not define', async () => {
+      const { errors } = await query({
+        query: searchQuery,
+        variables: { roleName: 'moderator', orderBy: ['nonsense_asc'] },
+      })
+      // Enum validation now catches this before the resolver runs, which is the better place.
+      expect(errors?.[0].message).toContain('nonsense_asc')
     })
 
     it('rejects combining roleName/search with an incompatible filter (locationName)', async () => {

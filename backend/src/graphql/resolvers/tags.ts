@@ -11,7 +11,16 @@ const tagQuery = nodeQuery({
   // Tag.gql exposes deleted/disabled as plain fields; keep them matchable like the
   // generated query did.
   softDeleteFields: ['deleted', 'disabled'],
-  orderable: ['id', 'taggedCount', 'taggedCountUnique'],
+  orderingEnum: '_TagOrdering',
+  // Both counts are @cypher fields, not stored properties, so they need an expression —
+  // `tag.taggedCount` would compare nulls and quietly do nothing. The unique variant needs
+  // DISTINCT, which a pattern comprehension cannot express; apoc.coll.toSet is available
+  // (see NEO4J_dbms_security_procedures_unrestricted in docker-compose.yml) and verified.
+  computedOrder: {
+    taggedCount: 'size([(tag)<-[:TAGGED]-(p:Post) | p])',
+    taggedCountUnique:
+      'size(apoc.coll.toSet([(tag)<-[:TAGGED]-(:Post)<-[:WROTE]-(u:User) | u.id]))',
+  },
   defaultOrder: 'tag.id ASC',
   filterFields: ['id_in'],
 })

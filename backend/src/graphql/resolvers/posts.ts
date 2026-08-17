@@ -15,6 +15,7 @@ import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
 import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
 import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
+import { orderClause } from './helpers/ordering'
 import { postFilterToCypher, postOrderClause } from './helpers/postFilter'
 import Resolver from './helpers/Resolver'
 import { images } from './images/images'
@@ -98,28 +99,14 @@ const filterEventDates = (params) => {
   return params
 }
 
-// _CommentOrdering, whitelisted because the field name is interpolated into Cypher.
-const COMMENT_ORDERING = new Map<string, string>([
-  ['id_asc', 'comment.id ASC'],
-  ['id_desc', 'comment.id DESC'],
-  ['content_asc', 'comment.content ASC'],
-  ['content_desc', 'comment.content DESC'],
-  ['createdAt_asc', 'comment.createdAt ASC'],
-  ['createdAt_desc', 'comment.createdAt DESC'],
-  ['updatedAt_asc', 'comment.updatedAt ASC'],
-  ['updatedAt_desc', 'comment.updatedAt DESC'],
-])
-
-const commentOrderClause = (orderBy: unknown): string => {
-  const entries = orderBy == null ? [] : Array.isArray(orderBy) ? orderBy : [orderBy]
-  const clauses = entries.map((entry) => {
-    const clause = COMMENT_ORDERING.get(String(entry))
-    if (!clause) throw new UserInputError(`Unsupported orderBy '${String(entry)}' for comments.`)
-    return clause
+// ORDER BY from `_CommentOrdering`. Oldest first by default — how a thread reads, and what
+// the webapp asks for.
+const commentOrderClause = (orderBy: unknown): string =>
+  orderClause(orderBy, {
+    enumName: '_CommentOrdering',
+    alias: 'comment',
+    fallback: 'comment.createdAt ASC',
   })
-  // Oldest first matches how a comment thread reads, and what the webapp asks for.
-  return clauses.length > 0 ? clauses.join(', ') : 'comment.createdAt ASC'
-}
 
 // Shared execution for Post and profilePagePosts (stage C2). Both build the same filter
 // tree through the wrappers above and then differ only in which pinned-post rule they
