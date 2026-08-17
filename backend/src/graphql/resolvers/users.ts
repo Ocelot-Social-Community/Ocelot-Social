@@ -749,6 +749,8 @@ export default {
         shouted: '-[:SHOUTED]->(related:Post)',
         categories: '-[:CATEGORIZED]->(related:Category)',
         badgeTrophies: '<-[:REWARDED]-(related:Badge)',
+        // Counterpart of the invitedBy hasOne above.
+        invited: '-[:INVITED]->(related:User)',
       },
     }),
     following: async (

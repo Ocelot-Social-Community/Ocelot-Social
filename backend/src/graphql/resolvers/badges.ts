@@ -9,6 +9,8 @@ import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import { branding } from '@src/branding'
 
+import Resolver from './helpers/Resolver'
+
 import type { Context } from '@src/context'
 
 export const defaultTrophyBadge = {
@@ -179,6 +181,14 @@ export default {
     },
   },
   Badge: {
+    // Both edges point FROM the badge TO the user (see the @relation directives in
+    // Badge.gql and the `direction: 'in'` on User.rewarded).
+    ...Resolver('Badge', {
+      hasMany: {
+        rewarded: '-[:REWARDED]->(related:User)',
+        verifies: '-[:VERIFIES]->(related:User)',
+      },
+    }),
     isDefault: async (parent, _params, _context, _resolveInfo) =>
       [defaultTrophyBadge.id, defaultVerificationBadge.id].includes(parent.id),
   },

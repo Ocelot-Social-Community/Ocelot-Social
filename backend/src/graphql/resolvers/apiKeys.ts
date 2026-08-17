@@ -2,6 +2,8 @@ import { createHash, randomBytes } from 'node:crypto'
 
 import { v4 as uuid } from 'uuid'
 
+import Resolver from './helpers/Resolver'
+
 import type { Context } from '@src/context'
 import type { Integer, Record as Neo4jRecord } from 'neo4j-driver'
 
@@ -224,5 +226,14 @@ export default {
       })
       return toNumber(result.records[0].get('count') as Integer)
     },
+  },
+  ApiKey: {
+    // The edge runs (user)-[:HAS_API_KEY]->(apiKey), hence the inbound match from here
+    // (ApiKey.gql declares direction "IN" on this field).
+    ...Resolver('ApiKey', {
+      hasOne: {
+        owner: '<-[:HAS_API_KEY]-(related:User)',
+      },
+    }),
   },
 }

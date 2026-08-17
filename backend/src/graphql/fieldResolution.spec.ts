@@ -7,14 +7,16 @@
 // Indexing PROBES / registry maps by a type or field name read from the schema. The keys
 // come from our own .gql files, not from request data, so this is not an injection sink.
 /* eslint-disable security/detect-object-injection */
+import { createLoaders } from '@context/loaders'
 import Factory, { cleanDatabase } from '@db/factories'
 import {
   directiveInventory,
   fieldMetadata,
   representativeScalarFields,
 } from '@root/test/directiveInventory'
-import { createApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup, TEST_CONFIG } from '@root/test/helpers'
 import { MIGRATION_FIELD_REGISTRY } from '@root/test/migrationFieldRegistry'
+import { createInMemoryPolicyService } from '@src/policy'
 
 import resolvers from './resolvers'
 
@@ -46,6 +48,8 @@ const ids = {
   badge: '',
   category: '',
   tag: '',
+  comment: '',
+  message: '',
 }
 
 /** How to reach instances of a type, and how to select its directive fields. */
@@ -224,7 +228,8 @@ beforeAll(async () => {
   ids.post = post.get('id')
   await Promise.all([tag.relateTo(post, 'post'), category.relateTo(post, 'post')])
 
-  await Factory.build('comment', {}, { authorId: ids.otherUser, postId: ids.post })
+  const comment = await Factory.build('comment', {}, { authorId: ids.otherUser, postId: ids.post })
+  ids.comment = comment.get('id')
 
   const group = await Factory.build('group', { name: 'Probe group' }, { ownerId: ids.user })
   ids.group = group.get('id')
@@ -247,6 +252,7 @@ beforeAll(async () => {
     variables: { userId: ids.otherUser, content: 'Probe message' },
   })
   ids.room = message.data?.CreateMessage?.room?.id ?? ''
+  ids.message = message.data?.CreateMessage?.id ?? ''
 })
 
 afterAll(async () => {
@@ -313,6 +319,107 @@ describe('@cypher / @relation field resolution', () => {
       (typeName, fieldName) => {
         const typeResolvers = (resolvers as Record<string, Record<string, unknown>>)[typeName]
         expect(typeResolvers?.[fieldName]).toBeInstanceOf(Function)
+      },
+    )
+  })
+
+  // The tests above go through a root query, so neo4jgraphql() translates the whole
+  // selection and hands each field resolver a parent that ALREADY carries the value. The
+  // Resolver() factory then short-circuits on `typeof parent[key] !== 'undefined'` and
+  // returns it — meaning its own Cypher never runs and is never verified.
+  //
+  // These tests call the resolvers directly with a bare `{ id }` parent, which is what a
+  // subscription payload or a hand-written root resolver produces, and what EVERY parent
+  // will look like once the library is gone. This is the pass that actually exercises the
+  // hand-written Cypher, so it is the one that makes stage B verifiable.
+  describe('field resolvers without a neo4jgraphql translation', () => {
+    // Types whose fixture id is known here. Others (Location, SocialMedia, InviteCode,
+    // ApiKey) are reached through their owner and have no standalone id in this spec.
+    const parentIdFor = (): Record<string, string> => ({
+      User: ids.user,
+      Post: ids.post,
+      Group: ids.group,
+      Room: ids.room,
+      Message: ids.message,
+      Comment: ids.comment,
+      Badge: ids.badge,
+      Category: ids.category,
+      Tag: ids.tag,
+    })
+
+    const explicitlyResolved = Object.entries(MIGRATION_FIELD_REGISTRY).flatMap(
+      ([typeName, fieldNames]) =>
+        fieldNames
+          .filter(
+            (fieldName) =>
+              typeof (resolvers as Record<string, Record<string, unknown>>)[typeName]?.[
+                fieldName
+              ] === 'function',
+          )
+          .map((fieldName) => [typeName, fieldName] as const),
+    )
+
+    // Compares the two paths rather than just checking the resolver returns something:
+    // a mis-wired relation (wrong direction, wrong edge name) yields an empty list, which
+    // is perfectly "defined". Shape differs between the paths — the library returns the
+    // sub-selection we asked for, the resolver returns whole nodes — so compare what is
+    // comparable: list length, presence for single objects, value for scalars.
+    const comparable = (value: unknown): unknown => {
+      if (Array.isArray(value)) return { kind: 'list', length: value.length }
+      if (value === null || value === undefined) return { kind: 'empty' }
+      if (typeof value === 'object') return { kind: 'object' }
+      return { kind: 'scalar', value }
+    }
+
+    it.each(
+      explicitlyResolved.filter(
+        ([typeName]) => parentIdFor()[typeName] !== undefined && PROBES[typeName],
+      ),
+    )(
+      '%s.%s resolves from a bare { id } parent, matching the library',
+      async (typeName, fieldName) => {
+        const resolver = (resolvers as Record<string, Record<string, (...args: any[]) => unknown>>)[
+          typeName
+        ][fieldName]
+
+        // A full-ish context: field resolvers are not all Resolver()-generated. Some are
+        // hand-written and reach for policy (User.socialMedia gates on socialMediaEnabled)
+        // or database. A thin stub would fail them for the wrong reason.
+        const context = {
+          driver: setup.database.driver,
+          database: setup.database,
+          neode: setup.database.neode,
+          cypherParams: { currentUserId: ids.user, languageDefault: 'EN' },
+          user: { id: ids.user },
+          policy: createInMemoryPolicyService({
+            socialMediaEnabled: true,
+            groupsEnabled: true,
+            badgesEnabled: true,
+            categoriesActive: true,
+          }),
+          config: TEST_CONFIG,
+          effectivePermissions: new Set<string>(),
+          loaders: createLoaders(setup.database.driver, ids.user),
+        }
+
+        const viaResolver = await resolver({ id: parentIdFor()[typeName] }, {}, context, {})
+
+        // The same field through the root query, i.e. resolved by neo4j-graphql-js.
+        const probe = PROBES[typeName]
+        // Present by construction: the work list is built from the same registry and
+        // already threw in that case, but assert instead of asserting non-null.
+        const field = workList[typeName].find((candidate) => candidate.name === fieldName)
+        if (!field) throw new Error(`${typeName}.${fieldName} missing from the work list`)
+
+        const { data, errors } = await setup.query({
+          query: probe.operation(buildSelection([field], probe.overrides)),
+        })
+        expect(errors).toBeUndefined()
+
+        const instances = probe.extract(data ?? {}) as Record<string, unknown>[]
+        const viaLibrary = instances[0]?.[fieldName]
+
+        expect(comparable(viaResolver)).toEqual(comparable(viaLibrary))
       },
     )
   })
