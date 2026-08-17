@@ -6,17 +6,17 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { isEmpty } from 'lodash'
-import { neo4jgraphql } from 'neo4j-graphql-js'
 import { v4 as uuid } from 'uuid'
 
 import { UserInputError } from '@graphql/errors'
 
-import cypherFields from './helpers/cypherField'
+import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
 import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
 import { filterPostsHasLocation } from './helpers/filterHasLocation'
 import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
 import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
+import { postFilterToCypher, postOrderClause } from './helpers/postFilter'
 import Resolver from './helpers/Resolver'
 import { images } from './images/images'
 import { createOrUpdateLocations } from './users/location'
@@ -99,9 +99,40 @@ const filterEventDates = (params) => {
   return params
 }
 
+// Shared execution for Post and profilePagePosts (stage C2). Both build the same filter
+// tree through the wrappers above and then differ only in which pinned-post rule they
+// applied, so the query itself is identical.
+//
+// The wrappers keep producing filter OBJECTS rather than Cypher: filterInvisiblePosts and
+// filterForMutedUsers are the access control, they are covered by their own specs, and
+// rewriting them at the same time as the query would have made a regression impossible to
+// localise. postFilterToCypher translates the tree they build.
+const queryPosts = async (params, context: Context) => {
+  const { where, params: whereParams } = postFilterToCypher(params)
+  const session = context.driver.session()
+  try {
+    return await session.readTransaction(async (transaction) => {
+      const result = await transaction.run(
+        `
+          MATCH (post:Post)
+          ${where ? `WHERE ${where}` : ''}
+          RETURN post { .* } AS post
+          ORDER BY ${postOrderClause(params.orderBy)}
+          ${params.offset ? 'SKIP toInteger($offset)' : ''}
+          ${params.first ? 'LIMIT toInteger($first)' : ''}
+        `,
+        { ...whereParams, offset: params.offset ?? 0, first: params.first ?? 0 },
+      )
+      return result.records.map((record) => unwrap(record.get('post')))
+    })
+  } finally {
+    await session.close()
+  }
+}
+
 export default {
   Query: {
-    Post: async (object, params, context: Context, resolveInfo) => {
+    Post: async (_object, params, context: Context, _resolveInfo) => {
       const skipPinnedFilter = !!params.filter?.skipPinnedFilter
       if (params.filter) delete params.filter.skipPinnedFilter
       params = await filterPostsOfMyGroups(params, context)
@@ -112,15 +143,15 @@ export default {
       if (!skipPinnedFilter) {
         params = await maintainPinnedPosts(params)
       }
-      return neo4jgraphql(object, params, context, resolveInfo)
+      return queryPosts(params, context)
     },
-    profilePagePosts: async (object, params, context, resolveInfo) => {
+    profilePagePosts: async (_object, params, context: Context, _resolveInfo) => {
       params = await filterPostsOfMyGroups(params, context)
       params = await filterInvisiblePosts(params, context)
       params = await filterForMutedUsers(params, context)
       params = await filterPostsHasLocation(params, context)
       params = await maintainGroupPinnedPosts(params)
-      return neo4jgraphql(object, params, context, resolveInfo)
+      return queryPosts(params, context)
     },
     PostsEmotionsCountByEmotion: async (_object, params, context, _resolveInfo) => {
       const { postId, data } = params
@@ -683,9 +714,7 @@ export default {
   Post: {
     // Verbatim from Post.gql. postType is derived from the node's Neo4j labels, so it has
     // no equivalent as a stored property — it must stay a query.
-    ...cypherFields('Post', {
-      postType: "RETURN [l IN labels(this) WHERE NOT l = 'Post']",
-    }),
+    ...underscoreIdResolver,
     ...Resolver('Post', {
       undefinedToNull: [
         'activityId',
@@ -706,7 +735,6 @@ export default {
         categories: '-[:CATEGORIZED]->(related:Category)',
         comments: '<-[:COMMENTS]-(related:Comment)',
         shoutedBy: '<-[:SHOUTED]-(related:User)',
-        emotions: '<-[related:EMOTED]',
       },
       hasOne: {
         author: '<-[:WROTE]-(related:User)',
@@ -748,6 +776,28 @@ export default {
         ).records.length === 1
       )
     }, */
+    // ORDER MATTERS: this spread comes after Resolver('Post') because that helper's
+    // `undefinedToNull` list also names pinnedAt and eventLocation. undefinedToNull answers
+    // `null` for anything missing on the parent, which would shadow the real resolution now
+    // that the parent is plain node properties (stage C2) instead of a neo4jgraphql
+    // projection that carried these values along.
+    ...cypherFields('Post', {
+      postType: "RETURN [l IN labels(this) WHERE NOT l = 'Post']",
+      // Verbatim from Post.gql — both read relationship data, so neither is a node property.
+      pinnedAt:
+        'MATCH (this)<-[pinned:PINNED]-(:User) WHERE NOT this.deleted = true AND NOT this.disabled = true RETURN pinned.createdAt',
+      eventLocation: 'MATCH (this)-[:IS_IN]->(l:Location) RETURN l',
+      // EMOTED is a RELATIONSHIP type (`type EMOTED @relation(...)` in EMOTED.gql), so the
+      // generated `_PostEmotions` carries the relationship properties PLUS the end node
+      // under the node's type name (`User`). The Resolver() hasMany helper only projects
+      // `related { .* }`, which drops that field — hence a dedicated statement here.
+      // (Its previous hasMany entry was `<-[related:EMOTED]`, not even valid Cypher; it
+      // never ran while the library supplied the field.)
+      emotions: `
+        MATCH (this)<-[emoted:EMOTED]-(user:User)
+        RETURN collect(emoted { .*, User: properties(user) })
+      `,
+    }),
     unreadNotificationByCurrentUser: async (parent, _params, context: Context, _resolveInfo) => {
       const currentUserId = context.user?.id
       if (!currentUserId || !parent?.id) return null

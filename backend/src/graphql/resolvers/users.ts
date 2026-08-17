@@ -5,15 +5,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-shadow */
-import { neo4jgraphql } from 'neo4j-graphql-js'
-
+// Field names indexed here come from the literal equalityFields list in the User query,
+// never from request data.
+/* eslint-disable security/detect-object-injection */
 import { GROUP_MEMBERSHIP_VISIBILITY_CHANGED } from '@constants/subscriptions'
 import { getNeode } from '@db/neo4j'
 import { UserInputError, ForbiddenError } from '@graphql/errors'
 import { branding } from '@src/branding'
 
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
-import cypherFields, { underscoreIdResolver } from './helpers/cypherField'
+import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
 import { filterUsersHasLocation } from './helpers/filterHasLocation'
 import normalizeEmail from './helpers/normalizeEmail'
 import Resolver from './helpers/Resolver'
@@ -42,6 +43,35 @@ export const getMutedUsers = async (context) => {
   return mutedUsers
 }
 
+// Honour orderBy via a whitelist — field names are interpolated into Cypher, so they must
+// never come from raw input (Map.get avoids that injection sink). Shared by the admin
+// search path and the general User query (stage C2), so both accept exactly the values
+// _UserOrdering advertises and reject anything else instead of ignoring it.
+const USER_ORDERING = new Map<string, string>([
+  ['id_asc', 'user.id ASC'],
+  ['id_desc', 'user.id DESC'],
+  ['slug_asc', 'user.slug ASC'],
+  ['slug_desc', 'user.slug DESC'],
+  ['name_asc', 'user.name ASC'],
+  ['name_desc', 'user.name DESC'],
+  ['createdAt_asc', 'user.createdAt ASC'],
+  ['createdAt_desc', 'user.createdAt DESC'],
+  ['updatedAt_asc', 'user.updatedAt ASC'],
+  ['updatedAt_desc', 'user.updatedAt DESC'],
+])
+
+const userOrderClause = (orderBy: unknown, fallback: string): string => {
+  const entries = orderBy == null ? [] : Array.isArray(orderBy) ? orderBy : [orderBy]
+  const clauses = entries.map((entry) => {
+    const clause = USER_ORDERING.get(String(entry))
+    if (!clause) {
+      throw new UserInputError(`Unsupported orderBy '${String(entry)}' for the user search.`)
+    }
+    return clause
+  })
+  return clauses.length > 0 ? clauses.join(', ') : fallback
+}
+
 export default {
   Query: {
     mutedUsers: async (_object, _args, context, _resolveInfo) => getMutedUsers(context),
@@ -54,7 +84,7 @@ export default {
         })
       ).records.map((r) => r.get('blocked'))
     },
-    User: async (object, args, context, resolveInfo) => {
+    User: async (_object, args, context, _resolveInfo) => {
       if (args.email) {
         args.email = normalizeEmail(args.email)
         const session = context.driver.session()
@@ -109,31 +139,7 @@ export default {
             `roleName/search cannot be combined with: ${incompatible.join(', ')}.`,
           )
         }
-        // Honour orderBy via a whitelist — field names are interpolated into Cypher,
-        // so they must never come from raw input (Map.get avoids that injection sink).
-        // Defaults to newest-first, matching the admin list.
-        const userOrdering = new Map<string, string>([
-          ['id_asc', 'user.id ASC'],
-          ['id_desc', 'user.id DESC'],
-          ['slug_asc', 'user.slug ASC'],
-          ['slug_desc', 'user.slug DESC'],
-          ['name_asc', 'user.name ASC'],
-          ['name_desc', 'user.name DESC'],
-          ['createdAt_asc', 'user.createdAt ASC'],
-          ['createdAt_desc', 'user.createdAt DESC'],
-          ['updatedAt_asc', 'user.updatedAt ASC'],
-          ['updatedAt_desc', 'user.updatedAt DESC'],
-        ])
-        const orderByInput =
-          args.orderBy == null ? [] : Array.isArray(args.orderBy) ? args.orderBy : [args.orderBy]
-        const orderClauses = orderByInput.map((entry) => {
-          const clause = userOrdering.get(String(entry))
-          if (!clause) {
-            throw new UserInputError(`Unsupported orderBy '${String(entry)}' for the user search.`)
-          }
-          return clause
-        })
-        const orderBy = orderClauses.length > 0 ? orderClauses.join(', ') : 'user.createdAt DESC'
+        const orderBy = userOrderClause(args.orderBy, 'user.createdAt DESC')
 
         // Searching BY e-mail is an oracle on personal data, so gate it with the
         // SAME permission that gates reading the e-mail field (User.email shield
@@ -177,8 +183,64 @@ export default {
           await session.close()
         }
       }
+      // Stage C2: the general User lookup in hand-written Cypher.
+      //
+      // `filterUsersHasLocation` still runs first — it turns `filter.hasLocation` into an
+      // `id_in` list, and keeping that shared helper means the User and Post queries treat
+      // the location filter identically.
       args = await filterUsersHasLocation(args, context)
-      return neo4jgraphql(object, args, context, resolveInfo)
+
+      // The scalar arguments are equality matches, exactly as the generated query did.
+      // Anything else the schema advertises but this path does not implement is REJECTED
+      // rather than ignored — silently dropping a filter would widen a result set the
+      // caller believes to be narrowed. Same reasoning as the roleName/search path above.
+      const supportedFilterKeys = ['id_in']
+      const unsupported = Object.keys(args.filter ?? {}).filter(
+        (key) => !supportedFilterKeys.includes(key),
+      )
+      if (unsupported.length > 0) {
+        throw new UserInputError(`Unsupported User filter: ${unsupported.join(', ')}.`)
+      }
+
+      const equalityFields = [
+        'id',
+        'name',
+        'slug',
+        'locationName',
+        'about',
+        'createdAt',
+        'updatedAt',
+      ]
+      const conditions = equalityFields
+        .filter((field) => args[field] !== undefined && args[field] !== null)
+        // Field names come from this literal list, never from input.
+        .map((field) => `user.${field} = $${field}`)
+      if (args.filter?.id_in) conditions.push('user.id IN $filterIdIn')
+
+      const session = context.driver.session()
+      try {
+        return await session.readTransaction(async (transaction) => {
+          const result = await transaction.run(
+            `
+              MATCH (user:User)
+              ${conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''}
+              RETURN user { .* } AS user
+              ORDER BY ${userOrderClause(args.orderBy, 'user.createdAt DESC')}
+              ${args.offset ? 'SKIP toInteger($offset)' : ''}
+              ${args.first ? 'LIMIT toInteger($first)' : ''}
+            `,
+            {
+              ...Object.fromEntries(equalityFields.map((field) => [field, args[field] ?? null])),
+              filterIdIn: args.filter?.id_in ?? [],
+              offset: args.offset ?? 0,
+              first: args.first ?? 0,
+            },
+          )
+          return result.records.map((record) => unwrap(record.get('user')))
+        })
+      } finally {
+        await session.close()
+      }
     },
   },
   Mutation: {
