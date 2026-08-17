@@ -15,6 +15,18 @@ interface PagingArguments {
  * handled the same way so the rule has no exceptions to remember.
  *
  * An absent argument still means unbounded, which is what the queries did before.
+ *
+ * That unbounded path is a real exposure — one request can read every row of a label — but a
+ * server-side maximum is NOT a free fix, and deliberately is not applied here. Two client
+ * calls rely on the absence of a limit: `Category(orderBy: postCount_desc)` on the admin page
+ * and `Tag(orderBy: id_asc)` behind the hashtag autocomplete. Categories are few; tags are
+ * not, and on an active instance a cap would silently shorten that list. Trading a
+ * performance risk for quietly incomplete data is the wrong direction — the client cannot
+ * tell a truncated answer from a complete one.
+ *
+ * Bounding it properly means giving those callers an explicit `first` (or a search-driven
+ * query) FIRST, and only then enforcing a maximum here. That is a change to the webapp, not
+ * to this helper.
  */
 export const pagingClause = ({ first, offset }: PagingArguments) => {
   // Neo4j rejects a negative SKIP/LIMIT with an internal error, which surfaces as a 500 for
