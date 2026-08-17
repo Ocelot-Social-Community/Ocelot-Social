@@ -90,26 +90,9 @@ const batchBoolean = async ({ context, condition, key, ids }) => {
   return ids.map((id) => byId.get(id) ?? false)
 }
 
-export const undefinedToNullResolver = (list) => {
-  const resolvers = {}
-  list.forEach((key) => {
-    resolvers[key] = async (parent) => {
-      return typeof parent[key] === 'undefined' ? null : parent[key]
-    }
-  })
-  return resolvers
-}
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function Resolver(type, options: any = {}) {
-  const {
-    idAttribute = 'id',
-    undefinedToNull = [],
-    boolean = {},
-    count = {},
-    hasOne = {},
-    hasMany = {},
-  } = options
+  const { idAttribute = 'id', boolean = {}, count = {}, hasOne = {}, hasMany = {} } = options
 
   const _hasResolver = (_resolvers, { key, connection }, { returnType }) => {
     return async (parent, _params, context, _resolveInfo) => {
@@ -181,7 +164,6 @@ export default function Resolver(type, options: any = {}) {
   }
 
   const result = {
-    ...undefinedToNullResolver(undefinedToNull),
     ...booleanResolver(boolean),
     ...countResolver(count),
     ...hasOneResolver(hasOne),

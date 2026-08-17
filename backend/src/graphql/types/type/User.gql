@@ -156,41 +156,12 @@ type User {
   groups(first: Int, offset: Int, nameFilter: String): [Group]
 }
 
+"Filter for the User query. Scoped to what users.ts implements; anything not listed is rejected at validation time."
 input _UserFilter {
-  AND: [_UserFilter!]
-  OR: [_UserFilter!]
-  hasLocation: Boolean
-  name_contains: String
-  about_contains: String
-  slug_contains: String
-  id: ID
-  id_not: ID
+  "Restrict to these user ids."
   id_in: [ID!]
-  id_not_in: [ID!]
-  friends: _UserFilter
-  friends_not: _UserFilter
-  friends_in: [_UserFilter!]
-  friends_not_in: [_UserFilter!]
-  friends_some: _UserFilter
-  friends_none: _UserFilter
-  friends_single: _UserFilter
-  friends_every: _UserFilter
-  following: _UserFilter
-  following_not: _UserFilter
-  following_in: [_UserFilter!]
-  following_not_in: [_UserFilter!]
-  following_some: _UserFilter
-  following_none: _UserFilter
-  following_single: _UserFilter
-  following_every: _UserFilter
-  followedBy: _UserFilter
-  followedBy_not: _UserFilter
-  followedBy_in: [_UserFilter!]
-  followedBy_not_in: [_UserFilter!]
-  followedBy_some: _UserFilter
-  followedBy_none: _UserFilter
-  followedBy_single: _UserFilter
-  followedBy_every: _UserFilter
+  "Only users that have a location attached."
+  hasLocation: Boolean
 }
 
 type Query {

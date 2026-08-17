@@ -9,48 +9,31 @@ interface FilterParams {
   [key: string]: unknown
 }
 
-type AllowedLabel = 'User' | 'Post'
+// `hasLocation` is passed straight through to the Cypher builders, which turn it into an
+// EXISTS pattern. Previously both helpers ran a query that collected the id of EVERY node
+// with a location and intersected it with the filter — unbounded, and re-run per request.
+// The library could not filter on a relation; hand-written Cypher can.
 
-const getIdsWithLocation = async (context: Context, label: AllowedLabel): Promise<string[]> => {
-  const session = context.driver.session()
-  try {
-    const result = await session.readTransaction(async (transaction) => {
-      const cypher = `
-        MATCH (n:${label})-[:IS_IN]->(l:Location)
-        RETURN collect(n.id) AS ids`
-      const response = await transaction.run(cypher)
-      return response.records.map((record) => record.get('ids') as string[])
-    })
-    const [ids] = result
-    return ids
-  } finally {
-    await session.close()
-  }
-}
-
-const mergeIdIn = (existing: string[] | undefined, incoming: string[]): string[] => {
-  if (!existing) return incoming
-  return existing.filter((id) => incoming.includes(id))
-}
+export const filterPostsHasLocation = (params: FilterParams): FilterParams => params
 
 export const filterUsersHasLocation = async (
   params: FilterParams,
   context: Context,
 ): Promise<FilterParams> => {
   if (!params.filter?.hasLocation) return params
+  // The User query builds its WHERE by hand and has no operator table, so resolve it here.
   delete params.filter.hasLocation
-  const userIds = await getIdsWithLocation(context, 'User')
-  params.filter.id_in = mergeIdIn(params.filter.id_in, userIds)
-  return params
-}
-
-export const filterPostsHasLocation = async (
-  params: FilterParams,
-  context: Context,
-): Promise<FilterParams> => {
-  if (!params.filter?.hasLocation) return params
-  delete params.filter.hasLocation
-  const postIds = await getIdsWithLocation(context, 'Post')
-  params.filter.id_in = mergeIdIn(params.filter.id_in, postIds)
-  return params
+  const session = context.driver.session()
+  try {
+    const result = await session.readTransaction((transaction) =>
+      transaction.run('MATCH (u:User)-[:IS_IN]->(:Location) RETURN collect(u.id) AS ids'),
+    )
+    const ids = (result.records[0]?.get('ids') as string[] | undefined) ?? []
+    params.filter.id_in = params.filter.id_in
+      ? params.filter.id_in.filter((id) => ids.includes(id))
+      : ids
+    return params
+  } finally {
+    await session.close()
+  }
 }

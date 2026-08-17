@@ -710,7 +710,6 @@ export default {
       return result.records[0].get('count')
     },
     ...Resolver('Group', {
-      undefinedToNull: ['deleted', 'disabled', 'locationName', 'about'],
       hasMany: {
         categories: '-[:CATEGORIZED]->(related:Category)',
         posts: '<-[:IN]-(related:Post)',

@@ -267,7 +267,6 @@ export default {
   Room: {
     ...underscoreIdResolver,
     ...Resolver('Room', {
-      undefinedToNull: ['lastMessageAt'],
       hasMany: {
         users: '<-[:CHATS_IN]-(related:User)',
       },
@@ -323,6 +322,5 @@ export default {
     }),
     // Batched: a chat list of N rooms resolves in ONE Cypher statement instead of N.
     // The loader is request-scoped and already bound to the current user (context/loaders).
-
   },
 }

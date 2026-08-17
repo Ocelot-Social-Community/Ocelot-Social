@@ -77,9 +77,7 @@ const chain: (...methods: UrlResolver[]) => UrlResolver = (...methods) => {
 
 export default {
   Image: {
-    ...Resolver('Image', {
-      undefinedToNull: ['sensitive', 'alt', 'aspectRatio', 'type'],
-    }),
+    ...Resolver('Image', {}),
     transform: pointUrlToImagor({ transformations: [resize, sign] }),
   },
 }

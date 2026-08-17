@@ -2,8 +2,6 @@
 type EMOTED {
   "The reacting user."
   from: User
-  "Alias of `from`, kept so removing neo4j-graphql-js did not change the published API."
-  User: User @deprecated(reason: "Use `from`.")
   "The post reacted to."
   to: Post
 

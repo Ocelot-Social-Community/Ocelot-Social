@@ -786,21 +786,6 @@ export default {
       email: 'MATCH (this)-[:PRIMARY_EMAIL]->(e:EmailAddress) RETURN e.email',
     }),
     ...Resolver('User', {
-      undefinedToNull: [
-        'actorId',
-        'deleted',
-        'disabled',
-        'locationName',
-        'about',
-        'termsAndConditionsAgreedVersion',
-        'termsAndConditionsAgreedAt',
-        'allowEmbedIframes',
-        'showShoutsPublicly',
-        'showPublicGroupsOnProfile',
-        'showClosedGroupsOnProfile',
-        'showHiddenGroupsOnProfile',
-        'locale',
-      ],
       boolean: {
         followedByCurrentUser:
           'MATCH (this)<-[:FOLLOWS]-(u:User {id: $cypherParams.currentUserId}) RETURN COUNT(u) >= 1',

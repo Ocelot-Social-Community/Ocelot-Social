@@ -75,22 +75,6 @@ type GroupMember {
   membership: MEMBER_OF
 }
 
-input _GroupFilter {
-  AND: [_GroupFilter!]
-  OR: [_GroupFilter!]
-  name_contains: String
-  slug_contains: String
-  about_contains: String
-  description_contains: String
-  groupType_in: [GroupType!]
-  actionRadius_in: [GroupActionRadius!]
-  myRole_in: [GroupMemberRole!]
-  id: ID
-  id_not: ID
-  id_in: [ID!]
-  id_not_in: [ID!]
-}
-
 type Query {
   "List groups. Requires authentication. Filter to the current user's memberships with `isMember`, or to located groups with `hasLocation`."
   Group(

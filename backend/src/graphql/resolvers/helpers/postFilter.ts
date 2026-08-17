@@ -119,7 +119,39 @@ const translate = (
       case 'id_in':
         fragments.push({ where: `${alias}.id IN $${parameter}`, params: { [parameter]: value } })
         continue
-      // Access control: the viewer's invisible posts (filterInvisiblePosts).
+      // Access control, evaluated in the graph instead of as an id list.
+      //
+      // These two replace what filterInvisiblePosts and filterHasLocation used to do by
+      // COLLECTING every matching id and passing it in as a parameter array. For an
+      // anonymous visitor that meant every post in a non-public group — an unbounded list
+      // sent with each request, growing with the database. The library could not filter on
+      // a relation, so the ids were the only way; hand-written Cypher can just ask.
+      case 'invisibleTo': {
+        const viewerId = value as string | null
+        fragments.push(
+          viewerId
+            ? {
+                where: `NOT EXISTS { MATCH (${alias})<-[:CANNOT_SEE]-(:User { id: $${parameter} }) }`,
+                params: { [parameter]: viewerId },
+              }
+            : {
+                // Anonymous: posts inside a non-public group are not visible.
+                where: `NOT EXISTS { MATCH (${alias})-[:IN]->(g:Group) WHERE NOT g.groupType = 'public' }`,
+                params: {},
+              },
+        )
+        continue
+      }
+
+      case 'hasLocation':
+        if (!value) continue
+        fragments.push({
+          where: `EXISTS { MATCH (${alias})-[:IS_IN]->(:Location) }`,
+          params: {},
+        })
+        continue
+
+      // Kept for callers that still pass an explicit id list.
       case 'id_not_in':
         fragments.push({
           where: `NOT ${alias}.id IN $${parameter}`,

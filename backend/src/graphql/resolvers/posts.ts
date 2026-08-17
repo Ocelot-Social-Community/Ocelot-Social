@@ -136,10 +136,10 @@ export default {
       const skipPinnedFilter = !!params.filter?.skipPinnedFilter
       if (params.filter) delete params.filter.skipPinnedFilter
       params = await filterPostsOfMyGroups(params, context)
-      params = await filterInvisiblePosts(params, context)
+      params = filterInvisiblePosts(params, context)
       params = await filterForMutedUsers(params, context)
       params = filterEventDates(params)
-      params = await filterPostsHasLocation(params, context)
+      params = filterPostsHasLocation(params)
       if (!skipPinnedFilter) {
         params = await maintainPinnedPosts(params)
       }
@@ -147,9 +147,9 @@ export default {
     },
     profilePagePosts: async (_object, params, context: Context, _resolveInfo) => {
       params = await filterPostsOfMyGroups(params, context)
-      params = await filterInvisiblePosts(params, context)
+      params = filterInvisiblePosts(params, context)
       params = await filterForMutedUsers(params, context)
-      params = await filterPostsHasLocation(params, context)
+      params = filterPostsHasLocation(params)
       params = await maintainGroupPinnedPosts(params)
       return queryPosts(params, context)
     },
@@ -715,20 +715,6 @@ export default {
     // No `_id` here: unlike Room/Message/User it is not selected by the chat frontend, so
     // stage D dropped the field from Post rather than carrying the alias forward.
     ...Resolver('Post', {
-      undefinedToNull: [
-        'activityId',
-        'objectId',
-        'language',
-        'pinnedAt',
-        'pinned',
-        'groupPinned',
-        'eventVenue',
-        'eventLocation',
-        'eventLocationName',
-        'eventStart',
-        'eventEnd',
-        'eventIsOnline',
-      ],
       hasMany: {
         tags: '-[:TAGGED]->(related:Tag)',
         categories: '-[:CATEGORIZED]->(related:Category)',
@@ -775,11 +761,6 @@ export default {
         ).records.length === 1
       )
     }, */
-    // ORDER MATTERS: this spread comes after Resolver('Post') because that helper's
-    // `undefinedToNull` list also names pinnedAt and eventLocation. undefinedToNull answers
-    // `null` for anything missing on the parent, which would shadow the real resolution now
-    // that the parent is plain node properties (stage C2) instead of a neo4jgraphql
-    // projection that carried these values along.
     ...cypherFields('Post', {
       postType: {
         // The node also has a `postType` STRING property; this field is the label list.
@@ -790,15 +771,12 @@ export default {
       pinnedAt:
         'MATCH (this)<-[pinned:PINNED]-(:User) WHERE NOT this.deleted = true AND NOT this.disabled = true RETURN pinned.createdAt',
       eventLocation: 'MATCH (this)-[:IS_IN]->(l:Location) RETURN l',
-      // EMOTED is a RELATIONSHIP type (`type EMOTED @relation(...)` in EMOTED.gql), so the
-      // generated `_PostEmotions` carries the relationship properties PLUS the end node
-      // under the node's type name (`User`). The Resolver() hasMany helper only projects
-      // `related { .* }`, which drops that field — hence a dedicated statement here.
-      // (Its previous hasMany entry was `<-[related:EMOTED]`, not even valid Cypher; it
-      // never ran while the library supplied the field.)
+      // EMOTED is a relationship type: the field carries the relationship's own properties
+      // plus its endpoints. Resolver()'s hasMany helper only projects `related { .* }`,
+      // which would drop from/to — hence a dedicated statement.
       emotions: `
         MATCH (this)<-[emoted:EMOTED]-(user:User)
-        RETURN collect(emoted { .*, User: properties(user), from: properties(user), to: properties(this) })
+        RETURN collect(emoted { .*, from: properties(user), to: properties(this) })
       `,
     }),
     unreadNotificationByCurrentUser: async (parent, _params, context: Context, _resolveInfo) => {

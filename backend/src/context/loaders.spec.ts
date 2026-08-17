@@ -35,14 +35,16 @@ const run = async (cypher: string, params: Record<string, unknown> = {}) => {
 }
 
 /** Calls the real Room.unreadCount resolver with a bare parent, as a list query would. */
-const unreadCountFor = async (roomIds: string[], viewerId: string | null) => {
+const unreadCountFor = async (roomIds: string[], viewerId: string | null): Promise<number[]> => {
   const context = {
     driver,
     cypherParams: { currentUserId: viewerId },
     loaders: createLoaders(driver, viewerId),
   }
   const resolver = (resolvers as any).Room.unreadCount
-  return Promise.all(roomIds.map((id) => resolver({ id }, {}, context, {})))
+  return Promise.all(
+    roomIds.map(async (id) => resolver({ id }, {}, context, {}) as Promise<number>),
+  )
 }
 
 beforeAll(async () => {
@@ -117,11 +119,11 @@ describe('forField', () => {
   it('coalesces calls made in the same tick into one batch', async () => {
     const loaders = createLoaders(driver, 'irrelevant')
     const batches: (readonly string[])[] = []
-    const load = (id: string) =>
+    const load = async (id: string) =>
       loaders
         .forField('Probe.field', async (ids) => {
           batches.push(ids)
-          return ids.map((key) => `value-${key}`)
+          return Promise.resolve(ids.map((key) => `value-${key}`))
         })
         .load(id)
 
@@ -138,11 +140,11 @@ describe('forField', () => {
   it('reuses the loader for a key but does not memoise results', async () => {
     const loaders = createLoaders(driver, 'irrelevant')
     let calls = 0
-    const load = (id: string) =>
+    const load = async (id: string) =>
       loaders
         .forField('Probe.counter', async (ids) => {
           calls += 1
-          return ids.map(() => calls)
+          return Promise.resolve(ids.map(() => calls))
         })
         .load(id)
 
@@ -155,11 +157,11 @@ describe('forField', () => {
   it('keeps separate loaders per key', async () => {
     const loaders = createLoaders(driver, 'irrelevant')
     const seen: string[] = []
-    const load = (field: string) =>
+    const load = async (field: string) =>
       loaders
         .forField(field, async (ids) => {
           seen.push(field)
-          return ids.map(() => field)
+          return Promise.resolve(ids.map(() => field))
         })
         .load('x')
 
@@ -185,10 +187,10 @@ describe('Room.unreadCount', () => {
     )
     await expect(unreadCountFor(['room-two-unread'], reader)).resolves.toEqual([0])
 
-    await run(
-      `MATCH (:User { id: $reader })-[muted:MUTED]->(:User { id: $sender }) DELETE muted`,
-      { reader, sender },
-    )
+    await run(`MATCH (:User { id: $reader })-[muted:MUTED]->(:User { id: $sender }) DELETE muted`, {
+      reader,
+      sender,
+    })
     await expect(unreadCountFor(['room-two-unread'], reader)).resolves.toEqual([2])
   })
 

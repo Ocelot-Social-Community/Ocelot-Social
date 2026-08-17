@@ -118,8 +118,6 @@ export default {
     },
   },
   EmailAddress: {
-    ...Resolver('EmailAddress', {
-      undefinedToNull: ['verifiedAt'],
-    }),
+    ...Resolver('EmailAddress', {}),
   },
 }

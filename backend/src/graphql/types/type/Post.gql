@@ -1,99 +1,80 @@
-input _CategoryFilter {
-  AND: [_CategoryFilter!]
-  OR: [_CategoryFilter!]
-  id_in: [ID!]
-}
+"Filter for the post queries. Scoped to what helpers/postFilter.ts implements; anything not listed is rejected at validation time."
 input _PostFilter {
+  "Combine filters; every branch must match."
   AND: [_PostFilter!]
+  "Combine filters; at least one branch must match."
   OR: [_PostFilter!]
+
   id: ID
-  id_not: ID
   id_in: [ID!]
   id_not_in: [ID!]
-  author: _UserFilter
-  author_not: _UserFilter
-  author_in: [_UserFilter!]
-  author_not_in: [_UserFilter!]
   title: String
-  title_not: String
-  title_in: [String!]
-  title_not_in: [String!]
-  title_contains: String
-  title_not_contains: String
-  title_starts_with: String
-  title_not_starts_with: String
-  title_ends_with: String
-  title_not_ends_with: String
-  shoutedBy_some: _UserFilter
   slug: String
-  slug_not: String
-  slug_in: [String!]
-  slug_not_in: [String!]
-  slug_contains: String
-  slug_not_contains: String
-  slug_starts_with: String
-  slug_not_starts_with: String
-  slug_ends_with: String
-  slug_not_ends_with: String
   content: String
-  content_not: String
-  content_in: [String!]
-  content_not_in: [String!]
-  content_contains: String
-  content_not_contains: String
-  content_starts_with: String
-  content_not_starts_with: String
-  content_ends_with: String
-  content_not_ends_with: String
   visibility: Visibility
-  visibility_not: Visibility
-  visibility_in: [Visibility!]
-  visibility_not_in: [Visibility!]
   language: String
-  language_not: String
-  language_in: [String!]
-  language_not_in: [String!]
-  pinned: Boolean # required for `maintainPinnedPost`
-  groupPinned: Boolean # required for `maintainGroupPinnedPost`
-  tags: _TagFilter
-  tags_not: _TagFilter
-  tags_in: [_TagFilter!]
-  tags_not_in: [_TagFilter!]
-  tags_some: _TagFilter
-  tags_none: _TagFilter
-  tags_single: _TagFilter
-  tags_every: _TagFilter
-  categories: _CategoryFilter
-  categories_not: _CategoryFilter
-  categories_in: [_CategoryFilter!]
-  categories_not_in: [_CategoryFilter!]
-  categories_some: _CategoryFilter
-  categories_none: _CategoryFilter
-  categories_single: _CategoryFilter
-  categories_every: _CategoryFilter
-  comments: _CommentFilter
-  comments_not: _CommentFilter
-  comments_in: [_CommentFilter!]
-  comments_not_in: [_CommentFilter!]
-  comments_some: _CommentFilter
-  comments_none: _CommentFilter
-  comments_single: _CommentFilter
-  comments_every: _CommentFilter
-  emotions: _PostEMOTEDFilter
-  emotions_not: _PostEMOTEDFilter
-  emotions_in: [_PostEMOTEDFilter!]
-  emotions_not_in: [_PostEMOTEDFilter!]
-  emotions_some: _PostEMOTEDFilter
-  emotions_none: _PostEMOTEDFilter
-  emotions_single: _PostEMOTEDFilter
-  emotions_every: _PostEMOTEDFilter
-  group: _GroupFilter
-  postsInMyGroups: Boolean
+  language_in: [String]
+  createdAt: String
+  updatedAt: String
+  imageBlurred: Boolean
+  imageAspectRatio: Float
+
+  "Instance-wide pinned posts."
+  pinned: Boolean
+  "Posts pinned inside their group."
+  groupPinned: Boolean
+
+  deleted: Boolean
+  disabled: Boolean
+
+  "Restrict to these post types (Article, Event, ...)."
   postType_in: [PostType]
+  "Events starting at or after this time."
   eventStart_gte: String
+  "Events ending at or after this time."
   eventEnd_gte: String
+  "Only posts that have a location attached."
   hasLocation: Boolean
-  skipPinnedFilter: Boolean
+
+  "Posts in the groups the current user belongs to."
+  postsInMyGroups: Boolean
+  "Posts filed under any of these categories."
+  categories_some: _PostCategoriesFilter
+  "Posts carrying any of these emotions."
+  emotions_some: _PostEMOTEDFilter
+  "Filter by the post's author."
+  author: _PostAuthorFilter
+  "Exclude posts by these authors."
+  author_not: _PostAuthorIdsFilter
+  "Filter by the group the post was published in."
+  group: _PostGroupFilter
+}
+
+"Selects categories by id."
+input _PostCategoriesFilter {
+  id_in: [ID!]
+}
+
+"Selects an author, either directly or by who follows them."
+input _PostAuthorFilter {
+  id: ID
+  followedBy_some: _PostAuthorFollowedByFilter
+}
+
+"Selects authors the given user follows."
+input _PostAuthorFollowedByFilter {
+  id: ID
+}
+
+"Selects authors by id."
+input _PostAuthorIdsFilter {
+  id_in: [ID!]
+}
+
+"Selects a group, either by id or from a set."
+input _PostGroupFilter {
+  id: ID
+  id_in: [ID!]
 }
 
 enum _PostOrdering {

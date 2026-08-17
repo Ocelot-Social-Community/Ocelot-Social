@@ -244,7 +244,7 @@ describe('User', () => {
     it('rejects combining roleName/search with a structured filter', async () => {
       const { errors } = await query({
         query: searchQuery,
-        variables: { search: 'ann', filter: { id: 'mod-anna' } },
+        variables: { search: 'ann', filter: { id_in: ['mod-anna'] } },
       })
       expect(errors?.[0].message).toContain('cannot be combined with')
     })
