@@ -192,6 +192,22 @@ describe('Post', () => {
         await expect(query({ query: Post, variables })).resolves.toMatchObject(expected)
       })
 
+      // The projection is `RETURN collect(...)`, an aggregation without a grouping key, so
+      // it yields one row with [] even when nothing matched — which is why the field comes
+      // back as an empty list rather than null. Pinned down here because a later rewrite
+      // (e.g. to OPTIONAL MATCH with a different shape) could flip it to null unnoticed,
+      // and clients iterate over this field.
+      it('returns an empty list, not null, for a post without emotions', async () => {
+        await expect(query({ query: Post, variables })).resolves.toMatchObject({
+          data: {
+            Post: expect.arrayContaining([
+              expect.objectContaining({ id: 'happy-post', emotions: [] }),
+            ]),
+          },
+          errors: undefined,
+        })
+      })
+
       it('filters by multiple emotions', async () => {
         await user.relateTo(happyPost, 'emoted', { emotion: 'happy' })
         await user.relateTo(cryPost, 'emoted', { emotion: 'cry' })
