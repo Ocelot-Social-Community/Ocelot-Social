@@ -92,8 +92,16 @@ const countRoundTrips = async (
     return session
   }) as any)
 
-  const result = await setup.query({ query, variables })
-  spy.mockRestore()
+  // Restored in `finally`, because leaving the patch in place would not just skip cleanup —
+  // the next call binds `driver.session` again, this time capturing the ALREADY patched
+  // function. The instrumentation would nest and count every statement twice, so one failure
+  // here would turn into wrong numbers for the rest of the file rather than a local error.
+  let result
+  try {
+    result = await setup.query({ query, variables })
+  } finally {
+    spy.mockRestore()
+  }
 
   return { runs, errors: result.errors, rows: result.data?.[rootField]?.length ?? 0 }
 }
