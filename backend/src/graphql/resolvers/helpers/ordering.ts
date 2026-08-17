@@ -14,14 +14,29 @@ import typeDefs from '@graphql/types/index'
 // Field names are interpolated into Cypher, so they must never come from request data. They
 // do not: they come from our own SDL, and anything not in it is rejected.
 
-const orderingFields = (enumName: string): Set<string> => {
+// Memoised per enum. `typeDefs` is a module-level import that nothing mutates at runtime, so
+// the answer cannot change once computed. The saving is not the point — the scan is ~11µs
+// against a query that costs milliseconds — but the lookup is a pure function of a constant,
+// and repeating it on every request only invites someone to wonder whether it has to be there.
+const orderingFieldsCache = new Map<string, ReadonlySet<string>>()
+
+// ReadonlySet, because the returned set is now SHARED between requests rather than built
+// fresh each time — a caller that added to it would corrupt every later validation.
+const orderingFields = (enumName: string): ReadonlySet<string> => {
+  const cached = orderingFieldsCache.get(enumName)
+  if (cached) return cached
+
   for (const definition of typeDefs.definitions) {
     if (definition.kind !== Kind.ENUM_TYPE_DEFINITION) continue
     if (definition.name.value !== enumName) continue
-    return new Set(
+    const fields = new Set(
       (definition.values ?? []).map((value) => value.name.value.replace(/_(asc|desc)$/, '')),
     )
+    orderingFieldsCache.set(enumName, fields)
+    return fields
   }
+  // Not cached: a missing enum is a schema error, and caching the failure would only make it
+  // harder to see if the schema were ever built differently in the same process.
   throw new Error(`Ordering enum ${enumName} not found in the schema.`)
 }
 
