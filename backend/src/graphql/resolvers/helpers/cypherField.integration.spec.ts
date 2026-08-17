@@ -44,6 +44,27 @@ beforeAll(async () => {
     cypherParams: { currentUserId: 'nobody' },
     loaders: createLoaders(setup.database.driver, 'nobody'),
   } as unknown as Context
+
+  // Every fixture is built HERE, not inside the test that first needs it. Several cases read
+  // the same node, and creating it in one of them would make the others depend on execution
+  // order — `it.only`, a `-t` filter or a reordering would leave the node missing, and the
+  // assertion then fails with "expected '' but got null". That reads like a broken fallback,
+  // which is exactly the thing under test, so the misleading message would point at the code
+  // instead of at the setup.
+  //
+  // A user without a primary email address — a state the product supports.
+  await Factory.build('userWithoutEmailAddress', { id: 'no-mail' })
+  await setup.database.write({
+    query: `
+      // A direct room left without its other participant.
+      CREATE (:Room { id: 'lonely-room' })
+      // A message that outlived its author, so the CREATED edge is gone.
+      CREATE (:Message { id: 'orphan-message', createdAt: '2026-01-01T00:00:00.000Z' })
+      // Nodes for the aggregate counter-example, with nothing pointing at them.
+      CREATE (:Tag { id: 'unused-tag' })
+      CREATE (:Category { id: 'empty-cat', name: 'Empty' })
+    `,
+  })
 })
 
 afterAll(async () => {
@@ -57,25 +78,17 @@ describe('non-null fields with missing data', () => {
   it('resolves User.email for a user that has no primary email', async () => {
     // Supported state — hence the factory. Erroring here would lock such a user out of
     // their own settings page, since the error takes the entire User with it.
-    await Factory.build('userWithoutEmailAddress', { id: 'no-mail' })
-
     await expect(resolve('User', 'email', { id: 'no-mail' })).resolves.toBe('')
   })
 
   it('resolves Room.roomName for a direct room without a remaining partner', async () => {
     // Neither a group name nor a partner name to coalesce — what a direct room looks like
     // once the other participant is deleted.
-    await setup.database.write({ query: `CREATE (:Room { id: 'lonely-room' })` })
-
     await expect(resolve('Room', 'roomName', { id: 'lonely-room' })).resolves.toBe('')
   })
 
   it('resolves Message.senderId and username for a message whose author is gone', async () => {
     // Deleting a user detaches the CREATED edge; the message itself survives.
-    await setup.database.write({
-      query: `CREATE (:Message { id: 'orphan-message', createdAt: '2026-01-01T00:00:00.000Z' })`,
-    })
-
     await expect(resolve('Message', 'senderId', { id: 'orphan-message' })).resolves.toBe('')
     await expect(resolve('Message', 'username', { id: 'orphan-message' })).resolves.toBe('')
   })
@@ -83,9 +96,6 @@ describe('non-null fields with missing data', () => {
   it('resolves aggregates to 0 without needing a fallback', async () => {
     // The counter-example that keeps the fallbacks above narrow: an aggregation produces a
     // row even when it counts nothing, so these fields cannot go null in the first place.
-    await setup.database.write({ query: `CREATE (:Tag { id: 'unused-tag' })` })
-    await setup.database.write({ query: `CREATE (:Category { id: 'empty-cat', name: 'Empty' })` })
-
     await expect(resolve('Tag', 'taggedCount', { id: 'unused-tag' })).resolves.toBe(0)
     await expect(resolve('Tag', 'taggedCountUnique', { id: 'unused-tag' })).resolves.toBe(0)
     await expect(resolve('Category', 'postCount', { id: 'empty-cat' })).resolves.toBe(0)
