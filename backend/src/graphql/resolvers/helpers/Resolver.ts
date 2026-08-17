@@ -71,10 +71,18 @@ const batchCount = async ({ context, type, idAttribute, connection, ids }) => {
   })
 }
 
-const batchBoolean = async ({ context, condition, key, ids }) => {
-  // The condition is a complete `MATCH (this)… RETURN <expr>` statement. A CALL subquery
-  // runs it per parent without having to parse or rewrite its body; only `this` is bound.
-  const bound = condition.replace('this', 'this { id: __id }')
+const batchBoolean = async ({ context, type, idAttribute, condition, key, ids }) => {
+  // The condition is a complete `MATCH (this)… RETURN <expr>` statement, run unchanged inside
+  // a CALL subquery with only `this` bound — the same approach as helpers/cypherField.ts.
+  //
+  // `this` is bound by a PRECEDING match, not by editing the condition. Substituting into it
+  // (`condition.replace('this', 'this { id: __id }')`) produced a pattern with neither label
+  // nor idAttribute, and the label is what makes this affordable: for a condition that offers
+  // no other indexed anchor — `MATCH (this) RETURN EXISTS(…)`, as Group.isMutedByMe and
+  // Comment.shoutedByCurrentUser are written — the planner answered with an AllNodesScan of
+  // the entire database per request, against a NodeUniqueIndexSeek once the label is there.
+  // It was also wrong on its own terms: any node of any type sharing the id could match, and
+  // a condition beginning `MATCH (this:User)` would have been rewritten into invalid Cypher.
   const { byId } = await runBatch({
     context,
     ids,
@@ -82,7 +90,8 @@ const batchBoolean = async ({ context, condition, key, ids }) => {
       UNWIND $ids AS __id
       CALL {
         WITH __id
-        ${bound} AS ${key}
+        MATCH (this:${type} { ${idAttribute}: __id })
+        ${condition} AS ${key}
       }
       RETURN __id AS __id, ${key} AS __value
     `,
@@ -122,7 +131,9 @@ export default function Resolver(type, options: any = {}) {
         if (id === undefined || id === null) return false
 
         return context.loaders
-          .forField(`${type}.${key}`, async (ids) => batchBoolean({ context, condition, key, ids }))
+          .forField(`${type}.${key}`, async (ids) =>
+            batchBoolean({ context, type, idAttribute, condition, key, ids }),
+          )
           .load(id)
       }
     }
