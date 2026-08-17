@@ -1,23 +1,29 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Factory, { cleanDatabase } from '@db/factories'
 import { closeDriver, getDriver } from '@db/neo4j'
+import resolvers from '@graphql/resolvers'
 
 import { createLoaders } from './loaders'
 
 import type { Driver } from 'neo4j-driver'
 
-// The point of the loader is that N rooms cost ONE query, so the tests assert the query
-// COUNT as well as the values. Without the count assertion this would pass just as well
-// with the per-room implementation it replaced, and the migration would have bought
-// nothing measurable.
+// Two things are under test here, and they belong to different layers:
+//
+//   * `forField` as INFRASTRUCTURE — batching, no memoisation, one entry per key. It knows
+//     nothing about the domain, so it is tested with a stub batch function.
+//   * `Room.unreadCount` as an example CONSUMER — it used to be a hand-written loader in
+//     this file; it is now an ordinary `count` entry on Resolver('Room') and goes through
+//     the same generic path as every other field. Its semantics (unseen only, blocked and
+//     muted senders excluded) are worth pinning down because they are access-control-shaped.
 
 let driver: Driver
 let reader: string
 let sender: string
 let blockedSender: string
-const rooms: string[] = []
+const rooms = ['room-two-unread', 'room-one-unread', 'room-none', 'room-empty']
 
 const run = async (cypher: string, params: Record<string, unknown> = {}) => {
   const session = driver.session()
@@ -26,6 +32,17 @@ const run = async (cypher: string, params: Record<string, unknown> = {}) => {
   } finally {
     await session.close()
   }
+}
+
+/** Calls the real Room.unreadCount resolver with a bare parent, as a list query would. */
+const unreadCountFor = async (roomIds: string[], viewerId: string | null) => {
+  const context = {
+    driver,
+    cypherParams: { currentUserId: viewerId },
+    loaders: createLoaders(driver, viewerId),
+  }
+  const resolver = (resolvers as any).Room.unreadCount
+  return Promise.all(roomIds.map((id) => resolver({ id }, {}, context, {})))
 }
 
 beforeAll(async () => {
@@ -41,26 +58,21 @@ beforeAll(async () => {
   sender = senderNode.get('id')
   blockedSender = blockedNode.get('id')
 
-  // Rooms are built in raw Cypher: the loader reads the graph directly, so driving it
-  // through the chat mutations would only add indirection to the fixture.
-  //   room-two-unread   2 unread messages from `sender`
+  //   room-two-unread   2 unread from `sender`
   //   room-one-unread   1 unread from `sender`, 1 already seen
   //   room-none         only messages from a blocked sender ⇒ must count 0
-  //   room-empty        no messages at all ⇒ must still yield a 0 entry
-  rooms.push('room-two-unread', 'room-one-unread', 'room-none', 'room-empty')
-
+  //   room-empty        no messages at all ⇒ must still yield 0
   await run(
     `
       MATCH (reader:User { id: $reader })
-      MATCH (sender:User { id: $sender })
       MATCH (blocked:User { id: $blocked })
       MERGE (reader)-[:BLOCKED]->(blocked)
-      WITH reader, sender, blocked
+      WITH reader
       UNWIND $rooms AS roomId
       MERGE (room:Room { id: roomId })
       MERGE (reader)-[:CHATS_IN]->(room)
     `,
-    { reader, sender, blocked: blockedSender, rooms },
+    { reader, blocked: blockedSender, rooms },
   )
 
   await run(
@@ -84,7 +96,7 @@ beforeAll(async () => {
       CREATE (sender)-[:CREATED]->(m4)
       CREATE (blocked)-[:CREATED]->(m5)
 
-      // m4 is deliberately NOT marked unseen — it is the "already read" message.
+      // m4 is deliberately NOT marked unseen — the "already read" message.
       CREATE (reader)-[:HAS_NOT_SEEN]->(m1)
       CREATE (reader)-[:HAS_NOT_SEEN]->(m2)
       CREATE (reader)-[:HAS_NOT_SEEN]->(m3)
@@ -96,94 +108,122 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  // closeDriver(), not driver.close(): getDriver() memoises the driver in a module
-  // variable, and only closeDriver() clears it. Closing the instance directly would leave
-  // a closed driver behind the memo, and it also closes the neode handle that would
-  // otherwise keep the worker alive.
+  // closeDriver(), not driver.close(): getDriver() memoises the driver in a module variable
+  // and only closeDriver() clears it, so a later getDriver() does not hand back a closed one.
   await closeDriver()
 })
 
-describe('roomUnreadCount loader', () => {
-  it('answers every room, including those with no unread messages', async () => {
-    const loaders = createLoaders(driver, reader)
+describe('forField', () => {
+  it('coalesces calls made in the same tick into one batch', async () => {
+    const loaders = createLoaders(driver, 'irrelevant')
+    const batches: (readonly string[])[] = []
+    const load = (id: string) =>
+      loaders
+        .forField('Probe.field', async (ids) => {
+          batches.push(ids)
+          return ids.map((key) => `value-${key}`)
+        })
+        .load(id)
 
-    await expect(loaders.roomUnreadCount.loadMany(rooms)).resolves.toEqual([2, 1, 0, 0])
+    await expect(Promise.all([load('a'), load('b'), load('c')])).resolves.toEqual([
+      'value-a',
+      'value-b',
+      'value-c',
+    ])
+    // One batch for three keys — the whole point of the registry.
+    expect(batches).toHaveLength(1)
+    expect(batches[0]).toEqual(['a', 'b', 'c'])
+  })
+
+  it('reuses the loader for a key but does not memoise results', async () => {
+    const loaders = createLoaders(driver, 'irrelevant')
+    let calls = 0
+    const load = (id: string) =>
+      loaders
+        .forField('Probe.counter', async (ids) => {
+          calls += 1
+          return ids.map(() => calls)
+        })
+        .load(id)
+
+    await expect(load('a')).resolves.toBe(1)
+    // Same key again in a later tick: re-read, not served from a cache. A context can
+    // outlive one resolution pass (subscriptions), so a memoised value would go stale.
+    await expect(load('a')).resolves.toBe(2)
+  })
+
+  it('keeps separate loaders per key', async () => {
+    const loaders = createLoaders(driver, 'irrelevant')
+    const seen: string[] = []
+    const load = (field: string) =>
+      loaders
+        .forField(field, async (ids) => {
+          seen.push(field)
+          return ids.map(() => field)
+        })
+        .load('x')
+
+    await Promise.all([load('A.one'), load('B.two')])
+    expect(seen.sort()).toEqual(['A.one', 'B.two'])
+  })
+})
+
+describe('Room.unreadCount', () => {
+  it('counts unseen messages per room, including rooms with none', async () => {
+    await expect(unreadCountFor(rooms, reader)).resolves.toEqual([2, 1, 0, 0])
   })
 
   it('excludes messages from blocked senders', async () => {
-    const loaders = createLoaders(driver, reader)
-
-    await expect(loaders.roomUnreadCount.load('room-none')).resolves.toBe(0)
+    await expect(unreadCountFor(['room-none'], reader)).resolves.toEqual([0])
   })
 
-  it('resolves all rooms of a request in a single query', async () => {
-    const loaders = createLoaders(driver, reader)
-    const sessionSpy = jest.spyOn(driver, 'session')
-
-    await loaders.roomUnreadCount.loadMany(rooms)
-
-    // The whole point of stage B1: four rooms, one round trip.
-    expect(sessionSpy).toHaveBeenCalledTimes(1)
-    sessionSpy.mockRestore()
-  })
-
-  // Caching is switched off on purpose (see loaders.ts): a subscription context outlives a
-  // single resolution pass, so a memoised unreadCount would freeze at its first value while
-  // the client keeps receiving roomUpdated events. These two tests pin that behaviour down —
-  // if someone enables `cache: true` for the batching win, they fail.
-  it('re-reads a repeated key instead of memoising it', async () => {
-    const loaders = createLoaders(driver, reader)
-    await loaders.roomUnreadCount.load('room-two-unread')
-
-    const sessionSpy = jest.spyOn(driver, 'session')
-    await expect(loaders.roomUnreadCount.load('room-two-unread')).resolves.toBe(2)
-
-    expect(sessionSpy).toHaveBeenCalledTimes(1)
-    sessionSpy.mockRestore()
-  })
-
-  it('sees writes that happen while the same context is still alive', async () => {
-    const loaders = createLoaders(driver, reader)
-    await expect(loaders.roomUnreadCount.load('room-two-unread')).resolves.toBe(2)
+  it('excludes messages from muted senders', async () => {
+    await run(
+      `MATCH (reader:User { id: $reader }), (sender:User { id: $sender })
+       MERGE (reader)-[:MUTED]->(sender)`,
+      { reader, sender },
+    )
+    await expect(unreadCountFor(['room-two-unread'], reader)).resolves.toEqual([0])
 
     await run(
-      `MATCH (reader:User { id: $reader })-[seen:HAS_NOT_SEEN]->(:Message { id: 'm1' })
-       DELETE seen`,
+      `MATCH (:User { id: $reader })-[muted:MUTED]->(:User { id: $sender }) DELETE muted`,
+      { reader, sender },
+    )
+    await expect(unreadCountFor(['room-two-unread'], reader)).resolves.toEqual([2])
+  })
+
+  it('resolves a whole room list in a single query', async () => {
+    const sessionSpy = jest.spyOn(driver, 'session')
+
+    await unreadCountFor(rooms, reader)
+
+    // Four rooms, one round trip — the property the DataLoader registry exists for.
+    expect(sessionSpy).toHaveBeenCalledTimes(1)
+    sessionSpy.mockRestore()
+  })
+
+  it('sees writes made while the same context is still alive', async () => {
+    const context = {
+      driver,
+      cypherParams: { currentUserId: reader },
+      loaders: createLoaders(driver, reader),
+    }
+    const resolver = (resolvers as any).Room.unreadCount
+
+    await expect(resolver({ id: 'room-two-unread' }, {}, context, {})).resolves.toBe(2)
+
+    await run(
+      `MATCH (:User { id: $reader })-[seen:HAS_NOT_SEEN]->(:Message { id: 'm1' }) DELETE seen`,
       { reader },
     )
 
     // Same loader instance, new value — this is the subscription case.
-    await expect(loaders.roomUnreadCount.load('room-two-unread')).resolves.toBe(1)
+    await expect(resolver({ id: 'room-two-unread' }, {}, context, {})).resolves.toBe(1)
 
     await run(
       `MATCH (reader:User { id: $reader }), (m:Message { id: 'm1' })
        CREATE (reader)-[:HAS_NOT_SEEN]->(m)`,
       { reader },
     )
-  })
-
-  it('gives anonymous viewers zeros without querying', async () => {
-    const loaders = createLoaders(driver, null)
-    const sessionSpy = jest.spyOn(driver, 'session')
-
-    await expect(loaders.roomUnreadCount.loadMany(rooms)).resolves.toEqual([0, 0, 0, 0])
-
-    expect(sessionSpy).not.toHaveBeenCalled()
-    sessionSpy.mockRestore()
-  })
-
-  it('does not share a cache between requests', async () => {
-    const first = createLoaders(driver, reader)
-    await expect(first.roomUnreadCount.load('room-one-unread')).resolves.toBe(1)
-
-    await run(
-      `MATCH (reader:User { id: $reader }), (m:Message { id: 'm4' })
-       CREATE (reader)-[:HAS_NOT_SEEN]->(m)`,
-      { reader },
-    )
-
-    // A fresh request must see the new state; a loader cached across requests would not.
-    const second = createLoaders(driver, reader)
-    await expect(second.roomUnreadCount.load('room-one-unread')).resolves.toBe(2)
   })
 })

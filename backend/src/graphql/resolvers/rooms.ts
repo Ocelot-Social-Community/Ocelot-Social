@@ -274,6 +274,20 @@ export default {
       hasOne: {
         group: '-[:ROOM_FOR]->(related:Group)',
       },
+      count: {
+        // Unread messages for the current viewer, ignoring blocked and muted senders.
+        // Expressed through the generic count helper so it batches like every other field
+        // — it used to be a hand-written loader in context/loaders.ts, which is now pure
+        // infrastructure. Anchoring on CREATED keeps the original semantics: only messages
+        // that actually have an author count.
+        unreadCount: `<-[:INSIDE]-(related:Message)<-[:CREATED]-(sender:User)
+          WHERE EXISTS {
+            MATCH (viewer:User { id: $cypherParams.currentUserId })-[:HAS_NOT_SEEN]->(related)
+          }
+          AND NOT EXISTS {
+            MATCH (viewer:User { id: $cypherParams.currentUserId })-[:BLOCKED|MUTED]->(sender)
+          }`,
+      },
     }),
     // Statements lifted verbatim from the @cypher directives in Room.gql. Without these,
     // a Room that did not come from a neo4jgraphql() translation — every roomUpdated
@@ -309,9 +323,6 @@ export default {
     }),
     // Batched: a chat list of N rooms resolves in ONE Cypher statement instead of N.
     // The loader is request-scoped and already bound to the current user (context/loaders).
-    unreadCount: async (parent, _args, context) => {
-      if (!parent?.id) return 0
-      return context.loaders.roomUnreadCount.load(parent.id)
-    },
+
   },
 }
