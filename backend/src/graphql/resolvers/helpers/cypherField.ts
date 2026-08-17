@@ -69,12 +69,28 @@ interface CypherFieldOptions {
  * so the schema's own default never gets applied. Mirror the SDL default here.
  */
 type FieldStatement =
-  string | { statement: string; defaults?: Record<string, unknown>; always?: boolean }
+  | string
+  | {
+      statement: string
+      defaults?: Record<string, unknown>
+      always?: boolean
+      /**
+       * Value to use when the statement yields nothing.
+       *
+       * REQUIRED for non-null fields whose data can legitimately be missing. GraphQL refuses
+       * null there and propagates the error to the nearest nullable ancestor, which removes
+       * the WHOLE parent object from the response — one deleted chat partner would blank the
+       * room, one author-less message the message. An aggregate returns 0 on its own
+       * (`RETURN count(...)` is an aggregation and always produces a row), so this is only
+       * for the lookups: an unmatched MATCH produces no row at all.
+       */
+      fallback?: unknown
+    }
 
 const normalise = (spec: FieldStatement) =>
   typeof spec === 'string'
-    ? { statement: spec, defaults: {}, always: false }
-    : { defaults: {}, always: false, ...spec }
+    ? { statement: spec, defaults: {}, always: false, fallback: undefined }
+    : { defaults: {}, always: false, fallback: undefined, ...spec }
 
 /**
  * Builds field resolvers from `{ fieldName: cypherStatement }`, where the statement is the
@@ -93,7 +109,7 @@ export default function cypherFields(
   const resolvers: Record<string, unknown> = {}
 
   for (const [key, spec] of Object.entries(statements)) {
-    const { statement, defaults, always } = normalise(spec)
+    const { statement, defaults, always, fallback } = normalise(spec)
 
     resolvers[key] = async (parent: any, params: any, context: Context) => {
       // `always` disables the pass-through for fields whose NAME collides with a node
@@ -137,7 +153,10 @@ export default function cypherFields(
                 byId.set(record.get('__id'), record.get('__value'))
               // An id with no row is a legitimate empty answer — what the directive produced
               // too — but DataLoader still needs one entry per key, in key order.
-              return ids.map((id) => (byId.has(id) ? unwrap(byId.get(id)) : null))
+              return ids.map((id) => {
+                const value = byId.has(id) ? unwrap(byId.get(id)) : null
+                return value ?? fallback ?? null
+              })
             })
           } finally {
             await session.close()

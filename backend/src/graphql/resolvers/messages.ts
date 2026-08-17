@@ -363,8 +363,17 @@ export default {
     // Verbatim from the @cypher directives in Message.gql. senderId/username/date are
     // non-null, so an unresolved one kills the chatMessageAdded payload it appears in.
     ...cypherFields('Message', {
-      senderId: 'MATCH (this)<-[:CREATED]-(user:User) RETURN user.id',
-      username: 'MATCH (this)<-[:CREATED]-(user:User) RETURN user.name',
+      // A message whose author is gone matches nothing and returns no row at all —
+      // verified against the database. Both fields are non-null, so the fallback keeps the
+      // message (and the payload carrying it) intact instead of losing it to the author.
+      senderId: {
+        statement: 'MATCH (this)<-[:CREATED]-(user:User) RETURN user.id',
+        fallback: '',
+      },
+      username: {
+        statement: 'MATCH (this)<-[:CREATED]-(user:User) RETURN user.name',
+        fallback: '',
+      },
       avatar: 'MATCH (this)<-[:CREATED]-(:User)-[:AVATAR_IMAGE]->(image:Image) RETURN image.url',
       date: 'RETURN this.createdAt',
       seen: `

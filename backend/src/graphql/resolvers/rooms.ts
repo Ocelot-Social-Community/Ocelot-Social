@@ -298,13 +298,20 @@ export default {
         OPTIONAL MATCH (this)-[:ROOM_FOR]->(g:Group)
         RETURN g IS NOT NULL
       `,
-      roomName: `
-        OPTIONAL MATCH (this)-[:ROOM_FOR]->(g:Group)
-        WITH this, g
-        OPTIONAL MATCH (this)<-[:CHATS_IN]-(user:User)
-        WHERE g IS NULL AND NOT user.id = $cypherParams.currentUserId
-        RETURN COALESCE(g.name, user.name)
-      `,
+      roomName: {
+        statement: `
+          OPTIONAL MATCH (this)-[:ROOM_FOR]->(g:Group)
+          WITH this, g
+          OPTIONAL MATCH (this)<-[:CHATS_IN]-(user:User)
+          WHERE g IS NULL AND NOT user.id = $cypherParams.currentUserId
+          RETURN COALESCE(g.name, user.name)
+        `,
+        // A direct room whose other participant was deleted has neither a group name nor a
+        // partner name, so the COALESCE yields null — verified against the database. The
+        // field is non-null, so without this the room, and with it the whole chat list,
+        // would drop out of the response over one deleted account.
+        fallback: '',
+      },
       avatar: `
         OPTIONAL MATCH (this)-[:ROOM_FOR]->(g:Group)
         OPTIONAL MATCH (g)-[:AVATAR_IMAGE]->(groupImg:Image)

@@ -762,7 +762,13 @@ export default {
     // Verbatim from User.gql. Who may READ this field is enforced separately by the
     // graphql-shield rule on User.email; this resolver only fetches it.
     ...cypherFields('User', {
-      email: 'MATCH (this)-[:PRIMARY_EMAIL]->(e:EmailAddress) RETURN e.email',
+      // A user without a primary email is a supported state — see the
+      // `userWithoutEmailAddress` factory. The field is non-null, so the fallback keeps such
+      // a user readable rather than erroring out of their own settings page.
+      email: {
+        statement: 'MATCH (this)-[:PRIMARY_EMAIL]->(e:EmailAddress) RETURN e.email',
+        fallback: '',
+      },
     }),
     ...Resolver('User', {
       boolean: {

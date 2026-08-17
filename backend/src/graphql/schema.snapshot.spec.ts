@@ -16,8 +16,8 @@ import { buildSchemaSdl, schemaSdlFile } from './print-schema'
 // schema. Its companion is webappQueries.spec.ts, which checks the other direction: that
 // what the client sends still fits what the schema offers.
 //
-// The SDL is derived from typeDefs + the augmentation config only, so this needs no env,
-// no database and no .gql require-hook.
+// The SDL is derived from typeDefs alone, so this needs no env, no database and no .gql
+// require-hook.
 describe('schema.graphql snapshot', () => {
   // Line-set comparison rather than toEqual() on the whole string: a 4000-line diff is
   // unreadable in the reporter, and it reports every following line as changed when a
