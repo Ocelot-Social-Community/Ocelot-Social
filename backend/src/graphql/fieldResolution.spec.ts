@@ -371,15 +371,47 @@ describe('@cypher / @relation field resolution', () => {
           .map((fieldName) => [typeName, fieldName] as const),
     )
 
-    // Compares the two paths rather than just checking the resolver returns something:
-    // a mis-wired relation (wrong direction, wrong edge name) yields an empty list, which
-    // is perfectly "defined". Shape differs between the paths — the library returns the
-    // sub-selection we asked for, the resolver returns whole nodes — so compare what is
-    // comparable: list length, presence for single objects, value for scalars.
-    const comparable = (value: unknown): unknown => {
-      if (Array.isArray(value)) return { kind: 'list', length: value.length }
-      if (value === null || value === undefined) return { kind: 'empty' }
-      if (typeof value === 'object') return { kind: 'object' }
+    // Compares the two paths rather than just checking the resolver returns something: a
+    // mis-wired relation that yields an empty list is perfectly "defined".
+    //
+    // SCOPE, since it is easy to overestimate: while neo4j-graphql-js existed, the root
+    // query was an INDEPENDENT implementation and this really did cross-check the resolver
+    // against it. It is gone, so both paths now run the same resolver and differ only in
+    // the parent they get — a full node from the root projection (which lets the
+    // pass-through guard fire) versus a bare { id }. What this catches is the two
+    // disagreeing; whether the resolver fetches the RIGHT node is on the behavioural specs
+    // (posts.spec.ts and friends), which assert actual values.
+    //
+    // The two paths return different SHAPES — through the root query a field carries only
+    // the sub-selection that buildSelection asked for, called directly it carries whole
+    // nodes — so they are compared on identity rather than deep equality. The identity key
+    // is the very scalar buildSelection selected (representativeScalarFields), so it is
+    // present on both sides.
+    //
+    // null and undefined are kept APART on purpose: a field resolved through GraphQL is
+    // always null when empty, never undefined, so `undefined` on the direct path means the
+    // resolver returned nothing at all — exactly the failure this suite exists to catch.
+    const identityOf = (value: unknown, key: string | undefined): unknown => {
+      if (value === null || typeof value !== 'object' || !key) return null
+      return (value as Record<string, unknown>)[key] ?? null
+    }
+
+    const comparable = (value: unknown, namedType: string): unknown => {
+      const key = scalarFor[namedType]
+      if (value === undefined) return { kind: 'undefined' }
+      if (value === null) return { kind: 'null' }
+      if (Array.isArray(value)) {
+        // Sorted: the two paths may order a relation differently, which is not what this
+        // test is about — membership is.
+        return {
+          kind: 'list',
+          keys: value
+            .map((entry) => identityOf(entry, key))
+            .map((entry) => String(entry))
+            .sort((a, b) => a.localeCompare(b)),
+        }
+      }
+      if (typeof value === 'object') return { kind: 'object', key: identityOf(value, key) }
       return { kind: 'scalar', value }
     }
 
@@ -388,7 +420,7 @@ describe('@cypher / @relation field resolution', () => {
         ([typeName]) => parentFor()[typeName] !== undefined && PROBES[typeName],
       ),
     )(
-      '%s.%s resolves from a bare { id } parent, matching the library',
+      '%s.%s resolves from a bare { id } parent, matching the root-query path',
       async (typeName, fieldName) => {
         const resolver = (resolvers as Record<string, Record<string, (...args: any[]) => unknown>>)[
           typeName
@@ -431,7 +463,9 @@ describe('@cypher / @relation field resolution', () => {
         const instances = probe.extract(data ?? {}) as Record<string, unknown>[]
         const viaLibrary = instances[0]?.[fieldName]
 
-        expect(comparable(viaResolver)).toEqual(comparable(viaLibrary))
+        expect(comparable(viaResolver, field.namedType)).toEqual(
+          comparable(viaLibrary, field.namedType),
+        )
       },
     )
   })
