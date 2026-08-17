@@ -69,7 +69,23 @@ const FILTER_FIXTURES: Record<string, unknown> = {
   tags_some: { id: 'hashtag' },
   comments_some: { author: { id: 'u1' } },
   shoutedBy_some: { id: 'u1' },
+
+  // Suffix-free filters the webapp also sends. The extraction above cannot find these — the
+  // names are ordinary object keys — so they are listed by hand, from reading the call sites:
+  // pages/profile/…/_slug.vue (author.id, and author.followedBy_some via store/posts.js) and
+  // pages/groups/…/_slug.vue (group.id).
+  author: { id: 'u1' },
+  group: { id: 'g1' },
 }
+
+/**
+ * Filters a WRAPPER rewrites before postFilterToCypher ever sees them, so they must be
+ * declared on `_PostFilter` but would be rejected by the translation.
+ *
+ * `postsInMyGroups` is a client-facing flag; filterPostsOfMyGroups turns it into the
+ * `inGroupsOf` operator, which carries the viewer whose memberships decide the answer.
+ */
+const TRANSLATED_BY_A_WRAPPER = ['postsInMyGroups']
 
 const readSources = (): string[] => {
   const files: string[] = []
@@ -135,6 +151,18 @@ describe('post filters used by the webapp', () => {
     const withoutFixture = expectedOnPostFilter.filter((key) => !(key in FILTER_FIXTURES))
 
     expect(withoutFixture).toEqual([])
+  })
+
+  it('declares every hand-listed filter on _PostFilter', () => {
+    // Covers the suffix-free filters the extraction cannot see. They are checked here rather
+    // than trusted, because they fail exactly like the three that broke: schema-valid
+    // document, request rejected during variable coercion.
+    const declared = postFilterFields()
+    const undeclared = [...Object.keys(FILTER_FIXTURES), ...TRANSLATED_BY_A_WRAPPER].filter(
+      (key) => !declared.has(key),
+    )
+
+    expect(undeclared).toEqual([])
   })
 
   it.each(Object.keys(FILTER_FIXTURES))('translates %s to Cypher', (key) => {
