@@ -98,6 +98,29 @@ const filterEventDates = (params) => {
   return params
 }
 
+// _CommentOrdering, whitelisted because the field name is interpolated into Cypher.
+const COMMENT_ORDERING = new Map<string, string>([
+  ['id_asc', 'comment.id ASC'],
+  ['id_desc', 'comment.id DESC'],
+  ['content_asc', 'comment.content ASC'],
+  ['content_desc', 'comment.content DESC'],
+  ['createdAt_asc', 'comment.createdAt ASC'],
+  ['createdAt_desc', 'comment.createdAt DESC'],
+  ['updatedAt_asc', 'comment.updatedAt ASC'],
+  ['updatedAt_desc', 'comment.updatedAt DESC'],
+])
+
+const commentOrderClause = (orderBy: unknown): string => {
+  const entries = orderBy == null ? [] : Array.isArray(orderBy) ? orderBy : [orderBy]
+  const clauses = entries.map((entry) => {
+    const clause = COMMENT_ORDERING.get(String(entry))
+    if (!clause) throw new UserInputError(`Unsupported orderBy '${String(entry)}' for comments.`)
+    return clause
+  })
+  // Oldest first matches how a comment thread reads, and what the webapp asks for.
+  return clauses.length > 0 ? clauses.join(', ') : 'comment.createdAt ASC'
+}
+
 // Shared execution for Post and profilePagePosts (stage C2). Both build the same filter
 // tree through the wrappers above and then differ only in which pinned-post rule they
 // applied, so the query itself is identical.
@@ -715,7 +738,6 @@ export default {
       hasMany: {
         tags: '-[:TAGGED]->(related:Tag)',
         categories: '-[:CATEGORIZED]->(related:Category)',
-        comments: '<-[:COMMENTS]-(related:Comment)',
         shoutedBy: '<-[:SHOUTED]-(related:User)',
       },
       hasOne: {
@@ -758,6 +780,45 @@ export default {
         ).records.length === 1
       )
     }, */
+    // `comments` takes an orderBy argument, which the hasMany helper cannot express, so it
+    // gets its own batched resolver. The sort runs inside the collect() so each post keeps
+    // its own ordering — sorting the flattened batch would be meaningless.
+    comments: async (parent, params: { orderBy?: unknown }, context: Context) => {
+      if (typeof parent?.comments !== 'undefined') return parent.comments
+      if (!parent?.id) return []
+
+      const order = commentOrderClause(params.orderBy)
+      return (
+        context.loaders
+          // The clause is part of the key: a batch sorted createdAt_asc must not answer a
+          // request for createdAt_desc.
+          .forField(`Post.comments:${order}`, async (ids) => {
+            const session = context.driver.session()
+            try {
+              return await session.readTransaction(async (transaction) => {
+                const result = await transaction.run(
+                  `
+                  UNWIND $ids AS __id
+                  MATCH (post:Post { id: __id })
+                  OPTIONAL MATCH (post)<-[:COMMENTS]-(comment:Comment)
+                  WITH __id, comment ORDER BY ${order}
+                  RETURN __id AS __id, collect(comment { .* }) AS __value
+                `,
+                  { ids },
+                )
+                const byId = new Map<unknown, unknown>()
+                for (const record of result.records) {
+                  byId.set(record.get('__id'), record.get('__value'))
+                }
+                return ids.map((id) => unwrap(byId.get(id) ?? []))
+              })
+            } finally {
+              await session.close()
+            }
+          })
+          .load(parent.id as string)
+      )
+    },
     ...cypherFields('Post', {
       postType: {
         // The node also has a `postType` STRING property; this field is the label list.

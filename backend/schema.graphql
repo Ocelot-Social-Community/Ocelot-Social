@@ -1302,7 +1302,9 @@ type Post {
 
   """Number of times the post has been opened."""
   clickedCount: Int!
-  comments: [Comment]!
+
+  """Comments on this post. `orderBy` defaults to oldest first."""
+  comments(orderBy: [_CommentOrdering]): [Comment]!
 
   """Number of visible (non-deleted, non-disabled) comments."""
   commentsCount: Int!
