@@ -23,7 +23,16 @@ let driver: Driver
 let reader: string
 let sender: string
 let blockedSender: string
+// Rooms the read-only assertions share. Tests that need to WRITE get their own room below,
+// so no test depends on another having cleaned up after itself — a restore that runs after
+// the assertions is skipped when one of them fails, and the next test then breaks somewhere
+// unrelated to its cause.
 const rooms = ['room-two-unread', 'room-one-unread', 'room-none', 'room-empty']
+/** Own room + own muted sender, so the mute case needs no fixture mutation at all. */
+const MUTED_ROOM = 'room-muted'
+/** Own room for the write-visibility test, whose mutation must not reach anything else. */
+const LIVE_ROOM = 'room-live'
+let mutedSender: string
 
 const run = async (cypher: string, params: Record<string, unknown> = {}) => {
   const session = driver.session()
@@ -51,14 +60,16 @@ beforeAll(async () => {
   await cleanDatabase()
   driver = getDriver()
 
-  const [readerNode, senderNode, blockedNode] = await Promise.all([
+  const [readerNode, senderNode, blockedNode, mutedNode] = await Promise.all([
     Factory.build('user', { name: 'Reader' }),
     Factory.build('user', { name: 'Sender' }),
     Factory.build('user', { name: 'Blocked' }),
+    Factory.build('user', { name: 'Muted' }),
   ])
   reader = readerNode.get('id')
   sender = senderNode.get('id')
   blockedSender = blockedNode.get('id')
+  mutedSender = mutedNode.get('id')
 
   //   room-two-unread   2 unread from `sender`
   //   room-one-unread   1 unread from `sender`, 1 already seen
@@ -68,13 +79,20 @@ beforeAll(async () => {
     `
       MATCH (reader:User { id: $reader })
       MATCH (blocked:User { id: $blocked })
+      MATCH (muted:User { id: $muted })
       MERGE (reader)-[:BLOCKED]->(blocked)
+      MERGE (reader)-[:MUTED]->(muted)
       WITH reader
       UNWIND $rooms AS roomId
       MERGE (room:Room { id: roomId })
       MERGE (reader)-[:CHATS_IN]->(room)
     `,
-    { reader, blocked: blockedSender, rooms },
+    {
+      reader,
+      blocked: blockedSender,
+      muted: mutedSender,
+      rooms: [...rooms, MUTED_ROOM, LIVE_ROOM],
+    },
   )
 
   await run(
@@ -82,29 +100,38 @@ beforeAll(async () => {
       MATCH (reader:User { id: $reader })
       MATCH (sender:User { id: $sender })
       MATCH (blocked:User { id: $blocked })
+      MATCH (muted:User { id: $muted })
       MATCH (twoUnread:Room { id: 'room-two-unread' })
       MATCH (oneUnread:Room { id: 'room-one-unread' })
       MATCH (none:Room { id: 'room-none' })
+      MATCH (mutedRoom:Room { id: 'room-muted' })
+      MATCH (liveRoom:Room { id: 'room-live' })
 
       CREATE (m1:Message { id: 'm1' })-[:INSIDE]->(twoUnread)
       CREATE (m2:Message { id: 'm2' })-[:INSIDE]->(twoUnread)
       CREATE (m3:Message { id: 'm3' })-[:INSIDE]->(oneUnread)
       CREATE (m4:Message { id: 'm4' })-[:INSIDE]->(oneUnread)
       CREATE (m5:Message { id: 'm5' })-[:INSIDE]->(none)
+      CREATE (m6:Message { id: 'm6' })-[:INSIDE]->(mutedRoom)
+      CREATE (m7:Message { id: 'm7' })-[:INSIDE]->(liveRoom)
 
       CREATE (sender)-[:CREATED]->(m1)
       CREATE (sender)-[:CREATED]->(m2)
       CREATE (sender)-[:CREATED]->(m3)
       CREATE (sender)-[:CREATED]->(m4)
       CREATE (blocked)-[:CREATED]->(m5)
+      CREATE (muted)-[:CREATED]->(m6)
+      CREATE (sender)-[:CREATED]->(m7)
 
       // m4 is deliberately NOT marked unseen — the "already read" message.
       CREATE (reader)-[:HAS_NOT_SEEN]->(m1)
       CREATE (reader)-[:HAS_NOT_SEEN]->(m2)
       CREATE (reader)-[:HAS_NOT_SEEN]->(m3)
       CREATE (reader)-[:HAS_NOT_SEEN]->(m5)
+      CREATE (reader)-[:HAS_NOT_SEEN]->(m6)
+      CREATE (reader)-[:HAS_NOT_SEEN]->(m7)
     `,
-    { reader, sender, blocked: blockedSender },
+    { reader, sender, blocked: blockedSender, muted: mutedSender },
   )
 })
 
@@ -179,19 +206,10 @@ describe('Room.unreadCount', () => {
     await expect(unreadCountFor(['room-none'], reader)).resolves.toEqual([0])
   })
 
+  // MUTED is filtered by the same clause as BLOCKED (`[:BLOCKED|MUTED]`), so a typo would
+  // take out both at once — worth its own case rather than trusting the blocked one.
   it('excludes messages from muted senders', async () => {
-    await run(
-      `MATCH (reader:User { id: $reader }), (sender:User { id: $sender })
-       MERGE (reader)-[:MUTED]->(sender)`,
-      { reader, sender },
-    )
-    await expect(unreadCountFor(['room-two-unread'], reader)).resolves.toEqual([0])
-
-    await run(`MATCH (:User { id: $reader })-[muted:MUTED]->(:User { id: $sender }) DELETE muted`, {
-      reader,
-      sender,
-    })
-    await expect(unreadCountFor(['room-two-unread'], reader)).resolves.toEqual([2])
+    await expect(unreadCountFor([MUTED_ROOM], reader)).resolves.toEqual([0])
   })
 
   it('resolves a whole room list in a single query', async () => {
@@ -204,6 +222,8 @@ describe('Room.unreadCount', () => {
     sessionSpy.mockRestore()
   })
 
+  // Writes into LIVE_ROOM only, which nothing else reads — so this test needs no restore
+  // step, and a failing assertion cannot leave the shared fixture behind for the next one.
   it('sees writes made while the same context is still alive', async () => {
     const context = {
       driver,
@@ -212,20 +232,15 @@ describe('Room.unreadCount', () => {
     }
     const resolver = (resolvers as any).Room.unreadCount
 
-    await expect(resolver({ id: 'room-two-unread' }, {}, context, {})).resolves.toBe(2)
+    await expect(resolver({ id: LIVE_ROOM }, {}, context, {})).resolves.toBe(1)
 
     await run(
-      `MATCH (:User { id: $reader })-[seen:HAS_NOT_SEEN]->(:Message { id: 'm1' }) DELETE seen`,
+      `MATCH (:User { id: $reader })-[seen:HAS_NOT_SEEN]->(:Message { id: 'm7' }) DELETE seen`,
       { reader },
     )
 
-    // Same loader instance, new value — this is the subscription case.
-    await expect(resolver({ id: 'room-two-unread' }, {}, context, {})).resolves.toBe(1)
-
-    await run(
-      `MATCH (reader:User { id: $reader }), (m:Message { id: 'm1' })
-       CREATE (reader)-[:HAS_NOT_SEEN]->(m)`,
-      { reader },
-    )
+    // Same loader instance, new value — this is the subscription case. A memoising loader
+    // would still answer 1 here.
+    await expect(resolver({ id: LIVE_ROOM }, {}, context, {})).resolves.toBe(0)
   })
 })
