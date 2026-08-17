@@ -142,7 +142,6 @@ type User {
 
   "personal inviteCodes the user has generated"
   inviteCodes: [InviteCode]!
-  # inviteCodes: [InviteCode]!
 
   "The invite code this user redeemed on registration, if any."
   redeemedInviteCode: InviteCode
