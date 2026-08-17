@@ -58,27 +58,8 @@ export const getRoomProperties = async (roomId, session) => {
   })
 }
 
-const toJsNumber = (value) => {
-  if (value == null) return 0
-  if (typeof value === 'number') return value
-  if (typeof value.toNumber === 'function') return value.toNumber()
-  return Number(value) || 0
-}
-
-export const getRoomUnreadCountForUser = async (roomId, userId, session) => {
-  return session.readTransaction(async (transaction) => {
-    const result = await transaction.run(
-      `
-        MATCH (u:User { id: $userId })-[:HAS_NOT_SEEN]->(message:Message)-[:INSIDE]->(room:Room { id: $roomId })
-        MATCH (message)<-[:CREATED]-(sender:User)
-        WHERE NOT (u)-[:BLOCKED]->(sender) AND NOT (u)-[:MUTED]->(sender)
-        RETURN count(DISTINCT message) AS cnt
-      `,
-      { userId, roomId },
-    )
-    return toJsNumber(result.records[0]?.get('cnt'))
-  })
-}
+// The per-room unread count moved to context/loaders.ts, where the same Cypher answers
+// every room of a request in one statement. Nothing calls it one room at a time any more.
 
 export const roomUpdatedFilter = (payload, variables, context) => {
   return payload.userId === context.user?.id
@@ -285,15 +266,11 @@ export default {
         group: '-[:ROOM_FOR]->(related:Group)',
       },
     }),
+    // Batched: a chat list of N rooms resolves in ONE Cypher statement instead of N.
+    // The loader is request-scoped and already bound to the current user (context/loaders).
     unreadCount: async (parent, _args, context) => {
-      const currentUserId = context.cypherParams?.currentUserId
-      if (!currentUserId || !parent?.id) return 0
-      const session = context.driver.session()
-      try {
-        return await getRoomUnreadCountForUser(parent.id, currentUserId, session)
-      } finally {
-        await session.close()
-      }
+      if (!parent?.id) return 0
+      return context.loaders.roomUnreadCount.load(parent.id)
     },
   },
 }

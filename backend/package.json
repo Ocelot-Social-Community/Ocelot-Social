@@ -50,6 +50,7 @@
     "body-parser": "^2.3.0",
     "cheerio": "~1.2.0",
     "cross-env": "~10.1.0",
+    "dataloader": "^2.2.3",
     "dotenv": "~17.0.1",
     "email-templates": "^13.0.1",
     "express": "^4.22.1",
