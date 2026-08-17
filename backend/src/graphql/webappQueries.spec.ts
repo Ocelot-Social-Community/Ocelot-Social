@@ -11,7 +11,7 @@ import path from 'node:path'
 
 import { buildSchema, Kind, parse, Source, validate } from 'graphql'
 
-import { buildAugmentedSdl } from './print-schema'
+import { buildSchemaSdl } from './print-schema'
 
 // Validates the webapp's GraphQL documents against the backend schema.
 //
@@ -103,7 +103,7 @@ const PARAMETERISED_FRAGMENTS = ['User', 'Group'].map(
 
 describe('webapp GraphQL documents', () => {
   it('are valid against the backend schema', () => {
-    const schema = buildSchema(buildAugmentedSdl())
+    const schema = buildSchema(buildSchemaSdl())
     const templates = collectTemplates()
 
     // Guard the harness itself: a broken path would make this pass vacuously.

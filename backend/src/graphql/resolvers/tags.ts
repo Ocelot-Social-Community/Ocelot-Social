@@ -25,10 +25,9 @@ const tagQuery = nodeQuery({
   filterFields: ['id_in'],
 })
 
-// Like categories.ts: no root resolver, only field resolvers, so Tag's fields stop
-// depending on a neo4jgraphql() translation being in flight. See the migration plan, B2/B3.
+// The Tag query and its field resolvers, hand-written since the neo4j-graphql-js migration.
 //
-// Unfiltered on purpose — mirrors the directives they replace.
+// `taggedPosts` is unfiltered on purpose — it mirrors the @relation directive it replaced.
 export default {
   Query: {
     Tag: async (_object, params: NodeQueryParams, context: Context, _resolveInfo) =>

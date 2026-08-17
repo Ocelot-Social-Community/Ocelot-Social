@@ -18,7 +18,7 @@ import typeDefs from '@graphql/types/index'
 //
 // Sorting lexicographically keeps the output deterministic across runs regardless of file
 // load order, so regenerating without API changes yields an identical file.
-export const buildAugmentedSdl = (): string =>
+export const buildSchemaSdl = (): string =>
   printSchema(lexicographicSortSchema(makeExecutableSchema({ typeDefs }))) + '\n'
 
 // Committed to git (NOT a build artefact) so that `git diff` shows API changes in review
@@ -29,7 +29,7 @@ export const schemaSdlFile = path.resolve(__dirname, '../../schema.graphql')
 // which the snapshot test does — must not touch the file it is about to verify.
 if (require.main === module) {
   // eslint-disable-next-line n/no-sync
-  writeFileSync(schemaSdlFile, buildAugmentedSdl(), 'utf-8')
+  writeFileSync(schemaSdlFile, buildSchemaSdl(), 'utf-8')
 
   // eslint-disable-next-line no-console
   console.log(`Wrote schema SDL to ${schemaSdlFile}`)

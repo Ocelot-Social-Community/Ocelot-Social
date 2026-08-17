@@ -1,21 +1,20 @@
 import { readFileSync } from 'node:fs'
 
-import { buildAugmentedSdl, schemaSdlFile } from './print-schema'
+import { buildSchemaSdl, schemaSdlFile } from './print-schema'
 
 // Guards the PUBLIC API surface. `schema.graphql` is committed, so every change to it
 // shows up as a reviewable diff; this test fails when the generated SDL and the committed
 // file drift apart.
 //
-// Why this matters beyond ordinary review hygiene: neo4j-graphql-js generates a large part
-// of the schema (queries, filters, orderBy) from directives in the .gql files. While that
-// library is being replaced step by step, an edit meant to be internal can change the SDL
-// as a side effect. Without this test the first symptom would be a broken frontend query.
+// Why this matters beyond ordinary review hygiene: the SDL is the contract the webapp and
+// any API-key client compile against, and it is easy to change one without meaning to. The
+// committed file turns that into a reviewable diff instead of a runtime surprise.
 //
-// What it does NOT catch: removing a @cypher/@relation directive leaves the printed SDL
-// unchanged (graphql-js prints directive *definitions*, not their *application* to fields).
-// That is exactly the edit the migration makes, so the SDL snapshot is the guard against
-// collateral damage, not against the migration's own failure mode — field resolution is
-// covered separately by the field-selection tests.
+// It was written during the neo4j-graphql-js migration, where the library generated a large
+// part of the schema and an edit meant to be internal could shift the SDL underneath us.
+// The library is gone, but the guard is just as useful now that the .gql files ARE the
+// schema. Its companion is webappQueries.spec.ts, which checks the other direction: that
+// what the client sends still fits what the schema offers.
 //
 // The SDL is derived from typeDefs + the augmentation config only, so this needs no env,
 // no database and no .gql require-hook.
@@ -33,7 +32,7 @@ describe('schema.graphql snapshot', () => {
   it('matches the generated SDL — run `yarn schema:print` and commit if this fails', () => {
     // eslint-disable-next-line n/no-sync, security/detect-non-literal-fs-filename
     const committed = readFileSync(schemaSdlFile, 'utf-8').split('\n')
-    const generated = buildAugmentedSdl().split('\n')
+    const generated = buildSchemaSdl().split('\n')
 
     expect({
       addedToSchema: linesOnlyIn(generated, committed),

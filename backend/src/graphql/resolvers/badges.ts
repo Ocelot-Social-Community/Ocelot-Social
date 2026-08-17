@@ -198,10 +198,11 @@ export default {
     },
   },
   Badge: {
-    // No `_id` resolver here: Badge is in the augmentation `exclude` list, so the library
-    // never generates the field for it and Apollo rejects a resolver without a schema field.
-    // Both edges point FROM the badge TO the user (see the @relation directives in
-    // Badge.gql and the `direction: 'in'` on User.rewarded).
+    // Badge has no `_id` field, unlike Room/Message/User: neo4j-graphql-js excluded this
+    // type from augmentation, so it was never generated here and there was nothing to carry
+    // forward as an alias.
+    //
+    // Both edges point FROM the badge TO the user (see `direction: 'in'` on User.rewarded).
     ...Resolver('Badge', {
       hasMany: {
         rewarded: '-[:REWARDED]->(related:User)',

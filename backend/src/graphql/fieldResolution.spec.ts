@@ -24,16 +24,18 @@ import type { DirectiveField } from '@root/test/directiveInventory'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
-// Every field that neo4j-graphql-js resolves via @cypher / @relation, actually selected
-// against a populated database.
+// Every field that neo4j-graphql-js used to resolve via @cypher / @relation, actually
+// selected against a populated database.
 //
-// The work list is DERIVED from the .gql files (test/directiveInventory.ts), not hand-
-// maintained: a new directive field with no probe fails the completeness test below, and a
-// directive that loses its resolution during the migration fails its type's selection test.
+// The work list comes from MIGRATION_FIELD_REGISTRY — deliberately frozen rather than
+// derived, because deriving it from the directives would have deleted each test together
+// with the directive it was meant to guard. The fields are still in the schema and still
+// have to resolve, so they are still listed.
 //
-// This is the guard the SDL snapshot test cannot be: removing a @cypher directive does not
-// change the printed schema at all (printSchema outputs directive DEFINITIONS, not their
-// APPLICATION to fields), so nothing but actually resolving the field detects the loss.
+// This was the guard the SDL snapshot test could not be: removing a @cypher directive did
+// not change the printed schema at all (printSchema outputs directive DEFINITIONS, not
+// their APPLICATION), so only resolving a field could detect the loss. With the directives
+// gone it keeps that role for the resolvers that replaced them.
 
 let setup: ApolloTestSetup
 let authenticatedUser: Context['user']
