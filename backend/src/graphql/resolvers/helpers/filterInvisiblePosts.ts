@@ -1,9 +1,5 @@
+import type { PostQueryParams } from './postFilter'
 import type { Context } from '@src/context'
-
-interface FilterParams {
-  filter?: Record<string, unknown>
-  [key: string]: unknown
-}
 
 // Marks the query so postFilterToCypher can express visibility as a graph condition.
 //
@@ -15,7 +11,10 @@ interface FilterParams {
 //
 // Kept as a wrapper rather than inlined into the resolvers so the two post queries cannot
 // drift apart on something this close to access control.
-export const filterInvisiblePosts = (params: FilterParams, context: Context): FilterParams => ({
+export const filterInvisiblePosts = (
+  params: PostQueryParams,
+  context: Context,
+): PostQueryParams => ({
   ...params,
   filter: { ...params.filter, invisibleTo: context.user?.id ?? null },
 })

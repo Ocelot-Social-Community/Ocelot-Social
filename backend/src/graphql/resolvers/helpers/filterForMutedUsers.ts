@@ -1,11 +1,5 @@
+import type { PostQueryParams } from './postFilter'
 import type { Context } from '@src/context'
-
-interface FilterParams {
-  filter?: Record<string, unknown>
-  id?: string
-  slug?: string
-  [key: string]: unknown
-}
 
 // Marks the query so postFilterToCypher can exclude muted authors as a graph condition.
 //
@@ -16,7 +10,7 @@ interface FilterParams {
 //
 // Single-post lookups by id or slug keep skipping the filter: navigating directly to a post
 // should show it even if its author is muted.
-export const filterForMutedUsers = (params: FilterParams, context: Context): FilterParams => {
+export const filterForMutedUsers = (params: PostQueryParams, context: Context): PostQueryParams => {
   if (!context.user || params.id || params.slug) return params
   return { ...params, filter: { ...params.filter, mutedBy: context.user.id } }
 }

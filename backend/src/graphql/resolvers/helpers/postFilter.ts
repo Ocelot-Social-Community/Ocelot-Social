@@ -20,6 +20,30 @@ import { orderClause } from './ordering'
 //
 // Values are always bound as parameters; only fixed, code-defined strings are interpolated.
 
+/**
+ * Arguments of the Post / profilePagePosts queries, as they travel through the filter
+ * wrappers on their way here.
+ *
+ * Shared on purpose. filterInvisiblePosts, filterForMutedUsers and filterPostsOfMyGroups each
+ * declared their own copy, and the copies had already diverged — only one of them knew about
+ * `id` and `slug`, the very fields it uses to exempt single-post lookups from muting. The
+ * three run as a CHAIN, each handing its output to the next and the last to this module, so a
+ * type that describes something slightly different in the middle of that chain is a type that
+ * describes nothing.
+ *
+ * The index signature is what makes the scalar arguments (title, slug, visibility, …) usable
+ * without listing every one of them; `id` and `slug` are named because wrappers read them.
+ */
+export interface PostQueryParams {
+  filter?: Record<string, unknown>
+  id?: string
+  slug?: string
+  first?: number | null
+  offset?: number | null
+  orderBy?: unknown
+  [argument: string]: unknown
+}
+
 interface CypherFragment {
   /** Boolean Cypher expression over the `post` alias, or null when nothing constrains. */
   where: string | null
@@ -349,10 +373,7 @@ const translate = (
  * Turns the resolver's `params` (scalar arguments plus `filter`) into one WHERE expression.
  * Returns `where: null` when nothing constrains the query.
  */
-export const postFilterToCypher = (
-  params: Record<string, unknown>,
-  alias = 'post',
-): CypherFragment => {
+export const postFilterToCypher = (params: PostQueryParams, alias = 'post'): CypherFragment => {
   let counter = 0
   const next = () => `pf${String(counter++)}`
 
