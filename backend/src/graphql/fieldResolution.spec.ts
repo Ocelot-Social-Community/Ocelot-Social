@@ -524,7 +524,13 @@ describe('@cypher / @relation field resolution', () => {
       it.each(nonNullFields.map((field) => [field.name, field] as const))(
         'resolves non-null %s to a value',
         async (fieldName, field) => {
-          const { instances } = await resolveField(field)
+          const { errors, instances } = await resolveField(field)
+
+          // Asserted before indexing: without these, a failed query or an empty probe turns
+          // into "Cannot read properties of undefined", which names neither the field nor
+          // the cause. On a non-null field the message IS the value of this test.
+          expect(errors).toBeUndefined()
+          expect(instances.length).toBeGreaterThan(0)
 
           expect(instances[0][fieldName]).not.toBeNull()
         },
