@@ -20,6 +20,7 @@ let authenticatedUser: Context['user']
 let rolesOverride: RoleDefinition[] | undefined
 const context = () => ({ authenticatedUser, roles: rolesOverride })
 let mutate: ApolloTestSetup['mutate']
+let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
@@ -27,6 +28,7 @@ beforeAll(async () => {
   await cleanDatabase()
   const apolloSetup = await createApolloTestSetup({ context })
   mutate = apolloSetup.mutate
+  query = apolloSetup.query
   database = apolloSetup.database
   server = apolloSetup.server
 })
@@ -83,6 +85,62 @@ const setupPostAndComment = async () => {
     content: 'The comment is updated',
   }
 }
+
+describe('Comment query', () => {
+  // The default ordering is a deliberate behaviour change: neo4j-graphql-js emitted no
+  // ORDER BY without an explicit `orderBy`, so the order was whatever the database returned.
+  // Paging over an unordered result is unstable by definition, hence a fixed default —
+  // oldest first, because a comment list reads as a thread. Pinned down here so the choice
+  // cannot be lost silently.
+  it('returns comments oldest first when no orderBy is given', async () => {
+    await setupPostAndComment()
+    authenticatedUser = await commentAuthor.toJson()
+
+    // Distinct, deliberately out-of-order timestamps: insertion order must not be what
+    // makes this pass.
+    await database.write({
+      query: `
+        MATCH (post:Post { id: 'p1' })
+        CREATE (c1:Comment { id: 'ordered-2', content: 'second', createdAt: '2020-02-02T00:00:00.000Z' })-[:COMMENTS]->(post)
+        CREATE (c2:Comment { id: 'ordered-1', content: 'first', createdAt: '2020-01-01T00:00:00.000Z' })-[:COMMENTS]->(post)
+      `,
+    })
+
+    const { data, errors } = await query({
+      query: '{ Comment(filter: { id_in: ["ordered-1", "ordered-2"] }) { id } }',
+    })
+
+    expect(errors).toBeUndefined()
+    expect((data.Comment as { id: string }[]).map((comment) => comment.id)).toEqual([
+      'ordered-1',
+      'ordered-2',
+    ])
+  })
+
+  it('honours an explicit orderBy', async () => {
+    await setupPostAndComment()
+    authenticatedUser = await commentAuthor.toJson()
+
+    await database.write({
+      query: `
+        MATCH (post:Post { id: 'p1' })
+        CREATE (c1:Comment { id: 'ordered-2', content: 'second', createdAt: '2020-02-02T00:00:00.000Z' })-[:COMMENTS]->(post)
+        CREATE (c2:Comment { id: 'ordered-1', content: 'first', createdAt: '2020-01-01T00:00:00.000Z' })-[:COMMENTS]->(post)
+      `,
+    })
+
+    const { data, errors } = await query({
+      query:
+        '{ Comment(filter: { id_in: ["ordered-1", "ordered-2"] }, orderBy: createdAt_desc) { id } }',
+    })
+
+    expect(errors).toBeUndefined()
+    expect((data.Comment as { id: string }[]).map((comment) => comment.id)).toEqual([
+      'ordered-2',
+      'ordered-1',
+    ])
+  })
+})
 
 describe('CreateComment', () => {
   describe('unauthenticated', () => {

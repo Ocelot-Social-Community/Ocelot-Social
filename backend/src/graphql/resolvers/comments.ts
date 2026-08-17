@@ -19,7 +19,8 @@ const commentQuery = nodeQuery({
   equalityFields: ['id', 'content', 'createdAt', 'updatedAt'],
   softDeleteFields: ['deleted', 'disabled'],
   orderingEnum: '_CommentOrdering',
-  defaultOrder: 'comment.createdAt ASC',
+  // Oldest first: a comment list reads as a thread.
+  defaultOrder: { field: 'createdAt', direction: 'ASC' as const },
   filterFields: ['id_in'],
 })
 

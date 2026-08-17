@@ -21,7 +21,7 @@ const tagQuery = nodeQuery({
     taggedCountUnique:
       'size(apoc.coll.toSet([(tag)<-[:TAGGED]-(:Post)<-[:WROTE]-(u:User) | u.id]))',
   },
-  defaultOrder: 'tag.id ASC',
+  defaultOrder: { field: 'id', direction: 'ASC' as const },
   filterFields: ['id_in'],
 })
 

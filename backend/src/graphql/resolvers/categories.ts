@@ -12,7 +12,7 @@ const categoryQuery = nodeQuery({
   // postCount is a @cypher field, not a stored property — sorting by `category.postCount`
   // would compare nulls and quietly do nothing.
   computedOrder: { postCount: 'size([(category)<-[:CATEGORIZED]-(p:Post) | p])' },
-  defaultOrder: 'category.name ASC',
+  defaultOrder: { field: 'name', direction: 'ASC' as const },
 })
 
 // The Category query and its field resolvers. Both used to come from neo4j-graphql-js —

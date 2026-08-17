@@ -40,8 +40,17 @@ interface NodeQueryConfig {
   softDeleteFields?: string[]
   /** The `_*Ordering` enum defining what callers may sort by. */
   orderingEnum: string
-  /** ORDER BY used when the caller passes none. */
-  defaultOrder: string
+  /**
+   * ORDER BY used when the caller passes none, given as field + direction so the alias stays
+   * derived from `label` instead of being repeated here.
+   *
+   * NOTE — this is a deliberate behaviour change: neo4j-graphql-js emitted no ORDER BY at all
+   * without an explicit `orderBy`, leaving the order up to the database. Paging (`first` /
+   * `offset`) over an unordered result is unstable by definition — the same offset can return
+   * the same row twice or skip one — so these queries now always order. Each consumer picks
+   * the key that matches how its data reads.
+   */
+  defaultOrder: { field: string; direction: 'ASC' | 'DESC' }
   /** Sortable fields that are NOT stored properties, mapped to their expression. */
   computedOrder?: Record<string, string>
   /** Filter keys understood here — everything else raises. */
@@ -83,7 +92,7 @@ export const nodeQuery =
     const order = orderClause(params.orderBy, {
       enumName: orderingEnum,
       alias,
-      fallback: defaultOrder,
+      fallback: `${alias}.${defaultOrder.field} ${defaultOrder.direction}`,
       computed: config.computedOrder,
     })
 
