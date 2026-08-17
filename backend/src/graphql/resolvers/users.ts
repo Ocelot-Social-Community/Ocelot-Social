@@ -13,7 +13,7 @@ import { UserInputError, ForbiddenError } from '@graphql/errors'
 import { branding } from '@src/branding'
 
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
-import cypherFields from './helpers/cypherField'
+import cypherFields, { underscoreIdResolver } from './helpers/cypherField'
 import { filterUsersHasLocation } from './helpers/filterHasLocation'
 import normalizeEmail from './helpers/normalizeEmail'
 import Resolver from './helpers/Resolver'
@@ -702,6 +702,7 @@ export default {
         await session.close()
       }
     },
+    ...underscoreIdResolver,
     // Verbatim from User.gql. Who may READ this field is enforced separately by the
     // graphql-shield rule on User.email; this resolver only fetches it.
     ...cypherFields('User', {

@@ -8,6 +8,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable security/detect-object-injection */
+import { unwrap } from './cypherField'
+
 export const undefinedToNullResolver = (list) => {
   const resolvers = {}
   list.forEach((key) => {
@@ -41,7 +43,11 @@ export default function Resolver(type, options: any = {}) {
           RETURN related {.*} as related
           `
           const result = await txc.run(cypher, { id, cypherParams })
-          return result.records.map((r) => r.get('related'))
+          // unwrap: `related { .* }` hands back raw Bolt values, and an integer property
+          // among them ({low, high}) fails GraphQL's Int serialiser. While neo4j-graphql-js
+          // still translates the parent query this branch rarely runs, but it is the only
+          // path left once the library is gone.
+          return result.records.map((r) => unwrap(r.get('related')))
         })
         if (returnType === 'object') response = response[0] || null
         return response

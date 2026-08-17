@@ -6,11 +6,10 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/no-shadow */
 import { withFilter } from 'graphql-subscriptions'
-import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import { ROOM_UPDATED } from '@constants/subscriptions'
 
-import cypherFields from './helpers/cypherField'
+import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
 import Resolver from './helpers/Resolver'
 
 // excludeGroupRooms: when the groups feature is off, group rooms must not count towards the
@@ -76,7 +75,7 @@ export default {
     },
   },
   Query: {
-    Room: async (object, params, context, resolveInfo) => {
+    Room: async (_object, params, context, _resolveInfo) => {
       // Group chat is gated by the groups feature: while it is off, no group room is served
       // (not fetched by groupId, not listed) and its messages are blocked (see messages.ts).
       // Existing rooms/messages stay in the DB and reappear when the feature is re-enabled.
@@ -104,14 +103,14 @@ export default {
               groupId: params.groupId || null,
             })
           })
-          const rooms = result.records.map((record) => record.get('room'))
+          const rooms = result.records.map((record) => unwrap(record.get('room')))
           if (rooms.length === 0) return []
-          // Re-query via neo4jgraphql to get all computed fields
-          delete params.userId
-          delete params.groupId
-          params.filter = { users_some: { id: context.user.id } }
-          params.id = rooms[0].id
-          return neo4jgraphql(object, params, context, resolveInfo)
+          // The match above already restricts to rooms the current user CHATS_IN, so the
+          // authorisation the old `users_some` filter provided is covered here. Computed
+          // fields no longer need the second pass through neo4jgraphql — Room's field
+          // resolvers fetch them from these plain properties.
+          // Kept to one room, as the previous `params.id = rooms[0].id` did.
+          return [rooms[0]]
         } finally {
           await session.close()
         }
@@ -133,9 +132,26 @@ export default {
             await session.close()
           }
         }
-        if (!params.filter) params.filter = {}
-        params.filter.users_some = { id: context.user.id }
-        return neo4jgraphql(object, params, context, resolveInfo)
+        // AUTHORISATION: the CHATS_IN edge in this match is what used to be the
+        // `filter.users_some = { id: currentUser }` handed to neo4jgraphql — and on this
+        // branch it is the ONLY membership check. A room the user does not chat in must
+        // not match, so the edge belongs in the pattern, not in a WHERE that could be
+        // relaxed later.
+        const session = context.driver.session()
+        try {
+          const result = await session.readTransaction((transaction) =>
+            transaction.run(
+              `
+                MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
+                RETURN room { .* } AS room
+              `,
+              { currentUserId: context.user.id, roomId: params.id },
+            ),
+          )
+          return result.records.map((record) => unwrap(record.get('room')))
+        } finally {
+          await session.close()
+        }
       }
 
       // Room list with cursor-based pagination sorted by latest activity
@@ -160,7 +176,7 @@ export default {
             WITH room, g, COALESCE(room.lastMessageAt, room.createdAt) AS sortDate,
                  COALESCE(g.name, otherUser.name) AS roomName
             ${whereClause}
-            RETURN room.id AS id
+            RETURN room { .* } AS room
             ORDER BY sortDate DESC
             LIMIT toInteger($first)
           `
@@ -171,22 +187,13 @@ export default {
             search,
           })
         })
-        const roomIds: string[] = result.records.map((record) => record.get('id') as string)
-        if (roomIds.length === 0) return []
-        // Batch query via neo4jgraphql with id_in filter (avoids N+1)
-        const roomParams = {
-          filter: {
-            id_in: roomIds,
-            users_some: { id: context.user.id },
-          },
-        }
-        const rooms = await neo4jgraphql(object, roomParams, context, resolveInfo)
-        // Preserve the sort order from the cursor query
-        const orderMap = new Map<string, number>(roomIds.map((id, i) => [id, i]))
-        return (rooms || []).sort(
-          (a: { id: string }, b: { id: string }) =>
-            (orderMap.get(a.id) || 0) - (orderMap.get(b.id) || 0),
-        )
+        // Returns the rooms themselves rather than ids for a second, neo4jgraphql-driven
+        // batch query. That second pass existed only to fill the computed fields, which
+        // Room's own field resolvers now handle — so the whole round trip disappears, and
+        // with it the re-sorting that had to undo the batch query's arbitrary order.
+        // Membership is enforced by the CHATS_IN edge in the match above (previously the
+        // `users_some` filter).
+        return result.records.map((record) => unwrap(record.get('room')))
       } finally {
         await session.close()
       }
@@ -258,6 +265,7 @@ export default {
     },
   },
   Room: {
+    ...underscoreIdResolver,
     ...Resolver('Room', {
       undefinedToNull: ['lastMessageAt'],
       hasMany: {

@@ -6,7 +6,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { withFilter } from 'graphql-subscriptions'
-import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import CONFIG from '@config/index'
 import {
@@ -17,7 +16,7 @@ import {
 import { ForbiddenError } from '@graphql/errors'
 
 import { attachments } from './attachments/attachments'
-import cypherFields from './helpers/cypherField'
+import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
 import Resolver from './helpers/Resolver'
 import { getRoomProperties, groupChatGated, roomIsGroupRoom } from './rooms'
 
@@ -83,7 +82,7 @@ export default {
     },
   },
   Query: {
-    Message: async (object, params, context, resolveInfo) => {
+    Message: async (_object, params, context, _resolveInfo) => {
       const { roomId, beforeIndex } = params
       // Group chat is gated by the groups feature: while it is off, a group room's messages
       // are not served (its history stays in the DB, just inaccessible). DM rooms are unaffected.
@@ -95,20 +94,59 @@ export default {
           await session.close()
         }
       }
-      delete params.roomId
-      delete params.beforeIndex
-      if (!params.filter) params.filter = {}
-      params.filter.room = {
-        id: roomId,
-        users_some: {
-          id: context.user.id,
-        },
-      }
-      if (beforeIndex !== undefined && beforeIndex !== null) {
-        params.filter.indexId_lt = beforeIndex
-      }
+      // AUTHORISATION: the CHATS_IN edge replaces the `filter.room.users_some` that used to
+      // be handed to neo4jgraphql, and it is the only thing keeping a non-participant out of
+      // a room's history. It sits in the match pattern so a message can only be reached
+      // through a room the current user actually chats in.
+      //
+      // `senderId` is projected alongside the properties: it is a former @cypher field, and
+      // the distribution fallback below reads it. Supplying it here also means Message's
+      // field resolver finds it on the parent and skips its own query.
+      const messageSession = context.driver.session()
+      let resolved
+      try {
+        const beforeIndexClause =
+          beforeIndex !== undefined && beforeIndex !== null
+            ? 'WHERE message.indexId < toInteger($beforeIndex)'
+            : ''
+        // Ordering is fixed to indexId DESC — the only value _MessageOrdering offers, and
+        // what the beforeIndex cursor assumes. Previously an omitted orderBy left the order
+        // undefined; pinning it is strictly more predictable.
+        const pagingClause = [
+          params.offset ? 'SKIP toInteger($offset)' : '',
+          params.first ? 'LIMIT toInteger($first)' : '',
+        ]
+          .filter(Boolean)
+          .join(' ')
 
-      const resolved = await neo4jgraphql(object, params, context, resolveInfo)
+        resolved = await messageSession.readTransaction(async (transaction) => {
+          const result = await transaction.run(
+            `
+              MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
+              MATCH (room)<-[:INSIDE]-(message:Message)
+              ${beforeIndexClause}
+              WITH message
+              ORDER BY message.indexId DESC
+              ${pagingClause}
+              RETURN message {
+                .*,
+                senderId: head([(message)<-[:CREATED]-(sender:User) | sender.id])
+              } AS message
+            `,
+            {
+              currentUserId: context.user.id,
+              roomId,
+              beforeIndex: beforeIndex ?? null,
+              offset: params.offset ?? 0,
+              first: params.first ?? 0,
+            },
+          )
+          // unwrap: indexId is a Bolt integer and would fail GraphQL's Int serialiser.
+          return result.records.map((record) => unwrap(record.get('message')))
+        })
+      } finally {
+        await messageSession.close()
+      }
 
       if (resolved) {
         // Mark undistributed messages as distributed (fallback for missed socket deliveries)
@@ -312,6 +350,7 @@ export default {
     },
   },
   Message: {
+    ...underscoreIdResolver,
     ...Resolver('Message', {
       hasOne: {
         author: '<-[:CREATED]-(related:User)',
