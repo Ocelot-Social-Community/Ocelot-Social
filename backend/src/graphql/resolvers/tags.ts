@@ -22,7 +22,6 @@ const tagQuery = nodeQuery({
       'size(apoc.coll.toSet([(tag)<-[:TAGGED]-(:Post)<-[:WROTE]-(u:User) | u.id]))',
   },
   defaultOrder: { field: 'id', direction: 'ASC' as const },
-  filterFields: ['id_in'],
 })
 
 // The Tag query and its field resolvers, hand-written since the neo4j-graphql-js migration.

@@ -21,7 +21,6 @@ const commentQuery = nodeQuery({
   orderingEnum: '_CommentOrdering',
   // Oldest first: a comment list reads as a thread.
   defaultOrder: { field: 'createdAt', direction: 'ASC' as const },
-  filterFields: ['id_in'],
 })
 
 export default {

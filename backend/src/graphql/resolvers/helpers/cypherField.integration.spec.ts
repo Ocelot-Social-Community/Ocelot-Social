@@ -1,10 +1,18 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import Factory, { cleanDatabase } from '@db/factories'
+import resolvers from '@graphql/resolvers'
 import { createApolloTestSetup } from '@root/test/helpers'
-
-import resolvers from '../index'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+
+type FieldResolver = (
+  parent: unknown,
+  args: unknown,
+  context: Context,
+  info: unknown,
+) => Promise<unknown>
 
 // Non-null cypherFields whose data can legitimately be missing.
 //
@@ -21,16 +29,11 @@ import type { Context } from '@src/context'
 let setup: ApolloTestSetup
 let context: Context
 
-const resolve = async (type: string, field: string, parent: Record<string, unknown>) => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, security/detect-object-injection
-  const resolver = (resolvers as any)[type][field] as (
-    parent: unknown,
-    args: unknown,
-    context: Context,
-    info: unknown,
-  ) => Promise<unknown>
-  return resolver(parent, {}, context, {})
-}
+/* Type and field names below are literals from this file, never request data. */
+/* eslint-disable security/detect-object-injection */
+const resolve = async (type: string, field: string, parent: Record<string, unknown>) =>
+  (resolvers as Record<string, Record<string, FieldResolver>>)[type][field](parent, {}, context, {})
+/* eslint-enable security/detect-object-injection */
 
 beforeAll(async () => {
   await cleanDatabase()

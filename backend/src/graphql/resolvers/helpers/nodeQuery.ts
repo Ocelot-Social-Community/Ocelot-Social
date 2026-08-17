@@ -53,8 +53,30 @@ interface NodeQueryConfig {
   defaultOrder: { field: string; direction: 'ASC' | 'DESC' }
   /** Sortable fields that are NOT stored properties, mapped to their expression. */
   computedOrder?: Record<string, string>
-  /** Filter keys understood here — everything else raises. */
-  filterFields?: string[]
+}
+
+/** Builds the WHERE fragment for one filter operator, plus the parameters it references. */
+type FilterHandler = (
+  value: unknown,
+  alias: string,
+) => { condition: string; params: Record<string, unknown> }
+
+/**
+ * The filter operators this helper implements — and, by being that same object, the ones it
+ * ACCEPTS. Anything absent here is rejected.
+ *
+ * The two have to be one thing. A separate allow-list would let a key be permitted while no
+ * branch acts on it: the caller's filter is then silently dropped and the result set is
+ * WIDER than requested, which is the direction that leaks. `_TagFilter` alone advertises
+ * eight operators against the one implemented below, so that gap is a realistic edit away.
+ * Adding an entry here is what makes an operator available; there is no second place to
+ * forget.
+ */
+const FILTER_HANDLERS: Record<string, FilterHandler> = {
+  id_in: (value, alias) => ({
+    condition: `${alias}.id IN $filterIdIn`,
+    params: { filterIdIn: value },
+  }),
 }
 
 export const nodeQuery =
@@ -63,9 +85,8 @@ export const nodeQuery =
     const { label, equalityFields, softDeleteFields = [], orderingEnum, defaultOrder } = config
     const alias = label.toLowerCase()
 
-    const unsupported = Object.keys(params.filter ?? {}).filter(
-      (key) => !(config.filterFields ?? []).includes(key),
-    )
+    const filter = params.filter ?? {}
+    const unsupported = Object.keys(filter).filter((key) => !(key in FILTER_HANDLERS))
     if (unsupported.length > 0) {
       throw new UserInputError(`Unsupported ${label} filter: ${unsupported.join(', ')}.`)
     }
@@ -84,9 +105,12 @@ export const nodeQuery =
       conditions.push(`coalesce(${alias}.${field}, false) = $${field}`)
       queryParams[field] = params[field]
     }
-    if (params.filter?.id_in) {
-      conditions.push(`${alias}.id IN $filterIdIn`)
-      queryParams.filterIdIn = params.filter.id_in
+    for (const [key, value] of Object.entries(filter)) {
+      if (value === undefined || value === null) continue
+      // Guaranteed present: the loop above rejected every key without a handler.
+      const { condition, params: handlerParams } = FILTER_HANDLERS[key](value, alias)
+      conditions.push(condition)
+      Object.assign(queryParams, handlerParams)
     }
 
     const order = orderClause(params.orderBy, {
