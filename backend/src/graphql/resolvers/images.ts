@@ -3,8 +3,6 @@
 import crypto from 'node:crypto'
 import { join as joinPath } from 'node:path/posix'
 
-import Resolver from './helpers/Resolver'
-
 import type { Context } from '@src/context'
 
 type UrlResolver = (
@@ -77,7 +75,6 @@ const chain: (...methods: UrlResolver[]) => UrlResolver = (...methods) => {
 
 export default {
   Image: {
-    ...Resolver('Image', {}),
     transform: pointUrlToImagor({ transformations: [resize, sign] }),
   },
 }
