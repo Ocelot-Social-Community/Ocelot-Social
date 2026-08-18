@@ -1,195 +1,194 @@
 <template>
   <transition name="fade" appear>
-    <div>
-      <div class="ds-my-small">
-        <h1 class="ds-heading ds-heading-h1">{{ heading }}</h1>
-        <h2
-          v-if="post && post.group && post.group.id && post.group.slug"
-          class="ds-heading ds-heading-h2"
-        >
-          {{ $t('post.viewPost.forGroup.title') }}
-          <nuxt-link
-            :to="{ name: 'groups-id-slug', params: { slug: post.group.slug, id: post.group.id } }"
-          >
-            {{ post.group.name }}
-          </nuxt-link>
-        </h2>
+    <div class="ds-flex ds-flex-gap-small post-detail-layout">
+      <div class="post-detail-layout__sidebar">
+        <os-menu :routes="routes" class="post-side-navigation" link-tag="router-link" />
       </div>
-      <div class="ds-my-large"></div>
-      <div class="ds-flex ds-flex-gap-small post-detail-layout">
-        <div class="post-detail-layout__main">
-          <os-card
-            v-if="post && ready"
-            :lang="post.language"
-            :class="{
-              'post-page': true,
-              'disabled-content': post.disabled,
-              '--blur-image': blurred,
-            }"
-            :style="heroImageStyle"
-          >
-            <template #heroImage v-if="post.image">
-              <responsive-image
-                :image="post.image"
-                sizes="(max-width: 1024px) 640px, 1024px"
-                class="image"
-              />
-              <aside v-show="post.image && post.image.sensitive" class="blur-toggle">
-                <img v-show="blurred" :src="post.image.url.w320" class="preview" />
-                <os-button
-                  variant="primary"
-                  appearance="filled"
-                  circle
-                  :aria-label="
-                    $t(blurred ? 'post.sensitiveContent.show' : 'post.sensitiveContent.hide')
-                  "
-                  @click="blurred = !blurred"
-                >
-                  <template #icon>
-                    <os-icon :icon="blurred ? icons.eye : icons.eyeSlash" />
-                  </template>
-                </os-button>
-              </aside>
-            </template>
-            <section class="menu">
-              <user-avatar :user="post.author" :group="post.group" wide :date-time="post.createdAt">
-                <template #dateTime>
-                  <p class="ds-text" v-if="post.createdAt !== post.updatedAt">
-                    ({{ $t('post.edited') }})
-                  </p>
-                </template>
-              </user-avatar>
-              <client-only>
-                <content-menu
-                  placement="bottom-end"
-                  resource-type="contribution"
-                  :resource="post"
-                  :modalsData="menuModalsData"
-                  :is-owner="isAuthor"
-                  @pinPost="pinPost"
-                  @unpinPost="unpinPost"
-                  @pinGroupPost="pinGroupPost"
-                  @unpinGroupPost="unpinGroupPost"
-                  @pushPost="pushPost"
-                  @unpushPost="unpushPost"
-                  @toggleObservePost="toggleObservePost"
-                />
-              </client-only>
-            </section>
-            <div class="ds-mb-small"></div>
-            <h2 class="title hyphenate-text">{{ post.title }}</h2>
-            <!-- event data -->
-            <div
-              v-if="post && post.postType[0] === 'Event'"
-              class="ds-mb-small event-data"
-              :class="{ 'event-data--with-map': showEventMap }"
-            >
-              <div class="event-data__info" style="padding: 10px">
-                <location-teaser
-                  class="event-info"
-                  :venue="post.eventVenue"
-                  :locationName="post.eventLocationName"
-                  :isOnline="post.eventIsOnline"
-                  :to="mapLinkTo"
-                />
-                <date-time-range
-                  class="event-info"
-                  :startDate="post.eventStart"
-                  :endDate="post.eventEnd"
-                />
-              </div>
-              <event-location-map
-                v-if="showEventMap"
-                class="event-data__map"
-                :location="eventMapLocation"
-                :editable="false"
-                :is-past-event="isPastEvent"
-                :post-id="post.id"
-              />
-            </div>
-            <div class="ds-mb-small"></div>
-            <!-- content -->
-            <content-viewer class="content hyphenate-text" :content="post.content" />
-            <!-- categories -->
-            <div v-if="categoriesActive && post.categories.length > 0" class="categories">
-              <div class="ds-my-xx-large"></div>
-              <div class="ds-my-xx-small"></div>
-              <hc-category
-                v-for="category in sortCategories(post.categories)"
-                :key="category.id"
-                :icon="category.icon"
-                :name="$t(`contribution.category.name.${category.slug}`)"
-                v-tooltip="{
-                  content: $t(`contribution.category.description.${category.slug}`),
-                  placement: 'bottom-start',
-                }"
-              />
-            </div>
-            <div class="ds-mb-small"></div>
-            <!-- Tags -->
-            <div v-if="post.tags && post.tags.length" class="tags">
-              <div class="ds-my-xx-small"></div>
-              <hc-hashtag v-for="tag in sortedTags" :key="tag.id" :id="tag.id" />
-            </div>
-            <div class="actions">
-              <!-- Shout Button -->
-              <os-action-button
-                :disabled="isAuthor"
-                :count="shoutedCount"
-                :aria-label="$t('shoutButton.shouted', { count: shoutedCount })"
-                :filled="shouted"
-                :icon="icons.heartO"
-                :loading="shoutLoading"
-                @click="toggleShout"
-              />
-              <!-- Follow Button -->
-              <os-action-button
-                :count="post.observingUsersCount"
-                :aria-label="$t('observeButton.observed', { count: post.observingUsersCount })"
-                :filled="post.isObservedByMe"
-                :icon="icons.bell"
-                :loading="observeLoading"
-                @click="toggleObservePost(post.id, !post.isObservedByMe)"
-              />
-            </div>
-            <!-- comments -->
-            <section class="ds-section">
-              <!-- comment list -->
-              <comment-list
-                :post="post"
-                @toggleNewCommentForm="toggleNewCommentForm"
-                @reply="reply"
-              />
-              <div class="ds-mb-large"></div>
-              <!-- commenting form -->
-              <comment-form
-                v-if="
-                  showNewCommentForm &&
-                  !isBlocked &&
-                  (!this.post.group || commentingAllowedByGroupRole) &&
-                  canComment
+      <div class="post-detail-layout__main">
+        <os-card
+          v-if="post && ready"
+          :lang="post.language"
+          :class="{
+            'post-page': true,
+            'disabled-content': post.disabled,
+            '--blur-image': blurred,
+          }"
+          :style="heroImageStyle"
+        >
+          <template #heroImage v-if="post.image">
+            <responsive-image
+              :image="post.image"
+              sizes="(max-width: 1024px) 640px, 1024px"
+              class="image"
+            />
+            <aside v-show="post.image && post.image.sensitive" class="blur-toggle">
+              <img v-show="blurred" :src="post.image.url.w320" class="preview" />
+              <os-button
+                variant="primary"
+                appearance="filled"
+                circle
+                :aria-label="
+                  $t(blurred ? 'post.sensitiveContent.show' : 'post.sensitiveContent.hide')
                 "
-                ref="commentForm"
-                :post="post"
-                @createComment="createComment"
+                @click="blurred = !blurred"
+              >
+                <template #icon>
+                  <os-icon :icon="blurred ? icons.eye : icons.eyeSlash" />
+                </template>
+              </os-button>
+            </aside>
+          </template>
+          <section class="menu">
+            <user-avatar :user="post.author" :group="post.group" wide :date-time="post.createdAt">
+              <template #dateTime>
+                <p class="ds-text" v-if="post.createdAt !== post.updatedAt">
+                  ({{ $t('post.edited') }})
+                </p>
+              </template>
+            </user-avatar>
+            <client-only>
+              <content-menu
+                placement="bottom-end"
+                resource-type="contribution"
+                :resource="post"
+                :modalsData="menuModalsData"
+                :is-owner="isAuthor"
+                @pinPost="pinPost"
+                @unpinPost="unpinPost"
+                @pinGroupPost="pinGroupPost"
+                @unpinGroupPost="unpinGroupPost"
+                @pushPost="pushPost"
+                @unpushPost="unpushPost"
+                @toggleObservePost="toggleObservePost"
               />
-              <!-- commenting disabled -->
-              <div class="ds-placeholder" v-else>
-                <hc-empty margin="xxx-small" icon="messages" :message="commentingDisabledMessage">
-                  <cta-unblock-author v-if="isBlocked" :author="post.author" />
-                  <cta-join-leave-group
-                    v-else-if="group && !commentingAllowedByGroupRole"
-                    :group="group"
-                    @update="updateJoinLeave"
-                  />
-                </hc-empty>
-              </div>
-            </section>
-          </os-card>
-        </div>
-        <div class="post-detail-layout__sidebar" style="flex: 0 0 200px; width: 200px">
-          <os-menu :routes="routes" class="post-side-navigation" link-tag="router-link" />
-        </div>
+            </client-only>
+          </section>
+          <div class="ds-mb-small"></div>
+          <!-- The page's type ("Event"/"Post") is shown here as a small kicker
+             rather than as its own heading — post.title below is the page's
+             only h1, so search engines see the actual, unique content as the
+             page's main heading instead of a label repeated across every
+             post of the same type. -->
+          <p class="post-kicker ds-text ds-text-soft ds-text-size-small ds-text-uppercase">
+            {{ heading }}
+            <template v-if="post.group && post.group.id && post.group.slug">
+              ·
+              {{ $t('post.viewPost.forGroup.title') }}
+              <nuxt-link
+                :to="{
+                  name: 'groups-id-slug',
+                  params: { slug: post.group.slug, id: post.group.id },
+                }"
+              >
+                {{ post.group.name }}
+              </nuxt-link>
+            </template>
+          </p>
+          <h1 class="ds-heading ds-heading-h1 title hyphenate-text">{{ post.title }}</h1>
+          <!-- event data -->
+          <div v-if="post && post.postType[0] === 'Event'" class="ds-mb-small event-data">
+            <div class="event-data__info" style="padding: 10px">
+              <location-teaser
+                class="event-info"
+                :venue="post.eventVenue"
+                :locationName="post.eventLocationName"
+                :isOnline="post.eventIsOnline"
+                :to="mapLinkTo"
+              />
+              <date-time-range
+                class="event-info"
+                :startDate="post.eventStart"
+                :endDate="post.eventEnd"
+              />
+            </div>
+            <event-location-map
+              v-if="showEventMap"
+              class="event-data__map"
+              :location="eventMapLocation"
+              :editable="false"
+              :is-past-event="isPastEvent"
+              :post-id="post.id"
+            />
+          </div>
+          <div class="ds-mb-small"></div>
+          <!-- content -->
+          <content-viewer class="content hyphenate-text" :content="post.content" />
+          <!-- categories -->
+          <div v-if="categoriesActive && post.categories.length > 0" class="categories">
+            <div class="ds-my-xx-large"></div>
+            <div class="ds-my-xx-small"></div>
+            <hc-category
+              v-for="category in sortCategories(post.categories)"
+              :key="category.id"
+              :icon="category.icon"
+              :name="$t(`contribution.category.name.${category.slug}`)"
+              v-tooltip="{
+                content: $t(`contribution.category.description.${category.slug}`),
+                placement: 'bottom-start',
+              }"
+            />
+          </div>
+          <div class="ds-mb-small"></div>
+          <!-- Tags -->
+          <div v-if="post.tags && post.tags.length" class="tags">
+            <div class="ds-my-xx-small"></div>
+            <hc-hashtag v-for="tag in sortedTags" :key="tag.id" :id="tag.id" />
+          </div>
+          <div class="actions">
+            <!-- Shout Button -->
+            <os-action-button
+              :disabled="isAuthor"
+              :count="shoutedCount"
+              :aria-label="$t('shoutButton.shouted', { count: shoutedCount })"
+              :filled="shouted"
+              :icon="icons.heartO"
+              :loading="shoutLoading"
+              @click="toggleShout"
+            />
+            <!-- Follow Button -->
+            <os-action-button
+              :count="post.observingUsersCount"
+              :aria-label="$t('observeButton.observed', { count: post.observingUsersCount })"
+              :filled="post.isObservedByMe"
+              :icon="icons.bell"
+              :loading="observeLoading"
+              @click="toggleObservePost(post.id, !post.isObservedByMe)"
+            />
+          </div>
+          <!-- comments -->
+          <section id="comments" class="ds-section">
+            <!-- comment list -->
+            <comment-list
+              :post="post"
+              @toggleNewCommentForm="toggleNewCommentForm"
+              @reply="reply"
+            />
+            <div class="ds-mb-large"></div>
+            <!-- commenting form -->
+            <comment-form
+              v-if="
+                showNewCommentForm &&
+                !isBlocked &&
+                (!this.post.group || commentingAllowedByGroupRole) &&
+                canComment
+              "
+              ref="commentForm"
+              :post="post"
+              @createComment="createComment"
+            />
+            <!-- commenting disabled -->
+            <div class="ds-placeholder" v-else>
+              <hc-empty margin="xxx-small" icon="messages" :message="commentingDisabledMessage">
+                <cta-unblock-author v-if="isBlocked" :author="post.author" />
+                <cta-join-leave-group
+                  v-else-if="group && !commentingAllowedByGroupRole"
+                  :group="group"
+                  @update="updateJoinLeave"
+                />
+              </hc-empty>
+            </div>
+          </section>
+        </os-card>
       </div>
     </div>
   </transition>
@@ -320,16 +319,6 @@ export default {
               name: this.$t('common.comment', null, 2),
               path: `${postPath}#comments`,
             },
-            // TODO implement
-            /* {
-                name: this.$t('common.letsTalk'),
-                path: `${postPath}#lets-talk`
-                }, */
-            // TODO implement
-            /* {
-                name: this.$t('common.versus'),
-                path: `${postPath}#versus`
-                } */
           ],
         },
       ]
@@ -600,21 +589,43 @@ export default {
 </script>
 
 <style>
+.post-kicker {
+  margin: 0;
+}
+
+/* .ds-heading defaults to a large top margin meant for headings that open a
+   section on their own — too much space directly under the kicker label. */
+.post-kicker + .title.ds-heading {
+  margin-top: 0.2em;
+}
+
+/* main.css's ".os-card > .title" sizes teaser-card titles (e.g. a post
+   teaser in a feed) at --font-size-large. OsCard only nests this h1 one
+   level deeper (inside .os-card__content) when the post has a hero image,
+   so without one this h1 was also a *direct* child of .os-card and matched
+   that rule — with 2 classes it out-specifies .ds-heading-h1's single
+   class, silently shrinking the title whenever the post had no image.
+   Re-assert ds-heading-h1's own sizing here with higher specificity so it
+   wins regardless of hero-image-driven nesting depth. */
+.post-page .title.hyphenate-text {
+  font-size: var(--font-size-xx-large);
+}
+@media (--vp-desktop-up) {
+  .post-page .title.hyphenate-text {
+    font-size: var(--font-size-xxx-large);
+  }
+}
+
+.post-detail-layout__sidebar,
 .post-detail-layout__main {
   flex: 0 0 100%;
   width: 100%;
 }
-@media (--vp-small-up) {
-  .post-detail-layout__main {
-    flex: 2 0 0;
-  }
-}
 @media (--vp-tablet-up) {
-  .post-detail-layout__main {
-    flex: 2 0 0;
+  .post-detail-layout__sidebar {
+    flex: 0 0 200px;
+    width: 200px;
   }
-}
-@media (--vp-desktop-up) {
   .post-detail-layout__main {
     flex: 1 0 0;
   }
@@ -624,6 +635,7 @@ export default {
   top: 65px;
   z-index: 2;
 }
+
 .post-page {
   > .os-card__hero-image {
     position: relative;
@@ -685,16 +697,8 @@ export default {
 <style scoped>
 .event-data {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: var(--space-small);
-}
-
-.event-data--with-map .event-data__info {
-  flex: 1 1 260px;
-}
-
-.event-data__map {
-  flex: 1 1 300px;
 }
 
 .actions {

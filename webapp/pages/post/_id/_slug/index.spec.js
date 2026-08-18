@@ -564,25 +564,32 @@ describe('PostSlug', () => {
     })
 
     describe('computed branches', () => {
-      it('routes and heading pick the Event title for event posts', () => {
-        // Testing the computeds in isolation avoids rendering the Event-specific
+      it('heading picks the Event title for event posts', () => {
+        // Testing the computed in isolation avoids rendering the Event-specific
         // DateTimeRange child which has its own required props.
         const ctx = {
           post: { postType: ['Event'] },
           $t: (k) => k,
-          $route: { params: { slug: 'slug', id: 'id' } },
         }
         expect(PostSlug.computed.heading.call(ctx)).toBe('post.viewEvent.title')
-        expect(PostSlug.computed.routes.call(ctx)[0].name).toBe('post.viewEvent.title')
       })
 
-      it('routes re-encode params with reserved characters', () => {
+      it('heading picks the Post title for non-event posts', () => {
         const ctx = {
           post: { postType: ['Article'] },
+          $t: (k) => k,
+        }
+        expect(PostSlug.computed.heading.call(ctx)).toBe('post.viewPost.title')
+      })
+
+      it('routes picks the Event title and re-encodes params with reserved characters', () => {
+        const ctx = {
+          post: { postType: ['Event'] },
           $t: (k) => k,
           $route: { params: { id: 'abc', slug: 'foo/bar' } },
         }
         const [top] = PostSlug.computed.routes.call(ctx)
+        expect(top.name).toBe('post.viewEvent.title')
         expect(top.path).toBe('/post/abc/foo%2Fbar')
         expect(top.children[0].path).toBe('/post/abc/foo%2Fbar#comments')
       })
