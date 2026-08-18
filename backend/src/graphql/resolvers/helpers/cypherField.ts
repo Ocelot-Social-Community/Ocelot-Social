@@ -123,7 +123,12 @@ export default function cypherFields(
       // projection that coalesced to nothing, or a constructed subscription payload — and
       // returning that unchanged would fail a non-null field exactly like an unresolved one.
       if (!always && typeof parent?.[key] !== 'undefined') return parent[key] ?? fallback ?? null
-      if (!parent?.[idAttribute]) return null
+      // A parent with no id cannot be matched, so there is nothing to look up — but the
+      // fallback still applies. It exists to keep a non-null field from taking its parent
+      // out of the response, and from the client's side an unresolvable id is no different
+      // from a missing edge: either way the object disappears. Fields without a fallback
+      // keep answering null here, which is the honest answer for a nullable field.
+      if (!parent?.[idAttribute]) return fallback ?? null
 
       const args = { ...defaults, ...(params ?? {}) }
 

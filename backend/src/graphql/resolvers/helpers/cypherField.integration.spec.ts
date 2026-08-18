@@ -121,6 +121,21 @@ describe('non-null fields with missing data', () => {
     ).resolves.toBe('')
   })
 
+  it('applies the fallback when the parent has no id at all', async () => {
+    // The third path into the resolver, next to the pass-through and the empty batch result.
+    // A constructed parent — a subscription payload, a projection that never selected the id
+    // — cannot be matched, so nothing can be looked up. The field is still non-null, and the
+    // client cannot tell an unresolvable parent from a missing edge: in both cases the object
+    // vanishes from the response. All three paths therefore answer the same way.
+    await expect(resolve('Room', 'roomName', {})).resolves.toBe('')
+    await expect(resolve('User', 'email', {})).resolves.toBe('')
+  })
+
+  it('still returns null without a fallback when the parent has no id', async () => {
+    // The fallback is opt-in per field. A nullable field says null, which is the truth.
+    await expect(resolve('Room', 'lastMessage', {})).resolves.toBeNull()
+  })
+
   it('still prefers a real value carried by the parent', async () => {
     // The fallback must not shadow the pass-through's actual job.
     await expect(
