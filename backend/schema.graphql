@@ -2260,7 +2260,7 @@ input _PostCommentsFilter {
 
 input _PostEMOTEDFilter {
   createdAt: String
-  emotion_in: [Emotion]
+  emotion_in: [Emotion!]
   updatedAt: String
 }
 
@@ -2315,13 +2315,13 @@ input _PostFilter {
   imageAspectRatio: Float
   imageBlurred: Boolean
   language: String
-  language_in: [String]
+  language_in: [String!]
 
   """Instance-wide pinned posts."""
   pinned: Boolean
 
   """Restrict to these post types (Article, Event, ...)."""
-  postType_in: [PostType]
+  postType_in: [PostType!]
 
   """Posts in the groups the current user belongs to."""
   postsInMyGroups: Boolean

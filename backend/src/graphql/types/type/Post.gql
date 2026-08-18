@@ -14,7 +14,7 @@ input _PostFilter {
   content: String
   visibility: Visibility
   language: String
-  language_in: [String]
+  language_in: [String!]
   createdAt: String
   updatedAt: String
   imageBlurred: Boolean
@@ -29,7 +29,7 @@ input _PostFilter {
   disabled: Boolean
 
   "Restrict to these post types (Article, Event, ...)."
-  postType_in: [PostType]
+  postType_in: [PostType!]
   "Events starting at or after this time."
   eventStart_gte: String
   "Events ending at or after this time."

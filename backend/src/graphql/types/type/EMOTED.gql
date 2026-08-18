@@ -18,7 +18,7 @@ input _EMOTEDInput {
 }
 
 input _PostEMOTEDFilter {
-  emotion_in: [Emotion]
+  emotion_in: [Emotion!]
   createdAt: String
   updatedAt: String
 }
