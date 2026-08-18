@@ -29,12 +29,25 @@ export const runBatch = async ({
   ids: readonly string[]
   params?: Record<string, unknown>
 }): Promise<{ byId: Map<unknown, unknown> }> => {
+  // Deduplicated before the statement runs, NOT after.
+  //
+  // `cache: false` on the loaders (see context/loaders.ts, where the reason is spelled out)
+  // switches off DataLoader's per-batch deduplication along with its memoisation, so the same
+  // key arrives once per `.load()` call. That is the normal case, not a corner case: a feed of
+  // 30 posts by one author asks `User.followedByCurrentUser` 30 times for that one author, and
+  // `UNWIND` would walk the identical pattern 30 times. Measured at 10 ids / 1 distinct on a
+  // 10-post feed.
+  //
+  // Callers still index the result against the FULL `ids` list, so DataLoader keeps getting
+  // one entry per key, in key order — the map lookup does not care that the query saw fewer.
+  const distinctIds = [...new Set(ids)]
+
   const session = context.driver.session()
   try {
     return await session.readTransaction(async (transaction) => {
       const result = await transaction.run(cypher, {
         ...params,
-        ids,
+        ids: distinctIds,
         cypherParams: context.cypherParams ?? {},
       })
       const byId = new Map<unknown, unknown>()

@@ -67,6 +67,9 @@ const countRoundTrips = async (
 ) => {
   const { driver } = setup.database
   let runs = 0
+  // Every `ids` array a batched statement was called with, so a test can assert that no
+  // statement was handed the same key twice.
+  const idBatches: string[][] = []
   const openSession = driver.session.bind(driver)
 
   const instrument = (session: any, method: 'readTransaction' | 'writeTransaction') => {
@@ -77,6 +80,8 @@ const countRoundTrips = async (
           const run = transaction.run.bind(transaction)
           transaction.run = (...runArgs: any[]) => {
             runs += 1
+            const ids = (runArgs[1] as { ids?: unknown })?.ids
+            if (Array.isArray(ids)) idBatches.push(ids as string[])
             return run(...runArgs)
           }
           return work(transaction)
@@ -117,7 +122,7 @@ const countRoundTrips = async (
     spy.mockRestore()
   }
 
-  return { runs, errors: result.errors, rows: result.data?.[rootField]?.length ?? 0 }
+  return { runs, idBatches, errors: result.errors, rows: result.data?.[rootField]?.length ?? 0 }
 }
 
 beforeAll(async () => {
@@ -203,6 +208,34 @@ describe('Cypher round trips', () => {
     expect(many.rows).toBe(12)
 
     expect(many.runs).toBe(one.runs)
+  }, 120000)
+
+  // Selects a field that is RESOLVED for the shared author, not just read off the node.
+  // `author { id name slug }` in FEED_QUERY comes straight from the post's parent projection
+  // and never reaches a loader, so it cannot produce duplicate keys — which is exactly how an
+  // earlier version of this test passed without any deduplication in place.
+  const SHARED_AUTHOR_QUERY = `
+    query Post($first: Int) {
+      Post(first: $first) {
+        id
+        author { id followedByCurrentUser isBlocked followedByCount }
+      }
+    }
+  `
+
+  it('never asks a statement for the same key twice', async () => {
+    // `cache: false` on the loaders turns off DataLoader's per-batch dedup along with its
+    // memoisation, so a feed where many rows share a parent (12 posts, one author) hands the
+    // same key to `.load()` over and over. Without deduplication the author's fields are
+    // looked up once PER POST inside a single UNWIND — invisible to the round-trip count
+    // above, which stays at one statement either way.
+    const { idBatches, rows } = await countRoundTrips(SHARED_AUTHOR_QUERY, { first: 12 })
+    expect(rows).toBe(12)
+
+    const withDuplicates = idBatches.filter((ids) => new Set(ids).size !== ids.length)
+    expect(withDuplicates).toEqual([])
+    // Guard the probe: no batches at all would satisfy the assertion vacuously.
+    expect(idBatches.length).toBeGreaterThan(0)
   }, 120000)
 
   it('does not scale round trips per row', async () => {
