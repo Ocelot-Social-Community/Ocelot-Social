@@ -42,6 +42,18 @@ export const runBatch = async ({
   // one entry per key, in key order — the map lookup does not care that the query saw fewer.
   const distinctIds = [...new Set(ids)]
 
+  // `ids` and `cypherParams` belong to this helper and are appended AFTER the caller's
+  // params, so a caller passing either name would have it silently replaced. cypherField
+  // fills `params` from a field's GraphQL ARGUMENTS, so the names are not fully under this
+  // module's control — a field argument called `ids` would vanish here, and the search for
+  // it would start in the Cypher. No such argument exists today; this keeps it that way, and
+  // says so at the point where the collision would happen.
+  for (const reserved of ['ids', 'cypherParams']) {
+    if (reserved in params) {
+      throw new Error(`runBatch: "${reserved}" is reserved and cannot be passed in params.`)
+    }
+  }
+
   const session = context.driver.session()
   try {
     return await session.readTransaction(async (transaction) => {
