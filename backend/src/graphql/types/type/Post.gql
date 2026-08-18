@@ -39,6 +39,8 @@ input _PostFilter {
 
   "Posts in the groups the current user belongs to."
   postsInMyGroups: Boolean
+  "Skip the pinned-posts-first ordering. Used by the map, which sorts by location instead."
+  skipPinnedFilter: Boolean
   "Posts filed under any of these categories."
   categories_some: _PostCategoriesFilter
   "Posts carrying any of these emotions."

@@ -28,10 +28,18 @@ import type { InputObjectTypeDefinitionNode } from 'graphql'
 // tabs) — so those requests failed on variable coercion. Same shape as the `orderBy` outage:
 // what was verified was what the schema DECLARED, not what the client SENDS.
 //
-// Scope, stated plainly: this collects keys carrying a filter operator SUFFIX (`_some`,
-// `_in`, `_gte`, …). Suffix-free relation filters like `author` are not caught — their names
-// collide with ordinary object keys throughout a Vue codebase, and the noise would drown the
-// signal. The suffixed operators are the class that broke here.
+// Two readers, because one is not enough:
+//
+//  - by SUFFIX (`_some`, `_in`, `_gte`, …) anywhere in the sources. Catches operators that
+//    are assembled dynamically, e.g. `update(filter, 'categories_some.id_in', …)`.
+//  - by FILTER OBJECT: the top-level keys of every `filter: { … }` / `postFilter: { … }`
+//    literal. Catches suffix-FREE keys, which the first reader structurally cannot see.
+//
+// The second reader exists because the first one missed a second production bug of the same
+// kind: `skipPinnedFilter`, sent by the map page, carries no operator suffix and was likewise
+// absent from `_PostFilter` — so the map died on variable coercion exactly as the hashtag
+// filter had. One reader with a documented blind spot is a reader that will be surprised
+// again.
 
 const WEBAPP_ROOT = path.resolve(__dirname, '../../../webapp')
 const SEARCH_DIRS = ['graphql', 'components', 'pages', 'store', 'mixins', 'composables']
@@ -76,16 +84,20 @@ const FILTER_FIXTURES: Record<string, unknown> = {
   // pages/groups/…/_slug.vue (group.id).
   author: { id: 'u1' },
   group: { id: 'g1' },
+  hasLocation: true,
 }
 
 /**
- * Filters a WRAPPER rewrites before postFilterToCypher ever sees them, so they must be
- * declared on `_PostFilter` but would be rejected by the translation.
+ * Client-facing flags that a WRAPPER consumes before postFilterToCypher ever sees them. They
+ * must be declared on `_PostFilter` — the client sends them — but the translation would
+ * reject them, so they get no fixture.
  *
- * `postsInMyGroups` is a client-facing flag; filterPostsOfMyGroups turns it into the
- * `inGroupsOf` operator, which carries the viewer whose memberships decide the answer.
+ *  - `postsInMyGroups`: filterPostsOfMyGroups turns it into the `inGroupsOf` operator, which
+ *    carries the viewer whose memberships decide the answer.
+ *  - `skipPinnedFilter`: the Post resolver reads and deletes it, then skips
+ *    maintainPinnedPosts. The map page sends it because it orders by location, not by pins.
  */
-const TRANSLATED_BY_A_WRAPPER = ['postsInMyGroups']
+const TRANSLATED_BY_A_WRAPPER = ['postsInMyGroups', 'skipPinnedFilter']
 
 /**
  * Fails with the actual cause rather than "expected >= N, received 0".
@@ -103,6 +115,44 @@ const assertWebappReadable = () => {
         'provides them.',
     )
   }
+}
+
+/**
+ * Keys found inside `filter: { … }` literals that are NOT post filters.
+ *
+ * Kept as an explicit list, like BELONGS_TO_ANOTHER_INPUT: filtering them out by comparing
+ * against `_PostFilter` would hide precisely the missing field this test looks for.
+ */
+const NOT_A_POST_FILTER: Record<string, string> = {
+  type: 'OcelotSelect.vue — a Vue prop named `filter` that holds a function; this is its type',
+  default: 'OcelotSelect.vue — the default value of that same prop',
+  categoryId: 'index.spec.js — a $route.query mock, not a GraphQL filter',
+  existing: 'profile/_slug.methods.spec.js — a placeholder value in a "filter unchanged" case',
+}
+
+/** Filters whose Cypher binds no value, so the fixture check must not demand a parameter. */
+const VALUE_LESS_FILTERS = new Set(['hasLocation'])
+
+/** `filter: { … }` and `postFilter: { … }`, but not `userFilter`, `groupFilter`, … */
+const FILTER_OBJECT_START = /(?:^|[^a-zA-Z])(?:postFilter|filter)\s*[:=]\s*\{/g
+
+/** Top-level keys of one object literal, given the source and the index of its `{`. */
+const topLevelKeys = (source: string, braceIndex: number): string[] => {
+  let depth = 0
+  let end = braceIndex
+  for (; end < source.length; end++) {
+    if (source[end] === '{') depth++
+    else if (source[end] === '}' && --depth === 0) break
+  }
+  // Flatten: drop everything nested, so only this object's own keys remain.
+  let nested = 0
+  let flat = ''
+  for (const character of source.slice(braceIndex + 1, end)) {
+    if ('{['.includes(character)) nested++
+    else if ('}]'.includes(character)) nested--
+    else if (nested === 0) flat += character
+  }
+  return [...flat.matchAll(/(?:^|,)\s*\.{0,3}([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g)].map((m) => m[1])
 }
 
 const readSources = (): string[] => {
@@ -137,13 +187,16 @@ const postFilterFields = (): Set<string> => {
   return new Set(definition.fields?.map((field) => field.name.value) ?? [])
 }
 
-/** Every suffixed operator key appearing anywhere in the webapp sources. */
+/** Every filter key the webapp uses: suffixed operators plus filter-object literals. */
 const operatorsUsedByWebapp = (): string[] => {
   const found = new Set<string>()
   for (const source of readSources()) {
     for (const match of source.matchAll(OPERATOR_SUFFIX)) found.add(match[1])
+    for (const match of source.matchAll(FILTER_OBJECT_START)) {
+      for (const key of topLevelKeys(source, source.indexOf('{', match.index))) found.add(key)
+    }
   }
-  return [...found].sort()
+  return [...found].filter((key) => !(key in NOT_A_POST_FILTER)).sort()
 }
 
 describe('post filters used by the webapp', () => {
@@ -167,7 +220,11 @@ describe('post filters used by the webapp', () => {
   })
 
   it('has a fixture for every operator the webapp sends', () => {
-    const withoutFixture = expectedOnPostFilter.filter((key) => !(key in FILTER_FIXTURES))
+    // Wrapper-consumed flags are exempt: they never reach the translation, so a fixture for
+    // them would assert the opposite of what happens.
+    const withoutFixture = expectedOnPostFilter.filter(
+      (key) => !(key in FILTER_FIXTURES) && !TRANSLATED_BY_A_WRAPPER.includes(key),
+    )
 
     expect(withoutFixture).toEqual([])
   })
@@ -190,6 +247,13 @@ describe('post filters used by the webapp', () => {
     // A filter translating to nothing would return EVERY post — the direction that leaks,
     // and indistinguishable in the response from having sent no filter at all.
     expect(where).not.toBe('')
-    expect(Object.keys(params).length).toBeGreaterThan(0)
+    expect(where).not.toBeNull()
+
+    // Values must be BOUND, never interpolated into the statement. `hasLocation` is the one
+    // exception and needs no parameter at all: it is a pure existence check
+    // (`EXISTS { (post)-[:IS_IN]->() }`) whose flag picks the clause rather than appearing
+    // in it. Expressed as a minimum rather than an `if`, so the assertion always runs.
+    const boundValuesExpected = VALUE_LESS_FILTERS.has(key) ? 0 : 1
+    expect(Object.keys(params).length).toBeGreaterThanOrEqual(boundValuesExpected)
   })
 })

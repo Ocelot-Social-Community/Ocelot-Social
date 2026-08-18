@@ -2328,6 +2328,11 @@ input _PostFilter {
 
   """Posts shouted by the given user."""
   shoutedBy_some: _PostShoutedByFilter
+
+  """
+  Skip the pinned-posts-first ordering. Used by the map, which sorts by location instead.
+  """
+  skipPinnedFilter: Boolean
   slug: String
 
   """Posts carrying any of these hashtags."""
