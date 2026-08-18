@@ -996,6 +996,61 @@ describe('map', () => {
       })
     })
 
+    describe('openInitialEventPopup', () => {
+      const eventFeature = {
+        geometry: { coordinates: [9.17702, 48.78232] },
+        properties: {
+          type: 'event',
+          slug: 'kindergeburtstag',
+          id: 'e1',
+          name: 'Kindergeburtstag',
+          locationName: 'Stuttgart',
+          description: 'Fun event',
+        },
+      }
+
+      it('does nothing without an initialEventId', () => {
+        wrapper.vm.markers.geoJSON = [eventFeature]
+        wrapper.vm.openInitialEventPopup()
+        expect(mapboxgl.__popupInstance.setLngLat).not.toHaveBeenCalled()
+      })
+
+      it('does nothing when no event matches the deep-linked id', () => {
+        mocks.$route = { path: '/map', query: { eventId: 'does-not-exist' } }
+        const w = createWrapper()
+        w.vm.markers.geoJSON = [eventFeature]
+        w.vm.openInitialEventPopup()
+        expect(mapboxgl.__popupInstance.setLngLat).not.toHaveBeenCalled()
+      })
+
+      it('opens the popup for the matching event feature', () => {
+        mocks.$route = { path: '/map', query: { eventId: 'e1' } }
+        const w = createWrapper()
+        w.vm.onMapLoad({ map: mapMock })
+        w.vm.markers.geoJSON = [eventFeature]
+        w.vm.openInitialEventPopup()
+        expect(mapboxgl.__popupInstance.setLngLat).toHaveBeenCalledWith([9.17702, 48.78232])
+        expect(mapboxgl.__popupInstance.setDOMContent).toHaveBeenCalled()
+        expect(mapboxgl.__popupInstance.addTo).toHaveBeenCalledWith(mapMock)
+      })
+
+      it('is triggered once markers are added and the map has flown to center', async () => {
+        mocks.$route = { path: '/map', query: { eventId: 'e1' } }
+        const w = createWrapper()
+        w.vm.onMapLoad({ map: mapMock })
+        w.vm.markers.isImagesLoaded = true
+        await w.setData({
+          users: otherUsers,
+          groups,
+          posts,
+          currentUserCoordinates: [13.38333, 52.51667],
+          currentUserLocation: userLocation,
+        })
+        w.vm.addMarkersOnCheckPrepared()
+        expect(mapboxgl.__popupInstance.setLngLat).toHaveBeenCalledWith([9.17702, 48.78232])
+      })
+    })
+
     describe('getUserLocation', () => {
       it('returns location when user has one', async () => {
         mocks.$apollo.query.mockResolvedValueOnce({

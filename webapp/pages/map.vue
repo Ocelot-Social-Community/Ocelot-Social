@@ -137,12 +137,18 @@ export default {
     const lat = parseFloat(query.lat)
     const lng = parseFloat(query.lng)
     const initialCoordinates = Number.isFinite(lat) && Number.isFinite(lng) ? [lng, lat] : null
+    // Deep-linked from a specific event's "view on map" — opens that
+    // event's popup once its marker is on the map (see
+    // openInitialEventPopup()), same one-time/non-reactive reasoning as
+    // initialCoordinates above.
+    const initialEventId = typeof query.eventId === 'string' ? query.eventId : null
     return {
       isEmpty,
       mapboxgl,
       legendOpen: false,
       activeStyle: null,
       initialCoordinates,
+      initialEventId,
       // ids from markers.types.id that the user hid via the legend's eye
       // toggle. Purely a local display preference (not deep-linked).
       hiddenMarkerTypes: [],
@@ -465,108 +471,11 @@ export default {
         maxWidth: '300px',
       })
 
-      // show popup for given features at coordinates
-      const showPopup = (features, lngLat) => {
-        if (this.markers.popup.isOpen()) {
-          this.markers.popup.remove()
-        }
-
-        this.map.getCanvas().style.cursor = 'pointer'
-
-        const coordinates = features[0].geometry.coordinates.slice()
-
-        // Ensure popup appears over the correct copy when map is zoomed out
-        while (Math.abs(lngLat.lng - coordinates[0]) > 180) {
-          coordinates[0] += lngLat.lng > coordinates[0] ? 360 : -360
-        }
-
-        // Build popup content safely using DOM nodes (no raw HTML interpolation)
-        const container = document.createElement('div')
-        container.className = 'map-popup-container'
-
-        const locationName = features[0].properties.locationName
-        if (locationName) {
-          const header = document.createElement('div')
-          header.className = 'map-popup-header'
-          header.textContent = locationName
-          container.appendChild(header)
-        }
-
-        const body = document.createElement('div')
-        body.className = 'map-popup-body'
-
-        features.forEach((feature, index) => {
-          if (index > 0) {
-            body.appendChild(document.createElement('hr'))
-          }
-
-          const markerTypeLabel = this.$t(`map.markerTypes.${feature.properties.type}`)
-          const encodedId = encodeURIComponent(feature.properties.id)
-          const encodedSlug = encodeURIComponent(feature.properties.slug)
-          const markerProfile = {
-            theUser: {
-              linkTitle: '@' + feature.properties.slug,
-              link: `/profile/${encodedId}/${encodedSlug}`,
-            },
-            user: {
-              linkTitle: '@' + feature.properties.slug,
-              link: `/profile/${encodedId}/${encodedSlug}`,
-            },
-            group: {
-              linkTitle: '&' + feature.properties.slug,
-              link: `/groups/${encodedId}/${encodedSlug}`,
-            },
-            event: {
-              linkTitle: feature.properties.slug,
-              link: `/post/${encodedId}/${encodedSlug}`,
-            },
-          }
-          const profile = markerProfile[feature.properties.type]
-
-          const item = document.createElement('div')
-
-          const nameRow = document.createElement('div')
-          const nameB = document.createElement('b')
-          nameB.textContent = feature.properties.name
-          const typeI = document.createElement('i')
-          typeI.textContent = ` (${markerTypeLabel})`
-          nameRow.appendChild(nameB)
-          nameRow.appendChild(typeI)
-          item.appendChild(nameRow)
-
-          const linkRow = document.createElement('div')
-          const link = document.createElement('a')
-          link.href = profile.link
-          link.target = '_blank'
-          link.rel = 'noopener noreferrer'
-          link.textContent = profile.linkTitle
-          linkRow.appendChild(link)
-          item.appendChild(linkRow)
-
-          body.appendChild(item)
-
-          if (feature.properties.description && feature.properties.description.length > 0) {
-            const desc = document.createElement('div')
-            desc.style.marginTop = '4px'
-            desc.textContent = feature.properties.description
-            body.appendChild(desc)
-          }
-        })
-
-        container.appendChild(body)
-        this.markers.popup.setLngLat(coordinates).setDOMContent(container).addTo(this.map)
-      }
-
-      // Query all features at the clicked/hovered point
-      const getFeaturesAtPoint = (point) => {
-        return this.map.queryRenderedFeatures(point, { layers: ['markers'] })
-      }
-
       // Desktop: show popup on hover
       this.map.on('mouseenter', 'markers', (e) => {
-        const features = getFeaturesAtPoint(e.point)
+        const features = this.getFeaturesAtPoint(e.point)
         if (features.length > 0) {
-          showPopup(features, e.lngLat)
+          this.showPopup(features, e.lngLat)
         }
       })
 
@@ -576,14 +485,111 @@ export default {
 
       // Mobile: show popup on click/tap
       this.map.on('click', 'markers', (e) => {
-        const features = getFeaturesAtPoint(e.point)
+        const features = this.getFeaturesAtPoint(e.point)
         if (features.length > 0) {
-          showPopup(features, e.lngLat)
+          this.showPopup(features, e.lngLat)
           e.originalEvent.stopPropagation()
         }
       })
 
       this.loadMarkersIconsAndAddMarkers()
+    },
+    // Show popup for given features at coordinates. Also used to open the
+    // popup programmatically for a deep-linked event (see
+    // openInitialEventPopup()), not just on hover/click.
+    showPopup(features, lngLat) {
+      if (this.markers.popup.isOpen()) {
+        this.markers.popup.remove()
+      }
+
+      this.map.getCanvas().style.cursor = 'pointer'
+
+      const coordinates = features[0].geometry.coordinates.slice()
+
+      // Ensure popup appears over the correct copy when map is zoomed out
+      while (Math.abs(lngLat.lng - coordinates[0]) > 180) {
+        coordinates[0] += lngLat.lng > coordinates[0] ? 360 : -360
+      }
+
+      // Build popup content safely using DOM nodes (no raw HTML interpolation)
+      const container = document.createElement('div')
+      container.className = 'map-popup-container'
+
+      const locationName = features[0].properties.locationName
+      if (locationName) {
+        const header = document.createElement('div')
+        header.className = 'map-popup-header'
+        header.textContent = locationName
+        container.appendChild(header)
+      }
+
+      const body = document.createElement('div')
+      body.className = 'map-popup-body'
+
+      features.forEach((feature, index) => {
+        if (index > 0) {
+          body.appendChild(document.createElement('hr'))
+        }
+
+        const markerTypeLabel = this.$t(`map.markerTypes.${feature.properties.type}`)
+        const encodedId = encodeURIComponent(feature.properties.id)
+        const encodedSlug = encodeURIComponent(feature.properties.slug)
+        const markerProfile = {
+          theUser: {
+            linkTitle: '@' + feature.properties.slug,
+            link: `/profile/${encodedId}/${encodedSlug}`,
+          },
+          user: {
+            linkTitle: '@' + feature.properties.slug,
+            link: `/profile/${encodedId}/${encodedSlug}`,
+          },
+          group: {
+            linkTitle: '&' + feature.properties.slug,
+            link: `/groups/${encodedId}/${encodedSlug}`,
+          },
+          event: {
+            linkTitle: feature.properties.slug,
+            link: `/post/${encodedId}/${encodedSlug}`,
+          },
+        }
+        const profile = markerProfile[feature.properties.type]
+
+        const item = document.createElement('div')
+
+        const nameRow = document.createElement('div')
+        const nameB = document.createElement('b')
+        nameB.textContent = feature.properties.name
+        const typeI = document.createElement('i')
+        typeI.textContent = ` (${markerTypeLabel})`
+        nameRow.appendChild(nameB)
+        nameRow.appendChild(typeI)
+        item.appendChild(nameRow)
+
+        const linkRow = document.createElement('div')
+        const link = document.createElement('a')
+        link.href = profile.link
+        link.target = '_blank'
+        link.rel = 'noopener noreferrer'
+        link.textContent = profile.linkTitle
+        linkRow.appendChild(link)
+        item.appendChild(linkRow)
+
+        body.appendChild(item)
+
+        if (feature.properties.description && feature.properties.description.length > 0) {
+          const desc = document.createElement('div')
+          desc.style.marginTop = '4px'
+          desc.textContent = feature.properties.description
+          body.appendChild(desc)
+        }
+      })
+
+      container.appendChild(body)
+      this.markers.popup.setLngLat(coordinates).setDOMContent(container).addTo(this.map)
+    },
+    // Query all features at the clicked/hovered point
+    getFeaturesAtPoint(point) {
+      return this.map.queryRenderedFeatures(point, { layers: ['markers'] })
     },
     language(map) {
       // example in mapbox-gl-language: https://github.com/mapbox/mapbox-gl-language/blob/master/index.js
@@ -795,7 +801,22 @@ export default {
       if (!this.markers.isFlyToCenter && this.markers.isSourceAndLayerAdded) {
         this.mapFlyToCenter()
         this.markers.isFlyToCenter = true
+        this.openInitialEventPopup()
       }
+    },
+    // Opens the popup for the event a "view on map" deep-link pointed at, so
+    // arriving here immediately shows the same event info instead of just an
+    // unlabeled pin among possibly many others. The popup positions itself
+    // from its own lngLat, so it doesn't need to wait for the flyTo above to
+    // finish animating.
+    openInitialEventPopup() {
+      if (!this.initialEventId) return
+      const feature = this.markers.geoJSON.find(
+        (f) => f.properties.type === 'event' && f.properties.id === this.initialEventId,
+      )
+      if (!feature) return
+      const [lng, lat] = feature.geometry.coordinates
+      this.showPopup([feature], { lng, lat })
     },
     // Called when users/groups/posts change after the initial load (e.g. the
     // "show past events" filter re-triggered the apollo query) — updates the

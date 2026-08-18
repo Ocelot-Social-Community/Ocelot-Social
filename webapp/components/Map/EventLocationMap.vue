@@ -74,6 +74,12 @@ export default {
       type: Boolean,
       default: false,
     },
+    // The event post's id — sent along on "view on map" so the main map can
+    // open this exact event's popup instead of just centering on a pin.
+    postId: {
+      type: String,
+      default: null,
+    },
   },
   data() {
     return {
@@ -171,6 +177,7 @@ export default {
     onViewOnMap({ lat, lng }) {
       const query = { lat, lng }
       if (this.isPastEvent) query.showPastEvents = '1'
+      if (this.postId) query.eventId = this.postId
       this.$router.push({ path: '/map', query })
     },
   },

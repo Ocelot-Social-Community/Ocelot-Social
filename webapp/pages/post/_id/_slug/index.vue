@@ -104,6 +104,7 @@
                 :location="eventMapLocation"
                 :editable="false"
                 :is-past-event="isPastEvent"
+                :post-id="post.id"
               />
             </div>
             <div class="ds-mb-small"></div>
@@ -405,6 +406,7 @@ export default {
         query: {
           lat: this.post.eventLocation.lat,
           lng: this.post.eventLocation.lng,
+          eventId: this.post.id,
           ...(this.isPastEvent ? { showPastEvents: '1' } : {}),
         },
       }
