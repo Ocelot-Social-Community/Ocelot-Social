@@ -8,6 +8,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
 /* eslint-disable security/detect-object-injection */
+import { runBatch } from './batch'
 import { unwrap } from './cypherField'
 
 // ---------------------------------------------------------------------------------------
@@ -24,20 +25,6 @@ import { unwrap } from './cypherField'
 //     to an OPTIONAL MATCH that WHERE stays part of it, which is what the single-row version
 //     did too.
 // ---------------------------------------------------------------------------------------
-
-const runBatch = async ({ context, cypher, ids }) => {
-  const session = context.driver.session()
-  try {
-    return await session.readTransaction(async (txc) => {
-      const result = await txc.run(cypher, { ids, cypherParams: context.cypherParams ?? {} })
-      const byId = new Map()
-      for (const record of result.records) byId.set(record.get('__id'), record.get('__value'))
-      return { byId }
-    })
-  } finally {
-    await session.close()
-  }
-}
 
 const batchRelated = async ({ context, type, idAttribute, connection, ids }) => {
   const { byId } = await runBatch({
@@ -65,10 +52,10 @@ const batchCount = async ({ context, type, idAttribute, connection, ids }) => {
       RETURN __id AS __id, COUNT(DISTINCT related) AS __value
     `,
   })
-  return ids.map((id) => {
-    const value = byId.get(id)
-    return typeof value?.toNumber === 'function' ? value.toNumber() : (value ?? 0)
-  })
+  // unwrap() rather than an ad-hoc toNumber check: COUNT comes back as a Bolt integer
+  // (`{low, high}`), which graphql-js refuses to serialise as Int. The typed runBatch made
+  // this visible — the hand-rolled duck-typing passed only because the value was `any`.
+  return ids.map((id) => unwrap(byId.get(id)) ?? 0)
 }
 
 const batchBoolean = async ({ context, type, idAttribute, condition, key, ids }) => {

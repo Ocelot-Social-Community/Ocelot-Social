@@ -3,6 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable security/detect-object-injection */
+import { runBatch } from './batch'
+
 import type { Context } from '@src/context'
 
 // Field resolvers for what used to be @cypher directives.
@@ -132,38 +134,30 @@ export default function cypherFields(
 
       return context.loaders
         .forField(loaderKey, async (ids) => {
-          const session = context.driver.session()
-          try {
-            return await session.readTransaction(async (transaction) => {
-              // The statement runs unchanged inside a CALL subquery, with only `this` bound.
-              // That avoids parsing or rewriting its body — the statements come from the old
-              // @cypher directives and range from `RETURN this.id` to multi-clause queries
-              // with WITH/ORDER BY/LIMIT.
-              const result = await transaction.run(
-                `
-                UNWIND $ids AS __id
-                CALL {
-                  WITH __id
-                  MATCH (this:${type} { ${idAttribute}: __id })
-                  ${statement} AS __value
-                }
-                RETURN __id AS __id, __value AS __value
-              `,
-                { ...args, ids, cypherParams: context.cypherParams ?? {} },
-              )
-              const byId = new Map<unknown, unknown>()
-              for (const record of result.records)
-                byId.set(record.get('__id'), record.get('__value'))
-              // An id with no row is a legitimate empty answer — what the directive produced
-              // too — but DataLoader still needs one entry per key, in key order.
-              return ids.map((id) => {
-                const value = byId.has(id) ? unwrap(byId.get(id)) : null
-                return value ?? fallback ?? null
-              })
-            })
-          } finally {
-            await session.close()
-          }
+          // The statement runs unchanged inside a CALL subquery, with only `this` bound. That
+          // avoids parsing or rewriting its body — the statements come from the old @cypher
+          // directives and range from `RETURN this.id` to multi-clause queries with
+          // WITH/ORDER BY/LIMIT.
+          const { byId } = await runBatch({
+            context,
+            ids,
+            params: args,
+            cypher: `
+              UNWIND $ids AS __id
+              CALL {
+                WITH __id
+                MATCH (this:${type} { ${idAttribute}: __id })
+                ${statement} AS __value
+              }
+              RETURN __id AS __id, __value AS __value
+            `,
+          })
+          // An id with no row is a legitimate empty answer — what the directive produced too
+          // — but DataLoader still needs one entry per key, in key order.
+          return ids.map((id) => {
+            const value = byId.has(id) ? unwrap(byId.get(id)) : null
+            return value ?? fallback ?? null
+          })
         })
         .load(parent[idAttribute] as string)
     }

@@ -10,6 +10,7 @@ import { v4 as uuid } from 'uuid'
 
 import { UserInputError } from '@graphql/errors'
 
+import { runBatch } from './helpers/batch'
 import cypherFields, { unwrap } from './helpers/cypherField'
 import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
@@ -781,28 +782,18 @@ export default {
           // The clause is part of the key: a batch sorted createdAt_asc must not answer a
           // request for createdAt_desc.
           .forField(`Post.comments:${order}`, async (ids) => {
-            const session = context.driver.session()
-            try {
-              return await session.readTransaction(async (transaction) => {
-                const result = await transaction.run(
-                  `
-                  UNWIND $ids AS __id
-                  MATCH (post:Post { id: __id })
-                  OPTIONAL MATCH (post)<-[:COMMENTS]-(comment:Comment)
-                  WITH __id, comment ORDER BY ${order}
-                  RETURN __id AS __id, collect(comment { .* }) AS __value
-                `,
-                  { ids },
-                )
-                const byId = new Map<unknown, unknown>()
-                for (const record of result.records) {
-                  byId.set(record.get('__id'), record.get('__value'))
-                }
-                return ids.map((id) => unwrap(byId.get(id) ?? []))
-              })
-            } finally {
-              await session.close()
-            }
+            const { byId } = await runBatch({
+              context,
+              ids,
+              cypher: `
+                UNWIND $ids AS __id
+                MATCH (post:Post { id: __id })
+                OPTIONAL MATCH (post)<-[:COMMENTS]-(comment:Comment)
+                WITH __id, comment ORDER BY ${order}
+                RETURN __id AS __id, collect(comment { .* }) AS __value
+              `,
+            })
+            return ids.map((id) => unwrap(byId.get(id) ?? []))
           })
           .load(parent.id as string)
       )
