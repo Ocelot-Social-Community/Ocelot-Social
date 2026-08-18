@@ -49,6 +49,14 @@ services:
       - LIVEKIT_API_SECRET=test-secret
     volumes:
       - ./coverage:/app/coverage
+      # Two backend tests read the webapp's SOURCES to check the client against the schema:
+      # webappQueries.spec.ts validates its GraphQL documents, webappPostFilters.spec.ts the
+      # post filters it sends. The `test` image only copies `backend/`, so in the container
+      # they find nothing — and a reader that finds nothing satisfies every assertion made
+      # about what it read. Mounted read-only instead of COPYied, so the backend image stays a
+      # backend image. `/webapp` is where the specs look: they resolve
+      # `<backend>/src/graphql/../../../webapp`, and the backend lives at /app.
+      - ./webapp:/webapp:ro
 
   maintenance:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there

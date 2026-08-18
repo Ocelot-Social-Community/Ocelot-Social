@@ -87,7 +87,26 @@ const FILTER_FIXTURES: Record<string, unknown> = {
  */
 const TRANSLATED_BY_A_WRAPPER = ['postsInMyGroups']
 
+/**
+ * Fails with the actual cause rather than "expected >= N, received 0".
+ *
+ * The sources live OUTSIDE this package, and the backend test image only contains `backend/`.
+ * Without the read-only `./webapp:/webapp` mount from docker-compose.test.yml the reader finds
+ * nothing, and every count-based assertion below then reports a number instead of the reason.
+ */
+const assertWebappReadable = () => {
+  if (!fs.existsSync(WEBAPP_ROOT)) {
+    throw new Error(
+      `Webapp sources not found at ${WEBAPP_ROOT}. This spec reads the CLIENT's files to ` +
+        'check them against the schema. In Docker they arrive through the read-only mount ' +
+        'in docker-compose.test.yml (`./webapp:/webapp:ro`); locally the repository checkout ' +
+        'provides them.',
+    )
+  }
+}
+
 const readSources = (): string[] => {
+  assertWebappReadable()
   const files: string[] = []
   const walk = (dir: string) => {
     if (!fs.existsSync(dir)) return
