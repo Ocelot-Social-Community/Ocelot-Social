@@ -204,7 +204,9 @@ export default {
       // `id` without a word, which loses something the client explicitly asked for — and
       // since the two express the same thing, sending both is a mistake worth naming.
       // helpers/nodeQuery.ts (Tag, Comment) does the same.
-      if (args.filter?.id !== undefined && args.filter?.id_in !== undefined) {
+      // Explicit `null` counts as not set: the line below already treats a null `id` as
+      // absent, so refusing it here would reject a filter the resolver is happy to run.
+      if (args.filter?.id != null && args.filter?.id_in != null) {
         throw new UserInputError('User filter: use either `id` or `id_in`, not both.')
       }
       const filterIds = args.filter?.id_in ?? (args.filter?.id ? [args.filter.id] : null)

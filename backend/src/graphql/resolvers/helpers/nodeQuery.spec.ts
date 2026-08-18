@@ -76,6 +76,20 @@ describe('Tag filter', () => {
     expect(data?.Tag).toBeFalsy()
   })
 
+  it.each([
+    ['id is explicitly null', { id: null, id_in: ['nodequery-beta'] }, ['nodequery-beta']],
+    ['id_in is explicitly null', { id: 'nodequery-beta', id_in: null }, ['nodequery-beta']],
+  ])('accepts the pair when %s', async (_name, filter, expected) => {
+    // The conflict check has to agree with the loop that applies the filters, and that loop
+    // skips null values. GraphQL allows an explicit null for a nullable input field — a
+    // client passing a form object straight through sends exactly this — so treating it as
+    // "set" would reject a filter the resolver then runs as a plain one-sided lookup.
+    const { data, errors } = await setup.query({ query: tagQuery, variables: { filter } })
+
+    expect(errors).toBeUndefined()
+    expect(data?.Tag).toEqual(expected.map((id) => ({ id })))
+  })
+
   it.each(['id_not', 'id_not_in', 'taggedPosts_some'])(
     'rejects the undeclared operator %s',
     async (key) => {

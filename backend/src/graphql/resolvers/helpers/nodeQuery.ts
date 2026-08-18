@@ -111,7 +111,12 @@ export const nodeQuery =
     // self-contradictory — there is no query it expresses that one of them alone does not.
     // Rejected rather than resolved: ANDing them answers a contradiction with a silent empty
     // list, and letting one win throws away something the client explicitly asked for.
-    if (filter.id !== undefined && filter.id_in !== undefined) {
+    //
+    // An explicit `null` counts as NOT SET, matching the loop below, which skips null values.
+    // GraphQL lets a client send `{ id: null, id_in: [...] }` — passing a form object straight
+    // through does it — and rejecting that would refuse a filter the resolver then executes
+    // as a plain `id_in`.
+    if (filter.id != null && filter.id_in != null) {
       throw new UserInputError(`${label} filter: use either \`id\` or \`id_in\`, not both.`)
     }
 
