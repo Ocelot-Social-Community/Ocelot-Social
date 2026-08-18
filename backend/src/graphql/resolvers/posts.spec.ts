@@ -192,6 +192,22 @@ describe('Post', () => {
         await expect(query({ query: Post, variables })).resolves.toMatchObject(expected)
       })
 
+      // The projection is `RETURN collect(...)`, an aggregation without a grouping key, so
+      // it yields one row with [] even when nothing matched — which is why the field comes
+      // back as an empty list rather than null. Pinned down here because a later rewrite
+      // (e.g. to OPTIONAL MATCH with a different shape) could flip it to null unnoticed,
+      // and clients iterate over this field.
+      it('returns an empty list, not null, for a post without emotions', async () => {
+        await expect(query({ query: Post, variables })).resolves.toMatchObject({
+          data: {
+            Post: expect.arrayContaining([
+              expect.objectContaining({ id: 'happy-post', emotions: [] }),
+            ]),
+          },
+          errors: undefined,
+        })
+      })
+
       it('filters by multiple emotions', async () => {
         await user.relateTo(happyPost, 'emoted', { emotion: 'happy' })
         await user.relateTo(cryPost, 'emoted', { emotion: 'cry' })
@@ -2078,8 +2094,8 @@ describe('emotions', () => {
             Post: [
               {
                 emotions: expect.arrayContaining([
-                  { emotion: 'happy', User: { id: 'current-user' } },
-                  { emotion: 'surprised', User: { id: 'current-user' } },
+                  { emotion: 'happy', from: { id: 'current-user' } },
+                  { emotion: 'surprised', from: { id: 'current-user' } },
                 ]),
               },
             ],
@@ -2184,7 +2200,7 @@ describe('emotions', () => {
         })
 
         it('removes only the requested emotion, not all emotions', async () => {
-          const expectedEmotions = [{ emotion: 'happy', User: { id: 'u257' } }]
+          const expectedEmotions = [{ emotion: 'happy', from: { id: 'u257' } }]
           const expectedResponse = {
             data: { Post: [{ emotions: expect.arrayContaining(expectedEmotions) }] },
           }

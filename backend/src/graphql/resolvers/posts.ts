@@ -6,16 +6,19 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { isEmpty } from 'lodash'
-import { neo4jgraphql } from 'neo4j-graphql-js'
 import { v4 as uuid } from 'uuid'
 
 import { UserInputError } from '@graphql/errors'
 
+import { runBatch } from './helpers/batch'
+import cypherFields, { unwrap } from './helpers/cypherField'
 import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
-import { filterPostsHasLocation } from './helpers/filterHasLocation'
 import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
 import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
+import { orderClause } from './helpers/ordering'
+import { pagingClause } from './helpers/paging'
+import { postFilterToCypher, postOrderClause } from './helpers/postFilter'
 import Resolver from './helpers/Resolver'
 import { images } from './images/images'
 import { createOrUpdateLocations } from './users/location'
@@ -98,28 +101,66 @@ const filterEventDates = (params) => {
   return params
 }
 
+// ORDER BY from `_CommentOrdering`. Oldest first by default — how a thread reads, and what
+// the webapp asks for.
+const commentOrderClause = (orderBy: unknown): string =>
+  orderClause(orderBy, {
+    enumName: '_CommentOrdering',
+    alias: 'comment',
+    fallback: 'comment.createdAt ASC',
+  })
+
+// Shared execution for Post and profilePagePosts (stage C2). Both build the same filter
+// tree through the wrappers above and then differ only in which pinned-post rule they
+// applied, so the query itself is identical.
+//
+// The wrappers keep producing filter OBJECTS rather than Cypher: filterInvisiblePosts and
+// filterForMutedUsers are the access control, they are covered by their own specs, and
+// rewriting them at the same time as the query would have made a regression impossible to
+// localise. postFilterToCypher translates the tree they build.
+const queryPosts = async (params, context: Context) => {
+  const { where, params: whereParams } = postFilterToCypher(params)
+  const paging = pagingClause(params)
+  const session = context.driver.session()
+  try {
+    return await session.readTransaction(async (transaction) => {
+      const result = await transaction.run(
+        `
+          MATCH (post:Post)
+          ${where ? `WHERE ${where}` : ''}
+          RETURN post { .* } AS post
+          ORDER BY ${postOrderClause(params.orderBy)}
+          ${paging.clause}
+        `,
+        { ...whereParams, ...paging.params },
+      )
+      return result.records.map((record) => unwrap(record.get('post')))
+    })
+  } finally {
+    await session.close()
+  }
+}
+
 export default {
   Query: {
-    Post: async (object, params, context: Context, resolveInfo) => {
+    Post: async (_object, params, context: Context, _resolveInfo) => {
       const skipPinnedFilter = !!params.filter?.skipPinnedFilter
       if (params.filter) delete params.filter.skipPinnedFilter
-      params = await filterPostsOfMyGroups(params, context)
-      params = await filterInvisiblePosts(params, context)
-      params = await filterForMutedUsers(params, context)
+      params = filterPostsOfMyGroups(params, context)
+      params = filterInvisiblePosts(params, context)
+      params = filterForMutedUsers(params, context)
       params = filterEventDates(params)
-      params = await filterPostsHasLocation(params, context)
       if (!skipPinnedFilter) {
         params = await maintainPinnedPosts(params)
       }
-      return neo4jgraphql(object, params, context, resolveInfo)
+      return queryPosts(params, context)
     },
-    profilePagePosts: async (object, params, context, resolveInfo) => {
-      params = await filterPostsOfMyGroups(params, context)
-      params = await filterInvisiblePosts(params, context)
-      params = await filterForMutedUsers(params, context)
-      params = await filterPostsHasLocation(params, context)
+    profilePagePosts: async (_object, params, context: Context, _resolveInfo) => {
+      params = filterPostsOfMyGroups(params, context)
+      params = filterInvisiblePosts(params, context)
+      params = filterForMutedUsers(params, context)
       params = await maintainGroupPinnedPosts(params)
-      return neo4jgraphql(object, params, context, resolveInfo)
+      return queryPosts(params, context)
     },
     PostsEmotionsCountByEmotion: async (_object, params, context, _resolveInfo) => {
       const { postId, data } = params
@@ -680,27 +721,13 @@ export default {
     },
   },
   Post: {
+    // No `_id` here: unlike Room/Message/User it is not selected by the chat frontend, so
+    // stage D dropped the field from Post rather than carrying the alias forward.
     ...Resolver('Post', {
-      undefinedToNull: [
-        'activityId',
-        'objectId',
-        'language',
-        'pinnedAt',
-        'pinned',
-        'groupPinned',
-        'eventVenue',
-        'eventLocation',
-        'eventLocationName',
-        'eventStart',
-        'eventEnd',
-        'eventIsOnline',
-      ],
       hasMany: {
         tags: '-[:TAGGED]->(related:Tag)',
         categories: '-[:CATEGORIZED]->(related:Category)',
-        comments: '<-[:COMMENTS]-(related:Comment)',
         shoutedBy: '<-[:SHOUTED]-(related:User)',
-        emotions: '<-[related:EMOTED]',
       },
       hasOne: {
         author: '<-[:WROTE]-(related:User)',
@@ -742,6 +769,53 @@ export default {
         ).records.length === 1
       )
     }, */
+    // `comments` takes an orderBy argument, which the hasMany helper cannot express, so it
+    // gets its own batched resolver. The sort runs inside the collect() so each post keeps
+    // its own ordering — sorting the flattened batch would be meaningless.
+    comments: async (parent, params: { orderBy?: unknown }, context: Context) => {
+      if (typeof parent?.comments !== 'undefined') return parent.comments
+      if (!parent?.id) return []
+
+      const order = commentOrderClause(params.orderBy)
+      return (
+        context.loaders
+          // The clause is part of the key: a batch sorted createdAt_asc must not answer a
+          // request for createdAt_desc.
+          .forField(`Post.comments:${order}`, async (ids) => {
+            const { byId } = await runBatch({
+              context,
+              ids,
+              cypher: `
+                UNWIND $ids AS __id
+                MATCH (post:Post { id: __id })
+                OPTIONAL MATCH (post)<-[:COMMENTS]-(comment:Comment)
+                WITH __id, comment ORDER BY ${order}
+                RETURN __id AS __id, collect(comment { .* }) AS __value
+              `,
+            })
+            return ids.map((id) => unwrap(byId.get(id) ?? []))
+          })
+          .load(parent.id as string)
+      )
+    },
+    ...cypherFields('Post', {
+      postType: {
+        // The node also has a `postType` STRING property; this field is the label list.
+        always: true,
+        statement: "RETURN [l IN labels(this) WHERE NOT l = 'Post']",
+      },
+      // Verbatim from Post.gql — both read relationship data, so neither is a node property.
+      pinnedAt:
+        'MATCH (this)<-[pinned:PINNED]-(:User) WHERE NOT this.deleted = true AND NOT this.disabled = true RETURN pinned.createdAt',
+      eventLocation: 'MATCH (this)-[:IS_IN]->(l:Location) RETURN l',
+      // EMOTED is a relationship type: the field carries the relationship's own properties
+      // plus its endpoints. Resolver()'s hasMany helper only projects `related { .* }`,
+      // which would drop from/to — hence a dedicated statement.
+      emotions: `
+        MATCH (this)<-[emoted:EMOTED]-(user:User)
+        RETURN collect(emoted { .*, from: properties(user), to: properties(this) })
+      `,
+    }),
     unreadNotificationByCurrentUser: async (parent, _params, context: Context, _resolveInfo) => {
       const currentUserId = context.user?.id
       if (!currentUserId || !parent?.id) return null

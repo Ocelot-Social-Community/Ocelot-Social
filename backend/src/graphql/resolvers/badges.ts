@@ -5,9 +5,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-loop-func */
-import { neo4jgraphql } from 'neo4j-graphql-js'
-
 import { branding } from '@src/branding'
+
+import { unwrap } from './helpers/cypherField'
+import Resolver from './helpers/Resolver'
 
 import type { Context } from '@src/context'
 
@@ -32,9 +33,27 @@ export default {
     // Sort by the stable badge id so the list is deterministic and identical across
     // instances. Without this the order follows the database insertion (seed) order,
     // which differs between instances even though the badge data is the same.
-    Badge: async (object, args, context, resolveInfo) => {
-      const badges = await neo4jgraphql(object, args, context, resolveInfo)
-      return badges.sort((a, b) => String(a.id).localeCompare(String(b.id)))
+    //
+    // Stage C2: hand-written Cypher instead of neo4jgraphql. The query takes no arguments
+    // (Badge.gql declares `Badge: [Badge]`), so there is no filtering or pagination to
+    // reproduce — the ordering moves into Cypher, and Badge's field resolvers handle
+    // `rewarded`/`verifies`.
+    Badge: async (_object, _args, context: Context, _resolveInfo) => {
+      const session = context.driver.session()
+      try {
+        return await session.readTransaction(async (transaction) => {
+          const result = await transaction.run(
+            `
+              MATCH (badge:Badge)
+              RETURN badge { .* } AS badge
+              ORDER BY badge.id ASC
+            `,
+          )
+          return result.records.map((record) => unwrap(record.get('badge')))
+        })
+      } finally {
+        await session.close()
+      }
     },
   },
 
@@ -179,6 +198,17 @@ export default {
     },
   },
   Badge: {
+    // Badge has no `_id` field, unlike Room/Message/User: neo4j-graphql-js excluded this
+    // type from augmentation, so it was never generated here and there was nothing to carry
+    // forward as an alias.
+    //
+    // Both edges point FROM the badge TO the user (see `direction: 'in'` on User.rewarded).
+    ...Resolver('Badge', {
+      hasMany: {
+        rewarded: '-[:REWARDED]->(related:User)',
+        verifies: '-[:VERIFIES]->(related:User)',
+      },
+    }),
     isDefault: async (parent, _params, _context, _resolveInfo) =>
       [defaultTrophyBadge.id, defaultVerificationBadge.id].includes(parent.id),
   },

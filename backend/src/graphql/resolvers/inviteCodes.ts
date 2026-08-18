@@ -293,7 +293,6 @@ export default {
     },
     ...Resolver('InviteCode', {
       idAttribute: 'code',
-      undefinedToNull: ['expiresAt', 'comment'],
       count: {
         redeemedByCount: '<-[:REDEEMED]-(related:User)',
       },

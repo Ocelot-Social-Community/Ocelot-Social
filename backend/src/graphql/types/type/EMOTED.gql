@@ -1,5 +1,5 @@
 "Relationship representing a user's emotional reaction to a post."
-type EMOTED @relation(name: "EMOTED") {
+type EMOTED {
   "The reacting user."
   from: User
   "The post reacted to."
@@ -18,7 +18,7 @@ input _EMOTEDInput {
 }
 
 input _PostEMOTEDFilter {
-  emotion_in: [Emotion]
+  emotion_in: [Emotion!]
   createdAt: String
   updatedAt: String
 }

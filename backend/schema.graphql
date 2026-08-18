@@ -1,0 +1,2472 @@
+"""
+A personal API key that authenticates programmatic access on behalf of its owner. Only a non-secret prefix and metadata are stored; the secret itself is shown exactly once, at creation.
+"""
+type ApiKey {
+  createdAt: String!
+
+  """True once the key has been revoked."""
+  disabled: Boolean!
+  disabledAt: String
+
+  """When the key expires, or null if it never expires."""
+  expiresAt: String
+  id: ID!
+
+  """
+  Non-secret leading segment of the key, used to identify it in listings.
+  """
+  keyPrefix: String!
+
+  """When the key last authenticated a request, or null if never used."""
+  lastUsedAt: String
+
+  """Human-readable label chosen by the owner."""
+  name: String!
+  owner: User
+}
+
+"""Aggregated per-user API-key usage, for the administration overview."""
+type ApiKeyUserSummary {
+  """Number of the user's currently active (non-revoked) keys."""
+  activeCount: Int!
+  commentsCount: Int!
+
+  """Most recent time any of the user's keys was used, or null."""
+  lastActivity: String
+  postsCount: Int!
+
+  """Number of the user's revoked keys."""
+  revokedCount: Int!
+  user: User!
+}
+
+"""
+Returned exactly once, on creation — the only moment the full secret is exposed.
+"""
+type ApiKeyWithSecret {
+  apiKey: ApiKey!
+
+  """The full API key secret. Store it now; it cannot be retrieved again."""
+  secret: String!
+}
+
+"""
+A badge that can be attached to users — either a verification mark or an awardable trophy.
+"""
+type Badge {
+  createdAt: String
+  description: String!
+
+  """Identifier/URL of the badge's icon asset."""
+  icon: String!
+  id: ID!
+
+  """Whether this badge is the instance-wide default of its type."""
+  isDefault: Boolean!
+
+  """Users currently wearing this trophy badge."""
+  rewarded: [User]!
+  type: BadgeType!
+
+  """Users whose verification this badge represents."""
+  verifies: [User]!
+}
+
+"""The purpose of a badge."""
+enum BadgeType {
+  """An achievement a user can be awarded and choose to display."""
+  trophy
+
+  """Marks a user as verified."""
+  verification
+}
+
+"""
+A topical category that posts and groups can be filed under. Categories are a fixed, instance-configured taxonomy (unlike free-form tags).
+"""
+type Category {
+  createdAt: String
+
+  """Identifier of the category's icon."""
+  icon: String!
+  id: ID!
+  name: String!
+
+  """Number of posts filed under this category."""
+  postCount: Int!
+  posts: [Post]!
+  slug: String
+  updatedAt: String
+}
+
+"""Real-time delivery/seen-status update for messages in a room."""
+type ChatMessageStatusPayload {
+  messageIds: [String!]!
+  roomId: ID!
+  status: String!
+}
+
+"""A candidate recipient when starting a chat: a user or a group."""
+union ChatTarget = Group | User
+
+"""A comment written by a user in reply to a post."""
+type Comment {
+  """ActivityPub activity id, for federated comments."""
+  activityId: String
+  author: User
+
+  """Comment body as rich text (HTML)."""
+  content: String!
+  createdAt: String
+
+  """True once the comment has been moderated away."""
+  deleted: Boolean
+
+  """True once the comment has been disabled by a moderator."""
+  disabled: Boolean
+  id: ID!
+
+  """Whether the current user observes the post this comment belongs to."""
+  isPostObservedByMe: Boolean!
+
+  """The post this comment belongs to."""
+  post: Post
+
+  """Number of users observing the post this comment belongs to."""
+  postObservingUsersCount: Int!
+
+  """Whether the current user has shouted (endorsed) this comment."""
+  shoutedByCurrentUser: Boolean!
+
+  """Number of users who have shouted (endorsed) this comment."""
+  shoutedCount: Int!
+  updatedAt: String
+}
+
+enum ConfigKeyState {
+  empty
+  missing
+  set
+}
+
+"""Resources that can be deleted along with a user account."""
+enum Deletable {
+  Comment
+  Post
+}
+
+"""
+Instance-wide donation campaign state, shown in the donation progress widget.
+"""
+type Donations {
+  createdAt: String!
+
+  """Fundraising target amount."""
+  goal: Int!
+  id: ID!
+
+  """Amount raised so far."""
+  progress: Int!
+
+  """Whether the donation widget is shown to users."""
+  showDonations: Boolean!
+  updatedAt: String!
+}
+
+"""Relationship representing a user's emotional reaction to a post."""
+type EMOTED {
+  createdAt: String
+  emotion: Emotion
+
+  """The reacting user."""
+  from: User
+
+  """The post reacted to."""
+  to: Post
+  updatedAt: String
+}
+
+"""
+A permission the current viewer effectively holds, carrying its catalog group so the webapp can gate UI areas by group (e.g. show the admin area for ANY administration-group permission) without a hard-coded key list.
+"""
+type EffectivePermission {
+  group: String!
+  key: String!
+}
+
+"""An email address belonging to a user, with its verification state."""
+type EmailAddress {
+  createdAt: String
+  email: ID!
+
+  """When the address was verified, or null if still unverified."""
+  verifiedAt: String
+}
+
+"""
+A user's email notification toggles for one category (post, chat or group).
+"""
+type EmailNotificationSettings {
+  settings: [EmailNotificationSettingsOption]
+  type: EmailNotificationSettingsType
+}
+
+"""Input toggling a single email notification setting on or off."""
+input EmailNotificationSettingsInput {
+  name: EmailNotificationSettingsName
+  value: Boolean
+}
+
+"""
+An individual email-notification toggle, identifying the event that triggers an email.
+"""
+enum EmailNotificationSettingsName {
+  """The user received a direct chat message."""
+  chatMessage
+
+  """Someone commented on a post the user observes."""
+  commentOnObservedPost
+
+  """A user the current user follows published a post."""
+  followingUsers
+
+  """A user joined a group the user administrates."""
+  groupMemberJoined
+
+  """A user left a group the user administrates."""
+  groupMemberLeft
+
+  """A member was removed from a group the user administrates."""
+  groupMemberRemoved
+
+  """A member's role changed in a group the user administrates."""
+  groupMemberRoleChanged
+
+  """The user was mentioned in a post or comment."""
+  mention
+
+  """A new post was created in a group the user is a member of."""
+  postInGroup
+}
+
+"""A single email notification toggle and its current value."""
+type EmailNotificationSettingsOption {
+  name: EmailNotificationSettingsName
+  value: Boolean
+}
+
+"""The category a set of email-notification toggles belongs to."""
+enum EmailNotificationSettingsType {
+  """Notifications about direct chat messages."""
+  chat
+
+  """Notifications about group membership events."""
+  group
+
+  """Notifications about posts and comments."""
+  post
+}
+
+"""
+oEmbed-style metadata scraped from an external URL, used to render link previews.
+"""
+type Embed {
+  audio: String
+  author: String
+  date: String
+  description: String
+
+  """
+  Embeddable HTML fragment (e.g. a player iframe), when the provider offers one.
+  """
+  html: String
+
+  """URL of a representative preview image."""
+  image: String
+
+  """Detected content language."""
+  lang: String
+  publisher: String
+  sources: [String]
+  title: String
+
+  """The oEmbed resource type (e.g. link, video, photo, rich)."""
+  type: String
+  url: String
+  video: String
+}
+
+"""An oEmbed provider this instance can resolve link previews for."""
+type EmbedProvider {
+  """Display name, e.g. "YouTube"."""
+  name: String!
+
+  """The provider's own site, e.g. "https://youtube.com"."""
+  url: String!
+}
+
+"""An emotional reaction a user can leave on a post."""
+enum Emotion {
+  angry
+  cry
+  funny
+  happy
+  surprised
+}
+
+enum EnvCategory {
+  auth
+  branding
+  database
+  features
+  general
+  layout
+  mail
+  maps
+  monitoring
+  redis
+  registration
+  server
+  storage
+  video
+}
+
+type EnvKeyStatus {
+  """The environment variable name (e.g. LIVEKIT_API_SECRET)."""
+  name: String!
+
+  """Presence state — the only thing reported; a value is never returned."""
+  state: ConfigKeyState!
+}
+
+"""
+Relationship recording that a user filed a moderation report against a resource, with the stated reason.
+"""
+type FILED {
+  createdAt: String!
+  reasonCategory: ReasonCategory!
+
+  """Free-text explanation the reporter provided."""
+  reasonDescription: String!
+
+  """The user who filed the report."""
+  submitter: User
+}
+
+"""A file attached to a chat message."""
+type File {
+  """Duration in seconds for audio/video files."""
+  duration: Float
+  extension: String
+  name: String
+
+  """MIME type of the file."""
+  type: String
+
+  """The file's URL, which also serves as its identifier."""
+  url: ID!
+}
+
+"""
+Input for a file to attach to a chat message. The file itself must be provided as `upload` (attaching without it is rejected); the remaining fields are its metadata.
+"""
+input FileInput {
+  duration: Float
+  extension: String
+  name: String
+  type: String
+
+  """
+  The file to upload. Required — the resolver rejects an attachment without it.
+  """
+  upload: Upload
+}
+
+"""
+The result of filing a report, echoing the reason and linking to the created report.
+"""
+type FiledReport {
+  createdAt: String!
+  reasonCategory: ReasonCategory!
+  reasonDescription: String!
+  reportId: ID!
+  resource: ReportedResource!
+}
+
+"""
+A group: a space where members share posts, chat and optionally hold video calls. Discoverability and joining are governed by its groupType.
+"""
+type Group {
+  """Short statement of the group's goal."""
+  about: String
+  actionRadius: GroupActionRadius!
+  avatar: Image
+  categories: [Category]
+
+  """ISO 8601 date-time string of creation."""
+  createdAt: String!
+
+  """Number of posts currently pinned within this group."""
+  currentlyPinnedPostsCount: Int!
+  deleted: Boolean
+
+  """Full group description (rich text)."""
+  description: String!
+
+  """Plain-text excerpt of the description, for previews."""
+  descriptionExcerpt: String!
+  disabled: Boolean
+  groupType: GroupType!
+  id: ID!
+
+  """Invite codes to this group the current user has generated."""
+  inviteCodes: [InviteCode]!
+
+  """Whether the current user has muted this group."""
+  isMutedByMe: Boolean!
+  location: Location
+  locationName: String
+
+  """Number of members, excluding those with a pending join request."""
+  membersCount: Int!
+
+  """
+  The current user's role in this group, or null if they are not a member.
+  """
+  myRole: GroupMemberRole
+
+  """The group's title."""
+  name: String!
+  posts: [Post]
+
+  """Total number of non-deleted, non-disabled posts in this group."""
+  postsCount: Int!
+
+  """For closed groups: whether non-members can see the member list."""
+  showMembers: Boolean
+
+  """
+  Whether the profile owner has chosen to show this group on their public profile.
+  """
+  showOnProfile: Boolean
+
+  """URL-safe unique handle for the group."""
+  slug: String!
+
+  """ISO 8601 date-time string of the last update."""
+  updatedAt: String!
+}
+
+"""The geographic reach a group intends its activities to have."""
+enum GroupActionRadius {
+  continental
+  global
+
+  """Tongue-in-cheek maximum reach: beyond planet Earth."""
+  interplanetary
+  national
+  regional
+}
+
+"""
+A group member paired with their membership relationship (role, join date).
+"""
+type GroupMember {
+  membership: MEMBER_OF
+  user: User
+}
+
+"""A user's role within a group, in ascending order of privilege."""
+enum GroupMemberRole {
+  """Can manage members and group settings."""
+  admin
+
+  """
+  Full control over the group, including deleting it; there is exactly one owner.
+  """
+  owner
+
+  """
+  Membership requested but not yet approved (closed groups); not counted as a member.
+  """
+  pending
+
+  """Regular member."""
+  usual
+}
+
+type GroupMembershipVisibilityChanged {
+  userId: ID!
+}
+
+type GroupShowMembersChanged {
+  groupId: ID!
+}
+
+"""Determines a group's discoverability and how users become members."""
+enum GroupType {
+  """
+  Anyone can find the group, but joining requires approval by a group admin/owner.
+  """
+  closed
+
+  """The group is unlisted; it can only be found and joined via invite."""
+  hidden
+
+  """Anyone can find the group and join without approval."""
+  public
+}
+
+"""An image asset (avatar, hero image, etc.) with rendering metadata."""
+type Image {
+  """Alternative text for accessibility."""
+  alt: String
+
+  """Width-to-height ratio, used to reserve layout space before load."""
+  aspectRatio: Float
+
+  """
+  Whether the image is flagged as sensitive and should be blurred by default.
+  """
+  sensitive: Boolean
+
+  """URL of a variant resized to the requested width/height."""
+  transform(height: Int, width: Int): String
+
+  """MIME type of the image."""
+  type: String
+
+  """The image's URL, which also serves as its identifier."""
+  url: ID!
+}
+
+"""
+Input for uploading or updating an image. Provide `upload` to set a new file.
+"""
+input ImageInput {
+  alt: String
+  aspectRatio: Float
+  sensitive: Boolean
+  type: String
+  upload: Upload
+}
+
+"""
+An invite code. A personal code lets its holder register on the instance; a group code additionally grants membership in a specific group. May be limited by an expiry and a redemption limit.
+"""
+type InviteCode {
+  """The code string, which also serves as its identifier."""
+  code: ID!
+
+  """Free-form note the issuer attached to the code."""
+  comment: String
+  createdAt: String!
+
+  """When the code expires, or null if it never expires."""
+  expiresAt: String
+
+  """The user who issued the code."""
+  generatedBy: User
+
+  """
+  The group this code invites into, or null for a personal (registration-only) code.
+  """
+  invitedTo: Group
+
+  """
+  Whether the code can still be redeemed (not expired, invalidated, or over its redemption limit).
+  """
+  isValid: Boolean!
+
+  """Users who have redeemed this code."""
+  redeemedBy: [User]
+  redeemedByCount: Int!
+}
+
+"""
+A geographic place (city, region, country, …) linked to users, groups and events. Places nest via `parent`, forming a hierarchy up to the country level.
+"""
+type Location {
+  """
+  Distance in kilometres from the current user's location. Requires authentication.
+  """
+  distanceToMe: Int
+  id: ID!
+
+  """Latitude in decimal degrees (WGS84)."""
+  lat: Float
+
+  """Longitude in decimal degrees (WGS84)."""
+  lng: Float
+
+  """
+  Localized place name. Falls back through the requested `lang`, the instance default language, and finally the raw name/id.
+  """
+  name(lang: String = ""): String!
+
+  """The enclosing place one level up in the hierarchy."""
+  parent: Location
+
+  """The place's granularity (e.g. country, region, place)."""
+  type: String!
+}
+
+"""A geocoding suggestion returned by the MapBox-backed place search."""
+type LocationMapBox {
+  id: ID!
+  place_name: String!
+}
+
+"""
+Relationship carrying a user's membership in a group, including their role and when it began.
+"""
+type MEMBER_OF {
+  createdAt: String!
+  role: GroupMemberRole!
+  showOnProfile: Boolean
+  updatedAt: String!
+}
+
+"""A single chat message within a room."""
+type Message {
+  """
+  Alias of `id`, kept for the chat frontend (vue-advanced-chat keys objects by `_id`).
+  """
+  _id: String @deprecated(reason: "Use `id`.")
+  author: User!
+
+  """Avatar URL of the sending user."""
+  avatar: String
+  content: String
+  createdAt: String
+
+  """Alias of createdAt; prefer createdAt in new code."""
+  date: String!
+
+  """
+  Whether the message has been distributed to recipients (delivery-status flag).
+  """
+  distributed: Boolean
+
+  """Files attached to the message."""
+  files: [File]!
+  id: ID!
+
+  """
+  Monotonically increasing index of the message within its room, used for ordering and paging.
+  """
+  indexId: Int!
+  room: Room!
+
+  """Whether the message has been persisted (delivery-status flag)."""
+  saved: Boolean
+
+  """
+  Whether the current user has seen the message (always true for messages they sent).
+  """
+  seen: Boolean
+
+  """Id of the sending user."""
+  senderId: String!
+  updatedAt: String
+
+  """Display name of the sending user."""
+  username: String!
+}
+
+type Mutation {
+  """
+  Add a further email address to the current account, sending a verification nonce. Requires authentication.
+  """
+  AddEmailAddress(email: String!): EmailAddress
+
+  """
+  Add the current user's emotional reaction to a post. Requires authentication.
+  """
+  AddPostEmotions(data: _EMOTEDInput!, to: _PostInput!): EMOTED
+
+  """
+  Change a member's role in a group. Restricted to admins/owners, subject to the role hierarchy.
+  """
+  ChangeGroupMemberRole(groupId: ID!, roleInGroup: GroupMemberRole!, userId: ID!): GroupMember
+
+  """
+  Write a comment on a post. Requires authentication, the `comment.create` permission, and permission to comment on that post.
+  """
+  CreateComment(content: String!, id: ID, postId: ID!): Comment
+
+  """
+  Create a group. Requires authentication and the `group.create_<type>` permission matching the chosen groupType.
+  """
+  CreateGroup(
+    about: String
+    actionRadius: GroupActionRadius!
+    categoryIds: [ID]
+    description: String!
+    groupType: GroupType!
+    id: ID
+
+    """Empty string '' clears the location (sets it to null)."""
+    locationName: String
+    name: String!
+    showMembers: Boolean
+    slug: String
+  ): Group
+
+  """Create (or fetch) the chat room for a group. Requires authentication."""
+  CreateGroupRoom(groupId: ID!): Room
+
+  """
+  Send a message to a room (by `roomId`) or to a user (by `userId`, opening a direct room). Requires authentication.
+  """
+  CreateMessage(content: String, files: [FileInput], roomId: ID, userId: ID): Message
+
+  """
+  Create a post. Requires authentication and the `post.create` permission; posting into a group additionally requires membership of that group.
+  """
+  CreatePost(
+    categoryIds: [ID]
+    content: String!
+
+    """Event details; required when postType is Event."""
+    eventInput: _EventInput
+
+    """Post into this group; omit for a public/timeline post."""
+    groupId: ID
+    id: ID
+    image: ImageInput
+    language: String
+    postType: PostType = Article
+    slug: String
+    title: String!
+    visibility: Visibility
+  ): Post
+
+  """
+  Add a social-media link to your profile. Requires the `socialMedia.create` permission.
+  """
+  CreateSocialMedia(id: ID, url: String!): SocialMedia
+
+  """Delete one of your own comments. Restricted to the author."""
+  DeleteComment(id: ID!): Comment
+
+  """Delete one of your own posts. Restricted to the author."""
+  DeletePost(id: ID!): Post
+
+  """Remove one of your own social-media links. Restricted to the owner."""
+  DeleteSocialMedia(id: ID!): SocialMedia
+
+  """
+  Delete a user account. Allowed for the account owner, or with user.delete.any subject to the act-on hierarchy. Optionally also delete the user's posts and/or comments via `resource`.
+  """
+  DeleteUser(id: ID!, resource: [Deletable]): User
+
+  """
+  Join a group, or accept/approve a pending membership. Allowed per the group's join rules; joining on behalf of another user requires the appropriate rights.
+  """
+  JoinGroup(groupId: ID!, userId: ID!): GroupMember
+
+  """Leave a group, or (for admins/owners) let a member leave."""
+  LeaveGroup(groupId: ID!, userId: ID!): GroupMember
+
+  """
+  Mark the given messages as seen by the current user. Requires authentication.
+  """
+  MarkMessagesAsSeen(messageIds: [String!]): Boolean
+
+  """
+  Remove the current user's emotional reaction from a post. Requires authentication.
+  """
+  RemovePostEmotions(data: _EMOTEDInput!, to: _PostInput!): EMOTED
+
+  """
+  Remove a user from a group. Restricted to those allowed to manage the group's members.
+  """
+  RemoveUserFromGroup(groupId: ID!, userId: ID!): GroupMember
+
+  """
+  Begin registration for an email address, sending a verification nonce. Allowed when public or invite registration is enabled (or by an admin with `role.manage`); an inviteCode is required for invite-only registration.
+  """
+  Signup(email: String!, inviteCode: String = null, locale: String!): EmailAddress
+
+  """
+  Complete registration by confirming the nonce and creating the user account. Public.
+  """
+  SignupVerification(about: String, email: String!, inviteCode: String = null, locale: String, locationName: String = null, name: String!, nonce: String!, password: String!, slug: String, termsAndConditionsAgreedVersion: String!): User
+
+  """Edit one of your own comments. Restricted to the author."""
+  UpdateComment(content: String!, id: ID!): Comment
+
+  """
+  Update the donation campaign settings. Requires the `donation.manage` permission.
+  """
+  UpdateDonations(goal: Int, progress: Int, showDonations: Boolean): Donations
+
+  """Update a group's settings. Restricted to admins/owners of the group."""
+  UpdateGroup(
+    about: String
+    actionRadius: GroupActionRadius
+    avatar: ImageInput
+    categoryIds: [ID]
+    description: String
+    groupType: GroupType
+    id: ID!
+
+    """Empty string '' clears the location (sets it to null)."""
+    locationName: String
+    name: String
+    showMembers: Boolean
+    slug: String
+  ): Group
+
+  """Update one of your own posts. Restricted to the author."""
+  UpdatePost(categoryIds: [ID], content: String!, eventInput: _EventInput, id: ID!, image: ImageInput, language: String, postType: PostType, slug: String, title: String!, visibility: Visibility): Post
+
+  """Update one of your own social-media links. Restricted to the owner."""
+  UpdateSocialMedia(id: ID!, url: String!): SocialMedia
+
+  """Update your own profile. Restricted to the account owner."""
+  UpdateUser(
+    about: String
+    allowEmbedIframes: Boolean
+    avatar: ImageInput
+    email: String
+    emailNotificationSettings: [EmailNotificationSettingsInput]
+    id: ID!
+    locale: String
+
+    """Empty string '' clears the location (sets it to null)."""
+    locationName: String
+    name: String
+    showClosedGroupsOnProfile: Boolean
+    showHiddenGroupsOnProfile: Boolean
+    showPublicGroupsOnProfile: Boolean
+    showShoutsPublicly: Boolean
+    slug: String
+    termsAndConditionsAgreedAt: String
+    termsAndConditionsAgreedVersion: String
+  ): User
+
+  """
+  Confirm a pending email address via its nonce. Requires authentication.
+  """
+  VerifyEmailAddress(email: String!, nonce: String!): EmailAddress
+
+  """
+  Revoke any user's API key (administration). Requires the `apiKey.administer` permission.
+  """
+  adminRevokeApiKey(id: ID!): Boolean!
+
+  """
+  Revoke all of a user's API keys and return how many were revoked. Requires the `apiKey.administer` permission.
+  """
+  adminRevokeUserApiKeys(userId: ID!): Int!
+
+  """
+  Block a user, cutting off interaction in both directions. Requires authentication.
+  """
+  blockUser(id: ID!): User
+
+  """Change the current user's password. Requires authentication."""
+  changePassword(newPassword: String!, oldPassword: String!): String!
+
+  """
+  Create a new API key and return its secret (shown only here). Requires the `apiKey.create` permission (gated by the apiKeysEnabled policy).
+  """
+  createApiKey(expiresInDays: Int, name: String!): ApiKeyWithSecret!
+
+  """
+  Create a new role with the given permission bundle. Requires the `role.manage` permission.
+  """
+  createRole(name: String!, permissions: [String!]!): Role!
+
+  """
+  Delete a role. Returns the deleted role's name (the input name echoed back on success). Requires the `role.manage` permission.
+  """
+  deleteRole(name: String!): String!
+
+  """
+  Reversibly deactivate (disable: true) or reactivate (disable: false) a user account. Moderator-grade, subject to the act-on hierarchy.
+  """
+  disableUser(disable: Boolean!, id: ID!): User
+
+  """
+  File a moderation report against a user, post or comment. Requires authentication.
+  """
+  fileReport(reasonCategory: ReasonCategory!, reasonDescription: String!, resourceId: ID!): FiledReport
+
+  """Follow a user. Requires authentication."""
+  followUser(id: ID!): User
+
+  """
+  Issue an invite code granting membership in a group. Restricted to admins/owners of that group.
+  """
+  generateGroupInviteCode(comment: String = null, expiresAt: String = null, groupId: ID!): InviteCode!
+
+  """
+  Issue a personal invite code for registering new users. Requires authentication and the `user.invite` permission.
+  """
+  generatePersonalInviteCode(comment: String = null, expiresAt: String = null): InviteCode!
+
+  """
+  Invalidate one of your invite codes so it can no longer be redeemed. Requires authentication.
+  """
+  invalidateInviteCode(code: String!): InviteCode
+
+  """
+  Join a group's video call, returning the credentials to connect. Requires authentication.
+  """
+  joinGroupVideoCall(groupId: ID!): VideoCallJoinPayload!
+
+  """Get a JWT Token for the given Email and password"""
+  login(email: String!, password: String!): String!
+
+  """
+  Mark all of the current user's notifications as read. Requires authentication.
+  """
+  markAllAsRead: [NOTIFIED]
+
+  """Mark a notification as read. Requires authentication."""
+  markAsRead(id: ID!): NOTIFIED
+
+  """Mark a notification as unread. Requires authentication."""
+  markAsUnread(id: ID!): NOTIFIED
+
+  """Mark a post's teaser as viewed by the current user. Public."""
+  markTeaserAsViewed(id: ID!): Post
+
+  """
+  Mute a group so its posts no longer appear in the current user's feed. Requires membership.
+  """
+  muteGroup(groupId: ID!): Group
+
+  """
+  Mute a user, hiding their content from the current user. Requires authentication.
+  """
+  muteUser(id: ID!): User
+
+  """
+  Pin a post within its group. Restricted to those allowed to pin in that group.
+  """
+  pinGroupPost(id: ID!): Post
+
+  """Pin a post instance-wide. Requires the `post.pin` permission."""
+  pinPost(id: ID!): Post
+
+  """
+  Push (boost) a post to the top of feeds. Requires the `post.push` permission.
+  """
+  pushPost(id: ID!): Post!
+
+  """
+  Redeem an invite code for the current user (registration and/or group membership). Requires authentication.
+  """
+  redeemInviteCode(code: String!): Boolean!
+
+  """
+  Rename a role, keeping its permission bundle and all its members (its HAS_ROLE edges are preserved). The mandatory owner and user roles cannot be renamed. Requires the `role.manage` permission.
+  """
+  renameRole(name: String!, newName: String!): Role!
+
+  """Request a password-reset email for the given address. Public."""
+  requestPasswordReset(email: String!, locale: String!): Boolean!
+
+  """Reset a password using the nonce from the reset email. Public."""
+  resetPassword(email: String!, newPassword: String!, nonce: String!): Boolean!
+
+  """
+  Reset several policy keys to their configured defaults in one request (only keys that diverge actually change). Requires the `policy.manage` permission.
+  """
+  resetPolicies(keys: [PolicyKey!]!): [PolicyChangeEvent!]!
+
+  """
+  Reset a single policy key to its configured default. Requires the `policy.manage` permission.
+  """
+  resetPolicy(key: PolicyKey!): PolicyChangeEvent!
+
+  """Clear all displayed trophy badges. Requires authentication."""
+  resetTrophyBadgesSelected: User
+
+  """
+  Resynchronise the in-memory role & policy caches from the database. Dev/test-only recovery hook for when an out-of-process change (db:reset / db:seed, the e2e harness) leaves a running server's caches stale; it needs no auth outside production so it works even when no users exist yet (right after a wipe). Disabled in production — there a rolling restart re-reads the DB on each instance's boot.
+  """
+  resyncCaches: Boolean!
+
+  """
+  Record a moderation decision on a reported resource: optionally disable (hide) it and/or close the report. Requires the `content.moderate` permission and must respect the act-on hierarchy for the target user.
+  """
+  review(closed: Boolean, disable: Boolean, resourceId: ID!): REVIEWED
+
+  """Revoke one of your own API keys. Requires authentication."""
+  revokeApiKey(id: ID!): Boolean!
+
+  """Remove a badge from a user. Requires the `badge.manage` permission."""
+  revokeBadge(badgeId: ID!, userId: ID!): User
+
+  """
+  Award a trophy badge to a user. Requires the `badge.manage` permission.
+  """
+  rewardTrophyBadge(badgeId: ID!, userId: ID!): User
+
+  """
+  Set the current user's active content-filter categories. Requires authentication.
+  """
+  saveCategorySettings(activeCategories: [String]): Boolean
+
+  """
+  Switch the live network branding to the given baked-in brand id (one of /branding/manifest.json), or the empty string for framework defaults. Persisted as the `activeBranding` policy value and broadcast live via the `policyChanged` subscription, so every client reloads the new brand's config without a redeploy. Requires the `branding.manage` permission. Returns the applied id.
+  """
+  setActiveBranding(id: String!): String!
+
+  """
+  Set the per-bucket branding composition — a JSON-encoded object mapping a bucket slot (theme/identity/logos/legal/navigation/behavior) to a source 'id[@version][/instance]', layered over `activeBranding`. The empty string clears all per-slot overrides. Persisted as the `brandingComposition` policy value and broadcast live via `policyChanged`, so clients reload the recomposed branding. Requires the `branding.manage` permission. Returns the applied JSON string.
+  """
+  setBrandingComposition(composition: String!): String!
+
+  """
+  Toggle whether a group membership is shown on the current user's profile.
+  """
+  setGroupMembershipVisibility(groupId: ID!, showOnProfile: Boolean!): MEMBER_OF
+
+  """
+  Set a single policy key to a value. Requires the `policy.manage` permission.
+  """
+  setPolicy(key: PolicyKey!, value: String!): PolicyChangeEvent!
+
+  """
+  Choose which trophy badge to display in a given slot (null clears the slot). Requires authentication.
+  """
+  setTrophyBadgeSelected(badgeId: ID, slot: Int!): User
+
+  """
+  Set a user's single role (replaces their current role). Requires the `role.manage` permission.
+  """
+  setUserRole(roleName: String!, userId: ID!): User!
+
+  """
+  Assign a verification badge to a user. Requires the `badge.manage` permission.
+  """
+  setVerificationBadge(badgeId: ID!, userId: ID!): User
+
+  """Shout (endorse) the given post or comment. Requires authentication."""
+  shout(id: ID!, type: ShoutTypeEnum!): Boolean!
+
+  """
+  Start or stop observing a post (to receive notifications about its comments). Requires authentication.
+  """
+  toggleObservePost(id: ID!, value: Boolean!): Post!
+
+  """Unblock a previously blocked user. Requires authentication."""
+  unblockUser(id: ID!): User
+
+  """Unfollow a user. Requires authentication."""
+  unfollowUser(id: ID!): User
+
+  """Unmute a previously muted group. Requires membership."""
+  unmuteGroup(groupId: ID!): Group
+
+  """Unmute a previously muted user. Requires authentication."""
+  unmuteUser(id: ID!): User
+
+  """Remove a group pin. Restricted to those allowed to pin in that group."""
+  unpinGroupPost(id: ID!): Post
+
+  """Remove an instance-wide pin. Requires the `post.pin` permission."""
+  unpinPost(id: ID!): Post
+
+  """Remove a post's push/boost. Requires the `post.push` permission."""
+  unpushPost(id: ID!): Post!
+
+  """
+  Withdraw a shout from the given post or comment. Requires authentication.
+  """
+  unshout(id: ID!, type: ShoutTypeEnum!): Boolean!
+
+  """Rename one of your own API keys. Requires authentication."""
+  updateApiKey(id: ID!, name: String!): ApiKey!
+
+  """Update the current user's online/away status. Requires authentication."""
+  updateOnlineStatus(status: OnlineStatus!): Boolean!
+
+  """
+  Replace an existing role's permission bundle. Requires the `role.manage` permission.
+  """
+  updateRole(name: String!, permissions: [String!]!): Role!
+}
+
+"""
+Relationship representing a notification delivered to a user about some source activity.
+"""
+type NOTIFIED {
+  createdAt: String!
+
+  """The post, comment or group the notification is about."""
+  from: NotificationSource
+  id: ID!
+
+  """Whether the recipient has read the notification."""
+  read: Boolean
+  reason: NotificationReason
+
+  """The user who triggered the notification, when applicable."""
+  relatedUser: User
+
+  """The recipient of the notification."""
+  to: User
+  updatedAt: String!
+}
+
+"""Ordering options for the notifications query."""
+enum NotificationOrdering {
+  createdAt_asc
+  createdAt_desc
+  updatedAt_asc
+  updatedAt_desc
+}
+
+"""Why a notification was created."""
+enum NotificationReason {
+  changed_group_member_role
+  commented_on_post
+
+  """A user the recipient follows published a post."""
+  followed_user_posted
+  mentioned_in_comment
+  mentioned_in_post
+
+  """A new post was created in a group the recipient belongs to."""
+  post_in_group
+  removed_user_from_group
+  user_joined_group
+  user_left_group
+}
+
+"""The kind of node a notification originates from."""
+union NotificationSource = Comment | Group | Post
+
+"""A user's self-reported presence state."""
+enum OnlineStatus {
+  away
+  online
+}
+
+"""
+A single entry in the permission catalog: a grantable right and its metadata.
+"""
+type Permission {
+  """
+  Whether the permission is effective right now for the requesting viewer's config/policy. False ⇒ the feature is not configured/enabled; the admin UI disables granting it.
+  """
+  available: Boolean!
+  description: String!
+
+  """
+  The runtime feature gate this permission depends on (e.g. videoCall, apiKeys), or null when it is always effective.
+  """
+  gatedBy: String
+  group: String!
+  key: String!
+}
+
+"""
+A signal that effective permissions may have changed (a role's permission set, or a user's role assignment). Clients refetch their own myPermissions on receipt — the payload carries only the affected role name, no actor (Datensparsamkeit).
+"""
+type PermissionsChanged {
+  """
+  Set only for a rename: the role's former name, so an admin roles view with this role selected can follow the selection to its new name.
+  """
+  previousRoleName: String
+  roleName: String
+}
+
+"""Instance-wide pinned-post counters."""
+type PinnedPostCounts {
+  currentlyPinnedPosts: Int!
+}
+
+"""An applied change to a single policy key, with audit metadata."""
+type PolicyChangeEvent {
+  actor: String!
+  key: PolicyKey!
+  timestamp: String!
+  value: String!
+}
+
+type PolicyConfigEntry {
+  """
+  Whether all hard env requirements are met (always true when there are none). Policy→policy dependencies (requiresPolicy on the policy query) are folded live in the client, not here, so re-enabling a dependency un-greys the dependent key without a refetch.
+  """
+  available: Boolean!
+
+  """
+  Admin display group the key belongs to (e.g. registration, features, layout, video).
+  """
+  category: String!
+
+  """
+  The configured default = env seed if set, else the software default, JSON-encoded.
+  """
+  configuredDefault: String!
+
+  """
+  Effective value (env-folded), JSON-encoded. This is what the permission gates read.
+  """
+  effective: String!
+
+  """Name of the env var that SEEDS the default (soft), or null."""
+  envSeed: String
+
+  """Presence of the envSeed var, or null when the key has no envSeed."""
+  envSeedState: ConfigKeyState
+
+  """The policy key (e.g. videoConference, apiKeysEnabled)."""
+  key: String!
+
+  """
+  Hard env requirements with their presence state (empty when the key needs no env).
+  """
+  requiresEnv: [EnvKeyStatus!]!
+
+  """The software default baked into the schema, JSON-encoded."""
+  softwareDefault: String!
+
+  """Value type: boolean | integer."""
+  type: String!
+}
+
+"""
+The configured policy defaults together with audit info about the last change.
+"""
+type PolicyDefaults {
+  defaults: [PolicyEntry!]!
+  lastChange: PolicyLastChange
+}
+
+"""
+A single policy key with its current (or default) value, JSON-encoded (heterogeneous types: boolean / integer). The value is null for a key the viewer may not see, or a genuinely unset value (e.g. an unlimited limit).
+"""
+type PolicyEntry {
+  key: PolicyKey!
+
+  """
+  Other policy keys this one depends on (policy→policy gate): the key is only effective while every listed key is effectively on. Static schema metadata (empty for most keys); the client re-folds it so a layout toggle respects its feature gate (e.g. showGroupButtonInHeader depends on groupsEnabled).
+  """
+  requiresPolicy: [PolicyKey!]!
+  value: String
+}
+
+enum PolicyKey {
+  activeBranding
+  apiKeysEnabled
+  apiKeysMaxPerUser
+  askForRealName
+  badgesEnabled
+  brandingComposition
+  categoriesActive
+  groupsEnabled
+  inviteCodesGroupPerUser
+  inviteCodesPersonalPerUser
+  inviteLinkLimit
+  inviteRegistration
+  maxGroupPinnedPosts
+  maxPinnedPosts
+  publicRegistration
+  requireLocation
+  showContentFilterHeaderMenu
+  showContentFilterMasonryGrid
+  showGroupButtonInHeader
+  socialMediaEnabled
+  videoConference
+}
+
+"""Who last changed a policy value, and when."""
+type PolicyLastChange {
+  actor: String!
+  timestamp: String!
+}
+
+"""A policy key/value change, broadcast to subscribers."""
+type PolicyValueChanged {
+  key: PolicyKey!
+  value: String!
+}
+
+"""
+A contribution — an article or event — written by a user, optionally within a group.
+"""
+type Post {
+  """ActivityPub activity id, for federated posts."""
+  activityId: String
+  author: User
+  categories: [Category]
+
+  """Number of times the post has been opened."""
+  clickedCount: Int!
+
+  """Comments on this post. `orderBy` defaults to oldest first."""
+  comments(orderBy: [_CommentOrdering]): [Comment]!
+
+  """Number of visible (non-deleted, non-disabled) comments."""
+  commentsCount: Int!
+
+  """Post body as rich text (HTML)."""
+  content: String!
+
+  """ISO 8601 date-time string of creation."""
+  createdAt: String
+
+  """True once the post has been moderated away."""
+  deleted: Boolean
+
+  """True once the post has been disabled by a moderator."""
+  disabled: Boolean
+  emotions: [EMOTED]
+
+  """Total number of emotional reactions on the post."""
+  emotionsCount: Int!
+
+  """Event end time (Event posts)."""
+  eventEnd: String
+
+  """Whether the event takes place online (Event posts)."""
+  eventIsOnline: Boolean
+
+  """Structured location of the event (Event posts)."""
+  eventLocation: Location
+
+  """Name of the event's location (Event posts)."""
+  eventLocationName: String
+
+  """Event start time (Event posts)."""
+  eventStart: String
+
+  """Venue/room of the event (Event posts)."""
+  eventVenue: String
+
+  """The group this post belongs to, or null for a public/timeline post."""
+  group: Group
+
+  """Whether the post is pinned within its group."""
+  groupPinned: Boolean
+  id: ID!
+
+  """The post's hero image."""
+  image: Image
+
+  """
+  Whether the current user observes this post (receives notifications about its comments).
+  """
+  isObservedByMe: Boolean!
+
+  """Content language as an IETF/ISO code (e.g. `en`, `de`)."""
+  language: String
+
+  """ActivityPub object id, for federated posts."""
+  objectId: String
+
+  """Number of users observing this post."""
+  observingUsersCount: Int!
+
+  """Whether the post is pinned instance-wide."""
+  pinned: Boolean
+
+  """When the post was pinned instance-wide, or null if not pinned."""
+  pinnedAt: String
+
+  """The user who pinned the post instance-wide."""
+  pinnedBy: User
+
+  """
+  The post's type(s), derived from its Neo4j labels (e.g. Article, Event).
+  """
+  postType: [PostType]
+
+  """Up to 10 other posts sharing a tag or category with this one."""
+  relatedContributions: [Post]!
+  shoutedBy: [User]!
+
+  """Has the currently logged in user shouted that post?"""
+  shoutedByCurrentUser: Boolean!
+
+  """Number of users who have shouted (endorsed) this post."""
+  shoutedCount: Int!
+
+  """URL-safe unique handle for the post."""
+  slug: String!
+
+  """
+  Date used to sort the post in feeds (may differ from createdAt, e.g. for events).
+  """
+  sortDate: String
+  tags: [Tag]!
+  title: String!
+
+  """
+  Unread notifications for comments in this post targeting the currently logged in user.
+  """
+  unreadCommentNotificationsByCurrentUser: [NOTIFIED!]!
+
+  """
+  Unread notification for this post targeting the currently logged in user, or null.
+  """
+  unreadNotificationByCurrentUser: NOTIFIED
+
+  """ISO 8601 date-time string of the last update."""
+  updatedAt: String
+
+  """Whether the current user has viewed the post's teaser."""
+  viewedTeaserByCurrentUser: Boolean!
+
+  """Number of times the post's teaser has been viewed."""
+  viewedTeaserCount: Int!
+  visibility: Visibility
+}
+
+"""
+The kind of content a post represents. Stored as an additional Neo4j node label.
+"""
+enum PostType {
+  """A regular text article."""
+  Article
+
+  """An event with a date, and optionally a location or online link."""
+  Event
+}
+
+type Query {
+  """List all available badges. Public."""
+  Badge: [Badge]
+
+  """List categories. Public."""
+  Category(createdAt: String, first: Int, icon: String, id: ID, name: String, offset: Int, orderBy: [_CategoryOrdering], slug: String, updatedAt: String): [Category]
+
+  """List comments. Public."""
+  Comment(content: String, createdAt: String, filter: _CommentFilter, first: Int, id: ID, offset: Int, orderBy: [_CommentOrdering], updatedAt: String): [Comment]
+
+  """The current donation campaign state. Requires authentication."""
+  Donations: Donations
+
+  """
+  List groups. Requires authentication. Filter to the current user's memberships with `isMember`, or to located groups with `hasLocation`.
+  """
+  Group(
+    first: Int
+
+    """If true, only groups that have a location."""
+    hasLocation: Boolean
+    id: ID
+
+    """
+    Null/undefined returns all groups; true only the user's groups; false only groups they are not in.
+    """
+    isMember: Boolean
+    offset: Int
+    slug: String
+  ): [Group]
+
+  """
+  Count groups, optionally restricted to the current user's memberships. Requires authentication.
+  """
+  GroupCount(isMember: Boolean): Int
+
+  """
+  List a group's members. Visibility depends on the viewer's relation to the group. Set `includePending` to also return unapproved join requests (for admins/owners). Set `nameFilter` (min. 3 chars recommended) to search by display name.
+  """
+  GroupMembers(first: Int, id: ID!, includePending: Boolean, nameFilter: String, offset: Int): [GroupMember]
+
+  """
+  List messages in a room, newest first, with index-based paging. Requires authentication.
+  """
+  Message(beforeIndex: Int, first: Int, offset: Int, orderBy: [_MessageOrdering], roomId: ID!): [Message]
+
+  """
+  List posts (the main feed query). Public. Combine with `filter`, `orderBy` and paging for feeds, profiles and groups.
+  """
+  Post(content: String, createdAt: String, filter: _PostFilter, first: Int, id: ID, imageAspectRatio: Float, imageBlurred: Boolean, language: String, offset: Int, orderBy: [_PostOrdering], pinned: Boolean, slug: String, title: String, updatedAt: String, visibility: Visibility): [Post]
+
+  """
+  The emotions the current user has left on a post. Requires authentication.
+  """
+  PostsEmotionsByCurrentUser(postId: ID!): [String]
+
+  """Count of a single emotion on a post. Public."""
+  PostsEmotionsCountByEmotion(data: _EMOTEDInput!, postId: ID!): Int!
+
+  """Instance-wide pinned-post counts. Requires the `post.pin` permission."""
+  PostsPinnedCounts: PinnedPostCounts!
+
+  """
+  List the current user's chat rooms. Direct rooms are looked up by `userId`, group rooms by `groupId`. Requires authentication.
+  """
+  Room(before: String, first: Int, groupId: ID, id: ID, orderBy: [_RoomOrdering], search: String, userId: ID): [Room]
+
+  """List hashtags, e.g. for a trending-tags widget. Public."""
+  Tag(filter: _TagFilter, first: Int, id: ID, offset: Int, orderBy: [_TagOrdering]): [Tag]
+
+  """
+  Number of the current user's rooms with unread messages. Requires authentication.
+  """
+  UnreadRooms: Int
+
+  """
+  Look up users. Requires authentication; filtering by `email` additionally requires the user.email.readAny permission (used for admin user search).
+  """
+  User(
+    about: String
+    createdAt: String
+    email: String
+    filter: _UserFilter
+    first: Int
+    id: ID
+    locationName: String
+    name: String
+    offset: Int
+    orderBy: [_UserOrdering]
+
+    """
+    Admin user search: filter by single role (HAS_ROLE) and/or a free-text term (name/slug/about/email). Combinable; requires role.manage.
+    """
+    roleName: String
+
+    """Free-text search over name/slug/about (and email for admins)."""
+    search: String
+    slug: String
+    updatedAt: String
+  ): [User]
+
+  """
+  Check whether a signup/verification nonce is valid for the given email. Public.
+  """
+  VerifyNonce(email: String!, nonce: String!): Boolean!
+
+  """
+  Administration overview of API-key usage per user. Requires the `apiKey.administer` permission.
+  """
+  apiKeyUsers(first: Int, offset: Int): [ApiKeyUserSummary!]!
+
+  """
+  All API keys belonging to a given user. Requires the `apiKey.administer` permission.
+  """
+  apiKeysForUser(userId: ID!): [ApiKey!]!
+
+  """Users the current user has blocked. Requires authentication."""
+  blockedUsers: [User]
+
+  """The currently authenticated user. Requires authentication."""
+  currentUser: User!
+
+  """Fetch link-preview metadata for a URL. Public."""
+  embed(url: String!): Embed
+
+  """The oEmbed providers this instance resolves link previews for. Public."""
+  embedProviders: [EmbedProvider!]!
+
+  """Users the current user has muted. Requires authentication."""
+  mutedUsers: [User]
+
+  """
+  The requesting user's own API keys. Requires authentication and the apiKeysEnabled policy.
+  """
+  myApiKeys: [ApiKey!]!
+
+  """
+  The current viewer's effective permissions, each carrying its catalog group — drives the webapp can() and group-based area gating.
+  """
+  myPermissions: [EffectivePermission!]!
+
+  """The current user's notifications. Requires authentication."""
+  notifications(first: Int, offset: Int, orderBy: NotificationOrdering, read: Boolean): [NOTIFIED]
+
+  """The closed permission catalog (admin / role.manage)."""
+  permissionCatalog: [Permission!]!
+
+  """
+  The instance's network policy as a key/value list — every recognised policy key, so a client needs no per-key field selection and the set stays in sync with the backend automatically. Public — anonymous viewers (login/register screen) need it. Per-key visibility is enforced in the resolver: a key the viewer may not see carries a null value.
+  """
+  policy: [PolicyEntry!]!
+
+  """
+  Per-policy configuration with its software/env-seed/effective value layers and hard env requirements (policy.manage). Secret values are never returned — only env presence state.
+  """
+  policyConfig: [PolicyConfigEntry!]!
+
+  """
+  The configured policy defaults plus last-change audit info. Requires the `policy.manage` permission.
+  """
+  policyDefaults: PolicyDefaults!
+
+  """Posts for a user's profile page. Public."""
+  profilePagePosts(filter: _PostFilter, first: Int, offset: Int, orderBy: [_PostOrdering]): [Post]
+
+  """
+  Search for places via the MapBox geocoder, to attach a location to a profile, group or event. Public.
+  """
+  queryLocations(lang: String!, place: String!, proximity: String, types: String): [LocationMapBox]!
+
+  """
+  List moderation reports for the moderation queue. Requires the `content.moderate` permission.
+  """
+  reports(
+    """Filter by whether the report is closed."""
+    closed: Boolean
+    first: Int
+    offset: Int
+    orderBy: ReportOrdering
+
+    """Filter by whether the report has been reviewed."""
+    reviewed: Boolean
+  ): [Report]
+
+  """
+  All roles with their permission bundles and member counts (role.manage).
+  """
+  roles: [Role!]!
+
+  """
+  Search for users and groups to start a chat with. Requires authentication.
+  """
+  searchChatTargets(limit: Int = 10, query: String!): [ChatTarget]!
+
+  """Search groups by name/description. Public."""
+  searchGroups(firstGroups: Int, groupsOffset: Int, query: String!): groupSearchResults!
+
+  """Search hashtags. Public."""
+  searchHashtags(firstHashtags: Int, hashtagsOffset: Int, query: String!): hashtagSearchResults!
+
+  """Search posts by title/content. Public."""
+  searchPosts(firstPosts: Int, postsOffset: Int, query: String!): postSearchResults!
+
+  """
+  Combined search across posts, users, tags and groups, for the global search box. Public.
+  """
+  searchResults(limit: Int = 5, query: String!): [SearchResult]!
+
+  """Search users by name/slug. Public."""
+  searchUsers(firstUsers: Int, query: String!, usersOffset: Int): userSearchResults!
+
+  """
+  Instance-wide usage counters. Requires the `network.statistics.read` permission.
+  """
+  statistics: Statistics!
+
+  """
+  Every environment variable the deployment recognises, with its effective/override/env-value/software-default layers and presence state (policy.manage). Secret values are never returned — only presence state.
+  """
+  systemConfig: [SystemConfigEntry!]!
+
+  """
+  Fetch a user together with their posts. Defaults to the current user when no id is given. Requires authentication.
+  """
+  userData(id: ID): UserData
+
+  """
+  The roles assigned to a specific user (role.manage) — for the admin UI.
+  """
+  userRoles(userId: ID!): [Role!]!
+
+  """
+  Look up an invite code and its validity, e.g. on the registration screen. Public.
+  """
+  validateInviteCode(code: String!): InviteCode
+
+  """Whether video calls are enabled on this instance. Public."""
+  videoCallConfig: VideoCallConfig!
+
+  """
+  Current number of participants in a group's video call. Requires authentication.
+  """
+  videoCallParticipantCount(groupId: ID!): Int!
+}
+
+"""Relationship recording a moderator's decision on a report."""
+type REVIEWED {
+  """Whether the moderator closed the report."""
+  closed: Boolean!
+  createdAt: String!
+
+  """Whether the moderator disabled (hid) the reported resource."""
+  disable: Boolean!
+
+  """The moderator who made the decision."""
+  moderator: User
+  report: Report
+  resource: ReviewedResource
+  updatedAt: String!
+}
+
+"""
+Reason a report was filed. This list equals the strings of an array in file `webapp/constants/modals.js`.
+"""
+enum ReasonCategory {
+  """Unsolicited advertising of products, services or commercial offers."""
+  advert_products_services_commercial
+
+  """Criminal behaviour or violation of (German) law."""
+  criminal_behavior_violation_german_law
+
+  """Discrimination, racism, sexism and the like."""
+  discrimination_etc
+
+  """Publishing private/identifying information (doxing)."""
+  doxing
+
+  """Glorification or trivialisation of cruel or inhuman acts."""
+  glorific_trivia_of_cruel_inhuman_acts
+
+  """Intentional intimidation, stalking or persecution."""
+  intentional_intimidation_stalking_persecution
+
+  """None of the listed categories fits."""
+  other
+
+  """Pornographic content or links to it."""
+  pornographic_content_links
+}
+
+"""
+A moderation report about a user, post or comment, aggregating all filings and reviews for that resource.
+"""
+type Report {
+  """Whether the report has been closed by a moderator."""
+  closed: Boolean!
+  createdAt: String!
+
+  """Whether the reported resource is currently disabled (hidden)."""
+  disable: Boolean!
+
+  """All filings submitted against the resource."""
+  filed: [FILED]!
+  id: ID!
+  resource: ReportedResource!
+
+  """All moderator reviews of the report."""
+  reviewed: [REVIEWED]!
+  rule: ReportRule!
+  updatedAt: String!
+}
+
+"""Ordering options for the reports query."""
+enum ReportOrdering {
+  createdAt_asc
+  createdAt_desc
+}
+
+"""The rule set by which a report's aggregate state is derived."""
+enum ReportRule {
+  latestReviewUpdatedAtRules
+}
+
+"""The kind of node a report can target."""
+union ReportedResource = Comment | Post | User
+
+"""The kind of node a moderation decision can apply to."""
+union ReviewedResource = Comment | Post | User
+
+"""A named bundle of permissions that can be assigned to users."""
+type Role {
+  """Number of users currently assigned this role."""
+  memberCount: Int
+  name: String!
+
+  """The permission keys granted by this role."""
+  permissions: [String!]!
+
+  """Whether the role is a protected built-in that cannot be deleted."""
+  protected: Boolean!
+}
+
+"""
+A chat room, either a one-to-one direct conversation between two users or the shared chat room of a group.
+"""
+type Room {
+  """
+  Alias of `id`, kept for the chat frontend (vue-advanced-chat keys objects by `_id`).
+  """
+  _id: String @deprecated(reason: "Use `id`.")
+
+  """
+  Display avatar URL: the group's avatar for a group room, otherwise the other participant's avatar.
+  """
+  avatar: String
+  createdAt: String
+
+  """The group this room belongs to, or null for a direct room."""
+  group: Group
+  id: ID!
+
+  """True if this is a group room, false for a direct room."""
+  isGroupRoom: Boolean!
+
+  """The most recent message in the room."""
+  lastMessage: Message
+
+  """Timestamp of the most recent message, for sorting the room list."""
+  lastMessageAt: String
+
+  """Alias of id; prefer id in new code."""
+  roomId: String!
+
+  """
+  Display name: the group's name for a group room, otherwise the other participant's name.
+  """
+  roomName: String!
+
+  """Count unread messages, excluding those from blocked/muted senders."""
+  unreadCount: Int
+  updatedAt: String
+
+  """Participants of the room."""
+  users: [User]!
+}
+
+"""A single hit in the global search, which can be any searchable entity."""
+union SearchResult = Group | Post | Tag | User
+
+"""The kind of node that can be shouted (endorsed/boosted)."""
+enum ShoutTypeEnum {
+  Comment
+  Post
+}
+
+"""A link to an external social-media profile, shown on a user's profile."""
+type SocialMedia {
+  id: ID!
+  ownedBy: User!
+  url: String
+}
+
+"""Aggregate counts describing the whole instance."""
+type Statistics {
+  """Number of trophy badges users have chosen to display."""
+  badgesDisplayed: Int!
+  badgesRewarded: Int!
+  chatMessages: Int!
+  chatRooms: Int!
+  comments: Int!
+
+  """Number of registered email addresses."""
+  emails: Int!
+  follows: Int!
+  groups: Int!
+  inviteCodes: Int!
+  inviteCodesExpired: Int!
+  inviteCodesRedeemed: Int!
+  invites: Int!
+  locations: Int!
+  notifications: Int!
+  posts: Int!
+  reports: Int!
+  shouts: Int!
+  tags: Int!
+
+  """Number of active (non-deleted) user accounts."""
+  users: Int!
+  usersDeleted: Int!
+  usersVerified: Int!
+}
+
+type Subscription {
+  """Pushes newly added messages in the current user's rooms."""
+  chatMessageAdded: Message
+
+  """Pushes delivery/seen status changes for messages."""
+  chatMessageStatusUpdated: ChatMessageStatusPayload
+
+  """
+  Fires when a user changes which group memberships are visible on their profile.
+  """
+  groupMembershipVisibilityChanged(userId: ID!): GroupMembershipVisibilityChanged!
+
+  """Fires when a closed group's showMembers setting changes."""
+  groupShowMembersChanged(groupId: ID!): GroupShowMembersChanged!
+
+  """Pushes newly created notifications for the current user in real time."""
+  notificationAdded: NOTIFIED
+
+  """Fires when a role's permissions or a user's role assignment changes."""
+  permissionsChanged: PermissionsChanged!
+
+  """Fires whenever a policy value changes, so clients can update live."""
+  policyChanged: PolicyValueChanged!
+
+  """Pushes a room whenever its state changes (e.g. a new message arrives)."""
+  roomUpdated: Room
+
+  """
+  Pushes the updated participant count as users join or leave a group's video call.
+  """
+  videoCallParticipantCountChanged(groupId: ID!): VideoCallParticipantCount!
+}
+
+type SystemConfigEntry {
+  """
+  An unmet hard env requirement that breaks its feature regardless of the policy flag.
+  """
+  blocking: Boolean!
+
+  """
+  Display grouping. Enum derived from the shared category vocabulary (config/categories).
+  """
+  category: EnvCategory!
+
+  """
+  Effective (in-operation) value as a display string (JSON-encoded for policy values, raw otherwise); null ⇒ show presence badge.
+  """
+  effective: String
+
+  """The environment variable name (e.g. NEO4J_URI, LIVEKIT_API_SECRET)."""
+  envKey: String!
+
+  """
+  Value the env var itself provides when set (JSON-encoded for seed vars, raw otherwise); null for secrets/unset/hard-requirement rows.
+  """
+  envValue: String
+
+  """Whether an admin can override this via a policy (deep-link target)."""
+  overridable: Boolean!
+
+  """
+  Admin override value when it diverges from the configured default (policy rows only), else null.
+  """
+  override: String
+
+  """
+  The policy key to deep-link to on the policy tab (set for policy rows), else null.
+  """
+  policyKey: String
+
+  """
+  Whether the value is sensitive — reported by presence only, its value is never returned.
+  """
+  secret: Boolean!
+
+  """The software default the value falls back to, or null (none / secret)."""
+  softwareDefault: String
+
+  """Presence of the env var."""
+  state: ConfigKeyState!
+}
+
+"""
+A free-form hashtag. The tag's text is its id. Tags are created implicitly from post content (unlike the curated Category taxonomy).
+"""
+type Tag {
+  deleted: Boolean
+  disabled: Boolean
+  id: ID!
+
+  """Total number of posts carrying this tag."""
+  taggedCount: Int!
+
+  """Number of distinct authors who have used this tag."""
+  taggedCountUnique: Int!
+  taggedPosts: [Post]!
+}
+
+"""
+The `Upload` scalar type represents a file upload, sent as multipart/form-data per the GraphQL multipart request spec.
+"""
+scalar Upload
+
+"""
+A person's account. Most fields are readable by any authenticated user; a few (email, notification and invite settings) are restricted to the owner or to admins.
+"""
+type User {
+  """
+  Alias of `id`, kept for the chat frontend (vue-advanced-chat keys objects by `_id`).
+  """
+  _id: String @deprecated(reason: "Use `id`.")
+
+  """The user's profile bio."""
+  about: String
+
+  """Category slugs the user has activated as their content filter."""
+  activeCategories: [String]
+
+  """ActivityPub actor id, for federated users."""
+  actorId: String
+
+  """Whether the user permits embedded iframes in content they view."""
+  allowEmbedIframes: Boolean
+  avatar: Image
+
+  """All trophy badges awarded to the user."""
+  badgeTrophies: [Badge]!
+  badgeTrophiesCount: Int!
+
+  """Trophy badges the user has chosen to display, in slot order."""
+  badgeTrophiesSelected: [Badge!]!
+
+  """Awarded trophy badges the user is not currently displaying."""
+  badgeTrophiesUnused: [Badge]!
+  badgeTrophiesUnusedCount: Int!
+
+  """The user's verification badge."""
+  badgeVerification: Badge!
+
+  """
+  Whether there is a block in either direction between this user and the current user.
+  """
+  blocked: Boolean!
+  categories: [Category]
+  commentedCount: Int!
+
+  """Comments written by this user."""
+  comments: [Comment]!
+
+  """Posts written by this user."""
+  contributions: [Post]!
+  contributionsCount: Int!
+
+  """ISO 8601 date-time string of registration."""
+  createdAt: String
+
+  """True once the account has been deleted (soft delete)."""
+  deleted: Boolean
+
+  """True while the account is disabled/deactivated."""
+  disabled: Boolean
+
+  """
+  The user's primary email address. Visible only to the owner or with user.email.readAny.
+  """
+  email: String!
+
+  """The user's email notification settings. Visible only to the owner."""
+  emailNotificationSettings: [EmailNotificationSettings]!
+  emotions: [EMOTED]
+
+  """Users who follow this user."""
+  followedBy(first: Int, nameFilter: String = "", offset: Int): [User]!
+  followedByCount: Int!
+
+  """Is the currently logged in user following that user?"""
+  followedByCurrentUser: Boolean!
+
+  """Users this user follows."""
+  following(first: Int, nameFilter: String = "", offset: Int): [User]!
+  followingCount: Int!
+  friends: [User]!
+  friendsCount: Int!
+
+  """
+  Groups this user is a member of. Ordered by shared membership with the viewer first.
+  """
+  groups(first: Int, nameFilter: String, offset: Int): [Group]
+  id: ID!
+
+  """personal inviteCodes the user has generated"""
+  inviteCodes: [InviteCode]!
+
+  """Users this user has invited."""
+  invited: [User]
+
+  """The user who invited this user, if any."""
+  invitedBy: User
+
+  """Whether this user is blocked by the current user."""
+  isBlocked: Boolean!
+
+  """Whether this user is muted by the current user."""
+  isMuted: Boolean!
+
+  """The user's preferred UI language."""
+  locale: String
+  location: Location
+  locationName: String
+  name: String
+
+  """The user's public key, for federation/verification."""
+  publicKey: String
+
+  """The invite code this user redeemed on registration, if any."""
+  redeemedInviteCode: InviteCode
+
+  """
+  The user's single dynamic role name (HAS_ROLE), incl. custom roles. Visible with role.manage.
+  """
+  roleName: String
+
+  """Posts this user has shouted (endorsed)."""
+  shouted: [Post]!
+  shoutedCount: Int!
+
+  """
+  Whether the user's closed group memberships are shown on their profile.
+  """
+  showClosedGroupsOnProfile: Boolean
+
+  """
+  Whether the user's hidden group memberships are shown on their profile.
+  """
+  showHiddenGroupsOnProfile: Boolean
+
+  """
+  Whether the user's public group memberships are shown on their profile.
+  """
+  showPublicGroupsOnProfile: Boolean
+
+  """Whether the user's shouts are shown publicly on their profile."""
+  showShoutsPublicly: Boolean
+
+  """URL-safe unique handle for the user."""
+  slug: String!
+  socialMedia: [SocialMedia]!
+
+  """When the user last agreed to the terms & conditions."""
+  termsAndConditionsAgreedAt: String
+
+  """Version of the terms & conditions the user last agreed to."""
+  termsAndConditionsAgreedVersion: String
+
+  """ISO 8601 date-time string of the last update."""
+  updatedAt: String
+}
+
+"""
+A bundle of a user together with their posts, used for GDPR-style data export/inspection.
+"""
+type UserData {
+  posts: [Post]
+  user: User!
+}
+
+"""Whether group video calls are available on this instance."""
+type VideoCallConfig {
+  enabled: Boolean!
+}
+
+"""
+Credentials for connecting to a group's video-call room on the media server.
+"""
+type VideoCallJoinPayload {
+  """Name of the room to join."""
+  roomName: String!
+
+  """Access token authorising the current user to join the room."""
+  token: String!
+
+  """WebSocket URL of the media server."""
+  url: String!
+}
+
+"""Live participant count for a group's video call."""
+type VideoCallParticipantCount {
+  count: Int!
+  groupId: ID!
+}
+
+"""Who is allowed to see a post."""
+enum Visibility {
+  """Visible only to the author's friends."""
+  friends
+
+  """Visible only to the author."""
+  private
+
+  """
+  Visible to everyone, including logged-out visitors and federated instances.
+  """
+  public
+}
+
+enum _CategoryOrdering {
+  createdAt_asc
+  createdAt_desc
+  icon_asc
+  icon_desc
+  id_asc
+  id_desc
+  name_asc
+  name_desc
+  postCount_asc
+  postCount_desc
+  slug_asc
+  slug_desc
+  updatedAt_asc
+  updatedAt_desc
+}
+
+"""
+Filter for the Comment query. Scoped to what helpers/nodeQuery.ts implements; anything not listed is rejected at validation time.
+"""
+input _CommentFilter {
+  """A single comment id; shorthand for a one-element `id_in`."""
+  id: ID
+  id_in: [ID!]
+}
+
+enum _CommentOrdering {
+  content_asc
+  content_desc
+  createdAt_asc
+  createdAt_desc
+  id_asc
+  id_desc
+  updatedAt_asc
+  updatedAt_desc
+}
+
+"""Selects which emotion to add or remove on a post."""
+input _EMOTEDInput {
+  createdAt: String
+  emotion: Emotion
+  updatedAt: String
+}
+
+"""Event details supplied when a post is of type Event."""
+input _EventInput {
+  eventEnd: String
+  eventIsOnline: Boolean
+  eventLocationName: String
+  eventStart: String!
+  eventVenue: String
+}
+
+enum _MessageOrdering {
+  indexId_desc
+}
+
+"""Selects an author, either directly or by who follows them."""
+input _PostAuthorFilter {
+  followedBy_some: _PostAuthorFollowedByFilter
+  id: ID
+}
+
+"""Selects authors the given user follows."""
+input _PostAuthorFollowedByFilter {
+  id: ID
+}
+
+"""Selects authors by id."""
+input _PostAuthorIdsFilter {
+  id_in: [ID!]
+}
+
+"""Selects categories by id."""
+input _PostCategoriesFilter {
+  id_in: [ID!]
+}
+
+"""Selects a comment author by id."""
+input _PostCommentsAuthorFilter {
+  id: ID
+}
+
+"""Selects posts by who commented on them."""
+input _PostCommentsFilter {
+  author: _PostCommentsAuthorFilter
+}
+
+input _PostEMOTEDFilter {
+  createdAt: String
+  emotion_in: [Emotion!]
+  updatedAt: String
+}
+
+"""
+Filter for the post queries. Scoped to what helpers/postFilter.ts implements; anything not listed is rejected at validation time.
+"""
+input _PostFilter {
+  """Combine filters; every branch must match."""
+  AND: [_PostFilter!]
+
+  """Combine filters; at least one branch must match."""
+  OR: [_PostFilter!]
+
+  """Filter by the post's author."""
+  author: _PostAuthorFilter
+
+  """Exclude posts by these authors."""
+  author_not: _PostAuthorIdsFilter
+
+  """Posts filed under any of these categories."""
+  categories_some: _PostCategoriesFilter
+
+  """Posts commented on by the given user."""
+  comments_some: _PostCommentsFilter
+  content: String
+  createdAt: String
+  deleted: Boolean
+  disabled: Boolean
+
+  """Posts carrying any of these emotions."""
+  emotions_some: _PostEMOTEDFilter
+
+  """Events ending at or after this time."""
+  eventEnd_gte: String
+
+  """Events starting at or after this time."""
+  eventStart_gte: String
+
+  """Filter by the group the post was published in."""
+  group: _PostGroupFilter
+
+  """Posts pinned inside their group."""
+  groupPinned: Boolean
+
+  """Only posts that have a location attached."""
+  hasLocation: Boolean
+
+  """A single post id; shorthand for a one-element `id_in`."""
+  id: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  imageAspectRatio: Float
+  imageBlurred: Boolean
+  language: String
+  language_in: [String!]
+
+  """Instance-wide pinned posts."""
+  pinned: Boolean
+
+  """Restrict to these post types (Article, Event, ...)."""
+  postType_in: [PostType!]
+
+  """Posts in the groups the current user belongs to."""
+  postsInMyGroups: Boolean
+
+  """Posts shouted by the given user."""
+  shoutedBy_some: _PostShoutedByFilter
+
+  """
+  Skip the pinned-posts-first ordering. Used by the map, which sorts by location instead.
+  """
+  skipPinnedFilter: Boolean
+  slug: String
+
+  """Posts carrying any of these hashtags."""
+  tags_some: _PostTagsFilter
+  title: String
+  updatedAt: String
+  visibility: Visibility
+}
+
+"""Selects a group, either by id or from a set."""
+input _PostGroupFilter {
+  id: ID
+  id_in: [ID!]
+}
+
+"""References a post by id."""
+input _PostInput {
+  id: ID!
+}
+
+enum _PostOrdering {
+  content_asc
+  content_desc
+  createdAt_asc
+  createdAt_desc
+  eventStart_asc
+  eventStart_desc
+  groupPinned_asc
+  groupPinned_desc
+  id_asc
+  id_desc
+  language_asc
+  language_desc
+  pinned_asc
+  pinned_desc
+  slug_asc
+  slug_desc
+  sortDate_asc
+  sortDate_desc
+  title_asc
+  title_desc
+  updatedAt_asc
+  updatedAt_desc
+  visibility_asc
+  visibility_desc
+}
+
+"""Selects posts by who shouted them."""
+input _PostShoutedByFilter {
+  id: ID
+}
+
+"""Selects hashtags. A tag's text is its id."""
+input _PostTagsFilter {
+  id: ID
+  id_in: [ID!]
+}
+
+enum _RoomOrdering {
+  createdAt_desc
+  lastMessageAt_desc
+}
+
+"""
+Filter for the Tag query. Scoped to what helpers/nodeQuery.ts implements; anything not listed is rejected at validation time.
+"""
+input _TagFilter {
+  """A single tag id; shorthand for a one-element `id_in`."""
+  id: ID
+  id_in: [ID!]
+}
+
+enum _TagOrdering {
+  id_asc
+  id_desc
+  taggedCountUnique_asc
+  taggedCountUnique_desc
+  taggedCount_asc
+  taggedCount_desc
+}
+
+"""
+Filter for the User query. Scoped to what users.ts implements; anything not listed is rejected at validation time.
+"""
+input _UserFilter {
+  """Only users that have a location attached."""
+  hasLocation: Boolean
+
+  """A single user id; shorthand for a one-element `id_in`."""
+  id: ID
+
+  """Restrict to these user ids."""
+  id_in: [ID!]
+}
+
+enum _UserOrdering {
+  about_asc
+  about_desc
+  createdAt_asc
+  createdAt_desc
+  id_asc
+  id_desc
+  locale_asc
+  locale_desc
+  locationName_asc
+  locationName_desc
+  name_asc
+  name_desc
+  slug_asc
+  slug_desc
+  updatedAt_asc
+  updatedAt_desc
+}
+
+"""A page of group search results with the total match count."""
+type groupSearchResults {
+  groupCount: Int
+  groups: [Group]!
+}
+
+"""A page of hashtag search results with the total match count."""
+type hashtagSearchResults {
+  hashtagCount: Int
+  hashtags: [Tag]!
+}
+
+"""A page of post search results with the total match count."""
+type postSearchResults {
+  postCount: Int
+  posts: [Post]!
+}
+
+"""A page of user search results with the total match count."""
+type userSearchResults {
+  userCount: Int
+  users: [User]!
+}

@@ -10,7 +10,6 @@ import { UserInputError } from '@graphql/errors'
 import existingEmailAddress from './helpers/existingEmailAddress'
 import generateNonce from './helpers/generateNonce'
 import normalizeEmail from './helpers/normalizeEmail'
-import Resolver from './helpers/Resolver'
 
 export default {
   Query: {
@@ -116,10 +115,5 @@ export default {
       if (!response) throw new UserInputError('Invalid nonce or no email address found.')
       return response
     },
-  },
-  EmailAddress: {
-    ...Resolver('EmailAddress', {
-      undefinedToNull: ['verifiedAt'],
-    }),
   },
 }

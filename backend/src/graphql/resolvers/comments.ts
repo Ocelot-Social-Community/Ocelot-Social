@@ -5,9 +5,29 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { v4 as uuid } from 'uuid'
 
+import { nodeQuery } from './helpers/nodeQuery'
 import Resolver from './helpers/Resolver'
 
+import type { NodeQueryParams } from './helpers/nodeQuery'
+import type { Context } from '@src/context'
+
+// The Comment root query, hand-written since the neo4j-graphql-js migration.
+// softDeleteMiddleware injects `deleted`/`disabled` as top-level arguments, so those must
+// constrain the query — without them, deleted comments are served to everyone.
+const commentQuery = nodeQuery({
+  label: 'Comment',
+  equalityFields: ['id', 'content', 'createdAt', 'updatedAt'],
+  softDeleteFields: ['deleted', 'disabled'],
+  orderingEnum: '_CommentOrdering',
+  // Oldest first: a comment list reads as a thread.
+  defaultOrder: { field: 'createdAt', direction: 'ASC' as const },
+})
+
 export default {
+  Query: {
+    Comment: async (_object, params: NodeQueryParams, context: Context, _resolveInfo) =>
+      commentQuery(params, context),
+  },
   Mutation: {
     CreateComment: async (_object, params, context, _resolveInfo) => {
       const { postId } = params

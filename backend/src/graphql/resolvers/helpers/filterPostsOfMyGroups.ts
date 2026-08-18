@@ -1,44 +1,17 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { mergeWith, isArray } from 'lodash'
+import type { PostQueryParams } from './postFilter'
+import type { Context } from '@src/context'
 
-const getMyGroupIds = async (context) => {
-  const { user } = context
-  if (!user?.id) return []
-  const session = context.driver.session()
-
-  try {
-    const readTxResult = await session.readTransaction(async (transaction) => {
-      const cypher = `
-        MATCH (group:Group)<-[membership:MEMBER_OF]-(:User { id: $userId })
-        WHERE membership.role IN ['usual', 'admin', 'owner']
-        RETURN collect(group.id) AS myGroupIds`
-      const getMyGroupIdsResponse = await transaction.run(cypher, { userId: user.id })
-      return getMyGroupIdsResponse.records.map((record) => record.get('myGroupIds'))
-    })
-    const [myGroupIds] = readTxResult
-    return myGroupIds
-  } finally {
-    await session.close()
-  }
-}
-
-export const filterPostsOfMyGroups = async (params, context) => {
+// Translates the client-facing `postsInMyGroups` flag into a graph condition.
+//
+// It used to fetch the ids of every group the viewer belongs to and pass them in as
+// `group.id_in`. The membership set is bounded, so this was never the scaling problem that
+// the invisible-post list was — but it is still one query per request for something the
+// main query can express itself (see the `inGroupsOf` operator).
+export const filterPostsOfMyGroups = (
+  params: PostQueryParams,
+  context: Context,
+): PostQueryParams => {
   if (!params.filter?.postsInMyGroups) return params
-  delete params.filter.postsInMyGroups
-  const myGroupIds = await getMyGroupIds(context)
-  params.filter = mergeWith(
-    params.filter,
-    {
-      group: { id_in: myGroupIds },
-    },
-    (objValue, srcValue) => {
-      if (isArray(objValue)) {
-        return objValue.concat(srcValue)
-      }
-    },
-  )
-  return params
+  const { postsInMyGroups: _flag, ...rest } = params.filter
+  return { ...params, filter: { ...rest, inGroupsOf: context.user?.id ?? null } }
 }

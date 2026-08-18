@@ -186,7 +186,6 @@ describe('Message', () => {
                       lastMessageAt: expect.any(String),
                       unreadCount: 0,
                       lastMessage: expect.objectContaining({
-                        _id: result.data?.Room[0].lastMessage.id,
                         id: expect.any(String),
                         content: 'Some nice message to other chatting user',
                         senderId: 'chatting-user',
@@ -215,7 +214,6 @@ describe('Message', () => {
                       lastMessageAt: expect.any(String),
                       unreadCount: 2,
                       lastMessage: expect.objectContaining({
-                        _id: expect.any(String),
                         id: expect.any(String),
                         content: 'Some nice message to other chatting user',
                         senderId: 'chatting-user',
@@ -446,7 +444,6 @@ describe('Message', () => {
                 }),
                 {
                   id: expect.any(String),
-                  _id: result.data?.Message[1].id,
                   indexId: 1,
                   content: 'Some nice message to other chatting user',
                   senderId: 'chatting-user',

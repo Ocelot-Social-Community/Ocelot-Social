@@ -207,7 +207,6 @@ describe('Room', () => {
                   roomName: 'Other Chatting User',
                   users: expect.arrayContaining([
                     {
-                      _id: 'chatting-user',
                       id: 'chatting-user',
                       name: 'Chatting User',
                       avatar: {
@@ -215,7 +214,6 @@ describe('Room', () => {
                       },
                     },
                     {
-                      _id: 'other-chatting-user',
                       id: 'other-chatting-user',
                       name: 'Other Chatting User',
                       avatar: {
@@ -248,7 +246,6 @@ describe('Room', () => {
                   unreadCount: 2,
                   users: expect.arrayContaining([
                     {
-                      _id: 'chatting-user',
                       id: 'chatting-user',
                       name: 'Chatting User',
                       avatar: {
@@ -256,7 +253,6 @@ describe('Room', () => {
                       },
                     },
                     {
-                      _id: 'other-chatting-user',
                       id: 'other-chatting-user',
                       name: 'Other Chatting User',
                       avatar: {
@@ -447,7 +443,6 @@ describe('Room', () => {
               }),
               users: expect.arrayContaining([
                 expect.objectContaining({
-                  _id: 'chatting-user',
                   id: 'chatting-user',
                   name: 'Chatting User',
                   avatar: {
@@ -455,7 +450,6 @@ describe('Room', () => {
                   },
                 }),
                 expect.objectContaining({
-                  _id: 'third-chatting-user',
                   id: 'third-chatting-user',
                   name: 'Third Chatting User',
                   avatar: {
@@ -476,7 +470,6 @@ describe('Room', () => {
               }),
               users: expect.arrayContaining([
                 expect.objectContaining({
-                  _id: 'chatting-user',
                   id: 'chatting-user',
                   name: 'Chatting User',
                   avatar: {
@@ -484,7 +477,6 @@ describe('Room', () => {
                   },
                 }),
                 expect.objectContaining({
-                  _id: 'second-chatting-user',
                   id: 'second-chatting-user',
                   name: 'Second Chatting User',
                   avatar: {
@@ -500,7 +492,6 @@ describe('Room', () => {
               lastMessageAt: expect.any(String),
               unreadCount: 0,
               lastMessage: {
-                _id: expect.any(String),
                 id: expect.any(String),
                 content: '2nd message to other chatting user',
                 senderId: 'chatting-user',
@@ -513,7 +504,6 @@ describe('Room', () => {
               },
               users: expect.arrayContaining([
                 expect.objectContaining({
-                  _id: 'chatting-user',
                   id: 'chatting-user',
                   name: 'Chatting User',
                   avatar: {
@@ -521,7 +511,6 @@ describe('Room', () => {
                   },
                 }),
                 expect.objectContaining({
-                  _id: 'other-chatting-user',
                   id: 'other-chatting-user',
                   name: 'Other Chatting User',
                   avatar: {

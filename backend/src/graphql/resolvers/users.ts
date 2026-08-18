@@ -5,16 +5,19 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-shadow */
-import { neo4jgraphql } from 'neo4j-graphql-js'
-
+// Field names indexed here come from the literal equalityFields list in the User query,
+// never from request data.
+/* eslint-disable security/detect-object-injection */
 import { GROUP_MEMBERSHIP_VISIBILITY_CHANGED } from '@constants/subscriptions'
 import { getNeode } from '@db/neo4j'
 import { UserInputError, ForbiddenError } from '@graphql/errors'
 import { branding } from '@src/branding'
 
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
-import { filterUsersHasLocation } from './helpers/filterHasLocation'
+import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
 import normalizeEmail from './helpers/normalizeEmail'
+import { orderClause } from './helpers/ordering'
+import { pagingClause } from './helpers/paging'
 import Resolver from './helpers/Resolver'
 import { images } from './images/images'
 import { createOrUpdateLocations } from './users/location'
@@ -41,6 +44,11 @@ export const getMutedUsers = async (context) => {
   return mutedUsers
 }
 
+// ORDER BY from `_UserOrdering`; the allowed fields come from the enum itself, so the
+// admin search and the general User query cannot drift apart from the schema.
+const userOrderClause = (orderBy: unknown, fallback: string): string =>
+  orderClause(orderBy, { enumName: '_UserOrdering', alias: 'user', fallback })
+
 export default {
   Query: {
     mutedUsers: async (_object, _args, context, _resolveInfo) => getMutedUsers(context),
@@ -53,7 +61,7 @@ export default {
         })
       ).records.map((r) => r.get('blocked'))
     },
-    User: async (object, args, context, resolveInfo) => {
+    User: async (_object, args, context, _resolveInfo) => {
       if (args.email) {
         args.email = normalizeEmail(args.email)
         const session = context.driver.session()
@@ -108,31 +116,7 @@ export default {
             `roleName/search cannot be combined with: ${incompatible.join(', ')}.`,
           )
         }
-        // Honour orderBy via a whitelist — field names are interpolated into Cypher,
-        // so they must never come from raw input (Map.get avoids that injection sink).
-        // Defaults to newest-first, matching the admin list.
-        const userOrdering = new Map<string, string>([
-          ['id_asc', 'user.id ASC'],
-          ['id_desc', 'user.id DESC'],
-          ['slug_asc', 'user.slug ASC'],
-          ['slug_desc', 'user.slug DESC'],
-          ['name_asc', 'user.name ASC'],
-          ['name_desc', 'user.name DESC'],
-          ['createdAt_asc', 'user.createdAt ASC'],
-          ['createdAt_desc', 'user.createdAt DESC'],
-          ['updatedAt_asc', 'user.updatedAt ASC'],
-          ['updatedAt_desc', 'user.updatedAt DESC'],
-        ])
-        const orderByInput =
-          args.orderBy == null ? [] : Array.isArray(args.orderBy) ? args.orderBy : [args.orderBy]
-        const orderClauses = orderByInput.map((entry) => {
-          const clause = userOrdering.get(String(entry))
-          if (!clause) {
-            throw new UserInputError(`Unsupported orderBy '${String(entry)}' for the user search.`)
-          }
-          return clause
-        })
-        const orderBy = orderClauses.length > 0 ? orderClauses.join(', ') : 'user.createdAt DESC'
+        const orderBy = userOrderClause(args.orderBy, 'user.createdAt DESC')
 
         // Searching BY e-mail is an oracle on personal data, so gate it with the
         // SAME permission that gates reading the e-mail field (User.email shield
@@ -176,8 +160,92 @@ export default {
           await session.close()
         }
       }
-      args = await filterUsersHasLocation(args, context)
-      return neo4jgraphql(object, args, context, resolveInfo)
+      // Stage C2: the general User lookup in hand-written Cypher. `hasLocation` is handled
+      // below as an EXISTS pattern, like the Post query does it.
+
+      // The scalar arguments are equality matches, exactly as the generated query did.
+      // Anything else the schema advertises but this path does not implement is REJECTED
+      // rather than ignored — silently dropping a filter would widen a result set the
+      // caller believes to be narrowed. Same reasoning as the roleName/search path above.
+      const supportedFilterKeys = ['id', 'id_in', 'hasLocation']
+      const unsupported = Object.keys(args.filter ?? {}).filter(
+        (key) => !supportedFilterKeys.includes(key),
+      )
+      if (unsupported.length > 0) {
+        throw new UserInputError(`Unsupported User filter: ${unsupported.join(', ')}.`)
+      }
+
+      const equalityFields = [
+        'id',
+        'name',
+        'slug',
+        'locationName',
+        'about',
+        'createdAt',
+        'updatedAt',
+      ]
+      // softDeleteMiddleware sets these as top-level args (deleted always, disabled unless
+      // the viewer may moderate). They must constrain the query — otherwise deleted and
+      // disabled accounts are served to everyone. coalesce() also covers nodes that never
+      // had the property, matching the admin search path above.
+      const softDeleteFields = ['deleted', 'disabled']
+      const conditions = equalityFields
+        .filter((field) => args[field] !== undefined && args[field] !== null)
+        // Field names come from this literal list, never from input.
+        .map((field) => `user.${field} = $${field}`)
+      conditions.push(
+        ...softDeleteFields
+          .filter((field) => args[field] !== undefined && args[field] !== null)
+          .map((field) => `coalesce(user.${field}, false) = $${field}`),
+      )
+      // `id` is an alias for a single-element `id_in`, so both go through one condition.
+      //
+      // Supplying both is rejected rather than resolved. It used to take `id_in` and drop
+      // `id` without a word, which loses something the client explicitly asked for — and
+      // since the two express the same thing, sending both is a mistake worth naming.
+      // helpers/nodeQuery.ts (Tag, Comment) does the same.
+      // Explicit `null` counts as not set: the line below already treats a null `id` as
+      // absent, so refusing it here would reject a filter the resolver is happy to run.
+      if (args.filter?.id != null && args.filter?.id_in != null) {
+        throw new UserInputError('User filter: use either `id` or `id_in`, not both.')
+      }
+      const filterIds = args.filter?.id_in ?? (args.filter?.id ? [args.filter.id] : null)
+      if (filterIds) conditions.push('user.id IN $filterIdIn')
+      // Asked of the graph rather than resolved into an id list first — the previous
+      // helper collected the id of EVERY user with a location on each request.
+      if (args.filter?.hasLocation) {
+        conditions.push('EXISTS { MATCH (user)-[:IS_IN]->(:Location) }')
+      }
+
+      const paging = pagingClause(args)
+
+      const session = context.driver.session()
+      try {
+        return await session.readTransaction(async (transaction) => {
+          const result = await transaction.run(
+            `
+              MATCH (user:User)
+              ${conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''}
+              RETURN user { .* } AS user
+              ORDER BY ${userOrderClause(args.orderBy, 'user.createdAt DESC')}
+              ${paging.clause}
+            `,
+            {
+              ...Object.fromEntries(
+                [...equalityFields, ...softDeleteFields].map((field) => [
+                  field,
+                  args[field] ?? null,
+                ]),
+              ),
+              filterIdIn: filterIds ?? [],
+              ...paging.params,
+            },
+          )
+          return result.records.map((record) => unwrap(record.get('user')))
+        })
+      } finally {
+        await session.close()
+      }
     },
   },
   Mutation: {
@@ -701,22 +769,19 @@ export default {
         await session.close()
       }
     },
+    ...underscoreIdResolver,
+    // Verbatim from User.gql. Who may READ this field is enforced separately by the
+    // graphql-shield rule on User.email; this resolver only fetches it.
+    ...cypherFields('User', {
+      // A user without a primary email is a supported state — see the
+      // `userWithoutEmailAddress` factory. The field is non-null, so the fallback keeps such
+      // a user readable rather than erroring out of their own settings page.
+      email: {
+        statement: 'MATCH (this)-[:PRIMARY_EMAIL]->(e:EmailAddress) RETURN e.email',
+        fallback: '',
+      },
+    }),
     ...Resolver('User', {
-      undefinedToNull: [
-        'actorId',
-        'deleted',
-        'disabled',
-        'locationName',
-        'about',
-        'termsAndConditionsAgreedVersion',
-        'termsAndConditionsAgreedAt',
-        'allowEmbedIframes',
-        'showShoutsPublicly',
-        'showPublicGroupsOnProfile',
-        'showClosedGroupsOnProfile',
-        'showHiddenGroupsOnProfile',
-        'locale',
-      ],
       boolean: {
         followedByCurrentUser:
           'MATCH (this)<-[:FOLLOWS]-(u:User {id: $cypherParams.currentUserId}) RETURN COUNT(u) >= 1',
@@ -749,6 +814,8 @@ export default {
         shouted: '-[:SHOUTED]->(related:Post)',
         categories: '-[:CATEGORIZED]->(related:Category)',
         badgeTrophies: '<-[:REWARDED]-(related:Badge)',
+        // Counterpart of the invitedBy hasOne above.
+        invited: '-[:INVITED]->(related:User)',
       },
     }),
     following: async (

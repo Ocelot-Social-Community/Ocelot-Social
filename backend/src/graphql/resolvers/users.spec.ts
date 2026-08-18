@@ -225,12 +225,25 @@ describe('User', () => {
       expect(desc.data.User.map((u) => u.name)).toEqual(['Bob', 'Anna'])
     })
 
-    it('rejects an orderBy it does not support', async () => {
+    // `about_asc` IS part of _UserOrdering, so it has to work. The resolver used to keep its
+    // own hand-written whitelist which happened to omit about, locale and locationName —
+    // the schema offered them, the resolver rejected them, and this test cemented that.
+    // The allowed set is now read from the enum itself (helpers/ordering.ts).
+    it('honours an orderBy the schema advertises', async () => {
       const { errors } = await query({
         query: searchQuery,
         variables: { roleName: 'moderator', orderBy: ['about_asc'] },
       })
-      expect(errors?.[0].message).toContain('Unsupported orderBy')
+      expect(errors).toBeUndefined()
+    })
+
+    it('rejects an orderBy the schema does not define', async () => {
+      const { errors } = await query({
+        query: searchQuery,
+        variables: { roleName: 'moderator', orderBy: ['nonsense_asc'] },
+      })
+      // Enum validation now catches this before the resolver runs, which is the better place.
+      expect(errors?.[0].message).toContain('nonsense_asc')
     })
 
     it('rejects combining roleName/search with an incompatible filter (locationName)', async () => {
@@ -244,9 +257,29 @@ describe('User', () => {
     it('rejects combining roleName/search with a structured filter', async () => {
       const { errors } = await query({
         query: searchQuery,
-        variables: { search: 'ann', filter: { id: 'mod-anna' } },
+        variables: { search: 'ann', filter: { id_in: ['mod-anna'] } },
       })
       expect(errors?.[0].message).toContain('cannot be combined with')
+    })
+
+    it('rejects id and id_in together', async () => {
+      // `id` is documented as a one-element `id_in`. This used to keep id_in and drop `id`
+      // without a word — the same rule now applies here and in helpers/nodeQuery.ts.
+      const { errors } = await query({
+        query: searchQuery,
+        variables: { filter: { id: 'mod-anna', id_in: ['mod-bob'] } },
+      })
+      expect(errors?.[0].message).toContain('use either `id` or `id_in`, not both')
+    })
+
+    it.each([
+      ['id', { id: 'mod-anna' }],
+      ['id_in', { id_in: ['mod-anna'] }],
+    ])('still accepts %s on its own', async (_name, filter) => {
+      const { data, errors } = await query({ query: searchQuery, variables: { filter } })
+
+      expect(errors).toBeUndefined()
+      expect(data?.User).toEqual([expect.objectContaining({ id: 'mod-anna' })])
     })
   })
 })

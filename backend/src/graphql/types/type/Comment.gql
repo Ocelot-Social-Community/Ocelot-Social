@@ -9,31 +9,11 @@ enum _CommentOrdering {
   updatedAt_desc
 }
 
+"Filter for the Comment query. Scoped to what helpers/nodeQuery.ts implements; anything not listed is rejected at validation time."
 input _CommentFilter {
-  AND: [_CommentFilter!]
-  OR: [_CommentFilter!]
+  "A single comment id; shorthand for a one-element `id_in`."
   id: ID
-  id_not: ID
   id_in: [ID!]
-  id_not_in: [ID!]
-  author: _UserFilter
-  author_not: _UserFilter
-  author_in: [_UserFilter!]
-  author_not_in: [_UserFilter!]
-  content: String
-  content_not: String
-  content_in: [String!]
-  content_not_in: [String!]
-  content_contains: String
-  content_not_contains: String
-  content_starts_with: String
-  content_not_starts_with: String
-  content_ends_with: String
-  content_not_ends_with: String
-  post: _PostFilter
-  post_not: _PostFilter
-  post_in: [_PostFilter!]
-  post_not_in: [_PostFilter!]
 }
 
 "A comment written by a user in reply to a post."
@@ -41,11 +21,11 @@ type Comment {
   id: ID!
   "ActivityPub activity id, for federated comments."
   activityId: String
-  author: User @relation(name: "WROTE", direction: "IN")
+  author: User
   "Comment body as rich text (HTML)."
   content: String!
   "The post this comment belongs to."
-  post: Post @relation(name: "COMMENTS", direction: "OUT")
+  post: Post
   createdAt: String
   updatedAt: String
   "True once the comment has been moderated away."
@@ -54,26 +34,14 @@ type Comment {
   disabled: Boolean
   "Whether the current user observes the post this comment belongs to."
   isPostObservedByMe: Boolean!
-    @cypher(
-      statement: "MATCH (this)-[:COMMENTS]->(:Post)<-[obs:OBSERVES]-(u:User {id: $cypherParams.currentUserId}) WHERE obs.active = true RETURN COUNT(u) >= 1"
-    )
   "Number of users observing the post this comment belongs to."
   postObservingUsersCount: Int!
-    @cypher(
-      statement: "MATCH (this)-[:COMMENTS]->(:Post)<-[obs:OBSERVES]-(u:User) WHERE obs.active = true AND NOT u.disabled = true AND NOT u.deleted = true RETURN COUNT(DISTINCT u)"
-    )
 
   "Whether the current user has shouted (endorsed) this comment."
   shoutedByCurrentUser: Boolean!
-    @cypher(
-      statement: "MATCH (this) RETURN EXISTS((this)<-[:SHOUTED]-(:User {id: $cypherParams.currentUserId}))"
-    )
 
   "Number of users who have shouted (endorsed) this comment."
   shoutedCount: Int!
-    @cypher(
-      statement: "MATCH (this)<-[:SHOUTED]-(related:User) WHERE NOT related.deleted = true AND NOT related.disabled = true RETURN COUNT(DISTINCT related)"
-    )
 }
 
 type Query {
