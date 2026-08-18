@@ -229,7 +229,13 @@ describe('Cypher round trips', () => {
     // same key to `.load()` over and over. Without deduplication the author's fields are
     // looked up once PER POST inside a single UNWIND — invisible to the round-trip count
     // above, which stays at one statement either way.
-    const { idBatches, rows } = await countRoundTrips(SHARED_AUTHOR_QUERY, { first: 12 })
+    const { idBatches, rows, errors } = await countRoundTrips(SHARED_AUTHOR_QUERY, { first: 12 })
+
+    // Checked FIRST. GraphQL answers partially: the 12 posts can come back while every
+    // author field fails, and a field that errors may never reach its loader — no batch, no
+    // duplicates, assertion satisfied by an execution that tested nothing. `rows` counts
+    // posts, so it stays at 12 and hides it.
+    expect(errors).toBeUndefined()
     expect(rows).toBe(12)
 
     const withDuplicates = idBatches.filter((ids) => new Set(ids).size !== ids.length)
@@ -239,7 +245,11 @@ describe('Cypher round trips', () => {
   }, 120000)
 
   it('does not scale round trips per row', async () => {
-    const { runs, rows } = await countRoundTrips(FEED_QUERY, { first: 12 })
+    const { runs, rows, errors } = await countRoundTrips(FEED_QUERY, { first: 12 })
+
+    // Same reason as above: a failed field selection means fewer statements, which would
+    // make this ceiling easier to meet rather than harder.
+    expect(errors).toBeUndefined()
 
     // A generous ceiling: one statement per selected field would already exceed it, while
     // the batched implementation sits far below. Catches the regression, not the details.
