@@ -56,10 +56,19 @@ interface NodeQueryConfig {
   computedOrder?: Record<string, string>
 }
 
-/** Builds the WHERE fragment for one filter operator, plus the parameters it references. */
+/**
+ * Builds the WHERE fragment for one filter operator, plus the parameters it references.
+ *
+ * `parameter` is handed in rather than chosen by the handler, and every handler MUST use it.
+ * Two handlers that hard-code the same name overwrite each other in the merged parameter map
+ * while both conditions stay in the WHERE clause — they then evaluate against whichever value
+ * was assigned last, and the query answers with rows the other filter excluded. postFilter.ts
+ * avoids this the same way, by handing out a fresh name per operator.
+ */
 type FilterHandler = (
   value: unknown,
   alias: string,
+  parameter: string,
 ) => { condition: string; params: Record<string, unknown> }
 
 /**
@@ -74,15 +83,15 @@ type FilterHandler = (
  * forget.
  */
 const FILTER_HANDLERS: Record<string, FilterHandler> = {
-  id_in: (value, alias) => ({
-    condition: `${alias}.id IN $filterIdIn`,
-    params: { filterIdIn: value },
+  id_in: (value, alias, parameter) => ({
+    condition: `${alias}.id IN $${parameter}`,
+    params: { [parameter]: value },
   }),
   // `id` is a one-element `id_in`. Selecting a single node by id is the most ordinary filter
   // there is, and the User query already treats the two as the same thing.
-  id: (value, alias) => ({
-    condition: `${alias}.id IN $filterIdIn`,
-    params: { filterIdIn: [value] },
+  id: (value, alias, parameter) => ({
+    condition: `${alias}.id IN $${parameter}`,
+    params: { [parameter]: [value] },
   }),
 }
 
@@ -96,6 +105,14 @@ export const nodeQuery =
     const unsupported = Object.keys(filter).filter((key) => !(key in FILTER_HANDLERS))
     if (unsupported.length > 0) {
       throw new UserInputError(`Unsupported ${label} filter: ${unsupported.join(', ')}.`)
+    }
+
+    // `id` is documented as a one-element `id_in`, so sending both is either redundant or
+    // self-contradictory — there is no query it expresses that one of them alone does not.
+    // Rejected rather than resolved: ANDing them answers a contradiction with a silent empty
+    // list, and letting one win throws away something the client explicitly asked for.
+    if (filter.id !== undefined && filter.id_in !== undefined) {
+      throw new UserInputError(`${label} filter: use either \`id\` or \`id_in\`, not both.`)
     }
 
     const conditions: string[] = []
@@ -115,7 +132,13 @@ export const nodeQuery =
     for (const [key, value] of Object.entries(filter)) {
       if (value === undefined || value === null) continue
       // Guaranteed present: the loop above rejected every key without a handler.
-      const { condition, params: handlerParams } = FILTER_HANDLERS[key](value, alias)
+      // The name is derived from the operator, which is unique within one filter object and
+      // comes from FILTER_HANDLERS rather than from request data.
+      const { condition, params: handlerParams } = FILTER_HANDLERS[key](
+        value,
+        alias,
+        `filter_${key}`,
+      )
       conditions.push(condition)
       Object.assign(queryParams, handlerParams)
     }

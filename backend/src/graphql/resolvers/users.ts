@@ -199,6 +199,14 @@ export default {
           .map((field) => `coalesce(user.${field}, false) = $${field}`),
       )
       // `id` is an alias for a single-element `id_in`, so both go through one condition.
+      //
+      // Supplying both is rejected rather than resolved. It used to take `id_in` and drop
+      // `id` without a word, which loses something the client explicitly asked for — and
+      // since the two express the same thing, sending both is a mistake worth naming.
+      // helpers/nodeQuery.ts (Tag, Comment) does the same.
+      if (args.filter?.id !== undefined && args.filter?.id_in !== undefined) {
+        throw new UserInputError('User filter: use either `id` or `id_in`, not both.')
+      }
       const filterIds = args.filter?.id_in ?? (args.filter?.id ? [args.filter.id] : null)
       if (filterIds) conditions.push('user.id IN $filterIdIn')
       // Asked of the graph rather than resolved into an id list first — the previous

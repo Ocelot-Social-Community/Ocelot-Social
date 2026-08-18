@@ -261,6 +261,26 @@ describe('User', () => {
       })
       expect(errors?.[0].message).toContain('cannot be combined with')
     })
+
+    it('rejects id and id_in together', async () => {
+      // `id` is documented as a one-element `id_in`. This used to keep id_in and drop `id`
+      // without a word — the same rule now applies here and in helpers/nodeQuery.ts.
+      const { errors } = await query({
+        query: searchQuery,
+        variables: { filter: { id: 'mod-anna', id_in: ['mod-bob'] } },
+      })
+      expect(errors?.[0].message).toContain('use either `id` or `id_in`, not both')
+    })
+
+    it.each([
+      ['id', { id: 'mod-anna' }],
+      ['id_in', { id_in: ['mod-anna'] }],
+    ])('still accepts %s on its own', async (_name, filter) => {
+      const { data, errors } = await query({ query: searchQuery, variables: { filter } })
+
+      expect(errors).toBeUndefined()
+      expect(data?.User).toEqual([expect.objectContaining({ id: 'mod-anna' })])
+    })
   })
 })
 

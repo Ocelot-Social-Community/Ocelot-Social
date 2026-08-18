@@ -63,6 +63,19 @@ describe('Tag filter', () => {
     expect(data?.Tag).toEqual([{ id: 'nodequery-beta' }])
   })
 
+  it('rejects id and id_in together', async () => {
+    // The two express the same thing — `id` is documented as a one-element `id_in` — so
+    // supplying both is a client mistake. Answering it by ANDing them would hand back an
+    // empty list with no indication that the filter contradicted itself.
+    const { data, errors } = await setup.query({
+      query: tagQuery,
+      variables: { filter: { id: 'nodequery-alpha', id_in: ['nodequery-beta'] } },
+    })
+
+    expect(errors?.[0].message).toContain('use either `id` or `id_in`, not both')
+    expect(data?.Tag).toBeFalsy()
+  })
+
   it.each(['id_not', 'id_not_in', 'taggedPosts_some'])(
     'rejects the undeclared operator %s',
     async (key) => {
