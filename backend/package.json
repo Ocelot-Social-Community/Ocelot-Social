@@ -37,7 +37,7 @@
     "prod:db:func:disable:notifications": "node build/src/db/disable-notifications.js"
   },
   "dependencies": {
-    "@apollo/server": "^4.11.3",
+    "@apollo/server": "^5.5.1",
     "@aws-sdk/client-s3": "^3.1109.0",
     "@aws-sdk/lib-storage": "^3.1109.0",
     "@graphql-tools/load-files": "^7.0.0",
