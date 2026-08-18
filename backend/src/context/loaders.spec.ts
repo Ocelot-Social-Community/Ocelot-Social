@@ -215,11 +215,20 @@ describe('Room.unreadCount', () => {
   it('resolves a whole room list in a single query', async () => {
     const sessionSpy = jest.spyOn(driver, 'session')
 
-    await unreadCountFor(rooms, reader)
+    // Restored in `finally`: jest is configured without `restoreMocks`, so a failing
+    // assertion would leave the spy on the shared driver for every later test in this file.
+    // Milder than the same omission in queryBatching.spec.ts — there is no mockImplementation
+    // here, so the real session still opens and only the call count keeps accumulating — but
+    // a counter that survives its own test is the kind of thing the NEXT counting test
+    // inherits without noticing.
+    try {
+      await unreadCountFor(rooms, reader)
 
-    // Four rooms, one round trip — the property the DataLoader registry exists for.
-    expect(sessionSpy).toHaveBeenCalledTimes(1)
-    sessionSpy.mockRestore()
+      // Four rooms, one round trip — the property the DataLoader registry exists for.
+      expect(sessionSpy).toHaveBeenCalledTimes(1)
+    } finally {
+      sessionSpy.mockRestore()
+    }
   })
 
   // Writes into LIVE_ROOM only, which nothing else reads — so this test needs no restore
