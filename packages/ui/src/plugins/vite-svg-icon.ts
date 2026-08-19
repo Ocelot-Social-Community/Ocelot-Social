@@ -35,14 +35,18 @@ export default function svgIcon(): Plugin {
     enforce: 'pre',
 
     resolveId(source, importer) {
-      if (!source.endsWith(SUFFIX)) return null
+      if (!source.endsWith(SUFFIX)) {
+        return null
+      }
       const svgPath = source.slice(0, -SUFFIX.length)
       const resolved = importer ? resolve(importer, '..', svgPath) : svgPath
       return `\0svg-icon:${resolved}`
     },
 
     async load(id) {
-      if (!id.startsWith('\0svg-icon:')) return null
+      if (!id.startsWith('\0svg-icon:')) {
+        return null
+      }
       const filePath = id.slice('\0svg-icon:'.length)
       // eslint-disable-next-line security/detect-non-literal-fs-filename -- resolved from Vite import graph
       const svg = await readFile(filePath, 'utf-8')

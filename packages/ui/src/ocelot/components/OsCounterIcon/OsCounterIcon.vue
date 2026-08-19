@@ -27,8 +27,11 @@
 
       const badgeClass = computed(() => {
         const classes = ['os-counter-icon__count']
-        if (props.soft) classes.push('os-counter-icon__count--soft')
-        else if (props.danger) classes.push('os-counter-icon__count--danger')
+        if (props.soft) {
+          classes.push('os-counter-icon__count--soft')
+        } else if (props.danger) {
+          classes.push('os-counter-icon__count--danger')
+        }
         return classes.join(' ')
       })
 

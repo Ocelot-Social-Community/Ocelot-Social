@@ -47,7 +47,9 @@
         const proxy = instance?.proxy as Record<string, unknown> | undefined
         const vm = (isVue2 ? proxy : getCurrentInstance()?.proxy) as Record<string, unknown>
 
-        if (!vm || !props.route) return null
+        if (!vm || !props.route) {
+          return null
+        }
 
         const resolvedLinkTag = vm.resolvedLinkTag as string | Component
         const matcherResult = vm.matcherResult as boolean
@@ -161,7 +163,9 @@
     },
     computed: {
       resolvedLinkTag(): string | Component {
-        if (this.linkTag) return this.linkTag
+        if (this.linkTag) {
+          return this.linkTag
+        }
         const menu = this.$parentMenu as Record<string, unknown> | null
         return (menu?.linkTag as string | Component) || 'a'
       },
