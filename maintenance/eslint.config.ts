@@ -6,7 +6,6 @@ import {
   yaml,
   css,
   prettier,
-  typescript as it4cTypescript,
   vue3 as it4cVue3,
   importX as it4cImportX,
 } from 'eslint-config-it4c'
@@ -16,8 +15,11 @@ import withNuxt from './.nuxt/eslint.config.mjs'
 // it4c ESLint-Basisregeln extrahieren (recommended + custom, kein Plugin/Parser-Overlap mit Nuxt)
 const it4cEslintRules = Object.assign({}, ...it4cEslint.map((c) => c.rules))
 
-// it4c TypeScript-Regeln extrahieren (Plugin/Parser-Setup wird von Nuxt via tsconfigPath bereitgestellt)
-const it4cTsRules = Object.assign({}, ...it4cTypescript.map((c) => c.rules))
+// Regeln ohne ihr Plugin zu extrahieren lässt sie ins Leere zeigen — ESLint bricht dann mit
+// "could not find plugin" ab. Betrifft `no-catch-all`, das in eslint-config-it4c 0.13 vom
+// typescript- ins eslint-Modul gewandert ist. Das Plugin kommt deshalb aus demselben Modul
+// wie die Regeln, statt hier separat deklariert zu werden.
+const it4cEslintPlugins = Object.assign({}, ...it4cEslint.map((c) => c.plugins))
 
 // it4c Vue3-Regeln extrahieren (Plugin/Parser-Setup wird von Nuxt bereitgestellt)
 const it4cVue3Rules = Object.assign({}, ...it4cVue3.map((c) => c.rules))
@@ -29,14 +31,12 @@ const it4cImportRules = Object.fromEntries(
     .map(([key, value]) => [key.replace('import-x/', 'import/'), value]),
 )
 
-// no-catch-all gehört nicht ins TypeScript-Modul
-delete it4cTsRules['no-catch-all/no-catch-all']
-
 export default withNuxt(
   { ignores: ['.nuxt/', '.claude/', '.output/', 'coverage/', 'eslint.config.ts', 'nuxt.config.ts', 'vitest.config.ts'] },
   // it4c ESLint-Basisregeln
   {
     files: ['**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx,vue}'],
+    plugins: it4cEslintPlugins,
     rules: it4cEslintRules,
   },
   {
