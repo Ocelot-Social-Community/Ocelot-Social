@@ -564,32 +564,33 @@ describe('PostSlug', () => {
     })
 
     describe('computed branches', () => {
-      it('heading picks the Event title for event posts', () => {
+      it('ribbonText picks the event label for event posts', () => {
         // Testing the computed in isolation avoids rendering the Event-specific
         // DateTimeRange child which has its own required props.
         const ctx = {
           post: { postType: ['Event'] },
           $t: (k) => k,
         }
-        expect(PostSlug.computed.heading.call(ctx)).toBe('post.viewEvent.title')
+        expect(PostSlug.computed.ribbonText.call(ctx)).toBe('post.event')
       })
 
-      it('heading picks the Post title for non-event posts', () => {
+      it('ribbonText picks the article label for non-event posts, ignoring pinned state', () => {
         const ctx = {
-          post: { postType: ['Article'] },
+          post: { postType: ['Article'], pinned: true },
           $t: (k) => k,
         }
-        expect(PostSlug.computed.heading.call(ctx)).toBe('post.viewPost.title')
+        expect(PostSlug.computed.ribbonText.call(ctx)).toBe('post.article')
       })
 
-      it('routes picks the Event title and re-encodes params with reserved characters', () => {
+      it('routes reuses ribbonText for the name (never a separately-worded type label) and re-encodes params with reserved characters', () => {
         const ctx = {
           post: { postType: ['Event'] },
+          ribbonText: 'post.event',
           $t: (k) => k,
           $route: { params: { id: 'abc', slug: 'foo/bar' } },
         }
         const [top] = PostSlug.computed.routes.call(ctx)
-        expect(top.name).toBe('post.viewEvent.title')
+        expect(top.name).toBe('post.event')
         expect(top.path).toBe('/post/abc/foo%2Fbar')
         expect(top.children[0].path).toBe('/post/abc/foo%2Fbar#comments')
       })

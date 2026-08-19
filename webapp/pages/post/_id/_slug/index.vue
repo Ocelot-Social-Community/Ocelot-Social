@@ -38,7 +38,7 @@
               </os-button>
             </aside>
           </template>
-          <section class="menu">
+          <section class="menu" :class="{ 'menu--no-image': !post.image }">
             <user-avatar :user="post.author" :group="post.group" wide :date-time="post.createdAt">
               <template #dateTime>
                 <p class="ds-text" v-if="post.createdAt !== post.updatedAt">
@@ -62,32 +62,31 @@
                 @toggleObservePost="toggleObservePost"
               />
             </client-only>
+            <!-- Same ribbon as PostTeaser (type only here — deliberately no
+                 pinned state, that's only meaningful while browsing a list). -->
+            <hc-ribbon
+              class="post-detail-ribbon"
+              :class="post.image ? 'post-detail-ribbon-w-img' : ''"
+              :text="ribbonText"
+              :typ="post.postType[0]"
+            />
           </section>
           <div class="ds-mb-small"></div>
-          <!-- The page's type ("Event"/"Post") is shown here as a small kicker
-             rather than as its own heading — post.title below is the page's
-             only h1, so search engines see the actual, unique content as the
-             page's main heading instead of a label repeated across every
-             post of the same type. -->
-          <p class="post-kicker ds-text ds-text-soft ds-text-size-small ds-text-uppercase">
-            {{ heading }}
-            <template v-if="post.group && post.group.id && post.group.slug">
-              ·
-              {{ $t('post.viewPost.forGroup.title') }}
-              <nuxt-link
-                :to="{
-                  name: 'groups-id-slug',
-                  params: { slug: post.group.slug, id: post.group.id },
-                }"
-              >
-                {{ post.group.name }}
-              </nuxt-link>
-            </template>
+          <p
+            v-if="post.group && post.group.id && post.group.slug"
+            class="post-kicker ds-text ds-text-soft ds-text-size-small"
+          >
+            {{ $t('post.viewPost.forGroup.title') }}
+            <nuxt-link
+              :to="{ name: 'groups-id-slug', params: { slug: post.group.slug, id: post.group.id } }"
+            >
+              {{ post.group.name }}
+            </nuxt-link>
           </p>
           <h1 class="ds-heading ds-heading-h1 title hyphenate-text">{{ post.title }}</h1>
           <!-- event data -->
           <div v-if="post && post.postType[0] === 'Event'" class="ds-mb-small event-data">
-            <div class="event-data__info" style="padding: 10px">
+            <div class="event-data__info">
               <location-teaser
                 class="event-info"
                 :venue="post.eventVenue"
@@ -208,6 +207,7 @@ import EventLocationMap from '~/components/Map/EventLocationMap'
 import HcCategory from '~/components/Category'
 import HcEmpty from '~/components/Empty/Empty'
 import HcHashtag from '~/components/Hashtag/Hashtag'
+import HcRibbon from '~/components/Ribbon'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
 import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
 import { useShout } from '~/composables/useShout'
@@ -248,6 +248,7 @@ export default {
     HcCategory,
     HcEmpty,
     HcHashtag,
+    HcRibbon,
     LocationTeaser,
     OsActionButton,
     ResponsiveImage,
@@ -309,10 +310,10 @@ export default {
       const postPath = `/post/${encodedId}/${encodedSlug}`
       return [
         {
-          name:
-            this.post?.postType[0] === 'Event'
-              ? this.$t('post.viewEvent.title')
-              : this.$t('post.viewPost.title'),
+          // Reuses ribbonText (the same label shown on the ribbon) rather
+          // than a second, separately-worded type lookup — the two must
+          // never say something different for the same post.
+          name: this.ribbonText,
           path: postPath,
           children: [
             {
@@ -323,9 +324,14 @@ export default {
         },
       ]
     },
-    heading() {
-      if (this.post?.postType[0] === 'Event') return this.$t('post.viewEvent.title')
-      return this.$t('post.viewPost.title')
+    // No pinned state here (unlike PostTeaser's ribbonText) — that's only
+    // meaningful while browsing a list, not on the post itself.
+    ribbonText() {
+      // Also read by routes(), which the sidebar renders even before the
+      // post has loaded — needs the same "post may still be null" guard
+      // that computed used to have inline.
+      if (this.post?.postType[0] === 'Event') return this.$t('post.event')
+      return this.$t('post.article')
     },
     menuModalsData() {
       return postMenuModalsData(
@@ -594,8 +600,9 @@ export default {
 }
 
 /* .ds-heading defaults to a large top margin meant for headings that open a
-   section on their own — too much space directly under the kicker label. */
-.post-kicker + .title.ds-heading {
+   section on their own — too much space here, whether or not the "in group"
+   kicker line precedes it. */
+.post-page .title.ds-heading {
   margin-top: 0.2em;
 }
 
@@ -658,9 +665,36 @@ export default {
   }
 
   .menu {
+    position: relative;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    /* Positioned like PostTeaser's ribbon (same component/offsets) — its
+       folded corner is hard-coded to the right in Ribbon/index.vue, so it
+       stays right here too. padding-right keeps the content-menu's "..."
+       button from sitting directly under it. */
+    padding-right: 48px;
+
+    .post-detail-ribbon {
+      position: absolute;
+      top: -16px;
+      right: -29px;
+    }
+
+    .post-detail-ribbon-w-img {
+      /* With a hero image the ribbon sits on the image's bottom-right
+         corner, well above the menu row already. */
+      top: -36px;
+    }
+
+    /* Without a hero image the ribbon (top: -16px above) has no image
+       corner to sit on and can't move further up without poking out past
+       the card's own top edge, so instead the row's content (avatar,
+       "..." button) is pushed down to clear the ribbon — its anchor point
+       (.menu's top border edge) stays put, only the flex content shifts. */
+    &.menu--no-image {
+      padding-top: 16px;
+    }
   }
 
   &.--blur-image > .os-card__hero-image > .image {
@@ -699,6 +733,16 @@ export default {
   display: flex;
   flex-direction: column;
   gap: var(--space-small);
+}
+
+.event-data__info {
+  padding: 10px;
+}
+
+/* Same left/right inset as .event-data__info above, so the map's edges
+   line up with the location/date text instead of running edge-to-edge. */
+.event-data__map {
+  padding: 0 10px;
 }
 
 .actions {
