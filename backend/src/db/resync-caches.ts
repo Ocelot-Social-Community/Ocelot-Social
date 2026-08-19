@@ -14,7 +14,9 @@ const RESYNC_TIMEOUT = 3000
 // reset/seed.
 export async function nudgeCacheResync(): Promise<void> {
   const uri = CONFIG.GRAPHQL_URI
-  if (!uri) return
+  if (!uri) {
+    return
+  }
   try {
     const response = await fetch(uri, {
       method: 'POST',

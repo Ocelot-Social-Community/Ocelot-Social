@@ -85,7 +85,9 @@ beforeAll(async () => {
       const post = await Factory.build('post', { id: `co-post-${String(postIndex++)}` }, { author })
       await tag.relateTo(post, 'post')
       // Two of the posts also land in a category, so postCount has something to order by.
-      if (postIndex <= 2) await category.relateTo(post, 'post')
+      if (postIndex <= 2) {
+        await category.relateTo(post, 'post')
+      }
     }
   }
 }, 120000)

@@ -11,7 +11,9 @@ export default {
     // service was initialised with); secret values are never returned.
     systemConfig: (_parent: unknown, _args: unknown, context: Context) => {
       const { policy } = context
-      if (!policy) return []
+      if (!policy) {
+        return []
+      }
       return systemConfigStatus(process.env, policy)
     },
   },

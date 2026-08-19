@@ -65,7 +65,9 @@ export function overlayBrandRuntimeFiles(
     if (entry.startsWith('emails/locales/') && entry.endsWith('.json')) {
       // strip the `emails/` prefix → `locales/<file>` relative to emailsDir (safeJoin guards traversal).
       const target = safeJoin(dirs.emailsDir, entry.slice('emails/'.length))
-      if (!target) continue
+      if (!target) {
+        continue
+      }
       let brand: Json
       try {
         brand = JSON.parse(data.toString('utf8')) as Json
@@ -82,7 +84,9 @@ export function overlayBrandRuntimeFiles(
     } else if (entry.startsWith('emails/templates/')) {
       // strip the `emails/` prefix → `templates/<…>` relative to emailsDir.
       const target = safeJoin(dirs.emailsDir, entry.slice('emails/'.length))
-      if (target) writeFileEnsured(target, data)
+      if (target) {
+        writeFileEnsured(target, data)
+      }
     }
   }
 }

@@ -61,7 +61,9 @@ export class RoleService {
     if (pubsub) {
       this.subscriptionId = await pubsub.subscribe(ROLE_CHANGED_CHANNEL, (payload) => {
         const event = payload.roleChanged
-        if (!this.initialised && event.definition === null) deletedDuringInit.add(event.name)
+        if (!this.initialised && event.definition === null) {
+          deletedDuringInit.add(event.name)
+        }
         this.applyExternalChange(event)
       })
     }
@@ -74,10 +76,14 @@ export class RoleService {
     for (const role of roles) {
       // A concurrent change event during init already set this role to a fresher
       // value — don't clobber it with the read.
-      if (this.cache.has(role.name)) continue
+      if (this.cache.has(role.name)) {
+        continue
+      }
       // A concurrent delete event removed this role mid-init; the read snapshot is
       // stale, so don't resurrect it (events win over the initial read).
-      if (deletedDuringInit.has(role.name)) continue
+      if (deletedDuringInit.has(role.name)) {
+        continue
+      }
       this.cache.set(role.name, role)
     }
 
@@ -199,7 +205,9 @@ export class RoleService {
       throw new RoleValidationError(`Role '${oldName}' is mandatory and cannot be renamed.`)
     }
     // A no-op rename (same name) is idempotent success — nothing to persist or broadcast.
-    if (oldName === newName) return existing
+    if (oldName === newName) {
+      return existing
+    }
     if (this.cache.get(newName)) {
       throw new RoleValidationError(`Role '${newName}' already exists.`)
     }

@@ -63,7 +63,9 @@ export const runBatch = async ({
         cypherParams: context.cypherParams ?? {},
       })
       const byId = new Map<unknown, unknown>()
-      for (const record of result.records) byId.set(record.get('__id'), record.get('__value'))
+      for (const record of result.records) {
+        byId.set(record.get('__id'), record.get('__value'))
+      }
       return { byId }
     })
   } finally {

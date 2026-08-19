@@ -43,7 +43,9 @@ const metascraper = Metascraper([
 
 const fetchEmbed = async (url) => {
   let endpointUrl = findProvider(url)
-  if (!endpointUrl) return {}
+  if (!endpointUrl) {
+    return {}
+  }
   endpointUrl = new URL(endpointUrl)
   endpointUrl.searchParams.append('url', url)
   endpointUrl.searchParams.append('format', 'json')
