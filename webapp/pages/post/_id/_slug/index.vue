@@ -50,14 +50,20 @@
               <!-- Same read-only counters as PostTeaser's footer (shout
                    count is already visible on the interactive shout button
                    below, so it's not repeated here). -->
-              <os-counter-icon
-                :icon="icons.comments"
-                :count="post.commentsCount"
-                v-tooltip="{
-                  content: $t('contribution.amount-comments', { amount: post.commentsCount }),
-                  placement: 'bottom-start',
-                }"
-              />
+              <a
+                href="#comments"
+                class="comments-jump-link"
+                :aria-label="$t('contribution.amount-comments', { amount: commentsCount })"
+              >
+                <os-counter-icon
+                  :icon="icons.comments"
+                  :count="commentsCount"
+                  v-tooltip="{
+                    content: $t('contribution.amount-comments', { amount: commentsCount }),
+                    placement: 'bottom-start',
+                  }"
+                />
+              </a>
               <os-counter-icon
                 :icon="icons.handPointer"
                 :count="post.clickedCount"
@@ -383,6 +389,16 @@ export default {
       // that computed used to have inline.
       if (this.post?.postType[0] === 'Event') return this.$t('post.event')
       return this.$t('post.article')
+    },
+    // Same derivation as CommentList's own heading counter — reading
+    // post.commentsCount directly would miss comments added/removed on
+    // this page, since createComment() only pushes into post.comments.
+    commentsCount() {
+      return (
+        (this.post?.comments &&
+          this.post.comments.filter((comment) => !comment.deleted && !comment.disabled).length) ||
+        0
+      )
     },
     // Shared by the "in group" kicker link and its popover trigger below.
     groupLink() {
@@ -782,6 +798,13 @@ export default {
         margin-right: var(--space-small);
         opacity: var(--opacity-disabled);
       }
+
+      /* Comments icon doubles as a jump-to-comments link — keep it looking
+         like the other, non-interactive counters instead of picking up the
+         global link color. */
+      .comments-jump-link {
+        color: inherit;
+      }
     }
   }
 
@@ -831,6 +854,11 @@ export default {
    line up with the location/date text instead of running edge-to-edge. */
 .event-data__map {
   padding: 0 10px;
+  /* Extra breathing room below the map specifically — the surrounding
+     ds-mb-small spacers are shared across the page and fine for the
+     location/date text alone, but felt cramped after the map's large,
+     hard-edged box. */
+  margin-bottom: var(--space-small);
 }
 
 .actions {

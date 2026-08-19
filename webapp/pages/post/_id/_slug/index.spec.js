@@ -588,6 +588,25 @@ describe('PostSlug', () => {
         expect(PostSlug.computed.ribbonText.call(ctx)).toBe('post.article')
       })
 
+      it('commentsCount excludes deleted and disabled comments', () => {
+        const ctx = {
+          post: {
+            comments: [
+              { id: '1' },
+              { id: '2', deleted: true },
+              { id: '3', disabled: true },
+              { id: '4' },
+            ],
+          },
+        }
+        expect(PostSlug.computed.commentsCount.call(ctx)).toBe(2)
+      })
+
+      it('commentsCount is 0 without a post or comments', () => {
+        expect(PostSlug.computed.commentsCount.call({ post: null })).toBe(0)
+        expect(PostSlug.computed.commentsCount.call({ post: {} })).toBe(0)
+      })
+
       it('routes reuses ribbonText for the name (never a separately-worded type label) and re-encodes params with reserved characters', () => {
         const ctx = {
           post: { postType: ['Event'] },
@@ -731,10 +750,12 @@ describe('PostSlug', () => {
           isPostObservedByMe: true,
           postObservingUsersCount: 5,
         }
+        const beforeCommentsCount = wrapper.vm.commentsCount
         await wrapper.vm.createComment(newComment)
         expect(wrapper.vm.post.comments).toHaveLength(before + 1)
         expect(wrapper.vm.post.isObservedByMe).toBe(true)
         expect(wrapper.vm.post.observingUsersCount).toBe(5)
+        expect(wrapper.vm.commentsCount).toBe(beforeCommentsCount + 1)
       })
 
       it('toggleObservePost fires the mutation, refetches, and toasts success', async () => {
