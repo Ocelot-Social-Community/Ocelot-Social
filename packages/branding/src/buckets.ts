@@ -88,7 +88,9 @@ export interface BucketSource {
  * default). Examples: `acme` → {acme,null,default}; `acme@1.2.0/dark` → {acme,1.2.0,dark}.
  */
 export function parseSource(spec: unknown): BucketSource | null {
-  if (typeof spec !== 'string' || !spec) return null
+  if (typeof spec !== 'string' || !spec) {
+    return null
+  }
   let rest = spec
   let name = 'default'
   const slash = rest.indexOf('/')
@@ -102,7 +104,9 @@ export function parseSource(spec: unknown): BucketSource | null {
     version = rest.slice(at + 1) || null
     rest = rest.slice(0, at)
   }
-  if (!rest) return null
+  if (!rest) {
+    return null
+  }
   return { id: rest, version, name }
 }
 
@@ -112,7 +116,9 @@ export function formatSource({
   version = null,
   name = 'default',
 }: Partial<BucketSource>): string {
-  if (!id) return ''
+  if (!id) {
+    return ''
+  }
   return `${id}${version ? `@${version}` : ''}${name && name !== 'default' ? `/${name}` : ''}`
 }
 
@@ -187,7 +193,9 @@ function deepMergeInto(
   patch: Record<string, unknown>,
 ): Record<string, unknown> {
   for (const key of Object.keys(patch)) {
-    if (isForbiddenMergeKey(key)) continue // prototype-pollution guard
+    if (isForbiddenMergeKey(key)) {
+      continue
+    } // prototype-pollution guard
     const patchValue = patch[key]
     const targetValue = target[key]
     if (isPlainObject(targetValue) && isPlainObject(patchValue)) {
@@ -201,7 +209,9 @@ function deepMergeInto(
 
 function getPath(obj: unknown, path: string): unknown {
   return path.split('.').reduce<unknown>((o, key) => {
-    if (o != null && typeof o === 'object') return (o as Record<string, unknown>)[key]
+    if (o != null && typeof o === 'object') {
+      return (o as Record<string, unknown>)[key]
+    }
     return undefined
   }, obj)
 }
@@ -211,7 +221,9 @@ function setPath(target: Record<string, unknown>, path: string, value: unknown):
   let node = target
   for (let i = 0; i < keys.length - 1; i++) {
     const key = keys[i]
-    if (node[key] == null || typeof node[key] !== 'object') node[key] = {}
+    if (node[key] == null || typeof node[key] !== 'object') {
+      node[key] = {}
+    }
     node = node[key] as Record<string, unknown>
   }
   node[keys[keys.length - 1]] = value
@@ -234,9 +246,13 @@ export function composeConfig(
   const result = clone(brandingDefaults) as unknown as Record<string, unknown>
   for (const { path, bucket } of OWNED_PATHS) {
     const source = bucketSources[bucket]
-    if (!source) continue // no source for this bucket → keep the framework default
+    if (!source) {
+      continue
+    } // no source for this bucket → keep the framework default
     const value = getPath(source, path)
-    if (value === undefined) continue
+    if (value === undefined) {
+      continue
+    }
     // A plain-object owned value is MERGED onto the default subtree so a source that only carries some
     // sibling leaves (a sparse fragment) doesn't wipe the defaults for the rest — e.g. a navigation
     // source with just `headerMenu.menu` keeps the default `headerMenu.customButton`. The build's
@@ -255,7 +271,9 @@ export function composeConfig(
   const locales = result.locales as Record<string, unknown>
   for (const bucket of BUCKET_NAMES) {
     const sourceLocales = (bucketSources[bucket] as { locales?: unknown } | undefined)?.locales
-    if (isPlainObject(sourceLocales)) deepMergeInto(locales, sourceLocales)
+    if (isPlainObject(sourceLocales)) {
+      deepMergeInto(locales, sourceLocales)
+    }
   }
   result.locales = locales
   return result as unknown as BrandingConfig
@@ -288,7 +306,9 @@ export function extractBucket(
 ): DeepPartial<BrandingConfig> {
   const out: Record<string, unknown> = {}
   walkLeaves(config, '', (path, value) => {
-    if (bucketOfPath(path) === bucket) setPath(out, path, clone(value))
+    if (bucketOfPath(path) === bucket) {
+      setPath(out, path, clone(value))
+    }
   })
   return out
 }

@@ -15,13 +15,19 @@ import type { BrandingConfig } from './schema.js'
 export function validateBranding(config: BrandingConfig): string[] {
   const violations: string[] = []
   const atLeast = (path: string, n: number, lo: number): void => {
-    if (!(n >= lo)) violations.push(`${path} must be ≥ ${String(lo)} (got ${String(n)})`)
+    if (!(n >= lo)) {
+      violations.push(`${path} must be ≥ ${String(lo)} (got ${String(n)})`)
+    }
   }
   const atMost = (aPath: string, a: number, bPath: string, b: number): void => {
-    if (!(a <= b)) violations.push(`${aPath} (${String(a)}) must be ≤ ${bPath} (${String(b)})`)
+    if (!(a <= b)) {
+      violations.push(`${aPath} (${String(a)}) must be ≤ ${bPath} (${String(b)})`)
+    }
   }
   const nonEmpty = (path: string, s: string): void => {
-    if (s.trim().length === 0) violations.push(`${path} must not be empty`)
+    if (s.trim().length === 0) {
+      violations.push(`${path} must not be empty`)
+    }
   }
 
   const { group, registration, comment, category, badges, metadata } = config

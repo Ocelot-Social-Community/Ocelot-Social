@@ -27,7 +27,9 @@ const GENERATOR = fileURLToPath(new URL('./build-maintenance-branding.ts', impor
 
 const roots: string[] = []
 after(() => {
-  for (const dir of roots) rmSync(dir, { recursive: true, force: true })
+  for (const dir of roots) {
+    rmSync(dir, { recursive: true, force: true })
+  }
 })
 
 function tmp(prefix: string): string {
@@ -41,8 +43,11 @@ function walk(dir: string, prefix = ''): string[] {
   const out: string[] = []
   for (const entry of readdirSync(join(dir, prefix), { withFileTypes: true })) {
     const rel = prefix ? `${prefix}/${entry.name}` : entry.name
-    if (entry.isDirectory()) out.push(...walk(dir, rel))
-    else out.push(rel)
+    if (entry.isDirectory()) {
+      out.push(...walk(dir, rel))
+    } else {
+      out.push(rel)
+    }
   }
   return out.sort()
 }
@@ -94,6 +99,10 @@ function brandDir(): string {
       site: { madeBy: 'Acme' },
     }),
   )
+  // A locale the brand DOES translate, but only in a namespace the maintenance page never renders.
+  // Distinct from `en` below, which the brand does not carry at all — both must end up without an
+  // overlay file, for different reasons.
+  write(join(dir, 'locales/fr.json'), JSON.stringify({ site: { madeBy: 'Acme' } }))
   return dir
 }
 
@@ -116,6 +125,10 @@ function maintenanceDir(): string {
   write(
     join(dir, 'locales/en.json'),
     JSON.stringify({ maintenance: { explanation: 'Back soon.' } }),
+  )
+  write(
+    join(dir, 'locales/fr.json'),
+    JSON.stringify({ maintenance: { explanation: 'De retour bientôt.' } }),
   )
   write(join(dir, 'app/assets/css/branding.css'), ':root { --color-primary: green; }\n')
   write(join(dir, 'app/constants/metadata.ts'), 'export default { APPLICATION_NAME: "ocelot" };\n')
@@ -199,7 +212,9 @@ describe('build-maintenance-branding', () => {
     // Changed or removed: a path list cannot catch either, so compare the files themselves. Tracking
     // only names would miss a committed file being overwritten in place.
     for (const [rel, content] of before) {
-      if (managed(rel)) continue
+      if (managed(rel)) {
+        continue
+      }
       assert.ok(afterRun.has(rel), `${rel} was removed`)
       assert.equal(afterRun.get(rel), content, `${rel} was modified`)
     }
@@ -392,6 +407,9 @@ describe('build-maintenance-branding', () => {
     assert.equal(de.localeSwitch, undefined)
     // A locale the brand does not translate gets no overlay at all.
     assert.equal(existsSync(join(to, 'app/locales/en.json')), false)
+    // Nor does one it DOES translate, when nothing it translated is rendered here: an overlay file
+    // holding `{}` would still be written, read and deep-merged on every page load for no effect.
+    assert.equal(existsSync(join(to, 'app/locales/fr.json')), false)
   })
 
   // The tree is ephemeral in Docker but is your working copy under `npm run brand` — a second run
@@ -576,7 +594,9 @@ describe('build-maintenance-branding', () => {
       const meta = overlay(to)
       // Omitted, not null — a present overlay key wins, so null would blank the vanilla value out
       // instead of falling through to it.
-      for (const key of ['FAVICON', 'LOGO', 'OG_IMAGE']) assert.ok(!(key in meta), key)
+      for (const key of ['FAVICON', 'LOGO', 'OG_IMAGE']) {
+        assert.ok(!(key in meta), key)
+      }
       assert.deepEqual(readSheets(to), [])
       assert.ok(existsSync(join(to, 'public/favicon.ico'))) // the vanilla icon still answers
       assert.match(stderr, /favicon: \/img\/custom\/logo\.svg is served by the webapp/)
