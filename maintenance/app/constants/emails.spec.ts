@@ -28,6 +28,7 @@ const HOSTILE = [
   // Only the string has to go for the surrounding object literal to become attacker-controlled.
   'x",evil:"1@example.org',
   // A template literal needs no quote of its own.
+  // eslint-disable-next-line no-template-curly-in-string -- the `${}` is the payload under test, not a mistyped template literal
   "x`${alert(1)}`@example.org",
   // No quote, no backtick — an injected tag is enough on its own.
   "x<img src=x onerror=alert(1)>@example.org",
