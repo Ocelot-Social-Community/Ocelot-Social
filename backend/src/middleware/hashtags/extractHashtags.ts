@@ -4,7 +4,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { load } from 'cheerio'
-// eslint-disable-next-line import-x/extensions
 import { exec, build } from 'xregexp/xregexp-all.js'
 // formats of a Hashtag:
 //   https://en.wikipedia.org/w/index.php?title=Hashtag&oldid=905141980#Style
@@ -15,7 +14,9 @@ import { exec, build } from 'xregexp/xregexp-all.js'
 const regX = build('^((\\pL+[\\pL0-9]*)|([0-9]+\\pL+[\\pL0-9]*))$')
 
 export default function (content?) {
-  if (!content) return []
+  if (!content) {
+    return []
+  }
   const $ = load(content)
   // We can not search for class '.hashtag', because the classes are removed at the 'xss' middleware.
   //   But we have to know, which Hashtags are removed from the content as well, so we search for the 'a' html-tag.
