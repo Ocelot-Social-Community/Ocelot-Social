@@ -139,7 +139,9 @@ const isMySocialMedia = rule({
 const isAllowedToChangeGroupSettings = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }: Context) => {
-  if (!user?.id) return false
+  if (!user?.id) {
+    return false
+  }
   const ownerId = user.id
   const { id: groupId } = args
   const session = driver.session()
@@ -159,8 +161,6 @@ const isAllowedToChangeGroupSettings = rule({
   try {
     const { owner, group } = await readTxPromise
     return !!group && !!owner && ['owner'].includes(owner.myRoleInGroup)
-  } catch (error) {
-    throw new Error(error)
   } finally {
     await session.close()
   }
@@ -169,7 +169,9 @@ const isAllowedToChangeGroupSettings = rule({
 const isAllowedSeeingGroupMembers = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }: Context) => {
-  if (!user?.id) return false
+  if (!user?.id) {
+    return false
+  }
   const { id: groupId } = args
   const session = driver.session()
   const readTxPromise = session.readTransaction(async (transaction) => {
@@ -195,8 +197,6 @@ const isAllowedSeeingGroupMembers = rule({
         (['closed', 'hidden'].includes(group.groupType) && isMember) ||
         (group.groupType === 'closed' && group.showMembers === true))
     )
-  } catch (error) {
-    throw new Error(error)
   } finally {
     await session.close()
   }
@@ -205,10 +205,14 @@ const isAllowedSeeingGroupMembers = rule({
 const isAllowedToChangeGroupMemberRole = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }: Context) => {
-  if (!user?.id) return false
+  if (!user?.id) {
+    return false
+  }
   const currentUserId = user.id
   const { groupId, userId, roleInGroup } = args
-  if (currentUserId === userId) return false
+  if (currentUserId === userId) {
+    return false
+  }
   const session = driver.session()
   const readTxPromise = session.readTransaction(async (transaction) => {
     const transactionResponse = await transaction.run(
@@ -242,8 +246,6 @@ const isAllowedToChangeGroupMemberRole = rule({
       (!userIsMember || (userIsMember && (sameUserRoleInGroup || !userIsOwner))) &&
       ((currentUserIsAdmin && adminCanSetRole) || (currentUserIsOwner && ownerCanSetRole))
     )
-  } catch (error) {
-    throw new Error(error)
   } finally {
     await session.close()
   }
@@ -252,7 +254,9 @@ const isAllowedToChangeGroupMemberRole = rule({
 const isAllowedToJoinGroup = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }: Context) => {
-  if (!user?.id) return false
+  if (!user?.id) {
+    return false
+  }
   const { groupId, userId } = args
   const session = driver.session()
   const readTxPromise = session.readTransaction(async (transaction) => {
@@ -272,8 +276,6 @@ const isAllowedToJoinGroup = rule({
   try {
     const { group, member } = await readTxPromise
     return !!group && (group.groupType !== 'hidden' || (!!member && !!member.myRoleInGroup))
-  } catch (error) {
-    throw new Error(error)
   } finally {
     await session.close()
   }
@@ -282,9 +284,13 @@ const isAllowedToJoinGroup = rule({
 const isAllowedToLeaveGroup = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }: Context) => {
-  if (!user?.id) return false
+  if (!user?.id) {
+    return false
+  }
   const { groupId, userId } = args
-  if (user.id !== userId) return false
+  if (user.id !== userId) {
+    return false
+  }
   const session = driver.session()
   const readTxPromise = session.readTransaction(async (transaction) => {
     const transactionResponse = await transaction.run(
@@ -302,8 +308,6 @@ const isAllowedToLeaveGroup = rule({
   try {
     const { group, member } = await readTxPromise
     return !!group && !!member && !!member.myRoleInGroup && member.myRoleInGroup !== 'owner'
-  } catch (error) {
-    throw new Error(error)
   } finally {
     await session.close()
   }
@@ -312,9 +316,13 @@ const isAllowedToLeaveGroup = rule({
 const isMemberOfGroup = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }: Context) => {
-  if (!user?.id) return false
+  if (!user?.id) {
+    return false
+  }
   const { groupId } = args
-  if (!groupId) return true
+  if (!groupId) {
+    return true
+  }
   const userId = user.id
   const session = driver.session()
   const readTxPromise = session.readTransaction(async (transaction) => {
@@ -330,8 +338,6 @@ const isMemberOfGroup = rule({
   try {
     const role = await readTxPromise
     return ['usual', 'admin', 'owner'].includes(role)
-  } catch (error) {
-    throw new Error(error)
   } finally {
     await session.close()
   }
@@ -340,10 +346,14 @@ const isMemberOfGroup = rule({
 const canRemoveUserFromGroup = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }: Context) => {
-  if (!user?.id) return false
+  if (!user?.id) {
+    return false
+  }
   const { groupId, userId } = args
   const currentUserId = user.id
-  if (currentUserId === userId) return false
+  if (currentUserId === userId) {
+    return false
+  }
   const session = driver.session()
   const readTxPromise = session.readTransaction(async (transaction) => {
     const transactionResponse = await transaction.run(
@@ -366,8 +376,6 @@ const canRemoveUserFromGroup = rule({
     return (
       currentUserRole && ['owner'].includes(currentUserRole) && userRole && userRole !== 'owner'
     )
-  } catch (error) {
-    throw new Error(error)
   } finally {
     await session.close()
   }
@@ -376,7 +384,9 @@ const canRemoveUserFromGroup = rule({
 const canCommentPost = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }: Context) => {
-  if (!user?.id) return false
+  if (!user?.id) {
+    return false
+  }
   const { postId } = args
   const userId = user.id
   const session = driver.session()
@@ -400,8 +410,6 @@ const canCommentPost = rule({
     return (
       !group || (membership && ['usual', 'admin', 'owner'].includes(membership.properties.role))
     )
-  } catch (error) {
-    throw new Error(error)
   } finally {
     await session.close()
   }
@@ -410,7 +418,9 @@ const canCommentPost = rule({
 const isAuthor = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }: Context) => {
-  if (!user) return false
+  if (!user) {
+    return false
+  }
   const { id: resourceId } = args
   const session = driver.session()
   const authorReadTxPromise = session.readTransaction(async (transaction) => {
@@ -461,7 +471,9 @@ const effectivePermissionsOfUser = async (
 // separately via hasPermission(); this rule only enforces the relative ranking.
 const canActOnTargetUser = rule({ cache: 'no_cache' })(async (_parent, args, context: Context) => {
   const targetId = args.id as string | undefined
-  if (!targetId) return false
+  if (!targetId) {
+    return false
+  }
   const targetPermissions = await effectivePermissionsOfUser(context, targetId)
   return dominates(context.effectivePermissions, targetPermissions)
 })
@@ -476,13 +488,17 @@ const canModerateTargetUser = rule({ cache: 'no_cache' })(async (
   context: Context,
 ) => {
   const resourceId = args.resourceId as string | undefined
-  if (!resourceId) return false
+  if (!resourceId) {
+    return false
+  }
   // Self-review is a conflict-of-interest case, not a privilege-escalation one: you can
   // never strictly dominate your own permission set, so the dominance check below would
   // reject it with a generic "Not Authorized!". Let it pass here and leave it to
   // validateReview, which rejects self-review with the specific "You cannot review
   // yourself!" message. Self stays blocked — just by the rule that owns that concern.
-  if (resourceId === context.user?.id) return true
+  if (resourceId === context.user?.id) {
+    return true
+  }
   const result = await context.database.query({
     query: `MATCH (resource {id: $resourceId})
               OPTIONAL MATCH (resource)-[:HAS_ROLE]->(r:Role)
@@ -491,8 +507,12 @@ const canModerateTargetUser = rule({ cache: 'no_cache' })(async (
   })
   const row = result.records[0]
   // Resource not found — let the resolver handle it; no user can be escalated.
-  if (!row) return true
-  if (!(row.get('isUser') as boolean)) return true
+  if (!row) {
+    return true
+  }
+  if (!(row.get('isUser') as boolean)) {
+    return true
+  }
   const targetPermissions = context.role.permissionsForRole(
     (row.get('roleName') as string | undefined) ?? 'user',
   )
@@ -510,7 +530,9 @@ const publicRegistration = rule()(async (_parent, _args, context: Context) =>
 )
 
 const inviteRegistration = rule()(async (_parent, args, context: Context) => {
-  if (!context.policy.get('inviteRegistration')) return false
+  if (!context.policy.get('inviteRegistration')) {
+    return false
+  }
   const { inviteCode } = args
   return validateInviteCode(context, inviteCode)
 })
@@ -518,7 +540,9 @@ const inviteRegistration = rule()(async (_parent, args, context: Context) => {
 const isAllowedToGenerateGroupInviteCode = rule({
   cache: 'no_cache',
 })(async (_parent, args, context: Context) => {
-  if (!context.user) return false
+  if (!context.user) {
+    return false
+  }
 
   return !!(
     await context.database.query({
@@ -536,7 +560,9 @@ const isAllowedToGenerateGroupInviteCode = rule({
 const isAllowedToPinGroupPost = rule({
   cache: 'no_cache',
 })(async (_parent, args, context: Context) => {
-  if (!context.user) return false
+  if (!context.user) {
+    return false
+  }
 
   return (
     (

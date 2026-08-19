@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
@@ -36,7 +36,7 @@ export async function up(next) {
     await transaction.rollback()
     // eslint-disable-next-line no-console
     console.log('rolled back')
-    throw new Error(error)
+    throw error
   } finally {
     await session.close()
   }

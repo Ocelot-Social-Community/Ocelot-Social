@@ -32,12 +32,14 @@ export async function readAllRoles(db: DbContext): Promise<RoleDefinition[]> {
       protected: Boolean(record.get('protected')),
       permissions: (record.get('permissions') as string | null) ?? '[]',
     } satisfies RawRoleRow
-    let parsed: unknown = []
+    let parsed: unknown
     try {
       parsed = JSON.parse(row.permissions)
     } catch (error) {
       // Malformed JSON ⇒ treat as no permissions; rethrow anything unexpected.
-      if (!(error instanceof SyntaxError)) throw error
+      if (!(error instanceof SyntaxError)) {
+        throw error
+      }
       parsed = []
     }
     return {
