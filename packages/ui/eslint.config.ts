@@ -62,6 +62,15 @@ export default [
       'n/file-extension-in-import': 'off',
     },
   },
+  {
+    // Specs assert on globals that were replaced by mocks (`window.requestAnimationFrame`
+    // and friends). Referencing them is the point of the assertion, not an accidental
+    // unbinding, so the rule is noise here — it fires on every `expect(obj.method)`.
+    files: ['**/*.spec.ts'],
+    rules: {
+      '@typescript-eslint/unbound-method': 'off',
+    },
+  },
   ...css,
   {
     // Extend CSS config with Tailwind v4 syntax support

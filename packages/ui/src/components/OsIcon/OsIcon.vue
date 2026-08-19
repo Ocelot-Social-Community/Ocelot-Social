@@ -44,7 +44,9 @@
         const iconComponent =
           props.icon || (props.name ? SYSTEM_ICONS[props.name as SystemIconName] : undefined)
 
-        if (!iconComponent) return null
+        if (!iconComponent) {
+          return null
+        }
 
         const sizeClass = ICON_SIZES[props.size]
 

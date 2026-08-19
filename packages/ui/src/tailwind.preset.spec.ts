@@ -46,7 +46,7 @@ describe('tailwind.preset', () => {
 
       expect(() => {
         validateCssVariables()
-      }).not.toThrowError()
+      }).not.toThrow()
     })
 
     it('does not warn when all variables are defined', () => {
