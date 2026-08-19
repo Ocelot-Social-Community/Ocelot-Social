@@ -39,7 +39,7 @@
             </aside>
           </template>
           <section class="menu" :class="{ 'menu--no-image': !post.image }">
-            <user-avatar :user="post.author" :group="post.group" wide :date-time="post.createdAt">
+            <user-avatar :user="post.author" wide :date-time="post.createdAt">
               <template #dateTime>
                 <p class="ds-text" v-if="post.createdAt !== post.updatedAt">
                   ({{ $t('post.edited') }})
@@ -632,6 +632,14 @@ export default {
      it back inline so the group link sits right after the label text. */
   .v-popover {
     display: inline-block;
+  }
+
+  /* On touch devices UserAvatarHelper renders the trigger as a <button>
+     instead of a <nuxt-link> (tap opens the popover instead of navigating
+     straight away) — buttons don't pick up the global "a { color }" rule,
+     so the group name loses its link color there unless set explicitly. */
+  .trigger button {
+    color: var(--color-primary);
   }
 }
 
