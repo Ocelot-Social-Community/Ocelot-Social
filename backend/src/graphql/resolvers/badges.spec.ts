@@ -188,7 +188,7 @@ describe('Badges', () => {
             errors: [
               {
                 message:
-                  'Error: Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.',
+                  'Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.',
               },
             ],
           })
@@ -207,7 +207,7 @@ describe('Badges', () => {
             errors: [
               {
                 message:
-                  'Error: Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.',
+                  'Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.',
               },
             ],
           })
@@ -226,7 +226,7 @@ describe('Badges', () => {
             errors: [
               {
                 message:
-                  'Error: Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.',
+                  'Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.',
               },
             ],
           })
