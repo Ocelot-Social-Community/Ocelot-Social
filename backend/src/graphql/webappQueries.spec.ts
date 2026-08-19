@@ -76,11 +76,16 @@ const collectTemplates = (): { file: string; body: string }[] => {
   assertWebappReadable()
   const files: string[] = []
   const walk = (dir: string) => {
-    if (!fs.existsSync(dir)) return
+    if (!fs.existsSync(dir)) {
+      return
+    }
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
       const full = path.join(dir, entry.name)
-      if (entry.isDirectory()) walk(full)
-      else if (/\.(js|ts|vue)$/.test(entry.name) && !entry.name.includes('.spec.')) files.push(full)
+      if (entry.isDirectory()) {
+        walk(full)
+      } else if (/\.(js|ts|vue)$/.test(entry.name) && !entry.name.includes('.spec.')) {
+        files.push(full)
+      }
     }
   }
   SEARCH_DIRS.forEach((dir) => {
@@ -104,7 +109,9 @@ const collectTemplates = (): { file: string; body: string }[] => {
 
       for (const variant of variants) {
         const body = stripInterpolations(variant)
-        if (body.trim()) templates.push({ file: relative, body })
+        if (body.trim()) {
+          templates.push({ file: relative, body })
+        }
       }
     }
   }
@@ -166,7 +173,9 @@ describe('webapp GraphQL documents', () => {
         // Every fragment is in scope for every operation here, so "unused" is expected.
         (error) => !error.message.includes('is never used'),
       )
-      for (const error of errors) messages.add(error.message)
+      for (const error of errors) {
+        messages.add(error.message)
+      }
     }
 
     expect([...messages]).toEqual([])

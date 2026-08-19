@@ -37,13 +37,19 @@ let client: RoomServiceClient | null = null
 const lastSeenCounts = new Map<string, number>()
 
 const pollOnce = async () => {
-  if (!CONFIG.LIVEKIT_ENABLED) return
+  if (!CONFIG.LIVEKIT_ENABLED) {
+    return
+  }
   // Skip if the previous tick is still in flight — prevents pile-up of
   // pending HTTP requests when LiveKit is slow or unreachable.
-  if (polling) return
+  if (polling) {
+    return
+  }
   // Client is created once in startLiveKitPoller() — bail out cleanly if the
   // poller wasn't started (e.g. direct unit-test invocation).
-  if (!client) return
+  if (!client) {
+    return
+  }
   polling = true
   try {
     let rooms
@@ -62,10 +68,14 @@ const pollOnce = async () => {
     }
     const seen = new Set<string>()
     for (const room of rooms) {
-      if (!room.name?.startsWith('group-')) continue
+      if (!room.name?.startsWith('group-')) {
+        continue
+      }
       seen.add(room.name)
       const groupId = groupIdFromRoomName(room.name)
-      if (!groupId) continue
+      if (!groupId) {
+        continue
+      }
       // room.numParticipants is a number; gracefully coerce in case of bigint
       const count = Number(room.numParticipants ?? 0) || 0
       if (lastSeenCounts.get(room.name) !== count) {
@@ -78,7 +88,9 @@ const pollOnce = async () => {
     // event never made it to us, then drop the entry so the map doesn't grow
     // unbounded across long-lived servers with many short-lived rooms.
     for (const [roomName, lastCount] of lastSeenCounts) {
-      if (seen.has(roomName)) continue
+      if (seen.has(roomName)) {
+        continue
+      }
       if (lastCount > 0) {
         const groupId = groupIdFromRoomName(roomName)
         if (groupId) {
@@ -103,12 +115,18 @@ const runTick = async () => {
 }
 
 export const startLiveKitPoller = () => {
-  if (!CONFIG.LIVEKIT_ENABLED) return
-  if (pollTimer) return
+  if (!CONFIG.LIVEKIT_ENABLED) {
+    return
+  }
+  if (pollTimer) {
+    return
+  }
   const livekitUrl = CONFIG.LIVEKIT_URL
   const apiKey = CONFIG.LIVEKIT_API_KEY
   const apiSecret = CONFIG.LIVEKIT_API_SECRET
-  if (!livekitUrl || !apiKey || !apiSecret) return
+  if (!livekitUrl || !apiKey || !apiSecret) {
+    return
+  }
   client = new RoomServiceClient(httpUrlFor(livekitUrl), apiKey, apiSecret)
   logger.info(`LiveKit poller starting (every ${(POLL_INTERVAL_MS / 1000).toString()}s).`)
   // First run a bit later so server startup isn't blocked. Tracked so a
@@ -117,11 +135,15 @@ export const startLiveKitPoller = () => {
     initialTimer = null
     void runTick()
   }, 5_000)
-  if (typeof initialTimer.unref === 'function') initialTimer.unref()
+  if (typeof initialTimer.unref === 'function') {
+    initialTimer.unref()
+  }
   pollTimer = setInterval(() => {
     void runTick()
   }, POLL_INTERVAL_MS)
-  if (typeof pollTimer.unref === 'function') pollTimer.unref()
+  if (typeof pollTimer.unref === 'function') {
+    pollTimer.unref()
+  }
 }
 
 export const stopLiveKitPoller = () => {

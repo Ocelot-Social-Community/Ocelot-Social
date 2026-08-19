@@ -12,7 +12,9 @@ import CONFIG from '@config/index'
 let instance: PubSub | RedisPubSub | undefined
 
 export default () => {
-  if (instance) return instance
+  if (instance) {
+    return instance
+  }
 
   const { REDIS_DOMAIN, REDIS_PORT, REDIS_PASSWORD } = CONFIG
   if (!(REDIS_DOMAIN && REDIS_PORT && REDIS_PASSWORD)) {

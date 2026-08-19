@@ -163,14 +163,18 @@ const workList: Record<string, DirectiveField[]> = Object.fromEntries(
 const buildSelection = (fields: DirectiveField[], overrides: Record<string, string> = {}): string =>
   fields
     .map((field) => {
-      if (overrides[field.name]) return overrides[field.name]
+      if (overrides[field.name]) {
+        return overrides[field.name]
+      }
       if (field.requiredArgumentNames.length > 0) {
         throw new Error(
           `${field.name} has required arguments (${field.requiredArgumentNames.join(', ')}) ` +
             'but no override in PROBES. Add one so the field is actually exercised.',
         )
       }
-      if (!field.isObject) return field.name
+      if (!field.isObject) {
+        return field.name
+      }
 
       const scalar = scalarFor[field.namedType]
       if (!scalar) {
@@ -300,7 +304,9 @@ describe('@cypher / @relation field resolution', () => {
     for (const [typeName, probe] of Object.entries(PROBES)) {
       // Every probe operation already selects `id`, so an empty field selection is valid.
       const { data } = await setup.query({ query: probe.operation('') })
-      if (probe.extract(data ?? {}).length === 0) empty.push(typeName)
+      if (probe.extract(data ?? {}).length === 0) {
+        empty.push(typeName)
+      }
     }
 
     // A probe with no instances would pass its selection test vacuously.
@@ -405,14 +411,20 @@ describe('@cypher / @relation field resolution', () => {
     // always null when empty, never undefined, so `undefined` on the direct path means the
     // resolver returned nothing at all — exactly the failure this suite exists to catch.
     const identityOf = (value: unknown, key: string | undefined): unknown => {
-      if (value === null || typeof value !== 'object' || !key) return null
+      if (value === null || typeof value !== 'object' || !key) {
+        return null
+      }
       return (value as Record<string, unknown>)[key] ?? null
     }
 
     const comparable = (value: unknown, namedType: string): unknown => {
       const key = scalarFor[namedType]
-      if (value === undefined) return { kind: 'undefined' }
-      if (value === null) return { kind: 'null' }
+      if (value === undefined) {
+        return { kind: 'undefined' }
+      }
+      if (value === null) {
+        return { kind: 'null' }
+      }
       if (Array.isArray(value)) {
         // Sorted: the two paths may order a relation differently, which is not what this
         // test is about — membership is.
@@ -424,7 +436,9 @@ describe('@cypher / @relation field resolution', () => {
             .sort((a, b) => a.localeCompare(b)),
         }
       }
-      if (typeof value === 'object') return { kind: 'object', key: identityOf(value, key) }
+      if (typeof value === 'object') {
+        return { kind: 'object', key: identityOf(value, key) }
+      }
       return { kind: 'scalar', value }
     }
 
@@ -466,7 +480,9 @@ describe('@cypher / @relation field resolution', () => {
         // Present by construction: the work list is built from the same registry and
         // already threw in that case, but assert instead of asserting non-null.
         const field = workList[typeName].find((candidate) => candidate.name === fieldName)
-        if (!field) throw new Error(`${typeName}.${fieldName} missing from the work list`)
+        if (!field) {
+          throw new Error(`${typeName}.${fieldName} missing from the work list`)
+        }
 
         const { data, errors } = await setup.query({
           query: probe.operation(buildSelection([field], probe.overrides)),

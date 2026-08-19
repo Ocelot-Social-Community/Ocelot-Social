@@ -21,7 +21,9 @@ const matchWholeText = (str, boost = 8) => {
 }
 
 const matchEachWordExactly = (str, boost = 4) => {
-  if (!str.includes(' ')) return ''
+  if (!str.includes(' ')) {
+    return ''
+  }
   const tmp = str
     .split(' ')
     .map((s, i) => (i === 0 ? `"${s}"` : `AND "${s}"`))
@@ -30,7 +32,9 @@ const matchEachWordExactly = (str, boost = 4) => {
 }
 
 const matchSomeWordsExactly = (str, boost = 2) => {
-  if (!str.includes(' ')) return ''
+  if (!str.includes(' ')) {
+    return ''
+  }
   return str
     .split(' ')
     .map((s) => `"${s}"^${boost}`)

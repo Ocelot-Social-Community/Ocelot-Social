@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable jest/no-conditional-expect */
 /* eslint-disable promise/prefer-await-to-callbacks */
-/* eslint-disable no-undef */
+
 /* eslint-disable @typescript-eslint/no-shadow */
 import { DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
@@ -154,13 +154,13 @@ describe('mergeImage', () => {
 
   describe('given image.upload', () => {
     beforeEach(() => {
-      const createReadStream: FileUpload['createReadStream'] = (() => ({
+      const createReadStream: FileUpload['createReadStream'] = () => ({
         pipe: () => ({
           on: (_: unknown, callback: () => void) => {
             callback()
           },
         }),
-      })) as unknown as FileUpload['createReadStream']
+      })
       imageInput = {
         ...imageInput,
         upload: Promise.resolve({

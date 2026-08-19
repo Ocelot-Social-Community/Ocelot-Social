@@ -145,7 +145,9 @@ export default {
   Query: {
     Post: async (_object, params, context: Context, _resolveInfo) => {
       const skipPinnedFilter = !!params.filter?.skipPinnedFilter
-      if (params.filter) delete params.filter.skipPinnedFilter
+      if (params.filter) {
+        delete params.filter.skipPinnedFilter
+      }
       params = filterPostsOfMyGroups(params, context)
       params = filterInvisiblePosts(params, context)
       params = filterForMutedUsers(params, context)
@@ -249,7 +251,7 @@ export default {
             { groupId },
           )
           const [groupType] = groupTypeResponse.records.map((record) => record.get('groupType'))
-          if (groupType !== 'public')
+          if (groupType !== 'public') {
             groupCypher += `
              WITH post, group
              MATCH (user:User)-[membership:MEMBER_OF]->(group)
@@ -260,6 +262,7 @@ export default {
              FOREACH (user IN nodes(path) |
                MERGE (user)-[:CANNOT_SEE]->(post)
              )`
+          }
         }
         const categoriesCypher =
           policy.get('categoriesActive') && categoryIds && categoryIds.length > 0
@@ -305,8 +308,9 @@ export default {
         }
         return post
       } catch (e) {
-        if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
+        if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
           throw new UserInputError('Post with this slug already exists!')
+        }
         throw e
       } finally {
         await session.close()
@@ -375,8 +379,9 @@ export default {
         }
         return post
       } catch (e) {
-        if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
+        if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
           throw new UserInputError('Post with this slug already exists!')
+        }
         throw e
       } finally {
         await session.close()
@@ -470,7 +475,9 @@ export default {
       }
       const { policy } = context
       const maxPinnedPosts = policy.get('maxPinnedPosts')
-      if (maxPinnedPosts === 0) throw new Error('Pinned posts are not allowed!')
+      if (maxPinnedPosts === 0) {
+        throw new Error('Pinned posts are not allowed!')
+      }
       let pinnedPostWithNestedAttributes
       const { driver, user } = context
       const session = driver.session()
@@ -773,8 +780,12 @@ export default {
     // gets its own batched resolver. The sort runs inside the collect() so each post keeps
     // its own ordering — sorting the flattened batch would be meaningless.
     comments: async (parent, params: { orderBy?: unknown }, context: Context) => {
-      if (typeof parent?.comments !== 'undefined') return parent.comments
-      if (!parent?.id) return []
+      if (typeof parent?.comments !== 'undefined') {
+        return parent.comments
+      }
+      if (!parent?.id) {
+        return []
+      }
 
       const order = commentOrderClause(params.orderBy)
       return (
@@ -818,7 +829,9 @@ export default {
     }),
     unreadNotificationByCurrentUser: async (parent, _params, context: Context, _resolveInfo) => {
       const currentUserId = context.user?.id
-      if (!currentUserId || !parent?.id) return null
+      if (!currentUserId || !parent?.id) {
+        return null
+      }
       const session = context.driver.session()
       try {
         const result = await session.readTransaction((transaction) =>
@@ -840,7 +853,9 @@ export default {
       _resolveInfo,
     ) => {
       const currentUserId = context.user?.id
-      if (!currentUserId || !parent?.id) return []
+      if (!currentUserId || !parent?.id) {
+        return []
+      }
       const session = context.driver.session()
       try {
         const result = await session.readTransaction((transaction) =>
@@ -855,7 +870,9 @@ export default {
       }
     },
     relatedContributions: async (parent, _params, context, _resolveInfo) => {
-      if (typeof parent.relatedContributions !== 'undefined') return parent.relatedContributions
+      if (typeof parent.relatedContributions !== 'undefined') {
+        return parent.relatedContributions
+      }
       const { id } = parent
       const session = context.driver.session()
 

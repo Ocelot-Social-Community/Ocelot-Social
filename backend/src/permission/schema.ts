@@ -54,7 +54,9 @@ export function descriptionFor(key: PermissionKey): string {
 // gate is open (AND). See ./gates.ts for how a gate name resolves to a boolean.
 export function gatesFor(key: PermissionKey): PermissionGate[] {
   const gatedBy = catalog[key].gatedBy
-  if (gatedBy === undefined) return []
+  if (gatedBy === undefined) {
+    return []
+  }
   return Array.isArray(gatedBy) ? [...gatedBy] : [gatedBy]
 }
 
@@ -65,7 +67,9 @@ export function gatesFor(key: PermissionKey): PermissionGate[] {
 export function allPermissionGates(): PermissionGate[] {
   const gates = new Set<PermissionGate>()
   for (const key of allPermissionKeys()) {
-    for (const gate of gatesFor(key)) gates.add(gate)
+    for (const gate of gatesFor(key)) {
+      gates.add(gate)
+    }
   }
   return [...gates]
 }

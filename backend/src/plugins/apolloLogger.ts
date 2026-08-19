@@ -18,7 +18,9 @@ export const loggerPlugin = {
       logRequest.push(JSON.stringify(requestContext.request.query))
       if (requestContext.request.variables) {
         const variables = cloneDeep(requestContext.request.variables)
-        if (variables.password) variables.password = '***'
+        if (variables.password) {
+          variables.password = '***'
+        }
         logRequest.push(JSON.stringify(variables))
       }
       ocelotLogger.debug(...logRequest)
