@@ -83,8 +83,7 @@ describe("LocaleSwitch", () => {
     const deutsch = Array.from(
       document.querySelectorAll(".os-menu-item-link"),
     ).find((el) => el.textContent?.trim() === "Deutsch") as
-      | HTMLButtonElement
-      | undefined;
+      HTMLButtonElement | undefined;
     expect(
       deutsch,
       'Expected "Deutsch" locale item to exist in dropdown',
