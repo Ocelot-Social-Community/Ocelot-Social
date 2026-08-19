@@ -49,7 +49,9 @@ const { servedDir: SERVED_DIR, paths: GENERATED } = JSON.parse(
 // Clear first: this is the ONLY cleanup step there is. Without it a brand that dropped a font (or a
 // rebuild for a different brand) would leave the previous one behind, and the app would keep loading
 // a locale overlay nobody generates any more.
-for (const rel of GENERATED) rmSync(join(maintenanceDir, rel), { recursive: true, force: true })
+for (const rel of GENERATED) {
+  rmSync(join(maintenanceDir, rel), { recursive: true, force: true })
+}
 
 const out = (rel: string): string => {
   const path = join(maintenanceDir, rel)
@@ -64,7 +66,13 @@ const archive = readTarGz(gz)
 // Compose the effective config from the archive's instance fragments (no merged branding.json).
 // buildBrandArchive always writes a manifest, so composeArchive is non-null here.
 const config = composeArchive(archive)
-if (!config) throw new Error(`could not compose config from archive for ${id}`)
+// Excluded from coverage: an invariant assertion, kept so a future change to buildBrandArchive fails
+// loudly here rather than further down on a null field. Reaching it needs an archive without a
+// manifest, which the line above cannot produce.
+/* node:coverage ignore next 3 */
+if (!config) {
+  throw new Error(`could not compose config from archive for ${id}`)
+}
 
 /**
  * Copy an archive entry under `dir` and return the URL it is served from, KEEPING the entry's own
@@ -93,7 +101,13 @@ function serveEntry(entry: string, data: Buffer): string {
 /** An archive entry for a `/branding/<id>/…` path, or null when the path is external/absent. */
 function archiveEntry(namespaced: string): { entry: string; data: Buffer } | null {
   const prefix = `/branding/${id}/`
-  if (!namespaced.startsWith(prefix)) return null
+  // Excluded from coverage: `servedUrl` is the only caller and applies this exact test before it
+  // calls, so the guard cannot fire. It stays because this function's contract is stated in terms of
+  // the prefix, and a second caller must not inherit an unchecked slice() below.
+  /* node:coverage ignore next 3 */
+  if (!namespaced.startsWith(prefix)) {
+    return null
+  }
   const entry = namespaced.slice(prefix.length)
   const data = archive.get(entry)
   if (!data) {
@@ -120,9 +134,15 @@ function archiveEntry(namespaced: string): { entry: string; data: Buffer } | nul
  * the vanilla value survive (a present key wins; see the metadata overlay below).
  */
 function servedUrl(path: string | null | undefined, label: string): string | null {
-  if (!path) return null
-  if (/^(?:https?:|data:)/.test(path)) return path
-  if (path.startsWith(`/branding/${id}/`)) return serveArchived(path, label)
+  if (!path) {
+    return null
+  }
+  if (/^(?:https?:|data:)/.test(path)) {
+    return path
+  }
+  if (path.startsWith(`/branding/${id}/`)) {
+    return serveArchived(path, label)
+  }
   console.warn(
     `[maintenance] ! ${label}: ${path} is served by the webapp, which is down whenever this page shows — omitted`,
   )
@@ -140,7 +160,9 @@ function servedUrl(path: string | null | undefined, label: string): string | nul
 // EVERY asset entry, not just the referenced ones: a stylesheet's url() targets (fonts, background
 // images) are named inside the CSS, which nothing here parses.
 for (const [entry, data] of archive) {
-  if (!entry.startsWith('assets/')) continue
+  if (!entry.startsWith('assets/')) {
+    continue
+  }
   serveEntry(entry, data)
 }
 
@@ -187,7 +209,9 @@ console.log(
 // rewriting the path is what makes them show up at all.
 function serveArchived(namespaced: string, label: string): string | null {
   const found = archiveEntry(namespaced)
-  if (!found) return null
+  if (!found) {
+    return null
+  }
   const url = serveEntry(found.entry, found.data)
 
   console.log(`[maintenance] ${label} → public${url}`)
@@ -267,14 +291,22 @@ let overlaid = 0
 if (existsSync(vanillaLocales)) {
   for (const file of readdirSync(vanillaLocales).filter((f) => f.endsWith('.json'))) {
     const strings = brandLocales[basename(file, '.json')]
-    if (!strings) continue
+    if (!strings) {
+      continue
+    }
     const overlay: Record<string, unknown> = {}
     for (const ns of RENDERED_NAMESPACES) {
-      if (strings[ns] !== undefined) overlay[ns] = strings[ns]
+      if (strings[ns] !== undefined) {
+        overlay[ns] = strings[ns]
+      }
     }
-    if (!Object.keys(overlay).length) continue
+    if (!Object.keys(overlay).length) {
+      continue
+    }
     writeFileSync(out(`app/locales/${file}`), `${JSON.stringify(overlay, null, 2)}\n`)
     overlaid++
   }
 }
-if (overlaid) console.log(`[maintenance] i18n → app/locales (${overlaid} locale(s))`)
+if (overlaid) {
+  console.log(`[maintenance] i18n → app/locales (${overlaid} locale(s))`)
+}

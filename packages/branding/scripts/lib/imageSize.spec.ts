@@ -136,13 +136,25 @@ describe('readImage', () => {
 
   // A file cut short still has to be identifiable — the caller reports a truncated PNG differently
   // from an unrecognised one, and only a format-with-no-dimensions can tell the two apart.
+  // Every format guards its own header length, and each guard is a separate line of defence: the
+  // signature is short enough to match before the bytes carrying the dimensions have arrived, so a
+  // reader without the guard would read past the end of a half-written file rather than say `null`.
   test('identifies a truncated file but reports no dimensions', () => {
-    const cut = png(512, 512).subarray(0, 12)
-    const image = readImage(cut)
+    const TRUNCATED: [string, Buffer][] = [
+      ['png', png(512, 512).subarray(0, 12)],
+      // The GIF signature is 6 bytes, the screen descriptor sits at 6..10.
+      ['gif', gif(512, 512).subarray(0, 8)],
+      // A WebP announces itself in the first 12 bytes; the chunk header follows.
+      ['webp', webpLossy(512, 512).subarray(0, 20)],
+    ]
 
-    assert.equal(image?.format, 'png')
-    assert.equal(image?.raster, true)
-    assert.equal(image?.width, null)
+    for (const [format, cut] of TRUNCATED) {
+      const image = readImage(cut)
+
+      assert.equal(image?.format, format)
+      assert.equal(image?.raster, true)
+      assert.equal(image?.width, null)
+    }
   })
 
   // A RIFF/WebP wrapper around a payload chunk this reader does not know: still a WebP, no dimensions.

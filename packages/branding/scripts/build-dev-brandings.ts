@@ -46,7 +46,9 @@ if (!existsSync(configurationsRoot)) {
 const compatible: string[] = []
 const skipped: string[] = []
 for (const entry of readdirSync(configurationsRoot, { withFileTypes: true })) {
-  if (!entry.isDirectory()) continue
+  if (!entry.isDirectory()) {
+    continue
+  }
   const brandDir = join(configurationsRoot, entry.name, 'branding')
   if (existsSync(brandDir) && findConfig(brandDir)) {
     compatible.push(brandDir)
@@ -68,7 +70,9 @@ for (const brandDir of compatible) {
 
   // Same reason the single-brand CLI reports them: every check in build-brandings.ts describes damage
   // the archive itself cannot show, so a swallowed warning is a fault discovered in a browser instead.
-  for (const warning of warnings) console.error(warning)
+  for (const warning of warnings) {
+    console.error(warning)
+  }
   console.log(
     `[dev-brandings] ${id}${version ? ` v${version}` : ''} → ${dir}${versioned ? ' (+versioned)' : ''}`,
   )
