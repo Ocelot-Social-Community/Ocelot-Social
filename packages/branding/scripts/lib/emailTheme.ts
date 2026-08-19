@@ -81,17 +81,22 @@ function findVarRef(value: string): VarScan {
     const named = VAR_NAME.exec(value)
     // Those four characters also end other identifiers (`myvar(x)`), and `var(--a b)` is not a
     // reference either. Neither is an error — keep looking for a real one, as the old pattern did.
-    if (!named) continue
+    if (!named) {
+      continue
+    }
     const afterName = VAR_NAME.lastIndex
     if (value[afterName] === ')') {
       return { kind: 'ref', start: open, end: afterName + 1, name: named[1], fallback: null }
     }
-    if (value[afterName] !== ',') continue
+    if (value[afterName] !== ',') {
+      continue
+    }
 
     let depth = 1 // the `var(` itself
     for (let i = afterName + 1; i < value.length; i++) {
-      if (value[i] === '(') depth++
-      else if (value[i] === ')' && --depth === 0) {
+      if (value[i] === '(') {
+        depth++
+      } else if (value[i] === ')' && --depth === 0) {
         return {
           kind: 'ref',
           start: open,
@@ -163,7 +168,9 @@ function cyclicTokens(raw: Record<string, string>): Set<string> {
     onStack[v] = true
     for (const w of edges[v]) {
       // A self-reference is a cycle of one; an SCC of size 1 cannot say so on its own.
-      if (w === v) cyclic.add(names[v])
+      if (w === v) {
+        cyclic.add(names[v])
+      }
       if (index[w] === -1) {
         visit(w)
         lowLink[v] = Math.min(lowLink[v], lowLink[w])
@@ -171,19 +178,29 @@ function cyclicTokens(raw: Record<string, string>): Set<string> {
         lowLink[v] = Math.min(lowLink[v], index[w])
       }
     }
-    if (lowLink[v] !== index[v]) return
+    if (lowLink[v] !== index[v]) {
+      return
+    }
     // v roots an SCC: everything above it on the stack belongs to the same component.
     const component: number[] = []
-    let member = -1
+    let member: number
     do {
       member = stack.pop() ?? -1
       onStack[member] = false
       component.push(member)
     } while (member !== v)
-    if (component.length > 1) for (const m of component) cyclic.add(names[m])
+    if (component.length > 1) {
+      for (const m of component) {
+        cyclic.add(names[m])
+      }
+    }
   }
 
-  for (let v = 0; v < names.length; v++) if (index[v] === -1) visit(v)
+  for (let v = 0; v < names.length; v++) {
+    if (index[v] === -1) {
+      visit(v)
+    }
+  }
   return cyclic
 }
 
@@ -219,9 +236,15 @@ export function resolveTokens(raw: Record<string, string>): Record<string, strin
 
   // Phase 2 — the values.
   const resolve = (name: string): string | null => {
-    if (cyclic.has(name)) return null
-    if (Object.hasOwn(resolved, name)) return resolved[name]
-    if (!Object.hasOwn(raw, name)) return null
+    if (cyclic.has(name)) {
+      return null
+    }
+    if (Object.hasOwn(resolved, name)) {
+      return resolved[name]
+    }
+    if (!Object.hasOwn(raw, name)) {
+      return null
+    }
     let out: string | null = raw[name]
     // A single declaration can hold several references (`0 1px var(--a), 0 2px var(--b)`), so this
     // loops until none is left rather than replacing once.
@@ -252,12 +275,18 @@ export function resolveTokens(raw: Record<string, string>): Record<string, strin
     // otherwise be written into the stylesheet verbatim: precisely the declaration a mail client
     // discards. Phrased with referencesIn, so "is a reference" means the same thing here as it does to
     // the dependency graph.
-    if (out !== null && referencesIn(out).length > 0) out = null
-    if (out !== null) resolved[name] = out.trim().replace(/\s+/g, ' ')
+    if (out !== null && referencesIn(out).length > 0) {
+      out = null
+    }
+    if (out !== null) {
+      resolved[name] = out.trim().replace(/\s+/g, ' ')
+    }
     return out
   }
 
-  for (const name of Object.keys(raw)) resolve(name)
+  for (const name of Object.keys(raw)) {
+    resolve(name)
+  }
   return resolved
 }
 
@@ -279,14 +308,20 @@ export function buildEmailBrandingCss(
   // Grouped by selector so the output reads like a stylesheet someone wrote, not like a dump.
   const rules = new Map<string, string[]>()
   for (const { selector, property, token } of EMAIL_THEME) {
-    if (!Object.hasOwn(after, token)) continue
+    if (!Object.hasOwn(after, token)) {
+      continue
+    }
     const value = after[token]
-    if (Object.hasOwn(before, token) && value === before[token]) continue
+    if (Object.hasOwn(before, token) && value === before[token]) {
+      continue
+    }
     const declarations = rules.get(selector) ?? []
     declarations.push(`  ${property}: ${value};`)
     rules.set(selector, declarations)
   }
-  if (rules.size === 0) return ''
+  if (rules.size === 0) {
+    return ''
+  }
 
   const body = [...rules]
     .map(([selector, declarations]) => `${selector} {\n${declarations.join('\n')}\n}`)

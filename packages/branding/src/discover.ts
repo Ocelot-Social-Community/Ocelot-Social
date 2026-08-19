@@ -72,10 +72,14 @@ function statCached<T>(
     return null
   }
   const cached = cache.get(file)
-  if (cached?.mtimeMs === stat.mtimeMs) return cached.value
+  if (cached?.mtimeMs === stat.mtimeMs) {
+    return cached.value
+  }
   try {
     const value = compute()
-    if (value === null) return null
+    if (value === null) {
+      return null
+    }
     cache.set(file, { mtimeMs: stat.mtimeMs, value })
     return value
   } catch {
@@ -95,11 +99,15 @@ export function resolveRoots(spec: string | string[] | null | undefined): string
   const roots: string[] = []
   for (const entry of raw) {
     const trimmed = typeof entry === 'string' ? entry.trim() : ''
-    if (!trimmed) continue
+    if (!trimmed) {
+      continue
+    }
     // Absolute, so the dedupe below compares like for like and callers can prefix-test a path
     // against a root (the sync middleware does, to spot an archive shadowing its own cache).
     const full = resolve(trimmed)
-    if (!roots.includes(full)) roots.push(full)
+    if (!roots.includes(full)) {
+      roots.push(full)
+    }
   }
   return roots
 }
@@ -175,24 +183,37 @@ function walk(dir: string, out: string[]): void {
     return
   }
   for (const entry of [...entries].sort((a, b) => (a.name < b.name ? -1 : 1))) {
-    if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue
+    if (entry.name === 'node_modules' || entry.name.startsWith('.')) {
+      continue
+    }
     const full = join(dir, entry.name)
-    if (entry.isDirectory()) walk(full, out)
-    else if (entry.name.endsWith('.tar.gz')) out.push(full)
+    if (entry.isDirectory()) {
+      walk(full, out)
+    } else if (entry.name.endsWith('.tar.gz')) {
+      out.push(full)
+    }
   }
 }
 
 // Compare dotted numeric versions; null sorts lowest. Returns a-b sign.
 function compareVersions(a: string | null, b: string | null): number {
-  if (a === b) return 0
-  if (!a) return -1
-  if (!b) return 1
+  if (a === b) {
+    return 0
+  }
+  if (!a) {
+    return -1
+  }
+  if (!b) {
+    return 1
+  }
   const pa = a.split('.')
   const pb = b.split('.')
   for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
     const x = parseInt(pa[i] ?? '0', 10) || 0
     const y = parseInt(pb[i] ?? '0', 10) || 0
-    if (x !== y) return x < y ? -1 : 1
+    if (x !== y) {
+      return x < y ? -1 : 1
+    }
   }
   return 0
 }
@@ -202,7 +223,9 @@ function compareVersions(a: string | null, b: string | null): number {
 function readMeta(file: string): ArchiveMeta | null {
   return statCached(file, metaCache, () => {
     const manifest = readManifest(readTarGz(readFileSync(file)))
-    if (!manifest || typeof manifest.id !== 'string' || !manifest.id) return null
+    if (!manifest || typeof manifest.id !== 'string' || !manifest.id) {
+      return null
+    }
     return {
       id: manifest.id,
       version: typeof manifest.version === 'string' ? manifest.version : null,
@@ -215,7 +238,9 @@ function readMeta(file: string): ArchiveMeta | null {
 /** Parse an archive's manifest.json (the library index), or null when missing/garbled. */
 export function readManifest(files: Map<string, Buffer>): ArchiveManifest | null {
   const entry = files.get('manifest.json')
-  if (!entry) return null
+  if (!entry) {
+    return null
+  }
   try {
     return JSON.parse(entry.toString('utf8')) as ArchiveManifest
   } catch {
@@ -235,14 +260,18 @@ export function composeArchive(
   selection: Partial<Record<BucketName, string>> = {},
 ): (BrandingConfig & { id?: string }) | null {
   const manifest = readManifest(files)
-  if (!manifest) return null
+  if (!manifest) {
+    return null
+  }
   const instances = Array.isArray(manifest.instances) ? manifest.instances : []
   const sources: Partial<Record<BucketName, DeepPartial<BrandingConfig>>> = {}
   for (const type of BUCKET_NAMES) {
     const name = selection[type] ?? 'default'
     const entry = instances.find((i) => i.type === type && i.name === name)
     const raw = entry && files.get(entry.file)
-    if (!raw) continue
+    if (!raw) {
+      continue
+    }
     try {
       sources[type] = JSON.parse(raw.toString('utf8')) as DeepPartial<BrandingConfig>
     } catch {
@@ -282,15 +311,23 @@ export function composeFromArchives(
   const filesById = new Map<string, Map<string, Buffer> | null>()
   for (const slot of BUCKET_NAMES) {
     const src = parseSource(map[slot] ?? map._default)
-    if (!src) continue // vanilla / unset → framework default for this slot
-    if (!filesById.has(src.id)) filesById.set(src.id, getFiles(src.id))
+    if (!src) {
+      continue
+    } // vanilla / unset → framework default for this slot
+    if (!filesById.has(src.id)) {
+      filesById.set(src.id, getFiles(src.id))
+    }
     const files = filesById.get(src.id)
-    if (!files) continue
+    if (!files) {
+      continue
+    }
     const manifest = readManifest(files)
     const instances = Array.isArray(manifest?.instances) ? manifest.instances : []
     const entry = instances.find((i) => i.type === slot && i.name === src.name)
     const raw = entry && files.get(entry.file)
-    if (!raw) continue
+    if (!raw) {
+      continue
+    }
     try {
       sources[slot] = JSON.parse(raw.toString('utf8')) as DeepPartial<BrandingConfig>
     } catch {
@@ -319,9 +356,13 @@ export function composeComposition(roots: string | string[], map: CompositionMap
  */
 function outranks(candidate: BrandArchive, incumbent: BrandArchive): boolean {
   const byVersion = compareVersions(candidate.version, incumbent.version)
-  if (byVersion !== 0) return byVersion > 0
+  if (byVersion !== 0) {
+    return byVersion > 0
+  }
   const isCurrent = (a: BrandArchive): boolean => basename(a.file) === `${a.id}.tar.gz`
-  if (isCurrent(candidate) !== isCurrent(incumbent)) return isCurrent(candidate)
+  if (isCurrent(candidate) !== isCurrent(incumbent)) {
+    return isCurrent(candidate)
+  }
   // Fully tied (same version, same kind of name) → keep the incumbent; walk order is sorted, so which
   // one that is stays reproducible across machines.
   return false
@@ -334,7 +375,9 @@ function discoverInRoot(root: string): Map<string, BrandArchive> {
   const byId = new Map<string, BrandArchive>()
   for (const file of paths) {
     const meta = readMeta(file)
-    if (!meta) continue
+    if (!meta) {
+      continue
+    }
     const archive: BrandArchive = {
       id: meta.id,
       version: meta.version,
@@ -343,7 +386,9 @@ function discoverInRoot(root: string): Map<string, BrandArchive> {
       file,
     }
     const existing = byId.get(meta.id)
-    if (!existing || outranks(archive, existing)) byId.set(meta.id, archive)
+    if (!existing || outranks(archive, existing)) {
+      byId.set(meta.id, archive)
+    }
   }
   return byId
 }
@@ -358,7 +403,9 @@ export function discoverArchives(roots: string | string[]): Map<string, BrandArc
   const byId = new Map<string, BrandArchive>()
   for (const root of resolveRoots(roots)) {
     for (const [id, archive] of discoverInRoot(root)) {
-      if (!byId.has(id)) byId.set(id, archive)
+      if (!byId.has(id)) {
+        byId.set(id, archive)
+      }
     }
   }
   return byId
@@ -379,7 +426,9 @@ export function readDefaultMarker(roots: string | string[]): string {
   for (const root of resolveRoots(roots)) {
     try {
       const id = readFileSync(join(root, 'DEFAULT'), 'utf8').trim()
-      if (id) return id
+      if (id) {
+        return id
+      }
     } catch {
       // no (readable) marker in this root → try the next
     }

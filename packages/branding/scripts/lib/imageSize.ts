@@ -31,13 +31,17 @@ const raster = (
 
 /** PNG: the IHDR chunk is mandatory and FIRST, so both dimensions sit at fixed offsets. */
 function pngSize(data: Buffer): { width: number; height: number } | null {
-  if (data.length < 24) return null
+  if (data.length < 24) {
+    return null
+  }
   return { width: data.readUInt32BE(16), height: data.readUInt32BE(20) }
 }
 
 /** GIF: the logical-screen descriptor follows the 6-byte signature, little-endian. */
 function gifSize(data: Buffer): { width: number; height: number } | null {
-  if (data.length < 10) return null
+  if (data.length < 10) {
+    return null
+  }
   return { width: data.readUInt16LE(6), height: data.readUInt16LE(8) }
 }
 
@@ -48,7 +52,9 @@ function gifSize(data: Buffer): { width: number; height: number } | null {
 function jpegSize(data: Buffer): { width: number; height: number } | null {
   let pos = 2 // past the SOI marker
   while (pos + 9 < data.length) {
-    if (data[pos] !== 0xff) return null // desynchronised — not a segment boundary any more
+    if (data[pos] !== 0xff) {
+      return null
+    } // desynchronised — not a segment boundary any more
     const marker = data[pos + 1]
     // SOF0..SOF15 carry the frame header. The three exceptions in that range are other things
     // entirely: DHT (c4), JPG (c8) and DAC (cc).
@@ -68,16 +74,22 @@ function jpegSize(data: Buffer): { width: number; height: number } | null {
  * that looks least like the others.
  */
 function webpSize(data: Buffer): { width: number; height: number } | null {
-  if (data.length < 30) return null
+  if (data.length < 30) {
+    return null
+  }
   const chunk = data.toString('ascii', 12, 16)
   if (chunk === 'VP8 ') {
     // Lossy: a 3-byte frame tag, then the 3-byte sync code that confirms the layout.
-    if (data[23] !== 0x9d || data[24] !== 0x01 || data[25] !== 0x2a) return null
+    if (data[23] !== 0x9d || data[24] !== 0x01 || data[25] !== 0x2a) {
+      return null
+    }
     // 14 bits each; the top 2 are a scaling hint this does not apply.
     return { width: data.readUInt16LE(26) & 0x3fff, height: data.readUInt16LE(28) & 0x3fff }
   }
   if (chunk === 'VP8L') {
-    if (data[20] !== 0x2f) return null // lossless signature byte
+    if (data[20] !== 0x2f) {
+      return null
+    } // lossless signature byte
     // 14 bits of (width - 1) then 14 of (height - 1), packed into one little-endian word.
     const bits = data.readUInt32LE(21)
     return { width: (bits & 0x3fff) + 1, height: ((bits >> 14) & 0x3fff) + 1 }
@@ -97,13 +109,19 @@ function webpSize(data: Buffer): { width: number; height: number } | null {
  * as "unknown", not as "invalid": being unable to name a format is not evidence the file is broken.
  */
 export function readImage(data: Buffer): ImageInfo | null {
-  if (data.subarray(0, 8).equals(PNG_SIGNATURE)) return raster('png', pngSize(data))
+  if (data.subarray(0, 8).equals(PNG_SIGNATURE)) {
+    return raster('png', pngSize(data))
+  }
   if (data.subarray(0, 4).equals(ICO_SIGNATURE)) {
     return { format: 'ico', raster: false, width: null, height: null }
   }
-  if (data[0] === 0xff && data[1] === 0xd8) return raster('jpeg', jpegSize(data))
+  if (data[0] === 0xff && data[1] === 0xd8) {
+    return raster('jpeg', jpegSize(data))
+  }
   const ascii6 = data.toString('ascii', 0, 6)
-  if (ascii6 === 'GIF87a' || ascii6 === 'GIF89a') return raster('gif', gifSize(data))
+  if (ascii6 === 'GIF87a' || ascii6 === 'GIF89a') {
+    return raster('gif', gifSize(data))
+  }
   if (ascii6.startsWith('RIFF') && data.toString('ascii', 8, 12) === 'WEBP') {
     return raster('webp', webpSize(data))
   }

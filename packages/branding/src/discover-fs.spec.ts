@@ -28,7 +28,9 @@ function tmp() {
   return dir
 }
 after(() => {
-  for (const dir of roots) rmSync(dir, { recursive: true, force: true })
+  for (const dir of roots) {
+    rmSync(dir, { recursive: true, force: true })
+  }
 })
 
 // A real `<id>.tar.gz` buffer: manifest + a theme fragment (primary colour) + identity fragment (name).
