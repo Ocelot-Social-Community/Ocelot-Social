@@ -153,7 +153,9 @@ describe('readImage', () => {
 
       assert.equal(image?.format, format)
       assert.equal(image?.raster, true)
-      assert.equal(image?.width, null)
+      // BOTH, not just width: the two are separately nullable fields of the contract, and asserting
+      // one of them would pass a reader that came back with half a size.
+      assert.deepEqual(pick(image), { width: null, height: null })
     }
   })
 
