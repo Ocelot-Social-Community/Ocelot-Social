@@ -757,6 +757,8 @@ export default {
   .menu {
     position: relative;
     display: flex;
+    flex-wrap: wrap;
+    row-gap: var(--space-x-small);
     justify-content: space-between;
     align-items: center;
     /* Positioned like PostTeaser's ribbon (same component/offsets) — its
@@ -765,6 +767,13 @@ export default {
        handled vertically below (per image/no-image case) rather than by
        indenting the whole row horizontally, which looked cramped on
        narrow/mobile widths. */
+
+    /* On narrow screens the avatar name/date plus the counters + "..."
+       button don't fit on one line — wrap instead of letting the trailing
+       group get pushed past the card edge. */
+    > .user-avatar {
+      min-width: 0;
+    }
 
     .post-detail-ribbon {
       position: absolute;
@@ -791,6 +800,11 @@ export default {
       display: flex;
       align-items: center;
       flex-shrink: 0;
+      /* justify-content: space-between only distributes space *within* a
+         wrapped line — with .menu-meta alone on the second line it would
+         sit at the left. margin-left: auto claims all remaining space on
+         that line instead, keeping it pinned to the right in both cases. */
+      margin-left: auto;
 
       /* Same muted, non-interactive look as PostTeaser's footer counters. */
       .os-counter-icon {
