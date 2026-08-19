@@ -46,22 +46,51 @@
                 </p>
               </template>
             </user-avatar>
-            <client-only>
-              <content-menu
-                placement="bottom-end"
-                resource-type="contribution"
-                :resource="post"
-                :modalsData="menuModalsData"
-                :is-owner="isAuthor"
-                @pinPost="pinPost"
-                @unpinPost="unpinPost"
-                @pinGroupPost="pinGroupPost"
-                @unpinGroupPost="unpinGroupPost"
-                @pushPost="pushPost"
-                @unpushPost="unpushPost"
-                @toggleObservePost="toggleObservePost"
+            <div class="menu-meta">
+              <!-- Same read-only counters as PostTeaser's footer (shout
+                   count is already visible on the interactive shout button
+                   below, so it's not repeated here). -->
+              <os-counter-icon
+                :icon="icons.comments"
+                :count="post.commentsCount"
+                v-tooltip="{
+                  content: $t('contribution.amount-comments', { amount: post.commentsCount }),
+                  placement: 'bottom-start',
+                }"
               />
-            </client-only>
+              <os-counter-icon
+                :icon="icons.handPointer"
+                :count="post.clickedCount"
+                v-tooltip="{
+                  content: $t('contribution.amount-clicks', { amount: post.clickedCount }),
+                  placement: 'bottom-start',
+                }"
+              />
+              <os-counter-icon
+                :icon="icons.eye"
+                :count="post.viewedTeaserCount"
+                v-tooltip="{
+                  content: $t('contribution.amount-views', { amount: post.viewedTeaserCount }),
+                  placement: 'bottom-start',
+                }"
+              />
+              <client-only>
+                <content-menu
+                  placement="bottom-end"
+                  resource-type="contribution"
+                  :resource="post"
+                  :modalsData="menuModalsData"
+                  :is-owner="isAuthor"
+                  @pinPost="pinPost"
+                  @unpinPost="unpinPost"
+                  @pinGroupPost="pinGroupPost"
+                  @unpinGroupPost="unpinGroupPost"
+                  @pushPost="pushPost"
+                  @unpushPost="unpushPost"
+                  @toggleObservePost="toggleObservePost"
+                />
+              </client-only>
+            </div>
             <!-- Same ribbon as PostTeaser (type only here — deliberately no
                  pinned state, that's only meaningful while browsing a list). -->
             <hc-ribbon
@@ -209,7 +238,7 @@
 </template>
 
 <script>
-import { OsButton, OsCard, OsIcon, OsMenu, OsActionButton } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsCounterIcon, OsIcon, OsMenu, OsActionButton } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import CommentForm from '~/components/CommentForm/CommentForm'
@@ -253,6 +282,7 @@ export default {
   components: {
     OsCard,
     OsButton,
+    OsCounterIcon,
     OsIcon,
     OsMenu,
     CommentForm,
@@ -715,9 +745,10 @@ export default {
     align-items: center;
     /* Positioned like PostTeaser's ribbon (same component/offsets) — its
        folded corner is hard-coded to the right in Ribbon/index.vue, so it
-       stays right here too. padding-right keeps the content-menu's "..."
-       button from sitting directly under it. */
-    padding-right: 48px;
+       stays right here too. Clearance from the "..." button/counters is
+       handled vertically below (per image/no-image case) rather than by
+       indenting the whole row horizontally, which looked cramped on
+       narrow/mobile widths. */
 
     .post-detail-ribbon {
       position: absolute;
@@ -728,7 +759,7 @@ export default {
     .post-detail-ribbon-w-img {
       /* With a hero image the ribbon sits on the image's bottom-right
          corner, well above the menu row already. */
-      top: -36px;
+      top: -40px;
     }
 
     /* Without a hero image the ribbon (top: -16px above) has no image
@@ -737,7 +768,20 @@ export default {
        "..." button) is pushed down to clear the ribbon — its anchor point
        (.menu's top border edge) stays put, only the flex content shifts. */
     &.menu--no-image {
-      padding-top: 16px;
+      padding-top: var(--space-base);
+    }
+
+    .menu-meta {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+
+      /* Same muted, non-interactive look as PostTeaser's footer counters. */
+      .os-counter-icon {
+        display: block;
+        margin-right: var(--space-small);
+        opacity: var(--opacity-disabled);
+      }
     }
   }
 
