@@ -74,14 +74,29 @@
           <div class="ds-mb-small"></div>
           <p
             v-if="post.group && post.group.id && post.group.slug"
-            class="post-kicker ds-text ds-text-soft ds-text-size-small"
+            class="post-kicker ds-text ds-text-soft ds-text-size-base"
           >
             {{ $t('post.viewPost.forGroup.title') }}
-            <nuxt-link
-              :to="{ name: 'groups-id-slug', params: { slug: post.group.slug, id: post.group.id } }"
-            >
-              {{ post.group.name }}
-            </nuxt-link>
+            <dropdown placement="top-start">
+              <template #default="{ openMenu, closeMenu }">
+                <user-avatar-helper
+                  :link-to-profile="true"
+                  :user-link="groupLink"
+                  :show-popover="true"
+                  @open-menu="openMenu(false)"
+                  @close-menu="closeMenu(false)"
+                >
+                  {{ post.group.name }}
+                </user-avatar-helper>
+              </template>
+              <template #popover="{ isOpen }">
+                <group-avatar-popover
+                  v-if="isOpen"
+                  :group-id="post.group.id"
+                  :group-link="groupLink"
+                />
+              </template>
+            </dropdown>
           </p>
           <h1 class="ds-heading ds-heading-h1 title hyphenate-text">{{ post.title }}</h1>
           <!-- event data -->
@@ -203,7 +218,9 @@ import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import CtaUnblockAuthor from '~/components/Empty/CallToAction/CtaUnblockAuthor.vue'
 import CtaJoinLeaveGroup from '~/components/Empty/CallToAction/CtaJoinLeaveGroup.vue'
 import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
+import Dropdown from '~/components/Dropdown'
 import EventLocationMap from '~/components/Map/EventLocationMap'
+import GroupAvatarPopover from '~/components/GroupAvatar/GroupAvatarPopover'
 import HcCategory from '~/components/Category'
 import HcEmpty from '~/components/Empty/Empty'
 import HcHashtag from '~/components/Hashtag/Hashtag'
@@ -212,6 +229,7 @@ import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
 import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
 import { useShout } from '~/composables/useShout'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
+import UserAvatarHelper from '~/components/UserAvatar/UserAvatarHelper'
 import {
   postMenuModalsData,
   deletePostMutation,
@@ -244,7 +262,9 @@ export default {
     CtaUnblockAuthor,
     CtaJoinLeaveGroup,
     DateTimeRange,
+    Dropdown,
     EventLocationMap,
+    GroupAvatarPopover,
     HcCategory,
     HcEmpty,
     HcHashtag,
@@ -253,6 +273,7 @@ export default {
     OsActionButton,
     ResponsiveImage,
     UserAvatar,
+    UserAvatarHelper,
   },
   mixins: [GetCategories, postListActions, SortCategories],
   beforeCreate() {
@@ -332,6 +353,14 @@ export default {
       // that computed used to have inline.
       if (this.post?.postType[0] === 'Event') return this.$t('post.event')
       return this.$t('post.article')
+    },
+    // Shared by the "in group" kicker link and its popover trigger below.
+    groupLink() {
+      if (!this.post?.group?.id || !this.post.group.slug) return null
+      return {
+        name: 'groups-id-slug',
+        params: { slug: this.post.group.slug, id: this.post.group.id },
+      }
     },
     menuModalsData() {
       return postMenuModalsData(
@@ -597,6 +626,13 @@ export default {
 <style>
 .post-kicker {
   margin: 0;
+
+  /* Dropdown renders its trigger wrapped in a block-level ".v-popover" div
+     (v-tooltip), which breaks the text flow onto its own line here — force
+     it back inline so the group link sits right after the label text. */
+  .v-popover {
+    display: inline-block;
+  }
 }
 
 /* .ds-heading defaults to a large top margin meant for headings that open a
