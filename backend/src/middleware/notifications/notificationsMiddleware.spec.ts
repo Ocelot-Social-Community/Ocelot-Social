@@ -23,7 +23,6 @@ import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
-import type { DecodedUser } from '@src/jwt/decode'
 
 const sendChatMessageMailMock: (notification) => void = jest.fn()
 const sendNotificationMailMock: (notification) => void = jest.fn()
@@ -1183,7 +1182,7 @@ describe('notifications', () => {
           mutation: JoinGroup,
           variables: {
             groupId: 'closed-group',
-            userId: authenticatedUser.id,
+            userId: authenticatedUser?.id,
           },
         })
         authenticatedUser = await groupOwner.toJson()
@@ -1280,7 +1279,7 @@ describe('notifications', () => {
           mutation: LeaveGroup,
           variables: {
             groupId: 'closed-group',
-            userId: authenticatedUser.id,
+            userId: authenticatedUser?.id,
           },
         })
         authenticatedUser = await groupOwner.toJson()
@@ -1293,7 +1292,7 @@ describe('notifications', () => {
           mutation: JoinGroup,
           variables: {
             groupId: 'closed-group',
-            userId: authenticatedUser.id,
+            userId: authenticatedUser?.id,
           },
         })
       })
@@ -1430,7 +1429,7 @@ describe('notifications', () => {
           mutation: JoinGroup,
           variables: {
             groupId: 'closed-group',
-            userId: authenticatedUser.id,
+            userId: authenticatedUser?.id,
           },
         })
         // Clear after because the above generates a notification not related
@@ -1536,7 +1535,7 @@ describe('notifications', () => {
           mutation: JoinGroup,
           variables: {
             groupId: 'closed-group',
-            userId: authenticatedUser.id,
+            userId: authenticatedUser?.id,
           },
         })
         // Clear after because the above generates a notification not related

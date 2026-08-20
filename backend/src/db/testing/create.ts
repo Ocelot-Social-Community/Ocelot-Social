@@ -56,7 +56,13 @@ export const createNode = async (
   if (unknown.length > 0) {
     throw new Error(`${entity.label} does not declare the secondary label(s) ${unknown.join(', ')}`)
   }
-  const complete = conventions(entity, properties)
+  // A null value means "no such property": that is what `SET n.x = null` does in Neo4j, so a
+  // node never holds one. Dropping them before validation is therefore not leniency — it is
+  // describing the node that will actually exist. The fixtures rely on it to clear a default
+  // (`Factory.build('emailAddress', { verifiedAt: null })` for an unverified address).
+  const complete = Object.fromEntries(
+    Object.entries(conventions(entity, properties)).filter(([, value]) => value !== null),
+  )
   const invalid = validateProperties(entity, complete)
   if (invalid) {
     throw new Error(`Cannot build a ${entity.label} fixture: ${invalid}`)
