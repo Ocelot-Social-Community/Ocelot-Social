@@ -38,19 +38,24 @@ export const validateEventParams = (params) => {
 
 const validateEventDate = (dateString) => {
   const date = new Date(dateString)
-  if (date.toString() === 'Invalid Date')
+  if (date.toString() === 'Invalid Date') {
     throw new UserInputError('Event start date must be a valid date!')
-  if (date.toISOString() !== dateString)
+  }
+  if (date.toISOString() !== dateString) {
     throw new UserInputError('Event start date must be in ISO format!')
+  }
 }
 
 const validateEventEnd = (start, end) => {
   const endDate = new Date(end)
-  if (endDate.toString() === 'Invalid Date')
+  if (endDate.toString() === 'Invalid Date') {
     throw new UserInputError('Event end date must be a valid date!')
-  if (endDate.toISOString() !== end)
+  }
+  if (endDate.toISOString() !== end) {
     throw new UserInputError('Event end date must be in ISO format!')
+  }
   const startDate = new Date(start)
-  if (endDate < startDate)
+  if (endDate < startDate) {
     throw new UserInputError('Event end date must be a after event start date!')
+  }
 }

@@ -132,7 +132,9 @@ export function systemConfigStatus(env: Env, policy: PolicyLike): SystemConfigRo
   }
 
   for (const spec of ENV_REGISTRY) {
-    if (governed.has(spec.name)) continue
+    if (governed.has(spec.name)) {
+      continue
+    }
     const state = policy.envState(spec.name)
     const rawValue = !spec.secret && state === 'set' ? (env[spec.name] ?? null) : null
     // A list var arrives comma-separated in the env; surface it (and its default) as a JSON

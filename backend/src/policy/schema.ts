@@ -131,7 +131,9 @@ const validators = Object.fromEntries(
 // true if valid, otherwise a human-readable error message.
 export function validatePolicyValue(key: PolicyKey, value: unknown): true | string {
   const validate = validators[key]
-  if (validate(value)) return true
+  if (validate(value)) {
+    return true
+  }
   return ajv.errorsText(validate.errors, { dataVar: key })
 }
 
@@ -208,7 +210,9 @@ function assertRequiresPolicyGraph(): void {
   const keySet = new Set<string>(keys)
   for (const key of keys) {
     const deps = requiresPolicyFor(key)
-    if (deps.length === 0) continue
+    if (deps.length === 0) {
+      continue
+    }
     if (typeFor(key) !== 'boolean') {
       throw new Error(`policy.schema.json: "${key}" has requiresPolicy but is not boolean`)
     }
@@ -244,12 +248,16 @@ function assertRequiresPolicyGraph(): void {
       if (state === GREY) {
         throw new Error(`policy.schema.json: requiresPolicy cycle through "${dep}"`)
       }
-      if (state === WHITE) visit(dep)
+      if (state === WHITE) {
+        visit(dep)
+      }
     }
     colour.set(key, BLACK)
   }
   for (const key of keys) {
-    if (colour.get(key) === WHITE) visit(key)
+    if (colour.get(key) === WHITE) {
+      visit(key)
+    }
   }
 }
 

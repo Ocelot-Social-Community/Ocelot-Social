@@ -121,9 +121,11 @@ updates:
     timezone: "Europe/Berlin"
     time: "03:00"
 
+# documentation site — its npm dependencies ride on the root package.json above (see the `vuepress`
+# group there); only the image it is served from needs its own entry.
 - package-ecosystem: docker
   open-pull-requests-limit: 99
-  directory: "/deployment/src/docker"
+  directory: "/.vuepress"
   schedule:
     interval: weekly
     day: "saturday"
@@ -166,6 +168,14 @@ updates:
         - "@tailwindcss*"
 
 # ui library
+- package-ecosystem: docker
+  open-pull-requests-limit: 99
+  directory: "/packages/ui"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
 - package-ecosystem: npm
   open-pull-requests-limit: 99
   directory: "/packages/ui"
@@ -190,6 +200,17 @@ updates:
       patterns:
         - "vitest*"
         - "@vitest*"
+
+# branding library — no `groups`: ten dependencies, none of them a family that arrives in a bundle,
+# so grouping would only hide which one moved.
+- package-ecosystem: npm
+  open-pull-requests-limit: 99
+  directory: "/packages/branding"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
 
 # ui examples
 - package-ecosystem: npm

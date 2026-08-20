@@ -33,8 +33,9 @@ export function readTarGz(
   const files = new Map<string, Buffer>()
   for (const entry of parseTar(tar)) {
     // parseTar yields `data: undefined` for a zero-byte file — preserve it as an empty buffer.
-    if (entry.type === 'file')
+    if (entry.type === 'file') {
       files.set(entry.name, entry.data ? Buffer.from(entry.data) : Buffer.alloc(0))
+    }
   }
   return files
 }

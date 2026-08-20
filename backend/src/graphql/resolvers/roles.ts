@@ -159,7 +159,9 @@ export default {
         return toGraphqlRole(def, 0)
       } catch (err) {
         // A protected/baseline violation is a client error, not internal.
-        if (err instanceof RoleValidationError) throw new ForbiddenError(err.message)
+        if (err instanceof RoleValidationError) {
+          throw new ForbiddenError(err.message)
+        }
         throw err
       }
     },
@@ -185,7 +187,9 @@ export default {
         publishPermissionsChanged(context, def.name)
         return toGraphqlRole(def, await countMembers(context, def.name))
       } catch (err) {
-        if (err instanceof RoleValidationError) throw new ForbiddenError(err.message)
+        if (err instanceof RoleValidationError) {
+          throw new ForbiddenError(err.message)
+        }
         throw err
       }
     },
@@ -212,11 +216,15 @@ export default {
         publishPermissionsChanged(context, def.name, name)
         return toGraphqlRole(def, await countMembers(context, def.name))
       } catch (err) {
-        if (err instanceof RoleValidationError) throw new ForbiddenError(err.message)
+        if (err instanceof RoleValidationError) {
+          throw new ForbiddenError(err.message)
+        }
         // Lost the uniqueness-constraint race on Role.id: a concurrent rename claimed
         // `newName` between our getRole(newName) snapshot and the write. Surface the same
         // stable conflict as the pre-check, not a raw driver error.
-        if (isRoleNameConflict(err)) throw new UserInputError(`Role '${newName}' already exists.`)
+        if (isRoleNameConflict(err)) {
+          throw new UserInputError(`Role '${newName}' already exists.`)
+        }
         throw err
       }
     },
@@ -228,7 +236,9 @@ export default {
         publishPermissionsChanged(context, name)
         return name
       } catch (err) {
-        if (err instanceof RoleValidationError) throw new ForbiddenError(err.message)
+        if (err instanceof RoleValidationError) {
+          throw new ForbiddenError(err.message)
+        }
         throw err
       }
     },
@@ -277,7 +287,9 @@ export default {
         variables: { userId, roleName },
       })
       const user = result.records[0]?.get('user') as unknown
-      if (!user) throw new UserInputError('Could not find User')
+      if (!user) {
+        throw new UserInputError('Could not find User')
+      }
       // The target user's effective permissions changed → they must refetch.
       publishPermissionsChanged(context, roleName)
       return user

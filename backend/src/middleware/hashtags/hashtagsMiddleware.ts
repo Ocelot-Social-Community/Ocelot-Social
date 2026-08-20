@@ -5,7 +5,9 @@
 import extractHashtags from './extractHashtags'
 
 const updateHashtagsOfPost = async (postId, hashtags, context) => {
-  if (!hashtags.length) return
+  if (!hashtags.length) {
+    return
+  }
   const session = context.driver.session()
 
   try {

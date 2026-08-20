@@ -91,12 +91,16 @@ export default {
         // A gate-flag change flips permission availability network-wide, so signal the
         // permission system too: clients refetch myPermissions (can()) and the admin
         // roles catalog (available) live, not just the policy value.
-        if (isPermissionGatePolicyKey(key)) publishPermissionsChanged(context, null)
+        if (isPermissionGatePolicyKey(key)) {
+          publishPermissionsChanged(context, null)
+        }
         return serializeEvent(event)
       } catch (err) {
         // A domain validation error (e.g. a valid-JSON value of the wrong type,
         // "123" for a boolean key) is a client input error, not an internal one.
-        if (err instanceof PolicyValidationError) throw new UserInputError(err.message)
+        if (err instanceof PolicyValidationError) {
+          throw new UserInputError(err.message)
+        }
         throw err
       }
     },
@@ -104,10 +108,14 @@ export default {
       const { policy, user } = context
       try {
         const event = await policy.reset(key as PolicyKey, user?.id ?? 'unknown')
-        if (isPermissionGatePolicyKey(key)) publishPermissionsChanged(context, null)
+        if (isPermissionGatePolicyKey(key)) {
+          publishPermissionsChanged(context, null)
+        }
         return serializeEvent(event)
       } catch (err) {
-        if (err instanceof PolicyValidationError) throw new UserInputError(err.message)
+        if (err instanceof PolicyValidationError) {
+          throw new UserInputError(err.message)
+        }
         throw err
       }
     },
@@ -125,7 +133,9 @@ export default {
         }
         return events.map(serializeEvent)
       } catch (err) {
-        if (err instanceof PolicyValidationError) throw new UserInputError(err.message)
+        if (err instanceof PolicyValidationError) {
+          throw new UserInputError(err.message)
+        }
         throw err
       }
     },

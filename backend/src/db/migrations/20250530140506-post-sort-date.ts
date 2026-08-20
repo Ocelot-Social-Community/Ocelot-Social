@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-
 import { getDriver } from '@db/neo4j'
 
 export const description = ''
@@ -22,7 +20,7 @@ export async function up(_next) {
     await transaction.rollback()
     // eslint-disable-next-line no-console
     console.log('rolled back')
-    throw new Error(error)
+    throw error
   } finally {
     await session.close()
   }
@@ -46,7 +44,7 @@ export async function down(_next) {
     await transaction.rollback()
     // eslint-disable-next-line no-console
     console.log('rolled back')
-    throw new Error(error)
+    throw error
   } finally {
     await session.close()
   }

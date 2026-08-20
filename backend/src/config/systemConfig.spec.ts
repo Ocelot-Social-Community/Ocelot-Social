@@ -24,7 +24,9 @@ const rowFor = (
   values?: Partial<NetworkPolicy>,
 ) => {
   const row = rowsFor(env, values).find((entry) => entry.envKey === envKey)
-  if (!row) throw new Error(`no systemConfig row for ${envKey}`)
+  if (!row) {
+    throw new Error(`no systemConfig row for ${envKey}`)
+  }
   return row
 }
 

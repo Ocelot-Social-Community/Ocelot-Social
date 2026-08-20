@@ -23,7 +23,9 @@ const walkRecursive = (data, fields, fieldName, callback, _key?) => {
   }
   const fieldDef = fields.find((f) => f.field === _key)
   if (data && typeof data === 'string' && fieldDef) {
-    if (!fieldDef.excludes?.includes(fieldName)) data = callback(data, _key)
+    if (!fieldDef.excludes?.includes(fieldName)) {
+      data = callback(data, _key)
+    }
   } else if (data && Array.isArray(data)) {
     // go into the rabbit hole and dig through that array
     data.forEach((res, index) => {

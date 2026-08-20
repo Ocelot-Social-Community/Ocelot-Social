@@ -90,7 +90,9 @@ export default {
       if (groupChatGated(context) && roomId) {
         const session = context.driver.session()
         try {
-          if (await roomIsGroupRoom(roomId, session)) return []
+          if (await roomIsGroupRoom(roomId, session)) {
+            return []
+          }
         } finally {
           await session.close()
         }
@@ -336,7 +338,9 @@ export default {
               userId: currentUserId,
             })
             // eslint-disable-next-line no-catch-all/no-catch-all -- see block comment above
-          } catch {}
+          } catch {
+            // Intentionally ignored — see block comment above.
+          }
         }
         return true
       } finally {

@@ -24,12 +24,13 @@ async function rewriteRolePermissions(transform: (permissions: string[]) => stri
       let parsed: unknown
       try {
         parsed = JSON.parse((record.get('permissions') as string | null) ?? '[]')
-      } catch (error) {
+      } catch (error: unknown) {
         // A corrupt permissions value is an invariant violation (the app always writes
         // valid JSON). Abort loudly rather than silently overwriting it with only the
         // new permission — the surrounding transaction rolls back, so no data is lost.
         throw new Error(
           `Migration aborted: role ${id} has malformed permissions JSON; fix it manually before re-running. Cause: ${String(error)}`,
+          { cause: error },
         )
       }
       if (!Array.isArray(parsed)) {

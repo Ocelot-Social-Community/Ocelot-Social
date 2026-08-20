@@ -124,18 +124,24 @@ export const nodeQuery =
     const queryParams: Record<string, unknown> = {}
 
     for (const field of equalityFields) {
-      if (params[field] === undefined || params[field] === null) continue
+      if (params[field] === undefined || params[field] === null) {
+        continue
+      }
       // Field names come from the config literal, never from request data.
       conditions.push(`${alias}.${field} = $${field}`)
       queryParams[field] = params[field]
     }
     for (const field of softDeleteFields) {
-      if (params[field] === undefined || params[field] === null) continue
+      if (params[field] === undefined || params[field] === null) {
+        continue
+      }
       conditions.push(`coalesce(${alias}.${field}, false) = $${field}`)
       queryParams[field] = params[field]
     }
     for (const [key, value] of Object.entries(filter)) {
-      if (value === undefined || value === null) continue
+      if (value === undefined || value === null) {
+        continue
+      }
       // Guaranteed present: the loop above rejected every key without a handler.
       // The name is derived from the operator, which is unique within one filter object and
       // comes from FILTER_HANDLERS rather than from request data.

@@ -210,7 +210,9 @@ export default {
         throw new UserInputError('User filter: use either `id` or `id_in`, not both.')
       }
       const filterIds = args.filter?.id_in ?? (args.filter?.id ? [args.filter.id] : null)
-      if (filterIds) conditions.push('user.id IN $filterIdIn')
+      if (filterIds) {
+        conditions.push('user.id IN $filterIdIn')
+      }
       // Asked of the graph rather than resolved into an id list first — the previous
       // helper collected the id of EVERY user with a location on each request.
       if (args.filter?.hasLocation) {
@@ -251,7 +253,9 @@ export default {
   Mutation: {
     muteUser: async (_parent, params, context, _resolveInfo) => {
       const { user: currentUser } = context
-      if (currentUser.id === params.id) return null
+      if (currentUser.id === params.id) {
+        return null
+      }
       await neode.writeCypher(
         `
           MATCH(u:User {id: $currentUser.id})-[previousRelationship:FOLLOWS]->(b:User {id: $params.id})
@@ -268,7 +272,9 @@ export default {
     },
     unmuteUser: async (_parent, params, context, _resolveInfo) => {
       const { user: currentUser } = context
-      if (currentUser.id === params.id) return null
+      if (currentUser.id === params.id) {
+        return null
+      }
       await neode.writeCypher(
         `
           MATCH(u:User {id: $currentUser.id})-[previousRelationship:MUTED]->(b:User {id: $params.id})
@@ -281,7 +287,9 @@ export default {
     },
     blockUser: async (_object, args, context, _resolveInfo) => {
       const { user: currentUser } = context
-      if (currentUser.id === args.id) return null
+      if (currentUser.id === args.id) {
+        return null
+      }
 
       const session = context.driver.session()
       try {
@@ -309,7 +317,9 @@ export default {
     },
     unblockUser: async (_object, args, context, _resolveInfo) => {
       const { user: currentUser } = context
-      if (currentUser.id === args.id) return null
+      if (currentUser.id === args.id) {
+        return null
+      }
 
       const session = context.driver.session()
       try {
@@ -740,7 +750,9 @@ export default {
       // off, expose no links at all (data minimisation) rather than relying on the
       // webapp to hide them — the field is public, so anonymous profile viewers hit
       // this too. When on, this mirrors the default hasMany relation resolver.
-      if (!context.policy.getEffective('socialMediaEnabled')) return []
+      if (!context.policy.getEffective('socialMediaEnabled')) {
+        return []
+      }
       return (
         await context.database.query({
           query: `

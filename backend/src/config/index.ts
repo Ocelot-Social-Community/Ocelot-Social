@@ -119,8 +119,12 @@ const redis = {
 // default to wss://.
 const LIVEKIT_URL = (() => {
   const raw = env.LIVEKIT_URL
-  if (!raw) return undefined
-  if (/^(wss?:|https?:)\/\//.test(raw)) return raw
+  if (!raw) {
+    return undefined
+  }
+  if (/^(wss?:|https?:)\/\//.test(raw)) {
+    return raw
+  }
   return `wss://${raw}`
 })()
 const LIVEKIT_API_KEY = env.LIVEKIT_API_KEY
