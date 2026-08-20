@@ -26,9 +26,10 @@ async function rewriteAdminPermissions(transform: (permissions: string[]) => str
       let parsed: unknown
       try {
         parsed = JSON.parse((record.get('permissions') as string | null) ?? '[]')
-      } catch (error) {
+      } catch (error: unknown) {
         throw new Error(
           `Migration aborted: role ${id} has malformed permissions JSON; fix it manually before re-running. Cause: ${String(error)}`,
+          { cause: error },
         )
       }
       if (!Array.isArray(parsed)) {

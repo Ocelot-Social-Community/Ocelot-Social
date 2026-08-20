@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -32,7 +31,7 @@ export async function up(next) {
       await transaction.rollback()
       // eslint-disable-next-line no-console
       console.log('rolled back')
-      throw new Error(error)
+      throw error
     }
   } finally {
     await session.close()
@@ -60,7 +59,7 @@ export async function down(next) {
     await transaction.rollback()
     // eslint-disable-next-line no-console
     console.log('rolled back')
-    throw new Error(error)
+    throw error
   } finally {
     await session.close()
   }

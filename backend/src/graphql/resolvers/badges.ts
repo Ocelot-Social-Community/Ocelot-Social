@@ -96,8 +96,6 @@ export default {
           )
         }
         return user
-      } catch (error) {
-        throw new Error(error)
       } finally {
         await session.close()
       }
@@ -190,8 +188,6 @@ export default {
       })
       try {
         return await writeTxResultPromise
-      } catch (error) {
-        throw new Error(error)
       } finally {
         await session.close()
       }
