@@ -1,4 +1,5 @@
 import { getDriver } from '@db/neo4j'
+import { relationships } from '@db/schema/relationships'
 
 import { resolveAlias } from './aliases'
 
@@ -99,6 +100,20 @@ export class TestNode {
     properties: NodeProperties = {},
   ): Promise<TestNode> {
     const { type, direction } = resolveAlias(this.entity.label, alias)
+    // Edge property defaults, the counterpart to defaults.ts for nodes: neode applied the
+    // relationship's model defaults on every relateTo, and resolvers project them
+    // (`pinnedAt: pinned.createdAt`). Without them a fixture edge exists but carries nothing,
+    // and the field reads as null.
+    const declared = relationships.find((relationship) => relationship.type === type)
+    const declaredEdgeProperties = new Map(Object.entries(declared?.properties ?? {}))
+    const given = new Map(Object.entries(properties))
+    const edge = new Map(given)
+    for (const property of ['createdAt', 'updatedAt']) {
+      if (declaredEdgeProperties.has(property) && given.get(property) === undefined) {
+        edge.set(property, new Date().toISOString())
+      }
+    }
+    const edgeProperties = Object.fromEntries(edge)
     const pattern =
       direction === 'out'
         ? `(source)-[edge:${type}]->(target)`
@@ -112,7 +127,7 @@ export class TestNode {
            MATCH (target) WHERE id(target) = $targetId
            MERGE ${pattern}
            SET edge += $properties`,
-          { sourceId: this.internalId, targetId: target.id, properties },
+          { sourceId: this.internalId, targetId: target.id, properties: edgeProperties },
         ),
       )
       return this

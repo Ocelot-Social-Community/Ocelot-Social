@@ -11,7 +11,8 @@ import { DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
+import { getDriver } from '@db/neo4j'
+import { fixtures } from '@db/testing/fixtures'
 import { UserInputError } from '@graphql/errors'
 
 import { images } from './imagesS3'
@@ -43,7 +44,9 @@ const mockUpload = jest.mocked(Upload)
 const mockDeleteObjectCommand = jest.mocked(DeleteObjectCommand)
 
 const driver = getDriver()
-const neode = getNeode()
+// The fixture API, not neode: a neode node cannot be related to a fixture handle, and this
+// file mixes the two.
+const neode = fixtures
 const uuid = '[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}'
 
 const config: S3Config = {
@@ -372,7 +375,7 @@ describe('mergeImage', () => {
         await mergeImage(post, 'HERO_IMAGE', imageInput)
         const images = await neode.all('Image')
         expect(images).toHaveLength(1)
-        await expect(images.first().toJson()).resolves.toMatchObject({
+        await expect(images[0].toJson()).resolves.toMatchObject({
           createdAt: expect.any(String),
           url: expect.any(String),
           alt: 'A description of the new image',

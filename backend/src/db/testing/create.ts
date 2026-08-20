@@ -1,6 +1,7 @@
 import { getDriver } from '@db/neo4j'
 import { validateProperties } from '@db/schema/validate'
 
+import { onlyDeclared, withDefaults } from './defaults'
 import { TestNode } from './node'
 
 import type { NodeProperties } from './node'
@@ -16,22 +17,6 @@ import type { EntityDefinition } from '@db/schema/types'
 //
 // So: the caller passes what the node will carry, and it is checked against the declaration
 // before it is written. No hidden defaults.
-
-/** Properties every fixture gets unless the caller sets them, mirroring what resolvers write. */
-const conventions = (entity: EntityDefinition, properties: NodeProperties): NodeProperties => {
-  const now = new Date().toISOString()
-  const declared = new Map(Object.entries(entity.properties))
-  // Through a Map: `property` comes from the loop, and indexing an object with a variable is
-  // the pattern the security lint flags.
-  const filled = new Map(Object.entries(properties))
-  for (const property of ['createdAt', 'updatedAt']) {
-    const missing = filled.get(property) === undefined
-    if (declared.has(property) && entity.required.includes(property) && missing) {
-      filled.set(property, now)
-    }
-  }
-  return Object.fromEntries(filled)
-}
 
 /**
  * Writes one node and returns a handle to it.
@@ -60,8 +45,19 @@ export const createNode = async (
   // node never holds one. Dropping them before validation is therefore not leniency — it is
   // describing the node that will actually exist. The fixtures rely on it to clear a default
   // (`Factory.build('emailAddress', { verifiedAt: null })` for an unverified address).
+  // Undeclared keys are dropped rather than rejected — the one place this layer is lenient,
+  // and deliberately so. rosie cannot tell an OPTION passed in the attributes slot
+  // (`Factory.build('post', { authorId })`) from a property, and neode's model filtering is
+  // what made those call sites work for years. Rejecting them would mean editing test files
+  // to remove keys that never reached a node.
+  //
+  // What is NOT lost: the write path in production still refuses undeclared properties
+  // (db/schema/validate.ts), and run-audit.ts reports any that reach the database anyway. The
+  // guard moved from the ORM to the two places that can act on it.
   const complete = Object.fromEntries(
-    Object.entries(conventions(entity, properties)).filter(([, value]) => value !== null),
+    Object.entries(onlyDeclared(entity, withDefaults(entity, properties))).filter(
+      ([, value]) => value !== null,
+    ),
   )
   const invalid = validateProperties(entity, complete)
   if (invalid) {
