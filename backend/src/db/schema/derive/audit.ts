@@ -15,7 +15,20 @@ import type { PropertyType } from '@db/schema/types'
 export interface AuditQuery {
   /** Stable identifier, used as the test name and as the metric label. */
   readonly violation: string
+  /** Counts violations. Cheap enough to run over every rule on every deployment. */
   readonly cypher: string
+  /**
+   * Up to ten offending records, as `id` + `detail` columns.
+   *
+   * A SEPARATE query rather than a `collect()` in the one above, because it is only ever run
+   * when the count came back non-zero — which is the exceptional case. The normal path stays
+   * a plain count.
+   *
+   * It exists because Neo4j's own error is not enough to act on: creating a constraint over
+   * violating data reports exactly ONE conflicting pair ("Both Node(6141) and Node(6142)
+   * have ..."), however many there are.
+   */
+  readonly sampleCypher: string
 }
 
 // Neo4j 4.4 has no valueType(); apoc.meta.cypher.type() is the portable way to ask.
@@ -32,20 +45,35 @@ const CYPHER_TYPE_PREDICATE = new Map<PropertyType, (value: string) => string>([
 const matchFor = (scope: Scope): string =>
   'node' in scope ? `MATCH (n:${scope.node})` : `MATCH ()-[n:${scope.edge}]->()`
 
-const propertyAudit = (scope: Scope, violation: string, where: string): AuditQuery => ({
+const SAMPLE_LIMIT = '10'
+
+const propertyAudit = (
+  scope: Scope,
+  violation: string,
+  where: string,
+  property: string,
+): AuditQuery => ({
   violation,
   cypher: `${matchFor(scope)} WHERE ${where} RETURN count(n) AS violations`,
+  sampleCypher:
+    `${matchFor(scope)} WHERE ${where} ` +
+    `RETURN id(n) AS id, n.${property} AS detail LIMIT ${SAMPLE_LIMIT}`,
 })
 
 const literal = (value: unknown): string =>
   typeof value === 'string' ? `'${value.replace(/'/g, "\\'")}'` : String(value)
 
-/** The audit for one rule, or null if the rule needs none because the backend enforces it. */
-export const auditFor = (rule: Rule, profile: BackendProfile): AuditQuery | null => {
-  if (statementFor(rule, profile) !== null) {
-    return null
-  }
-
+/**
+ * The audit for one rule, regardless of whether any backend enforces it.
+ *
+ * Separate from `auditFor` because the two callers want opposite things: the reporting run
+ * wants the COMPLEMENT of what the backend enforces, while the apply run wants the audit for
+ * exactly those rules it is about to turn into constraints — as a pre-flight check.
+ *
+ * Returns null only where no query can express the rule (a data type nothing can be asked
+ * about); rules.spec.ts pins that this never happens for the declared registry.
+ */
+export const auditQueryFor = (rule: Rule): AuditQuery | null => {
   switch (rule.kind) {
     case 'unique': {
       const properties = rule.properties.map((property) => `n.${property}`).join(', ')
@@ -54,6 +82,9 @@ export const auditFor = (rule: Rule, profile: BackendProfile): AuditQuery | null
         cypher:
           `MATCH (n:${rule.label}) WITH [${properties}] AS key, count(*) AS nodes ` +
           `WHERE nodes > 1 RETURN count(key) AS violations`,
+        sampleCypher:
+          `MATCH (n:${rule.label}) WITH [${properties}] AS key, collect(id(n)) AS ids ` +
+          `WHERE size(ids) > 1 RETURN head(ids) AS id, key AS detail LIMIT ${SAMPLE_LIMIT}`,
       }
     }
 
@@ -62,6 +93,7 @@ export const auditFor = (rule: Rule, profile: BackendProfile): AuditQuery | null
         rule.scope,
         `${scopeLabel(rule.scope)}.${rule.property} exists`,
         `n.${rule.property} IS NULL`,
+        rule.property,
       )
 
     case 'dataType': {
@@ -78,6 +110,7 @@ export const auditFor = (rule: Rule, profile: BackendProfile): AuditQuery | null
         rule.scope,
         `${scopeLabel(rule.scope)}.${rule.property} type`,
         `n.${rule.property} IS NOT NULL AND ${predicates.join(' AND ')}`,
+        rule.property,
       )
     }
 
@@ -86,6 +119,7 @@ export const auditFor = (rule: Rule, profile: BackendProfile): AuditQuery | null
         rule.scope,
         `${scopeLabel(rule.scope)}.${rule.property} pattern`,
         `n.${rule.property} IS NOT NULL AND NOT n.${rule.property} =~ '${rule.pattern}'`,
+        rule.property,
       )
 
     case 'minLength':
@@ -93,6 +127,7 @@ export const auditFor = (rule: Rule, profile: BackendProfile): AuditQuery | null
         rule.scope,
         `${scopeLabel(rule.scope)}.${rule.property} minLength`,
         `n.${rule.property} IS NOT NULL AND size(n.${rule.property}) < ${String(rule.minLength)}`,
+        rule.property,
       )
 
     case 'minimum':
@@ -100,6 +135,7 @@ export const auditFor = (rule: Rule, profile: BackendProfile): AuditQuery | null
         rule.scope,
         `${scopeLabel(rule.scope)}.${rule.property} minimum`,
         `n.${rule.property} IS NOT NULL AND n.${rule.property} < ${String(rule.minimum)}`,
+        rule.property,
       )
 
     case 'enum': {
@@ -108,18 +144,21 @@ export const auditFor = (rule: Rule, profile: BackendProfile): AuditQuery | null
         rule.scope,
         `${scopeLabel(rule.scope)}.${rule.property} enum`,
         `n.${rule.property} IS NOT NULL AND NOT n.${rule.property} IN [${allowed.map(literal).join(', ')}]`,
+        rule.property,
       )
     }
 
     case 'cardinality': {
       const comparison = rule.cardinality === 'exactly-one' ? '<> 1' : '> 1'
       const isSource = rule.from.map((label) => `n:${label}`).join(' OR ')
+      const degree =
+        `MATCH (n) WHERE ${isSource} ` +
+        `WITH n, size([(n)-[:${rule.type}]->() | 1]) AS edges ` +
+        `WHERE edges ${comparison} `
       return {
         violation: `${rule.from.join('|')}-[:${rule.type}] ${rule.cardinality}`,
-        cypher:
-          `MATCH (n) WHERE ${isSource} ` +
-          `WITH n, size([(n)-[:${rule.type}]->() | 1]) AS edges ` +
-          `WHERE edges ${comparison} RETURN count(n) AS violations`,
+        cypher: `${degree}RETURN count(n) AS violations`,
+        sampleCypher: `${degree}RETURN id(n) AS id, edges AS detail LIMIT ${SAMPLE_LIMIT}`,
       }
     }
 
@@ -128,16 +167,19 @@ export const auditFor = (rule: Rule, profile: BackendProfile): AuditQuery | null
       // label and points at ANY declared target label.
       const wrongSource = rule.from.map((label) => `NOT a:${label}`).join(' AND ')
       const wrongTarget = rule.to.map((label) => `NOT b:${label}`).join(' AND ')
+      const wrong = `MATCH (a)-[r:${rule.type}]->(b) WHERE (${wrongSource}) OR (${wrongTarget}) `
       return {
         violation: `[:${rule.type}] endpoints ${rule.from.join('|')}->${rule.to.join('|')}`,
-        cypher:
-          `MATCH (a)-[r:${rule.type}]->(b) ` +
-          `WHERE (${wrongSource}) OR (${wrongTarget}) ` +
-          `RETURN count(r) AS violations`,
+        cypher: `${wrong}RETURN count(r) AS violations`,
+        sampleCypher: `${wrong}RETURN id(r) AS id, [labels(a), labels(b)] AS detail LIMIT ${SAMPLE_LIMIT}`,
       }
     }
   }
 }
+
+/** The audit for one rule, or null if the rule needs none because the backend enforces it. */
+export const auditFor = (rule: Rule, profile: BackendProfile): AuditQuery | null =>
+  statementFor(rule, profile) !== null ? null : auditQueryFor(rule)
 
 export const auditsFor = (rules: readonly Rule[], profile: BackendProfile): AuditQuery[] =>
   rules
