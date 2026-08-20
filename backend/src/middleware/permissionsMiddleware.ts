@@ -8,20 +8,16 @@
 import { rule, shield, deny, allow, or, and } from 'graphql-shield'
 
 import CONFIG from '@config/index'
-import { getNeode } from '@db/neo4j'
 import { AuthenticationError } from '@graphql/errors'
 import { validateInviteCode } from '@graphql/resolvers/inviteCodes'
 import { isPermissionAvailable } from '@src/permission'
 import { dominates } from '@src/role'
 
-import type SocialMedia from '@db/models/SocialMedia'
 import type { Context } from '@src/context'
 import type { PermissionKey } from '@src/permission'
 
 const debug = !!CONFIG.DEBUG
 const allowExternalErrors = true
-
-const neode = getNeode()
 
 const isAuthenticated = rule({
   cache: 'contextual',
@@ -119,21 +115,22 @@ const isMyOwn = rule({
 
 const isMySocialMedia = rule({
   cache: 'no_cache',
-})(async (_, args, { user }: Context) => {
-  // We need a User
+})(async (_, args, context: Context) => {
+  const { user } = context
   if (!user) {
     return false
   }
-  const socialMedia = await neode.find<typeof SocialMedia>('SocialMedia', args.id)
-  // Did we find a social media node?
-  if (!socialMedia) {
-    return false
-  }
-  const socialMediaJson = await socialMedia.toJson() // whats this for?
-
-  // Is it my social media entry?
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (socialMediaJson.ownedBy as any).node.id === user.id
+  // One question, one query: does an OWNED_BY edge run from this entry to the viewer? The
+  // neode version loaded the node, serialised it with its eager `ownedBy` relation and then
+  // compared an id out of that — three round trips for a boolean.
+  const result = await context.database.query({
+    query: `
+      MATCH (socialMedia:SocialMedia {id: $id})-[:OWNED_BY]->(owner:User {id: $userId})
+      RETURN count(owner) > 0 AS isMine
+    `,
+    variables: { id: args.id, userId: user.id },
+  })
+  return Boolean(result.records[0]?.get('isMine'))
 })
 
 const isAllowedToChangeGroupSettings = rule({

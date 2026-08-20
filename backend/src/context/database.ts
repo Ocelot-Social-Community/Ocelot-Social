@@ -39,6 +39,10 @@ export const write =
 
 export default () => {
   const driver = getDriver()
+  // The last thing holding neode in the request context. No resolver and no middleware uses it
+  // any more (concept stage P5) — it is here for the SPECS, which reach for
+  // `database.neode.model(...)` to set up fixtures, and for db/factories.ts behind them. It
+  // goes with those, in P6.
   const neode = getNeode()
 
   return {
