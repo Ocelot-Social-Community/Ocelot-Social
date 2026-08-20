@@ -7,14 +7,17 @@ import { createHash } from 'node:crypto'
 import { setTimeout as delay } from 'node:timers/promises'
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { getDriver, getNeode } from '@db/neo4j'
+import { getDriver } from '@db/neo4j'
+import { fixtures } from '@db/testing/fixtures'
 import { TEST_CONFIG } from '@root/test/helpers'
 
 import { decode } from './decode'
 import { encode } from './encode'
 
 const driver = getDriver()
-const neode = getNeode()
+// The fixture API, not neode: a neode node cannot be related to a fixture handle, and this
+// file mixes the two.
+const neode = fixtures
 const config = {
   JWT_SECRET: 'supersecret',
   JWT_EXPIRES: TEST_CONFIG.JWT_EXPIRES,
@@ -298,10 +301,9 @@ describe('decode', () => {
       it('does not touch `lastActiveAt` on authenticated requests', async () => {
         let user = await neode.first('User', { id: 'u3' }, undefined)
         await user.update({
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          updatedAt: new Date().toISOString() as any,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          lastActiveAt: '2019-10-03T23:33:08.598Z' as any,
+          updatedAt: new Date().toISOString(),
+
+          lastActiveAt: '2019-10-03T23:33:08.598Z',
         })
         await expect(user.toJson()).resolves.toMatchObject({
           lastActiveAt: '2019-10-03T23:33:08.598Z',

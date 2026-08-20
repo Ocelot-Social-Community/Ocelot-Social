@@ -2,6 +2,7 @@ import { getDriver } from '@db/neo4j'
 import { entities } from '@db/schema/index'
 
 import { createNode, findNode } from './create'
+import { onlyDeclared } from './defaults'
 import { TestNode } from './node'
 
 import type { NodeProperties } from './node'
@@ -71,11 +72,17 @@ export interface FixtureModel {
 }
 
 export const fixtures: FixtureApi = {
-  create: async (label, properties) => createNode(entityFor(label), properties),
+  create: async (label, properties) => {
+    const entity = entityFor(label)
+    return createNode(entity, onlyDeclared(entity, properties))
+  },
 
   model: (label) => {
     const entity = entityFor(label)
-    return { entity, create: async (properties) => createNode(entity, properties) }
+    return {
+      entity,
+      create: async (properties) => createNode(entity, onlyDeclared(entity, properties)),
+    }
   },
 
   // neode's `find` looked a node up by its primary key. Here that is the first declared
@@ -102,7 +109,7 @@ export const fixtures: FixtureApi = {
       const result = await session.readTransaction((transaction) =>
         transaction.run(
           property === undefined
-            ? `MATCH (node:${entity.label}) RETURN node {.*} AS node LIMIT 1`
+            ? `MATCH (node:${entity.label}) RETURN node {.*} AS node, id(node) AS internalId LIMIT 1`
             : `MATCH (node:${entity.label} {${property}: $value}) RETURN node {.*} AS node, id(node) AS internalId LIMIT 1`,
           { value },
         ),
