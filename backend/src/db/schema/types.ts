@@ -34,8 +34,17 @@ export interface EntityDefinition {
   readonly label: string
   /**
    * Additional labels nodes of this entity MAY carry. Declared so the drift check does not
-   * report `(:Post:Article)` as an unknown label. `Post` carries `Article` today via
-   * neode's `extend()` in db/neo4j.ts.
+   * report `(:Post:Article)` as an unknown label.
+   *
+   * Secondary labels are markers and carry NO constraints of their own — uniqueness and
+   * existence are declared on the primary label only. That is a decision, not an omission:
+   * a uniqueness constraint is per label, and every `(:Article)` also carries `(:Post)`, so
+   * an `Article(id)` constraint can never fire while `Post(id)` exists. It would only cost a
+   * second index on every post write.
+   *
+   * The pair that neode's `extend('Post', 'Article')` used to install is removed by
+   * migration 20260820140000. If the drift check reports them as SURPLUS again, the answer is
+   * that migration — not re-adding the constraints.
    */
   readonly alsoLabelled?: readonly string[]
   readonly properties: Readonly<Record<string, PropertySchema>>
