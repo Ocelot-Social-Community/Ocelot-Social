@@ -58,7 +58,9 @@ const decodeJwt = async (
   })
   try {
     const [raw] = await readTxResultPromise
-    if (!raw) return null
+    if (!raw) {
+      return null
+    }
     const { roles, ...rest } = raw
     return {
       ...rest,
@@ -91,7 +93,9 @@ const decodeApiKey = async (driver: Driver, key: string): Promise<DecodedUser | 
         { keyHash },
       )
     })
-    if (result.records.length === 0) return null
+    if (result.records.length === 0) {
+      return null
+    }
 
     const record = result.records[0]
     const raw = record.get('user') as RawDbUser
@@ -124,7 +128,9 @@ const decodeApiKey = async (driver: Driver, key: string): Promise<DecodedUser | 
 export const decode =
   (context: { config: Pick<typeof CONFIG, 'JWT_SECRET'>; driver: Driver }) =>
   async (authorizationHeader: string | undefined | null) => {
-    if (!authorizationHeader) return null
+    if (!authorizationHeader) {
+      return null
+    }
     const token = authorizationHeader.replace('Bearer ', '')
 
     // Route by token prefix: oak_ = API key, otherwise JWT

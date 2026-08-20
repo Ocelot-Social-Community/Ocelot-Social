@@ -100,7 +100,9 @@ export const assertGroupMembershipCached = async (
   const now = Date.now()
   const expiresAt = membershipCache.get(key)
   if (expiresAt !== undefined) {
-    if (expiresAt > now) return true
+    if (expiresAt > now) {
+      return true
+    }
     membershipCache.delete(key)
   }
   try {
@@ -176,8 +178,12 @@ export default {
           variables: { groupId: string },
           context,
         ) => {
-          if (!context.user) return false
-          if (payload.groupId !== variables.groupId) return false
+          if (!context.user) {
+            return false
+          }
+          if (payload.groupId !== variables.groupId) {
+            return false
+          }
           return assertGroupMembershipCached(context.driver, payload.groupId, context.user.id)
         },
       ),

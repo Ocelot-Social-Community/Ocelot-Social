@@ -141,16 +141,23 @@ const topLevelKeys = (source: string, braceIndex: number): string[] => {
   let depth = 0
   let end = braceIndex
   for (; end < source.length; end++) {
-    if (source[end] === '{') depth++
-    else if (source[end] === '}' && --depth === 0) break
+    if (source[end] === '{') {
+      depth++
+    } else if (source[end] === '}' && --depth === 0) {
+      break
+    }
   }
   // Flatten: drop everything nested, so only this object's own keys remain.
   let nested = 0
   let flat = ''
   for (const character of source.slice(braceIndex + 1, end)) {
-    if ('{['.includes(character)) nested++
-    else if ('}]'.includes(character)) nested--
-    else if (nested === 0) flat += character
+    if ('{['.includes(character)) {
+      nested++
+    } else if ('}]'.includes(character)) {
+      nested--
+    } else if (nested === 0) {
+      flat += character
+    }
   }
   return [...flat.matchAll(/(?:^|,)\s*\.{0,3}([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g)].map((m) => m[1])
 }
@@ -159,11 +166,15 @@ const readSources = (): string[] => {
   assertWebappReadable()
   const files: string[] = []
   const walk = (dir: string) => {
-    if (!fs.existsSync(dir)) return
+    if (!fs.existsSync(dir)) {
+      return
+    }
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
       const full = path.join(dir, entry.name)
       if (entry.isDirectory()) {
-        if (entry.name !== 'node_modules') walk(full)
+        if (entry.name !== 'node_modules') {
+          walk(full)
+        }
         // Webapp SPECS are read too, deliberately: store/posts.js assembles its filter
         // dynamically, so those operator names never appear as literals in the production
         // source — its spec is where the concrete shape is written down. Reading production
@@ -173,7 +184,9 @@ const readSources = (): string[] => {
       }
     }
   }
-  for (const dir of SEARCH_DIRS) walk(path.join(WEBAPP_ROOT, dir))
+  for (const dir of SEARCH_DIRS) {
+    walk(path.join(WEBAPP_ROOT, dir))
+  }
   return files
 }
 
@@ -191,9 +204,13 @@ const postFilterFields = (): Set<string> => {
 const operatorsUsedByWebapp = (): string[] => {
   const found = new Set<string>()
   for (const source of readSources()) {
-    for (const match of source.matchAll(OPERATOR_SUFFIX)) found.add(match[1])
+    for (const match of source.matchAll(OPERATOR_SUFFIX)) {
+      found.add(match[1])
+    }
     for (const match of source.matchAll(FILTER_OBJECT_START)) {
-      for (const key of topLevelKeys(source, source.indexOf('{', match.index))) found.add(key)
+      for (const key of topLevelKeys(source, source.indexOf('{', match.index))) {
+        found.add(key)
+      }
     }
   }
   return [...found].filter((key) => !(key in NOT_A_POST_FILTER)).sort()

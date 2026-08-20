@@ -103,7 +103,9 @@ const resolveAuthUserRoles = async (
   database: ReturnType<typeof databaseContext>,
   authenticatedUser: Context['user'] | undefined,
 ): Promise<Context['user'] | undefined> => {
-  if (!authenticatedUser?.id) return authenticatedUser
+  if (!authenticatedUser?.id) {
+    return authenticatedUser
+  }
   const result = await database.query({
     query: `OPTIONAL MATCH (u:User {id: $id})
             RETURN u IS NOT NULL AS userExists, [(u)-[:HAS_ROLE]->(r:Role) | r.name] AS roles`,
@@ -112,7 +114,9 @@ const resolveAuthUserRoles = async (
   const record = result.records[0]
   const userExists = record?.get('userExists') === true
   const dbRoles = (record?.get('roles') as string[] | undefined) ?? []
-  if (userExists) return { ...authenticatedUser, roleName: resolveRoleName(dbRoles) }
+  if (userExists) {
+    return { ...authenticatedUser, roleName: resolveRoleName(dbRoles) }
+  }
   return { ...authenticatedUser, roleName: authenticatedUser.roleName }
 }
 

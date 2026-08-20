@@ -169,7 +169,9 @@ export default {
     searchPosts: async (_parent, args, context, _resolveInfo) => {
       const { query, postsOffset, firstPosts } = args
       let userId = null
-      if (context.user) userId = context.user.id
+      if (context.user) {
+        userId = context.user.id
+      }
       return {
         postCount: getSearchResults(
           context,
@@ -230,7 +232,9 @@ export default {
     searchGroups: async (_parent, args, context, _resolveInfo) => {
       const { query, groupsOffset, firstGroups } = args
       let userId = null
-      if (context.user) userId = context.user.id
+      if (context.user) {
+        userId = context.user.id
+      }
       return {
         groupCount: getSearchResults(
           context,
@@ -286,18 +290,21 @@ export default {
       // Groups off ⇒ groups drop out of the global search too (mirrors the gated searchGroups).
       const groupsOff = context.policy?.getEffective('groupsEnabled') === false
 
-      if (searchType === '')
+      if (searchType === '') {
         return [
           ...(await getSearchResults(context, searchPostsSetup, params)),
           ...(await getSearchResults(context, searchUsersSetup, params)),
           ...(groupsOff ? [] : await getSearchResults(context, searchGroupsSetup, params)),
           ...(await getSearchResults(context, searchHashtagsSetup, params)),
         ]
+      }
 
       params.limit = 15
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const type: any = multiSearchMap.find((obj) => obj.symbol === searchType)
-      if (groupsOff && type?.setup === searchGroupsSetup) return []
+      if (groupsOff && type?.setup === searchGroupsSetup) {
+        return []
+      }
       return getSearchResults(context, type.setup, params)
     },
   },

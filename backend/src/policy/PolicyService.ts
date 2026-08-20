@@ -76,18 +76,26 @@ type Env = Record<string, string | undefined>
 
 function parseEnvValue(envName: string, env: Env, typeName: string): unknown {
   const raw = env[envName]
-  if (raw === undefined) return undefined
+  if (raw === undefined) {
+    return undefined
+  }
 
   if (typeName === 'boolean') {
-    if (raw === 'true') return true
-    if (raw === 'false') return false
+    if (raw === 'true') {
+      return true
+    }
+    if (raw === 'false') {
+      return false
+    }
     return undefined // fall through to default
   }
   if (typeName === 'integer') {
     const n = parseInt(raw, 10)
     return Number.isFinite(n) ? n : undefined
   }
-  if (typeName === 'string') return raw
+  if (typeName === 'string') {
+    return raw
+  }
   return undefined
 }
 
@@ -132,7 +140,9 @@ export class PolicyService {
     for (const key of allKeys()) {
       // A concurrent change event during init already set this key to a value
       // at least as fresh as the snapshot — don't overwrite it with the read.
-      if (this.cache[key] !== undefined) continue
+      if (this.cache[key] !== undefined) {
+        continue
+      }
 
       const existing = dbValues[key]
       // Adopt a stored value only if it still satisfies the schema.
@@ -251,12 +261,16 @@ export class PolicyService {
   getEffective<K extends PolicyKey>(key: K): NetworkPolicy[K] {
     if (typeFor(key) === 'boolean') {
       // Env dependency: a boolean key whose hard env requirements are unmet is off.
-      if (!this.isAvailable(key)) return false as NetworkPolicy[K]
+      if (!this.isAvailable(key)) {
+        return false as NetworkPolicy[K]
+      }
       // Policy→policy dependency: a boolean key is effective only while every policy it
       // depends on is itself effectively on (recursion folds their env/policy deps too;
       // the schema is validated acyclic at load, so this terminates).
       for (const dependency of requiresPolicyFor(key)) {
-        if (!this.getEffective(dependency)) return false as NetworkPolicy[K]
+        if (!this.getEffective(dependency)) {
+          return false as NetworkPolicy[K]
+        }
       }
     }
     return this.get(key)
@@ -326,10 +340,14 @@ export class PolicyService {
   // broadcasts per-key (the subscription is per-key), but from a single request and a
   // single last-change, instead of N sequential round-trips.
   async resetMany(keys: PolicyKey[], actor: string): Promise<PolicyChangeEvent[]> {
-    for (const key of keys) this.assertKnownKey(key)
+    for (const key of keys) {
+      this.assertKnownKey(key)
+    }
     const events: PolicyChangeEvent[] = []
     for (const key of keys) {
-      if (this.get(key) === this.getDefault(key)) continue
+      if (this.get(key) === this.getDefault(key)) {
+        continue
+      }
       events.push(await this.reset(key, actor))
     }
     return events
@@ -366,7 +384,9 @@ export class PolicyService {
   // change. Idempotent when invoked locally after our own set() updated the
   // cache (same value written twice).
   applyExternalChange(event: PolicyChangeEvent): void {
-    if (!this.isKnownKey(event.key)) return
+    if (!this.isKnownKey(event.key)) {
+      return
+    }
     // Discard a malformed cross-instance event (e.g. a different / older backend
     // version publishing a wrong-typed value) instead of corrupting the cache —
     // symmetric with init()'s reseed-on-mismatch. Never throws: this runs inside

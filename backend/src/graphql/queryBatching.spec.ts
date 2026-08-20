@@ -81,7 +81,9 @@ const countRoundTrips = async (
           transaction.run = (...runArgs: any[]) => {
             runs += 1
             const ids = (runArgs[1] as { ids?: unknown })?.ids
-            if (Array.isArray(ids)) idBatches.push(ids as string[])
+            if (Array.isArray(ids)) {
+              idBatches.push(ids as string[])
+            }
             return run(...runArgs)
           }
           return work(transaction)

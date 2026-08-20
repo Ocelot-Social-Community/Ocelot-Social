@@ -34,7 +34,9 @@ export default function (embedUrl) {
   for (const provider of oEmbedProviders) {
     for (const endpoint of provider.endpoints) {
       const { schemes = [], url } = endpoint
-      if (schemes.some((scheme) => minimatch(embedUrl, scheme))) return url
+      if (schemes.some((scheme) => minimatch(embedUrl, scheme))) {
+        return url
+      }
     }
     const { hostname } = new URL(embedUrl)
     if (provider.provider_url.includes(hostname)) {

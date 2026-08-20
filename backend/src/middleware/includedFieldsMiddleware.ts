@@ -5,7 +5,9 @@
 import cloneDeep from 'lodash/cloneDeep'
 
 const _includeFieldsRecursively = (selectionSet, includedFields) => {
-  if (!selectionSet) return
+  if (!selectionSet) {
+    return
+  }
   includedFields.forEach((includedField) => {
     selectionSet.selections.unshift({
       kind: 'Field',

@@ -24,11 +24,17 @@ const orderingFieldsCache = new Map<string, ReadonlySet<string>>()
 // fresh each time — a caller that added to it would corrupt every later validation.
 const orderingFields = (enumName: string): ReadonlySet<string> => {
   const cached = orderingFieldsCache.get(enumName)
-  if (cached) return cached
+  if (cached) {
+    return cached
+  }
 
   for (const definition of typeDefs.definitions) {
-    if (definition.kind !== Kind.ENUM_TYPE_DEFINITION) continue
-    if (definition.name.value !== enumName) continue
+    if (definition.kind !== Kind.ENUM_TYPE_DEFINITION) {
+      continue
+    }
+    if (definition.name.value !== enumName) {
+      continue
+    }
     const fields = new Set(
       (definition.values ?? []).map((value) => value.name.value.replace(/_(asc|desc)$/, '')),
     )

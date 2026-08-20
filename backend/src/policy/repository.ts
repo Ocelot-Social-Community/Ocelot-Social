@@ -32,7 +32,9 @@ export async function readAllSettings(
       out[key] = JSON.parse(rawValue)
     } catch (error) {
       // Skip malformed JSON (bootstrap will reseed); rethrow anything unexpected.
-      if (!(error instanceof SyntaxError)) throw error
+      if (!(error instanceof SyntaxError)) {
+        throw error
+      }
     }
   }
   return out
@@ -54,7 +56,9 @@ export async function readLastChange(
     variables: { namespace },
   })
   const record = result.records[0]
-  if (!record) return null
+  if (!record) {
+    return null
+  }
   return {
     actor: record.get('actor') as string,
     timestamp: record.get('timestamp') as string,

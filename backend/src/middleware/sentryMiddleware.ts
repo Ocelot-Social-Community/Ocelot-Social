@@ -19,7 +19,9 @@ export const createSentryMiddleware = (options: SentryMiddlewareOptions): Sentry
   const passthrough: SentryMiddleware = (resolve, root, args, context, resolveInfo) =>
     resolve(root, args, context, resolveInfo)
 
-  if (!options.dsn) return passthrough
+  if (!options.dsn) {
+    return passthrough
+  }
 
   init({
     dsn: options.dsn,

@@ -80,7 +80,9 @@ export default {
       // (not fetched by groupId, not listed) and its messages are blocked (see messages.ts).
       // Existing rooms/messages stay in the DB and reappear when the feature is re-enabled.
       const groupsOff = groupChatGated(context)
-      if (groupsOff && params.groupId) return []
+      if (groupsOff && params.groupId) {
+        return []
+      }
 
       // Single room lookup by userId or groupId
       if (params.userId || params.groupId) {
@@ -104,7 +106,9 @@ export default {
             })
           })
           const rooms = result.records.map((record) => unwrap(record.get('room')))
-          if (rooms.length === 0) return []
+          if (rooms.length === 0) {
+            return []
+          }
           // The match above already restricts to rooms the current user CHATS_IN, so the
           // authorisation the old `users_some` filter provided is covered here. Computed
           // fields no longer need the second pass through neo4jgraphql — Room's field
@@ -127,7 +131,9 @@ export default {
         if (groupsOff) {
           const session = context.driver.session()
           try {
-            if (await roomIsGroupRoom(params.id, session)) return []
+            if (await roomIsGroupRoom(params.id, session)) {
+              return []
+            }
           } finally {
             await session.close()
           }
@@ -162,11 +168,17 @@ export default {
         const search = params.search || null
         const result = await session.readTransaction(async (transaction) => {
           const conditions: string[] = []
-          if (before) conditions.push('sortDate < $before')
-          if (search) conditions.push('toLower(roomName) CONTAINS toLower($search)')
+          if (before) {
+            conditions.push('sortDate < $before')
+          }
+          if (search) {
+            conditions.push('toLower(roomName) CONTAINS toLower($search)')
+          }
           // Groups off ⇒ drop group rooms from the chat list entirely (they carry a ROOM_FOR
           // edge to a Group). `g` is kept in the WITH so it can be filtered here.
-          if (groupsOff) conditions.push('g IS NULL')
+          if (groupsOff) {
+            conditions.push('g IS NULL')
+          }
           const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''
           const cypher = `
             MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)

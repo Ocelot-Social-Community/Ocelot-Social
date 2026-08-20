@@ -227,7 +227,9 @@ const notifyFollowingUsers = async (postId, groupId, context) => {
 }
 
 const notifyGroupMembersOfNewPost = async (postId, groupId, context) => {
-  if (!groupId) return []
+  if (!groupId) {
+    return []
+  }
   const reason = 'post_in_group'
   const cypher = `
     MATCH (post:Post { id: $postId })<-[:WROTE]-(author:User { id: $userId })
@@ -336,7 +338,9 @@ const notifyMemberOfGroup = async (groupId, userId, reason, context) => {
 }
 
 const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
-  if (!idsOfUsers?.length) return []
+  if (!idsOfUsers?.length) {
+    return []
+  }
   await validateNotifyUsers(label, reason)
   let mentionedCypher
   switch (reason) {
@@ -473,7 +477,9 @@ const handleCreateMessage: IMiddlewareResolver = async (
       })
       resolvedRoomId = roomResult.records[0]?.get('roomId')
     }
-    if (!resolvedRoomId) return message
+    if (!resolvedRoomId) {
+      return message
+    }
 
     const { senderUser, recipients } = await session.readTransaction(async (transaction) => {
       const messageRecipientsCypher = `

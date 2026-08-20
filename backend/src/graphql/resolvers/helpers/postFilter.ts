@@ -83,10 +83,14 @@ const combine = (fragments: CypherFragment[], operator: 'AND' | 'OR'): CypherFra
   // instead. maintainPinnedPosts relies on exactly this: it builds
   // `OR: [{ pinned: true }, {}]`, where the empty branch means "or anything else".
   // Dropping it would narrow the feed to pinned posts only.
-  if (operator === 'OR' && fragments.some((fragment) => fragment.where === null)) return EMPTY
+  if (operator === 'OR' && fragments.some((fragment) => fragment.where === null)) {
+    return EMPTY
+  }
 
   const present = fragments.filter((fragment) => fragment.where !== null)
-  if (present.length === 0) return EMPTY
+  if (present.length === 0) {
+    return EMPTY
+  }
   return {
     where:
       present.length === 1
@@ -113,7 +117,9 @@ const translate = (
   const fragments: CypherFragment[] = []
 
   for (const [key, value] of Object.entries(filter)) {
-    if (value === undefined) continue
+    if (value === undefined) {
+      continue
+    }
 
     // --- boolean composition -------------------------------------------------------
     if (key === 'OR' || key === 'AND') {
@@ -172,7 +178,9 @@ const translate = (
       // Access control: posts written by someone the viewer muted.
       case 'mutedBy': {
         const viewerId = value as string | null
-        if (!viewerId) continue
+        if (!viewerId) {
+          continue
+        }
         fragments.push({
           where: `NOT EXISTS { MATCH (${alias})<-[:WROTE]-(:User)<-[:MUTED]-(:User { id: $${parameter} }) }`,
           params: { [parameter]: viewerId },
@@ -200,7 +208,9 @@ const translate = (
       }
 
       case 'hasLocation':
-        if (!value) continue
+        if (!value) {
+          continue
+        }
         fragments.push({
           where: `EXISTS { MATCH (${alias})-[:IS_IN]->(:Location) }`,
           params: {},
@@ -246,7 +256,9 @@ const translate = (
       // --- relations -------------------------------------------------------------
       case 'categories_some': {
         const ids = (value as { id_in?: string[] }).id_in
-        if (!ids) throw new UserInputError('categories_some supports only `id_in`.')
+        if (!ids) {
+          throw new UserInputError('categories_some supports only `id_in`.')
+        }
         fragments.push({
           where: `EXISTS { MATCH (${alias})-[:CATEGORIZED]->(c:Category) WHERE c.id IN $${parameter} }`,
           params: { [parameter]: ids },
@@ -256,7 +268,9 @@ const translate = (
 
       case 'emotions_some': {
         const emotions = (value as { emotion_in?: string[] }).emotion_in
-        if (!emotions) throw new UserInputError('emotions_some supports only `emotion_in`.')
+        if (!emotions) {
+          throw new UserInputError('emotions_some supports only `emotion_in`.')
+        }
         fragments.push({
           where: `EXISTS { MATCH (${alias})<-[emoted:EMOTED]-(:User) WHERE emoted.emotion IN $${parameter} }`,
           params: { [parameter]: emotions },
@@ -291,7 +305,9 @@ const translate = (
       // smuggled into a migration whose job was to reproduce the generated filter.
       case 'comments_some': {
         const authorId = (value as { author?: { id?: string } }).author?.id
-        if (!authorId) throw new UserInputError('comments_some supports only `author.id`.')
+        if (!authorId) {
+          throw new UserInputError('comments_some supports only `author.id`.')
+        }
         fragments.push({
           where: `EXISTS {
             MATCH (${alias})<-[:COMMENTS]-(:Comment)<-[:WROTE]-(:User { id: $${parameter} })
@@ -304,7 +320,9 @@ const translate = (
       // The profile page's "shouts" tab.
       case 'shoutedBy_some': {
         const shouterId = (value as { id?: string }).id
-        if (!shouterId) throw new UserInputError('shoutedBy_some supports only `id`.')
+        if (!shouterId) {
+          throw new UserInputError('shoutedBy_some supports only `id`.')
+        }
         fragments.push({
           where: `EXISTS { MATCH (${alias})<-[:SHOUTED]-(:User { id: $${parameter} }) }`,
           params: { [parameter]: shouterId },
@@ -334,7 +352,9 @@ const translate = (
       // Access control: hide posts by muted authors (filterForMutedUsers).
       case 'author_not': {
         const ids = (value as { id_in?: string[] }).id_in
-        if (!ids) throw new UserInputError('author_not supports only `id_in`.')
+        if (!ids) {
+          throw new UserInputError('author_not supports only `id_in`.')
+        }
         fragments.push({
           where: `NOT EXISTS { MATCH (${alias})<-[:WROTE]-(author:User) WHERE author.id IN $${parameter} }`,
           params: { [parameter]: ids },

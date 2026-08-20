@@ -55,7 +55,9 @@ const validateUpdateComment: IMiddlewareResolver = async (resolve, root, args, c
 const validateReport: IMiddlewareResolver = async (resolve, root, args, context, info) => {
   const { resourceId } = args
   const { user } = context
-  if (resourceId === user.id) throw new Error('You cannot report yourself!')
+  if (resourceId === user.id) {
+    throw new Error('You cannot report yourself!')
+  }
   return resolve(root, args, context, info)
 }
 
@@ -63,7 +65,9 @@ const validateReview: IMiddlewareResolver = async (resolve, root, args, context,
   const { resourceId } = args
   let existingReportedResource
   const { user, driver } = context
-  if (resourceId === user.id) throw new Error('You cannot review yourself!')
+  if (resourceId === user.id) {
+    throw new Error('You cannot review yourself!')
+  }
   const session = driver.session()
   try {
     const txResult = await session.readTransaction(async (transaction) => {
@@ -87,19 +91,22 @@ const validateReview: IMiddlewareResolver = async (resolve, root, args, context,
       }))
     })
     existingReportedResource = txResult
-    if (!existingReportedResource?.length)
+    if (!existingReportedResource?.length) {
       throw new Error(`Resource not found or is not a Post|Comment|User!`)
+    }
     existingReportedResource = existingReportedResource[0]
-    if (!existingReportedResource.filed)
+    if (!existingReportedResource.filed) {
       throw new Error(
         `Before starting the review process, please report the ${existingReportedResource.label}!`,
       )
+    }
     const authorId =
       existingReportedResource.label !== 'User' && existingReportedResource.author
         ? existingReportedResource.author.properties.id
         : null
-    if (authorId && authorId === user.id)
+    if (authorId && authorId === user.id) {
       throw new Error(`You cannot review your own ${existingReportedResource.label}!`)
+    }
   } finally {
     await session.close()
   }
@@ -115,7 +122,9 @@ export const validateNotifyUsers = async (label: string, reason: string): Promis
     'followed_user_posted',
     'post_in_group',
   ]
-  if (!reasonsAllowed.includes(reason)) throw new Error('Notification reason is not allowed!')
+  if (!reasonsAllowed.includes(reason)) {
+    throw new Error('Notification reason is not allowed!')
+  }
   if (
     (label === 'Post' && reason !== 'mentioned_in_post') ||
     (label === 'Comment' && !['mentioned_in_comment', 'commented_on_post'].includes(reason))
@@ -126,8 +135,9 @@ export const validateNotifyUsers = async (label: string, reason: string): Promis
 
 const validateUpdateUser: IMiddlewareResolver = async (resolve, root, params, context, info) => {
   const { name } = params
-  if (typeof name === 'string' && name.trim().length < USERNAME_MIN_LENGTH)
+  if (typeof name === 'string' && name.trim().length < USERNAME_MIN_LENGTH) {
     throw new UserInputError(`Username must be at least ${USERNAME_MIN_LENGTH} character long!`)
+  }
   return resolve(root, params, context, info)
 }
 

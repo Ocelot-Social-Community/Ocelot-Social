@@ -28,7 +28,9 @@ export default {
     },
     DeleteSocialMedia: async (_object, { id }, _context, _resolveInfo) => {
       const socialMedia = await neode.find('SocialMedia', id)
-      if (!socialMedia) return null
+      if (!socialMedia) {
+        return null
+      }
       await socialMedia.delete()
       return socialMedia.toJson()
     },

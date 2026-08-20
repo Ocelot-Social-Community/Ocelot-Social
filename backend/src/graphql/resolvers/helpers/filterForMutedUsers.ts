@@ -11,6 +11,8 @@ import type { Context } from '@src/context'
 // Single-post lookups by id or slug keep skipping the filter: navigating directly to a post
 // should show it even if its author is muted.
 export const filterForMutedUsers = (params: PostQueryParams, context: Context): PostQueryParams => {
-  if (!context.user || params.id || params.slug) return params
+  if (!context.user || params.id || params.slug) {
+    return params
+  }
   return { ...params, filter: { ...params.filter, mutedBy: context.user.id } }
 }
