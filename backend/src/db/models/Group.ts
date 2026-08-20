@@ -33,7 +33,6 @@ export default {
   groupType: { type: 'string', default: 'public' },
   actionRadius: { type: 'string', default: 'regional' },
 
-
   locationName: { type: 'string', allow: [null] },
 
   isIn: {

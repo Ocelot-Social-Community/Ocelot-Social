@@ -64,6 +64,7 @@ export const TEST_CONFIG = {
 
   LANGUAGE_DEFAULT: 'en',
   LOG_LEVEL: 'DEBUG',
+  NEO4J_PROFILE: 'neo4j-community',
 } as const satisfies typeof CONFIG
 
 interface OverwritableContextParams {
