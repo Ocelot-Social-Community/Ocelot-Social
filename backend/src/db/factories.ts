@@ -11,16 +11,101 @@ import { hashSync } from 'bcryptjs'
 import { Factory } from 'rosie'
 import { v4 as uuid } from 'uuid'
 
+import { Badge } from '@db/schema/entities/Badge'
+import { Category } from '@db/schema/entities/Category'
+import { Comment } from '@db/schema/entities/Comment'
+import { Donations } from '@db/schema/entities/Donations'
+import { EmailAddress } from '@db/schema/entities/EmailAddress'
+import { File } from '@db/schema/entities/File'
+import { Group } from '@db/schema/entities/Group'
+import { Image } from '@db/schema/entities/Image'
+import { InviteCode } from '@db/schema/entities/InviteCode'
+import { Location } from '@db/schema/entities/Location'
+import { Post } from '@db/schema/entities/Post'
+import { Report } from '@db/schema/entities/Report'
+import { Role } from '@db/schema/entities/Role'
+import { SocialMedia } from '@db/schema/entities/SocialMedia'
+import { Tag } from '@db/schema/entities/Tag'
+import { UnverifiedEmailAddress } from '@db/schema/entities/UnverifiedEmailAddress'
+import { User } from '@db/schema/entities/User'
+import { createNode, findNode } from '@db/testing/create'
 import { generateInviteCode } from '@graphql/resolvers/inviteCodes'
 import { isUniqueFor } from '@middleware/sluggifyMiddleware'
 import uniqueSlug, { toSlug } from '@middleware/slugify/uniqueSlug'
 import { seedDefaultRoleNodes } from '@src/role'
 
-import { getDriver, getNeode } from './neo4j'
+import { getDriver } from './neo4j'
 
 import type { Context } from '@src/context'
 
-const neode = getNeode()
+// The two entities whose factories carry BUILD inputs next to node properties. neode used to
+// drop whatever its model did not declare; nothing does that any more, so the split is made
+// here — visibly, which is the point.
+
+/**
+ * A fixture user.
+ *
+ * The defaults below came from `default:` entries in db/models/User.ts. They are written out
+ * because that model is going away, and because writerParity.spec.ts pins what a factory user
+ * has that a registered one does not — the nine `emailNotifications*` among them. That
+ * divergence is accepted (a migration materialised those properties on every pre-existing
+ * account), so the factory keeps producing it rather than quietly changing what every seeded
+ * database looks like.
+ */
+const createUserNode = async (buildObject) => {
+  // `password` is a build input — the hash derived from it is what the node carries. `role`
+  // selects the Role node to link and was never a property.
+  const { password, role, ...properties } = buildObject
+  void password
+  void role
+  return createNode(User, {
+    deleted: false,
+    disabled: false,
+    allowEmbedIframes: false,
+    showShoutsPublicly: false,
+    emailNotificationsCommentOnObservedPost: true,
+    emailNotificationsMention: true,
+    emailNotificationsChatMessage: true,
+    emailNotificationsGroupMemberJoined: true,
+    emailNotificationsGroupMemberLeft: true,
+    emailNotificationsGroupMemberRemoved: true,
+    emailNotificationsGroupMemberRoleChanged: true,
+    emailNotificationsFollowingUsers: true,
+    emailNotificationsPostInGroup: true,
+    ...properties,
+    // After the spread, because `basicUser` sets slug to null explicitly: registration always
+    // assigns one, and only the `user` factory computed it — the leaner user factories built
+    // users without a slug and neode allowed it.
+    slug: (properties.slug as string) || toSlug(properties.name as string),
+  })
+}
+
+/**
+ * A fixture post, carrying its secondary label.
+ *
+ * `neode.create('Article', ...)` used to do this through `extend('Post', 'Article')`, which is
+ * also where the duplicate Article constraints came from. Here the label is just a label.
+ */
+const createPostNode = async (buildObject) => {
+  // Build inputs that were never Post properties: neode dropped them, so they have never
+  // existed on a single node in any database.
+  const { visibility, imageBlurred, imageAspectRatio, ...properties } = buildObject
+  void visibility
+  void imageBlurred
+  void imageAspectRatio
+  const postType = (properties.postType as string) || 'Article'
+  const now = new Date().toISOString()
+  return createNode(
+    Post,
+    {
+      disabled: false,
+      postType,
+      sortDate: now,
+      ...properties,
+    },
+    [postType],
+  )
+}
 
 const uniqueImageUrl = (imageUrl) => {
   const newUrl = new URL(imageUrl)
@@ -85,15 +170,22 @@ Factory.define('category')
   .attr('id', uuid)
   .attr('icon', 'globe')
   .attr('name', 'Global Peace & Nonviolence')
+  // Every category in a real database has a slug (constants/categories seeds them with one);
+  // the factory never set it, and neode did not mind because the model gave it no default.
+  .attr('slug', ['slug', 'name'], (slug, name) => slug || toSlug(name))
   .after(async (buildObject, _options) => {
-    return neode.create('Category', buildObject)
+    return createNode(Category, buildObject)
   })
 
 Factory.define('badge')
-  .attr('type', 'crowdfunding')
-  .attr('status', 'permanent')
+  .attr('id', 'trophy_default')
+  .attr('type', 'trophy')
+  .attr('icon', '/img/badges/trophy_default.svg')
+  .attr('description', 'A trophy badge')
   .after(async (buildObject, _options) => {
-    return neode.create('Badge', buildObject)
+    // `status: 'permanent'` used to be here. It is not a Badge property and never was — neode
+    // dropped every key its model did not know, so the attr had no effect for years.
+    return createNode(Badge, buildObject)
   })
 
 Factory.define('image')
@@ -111,9 +203,15 @@ Factory.define('image')
         blur: buildObject.blur,
       })
     }
-    buildObject.url = uniqueImageUrl(buildObject.url)
-    buildObject.aspectRatio = buildObject.width / buildObject.height
-    return neode.create('Image', buildObject)
+    const { width, height, blur, ...properties } = buildObject
+    void blur
+    // width/height/blur shape the generated URL; only their ratio is stored. They used to be
+    // handed to neode and dropped there.
+    return createNode(Image, {
+      ...properties,
+      url: uniqueImageUrl(buildObject.url),
+      aspectRatio: width / height,
+    })
   })
 
 Factory.define('file')
@@ -124,8 +222,7 @@ Factory.define('file')
     if (!buildObject.url) {
       buildObject.url = faker.image.urlPicsumPhotos()
     }
-    buildObject.url = uniqueImageUrl(buildObject.url)
-    return neode.create('File', buildObject)
+    return createNode(File, { ...buildObject, url: uniqueImageUrl(buildObject.url) })
   })
 
 Factory.define('basicUser')
@@ -158,7 +255,7 @@ const relateUserToRole = async (user, roleName) => {
   if (!roleName) {
     return
   }
-  const role = await neode.find('Role', roleName)
+  const role = await findNode(Role, 'id', roleName)
   if (role) {
     await user.relateTo(role, 'roles')
   }
@@ -169,7 +266,7 @@ const relateUserToRole = async (user, roleName) => {
 const createUserWithRole = async (buildObject, roleNameOverride) => {
   const roleName = roleNameOverride ?? buildObject.role
   delete buildObject.role
-  const user = await neode.create('User', buildObject)
+  const user = await createUserNode(buildObject)
   await relateUserToRole(user, roleName)
   return user
 }
@@ -223,8 +320,8 @@ Factory.define('user')
     const roleName = options.roleName ?? buildObject.role
     delete buildObject.role
     const [user, email, avatar] = await Promise.all([
-      neode.create('User', buildObject),
-      neode.create('EmailAddress', { email: options.email }),
+      createUserNode(buildObject),
+      createNode(EmailAddress, { email: options.email }),
       options.avatar,
     ])
     await Promise.all([user.relateTo(email, 'primaryEmail'), email.relateTo(user, 'belongsTo')])
@@ -244,12 +341,12 @@ Factory.define('post')
   }) */
   .option('tagIds', [])
   .option('tags', ['tagIds'], async (tagIds) => {
-    return Promise.all(tagIds.map(async (id) => neode.find('Tag', id)))
+    return Promise.all(tagIds.map(async (id) => findNode(Tag, 'id', id)))
   })
   .option('authorId', null)
   .option('author', ['authorId'], (authorId) => {
     if (authorId) {
-      return neode.find('User', authorId)
+      return findNode(User, 'id', authorId)
     }
     return Factory.build('user')
   })
@@ -281,7 +378,7 @@ Factory.define('post')
   })
   .after(async (buildObject, options) => {
     const [post, author, image, /* categories, */ tags] = await Promise.all([
-      neode.create('Article', buildObject),
+      createPostNode(buildObject),
       options.author,
       options.image,
       // options.categories,
@@ -307,7 +404,7 @@ Factory.define('group')
   .option('ownerId', null)
   .option('owner', ['ownerId'], (ownerId) => {
     if (ownerId) {
-      return neode.find('User', ownerId)
+      return findNode(User, 'id', ownerId)
     }
     return Factory.build('user')
   })
@@ -336,7 +433,7 @@ Factory.define('group')
     },
   )
   .after(async (buildObject, options) => {
-    const [group, owner] = await Promise.all([neode.create('Group', buildObject), options.owner])
+    const [group, owner] = await Promise.all([createNode(Group, buildObject), options.owner])
     const session = driver.session()
     try {
       await session.writeTransaction((txc) =>
@@ -362,24 +459,28 @@ Factory.define('comment')
   .option('postId', null)
   .option('post', ['postId'], (postId) => {
     if (postId) {
-      return neode.find('Post', postId)
+      return findNode(Post, 'id', postId)
     }
     return Factory.build('post')
   })
   .option('authorId', null)
   .option('author', ['authorId'], (authorId) => {
     if (authorId) {
-      return neode.find('User', authorId)
+      return findNode(User, 'id', authorId)
     }
     return Factory.build('user')
   })
   .attrs({
     id: uuid,
     content: faker.lorem.sentence,
+    // Came from `default: false` in db/models/Comment.ts. Written out because the resolver
+    // writes them too — writerParity.spec.ts is what caught their absence.
+    deleted: false,
+    disabled: false,
   })
   .after(async (buildObject, options) => {
     const [comment, author, post] = await Promise.all([
-      neode.create('Comment', buildObject),
+      createNode(Comment, buildObject),
       options.author,
       options.post,
     ])
@@ -397,7 +498,7 @@ Factory.define('donations')
   .attr('goal', 15000)
   .attr('progress', 7000)
   .after(async (buildObject, _options) => {
-    return neode.create('Donations', buildObject)
+    return createNode(Donations, buildObject)
   })
 
 const emailDefaults = {
@@ -408,13 +509,16 @@ const emailDefaults = {
 Factory.define('emailAddress')
   .attrs(emailDefaults)
   .after(async (buildObject, _options) => {
-    return neode.create('EmailAddress', buildObject)
+    return createNode(EmailAddress, buildObject)
   })
 
 Factory.define('unverifiedEmailAddress')
-  .attr(emailDefaults)
+  // `.attr(...)` (singular) with an object was a typo: rosie takes a NAME there, so the whole
+  // defaults object became one attribute and the node ended up without an email. Nothing
+  // noticed, because neode dropped the unknown key and the model required nothing.
+  .attrs({ email: faker.internet.email })
   .after(async (buildObject, _options) => {
-    return neode.create('UnverifiedEmailAddress', buildObject)
+    return createNode(UnverifiedEmailAddress, buildObject)
   })
 
 const inviteCodeDefaults = {
@@ -428,19 +532,19 @@ Factory.define('inviteCode')
   .option('groupId', null)
   .option('group', ['groupId'], async (groupId) => {
     if (groupId) {
-      return neode.find('Group', groupId)
+      return findNode(Group, 'id', groupId)
     }
   })
   .option('generatedById', null)
   .option('generatedBy', ['generatedById'], (generatedById) => {
     if (generatedById) {
-      return neode.find('User', generatedById)
+      return findNode(User, 'id', generatedById)
     }
     return Factory.build('user')
   })
   .after(async (buildObject, options) => {
     const [inviteCode, generatedBy, group] = await Promise.all([
-      neode.create('InviteCode', buildObject),
+      createNode(InviteCode, buildObject),
       options.generatedBy,
       options.group,
     ])
@@ -466,27 +570,39 @@ Factory.define('location')
     type: 'country',
   })
   .after(async (buildObject, _options) => {
-    return neode.create('Location', buildObject)
+    return createNode(Location, buildObject)
   })
 
 Factory.define('report').after(async (buildObject, _options) => {
-  return neode.create('Report', buildObject)
+  return createNode(Report, {
+    id: uuid(),
+    rule: 'latestReviewUpdatedAtRules',
+    closed: false,
+    ...buildObject,
+  })
 })
 
 Factory.define('tag')
   .attrs({
-    name: '#human-connection',
+    // The id IS the hashtag — that is how the hashtag middleware writes them. The attr used to
+    // be called `name`, which Tag has never had: neode dropped it, so every tag this factory
+    // built went in WITHOUT an id. Callers that pass `{ id }` were unaffected, which is why it
+    // stayed unnoticed.
+    id: '#human-connection',
+    deleted: false,
+    disabled: false,
   })
   .after(async (buildObject, _options) => {
-    return neode.create('Tag', buildObject)
+    return createNode(Tag, buildObject)
   })
 
 Factory.define('socialMedia')
   .attrs({
+    id: uuid,
     url: 'https://mastodon.social/@Gargron',
   })
   .after(async (buildObject, _options) => {
-    return neode.create('SocialMedia', buildObject)
+    return createNode(SocialMedia, buildObject)
   })
 
 export default Factory
