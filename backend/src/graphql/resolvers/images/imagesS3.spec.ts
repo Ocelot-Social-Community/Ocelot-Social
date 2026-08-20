@@ -5,6 +5,8 @@
 /* eslint-disable jest/no-conditional-expect */
 
 /* eslint-disable @typescript-eslint/no-shadow */
+import { Readable } from 'node:stream'
+
 import { DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 
@@ -153,8 +155,9 @@ describe('mergeImage', () => {
 
   describe('given image.upload', () => {
     beforeEach(() => {
-      // `Upload` is mocked, so the stream is only handed over as `Body` and never read.
-      const createReadStream: FileUpload['createReadStream'] = () => ({})
+      // `Upload` is mocked, so the stream is only handed over as `Body` and never consumed.
+      // It is still a real readable stream so the mock honours the `Body` contract.
+      const createReadStream: FileUpload['createReadStream'] = () => Readable.from([])
       imageInput = {
         ...imageInput,
         upload: Promise.resolve({
