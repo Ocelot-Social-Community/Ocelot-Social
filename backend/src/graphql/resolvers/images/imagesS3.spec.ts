@@ -220,9 +220,11 @@ describe('mergeImage', () => {
           `MATCH(p:Post {id: "p99"})-[:HERO_IMAGE]->(i:Image) RETURN i,p`,
           {},
         )
-        post = neode.hydrateFirst(result, 'p', neode.model('Post')).properties()
+        // Locals rather than the shared `post`: hydrateFirst answers null when the node is
+        // gone, and this test only wants to know that both are there.
+        const hydratedPost = neode.hydrateFirst(result, 'p', neode.model('Post'))
         const image = neode.hydrateFirst(result, 'i', neode.model('Image'))
-        expect(post).toBeTruthy()
+        expect(hydratedPost).toBeTruthy()
         expect(image).toBeTruthy()
       })
 

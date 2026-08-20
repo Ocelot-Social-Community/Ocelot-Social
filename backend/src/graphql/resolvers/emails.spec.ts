@@ -285,7 +285,8 @@ describe('VerifyEmailAddress', () => {
             await mutate({ mutation: VerifyEmailAddress, variables })
             result = await database.neode.cypher(cypherStatement, {})
             email = database.neode.hydrateFirst(result, 'e', database.neode.model('EmailAddress'))
-            expect(email).toBe(false)
+            // `false` was neode's way of saying "no such node"; the fixture API answers null.
+            expect(email).toBeNull()
           })
 
           it('removes previous `EmailAddress` node', async () => {
@@ -305,7 +306,8 @@ describe('VerifyEmailAddress', () => {
             await mutate({ mutation: VerifyEmailAddress, variables })
             result = await database.neode.cypher(cypherStatement, {})
             email = database.neode.hydrateFirst(result, 'e', database.neode.model('EmailAddress'))
-            expect(email).toBe(false)
+            // `false` was neode's way of saying "no such node"; the fixture API answers null.
+            expect(email).toBeNull()
           })
 
           describe('Edge case: In the meantime someone created an `EmailAddress` node with the given email belonging to a user', () => {

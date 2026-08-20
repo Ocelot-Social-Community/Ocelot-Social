@@ -13,8 +13,6 @@ import { TEST_CONFIG } from '@root/test/helpers'
 import { decode } from './decode'
 import { encode } from './encode'
 
-import type User from '@db/models/User'
-
 const driver = getDriver()
 const neode = getNeode()
 const config = {
