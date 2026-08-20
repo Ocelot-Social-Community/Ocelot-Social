@@ -3,7 +3,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable jest/no-conditional-expect */
-/* eslint-disable promise/prefer-await-to-callbacks */
 
 /* eslint-disable @typescript-eslint/no-shadow */
 import { DeleteObjectCommand } from '@aws-sdk/client-s3'
@@ -154,13 +153,8 @@ describe('mergeImage', () => {
 
   describe('given image.upload', () => {
     beforeEach(() => {
-      const createReadStream: FileUpload['createReadStream'] = () => ({
-        pipe: () => ({
-          on: (_: unknown, callback: () => void) => {
-            callback()
-          },
-        }),
-      })
+      // `Upload` is mocked, so the stream is only handed over as `Body` and never read.
+      const createReadStream: FileUpload['createReadStream'] = () => ({})
       imageInput = {
         ...imageInput,
         upload: Promise.resolve({

@@ -1,4 +1,3 @@
-/* eslint-disable promise/prefer-await-to-callbacks */
 import { Upload } from '@aws-sdk/lib-storage'
 
 import { s3Service } from './s3Service'
@@ -24,13 +23,8 @@ jest.mock('@aws-sdk/lib-storage', () => {
 
 const uploadMock = Upload as unknown as jest.Mock
 
-const createReadStream: FileUpload['createReadStream'] = () => ({
-  pipe: () => ({
-    on: (_: unknown, callback: () => void) => {
-      callback()
-    },
-  }),
-})
+// `Upload` is mocked, so the stream is only handed over as `Body` and never read.
+const createReadStream: FileUpload['createReadStream'] = () => ({})
 const input = {
   uniqueFilename: 'unique-filename.jpg',
   mimetype: 'image/jpeg',
