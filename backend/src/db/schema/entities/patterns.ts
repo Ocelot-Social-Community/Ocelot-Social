@@ -29,3 +29,12 @@ export const ISO_DATE_TIME =
  * than accepting an odd one — delivery is the real validator.
  */
 export const EMAIL = '^[^@\\s]+@[^@\\s.]+([.][^@\\s.]+)+$'
+
+/**
+ * A URI with an explicit scheme: `https://example.org`, `mailto:someone@example.org`.
+ *
+ * Replaces neode's Joi `uri: true` on SocialMedia.url. Deliberately not a full RFC 3986
+ * grammar — the rule that matters is "a scheme and something after it", which is what
+ * separates a link a browser can follow from the string `not-a-url`.
+ */
+export const URI = '^[a-zA-Z][a-zA-Z0-9+.-]*:[^\\s]+$'
