@@ -464,6 +464,47 @@ describe('slugifyMiddleware', () => {
       })
     })
 
+    describe('not setting a slug explicitly (the actual frontend never sends one)', () => {
+      it('keeps the post\'s own existing slug instead of colliding with itself and appending "-1"', async () => {
+        await expect(
+          mutate({
+            mutation: UpdatePost,
+            variables: {
+              id: createPostResult.data.CreatePost.id,
+              title: 'I am a brand new post',
+              content: 'Some edited content',
+            },
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            UpdatePost: {
+              slug: 'i-am-a-brand-new-post',
+            },
+          },
+          errors: undefined,
+        })
+      })
+
+      it('stays stable across repeated saves (no incrementing suffix on every save)', async () => {
+        const editVariables = {
+          id: createPostResult.data.CreatePost.id,
+          title: 'I am a brand new post',
+          content: 'Some edited content',
+        }
+        await mutate({ mutation: UpdatePost, variables: editVariables })
+        await expect(
+          mutate({ mutation: UpdatePost, variables: editVariables }),
+        ).resolves.toMatchObject({
+          data: {
+            UpdatePost: {
+              slug: 'i-am-a-brand-new-post',
+            },
+          },
+          errors: undefined,
+        })
+      })
+    })
+
     describe('if new slug exists in another post', () => {
       beforeEach(async () => {
         await Factory.build(
