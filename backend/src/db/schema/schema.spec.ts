@@ -1,11 +1,12 @@
 import { Ajv } from 'ajv'
 
+import { targetsOf } from './derive/rules'
 import { jsonSchemaFor, relationshipJsonSchemaFor } from './types'
 
 import { entities, labels, relationships, relationshipTypes, User } from './index'
 
 import type { Post, Role } from './index'
-import type { EntityProperties } from './types'
+import type { EntityProperties, RelationshipDefinition } from './types'
 
 const ajv = new Ajv({ allErrors: true })
 
@@ -35,8 +36,21 @@ describe('the declaration', () => {
   it('connects only declared entities', () => {
     for (const relationship of relationships) {
       expect(labels()).toContain(relationship.from.label)
-      expect(labels()).toContain(relationship.to.label)
+      for (const target of targetsOf(relationship)) {
+        expect(labels()).toContain(target.label)
+      }
     }
+  })
+
+  it('allows a relationship to name several target entities', () => {
+    // WROTE points at both Post and Comment; a single-target declaration would report every
+    // comment edge as an endpoint violation.
+    const wrote = relationships.find((relationship) => relationship.type === 'WROTE')
+    expect(wrote).toBeDefined()
+    expect(targetsOf(wrote as RelationshipDefinition).map((entity) => entity.label)).toEqual([
+      'Post',
+      'Comment',
+    ])
   })
 
   it('exposes secondary labels, so (:Post:Article) is not reported as unknown', () => {

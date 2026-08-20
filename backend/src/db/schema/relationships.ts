@@ -1,3 +1,4 @@
+import { Comment } from './entities/Comment'
 import { ISO_DATE_TIME } from './entities/patterns'
 import { Post } from './entities/Post'
 import { Role } from './entities/Role'
@@ -21,10 +22,11 @@ export const HAS_ROLE = defineRelationship({
   cardinality: 'exactly-one',
 })
 
+// Polymorphic: 158 edges point at posts, 101 at comments in a seeded database.
 export const WROTE = defineRelationship({
   type: 'WROTE',
   from: User,
-  to: Post,
+  to: [Post, Comment],
   cardinality: 'many',
 })
 

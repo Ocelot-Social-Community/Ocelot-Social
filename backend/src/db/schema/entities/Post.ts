@@ -37,6 +37,8 @@ export const Post = defineEntity({
     postType: { type: 'string', enum: ['Article', 'Event'] },
   },
   required: ['id', 'title', 'content', 'postType', 'createdAt', 'updatedAt'],
-  unique: ['slug'],
+  // Both are `primary`/`unique` in db/models/Post.ts and both constraints exist in the
+  // database — `id` was missing here until the audit run compared the two.
+  unique: ['id', 'slug'],
   fulltext: [{ name: 'post_fulltext_search', properties: ['title', 'content'] }],
 })

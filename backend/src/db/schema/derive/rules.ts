@@ -22,7 +22,7 @@ export type Rule =
   | { kind: 'minimum'; label: string; property: string; minimum: number }
   | { kind: 'enum'; label: string; property: string; values: readonly unknown[] }
   | { kind: 'cardinality'; type: string; from: string; cardinality: Cardinality }
-  | { kind: 'endpoints'; type: string; from: string; to: string }
+  | { kind: 'endpoints'; type: string; from: string; to: string[] }
 
 // `typeof` rather than Array.isArray: the latter widens a `readonly PropertyType[]` to
 // `any[]`, which then infects every array built from it.
@@ -68,13 +68,19 @@ export const rulesForEntity = (entity: EntityDefinition): Rule[] => {
   return rules
 }
 
+/** The permitted target entities of a relationship, always as a list. */
+export const targetsOf = (relationship: RelationshipDefinition): readonly EntityDefinition[] =>
+  Array.isArray(relationship.to)
+    ? (relationship.to as readonly EntityDefinition[])
+    : [relationship.to as EntityDefinition]
+
 export const rulesForRelationship = (relationship: RelationshipDefinition): Rule[] => {
   const rules: Rule[] = [
     {
       kind: 'endpoints',
       type: relationship.type,
       from: relationship.from.label,
-      to: relationship.to.label,
+      to: targetsOf(relationship).map((entity) => entity.label),
     },
   ]
   // `many` states no restriction, so it yields no rule. Emitting one would leave a rule that

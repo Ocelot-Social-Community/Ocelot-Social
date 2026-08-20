@@ -88,8 +88,9 @@ describe('generated queries', () => {
   })
 
   it('counts edges between the wrong labels', () => {
-    expect(audit('[:WROTE] endpoints User->Post')?.cypher).toBe(
-      'MATCH (a)-[r:WROTE]->(b) WHERE NOT a:User OR NOT b:Post RETURN count(r) AS violations',
+    expect(audit('[:WROTE] endpoints User->Post|Comment')?.cypher).toBe(
+      'MATCH (a)-[r:WROTE]->(b) WHERE NOT a:User OR (NOT b:Post AND NOT b:Comment) ' +
+        'RETURN count(r) AS violations',
     )
   })
 
