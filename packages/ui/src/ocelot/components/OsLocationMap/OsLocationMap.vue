@@ -30,26 +30,17 @@
     label: string
   }
 
-  // The native `crosshair` cursor renders quite small in most browsers. A
-  // custom cursor image (white outline + black fill, so it stays visible
-  // over both light and dark map styles) is easier to spot while the
-  // pick-location tool is armed. Hotspot is the exact center (16, 16). The
-  // ring and tick marks are kept clear of the center point itself (an open
-  // gap, no fill/dot) so the exact click position stays unobstructed.
+  // Same glyph as the app's own filled map-pin icon (icons/svgs/map-pin-filled.svg)
+  // — a solid shape reads better at small sizes than the thin outline
+  // map-marker glyph used elsewhere. White outline keeps it visible over
+  // both light and dark map styles. Hotspot (10, 30) sits at the pin's tip —
+  // the point that actually touches the map — not the image center.
   const PICKER_CURSOR_SVG =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">' +
-    '<g fill="none" stroke="white" stroke-width="4" stroke-linecap="round">' +
-    '<circle cx="16" cy="16" r="6"/>' +
-    '<line x1="16" y1="2" x2="16" y2="7"/><line x1="16" y1="25" x2="16" y2="30"/>' +
-    '<line x1="2" y1="16" x2="7" y2="16"/><line x1="25" y1="16" x2="30" y2="16"/>' +
-    '</g>' +
-    '<g fill="none" stroke="black" stroke-width="2" stroke-linecap="round">' +
-    '<circle cx="16" cy="16" r="6"/>' +
-    '<line x1="16" y1="2" x2="16" y2="7"/><line x1="16" y1="25" x2="16" y2="30"/>' +
-    '<line x1="2" y1="16" x2="7" y2="16"/><line x1="25" y1="16" x2="30" y2="16"/>' +
-    '</g>' +
+    '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="33" viewBox="0 0 20 33">' +
+    '<path d="M19.25,10.4a13.0663,13.0663,0,0,1-1.4607,5.2235,41.5281,41.5281,0,0,1-3.2459,5.5483c-1.1829,1.7369-2.3662,3.2784-3.2541,4.3859-.4438.5536-.8135.9984-1.0721,1.3046-.0844.1-.157.1852-.2164.2545-.06-.07-.1325-.1564-.2173-.2578-.2587-.3088-.6284-.7571-1.0723-1.3147-.8879-1.1154-2.0714-2.6664-3.2543-4.41a42.2677,42.2677,0,0,1-3.2463-5.5535A12.978,12.978,0,0,1,.75,10.4,9.4659,9.4659,0,0,1,10,.75,9.4659,9.4659,0,0,1,19.25,10.4Z" fill="black" stroke="white" stroke-width="1.5"/>' +
+    '<path d="M13.55,10A3.55,3.55,0,1,1,10,6.45,3.5484,3.5484,0,0,1,13.55,10Z" fill="#fff"/>' +
     '</svg>'
-  const PICKER_CURSOR = `url("data:image/svg+xml,${encodeURIComponent(PICKER_CURSOR_SVG)}") 16 16, crosshair`
+  const PICKER_CURSOR = `url("data:image/svg+xml,${encodeURIComponent(PICKER_CURSOR_SVG)}") 10 30, crosshair`
 
   /**
    * Interactive map preview with a single, optionally movable pin.
@@ -350,12 +341,18 @@
             toggle.title = props.pickLocationLabel
             toggle.setAttribute('aria-label', props.pickLocationLabel)
             toggle.setAttribute('aria-pressed', 'false')
+            // Same filled map-pin glyph as the cursor above — a solid shape
+            // reads more clearly at this small toolbar size than the thin
+            // outline map-marker glyph used elsewhere in the app. viewBox is
+            // cropped tighter than the source icon's own 0 0 20 33 (measured
+            // ink bounds: y 0.83–29.77) — the extra ~3 units below the tip
+            // were sized for that icon's own drop-shadow ellipse, which this
+            // toolbar rendering drops; left uncropped it pushed the visible
+            // shape up and shrank it inside the square aspect-fit box.
             toggle.innerHTML =
-              '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" ' +
-              'stroke-width="2" stroke-linecap="round" aria-hidden="true">' +
-              '<circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/>' +
-              '<line x1="12" y1="1.5" x2="12" y2="4.5"/><line x1="12" y1="19.5" x2="12" y2="22.5"/>' +
-              '<line x1="1.5" y1="12" x2="4.5" y2="12"/><line x1="19.5" y1="12" x2="22.5" y2="12"/>' +
+              '<svg viewBox="0 0 20 30.5" width="16" height="24" aria-hidden="true">' +
+              '<path d="M19.25,10.4a13.0663,13.0663,0,0,1-1.4607,5.2235,41.5281,41.5281,0,0,1-3.2459,5.5483c-1.1829,1.7369-2.3662,3.2784-3.2541,4.3859-.4438.5536-.8135.9984-1.0721,1.3046-.0844.1-.157.1852-.2164.2545-.06-.07-.1325-.1564-.2173-.2578-.2587-.3088-.6284-.7571-1.0723-1.3147-.8879-1.1154-2.0714-2.6664-3.2543-4.41a42.2677,42.2677,0,0,1-3.2463-5.5535A12.978,12.978,0,0,1,.75,10.4,9.4659,9.4659,0,0,1,10,.75,9.4659,9.4659,0,0,1,19.25,10.4Z" fill="currentColor"/>' +
+              '<path d="M13.55,10A3.55,3.55,0,1,1,10,6.45,3.5484,3.5484,0,0,1,13.55,10Z" fill="#fff"/>' +
               '</svg>'
             toggle.addEventListener('click', (e) => {
               e.stopPropagation()
@@ -878,7 +875,11 @@
 
   .os-location-map-picker-toggle--active {
     background: rgba(0, 0, 0, 0.1);
-    color: #1a73e8;
+    /* Deliberately not --color-primary — that's the app's brand accent
+       (green in this app), which reads as a totally different, unrelated
+       signal here. This is the same "map tool armed" blue used before,
+       just promoted to its own overridable custom property. */
+    color: var(--os-location-map-picker-active-color, #1a73e8);
   }
 
   .os-location-map-view-on-map {
