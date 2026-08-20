@@ -158,7 +158,7 @@ describe('CreateComment', () => {
   describe('authenticated', () => {
     beforeEach(async () => {
       const user = await database.neode.create('User', { name: 'Author' })
-      authenticatedUser = (await user.toJson()) as Context['user']
+      authenticatedUser = (await user.toJson()) as unknown as Context['user']
     })
 
     describe('given a post', () => {

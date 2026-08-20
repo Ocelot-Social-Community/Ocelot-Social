@@ -290,10 +290,10 @@ describe('decode', () => {
       })
 
       it('does not set `lastActiveAt`', async () => {
-        let user = await neode.first<typeof User>('User', { id: 'u3' }, undefined)
+        let user = await neode.first('User', { id: 'u3' }, undefined)
         await expect(user.toJson()).resolves.not.toHaveProperty('lastActiveAt')
         await decode(context)(validAuthorizationHeader)
-        user = await neode.first<typeof User>('User', { id: 'u3' }, undefined)
+        user = await neode.first('User', { id: 'u3' }, undefined)
         await expect(user.toJson()).resolves.not.toHaveProperty('lastActiveAt')
       })
 
@@ -309,7 +309,7 @@ describe('decode', () => {
           lastActiveAt: '2019-10-03T23:33:08.598Z',
         })
         await decode(context)(validAuthorizationHeader)
-        user = await neode.first<typeof User>('User', { id: 'u3' }, undefined)
+        user = await neode.first('User', { id: 'u3' }, undefined)
         await expect(user.toJson()).resolves.toMatchObject({
           lastActiveAt: '2019-10-03T23:33:08.598Z',
         })
