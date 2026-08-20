@@ -520,6 +520,23 @@
           failIfMajorPerformanceCaveat: false,
         })
 
+        // mapbox-gl stacks same-corner controls in the order they're added
+        // (each addControl() appends below the previous one) — the
+        // pick-location/view-on-map tool is added first so it lands at the
+        // very top of the top-right stack, above the secondary
+        // zoom/fullscreen/geolocate/style controls below it.
+        if (props.editable) {
+          map.addControl(buildLocationPicker(), 'top-right')
+          document.addEventListener('keydown', onDocumentKeydown)
+          setPicking(!hasPin.value)
+        }
+
+        if (props.viewOnMap) {
+          // Same corner the pick-location tool would use — the two are not
+          // meant to be active at once (editable vs. read-only display).
+          map.addControl(buildViewOnMapControl(), 'top-right')
+        }
+
         map.addControl(new props.mapboxGl.NavigationControl(), 'top-right')
         map.addControl(new props.mapboxGl.FullscreenControl(), 'top-right')
         map.addControl(
@@ -528,22 +545,8 @@
         )
         map.addControl(new props.mapboxGl.ScaleControl(), 'bottom-left')
 
-        if (props.editable) {
-          // Takes over the search's usual top-left spot when there's no
-          // search box to collide with — it's the primary control then.
-          map.addControl(buildLocationPicker(), props.showSearch ? 'top-right' : 'top-left')
-          document.addEventListener('keydown', onDocumentKeydown)
-          setPicking(!hasPin.value)
-        }
-
         if (props.styles.length > 1) {
           map.addControl(buildStyleSwitcher(), 'top-right')
-        }
-
-        if (props.viewOnMap) {
-          // Same corner the pick-location tool would use — the two are not
-          // meant to be active at once (editable vs. read-only display).
-          map.addControl(buildViewOnMapControl(), 'top-left')
         }
 
         // A <button> with no explicit `type` defaults to type="submit". Inside
@@ -877,9 +880,10 @@
     background: rgba(0, 0, 0, 0.1);
     /* Deliberately not --color-primary — that's the app's brand accent
        (green in this app), which reads as a totally different, unrelated
-       signal here. This is the same "map tool armed" blue used before,
-       just promoted to its own overridable custom property. */
-    color: var(--os-location-map-picker-active-color, #1a73e8);
+       signal here. This is the shared "map tool" accent blue, its own
+       overridable custom property (also used by the view-on-map button
+       below). */
+    color: var(--os-location-map-accent-color, rgb(0, 142, 230));
   }
 
   .os-location-map-view-on-map {
@@ -898,6 +902,9 @@
     border: none;
     background: none;
     cursor: pointer;
+    /* Neutral, same as the picker toggle's own resting state — this button
+       has no armed/active state of its own (it's a one-shot action, not a
+       toggle), so it shouldn't wear the "tool is active" accent color. */
     color: #333;
   }
 

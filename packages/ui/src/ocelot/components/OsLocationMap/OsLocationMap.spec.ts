@@ -309,7 +309,7 @@ describe('osLocationMap', () => {
     expect(findControlWithOnAdd()).toBeUndefined()
   })
 
-  it('places the pick-location tool top-left when search is hidden, top-right otherwise', () => {
+  it('places the pick-location tool top-right regardless of whether search is shown', () => {
     mount(OsLocationMap, {
       props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', editable: true },
     })
@@ -317,7 +317,7 @@ describe('osLocationMap', () => {
       ([control]) => typeof control?.onAdd === 'function',
     )
 
-    expect(withoutSearchCall?.[1]).toBe('top-left')
+    expect(withoutSearchCall?.[1]).toBe('top-right')
 
     ctx = createMockMapboxGl()
     mount(OsLocationMap, {

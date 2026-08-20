@@ -188,6 +188,10 @@ export default {
 @import 'mapbox-gl/dist/mapbox-gl.css';
 
 .event-location-map {
-  height: 260px;
+  /* All map tools (zoom, fullscreen, geolocate, pick-location/view-on-map,
+     style-switcher) now stack in the top-right corner instead of splitting
+     across both sides — taller than before so that stack doesn't crowd out
+     the visible map/pin area. */
+  height: 280px;
 }
 </style>
