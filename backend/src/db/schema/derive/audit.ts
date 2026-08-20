@@ -115,14 +115,17 @@ export const auditFor = (rule: Rule, profile: BackendProfile): AuditQuery | null
       }
     }
 
-    case 'endpoints':
+    case 'endpoints': {
+      // A target list is a disjunction: the edge is fine if it points at ANY declared label.
+      const wrongTarget = rule.to.map((label) => `NOT b:${label}`).join(' AND ')
       return {
-        violation: `[:${rule.type}] endpoints ${rule.from}->${rule.to}`,
+        violation: `[:${rule.type}] endpoints ${rule.from}->${rule.to.join('|')}`,
         cypher:
           `MATCH (a)-[r:${rule.type}]->(b) ` +
-          `WHERE NOT a:${rule.from} OR NOT b:${rule.to} ` +
+          `WHERE NOT a:${rule.from} OR (${wrongTarget}) ` +
           `RETURN count(r) AS violations`,
       }
+    }
   }
 }
 

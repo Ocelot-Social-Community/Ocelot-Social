@@ -1,3 +1,4 @@
+import { Comment } from './entities/Comment'
 import { Post } from './entities/Post'
 import { Role } from './entities/Role'
 import { User } from './entities/User'
@@ -17,10 +18,10 @@ import type { EntityDefinition } from './types'
 // that is what makes `unique: ['slugg']` a compile error and EntityProperties<typeof User>
 // exact — but a narrow tuple hides every optional key from code that iterates the registry.
 // Consumers that need the exact shape import the entity itself.
-export const entities: readonly EntityDefinition[] = [User, Role, Post]
+export const entities: readonly EntityDefinition[] = [User, Role, Post, Comment]
 
 export { relationships }
-export { Post, Role, User }
+export { Comment, Post, Role, User }
 
 /** Every label the database may carry, primary and secondary. */
 export const labels = (): string[] => [

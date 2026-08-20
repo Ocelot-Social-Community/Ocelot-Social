@@ -49,7 +49,12 @@ export type Cardinality =
 export interface RelationshipDefinition {
   readonly type: string
   readonly from: EntityDefinition
-  readonly to: EntityDefinition
+  /**
+   * The permitted target entities. A list because relationship types are polymorphic in this
+   * graph: `WROTE` points at both Post and Comment, and declaring one of them reports the
+   * other as an endpoint violation (found by the first audit run against seeded data).
+   */
+  readonly to: EntityDefinition | readonly EntityDefinition[]
   /** Seen from `from`. */
   readonly cardinality: Cardinality
   readonly properties?: Readonly<Record<string, PropertySchema>>
