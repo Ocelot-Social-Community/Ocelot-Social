@@ -143,15 +143,23 @@ describe('User', () => {
     const onlyFactory = Object.keys(viaFactory).filter((key) => !(key in viaResolver))
     const onlyResolver = Object.keys(viaResolver).filter((key) => !(key in viaFactory))
 
-    // Pinned, not endorsed. Every entry is a neode model default that the signup Cypher
-    // (resolvers/registration.ts:70-79) does not set: a REGISTERED user has none of the nine
-    // e-mail notification switches, while every SEEDED user has all nine set to true.
+    // ACCEPTED divergence — do not "fix" either side without deciding it again.
     //
-    // Harmless today only because both readers spell the default out —
-    // notificationsMiddleware.ts:31 and users.ts:644 both do `?? true`. It stops being
-    // harmless the moment someone writes `if (user.emailNotificationsMention)` or filters in
-    // Cypher with `= true`, which would silently exclude every real account while every test,
-    // written against seeded data, keeps passing. That asymmetry is the point of this test.
+    // A registered user has none of the nine e-mail notification switches, because the signup
+    // Cypher (resolvers/registration.ts:70-79) does not set them; every factory-built user has
+    // all nine, because db/models/User.ts declares them with `default: true`.
+    //
+    // Neither side is simply wrong. Migration 20250405030454 materialised the nine properties
+    // on every user that existed then, so a production database holds them for pre-migration
+    // accounts and lacks them for everyone registered since — the factory matches the former,
+    // the resolver the latter.
+    //
+    // Both readers spell the default out (notificationsMiddleware.ts:31 and users.ts:644 do
+    // `?? true`) and no Cypher filters on the properties, so the difference is inert today.
+    // What is NOT inert: writing `if (user.emailNotificationsMention)` or filtering with
+    // `= true` in Cypher would silently drop every post-migration account while every test —
+    // written against seeded data, which has the properties — stays green. This assertion
+    // exists so that trap is visible in the codebase rather than in production.
     expect(onlyFactory.sort()).toEqual(
       [
         'emailNotificationsChatMessage',
