@@ -12,7 +12,13 @@
 
     /* Language and Environment */
     "target": "es2016" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
-    // "lib": [],                                        /* Specify a set of bundled library declaration files that describe the target runtime environment. */
+    /* Spelled out only because `new Error(msg, { cause })` needs ES2022's Error overload; the
+       runtime has had `cause` since Node 16.9, well below the `engines` floor of 20.12.1.
+       `target` stays at es2016, so the emitted JS is unchanged, and every other type stays on
+       ES2016 semantics. DOM and DOM.Iterable are restated because naming `lib` at all replaces
+       the implicit `lib.es2016.full`, which had supplied them — `Image` and `Headers.entries()`
+       are used in specs. */
+    "lib": ["ES2016", "ES2022.Error", "DOM", "DOM.Iterable"],
     // "jsx": "preserve",                                /* Specify what JSX code is generated. */
     // "experimentalDecorators": true,                   /* Enable experimental support for legacy experimental decorators. */
     // "emitDecoratorMetadata": true,                    /* Emit design-type metadata for decorated declarations in source files. */

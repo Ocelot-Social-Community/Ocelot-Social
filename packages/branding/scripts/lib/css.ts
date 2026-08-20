@@ -33,13 +33,19 @@ export function customPropertiesIn(
 ): Record<string, string> {
   const out: Record<string, string> = {}
   postcss.parse(css).walkRules((rule) => {
-    if (topLevelOnly && rule.parent?.type !== 'root') return
+    if (topLevelOnly && rule.parent?.type !== 'root') {
+      return
+    }
     // `:root`, `:root:root` (what a brand override uses), `:root, :root` — root and nothing else.
-    if (!rule.selectors.every((s) => /^(:root)+$/.test(s))) return
+    if (!rule.selectors.every((s) => /^(:root)+$/.test(s))) {
+      return
+    }
     // `each`, not `walkDecls`: only this rule's OWN declarations. A nested `:root { .card { --x: 1 } }`
     // declares `--x` on `.card`, not on the root.
     rule.each((node) => {
-      if (node.type !== 'decl' || !node.prop.startsWith('--')) return
+      if (node.type !== 'decl' || !node.prop.startsWith('--')) {
+        return
+      }
       out[node.prop.slice(2)] = node.value.trim().replace(/\s+/g, ' ')
     })
   })

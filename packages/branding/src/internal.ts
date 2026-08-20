@@ -48,11 +48,15 @@ export function deepMerge(
   const result: Record<string, unknown> = {}
   const patchKeys = new Set(Object.keys(patch))
   for (const key of Object.keys(base)) {
-    if (isForbiddenMergeKey(key) || patchKeys.has(key)) continue
+    if (isForbiddenMergeKey(key) || patchKeys.has(key)) {
+      continue
+    }
     result[key] = clone(base[key]) // base-only branch → own copy, never alias base
   }
   for (const key of patchKeys) {
-    if (isForbiddenMergeKey(key)) continue // prototype-pollution guard
+    if (isForbiddenMergeKey(key)) {
+      continue
+    } // prototype-pollution guard
     const baseValue = base[key]
     const patchValue = patch[key]
     result[key] =

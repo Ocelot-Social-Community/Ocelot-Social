@@ -16,6 +16,7 @@ Module._extensions['.gql'] = function (_module: typeof module, filename: string)
   } catch (error: unknown) {
     throw new Error(
       `Failed to parse ${filename}: ${error instanceof Error ? error.message : String(error)}`,
+      { cause: error },
     )
   }
 }

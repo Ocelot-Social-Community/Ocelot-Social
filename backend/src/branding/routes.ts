@@ -112,7 +112,7 @@ export function brandingRouter(
     }
     // The baked default of THIS deployment. Empty when no brand was baked in — a client then falls
     // through to its own env pin or to vanilla, exactly as it would without a marker on disk.
-    let defaultId = ''
+    let defaultId: string
     try {
       defaultId = hasRoots ? readDefaultMarker(dir) : ''
     } catch {

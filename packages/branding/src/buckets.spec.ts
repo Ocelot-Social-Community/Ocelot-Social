@@ -19,7 +19,9 @@ import { defineBranding } from '../dist/merge.js'
 // Collect every leaf dot-path of a config (empty objects/arrays count as leaves).
 function leaves(obj, prefix, out) {
   if (obj !== null && typeof obj === 'object' && !Array.isArray(obj) && Object.keys(obj).length) {
-    for (const k of Object.keys(obj)) leaves(obj[k], prefix ? `${prefix}.${k}` : k, out)
+    for (const k of Object.keys(obj)) {
+      leaves(obj[k], prefix ? `${prefix}.${k}` : k, out)
+    }
   } else {
     out.push(prefix)
   }
