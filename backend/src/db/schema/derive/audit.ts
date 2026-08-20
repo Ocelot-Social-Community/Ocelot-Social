@@ -1,7 +1,8 @@
 import { statementFor } from './ddl'
+import { scopeLabel } from './rules'
 
 import type { BackendProfile } from './ddl'
-import type { Rule } from './rules'
+import type { Rule, Scope } from './rules'
 import type { PropertyType } from '@db/schema/types'
 
 // The complement of derive/ddl.ts: a Cypher query per rule the backend cannot enforce.
@@ -22,12 +23,18 @@ const CYPHER_TYPE_PREDICATE = new Map<PropertyType, (value: string) => string>([
   ['string', (value) => `apoc.meta.cypher.type(${value}) <> 'STRING'`],
   ['boolean', (value) => `apoc.meta.cypher.type(${value}) <> 'BOOLEAN'`],
   ['integer', (value) => `apoc.meta.cypher.type(${value}) <> 'INTEGER'`],
-  ['number', (value) => `apoc.meta.cypher.type(${value}) NOT IN ['INTEGER', 'FLOAT']`],
+  // `x NOT IN [...]` is not Cypher; the negation goes in front of the whole predicate.
+  ['number', (value) => `NOT apoc.meta.cypher.type(${value}) IN ['INTEGER', 'FLOAT']`],
+  ['datetime', (value) => `apoc.meta.cypher.type(${value}) <> 'DATE_TIME'`],
 ])
 
-const nodeAudit = (label: string, violation: string, where: string): AuditQuery => ({
+// Both scopes bind the alias `n`, so every predicate is written once and reads the same.
+const matchFor = (scope: Scope): string =>
+  'node' in scope ? `MATCH (n:${scope.node})` : `MATCH ()-[n:${scope.edge}]->()`
+
+const propertyAudit = (scope: Scope, violation: string, where: string): AuditQuery => ({
   violation,
-  cypher: `MATCH (n:${label}) WHERE ${where} RETURN count(n) AS violations`,
+  cypher: `${matchFor(scope)} WHERE ${where} RETURN count(n) AS violations`,
 })
 
 const literal = (value: unknown): string =>
@@ -51,9 +58,9 @@ export const auditFor = (rule: Rule, profile: BackendProfile): AuditQuery | null
     }
 
     case 'exists':
-      return nodeAudit(
-        rule.label,
-        `${rule.label}.${rule.property} exists`,
+      return propertyAudit(
+        rule.scope,
+        `${scopeLabel(rule.scope)}.${rule.property} exists`,
         `n.${rule.property} IS NULL`,
       )
 
@@ -67,62 +74,65 @@ export const auditFor = (rule: Rule, profile: BackendProfile): AuditQuery | null
       if (predicates.length !== types.length || predicates.length === 0) {
         return null
       }
-      return nodeAudit(
-        rule.label,
-        `${rule.label}.${rule.property} type`,
+      return propertyAudit(
+        rule.scope,
+        `${scopeLabel(rule.scope)}.${rule.property} type`,
         `n.${rule.property} IS NOT NULL AND ${predicates.join(' AND ')}`,
       )
     }
 
     case 'pattern':
-      return nodeAudit(
-        rule.label,
-        `${rule.label}.${rule.property} pattern`,
+      return propertyAudit(
+        rule.scope,
+        `${scopeLabel(rule.scope)}.${rule.property} pattern`,
         `n.${rule.property} IS NOT NULL AND NOT n.${rule.property} =~ '${rule.pattern}'`,
       )
 
     case 'minLength':
-      return nodeAudit(
-        rule.label,
-        `${rule.label}.${rule.property} minLength`,
+      return propertyAudit(
+        rule.scope,
+        `${scopeLabel(rule.scope)}.${rule.property} minLength`,
         `n.${rule.property} IS NOT NULL AND size(n.${rule.property}) < ${String(rule.minLength)}`,
       )
 
     case 'minimum':
-      return nodeAudit(
-        rule.label,
-        `${rule.label}.${rule.property} minimum`,
+      return propertyAudit(
+        rule.scope,
+        `${scopeLabel(rule.scope)}.${rule.property} minimum`,
         `n.${rule.property} IS NOT NULL AND n.${rule.property} < ${String(rule.minimum)}`,
       )
 
     case 'enum': {
       const allowed = rule.values.filter((value) => value !== null)
-      return nodeAudit(
-        rule.label,
-        `${rule.label}.${rule.property} enum`,
+      return propertyAudit(
+        rule.scope,
+        `${scopeLabel(rule.scope)}.${rule.property} enum`,
         `n.${rule.property} IS NOT NULL AND NOT n.${rule.property} IN [${allowed.map(literal).join(', ')}]`,
       )
     }
 
     case 'cardinality': {
       const comparison = rule.cardinality === 'exactly-one' ? '<> 1' : '> 1'
+      const isSource = rule.from.map((label) => `n:${label}`).join(' OR ')
       return {
-        violation: `${rule.from}-[:${rule.type}] ${rule.cardinality}`,
+        violation: `${rule.from.join('|')}-[:${rule.type}] ${rule.cardinality}`,
         cypher:
-          `MATCH (n:${rule.from}) ` +
+          `MATCH (n) WHERE ${isSource} ` +
           `WITH n, size([(n)-[:${rule.type}]->() | 1]) AS edges ` +
           `WHERE edges ${comparison} RETURN count(n) AS violations`,
       }
     }
 
     case 'endpoints': {
-      // A target list is a disjunction: the edge is fine if it points at ANY declared label.
+      // Both lists are disjunctions: the edge is fine if it starts at ANY declared source
+      // label and points at ANY declared target label.
+      const wrongSource = rule.from.map((label) => `NOT a:${label}`).join(' AND ')
       const wrongTarget = rule.to.map((label) => `NOT b:${label}`).join(' AND ')
       return {
-        violation: `[:${rule.type}] endpoints ${rule.from}->${rule.to.join('|')}`,
+        violation: `[:${rule.type}] endpoints ${rule.from.join('|')}->${rule.to.join('|')}`,
         cypher:
           `MATCH (a)-[r:${rule.type}]->(b) ` +
-          `WHERE NOT a:${rule.from} OR (${wrongTarget}) ` +
+          `WHERE (${wrongSource}) OR (${wrongTarget}) ` +
           `RETURN count(r) AS violations`,
       }
     }

@@ -93,20 +93,23 @@ export const statementFor = (rule: Rule, profile: BackendProfile): string | null
     }
 
     case 'exists': {
-      if (!capabilities.existence) {
+      // Neither Neo4j nor Memgraph constrains edge properties, so an edge-scoped rule is
+      // always left to the audit.
+      if (!capabilities.existence || !('node' in rule.scope)) {
         return null
       }
+      const label = rule.scope.node
       if (neo4j) {
         return (
-          `CREATE CONSTRAINT ${rule.label}_${rule.property}_exists IF NOT EXISTS ` +
-          `FOR (n:${rule.label}) REQUIRE n.${rule.property} IS NOT NULL`
+          `CREATE CONSTRAINT ${label}_${rule.property}_exists IF NOT EXISTS ` +
+          `FOR (n:${label}) REQUIRE n.${rule.property} IS NOT NULL`
         )
       }
-      return `CREATE CONSTRAINT ON (n:${rule.label}) ASSERT EXISTS (n.${rule.property})`
+      return `CREATE CONSTRAINT ON (n:${label}) ASSERT EXISTS (n.${rule.property})`
     }
 
     case 'dataType': {
-      if (!capabilities.dataType) {
+      if (!capabilities.dataType || !('node' in rule.scope)) {
         return null
       }
       const type = soleType(rule.types)
@@ -118,7 +121,10 @@ export const statementFor = (rule: Rule, profile: BackendProfile): string | null
       if (memgraphType === undefined) {
         return null
       }
-      return `CREATE CONSTRAINT ON (n:${rule.label}) ASSERT n.${rule.property} IS TYPED ${memgraphType}`
+      return (
+        `CREATE CONSTRAINT ON (n:${rule.scope.node}) ` +
+        `ASSERT n.${rule.property} IS TYPED ${memgraphType}`
+      )
     }
 
     // Value-shape rules and everything about edges are enforced by no backend we target.

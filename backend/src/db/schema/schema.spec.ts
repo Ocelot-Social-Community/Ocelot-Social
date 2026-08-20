@@ -1,6 +1,6 @@
 import { Ajv } from 'ajv'
 
-import { targetsOf } from './derive/rules'
+import { sourcesOf, targetsOf } from './derive/rules'
 import { jsonSchemaFor, relationshipJsonSchemaFor } from './types'
 
 import { entities, labels, relationships, relationshipTypes, User } from './index'
@@ -35,7 +35,9 @@ describe('the declaration', () => {
 
   it('connects only declared entities', () => {
     for (const relationship of relationships) {
-      expect(labels()).toContain(relationship.from.label)
+      for (const source of sourcesOf(relationship)) {
+        expect(labels()).toContain(source.label)
+      }
       for (const target of targetsOf(relationship)) {
         expect(labels()).toContain(target.label)
       }

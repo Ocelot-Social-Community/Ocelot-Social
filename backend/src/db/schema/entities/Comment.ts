@@ -17,6 +17,8 @@ export const Comment = defineEntity({
     content: { type: 'string', minLength: 3 },
     deleted: { type: 'boolean' },
     disabled: { type: 'boolean' },
+    createdByApiKey: { type: 'string' },
+    closed: { type: 'boolean' }, // see the note on User.closed
     createdAt: { type: 'string', pattern: ISO_DATE_TIME },
     updatedAt: { type: 'string', pattern: ISO_DATE_TIME },
   },
