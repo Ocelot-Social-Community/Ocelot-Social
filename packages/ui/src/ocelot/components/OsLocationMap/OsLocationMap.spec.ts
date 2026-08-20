@@ -1,11 +1,31 @@
+/* eslint-disable security/detect-object-injection */
+// Event-handler maps below are keyed by mapbox-gl's own fixed event names
+// ('click', 'dragend', ...), never by anything attacker-controlled.
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import OsLocationMap from './OsLocationMap.vue'
 
+import type { Mock } from 'vitest'
+
 interface MapboxControl {
   onAdd: () => HTMLElement
   onRemove?: () => void
+}
+
+// Named so setLngLat/addTo can return it without referencing the not-yet-
+// fully-typed `markerInstance` const from inside its own initializer (which
+// TypeScript can only resolve as `any`, cascading into every call site).
+// Methods are typed as `Mock<...>` (not plain functions) so call sites can
+// use vi.fn()'s own inspection methods (mockClear(), etc.) on them too.
+interface MockMarker {
+  setLngLat: Mock<(lngLat: [number, number]) => MockMarker>
+  addTo: Mock<(map: unknown) => MockMarker>
+  on: Mock<(event: string, handler: (...args: unknown[]) => void) => void>
+  remove: Mock<() => void>
+  setDraggable: Mock<(draggable: boolean) => void>
+  getLngLat: Mock<() => { lng: number; lat: number }>
+  getElement: Mock<() => HTMLElement>
 }
 
 function createMockMapboxGl() {
@@ -22,61 +42,62 @@ function createMockMapboxGl() {
   // untyped-button controls (like the attribution "i" toggle).
   const mapContainer = document.createElement('div')
   const mapInstance = {
-    addControl: vi.fn((control?: MapboxControl, _position?: string) => {
+    addControl: vi.fn<(control?: MapboxControl, position?: string) => void>((control) => {
       if (typeof control?.onAdd === 'function') {
         controls.push(control)
         controlContainers.push(control.onAdd())
       }
     }),
-    on: vi.fn((event: string, handler: (...args: unknown[]) => void) => {
+    on: vi.fn<(event: string, handler: (...args: unknown[]) => void) => void>((event, handler) => {
       mapHandlers[event] = handler
     }),
-    flyTo: vi.fn(),
-    setStyle: vi.fn(),
+    flyTo: vi.fn<(options: { center: [number, number]; zoom: number }) => void>(),
+    setStyle: vi.fn<(url: string) => void>(),
     // Real mapbox-gl-js calls control.onRemove() unconditionally for every
     // added control when the map is destroyed — a control missing onRemove
     // throws "onRemove is not a function" there. Replicate that here so a
     // control forgetting to define one fails a test instead of only
     // surfacing live, on navigating away from the page.
-    remove: vi.fn(() => {
+    remove: vi.fn<() => void>(() => {
       controls.forEach((control) => {
         ;(control.onRemove as () => void)()
       })
     }),
-    getContainer: vi.fn(() => mapContainer),
-    getCanvas: vi.fn(() => ({ style: {} }) as HTMLCanvasElement),
+    getContainer: vi.fn<() => HTMLElement>(() => mapContainer),
+    getCanvas: vi.fn<() => HTMLCanvasElement>(() => ({ style: {} }) as HTMLCanvasElement),
   }
 
   const markerHandlers: Record<string, (...args: unknown[]) => void> = {}
   const markerElement = document.createElement('div')
-  const markerInstance = {
-    setLngLat: vi.fn(function (this: typeof markerInstance) {
+  const markerInstance: MockMarker = {
+    setLngLat: vi.fn<(lngLat: [number, number]) => MockMarker>(function (this: MockMarker) {
       return this
     }),
-    addTo: vi.fn(function (this: typeof markerInstance) {
+    addTo: vi.fn<(map: unknown) => MockMarker>(function (this: MockMarker) {
       return this
     }),
-    on: vi.fn((event: string, handler: (...args: unknown[]) => void) => {
+    on: vi.fn<(event: string, handler: (...args: unknown[]) => void) => void>((event, handler) => {
       markerHandlers[event] = handler
     }),
-    remove: vi.fn(),
-    setDraggable: vi.fn(),
-    getLngLat: vi.fn(() => ({ lng: 13.4, lat: 52.5 })),
-    getElement: vi.fn(() => markerElement),
+    remove: vi.fn<() => void>(),
+    setDraggable: vi.fn<(draggable: boolean) => void>(),
+    getLngLat: vi.fn<() => { lng: number; lat: number }>(() => ({ lng: 13.4, lat: 52.5 })),
+    getElement: vi.fn<() => HTMLElement>(() => markerElement),
   }
 
   const mapboxGl = {
     accessToken: '',
-    Map: vi.fn(function () {
+    Map: vi.fn<() => typeof mapInstance>(function () {
       return mapInstance
     }),
-    Marker: vi.fn(function () {
+    Marker: vi.fn<(options?: { draggable?: boolean; color?: string }) => MockMarker>(function () {
       return markerInstance
     }),
-    NavigationControl: vi.fn(),
-    FullscreenControl: vi.fn(),
-    GeolocateControl: vi.fn(),
-    ScaleControl: vi.fn(),
+    NavigationControl: vi.fn<() => void>(),
+    FullscreenControl: vi.fn<() => void>(),
+    GeolocateControl:
+      vi.fn<(options?: { positionOptions?: { enableHighAccuracy?: boolean } }) => void>(),
+    ScaleControl: vi.fn<() => void>(),
   }
 
   return {
@@ -199,7 +220,9 @@ describe('osLocationMap', () => {
     const toggle = ctx.controlContainers
       .map((container) => container.querySelector('.os-location-map-picker-toggle'))
       .find((el): el is HTMLButtonElement => el !== null)
-    if (!toggle) throw new Error('pick-location toggle was not found')
+    if (!toggle) {
+      throw new Error('pick-location toggle was not found')
+    }
     return toggle
   }
 
@@ -214,13 +237,13 @@ describe('osLocationMap', () => {
 
     ctx.mapHandlers.click({ lngLat: { lat: 1, lng: 2 } })
 
-    expect(wrapper.emitted('pin-change')).toEqual([[{ lat: 1, lng: 2 }]])
+    expect(wrapper.emitted('pin-change')).toStrictEqual([[{ lat: 1, lng: 2 }]])
     expect(toggle.classList.contains('os-location-map-picker-toggle--active')).toBe(false)
 
     // Disarmed again — a further click doesn't emit anything else.
     ctx.mapHandlers.click({ lngLat: { lat: 3, lng: 4 } })
 
-    expect(wrapper.emitted('pin-change')).toEqual([[{ lat: 1, lng: 2 }]])
+    expect(wrapper.emitted('pin-change')).toStrictEqual([[{ lat: 1, lng: 2 }]])
   })
 
   it('ignores a bare map click once a pin already exists, until re-armed', () => {
@@ -245,7 +268,7 @@ describe('osLocationMap', () => {
     toggle.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     ctx.mapHandlers.click({ lngLat: { lat: 1, lng: 2 } })
 
-    expect(wrapper.emitted('pin-change')).toEqual([[{ lat: 1, lng: 2 }]])
+    expect(wrapper.emitted('pin-change')).toStrictEqual([[{ lat: 1, lng: 2 }]])
   })
 
   it('re-arms the tool automatically once the pin is cleared', async () => {
@@ -358,7 +381,100 @@ describe('osLocationMap', () => {
 
     ctx.markerHandlers.dragend()
 
-    expect(wrapper.emitted('pin-change')).toEqual([[{ lat: 52.5, lng: 13.4 }]])
+    expect(wrapper.emitted('pin-change')).toStrictEqual([[{ lat: 52.5, lng: 13.4 }]])
+  })
+
+  it('repositions the existing marker (rather than recreating it) when lat/lng change again', async () => {
+    const wrapper = mount(OsLocationMap, {
+      props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', lat: 52.5, lng: 13.4 },
+    })
+
+    await wrapper.setProps({ lat: 48.87, lng: 9.63 })
+
+    expect(ctx.mapboxGl.Marker).toHaveBeenCalledTimes(1)
+    expect(ctx.markerInstance.setLngLat).toHaveBeenLastCalledWith([9.63, 48.87])
+  })
+
+  it('updates the existing marker draggable state when editable changes', async () => {
+    const wrapper = mount(OsLocationMap, {
+      props: {
+        mapboxGl: ctx.mapboxGl,
+        accessToken: 'test-token',
+        editable: false,
+        lat: 52.5,
+        lng: 13.4,
+      },
+    })
+    ctx.markerInstance.setDraggable.mockClear()
+
+    await wrapper.setProps({ editable: true })
+
+    expect(ctx.markerInstance.setDraggable).toHaveBeenCalledWith(true)
+  })
+
+  it('does nothing when editable changes and no marker exists yet', async () => {
+    const wrapper = mount(OsLocationMap, {
+      props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', editable: false },
+    })
+
+    await expect(wrapper.setProps({ editable: true })).resolves.not.toThrow()
+    expect(ctx.markerInstance.setDraggable).not.toHaveBeenCalled()
+  })
+
+  it('does not throw when the pick-location toggle is clicked after the map is torn down', () => {
+    const wrapper = mount(OsLocationMap, {
+      props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', editable: true },
+    })
+    const toggle = getPickerToggle()
+
+    wrapper.unmount()
+
+    expect(() => {
+      toggle.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    }).not.toThrow()
+  })
+
+  it('disarms the pick-location tool on Escape', () => {
+    mount(OsLocationMap, {
+      props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', editable: true },
+    })
+    const toggle = getPickerToggle()
+
+    expect(toggle.classList.contains('os-location-map-picker-toggle--active')).toBe(true)
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+
+    expect(toggle.classList.contains('os-location-map-picker-toggle--active')).toBe(false)
+  })
+
+  it('ignores Escape when the tool is not currently armed', () => {
+    mount(OsLocationMap, {
+      props: {
+        mapboxGl: ctx.mapboxGl,
+        accessToken: 'test-token',
+        editable: true,
+        lat: 52.5,
+        lng: 13.4,
+      },
+    })
+    // A pin already exists, so the tool starts disarmed.
+    const toggle = getPickerToggle()
+
+    expect(toggle.classList.contains('os-location-map-picker-toggle--active')).toBe(false)
+    expect(() => {
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+    }).not.toThrow()
+    expect(toggle.classList.contains('os-location-map-picker-toggle--active')).toBe(false)
+  })
+
+  it('unmounts cleanly with the pick-location tool active (picker control onRemove)', () => {
+    const wrapper = mount(OsLocationMap, {
+      props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', editable: true },
+    })
+
+    expect(() => {
+      wrapper.unmount()
+    }).not.toThrow()
   })
 
   describe('viewOnMap', () => {
@@ -370,6 +486,7 @@ describe('osLocationMap', () => {
       const control = ctx.controlContainers
         .map((container) => container.querySelector('.os-location-map-view-on-map-toggle'))
         .find((el) => el !== null)
+
       expect(control).toBeUndefined()
       expect(ctx.markerElement.style.cursor).not.toBe('pointer')
     })
@@ -389,12 +506,13 @@ describe('osLocationMap', () => {
       const button = ctx.controlContainers
         .map((container) => container.querySelector('.os-location-map-view-on-map-toggle'))
         .find((el): el is HTMLButtonElement => el !== null)
+
       expect(button).toBeDefined()
       expect(button?.getAttribute('aria-label')).toBe('View on map')
 
       button?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
 
-      expect(wrapper.emitted('view-on-map')).toEqual([[{ lat: 52.5, lng: 13.4 }]])
+      expect(wrapper.emitted('view-on-map')).toStrictEqual([[{ lat: 52.5, lng: 13.4 }]])
     })
 
     it('makes the pin itself clickable and emits view-on-map on click', () => {
@@ -412,7 +530,7 @@ describe('osLocationMap', () => {
 
       ctx.markerElement.dispatchEvent(new MouseEvent('click', { bubbles: true }))
 
-      expect(wrapper.emitted('view-on-map')).toEqual([[{ lat: 52.5, lng: 13.4 }]])
+      expect(wrapper.emitted('view-on-map')).toStrictEqual([[{ lat: 52.5, lng: 13.4 }]])
     })
 
     it('unmounts cleanly (the view-on-map control must define onRemove)', () => {
@@ -430,6 +548,20 @@ describe('osLocationMap', () => {
         wrapper.unmount()
       }).not.toThrow()
     })
+
+    it('does nothing when the view-on-map control is clicked without a pin', () => {
+      const wrapper = mount(OsLocationMap, {
+        props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', viewOnMap: true },
+      })
+
+      const button = ctx.controlContainers
+        .map((container) => container.querySelector('.os-location-map-view-on-map-toggle'))
+        .find((el): el is HTMLButtonElement => el !== null)
+
+      button?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+      expect(wrapper.emitted('view-on-map')).toBeUndefined()
+    })
   })
 
   it('removes the map on unmount', () => {
@@ -442,6 +574,146 @@ describe('osLocationMap', () => {
     expect(ctx.mapInstance.remove).toHaveBeenCalledTimes(1)
   })
 
+  it('observes the container for resize and disconnects on unmount', () => {
+    const observe = vi.fn<(target: Element) => void>()
+    const disconnect = vi.fn<() => void>()
+    class MockResizeObserver {
+      observe = observe
+      disconnect = disconnect
+      unobserve = vi.fn<() => void>()
+    }
+    const originalResizeObserver = globalThis.ResizeObserver
+    globalThis.ResizeObserver = MockResizeObserver
+
+    try {
+      const wrapper = mount(OsLocationMap, {
+        props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token' },
+      })
+
+      expect(observe).toHaveBeenCalledTimes(1)
+
+      wrapper.unmount()
+
+      expect(disconnect).toHaveBeenCalledTimes(1)
+    } finally {
+      globalThis.ResizeObserver = originalResizeObserver
+    }
+  })
+
+  describe('style switcher', () => {
+    const styles = [
+      { id: 'streets', url: 'mapbox://styles/mapbox/streets-v11', label: 'Streets' },
+      { id: 'satellite', url: 'mapbox://styles/mapbox/satellite-v9', label: 'Satellite' },
+    ]
+
+    function getStyleSwitcherToggle() {
+      const toggle = ctx.controlContainers
+        .map((container) => container.querySelector('.os-location-map-style-switcher-toggle'))
+        .find((el): el is HTMLButtonElement => el !== null)
+      if (!toggle) {
+        throw new Error('style switcher toggle was not found')
+      }
+      return toggle
+    }
+
+    // Other tests in this file (e.g. "adds a style switcher control when 2+
+    // styles are given") also create a style switcher and never unmount it,
+    // leaving its popover element in document.body — always take the most
+    // recently appended match, which is this test's own.
+    function getLatestPopover() {
+      // Array.prototype.find()'s return type genuinely includes `undefined`
+      // (unlike indexed access, and .at() isn't in this project's ES2020
+      // lib target), so the guard below isn't flagged as unreachable.
+      const popovers = [...document.querySelectorAll('.os-location-map-style-popover')]
+      const popover = popovers.find((_el, i) => i === popovers.length - 1)
+      if (!popover) {
+        throw new Error('style popover was not found')
+      }
+      return popover
+    }
+
+    function getStyleOption(index: number) {
+      // See getLatestPopover() above re: find() vs. indexed/at() access.
+      const option = [
+        ...getLatestPopover().querySelectorAll('.os-location-map-style-popover-btn'),
+      ].find((_el, i) => i === index)
+      if (!option) {
+        throw new Error(`style option ${String(index)} was not found`)
+      }
+      return option as HTMLButtonElement
+    }
+
+    it('opens and positions the popover when the toggle is clicked', () => {
+      mount(OsLocationMap, {
+        props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', styles },
+      })
+      const toggle = getStyleSwitcherToggle()
+
+      toggle.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+      expect(getLatestPopover().classList.contains('os-location-map-style-popover--open')).toBe(
+        true,
+      )
+      expect(toggle.getAttribute('aria-expanded')).toBe('true')
+    })
+
+    it('closes again on a second click of the toggle', () => {
+      mount(OsLocationMap, {
+        props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', styles },
+      })
+      const toggle = getStyleSwitcherToggle()
+
+      toggle.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      toggle.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+      expect(getLatestPopover().classList.contains('os-location-map-style-popover--open')).toBe(
+        false,
+      )
+      expect(toggle.getAttribute('aria-expanded')).toBe('false')
+    })
+
+    it('selects a style, updates the map, and marks the option active', () => {
+      mount(OsLocationMap, {
+        props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', styles },
+      })
+      const toggle = getStyleSwitcherToggle()
+      toggle.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      const option = getStyleOption(1)
+
+      option.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+      expect(ctx.mapInstance.setStyle).toHaveBeenCalledWith(styles[1].url)
+      expect(option.classList.contains('os-location-map-style-popover-btn--active')).toBe(true)
+      expect(toggle.getAttribute('aria-expanded')).toBe('false')
+    })
+
+    it('closes the popover when clicking elsewhere on the page', () => {
+      mount(OsLocationMap, {
+        props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', styles },
+      })
+      const toggle = getStyleSwitcherToggle()
+      toggle.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+      document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+      expect(getLatestPopover().classList.contains('os-location-map-style-popover--open')).toBe(
+        false,
+      )
+    })
+
+    it('unmounts cleanly (style switcher onRemove tears down its outside-click listener)', () => {
+      const wrapper = mount(OsLocationMap, {
+        props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', styles },
+      })
+      const toggle = getStyleSwitcherToggle()
+      toggle.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+      expect(() => {
+        wrapper.unmount()
+      }).not.toThrow()
+    })
+  })
+
   describe('search', () => {
     it('does not render a search input by default', () => {
       const wrapper = mount(OsLocationMap, {
@@ -449,6 +721,16 @@ describe('osLocationMap', () => {
       })
 
       expect(wrapper.find('.os-location-map__search-input').exists()).toBe(false)
+    })
+
+    it('does not show a results list on focus when there are no results yet', async () => {
+      const wrapper = mount(OsLocationMap, {
+        props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', showSearch: true },
+      })
+
+      await wrapper.find('.os-location-map__search-input').trigger('focus')
+
+      expect(wrapper.find('.os-location-map__search-result').exists()).toBe(false)
     })
 
     it('emits a debounced search-input event while typing', async () => {
@@ -463,7 +745,7 @@ describe('osLocationMap', () => {
 
       vi.advanceTimersByTime(400)
 
-      expect(wrapper.emitted('search-input')).toEqual([['Berlin']])
+      expect(wrapper.emitted('search-input')).toStrictEqual([['Berlin']])
 
       vi.useRealTimers()
     })
@@ -481,9 +763,82 @@ describe('osLocationMap', () => {
       await wrapper.find('.os-location-map__search-input').setValue('Berlin')
       await wrapper.find('.os-location-map__search-result').trigger('click')
 
-      expect(wrapper.emitted('search-select')).toEqual([
+      expect(wrapper.emitted('search-select')).toStrictEqual([
         [{ id: '1', label: 'Berlin, Germany', lat: 52.5, lng: 13.4 }],
       ])
+    })
+
+    it('clears the previous debounce timer when typing again quickly', async () => {
+      vi.useFakeTimers()
+      const wrapper = mount(OsLocationMap, {
+        props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', showSearch: true },
+      })
+
+      await wrapper.find('.os-location-map__search-input').setValue('Berl')
+      await wrapper.find('.os-location-map__search-input').setValue('Berlin')
+      vi.advanceTimersByTime(400)
+
+      expect(wrapper.emitted('search-input')).toStrictEqual([['Berlin']])
+
+      vi.useRealTimers()
+    })
+
+    it('clears a pending debounce timer on unmount', async () => {
+      const wrapper = mount(OsLocationMap, {
+        props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', showSearch: true },
+      })
+
+      await wrapper.find('.os-location-map__search-input').setValue('Berlin')
+
+      expect(() => {
+        wrapper.unmount()
+      }).not.toThrow()
+    })
+
+    it('does nothing on blur when the search is not collapsible', async () => {
+      const wrapper = mount(OsLocationMap, {
+        props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', showSearch: true },
+      })
+
+      await wrapper.find('.os-location-map__search-input').trigger('blur')
+
+      expect(wrapper.find('.os-location-map__search-input').exists()).toBe(true)
+    })
+
+    it('shows previously fetched results again when the input regains focus', async () => {
+      const wrapper = mount(OsLocationMap, {
+        props: {
+          mapboxGl: ctx.mapboxGl,
+          accessToken: 'test-token',
+          showSearch: true,
+          searchResults: [{ id: '1', label: 'Berlin, Germany', lat: 52.5, lng: 13.4 }],
+        },
+      })
+
+      await wrapper.find('.os-location-map__search-input').trigger('focus')
+
+      expect(wrapper.find('.os-location-map__search-result').exists()).toBe(true)
+    })
+
+    it('clears the query after selecting a result without having typed anything first', async () => {
+      const wrapper = mount(OsLocationMap, {
+        props: {
+          mapboxGl: ctx.mapboxGl,
+          accessToken: 'test-token',
+          showSearch: true,
+          searchResults: [{ id: '1', label: 'Berlin, Germany', lat: 52.5, lng: 13.4 }],
+        },
+      })
+
+      // Focus (not typing) reveals the results, so no debounce timer from
+      // onSearchInput exists yet when the result — and then clear — is clicked.
+      await wrapper.find('.os-location-map__search-input').trigger('focus')
+      await wrapper.find('.os-location-map__search-result').trigger('click')
+      await wrapper.find('.os-location-map__search-clear').trigger('click')
+
+      expect(
+        (wrapper.find('.os-location-map__search-input').element as HTMLInputElement).value,
+      ).toBe('')
     })
 
     it('clears the search query and emits an empty search-input', async () => {
@@ -500,7 +855,7 @@ describe('osLocationMap', () => {
 
       const searchInputEvents = wrapper.emitted('search-input') ?? []
 
-      expect(searchInputEvents[searchInputEvents.length - 1]).toEqual([''])
+      expect(searchInputEvents[searchInputEvents.length - 1]).toStrictEqual([''])
     })
 
     describe('searchCollapsible', () => {

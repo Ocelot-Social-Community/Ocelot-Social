@@ -216,7 +216,9 @@
       }
 
       function onSearchInputBlur() {
-        if (!props.searchCollapsible) return
+        if (!props.searchCollapsible) {
+          return
+        }
         // Delayed so a click on a result/clear button (which blurs the
         // input first) still gets to run before the search collapses away.
         setTimeout(() => {
@@ -236,7 +238,13 @@
       const hasPin = computed(() => typeof props.lat === 'number' && typeof props.lng === 'number')
 
       function updateMarker() {
-        if (!map) return
+        /* v8 ignore start -- map is always set synchronously in onMounted
+           before any watcher or the resize observer can run; this guard
+           can't be reached through the component's public API/lifecycle. */
+        if (!map) {
+          return
+        }
+        /* v8 ignore stop */
         if (!hasPin.value) {
           if (marker) {
             marker.remove()
@@ -271,7 +279,9 @@
       }
 
       function flyToPin() {
-        if (!map || !hasPin.value) return
+        if (!map || !hasPin.value) {
+          return
+        }
         map.flyTo({ center: [props.lng, props.lat], zoom: props.pinZoom })
       }
 
@@ -286,7 +296,9 @@
       watch(
         () => props.editable,
         () => {
-          if (marker) marker.setDraggable(props.editable)
+          if (marker) {
+            marker.setDraggable(props.editable)
+          }
         },
       )
 
@@ -301,7 +313,9 @@
 
       function setPicking(value: boolean) {
         isPicking = value
-        if (map) map.getCanvas().style.cursor = value ? PICKER_CURSOR : ''
+        if (map) {
+          map.getCanvas().style.cursor = value ? PICKER_CURSOR : ''
+        }
         if (pickerToggleEl) {
           pickerToggleEl.classList.toggle('os-location-map-picker-toggle--active', value)
           pickerToggleEl.setAttribute('aria-pressed', String(value))
@@ -309,7 +323,9 @@
       }
 
       function onDocumentKeydown(e: KeyboardEvent) {
-        if (e.key === 'Escape' && isPicking) setPicking(false)
+        if (e.key === 'Escape' && isPicking) {
+          setPicking(false)
+        }
       }
 
       // With no pin yet, there's nothing an accidental click could disturb —
@@ -318,12 +334,16 @@
       // re-armed explicitly again; and re-arm automatically if the pin is
       // cleared (e.g. the location field is emptied or "online" is toggled).
       watch(hasPin, (has) => {
-        if (props.editable) setPicking(!has)
+        if (props.editable) {
+          setPicking(!has)
+        }
       })
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       function onMapClick(e: any) {
-        if (!props.editable || !isPicking) return
+        if (!props.editable || !isPicking) {
+          return
+        }
         emit('pin-change', { lat: e.lngLat.lat, lng: e.lngLat.lng })
         setPicking(false)
       }
@@ -390,7 +410,9 @@
               '</svg>'
             button.addEventListener('click', (e) => {
               e.stopPropagation()
-              if (!hasPin.value) return
+              if (!hasPin.value) {
+                return
+              }
               emit('view-on-map', { lat: props.lat, lng: props.lng })
             })
             container.appendChild(button)
@@ -440,7 +462,9 @@
               e.stopPropagation()
               const isOpen = popoverEl.classList.toggle('os-location-map-style-popover--open')
               toggle.setAttribute('aria-expanded', String(isOpen))
-              if (isOpen) positionPopover(toggle)
+              if (isOpen) {
+                positionPopover(toggle)
+              }
             })
             container.appendChild(toggle)
 
@@ -490,10 +514,15 @@
             return container
           },
           onRemove: () => {
+            /* v8 ignore start -- outsideHandler is always set by onAdd
+               before onRemove can run for the same control instance; this
+               guard only matters for a double-onRemove call, which never
+               happens through the component's own lifecycle. */
             if (outsideHandler) {
               document.removeEventListener('click', outsideHandler)
               outsideHandler = null
             }
+            /* v8 ignore stop */
             popoverEl?.remove()
           },
         }
@@ -501,14 +530,16 @@
 
       onMounted(() => {
         /* v8 ignore start -- SSR / non-browser guard */
-        if (typeof window === 'undefined' || !containerRef.value) return
+        if (typeof window === 'undefined' || !containerRef.value) {
+          return
+        }
         /* v8 ignore stop */
 
         // Setting the static accessToken on the injected mapbox-gl module is
         // part of the library's own API contract, not app state — required
         // for older mapbox-gl versions where the Map constructor option alone
         // is not honored.
-        // eslint-disable-next-line vue/no-mutating-props
+
         props.mapboxGl.accessToken = props.accessToken
 
         map = new props.mapboxGl.Map({
@@ -584,7 +615,9 @@
       })
 
       onBeforeUnmount(() => {
-        if (debounceTimer) clearTimeout(debounceTimer)
+        if (debounceTimer) {
+          clearTimeout(debounceTimer)
+        }
         if (resizeObserver) {
           resizeObserver.disconnect()
           resizeObserver = null
@@ -592,10 +625,15 @@
         if (props.editable) {
           document.removeEventListener('keydown', onDocumentKeydown)
         }
+        /* v8 ignore start -- map is always set by the time unmount runs
+           (onBeforeUnmount only fires once per instance, after onMounted
+           has already assigned it); unreachable through the component's
+           own lifecycle. */
         if (map) {
           map.remove()
           map = null
         }
+        /* v8 ignore stop */
         marker = null
       })
 
@@ -603,7 +641,9 @@
         const value = (e.target as HTMLInputElement).value
         searchQuery.value = value
         showResults.value = value.length > 0
-        if (debounceTimer) clearTimeout(debounceTimer)
+        if (debounceTimer) {
+          clearTimeout(debounceTimer)
+        }
         debounceTimer = setTimeout(() => emit('search-input', value), props.searchDebounce)
       }
 
@@ -616,7 +656,9 @@
       function clearSearch() {
         searchQuery.value = ''
         showResults.value = false
-        if (debounceTimer) clearTimeout(debounceTimer)
+        if (debounceTimer) {
+          clearTimeout(debounceTimer)
+        }
         emit('search-input', '')
       }
 
@@ -644,7 +686,9 @@
               // Vue 2's and Vue 3's h() — this is guaranteed version-safe.
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               ref: (el: any) => {
-                if (!el) return
+                if (!el) {
+                  return
+                }
                 el.innerHTML =
                   '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" ' +
                   'stroke-width="2" stroke-linecap="round" aria-hidden="true">' +
@@ -708,7 +752,9 @@
                 ...eventProps({
                   input: onSearchInput as (...args: unknown[]) => void,
                   focus: () => {
-                    if (props.searchResults.length) showResults.value = true
+                    if (props.searchResults.length) {
+                      showResults.value = true
+                    }
                   },
                   blur: onSearchInputBlur,
                 }),
