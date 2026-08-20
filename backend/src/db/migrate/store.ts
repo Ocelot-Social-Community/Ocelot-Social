@@ -2,52 +2,122 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-confusing-void-expression */
-import { getDriver, getNeode } from '@db/neo4j'
+
+import CONFIG from '@config/index'
+import { closeDriver, getDriver } from '@db/neo4j'
+import { applyPlan, enforce, planConstraints } from '@db/schema/derive/apply'
+import { declaredIndexStatements, isKnownProfile } from '@db/schema/derive/drift'
+import { entities, relationships } from '@db/schema/index'
+
+import type { Enforcement, SchemaRunner } from '@db/schema/derive/apply'
+import type { BackendProfile } from '@db/schema/derive/ddl'
+import type { Session } from 'neo4j-driver'
+
+// The backend profile decides which of the declared rules the database can actually enforce.
+// Explicit rather than sniffed from `dbms.components()`: the operator knows what they run, and
+// a wrong guess would silently emit statements the server rejects.
+const profile = (): BackendProfile => {
+  const configured = CONFIG.NEO4J_PROFILE
+  if (!isKnownProfile(configured)) {
+    throw new Error(`NEO4J_PROFILE is not a known backend profile: ${configured}`)
+  }
+  return configured
+}
+
+// Production reports and carries on; everywhere else a violation is an error.
+//
+// A constraint that cannot be created leaves the database exactly as it already is, so
+// skipping it is never a regression — whereas an aborted init container is an outage. In CI
+// and locally the data is disposable and a violation means the code or the declaration is
+// wrong, which is precisely what should stop the run.
+const enforcement = (): Enforcement => (CONFIG.PRODUCTION ? 'report' : 'strict')
+
+const runnerFor = (session: Session): SchemaRunner => ({
+  count: async (cypher) => {
+    const result = await session.readTransaction((transaction) => transaction.run(cypher))
+    const value: unknown = result.records[0]?.get(0)
+    return typeof value === 'number'
+      ? value
+      : Number((value as { toString: () => string } | null)?.toString() ?? 0)
+  },
+  sample: async (cypher) => {
+    const result = await session.readTransaction((transaction) => transaction.run(cypher))
+    return result.records.map((record) => record.toObject())
+  },
+  execute: async (cypher) => {
+    await session.run(cypher)
+  },
+})
 
 class Store {
+  /**
+   * Brings constraints and indices in line with `src/db/schema`.
+   *
+   * Replaces two things that used to live here:
+   *
+   *   - `CALL apoc.schema.assert({},{},true)`, which DROPPED every constraint and index before
+   *     reinstalling them. The helm chart runs this init container on every pod start
+   *     (deployment.yaml: `yarn prod:migrate init && yarn prod:migrate up`), so production spent
+   *     a window of every single deployment with no constraint enforcement at all.
+   *   - `neode.schema.install()`, which derived the DDL from `src/db/models`. It emitted
+   *     uniqueness constraints twice for Post (once per label, via `extend('Post','Article')`)
+   *     and no index at all for `Role.name`/`Setting.namespace`, because neode reads that flag
+   *     from `index` while the models spell it `indexed`.
+   *
+   * The declaration converges instead: `CREATE ... IF NOT EXISTS` recognises an equivalent
+   * object whatever it is named, so running this on every deployment is a no-op once the
+   * database matches. Each constraint is audited BEFORE it is created, so violating data turns
+   * into a report rather than a failed statement — see db/schema/derive/apply.ts for why that
+   * matters on Neo4j 4.4.
+   *
+   * Not removed automatically: an object the database holds and the declaration no longer
+   * wants. `run-audit.ts check` reports it as SURPLUS; dropping stays a deliberate migration.
+   */
   async init(errFn) {
-    const neode = getNeode()
-    const session = neode.session()
-    const txFreshIndicesConstrains = session.writeTransaction(async (txc) => {
-      // drop all indices and constraints
-      await txc.run('CALL apoc.schema.assert({},{},true)')
-      /* 
-      #############################################
-      # ADD YOUR CUSTOM INDICES & CONSTRAINS HERE #
-      #############################################
-      */
-      // Search indexes (also part of migration 20230320130345-fulltext-search-indexes)
-      await txc.run(
-        `CALL db.index.fulltext.createNodeIndex("user_fulltext_search",["User"],["name", "slug"])`,
-      )
-      await txc.run(
-        `CALL db.index.fulltext.createNodeIndex("post_fulltext_search",["Post"],["title", "content"])`,
-      )
-      await txc.run(`CALL db.index.fulltext.createNodeIndex("tag_fulltext_search",["Tag"],["id"])`) // also part of migration 20200207080200-fulltext_index_for_tags
-      // Search indexes (also part of migration 20220803060819-create_fulltext_indices_and_unique_keys_for_groups)
-      await txc.run(`
-        CALL db.index.fulltext.createNodeIndex("group_fulltext_search",["Group"],["name", "slug", "about", "description"])
-      `)
-    })
+    const session = getDriver().session()
     try {
-      // Due to limitations of neode in combination with the limitations of the community version of neo4j
-      // we need to have all constraints and indexes defined here. They can not be properly migrated
-      await txFreshIndicesConstrains
+      const target = profile()
+      const { statements, unsupported } = declaredIndexStatements(entities, target)
+      const report = await applyPlan(
+        runnerFor(session),
+        planConstraints(entities, relationships, target),
+        statements,
+        unsupported,
+      )
 
-      // You have to wait for the schema to install, else the constraints will not be present.
-      // This is a type error of the library
-      // eslint-disable-next-line @typescript-eslint/await-thenable
-      await getNeode().schema.install()
-      // eslint-disable-next-line no-console
-      console.log('Successfully created database indices and constraints!')
+      /* eslint-disable no-console */
+      console.log(
+        `Schema (${target}): ${String(report.applied.length)} applied, ` +
+          `${String(report.unchanged.length)} already in place`,
+      )
+      for (const item of report.skipped) {
+        console.log(
+          `SKIPPED ${item.violation}: ${String(item.violations)} violation(s) — ` + item.statement,
+        )
+        for (const row of item.sample) {
+          console.log(`  ${JSON.stringify(row)}`)
+        }
+      }
+      for (const item of report.failed) {
+        console.log(`FAILED ${item.code}: ${item.message} — ${item.statement}`)
+      }
+      for (const item of report.unsupported) {
+        console.log(`UNSUPPORTED ${item}`)
+      }
+      /* eslint-enable no-console */
+
+      enforce(report, enforcement())
       // eslint-disable-next-line no-catch-all/no-catch-all
     } catch (error) {
       console.log(error) // eslint-disable-line no-console
       errFn(error)
     } finally {
       await session.close()
-      neode.close()
+      // The old implementation closed neode here, which closed its driver with it. Without an
+      // equivalent the shared driver keeps its sockets open and the `migrate init` process
+      // never exits — the CLI has nothing else to wait for. getDriver() re-creates on demand,
+      // so closing is safe even if something in the same process needs it afterwards.
+      await closeDriver()
     }
   }
 
