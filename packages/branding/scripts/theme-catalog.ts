@@ -20,11 +20,15 @@ export function catalogAvailable(dir: string = CSS_DIR): boolean {
 
 /** Every `:root` custom property across the webapp's stylesheets, keyed without the leading `--`. */
 export function computeCatalog(dir: string = CSS_DIR): Record<string, string> {
-  if (!existsSync(dir)) return {}
+  if (!existsSync(dir)) {
+    return {}
+  }
   const files = readdirSync(dir)
     .filter((f) => f.endsWith('.css'))
     .sort()
   const out: Record<string, string> = {}
-  for (const f of files) Object.assign(out, customPropertiesIn(readFileSync(join(dir, f), 'utf8')))
+  for (const f of files) {
+    Object.assign(out, customPropertiesIn(readFileSync(join(dir, f), 'utf8')))
+  }
   return out
 }

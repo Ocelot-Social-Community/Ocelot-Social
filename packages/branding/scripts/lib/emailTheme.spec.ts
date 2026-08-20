@@ -327,6 +327,8 @@ describe('buildEmailBrandingCss', () => {
   test('only targets selectors the framework mail stylesheet defines', () => {
     const styled = new Set(['a', 'a.button', 'h2', '.text-block', 'footer', 'body'])
 
-    for (const { selector } of EMAIL_THEME) assert.ok(styled.has(selector), selector)
+    for (const { selector } of EMAIL_THEME) {
+      assert.ok(styled.has(selector), selector)
+    }
   })
 })

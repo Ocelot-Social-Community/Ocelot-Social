@@ -15,10 +15,14 @@ export type SchemaCompat = 'ok' | 'archive-newer' | 'archive-older' | 'unknown'
 // Map a version to its monotonic "breaking generation" key, or null when unparseable. Encoded so a
 // >= 1.0 archive always sorts ABOVE any 0.x runtime (a 1.0 archive is newer than every 0.x).
 function generation(version: string | null | undefined): number | null {
-  if (!version) return null
+  if (!version) {
+    return null
+  }
   const parts = version.split('.')
   const major = Number.parseInt(parts[0] ?? '', 10)
-  if (Number.isNaN(major)) return null
+  if (Number.isNaN(major)) {
+    return null
+  }
   const minor = Number.parseInt(parts[1] ?? '0', 10) || 0
   return major > 0 ? 1_000_000 + major : minor
 }
@@ -39,8 +43,12 @@ export function checkSchemaCompat(
 ): SchemaCompat {
   const a = generation(archiveVersion)
   const r = generation(runtimeVersion)
-  if (a === null || r === null) return 'unknown'
-  if (a === r) return 'ok'
+  if (a === null || r === null) {
+    return 'unknown'
+  }
+  if (a === r) {
+    return 'ok'
+  }
   return a > r ? 'archive-newer' : 'archive-older'
 }
 
