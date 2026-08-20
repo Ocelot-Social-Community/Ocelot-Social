@@ -123,9 +123,7 @@ export const planConstraints = (
 }
 
 const errorCode = (error: unknown): string =>
-  typeof error === 'object' && error !== null && 'code' in error
-    ? String((error as { code: unknown }).code)
-    : 'unknown'
+  typeof error === 'object' && error !== null && 'code' in error ? String(error.code) : 'unknown'
 
 /**
  * Runs a plan. Never throws for a data problem — the caller decides what a report means (see
