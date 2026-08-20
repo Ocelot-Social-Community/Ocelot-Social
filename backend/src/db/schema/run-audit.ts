@@ -1,117 +1,241 @@
 /* eslint-disable no-console */
 import { closeDriver, getDriver } from '@db/neo4j'
+import { applyPlan, enforce, planConstraints } from '@db/schema/derive/apply'
 import { auditsFor } from '@db/schema/derive/audit'
-import { indexStatementsFor, statementFor } from '@db/schema/derive/ddl'
+import {
+  compareSchemaObjects,
+  declaredIndexStatements,
+  declaredObjects,
+  describeSchemaObject,
+  isKnownProfile,
+} from '@db/schema/derive/drift'
 import { allRules } from '@db/schema/derive/rules'
 import { entities, labels, relationships, relationshipTypes } from '@db/schema/index'
 
+import type { Enforcement, SchemaRunner } from '@db/schema/derive/apply'
 import type { BackendProfile } from '@db/schema/derive/ddl'
+import type { SchemaObject } from '@db/schema/derive/drift'
+import type { Session } from 'neo4j-driver'
 
-// Runs the declaration against a live database and reports, without changing anything:
+// The operator tool for the declaration in this folder.
 //
-//   1. every rule the backend cannot enforce, as a violation count
-//   2. what the database has in the way of constraints/indices vs. what the declaration wants
-//   3. which labels and relationship types exist that nothing declares
+//   yarn tsx src/db/schema/run-audit.ts check [profile]
+//   yarn tsx src/db/schema/run-audit.ts apply [profile] [--strict]
 //
-// Read-only by design. This is the P3 gate of the schema concept: it answers whether the
-// invariants transcribed from the neode models actually hold in real data — before the
-// remaining 20 entities are written against the same assumptions.
+// `check` never writes and exits non-zero on findings. Run it against a restored production
+// dump before a release — and with the TARGET profile before switching backends: `check
+// memgraph` against a Neo4j database answers what would break after a Memgraph migration,
+// before anything is migrated.
 //
-//   yarn tsx src/db/schema/run-audit.ts [profile]
+// `apply` audits each constraint before creating it, so a violating row becomes a skipped
+// object plus a report instead of an aborted deployment. `--strict` (CI, dev) makes any skip
+// an error; without it (production) only a statement that ERRORED does.
 
-const profile = (process.argv[2] ?? 'neo4j-community') as BackendProfile
+const [, , commandArgument, profileArgument, ...flags] = process.argv
+const command = commandArgument ?? 'check'
+const profileInput = profileArgument ?? 'neo4j-community'
+const strict = flags.includes('--strict')
 
 const heading = (text: string): void => {
   console.log(`\n\x1b[1m${text}\x1b[0m`)
 }
 
-const main = async (): Promise<number> => {
-  const driver = getDriver()
-  const session = driver.session()
-  let failures = 0
+const asNumber = (value: unknown): number =>
+  typeof value === 'number'
+    ? value
+    : Number((value as { toString: () => string } | null)?.toString() ?? 0)
+
+const runnerFor = (session: Session): SchemaRunner => ({
+  count: async (cypher) => {
+    const result = await session.readTransaction((transaction) => transaction.run(cypher))
+    return asNumber(result.records[0]?.get(0))
+  },
+  sample: async (cypher) => {
+    const result = await session.readTransaction((transaction) => transaction.run(cypher))
+    return result.records.map((record) => record.toObject())
+  },
+  execute: async (cypher) => {
+    await session.run(cypher)
+  },
+})
+
+/** What `SHOW CONSTRAINTS` / `SHOW INDEXES` report, mapped onto the comparison shape. */
+const presentObjects = async (session: Session): Promise<SchemaObject[]> => {
+  const constraints = await session.run('SHOW CONSTRAINTS')
+  const indices = await session.run('SHOW INDEXES')
+  const constraintNames = new Set(constraints.records.map((record) => String(record.get('name'))))
+  return [
+    ...constraints.records.map((record): SchemaObject => ({
+      kind: 'constraint',
+      label: (record.get('labelsOrTypes') as string[])[0],
+      properties: record.get('properties') as string[],
+    })),
+    ...indices.records
+      // Neo4j reports the index BACKING a uniqueness constraint in SHOW INDEXES under the
+      // constraint's own name. Listing it as an unwanted index would be noise about something
+      // that cannot exist on its own. LOOKUP indices carry no label and are built in.
+      .filter(
+        (record) =>
+          !constraintNames.has(String(record.get('name'))) &&
+          String(record.get('type')) !== 'LOOKUP',
+      )
+      .map((record): SchemaObject => ({
+        kind: 'index',
+        label: (record.get('labelsOrTypes') as string[])[0],
+        properties: record.get('properties') as string[],
+      })),
+  ]
+}
+
+const reportAudits = async (session: Session, profile: BackendProfile): Promise<number> => {
+  heading(`1. Declared rules that ${profile} cannot enforce`)
+  const audits = auditsFor(allRules(entities, relationships), profile)
+  const runner = runnerFor(session)
+  let findings = 0
+
+  for (const { violation, cypher, sampleCypher } of audits) {
+    try {
+      const violations = await runner.count(cypher)
+      if (violations === 0) {
+        console.log(`  ok    ${violation}`)
+        continue
+      }
+      findings += 1
+      console.log(`  \x1b[31mFAIL\x1b[0m  ${violation}: ${String(violations)}`)
+      for (const row of await runner.sample(sampleCypher)) {
+        console.log(`          ${JSON.stringify(row)}`)
+      }
+      // eslint-disable-next-line no-catch-all/no-catch-all
+    } catch (error) {
+      findings += 1
+      console.log(`  \x1b[33mERR \x1b[0m  ${violation}: ${(error as Error).message.split('\n')[0]}`)
+    }
+  }
+  console.log(`  — ${String(audits.length)} audits, ${String(findings)} with findings`)
+  return findings
+}
+
+const reportDrift = async (session: Session, profile: BackendProfile): Promise<number> => {
+  heading('2. Constraints and indices: declared vs. present')
+  const { missing, surplus } = compareSchemaObjects(
+    declaredObjects(entities, profile),
+    await presentObjects(session),
+  )
+  for (const object of missing) {
+    console.log(`  \x1b[33mMISSING\x1b[0m ${describeSchemaObject(object)}`)
+  }
+  for (const object of surplus) {
+    // Never dropped automatically: a typo in a declaration would otherwise turn into
+    // data-availability loss on the next deployment.
+    console.log(`  \x1b[33mSURPLUS\x1b[0m ${describeSchemaObject(object)} (declared nowhere)`)
+  }
+  const { unsupported } = declaredIndexStatements(entities, profile)
+  for (const item of unsupported) {
+    console.log(`  \x1b[33mUNSUPPORTED\x1b[0m ${item} — ${profile} cannot express it`)
+  }
+  if (missing.length === 0 && surplus.length === 0) {
+    console.log('  in sync')
+  }
+  return missing.length + surplus.length
+}
+
+const reportRegistry = async (session: Session): Promise<number> => {
+  heading('3. Labels and relationship types the registry does not declare')
+  const labelResult = await session.run('CALL db.labels()')
+  const typeResult = await session.run('CALL db.relationshipTypes()')
+  const undeclaredLabels = labelResult.records
+    .map((record) => String(record.get('label')))
+    .filter((label) => !labels().includes(label))
+  const undeclaredTypes = typeResult.records
+    .map((record) => String(record.get('relationshipType')))
+    .filter((type) => !relationshipTypes().includes(type))
+  console.log(`  undeclared labels:    ${undeclaredLabels.join(', ') || '—'}`)
+  console.log(`  undeclared rel types: ${undeclaredTypes.join(', ') || '—'}`)
+  return undeclaredLabels.length + undeclaredTypes.length
+}
+
+const check = async (session: Session, profile: BackendProfile): Promise<number> => {
+  const audits = await reportAudits(session, profile)
+  const drift = await reportDrift(session, profile)
+  const registry = await reportRegistry(session)
+  return audits + drift + registry
+}
+
+const apply = async (
+  session: Session,
+  profile: BackendProfile,
+  enforcement: Enforcement,
+): Promise<number> => {
+  heading(`Applying the declaration to ${profile} (${enforcement})`)
+  const { statements, unsupported } = declaredIndexStatements(entities, profile)
+  const report = await applyPlan(
+    runnerFor(session),
+    planConstraints(entities, relationships, profile),
+    statements,
+    unsupported,
+  )
+
+  console.log(
+    `  applied: ${String(report.applied.length)}, ` +
+      `already in place: ${String(report.unchanged.length)}`,
+  )
+  for (const item of report.skipped) {
+    console.log(
+      `  \x1b[33mSKIPPED\x1b[0m ${item.violation}: ${String(item.violations)} violation(s)`,
+    )
+    for (const row of item.sample) {
+      console.log(`          ${JSON.stringify(row)}`)
+    }
+    console.log(`          would have been: ${item.statement}`)
+  }
+  for (const item of report.failed) {
+    console.log(`  \x1b[31mFAILED\x1b[0m ${item.code}: ${item.message}`)
+    console.log(`          ${item.statement}`)
+  }
+  for (const item of report.unsupported) {
+    console.log(`  \x1b[33mUNSUPPORTED\x1b[0m ${item}`)
+  }
 
   try {
-    heading(`1. Declared rules that ${profile} cannot enforce`)
-    const audits = auditsFor(allRules(entities, relationships), profile)
-    for (const { violation, cypher } of audits) {
-      try {
-        const result = await session.readTransaction((transaction) => transaction.run(cypher))
-        const count = result.records[0]?.get('violations') as { toNumber?: () => number } | number
-        const violations = typeof count === 'number' ? count : (count?.toNumber?.() ?? 0)
-        if (violations > 0) {
-          failures += 1
-          console.log(`  \x1b[31mFAIL\x1b[0m  ${violation}: ${String(violations)}`)
-        } else {
-          console.log(`  ok    ${violation}`)
-        }
-        // eslint-disable-next-line no-catch-all/no-catch-all
-      } catch (error) {
-        failures += 1
-        console.log(
-          `  \x1b[33mERR \x1b[0m  ${violation}: ${(error as Error).message.split('\n')[0]}`,
-        )
-      }
-    }
-    console.log(`  — ${String(audits.length)} audits, ${String(failures)} with findings`)
+    enforce(report, enforcement)
+    return 0
+    // eslint-disable-next-line no-catch-all/no-catch-all
+  } catch (error) {
+    console.log(`\n${(error as Error).message}`)
+    return report.skipped.length + report.failed.length
+  }
+}
 
-    heading('2. Constraints and indices: declared vs. present')
-    const declared = [
-      ...allRules(entities, [])
-        .map((rule) => statementFor(rule, profile))
-        .filter((statement): statement is string => statement !== null),
-      ...entities.flatMap((entity) => indexStatementsFor(entity, profile).statements),
-    ]
-    const present = await session.readTransaction(async (transaction) => {
-      const constraints = await transaction.run('SHOW CONSTRAINTS')
-      const indices = await transaction.run('SHOW INDEXES')
-      // 4.4 returns [id, name, type, entityType, labelsOrTypes, properties, ownedIndexId] —
-      // there is no rendered description, so it is assembled here.
-      const describe = (record: { get: (key: string) => unknown }): string =>
-        `${String(record.get('name'))} ${String(record.get('type'))} ` +
-        `${JSON.stringify(record.get('labelsOrTypes'))}${JSON.stringify(record.get('properties'))}`
-      return [...constraints.records.map(describe), ...indices.records.map(describe)]
-    })
-    console.log(`  declared: ${String(declared.length)}`)
-    for (const statement of declared) {
-      console.log(`    ${statement}`)
-    }
-    console.log(`  present in database: ${String(present.length)}`)
-    for (const item of present) {
-      console.log(`    ${item}`)
-    }
-
-    heading('3. Labels and relationship types the registry does not declare')
-    const { dbLabels, dbTypes } = await session.readTransaction(async (transaction) => {
-      const labelResult = await transaction.run('CALL db.labels()')
-      const typeResult = await transaction.run('CALL db.relationshipTypes()')
-      return {
-        dbLabels: labelResult.records.map((record) => String(record.get('label'))),
-        dbTypes: typeResult.records.map((record) => String(record.get('relationshipType'))),
-      }
-    })
-    const undeclaredLabels = dbLabels.filter((label) => !labels().includes(label))
-    const undeclaredTypes = dbTypes.filter((type) => !relationshipTypes().includes(type))
-    console.log(`  labels in database:    ${String(dbLabels.length)} (${dbLabels.join(', ')})`)
-    console.log(`  not declared:         ${undeclaredLabels.join(', ') || '—'}`)
-    console.log(`  rel types in database: ${String(dbTypes.length)}`)
-    console.log(`  not declared:         ${undeclaredTypes.join(', ') || '—'}`)
+const main = async (): Promise<number> => {
+  if (!isKnownProfile(profileInput)) {
+    console.error(`Unknown profile: ${profileInput}`)
+    return 1
+  }
+  if (command !== 'check' && command !== 'apply') {
+    console.error(`Unknown command: ${command} (expected 'check' or 'apply')`)
+    return 1
+  }
+  const session = getDriver().session()
+  try {
+    return command === 'apply'
+      ? await apply(session, profileInput, strict ? 'strict' : 'report')
+      : await check(session, profileInput)
   } finally {
     await session.close()
     await closeDriver()
   }
-
-  return failures
 }
 
 const run = async (): Promise<void> => {
   try {
-    const failures = await main()
-    heading(failures === 0 ? 'No findings.' : `${String(failures)} finding(s).`)
-    process.exit(0)
+    const findings = await main()
+    heading(findings === 0 ? 'No findings.' : `${String(findings)} finding(s).`)
+    // The non-zero exit is what makes this usable as a CI gate and as a pre-release check.
+    process.exit(findings === 0 ? 0 : 1)
     // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (error) {
     console.error(error)
-    process.exit(1)
+    process.exit(2)
   }
 }
 
