@@ -4,8 +4,22 @@
       <template>
         <os-card>
           <template #heroImage>
+            <!-- The existing (already saved) image has transformed w320/w640/w1024
+                 URLs from the backend — routed through it here via
+                 ResponsiveImage, same as the post detail page, rather than a
+                 plain <img src> pointing straight at raw storage (unreliable
+                 to fetch directly in local dev). A freshly picked, not yet
+                 saved file only has a local data: URL (see addHeroImage) and
+                 needs neither transforms nor that routing. -->
+            <responsive-image
+              v-if="formData.image && !formData.imageUpload"
+              :image="formData.image"
+              sizes="(max-width: 1024px) 640px, 1024px"
+              loading="eager"
+              :class="['image', formData.imageBlurred && '--blur-image']"
+            />
             <img
-              v-if="formData.image"
+              v-else-if="formData.image"
               :src="formData.image.url"
               :class="['image', formData.imageBlurred && '--blur-image']"
             />
@@ -254,6 +268,7 @@ import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 import LocationSelect from '~/components/Select/LocationSelect'
 import EventLocationMap from '~/components/Map/EventLocationMap'
+import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
 
 export default {
   mixins: [GetCategories, formValidation],
@@ -270,6 +285,7 @@ export default {
     LocationSelect,
     EventLocationMap,
     OsValidationHint,
+    ResponsiveImage,
   },
   props: {
     contribution: {

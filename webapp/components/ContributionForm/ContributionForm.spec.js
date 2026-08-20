@@ -5,6 +5,7 @@ import PostMutations from '~/graphql/PostMutations.js'
 import Vuex from 'vuex'
 
 import ImageUploader from '~/components/Uploader/ImageUploader'
+import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
 import MutationObserver from 'mutation-observer'
 
 global.MutationObserver = MutationObserver
@@ -340,6 +341,37 @@ describe('ContributionForm.vue', () => {
           wrapper.find('[data-test="delete-button"]').trigger('click')
           await wrapper.find('form').trigger('submit')
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining(expectedParams))
+        })
+
+        it('renders an existing (already saved) teaser image via ResponsiveImage, not a plain <img src>', () => {
+          propsData.contribution.image = {
+            url: '/uploads/someimage.png',
+            w320: '/uploads/someimage-320.png',
+            w640: '/uploads/someimage-640.png',
+            w1024: '/uploads/someimage-1024.png',
+          }
+          wrapper = Wrapper()
+          expect(wrapper.findComponent(ResponsiveImage).exists()).toBe(true)
+        })
+
+        it('renders a freshly picked (not yet saved) image as a plain <img>, not ResponsiveImage', async () => {
+          const spy = jest
+            .spyOn(FileReader.prototype, 'readAsDataURL')
+            .mockImplementation(function () {
+              this.onload({ target: { result: 'someUrlToImage' } })
+            })
+          propsData.contribution.image = {
+            url: '/uploads/someimage.png',
+            w320: '/uploads/someimage-320.png',
+            w640: '/uploads/someimage-640.png',
+            w1024: '/uploads/someimage-1024.png',
+          }
+          wrapper = Wrapper()
+          wrapper.findComponent(ImageUploader).vm.$emit('addHeroImage', imageUpload)
+          await wrapper.vm.$nextTick()
+          expect(wrapper.findComponent(ResponsiveImage).exists()).toBe(false)
+          expect(wrapper.find('img.image').exists()).toBe(true)
+          spy.mockRestore()
         })
       })
     })
