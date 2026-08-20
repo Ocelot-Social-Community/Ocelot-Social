@@ -27,6 +27,8 @@
     "db:data:badges": "tsx src/db/badges.ts",
     "db:data:branding": "tsx src/db/data-branding.ts",
     "db:data:categories": "tsx src/db/categories.ts",
+    "db:schema:check": "tsx src/db/schema/run-audit.ts check",
+    "db:schema:apply": "tsx src/db/schema/run-audit.ts apply",
     "db:migrate": "migrate --compiler 'ts:./src/db/compiler.ts' --migrations-dir ./src/db/migrations --store ./src/db/migrate/store.ts",
     "db:migrate:create": "migrate --compiler 'ts:./src/db/compiler.ts' --migrations-dir ./src/db/migrations --template-file ./src/db/migrate/template.ts --date-format 'yyyymmddHHmmss' create",
     "db:func:disable:notifications": "tsx src/db/disable-notifications.ts",

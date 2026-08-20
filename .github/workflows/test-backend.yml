@@ -269,6 +269,14 @@ jobs:
       - name: backend | Migrate Database Up
         run: docker compose exec -T backend yarn db:migrate up
 
+      # Read-only, and it exits non-zero on any finding. Placed BEFORE the unit tests because
+      # those wipe the database (every spec calls cleanDatabase), which would make the data
+      # audits vacuous. On a freshly migrated database the meaningful part is the comparison
+      # against src/db/schema: a constraint or index the declaration wants and `migrate init`
+      # did not produce, or one the database holds that nothing declares any more — plus a
+      # label or relationship type in the database that the registry does not know.
+      - name: backend | Schema check - declaration vs. database
+        run: docker compose exec -T backend yarn db:schema:check
 
       - name: backend | Unit test incl. coverage check
         run: docker compose exec -T backend yarn test
