@@ -12,7 +12,11 @@
 // error — a nested schema hides the property names behind an object literal that TypeScript
 // can no longer relate to the sibling keys.
 
-export type PropertyType = 'string' | 'boolean' | 'integer' | 'number' | 'null'
+// `datetime` is a NATIVE Neo4j temporal, not an ISO string. Both spellings exist in this
+// database: most timestamps are strings (see ISO_DATE_TIME), but PasswordReset writes
+// `datetime($issuedAt)`. Declaring the difference is the only way an audit can tell a
+// mis-typed timestamp from a correct one.
+export type PropertyType = 'string' | 'boolean' | 'integer' | 'number' | 'datetime' | 'null'
 
 export interface PropertySchema {
   /** A list means a union; include 'null' for nullable properties. */
@@ -48,7 +52,11 @@ export type Cardinality =
 
 export interface RelationshipDefinition {
   readonly type: string
-  readonly from: EntityDefinition
+  /**
+   * The permitted source entities. A list for the same reason as `to`: `IS_IN` starts at
+   * User, Location, Group and Post, `NOTIFIED` at Group, Post and Comment.
+   */
+  readonly from: EntityDefinition | readonly EntityDefinition[]
   /**
    * The permitted target entities. A list because relationship types are polymorphic in this
    * graph: `WROTE` points at both Post and Comment, and declaring one of them reports the
@@ -71,9 +79,13 @@ type ScalarOf<T> = T extends 'string'
     ? boolean
     : T extends 'integer' | 'number'
       ? number
-      : T extends 'null'
-        ? null
-        : never
+      : T extends 'datetime'
+        ? // The driver hands back a DateTime object; typing it beyond "not a primitive" would
+          // drag neo4j-driver into the declaration layer.
+          object
+        : T extends 'null'
+          ? null
+          : never
 
 type ValueOf<P extends PropertySchema> = P extends { readonly enum: readonly (infer E)[] }
   ? E
@@ -131,10 +143,30 @@ export const defineRelationship = <
 
 export interface JsonSchema {
   type: 'object'
-  properties: Record<string, PropertySchema>
+  properties: Record<string, object>
   required: string[]
   additionalProperties: false
 }
+
+/**
+ * `datetime` has no JSON Schema counterpart — the driver hands back a DateTime instance, so
+ * ajv sees an object. Translated here rather than in the declaration, which should say what
+ * the property IS, not how one particular validator has to spell it.
+ */
+const toJsonSchemaType = (type: PropertyType | readonly PropertyType[]): string | string[] => {
+  const translate = (single: PropertyType): string => (single === 'datetime' ? 'object' : single)
+  return typeof type === 'string' ? translate(type) : type.map(translate)
+}
+
+const toJsonSchemaProperties = (
+  properties: Readonly<Record<string, PropertySchema>>,
+): Record<string, object> =>
+  Object.fromEntries(
+    Object.entries(properties).map(([name, schema]) => [
+      name,
+      { ...schema, type: toJsonSchemaType(schema.type) },
+    ]),
+  )
 
 /**
  * The JSON Schema for a node's properties.
@@ -146,7 +178,7 @@ export interface JsonSchema {
  */
 export const jsonSchemaFor = (entity: EntityDefinition): JsonSchema => ({
   type: 'object',
-  properties: { ...entity.properties },
+  properties: toJsonSchemaProperties(entity.properties),
   required: [...entity.required],
   additionalProperties: false,
 })
@@ -154,7 +186,7 @@ export const jsonSchemaFor = (entity: EntityDefinition): JsonSchema => ({
 /** The JSON Schema for an edge's properties. Edges without properties allow none. */
 export const relationshipJsonSchemaFor = (relationship: RelationshipDefinition): JsonSchema => ({
   type: 'object',
-  properties: { ...(relationship.properties ?? {}) },
+  properties: toJsonSchemaProperties(relationship.properties ?? {}),
   required: [...(relationship.required ?? [])],
   additionalProperties: false,
 })

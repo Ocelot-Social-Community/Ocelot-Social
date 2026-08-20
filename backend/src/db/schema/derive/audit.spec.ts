@@ -82,14 +82,14 @@ describe('generated queries', () => {
   it('counts users whose single-role invariant is broken', () => {
     // The rule the authorisation layer assumes and that no engine can enforce.
     expect(audit('User-[:HAS_ROLE] exactly-one')?.cypher).toBe(
-      'MATCH (n:User) WITH n, size([(n)-[:HAS_ROLE]->() | 1]) AS edges ' +
+      'MATCH (n) WHERE n:User WITH n, size([(n)-[:HAS_ROLE]->() | 1]) AS edges ' +
         'WHERE edges <> 1 RETURN count(n) AS violations',
     )
   })
 
   it('counts edges between the wrong labels', () => {
     expect(audit('[:WROTE] endpoints User->Post|Comment')?.cypher).toBe(
-      'MATCH (a)-[r:WROTE]->(b) WHERE NOT a:User OR (NOT b:Post AND NOT b:Comment) ' +
+      'MATCH (a)-[r:WROTE]->(b) WHERE (NOT a:User) OR (NOT b:Post AND NOT b:Comment) ' +
         'RETURN count(r) AS violations',
     )
   })
@@ -121,5 +121,35 @@ describe('coverage of the pilot registry', () => {
   it('gives every audit a stable, unique identifier', () => {
     const violations = auditsFor(RULES, 'neo4j-community').map((query) => query.violation)
     expect(new Set(violations).size).toBe(violations.length)
+  })
+})
+
+describe('edge properties', () => {
+  // Until edge-scoped rules existed, a declaration could state `SELECTED.slot must be an
+  // integer` and nothing anywhere would look at it: no engine constrains edge properties, and
+  // no rule was emitted for them either.
+  it('audits an edge property type against the edges, not against nodes', () => {
+    expect(audit('[:SELECTED].slot type')?.cypher).toBe(
+      "MATCH ()-[n:SELECTED]->() WHERE n.slot IS NOT NULL AND apoc.meta.cypher.type(n.slot) <> 'INTEGER' " +
+        'RETURN count(n) AS violations',
+    )
+  })
+
+  it('audits a required edge property', () => {
+    expect(audit('[:EMOTED].emotion exists')?.cypher).toBe(
+      'MATCH ()-[n:EMOTED]->() WHERE n.emotion IS NULL RETURN count(n) AS violations',
+    )
+  })
+
+  it('audits an edge enum', () => {
+    expect(audit('[:MEMBER_OF].role enum')?.cypher).toContain(
+      "NOT n.role IN ['pending', 'usual', 'admin', 'owner']",
+    )
+  })
+
+  it('leaves edge rules unenforced on every profile, including memgraph', () => {
+    for (const profile of PROFILES) {
+      expect(audit('[:SELECTED].slot type', profile)).toBeDefined()
+    }
   })
 })

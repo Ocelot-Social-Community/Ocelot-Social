@@ -40,6 +40,10 @@ export const User = defineEntity({
     allowEmbedIframes: { type: 'boolean' },
     showShoutsPublicly: { type: 'boolean' },
     locale: { type: ['string', 'null'] },
+    // Not in db/models/User.ts and present on exactly one seeded node, same as on Post and
+    // Comment. Looks like moderation writes `closed` onto the reported resource rather than
+    // only onto the Report. Declared so reads do not fail; flagged as a cleanup candidate.
+    closed: { type: 'boolean' },
 
     emailNotificationsCommentOnObservedPost: { type: 'boolean' },
     emailNotificationsMention: { type: 'boolean' },

@@ -35,6 +35,14 @@ export const Post = defineEntity({
     pinned: { type: ['boolean', 'null'], enum: [true, null] },
     groupPinned: { type: ['boolean', 'null'], enum: [true, null] },
     postType: { type: 'string', enum: ['Article', 'Event'] },
+    createdByApiKey: { type: 'string' },
+    closed: { type: 'boolean' }, // see the note on User.closed
+    // Event posts only — the neode model does not mention them at all.
+    eventStart: { type: 'string', pattern: ISO_DATE_TIME },
+    eventEnd: { type: 'string', pattern: ISO_DATE_TIME },
+    eventVenue: { type: 'string' },
+    eventLocationName: { type: 'string' },
+    eventIsOnline: { type: 'boolean' },
   },
   required: ['id', 'title', 'content', 'postType', 'createdAt', 'updatedAt'],
   // Both are `primary`/`unique` in db/models/Post.ts and both constraints exist in the
