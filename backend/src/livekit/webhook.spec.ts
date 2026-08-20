@@ -65,10 +65,7 @@ function makeApp() {
   const post = jest.fn((path: string, _parser: unknown, handler: CapturedHandler) => {
     handlers.push({ path, handler })
   })
-  return { post, handlers } as unknown as {
-    post: jest.Mock
-    handlers: { path: string; handler: CapturedHandler }[]
-  }
+  return { post, handlers }
 }
 
 function makeRes() {

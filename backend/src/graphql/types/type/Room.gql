@@ -5,62 +5,31 @@ enum _RoomOrdering {
 
 "A chat room, either a one-to-one direct conversation between two users or the shared chat room of a group."
 type Room {
+  "Alias of `id`, kept for the chat frontend (vue-advanced-chat keys objects by `_id`)."
+  _id: String @deprecated(reason: "Use `id`.")
   id: ID!
   createdAt: String
   updatedAt: String
 
   "Participants of the room."
-  users: [User]! @relation(name: "CHATS_IN", direction: "IN")
+  users: [User]!
   "The group this room belongs to, or null for a direct room."
-  group: Group @relation(name: "ROOM_FOR", direction: "OUT")
+  group: Group
 
   "Alias of id; prefer id in new code."
-  roomId: String! @cypher(statement: "RETURN this.id")
+  roomId: String!
   "True if this is a group room, false for a direct room."
   isGroupRoom: Boolean!
-    @cypher(
-      statement: """
-      OPTIONAL MATCH (this)-[:ROOM_FOR]->(g:Group)
-      RETURN g IS NOT NULL
-      """
-    )
   "Display name: the group's name for a group room, otherwise the other participant's name."
   roomName: String!
-    @cypher(
-      statement: """
-      OPTIONAL MATCH (this)-[:ROOM_FOR]->(g:Group)
-      WITH this, g
-      OPTIONAL MATCH (this)<-[:CHATS_IN]-(user:User)
-      WHERE g IS NULL AND NOT user.id = $cypherParams.currentUserId
-      RETURN COALESCE(g.name, user.name)
-      """
-    )
   "Display avatar URL: the group's avatar for a group room, otherwise the other participant's avatar."
   avatar: String
-    @cypher(
-      statement: """
-      OPTIONAL MATCH (this)-[:ROOM_FOR]->(g:Group)
-      OPTIONAL MATCH (g)-[:AVATAR_IMAGE]->(groupImg:Image)
-      WITH this, g, groupImg
-      OPTIONAL MATCH (this)<-[:CHATS_IN]-(user:User)
-      WHERE g IS NULL AND NOT user.id = $cypherParams.currentUserId
-      OPTIONAL MATCH (user)-[:AVATAR_IMAGE]->(userImg:Image)
-      RETURN COALESCE(groupImg.url, userImg.url)
-      """
-    )
 
   "Timestamp of the most recent message, for sorting the room list."
   lastMessageAt: String
 
   "The most recent message in the room."
   lastMessage: Message
-    @cypher(
-      statement: """
-      MATCH (this)<-[:INSIDE]-(message:Message)
-      WITH message ORDER BY message.indexId DESC LIMIT 1
-      RETURN message
-      """
-    )
 
   "Count unread messages, excluding those from blocked/muted senders."
   unreadCount: Int

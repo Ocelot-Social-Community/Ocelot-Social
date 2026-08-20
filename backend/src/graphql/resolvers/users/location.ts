@@ -72,7 +72,9 @@ export const createOrUpdateLocations = async (
   session,
   context: Context,
 ) => {
-  if (locationName === undefined) return
+  if (locationName === undefined) {
+    return
+  }
 
   let locationId
 

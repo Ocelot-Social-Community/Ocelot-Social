@@ -460,9 +460,7 @@ describe('PolicyService', () => {
       await expect(svc.set('apiKeysMaxPerUser', true as never, 'actor')).rejects.toThrow(
         /must be integer/,
       )
-      await expect(svc.set('apiKeysMaxPerUser', 1.5 as never, 'actor')).rejects.toThrow(
-        /must be integer/,
-      )
+      await expect(svc.set('apiKeysMaxPerUser', 1.5, 'actor')).rejects.toThrow(/must be integer/)
     })
 
     it('enforces per-key schema minimums (apiKeysMaxPerUser >= 1, maxPinnedPosts >= 0)', async () => {
@@ -472,9 +470,7 @@ describe('PolicyService', () => {
 
       // apiKeysMaxPerUser has minimum 1: disabling is done via apiKeysEnabled, so 0
       // (and negative) are invalid.
-      await expect(svc.set('apiKeysMaxPerUser', 0 as never, 'actor')).rejects.toThrow(
-        /must be >= 1/,
-      )
+      await expect(svc.set('apiKeysMaxPerUser', 0, 'actor')).rejects.toThrow(/must be >= 1/)
       await expect(svc.set('apiKeysMaxPerUser', -1 as never, 'actor')).rejects.toThrow(
         /must be >= 1/,
       )

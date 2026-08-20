@@ -2,7 +2,9 @@
 import { load } from 'cheerio'
 
 export default (content?) => {
-  if (!content) return []
+  if (!content) {
+    return []
+  }
   const $ = load(content)
   const userIds = $('a.mention[data-mention-id]')
     .map((_, el) => {

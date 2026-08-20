@@ -35,7 +35,9 @@ import { buildBrandArchive, publishBrandArchive } from './lib/build-brandings.ts
  * stderr, not stdout: the one line stdout carries is the artifact path, which callers pipe.
  */
 function report(warnings: string[]): void {
-  for (const warning of warnings) console.error(warning)
+  for (const warning of warnings) {
+    console.error(warning)
+  }
 }
 
 const rest = process.argv.slice(2)
@@ -79,7 +81,9 @@ if (isWatch) {
   let timer: ReturnType<typeof setTimeout> | undefined
   watch(brandDir, { recursive: true }, (_event, filename) => {
     // Ignore our own output (the .tar.gz files, incl. those under dist/).
-    if (filename?.endsWith('.tar.gz')) return
+    if (filename?.endsWith('.tar.gz')) {
+      return
+    }
     clearTimeout(timer)
     timer = setTimeout(() => {
       build().catch((error: unknown) => {

@@ -47,7 +47,9 @@
         const proxy = instance?.proxy as Record<string, unknown> | undefined
         const vm = (isVue2 ? proxy : getCurrentInstance()?.proxy) as Record<string, unknown>
 
-        if (!vm || !props.route) return null
+        if (!vm || !props.route) {
+          return null
+        }
 
         const resolvedLinkTag = vm.resolvedLinkTag as string | Component
         const matcherResult = vm.matcherResult as boolean
@@ -161,7 +163,9 @@
     },
     computed: {
       resolvedLinkTag(): string | Component {
-        if (this.linkTag) return this.linkTag
+        if (this.linkTag) {
+          return this.linkTag
+        }
         const menu = this.$parentMenu as Record<string, unknown> | null
         return (menu?.linkTag as string | Component) || 'a'
       },
@@ -224,8 +228,7 @@
       }
       document.addEventListener('click', this.clickOutsideHandler, true)
     },
-    /* v8 ignore next 4 -- Vue 2 lifecycle hook */
-    // eslint-disable-next-line vue/no-deprecated-destroyed-lifecycle
+    /* v8 ignore next 3 -- Vue 2 lifecycle hook */
     beforeDestroy() {
       this.cleanup()
     },

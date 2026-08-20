@@ -23,7 +23,9 @@ export default {
         await policy.set('activeBranding', id, user?.id ?? 'unknown')
         return id
       } catch (err) {
-        if (err instanceof PolicyValidationError) throw new UserInputError(err.message)
+        if (err instanceof PolicyValidationError) {
+          throw new UserInputError(err.message)
+        }
         throw err
       }
     },
@@ -52,7 +54,9 @@ export default {
         await policy.set('brandingComposition', composition, user?.id ?? 'unknown')
         return composition
       } catch (err) {
-        if (err instanceof PolicyValidationError) throw new UserInputError(err.message)
+        if (err instanceof PolicyValidationError) {
+          throw new UserInputError(err.message)
+        }
         throw err
       }
     },

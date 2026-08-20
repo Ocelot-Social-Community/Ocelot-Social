@@ -164,7 +164,9 @@ beforeEach(() => {
     // Mapbox requests
     if (path.includes('api.mapbox.com')) {
       if (path.includes('Berlin')) {
-        if (path.includes('language=de')) return Promise.resolve(mockJsonResponse(berlinMapboxDe))
+        if (path.includes('language=de')) {
+          return Promise.resolve(mockJsonResponse(berlinMapboxDe))
+        }
         return Promise.resolve(mockJsonResponse(berlinMapboxEn))
       }
       if (path.includes('Welzheim')) {

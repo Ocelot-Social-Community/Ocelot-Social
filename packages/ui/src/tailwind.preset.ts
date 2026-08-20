@@ -80,7 +80,9 @@ export const requiredCssVariables: string[] = [
  * ```
  */
 export function validateCssVariables(): void {
-  if (typeof window === 'undefined') return
+  if (typeof window === 'undefined') {
+    return
+  }
 
   const styles = getComputedStyle(document.documentElement)
   const missing = requiredCssVariables.filter(

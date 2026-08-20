@@ -36,7 +36,9 @@ describe('RoleService', () => {
       const perms = svc.permissionsForRole(MODERATOR_ROLE)
       expect(perms.has('content.moderate')).toBe(true)
       expect(perms.has('badge.manage')).toBe(true)
-      for (const baseline of BASELINE) expect(perms.has(baseline as never)).toBe(true)
+      for (const baseline of BASELINE) {
+        expect(perms.has(baseline as never)).toBe(true)
+      }
     })
 
     it('returns the self-contained admin set (baseline + moderation + admin extras)', () => {
@@ -45,7 +47,9 @@ describe('RoleService', () => {
       expect(perms.has('role.manage')).toBe(true)
       expect(perms.has('policy.manage')).toBe(true)
       expect(perms.has('badge.manage')).toBe(true)
-      for (const baseline of BASELINE) expect(perms.has(baseline as never)).toBe(true)
+      for (const baseline of BASELINE) {
+        expect(perms.has(baseline as never)).toBe(true)
+      }
     })
 
     it('falls back to the baseline for an unknown role (never permission-less)', () => {
@@ -175,8 +179,12 @@ describe('RoleService', () => {
     // A neode-style record for readAllRoles (name/protected/permissions-as-JSON).
     const roleRecord = (role: { name: string; protected: boolean; permissions: string[] }) => ({
       get: (key: string) => {
-        if (key === 'permissions') return JSON.stringify(role.permissions)
-        if (key === 'protected') return role.protected
+        if (key === 'permissions') {
+          return JSON.stringify(role.permissions)
+        }
+        if (key === 'protected') {
+          return role.protected
+        }
         return role.name
       },
     })
@@ -389,7 +397,7 @@ describe('RoleService', () => {
       const fakePubsub: RolePubSub = {
         publish: () => undefined,
         subscribe: async (_channel, listener) => {
-          onChange = listener as typeof onChange
+          onChange = listener
           return Promise.resolve(1)
         },
         unsubscribe: () => undefined,

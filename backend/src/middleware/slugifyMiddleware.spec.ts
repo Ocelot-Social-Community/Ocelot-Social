@@ -176,7 +176,8 @@ describe('slugifyMiddleware', () => {
               ],
             })
           } catch (error) {
-            throw new Error(`
+            throw new Error(
+              `
               ${error}
 
               Probably your database has no unique constraints!
@@ -189,7 +190,9 @@ describe('slugifyMiddleware', () => {
 
               Learn how to setup the database here:
               https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/backend/README.md#database-indices-and-constraints
-            `)
+            `,
+              { cause: error },
+            )
           }
         })
       })
@@ -279,7 +282,8 @@ describe('slugifyMiddleware', () => {
                 ],
               })
             } catch (error) {
-              throw new Error(`
+              throw new Error(
+                `
                 ${error}
 
                 Probably your database has no unique constraints!
@@ -292,7 +296,9 @@ describe('slugifyMiddleware', () => {
 
                 Learn how to setup the database here:
                 https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/backend/README.md#database-indices-and-constraints
-              `)
+              `,
+                { cause: error },
+              )
             }
           })
         })
@@ -405,7 +411,8 @@ describe('slugifyMiddleware', () => {
               ],
             })
           } catch (error) {
-            throw new Error(`
+            throw new Error(
+              `
               ${error}
 
               Probably your database has no unique constraints!
@@ -418,7 +425,9 @@ describe('slugifyMiddleware', () => {
 
               Learn how to setup the database here:
               https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/backend/README.md#database-indices-and-constraints
-            `)
+            `,
+              { cause: error },
+            )
           }
         })
       })
@@ -541,7 +550,8 @@ describe('slugifyMiddleware', () => {
               ],
             })
           } catch (error) {
-            throw new Error(`
+            throw new Error(
+              `
               ${error}
 
               Probably your database has no unique constraints!
@@ -554,7 +564,9 @@ describe('slugifyMiddleware', () => {
 
               Learn how to setup the database here:
               https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/backend/README.md#database-indices-and-constraints
-            `)
+            `,
+              { cause: error },
+            )
           }
         })
       })

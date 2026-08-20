@@ -6,4 +6,4 @@
 // The trailing marker lets release-please bump this in lock-step with package.json (see
 // .github/release-please/branding-config.json `extra-files`), so the drift guard in version.spec never
 // trips on a release.
-export const SCHEMA_VERSION = '0.1.4' // x-release-please-version
+export const SCHEMA_VERSION = '0.1.5' // x-release-please-version

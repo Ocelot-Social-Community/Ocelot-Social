@@ -1,51 +1,20 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { mergeWith, isArray } from 'lodash'
+import type { PostQueryParams } from './postFilter'
+import type { Context } from '@src/context'
 
-const getInvisiblePosts = async (context) => {
-  const session = context.driver.session()
-  try {
-    const readTxResult = await session.readTransaction(async (transaction) => {
-      let cypher = ''
-      const { user } = context
-      if (user?.id) {
-        cypher = `
-          MATCH (post:Post)<-[:CANNOT_SEE]-(user:User { id: $userId })
-          RETURN collect(post.id) AS invisiblePostIds`
-      } else {
-        cypher = `
-          MATCH (post:Post)-[:IN]->(group:Group)
-          WHERE NOT group.groupType = 'public'
-          RETURN collect(post.id) AS invisiblePostIds`
-      }
-      const invisiblePostIdsResponse = await transaction.run(cypher, {
-        userId: user ? user.id : null,
-      })
-      return invisiblePostIdsResponse.records.map((record) => record.get('invisiblePostIds'))
-    })
-    const [invisiblePostIds] = readTxResult
-    return invisiblePostIds
-  } finally {
-    await session.close()
-  }
-}
-
-export const filterInvisiblePosts = async (params, context) => {
-  const invisiblePostIds = await getInvisiblePosts(context)
-  if (!invisiblePostIds.length) return params
-
-  params.filter = mergeWith(
-    params.filter,
-    {
-      id_not_in: invisiblePostIds,
-    },
-    (objValue, srcValue) => {
-      if (isArray(objValue)) {
-        return objValue.concat(srcValue)
-      }
-    },
-  )
-  return params
-}
+// Marks the query so postFilterToCypher can express visibility as a graph condition.
+//
+// This used to run its own query first, collecting the ids of every post the viewer must
+// not see and passing them in as `id_not_in`. For an anonymous visitor that is every post
+// in a non-public group — a list that grows with the database and travels with each
+// request. neo4j-graphql-js could not filter on a relation, so the ids were the only way
+// through; hand-written Cypher asks the graph directly (see the `invisibleTo` operator).
+//
+// Kept as a wrapper rather than inlined into the resolvers so the two post queries cannot
+// drift apart on something this close to access control.
+export const filterInvisiblePosts = (
+  params: PostQueryParams,
+  context: Context,
+): PostQueryParams => ({
+  ...params,
+  filter: { ...params.filter, invisibleTo: context.user?.id ?? null },
+})

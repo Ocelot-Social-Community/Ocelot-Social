@@ -31,7 +31,9 @@ async function tryReadFile(path: string): Promise<string | null> {
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- path from glob, not user input
     return await readFile(path, 'utf-8')
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      return null
+    }
     throw error
   }
 }
@@ -77,7 +79,9 @@ function checkStoryCoverage(
 
   for (const match of storyExports) {
     const storyName = match[1]
-    if (storyName === 'Playground') continue
+    if (storyName === 'Playground') {
+      continue
+    }
     const kebabName = toKebabCase(storyName)
 
     if (!visualTestContent.includes(`--${kebabName}`)) {
@@ -179,7 +183,9 @@ for (const storyPath of ocelotStories) {
   const storyDir = dirname(storyPath)
 
   // Skip stories that already have a .vue component (checked in the component loop above)
-  if (componentDirs.has(storyDir)) continue
+  if (componentDirs.has(storyDir)) {
+    continue
+  }
 
   const visualTestPath = join(storyDir, `${storyName}.visual.spec.ts`)
   const unitTestPath = join(storyDir, 'index.spec.ts')

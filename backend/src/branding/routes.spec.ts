@@ -77,7 +77,7 @@ function makeRes(): MockRes {
   })
   res.setHeader = jest.fn(function setHeader(this: MockRes, k: string, v: string) {
     this.headers[k.toLowerCase()] = v
-  }) as unknown as jest.Mock
+  })
   res.json = jest.fn(function json(this: MockRes, value: unknown) {
     this.body = JSON.stringify(value)
     return this

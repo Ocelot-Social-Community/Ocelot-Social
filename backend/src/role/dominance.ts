@@ -24,9 +24,13 @@ import type { PermissionKey } from '@src/permission'
 export function dominates(actor: Set<PermissionKey>, target: Set<PermissionKey>): boolean {
   // Strict: must have strictly more. Combined with target ⊆ actor below, a larger
   // size guarantees a proper superset (equal sets share the same size → blocked).
-  if (actor.size <= target.size) return false
+  if (actor.size <= target.size) {
+    return false
+  }
   for (const permission of target) {
-    if (!actor.has(permission)) return false
+    if (!actor.has(permission)) {
+      return false
+    }
   }
   return true
 }

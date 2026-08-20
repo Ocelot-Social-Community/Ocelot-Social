@@ -22,7 +22,9 @@ import {
 
 const roots = []
 after(() => {
-  for (const dir of roots) rmSync(dir, { recursive: true, force: true })
+  for (const dir of roots) {
+    rmSync(dir, { recursive: true, force: true })
+  }
 })
 
 // Create a temp brand dir: package.json (unless pkg===null), a .mjs config with the given overrides,
@@ -36,8 +38,12 @@ function brandDir({
 } = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'ocelot-brand-'))
   roots.push(dir)
-  if (pkg) writeFileSync(join(dir, 'package.json'), JSON.stringify(pkg))
-  if (config) writeFileSync(join(dir, 'brand.config.mjs'), config)
+  if (pkg) {
+    writeFileSync(join(dir, 'package.json'), JSON.stringify(pkg))
+  }
+  if (config) {
+    writeFileSync(join(dir, 'brand.config.mjs'), config)
+  }
   // Arbitrary nested files (e.g. emails/, public/) written verbatim under the brand dir.
   for (const [rel, body] of Object.entries(files)) {
     const p = join(dir, rel)
@@ -46,7 +52,9 @@ function brandDir({
   }
   const assetDir = join(dir, 'assets')
   mkdirSync(assetDir, { recursive: true })
-  for (const [name, body] of Object.entries(assets)) writeFileSync(join(assetDir, name), body)
+  for (const [name, body] of Object.entries(assets)) {
+    writeFileSync(join(assetDir, name), body)
+  }
   if (Object.keys(locales).length) {
     const localesDir = join(dir, 'locales')
     mkdirSync(localesDir, { recursive: true })

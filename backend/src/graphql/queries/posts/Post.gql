@@ -13,7 +13,7 @@ query Post($id: ID, $filter: _PostFilter, $first: Int, $offset: Int, $orderBy: [
     emotionsCount
     emotions {
       emotion
-      User {
+      from {
         id
       }
     }
