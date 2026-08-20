@@ -58,8 +58,11 @@ function collectFiles(dir: string, prefix: string, entries: TarEntry[]): void {
   for (const name of readdirSync(dir)) {
     const full = join(dir, name)
     const rel = prefix ? `${prefix}/${name}` : name
-    if (statSync(full).isDirectory()) collectFiles(full, rel, entries)
-    else entries.push({ name: rel, data: readFileSync(full) })
+    if (statSync(full).isDirectory()) {
+      collectFiles(full, rel, entries)
+    } else {
+      entries.push({ name: rel, data: readFileSync(full) })
+    }
   }
 }
 
@@ -69,7 +72,9 @@ const isRelativeAsset = (v: unknown): v is string =>
   typeof v === 'string' && v.length > 0 && !v.startsWith('/') && !/^(https?:|data:|mailto:)/.test(v)
 
 function namespacePath(value: string, id: string, brandDir: string, warnings: string[]): string {
-  if (!isRelativeAsset(value)) return value
+  if (!isRelativeAsset(value)) {
+    return value
+  }
   if (!existsSync(join(brandDir, value))) {
     warnings.push(`  ! ${id}: referenced asset not found: ${value}`)
   }
@@ -100,29 +105,43 @@ function namespaceConfig(
   const logos = c.logos as unknown as Record<string, string | undefined>
   for (const k of LOGO_KEYS) {
     const val = logos[k]
-    if (val != null) logos[k] = ns(val)
+    if (val != null) {
+      logos[k] = ns(val)
+    }
   }
   c.metadata.ogImage = ns(c.metadata.ogImage) // ogImage is always set (merged default)
-  if (Array.isArray(c.assets.css)) c.assets.css = c.assets.css.map(ns)
-  if (c.assets.favicon != null) c.assets.favicon = ns(c.assets.favicon)
-  if (c.assets.icon != null) c.assets.icon = ns(c.assets.icon)
+  if (Array.isArray(c.assets.css)) {
+    c.assets.css = c.assets.css.map(ns)
+  }
+  if (c.assets.favicon != null) {
+    c.assets.favicon = ns(c.assets.favicon)
+  }
+  if (c.assets.icon != null) {
+    c.assets.icon = ns(c.assets.icon)
+  }
   const html = c.assets.html as Record<string, Record<string, string>>
   for (const page of Object.keys(html)) {
     const locales = html[page]
-    for (const locale of Object.keys(locales)) locales[locale] = ns(locales[locale])
+    for (const locale of Object.keys(locales)) {
+      locales[locale] = ns(locales[locale])
+    }
   }
   // Brand web-font files live in the served assets folder too.
   // The header's custom-button icon is a brand asset like any logo (it used to be a framework-served
   // /img/custom/… path, which is why it was missed here at first).
   const customButton = c.headerMenu.customButton as unknown as Record<string, string | undefined>
-  if (customButton.iconPath != null) customButton.iconPath = ns(customButton.iconPath)
+  if (customButton.iconPath != null) {
+    customButton.iconPath = ns(customButton.iconPath)
+  }
   return c
 }
 
 /** Read the brand's package.json once (or null). */
 function readBrandPkg(brandDir: string): BrandPkg | null {
   const pkgPath = join(brandDir, 'package.json')
-  if (!existsSync(pkgPath)) return null
+  if (!existsSync(pkgPath)) {
+    return null
+  }
   try {
     return JSON.parse(readFileSync(pkgPath, 'utf8')) as BrandPkg
   } catch {
@@ -132,8 +151,12 @@ function readBrandPkg(brandDir: string): BrandPkg | null {
 
 export function brandId(brandDir: string): string {
   const pkg = readBrandPkg(brandDir)
-  if (pkg?.brandId) return pkg.brandId
-  if (pkg?.name) return pkg.name.replace(/-branding$/, '')
+  if (pkg?.brandId) {
+    return pkg.brandId
+  }
+  if (pkg?.name) {
+    return pkg.name.replace(/-branding$/, '')
+  }
   return basename(brandDir)
 }
 
@@ -150,7 +173,9 @@ export function brandVersion(brandDir: string): string | null {
 export function findConfig(brandDir: string): string | null {
   for (const name of ['brand.config.ts', 'brand.config.mjs', 'brand.config.js']) {
     const p = join(brandDir, name)
-    if (existsSync(p)) return p
+    if (existsSync(p)) {
+      return p
+    }
   }
   return null
 }
@@ -225,11 +250,12 @@ function loadThemeFromStylesheets(
       .filter((name) => Object.hasOwn(resolved, name))
       .map((name) => [name, resolved[name]]),
   )
-  if (!unconditional['color-primary'] && declared['color-primary'])
+  if (!unconditional['color-primary'] && declared['color-primary']) {
     warnings.push(
       `  ! ${id}: --color-primary is only declared inside an at-rule, so it cannot become the PWA` +
         ` theme colour — declare it on a plain ':root' as well`,
     )
+  }
   return declared
 }
 
@@ -265,7 +291,9 @@ function loadLocaleFiles(
   warnings: string[],
 ): void {
   const localesDir = join(dir, 'locales')
-  if (!existsSync(localesDir)) return
+  if (!existsSync(localesDir)) {
+    return
+  }
   const merge = (code: string, file: string, label: string): void => {
     try {
       const strings = JSON.parse(readFileSync(file, 'utf8')) as Record<string, unknown>
@@ -289,7 +317,9 @@ function loadLocaleFiles(
       const featureFiles = readdirSync(join(localesDir, code))
         .filter((n) => n.endsWith('.json'))
         .sort()
-      for (const f of featureFiles) merge(code, join(localesDir, code, f), `locales/${code}/${f}`)
+      for (const f of featureFiles) {
+        merge(code, join(localesDir, code, f), `locales/${code}/${f}`)
+      }
     }
   }
 }
@@ -321,10 +351,22 @@ function warnThemeTokenTypos(
 ): void {
   // Live from the webapp's stylesheets. Where they are not reachable (a brand's own repo) there is
   // nothing to compare against, and a guess would produce false warnings — so skip the check.
-  if (!catalogAvailable()) return
+  //
+  // Excluded from coverage rather than tested: reaching it needs `../../../webapp/assets/css` to be
+  // absent, which inside this monorepo it never is, and `catalogAvailable()` is called without the
+  // directory argument it accepts — so no seam exists to drive it from a spec. The guard was equally
+  // unexercised before, it was simply invisible: as a single-line `if (...) return` the line counted
+  // as covered because the condition ran. Removing this pragma requires threading a `cssDir` through
+  // `buildBrandArchive`, not just a new test.
+  /* node:coverage ignore next 3 */
+  if (!catalogAvailable()) {
+    return
+  }
   const known = Object.keys(computeCatalog())
   for (const key of Object.keys(declared)) {
-    if (known.includes(key)) continue
+    if (known.includes(key)) {
+      continue
+    }
     const near = known.find(
       (k) => Math.abs(k.length - key.length) <= 1 && editDistance(key, k) <= 2,
     )
@@ -349,7 +391,9 @@ const STYLE_SOURCE_EXT = /\.(scss|sass|less|styl)$/i
  */
 function warnUncompiledStylesheets(entries: TarEntry[], id: string, warnings: string[]): void {
   for (const entry of entries) {
-    if (!entry.name.startsWith('assets/') || !STYLE_SOURCE_EXT.test(entry.name)) continue
+    if (!entry.name.startsWith('assets/') || !STYLE_SOURCE_EXT.test(entry.name)) {
+      continue
+    }
     warnings.push(
       `  ! ${id}: ${entry.name} is a SOURCE stylesheet — it is packed but NEVER compiled or served. ` +
         `Port it to plain CSS and list it in assets.css.`,
@@ -402,9 +446,13 @@ function resolveIconAsset(
   }
   // Only a brand-relative path names a file this build can read; an external URL or an absolute
   // framework path is not ours to inspect (see namespacePath).
-  if (!isRelativeAsset(rel)) return
+  if (!isRelativeAsset(rel)) {
+    return
+  }
   const file = join(dir, rel)
-  if (!existsSync(file)) return // already reported by namespacePath as "referenced asset not found"
+  if (!existsSync(file)) {
+    return
+  } // already reported by namespacePath as "referenced asset not found"
 
   // existsSync says a path RESOLVES, not that it can be read as a file: a directory passes it and then
   // throws EISDIR here, as does an unreadable file (EACCES) or a mid-build I/O error. Every other
@@ -463,7 +511,9 @@ function resolveIconAsset(
  * longer packed at all), so say so loudly at build time.
  */
 function warnRemovedPublicBucket(dir: string, id: string, warnings: string[]): void {
-  if (!existsSync(join(dir, 'public'))) return
+  if (!existsSync(join(dir, 'public'))) {
+    return
+  }
   warnings.push(
     `  ! ${id}: public/ is NO LONGER PACKED — move its files to assets/badges/ and point the badge ` +
       `seed data at /branding/${id}/assets/badges/<file>.svg.`,
@@ -477,7 +527,9 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
   const version = brandVersion(dir)
   const warnings: string[] = []
   const configPath = findConfig(dir)
-  if (!configPath) throw new Error(`no brand.config.(ts|mjs|js) in ${dir}`)
+  if (!configPath) {
+    throw new Error(`no brand.config.(ts|mjs|js) in ${dir}`)
+  }
   const config = await loadConfig(configPath)
   // Brands may author i18n overrides as conventional locales/<code>.json files (in addition to, or
   // instead of, inline config.locales) — merge those in now. Runtime shape is unchanged.
@@ -519,7 +571,9 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
   for (const type of BUCKET_NAMES) {
     const owned = JSON.stringify(extractBucket(namespaced, type))
     const ownedDefault = JSON.stringify(extractBucket(brandingDefaults, type))
-    if (owned === ownedDefault) continue // not customised → don't provide this bucket
+    if (owned === ownedDefault) {
+      continue
+    } // not customised → don't provide this bucket
     const name = 'default'
     const file = instanceFile(type, name)
     entries.push({ name: file, data: Buffer.from(`${JSON.stringify(fragments[type], null, 2)}\n`) })
@@ -541,7 +595,9 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
   // branding-assets middleware — nothing is copied into an image.
   for (const sub of ['assets', 'html', 'emails']) {
     const src = join(dir, sub)
-    if (existsSync(src)) collectFiles(src, sub, entries)
+    if (existsSync(src)) {
+      collectFiles(src, sub, entries)
+    }
   }
 
   // The brand's theme, translated into the one stylesheet the e-mails load (backend
@@ -557,7 +613,9 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
     // narrowed to unconditional ones, which is what a mail needs too — no client evaluates a media
     // query in a <style> block reliably enough to hang a brand's colour on it.
     const css = buildEmailBrandingCss(FRAMEWORK_TOKENS, config.theme.tokens)
-    if (css) entries.push({ name: EMAIL_BRANDING_CSS, data: Buffer.from(css) })
+    if (css) {
+      entries.push({ name: EMAIL_BRANDING_CSS, data: Buffer.from(css) })
+    }
   }
 
   // The brand's own stylesheets ship with their `:root` raised to `:root:root` — see
@@ -567,7 +625,9 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
     config.assets.css.map((href) => href.replace(/^\/branding\/[^/]+\//, '')),
   )
   for (const entry of entries) {
-    if (!sheetEntries.has(entry.name)) continue
+    if (!sheetEntries.has(entry.name)) {
+      continue
+    }
     entry.data = Buffer.from(outSpecifyRoot(entry.data.toString('utf8')))
   }
   warnUncompiledStylesheets(entries, id, warnings)
@@ -595,6 +655,8 @@ export async function publishBrandArchive(
     versioned = join(dir, `${built.id}-${built.version}.tar.gz`)
     writeFileSync(versioned, built.gz)
   }
-  if (markDefault) writeFileSync(join(dir, 'DEFAULT'), `${built.id}\n`)
+  if (markDefault) {
+    writeFileSync(join(dir, 'DEFAULT'), `${built.id}\n`)
+  }
   return { ...built, dir, latest, versioned }
 }

@@ -12,7 +12,9 @@ describe('withTimeout', () => {
       const timer = setTimeout(() => {
         resolve(1)
       }, 1000)
-      if (typeof timer.unref === 'function') timer.unref()
+      if (typeof timer.unref === 'function') {
+        timer.unref()
+      }
     })
     await expect(withTimeout(slow, 20, 'slow')).rejects.toThrow('slow timed out after 20ms')
   })

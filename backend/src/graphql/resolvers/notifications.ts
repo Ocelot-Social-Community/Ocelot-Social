@@ -30,7 +30,9 @@ const setNotificationReadState = async (
   const fromState = targetRead ? 'FALSE' : 'TRUE'
   const toState = targetRead ? 'TRUE' : 'FALSE'
   const params: Record<string, string> = { id: currentUser.id }
-  if (resourceId) params.resourceId = resourceId
+  if (resourceId) {
+    params.resourceId = resourceId
+  }
 
   const writeTxResultPromise = session.writeTransaction(async (transaction) => {
     const response = await transaction.run(

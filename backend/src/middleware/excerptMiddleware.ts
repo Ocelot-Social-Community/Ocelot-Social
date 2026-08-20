@@ -15,8 +15,9 @@ const createGroup: IMiddlewareResolver = async (resolve, root, args, context, in
 }
 
 const updateGroup: IMiddlewareResolver = async (resolve, root, args, context, info) => {
-  if (args.description)
+  if (args.description) {
     args.descriptionExcerpt = trunc(args.description, branding.group.descriptionExcerptLength).html
+  }
   return resolve(root, args, context, info)
 }
 

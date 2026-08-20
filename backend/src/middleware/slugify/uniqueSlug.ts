@@ -21,7 +21,9 @@ export function toSlug(str: string): string {
 type IsUnique = (slug: string) => Promise<boolean>
 export default async function uniqueSlug(str: string, isUnique: IsUnique) {
   const slug = toSlug(str)
-  if (await isUnique(slug)) return slug
+  if (await isUnique(slug)) {
+    return slug
+  }
 
   let count = 0
   let uniqueSlug: string

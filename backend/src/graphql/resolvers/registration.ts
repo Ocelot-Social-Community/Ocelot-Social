@@ -29,7 +29,9 @@ export default {
         // what to do?
       }
       */
-      if (emailAddress.alreadyExistingEmail) return emailAddress.alreadyExistingEmail
+      if (emailAddress.alreadyExistingEmail) {
+        return emailAddress.alreadyExistingEmail
+      }
       try {
         emailAddress = await neode.create('EmailAddress', args)
         return emailAddress.toJson()
@@ -54,7 +56,9 @@ export default {
       delete args.password
       delete args.locationName
 
-      if (locationName === '') locationName = null
+      if (locationName === '') {
+        locationName = null
+      }
 
       const { driver } = context
       const session = driver.session()
@@ -98,7 +102,9 @@ export default {
         )
         const [record] = createUserTransactionResponse.records
         const user = record?.get('user')
-        if (!user) throw new UserInputError('Invalid email or nonce')
+        if (!user) {
+          throw new UserInputError('Invalid email or nonce')
+        }
         // The single-role model requires exactly one HAS_ROLE edge. If the baseline
         // 'user' role node is not seeded, fail hard (rolls back this transaction)
         // rather than persist a half-initialized, edgeless user that later breaks
@@ -124,8 +130,9 @@ export default {
         await createOrUpdateLocations('User', user.id, locationName, session, context)
         return user
       } catch (e) {
-        if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
+        if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
           throw new UserInputError('User with this slug already exists!')
+        }
         throw new UserInputError(e.message)
       } finally {
         await session.close()

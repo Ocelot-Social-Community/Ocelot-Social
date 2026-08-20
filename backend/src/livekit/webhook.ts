@@ -29,11 +29,15 @@ const publishCount = async (
 }
 
 export const registerLiveKitWebhook = (app: Express) => {
-  if (!CONFIG.LIVEKIT_ENABLED) return
+  if (!CONFIG.LIVEKIT_ENABLED) {
+    return
+  }
   const livekitUrl = CONFIG.LIVEKIT_URL
   const apiKey = CONFIG.LIVEKIT_API_KEY
   const apiSecret = CONFIG.LIVEKIT_API_SECRET
-  if (!livekitUrl || !apiKey || !apiSecret) return
+  if (!livekitUrl || !apiKey || !apiSecret) {
+    return
+  }
 
   const receiver = new WebhookReceiver(apiKey, apiSecret)
 
@@ -103,7 +107,9 @@ export const registerLiveKitWebhook = (app: Express) => {
         // eslint-disable-next-line no-catch-all/no-catch-all
       } catch (err: unknown) {
         logger.error('Unexpected LiveKit webhook handler error', err)
-        if (!res.headersSent) res.status(500).end()
+        if (!res.headersSent) {
+          res.status(500).end()
+        }
       }
     })()
   })

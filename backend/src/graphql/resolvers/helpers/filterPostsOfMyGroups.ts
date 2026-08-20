@@ -11,7 +11,9 @@ export const filterPostsOfMyGroups = (
   params: PostQueryParams,
   context: Context,
 ): PostQueryParams => {
-  if (!params.filter?.postsInMyGroups) return params
+  if (!params.filter?.postsInMyGroups) {
+    return params
+  }
   const { postsInMyGroups: _flag, ...rest } = params.filter
   return { ...params, filter: { ...rest, inGroupsOf: context.user?.id ?? null } }
 }

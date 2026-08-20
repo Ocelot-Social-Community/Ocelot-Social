@@ -12,12 +12,16 @@ export const withTimeout = <T>(promise: Promise<T>, ms: number, label: string): 
     timer = setTimeout(() => {
       reject(new Error(`${label} timed out after ${ms.toString()}ms`))
     }, ms)
-    if (typeof timer.unref === 'function') timer.unref()
+    if (typeof timer.unref === 'function') {
+      timer.unref()
+    }
   })
   // Clear the timer once the race settles so a fast resolution doesn't leave
   // a pending setTimeout behind — otherwise burst traffic piles them up until
   // the underlying timers fire.
   return Promise.race([promise, timeoutPromise]).finally(() => {
-    if (timer) clearTimeout(timer)
+    if (timer) {
+      clearTimeout(timer)
+    }
   })
 }

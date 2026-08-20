@@ -44,13 +44,25 @@ const isNeo4jNode = (value: object): value is Neo4jNode =>
  * nested inside it.
  */
 export const unwrap = (value: unknown): unknown => {
-  if (value === null || value === undefined) return null
-  if (Array.isArray(value)) return value.map(unwrap)
-  if (typeof value !== 'object') return value
-  if (isNeo4jInteger(value)) return value.toNumber()
+  if (value === null || value === undefined) {
+    return null
+  }
+  if (Array.isArray(value)) {
+    return value.map(unwrap)
+  }
+  if (typeof value !== 'object') {
+    return value
+  }
+  if (isNeo4jInteger(value)) {
+    return value.toNumber()
+  }
   // A node — a field resolver is expected to return its properties, not the wrapper.
-  if (isNeo4jNode(value)) return unwrap(value.properties)
-  if (value instanceof Date) return value
+  if (isNeo4jNode(value)) {
+    return unwrap(value.properties)
+  }
+  if (value instanceof Date) {
+    return value
+  }
   // A projection map (`node { .*, extra: … }`): its values need the same treatment.
   return Object.fromEntries(
     Object.entries(value as Record<string, unknown>).map(([key, nested]) => [key, unwrap(nested)]),
@@ -122,13 +134,17 @@ export default function cypherFields(
       // The fallback applies here too: a parent can carry the key with a NULL value — a
       // projection that coalesced to nothing, or a constructed subscription payload — and
       // returning that unchanged would fail a non-null field exactly like an unresolved one.
-      if (!always && typeof parent?.[key] !== 'undefined') return parent[key] ?? fallback ?? null
+      if (!always && typeof parent?.[key] !== 'undefined') {
+        return parent[key] ?? fallback ?? null
+      }
       // A parent with no id cannot be matched, so there is nothing to look up — but the
       // fallback still applies. It exists to keep a non-null field from taking its parent
       // out of the response, and from the client's side an unresolvable id is no different
       // from a missing edge: either way the object disappears. Fields without a fallback
       // keep answering null here, which is the honest answer for a nullable field.
-      if (!parent?.[idAttribute]) return fallback ?? null
+      if (!parent?.[idAttribute]) {
+        return fallback ?? null
+      }
 
       const args = { ...defaults, ...(params ?? {}) }
 

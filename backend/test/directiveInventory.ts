@@ -49,8 +49,12 @@ const isObjectTypeDefinition = (
 ): definition is ObjectTypeDefinitionNode => definition.kind === Kind.OBJECT_TYPE_DEFINITION
 
 const printType = (type: TypeNode): string => {
-  if (type.kind === Kind.NON_NULL_TYPE) return `${printType(type.type)}!`
-  if (type.kind === Kind.LIST_TYPE) return `[${printType(type.type)}]`
+  if (type.kind === Kind.NON_NULL_TYPE) {
+    return `${printType(type.type)}!`
+  }
+  if (type.kind === Kind.LIST_TYPE) {
+    return `[${printType(type.type)}]`
+  }
   return type.name.value
 }
 
@@ -96,13 +100,17 @@ export const directiveInventory = (
   const inventory: Record<string, DirectiveField[]> = {}
 
   for (const definition of document.definitions) {
-    if (!isObjectTypeDefinition(definition)) continue
+    if (!isObjectTypeDefinition(definition)) {
+      continue
+    }
 
     const fields = (definition.fields ?? [])
       .map((field) => toDirectiveField(field, objectTypeNames))
       .filter((field) => field.directives.length > 0)
 
-    if (fields.length > 0) inventory[definition.name.value] = fields
+    if (fields.length > 0) {
+      inventory[definition.name.value] = fields
+    }
   }
 
   return inventory
@@ -147,14 +155,18 @@ export const representativeScalarFields = (
   const representatives: Record<string, string> = {}
 
   for (const definition of document.definitions) {
-    if (!isObjectTypeDefinition(definition)) continue
+    if (!isObjectTypeDefinition(definition)) {
+      continue
+    }
 
     const scalarFields = (definition.fields ?? []).filter(
       (field) => !objectTypeNames.has(namedTypeOf(field.type)) && hasNoRequiredArguments(field),
     )
 
     const chosen = scalarFields.find((field) => field.name.value === 'id') ?? scalarFields[0]
-    if (chosen) representatives[definition.name.value] = chosen.name.value
+    if (chosen) {
+      representatives[definition.name.value] = chosen.name.value
+    }
   }
 
   return representatives

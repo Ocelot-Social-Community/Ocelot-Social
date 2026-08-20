@@ -14,7 +14,9 @@ import { catalogAvailable, computeCatalog } from './theme-catalog.ts'
 
 const dirs: string[] = []
 after(() => {
-  for (const dir of dirs) rmSync(dir, { recursive: true, force: true })
+  for (const dir of dirs) {
+    rmSync(dir, { recursive: true, force: true })
+  }
 })
 
 describe('framework tokens snapshot', () => {

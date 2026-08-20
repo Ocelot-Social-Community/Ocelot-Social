@@ -155,9 +155,13 @@ Factory.define('basicUser')
 // cleanDatabase, so the edge is created in tests too. `roles` is the relationship key
 // on the User neode model.
 const relateUserToRole = async (user, roleName) => {
-  if (!roleName) return
+  if (!roleName) {
+    return
+  }
   const role = await neode.find('Role', roleName)
-  if (role) await user.relateTo(role, 'roles')
+  if (role) {
+    await user.relateTo(role, 'roles')
+  }
 }
 
 // Create a User node from the build attrs, then link it to its role node. `role` is
@@ -224,7 +228,9 @@ Factory.define('user')
       options.avatar,
     ])
     await Promise.all([user.relateTo(email, 'primaryEmail'), email.relateTo(user, 'belongsTo')])
-    if (avatar) await user.relateTo(avatar, 'avatar')
+    if (avatar) {
+      await user.relateTo(avatar, 'avatar')
+    }
     await relateUserToRole(user, roleName)
     return user
   })
@@ -242,7 +248,9 @@ Factory.define('post')
   })
   .option('authorId', null)
   .option('author', ['authorId'], (authorId) => {
-    if (authorId) return neode.find('User', authorId)
+    if (authorId) {
+      return neode.find('User', authorId)
+    }
     return Factory.build('user')
   })
   .option('pinnedBy', null)
@@ -285,7 +293,9 @@ Factory.define('post')
       // Promise.all(categories.map((c) => c.relateTo(post, 'post'))),
       Promise.all(tags.map((t) => t.relateTo(post, 'post'))),
     ])
-    if (image) await post.relateTo(image, 'image')
+    if (image) {
+      await post.relateTo(image, 'image')
+    }
     if (buildObject.pinned) {
       const pinnedBy = await (options.pinnedBy || Factory.build('user', { role: 'admin' }))
       await pinnedBy.relateTo(post, 'pinned')
@@ -296,7 +306,9 @@ Factory.define('post')
 Factory.define('group')
   .option('ownerId', null)
   .option('owner', ['ownerId'], (ownerId) => {
-    if (ownerId) return neode.find('User', ownerId)
+    if (ownerId) {
+      return neode.find('User', ownerId)
+    }
     return Factory.build('user')
   })
   .attrs({
@@ -349,12 +361,16 @@ Factory.define('group')
 Factory.define('comment')
   .option('postId', null)
   .option('post', ['postId'], (postId) => {
-    if (postId) return neode.find('Post', postId)
+    if (postId) {
+      return neode.find('Post', postId)
+    }
     return Factory.build('post')
   })
   .option('authorId', null)
   .option('author', ['authorId'], (authorId) => {
-    if (authorId) return neode.find('User', authorId)
+    if (authorId) {
+      return neode.find('User', authorId)
+    }
     return Factory.build('user')
   })
   .attrs({
@@ -417,7 +433,9 @@ Factory.define('inviteCode')
   })
   .option('generatedById', null)
   .option('generatedBy', ['generatedById'], (generatedById) => {
-    if (generatedById) return neode.find('User', generatedById)
+    if (generatedById) {
+      return neode.find('User', generatedById)
+    }
     return Factory.build('user')
   })
   .after(async (buildObject, options) => {

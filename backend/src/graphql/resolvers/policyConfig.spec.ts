@@ -23,7 +23,9 @@ const rowFor = (
   env?: Record<string, string | undefined>,
 ) => {
   const row = rowsFor(values, env).find((entry) => entry.key === key)
-  if (!row) throw new Error(`no policyConfig row for ${key}`)
+  if (!row) {
+    throw new Error(`no policyConfig row for ${key}`)
+  }
   return row
 }
 

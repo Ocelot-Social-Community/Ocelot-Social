@@ -18,7 +18,9 @@ export interface RoleBearer {
 // carries only the resolved `roleName`, never the array.
 export function resolveRoleName(roleNames: readonly string[] | null | undefined): string {
   const roles = roleNames ?? []
-  if (roles.length === 1) return roles[0]
+  if (roles.length === 1) {
+    return roles[0]
+  }
   if (roles.length > 1) {
     // eslint-disable-next-line no-console
     console.warn(

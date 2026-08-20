@@ -92,9 +92,13 @@ export default function Resolver(type, options: any = {}) {
 
   const _hasResolver = (_resolvers, { key, connection }, { returnType }) => {
     return async (parent, _params, context, _resolveInfo) => {
-      if (typeof parent[key] !== 'undefined') return parent[key]
+      if (typeof parent[key] !== 'undefined') {
+        return parent[key]
+      }
       const id = parent[idAttribute]
-      if (id === undefined || id === null) return returnType === 'object' ? null : []
+      if (id === undefined || id === null) {
+        return returnType === 'object' ? null : []
+      }
 
       // Batched across every parent of this field in the current request: one statement
       // for a whole list instead of one per row (see context/loaders.ts).
@@ -113,9 +117,13 @@ export default function Resolver(type, options: any = {}) {
     const resolvers = {}
     for (const [key, condition] of Object.entries(obj)) {
       resolvers[key] = async (parent, _params, context, _resolveInfo) => {
-        if (typeof parent[key] !== 'undefined') return parent[key]
+        if (typeof parent[key] !== 'undefined') {
+          return parent[key]
+        }
         const id = parent[idAttribute]
-        if (id === undefined || id === null) return false
+        if (id === undefined || id === null) {
+          return false
+        }
 
         return context.loaders
           .forField(`${type}.${key}`, async (ids) =>
@@ -131,9 +139,13 @@ export default function Resolver(type, options: any = {}) {
     const resolvers = {}
     for (const [key, connection] of Object.entries(obj)) {
       resolvers[key] = async (parent, _params, context, _resolveInfo) => {
-        if (typeof parent[key] !== 'undefined') return parent[key]
+        if (typeof parent[key] !== 'undefined') {
+          return parent[key]
+        }
         const id = parent[idAttribute]
-        if (id === undefined || id === null) return 0
+        if (id === undefined || id === null) {
+          return 0
+        }
 
         return context.loaders
           .forField(`${type}.${key}`, async (ids) =>

@@ -36,8 +36,9 @@ describe('slug', () => {
     await neode.create('User', { slug: 'Matt' })
     try {
       await expect(neode.create('User', { slug: 'Matt' })).rejects.toThrow('already exists')
-    } catch (error) {
-      throw new Error(`
+    } catch (error: unknown) {
+      throw new Error(
+        `
         ${error}
 
         Probably your database has no unique constraints!
@@ -50,7 +51,9 @@ describe('slug', () => {
 
         Learn how to setup the database here:
         https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/backend/README.md#database-indices-and-constraints
-      `)
+      `,
+        { cause: error },
+      )
     }
   })
 

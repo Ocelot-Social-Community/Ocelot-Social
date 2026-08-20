@@ -9,6 +9,7 @@ export default {
     } catch (error: unknown) {
       throw new Error(
         `Failed to parse ${sourcePath}: ${error instanceof Error ? error.message : String(error)}`,
+        { cause: error },
       )
     }
   },

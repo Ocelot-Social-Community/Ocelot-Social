@@ -1,7 +1,7 @@
 {
   "name": "@ocelot-social/branding",
   "version": "0.1.5",
-  "description": "Shared branding override schema, framework defaults and resolver — consumed by both backend and webapp so brand-tunable constants (group limits, registration lengths, metadata, logo paths, menu, …) cannot drift between the two. Authored in TypeScript, built to dist/ (CommonJS + .d.ts).",
+  "description": "Shared branding override schema, framework defaults and resolver \u2014 consumed by both backend and webapp so brand-tunable constants (group limits, registration lengths, metadata, logo paths, menu, \u2026) cannot drift between the two. Authored in TypeScript, built to dist/ (CommonJS + .d.ts).",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -29,7 +29,7 @@
     "typecheck": "tsc -p tsconfig.json",
     "validate": "publint && attw --pack . --profile node16",
     "test": "npm run build && node --test \"src/**/*.spec.ts\" \"scripts/**/*.spec.ts\"",
-    "test:coverage": "npm run build && node --test --experimental-test-coverage --test-coverage-lines=100 --test-coverage-functions=100 --test-coverage-branches=90 \"src/**/*.spec.ts\" \"scripts/**/*.spec.ts\"",
+    "test:coverage": "npm run build && node --test --experimental-test-coverage --test-coverage-lines=100 --test-coverage-functions=100 --test-coverage-branches=90 --test-coverage-exclude='dist/**' --test-coverage-exclude='**/*.spec.ts' \"src/**/*.spec.ts\" \"scripts/**/*.spec.ts\"",
     "check": "npm run build && npm run lint && npm run typecheck && npm run test:coverage && npm run validate",
     "build:dev-brandings": "node scripts/build-dev-brandings.ts",
     "schema:snapshot": "npm run build && node scripts/schema-snapshot.run.ts",
@@ -39,8 +39,8 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.3",
     "@types/node": "^18.18.9",
-    "eslint": "^9.27.0",
-    "eslint-config-it4c": "^0.12.0",
+    "eslint": "^10.8.1",
+    "eslint-config-it4c": "^0.13.2",
     "publint": "^0.3.18",
     "typescript": "^5.6.0",
     "typescript-eslint": "^8.63.0"
