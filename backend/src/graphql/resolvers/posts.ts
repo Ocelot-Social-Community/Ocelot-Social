@@ -96,17 +96,19 @@ const filterEventDates = (params) => {
   if (params.filter?.eventStart_gte) {
     const date = params.filter.eventStart_gte
     delete params.filter.eventStart_gte
-    // Posts saved before eventEnd defaulting existed (see ContributionForm's
-    // fallback) may still have no eventEnd at all. Treat those as running
-    // through the rest of the day they started, rather than dropping them
-    // the instant eventStart passes.
+    // An event stays "current" through the rest of the calendar day it ends
+    // on, not just up to its exact eventEnd instant — so this compares
+    // eventEnd against the *start* of the cutoff's day, not the cutoff
+    // itself. Posts saved before eventEnd defaulting existed (see
+    // ContributionForm's fallback) may still have no eventEnd at all; those
+    // get the same day-level grace period, based on eventStart instead.
     const startOfStartDate = new Date(date)
     startOfStartDate.setHours(0, 0, 0, 0)
     params.filter = {
       ...params.filter,
       OR: [
         { eventStart_gte: date },
-        { eventEnd_gte: date },
+        { eventEnd_gte: startOfStartDate.toISOString() },
         { eventEnd: null, eventStart_gte: startOfStartDate.toISOString() },
       ],
     }

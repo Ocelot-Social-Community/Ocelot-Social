@@ -841,19 +841,16 @@ export default {
       return [location.lng, location.lat]
     },
     // Mirrors filterEventDates() in backend/src/graphql/resolvers/posts.ts:
-    // the backend keeps an event while EITHER eventStart or eventEnd is
-    // still in the future, so a still-running event is only truly "past"
-    // once both have elapsed. Events without an eventEnd (never set by the
-    // author) are assumed to run through the rest of the day they started.
+    // an event stays "current" through the rest of the calendar day it ends
+    // on (or, without an eventEnd, the day it started), only truly "past"
+    // once that whole day has elapsed — not the instant the raw timestamp
+    // passes.
     isEventPast(post) {
       if (!post.eventStart) return false
       const now = new Date()
-      if (post.eventEnd) {
-        return new Date(post.eventStart) < now && new Date(post.eventEnd) < now
-      }
-      const endOfStartDate = new Date(post.eventStart)
-      endOfStartDate.setHours(23, 59, 59, 999)
-      return endOfStartDate < now
+      const endOfRelevantDate = new Date(post.eventEnd || post.eventStart)
+      endOfRelevantDate.setHours(23, 59, 59, 999)
+      return endOfRelevantDate < now
     },
     async getUserLocation(id) {
       try {

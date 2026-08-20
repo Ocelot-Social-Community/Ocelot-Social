@@ -277,6 +277,9 @@ describe('Post', () => {
       await createEvent('ongoing-event', { eventStart: hours(-1), eventEnd: hours(1) })
       // Fully ended two days ago.
       await createEvent('ended-event', { eventStart: hours(-48), eventEnd: hours(-24) })
+      // Fully ended an hour ago, but still "today" — should get the same
+      // rest-of-day grace period as an event with no eventEnd at all.
+      await createEvent('ended-today-event', { eventStart: hours(-3), eventEnd: hours(-1) })
       // No eventEnd, started an hour ago — still "today".
       await createEvent('no-end-today-event', { eventStart: hours(-1) })
       // No eventEnd, started 30 hours ago — its start day has fully elapsed.
@@ -291,7 +294,12 @@ describe('Post', () => {
       const { data } = await query({ query: Post, variables })
       const ids = data?.Post.map((post: { id: string }) => post.id)
       expect(ids).toEqual(
-        expect.arrayContaining(['future-event', 'ongoing-event', 'no-end-today-event']),
+        expect.arrayContaining([
+          'future-event',
+          'ongoing-event',
+          'ended-today-event',
+          'no-end-today-event',
+        ]),
       )
       expect(ids).not.toContain('ended-event')
       expect(ids).not.toContain('no-end-old-event')
@@ -306,6 +314,7 @@ describe('Post', () => {
           'future-event',
           'ongoing-event',
           'ended-event',
+          'ended-today-event',
           'no-end-today-event',
           'no-end-old-event',
         ]),

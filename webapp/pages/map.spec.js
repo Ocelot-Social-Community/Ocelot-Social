@@ -1265,6 +1265,16 @@ describe('map', () => {
         expect(geoJSON.find((f) => f.properties.type === 'event').properties.isPast).toBe(false)
       })
 
+      it('does not mark an event as isPast while still within the day its eventEnd falls on', async () => {
+        // eventEnd already passed as an exact instant, but the event stays
+        // "current" through the rest of that calendar day — same grace
+        // period as an event with no eventEnd at all.
+        const endedTodayPost = { ...posts[0], eventStart: hoursFromNow(-3), eventEnd: hoursFromNow(-1) }
+        await wrapper.setData({ users: [], groups: [], posts: [endedTodayPost] })
+        const geoJSON = wrapper.vm.buildMarkersGeoJSON()
+        expect(geoJSON.find((f) => f.properties.type === 'event').properties.isPast).toBe(false)
+      })
+
       it('does not mark future events as isPast', async () => {
         const futurePost = { ...posts[0], eventStart: hoursFromNow(24), eventEnd: hoursFromNow(48) }
         await wrapper.setData({ users: [], groups: [], posts: [futurePost] })
