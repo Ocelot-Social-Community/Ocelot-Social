@@ -1178,7 +1178,7 @@ describe('notifications', () => {
 
     describe('user joins group', () => {
       const joinGroupAction = async () => {
-        authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
+        authenticatedUser = await notifiedUser.toJson()
         await mutate({
           mutation: JoinGroup,
           variables: {
@@ -1275,7 +1275,7 @@ describe('notifications', () => {
 
     describe('user joins and leaves group', () => {
       const leaveGroupAction = async () => {
-        authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
+        authenticatedUser = await notifiedUser.toJson()
         await mutate({
           mutation: LeaveGroup,
           variables: {
@@ -1288,7 +1288,7 @@ describe('notifications', () => {
 
       beforeEach(async () => {
         jest.clearAllMocks()
-        authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
+        authenticatedUser = await notifiedUser.toJson()
         await mutate({
           mutation: JoinGroup,
           variables: {
@@ -1412,7 +1412,7 @@ describe('notifications', () => {
 
     describe('user role in group changes', () => {
       const changeGroupMemberRoleAction = async () => {
-        authenticatedUser = (await groupOwner.toJson()) as DecodedUser
+        authenticatedUser = await groupOwner.toJson()
         await mutate({
           mutation: ChangeGroupMemberRole,
           variables: {
@@ -1425,7 +1425,7 @@ describe('notifications', () => {
       }
 
       beforeEach(async () => {
-        authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
+        authenticatedUser = await notifiedUser.toJson()
         await mutate({
           mutation: JoinGroup,
           variables: {
@@ -1531,7 +1531,7 @@ describe('notifications', () => {
       }
 
       beforeEach(async () => {
-        authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
+        authenticatedUser = await notifiedUser.toJson()
         await mutate({
           mutation: JoinGroup,
           variables: {

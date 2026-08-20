@@ -114,7 +114,7 @@ describe('AddEmailAddress', () => {
           'e',
           database.neode.model('UnverifiedEmailAddress'),
         )
-        await expect(email.toJson()).resolves.toMatchObject({
+        await expect(email?.toJson()).resolves.toMatchObject({
           email: 'new-email@example.org',
           nonce: expect.any(String),
         })
@@ -195,7 +195,9 @@ describe('VerifyEmailAddress', () => {
       beforeEach(async () => {
         emailAddress = await Factory.build('unverifiedEmailAddress', {
           nonce: '12345',
-          verifiedAt: null,
+          // `verifiedAt: null` used to be here. UnverifiedEmailAddress has no such property —
+          // neode dropped the key, and writing null to Neo4j removes a property anyway, so it
+          // never reached a node either way.
           createdAt: new Date().toISOString(),
           email: 'to-be-verified@example.org',
         })
@@ -261,7 +263,7 @@ describe('VerifyEmailAddress', () => {
               'e',
               database.neode.model('EmailAddress'),
             )
-            await expect(email.toJson()).resolves.toMatchObject({
+            await expect(email?.toJson()).resolves.toMatchObject({
               email: 'to-be-verified@example.org',
             })
           })
@@ -277,7 +279,7 @@ describe('VerifyEmailAddress', () => {
               'e',
               database.neode.model('EmailAddress'),
             )
-            await expect(email.toJson()).resolves.toMatchObject({
+            await expect(email?.toJson()).resolves.toMatchObject({
               email: 'user@example.org',
             })
             await mutate({ mutation: VerifyEmailAddress, variables })
@@ -297,7 +299,7 @@ describe('VerifyEmailAddress', () => {
               'e',
               database.neode.model('EmailAddress'),
             )
-            await expect(email.toJson()).resolves.toMatchObject({
+            await expect(email?.toJson()).resolves.toMatchObject({
               email: 'user@example.org',
             })
             await mutate({ mutation: VerifyEmailAddress, variables })
@@ -340,7 +342,7 @@ describe('VerifyEmailAddress', () => {
                 'e',
                 database.neode.model('EmailAddress'),
               )
-              await expect(email.toJson()).resolves.toMatchObject({
+              await expect(email?.toJson()).resolves.toMatchObject({
                 email: 'to-be-verified@example.org',
               })
             })

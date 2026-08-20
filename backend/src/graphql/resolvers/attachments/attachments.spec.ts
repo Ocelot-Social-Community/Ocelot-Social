@@ -17,7 +17,6 @@ import { createApolloTestSetup } from '@root/test/helpers'
 import { attachments } from './attachments'
 
 import type { FileInput } from './attachments'
-import type File from '@db/models/File'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { S3Config } from '@src/config'
 import type { Context } from '@src/context'
@@ -243,17 +242,18 @@ describe('add Attachment', () => {
           `MATCH(p:Post {id: "p99"})-[:ATTACHMENT]->(f:File) RETURN f,p`,
           {},
         )
-        post = database.neode
-          .hydrateFirst<{ id: string }>(result, 'p', database.neode.model('Post'))
-          .properties()
+        // Assigned to locals rather than to the shared `post`: hydrateFirst answers null when
+        // the node is gone, which is what other tests in this file assert, and this one only
+        // wants to know that both are there.
+        const hydratedPost = database.neode.hydrateFirst(result, 'p', database.neode.model('Post'))
         const file = database.neode.hydrateFirst(result, 'f', database.neode.model('File'))
-        expect(post).toBeTruthy()
+        expect(hydratedPost).toBeTruthy()
         expect(file).toBeTruthy()
       })
 
       it('sets metadata', async () => {
         await addAttachment(post, 'ATTACHMENT', fileInput)
-        const file = await database.neode.first<typeof File>('File', {}, undefined)
+        const file = await database.neode.first('File', {}, undefined)
         await expect(file.toJson()).resolves.toMatchObject({
           name: 'The name of the new attachment',
           type: 'application/any',
@@ -289,7 +289,7 @@ describe('add Attachment', () => {
           } finally {
             await session.close()
           }
-          const file = await database.neode.first<typeof File>(
+          const file = await database.neode.first(
             'File',
             { name: 'This name text gets overwritten' },
             undefined,

@@ -75,7 +75,7 @@ describe('admin user search — e-mail filter is gated by user.email.readAny', (
               MERGE (r:Role { id: 'usermanager', name: 'usermanager' })
               MERGE (u)-[:HAS_ROLE]->(r)`,
     })
-    authenticatedUser = (await manager.toJson()) as Context['user']
+    authenticatedUser = await manager.toJson()
   }
 
   it('reaches the search (has role.manage) but does NOT match by e-mail (no oracle)', async () => {

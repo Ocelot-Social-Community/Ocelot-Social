@@ -22,9 +22,17 @@ export interface NodeProperties {
 }
 
 export class TestNode {
+  /**
+   * @param internalId Neo4j's own node id, captured when the node was created or read.
+   *
+   * Nodes are addressed by it rather than by a primary key, because not every entity has one:
+   * UnverifiedEmailAddress deliberately carries no uniqueness constraint (the same address may
+   * await verification for several users), and a handle has to work for those too.
+   */
   constructor(
     private readonly entity: EntityDefinition,
-    private properties: NodeProperties,
+    private stored: NodeProperties,
+    private readonly internalId: number,
   ) {}
 
   get label(): string {
@@ -39,7 +47,7 @@ export class TestNode {
    * round trip per call would show in a suite that builds thousands of fixtures.
    */
   async toJson(): Promise<NodeProperties> {
-    return Promise.resolve({ ...this.properties })
+    return Promise.resolve({ ...this.stored })
   }
 
   /**
@@ -47,24 +55,31 @@ export class TestNode {
    * straight away (`user.get('encryptedPassword')`), and the declaration cannot narrow it
    * without the caller naming the entity a second time.
    */
+  /**
+   * The properties, synchronously. neode's Node had this next to `toJson()`, and the
+   * attachment specs use it after hydrating a node out of a raw Cypher result.
+   */
+  properties(): NodeProperties {
+    return { ...this.stored }
+  }
+
   get(property: string): unknown {
-    return new Map(Object.entries(this.properties)).get(property)
+    return new Map(Object.entries(this.stored)).get(property)
   }
 
   /** Writes the given properties and keeps the handle in sync with what the database now holds. */
   async update(properties: NodeProperties): Promise<TestNode> {
-    const primary = this.primaryKey()
     const session = getDriver().session()
     try {
       const result = await session.writeTransaction((transaction) =>
         transaction.run(
-          `MATCH (n:${this.entity.label} {${primary.property}: $key})
+          `MATCH (n) WHERE id(n) = $internalId
            SET n += $properties
            RETURN n {.*} AS node`,
-          { key: primary.value, properties },
+          { internalId: this.internalId, properties },
         ),
       )
-      this.properties = (result.records[0]?.get('node') ?? this.properties) as NodeProperties
+      this.stored = (result.records[0]?.get('node') ?? this.stored) as NodeProperties
       return this
     } finally {
       await session.close()
@@ -84,8 +99,6 @@ export class TestNode {
     properties: NodeProperties = {},
   ): Promise<TestNode> {
     const { type, direction } = resolveAlias(this.entity.label, alias)
-    const source = this.primaryKey()
-    const other = target.primaryKey()
     const pattern =
       direction === 'out'
         ? `(source)-[edge:${type}]->(target)`
@@ -95,11 +108,11 @@ export class TestNode {
     try {
       await session.writeTransaction((transaction) =>
         transaction.run(
-          `MATCH (source:${this.entity.label} {${source.property}: $sourceKey})
-           MATCH (target:${target.label} {${other.property}: $targetKey})
+          `MATCH (source) WHERE id(source) = $sourceId
+           MATCH (target) WHERE id(target) = $targetId
            MERGE ${pattern}
            SET edge += $properties`,
-          { sourceKey: source.value, targetKey: other.value, properties },
+          { sourceId: this.internalId, targetId: target.id, properties },
         ),
       )
       return this
@@ -108,22 +121,8 @@ export class TestNode {
     }
   }
 
-  /**
-   * How this node is addressed: its first declared uniqueness constraint.
-   *
-   * `id` for most entities, but `url` for Image and File, `email` for EmailAddress, `code`
-   * for InviteCode — the same keys neode called primary.
-   */
-  private primaryKey(): { property: string; value: unknown } {
-    const [first] = this.entity.unique ?? []
-    const property = typeof first === 'string' ? first : first?.[0]
-    if (!property) {
-      throw new Error(`${this.entity.label} declares no unique property to address a node by`)
-    }
-    const value = new Map(Object.entries(this.properties)).get(property)
-    if (value === undefined) {
-      throw new Error(`${this.entity.label} fixture carries no ${property}`)
-    }
-    return { property, value }
+  /** Neo4j's node id, so another handle can point an edge at this one. */
+  get id(): number {
+    return this.internalId
   }
 }

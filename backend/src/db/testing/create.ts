@@ -68,11 +68,16 @@ export const createNode = async (
       transaction.run(
         `CREATE (node:${[entity.label, ...additionalLabels].join(':')})
          SET node += $properties
-         RETURN node {.*} AS node`,
+         RETURN node {.*} AS node, id(node) AS internalId`,
         { properties: complete },
       ),
     )
-    return new TestNode(entity, result.records[0].get('node') as NodeProperties)
+    const record = result.records[0]
+    return new TestNode(
+      entity,
+      record.get('node') as NodeProperties,
+      (record.get('internalId') as { toNumber: () => number }).toNumber(),
+    )
   } finally {
     await session.close()
   }
@@ -88,12 +93,20 @@ export const findNode = async (
   try {
     const result = await session.readTransaction((transaction) =>
       transaction.run(
-        `MATCH (node:${entity.label} {${property}: $value}) RETURN node {.*} AS node`,
+        `MATCH (node:${entity.label} {${property}: $value})
+         RETURN node {.*} AS node, id(node) AS internalId`,
         { value },
       ),
     )
-    const found = result.records[0]?.get('node') as NodeProperties | undefined
-    return found ? new TestNode(entity, found) : null
+    const record = result.records[0]
+    if (!record) {
+      return null
+    }
+    return new TestNode(
+      entity,
+      record.get('node') as NodeProperties,
+      (record.get('internalId') as { toNumber: () => number }).toNumber(),
+    )
   } finally {
     await session.close()
   }
