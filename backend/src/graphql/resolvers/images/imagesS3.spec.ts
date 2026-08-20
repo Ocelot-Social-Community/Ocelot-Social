@@ -220,7 +220,7 @@ describe('mergeImage', () => {
           `MATCH(p:Post {id: "p99"})-[:HERO_IMAGE]->(i:Image) RETURN i,p`,
           {},
         )
-        post = neode.hydrateFirst<{ id: string }>(result, 'p', neode.model('Post')).properties()
+        post = neode.hydrateFirst(result, 'p', neode.model('Post')).properties()
         const image = neode.hydrateFirst(result, 'i', neode.model('Image'))
         expect(post).toBeTruthy()
         expect(image).toBeTruthy()
@@ -228,7 +228,7 @@ describe('mergeImage', () => {
 
       it('sets metadata', async () => {
         await mergeImage(post, 'HERO_IMAGE', imageInput)
-        const image = await neode.first<typeof Image>('Image', {}, undefined)
+        const image = await neode.first('Image', {}, undefined)
         await expect(image.toJson()).resolves.toMatchObject({
           alt: 'A description of the new image',
           createdAt: expect.any(String),
@@ -256,7 +256,7 @@ describe('mergeImage', () => {
           } finally {
             await session.close()
           }
-          const image = await neode.first<typeof Image>(
+          const image = await neode.first(
             'Image',
             { alt: 'This alt text gets overwritten' },
             undefined,
@@ -309,7 +309,7 @@ describe('mergeImage', () => {
           await expect(neode.all('Image')).resolves.toHaveLength(1)
           await mergeImage(post, 'HERO_IMAGE', imageInput)
           await expect(neode.all('Image')).resolves.toHaveLength(1)
-          const image = await neode.first<typeof Image>('Image', {}, undefined)
+          const image = await neode.first('Image', {}, undefined)
           await expect(image.toJson()).resolves.toMatchObject({
             alt: 'A description of the new image',
             createdAt: expect.any(String),

@@ -7,8 +7,6 @@ import Signup from '@graphql/queries/auth/Signup.gql'
 import SignupVerification from '@graphql/queries/auth/SignupVerification.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-import type EmailAddress from '@db/models/EmailAddress'
-import type User from '@db/models/User'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 import type { NetworkPolicy } from '@src/policy'
@@ -90,21 +88,19 @@ describe('Signup', () => {
       describe('creates a EmailAddress node', () => {
         it('with `createdAt` attribute', async () => {
           await mutate({ mutation: Signup, variables })
-          const emailAddress = await database.neode.first<typeof EmailAddress>(
+          const emailAddress = await database.neode.first(
             'EmailAddress',
             { email: 'someuser@example.org' },
             undefined,
           )
           const emailAddressJson = await emailAddress.toJson()
           expect(emailAddressJson.createdAt).toBeTruthy()
-          expect(Date.parse(emailAddressJson.createdAt as unknown as string)).toEqual(
-            expect.any(Number),
-          )
+          expect(Date.parse(emailAddressJson.createdAt as string)).toEqual(expect.any(Number))
         })
 
         it('with a cryptographic `nonce`', async () => {
           await mutate({ mutation: Signup, variables })
-          const emailAddress = await database.neode.first<typeof EmailAddress>(
+          const emailAddress = await database.neode.first(
             'EmailAddress',
             { email: 'someuser@example.org' },
             undefined,
@@ -278,11 +274,7 @@ describe('SignupVerification', () => {
           it('sets `about` attribute of User', async () => {
             variables = { ...variables, about: 'Find this description in the user profile' }
             await mutate({ mutation: SignupVerification, variables })
-            const user = await database.neode.first<typeof User>(
-              'User',
-              { name: 'John Doe' },
-              undefined,
-            )
+            const user = await database.neode.first('User', { name: 'John Doe' }, undefined)
             await expect(user.toJson()).resolves.toMatchObject({
               about: 'Find this description in the user profile',
             })

@@ -686,7 +686,7 @@ describe('role management', () => {
         { id: 'plain', role: 'user' },
         { email: 'plain@e.org', password: '1234' },
       )
-      authenticatedUser = (await plain.toJson()) as Context['user']
+      authenticatedUser = await plain.toJson()
       const { errors } = await query({ query: SEARCH, variables: { roleName: 'admin' } })
       expect(errors?.[0].message).toMatch(/Not Authorized/)
     })
