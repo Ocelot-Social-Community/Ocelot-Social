@@ -10,9 +10,10 @@ import {
   isKnownProfile,
 } from '@db/schema/derive/drift'
 import { allRules } from '@db/schema/derive/rules'
+import { runnerFor } from '@db/schema/derive/runner'
 import { entities, labels, relationships, relationshipTypes } from '@db/schema/index'
 
-import type { Enforcement, SchemaRunner } from '@db/schema/derive/apply'
+import type { Enforcement } from '@db/schema/derive/apply'
 import type { BackendProfile } from '@db/schema/derive/ddl'
 import type { SchemaObject } from '@db/schema/derive/drift'
 import type { Session } from 'neo4j-driver'
@@ -43,25 +44,6 @@ const strict = flags.includes('--strict')
 const heading = (text: string): void => {
   console.log(`\n\x1b[1m${text}\x1b[0m`)
 }
-
-const asNumber = (value: unknown): number =>
-  typeof value === 'number'
-    ? value
-    : Number((value as { toString: () => string } | null)?.toString() ?? 0)
-
-const runnerFor = (session: Session): SchemaRunner => ({
-  count: async (cypher) => {
-    const result = await session.readTransaction((transaction) => transaction.run(cypher))
-    return asNumber(result.records[0]?.get(0))
-  },
-  sample: async (cypher) => {
-    const result = await session.readTransaction((transaction) => transaction.run(cypher))
-    return result.records.map((record) => record.toObject())
-  },
-  execute: async (cypher) => {
-    await session.run(cypher)
-  },
-})
 
 /** What `SHOW CONSTRAINTS` / `SHOW INDEXES` report, mapped onto the comparison shape. */
 const presentObjects = async (session: Session): Promise<SchemaObject[]> => {
