@@ -1,8 +1,6 @@
 import Factory, { cleanDatabase } from '../../backend/build/src/db/factories'
-import { getNeode } from '../../backend/build/src/db/neo4j'
+import { fixtures } from '../../backend/build/src/db/testing/fixtures'
 import CONFIG from '../../backend/build/src/config'
-
-const neodeInstance = getNeode()
 
 // Wipe the DB before each test AND re-seed the default Role nodes. The single-role
 // model resolves authorization from a (:User)-[:HAS_ROLE]->(:Role) edge, which the
@@ -40,15 +38,18 @@ beforeEach(() => {
   })
 })
 
-Cypress.Commands.add('neode', () => {
-  return neodeInstance
+// The same fixture API the backend specs use (backend/src/db/testing), so both halves of
+// the suite build nodes through one code path. It replaced neode; `cy.neode()` is gone with
+// it, and the step definitions call `cy.fixtures()`.
+Cypress.Commands.add('fixtures', () => {
+  return fixtures
 })
 
 Cypress.Commands.add(
   'firstOf',
   { prevSubject: true },
-  (neode, model, properties) => {
-    return neode.first(model, properties)
+  (fixtureApi, label, properties) => {
+    return fixtureApi.first(label, properties)
   }
 )
 Cypress.Commands.add(
