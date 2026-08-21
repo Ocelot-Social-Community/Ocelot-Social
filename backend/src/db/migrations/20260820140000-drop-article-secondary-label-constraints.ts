@@ -23,23 +23,49 @@ export const description = `
 
   Dropped by definition, not by name: the names are generated per database (constraint_680d649a
   and constraint_dc463a88 in one instance, different in the next), so the migration looks up
-  whatever constraints sit on :Article and drops those.
+  whatever UNIQUENESS constraints sit on :Article and drops those.
 
-  NOTE — until neode is gone, a fresh \`db:migrate init\` recreates them: store.ts still calls
-  schema.install(), which still walks the extended model. The schema layer's drift check reports
-  them as SURPLUS, which is the reminder. They stop coming back when the DDL comes from
-  db/schema instead (concept stage P2).
+  They no longer come back. \`db:migrate init\` used to recreate them via neode's
+  schema.install(), which walked the extended model; store.ts now applies the declaration in
+  db/schema, and that emits constraints for PRIMARY labels only (see \`alsoLabelled\` in
+  db/schema/types.ts). If run-audit.ts reports them as SURPLUS again, this migration is the
+  answer — not re-adding them to the declaration.
 `
 
+/**
+ * The UNIQUENESS constraints on the secondary label :Article.
+ *
+ * Narrowed by type, not just by label: `down()` recreates exactly two uniqueness constraints,
+ * so anything else this dropped would be gone for good. An existence or key constraint on
+ * :Article is not what neode's `extend` produced and not what this migration is about — an
+ * operator who added one meant it, and a migration that silently removed it would take a
+ * database guarantee with it.
+ *
+ * A record without a `type` column is left alone for the same reason: `SHOW CONSTRAINTS`
+ * reports one on Neo4j 4.4 (verified: `id, name, type, entityType, labelsOrTypes, properties,
+ * ownedIndexId`), but where the answer is unknown, not dropping is the safe direction.
+ */
 const constraintsOnArticle = async (session: Session): Promise<string[]> => {
   const result = await session.run('SHOW CONSTRAINTS')
   return result.records
     .filter((record) => {
       const labels = record.get('labelsOrTypes') as string[] | null
-      return labels?.length === 1 && labels[0] === 'Article'
+      const onArticle = labels?.length === 1 && labels[0] === 'Article'
+      return onArticle && record.has('type') && String(record.get('type')) === 'UNIQUENESS'
     })
     .map((record) => String(record.get('name')))
 }
+
+/**
+ * `DROP CONSTRAINT` for one name.
+ *
+ * The name is a Cypher IDENTIFIER, not a parameter — no `$name` can stand here. Backticks
+ * because the generated names (`constraint_680d649a`) are not the only ones this can meet: a
+ * constraint an operator created as `` `article-legacy` `` is a syntax error unquoted. An
+ * inner backtick is escaped by doubling it, which is Cypher's own rule for quoted identifiers.
+ */
+const dropStatement = (name: string): string =>
+  `DROP CONSTRAINT \`${name.replace(/`/g, '``')}\` IF EXISTS`
 
 export async function up(_next) {
   const driver = getDriver()
@@ -47,7 +73,7 @@ export async function up(_next) {
   try {
     for (const name of await constraintsOnArticle(session)) {
       // Schema statements cannot share a transaction in community edition, so each runs alone.
-      await session.run(`DROP CONSTRAINT ${name} IF EXISTS`)
+      await session.run(dropStatement(name))
     }
   } finally {
     await session.close()
