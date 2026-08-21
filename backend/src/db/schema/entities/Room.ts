@@ -16,5 +16,4 @@ export const Room = defineEntity({
     createdAt: { type: 'string', pattern: ISO_DATE_TIME },
   },
   required: ['id', 'createdAt'],
-  indexed: ['id'],
 })
