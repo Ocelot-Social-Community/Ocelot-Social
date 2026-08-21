@@ -13,7 +13,8 @@ import CONFIG, { nodemailerTransportOptions } from '@config/index'
 import { SUPPORTED_LOCALES } from '@config/locales'
 import { branding } from '@src/branding'
 
-import type { UserDbProperties } from '@db/types/User'
+import type { User } from '@db/schema/entities/User'
+import type { EntityProperties } from '@db/schema/types'
 
 const settingsUrl = new URL('/settings/notifications', CONFIG.CLIENT_URI)
 
@@ -169,8 +170,8 @@ export const sendNotificationMail = async (notification: any): Promise<OriginalM
 }
 
 export interface ChatMessageEmailInput {
-  senderUser: UserDbProperties
-  recipientUser: UserDbProperties
+  senderUser: EntityProperties<typeof User>
+  recipientUser: EntityProperties<typeof User>
   email: string
 }
 

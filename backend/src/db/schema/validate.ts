@@ -64,21 +64,6 @@ export const validateProperties = (entity: EntityDefinition, value: unknown): st
   return describe(entity.label, validate.errors)
 }
 
-/**
- * ajv's own text drops the offending key for `additionalProperties`, which is the one case
- * where the key IS the message ("must NOT have additional properties" tells you nothing).
- */
-const describe = (label: string, errors: ValidateFunction['errors']): string =>
-  (errors ?? [])
-    .map((error) => {
-      const extra = (error.params as { additionalProperty?: string }).additionalProperty
-      const where = `${label}${error.instancePath}`
-      return extra
-        ? `${where} has undeclared property "${extra}"`
-        : `${where} ${error.message ?? ''}`
-    })
-    .join(', ')
-
 const propertyValidators = new Map<string, ValidateFunction>()
 
 /**
