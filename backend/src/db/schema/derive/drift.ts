@@ -1,4 +1,4 @@
-import { CAPABILITIES, indexStatementsFor, statementFor } from './ddl'
+import { capabilitiesFor, CAPABILITIES, indexStatementsFor, statementFor } from './ddl'
 import { rulesForEntity } from './rules'
 
 import type { BackendProfile } from './ddl'
@@ -45,15 +45,50 @@ export const declaredObjects = (
       // pair with the existence constraint, so they would collapse onto the same key. They
       // are covered by the apply report rather than by this comparison.
     }
+    // Plain indexes need no capability test: every profile can express one, only the spelling
+    // differs (see indexStatementsFor).
     for (const property of entity.indexed ?? []) {
       objects.push({ kind: 'index', label: entity.label, properties: [property] })
     }
-    for (const index of entity.fulltext ?? []) {
-      objects.push({ kind: 'index', label: entity.label, properties: index.properties })
+    // A fulltext index only counts as declared where the profile can create it. Otherwise the
+    // comparison would want an object that `apply` reports as UNSUPPORTED in the same run:
+    // the drift report listed it as MISSING and as UNSUPPORTED at once, and since `missing`
+    // feeds the exit code, `check memgraph` could never come back clean. Which profiles can
+    // is decided once, in the capability table.
+    if (capabilitiesFor(profile).fulltext) {
+      for (const index of entity.fulltext ?? []) {
+        objects.push({ kind: 'index', label: entity.label, properties: index.properties })
+      }
     }
   }
 
   return objects
+}
+
+/**
+ * Objects the declaration names and this profile cannot create.
+ *
+ * The counterpart to leaving them out of `declaredObjects`: excluding them from the WANTED
+ * side alone only moves the double report, it does not remove it. Against a database that
+ * holds such an object — `check memgraph` against the running Neo4j, which is the documented
+ * "what would break after the migration" run — it would come back as SURPLUS "declared
+ * nowhere", which is both untrue and an invitation to drop an index Neo4j should keep. The
+ * honest report says UNSUPPORTED once, and nothing else.
+ */
+export const inexpressibleObjects = (
+  entities: readonly EntityDefinition[],
+  profile: BackendProfile,
+): SchemaObject[] => {
+  if (capabilitiesFor(profile).fulltext) {
+    return []
+  }
+  return entities.flatMap((entity) =>
+    (entity.fulltext ?? []).map((index): SchemaObject => ({
+      kind: 'index',
+      label: entity.label,
+      properties: index.properties,
+    })),
+  )
 }
 
 export interface DriftReport {

@@ -18,6 +18,16 @@ interface Capabilities {
   readonly existence: boolean
   /** "property must be of type X" — Memgraph only; Neo4j 4.4 has no such constraint. */
   readonly dataType: boolean
+  /**
+   * A fulltext index over named properties, as `entity.fulltext` declares it.
+   *
+   * A capability rather than a `dialect === 'neo4j'` test at the two places that ask, because
+   * both of them have to answer identically: indexStatementsFor() decides whether to emit the
+   * statement, and declaredObjects() (drift.ts) decides whether the index is something this
+   * profile wants at all. When those two disagreed, the drift report listed the same index as
+   * MISSING and as UNSUPPORTED, and `check` could never reach "in sync".
+   */
+  readonly fulltext: boolean
   readonly dialect: 'neo4j' | 'memgraph'
 }
 
@@ -28,24 +38,46 @@ export const CAPABILITIES = new Map<BackendProfile, Capabilities>([
   // only as NODE KEY, which is an Enterprise feature.
   [
     'neo4j-community',
-    { unique: true, compositeUnique: false, existence: false, dataType: false, dialect: 'neo4j' },
+    {
+      unique: true,
+      compositeUnique: false,
+      existence: false,
+      dataType: false,
+      fulltext: true,
+      dialect: 'neo4j',
+    },
   ],
   // Neo4j 4.4 Enterprise: adds existence constraints and NODE KEY. Type constraints did not
   // arrive before Neo4j 5.9, so they stay unenforced here too.
   [
     'neo4j-enterprise',
-    { unique: true, compositeUnique: true, existence: true, dataType: false, dialect: 'neo4j' },
+    {
+      unique: true,
+      compositeUnique: true,
+      existence: true,
+      dataType: false,
+      fulltext: true,
+      dialect: 'neo4j',
+    },
   ],
   // Memgraph's free edition carries all three constraint classes, including native composite
   // uniqueness and IS TYPED. This is the profile that enforces the most of our declaration —
-  // relevant for the paused Memgraph migration.
+  // relevant for the paused Memgraph migration. Fulltext is the one thing it does NOT have in
+  // this shape: it offers text indexes, which are a different object (see indexStatementsFor).
   [
     'memgraph',
-    { unique: true, compositeUnique: true, existence: true, dataType: true, dialect: 'memgraph' },
+    {
+      unique: true,
+      compositeUnique: true,
+      existence: true,
+      dataType: true,
+      fulltext: false,
+      dialect: 'memgraph',
+    },
   ],
 ])
 
-const capabilitiesFor = (profile: BackendProfile): Capabilities => {
+export const capabilitiesFor = (profile: BackendProfile): Capabilities => {
   const capabilities = CAPABILITIES.get(profile)
   if (capabilities === undefined) {
     throw new Error(`Unknown backend profile: ${profile}`)
@@ -161,7 +193,8 @@ export const indexStatementsFor = (
   entity: EntityDefinition,
   profile: BackendProfile,
 ): { statements: string[]; unsupported: string[] } => {
-  const neo4j = capabilitiesFor(profile).dialect === 'neo4j'
+  const capabilities = capabilitiesFor(profile)
+  const neo4j = capabilities.dialect === 'neo4j'
   const statements = (entity.indexed ?? []).map((property) =>
     neo4j
       ? `CREATE INDEX ${entity.label}_${property}_index IF NOT EXISTS FOR (n:${entity.label}) ON (n.${property})`
@@ -170,7 +203,7 @@ export const indexStatementsFor = (
   const unsupported: string[] = []
 
   for (const index of entity.fulltext ?? []) {
-    if (neo4j) {
+    if (capabilities.fulltext) {
       // Neo4j 4.4 spells fulltext indexes as a procedure call; CREATE FULLTEXT INDEX is 5.x.
       statements.push(
         `CALL db.index.fulltext.createNodeIndex(` +
