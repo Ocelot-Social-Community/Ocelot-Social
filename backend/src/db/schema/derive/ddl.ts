@@ -72,6 +72,22 @@ const MEMGRAPH_TYPE = new Map<PropertyType, string>([
  * Returning null rather than throwing is what makes the audit complement work: audit.ts asks
  * the same question and takes everything this returns null for.
  */
+// UNVERIFIED on Memgraph: idempotency.
+//
+// Every Neo4j statement below carries `IF NOT EXISTS`, so `apply` can run on every deployment
+// and a second run is a no-op. Memgraph's constraint grammar is the pre-4.4 spelling
+// (`CREATE CONSTRAINT ON ... ASSERT ...`) and has no such clause, so re-creating an existing
+// constraint is answered by the server rather than by the statement — and applyPlan()
+// recognises exactly one "already there" answer, Neo4j's EquivalentSchemaRuleAlreadyExists.
+// If Memgraph errors instead of shrugging, a second `apply memgraph` lands in `failed`, which
+// `enforce` turns into a thrown error in BOTH enforcement modes, production included.
+//
+// Not fixed here because it cannot be verified here: no Memgraph runs in this project (the
+// profile exists for `check memgraph`, which never executes DDL — see run-audit.ts), so any
+// remedy would be written blind. The two candidates, in order of preference once a server is
+// available to measure against: ask `SHOW CONSTRAINT INFO` before creating, which depends on
+// no error text at all; or teach `isAlreadySatisfied` the message Memgraph actually returns.
+// Guessing that string now would look like coverage and be none.
 export const statementFor = (rule: Rule, profile: BackendProfile): string | null => {
   const capabilities = capabilitiesFor(profile)
   const neo4j = capabilities.dialect === 'neo4j'
