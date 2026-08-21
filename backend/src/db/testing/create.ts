@@ -59,7 +59,17 @@ export const createNode = async (
       ([, value]) => value !== null,
     ),
   )
-  const invalid = validateProperties(entity, complete)
+  // Neo4j Integers are objects; the declaration describes the unwrapped value, so they are
+  // validated as the numbers they represent and written as the Integers they are.
+  const asPlainValues = Object.fromEntries(
+    Object.entries(complete).map(([name, value]) => [
+      name,
+      typeof value === 'object' && value !== null && 'toNumber' in value
+        ? (value as { toNumber: () => number }).toNumber()
+        : value,
+    ]),
+  )
+  const invalid = validateProperties(entity, asPlainValues)
   if (invalid) {
     throw new Error(`Cannot build a ${entity.label} fixture: ${invalid}`)
   }
