@@ -121,9 +121,20 @@ describe('applyPlan', () => {
   })
 
   it('samples the offending rows only when there are any', async () => {
-    const { calls } = stubRunner()
-    await applyPlan(stubRunner().runner, plan)
-    expect(calls.filter((call) => call.startsWith('sample'))).toEqual([])
+    // Why it matters that this is asserted in BOTH directions: the sample is a SECOND query
+    // per statement, split off precisely so the normal path stays a plain count (see the
+    // docblock on AuditQuery.sampleCypher). A sample fetched unconditionally would cost one
+    // extra round trip per constraint on every deployment, and no other assertion would
+    // notice — the report would look identical.
+    const clean = stubRunner()
+    await applyPlan(clean.runner, plan)
+    expect(clean.calls.filter((call) => call.startsWith('sample'))).toEqual([])
+
+    const violating = stubRunner({ violations: new Map([[AUDIT, 3]]) })
+    await applyPlan(violating.runner, plan)
+    expect(violating.calls.filter((call) => call.startsWith('sample'))).toEqual([
+      'sample SAMPLE User.slug',
+    ])
   })
 
   it('carries on with the remaining statements after a skip', async () => {
