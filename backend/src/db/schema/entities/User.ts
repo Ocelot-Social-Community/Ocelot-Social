@@ -36,7 +36,10 @@ export const User = defineEntity({
     createdAt: { type: 'string', pattern: ISO_DATE_TIME },
     updatedAt: { type: 'string', pattern: ISO_DATE_TIME },
     termsAndConditionsAgreedVersion: { type: ['string', 'null'] },
-    termsAndConditionsAgreedAt: { type: ['string', 'null'] },
+    // Nullable AND patterned: JSON Schema applies `pattern` only to a string, so null stays
+    // valid, and the audit query skips null anyway. Both writers spell it
+    // `new Date().toISOString()` (resolvers/users.ts, resolvers/registration.ts).
+    termsAndConditionsAgreedAt: { type: ['string', 'null'], pattern: ISO_DATE_TIME },
     allowEmbedIframes: { type: 'boolean' },
     showShoutsPublicly: { type: 'boolean' },
     locale: { type: ['string', 'null'] },
