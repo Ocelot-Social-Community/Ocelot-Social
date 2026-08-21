@@ -2,8 +2,8 @@ import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 import './../../factories'
 
 defineStep('{string} is a member of group {string}', (userSlug, groupId) => {
-  cy.neode().then((neode) => {
-    return neode.writeCypher(
+  cy.fixtures().then((fixtures) => {
+    return fixtures.cypher(
       `MATCH (user:User {slug: $userSlug}), (group:Group {id: $groupId})
        MERGE (user)-[membership:MEMBER_OF]->(group)
        ON CREATE SET
