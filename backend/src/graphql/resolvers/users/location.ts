@@ -237,7 +237,9 @@ export const queryLocations = async ({ place, lang, types, proximity }, context:
       const features = await fetchMapboxFeatures(
         buildMapboxUrl(trimmedPlace, lang, type, 1, proximity, accessToken),
       )
-      if (features.length) return features
+      if (features.length) {
+        return features
+      }
     }
     return []
   }
