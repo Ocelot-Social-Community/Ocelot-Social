@@ -532,8 +532,25 @@ export default {
         categoryIds: categories ? categories.map((category) => category.id) : [],
         eventStart: eventStart ? new Date(eventStart) : null,
         eventEnd: eventEnd ? new Date(eventEnd) : null,
-        eventLocation: eventLocation || '',
-        eventLocationName: eventLocationName || '',
+        // A selection object (same { label, value, id, lat, lng } shape
+        // LocationSelect/EventLocationMap produce when the user picks a
+        // result), not just the bare name — otherwise EventLocationMap has
+        // no coordinates to show a pin for on an event being edited, even
+        // though it was already geocoded once. Falls back to the plain
+        // string when there's no saved location (online events) or no
+        // coordinates were ever geocoded for it.
+        eventLocationName:
+          eventLocation &&
+          typeof eventLocation.lat === 'number' &&
+          typeof eventLocation.lng === 'number'
+            ? {
+                label: eventLocationName || '',
+                value: eventLocationName || '',
+                id: eventLocation.id ?? null,
+                lat: eventLocation.lat,
+                lng: eventLocation.lng,
+              }
+            : eventLocationName || '',
         eventVenue: eventVenue || '',
         eventIsOnline: eventIsOnline || false,
       }

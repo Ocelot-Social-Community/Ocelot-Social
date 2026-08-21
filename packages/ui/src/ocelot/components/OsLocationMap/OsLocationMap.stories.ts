@@ -22,7 +22,12 @@ function createStubMapboxGl() {
     flyTo: () => {},
     setStyle: () => {},
     remove: () => {},
+    resize: () => {},
     getContainer: () => document.createElement('div'),
+    // Read by setPicking() (cursor styling) and flyToPin() (never zooming
+    // back out below the current level).
+    getCanvas: () => document.createElement('canvas'),
+    getZoom: () => 2,
   }
   const stubMarker = {
     setLngLat: function (this: unknown) {
@@ -35,6 +40,8 @@ function createStubMapboxGl() {
     remove: () => {},
     setDraggable: () => {},
     getLngLat: () => ({ lng: 0, lat: 0 }),
+    // Read by updateMarker() to set the view-on-map a11y attributes.
+    getElement: () => document.createElement('div'),
   }
 
   return {

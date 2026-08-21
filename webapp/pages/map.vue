@@ -375,6 +375,11 @@ export default {
         // Triggered when `setStyle` is called.
         this.markers.isImagesLoaded = false
         this.markers.isSourceAndLayerAdded = false
+        // Without this, addMarkersOnCheckPrepared() below would skip rebuilding
+        // markers.geoJSON — isPreparedForMarkers requires !isGeoJSON, which
+        // stays permanently true after the very first successful build — and
+        // re-add the layer with whatever (possibly stale) data it last held.
+        this.markers.isGeoJSON = false
         this.loadMarkersIconsAndAddMarkers()
       })
 

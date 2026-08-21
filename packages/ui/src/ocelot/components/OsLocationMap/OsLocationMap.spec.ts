@@ -128,6 +128,13 @@ describe('osLocationMap', () => {
     // timers into later tests.
     vi.useRealTimers()
     vi.restoreAllMocks()
+    // The style switcher's popover is appended straight to document.body (by
+    // design — see buildStyleSwitcher()'s own comment); most tests that open
+    // one don't unmount afterwards, so without this every later test would
+    // find multiple stale popovers accumulated from earlier ones.
+    document.querySelectorAll('.os-location-map-style-popover').forEach((el) => {
+      el.remove()
+    })
   })
 
   it('creates a mapbox-gl map on mount using the injected library', () => {
@@ -688,16 +695,10 @@ describe('osLocationMap', () => {
       return toggle
     }
 
-    // Other tests in this file (e.g. "adds a style switcher control when 2+
-    // styles are given") also create a style switcher and never unmount it,
-    // leaving its popover element in document.body — always take the most
-    // recently appended match, which is this test's own.
+    // The top-level afterEach() removes any popover left in document.body
+    // after every test, so at most one can exist here.
     function getLatestPopover() {
-      // Array.prototype.find()'s return type genuinely includes `undefined`
-      // (unlike indexed access, and .at() isn't in this project's ES2020
-      // lib target), so the guard below isn't flagged as unreachable.
-      const popovers = [...document.querySelectorAll('.os-location-map-style-popover')]
-      const popover = popovers.find((_el, i) => i === popovers.length - 1)
+      const popover = document.querySelector('.os-location-map-style-popover')
       if (!popover) {
         throw new Error('style popover was not found')
       }

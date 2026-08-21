@@ -251,7 +251,7 @@ describe('Filter Posts', () => {
     })
 
     it('excludes an event that was given an explicit eventEnd', async () => {
-      await mutate({
+      const createResult = await mutate({
         mutation: CreatePost,
         variables: {
           id: 'e3',
@@ -265,6 +265,9 @@ describe('Filter Posts', () => {
           },
         },
       })
+      // Otherwise a silently failed creation would be indistinguishable
+      // below from e3 having been correctly filtered out.
+      expect(createResult.errors).toBeUndefined()
 
       const {
         data: { Post: result },

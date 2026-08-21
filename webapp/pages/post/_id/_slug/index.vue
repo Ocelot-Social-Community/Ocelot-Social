@@ -103,7 +103,7 @@
               class="post-detail-ribbon"
               :class="post.image ? 'post-detail-ribbon-w-img' : ''"
               :text="ribbonText"
-              :typ="post.postType[0]"
+              :typ="post.postType && post.postType[0]"
             />
           </section>
           <div class="ds-mb-small"></div>
@@ -135,7 +135,10 @@
           </p>
           <h1 class="ds-heading ds-heading-h1 title hyphenate-text">{{ post.title }}</h1>
           <!-- event data -->
-          <div v-if="post && post.postType[0] === 'Event'" class="ds-mb-small event-data">
+          <div
+            v-if="post && post.postType && post.postType[0] === 'Event'"
+            class="ds-mb-small event-data"
+          >
             <div class="event-data__info">
               <location-teaser
                 class="event-info"
@@ -387,7 +390,7 @@ export default {
       // Also read by routes(), which the sidebar renders even before the
       // post has loaded — needs the same "post may still be null" guard
       // that computed used to have inline.
-      if (this.post?.postType[0] === 'Event') return this.$t('post.event')
+      if (this.post?.postType?.[0] === 'Event') return this.$t('post.event')
       return this.$t('post.article')
     },
     // Same derivation as CommentList's own heading counter — reading
@@ -459,7 +462,7 @@ export default {
     // Read-only map only makes sense for in-person events with a resolved pin.
     showEventMap() {
       return (
-        this.post?.postType[0] === 'Event' && !this.post.eventIsOnline && this.hasEventCoordinates
+        this.post?.postType?.[0] === 'Event' && !this.post.eventIsOnline && this.hasEventCoordinates
       )
     },
     eventMapLocation() {

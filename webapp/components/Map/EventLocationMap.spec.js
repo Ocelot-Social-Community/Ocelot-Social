@@ -43,6 +43,30 @@ describe('EventLocationMap', () => {
     expect(wrapper.findComponent({ name: 'OsLocationMap' }).exists()).toBe(true)
   })
 
+  describe('onViewOnMap', () => {
+    it('navigates to the main map centered on the coordinates', () => {
+      wrapper = Wrapper()
+
+      wrapper.vm.onViewOnMap({ lat: 52.5, lng: 13.4 })
+
+      expect(mocks.$router.push).toHaveBeenCalledWith({
+        path: '/map',
+        query: { lat: 52.5, lng: 13.4 },
+      })
+    })
+
+    it('includes showPastEvents and eventId for a past event deep-linked by postId', () => {
+      wrapper = Wrapper({ isPastEvent: true, postId: 'post-1' })
+
+      wrapper.vm.onViewOnMap({ lat: 52.5, lng: 13.4 })
+
+      expect(mocks.$router.push).toHaveBeenCalledWith({
+        path: '/map',
+        query: { lat: 52.5, lng: 13.4, showPastEvents: '1', eventId: 'post-1' },
+      })
+    })
+  })
+
   describe('onPinChange', () => {
     // Same reverse-geocoding endpoint the address search already uses —
     // mapbox auto-detects a "lng,lat" search string.

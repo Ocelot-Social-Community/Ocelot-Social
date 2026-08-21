@@ -588,6 +588,16 @@ describe('PostSlug', () => {
         expect(PostSlug.computed.ribbonText.call(ctx)).toBe('post.article')
       })
 
+      it('ribbonText falls back to the article label without throwing when post has no postType yet', () => {
+        // apollo's update() sets `post = Post[0] || {}` — reachable before the
+        // real post data has arrived.
+        const ctx = {
+          post: {},
+          $t: (k) => k,
+        }
+        expect(PostSlug.computed.ribbonText.call(ctx)).toBe('post.article')
+      })
+
       it('commentsCount excludes deleted and disabled comments', () => {
         const ctx = {
           post: {

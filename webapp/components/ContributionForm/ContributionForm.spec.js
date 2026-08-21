@@ -6,6 +6,7 @@ import Vuex from 'vuex'
 
 import ImageUploader from '~/components/Uploader/ImageUploader'
 import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
+import EventLocationMap from '~/components/Map/EventLocationMap'
 import MutationObserver from 'mutation-observer'
 
 global.MutationObserver = MutationObserver
@@ -296,6 +297,59 @@ describe('ContributionForm.vue', () => {
 
       it('sets content equal to contribution content', () => {
         expect(wrapper.vm.formData.content).toEqual(propsData.contribution.content)
+      })
+
+      describe('editing an event with a saved location', () => {
+        beforeEach(() => {
+          propsData = {
+            postType: 'Event',
+            contribution: {
+              id: 'p1456',
+              slug: 'kindergeburtstag',
+              title: 'Kindergeburtstag',
+              content: 'auf Deutsch geschrieben',
+              image,
+              eventStart: new Date().toISOString(),
+              eventVenue: 'Brandenburger Tor',
+              eventLocationName: 'Berlin, Germany',
+              eventLocation: { id: 'place.berlin', lat: 52.52, lng: 13.405 },
+            },
+          }
+          wrapper = Wrapper()
+        })
+
+        it('initializes eventLocationName as a selection object carrying the saved coordinates', () => {
+          expect(wrapper.vm.formData.eventLocationName).toEqual({
+            label: 'Berlin, Germany',
+            value: 'Berlin, Germany',
+            id: 'place.berlin',
+            lat: 52.52,
+            lng: 13.405,
+          })
+        })
+
+        it('passes that same location on to EventLocationMap, so its pin is shown without re-picking', () => {
+          expect(wrapper.findComponent(EventLocationMap).props('location')).toEqual({
+            label: 'Berlin, Germany',
+            value: 'Berlin, Germany',
+            id: 'place.berlin',
+            lat: 52.52,
+            lng: 13.405,
+          })
+        })
+
+        it('still sends only the plain name string to the mutation', async () => {
+          await wrapper.find('form').trigger('submit')
+          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+            expect.objectContaining({
+              variables: expect.objectContaining({
+                eventInput: expect.objectContaining({
+                  eventLocationName: 'Berlin, Germany',
+                }),
+              }),
+            }),
+          )
+        })
       })
 
       describe('valid update', () => {

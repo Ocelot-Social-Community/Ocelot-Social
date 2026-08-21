@@ -309,6 +309,15 @@ describe('Post', () => {
       expect(ids).not.toContain('no-end-old-event')
     })
 
+    it('throws a UserInputError instead of crashing on an invalid eventStart_gte value', async () => {
+      variables = {
+        filter: { postType_in: ['Event'], eventStart_gte: 'not-a-date' },
+      }
+      await expect(query({ query: Post, variables })).resolves.toMatchObject({
+        errors: [{ message: 'eventStart_gte is invalid' }],
+      })
+    })
+
     it('includes every event, without a date filter', async () => {
       variables = { filter: { postType_in: ['Event'] } }
       const { data } = await query({ query: Post, variables })

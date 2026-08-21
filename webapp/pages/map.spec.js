@@ -1,5 +1,6 @@
 import mapboxgl from 'mapbox-gl'
 import { mount } from '@vue/test-utils'
+import flushPromises from 'flush-promises'
 import VueMeta from 'vue-meta'
 import Vuex from 'vuex'
 import Map from './map'
@@ -429,8 +430,10 @@ describe('map', () => {
 
           onEventMocks['style.load']()
 
-          // loadMarkersIconsAndAddMarkers uses Promise.all().then() — flush microtasks
-          await wrapper.vm.$nextTick()
+          // loadMarkersIconsAndAddMarkers uses Promise.all().then(), which now
+          // (since the isGeoJSON reset below) also re-triggers the isPreparedForMarkers
+          // watcher's own async flush — a single $nextTick() isn't enough anymore.
+          await flushPromises()
 
           // After style.load, isSourceAndLayerAdded is reset and icons reload,
           // then addMarkersOnCheckPrepared re-adds source and layer
@@ -439,6 +442,29 @@ describe('map', () => {
           expect(mapAddLayerMock).toHaveBeenCalledWith(
             expect.objectContaining({ id: 'markers', type: 'symbol' }),
           )
+        })
+
+        it('rebuilds markers.geoJSON with current data instead of re-adding the layer with stale data', async () => {
+          await wrapper.setData({
+            users: otherUsers,
+            groups,
+            posts,
+            currentUserCoordinates: null,
+            currentUserLocation: null,
+          })
+          // Simulates a completed initial build, same as the test above —
+          // isPreparedForMarkers requires !isGeoJSON, so without resetting it
+          // in style.load, addMarkersOnCheckPrepared() would never call
+          // buildMarkersGeoJSON() again after this point.
+          wrapper.vm.markers.isGeoJSON = true
+          wrapper.vm.markers.isSourceAndLayerAdded = true
+          const buildSpy = jest.spyOn(wrapper.vm, 'buildMarkersGeoJSON')
+
+          onEventMocks['style.load']()
+          await flushPromises()
+
+          expect(buildSpy).toHaveBeenCalled()
+          expect(wrapper.vm.markers.isGeoJSON).toBe(true)
         })
       })
 

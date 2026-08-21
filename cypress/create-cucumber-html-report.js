@@ -7,7 +7,7 @@ const reportTitle = "Ocelot webapp end-to-end test report"
 ;(async () => {
   const { generate } = await import("multiple-cucumber-html-reporter");
 
-  generate({
+  await generate({
     jsonDir: "reports/json_logs",
     reportPath: "./reports/cucumber_html_report",
     pageTitle: reportTitle,
@@ -15,4 +15,7 @@ const reportTitle = "Ocelot webapp end-to-end test report"
     pageFooter: "<div></div>",
     hideMetadata: true
   });
-})();
+})().catch((error) => {
+  console.error("Failed to generate the cucumber HTML report:", error);
+  process.exitCode = 1;
+});

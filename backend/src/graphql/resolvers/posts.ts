@@ -107,6 +107,9 @@ const filterEventDates = (params) => {
     // boundary silently depend on whatever timezone the server process
     // happens to run in.
     const startOfStartDate = new Date(date)
+    if (Number.isNaN(startOfStartDate.getTime())) {
+      throw new UserInputError('eventStart_gte is invalid')
+    }
     startOfStartDate.setUTCHours(0, 0, 0, 0)
     params.filter = {
       ...params.filter,

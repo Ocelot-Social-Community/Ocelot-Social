@@ -660,9 +660,11 @@
           resizeObserver.disconnect()
           resizeObserver = null
         }
-        if (props.editable) {
-          document.removeEventListener('keydown', onDocumentKeydown)
-        }
+        // Not gated on props.editable — the listener was added based on its
+        // value at mount time, which may no longer match here if a host app
+        // changed the prop afterwards. removeEventListener() is a harmless
+        // no-op if it was never added in the first place.
+        document.removeEventListener('keydown', onDocumentKeydown)
         /* v8 ignore start -- map is always set by the time unmount runs
            (onBeforeUnmount only fires once per instance, after onMounted
            has already assigned it); unreachable through the component's
@@ -744,16 +746,17 @@
                     'ul',
                     { class: 'os-location-map__search-results' },
                     props.searchResults.map((result) =>
-                      h(
-                        'button',
-                        {
-                          type: 'button',
-                          key: result.id,
-                          class: 'os-location-map__search-result',
-                          ...eventProps({ click: () => selectResult(result) }),
-                        },
-                        result.label,
-                      ),
+                      h('li', { key: result.id }, [
+                        h(
+                          'button',
+                          {
+                            type: 'button',
+                            class: 'os-location-map__search-result',
+                            ...eventProps({ click: () => selectResult(result) }),
+                          },
+                          result.label,
+                        ),
+                      ]),
                     ),
                   ),
                 ]
