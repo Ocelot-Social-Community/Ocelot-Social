@@ -2,8 +2,10 @@ import { entities, Role, User } from '@db/schema/index'
 
 import {
   compareSchemaObjects,
+  declaredIndexStatements,
   declaredObjects,
   describeSchemaObject,
+  inexpressibleObjects,
   isKnownProfile,
 } from './drift'
 
@@ -41,11 +43,58 @@ describe('declaredObjects', () => {
     })
   })
 
+  it('does not want a fulltext index from a profile that cannot create one', () => {
+    // Memgraph has text indices, but not this object — indexStatementsFor reports it as
+    // UNSUPPORTED there. Declaring it anyway made the same index MISSING in the drift report
+    // AND unsupported in the apply report, from the same run; and since `missing` feeds the
+    // exit code, `check memgraph` against a database without it could never come back clean.
+    const declared = declaredObjects([User], 'memgraph')
+    expect(declared).not.toContainEqual({
+      kind: 'index',
+      label: 'User',
+      properties: ['name', 'slug'],
+    })
+    // The rest of User is unaffected — this is about one object class, not about the profile.
+    expect(declared).toContainEqual(constraint('User', 'slug'))
+  })
+
+  it('reports nothing missing for what a profile cannot express', () => {
+    // The end-to-end shape of the same thing: everything declared for a profile has to be
+    // creatable on it, or `check` reports work that no `apply` can ever do.
+    const { missing } = compareSchemaObjects(declaredObjects([User], 'memgraph'), [])
+    const { unsupported } = declaredIndexStatements([User], 'memgraph')
+    expect(unsupported).toHaveLength(1)
+    for (const object of missing) {
+      expect(describeSchemaObject(object)).not.toContain('name, slug')
+    }
+  })
+
   it('grows with the capability of the backend', () => {
     // Existence constraints only become real objects where the backend can hold them.
     expect(declaredObjects(entities, 'memgraph').length).toBeGreaterThan(
       declaredObjects(entities, 'neo4j-community').length,
     )
+  })
+})
+
+describe('inexpressibleObjects', () => {
+  const userFulltext = { kind: 'index' as const, label: 'User', properties: ['name', 'slug'] }
+
+  it('names what a profile cannot create, so it is not read as surplus either', () => {
+    // The other half of the same report. `check memgraph` against the RUNNING Neo4j — the
+    // documented "what would break after the migration" run — finds the fulltext index
+    // present. Undeclared for that profile, it would come back as SURPLUS "declared nowhere":
+    // untrue, and an invitation to drop an index the current backend needs.
+    expect(inexpressibleObjects([User], 'memgraph')).toEqual([userFulltext])
+    const { surplus } = compareSchemaObjects(declaredObjects([User], 'memgraph'), [userFulltext])
+    expect(surplus).toEqual([userFulltext])
+    // …which is why run-audit subtracts exactly this set before printing and counting.
+  })
+
+  it('is empty where the profile can create everything the declaration names', () => {
+    for (const profile of ['neo4j-community', 'neo4j-enterprise'] as const) {
+      expect(inexpressibleObjects(entities, profile)).toEqual([])
+    }
   })
 })
 

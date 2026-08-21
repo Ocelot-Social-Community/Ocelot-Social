@@ -1,4 +1,4 @@
-import { CAPABILITIES, statementFor } from './ddl'
+import { capabilitiesFor, statementFor } from './ddl'
 import { scopeLabel } from './rules'
 
 import type { BackendProfile } from './ddl'
@@ -74,8 +74,8 @@ const spelledAsNodeKey = (rule: Rule, profile: BackendProfile): boolean => {
   if (rule.kind !== 'unique' || rule.properties.length < 2) {
     return false
   }
-  const capabilities = CAPABILITIES.get(profile)
-  return capabilities?.dialect === 'neo4j' && capabilities.compositeUnique
+  const capabilities = capabilitiesFor(profile)
+  return capabilities.dialect === 'neo4j' && capabilities.compositeUnique
 }
 
 /**

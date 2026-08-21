@@ -7,6 +7,7 @@ import {
   declaredIndexStatements,
   declaredObjects,
   describeSchemaObject,
+  inexpressibleObjects,
   isKnownProfile,
 } from '@db/schema/derive/drift'
 import { allRules } from '@db/schema/derive/rules'
@@ -107,10 +108,18 @@ const reportDrift = async (session: Session, profile: BackendProfile): Promise<n
     declaredObjects(entities, profile),
     await presentObjects(session),
   )
+  // An object this profile cannot express is reported ONCE, as UNSUPPORTED. It is not
+  // declared for this profile (so it cannot be missing), and where the database happens to
+  // hold one it is not surplus either — "declared nowhere" would be untrue and would invite
+  // dropping an index the current backend needs.
+  const inexpressible = new Set(
+    inexpressibleObjects(entities, profile).map((object) => describeSchemaObject(object)),
+  )
+  const unwanted = surplus.filter((object) => !inexpressible.has(describeSchemaObject(object)))
   for (const object of missing) {
     console.log(`  \x1b[33mMISSING\x1b[0m ${describeSchemaObject(object)}`)
   }
-  for (const object of surplus) {
+  for (const object of unwanted) {
     // Never dropped automatically: a typo in a declaration would otherwise turn into
     // data-availability loss on the next deployment.
     console.log(`  \x1b[33mSURPLUS\x1b[0m ${describeSchemaObject(object)} (declared nowhere)`)
@@ -119,10 +128,10 @@ const reportDrift = async (session: Session, profile: BackendProfile): Promise<n
   for (const item of unsupported) {
     console.log(`  \x1b[33mUNSUPPORTED\x1b[0m ${item} — ${profile} cannot express it`)
   }
-  if (missing.length === 0 && surplus.length === 0) {
+  if (missing.length === 0 && unwanted.length === 0) {
     console.log('  in sync')
   }
-  return missing.length + surplus.length
+  return missing.length + unwanted.length
 }
 
 const reportRegistry = async (session: Session): Promise<number> => {
