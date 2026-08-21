@@ -110,7 +110,7 @@ export const planConstraints = (
     // `auditQueryFor`, not `auditFor`: the latter deliberately returns null for rules the
     // backend enforces, which is exactly the set being planned here. The pre-flight needs the
     // query for the constraint it is about to create.
-    const audit = auditQueryFor(rule)
+    const audit = auditQueryFor(rule, profile)
     items.push({
       statement,
       rule,
