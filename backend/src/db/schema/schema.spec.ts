@@ -123,7 +123,28 @@ describe('validation', () => {
 describe('patterns', () => {
   // Every pattern is read by ajv as a JS regex and by Cypher's `=~` as a Java regex. Only
   // constructs both dialects agree on are allowed; these are the ones that would differ.
-  const forbidden = [/\(\?</, /\\d/, /\\p\{/, /\(\?<[=!]/]
+  //
+  // The class shorthands are on the list because ECMAScript defines them over Unicode and
+  // Java over ASCII. `\s` was the one that got through: `[^@\s]` excluded U+00A0 for ajv and
+  // admitted it for Cypher, so the write path rejected an address the audit called clean —
+  // the audit missing precisely what it exists to find. `\v` is worse than a mismatch of
+  // sets: ECMAScript reads it as the single vertical tab, Java as a whole class.
+  //
+  // This is a cheap syntactic guard. The semantic one is patternParity.spec.ts, which asks a
+  // real Neo4j.
+  const forbidden = [
+    /\(\?</,
+    /\\d/,
+    /\\D/,
+    /\\w/,
+    /\\W/,
+    /\\s/,
+    /\\S/,
+    /\\v/,
+    /\\b/,
+    /\\p\{/,
+    /\(\?<[=!]/,
+  ]
 
   it.each(entities.map((entity) => [entity.label, entity] as const))(
     '%s uses only dialect-neutral patterns',
