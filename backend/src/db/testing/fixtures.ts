@@ -169,7 +169,21 @@ export const fixtures: FixtureApi = {
       // ("removes previous `EmailAddress` node"), so absence is a legitimate answer here.
       return null
     }
-    return new TestNode(model.entity, node.properties, node.identity?.toNumber() ?? -1)
+    if (node.identity === undefined) {
+      // A throw, unlike the absence above, because there is no sensible handle to hand back.
+      // The previous fallback of -1 produced one that LOOKED fine and quietly did nothing:
+      // `relateTo` matches its endpoints by `id(n)`, so a -1 source matches no node, the MERGE
+      // never runs, and the spec sees a fixture with a missing edge and nothing to explain it.
+      //
+      // Every node the driver returns carries an identity, so this is a guard against a shape
+      // that should not occur rather than a case anyone has hit — which is exactly why it must
+      // not be papered over with a sentinel.
+      throw new Error(
+        `Cannot hydrate ${model.entity.label} from "${alias}": the column holds no node id. ` +
+          `Return the node itself (RETURN n AS ${alias}), not a projection of it.`,
+      )
+    }
+    return new TestNode(model.entity, node.properties, node.identity.toNumber())
   },
 
   close: () => {

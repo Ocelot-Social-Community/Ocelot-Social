@@ -121,15 +121,28 @@ export class TestNode {
 
     const session = getDriver().session()
     try {
-      await session.writeTransaction((transaction) =>
+      const result = await session.writeTransaction((transaction) =>
         transaction.run(
           `MATCH (source) WHERE id(source) = $sourceId
            MATCH (target) WHERE id(target) = $targetId
            MERGE ${pattern}
-           SET edge += $properties`,
+           SET edge += $properties
+           RETURN id(edge) AS edgeId`,
           { sourceId: this.internalId, targetId: target.id, properties: edgeProperties },
         ),
       )
+      // A MATCH that finds nothing yields no rows, so the MERGE never runs — and Cypher calls
+      // that a successful query. Unchecked, a fixture then carries no edge and the spec fails
+      // somewhere else entirely, on a field that reads as null. Both ways to get here are
+      // mistakes worth naming: a handle whose node was removed in between (cleanDatabase
+      // between build and relate) and a handle that never had a real id.
+      if (result.records.length === 0) {
+        throw new Error(
+          `Could not relate ${this.entity.label}(${String(this.internalId)}) ` +
+            `-[:${type}]-> ${target.label}(${String(target.id)}) via "${alias}": ` +
+            `one of the two nodes does not exist.`,
+        )
+      }
       return this
     } finally {
       await session.close()
