@@ -7,11 +7,11 @@ import CONFIG from '@config/index'
 import { closeDriver, getDriver } from '@db/neo4j'
 import { applyPlan, enforce, planConstraints } from '@db/schema/derive/apply'
 import { declaredIndexStatements, isKnownProfile } from '@db/schema/derive/drift'
+import { runnerFor } from '@db/schema/derive/runner'
 import { entities, relationships } from '@db/schema/index'
 
-import type { Enforcement, SchemaRunner } from '@db/schema/derive/apply'
+import type { Enforcement } from '@db/schema/derive/apply'
 import type { BackendProfile } from '@db/schema/derive/ddl'
-import type { Session } from 'neo4j-driver'
 
 // The backend profile decides which of the declared rules the database can actually enforce.
 // Explicit rather than sniffed from `dbms.components()`: the operator knows what they run, and
@@ -31,23 +31,6 @@ const profile = (): BackendProfile => {
 // and locally the data is disposable and a violation means the code or the declaration is
 // wrong, which is precisely what should stop the run.
 const enforcement = (): Enforcement => (CONFIG.PRODUCTION ? 'report' : 'strict')
-
-const runnerFor = (session: Session): SchemaRunner => ({
-  count: async (cypher) => {
-    const result = await session.readTransaction((transaction) => transaction.run(cypher))
-    const value: unknown = result.records[0]?.get(0)
-    return typeof value === 'number'
-      ? value
-      : Number((value as { toString: () => string } | null)?.toString() ?? 0)
-  },
-  sample: async (cypher) => {
-    const result = await session.readTransaction((transaction) => transaction.run(cypher))
-    return result.records.map((record) => record.toObject())
-  },
-  execute: async (cypher) => {
-    await session.run(cypher)
-  },
-})
 
 class Store {
   /**
