@@ -360,8 +360,9 @@ Factory.define('post')
     deleted: false,
     imageBlurred: false,
     imageAspectRatio: 1.333,
-    clickedCount: 0,
-    viewedTeaserCount: 0,
+    // clickedCount and viewedTeaserCount deliberately NOT here: they have to be Neo4j
+    // Integers (resolvers/posts.ts reads `.low` off them), and db/testing/defaults.ts
+    // supplies them as such. A plain 0 here would override that with a FLOAT.
   })
   .attr('pinned', ['pinned'], (pinned) => {
     // Convert false to null
