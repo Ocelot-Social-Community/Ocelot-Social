@@ -167,14 +167,26 @@ const toJsonSchemaType = (type: PropertyType | readonly PropertyType[]): string 
   return typeof type === 'string' ? translate(type) : type.map(translate)
 }
 
+/**
+ * The JSON Schema for ONE property.
+ *
+ * The single place a declared property becomes something ajv can compile, because there are
+ * two callers and they must not drift: jsonSchemaFor() below, and validateProperty() in
+ * validate.ts, which checks a value before there is a node to write. The second one used to
+ * compile the raw declaration and threw for every `datetime` property — ajv rejects a type it
+ * does not know, so `validateProperty(PasswordReset, 'issuedAt', …)` answered with
+ * "schema is invalid" instead of with a verdict.
+ */
+export const jsonSchemaForProperty = (schema: PropertySchema): object => ({
+  ...schema,
+  type: toJsonSchemaType(schema.type),
+})
+
 const toJsonSchemaProperties = (
   properties: Readonly<Record<string, PropertySchema>>,
 ): Record<string, object> =>
   Object.fromEntries(
-    Object.entries(properties).map(([name, schema]) => [
-      name,
-      { ...schema, type: toJsonSchemaType(schema.type) },
-    ]),
+    Object.entries(properties).map(([name, schema]) => [name, jsonSchemaForProperty(schema)]),
   )
 
 /**

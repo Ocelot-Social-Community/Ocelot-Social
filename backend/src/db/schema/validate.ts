@@ -1,6 +1,6 @@
 import { Ajv } from 'ajv'
 
-import { jsonSchemaFor } from '@db/schema/types'
+import { jsonSchemaFor, jsonSchemaForProperty } from '@db/schema/types'
 
 import type { EntityDefinition } from '@db/schema/types'
 import type { ValidateFunction } from 'ajv'
@@ -87,7 +87,9 @@ export const validateProperty = (
     if (schema === undefined) {
       throw new Error(`${entity.label} declares no property ${property}`)
     }
-    validate = ajv.compile({ ...schema })
+    // Through the shared translation, NOT the raw declaration: `datetime` is ours, not
+    // ajv's, and compiling it directly throws "schema is invalid" — see jsonSchemaForProperty.
+    validate = ajv.compile(jsonSchemaForProperty(schema))
     propertyValidators.set(key, validate)
   }
   return validate(value) ? null : ajv.errorsText(validate.errors, { dataVar: key })

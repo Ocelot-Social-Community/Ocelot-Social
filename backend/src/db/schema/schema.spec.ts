@@ -2,8 +2,9 @@ import { Ajv } from 'ajv'
 
 import { sourcesOf, targetsOf } from './derive/rules'
 import { jsonSchemaFor, relationshipJsonSchemaFor } from './types'
+import { validateProperty } from './validate'
 
-import { entities, labels, relationships, relationshipTypes, User } from './index'
+import { entities, labels, PasswordReset, relationships, relationshipTypes, User } from './index'
 
 import type { Post, Role } from './index'
 import type { EntityProperties, RelationshipDefinition } from './types'
@@ -118,6 +119,57 @@ describe('validation', () => {
     expect(validate({ createdAt: '2026-08-19T10:00:00.000Z', active: true })).toBe(true)
     expect(validate({ createdAt: 'yesterday', active: true })).toBe(false)
   })
+})
+
+describe('validateProperty', () => {
+  // The single-property path exists for resolvers that check an input before there is a node
+  // to write — AddEmailAddress validates the address the user typed, while the node it will
+  // eventually create also carries a nonce and a timestamp that do not exist yet.
+
+  it('answers for a property that violates its pattern', () => {
+    expect(validateProperty(User, 'slug', 'peter-pan')).toBeNull()
+    expect(validateProperty(User, 'slug', 'Peter Pan')).toContain('must match pattern')
+  })
+
+  it.each([
+    ['a native datetime', 'issuedAt', new Date()],
+    ['a nullable datetime holding a value', 'usedAt', new Date()],
+    ['a nullable datetime holding null', 'usedAt', null],
+  ])('answers for %s instead of throwing', (_case, property, value) => {
+    // `datetime` is this schema's type, not one ajv knows. Compiling the declaration raw made
+    // every call for such a property throw "schema is invalid" — a 500 where a verdict was
+    // asked for. Latent while no caller validated a timestamp, which is exactly how long it
+    // would have stayed unnoticed.
+    expect(() => validateProperty(PasswordReset, property, value)).not.toThrow()
+    expect(validateProperty(PasswordReset, property, value)).toBeNull()
+  })
+
+  it('refuses an ISO string where the declaration says native datetime', () => {
+    // The distinction the `datetime` type exists to make: PasswordReset writes
+    // `datetime($issuedAt)`, every other timestamp in this schema is a string.
+    expect(validateProperty(PasswordReset, 'issuedAt', '2026-08-21T10:00:00Z')).toContain(
+      'must be object',
+    )
+  })
+
+  it('throws for a property nobody declared', () => {
+    // A typo in a resolver is a programming error, not user input — it must not read as
+    // "valid".
+    expect(() => validateProperty(User, 'nope', 'x')).toThrow('declares no property nope')
+  })
+
+  it.each(entities.map((entity) => [entity.label, entity] as const))(
+    'compiles every declared property of %s',
+    (_label, entity) => {
+      // The general form of the datetime case: whatever a property is declared as has to
+      // survive being compiled on its own, or the resolver that first validates it gets an
+      // exception instead of an answer. The counterpart to "%s compiles to a valid JSON
+      // Schema" above, which only ever exercises the whole-node path.
+      for (const property of Object.keys(entity.properties)) {
+        expect(() => validateProperty(entity, property, null)).not.toThrow()
+      }
+    },
+  )
 })
 
 describe('patterns', () => {
