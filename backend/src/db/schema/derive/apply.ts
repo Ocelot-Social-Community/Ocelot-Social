@@ -79,6 +79,13 @@ export interface ApplyReport {
  * That exception says the desired end state already holds, which is success by any useful
  * definition. It is recognised HERE rather than swallowed at the call site, so the one
  * "already exists" case is distinguishable from every other procedure failure.
+ *
+ * NEO4J ONLY, and knowingly so: this is the sole "already there" answer the module accepts,
+ * while the constraint statements for Memgraph carry no `IF NOT EXISTS` (its grammar has
+ * none — see the note above statementFor in ddl.ts). A repeated `apply memgraph` would
+ * therefore land in `failed` rather than in `unchanged`. Nothing in this project runs
+ * Memgraph yet, so the fix waits for a server to measure against instead of a guessed
+ * message.
  */
 const isAlreadySatisfied = (error: unknown): boolean =>
   (error as Error | null)?.message?.includes('EquivalentSchemaRuleAlreadyExists') === true
