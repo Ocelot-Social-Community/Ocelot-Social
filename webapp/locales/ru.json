@@ -1056,6 +1056,7 @@
     "legend": {
       "event": "Событие",
       "group": "Группа",
+      "hidePastEvents": "Скрыть прошедшие события",
       "hideType": "Скрыть {type}",
       "showPastEvents": "Показать прошедшие события",
       "showType": "Показать {type}",

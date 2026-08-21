@@ -266,10 +266,22 @@
             el.style.cursor = 'pointer'
             el.title = props.viewOnMapLabel
             el.setAttribute('aria-label', props.viewOnMapLabel)
-            el.addEventListener('click', (e: MouseEvent) => {
+            el.setAttribute('role', 'button')
+            el.setAttribute('tabindex', '0')
+            const triggerViewOnMap = (e: Event) => {
               e.stopPropagation()
               const { lng, lat } = marker.getLngLat()
               emit('view-on-map', { lat, lng })
+            }
+            el.addEventListener('click', triggerViewOnMap)
+            el.addEventListener('keydown', (e: KeyboardEvent) => {
+              if (e.key !== 'Enter' && e.key !== ' ') {
+                return
+              }
+              if (e.key === ' ') {
+                e.preventDefault()
+              }
+              triggerViewOnMap(e)
             })
           }
         } else {
@@ -282,7 +294,11 @@
         if (!map || !hasPin.value) {
           return
         }
-        map.flyTo({ center: [props.lng, props.lat], zoom: props.pinZoom })
+        // Zooms in to pinZoom the first time a pin appears (starting from the
+        // wide initialZoom), but never zooms back OUT again on a later pin
+        // change while the user has since zoomed in further themselves.
+        const zoom = Math.max(map.getZoom(), props.pinZoom)
+        map.flyTo({ center: [props.lng, props.lat], zoom })
       }
 
       watch(
@@ -435,12 +451,21 @@
         // position:fixed right back inside the clipped area anyway.
         let popoverEl: HTMLElement
         let outsideHandler: (() => void) | null = null
+        let scrollResizeHandler: (() => void) | null = null
 
         function positionPopover(toggle: HTMLElement) {
           const rect = toggle.getBoundingClientRect()
           popoverEl.style.top = `${rect.top}px`
           popoverEl.style.left = `${rect.left - 6}px`
           popoverEl.style.transform = 'translateX(-100%)'
+        }
+
+        function removeScrollResizeHandler() {
+          if (scrollResizeHandler) {
+            window.removeEventListener('scroll', scrollResizeHandler, true)
+            window.removeEventListener('resize', scrollResizeHandler)
+            scrollResizeHandler = null
+          }
         }
 
         return {
@@ -458,12 +483,28 @@
               '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">' +
               '<path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z"/>' +
               '</svg>'
+
+            function closePopover() {
+              popoverEl.classList.remove('os-location-map-style-popover--open')
+              toggle.setAttribute('aria-expanded', 'false')
+              removeScrollResizeHandler()
+            }
+
             toggle.addEventListener('click', (e) => {
               e.stopPropagation()
               const isOpen = popoverEl.classList.toggle('os-location-map-style-popover--open')
               toggle.setAttribute('aria-expanded', String(isOpen))
               if (isOpen) {
                 positionPopover(toggle)
+                // A fixed-position popover derived from the toggle's rect
+                // goes stale the moment the page scrolls or the toggle
+                // itself moves/resizes with the viewport — closing (rather
+                // than repositioning) matches how a native <select> behaves.
+                scrollResizeHandler = closePopover
+                window.addEventListener('scroll', scrollResizeHandler, true)
+                window.addEventListener('resize', scrollResizeHandler)
+              } else {
+                removeScrollResizeHandler()
               }
             })
             container.appendChild(toggle)
@@ -493,8 +534,7 @@
                 })
                 btn.classList.add('os-location-map-style-popover-btn--active')
                 btn.setAttribute('aria-selected', 'true')
-                popoverEl.classList.remove('os-location-map-style-popover--open')
-                toggle.setAttribute('aria-expanded', 'false')
+                closePopover()
               })
               popoverEl.appendChild(btn)
             })
@@ -505,10 +545,7 @@
             // click anywhere else on the page should close it. Clicks on the
             // toggle/option buttons never reach this handler; they call
             // stopPropagation() in their own listeners above.
-            outsideHandler = () => {
-              popoverEl.classList.remove('os-location-map-style-popover--open')
-              toggle.setAttribute('aria-expanded', 'false')
-            }
+            outsideHandler = closePopover
             document.addEventListener('click', outsideHandler)
 
             return container
@@ -523,6 +560,7 @@
               outsideHandler = null
             }
             /* v8 ignore stop */
+            removeScrollResizeHandler()
             popoverEl?.remove()
           },
         }
@@ -707,8 +745,9 @@
                     { class: 'os-location-map__search-results' },
                     props.searchResults.map((result) =>
                       h(
-                        'li',
+                        'button',
                         {
+                          type: 'button',
                           key: result.id,
                           class: 'os-location-map__search-result',
                           ...eventProps({ click: () => selectResult(result) }),
@@ -890,13 +929,23 @@
   }
 
   .os-location-map__search-result {
+    display: block;
+    width: 100%;
     padding: 6px 10px;
+    border: none;
+    background: none;
     cursor: pointer;
     font-size: 14px;
+    text-align: left;
   }
 
   .os-location-map__search-result:hover {
     background: rgba(0, 0, 0, 0.05);
+  }
+
+  .os-location-map__search-result:focus-visible {
+    outline: 2px solid var(--os-location-map-accent-color, rgb(0, 142, 230));
+    outline-offset: -2px;
   }
 
   .os-location-map-picker {

@@ -1049,6 +1049,26 @@ describe('map', () => {
         w.vm.addMarkersOnCheckPrepared()
         expect(mapboxgl.__popupInstance.setLngLat).toHaveBeenCalledWith([9.17702, 48.78232])
       })
+
+      it('retries via refreshMarkersData once a cache response without the event is followed by a network response that includes it', () => {
+        mocks.$route = { path: '/map', query: { eventId: 'e1' } }
+        const w = createWrapper()
+        w.vm.onMapLoad({ map: mapMock })
+        w.vm.markers.isSourceAndLayerAdded = true
+        const buildSpy = jest.spyOn(w.vm, 'buildMarkersGeoJSON')
+
+        // First (cache) response doesn't include the deep-linked event yet.
+        buildSpy.mockReturnValueOnce([])
+        w.vm.refreshMarkersData()
+        expect(mapboxgl.__popupInstance.setLngLat).not.toHaveBeenCalled()
+        expect(w.vm.initialEventId).toBe('e1')
+
+        // Later (network) response now includes it.
+        buildSpy.mockReturnValueOnce([eventFeature])
+        w.vm.refreshMarkersData()
+        expect(mapboxgl.__popupInstance.setLngLat).toHaveBeenCalledWith([9.17702, 48.78232])
+        expect(w.vm.initialEventId).toBeNull()
+      })
     })
 
     describe('getUserLocation', () => {
@@ -1179,6 +1199,18 @@ describe('map', () => {
         expect(w.find('.map-legend-past-events-toggle').attributes('aria-pressed')).toBe('true')
       })
 
+      it('labels the toggle with the action it performs, not its current state', () => {
+        expect(wrapper.find('.map-legend-past-events-toggle').attributes('aria-label')).toBe(
+          'map.legend.showPastEvents',
+        )
+
+        mocks.$route = { path: '/map', query: { showPastEvents: '1' } }
+        const w = createWrapper()
+        expect(w.find('.map-legend-past-events-toggle').attributes('aria-label')).toBe(
+          'map.legend.hidePastEvents',
+        )
+      })
+
       it('adds showPastEvents=1 to the route on click, keeping other query params', async () => {
         mocks.$route = { path: '/map', query: { lat: '52.5' } }
         const w = createWrapper()
@@ -1247,6 +1279,22 @@ describe('map', () => {
     })
 
     describe('buildMarkersGeoJSON isPast flag', () => {
+      // Frozen at midday on the test day (rather than the real current time)
+      // so the smallest offsets below (e.g. -1h/-3h) can't drift across a
+      // local midnight boundary and break the "still today" assertions —
+      // isEventPast() reads the real system clock internally, so the freeze
+      // has to cover it too, not just this helper.
+      beforeEach(() => {
+        const noon = new Date()
+        noon.setHours(12, 0, 0, 0)
+        jest.useFakeTimers()
+        jest.setSystemTime(noon)
+      })
+
+      afterEach(() => {
+        jest.useRealTimers()
+      })
+
       const hoursFromNow = (h) => new Date(Date.now() + h * 60 * 60 * 1000).toISOString()
 
       it('marks events with both eventStart and eventEnd in the past as isPast', async () => {

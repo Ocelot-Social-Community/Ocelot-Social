@@ -102,8 +102,12 @@ const filterEventDates = (params) => {
     // itself. Posts saved before eventEnd defaulting existed (see
     // ContributionForm's fallback) may still have no eventEnd at all; those
     // get the same day-level grace period, based on eventStart instead.
+    // UTC, not server-local time — the backend has no reliable notion of the
+    // requesting user's timezone, and using setHours() would make the day
+    // boundary silently depend on whatever timezone the server process
+    // happens to run in.
     const startOfStartDate = new Date(date)
-    startOfStartDate.setHours(0, 0, 0, 0)
+    startOfStartDate.setUTCHours(0, 0, 0, 0)
     params.filter = {
       ...params.filter,
       OR: [

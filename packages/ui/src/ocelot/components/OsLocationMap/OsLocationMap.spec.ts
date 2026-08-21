@@ -65,6 +65,10 @@ function createMockMapboxGl() {
     }),
     getContainer: vi.fn<() => HTMLElement>(() => mapContainer),
     getCanvas: vi.fn<() => HTMLCanvasElement>(() => ({ style: {} }) as HTMLCanvasElement),
+    // Below the default pinZoom (14) so existing flyTo assertions (which
+    // expect zoom: 14) keep working unchanged — tests exercising the
+    // "never zoom back out" behavior override this per-test.
+    getZoom: vi.fn<() => number>(() => 2),
   }
 
   const markerHandlers: Record<string, (...args: unknown[]) => void> = {}
@@ -119,6 +123,10 @@ describe('osLocationMap', () => {
   })
 
   afterEach(() => {
+    // Restores real timers even if a fake-timer test's assertions throw before
+    // reaching its own vi.useRealTimers() call, so a failure can't leak faked
+    // timers into later tests.
+    vi.useRealTimers()
     vi.restoreAllMocks()
   })
 
@@ -198,6 +206,17 @@ describe('osLocationMap', () => {
 
     expect(ctx.mapboxGl.Marker).toHaveBeenCalledTimes(1)
     expect(ctx.mapInstance.flyTo).toHaveBeenCalledWith({ center: [9.63, 48.87], zoom: 14 })
+  })
+
+  it('does not zoom back out when the pin changes while already zoomed in past pinZoom', async () => {
+    ctx.mapInstance.getZoom.mockReturnValue(16)
+    const wrapper = mount(OsLocationMap, {
+      props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token' },
+    })
+
+    await wrapper.setProps({ lat: 48.87, lng: 9.63 })
+
+    expect(ctx.mapInstance.flyTo).toHaveBeenCalledWith({ center: [9.63, 48.87], zoom: 16 })
   })
 
   it('removes the pin when lat/lng are cleared', async () => {
@@ -533,6 +552,59 @@ describe('osLocationMap', () => {
       expect(wrapper.emitted('view-on-map')).toStrictEqual([[{ lat: 52.5, lng: 13.4 }]])
     })
 
+    it('exposes the pin as a keyboard-focusable button and activates it on Enter', () => {
+      const wrapper = mount(OsLocationMap, {
+        props: {
+          mapboxGl: ctx.mapboxGl,
+          accessToken: 'test-token',
+          lat: 52.5,
+          lng: 13.4,
+          viewOnMap: true,
+        },
+      })
+
+      expect(ctx.markerElement.getAttribute('role')).toBe('button')
+      expect(ctx.markerElement.getAttribute('tabindex')).toBe('0')
+
+      ctx.markerElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+
+      expect(wrapper.emitted('view-on-map')).toStrictEqual([[{ lat: 52.5, lng: 13.4 }]])
+    })
+
+    it('activates the pin on Space, preventing the page from scrolling', () => {
+      const wrapper = mount(OsLocationMap, {
+        props: {
+          mapboxGl: ctx.mapboxGl,
+          accessToken: 'test-token',
+          lat: 52.5,
+          lng: 13.4,
+          viewOnMap: true,
+        },
+      })
+
+      const event = new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true })
+      ctx.markerElement.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBe(true)
+      expect(wrapper.emitted('view-on-map')).toStrictEqual([[{ lat: 52.5, lng: 13.4 }]])
+    })
+
+    it('ignores other keys on the pin', () => {
+      const wrapper = mount(OsLocationMap, {
+        props: {
+          mapboxGl: ctx.mapboxGl,
+          accessToken: 'test-token',
+          lat: 52.5,
+          lng: 13.4,
+          viewOnMap: true,
+        },
+      })
+
+      ctx.markerElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }))
+
+      expect(wrapper.emitted('view-on-map')).toBeUndefined()
+    })
+
     it('unmounts cleanly (the view-on-map control must define onRemove)', () => {
       const wrapper = mount(OsLocationMap, {
         props: {
@@ -687,6 +759,49 @@ describe('osLocationMap', () => {
       expect(toggle.getAttribute('aria-expanded')).toBe('false')
     })
 
+    it('closes the popover on window scroll (its fixed position would otherwise go stale)', () => {
+      mount(OsLocationMap, {
+        props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', styles },
+      })
+      const toggle = getStyleSwitcherToggle()
+      toggle.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+      window.dispatchEvent(new Event('scroll'))
+
+      expect(getLatestPopover().classList.contains('os-location-map-style-popover--open')).toBe(
+        false,
+      )
+      expect(toggle.getAttribute('aria-expanded')).toBe('false')
+    })
+
+    it('closes the popover on window resize', () => {
+      mount(OsLocationMap, {
+        props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', styles },
+      })
+      const toggle = getStyleSwitcherToggle()
+      toggle.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+      window.dispatchEvent(new Event('resize'))
+
+      expect(getLatestPopover().classList.contains('os-location-map-style-popover--open')).toBe(
+        false,
+      )
+    })
+
+    it('does not react to scroll/resize once the popover is already closed', () => {
+      mount(OsLocationMap, {
+        props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', styles },
+      })
+      const toggle = getStyleSwitcherToggle()
+      toggle.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      toggle.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+      expect(() => {
+        window.dispatchEvent(new Event('scroll'))
+        window.dispatchEvent(new Event('resize'))
+      }).not.toThrow()
+    })
+
     it('closes the popover when clicking elsewhere on the page', () => {
       mount(OsLocationMap, {
         props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', styles },
@@ -746,8 +861,6 @@ describe('osLocationMap', () => {
       vi.advanceTimersByTime(400)
 
       expect(wrapper.emitted('search-input')).toStrictEqual([['Berlin']])
-
-      vi.useRealTimers()
     })
 
     it('emits search-select when a result is clicked', async () => {
@@ -779,8 +892,6 @@ describe('osLocationMap', () => {
       vi.advanceTimersByTime(400)
 
       expect(wrapper.emitted('search-input')).toStrictEqual([['Berlin']])
-
-      vi.useRealTimers()
     })
 
     it('clears a pending debounce timer on unmount', async () => {
@@ -906,8 +1017,6 @@ describe('osLocationMap', () => {
         await wrapper.vm.$nextTick()
 
         expect(wrapper.find('.os-location-map__search-toggle').exists()).toBe(true)
-
-        vi.useRealTimers()
       })
 
       it('stays expanded on blur while the input still has text', async () => {
@@ -928,8 +1037,6 @@ describe('osLocationMap', () => {
         await wrapper.vm.$nextTick()
 
         expect(wrapper.find('.os-location-map__search-input').exists()).toBe(true)
-
-        vi.useRealTimers()
       })
     })
   })

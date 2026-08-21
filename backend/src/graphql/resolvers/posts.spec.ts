@@ -253,7 +253,11 @@ describe('Post', () => {
     // also keeps still-running events (started but not yet ended), and
     // — for events saved without an eventEnd at all — events that started
     // earlier the same day.
+    // Pinned to midday on the test day (rather than the real current time) so
+    // the smallest offsets below (e.g. hours(-1)) can't drift across a local
+    // midnight boundary and break the "still today" assertions.
     const now = new Date()
+    now.setHours(12, 0, 0, 0)
     const hours = (h) => new Date(now.getTime() + h * 60 * 60 * 1000).toISOString()
 
     beforeEach(async () => {

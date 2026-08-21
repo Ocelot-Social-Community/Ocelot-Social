@@ -86,6 +86,11 @@ export default {
       isEmpty,
       mapboxgl,
       defaultCenter: [10.452764, 51.165707], // center of Germany
+      // Bumped on every onPinChange call so a slow, stale reverse-geocoding
+      // response (from an earlier drag) can't overwrite what a later one
+      // already resolved — only the request matching the current value
+      // applies its result/error.
+      pinChangeRequestId: 0,
     }
   },
   computed: {
@@ -149,6 +154,7 @@ export default {
       // Mapbox forward-geocoding endpoint auto-detects a "lng,lat" search
       // string and reverse-geocodes it — same endpoint the address search
       // already uses, no separate backend resolver needed.
+      const requestId = ++this.pinChangeRequestId
       try {
         const {
           data: { queryLocations: results },
@@ -161,6 +167,7 @@ export default {
           },
           fetchPolicy: 'network-only',
         })
+        if (requestId !== this.pinChangeRequestId) return
         const match = results && results[0]
         const label = match ? match.place_name : formatCoordinates(lat, lng)
         this.$emit('input', {
@@ -171,6 +178,12 @@ export default {
           lng: match ? (match.lng ?? lng) : lng,
         })
       } catch (error) {
+        if (requestId !== this.pinChangeRequestId) return
+        // The pin itself already moved (mapbox-gl already redrew it) —
+        // still save/emit its raw coordinates so the field and the pin stay
+        // in sync even though reverse-geocoding couldn't label them.
+        const label = formatCoordinates(lat, lng)
+        this.$emit('input', { label, value: label, id: null, lat, lng })
         this.$toast.error(error.message)
       }
     },

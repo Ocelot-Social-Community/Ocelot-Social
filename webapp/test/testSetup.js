@@ -44,8 +44,9 @@ config.mocks.$policy = { get: () => false }
 // tests that exercise the map itself override with `mocks: { $env: { MAPBOX_TOKEN: '...' } }`.
 // Also mirrored on the prototype (see $can below) since config.mocks is not merged
 // when a spec passes its own `mocks` option.
-config.mocks.$env = { MAPBOX_TOKEN: '' }
-Vue.prototype.$env = { MAPBOX_TOKEN: '' }
+const defaultEnv = { MAPBOX_TOKEN: '' }
+config.mocks.$env = defaultEnv
+Vue.prototype.$env = defaultEnv
 
 // Mirror the $can inject (plugins/permissions.js) on the prototype so every component
 // has it (config.mocks is not merged when a spec passes its own `mocks`). Granted by

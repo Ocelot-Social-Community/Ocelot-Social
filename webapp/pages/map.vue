@@ -78,8 +78,12 @@
                 type="button"
                 class="map-legend-past-events-toggle"
                 :aria-pressed="String(showPastEvents)"
-                :aria-label="$t('map.legend.showPastEvents')"
-                :title="$t('map.legend.showPastEvents')"
+                :aria-label="
+                  $t(showPastEvents ? 'map.legend.hidePastEvents' : 'map.legend.showPastEvents')
+                "
+                :title="
+                  $t(showPastEvents ? 'map.legend.hidePastEvents' : 'map.legend.showPastEvents')
+                "
                 @click="toggleShowPastEvents"
               >
                 <os-icon :icon="showPastEvents ? icons.clockSlash : icons.clock" size="md" />
@@ -814,19 +818,26 @@ export default {
       const feature = this.markers.geoJSON.find(
         (f) => f.properties.type === 'event' && f.properties.id === this.initialEventId,
       )
+      // Left set (not cleared) when the feature isn't found yet — the
+      // deep-linked event may still be missing from an early cache response
+      // and only arrive with a later network one, which retries this via
+      // refreshMarkersData() below.
       if (!feature) return
       const [lng, lat] = feature.geometry.coordinates
       this.showPopup([feature], { lng, lat })
+      this.initialEventId = null
     },
     // Called when users/groups/posts change after the initial load (e.g. the
-    // "show past events" filter re-triggered the apollo query) — updates the
-    // already-added source in place instead of re-adding it.
+    // "show past events" filter re-triggered the apollo query, or a cache
+    // response was followed by a network one) — updates the already-added
+    // source in place instead of re-adding it.
     refreshMarkersData() {
       this.markers.geoJSON = this.buildMarkersGeoJSON()
       this.map.getSource('markers').setData({
         type: 'FeatureCollection',
         features: this.markers.geoJSON,
       })
+      this.openInitialEventPopup()
     },
     mapFlyToCenter() {
       if (this.map) {

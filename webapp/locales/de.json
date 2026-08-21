@@ -1056,6 +1056,7 @@
     "legend": {
       "event": "Veranstaltung",
       "group": "Gruppe",
+      "hidePastEvents": "Vergangene Veranstaltungen ausblenden",
       "hideType": "{type} ausblenden",
       "showPastEvents": "Vergangene Veranstaltungen anzeigen",
       "showType": "{type} anzeigen",

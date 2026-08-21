@@ -327,6 +327,7 @@ describe('Location Service', () => {
     expect(result.data.queryLocations).toEqual([
       { id: 'poi.hagenbeck', place_name: 'Tierpark Hagenbeck', lat: 53.551, lng: 9.993 },
     ])
+    expect(fetchSpy).toHaveBeenCalledTimes(2)
     const calledUrls = fetchSpy.mock.calls.map(([input]) => input as string)
     expect(calledUrls[0]).toContain('types=address')
     expect(calledUrls[0]).toContain('limit=1')

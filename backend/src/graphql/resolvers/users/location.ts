@@ -230,11 +230,12 @@ export const queryLocations = async ({ place, lang, types, proximity }, context:
   // Try each requested type in order, one request at a time, and return the
   // first match — e.g. an exact address, falling back to the nearest POI or
   // place name if there's no addressed building at that exact point.
-  if (COORDINATE_PATTERN.test(place.trim())) {
+  const trimmedPlace = place.trim()
+  if (COORDINATE_PATTERN.test(trimmedPlace)) {
     const reverseTypes = requestedTypes.length ? requestedTypes : DEFAULT_LOCATION_TYPES.split(',')
     for (const type of reverseTypes) {
       const features = await fetchMapboxFeatures(
-        buildMapboxUrl(place, lang, type, 1, proximity, accessToken),
+        buildMapboxUrl(trimmedPlace, lang, type, 1, proximity, accessToken),
       )
       if (features.length) return features
     }

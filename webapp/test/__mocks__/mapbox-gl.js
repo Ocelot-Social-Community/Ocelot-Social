@@ -15,6 +15,7 @@ function createMapInstance() {
     flyTo: jest.fn(),
     setStyle: jest.fn(),
     remove: jest.fn(),
+    resize: jest.fn(),
     getContainer: jest.fn(() => document.createElement('div')),
   }
 }

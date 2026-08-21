@@ -1056,6 +1056,7 @@
     "legend": {
       "event": "Ngjarje",
       "group": "Grup",
+      "hidePastEvents": "Fshih ngjarjet e kaluara",
       "hideType": "Fshih {type}",
       "showPastEvents": "Shfaq ngjarjet e kaluara",
       "showType": "Shfaq {type}",
