@@ -3,6 +3,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable jest/expect-expect */
 /* eslint-disable @typescript-eslint/no-shadow */
+import { createHash } from 'node:crypto'
+import { setTimeout as delay } from 'node:timers/promises'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver, getNeode } from '@db/neo4j'
 import { TEST_CONFIG } from '@root/test/helpers'
@@ -53,8 +56,7 @@ describe('decode', () => {
         })
         // Create API key node with known hash
         // SHA-256 of 'oak_testkey123' = known hash
-        const crypto = await import('node:crypto')
-        const keyHash = crypto.createHash('sha256').update('oak_testkey123').digest('hex')
+        const keyHash = createHash('sha256').update('oak_testkey123').digest('hex')
         const session = driver.session()
         await session.writeTransaction(async (tx) => {
           await tx.run(
@@ -85,7 +87,6 @@ describe('decode', () => {
       it('updates lastUsedAt on the API key', async () => {
         await decode(context)('Bearer oak_testkey123')
         // Give fire-and-forget time to complete
-        const { setTimeout: delay } = await import('node:timers/promises')
         await delay(500)
         const session = driver.session()
         const result = await session.readTransaction(async (tx) => {
@@ -104,8 +105,7 @@ describe('decode', () => {
           slug: 'dk-user',
           role: 'user',
         })
-        const crypto = await import('node:crypto')
-        const keyHash = crypto.createHash('sha256').update('oak_disabledkey').digest('hex')
+        const keyHash = createHash('sha256').update('oak_disabledkey').digest('hex')
         const session = driver.session()
         await session.writeTransaction(async (tx) => {
           await tx.run(
@@ -136,8 +136,7 @@ describe('decode', () => {
           slug: 'ek-user',
           role: 'user',
         })
-        const crypto = await import('node:crypto')
-        const keyHash = crypto.createHash('sha256').update('oak_expiredkey').digest('hex')
+        const keyHash = createHash('sha256').update('oak_expiredkey').digest('hex')
         const session = driver.session()
         await session.writeTransaction(async (tx) => {
           await tx.run(
@@ -178,8 +177,7 @@ describe('decode', () => {
           role: 'user',
           disabled: true,
         })
-        const crypto = await import('node:crypto')
-        const keyHash = crypto.createHash('sha256').update('oak_disableduser').digest('hex')
+        const keyHash = createHash('sha256').update('oak_disableduser').digest('hex')
         const session = driver.session()
         await session.writeTransaction(async (tx) => {
           await tx.run(
@@ -211,8 +209,7 @@ describe('decode', () => {
           role: 'user',
           deleted: true,
         })
-        const crypto = await import('node:crypto')
-        const keyHash = crypto.createHash('sha256').update('oak_deleteduser').digest('hex')
+        const keyHash = createHash('sha256').update('oak_deleteduser').digest('hex')
         const session = driver.session()
         await session.writeTransaction(async (tx) => {
           await tx.run(

@@ -38,10 +38,10 @@
   },
   "dependencies": {
     "@apollo/server": "^4.11.3",
-    "@aws-sdk/client-s3": "^3.1109.0",
+    "@aws-sdk/client-s3": "^3.1111.0",
     "@aws-sdk/lib-storage": "^3.1109.0",
     "@graphql-tools/load-files": "^7.0.0",
-    "@graphql-tools/merge": "^9.2.2",
+    "@graphql-tools/merge": "^9.2.3",
     "@graphql-tools/schema": "^10.0.0",
     "@ocelot-social/branding": "file:../packages/branding",
     "@sentry/node": "^10.70.0",
@@ -116,8 +116,8 @@
     "@types/slug": "^5.0.9",
     "@types/uuid": "~9.0.1",
     "@types/ws": "^8.18.1",
-    "eslint": "^9.27.0",
-    "eslint-config-it4c": "^0.12.0",
+    "eslint": "^10.8.1",
+    "eslint-config-it4c": "^0.13.2",
     "jest": "^30.4.2",
     "nodemon": "~3.1.14",
     "prettier": "^3.9.6",
@@ -140,6 +140,6 @@
     "re2": "~1.24.1"
   },
   "engines": {
-    "node": ">=20.12.1"
+    "node": ">=25.5.0"
   }
 }

@@ -103,6 +103,12 @@ export default [
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       // Allow @/* path aliases in relative parent imports
       'import-x/no-relative-parent-imports': ['error', { ignore: ['@/*'] }],
+      // `@ocelot-social/branding` is `"type": "module"` with no `exports` map, so deep imports
+      // resolve straight to files and ESM requires the `.js` suffix — dropping it breaks at
+      // runtime. Only the `js` key is relaxed, and only to `ignorePackages`: our own relative
+      // imports resolve to `.ts` and stay under the inherited `never`. The real fix is an
+      // `exports` map on packages/branding, which would let this import be extensionless.
+      'import-x/extensions': ['error', 'never', { json: 'always', js: 'ignorePackages' }],
     },
   },
   {

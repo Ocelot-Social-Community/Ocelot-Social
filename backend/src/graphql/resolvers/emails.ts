@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-// eslint-disable-next-line import-x/extensions
 import Validator from 'neode/build/Services/Validator.js'
 
 import { UserInputError } from '@graphql/errors'
@@ -44,8 +43,9 @@ export default {
 
       // check email does not belong to anybody
       const existingEmail = await existingEmailAddress({ args, context })
-      if (existingEmail?.alreadyExistingEmail && existingEmail.user)
+      if (existingEmail?.alreadyExistingEmail && existingEmail.user) {
         return existingEmail.alreadyExistingEmail
+      }
 
       const nonce = generateNonce()
       const {
@@ -71,7 +71,9 @@ export default {
           }))
         })
         const response = txResult[0]
-        if (!response) throw new UserInputError('User not found.')
+        if (!response) {
+          throw new UserInputError('User not found.')
+        }
         return response
       } finally {
         await session.close()
@@ -106,13 +108,16 @@ export default {
         })
         response = txResult[0]
       } catch (e) {
-        if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
+        if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
           throw new UserInputError('A user account with this email already exists.')
+        }
         throw e
       } finally {
         await session.close()
       }
-      if (!response) throw new UserInputError('Invalid nonce or no email address found.')
+      if (!response) {
+        throw new UserInputError('Invalid nonce or no email address found.')
+      }
       return response
     },
   },

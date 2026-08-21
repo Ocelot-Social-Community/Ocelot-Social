@@ -13,7 +13,7 @@
 # Build context is the repo root; see .vuepress/Dockerfile.dockerignore.
 
 # 1) Generate the GraphQL API reference on the backend's Node (schema:print + SpectaQL).
-FROM node:25-bookworm-slim AS apidocs
+FROM node:26-bookworm-slim AS apidocs
 WORKDIR /repo
 COPY backend/package.json backend/yarn.lock ./backend/
 RUN cd backend && yarn install --frozen-lockfile --ignore-scripts
@@ -23,7 +23,7 @@ RUN cd backend \
     && ./node_modules/.bin/spectaql --target-dir /api spectaql.yml
 
 # 2) Build the VuePress site (Node 20), embedding the API reference at /api.
-FROM node:20-bookworm-slim AS build
+FROM node:26-bookworm-slim AS build
 WORKDIR /repo
 COPY package.json package-lock.json ./
 # Retry once: esbuild's postinstall can hit a transient ETXTBSY race on some
