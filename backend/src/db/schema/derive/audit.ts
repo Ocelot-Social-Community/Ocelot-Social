@@ -77,13 +77,27 @@ export const auditQueryFor = (rule: Rule): AuditQuery | null => {
   switch (rule.kind) {
     case 'unique': {
       const properties = rule.properties.map((property) => `n.${property}`).join(', ')
+      // Nodes WITHOUT the property are excluded — a uniqueness constraint does not apply to
+      // them, on any backend we target, so counting them would report a violation the
+      // database is perfectly happy with. Not academic: `Post.slug` is declared unique but
+      // NOT required, and two slugless posts share the key `[null]`. Since planConstraints()
+      // runs this very query as the pre-flight for the constraint it is about to create, the
+      // false count would SKIP `Post_slug_unique` — an error under `strict` (CI, dev) and a
+      // constraint that silently never gets created in production.
+      //
+      // A COMPOSITE key deliberately keeps counting them: the profile that can express one
+      // spells it `IS NODE KEY` (see ddl.ts), which requires the properties to be present, so
+      // a node missing one violates the declaration rather than escaping it. Where no profile
+      // can enforce it, the audit is the only reading of the declaration there is, and it
+      // should be the strict one.
+      const guard = rule.properties.length > 1 ? '' : ` WHERE ${properties} IS NOT NULL`
       return {
         violation: `${rule.label}.${rule.properties.join('+')} unique`,
         cypher:
-          `MATCH (n:${rule.label}) WITH [${properties}] AS key, count(*) AS nodes ` +
+          `MATCH (n:${rule.label})${guard} WITH [${properties}] AS key, count(*) AS nodes ` +
           `WHERE nodes > 1 RETURN count(key) AS violations`,
         sampleCypher:
-          `MATCH (n:${rule.label}) WITH [${properties}] AS key, collect(id(n)) AS ids ` +
+          `MATCH (n:${rule.label})${guard} WITH [${properties}] AS key, collect(id(n)) AS ids ` +
           `WHERE size(ids) > 1 RETURN head(ids) AS id, key AS detail LIMIT ${SAMPLE_LIMIT}`,
       }
     }

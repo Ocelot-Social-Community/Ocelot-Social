@@ -1,6 +1,6 @@
 import { entities, Post, relationships, Role, User } from '@db/schema/index'
 
-import { auditFor, auditsFor } from './audit'
+import { auditFor, auditQueryFor, auditsFor } from './audit'
 import { CAPABILITIES, statementFor } from './ddl'
 import { allRules } from './rules'
 
@@ -76,6 +76,40 @@ describe('generated queries', () => {
       cypher:
         'MATCH (n:X) WITH [n.a, n.b] AS key, count(*) AS nodes WHERE nodes > 1 ' +
         'RETURN count(key) AS violations',
+    })
+  })
+
+  // Nodes missing the property are where an audit most easily disagrees with the database,
+  // and a single-property uniqueness audit is never reached through `auditFor` — every
+  // profile enforces it — so only `auditQueryFor`, the pre-flight in planConstraints(), sees
+  // this query. That is also what makes a false count expensive: it skips the constraint.
+  describe('nodes without the property', () => {
+    it('leaves them out of a single-property uniqueness audit, as the constraint does', () => {
+      // `Post.slug` is the live case: declared unique, NOT required. Two slugless posts share
+      // the key [null] and must not read as a duplicate.
+      expect(auditQueryFor({ kind: 'unique', label: 'Post', properties: ['slug'] })).toMatchObject({
+        cypher:
+          'MATCH (n:Post) WHERE n.slug IS NOT NULL WITH [n.slug] AS key, count(*) AS nodes ' +
+          'WHERE nodes > 1 RETURN count(key) AS violations',
+        sampleCypher:
+          'MATCH (n:Post) WHERE n.slug IS NOT NULL WITH [n.slug] AS key, collect(id(n)) AS ids ' +
+          'WHERE size(ids) > 1 RETURN head(ids) AS id, key AS detail LIMIT 10',
+      })
+    })
+
+    it('keeps them in a composite audit, which stands in for a NODE KEY', () => {
+      // The asymmetry is deliberate: the profiles that can express a composite key spell it
+      // `IS NODE KEY`, which requires the properties to be present.
+      const cypher = auditQueryFor({ kind: 'unique', label: 'X', properties: ['a', 'b'] })?.cypher
+      expect(cypher).not.toContain('IS NOT NULL')
+    })
+
+    it('excludes them from every value-shape audit', () => {
+      // The counterpart to the `exists` audit, which counts precisely those nodes: a value
+      // rule says what a value must look like, not that there has to be one.
+      for (const violation of ['User.slug pattern', 'User.name minLength', 'Post.pinned enum']) {
+        expect(audit(violation)?.cypher).toContain('IS NOT NULL AND')
+      }
     })
   })
 
