@@ -1,4 +1,4 @@
-import { statementFor } from './ddl'
+import { CAPABILITIES, statementFor } from './ddl'
 import { scopeLabel } from './rules'
 
 import type { BackendProfile } from './ddl'
@@ -64,33 +64,57 @@ const literal = (value: unknown): string =>
   typeof value === 'string' ? `'${value.replace(/'/g, "\\'")}'` : String(value)
 
 /**
+ * Whether this profile would spell the rule as `IS NODE KEY` rather than as uniqueness.
+ *
+ * The distinction is presence: a node key demands the properties exist, a uniqueness
+ * constraint ignores the nodes that lack them. Derived from the same capability table
+ * statementFor() uses, so the two cannot drift apart.
+ */
+const spelledAsNodeKey = (rule: Rule, profile: BackendProfile): boolean => {
+  if (rule.kind !== 'unique' || rule.properties.length < 2) {
+    return false
+  }
+  const capabilities = CAPABILITIES.get(profile)
+  return capabilities?.dialect === 'neo4j' && capabilities.compositeUnique
+}
+
+/**
  * The audit for one rule, regardless of whether any backend enforces it.
  *
  * Separate from `auditFor` because the two callers want opposite things: the reporting run
  * wants the COMPLEMENT of what the backend enforces, while the apply run wants the audit for
  * exactly those rules it is about to turn into constraints — as a pre-flight check.
  *
+ * The profile is needed even though the audit runs no DDL: what counts as a violation can
+ * depend on which constraint the backend would create (see the uniqueness case). It is also
+ * what makes `check memgraph` against a Neo4j database mean "what would break after the
+ * migration" rather than "what breaks here".
+ *
  * Returns null only where no query can express the rule (a data type nothing can be asked
  * about); rules.spec.ts pins that this never happens for the declared registry.
  */
-export const auditQueryFor = (rule: Rule): AuditQuery | null => {
+export const auditQueryFor = (rule: Rule, profile: BackendProfile): AuditQuery | null => {
   switch (rule.kind) {
     case 'unique': {
       const properties = rule.properties.map((property) => `n.${property}`).join(', ')
-      // Nodes WITHOUT the property are excluded — a uniqueness constraint does not apply to
-      // them, on any backend we target, so counting them would report a violation the
-      // database is perfectly happy with. Not academic: `Post.slug` is declared unique but
-      // NOT required, and two slugless posts share the key `[null]`. Since planConstraints()
-      // runs this very query as the pre-flight for the constraint it is about to create, the
-      // false count would SKIP `Post_slug_unique` — an error under `strict` (CI, dev) and a
-      // constraint that silently never gets created in production.
+      // Nodes WITHOUT the property are excluded, because a uniqueness constraint does not
+      // apply to them: counting them would report a violation the database is perfectly happy
+      // with. Not academic — `Post.slug` is declared unique but NOT required, and two slugless
+      // posts share the key `[null]`. planConstraints() runs this very query as the pre-flight
+      // for the constraint it is about to create, so the false count would SKIP
+      // `Post_slug_unique`: an error under `strict` (CI, dev) and a constraint that silently
+      // never gets created in production. Presence is a separate rule (`exists`) and stays
+      // there.
       //
-      // A COMPOSITE key deliberately keeps counting them: the profile that can express one
-      // spells it `IS NODE KEY` (see ddl.ts), which requires the properties to be present, so
-      // a node missing one violates the declaration rather than escaping it. Where no profile
-      // can enforce it, the audit is the only reading of the declaration there is, and it
-      // should be the strict one.
-      const guard = rule.properties.length > 1 ? '' : ` WHERE ${properties} IS NOT NULL`
+      // The one exception is a composite key on a profile that spells it `IS NODE KEY` (see
+      // ddl.ts), because THAT constraint does require presence — excluding the nodes would let
+      // the pre-flight pass and the CREATE fail, which lands in `failed` and stops the
+      // deployment in every enforcement mode. Hence the profile: the audit mirrors the
+      // constraint this backend would actually create, and where it can create none, it
+      // mirrors plain uniqueness.
+      const guard = spelledAsNodeKey(rule, profile)
+        ? ''
+        : ` WHERE ${rule.properties.map((property) => `n.${property} IS NOT NULL`).join(' AND ')}`
       return {
         violation: `${rule.label}.${rule.properties.join('+')} unique`,
         cypher:
@@ -193,7 +217,7 @@ export const auditQueryFor = (rule: Rule): AuditQuery | null => {
 
 /** The audit for one rule, or null if the rule needs none because the backend enforces it. */
 export const auditFor = (rule: Rule, profile: BackendProfile): AuditQuery | null =>
-  statementFor(rule, profile) !== null ? null : auditQueryFor(rule)
+  statementFor(rule, profile) !== null ? null : auditQueryFor(rule, profile)
 
 export const auditsFor = (rules: readonly Rule[], profile: BackendProfile): AuditQuery[] =>
   rules

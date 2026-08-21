@@ -5,6 +5,7 @@ import { CAPABILITIES, statementFor } from './ddl'
 import { allRules } from './rules'
 
 import type { BackendProfile } from './ddl'
+import type { Rule } from './rules'
 
 const PROFILES = [...CAPABILITIES.keys()]
 const RULES = allRules(entities, relationships)
@@ -74,7 +75,8 @@ describe('generated queries', () => {
       auditFor({ kind: 'unique', label: 'X', properties: ['a', 'b'] }, 'neo4j-community'),
     ).toMatchObject({
       cypher:
-        'MATCH (n:X) WITH [n.a, n.b] AS key, count(*) AS nodes WHERE nodes > 1 ' +
+        'MATCH (n:X) WHERE n.a IS NOT NULL AND n.b IS NOT NULL ' +
+        'WITH [n.a, n.b] AS key, count(*) AS nodes WHERE nodes > 1 ' +
         'RETURN count(key) AS violations',
     })
   })
@@ -84,24 +86,42 @@ describe('generated queries', () => {
   // profile enforces it — so only `auditQueryFor`, the pre-flight in planConstraints(), sees
   // this query. That is also what makes a false count expensive: it skips the constraint.
   describe('nodes without the property', () => {
+    const COMPOSITE: Rule = { kind: 'unique', label: 'X', properties: ['a', 'b'] }
+
     it('leaves them out of a single-property uniqueness audit, as the constraint does', () => {
       // `Post.slug` is the live case: declared unique, NOT required. Two slugless posts share
-      // the key [null] and must not read as a duplicate.
-      expect(auditQueryFor({ kind: 'unique', label: 'Post', properties: ['slug'] })).toMatchObject({
-        cypher:
-          'MATCH (n:Post) WHERE n.slug IS NOT NULL WITH [n.slug] AS key, count(*) AS nodes ' +
-          'WHERE nodes > 1 RETURN count(key) AS violations',
-        sampleCypher:
-          'MATCH (n:Post) WHERE n.slug IS NOT NULL WITH [n.slug] AS key, collect(id(n)) AS ids ' +
-          'WHERE size(ids) > 1 RETURN head(ids) AS id, key AS detail LIMIT 10',
-      })
+      // the key [null] and must not read as a duplicate — on any profile, since every one of
+      // them spells a single-property rule as plain uniqueness.
+      for (const profile of PROFILES) {
+        expect(
+          auditQueryFor({ kind: 'unique', label: 'Post', properties: ['slug'] }, profile),
+        ).toMatchObject({
+          cypher:
+            'MATCH (n:Post) WHERE n.slug IS NOT NULL WITH [n.slug] AS key, count(*) AS nodes ' +
+            'WHERE nodes > 1 RETURN count(key) AS violations',
+          sampleCypher:
+            'MATCH (n:Post) WHERE n.slug IS NOT NULL WITH [n.slug] AS key, collect(id(n)) AS ids ' +
+            'WHERE size(ids) > 1 RETURN head(ids) AS id, key AS detail LIMIT 10',
+        })
+      }
     })
 
-    it('keeps them in a composite audit, which stands in for a NODE KEY', () => {
-      // The asymmetry is deliberate: the profiles that can express a composite key spell it
-      // `IS NODE KEY`, which requires the properties to be present.
-      const cypher = auditQueryFor({ kind: 'unique', label: 'X', properties: ['a', 'b'] })?.cypher
-      expect(cypher).not.toContain('IS NOT NULL')
+    it('keeps them where the profile spells a composite key as NODE KEY', () => {
+      // Neo4j Enterprise is the one that does. A node key REQUIRES the properties, so letting
+      // the pre-flight pass would only move the failure to the CREATE — which stops the
+      // deployment in both enforcement modes, unlike a skip.
+      expect(auditQueryFor(COMPOSITE, 'neo4j-enterprise')?.cypher).not.toContain('IS NOT NULL')
+    })
+
+    it('leaves them out where a composite key is plain uniqueness, or cannot be created', () => {
+      // Memgraph expresses it as a composite UNIQUE, which ignores nodes missing a property;
+      // Neo4j Community cannot express it at all, and then presence is the `exists` rule's
+      // business. Counting them on either would skip a constraint the server would accept.
+      for (const profile of ['memgraph', 'neo4j-community'] as const) {
+        expect(auditQueryFor(COMPOSITE, profile)?.cypher).toContain(
+          'WHERE n.a IS NOT NULL AND n.b IS NOT NULL',
+        )
+      }
     })
 
     it('excludes them from every value-shape audit', () => {
