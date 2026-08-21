@@ -9,6 +9,14 @@ import './../../factories'
 // Only columns the table actually supplies are cast: casting an absent one would turn it into
 // `false`/`NaN` and override the factory's own default, which is what the row means to fall
 // back to.
+//
+// The result has to go into BOTH slots of Factory.build(attributes, options), never the raw
+// row into the second one. rosie resolves an attribute's declared dependencies from the
+// OPTIONS first (rosie.js `_attrValue`), and an attr that lists itself as a dependency — as
+// `.attr('pinned', ['pinned'], …)` does — always runs its builder, even when the attribute was
+// passed in. A raw `entry` in the options slot therefore wins over anything cast here:
+//
+//   Factory.attributes('probe', { pinned: true }, { pinned: 'x' })  ->  { pinned: 'x' }
 const cast = (entry, coercions) => {
   const result = { ...entry }
   for (const [property, coerce] of Object.entries(coercions)) {
@@ -25,12 +33,13 @@ defineStep('the following {string} are in the database:', (table,data) => {
       data.hashes().forEach( entry => {
         // `pinned` is `true`-or-absent in the declaration, never false — the post factory
         // maps a falsy value onto null, and create.ts drops nulls before writing.
-        cy.factory().build('post', cast(entry, {
+        const post = cast(entry, {
           deleted: Boolean,
           disabled: Boolean,
           pinned: Boolean,
-        }),{
-          ...entry,
+        })
+        cy.factory().build('post', post, {
+          ...post,
           tagIds: entry.tagIds ? entry.tagIds.split(',').map(item => item.trim()) : [],
         })
       })
@@ -58,21 +67,20 @@ defineStep('the following {string} are in the database:', (table,data) => {
       break
     case 'groups':
       data.hashes().forEach( entry => {
-        cy.factory().build('group', cast(entry, {
-          deleted: Boolean,
-          disabled: Boolean,
-        }), entry)
+        const group = cast(entry, { deleted: Boolean, disabled: Boolean })
+        cy.factory().build('group', group, group)
       })
       break
     case 'donations':
       data.hashes().forEach( entry => {
         // `showDonations` is a boolean and `goal`/`progress` are numbers in the declaration;
         // the table writes them as "x" and "15000.0".
-        cy.factory().build('donations', cast(entry, {
+        const donations = cast(entry, {
           showDonations: Boolean,
           goal: Number,
           progress: Number,
-        }), entry)
+        })
+        cy.factory().build('donations', donations, donations)
       })
       break
   }
