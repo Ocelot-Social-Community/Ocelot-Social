@@ -31,7 +31,11 @@ import type { Session } from 'neo4j-driver'
 // object plus a report instead of an aborted deployment. `--strict` (CI, dev) makes any skip
 // an error; without it (production) only a statement that ERRORED does.
 
-const [, , commandArgument, profileArgument, ...flags] = process.argv
+// Flags are filtered out before the positional arguments are read: `apply --strict` used to
+// take "--strict" as the profile name, because the profile is simply argv[3].
+const argv = process.argv.slice(2)
+const flags = argv.filter((argument) => argument.startsWith('--'))
+const [commandArgument, profileArgument] = argv.filter((argument) => !argument.startsWith('--'))
 const command = commandArgument ?? 'check'
 const profileInput = profileArgument ?? 'neo4j-community'
 const strict = flags.includes('--strict')
