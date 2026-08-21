@@ -8350,23 +8350,6 @@ neo4j-driver@^4.4.11:
     neo4j-driver-core "4.4.11"
     rxjs "^6.6.3"
 
-neostandard@^0.12.2:
-  version "0.12.2"
-  resolved "https://registry.yarnpkg.com/neostandard/-/neostandard-0.12.2.tgz#da64aae492385746d379a8318e7c789c705ad6ab"
-  integrity sha512-VZU8EZpSaNadp3rKEwBhVD1Kw8jE3AftQLkCyOaM7bWemL1LwsYRsBnAmXy2LjG9zO8t66qJdqB7ccwwORyrAg==
-  dependencies:
-    "@humanwhocodes/gitignore-to-minimatch" "^1.0.2"
-    "@stylistic/eslint-plugin" "2.11.0"
-    eslint-import-resolver-typescript "^3.10.1"
-    eslint-plugin-import-x "^4.16.1"
-    eslint-plugin-n "^17.20.0"
-    eslint-plugin-promise "^7.2.1"
-    eslint-plugin-react "^7.37.5"
-    find-up "^5.0.0"
-    globals "^15.15.0"
-    peowly "^1.3.2"
-    typescript-eslint "^8.35.1"
-
 no-case@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/no-case/-/no-case-3.0.4.tgz#d361fd5c9800f558551a8369fc0dcd4662b6124d"
