@@ -73,6 +73,9 @@ class Store {
         `Schema (${target}): ${String(report.applied.length)} applied, ` +
           `${String(report.unchanged.length)} already in place`,
       )
+      for (const name of report.superseded) {
+        console.log(`SUPERSEDED index ${name} — replaced by the constraint on the same key`)
+      }
       for (const item of report.skipped) {
         console.log(
           `SKIPPED ${item.violation}: ${String(item.violations)} violation(s) — ` + item.statement,

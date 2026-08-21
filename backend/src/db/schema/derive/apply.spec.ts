@@ -14,6 +14,14 @@ interface StubOptions {
   rejects?: string[]
   /** Statements the stub answers with Neo4j's "an equivalent index already exists". */
   alreadyThere?: string[]
+  /** What `SHOW INDEXES` reports, in the column shape 4.4 uses. */
+  indices?: {
+    name: string
+    labelsOrTypes: string[]
+    properties: string[]
+    uniqueness: 'UNIQUE' | 'NONUNIQUE'
+    type: 'BTREE' | 'FULLTEXT'
+  }[]
 }
 
 const stubRunner = (options: StubOptions = {}) => {
@@ -25,7 +33,9 @@ const stubRunner = (options: StubOptions = {}) => {
     },
     sample: async (cypher) => {
       calls.push(`sample ${cypher}`)
-      return Promise.resolve([{ id: 1, detail: 'offending' }])
+      return Promise.resolve(
+        cypher === 'SHOW INDEXES' ? (options.indices ?? []) : [{ id: 1, detail: 'offending' }],
+      )
     },
     execute: async (cypher) => {
       calls.push(`execute ${cypher}`)
@@ -64,6 +74,24 @@ const plan = [
   },
   { statement: 'CREATE CONSTRAINT Role_id_unique', violation: 'Role.id unique', auditCypher: 'A2' },
 ]
+
+// The same statement, for a key the database may already index without a constraint.
+const supersedingPlan = [
+  {
+    statement: CONSTRAINT,
+    violation: 'User.slug unique',
+    auditCypher: AUDIT,
+    sampleCypher: 'SAMPLE User.slug',
+    supersedesIndexOn: { label: 'User', properties: ['slug'] },
+  },
+]
+
+const presentIndex = (
+  name: string,
+  label: string,
+  properties: string[],
+  uniqueness: 'UNIQUE' | 'NONUNIQUE' = 'NONUNIQUE',
+) => ({ name, labelsOrTypes: [label], properties, uniqueness, type: 'BTREE' as const })
 
 describe('planConstraints', () => {
   const items = planConstraints(entities, relationships, 'neo4j-community')
@@ -179,6 +207,101 @@ describe('applyPlan', () => {
     expect(report.applied).toEqual([])
   })
 
+  describe('an index the constraint supersedes', () => {
+    // Neo4j 4.4 refuses `CREATE CONSTRAINT` while a plain index holds the same key, and
+    // `IF NOT EXISTS` does not help — it guards against an existing CONSTRAINT. Without this,
+    // every declaration that turns an indexed property into a unique one would abort the
+    // deployment of every database that already has the index.
+    it('drops it first, then creates the constraint, and says so', async () => {
+      const { runner, calls } = stubRunner({
+        indices: [presentIndex('User_slug_index', 'User', ['slug'])],
+      })
+      const report = await applyPlan(runner, supersedingPlan)
+      expect(calls).toEqual([
+        `count ${AUDIT}`,
+        'sample SHOW INDEXES',
+        'execute DROP INDEX `User_slug_index` IF EXISTS',
+        `execute ${CONSTRAINT}`,
+      ])
+      expect(report.superseded).toEqual(['User_slug_index'])
+      expect(report.applied).toEqual([CONSTRAINT])
+    })
+
+    it('asks only after the audit came back clean', async () => {
+      // The index is given up for a constraint that is going to be created. If the data does
+      // not support one, nothing is given up and the database keeps what it has.
+      const { runner, calls } = stubRunner({
+        violations: new Map([[AUDIT, 2]]),
+        indices: [presentIndex('User_slug_index', 'User', ['slug'])],
+      })
+      const report = await applyPlan(runner, supersedingPlan)
+      expect(calls).not.toContain('sample SHOW INDEXES')
+      expect(calls.filter((call) => call.startsWith('execute DROP'))).toEqual([])
+      expect(report.superseded).toEqual([])
+    })
+
+    it('leaves the index backing a constraint alone', async () => {
+      // 4.4 lists it in SHOW INDEXES as well, refuses to drop it directly, and it is exactly
+      // what a re-run finds: the constraint created last time owns it.
+      const { runner, calls } = stubRunner({
+        indices: [presentIndex('User_slug_unique', 'User', ['slug'], 'UNIQUE')],
+      })
+      const report = await applyPlan(runner, supersedingPlan)
+      expect(calls.filter((call) => call.startsWith('execute DROP'))).toEqual([])
+      expect(report.superseded).toEqual([])
+    })
+
+    it('leaves a fulltext index on the same key alone', async () => {
+      // Found by running this against a real database: `Tag` declares BOTH `unique: ['id']`
+      // and a fulltext index over `['id']`, and the first version dropped tag_fulltext_search
+      // on the way to the constraint. A fulltext index is a different index type and does not
+      // occupy the slot the constraint needs.
+      const { runner, calls } = stubRunner({
+        indices: [
+          { ...presentIndex('tag_fulltext_search', 'User', ['slug']), type: 'FULLTEXT' as const },
+        ],
+      })
+      const report = await applyPlan(runner, supersedingPlan)
+      expect(calls.filter((call) => call.startsWith('execute DROP'))).toEqual([])
+      expect(report.superseded).toEqual([])
+    })
+
+    it('leaves an index on another key alone', async () => {
+      const { runner, calls } = stubRunner({
+        indices: [
+          presentIndex('User_name_index', 'User', ['name']),
+          presentIndex('Post_slug_index', 'Post', ['slug']),
+          presentIndex('User_slug_name_index', 'User', ['slug', 'name']),
+        ],
+      })
+      await applyPlan(runner, supersedingPlan)
+      expect(calls.filter((call) => call.startsWith('execute DROP'))).toEqual([])
+    })
+
+    it('puts it back when the constraint fails after all', async () => {
+      // The audit passed, so the drop looked safe — but data can change between the two, and a
+      // hot label left with no index because of a constraint that did not happen is the worse
+      // outcome of the two.
+      const { runner, calls } = stubRunner({
+        rejects: ['User_slug_unique'],
+        indices: [presentIndex('User_slug_index', 'User', ['slug'])],
+      })
+      const report = await applyPlan(runner, supersedingPlan)
+      expect(calls).toContain(
+        'execute CREATE INDEX `User_slug_index` IF NOT EXISTS FOR (n:User) ON (n.slug)',
+      )
+      expect(report.superseded).toEqual([])
+      expect(report.failed).toHaveLength(1)
+    })
+
+    it('costs one read and nothing else on a database that has no such index', async () => {
+      const { runner, calls } = stubRunner({ indices: [] })
+      const report = await applyPlan(runner, supersedingPlan)
+      expect(calls.filter((call) => call.startsWith('execute'))).toEqual([`execute ${CONSTRAINT}`])
+      expect(report.superseded).toEqual([])
+    })
+  })
+
   it('passes unsupported objects through instead of dropping them silently', async () => {
     const { runner } = stubRunner()
     const report = await applyPlan(runner, [], [], ['fulltext index x on Y(z)'])
@@ -192,6 +315,7 @@ describe('enforce', () => {
     unchanged: [],
     skipped: [],
     failed: [],
+    superseded: [],
     unsupported: [],
   }
   const withSkip: ApplyReport = {

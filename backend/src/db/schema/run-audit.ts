@@ -174,6 +174,11 @@ const apply = async (
     `  applied: ${String(report.applied.length)}, ` +
       `already in place: ${String(report.unchanged.length)}`,
   )
+  for (const name of report.superseded) {
+    // The one DROP this tool performs, and never silently: the constraint on the same key
+    // replaces the index, and Neo4j 4.4 will not create it while the index is there.
+    console.log(`  \x1b[33mSUPERSEDED\x1b[0m index ${name} — replaced by its constraint`)
+  }
   for (const item of report.skipped) {
     console.log(
       `  \x1b[33mSKIPPED\x1b[0m ${item.violation}: ${String(item.violations)} violation(s)`,
