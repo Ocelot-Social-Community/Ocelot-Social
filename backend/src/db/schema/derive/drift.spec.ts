@@ -25,9 +25,10 @@ describe('declaredObjects', () => {
   })
 
   it('lists the index the neode model asked for but never produced', () => {
-    // `Role.name` is declared `indexed: true` in db/models/Role.ts, but neode reads the flag
-    // from `index`, so no statement was ever generated and the index is absent from every
-    // running database. It is a `missing` object from the first run of the drift check on.
+    // `Role.name` was declared `indexed: true` in db/models/Role.ts, but neode read the flag
+    // from `index`, so no statement was ever generated and the index was absent from every
+    // running database. The drift check reported it as MISSING on its first run, and
+    // `migrate init` creates it from this declaration now.
     expect(declaredObjects([Role], 'neo4j-community')).toContainEqual({
       kind: 'index',
       label: 'Role',
