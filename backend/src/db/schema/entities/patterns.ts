@@ -47,10 +47,24 @@ const WHITESPACE =
 export const EMAIL = `^[^@${WHITESPACE}]+@[^@.${WHITESPACE}]+([.][^@.${WHITESPACE}]+)+$`
 
 /**
- * A URI with an explicit scheme: `https://example.org`, `mailto:someone@example.org`.
+ * A web address the UI may put in an `href`: `http://example.org`, `https://example.org/x`.
  *
- * Replaces neode's Joi `uri: true` on SocialMedia.url. Deliberately not a full RFC 3986
- * grammar — the rule that matters is "a scheme and something after it", which is what
- * separates a link a browser can follow from the string `not-a-url`.
+ * An ALLOWLIST of two schemes, not "a scheme and something after it". The permissive version
+ * this replaces — neode's Joi `uri: true`, transcribed as `^[a-zA-Z][a-zA-Z0-9+.-]*:…` —
+ * accepted `javascript:alert(document.cookie)`, `data:text/html;base64,…`, `vbscript:` and
+ * `file:///etc/passwd`. SocialMedia.url is rendered by the webapp as
+ * `<a :href="link.url">` on a user's PUBLIC profile, and Vue does not sanitise an href
+ * binding, so a stored `javascript:` URL runs in the browser of whoever clicks it. An
+ * allowlist is the only form of this rule that cannot be talked around by the next scheme
+ * nobody thought of.
+ *
+ * The scheme is spelled letter by letter rather than with a case-insensitive flag: `(?i)` is
+ * Java-only and ajv compiles the pattern without flags, so it would match `JavaScript:` in
+ * one engine and not the other — see patternParity.spec.ts. `jaVaScRiPt:` has to be rejected
+ * by both, and a browser reads schemes case-insensitively.
+ *
+ * `mailto:` is deliberately absent. This is the constraint on social-media profile links, and
+ * the component derives a favicon from the host — an address has none. Should a field ever
+ * need it, that is a second, differently named pattern, not a widening of this one.
  */
-export const URI = `^[a-zA-Z][a-zA-Z0-9+.-]*:[^${WHITESPACE}]+$`
+export const HTTP_URL = `^[hH][tT][tT][pP][sS]?://[^${WHITESPACE}]+$`

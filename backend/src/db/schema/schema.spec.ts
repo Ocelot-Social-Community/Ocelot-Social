@@ -133,6 +133,10 @@ describe('patterns', () => {
   // This is a cheap syntactic guard. The semantic one is patternParity.spec.ts, which asks a
   // real Neo4j.
   const forbidden = [
+    // `(?i)` and friends: Java honours an inline flag, ajv compiles the pattern without
+    // flags and ECMAScript has no such syntax at all, so the same string would be
+    // case-insensitive on one side only.
+    /\(\?[a-zA-Z]+[):]/,
     /\(\?</,
     /\\d/,
     /\\D/,

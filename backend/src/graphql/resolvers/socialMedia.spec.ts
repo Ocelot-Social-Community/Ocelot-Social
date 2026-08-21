@@ -151,6 +151,40 @@ describe('SocialMedia', () => {
         expect(result.errors![0].message).toEqual(expect.stringContaining('must match pattern'))
       })
 
+      // The webapp renders this value as `<a :href="link.url">` on a user's PUBLIC profile,
+      // and Vue does not sanitise an href binding. A stored `javascript:` url therefore runs
+      // in the browser of whoever clicks it — which the previous "any scheme followed by
+      // something" rule allowed. The declaration now allows http and https and nothing else,
+      // so the list below is what must stay refused.
+      it.each([
+        ['javascript', 'javascript:alert(document.cookie)'],
+        ['javascript in mixed case', 'jaVaScRiPt:alert(1)'],
+        ['data', 'data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg=='],
+        ['vbscript', 'vbscript:msgbox(1)'],
+        ['file', 'file:///etc/passwd'],
+        // Not an execution vector, but not a profile link either, and the component derives a
+        // favicon from the host.
+        ['mailto', 'mailto:someone@example.org'],
+      ])('refuses a %s url', async (_scheme, rejected) => {
+        variables = { url: rejected }
+        const result = await socialMediaAction(user, CreateSocialMedia, variables)
+
+        expect(result.errors![0].message).toEqual(expect.stringContaining('must match pattern'))
+        expect(result.data?.CreateSocialMedia).toBeFalsy()
+      })
+
+      it.each([
+        ['https', 'https://mastodon.social/@Gargron'],
+        ['http', 'http://example.org/profile'],
+        ['an uppercase scheme, as a browser reads it', 'HTTPS://example.org/profile'],
+      ])('accepts a %s url', async (_scheme, accepted) => {
+        variables = { url: accepted }
+        const result = await socialMediaAction(user, CreateSocialMedia, variables)
+
+        expect(result.errors).toBeUndefined()
+        expect(result.data).toMatchObject({ CreateSocialMedia: { url: accepted } })
+      })
+
       it('denies creating social media when the socialMediaEnabled policy is off', async () => {
         policyOverride = { socialMediaEnabled: false }
         const result = await socialMediaAction(user, CreateSocialMedia, variables)

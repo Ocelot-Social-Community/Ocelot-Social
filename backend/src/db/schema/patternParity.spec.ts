@@ -1,4 +1,5 @@
 import { closeDriver, getDriver } from '@db/neo4j'
+import { EMAIL, HTTP_URL, ISO_DATE_TIME, SLUG } from '@db/schema/entities/patterns'
 import { entities } from '@db/schema/index'
 
 // Do the two engines that read our patterns agree?
@@ -42,27 +43,31 @@ const TRICKY: readonly (readonly [string, string])[] = [
   ['U+00DF LATIN SMALL LETTER SHARP S', '\u00df'],
 ]
 
-/** One plausible value per pattern, so the injected character has somewhere to sit. */
+/**
+ * One value per pattern that the pattern itself accepts, so the injected character has
+ * somewhere to sit and a rejection means something.
+ *
+ * Keyed by the exported constant rather than guessed from the pattern text: a pattern that
+ * gets tightened — `URI` became `HTTP_URL` when the scheme allowlist arrived — would silently
+ * fall through to a sample it no longer matches, and every comparison below would degenerate
+ * to "false equals false". The self-check in the test turns that into a failure instead.
+ */
 const SAMPLES = new Map<string, string>([
-  ['^[a-z0-9_-]+$', 'peter-pan'],
-  ['someone@example.org', 'someone@example.org'],
+  [SLUG, 'peter-pan'],
+  [EMAIL, 'someone@example.org'],
+  [HTTP_URL, 'https://example.org/path'],
+  [ISO_DATE_TIME, '2026-08-21T10:00:00.000Z'],
 ])
 
 const sampleFor = (pattern: string): string => {
   const known = SAMPLES.get(pattern)
-  if (known !== undefined) {
-    return known
+  if (known === undefined) {
+    throw new Error(
+      `No sample declared for the pattern ${pattern}. Add one to SAMPLES — a new pattern ` +
+        `without one would go unchecked.`,
+    )
   }
-  if (pattern.includes('@')) {
-    return 'someone@example.org'
-  }
-  if (pattern.startsWith('^[a-zA-Z][a-zA-Z0-9+.-]*:')) {
-    return 'https://example.org/path'
-  }
-  if (pattern.startsWith('^[0-9]{4}-')) {
-    return '2026-08-21T10:00:00.000Z'
-  }
-  return 'peter-pan'
+  return known
 }
 
 /** Every distinct pattern in the declaration, with the properties that use it. */

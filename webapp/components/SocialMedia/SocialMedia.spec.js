@@ -144,6 +144,43 @@ describe('SocialMedia.vue', () => {
       })
     })
 
+    describe('a url with a scheme the browser must not follow', () => {
+      // This card sits on a PUBLIC profile, and Vue does not sanitise an href binding — a
+      // stored `javascript:` url would run in the browser of whoever clicks it. The backend
+      // now only accepts http and https, but rows written before that rule are still in the
+      // database, which is why the check is repeated here.
+      const wrapperFor = (url) => {
+        propsData.userName = 'Jenny Rostock'
+        propsData.user = {
+          socialMedia: [
+            { id: 'ee1e8ed6-fbef-4bcf-b411-a12926f2ea1e', url, __typename: 'SocialMedia' },
+          ],
+        }
+        return Wrapper()
+      }
+
+      it.each([
+        ['javascript', 'javascript:alert(document.cookie)'],
+        ['javascript in mixed case', 'jaVaScRiPt:alert(1)'],
+        ['data', 'data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg=='],
+        ['vbscript', 'vbscript:msgbox(1)'],
+        ['file', 'file:///etc/passwd'],
+      ])('renders no link at all for a %s url', (_scheme, url) => {
+        const wrapper = wrapperFor(url)
+        expect(wrapper.findAll('a')).toHaveLength(0)
+        // Not by another route either: no href, and no favicon src derived from the value.
+        expect(wrapper.html()).not.toContain(url)
+      })
+
+      it.each([
+        ['https', 'https://www.instagram.com/nimitbhargava'],
+        ['http', 'http://example.org/profile'],
+        ['an uppercase scheme, as a browser reads it', 'HTTPS://example.org/profile'],
+      ])('still links a %s url', (_scheme, url) => {
+        expect(wrapperFor(url).findAll('a').at(0).attributes('href')).toEqual(url)
+      })
+    })
+
     describe('social media link with a username that starts with www.', () => {
       let wrapper
 
