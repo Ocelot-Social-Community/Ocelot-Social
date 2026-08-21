@@ -1,4 +1,4 @@
-import neo4j from 'neo4j-driver'
+import { int } from 'neo4j-driver'
 import { v4 as uuid } from 'uuid'
 
 import { toSlug } from '@middleware/slugify/uniqueSlug'
@@ -81,8 +81,8 @@ const defaults = new Map<string, Defaults>([
       // Neo4j Integers, not JS numbers: the driver stores a plain number as a FLOAT, and
       // resolvers/posts.ts:660 reads `post.viewedTeaserCount.low` — on a float that is
       // undefined, and the mutation answers null. Same trap as SELECTED.slot.
-      clickedCount: neo4j.int(0),
-      viewedTeaserCount: neo4j.int(0),
+      clickedCount: int(0),
+      viewedTeaserCount: int(0),
       sortDate: timestamp(),
       slug: toSlug(text(properties.title, 'post')),
     }),
