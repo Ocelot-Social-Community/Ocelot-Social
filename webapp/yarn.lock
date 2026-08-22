@@ -4958,12 +4958,12 @@
   dependencies:
     "@sinonjs/commons" "^2.0.0"
 
-"@storybook/addon-a11y@7.6.24":
-  version "7.6.24"
-  resolved "https://registry.yarnpkg.com/@storybook/addon-a11y/-/addon-a11y-7.6.24.tgz#74d51aab060f7c50a61bf3d19e2c1481f1fc948d"
-  integrity sha512-0bEHRiEUuJpfgAzg+VY4ZRgHJKitz6cJSr2GN7aIiPpT+tZLzTbvSRY4aAMtVOlBkt3YpxhveWFl8NY76lM1Zw==
+"@storybook/addon-a11y@10.5.9":
+  version "10.5.9"
+  resolved "https://registry.yarnpkg.com/@storybook/addon-a11y/-/addon-a11y-10.5.9.tgz#b58d2b8c215c833b49924bef5f4d578b865cdfae"
+  integrity sha512-MvXkoJIVRcZrqhWi+wynYAmFkvTWm5aHdJfYohhgPeEJVDRF91zejtOsN7zPRE/lQvBDY+IiomKxeRN3UhWNVw==
   dependencies:
-    "@storybook/addon-highlight" "7.6.24"
+    "@storybook/global" "^5.0.0"
     axe-core "^4.2.0"
 
 "@storybook/addon-actions@7.6.24":
@@ -4977,13 +4977,6 @@
     dequal "^2.0.2"
     polished "^4.2.2"
     uuid "^9.0.0"
-
-"@storybook/addon-highlight@7.6.24":
-  version "7.6.24"
-  resolved "https://registry.yarnpkg.com/@storybook/addon-highlight/-/addon-highlight-7.6.24.tgz#2d1f978de8d1eebadacb4e6f30dcd20cd631db62"
-  integrity sha512-IOp9X2WtSe5VQearPGP2iLq0rPiN/R55sRYStYaAF5UUz/I5boyc1Cbn2HWRiSfGupFpqqTScYuzlU1sM68kKw==
-  dependencies:
-    "@storybook/global" "^5.0.0"
 
 "@storybook/builder-manager@7.6.24":
   version "7.6.24"

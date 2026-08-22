@@ -80,7 +80,7 @@
     "@csstools/postcss-global-data": "^4.0.0",
     "@faker-js/faker": "9.9.0",
     "@playwright/test": "~1.61.1",
-    "@storybook/addon-a11y": "7.6.24",
+    "@storybook/addon-a11y": "10.5.9",
     "@storybook/addon-actions": "7.6.24",
     "@storybook/vue": "7.6.24",
     "@storybook/vue-webpack5": "7.6.24",
