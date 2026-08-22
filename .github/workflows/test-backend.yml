@@ -195,11 +195,55 @@ jobs:
       - name: backend | docker compose
         run: docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend
 
+      # `up --detach` returns when the CONTAINER started, not when Neo4j accepts bolt. The
+      # first migrate run then raced it: the CI log showed nine index statements failing with
+      # ECONNREFUSED while the constraints, issued moments later, went through. The indices
+      # were simply missing afterwards — silently, because the previous schema installer
+      # swallowed the error. The schema check is what made it visible.
+      #
+      # Same probe as the helm chart's wait initContainer (templates/backend/deployment.yaml):
+      # node rather than nc, because busybox's nc has no portable -z.
+      - name: backend | Wait for Neo4j to accept connections
+        run: |
+          probe='const net=require("net")
+          const s=net.connect(7687,"neo4j")
+          s.on("connect",()=>{s.end();process.exit(0)})
+          s.on("error",()=>process.exit(1))
+          setTimeout(()=>process.exit(1),5000)'
+          for attempt in $(seq 1 60); do
+            if docker compose exec -T backend node -e "$probe"; then
+              echo "neo4j is reachable after $attempt attempt(s)"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "neo4j did not accept connections within 5 minutes"
+          exit 1
+
       - name: backend | Initialize Database
         run: docker compose exec -T backend yarn db:migrate init
 
       - name: backend | Migrate Database Up
         run: docker compose exec -T backend yarn db:migrate up
+
+      # Establishes the schema from src/db/schema, then verifies it. `apply` is what
+      # `db:migrate init` also does — running it explicitly makes the job independent of
+      # whether init reached this database, which is exactly what the first CI run of the
+      # check turned up: six declared indices missing after init reported success.
+      #
+      # --strict: any constraint the data will not support fails the job here, where the data
+      # is disposable. Production runs the same code without it (db/migrate/store.ts).
+      - name: backend | Schema apply - declaration to database
+        run: docker compose exec -T backend yarn db:schema:apply --strict
+
+      # Read-only, and it exits non-zero on any finding. Placed BEFORE the unit tests because
+      # those wipe the database (every spec calls cleanDatabase), which would make the data
+      # audits vacuous. On a freshly migrated database the meaningful part is the comparison
+      # against src/db/schema: a constraint or index the declaration wants and `migrate init`
+      # did not produce, or one the database holds that nothing declares any more — plus a
+      # label or relationship type in the database that the registry does not know.
+      - name: backend | Schema check - declaration vs. database
+        run: docker compose exec -T backend yarn db:schema:check
 
       - name: backend | Unit test incl. coverage check
         run: docker compose exec -T backend yarn test

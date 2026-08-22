@@ -84,6 +84,16 @@ export const ENV_REGISTRY: EnvVarSpec[] = [
     category: 'database',
     softwareDefault: SOFTWARE_DEFAULTS.NEO4J_PASSWORD,
   },
+  // Which constraint classes the graph backend can enforce, and therefore how much of
+  // src/db/schema the migration init installs. Community Neo4j holds uniqueness only;
+  // Enterprise adds existence constraints, Memgraph those plus data types. Everything a
+  // profile cannot enforce is covered by the audit queries instead.
+  {
+    name: 'NEO4J_PROFILE',
+    secret: false,
+    category: 'database',
+    softwareDefault: SOFTWARE_DEFAULTS.NEO4J_PROFILE,
+  },
 
   // --- Mail / SMTP --------------------------------------------------------
   { name: 'EMAIL_DEFAULT_SENDER', secret: false, category: 'mail', softwareDefault: null },

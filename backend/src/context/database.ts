@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-import { getDriver, getNeode } from '@db/neo4j'
+import { getDriver } from '@db/neo4j'
+import { fixtures } from '@db/testing/fixtures'
 
 import type { Driver } from 'neo4j-driver'
 
@@ -39,11 +40,13 @@ export const write =
 
 export default () => {
   const driver = getDriver()
-  const neode = getNeode()
 
   return {
     driver,
-    neode,
+    // The fixture API for tests. `neode` is the name 72 spec files know it by and stays as a
+    // deprecated alias — it is no longer neode, and nothing in production uses either.
+    fixtures,
+    neode: fixtures,
     query: query(driver),
     write: write(driver),
   }

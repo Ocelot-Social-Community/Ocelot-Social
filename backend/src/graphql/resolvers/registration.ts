@@ -5,7 +5,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { hash } from 'bcryptjs'
 
-import { getNeode } from '@db/neo4j'
+import { EmailAddress } from '@db/schema/entities/EmailAddress'
+import { validateProperties } from '@db/schema/validate'
 import { UserInputError } from '@graphql/errors'
 
 import existingEmailAddress from './helpers/existingEmailAddress'
@@ -16,14 +17,12 @@ import { createOrUpdateLocations } from './users/location'
 
 import type { Context } from '@src/context'
 
-const neode = getNeode()
-
 export default {
   Mutation: {
     Signup: async (_parent, args, context) => {
       args.nonce = generateNonce()
       args.email = normalizeEmail(args.email)
-      let emailAddress = await existingEmailAddress({ args, context })
+      const emailAddress = await existingEmailAddress({ args, context })
       /*
       if (emailAddress.user) {
         // what to do?
@@ -32,12 +31,28 @@ export default {
       if (emailAddress.alreadyExistingEmail) {
         return emailAddress.alreadyExistingEmail
       }
-      try {
-        emailAddress = await neode.create('EmailAddress', args)
-        return emailAddress.toJson()
-      } catch (e) {
-        throw new UserInputError(e.message)
+      // neode validated the address against db/models/EmailAddress before writing; that check
+      // moves to the declaration. `args` carries more than the node does (locale, inviteCode),
+      // so only the declared properties go in — `additionalProperties: false` would reject the
+      // rest, and they are arguments, not node properties.
+      const properties = {
+        email: args.email as string,
+        nonce: args.nonce as string,
+        createdAt: new Date().toISOString(),
       }
+      const invalid = validateProperties(EmailAddress, properties)
+      if (invalid) {
+        throw new UserInputError(invalid)
+      }
+      const created = await context.database.write({
+        query: `
+          CREATE (emailAddress:EmailAddress)
+          SET emailAddress += $properties
+          RETURN emailAddress {.*}
+        `,
+        variables: { properties },
+      })
+      return created.records[0].get('emailAddress')
     },
     SignupVerification: async (_parent, args, context: Context) => {
       const { termsAndConditionsAgreedVersion } = args

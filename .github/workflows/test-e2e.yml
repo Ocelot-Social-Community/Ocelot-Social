@@ -321,6 +321,20 @@ jobs:
           await backend 120 'curl -sf -X POST -H "Content-Type: application/json" -d "{\"query\":\"{__typename}\"}" http://localhost:4000 > /dev/null 2>&1'
           await webapp 120 'curl -sf http://localhost:3000 > /dev/null 2>&1'
 
+      # Same race as in test-backend.yml: `up --detach` returns before Neo4j accepts bolt.
+      - name: Wait for Neo4j to accept connections
+        run: |
+          probe='const net=require("net")
+          const s=net.connect(7687,"neo4j")
+          s.on("connect",()=>{s.end();process.exit(0)})
+          s.on("error",()=>process.exit(1))
+          setTimeout(()=>process.exit(1),5000)'
+          for attempt in $(seq 1 60); do
+            if docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend node -e "$probe"; then exit 0; fi
+            sleep 5
+          done
+          echo 'neo4j did not accept connections within 5 minutes'; exit 1
+
       - name: Initialize database
         run: docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend yarn db:migrate init
 

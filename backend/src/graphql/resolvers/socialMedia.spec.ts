@@ -136,8 +136,11 @@ describe('SocialMedia', () => {
         variables = { url: '' }
         const result = await socialMediaAction(user, CreateSocialMedia, variables)
 
+        // Wording is ours now, not Joi's: the rule moved from db/models/SocialMedia.ts into
+        // db/schema/entities/SocialMedia.ts, where the audit can check stored nodes against it
+        // too. What is asserted is the behaviour — an empty url is refused as user input.
         expect(result.errors![0].message).toEqual(
-          expect.stringContaining('"url" is not allowed to be empty'),
+          expect.stringContaining('must NOT have fewer than 1 characters'),
         )
       })
 
@@ -145,9 +148,7 @@ describe('SocialMedia', () => {
         variables = { url: 'not-a-url' }
         const result = await socialMediaAction(user, CreateSocialMedia, variables)
 
-        expect(result.errors![0].message).toEqual(
-          expect.stringContaining('"url" must be a valid uri'),
-        )
+        expect(result.errors![0].message).toEqual(expect.stringContaining('must match pattern'))
       })
 
       it('denies creating social media when the socialMediaEnabled policy is off', async () => {

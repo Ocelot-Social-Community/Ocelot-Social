@@ -6,10 +6,9 @@
 import { readdir } from 'node:fs/promises'
 import path from 'node:path'
 
-import { getNeode } from './neo4j'
+import { closeDriver } from './neo4j'
 
 const dataFolder = path.join(__dirname, 'data/')
-const neode = getNeode()
 
 ;(async function () {
   const files = await readdir(dataFolder)
@@ -23,6 +22,7 @@ const neode = getNeode()
     }
   }
 
-  // close database connection
-  neode.close()
+  // close database connection — the shared driver, not neode's: nothing here goes through
+  // the ORM any more.
+  await closeDriver()
 })()
