@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.6](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/branding-v0.1.5...branding-v0.1.6) (2026-08-20)
+
+
+### Bug Fixes
+
+* **package/ui:** update eslint-config-it4c & ensure 100% coverage ([#10078](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10078)) ([92fb085](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/92fb085ab59ff57d8b363c177e9d951fbbd3027c))
+
 ## [0.1.5](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/branding-v0.1.4...branding-v0.1.5) (2026-08-14)
 
 
