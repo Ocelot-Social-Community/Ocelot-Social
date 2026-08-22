@@ -99,7 +99,7 @@
     "slugify": "^1.6.8",
     "subscriptions-transport-ws": "^0.11.0",
     "trunc-html": "~1.1.2",
-    "tslog": "^4.10.2",
+    "tslog": "^5.1.0",
     "uuid": "~9.0.1",
     "validator": "^13.15.35",
     "ws": "^8.21.3",
