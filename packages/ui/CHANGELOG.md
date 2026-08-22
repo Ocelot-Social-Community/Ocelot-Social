@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.4](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/ui-v0.0.3...ui-v0.0.4) (2026-08-22)
+
+
+### Bug Fixes
+
+* **package/ui:** update eslint-config-it4c & dependencies ([#10074](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10074)) ([2f85dcf](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/2f85dcfc0ab6a1d5ffebc942e8f569be91bbdacb))
+
 ## [0.0.3](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/ui-v0.0.2...ui-v0.0.3) (2026-08-15)
 
 
