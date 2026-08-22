@@ -34,6 +34,8 @@ input _PostFilter {
   eventStart_gte: String
   "Events ending at or after this time."
   eventEnd_gte: String
+  "Exact match, including null — used to find events with no explicit end date."
+  eventEnd: String
   "Only posts that have a location attached."
   hasLocation: Boolean
 

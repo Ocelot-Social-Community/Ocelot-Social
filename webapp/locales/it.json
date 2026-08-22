@@ -1056,6 +1056,10 @@
     "legend": {
       "event": "Evento",
       "group": "Gruppo",
+      "hidePastEvents": "Nascondi eventi passati",
+      "hideType": "Nascondi {type}",
+      "showPastEvents": "Mostra eventi passati",
+      "showType": "Mostra {type}",
       "theUser": "La mia posizione",
       "title": "Legenda",
       "user": "Utente"
@@ -1255,7 +1259,9 @@
       "eventStartInPast": "La data di inizio è nel passato.",
       "eventStartNotEmpty": "Inserire una data di inizio.",
       "eventVenue": "Descrizione del luogo — es. cortile, 1° piano, …",
-      "title": "Evento"
+      "pickLocationOnMap": "Scegli la posizione sulla mappa",
+      "title": "Evento",
+      "viewOnMainMap": "Visualizza sulla mappa principale"
     },
     "viewPost": {
       "forGroup": {

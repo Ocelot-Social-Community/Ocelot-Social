@@ -253,6 +253,17 @@ const translate = (
         continue
       }
 
+      // Exact match — but Cypher's `=` never matches NULL, so `{ eventEnd: null }`
+      // (filterEventDates in posts.ts, finding events with no explicit end date)
+      // needs its own IS NULL branch instead of landing in EQUALITY_FIELDS.
+      case 'eventEnd':
+        fragments.push(
+          value === null
+            ? { where: `${alias}.eventEnd IS NULL`, params: {} }
+            : { where: `${alias}.eventEnd = $${parameter}`, params: { [parameter]: value } },
+        )
+        continue
+
       // --- relations -------------------------------------------------------------
       case 'categories_some': {
         const ids = (value as { id_in?: string[] }).id_in

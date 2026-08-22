@@ -96,7 +96,29 @@ const filterEventDates = (params) => {
   if (params.filter?.eventStart_gte) {
     const date = params.filter.eventStart_gte
     delete params.filter.eventStart_gte
-    params.filter = { ...params.filter, OR: [{ eventStart_gte: date }, { eventEnd_gte: date }] }
+    // An event stays "current" through the rest of the calendar day it ends
+    // on, not just up to its exact eventEnd instant — so this compares
+    // eventEnd against the *start* of the cutoff's day, not the cutoff
+    // itself. Posts saved before eventEnd defaulting existed (see
+    // ContributionForm's fallback) may still have no eventEnd at all; those
+    // get the same day-level grace period, based on eventStart instead.
+    // UTC, not server-local time — the backend has no reliable notion of the
+    // requesting user's timezone, and using setHours() would make the day
+    // boundary silently depend on whatever timezone the server process
+    // happens to run in.
+    const startOfStartDate = new Date(date)
+    if (Number.isNaN(startOfStartDate.getTime())) {
+      throw new UserInputError('eventStart_gte is invalid')
+    }
+    startOfStartDate.setUTCHours(0, 0, 0, 0)
+    params.filter = {
+      ...params.filter,
+      OR: [
+        { eventStart_gte: date },
+        { eventEnd_gte: startOfStartDate.toISOString() },
+        { eventEnd: null, eventStart_gte: startOfStartDate.toISOString() },
+      ],
+    }
   }
   return params
 }

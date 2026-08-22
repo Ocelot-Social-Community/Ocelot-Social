@@ -52,6 +52,7 @@ export default () => {
           eventVenue
           eventLocationName
           eventLocation {
+            id
             lng
             lat
           }
@@ -99,6 +100,7 @@ export default () => {
           eventLocationName
           eventVenue
           eventLocation {
+            id
             lng
             lat
           }

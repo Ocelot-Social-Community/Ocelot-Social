@@ -614,6 +614,12 @@ type Location {
 """A geocoding suggestion returned by the MapBox-backed place search."""
 type LocationMapBox {
   id: ID!
+
+  """Latitude in decimal degrees (WGS84), if known."""
+  lat: Float
+
+  """Longitude in decimal degrees (WGS84), if known."""
+  lng: Float
   place_name: String!
 }
 
@@ -2292,6 +2298,11 @@ input _PostFilter {
 
   """Posts carrying any of these emotions."""
   emotions_some: _PostEMOTEDFilter
+
+  """
+  Exact match, including null — used to find events with no explicit end date.
+  """
+  eventEnd: String
 
   """Events ending at or after this time."""
   eventEnd_gte: String

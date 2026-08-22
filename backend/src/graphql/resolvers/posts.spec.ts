@@ -246,6 +246,94 @@ describe('Post', () => {
       })
     })
   })
+
+  describe('event date filtering (filterEventDates)', () => {
+    // Mirrors what the newsfeed and the map both send to "hide past events":
+    // eventStart_gte: now. filterEventDates() rewrites this into an OR that
+    // also keeps still-running events (started but not yet ended), and
+    // — for events saved without an eventEnd at all — events that started
+    // earlier the same day.
+    // Pinned to midday on the test day (rather than the real current time) so
+    // the smallest offsets below (e.g. hours(-1)) can't drift across a local
+    // midnight boundary and break the "still today" assertions.
+    const now = new Date()
+    now.setHours(12, 0, 0, 0)
+    const hours = (h) => new Date(now.getTime() + h * 60 * 60 * 1000).toISOString()
+
+    beforeEach(async () => {
+      authenticatedUser = await user.toJson()
+      const createEvent = async (id: string, eventInput: Record<string, unknown>) => {
+        await mutate({
+          mutation: CreatePost,
+          variables: {
+            id,
+            title: `event ${id}`,
+            content: 'Some content',
+            categoryIds,
+            postType: 'Event',
+            eventInput,
+          },
+        })
+      }
+      // Future event: hasn't started yet.
+      await createEvent('future-event', { eventStart: hours(24), eventEnd: hours(48) })
+      // Ongoing event: started an hour ago, ends in an hour.
+      await createEvent('ongoing-event', { eventStart: hours(-1), eventEnd: hours(1) })
+      // Fully ended two days ago.
+      await createEvent('ended-event', { eventStart: hours(-48), eventEnd: hours(-24) })
+      // Fully ended an hour ago, but still "today" — should get the same
+      // rest-of-day grace period as an event with no eventEnd at all.
+      await createEvent('ended-today-event', { eventStart: hours(-3), eventEnd: hours(-1) })
+      // No eventEnd, started an hour ago — still "today".
+      await createEvent('no-end-today-event', { eventStart: hours(-1) })
+      // No eventEnd, started 30 hours ago — its start day has fully elapsed.
+      await createEvent('no-end-old-event', { eventStart: hours(-30) })
+      authenticatedUser = null
+    })
+
+    it('includes future, ongoing, and dateless-but-still-today events, excluding ended ones', async () => {
+      variables = {
+        filter: { postType_in: ['Event'], eventStart_gte: now.toISOString() },
+      }
+      const { data } = await query({ query: Post, variables })
+      const ids = data?.Post.map((post: { id: string }) => post.id)
+      expect(ids).toEqual(
+        expect.arrayContaining([
+          'future-event',
+          'ongoing-event',
+          'ended-today-event',
+          'no-end-today-event',
+        ]),
+      )
+      expect(ids).not.toContain('ended-event')
+      expect(ids).not.toContain('no-end-old-event')
+    })
+
+    it('throws a UserInputError instead of crashing on an invalid eventStart_gte value', async () => {
+      variables = {
+        filter: { postType_in: ['Event'], eventStart_gte: 'not-a-date' },
+      }
+      await expect(query({ query: Post, variables })).resolves.toMatchObject({
+        errors: [{ message: 'eventStart_gte is invalid' }],
+      })
+    })
+
+    it('includes every event, without a date filter', async () => {
+      variables = { filter: { postType_in: ['Event'] } }
+      const { data } = await query({ query: Post, variables })
+      const ids = data?.Post.map((post: { id: string }) => post.id)
+      expect(ids).toEqual(
+        expect.arrayContaining([
+          'future-event',
+          'ongoing-event',
+          'ended-event',
+          'ended-today-event',
+          'no-end-today-event',
+          'no-end-old-event',
+        ]),
+      )
+    })
+  })
 })
 
 describe('CreatePost', () => {

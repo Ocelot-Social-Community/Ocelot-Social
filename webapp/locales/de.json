@@ -1056,6 +1056,10 @@
     "legend": {
       "event": "Veranstaltung",
       "group": "Gruppe",
+      "hidePastEvents": "Vergangene Veranstaltungen ausblenden",
+      "hideType": "{type} ausblenden",
+      "showPastEvents": "Vergangene Veranstaltungen anzeigen",
+      "showType": "{type} anzeigen",
       "theUser": "Meine Position",
       "title": "Legende",
       "user": "Nutzer"
@@ -1255,7 +1259,9 @@
       "eventStartInPast": "Der Starttermin liegt in der Vergangenheit.",
       "eventStartNotEmpty": "Bitte ein Startdatum angeben.",
       "eventVenue": "Ortsbeschreibung — z.B. Hinterhof, 1. OG, …",
-      "title": "Veranstaltung"
+      "pickLocationOnMap": "Ort auf der Karte wählen",
+      "title": "Veranstaltung",
+      "viewOnMainMap": "Auf Hauptkarte anzeigen"
     },
     "viewPost": {
       "forGroup": {

@@ -1056,6 +1056,10 @@
     "legend": {
       "event": "Evenement",
       "group": "Groep",
+      "hidePastEvents": "Afgelopen evenementen verbergen",
+      "hideType": "{type} verbergen",
+      "showPastEvents": "Afgelopen evenementen tonen",
+      "showType": "{type} tonen",
       "theUser": "Mijn positie",
       "title": "Legenda",
       "user": "Gebruiker"
@@ -1255,7 +1259,9 @@
       "eventStartInPast": "De startdatum ligt in het verleden.",
       "eventStartNotEmpty": "Voer een startdatum in.",
       "eventVenue": "Locatiebeschrijving — bijv. achtertuin, 1e verdieping, …",
-      "title": "Evenement"
+      "pickLocationOnMap": "Locatie op de kaart kiezen",
+      "title": "Evenement",
+      "viewOnMainMap": "Bekijken op hoofdkaart"
     },
     "viewPost": {
       "forGroup": {

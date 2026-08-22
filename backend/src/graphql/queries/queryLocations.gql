@@ -2,5 +2,7 @@ query queryLocations($place: String!, $lang: String!, $types: String, $proximity
   queryLocations(place: $place, lang: $lang, types: $types, proximity: $proximity) {
     place_name
     id
+    lat
+    lng
   }
 }

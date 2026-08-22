@@ -1056,6 +1056,10 @@
     "legend": {
       "event": "Подія",
       "group": "Група",
+      "hidePastEvents": "Приховати минулі події",
+      "hideType": "Приховати {type}",
+      "showPastEvents": "Показати минулі події",
+      "showType": "Показати {type}",
       "theUser": "Моя позиція",
       "title": "Легенда",
       "user": "Користувач"
@@ -1255,7 +1259,9 @@
       "eventStartInPast": "Дата початку знаходиться в минулому.",
       "eventStartNotEmpty": "Будь ласка, введіть дату початку.",
       "eventVenue": "Опис місця — напр. подвір'я, 1-й поверх, …",
-      "title": "Подія"
+      "pickLocationOnMap": "Вибрати місце на карті",
+      "title": "Подія",
+      "viewOnMainMap": "Переглянути на головній карті"
     },
     "viewPost": {
       "forGroup": {

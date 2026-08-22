@@ -4,8 +4,22 @@
       <template>
         <os-card>
           <template #heroImage>
+            <!-- The existing (already saved) image has transformed w320/w640/w1024
+                 URLs from the backend — routed through it here via
+                 ResponsiveImage, same as the post detail page, rather than a
+                 plain <img src> pointing straight at raw storage (unreliable
+                 to fetch directly in local dev). A freshly picked, not yet
+                 saved file only has a local data: URL (see addHeroImage) and
+                 needs neither transforms nor that routing. -->
+            <responsive-image
+              v-if="formData.image && !formData.imageUpload"
+              :image="formData.image"
+              sizes="(max-width: 1024px) 640px, 1024px"
+              loading="eager"
+              :class="['image', formData.imageBlurred && '--blur-image']"
+            />
             <img
-              v-if="formData.image"
+              v-else-if="formData.image"
               :src="formData.image.url"
               :class="['image', formData.imageBlurred && '--blur-image']"
             />
@@ -62,66 +76,19 @@
 
           <!-- event data -->
           <div v-if="postType === 'Event'" class="eventData">
-            <hr />
-            <div class="ds-mt-x-small ds-mb-large"></div>
+            <div class="ds-mt-x-small ds-mb-small"></div>
+            <div class="event-online-checkbox">
+              <input
+                type="checkbox"
+                v-model="formData.eventIsOnline"
+                model="eventIsOnline"
+                name="eventIsOnline"
+                class="event-grid-item-font-helper"
+                @change="changeEventIsOnline($event)"
+              />
+              {{ $t('post.viewEvent.eventIsOnline') }}
+            </div>
             <div class="ds-grid event-date-grid">
-              <div class="event-grid-item">
-                <!-- <label>Begin</label> -->
-                <date-picker
-                  name="eventStart"
-                  v-model="formData.eventStart"
-                  type="datetime"
-                  value-type="date"
-                  :minute-step="15"
-                  format="DD.MM.YYYY HH:mm"
-                  :placeholder="$t('post.viewEvent.eventStart')"
-                  :class="{ 'mx-datepicker-error': visibleErrors && visibleErrors.eventStart }"
-                  :show-second="false"
-                  @change="changeEventStart($event)"
-                ></date-picker>
-              </div>
-              <div class="event-grid-item">
-                <!-- <label>End (optional)</label> -->
-                <date-picker
-                  v-model="formData.eventEnd"
-                  name="eventEnd"
-                  type="datetime"
-                  value-type="date"
-                  :minute-step="15"
-                  :seconds-step="0"
-                  format="DD.MM.YYYY HH:mm"
-                  :placeholder="$t('post.viewEvent.eventEnd')"
-                  :class="[
-                    'event-grid-item-font-helper',
-                    { 'mx-datepicker-error': visibleErrors && visibleErrors.eventEnd },
-                  ]"
-                  :show-second="false"
-                  @change="changeEventEnd($event)"
-                ></date-picker>
-              </div>
-            </div>
-            <div class="event-date-hints-zone">
-              <div class="event-date-hint-cell">
-                <os-validation-hint
-                  v-if="visibleErrors && visibleErrors.eventStart"
-                  variant="error"
-                  :text="$t('post.viewEvent.eventStartNotEmpty')"
-                />
-                <os-validation-hint
-                  v-else-if="eventStartIsInPast"
-                  variant="warning"
-                  :text="$t('post.viewEvent.eventStartInPast')"
-                />
-              </div>
-              <div class="event-date-hint-cell">
-                <os-validation-hint
-                  v-if="visibleErrors && visibleErrors.eventEnd"
-                  variant="error"
-                  :text="$t('post.viewEvent.eventEndBeforeStart')"
-                />
-              </div>
-            </div>
-            <div class="ds-grid event-location-grid">
               <div class="event-grid-item">
                 <ocelot-input
                   model="eventVenue"
@@ -137,6 +104,32 @@
                   :text="venueErrorText"
                 />
               </div>
+              <div class="event-grid-item">
+                <date-picker
+                  name="eventStart"
+                  v-model="formData.eventStart"
+                  type="datetime"
+                  value-type="date"
+                  :minute-step="15"
+                  format="DD.MM.YYYY HH:mm"
+                  :placeholder="$t('post.viewEvent.eventStart')"
+                  :class="{ 'mx-datepicker-error': visibleErrors && visibleErrors.eventStart }"
+                  :show-second="false"
+                  @change="changeEventStart($event)"
+                ></date-picker>
+                <os-validation-hint
+                  v-if="visibleErrors && visibleErrors.eventStart"
+                  variant="error"
+                  :text="$t('post.viewEvent.eventStartNotEmpty')"
+                />
+                <os-validation-hint
+                  v-else-if="eventStartIsInPast"
+                  variant="warning"
+                  :text="$t('post.viewEvent.eventStartInPast')"
+                />
+              </div>
+            </div>
+            <div class="ds-grid event-location-grid">
               <div class="event-grid-item">
                 <div
                   :class="{
@@ -164,19 +157,37 @@
                     :text="$t('post.viewEvent.eventLocationRequired')"
                   />
                 </div>
-                <div class="event-online-checkbox">
-                  <input
-                    type="checkbox"
-                    v-model="formData.eventIsOnline"
-                    model="eventIsOnline"
-                    name="eventIsOnline"
-                    class="event-grid-item-font-helper"
-                    @change="changeEventIsOnline($event)"
-                  />
-                  {{ $t('post.viewEvent.eventIsOnline') }}
-                </div>
+              </div>
+              <div class="event-grid-item">
+                <date-picker
+                  v-model="formData.eventEnd"
+                  name="eventEnd"
+                  type="datetime"
+                  value-type="date"
+                  :minute-step="15"
+                  :seconds-step="0"
+                  format="DD.MM.YYYY HH:mm"
+                  :placeholder="$t('post.viewEvent.eventEnd')"
+                  :class="[
+                    'event-grid-item-font-helper',
+                    { 'mx-datepicker-error': visibleErrors && visibleErrors.eventEnd },
+                  ]"
+                  :show-second="false"
+                  @change="changeEventEnd($event)"
+                ></date-picker>
+                <os-validation-hint
+                  v-if="visibleErrors && visibleErrors.eventEnd"
+                  variant="error"
+                  :text="$t('post.viewEvent.eventEndBeforeStart')"
+                />
               </div>
             </div>
+            <event-location-map
+              v-if="!locationSelectDisabled"
+              :location="formData.eventLocationName"
+              class="event-location-map-field"
+              @input="onEventLocationMapInput"
+            />
           </div>
           <div class="ds-mt-x-small ds-mb-large"></div>
           <categories-select
@@ -256,6 +267,8 @@ import GetCategories from '~/mixins/getCategoriesMixin.js'
 import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 import LocationSelect from '~/components/Select/LocationSelect'
+import EventLocationMap from '~/components/Map/EventLocationMap'
+import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
 
 export default {
   mixins: [GetCategories, formValidation],
@@ -270,7 +283,9 @@ export default {
     PageParamsLink,
     OcelotInput,
     LocationSelect,
+    EventLocationMap,
     OsValidationHint,
+    ResponsiveImage,
   },
   props: {
     contribution: {
@@ -517,8 +532,25 @@ export default {
         categoryIds: categories ? categories.map((category) => category.id) : [],
         eventStart: eventStart ? new Date(eventStart) : null,
         eventEnd: eventEnd ? new Date(eventEnd) : null,
-        eventLocation: eventLocation || '',
-        eventLocationName: eventLocationName || '',
+        // A selection object (same { label, value, id, lat, lng } shape
+        // LocationSelect/EventLocationMap produce when the user picks a
+        // result), not just the bare name — otherwise EventLocationMap has
+        // no coordinates to show a pin for on an event being edited, even
+        // though it was already geocoded once. Falls back to the plain
+        // string when there's no saved location (online events) or no
+        // coordinates were ever geocoded for it.
+        eventLocationName:
+          eventLocation &&
+          typeof eventLocation.lat === 'number' &&
+          typeof eventLocation.lng === 'number'
+            ? {
+                label: eventLocationName || '',
+                value: eventLocationName || '',
+                id: eventLocation.id ?? null,
+                lat: eventLocation.lat,
+                lng: eventLocation.lng,
+              }
+            : eventLocationName || '',
         eventVenue: eventVenue || '',
         eventIsOnline: eventIsOnline || false,
       }
@@ -582,6 +614,11 @@ export default {
     },
     changeEventIsOnline() {
       this.updateFormField('eventIsOnline', this.formData.eventIsOnline)
+    },
+    onEventLocationMapInput(location) {
+      this.formData.eventLocationName = location
+      this.touchField('eventLocationName')
+      this.$validateForm()
     },
     changeEventEnd(event) {
       this.touchField('eventEnd')
@@ -650,13 +687,6 @@ export default {
 
 <style>
 .eventData {
-  .event-date-hints-zone {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-small);
-    margin-bottom: var(--space-x-small);
-  }
-
   .chipbox {
     display: flex;
     justify-content: flex-end;
@@ -670,10 +700,16 @@ export default {
     grid-template-columns: repeat(2, 1fr);
     grid-auto-rows: auto;
     gap: var(--space-small);
+    margin-bottom: var(--space-x-small);
   }
 
   .event-online-checkbox {
-    margin-top: var(--space-x-small);
+    margin-bottom: var(--space-x-small);
+  }
+
+  .event-location-map-field {
+    margin-top: var(--space-small);
+    margin-bottom: var(--space-x-small);
   }
 
   .event-grid-item {
@@ -798,7 +834,7 @@ export default {
   }
   .mx-datepicker input {
     font-size: 1rem;
-    height: calc(1.625rem + 18px);
+    height: var(--input-height);
     padding: 8px 8px;
     background-color: var(--background-color-soft);
     border-color: var(--border-color-softer);

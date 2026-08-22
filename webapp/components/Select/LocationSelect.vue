@@ -171,6 +171,8 @@ export default {
           label: place.place_name,
           value: place.place_name,
           id: place.id,
+          lat: place.lat,
+          lng: place.lng,
         })
       })
 
@@ -242,6 +244,18 @@ export default {
     },
     async resolveLocalizedLocation() {
       if (!this.locationName) return
+      // Already a fully resolved selection (has real coordinates) — nothing
+      // to look up. Re-geocoding here would strip lat/lng back down to a
+      // bare string even on success, since the geocoder result never carries
+      // over an id/coordinate pair matching an already-saved location.
+      if (
+        typeof this.value === 'object' &&
+        this.value !== null &&
+        typeof this.value.lat === 'number' &&
+        typeof this.value.lng === 'number'
+      ) {
+        return
+      }
       const result = await this.requestGeoData(this.locationName)
       this.$nextTick(() => {
         this.currentValue = result || (this.cities.length ? this.cities[0] : this.locationName)

@@ -5,6 +5,8 @@ import PostMutations from '~/graphql/PostMutations.js'
 import Vuex from 'vuex'
 
 import ImageUploader from '~/components/Uploader/ImageUploader'
+import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
+import EventLocationMap from '~/components/Map/EventLocationMap'
 import MutationObserver from 'mutation-observer'
 
 global.MutationObserver = MutationObserver
@@ -297,6 +299,59 @@ describe('ContributionForm.vue', () => {
         expect(wrapper.vm.formData.content).toEqual(propsData.contribution.content)
       })
 
+      describe('editing an event with a saved location', () => {
+        beforeEach(() => {
+          propsData = {
+            postType: 'Event',
+            contribution: {
+              id: 'p1456',
+              slug: 'kindergeburtstag',
+              title: 'Kindergeburtstag',
+              content: 'auf Deutsch geschrieben',
+              image,
+              eventStart: new Date().toISOString(),
+              eventVenue: 'Brandenburger Tor',
+              eventLocationName: 'Berlin, Germany',
+              eventLocation: { id: 'place.berlin', lat: 52.52, lng: 13.405 },
+            },
+          }
+          wrapper = Wrapper()
+        })
+
+        it('initializes eventLocationName as a selection object carrying the saved coordinates', () => {
+          expect(wrapper.vm.formData.eventLocationName).toEqual({
+            label: 'Berlin, Germany',
+            value: 'Berlin, Germany',
+            id: 'place.berlin',
+            lat: 52.52,
+            lng: 13.405,
+          })
+        })
+
+        it('passes that same location on to EventLocationMap, so its pin is shown without re-picking', () => {
+          expect(wrapper.findComponent(EventLocationMap).props('location')).toEqual({
+            label: 'Berlin, Germany',
+            value: 'Berlin, Germany',
+            id: 'place.berlin',
+            lat: 52.52,
+            lng: 13.405,
+          })
+        })
+
+        it('still sends only the plain name string to the mutation', async () => {
+          await wrapper.find('form').trigger('submit')
+          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+            expect.objectContaining({
+              variables: expect.objectContaining({
+                eventInput: expect.objectContaining({
+                  eventLocationName: 'Berlin, Germany',
+                }),
+              }),
+            }),
+          )
+        })
+      })
+
       describe('valid update', () => {
         beforeEach(() => {
           mocks.$apollo.mutate = jest.fn().mockResolvedValueOnce({
@@ -340,6 +395,37 @@ describe('ContributionForm.vue', () => {
           wrapper.find('[data-test="delete-button"]').trigger('click')
           await wrapper.find('form').trigger('submit')
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining(expectedParams))
+        })
+
+        it('renders an existing (already saved) teaser image via ResponsiveImage, not a plain <img src>', () => {
+          propsData.contribution.image = {
+            url: '/uploads/someimage.png',
+            w320: '/uploads/someimage-320.png',
+            w640: '/uploads/someimage-640.png',
+            w1024: '/uploads/someimage-1024.png',
+          }
+          wrapper = Wrapper()
+          expect(wrapper.findComponent(ResponsiveImage).exists()).toBe(true)
+        })
+
+        it('renders a freshly picked (not yet saved) image as a plain <img>, not ResponsiveImage', async () => {
+          const spy = jest
+            .spyOn(FileReader.prototype, 'readAsDataURL')
+            .mockImplementation(function () {
+              this.onload({ target: { result: 'someUrlToImage' } })
+            })
+          propsData.contribution.image = {
+            url: '/uploads/someimage.png',
+            w320: '/uploads/someimage-320.png',
+            w640: '/uploads/someimage-640.png',
+            w1024: '/uploads/someimage-1024.png',
+          }
+          wrapper = Wrapper()
+          wrapper.findComponent(ImageUploader).vm.$emit('addHeroImage', imageUpload)
+          await wrapper.vm.$nextTick()
+          expect(wrapper.findComponent(ResponsiveImage).exists()).toBe(false)
+          expect(wrapper.find('img.image').exists()).toBe(true)
+          spy.mockRestore()
         })
       })
     })
