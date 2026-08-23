@@ -1,7 +1,7 @@
 import { getDriver } from '@db/neo4j'
 import { entities } from '@db/schema/index'
 
-import { createNode, findNode } from './create'
+import { createNode, declaredProperty, findNode } from './create'
 import { onlyDeclared } from './defaults'
 import { TestNode } from './node'
 
@@ -117,13 +117,18 @@ export const fixtures: FixtureApi = {
   first: async (label, where) => {
     const entity = entityFor(label)
     const [property, value] = Object.entries(where)[0] ?? []
+    // Same guard as findNode's, and the more exposed of the two: this one takes a property map
+    // straight from a spec, so `first('User', { slugg: 'x' })` is a plausible typo. Without it
+    // the answer would be the throw below — "No User matching …" — which blames the data for a
+    // property that does not exist.
+    const key = property === undefined ? undefined : declaredProperty(entity, property)
     const session = getDriver().session()
     try {
       const result = await session.readTransaction((transaction) =>
         transaction.run(
-          property === undefined
+          key === undefined
             ? `MATCH (node:${entity.label}) RETURN node {.*} AS node, id(node) AS internalId LIMIT 1`
-            : `MATCH (node:${entity.label} {${property}: $value}) RETURN node {.*} AS node, id(node) AS internalId LIMIT 1`,
+            : `MATCH (node:${entity.label} {${key}: $value}) RETURN node {.*} AS node, id(node) AS internalId LIMIT 1`,
           { value },
         ),
       )

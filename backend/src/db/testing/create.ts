@@ -95,17 +95,42 @@ export const createNode = async (
   }
 }
 
+/**
+ * The property name, checked against the declaration before it goes into a Cypher pattern.
+ *
+ * It has to be interpolated — Cypher has no placeholder for a property KEY, only for a value.
+ * An undeclared name is therefore not a syntax error but a pattern that matches nothing, and
+ * a lookup for `{ slugg: … }` comes back empty exactly like a lookup for a user who is not
+ * there. The caller then builds half a fixture and the spec fails several assertions later,
+ * on something unrelated. Named here for the same reason resolveAlias() names an unknown
+ * alias: the error should say what is actually wrong.
+ *
+ * Via a Map rather than an index, because `property` is a parameter — the pattern the
+ * security lint flags.
+ */
+export const declaredProperty = (entity: EntityDefinition, property: string): string => {
+  if (!new Map(Object.entries(entity.properties)).has(property)) {
+    throw new Error(
+      `${entity.label} declares no property ${property}. ` +
+        `See src/db/schema/entities/${entity.label}.ts`,
+    )
+  }
+  return property
+}
+
 /** Wraps an existing node, for the factories that look one up instead of creating it. */
 export const findNode = async (
   entity: EntityDefinition,
   property: string,
   value: unknown,
 ): Promise<TestNode | null> => {
+  // Before the session, so a typo costs no round trip and throws where it was made.
+  const key = declaredProperty(entity, property)
   const session = getDriver().session()
   try {
     const result = await session.readTransaction((transaction) =>
       transaction.run(
-        `MATCH (node:${entity.label} {${property}: $value})
+        `MATCH (node:${entity.label} {${key}: $value})
          RETURN node {.*} AS node, id(node) AS internalId`,
         { value },
       ),
