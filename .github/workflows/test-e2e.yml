@@ -321,6 +321,57 @@ jobs:
           await backend 120 'curl -sf -X POST -H "Content-Type: application/json" -d "{\"query\":\"{__typename}\"}" http://localhost:4000 > /dev/null 2>&1'
           await webapp 120 'curl -sf http://localhost:3000 > /dev/null 2>&1'
 
+      # Same race as in test-backend.yml: `up --detach` returns before Neo4j accepts bolt.
+      - name: Wait for Neo4j to accept connections
+        run: |
+          # The DRIVER, not a bare TCP connect: Neo4j accepts on 7687 before it will answer a
+          # query, and the steps after this one run migrations. verifyConnectivity() does the
+          # Bolt handshake and `RETURN 1` proves the database itself is servable. Measured: a
+          # net.connect probe reports READY against any listening port, this one does not.
+          #
+          # Built from `neo4j-driver` in node_modules rather than from the app's own
+          # getDriver(): the `test` image is `FROM base` + `COPY backend/`, so it has no
+          # build/ — and the production image has no src/ or tsx. node_modules is the one thing
+          # both carry, and neo4j-driver is a runtime dependency.
+          #
+          # The env fallbacks mirror config/softwareDefaults.ts, so the probe connects exactly
+          # where the migration will. With NEO4J_AUTH=none the credentials are ignored by the
+          # server, which is why no special case is needed for it.
+          #
+          # The 5s guard: the driver would otherwise wait out its own connection timeout, far
+          # past the retry interval.
+          probe='const neo4j = require("neo4j-driver")
+          const done = (code) => process.exit(code)
+          setTimeout(() => done(1), 5000)
+          const driver = neo4j.driver(
+            process.env.NEO4J_URI || "bolt://localhost:7687",
+            neo4j.auth.basic(
+              process.env.NEO4J_USERNAME || "neo4j",
+              process.env.NEO4J_PASSWORD || "neo4j",
+            ),
+          )
+          driver.verifyConnectivity()
+            .then(() => driver.session().run("RETURN 1"))
+            .then(() => done(0))
+            .catch(() => done(1))'
+          # An absolute deadline, not a number of attempts. A failing probe costs up to 5s of
+          # its own guard plus the 5s pause, so "60 attempts" was anywhere between five and ten
+          # minutes of runner time — times every job in this matrix. The wall clock is the thing
+          # worth bounding, and it makes the failure message exact by construction.
+          deadline_seconds=300
+          started=$(date +%s)
+          deadline=$(( started + deadline_seconds ))
+          attempt=0
+          while [ "$(date +%s)" -lt "$deadline" ]; do
+            attempt=$(( attempt + 1 ))
+            if docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend node -e "$probe"; then
+              echo "neo4j is reachable after $attempt attempt(s)"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "neo4j was not ready: $attempt attempts over $(( $(date +%s) - started ))s (deadline ${deadline_seconds}s)"; exit 1
+
       - name: Initialize database
         run: docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend yarn db:migrate init
 
