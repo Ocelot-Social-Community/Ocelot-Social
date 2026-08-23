@@ -60,6 +60,19 @@ export interface FixtureApi {
    * object. Returns null when the result has no such row, which is what the assertions check.
    */
   hydrateFirst: (result: QueryResult, alias: string, model: FixtureModel) => TestNode | null
+  /**
+   * The escape hatch: a spec's own Cypher, run as a WRITE transaction whatever it says.
+   *
+   * Deliberately one door and not two. The helper is handed an opaque string, so it cannot
+   * tell a read from a write, and the caller that names the wrong door gets a failure — an
+   * `ON CREATE SET` sent through a read transaction does not warn, it errors. Routing is the
+   * only thing the split would buy, and it buys nothing here: this runs against a single
+   * instance in jest and in the Cypress support process, never against a cluster with read
+   * replicas.
+   *
+   * Where the distinction does matter, it is already made: `context.database` exposes `query`
+   * (read) next to `write`, and production goes through those.
+   */
   cypher: (query: string, parameters?: Record<string, unknown>) => Promise<QueryResult>
   /** No-op. Kept because spec teardowns call it; the driver is closed centrally. */
   close: () => void
