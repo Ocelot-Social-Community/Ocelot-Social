@@ -44,11 +44,16 @@ export default {
       // their own settings page, which renders no href at all.
       return socialMedia.filter(({ url }) => LINKABLE.test(url)).map((socialMedia) => {
         const { url } = socialMedia
-        const matches = url.match(/^(?:https?:\/\/)?(?:[^@\n])?(?:www\.)?([^:/\n?]+)/g)
+        // Case-insensitive like LINKABLE above, and for the same reason: a browser reads a
+        // scheme without regard to case, so `HTTPS://example.org` is a link this card accepts.
+        // Without the flag the scheme group failed to match and the favicon was derived from
+        // the leftover `HTTPS`, giving `HTTPS/favicon.ico` — a broken image next to a working
+        // link.
+        const matches = url.match(/^(?:https?:\/\/)?(?:[^@\n])?(?:www\.)?([^:/\n?]+)/gi)
         const [domain] = matches || []
         const favicon = domain ? `${domain}/favicon.ico` : null
         const parts = url
-          .replace(/^https?:\/\//, '')
+          .replace(/^https?:\/\//i, '')
           .replace(/\/+$/, '')
           .split('/')
         const username =

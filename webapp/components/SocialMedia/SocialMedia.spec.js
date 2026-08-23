@@ -179,6 +179,18 @@ describe('SocialMedia.vue', () => {
       ])('still links a %s url', (_scheme, url) => {
         expect(wrapperFor(url).findAll('a').at(0).attributes('href')).toEqual(url)
       })
+
+      it.each([
+        ['https://www.instagram.com/nimitbhargava', 'https://www.instagram.com/favicon.ico'],
+        ['http://example.org/profile', 'http://example.org/favicon.ico'],
+        // The scheme is matched case-insensitively for the favicon too. Without that, the
+        // pattern fell through to the leftover `HTTPS` and asked for `HTTPS/favicon.ico` — a
+        // broken image beside a link that works.
+        ['HTTPS://example.org/profile', 'HTTPS://example.org/favicon.ico'],
+      ])('derives the favicon from the host of %s', (url, expected) => {
+        const favicon = wrapperFor(url).findAll('a').at(0).find('img')
+        expect(favicon.attributes('src')).toEqual(expected)
+      })
     })
 
     describe('social media link with a username that starts with www.', () => {
