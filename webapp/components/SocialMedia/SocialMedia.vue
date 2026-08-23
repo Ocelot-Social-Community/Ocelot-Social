@@ -1,13 +1,13 @@
 <template>
   <div
-    v-if="$policy.get('socialMediaEnabled') && user.socialMedia && user.socialMedia.length"
+    v-if="$policy.get('socialMediaEnabled') && socialMediaLinks.length"
     class="ds-my-large"
   >
     <os-card class="social-media-bc">
       <h5 class="title spacer-x-small" data-test="social-media-list-headline">
         {{ $t('profile.socialMedia') }} {{ userName | truncate(15) }}?
       </h5>
-      <div v-for="link in socialMediaLinks()" :key="link.url" class="ds-my-x-small">
+      <div v-for="link in socialMediaLinks" :key="link.url" class="ds-my-x-small">
         <a :href="link.href" target="_blank" rel="noopener noreferrer">
           <favicon :src="link.favicon" :size="22" />
           {{ link.username }}
@@ -35,7 +35,11 @@ export default {
     userName: { type: String, required: true },
     user: { type: Object, required: true },
   },
-  methods: {
+  computed: {
+    // A computed, not a method: `v-if` and `v-for` must agree on the SAME list. While the
+    // condition still asked `user.socialMedia.length` and the loop asked the filtered one, a
+    // profile whose links are all unfollowable rendered the card with a heading and nothing
+    // under it. Computing it once per render rather than twice is the smaller half of it.
     socialMediaLinks() {
       const { socialMedia = [] } = this.user
       // Filtered, not just stripped of its href: this card is a list of links to follow, and

@@ -172,6 +172,35 @@ describe('SocialMedia.vue', () => {
         expect(wrapper.html()).not.toContain(url)
       })
 
+      it('renders no card at all when every url is unfollowable', () => {
+        // The card is a list of links. With `v-if` still asking the RAW list while the loop
+        // asked the filtered one, a profile like this rendered the heading over nothing.
+        propsData.userName = 'Jenny Rostock'
+        propsData.user = {
+          socialMedia: [
+            { id: 'a', url: 'javascript:alert(1)', __typename: 'SocialMedia' },
+            { id: 'b', url: 'file:///etc/passwd', __typename: 'SocialMedia' },
+          ],
+        }
+        const wrapper = Wrapper()
+        expect(wrapper.find('[data-test="social-media-list-headline"]').exists()).toBe(false)
+        expect(wrapper.html()).toBe('')
+      })
+
+      it('still renders the card when only some urls are unfollowable', () => {
+        propsData.userName = 'Jenny Rostock'
+        propsData.user = {
+          socialMedia: [
+            { id: 'a', url: 'javascript:alert(1)', __typename: 'SocialMedia' },
+            { id: 'b', url: 'https://example.org/profile', __typename: 'SocialMedia' },
+          ],
+        }
+        const wrapper = Wrapper()
+        expect(wrapper.find('[data-test="social-media-list-headline"]').exists()).toBe(true)
+        expect(wrapper.findAll('a')).toHaveLength(1)
+        expect(wrapper.findAll('a').at(0).attributes('href')).toEqual('https://example.org/profile')
+      })
+
       it.each([
         ['https', 'https://www.instagram.com/nimitbhargava'],
         ['http', 'http://example.org/profile'],
