@@ -223,19 +223,23 @@ jobs:
             .then(() => driver.session().run("RETURN 1"))
             .then(() => done(0))
             .catch(() => done(1))'
-          attempts=60
-          for attempt in $(seq 1 "$attempts"); do
+          # An absolute deadline, not a number of attempts. A failing probe costs up to 5s of
+          # its own guard plus the 5s pause, so "60 attempts" was anywhere between five and ten
+          # minutes of runner time — and this step runs once per job. The wall clock is the
+          # thing worth bounding, and it makes the failure message exact by construction.
+          deadline_seconds=300
+          started=$(date +%s)
+          deadline=$(( started + deadline_seconds ))
+          attempt=0
+          while [ "$(date +%s)" -lt "$deadline" ]; do
+            attempt=$(( attempt + 1 ))
             if docker compose exec -T backend node -e "$probe"; then
               echo "neo4j is reachable after $attempt attempt(s)"
               exit 0
             fi
             sleep 5
           done
-          # No wall-clock claim in the message: each attempt costs a 5s pause plus up to 5s of
-          # probe, so the bound moves between five and ten minutes depending on whether the port
-          # refuses outright or hangs. It said "within 5 minutes", which was only the best case.
-          # The attempt count is exact, and the step's own duration is in the log.
-          echo "neo4j was not ready after $attempts attempts"
+          echo "neo4j was not ready: $attempt attempts over $(( $(date +%s) - started ))s (deadline ${deadline_seconds}s)"
           exit 1
 
       - name: backend | Initialize Database
