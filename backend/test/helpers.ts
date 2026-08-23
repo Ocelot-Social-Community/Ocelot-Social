@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import databaseContext from '@context/database'
+import { fixtures } from '@db/testing/fixtures'
 import { getContext } from '@src/context'
 import { createInMemoryPolicyService } from '@src/policy'
 import { createInMemoryRoleService, resolveRoleName } from '@src/role'
@@ -124,7 +125,11 @@ const resolveAuthUserRoles = async (
 export const createApolloTestSetup = async (opts?: CreateTestServerOptions) => {
   const defaultOpts: CreateTestServerOptions = { context: () => ({ authenticatedUser: null }) }
   const { context: testContext, plugins } = opts ?? defaultOpts
-  const database = databaseContext()
+  // The fixture API is attached HERE, not in @context/database: 71 spec files reach for
+  // `database.neode` (a deprecated alias — it is no longer neode), and this is the only place
+  // that may know db/testing exists. Production keeps a context with `query` and `write` and
+  // nothing that builds nodes.
+  const database = { ...databaseContext(), fixtures, neode: fixtures }
   const contextFn = async (req: { headers: { authorization?: string } }) => {
     const {
       authenticatedUser,

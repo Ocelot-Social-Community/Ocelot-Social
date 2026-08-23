@@ -25,7 +25,6 @@ beforeEach(async () => {
 
 afterAll(() => {
   void db.driver.close()
-  db.neode.close()
 })
 
 describe('writeSetting / readAllSettings', () => {

@@ -51,7 +51,6 @@ export const getContext =
     const result = {
       database,
       driver,
-      neode: database.neode,
       pubsub,
       logger,
       user,

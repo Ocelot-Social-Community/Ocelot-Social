@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import { getDriver } from '@db/neo4j'
-import { fixtures } from '@db/testing/fixtures'
 
 import type { Driver } from 'neo4j-driver'
 
@@ -41,12 +40,13 @@ export const write =
 export default () => {
   const driver = getDriver()
 
+  // Deliberately WITHOUT the fixture API from db/testing, which used to hang here as
+  // `fixtures` and as the deprecated alias `neode`. Nothing in production ever read either,
+  // but importing it here put test scaffolding into the production bundle and onto every
+  // request context. The specs get it from test/helpers.ts instead, which is the only place
+  // that should know db/testing exists.
   return {
     driver,
-    // The fixture API for tests. `neode` is the name 72 spec files know it by and stays as a
-    // deprecated alias — it is no longer neode, and nothing in production uses either.
-    fixtures,
-    neode: fixtures,
     query: query(driver),
     write: write(driver),
   }
