@@ -45,7 +45,7 @@
     "@cypress/webpack-preprocessor": "^7.1.2",
     "@vuepress/bundler-vite": "2.0.0-rc.18",
     "auto-changelog": "^2.6.0",
-    "cypress": "^15.20.1",
+    "cypress": "^15.21.0",
     "cypress-network-idle": "^2.0.1",
     "date-fns": "^3.6.0",
     "dotenv": "^17.3.1",
