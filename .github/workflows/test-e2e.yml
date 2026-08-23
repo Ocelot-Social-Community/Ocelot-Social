@@ -324,19 +324,36 @@ jobs:
       # Same race as in test-backend.yml: `up --detach` returns before Neo4j accepts bolt.
       - name: Wait for Neo4j to accept connections
         run: |
-          probe='const net=require("net")
-          const s=net.connect(7687,"neo4j")
-          s.on("connect",()=>{s.end();process.exit(0)})
-          s.on("error",()=>process.exit(1))
-          setTimeout(()=>process.exit(1),5000)'
-          for attempt in $(seq 1 60); do
+          # The DRIVER, not a bare TCP connect: Neo4j accepts on 7687 before it will answer a
+          # query, and the steps after this one run migrations. verifyConnectivity() does the
+          # Bolt handshake and `RETURN 1` proves the database itself is servable. Measured: a
+          # net.connect probe reports READY against any listening port, this one does not.
+          #
+          # Via the app's own getDriver(), so the probe uses exactly the URI and credentials
+          # the migration will use — including NEO4J_AUTH=none, which needs no special case.
+          # The 5s guard stays: getDriver sets connectionAcquisitionTimeout to 30s, which would
+          # stretch a hung attempt six times past the retry interval.
+          probe='const { getDriver } = require("./build/src/db/neo4j")
+          const done = (code) => process.exit(code)
+          setTimeout(() => done(1), 5000)
+          const driver = getDriver()
+          driver.verifyConnectivity()
+            .then(() => driver.session().run("RETURN 1"))
+            .then(() => done(0))
+            .catch(() => done(1))'
+          attempts=60
+          for attempt in $(seq 1 "$attempts"); do
             if docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend node -e "$probe"; then
               echo "neo4j is reachable after $attempt attempt(s)"
               exit 0
             fi
             sleep 5
           done
-          echo 'neo4j did not accept connections within 5 minutes'; exit 1
+          # No wall-clock claim in the message: each attempt costs a 5s pause plus up to 5s of
+          # probe, so the bound moves between five and ten minutes depending on whether the port
+          # refuses outright or hangs. It said "within 5 minutes", which was only the best case.
+          # The attempt count is exact, and the step's own duration is in the log.
+          echo "neo4j was not ready after $attempts attempts"; exit 1
 
       - name: Initialize database
         run: docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend yarn db:migrate init
