@@ -116,20 +116,39 @@ export const fixtures: FixtureApi = {
 
   first: async (label, where) => {
     const entity = entityFor(label)
-    const [property, value] = Object.entries(where)[0] ?? []
-    // Same guard as findNode's, and the more exposed of the two: this one takes a property map
-    // straight from a spec, so `first('User', { slugg: 'x' })` is a plausible typo. Without it
-    // the answer would be the throw below — "No User matching …" — which blames the data for a
-    // property that does not exist.
-    const key = property === undefined ? undefined : declaredProperty(entity, property)
+    // EVERY entry, not just the first. `Object.entries(where)[0]` honoured one condition and
+    // dropped the rest, so `first('User', { id: 'u1', deleted: false })` would happily return
+    // the deleted user — the spec gets a node, asserts against it, and goes green on a row
+    // that does not meet the condition it asked for.
+    //
+    // The property NAMES are interpolated because Cypher has no placeholder for a key, which
+    // is why each one is checked against the declaration first (same guard as findNode's, and
+    // this is the more exposed of the two: the map comes straight from a spec, where
+    // `{ slugg: 'x' }` is a plausible typo). The VALUES are parameters.
+    //
+    // Not `MATCH (node:Label $where)`: Neo4j rejects that outright — "Parameter maps cannot be
+    // used in MATCH patterns (use a literal map instead)".
+    const predicates: string[] = []
+    const parameters = new Map<string, unknown>()
+    Object.entries(where).forEach(([property, value], index) => {
+      const key = declaredProperty(entity, property)
+      if (value === null) {
+        // `node.x = $p` is never true for null in Cypher, so a null condition would silently
+        // match nothing rather than mean "has no such property".
+        predicates.push(`node.${key} IS NULL`)
+        return
+      }
+      predicates.push(`node.${key} = $value${String(index)}`)
+      parameters.set(`value${String(index)}`, value)
+    })
+    const clause = predicates.length > 0 ? ` WHERE ${predicates.join(' AND ')}` : ''
     const session = getDriver().session()
     try {
       const result = await session.readTransaction((transaction) =>
         transaction.run(
-          key === undefined
-            ? `MATCH (node:${entity.label}) RETURN node {.*} AS node, id(node) AS internalId LIMIT 1`
-            : `MATCH (node:${entity.label} {${key}: $value}) RETURN node {.*} AS node, id(node) AS internalId LIMIT 1`,
-          { value },
+          `MATCH (node:${entity.label})${clause} ` +
+            `RETURN node {.*} AS node, id(node) AS internalId LIMIT 1`,
+          Object.fromEntries(parameters),
         ),
       )
       const record = result.records[0]
