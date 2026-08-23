@@ -144,6 +144,89 @@ describe('SocialMedia.vue', () => {
       })
     })
 
+    describe('a url with a scheme the browser must not follow', () => {
+      // This card sits on a PUBLIC profile, and Vue does not sanitise an href binding — a
+      // stored `javascript:` url would run in the browser of whoever clicks it. The backend
+      // now only accepts http and https, but rows written before that rule are still in the
+      // database, which is why the check is repeated here.
+      const wrapperFor = (url) => {
+        propsData.userName = 'Jenny Rostock'
+        propsData.user = {
+          socialMedia: [
+            { id: 'ee1e8ed6-fbef-4bcf-b411-a12926f2ea1e', url, __typename: 'SocialMedia' },
+          ],
+        }
+        return Wrapper()
+      }
+
+      it.each([
+        ['javascript', 'javascript:alert(document.cookie)'],
+        ['javascript in mixed case', 'jaVaScRiPt:alert(1)'],
+        ['data', 'data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg=='],
+        ['vbscript', 'vbscript:msgbox(1)'],
+        ['file', 'file:///etc/passwd'],
+        // Right scheme, no host: nothing for a browser to follow. A `^https?://` test let
+        // these through and the card showed a dead link with a broken favicon.
+        ['https without a host', 'https://'],
+        ['http without a host', 'http://'],
+        ['a string that is no url at all', 'not-a-url'],
+      ])('renders no link at all for a %s url', (_scheme, url) => {
+        const wrapper = wrapperFor(url)
+        expect(wrapper.findAll('a')).toHaveLength(0)
+        // Not by another route either: no href, and no favicon src derived from the value.
+        expect(wrapper.html()).not.toContain(url)
+      })
+
+      it('renders no card at all when every url is unfollowable', () => {
+        // The card is a list of links. With `v-if` still asking the RAW list while the loop
+        // asked the filtered one, a profile like this rendered the heading over nothing.
+        propsData.userName = 'Jenny Rostock'
+        propsData.user = {
+          socialMedia: [
+            { id: 'a', url: 'javascript:alert(1)', __typename: 'SocialMedia' },
+            { id: 'b', url: 'file:///etc/passwd', __typename: 'SocialMedia' },
+          ],
+        }
+        const wrapper = Wrapper()
+        expect(wrapper.find('[data-test="social-media-list-headline"]').exists()).toBe(false)
+        expect(wrapper.html()).toBe('')
+      })
+
+      it('still renders the card when only some urls are unfollowable', () => {
+        propsData.userName = 'Jenny Rostock'
+        propsData.user = {
+          socialMedia: [
+            { id: 'a', url: 'javascript:alert(1)', __typename: 'SocialMedia' },
+            { id: 'b', url: 'https://example.org/profile', __typename: 'SocialMedia' },
+          ],
+        }
+        const wrapper = Wrapper()
+        expect(wrapper.find('[data-test="social-media-list-headline"]').exists()).toBe(true)
+        expect(wrapper.findAll('a')).toHaveLength(1)
+        expect(wrapper.findAll('a').at(0).attributes('href')).toEqual('https://example.org/profile')
+      })
+
+      it.each([
+        ['https', 'https://www.instagram.com/nimitbhargava'],
+        ['http', 'http://example.org/profile'],
+        ['an uppercase scheme, as a browser reads it', 'HTTPS://example.org/profile'],
+      ])('still links a %s url', (_scheme, url) => {
+        expect(wrapperFor(url).findAll('a').at(0).attributes('href')).toEqual(url)
+      })
+
+      it.each([
+        ['https://www.instagram.com/nimitbhargava', 'https://www.instagram.com/favicon.ico'],
+        ['http://example.org/profile', 'http://example.org/favicon.ico'],
+        // The scheme is matched case-insensitively for the favicon too. Without that, the
+        // pattern fell through to the leftover `HTTPS` and asked for `HTTPS/favicon.ico` — a
+        // broken image beside a link that works.
+        ['HTTPS://example.org/profile', 'HTTPS://example.org/favicon.ico'],
+      ])('derives the favicon from the host of %s', (url, expected) => {
+        const favicon = wrapperFor(url).findAll('a').at(0).find('img')
+        expect(favicon.attributes('src')).toEqual(expected)
+      })
+    })
+
     describe('social media link with a username that starts with www.', () => {
       let wrapper
 
