@@ -52,11 +52,6 @@ export class TestNode {
   }
 
   /**
-   * One property. Untyped on purpose: the 82 call sites read a single value and use it
-   * straight away (`user.get('encryptedPassword')`), and the declaration cannot narrow it
-   * without the caller naming the entity a second time.
-   */
-  /**
    * The properties, synchronously. neode's Node had this next to `toJson()`, and the
    * attachment specs use it after hydrating a node out of a raw Cypher result.
    */
@@ -64,8 +59,19 @@ export class TestNode {
     return { ...this.stored }
   }
 
+  /**
+   * One property. Untyped on purpose: the 82 call sites read a single value and use it
+   * straight away (`user.get('encryptedPassword')`), and the declaration cannot narrow it
+   * without the caller naming the entity a second time.
+   *
+   * Read through the own-property descriptor rather than `this.stored[property]`: the argument
+   * comes from the caller, and an index would resolve `toString` or `constructor` off the
+   * prototype and hand back a function where the node has no such property. It is also the
+   * pattern the security lint flags. The descriptor answers in constant time — the Map this
+   * replaces was built per read, over every key, 82 call sites deep.
+   */
   get(property: string): unknown {
-    return new Map(Object.entries(this.stored)).get(property)
+    return Object.getOwnPropertyDescriptor(this.stored, property)?.value
   }
 
   /** Writes the given properties and keeps the handle in sync with what the database now holds. */
