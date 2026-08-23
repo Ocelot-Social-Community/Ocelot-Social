@@ -2,6 +2,7 @@ import { getDriver } from '@db/neo4j'
 import { relationships } from '@db/schema/relationships'
 
 import { resolveAlias } from './aliases'
+import { timestamp } from './defaults'
 
 import type { EntityDefinition } from '@db/schema/types'
 
@@ -116,7 +117,11 @@ export class TestNode {
     const edge = new Map(given)
     for (const property of ['createdAt', 'updatedAt']) {
       if (declaredEdgeProperties.has(property) && given.get(property) === undefined) {
-        edge.set(property, new Date().toISOString())
+        // `timestamp()`, not `new Date()`: writing Cypher directly is fast enough that
+        // consecutive fixtures land in the same millisecond, and an edge timestamp is sorted
+        // on just like a node's — notifications.ts orders by `notification.updatedAt`, which
+        // is the NOTIFIED edge. See the note above the helper in defaults.ts.
+        edge.set(property, timestamp())
       }
     }
     const edgeProperties = Object.fromEntries(edge)

@@ -22,13 +22,18 @@ type Defaults = (properties: NodeProperties) => NodeProperties
 
 // Strictly increasing, not just "now".
 //
+// Exported because edges need the same guarantee for the same reason: relateTo() in node.ts
+// fills a declared `createdAt`/`updatedAt`, and resolvers sort on those — notifications.ts
+// orders by `notification.updatedAt`, where `notification` is the NOTIFIED edge itself. One
+// counter for nodes and edges, so no two fixtures of either kind can tie.
+//
 // Fixtures used to be slow enough that consecutive nodes landed in different milliseconds;
 // writing Cypher directly is fast enough that several share one. Tests that order by
 // `createdAt` then see a tie and the order becomes arbitrary — posts.spec's "pinned post
 // appears first even when created before other posts" is exactly that. Handing out a distinct
 // millisecond per fixture keeps those assertions meaningful without making them wait.
 let lastTimestamp = 0
-const timestamp = (): string => {
+export const timestamp = (): string => {
   lastTimestamp = Math.max(Date.now(), lastTimestamp + 1)
   return new Date(lastTimestamp).toISOString()
 }
