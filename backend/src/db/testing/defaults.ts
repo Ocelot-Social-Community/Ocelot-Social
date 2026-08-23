@@ -37,55 +37,84 @@ const timestamp = (): string => {
 const text = (value: unknown, fallback: string): string =>
   typeof value === 'string' ? value : fallback
 
+/**
+ * A default slug that two fixtures cannot share.
+ *
+ * `slug` is UNIQUE on User, Post and Category, so a constant fallback is a trap: two nodes
+ * built without a name are fine one at a time and the second CREATE fails with
+ * "already exists with label `User` and property `slug` = 'test-user'" — an error about
+ * uniqueness for two fixtures that were never meant to be the same node.
+ *
+ * The id settles it, because it is unique by construction (the caller's, or a fresh uuid).
+ * Kept readable rather than random: `test-user-u1` says which fixture it came from, and it is
+ * the same slug on every run, which a uuid suffix would not be.
+ */
+const slugFrom = (given: unknown, fallbackName: string, id: string): string =>
+  typeof given === 'string' ? toSlug(given) : toSlug(`${fallbackName}-${id}`)
+
 const defaults = new Map<string, Defaults>([
   [
     'User',
-    (properties) => ({
-      id: uuid(),
-      // Every user in a seeded database has one; the models gave it no default, so specs that
-      // create a user with just an id used to produce a nameless node.
-      name: 'Test User',
-      // Registration always assigns one. `toSlug` also lowercases, which is what neode's
-      // `lowercase: true` on the model did to whatever the caller passed.
-      slug: toSlug(text(properties.name, 'Test User')),
-      deleted: false,
-      disabled: false,
-      allowEmbedIframes: false,
-      showShoutsPublicly: false,
-      emailNotificationsCommentOnObservedPost: true,
-      emailNotificationsMention: true,
-      emailNotificationsChatMessage: true,
-      emailNotificationsGroupMemberJoined: true,
-      emailNotificationsGroupMemberLeft: true,
-      emailNotificationsGroupMemberRemoved: true,
-      emailNotificationsGroupMemberRoleChanged: true,
-      emailNotificationsFollowingUsers: true,
-      emailNotificationsPostInGroup: true,
-    }),
+    (properties) => {
+      // Settled ONCE: calling uuid() a second time for the slug would derive it from an id
+      // the node does not carry.
+      const id = text(properties.id, uuid())
+      return {
+        id,
+        // Every user in a seeded database has one; the models gave it no default, so specs
+        // that create a user with just an id used to produce a nameless node.
+        name: 'Test User',
+        // Registration always assigns one. `toSlug` also lowercases, which is what neode's
+        // `lowercase: true` on the model did to whatever the caller passed.
+        slug: slugFrom(properties.name, 'Test User', id),
+        deleted: false,
+        disabled: false,
+        allowEmbedIframes: false,
+        showShoutsPublicly: false,
+        emailNotificationsCommentOnObservedPost: true,
+        emailNotificationsMention: true,
+        emailNotificationsChatMessage: true,
+        emailNotificationsGroupMemberJoined: true,
+        emailNotificationsGroupMemberLeft: true,
+        emailNotificationsGroupMemberRemoved: true,
+        emailNotificationsGroupMemberRoleChanged: true,
+        emailNotificationsFollowingUsers: true,
+        emailNotificationsPostInGroup: true,
+      }
+    },
   ],
   [
     'Category',
-    (properties) => ({
-      id: uuid(),
-      slug: toSlug(text(properties.name, text(properties.id, 'category'))),
-      createdAt: timestamp(),
-    }),
+    (properties) => {
+      const id = text(properties.id, uuid())
+      return {
+        id,
+        slug: slugFrom(properties.name, 'category', id),
+        createdAt: timestamp(),
+      }
+    },
   ],
   [
     'Post',
-    (properties) => ({
-      id: uuid(),
-      postType: 'Article',
-      deleted: false,
-      disabled: false,
-      // Neo4j Integers, not JS numbers: the driver stores a plain number as a FLOAT, and
-      // resolvers/posts.ts:660 reads `post.viewedTeaserCount.low` — on a float that is
-      // undefined, and the mutation answers null. Same trap as SELECTED.slot.
-      clickedCount: int(0),
-      viewedTeaserCount: int(0),
-      sortDate: timestamp(),
-      slug: toSlug(text(properties.title, 'post')),
-    }),
+    (properties) => {
+      const id = text(properties.id, uuid())
+      return {
+        id,
+        postType: 'Article',
+        deleted: false,
+        disabled: false,
+        // Neo4j Integers, not JS numbers: the driver stores a plain number as a FLOAT, and
+        // resolvers/posts.ts:660 reads `post.viewedTeaserCount.low` — on a float that is
+        // undefined, and the mutation answers null. Same trap as SELECTED.slot.
+        clickedCount: int(0),
+        viewedTeaserCount: int(0),
+        sortDate: timestamp(),
+        // The fallback is unreachable today — `title` is required, so a titleless Post fails
+        // validation before the slug matters. Spelled like the other two anyway: the day
+        // `title` becomes optional, the trap would be back and silent.
+        slug: slugFrom(properties.title, 'post', id),
+      }
+    },
   ],
   ['Comment', () => ({ id: uuid(), deleted: false, disabled: false })],
   ['Group', () => ({ id: uuid(), deleted: false, disabled: false, groupType: 'public' })],
