@@ -330,7 +330,10 @@ jobs:
           s.on("error",()=>process.exit(1))
           setTimeout(()=>process.exit(1),5000)'
           for attempt in $(seq 1 60); do
-            if docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend node -e "$probe"; then exit 0; fi
+            if docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend node -e "$probe"; then
+              echo "neo4j is reachable after $attempt attempt(s)"
+              exit 0
+            fi
             sleep 5
           done
           echo 'neo4j did not accept connections within 5 minutes'; exit 1
