@@ -129,8 +129,19 @@ const reportDrift = async (session: Session, profile: BackendProfile): Promise<n
     console.log(`  \x1b[33mUNSUPPORTED\x1b[0m ${item} — ${profile} cannot express it`)
   }
   if (missing.length === 0 && unwanted.length === 0) {
-    console.log('  in sync')
+    // "in sync" only when there is nothing left to say. An object this profile cannot express
+    // is not drift — no apply run can create it and no operator can clear it, so counting it
+    // as a finding would make `check memgraph` red forever by construction. But it is also not
+    // nothing, and the summary must not read as if it were.
+    console.log(
+      unsupported.length === 0
+        ? '  in sync'
+        : `  in sync, except ${String(unsupported.length)} object(s) ${profile} cannot express`,
+    )
   }
+  // Deliberately NOT counting `unsupported`: the exit code says "there is work to do here",
+  // and there is none — the apply path makes the same call, `enforce()` looks at skipped and
+  // failed only.
   return missing.length + unwanted.length
 }
 
