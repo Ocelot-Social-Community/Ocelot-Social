@@ -165,6 +165,11 @@ describe('SocialMedia.vue', () => {
         ['data', 'data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg=='],
         ['vbscript', 'vbscript:msgbox(1)'],
         ['file', 'file:///etc/passwd'],
+        // Right scheme, no host: nothing for a browser to follow. A `^https?://` test let
+        // these through and the card showed a dead link with a broken favicon.
+        ['https without a host', 'https://'],
+        ['http without a host', 'http://'],
+        ['a string that is no url at all', 'not-a-url'],
       ])('renders no link at all for a %s url', (_scheme, url) => {
         const wrapper = wrapperFor(url)
         expect(wrapper.findAll('a')).toHaveLength(0)

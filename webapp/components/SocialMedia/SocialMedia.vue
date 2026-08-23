@@ -21,9 +21,22 @@ import Favicon from './Favicon.vue'
 // Vue does not sanitise an `:href` binding, so whatever is bound there is what the browser
 // runs on click — `javascript:alert(document.cookie)` included. The backend now only accepts
 // http and https for a social media url, but this profile also renders rows that were stored
-// before that rule existed, on a page every visitor can open. So the scheme is checked once
-// more, here, against the same allowlist.
-const LINKABLE = /^https?:\/\//i
+// before that rule existed, on a page every visitor can open. So the value is checked once
+// more, here.
+//
+// Parsed rather than pattern-matched: a `^https?://` test also passes a bare `https://`, which
+// has no host to go to. That rendered an entry with a dead link and a favicon derived from the
+// leftover `https`. The parser answers the question actually being asked — is this an address
+// a browser can follow — and it normalises the scheme, so uppercase needs no separate case.
+const linkable = (value) => {
+  try {
+    const { protocol, hostname } = new URL(value)
+    return (protocol === 'http:' || protocol === 'https:') && hostname !== ''
+  } catch {
+    // Not a URL at all: `not-a-url`, an empty string, a legacy row from before the rule.
+    return false
+  }
+}
 
 export default {
   name: 'social-media',
@@ -44,10 +57,10 @@ export default {
       // from a string that is not an address. The owner still sees and can fix the row on
       // their own settings page, which renders no href at all.
       return socialMedia
-        .filter(({ url }) => LINKABLE.test(url))
+        .filter(({ url }) => linkable(url))
         .map((socialMedia) => {
           const { url } = socialMedia
-          // Case-insensitive like LINKABLE above, and for the same reason: a browser reads a
+          // Case-insensitive for the same reason `linkable` parses: a browser reads a
           // scheme without regard to case, so `HTTPS://example.org` is a link this card accepts.
           // Without the flag the scheme group failed to match and the favicon was derived from
           // the leftover `HTTPS`, giving `HTTPS/favicon.ico` — a broken image next to a working
@@ -63,7 +76,7 @@ export default {
             parts.length > 1 ? parts[parts.length - 1] : parts[0].replace(/^www\./i, '')
           // `null`, not the raw value: an anchor without href still shows the name, and there is
           // nothing to follow. Keeping the value would put it back in the DOM.
-          const href = LINKABLE.test(url) ? url : null
+          const href = linkable(url) ? url : null
           return { url, href, username, favicon }
         })
     },
