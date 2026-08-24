@@ -19,7 +19,18 @@
           model="socialMediaUrl"
           type="text"
           :placeholder="$t('settings.social-media.placeholder')"
+          aria-describedby="socialMediaPrivacyHint"
         />
+        <!--
+          At the field, not in the docs. This list accepts `mailto:` since the value is
+          validated against the backend's rule, and a mail address typed here is PUBLISHED —
+          the address on the account is protected, this one is not, and nothing on the way in
+          said so. Tied to the input with aria-describedby so it is announced when the field
+          takes focus rather than only being visible to sighted users.
+        -->
+        <p id="socialMediaPrivacyHint" class="ds-text-small ds-text-soft ds-mt-x-small">
+          {{ $t('settings.social-media.privacy-hint') }}
+        </p>
       </template>
     </my-something-list>
   </os-card>
@@ -39,6 +50,7 @@ import MySomethingList from '~/components/_new/features/MySomethingList/MySometh
 import SocialMediaListItem from '~/components/_new/features/SocialMedia/SocialMediaListItem.vue'
 import scrollToContent from './scroll-to-content.js'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
+import { fallbackIconFor, faviconFor, followable } from '~/utils/followableUrl'
 
 export default {
   mixins: [scrollToContent],
@@ -55,8 +67,22 @@ export default {
       },
       useFormSchema: {
         socialMediaUrl: {
-          type: 'url',
-          message: this.$t('common.validations.url'),
+          // Not async-validator's `type: 'url'`: its pattern requires a `//` authority, so it
+          // rejects every `mailto:` — a value the backend accepts and the profile card
+          // renders. The form and the card now ask the same question.
+          //
+          // The empty value passes, as it did before: a built-in type skips an empty field
+          // while a custom validator runs on every one, so without this the form is invalid
+          // from the moment it mounts and never opens for input. Whether a value is REQUIRED
+          // is a separate rule, and not one this field carries.
+          //
+          // Trimmed here and trimmed again before the mutation, so the string this rule
+          // judges is the string the backend stores. Surrounding whitespace is a paste
+          // artefact and never part of a url, but the backend matches the value as given and
+          // refuses it — so a pasted `https://example.org ` used to pass this form and fail
+          // on save, with the space invisible in the field.
+          validator: (_rule, value) => value.trim() === '' || followable(value.trim()),
+          message: this.$t('common.validations.followableUrl'),
         },
       },
     }
@@ -66,13 +92,13 @@ export default {
       currentUser: 'auth/user',
     }),
     socialMediaLinks() {
-      const domainRegex = /^(?:https?:\/\/)?(?:[^@\n])?(?:www\.)?([^:/\n?]+)/g
       const { socialMedia = [] } = this.currentUser
-      return socialMedia.map(({ id, url }) => {
-        const [domain] = url.match(domainRegex) || []
-        const favicon = domain ? `${domain}/favicon.ico` : null
-        return { id, url, favicon }
-      })
+      return socialMedia.map(({ id, url }) => ({
+        id,
+        url,
+        favicon: faviconFor(url),
+        fallbackIcon: fallbackIconFor(url),
+      }))
     },
     mySomethingListTexts() {
       return {
@@ -132,7 +158,9 @@ export default {
         thisList.$toast.error(this.$t('permissions.deniedHint'))
         return false
       }
-      item.url = formData.socialMediaUrl
+      // The same trim the validator applied, so what was judged is what is sent — and what the
+      // duplicate check below compares against the rows already stored.
+      item.url = formData.socialMediaUrl.trim()
 
       const items = this.socialMediaLinks
       const duplicateUrl = items.find((eleItem) => eleItem.url === item.url)

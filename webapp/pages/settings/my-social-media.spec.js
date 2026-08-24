@@ -59,6 +59,75 @@ describe('my-social-media.vue', () => {
         input = wrapper.find('input#editSocialMedia')
       })
 
+      it.each([
+        ['a mail address', 'mailto:someone@example.org'],
+        ['a web address', 'https://example.org/profile'],
+        ['a plain http address', 'http://example.org/profile'],
+      ])('accepts %s, the same values the profile card renders', async (_case, url) => {
+        // The form used async-validator's `type: 'url'`, whose pattern requires a `//`
+        // authority — so a mailto the backend stores and the card displays could not be saved
+        // here. Both sides ask ~/utils/followableUrl now.
+        input.setValue(url)
+        form.trigger('submit')
+        await Vue.nextTick()
+        await flushPromises()
+        // The value itself, not just "a mutation happened": the field trims on the way out,
+        // and anything that reshapes the string further — a `new URL().toString()` appending a
+        // slash, a trim that takes more than whitespace — would still fire the mutation and
+        // leave a bare toHaveBeenCalled() green while storing something the owner never typed.
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({ variables: { url } }),
+        )
+      })
+
+      it.each([
+        ['a scheme a browser must not follow', 'javascript:alert(1)'],
+        ['a mailto carrying a bcc', 'mailto:someone@example.org?bcc=evil@example.tld'],
+        // Right scheme, nothing to go to. Both allowed schemes and the host check reach the
+        // mutation through this path; which values the rule itself accepts is settled once in
+        // utils/followableUrl.spec.js, against the same corpus the backend is held to.
+        ['a scheme with no host', 'https://'],
+      ])('still refuses %s', async (_case, url) => {
+        input.setValue(url)
+        form.trigger('submit')
+        await Vue.nextTick()
+        expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+      })
+
+      it('says that a link added here is published, to a screen reader as well', () => {
+        // The field accepts `mailto:` now, and a mail address typed into it goes on a page
+        // other people can read — the address on the account is protected, this one is not,
+        // and nothing on the way in said so.
+        expect(wrapper.find('#socialMediaPrivacyHint').exists()).toBe(true)
+        expect(mocks.$t).toHaveBeenCalledWith('settings.social-media.privacy-hint')
+        // On the control, not on the `ds-form-item` wrapper OcelotInput renders as its root:
+        // an aria-describedby the input does not carry describes nothing.
+        expect(input.attributes('aria-describedby')).toBe('socialMediaPrivacyHint')
+      })
+
+      it('accepts a pasted url with surrounding whitespace and stores it trimmed', async () => {
+        // `new URL` strips whitespace from both ends, so this form called the value valid while
+        // the backend — which matches the string as stored — refused it on save, with the space
+        // invisible in the field. Trimmed before validating AND before sending, so the string
+        // judged here is the string that arrives there.
+        input.setValue(`  ${newSocialMediaUrl}  `)
+        form.trigger('submit')
+        await Vue.nextTick()
+        await flushPromises()
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({ variables: { url: newSocialMediaUrl } }),
+        )
+      })
+
+      it('still refuses whitespace in the middle, which no trim can fix', async () => {
+        // Here `new URL` does not drop the character, it encodes it — `/a b` became `/a%20b`
+        // and looked clean. The backend sees the space and rejects the row.
+        input.setValue('https://example.org/a b')
+        form.trigger('submit')
+        await Vue.nextTick()
+        expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+      })
+
       it('requires the link to be a valid url', async () => {
         input.setValue('some value')
         form.trigger('submit')

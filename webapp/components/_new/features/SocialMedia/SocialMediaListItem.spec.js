@@ -32,5 +32,25 @@ describe('SocialMediaListItem.vue', () => {
         })
       })
     })
+
+    describe('given a mail address, which has no favicon to load', () => {
+      beforeEach(() => {
+        propsData = {
+          item: {
+            id: 's2',
+            url: 'mailto:someone@example.org',
+            favicon: null,
+            fallbackIcon: 'envelope',
+          },
+        }
+        wrapper = Wrapper()
+      })
+
+      it('passes the fallback icon on, instead of leaving the child at its default', () => {
+        // Left out, the child falls back to `link`: this list showed a chain link beside a
+        // mailto while the profile card showed an envelope — one value, described two ways.
+        expect(wrapper.findComponent({ name: 'Favicon' }).props('fallbackIcon')).toBe('envelope')
+      })
+    })
   })
 })

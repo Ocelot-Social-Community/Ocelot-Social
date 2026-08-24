@@ -18,6 +18,7 @@
         ]"
         :id="id"
         :name="name ? name : model"
+        :aria-describedby="ariaDescribedby"
         :type="type"
         :autofocus="autofocus"
         :placeholder="placeholder"
@@ -80,6 +81,18 @@ export default {
       default: null,
     },
     id: {
+      type: String,
+      default: null,
+    },
+    /**
+     * The id of an element describing this field — a hint that has to reach a screen reader,
+     * not only a sighted user.
+     *
+     * A prop rather than a fall-through attribute: the root element here is the `ds-form-item`
+     * wrapper, so `aria-describedby` written at the call site would land on a div and describe
+     * nothing. It belongs on the control itself.
+     */
+    ariaDescribedby: {
       type: String,
       default: null,
     },

@@ -490,10 +490,10 @@
       "eventLocationNameNotEmpty": "Por favor, insira um endereço.",
       "eventVenueLength": "A descrição do local deve ter entre {min} e {max} caracteres.",
       "eventVenueNotEmpty": "Por favor, insira uma descrição do local.",
+      "followableUrl": "deve ser um endereço web ou de e-mail válido",
       "formHasErrors": "Por favor, preencha todos os campos obrigatórios.",
       "titleLength": "O título deve ter entre {min} e {max} caracteres.",
-      "titleNotEmpty": "Por favor, insira um título.",
-      "url": "deve ser uma URL válida"
+      "titleNotEmpty": "Por favor, insira um título."
     },
     "versus": "Contra"
   },
@@ -1635,6 +1635,7 @@
       "edit-link": "Editar link",
       "name": "Mídias sociais",
       "placeholder": "Sua url de mídia social",
+      "privacy-hint": "Os links que você adicionar aqui são exibidos no seu perfil. Um endereço de e-mail ficará então visível para todas as pessoas que podem ver o seu perfil.",
       "requireUnique": "Você já adicionou esta URL",
       "submit": "Adicionar link",
       "successAdd": "Mídias sociais adicionadas. Perfil de usuário atualizado!",

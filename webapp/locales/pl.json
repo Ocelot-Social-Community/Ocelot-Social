@@ -490,10 +490,10 @@
       "eventLocationNameNotEmpty": "Proszę podać adres.",
       "eventVenueLength": "Opis miejsca musi mieć od {min} do {max} znaków.",
       "eventVenueNotEmpty": "Proszę podać opis miejsca.",
+      "followableUrl": "musi być poprawnym adresem internetowym lub adresem e-mail",
       "formHasErrors": "Proszę wypełnić wszystkie wymagane pola.",
       "titleLength": "Tytuł musi mieć od {min} do {max} znaków.",
-      "titleNotEmpty": "Proszę podać tytuł.",
-      "url": "musi być poprawnym adresem URL"
+      "titleNotEmpty": "Proszę podać tytuł."
     },
     "versus": "werset"
   },
@@ -1635,6 +1635,7 @@
       "edit-link": "Edytuj link",
       "name": "Media społecznościowe",
       "placeholder": "Dodaj link do mediów społecznościowych",
+      "privacy-hint": "Linki dodane tutaj są widoczne w Twoim profilu. Adres e-mail będzie wtedy widoczny dla wszystkich, którzy mogą zobaczyć Twój profil.",
       "requireUnique": "Ten url został już dodany",
       "submit": "Dodaj link",
       "successAdd": "Dodano społeczność. Profil zaktualizowany!",

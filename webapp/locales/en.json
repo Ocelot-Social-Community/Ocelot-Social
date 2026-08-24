@@ -490,10 +490,10 @@
       "eventLocationNameNotEmpty": "Please enter an address.",
       "eventVenueLength": "The venue description must be between {min} and {max} characters long.",
       "eventVenueNotEmpty": "Please enter a venue description.",
+      "followableUrl": "must be a valid web address or mail address",
       "formHasErrors": "Please fill in all required fields.",
       "titleLength": "The title must be between {min} and {max} characters.",
-      "titleNotEmpty": "Please enter a title.",
-      "url": "must be a valid URL"
+      "titleNotEmpty": "Please enter a title."
     },
     "versus": "Versus"
   },
@@ -1635,6 +1635,7 @@
       "edit-link": "Edit link",
       "name": "Social media",
       "placeholder": "Your social media url",
+      "privacy-hint": "Links you add here are shown on your profile. A mail address is then visible to everyone who can see your profile.",
       "requireUnique": "You added this url already",
       "submit": "Add link",
       "successAdd": "Added social media. Updated user profile!",
