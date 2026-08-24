@@ -47,24 +47,43 @@ const WHITESPACE =
 export const EMAIL = `^[^@${WHITESPACE}]+@[^@.${WHITESPACE}]+([.][^@.${WHITESPACE}]+)+$`
 
 /**
- * A web address the UI may put in an `href`: `http://example.org`, `https://example.org/x`.
+ * The address inside a `mailto:` — deliberately NOT the same rule as EMAIL.
  *
- * An ALLOWLIST of two schemes, not "a scheme and something after it". The permissive version
- * this replaces — neode's Joi `uri: true`, transcribed as `^[a-zA-Z][a-zA-Z0-9+.-]*:…` —
- * accepted `javascript:alert(document.cookie)`, `data:text/html;base64,…`, `vbscript:` and
- * `file:///etc/passwd`. SocialMedia.url is rendered by the webapp as
- * `<a :href="link.url">` on a user's PUBLIC profile, and Vue does not sanitise an href
- * binding, so a stored `javascript:` URL runs in the browser of whoever clicks it. An
- * allowlist is the only form of this rule that cannot be talked around by the next scheme
- * nobody thought of.
+ * `?` opens the query part of a mailto url and `,` separates recipients, so neither can be
+ * part of the address here. On its own an address may contain both: RFC 5322 puts `?` in
+ * atext, and EMAIL accordingly allows it. The two rules answer different questions — EMAIL
+ * asks whether a string is an address, this asks where an address ENDS.
  *
- * The scheme is spelled letter by letter rather than with a case-insensitive flag: `(?i)` is
- * Java-only and ajv compiles the pattern without flags, so it would match `JavaScript:` in
- * one engine and not the other — see patternParity.spec.ts. `jaVaScRiPt:` has to be rejected
- * by both, and a browser reads schemes case-insensitively.
- *
- * `mailto:` is deliberately absent. This is the constraint on social-media profile links, and
- * the component derives a favicon from the host — an address has none. Should a field ever
- * need it, that is a second, differently named pattern, not a widening of this one.
+ * That boundary is the whole point. `mailto:someone@example.org?bcc=elsewhere@example.tld`
+ * is a valid mailto, and clicking it opens a composer with a recipient the reader never saw;
+ * `?subject=` and `?body=` pre-fill a message they never wrote. A social-media link publishes
+ * a way to REACH someone, so it carries an address and nothing else.
  */
-export const HTTP_URL = `^[hH][tT][tT][pP][sS]?://[^${WHITESPACE}]+$`
+const MAILTO_ADDRESS = `[^@,?${WHITESPACE}]+@[^@.,?${WHITESPACE}]+([.][^@.,?${WHITESPACE}]+)+`
+
+/**
+ * A url this application will put in an `href`: `https://example.org/x`, `http://example.org`,
+ * `mailto:someone@example.org`.
+ *
+ * An ALLOWLIST of schemes, not "a scheme and something after it". The permissive version this
+ * replaces — neode's Joi `uri: true`, transcribed as `^[a-zA-Z][a-zA-Z0-9+.-]*:…` — accepted
+ * `javascript:alert(document.cookie)`, `data:text/html;base64,…`, `vbscript:` and
+ * `file:///etc/passwd`. SocialMedia.url is rendered by the webapp as `<a :href="link.url">` on
+ * a user's PUBLIC profile, and Vue does not sanitise an href binding, so a stored
+ * `javascript:` url runs in the browser of whoever clicks it. An allowlist is the only form of
+ * this rule that cannot be talked around by the next scheme nobody thought of.
+ *
+ * Every scheme is spelled letter by letter rather than with a case-insensitive flag: `(?i)` is
+ * Java-only and ajv compiles the pattern without flags, so it would match `JavaScript:` in one
+ * engine and not the other — see patternParity.spec.ts. `jaVaScRiPt:` has to be rejected by
+ * both, and a browser reads schemes case-insensitively.
+ *
+ * `mailto:` earns its place because an address is something a reader can act on and a browser
+ * can hand to a mail client. It costs the UI a case of its own: a mail address has no host, so
+ * there is no favicon to fetch from one, and the profile card shows an envelope instead
+ * (webapp/components/SocialMedia). And it is worth saying out loud that a mailto here PUBLISHES
+ * that address on a page open to everyone — the primary address of an account is protected,
+ * one typed into this field is not.
+ */
+export const FOLLOWABLE_URL =
+  `^([hH][tT][tT][pP][sS]?://[^${WHITESPACE}]+` + `|[mM][aA][iI][lL][tT][oO]:${MAILTO_ADDRESS})$`

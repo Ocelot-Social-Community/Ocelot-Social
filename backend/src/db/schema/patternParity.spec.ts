@@ -1,5 +1,5 @@
 import { closeDriver, getDriver } from '@db/neo4j'
-import { EMAIL, HTTP_URL, ISO_DATE_TIME, SLUG } from '@db/schema/entities/patterns'
+import { EMAIL, FOLLOWABLE_URL, ISO_DATE_TIME, SLUG } from '@db/schema/entities/patterns'
 import { entities } from '@db/schema/index'
 
 // Do the two engines that read our patterns agree?
@@ -44,24 +44,29 @@ const TRICKY: readonly (readonly [string, string])[] = [
 ]
 
 /**
- * One value per pattern that the pattern itself accepts, so the injected character has
- * somewhere to sit and a rejection means something.
+ * Values a pattern accepts, so the injected character has somewhere to sit and a rejection
+ * means something.
+ *
+ * A LIST per pattern, because an alternation has more than one accepting branch and they do
+ * not share their character classes: `FOLLOWABLE_URL` excludes `,` and `?` from the mailto
+ * address but not from a web address, so one sample would leave the other branch unmeasured —
+ * in the half where the classes are narrower and a disagreement is therefore more likely.
  *
  * Keyed by the exported constant rather than guessed from the pattern text: a pattern that
- * gets tightened — `URI` became `HTTP_URL` when the scheme allowlist arrived — would silently
+ * gets tightened — `URI` became `HTTP_URL`, then `FOLLOWABLE_URL` — would silently
  * fall through to a sample it no longer matches, and every comparison below would degenerate
  * to "false equals false". The self-check in the test turns that into a failure instead.
  */
-const SAMPLES = new Map<string, string>([
-  [SLUG, 'peter-pan'],
-  [EMAIL, 'someone@example.org'],
-  [HTTP_URL, 'https://example.org/path'],
-  [ISO_DATE_TIME, '2026-08-21T10:00:00.000Z'],
+const SAMPLES = new Map<string, readonly string[]>([
+  [SLUG, ['peter-pan']],
+  [EMAIL, ['someone@example.org']],
+  [FOLLOWABLE_URL, ['https://example.org/path', 'mailto:someone@example.org']],
+  [ISO_DATE_TIME, ['2026-08-21T10:00:00.000Z']],
 ])
 
-const sampleFor = (pattern: string): string => {
+const samplesFor = (pattern: string): readonly string[] => {
   const known = SAMPLES.get(pattern)
-  if (known === undefined) {
+  if (known === undefined || known.length === 0) {
     throw new Error(
       `No sample declared for the pattern ${pattern}. Add one to SAMPLES — a new pattern ` +
         `without one would go unchecked.`,
@@ -107,27 +112,32 @@ describe('every declared pattern reads the same in ajv and in Cypher', () => {
   it.each(patterns().map((entry) => [entry.used, entry.pattern] as const))(
     '%s',
     async (_used, pattern) => {
-      const sample = sampleFor(pattern)
       // Compiling a pattern that is not a literal is the whole point here — it comes from the
       // declaration, which is the thing under test. The same string is what ajv compiles.
       // eslint-disable-next-line security/detect-non-literal-regexp
       const inJavaScript = new RegExp(pattern)
-      // The sample itself first: a pattern that rejects its own valid value would make every
-      // comparison below trivially "false === false".
-      expect(inJavaScript.test(sample)).toBe(true)
-      expect(await matchesInJava(sample, pattern)).toBe(true)
 
-      for (const [name, character] of TRICKY) {
-        const value = `${sample.slice(0, 1)}${character}${sample.slice(1)}`
-        expect({
-          character: name,
-          value: JSON.stringify(value),
-          ajv: inJavaScript.test(value),
-        }).toEqual({
-          character: name,
-          value: JSON.stringify(value),
-          ajv: await matchesInJava(value, pattern),
+      for (const sample of samplesFor(pattern)) {
+        // The sample itself first: a pattern that rejects its own valid value would make every
+        // comparison below trivially "false === false".
+        expect({ sample, ajv: inJavaScript.test(sample) }).toEqual({ sample, ajv: true })
+        expect({ sample, cypher: await matchesInJava(sample, pattern) }).toEqual({
+          sample,
+          cypher: true,
         })
+
+        for (const [name, character] of TRICKY) {
+          const value = `${sample.slice(0, 1)}${character}${sample.slice(1)}`
+          expect({
+            character: name,
+            value: JSON.stringify(value),
+            ajv: inJavaScript.test(value),
+          }).toEqual({
+            character: name,
+            value: JSON.stringify(value),
+            ajv: await matchesInJava(value, pattern),
+          })
+        }
       }
     },
   )
