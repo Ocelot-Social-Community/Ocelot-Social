@@ -217,13 +217,44 @@ describe('SocialMedia.vue', () => {
       it.each([
         ['https://www.instagram.com/nimitbhargava', 'https://www.instagram.com/favicon.ico'],
         ['http://example.org/profile', 'http://example.org/favicon.ico'],
-        // The scheme is matched case-insensitively for the favicon too. Without that, the
-        // pattern fell through to the leftover `HTTPS` and asked for `HTTPS/favicon.ico` — a
-        // broken image beside a link that works.
-        ['HTTPS://example.org/profile', 'HTTPS://example.org/favicon.ico'],
-      ])('derives the favicon from the host of %s', (url, expected) => {
+        // Lower-cased, because the origin comes from the parsed url now and that is how a
+        // browser reads a scheme. The href keeps whatever was stored.
+        ['HTTPS://example.org/profile', 'https://example.org/favicon.ico'],
+        // The port belongs to the origin: a site on 8443 does not serve its favicon on 443.
+        ['https://example.org:8443/profile', 'https://example.org:8443/favicon.ico'],
+        // Credentials do not. `origin` drops them, so nothing asks a host called `user` for an
+        // icon and no secret travels in an image request.
+        ['https://user:secret@example.org/profile', 'https://example.org/favicon.ico'],
+      ])('derives the favicon from the origin of %s', (url, expected) => {
         const favicon = wrapperFor(url).findAll('a').at(0).find('img')
         expect(favicon.attributes('src')).toEqual(expected)
+      })
+
+      it('never puts credentials from a url into the page', () => {
+        // The label used to be cut out of the raw string, so this profile rendered
+        // "user:secret@example.org" as the name of the link — a password on a page every
+        // visitor can open.
+        const wrapper = wrapperFor('https://user:secret@example.org/')
+        expect(wrapper.text()).not.toContain('secret')
+        expect(wrapper.html()).not.toContain('secret')
+        expect(wrapper.findAll('a').at(0).text()).toContain('example.org')
+      })
+
+      it('drops credentials from the href, and only from an href that has them', () => {
+        // Rewriting every href would also normalise what needs no fixing — `toString()` adds a
+        // slash to `https://example.org` and lower-cases the scheme — and the stored value is
+        // what the owner chose to publish.
+        const withCredentials = wrapperFor('https://user:secret@example.org/profile')
+        expect(withCredentials.findAll('a').at(0).attributes('href')).toEqual(
+          'https://example.org/profile',
+        )
+        const without = wrapperFor('HTTPS://example.org/profile')
+        expect(without.findAll('a').at(0).attributes('href')).toEqual('HTTPS://example.org/profile')
+      })
+
+      it('shows the port in the label, because it is part of the address', () => {
+        const link = wrapperFor('https://example.org:8443/').findAll('a').at(0)
+        expect(link.text()).toContain('example.org:8443')
       })
     })
 

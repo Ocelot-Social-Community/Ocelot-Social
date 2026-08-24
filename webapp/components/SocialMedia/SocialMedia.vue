@@ -76,21 +76,42 @@ const describe = (url) => {
   if (address !== null) {
     return { url, href: url, username: address, favicon: null, fallbackIcon: 'envelope' }
   }
-  // Case-insensitive for the same reason the parsing above is: a browser reads a scheme
-  // without regard to case, so `HTTPS://example.org` is a link this card accepts. Without the
-  // flag the scheme group failed to match and the favicon was derived from the leftover
-  // `HTTPS`, giving `HTTPS/favicon.ico` — a broken image next to a working link.
-  const matches = url.match(/^(?:https?:\/\/)?(?:[^@\n])?(?:www\.)?([^:/\n?]+)/gi)
-  const [domain] = matches || []
-  const parts = url
-    .replace(/^https?:\/\//i, '')
-    .replace(/\/+$/, '')
-    .split('/')
+  // Everything below comes from the PARSED url, never from the string. Deriving it by pattern
+  // got two things wrong that a profile page must not get wrong:
+  //
+  //   https://user:secret@example.org  favicon https://user/favicon.ico, and the label read
+  //                                    "user:secret@example.org" — a password printed on a
+  //                                    page open to everyone
+  //   https://example.org:8443/x       the port was dropped, so the favicon was fetched from
+  //                                    a different origin than the link goes to
+  //
+  // `origin` answers "which site is this" the way a browser does: credentials stripped, port
+  // kept, scheme lower-cased. Parsing cannot throw here — this runs only for values `linkable`
+  // already accepted.
+  const parsed = new URL(url)
+  const { origin, host, pathname } = parsed
+  const segments = pathname.split('/').filter(Boolean)
+  // Credentials are dropped from the href as well, not just from what is shown: keeping them
+  // would leave a password in the DOM of a page open to everyone — copyable, and sent to the
+  // site by anyone who clicks. The link still resolves, just unauthenticated, which is the
+  // only sane reading of a credential typed into a PUBLIC profile field.
+  //
+  // Only THEN is the href rewritten. `toString()` also normalises what needs no fixing — it
+  // appends a slash to `https://example.org` and lower-cases the scheme — and the stored value
+  // is what the owner chose to publish. It is rewritten where there is a reason and left alone
+  // otherwise.
+  const hasCredentials = parsed.username !== '' || parsed.password !== ''
+  parsed.username = ''
+  parsed.password = ''
   return {
     url,
-    href: url,
-    username: parts.length > 1 ? parts[parts.length - 1] : parts[0].replace(/^www\./i, ''),
-    favicon: domain ? `${domain}/favicon.ico` : null,
+    href: hasCredentials ? parsed.toString() : url,
+    // The last path segment is the profile name on every site this card is for
+    // (instagram.com/name, mastodon.social/@name). Without one, the host stands in for it —
+    // `host`, not `hostname`, because a port is part of the address the link goes to. Minus a
+    // leading `www.`, which says nothing.
+    username: segments.length > 0 ? segments[segments.length - 1] : host.replace(/^www\./i, ''),
+    favicon: `${origin}/favicon.ico`,
     fallbackIcon: 'link',
   }
 }
