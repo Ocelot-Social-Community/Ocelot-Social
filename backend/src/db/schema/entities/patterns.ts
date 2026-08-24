@@ -58,8 +58,19 @@ export const EMAIL = `^[^@${WHITESPACE}]+@[^@.${WHITESPACE}]+([.][^@.${WHITESPAC
  * is a valid mailto, and clicking it opens a composer with a recipient the reader never saw;
  * `?subject=` and `?body=` pre-fill a message they never wrote. A social-media link publishes
  * a way to REACH someone, so it carries an address and nothing else.
+ *
+ * `%` is excluded so that this rule and the webapp's read the same characters. A url may
+ * percent-encode any of them, and the two sides then disagree about what they are looking at:
+ * this pattern sees the stored string, the webapp parses it, and a parser decodes. Measured
+ * over one corpus (webapp/utils/followableUrl.spec.js carries it), the encoded forms diverged
+ * every time — `mailto:a@example%2Eorg` was an undotted domain here and a dotted one there,
+ * `mailto:a b@example.org` was whitespace here and a legal address there, and
+ * `mailto:a@example.org%0A` passed BOTH and rendered a label with a newline in it. A regex
+ * cannot decode and Cypher has no function that would, so the fix is to accept no encoded
+ * octets at all. Nothing is lost: every character an address may legitimately carry here can
+ * be written literally, and the ones that cannot are the ones this rule already refuses.
  */
-const MAILTO_ADDRESS = `[^@,?${WHITESPACE}]+@[^@.,?${WHITESPACE}]+([.][^@.,?${WHITESPACE}]+)+`
+const MAILTO_ADDRESS = `[^@,?%${WHITESPACE}]+@[^@.,?%${WHITESPACE}]+([.][^@.,?%${WHITESPACE}]+)+`
 
 /**
  * A url this application will put in an `href`: `https://example.org/x`, `http://example.org`,

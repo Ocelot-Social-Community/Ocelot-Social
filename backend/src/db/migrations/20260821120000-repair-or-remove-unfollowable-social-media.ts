@@ -60,13 +60,52 @@ const followable = new RegExp(FOLLOWABLE_URL)
  * So the mail reading is offered first. And `mastodon.social/@user` has to reach the https
  * candidate even though it contains an `@`, which an if/else on "has an @" gets wrong.
  */
-const hasDottedHost = (candidate: string): boolean => {
+/**
+ * Whether a value we GUESSED a scheme for really names a host on the public internet.
+ *
+ * Two ways the guess goes wrong, both of which `new URL` accepts without complaint:
+ *
+ *   localhost/profile          no dot, so not a name anything outside this machine resolves
+ *   a b@example.org            parses as user `a b` at host `example.org` — the value is an
+ *                              address that failed to become a mailto, and prefixing `https://`
+ *                              turns it into a link to a site the owner never named, carrying
+ *                              what they typed as a credential
+ *
+ * Only asked of the guessed form. A stored `http://intranet` was written deliberately and is
+ * none of this migration's business.
+ */
+const namesAPublicHost = (candidate: string): boolean => {
   try {
-    return new URL(candidate).hostname.includes('.')
+    const { hostname, username, password } = new URL(candidate)
+    return hostname.includes('.') && username === '' && password === ''
     // eslint-disable-next-line no-catch-all/no-catch-all -- the question IS "does this parse"
   } catch {
     // `new URL` signals "not a url" the only way it can. There is no other error to let past.
     return false
+  }
+}
+
+/**
+ * The readings of a mailto address: as written, and — if it carries percent-encoding — decoded.
+ *
+ * The declaration accepts no encoded octets (see MAILTO_ADDRESS), because a regex cannot decode
+ * and the webapp's parser does, so the two would disagree about what they are reading. That
+ * makes `mailto:someone@example%2Eorg` a violation, but not a hopeless one: decoded it is an
+ * ordinary address, and a row that can be written back correctly should be, not deleted. The
+ * decoded reading still has to pass the declaration on its own — `%0A` decodes to a newline and
+ * gets no reprieve from this.
+ */
+const readings = (address: string): string[] => {
+  const asWritten = `mailto:${address}`
+  if (!address.includes('%')) {
+    return [asWritten]
+  }
+  try {
+    return [asWritten, `mailto:${decodeURIComponent(address)}`]
+    // eslint-disable-next-line no-catch-all/no-catch-all -- the question IS "does this decode"
+  } catch {
+    // A lone `%` is not an escape sequence. There is nothing to decode and nothing to repair.
+    return [asWritten]
   }
 }
 
@@ -77,22 +116,18 @@ export const repair = (value: string): string | null => {
 
   if (scheme?.[1].toLowerCase() === 'mailto') {
     // A mailto carrying more than an address: keep the address, drop the rest.
-    candidates.push(`mailto:${trimmed.slice('mailto:'.length).split('?')[0]}`)
+    candidates.push(...readings(trimmed.slice('mailto:'.length).split('?')[0]))
   }
   if (!scheme) {
     // Typed without a scheme — either an address or a host.
-    candidates.push(`mailto:${trimmed}`, `https://${trimmed}`)
+    candidates.push(...readings(trimmed), `https://${trimmed}`)
   }
 
   for (const candidate of candidates) {
     if (!followable.test(candidate)) {
       continue
     }
-    // A host without a dot (`localhost`, `not-a-url`) is not an address on the public
-    // internet, and `new URL` accepts it happily — so the dot is what separates a repairable
-    // row from a hopeless one. Only asked of the guessed https form: a stored `http://intranet`
-    // was written deliberately and is none of this migration's business.
-    if (candidate === `https://${trimmed}` && !hasDottedHost(candidate)) {
+    if (candidate === `https://${trimmed}` && !namesAPublicHost(candidate)) {
       continue
     }
     return candidate

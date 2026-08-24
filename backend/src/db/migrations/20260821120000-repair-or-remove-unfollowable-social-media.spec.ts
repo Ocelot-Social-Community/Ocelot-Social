@@ -50,6 +50,38 @@ describe('repair', () => {
   })
 
   it.each([
+    ['mailto:someone@example%2Eorg', 'mailto:someone@example.org'],
+    ['mailto:some%2Bone@example.org', 'mailto:some+one@example.org'],
+  ])('writes %j back decoded', (url, expected) => {
+    // The declaration accepts no encoded octets, so these rows violate it — but decoded they
+    // are ordinary addresses, and a row that can be written back correctly should be.
+    expect(repair(url)).toBe(expected)
+  })
+
+  it.each([
+    // Decodes to a newline and a space inside the address: still not followable, so the
+    // decoded reading earns no reprieve.
+    ['mailto:someone@example.org%0A'],
+    ['mailto:some%20one@example.org'],
+    // Decodes to `a@b@example.org` — two `@`, an address that names nobody.
+    ['mailto:a%40b@example.org'],
+    // Not an escape sequence at all, so `decodeURIComponent` throws and there is nothing to try.
+    ['mailto:someone%@example.org'],
+  ])('removes %j, whose decoded reading is no better', (url) => {
+    expect(repair(url)).toBeNull()
+  })
+
+  it.each([
+    // Prefixing `https://` would parse this as user `some one` at host `example.org`: a link to
+    // a site the owner never named, carrying what they typed as a credential. The mailto
+    // reading is the only honest one, and it fails.
+    ['some%20one@example.org'],
+    ['user:secret@example.org'],
+  ])('removes %j rather than guessing a host out of an address', (url) => {
+    expect(repair(url)).toBeNull()
+  })
+
+  it.each([
     ['javascript:alert(document.cookie)'],
     ['jaVaScRiPt:alert(1)'],
     ['data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg=='],
