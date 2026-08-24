@@ -362,13 +362,21 @@ jobs:
           started=$(date +%s)
           deadline=$(( started + deadline_seconds ))
           attempt=0
-          while [ "$(date +%s)" -lt "$deadline" ]; do
+          while :; do
+            remaining=$(( deadline - $(date +%s) ))
+            [ "$remaining" -gt 0 ] || break
             attempt=$(( attempt + 1 ))
-            if docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend node -e "$probe"; then
+            # Both waits are capped by what is left of the deadline. The probe guards itself at 5s,
+            # but that guard runs INSIDE the container while the deadline lives out here — without the
+            # cap a probe starting one second before the deadline still burns its five, and the pause
+            # adds five more. 6s so the normal path is decided by the probe's own guard, not by this.
+            if timeout "$(( remaining < 6 ? remaining : 6 ))" docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend node -e "$probe"; then
               echo "neo4j is reachable after $attempt attempt(s)"
               exit 0
             fi
-            sleep 5
+            remaining=$(( deadline - $(date +%s) ))
+            [ "$remaining" -gt 0 ] || break
+            sleep "$(( remaining < 5 ? remaining : 5 ))"
           done
           echo "neo4j was not ready: $attempt attempts over $(( $(date +%s) - started ))s (deadline ${deadline_seconds}s)"; exit 1
 

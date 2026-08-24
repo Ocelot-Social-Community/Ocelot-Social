@@ -12,9 +12,12 @@
 **/storybook-static
 **/playwright-report
 **/test-results
-# `backend/build/` too, and for a sharper reason than size: the `test` target is `COPY backend/ .`,
-# so whether the image contains a build output depended on whether the developer had run
-# `yarn build` — CI never has. A workflow step that reached for ./build/src worked locally and
-# died in CI with MODULE_NOT_FOUND. The production image builds its own from source and never
-# takes one from the context.
+# `backend/build/` too, and for a sharper reason than size: the `test` target — the image every
+# CI step runs in, see docker-compose.test.yml — takes the context as it finds it (`COPY
+# backend/ .`), so whether it contained a build output depended on whether the developer had run
+# `yarn build`. CI never has. A workflow step that reached for ./build/src worked locally and
+# died in CI with MODULE_NOT_FOUND.
+#
+# The `build` target copies the context too, but compiles its own output afterwards and never
+# uses one from the context — so this entry is about `test`, not about it.
 backend/build/
