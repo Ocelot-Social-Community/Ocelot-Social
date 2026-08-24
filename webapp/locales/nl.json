@@ -490,6 +490,7 @@
       "eventLocationNameNotEmpty": "Voer een adres in.",
       "eventVenueLength": "De plaatsbeschrijving moet tussen {min} en {max} tekens lang zijn.",
       "eventVenueNotEmpty": "Voer een plaatsbeschrijving in.",
+      "followableUrl": "moet een geldig webadres of e-mailadres zijn",
       "formHasErrors": "Vul alstublieft alle verplichte velden in.",
       "titleLength": "De titel moet tussen {min} en {max} tekens lang zijn.",
       "titleNotEmpty": "Voer een titel in.",

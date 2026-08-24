@@ -490,6 +490,7 @@
       "eventLocationNameNotEmpty": "Ju lutem shkruani një adresë.",
       "eventVenueLength": "Përshkrimi i vendit duhet të ketë midis {min} dhe {max} karaktere.",
       "eventVenueNotEmpty": "Ju lutem shkruani një përshkrim të vendit.",
+      "followableUrl": "duhet të jetë një adresë uebi ose e-mail e vlefshme",
       "formHasErrors": "Ju lutem plotësoni të gjitha fushat e detyrueshme.",
       "titleLength": "Titulli duhet të ketë midis {min} dhe {max} karaktere.",
       "titleNotEmpty": "Ju lutem shkruani një titull.",
