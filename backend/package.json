@@ -38,8 +38,8 @@
   },
   "dependencies": {
     "@apollo/server": "^4.11.3",
-    "@aws-sdk/client-s3": "^3.1111.0",
-    "@aws-sdk/lib-storage": "^3.1109.0",
+    "@aws-sdk/client-s3": "^3.1113.0",
+    "@aws-sdk/lib-storage": "^3.1113.0",
     "@graphql-tools/load-files": "^7.0.0",
     "@graphql-tools/merge": "^9.2.3",
     "@graphql-tools/schema": "^10.0.0",
@@ -68,7 +68,7 @@
     "languagedetect": "^2.0.0",
     "linkify-html": "^4.3.3",
     "linkifyjs": "^4.3.3",
-    "livekit-server-sdk": "^2.17.0",
+    "livekit-server-sdk": "^2.18.0",
     "lodash": "~4.18.1",
     "metascraper": "^5.50.0",
     "metascraper-author": "^5.50.0",
@@ -124,7 +124,7 @@
     "rosie": "^2.1.1",
     "spectaql": "^3.0.9",
     "ts-jest": "^29.4.12",
-    "tsc-alias": "^1.8.16",
+    "tsc-alias": "^1.9.2",
     "tsx": "^4.23.12",
     "typescript": "^5.8.3"
   },

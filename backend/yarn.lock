@@ -237,10 +237,10 @@
     "@smithy/types" "^4.16.1"
     tslib "^2.6.2"
 
-"@aws-sdk/client-s3@^3.1111.0":
-  version "3.1111.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/client-s3/-/client-s3-3.1111.0.tgz#7fc6e08ac09cf059dcd0f2f68279a2e85adff0ed"
-  integrity sha512-VnLT6aSTN8tWl/NsXUysXNZor7wQBp9CRwufo7kt8cwGXvHLZ0S/cV1K9WFcREGboVYSo3NGQ3ZvU7LRidh2aQ==
+"@aws-sdk/client-s3@^3.1113.0":
+  version "3.1113.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/client-s3/-/client-s3-3.1113.0.tgz#25775622ba1615968d7dbf24d712d47bc9dda77d"
+  integrity sha512-NRqdtohoMRyWkEeeznfG1KPN08dclCbl+HFuLPB2v8qPcgoNmTFlLKl9ELiR6hsGXQ4Ur3qvRnoJVEk8ND74pg==
   dependencies:
     "@aws-sdk/checksums" "^3.1000.28"
     "@aws-sdk/core" "^3.977.8"
@@ -376,10 +376,10 @@
     "@smithy/types" "^4.16.1"
     tslib "^2.6.2"
 
-"@aws-sdk/lib-storage@^3.1109.0":
-  version "3.1109.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/lib-storage/-/lib-storage-3.1109.0.tgz#85ccedc3158f8df5f02f3edc30dfc4f2cc93c7b9"
-  integrity sha512-l05ablXGuiLHmuhQZhisBQcK1ZgwP1CsTeb+7x9X942qP9ba6RAMqSfh8R7QGTkN5c9PowWfDVLNbouQDTrQiw==
+"@aws-sdk/lib-storage@^3.1113.0":
+  version "3.1113.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/lib-storage/-/lib-storage-3.1113.0.tgz#7893e719621f2b490ef1eee46fa9143b3a62637d"
+  integrity sha512-V3dzUPybNZQzGwMpXDcv5p2el81f2ihko52vzPf8d0C120Ui9L77rjsy7hbA4Raz+QGBl1Ld25IpSuQGDSVw+Q==
   dependencies:
     "@smithy/core" "^3.31.1"
     "@smithy/types" "^4.16.1"
@@ -2020,10 +2020,10 @@
     titleize "2"
     tlds "^1.261.0"
 
-"@livekit/protocol@^1.48.0":
-  version "1.49.0"
-  resolved "https://registry.yarnpkg.com/@livekit/protocol/-/protocol-1.49.0.tgz#ed2e9dd5f86e1485e3d95ff2077b0bf2f38d19ae"
-  integrity sha512-TCmihwjHBWAUdNrqvmrN/K59r7vDnPIy3OEaE3p0g4FvdcQTiLynmFC3igR25Q2fnifahhAJjnnfSCtWUK7kYg==
+"@livekit/protocol@1.48.0":
+  version "1.48.0"
+  resolved "https://registry.yarnpkg.com/@livekit/protocol/-/protocol-1.48.0.tgz#74d44d65fb049e33c927a6ed46b673cb0386b9ab"
+  integrity sha512-fYHYgltH6YavAsokl3qsHLkBdQeKCl4UORVTub5crS3t8JtKFZ0uinHDFQ+XXdNKS6Ub9gcOjV+UHcDiqnWXoQ==
   dependencies:
     "@bufbuild/protobuf" "^1.10.0"
 
@@ -7690,13 +7690,13 @@ linkifyjs@^4.3.3:
   resolved "https://registry.yarnpkg.com/linkifyjs/-/linkifyjs-4.3.3.tgz#da08f0eeb4d89a24541d09591fbdcc211eb8fef0"
   integrity sha512-P8aEP5U/D1/IlTY2OeYsErdwh9bGuLE30NcXtKEjgdHcahveQoQwM2yZNsioQHsWFz0P7KKudisbrzCgR0sDHg==
 
-livekit-server-sdk@^2.17.0:
-  version "2.17.0"
-  resolved "https://registry.yarnpkg.com/livekit-server-sdk/-/livekit-server-sdk-2.17.0.tgz#504780861dbd45609d6783977e879637992d3ba3"
-  integrity sha512-GWNEQrUD13UwZNrmosyTVFPgeBvSU2lFKGxdA4DaUI5F4sMb1cGeep/PPEE9vvRNELJYpxWS0ImS4gQmovKUDA==
+livekit-server-sdk@^2.18.0:
+  version "2.18.0"
+  resolved "https://registry.yarnpkg.com/livekit-server-sdk/-/livekit-server-sdk-2.18.0.tgz#2392169a2f28f1ab595083542b6eb2bcfaeba9df"
+  integrity sha512-iUGmkbyi0g4DHKQ0Z4VSVs/V+ddp3T75ccQIe6LX94AYlqgyh+SVSM1lQMjFQuI3Qh6Z9v06T4xxV+vWmp7VeQ==
   dependencies:
     "@bufbuild/protobuf" "^1.10.1"
-    "@livekit/protocol" "^1.48.0"
+    "@livekit/protocol" "1.48.0"
     jose "^5.1.2"
 
 livereload-js@^2.3.0:
@@ -10449,10 +10449,10 @@ ts-jest@^29.4.12:
     type-fest "^4.41.0"
     yargs-parser "^21.1.1"
 
-tsc-alias@^1.8.16:
-  version "1.8.16"
-  resolved "https://registry.yarnpkg.com/tsc-alias/-/tsc-alias-1.8.16.tgz#dbc74e797071801c7284f1a478259de920f852d4"
-  integrity sha512-QjCyu55NFyRSBAl6+MTFwplpFcnm2Pq01rR/uxfqJoLMm6X3O14KEGtaSDZpJYaE1bJBGDjD0eSuiIWPe2T58g==
+tsc-alias@^1.9.2:
+  version "1.9.2"
+  resolved "https://registry.yarnpkg.com/tsc-alias/-/tsc-alias-1.9.2.tgz#953563399e28f80b6e8ce2efb030221c3148f7cb"
+  integrity sha512-VTWQGMv0xXCEyHDLpmV2DEvGYHMxwsyx87dZeou2ynkM0+WOFdHe+KWiRucavMPUEdQysr7xSu60Y/WY0R4YKA==
   dependencies:
     chokidar "^3.5.3"
     commander "^9.0.0"

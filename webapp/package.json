@@ -26,7 +26,7 @@
     "lint:css-tokens": "node scripts/check-css-tokens.js"
   },
   "dependencies": {
-    "@mapbox/mapbox-gl-geocoder": "^5.0.2",
+    "@mapbox/mapbox-gl-geocoder": "^5.1.2",
     "@nuxtjs/apollo": "^4.0.0-rc19",
     "@nuxtjs/axios": "~5.13.6",
     "@nuxtjs/dotenv": "~1.4.2",
@@ -45,7 +45,7 @@
     "graphql": "14.7.0",
     "intersection-observer": "^0.12.2",
     "linkify-it": "~5.0.2",
-    "livekit-client": "^2.21.0",
+    "livekit-client": "^2.22.0",
     "mapbox-gl": "1.13.3",
     "nuxt-dropzone": "^1.0.4",
     "nuxt-env": "~0.1.0",
