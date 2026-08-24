@@ -493,8 +493,7 @@
       "followableUrl": "deve essere un indirizzo web o e-mail valido",
       "formHasErrors": "Si prega di compilare tutti i campi obbligatori.",
       "titleLength": "Il titolo deve essere compreso tra {min} e {max} caratteri.",
-      "titleNotEmpty": "Inserire un titolo.",
-      "url": "deve essere un URL valido"
+      "titleNotEmpty": "Inserire un titolo."
     },
     "versus": "Verso"
   },
@@ -1636,6 +1635,7 @@
       "edit-link": "Modifica link",
       "name": "Social media",
       "placeholder": "Il tuo URL social media",
+      "privacy-hint": "I link che aggiungi qui vengono mostrati sul tuo profilo. Un indirizzo e-mail sarà quindi visibile a tutte le persone che possono vedere il tuo profilo.",
       "requireUnique": "Hai già aggiunto questo URL",
       "submit": "Aggiungi link",
       "successAdd": "Social media aggiunti. \nProfilo utente aggiornato ",

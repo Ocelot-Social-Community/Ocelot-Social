@@ -19,7 +19,18 @@
           model="socialMediaUrl"
           type="text"
           :placeholder="$t('settings.social-media.placeholder')"
+          aria-describedby="socialMediaPrivacyHint"
         />
+        <!--
+          At the field, not in the docs. This list accepts `mailto:` since the value is
+          validated against the backend's rule, and a mail address typed here is PUBLISHED —
+          the address on the account is protected, this one is not, and nothing on the way in
+          said so. Tied to the input with aria-describedby so it is announced when the field
+          takes focus rather than only being visible to sighted users.
+        -->
+        <p id="socialMediaPrivacyHint" class="ds-text-small ds-text-soft ds-mt-x-small">
+          {{ $t('settings.social-media.privacy-hint') }}
+        </p>
       </template>
     </my-something-list>
   </os-card>

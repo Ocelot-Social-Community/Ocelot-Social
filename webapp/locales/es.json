@@ -493,8 +493,7 @@
       "followableUrl": "debe ser una dirección web o de correo electrónico válida",
       "formHasErrors": "Por favor, rellene todos los campos obligatorios.",
       "titleLength": "El título debe tener entre {min} y {max} caracteres.",
-      "titleNotEmpty": "Por favor, ingrese un título.",
-      "url": "debe ser una URL válida"
+      "titleNotEmpty": "Por favor, ingrese un título."
     },
     "versus": "Versus"
   },
@@ -1636,6 +1635,7 @@
       "edit-link": "Editar enlace",
       "name": "Medios de comunicación social",
       "placeholder": "Agregar una URL de Social-Media",
+      "privacy-hint": "Los enlaces que añadas aquí se muestran en tu perfil. Una dirección de correo electrónico será entonces visible para todas las personas que puedan ver tu perfil.",
       "requireUnique": "Ya ha añadido esta url",
       "submit": "Añadir enlace",
       "successAdd": "Social-Media agregó. Perfil actualizado!",

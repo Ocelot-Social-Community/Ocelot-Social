@@ -83,6 +83,17 @@ describe('my-social-media.vue', () => {
         expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
       })
 
+      it('says that a link added here is published, to a screen reader as well', () => {
+        // The field accepts `mailto:` now, and a mail address typed into it goes on a page
+        // other people can read — the address on the account is protected, this one is not,
+        // and nothing on the way in said so.
+        expect(wrapper.find('#socialMediaPrivacyHint').exists()).toBe(true)
+        expect(mocks.$t).toHaveBeenCalledWith('settings.social-media.privacy-hint')
+        // On the control, not on the `ds-form-item` wrapper OcelotInput renders as its root:
+        // an aria-describedby the input does not carry describes nothing.
+        expect(input.attributes('aria-describedby')).toBe('socialMediaPrivacyHint')
+      })
+
       it('accepts a pasted url with surrounding whitespace and stores it trimmed', async () => {
         // `new URL` strips whitespace from both ends, so this form called the value valid while
         // the backend — which matches the string as stored — refused it on save, with the space
