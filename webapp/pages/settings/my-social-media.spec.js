@@ -62,6 +62,7 @@ describe('my-social-media.vue', () => {
       it.each([
         ['a mail address', 'mailto:someone@example.org'],
         ['a web address', 'https://example.org/profile'],
+        ['a plain http address', 'http://example.org/profile'],
       ])('accepts %s, the same values the profile card renders', async (_case, url) => {
         // The form used async-validator's `type: 'url'`, whose pattern requires a `//`
         // authority — so a mailto the backend stores and the card displays could not be saved
@@ -82,6 +83,10 @@ describe('my-social-media.vue', () => {
       it.each([
         ['a scheme a browser must not follow', 'javascript:alert(1)'],
         ['a mailto carrying a bcc', 'mailto:someone@example.org?bcc=evil@example.tld'],
+        // Right scheme, nothing to go to. Both allowed schemes and the host check reach the
+        // mutation through this path; which values the rule itself accepts is settled once in
+        // utils/followableUrl.spec.js, against the same corpus the backend is held to.
+        ['a scheme with no host', 'https://'],
       ])('still refuses %s', async (_case, url) => {
         input.setValue(url)
         form.trigger('submit')
