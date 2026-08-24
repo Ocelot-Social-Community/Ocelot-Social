@@ -227,6 +227,57 @@ describe('SocialMedia.vue', () => {
       })
     })
 
+    describe('a mail address', () => {
+      const wrapperFor = (url) => {
+        propsData.userName = 'Jenny Rostock'
+        propsData.user = {
+          socialMedia: [
+            { id: 'ee1e8ed6-fbef-4bcf-b411-a12926f2ea1e', url, __typename: 'SocialMedia' },
+          ],
+        }
+        return Wrapper()
+      }
+
+      it('links a plain mailto', () => {
+        const link = wrapperFor('mailto:jenny@example.org').findAll('a').at(0)
+        expect(link.attributes('href')).toEqual('mailto:jenny@example.org')
+      })
+
+      it('shows the address as the label', () => {
+        const link = wrapperFor('mailto:jenny@example.org').findAll('a').at(0)
+        expect(link.text()).toContain('jenny@example.org')
+      })
+
+      it('shows an icon instead of a favicon, because a mail address has no host', () => {
+        // The earlier version derived one from whatever it did not understand and would have
+        // asked the browser for `ailto/favicon.ico`.
+        const wrapper = wrapperFor('mailto:jenny@example.org')
+        expect(wrapper.find('img').exists()).toBe(false)
+        expect(wrapper.find('.favicon-fallback').exists()).toBe(true)
+      })
+
+      it('links a mailto whose scheme is uppercase, as a browser reads it', () => {
+        const link = wrapperFor('MAILTO:jenny@example.org').findAll('a').at(0)
+        expect(link.attributes('href')).toEqual('MAILTO:jenny@example.org')
+      })
+
+      it.each([
+        // Query parameters pre-fill the composer. A reader who clicks "write to me" would send
+        // a message they never wrote, to recipients they never saw.
+        ['a bcc parameter', 'mailto:jenny@example.org?bcc=evil@example.tld'],
+        ['a subject and body', 'mailto:jenny@example.org?subject=Hi&body=Please%20pay'],
+        // Several recipients are the same trick without the query string.
+        ['more than one recipient', 'mailto:jenny@example.org,evil@example.tld'],
+        ['no address at all', 'mailto:'],
+        ['something that is not an address', 'mailto:notanaddress'],
+        ['an address without a domain', 'mailto:jenny@'],
+      ])('renders no link for a mailto with %s', (_case, url) => {
+        const wrapper = wrapperFor(url)
+        expect(wrapper.findAll('a')).toHaveLength(0)
+        expect(wrapper.html()).not.toContain(url)
+      })
+    })
+
     describe('social media link with a username that starts with www.', () => {
       let wrapper
 
