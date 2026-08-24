@@ -40,6 +40,24 @@ describe('followable', () => {
     ['mailto:'],
     ['mailto:notanaddress'],
     ['mailto:someone@'],
+    // A trailing `?` opens nothing, but `new URL` reports an empty `search` for it while the
+    // backend sees the character and rejects the value.
+    ['mailto:someone@example.org?'],
+    // Percent-encoding, which is where "the decoded address" and "the stored string" came
+    // apart. Every one of these was accepted by one side and refused by the other, or — worse
+    // — accepted by both and rendered as a label with a newline in it.
+    ['mailto:someone@example.org%0A'],
+    ['mailto:someone@example.org%20'],
+    ['mailto:some%0Aone@example.org'],
+    ['mailto:someone@exam%20ple.org'],
+    ['mailto:someone@example%2Eorg'],
+    ['mailto:some%40one@example.org'],
+    ['mailto:some one@example.org'],
+    // A domain has to be dotted and both halves present: nothing else is reachable from a
+    // public profile, and the backend has always said so.
+    ['mailto:someone@localhost'],
+    ['mailto:someone@.org'],
+    ['mailto:someone@example.'],
   ])('rejects %j', (value) => {
     expect(followable(value)).toBe(false)
   })
@@ -52,6 +70,13 @@ describe('mailAddress', () => {
 
   it('returns null for a web address', () => {
     expect(mailAddress('https://example.org')).toBeNull()
+  })
+
+  it('returns the address as stored, not a decoded reading of it', () => {
+    // The label a reader sees and the value the backend holds have to be one string. Decoding
+    // made them two, and the difference was invisible on the page: `%0A` showed as a line break
+    // in the label of a link the backend considered fine.
+    expect(mailAddress('mailto:someone@example.org%0A')).toBeNull()
   })
 })
 

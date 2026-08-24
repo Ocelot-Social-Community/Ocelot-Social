@@ -16,21 +16,51 @@
 // the value. `new URL` answers the question actually being asked.
 
 /**
+ * Every character ECMAScript's `\s` matches, spelled out — copied from the backend's
+ * WHITESPACE, and spelled out for the reason given there: `\s` means something different to
+ * Cypher's Java regex engine, so the shorthand would make the two rules disagree about
+ * U+00A0 and friends while looking identical.
+ */
+const WHITESPACE =
+  '\\t\\n\\f\\r \\u000b\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff'
+
+/**
+ * The address inside a `mailto:`. Character for character the backend's MAILTO_ADDRESS, with
+ * one addition: `%`.
+ *
+ * `?` opens the query part of a mailto and `,` separates recipients, so a click on
+ * `mailto:someone@example.org?bcc=elsewhere@example.tld` opens a composer with a recipient the
+ * reader never saw, and `?subject=`/`?body=` pre-fill a message they never wrote. A dotted
+ * domain because `alice@localhost` is not reachable from a public profile.
+ *
+ * `%` is excluded so that this rule and the backend's read the SAME characters. The backend
+ * validates the stored string; this side used to validate `decodeURIComponent(pathname)`, and
+ * percent-encoding is exactly where those two views come apart: `mailto:alice@example%2Eorg`
+ * was a dotted domain here and an undotted one there, `mailto:alice@example.org%0A` passed
+ * both and rendered a label with a newline in it, and `mailto:alice b@example.org` was
+ * whitespace to the backend and a legal address here. Rather than teach one side to decode —
+ * Cypher cannot — neither side accepts encoded octets, and the two see identical input.
+ */
+const ADDRESS = new RegExp(
+  `^[^@,?%${WHITESPACE}]+@[^@.,?%${WHITESPACE}]+([.][^@.,?%${WHITESPACE}]+)+$`,
+)
+
+/**
  * The address of a `mailto:` value, or null for anything else.
  *
- * A single recipient and no query. A mailto may carry `?bcc=`, `?subject=` and `?body=`, and a
- * click then opens the composer with all of it pre-filled — a reader who clicks "write to me"
- * would send a message they never wrote, to recipients they never saw. A comma-separated
- * recipient list is the same trick without the query string.
+ * `new URL` decides the scheme, because a browser's reading of a scheme is the question being
+ * asked; the charset above decides where the address ends. Not decoded: the returned string is
+ * both the label shown to a reader and the value the backend stored, and those must be the
+ * same string.
  */
 export const mailAddress = (value) => {
   try {
-    const { protocol, pathname, search } = new URL(value)
-    if (protocol !== 'mailto:' || search !== '') return null
-    const address = decodeURIComponent(pathname)
-    const [local, domain, ...rest] = address.split('@')
-    const single = rest.length === 0 && Boolean(local) && Boolean(domain) && !address.includes(',')
-    return single ? address : null
+    const { protocol, pathname } = new URL(value)
+    // `?` is looked for in the raw value, not in `search`: `new URL('mailto:a@b.org?')` reports
+    // an empty search, while the backend sees a `?` in the string and rejects it. Asking the
+    // same question of the same characters is the whole point of this file.
+    if (protocol !== 'mailto:' || value.includes('?')) return null
+    return ADDRESS.test(pathname) ? pathname : null
   } catch {
     return null
   }
