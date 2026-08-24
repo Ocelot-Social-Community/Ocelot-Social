@@ -135,12 +135,22 @@ export default {
       }
     },
     value(newVal, oldVal) {
-      if (newVal !== this.currentValue) {
+      // Distinguishes a genuinely external value change (e.g. loaded from DB
+      // on the settings page) from the round-trip echo of the user's own
+      // typing: #city's v-model="currentValue" already emits 'input' on
+      // every keystroke, which the parent reflects straight back down as
+      // this same value prop. Without this check, resolveLocalizedLocation()
+      // below would fire an un-debounced geocode request on every keystroke
+      // too, racing (and sometimes overwriting) the input's own debounced
+      // search in handleCityInput().
+      const isExternalChange = newVal !== this.currentValue
+      if (isExternalChange) {
         this.currentValue = newVal
       }
-      // Only re-resolve when the incoming value is a plain string (e.g. loaded
-      // from DB on settings page). An object means the user already selected a
-      // result from the dropdown — no re-query needed.
+      if (!isExternalChange) return
+      // Only re-resolve when the incoming value is a plain string. An object
+      // means the user already selected a result from the dropdown — no
+      // re-query needed.
       if (typeof newVal === 'object') return
       const oldName = typeof oldVal === 'object' ? oldVal.value : oldVal
       if (newVal && newVal !== oldName) {
