@@ -80,11 +80,31 @@ export const mailAddress = (value) => {
   }
 }
 
-/** A web address with a host: `https://example.org/x`, `http://example.org`. */
+/**
+ * A web address with a host and no credentials: `https://example.org/x`, `http://example.org`.
+ *
+ * `https://user:secret@example.org` is refused, and refused HERE rather than cleaned up at
+ * render time. The card used to strip the credentials out of the label and the href, which
+ * kept the password off the visible page and did nothing about the actual exposure: the
+ * profile query asks for `socialMedia { id url }`, so the stored string is serialised into
+ * every visitor's page state, and any API-key client reads it verbatim. A value nobody may see
+ * is not a rendering problem, so it must not be storable — see FOLLOWABLE_URL in
+ * backend/src/db/schema/entities/patterns.ts, which refuses an `@` in the authority, and the
+ * migration that strips credentials off the rows written before that rule.
+ *
+ * Nothing legitimate is lost. Credentials in a url are for machines, and this field publishes
+ * a place for PEOPLE to visit; a link that only works with a password is not one a profile can
+ * hand to a stranger anyway.
+ */
 export const webAddress = (value) => {
   try {
-    const { protocol, hostname } = new URL(value)
-    return (protocol === 'http:' || protocol === 'https:') && hostname !== ''
+    const { protocol, hostname, username, password } = new URL(value)
+    return (
+      (protocol === 'http:' || protocol === 'https:') &&
+      hostname !== '' &&
+      username === '' &&
+      password === ''
+    )
   } catch {
     // Not a URL at all: `not-a-url`, an empty string, a row from before the rule existed.
     return false

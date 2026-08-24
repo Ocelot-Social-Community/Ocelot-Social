@@ -222,34 +222,29 @@ describe('SocialMedia.vue', () => {
         ['HTTPS://example.org/profile', 'https://example.org/favicon.ico'],
         // The port belongs to the origin: a site on 8443 does not serve its favicon on 443.
         ['https://example.org:8443/profile', 'https://example.org:8443/favicon.ico'],
-        // Credentials do not. `origin` drops them, so nothing asks a host called `user` for an
-        // icon and no secret travels in an image request.
-        ['https://user:secret@example.org/profile', 'https://example.org/favicon.ico'],
       ])('derives the favicon from the origin of %s', (url, expected) => {
         const favicon = wrapperFor(url).findAll('a').at(0).find('img')
         expect(favicon.attributes('src')).toEqual(expected)
       })
 
-      it('never puts credentials from a url into the page', () => {
-        // The label used to be cut out of the raw string, so this profile rendered
-        // "user:secret@example.org" as the name of the link — a password on a page every
-        // visitor can open.
+      it('does not render a url that carries credentials at all', () => {
+        // Stripping them out of the label and the href was the earlier fix, and it was the
+        // weaker half: the profile query asks for `socialMedia { id url }`, so the raw string
+        // reached every visitor's page state and every API client no matter what the card drew.
+        // The rule now refuses such a value, so this row is treated like any other unfollowable
+        // one — not shown, and repaired in the database by migration.
         const wrapper = wrapperFor('https://user:secret@example.org/')
         expect(wrapper.text()).not.toContain('secret')
         expect(wrapper.html()).not.toContain('secret')
-        expect(wrapper.findAll('a').at(0).text()).toContain('example.org')
+        expect(wrapper.findAll('a')).toHaveLength(0)
       })
 
-      it('drops credentials from the href, and only from an href that has them', () => {
-        // Rewriting every href would also normalise what needs no fixing — `toString()` adds a
-        // slash to `https://example.org` and lower-cases the scheme — and the stored value is
-        // what the owner chose to publish.
-        const withCredentials = wrapperFor('https://user:secret@example.org/profile')
-        expect(withCredentials.findAll('a').at(0).attributes('href')).toEqual(
-          'https://example.org/profile',
-        )
-        const without = wrapperFor('HTTPS://example.org/profile')
-        expect(without.findAll('a').at(0).attributes('href')).toEqual('HTTPS://example.org/profile')
+      it('leaves the href exactly as stored', () => {
+        // Rewriting it would also normalise what needs no fixing — `toString()` adds a slash to
+        // `https://example.org` and lower-cases the scheme — and the stored value is what the
+        // owner chose to publish.
+        const wrapper = wrapperFor('HTTPS://example.org/profile')
+        expect(wrapper.findAll('a').at(0).attributes('href')).toEqual('HTTPS://example.org/profile')
       })
 
       it('shows the port in the label, because it is part of the address', () => {

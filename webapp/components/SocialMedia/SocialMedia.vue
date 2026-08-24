@@ -45,27 +45,22 @@ const describe = (url) => {
   //   https://example.org:8443/x       the port was dropped, so the favicon was fetched from
   //                                    a different origin than the link goes to
   //
-  // `origin` answers "which site is this" the way a browser does: credentials stripped, port
-  // kept, scheme lower-cased. Parsing cannot throw here — this runs only for values `followable`
-  // already accepted.
-  const parsed = new URL(url)
-  const { host, pathname } = parsed
-  const segments = pathname.split('/').filter(Boolean)
-  // Credentials are dropped from the href as well, not just from what is shown: keeping them
-  // would leave a password in the DOM of a page open to everyone — copyable, and sent to the
-  // site by anyone who clicks. The link still resolves, just unauthenticated, which is the
-  // only sane reading of a credential typed into a PUBLIC profile field.
+  // `origin` answers "which site is this" the way a browser does: port kept, scheme
+  // lower-cased. Parsing cannot throw here — this runs only for values `followable` already
+  // accepted.
   //
-  // Only THEN is the href rewritten. `toString()` also normalises what needs no fixing — it
-  // appends a slash to `https://example.org` and lower-cases the scheme — and the stored value
-  // is what the owner chose to publish. It is rewritten where there is a reason and left alone
-  // otherwise.
-  const hasCredentials = parsed.username !== '' || parsed.password !== ''
-  parsed.username = ''
-  parsed.password = ''
+  // Credentials are no longer stripped here, because they can no longer arrive: `followable`
+  // refuses a url that carries them. Stripping was the weaker half of the fix anyway — it kept
+  // the password out of the label and the href while the profile query still shipped the raw
+  // string to every visitor and every API client. The href is therefore the stored value,
+  // untouched: `toString()` would normalise what needs no fixing, appending a slash to
+  // `https://example.org` and lower-casing the scheme, and what the owner chose to publish is
+  // what gets published.
+  const { host, pathname } = new URL(url)
+  const segments = pathname.split('/').filter(Boolean)
   return {
     url,
-    href: hasCredentials ? parsed.toString() : url,
+    href: url,
     // The last path segment is the profile name on every site this card is for
     // (instagram.com/name, mastodon.social/@name). Without one, the host stands in for it —
     // `host`, not `hostname`, because a port is part of the address the link goes to. Minus a

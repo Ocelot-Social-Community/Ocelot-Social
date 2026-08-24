@@ -16,6 +16,10 @@ describe('followable', () => {
     ['mailto:someone@example.org'],
     ['MAILTO:someone@example.org'],
     ['mailto:first.last@sub.example.co.uk'],
+    // The `@` is in the PATH here, not in the authority — which is how half of the fediverse
+    // writes a profile url. A credential rule that cannot tell the two apart would delete them.
+    ['https://mastodon.social/@user'],
+    ['https://example.org/a@b/c'],
   ])('accepts %s', (value) => {
     expect(followable(value)).toBe(true)
   })
@@ -58,6 +62,12 @@ describe('followable', () => {
     ['mailto:someone@localhost'],
     ['mailto:someone@.org'],
     ['mailto:someone@example.'],
+    // Credentials, which the card used to strip at render time — while the profile query
+    // shipped the raw string to every visitor and every API client regardless. A value nobody
+    // may see cannot be a rendering problem; it must not be storable.
+    ['https://user:secret@example.org/profile'],
+    ['https://user@example.org'],
+    ['http://user:secret@example.org'],
     // Whitespace, which `new URL` makes disappear: it strips both ends and encodes the middle,
     // so these looked clean after parsing while the backend matched the string as stored and
     // refused it. The settings form trims before asking, so only the middle ones reach a
