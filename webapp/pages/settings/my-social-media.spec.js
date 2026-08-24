@@ -70,7 +70,13 @@ describe('my-social-media.vue', () => {
         form.trigger('submit')
         await Vue.nextTick()
         await flushPromises()
-        expect(mocks.$apollo.mutate).toHaveBeenCalled()
+        // The value itself, not just "a mutation happened": the field trims on the way out,
+        // and anything that reshapes the string further — a `new URL().toString()` appending a
+        // slash, a trim that takes more than whitespace — would still fire the mutation and
+        // leave a bare toHaveBeenCalled() green while storing something the owner never typed.
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({ variables: { url } }),
+        )
       })
 
       it.each([
