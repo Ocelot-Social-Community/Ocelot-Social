@@ -25,6 +25,20 @@ const WHITESPACE =
   '\\t\\n\\f\\r \\u000b\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff'
 
 /**
+ * Whitespace anywhere in the value, which no followable url may carry.
+ *
+ * Asked of the RAW string, before anything parses it, because parsing is where the character
+ * disappears: `new URL` strips whitespace from both ends and encodes it in the middle, so
+ * `'https://example.org/a b'` became `/a%20b` and looked clean, and `'mailto:a@example.org '`
+ * lost its trailing space entirely. The backend has neither luxury — it matches the string as
+ * stored — so both were values this form called valid and the mutation then refused.
+ *
+ * The settings form trims before it asks, so a reader only ever meets this rule over
+ * whitespace in the MIDDLE of a url, which is never a paste artefact and never intended.
+ */
+const WHITESPACE_ANYWHERE = new RegExp(`[${WHITESPACE}]`)
+
+/**
  * The address inside a `mailto:`. Character for character the backend's MAILTO_ADDRESS, with
  * one addition: `%`.
  *
@@ -86,7 +100,8 @@ export const webAddress = (value) => {
  * whoever clicks it. `data:`, `vbscript:` and `file:` are the same family. An allowlist is the
  * only form of this rule that cannot be talked around by the next scheme nobody thought of.
  */
-export const followable = (value) => webAddress(value) || mailAddress(value) !== null
+export const followable = (value) =>
+  !WHITESPACE_ANYWHERE.test(value) && (webAddress(value) || mailAddress(value) !== null)
 
 /**
  * The site's favicon for a value, or null when there is no site to ask.

@@ -64,7 +64,13 @@ export default {
           // while a custom validator runs on every one, so without this the form is invalid
           // from the moment it mounts and never opens for input. Whether a value is REQUIRED
           // is a separate rule, and not one this field carries.
-          validator: (_rule, value) => value === '' || followable(value),
+          //
+          // Trimmed here and trimmed again before the mutation, so the string this rule
+          // judges is the string the backend stores. Surrounding whitespace is a paste
+          // artefact and never part of a url, but the backend matches the value as given and
+          // refuses it — so a pasted `https://example.org ` used to pass this form and fail
+          // on save, with the space invisible in the field.
+          validator: (_rule, value) => value.trim() === '' || followable(value.trim()),
           message: this.$t('common.validations.followableUrl'),
         },
       },
@@ -141,7 +147,9 @@ export default {
         thisList.$toast.error(this.$t('permissions.deniedHint'))
         return false
       }
-      item.url = formData.socialMediaUrl
+      // The same trim the validator applied, so what was judged is what is sent — and what the
+      // duplicate check below compares against the rows already stored.
+      item.url = formData.socialMediaUrl.trim()
 
       const items = this.socialMediaLinks
       const duplicateUrl = items.find((eleItem) => eleItem.url === item.url)

@@ -58,6 +58,18 @@ describe('followable', () => {
     ['mailto:someone@localhost'],
     ['mailto:someone@.org'],
     ['mailto:someone@example.'],
+    // Whitespace, which `new URL` makes disappear: it strips both ends and encodes the middle,
+    // so these looked clean after parsing while the backend matched the string as stored and
+    // refused it. The settings form trims before asking, so only the middle ones reach a
+    // reader as an error.
+    ['https://example.org/a b'],
+    ['https://example.org '],
+    [' https://example.org'],
+    ['mailto:someone@example.org '],
+    // Non-breaking space: invisible in the field, and the reason both sides spell their
+    // whitespace set out by code point rather than with the `\s` shorthand. Escaped here for
+    // the same reason — a reviewer cannot see the difference otherwise.
+    ['https://example.org/a\u00a0b'],
   ])('rejects %j', (value) => {
     expect(followable(value)).toBe(false)
   })

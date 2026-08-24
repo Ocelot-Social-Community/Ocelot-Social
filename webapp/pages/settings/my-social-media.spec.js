@@ -83,6 +83,29 @@ describe('my-social-media.vue', () => {
         expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
       })
 
+      it('accepts a pasted url with surrounding whitespace and stores it trimmed', async () => {
+        // `new URL` strips whitespace from both ends, so this form called the value valid while
+        // the backend — which matches the string as stored — refused it on save, with the space
+        // invisible in the field. Trimmed before validating AND before sending, so the string
+        // judged here is the string that arrives there.
+        input.setValue(`  ${newSocialMediaUrl}  `)
+        form.trigger('submit')
+        await Vue.nextTick()
+        await flushPromises()
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({ variables: { url: newSocialMediaUrl } }),
+        )
+      })
+
+      it('still refuses whitespace in the middle, which no trim can fix', async () => {
+        // Here `new URL` does not drop the character, it encodes it — `/a b` became `/a%20b`
+        // and looked clean. The backend sees the space and rejects the row.
+        input.setValue('https://example.org/a b')
+        form.trigger('submit')
+        await Vue.nextTick()
+        expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+      })
+
       it('requires the link to be a valid url', async () => {
         input.setValue('some value')
         form.trigger('submit')
