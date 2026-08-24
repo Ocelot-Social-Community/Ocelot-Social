@@ -17,51 +17,11 @@
 <script>
 import { OsCard } from '@ocelot-social/ui'
 import Favicon from './Favicon.vue'
+import { fallbackIconFor, faviconFor, followable, mailAddress } from '~/utils/followableUrl'
 
-// Vue does not sanitise an `:href` binding, so whatever is bound there is what the browser
-// runs on click — `javascript:alert(document.cookie)` included. The backend only accepts the
-// schemes below for a social media url, but this profile also renders rows that were stored
-// before that rule existed, on a page every visitor can open. So the value is checked once
-// more, here.
-//
-// Parsed rather than pattern-matched: a `^https?://` test also passes a bare `https://`, which
-// has no host to go to. That rendered an entry with a dead link and a favicon derived from the
-// leftover `https`. The parser answers the question actually being asked — is this an address
-// a browser can follow — and it normalises the scheme, so uppercase needs no separate case.
-
-/**
- * The address of a `mailto:` url, or null for anything else.
- *
- * A single recipient and no query. A mailto may carry `?bcc=`, `?subject=` and `?body=`, and a
- * click then opens the composer with all of it pre-filled — a reader who clicks "write to me"
- * would send a message they never wrote, to recipients they never saw. The same holds for the
- * comma-separated recipient list. This card publishes a way to REACH someone; anything beyond
- * the address is a pre-written message, which is a different thing.
- */
-const mailAddress = (value) => {
-  try {
-    const { protocol, pathname, search } = new URL(value)
-    if (protocol !== 'mailto:' || search !== '') return null
-    const address = decodeURIComponent(pathname)
-    const [local, domain, ...rest] = address.split('@')
-    const single = rest.length === 0 && Boolean(local) && Boolean(domain) && !address.includes(',')
-    return single ? address : null
-  } catch {
-    return null
-  }
-}
-
-const webAddress = (value) => {
-  try {
-    const { protocol, hostname } = new URL(value)
-    return (protocol === 'http:' || protocol === 'https:') && hostname !== ''
-  } catch {
-    // Not a URL at all: `not-a-url`, an empty string, a legacy row from before the rule.
-    return false
-  }
-}
-
-const linkable = (value) => webAddress(value) || mailAddress(value) !== null
+// The rule lives in ~/utils/followableUrl.js, shared with the settings form that accepts these
+// values. It used to sit here, and the form validated with its own — so a `mailto:` this card
+// could render was one the form refused to save.
 
 /**
  * What the card shows for one url: where it goes, what it is called, what sits in front of it.
@@ -74,7 +34,7 @@ const linkable = (value) => webAddress(value) || mailAddress(value) !== null
 const describe = (url) => {
   const address = mailAddress(url)
   if (address !== null) {
-    return { url, href: url, username: address, favicon: null, fallbackIcon: 'envelope' }
+    return { url, href: url, username: address, favicon: null, fallbackIcon: fallbackIconFor(url) }
   }
   // Everything below comes from the PARSED url, never from the string. Deriving it by pattern
   // got two things wrong that a profile page must not get wrong:
@@ -86,10 +46,10 @@ const describe = (url) => {
   //                                    a different origin than the link goes to
   //
   // `origin` answers "which site is this" the way a browser does: credentials stripped, port
-  // kept, scheme lower-cased. Parsing cannot throw here — this runs only for values `linkable`
+  // kept, scheme lower-cased. Parsing cannot throw here — this runs only for values `followable`
   // already accepted.
   const parsed = new URL(url)
-  const { origin, host, pathname } = parsed
+  const { host, pathname } = parsed
   const segments = pathname.split('/').filter(Boolean)
   // Credentials are dropped from the href as well, not just from what is shown: keeping them
   // would leave a password in the DOM of a page open to everyone — copyable, and sent to the
@@ -111,8 +71,8 @@ const describe = (url) => {
     // `host`, not `hostname`, because a port is part of the address the link goes to. Minus a
     // leading `www.`, which says nothing.
     username: segments.length > 0 ? segments[segments.length - 1] : host.replace(/^www\./i, ''),
-    favicon: `${origin}/favicon.ico`,
-    fallbackIcon: 'link',
+    favicon: faviconFor(url),
+    fallbackIcon: fallbackIconFor(url),
   }
 }
 
@@ -134,7 +94,7 @@ export default {
       // an entry nobody can follow is noise here — its favicon and label would be derived
       // from a string that is not an address. The owner still sees and can fix the row on
       // their own settings page, which renders no href at all.
-      return socialMedia.filter(({ url }) => linkable(url)).map(({ url }) => describe(url))
+      return socialMedia.filter(({ url }) => followable(url)).map(({ url }) => describe(url))
     },
   },
 }

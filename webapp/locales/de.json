@@ -490,6 +490,7 @@
       "eventLocationNameNotEmpty": "Bitte eine Adresse eingeben.",
       "eventVenueLength": "Die Ortsbeschreibung muss zwischen {min} und {max} Zeichen lang sein.",
       "eventVenueNotEmpty": "Bitte eine Ortsbeschreibung eingeben.",
+      "followableUrl": "muss eine gültige Web- oder E-Mail-Adresse sein",
       "formHasErrors": "Bitte alle Pflichtfelder ausfüllen.",
       "titleLength": "Der Titel muss zwischen {min} und {max} Zeichen lang sein.",
       "titleNotEmpty": "Bitte einen Titel eingeben.",

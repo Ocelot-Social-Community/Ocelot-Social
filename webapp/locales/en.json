@@ -490,6 +490,7 @@
       "eventLocationNameNotEmpty": "Please enter an address.",
       "eventVenueLength": "The venue description must be between {min} and {max} characters long.",
       "eventVenueNotEmpty": "Please enter a venue description.",
+      "followableUrl": "must be a valid web address or mail address",
       "formHasErrors": "Please fill in all required fields.",
       "titleLength": "The title must be between {min} and {max} characters.",
       "titleNotEmpty": "Please enter a title.",

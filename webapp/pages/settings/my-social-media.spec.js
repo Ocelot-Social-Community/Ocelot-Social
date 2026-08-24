@@ -59,6 +59,30 @@ describe('my-social-media.vue', () => {
         input = wrapper.find('input#editSocialMedia')
       })
 
+      it.each([
+        ['a mail address', 'mailto:someone@example.org'],
+        ['a web address', 'https://example.org/profile'],
+      ])('accepts %s, the same values the profile card renders', async (_case, url) => {
+        // The form used async-validator's `type: 'url'`, whose pattern requires a `//`
+        // authority — so a mailto the backend stores and the card displays could not be saved
+        // here. Both sides ask ~/utils/followableUrl now.
+        input.setValue(url)
+        form.trigger('submit')
+        await Vue.nextTick()
+        await flushPromises()
+        expect(mocks.$apollo.mutate).toHaveBeenCalled()
+      })
+
+      it.each([
+        ['a scheme a browser must not follow', 'javascript:alert(1)'],
+        ['a mailto carrying a bcc', 'mailto:someone@example.org?bcc=evil@example.tld'],
+      ])('still refuses %s', async (_case, url) => {
+        input.setValue(url)
+        form.trigger('submit')
+        await Vue.nextTick()
+        expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+      })
+
       it('requires the link to be a valid url', async () => {
         input.setValue('some value')
         form.trigger('submit')

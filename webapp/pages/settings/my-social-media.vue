@@ -39,6 +39,7 @@ import MySomethingList from '~/components/_new/features/MySomethingList/MySometh
 import SocialMediaListItem from '~/components/_new/features/SocialMedia/SocialMediaListItem.vue'
 import scrollToContent from './scroll-to-content.js'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
+import { fallbackIconFor, faviconFor, followable } from '~/utils/followableUrl'
 
 export default {
   mixins: [scrollToContent],
@@ -55,8 +56,16 @@ export default {
       },
       useFormSchema: {
         socialMediaUrl: {
-          type: 'url',
-          message: this.$t('common.validations.url'),
+          // Not async-validator's `type: 'url'`: its pattern requires a `//` authority, so it
+          // rejects every `mailto:` — a value the backend accepts and the profile card
+          // renders. The form and the card now ask the same question.
+          //
+          // The empty value passes, as it did before: a built-in type skips an empty field
+          // while a custom validator runs on every one, so without this the form is invalid
+          // from the moment it mounts and never opens for input. Whether a value is REQUIRED
+          // is a separate rule, and not one this field carries.
+          validator: (_rule, value) => value === '' || followable(value),
+          message: this.$t('common.validations.followableUrl'),
         },
       },
     }
@@ -66,13 +75,13 @@ export default {
       currentUser: 'auth/user',
     }),
     socialMediaLinks() {
-      const domainRegex = /^(?:https?:\/\/)?(?:[^@\n])?(?:www\.)?([^:/\n?]+)/g
       const { socialMedia = [] } = this.currentUser
-      return socialMedia.map(({ id, url }) => {
-        const [domain] = url.match(domainRegex) || []
-        const favicon = domain ? `${domain}/favicon.ico` : null
-        return { id, url, favicon }
-      })
+      return socialMedia.map(({ id, url }) => ({
+        id,
+        url,
+        favicon: faviconFor(url),
+        fallbackIcon: fallbackIconFor(url),
+      }))
     },
     mySomethingListTexts() {
       return {
