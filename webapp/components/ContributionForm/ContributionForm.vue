@@ -79,18 +79,6 @@
           <!-- event data -->
           <div v-if="postType === 'Event'" class="eventData">
             <div class="ds-mt-x-small ds-mb-small"></div>
-            <div class="event-online-checkbox">
-              <input
-                type="checkbox"
-                id="event-is-online"
-                v-model="formData.eventIsOnline"
-                model="eventIsOnline"
-                name="eventIsOnline"
-                class="event-grid-item-font-helper"
-                @change="changeEventIsOnline($event)"
-              />
-              <label for="event-is-online">{{ $t('post.viewEvent.eventIsOnline') }}</label>
-            </div>
             <div class="ds-grid event-date-grid">
               <div class="event-grid-item">
                 <p class="ds-text select-label">{{ $t('post.viewEvent.eventStart') }}</p>
@@ -101,7 +89,6 @@
                   value-type="date"
                   :minute-step="15"
                   format="DD.MM.YYYY HH:mm"
-                  :placeholder="$t('post.viewEvent.eventStart')"
                   :class="{ 'mx-datepicker-error': visibleErrors && visibleErrors.eventStart }"
                   :show-second="false"
                   @change="changeEventStart($event)"
@@ -127,7 +114,6 @@
                   :minute-step="15"
                   :seconds-step="0"
                   format="DD.MM.YYYY HH:mm"
-                  :placeholder="$t('post.viewEvent.eventEnd')"
                   :class="[
                     'event-grid-item-font-helper',
                     { 'mx-datepicker-error': visibleErrors && visibleErrors.eventEnd },
@@ -156,6 +142,18 @@
               :variant="visibleErrors && visibleErrors.eventVenue ? 'error' : null"
               :text="venueErrorText"
             />
+            <div class="event-online-checkbox">
+              <input
+                type="checkbox"
+                id="event-is-online"
+                v-model="formData.eventIsOnline"
+                model="eventIsOnline"
+                name="eventIsOnline"
+                class="event-grid-item-font-helper"
+                @change="changeEventIsOnline($event)"
+              />
+              <label for="event-is-online">{{ $t('post.viewEvent.eventIsOnline') }}</label>
+            </div>
             <div
               :class="{
                 'ds-input-has-error':
@@ -710,11 +708,23 @@ export default {
   margin-top: 0;
 }
 
-/* Editor's own margin-top lives on .editor-content, nested two levels below
-   its root .editor element — out of reach of the adjacent-sibling rule
-   above, which only touches .editor itself. */
-.contribution-form .select-label + .editor .editor-content {
-  margin-top: 0;
+/* Editor's own margin-top lives on .editor-content (the space between its
+   own toolbar and the text area), nested inside the error-state wrapper div
+   that's the label's actual sibling here — out of reach of the
+   adjacent-sibling rule above, which only touches that wrapper div itself,
+   not its descendants. Matched to the label's own gap above the toolbar
+   (--space-xx-small padding-bottom + --space-xx-small margin-bottom = 8px)
+   rather than 0, so both gaps read the same. */
+.contribution-form .select-label + div .editor-content {
+  margin-top: var(--space-x-small);
+}
+
+/* Same .os-card__content > .ds-form-item margin reset as the rule above it,
+   but for form-items nested one level deeper inside .eventData — otherwise
+   they keep .ds-form-item's own default margin-bottom, spacing them further
+   from their validation-hint than every other field in this form. */
+.eventData > .ds-form-item {
+  margin-bottom: 0;
 }
 
 .eventData {

@@ -1261,7 +1261,7 @@
       "eventStart": "Start",
       "eventStartInPast": "The event start is in the past.",
       "eventStartNotEmpty": "Please enter a start date.",
-      "eventVenue": "Location description — e.g. backyard, 1st floor, …",
+      "eventVenue": "e.g. Café Chrysander, at Bergedorf Castle",
       "eventVenueLabel": "Location description",
       "pickLocationOnMap": "Pick location on map",
       "title": "Event",
