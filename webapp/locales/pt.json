@@ -605,6 +605,7 @@
     "categories": {
       "infoSelectedNoOfMaxCategories": "{chosen} de {max} categorias selecionadas"
     },
+    "categoriesTitle": "Tópicos",
     "category": {
       "description": {
         "body-and-excercise": "Esportes, yoga, massagem, relaxamento",
@@ -662,6 +663,7 @@
         }
       }
     },
+    "content": "Conteúdo",
     "emotions-label": {
       "angry": "Irritado",
       "cry": "Chorar",
@@ -1254,11 +1256,13 @@
       "eventEndBeforeStart": "A data de término deve ser posterior à data de início.",
       "eventIsOnline": "Online",
       "eventLocationName": "Endereço para navegação — ex.: Rua Exemplo 1, 12345 Cidade",
+      "eventLocationNameLabel": "Endereço",
       "eventLocationRequired": "Se o evento não for online, uma localização deve ser inserida.",
       "eventStart": "Início",
       "eventStartInPast": "A data de início está no passado.",
       "eventStartNotEmpty": "Por favor, insira uma data de início.",
       "eventVenue": "Descrição do local — ex.: quintal, 1º andar, …",
+      "eventVenueLabel": "Descrição do local",
       "pickLocationOnMap": "Escolher localização no mapa",
       "title": "Evento",
       "viewOnMainMap": "Ver no mapa principal"

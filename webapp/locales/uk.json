@@ -605,6 +605,7 @@
     "categories": {
       "infoSelectedNoOfMaxCategories": "Вибрано {chosen} з {max} тем"
     },
+    "categoriesTitle": "Теми",
     "category": {
       "description": {
         "body-and-excercise": "Спорт, йога, масаж, релаксація",
@@ -662,6 +663,7 @@
         }
       }
     },
+    "content": "Зміст",
     "emotions-label": {
       "angry": "Злість",
       "cry": "Сум",
@@ -1254,11 +1256,13 @@
       "eventEndBeforeStart": "Дата завершення має бути пізніше дати початку.",
       "eventIsOnline": "Онлайн",
       "eventLocationName": "Адреса для навігації — напр. Вулиця Прикладна 1, 01001 Київ",
+      "eventLocationNameLabel": "Адреса",
       "eventLocationRequired": "Якщо захід не проводиться онлайн, необхідно вказати місце проведення.",
       "eventStart": "Початок",
       "eventStartInPast": "Дата початку знаходиться в минулому.",
       "eventStartNotEmpty": "Будь ласка, введіть дату початку.",
       "eventVenue": "Опис місця — напр. подвір'я, 1-й поверх, …",
+      "eventVenueLabel": "Опис місця",
       "pickLocationOnMap": "Вибрати місце на карті",
       "title": "Подія",
       "viewOnMainMap": "Переглянути на головній карті"

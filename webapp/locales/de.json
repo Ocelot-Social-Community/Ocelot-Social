@@ -605,6 +605,7 @@
     "categories": {
       "infoSelectedNoOfMaxCategories": "{chosen} von {max} Themen ausgewählt"
     },
+    "categoriesTitle": "Themen",
     "category": {
       "description": {
         "body-and-excercise": "Sport, Yoga, Massage, Tanzen, Entspannung",
@@ -662,6 +663,7 @@
         }
       }
     },
+    "content": "Inhalt",
     "emotions-label": {
       "angry": "Verärgert",
       "cry": "Zum Weinen",
@@ -1254,11 +1256,13 @@
       "eventEndBeforeStart": "Das Enddatum muss nach dem Startdatum liegen.",
       "eventIsOnline": "Online",
       "eventLocationName": "Adresse für Navi — z.B. Musterstraße 1, 12345 Musterstadt",
+      "eventLocationNameLabel": "Adresse",
       "eventLocationRequired": "Wenn nicht online, ist eine Adresse erforderlich.",
       "eventStart": "Beginn",
       "eventStartInPast": "Der Starttermin liegt in der Vergangenheit.",
       "eventStartNotEmpty": "Bitte ein Startdatum angeben.",
       "eventVenue": "Ortsbeschreibung — z.B. Hinterhof, 1. OG, …",
+      "eventVenueLabel": "Ortsbeschreibung",
       "pickLocationOnMap": "Ort auf der Karte wählen",
       "title": "Veranstaltung",
       "viewOnMainMap": "Auf Hauptkarte anzeigen"

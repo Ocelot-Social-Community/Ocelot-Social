@@ -605,6 +605,7 @@
     "categories": {
       "infoSelectedNoOfMaxCategories": "{chosen} nga {max} tema të zgjedhura"
     },
+    "categoriesTitle": "Temat",
     "category": {
       "description": {
         "body-and-excercise": "Sport, joga, masazh, relaksim",
@@ -662,6 +663,7 @@
         }
       }
     },
+    "content": "Përmbajtja",
     "emotions-label": {
       "angry": "I zemëruar",
       "cry": "Qaj",
@@ -1254,11 +1256,13 @@
       "eventEndBeforeStart": "Data e mbarimit duhet të jetë pas datës së fillimit.",
       "eventIsOnline": "Online",
       "eventLocationName": "Adresa për navigim — p.sh. Rruga Shembull 1, 12345 Qytet",
+      "eventLocationNameLabel": "Adresa",
       "eventLocationRequired": "Nëse ngjarja nuk është online, duhet të futet një vendndodhje.",
       "eventStart": "Fillimi",
       "eventStartInPast": "Data e fillimit është në të kaluarën.",
       "eventStartNotEmpty": "Ju lutem shkruani një datë fillimi.",
       "eventVenue": "Përshkrimi i vendndodhjes — p.sh. oborri, kati 1, …",
+      "eventVenueLabel": "Përshkrimi i vendndodhjes",
       "pickLocationOnMap": "Zgjidh vendndodhjen në hartë",
       "title": "Ngjarje",
       "viewOnMainMap": "Shiko në hartën kryesore"

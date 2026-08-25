@@ -42,7 +42,8 @@
           <div class="ds-mt-base ds-mb-large"></div>
           <ocelot-input
             model="title"
-            :placeholder="$t('contribution.title')"
+            :label="$t('contribution.title')"
+            :placeholder="`${$t('contribution.title')} …`"
             name="title"
             autofocus
             size="large"
@@ -55,6 +56,7 @@
             :variant="visibleErrors && visibleErrors.title ? 'error' : null"
             :text="titleErrorText"
           />
+          <p class="ds-text select-label">{{ $t('contribution.content') }}</p>
           <div :class="{ 'ds-input-has-error': visibleErrors && visibleErrors.content }">
             <editor
               :users="users"
@@ -80,31 +82,18 @@
             <div class="event-online-checkbox">
               <input
                 type="checkbox"
+                id="event-is-online"
                 v-model="formData.eventIsOnline"
                 model="eventIsOnline"
                 name="eventIsOnline"
                 class="event-grid-item-font-helper"
                 @change="changeEventIsOnline($event)"
               />
-              {{ $t('post.viewEvent.eventIsOnline') }}
+              <label for="event-is-online">{{ $t('post.viewEvent.eventIsOnline') }}</label>
             </div>
             <div class="ds-grid event-date-grid">
               <div class="event-grid-item">
-                <ocelot-input
-                  model="eventVenue"
-                  name="eventVenue"
-                  :placeholder="$t('post.viewEvent.eventVenue')"
-                  hide-error
-                  @blur="dirtyFields.eventVenue && touchField('eventVenue')"
-                />
-                <os-validation-hint
-                  :count="formData.eventVenue.length"
-                  :max="formSchema.eventVenue.max"
-                  :variant="visibleErrors && visibleErrors.eventVenue ? 'error' : null"
-                  :text="venueErrorText"
-                />
-              </div>
-              <div class="event-grid-item">
+                <p class="ds-text select-label">{{ $t('post.viewEvent.eventStart') }}</p>
                 <date-picker
                   name="eventStart"
                   v-model="formData.eventStart"
@@ -128,37 +117,8 @@
                   :text="$t('post.viewEvent.eventStartInPast')"
                 />
               </div>
-            </div>
-            <div class="ds-grid event-location-grid">
               <div class="event-grid-item">
-                <div
-                  :class="{
-                    'ds-input-has-error':
-                      !locationSelectDisabled && visibleErrors && visibleErrors.eventLocationName,
-                  }"
-                >
-                  <location-select
-                    v-model="formData.eventLocationName"
-                    types="country,region,postcode,district,place,locality,neighborhood,address,poi"
-                    :show-previous-location="false"
-                    :show-label="false"
-                    :placeholder="$t('post.viewEvent.eventLocationName')"
-                    :disabled="locationSelectDisabled"
-                    @input="
-                      touchField('eventLocationName')
-                      $validateForm()
-                    "
-                  />
-                  <os-validation-hint
-                    v-if="
-                      !locationSelectDisabled && visibleErrors && visibleErrors.eventLocationName
-                    "
-                    variant="error"
-                    :text="$t('post.viewEvent.eventLocationRequired')"
-                  />
-                </div>
-              </div>
-              <div class="event-grid-item">
+                <p class="ds-text select-label">{{ $t('post.viewEvent.eventEnd') }}</p>
                 <date-picker
                   v-model="formData.eventEnd"
                   name="eventEnd"
@@ -182,6 +142,45 @@
                 />
               </div>
             </div>
+            <ocelot-input
+              model="eventVenue"
+              name="eventVenue"
+              :label="$t('post.viewEvent.eventVenueLabel')"
+              :placeholder="$t('post.viewEvent.eventVenue')"
+              hide-error
+              @blur="dirtyFields.eventVenue && touchField('eventVenue')"
+            />
+            <os-validation-hint
+              :count="formData.eventVenue.length"
+              :max="formSchema.eventVenue.max"
+              :variant="visibleErrors && visibleErrors.eventVenue ? 'error' : null"
+              :text="venueErrorText"
+            />
+            <div
+              :class="{
+                'ds-input-has-error':
+                  !locationSelectDisabled && visibleErrors && visibleErrors.eventLocationName,
+              }"
+            >
+              <p class="ds-text select-label">{{ $t('post.viewEvent.eventLocationNameLabel') }}</p>
+              <location-select
+                v-model="formData.eventLocationName"
+                types="country,region,postcode,district,place,locality,neighborhood,address,poi"
+                :show-previous-location="false"
+                :show-label="false"
+                :placeholder="$t('post.viewEvent.eventLocationName')"
+                :disabled="locationSelectDisabled"
+                @input="
+                  touchField('eventLocationName')
+                  $validateForm()
+                "
+              />
+              <os-validation-hint
+                v-if="!locationSelectDisabled && visibleErrors && visibleErrors.eventLocationName"
+                variant="error"
+                :text="$t('post.viewEvent.eventLocationRequired')"
+              />
+            </div>
             <event-location-map
               v-if="!locationSelectDisabled"
               :location="formData.eventLocationName"
@@ -190,6 +189,9 @@
             />
           </div>
           <div class="ds-mt-x-small ds-mb-large"></div>
+          <p v-if="categoriesActive" class="ds-text select-label">
+            {{ $t('contribution.categoriesTitle') }}
+          </p>
           <categories-select
             v-if="categoriesActive"
             model="categoryIds"
@@ -686,6 +688,35 @@ export default {
 </script>
 
 <style>
+/* .ds-text (ds-compat.css) sets its own margin-bottom: var(--font-space-x-large)
+   (~16px) as a longhand AFTER its own margin:0 shorthand, so it wins over
+   .select-label's margin-bottom: 0 on specificity ties purely by source
+   order (ds-compat.css loads after component styles) — the visible gap
+   under every .select-label in this form. Scoping with .contribution-form
+   bumps specificity so this actually wins, regardless of load order.
+   Not all the way to 0 — .select-label's own 4px padding-bottom alone read
+   as too tight; this adds another 4px on top of it (~8px total, matching
+   --space-x-small). */
+.contribution-form .select-label {
+  margin-bottom: var(--space-xx-small);
+}
+
+/* OcelotInput bundles its own label+input into one .ds-form-item, which the
+   rule below (.os-card__content > .ds-form-item) already zeroes the margin
+   on. Fields with a bare .select-label instead (date-picker, location-select)
+   have no such wrapper, so it's the sibling's own default top margin
+   creating the remaining gap — remove it directly. */
+.contribution-form .select-label + * {
+  margin-top: 0;
+}
+
+/* Editor's own margin-top lives on .editor-content, nested two levels below
+   its root .editor element — out of reach of the adjacent-sibling rule
+   above, which only touches .editor itself. */
+.contribution-form .select-label + .editor .editor-content {
+  margin-top: 0;
+}
+
 .eventData {
   .chipbox {
     display: flex;
@@ -695,8 +726,7 @@ export default {
       margin-top: -10px;
     }
   }
-  .event-date-grid,
-  .event-location-grid {
+  .event-date-grid {
     grid-template-columns: repeat(2, 1fr);
     grid-auto-rows: auto;
     gap: var(--space-small);
