@@ -406,6 +406,14 @@ describe('ContributionForm.vue', () => {
           }
           wrapper = Wrapper()
           expect(wrapper.findComponent(ResponsiveImage).exists()).toBe(true)
+          // Not "does not exist": ResponsiveImage's own root is an <img>, and
+          // Vue passes the class="image" binding straight through onto it —
+          // so img.image legitimately matches ResponsiveImage's own element
+          // here. What actually guards against a double render is the
+          // v-if/v-else-if pair being mutually exclusive, i.e. exactly one
+          // img.image in the tree, not the plain-<img> fallback rendering
+          // alongside it.
+          expect(wrapper.findAll('img.image')).toHaveLength(1)
         })
 
         it('renders a freshly picked (not yet saved) image as a plain <img>, not ResponsiveImage', async () => {
