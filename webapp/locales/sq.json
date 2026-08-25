@@ -490,10 +490,10 @@
       "eventLocationNameNotEmpty": "Ju lutem shkruani një adresë.",
       "eventVenueLength": "Përshkrimi i vendit duhet të ketë midis {min} dhe {max} karaktere.",
       "eventVenueNotEmpty": "Ju lutem shkruani një përshkrim të vendit.",
+      "followableUrl": "duhet të jetë një adresë uebi ose e-mail e vlefshme",
       "formHasErrors": "Ju lutem plotësoni të gjitha fushat e detyrueshme.",
       "titleLength": "Titulli duhet të ketë midis {min} dhe {max} karaktere.",
-      "titleNotEmpty": "Ju lutem shkruani një titull.",
-      "url": "duhet të jetë një URL e vlefshme"
+      "titleNotEmpty": "Ju lutem shkruani një titull."
     },
     "versus": "Kundër"
   },
@@ -1645,6 +1645,7 @@
       "edit-link": "Ndrysho lidhjen",
       "name": "Rrjetet sociale",
       "placeholder": "URL-ja jote e rrjeteve sociale",
+      "privacy-hint": "Lidhjet që shton këtu shfaqen në profilin tënd. Një adresë e-mail do të jetë e dukshme për të gjithë ata që mund të shohin profilin tënd.",
       "requireUnique": "E ke shtuar tashmë këtë URL",
       "submit": "Shto lidhje",
       "successAdd": "Rrjeti social u shtua. Profili i përdoruesit u përditësua!",

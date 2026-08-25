@@ -490,10 +490,10 @@
       "eventLocationNameNotEmpty": "Voer een adres in.",
       "eventVenueLength": "De plaatsbeschrijving moet tussen {min} en {max} tekens lang zijn.",
       "eventVenueNotEmpty": "Voer een plaatsbeschrijving in.",
+      "followableUrl": "moet een geldig webadres of e-mailadres zijn",
       "formHasErrors": "Vul alstublieft alle verplichte velden in.",
       "titleLength": "De titel moet tussen {min} en {max} tekens lang zijn.",
-      "titleNotEmpty": "Voer een titel in.",
-      "url": "moet een geldige URL zijn"
+      "titleNotEmpty": "Voer een titel in."
     },
     "versus": "Versus"
   },
@@ -1645,6 +1645,7 @@
       "edit-link": "Link bewerken",
       "name": "Sociale media",
       "placeholder": "Je sociale media url",
+      "privacy-hint": "Links die je hier toevoegt, worden op je profiel getoond. Een e-mailadres is dan zichtbaar voor iedereen die je profiel kan zien.",
       "requireUnique": "Je hebt deze url al toegevoegd",
       "submit": "Link toevoegen",
       "successAdd": "Sociale media toegevoegd. Gebruikersprofiel bijgewerkt!",
