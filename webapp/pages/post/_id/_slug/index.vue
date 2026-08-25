@@ -99,11 +99,11 @@
             </div>
             <!-- Same ribbon as PostTeaser (type only here — deliberately no
                  pinned state, that's only meaningful while browsing a list). -->
-            <hc-ribbon
+            <os-ribbon
               class="post-detail-ribbon"
               :class="post.image ? 'post-detail-ribbon-w-img' : ''"
               :text="ribbonText"
-              :typ="post.postType && post.postType[0]"
+              :type="post.postType && post.postType[0]"
             />
           </section>
           <div class="ds-mb-small"></div>
@@ -247,7 +247,15 @@
 </template>
 
 <script>
-import { OsButton, OsCard, OsCounterIcon, OsIcon, OsMenu, OsActionButton } from '@ocelot-social/ui'
+import {
+  OsButton,
+  OsCard,
+  OsCounterIcon,
+  OsIcon,
+  OsMenu,
+  OsActionButton,
+  OsRibbon,
+} from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import CommentForm from '~/components/CommentForm/CommentForm'
@@ -262,7 +270,6 @@ import GroupAvatarPopover from '~/components/GroupAvatar/GroupAvatarPopover'
 import HcCategory from '~/components/Category'
 import HcEmpty from '~/components/Empty/Empty'
 import HcHashtag from '~/components/Hashtag/Hashtag'
-import HcRibbon from '~/components/Ribbon'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
 import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
 import { useShout } from '~/composables/useShout'
@@ -307,9 +314,9 @@ export default {
     HcCategory,
     HcEmpty,
     HcHashtag,
-    HcRibbon,
     LocationTeaser,
     OsActionButton,
+    OsRibbon,
     ResponsiveImage,
     UserAvatar,
     UserAvatarHelper,

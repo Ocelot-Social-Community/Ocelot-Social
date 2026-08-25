@@ -30,10 +30,11 @@
       <client-only>
         <div class="post-user-row">
           <user-avatar :user="post.author" :group="post.group" />
-          <hc-ribbon
-            :class="[isPinned ? '--pinned' : '', post.image ? 'post-ribbon-w-img' : 'post-ribbon']"
+          <os-ribbon
+            :class="post.image ? 'post-ribbon-w-img' : 'post-ribbon'"
             :text="ribbonText"
-            :typ="post.postType[0]"
+            :type="post.postType[0]"
+            :pinned="isPinned"
           />
         </div>
         <template #placeholder>
@@ -166,12 +167,11 @@
 </template>
 
 <script>
-import { OsCounterIcon, OsCard, OsIcon } from '@ocelot-social/ui'
+import { OsCounterIcon, OsCard, OsIcon, OsRibbon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import Category from '~/components/Category'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
-import HcRibbon from '~/components/Ribbon'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
 import DateTime from '~/components/DateTime'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
@@ -191,7 +191,7 @@ export default {
     OsCard,
     OsIcon,
     DateTimeRange,
-    HcRibbon,
+    OsRibbon,
     LocationTeaser,
     DateTime,
     UserAvatar,
