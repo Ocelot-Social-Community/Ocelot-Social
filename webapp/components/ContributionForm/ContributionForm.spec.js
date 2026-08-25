@@ -448,6 +448,16 @@ describe('ContributionForm.vue', () => {
         expect(wrapper.find('div.eventData').exists()).toBe(true)
       })
 
+      it('associates the start, end and address labels with their inputs', () => {
+        const [startPicker, endPicker] = wrapper.findAllComponents({ name: 'DatePicker' }).wrappers
+        expect(wrapper.find('label[for="event-start-input"]').exists()).toBe(true)
+        expect(startPicker.props('inputAttr')).toEqual({ id: 'event-start-input' })
+        expect(wrapper.find('label[for="event-end-input"]').exists()).toBe(true)
+        expect(endPicker.props('inputAttr')).toEqual({ id: 'event-end-input' })
+        expect(wrapper.find('label[for="city"]').exists()).toBe(true)
+        expect(wrapper.find('#city').exists()).toBe(true)
+      })
+
       it('shows past-start warning immediately when editing an event with a past start date', () => {
         const pastDate = new Date(Date.now() - 24 * 60 * 60 * 1000) // yesterday
         propsData.contribution = { eventStart: pastDate.toISOString() }

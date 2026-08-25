@@ -16,14 +16,24 @@ function createStubMapboxGl() {
   function stubControl() {
     return {}
   }
+  // Real mapbox-gl-js calls a custom control's onAdd() synchronously inside
+  // addControl() and appends the returned element into the map's own
+  // container — that's what actually creates/mounts a control's DOM (the
+  // pick-location toggle, style switcher, ...). A no-op stub here would
+  // leave the Editable/WithStyleSwitcher stories showing no controls at all.
+  const mapContainer = document.createElement('div')
   const stubMap = {
-    addControl: () => {},
+    addControl: (control?: { onAdd?: () => HTMLElement }) => {
+      if (typeof control?.onAdd === 'function') {
+        mapContainer.appendChild(control.onAdd())
+      }
+    },
     on: () => {},
     flyTo: () => {},
     setStyle: () => {},
     remove: () => {},
     resize: () => {},
-    getContainer: () => document.createElement('div'),
+    getContainer: () => mapContainer,
     // Read by setPicking() (cursor styling) and flyToPin() (never zooming
     // back out below the current level).
     getCanvas: () => document.createElement('canvas'),

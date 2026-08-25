@@ -705,7 +705,19 @@ export default {
       })
       // add markers for "posts", post type "Event" with location coordinates
       this.posts.forEach((post) => {
-        if (!post.eventLocation) return
+        // hasLocation (the query filter) only guarantees the Post-[:IS_IN]->Location
+        // relationship exists, not that that Location node itself got lat/lng —
+        // e.g. a region-level or otherwise-incompletely-geocoded one doesn't.
+        // Pushing [null, null] here breaks mapbox-gl's rendering of every marker,
+        // not just this one, so events without real coordinates are skipped.
+        const { eventLocation } = post
+        if (
+          !eventLocation ||
+          typeof eventLocation.lat !== 'number' ||
+          typeof eventLocation.lng !== 'number'
+        ) {
+          return
+        }
         geoJSON.push({
           type: 'Feature',
           properties: {

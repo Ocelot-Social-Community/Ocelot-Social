@@ -875,7 +875,16 @@ describe('osLocationMap', () => {
       })
 
       await wrapper.find('.os-location-map__search-input').setValue('Berlin')
-      await wrapper.find('.os-location-map__search-result').trigger('click')
+      const result = wrapper.find('.os-location-map__search-result')
+
+      // Real button semantics (keyboard-focusable/activatable), not a
+      // clickable <li> — and type="button" specifically, so it can't
+      // accidentally submit a host form the way a type-less/submit button
+      // inside a <form> would.
+      expect(result.element.tagName).toBe('BUTTON')
+      expect(result.attributes('type')).toBe('button')
+
+      await result.trigger('click')
 
       expect(wrapper.emitted('search-select')).toStrictEqual([
         [{ id: '1', label: 'Berlin, Germany', lat: 52.5, lng: 13.4 }],

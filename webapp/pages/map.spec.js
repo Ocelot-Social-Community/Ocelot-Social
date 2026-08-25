@@ -886,6 +886,19 @@ describe('map', () => {
           expect(eventFeatures[0].properties.locationName).toBe('Stuttgart')
         })
 
+        it('skips an event whose eventLocation has no numeric coordinates, instead of pushing [null, null]', async () => {
+          const incompleteLocationPost = {
+            ...posts[0],
+            id: 'e2',
+            eventLocation: { id: 'loc5', name: 'Somewhere', lng: null, lat: null },
+          }
+          await wrapper.setData({ posts: [posts[0], incompleteLocationPost] })
+          const eventFeatures = wrapper.vm
+            .buildMarkersGeoJSON()
+            .filter((f) => f.properties.type === 'event')
+          expect(eventFeatures.map((f) => f.properties.id)).toEqual(['e1'])
+        })
+
         it('adds source and layer to map', () => {
           expect(mapAddSourceMock).toHaveBeenCalledWith(
             'markers',

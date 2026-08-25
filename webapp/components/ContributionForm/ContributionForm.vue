@@ -81,7 +81,9 @@
             <div class="ds-mt-x-small ds-mb-small"></div>
             <div class="ds-grid event-date-grid">
               <div class="event-grid-item">
-                <p class="ds-text select-label">{{ $t('post.viewEvent.eventStart') }}</p>
+                <label for="event-start-input" class="ds-text select-label">
+                  {{ $t('post.viewEvent.eventStart') }}
+                </label>
                 <date-picker
                   name="eventStart"
                   v-model="formData.eventStart"
@@ -89,6 +91,7 @@
                   value-type="date"
                   :minute-step="15"
                   format="DD.MM.YYYY HH:mm"
+                  :input-attr="{ id: 'event-start-input' }"
                   :class="{ 'mx-datepicker-error': visibleErrors && visibleErrors.eventStart }"
                   :show-second="false"
                   @change="changeEventStart($event)"
@@ -105,7 +108,9 @@
                 />
               </div>
               <div class="event-grid-item">
-                <p class="ds-text select-label">{{ $t('post.viewEvent.eventEnd') }}</p>
+                <label for="event-end-input" class="ds-text select-label">
+                  {{ $t('post.viewEvent.eventEnd') }}
+                </label>
                 <date-picker
                   v-model="formData.eventEnd"
                   name="eventEnd"
@@ -114,6 +119,7 @@
                   :minute-step="15"
                   :seconds-step="0"
                   format="DD.MM.YYYY HH:mm"
+                  :input-attr="{ id: 'event-end-input' }"
                   :class="[
                     'event-grid-item-font-helper',
                     { 'mx-datepicker-error': visibleErrors && visibleErrors.eventEnd },
@@ -160,7 +166,9 @@
                   !locationSelectDisabled && visibleErrors && visibleErrors.eventLocationName,
               }"
             >
-              <p class="ds-text select-label">{{ $t('post.viewEvent.eventLocationNameLabel') }}</p>
+              <label for="city" class="ds-text select-label">
+                {{ $t('post.viewEvent.eventLocationNameLabel') }}
+              </label>
               <location-select
                 v-model="formData.eventLocationName"
                 types="country,region,postcode,district,place,locality,neighborhood,address,poi"
