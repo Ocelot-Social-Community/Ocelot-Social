@@ -700,15 +700,19 @@ export default {
 }
 
 /* main.css's ".os-card > .title" sizes teaser-card titles (e.g. a post
-   teaser in a feed) at --font-size-large. OsCard only nests this h1 one
-   level deeper (inside .os-card__content) when the post has a hero image,
-   so without one this h1 was also a *direct* child of .os-card and matched
+   teaser in a feed) at --font-size-large and gives them a tight
+   margin-bottom of --space-x-small. OsCard only nests this h1 one level
+   deeper (inside .os-card__content) when the post has a hero image, so
+   without one this h1 was also a *direct* child of .os-card and matched
    that rule — with 2 classes it out-specifies .ds-heading-h1's single
-   class, silently shrinking the title whenever the post had no image.
-   Re-assert ds-heading-h1's own sizing here with higher specificity so it
-   wins regardless of hero-image-driven nesting depth. */
+   class, silently shrinking the title and the gap below it whenever the
+   post had no image (visible e.g. on events, which rarely carry a hero
+   image, vs. articles, which usually do).
+   Re-assert ds-heading-h1's own sizing/spacing here with higher
+   specificity so it wins regardless of hero-image-driven nesting depth. */
 .post-page .title.hyphenate-text {
   font-size: var(--font-size-xx-large);
+  margin-bottom: 0.6em;
 }
 @media (--vp-desktop-up) {
   .post-page .title.hyphenate-text {
@@ -863,14 +867,7 @@ export default {
   gap: var(--space-small);
 }
 
-.event-data__info {
-  padding: 10px;
-}
-
-/* Same left/right inset as .event-data__info above, so the map's edges
-   line up with the location/date text instead of running edge-to-edge. */
 .event-data__map {
-  padding: 0 10px;
   /* Extra breathing room below the map specifically — the surrounding
      ds-mb-small spacers are shared across the page and fine for the
      location/date text alone, but felt cramped after the map's large,
