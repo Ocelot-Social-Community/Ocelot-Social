@@ -43,7 +43,6 @@
           <ocelot-input
             model="title"
             :label="$t('contribution.title')"
-            :placeholder="`${$t('contribution.title')} …`"
             name="title"
             autofocus
             size="large"
