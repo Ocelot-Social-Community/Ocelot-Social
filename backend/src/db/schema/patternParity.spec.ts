@@ -60,7 +60,13 @@ const TRICKY: readonly (readonly [string, string])[] = [
 const SAMPLES = new Map<string, readonly string[]>([
   [SLUG, ['peter-pan']],
   [EMAIL, ['someone@example.org']],
-  [FOLLOWABLE_URL, ['https://example.org/path', 'mailto:someone@example.org']],
+  // Three, not two: the http branch now has a boundary inside it — no `@` in the authority,
+  // any `@` past the first `/`, `?` or `#` — and a sample that never reaches the path would
+  // leave the half where a dialect disagreement actually costs something unmeasured.
+  [
+    FOLLOWABLE_URL,
+    ['https://example.org/path', 'https://mastodon.social/@user', 'mailto:someone@example.org'],
+  ],
   [ISO_DATE_TIME, ['2026-08-21T10:00:00.000Z']],
 ])
 

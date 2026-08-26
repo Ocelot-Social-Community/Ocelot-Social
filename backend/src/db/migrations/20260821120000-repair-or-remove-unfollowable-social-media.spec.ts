@@ -78,7 +78,28 @@ describe('repair', () => {
     ['some%20one@example.org'],
     ['user:secret@example.org'],
   ])('removes %j rather than guessing a host out of an address', (url) => {
+    // And emphatically not by stripping: `https://` + `user:secret@example.org` parses as a
+    // user at `example.org`, so stripping would leave a link to a site the owner never named.
+    // Credentials are dropped only from a value that already carried an http(s) scheme.
     expect(repair(url)).toBeNull()
+  })
+
+  it.each([
+    ['https://user:secret@example.org/profile', 'https://example.org/profile'],
+    ['https://user@example.org/x', 'https://example.org/x'],
+    ['HTTP://user:secret@example.org', 'http://example.org/'],
+  ])('keeps the link in %j and drops the password', (url, expected) => {
+    // The card used to strip these at render time, which kept the secret off the visible page
+    // and did nothing about the exposure: the profile query returns the raw url, so it reached
+    // every visitor's page state and every API client anyway. Removing the row would take the
+    // link with it — the site is what the owner meant, only the credentials are not.
+    expect(repair(url)).toBe(expected)
+  })
+
+  it('leaves an `@` in the path alone, which is how the fediverse writes a profile url', () => {
+    // The `@` that matters sits in the AUTHORITY. A rule that cannot tell the two apart would
+    // delete half the mastodon links on the instance.
+    expect(repair('https://mastodon.social/@user')).toBe('https://mastodon.social/@user')
   })
 
   it.each([

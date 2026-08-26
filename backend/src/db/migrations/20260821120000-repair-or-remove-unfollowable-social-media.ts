@@ -52,15 +52,6 @@ export const description = `
 const followable = new RegExp(FOLLOWABLE_URL)
 
 /**
- * The repaired value, or null when there is nothing to repair it into.
- *
- * Candidates in order, first one the declaration accepts wins. The order is the whole logic:
- * `someone@example.org` prefixed with `https://` parses as a url whose USERNAME is `someone`
- * and whose host is `example.org` — a valid address pointing somewhere the owner never meant.
- * So the mail reading is offered first. And `mastodon.social/@user` has to reach the https
- * candidate even though it contains an `@`, which an if/else on "has an @" gets wrong.
- */
-/**
  * Whether a value we GUESSED a scheme for really names a host on the public internet.
  *
  * Two ways the guess goes wrong, both of which `new URL` accepts without complaint:
@@ -109,6 +100,44 @@ const readings = (address: string): string[] => {
   }
 }
 
+/**
+ * The same url without its credentials, or null when it carries none.
+ *
+ * `https://user:secret@example.org/x` names a site the owner meant; only the credentials do not
+ * belong on a public profile. Removing the row would take the link away too, so the secret is
+ * dropped and the link kept. `toString()` normalising the rest — a trailing slash, a lower-cased
+ * scheme — is acceptable here precisely because this value is being rewritten anyway.
+ *
+ * Offered only for a value that already carried an http(s) scheme. In the GUESSED branch the
+ * same shape means the opposite: `some one@example.org` with `https://` in front parses as a
+ * user at `example.org`, and stripping would leave a link to a site the owner never named. That
+ * one is refused by namesAPublicHost instead.
+ */
+const withoutCredentials = (candidate: string): string | null => {
+  try {
+    const parsed = new URL(candidate)
+    if (parsed.username === '' && parsed.password === '') {
+      return null
+    }
+    parsed.username = ''
+    parsed.password = ''
+    return parsed.toString()
+    // eslint-disable-next-line no-catch-all/no-catch-all -- the question IS "does this parse"
+  } catch {
+    // `new URL` signals "not a url" the only way it can. There is no other error to let past.
+    return null
+  }
+}
+
+/**
+ * The repaired value, or null when there is nothing to repair it into.
+ *
+ * Candidates in order, first one the declaration accepts wins. The order is the whole logic:
+ * `someone@example.org` prefixed with `https://` parses as a url whose USERNAME is `someone`
+ * and whose host is `example.org` — a valid address pointing somewhere the owner never meant.
+ * So the mail reading is offered first. And `mastodon.social/@user` has to reach the https
+ * candidate even though it contains an `@`, which an if/else on "has an @" gets wrong.
+ */
 export const repair = (value: string): string | null => {
   const trimmed = value.trim()
   const scheme = /^([a-z][a-z0-9+.-]*):/i.exec(trimmed)
@@ -117,6 +146,13 @@ export const repair = (value: string): string | null => {
   if (scheme?.[1].toLowerCase() === 'mailto') {
     // A mailto carrying more than an address: keep the address, drop the rest.
     candidates.push(...readings(trimmed.slice('mailto:'.length).split('?')[0]))
+  }
+  if (scheme !== null && ['http', 'https'].includes(scheme[1].toLowerCase())) {
+    // A link with a password in it: keep the link, drop the password.
+    const stripped = withoutCredentials(trimmed)
+    if (stripped !== null) {
+      candidates.push(stripped)
+    }
   }
   if (!scheme) {
     // Typed without a scheme — either an address or a host.

@@ -95,6 +95,19 @@ const MAILTO_ADDRESS = `[^@,?%${WHITESPACE}]+@[^@.,?%${WHITESPACE}]+([.][^@.,?%$
  * (webapp/components/SocialMedia). And it is worth saying out loud that a mailto here PUBLISHES
  * that address on a page open to everyone — the primary address of an account is protected,
  * one typed into this field is not.
+ *
+ * NO CREDENTIALS. `https://user:secret@example.org` is refused, and refused here rather than
+ * hidden at render time. The profile card used to strip the credentials out of the label and
+ * the href, which kept the password off the visible page and did nothing about the exposure
+ * itself: the profile query asks for `socialMedia { id url }`, so the stored string is
+ * serialised into every visitor's page state, and an API-key client reads it verbatim. A value
+ * nobody may see is not a rendering problem.
+ *
+ * The authority — everything between `//` and the first `/`, `?` or `#` — therefore admits no
+ * `@`. Past that boundary an `@` is ordinary, and has to be: `https://mastodon.social/@user`
+ * is how half the fediverse writes a profile url, and a rule that cannot tell the two apart
+ * would delete those rows. This is the reason the http branch is not simply `[^WS]+`.
  */
-export const FOLLOWABLE_URL =
-  `^([hH][tT][tT][pP][sS]?://[^${WHITESPACE}]+` + `|[mM][aA][iI][lL][tT][oO]:${MAILTO_ADDRESS})$`
+const HTTP_URL = `[hH][tT][tT][pP][sS]?://[^@/?#${WHITESPACE}]+([/?#][^${WHITESPACE}]*)?`
+
+export const FOLLOWABLE_URL = `^(${HTTP_URL}|[mM][aA][iI][lL][tT][oO]:${MAILTO_ADDRESS})$`
