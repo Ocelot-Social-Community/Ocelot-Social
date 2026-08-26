@@ -334,6 +334,49 @@ describe('Location Service', () => {
     expect(calledUrls[1]).toContain('types=poi')
   })
 
+  it('prefers an address match over a country match, regardless of the requested type order', async () => {
+    fetchSpy.mockImplementation(async (input: RequestInfo | URL) => {
+      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+      const path = decodeURIComponent(url)
+      // A coordinate matches essentially every "country" reverse-geocode
+      // lookup — if country were tried first (as it is in the caller-given
+      // order below, and in DEFAULT_LOCATION_TYPES), it would short-circuit
+      // the loop before the more specific address is ever requested.
+      if (path.includes('9.993,53.551') && path.includes('types=country')) {
+        return Promise.resolve(
+          mockJsonResponse({
+            features: [{ id: 'country.de', place_name: 'Germany', center: [9.993, 53.551] }],
+          }),
+        )
+      }
+      if (path.includes('9.993,53.551') && path.includes('types=address')) {
+        return Promise.resolve(
+          mockJsonResponse({
+            features: [
+              {
+                id: 'address.example',
+                place_name: 'Musterstraße 1, Hamburg',
+                center: [9.993, 53.551],
+              },
+            ],
+          }),
+        )
+      }
+      return Promise.resolve(mockJsonResponse({ features: [] }))
+    })
+
+    // Caller lists country before address — the fix must not just trust this
+    // order, or it would reproduce the bug.
+    variables = { place: '9.993,53.551', lang: 'en', types: 'country,address' }
+    const result = await query({ query: queryLocations, variables })
+
+    expect(result.data.queryLocations).toEqual([
+      { id: 'address.example', place_name: 'Musterstraße 1, Hamburg', lat: 53.551, lng: 9.993 },
+    ])
+    const calledUrls = fetchSpy.mock.calls.map(([input]) => input as string)
+    expect(calledUrls[0]).toContain('types=address')
+  })
+
   it('returns an empty array when reverse geocoding finds no match for any type', async () => {
     variables = { place: '0.0,0.0', lang: 'en', types: 'address,poi' }
     const result = await query({ query: queryLocations, variables })

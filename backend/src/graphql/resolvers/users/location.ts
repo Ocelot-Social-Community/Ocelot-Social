@@ -177,6 +177,15 @@ const ALLOWED_LOCATION_TYPES = [
 ]
 const DEFAULT_LOCATION_TYPES = 'country,region,place,address'
 
+// Reverse geocoding (see queryLocations below) tries one type at a time and
+// returns the first match — most specific first, so a pin dropped on a
+// building returns its address rather than short-circuiting on the country
+// every coordinate on Earth trivially matches. DEFAULT_LOCATION_TYPES above
+// is unsuitable here (country-first): it's tuned for forward/free-text
+// search, where all requested types go into a single combined request and
+// order doesn't affect which results come back.
+const REVERSE_GEOCODE_TYPE_PRIORITY = ['address', 'poi', 'place', 'region', 'country']
+
 // Matches a reverse-geocoding search string ("lng,lat"), as opposed to a
 // free-text place name. Linear-time (two flat, non-nested quantifiers), not
 // vulnerable to catastrophic backtracking despite the linter's warning.
@@ -230,9 +239,20 @@ export const queryLocations = async ({ place, lang, types, proximity }, context:
   // Try each requested type in order, one request at a time, and return the
   // first match — e.g. an exact address, falling back to the nearest POI or
   // place name if there's no addressed building at that exact point.
+  // Always walked in REVERSE_GEOCODE_TYPE_PRIORITY's most-specific-first
+  // order regardless of what order the caller listed them in (or the
+  // country-first DEFAULT_LOCATION_TYPES fallback below), restricted to
+  // types actually requested — otherwise a caller-supplied "country,address"
+  // would short-circuit on the country every coordinate trivially matches
+  // and never reach the address.
   const trimmedPlace = place.trim()
   if (COORDINATE_PATTERN.test(trimmedPlace)) {
-    const reverseTypes = requestedTypes.length ? requestedTypes : DEFAULT_LOCATION_TYPES.split(',')
+    const candidateTypes = requestedTypes.length
+      ? requestedTypes
+      : DEFAULT_LOCATION_TYPES.split(',')
+    const reverseTypes = REVERSE_GEOCODE_TYPE_PRIORITY.filter((type) =>
+      candidateTypes.includes(type),
+    )
     for (const type of reverseTypes) {
       const features = await fetchMapboxFeatures(
         buildMapboxUrl(trimmedPlace, lang, type, 1, proximity, accessToken),

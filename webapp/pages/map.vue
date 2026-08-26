@@ -644,7 +644,7 @@ export default {
       const geoJSON = []
       // add markers for "users"
       this.users.forEach((user) => {
-        if (user.id !== this.currentUser.id) {
+        if (user.id !== this.currentUser.id && this.hasCoordinates(user.location)) {
           geoJSON.push({
             type: 'Feature',
             properties: {
@@ -686,6 +686,9 @@ export default {
       }
       // add markers for "groups"
       this.groups.forEach((group) => {
+        if (!this.hasCoordinates(group.location)) {
+          return
+        }
         geoJSON.push({
           type: 'Feature',
           properties: {
@@ -708,15 +711,8 @@ export default {
       this.posts.forEach((post) => {
         // hasLocation (the query filter) only guarantees the Post-[:IS_IN]->Location
         // relationship exists, not that that Location node itself got lat/lng —
-        // e.g. a region-level or otherwise-incompletely-geocoded one doesn't.
-        // Pushing [null, null] here breaks mapbox-gl's rendering of every marker,
-        // not just this one, so events without real coordinates are skipped.
-        const { eventLocation } = post
-        if (
-          !eventLocation ||
-          typeof eventLocation.lat !== 'number' ||
-          typeof eventLocation.lng !== 'number'
-        ) {
+        // see hasCoordinates() above.
+        if (!this.hasCoordinates(post.eventLocation)) {
           return
         }
         geoJSON.push({
@@ -851,7 +847,22 @@ export default {
     // source in place instead of re-adding it.
     refreshMarkersData() {
       this.markers.geoJSON = this.buildMarkersGeoJSON()
-      this.map.getSource('markers').setData({
+      const source = this.map.getSource('markers')
+      if (!source) {
+        // The source can momentarily be gone mid-style-switch: mapbox-gl
+        // clears every source/layer synchronously on setStyle(), before the
+        // new style's own 'style.load' handler (above) has rebuilt them —
+        // isSourceAndLayerAdded can still read stale-true in that window,
+        // which is what routes an apollo update into this method at all.
+        // Route through the same rebuild path style.load uses instead of
+        // crashing on a missing source.
+        this.markers.isSourceAndLayerAdded = false
+        this.markers.isImagesLoaded = false
+        this.markers.isGeoJSON = false
+        this.loadMarkersIconsAndAddMarkers()
+        return
+      }
+      source.setData({
         type: 'FeatureCollection',
         features: this.markers.geoJSON,
       })
@@ -868,6 +879,15 @@ export default {
     },
     getCoordinates(location) {
       return [location.lng, location.lat]
+    },
+    // A location relationship (Post-[:IS_IN]->Location, same for users/
+    // groups) only guarantees the node exists, not that it has numeric
+    // lat/lng — e.g. a region-level or otherwise-incompletely-geocoded one
+    // doesn't. Pushing [null, null] into the GeoJSON breaks mapbox-gl's
+    // rendering of every marker, not just this one, so anything without real
+    // coordinates must be skipped before getCoordinates() is called on it.
+    hasCoordinates(location) {
+      return !!location && typeof location.lat === 'number' && typeof location.lng === 'number'
     },
     isEventPast,
     async getUserLocation(id) {

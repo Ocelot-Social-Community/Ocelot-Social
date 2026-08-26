@@ -899,6 +899,36 @@ describe('map', () => {
           expect(eventFeatures.map((f) => f.properties.id)).toEqual(['e1'])
         })
 
+        it('skips a user whose location has no numeric coordinates, instead of pushing [null, null]', async () => {
+          const incompleteLocationUser = {
+            id: 'u4',
+            slug: 'nobody',
+            name: 'Nobody',
+            about: null,
+            location: { id: 'loc6', name: 'Somewhere', lng: null, lat: null },
+          }
+          await wrapper.setData({ users: [...otherUsers, incompleteLocationUser] })
+          const userFeatures = wrapper.vm
+            .buildMarkersGeoJSON()
+            .filter((f) => f.properties.type === 'user')
+          expect(userFeatures.map((f) => f.properties.id)).toEqual(otherUsers.map((u) => u.id))
+        })
+
+        it('skips a group whose location has no numeric coordinates, instead of pushing [null, null]', async () => {
+          const incompleteLocationGroup = {
+            id: 'g2',
+            slug: 'no-location',
+            name: 'No Location Group',
+            about: null,
+            location: { id: 'loc7', name: 'Somewhere', lng: null, lat: null },
+          }
+          await wrapper.setData({ groups: [...groups, incompleteLocationGroup] })
+          const groupFeatures = wrapper.vm
+            .buildMarkersGeoJSON()
+            .filter((f) => f.properties.type === 'group')
+          expect(groupFeatures.map((f) => f.properties.id)).toEqual(groups.map((g) => g.id))
+        })
+
         it('adds source and layer to map', () => {
           expect(mapAddSourceMock).toHaveBeenCalledWith(
             'markers',
@@ -1218,6 +1248,24 @@ describe('map', () => {
         updateFn({ User: otherUsers, Group: groups, Post: posts })
         expect(spy).toHaveBeenCalled()
         expect(addSpy).not.toHaveBeenCalled()
+      })
+
+      it('rebuilds the source/layer instead of crashing when refreshMarkersData runs mid-style-switch', async () => {
+        // mapbox-gl clears every source/layer synchronously on setStyle(), before
+        // the new style's own 'style.load' has rebuilt them — isSourceAndLayerAdded
+        // can still read stale-true in that window, so getSource('markers') can
+        // legitimately return nothing even though the flag says otherwise.
+        wrapper.vm.onMapLoad({ map: mapMock })
+        await wrapper.setData({ users: otherUsers, groups, posts })
+        wrapper.vm.markers.isSourceAndLayerAdded = true
+        mapGetSourceMock.mockReturnValueOnce(undefined)
+
+        wrapper.vm.refreshMarkersData()
+        await flushPromises() // flush loadMarkersIconsAndAddMarkers()'s Promise.all().then()
+
+        expect(mapSetDataMock).not.toHaveBeenCalled()
+        expect(mapAddSourceMock).toHaveBeenCalledWith('markers', expect.any(Object))
+        expect(wrapper.vm.markers.isSourceAndLayerAdded).toBe(true)
       })
     })
 
