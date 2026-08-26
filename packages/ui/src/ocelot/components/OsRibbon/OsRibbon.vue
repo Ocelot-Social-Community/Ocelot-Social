@@ -59,7 +59,12 @@
     padding: var(--os-ribbon-padding, 6px);
     border-radius: var(--os-ribbon-radius, 2px) 0 0 var(--os-ribbon-radius, 2px);
     color: var(--os-ribbon-color, rgb(255, 255, 255));
-    background-color: var(--os-ribbon-bg, var(--color-ribbon-article, rgb(10, 161, 255)));
+    /* Literal fallback is deliberately darker than the app's own
+       --color-ribbon-article (rgb(10, 161, 255)) — that brighter blue is
+       under 4.5:1 contrast with white text, which only matters here
+       (Storybook/axe never see --color-ribbon-article, since it's a
+       webapp-only token) — the real app is unaffected either way. */
+    background-color: var(--os-ribbon-bg, var(--color-ribbon-article, rgb(0, 119, 182)));
     font-size: var(--os-ribbon-font-size, 0.7rem);
     font-weight: var(--os-ribbon-font-weight, 600);
   }
@@ -82,7 +87,10 @@
   }
 
   .os-ribbon--event {
-    background-color: var(--os-ribbon-event-bg, var(--color-ribbon-event, rgb(160, 103, 255)));
+    /* Same reasoning as .os-ribbon's own background above — darker than the
+       app's --color-ribbon-event so the Storybook/axe-only literal fallback
+       clears 4.5:1 contrast with white text. */
+    background-color: var(--os-ribbon-event-bg, var(--color-ribbon-event, rgb(111, 66, 193)));
   }
 
   .os-ribbon--event::before {

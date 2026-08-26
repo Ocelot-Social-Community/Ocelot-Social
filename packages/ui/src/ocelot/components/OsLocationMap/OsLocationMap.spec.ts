@@ -564,6 +564,32 @@ describe('osLocationMap', () => {
     }).not.toThrow()
   })
 
+  describe('keyboard accessibility', () => {
+    it('exposes the pick-location toggle as a real, natively focusable button', () => {
+      mount(OsLocationMap, {
+        props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', editable: true },
+      })
+      const toggle = getPickerToggle()
+
+      expect(toggle.tagName).toBe('BUTTON')
+      expect(toggle.getAttribute('type')).toBe('button')
+      expect(toggle.hasAttribute('tabindex')).toBe(false)
+    })
+
+    it('disarms the pick-location tool on Escape, reachable without a mouse', () => {
+      mount(OsLocationMap, {
+        props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', editable: true },
+      })
+      const toggle = getPickerToggle()
+
+      expect(toggle.classList.contains('os-location-map-picker-toggle--active')).toBe(true)
+
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+
+      expect(toggle.classList.contains('os-location-map-picker-toggle--active')).toBe(false)
+    })
+  })
+
   describe('viewOnMap', () => {
     it('does not add a view-on-map control or clickable pin by default', () => {
       mount(OsLocationMap, {

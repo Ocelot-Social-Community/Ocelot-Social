@@ -22,12 +22,14 @@ describe('osRibbon', () => {
     expect((wrapper.element as HTMLElement).tagName).toBe('DIV')
   })
 
-  it('is not keyboard-focusable and contains no focusable controls', () => {
-    const wrapper = mount(OsRibbon, { props: { text: 'Article' } })
-    const el = wrapper.element as HTMLElement
+  describe('keyboard accessibility', () => {
+    it('is not focusable and contains no focusable controls (non-interactive element)', () => {
+      const wrapper = mount(OsRibbon, { props: { text: 'Article' } })
+      const el = wrapper.element as HTMLElement
 
-    expect(el.hasAttribute('tabindex')).toBe(false)
-    expect(el.querySelectorAll('a, button, input, select, textarea, [tabindex]')).toHaveLength(0)
+      expect(el.hasAttribute('tabindex')).toBe(false)
+      expect(el.querySelectorAll('a, button, input, select, textarea, [tabindex]')).toHaveLength(0)
+    })
   })
 
   describe('variants', () => {
