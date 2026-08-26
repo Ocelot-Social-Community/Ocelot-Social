@@ -12,6 +12,10 @@
 # yet) but is far slower under amd64 emulation — prefer the npm/yarn scripts.
 #
 # Manual / advanced usage:
+# These skip their own build step if storybook-static already exists on your
+# machine (see "First run" note below) — if source changed since the last
+# run, either delete storybook-static first or use the npm/yarn scripts
+# above instead, which always rebuild fresh.
 #
 # webapp — New component (missing baseline):
 #   docker compose -f docker-compose.visual.yml run --rm webapp-visual-update
