@@ -61,10 +61,13 @@ describe('TestNode.update', () => {
     )
   })
 
-  it('refuses a value the declaration rejects', async () => {
-    // `name` has minLength 3.
+  it('refuses a value the declaration rejects, and says which rule', async () => {
+    // The message names the property and the rule, not just the entity. Asserting the prefix
+    // alone let any rejection pass: drop a required property from `stored` and this test stays
+    // green while reporting `User must have required property 'name'` — a different failure
+    // than the one it is written for.
     await expect(node(stored).update({ name: 'no' })).rejects.toThrow(
-      'Cannot update a User fixture',
+      'Cannot update a User fixture: User/name must NOT have fewer than 3 characters',
     )
   })
 })
