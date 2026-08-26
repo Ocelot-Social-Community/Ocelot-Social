@@ -83,6 +83,16 @@ describe('TestNode.update against a real node', () => {
     expect(node.get('name')).toBe('Live')
   })
 
+  it('normalises a slug the same way the create path does', async () => {
+    // `withDefaults` lowercased and slugified a caller's slug, and only the create path calls
+    // it — so the same value was accepted and converted on the way in and refused on the way
+    // through, for a pattern the declaration applies to both. What is validated is also what is
+    // written: the query stores the normalised patch, not the raw one.
+    const node = await fixtures.first('User', { id: 'live' })
+    await node.update({ slug: 'Peter Pan' })
+    expect(node.get('slug')).toBe('peter-pan')
+  })
+
   it('tolerates an undeclared property the node already carries', async () => {
     // A legacy shape a migration spec writes on purpose. It is the audit's business, not this
     // caller's — rejecting it would fail an update for something the caller did not do.

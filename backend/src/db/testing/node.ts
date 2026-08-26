@@ -3,7 +3,7 @@ import { relationships } from '@db/schema/relationships'
 import { validateProperties } from '@db/schema/validate'
 
 import { resolveAlias } from './aliases'
-import { asPlainValues, declaredProperty, onlyDeclared, timestamp } from './defaults'
+import { asPlainValues, declaredProperty, normalised, onlyDeclared, timestamp } from './defaults'
 
 import type { EntityDefinition } from '@db/schema/types'
 
@@ -98,10 +98,15 @@ export class TestNode {
     for (const property of Object.keys(properties)) {
       declaredProperty(this.entity, property)
     }
+    // The same reshaping the create path applies, and applied BEFORE validation so that what is
+    // judged is what gets written. `patch` rather than `properties` goes into the query below
+    // for the same reason: validating one string and storing another is how the two halves of a
+    // write come apart.
+    const patch = normalised(properties)
     // Nulls are dropped for the same reason createNode drops them: `SET n.x = null` REMOVES the
     // property in Neo4j, so the node that will exist is the one without it.
     const applied = Object.fromEntries(
-      Object.entries(onlyDeclared(this.entity, { ...this.stored, ...properties })).filter(
+      Object.entries(onlyDeclared(this.entity, { ...this.stored, ...patch })).filter(
         ([, value]) => value !== null,
       ),
     )
@@ -117,7 +122,7 @@ export class TestNode {
           `MATCH (n) WHERE id(n) = $internalId
            SET n += $properties
            RETURN n {.*} AS node`,
-          { internalId: this.internalId, properties },
+          { internalId: this.internalId, properties: patch },
         ),
       )
       this.stored = (result.records[0]?.get('node') ?? this.stored) as NodeProperties

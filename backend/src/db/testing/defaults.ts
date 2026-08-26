@@ -138,18 +138,30 @@ const defaults = new Map<string, Defaults>([
   ['Donations', () => ({ id: uuid() })],
 ])
 
+/**
+ * The caller's properties, with the values the writing side would have reshaped.
+ *
+ * Only the slug so far. `lowercase: true` in the neode models meant a slug the caller passed
+ * was normalised rather than taken as given, and without it a fixture carries a slug the
+ * declaration's pattern rejects.
+ *
+ * Its own export because BOTH write paths need it. It used to sit inside `withDefaults`, which
+ * only the create path calls, so `update({ slug: 'Peter Pan' })` reached validation unconverted
+ * and was refused for a value `create` accepts and converts. Two paths onto one declaration
+ * have to apply one rule, or every call site ends up preparing the value itself.
+ */
+export const normalised = (properties: NodeProperties): NodeProperties =>
+  typeof properties.slug === 'string'
+    ? { ...properties, slug: toSlug(properties.slug) }
+    : properties
+
 /** The caller's properties, with the entity's fixture defaults filled in underneath. */
 export const withDefaults = (
   entity: EntityDefinition,
   properties: NodeProperties,
 ): NodeProperties => {
   const forEntity = defaults.get(entity.label)
-  const filled = { ...(forEntity ? forEntity(properties) : {}), ...properties }
-  // `lowercase: true` in the neode models: a slug the caller passes is normalised, not taken
-  // as given. Without it a fixture can carry a slug the declaration's pattern rejects.
-  if (typeof filled.slug === 'string') {
-    filled.slug = toSlug(filled.slug)
-  }
+  const filled = normalised({ ...(forEntity ? forEntity(properties) : {}), ...properties })
   // createdAt/updatedAt where the declaration demands them and no entry above covers it.
   const now = timestamp()
   const known = new Map(Object.entries(entity.properties))
