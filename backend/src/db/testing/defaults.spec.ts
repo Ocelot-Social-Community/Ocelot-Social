@@ -56,6 +56,23 @@ describe('withDefaults', () => {
     expect(withDefaults(User, { name: undefined }).name).toBe('Test User')
   })
 
+  it.each([
+    ['null, which means "remove this property"', null],
+    ['an empty string, which is a value and a wrong one', ''],
+  ])('does not substitute a timestamp for %s', (_case, given) => {
+    // `!result.get(property)` read the VALUE, so both of these counted as "nothing was given"
+    // and became the current time — a fixture that accepted the removal of a required property
+    // and produced a node the declaration forbids, or turned a bad value into a good one.
+    //
+    // The same shape as neode's GenerateDefaultValues.js:45 (`if (output[key])`), which skipped
+    // `slot: 0` and left three seeded SELECTED edges holding a FLOAT.
+    expect(withDefaults(User, { createdAt: given }).createdAt).toBe(given)
+  })
+
+  it('still fills a timestamp in where the key is absent', () => {
+    expect(typeof withDefaults(User, {}).createdAt).toBe('string')
+  })
+
   it('leaves a null alone, so clearing a property still means clearing it', () => {
     // It then fails validation for a REQUIRED property, which is the correct answer rather than
     // a quietly substituted default.

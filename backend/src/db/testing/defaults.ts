@@ -181,7 +181,17 @@ export const withDefaults = (
   const known = new Map(Object.entries(entity.properties))
   const result = new Map(Object.entries(filled))
   for (const property of ['createdAt', 'updatedAt']) {
-    if (known.has(property) && entity.required.includes(property) && !result.get(property)) {
+    // `has`, not a falsy check on the value. `!result.get(property)` treated an explicit
+    // `createdAt: null` — which means "remove this property" everywhere else in this layer —
+    // as "nothing was given" and substituted the current time, so a fixture accepted the
+    // removal of a required property and produced a node the declaration forbids. An empty
+    // string went the same way, quietly becoming a valid timestamp instead of being refused.
+    //
+    // This is the shape of neode's own bug, and worth naming: GenerateDefaultValues.js:45 did
+    // `if (output[key])`, which skipped `slot: 0` and is why three seeded SELECTED edges held
+    // a FLOAT. `undefined` is already gone by here — normalised() drops it — so a key that is
+    // present carries a value the caller meant.
+    if (known.has(property) && entity.required.includes(property) && !result.has(property)) {
       result.set(property, now)
     }
   }
