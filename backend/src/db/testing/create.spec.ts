@@ -1,6 +1,7 @@
 import { Post, User } from '@db/schema/index'
 
-import { declaredProperty, findNode } from './create'
+import { findNode } from './create'
+import { declaredProperty } from './defaults'
 
 // No database: the guard runs before the session is opened, which is the point of it — a typo
 // should cost nothing and be reported where it was made, not turn into an empty result.

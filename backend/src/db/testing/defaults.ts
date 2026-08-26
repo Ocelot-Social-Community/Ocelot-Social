@@ -177,3 +177,43 @@ export const onlyDeclared = (
   const known = new Map(Object.entries(entity.properties))
   return Object.fromEntries(Object.entries(properties).filter(([name]) => known.has(name)))
 }
+
+/**
+ * The property name, checked against the declaration before it goes into a Cypher pattern.
+ *
+ * It has to be interpolated — Cypher has no placeholder for a property KEY, only for a value.
+ * An undeclared name is therefore not a syntax error but a pattern that matches nothing, and
+ * a lookup for `{ slugg: … }` comes back empty exactly like a lookup for a user who is not
+ * there. The caller then builds half a fixture and the spec fails several assertions later,
+ * on something unrelated. Named here for the same reason resolveAlias() names an unknown
+ * alias: the error should say what is actually wrong.
+ *
+ * Via a Map rather than an index, because `property` is a parameter — the pattern the
+ * security lint flags.
+ */
+export const declaredProperty = (entity: EntityDefinition, property: string): string => {
+  if (!new Map(Object.entries(entity.properties)).has(property)) {
+    throw new Error(
+      `${entity.label} declares no property ${property}. ` +
+        `See src/db/schema/entities/${entity.label}.ts`,
+    )
+  }
+  return property
+}
+
+/**
+ * The same properties with Neo4j Integers replaced by the numbers they represent.
+ *
+ * An Integer is an object, and the declaration describes the unwrapped value — so a counter
+ * declared as `integer` validates as the number it stands for and is written as the Integer it
+ * is. Shared by the create and the update path so the two cannot disagree about it.
+ */
+export const asPlainValues = (properties: NodeProperties): NodeProperties =>
+  Object.fromEntries(
+    Object.entries(properties).map(([name, value]) => [
+      name,
+      typeof value === 'object' && value !== null && 'toNumber' in value
+        ? (value as { toNumber: () => number }).toNumber()
+        : value,
+    ]),
+  )

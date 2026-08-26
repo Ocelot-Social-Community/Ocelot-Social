@@ -1,8 +1,9 @@
 import { getDriver } from '@db/neo4j'
 import { relationships } from '@db/schema/relationships'
+import { validateProperties } from '@db/schema/validate'
 
 import { resolveAlias } from './aliases'
-import { timestamp } from './defaults'
+import { asPlainValues, declaredProperty, onlyDeclared, timestamp } from './defaults'
 
 import type { EntityDefinition } from '@db/schema/types'
 
@@ -75,8 +76,40 @@ export class TestNode {
     return Object.getOwnPropertyDescriptor(this.stored, property)?.value
   }
 
-  /** Writes the given properties and keeps the handle in sync with what the database now holds. */
+  /**
+   * Writes the given properties and keeps the handle in sync with what the database now holds.
+   *
+   * Checked against the declaration first, in two steps that answer different questions.
+   *
+   * The NAMES in the patch, one by one: `SET n += $properties` writes whatever it is handed, so
+   * a typo at one of the fifty call sites used to add a property instead of changing one, and
+   * the fixture then held a node the declaration says cannot exist. The audit finds those
+   * afterwards; naming the key here saves the search. Rejected rather than dropped, unlike
+   * createNode: nothing routes rosie's build options through this method, so an unknown name
+   * here is a mistake and never a spare argument.
+   *
+   * The VALUE of the whole node, once the patch is applied: a partial write cannot be validated
+   * on its own, because `required` is a statement about the finished node — `{ deleted: true }`
+   * alone fails every entity in the registry. Undeclared properties already ON the node are
+   * ignored (`onlyDeclared`); they may predate the handle, a migration spec puts them there on
+   * purpose, and they are the audit's business rather than this caller's.
+   */
   async update(properties: NodeProperties): Promise<TestNode> {
+    for (const property of Object.keys(properties)) {
+      declaredProperty(this.entity, property)
+    }
+    // Nulls are dropped for the same reason createNode drops them: `SET n.x = null` REMOVES the
+    // property in Neo4j, so the node that will exist is the one without it.
+    const applied = Object.fromEntries(
+      Object.entries(onlyDeclared(this.entity, { ...this.stored, ...properties })).filter(
+        ([, value]) => value !== null,
+      ),
+    )
+    const invalid = validateProperties(this.entity, asPlainValues(applied))
+    if (invalid) {
+      throw new Error(`Cannot update a ${this.entity.label} fixture: ${invalid}`)
+    }
+
     const session = getDriver().session()
     try {
       const result = await session.writeTransaction((transaction) =>

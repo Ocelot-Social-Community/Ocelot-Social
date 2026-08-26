@@ -1,7 +1,7 @@
 import { getDriver } from '@db/neo4j'
 import { validateProperties } from '@db/schema/validate'
 
-import { onlyDeclared, withDefaults } from './defaults'
+import { asPlainValues, declaredProperty, onlyDeclared, withDefaults } from './defaults'
 import { TestNode } from './node'
 
 import type { NodeProperties } from './node'
@@ -59,17 +59,7 @@ export const createNode = async (
       ([, value]) => value !== null,
     ),
   )
-  // Neo4j Integers are objects; the declaration describes the unwrapped value, so they are
-  // validated as the numbers they represent and written as the Integers they are.
-  const asPlainValues = Object.fromEntries(
-    Object.entries(complete).map(([name, value]) => [
-      name,
-      typeof value === 'object' && value !== null && 'toNumber' in value
-        ? (value as { toNumber: () => number }).toNumber()
-        : value,
-    ]),
-  )
-  const invalid = validateProperties(entity, asPlainValues)
+  const invalid = validateProperties(entity, asPlainValues(complete))
   if (invalid) {
     throw new Error(`Cannot build a ${entity.label} fixture: ${invalid}`)
   }
@@ -93,29 +83,6 @@ export const createNode = async (
   } finally {
     await session.close()
   }
-}
-
-/**
- * The property name, checked against the declaration before it goes into a Cypher pattern.
- *
- * It has to be interpolated — Cypher has no placeholder for a property KEY, only for a value.
- * An undeclared name is therefore not a syntax error but a pattern that matches nothing, and
- * a lookup for `{ slugg: … }` comes back empty exactly like a lookup for a user who is not
- * there. The caller then builds half a fixture and the spec fails several assertions later,
- * on something unrelated. Named here for the same reason resolveAlias() names an unknown
- * alias: the error should say what is actually wrong.
- *
- * Via a Map rather than an index, because `property` is a parameter — the pattern the
- * security lint flags.
- */
-export const declaredProperty = (entity: EntityDefinition, property: string): string => {
-  if (!new Map(Object.entries(entity.properties)).has(property)) {
-    throw new Error(
-      `${entity.label} declares no property ${property}. ` +
-        `See src/db/schema/entities/${entity.label}.ts`,
-    )
-  }
-  return property
 }
 
 /** Wraps an existing node, for the factories that look one up instead of creating it. */

@@ -1,8 +1,8 @@
 import { getDriver } from '@db/neo4j'
 import { entities } from '@db/schema/index'
 
-import { createNode, declaredProperty, findNode } from './create'
-import { onlyDeclared } from './defaults'
+import { createNode, findNode } from './create'
+import { declaredProperty, onlyDeclared } from './defaults'
 import { TestNode } from './node'
 
 import type { NodeProperties } from './node'
