@@ -1,10 +1,12 @@
 import { Post, Role, User } from '@db/schema/index'
 import { defineEntity } from '@db/schema/types'
 
-import { CAPABILITIES, indexStatementsFor, statementFor } from './ddl'
+import { auditFor } from './audit'
+import { capabilitiesFor, CAPABILITIES, indexStatementsFor, statementFor } from './ddl'
 import { allRules, rulesForEntity } from './rules'
 
 import type { BackendProfile } from './ddl'
+import type { Rule } from './rules'
 
 const PROFILES = [...CAPABILITIES.keys()]
 
@@ -161,5 +163,38 @@ describe('every profile', () => {
       expect(emitted).not.toContainEqual('')
       expect(new Set(emitted).size).toBe(emitted.length)
     }
+  })
+})
+
+describe('a capability the table denies is not emitted', () => {
+  // The three profiles we ship all do single-property uniqueness, so the missing check cost
+  // nothing today. It is tested through a profile that says otherwise, because that is the only
+  // way to ask the question at all — and the answer decides whether the table is the single
+  // place a profile states its limits or merely documentation next to one.
+  const WITHOUT_UNIQUE = 'test-without-uniqueness' as BackendProfile
+
+  beforeAll(() => {
+    CAPABILITIES.set(WITHOUT_UNIQUE, {
+      ...capabilitiesFor('neo4j-community'),
+      unique: false,
+    })
+  })
+
+  afterAll(() => {
+    CAPABILITIES.delete(WITHOUT_UNIQUE)
+  })
+
+  it('emits no uniqueness constraint for a profile that has none', () => {
+    expect(statements(User, WITHOUT_UNIQUE)).toEqual([])
+  })
+
+  it('leaves the rule to the audit instead, rather than to nobody', () => {
+    // The half that makes the omission dangerous: auditFor stays quiet wherever a statement
+    // exists, so emitting one the server rejects also removes the only remaining check.
+    const rule = rulesForEntity(User).find(
+      (entry) => entry.kind === 'unique' && entry.properties.join() === 'id',
+    )
+    expect(rule).toBeDefined()
+    expect(auditFor(rule as Rule, WITHOUT_UNIQUE)).not.toBeNull()
   })
 })

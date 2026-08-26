@@ -141,6 +141,16 @@ export const statementFor = (rule: Rule, profile: BackendProfile): string | null
 
   switch (rule.kind) {
     case 'unique': {
+      // Asked, not assumed. Every profile we ship can do single-property uniqueness, and this
+      // branch used to say so by simply emitting the statement — the one case in this function
+      // that did not consult the table. `exists` and `dataType` both do, and the table is the
+      // single place a profile is supposed to state its limits. A profile without uniqueness
+      // constraints would have been handed one the server rejects AND had its audit switched
+      // off in the same step, since auditFor stays quiet wherever a statement exists. That
+      // combination — not enforced, not audited — is the one this module exists to rule out.
+      if (!capabilities.unique) {
+        return null
+      }
       const composite = rule.properties.length > 1
       if (composite && !capabilities.compositeUnique) {
         return null
