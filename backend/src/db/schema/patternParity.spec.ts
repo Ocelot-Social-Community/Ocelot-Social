@@ -3,6 +3,8 @@ import { cypherString } from '@db/schema/derive/audit'
 import { EMAIL, FOLLOWABLE_URL, ISO_DATE_TIME, SLUG } from '@db/schema/entities/patterns'
 import { entities } from '@db/schema/index'
 
+import type { Transaction } from 'neo4j-driver'
+
 // Do the two engines that read our patterns agree?
 //
 // Every `pattern` in the declaration is compiled twice: by ajv as an ECMAScript regex on the
@@ -146,32 +148,48 @@ const patterns = (): { pattern: string; used: string }[] => {
   return [...byPattern].map(([pattern, used]) => ({ pattern, used: used.join(', ') }))
 }
 
-const matchesInJava = async (value: string, pattern: string): Promise<boolean> => {
+/**
+ * One read transaction for a whole test case, rather than one per question.
+ *
+ * A test here asks up to 180 of them, and the wrapping is what they cost: measured against a
+ * local Neo4j, 180 round trips take 664 ms as a session-and-transaction each, 548 ms sharing
+ * the session, and 222 ms inside a single transaction. Jest's default timeout is 5 s and this
+ * file sets none, so the margin was about sevenfold locally and correspondingly thinner
+ * wherever the database is a network hop further away.
+ */
+const inReadTransaction = async (work: (transaction: Transaction) => Promise<void>) => {
   const session = getDriver().session()
   try {
-    const result = await session.readTransaction((transaction) =>
-      transaction.run('RETURN $value =~ $pattern AS matches', { value, pattern }),
-    )
-    return result.records[0].get('matches') as boolean
+    await session.readTransaction(async (transaction) => {
+      await work(transaction)
+    })
   } finally {
     await session.close()
   }
+}
+
+const matchesInJava = async (
+  transaction: Transaction,
+  value: string,
+  pattern: string,
+): Promise<boolean> => {
+  const result = await transaction.run('RETURN $value =~ $pattern AS matches', { value, pattern })
+  return result.records[0].get('matches') as boolean
 }
 
 /**
  * The same question, with the pattern spliced into a Cypher LITERAL — which is how the audit
  * queries carry it, since the runner takes a query string and no parameters.
  */
-const matchesInJavaLiteral = async (value: string, pattern: string): Promise<boolean> => {
-  const session = getDriver().session()
-  try {
-    const result = await session.readTransaction((transaction) =>
-      transaction.run(`RETURN $value =~ ${cypherString(pattern)} AS matches`, { value }),
-    )
-    return result.records[0].get('matches') as boolean
-  } finally {
-    await session.close()
-  }
+const matchesInJavaLiteral = async (
+  transaction: Transaction,
+  value: string,
+  pattern: string,
+): Promise<boolean> => {
+  const result = await transaction.run(`RETURN $value =~ ${cypherString(pattern)} AS matches`, {
+    value,
+  })
+  return result.records[0].get('matches') as boolean
 }
 
 afterAll(async () => {
@@ -187,17 +205,19 @@ describe('a pattern in an audit query means what it meant in the declaration', (
   it.each(patterns().map((entry) => [entry.used, entry.pattern] as const))(
     '%s',
     async (_used, pattern) => {
-      for (const sample of samplesFor(pattern)) {
-        for (const { value } of variantsOf(sample)) {
-          expect({
-            value: JSON.stringify(value),
-            literal: await matchesInJavaLiteral(value, pattern),
-          }).toEqual({
-            value: JSON.stringify(value),
-            literal: await matchesInJava(value, pattern),
-          })
+      await inReadTransaction(async (transaction) => {
+        for (const sample of samplesFor(pattern)) {
+          for (const { value } of variantsOf(sample)) {
+            expect({
+              value: JSON.stringify(value),
+              literal: await matchesInJavaLiteral(transaction, value, pattern),
+            }).toEqual({
+              value: JSON.stringify(value),
+              literal: await matchesInJava(transaction, value, pattern),
+            })
+          }
         }
-      }
+      })
     },
   )
 })
@@ -211,29 +231,31 @@ describe('every declared pattern reads the same in ajv and in Cypher', () => {
       // eslint-disable-next-line security/detect-non-literal-regexp
       const inJavaScript = new RegExp(pattern)
 
-      for (const marked of samplesFor(pattern)) {
-        // The sample itself first: a pattern that rejects its own valid value would make every
-        // comparison below trivially "false === false" — and so would an injection point that
-        // lands outside the class under test, which is why `variantsOf` declares where it goes.
-        const { value: sample } = placed(marked)
-        expect({ sample, ajv: inJavaScript.test(sample) }).toEqual({ sample, ajv: true })
-        expect({ sample, cypher: await matchesInJava(sample, pattern) }).toEqual({
-          sample,
-          cypher: true,
-        })
-
-        for (const { character, value } of variantsOf(marked)) {
-          expect({
-            character,
-            value: JSON.stringify(value),
-            ajv: inJavaScript.test(value),
-          }).toEqual({
-            character,
-            value: JSON.stringify(value),
-            ajv: await matchesInJava(value, pattern),
+      await inReadTransaction(async (transaction) => {
+        for (const marked of samplesFor(pattern)) {
+          // The sample itself first: a pattern that rejects its own valid value would make every
+          // comparison below trivially "false === false" — and so would an injection point that
+          // lands outside the class under test, which is why `variantsOf` declares where it goes.
+          const { value: sample } = placed(marked)
+          expect({ sample, ajv: inJavaScript.test(sample) }).toEqual({ sample, ajv: true })
+          expect({ sample, cypher: await matchesInJava(transaction, sample, pattern) }).toEqual({
+            sample,
+            cypher: true,
           })
+
+          for (const { character, value } of variantsOf(marked)) {
+            expect({
+              character,
+              value: JSON.stringify(value),
+              ajv: inJavaScript.test(value),
+            }).toEqual({
+              character,
+              value: JSON.stringify(value),
+              ajv: await matchesInJava(transaction, value, pattern),
+            })
+          }
         }
-      }
+      })
     },
   )
 })
