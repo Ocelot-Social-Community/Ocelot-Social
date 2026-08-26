@@ -164,7 +164,9 @@ beforeEach(() => {
     // Mapbox requests
     if (path.includes('api.mapbox.com')) {
       if (path.includes('Berlin')) {
-        if (path.includes('language=de')) return Promise.resolve(mockJsonResponse(berlinMapboxDe))
+        if (path.includes('language=de')) {
+          return Promise.resolve(mockJsonResponse(berlinMapboxDe))
+        }
         return Promise.resolve(mockJsonResponse(berlinMapboxEn))
       }
       if (path.includes('Welzheim')) {
@@ -217,22 +219,35 @@ describe('Location Service', () => {
     const result = await query({ query: queryLocations, variables })
     expect(result.data.queryLocations).toEqual(
       expect.arrayContaining([
-        { id: expect.stringMatching(/^place\.[0-9a-z-]+$/), place_name: 'Berlin, Germany' },
+        {
+          id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
+          place_name: 'Berlin, Germany',
+          lat: null,
+          lng: null,
+        },
         {
           id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
           place_name: 'Berlin, Maryland, United States',
+          lat: null,
+          lng: null,
         },
         {
           id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
           place_name: 'Berlin, Connecticut, United States',
+          lat: null,
+          lng: null,
         },
         {
           id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
           place_name: 'Berlin, New Jersey, United States',
+          lat: null,
+          lng: null,
         },
         {
           id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
           place_name: 'Berlin Heights, Ohio, United States',
+          lat: null,
+          lng: null,
         },
       ]),
     )
@@ -245,22 +260,35 @@ describe('Location Service', () => {
     }
     const result = await query({ query: queryLocations, variables })
     expect(result.data.queryLocations).toEqual([
-      { id: expect.stringMatching(/^place\.[0-9a-z-]+$/), place_name: 'Berlin, Deutschland' },
+      {
+        id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
+        place_name: 'Berlin, Deutschland',
+        lat: null,
+        lng: null,
+      },
       {
         id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
         place_name: 'Berlin, Maryland, Vereinigte Staaten',
+        lat: null,
+        lng: null,
       },
       {
         id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
         place_name: 'Berlin, New Jersey, Vereinigte Staaten',
+        lat: null,
+        lng: null,
       },
       {
         id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
         place_name: 'Berlin Heights, Ohio, Vereinigte Staaten',
+        lat: null,
+        lng: null,
       },
       {
         id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
         place_name: 'Berlin, Massachusetts, Vereinigte Staaten',
+        lat: null,
+        lng: null,
       },
     ])
   })
@@ -272,6 +300,120 @@ describe('Location Service', () => {
     }
     const result = await query({ query: queryLocations, variables })
     expect(result.data.queryLocations).toEqual([])
+  })
+
+  it('reverse-geocodes a "lng,lat" search string by trying types one at a time', async () => {
+    fetchSpy.mockImplementation(async (input: RequestInfo | URL) => {
+      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+      const path = decodeURIComponent(url)
+      if (path.includes('9.993,53.551') && path.includes('types=address')) {
+        return Promise.resolve(mockJsonResponse({ features: [] }))
+      }
+      if (path.includes('9.993,53.551') && path.includes('types=poi')) {
+        return Promise.resolve(
+          mockJsonResponse({
+            features: [
+              { id: 'poi.hagenbeck', place_name: 'Tierpark Hagenbeck', center: [9.993, 53.551] },
+            ],
+          }),
+        )
+      }
+      return Promise.resolve(mockJsonResponse({ features: [] }))
+    })
+
+    variables = { place: '9.993,53.551', lang: 'en', types: 'address,poi,place' }
+    const result = await query({ query: queryLocations, variables })
+
+    expect(result.data.queryLocations).toEqual([
+      { id: 'poi.hagenbeck', place_name: 'Tierpark Hagenbeck', lat: 53.551, lng: 9.993 },
+    ])
+    expect(fetchSpy).toHaveBeenCalledTimes(2)
+    const calledUrls = fetchSpy.mock.calls.map(([input]) => input as string)
+    expect(calledUrls[0]).toContain('types=address')
+    expect(calledUrls[0]).toContain('limit=1')
+    expect(calledUrls[1]).toContain('types=poi')
+  })
+
+  it('prefers an address match over a country match, regardless of the requested type order', async () => {
+    fetchSpy.mockImplementation(async (input: RequestInfo | URL) => {
+      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+      const path = decodeURIComponent(url)
+      // A coordinate matches essentially every "country" reverse-geocode
+      // lookup — if country were tried first (as it is in the caller-given
+      // order below, and in DEFAULT_LOCATION_TYPES), it would short-circuit
+      // the loop before the more specific address is ever requested.
+      if (path.includes('9.993,53.551') && path.includes('types=country')) {
+        return Promise.resolve(
+          mockJsonResponse({
+            features: [{ id: 'country.de', place_name: 'Germany', center: [9.993, 53.551] }],
+          }),
+        )
+      }
+      if (path.includes('9.993,53.551') && path.includes('types=address')) {
+        return Promise.resolve(
+          mockJsonResponse({
+            features: [
+              {
+                id: 'address.example',
+                place_name: 'Musterstraße 1, Hamburg',
+                center: [9.993, 53.551],
+              },
+            ],
+          }),
+        )
+      }
+      return Promise.resolve(mockJsonResponse({ features: [] }))
+    })
+
+    // Caller lists country before address — the fix must not just trust this
+    // order, or it would reproduce the bug.
+    variables = { place: '9.993,53.551', lang: 'en', types: 'country,address' }
+    const result = await query({ query: queryLocations, variables })
+
+    expect(result.data.queryLocations).toEqual([
+      { id: 'address.example', place_name: 'Musterstraße 1, Hamburg', lat: 53.551, lng: 9.993 },
+    ])
+    const calledUrls = fetchSpy.mock.calls.map(([input]) => input as string)
+    expect(calledUrls[0]).toContain('types=address')
+  })
+
+  it.each(['postcode', 'district', 'locality', 'neighborhood'])(
+    'reverse-geocodes with an explicitly requested "%s" type instead of always returning []',
+    async (type) => {
+      fetchSpy.mockImplementation(async (input: RequestInfo | URL) => {
+        const url =
+          typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+        const path = decodeURIComponent(url)
+        if (path.includes('9.993,53.551') && path.includes(`types=${type}`)) {
+          return Promise.resolve(
+            mockJsonResponse({
+              features: [
+                { id: `${type}.example`, place_name: 'Somewhere', center: [9.993, 53.551] },
+              ],
+            }),
+          )
+        }
+        return Promise.resolve(mockJsonResponse({ features: [] }))
+      })
+
+      variables = { place: '9.993,53.551', lang: 'en', types: type }
+      const result = await query({ query: queryLocations, variables })
+
+      // Before REVERSE_GEOCODE_TYPE_PRIORITY covered every ALLOWED_LOCATION_TYPES
+      // entry, a type missing from that list got filtered out entirely here,
+      // silently returning [] regardless of what Mapbox had.
+      expect(result.data.queryLocations).toEqual([
+        { id: `${type}.example`, place_name: 'Somewhere', lat: 53.551, lng: 9.993 },
+      ])
+    },
+  )
+
+  it('returns an empty array when reverse geocoding finds no match for any type', async () => {
+    variables = { place: '0.0,0.0', lang: 'en', types: 'address,poi' }
+    const result = await query({ query: queryLocations, variables })
+
+    expect(result.data.queryLocations).toEqual([])
+    expect(fetchSpy).toHaveBeenCalledTimes(2)
   })
 
   it('query Location without a place name given', async () => {

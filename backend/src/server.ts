@@ -167,7 +167,9 @@ const createServer = async (options?: CreateServerOptions) => {
   app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }) as any)
   app.use(graphqlUploadExpress())
   app.use((req, _res, next) => {
-    if (!req.body) req.body = {}
+    if (!req.body) {
+      req.body = {}
+    }
     next()
   })
   app.use(

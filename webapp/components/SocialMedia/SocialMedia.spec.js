@@ -144,6 +144,166 @@ describe('SocialMedia.vue', () => {
       })
     })
 
+    describe('a url with a scheme the browser must not follow', () => {
+      // This card sits on a PUBLIC profile, and Vue does not sanitise an href binding — a
+      // stored `javascript:` url would run in the browser of whoever clicks it. The backend
+      // now only accepts http and https, but rows written before that rule are still in the
+      // database, which is why the check is repeated here.
+      const wrapperFor = (url) => {
+        propsData.userName = 'Jenny Rostock'
+        propsData.user = {
+          socialMedia: [
+            { id: 'ee1e8ed6-fbef-4bcf-b411-a12926f2ea1e', url, __typename: 'SocialMedia' },
+          ],
+        }
+        return Wrapper()
+      }
+
+      it.each([
+        ['javascript', 'javascript:alert(document.cookie)'],
+        ['javascript in mixed case', 'jaVaScRiPt:alert(1)'],
+        ['data', 'data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg=='],
+        ['vbscript', 'vbscript:msgbox(1)'],
+        ['file', 'file:///etc/passwd'],
+        // Right scheme, no host: nothing for a browser to follow. A `^https?://` test let
+        // these through and the card showed a dead link with a broken favicon.
+        ['https without a host', 'https://'],
+        ['http without a host', 'http://'],
+        ['a string that is no url at all', 'not-a-url'],
+      ])('renders no link at all for a %s url', (_scheme, url) => {
+        const wrapper = wrapperFor(url)
+        expect(wrapper.findAll('a')).toHaveLength(0)
+        // Not by another route either: no href, and no favicon src derived from the value.
+        expect(wrapper.html()).not.toContain(url)
+      })
+
+      it('renders no card at all when every url is unfollowable', () => {
+        // The card is a list of links. With `v-if` still asking the RAW list while the loop
+        // asked the filtered one, a profile like this rendered the heading over nothing.
+        propsData.userName = 'Jenny Rostock'
+        propsData.user = {
+          socialMedia: [
+            { id: 'a', url: 'javascript:alert(1)', __typename: 'SocialMedia' },
+            { id: 'b', url: 'file:///etc/passwd', __typename: 'SocialMedia' },
+          ],
+        }
+        const wrapper = Wrapper()
+        expect(wrapper.find('[data-test="social-media-list-headline"]').exists()).toBe(false)
+        expect(wrapper.html()).toBe('')
+      })
+
+      it('still renders the card when only some urls are unfollowable', () => {
+        propsData.userName = 'Jenny Rostock'
+        propsData.user = {
+          socialMedia: [
+            { id: 'a', url: 'javascript:alert(1)', __typename: 'SocialMedia' },
+            { id: 'b', url: 'https://example.org/profile', __typename: 'SocialMedia' },
+          ],
+        }
+        const wrapper = Wrapper()
+        expect(wrapper.find('[data-test="social-media-list-headline"]').exists()).toBe(true)
+        expect(wrapper.findAll('a')).toHaveLength(1)
+        expect(wrapper.findAll('a').at(0).attributes('href')).toEqual('https://example.org/profile')
+      })
+
+      it.each([
+        ['https', 'https://www.instagram.com/nimitbhargava'],
+        ['http', 'http://example.org/profile'],
+        ['an uppercase scheme, as a browser reads it', 'HTTPS://example.org/profile'],
+      ])('still links a %s url', (_scheme, url) => {
+        expect(wrapperFor(url).findAll('a').at(0).attributes('href')).toEqual(url)
+      })
+
+      it.each([
+        ['https://www.instagram.com/nimitbhargava', 'https://www.instagram.com/favicon.ico'],
+        ['http://example.org/profile', 'http://example.org/favicon.ico'],
+        // Lower-cased, because the origin comes from the parsed url now and that is how a
+        // browser reads a scheme. The href keeps whatever was stored.
+        ['HTTPS://example.org/profile', 'https://example.org/favicon.ico'],
+        // The port belongs to the origin: a site on 8443 does not serve its favicon on 443.
+        ['https://example.org:8443/profile', 'https://example.org:8443/favicon.ico'],
+      ])('derives the favicon from the origin of %s', (url, expected) => {
+        const favicon = wrapperFor(url).findAll('a').at(0).find('img')
+        expect(favicon.attributes('src')).toEqual(expected)
+      })
+
+      it('does not render a url that carries credentials at all', () => {
+        // Stripping them out of the label and the href was the earlier fix, and it was the
+        // weaker half: the profile query asks for `socialMedia { id url }`, so the raw string
+        // reached every visitor's page state and every API client no matter what the card drew.
+        // The rule now refuses such a value, so this row is treated like any other unfollowable
+        // one — not shown, and repaired in the database by migration.
+        const wrapper = wrapperFor('https://user:secret@example.org/')
+        expect(wrapper.text()).not.toContain('secret')
+        expect(wrapper.html()).not.toContain('secret')
+        expect(wrapper.findAll('a')).toHaveLength(0)
+      })
+
+      it('leaves the href exactly as stored', () => {
+        // Rewriting it would also normalise what needs no fixing — `toString()` adds a slash to
+        // `https://example.org` and lower-cases the scheme — and the stored value is what the
+        // owner chose to publish.
+        const wrapper = wrapperFor('HTTPS://example.org/profile')
+        expect(wrapper.findAll('a').at(0).attributes('href')).toEqual('HTTPS://example.org/profile')
+      })
+
+      it('shows the port in the label, because it is part of the address', () => {
+        const link = wrapperFor('https://example.org:8443/').findAll('a').at(0)
+        expect(link.text()).toContain('example.org:8443')
+      })
+    })
+
+    describe('a mail address', () => {
+      const wrapperFor = (url) => {
+        propsData.userName = 'Jenny Rostock'
+        propsData.user = {
+          socialMedia: [
+            { id: 'ee1e8ed6-fbef-4bcf-b411-a12926f2ea1e', url, __typename: 'SocialMedia' },
+          ],
+        }
+        return Wrapper()
+      }
+
+      it('links a plain mailto', () => {
+        const link = wrapperFor('mailto:jenny@example.org').findAll('a').at(0)
+        expect(link.attributes('href')).toEqual('mailto:jenny@example.org')
+      })
+
+      it('shows the address as the label', () => {
+        const link = wrapperFor('mailto:jenny@example.org').findAll('a').at(0)
+        expect(link.text()).toContain('jenny@example.org')
+      })
+
+      it('shows an icon instead of a favicon, because a mail address has no host', () => {
+        // The earlier version derived one from whatever it did not understand and would have
+        // asked the browser for `ailto/favicon.ico`.
+        const wrapper = wrapperFor('mailto:jenny@example.org')
+        expect(wrapper.find('img').exists()).toBe(false)
+        expect(wrapper.find('.favicon-fallback').exists()).toBe(true)
+      })
+
+      it('links a mailto whose scheme is uppercase, as a browser reads it', () => {
+        const link = wrapperFor('MAILTO:jenny@example.org').findAll('a').at(0)
+        expect(link.attributes('href')).toEqual('MAILTO:jenny@example.org')
+      })
+
+      it.each([
+        // Query parameters pre-fill the composer. A reader who clicks "write to me" would send
+        // a message they never wrote, to recipients they never saw.
+        ['a bcc parameter', 'mailto:jenny@example.org?bcc=evil@example.tld'],
+        ['a subject and body', 'mailto:jenny@example.org?subject=Hi&body=Please%20pay'],
+        // Several recipients are the same trick without the query string.
+        ['more than one recipient', 'mailto:jenny@example.org,evil@example.tld'],
+        ['no address at all', 'mailto:'],
+        ['something that is not an address', 'mailto:notanaddress'],
+        ['an address without a domain', 'mailto:jenny@'],
+      ])('renders no link for a mailto with %s', (_case, url) => {
+        const wrapper = wrapperFor(url)
+        expect(wrapper.findAll('a')).toHaveLength(0)
+        expect(wrapper.html()).not.toContain(url)
+      })
+    })
+
     describe('social media link with a username that starts with www.', () => {
       let wrapper
 

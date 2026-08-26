@@ -1,4 +1,5 @@
-/* eslint-disable promise/prefer-await-to-callbacks */
+import { Readable } from 'node:stream'
+
 import { Upload } from '@aws-sdk/lib-storage'
 
 import { s3Service } from './s3Service'
@@ -22,16 +23,17 @@ jest.mock('@aws-sdk/lib-storage', () => {
   }
 })
 
-const uploadMock = Upload as unknown as jest.Mock
+interface UploadInput {
+  params: { Bucket: string; Key: string; ContentType: string; Body: unknown }
+}
+const uploadMock = Upload as unknown as jest.Mock<
+  { done: () => Promise<{ Location: string }> },
+  [UploadInput]
+>
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const createReadStream: FileUpload['createReadStream'] = (() => ({
-  pipe: () => ({
-    on: (_: unknown, callback: () => void) => {
-      callback()
-    },
-  }),
-})) as unknown as FileUpload['createReadStream']
+// `Upload` is mocked, so the stream is only handed over as `Body` and never consumed.
+// It is still a real readable stream so the mock honours the `Body` contract.
+const createReadStream: FileUpload['createReadStream'] = () => Readable.from([])
 const input = {
   uniqueFilename: 'unique-filename.jpg',
   mimetype: 'image/jpeg',
@@ -51,14 +53,27 @@ const config: S3Config = {
 
 describe('s3Service', () => {
   describe('upload', () => {
-    describe('if the S3 service returns a valid URL as a `Location`', () => {
-      beforeEach(() => {
-        uploadMock.mockImplementation(({ params: { Key } }: { params: { Key: string } }) => ({
-          done: async () =>
-            Promise.resolve({ Location: `http://your-objectstorage.com/bucket/${Key}` }),
-        }))
-      })
+    beforeEach(() => {
+      uploadMock.mockReset()
+      uploadMock.mockImplementation(({ params: { Key } }) => ({
+        done: async () =>
+          Promise.resolve({ Location: `http://your-objectstorage.com/bucket/${Key}` }),
+      }))
+    })
 
+    it('hands the file to the s3 client library as a readable `Body`', async () => {
+      const service = s3Service(config, 'ocelot-social')
+      await service.uploadFile(input)
+      const { params } = uploadMock.mock.calls[0][0]
+      expect(params).toMatchObject({
+        Bucket: 'AWS_BUCKET',
+        Key: 'ocelot-social/unique-filename.jpg',
+        ContentType: 'image/jpeg',
+      })
+      expect(params.Body).toBeInstanceOf(Readable)
+    })
+
+    describe('if the S3 service returns a valid URL as a `Location`', () => {
       it('returns the `Location` that was returned by the s3 client library', async () => {
         const service = s3Service(config, 'ocelot-social')
         await expect(service.uploadFile(input)).resolves.toEqual(
@@ -69,7 +84,7 @@ describe('s3Service', () => {
 
     describe('but if for some reason, the S3 service returns a `Location` wich is not a valid URL and misses the protocol part', () => {
       beforeEach(() => {
-        uploadMock.mockImplementation(({ params: { Key } }: { params: { Key: string } }) => ({
+        uploadMock.mockImplementation(({ params: { Key } }) => ({
           done: async () => Promise.resolve({ Location: `your-objectstorage.com/bucket/${Key}` }),
         }))
       })

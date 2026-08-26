@@ -490,10 +490,10 @@
       "eventLocationNameNotEmpty": "Bitte eine Adresse eingeben.",
       "eventVenueLength": "Die Ortsbeschreibung muss zwischen {min} und {max} Zeichen lang sein.",
       "eventVenueNotEmpty": "Bitte eine Ortsbeschreibung eingeben.",
+      "followableUrl": "muss eine gültige Web- oder E-Mail-Adresse sein",
       "formHasErrors": "Bitte alle Pflichtfelder ausfüllen.",
       "titleLength": "Der Titel muss zwischen {min} und {max} Zeichen lang sein.",
-      "titleNotEmpty": "Bitte einen Titel eingeben.",
-      "url": "muss eine gültige URL sein"
+      "titleNotEmpty": "Bitte einen Titel eingeben."
     },
     "versus": "Versus"
   },
@@ -605,6 +605,7 @@
     "categories": {
       "infoSelectedNoOfMaxCategories": "{chosen} von {max} Themen ausgewählt"
     },
+    "categoriesTitle": "Themen",
     "category": {
       "description": {
         "body-and-excercise": "Sport, Yoga, Massage, Tanzen, Entspannung",
@@ -662,6 +663,7 @@
         }
       }
     },
+    "content": "Inhalt",
     "emotions-label": {
       "angry": "Verärgert",
       "cry": "Zum Weinen",
@@ -1056,6 +1058,10 @@
     "legend": {
       "event": "Veranstaltung",
       "group": "Gruppe",
+      "hidePastEvents": "Vergangene Veranstaltungen ausblenden",
+      "hideType": "{type} ausblenden",
+      "showPastEvents": "Vergangene Veranstaltungen anzeigen",
+      "showType": "{type} anzeigen",
       "theUser": "Meine Position",
       "title": "Legende",
       "user": "Nutzer"
@@ -1250,12 +1256,16 @@
       "eventEndBeforeStart": "Das Enddatum muss nach dem Startdatum liegen.",
       "eventIsOnline": "Online",
       "eventLocationName": "Adresse für Navi — z.B. Musterstraße 1, 12345 Musterstadt",
+      "eventLocationNameLabel": "Adresse",
       "eventLocationRequired": "Wenn nicht online, ist eine Adresse erforderlich.",
       "eventStart": "Beginn",
       "eventStartInPast": "Der Starttermin liegt in der Vergangenheit.",
       "eventStartNotEmpty": "Bitte ein Startdatum angeben.",
-      "eventVenue": "Ortsbeschreibung — z.B. Hinterhof, 1. OG, …",
-      "title": "Veranstaltung"
+      "eventVenue": "z.B. Café Chrysander, am Schloss Bergedorf",
+      "eventVenueLabel": "Ortsbeschreibung",
+      "pickLocationOnMap": "Ort auf der Karte wählen",
+      "title": "Veranstaltung",
+      "viewOnMainMap": "Auf Hauptkarte anzeigen"
     },
     "viewPost": {
       "forGroup": {
@@ -1635,6 +1645,7 @@
       "edit-link": "Ändere den Link",
       "name": "Soziale Medien",
       "placeholder": "Deine Webadresse des Sozialen Netzwerkes",
+      "privacy-hint": "Links, die du hier hinzufügst, erscheinen auf deinem Profil. Eine E-Mail-Adresse ist damit für alle sichtbar, die dein Profil sehen können.",
       "requireUnique": "Dieser Link existiert bereits",
       "submit": "Link hinzufügen",
       "successAdd": "Soziales Netzwerk hinzugefügt. Profil wurde aktualisiert!",

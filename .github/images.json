@@ -1,0 +1,92 @@
+[
+  {
+    "name": "neo4j",
+    "context": "neo4j",
+    "file": "neo4j/Dockerfile",
+    "target": "community",
+    "release": true,
+    "cacheScope": "neo4j",
+    "cacheTo": true
+  },
+  {
+    "name": "backend-base",
+    "context": ".",
+    "file": "backend/Dockerfile",
+    "target": "base",
+    "release": false,
+    "cacheScope": "backend",
+    "cacheTo": false
+  },
+  {
+    "name": "backend-build",
+    "context": ".",
+    "file": "backend/Dockerfile",
+    "target": "build",
+    "release": false,
+    "cacheScope": "backend",
+    "cacheTo": false
+  },
+  {
+    "name": "backend",
+    "context": ".",
+    "file": "backend/Dockerfile",
+    "target": "production",
+    "release": true,
+    "cacheScope": "backend",
+    "cacheTo": true
+  },
+  {
+    "name": "webapp-base",
+    "context": ".",
+    "file": "webapp/Dockerfile",
+    "target": "base",
+    "release": false,
+    "cacheScope": "webapp",
+    "cacheTo": false
+  },
+  {
+    "name": "webapp-build",
+    "context": ".",
+    "file": "webapp/Dockerfile",
+    "target": "build",
+    "release": false,
+    "cacheScope": "webapp",
+    "cacheTo": false
+  },
+  {
+    "name": "webapp",
+    "context": ".",
+    "file": "webapp/Dockerfile",
+    "target": "production",
+    "release": true,
+    "cacheScope": "webapp",
+    "cacheTo": true
+  },
+  {
+    "name": "maintenance-base",
+    "context": ".",
+    "file": "maintenance/Dockerfile",
+    "target": "production",
+    "release": false,
+    "cacheScope": "maintenance",
+    "cacheTo": false
+  },
+  {
+    "name": "maintenance-build",
+    "context": ".",
+    "file": "maintenance/Dockerfile",
+    "target": "build",
+    "release": false,
+    "cacheScope": "maintenance",
+    "cacheTo": false
+  },
+  {
+    "name": "maintenance",
+    "context": ".",
+    "file": "maintenance/Dockerfile",
+    "target": "production",
+    "release": true,
+    "cacheScope": "maintenance",
+    "cacheTo": true
+  }
+]

@@ -99,8 +99,9 @@ export const attachments = (config: S3Config) => {
 
   const del: Attachments['del'] = async (resource, relationshipType, opts = {}) => {
     const { transaction } = opts
-    if (!transaction)
+    if (!transaction) {
       return wrapTransactionDeleteAttachment(del, [resource, relationshipType], opts)
+    }
     const txResult = await transaction.run(
       `
       MATCH (resource {id: $resource.id})-[rel:${relationshipType}]->(file:File)
@@ -125,15 +126,18 @@ export const attachments = (config: S3Config) => {
     opts = {},
   ) => {
     const { transaction } = opts
-    if (!transaction)
+    if (!transaction) {
       return wrapTransactionMergeAttachment(
         add,
         [resource, relationshipType, fileInput, fileAttributes],
         opts,
       )
+    }
 
     const { upload } = fileInput
-    if (!upload) throw new UserInputError('Cannot find attachment for given resource')
+    if (!upload) {
+      throw new UserInputError('Cannot find attachment for given resource')
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const uploadFile = await upload

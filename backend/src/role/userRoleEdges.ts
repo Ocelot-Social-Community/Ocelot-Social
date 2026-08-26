@@ -14,7 +14,9 @@ type DbContext = ReturnType<typeof databaseContext>
 //     so an operator can delete them permanently. The factory-reset CLI
 //     (`db:data:roles`) restores the full set on demand.
 function selectRolesToSeed(existingNames: Set<string>): RoleDefinition[] {
-  if (existingNames.size === 0) return DEFAULT_ROLES
+  if (existingNames.size === 0) {
+    return DEFAULT_ROLES
+  }
   return DEFAULT_ROLES.filter(
     (role) => MANDATORY_ROLE_NAMES.includes(role.name) && !existingNames.has(role.name),
   )
@@ -29,7 +31,9 @@ export async function seedDefaultRoleNodes(
   const existing = await readAllRoles(db)
   const existingNames = new Set(existing.map((role) => role.name))
   const toSeed = selectRolesToSeed(existingNames)
-  if (toSeed.length === 0) return existing
+  if (toSeed.length === 0) {
+    return existing
+  }
 
   const now = new Date().toISOString()
   for (const role of toSeed) {
@@ -103,6 +107,8 @@ export async function promoteToOwner(
     variables: { identifier },
   })
   const record = result.records[0]
-  if (!record) return null
+  if (!record) {
+    return null
+  }
   return { id: record.get('id') as string, slug: record.get('slug') as string }
 }

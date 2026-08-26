@@ -19,8 +19,9 @@ export const images = (config: S3Config) => {
 
   const deleteImage: Images['deleteImage'] = async (resource, relationshipType, opts = {}) => {
     const { transaction } = opts
-    if (!transaction)
+    if (!transaction) {
       return wrapTransactionDeleteImage(deleteImage, [resource, relationshipType], opts)
+    }
     const txResult = await transaction.run(
       `
       MATCH (resource {id: $resource.id})-[rel:${relationshipType}]->(image:Image)
@@ -47,11 +48,16 @@ export const images = (config: S3Config) => {
     imageInput,
     opts = {},
   ) => {
-    if (typeof imageInput === 'undefined') return
-    if (imageInput === null) return deleteImage(resource, relationshipType, opts)
+    if (typeof imageInput === 'undefined') {
+      return
+    }
+    if (imageInput === null) {
+      return deleteImage(resource, relationshipType, opts)
+    }
     const { transaction } = opts
-    if (!transaction)
+    if (!transaction) {
       return wrapTransactionMergeImage(mergeImage, [resource, relationshipType, imageInput], opts)
+    }
 
     let txResult = await transaction.run(
       `
@@ -62,7 +68,9 @@ export const images = (config: S3Config) => {
     )
     const [existingImage] = txResult.records.map((record) => record.get('image') as Image)
     const { upload } = imageInput
-    if (!(existingImage || upload)) throw new UserInputError('Cannot find image for given resource')
+    if (!(existingImage || upload)) {
+      throw new UserInputError('Cannot find image for given resource')
+    }
     if (existingImage && upload) {
       await s3.deleteFile(existingImage.url)
     }
@@ -85,7 +93,9 @@ export const images = (config: S3Config) => {
   }
 
   const uploadImageFile = async (uploadPromise: Promise<FileUpload> | undefined) => {
-    if (!uploadPromise) return undefined
+    if (!uploadPromise) {
+      return undefined
+    }
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const upload = await uploadPromise
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access

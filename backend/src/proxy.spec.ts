@@ -41,7 +41,7 @@ async function request(
   return {
     status: res.status,
     body: await res.text(),
-    headers: Object.fromEntries(res.headers.entries()) as Record<string, string>,
+    headers: Object.fromEntries(res.headers.entries()),
   }
 }
 

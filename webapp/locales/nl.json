@@ -490,10 +490,10 @@
       "eventLocationNameNotEmpty": "Voer een adres in.",
       "eventVenueLength": "De plaatsbeschrijving moet tussen {min} en {max} tekens lang zijn.",
       "eventVenueNotEmpty": "Voer een plaatsbeschrijving in.",
+      "followableUrl": "moet een geldig webadres of e-mailadres zijn",
       "formHasErrors": "Vul alstublieft alle verplichte velden in.",
       "titleLength": "De titel moet tussen {min} en {max} tekens lang zijn.",
-      "titleNotEmpty": "Voer een titel in.",
-      "url": "moet een geldige URL zijn"
+      "titleNotEmpty": "Voer een titel in."
     },
     "versus": "Versus"
   },
@@ -605,6 +605,7 @@
     "categories": {
       "infoSelectedNoOfMaxCategories": "{chosen} van {max} onderwerpen geselecteerd"
     },
+    "categoriesTitle": "Onderwerpen",
     "category": {
       "description": {
         "body-and-excercise": "Sport, yoga, massage, ontspanning",
@@ -662,6 +663,7 @@
         }
       }
     },
+    "content": "Inhoud",
     "emotions-label": {
       "angry": "Boos",
       "cry": "Huilen",
@@ -1056,6 +1058,10 @@
     "legend": {
       "event": "Evenement",
       "group": "Groep",
+      "hidePastEvents": "Afgelopen evenementen verbergen",
+      "hideType": "{type} verbergen",
+      "showPastEvents": "Afgelopen evenementen tonen",
+      "showType": "{type} tonen",
       "theUser": "Mijn positie",
       "title": "Legenda",
       "user": "Gebruiker"
@@ -1250,12 +1256,16 @@
       "eventEndBeforeStart": "De einddatum moet na de startdatum liggen.",
       "eventIsOnline": "Online",
       "eventLocationName": "Adres voor navigatie — bijv. Voorbeeldstraat 1, 1234 AB Stad",
+      "eventLocationNameLabel": "Adres",
       "eventLocationRequired": "Als het evenement niet online is, moet een locatie worden ingevoerd.",
       "eventStart": "Start",
       "eventStartInPast": "De startdatum ligt in het verleden.",
       "eventStartNotEmpty": "Voer een startdatum in.",
-      "eventVenue": "Locatiebeschrijving — bijv. achtertuin, 1e verdieping, …",
-      "title": "Evenement"
+      "eventVenue": "bijv. Café Chrysander, bij Slot Bergedorf",
+      "eventVenueLabel": "Locatiebeschrijving",
+      "pickLocationOnMap": "Locatie op de kaart kiezen",
+      "title": "Evenement",
+      "viewOnMainMap": "Bekijken op hoofdkaart"
     },
     "viewPost": {
       "forGroup": {
@@ -1635,6 +1645,7 @@
       "edit-link": "Link bewerken",
       "name": "Sociale media",
       "placeholder": "Je sociale media url",
+      "privacy-hint": "Links die je hier toevoegt, worden op je profiel getoond. Een e-mailadres is dan zichtbaar voor iedereen die je profiel kan zien.",
       "requireUnique": "Je hebt deze url al toegevoegd",
       "submit": "Link toevoegen",
       "successAdd": "Sociale media toegevoegd. Gebruikersprofiel bijgewerkt!",

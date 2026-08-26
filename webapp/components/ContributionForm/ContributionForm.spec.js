@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom'
 import { mount } from '@vue/test-utils'
 import ContributionForm from './ContributionForm.vue'
 import PostMutations from '~/graphql/PostMutations.js'
@@ -5,6 +6,8 @@ import PostMutations from '~/graphql/PostMutations.js'
 import Vuex from 'vuex'
 
 import ImageUploader from '~/components/Uploader/ImageUploader'
+import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
+import EventLocationMap from '~/components/Map/EventLocationMap'
 import MutationObserver from 'mutation-observer'
 
 global.MutationObserver = MutationObserver
@@ -98,6 +101,34 @@ describe('ContributionForm.vue', () => {
 
     beforeEach(() => {
       wrapper = Wrapper()
+    })
+
+    describe('accessibility', () => {
+      it("associates the editor's contenteditable with the visible content label", async () => {
+        // Accessible-name computation resolves aria-labelledby via
+        // document.getElementById, so the element must be attached to a
+        // real document — attachTo (unlike the plain Wrapper() above). Not
+        // destroyed afterwards: tiptap's own EditorContent#beforeDestroy
+        // throws when torn down outside a full page unmount, same as every
+        // other wrapper in this file (none of which call .destroy() either).
+        const attached = mount(ContributionForm, {
+          mocks,
+          localVue,
+          store,
+          propsData,
+          stubs,
+          attachTo: document.body,
+        })
+        // EditorContent moves the ProseMirror DOM into place inside its own
+        // $nextTick (see tiptap's EditorContent.js), one tick after Editor's
+        // mounted() creates it — so it isn't there synchronously after mount.
+        await attached.vm.$nextTick()
+        await attached.vm.$nextTick()
+        const label = attached.find('.select-label')
+        const editable = attached.find('.ProseMirror')
+        expect(editable.attributes('aria-labelledby')).toBe(label.attributes('id'))
+        expect(editable.element).toHaveAccessibleName(label.text())
+      })
     })
 
     describe('CreatePost', () => {
@@ -297,6 +328,59 @@ describe('ContributionForm.vue', () => {
         expect(wrapper.vm.formData.content).toEqual(propsData.contribution.content)
       })
 
+      describe('editing an event with a saved location', () => {
+        beforeEach(() => {
+          propsData = {
+            postType: 'Event',
+            contribution: {
+              id: 'p1456',
+              slug: 'kindergeburtstag',
+              title: 'Kindergeburtstag',
+              content: 'auf Deutsch geschrieben',
+              image,
+              eventStart: new Date().toISOString(),
+              eventVenue: 'Brandenburger Tor',
+              eventLocationName: 'Berlin, Germany',
+              eventLocation: { id: 'place.berlin', lat: 52.52, lng: 13.405 },
+            },
+          }
+          wrapper = Wrapper()
+        })
+
+        it('initializes eventLocationName as a selection object carrying the saved coordinates', () => {
+          expect(wrapper.vm.formData.eventLocationName).toEqual({
+            label: 'Berlin, Germany',
+            value: 'Berlin, Germany',
+            id: 'place.berlin',
+            lat: 52.52,
+            lng: 13.405,
+          })
+        })
+
+        it('passes that same location on to EventLocationMap, so its pin is shown without re-picking', () => {
+          expect(wrapper.findComponent(EventLocationMap).props('location')).toEqual({
+            label: 'Berlin, Germany',
+            value: 'Berlin, Germany',
+            id: 'place.berlin',
+            lat: 52.52,
+            lng: 13.405,
+          })
+        })
+
+        it('still sends only the plain name string to the mutation', async () => {
+          await wrapper.find('form').trigger('submit')
+          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+            expect.objectContaining({
+              variables: expect.objectContaining({
+                eventInput: expect.objectContaining({
+                  eventLocationName: 'Berlin, Germany',
+                }),
+              }),
+            }),
+          )
+        })
+      })
+
       describe('valid update', () => {
         beforeEach(() => {
           mocks.$apollo.mutate = jest.fn().mockResolvedValueOnce({
@@ -341,6 +425,45 @@ describe('ContributionForm.vue', () => {
           await wrapper.find('form').trigger('submit')
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining(expectedParams))
         })
+
+        it('renders an existing (already saved) teaser image via ResponsiveImage, not a plain <img src>', () => {
+          propsData.contribution.image = {
+            url: '/uploads/someimage.png',
+            w320: '/uploads/someimage-320.png',
+            w640: '/uploads/someimage-640.png',
+            w1024: '/uploads/someimage-1024.png',
+          }
+          wrapper = Wrapper()
+          expect(wrapper.findComponent(ResponsiveImage).exists()).toBe(true)
+          // Not "does not exist": ResponsiveImage's own root is an <img>, and
+          // Vue passes the class="image" binding straight through onto it —
+          // so img.image legitimately matches ResponsiveImage's own element
+          // here. What actually guards against a double render is the
+          // v-if/v-else-if pair being mutually exclusive, i.e. exactly one
+          // img.image in the tree, not the plain-<img> fallback rendering
+          // alongside it.
+          expect(wrapper.findAll('img.image')).toHaveLength(1)
+        })
+
+        it('renders a freshly picked (not yet saved) image as a plain <img>, not ResponsiveImage', async () => {
+          const spy = jest
+            .spyOn(FileReader.prototype, 'readAsDataURL')
+            .mockImplementation(function () {
+              this.onload({ target: { result: 'someUrlToImage' } })
+            })
+          propsData.contribution.image = {
+            url: '/uploads/someimage.png',
+            w320: '/uploads/someimage-320.png',
+            w640: '/uploads/someimage-640.png',
+            w1024: '/uploads/someimage-1024.png',
+          }
+          wrapper = Wrapper()
+          wrapper.findComponent(ImageUploader).vm.$emit('addHeroImage', imageUpload)
+          await wrapper.vm.$nextTick()
+          expect(wrapper.findComponent(ResponsiveImage).exists()).toBe(false)
+          expect(wrapper.find('img.image').exists()).toBe(true)
+          spy.mockRestore()
+        })
       })
     })
 
@@ -352,6 +475,16 @@ describe('ContributionForm.vue', () => {
 
       it('has event data block', () => {
         expect(wrapper.find('div.eventData').exists()).toBe(true)
+      })
+
+      it('associates the start, end and address labels with their inputs', () => {
+        const [startPicker, endPicker] = wrapper.findAllComponents({ name: 'DatePicker' }).wrappers
+        expect(wrapper.find('label[for="event-start-input"]').exists()).toBe(true)
+        expect(startPicker.props('inputAttr')).toEqual({ id: 'event-start-input' })
+        expect(wrapper.find('label[for="event-end-input"]').exists()).toBe(true)
+        expect(endPicker.props('inputAttr')).toEqual({ id: 'event-end-input' })
+        expect(wrapper.find('label[for="city"]').exists()).toBe(true)
+        expect(wrapper.find('#city').exists()).toBe(true)
       })
 
       it('shows past-start warning immediately when editing an event with a past start date', () => {

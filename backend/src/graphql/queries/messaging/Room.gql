@@ -7,7 +7,6 @@ query Room($first: Int, $before: String, $id: ID, $userId: ID, $groupId: ID) {
     lastMessageAt
     unreadCount
     lastMessage {
-      _id
       id
       content
       senderId
@@ -19,7 +18,6 @@ query Room($first: Int, $before: String, $id: ID, $userId: ID, $groupId: ID) {
       seen
     }
     users {
-      _id
       id
       name
       avatar {

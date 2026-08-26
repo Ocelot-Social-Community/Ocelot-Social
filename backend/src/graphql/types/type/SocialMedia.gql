@@ -2,7 +2,7 @@
 type SocialMedia {
   id: ID!
   url: String
-  ownedBy: User! @relation(name: "OWNED_BY", direction: "IN")
+  ownedBy: User!
 }
 
 type Mutation {

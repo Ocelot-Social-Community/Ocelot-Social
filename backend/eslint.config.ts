@@ -18,7 +18,13 @@ export default [
     // public-docs/ is generated (spectaql, see the root `docs:api` script) and gitignored, so it only
     // exists on a machine that ran the generator — where its minified bundle made `yarn lint` fail
     // while CI, which never generates it, stayed green.
-    ignores: ['node_modules/', 'build/', 'coverage/', 'public-docs/'],
+    //
+    // schema.graphql is likewise generated (`yarn schema:print`), but it IS committed, so unlike
+    // public-docs/ it fails lint everywhere rather than only locally. Its content is whatever
+    // neo4j-graphql-js augments the schema into — unreachable filter/ordering types for every
+    // type it touches, block descriptions in its own style. None of that is ours to fix, and
+    // graphql-eslint should judge the hand-written .gql sources instead.
+    ignores: ['node_modules/', 'build/', 'coverage/', 'public-docs/', 'schema.graphql'],
   },
   ...config,
   ...jest,
@@ -97,6 +103,12 @@ export default [
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       // Allow @/* path aliases in relative parent imports
       'import-x/no-relative-parent-imports': ['error', { ignore: ['@/*'] }],
+      // `@ocelot-social/branding` is `"type": "module"` with no `exports` map, so deep imports
+      // resolve straight to files and ESM requires the `.js` suffix — dropping it breaks at
+      // runtime. Only the `js` key is relaxed, and only to `ignorePackages`: our own relative
+      // imports resolve to `.ts` and stay under the inherited `never`. The real fix is an
+      // `exports` map on packages/branding, which would let this import be extensionless.
+      'import-x/extensions': ['error', 'never', { json: 'always', js: 'ignorePackages' }],
     },
   },
   {

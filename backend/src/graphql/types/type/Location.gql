@@ -3,17 +3,6 @@ type Location {
   id: ID!
   "Localized place name. Falls back through the requested `lang`, the instance default language, and finally the raw name/id."
   name(lang: String = ""): String!
-    @cypher(
-      statement: """
-      RETURN COALESCE(
-        CASE WHEN $lang <> '' THEN this['name' + toUpper($lang)] END,
-        this['name' + $cypherParams.languageDefault],
-        this.name,
-        this.nameEN,
-        this.id
-      )
-      """
-    )
   "The place's granularity (e.g. country, region, place)."
   type: String!
   "Latitude in decimal degrees (WGS84)."
@@ -21,7 +10,7 @@ type Location {
   "Longitude in decimal degrees (WGS84)."
   lng: Float
   "The enclosing place one level up in the hierarchy."
-  parent: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
+  parent: Location
   "Distance in kilometres from the current user's location. Requires authentication."
   distanceToMe: Int
 }
@@ -32,6 +21,10 @@ type Location {
 type LocationMapBox {
   id: ID!
   place_name: String!
+  "Latitude in decimal degrees (WGS84), if known."
+  lat: Float
+  "Longitude in decimal degrees (WGS84), if known."
+  lng: Float
 }
 
 type Query {

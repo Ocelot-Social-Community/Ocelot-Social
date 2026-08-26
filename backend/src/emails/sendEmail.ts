@@ -100,81 +100,72 @@ export const sendNotificationMail = async (notification: any): Promise<OriginalM
   const to = { name, address: notification?.email }
   const template = notification?.reason
 
-  try {
-    const { originalMessage } = await email.send({
-      template: path.join(__dirname, 'templates', template),
-      message: {
-        to,
-      },
-      locals: {
-        ...defaultParams,
-        locale,
-        name,
-        postTitle:
-          notification?.from?.__typename === 'Comment'
-            ? notification?.from?.post?.title
-            : notification?.from?.title,
-        postUrl: new URL(
-          notification?.from?.__typename === 'Comment'
-            ? `/post/${encodeURIComponent(notification?.from?.post?.id)}/${encodeURIComponent(notification?.from?.post?.slug)}`
-            : `/post/${encodeURIComponent(notification?.from?.id)}/${encodeURIComponent(notification?.from?.slug)}`,
-          CONFIG.CLIENT_URI,
-        ),
-        postAuthorName:
-          notification?.from?.__typename === 'Comment'
-            ? undefined
-            : notification?.from?.author?.name,
-        postAuthorUrl:
-          notification?.from?.__typename === 'Comment'
-            ? undefined
-            : new URL(
-                `profile/${encodeURIComponent(notification?.from?.author?.id)}/${encodeURIComponent(notification?.from?.author?.slug)}`,
-                CONFIG.CLIENT_URI,
-              ),
-        commenterName:
-          notification?.from?.__typename === 'Comment'
-            ? notification?.from?.author?.name
-            : undefined,
-        commenterUrl:
-          notification?.from?.__typename === 'Comment'
-            ? new URL(
-                `/profile/${encodeURIComponent(notification?.from?.author?.id)}/${encodeURIComponent(notification?.from?.author?.slug)}`,
-                CONFIG.CLIENT_URI,
-              )
-            : undefined,
-        commentUrl:
-          notification?.from?.__typename === 'Comment'
-            ? new URL(
-                `/post/${encodeURIComponent(notification?.from?.post?.id)}/${encodeURIComponent(notification?.from?.post?.slug)}#commentId-${encodeURIComponent(notification?.from?.id)}`,
-                CONFIG.CLIENT_URI,
-              )
-            : undefined,
-        // chattingUser: 'SR-71',
-        // chatUrl: new URL('/chat', CONFIG.CLIENT_URI),
-        groupUrl:
-          notification?.from?.__typename === 'Group'
-            ? new URL(
-                `/groups/${encodeURIComponent(notification?.from?.id)}/${encodeURIComponent(notification?.from?.slug)}`,
-                CONFIG.CLIENT_URI,
-              )
-            : undefined,
-        groupName:
-          notification?.from?.__typename === 'Group' ? notification?.from?.name : undefined,
-        groupRelatedUserName:
-          notification?.from?.__typename === 'Group' ? notification?.relatedUser?.name : undefined,
-        groupRelatedUserUrl:
-          notification?.from?.__typename === 'Group'
-            ? new URL(
-                `/profile/${encodeURIComponent(notification?.relatedUser?.id)}/${encodeURIComponent(notification?.relatedUser?.slug)}`,
-                CONFIG.CLIENT_URI,
-              )
-            : undefined,
-      },
-    })
-    return originalMessage as OriginalMessage
-  } catch (error) {
-    throw new Error(error)
-  }
+  const { originalMessage } = await email.send({
+    template: path.join(__dirname, 'templates', template),
+    message: {
+      to,
+    },
+    locals: {
+      ...defaultParams,
+      locale,
+      name,
+      postTitle:
+        notification?.from?.__typename === 'Comment'
+          ? notification?.from?.post?.title
+          : notification?.from?.title,
+      postUrl: new URL(
+        notification?.from?.__typename === 'Comment'
+          ? `/post/${encodeURIComponent(notification?.from?.post?.id)}/${encodeURIComponent(notification?.from?.post?.slug)}`
+          : `/post/${encodeURIComponent(notification?.from?.id)}/${encodeURIComponent(notification?.from?.slug)}`,
+        CONFIG.CLIENT_URI,
+      ),
+      postAuthorName:
+        notification?.from?.__typename === 'Comment' ? undefined : notification?.from?.author?.name,
+      postAuthorUrl:
+        notification?.from?.__typename === 'Comment'
+          ? undefined
+          : new URL(
+              `profile/${encodeURIComponent(notification?.from?.author?.id)}/${encodeURIComponent(notification?.from?.author?.slug)}`,
+              CONFIG.CLIENT_URI,
+            ),
+      commenterName:
+        notification?.from?.__typename === 'Comment' ? notification?.from?.author?.name : undefined,
+      commenterUrl:
+        notification?.from?.__typename === 'Comment'
+          ? new URL(
+              `/profile/${encodeURIComponent(notification?.from?.author?.id)}/${encodeURIComponent(notification?.from?.author?.slug)}`,
+              CONFIG.CLIENT_URI,
+            )
+          : undefined,
+      commentUrl:
+        notification?.from?.__typename === 'Comment'
+          ? new URL(
+              `/post/${encodeURIComponent(notification?.from?.post?.id)}/${encodeURIComponent(notification?.from?.post?.slug)}#commentId-${encodeURIComponent(notification?.from?.id)}`,
+              CONFIG.CLIENT_URI,
+            )
+          : undefined,
+      // chattingUser: 'SR-71',
+      // chatUrl: new URL('/chat', CONFIG.CLIENT_URI),
+      groupUrl:
+        notification?.from?.__typename === 'Group'
+          ? new URL(
+              `/groups/${encodeURIComponent(notification?.from?.id)}/${encodeURIComponent(notification?.from?.slug)}`,
+              CONFIG.CLIENT_URI,
+            )
+          : undefined,
+      groupName: notification?.from?.__typename === 'Group' ? notification?.from?.name : undefined,
+      groupRelatedUserName:
+        notification?.from?.__typename === 'Group' ? notification?.relatedUser?.name : undefined,
+      groupRelatedUserUrl:
+        notification?.from?.__typename === 'Group'
+          ? new URL(
+              `/profile/${encodeURIComponent(notification?.relatedUser?.id)}/${encodeURIComponent(notification?.relatedUser?.slug)}`,
+              CONFIG.CLIENT_URI,
+            )
+          : undefined,
+    },
+  })
+  return originalMessage as OriginalMessage
 }
 
 export interface ChatMessageEmailInput {
@@ -188,28 +179,24 @@ export const sendChatMessageMail = async (
 ): Promise<OriginalMessage> => {
   const { senderUser, recipientUser } = data
   const to = { name: recipientUser.name, address: data.email }
-  try {
-    const { originalMessage } = await email.send({
-      template: path.join(__dirname, 'templates', 'chat_message'),
-      message: {
-        to,
-      },
-      locals: {
-        ...defaultParams,
-        locale: recipientUser.locale,
-        name: recipientUser.name,
-        chattingUser: senderUser.name,
-        chattingUserUrl: new URL(
-          `/profile/${encodeURIComponent(senderUser.id)}/${encodeURIComponent(senderUser.slug)}`,
-          CONFIG.CLIENT_URI,
-        ),
-        chatUrl: new URL('/chat', CONFIG.CLIENT_URI),
-      },
-    })
-    return originalMessage as OriginalMessage
-  } catch (error) {
-    throw new Error(error)
-  }
+  const { originalMessage } = await email.send({
+    template: path.join(__dirname, 'templates', 'chat_message'),
+    message: {
+      to,
+    },
+    locals: {
+      ...defaultParams,
+      locale: recipientUser.locale,
+      name: recipientUser.name,
+      chattingUser: senderUser.name,
+      chattingUserUrl: new URL(
+        `/profile/${encodeURIComponent(senderUser.id)}/${encodeURIComponent(senderUser.slug)}`,
+        CONFIG.CLIENT_URI,
+      ),
+      chatUrl: new URL('/chat', CONFIG.CLIENT_URI),
+    },
+  })
+  return originalMessage as OriginalMessage
 }
 
 interface VerifyMailInput {
@@ -238,24 +225,20 @@ export const sendRegistrationMail = async (
     actionUrl.searchParams.set('method', 'invite-mail')
   }
 
-  try {
-    const { originalMessage } = await email.send({
-      template: path.join(__dirname, 'templates', 'registration'),
-      message: {
-        to,
-      },
-      locals: {
-        ...defaultParams,
-        locale,
-        actionUrl,
-        nonce,
-        renderSettingsUrl: false,
-      },
-    })
-    return originalMessage as OriginalMessage
-  } catch (error) {
-    throw new Error(error)
-  }
+  const { originalMessage } = await email.send({
+    template: path.join(__dirname, 'templates', 'registration'),
+    message: {
+      to,
+    },
+    locals: {
+      ...defaultParams,
+      locale,
+      actionUrl,
+      nonce,
+      renderSettingsUrl: false,
+    },
+  })
+  return originalMessage as OriginalMessage
 }
 
 interface EmailVerificationInput extends VerifyMailInput {
@@ -271,25 +254,21 @@ export const sendEmailVerification = async (
   actionUrl.searchParams.set('email', to.address)
   actionUrl.searchParams.set('nonce', nonce)
 
-  try {
-    const { originalMessage } = await email.send({
-      template: path.join(__dirname, 'templates', 'emailVerification'),
-      message: {
-        to,
-      },
-      locals: {
-        ...defaultParams,
-        locale,
-        actionUrl,
-        nonce,
-        name,
-        renderSettingsUrl: false,
-      },
-    })
-    return originalMessage as OriginalMessage
-  } catch (error) {
-    throw new Error(error)
-  }
+  const { originalMessage } = await email.send({
+    template: path.join(__dirname, 'templates', 'emailVerification'),
+    message: {
+      to,
+    },
+    locals: {
+      ...defaultParams,
+      locale,
+      actionUrl,
+      nonce,
+      name,
+      renderSettingsUrl: false,
+    },
+  })
+  return originalMessage as OriginalMessage
 }
 
 export const sendResetPasswordMail = async (
@@ -300,25 +279,21 @@ export const sendResetPasswordMail = async (
   const actionUrl = new URL('/password-reset/change-password', CONFIG.CLIENT_URI)
   actionUrl.searchParams.set('email', to.address)
   actionUrl.searchParams.set('nonce', nonce)
-  try {
-    const { originalMessage } = await email.send({
-      template: path.join(__dirname, 'templates', 'resetPassword'),
-      message: {
-        to,
-      },
-      locals: {
-        ...defaultParams,
-        locale,
-        actionUrl,
-        nonce,
-        name,
-        renderSettingsUrl: false,
-      },
-    })
-    return originalMessage as OriginalMessage
-  } catch (error) {
-    throw new Error(error)
-  }
+  const { originalMessage } = await email.send({
+    template: path.join(__dirname, 'templates', 'resetPassword'),
+    message: {
+      to,
+    },
+    locals: {
+      ...defaultParams,
+      locale,
+      actionUrl,
+      nonce,
+      name,
+      renderSettingsUrl: false,
+    },
+  })
+  return originalMessage as OriginalMessage
 }
 
 export const sendWrongEmail = async (data: {
@@ -329,21 +304,17 @@ export const sendWrongEmail = async (data: {
   const { locale, name } = data
   const to = { name, address: data.email }
   const actionUrl = new URL('/password-reset/request', CONFIG.CLIENT_URI)
-  try {
-    const { originalMessage } = await email.send({
-      template: path.join(__dirname, 'templates', 'wrongEmail'),
-      message: {
-        to,
-      },
-      locals: {
-        ...defaultParams,
-        locale,
-        actionUrl,
-        renderSettingsUrl: false,
-      },
-    })
-    return originalMessage as OriginalMessage
-  } catch (error) {
-    throw new Error(error)
-  }
+  const { originalMessage } = await email.send({
+    template: path.join(__dirname, 'templates', 'wrongEmail'),
+    message: {
+      to,
+    },
+    locals: {
+      ...defaultParams,
+      locale,
+      actionUrl,
+      renderSettingsUrl: false,
+    },
+  })
+  return originalMessage as OriginalMessage
 }

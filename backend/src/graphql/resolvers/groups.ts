@@ -52,8 +52,12 @@ export default {
             throw new Error('Missing authenticated user.')
           }
           const matchFilters: string[] = []
-          if (id !== undefined) matchFilters.push('group.id = $id')
-          if (slug !== undefined) matchFilters.push('group.slug = $slug')
+          if (id !== undefined) {
+            matchFilters.push('group.id = $id')
+          }
+          if (slug !== undefined) {
+            matchFilters.push('group.slug = $slug')
+          }
           const matchWhere = matchFilters.length ? `WHERE ${matchFilters.join(' AND ')}` : ''
 
           const locationMatch = hasLocation === true ? 'MATCH (group)-[:IS_IN]->(:Location)' : ''
@@ -255,8 +259,9 @@ export default {
         await createOrUpdateLocations('Group', params.id, params.locationName, session, context)
         return group
       } catch (error) {
-        if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
+        if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
           throw new UserInputError('Group with this slug already exists!')
+        }
         throw error
       } finally {
         await session.close()
@@ -379,8 +384,9 @@ export default {
         }
         return group
       } catch (error) {
-        if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
+        if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
           throw new UserInputError('Group with this slug already exists!')
+        }
         throw error
       } finally {
         await session.close()
@@ -436,7 +442,7 @@ export default {
       const session = context.driver.session()
       try {
         return await session.writeTransaction(async (transaction) => {
-          let postRestrictionCypher = ''
+          let postRestrictionCypher: string
           if (['usual', 'admin', 'owner'].includes(roleInGroup)) {
             postRestrictionCypher = `
               WITH group, member, membership
@@ -589,7 +595,9 @@ export default {
       // Server-side enforcement of the groups gate: with the feature off, a profile exposes
       // no groups at all (data minimisation), rather than relying on the webapp to hide the
       // list. Mirrors the socialMedia field gate.
-      if (!context.policy.getEffective('groupsEnabled')) return []
+      if (!context.policy.getEffective('groupsEnabled')) {
+        return []
+      }
       const profileUserId = parent.id
       const viewerId = context.user?.id
       const isOwnProfile = profileUserId === viewerId
@@ -710,7 +718,6 @@ export default {
       return result.records[0].get('count')
     },
     ...Resolver('Group', {
-      undefinedToNull: ['deleted', 'disabled', 'locationName', 'about'],
       hasMany: {
         categories: '-[:CATEGORIZED]->(related:Category)',
         posts: '<-[:IN]-(related:Post)',
@@ -725,7 +732,9 @@ export default {
       },
     }),
     membersCount: async (parent, _args, context: Context, _resolveInfo) => {
-      if (typeof parent.membersCount !== 'undefined') return parent.membersCount
+      if (typeof parent.membersCount !== 'undefined') {
+        return parent.membersCount
+      }
       const session = context.driver.session()
       try {
         return await session.readTransaction(async (txc) => {
@@ -755,8 +764,12 @@ export default {
       return parent.about
     },
     showMembers: (parent) => {
-      if (parent.groupType === 'public') return true
-      if (parent.groupType === 'hidden') return false
+      if (parent.groupType === 'public') {
+        return true
+      }
+      if (parent.groupType === 'hidden') {
+        return false
+      }
       // closed: configurable by owner; default false when property not yet set on the node
       return (parent.showMembers as boolean) ?? false
     },
@@ -771,11 +784,15 @@ export default {
           args: { userId: string },
           context: Context,
         ) => {
-          if (!context.user) return false
+          if (!context.user) {
+            return false
+          }
           // Subscriptions bypass the permissionsMiddleware shield (it gates only
           // Query/Mutation), so the groups feature gate must be re-applied here — otherwise
           // group events keep flowing while groupsEnabled is off.
-          if (!context.policy.getEffective('groupsEnabled')) return false
+          if (!context.policy.getEffective('groupsEnabled')) {
+            return false
+          }
           return payload.groupMembershipVisibilityChanged.userId === args.userId
         },
       ),
@@ -789,10 +806,14 @@ export default {
           args: { groupId: string },
           context: Context,
         ) => {
-          if (!context.user) return false
+          if (!context.user) {
+            return false
+          }
           // See groupMembershipVisibilityChanged: the shield does not cover Subscriptions,
           // so re-gate on groupsEnabled here so no group events leak while the feature is off.
-          if (!context.policy.getEffective('groupsEnabled')) return false
+          if (!context.policy.getEffective('groupsEnabled')) {
+            return false
+          }
           return payload.groupShowMembersChanged.groupId === args.groupId
         },
       ),

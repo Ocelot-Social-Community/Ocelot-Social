@@ -1,9 +1,19 @@
+# `rebase-strategy` is deliberately absent: the default is "auto", and every block here used to
+# override it with "disabled". Auto-merge is what changed the calculation — a pull request that has
+# fallen into conflict with master is never merged by anyone, and with rebasing off it just sits
+# there until someone notices. Dependabot now resolves that itself.
+#
+# It is cheaper than it sounds. "auto" does NOT rebase on every push to master; it re-checks a pull
+# request when the weekly schedule runs, when a closed one is reopened, when `target-branch` changes,
+# or when a push to master puts the pull request in CONFLICT. Only the last one is event-driven, and
+# only conflicting pull requests pay for it. Two limits worth knowing: Dependabot gives up rebasing a
+# pull request 30 days after it was opened, and it stops rebasing any branch that has received
+# commits of its own (unless the commit message carries `[dependabot skip]`).
 version: 2
 updates:
 - package-ecosystem: "github-actions"
   open-pull-requests-limit: 99
   directory: "/"
-  rebase-strategy: "disabled"
   schedule:
     interval: weekly
     day: "saturday"
@@ -12,7 +22,6 @@ updates:
 - package-ecosystem: npm
   open-pull-requests-limit: 99
   directory: "/"
-  rebase-strategy: "disabled"
   schedule:
     interval: weekly
     day: "saturday"
@@ -37,7 +46,6 @@ updates:
 - package-ecosystem: docker
   open-pull-requests-limit: 99
   directory: "/backend"
-  rebase-strategy: "disabled"
   schedule:
     interval: weekly
     day: "saturday"
@@ -46,7 +54,6 @@ updates:
 - package-ecosystem: npm
   open-pull-requests-limit: 99
   directory: "/backend"
-  rebase-strategy: "disabled"
   schedule:
     interval: weekly
     day: "saturday"
@@ -66,7 +73,6 @@ updates:
 - package-ecosystem: docker
   open-pull-requests-limit: 99
   directory: "/webapp"
-  rebase-strategy: "disabled"
   schedule:
     interval: weekly
     day: "saturday"
@@ -75,7 +81,6 @@ updates:
 - package-ecosystem: npm
   open-pull-requests-limit: 99
   directory: "/webapp"
-  rebase-strategy: "disabled"
   schedule:
     interval: weekly
     day: "saturday"
@@ -110,17 +115,17 @@ updates:
 - package-ecosystem: docker
   open-pull-requests-limit: 99
   directory: "/neo4j"
-  rebase-strategy: "disabled"
   schedule:
     interval: weekly
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
 
+# documentation site — its npm dependencies ride on the root package.json above (see the `vuepress`
+# group there); only the image it is served from needs its own entry.
 - package-ecosystem: docker
   open-pull-requests-limit: 99
-  directory: "/deployment/src/docker"
-  rebase-strategy: "disabled"
+  directory: "/.vuepress"
   schedule:
     interval: weekly
     day: "saturday"
@@ -131,7 +136,6 @@ updates:
 - package-ecosystem: docker
   open-pull-requests-limit: 99
   directory: "/maintenance"
-  rebase-strategy: "disabled"
   schedule:
     interval: weekly
     day: "saturday"
@@ -140,7 +144,6 @@ updates:
 - package-ecosystem: npm
   open-pull-requests-limit: 99
   directory: "/maintenance"
-  rebase-strategy: "disabled"
   schedule:
     interval: weekly
     day: "saturday"
@@ -165,10 +168,17 @@ updates:
         - "@tailwindcss*"
 
 # ui library
+- package-ecosystem: docker
+  open-pull-requests-limit: 99
+  directory: "/packages/ui"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
 - package-ecosystem: npm
   open-pull-requests-limit: 99
   directory: "/packages/ui"
-  rebase-strategy: "disabled"
   schedule:
     interval: weekly
     day: "saturday"
@@ -191,11 +201,21 @@ updates:
         - "vitest*"
         - "@vitest*"
 
+# branding library — no `groups`: ten dependencies, none of them a family that arrives in a bundle,
+# so grouping would only hide which one moved.
+- package-ecosystem: npm
+  open-pull-requests-limit: 99
+  directory: "/packages/branding"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
+
 # ui examples
 - package-ecosystem: npm
   open-pull-requests-limit: 99
   directory: "/packages/ui/examples/vue3-tailwind"
-  rebase-strategy: "disabled"
   schedule:
     interval: weekly
     day: "saturday"
@@ -205,7 +225,6 @@ updates:
 - package-ecosystem: npm
   open-pull-requests-limit: 99
   directory: "/packages/ui/examples/vue3-css"
-  rebase-strategy: "disabled"
   schedule:
     interval: weekly
     day: "saturday"
@@ -215,7 +234,6 @@ updates:
 - package-ecosystem: npm
   open-pull-requests-limit: 99
   directory: "/packages/ui/examples/vue2-tailwind"
-  rebase-strategy: "disabled"
   schedule:
     interval: weekly
     day: "saturday"
@@ -225,7 +243,6 @@ updates:
 - package-ecosystem: npm
   open-pull-requests-limit: 99
   directory: "/packages/ui/examples/vue2-css"
-  rebase-strategy: "disabled"
   schedule:
     interval: weekly
     day: "saturday"

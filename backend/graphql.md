@@ -4,11 +4,11 @@ GraphQL is a data query language which provides an alternative to REST and ad-ho
 
 We have a closer description for the [GraphQL Playground](./src/graphql/GraphQL-Playground.md).
 
-![GraphQL Playground](../.gitbook/assets/graphql-playground%20%281%29.png)
+![GraphQL Playground](../docu/gitbook/graphql-playground%20%281%29.png)
 
 ## Middleware keeps resolvers clean
 
-![Middleware schema](../.gitbook/assets/grafik-4.png)
+![Middleware schema](../docu/gitbook/grafik-4.png)
 
 A well-organized codebase is key for the ability to maintain and easily introduce changes into an app. Figuring out the right structure for your code remains a continuous challenge - especially as an application grows and more developers are joining a project.
 

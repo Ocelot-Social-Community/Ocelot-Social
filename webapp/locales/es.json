@@ -490,10 +490,10 @@
       "eventLocationNameNotEmpty": "Por favor, ingrese una dirección.",
       "eventVenueLength": "La descripción del lugar debe tener entre {min} y {max} caracteres.",
       "eventVenueNotEmpty": "Por favor, ingrese una descripción del lugar.",
+      "followableUrl": "debe ser una dirección web o de correo electrónico válida",
       "formHasErrors": "Por favor, rellene todos los campos obligatorios.",
       "titleLength": "El título debe tener entre {min} y {max} caracteres.",
-      "titleNotEmpty": "Por favor, ingrese un título.",
-      "url": "debe ser una URL válida"
+      "titleNotEmpty": "Por favor, ingrese un título."
     },
     "versus": "Versus"
   },
@@ -605,6 +605,7 @@
     "categories": {
       "infoSelectedNoOfMaxCategories": "{chosen} de {max} categorías seleccionadas"
     },
+    "categoriesTitle": "Temas",
     "category": {
       "description": {
         "body-and-excercise": "Deporte, yoga, masajes, relajación",
@@ -662,6 +663,7 @@
         }
       }
     },
+    "content": "Contenido",
     "emotions-label": {
       "angry": "Enfadado",
       "cry": "Llorar",
@@ -1056,6 +1058,10 @@
     "legend": {
       "event": "Evento",
       "group": "Grupo",
+      "hidePastEvents": "Ocultar eventos pasados",
+      "hideType": "Ocultar {type}",
+      "showPastEvents": "Mostrar eventos pasados",
+      "showType": "Mostrar {type}",
       "theUser": "Mi posición",
       "title": "Leyenda",
       "user": "Usuario"
@@ -1250,12 +1256,16 @@
       "eventEndBeforeStart": "La fecha de finalización debe ser posterior a la fecha de inicio.",
       "eventIsOnline": "En línea",
       "eventLocationName": "Dirección para navegación — p. ej. Calle Ejemplo 1, 12345 Ciudad",
+      "eventLocationNameLabel": "Dirección",
       "eventLocationRequired": "Si el evento no es en línea, se debe ingresar una ubicación.",
       "eventStart": "Inicio",
       "eventStartInPast": "La fecha de inicio está en el pasado.",
       "eventStartNotEmpty": "Por favor, introduzca una fecha de inicio.",
-      "eventVenue": "Descripción del lugar — p. ej. patio trasero, 1er piso, …",
-      "title": "Evento"
+      "eventVenue": "p. ej. Café Chrysander, junto al castillo de Bergedorf",
+      "eventVenueLabel": "Descripción del lugar",
+      "pickLocationOnMap": "Elegir ubicación en el mapa",
+      "title": "Evento",
+      "viewOnMainMap": "Ver en el mapa principal"
     },
     "viewPost": {
       "forGroup": {
@@ -1635,6 +1645,7 @@
       "edit-link": "Editar enlace",
       "name": "Medios de comunicación social",
       "placeholder": "Agregar una URL de Social-Media",
+      "privacy-hint": "Los enlaces que añadas aquí se muestran en tu perfil. Una dirección de correo electrónico será entonces visible para todas las personas que puedan ver tu perfil.",
       "requireUnique": "Ya ha añadido esta url",
       "submit": "Añadir enlace",
       "successAdd": "Social-Media agregó. Perfil actualizado!",

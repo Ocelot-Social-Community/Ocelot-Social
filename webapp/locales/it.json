@@ -490,10 +490,10 @@
       "eventLocationNameNotEmpty": "Inserire un indirizzo.",
       "eventVenueLength": "La descrizione del luogo deve essere compresa tra {min} e {max} caratteri.",
       "eventVenueNotEmpty": "Inserire una descrizione del luogo.",
+      "followableUrl": "deve essere un indirizzo web o e-mail valido",
       "formHasErrors": "Si prega di compilare tutti i campi obbligatori.",
       "titleLength": "Il titolo deve essere compreso tra {min} e {max} caratteri.",
-      "titleNotEmpty": "Inserire un titolo.",
-      "url": "deve essere un URL valido"
+      "titleNotEmpty": "Inserire un titolo."
     },
     "versus": "Verso"
   },
@@ -605,6 +605,7 @@
     "categories": {
       "infoSelectedNoOfMaxCategories": "{chosen} di {max} argomenti selezionati"
     },
+    "categoriesTitle": "Argomenti",
     "category": {
       "description": {
         "body-and-excercise": "Sport, yoga, massaggi, relax",
@@ -662,6 +663,7 @@
         }
       }
     },
+    "content": "Contenuto",
     "emotions-label": {
       "angry": "Arrabbiato",
       "cry": "Piangere",
@@ -1056,6 +1058,10 @@
     "legend": {
       "event": "Evento",
       "group": "Gruppo",
+      "hidePastEvents": "Nascondi eventi passati",
+      "hideType": "Nascondi {type}",
+      "showPastEvents": "Mostra eventi passati",
+      "showType": "Mostra {type}",
       "theUser": "La mia posizione",
       "title": "Legenda",
       "user": "Utente"
@@ -1250,12 +1256,16 @@
       "eventEndBeforeStart": "La data di fine deve essere successiva alla data di inizio.",
       "eventIsOnline": "Online",
       "eventLocationName": "Indirizzo per la navigazione — es. Via Esempio 1, 12345 Città",
+      "eventLocationNameLabel": "Indirizzo",
       "eventLocationRequired": "Se l'evento non è online, è necessario inserire una posizione.",
       "eventStart": "Inizio",
       "eventStartInPast": "La data di inizio è nel passato.",
       "eventStartNotEmpty": "Inserire una data di inizio.",
-      "eventVenue": "Descrizione del luogo — es. cortile, 1° piano, …",
-      "title": "Evento"
+      "eventVenue": "es. Café Chrysander, vicino al castello di Bergedorf",
+      "eventVenueLabel": "Descrizione del luogo",
+      "pickLocationOnMap": "Scegli la posizione sulla mappa",
+      "title": "Evento",
+      "viewOnMainMap": "Visualizza sulla mappa principale"
     },
     "viewPost": {
       "forGroup": {
@@ -1635,6 +1645,7 @@
       "edit-link": "Modifica link",
       "name": "Social media",
       "placeholder": "Il tuo URL social media",
+      "privacy-hint": "I link che aggiungi qui vengono mostrati sul tuo profilo. Un indirizzo e-mail sarà quindi visibile a tutte le persone che possono vedere il tuo profilo.",
       "requireUnique": "Hai già aggiunto questo URL",
       "submit": "Aggiungi link",
       "successAdd": "Social media aggiunti. \nProfilo utente aggiornato ",

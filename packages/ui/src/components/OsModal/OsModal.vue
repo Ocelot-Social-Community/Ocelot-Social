@@ -119,7 +119,9 @@
         () => props.open,
         (show) => {
           /* v8 ignore start -- SSR guard */
-          if (typeof document === 'undefined') return
+          if (typeof document === 'undefined') {
+            return
+          }
           /* v8 ignore stop */
           if (show) {
             previousOverflow = document.body.style.overflow
@@ -155,12 +157,16 @@
       // --- Focus trap ---
       /* v8 ignore start -- focus wrapping requires real browser (tested in visual tests) */
       function onFocusTrap(e: KeyboardEvent) {
-        if (e.key !== 'Tab' || !modalRef.value) return
+        if (e.key !== 'Tab' || !modalRef.value) {
+          return
+        }
 
         const focusable = modalRef.value.querySelectorAll<HTMLElement>(
           'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
         )
-        if (focusable.length === 0) return
+        if (focusable.length === 0) {
+          return
+        }
 
         const first = focusable[0]
         const last = focusable[focusable.length - 1]

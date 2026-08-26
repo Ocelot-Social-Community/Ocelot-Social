@@ -1,4 +1,5 @@
 import databaseContext from '@context/database'
+import { createLoaders } from '@context/loaders'
 import pubsubContext from '@context/pubsub'
 import CONFIG from '@src/config'
 import { decode } from '@src/jwt/decode'
@@ -63,6 +64,9 @@ export const getContext =
       policy,
       role,
       effectivePermissions,
+      // Built per request, so the batching cache never outlives the request and cannot
+      // serve one viewer's data to another (the loaders close over this user's id).
+      loaders: createLoaders(driver, user ? user.id : null),
     }
     return result
   }

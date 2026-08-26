@@ -1,0 +1,58 @@
+name: Cache cleanup
+
+# Caches are scoped to the ref that created them, and a pull request leaves two of those behind: the
+# merge ref the checks ran on (refs/pull/<n>/merge) and the head branch itself. Neither is reachable
+# from master once the pull request is closed — a cache created on a child branch is invisible to the
+# parent — so from that moment on they are pure LRU ballast in the repository's 10 GB budget.
+#
+# This matters here because of Dependabot: every one of its pull requests changes a lockfile, which
+# changes the hash in the setup-node cache key, which produces a fresh 0.6–1.3 GB cache that no other
+# branch can ever hit. Merging the pull request re-creates the equivalent cache on master, where
+# every branch CAN read it. Deleting the branch copy therefore loses nothing.
+#
+# `types: [closed]` fires exactly once per pull request and covers both endings — merged and closed
+# unmerged (tell them apart via github.event.pull_request.merged if that is ever needed). It
+# deliberately does NOT fire on `synchronize` or `reopened`, so re-running checks on an OPEN pull
+# request always finds its caches intact.
+on:
+  pull_request:
+    types: [closed]
+
+# Deleting a cache is an Actions API write. Nothing else is needed — this job does not check out the
+# repository.
+permissions:
+  actions: write
+
+jobs:
+  cleanup:
+    name: Delete caches of the closed pull request
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete caches for this pull request
+        # No `|| true` on the deletes: a cleanup that fails silently would look exactly like a
+        # cleanup that works, and the symptom (a slowly filling cache budget) takes weeks to notice.
+        # A failure here is harmless to the pull request, which is already closed.
+        run: |
+          set -euo pipefail
+
+          deleted=0
+          for ref in "refs/pull/${PR_NUMBER}/merge" "refs/heads/${HEAD_REF}"; do
+            # `gh cache list` caps out at 100 per call, so loop until the ref comes back empty.
+            # Bounded rather than `while true`: if a delete ever stopped taking effect, this would
+            # otherwise spin until the job times out.
+            for _ in 1 2 3 4 5 6 7 8 9 10; do
+              ids=$(gh cache list --ref "$ref" --limit 100 --json id --jq '.[].id')
+              [ -z "$ids" ] && break
+              for id in $ids; do
+                gh cache delete "$id"
+                deleted=$((deleted + 1))
+              done
+            done
+          done
+
+          echo "deleted ${deleted} cache entries for PR #${PR_NUMBER} (${HEAD_REF})"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}

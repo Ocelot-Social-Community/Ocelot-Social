@@ -46,7 +46,9 @@
       const badgeVariant = computed(() => (props.variant === 'error' ? 'danger' : undefined))
 
       return () => {
-        if (!hasContent.value) return null
+        if (!hasContent.value) {
+          return null
+        }
 
         const rootClasses = cn(
           'os-validation-hint mt-[4px]',

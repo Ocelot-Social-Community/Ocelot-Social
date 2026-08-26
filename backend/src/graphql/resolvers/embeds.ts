@@ -3,7 +3,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { embedProviders } from './embeds/findProvider'
 import scrape from './embeds/scraper'
-import { undefinedToNullResolver } from './helpers/Resolver'
 
 export default {
   Query: {
@@ -18,20 +17,9 @@ export default {
     },
   },
   Embed: {
-    ...undefinedToNullResolver([
-      'type',
-      'title',
-      'author',
-      'publisher',
-      'date',
-      'description',
-      'url',
-      'image',
-      'audio',
-      'video',
-      'lang',
-      'html',
-    ]),
+    // No per-field `undefined -> null` mapping here: that is what GraphQL's default
+    // resolver already does for a nullable field. `sources` is the exception — it is a
+    // LIST, where the default would yield null rather than an empty array.
     sources: async (parent, _params, _context, _resolveInfo) => {
       return typeof parent.sources === 'undefined' ? [] : parent.sources
     },

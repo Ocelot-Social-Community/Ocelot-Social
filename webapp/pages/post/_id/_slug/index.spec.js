@@ -22,6 +22,9 @@ describe('PostSlug', () => {
         postType: ['Article'],
         shoutedCount: 0,
         shoutedByCurrentUser: false,
+        commentsCount: 0,
+        clickedCount: 0,
+        viewedTeaserCount: 0,
         observingUsersCount: 0,
         isObservedByMe: false,
         comments: [
@@ -131,6 +134,9 @@ describe('PostSlug', () => {
             postType: ['Article'],
             shoutedCount: 0,
             shoutedByCurrentUser: false,
+            commentsCount: 0,
+            clickedCount: 0,
+            viewedTeaserCount: 0,
             observingUsersCount: 0,
             isObservedByMe: false,
             comments: [],
@@ -564,25 +570,91 @@ describe('PostSlug', () => {
     })
 
     describe('computed branches', () => {
-      it('routes and heading pick the Event title for event posts', () => {
-        // Testing the computeds in isolation avoids rendering the Event-specific
+      it('ribbonText picks the event label for event posts', () => {
+        // Testing the computed in isolation avoids rendering the Event-specific
         // DateTimeRange child which has its own required props.
         const ctx = {
           post: { postType: ['Event'] },
           $t: (k) => k,
-          $route: { params: { slug: 'slug', id: 'id' } },
         }
-        expect(PostSlug.computed.heading.call(ctx)).toBe('post.viewEvent.title')
-        expect(PostSlug.computed.routes.call(ctx)[0].name).toBe('post.viewEvent.title')
+        expect(PostSlug.computed.ribbonText.call(ctx)).toBe('post.event')
       })
 
-      it('routes re-encode params with reserved characters', () => {
+      it('ribbonText picks the article label for non-event posts, ignoring pinned state', () => {
         const ctx = {
-          post: { postType: ['Article'] },
+          post: { postType: ['Article'], pinned: true },
+          $t: (k) => k,
+        }
+        expect(PostSlug.computed.ribbonText.call(ctx)).toBe('post.article')
+      })
+
+      it('ribbonText falls back to the article label without throwing when post has no postType yet', () => {
+        // apollo's update() sets `post = Post[0] || {}` — reachable before the
+        // real post data has arrived.
+        const ctx = {
+          post: {},
+          $t: (k) => k,
+        }
+        expect(PostSlug.computed.ribbonText.call(ctx)).toBe('post.article')
+      })
+
+      describe('isPastEvent', () => {
+        beforeEach(() => {
+          const noon = new Date()
+          noon.setHours(12, 0, 0, 0)
+          jest.useFakeTimers()
+          jest.setSystemTime(noon)
+        })
+
+        afterEach(() => {
+          jest.useRealTimers()
+        })
+
+        const hoursFromNow = (h) => new Date(Date.now() + h * 60 * 60 * 1000).toISOString()
+
+        it('is true once both eventStart and eventEnd are in the past', () => {
+          const ctx = { post: { eventStart: hoursFromNow(-48), eventEnd: hoursFromNow(-24) } }
+          expect(PostSlug.computed.isPastEvent.call(ctx)).toBe(true)
+        })
+
+        it('is false for a still-running event (eventStart past, eventEnd future)', () => {
+          const ctx = { post: { eventStart: hoursFromNow(-1), eventEnd: hoursFromNow(1) } }
+          expect(PostSlug.computed.isPastEvent.call(ctx)).toBe(false)
+        })
+
+        it('is false without a post', () => {
+          expect(PostSlug.computed.isPastEvent.call({ post: null })).toBe(false)
+        })
+      })
+
+      it('commentsCount excludes deleted and disabled comments', () => {
+        const ctx = {
+          post: {
+            comments: [
+              { id: '1' },
+              { id: '2', deleted: true },
+              { id: '3', disabled: true },
+              { id: '4' },
+            ],
+          },
+        }
+        expect(PostSlug.computed.commentsCount.call(ctx)).toBe(2)
+      })
+
+      it('commentsCount is 0 without a post or comments', () => {
+        expect(PostSlug.computed.commentsCount.call({ post: null })).toBe(0)
+        expect(PostSlug.computed.commentsCount.call({ post: {} })).toBe(0)
+      })
+
+      it('routes reuses ribbonText for the name (never a separately-worded type label) and re-encodes params with reserved characters', () => {
+        const ctx = {
+          post: { postType: ['Event'] },
+          ribbonText: 'post.event',
           $t: (k) => k,
           $route: { params: { id: 'abc', slug: 'foo/bar' } },
         }
         const [top] = PostSlug.computed.routes.call(ctx)
+        expect(top.name).toBe('post.event')
         expect(top.path).toBe('/post/abc/foo%2Fbar')
         expect(top.children[0].path).toBe('/post/abc/foo%2Fbar#comments')
       })
@@ -717,10 +789,12 @@ describe('PostSlug', () => {
           isPostObservedByMe: true,
           postObservingUsersCount: 5,
         }
+        const beforeCommentsCount = wrapper.vm.commentsCount
         await wrapper.vm.createComment(newComment)
         expect(wrapper.vm.post.comments).toHaveLength(before + 1)
         expect(wrapper.vm.post.isObservedByMe).toBe(true)
         expect(wrapper.vm.post.observingUsersCount).toBe(5)
+        expect(wrapper.vm.commentsCount).toBe(beforeCommentsCount + 1)
       })
 
       it('toggleObservePost fires the mutation, refetches, and toasts success', async () => {

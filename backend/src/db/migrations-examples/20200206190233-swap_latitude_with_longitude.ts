@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
 import { getDriver } from '@db/neo4j'
@@ -32,7 +32,7 @@ const swap = async function (next) {
     await transaction.rollback()
     // eslint-disable-next-line no-console
     console.log('rolled back')
-    throw new Error(error)
+    throw error
   } finally {
     session.close()
   }
