@@ -377,6 +377,37 @@ describe('Location Service', () => {
     expect(calledUrls[0]).toContain('types=address')
   })
 
+  it.each(['postcode', 'district', 'locality', 'neighborhood'])(
+    'reverse-geocodes with an explicitly requested "%s" type instead of always returning []',
+    async (type) => {
+      fetchSpy.mockImplementation(async (input: RequestInfo | URL) => {
+        const url =
+          typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+        const path = decodeURIComponent(url)
+        if (path.includes('9.993,53.551') && path.includes(`types=${type}`)) {
+          return Promise.resolve(
+            mockJsonResponse({
+              features: [
+                { id: `${type}.example`, place_name: 'Somewhere', center: [9.993, 53.551] },
+              ],
+            }),
+          )
+        }
+        return Promise.resolve(mockJsonResponse({ features: [] }))
+      })
+
+      variables = { place: '9.993,53.551', lang: 'en', types: type }
+      const result = await query({ query: queryLocations, variables })
+
+      // Before REVERSE_GEOCODE_TYPE_PRIORITY covered every ALLOWED_LOCATION_TYPES
+      // entry, a type missing from that list got filtered out entirely here,
+      // silently returning [] regardless of what Mapbox had.
+      expect(result.data.queryLocations).toEqual([
+        { id: `${type}.example`, place_name: 'Somewhere', lat: 53.551, lng: 9.993 },
+      ])
+    },
+  )
+
   it('returns an empty array when reverse geocoding finds no match for any type', async () => {
     variables = { place: '0.0,0.0', lang: 'en', types: 'address,poi' }
     const result = await query({ query: queryLocations, variables })

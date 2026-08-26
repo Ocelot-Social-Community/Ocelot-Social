@@ -55,6 +55,12 @@ export default {
     hashtags: { type: Array, default: () => null }, // If 'null', than the Hashtag extention is not assigned.
     value: { type: String, default: '' },
     doc: { type: Object, default: () => {} },
+    // Id of an element (e.g. the visible "Content"/"Description" label
+    // above this editor) that names the ProseMirror-generated
+    // contenteditable as its accessible name — the label itself has no
+    // `for` target to attach to, since ProseMirror's DOM isn't rendered by
+    // this component (see mounted() below).
+    ariaLabelledby: { type: String, default: null },
   },
   data() {
     return {
@@ -126,6 +132,9 @@ export default {
     this.editor = new Editor({
       content: this.value || '',
       doc: this.doc,
+      editorProps: this.ariaLabelledby
+        ? { attributes: { 'aria-labelledby': this.ariaLabelledby } }
+        : {},
       extensions: [
         // Hashtags must come first, see
         // https://github.com/scrumpy/tiptap/issues/421#issuecomment-523037460

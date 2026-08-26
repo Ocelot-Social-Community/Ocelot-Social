@@ -131,8 +131,18 @@ function createStubMapboxGl() {
       }
       return el
     }
+    // Tracks each control's own DOM element so removeControl() below can
+    // find and remove it — needed for the editable watcher's
+    // map.removeControl(locationPickerControl) call (see OsLocationMap.vue)
+    // to work in these stories instead of throwing when a host toggles
+    // `editable` off after mount.
+    interface StubControl {
+      onAdd?: () => HTMLElement
+      onRemove?: () => void
+    }
+    const controlElements = new Map<StubControl, HTMLElement>()
     return {
-      addControl: (control?: { onAdd?: () => HTMLElement }, position = 'top-right') => {
+      addControl: (control?: StubControl, position = 'top-right') => {
         if (typeof control?.onAdd !== 'function') {
           return
         }
@@ -147,6 +157,15 @@ function createStubMapboxGl() {
           };
         `
         getCorner(position).appendChild(el)
+        controlElements.set(control, el)
+      },
+      removeControl: (control?: StubControl) => {
+        if (!control) {
+          return
+        }
+        controlElements.get(control)?.remove()
+        controlElements.delete(control)
+        control.onRemove?.()
       },
       on: () => {},
       flyTo: () => {},

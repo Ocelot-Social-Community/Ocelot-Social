@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom'
 import { mount } from '@vue/test-utils'
 import ContributionForm from './ContributionForm.vue'
 import PostMutations from '~/graphql/PostMutations.js'
@@ -100,6 +101,34 @@ describe('ContributionForm.vue', () => {
 
     beforeEach(() => {
       wrapper = Wrapper()
+    })
+
+    describe('accessibility', () => {
+      it("associates the editor's contenteditable with the visible content label", async () => {
+        // Accessible-name computation resolves aria-labelledby via
+        // document.getElementById, so the element must be attached to a
+        // real document — attachTo (unlike the plain Wrapper() above). Not
+        // destroyed afterwards: tiptap's own EditorContent#beforeDestroy
+        // throws when torn down outside a full page unmount, same as every
+        // other wrapper in this file (none of which call .destroy() either).
+        const attached = mount(ContributionForm, {
+          mocks,
+          localVue,
+          store,
+          propsData,
+          stubs,
+          attachTo: document.body,
+        })
+        // EditorContent moves the ProseMirror DOM into place inside its own
+        // $nextTick (see tiptap's EditorContent.js), one tick after Editor's
+        // mounted() creates it — so it isn't there synchronously after mount.
+        await attached.vm.$nextTick()
+        await attached.vm.$nextTick()
+        const label = attached.find('.select-label')
+        const editable = attached.find('.ProseMirror')
+        expect(editable.attributes('aria-labelledby')).toBe(label.attributes('id'))
+        expect(editable.element).toHaveAccessibleName(label.text())
+      })
     })
 
     describe('CreatePost', () => {

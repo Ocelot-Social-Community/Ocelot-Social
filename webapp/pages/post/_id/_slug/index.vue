@@ -6,7 +6,7 @@
       </div>
       <div class="post-detail-layout__main">
         <os-card
-          v-if="post && ready"
+          v-if="post && post.id && ready"
           :lang="post.language"
           :class="{
             'post-page': true,

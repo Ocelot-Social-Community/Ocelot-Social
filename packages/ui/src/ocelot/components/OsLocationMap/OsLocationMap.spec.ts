@@ -457,7 +457,8 @@ describe('osLocationMap', () => {
       props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', editable: false },
     })
 
-    await expect(wrapper.setProps({ editable: true })).resolves.not.toThrow()
+    await wrapper.setProps({ editable: true })
+
     expect(ctx.markerInstance.setDraggable).not.toHaveBeenCalled()
   })
 

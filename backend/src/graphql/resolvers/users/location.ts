@@ -184,7 +184,26 @@ const DEFAULT_LOCATION_TYPES = 'country,region,place,address'
 // is unsuitable here (country-first): it's tuned for forward/free-text
 // search, where all requested types go into a single combined request and
 // order doesn't affect which results come back.
-const REVERSE_GEOCODE_TYPE_PRIORITY = ['address', 'poi', 'place', 'region', 'country']
+// Covers every type in ALLOWED_LOCATION_TYPES above (in the reverse of that
+// array's own broad-to-specific order, i.e. Mapbox's own documented
+// hierarchy — country is the broadest, poi the narrowest) — a caller-
+// requested type missing from this list would otherwise get filtered out
+// entirely below, always returning [] regardless of what Mapbox has.
+// address before poi is the one deliberate deviation from that pure
+// hierarchy: a building's address is more useful/specific for a human than
+// a generic point-of-interest label, even though Mapbox itself ranks poi as
+// the more granular category.
+const REVERSE_GEOCODE_TYPE_PRIORITY = [
+  'address',
+  'poi',
+  'neighborhood',
+  'locality',
+  'place',
+  'district',
+  'postcode',
+  'region',
+  'country',
+]
 
 // Matches a reverse-geocoding search string ("lng,lat"), as opposed to a
 // free-text place name. Linear-time (two flat, non-nested quantifiers), not

@@ -55,12 +55,15 @@
             :variant="visibleErrors && visibleErrors.title ? 'error' : null"
             :text="titleErrorText"
           />
-          <p class="ds-text select-label">{{ $t('contribution.content') }}</p>
+          <p :id="`content-label-${_uid}`" class="ds-text select-label">
+            {{ $t('contribution.content') }}
+          </p>
           <div :class="{ 'ds-input-has-error': visibleErrors && visibleErrors.content }">
             <editor
               :users="users"
               :value="formData.content"
               :hashtags="hashtags"
+              :aria-labelledby="`content-label-${_uid}`"
               @input="updateEditorContent"
               @blur.native.capture="dirtyFields.content && touchField('content')"
             />

@@ -17,7 +17,7 @@ async function checkA11y(page: Page) {
 }
 
 test.describe('OsLocationMap keyboard accessibility', () => {
-  test('the pick-location tool is reachable via the keyboard and exposes its state via aria-pressed', async ({
+  test('Tab from the page reaches the pick-location tool first and exposes its state via aria-pressed', async ({
     page,
   }) => {
     await page.goto(`${STORY_URL}--editable&viewMode=story`)
@@ -26,7 +26,13 @@ test.describe('OsLocationMap keyboard accessibility', () => {
 
     const toggle = root.locator('.os-location-map-picker-toggle')
     await toggle.waitFor()
-    await toggle.focus()
+
+    // The Editable story adds the pick-location tool before the other map
+    // controls (see OsLocationMap.vue's addControl ordering comment), so it
+    // is the very first Tab stop from the page's initial (nothing-focused)
+    // state — a real assertion of Tab reachability, not just that .focus()
+    // happens to work on the element.
+    await page.keyboard.press('Tab')
 
     await expect(toggle).toBeFocused()
     // Disarmed by default (the Editable story already has a pin) — a real
@@ -35,16 +41,26 @@ test.describe('OsLocationMap keyboard accessibility', () => {
     await expect(toggle).toHaveAttribute('aria-pressed', 'false')
   })
 
-  test('the search input is reachable via Tab and not a focus trap', async ({ page }) => {
+  test('Tab from the page reaches the search input first, and Tab again moves on without trapping focus', async ({
+    page,
+  }) => {
     await page.goto(`${STORY_URL}--with-search&viewMode=story`)
     const root = page.locator(STORY_ROOT)
     await root.waitFor()
 
     const input = root.locator('.os-location-map__search-input')
     await input.waitFor()
-    await input.focus()
 
+    // The WithSearch story renders the search markup before the map
+    // container (see OsLocationMap.vue's render function), so it is the
+    // very first Tab stop from the page's initial state.
+    await page.keyboard.press('Tab')
     await expect(input).toBeFocused()
+
+    // A second Tab must move focus on to the map's own controls rather than
+    // staying stuck on the input — proof this isn't a focus trap.
+    await page.keyboard.press('Tab')
+    await expect(input).not.toBeFocused()
   })
 })
 

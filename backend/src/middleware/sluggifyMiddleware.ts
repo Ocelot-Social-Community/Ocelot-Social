@@ -21,7 +21,13 @@ export const isUniqueFor = (context: Context, type: string, excludeId?: string) 
             ${excludeId ? 'WHERE p.id <> $excludeId' : ''}
             RETURN p.slug
           `,
-          { slug, excludeId },
+          // neo4j-driver's parameter serialization does not accept a plain
+          // JS `undefined` — normalize the omitted-excludeId case (every
+          // call site here except UpdatePost) to an explicit `null` instead.
+          // Harmless either way for the query itself: the WHERE clause
+          // referencing $excludeId is only present in the template when
+          // excludeId is truthy.
+          { slug, excludeId: excludeId ?? null },
         )
       })
       return existingSlug.records.length === 0
