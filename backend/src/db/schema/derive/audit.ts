@@ -232,13 +232,27 @@ export const auditQueryFor = (rule: Rule, profile: BackendProfile): AuditQuery |
     }
 
     case 'endpoints': {
-      // Both lists are disjunctions: the edge is fine if it starts at ANY declared source
-      // label and points at ANY declared target label.
-      const wrongSource = rule.from.map((label) => `NOT a:${label}`).join(' AND ')
-      const wrongTarget = rule.to.map((label) => `NOT b:${label}`).join(' AND ')
-      const wrong = `MATCH (a)-[r:${rule.type}]->(b) WHERE (${wrongSource}) OR (${wrongTarget}) `
+      // An edge is fine if it matches ANY declared branch, and a branch means both ends at
+      // once. The earlier version paired the two label lists with an OR, which for a type whose
+      // sources and targets are both polymorphic claims every combination of the two — and
+      // BELONGS_TO has nine, of which four are nonsense (see RelationshipEndpoints). The
+      // negation goes around the whole thing rather than being pushed into each half, so the
+      // formula reads as the declaration does.
+      const side = (alias: string, labels: string[]) =>
+        labels.length === 1
+          ? `${alias}:${labels[0]}`
+          : `(${labels.map((label) => `${alias}:${label}`).join(' OR ')})`
+      const branch = ({ from, to }: { from: string[]; to: string[] }) =>
+        `${side('a', from)} AND ${side('b', to)}`
+      const allowed =
+        rule.branches.length === 1
+          ? branch(rule.branches[0])
+          : rule.branches.map((entry) => `(${branch(entry)})`).join(' OR ')
+      const wrong = `MATCH (a)-[r:${rule.type}]->(b) WHERE NOT (${allowed}) `
       return {
-        violation: `[:${rule.type}] endpoints ${rule.from.join('|')}->${rule.to.join('|')}`,
+        violation:
+          `[:${rule.type}] endpoints ` +
+          rule.branches.map((entry) => `${entry.from.join('|')}->${entry.to.join('|')}`).join(', '),
         cypher: `${wrong}RETURN count(r) AS violations`,
         sampleCypher: `${wrong}RETURN id(r) AS id, [labels(a), labels(b)] AS detail LIMIT ${SAMPLE_LIMIT}`,
       }

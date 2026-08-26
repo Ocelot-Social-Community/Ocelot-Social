@@ -30,10 +30,19 @@ export const identity: readonly RelationshipDefinition[] = [
   }),
   defineRelationship({
     type: 'BELONGS_TO',
-    // Two unrelated uses share this type: an address belongs to its user, a report belongs to
-    // the thing it reports.
-    from: [EmailAddress, UnverifiedEmailAddress, Report],
-    to: [User, Post, Comment],
+    // Two unrelated uses share this type, and they do NOT mix: an address belongs to its user,
+    // a report belongs to the thing it reports. Written as one source list and one target list
+    // the declaration claims all nine combinations, and the endpoints audit accepted
+    // `EmailAddress -> Post` as legitimate — four of the nine are nonsense.
+    //
+    // Which five are real is not a judgement call; it is what the resolvers can write.
+    // reports.ts guards its MERGE with `WHERE resource:User OR resource:Post OR resource:Comment`,
+    // and registration.ts, emails.ts and db/owner.ts attach an address to a User and to nothing
+    // else.
+    connects: [
+      { from: [EmailAddress, UnverifiedEmailAddress], to: User },
+      { from: Report, to: [User, Post, Comment] },
+    ],
     cardinality: 'at-most-one',
   }),
   defineRelationship({

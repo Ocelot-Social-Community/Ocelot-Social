@@ -33,7 +33,18 @@ export type Rule =
   | { kind: 'minimum'; scope: Scope; property: string; minimum: number }
   | { kind: 'enum'; scope: Scope; property: string; values: readonly unknown[] }
   | { kind: 'cardinality'; type: string; from: string[]; cardinality: Cardinality }
-  | { kind: 'endpoints'; type: string; from: string[]; to: string[] }
+  | {
+      kind: 'endpoints'
+      type: string
+      from: string[]
+      to: string[]
+      /**
+       * Which source/target combinations are real. One branch means "every source with every
+       * target", which is what `from` and `to` alone can say; more than one means the cross
+       * product overstates it — see RelationshipEndpoints.
+       */
+      branches: { from: string[]; to: string[] }[]
+    }
 
 // `typeof` rather than Array.isArray: the latter widens a `readonly PropertyType[]` to
 // `any[]`, which then infects every array built from it.
@@ -82,12 +93,34 @@ const asList = (
   Array.isArray(value) ? (value as readonly EntityDefinition[]) : [value as EntityDefinition]
 
 /** The permitted source entities of a relationship, always as a list. */
+/**
+ * The permitted ways to connect, always as a list of branches.
+ *
+ * The `from`/`to` form is one branch; `connects` is however many it declares. Everything below
+ * reads THIS rather than the two fields, so a declaration written either way produces the same
+ * rules and the shape stays a detail of the declaration.
+ */
+export const branchesOf = (
+  relationship: RelationshipDefinition,
+): readonly { from: readonly EntityDefinition[]; to: readonly EntityDefinition[] }[] =>
+  relationship.connects
+    ? relationship.connects.map((branch) => ({
+        from: asList(branch.from),
+        to: asList(branch.to),
+      }))
+    : [{ from: asList(relationship.from), to: asList(relationship.to) }]
+
+/** Distinct entities, in declaration order — a label may appear in more than one branch. */
+const distinct = (entities: readonly EntityDefinition[]): readonly EntityDefinition[] => [
+  ...new Map(entities.map((entity) => [entity.label, entity])).values(),
+]
+
 export const sourcesOf = (relationship: RelationshipDefinition): readonly EntityDefinition[] =>
-  asList(relationship.from)
+  distinct(branchesOf(relationship).flatMap((branch) => branch.from))
 
 /** The permitted target entities of a relationship, always as a list. */
 export const targetsOf = (relationship: RelationshipDefinition): readonly EntityDefinition[] =>
-  asList(relationship.to)
+  distinct(branchesOf(relationship).flatMap((branch) => branch.to))
 
 export const rulesForRelationship = (relationship: RelationshipDefinition): Rule[] => {
   const rules: Rule[] = [
@@ -104,6 +137,10 @@ export const rulesForRelationship = (relationship: RelationshipDefinition): Rule
       type: relationship.type,
       from: sourcesOf(relationship).map((entity) => entity.label),
       to: targetsOf(relationship).map((entity) => entity.label),
+      branches: branchesOf(relationship).map((branch) => ({
+        from: branch.from.map((entity) => entity.label),
+        to: branch.to.map((entity) => entity.label),
+      })),
     },
   ]
   // `many` states no restriction, so it yields no rule. Emitting one would leave a rule that

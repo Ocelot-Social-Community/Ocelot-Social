@@ -155,8 +155,27 @@ describe('generated queries', () => {
 
   it('counts edges between the wrong labels', () => {
     expect(audit('[:WROTE] endpoints User->Post|Comment')?.cypher).toBe(
-      'MATCH (a)-[r:WROTE]->(b) WHERE (NOT a:User) OR (NOT b:Post AND NOT b:Comment) ' +
+      'MATCH (a)-[r:WROTE]->(b) WHERE NOT (a:User AND (b:Post OR b:Comment)) ' +
         'RETURN count(r) AS violations',
+    )
+  })
+
+  it('does not let the two ends of BELONGS_TO be combined freely', () => {
+    // Its sources and targets are BOTH polymorphic, so pairing the two lists with an OR claimed
+    // all nine combinations. Four are nonsense — an address does not belong to a post — and the
+    // audit called a graph holding them clean. The branches say which five are real; the
+    // resolvers are where they come from: reports.ts guards `resource:User OR resource:Post OR
+    // resource:Comment`, registration.ts and emails.ts attach an address to a User and nothing
+    // else.
+    expect(
+      audit(
+        '[:BELONGS_TO] endpoints EmailAddress|UnverifiedEmailAddress->User, Report->User|Post|Comment',
+      )?.cypher,
+    ).toBe(
+      'MATCH (a)-[r:BELONGS_TO]->(b) WHERE NOT (' +
+        '((a:EmailAddress OR a:UnverifiedEmailAddress) AND b:User) OR ' +
+        '(a:Report AND (b:User OR b:Post OR b:Comment))' +
+        ') RETURN count(r) AS violations',
     )
   })
 

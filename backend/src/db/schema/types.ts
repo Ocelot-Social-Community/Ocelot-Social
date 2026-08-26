@@ -59,24 +59,47 @@ export type Cardinality =
   /** Every source node has exactly one such edge. Enforceable by no engine — audited. */
   'exactly-one' | 'at-most-one' | 'many'
 
-export interface RelationshipDefinition {
-  readonly type: string
-  /**
-   * The permitted source entities. A list for the same reason as `to`: `IS_IN` starts at
-   * User, Location, Group and Post, `NOTIFIED` at Group, Post and Comment.
-   */
+/** One permitted way to connect: these sources to these targets, and no crossing over. */
+export interface EndpointPair {
   readonly from: EntityDefinition | readonly EntityDefinition[]
-  /**
-   * The permitted target entities. A list because relationship types are polymorphic in this
-   * graph: `WROTE` points at both Post and Comment, and declaring one of them reports the
-   * other as an endpoint violation (found by the first audit run against seeded data).
-   */
   readonly to: EntityDefinition | readonly EntityDefinition[]
+}
+
+/**
+ * The endpoints, in one of two forms.
+ *
+ * `from`/`to` for the ordinary case, where every source may point at every target — which is
+ * exact whenever one of the two sides names a single entity, and that is 43 of the 44 types.
+ *
+ * `connects` for the one type where it is not. `BELONGS_TO` carries two unrelated uses: an
+ * address belongs to its user, a report belongs to the thing it reports. Written as
+ * `from: [EmailAddress, UnverifiedEmailAddress, Report]` and `to: [User, Post, Comment]`, the
+ * declaration claims all NINE combinations, and the endpoints audit — which pairs the lists
+ * with an OR — accepted `EmailAddress -> Post` as legitimate. Four of the nine are nonsense,
+ * and an audit that reports the graph as clean while holding them is the failure this registry
+ * exists to prevent. Branches say which combinations are real.
+ */
+export type RelationshipEndpoints =
+  | {
+      readonly from: EntityDefinition | readonly EntityDefinition[]
+      readonly to: EntityDefinition | readonly EntityDefinition[]
+      readonly connects?: undefined
+    }
+  | {
+      readonly connects: readonly EndpointPair[]
+      readonly from?: undefined
+      readonly to?: undefined
+    }
+
+interface RelationshipCommon {
+  readonly type: string
   /** Seen from `from`. */
   readonly cardinality: Cardinality
   readonly properties?: Readonly<Record<string, PropertySchema>>
   readonly required?: readonly string[]
 }
+
+export type RelationshipDefinition = RelationshipCommon & RelationshipEndpoints
 
 // ---------------------------------------------------------------------------
 // Derivation: the TS type of a node's properties
