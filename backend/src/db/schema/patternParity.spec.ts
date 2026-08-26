@@ -45,30 +45,45 @@ const TRICKY: readonly (readonly [string, string])[] = [
 ]
 
 /**
- * Values a pattern accepts, so the injected character has somewhere to sit and a rejection
- * means something.
+ * Values a pattern accepts, each marked with `|` where the tricky character is to be injected.
+ *
+ * The position is DECLARED, not assumed. It used to be index 1 for every sample, and for
+ * `FOLLOWABLE_URL` index 1 falls inside the scheme — the `[tT]` of `https`, the `[aA]` of
+ * `mailto`. Both engines then reject the value because the scheme no longer spells a scheme,
+ * whatever the injected character is, and the comparison degenerates to `false === false`.
+ * Every negated class in that pattern went unmeasured: `[^@/?#WS]` in the authority, `[^WS]`
+ * in the path, `[^@.,?%WS]` in the mailto address. Those are the classes this file exists for,
+ * and the ones a `\s` shorthand would have silently broken.
  *
  * A LIST per pattern, because an alternation has more than one accepting branch and they do
  * not share their character classes: `FOLLOWABLE_URL` excludes `,` and `?` from the mailto
  * address but not from a web address, so one sample would leave the other branch unmeasured —
- * in the half where the classes are narrower and a disagreement is therefore more likely.
+ * in the half where the classes are narrower and a disagreement is therefore more likely. Same
+ * reasoning within a branch, which is why the http samples mark the authority and the path
+ * separately: they are different classes.
  *
  * Keyed by the exported constant rather than guessed from the pattern text: a pattern that
  * gets tightened — `URI` became `HTTP_URL`, then `FOLLOWABLE_URL` — would silently
  * fall through to a sample it no longer matches, and every comparison below would degenerate
- * to "false equals false". The self-check in the test turns that into a failure instead.
+ * to "false equals false" for a second reason. The self-check in the test turns that into a
+ * failure instead.
  */
 const SAMPLES = new Map<string, readonly string[]>([
-  [SLUG, ['peter-pan']],
-  [EMAIL, ['someone@example.org']],
-  // Three, not two: the http branch now has a boundary inside it — no `@` in the authority,
-  // any `@` past the first `/`, `?` or `#` — and a sample that never reaches the path would
-  // leave the half where a dialect disagreement actually costs something unmeasured.
+  [SLUG, ['p|eter-pan']],
+  [EMAIL, ['some|one@example.org', 'someone@exam|ple.org']],
+  // One entry per class the pattern actually has, since each is a separate opportunity for the
+  // two engines to disagree.
   [
     FOLLOWABLE_URL,
-    ['https://example.org/path', 'https://mastodon.social/@user', 'mailto:someone@example.org'],
+    [
+      'https://exam|ple.org/path', //     authority, [^@/?#WS]
+      'https://example.org/pa|th', //     path, [^WS] — wider, and reached only past the first /
+      'https://mastodon.social/@us|er', // path after an `@`, which the authority may not carry
+      'mailto:some|one@example.org', //   local part, [^@,?%WS]
+      'mailto:someone@exam|ple.org', //   domain label, [^@.,?%WS]
+    ],
   ],
-  [ISO_DATE_TIME, ['2026-08-21T10:00:00.000Z']],
+  [ISO_DATE_TIME, ['2026-08-21T10:00:00.000|Z']],
 ])
 
 const samplesFor = (pattern: string): readonly string[] => {
@@ -80,6 +95,38 @@ const samplesFor = (pattern: string): readonly string[] => {
     )
   }
   return known
+}
+
+const MARKER = '|'
+
+/**
+ * A marked sample as the value it stands for, plus the offset the tricky character goes at.
+ *
+ * The marker has to be there and has to be alone: a sample that lost it during an edit would
+ * otherwise inject at offset -1 or 0 and quietly stop measuring the class it was written for,
+ * which is exactly the failure this indirection exists to end.
+ */
+const placed = (marked: string): { value: string; at: number } => {
+  const at = marked.indexOf(MARKER)
+  if (at < 0 || marked.includes(MARKER, at + 1)) {
+    throw new Error(
+      `The sample ${JSON.stringify(marked)} needs exactly one ${MARKER}, marking where the ` +
+        `tricky character is injected. Put it inside the character class under test.`,
+    )
+  }
+  return { value: marked.replace(MARKER, ''), at }
+}
+
+/** The sample itself, then one variant per tricky character at the marked offset. */
+const variantsOf = (marked: string): { character: string; value: string }[] => {
+  const { value, at } = placed(marked)
+  return [
+    { character: 'none — the sample itself', value },
+    ...TRICKY.map(([name, character]) => ({
+      character: name,
+      value: `${value.slice(0, at)}${character}${value.slice(at)}`,
+    })),
+  ]
 }
 
 /** Every distinct pattern in the declaration, with the properties that use it. */
@@ -141,11 +188,7 @@ describe('a pattern in an audit query means what it meant in the declaration', (
     '%s',
     async (_used, pattern) => {
       for (const sample of samplesFor(pattern)) {
-        const values = [
-          sample,
-          ...TRICKY.map(([, character]) => `${sample.slice(0, 1)}${character}${sample.slice(1)}`),
-        ]
-        for (const value of values) {
+        for (const { value } of variantsOf(sample)) {
           expect({
             value: JSON.stringify(value),
             literal: await matchesInJavaLiteral(value, pattern),
@@ -168,23 +211,24 @@ describe('every declared pattern reads the same in ajv and in Cypher', () => {
       // eslint-disable-next-line security/detect-non-literal-regexp
       const inJavaScript = new RegExp(pattern)
 
-      for (const sample of samplesFor(pattern)) {
+      for (const marked of samplesFor(pattern)) {
         // The sample itself first: a pattern that rejects its own valid value would make every
-        // comparison below trivially "false === false".
+        // comparison below trivially "false === false" — and so would an injection point that
+        // lands outside the class under test, which is why `variantsOf` declares where it goes.
+        const { value: sample } = placed(marked)
         expect({ sample, ajv: inJavaScript.test(sample) }).toEqual({ sample, ajv: true })
         expect({ sample, cypher: await matchesInJava(sample, pattern) }).toEqual({
           sample,
           cypher: true,
         })
 
-        for (const [name, character] of TRICKY) {
-          const value = `${sample.slice(0, 1)}${character}${sample.slice(1)}`
+        for (const { character, value } of variantsOf(marked)) {
           expect({
-            character: name,
+            character,
             value: JSON.stringify(value),
             ajv: inJavaScript.test(value),
           }).toEqual({
-            character: name,
+            character,
             value: JSON.stringify(value),
             ajv: await matchesInJava(value, pattern),
           })
