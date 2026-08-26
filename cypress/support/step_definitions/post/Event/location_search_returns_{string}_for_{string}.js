@@ -25,7 +25,19 @@ defineStep('location search returns {string} for {string}', (placeName, searchTe
         body: JSON.stringify({
           data: {
             queryLocations: [
-              { __typename: 'LocationMapBox', id: 'place.mocked', place_name: placeName },
+              {
+                __typename: 'LocationMapBox',
+                id: 'place.mocked',
+                place_name: placeName,
+                // The query also selects lat/lng (see graphql/location.js) —
+                // a real GraphQL response always includes every requested
+                // field, using null for ones it doesn't have. Omitting them
+                // here instead of setting them null makes Apollo Client's
+                // result validation reject the response and resolve the
+                // query with `data: null`, so the dropdown never renders.
+                lat: null,
+                lng: null,
+              },
             ],
           },
         }),

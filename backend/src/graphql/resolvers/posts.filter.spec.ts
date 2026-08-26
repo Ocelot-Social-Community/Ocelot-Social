@@ -232,4 +232,51 @@ describe('Filter Posts', () => {
       ])
     })
   })
+
+  describe('filter events with no explicit end date (eventEnd: null)', () => {
+    it('finds both events, neither of which was given an eventEnd', async () => {
+      const {
+        data: { Post: result },
+      } = (await query({
+        query: Post,
+        variables: { filter: { postType_in: ['Event'], eventEnd: null } },
+      })) as any
+      expect(result).toHaveLength(2)
+      expect(result).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: 'e1' }),
+          expect.objectContaining({ id: 'e2' }),
+        ]),
+      )
+    })
+
+    it('excludes an event that was given an explicit eventEnd', async () => {
+      const createResult = await mutate({
+        mutation: CreatePost,
+        variables: {
+          id: 'e3',
+          title: 'Sommerfest',
+          content: 'Mit Kuchen und Musik.',
+          postType: 'Event',
+          eventInput: {
+            eventStart: new Date(now.getFullYear(), now.getMonth() + 1, 20).toISOString(),
+            eventEnd: new Date(now.getFullYear(), now.getMonth() + 1, 20, 18).toISOString(),
+            eventVenue: 'Dorfplatz',
+          },
+        },
+      })
+      // Otherwise a silently failed creation would be indistinguishable
+      // below from e3 having been correctly filtered out.
+      expect(createResult.errors).toBeUndefined()
+
+      const {
+        data: { Post: result },
+      } = (await query({
+        query: Post,
+        variables: { filter: { postType_in: ['Event'], eventEnd: null } },
+      })) as any
+      expect(result).toHaveLength(2)
+      expect(result.map((post: { id: string }) => post.id)).not.toContain('e3')
+    })
+  })
 })

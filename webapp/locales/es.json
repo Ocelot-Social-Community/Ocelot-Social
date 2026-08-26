@@ -605,6 +605,7 @@
     "categories": {
       "infoSelectedNoOfMaxCategories": "{chosen} de {max} categorías seleccionadas"
     },
+    "categoriesTitle": "Temas",
     "category": {
       "description": {
         "body-and-excercise": "Deporte, yoga, masajes, relajación",
@@ -662,6 +663,7 @@
         }
       }
     },
+    "content": "Contenido",
     "emotions-label": {
       "angry": "Enfadado",
       "cry": "Llorar",
@@ -1056,6 +1058,10 @@
     "legend": {
       "event": "Evento",
       "group": "Grupo",
+      "hidePastEvents": "Ocultar eventos pasados",
+      "hideType": "Ocultar {type}",
+      "showPastEvents": "Mostrar eventos pasados",
+      "showType": "Mostrar {type}",
       "theUser": "Mi posición",
       "title": "Leyenda",
       "user": "Usuario"
@@ -1250,12 +1256,16 @@
       "eventEndBeforeStart": "La fecha de finalización debe ser posterior a la fecha de inicio.",
       "eventIsOnline": "En línea",
       "eventLocationName": "Dirección para navegación — p. ej. Calle Ejemplo 1, 12345 Ciudad",
+      "eventLocationNameLabel": "Dirección",
       "eventLocationRequired": "Si el evento no es en línea, se debe ingresar una ubicación.",
       "eventStart": "Inicio",
       "eventStartInPast": "La fecha de inicio está en el pasado.",
       "eventStartNotEmpty": "Por favor, introduzca una fecha de inicio.",
-      "eventVenue": "Descripción del lugar — p. ej. patio trasero, 1er piso, …",
-      "title": "Evento"
+      "eventVenue": "p. ej. Café Chrysander, junto al castillo de Bergedorf",
+      "eventVenueLabel": "Descripción del lugar",
+      "pickLocationOnMap": "Elegir ubicación en el mapa",
+      "title": "Evento",
+      "viewOnMainMap": "Ver en el mapa principal"
     },
     "viewPost": {
       "forGroup": {

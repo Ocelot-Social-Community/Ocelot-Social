@@ -177,22 +177,58 @@ const ALLOWED_LOCATION_TYPES = [
 ]
 const DEFAULT_LOCATION_TYPES = 'country,region,place,address'
 
-export const queryLocations = async ({ place, lang, types, proximity }, context: Context) => {
-  const locationTypes =
-    types
-      ?.split(',')
-      .map((t) => t.trim())
-      .filter((t) => ALLOWED_LOCATION_TYPES.includes(t))
-      .join(',') || DEFAULT_LOCATION_TYPES
+// Reverse geocoding (see queryLocations below) tries one type at a time and
+// returns the first match — most specific first, so a pin dropped on a
+// building returns its address rather than short-circuiting on the country
+// every coordinate on Earth trivially matches. DEFAULT_LOCATION_TYPES above
+// is unsuitable here (country-first): it's tuned for forward/free-text
+// search, where all requested types go into a single combined request and
+// order doesn't affect which results come back.
+// Covers every type in ALLOWED_LOCATION_TYPES above (in the reverse of that
+// array's own broad-to-specific order, i.e. Mapbox's own documented
+// hierarchy — country is the broadest, poi the narrowest) — a caller-
+// requested type missing from this list would otherwise get filtered out
+// entirely below, always returning [] regardless of what Mapbox has.
+// address before poi is the one deliberate deviation from that pure
+// hierarchy: a building's address is more useful/specific for a human than
+// a generic point-of-interest label, even though Mapbox itself ranks poi as
+// the more granular category.
+const REVERSE_GEOCODE_TYPE_PRIORITY = [
+  'address',
+  'poi',
+  'neighborhood',
+  'locality',
+  'place',
+  'district',
+  'postcode',
+  'region',
+  'country',
+]
 
+// Matches a reverse-geocoding search string ("lng,lat"), as opposed to a
+// free-text place name. Linear-time (two flat, non-nested quantifiers), not
+// vulnerable to catastrophic backtracking despite the linter's warning.
+// eslint-disable-next-line security/detect-unsafe-regex
+const COORDINATE_PATTERN = /^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/
+
+const buildMapboxUrl = (
+  place: string,
+  lang: string,
+  types: string,
+  limit: number,
+  proximity: string | undefined,
+  accessToken: string,
+) => {
   let url =
     `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(place)}.json` +
-    `?access_token=${context.config.MAPBOX_TOKEN}&types=${locationTypes}&language=${encodeURIComponent(lang)}&limit=10`
-
+    `?access_token=${accessToken}&types=${types}&language=${encodeURIComponent(lang)}&limit=${limit}`
   if (proximity) {
     url += `&proximity=${encodeURIComponent(proximity)}`
   }
+  return url
+}
 
+const fetchMapboxFeatures = async (url: string) => {
   const res: any = await fetch(url, {
     signal: AbortSignal.timeout(REQUEST_TIMEOUT),
   })
@@ -201,6 +237,51 @@ export const queryLocations = async ({ place, lang, types, proximity }, context:
     response?.features?.map((item: any) => ({
       place_name: item.place_name,
       id: item.id,
+      lng: item.center?.length ? item.center[0] : null,
+      lat: item.center?.length ? item.center[1] : null,
     })) ?? []
   )
+}
+
+export const queryLocations = async ({ place, lang, types, proximity }, context: Context) => {
+  const requestedTypes =
+    types
+      ?.split(',')
+      .map((t) => t.trim())
+      .filter((t) => ALLOWED_LOCATION_TYPES.includes(t)) ?? []
+  const locationTypes = requestedTypes.join(',') || DEFAULT_LOCATION_TYPES
+  const accessToken = context.config.MAPBOX_TOKEN
+
+  // Mapbox's reverse-geocoding (a "lng,lat" search string) only accepts a
+  // single `types` value combined with `limit=1` — passing multiple types
+  // is rejected/returns no results, unlike forward (place-name) search.
+  // Try each requested type in order, one request at a time, and return the
+  // first match — e.g. an exact address, falling back to the nearest POI or
+  // place name if there's no addressed building at that exact point.
+  // Always walked in REVERSE_GEOCODE_TYPE_PRIORITY's most-specific-first
+  // order regardless of what order the caller listed them in (or the
+  // country-first DEFAULT_LOCATION_TYPES fallback below), restricted to
+  // types actually requested — otherwise a caller-supplied "country,address"
+  // would short-circuit on the country every coordinate trivially matches
+  // and never reach the address.
+  const trimmedPlace = place.trim()
+  if (COORDINATE_PATTERN.test(trimmedPlace)) {
+    const candidateTypes = requestedTypes.length
+      ? requestedTypes
+      : DEFAULT_LOCATION_TYPES.split(',')
+    const reverseTypes = REVERSE_GEOCODE_TYPE_PRIORITY.filter((type) =>
+      candidateTypes.includes(type),
+    )
+    for (const type of reverseTypes) {
+      const features = await fetchMapboxFeatures(
+        buildMapboxUrl(trimmedPlace, lang, type, 1, proximity, accessToken),
+      )
+      if (features.length) {
+        return features
+      }
+    }
+    return []
+  }
+
+  return fetchMapboxFeatures(buildMapboxUrl(place, lang, locationTypes, 10, proximity, accessToken))
 }
