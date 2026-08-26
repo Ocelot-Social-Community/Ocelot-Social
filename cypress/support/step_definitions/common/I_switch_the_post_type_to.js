@@ -7,11 +7,16 @@ import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 // gone — a known mapbox-gl-js race in third-party code, not this app's own,
 // and harmless (the control it was about to label is already removed too).
 Cypress.on('uncaught:exception', (err) => {
-  // Message alone ("_getUIString") is a fairly unique token already, but
-  // requiring the stack to point into mapbox-gl too keeps this from ever
-  // accidentally swallowing an unrelated error in this app's own code that
-  // happens to mention the same substring.
-  if (err.message.includes('_getUIString') && /mapbox-gl/i.test(err.stack || '')) {
+  // Deliberately message-only, not also checking err.stack for a
+  // "mapbox-gl" source hint: CI builds the app in production mode, where
+  // webpack bundles/chunks everything (including mapbox-gl-js) into hashed,
+  // generic filenames like "1d3641f_3.18.4.js" — the literal string
+  // "mapbox-gl" never appears in that stack, so a stricter check here always
+  // misses in CI even though it passes locally against the (unminified,
+  // real-path) dev server. "_getUIString" alone is already a distinctive
+  // enough token — it's mapbox-gl-js's own internal method name, not
+  // something this app's own code would ever throw.
+  if (err.message.includes('_getUIString')) {
     return false
   }
 })
