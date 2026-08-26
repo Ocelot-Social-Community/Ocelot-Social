@@ -160,6 +160,15 @@ describe('generated queries', () => {
     )
   })
 
+  it('escapes the backslashes in a pattern instead of letting Cypher read them', () => {
+    // The literal is parsed before the regex engine sees it, so an interpolated pattern is read
+    // twice. WHITESPACE spells its characters as `\t`, `\u00a0` and so on; those survive the
+    // double reading by luck, because inside a character class the character and its escape ask
+    // the same question. `\\` would not — see the note on cypherString. Doubling them makes what
+    // the engine receives equal to what was declared, for any sequence.
+    expect(audit('SocialMedia.url pattern')?.cypher).toContain(String.raw`\\t\\n\\f\\r`)
+  })
+
   it('asks about property types through apoc, which 4.4 has and valueType() is not', () => {
     expect(audit('Role.protected type')?.cypher).toContain(
       "apoc.meta.cypher.type(n.protected) <> 'BOOLEAN'",

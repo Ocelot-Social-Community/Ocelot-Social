@@ -60,8 +60,26 @@ const propertyAudit = (
     `RETURN id(n) AS id, n.${property} AS detail LIMIT ${SAMPLE_LIMIT}`,
 })
 
+/**
+ * A string as a Cypher literal: quoted, with the backslash escaped BEFORE the quote.
+ *
+ * Order matters — escaping the quote first would then have its own backslash doubled by the
+ * second pass, turning `'` into `\\'` and ending the literal early.
+ *
+ * The backslash half is not theoretical, though the patterns we ship today survive without it.
+ * Cypher processes escape sequences in a literal before the regex engine ever sees the string,
+ * so an interpolated pattern is read twice. Measured against 4.4: `\t` and `\u00a0` come out as
+ * the characters themselves, which inside a character class asks the identical question, and
+ * `\.` passes through untouched — which is why the audit has been correct so far. `\\` does not.
+ * A pattern meaning "a literal backslash" arrives at the engine as `\b`, a word boundary, and
+ * the audit then quietly asks something else and reports nothing. Escaping here makes what the
+ * engine receives equal to what was declared, whatever the sequence.
+ */
+export const cypherString = (value: string): string =>
+  `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
+
 const literal = (value: unknown): string =>
-  typeof value === 'string' ? `'${value.replace(/'/g, "\\'")}'` : String(value)
+  typeof value === 'string' ? cypherString(value) : String(value)
 
 /**
  * Whether this profile would spell the rule as `IS NODE KEY` rather than as uniqueness.
@@ -156,7 +174,7 @@ export const auditQueryFor = (rule: Rule, profile: BackendProfile): AuditQuery |
       return propertyAudit(
         rule.scope,
         `${scopeLabel(rule.scope)}.${rule.property} pattern`,
-        `n.${rule.property} IS NOT NULL AND NOT n.${rule.property} =~ '${rule.pattern}'`,
+        `n.${rule.property} IS NOT NULL AND NOT n.${rule.property} =~ ${cypherString(rule.pattern)}`,
         rule.property,
       )
 

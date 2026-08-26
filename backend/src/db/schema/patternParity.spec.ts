@@ -1,4 +1,5 @@
 import { closeDriver, getDriver } from '@db/neo4j'
+import { cypherString } from '@db/schema/derive/audit'
 import { EMAIL, FOLLOWABLE_URL, ISO_DATE_TIME, SLUG } from '@db/schema/entities/patterns'
 import { entities } from '@db/schema/index'
 
@@ -110,8 +111,52 @@ const matchesInJava = async (value: string, pattern: string): Promise<boolean> =
   }
 }
 
+/**
+ * The same question, with the pattern spliced into a Cypher LITERAL — which is how the audit
+ * queries carry it, since the runner takes a query string and no parameters.
+ */
+const matchesInJavaLiteral = async (value: string, pattern: string): Promise<boolean> => {
+  const session = getDriver().session()
+  try {
+    const result = await session.readTransaction((transaction) =>
+      transaction.run(`RETURN $value =~ ${cypherString(pattern)} AS matches`, { value }),
+    )
+    return result.records[0].get('matches') as boolean
+  } finally {
+    await session.close()
+  }
+}
+
 afterAll(async () => {
   await closeDriver()
+})
+
+describe('a pattern in an audit query means what it meant in the declaration', () => {
+  // A third reader, after ajv and Cypher-with-a-parameter: Cypher parsing a string LITERAL. It
+  // processes escape sequences before the regex engine sees them, so an interpolated pattern is
+  // read twice, and one that survives a single reading can quietly change under two. The audit
+  // would then ask a different question and report nothing — the silent half of a wrong answer,
+  // which is what this file exists to rule out.
+  it.each(patterns().map((entry) => [entry.used, entry.pattern] as const))(
+    '%s',
+    async (_used, pattern) => {
+      for (const sample of samplesFor(pattern)) {
+        const values = [
+          sample,
+          ...TRICKY.map(([, character]) => `${sample.slice(0, 1)}${character}${sample.slice(1)}`),
+        ]
+        for (const value of values) {
+          expect({
+            value: JSON.stringify(value),
+            literal: await matchesInJavaLiteral(value, pattern),
+          }).toEqual({
+            value: JSON.stringify(value),
+            literal: await matchesInJava(value, pattern),
+          })
+        }
+      }
+    },
+  )
 })
 
 describe('every declared pattern reads the same in ajv and in Cypher', () => {
