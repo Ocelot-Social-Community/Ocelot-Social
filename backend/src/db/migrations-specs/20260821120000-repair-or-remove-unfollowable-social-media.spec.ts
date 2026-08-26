@@ -1,8 +1,17 @@
-import { repair } from './20260821120000-repair-or-remove-unfollowable-social-media'
+import { repair } from '@db/migrations/20260821120000-repair-or-remove-unfollowable-social-media'
 
 // The classification, without a database. What `up` does around it — read, write, delete,
 // print — is mechanical; the decision "repair into what, or remove" is where the judgement
 // sits, and it is exactly the part that decides whether a user's profile link survives.
+//
+// NOT beside its subject, which is the convention everywhere else in this repository, because
+// `node-migrate` requires EVERY entry that `readdir` returns for --migrations-dir. A spec left
+// in there is loaded by the runner, `describe` is not defined outside jest, and `db:migrate up`
+// dies before it reaches the first real migration — in the init container, on every deploy.
+// Measured, not assumed: `yarn db:migrate list` reproduces it, and a `__tests__/` subdirectory
+// does not help, because the loader `require`s the directory entry too. The only fix is to be
+// outside that directory, next to migrations-examples, which the runner ignores for the same
+// reason.
 
 describe('repair', () => {
   it.each([
