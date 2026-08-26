@@ -374,15 +374,6 @@
   /*  Literal, not derived: this used to be a build-time color.adjust() of --color-ribbon-event. */
   /*  Kept at its exact vanilla value — a color-mix() approximation would have shifted the colour. */
   --color-ribbon-event-shadow: #6001ff;
-  /* OsRibbon's own default text color (white) is under 4.5:1 WCAG AA contrast
-     against --color-ribbon-article/-event above (2.77:1 / 3.57:1) — this is
-     the one place that matters, since only this app actually sets those two
-     background tokens (OsRibbon's own Storybook fallback literals were
-     darkened separately, see its own source). --color-neutral-0 clears
-     AA against all three ribbon backgrounds (article, event, and the
-     --color-warning-derived pinned one), with the narrowest margin — event's
-     purple — still a comfortable 4.98:1. */
-  --os-ribbon-color: var(--color-neutral-0);
   /**
  * @tokens Chat Color
  */
