@@ -21,8 +21,7 @@
     "test:unit:update": "yarn test -- --updateSnapshot",
     "test:unit:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --no-cache --runInBand  --forceExit --detectOpenHandles",
     "test:visual": "playwright test",
-    "test:visual:update": "playwright test --update-snapshots=missing",
-    "test:visual:update-changed": "playwright test --update-snapshots=changed",
+    "test:visual:docker": "node scripts/fix-storybook-webpack.js && yarn build-storybook && docker compose -f ../docker-compose.visual.yml run --rm webapp-visual-update-changed",
     "postinstall": "node scripts/fix-vue2-jest.js && node scripts/fix-v-mapbox.js",
     "lint:css-tokens": "node scripts/check-css-tokens.js"
   },

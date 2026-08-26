@@ -1,5 +1,18 @@
 # Visual regression baseline update — renders screenshots on Linux so they match CI.
 #
+# Simplest usage — regenerate whatever differs from the current baselines:
+#   webapp:      cd webapp && yarn test:visual:docker
+#   packages/ui: cd packages/ui && npm run test:visual:docker
+# These build Storybook natively first (fast, architecture-independent — the
+# static HTML/JS/CSS output doesn't depend on the CPU that built it) and then
+# run only the Playwright test/screenshot step in the amd64 container below,
+# which is the part that actually needs to match CI's runner architecture.
+# Building Storybook itself *inside* the amd64 container works too (the
+# services below do this automatically if storybook-static doesn't exist
+# yet) but is far slower under amd64 emulation — prefer the npm/yarn scripts.
+#
+# Manual / advanced usage:
+#
 # webapp — New component (missing baseline):
 #   docker compose -f docker-compose.visual.yml run --rm webapp-visual-update
 # webapp — Existing component changed:
@@ -12,7 +25,8 @@
 #
 # Filter to specific component: -e TEST=OsValidationHint
 #
-# First run: storybook build is cached in named volume; subsequent runs are much faster.
+# First run: storybook build is cached (in the bind-mounted storybook-static
+# dir, so it persists on the host); subsequent runs are much faster.
 # After the run, commit the updated __screenshots__/ files.
 
 x-visual-base: &visual-base
