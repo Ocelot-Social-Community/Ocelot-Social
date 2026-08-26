@@ -15,14 +15,33 @@ import type { EntityDefinition } from '@db/schema/types'
 // Removal stays MANUAL. This module reports; it does not drop. An automatic drop would turn a
 // typo in a declaration into data-availability loss on the next deployment.
 
+/**
+ * One schema object, identified by what it IS and not merely by where it sits.
+ *
+ * `kind` distinguishes the two constraint classes rather than lumping them as "constraint".
+ * They share a label and a property list — `User.id` is both unique and required — so one
+ * shared name collapsed them onto a single key, with two consequences. The wanted set held the
+ * object twice, so a missing one printed twice and counted twice towards the exit code. Worse,
+ * a database holding only the uniqueness constraint answered for the existence constraint as
+ * well: the missing one was reported as present and never mentioned again. A drift check that
+ * files a missing constraint as present is worse than none, because it claims assurance.
+ *
+ * Not visible on neo4j-community, where `existence: false` means no existence constraint is
+ * ever wanted. It appears the moment the profile becomes enterprise or memgraph.
+ */
 export interface SchemaObject {
-  readonly kind: 'constraint' | 'index'
+  readonly kind: 'unique' | 'exists' | 'index'
   readonly label: string
   readonly properties: readonly string[]
 }
 
 const key = (object: SchemaObject): string =>
   `${object.kind}:${object.label}(${[...object.properties].join(',')})`
+
+/** The same objects with duplicates removed, first occurrence kept. */
+const unique = (objects: readonly SchemaObject[]): SchemaObject[] => [
+  ...new Map(objects.map((object) => [key(object), object])).values(),
+]
 
 /** Everything the declaration wants the database to hold, for one backend profile. */
 export const declaredObjects = (
@@ -37,13 +56,16 @@ export const declaredObjects = (
         continue
       }
       if (rule.kind === 'unique') {
-        objects.push({ kind: 'constraint', label: rule.label, properties: rule.properties })
+        objects.push({ kind: 'unique', label: rule.label, properties: rule.properties })
       } else if (rule.kind === 'exists' && 'node' in rule.scope) {
-        objects.push({ kind: 'constraint', label: rule.scope.node, properties: [rule.property] })
+        objects.push({ kind: 'exists', label: rule.scope.node, properties: [rule.property] })
       }
-      // Type constraints (memgraph) are per property too, but they share the label/property
-      // pair with the existence constraint, so they would collapse onto the same key. They
-      // are covered by the apply report rather than by this comparison.
+      // Type constraints (memgraph) are left out — no longer because they would collide with
+      // the existence constraint, which `kind` now prevents, but because nothing can read them
+      // back. The present-side reader speaks `SHOW CONSTRAINTS`, which is Neo4j's; Memgraph
+      // lists its constraints in another shape entirely. Declaring them wanted would make every
+      // one of them MISSING on the documented "check memgraph against the running Neo4j"
+      // preview run. They stay in the apply report.
     }
     // Plain indexes need no capability test: every profile can express one, only the spelling
     // differs (see indexStatementsFor).
@@ -111,15 +133,27 @@ export const compareSchemaObjects = (
 ): DriftReport => {
   const declaredKeys = new Set(declared.map(key))
   const presentKeys = new Set(present.map(key))
+  // Both sides are SETS of objects, so each answer is given once. Filtering the arrays let a
+  // duplicate through twice — printed twice and counted twice towards the exit code — which is
+  // how the collapsed constraint kinds first showed themselves.
   return {
-    missing: declared.filter((object) => !presentKeys.has(key(object))),
-    surplus: present.filter((object) => !declaredKeys.has(key(object))),
+    missing: unique(declared).filter((object) => !presentKeys.has(key(object))),
+    surplus: unique(present).filter((object) => !declaredKeys.has(key(object))),
   }
+}
+
+// The operator-facing name of each kind. `unique` and `exists` are how the code tells them
+// apart; a drift report is read by someone deciding whether to create or drop something, and
+// "unique User(id)" alone does not say what the object is.
+const NAMES: Record<SchemaObject['kind'], string> = {
+  unique: 'unique constraint',
+  exists: 'existence constraint',
+  index: 'index',
 }
 
 /** Human-readable one-liner, used by the CLI and by the failure messages. */
 export const describeSchemaObject = (object: SchemaObject): string =>
-  `${object.kind} ${object.label}(${[...object.properties].join(', ')})`
+  `${NAMES[object.kind]} ${object.label}(${[...object.properties].join(', ')})`
 
 /** Index statements for every entity, plus whatever the profile cannot express. */
 export const declaredIndexStatements = (

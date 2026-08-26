@@ -46,6 +46,18 @@ const heading = (text: string): void => {
   console.log(`\n\x1b[1m${text}\x1b[0m`)
 }
 
+/**
+ * Which of our two constraint kinds a `SHOW CONSTRAINTS` row is.
+ *
+ * The column was previously discarded and every row filed as "a constraint". A property that is
+ * both unique and required — User.id — then had its uniqueness constraint answer for its
+ * existence constraint, and a missing one was reported as present. NODE KEY counts as unique
+ * because that is how statementFor spells a composite uniqueness rule on enterprise; that it
+ * also implies presence is the audit's business, not this comparison's.
+ */
+const constraintKind = (type: string): SchemaObject['kind'] =>
+  type.includes('EXISTENCE') ? 'exists' : 'unique'
+
 /** What `SHOW CONSTRAINTS` / `SHOW INDEXES` report, mapped onto the comparison shape. */
 const presentObjects = async (session: Session): Promise<SchemaObject[]> => {
   const constraints = await session.run('SHOW CONSTRAINTS')
@@ -53,7 +65,7 @@ const presentObjects = async (session: Session): Promise<SchemaObject[]> => {
   const constraintNames = new Set(constraints.records.map((record) => String(record.get('name'))))
   return [
     ...constraints.records.map((record): SchemaObject => ({
-      kind: 'constraint',
+      kind: constraintKind(String(record.get('type'))),
       label: (record.get('labelsOrTypes') as string[])[0],
       properties: record.get('properties') as string[],
     })),

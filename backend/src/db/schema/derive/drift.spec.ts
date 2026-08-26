@@ -12,9 +12,15 @@ import {
 import type { SchemaObject } from './drift'
 
 const constraint = (label: string, ...properties: string[]): SchemaObject => ({
-  kind: 'constraint',
+  kind: 'unique',
   label,
   properties,
+})
+
+const existence = (label: string, property: string): SchemaObject => ({
+  kind: 'exists',
+  label,
+  properties: [property],
 })
 
 describe('declaredObjects', () => {
@@ -142,8 +148,11 @@ describe('compareSchemaObjects', () => {
 
 describe('describeSchemaObject', () => {
   it('reads as the operator would say it', () => {
-    expect(describeSchemaObject(constraint('User', 'slug'))).toBe('constraint User(slug)')
-    expect(describeSchemaObject(constraint('X', 'a', 'b'))).toBe('constraint X(a, b)')
+    expect(describeSchemaObject(constraint('User', 'slug'))).toBe('unique constraint User(slug)')
+    expect(describeSchemaObject(constraint('X', 'a', 'b'))).toBe('unique constraint X(a, b)')
+    // The two constraint kinds read differently, because someone deciding whether to create or
+    // drop an object needs to know which one is missing.
+    expect(describeSchemaObject(existence('User', 'id'))).toBe('existence constraint User(id)')
   })
 })
 
@@ -152,5 +161,34 @@ describe('isKnownProfile', () => {
     expect(isKnownProfile('neo4j-community')).toBe(true)
     expect(isKnownProfile('memgraph')).toBe(true)
     expect(isKnownProfile('neo4j-comunity')).toBe(false)
+  })
+})
+
+describe('the two constraint kinds are told apart', () => {
+  // `User.id` is unique AND required, so on a profile that can hold both it is two objects over
+  // one label and one property. Filed under a single name they collapsed: the wanted set held
+  // it twice, and a database with only the uniqueness constraint answered for the existence one
+  // as well — a missing constraint reported as present, which is the one outcome that makes a
+  // drift check worse than no drift check.
+
+  it('wants both where the backend can hold both', () => {
+    const declared = declaredObjects([User], 'neo4j-enterprise')
+    expect(declared).toContainEqual(constraint('User', 'id'))
+    expect(declared).toContainEqual(existence('User', 'id'))
+  })
+
+  it('does not let a uniqueness constraint answer for an existence constraint', () => {
+    const report = compareSchemaObjects(
+      [constraint('User', 'id'), existence('User', 'id')],
+      [constraint('User', 'id')],
+    )
+    expect(report.missing).toEqual([existence('User', 'id')])
+  })
+
+  it('reports a missing object once, however often it was wanted', () => {
+    // `missing` filtered the array rather than a set, so a duplicate printed twice and counted
+    // twice towards the exit code.
+    const report = compareSchemaObjects([constraint('User', 'id'), constraint('User', 'id')], [])
+    expect(report.missing).toEqual([constraint('User', 'id')])
   })
 })
