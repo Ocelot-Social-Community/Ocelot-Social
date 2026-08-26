@@ -1,0 +1,145 @@
+# Visual regression baseline update — renders screenshots on Linux so they match CI.
+#
+# Simplest usage — regenerate whatever differs from the current baselines:
+#   webapp:      cd webapp && yarn test:visual:docker
+#   packages/ui: cd packages/ui && npm run test:visual:docker
+# These build Storybook natively first (fast, architecture-independent — the
+# static HTML/JS/CSS output doesn't depend on the CPU that built it) and then
+# run only the Playwright test/screenshot step in the amd64 container below,
+# which is the part that actually needs to match CI's runner architecture.
+# Building Storybook itself *inside* the amd64 container works too (the
+# services below do this automatically if storybook-static doesn't exist
+# yet) but is far slower under amd64 emulation — prefer the npm/yarn scripts.
+#
+# Why a plain ubuntu:24.04 base instead of a prebuilt Playwright image: the
+# actual GitHub Actions workflows (ui-visual.yml / webapp-visual.yml) run
+# directly on the ubuntu-latest runner and call
+# `npx playwright install chromium --with-deps` there — that installs
+# Chromium plus current OS font/rendering packages live, at whatever
+# versions Ubuntu's repos have *right now*. A prebuilt image (e.g.
+# mcr.microsoft.com/playwright:...) freezes those same packages at the
+# image's own build date, which silently drifts out of sync with CI over
+# time — confirmed in practice: OsBadge's icon rendering matched a prebuilt
+# image locally while still failing 2% different in real CI. Installing
+# Node and Playwright's browser/deps fresh in every run, exactly like CI's
+# own steps, is slower per run but is the only way that's actually
+# guaranteed to match — no periodic image-drift debugging.
+#
+# Manual / advanced usage:
+# These skip their own Storybook build step if storybook-static already
+# exists on your machine (see "First run" note below) — if source changed
+# since the last run, either delete storybook-static first or use the
+# npm/yarn scripts above instead, which always rebuild fresh.
+#
+# webapp — New component (missing baseline):
+#   docker compose -f docker-compose.visual.yml run --rm webapp-visual-update
+# webapp — Existing component changed:
+#   docker compose -f docker-compose.visual.yml run --rm webapp-visual-update-changed
+#
+# packages/ui — New component (missing baseline):
+#   docker compose -f docker-compose.visual.yml run --rm ui-visual-update
+# packages/ui — Existing component changed:
+#   docker compose -f docker-compose.visual.yml run --rm ui-visual-update-changed
+#
+# Filter to specific component: -e TEST=OsValidationHint
+#
+# First run: storybook build is cached (in the bind-mounted storybook-static
+# dir, so it persists on the host); subsequent runs are much faster. Node
+# itself and Playwright's browser/OS deps are re-installed on every run (not
+# cached) — that live install is the whole point, see above.
+# After the run, commit the updated __screenshots__/ files.
+
+x-visual-base: &visual-base
+  image: ubuntu:24.04
+  platform: linux/amd64
+  working_dir: /app
+  shm_size: '2gb'
+  environment:
+    - NODE_ENV=development
+    - DEBIAN_FRONTEND=noninteractive
+    # TEST filters which spec files Playwright runs — empty = all tests.
+    # Override via: docker compose ... run --rm -e TEST=CommentCard webapp-visual-update-changed
+    - TEST=
+  volumes:
+    - ./webapp:/app
+    - webapp_visual_node_modules:/app/node_modules
+    - ./packages/ui:/packages/ui
+    - ./packages/branding:/packages/branding
+
+services:
+  # Every service below starts its command with the same four lines,
+  # installing the exact Node version CI uses (webapp/.nvmrc and
+  # packages/ui/.tool-versions both pin the same version) via NodeSource —
+  # same effective binary actions/setup-node would install, just fetched
+  # ourselves since this is a bare Ubuntu image, not a GitHub Actions runner.
+  # YAML anchors can't be spliced into the middle of another scalar string,
+  # so this is duplicated rather than shared.
+  webapp-visual-update:
+    <<: *visual-base
+    command: >
+      /bin/bash -c "
+        apt-get update -qq &&
+        apt-get install -y -qq curl ca-certificates &&
+        curl -fsSL https://deb.nodesource.com/setup_25.x | bash - &&
+        apt-get install -y -qq nodejs &&
+        npm install -g yarn@1.22.22 &&
+        yarn install &&
+        node scripts/fix-storybook-webpack.js &&
+        ([ -d storybook-static ] || yarn build-storybook) &&
+        npx playwright install chromium --with-deps &&
+        CI=true ./node_modules/.bin/playwright test --update-snapshots=missing $${TEST:-}
+      "
+
+  webapp-visual-update-changed:
+    <<: *visual-base
+    command: >
+      /bin/bash -c "
+        apt-get update -qq &&
+        apt-get install -y -qq curl ca-certificates &&
+        curl -fsSL https://deb.nodesource.com/setup_25.x | bash - &&
+        apt-get install -y -qq nodejs &&
+        npm install -g yarn@1.22.22 &&
+        yarn install &&
+        node scripts/fix-storybook-webpack.js &&
+        ([ -d storybook-static ] || yarn build-storybook) &&
+        npx playwright install chromium --with-deps &&
+        CI=true ./node_modules/.bin/playwright test --update-snapshots=changed $${TEST:-}
+      "
+
+  ui-visual-update:
+    <<: *visual-base
+    volumes:
+      - ./packages/ui:/app
+      - ui_visual_node_modules:/app/node_modules
+    command: >
+      /bin/bash -c "
+        apt-get update -qq &&
+        apt-get install -y -qq curl ca-certificates &&
+        curl -fsSL https://deb.nodesource.com/setup_25.x | bash - &&
+        apt-get install -y -qq nodejs &&
+        npm install &&
+        ([ -d storybook-static ] || npm run storybook:build) &&
+        npx playwright install chromium --with-deps &&
+        CI=true npx playwright test --update-snapshots=missing $${TEST:-}
+      "
+
+  ui-visual-update-changed:
+    <<: *visual-base
+    volumes:
+      - ./packages/ui:/app
+      - ui_visual_node_modules:/app/node_modules
+    command: >
+      /bin/bash -c "
+        apt-get update -qq &&
+        apt-get install -y -qq curl ca-certificates &&
+        curl -fsSL https://deb.nodesource.com/setup_25.x | bash - &&
+        apt-get install -y -qq nodejs &&
+        npm install &&
+        ([ -d storybook-static ] || npm run storybook:build) &&
+        npx playwright install chromium --with-deps &&
+        CI=true npx playwright test --update-snapshots=changed $${TEST:-}
+      "
+
+volumes:
+  webapp_visual_node_modules:
+  ui_visual_node_modules:
