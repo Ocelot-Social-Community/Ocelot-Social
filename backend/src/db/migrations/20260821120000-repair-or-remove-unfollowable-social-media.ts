@@ -213,29 +213,41 @@ export async function up(_next) {
       }
     }
 
-    for (const { id, to } of repaired) {
+    /* eslint-disable no-console */
+    // Every value is printed BEFORE the write that destroys it, and in the present tense.
+    //
+    // `down` is empty and justifies itself with these lines: what was removed is recoverable
+    // from the deployment log. That promise only holds if the line exists before the value
+    // stops existing. Printed afterwards, a run that dies partway through the loop — a lost
+    // connection, a killed pod — would have deleted rows it never named, and the data would be
+    // gone without a trace. Which is the one outcome the note above about telling people what
+    // disappeared from their profile is meant to prevent.
+    //
+    // A repair is the same problem in a quieter form: `SET s.url = $url` overwrites the only
+    // copy of the old value, and a dropped `?bcc=` cannot be reconstructed from the result.
+    //
+    // The counts go first because they are known before any write — they describe the plan, so
+    // an interrupted run can be told apart from one that had nothing to do.
+    console.log(
+      `SocialMedia urls: ${String(rows.length)} checked, ${String(repaired.length)} to repair, ` +
+        `${String(removed.length)} to remove`,
+    )
+
+    for (const { id, from, to } of repaired) {
+      console.log(`  repairing ${JSON.stringify(from)} -> ${JSON.stringify(to)}`)
       await session.writeTransaction((transaction) =>
         transaction.run('MATCH (s:SocialMedia {id: $id}) SET s.url = $url', { id, url: to }),
       )
     }
-    for (const { id } of removed) {
+    for (const { id, owner, url } of removed) {
+      // The owner's slug, so this is actionable: someone can tell them what is gone.
+      console.log(`  removing ${owner}: ${JSON.stringify(url)}`)
       await session.writeTransaction((transaction) =>
         transaction.run('MATCH (s:SocialMedia {id: $id}) DETACH DELETE s', { id }),
       )
     }
 
-    /* eslint-disable no-console */
-    console.log(
-      `SocialMedia urls: ${String(rows.length)} checked, ${String(repaired.length)} repaired, ` +
-        `${String(removed.length)} removed`,
-    )
-    for (const { from, to } of repaired) {
-      console.log(`  repaired ${JSON.stringify(from)} -> ${JSON.stringify(to)}`)
-    }
-    for (const { owner, url } of removed) {
-      // The owner's slug, so this is actionable: someone can tell them what is gone.
-      console.log(`  removed  ${owner}: ${JSON.stringify(url)}`)
-    }
+    console.log(`SocialMedia urls: done`)
     /* eslint-enable no-console */
   } finally {
     await session.close()

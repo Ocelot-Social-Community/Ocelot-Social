@@ -1,4 +1,10 @@
-import { repair } from '@db/migrations/20260821120000-repair-or-remove-unfollowable-social-media'
+import {
+  repair,
+  up,
+} from '@db/migrations/20260821120000-repair-or-remove-unfollowable-social-media'
+import { getDriver } from '@db/neo4j'
+
+jest.mock('@db/neo4j')
 
 // The classification, without a database. What `up` does around it — read, write, delete,
 // print — is mechanical; the decision "repair into what, or remove" is where the judgement
@@ -148,5 +154,69 @@ describe('repair', () => {
       expect(once).not.toBeNull()
       expect(repair(once as string)).toBe(once)
     }
+  })
+})
+
+describe('up', () => {
+  // One row that survives a repair, one that cannot be repaired and is removed.
+  const rows = [
+    { id: 's1', url: 'mailto:a@example.org?bcc=evil@example.tld', owner: 'jenny' },
+    { id: 's2', url: 'javascript:alert(1)', owner: 'peter' },
+  ]
+
+  let events: string[]
+
+  beforeEach(async () => {
+    events = []
+    const record = (row: (typeof rows)[number]) => ({
+      get: (key: string) => row[key as keyof typeof row],
+    })
+    const session = {
+      readTransaction: async (work: (t: unknown) => unknown) =>
+        Promise.resolve(work({ run: () => ({ records: rows.map(record) }) })),
+      writeTransaction: async (work: (t: unknown) => unknown) =>
+        Promise.resolve(
+          work({
+            run: (_query: string, parameters: { id: string }) => {
+              events.push(`write ${parameters.id}`)
+              return { records: [] }
+            },
+          }),
+        ),
+      close: async () => Promise.resolve(),
+    }
+    jest.mocked(getDriver).mockReturnValue({ session: () => session } as never)
+    jest.spyOn(console, 'log').mockImplementation((line: string) => {
+      events.push(`log ${line.trim()}`)
+    })
+    await up(undefined)
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  it('names a url before the write that destroys it', () => {
+    // `down` is empty and promises that a removed value is recoverable from the deployment log.
+    // Printed after the delete, a run that dies partway through the loop takes user data with it
+    // and names nothing. The order is the promise.
+    const removal = events.indexOf('write s2')
+    const naming = events.findIndex((event) => event.includes('javascript:alert(1)'))
+    expect(naming).toBeGreaterThanOrEqual(0)
+    expect(naming).toBeLessThan(removal)
+  })
+
+  it('names the old value before a repair overwrites it', () => {
+    // The quieter half of the same problem: `SET s.url = $url` overwrites the only copy, and a
+    // dropped `?bcc=` cannot be reconstructed from the result.
+    const write = events.indexOf('write s1')
+    const naming = events.findIndex((event) => event.includes('bcc=evil@example.tld'))
+    expect(naming).toBeGreaterThanOrEqual(0)
+    expect(naming).toBeLessThan(write)
+  })
+
+  it('states the plan before doing any of it', () => {
+    // So an interrupted run can be told apart from one that had nothing to do.
+    expect(events[0]).toBe('log SocialMedia urls: 2 checked, 1 to repair, 1 to remove')
   })
 })
