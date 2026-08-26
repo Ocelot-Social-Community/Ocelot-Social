@@ -37,10 +37,22 @@ import type { Session } from 'neo4j-driver'
 // take "--strict" as the profile name, because the profile is simply argv[3].
 const argv = process.argv.slice(2)
 const flags = argv.filter((argument) => argument.startsWith('--'))
-const [commandArgument, profileArgument] = argv.filter((argument) => !argument.startsWith('--'))
+const positional = argv.filter((argument) => !argument.startsWith('--'))
+const [commandArgument, profileArgument] = positional
 const command = commandArgument ?? 'check'
 const profileInput = profileArgument ?? 'neo4j-community'
 const strict = flags.includes('--strict')
+
+/**
+ * Every flag this tool accepts, so that anything else is an error rather than a shrug.
+ *
+ * `--strict` is the only one, and it is the one that matters: it turns a skipped constraint into
+ * a failure, which is what makes the CI step a gate. Unrecognised flags used to be dropped, so
+ * `apply neo4j-community --strikt` ran in report mode, a skip was no longer an error, the
+ * command exited 0 and the typo was the only trace. The rest of this file already refuses an
+ * unknown command and an unknown profile; a flag is not different.
+ */
+const KNOWN_FLAGS = ['--strict']
 
 const heading = (text: string): void => {
   console.log(`\n\x1b[1m${text}\x1b[0m`)
@@ -230,6 +242,18 @@ const apply = async (
 }
 
 const main = async (): Promise<number> => {
+  const unknownFlags = flags.filter((flag) => !KNOWN_FLAGS.includes(flag))
+  if (unknownFlags.length > 0) {
+    console.error(
+      `Unknown flag(s): ${unknownFlags.join(', ')} (expected ${KNOWN_FLAGS.join(', ')})`,
+    )
+    return 1
+  }
+  if (positional.length > 2) {
+    // An argument nobody reads is a typo with no trace, same as an unknown flag.
+    console.error(`Unexpected argument(s): ${positional.slice(2).join(', ')}`)
+    return 1
+  }
   if (!isKnownProfile(profileInput)) {
     console.error(`Unknown profile: ${profileInput}`)
     return 1
