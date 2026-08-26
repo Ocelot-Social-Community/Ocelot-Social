@@ -136,8 +136,20 @@ describe('generated queries', () => {
   it('counts users whose single-role invariant is broken', () => {
     // The rule the authorisation layer assumes and that no engine can enforce.
     expect(audit('User-[:HAS_ROLE] exactly-one')?.cypher).toBe(
-      'MATCH (n) WHERE n:User WITH n, size([(n)-[:HAS_ROLE]->() | 1]) AS edges ' +
+      'MATCH (n:User) WITH n, size([(n)-[:HAS_ROLE]->() | 1]) AS edges ' +
         'WHERE edges <> 1 RETURN count(n) AS violations',
+    )
+  })
+
+  it('falls back to a disjunction where a rule names several source labels', () => {
+    // Cypher has no `(n:A|B)` for a node, so the predicate form is not a style choice here.
+    // BELONGS_TO carries two unrelated uses and three source labels.
+    expect(
+      audit('EmailAddress|UnverifiedEmailAddress|Report-[:BELONGS_TO] at-most-one')?.cypher,
+    ).toBe(
+      'MATCH (n) WHERE n:EmailAddress OR n:UnverifiedEmailAddress OR n:Report ' +
+        'WITH n, size([(n)-[:BELONGS_TO]->() | 1]) AS edges ' +
+        'WHERE edges > 1 RETURN count(n) AS violations',
     )
   })
 

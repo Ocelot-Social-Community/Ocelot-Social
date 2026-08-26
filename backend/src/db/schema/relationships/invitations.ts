@@ -5,27 +5,29 @@ import { defineRelationship } from '@db/schema/types'
 
 import { createdAt } from './timestamps'
 
+import type { RelationshipDefinition } from '@db/schema/types'
+
 // Invite codes: who made one, who used it, and which group it opens.
 
-export const GENERATED = defineRelationship({
-  type: 'GENERATED',
-  from: User,
-  to: InviteCode,
-  cardinality: 'many',
-})
-
-export const REDEEMED = defineRelationship({
-  type: 'REDEEMED',
-  from: User,
-  to: InviteCode,
-  cardinality: 'at-most-one',
-  properties: { createdAt },
-  required: ['createdAt'],
-})
-
-export const INVITES_TO = defineRelationship({
-  type: 'INVITES_TO',
-  from: InviteCode,
-  to: Group,
-  cardinality: 'at-most-one',
-})
+export const invitations: readonly RelationshipDefinition[] = [
+  defineRelationship({
+    type: 'GENERATED',
+    from: User,
+    to: InviteCode,
+    cardinality: 'many',
+  }),
+  defineRelationship({
+    type: 'REDEEMED',
+    from: User,
+    to: InviteCode,
+    cardinality: 'at-most-one',
+    properties: { createdAt },
+    required: ['createdAt'],
+  }),
+  defineRelationship({
+    type: 'INVITES_TO',
+    from: InviteCode,
+    to: Group,
+    cardinality: 'at-most-one',
+  }),
+]

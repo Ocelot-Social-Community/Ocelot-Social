@@ -188,9 +188,22 @@ export const auditQueryFor = (rule: Rule, profile: BackendProfile): AuditQuery |
 
     case 'cardinality': {
       const comparison = rule.cardinality === 'exactly-one' ? '<> 1' : '> 1'
-      const isSource = rule.from.map((label) => `n:${label}`).join(' OR ')
+      // One source label goes into the pattern, several stay a disjunction — Cypher has no
+      // `(n:A|B)` for a node.
+      //
+      // NOT a Neo4j optimisation, and worth saying so before someone "fixes" it back: measured
+      // with EXPLAIN on 4.4, `MATCH (n) WHERE n:User` and `MATCH (n:User)` produce the same
+      // NodeByLabelScan, and the two-label disjunction produces two of them. The planner folds
+      // the predicate either way. It is written this way because the pattern says what the
+      // query means without a planner having to infer it, and because this generator also
+      // targets Memgraph, whose planner makes its own choices — the form that needs no
+      // inference is the one that cannot lose it.
+      const match =
+        rule.from.length === 1
+          ? `MATCH (n:${rule.from[0]})`
+          : `MATCH (n) WHERE ${rule.from.map((label) => `n:${label}`).join(' OR ')}`
       const degree =
-        `MATCH (n) WHERE ${isSource} ` +
+        `${match} ` +
         `WITH n, size([(n)-[:${rule.type}]->() | 1]) AS edges ` +
         `WHERE edges ${comparison} `
       return {

@@ -1,12 +1,12 @@
-import * as authoring from './authoring'
-import * as badges from './badges'
-import * as chat from './chat'
-import * as identity from './identity'
-import * as invitations from './invitations'
-import * as media from './media'
-import * as moderation from './moderation'
-import * as reactions from './reactions'
-import * as social from './social'
+import { authoring } from './authoring'
+import { badges } from './badges'
+import { chat } from './chat'
+import { identity } from './identity'
+import { invitations } from './invitations'
+import { media } from './media'
+import { moderation } from './moderation'
+import { reactions } from './reactions'
+import { social } from './social'
 
 import type { RelationshipDefinition } from '@db/schema/types'
 
@@ -25,28 +25,16 @@ import type { RelationshipDefinition } from '@db/schema/types'
 // connects: putting HAS_ROLE in User.ts or in Role.ts would be equally arbitrary, and a
 // polymorphic edge with four possible endpoints has no such home at all. The grouping is the
 // same one the single file used to draw with comment headers.
-
-export * from './authoring'
-export * from './badges'
-export * from './chat'
-export * from './identity'
-export * from './invitations'
-export * from './media'
-export * from './moderation'
-export * from './reactions'
-export * from './social'
-
-// Collected from the modules, not relisted by hand.
 //
-// The list this replaces named all forty-four types a second time, and nothing checked that
-// the two agreed — an edge declared and then forgotten here would simply never be audited,
-// which is the one failure this whole registry exists to prevent. Splitting the file into nine
-// made that easy enough to do accidentally that deriving it was the only defensible option.
-//
-// Every export of these modules is a relationship: the shared edge properties live in
-// ./timestamps, which is deliberately not spread in here. If one ever slipped through,
-// schema.spec.ts walks this array asking each entry for its endpoints and would fail.
-export const relationships: readonly RelationshipDefinition[] = Object.values({
+// Each of those files exports its edges as ONE array rather than as named constants, and this
+// is the only place they are joined. The single file this replaces ended with all forty-four
+// types written out a second time, with nothing checking that the two agreed — an edge
+// declared and then forgotten there would simply never be audited, which is the one failure
+// this registry exists to prevent. Nine names listed once each, in the file whose only job is
+// listing them, is the smallest version of that risk that does not need reflection over the
+// module system to avoid.
+
+export const relationships: readonly RelationshipDefinition[] = [
   ...authoring,
   ...badges,
   ...chat,
@@ -56,4 +44,4 @@ export const relationships: readonly RelationshipDefinition[] = Object.values({
   ...moderation,
   ...reactions,
   ...social,
-})
+]
