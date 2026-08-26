@@ -6,8 +6,9 @@ import uniqueSlug from './slugify/uniqueSlug'
 import type { Context } from '@src/context'
 
 // excludeId lets an update exclude the very node being updated from the
-// uniqueness check — without it, re-saving a post/group/user without an
-// explicit slug always collides with its own existing slug and picks up an
+// uniqueness check — without it, re-saving a post without an explicit slug
+// (the only mutation below that passes one; UpdateGroup/UpdateUser aren't
+// handled here) always collides with its own existing slug and picks up an
 // unwanted "-1" (or increments further on every subsequent save).
 export const isUniqueFor = (context: Context, type: string, excludeId?: string) => {
   return async (slug: string) => {

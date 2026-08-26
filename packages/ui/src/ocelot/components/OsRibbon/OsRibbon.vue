@@ -42,6 +42,15 @@
 </script>
 
 <style>
+  /* :where() keeps this at 0 specificity, so a consumer positioning the
+     ribbon itself (e.g. webapp's .post-detail-ribbon { position: absolute })
+     still wins outright — this is only a fallback so the ::before triangle
+     below still anchors to the ribbon and not some unrelated ancestor when
+     no such consumer rule applies. */
+  :where(.os-ribbon) {
+    position: relative;
+  }
+
   .os-ribbon {
     padding: var(--os-ribbon-padding, 6px);
     border-radius: var(--os-ribbon-radius, 2px) 0 0 var(--os-ribbon-radius, 2px);

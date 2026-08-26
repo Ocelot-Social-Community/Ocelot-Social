@@ -905,15 +905,16 @@ describe('osLocationMap', () => {
     })
 
     it('clears a pending debounce timer on unmount', async () => {
+      vi.useFakeTimers()
       const wrapper = mount(OsLocationMap, {
         props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', showSearch: true },
       })
 
       await wrapper.find('.os-location-map__search-input').setValue('Berlin')
+      wrapper.unmount()
+      vi.advanceTimersByTime(400)
 
-      expect(() => {
-        wrapper.unmount()
-      }).not.toThrow()
+      expect(wrapper.emitted('search-input')).toBeUndefined()
     })
 
     it('does nothing on blur when the search is not collapsible', async () => {

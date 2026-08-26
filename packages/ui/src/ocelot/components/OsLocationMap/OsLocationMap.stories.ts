@@ -22,6 +22,11 @@ function createStubMapboxGl() {
   // pick-location toggle, style switcher, ...). A no-op stub here would
   // leave the Editable/WithStyleSwitcher stories showing no controls at all.
   const mapContainer = document.createElement('div')
+  // Hoisted (not created fresh per call) so a cursor style setPicking() sets
+  // on one getCanvas() call is still there on a later call reading it back —
+  // same reasoning for the marker element and updateMarker()'s a11y attrs.
+  const canvasElement = document.createElement('canvas')
+  const markerElement = document.createElement('div')
   const stubMap = {
     addControl: (control?: { onAdd?: () => HTMLElement }) => {
       if (typeof control?.onAdd === 'function') {
@@ -36,7 +41,7 @@ function createStubMapboxGl() {
     getContainer: () => mapContainer,
     // Read by setPicking() (cursor styling) and flyToPin() (never zooming
     // back out below the current level).
-    getCanvas: () => document.createElement('canvas'),
+    getCanvas: () => canvasElement,
     getZoom: () => 2,
   }
   const stubMarker = {
@@ -51,7 +56,7 @@ function createStubMapboxGl() {
     setDraggable: () => {},
     getLngLat: () => ({ lng: 0, lat: 0 }),
     // Read by updateMarker() to set the view-on-map a11y attributes.
-    getElement: () => document.createElement('div'),
+    getElement: () => markerElement,
   }
 
   return {

@@ -690,6 +690,9 @@
       function selectResult(result: OsLocationMapSearchResult) {
         showResults.value = false
         searchQuery.value = result.label
+        if (debounceTimer) {
+          clearTimeout(debounceTimer)
+        }
         emit('search-select', result)
       }
 

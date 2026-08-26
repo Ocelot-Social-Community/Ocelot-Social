@@ -257,6 +257,7 @@ import {
   OsRibbon,
 } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
+import { isEventPast } from '~/utils/eventDate'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import CommentForm from '~/components/CommentForm/CommentForm'
 import CommentList from '~/components/CommentList/CommentList'
@@ -461,10 +462,11 @@ export default {
         typeof this.post.eventLocation.lng === 'number'
       )
     },
-    // Same definition the main map itself uses to hide events (eventStart in
-    // the past) — deep-linking from one tells the map to include past pins.
+    // Same definition the main map itself uses (eventStart AND eventEnd both
+    // past, with a same-day grace period) — deep-linking from a still-running
+    // event must not tell the map to hide it.
     isPastEvent() {
-      return !!this.post?.eventStart && new Date(this.post.eventStart) < new Date()
+      return isEventPast(this.post)
     },
     // Read-only map only makes sense for in-person events with a resolved pin.
     showEventMap() {

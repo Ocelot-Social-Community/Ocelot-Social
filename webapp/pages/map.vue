@@ -106,6 +106,7 @@ import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
 import { mapGetters } from 'vuex'
 import { OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
+import { isEventPast } from '~/utils/eventDate'
 import { profileUserQuery } from '~/graphql/User'
 import { mapQuery } from '~/graphql/MapQuery'
 import mobile from '~/mixins/mobile'
@@ -868,18 +869,7 @@ export default {
     getCoordinates(location) {
       return [location.lng, location.lat]
     },
-    // Mirrors filterEventDates() in backend/src/graphql/resolvers/posts.ts:
-    // an event stays "current" through the rest of the calendar day it ends
-    // on (or, without an eventEnd, the day it started), only truly "past"
-    // once that whole day has elapsed — not the instant the raw timestamp
-    // passes.
-    isEventPast(post) {
-      if (!post.eventStart) return false
-      const now = new Date()
-      const endOfRelevantDate = new Date(post.eventEnd || post.eventStart)
-      endOfRelevantDate.setHours(23, 59, 59, 999)
-      return endOfRelevantDate < now
-    },
+    isEventPast,
     async getUserLocation(id) {
       try {
         const {

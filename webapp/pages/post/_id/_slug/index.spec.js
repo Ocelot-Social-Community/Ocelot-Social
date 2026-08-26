@@ -598,6 +598,35 @@ describe('PostSlug', () => {
         expect(PostSlug.computed.ribbonText.call(ctx)).toBe('post.article')
       })
 
+      describe('isPastEvent', () => {
+        beforeEach(() => {
+          const noon = new Date()
+          noon.setHours(12, 0, 0, 0)
+          jest.useFakeTimers()
+          jest.setSystemTime(noon)
+        })
+
+        afterEach(() => {
+          jest.useRealTimers()
+        })
+
+        const hoursFromNow = (h) => new Date(Date.now() + h * 60 * 60 * 1000).toISOString()
+
+        it('is true once both eventStart and eventEnd are in the past', () => {
+          const ctx = { post: { eventStart: hoursFromNow(-48), eventEnd: hoursFromNow(-24) } }
+          expect(PostSlug.computed.isPastEvent.call(ctx)).toBe(true)
+        })
+
+        it('is false for a still-running event (eventStart past, eventEnd future)', () => {
+          const ctx = { post: { eventStart: hoursFromNow(-1), eventEnd: hoursFromNow(1) } }
+          expect(PostSlug.computed.isPastEvent.call(ctx)).toBe(false)
+        })
+
+        it('is false without a post', () => {
+          expect(PostSlug.computed.isPastEvent.call({ post: null })).toBe(false)
+        })
+      })
+
       it('commentsCount excludes deleted and disabled comments', () => {
         const ctx = {
           post: {
