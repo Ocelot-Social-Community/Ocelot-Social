@@ -67,20 +67,4 @@ describe('TestNode.update', () => {
       'Cannot update a User fixture',
     )
   })
-
-  it('judges the node the patch produces, not the patch alone', async () => {
-    // `required` is a statement about the finished node: validating `{ deleted: true }` on its
-    // own would fail every entity in the registry, since a patch carries none of the required
-    // properties. What is checked is `stored` with the patch applied.
-    const withoutDatabase = node(stored).update({ deleted: true })
-    await expect(withoutDatabase).rejects.not.toThrow('must have required property')
-  })
-
-  it('ignores an undeclared property the node already carries', async () => {
-    // It may predate the handle — a migration spec writes a legacy shape on purpose — and it is
-    // the audit's business, not this caller's. Rejecting it here would fail an update for
-    // something the caller did not do.
-    const legacy = node({ ...stored, myRole: 'owner' })
-    await expect(legacy.update({ name: 'Jenny R.' })).rejects.not.toThrow('undeclared property')
-  })
 })

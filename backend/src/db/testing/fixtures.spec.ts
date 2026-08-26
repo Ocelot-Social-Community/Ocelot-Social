@@ -67,3 +67,29 @@ describe('fixtures.first', () => {
     )
   })
 })
+
+describe('TestNode.update against a real node', () => {
+  // The two cases that have to NOT be rejected. Here rather than in node.spec.ts, because
+  // proving that a check stays quiet means letting the write happen — and node.spec.ts is
+  // deliberately driverless, so a passing update there would hang on a session it never opens.
+
+  it('accepts a partial patch, judging the node it produces', async () => {
+    // `required` is a statement about the finished node. Validating `{ deleted: true }` on its
+    // own would fail every entity in the registry, since a patch carries none of the required
+    // properties — what is checked is the stored node with the patch applied.
+    const node = await fixtures.first('User', { id: 'live' })
+    await node.update({ deleted: true })
+    expect(node.get('deleted')).toBe(true)
+    expect(node.get('name')).toBe('Live')
+  })
+
+  it('tolerates an undeclared property the node already carries', async () => {
+    // A legacy shape a migration spec writes on purpose. It is the audit's business, not this
+    // caller's — rejecting it would fail an update for something the caller did not do.
+    await run(`MATCH (n:User {id: 'gone'}) SET n.myRole = 'owner'`)
+    const node = await fixtures.first('User', { id: 'gone' })
+    await node.update({ name: 'Gone Away' })
+    expect(node.get('name')).toBe('Gone Away')
+    expect(node.get('myRole')).toBe('owner')
+  })
+})
