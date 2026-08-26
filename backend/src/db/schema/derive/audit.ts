@@ -3,7 +3,7 @@ import { scopeLabel } from './rules'
 
 import type { BackendProfile } from './ddl'
 import type { Rule, Scope } from './rules'
-import type { PropertyType } from '@db/schema/types'
+import type { Cardinality, PropertyType } from '@db/schema/types'
 
 // The complement of derive/ddl.ts: a Cypher query per rule the backend cannot enforce.
 //
@@ -205,7 +205,19 @@ export const auditQueryFor = (rule: Rule, profile: BackendProfile): AuditQuery |
     }
 
     case 'cardinality': {
-      const comparison = rule.cardinality === 'exactly-one' ? '<> 1' : '> 1'
+      // A total map rather than a ternary, so that adding a cardinality is a compile error here
+      // instead of a silent `> 1`. `many` maps to null because it states no restriction at all
+      // — rulesForRelationship already declines to emit a rule for it, and this says the same
+      // thing a second time rather than trusting the caller to keep doing so.
+      const COMPARISON: Record<Cardinality, string | null> = {
+        'exactly-one': '<> 1',
+        'at-most-one': '> 1',
+        many: null,
+      }
+      const comparison = COMPARISON[rule.cardinality]
+      if (comparison === null) {
+        return null
+      }
       // One source label goes into the pattern, several stay a disjunction — Cypher has no
       // `(n:A|B)` for a node.
       //

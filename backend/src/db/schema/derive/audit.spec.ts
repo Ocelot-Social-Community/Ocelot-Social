@@ -153,6 +153,19 @@ describe('generated queries', () => {
     )
   })
 
+  it('asks nothing about a cardinality that restricts nothing', () => {
+    // `many` yields no rule — rulesForRelationship declines to emit one — so this is the
+    // contract of the generator rather than a reachable path today. It is stated here because
+    // the alternative reading, "anything that is not exactly-one means more than one is a
+    // violation", is what the ternary this replaces actually said.
+    expect(
+      auditQueryFor(
+        { kind: 'cardinality', type: 'FRIENDS', from: ['User'], cardinality: 'many' },
+        'neo4j-community',
+      ),
+    ).toBeNull()
+  })
+
   it('counts edges between the wrong labels', () => {
     expect(audit('[:WROTE] endpoints User->Post|Comment')?.cypher).toBe(
       'MATCH (a)-[r:WROTE]->(b) WHERE NOT (a:User AND (b:Post OR b:Comment)) ' +
