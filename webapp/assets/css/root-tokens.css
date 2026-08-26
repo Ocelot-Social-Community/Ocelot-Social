@@ -405,4 +405,17 @@
   --chat-icon-add: var(--color-primary);
   --chat-icon-send: var(--color-primary);
   --chat-icon-emoji: var(--color-primary);
+  /**
+ * @tokens Map Marker Color
+ * @presenter Color
+ */
+
+  /* Same colors as pages/map.vue's marker legend (markers.types). Not yet consumed there itself —
+     that page still keys its GeoJSON icons by hardcoded hex — but defined here as the single source
+     so other map/location UI (e.g. EventLocationMap's pin) can share it, and so it stays overridable
+     by a brand like every other token here. */
+  --color-map-marker-current-user: rgb(247, 150, 64);
+  --color-map-marker-user: rgb(51, 195, 119);
+  --color-map-marker-group: rgb(248, 77, 77);
+  --color-map-marker-event: rgb(119, 83, 235);
 }

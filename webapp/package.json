@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt",
     "storybook": "cross-env NODE_OPTIONS=--openssl-legacy-provider storybook dev -p 3002 -c storybook/ --host 0.0.0.0",
-    "build-storybook": "cross-env NODE_OPTIONS=--openssl-legacy-provider storybook build -c storybook/",
+    "build-storybook": "node scripts/fix-storybook-webpack.js && cross-env NODE_OPTIONS=--openssl-legacy-provider storybook build -c storybook/",
     "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt build",
     "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt-start",
     "generate": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt generate",
@@ -21,8 +21,8 @@
     "test:unit:update": "yarn test -- --updateSnapshot",
     "test:unit:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --no-cache --runInBand  --forceExit --detectOpenHandles",
     "test:visual": "playwright test",
-    "test:visual:update": "playwright test --update-snapshots",
-    "postinstall": "node scripts/fix-vue2-jest.js && node scripts/fix-v-mapbox.js && node scripts/fix-storybook-webpack.js",
+    "test:visual:docker": "yarn build-storybook && docker compose -f ../docker-compose.visual.yml run --rm webapp-visual-update-changed",
+    "postinstall": "node scripts/fix-vue2-jest.js && node scripts/fix-v-mapbox.js",
     "lint:css-tokens": "node scripts/check-css-tokens.js"
   },
   "dependencies": {

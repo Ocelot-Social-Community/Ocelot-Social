@@ -62,6 +62,7 @@ module.exports = {
     '\\.(svg)$': '<rootDir>/test/fileMock.js',
     '\\.(scss|css|less)$': 'identity-obj-proxy',
     '@mapbox/mapbox-gl-geocoder': 'identity-obj-proxy',
+    '^mapbox-gl$': '<rootDir>/test/__mocks__/mapbox-gl.js',
     'vue2-datepicker/locale/undefined': 'vue2-datepicker/locale/en',
     '^@/(.*)$': '<rootDir>/src/$1',
     '^~/(.*)$': '<rootDir>/$1',

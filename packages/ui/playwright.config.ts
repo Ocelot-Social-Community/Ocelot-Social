@@ -36,13 +36,18 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        launchOptions: { args: ['--disable-gpu'] },
+      },
     },
   ],
 
   /* Run Storybook before starting the tests */
   webServer: {
-    command: 'npm run storybook:build && npx http-server storybook-static -p 6006 -s',
+    command: process.env.CI
+      ? 'npx http-server storybook-static -p 6006 -s'
+      : 'npm run storybook:build && npx http-server storybook-static -p 6006 -s',
     url: 'http://localhost:6006',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
@@ -51,8 +56,9 @@ export default defineConfig({
   /* Snapshot configuration */
   expect: {
     toHaveScreenshot: {
-      /* Allow slight differences due to font rendering across platforms (self-hosted font) and OS-level rendering differences (macOS vs Linux) */
-      maxDiffPixelRatio: 0.03,
+      // Baselines are rendered on Linux (docker-compose.visual.yml) — same platform as CI.
+      // 0.1 % gives a tiny buffer for sub-pixel antialiasing while catching real regressions.
+      maxDiffPixelRatio: 0.001,
     },
   },
 

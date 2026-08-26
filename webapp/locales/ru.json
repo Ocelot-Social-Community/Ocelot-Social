@@ -605,6 +605,7 @@
     "categories": {
       "infoSelectedNoOfMaxCategories": "Выбрано {chosen} из {max} категорий"
     },
+    "categoriesTitle": "Темы",
     "category": {
       "description": {
         "body-and-excercise": "Спорт, йога, массаж, релаксация",
@@ -662,6 +663,7 @@
         }
       }
     },
+    "content": "Содержание",
     "emotions-label": {
       "angry": "Возмутительно",
       "cry": "Плачу",
@@ -1056,6 +1058,10 @@
     "legend": {
       "event": "Событие",
       "group": "Группа",
+      "hidePastEvents": "Скрыть прошедшие события",
+      "hideType": "Скрыть {type}",
+      "showPastEvents": "Показать прошедшие события",
+      "showType": "Показать {type}",
       "theUser": "Моя позиция",
       "title": "Легенда",
       "user": "Пользователь"
@@ -1250,12 +1256,16 @@
       "eventEndBeforeStart": "Дата окончания должна быть позже даты начала.",
       "eventIsOnline": "Онлайн",
       "eventLocationName": "Адрес для навигации — например, ул. Примерная 1, 12345 Город",
+      "eventLocationNameLabel": "Адрес",
       "eventLocationRequired": "Если мероприятие не проходит онлайн, необходимо указать место проведения.",
       "eventStart": "Начало",
       "eventStartInPast": "Дата начала находится в прошлом.",
       "eventStartNotEmpty": "Пожалуйста, укажите дату начала.",
-      "eventVenue": "Описание места — например, задний двор, 1-й этаж, …",
-      "title": "Событие"
+      "eventVenue": "например, кафе «Хрисандер», у замка Бергедорф",
+      "eventVenueLabel": "Описание места",
+      "pickLocationOnMap": "Выбрать место на карте",
+      "title": "Событие",
+      "viewOnMainMap": "Посмотреть на главной карте"
     },
     "viewPost": {
       "forGroup": {

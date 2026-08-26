@@ -71,7 +71,12 @@ export default {
   display: flex;
   flex-wrap: nowrap;
 
-  .trigger {
+  /* Direct child only — a plain ".trigger" descendant selector would also
+     match the group-link's own nested Dropdown trigger further down the
+     tree, forcing a max-width onto it that (combined with inherited
+     overflow-wrap: break-word) breaks the group name mid-word despite its
+     white-space: nowrap. */
+  > .trigger {
     max-width: 100%;
     display: flex !important;
     justify-content: center;

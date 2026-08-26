@@ -605,6 +605,7 @@
     "categories": {
       "infoSelectedNoOfMaxCategories": "{chosen} of {max} topics selected"
     },
+    "categoriesTitle": "Topics",
     "category": {
       "description": {
         "body-and-excercise": "Sports, yoga, massage, relaxation",
@@ -662,6 +663,7 @@
         }
       }
     },
+    "content": "Content",
     "emotions-label": {
       "angry": "Angry",
       "cry": "Cry",
@@ -1056,6 +1058,10 @@
     "legend": {
       "event": "Event",
       "group": "Group",
+      "hidePastEvents": "Hide past events",
+      "hideType": "Hide {type}",
+      "showPastEvents": "Show past events",
+      "showType": "Show {type}",
       "theUser": "My position",
       "title": "Legend",
       "user": "User"
@@ -1250,16 +1256,20 @@
       "eventEndBeforeStart": "The end date must be after the start date.",
       "eventIsOnline": "Online",
       "eventLocationName": "Address for navi — e.g. Example Street 1, 12345 City",
+      "eventLocationNameLabel": "Address",
       "eventLocationRequired": "If the event is not online, a location must be entered.",
       "eventStart": "Start",
       "eventStartInPast": "The event start is in the past.",
       "eventStartNotEmpty": "Please enter a start date.",
-      "eventVenue": "Location description — e.g. backyard, 1st floor, …",
-      "title": "Event"
+      "eventVenue": "e.g. Café Chrysander, at Bergedorf Castle",
+      "eventVenueLabel": "Location description",
+      "pickLocationOnMap": "Pick location on map",
+      "title": "Event",
+      "viewOnMainMap": "View on main map"
     },
     "viewPost": {
       "forGroup": {
-        "title": "In The Group "
+        "title": "In the group "
       },
       "title": "Post"
     }

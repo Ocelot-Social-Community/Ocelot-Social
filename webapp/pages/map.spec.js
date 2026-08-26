@@ -1,5 +1,6 @@
 import mapboxgl from 'mapbox-gl'
 import { mount } from '@vue/test-utils'
+import flushPromises from 'flush-promises'
 import VueMeta from 'vue-meta'
 import Vuex from 'vuex'
 import Map from './map'
@@ -48,6 +49,9 @@ const mapOnMock = jest.fn((key, ...args) => {
 const mapAddControlMock = jest.fn()
 const mapAddSourceMock = jest.fn()
 const mapAddLayerMock = jest.fn()
+const mapSetFilterMock = jest.fn()
+const mapSetDataMock = jest.fn()
+const mapGetSourceMock = jest.fn(() => ({ setData: mapSetDataMock }))
 const mapAddImageMock = jest.fn()
 const mapSetStyleMock = jest.fn()
 const mapSetLayoutPropertyMock = jest.fn()
@@ -76,6 +80,8 @@ const mapMock = {
   addControl: mapAddControlMock,
   addSource: mapAddSourceMock,
   addLayer: mapAddLayerMock,
+  setFilter: mapSetFilterMock,
+  getSource: mapGetSourceMock,
   addImage: mapAddImageMock,
   loadImage: mapLoadImageMock,
   setStyle: mapSetStyleMock,
@@ -171,6 +177,8 @@ describe('map', () => {
     mocks = {
       $t: (t) => t,
       $i18n: { locale: () => 'en' },
+      $route: { path: '/map', query: {} },
+      $router: { replace: jest.fn() },
       $env: {
         MAPBOX_TOKEN: 'MY_MAPBOX_TOKEN',
       },
@@ -230,8 +238,12 @@ describe('map', () => {
     })
 
     it('renders legend with all marker types', () => {
-      const items = wrapper.findAll('.map-legend-item')
+      const items = wrapper.findAll('[data-test="marker-type-item"]')
       expect(items.length).toBe(4)
+    })
+
+    it('renders a "show past events" toggle button in the legend', () => {
+      expect(wrapper.find('.map-legend-past-events-toggle').exists()).toBe(true)
     })
 
     it('legend is closed by default on mobile', () => {
@@ -293,6 +305,25 @@ describe('map', () => {
 
       it('isPreparedForMarkers is false initially', () => {
         expect(wrapper.vm.isPreparedForMarkers).toBe(false)
+      })
+    })
+
+    describe('lat/lng query params (deep link, e.g. from an event map)', () => {
+      it('centers on the query coordinates, taking priority over the user location', async () => {
+        mocks.$route = { query: { lat: '52.52', lng: '13.38' } }
+        wrapper = createWrapper()
+        await wrapper.setData({ currentUserCoordinates: [9.63, 48.87] })
+
+        expect(wrapper.vm.mapCenter).toEqual([13.38, 52.52])
+        expect(wrapper.vm.mapZoom).toBe(15)
+      })
+
+      it('falls back to the user location / default center when absent or invalid', () => {
+        mocks.$route = { query: { lat: 'not-a-number', lng: '13.38' } }
+        wrapper = createWrapper()
+
+        expect(wrapper.vm.mapCenter).toEqual([10.452764, 51.165707])
+        expect(wrapper.vm.mapZoom).toBe(4)
       })
     })
 
@@ -399,8 +430,10 @@ describe('map', () => {
 
           onEventMocks['style.load']()
 
-          // loadMarkersIconsAndAddMarkers uses Promise.all().then() — flush microtasks
-          await wrapper.vm.$nextTick()
+          // loadMarkersIconsAndAddMarkers uses Promise.all().then(), which now
+          // (since the isGeoJSON reset below) also re-triggers the isPreparedForMarkers
+          // watcher's own async flush — a single $nextTick() isn't enough anymore.
+          await flushPromises()
 
           // After style.load, isSourceAndLayerAdded is reset and icons reload,
           // then addMarkersOnCheckPrepared re-adds source and layer
@@ -409,6 +442,29 @@ describe('map', () => {
           expect(mapAddLayerMock).toHaveBeenCalledWith(
             expect.objectContaining({ id: 'markers', type: 'symbol' }),
           )
+        })
+
+        it('rebuilds markers.geoJSON with current data instead of re-adding the layer with stale data', async () => {
+          await wrapper.setData({
+            users: otherUsers,
+            groups,
+            posts,
+            currentUserCoordinates: null,
+            currentUserLocation: null,
+          })
+          // Simulates a completed initial build, same as the test above —
+          // isPreparedForMarkers requires !isGeoJSON, so without resetting it
+          // in style.load, addMarkersOnCheckPrepared() would never call
+          // buildMarkersGeoJSON() again after this point.
+          wrapper.vm.markers.isGeoJSON = true
+          wrapper.vm.markers.isSourceAndLayerAdded = true
+          const buildSpy = jest.spyOn(wrapper.vm, 'buildMarkersGeoJSON')
+
+          onEventMocks['style.load']()
+          await flushPromises()
+
+          expect(buildSpy).toHaveBeenCalled()
+          expect(wrapper.vm.markers.isGeoJSON).toBe(true)
         })
       })
 
@@ -830,6 +886,78 @@ describe('map', () => {
           expect(eventFeatures[0].properties.locationName).toBe('Stuttgart')
         })
 
+        it("prefers the post's own precise lat/lng pin over eventLocation's (shared, less exact) coordinates", async () => {
+          const preciseEventPost = {
+            ...posts[0],
+            id: 'e3',
+            lat: 48.7758,
+            lng: 9.1829,
+            // Deliberately different from lat/lng above — proves the precise
+            // pin wins over eventLocation, not just that both happen to agree.
+            eventLocation: { id: 'loc4', name: 'Stuttgart', lng: 9.17702, lat: 48.78232 },
+          }
+          await wrapper.setData({ posts: [preciseEventPost] })
+          const eventFeatures = wrapper.vm
+            .buildMarkersGeoJSON()
+            .filter((f) => f.properties.type === 'event')
+          expect(eventFeatures[0].geometry.coordinates).toEqual([9.1829, 48.7758])
+          // The address label still comes from eventLocation even though its
+          // coordinates were not used for the pin.
+          expect(eventFeatures[0].properties.locationName).toBe('Stuttgart')
+        })
+
+        it("falls back to eventLocation's coordinates for events saved before Post had its own lat/lng", () => {
+          // posts[0] (the default fixture) has no lat/lng of its own, only
+          // eventLocation — this is the pre-fix, already-existing shape.
+          const eventFeatures = wrapper.vm.markers.geoJSON.filter(
+            (f) => f.properties.type === 'event',
+          )
+          expect(eventFeatures[0].geometry.coordinates).toEqual([9.17702, 48.78232])
+        })
+
+        it('skips an event whose eventLocation has no numeric coordinates, instead of pushing [null, null]', async () => {
+          const incompleteLocationPost = {
+            ...posts[0],
+            id: 'e2',
+            eventLocation: { id: 'loc5', name: 'Somewhere', lng: null, lat: null },
+          }
+          await wrapper.setData({ posts: [posts[0], incompleteLocationPost] })
+          const eventFeatures = wrapper.vm
+            .buildMarkersGeoJSON()
+            .filter((f) => f.properties.type === 'event')
+          expect(eventFeatures.map((f) => f.properties.id)).toEqual(['e1'])
+        })
+
+        it('skips a user whose location has no numeric coordinates, instead of pushing [null, null]', async () => {
+          const incompleteLocationUser = {
+            id: 'u4',
+            slug: 'nobody',
+            name: 'Nobody',
+            about: null,
+            location: { id: 'loc6', name: 'Somewhere', lng: null, lat: null },
+          }
+          await wrapper.setData({ users: [...otherUsers, incompleteLocationUser] })
+          const userFeatures = wrapper.vm
+            .buildMarkersGeoJSON()
+            .filter((f) => f.properties.type === 'user')
+          expect(userFeatures.map((f) => f.properties.id)).toEqual(otherUsers.map((u) => u.id))
+        })
+
+        it('skips a group whose location has no numeric coordinates, instead of pushing [null, null]', async () => {
+          const incompleteLocationGroup = {
+            id: 'g2',
+            slug: 'no-location',
+            name: 'No Location Group',
+            about: null,
+            location: { id: 'loc7', name: 'Somewhere', lng: null, lat: null },
+          }
+          await wrapper.setData({ groups: [...groups, incompleteLocationGroup] })
+          const groupFeatures = wrapper.vm
+            .buildMarkersGeoJSON()
+            .filter((f) => f.properties.type === 'group')
+          expect(groupFeatures.map((f) => f.properties.id)).toEqual(groups.map((g) => g.id))
+        })
+
         it('adds source and layer to map', () => {
           expect(mapAddSourceMock).toHaveBeenCalledWith(
             'markers',
@@ -838,6 +966,24 @@ describe('map', () => {
           expect(mapAddLayerMock).toHaveBeenCalledWith(
             expect.objectContaining({ id: 'markers', type: 'symbol' }),
           )
+        })
+
+        it('renders past events paler via icon-opacity, from the --opacity-soft token (falls back to 0.7 in jsdom, where the token is unset)', () => {
+          const [layerArg] = mapAddLayerMock.mock.calls[0]
+          expect(layerArg.paint['icon-opacity']).toEqual([
+            'case',
+            ['boolean', ['get', 'isPast'], false],
+            0.7,
+            1,
+          ])
+        })
+
+        it('applies a marker-type filter showing every type once the layer is added', () => {
+          expect(mapSetFilterMock).toHaveBeenCalledWith('markers', [
+            'in',
+            ['get', 'type'],
+            ['literal', ['theUser', 'user', 'group', 'event']],
+          ])
         })
 
         it('calls flyTo', () => {
@@ -948,6 +1094,81 @@ describe('map', () => {
       })
     })
 
+    describe('openInitialEventPopup', () => {
+      const eventFeature = {
+        geometry: { coordinates: [9.17702, 48.78232] },
+        properties: {
+          type: 'event',
+          slug: 'kindergeburtstag',
+          id: 'e1',
+          name: 'Kindergeburtstag',
+          locationName: 'Stuttgart',
+          description: 'Fun event',
+        },
+      }
+
+      it('does nothing without an initialEventId', () => {
+        wrapper.vm.markers.geoJSON = [eventFeature]
+        wrapper.vm.openInitialEventPopup()
+        expect(mapboxgl.__popupInstance.setLngLat).not.toHaveBeenCalled()
+      })
+
+      it('does nothing when no event matches the deep-linked id', () => {
+        mocks.$route = { path: '/map', query: { eventId: 'does-not-exist' } }
+        const w = createWrapper()
+        w.vm.markers.geoJSON = [eventFeature]
+        w.vm.openInitialEventPopup()
+        expect(mapboxgl.__popupInstance.setLngLat).not.toHaveBeenCalled()
+      })
+
+      it('opens the popup for the matching event feature', () => {
+        mocks.$route = { path: '/map', query: { eventId: 'e1' } }
+        const w = createWrapper()
+        w.vm.onMapLoad({ map: mapMock })
+        w.vm.markers.geoJSON = [eventFeature]
+        w.vm.openInitialEventPopup()
+        expect(mapboxgl.__popupInstance.setLngLat).toHaveBeenCalledWith([9.17702, 48.78232])
+        expect(mapboxgl.__popupInstance.setDOMContent).toHaveBeenCalled()
+        expect(mapboxgl.__popupInstance.addTo).toHaveBeenCalledWith(mapMock)
+      })
+
+      it('is triggered once markers are added and the map has flown to center', async () => {
+        mocks.$route = { path: '/map', query: { eventId: 'e1' } }
+        const w = createWrapper()
+        w.vm.onMapLoad({ map: mapMock })
+        w.vm.markers.isImagesLoaded = true
+        await w.setData({
+          users: otherUsers,
+          groups,
+          posts,
+          currentUserCoordinates: [13.38333, 52.51667],
+          currentUserLocation: userLocation,
+        })
+        w.vm.addMarkersOnCheckPrepared()
+        expect(mapboxgl.__popupInstance.setLngLat).toHaveBeenCalledWith([9.17702, 48.78232])
+      })
+
+      it('retries via refreshMarkersData once a cache response without the event is followed by a network response that includes it', () => {
+        mocks.$route = { path: '/map', query: { eventId: 'e1' } }
+        const w = createWrapper()
+        w.vm.onMapLoad({ map: mapMock })
+        w.vm.markers.isSourceAndLayerAdded = true
+        const buildSpy = jest.spyOn(w.vm, 'buildMarkersGeoJSON')
+
+        // First (cache) response doesn't include the deep-linked event yet.
+        buildSpy.mockReturnValueOnce([])
+        w.vm.refreshMarkersData()
+        expect(mapboxgl.__popupInstance.setLngLat).not.toHaveBeenCalled()
+        expect(w.vm.initialEventId).toBe('e1')
+
+        // Later (network) response now includes it.
+        buildSpy.mockReturnValueOnce([eventFeature])
+        w.vm.refreshMarkersData()
+        expect(mapboxgl.__popupInstance.setLngLat).toHaveBeenCalledWith([9.17702, 48.78232])
+        expect(w.vm.initialEventId).toBeNull()
+      })
+    })
+
     describe('getUserLocation', () => {
       it('returns location when user has one', async () => {
         mocks.$apollo.query.mockResolvedValueOnce({
@@ -1026,6 +1247,15 @@ describe('map', () => {
         expect(vars.groupHasLocation).toBe(true)
         expect(vars.postFilter.postType_in).toEqual(['Event'])
         expect(vars.postFilter.hasLocation).toBe(true)
+        expect(vars.postFilter.eventStart_gte).toBeInstanceOf(Date)
+      })
+
+      it('variables omits eventStart_gte when showPastEvents is true', () => {
+        mocks.$route = { path: '/map', query: { showPastEvents: '1' } }
+        const w = createWrapper()
+        const variablesFn = w.vm.$options.apollo.mapData.variables.bind(w.vm)
+        const vars = variablesFn()
+        expect(vars.postFilter.eventStart_gte).toBeUndefined()
       })
 
       it('update sets users, groups, posts and calls addMarkersOnCheckPrepared', () => {
@@ -1036,6 +1266,211 @@ describe('map', () => {
         expect(wrapper.vm.groups).toBe(groups)
         expect(wrapper.vm.posts).toBe(posts)
         expect(spy).toHaveBeenCalled()
+      })
+
+      it('update refreshes the existing source instead of re-adding it once already added', () => {
+        wrapper.vm.onMapLoad({ map: mapMock })
+        wrapper.vm.markers.isSourceAndLayerAdded = true
+        const spy = jest.spyOn(wrapper.vm, 'refreshMarkersData')
+        const addSpy = jest.spyOn(wrapper.vm, 'addMarkersOnCheckPrepared')
+        const updateFn = wrapper.vm.$options.apollo.mapData.update.bind(wrapper.vm)
+        updateFn({ User: otherUsers, Group: groups, Post: posts })
+        expect(spy).toHaveBeenCalled()
+        expect(addSpy).not.toHaveBeenCalled()
+      })
+
+      it('rebuilds the source/layer instead of crashing when refreshMarkersData runs mid-style-switch', async () => {
+        // mapbox-gl clears every source/layer synchronously on setStyle(), before
+        // the new style's own 'style.load' has rebuilt them — isSourceAndLayerAdded
+        // can still read stale-true in that window, so getSource('markers') can
+        // legitimately return nothing even though the flag says otherwise.
+        wrapper.vm.onMapLoad({ map: mapMock })
+        await wrapper.setData({ users: otherUsers, groups, posts })
+        wrapper.vm.markers.isSourceAndLayerAdded = true
+        mapGetSourceMock.mockReturnValueOnce(undefined)
+
+        wrapper.vm.refreshMarkersData()
+        await flushPromises() // flush loadMarkersIconsAndAddMarkers()'s Promise.all().then()
+
+        expect(mapSetDataMock).not.toHaveBeenCalled()
+        expect(mapAddSourceMock).toHaveBeenCalledWith('markers', expect.any(Object))
+        expect(wrapper.vm.markers.isSourceAndLayerAdded).toBe(true)
+      })
+    })
+
+    describe('showPastEvents', () => {
+      it('defaults to false without a query param', () => {
+        expect(wrapper.vm.showPastEvents).toBe(false)
+      })
+
+      it('is enabled by the ?showPastEvents=1 deep-link query param', () => {
+        mocks.$route = { path: '/map', query: { showPastEvents: '1' } }
+        const w = createWrapper()
+        expect(w.vm.showPastEvents).toBe(true)
+      })
+
+      it('reflects showPastEvents=1 via aria-pressed on the toggle', () => {
+        mocks.$route = { path: '/map', query: { showPastEvents: '1' } }
+        const w = createWrapper()
+        expect(w.find('.map-legend-past-events-toggle').attributes('aria-pressed')).toBe('true')
+      })
+
+      it('labels the toggle with the action it performs, not its current state', () => {
+        expect(wrapper.find('.map-legend-past-events-toggle').attributes('aria-label')).toBe(
+          'map.legend.showPastEvents',
+        )
+
+        mocks.$route = { path: '/map', query: { showPastEvents: '1' } }
+        const w = createWrapper()
+        expect(w.find('.map-legend-past-events-toggle').attributes('aria-label')).toBe(
+          'map.legend.hidePastEvents',
+        )
+      })
+
+      it('adds showPastEvents=1 to the route on click, keeping other query params', async () => {
+        mocks.$route = { path: '/map', query: { lat: '52.5' } }
+        const w = createWrapper()
+        await w.find('.map-legend-past-events-toggle').trigger('click')
+        expect(mocks.$router.replace).toHaveBeenCalledWith({
+          path: '/map',
+          query: { lat: '52.5', showPastEvents: '1' },
+        })
+      })
+
+      it('removes showPastEvents from the route on click when already enabled', async () => {
+        mocks.$route = { path: '/map', query: { lat: '52.5', showPastEvents: '1' } }
+        const w = createWrapper()
+        await w.find('.map-legend-past-events-toggle').trigger('click')
+        expect(mocks.$router.replace).toHaveBeenCalledWith({
+          path: '/map',
+          query: { lat: '52.5' },
+        })
+      })
+    })
+
+    describe('marker type visibility toggle', () => {
+      it('renders a visibility toggle for each marker type', () => {
+        const toggles = wrapper.findAll('.map-legend-visibility-toggle')
+        expect(toggles.length).toBe(4)
+      })
+
+      it('toggles a type in and out of hiddenMarkerTypes', () => {
+        expect(wrapper.vm.isMarkerTypeHidden('user')).toBe(false)
+        wrapper.vm.toggleMarkerTypeVisibility('user')
+        expect(wrapper.vm.isMarkerTypeHidden('user')).toBe(true)
+        wrapper.vm.toggleMarkerTypeVisibility('user')
+        expect(wrapper.vm.isMarkerTypeHidden('user')).toBe(false)
+      })
+
+      it('reflects the hidden state via aria-pressed and toggles it on click', async () => {
+        // Marker order in the legend matches markers.types: theUser, user, group, event.
+        const userToggle = wrapper.findAll('.map-legend-visibility-toggle').at(1)
+        expect(userToggle.attributes('aria-pressed')).toBe('true')
+
+        await userToggle.trigger('click')
+
+        expect(userToggle.attributes('aria-pressed')).toBe('false')
+        expect(wrapper.vm.isMarkerTypeHidden('user')).toBe(true)
+      })
+
+      it('does not touch the map filter before the layer has been added', async () => {
+        wrapper.vm.toggleMarkerTypeVisibility('group')
+        await wrapper.vm.$nextTick()
+        expect(mapSetFilterMock).not.toHaveBeenCalled()
+      })
+
+      it('applies a mapbox layer filter excluding hidden types once the layer exists', async () => {
+        wrapper.vm.onMapLoad({ map: mapMock })
+        wrapper.vm.markers.isSourceAndLayerAdded = true
+
+        wrapper.vm.toggleMarkerTypeVisibility('group')
+        await wrapper.vm.$nextTick()
+
+        expect(mapSetFilterMock).toHaveBeenCalledWith('markers', [
+          'in',
+          ['get', 'type'],
+          ['literal', ['theUser', 'user', 'event']],
+        ])
+      })
+    })
+
+    describe('buildMarkersGeoJSON isPast flag', () => {
+      // Frozen at midday on the test day (rather than the real current time)
+      // so the smallest offsets below (e.g. -1h/-3h) can't drift across a
+      // local midnight boundary and break the "still today" assertions —
+      // isEventPast() reads the real system clock internally, so the freeze
+      // has to cover it too, not just this helper.
+      beforeEach(() => {
+        const noon = new Date()
+        noon.setHours(12, 0, 0, 0)
+        jest.useFakeTimers()
+        jest.setSystemTime(noon)
+      })
+
+      afterEach(() => {
+        jest.useRealTimers()
+      })
+
+      const hoursFromNow = (h) => new Date(Date.now() + h * 60 * 60 * 1000).toISOString()
+
+      it('marks events with both eventStart and eventEnd in the past as isPast', async () => {
+        const pastPost = { ...posts[0], eventStart: hoursFromNow(-48), eventEnd: hoursFromNow(-24) }
+        await wrapper.setData({ users: [], groups: [], posts: [pastPost] })
+        const geoJSON = wrapper.vm.buildMarkersGeoJSON()
+        expect(geoJSON.find((f) => f.properties.type === 'event').properties.isPast).toBe(true)
+      })
+
+      it('does not mark a still-running event (eventStart past, eventEnd future) as isPast', async () => {
+        // Mirrors the backend's filterEventDates(): an event stays "current"
+        // while either boundary is still ahead.
+        const ongoingPost = { ...posts[0], eventStart: hoursFromNow(-1), eventEnd: hoursFromNow(1) }
+        await wrapper.setData({ users: [], groups: [], posts: [ongoingPost] })
+        const geoJSON = wrapper.vm.buildMarkersGeoJSON()
+        expect(geoJSON.find((f) => f.properties.type === 'event').properties.isPast).toBe(false)
+      })
+
+      it('does not mark an event as isPast while still within the day its eventEnd falls on', async () => {
+        // eventEnd already passed as an exact instant, but the event stays
+        // "current" through the rest of that calendar day — same grace
+        // period as an event with no eventEnd at all.
+        const endedTodayPost = {
+          ...posts[0],
+          eventStart: hoursFromNow(-3),
+          eventEnd: hoursFromNow(-1),
+        }
+        await wrapper.setData({ users: [], groups: [], posts: [endedTodayPost] })
+        const geoJSON = wrapper.vm.buildMarkersGeoJSON()
+        expect(geoJSON.find((f) => f.properties.type === 'event').properties.isPast).toBe(false)
+      })
+
+      it('does not mark future events as isPast', async () => {
+        const futurePost = { ...posts[0], eventStart: hoursFromNow(24), eventEnd: hoursFromNow(48) }
+        await wrapper.setData({ users: [], groups: [], posts: [futurePost] })
+        const geoJSON = wrapper.vm.buildMarkersGeoJSON()
+        expect(geoJSON.find((f) => f.properties.type === 'event').properties.isPast).toBe(false)
+      })
+
+      it('does not mark dateless events as isPast', async () => {
+        const datelessPost = { ...posts[0], eventStart: undefined, eventEnd: undefined }
+        await wrapper.setData({ users: [], groups: [], posts: [datelessPost] })
+        const geoJSON = wrapper.vm.buildMarkersGeoJSON()
+        expect(geoJSON.find((f) => f.properties.type === 'event').properties.isPast).toBe(false)
+      })
+
+      it('does not mark an event without eventEnd as isPast while still within its start day', async () => {
+        // No eventEnd was ever given (legacy posts) — assumed to run through
+        // the rest of the day it started, mirroring the backend fallback.
+        const noEndTodayPost = { ...posts[0], eventStart: hoursFromNow(-1), eventEnd: null }
+        await wrapper.setData({ users: [], groups: [], posts: [noEndTodayPost] })
+        const geoJSON = wrapper.vm.buildMarkersGeoJSON()
+        expect(geoJSON.find((f) => f.properties.type === 'event').properties.isPast).toBe(false)
+      })
+
+      it('marks an event without eventEnd as isPast once its start day has fully elapsed', async () => {
+        const noEndOldPost = { ...posts[0], eventStart: hoursFromNow(-30), eventEnd: null }
+        await wrapper.setData({ users: [], groups: [], posts: [noEndOldPost] })
+        const geoJSON = wrapper.vm.buildMarkersGeoJSON()
+        expect(geoJSON.find((f) => f.properties.type === 'event').properties.isPast).toBe(true)
       })
     })
 

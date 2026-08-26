@@ -94,9 +94,38 @@ const maintainGroupPinnedPosts = (params) => {
 
 const filterEventDates = (params) => {
   if (params.filter?.eventStart_gte) {
-    const date = params.filter.eventStart_gte
-    delete params.filter.eventStart_gte
-    params.filter = { ...params.filter, OR: [{ eventStart_gte: date }, { eventEnd_gte: date }] }
+    const { eventStart_gte: date, ...restFilter } = params.filter
+    // An event stays "current" through the rest of the calendar day it ends
+    // on, not just up to its exact eventEnd instant — so this compares
+    // eventEnd against the *start* of the cutoff's day, not the cutoff
+    // itself. Posts saved before eventEnd defaulting existed (see
+    // ContributionForm's fallback) may still have no eventEnd at all; those
+    // get the same day-level grace period, based on eventStart instead.
+    // UTC, not server-local time — the backend has no reliable notion of the
+    // requesting user's timezone, and using setHours() would make the day
+    // boundary silently depend on whatever timezone the server process
+    // happens to run in.
+    const startOfStartDate = new Date(date)
+    if (Number.isNaN(startOfStartDate.getTime())) {
+      throw new UserInputError('eventStart_gte is invalid')
+    }
+    startOfStartDate.setUTCHours(0, 0, 0, 0)
+    // AND, not a spread — restFilter may itself carry a top-level OR/AND (or
+    // any other key) from the client; spreading it alongside this OR would
+    // silently overwrite a same-named client key (most notably OR) instead
+    // of combining with it.
+    params.filter = {
+      AND: [
+        restFilter,
+        {
+          OR: [
+            { eventStart_gte: date },
+            { eventEnd_gte: startOfStartDate.toISOString() },
+            { eventEnd: null, eventStart_gte: startOfStartDate.toISOString() },
+          ],
+        },
+      ],
+    }
   }
   return params
 }
@@ -232,7 +261,7 @@ export default {
       const { categoryIds, groupId } = params
       const { image: imageInput } = params
 
-      const locationName = validateEventParams(params)
+      const { locationName, coordinates } = validateEventParams(params)
 
       delete params.categoryIds
       delete params.image
@@ -304,7 +333,14 @@ export default {
       try {
         const post = await writeTxResultPromise
         if (locationName) {
-          await createOrUpdateLocations('Post', post.id, locationName, session, context)
+          await createOrUpdateLocations(
+            'Post',
+            post.id,
+            locationName,
+            session,
+            context,
+            coordinates,
+          )
         }
         return post
       } catch (e) {
@@ -321,7 +357,7 @@ export default {
       const { categoryIds } = params
       const { image: imageInput } = params
 
-      const locationName = validateEventParams(params)
+      const { locationName, coordinates } = validateEventParams(params)
 
       delete params.categoryIds
       delete params.image
@@ -375,7 +411,14 @@ export default {
         const post = await writeTxResultPromise
         await images(context.config).mergeImage(post, 'HERO_IMAGE', imageInput)
         if (locationName !== undefined) {
-          await createOrUpdateLocations('Post', post.id, locationName, session, context)
+          await createOrUpdateLocations(
+            'Post',
+            post.id,
+            locationName,
+            session,
+            context,
+            coordinates,
+          )
         }
         return post
       } catch (e) {

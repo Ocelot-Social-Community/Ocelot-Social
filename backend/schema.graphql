@@ -614,6 +614,12 @@ type Location {
 """A geocoding suggestion returned by the MapBox-backed place search."""
 type LocationMapBox {
   id: ID!
+
+  """Latitude in decimal degrees (WGS84), if known."""
+  lat: Float
+
+  """Longitude in decimal degrees (WGS84), if known."""
+  lng: Float
   place_name: String!
 }
 
@@ -1360,6 +1366,14 @@ type Post {
 
   """Content language as an IETF/ISO code (e.g. `en`, `de`)."""
   language: String
+
+  """
+  Precise latitude of the event's map pin (Event posts) — the exact point picked, independent of eventLocation's own coordinates (which belong to a Location node shared/reused across other posts, users and groups at the same address, and so cannot hold any one event's exact pick).
+  """
+  lat: Float
+
+  """Precise longitude of the event's map pin (Event posts), see lat."""
+  lng: Float
 
   """ActivityPub object id, for federated posts."""
   objectId: String
@@ -2221,6 +2235,12 @@ input _EventInput {
   eventLocationName: String
   eventStart: String!
   eventVenue: String
+
+  """
+  Precise coordinates for eventLocationName (e.g. a dropped map pin or picked search result). When given, the server reverse-geocodes these instead of re-deriving a location by forward-geocoding the name text, so the saved location matches the exact point the user picked rather than a text-search approximation.
+  """
+  lat: Float
+  lng: Float
 }
 
 enum _MessageOrdering {
@@ -2292,6 +2312,11 @@ input _PostFilter {
 
   """Posts carrying any of these emotions."""
   emotions_some: _PostEMOTEDFilter
+
+  """
+  Exact match, including null — used to find events with no explicit end date.
+  """
+  eventEnd: String
 
   """Events ending at or after this time."""
   eventEnd_gte: String

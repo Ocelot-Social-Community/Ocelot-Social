@@ -38,7 +38,12 @@
             role="region"
             :aria-label="$t('map.legend.title')"
           >
-            <div v-for="type in markers.types" :key="type.id" class="map-legend-item">
+            <div
+              v-for="type in markers.types"
+              :key="type.id"
+              class="map-legend-item"
+              data-test="marker-type-item"
+            >
               <span :style="{ color: type.color }">
                 <os-icon
                   :icon="icons.mapPinFilled"
@@ -47,6 +52,42 @@
                 />
               </span>
               {{ $t('map.legend.' + type.id) }}
+              <button
+                type="button"
+                class="map-legend-visibility-toggle"
+                :aria-pressed="String(!isMarkerTypeHidden(type.id))"
+                :aria-label="
+                  $t(isMarkerTypeHidden(type.id) ? 'map.legend.showType' : 'map.legend.hideType', {
+                    type: $t('map.legend.' + type.id),
+                  })
+                "
+                :title="
+                  $t(isMarkerTypeHidden(type.id) ? 'map.legend.showType' : 'map.legend.hideType', {
+                    type: $t('map.legend.' + type.id),
+                  })
+                "
+                @click="toggleMarkerTypeVisibility(type.id)"
+              >
+                <os-icon
+                  :icon="isMarkerTypeHidden(type.id) ? icons.eyeSlash : icons.eye"
+                  size="md"
+                />
+              </button>
+              <button
+                v-if="type.id === 'event'"
+                type="button"
+                class="map-legend-past-events-toggle"
+                :aria-pressed="String(showPastEvents)"
+                :aria-label="
+                  $t(showPastEvents ? 'map.legend.hidePastEvents' : 'map.legend.showPastEvents')
+                "
+                :title="
+                  $t(showPastEvents ? 'map.legend.hidePastEvents' : 'map.legend.showPastEvents')
+                "
+                @click="toggleShowPastEvents"
+              >
+                <os-icon :icon="showPastEvents ? icons.clockSlash : icons.clock" size="md" />
+              </button>
             </div>
           </div>
         </div>
@@ -65,12 +106,17 @@ import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
 import { mapGetters } from 'vuex'
 import { OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
+import { isEventPast } from '~/utils/eventDate'
 import { profileUserQuery } from '~/graphql/User'
 import { mapQuery } from '~/graphql/MapQuery'
 import mobile from '~/mixins/mobile'
 import Empty from '~/components/Empty/Empty'
 
 const maxMobileWidth = 639 // on this width and smaller the mapbox 'MapboxGeocoder' search gets bigger
+
+// Same value as --opacity-soft in root-tokens.css, used only if that custom
+// property can't be read yet (e.g. before the stylesheet is applied).
+const PAST_EVENT_OPACITY_FALLBACK = 0.7
 
 export default {
   name: 'Map',
@@ -86,11 +132,31 @@ export default {
   },
   data() {
     mapboxgl.accessToken = this.$env.MAPBOX_TOKEN
+    // Read once at page load, deliberately NOT reactive to later route
+    // changes (e.g. toggling "show past events" also touches $route.query,
+    // and v-mapbox's `center` watcher calls map.setCenter() on ANY new
+    // array reference — a reactive computed here would re-snap the map to
+    // this point on every unrelated query-param change, fighting the user's
+    // own panning/zooming).
+    const query = this.$route?.query || {}
+    const lat = parseFloat(query.lat)
+    const lng = parseFloat(query.lng)
+    const initialCoordinates = Number.isFinite(lat) && Number.isFinite(lng) ? [lng, lat] : null
+    // Deep-linked from a specific event's "view on map" — opens that
+    // event's popup once its marker is on the map (see
+    // openInitialEventPopup()), same one-time/non-reactive reasoning as
+    // initialCoordinates above.
+    const initialEventId = typeof query.eventId === 'string' ? query.eventId : null
     return {
       isEmpty,
       mapboxgl,
       legendOpen: false,
       activeStyle: null,
+      initialCoordinates,
+      initialEventId,
+      // ids from markers.types.id that the user hid via the legend's eye
+      // toggle. Purely a local display preference (not deep-linked).
+      hiddenMarkerTypes: [],
       defaultCenter: [10.452764, 51.165707], // center of Germany: https://www.gpskoordinaten.de/karte/land/DE
       currentUserLocation: null,
       currentUserCoordinates: null,
@@ -174,6 +240,18 @@ export default {
         this.posts
       )
     },
+    // Mapbox's icon-opacity paint property needs a resolved number, not a
+    // live var() reference, hence getComputedStyle() instead of just passing
+    // "var(--opacity-soft)" straight through — mirrors how EventLocationMap
+    // resolves --color-map-marker-event for the pin color.
+    pastEventOpacity() {
+      if (typeof window === 'undefined') return PAST_EVENT_OPACITY_FALLBACK
+      const value = getComputedStyle(document.documentElement)
+        .getPropertyValue('--opacity-soft')
+        .trim()
+      const parsed = parseFloat(value)
+      return Number.isFinite(parsed) ? parsed : PAST_EVENT_OPACITY_FALLBACK
+    },
     availableStyles() {
       // https://docs.mapbox.com/api/maps/styles/
       const availableStyles = {
@@ -208,10 +286,18 @@ export default {
       }
     },
     mapCenter() {
-      return this.currentUserCoordinates ? this.currentUserCoordinates : this.defaultCenter
+      return this.initialCoordinates || this.currentUserCoordinates || this.defaultCenter
     },
     mapZoom() {
+      if (this.initialCoordinates) return 15
       return this.currentUserCoordinates ? 10 : 4
+    },
+    // Driven by the route (not local data) so toggling it is a real
+    // navigation — reliably reactive for the apollo `variables()` watcher,
+    // bookmarkable/shareable, and consistent with the deep-link query params
+    // above. Auto-enabled when deep-linking from a past event.
+    showPastEvents() {
+      return this.$route?.query?.showPastEvents === '1'
     },
   },
   watch: {
@@ -220,8 +306,38 @@ export default {
         this.addMarkersOnCheckPrepared()
       }
     },
+    hiddenMarkerTypes() {
+      this.applyMarkerTypeFilter()
+    },
   },
   methods: {
+    isMarkerTypeHidden(typeId) {
+      return this.hiddenMarkerTypes.includes(typeId)
+    },
+    toggleMarkerTypeVisibility(typeId) {
+      this.hiddenMarkerTypes = this.isMarkerTypeHidden(typeId)
+        ? this.hiddenMarkerTypes.filter((id) => id !== typeId)
+        : [...this.hiddenMarkerTypes, typeId]
+    },
+    // Hides marker types purely via the layer's own filter — hidden
+    // features are then simply not "rendered features", so hover/click
+    // popups (queryRenderedFeatures) automatically skip them too.
+    applyMarkerTypeFilter() {
+      if (!this.map || !this.markers.isSourceAndLayerAdded) return
+      const visibleTypes = this.markers.types
+        .map((type) => type.id)
+        .filter((id) => !this.isMarkerTypeHidden(id))
+      this.map.setFilter('markers', ['in', ['get', 'type'], ['literal', visibleTypes]])
+    },
+    toggleShowPastEvents() {
+      const query = { ...this.$route.query }
+      if (this.showPastEvents) {
+        delete query.showPastEvents
+      } else {
+        query.showPastEvents = '1'
+      }
+      this.$router.replace({ path: '/map', query })
+    },
     addGeocoder() {
       this.geocoder = new MapboxGeocoder({
         accessToken: this.$env.MAPBOX_TOKEN,
@@ -260,6 +376,11 @@ export default {
         // Triggered when `setStyle` is called.
         this.markers.isImagesLoaded = false
         this.markers.isSourceAndLayerAdded = false
+        // Without this, addMarkersOnCheckPrepared() below would skip rebuilding
+        // markers.geoJSON — isPreparedForMarkers requires !isGeoJSON, which
+        // stays permanently true after the very first successful build — and
+        // re-add the layer with whatever (possibly stale) data it last held.
+        this.markers.isGeoJSON = false
         this.loadMarkersIconsAndAddMarkers()
       })
 
@@ -360,108 +481,11 @@ export default {
         maxWidth: '300px',
       })
 
-      // show popup for given features at coordinates
-      const showPopup = (features, lngLat) => {
-        if (this.markers.popup.isOpen()) {
-          this.markers.popup.remove()
-        }
-
-        this.map.getCanvas().style.cursor = 'pointer'
-
-        const coordinates = features[0].geometry.coordinates.slice()
-
-        // Ensure popup appears over the correct copy when map is zoomed out
-        while (Math.abs(lngLat.lng - coordinates[0]) > 180) {
-          coordinates[0] += lngLat.lng > coordinates[0] ? 360 : -360
-        }
-
-        // Build popup content safely using DOM nodes (no raw HTML interpolation)
-        const container = document.createElement('div')
-        container.className = 'map-popup-container'
-
-        const locationName = features[0].properties.locationName
-        if (locationName) {
-          const header = document.createElement('div')
-          header.className = 'map-popup-header'
-          header.textContent = locationName
-          container.appendChild(header)
-        }
-
-        const body = document.createElement('div')
-        body.className = 'map-popup-body'
-
-        features.forEach((feature, index) => {
-          if (index > 0) {
-            body.appendChild(document.createElement('hr'))
-          }
-
-          const markerTypeLabel = this.$t(`map.markerTypes.${feature.properties.type}`)
-          const encodedId = encodeURIComponent(feature.properties.id)
-          const encodedSlug = encodeURIComponent(feature.properties.slug)
-          const markerProfile = {
-            theUser: {
-              linkTitle: '@' + feature.properties.slug,
-              link: `/profile/${encodedId}/${encodedSlug}`,
-            },
-            user: {
-              linkTitle: '@' + feature.properties.slug,
-              link: `/profile/${encodedId}/${encodedSlug}`,
-            },
-            group: {
-              linkTitle: '&' + feature.properties.slug,
-              link: `/groups/${encodedId}/${encodedSlug}`,
-            },
-            event: {
-              linkTitle: feature.properties.slug,
-              link: `/post/${encodedId}/${encodedSlug}`,
-            },
-          }
-          const profile = markerProfile[feature.properties.type]
-
-          const item = document.createElement('div')
-
-          const nameRow = document.createElement('div')
-          const nameB = document.createElement('b')
-          nameB.textContent = feature.properties.name
-          const typeI = document.createElement('i')
-          typeI.textContent = ` (${markerTypeLabel})`
-          nameRow.appendChild(nameB)
-          nameRow.appendChild(typeI)
-          item.appendChild(nameRow)
-
-          const linkRow = document.createElement('div')
-          const link = document.createElement('a')
-          link.href = profile.link
-          link.target = '_blank'
-          link.rel = 'noopener noreferrer'
-          link.textContent = profile.linkTitle
-          linkRow.appendChild(link)
-          item.appendChild(linkRow)
-
-          body.appendChild(item)
-
-          if (feature.properties.description && feature.properties.description.length > 0) {
-            const desc = document.createElement('div')
-            desc.style.marginTop = '4px'
-            desc.textContent = feature.properties.description
-            body.appendChild(desc)
-          }
-        })
-
-        container.appendChild(body)
-        this.markers.popup.setLngLat(coordinates).setDOMContent(container).addTo(this.map)
-      }
-
-      // Query all features at the clicked/hovered point
-      const getFeaturesAtPoint = (point) => {
-        return this.map.queryRenderedFeatures(point, { layers: ['markers'] })
-      }
-
       // Desktop: show popup on hover
       this.map.on('mouseenter', 'markers', (e) => {
-        const features = getFeaturesAtPoint(e.point)
+        const features = this.getFeaturesAtPoint(e.point)
         if (features.length > 0) {
-          showPopup(features, e.lngLat)
+          this.showPopup(features, e.lngLat)
         }
       })
 
@@ -471,14 +495,111 @@ export default {
 
       // Mobile: show popup on click/tap
       this.map.on('click', 'markers', (e) => {
-        const features = getFeaturesAtPoint(e.point)
+        const features = this.getFeaturesAtPoint(e.point)
         if (features.length > 0) {
-          showPopup(features, e.lngLat)
+          this.showPopup(features, e.lngLat)
           e.originalEvent.stopPropagation()
         }
       })
 
       this.loadMarkersIconsAndAddMarkers()
+    },
+    // Show popup for given features at coordinates. Also used to open the
+    // popup programmatically for a deep-linked event (see
+    // openInitialEventPopup()), not just on hover/click.
+    showPopup(features, lngLat) {
+      if (this.markers.popup.isOpen()) {
+        this.markers.popup.remove()
+      }
+
+      this.map.getCanvas().style.cursor = 'pointer'
+
+      const coordinates = features[0].geometry.coordinates.slice()
+
+      // Ensure popup appears over the correct copy when map is zoomed out
+      while (Math.abs(lngLat.lng - coordinates[0]) > 180) {
+        coordinates[0] += lngLat.lng > coordinates[0] ? 360 : -360
+      }
+
+      // Build popup content safely using DOM nodes (no raw HTML interpolation)
+      const container = document.createElement('div')
+      container.className = 'map-popup-container'
+
+      const locationName = features[0].properties.locationName
+      if (locationName) {
+        const header = document.createElement('div')
+        header.className = 'map-popup-header'
+        header.textContent = locationName
+        container.appendChild(header)
+      }
+
+      const body = document.createElement('div')
+      body.className = 'map-popup-body'
+
+      features.forEach((feature, index) => {
+        if (index > 0) {
+          body.appendChild(document.createElement('hr'))
+        }
+
+        const markerTypeLabel = this.$t(`map.markerTypes.${feature.properties.type}`)
+        const encodedId = encodeURIComponent(feature.properties.id)
+        const encodedSlug = encodeURIComponent(feature.properties.slug)
+        const markerProfile = {
+          theUser: {
+            linkTitle: '@' + feature.properties.slug,
+            link: `/profile/${encodedId}/${encodedSlug}`,
+          },
+          user: {
+            linkTitle: '@' + feature.properties.slug,
+            link: `/profile/${encodedId}/${encodedSlug}`,
+          },
+          group: {
+            linkTitle: '&' + feature.properties.slug,
+            link: `/groups/${encodedId}/${encodedSlug}`,
+          },
+          event: {
+            linkTitle: feature.properties.slug,
+            link: `/post/${encodedId}/${encodedSlug}`,
+          },
+        }
+        const profile = markerProfile[feature.properties.type]
+
+        const item = document.createElement('div')
+
+        const nameRow = document.createElement('div')
+        const nameB = document.createElement('b')
+        nameB.textContent = feature.properties.name
+        const typeI = document.createElement('i')
+        typeI.textContent = ` (${markerTypeLabel})`
+        nameRow.appendChild(nameB)
+        nameRow.appendChild(typeI)
+        item.appendChild(nameRow)
+
+        const linkRow = document.createElement('div')
+        const link = document.createElement('a')
+        link.href = profile.link
+        link.target = '_blank'
+        link.rel = 'noopener noreferrer'
+        link.textContent = profile.linkTitle
+        linkRow.appendChild(link)
+        item.appendChild(linkRow)
+
+        body.appendChild(item)
+
+        if (feature.properties.description && feature.properties.description.length > 0) {
+          const desc = document.createElement('div')
+          desc.style.marginTop = '4px'
+          desc.textContent = feature.properties.description
+          body.appendChild(desc)
+        }
+      })
+
+      container.appendChild(body)
+      this.markers.popup.setLngLat(coordinates).setDOMContent(container).addTo(this.map)
+    },
+    // Query all features at the clicked/hovered point
+    getFeaturesAtPoint(point) {
+      return this.map.queryRenderedFeatures(point, { layers: ['markers'] })
     },
     language(map) {
       // example in mapbox-gl-language: https://github.com/mapbox/mapbox-gl-language/blob/master/index.js
@@ -516,119 +637,140 @@ export default {
         this.addMarkersOnCheckPrepared()
       })
     },
-    addMarkersOnCheckPrepared() {
-      // set geoJSON for markers
-      if (this.isPreparedForMarkers) {
-        // add markers for "users"
-        this.users.forEach((user) => {
-          if (user.id !== this.currentUser.id) {
-            this.markers.geoJSON.push({
-              type: 'Feature',
-              properties: {
-                type: 'user',
-                iconName: 'marker-green',
-                iconRotate: 0.0,
-                id: user.id,
-                slug: user.slug,
-                name: user.name,
-                locationName: user.location.name,
-                description: user.about ? user.about : undefined,
-              },
-              geometry: {
-                type: 'Point',
-                coordinates: this.getCoordinates(user.location),
-              },
-            })
-          }
-        })
-        // add marker for "currentUser"
-        if (this.currentUserCoordinates) {
-          this.markers.geoJSON.push({
+    // Pure function of users/groups/posts/currentUser — reused for the
+    // initial build and to refresh an already-added source (e.g. after the
+    // "show past events" filter changes and new posts arrive).
+    buildMarkersGeoJSON() {
+      const geoJSON = []
+      // add markers for "users"
+      this.users.forEach((user) => {
+        if (user.id !== this.currentUser.id && this.hasCoordinates(user.location)) {
+          geoJSON.push({
             type: 'Feature',
             properties: {
-              type: 'theUser',
-              iconName: 'marker-orange',
-              iconRotate: 45.0,
-              id: this.currentUser.id,
-              slug: this.currentUser.slug,
-              name: this.currentUser.name,
-              locationName: this.currentUserLocation.name,
-              description: this.currentUser.about ? this.currentUser.about : undefined,
+              type: 'user',
+              iconName: 'marker-green',
+              iconRotate: 0.0,
+              id: user.id,
+              slug: user.slug,
+              name: user.name,
+              locationName: user.location.name,
+              description: user.about ? user.about : undefined,
             },
             geometry: {
               type: 'Point',
-              coordinates: this.currentUserCoordinates,
+              coordinates: this.getCoordinates(user.location),
             },
           })
         }
-        // add markers for "groups"
-        this.groups.forEach((group) => {
-          this.markers.geoJSON.push({
-            type: 'Feature',
-            properties: {
-              type: 'group',
-              iconName: 'marker-red',
-              iconRotate: 0.0,
-              id: group.id,
-              slug: group.slug,
-              name: group.name,
-              locationName: group.location.name,
-              description: group.about ? group.about : undefined,
-            },
-            geometry: {
-              type: 'Point',
-              coordinates: this.getCoordinates(group.location),
-            },
-          })
+      })
+      // add marker for "currentUser"
+      if (this.currentUserCoordinates) {
+        geoJSON.push({
+          type: 'Feature',
+          properties: {
+            type: 'theUser',
+            iconName: 'marker-orange',
+            iconRotate: 45.0,
+            id: this.currentUser.id,
+            slug: this.currentUser.slug,
+            name: this.currentUser.name,
+            locationName: this.currentUserLocation.name,
+            description: this.currentUser.about ? this.currentUser.about : undefined,
+          },
+          geometry: {
+            type: 'Point',
+            coordinates: this.currentUserCoordinates,
+          },
         })
-        // add markers for "posts", post type "Event" with location coordinates
-        this.posts.forEach((post) => {
-          if (!post.eventLocation) return
-          this.markers.geoJSON.push({
-            type: 'Feature',
-            properties: {
-              type: 'event',
-              iconName: 'marker-purple',
-              iconRotate: 0.0,
-              id: post.id,
-              slug: post.slug,
-              name: post.title,
-              locationName: post.eventLocation.name,
-              description: this.$filters.removeHtml(post.content),
-            },
-            geometry: {
-              type: 'Point',
-              coordinates: this.getCoordinates(post.eventLocation),
-            },
-          })
+      }
+      // add markers for "groups"
+      this.groups.forEach((group) => {
+        if (!this.hasCoordinates(group.location)) {
+          return
+        }
+        geoJSON.push({
+          type: 'Feature',
+          properties: {
+            type: 'group',
+            iconName: 'marker-red',
+            iconRotate: 0.0,
+            id: group.id,
+            slug: group.slug,
+            name: group.name,
+            locationName: group.location.name,
+            description: group.about ? group.about : undefined,
+          },
+          geometry: {
+            type: 'Point',
+            coordinates: this.getCoordinates(group.location),
+          },
         })
+      })
+      // add markers for "posts", post type "Event" with location coordinates
+      this.posts.forEach((post) => {
+        // hasLocation (the query filter) only guarantees the Post-[:IS_IN]->Location
+        // relationship exists, not that that Location node itself got lat/lng —
+        // see hasCoordinates() above.
+        const pinLocation = this.eventPinLocation(post)
+        if (!this.hasCoordinates(pinLocation)) {
+          return
+        }
+        geoJSON.push({
+          type: 'Feature',
+          properties: {
+            type: 'event',
+            iconName: 'marker-purple',
+            iconRotate: 0.0,
+            id: post.id,
+            slug: post.slug,
+            name: post.title,
+            locationName: pinLocation.name,
+            description: this.$filters.removeHtml(post.content),
+            // Mirrors the backend's own "past" definition (filterEventDates in
+            // posts.ts): an event still counts as current while EITHER its
+            // start or its end is in the future — i.e. it's only "past" once
+            // both have elapsed. A still-running event must not render pale.
+            isPast: this.isEventPast(post),
+          },
+          geometry: {
+            type: 'Point',
+            coordinates: this.getCoordinates(pinLocation),
+          },
+        })
+      })
 
-        // Nudge markers of different types sharing the same coordinates
-        const coordGroups = {}
-        this.markers.geoJSON.forEach((feature) => {
-          const key = feature.geometry.coordinates.join(',')
-          if (!coordGroups[key]) coordGroups[key] = []
-          coordGroups[key].push(feature)
+      // Nudge markers of different types sharing the same coordinates
+      const coordGroups = {}
+      geoJSON.forEach((feature) => {
+        const key = feature.geometry.coordinates.join(',')
+        if (!coordGroups[key]) coordGroups[key] = []
+        coordGroups[key].push(feature)
+      })
+      const lngOffset = 0.0002 // small longitude offset (~15m at mid-latitudes)
+      Object.values(coordGroups).forEach((group) => {
+        // Deduplicate by type — only offset distinct types
+        const uniqueTypes = [...new Set(group.map((f) => f.properties.type))]
+        if (uniqueTypes.length <= 1) return
+        const totalWidth = (uniqueTypes.length - 1) * lngOffset
+        uniqueTypes.forEach((type, index) => {
+          const offset = -totalWidth / 2 + index * lngOffset
+          group
+            .filter((f) => f.properties.type === type)
+            .forEach((feature) => {
+              feature.geometry.coordinates = [
+                feature.geometry.coordinates[0] + offset,
+                feature.geometry.coordinates[1],
+              ]
+            })
         })
-        const lngOffset = 0.0002 // small longitude offset (~15m at mid-latitudes)
-        Object.values(coordGroups).forEach((group) => {
-          // Deduplicate by type — only offset distinct types
-          const uniqueTypes = [...new Set(group.map((f) => f.properties.type))]
-          if (uniqueTypes.length <= 1) return
-          const totalWidth = (uniqueTypes.length - 1) * lngOffset
-          uniqueTypes.forEach((type, index) => {
-            const offset = -totalWidth / 2 + index * lngOffset
-            group
-              .filter((f) => f.properties.type === type)
-              .forEach((feature) => {
-                feature.geometry.coordinates = [
-                  feature.geometry.coordinates[0] + offset,
-                  feature.geometry.coordinates[1],
-                ]
-              })
-          })
-        })
+      })
 
+      return geoJSON
+    },
+    addMarkersOnCheckPrepared() {
+      if (this.isPreparedForMarkers) {
+        this.markers.geoJSON = this.buildMarkersGeoJSON()
         this.markers.isGeoJSON = true
       }
 
@@ -656,16 +798,76 @@ export default {
             // 'text-anchor': 'top',
             // 'text-allow-overlap': true,
           },
+          paint: {
+            // Past events (only fetched at all when "show past events" is
+            // on) render paler than everything else.
+            'icon-opacity': [
+              'case',
+              ['boolean', ['get', 'isPast'], false],
+              this.pastEventOpacity,
+              1,
+            ],
+          },
         })
 
         this.markers.isSourceAndLayerAdded = true
+        // Re-applies any already-toggled hidden types — needed after a style
+        // switch too, since that re-adds the layer without a filter.
+        this.applyMarkerTypeFilter()
       }
 
       // fly to center if never done
       if (!this.markers.isFlyToCenter && this.markers.isSourceAndLayerAdded) {
         this.mapFlyToCenter()
         this.markers.isFlyToCenter = true
+        this.openInitialEventPopup()
       }
+    },
+    // Opens the popup for the event a "view on map" deep-link pointed at, so
+    // arriving here immediately shows the same event info instead of just an
+    // unlabeled pin among possibly many others. The popup positions itself
+    // from its own lngLat, so it doesn't need to wait for the flyTo above to
+    // finish animating.
+    openInitialEventPopup() {
+      if (!this.initialEventId) return
+      const feature = this.markers.geoJSON.find(
+        (f) => f.properties.type === 'event' && f.properties.id === this.initialEventId,
+      )
+      // Left set (not cleared) when the feature isn't found yet — the
+      // deep-linked event may still be missing from an early cache response
+      // and only arrive with a later network one, which retries this via
+      // refreshMarkersData() below.
+      if (!feature) return
+      const [lng, lat] = feature.geometry.coordinates
+      this.showPopup([feature], { lng, lat })
+      this.initialEventId = null
+    },
+    // Called when users/groups/posts change after the initial load (e.g. the
+    // "show past events" filter re-triggered the apollo query, or a cache
+    // response was followed by a network one) — updates the already-added
+    // source in place instead of re-adding it.
+    refreshMarkersData() {
+      this.markers.geoJSON = this.buildMarkersGeoJSON()
+      const source = this.map.getSource('markers')
+      if (!source) {
+        // The source can momentarily be gone mid-style-switch: mapbox-gl
+        // clears every source/layer synchronously on setStyle(), before the
+        // new style's own 'style.load' handler (above) has rebuilt them —
+        // isSourceAndLayerAdded can still read stale-true in that window,
+        // which is what routes an apollo update into this method at all.
+        // Route through the same rebuild path style.load uses instead of
+        // crashing on a missing source.
+        this.markers.isSourceAndLayerAdded = false
+        this.markers.isImagesLoaded = false
+        this.markers.isGeoJSON = false
+        this.loadMarkersIconsAndAddMarkers()
+        return
+      }
+      source.setData({
+        type: 'FeatureCollection',
+        features: this.markers.geoJSON,
+      })
+      this.openInitialEventPopup()
     },
     mapFlyToCenter() {
       if (this.map) {
@@ -679,6 +881,28 @@ export default {
     getCoordinates(location) {
       return [location.lng, location.lat]
     },
+    // A location relationship (Post-[:IS_IN]->Location, same for users/
+    // groups) only guarantees the node exists, not that it has numeric
+    // lat/lng — e.g. a region-level or otherwise-incompletely-geocoded one
+    // doesn't. Pushing [null, null] into the GeoJSON breaks mapbox-gl's
+    // rendering of every marker, not just this one, so anything without real
+    // coordinates must be skipped before getCoordinates() is called on it.
+    hasCoordinates(location) {
+      return !!location && typeof location.lat === 'number' && typeof location.lng === 'number'
+    },
+    // Prefers the post's own precise pin (Post.lat/lng — the exact point
+    // picked on the map) over eventLocation's coordinates (the shared
+    // Location node's own point, e.g. a building's registered entrance,
+    // reused across every other post/user/group at that same address).
+    // Falls back to eventLocation only for events saved before Post gained
+    // its own lat/lng.
+    eventPinLocation(post) {
+      if (this.hasCoordinates(post)) {
+        return { lat: post.lat, lng: post.lng, name: post.eventLocation?.name }
+      }
+      return post.eventLocation
+    },
+    isEventPast,
     async getUserLocation(id) {
       try {
         const {
@@ -709,7 +933,7 @@ export default {
           groupHasLocation: true,
           postFilter: {
             postType_in: ['Event'],
-            eventStart_gte: new Date(),
+            ...(this.showPastEvents ? {} : { eventStart_gte: new Date() }),
             hasLocation: true,
             skipPinnedFilter: true,
           },
@@ -719,7 +943,11 @@ export default {
         this.users = User
         this.groups = Group
         this.posts = Post
-        this.addMarkersOnCheckPrepared()
+        if (this.markers.isSourceAndLayerAdded) {
+          this.refreshMarkersData()
+        } else {
+          this.addMarkersOnCheckPrepared()
+        }
       },
       fetchPolicy: 'cache-and-network',
     },
@@ -908,6 +1136,24 @@ export default {
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+.map-legend-visibility-toggle,
+.map-legend-past-events-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 2px;
+  padding: 2px;
+  border: none;
+  border-radius: var(--border-radius-base, 4px);
+  background: none;
+  color: inherit;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
 }
 
 @media (max-width: 639px) {

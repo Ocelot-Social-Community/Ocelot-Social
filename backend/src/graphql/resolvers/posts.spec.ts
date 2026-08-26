@@ -246,6 +246,112 @@ describe('Post', () => {
       })
     })
   })
+
+  describe('event date filtering (filterEventDates)', () => {
+    // Mirrors what the newsfeed and the map both send to "hide past events":
+    // eventStart_gte: now. filterEventDates() rewrites this into an OR that
+    // also keeps still-running events (started but not yet ended), and
+    // — for events saved without an eventEnd at all — events that started
+    // earlier the same day.
+    // Pinned to midday on the test day (rather than the real current time) so
+    // the smallest offsets below (e.g. hours(-1)) can't drift across a local
+    // midnight boundary and break the "still today" assertions.
+    const now = new Date()
+    now.setHours(12, 0, 0, 0)
+    const hours = (h) => new Date(now.getTime() + h * 60 * 60 * 1000).toISOString()
+
+    beforeEach(async () => {
+      authenticatedUser = await user.toJson()
+      const createEvent = async (id: string, eventInput: Record<string, unknown>) => {
+        await mutate({
+          mutation: CreatePost,
+          variables: {
+            id,
+            title: `event ${id}`,
+            content: 'Some content',
+            categoryIds,
+            postType: 'Event',
+            eventInput,
+          },
+        })
+      }
+      // Future event: hasn't started yet.
+      await createEvent('future-event', { eventStart: hours(24), eventEnd: hours(48) })
+      // Ongoing event: started an hour ago, ends in an hour.
+      await createEvent('ongoing-event', { eventStart: hours(-1), eventEnd: hours(1) })
+      // Fully ended two days ago.
+      await createEvent('ended-event', { eventStart: hours(-48), eventEnd: hours(-24) })
+      // Fully ended an hour ago, but still "today" — should get the same
+      // rest-of-day grace period as an event with no eventEnd at all.
+      await createEvent('ended-today-event', { eventStart: hours(-3), eventEnd: hours(-1) })
+      // No eventEnd, started an hour ago — still "today".
+      await createEvent('no-end-today-event', { eventStart: hours(-1) })
+      // No eventEnd, started 30 hours ago — its start day has fully elapsed.
+      await createEvent('no-end-old-event', { eventStart: hours(-30) })
+      authenticatedUser = null
+    })
+
+    it('includes future, ongoing, and dateless-but-still-today events, excluding ended ones', async () => {
+      variables = {
+        filter: { postType_in: ['Event'], eventStart_gte: now.toISOString() },
+      }
+      const { data } = await query({ query: Post, variables })
+      const ids = data?.Post.map((post: { id: string }) => post.id)
+      expect(ids).toEqual(
+        expect.arrayContaining([
+          'future-event',
+          'ongoing-event',
+          'ended-today-event',
+          'no-end-today-event',
+        ]),
+      )
+      expect(ids).not.toContain('ended-event')
+      expect(ids).not.toContain('no-end-old-event')
+    })
+
+    it('throws a UserInputError instead of crashing on an invalid eventStart_gte value', async () => {
+      variables = {
+        filter: { postType_in: ['Event'], eventStart_gte: 'not-a-date' },
+      }
+      await expect(query({ query: Post, variables })).resolves.toMatchObject({
+        errors: [{ message: 'eventStart_gte is invalid' }],
+      })
+    })
+
+    it('combines a client-provided OR filter with the date filter via AND, instead of replacing it', async () => {
+      variables = {
+        filter: {
+          eventStart_gte: now.toISOString(),
+          OR: [{ id: 'ended-event' }, { id: 'future-event' }],
+        },
+      }
+      const { data } = await query({ query: Post, variables })
+      const ids = data?.Post.map((post: { id: string }) => post.id)
+      // Only 'future-event' satisfies both sides: it's named in the client's
+      // OR *and* passes the date filter. 'ended-event' is named in the OR
+      // but excluded by the date filter. Any other non-past event (e.g.
+      // 'ongoing-event', never mentioned in the client's OR) showing up here
+      // would mean that OR got silently replaced instead of ANDed with the
+      // date filter.
+      expect(ids).toEqual(['future-event'])
+    })
+
+    it('includes every event, without a date filter', async () => {
+      variables = { filter: { postType_in: ['Event'] } }
+      const { data } = await query({ query: Post, variables })
+      const ids = data?.Post.map((post: { id: string }) => post.id)
+      expect(ids).toEqual(
+        expect.arrayContaining([
+          'future-event',
+          'ongoing-event',
+          'ended-event',
+          'ended-today-event',
+          'no-end-today-event',
+          'no-end-old-event',
+        ]),
+      )
+    })
+  })
 })
 
 describe('CreatePost', () => {
@@ -572,6 +678,85 @@ describe('CreatePost', () => {
         })
       })
 
+      describe('event location coordinates are out of range', () => {
+        it('rejects an out-of-range latitude before any reverse-geocoding happens', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: CreatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventLocationName: 'Berlin',
+                  eventVenue: 'Brandenburger Tor',
+                  lat: 90.1,
+                  lng: 13.4,
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event location latitude must be a finite number between -90 and 90!',
+              },
+            ],
+          })
+        })
+
+        it('rejects an out-of-range longitude before any reverse-geocoding happens', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: CreatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventLocationName: 'Berlin',
+                  eventVenue: 'Brandenburger Tor',
+                  lat: 52.5,
+                  lng: 200,
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event location longitude must be a finite number between -180 and 180!',
+              },
+            ],
+          })
+        })
+
+        it('rejects lat given without lng, instead of silently discarding it', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: CreatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventLocationName: 'Berlin',
+                  eventVenue: 'Brandenburger Tor',
+                  lat: 52.5,
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event location requires both lat and lng, or neither!',
+              },
+            ],
+          })
+        })
+      })
+
       describe('valid event input without location', () => {
         it('has label "Event" set', async () => {
           const now = new Date()
@@ -625,6 +810,54 @@ describe('CreatePost', () => {
                 eventLocation: {
                   lng: 12.375101,
                   lat: 51.34083,
+                },
+              },
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('valid event input with location name and precise coordinates (e.g. a dropped map pin)', () => {
+        it('reverse-geocodes the coordinates instead of forward-geocoding the name text, keeping the exact picked point', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: CreatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  // Deliberately generic: if the coordinates below weren't
+                  // honored, forward-geocoding just "Hamburg" would resolve to
+                  // Hamburg's city center, not this specific address.
+                  eventLocationName: 'Hamburg',
+                  eventVenue: 'Rathaus',
+                  // A few metres off "Plan 6, 20095 Hamburg"'s own registered
+                  // point (53.55144, 9.994072) — reverse-geocoding still
+                  // matches that address, but its center differs from this
+                  // input, so the assertions below can tell apart "the exact
+                  // point picked" (post.lat/lng) from "the matched address's
+                  // own point" (eventLocation.lat/lng).
+                  lat: 53.5514,
+                  lng: 9.994,
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              CreatePost: {
+                postType: ['Event'],
+                eventLocationName: 'Hamburg',
+                eventVenue: 'Rathaus',
+                // The exact point picked — not the matched address's own
+                // registered point (asserted separately below).
+                lat: 53.5514,
+                lng: 9.994,
+                eventLocation: {
+                  lat: 53.55144,
+                  lng: 9.994072,
                 },
               },
             },
@@ -887,6 +1120,54 @@ describe('UpdatePost', () => {
                 eventLocation: {
                   lng: 12.375101,
                   lat: 51.34083,
+                },
+              },
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('valid event input with location name and precise coordinates (e.g. a dropped map pin)', () => {
+        it('reverse-geocodes the coordinates instead of forward-geocoding the name text, keeping the exact picked point', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: UpdatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  // Deliberately generic: if the coordinates below weren't
+                  // honored, forward-geocoding just "Hamburg" would resolve to
+                  // Hamburg's city center, not this specific address.
+                  eventLocationName: 'Hamburg',
+                  eventVenue: 'Rathaus',
+                  // A few metres off "Plan 6, 20095 Hamburg"'s own registered
+                  // point (53.55144, 9.994072) — reverse-geocoding still
+                  // matches that address, but its center differs from this
+                  // input, so the assertions below can tell apart "the exact
+                  // point picked" (post.lat/lng) from "the matched address's
+                  // own point" (eventLocation.lat/lng).
+                  lat: 53.5514,
+                  lng: 9.994,
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              UpdatePost: {
+                postType: ['Event'],
+                eventLocationName: 'Hamburg',
+                eventVenue: 'Rathaus',
+                // The exact point picked — not the matched address's own
+                // registered point (asserted separately below).
+                lat: 53.5514,
+                lng: 9.994,
+                eventLocation: {
+                  lat: 53.55144,
+                  lng: 9.994072,
                 },
               },
             },

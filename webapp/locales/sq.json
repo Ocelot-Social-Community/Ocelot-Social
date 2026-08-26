@@ -605,6 +605,7 @@
     "categories": {
       "infoSelectedNoOfMaxCategories": "{chosen} nga {max} tema të zgjedhura"
     },
+    "categoriesTitle": "Temat",
     "category": {
       "description": {
         "body-and-excercise": "Sport, joga, masazh, relaksim",
@@ -662,6 +663,7 @@
         }
       }
     },
+    "content": "Përmbajtja",
     "emotions-label": {
       "angry": "I zemëruar",
       "cry": "Qaj",
@@ -1056,6 +1058,10 @@
     "legend": {
       "event": "Ngjarje",
       "group": "Grup",
+      "hidePastEvents": "Fshih ngjarjet e kaluara",
+      "hideType": "Fshih {type}",
+      "showPastEvents": "Shfaq ngjarjet e kaluara",
+      "showType": "Shfaq {type}",
       "theUser": "Pozicioni im",
       "title": "Legjenda",
       "user": "Përdorues"
@@ -1250,12 +1256,16 @@
       "eventEndBeforeStart": "Data e mbarimit duhet të jetë pas datës së fillimit.",
       "eventIsOnline": "Online",
       "eventLocationName": "Adresa për navigim — p.sh. Rruga Shembull 1, 12345 Qytet",
+      "eventLocationNameLabel": "Adresa",
       "eventLocationRequired": "Nëse ngjarja nuk është online, duhet të futet një vendndodhje.",
       "eventStart": "Fillimi",
       "eventStartInPast": "Data e fillimit është në të kaluarën.",
       "eventStartNotEmpty": "Ju lutem shkruani një datë fillimi.",
-      "eventVenue": "Përshkrimi i vendndodhjes — p.sh. oborri, kati 1, …",
-      "title": "Ngjarje"
+      "eventVenue": "p.sh. Kafe Chrysander, pranë Kalasë së Bergedorfit",
+      "eventVenueLabel": "Përshkrimi i vendndodhjes",
+      "pickLocationOnMap": "Zgjidh vendndodhjen në hartë",
+      "title": "Ngjarje",
+      "viewOnMainMap": "Shiko në hartën kryesore"
     },
     "viewPost": {
       "forGroup": {

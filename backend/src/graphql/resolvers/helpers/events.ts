@@ -7,6 +7,12 @@ import { UserInputError } from '@graphql/errors'
 
 export const validateEventParams = (params) => {
   let locationName: string | null | undefined
+  // Only set alongside a truthy locationName, and only when the client sent
+  // both as numbers (e.g. from a dropped map pin) — createOrUpdateLocations()
+  // reverse-geocodes these instead of forward-geocoding locationName's text
+  // when present, so the saved location matches the exact point picked
+  // rather than a text-search approximation of it.
+  let coordinates: { lat: number; lng: number } | null = null
   if (params.postType && params.postType === 'Event') {
     const { eventInput } = params
     validateEventDate(eventInput.eventStart)
@@ -26,14 +32,42 @@ export const validateEventParams = (params) => {
     params.eventLocationName = eventInput.eventLocationName?.trim()
     if (params.eventLocationName) {
       locationName = params.eventLocationName
+      const hasLat = typeof eventInput.lat === 'number'
+      const hasLng = typeof eventInput.lng === 'number'
+      if (hasLat !== hasLng) {
+        throw new UserInputError('Event location requires both lat and lng, or neither!')
+      }
+      if (hasLat && hasLng) {
+        validateEventCoordinates(eventInput.lat, eventInput.lng)
+        coordinates = { lat: eventInput.lat, lng: eventInput.lng }
+      }
     } else {
       params.eventLocationName = null
       locationName = null
     }
+    // Stored directly on the post itself (SET post += $params below), not on
+    // the Location node coordinates carries — that node is MERGEd and shared
+    // with every other post/user/group at the same address, so it can't hold
+    // any one event's exact pick without corrupting it for everyone else
+    // pointing at it. Cleared to null alongside locationName so a removed
+    // location doesn't leave a stale pin behind.
+    params.lat = coordinates?.lat ?? null
+    params.lng = coordinates?.lng ?? null
     params.eventIsOnline = !!eventInput.eventIsOnline
   }
   delete params.eventInput
-  return locationName
+  return { locationName, coordinates }
+}
+
+const validateEventCoordinates = (lat: number, lng: number) => {
+  if (!Number.isFinite(lat) || lat < -90 || lat > 90) {
+    throw new UserInputError('Event location latitude must be a finite number between -90 and 90!')
+  }
+  if (!Number.isFinite(lng) || lng < -180 || lng > 180) {
+    throw new UserInputError(
+      'Event location longitude must be a finite number between -180 and 180!',
+    )
+  }
 }
 
 const validateEventDate = (dateString) => {
