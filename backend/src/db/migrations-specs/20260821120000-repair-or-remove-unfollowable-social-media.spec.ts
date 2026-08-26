@@ -159,9 +159,11 @@ describe('repair', () => {
 
 describe('up', () => {
   // One row that survives a repair, one that cannot be repaired and is removed.
+  // One repairable row whose query carries a third party's address, and one unrepairable row
+  // whose url carries a password. Both are exactly what must not reach a deployment log.
   const rows = [
     { id: 's1', url: 'mailto:a@example.org?bcc=evil@example.tld', owner: 'jenny' },
-    { id: 's2', url: 'javascript:alert(1)', owner: 'peter' },
+    { id: 's2', url: 'ftp://user:secret@example.org/pub', owner: 'peter' },
   ]
 
   let events: string[]
@@ -197,22 +199,33 @@ describe('up', () => {
   })
 
   it('names a url before the write that destroys it', () => {
-    // `down` is empty and promises that a removed value is recoverable from the deployment log.
-    // Printed after the delete, a run that dies partway through the loop takes user data with it
-    // and names nothing. The order is the promise.
+    // `down` is empty and promises that an operator can say which link disappeared. Printed
+    // after the delete, a run that dies partway through the loop takes user data with it and
+    // names nothing. The order is the promise.
     const removal = events.indexOf('write s2')
-    const naming = events.findIndex((event) => event.includes('javascript:alert(1)'))
+    const naming = events.findIndex((event) => event.includes('example.org/pub'))
     expect(naming).toBeGreaterThanOrEqual(0)
     expect(naming).toBeLessThan(removal)
   })
 
   it('names the old value before a repair overwrites it', () => {
-    // The quieter half of the same problem: `SET s.url = $url` overwrites the only copy, and a
-    // dropped `?bcc=` cannot be reconstructed from the result.
+    // The quieter half of the same problem: `SET s.url = $url` overwrites the only copy.
     const write = events.indexOf('write s1')
-    const naming = events.findIndex((event) => event.includes('bcc=evil@example.tld'))
+    const naming = events.findIndex((event) => event.includes('mailto:a@example.org'))
     expect(naming).toBeGreaterThanOrEqual(0)
     expect(naming).toBeLessThan(write)
+  })
+
+  it('keeps the password and the third party out of the log', () => {
+    // A deployment log outlives the row and travels further than the database. Copying a
+    // password or someone else's address into it would leave the migration undoing itself —
+    // removing the value from the public profile and keeping it somewhere less guarded.
+    const log = events.filter((event) => event.startsWith('log ')).join('\n')
+    expect(log).not.toContain('secret')
+    expect(log).not.toContain('evil@example.tld')
+    // Still enough to act on: the owner and the link they lost.
+    expect(log).toContain('peter')
+    expect(log).toContain('ftp://example.org/pub (redacted)')
   })
 
   it('states the plan before doing any of it', () => {

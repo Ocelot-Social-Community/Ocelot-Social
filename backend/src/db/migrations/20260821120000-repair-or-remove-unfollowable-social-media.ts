@@ -36,7 +36,10 @@ export const description = `
   Everything else: any other scheme, a scheme with no host, an empty value, anything that is
   not an address. Each removal is printed with the owner's slug and the old value, so an
   operator can tell the person what disappeared from their profile. Removing user data without
-  a trace is the wrong default even when the value was nonsense.
+  a trace is the wrong default even when the value was nonsense. The printed value has its
+  credentials and its query string stripped (see forLog): a deployment log outlives the row and
+  travels further than the database, and keeping a password or someone else's address there
+  would undo half of what this migration is for.
 
   Every repaired value is checked against the declaration BEFORE it is written, and removed
   instead if it still fails. The migration therefore cannot leave behind a row that the schema
@@ -172,6 +175,44 @@ export const repair = (value: string): string | null => {
   return null
 }
 
+/**
+ * A stored value in a form fit for a deployment log: no credentials, no query.
+ *
+ * The log outlives the row, and it is a different sink — shipped to an aggregator, kept longer,
+ * readable by more people than the database. Two things in these values must not make that
+ * trip. A password (`https://user:secret@example.org`, and `ftp://user:secret@…` on the removal
+ * path, which no repair rescues) is a secret whatever else is true of it. A `?bcc=` carries
+ * addresses of THIRD parties, who never chose to publish anything.
+ *
+ * Both were already readable by anyone: this field is published on a public profile and any API
+ * client reads it verbatim. So this is not a fresh leak — it is about not keeping a copy of the
+ * value in a second place after the migration removed it from the first, which would leave the
+ * migration undoing itself.
+ *
+ * The rest is kept, because the log has a job: `down` is deliberately empty and points here, and
+ * an operator telling someone what disappeared from their profile needs to name the link. Scheme,
+ * host and path do that; a password does not.
+ */
+const forLog = (value: string): string => {
+  try {
+    const parsed = new URL(value)
+    const carried = parsed.username !== '' || parsed.password !== '' || parsed.search !== ''
+    if (!carried) {
+      return value
+    }
+    parsed.username = ''
+    parsed.password = ''
+    parsed.search = ''
+    return `${parsed.toString()} (redacted)`
+    // eslint-disable-next-line no-catch-all/no-catch-all -- the question IS "does this parse"
+  } catch {
+    // Not a url, so it has no authority to hide a credential in and no query to carry a bcc.
+    // `javascript:alert(document.cookie)` reaches this line unchanged, which is what an
+    // operator needs to see.
+    return value
+  }
+}
+
 interface Row {
   id: string
   url: string
@@ -234,14 +275,14 @@ export async function up(_next) {
     )
 
     for (const { id, from, to } of repaired) {
-      console.log(`  repairing ${JSON.stringify(from)} -> ${JSON.stringify(to)}`)
+      console.log(`  repairing ${JSON.stringify(forLog(from))} -> ${JSON.stringify(to)}`)
       await session.writeTransaction((transaction) =>
         transaction.run('MATCH (s:SocialMedia {id: $id}) SET s.url = $url', { id, url: to }),
       )
     }
     for (const { id, owner, url } of removed) {
       // The owner's slug, so this is actionable: someone can tell them what is gone.
-      console.log(`  removing ${owner}: ${JSON.stringify(url)}`)
+      console.log(`  removing ${owner}: ${JSON.stringify(forLog(url))}`)
       await session.writeTransaction((transaction) =>
         transaction.run('MATCH (s:SocialMedia {id: $id}) DETACH DELETE s', { id }),
       )
@@ -256,7 +297,9 @@ export async function up(_next) {
 
 export async function down(_next) {
   // Deliberately empty. The previous state was "some urls a browser must not follow", which is
-  // not a state worth reconstructing — and the removed rows are printed by `up`, so the values
-  // are recoverable from the deployment log if anyone needs them.
+  // not a state worth reconstructing — and the removed rows are printed by `up`, so an operator
+  // can tell the owner which link disappeared. Not verbatim: the printed form drops credentials
+  // and the query string, which is the trade this makes on purpose. Restoring a password onto a
+  // public profile is not a recovery anyone should want.
   await Promise.resolve()
 }
