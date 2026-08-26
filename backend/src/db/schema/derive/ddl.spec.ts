@@ -72,6 +72,18 @@ describe('statementFor', () => {
       )
     })
 
+    it('leaves `number` to the audit, because IS TYPED cannot spell the union', () => {
+      // JSON Schema's `number` is "integer or float" and Memgraph keeps the two apart. Spelled
+      // as FLOAT it would reject the value 1, which the declaration allows — and a constraint
+      // silences the audit for its rule, so nothing would be left to notice.
+      const Measured = defineEntity({
+        label: 'Measured',
+        properties: { value: { type: 'number' } },
+        required: [],
+      })
+      expect(statements(Measured, 'memgraph')).toEqual([])
+    })
+
     it('leaves a union wider than X|null to the audit', () => {
       const Widened = defineEntity({
         label: 'Widened',

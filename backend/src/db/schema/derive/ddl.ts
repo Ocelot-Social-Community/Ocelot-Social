@@ -91,11 +91,26 @@ const soleType = (types: PropertyType[]): PropertyType | null => {
   return withoutNull.length === 1 ? withoutNull[0] : null
 }
 
+/**
+ * Our property types as Memgraph's `IS TYPED` names.
+ *
+ * `number` is deliberately ABSENT. JSON Schema's `number` is "integer or float", and Memgraph
+ * keeps the two strictly apart — there is no `IS TYPED` that spells the union. Mapping it to
+ * FLOAT looked harmless and was not: a constraint silences the audit for that rule
+ * (`auditFor`), so the value 1 stored in a `number` property would have violated a constraint
+ * the declaration permits, with nothing left to say otherwise. Seven properties are declared
+ * that way — Location.lat/lng, Migration.timestamp, Donations.goal/progress, Image.aspectRatio,
+ * File.duration — and a millisecond timestamp is an INTEGER in practice, so this would have
+ * failed on the first real Memgraph deployment rather than in a corner case.
+ *
+ * Absent means audited: audit.ts asks `NOT type IN ['INTEGER', 'FLOAT']`, which is the
+ * question the declaration actually poses. A type the backend cannot express is not a type we
+ * stop checking.
+ */
 const MEMGRAPH_TYPE = new Map<PropertyType, string>([
   ['string', 'STRING'],
   ['boolean', 'BOOLEAN'],
   ['integer', 'INTEGER'],
-  ['number', 'FLOAT'],
 ])
 
 /**

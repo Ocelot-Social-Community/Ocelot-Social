@@ -178,6 +178,14 @@ describe('generated queries', () => {
   it('emits no type audit where the backend enforces the type', () => {
     expect(audit('Role.protected type', 'memgraph')).toBeUndefined()
   })
+
+  it('still audits a `number` on memgraph, which has no IS TYPED for the union', () => {
+    // The other half of the partition: no constraint means the audit has to stay, and it asks
+    // the question the declaration poses rather than the narrower one a constraint could.
+    expect(audit('Location.lat type', 'memgraph')?.cypher).toContain(
+      "NOT apoc.meta.cypher.type(n.lat) IN ['INTEGER', 'FLOAT']",
+    )
+  })
 })
 
 describe('coverage of the pilot registry', () => {
