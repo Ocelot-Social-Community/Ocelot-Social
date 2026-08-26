@@ -191,19 +191,32 @@ export const repair = (value: string): string | null => {
  *
  * The rest is kept, because the log has a job: `down` is deliberately empty and points here, and
  * an operator telling someone what disappeared from their profile needs to name the link. Scheme,
- * host and path do that; a password does not.
+ * host and path do that; a password does not. Note what this costs and what it does not: a value
+ * carrying neither reaches the log unchanged, which is most of them, so what can be restored
+ * still can be. What is dropped is what must never be restored — putting a password back on a
+ * public profile is not a recovery, and putting a `?bcc=` back is restoring the attack.
+ *
+ * The note NAMES what went, rather than saying "redacted" for both. That an account had a
+ * password in a public field is itself worth knowing — it means the secret is burned and should
+ * be rotated — and that fact belongs in the log even though the value does not.
  */
-const forLog = (value: string): string => {
+export const forLog = (value: string): string => {
   try {
     const parsed = new URL(value)
-    const carried = parsed.username !== '' || parsed.password !== '' || parsed.search !== ''
-    if (!carried) {
+    const dropped: string[] = []
+    if (parsed.username !== '' || parsed.password !== '') {
+      dropped.push('credentials')
+    }
+    if (parsed.search !== '') {
+      dropped.push('query')
+    }
+    if (dropped.length === 0) {
       return value
     }
     parsed.username = ''
     parsed.password = ''
     parsed.search = ''
-    return `${parsed.toString()} (redacted)`
+    return `${parsed.toString()} (${dropped.join(' and ')} removed)`
     // eslint-disable-next-line no-catch-all/no-catch-all -- the question IS "does this parse"
   } catch {
     // Not a url, so it has no authority to hide a credential in and no query to carry a bcc.

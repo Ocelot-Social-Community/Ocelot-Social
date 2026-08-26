@@ -1,4 +1,5 @@
 import {
+  forLog,
   repair,
   up,
 } from '@db/migrations/20260821120000-repair-or-remove-unfollowable-social-media'
@@ -157,6 +158,33 @@ describe('repair', () => {
   })
 })
 
+describe('forLog', () => {
+  it.each([
+    ['https://example.org/profile'],
+    ['mailto:someone@example.org'],
+    // Not a url, so it has no authority to hide a credential in and no query to carry a bcc —
+    // and an operator needs to see exactly this one.
+    ['javascript:alert(document.cookie)'],
+    ['not-a-url'],
+  ])('passes %j through untouched, so what can be restored still can be', (url) => {
+    expect(forLog(url)).toBe(url)
+  })
+
+  it.each([
+    ['https://user:secret@example.org/x', 'https://example.org/x (credentials removed)'],
+    ['mailto:a@example.org?bcc=evil@example.tld', 'mailto:a@example.org (query removed)'],
+    [
+      'https://user:secret@example.org/x?token=abc',
+      'https://example.org/x (credentials and query removed)',
+    ],
+  ])('names what it dropped from %j', (url, expected) => {
+    // Named rather than a blanket "redacted": a password in a public field is a burned secret
+    // that should be rotated, and that is worth knowing even though the value is not worth
+    // keeping. A `?bcc=` is someone else's address, which was never the owner's to publish.
+    expect(forLog(url)).toBe(expected)
+  })
+})
+
 describe('up', () => {
   // One row that survives a repair, one that cannot be repaired and is removed.
   // One repairable row whose query carries a third party's address, and one unrepairable row
@@ -225,7 +253,11 @@ describe('up', () => {
     expect(log).not.toContain('evil@example.tld')
     // Still enough to act on: the owner and the link they lost.
     expect(log).toContain('peter')
-    expect(log).toContain('ftp://example.org/pub (redacted)')
+    // And the note says WHICH part went. That an account had a password in a public field means
+    // the secret is burned and should be rotated — a fact worth logging even though the value
+    // is not, and one that "redacted" for both cases would have hidden.
+    expect(log).toContain('ftp://example.org/pub (credentials removed)')
+    expect(log).toContain('mailto:a@example.org (query removed)')
   })
 
   it('states the plan before doing any of it', () => {
