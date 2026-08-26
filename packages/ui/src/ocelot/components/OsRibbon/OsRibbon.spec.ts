@@ -16,10 +16,18 @@ describe('osRibbon', () => {
     expect(wrapper.text()).toBe('Article')
   })
 
-  it('renders as a non-interactive aside', () => {
+  it('renders as a plain, non-landmark div', () => {
     const wrapper = mount(OsRibbon, { props: { text: 'Article' } })
 
-    expect((wrapper.element as HTMLElement).tagName).toBe('ASIDE')
+    expect((wrapper.element as HTMLElement).tagName).toBe('DIV')
+  })
+
+  it('is not keyboard-focusable and contains no focusable controls', () => {
+    const wrapper = mount(OsRibbon, { props: { text: 'Article' } })
+    const el = wrapper.element as HTMLElement
+
+    expect(el.hasAttribute('tabindex')).toBe(false)
+    expect(el.querySelectorAll('a, button, input, select, textarea, [tabindex]')).toHaveLength(0)
   })
 
   describe('variants', () => {

@@ -309,15 +309,6 @@
         },
       )
 
-      watch(
-        () => props.editable,
-        () => {
-          if (marker) {
-            marker.setDraggable(props.editable)
-          }
-        },
-      )
-
       // A plain map click never sets the pin on its own — the pan cursor and
       // the "click to place" cursor look identical, so a bare click-to-place
       // is easy to trigger by accident while just looking around the map.
@@ -326,6 +317,8 @@
       // or Escape) so the map goes back to plain panning.
       let isPicking = false
       let pickerToggleEl: HTMLButtonElement | null = null
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let locationPickerControl: any = null
 
       function setPicking(value: boolean) {
         isPicking = value
@@ -405,6 +398,49 @@
           },
         }
       }
+
+      // Keeps the pick-location tool (control + Escape listener) in sync when
+      // a host app flips `editable` after mount, not just at mount time — an
+      // app switching from an edit form to a read-only view (or back) must
+      // not leave a still-clickable pick-location button and a stray
+      // document-level keydown listener behind once editing is over.
+      watch(
+        () => props.editable,
+        (isEditable) => {
+          if (marker) {
+            marker.setDraggable(props.editable)
+          }
+          /* v8 ignore start -- map is always set synchronously in onMounted
+             before this watcher can fire; unreachable through the
+             component's own lifecycle. */
+          if (!map) {
+            return
+          }
+          /* v8 ignore stop */
+          /* v8 ignore start -- locationPickerControl's presence always
+             mirrors "was editable at the previous watcher firing" (set by
+             the branch below, cleared by the other one), so the "not
+             editable, no control to remove" combination (neither branch
+             taken) can only occur before this watcher has ever fired —
+             unreachable through the component's own lifecycle/reactivity.
+             Both branches below DO run under real tests; this annotation
+             only works around the coverage tool requiring that otherwise
+             untakeable combination too. */
+          if (isEditable && !locationPickerControl) {
+            locationPickerControl = buildLocationPicker()
+            map.addControl(locationPickerControl, 'top-right')
+            document.addEventListener('keydown', onDocumentKeydown)
+            setPicking(!hasPin.value)
+          } else if (!isEditable && locationPickerControl) {
+            // The control's own onRemove() already calls setPicking(false)
+            // and clears pickerToggleEl.
+            map.removeControl(locationPickerControl)
+            locationPickerControl = null
+            document.removeEventListener('keydown', onDocumentKeydown)
+          }
+          /* v8 ignore stop */
+        },
+      )
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       function buildViewOnMapControl(): any {
@@ -595,7 +631,8 @@
         // very top of the top-right stack, above the secondary
         // zoom/fullscreen/geolocate/style controls below it.
         if (props.editable) {
-          map.addControl(buildLocationPicker(), 'top-right')
+          locationPickerControl = buildLocationPicker()
+          map.addControl(locationPickerControl, 'top-right')
           document.addEventListener('keydown', onDocumentKeydown)
           setPicking(!hasPin.value)
         }
@@ -675,6 +712,7 @@
         }
         /* v8 ignore stop */
         marker = null
+        locationPickerControl = null
       })
 
       function onSearchInput(e: Event) {

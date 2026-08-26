@@ -7,7 +7,11 @@ import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 // gone — a known mapbox-gl-js race in third-party code, not this app's own,
 // and harmless (the control it was about to label is already removed too).
 Cypress.on('uncaught:exception', (err) => {
-  if (err.message.includes('_getUIString')) {
+  // Message alone ("_getUIString") is a fairly unique token already, but
+  // requiring the stack to point into mapbox-gl too keeps this from ever
+  // accidentally swallowing an unrelated error in this app's own code that
+  // happens to mention the same substring.
+  if (err.message.includes('_getUIString') && /mapbox-gl/i.test(err.stack || '')) {
     return false
   }
 })

@@ -318,6 +318,24 @@ describe('Post', () => {
       })
     })
 
+    it('combines a client-provided OR filter with the date filter via AND, instead of replacing it', async () => {
+      variables = {
+        filter: {
+          eventStart_gte: now.toISOString(),
+          OR: [{ id: 'ended-event' }, { id: 'future-event' }],
+        },
+      }
+      const { data } = await query({ query: Post, variables })
+      const ids = data?.Post.map((post: { id: string }) => post.id)
+      // Only 'future-event' satisfies both sides: it's named in the client's
+      // OR *and* passes the date filter. 'ended-event' is named in the OR
+      // but excluded by the date filter. Any other non-past event (e.g.
+      // 'ongoing-event', never mentioned in the client's OR) showing up here
+      // would mean that OR got silently replaced instead of ANDed with the
+      // date filter.
+      expect(ids).toEqual(['future-event'])
+    })
+
     it('includes every event, without a date filter', async () => {
       variables = { filter: { postType_in: ['Event'] } }
       const { data } = await query({ query: Post, variables })

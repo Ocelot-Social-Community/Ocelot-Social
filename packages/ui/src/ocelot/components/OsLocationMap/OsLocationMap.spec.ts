@@ -48,6 +48,20 @@ function createMockMapboxGl() {
         controlContainers.push(control.onAdd())
       }
     }),
+    // Real mapbox-gl-js removes a single control's DOM and calls its own
+    // onRemove() — used by OsLocationMap to tear down the pick-location tool
+    // when `editable` flips back to false after mount.
+    removeControl: vi.fn<(control?: MapboxControl) => void>((control) => {
+      if (!control) {
+        return
+      }
+      const index = controls.indexOf(control)
+      if (index !== -1) {
+        controls.splice(index, 1)
+        controlContainers.splice(index, 1)[0]?.remove()
+      }
+      control.onRemove?.()
+    }),
     on: vi.fn<(event: string, handler: (...args: unknown[]) => void) => void>((event, handler) => {
       mapHandlers[event] = handler
     }),
@@ -445,6 +459,53 @@ describe('osLocationMap', () => {
 
     await expect(wrapper.setProps({ editable: true })).resolves.not.toThrow()
     expect(ctx.markerInstance.setDraggable).not.toHaveBeenCalled()
+  })
+
+  it('adds the pick-location tool when editable flips from false to true after mount', async () => {
+    const wrapper = mount(OsLocationMap, {
+      props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', editable: false },
+    })
+
+    expect(findControlWithOnAdd()).toBeUndefined()
+
+    await wrapper.setProps({ editable: true })
+
+    expect(findControlWithOnAdd()).toBeDefined()
+  })
+
+  it('removes the pick-location tool and the Escape listener when editable flips from true to false after mount', async () => {
+    const wrapper = mount(OsLocationMap, {
+      props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', editable: true },
+    })
+    // Captured before removal — getPickerToggle() looks it up via
+    // ctx.controlContainers, which removeControl()'s mock splices the
+    // container out of once removed.
+    const toggle = getPickerToggle()
+    const removeListenerSpy = vi.spyOn(document, 'removeEventListener')
+
+    await wrapper.setProps({ editable: false })
+
+    expect(ctx.mapInstance.removeControl).toHaveBeenCalledTimes(1)
+    expect(removeListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function))
+    // The removed control's own onRemove() is what disarms picking — assert
+    // the DOM effect it produces rather than reaching into private state.
+    expect(toggle.classList.contains('os-location-map-picker-toggle--active')).toBe(false)
+  })
+
+  it('does not add a second pick-location control on a false-then-true editable round trip', async () => {
+    const wrapper = mount(OsLocationMap, {
+      props: { mapboxGl: ctx.mapboxGl, accessToken: 'test-token', editable: true },
+    })
+    ctx.mapInstance.addControl.mockClear()
+
+    await wrapper.setProps({ editable: false })
+    await wrapper.setProps({ editable: true })
+
+    const pickerAddCalls = ctx.mapInstance.addControl.mock.calls.filter(
+      ([control]) => typeof control?.onAdd === 'function',
+    )
+
+    expect(pickerAddCalls).toHaveLength(1)
   })
 
   it('does not throw when the pick-location toggle is clicked after the map is torn down', () => {

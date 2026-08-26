@@ -94,8 +94,7 @@ const maintainGroupPinnedPosts = (params) => {
 
 const filterEventDates = (params) => {
   if (params.filter?.eventStart_gte) {
-    const date = params.filter.eventStart_gte
-    delete params.filter.eventStart_gte
+    const { eventStart_gte: date, ...restFilter } = params.filter
     // An event stays "current" through the rest of the calendar day it ends
     // on, not just up to its exact eventEnd instant — so this compares
     // eventEnd against the *start* of the cutoff's day, not the cutoff
@@ -111,12 +110,20 @@ const filterEventDates = (params) => {
       throw new UserInputError('eventStart_gte is invalid')
     }
     startOfStartDate.setUTCHours(0, 0, 0, 0)
+    // AND, not a spread — restFilter may itself carry a top-level OR/AND (or
+    // any other key) from the client; spreading it alongside this OR would
+    // silently overwrite a same-named client key (most notably OR) instead
+    // of combining with it.
     params.filter = {
-      ...params.filter,
-      OR: [
-        { eventStart_gte: date },
-        { eventEnd_gte: startOfStartDate.toISOString() },
-        { eventEnd: null, eventStart_gte: startOfStartDate.toISOString() },
+      AND: [
+        restFilter,
+        {
+          OR: [
+            { eventStart_gte: date },
+            { eventEnd_gte: startOfStartDate.toISOString() },
+            { eventEnd: null, eventStart_gte: startOfStartDate.toISOString() },
+          ],
+        },
       ],
     }
   }

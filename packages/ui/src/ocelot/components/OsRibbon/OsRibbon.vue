@@ -21,7 +21,11 @@
     setup(props) {
       return () =>
         h(
-          'aside',
+          // Not <aside> — that carries an implicit "complementary" landmark
+          // role, and a feed with dozens of post teasers would then expose
+          // dozens of meaningless landmarks to screen-reader landmark
+          // navigation. This is a purely decorative type badge, not a region.
+          'div',
           {
             class: [
               'os-ribbon',
