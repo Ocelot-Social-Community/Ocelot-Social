@@ -150,10 +150,19 @@ const defaults = new Map<string, Defaults>([
  * and was refused for a value `create` accepts and converts. Two paths onto one declaration
  * have to apply one rule, or every call site ends up preparing the value itself.
  */
-export const normalised = (properties: NodeProperties): NodeProperties =>
-  typeof properties.slug === 'string'
-    ? { ...properties, slug: toSlug(properties.slug) }
-    : properties
+export const normalised = (properties: NodeProperties): NodeProperties => {
+  // `undefined` is dropped, `null` is not. They mean opposite things here and a spread cannot
+  // tell them apart: `{ ...defaults, ...{ name: undefined } }` copies the key and overwrites
+  // the default with nothing, so `Factory.build('user', { name: someVar })` with an unset
+  // variable failed validation as "must have required property 'name'" instead of using the
+  // default — which is what every other JS API means by an undefined argument, and what neode
+  // did. `null` keeps meaning "remove this property", so clearing a REQUIRED one still fails,
+  // as it should.
+  const given = Object.fromEntries(
+    Object.entries(properties).filter(([, value]) => value !== undefined),
+  )
+  return typeof given.slug === 'string' ? { ...given, slug: toSlug(given.slug) } : given
+}
 
 /** The caller's properties, with the entity's fixture defaults filled in underneath. */
 export const withDefaults = (
@@ -161,7 +170,12 @@ export const withDefaults = (
   properties: NodeProperties,
 ): NodeProperties => {
   const forEntity = defaults.get(entity.label)
-  const filled = normalised({ ...(forEntity ? forEntity(properties) : {}), ...properties })
+  // Normalised BEFORE the merge, not after: an `undefined` that has already overwritten a
+  // default cannot be told from one that was never there. The defaults see the same reading,
+  // so a value derived from another property (`slugFrom(given.slug, name, id)`) is derived
+  // from what the caller meant.
+  const given = normalised(properties)
+  const filled = { ...(forEntity ? forEntity(given) : {}), ...given }
   // createdAt/updatedAt where the declaration demands them and no entry above covers it.
   const now = timestamp()
   const known = new Map(Object.entries(entity.properties))

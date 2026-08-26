@@ -1,4 +1,6 @@
-import { timestamp } from './defaults'
+import { User } from '@db/schema/index'
+
+import { normalised, timestamp, withDefaults } from './defaults'
 
 // No database: the point of this helper is what it guarantees in-process, and a round trip
 // would hide it — two writes 40ms apart differ even with `new Date()`.
@@ -26,5 +28,37 @@ describe('timestamp', () => {
     for (const stamp of [stamps[0], stamps[stamps.length - 1]]) {
       expect(stamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
     }
+  })
+})
+
+describe('normalised', () => {
+  it('drops an undefined value, so a default can still apply', () => {
+    // A spread copies the key either way: `{ ...defaults, ...{ name: undefined } }` overwrites
+    // the default with nothing, and `Factory.build('user', { name: someVar })` with an unset
+    // variable then failed as "must have required property 'name'". Every other JS API reads an
+    // undefined argument as "not given", and so did neode.
+    expect(normalised({ name: undefined, about: 'here' })).toEqual({ about: 'here' })
+  })
+
+  it('keeps a null value, which means something else entirely', () => {
+    // `SET n.x = null` REMOVES the property, and the fixtures rely on it to clear a default —
+    // `Factory.build('emailAddress', { verifiedAt: null })` for an unverified address.
+    expect(normalised({ verifiedAt: null })).toEqual({ verifiedAt: null })
+  })
+
+  it('normalises a slug the way the writing side does', () => {
+    expect(normalised({ slug: 'Peter Pan' })).toEqual({ slug: 'peter-pan' })
+  })
+})
+
+describe('withDefaults', () => {
+  it('fills in the default for a property passed as undefined', () => {
+    expect(withDefaults(User, { name: undefined }).name).toBe('Test User')
+  })
+
+  it('leaves a null alone, so clearing a property still means clearing it', () => {
+    // It then fails validation for a REQUIRED property, which is the correct answer rather than
+    // a quietly substituted default.
+    expect(withDefaults(User, { name: null }).name).toBeNull()
   })
 })
