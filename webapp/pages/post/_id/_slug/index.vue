@@ -167,7 +167,7 @@
           <content-viewer class="content hyphenate-text" :content="post.content" />
           <!-- categories -->
           <div v-if="categoriesActive && post.categories.length > 0" class="categories">
-            <div class="ds-my-xx-large"></div>
+            <div class="ds-mb-large"></div>
             <div class="ds-my-xx-small"></div>
             <hc-category
               v-for="category in sortCategories(post.categories)"
