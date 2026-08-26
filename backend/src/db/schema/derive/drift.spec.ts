@@ -185,10 +185,23 @@ describe('the two constraint kinds are told apart', () => {
     expect(report.missing).toEqual([existence('User', 'id')])
   })
 
-  it('reports a missing object once, however often it was wanted', () => {
-    // `missing` filtered the array rather than a set, so a duplicate printed twice and counted
-    // twice towards the exit code.
-    const report = compareSchemaObjects([constraint('User', 'id'), constraint('User', 'id')], [])
-    expect(report.missing).toEqual([constraint('User', 'id')])
+  it('reports an object once per side, however often it was listed', () => {
+    // `missing` and `surplus` both filtered the array rather than a set, so a duplicate printed
+    // twice and counted twice towards the exit code — reportDrift returns
+    // `missing.length + unwanted.length`, so the two sides carry exactly the same weight.
+    const wantedTwice = compareSchemaObjects(
+      [constraint('User', 'id'), constraint('User', 'id')],
+      [],
+    )
+    expect(wantedTwice.missing).toEqual([constraint('User', 'id')])
+
+    // The present side is the harder one to reach — Neo4j will not hold two constraints over
+    // the same label and properties — but it is the same comparison, and only one half of it
+    // was pinned. A reader of `surplus` should not have to check which.
+    const presentTwice = compareSchemaObjects(
+      [],
+      [constraint('User', 'id'), constraint('User', 'id')],
+    )
+    expect(presentTwice.surplus).toEqual([constraint('User', 'id')])
   })
 })
