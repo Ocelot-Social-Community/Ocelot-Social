@@ -1370,6 +1370,12 @@ export default {
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
   white-space: nowrap;
   overflow: hidden;
+  /* Mapbox's own corner containers (.mapboxgl-ctrl-top-right,
+     -bottom-left, …) all share z-index: 2 — with equal z-index, later-in-DOM
+     wins, which happens to put the bottom-left corner (the scale control)
+     above this popover when they visually overlap. This lifts the popover
+     above every corner container regardless of that DOM-order tie. */
+  z-index: 3;
 }
 
 .map-style-popover--open {
