@@ -45,6 +45,8 @@ export const mapQuery = (i18n) => {
           lng
           lat
         }
+        lat
+        lng
       }
     }
   `

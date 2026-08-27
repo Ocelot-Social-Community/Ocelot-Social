@@ -627,6 +627,37 @@ describe('PostSlug', () => {
         })
       })
 
+      describe('eventPinCoordinates', () => {
+        it("prefers the post's own precise lat/lng over eventLocation's (shared, less exact) coordinates", () => {
+          const ctx = {
+            post: {
+              lat: 48.7758,
+              lng: 9.1829,
+              // Deliberately different — proves the precise pin wins over
+              // eventLocation, not just that both happen to agree.
+              eventLocation: { lat: 48.78232, lng: 9.17702 },
+            },
+          }
+          expect(PostSlug.computed.eventPinCoordinates.call(ctx)).toEqual({
+            lat: 48.7758,
+            lng: 9.1829,
+          })
+        })
+
+        it("falls back to eventLocation's coordinates for events saved before Post had its own lat/lng", () => {
+          const ctx = { post: { eventLocation: { lat: 48.78232, lng: 9.17702 } } }
+          expect(PostSlug.computed.eventPinCoordinates.call(ctx)).toEqual({
+            lat: 48.78232,
+            lng: 9.17702,
+          })
+        })
+
+        it('is null without either', () => {
+          expect(PostSlug.computed.eventPinCoordinates.call({ post: {} })).toBeNull()
+          expect(PostSlug.computed.eventPinCoordinates.call({ post: null })).toBeNull()
+        })
+      })
+
       it('commentsCount excludes deleted and disabled comments', () => {
         const ctx = {
           post: {

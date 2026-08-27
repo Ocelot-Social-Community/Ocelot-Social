@@ -455,12 +455,25 @@ export default {
     commentingAllowedByGroupRole() {
       return this.group && ['usual', 'admin', 'owner'].includes(this.group.myRole)
     },
+    // Prefers the post's own precise pin (Post.lat/lng — the exact point
+    // picked on the map) over eventLocation's coordinates (the shared
+    // Location node's own point, reused across every other post/user/group
+    // at that same address). Falls back to eventLocation only for events
+    // saved before Post gained its own lat/lng.
+    eventPinCoordinates() {
+      if (typeof this.post?.lat === 'number' && typeof this.post?.lng === 'number') {
+        return { lat: this.post.lat, lng: this.post.lng }
+      }
+      if (
+        typeof this.post?.eventLocation?.lat === 'number' &&
+        typeof this.post?.eventLocation?.lng === 'number'
+      ) {
+        return { lat: this.post.eventLocation.lat, lng: this.post.eventLocation.lng }
+      }
+      return null
+    },
     hasEventCoordinates() {
-      return (
-        !!this.post?.eventLocation &&
-        typeof this.post.eventLocation.lat === 'number' &&
-        typeof this.post.eventLocation.lng === 'number'
-      )
+      return !!this.eventPinCoordinates
     },
     // Same definition the main map itself uses (eventStart AND eventEnd both
     // past, with a same-day grace period) — deep-linking from a still-running
@@ -475,19 +488,17 @@ export default {
       )
     },
     eventMapLocation() {
-      return this.hasEventCoordinates
-        ? { lat: this.post.eventLocation.lat, lng: this.post.eventLocation.lng }
-        : null
+      return this.eventPinCoordinates
     },
     // Lets the venue/address text (LocationTeaser's `to` prop) deep-link into
     // the main map, same coordinates the read-only pin uses.
     mapLinkTo() {
-      if (!this.hasEventCoordinates) return null
+      if (!this.eventPinCoordinates) return null
       return {
         path: '/map',
         query: {
-          lat: this.post.eventLocation.lat,
-          lng: this.post.eventLocation.lng,
+          lat: this.eventPinCoordinates.lat,
+          lng: this.eventPinCoordinates.lng,
           eventId: this.post.id,
           ...(this.isPastEvent ? { showPastEvents: '1' } : {}),
         },

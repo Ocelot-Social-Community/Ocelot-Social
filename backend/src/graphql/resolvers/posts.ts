@@ -261,7 +261,7 @@ export default {
       const { categoryIds, groupId } = params
       const { image: imageInput } = params
 
-      const locationName = validateEventParams(params)
+      const { locationName, coordinates } = validateEventParams(params)
 
       delete params.categoryIds
       delete params.image
@@ -333,7 +333,14 @@ export default {
       try {
         const post = await writeTxResultPromise
         if (locationName) {
-          await createOrUpdateLocations('Post', post.id, locationName, session, context)
+          await createOrUpdateLocations(
+            'Post',
+            post.id,
+            locationName,
+            session,
+            context,
+            coordinates,
+          )
         }
         return post
       } catch (e) {
@@ -350,7 +357,7 @@ export default {
       const { categoryIds } = params
       const { image: imageInput } = params
 
-      const locationName = validateEventParams(params)
+      const { locationName, coordinates } = validateEventParams(params)
 
       delete params.categoryIds
       delete params.image
@@ -404,7 +411,14 @@ export default {
         const post = await writeTxResultPromise
         await images(context.config).mergeImage(post, 'HERO_IMAGE', imageInput)
         if (locationName !== undefined) {
-          await createOrUpdateLocations('Post', post.id, locationName, session, context)
+          await createOrUpdateLocations(
+            'Post',
+            post.id,
+            locationName,
+            session,
+            context,
+            coordinates,
+          )
         }
         return post
       } catch (e) {

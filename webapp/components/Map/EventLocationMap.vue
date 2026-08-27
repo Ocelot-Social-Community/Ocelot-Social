@@ -170,12 +170,17 @@ export default {
         if (requestId !== this.pinChangeRequestId) return
         const match = results && results[0]
         const label = match ? match.place_name : formatCoordinates(lat, lng)
+        // Always the exact clicked/dragged point, never match.lat/match.lng
+        // (the matched place's own registered coordinate, which can be
+        // measurably off — e.g. a building's entrance rather than where the
+        // user actually pinned). The match is only used for its label/id;
+        // the pin itself must stay exactly where it was put.
         this.$emit('input', {
           label,
           value: label,
           id: match ? match.id : null,
-          lat: match ? (match.lat ?? lat) : lat,
-          lng: match ? (match.lng ?? lng) : lng,
+          lat,
+          lng,
         })
       } catch (error) {
         if (requestId !== this.pinChangeRequestId) return

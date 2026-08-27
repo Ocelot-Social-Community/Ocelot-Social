@@ -678,6 +678,85 @@ describe('CreatePost', () => {
         })
       })
 
+      describe('event location coordinates are out of range', () => {
+        it('rejects an out-of-range latitude before any reverse-geocoding happens', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: CreatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventLocationName: 'Berlin',
+                  eventVenue: 'Brandenburger Tor',
+                  lat: 90.1,
+                  lng: 13.4,
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event location latitude must be a finite number between -90 and 90!',
+              },
+            ],
+          })
+        })
+
+        it('rejects an out-of-range longitude before any reverse-geocoding happens', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: CreatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventLocationName: 'Berlin',
+                  eventVenue: 'Brandenburger Tor',
+                  lat: 52.5,
+                  lng: 200,
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event location longitude must be a finite number between -180 and 180!',
+              },
+            ],
+          })
+        })
+
+        it('rejects lat given without lng, instead of silently discarding it', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: CreatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventLocationName: 'Berlin',
+                  eventVenue: 'Brandenburger Tor',
+                  lat: 52.5,
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event location requires both lat and lng, or neither!',
+              },
+            ],
+          })
+        })
+      })
+
       describe('valid event input without location', () => {
         it('has label "Event" set', async () => {
           const now = new Date()
@@ -731,6 +810,54 @@ describe('CreatePost', () => {
                 eventLocation: {
                   lng: 12.375101,
                   lat: 51.34083,
+                },
+              },
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('valid event input with location name and precise coordinates (e.g. a dropped map pin)', () => {
+        it('reverse-geocodes the coordinates instead of forward-geocoding the name text, keeping the exact picked point', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: CreatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  // Deliberately generic: if the coordinates below weren't
+                  // honored, forward-geocoding just "Hamburg" would resolve to
+                  // Hamburg's city center, not this specific address.
+                  eventLocationName: 'Hamburg',
+                  eventVenue: 'Rathaus',
+                  // A few metres off "Plan 6, 20095 Hamburg"'s own registered
+                  // point (53.55144, 9.994072) — reverse-geocoding still
+                  // matches that address, but its center differs from this
+                  // input, so the assertions below can tell apart "the exact
+                  // point picked" (post.lat/lng) from "the matched address's
+                  // own point" (eventLocation.lat/lng).
+                  lat: 53.5514,
+                  lng: 9.994,
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              CreatePost: {
+                postType: ['Event'],
+                eventLocationName: 'Hamburg',
+                eventVenue: 'Rathaus',
+                // The exact point picked — not the matched address's own
+                // registered point (asserted separately below).
+                lat: 53.5514,
+                lng: 9.994,
+                eventLocation: {
+                  lat: 53.55144,
+                  lng: 9.994072,
                 },
               },
             },
@@ -993,6 +1120,54 @@ describe('UpdatePost', () => {
                 eventLocation: {
                   lng: 12.375101,
                   lat: 51.34083,
+                },
+              },
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('valid event input with location name and precise coordinates (e.g. a dropped map pin)', () => {
+        it('reverse-geocodes the coordinates instead of forward-geocoding the name text, keeping the exact picked point', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: UpdatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  // Deliberately generic: if the coordinates below weren't
+                  // honored, forward-geocoding just "Hamburg" would resolve to
+                  // Hamburg's city center, not this specific address.
+                  eventLocationName: 'Hamburg',
+                  eventVenue: 'Rathaus',
+                  // A few metres off "Plan 6, 20095 Hamburg"'s own registered
+                  // point (53.55144, 9.994072) — reverse-geocoding still
+                  // matches that address, but its center differs from this
+                  // input, so the assertions below can tell apart "the exact
+                  // point picked" (post.lat/lng) from "the matched address's
+                  // own point" (eventLocation.lat/lng).
+                  lat: 53.5514,
+                  lng: 9.994,
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              UpdatePost: {
+                postType: ['Event'],
+                eventLocationName: 'Hamburg',
+                eventVenue: 'Rathaus',
+                // The exact point picked — not the matched address's own
+                // registered point (asserted separately below).
+                lat: 53.5514,
+                lng: 9.994,
+                eventLocation: {
+                  lat: 53.55144,
+                  lng: 9.994072,
                 },
               },
             },

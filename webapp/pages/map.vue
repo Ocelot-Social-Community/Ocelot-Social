@@ -712,7 +712,8 @@ export default {
         // hasLocation (the query filter) only guarantees the Post-[:IS_IN]->Location
         // relationship exists, not that that Location node itself got lat/lng —
         // see hasCoordinates() above.
-        if (!this.hasCoordinates(post.eventLocation)) {
+        const pinLocation = this.eventPinLocation(post)
+        if (!this.hasCoordinates(pinLocation)) {
           return
         }
         geoJSON.push({
@@ -724,7 +725,7 @@ export default {
             id: post.id,
             slug: post.slug,
             name: post.title,
-            locationName: post.eventLocation.name,
+            locationName: pinLocation.name,
             description: this.$filters.removeHtml(post.content),
             // Mirrors the backend's own "past" definition (filterEventDates in
             // posts.ts): an event still counts as current while EITHER its
@@ -734,7 +735,7 @@ export default {
           },
           geometry: {
             type: 'Point',
-            coordinates: this.getCoordinates(post.eventLocation),
+            coordinates: this.getCoordinates(pinLocation),
           },
         })
       })
@@ -888,6 +889,18 @@ export default {
     // coordinates must be skipped before getCoordinates() is called on it.
     hasCoordinates(location) {
       return !!location && typeof location.lat === 'number' && typeof location.lng === 'number'
+    },
+    // Prefers the post's own precise pin (Post.lat/lng — the exact point
+    // picked on the map) over eventLocation's coordinates (the shared
+    // Location node's own point, e.g. a building's registered entrance,
+    // reused across every other post/user/group at that same address).
+    // Falls back to eventLocation only for events saved before Post gained
+    // its own lat/lng.
+    eventPinLocation(post) {
+      if (this.hasCoordinates(post)) {
+        return { lat: post.lat, lng: post.lng, name: post.eventLocation?.name }
+      }
+      return post.eventLocation
     },
     isEventPast,
     async getUserLocation(id) {

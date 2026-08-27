@@ -84,7 +84,7 @@ describe('EventLocationMap', () => {
       },
     })
 
-    it('emits the geocoded label and coordinates on success', async () => {
+    it("emits the geocoded label but the exact clicked/dragged coordinates, not the matched place's own", async () => {
       mocks.$apollo.query.mockResolvedValue(resolvedLocation())
       wrapper = Wrapper()
 
@@ -95,14 +95,18 @@ describe('EventLocationMap', () => {
         variables: { place: '13.4,52.5', lang: 'en', types: 'address,poi,place' },
         fetchPolicy: 'network-only',
       })
+      // lat/lng are 52.5/13.4 (the click), not 52.52/13.41 (resolvedLocation's
+      // match coordinates) — the match is only used for its label/id here.
+      // The pin must stay exactly where it was put, not jump to the matched
+      // place's own registered point.
       expect(wrapper.emitted('input')).toStrictEqual([
         [
           {
             label: 'Alexanderplatz, Berlin',
             value: 'Alexanderplatz, Berlin',
             id: 'poi.1',
-            lat: 52.52,
-            lng: 13.41,
+            lat: 52.5,
+            lng: 13.4,
           },
         ],
       ])
