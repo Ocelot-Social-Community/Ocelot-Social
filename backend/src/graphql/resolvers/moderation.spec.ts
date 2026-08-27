@@ -499,8 +499,8 @@ describe('moderate resources', () => {
             ])
             await Promise.all([
               reportAgainstTrollingComment.relateTo(moderator, 'reviewed', {
-                ...disableVariables,
-                resourceId: 'comment-id',
+                disable: disableVariables.disable,
+                closed: disableVariables.closed,
               }),
               trollingComment.update({ disabled: true, updatedAt: new Date().toISOString() }),
             ])
@@ -564,8 +564,8 @@ describe('moderate resources', () => {
             ])
             await Promise.all([
               reportAgainstTrollingPost.relateTo(moderator, 'reviewed', {
-                ...disableVariables,
-                resourceId: 'comment-id',
+                disable: disableVariables.disable,
+                closed: disableVariables.closed,
               }),
               trollingPost.update({ disabled: true, updatedAt: new Date().toISOString() }),
             ])
@@ -628,8 +628,8 @@ describe('moderate resources', () => {
             ])
             await Promise.all([
               reportAgainstTroll.relateTo(moderator, 'reviewed', {
-                ...disableVariables,
-                resourceId: 'comment-id',
+                disable: disableVariables.disable,
+                closed: disableVariables.closed,
               }),
               troll.update({ disabled: true, updatedAt: new Date().toISOString() }),
             ])

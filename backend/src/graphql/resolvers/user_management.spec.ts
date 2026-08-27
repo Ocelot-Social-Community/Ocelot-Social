@@ -44,7 +44,10 @@ const disable = async (id) => {
   ])
   const disableVariables = { resourceId: user.get('id'), disable: true, closed: false }
   await Promise.all([
-    reportAgainstUser.relateTo(moderator, 'reviewed', disableVariables),
+    reportAgainstUser.relateTo(moderator, 'reviewed', {
+      disable: disableVariables.disable,
+      closed: disableVariables.closed,
+    }),
     user.update({ disabled: true, updatedAt: new Date().toISOString() }),
   ])
 }
