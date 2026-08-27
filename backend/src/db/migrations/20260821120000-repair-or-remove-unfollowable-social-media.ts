@@ -213,10 +213,17 @@ export const forLog = (value: string): string => {
     if (parsed.search !== '') {
       dropped.push('query')
     }
+    if (parsed.hash !== '') {
+      // A fragment is a place to hide a token as much as a query is, and leaving it made the
+      // note actively misleading: `mailto:a@example.org?bcc=…#access_token=secret` was logged
+      // as "(query removed)" with the secret still in plain view two characters further on.
+      dropped.push('fragment')
+    }
     if (dropped.length > 0) {
       parsed.username = ''
       parsed.password = ''
       parsed.search = ''
+      parsed.hash = ''
       return `${parsed.toString()} (${dropped.join(' and ')} removed)`
     }
     // eslint-disable-next-line no-catch-all/no-catch-all -- the question IS "does this parse"
@@ -235,8 +242,14 @@ export const forLog = (value: string): string => {
   // apart, and above it does; it just reads `user:` as the scheme, which leaves the password in
   // the path rather than in the credential slot. The realistic shape a browser would follow —
   // and the one this field collects — carries a scheme, and that one is covered.
-  const query = value.indexOf('?')
-  return query < 0 ? value : `${value.slice(0, query)} (query removed)`
+  const boundary = value.search(/[?#]/)
+  if (boundary < 0) {
+    return value
+  }
+  // Named after the boundary character, and everything past it goes — a fragment may itself
+  // contain a `?` and a query a `#`, so one name for the cut is the honest description.
+  const part = value.startsWith('?', boundary) ? 'query' : 'fragment'
+  return `${value.slice(0, boundary)} (${part} removed)`
 }
 
 interface Row {

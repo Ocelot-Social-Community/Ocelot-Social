@@ -195,9 +195,17 @@ describe('forLog', () => {
       'https://example.org/x (credentials and query removed)',
     ],
     // Without a scheme `new URL` refuses the value entirely, and it used to pass through with
-    // the token intact — while the same value with `https://` in front was redacted. A query is
-    // identifiable without parsing.
+    // the token intact — while the same value with `https://` in front was redacted. A boundary
+    // is identifiable without parsing.
     ['example.org/x?token=abc', 'example.org/x (query removed)'],
+    ['example.org/x#access_token=secret', 'example.org/x (fragment removed)'],
+    // A fragment hides a token as well as a query does. Left alone, the note was actively
+    // misleading: marked "(query removed)" with the secret two characters further on.
+    ['mailto:a@example.org#access_token=secret', 'mailto:a@example.org (fragment removed)'],
+    [
+      'mailto:a@example.org?bcc=x@y.tld#access_token=secret',
+      'mailto:a@example.org (query and fragment removed)',
+    ],
   ])('names what it dropped from %j', (url, expected) => {
     // Named rather than a blanket "redacted": a password in a public field is a burned secret
     // that should be rotated, and that is worth knowing even though the value is not worth
