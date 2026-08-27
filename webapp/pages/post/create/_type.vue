@@ -122,6 +122,27 @@ export default {
     if (!draft.groupId && this.$route.query.groupId) {
       draft.groupId = this.$route.query.groupId
     }
+    // First-time arrival via the main map's "place a new event here" pin tool
+    // (/post/create/event?lat=&lng=&locationName=&locationId=) — seed the
+    // draft's eventLocationName as the same { label, value, id, lat, lng }
+    // selection-object shape LocationSelect/EventLocationMap themselves
+    // produce, so ContributionForm shows the pin already placed. A truthy
+    // draft.eventLocationName (from a prior remount) wins, same reasoning as
+    // groupId above.
+    if (!draft.eventLocationName) {
+      const lat = parseFloat(this.$route.query.lat)
+      const lng = parseFloat(this.$route.query.lng)
+      if (Number.isFinite(lat) && Number.isFinite(lng)) {
+        const label = this.$route.query.locationName || ''
+        draft.eventLocationName = {
+          label,
+          value: label,
+          id: this.$route.query.locationId || null,
+          lat,
+          lng,
+        }
+      }
+    }
     return {
       type: this.$route.params.type,
       draft,

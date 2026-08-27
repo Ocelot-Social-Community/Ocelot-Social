@@ -1055,6 +1055,10 @@
   },
   "map": {
     "alertMessage": "Карта недоступна: токен Mapbox не налаштовано на сервері!",
+    "createEvent": {
+      "pickLocation": "Розмістити тут нову подію",
+      "resolvingLocation": "Пошук адреси…"
+    },
     "legend": {
       "event": "Подія",
       "group": "Група",

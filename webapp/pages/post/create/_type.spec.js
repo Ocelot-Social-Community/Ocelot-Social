@@ -78,6 +78,60 @@ describe('create.vue', () => {
       expect(second.vm.draft.groupId).toBe('g2')
     })
 
+    it('seeds draft.eventLocationName from ?lat=&lng=&locationName=&locationId= on first-time arrival', () => {
+      mocks = makeMocks({
+        type: 'event',
+        query: {
+          lat: '52.5',
+          lng: '13.4',
+          locationName: 'Alexanderplatz, Berlin',
+          locationId: 'poi.1',
+        },
+      })
+      wrapper = Wrapper()
+      expect(wrapper.vm.draft.eventLocationName).toEqual({
+        label: 'Alexanderplatz, Berlin',
+        value: 'Alexanderplatz, Berlin',
+        id: 'poi.1',
+        lat: 52.5,
+        lng: 13.4,
+      })
+    })
+
+    it('seeds draft.eventLocationName with an empty label when the map pin tool found no address', () => {
+      mocks = makeMocks({ type: 'event', query: { lat: '52.5', lng: '13.4' } })
+      wrapper = Wrapper()
+      expect(wrapper.vm.draft.eventLocationName).toEqual({
+        label: '',
+        value: '',
+        id: null,
+        lat: 52.5,
+        lng: 13.4,
+      })
+    })
+
+    it('does not seed eventLocationName without both lat and lng in the URL', () => {
+      mocks = makeMocks({ type: 'event', query: { lat: '52.5' } })
+      wrapper = Wrapper()
+      expect(wrapper.vm.draft.eventLocationName).toBe('')
+    })
+
+    it('does not overwrite an existing draft.eventLocationName with a stale URL query', () => {
+      mocks = makeMocks({ type: 'event' })
+      const first = Wrapper()
+      first.vm.draft.eventLocationName = { label: 'Kept', value: 'Kept', id: null, lat: 1, lng: 1 }
+      first.destroy()
+      mocks = makeMocks({ type: 'event', query: { lat: '52.5', lng: '13.4' } })
+      const second = Wrapper()
+      expect(second.vm.draft.eventLocationName).toEqual({
+        label: 'Kept',
+        value: 'Kept',
+        id: null,
+        lat: 1,
+        lng: 1,
+      })
+    })
+
     it('passes the draft into ContributionForm via externalFormData', () => {
       wrapper = Wrapper()
       const form = wrapper.findComponent({ name: 'ContributionForm' })

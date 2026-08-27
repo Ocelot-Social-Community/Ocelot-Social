@@ -1055,6 +1055,10 @@
   },
   "map": {
     "alertMessage": "La carte n'est pas accessible : Le token Mapbox n'est pas configuré sur le serveur !",
+    "createEvent": {
+      "pickLocation": "Créer un nouvel événement ici",
+      "resolvingLocation": "Recherche de l'adresse…"
+    },
     "legend": {
       "event": "Événement",
       "group": "Groupe",

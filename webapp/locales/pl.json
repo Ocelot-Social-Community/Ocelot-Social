@@ -1055,6 +1055,10 @@
   },
   "map": {
     "alertMessage": "Nie można uzyskać dostępu do mapy: token Mapbox nie jest ustawiony na serwerze!",
+    "createEvent": {
+      "pickLocation": "Utwórz tutaj nowe wydarzenie",
+      "resolvingLocation": "Wyszukiwanie adresu…"
+    },
     "legend": {
       "event": "Wydarzenie",
       "group": "Grupa",

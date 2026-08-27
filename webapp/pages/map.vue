@@ -106,6 +106,7 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import { isEventPast } from '~/utils/eventDate'
 import { profileUserQuery } from '~/graphql/User'
 import { mapQuery } from '~/graphql/MapQuery'
+import { queryLocations } from '~/graphql/location'
 import mobile from '~/mixins/mobile'
 import Empty from '~/components/Empty/Empty'
 
@@ -114,6 +115,16 @@ const maxMobileWidth = 639 // on this width and smaller the mapbox 'MapboxGeocod
 // Same value as --opacity-soft in root-tokens.css, used only if that custom
 // property can't be read yet (e.g. before the stylesheet is applied).
 const PAST_EVENT_OPACITY_FALLBACK = 0.7
+
+// Same cursor (glyph, hotspot, fallback) as OsLocationMap's own pick-location
+// tool (its PICKER_CURSOR) — shown while the "place a new event here" pin
+// tool below is armed, for visual consistency with the event form's map.
+const EVENT_PIN_TOOL_CURSOR_SVG =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="33" viewBox="0 0 20 33">' +
+  '<path d="M19.25,10.4a13.0663,13.0663,0,0,1-1.4607,5.2235,41.5281,41.5281,0,0,1-3.2459,5.5483c-1.1829,1.7369-2.3662,3.2784-3.2541,4.3859-.4438.5536-.8135.9984-1.0721,1.3046-.0844.1-.157.1852-.2164.2545-.06-.07-.1325-.1564-.2173-.2578-.2587-.3088-.6284-.7571-1.0723-1.3147-.8879-1.1154-2.0714-2.6664-3.2543-4.41a42.2677,42.2677,0,0,1-3.2463-5.5535A12.978,12.978,0,0,1,.75,10.4,9.4659,9.4659,0,0,1,10,.75,9.4659,9.4659,0,0,1,19.25,10.4Z" fill="black" stroke="white" stroke-width="1.5"/>' +
+  '<path d="M13.55,10A3.55,3.55,0,1,1,10,6.45,3.5484,3.5484,0,0,1,13.55,10Z" fill="#fff"/>' +
+  '</svg>'
+const EVENT_PIN_TOOL_CURSOR = `url("data:image/svg+xml,${encodeURIComponent(EVENT_PIN_TOOL_CURSOR_SVG)}") 10 30, crosshair`
 
 export default {
   name: 'Map',
@@ -350,6 +361,51 @@ export default {
         parent.insertBefore(container, parent.firstChild)
       }
     },
+    // Reverse-geocodes the clicked point (same endpoint/types EventLocationMap's
+    // own onPinChange uses) so the create-event page opens with a resolved
+    // address ready to submit, not just bare coordinates that would only
+    // resolve later inside the form. Shows a busy cursor for that brief
+    // request instead of navigating immediately — see the pin tool's own
+    // comment in onMapLoad for why.
+    async placeEventAtCoordinates({ lat, lng }) {
+      this.map.getCanvas().style.cursor = 'wait'
+      if (this.eventPinToolToggle) {
+        this.eventPinToolToggle.title = this.$t('map.createEvent.resolvingLocation')
+        this.eventPinToolToggle.setAttribute(
+          'aria-label',
+          this.$t('map.createEvent.resolvingLocation'),
+        )
+      }
+      const query = { lat, lng }
+      try {
+        const {
+          data: { queryLocations: results },
+        } = await this.$apollo.query({
+          query: queryLocations(),
+          variables: {
+            place: `${lng},${lat}`,
+            lang: this.$i18n.locale(),
+            types: 'address,poi,place',
+          },
+          fetchPolicy: 'network-only',
+        })
+        const match = results && results[0]
+        if (match) {
+          query.locationName = match.place_name
+          if (match.id) query.locationId = match.id
+        }
+      } catch (error) {
+        this.$toast.error(error.message)
+      } finally {
+        this.map.getCanvas().style.cursor = ''
+        if (this.eventPinToolToggle) {
+          const label = this.$t('map.createEvent.pickLocation')
+          this.eventPinToolToggle.title = label
+          this.eventPinToolToggle.setAttribute('aria-label', label)
+        }
+      }
+      this.$router.push({ path: '/post/create/event', query })
+    },
     updateMapPosition() {
       const navbar = document.getElementById('navbar')
       const footer = document.getElementById('footer')
@@ -368,18 +424,6 @@ export default {
 
       // set the default atmosphere style
       // this.map.setFog({}) // the package is probably to old, because of Vue2: https://docs.mapbox.com/mapbox-gl-js/example/globe/
-
-      // Zoom/fullscreen/geolocate added imperatively (not as declarative
-      // <Mgl*Control> children) so their order in the top-right stack is
-      // deterministic relative to the geocoder and style switcher added
-      // below — mapbox-gl stacks same-corner controls in add order, and the
-      // three declarative components used to mount independently of (and
-      // sometimes after) this method, making the final order a race. This
-      // now matches OsLocationMap's own control order (zoom → fullscreen →
-      // geolocate → style switcher).
-      this.map.addControl(new mapboxgl.NavigationControl(), 'top-right')
-      this.map.addControl(new mapboxgl.FullscreenControl(), 'top-right')
-      this.map.addControl(new mapboxgl.GeolocateControl(), 'top-right')
 
       this.map.on('style.load', (value) => {
         // Triggered when `setStyle` is called.
@@ -405,6 +449,67 @@ export default {
         }
       }
       window.addEventListener('resize', this.geocoderCollapseHandler)
+
+      // add "place a new event here" pin tool — directly below the search
+      // field (added just above) and above zoom/fullscreen/geolocate (added
+      // further below), matching the order requested for this control group.
+      // Starts disarmed; same click-to-arm-then-click-the-map pattern as
+      // OsLocationMap's own pick-location tool (see its buildLocationPicker()),
+      // including the same pin glyph, for visual consistency with the event
+      // form's own map.
+      let isPlacingEvent = false
+      const pinToolLabel = this.$t('map.createEvent.pickLocation')
+      const pinTool = {
+        onAdd: () => {
+          const container = document.createElement('div')
+          container.className = 'mapboxgl-ctrl map-event-pin-tool'
+          const toggle = document.createElement('button')
+          toggle.type = 'button'
+          toggle.className = 'map-event-pin-tool-toggle'
+          toggle.title = pinToolLabel
+          toggle.setAttribute('aria-label', pinToolLabel)
+          toggle.setAttribute('aria-pressed', 'false')
+          toggle.innerHTML =
+            '<svg viewBox="0 0 20 30.5" width="16" height="24" aria-hidden="true">' +
+            '<path d="M19.25,10.4a13.0663,13.0663,0,0,1-1.4607,5.2235,41.5281,41.5281,0,0,1-3.2459,5.5483c-1.1829,1.7369-2.3662,3.2784-3.2541,4.3859-.4438.5536-.8135.9984-1.0721,1.3046-.0844.1-.157.1852-.2164.2545-.06-.07-.1325-.1564-.2173-.2578-.2587-.3088-.6284-.7571-1.0723-1.3147-.8879-1.1154-2.0714-2.6664-3.2543-4.41a42.2677,42.2677,0,0,1-3.2463-5.5535A12.978,12.978,0,0,1,.75,10.4,9.4659,9.4659,0,0,1,10,.75,9.4659,9.4659,0,0,1,19.25,10.4Z" fill="currentColor"/>' +
+            '<path d="M13.55,10A3.55,3.55,0,1,1,10,6.45,3.5484,3.5484,0,0,1,13.55,10Z" fill="#fff"/>' +
+            '</svg>'
+          toggle.addEventListener('click', (e) => {
+            e.stopPropagation()
+            isPlacingEvent = !isPlacingEvent
+            toggle.classList.toggle('map-event-pin-tool-toggle--active', isPlacingEvent)
+            toggle.setAttribute('aria-pressed', String(isPlacingEvent))
+            this.map.getCanvas().style.cursor = isPlacingEvent ? EVENT_PIN_TOOL_CURSOR : ''
+          })
+          container.appendChild(toggle)
+          this.eventPinToolToggle = toggle
+          return container
+        },
+        onRemove: () => {},
+      }
+      this.map.addControl(pinTool, 'top-right')
+
+      this.map.on('click', (e) => {
+        if (!isPlacingEvent) return
+        isPlacingEvent = false
+        if (this.eventPinToolToggle) {
+          this.eventPinToolToggle.classList.remove('map-event-pin-tool-toggle--active')
+          this.eventPinToolToggle.setAttribute('aria-pressed', 'false')
+        }
+        this.placeEventAtCoordinates(e.lngLat)
+      })
+
+      // Zoom/fullscreen/geolocate added imperatively (not as declarative
+      // <Mgl*Control> children) so their order in the top-right stack is
+      // deterministic relative to the geocoder/pin-tool (above) and the
+      // style switcher (below) — mapbox-gl stacks same-corner controls in
+      // add order, and the three declarative components used to mount
+      // independently of (and sometimes after) this method, making the
+      // final order a race. This now matches OsLocationMap's own control
+      // order (zoom → fullscreen → geolocate → style switcher).
+      this.map.addControl(new mapboxgl.NavigationControl(), 'top-right')
+      this.map.addControl(new mapboxgl.FullscreenControl(), 'top-right')
+      this.map.addControl(new mapboxgl.GeolocateControl(), 'top-right')
 
       // add style switcher control
       let closePopoverHandler = null
@@ -1197,6 +1302,37 @@ export default {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
   }
+}
+
+.map-event-pin-tool {
+  background: var(--color-neutral-100);
+  border-radius: var(--border-radius-x-large);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.map-event-pin-tool-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 29px;
+  height: 29px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #333;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+}
+
+.map-event-pin-tool-toggle--active {
+  background: rgba(0, 0, 0, 0.1);
+  /* Same "map tool" accent as OsLocationMap's own pick-location toggle
+     (--os-location-map-accent-color there) — not --color-primary, which is
+     this app's unrelated brand accent. */
+  color: rgb(0, 142, 230);
 }
 
 .map-style-switcher {

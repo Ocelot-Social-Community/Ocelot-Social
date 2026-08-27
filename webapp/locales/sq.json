@@ -1055,6 +1055,10 @@
   },
   "map": {
     "alertMessage": "Harta nuk mund të aksesohet: Tokeni i Mapbox nuk është vendosur në server!",
+    "createEvent": {
+      "pickLocation": "Vendos këtu një aktivitet të ri",
+      "resolvingLocation": "Duke kërkuar adresën…"
+    },
     "legend": {
       "event": "Ngjarje",
       "group": "Grup",

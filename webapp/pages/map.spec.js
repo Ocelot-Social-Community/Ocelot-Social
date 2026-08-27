@@ -179,7 +179,7 @@ describe('map', () => {
       $t: (t) => t,
       $i18n: { locale: () => 'en' },
       $route: { path: '/map', query: {} },
-      $router: { replace: jest.fn() },
+      $router: { replace: jest.fn(), push: jest.fn() },
       $env: {
         MAPBOX_TOKEN: 'MY_MAPBOX_TOKEN',
       },
@@ -387,11 +387,116 @@ describe('map', () => {
       })
 
       it('adds style switcher control', () => {
-        // style switcher is the second addControl call (after geocoder)
         const styleSwitcherCall = mapAddControlMock.mock.calls.find(
-          (call) => call[1] === 'top-right' && call[0].onAdd,
+          (call) =>
+            call[1] === 'top-right' &&
+            call[0].onAdd &&
+            call[0].onAdd().className.includes('map-style-switcher'),
         )
         expect(styleSwitcherCall).toBeTruthy()
+      })
+
+      describe('event pin tool control', () => {
+        let container, toggle
+
+        beforeEach(() => {
+          const pinToolCall = mapAddControlMock.mock.calls.find(
+            (call) =>
+              call[1] === 'top-right' &&
+              call[0].onAdd &&
+              call[0].onAdd().className.includes('map-event-pin-tool'),
+          )
+          container = pinToolCall[0].onAdd()
+          toggle = container.querySelector('.map-event-pin-tool-toggle')
+        })
+
+        it('adds the tool, starting disarmed', () => {
+          expect(toggle).toBeTruthy()
+          expect(toggle.getAttribute('aria-pressed')).toBe('false')
+          expect(toggle.classList.contains('map-event-pin-tool-toggle--active')).toBe(false)
+        })
+
+        it('arms on click and disarms again on a second click', () => {
+          toggle.click()
+          expect(toggle.getAttribute('aria-pressed')).toBe('true')
+          expect(toggle.classList.contains('map-event-pin-tool-toggle--active')).toBe(true)
+
+          toggle.click()
+          expect(toggle.getAttribute('aria-pressed')).toBe('false')
+          expect(toggle.classList.contains('map-event-pin-tool-toggle--active')).toBe(false)
+        })
+      })
+
+      describe('map click while the event pin tool is armed', () => {
+        // The generic (layer-less) 'click' registration — distinct from the
+        // existing 3-arg map.on('click', 'markers', handler) used for the
+        // popup, which shares the same event name.
+        const getGenericClickHandler = () =>
+          mapOnMock.mock.calls.find((call) => call[0] === 'click' && call.length === 2)[1]
+
+        const armPinTool = () => {
+          const pinToolCall = mapAddControlMock.mock.calls.find(
+            (call) =>
+              call[1] === 'top-right' &&
+              call[0].onAdd &&
+              call[0].onAdd().className.includes('map-event-pin-tool'),
+          )
+          const container = pinToolCall[0].onAdd()
+          container.querySelector('.map-event-pin-tool-toggle').click()
+        }
+
+        it('does nothing while disarmed', () => {
+          getGenericClickHandler()({ lngLat: { lat: 52.5, lng: 13.4 } })
+          expect(mocks.$router.push).not.toHaveBeenCalled()
+        })
+
+        it('navigates to event creation with the resolved location, and disarms itself', async () => {
+          mocks.$apollo.query.mockResolvedValueOnce({
+            data: {
+              queryLocations: [
+                { id: 'poi.1', place_name: 'Alexanderplatz, Berlin', lat: 52.52, lng: 13.41 },
+              ],
+            },
+          })
+          armPinTool()
+
+          await getGenericClickHandler()({ lngLat: { lat: 52.5, lng: 13.4 } })
+
+          expect(mocks.$router.push).toHaveBeenCalledWith({
+            path: '/post/create/event',
+            query: {
+              lat: 52.5,
+              lng: 13.4,
+              locationName: 'Alexanderplatz, Berlin',
+              locationId: 'poi.1',
+            },
+          })
+        })
+
+        it('still navigates with just the coordinates when reverse-geocoding finds no match', async () => {
+          mocks.$apollo.query.mockResolvedValueOnce({ data: { queryLocations: [] } })
+          armPinTool()
+
+          await getGenericClickHandler()({ lngLat: { lat: 52.5, lng: 13.4 } })
+
+          expect(mocks.$router.push).toHaveBeenCalledWith({
+            path: '/post/create/event',
+            query: { lat: 52.5, lng: 13.4 },
+          })
+        })
+
+        it('still navigates with just the coordinates, and toasts, when reverse-geocoding fails', async () => {
+          mocks.$apollo.query.mockRejectedValueOnce(new Error('Network error'))
+          armPinTool()
+
+          await getGenericClickHandler()({ lngLat: { lat: 52.5, lng: 13.4 } })
+
+          expect(mocks.$toast.error).toHaveBeenCalledWith('Network error')
+          expect(mocks.$router.push).toHaveBeenCalledWith({
+            path: '/post/create/event',
+            query: { lat: 52.5, lng: 13.4 },
+          })
+        })
       })
 
       it('creates popup', () => {
@@ -474,7 +579,10 @@ describe('map', () => {
 
         beforeEach(() => {
           const styleSwitcherCall = mapAddControlMock.mock.calls.find(
-            (call) => call[1] === 'top-right' && call[0].onAdd,
+            (call) =>
+              call[1] === 'top-right' &&
+              call[0].onAdd &&
+              call[0].onAdd().className.includes('map-style-switcher'),
           )
           container = styleSwitcherCall[0].onAdd()
         })

@@ -1055,6 +1055,10 @@
   },
   "map": {
     "alertMessage": "De kaart is niet toegankelijk: het Mapbox-token is niet ingesteld op de server!",
+    "createEvent": {
+      "pickLocation": "Hier een nieuw evenement plaatsen",
+      "resolvingLocation": "Adres wordt opgezocht…"
+    },
     "legend": {
       "event": "Evenement",
       "group": "Groep",

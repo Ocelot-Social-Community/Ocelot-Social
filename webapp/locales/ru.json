@@ -1055,6 +1055,10 @@
   },
   "map": {
     "alertMessage": "Карта недоступна: Токен Mapbox не настроен на сервере!",
+    "createEvent": {
+      "pickLocation": "Разместить здесь новое мероприятие",
+      "resolvingLocation": "Поиск адреса…"
+    },
     "legend": {
       "event": "Событие",
       "group": "Группа",
