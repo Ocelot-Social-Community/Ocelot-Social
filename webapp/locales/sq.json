@@ -1059,6 +1059,9 @@
       "pickLocation": "Vendos këtu një aktivitet të ri",
       "resolvingLocation": "Duke kërkuar adresën…"
     },
+    "eventPopover": {
+      "unavailable": "Kjo ngjarje nuk është më e disponueshme."
+    },
     "legend": {
       "event": "Ngjarje",
       "group": "Grup",

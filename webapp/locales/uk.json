@@ -1059,6 +1059,9 @@
       "pickLocation": "Розмістити тут нову подію",
       "resolvingLocation": "Пошук адреси…"
     },
+    "eventPopover": {
+      "unavailable": "Ця подія більше недоступна."
+    },
     "legend": {
       "event": "Подія",
       "group": "Група",

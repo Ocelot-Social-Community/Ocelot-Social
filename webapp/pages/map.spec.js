@@ -15,10 +15,29 @@ jest.mock('@mapbox/mapbox-gl-geocoder', () => {
   })
 })
 
+jest.mock('~/components/UserAvatar/UserAvatarPopover', () => ({
+  name: 'UserAvatarPopover',
+  props: ['userId', 'userLink'],
+  render: (h) => h('div', { class: 'user-avatar-popover-stub' }),
+}))
+
+jest.mock('~/components/GroupAvatar/GroupAvatarPopover', () => ({
+  name: 'GroupAvatarPopover',
+  props: ['groupId', 'groupLink'],
+  render: (h) => h('div', { class: 'group-avatar-popover-stub' }),
+}))
+
+jest.mock('~/components/Map/MapEventPopover', () => ({
+  name: 'MapEventPopover',
+  props: ['postId'],
+  render: (h) => h('div', { class: 'map-event-popover-stub' }),
+}))
+
 jest.mock('mapbox-gl', () => {
   const popupInstance = {
     isOpen: jest.fn(() => false),
     remove: jest.fn(),
+    on: jest.fn(),
     setLngLat: jest.fn(() => popupInstance),
     setHTML: jest.fn(() => popupInstance),
     setDOMContent: jest.fn(() => popupInstance),
@@ -537,7 +556,7 @@ describe('map', () => {
         expect(mapboxgl.Popup).toHaveBeenCalledWith({
           closeButton: true,
           closeOnClick: true,
-          maxWidth: '300px',
+          maxWidth: '320px',
         })
       })
 
@@ -715,43 +734,51 @@ describe('map', () => {
           expect(mapboxgl.__popupInstance.setLngLat).not.toHaveBeenCalled()
         })
 
-        it('popup includes location name header', () => {
+        it('mounts a UserAvatarPopover with the feature id and profile link', () => {
           mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
           onEventMocks.mouseenter({
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
-          const dom = getPopupDOM()
-          const header = dom.querySelector('.map-popup-header')
-          expect(header).toBeTruthy()
-          expect(header.textContent).toBe('Hamburg')
+          const [instance] = wrapper.vm.popupComponentInstances
+          expect(instance.$options.name).toBe('UserAvatarPopover')
+          expect(instance.userId).toBe('u2')
+          expect(instance.userLink).toEqual({ path: '/profile/u2/bob' })
         })
 
-        it('popup includes user name and profile link', () => {
+        it('destroys previously mounted popover instances before mounting new ones', () => {
           mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
           onEventMocks.mouseenter({
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
-          const dom = getPopupDOM()
-          expect(dom.textContent).toContain('Bob')
-          const link = dom.querySelector('a')
-          expect(link.textContent).toBe('@bob')
-          expect(link.getAttribute('href')).toBe('/profile/u2/bob')
-          expect(link.getAttribute('rel')).toBe('noopener noreferrer')
-        })
-
-        it('popup includes description when present', () => {
+          const [firstInstance] = wrapper.vm.popupComponentInstances
+          const destroySpy = jest.spyOn(firstInstance, '$destroy')
           mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
           onEventMocks.mouseenter({
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
-          const dom = getPopupDOM()
-          expect(dom.textContent).toContain('Builder')
+          expect(destroySpy).toHaveBeenCalled()
         })
 
-        it('popup shows multiple features separated by hr', () => {
+        it('destroys mounted popover instances when the popup fires its own close event', () => {
+          mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
+          onEventMocks.mouseenter({
+            point: { x: 100, y: 200 },
+            lngLat: { lng: 10.0, lat: 53.55 },
+          })
+          const [instance] = wrapper.vm.popupComponentInstances
+          const destroySpy = jest.spyOn(instance, '$destroy')
+          const closeHandler = mapboxgl.__popupInstance.on.mock.calls.find(
+            (call) => call[0] === 'close',
+          )[1]
+          closeHandler()
+          expect(destroySpy).toHaveBeenCalled()
+          expect(wrapper.vm.popupComponentInstances).toEqual([])
+        })
+
+        it('popup shows multiple features separated by hr, one popover instance each', () => {
           const multiFeatures = [
             ...features,
             {
@@ -773,9 +800,13 @@ describe('map', () => {
           })
           const dom = getPopupDOM()
           expect(dom.querySelectorAll('hr').length).toBe(1)
-          const links = dom.querySelectorAll('a')
-          expect(links[1].textContent).toBe('&journalism')
-          expect(links[1].getAttribute('href')).toBe('/groups/g1/journalism')
+          const instances = wrapper.vm.popupComponentInstances
+          expect(instances.map((instance) => instance.$options.name)).toEqual([
+            'UserAvatarPopover',
+            'GroupAvatarPopover',
+          ])
+          expect(instances[1].groupId).toBe('g1')
+          expect(instances[1].groupLink).toEqual({ path: '/groups/g1/journalism' })
         })
 
         it('removes existing popup before showing new one', () => {
@@ -859,9 +890,7 @@ describe('map', () => {
       })
 
       describe('popup content for different marker types', () => {
-        const getPopupDOMForType = () => mapboxgl.__popupInstance.setDOMContent.mock.calls[0][0]
-
-        it('generates correct link for event type', () => {
+        it('mounts a MapEventPopover with the feature id for event type', () => {
           const eventFeatures = [
             {
               geometry: { coordinates: [9.17, 48.78] },
@@ -880,13 +909,12 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 9.17, lat: 48.78 },
           })
-          const dom = getPopupDOMForType()
-          const link = dom.querySelector('a')
-          expect(link.getAttribute('href')).toBe('/post/e1/party')
-          expect(link.textContent).toBe('party')
+          const [instance] = wrapper.vm.popupComponentInstances
+          expect(instance.$options.name).toBe('MapEventPopover')
+          expect(instance.postId).toBe('e1')
         })
 
-        it('generates correct link for theUser type', () => {
+        it('mounts a UserAvatarPopover for theUser type, same as user type', () => {
           const userFeatures = [
             {
               geometry: { coordinates: [13.38, 52.52] },
@@ -905,33 +933,10 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 13.38, lat: 52.52 },
           })
-          const dom = getPopupDOMForType()
-          const link = dom.querySelector('a')
-          expect(link.getAttribute('href')).toBe('/profile/u1/peter')
-          expect(link.textContent).toBe('@peter')
-        })
-
-        it('omits location header when locationName is empty', () => {
-          const features = [
-            {
-              geometry: { coordinates: [10.0, 53.55] },
-              properties: {
-                type: 'user',
-                slug: 'bob',
-                id: 'u2',
-                name: 'Bob',
-                locationName: '',
-                description: '',
-              },
-            },
-          ]
-          mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
-          onEventMocks.mouseenter({
-            point: { x: 100, y: 200 },
-            lngLat: { lng: 10.0, lat: 53.55 },
-          })
-          const dom = getPopupDOMForType()
-          expect(dom.querySelector('.map-popup-header')).toBeNull()
+          const [instance] = wrapper.vm.popupComponentInstances
+          expect(instance.$options.name).toBe('UserAvatarPopover')
+          expect(instance.userId).toBe('u1')
+          expect(instance.userLink).toEqual({ path: '/profile/u1/peter' })
         })
       })
 

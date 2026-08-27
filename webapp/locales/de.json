@@ -1059,6 +1059,9 @@
       "pickLocation": "Hier eine neue Veranstaltung anlegen",
       "resolvingLocation": "Adresse wird ermittelt …"
     },
+    "eventPopover": {
+      "unavailable": "Diese Veranstaltung ist nicht mehr verfügbar."
+    },
     "legend": {
       "event": "Veranstaltung",
       "group": "Gruppe",

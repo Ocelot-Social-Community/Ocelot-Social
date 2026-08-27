@@ -1059,6 +1059,9 @@
       "pickLocation": "Place a new event here",
       "resolvingLocation": "Looking up the address…"
     },
+    "eventPopover": {
+      "unavailable": "This event is no longer available."
+    },
     "legend": {
       "event": "Event",
       "group": "Group",

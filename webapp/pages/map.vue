@@ -96,6 +96,7 @@
 
 <!-- eslint-disable vue/no-reserved-component-names -->
 <script>
+import Vue from 'vue'
 import { isEmpty } from 'lodash'
 import mapboxgl from 'mapbox-gl'
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
@@ -109,6 +110,9 @@ import { mapQuery } from '~/graphql/MapQuery'
 import { queryLocations } from '~/graphql/location'
 import mobile from '~/mixins/mobile'
 import Empty from '~/components/Empty/Empty'
+import UserAvatarPopover from '~/components/UserAvatar/UserAvatarPopover'
+import GroupAvatarPopover from '~/components/GroupAvatar/GroupAvatarPopover'
+import MapEventPopover from '~/components/Map/MapEventPopover'
 
 const maxMobileWidth = 639 // on this width and smaller the mapbox 'MapboxGeocoder' search gets bigger
 
@@ -217,6 +221,13 @@ export default {
   },
   created() {
     this.icons = iconRegistry
+    // Vue instances mounted into the currently-open popup's DOM (see
+    // showPopup()) — a plain (non-reactive) instance property, same pattern
+    // as this.geocoder below, not data(): Vue 2 would otherwise walk these
+    // component instances trying to make them reactive. Destroyed on the
+    // next popup open/close instead of leaking (stale Apollo subscriptions,
+    // event listeners) on every marker click.
+    this.popupComponentInstances = []
   },
   async mounted() {
     this.updateMapPosition()
@@ -595,8 +606,13 @@ export default {
       this.markers.popup = new mapboxgl.Popup({
         closeButton: true,
         closeOnClick: true,
-        maxWidth: '300px',
+        maxWidth: '320px',
       })
+      // Fires on the close button, clicking elsewhere on the map
+      // (closeOnClick above), or Escape — not just our own explicit
+      // .remove() calls in showPopup() — so this is the one place that
+      // reliably catches every way the popup can close.
+      this.markers.popup.on('close', () => this.destroyPopupComponents())
 
       // Desktop: show popup on hover
       this.map.on('mouseenter', 'markers', (e) => {
@@ -624,10 +640,20 @@ export default {
     // Show popup for given features at coordinates. Also used to open the
     // popup programmatically for a deep-linked event (see
     // openInitialEventPopup()), not just on hover/click.
+    //
+    // Content is the same real, self-contained popover components used
+    // elsewhere on the network for a name/avatar (UserAvatarPopover,
+    // GroupAvatarPopover — each normally opens on hover over a name/avatar
+    // there; here the marker click is that trigger instead) and a
+    // PostTeaser-styled one for events (MapEventPopover, built for this,
+    // since there's no existing compact single-post preview to reuse).
+    // Each is a real, independently-mounted Vue instance (own Apollo query),
+    // not the plain hand-built DOM the popup used before.
     showPopup(features, lngLat) {
       if (this.markers.popup.isOpen()) {
         this.markers.popup.remove()
       }
+      this.destroyPopupComponents()
 
       this.map.getCanvas().style.cursor = 'pointer'
 
@@ -638,81 +664,73 @@ export default {
         coordinates[0] += lngLat.lng > coordinates[0] ? 360 : -360
       }
 
-      // Build popup content safely using DOM nodes (no raw HTML interpolation)
       const container = document.createElement('div')
       container.className = 'map-popup-container'
 
-      const locationName = features[0].properties.locationName
-      if (locationName) {
-        const header = document.createElement('div')
-        header.className = 'map-popup-header'
-        header.textContent = locationName
-        container.appendChild(header)
-      }
-
-      const body = document.createElement('div')
-      body.className = 'map-popup-body'
-
       features.forEach((feature, index) => {
         if (index > 0) {
-          body.appendChild(document.createElement('hr'))
+          container.appendChild(document.createElement('hr'))
         }
-
-        const markerTypeLabel = this.$t(`map.markerTypes.${feature.properties.type}`)
-        const encodedId = encodeURIComponent(feature.properties.id)
-        const encodedSlug = encodeURIComponent(feature.properties.slug)
-        const markerProfile = {
-          theUser: {
-            linkTitle: '@' + feature.properties.slug,
-            link: `/profile/${encodedId}/${encodedSlug}`,
-          },
-          user: {
-            linkTitle: '@' + feature.properties.slug,
-            link: `/profile/${encodedId}/${encodedSlug}`,
-          },
-          group: {
-            linkTitle: '&' + feature.properties.slug,
-            link: `/groups/${encodedId}/${encodedSlug}`,
-          },
-          event: {
-            linkTitle: feature.properties.slug,
-            link: `/post/${encodedId}/${encodedSlug}`,
-          },
-        }
-        const profile = markerProfile[feature.properties.type]
-
-        const item = document.createElement('div')
-
-        const nameRow = document.createElement('div')
-        const nameB = document.createElement('b')
-        nameB.textContent = feature.properties.name
-        const typeI = document.createElement('i')
-        typeI.textContent = ` (${markerTypeLabel})`
-        nameRow.appendChild(nameB)
-        nameRow.appendChild(typeI)
-        item.appendChild(nameRow)
-
-        const linkRow = document.createElement('div')
-        const link = document.createElement('a')
-        link.href = profile.link
-        link.target = '_blank'
-        link.rel = 'noopener noreferrer'
-        link.textContent = profile.linkTitle
-        linkRow.appendChild(link)
-        item.appendChild(linkRow)
-
-        body.appendChild(item)
-
-        if (feature.properties.description && feature.properties.description.length > 0) {
-          const desc = document.createElement('div')
-          desc.style.marginTop = '4px'
-          desc.textContent = feature.properties.description
-          body.appendChild(desc)
-        }
+        const mountEl = document.createElement('div')
+        container.appendChild(mountEl)
+        const instance = this.mountPopupComponent(feature.properties, mountEl)
+        if (instance) this.popupComponentInstances.push(instance)
       })
 
-      container.appendChild(body)
       this.markers.popup.setLngLat(coordinates).setDOMContent(container).addTo(this.map)
+    },
+    // Mounts the right popover component for one marker's properties into
+    // mountEl, imperatively (parent: this gives it access to $apollo/$store/
+    // $t exactly like a normally-declared child would have) since these are
+    // built as native mapbox-gl DOM controls/popups, not part of the
+    // template's own component tree.
+    mountPopupComponent(properties, mountEl) {
+      const { type, id, slug } = properties
+      if (type === 'user' || type === 'theUser') {
+        const instance = new Vue({
+          parent: this,
+          ...UserAvatarPopover,
+          propsData: {
+            userId: id,
+            userLink: { path: `/profile/${encodeURIComponent(id)}/${encodeURIComponent(slug)}` },
+          },
+        })
+        // UserAvatarPopover only shows its "open profile" link on touch
+        // devices — elsewhere it opens via hovering a name/avatar that's
+        // already its own link, so the button is redundant there. Here the
+        // marker click is the *only* way in, with no separate link, so the
+        // button must always show regardless of the actual device.
+        instance.isTouchDevice = true
+        instance.$mount(mountEl)
+        return instance
+      }
+      if (type === 'group') {
+        const instance = new Vue({
+          parent: this,
+          ...GroupAvatarPopover,
+          propsData: {
+            groupId: id,
+            groupLink: { path: `/groups/${encodeURIComponent(id)}/${encodeURIComponent(slug)}` },
+          },
+        })
+        instance.isTouchDevice = true
+        instance.$mount(mountEl)
+        return instance
+      }
+      if (type === 'event') {
+        const instance = new Vue({
+          parent: this,
+          ...MapEventPopover,
+          propsData: { postId: id },
+        })
+        instance.$mount(mountEl)
+        return instance
+      }
+      return null
+    },
+    destroyPopupComponents() {
+      this.popupComponentInstances.forEach((instance) => instance.$destroy())
+      this.popupComponentInstances = []
     },
     // Query all features at the clicked/hovered point
     getFeaturesAtPoint(point) {
@@ -1340,6 +1358,14 @@ export default {
   background: var(--color-neutral-100);
   border-radius: var(--border-radius-x-large);
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+  /* Mapbox gives every top-level control (.mapboxgl-ctrl, including this one
+     and the scale control) `transform: translate(0)`, which makes each its
+     own stacking context. That containment means a z-index set on a
+     *descendant* (e.g. the popover below) can never win against a sibling
+     .mapboxgl-ctrl no matter how high it is — the z-index has to sit here,
+     on the .mapboxgl-ctrl element itself, to out-rank the scale control's
+     container. */
+  z-index: 3;
 }
 
 .map-style-switcher-toggle {
@@ -1370,12 +1396,6 @@ export default {
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
   white-space: nowrap;
   overflow: hidden;
-  /* Mapbox's own corner containers (.mapboxgl-ctrl-top-right,
-     -bottom-left, …) all share z-index: 2 — with equal z-index, later-in-DOM
-     wins, which happens to put the bottom-left corner (the scale control)
-     above this popover when they visually overlap. This lifts the popover
-     above every corner container regardless of that DOM-order tie. */
-  z-index: 3;
 }
 
 .map-style-popover--open {

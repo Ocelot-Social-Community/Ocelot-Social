@@ -1059,6 +1059,9 @@
       "pickLocation": "Hier een nieuw evenement plaatsen",
       "resolvingLocation": "Adres wordt opgezocht…"
     },
+    "eventPopover": {
+      "unavailable": "Dit evenement is niet meer beschikbaar."
+    },
     "legend": {
       "event": "Evenement",
       "group": "Groep",

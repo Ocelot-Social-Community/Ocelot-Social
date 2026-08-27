@@ -1059,6 +1059,9 @@
       "pickLocation": "Разместить здесь новое мероприятие",
       "resolvingLocation": "Поиск адреса…"
     },
+    "eventPopover": {
+      "unavailable": "Это мероприятие больше недоступно."
+    },
     "legend": {
       "event": "Событие",
       "group": "Группа",

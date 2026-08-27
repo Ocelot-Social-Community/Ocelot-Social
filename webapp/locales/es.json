@@ -1059,6 +1059,9 @@
       "pickLocation": "Crear un evento nuevo aquí",
       "resolvingLocation": "Buscando la dirección…"
     },
+    "eventPopover": {
+      "unavailable": "Este evento ya no está disponible."
+    },
     "legend": {
       "event": "Evento",
       "group": "Grupo",
