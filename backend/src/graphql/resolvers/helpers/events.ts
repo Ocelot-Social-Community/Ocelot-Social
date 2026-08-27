@@ -32,7 +32,12 @@ export const validateEventParams = (params) => {
     params.eventLocationName = eventInput.eventLocationName?.trim()
     if (params.eventLocationName) {
       locationName = params.eventLocationName
-      if (typeof eventInput.lat === 'number' && typeof eventInput.lng === 'number') {
+      const hasLat = typeof eventInput.lat === 'number'
+      const hasLng = typeof eventInput.lng === 'number'
+      if (hasLat !== hasLng) {
+        throw new UserInputError('Event location requires both lat and lng, or neither!')
+      }
+      if (hasLat && hasLng) {
         validateEventCoordinates(eventInput.lat, eventInput.lng)
         coordinates = { lat: eventInput.lat, lng: eventInput.lng }
       }

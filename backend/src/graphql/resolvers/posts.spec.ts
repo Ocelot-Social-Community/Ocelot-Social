@@ -730,6 +730,31 @@ describe('CreatePost', () => {
             ],
           })
         })
+
+        it('rejects lat given without lng, instead of silently discarding it', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: CreatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventLocationName: 'Berlin',
+                  eventVenue: 'Brandenburger Tor',
+                  lat: 52.5,
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event location requires both lat and lng, or neither!',
+              },
+            ],
+          })
+        })
       })
 
       describe('valid event input without location', () => {
