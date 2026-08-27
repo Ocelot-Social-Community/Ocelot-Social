@@ -1,0 +1,60 @@
+import { ApiKey } from '@db/schema/entities/ApiKey'
+import { Comment } from '@db/schema/entities/Comment'
+import { EmailAddress } from '@db/schema/entities/EmailAddress'
+import { PasswordReset } from '@db/schema/entities/PasswordReset'
+import { Post } from '@db/schema/entities/Post'
+import { Report } from '@db/schema/entities/Report'
+import { Role } from '@db/schema/entities/Role'
+import { UnverifiedEmailAddress } from '@db/schema/entities/UnverifiedEmailAddress'
+import { User } from '@db/schema/entities/User'
+import { defineRelationship } from '@db/schema/types'
+
+import type { RelationshipDefinition } from '@db/schema/types'
+
+// Who a user is and what they may do: their role, their addresses, their api keys.
+
+export const identity: readonly RelationshipDefinition[] = [
+  defineRelationship({
+    type: 'HAS_ROLE',
+    from: User,
+    to: Role,
+    // What the entire authorisation layer assumes. Stated in a comment in db/models/User.ts
+    // and checked by nothing until now.
+    cardinality: 'exactly-one',
+  }),
+  defineRelationship({
+    type: 'PRIMARY_EMAIL',
+    from: User,
+    to: EmailAddress,
+    cardinality: 'exactly-one',
+  }),
+  defineRelationship({
+    type: 'BELONGS_TO',
+    // Two unrelated uses share this type, and they do NOT mix: an address belongs to its user,
+    // a report belongs to the thing it reports. Written as one source list and one target list
+    // the declaration claims all nine combinations, and the endpoints audit accepted
+    // `EmailAddress -> Post` as legitimate — four of the nine are nonsense.
+    //
+    // Which five are real is not a judgement call; it is what the resolvers can write.
+    // reports.ts guards its MERGE with `WHERE resource:User OR resource:Post OR resource:Comment`,
+    // and registration.ts, emails.ts and db/owner.ts attach an address to a User and to nothing
+    // else.
+    connects: [
+      { from: [EmailAddress, UnverifiedEmailAddress], to: User },
+      { from: Report, to: [User, Post, Comment] },
+    ],
+    cardinality: 'at-most-one',
+  }),
+  defineRelationship({
+    type: 'REQUESTED',
+    from: User,
+    to: PasswordReset,
+    cardinality: 'many',
+  }),
+  defineRelationship({
+    type: 'HAS_API_KEY',
+    from: User,
+    to: ApiKey,
+    cardinality: 'many',
+  }),
+]
