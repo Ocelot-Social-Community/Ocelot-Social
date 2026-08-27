@@ -56,6 +56,8 @@ export default () => {
             lng
             lat
           }
+          lat
+          lng
         }
       }
     `,
@@ -104,6 +106,8 @@ export default () => {
             lng
             lat
           }
+          lat
+          lng
         }
       }
     `,

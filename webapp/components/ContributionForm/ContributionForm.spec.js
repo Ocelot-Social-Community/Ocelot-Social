@@ -367,17 +367,50 @@ describe('ContributionForm.vue', () => {
           })
         })
 
-        it('still sends only the plain name string to the mutation', async () => {
+        it('sends the saved coordinates along with the name, not just the name', async () => {
           await wrapper.find('form').trigger('submit')
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
             expect.objectContaining({
               variables: expect.objectContaining({
                 eventInput: expect.objectContaining({
                   eventLocationName: 'Berlin, Germany',
+                  lat: 52.52,
+                  lng: 13.405,
                 }),
               }),
             }),
           )
+        })
+      })
+
+      describe('editing an event whose post has its own precise lat/lng', () => {
+        beforeEach(() => {
+          propsData = {
+            postType: 'Event',
+            contribution: {
+              id: 'p1456',
+              slug: 'kindergeburtstag',
+              title: 'Kindergeburtstag',
+              content: 'auf Deutsch geschrieben',
+              image,
+              eventStart: new Date().toISOString(),
+              eventVenue: 'Brandenburger Tor',
+              eventLocationName: 'Berlin, Germany',
+              lat: 52.5001,
+              lng: 13.404,
+              // Deliberately different from lat/lng above — proves the
+              // post's own precise pin wins, not just that both agree.
+              eventLocation: { id: 'place.berlin', lat: 52.52, lng: 13.405 },
+            },
+          }
+          wrapper = Wrapper()
+        })
+
+        it("shows the pin at the post's own precise coordinates, not eventLocation's", () => {
+          expect(wrapper.findComponent(EventLocationMap).props('location')).toMatchObject({
+            lat: 52.5001,
+            lng: 13.404,
+          })
         })
       })
 
@@ -571,6 +604,8 @@ describe('ContributionForm.vue', () => {
                     eventLocationName: 'Deutschland',
                     eventIsOnline: false,
                     eventEnd: null,
+                    lat: null,
+                    lng: null,
                   },
                 }),
               })
@@ -594,6 +629,35 @@ describe('ContributionForm.vue', () => {
                 variables: expect.objectContaining({
                   eventInput: expect.objectContaining({
                     eventLocationName: 'Deutschland, Germany',
+                  }),
+                }),
+              })
+            })
+          })
+
+          describe('submit with a map-pin/search-result payload carrying coordinates', () => {
+            beforeEach(async () => {
+              // Shape EventLocationMap's onPinChange and LocationSelect's
+              // processLocationsResult() both emit once a pin/result is picked.
+              wrapper.vm.updateFormField('eventLocationName', {
+                label: 'Deutschland, Germany',
+                value: 'Deutschland, Germany',
+                id: 'place.abc123',
+                lat: 51.165691,
+                lng: 10.451526,
+              })
+              await wrapper.find('form').trigger('submit')
+              await wrapper.vm.$nextTick()
+            })
+
+            it('sends the picked coordinates along with the name, not just the name', () => {
+              expect(mocks.$apollo.mutate).toHaveBeenCalledWith({
+                mutation: PostMutations().CreatePost,
+                variables: expect.objectContaining({
+                  eventInput: expect.objectContaining({
+                    eventLocationName: 'Deutschland, Germany',
+                    lat: 51.165691,
+                    lng: 10.451526,
                   }),
                 }),
               })

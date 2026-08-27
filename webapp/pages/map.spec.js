@@ -886,6 +886,35 @@ describe('map', () => {
           expect(eventFeatures[0].properties.locationName).toBe('Stuttgart')
         })
 
+        it("prefers the post's own precise lat/lng pin over eventLocation's (shared, less exact) coordinates", async () => {
+          const preciseEventPost = {
+            ...posts[0],
+            id: 'e3',
+            lat: 48.7758,
+            lng: 9.1829,
+            // Deliberately different from lat/lng above — proves the precise
+            // pin wins over eventLocation, not just that both happen to agree.
+            eventLocation: { id: 'loc4', name: 'Stuttgart', lng: 9.17702, lat: 48.78232 },
+          }
+          await wrapper.setData({ posts: [preciseEventPost] })
+          const eventFeatures = wrapper.vm
+            .buildMarkersGeoJSON()
+            .filter((f) => f.properties.type === 'event')
+          expect(eventFeatures[0].geometry.coordinates).toEqual([9.1829, 48.7758])
+          // The address label still comes from eventLocation even though its
+          // coordinates were not used for the pin.
+          expect(eventFeatures[0].properties.locationName).toBe('Stuttgart')
+        })
+
+        it("falls back to eventLocation's coordinates for events saved before Post had its own lat/lng", () => {
+          // posts[0] (the default fixture) has no lat/lng of its own, only
+          // eventLocation — this is the pre-fix, already-existing shape.
+          const eventFeatures = wrapper.vm.markers.geoJSON.filter(
+            (f) => f.properties.type === 'event',
+          )
+          expect(eventFeatures[0].geometry.coordinates).toEqual([9.17702, 48.78232])
+        })
+
         it('skips an event whose eventLocation has no numeric coordinates, instead of pushing [null, null]', async () => {
           const incompleteLocationPost = {
             ...posts[0],

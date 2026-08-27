@@ -442,14 +442,26 @@ export default {
     },
     eventInput() {
       if (this.postType === 'Event') {
+        const locationValue = this.formData.eventLocationName
+        // LocationSelect and EventLocationMap both already resolve lat/lng
+        // (via reverse/forward geocoding) alongside the label when a search
+        // result or map pin is picked — a plain string here means the field
+        // still holds unresolved/typed text, no coordinates to send yet.
+        const hasCoordinates =
+          typeof locationValue === 'object' &&
+          locationValue !== null &&
+          typeof locationValue.lat === 'number' &&
+          typeof locationValue.lng === 'number'
         return {
           eventStart: new Date(this.formData.eventStart).toISOString(),
           eventVenue: this.formData.eventVenue,
           eventEnd: this.formData.eventEnd ? new Date(this.formData.eventEnd).toISOString() : null,
           eventIsOnline: this.formData.eventIsOnline,
           eventLocationName: !this.formData.eventIsOnline
-            ? (this.formData.eventLocationName?.value ?? this.formData.eventLocationName) || null
+            ? (locationValue?.value ?? locationValue) || null
             : null,
+          lat: !this.formData.eventIsOnline && hasCoordinates ? locationValue.lat : null,
+          lng: !this.formData.eventIsOnline && hasCoordinates ? locationValue.lng : null,
         }
       }
       return undefined
@@ -525,6 +537,8 @@ export default {
         eventVenue,
         eventIsOnline,
         eventLocation,
+        lat,
+        lng,
       } = this.contribution
       const {
         sensitive: imageBlurred = false,
@@ -549,18 +563,27 @@ export default {
         // though it was already geocoded once. Falls back to the plain
         // string when there's no saved location (online events) or no
         // coordinates were ever geocoded for it.
+        //
+        // Prefers the post's own precise lat/lng (the exact point picked)
+        // over eventLocation's (the shared Location node's own point, e.g.
+        // a building's registered entrance) — using eventLocation's here
+        // would re-show the pin at the wrong spot on every edit, snapping it
+        // away from where it was actually placed. Falls back to eventLocation
+        // only for events saved before Post had its own lat/lng.
         eventLocationName:
-          eventLocation &&
-          typeof eventLocation.lat === 'number' &&
-          typeof eventLocation.lng === 'number'
-            ? {
-                label: eventLocationName || '',
-                value: eventLocationName || '',
-                id: eventLocation.id ?? null,
-                lat: eventLocation.lat,
-                lng: eventLocation.lng,
-              }
-            : eventLocationName || '',
+          typeof lat === 'number' && typeof lng === 'number'
+            ? { label: eventLocationName || '', value: eventLocationName || '', id: null, lat, lng }
+            : eventLocation &&
+                typeof eventLocation.lat === 'number' &&
+                typeof eventLocation.lng === 'number'
+              ? {
+                  label: eventLocationName || '',
+                  value: eventLocationName || '',
+                  id: eventLocation.id ?? null,
+                  lat: eventLocation.lat,
+                  lng: eventLocation.lng,
+                }
+              : eventLocationName || '',
         eventVenue: eventVenue || '',
         eventIsOnline: eventIsOnline || false,
       }

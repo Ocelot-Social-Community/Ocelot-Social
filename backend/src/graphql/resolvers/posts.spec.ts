@@ -738,6 +738,44 @@ describe('CreatePost', () => {
           })
         })
       })
+
+      describe('valid event input with location name and precise coordinates (e.g. a dropped map pin)', () => {
+        it('reverse-geocodes the coordinates instead of forward-geocoding the name text, keeping the exact picked point', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: CreatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  // Deliberately generic: if the coordinates below weren't
+                  // honored, forward-geocoding just "Hamburg" would resolve to
+                  // Hamburg's city center, not this specific address.
+                  eventLocationName: 'Hamburg',
+                  eventVenue: 'Rathaus',
+                  lat: 53.551311,
+                  lng: 9.993852,
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              CreatePost: {
+                postType: ['Event'],
+                eventLocationName: 'Hamburg',
+                eventVenue: 'Rathaus',
+                eventLocation: {
+                  lat: 53.551311,
+                  lng: 9.993852,
+                },
+              },
+            },
+            errors: undefined,
+          })
+        })
+      })
     })
   })
 })
@@ -993,6 +1031,44 @@ describe('UpdatePost', () => {
                 eventLocation: {
                   lng: 12.375101,
                   lat: 51.34083,
+                },
+              },
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('valid event input with location name and precise coordinates (e.g. a dropped map pin)', () => {
+        it('reverse-geocodes the coordinates instead of forward-geocoding the name text, keeping the exact picked point', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: UpdatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  // Deliberately generic: if the coordinates below weren't
+                  // honored, forward-geocoding just "Hamburg" would resolve to
+                  // Hamburg's city center, not this specific address.
+                  eventLocationName: 'Hamburg',
+                  eventVenue: 'Rathaus',
+                  lat: 53.551311,
+                  lng: 9.993852,
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              UpdatePost: {
+                postType: ['Event'],
+                eventLocationName: 'Hamburg',
+                eventVenue: 'Rathaus',
+                eventLocation: {
+                  lat: 53.551311,
+                  lng: 9.993852,
                 },
               },
             },

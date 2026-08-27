@@ -225,6 +225,10 @@ type Post {
   eventEnd: String
   "Whether the event takes place online (Event posts)."
   eventIsOnline: Boolean
+  "Precise latitude of the event's map pin (Event posts) — the exact point picked, independent of eventLocation's own coordinates (which belong to a Location node shared/reused across other posts, users and groups at the same address, and so cannot hold any one event's exact pick)."
+  lat: Float
+  "Precise longitude of the event's map pin (Event posts), see lat."
+  lng: Float
 
   "Whether the current user observes this post (receives notifications about its comments)."
   isObservedByMe: Boolean!
@@ -244,6 +248,9 @@ input _EventInput {
   eventVenue: String
   eventLocationName: String
   eventIsOnline: Boolean
+  "Precise coordinates for eventLocationName (e.g. a dropped map pin or picked search result). When given, the server reverse-geocodes these instead of re-deriving a location by forward-geocoding the name text, so the saved location matches the exact point the user picked rather than a text-search approximation."
+  lat: Float
+  lng: Float
 }
 
 type Mutation {

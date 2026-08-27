@@ -33,6 +33,8 @@ export default (i18n) => {
           lng
         }
         eventIsOnline
+        lat
+        lng
         ...post
         ...postCounts
         ...tagsCategoriesAndPinned
