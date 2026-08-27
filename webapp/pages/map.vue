@@ -623,7 +623,7 @@ export default {
       })
 
       this.map.on('mouseleave', 'markers', () => {
-        this.map.getCanvas().style.cursor = ''
+        this.map.getCanvas().style.cursor = isPlacingEvent ? EVENT_PIN_TOOL_CURSOR : ''
       })
 
       // Mobile: show popup on click/tap
