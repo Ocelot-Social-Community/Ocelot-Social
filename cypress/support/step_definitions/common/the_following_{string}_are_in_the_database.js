@@ -1,6 +1,30 @@
 import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 import './../../factories'
 
+/**
+ * A flag column, where these tables write `x` for true and leave the cell empty for false.
+ *
+ * `Boolean(cell)` agreed with that convention by accident rather than by rule: a gherkin cell is
+ * always a string, and `Boolean` turns "false" and "0" into TRUE. A table that spelled a flag out
+ * would have built the opposite fixture without saying so — and a silently wrong fixture is worse
+ * than a broken one, because the scenario still runs and asserts against it.
+ *
+ * An unrecognised value is refused rather than guessed, so `X` or `yes` fails the scenario where
+ * it was written instead of quietly setting the flag.
+ */
+const flag = (value, column) => {
+  if (value === undefined || value === '') {
+    return false
+  }
+  if (value === 'x') {
+    return true
+  }
+  throw new Error(
+    `The "${column}" column takes "x" for true or an empty cell for false, ` +
+      `not ${JSON.stringify(value)}.`,
+  )
+}
+
 defineStep('the following {string} are in the database:', (table,data) => {
   switch(table){
     case 'posts':
@@ -11,9 +35,9 @@ defineStep('the following {string} are in the database:', (table,data) => {
         // `pinned: true` next to it, and the declaration rejected a string.
         const attributes = {
           ...entry,
-          deleted: Boolean(entry.deleted),
-          disabled: Boolean(entry.disabled),
-          pinned: Boolean(entry.pinned),
+          deleted: flag(entry.deleted, 'deleted'),
+          disabled: flag(entry.disabled, 'disabled'),
+          pinned: flag(entry.pinned, 'pinned'),
         }
         cy.factory().build('post', attributes, {
           ...attributes,
@@ -46,8 +70,8 @@ defineStep('the following {string} are in the database:', (table,data) => {
       data.hashes().forEach( entry => {
         const attributes = {
           ...entry,
-          deleted: Boolean(entry.deleted),
-          disabled: Boolean(entry.disabled),
+          deleted: flag(entry.deleted, 'deleted'),
+          disabled: flag(entry.disabled, 'disabled'),
         }
         cy.factory().build('group', attributes, attributes)
       })
@@ -58,7 +82,7 @@ defineStep('the following {string} are in the database:', (table,data) => {
         // number and `showDonations` as a boolean, and the row hands over "15000.0" and "x".
         const attributes = {
           ...entry,
-          showDonations: Boolean(entry.showDonations),
+          showDonations: flag(entry.showDonations, 'showDonations'),
           goal: Number(entry.goal),
           progress: Number(entry.progress),
         }
