@@ -20,10 +20,8 @@ import UserFollowedBy from '@graphql/queries/users/UserFollowedBy.gql'
 import UserFollowing from '@graphql/queries/users/UserFollowing.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-import type User from '@db/models/User'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
-import type { DecodedUser } from '@src/jwt/decode'
 // import CONFIG from '@src/config'
 
 const categoryIds = ['cat9']
@@ -776,11 +774,11 @@ describe('emailNotificationSettings', () => {
 
     describe('as self', () => {
       it('updates the emailNotificationSettings', async () => {
-        authenticatedUser = (await user.toJson()) as DecodedUser
+        authenticatedUser = await user.toJson()
         await expect(
           mutate({
             mutation: UpdateUser,
-            variables: { id: authenticatedUser.id, emailNotificationSettings },
+            variables: { id: authenticatedUser?.id, emailNotificationSettings },
           }),
         ).resolves.toMatchObject({
           data: {
@@ -1006,11 +1004,11 @@ describe('updateOnlineStatus', () => {
         const cypher = 'MATCH (u:User {id: $id}) RETURN u'
         const result = await database.neode.cypher(cypher, { id: authenticatedUser?.id })
         const dbUser = database.neode.hydrateFirst(result, 'u', database.neode.model('User'))
-        await expect(dbUser.toJson()).resolves.toMatchObject({
+        await expect(dbUser?.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'online',
           lastActiveAt: expect.any(String),
         })
-        await expect(dbUser.toJson()).resolves.not.toMatchObject({
+        await expect(dbUser?.toJson()).resolves.not.toMatchObject({
           awaySince: expect.any(String),
         })
       })
@@ -1033,7 +1031,7 @@ describe('updateOnlineStatus', () => {
         const cypher = 'MATCH (u:User {id: $id}) RETURN u'
         const result = await database.neode.cypher(cypher, { id: authenticatedUser?.id })
         const dbUser = database.neode.hydrateFirst(result, 'u', database.neode.model('User'))
-        await expect(dbUser.toJson()).resolves.toMatchObject({
+        await expect(dbUser?.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'away',
           awaySince: expect.any(String),
         })
@@ -1048,17 +1046,13 @@ describe('updateOnlineStatus', () => {
 
         const cypher = 'MATCH (u:User {id: $id}) RETURN u'
         const result = await database.neode.cypher(cypher, { id: authenticatedUser?.id })
-        const dbUser = database.neode.hydrateFirst<typeof User>(
-          result,
-          'u',
-          database.neode.model('User'),
-        )
-        await expect(dbUser.toJson()).resolves.toMatchObject({
+        const dbUser = database.neode.hydrateFirst(result, 'u', database.neode.model('User'))
+        await expect(dbUser?.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'away',
           awaySince: expect.any(String),
         })
 
-        const awaySince = (await dbUser.toJson()).awaySince
+        const awaySince = (await dbUser?.toJson())?.awaySince
 
         await expect(mutate({ mutation: updateOnlineStatus, variables })).resolves.toEqual(
           expect.objectContaining({
@@ -1068,7 +1062,7 @@ describe('updateOnlineStatus', () => {
 
         const result2 = await database.neode.cypher(cypher, { id: authenticatedUser?.id })
         const dbUser2 = database.neode.hydrateFirst(result2, 'u', database.neode.model('User'))
-        await expect(dbUser2.toJson()).resolves.toMatchObject({
+        await expect(dbUser2?.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'away',
           awaySince,
         })

@@ -197,7 +197,7 @@ describe('filterInvisiblePosts', () => {
 
     it('filters posts in non-public groups for non-members', async () => {
       const outsider = await database.neode.find('User', 'outsider')
-      authenticatedUser = (await outsider.toJson()) as Context['user']
+      authenticatedUser = (await outsider.toJson()) as unknown as Context['user']
       const result = await query({ query: Post })
       const ids = result.data?.Post.map((p: { id: string }) => p.id)
       expect(ids).toContain('public-post')

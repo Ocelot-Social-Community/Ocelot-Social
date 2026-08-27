@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable promise/prefer-await-to-callbacks */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable jest/unbound-method */
+
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable jest/expect-expect */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
@@ -42,9 +42,12 @@ const disable = async (id) => {
     }),
     reportAgainstUser.relateTo(user, 'belongsTo'),
   ])
-  const disableVariables = { resourceId: user.id, disable: true, closed: false }
+  const disableVariables = { resourceId: user.get('id'), disable: true, closed: false }
   await Promise.all([
-    reportAgainstUser.relateTo(moderator, 'reviewed', disableVariables),
+    reportAgainstUser.relateTo(moderator, 'reviewed', {
+      disable: disableVariables.disable,
+      closed: disableVariables.closed,
+    }),
     user.update({ disabled: true, updatedAt: new Date().toISOString() }),
   ])
 }

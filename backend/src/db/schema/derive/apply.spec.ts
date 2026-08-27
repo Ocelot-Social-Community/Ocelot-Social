@@ -227,6 +227,38 @@ describe('applyPlan', () => {
       expect(report.applied).toEqual([CONSTRAINT])
     })
 
+    it('records a restoration that fails, instead of throwing out of the run', async () => {
+      // The dropped index is put back when the constraint fails, and that put-back is a write
+      // like any other. Unguarded it threw out of applyPlan, so store.ts never received the
+      // report, `enforce` never ran, and the deployment died on the raw error — with NEITHER
+      // the constraint failure nor the lost index recorded anywhere, while the index really
+      // was gone. The worst outcome of a run was the one it did not report.
+      const { runner } = stubRunner({
+        indices: [presentIndex('User_slug_index', 'User', ['slug'])],
+        rejects: [CONSTRAINT, 'CREATE INDEX'],
+      })
+      const report = await applyPlan(runner, supersedingPlan)
+      // Still in `superseded`, because that is the truth: dropped, and not back.
+      expect(report.superseded).toEqual(['User_slug_index'])
+      expect(report.failed.map((item) => item.message)).toEqual([
+        expect.stringContaining('could not be restored'),
+        expect.stringContaining('Unable to create Constraint'),
+      ])
+    })
+
+    it('stops a deployment over a lost index even in report mode', async () => {
+      // `report` forgives a skip, never a failure — so this changes what an operator is told,
+      // not whether they are stopped.
+      const { runner } = stubRunner({
+        indices: [presentIndex('User_slug_index', 'User', ['slug'])],
+        rejects: [CONSTRAINT, 'CREATE INDEX'],
+      })
+      const report = await applyPlan(runner, supersedingPlan)
+      expect(() => {
+        enforce(report, 'report')
+      }).toThrow(SchemaEnforcementError)
+    })
+
     it('asks only after the audit came back clean', async () => {
       // The index is given up for a constraint that is going to be created. If the data does
       // not support one, nothing is given up and the database keeps what it has.

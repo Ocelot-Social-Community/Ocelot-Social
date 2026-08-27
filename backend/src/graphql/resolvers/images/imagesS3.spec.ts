@@ -11,7 +11,8 @@ import { DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
+import { getDriver } from '@db/neo4j'
+import { fixtures } from '@db/testing/fixtures'
 import { UserInputError } from '@graphql/errors'
 
 import { images } from './imagesS3'
@@ -43,7 +44,9 @@ const mockUpload = jest.mocked(Upload)
 const mockDeleteObjectCommand = jest.mocked(DeleteObjectCommand)
 
 const driver = getDriver()
-const neode = getNeode()
+// The fixture API, not neode: a neode node cannot be related to a fixture handle, and this
+// file mixes the two.
+const neode = fixtures
 const uuid = '[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}'
 
 const config: S3Config = {
@@ -220,15 +223,17 @@ describe('mergeImage', () => {
           `MATCH(p:Post {id: "p99"})-[:HERO_IMAGE]->(i:Image) RETURN i,p`,
           {},
         )
-        post = neode.hydrateFirst<{ id: string }>(result, 'p', neode.model('Post')).properties()
+        // Locals rather than the shared `post`: hydrateFirst answers null when the node is
+        // gone, and this test only wants to know that both are there.
+        const hydratedPost = neode.hydrateFirst(result, 'p', neode.model('Post'))
         const image = neode.hydrateFirst(result, 'i', neode.model('Image'))
-        expect(post).toBeTruthy()
+        expect(hydratedPost).toBeTruthy()
         expect(image).toBeTruthy()
       })
 
       it('sets metadata', async () => {
         await mergeImage(post, 'HERO_IMAGE', imageInput)
-        const image = await neode.first<typeof Image>('Image', {}, undefined)
+        const image = await neode.first('Image', {}, undefined)
         await expect(image.toJson()).resolves.toMatchObject({
           alt: 'A description of the new image',
           createdAt: expect.any(String),
@@ -256,7 +261,7 @@ describe('mergeImage', () => {
           } finally {
             await session.close()
           }
-          const image = await neode.first<typeof Image>(
+          const image = await neode.first(
             'Image',
             { alt: 'This alt text gets overwritten' },
             undefined,
@@ -309,7 +314,7 @@ describe('mergeImage', () => {
           await expect(neode.all('Image')).resolves.toHaveLength(1)
           await mergeImage(post, 'HERO_IMAGE', imageInput)
           await expect(neode.all('Image')).resolves.toHaveLength(1)
-          const image = await neode.first<typeof Image>('Image', {}, undefined)
+          const image = await neode.first('Image', {}, undefined)
           await expect(image.toJson()).resolves.toMatchObject({
             alt: 'A description of the new image',
             createdAt: expect.any(String),
@@ -370,7 +375,7 @@ describe('mergeImage', () => {
         await mergeImage(post, 'HERO_IMAGE', imageInput)
         const images = await neode.all('Image')
         expect(images).toHaveLength(1)
-        await expect(images.first().toJson()).resolves.toMatchObject({
+        await expect(images[0].toJson()).resolves.toMatchObject({
           createdAt: expect.any(String),
           url: expect.any(String),
           alt: 'A description of the new image',

@@ -63,7 +63,7 @@ describe('act-on hierarchy', () => {
 
   const as = async (id: string) => {
     const result = await database.neode.find('User', id)
-    authenticatedUser = (await result.toJson()) as Context['user']
+    authenticatedUser = (await result.toJson()) as unknown as Context['user']
   }
 
   describe('disableUser (user.disable + dominance)', () => {

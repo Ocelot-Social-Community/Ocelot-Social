@@ -9,7 +9,6 @@
 // never from request data.
 /* eslint-disable security/detect-object-injection */
 import { GROUP_MEMBERSHIP_VISIBILITY_CHANGED } from '@constants/subscriptions'
-import { getNeode } from '@db/neo4j'
 import { UserInputError, ForbiddenError } from '@graphql/errors'
 import { branding } from '@src/branding'
 
@@ -24,24 +23,21 @@ import { createOrUpdateLocations } from './users/location'
 
 import type { Context } from '@src/context'
 
-const neode = getNeode()
-
 const visiblePostFilter =
   'WHERE NOT related.disabled = true AND NOT related.deleted = true AND NOT (related)<-[:CANNOT_SEE]-(:User {id: $cypherParams.currentUserId})'
 
-export const getMutedUsers = async (context) => {
-  const { neode } = context
-  const userModel = neode.model('User')
-  let mutedUsers = neode
-    .query()
-    .match('user', userModel)
-    .where('user.id', context.user.id)
-    .relationship(userModel.relationships().get('muted'))
-    .to('muted', userModel)
-    .return('muted')
-  mutedUsers = await mutedUsers.execute()
-  mutedUsers = mutedUsers.records.map((r) => r.get('muted').properties)
-  return mutedUsers
+export const getMutedUsers = async (context: Context) => {
+  if (!context.user) {
+    return []
+  }
+  const result = await context.database.query({
+    query: `
+      MATCH (user:User {id: $id})-[:MUTED]->(muted:User)
+      RETURN muted {.*}
+    `,
+    variables: { id: context.user.id },
+  })
+  return result.records.map((record) => record.get('muted'))
 }
 
 // ORDER BY from `_UserOrdering`; the allowed fields come from the enum itself, so the
@@ -256,34 +252,37 @@ export default {
       if (currentUser.id === params.id) {
         return null
       }
-      await neode.writeCypher(
-        `
-          MATCH(u:User {id: $currentUser.id})-[previousRelationship:FOLLOWS]->(b:User {id: $params.id})
-          DELETE previousRelationship
+      // Muting drops an existing FOLLOWS edge and adds MUTED. One statement instead of a
+      // delete, two loads and a relateTo — and `createdAt` on the edge, which neode used to
+      // contribute from the model default, is now spelled out.
+      const result = await context.database.write({
+        query: `
+          MATCH (user:User {id: $currentUserId}), (muted:User {id: $id})
+          OPTIONAL MATCH (user)-[follows:FOLLOWS]->(muted)
+          DELETE follows
+          MERGE (user)-[mutes:MUTED]->(muted)
+          ON CREATE SET mutes.createdAt = toString(datetime())
+          RETURN muted {.*}
         `,
-        { currentUser, params },
-      )
-      const [user, mutedUser] = await Promise.all([
-        neode.find('User', currentUser.id),
-        neode.find('User', params.id),
-      ])
-      await user.relateTo(mutedUser, 'muted')
-      return mutedUser.toJson()
+        variables: { currentUserId: currentUser.id, id: params.id },
+      })
+      return result.records[0]?.get('muted') ?? null
     },
     unmuteUser: async (_parent, params, context, _resolveInfo) => {
       const { user: currentUser } = context
       if (currentUser.id === params.id) {
         return null
       }
-      await neode.writeCypher(
-        `
-          MATCH(u:User {id: $currentUser.id})-[previousRelationship:MUTED]->(b:User {id: $params.id})
-          DELETE previousRelationship
+      const result = await context.database.write({
+        query: `
+          MATCH (unmuted:User {id: $id})
+          OPTIONAL MATCH (:User {id: $currentUserId})-[mutes:MUTED]->(unmuted)
+          DELETE mutes
+          RETURN unmuted {.*}
         `,
-        { currentUser, params },
-      )
-      const unmutedUser = await neode.find('User', params.id)
-      return unmutedUser.toJson()
+        variables: { currentUserId: currentUser.id, id: params.id },
+      })
+      return result.records[0]?.get('unmuted') ?? null
     },
     blockUser: async (_object, args, context, _resolveInfo) => {
       const { user: currentUser } = context

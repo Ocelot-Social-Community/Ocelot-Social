@@ -13,9 +13,9 @@ const createMessageMutation = `
 defineStep(
   '{string} sends a chat message {string} to {string}',
   (senderSlug, message, recipientSlug) => {
-    cy.neode()
-      .then((neode) => {
-        return neode.cypher(
+    cy.fixtures()
+      .then((fixtures) => {
+        return fixtures.cypher(
           `MATCH (sender:User {slug: $senderSlug})-[:PRIMARY_EMAIL]->(e:EmailAddress)
            MATCH (recipient:User {slug: $recipientSlug})
            RETURN e.email AS senderEmail, recipient.id AS recipientId`,

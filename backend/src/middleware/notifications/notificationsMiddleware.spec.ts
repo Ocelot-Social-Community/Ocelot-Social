@@ -23,7 +23,6 @@ import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
-import type { DecodedUser } from '@src/jwt/decode'
 
 const sendChatMessageMailMock: (notification) => void = jest.fn()
 const sendNotificationMailMock: (notification) => void = jest.fn()
@@ -1178,12 +1177,12 @@ describe('notifications', () => {
 
     describe('user joins group', () => {
       const joinGroupAction = async () => {
-        authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
+        authenticatedUser = await notifiedUser.toJson()
         await mutate({
           mutation: JoinGroup,
           variables: {
             groupId: 'closed-group',
-            userId: authenticatedUser.id,
+            userId: authenticatedUser?.id,
           },
         })
         authenticatedUser = await groupOwner.toJson()
@@ -1275,12 +1274,12 @@ describe('notifications', () => {
 
     describe('user joins and leaves group', () => {
       const leaveGroupAction = async () => {
-        authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
+        authenticatedUser = await notifiedUser.toJson()
         await mutate({
           mutation: LeaveGroup,
           variables: {
             groupId: 'closed-group',
-            userId: authenticatedUser.id,
+            userId: authenticatedUser?.id,
           },
         })
         authenticatedUser = await groupOwner.toJson()
@@ -1288,12 +1287,12 @@ describe('notifications', () => {
 
       beforeEach(async () => {
         jest.clearAllMocks()
-        authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
+        authenticatedUser = await notifiedUser.toJson()
         await mutate({
           mutation: JoinGroup,
           variables: {
             groupId: 'closed-group',
-            userId: authenticatedUser.id,
+            userId: authenticatedUser?.id,
           },
         })
       })
@@ -1412,7 +1411,7 @@ describe('notifications', () => {
 
     describe('user role in group changes', () => {
       const changeGroupMemberRoleAction = async () => {
-        authenticatedUser = (await groupOwner.toJson()) as DecodedUser
+        authenticatedUser = await groupOwner.toJson()
         await mutate({
           mutation: ChangeGroupMemberRole,
           variables: {
@@ -1425,12 +1424,12 @@ describe('notifications', () => {
       }
 
       beforeEach(async () => {
-        authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
+        authenticatedUser = await notifiedUser.toJson()
         await mutate({
           mutation: JoinGroup,
           variables: {
             groupId: 'closed-group',
-            userId: authenticatedUser.id,
+            userId: authenticatedUser?.id,
           },
         })
         // Clear after because the above generates a notification not related
@@ -1531,12 +1530,12 @@ describe('notifications', () => {
       }
 
       beforeEach(async () => {
-        authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
+        authenticatedUser = await notifiedUser.toJson()
         await mutate({
           mutation: JoinGroup,
           variables: {
             groupId: 'closed-group',
-            userId: authenticatedUser.id,
+            userId: authenticatedUser?.id,
           },
         })
         // Clear after because the above generates a notification not related

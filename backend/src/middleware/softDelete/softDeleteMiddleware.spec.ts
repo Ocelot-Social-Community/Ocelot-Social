@@ -176,16 +176,19 @@ beforeAll(async () => {
   }
 
   await Promise.all([
-    reportAgainstTroll.relateTo(moderator, 'reviewed', { ...disableVariables, resourceId: 'u2' }),
+    reportAgainstTroll.relateTo(moderator, 'reviewed', {
+      disable: disableVariables.disable,
+      closed: disableVariables.closed,
+    }),
     troll.update({ disabled: true, updatedAt: new Date().toISOString() }),
     reportAgainstTrollingPost.relateTo(moderator, 'reviewed', {
-      ...disableVariables,
-      resourceId: 'p2',
+      disable: disableVariables.disable,
+      closed: disableVariables.closed,
     }),
     trollingPost.update({ disabled: true, updatedAt: new Date().toISOString() }),
     reportAgainstTrollingComment.relateTo(moderator, 'reviewed', {
-      ...disableVariables,
-      resourceId: 'c1',
+      disable: disableVariables.disable,
+      closed: disableVariables.closed,
     }),
     trollingComment.update({ disabled: true, updatedAt: new Date().toISOString() }),
   ])

@@ -97,6 +97,21 @@ spec:
           - secretRef:
               name: {{ .Release.Name }}-backend-secret-env
           {{- include "resources" .Values.backend.resources | indent 10 }}
+        # `init` installs constraints and indices, `up` runs the data migrations. Both run on
+        # EVERY pod start, which is what makes the schema converge: `init` derives the DDL from
+        # src/db/schema and issues `CREATE ... IF NOT EXISTS`, so a declaration added since the
+        # last release reaches an existing database here — and a database that already matches
+        # is left untouched.
+        #
+        # It used to do the opposite: `CALL apoc.schema.assert({},{},true)` dropped every
+        # constraint and index first, so every deployment had a window with no enforcement at
+        # all. That is gone.
+        #
+        # A constraint whose data violates it is SKIPPED and reported, not raised: outside
+        # NODE_ENV=production the init container fails on it (CI, dev), in production it carries
+        # on, because a constraint that cannot be created leaves the database exactly as it
+        # already is while an aborted init container is an outage. See
+        # backend/src/db/migrate/store.ts and the runbook in the schema concept.
         - name: {{ .Release.Name }}-backend-migrations
           image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default (include "defaultTag" .) }}"
           imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}

@@ -149,7 +149,15 @@ export default {
           query: `
         MATCH (badge:Badge {id: $badgeId, type: 'trophy'}), (user:User {id: $userId})
         MERGE (badge)-[:REWARDED {by: $currentUserId}]->(user)
-        ${slot === undefined ? '' : 'MERGE (badge)<-[:SELECTED {slot: $slot}]-(user)'}
+        ${
+          slot === undefined
+            ? ''
+            : // toInteger, because the driver stores a plain JS number as a FLOAT — the edge
+              // would hold 0.0 where db/schema/relationships.ts says INTEGER. Hardening, not a
+              // bug fix: the FLOAT slots the schema audit found came from neode skipping its
+              // own int conversion for the falsy value 0 (see migration 20260820150000).
+              'MERGE (badge)<-[:SELECTED {slot: toInteger($slot)}]-(user)'
+        }
         RETURN user {.*}
         `,
           variables: { badgeId, userId, currentUserId, slot },
