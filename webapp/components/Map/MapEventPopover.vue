@@ -8,14 +8,18 @@
       :to="{ name: 'post-id-slug', params: { id: resolvedPost.id, slug: resolvedPost.slug } }"
       class="event-link"
     >
-      <div v-if="resolvedPost.image" class="image-wrapper">
-        <responsive-image :image="resolvedPost.image" sizes="280px" class="image" />
+      <div v-if="resolvedPost.image" class="image-wrapper-outer">
+        <div class="image-wrapper">
+          <responsive-image :image="resolvedPost.image" sizes="280px" class="image" />
+        </div>
+        <os-ribbon class="event-ribbon-w-img" :text="$t('post.event')" type="Event" />
       </div>
       <div class="content">
         <div class="post-user-row">
           <user-avatar :user="resolvedPost.author" size="small" :show-popover="false" />
           <os-ribbon
-            :class="resolvedPost.image ? 'event-ribbon-w-img' : 'event-ribbon'"
+            v-if="!resolvedPost.image"
+            class="event-ribbon"
             :text="$t('post.event')"
             type="Event"
           />
@@ -157,6 +161,10 @@ export default {
   text-decoration: none;
 }
 
+.image-wrapper-outer {
+  position: relative;
+}
+
 /* Clips and rounds the image itself (top corners only, like PostTeaser's
    own .os-card__hero-image) — the popup shell (.mapboxgl-popup-content in
    pages/map.vue) is overflow: visible for this popover specifically, so the
@@ -194,15 +202,23 @@ export default {
   align-items: center;
 }
 
-/* Same folded-corner ribbon placement and offsets as PostTeaser's own
-   .post-ribbon-w-img / .post-ribbon — this popover now matches its 24px
-   content padding exactly, so the same values apply unscaled. */
+/* Anchored to the image itself (via .image-wrapper-outer) instead of
+   guessing an offset from the content row below — bottom: 0 would sit
+   flush with the image's own bottom edge regardless of the ribbon's actual
+   rendered height. -14px is half of the ribbon's own height (2 × 6px
+   padding + ~16px line box for the 0.7rem/600 text), so its text line —
+   not just its lower edge — lands right on the image's bottom edge, with
+   the folded-corner triangle hanging just past it into the content area.
+   right: -6px matches PostTeaser's own ribbon, which likewise pokes a few
+   pixels past its card's true right edge rather than sitting flush/inset. */
 .event-ribbon-w-img {
   position: absolute;
-  top: -36px;
-  right: -29px;
+  bottom: -14px;
+  right: -6px;
 }
 
+/* No image to anchor to here, so this one still hangs off the content row
+   like PostTeaser's own .post-ribbon (same 24px content padding). */
 .event-ribbon {
   position: absolute;
   top: -16px;
