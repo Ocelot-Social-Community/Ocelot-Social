@@ -177,6 +177,10 @@ describe('forLog', () => {
       'https://user:secret@example.org/x?token=abc',
       'https://example.org/x (credentials and query removed)',
     ],
+    // Without a scheme `new URL` refuses the value entirely, and it used to pass through with
+    // the token intact — while the same value with `https://` in front was redacted. A query is
+    // identifiable without parsing.
+    ['example.org/x?token=abc', 'example.org/x (query removed)'],
   ])('names what it dropped from %j', (url, expected) => {
     // Named rather than a blanket "redacted": a password in a public field is a burned secret
     // that should be rotated, and that is worth knowing even though the value is not worth
@@ -192,6 +196,9 @@ describe('up', () => {
   const rows = [
     { id: 's1', url: 'mailto:a@example.org?bcc=evil@example.tld', owner: 'jenny' },
     { id: 's2', url: 'ftp://user:secret@example.org/pub', owner: 'peter' },
+    // Repaired by gaining a scheme, and the repair has no reason to touch the query — so the
+    // TARGET still carries the token. That is the half a redaction of the old value misses.
+    { id: 's3', url: 'example.org/x?token=abc', owner: 'robin' },
   ]
 
   let events: string[]
@@ -244,6 +251,15 @@ describe('up', () => {
     expect(naming).toBeLessThan(write)
   })
 
+  it('redacts the repaired TARGET as well, not only the old value', () => {
+    // Logging the old value redacted and the new one raw put the token in the log anyway, by
+    // the other half of the same line.
+    const line = events.find((event) => event.includes('example.org/x'))
+    expect(line).toBeDefined()
+    expect(line).not.toContain('token=abc')
+    expect(line).toContain('https://example.org/x (query removed)')
+  })
+
   it('keeps the password and the third party out of the log', () => {
     // A deployment log outlives the row and travels further than the database. Copying a
     // password or someone else's address into it would leave the migration undoing itself —
@@ -262,6 +278,6 @@ describe('up', () => {
 
   it('states the plan before doing any of it', () => {
     // So an interrupted run can be told apart from one that had nothing to do.
-    expect(events[0]).toBe('log SocialMedia urls: 2 checked, 1 to repair, 1 to remove')
+    expect(events[0]).toBe('log SocialMedia urls: 3 checked, 2 to repair, 1 to remove')
   })
 })

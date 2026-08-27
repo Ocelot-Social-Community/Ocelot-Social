@@ -210,20 +210,30 @@ export const forLog = (value: string): string => {
     if (parsed.search !== '') {
       dropped.push('query')
     }
-    if (dropped.length === 0) {
-      return value
+    if (dropped.length > 0) {
+      parsed.username = ''
+      parsed.password = ''
+      parsed.search = ''
+      return `${parsed.toString()} (${dropped.join(' and ')} removed)`
     }
-    parsed.username = ''
-    parsed.password = ''
-    parsed.search = ''
-    return `${parsed.toString()} (${dropped.join(' and ')} removed)`
     // eslint-disable-next-line no-catch-all/no-catch-all -- the question IS "does this parse"
   } catch {
-    // Not a url, so it has no authority to hide a credential in and no query to carry a bcc.
-    // `javascript:alert(document.cookie)` reaches this line unchanged, which is what an
-    // operator needs to see.
-    return value
+    // Falls through to the textual pass below. `new URL` is the better reader when it can read
+    // the value at all, and a value without a scheme is one it cannot.
   }
+  // A query is identifiable without parsing, and a value that `new URL` refuses can still carry
+  // one: `example.org/x?token=abc` is what a user types without a scheme, and it reached the log
+  // untouched while the same value with `https://` in front was redacted.
+  //
+  // KNOWN LIMIT, stated rather than half-solved: a credential in a schemeless value —
+  // `user:secret@example.org/x` — is not detected here. Textually it cannot be told from
+  // `mailto:someone@example.org`, since both are `something:something@something`, and a rule
+  // that caught the first would redact every mail address in the log. `new URL` does tell them
+  // apart, and above it does; it just reads `user:` as the scheme, which leaves the password in
+  // the path rather than in the credential slot. The realistic shape a browser would follow —
+  // and the one this field collects — carries a scheme, and that one is covered.
+  const query = value.indexOf('?')
+  return query < 0 ? value : `${value.slice(0, query)} (query removed)`
 }
 
 interface Row {
@@ -288,7 +298,7 @@ export async function up(_next) {
     )
 
     for (const { id, from, to } of repaired) {
-      console.log(`  repairing ${JSON.stringify(forLog(from))} -> ${JSON.stringify(to)}`)
+      console.log(`  repairing ${JSON.stringify(forLog(from))} -> ${JSON.stringify(forLog(to))}`)
       await session.writeTransaction((transaction) =>
         transaction.run('MATCH (s:SocialMedia {id: $id}) SET s.url = $url', { id, url: to }),
       )
