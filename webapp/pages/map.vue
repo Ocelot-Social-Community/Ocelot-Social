@@ -1350,7 +1350,7 @@ export default {
   /* Same "map tool" accent as OsLocationMap's own pick-location toggle
      (--os-location-map-accent-color there) — not --color-primary, which is
      this app's unrelated brand accent. */
-  color: rgb(0, 142, 230);
+  color: var(--color-secondary);
 }
 
 .map-style-switcher {
