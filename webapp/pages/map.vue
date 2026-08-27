@@ -1347,10 +1347,10 @@ export default {
 
 .map-event-pin-tool-toggle--active {
   background: rgba(0, 0, 0, 0.1);
-  /* Same "map tool" accent as OsLocationMap's own pick-location toggle
-     (--os-location-map-accent-color there) — not --color-primary, which is
-     this app's unrelated brand accent. */
-  color: var(--color-secondary);
+  /* Same "map tool" accent as OsLocationMap's own pick-location toggle —
+     shares its --os-location-map-accent-color override hook, not
+     --color-primary, which is this app's unrelated brand accent. */
+  color: var(--os-location-map-accent-color, var(--color-secondary));
 }
 
 .map-style-switcher {
