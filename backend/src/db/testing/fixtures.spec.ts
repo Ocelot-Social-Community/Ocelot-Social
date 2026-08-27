@@ -118,6 +118,27 @@ describe('TestNode.update against a real node', () => {
     await expect(node.relateTo(node, alias)).rejects.toThrow(arrow)
   })
 
+  it('refuses an edge property the relationship does not declare', async () => {
+    // `SET edge += $properties` writes whatever it is handed, so a typo added an edge property
+    // instead of setting one. Edges have no second line of defence either: the audit reports an
+    // undeclared NODE property, but nothing asks about an undeclared edge property.
+    const now = '2026-08-21T10:00:00.000Z'
+    await run(
+      `CREATE (:User {id: 'edge-a', name: 'Edge A', slug: 'edge-a', createdAt: $now,
+                      updatedAt: $now})
+       CREATE (:User {id: 'edge-b', name: 'Edge B', slug: 'edge-b', createdAt: $now,
+                      updatedAt: $now})`,
+      { now },
+    )
+    const a = await fixtures.first('User', { id: 'edge-a' })
+    const b = await fixtures.first('User', { id: 'edge-b' })
+    await expect(a.relateTo(b, 'following', { createdAtd: now })).rejects.toThrow(
+      '[:FOLLOWS] declares no property createdAtd',
+    )
+    // The declared one still goes through.
+    await expect(a.relateTo(b, 'following', { createdAt: now })).resolves.toBeDefined()
+  })
+
   it('normalises a slug the same way the create path does', async () => {
     // `withDefaults` lowercased and slugified a caller's slug, and only the create path calls
     // it — so the same value was accepted and converted on the way in and refused on the way

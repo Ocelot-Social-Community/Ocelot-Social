@@ -165,8 +165,27 @@ export class TestNode {
     // (`pinnedAt: pinned.createdAt`). Without them a fixture edge exists but carries nothing,
     // and the field reads as null.
     const declared = relationships.find((relationship) => relationship.type === type)
-    const declaredEdgeProperties = new Map(Object.entries(declared?.properties ?? {}))
+    if (declared === undefined) {
+      // Unreachable while every alias points at a declared type, which a check confirms — but
+      // an optional chain here would silently accept every property name on a type nobody
+      // declared, which is the opposite of what the next few lines are for.
+      throw new Error(`No relationship is declared for type ${type} (alias "${alias}")`)
+    }
+    const declaredEdgeProperties = new Map(Object.entries(declared.properties ?? {}))
     const given = new Map(Object.entries(properties))
+    // The names, checked before the write, exactly as update() checks a node's. `SET edge +=`
+    // writes whatever it is handed, so `{ createdAtd: … }` used to ADD an edge property rather
+    // than set one, leaving a fixture the declaration says cannot exist — and edges have no
+    // second line of defence: the audit reports an undeclared NODE property, but an undeclared
+    // edge property is not something any of its queries ask about.
+    for (const property of given.keys()) {
+      if (!declaredEdgeProperties.has(property)) {
+        throw new Error(
+          `[:${type}] declares no property ${property}. ` +
+            `See src/db/schema/relationships/ — the alias "${alias}" resolves to that type.`,
+        )
+      }
+    }
     const edge = new Map(given)
     for (const property of ['createdAt', 'updatedAt']) {
       if (declaredEdgeProperties.has(property) && given.get(property) === undefined) {
