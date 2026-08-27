@@ -231,25 +231,39 @@ export const forLog = (value: string): string => {
     // Falls through to the textual pass below. `new URL` is the better reader when it can read
     // the value at all, and a value without a scheme is one it cannot.
   }
-  // A query is identifiable without parsing, and a value that `new URL` refuses can still carry
-  // one: `example.org/x?token=abc` is what a user types without a scheme, and it reached the log
-  // untouched while the same value with `https://` in front was redacted.
+  // The textual pass, for a value `new URL` refuses. Two things are identifiable without a
+  // parser, and both reached the log untouched while the same value in parseable form was
+  // redacted:
   //
-  // KNOWN LIMIT, stated rather than half-solved: a credential in a schemeless value —
-  // `user:secret@example.org/x` — is not detected here. Textually it cannot be told from
-  // `mailto:someone@example.org`, since both are `something:something@something`, and a rule
-  // that caught the first would redact every mail address in the log. `new URL` does tell them
-  // apart, and above it does; it just reads `user:` as the scheme, which leaves the password in
-  // the path rather than in the credential slot. The realistic shape a browser would follow —
-  // and the one this field collects — carries a scheme, and that one is covered.
-  const boundary = value.search(/[?#]/)
-  if (boundary < 0) {
+  //   example.org/x?token=abc                a boundary, on a value typed without a scheme
+  //   https://user:secret@example.org:bad/x  userinfo, on one `new URL` rejects for the port
+  //
+  // The second was the worse of the two, because two of its shapes carried a redaction marker
+  // with the password still in plain view beside it.
+  //
+  // Userinfo is only looked for after an explicit `http://` or `https://`, where the authority
+  // runs to the first `/?#` and an `@` inside it can be nothing else. KNOWN LIMIT, stated rather
+  // than half-solved: without a scheme it stays undetected, because `user:secret@example.org`
+  // cannot be told from `mailto:someone@example.org` — both are `something:something@something`,
+  // and a rule that caught the first would redact every mail address in the log. `new URL` tells
+  // them apart and does so above; it just reads `user:` as a scheme, which puts the password in
+  // the path rather than in the credential slot.
+  const stripped = value.replace(/^(https?:\/\/)[^/?#]*@/i, '$1')
+  const dropped: string[] = []
+  if (stripped !== value) {
+    dropped.push('credentials')
+  }
+  const boundary = stripped.search(/[?#]/)
+  if (boundary >= 0) {
+    // Named after the boundary character, and everything past it goes — a fragment may itself
+    // contain a `?` and a query a `#`, so one name for the cut is the honest description.
+    dropped.push(stripped.startsWith('?', boundary) ? 'query' : 'fragment')
+  }
+  if (dropped.length === 0) {
     return value
   }
-  // Named after the boundary character, and everything past it goes — a fragment may itself
-  // contain a `?` and a query a `#`, so one name for the cut is the honest description.
-  const part = value.startsWith('?', boundary) ? 'query' : 'fragment'
-  return `${value.slice(0, boundary)} (${part} removed)`
+  const kept = boundary < 0 ? stripped : stripped.slice(0, boundary)
+  return `${kept} (${dropped.join(' and ')} removed)`
 }
 
 interface Row {

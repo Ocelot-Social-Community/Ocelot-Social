@@ -183,6 +183,9 @@ describe('forLog', () => {
     // and an operator needs to see exactly this one.
     ['javascript:alert(document.cookie)'],
     ['not-a-url'],
+    // The known limit, pinned so it is a decision and not an oversight: without a scheme this
+    // cannot be told from a mail address, and redacting it would redact every mailto in the log.
+    ['user:secret@example.org/x'],
   ])('passes %j through untouched, so what can be restored still can be', (url) => {
     expect(forLog(url)).toBe(url)
   })
@@ -205,6 +208,18 @@ describe('forLog', () => {
     [
       'mailto:a@example.org?bcc=x@y.tld#access_token=secret',
       'mailto:a@example.org (query and fragment removed)',
+    ],
+    // `new URL` rejects these for the port, so the parser never sees the userinfo. Two of them
+    // used to carry a redaction marker with the password still in plain view beside it, which
+    // is worse than no marker at all.
+    ['https://user:secret@example.org:bad/x', 'https://example.org:bad/x (credentials removed)'],
+    [
+      'https://user:secret@example.org:bad/x?token=abc',
+      'https://example.org:bad/x (credentials and query removed)',
+    ],
+    [
+      'HTTPS://user:secret@example.org:bad/x#frag',
+      'HTTPS://example.org:bad/x (credentials and fragment removed)',
     ],
   ])('names what it dropped from %j', (url, expected) => {
     // Named rather than a blanket "redacted": a password in a public field is a burned secret
