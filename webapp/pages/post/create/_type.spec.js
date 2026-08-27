@@ -139,6 +139,68 @@ describe('create.vue', () => {
     })
   })
 
+  describe('scrolling to the location section on arrival via the map pin tool', () => {
+    // A real ContributionForm pulls in EventLocationMap/mapbox-gl and needs a
+    // MAPBOX_TOKEN — this minimal stub renders just enough (the same class
+    // ContributionForm puts on its EventLocationMap wrapper) for
+    // scrollIntoView() to have something to find and act on.
+    const stubsWithLocationField = {
+      ...stubs,
+      ContributionForm: { template: '<div class="event-location-map-field"></div>' },
+    }
+
+    let scrollIntoViewSpy
+
+    beforeEach(() => {
+      scrollIntoViewSpy = jest.fn()
+      Element.prototype.scrollIntoView = scrollIntoViewSpy
+    })
+
+    afterEach(() => {
+      delete Element.prototype.scrollIntoView
+    })
+
+    it('sets seededLocationFromMapPin and scrolls the location section into view', async () => {
+      mocks = makeMocks({ type: 'event', query: { lat: '52.5', lng: '13.4' } })
+      wrapper = mount(create, { mocks, localVue, stubs: stubsWithLocationField, store })
+      expect(wrapper.vm.seededLocationFromMapPin).toBe(true)
+
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+
+      expect(scrollIntoViewSpy).toHaveBeenCalledWith({ behavior: 'smooth', block: 'center' })
+    })
+
+    it('does not scroll on a normal arrival without ?lat=&lng=', async () => {
+      mocks = makeMocks({ type: 'event' })
+      wrapper = mount(create, { mocks, localVue, stubs: stubsWithLocationField, store })
+      expect(wrapper.vm.seededLocationFromMapPin).toBe(false)
+
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+
+      expect(scrollIntoViewSpy).not.toHaveBeenCalled()
+    })
+
+    it('does not scroll again on a remount that reuses the already-seeded shared draft', async () => {
+      mocks = makeMocks({ type: 'event', query: { lat: '52.5', lng: '13.4' } })
+      const first = mount(create, { mocks, localVue, stubs: stubsWithLocationField, store })
+      await first.vm.$nextTick()
+      await first.vm.$nextTick()
+      first.destroy()
+      scrollIntoViewSpy.mockClear()
+
+      mocks = makeMocks({ type: 'event', query: { lat: '52.5', lng: '13.4' } })
+      const second = mount(create, { mocks, localVue, stubs: stubsWithLocationField, store })
+      expect(second.vm.seededLocationFromMapPin).toBe(false)
+
+      await second.vm.$nextTick()
+      await second.vm.$nextTick()
+
+      expect(scrollIntoViewSpy).not.toHaveBeenCalled()
+    })
+  })
+
   describe('post-in selector UI', () => {
     it('renders the personal profile link when no group is selected', () => {
       wrapper = Wrapper()
