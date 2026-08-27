@@ -2337,37 +2337,33 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     // review resource first time
     await reportAgainstDagobert.relateTo(bobDerBaumeister, 'reviewed', {
-      ...disableVariables,
-      resourceId: 'u7',
+      disable: disableVariables.disable,
+      closed: disableVariables.closed,
     })
     await dagobert.update({ disabled: true, updatedAt: new Date().toISOString() })
     await reportAgainstTrollingPost.relateTo(peterLustig, 'reviewed', {
-      ...disableVariables,
-      resourceId: 'p2',
+      disable: disableVariables.disable,
+      closed: disableVariables.closed,
     })
     await p2.update({ disabled: true, updatedAt: new Date().toISOString() })
     await reportAgainstTrollingComment.relateTo(bobDerBaumeister, 'reviewed', {
-      ...disableVariables,
-      resourceId: 'c1',
+      disable: disableVariables.disable,
+      closed: disableVariables.closed,
     })
     await trollingComment.update({ disabled: true, updatedAt: new Date().toISOString() })
 
     // second review of resource and close report
     await reportAgainstDagobert.relateTo(peterLustig, 'reviewed', {
-      resourceId: 'u7',
       disable: false,
       closed: true,
     })
     await dagobert.update({ disabled: false, updatedAt: new Date().toISOString(), closed: true })
     await reportAgainstTrollingPost.relateTo(bobDerBaumeister, 'reviewed', {
-      resourceId: 'p2',
       disable: true,
       closed: true,
     })
     await p2.update({ disabled: true, updatedAt: new Date().toISOString(), closed: true })
     await reportAgainstTrollingComment.relateTo(peterLustig, 'reviewed', {
-      ...disableVariables,
-      resourceId: 'c1',
       disable: true,
       closed: true,
     })
