@@ -29,15 +29,14 @@
         :end-date="resolvedPost.eventEnd"
       />
     </template>
-    <template v-else-if="showContent">
-      <p class="event-unavailable">{{ $t('map.eventPopover.unavailable') }}</p>
-    </template>
+    <empty v-else-if="showContent" icon="alert" :message="$t('map.eventPopover.unavailable')" />
   </div>
 </template>
 
 <script>
 import { OsRibbon, OsSpinner } from '@ocelot-social/ui'
 import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
+import Empty from '~/components/Empty/Empty'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
 import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
@@ -47,6 +46,7 @@ export default {
   name: 'MapEventPopover',
   components: {
     DateTimeRange,
+    Empty,
     LocationTeaser,
     OsRibbon,
     OsSpinner,
@@ -178,10 +178,5 @@ export default {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-}
-
-.event-unavailable {
-  text-align: center;
-  margin: 0;
 }
 </style>

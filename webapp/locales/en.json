@@ -1693,7 +1693,8 @@
   },
   "user-avatar": {
     "popover": {
-      "open-profile": "Open profile"
+      "open-profile": "Open profile",
+      "unavailable": "User no longer available"
     }
   },
   "videoCall": {

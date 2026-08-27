@@ -1693,7 +1693,8 @@
   },
   "user-avatar": {
     "popover": {
-      "open-profile": "Відкрити профіль"
+      "open-profile": "Відкрити профіль",
+      "unavailable": "Користувач більше недоступний"
     }
   },
   "videoCall": {

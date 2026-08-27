@@ -1693,7 +1693,8 @@
   },
   "user-avatar": {
     "popover": {
-      "open-profile": "Hap profilin"
+      "open-profile": "Hap profilin",
+      "unavailable": "Përdoruesi nuk është më i disponueshëm"
     }
   },
   "videoCall": {
