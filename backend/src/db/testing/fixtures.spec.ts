@@ -102,6 +102,22 @@ describe('TestNode.update against a real node', () => {
     await expect(node.update({ name: 'Renamed' })).rejects.toThrow('the node does not exist')
   })
 
+  it.each([
+    ['an outbound alias', 'following', '-[:FOLLOWS]->'],
+    ['an inbound alias', 'rewarded', '<-[:REWARDED]-'],
+  ])('describes %s in the direction it actually points', async (_case, alias, arrow) => {
+    // The message used to be written as `source -[:TYPE]-> target` whatever the alias, so every
+    // inbound one described the edge backwards and sent the reader to the wrong end.
+    const now = '2026-08-21T10:00:00.000Z'
+    await run(
+      `CREATE (:User {id: 'arrow', name: 'Arrow', slug: 'arrow', createdAt: $now, updatedAt: $now})`,
+      { now },
+    )
+    const node = await fixtures.first('User', { id: 'arrow' })
+    await run(`MATCH (n:User {id: 'arrow'}) DETACH DELETE n`)
+    await expect(node.relateTo(node, alias)).rejects.toThrow(arrow)
+  })
+
   it('normalises a slug the same way the create path does', async () => {
     // `withDefaults` lowercased and slugified a caller's slug, and only the create path calls
     // it — so the same value was accepted and converted on the way in and refused on the way

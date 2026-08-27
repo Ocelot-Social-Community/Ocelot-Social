@@ -178,10 +178,13 @@ export class TestNode {
       }
     }
     const edgeProperties = Object.fromEntries(edge)
-    const pattern =
-      direction === 'out'
-        ? `(source)-[edge:${type}]->(target)`
-        : `(source)<-[edge:${type}]-(target)`
+    // The arrowheads come from ONE reading of `direction`, so the pattern that runs and the
+    // message that explains a failure cannot point opposite ways. They did: the message was
+    // written as `source -[:TYPE]-> target` whatever the alias, so every inbound one —
+    // `User.rewarded`, `User.followedBy`, `Post.author` — described an edge in the direction it
+    // is not. A diagnostic that misstates the shape sends the reader looking at the wrong end.
+    const [tail, head] = direction === 'out' ? ['-', '->'] : ['<-', '-']
+    const pattern = `(source)${tail}[edge:${type}]${head}(target)`
 
     const session = getDriver().session()
     try {
@@ -203,7 +206,7 @@ export class TestNode {
       if (result.records.length === 0) {
         throw new Error(
           `Could not relate ${this.entity.label}(${String(this.internalId)}) ` +
-            `-[:${type}]-> ${target.label}(${String(target.id)}) via "${alias}": ` +
+            `${tail}[:${type}]${head} ${target.label}(${String(target.id)}) via "${alias}": ` +
             `one of the two nodes does not exist.`,
         )
       }
