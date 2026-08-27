@@ -125,7 +125,22 @@ export class TestNode {
           { internalId: this.internalId, properties: patch },
         ),
       )
-      this.stored = (result.records[0]?.get('node') ?? this.stored) as NodeProperties
+      // A MATCH that finds nothing yields no rows, so `SET` never runs — and Cypher calls that a
+      // successful query. The same trap relateTo names, and the same two ways into it: a handle
+      // whose node was removed in between (cleanDatabase between building and updating) and one
+      // that never had a real id. Unchecked, the write silently does not happen; the handle then
+      // keeps its OLD values, so a spec either goes green on a database that never got the
+      // write, or fails several assertions later on a field that looks stale for no reason.
+      //
+      // The `?? this.stored` fallback that used to sit here is gone with it: it was what made
+      // the silence possible.
+      if (result.records.length === 0) {
+        throw new Error(
+          `Could not update ${this.entity.label}(${String(this.internalId)}): ` +
+            `the node does not exist.`,
+        )
+      }
+      this.stored = result.records[0].get('node') as NodeProperties
       return this
     } finally {
       await session.close()

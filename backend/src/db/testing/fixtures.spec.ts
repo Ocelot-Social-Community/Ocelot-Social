@@ -83,6 +83,25 @@ describe('TestNode.update against a real node', () => {
     expect(node.get('name')).toBe('Live')
   })
 
+  it('refuses to report a write that never happened', async () => {
+    // `MATCH ... WHERE id(n) = $id` finds nothing for a deleted node, `SET` never runs, and
+    // Cypher calls the query a success. The handle then keeps its old values, so the failure
+    // surfaces later on a field that looks stale for no reason — or not at all, on a database
+    // that never got the write. relateTo already refuses this; update did not.
+    //
+    // Its own node, not one of the two the suite shares: this test destroys what it works on,
+    // and the tests here are not ordered.
+    const now = '2026-08-21T10:00:00.000Z'
+    await run(
+      `CREATE (:User {id: 'doomed', name: 'Doomed', slug: 'doomed', createdAt: $now,
+                      updatedAt: $now})`,
+      { now },
+    )
+    const node = await fixtures.first('User', { id: 'doomed' })
+    await run(`MATCH (n:User {id: 'doomed'}) DETACH DELETE n`)
+    await expect(node.update({ name: 'Renamed' })).rejects.toThrow('the node does not exist')
+  })
+
   it('normalises a slug the same way the create path does', async () => {
     // `withDefaults` lowercased and slugified a caller's slug, and only the create path calls
     // it — so the same value was accepted and converted on the way in and refused on the way
