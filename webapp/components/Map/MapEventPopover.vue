@@ -3,33 +3,40 @@
     <div v-if="!showContent" class="loading-state">
       <os-spinner size="md" />
     </div>
-    <template v-else-if="showContent && resolvedPost">
-      <nuxt-link
-        :to="{ name: 'post-id-slug', params: { id: resolvedPost.id, slug: resolvedPost.slug } }"
-        class="event-link"
-      >
-        <div v-if="resolvedPost.image" class="image-wrapper">
-          <responsive-image :image="resolvedPost.image" sizes="280px" class="image" />
-        </div>
+    <nuxt-link
+      v-else-if="showContent && resolvedPost"
+      :to="{ name: 'post-id-slug', params: { id: resolvedPost.id, slug: resolvedPost.slug } }"
+      class="event-link"
+    >
+      <div v-if="resolvedPost.image" class="image-wrapper">
+        <responsive-image :image="resolvedPost.image" sizes="280px" class="image" />
+      </div>
+      <div class="content">
         <div class="post-user-row">
           <user-avatar :user="resolvedPost.author" size="small" :show-popover="false" />
-          <os-ribbon class="event-ribbon" :text="$t('post.event')" type="Event" />
+          <os-ribbon
+            :class="resolvedPost.image ? 'event-ribbon-w-img' : 'event-ribbon'"
+            :text="$t('post.event')"
+            type="Event"
+          />
         </div>
         <h3 class="event-title hyphenate-text">{{ resolvedPost.title }}</h3>
-      </nuxt-link>
-      <location-teaser
-        size="small"
-        :venue="resolvedPost.eventVenue"
-        :location-name="resolvedPost.eventLocationName"
-        :is-online="resolvedPost.eventIsOnline"
-      />
-      <date-time-range
-        size="small"
-        :start-date="resolvedPost.eventStart"
-        :end-date="resolvedPost.eventEnd"
-      />
-    </template>
-    <empty v-else-if="showContent" icon="alert" :message="$t('map.eventPopover.unavailable')" />
+        <location-teaser
+          size="small"
+          :venue="resolvedPost.eventVenue"
+          :location-name="resolvedPost.eventLocationName"
+          :is-online="resolvedPost.eventIsOnline"
+        />
+        <date-time-range
+          size="small"
+          :start-date="resolvedPost.eventStart"
+          :end-date="resolvedPost.eventEnd"
+        />
+      </div>
+    </nuxt-link>
+    <div v-else-if="showContent" class="unavailable-state">
+      <empty icon="alert" :message="$t('map.eventPopover.unavailable')" />
+    </div>
   </div>
 </template>
 
@@ -128,8 +135,6 @@ export default {
 .map-event-popover {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 16px;
   min-width: 220px;
   max-width: 280px;
   width: 280px;
@@ -142,33 +147,63 @@ export default {
   justify-content: center;
   align-items: center;
   min-height: 120px;
+  padding: 24px;
 }
 
 .event-link {
   display: flex;
   flex-direction: column;
-  gap: 6px;
   color: inherit;
   text-decoration: none;
 }
 
+/* No border-radius/overflow here on purpose — the popup shell
+   (.mapboxgl-popup-content in pages/map.vue) owns the rounding and clips
+   this image to whatever corner radius is currently in effect, exactly like
+   OsCard does for PostTeaser's own hero image.
+   Unlike PostTeaser (which lets the image keep its own aspect ratio at
+   640px wide), this popover has a hard 40vh height budget shared with the
+   title/location/date below it — a tall portrait or square photo at 280px
+   wide would otherwise eat that whole budget and push the actual event
+   info out of view. Fixed height + object-fit: cover keeps the hero-image
+   look without that risk. */
 .image-wrapper {
-  overflow: hidden;
-  border-radius: var(--border-radius-x-large);
+  height: 140px;
 }
 
 .image-wrapper .image {
   display: block;
   width: 100%;
-  aspect-ratio: 16 / 9;
+  height: 100%;
   object-fit: cover;
 }
 
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 24px;
+}
+
 .post-user-row {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+}
+
+/* Same folded-corner ribbon placement and offsets as PostTeaser's own
+   .post-ribbon-w-img / .post-ribbon — this popover now matches its 24px
+   content padding exactly, so the same values apply unscaled. */
+.event-ribbon-w-img {
+  position: absolute;
+  top: -36px;
+  right: -29px;
+}
+
+.event-ribbon {
+  position: absolute;
+  top: -16px;
+  right: -29px;
 }
 
 .event-title {
@@ -178,5 +213,13 @@ export default {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+}
+
+.unavailable-state {
+  padding: 24px;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

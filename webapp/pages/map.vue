@@ -1131,6 +1131,15 @@ export default {
   position: static;
 }
 
+.mapboxgl-popup {
+  /* Mapbox gives .mapboxgl-popup no z-index of its own (position: absolute
+     only), while the control corners (.mapboxgl-ctrl-top-right etc.) sit at
+     z-index: 2 and our own style switcher at z-index: 3 — positioned
+     siblings with an explicit z-index always paint above ones without one,
+     regardless of DOM order, so the popup was rendering behind both. */
+  z-index: 4;
+}
+
 .mapboxgl-popup-content {
   max-height: 40vh;
   overflow: hidden;
@@ -1138,11 +1147,28 @@ export default {
   border-radius: var(--border-radius-x-large);
 }
 
+/* The event popover renders its own edge-to-edge hero image (PostTeaser
+   style) — it needs to reach this container's own rounded corners, so its
+   ambient 10px padding has to get out of the way. overflow: hidden above
+   still clips the image to whatever corner radius is in effect.
+   It also gets a taller budget than the plain 40vh other popover types
+   use: its fixed-height image plus PostTeaser-matching padding around the
+   avatar/title/location/date content need more room than a compact
+   user/group card does. */
+.mapboxgl-popup-content:has(.map-event-popover) {
+  padding: 0;
+  max-height: 80vh;
+}
+
 .map-popup-container {
   display: flex;
   flex-direction: column;
   max-height: calc(40vh - 20px);
   overflow: hidden;
+}
+
+.mapboxgl-popup-content:has(.map-event-popover) .map-popup-container {
+  max-height: 80vh;
 }
 
 .mapboxgl-popup-close-button {
