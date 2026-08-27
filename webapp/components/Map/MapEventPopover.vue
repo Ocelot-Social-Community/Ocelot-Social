@@ -157,18 +157,21 @@ export default {
   text-decoration: none;
 }
 
-/* No border-radius/overflow here on purpose — the popup shell
-   (.mapboxgl-popup-content in pages/map.vue) owns the rounding and clips
-   this image to whatever corner radius is currently in effect, exactly like
-   OsCard does for PostTeaser's own hero image.
+/* Clips and rounds the image itself (top corners only, like PostTeaser's
+   own .os-card__hero-image) — the popup shell (.mapboxgl-popup-content in
+   pages/map.vue) is overflow: visible for this popover specifically, so the
+   ribbon's folded-corner triangle below can poke out past this box instead
+   of being clipped away with it.
    Unlike PostTeaser (which lets the image keep its own aspect ratio at
-   640px wide), this popover has a hard 40vh height budget shared with the
+   640px wide), this popover has a hard height budget shared with the
    title/location/date below it — a tall portrait or square photo at 280px
    wide would otherwise eat that whole budget and push the actual event
    info out of view. Fixed height + object-fit: cover keeps the hero-image
    look without that risk. */
 .image-wrapper {
   height: 140px;
+  overflow: hidden;
+  border-radius: var(--border-radius-x-large) var(--border-radius-x-large) 0 0;
 }
 
 .image-wrapper .image {

@@ -604,14 +604,14 @@ export default {
 
       // create a popup, but don't add it to the map yet
       this.markers.popup = new mapboxgl.Popup({
-        closeButton: true,
+        closeButton: false,
         closeOnClick: true,
         maxWidth: '320px',
       })
-      // Fires on the close button, clicking elsewhere on the map
-      // (closeOnClick above), or Escape — not just our own explicit
-      // .remove() calls in showPopup() — so this is the one place that
-      // reliably catches every way the popup can close.
+      // Fires on clicking elsewhere on the map (closeOnClick above) or
+      // Escape — not just our own explicit .remove() calls in showPopup()
+      // — so this is the one place that reliably catches every way the
+      // popup can close.
       this.markers.popup.on('close', () => this.destroyPopupComponents())
 
       // Desktop: show popup on hover
@@ -1149,14 +1149,20 @@ export default {
 
 /* The event popover renders its own edge-to-edge hero image (PostTeaser
    style) — it needs to reach this container's own rounded corners, so its
-   ambient 10px padding has to get out of the way. overflow: hidden above
-   still clips the image to whatever corner radius is in effect.
+   ambient 10px padding has to get out of the way.
+   overflow is switched to visible (like PostTeaser's own .os-card) instead
+   of hidden: the image clips itself (see .image-wrapper in
+   MapEventPopover.vue), same split PostTeaser uses between its card
+   (visible) and its hero-image wrapper (hidden) — that's what lets the
+   ribbon's folded-corner triangle poke out past the image's edge instead
+   of being clipped away by this container.
    It also gets a taller budget than the plain 40vh other popover types
    use: its fixed-height image plus PostTeaser-matching padding around the
    avatar/title/location/date content need more room than a compact
    user/group card does. */
 .mapboxgl-popup-content:has(.map-event-popover) {
   padding: 0;
+  overflow: visible;
   max-height: 80vh;
 }
 
@@ -1169,12 +1175,7 @@ export default {
 
 .mapboxgl-popup-content:has(.map-event-popover) .map-popup-container {
   max-height: 80vh;
-}
-
-.mapboxgl-popup-close-button {
-  font-size: var(--font-size-large);
-  padding: 2px 6px;
-  z-index: 1;
+  overflow: visible;
 }
 
 .map-popup-header {

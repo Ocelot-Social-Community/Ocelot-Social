@@ -554,7 +554,7 @@ describe('map', () => {
 
       it('creates popup', () => {
         expect(mapboxgl.Popup).toHaveBeenCalledWith({
-          closeButton: true,
+          closeButton: false,
           closeOnClick: true,
           maxWidth: '320px',
         })
