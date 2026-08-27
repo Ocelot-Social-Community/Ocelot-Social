@@ -16,6 +16,8 @@
     "docs:api": "yarn run schema:print && spectaql spectaql.yml",
     "lint": "eslint --max-warnings 0 .",
     "test": "cross-env NODE_ENV=test NODE_OPTIONS=--max-old-space-size=8192 jest --runInBand --coverage --forceExit --detectOpenHandles",
+    "db:schema:check": "tsx src/db/schema/run-audit.ts check",
+    "db:schema:apply": "tsx src/db/schema/run-audit.ts apply",
     "db:reset": "tsx src/db/reset.ts",
     "db:reset:withmigrations": "tsx src/db/reset-with-migrations.ts",
     "db:seed": "tsx --require ./src/graphql/gql-register.ts src/db/seed.ts",
