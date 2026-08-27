@@ -17,9 +17,6 @@
         :max-pitch="60"
         @load="onMapLoad"
       >
-        <MglFullscreenControl />
-        <MglNavigationControl position="top-right" />
-        <MglGeolocateControl position="top-right" />
         <MglScaleControl />
         <div class="map-legend" :class="{ 'map-legend--open': legendOpen }">
           <button
@@ -372,6 +369,18 @@ export default {
       // set the default atmosphere style
       // this.map.setFog({}) // the package is probably to old, because of Vue2: https://docs.mapbox.com/mapbox-gl-js/example/globe/
 
+      // Zoom/fullscreen/geolocate added imperatively (not as declarative
+      // <Mgl*Control> children) so their order in the top-right stack is
+      // deterministic relative to the geocoder and style switcher added
+      // below — mapbox-gl stacks same-corner controls in add order, and the
+      // three declarative components used to mount independently of (and
+      // sometimes after) this method, making the final order a race. This
+      // now matches OsLocationMap's own control order (zoom → fullscreen →
+      // geolocate → style switcher).
+      this.map.addControl(new mapboxgl.NavigationControl(), 'top-right')
+      this.map.addControl(new mapboxgl.FullscreenControl(), 'top-right')
+      this.map.addControl(new mapboxgl.GeolocateControl(), 'top-right')
+
       this.map.on('style.load', (value) => {
         // Triggered when `setStyle` is called.
         this.markers.isImagesLoaded = false
@@ -472,6 +481,9 @@ export default {
           }
         },
       }
+      // Added last (see the NavigationControl/FullscreenControl/
+      // GeolocateControl comment above) so it lands at the bottom of the
+      // top-right stack.
       this.map.addControl(styleSwitcher, 'top-right')
 
       // create a popup, but don't add it to the map yet

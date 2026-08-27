@@ -26,6 +26,7 @@ jest.mock('mapbox-gl', () => {
   }
   return {
     accessToken: null,
+    FullscreenControl: jest.fn(),
     GeolocateControl: jest.fn(),
     Map: jest.fn(() => ({
       addControl: jest.fn(),
