@@ -49,15 +49,25 @@ export const EMAIL = `^[^@${WHITESPACE}]+@[^@.${WHITESPACE}]+([.][^@.${WHITESPAC
 /**
  * The address inside a `mailto:` — deliberately NOT the same rule as EMAIL.
  *
- * `?` opens the query part of a mailto url and `,` separates recipients, so neither can be
- * part of the address here. On its own an address may contain both: RFC 5322 puts `?` in
- * atext, and EMAIL accordingly allows it. The two rules answer different questions — EMAIL
- * asks whether a string is an address, this asks where an address ENDS.
+ * `?` opens the query part of a mailto url, `#` opens its fragment and `,` separates
+ * recipients, so none of them can be part of the address here. On its own an address may carry
+ * them: RFC 5322 puts `?` and `#` in atext, and EMAIL accordingly allows both. The two rules
+ * answer different questions — EMAIL asks whether a string is an address, this asks where an
+ * address ENDS.
  *
  * That boundary is the whole point. `mailto:someone@example.org?bcc=elsewhere@example.tld`
  * is a valid mailto, and clicking it opens a composer with a recipient the reader never saw;
  * `?subject=` and `?body=` pre-fill a message they never wrote. A social-media link publishes
  * a way to REACH someone, so it carries an address and nothing else.
+ *
+ * `#` is the same boundary and was missed at first, which made the two readers of this rule
+ * disagree. A url parser splits at it: `mailto:alice#fragment@example.org` has `alice` as its
+ * path and `#fragment@example.org` as its fragment, so the webapp sees no address at all and
+ * drops the link, while this pattern — matching the string as a whole — accepted it. Three
+ * values diverged that way, all of them silently: stored happily, never rendered. Excluding it
+ * from the local part alone would have swapped them for a divergence in the other direction, on
+ * `mailto:alice@example.org#frag`; it is excluded from both classes, and the webapp refuses a
+ * `#` in a mailto for the same reason it refuses a `?`.
  *
  * `%` is excluded so that this rule and the webapp's read the same characters. A url may
  * percent-encode any of them, and the two sides then disagree about what they are looking at:
@@ -70,7 +80,7 @@ export const EMAIL = `^[^@${WHITESPACE}]+@[^@.${WHITESPACE}]+([.][^@.${WHITESPAC
  * octets at all. Nothing is lost: every character an address may legitimately carry here can
  * be written literally, and the ones that cannot are the ones this rule already refuses.
  */
-const MAILTO_ADDRESS = `[^@,?%${WHITESPACE}]+@[^@.,?%${WHITESPACE}]+([.][^@.,?%${WHITESPACE}]+)+`
+const MAILTO_ADDRESS = `[^@,?#%${WHITESPACE}]+@[^@.,?#%${WHITESPACE}]+([.][^@.,?#%${WHITESPACE}]+)+`
 
 /**
  * A url this application will put in an `href`: `https://example.org/x`, `http://example.org`,

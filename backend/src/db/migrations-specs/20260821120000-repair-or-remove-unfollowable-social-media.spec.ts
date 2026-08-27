@@ -66,6 +66,23 @@ describe('repair', () => {
   })
 
   it.each([
+    ['mailto:a@example.org#frag', 'mailto:a@example.org'],
+    ['mailto:a@example.org?subject=Hi#frag', 'mailto:a@example.org'],
+  ])('drops the fragment of %j', (url, expected) => {
+    // A fragment ends an address exactly as a query does. Cutting at `?` alone left these to be
+    // deleted rather than repaired, for a part of the value that carries no meaning in a mailto.
+    expect(repair(url)).toBe(expected)
+  })
+
+  it('removes a mailto whose address is split by a fragment', () => {
+    // `mailto:alice#fragment@example.org` has `alice` as its path and the rest as its fragment,
+    // so there is no address before the boundary and nothing to repair it into. It used to be
+    // accepted by the declaration and silently dropped by the webapp, which is the divergence
+    // that put `#` into MAILTO_ADDRESS in the first place.
+    expect(repair('mailto:alice#fragment@example.org')).toBeNull()
+  })
+
+  it.each([
     ['mailto:someone@example%2Eorg', 'mailto:someone@example.org'],
     ['mailto:some%2Bone@example.org', 'mailto:some+one@example.org'],
   ])('writes %j back decoded', (url, expected) => {

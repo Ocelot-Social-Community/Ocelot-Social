@@ -147,8 +147,11 @@ export const repair = (value: string): string | null => {
   const candidates: string[] = [trimmed]
 
   if (scheme?.[1].toLowerCase() === 'mailto') {
-    // A mailto carrying more than an address: keep the address, drop the rest.
-    candidates.push(...readings(trimmed.slice('mailto:'.length).split('?')[0]))
+    // A mailto carrying more than an address: keep the address, drop the rest. Both boundaries,
+    // not just `?` — a fragment ends an address the same way a query does, and cutting at only
+    // one of them left `mailto:a@b.org#frag` to be deleted rather than repaired.
+    const address = trimmed.slice('mailto:'.length).split(/[?#]/)[0]
+    candidates.push(...readings(address))
   }
   if (scheme !== null && ['http', 'https'].includes(scheme[1].toLowerCase())) {
     // A link with a password in it: keep the link, drop the password.
