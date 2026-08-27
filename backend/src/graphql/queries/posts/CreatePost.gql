@@ -42,6 +42,8 @@ mutation CreatePost(
       lng
       lat
     }
+    lat
+    lng
     isObservedByMe
     observingUsersCount
     language

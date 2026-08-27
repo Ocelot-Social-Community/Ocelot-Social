@@ -41,5 +41,7 @@ mutation UpdatePost(
       lng
       lat
     }
+    lat
+    lng
   }
 }

@@ -33,6 +33,7 @@ export const validateEventParams = (params) => {
     if (params.eventLocationName) {
       locationName = params.eventLocationName
       if (typeof eventInput.lat === 'number' && typeof eventInput.lng === 'number') {
+        validateEventCoordinates(eventInput.lat, eventInput.lng)
         coordinates = { lat: eventInput.lat, lng: eventInput.lng }
       }
     } else {
@@ -51,6 +52,17 @@ export const validateEventParams = (params) => {
   }
   delete params.eventInput
   return { locationName, coordinates }
+}
+
+const validateEventCoordinates = (lat: number, lng: number) => {
+  if (!Number.isFinite(lat) || lat < -90 || lat > 90) {
+    throw new UserInputError('Event location latitude must be a finite number between -90 and 90!')
+  }
+  if (!Number.isFinite(lng) || lng < -180 || lng > 180) {
+    throw new UserInputError(
+      'Event location longitude must be a finite number between -180 and 180!',
+    )
+  }
 }
 
 const validateEventDate = (dateString) => {

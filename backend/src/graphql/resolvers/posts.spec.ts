@@ -678,6 +678,60 @@ describe('CreatePost', () => {
         })
       })
 
+      describe('event location coordinates are out of range', () => {
+        it('rejects an out-of-range latitude before any reverse-geocoding happens', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: CreatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventLocationName: 'Berlin',
+                  eventVenue: 'Brandenburger Tor',
+                  lat: 90.1,
+                  lng: 13.4,
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event location latitude must be a finite number between -90 and 90!',
+              },
+            ],
+          })
+        })
+
+        it('rejects an out-of-range longitude before any reverse-geocoding happens', async () => {
+          const now = new Date()
+          await expect(
+            mutate({
+              mutation: CreatePost,
+              variables: {
+                ...variables,
+                postType: 'Event',
+                eventInput: {
+                  eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+                  eventLocationName: 'Berlin',
+                  eventVenue: 'Brandenburger Tor',
+                  lat: 52.5,
+                  lng: 200,
+                },
+              },
+            }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Event location longitude must be a finite number between -180 and 180!',
+              },
+            ],
+          })
+        })
+      })
+
       describe('valid event input without location', () => {
         it('has label "Event" set', async () => {
           const now = new Date()
@@ -755,8 +809,14 @@ describe('CreatePost', () => {
                   // Hamburg's city center, not this specific address.
                   eventLocationName: 'Hamburg',
                   eventVenue: 'Rathaus',
-                  lat: 53.551311,
-                  lng: 9.993852,
+                  // A few metres off "Plan 6, 20095 Hamburg"'s own registered
+                  // point (53.55144, 9.994072) — reverse-geocoding still
+                  // matches that address, but its center differs from this
+                  // input, so the assertions below can tell apart "the exact
+                  // point picked" (post.lat/lng) from "the matched address's
+                  // own point" (eventLocation.lat/lng).
+                  lat: 53.5514,
+                  lng: 9.994,
                 },
               },
             }),
@@ -766,9 +826,13 @@ describe('CreatePost', () => {
                 postType: ['Event'],
                 eventLocationName: 'Hamburg',
                 eventVenue: 'Rathaus',
+                // The exact point picked — not the matched address's own
+                // registered point (asserted separately below).
+                lat: 53.5514,
+                lng: 9.994,
                 eventLocation: {
-                  lat: 53.551311,
-                  lng: 9.993852,
+                  lat: 53.55144,
+                  lng: 9.994072,
                 },
               },
             },
@@ -1055,8 +1119,14 @@ describe('UpdatePost', () => {
                   // Hamburg's city center, not this specific address.
                   eventLocationName: 'Hamburg',
                   eventVenue: 'Rathaus',
-                  lat: 53.551311,
-                  lng: 9.993852,
+                  // A few metres off "Plan 6, 20095 Hamburg"'s own registered
+                  // point (53.55144, 9.994072) — reverse-geocoding still
+                  // matches that address, but its center differs from this
+                  // input, so the assertions below can tell apart "the exact
+                  // point picked" (post.lat/lng) from "the matched address's
+                  // own point" (eventLocation.lat/lng).
+                  lat: 53.5514,
+                  lng: 9.994,
                 },
               },
             }),
@@ -1066,9 +1136,13 @@ describe('UpdatePost', () => {
                 postType: ['Event'],
                 eventLocationName: 'Hamburg',
                 eventVenue: 'Rathaus',
+                // The exact point picked — not the matched address's own
+                // registered point (asserted separately below).
+                lat: 53.5514,
+                lng: 9.994,
                 eventLocation: {
-                  lat: 53.551311,
-                  lng: 9.993852,
+                  lat: 53.55144,
+                  lng: 9.994072,
                 },
               },
             },
