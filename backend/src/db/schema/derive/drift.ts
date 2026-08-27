@@ -28,9 +28,16 @@ import type { EntityDefinition } from '@db/schema/types'
  *
  * Not visible on neo4j-community, where `existence: false` means no existence constraint is
  * ever wanted. It appears the moment the profile becomes enterprise or memgraph.
+ *
+ * The two INDEX kinds are separated for the same reason, one step ahead of the same bug. A
+ * plain index and a fulltext index are different objects — different DDL, different capability,
+ * `SHOW INDEXES` reports them as BTREE and FULLTEXT — and nothing stops an entity declaring
+ * both over one property. None does today; the day one does, a single name would let a present
+ * fulltext index answer for a missing plain one, and `unique()` would quietly drop one of the
+ * two from the wanted side as a duplicate.
  */
 export interface SchemaObject {
-  readonly kind: 'unique' | 'exists' | 'index'
+  readonly kind: 'unique' | 'exists' | 'index' | 'fulltext'
   readonly label: string
   readonly properties: readonly string[]
 }
@@ -79,7 +86,7 @@ export const declaredObjects = (
     // is decided once, in the capability table.
     if (capabilitiesFor(profile).fulltext) {
       for (const index of entity.fulltext ?? []) {
-        objects.push({ kind: 'index', label: entity.label, properties: index.properties })
+        objects.push({ kind: 'fulltext', label: entity.label, properties: index.properties })
       }
     }
   }
@@ -106,7 +113,7 @@ export const inexpressibleObjects = (
   }
   return entities.flatMap((entity) =>
     (entity.fulltext ?? []).map((index): SchemaObject => ({
-      kind: 'index',
+      kind: 'fulltext',
       label: entity.label,
       properties: index.properties,
     })),
@@ -149,6 +156,7 @@ const NAMES: Record<SchemaObject['kind'], string> = {
   unique: 'unique constraint',
   exists: 'existence constraint',
   index: 'index',
+  fulltext: 'fulltext index',
 }
 
 /** Human-readable one-liner, used by the CLI and by the failure messages. */

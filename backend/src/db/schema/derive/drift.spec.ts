@@ -1,4 +1,5 @@
 import { entities, Role, User } from '@db/schema/index'
+import { defineEntity } from '@db/schema/types'
 
 import {
   compareSchemaObjects,
@@ -42,9 +43,9 @@ describe('declaredObjects', () => {
     })
   })
 
-  it('lists fulltext indices by their property set', () => {
+  it('lists fulltext indices by their property set, under their own kind', () => {
     expect(declaredObjects([User], 'neo4j-community')).toContainEqual({
-      kind: 'index',
+      kind: 'fulltext',
       label: 'User',
       properties: ['name', 'slug'],
     })
@@ -57,7 +58,7 @@ describe('declaredObjects', () => {
     // exit code, `check memgraph` against a database without it could never come back clean.
     const declared = declaredObjects([User], 'memgraph')
     expect(declared).not.toContainEqual({
-      kind: 'index',
+      kind: 'fulltext',
       label: 'User',
       properties: ['name', 'slug'],
     })
@@ -85,7 +86,7 @@ describe('declaredObjects', () => {
 })
 
 describe('inexpressibleObjects', () => {
-  const userFulltext = { kind: 'index' as const, label: 'User', properties: ['name', 'slug'] }
+  const userFulltext = { kind: 'fulltext' as const, label: 'User', properties: ['name', 'slug'] }
 
   it('names what a profile cannot create, so it is not read as surplus either', () => {
     // The other half of the same report. `check memgraph` against the RUNNING Neo4j — the
@@ -203,5 +204,42 @@ describe('the two constraint kinds are told apart', () => {
       [constraint('User', 'id'), constraint('User', 'id')],
     )
     expect(presentTwice.surplus).toEqual([constraint('User', 'id')])
+  })
+})
+
+describe('the two index kinds are told apart', () => {
+  // Nothing declares both over one property today. The day something does, one name would let a
+  // present FULLTEXT index answer for a missing BTREE one — the index half of the mistake the
+  // constraint kinds already made, and cheaper to prevent than to find later.
+  const Both = defineEntity({
+    label: 'Both',
+    properties: { id: { type: 'string' } },
+    required: [],
+    indexed: ['id'],
+    fulltext: [{ name: 'both_fulltext', properties: ['id'] }],
+  })
+
+  it('wants a plain index and a fulltext index over the same property as two objects', () => {
+    expect(declaredObjects([Both], 'neo4j-community')).toEqual([
+      { kind: 'index', label: 'Both', properties: ['id'] },
+      { kind: 'fulltext', label: 'Both', properties: ['id'] },
+    ])
+  })
+
+  it('does not let a fulltext index answer for a missing plain one', () => {
+    const report = compareSchemaObjects(declaredObjects([Both], 'neo4j-community'), [
+      { kind: 'fulltext', label: 'Both', properties: ['id'] },
+    ])
+    expect(report.missing).toEqual([{ kind: 'index', label: 'Both', properties: ['id'] }])
+    expect(report.surplus).toEqual([])
+  })
+
+  it('reads them differently, because an operator has to know which to create', () => {
+    expect(describeSchemaObject({ kind: 'index', label: 'Both', properties: ['id'] })).toBe(
+      'index Both(id)',
+    )
+    expect(describeSchemaObject({ kind: 'fulltext', label: 'Both', properties: ['id'] })).toBe(
+      'fulltext index Both(id)',
+    )
   })
 })

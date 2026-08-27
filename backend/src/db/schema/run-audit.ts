@@ -70,6 +70,16 @@ const heading = (text: string): void => {
 const constraintKind = (type: string): SchemaObject['kind'] =>
   type.includes('EXISTENCE') ? 'exists' : 'unique'
 
+/**
+ * Which of our two index kinds a `SHOW INDEXES` row is.
+ *
+ * BTREE and FULLTEXT are different objects with different DDL, and the column was read only to
+ * skip LOOKUP rows. Filed under one name, a present fulltext index would answer for a missing
+ * plain one over the same property — the index half of the mistake constraintKind describes.
+ */
+const indexKind = (type: string): SchemaObject['kind'] =>
+  type === 'FULLTEXT' ? 'fulltext' : 'index'
+
 /** What `SHOW CONSTRAINTS` / `SHOW INDEXES` report, mapped onto the comparison shape. */
 const presentObjects = async (session: Session): Promise<SchemaObject[]> => {
   const constraints = await session.run('SHOW CONSTRAINTS')
@@ -91,7 +101,7 @@ const presentObjects = async (session: Session): Promise<SchemaObject[]> => {
           String(record.get('type')) !== 'LOOKUP',
       )
       .map((record): SchemaObject => ({
-        kind: 'index',
+        kind: indexKind(String(record.get('type'))),
         label: (record.get('labelsOrTypes') as string[])[0],
         properties: record.get('properties') as string[],
       })),
