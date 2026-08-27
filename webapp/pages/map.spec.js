@@ -396,6 +396,40 @@ describe('map', () => {
         expect(styleSwitcherCall).toBeTruthy()
       })
 
+      it('registers every top-right control in the documented order: geocoder → pin tool → zoom → fullscreen → geolocate → style switcher', () => {
+        const topRightControls = mapAddControlMock.mock.calls
+          .filter((call) => call[1] === 'top-right')
+          .map((call) => call[0])
+
+        const indexOf = (predicate) => topRightControls.findIndex(predicate)
+        const geocoderIndex = indexOf((control) => control === wrapper.vm.geocoder)
+        const pinToolIndex = indexOf(
+          (control) => control.onAdd && control.onAdd().className.includes('map-event-pin-tool'),
+        )
+        const navigationIndex = indexOf(
+          (control) => control === mapboxgl.NavigationControl.mock.instances[0],
+        )
+        const fullscreenIndex = indexOf(
+          (control) => control === mapboxgl.FullscreenControl.mock.instances[0],
+        )
+        const geolocateIndex = indexOf(
+          (control) => control === mapboxgl.GeolocateControl.mock.instances[0],
+        )
+        const styleSwitcherIndex = indexOf(
+          (control) => control.onAdd && control.onAdd().className.includes('map-style-switcher'),
+        )
+
+        // Each found (not -1), then strictly ascending — the actual visual
+        // top-to-bottom order in the corner (mapbox-gl stacks same-corner
+        // controls in add order).
+        expect(geocoderIndex).toBeGreaterThanOrEqual(0)
+        expect(pinToolIndex).toBeGreaterThan(geocoderIndex)
+        expect(navigationIndex).toBeGreaterThan(pinToolIndex)
+        expect(fullscreenIndex).toBeGreaterThan(navigationIndex)
+        expect(geolocateIndex).toBeGreaterThan(fullscreenIndex)
+        expect(styleSwitcherIndex).toBeGreaterThan(geolocateIndex)
+      })
+
       describe('event pin tool control', () => {
         let container, toggle
 
