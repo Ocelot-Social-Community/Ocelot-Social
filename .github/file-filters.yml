@@ -4,14 +4,37 @@ ui: &ui
   - '.github/workflows/ui-*.yml'
   - 'packages/ui/**/*'
 
+# What OTHER packages consume. `backend` and `webapp` reference this, meaning "the branding package
+# changed, so the thing that depends on it may break". Keep it to the package itself — anything added
+# here is inherited by those heavy pipelines.
 branding: &branding
+  - '.github/file-filters.yml'
   - '.github/workflows/branding-*.yml'
   - 'packages/branding/**/*'
 
+# What can break the branding package's OWN build and tests. A superset of the above, and the filter
+# the branding-*.yml workflows gate on.
+#
+# The extra entry is the direction that is easy to miss: the dependency runs both ways. The framework
+# token snapshot (src/frameworkTokens.generated.ts) is generated FROM the webapp's stylesheets —
+# scripts/theme-catalog.ts reads ../../../webapp/assets/css — and framework-tokens.spec.ts fails once
+# the two drift apart. Without it a stylesheet-only change skipped the branding jobs entirely, which
+# is how the map-marker tokens of #10025 merged green with a stale snapshot.
+#
+# Deliberately NOT folded into `branding` above: `backend` inherits that anchor, so a webapp CSS
+# change would then build the Neo4j and backend images for a stylesheet the backend never reads.
+branding-inputs: &branding-inputs
+  - *branding
+  - 'webapp/assets/css/**/*'
+
 maintenance: &maintenance
+  - '.github/file-filters.yml'
   - '.github/workflows/maintenance-*.yml'
   - 'maintenance/**/*'
   - *ui
+  # Same shape as the branding case above: app/locales.spec.ts asserts that the maintenance page
+  # offers exactly the languages the webapp does, so ADDING a webapp locale breaks it here.
+  - 'webapp/locales/**/*'
 
 backend: &backend
   - '.github/workflows/test-backend.yml'
@@ -20,6 +43,24 @@ backend: &backend
   - 'package.json'
   # backend consumes @ocelot-social/branding (file: dep) → a branding change can break it
   - *branding
+
+# The third cross-package read, and the one the `backend` filter above cannot carry.
+# backend/src/graphql/webappQueries.spec.ts validates every gql`` template the WEBAPP sends against
+# the backend schema, so either side can break it — but `webapp/**/*` in `backend` would build the
+# Neo4j and backend images for every webapp pull request, which is the commonest kind there is.
+# These two specs need no database and no image, so they get a job of their own (test-schema-
+# contract.yml) and this filter, listing exactly the directories the specs read (SEARCH_DIRS) plus
+# the schema they are checked against.
+schema-contract: &schema-contract
+  - '.github/file-filters.yml'
+  - '.github/workflows/test-schema-contract.yml'
+  - 'backend/src/graphql/**/*'
+  - 'webapp/graphql/**/*'
+  - 'webapp/components/**/*'
+  - 'webapp/pages/**/*'
+  - 'webapp/store/**/*'
+  - 'webapp/mixins/**/*'
+  - 'webapp/composables/**/*'
 
 docker: &docker
   - 'docker-compose.*'
