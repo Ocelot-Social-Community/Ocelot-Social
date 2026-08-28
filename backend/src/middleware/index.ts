@@ -7,7 +7,6 @@ import CONFIG from '@config/index'
 import brandingMiddlewares from './branding/brandingMiddlewares'
 import categories from './categories'
 import chatMiddleware from './chatMiddleware'
-import excerpt from './excerptMiddleware'
 import hashtags from './hashtags/hashtagsMiddleware'
 import includedFields from './includedFieldsMiddleware'
 import languages from './languages/languages'
@@ -70,8 +69,7 @@ addMiddleware({
 })
 addMiddleware({ name: 'sluggify', middleware: sluggify, position: { after: 'userInteractions' } })
 addMiddleware({ name: 'languages', middleware: languages, position: { after: 'sluggify' } })
-addMiddleware({ name: 'excerpt', middleware: excerpt, position: { after: 'languages' } })
-addMiddleware({ name: 'login', middleware: login, position: { after: 'excerpt' } })
+addMiddleware({ name: 'login', middleware: login, position: { after: 'languages' } })
 addMiddleware({ name: 'notifications', middleware: notifications, position: { after: 'login' } })
 addMiddleware({ name: 'hashtags', middleware: hashtags, position: { after: 'notifications' } })
 addMiddleware({ name: 'softDelete', middleware: softDelete, position: { after: 'hashtags' } })

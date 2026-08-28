@@ -426,13 +426,6 @@ Factory.define('group')
     // neode ERROR_VALIDATION).
     return slug || toSlug(name)
   })
-  .attr(
-    'descriptionExcerpt',
-    ['descriptionExcerpt', 'description'],
-    (descriptionExcerpt, description) => {
-      return descriptionExcerpt || description
-    },
-  )
   .after(async (buildObject, options) => {
     const [group, owner] = await Promise.all([createNode(Group, buildObject), options.owner])
     const session = driver.session()

@@ -29,7 +29,6 @@ mutation CreateGroup(
     deleted
     about
     description
-    descriptionExcerpt
     groupType
     actionRadius
     categories {

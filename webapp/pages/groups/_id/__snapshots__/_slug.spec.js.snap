@@ -638,8 +638,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
-              class="content hyphenate-text description-clamp description-clamp--collapsed description-clamp--faded"
-              style="--group-description-lines: 8;"
+              class="content hyphenate-text description-clamp description-clamp--faded"
+              style="max-height: calc(8 * var(--line-height-base, 1.3) * 1em); overflow: hidden;"
             >
               <div>
                 <div>
@@ -1211,8 +1211,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
-              class="content hyphenate-text description-clamp description-clamp--collapsed description-clamp--faded"
-              style="--group-description-lines: 8;"
+              class="content hyphenate-text description-clamp description-clamp--faded"
+              style="max-height: calc(8 * var(--line-height-base, 1.3) * 1em); overflow: hidden;"
             >
               <div>
                 <div>
@@ -1769,8 +1769,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
-              class="content hyphenate-text description-clamp description-clamp--collapsed description-clamp--faded"
-              style="--group-description-lines: 8;"
+              class="content hyphenate-text description-clamp description-clamp--faded"
+              style="max-height: calc(8 * var(--line-height-base, 1.3) * 1em); overflow: hidden;"
             >
               <div>
                 <div>
@@ -2517,8 +2517,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
-              class="content hyphenate-text description-clamp description-clamp--collapsed description-clamp--faded"
-              style="--group-description-lines: 8;"
+              class="content hyphenate-text description-clamp description-clamp--faded"
+              style="max-height: calc(8 * var(--line-height-base, 1.3) * 1em); overflow: hidden;"
             >
               <div>
                 <div>
@@ -3308,8 +3308,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
-              class="content hyphenate-text description-clamp description-clamp--collapsed description-clamp--faded"
-              style="--group-description-lines: 8;"
+              class="content hyphenate-text description-clamp description-clamp--faded"
+              style="max-height: calc(8 * var(--line-height-base, 1.3) * 1em); overflow: hidden;"
             >
               <div>
                 <div>
@@ -3821,8 +3821,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
-              class="content hyphenate-text description-clamp description-clamp--collapsed description-clamp--faded"
-              style="--group-description-lines: 8;"
+              class="content hyphenate-text description-clamp description-clamp--faded"
+              style="max-height: calc(8 * var(--line-height-base, 1.3) * 1em); overflow: hidden;"
             >
               <div>
                 <div>
@@ -4319,8 +4319,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
-              class="content hyphenate-text description-clamp description-clamp--collapsed description-clamp--faded"
-              style="--group-description-lines: 8;"
+              class="content hyphenate-text description-clamp description-clamp--faded"
+              style="max-height: calc(8 * var(--line-height-base, 1.3) * 1em); overflow: hidden;"
             >
               <div>
                 <div>
@@ -4979,8 +4979,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
-              class="content hyphenate-text description-clamp description-clamp--collapsed description-clamp--faded"
-              style="--group-description-lines: 8;"
+              class="content hyphenate-text description-clamp description-clamp--faded"
+              style="max-height: calc(8 * var(--line-height-base, 1.3) * 1em); overflow: hidden;"
             >
               <div>
                 <div>
@@ -5825,8 +5825,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
-              class="content hyphenate-text description-clamp description-clamp--collapsed description-clamp--faded"
-              style="--group-description-lines: 8;"
+              class="content hyphenate-text description-clamp description-clamp--faded"
+              style="max-height: calc(8 * var(--line-height-base, 1.3) * 1em); overflow: hidden;"
             >
               <div>
                 <div>
@@ -6624,8 +6624,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
-              class="content hyphenate-text description-clamp description-clamp--collapsed description-clamp--faded"
-              style="--group-description-lines: 8;"
+              class="content hyphenate-text description-clamp description-clamp--faded"
+              style="max-height: calc(8 * var(--line-height-base, 1.3) * 1em); overflow: hidden;"
             >
               <div>
                 <div>

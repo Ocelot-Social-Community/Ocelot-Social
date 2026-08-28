@@ -237,11 +237,8 @@
             <div
               ref="descriptionClamp"
               class="content hyphenate-text description-clamp"
-              :class="{
-                'description-clamp--collapsed': isDescriptionCollapsed,
-                'description-clamp--faded': isDescriptionCollapsed && descriptionOverflows,
-              }"
-              :style="{ '--group-description-lines': descriptionClampHeight }"
+              :class="{ 'description-clamp--faded': isDescriptionCollapsed && descriptionOverflows }"
+              :style="descriptionClampStyle"
             >
               <!-- Both states go through the same tiptap viewer so links, hashtags and
                    mentions render identically. ContentViewer builds its editor in
@@ -480,13 +477,20 @@ export default {
       const { slug } = this.group || {}
       return slug
     },
-    // Only the line COUNT crosses into CSS; the height itself is calc()'d there from
-    // --line-height-base, so the line height stays single-sourced in the design tokens.
-    // `descriptionExcerpt` is deliberately unused on this page — it is a character cut,
-    // which is exactly what made the preview height depend on the markup. It still
-    // feeds the group teaser and search.
-    descriptionClampHeight() {
-      return String(branding.group.descriptionCollapsedLines)
+    // Inline rather than in a class, because this has to hold on the FIRST paint. The
+    // page's scoped stylesheet is not necessarily there yet — under Nuxt's dev server
+    // it is injected by JS after hydration — and until it arrives a class-based cap
+    // does nothing, so the full description flashed up and then collapsed. An inline
+    // style ships inside the server-rendered HTML and applies before any stylesheet.
+    //
+    // Only the line COUNT is ours; the line height itself comes from the design tokens,
+    // with the token's own value as the fallback for the same first-paint reason.
+    descriptionClampStyle() {
+      if (!this.isDescriptionCollapsed) return {}
+      return {
+        maxHeight: `calc(${branding.group.descriptionCollapsedLines} * var(--line-height-base, 1.3) * 1em)`,
+        overflow: 'hidden',
+      }
     },
     isGroupOwner() {
       return this.group ? this.group.myRole === 'owner' : false
@@ -991,16 +995,11 @@ export default {
   }
 }
 
-/* Collapsed preview: a fixed number of text lines, so the card is the same height
-   whether the description opens with a heading and a list or with a paragraph.
-   The line count comes from branding (group.descriptionCollapsedLines) via the
-   inline --group-description-lines; the line height stays in the design tokens. */
-.description-clamp--collapsed {
-  max-height: calc(var(--group-description-lines) * var(--line-height-base) * 1em);
-  overflow: hidden;
-}
+/* The collapsed height itself is an inline style (see descriptionClampStyle) so it
+   survives the first paint. Only the fade lives here — it has no first-paint job,
+   because it depends on a measurement that a browser can only make after hydration.
 
-/* Fades the last lines out instead of slicing through them. A mask rather than a
+   Fades the last lines out instead of slicing through them. A mask rather than a
    gradient overlay, so it does not have to know the card's background colour.
    Gated on the measured overflow: a description that ends well above the cap must
    not fade out its own last line for no reason. */

@@ -23,7 +23,6 @@
     "group.descriptionMinLength: number",
     "group.nameLengthMax: number",
     "group.nameLengthMin: number",
-    "group.teaserDescriptionLines: number",
     "headerMenu.customButton: object",
     "headerMenu.menu: array",
     "links.footerOrder: array",

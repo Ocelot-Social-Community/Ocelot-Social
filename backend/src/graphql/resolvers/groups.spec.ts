@@ -342,7 +342,6 @@ describe('in mode', () => {
                 slug: 'the-group',
                 about: 'We will change the world!',
                 description: 'Some description' + descriptionAdditional100,
-                descriptionExcerpt: 'Some description' + descriptionAdditional100,
                 groupType: 'public',
                 actionRadius: 'regional',
                 locationName: 'Hamburg, Germany',
@@ -616,7 +615,7 @@ describe('in mode', () => {
         describe('query groups', () => {
           describe('in general finds only listed groups – no hidden groups where user is none or pending member', () => {
             describe('without any filters', () => {
-              it('finds all listed groups – including the set descriptionExcerpts and locations', async () => {
+              it('finds all listed groups – including the set descriptions and locations', async () => {
                 const result = await query({ query: groupQuery, variables: {} })
                 expect(result).toMatchObject({
                   data: {
@@ -624,7 +623,7 @@ describe('in mode', () => {
                       expect.objectContaining({
                         id: 'my-group',
                         slug: 'the-best-group',
-                        descriptionExcerpt: 'Some description' + descriptionAdditional100,
+                        description: 'Some description' + descriptionAdditional100,
                         locationName: 'Hamburg, Germany',
                         location: expect.objectContaining({
                           name: 'Hamburg',
@@ -634,7 +633,7 @@ describe('in mode', () => {
                       expect.objectContaining({
                         id: 'others-group',
                         slug: 'uninteresting-group',
-                        descriptionExcerpt: 'We love it like it is!?' + descriptionAdditional100,
+                        description: 'We love it like it is!?' + descriptionAdditional100,
                         locationName: null,
                         location: null,
                         myRole: null,
@@ -642,7 +641,7 @@ describe('in mode', () => {
                       expect.objectContaining({
                         id: 'third-hidden-group',
                         slug: 'third-investigative-journalism-group',
-                        descriptionExcerpt: 'We research …' + descriptionAdditional100,
+                        description: 'We research …' + descriptionAdditional100,
                         myRole: 'usual',
                         locationName: null,
                         location: null,
@@ -3203,8 +3202,6 @@ describe('in mode', () => {
                       slug: 'the-best-group', // changing the slug is tested in the slugifyMiddleware
                       about: 'We will change the land!',
                       description: 'Some country relevant description' + descriptionAdditional100,
-                      descriptionExcerpt:
-                        'Some country relevant description' + descriptionAdditional100,
                       actionRadius: 'national',
                       // avatar, // test this as result
                       myRole: 'owner',

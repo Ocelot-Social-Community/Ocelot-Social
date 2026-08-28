@@ -49,7 +49,7 @@ describe('GroupTeaser', () => {
     })
   }
 
-  const description = () => wrapper.find('.teaser-clamp')
+  const description = () => wrapper.find('.content')
 
   beforeEach(() => {
     wrapper = Wrapper()
@@ -69,12 +69,21 @@ describe('GroupTeaser', () => {
     expect(description().text()).toBe('Read the handbook and the FAQ before joining.')
   })
 
-  // A character-cut excerpt renders at a different height for every group, which is
-  // what made the rows of the card grid ragged.
-  it('reserves the branded number of lines for the description', () => {
-    expect(description().element.style.getPropertyValue('--group-teaser-lines')).toBe(
-      String(branding.group.teaserDescriptionLines),
-    )
+  // The cut used to be made by the backend and stored as descriptionExcerpt. It now
+  // happens here, with the same function at the same branded length.
+  it('cuts a long description to the branded length and marks the cut', () => {
+    const long = `<p>${'word '.repeat(200).trim()}</p>`
+    wrapper = Wrapper({ description: long })
+
+    const text = description().text()
+    expect(text.length).toBeLessThan(branding.group.descriptionExcerptLength + 20)
+    expect(text).toMatch(/…$/)
+  })
+
+  it('leaves a description shorter than the limit untouched', () => {
+    wrapper = Wrapper({ description: '<p>Short and sweet.</p>' })
+
+    expect(description().text()).toBe('Short and sweet.')
   })
 
   it('renders nothing for a group without a description', () => {

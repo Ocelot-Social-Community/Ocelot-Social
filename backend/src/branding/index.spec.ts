@@ -13,7 +13,6 @@ describe('branding (shared package)', () => {
 
   it('exposes the migrated backend domains with their default values', () => {
     expect(branding.group.descriptionMinLength).toBe(3)
-    expect(branding.group.descriptionExcerptLength).toBe(250)
     expect(branding.registration.nonceLength).toBe(5)
     expect(branding.registration.inviteCodeLength).toBe(6)
     expect(branding.metadata.applicationName).toBe('ocelot.social')

@@ -17,7 +17,6 @@ interface MockOptions {
 const middlewareModules = [
   './categories',
   './chatMiddleware',
-  './excerptMiddleware',
   './hashtags/hashtagsMiddleware',
   './includedFieldsMiddleware',
   './languages/languages',
@@ -67,10 +66,10 @@ const loadModule = (
 }
 
 describe('default', () => {
-  it('registers the 16 default middlewares', () => {
+  it('registers the 15 default middlewares', () => {
     jest.isolateModules(() => {
       const { getCapturedMiddlewares } = loadModule()
-      expect(getCapturedMiddlewares()).toHaveLength(16)
+      expect(getCapturedMiddlewares()).toHaveLength(15)
     })
   })
 
@@ -97,7 +96,7 @@ describe('default', () => {
       })
       const consoleSpy = jest.spyOn(console, 'log').mockImplementation()
       const middlewares = getCapturedMiddlewares()
-      expect(middlewares).toHaveLength(14)
+      expect(middlewares).toHaveLength(13)
       expect(middlewares).not.toContain(sentryMarker)
       expect(middlewares).not.toContain(xssMarker)
       expect(consoleSpy).toHaveBeenCalledWith('Warning: Disabled "sentry, xss" middleware.')
@@ -114,8 +113,8 @@ describe('addMiddleware', () => {
         const m = { __test: 'appended' }
         mod.addMiddleware({ name: 'test-append', middleware: m, position: 'append' })
         const middlewares = getCapturedMiddlewares()
-        expect(middlewares).toHaveLength(17)
-        expect(middlewares[16]).toBe(m)
+        expect(middlewares).toHaveLength(16)
+        expect(middlewares[15]).toBe(m)
       })
     })
   })
@@ -127,7 +126,7 @@ describe('addMiddleware', () => {
         const m = { __test: 'prepended' }
         mod.addMiddleware({ name: 'test-prepend', middleware: m, position: 'prepend' })
         const middlewares = getCapturedMiddlewares()
-        expect(middlewares).toHaveLength(17)
+        expect(middlewares).toHaveLength(16)
         expect(middlewares[0]).toBe(m)
       })
     })
