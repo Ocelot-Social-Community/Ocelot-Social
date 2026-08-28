@@ -74,10 +74,21 @@ export default ({ app = {} }) => {
     },
     removeLinks: (content) => {
       if (!content) return ''
-      // remove all links from excerpt to prevent issues with the surrounding link.
-      // Lazy quantifiers matter: a greedy `<a.*>(.+)</a>` matches from the first
-      // `<a` to the last `</a>` and swallows everything between two links.
-      let excerpt = content.replace(/<a[^>]*>(.*?)<\/a>/gis, '$1')
+      // Remove all links, so an excerpt can sit inside a surrounding link without
+      // nesting one <a> in another. Two details in the expression, both load-bearing:
+      //
+      // Lazy quantifiers: a greedy `<a.*>(.+)</a>` matches from the FIRST `<a` to the
+      // LAST `</a>` and swallows every character between two links along with them.
+      //
+      // The attribute alternation instead of a plain `[^>]*`: an attribute value may
+      // itself contain `>`, and `[^>]*` ends the tag inside the quotes, leaving the
+      // rest of the attribute in the output as text (`<a title="A > B">x</a>` becomes
+      // ` B">x`). Skipping over quoted runs as a whole keeps it inside the tag. The
+      // three branches cannot match the same first character, so this cannot backtrack
+      // catastrophically. Defence in depth rather than a live bug: sanitize-html
+      // escapes `>` to `&gt;` in every attribute it keeps, so stored content does not
+      // reach here in that shape — but this filter does not get to assume that.
+      let excerpt = content.replace(/<a(?:[^>"']|"[^"]*"|'[^']*')*>(.*?)<\/a>/gis, '$1')
       // do not display content that is only linebreaks
       if (excerpt.replace(/<br>/gim, '').trim() === '') {
         excerpt = ''
