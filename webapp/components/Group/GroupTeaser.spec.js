@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import Vuex from 'vuex'
-import { branding } from '@ocelot-social/branding'
+import { branding, brandingDefaults, setBranding } from '@ocelot-social/branding'
 import GroupTeaser from './GroupTeaser.vue'
 import Filters from '~/plugins/vue-filters'
 
@@ -50,9 +50,16 @@ describe('GroupTeaser', () => {
   }
 
   const description = () => wrapper.find('.content')
+  const renderedDescription = (text) => Wrapper({ description: text }).find('.content').text()
+
+  const longDescription = `<p>${'word '.repeat(200).trim()}</p>`
 
   beforeEach(() => {
     wrapper = Wrapper()
+  })
+
+  afterEach(() => {
+    setBranding(undefined) // the brand config lives on globalThis — reset it
   })
 
   it('renders the group name', () => {
@@ -71,13 +78,31 @@ describe('GroupTeaser', () => {
 
   // The cut used to be made by the backend and stored as descriptionExcerpt. It now
   // happens here, with the same function at the same branded length.
-  it('cuts a long description to the branded length and marks the cut', () => {
-    const long = `<p>${'word '.repeat(200).trim()}</p>`
-    wrapper = Wrapper({ description: long })
+  it('cuts a long description and marks the cut', () => {
+    wrapper = Wrapper({ description: longDescription })
 
     const text = description().text()
     expect(text.length).toBeLessThan(branding.group.descriptionExcerptLength + 20)
     expect(text).toMatch(/…$/)
+  })
+
+  // Pins the length to BRANDING rather than to a constant that happens to equal the
+  // default. Asserted by moving the brand's limit and watching the cut move with it:
+  // a hardcoded 250 in the component produces the identical string both times, and
+  // the inequality is what catches that. Checking that `truncate` was *called* with
+  // the right number would only restate the implementation.
+  it('cuts where the brand says, not at a fixed length', () => {
+    const atDefault = renderedDescription(longDescription)
+
+    setBranding({
+      ...brandingDefaults,
+      group: { ...brandingDefaults.group, descriptionExcerptLength: 40 },
+    })
+    const atForty = renderedDescription(longDescription)
+
+    expect(atForty).not.toBe(atDefault)
+    expect(atDefault.length).toBeGreaterThan(200)
+    expect(atForty.length).toBeLessThan(50)
   })
 
   it('leaves a description shorter than the limit untouched', () => {
