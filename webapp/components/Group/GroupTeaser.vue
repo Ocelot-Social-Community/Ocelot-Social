@@ -26,8 +26,18 @@
         </div>
       </div>
       <!-- TODO: replace editor content with tiptap render view -->
-      <!-- eslint-disable-next-line vue/no-v-html -->
-      <div class="content hyphenate-text" v-html="descriptionExcerpt" />
+      <div class="content hyphenate-text">
+        <!-- A fixed number of lines rather than the character-cut descriptionExcerpt:
+             equally long excerpts render at wildly different heights depending on
+             whether they start with a heading and a list or with a paragraph, and in
+             a grid of cards that difference is what makes the rows ragged. -->
+        <!-- eslint-disable-next-line vue/no-v-html -->
+        <div
+          class="teaser-clamp"
+          :style="{ '--group-teaser-lines': teaserLines }"
+          v-html="descriptionWithoutLinks"
+        />
+      </div>
       <footer class="footer">
         <div>
           <!-- group my role in group -->
@@ -81,6 +91,7 @@
 
 <script>
 import { OsBadge, OsCard, OsIcon } from '@ocelot-social/ui'
+import { branding } from '@ocelot-social/branding'
 import { iconRegistry } from '~/utils/iconRegistry'
 import Category from '~/components/Category'
 import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
@@ -117,8 +128,13 @@ export default {
     },
   },
   computed: {
-    descriptionExcerpt() {
-      return this.$filters.removeLinks(this.group.descriptionExcerpt)
+    // removeLinks stays: the whole card is a <nuxt-link>, and an <a> inside an <a> is
+    // invalid HTML. Only the anchors go — their text is kept.
+    descriptionWithoutLinks() {
+      return this.$filters.removeLinks(this.group.description)
+    },
+    teaserLines() {
+      return String(branding.group.teaserDescriptionLines)
     },
   },
 }
@@ -161,6 +177,16 @@ export default {
   > .content {
     flex-grow: 1;
     margin-bottom: var(--space-small);
+  }
+
+  /* A fixed height, not a cap: the card has no "show more", so every teaser reserves
+     the same space and the grid rows line up. A short description simply leaves the
+     lower part empty — where the fade then has nothing to act on. */
+  .teaser-clamp {
+    height: calc(var(--group-teaser-lines) * var(--line-height-base) * 1em);
+    overflow: hidden;
+    mask-image: linear-gradient(to bottom, black calc(100% - 1.5em), transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 1.5em), transparent 100%);
   }
 
   > .footer {

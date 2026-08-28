@@ -142,8 +142,11 @@ describe('NotificationsTable.vue', () => {
         })
       })
 
-      describe('fallback to descriptionExcerpt when content is empty', () => {
-        it('renders descriptionExcerpt if content is missing', () => {
+      // Groups carry a description rather than content. It used to read the
+      // backend's descriptionExcerpt, which is pointless here: this cell truncates
+      // to 120/180 characters of its own anyway.
+      describe('fallback to description when content is empty', () => {
+        it('renders description if content is missing', () => {
           const fallbackNotification = {
             read: false,
             reason: 'mentioned_in_post',
@@ -153,7 +156,7 @@ describe('NotificationsTable.vue', () => {
               title: 'fallback post',
               slug: 'fallback-post',
               content: '',
-              descriptionExcerpt: 'fallback description text',
+              description: 'fallback description text',
               author: { id: 'u1', slug: 'user', name: 'User' },
             },
           }

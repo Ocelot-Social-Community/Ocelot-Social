@@ -147,6 +147,22 @@ export interface BrandingConfig {
     nameLengthMax: number
     descriptionMinLength: number
     descriptionExcerptLength: number
+    /**
+     * Height of the collapsed group description on the group page, in text lines.
+     *
+     * Deliberately a line count and not a character count like `descriptionExcerptLength`:
+     * the collapsed preview is capped by CSS after layout, so headings and lists no longer
+     * blow up its height the way an equally long run of characters would.
+     */
+    descriptionCollapsedLines: number
+    /**
+     * Height of the description on a group teaser card, in text lines.
+     *
+     * Separate from `descriptionCollapsedLines` because the two surfaces differ: the
+     * group page shows a preview that can be expanded, the teaser is a fixed tile in a
+     * grid whose cards should line up. This one is a fixed height, not a cap.
+     */
+    teaserDescriptionLines: number
   }
   registration: {
     nonceLength: number
