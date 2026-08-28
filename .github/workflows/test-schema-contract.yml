@@ -1,0 +1,85 @@
+name: Schema Contract Test
+
+# The contract between the webapp's GraphQL documents and the backend's schema. Both sides can break
+# it, and until this workflow existed only one of them was watched: the guards live in the backend
+# (backend/src/graphql/webappQueries.spec.ts, webappPostFilters.spec.ts), so a WEBAPP-only pull
+# request skipped them via the `backend` path filter and merged a query the schema does not answer.
+#
+# Kept out of test-backend.yml deliberately. That workflow builds the Neo4j and backend images before
+# it can run anything, and attaching webapp paths to it would pay that price on every webapp pull
+# request — the commonest kind in this repository. These two specs read files and call graphql-js
+# `validate`; they need no database, no image and no services.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+# Same reasoning as the other workflows: one run per workflow and branch, keyed by pull request
+# NUMBER rather than head_ref, so two forks using the same branch name do not cancel each other.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+# pull-requests:read is what dorny/paths-filter needs to list a pull request's changed files via the
+# API — the shallow checkout has no base history to diff against locally.
+permissions:
+  contents: read
+  pull-requests: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  files-changed:
+    name: Detect File Changes
+    runs-on: ubuntu-latest
+    outputs:
+      schema-contract: ${{ steps.changes.outputs.schema-contract }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check for file changes
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        id: changes
+        with:
+          token: ${{ github.token }}
+          filters: .github/file-filters.yml
+
+  schema_contract:
+    name: Webapp queries vs. backend schema
+    if: needs.files-changed.outputs.schema-contract == 'true'
+    needs: files-changed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: 'backend/.nvmrc'
+          cache: 'yarn'
+          cache-dependency-path: 'backend/yarn.lock'
+
+      # @ocelot-social/branding is a `file:../packages/branding` dependency, and yarn copies its
+      # dist/ at install time — so it has to be built BEFORE the install, or the types do not
+      # resolve. Same step, same reason, as in test-backend.yml's lint job.
+      - name: Build @ocelot-social/branding
+        run: cd packages/branding && npm ci && npm run build
+
+      - name: Install backend dependencies
+        run: cd backend && yarn --frozen-lockfile
+
+      - name: Validate the webapp's GraphQL documents against the schema
+        run: |
+          cd backend && yarn jest \
+            src/graphql/webappQueries.spec.ts \
+            src/graphql/webappPostFilters.spec.ts
