@@ -237,7 +237,9 @@
             <div
               ref="descriptionClamp"
               class="content hyphenate-text description-clamp"
-              :class="{ 'description-clamp--faded': isDescriptionCollapsed && descriptionOverflows }"
+              :class="{
+                'description-clamp--faded': isDescriptionCollapsed && descriptionOverflows,
+              }"
               :style="descriptionClampStyle"
             >
               <!-- Both states go through the same tiptap viewer so links, hashtags and
