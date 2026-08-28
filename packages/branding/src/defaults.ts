@@ -25,6 +25,7 @@ export const brandingDefaults: BrandingConfig = {
     nameLengthMax: 50,
     descriptionMinLength: 3,
     descriptionExcerptLength: 250,
+    descriptionCollapsedLines: 8,
   },
   registration: {
     nonceLength: 5,

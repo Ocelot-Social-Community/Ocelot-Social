@@ -81,6 +81,7 @@
 
 <script>
 import { OsBadge, OsCard, OsIcon } from '@ocelot-social/ui'
+import { branding } from '@ocelot-social/branding'
 import { iconRegistry } from '~/utils/iconRegistry'
 import Category from '~/components/Category'
 import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
@@ -117,8 +118,22 @@ export default {
     },
   },
   computed: {
+    // Cut here rather than in the database. This is trunc-html at the same length the
+    // backend's excerptMiddleware used, so the card renders exactly what the stored
+    // descriptionExcerpt used to hold — trailing "…" included — and the excerpt no
+    // longer has to be persisted, indexed and shipped alongside the description it
+    // was derived from.
+    //
+    // Truncate BEFORE removeLinks, in that order: the backend cut the full markup and
+    // the webapp stripped the anchors afterwards, and swapping the two would count
+    // the href characters against the limit.
+    //
+    // removeLinks stays: the whole card is a <nuxt-link>, and an <a> inside an <a> is
+    // invalid HTML. Only the anchors go — their text is kept.
     descriptionExcerpt() {
-      return this.$filters.removeLinks(this.group.descriptionExcerpt)
+      return this.$filters.removeLinks(
+        this.$filters.truncate(this.group.description, branding.group.descriptionExcerptLength),
+      )
     },
   },
 }

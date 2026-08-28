@@ -18,6 +18,7 @@
     "dateTime.absoluteDateTimeFormat: string",
     "dateTime.relativeDateTime: boolean",
     "donation.progressBarColorType: string",
+    "group.descriptionCollapsedLines: number",
     "group.descriptionExcerptLength: number",
     "group.descriptionMinLength: number",
     "group.nameLengthMax: number",

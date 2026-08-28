@@ -13,7 +13,13 @@ test('the framework defaults are valid (no violations)', () => {
 test('validateBranding collects ALL invariant violations, not just the first', () => {
   const bad = {
     ...brandingDefaults,
-    group: { ...brandingDefaults.group, nameLengthMin: 60, nameLengthMax: 50 },
+    group: {
+      ...brandingDefaults.group,
+      nameLengthMin: 60,
+      nameLengthMax: 50,
+      // 0 lines would collapse the group description preview to nothing at all
+      descriptionCollapsedLines: 0,
+    },
     registration: { ...brandingDefaults.registration, nonceLength: 0 },
     comment: { ...brandingDefaults.comment, truncateToLength: 5000, maxUntruncatedLength: 1200 },
     category: { min: 5, max: 3 },
@@ -23,6 +29,7 @@ test('validateBranding collects ALL invariant violations, not just the first', (
   assert.ok(
     v.some((x) => x.includes('group.nameLengthMin (60) must be ≤ group.nameLengthMax (50)')),
   )
+  assert.ok(v.some((x) => x.includes('group.descriptionCollapsedLines must be ≥ 1')))
   assert.ok(v.some((x) => x.includes('registration.nonceLength must be ≥ 1')))
   assert.ok(
     v.some((x) => /comment\.truncateToLength .* must be ≤ comment\.maxUntruncatedLength/.test(x)),

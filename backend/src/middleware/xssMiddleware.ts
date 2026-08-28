@@ -46,7 +46,6 @@ const fields = [
 
   { field: 'reasonDescription' },
   { field: 'description', excludes: ['embed'] },
-  { field: 'descriptionExcerpt' },
 ]
 
 const mutationXss: IMiddlewareResolver = async (resolve, root, args, context, info) => {

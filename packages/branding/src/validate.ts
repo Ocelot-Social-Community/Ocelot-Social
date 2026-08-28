@@ -36,6 +36,8 @@ export function validateBranding(config: BrandingConfig): string[] {
   atMost('group.nameLengthMin', group.nameLengthMin, 'group.nameLengthMax', group.nameLengthMax)
   atLeast('group.descriptionMinLength', group.descriptionMinLength, 0)
   atLeast('group.descriptionExcerptLength', group.descriptionExcerptLength, 0)
+  // At least one line, otherwise the collapsed preview shows nothing at all.
+  atLeast('group.descriptionCollapsedLines', group.descriptionCollapsedLines, 1)
 
   atLeast('registration.nonceLength', registration.nonceLength, 1)
   atLeast('registration.inviteCodeLength', registration.inviteCodeLength, 1)

@@ -1,6 +1,7 @@
 import GroupProfileSlug from './_slug.vue'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { mount } from '@vue/test-utils'
+import { branding as brandingDefaults } from '@ocelot-social/branding'
 import Vue from 'vue'
 import Vuex from 'vuex'
 
@@ -25,6 +26,39 @@ Object.assign(Math, {
 
 jest.mock('vue-infinite-loading', () => ({}))
 
+// jsdom does no layout, so every element reports height 0 and the description would
+// always measure as "fits". Fake just the two numbers the overflow check reads: the
+// natural height of the content and the height the collapsed cap leaves it.
+// `contentHeight` above `clampHeight` is a description that needs a "show more".
+const stubDescriptionHeights = ({ contentHeight, clampHeight }) => {
+  const originals = {
+    scrollHeight: Object.getOwnPropertyDescriptor(Element.prototype, 'scrollHeight'),
+    clientHeight: Object.getOwnPropertyDescriptor(Element.prototype, 'clientHeight'),
+  }
+  Object.defineProperty(Element.prototype, 'scrollHeight', {
+    configurable: true,
+    get() {
+      if (!this.parentElement?.classList.contains('description-clamp')) return 0
+      // Empty description => no height, so "the group has not loaded yet" does not
+      // masquerade as content that needs a toggle.
+      return this.textContent.trim() ? contentHeight : 0
+    },
+  })
+  Object.defineProperty(Element.prototype, 'clientHeight', {
+    configurable: true,
+    get() {
+      if (!this.classList.contains('description-clamp')) return 0
+      // Keyed off the inline max-height, which is where the cap actually lives —
+      // uncapped once expanded, exactly as the real element is.
+      return this.style.maxHeight ? clampHeight : contentHeight
+    },
+  })
+  return () => {
+    Object.defineProperty(Element.prototype, 'scrollHeight', originals.scrollHeight)
+    Object.defineProperty(Element.prototype, 'clientHeight', originals.clientHeight)
+  }
+}
+
 describe('GroupProfileSlug', () => {
   let wrapper
   let mocks
@@ -35,8 +69,19 @@ describe('GroupProfileSlug', () => {
   let jennyRostock
   let bobDerBaumeister
   let huey
+  let restoreDescriptionHeights
 
   const currentUserMock = jest.fn()
+
+  // The fixtures below are the seeded descriptions — long enough to be truncated in
+  // reality, so the default for the suite is "overflows" and the toggle is present.
+  beforeEach(() => {
+    restoreDescriptionHeights = stubDescriptionHeights({ contentHeight: 500, clampHeight: 100 })
+  })
+
+  afterEach(() => {
+    restoreDescriptionHeights()
+  })
 
   const getters = {
     'auth/user': currentUserMock,
@@ -71,8 +116,8 @@ describe('GroupProfileSlug', () => {
       // (off) and the test catches it, rather than passing on a blanket `true`.
       $policy: { get: (key) => key === 'categoriesActive' },
       $t: jest.fn((a) => a),
+      // No removeLinks: this page must not strip links from the description.
       $filters: {
-        removeLinks: (c) => c,
         truncate: (a) => a,
       },
       // If you're mocking router, then don't use VueRouter with localVue: https://vue-test-utils.vuejs.org/guides/using-with-vue-router.html
@@ -105,7 +150,6 @@ describe('GroupProfileSlug', () => {
       slug: 'yoga-practice',
       about: null,
       description: `<h3>What Is yoga?</h3><p>Yoga is not just about practicing asanas. It's about how we do it.</p><p class="">And practicing asanas doesn't have to be yoga, it can be more athletic than yogic.</p><h3>What makes practicing asanas yogic?</h3><p class="">The important thing is:</p><ul><li><p>Use the exercises (consciously) for your personal development.</p></li></ul>`,
-      descriptionExcerpt: `<h3>What Is yoga?</h3><p>Yoga is not just about practicing asanas. It's about how we do it.</p><p>And practicing asanas doesn't have to be yoga, it can be more athletic than yogic.</p><h3>What makes practicing asanas yogic?</h3><p>The important thing is:</p><ul><li><p>Use the exercises …</p></li></ul>`,
       groupType: 'public',
       actionRadius: 'interplanetary',
       categories: [
@@ -143,7 +187,6 @@ describe('GroupProfileSlug', () => {
       slug: 'school-for-citizens',
       about: 'Our children shall receive education for life.',
       description: `<p class=""><em>English</em></p><h3>Our goal</h3><p>Only those who enjoy learning and do not lose their curiosity can obtain a good education for life and continue to learn with joy throughout their lives.</p><h3>Curiosity</h3><p>For this we need a school that takes up the curiosity of the children, the people, and satisfies it through a lot of experience.</p><p><br></p><p><em>Deutsch</em></p><h3>Unser Ziel</h3><p class="">Nur wer Spaß am Lernen hat und seine Neugier nicht verliert, kann gute Bildung für's Leben erlangen und sein ganzes Leben mit Freude weiter lernen.</p><h3>Neugier</h3><p class="">Dazu benötigen wir eine Schule, die die Neugier der Kinder, der Menschen, aufnimmt und durch viel Erfahrung befriedigt.</p>`,
-      descriptionExcerpt: `<p><em>English</em></p><h3>Our goal</h3><p>Only those who enjoy learning and do not lose their curiosity can obtain a good education for life and continue to learn with joy throughout their lives.</p><h3>Curiosity</h3><p>For this we need a school that takes up the curiosity of the children, …</p>`,
       groupType: 'closed',
       actionRadius: 'national',
       categories: [
@@ -176,8 +219,6 @@ describe('GroupProfileSlug', () => {
       slug: 'investigative-journalism',
       about: 'Investigative journalists share ideas and insights and can collaborate.',
       description: `<p class=""><em>English:</em></p><p class="">This group is hidden.</p><h3>What is our group for?</h3><p>This group was created to allow investigative journalists to share and collaborate.</p><h3>How does it work?</h3><p>Here you can internally share posts and comments about them.</p><p><br></p><p><em>Deutsch:</em></p><p class="">Diese Gruppe ist verborgen.</p><h3>Wofür ist unsere Gruppe?</h3><p class="">Diese Gruppe wurde geschaffen, um investigativen Journalisten den Austausch und die Zusammenarbeit zu ermöglichen.</p><h3>Wie funktioniert das?</h3><p class="">Hier könnt ihr euch intern über Beiträge und Kommentare zu ihnen austauschen.</p>`,
-      descriptionExcerpt:
-        '<p><em>English:</em></p><p>This group is hidden.</p><h3>What is our group for?</h3><p>This group was created to allow investigative journalists to share and collaborate.</p><h3>How does it work?</h3><p>Here you can internally share posts and comments about them.</p><p><br/></p><p><em>Deutsch:</em></p><p>Diese Gruppe ist verborgen.</p><h3>…</h3>',
       groupType: 'hidden',
       actionRadius: 'global',
       categories: [
@@ -283,6 +324,122 @@ describe('GroupProfileSlug', () => {
 
           it('has "show less" button', () => {
             expect(screen.queryByText('comment.show.less')).not.toBeNull()
+          })
+        })
+
+        describe('given a description containing links', () => {
+          const linkedDescription =
+            '<p>Read the <a href="https://ocelot.social">handbook</a> and the <a href="https://example.org">FAQ</a> before joining.</p>'
+          const linkedGroup = () => () => {
+            return {
+              group: {
+                ...yogaPractice,
+                myRole: 'owner',
+                description: linkedDescription,
+              },
+            }
+          }
+
+          beforeEach(() => {
+            wrapper = Wrapper(linkedGroup())
+          })
+
+          // Scoped to this wrapper rather than `screen`: the outer beforeEach
+          // already rendered a second instance into the same document.
+          const description = () => wrapper.container.querySelector('.group-description')
+          const descriptionLinks = () =>
+            Array.from(description().querySelectorAll('a')).map((a) => a.getAttribute('href'))
+
+          it('keeps the links while collapsed', () => {
+            expect(description().textContent).toContain('comment.show.more')
+            expect(descriptionLinks()).toEqual(['https://ocelot.social', 'https://example.org'])
+          })
+
+          it('keeps the text between two links while collapsed', () => {
+            expect(description().textContent).toContain('and the')
+          })
+
+          it('keeps the links after "show more"', async () => {
+            await fireEvent.click(description().querySelector('.collaps-button'))
+
+            expect(description().textContent).toContain('comment.show.less')
+            expect(descriptionLinks()).toEqual(['https://ocelot.social', 'https://example.org'])
+          })
+
+          // ContentViewer instantiates tiptap in data() and needs `document`, so it
+          // must stay out of the first (server-side) render. Asserting synchronously
+          // is what pins this down: `hydrated` flips in mounted()'s $nextTick, i.e.
+          // in a microtask that has not run yet while this test body executes.
+          it('renders plain HTML instead of the tiptap viewer before hydration', () => {
+            const ssrWrapper = render(GroupProfileSlug, {
+              mocks,
+              localVue,
+              data: linkedGroup(),
+              stubs,
+              store,
+            })
+            const ssrDescription = ssrWrapper.container.querySelector('.group-description')
+
+            expect(ssrDescription.querySelector('.ProseMirror')).toBeNull()
+            expect(
+              Array.from(ssrDescription.querySelectorAll('a')).map((a) => a.getAttribute('href')),
+            ).toEqual(['https://ocelot.social', 'https://example.org'])
+          })
+        })
+
+        // The collapsed height is a CSS cap on the full description, not a character
+        // cut — that is what makes it independent of whether the text starts with a
+        // heading and a list or with a paragraph.
+        describe('collapsed description height', () => {
+          const clamp = () => wrapper.container.querySelector('.description-clamp')
+          const toggle = () => wrapper.container.querySelector('.collaps-button')
+          // The overflow verdict only reaches the DOM on the next tick, so re-render
+          // and wait rather than reusing the wrapper from the enclosing beforeEach.
+          const renderGroup = async (group = yogaPractice) => {
+            wrapper = Wrapper(() => ({ group: { ...group, myRole: 'owner' } }))
+            await Vue.nextTick()
+          }
+
+          // Inline, not via a class: it has to hold on the first paint, before the
+          // page's stylesheet is necessarily there.
+          it('caps the height at the branded number of lines while collapsed', async () => {
+            await renderGroup()
+
+            expect(clamp().style.maxHeight).toBe(
+              `calc(${brandingDefaults.group.descriptionCollapsedLines} * var(--line-height-base, 1.3) * 1em)`,
+            )
+            expect(clamp().style.overflow).toBe('hidden')
+          })
+
+          it('offers the toggle and fades the cut edge when the description exceeds the cap', async () => {
+            await renderGroup()
+
+            expect(toggle()).not.toBeNull()
+            expect(clamp().classList).toContain('description-clamp--faded')
+          })
+
+          it('lifts the cap and the fade once expanded', async () => {
+            await renderGroup()
+
+            await fireEvent.click(toggle())
+
+            expect(clamp().style.maxHeight).toBe('')
+            expect(clamp().classList).not.toContain('description-clamp--faded')
+          })
+
+          // An always-visible toggle on a description that already fits is a dead end
+          // — this is what the character-count excerpt could not tell us.
+          it('hides the toggle and the fade when the description fits', async () => {
+            restoreDescriptionHeights()
+            restoreDescriptionHeights = stubDescriptionHeights({
+              contentHeight: 40,
+              clampHeight: 100,
+            })
+
+            await renderGroup()
+
+            expect(toggle()).toBeNull()
+            expect(clamp().classList).not.toContain('description-clamp--faded')
           })
         })
       })
@@ -515,6 +672,69 @@ describe('GroupProfileSlug', () => {
           })
         })
       })
+    })
+  })
+
+  // The group arrives from Apollo AFTER mount, so the first overflow measurement runs
+  // against an empty card. ResizeObserver covers this in a browser, but not where it is
+  // missing — and not in jsdom, which is exactly why this is asserted here.
+  describe('description overflow re-measurement', () => {
+    let savedErrorHandler
+    let savedWarnHandler
+
+    beforeEach(() => {
+      // vue-test-utils refuses to install its own error handler if one is present
+      savedErrorHandler = Vue.config.errorHandler
+      savedWarnHandler = Vue.config.warnHandler
+      Vue.config.errorHandler = null
+      Vue.config.warnHandler = null
+    })
+
+    afterEach(() => {
+      Vue.config.errorHandler = savedErrorHandler
+      Vue.config.warnHandler = savedWarnHandler
+    })
+
+    it('shows the toggle once a description arrives after mount', async () => {
+      currentUserMock.mockReturnValue(peterLustig)
+      const wrapper = mount(GroupProfileSlug, {
+        localVue,
+        store,
+        stubs: {
+          ...stubs,
+          'infinite-loading': true,
+          'masonry-grid': true,
+          'masonry-grid-item': true,
+          'post-teaser': true,
+          // A stub that actually renders its content: the measurement reads the
+          // rendered text, and the default empty stub would report every description
+          // as empty. Real tiptap is no use here either — it attaches its DOM
+          // imperatively, so in jsdom the text is not there yet when the watcher
+          // measures, which is a quirk of the editor and not of this wiring.
+          'content-viewer': {
+            props: ['content'],
+            template: '<div>{{ content }}</div>',
+          },
+        },
+        mocks,
+        data: () => ({ group: { ...yogaPractice, myRole: 'owner', description: '' } }),
+      })
+      await Vue.nextTick()
+      expect(wrapper.find('.collaps-button').exists()).toBe(false)
+
+      await wrapper.setData({
+        group: {
+          ...yogaPractice,
+          myRole: 'owner',
+          description: '<p>Now there is something to read.</p>',
+        },
+      })
+      // Two ticks: one for the watcher's deferred measurement, one for the re-render
+      // the resulting `descriptionOverflows` change schedules.
+      await Vue.nextTick()
+      await Vue.nextTick()
+
+      expect(wrapper.find('.collaps-button').exists()).toBe(true)
     })
   })
 

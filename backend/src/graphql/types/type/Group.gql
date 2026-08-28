@@ -36,8 +36,6 @@ type Group {
   about: String
   "Full group description (rich text)."
   description: String!
-  "Plain-text excerpt of the description, for previews."
-  descriptionExcerpt: String!
   groupType: GroupType!
   actionRadius: GroupActionRadius!
 

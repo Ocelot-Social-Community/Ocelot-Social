@@ -39,7 +39,6 @@ export const createGroupMutation = () => {
         deleted
         about
         description
-        descriptionExcerpt
         groupType
         actionRadius
         categories {
@@ -95,7 +94,6 @@ export const updateGroupMutation = () => {
         deleted
         about
         description
-        descriptionExcerpt
         groupType
         actionRadius
         categories {
@@ -217,7 +215,6 @@ export const groupQuery = (i18n) => {
         deleted
         about
         description
-        descriptionExcerpt
         groupType
         actionRadius
         isMutedByMe
