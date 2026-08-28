@@ -78,8 +78,13 @@ jobs:
       - name: Install backend dependencies
         run: cd backend && yarn --frozen-lockfile
 
+      # --coverage=false is required, not a preference. jest.config.ts sets collectCoverage: true
+      # with a global 95% line threshold, which is a statement about the WHOLE backend suite — this
+      # job deliberately runs two specs, so the measurement is meaningless here and the threshold
+      # fails on principle (2.19% of the backend, all 19 tests green). Coverage stays enforced where
+      # it means something: the full run in test-backend.yml.
       - name: Validate the webapp's GraphQL documents against the schema
         run: |
-          cd backend && yarn jest \
+          cd backend && yarn jest --coverage=false \
             src/graphql/webappQueries.spec.ts \
             src/graphql/webappPostFilters.spec.ts
