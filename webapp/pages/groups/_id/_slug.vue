@@ -229,14 +229,18 @@
         <!-- Group description -->
         <div class="ds-mb-large">
           <os-card class="group-description">
-            <!-- TODO: replace editor content with tiptap render view -->
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <div
-              v-if="isDescriptionCollapsed"
+            <!-- Both states go through the same tiptap viewer so links, hashtags and
+                 mentions render identically collapsed and expanded. ContentViewer
+                 builds its editor in data() and needs `document`, so before hydration
+                 we emit the backend-sanitized HTML as-is — same markup, SSR-safe, and
+                 the server response still carries the description for crawlers. -->
+            <content-viewer
+              v-if="hydrated"
               class="content hyphenate-text"
-              v-html="groupDescriptionExcerpt"
+              :content="groupDescriptionContent"
             />
-            <content-viewer v-else class="content hyphenate-text" :content="group.description" />
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <div v-else class="content hyphenate-text" v-html="groupDescriptionContent" />
             <os-button
               class="collaps-button"
               variant="primary"
@@ -456,8 +460,11 @@ export default {
       const { slug } = this.group || {}
       return slug
     },
-    groupDescriptionExcerpt() {
-      return this.group ? this.$filters.removeLinks(this.group.descriptionExcerpt) : ''
+    groupDescriptionContent() {
+      // No removeLinks here: unlike the GroupTeaser card, this page has no
+      // surrounding link, so anchors in the description are valid and must stay.
+      if (!this.group) return ''
+      return this.isDescriptionCollapsed ? this.group.descriptionExcerpt : this.group.description
     },
     isGroupOwner() {
       return this.group ? this.group.myRole === 'owner' : false

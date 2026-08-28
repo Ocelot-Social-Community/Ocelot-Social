@@ -74,8 +74,10 @@ export default ({ app = {} }) => {
     },
     removeLinks: (content) => {
       if (!content) return ''
-      // remove all links from excerpt to prevent issues with the surrounding link
-      let excerpt = content.replace(/<a.*>(.+)<\/a>/gim, '$1')
+      // remove all links from excerpt to prevent issues with the surrounding link.
+      // Lazy quantifiers matter: a greedy `<a.*>(.+)</a>` matches from the first
+      // `<a` to the last `</a>` and swallows everything between two links.
+      let excerpt = content.replace(/<a[^>]*>(.*?)<\/a>/gis, '$1')
       // do not display content that is only linebreaks
       if (excerpt.replace(/<br>/gim, '').trim() === '') {
         excerpt = ''

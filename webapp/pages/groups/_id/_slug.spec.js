@@ -71,8 +71,8 @@ describe('GroupProfileSlug', () => {
       // (off) and the test catches it, rather than passing on a blanket `true`.
       $policy: { get: (key) => key === 'categoriesActive' },
       $t: jest.fn((a) => a),
+      // No removeLinks: this page must not strip links from the description.
       $filters: {
-        removeLinks: (c) => c,
         truncate: (a) => a,
       },
       // If you're mocking router, then don't use VueRouter with localVue: https://vue-test-utils.vuejs.org/guides/using-with-vue-router.html
@@ -283,6 +283,67 @@ describe('GroupProfileSlug', () => {
 
           it('has "show less" button', () => {
             expect(screen.queryByText('comment.show.less')).not.toBeNull()
+          })
+        })
+
+        describe('given a description containing links', () => {
+          const linkedDescription =
+            '<p>Read the <a href="https://ocelot.social">handbook</a> and the <a href="https://example.org">FAQ</a> before joining.</p>'
+          const linkedGroup = () => () => {
+            return {
+              group: {
+                ...yogaPractice,
+                myRole: 'owner',
+                description: linkedDescription,
+                descriptionExcerpt: linkedDescription,
+              },
+            }
+          }
+
+          beforeEach(() => {
+            wrapper = Wrapper(linkedGroup())
+          })
+
+          // Scoped to this wrapper rather than `screen`: the outer beforeEach
+          // already rendered a second instance into the same document.
+          const description = () => wrapper.container.querySelector('.group-description')
+          const descriptionLinks = () =>
+            Array.from(description().querySelectorAll('a')).map((a) => a.getAttribute('href'))
+
+          it('keeps the links while collapsed', () => {
+            expect(description().textContent).toContain('comment.show.more')
+            expect(descriptionLinks()).toEqual(['https://ocelot.social', 'https://example.org'])
+          })
+
+          it('keeps the text between two links while collapsed', () => {
+            expect(description().textContent).toContain('and the')
+          })
+
+          it('keeps the links after "show more"', async () => {
+            await fireEvent.click(description().querySelector('.collaps-button'))
+
+            expect(description().textContent).toContain('comment.show.less')
+            expect(descriptionLinks()).toEqual(['https://ocelot.social', 'https://example.org'])
+          })
+
+          // ContentViewer instantiates tiptap in data() and needs `document`, so it
+          // must stay out of the first (server-side) render. Asserting synchronously
+          // is what pins this down: `hydrated` flips in mounted()'s $nextTick, i.e.
+          // in a microtask that has not run yet while this test body executes.
+          it('renders plain HTML instead of the tiptap viewer before hydration', () => {
+            const ssrWrapper = render(GroupProfileSlug, {
+              mocks,
+              localVue,
+              data: linkedGroup(),
+              stubs,
+              store,
+            })
+            const ssrDescription = ssrWrapper.container.querySelector('.group-description')
+
+            expect(ssrDescription.querySelector('.ProseMirror')).toBeNull()
+            expect(
+              Array.from(ssrDescription.querySelectorAll('a')).map((a) => a.getAttribute('href')),
+            ).toEqual(['https://ocelot.social', 'https://example.org'])
           })
         })
       })
