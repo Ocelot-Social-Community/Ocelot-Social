@@ -150,9 +150,9 @@ export interface BrandingConfig {
      * Characters of the group description shown on a teaser card, cut with trunc-html
      * so the markup stays balanced and the cut ends in an ellipsis.
      *
-     * Read by the WEBAPP. It used to drive a `descriptionExcerpt` property persisted on
-     * every Group node; that field is gone — the same cut is now made where it is
-     * displayed, which is the only place it was ever needed.
+     * Read by the WEBAPP, and only there. It used to drive a `descriptionExcerpt` property
+     * persisted on every Group node; that field is gone — the same cut is now made where it
+     * is displayed, which is the only place it was ever needed.
      */
     descriptionExcerptLength: number
     /**
