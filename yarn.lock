@@ -3736,10 +3736,10 @@ cypress-network-idle@^2.0.1:
   resolved "https://registry.yarnpkg.com/cypress-network-idle/-/cypress-network-idle-2.0.1.tgz#f523eb993569e8072765bfe2891529885d7011e4"
   integrity sha512-dw7QtnQKOOsFnWSGWvJ9D2TxcLHovW467JYLgOC8K913uUbAmY+sveoGz7EPqumvRDfWWZEKv+F8o+rxtLCQRQ==
 
-cypress@^15.21.0:
-  version "15.21.0"
-  resolved "https://registry.yarnpkg.com/cypress/-/cypress-15.21.0.tgz#61017bb85ae2886fefcd2b9b4c21b47cb62a1b6b"
-  integrity sha512-6uPy5GUjao97t/QDIwlPyJz4JUqPpFIPq5lNazN95LSA3ynJoYC1sHZ3W+aj4f+K1OFGbMfno0+OX2Gx0OmlPA==
+cypress@^15.21.1:
+  version "15.21.1"
+  resolved "https://registry.yarnpkg.com/cypress/-/cypress-15.21.1.tgz#51653d58fa0e9994a11406aa3df2bee716264f9a"
+  integrity sha512-ogHpHMj0XNlZA5MGzjg8SWHf0eMw9lTwVQRKjpcT1GzNTxNUjwnHA8YCG6nOJ8ThU+XZaUxJgpMYZnJ//8aDaw==
   dependencies:
     "@cypress/request" "^4.0.0"
     "@cypress/xvfb" "^1.2.4"
@@ -5580,10 +5580,10 @@ js-yaml@^4.1.0:
   dependencies:
     argparse "^2.0.1"
 
-js-yaml@^5.2.2:
-  version "5.3.0"
-  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-5.3.0.tgz#526430a6da31065127528ae695ce168cfc5f91f0"
-  integrity sha512-muutsYr+e2+d3rTgUGslq5rxbBlUy3cJ61IsHag2QNDQV+7zXWjkUpmALIajhrlLlrgRUiymj6U3zUr/TMK84Q==
+js-yaml@^5.3.0:
+  version "5.4.1"
+  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-5.4.1.tgz#4629d91d4b4551f300435f0e4127899710f816fb"
+  integrity sha512-28R/k+NAjeuf7+CKlTxWZVExJGwVVLwY06DgEnOMz2gEpfNkDcD7QvyiVPT0xy0XXhU8vHsd4Ot42OOPdJG7dQ==
   dependencies:
     argparse "^2.0.1"
 
@@ -5675,7 +5675,7 @@ linkify-it@^5.0.0:
   dependencies:
     uc.micro "^2.0.0"
 
-liquidjs@^10.27.2:
+liquidjs@^10.29.0:
   version "10.29.0"
   resolved "https://registry.yarnpkg.com/liquidjs/-/liquidjs-10.29.0.tgz#ee061890ccf0da26be377aad4f02bd32da0140d8"
   integrity sha512-pCVOhs6FLAR8su3ItJ07diN26t6W5dHQRnmTMy8HPyTFuv1+oSCVJIGp5pGjfQyOZfh50KswvKtMTp6p4JEIdw==
@@ -6103,25 +6103,25 @@ ms@^2.1.1, ms@^2.1.3:
   resolved "https://registry.npmjs.org/ms/-/ms-2.1.3.tgz"
   integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
 
-multiple-cucumber-html-reporter@^4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/multiple-cucumber-html-reporter/-/multiple-cucumber-html-reporter-4.2.0.tgz#c23e8b916ab58fbbd7b7237333dc6756fe0e00c5"
-  integrity sha512-L3j1Jl/UNVYjDKLwsA1WOXFlgb29Lp5CA2NqmIflYuyJOpprQuYVOfOX0RbpUKUxFRS2c9YamQanmF7WQ4X9HQ==
+multiple-cucumber-html-reporter@^4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/multiple-cucumber-html-reporter/-/multiple-cucumber-html-reporter-4.3.0.tgz#7c47d4814666448c5cf0a5a4b34895ca1185cbc8"
+  integrity sha512-vion4KvzW0maf4k4NxDYri7HCI71z2/V6Uk/Fs419zvyCO7BKGnC8sdQ1EIqxFWWvv0pNO8p0B31CZGUtdW/EA==
   dependencies:
     "@clack/prompts" "^1.7.0"
     env-interpolation "^1.1.1"
     find "^0.3.0"
     fs-extra "^11.4.0"
     jiti "^2.7.0"
-    js-yaml "^5.2.2"
+    js-yaml "^5.3.0"
     jsonfile "^6.2.1"
-    liquidjs "^10.27.2"
+    liquidjs "^10.29.0"
     lodash "^4.18.1"
     luxon "^3.7.2"
-    open "^11.0.0"
+    open "^11.0.1"
     stream-chain "^4.2.5"
     stream-json "^3.5.0"
-    uuid "^14.0.1"
+    uuid "^14.0.2"
 
 nan@2.17.0:
   version "2.17.0"
@@ -6298,7 +6298,7 @@ oniguruma-to-js@0.4.3:
   dependencies:
     regex "^4.3.2"
 
-open@^11.0.0:
+open@^11.0.1:
   version "11.0.1"
   resolved "https://registry.yarnpkg.com/open/-/open-11.0.1.tgz#aabc32fa311acc8c0d7855938eb94583249c31bd"
   integrity sha512-NzwMUB6C1D0+Kd+9iMS/H4k+Ck3cTX6Ckyfr/gAGlmvSE1LUQZnEZvWBi4PYmMwH/S5SMeTXnE+9uAz8uF+pWw==
@@ -8182,10 +8182,10 @@ util@^0.12.4, util@^0.12.5:
     is-typed-array "^1.1.3"
     which-typed-array "^1.1.2"
 
-uuid@^14.0.0, uuid@^14.0.1:
-  version "14.0.1"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-14.0.1.tgz#8a5975b3e038902bfd169a10b5202f5ec0cf3faf"
-  integrity sha512-6ZxzVpzDXDa3bJWaHilVayA+BH/1zmxCJoVgvmqJnid/gPoKHxUrS/aC/T6LGQtNHT+XHG9fXPJB4d+IrU30Ew==
+uuid@^14.0.0, uuid@^14.0.2:
+  version "14.0.2"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-14.0.2.tgz#d5ae03e4db0881c87271f8b0b9bd7312d02c799a"
+  integrity sha512-xZe/16rV4aa+HGSOCiY2YeLT1OybRLrrkL/Rqaq7p7GMVXjFh+6wN4oMYgjFmnSnhY8t6Xpdl2l9qmnHYuMHwQ==
 
 validate-npm-package-license@^3.0.4:
   version "3.0.4"
