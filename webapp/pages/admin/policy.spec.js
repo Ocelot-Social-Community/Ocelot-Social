@@ -263,6 +263,49 @@ describe('admin/policy.vue', () => {
     expect(fetchDefaults).toHaveBeenCalledTimes(1)
   })
 
+  // Regression: the rows are rendered from the snapshot keys, so they appear the moment
+  // policy/init resolves. If the form sync waited for the *optional* defaults round-trip,
+  // every checkbox rendered unchecked (and every number input empty) for its duration —
+  // an admin toggling inside that window had their edit reverted the moment the sync landed,
+  // which also disabled the save button again. Nothing may be awaited between the snapshot
+  // arriving and the form being synced from it.
+  describe('while the optional defaults round-trip is still pending', () => {
+    let releaseDefaults
+
+    beforeEach(async () => {
+      fetchDefaults.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            releaseDefaults = resolve
+          }),
+      )
+      wrapper = Wrapper()
+      await flushPromises()
+    })
+
+    it('already renders the stored values rather than a blank form', () => {
+      expect(fetchDefaults).toHaveBeenCalledTimes(1)
+      expect(wrapper.find('#policy-inviteRegistration').element.checked).toBe(true)
+      expect(wrapper.find('#policy-publicRegistration').element.checked).toBe(false)
+      expect(wrapper.find('#policy-apiKeysMaxPerUser').element.value).toBe('5')
+    })
+
+    it('keeps an edit made in this window instead of reverting it once the defaults land', async () => {
+      await wrapper.find('#policy-publicRegistration').setChecked(true)
+      expect(wrapper.vm.isDirty).toBe(true)
+
+      releaseDefaults()
+      await flushPromises()
+
+      expect(wrapper.find('#policy-publicRegistration').element.checked).toBe(true)
+      expect(wrapper.vm.isDirty).toBe(true)
+      // Still saveable — a reverted edit would have disabled the button again, which is
+      // how this surfaced in the e2e suite (the save click landed on a disabled button,
+      // so no mutation ran and no toaster ever appeared).
+      expect(wrapper.find('[data-test="policy-save"]').attributes('disabled')).toBeFalsy()
+    })
+  })
+
   it('still initializes the page when fetchDefaults fails (optional metadata)', async () => {
     fetchDefaults.mockRejectedValueOnce(new Error('network'))
     wrapper = Wrapper()

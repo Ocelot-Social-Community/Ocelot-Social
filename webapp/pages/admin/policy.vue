@@ -437,6 +437,15 @@ export default {
     // Required: the viewer-scoped snapshot drives the form/checkboxes. policy/init
     // swallows its own errors, so this won't reject — the page is usable from it.
     await this.fetchPolicy()
+    // Sync (and arm the watcher) IMMEDIATELY, in the same microtask checkpoint the
+    // snapshot arrived in — before the optional round-trip below. The rows are rendered
+    // from the snapshot keys, so anything awaited between the snapshot landing and this
+    // call is a window in which every checkbox renders unchecked and every number input
+    // empty, regardless of the stored value. An admin acting inside that window (or an
+    // e2e step doing the same) gets their edit silently reverted when the sync finally
+    // lands, which also disables the save button again.
+    this.syncFormFromSnapshot()
+    this.loaded = true
     // Optional admin metadata (configured defaults + last-changed line). A failure
     // here must NOT break the page: degrade gracefully (grey defaults / last-changed
     // line simply won't render) rather than aborting the whole init.
@@ -445,8 +454,6 @@ export default {
     } catch (err) {
       // ignore — snapshot alone is enough to work with
     }
-    this.syncFormFromSnapshot()
-    this.loaded = true
   },
 }
 </script>
