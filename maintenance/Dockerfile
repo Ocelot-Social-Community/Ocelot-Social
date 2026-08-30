@@ -3,7 +3,7 @@
 # ==============================================================================
 # Stage 1: Build UI library
 # ==============================================================================
-FROM node:26.7.0-alpine AS ui-library
+FROM node:26.8.1-alpine AS ui-library
 RUN apk --no-cache add git python3 make g++
 WORKDIR /packages/ui
 COPY packages/ui/ .
@@ -21,7 +21,7 @@ RUN npm run build
 # static output, so nothing of it can reach a runtime image. Hence no pruned runtime counterpart —
 # the devDeps (typescript, needed to type-check + evaluate a brand's brand.config.ts) simply stay.
 # ==============================================================================
-FROM node:26.7.0-alpine AS branding-tools
+FROM node:26.8.1-alpine AS branding-tools
 WORKDIR /app
 COPY packages/branding/package.json packages/branding/package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm,sharing=locked \
@@ -32,7 +32,7 @@ RUN npm run build
 # ==============================================================================
 # Stage 2: Install dependencies and copy sources
 # ==============================================================================
-FROM node:26.7.0-alpine AS base
+FROM node:26.8.1-alpine AS base
 RUN apk --no-cache add git python3 make g++
 WORKDIR /app
 COPY --from=ui-library /packages/ui/ /packages/ui/
