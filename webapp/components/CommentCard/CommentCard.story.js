@@ -1,6 +1,6 @@
 import { storiesOf } from '@storybook/vue'
 import CommentCard from './CommentCard'
-import helpers from '~/storybook/helpers'
+import helpers, { FIXTURE_AVATAR_URL } from '~/storybook/helpers'
 
 helpers.init()
 
@@ -16,9 +16,7 @@ const comment = {
   disabled: false,
   author: {
     id: '1',
-    avatar: helpers.avatarImage(
-      'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/db/dbc9e03ebcc384b920c31542af2d27dd8eea9dc2_full.jpg',
-    ),
+    avatar: helpers.avatarImage(FIXTURE_AVATAR_URL),
     slug: 'jenny-rostock',
     name: 'Rainer Unsinn',
     disabled: false,

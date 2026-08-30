@@ -45,12 +45,45 @@ const WAIT_FOR_DOM_QUIET_SCRIPT = ({ quietMs, timeoutMs }) =>
     const hardCap = setTimeout(finish, timeoutMs)
   })
 
+// A screenshot may only depend on things this repo controls. A story that loads an image (or
+// anything else) off someone else's server makes a green run a function of that host's uptime:
+// picsum.photos returning 522 collapsed PostTeaser's "with image" story to the no-image layout and
+// failed CI, and the s3.amazonaws.com/uifaces avatars several stories used had been 403 for long
+// enough that the committed baselines recorded the initials fallback rather than an avatar — a test
+// that looked green while asserting the wrong picture. So: block every request that does not go to
+// the local Storybook server, collect what was blocked, and fail the test naming the offending urls
+// instead of letting it turn into a screenshot diff someone has to reverse-engineer.
+const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]'])
+
+const isLocal = (url) => {
+  // Non-http schemes (data:, blob:, about:) never leave the browser, so they are always fine.
+  if (!/^https?:/i.test(url)) return true
+  try {
+    return LOCAL_HOSTS.has(new URL(url).hostname)
+  } catch {
+    return false
+  }
+}
+
+async function blockOutboundRequests(page, blocked) {
+  await page.route('**/*', (route) => {
+    const url = route.request().url()
+    if (isLocal(url)) return route.continue()
+    blocked.add(url)
+    return route.abort()
+  })
+}
+
 /**
  * Navigates to a story's iframe (the same URL Storybook's own "open canvas in new tab" uses) and
  * waits for it to actually render. Combined with the init script above and the fixed faker seed /
  * fixed dates in the stories themselves, this is what makes a screenshot the same on every run.
+ *
+ * Throws if the story reached out to the network — see blockOutboundRequests above.
  */
 async function gotoStory(page, storyId) {
+  const blocked = new Set()
+  await blockOutboundRequests(page, blocked)
   await page.addInitScript(FREEZE_ANIMATIONS_SCRIPT)
   await page.goto(`/iframe.html?id=${storyId}&viewMode=story`, { waitUntil: 'domcontentloaded' })
   const root = page.locator(STORY_ROOT)
@@ -79,6 +112,14 @@ async function gotoStory(page, storyId) {
   // font, different metrics) — mutation-quiet again to let that settle before the screenshot.
   await page.evaluate(async () => document.fonts.ready)
   await page.evaluate(WAIT_FOR_DOM_QUIET_SCRIPT, { quietMs: 150, timeoutMs: 2000 })
+  if (blocked.size) {
+    throw new Error(
+      `Story "${storyId}" requested ${blocked.size} remote resource(s), which would make this ` +
+        `screenshot depend on a third-party host being up:\n` +
+        `${[...blocked].map((url) => `  - ${url}`).join('\n')}\n` +
+        `Commit the asset under storybook/fixtures/ and reference it via helpers.responsiveImage().`,
+    )
+  }
   return root
 }
 
