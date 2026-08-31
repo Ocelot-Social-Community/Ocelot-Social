@@ -34,4 +34,6 @@ cd "$ROOT_DIR"
 # `--no`: run ONLY the auto-changelog locked in the root package.json. Without it npx silently
 # fetches the package from the registry when the local one is missing, which turns a broken
 # install into an unpinned download during a release.
-npx --no auto-changelog --commit-limit 0 --latest-version "$VERSION_NEW"
+# The `--` is not optional: with `npx --no auto-changelog --latest-version ...` npm claims the
+# following flags for itself and dies with EUNKNOWNCONFIG. The separator hands them to the package.
+npx --no -- auto-changelog --commit-limit 0 --latest-version "$VERSION_NEW"
