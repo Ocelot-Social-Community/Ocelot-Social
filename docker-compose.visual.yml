@@ -29,7 +29,10 @@
 # These skip their own Storybook build step if storybook-static already
 # exists on your machine (see "First run" note below) — if source changed
 # since the last run, either delete storybook-static first or use the
-# npm/yarn scripts above instead, which always rebuild fresh.
+# npm/yarn scripts above instead, which always rebuild fresh. "Source"
+# includes packages/ui and packages/branding: the webapp services rebuild
+# those, but a storybook-static left over from before that rebuild still
+# contains the old bundle, so delete it after changing either package.
 #
 # webapp — New component (missing baseline):
 #   docker compose -f docker-compose.visual.yml run --rm webapp-visual-update
@@ -64,7 +67,12 @@ x-visual-base: &visual-base
     - ./webapp:/app
     - webapp_visual_node_modules:/app/node_modules
     - ./packages/ui:/packages/ui
+    # Own volume so the container's `npm ci` populates its own tree instead of overwriting the
+    # host's packages/ui|branding node_modules with amd64-emulated binaries. dist/ is deliberately
+    # NOT shadowed: it is the artifact webapp's file: dependency copies from, and it is gitignored.
+    - ui_package_node_modules:/packages/ui/node_modules
     - ./packages/branding:/packages/branding
+    - branding_package_node_modules:/packages/branding/node_modules
 
 services:
   # Every service below starts its command with the same four lines,
@@ -74,6 +82,14 @@ services:
   # ourselves since this is a bare Ubuntu image, not a GitHub Actions runner.
   # YAML anchors can't be spliced into the middle of another scalar string,
   # so this is duplicated rather than shared.
+  #
+  # The webapp services then build @ocelot-social/branding and @ocelot-social/ui and re-copy them,
+  # mirroring webapp-visual.yml. Both are `file:` dependencies whose dist/ is not committed, so
+  # whatever happens to sit in the working copy decides what Storybook renders. Skipping this is
+  # not a slow path, it is a wrong one: a dist/ predating a component silently drops it from every
+  # screenshot, and the resulting baselines then disagree with CI (OsRibbon, PostTeaser #10025).
+  # The `rm -rf` is load-bearing — yarn keys file: deps by version, so with the persistent
+  # node_modules volume an unchanged version number means a rebuilt package is never re-copied.
   webapp-visual-update:
     <<: *visual-base
     command: >
@@ -83,6 +99,9 @@ services:
         curl -fsSL https://deb.nodesource.com/setup_25.x | bash - &&
         apt-get install -y -qq nodejs &&
         npm install -g yarn@1.22.22 &&
+        (cd /packages/branding && npm ci && npm run build) &&
+        (cd /packages/ui && npm ci && npm run build) &&
+        rm -rf node_modules/@ocelot-social/branding node_modules/@ocelot-social/ui &&
         yarn install &&
         node scripts/fix-storybook-webpack.js &&
         ([ -d storybook-static ] || yarn build-storybook) &&
@@ -99,6 +118,9 @@ services:
         curl -fsSL https://deb.nodesource.com/setup_25.x | bash - &&
         apt-get install -y -qq nodejs &&
         npm install -g yarn@1.22.22 &&
+        (cd /packages/branding && npm ci && npm run build) &&
+        (cd /packages/ui && npm ci && npm run build) &&
+        rm -rf node_modules/@ocelot-social/branding node_modules/@ocelot-social/ui &&
         yarn install &&
         node scripts/fix-storybook-webpack.js &&
         ([ -d storybook-static ] || yarn build-storybook) &&
@@ -143,3 +165,5 @@ services:
 volumes:
   webapp_visual_node_modules:
   ui_visual_node_modules:
+  ui_package_node_modules:
+  branding_package_node_modules:
