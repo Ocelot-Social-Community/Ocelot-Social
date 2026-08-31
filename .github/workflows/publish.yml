@@ -198,7 +198,8 @@ jobs:
       - name: Generate changelog
         run: |
           npm ci
-          npx auto-changelog --latest-version "${VERSION}" --unreleased-only
+          # `--no`: use only the locked local binary, never a registry fetch (see scripts/release.sh).
+          npx --no auto-changelog --latest-version "${VERSION}" --unreleased-only
       - name: Compose release notes
         run: |
           set -euo pipefail

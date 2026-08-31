@@ -31,4 +31,7 @@ sed -i -e 's/^version: .*/version: '"$VERSION_NEW"'/' "$ROOT_DIR/deployment/helm
 
 # generate changelog
 cd "$ROOT_DIR"
-npx auto-changelog --commit-limit 0 --latest-version "$VERSION_NEW"
+# `--no`: run ONLY the auto-changelog locked in the root package.json. Without it npx silently
+# fetches the package from the registry when the local one is missing, which turns a broken
+# install into an unpinned download during a release.
+npx --no auto-changelog --commit-limit 0 --latest-version "$VERSION_NEW"

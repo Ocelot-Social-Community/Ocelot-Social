@@ -85,6 +85,6 @@ jobs:
       # it means something: the full run in test-backend.yml.
       - name: Validate the webapp's GraphQL documents against the schema
         run: |
-          cd backend && npx jest --coverage=false \
+          cd backend && npx --no jest --coverage=false \
             src/graphql/webappQueries.spec.ts \
             src/graphql/webappPostFilters.spec.ts
