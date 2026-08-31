@@ -55,9 +55,13 @@ const WAIT_FOR_DOM_QUIET_SCRIPT = ({ quietMs, timeoutMs }) =>
 // instead of letting it turn into a screenshot diff someone has to reverse-engineer.
 const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]'])
 
+// Schemes that genuinely never touch the network. Everything else — including ws:/wss:, which very
+// much does leave the browser — is judged by its host, so this one predicate is correct for both the
+// HTTP and the WebSocket guard below.
+const INERT_SCHEMES = /^(data|blob|about):/i
+
 const isLocal = (url) => {
-  // Non-http schemes (data:, blob:, about:) never leave the browser, so they are always fine.
-  if (!/^https?:/i.test(url)) return true
+  if (INERT_SCHEMES.test(url)) return true
   try {
     return LOCAL_HOSTS.has(new URL(url).hostname)
   } catch {
@@ -74,16 +78,32 @@ async function blockOutboundRequests(page, blocked) {
   })
 }
 
+// page.route() covers HTTP(S) only — a WebSocket handshake goes straight past it. Matched by
+// predicate rather than '**/*' on purpose: only non-local sockets are intercepted at all, so
+// Storybook's own HMR reconnect socket (see the networkidle note in gotoStory) keeps talking to the
+// local server directly instead of being proxied through Playwright. Without connectToServer() the
+// outbound connection is never established, so closing here is the block.
+async function blockOutboundWebSockets(page, blocked) {
+  await page.routeWebSocket(
+    (url) => !isLocal(url.href),
+    (ws) => {
+      blocked.add(ws.url())
+      ws.close()
+    },
+  )
+}
+
 /**
  * Navigates to a story's iframe (the same URL Storybook's own "open canvas in new tab" uses) and
  * waits for it to actually render. Combined with the init script above and the fixed faker seed /
  * fixed dates in the stories themselves, this is what makes a screenshot the same on every run.
  *
- * Throws if the story reached out to the network — see blockOutboundRequests above.
+ * Throws if the story reached out to the network — see blockOutboundRequests/blockOutboundWebSockets.
  */
 async function gotoStory(page, storyId) {
   const blocked = new Set()
   await blockOutboundRequests(page, blocked)
+  await blockOutboundWebSockets(page, blocked)
   await page.addInitScript(FREEZE_ANIMATIONS_SCRIPT)
   await page.goto(`/iframe.html?id=${storyId}&viewMode=story`, { waitUntil: 'domcontentloaded' })
   const root = page.locator(STORY_ROOT)
