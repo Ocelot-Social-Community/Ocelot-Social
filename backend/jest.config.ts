@@ -36,6 +36,13 @@ export default {
   transform: {
     '\\.gql$': '<rootDir>/test/graphqlTransform.ts',
     '\\.tsx?$': 'ts-jest',
+    // `uuid` is ESM-only since v12 and ships no CommonJS build. Jest runs the suite
+    // as CommonJS, so the package has to be down-compiled on the way in — see
+    // `transformIgnorePatterns` below, which is what lets this rule see it at all.
+    '\\.jsx?$': ['ts-jest', { tsconfig: { allowJs: true, checkJs: false } }],
   },
+  // Default is to skip all of `node_modules`; carve out the ESM-only packages so the
+  // `\\.jsx?$` transform above applies to them.
+  transformIgnorePatterns: ['/node_modules/(?!uuid/)'],
   moduleNameMapper: pathsToModuleNameMapper(paths, { prefix: '<rootDir>/' }),
 }
