@@ -101,7 +101,7 @@
     "subscriptions-transport-ws": "^0.11.0",
     "trunc-html": "~1.1.2",
     "tslog": "^4.10.2",
-    "uuid": "~9.0.1",
+    "uuid": "^14.0.2",
     "validator": "^13.15.35",
     "ws": "^8.21.3",
     "xregexp": "^5.1.2"
@@ -115,7 +115,6 @@
     "@types/node": "^26.1.1",
     "@types/request": "^2.48.13",
     "@types/slug": "^5.0.9",
-    "@types/uuid": "~9.0.1",
     "@types/ws": "^8.18.1",
     "eslint": "^10.8.1",
     "eslint-config-it4c": "^0.13.2",
