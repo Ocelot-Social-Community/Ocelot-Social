@@ -20,7 +20,7 @@
     "db:schema:apply": "tsx src/db/schema/run-audit.ts apply",
     "db:reset": "tsx src/db/reset.ts",
     "db:reset:withmigrations": "tsx src/db/reset-with-migrations.ts",
-    "db:seed": "tsx --require ./src/graphql/gql-register.ts src/db/seed.ts",
+    "db:seed": "tsx src/db/seed.ts",
     "db:data:owner": "tsx src/db/owner.ts",
     "db:data:promote-owner": "tsx src/db/promote-owner.ts",
     "db:data:roles": "tsx src/db/roles.ts",
