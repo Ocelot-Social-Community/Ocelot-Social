@@ -145,6 +145,6 @@
     "node": ">=25.5.0"
   },
   "allowScripts": {
-    "re2": true
+    "re2@1.24.1": true
   }
 }

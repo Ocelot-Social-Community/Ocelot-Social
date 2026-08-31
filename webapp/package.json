@@ -168,6 +168,6 @@
     "tiptap-utils": "1.8.4"
   },
   "allowScripts": {
-    "vue-demi": true
+    "vue-demi@0.14.10": true
   }
 }

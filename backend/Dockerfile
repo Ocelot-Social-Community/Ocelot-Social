@@ -164,6 +164,12 @@ ONBUILD RUN --mount=type=cache,target=/root/.npm,sharing=locked \
 # default, which would leave re2 installed but unbuilt — it then throws "Cannot find module
 # './build/Release/re2.node'" at require time rather than failing the install. node:26 still ships
 # npm 11, where the block does not exist; the entry is what keeps this working when it lands.
+#
+# The entry is version-pinned (`re2@1.24.1`), so BUMPING re2 requires updating it in the same commit:
+#   npm install-scripts approve re2 --allow-scripts-pin
+# That is deliberate — an unpinned entry would hand a future release's install script a standing
+# permission nobody looked at. Mind how it fails, though: under npm 11 (this image) nothing changes,
+# so CI stays green and only a developer on npm 12 sees it, at require time rather than at install.
 FROM base-build AS test-modules
 COPY backend/package.json backend/package-lock.json backend/.npmrc ./
 RUN --mount=type=cache,target=/root/.npm,sharing=locked \
