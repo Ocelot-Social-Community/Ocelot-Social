@@ -1,6 +1,6 @@
 import { storiesOf } from '@storybook/vue'
 import UserAvatar from '~/components/UserAvatar/UserAvatar.vue'
-import helpers from '~/storybook/helpers'
+import helpers, { FIXTURE_AVATAR_URL } from '~/storybook/helpers'
 
 helpers.init()
 
@@ -8,7 +8,7 @@ export const user = {
   id: 'u6',
   slug: 'louie',
   name: 'Louie',
-  avatar: helpers.avatarImage('https://s3.amazonaws.com/uifaces/faces/twitter/designervzm/128.jpg'),
+  avatar: helpers.avatarImage(FIXTURE_AVATAR_URL),
   about:
     'Illum in et velit soluta voluptatem architecto consequuntur enim placeat. Eum excepturi est ratione rerum in voluptatum corporis. Illum consequatur minus. Modi incidunt velit.',
   disabled: false,
@@ -27,9 +27,7 @@ export const user = {
       id: 'u3',
       slug: 'jenny-rostock',
       name: 'Jenny Rostock',
-      avatar: helpers.avatarImage(
-        'https://s3.amazonaws.com/uifaces/faces/twitter/bowbrick/128.jpg',
-      ),
+      avatar: helpers.avatarImage(FIXTURE_AVATAR_URL),
       disabled: false,
       deleted: false,
       followedByCount: 2,

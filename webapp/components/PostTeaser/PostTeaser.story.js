@@ -1,6 +1,6 @@
 import { storiesOf } from '@storybook/vue'
 import PostTeaser from './PostTeaser.vue'
-import helpers from '~/storybook/helpers'
+import helpers, { FIXTURE_AVATAR_URL, FIXTURE_POST_IMAGE_URL } from '~/storybook/helpers'
 
 helpers.init()
 
@@ -15,9 +15,7 @@ export const post = {
   image: null,
   author: {
     id: 'u3',
-    avatar: helpers.avatarImage(
-      'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/db/dbc9e03ebcc384b920c31542af2d27dd8eea9dc2_full.jpg',
-    ),
+    avatar: helpers.avatarImage(FIXTURE_AVATAR_URL),
     slug: 'jenny-rostock',
     name: 'Rainer Unsinn',
     disabled: false,
@@ -68,12 +66,10 @@ storiesOf('PostTeaser', module)
     data: () => ({
       post: {
         ...post,
-        image: {
-          url: 'https://picsum.photos/id/1015/800/450',
-          w320: 'https://picsum.photos/id/1015/320/180',
-          w640: 'https://picsum.photos/id/1015/640/360',
-          w1024: 'https://picsum.photos/id/1015/1024/576',
-        },
+        // Same shape as a real Post.image (srcset breakpoints), but every breakpoint points at the
+        // one committed local file — see helpers.avatarImage for why a remote url does not belong
+        // in a story the visual regression suite screenshots.
+        image: helpers.responsiveImage(FIXTURE_POST_IMAGE_URL),
       },
     }),
     template: `

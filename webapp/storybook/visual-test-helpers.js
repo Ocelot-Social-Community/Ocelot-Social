@@ -45,12 +45,65 @@ const WAIT_FOR_DOM_QUIET_SCRIPT = ({ quietMs, timeoutMs }) =>
     const hardCap = setTimeout(finish, timeoutMs)
   })
 
+// A screenshot may only depend on things this repo controls. A story that loads an image (or
+// anything else) off someone else's server makes a green run a function of that host's uptime:
+// picsum.photos returning 522 collapsed PostTeaser's "with image" story to the no-image layout and
+// failed CI, and the s3.amazonaws.com/uifaces avatars several stories used had been 403 for long
+// enough that the committed baselines recorded the initials fallback rather than an avatar — a test
+// that looked green while asserting the wrong picture. So: block every request that does not go to
+// the local Storybook server, collect what was blocked, and fail the test naming the offending urls
+// instead of letting it turn into a screenshot diff someone has to reverse-engineer.
+const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]'])
+
+// Schemes that genuinely never touch the network. Everything else — including ws:/wss:, which very
+// much does leave the browser — is judged by its host, so this one predicate is correct for both the
+// HTTP and the WebSocket guard below.
+const INERT_SCHEMES = /^(data|blob|about):/i
+
+const isLocal = (url) => {
+  if (INERT_SCHEMES.test(url)) return true
+  try {
+    return LOCAL_HOSTS.has(new URL(url).hostname)
+  } catch {
+    return false
+  }
+}
+
+async function blockOutboundRequests(page, blocked) {
+  await page.route('**/*', (route) => {
+    const url = route.request().url()
+    if (isLocal(url)) return route.continue()
+    blocked.add(url)
+    return route.abort()
+  })
+}
+
+// page.route() covers HTTP(S) only — a WebSocket handshake goes straight past it. Matched by
+// predicate rather than '**/*' on purpose: only non-local sockets are intercepted at all, so
+// Storybook's own HMR reconnect socket (see the networkidle note in gotoStory) keeps talking to the
+// local server directly instead of being proxied through Playwright. Without connectToServer() the
+// outbound connection is never established, so closing here is the block.
+async function blockOutboundWebSockets(page, blocked) {
+  await page.routeWebSocket(
+    (url) => !isLocal(url.href),
+    (ws) => {
+      blocked.add(ws.url())
+      ws.close()
+    },
+  )
+}
+
 /**
  * Navigates to a story's iframe (the same URL Storybook's own "open canvas in new tab" uses) and
  * waits for it to actually render. Combined with the init script above and the fixed faker seed /
  * fixed dates in the stories themselves, this is what makes a screenshot the same on every run.
+ *
+ * Throws if the story reached out to the network — see blockOutboundRequests/blockOutboundWebSockets.
  */
 async function gotoStory(page, storyId) {
+  const blocked = new Set()
+  await blockOutboundRequests(page, blocked)
+  await blockOutboundWebSockets(page, blocked)
   await page.addInitScript(FREEZE_ANIMATIONS_SCRIPT)
   await page.goto(`/iframe.html?id=${storyId}&viewMode=story`, { waitUntil: 'domcontentloaded' })
   const root = page.locator(STORY_ROOT)
@@ -79,6 +132,14 @@ async function gotoStory(page, storyId) {
   // font, different metrics) — mutation-quiet again to let that settle before the screenshot.
   await page.evaluate(async () => document.fonts.ready)
   await page.evaluate(WAIT_FOR_DOM_QUIET_SCRIPT, { quietMs: 150, timeoutMs: 2000 })
+  if (blocked.size) {
+    throw new Error(
+      `Story "${storyId}" requested ${blocked.size} remote resource(s), which would make this ` +
+        `screenshot depend on a third-party host being up:\n` +
+        `${[...blocked].map((url) => `  - ${url}`).join('\n')}\n` +
+        `Commit the asset under storybook/fixtures/ and reference it via helpers.responsiveImage().`,
+    )
+  }
   return root
 }
 

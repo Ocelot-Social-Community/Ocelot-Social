@@ -13,7 +13,10 @@ module.exports = {
   features: {
     storyStoreV7: false,
   },
-  staticDirs: ['../static'],
+  // `fixtures/` holds the images the stories render (see helpers.postImage/avatarImage). It is
+  // mounted under its own prefix rather than merged into `static/` so these test-only assets never
+  // ship in the production bundle, and so they can't collide with a real app asset name.
+  staticDirs: ['../static', { from: './fixtures', to: '/storybook-fixtures' }],
   webpackFinal: async (config) => {
     // Root-relative url()s (`/fonts/...`, `/img/...`) point at the `static/` dir, which staticDirs
     // serves at `/` — they are not webpack modules. css-loader's default `url` resolution tries to
