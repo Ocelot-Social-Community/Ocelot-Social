@@ -24,7 +24,7 @@
     "test:visual:docker": "yarn build:file-packages && yarn build-storybook && docker compose -f ../docker-compose.visual.yml run --rm webapp-visual-update-changed",
     "postinstall": "node scripts/fix-vue2-jest.js && node scripts/fix-v-mapbox.js",
     "lint:css-tokens": "node scripts/check-css-tokens.js",
-    "build:file-packages": "npm --prefix ../packages/branding run build && npm --prefix ../packages/ui run build && rm -rf node_modules/@ocelot-social/branding node_modules/@ocelot-social/ui node_modules/.yarn-integrity && yarn install"
+    "build:file-packages": "([ -d ../packages/branding/node_modules ] || npm --prefix ../packages/branding ci) && npm --prefix ../packages/branding run build && ([ -d ../packages/ui/node_modules ] || npm --prefix ../packages/ui ci) && npm --prefix ../packages/ui run build && rm -rf node_modules/@ocelot-social/branding node_modules/@ocelot-social/ui node_modules/.yarn-integrity && yarn install"
   },
   "dependencies": {
     "@mapbox/mapbox-gl-geocoder": "^5.1.2",
