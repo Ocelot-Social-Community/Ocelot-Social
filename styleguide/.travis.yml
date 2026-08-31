@@ -1,6 +1,8 @@
 language: node_js
+# Must stay in step with package-lock.json: it is lockfileVersion 3, which needs npm >= 7 and so
+# Node >= 15. The "10" that stood here shipped npm 6 and could not read the lockfile at all.
 node_js:
-  - "10"
+  - "26"
 cache:
   npm: true
   directories:
