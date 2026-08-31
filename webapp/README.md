@@ -5,8 +5,9 @@
 ## Installation
 
 For preparation you need a recent version of
-[Node](https://nodejs.org/en/). We are using
-`v25.3.0` and recommend to use [node version manager](https://github.com/nvm-sh/nvm) `nvm` to switch
+[Node](https://nodejs.org/en/). The version we build and test against is pinned in
+[`.nvmrc`](.nvmrc), and the commands below read it — so there is one place to change it. You can use
+[node version manager](https://github.com/nvm-sh/nvm) `nvm` to switch
 between different local Node versions:
 
 ```bash
