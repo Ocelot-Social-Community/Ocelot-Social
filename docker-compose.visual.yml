@@ -7,9 +7,15 @@
 # static HTML/JS/CSS output doesn't depend on the CPU that built it) and then
 # run only the Playwright test/screenshot step in the amd64 container below,
 # which is the part that actually needs to match CI's runner architecture.
-# Building Storybook itself *inside* the amd64 container works too (the
-# services below do this automatically if storybook-static doesn't exist
-# yet) but is far slower under amd64 emulation — prefer the npm/yarn scripts.
+# The webapp services deliberately do NOT build anything themselves — they run
+# Playwright and nothing else. Two reasons. Speed: a Storybook build under amd64
+# emulation costs minutes for output that is architecture-independent anyway.
+# And it would not work: webapp's own webpack is v4 while the Storybook 7 builder
+# needs the v5 in the repo ROOT node_modules (see the "Install root dependencies"
+# step in webapp-visual.yml), which is not mounted here — the build dies inside
+# builder-webpack5. So arrive with a freshly built storybook-static; the services
+# refuse to run against a stale or missing one rather than silently screenshotting
+# an outdated app (scripts/assert-fresh-storybook.js).
 #
 # Why a plain ubuntu:24.04 base instead of a prebuilt Playwright image: the
 # actual GitHub Actions workflows (ui-visual.yml / webapp-visual.yml) run
@@ -25,14 +31,12 @@
 # own steps, is slower per run but is the only way that's actually
 # guaranteed to match — no periodic image-drift debugging.
 #
-# Manual / advanced usage:
-# These skip their own Storybook build step if storybook-static already
-# exists on your machine (see "First run" note below) — if source changed
-# since the last run, either delete storybook-static first or use the
-# npm/yarn scripts above instead, which always rebuild fresh. "Source"
-# includes packages/ui and packages/branding: the webapp services rebuild
-# those, but a storybook-static left over from before that rebuild still
-# contains the old bundle, so delete it after changing either package.
+# Manual / advanced usage — build first, then run a service directly:
+#   cd webapp && yarn build:file-packages && yarn build-storybook
+# build:file-packages rebuilds @ocelot-social/branding and @ocelot-social/ui and
+# forces yarn to re-copy them. Both are `file:` dependencies whose dist/ is not
+# committed, so a stale dist/ silently drops components from every screenshot —
+# a dist/ predating OsRibbon is how PostTeaser baselines once disagreed with CI.
 #
 # webapp — New component (missing baseline):
 #   docker compose -f docker-compose.visual.yml run --rm webapp-visual-update
@@ -46,9 +50,7 @@
 #
 # Filter to specific component: -e TEST=OsValidationHint
 #
-# First run: storybook build is cached (in the bind-mounted storybook-static
-# dir, so it persists on the host); subsequent runs are much faster. Node
-# itself and Playwright's browser/OS deps are re-installed on every run (not
+# Node and Playwright's browser/OS deps are re-installed on every run (not
 # cached) — that live install is the whole point, see above.
 # After the run, commit the updated __screenshots__/ files.
 
@@ -66,13 +68,10 @@ x-visual-base: &visual-base
   volumes:
     - ./webapp:/app
     - webapp_visual_node_modules:/app/node_modules
-    - ./packages/ui:/packages/ui
-    # Own volume so the container's `npm ci` populates its own tree instead of overwriting the
-    # host's packages/ui|branding node_modules with amd64-emulated binaries. dist/ is deliberately
-    # NOT shadowed: it is the artifact webapp's file: dependency copies from, and it is gitignored.
-    - ui_package_node_modules:/packages/ui/node_modules
-    - ./packages/branding:/packages/branding
-    - branding_package_node_modules:/packages/branding/node_modules
+    # Read-only: the container never builds these, it only lets assert-fresh-storybook.js compare
+    # their mtimes against the bundle. Building them is the host's job (yarn build:file-packages).
+    - ./packages/ui:/packages/ui:ro
+    - ./packages/branding:/packages/branding:ro
 
 services:
   # Every service below starts its command with the same four lines,
@@ -83,13 +82,10 @@ services:
   # YAML anchors can't be spliced into the middle of another scalar string,
   # so this is duplicated rather than shared.
   #
-  # The webapp services then build @ocelot-social/branding and @ocelot-social/ui and re-copy them,
-  # mirroring webapp-visual.yml. Both are `file:` dependencies whose dist/ is not committed, so
-  # whatever happens to sit in the working copy decides what Storybook renders. Skipping this is
-  # not a slow path, it is a wrong one: a dist/ predating a component silently drops it from every
-  # screenshot, and the resulting baselines then disagree with CI (OsRibbon, PostTeaser #10025).
-  # The `rm -rf` is load-bearing — yarn keys file: deps by version, so with the persistent
-  # node_modules volume an unchanged version number means a rebuilt package is never re-copied.
+  # The webapp services then assert the bundle is current before touching anything else, so a stale
+  # storybook-static fails with an explicit message instead of producing a green run against an
+  # outdated app. `yarn install` afterwards is only for Playwright itself — node_modules has no
+  # bearing on the screenshots, which come solely from storybook-static.
   webapp-visual-update:
     <<: *visual-base
     command: >
@@ -99,12 +95,8 @@ services:
         curl -fsSL https://deb.nodesource.com/setup_25.x | bash - &&
         apt-get install -y -qq nodejs &&
         npm install -g yarn@1.22.22 &&
-        (cd /packages/branding && npm ci && npm run build) &&
-        (cd /packages/ui && npm ci && npm run build) &&
-        rm -rf node_modules/@ocelot-social/branding node_modules/@ocelot-social/ui &&
+        node scripts/assert-fresh-storybook.js /packages/ui /packages/branding &&
         yarn install &&
-        node scripts/fix-storybook-webpack.js &&
-        ([ -d storybook-static ] || yarn build-storybook) &&
         npx playwright install chromium --with-deps &&
         CI=true ./node_modules/.bin/playwright test --update-snapshots=missing $${TEST:-}
       "
@@ -118,12 +110,8 @@ services:
         curl -fsSL https://deb.nodesource.com/setup_25.x | bash - &&
         apt-get install -y -qq nodejs &&
         npm install -g yarn@1.22.22 &&
-        (cd /packages/branding && npm ci && npm run build) &&
-        (cd /packages/ui && npm ci && npm run build) &&
-        rm -rf node_modules/@ocelot-social/branding node_modules/@ocelot-social/ui &&
+        node scripts/assert-fresh-storybook.js /packages/ui /packages/branding &&
         yarn install &&
-        node scripts/fix-storybook-webpack.js &&
-        ([ -d storybook-static ] || yarn build-storybook) &&
         npx playwright install chromium --with-deps &&
         CI=true ./node_modules/.bin/playwright test --update-snapshots=changed $${TEST:-}
       "
@@ -165,5 +153,3 @@ services:
 volumes:
   webapp_visual_node_modules:
   ui_visual_node_modules:
-  ui_package_node_modules:
-  branding_package_node_modules:
