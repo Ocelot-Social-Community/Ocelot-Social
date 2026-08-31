@@ -89,7 +89,7 @@ jobs:
       # ARTIFACT, not cache. These are run-scoped hand-offs between jobs, which is what artifacts are
       # for; `actions/cache` with a `run_id` key can never hit on a later run, yet it occupies the
       # repo's 10 GB cache budget and evicts by LRU the caches that COULD hit — the buildx `type=gha`
-      # scopes and the yarn cache. `compression-level: 0` because the payload is already zstd-compressed.
+      # scopes and the npm cache. `compression-level: 0` because the payload is already zstd-compressed.
       - name: Upload images for the test jobs
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -161,7 +161,7 @@ jobs:
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: 'backend/.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Copy env files
         run: |
@@ -173,18 +173,18 @@ jobs:
           sudo wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-amd64"
           echo "66a2ef158866c3ecb3d8e49a7189814a485bddca43e133e4ca5735b8d3951bf7  /opt/cucumber-json-formatter" | sha256sum -c -
           sudo chmod +x /opt/cucumber-json-formatter
-          # Build the @ocelot-social/branding file: dependency first so the backend `yarn build` (tsc)
+          # Build the @ocelot-social/branding file: dependency first so the backend `npm run build` (tsc)
           # can resolve its types.
           cd packages/branding && npm ci && npm run build && cd ../..
           cd backend
-          yarn install
-          yarn build
+          npm ci
+          npm run build
           cd ..
-          yarn install
+          npm ci
       
       # ARTIFACT, not cache — for the same reason as the images above, which this step used to
       # contradict. It is a HAND-OFF to the matrix jobs: the payload is the whole installed workspace
-      # (sources, cypress specs, every node_modules, the backend `yarn build` output), so it is only
+      # (sources, cypress specs, every node_modules, the backend `npm run build` output), so it is only
       # ever valid for the commit that produced it. Its cache key therefore ended in `github.sha`,
       # which can never hit on a later run — a write-once entry of roughly a gigabyte, produced by
       # EVERY push to EVERY branch, evicting by LRU the caches that could actually hit. It also
@@ -252,9 +252,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      # Deliberately WITHOUT `cache: 'yarn'`, unlike `prepare_cypress`: this job never runs an install.
+      # Deliberately WITHOUT `cache: 'npm'`, unlike `prepare_cypress`: this job never runs an install.
       # The restore below brings the whole workspace INCLUDING every node_modules tree, so downloading
-      # and unpacking the yarn download cache on top of it is a few hundred megabytes that nothing
+      # and unpacking the npm download cache on top of it is a few hundred megabytes that nothing
       # reads — 40 times per run.
       - name: Setup Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -381,14 +381,14 @@ jobs:
           echo "neo4j was not ready: $attempt attempts over $(( $(date +%s) - started ))s (deadline ${deadline_seconds}s)"; exit 1
 
       - name: Initialize database
-        run: docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend yarn db:migrate init
+        run: docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend npm run db:migrate -- init
 
       - name: Migrate database
-        run: docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend yarn db:migrate up
+        run: docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend npm run db:migrate -- up
 
       - name: Full stack tests | run tests
         id: e2e-tests
-        run: yarn run cypress:run --spec "cypress/e2e/${{ matrix.feature }}"
+        run: npm run cypress:run --spec "cypress/e2e/${{ matrix.feature }}"
 
       - name: Full stack tests | if tests failed, compile html report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}

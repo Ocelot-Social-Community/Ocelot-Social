@@ -12,5 +12,5 @@ it is possible to log out the generated cypher statements. To do so, run the
 backend like this:
 
 ```sh
-DEBUG=neo4j-graphql-js yarn run dev
+DEBUG=neo4j-graphql-js npm run dev
 ```

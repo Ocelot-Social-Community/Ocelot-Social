@@ -23,8 +23,8 @@ fi
 ## Build the project
 cd $PROJECT_ROOT/styleguide
 rm -R $BUILD_DIR
-yarn install
-yarn run build
+npm ci
+npm run build
 
 ## Copy files and Sym link to deploy dir
 mkdir "$DEPLOY_DIR_REF/"

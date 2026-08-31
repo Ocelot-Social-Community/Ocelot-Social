@@ -1,7 +1,7 @@
 # Visual regression baseline update — renders screenshots on Linux so they match CI.
 #
 # Simplest usage — regenerate whatever differs from the current baselines:
-#   webapp:      cd webapp && yarn test:visual:docker
+#   webapp:      cd webapp && npm run test:visual:docker
 #   packages/ui: cd packages/ui && npm run test:visual:docker
 # These build Storybook natively first (fast, architecture-independent — the
 # static HTML/JS/CSS output doesn't depend on the CPU that built it) and then
@@ -32,9 +32,9 @@
 # guaranteed to match — no periodic image-drift debugging.
 #
 # Manual / advanced usage — build first, then run a service directly:
-#   cd webapp && yarn build:file-packages && yarn build-storybook
+#   cd webapp && npm run build:file-packages && npm run build-storybook
 # build:file-packages rebuilds @ocelot-social/branding and @ocelot-social/ui and
-# forces yarn to re-copy them. Both are `file:` dependencies whose dist/ is not
+# forces npm to re-pack them. Both are `file:` dependencies whose dist/ is not
 # committed, so a stale dist/ silently drops components from every screenshot —
 # a dist/ predating OsRibbon is how PostTeaser baselines once disagreed with CI.
 #
@@ -69,7 +69,7 @@ x-visual-base: &visual-base
     - ./webapp:/app
     - webapp_visual_node_modules:/app/node_modules
     # Read-only: the container never builds these, it only lets assert-fresh-storybook.js compare
-    # their mtimes against the bundle. Building them is the host's job (yarn build:file-packages).
+    # their mtimes against the bundle. Building them is the host's job (npm run build:file-packages).
     - ./packages/ui:/packages/ui:ro
     - ./packages/branding:/packages/branding:ro
 
@@ -84,7 +84,7 @@ services:
   #
   # The webapp services then assert the bundle is current before touching anything else, so a stale
   # storybook-static fails with an explicit message instead of producing a green run against an
-  # outdated app. `yarn install` afterwards is only for Playwright itself — node_modules has no
+  # outdated app. `npm ci` afterwards is only for Playwright itself — node_modules has no
   # bearing on the screenshots, which come solely from storybook-static.
   webapp-visual-update:
     <<: *visual-base
@@ -92,11 +92,10 @@ services:
       /bin/bash -c "
         apt-get update -qq &&
         apt-get install -y -qq curl ca-certificates &&
-        curl -fsSL https://deb.nodesource.com/setup_25.x | bash - &&
+        curl -fsSL https://deb.nodesource.com/setup_26.x | bash - &&
         apt-get install -y -qq nodejs &&
-        npm install -g yarn@1.22.22 &&
         node scripts/assert-fresh-storybook.js /packages/ui /packages/branding &&
-        yarn install &&
+        npm ci &&
         npx playwright install chromium --with-deps &&
         CI=true ./node_modules/.bin/playwright test --update-snapshots=missing $${TEST:-}
       "
@@ -107,11 +106,10 @@ services:
       /bin/bash -c "
         apt-get update -qq &&
         apt-get install -y -qq curl ca-certificates &&
-        curl -fsSL https://deb.nodesource.com/setup_25.x | bash - &&
+        curl -fsSL https://deb.nodesource.com/setup_26.x | bash - &&
         apt-get install -y -qq nodejs &&
-        npm install -g yarn@1.22.22 &&
         node scripts/assert-fresh-storybook.js /packages/ui /packages/branding &&
-        yarn install &&
+        npm ci &&
         npx playwright install chromium --with-deps &&
         CI=true ./node_modules/.bin/playwright test --update-snapshots=changed $${TEST:-}
       "
@@ -125,7 +123,7 @@ services:
       /bin/bash -c "
         apt-get update -qq &&
         apt-get install -y -qq curl ca-certificates &&
-        curl -fsSL https://deb.nodesource.com/setup_25.x | bash - &&
+        curl -fsSL https://deb.nodesource.com/setup_26.x | bash - &&
         apt-get install -y -qq nodejs &&
         npm install &&
         ([ -d storybook-static ] || npm run storybook:build) &&
@@ -142,7 +140,7 @@ services:
       /bin/bash -c "
         apt-get update -qq &&
         apt-get install -y -qq curl ca-certificates &&
-        curl -fsSL https://deb.nodesource.com/setup_25.x | bash - &&
+        curl -fsSL https://deb.nodesource.com/setup_26.x | bash - &&
         apt-get install -y -qq nodejs &&
         npm install &&
         ([ -d storybook-static ] || npm run storybook:build) &&

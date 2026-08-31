@@ -31,16 +31,16 @@ $ nvm install
 $ nvm use
 ```
 
-Install node dependencies with [yarn](https://yarnpkg.com/en/):
+Install node dependencies with [npm](https://www.npmjs.com/):
 
 ```sh
 # in main folder
 $ cd backend
-$ yarn install
+$ npm ci
 # or just
-$ yarn
+$ npm
 # or just later on to use version of ".nvmrc" file
-$ nvm use && yarn
+$ nvm use && npm
 ```
 
 Copy Environment Variables:
@@ -57,14 +57,14 @@ Start the backend for development with:
 
 ```sh
 # in backend/
-$ yarn run dev
+$ npm run dev
 ```
 
 or start the backend in production environment with:
 
 ```sh
 # in backend/
-$ yarn run start
+$ npm run start
 ```
 
 For e-mail delivery, please configure at least `SMTP_HOST` and `SMTP_PORT` in
@@ -83,21 +83,21 @@ A fresh database needs to be initialized and migrated.
 
 ```sh
 # in folder backend while database is running
-yarn db:migrate init
+npm run db:migrate -- init
 # for docker environments:
-docker exec ocelot-social-backend-1 yarn db:migrate init
+docker exec ocelot-social-backend-1 npm run db:migrate -- init
 # for docker production:
-docker exec ocelot-social-backend-1 yarn prod:migrate init
+docker exec ocelot-social-backend-1 npm run prod:migrate -- init
 ```
 
 ```sh
 # in backend with database running (In docker or local)
-yarn db:migrate up
+npm run db:migrate -- up
 
 # for docker development:
-docker exec ocelot-social-backend-1 yarn db:migrate up
+docker exec ocelot-social-backend-1 npm run db:migrate -- up
 # for docker production
-docker exec ocelot-social-backend-1 yarn prod:migrate up
+docker exec ocelot-social-backend-1 npm run prod:migrate -- up
 ```
 
 ### Optional Data
@@ -109,29 +109,29 @@ bootstrap account is the instance owner — the failsafe superuser):
 
 ```sh
 # in backend with database running (In docker or local)
-yarn db:data:owner
+npm run db:data:owner
 ```
 
 > [!WARNING]
 > These are **well-known, insecure default credentials** intended for local
-> development and CI only. **Never** run `yarn db:data:owner` on a production or
+> development and CI only. **Never** run `npm run db:data:owner` on a production or
 > internet-reachable instance with the defaults. If you do bootstrap an owner this
 > way, change the password (and ideally the email address) **immediately** after
 > first login. For production, prefer promoting a real, self-registered account via
-> `yarn db:data:promote-owner` (below) instead of seeding the default owner.
+> `npm run db:data:promote-owner` (below) instead of seeding the default owner.
 
 To promote an existing user to owner (e.g. a legacy instance that has no owner yet —
 the API only lets an existing owner grant the owner role), use, by email, slug or id:
 
 ```sh
-yarn db:data:promote-owner <email | slug | id>
+npm run db:data:promote-owner <email | slug | id>
 ```
 
 When using `CATEGORIES_ACTIVE=true` you also want to seed the categories with:
 
 ```sh
 # in backend with database running (In docker or local)
-yarn db:data:categories
+npm run db:data:categories
 ```
 
 ### Branding Data
@@ -142,10 +142,10 @@ To do so, run:
 
 ```sh
 # in backend with database running (In docker or local)
-yarn db:data:branding
+npm run db:data:branding
 
 # for docker
-docker exec ocelot-social-backend-1 yarn db:data:branding
+docker exec ocelot-social-backend-1 npm run db:data:branding
 ```
 
 ### Seed Data
@@ -154,10 +154,10 @@ For a predefined set of test data you can seed the database with:
 
 ```sh
 # in backend with database running (In docker or local)
-yarn db:seed
+npm run db:seed
 
 # for docker
-docker exec ocelot-social-backend-1 yarn db:seed
+docker exec ocelot-social-backend-1 npm run db:seed
 ```
 
 ### Reset Data
@@ -166,19 +166,19 @@ In order to reset the database you can run:
 
 ```sh
 # in backend with database running (In docker or local)
-yarn db:reset
+npm run db:reset
 # or deleting the migrations as well
-yarn db:reset:withmigrations
+npm run db:reset:withmigrations
 
 # for docker
-docker exec ocelot-social-backend-1 yarn db:reset
+docker exec ocelot-social-backend-1 npm run db:reset
 # or deleting the migrations as well
-docker exec ocelot-social-backend-1 yarn db:reset:withmigrations
+docker exec ocelot-social-backend-1 npm run db:reset:withmigrations
 # you could also wipe out your neo4j database and delete all volumes with:
 docker compose down -v
 ```
 
-> Note: This just deletes the data and not the constraints, hence you do not need to rerun `yarn db:migrate init` or `yarn db:migrate up`.
+> Note: This just deletes the data and not the constraints, hence you do not need to rerun `npm run db:migrate -- init` or `npm run db:migrate -- up`.
 
 > Note on caches: the role & policy permission caches live in the running server process. A `db:reset` / `db:seed` runs in a **separate** process, so it cannot clear them directly — the running server's caches would otherwise go stale (e.g. still point at roles that were just wiped). In dev/test the reset/seed scripts therefore best-effort POST `mutation { resyncCaches }` to the server, which re-reads both caches from the DB. This mutation is **disabled in production**; there a cache resync is simply a **rolling restart**, since each instance re-reads the DB on boot.
 
@@ -191,12 +191,12 @@ Generate a data migration file:
 
 ```sh
 # in backend
-$ yarn run db:migrate:create your_data_migration
+$ npm run db:migrate:create your_data_migration
 # Edit the file in ./src/db/migrations/
 
 # for docker
 # in main folder while docker compose is running
-$ docker compose exec ocelot-social-backend-1 yarn run db:migrate:create your_data_migration
+$ docker compose exec ocelot-social-backend-1 npm run db:migrate:create your_data_migration
 # Edit the file in ./src/db/migrations/
 ```
 
@@ -204,11 +204,11 @@ To run the migration:
 
 ```sh
 # in backend/ while database is running
-$ yarn run db:migrate up
+$ npm run db:migrate up
 
 # for docker
 # in main folder while docker compose is running
-$ docker exec backend yarn run db:migrate up
+$ docker exec backend npm run db:migrate up
 ```
 
 ## Testing
@@ -220,16 +220,16 @@ Run the unit tests:
 
 ```sh
 # in backend/ while database is running
-$ yarn run test
+$ npm test
 
 # for docker
 # in main folder while docker compose is running
-$ docker exec ocelot-social-backend-1 yarn run test
+$ docker exec ocelot-social-backend-1 npm test
 ```
 
 If the snapshots of the emails must be updated, you have to run the tests in docker! Otherwise the CI will fail.
 
 ```sh
 # in main folder while docker compose is running
-$ docker exec ocelot-social-backend-1 yarn run test -u src/emails/
+$ docker exec ocelot-social-backend-1 npm test -u src/emails/
 ```

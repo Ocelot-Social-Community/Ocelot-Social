@@ -119,14 +119,14 @@ Locally without Docker:
 
 ```bash
 # in backend folder
-$ yarn prod:migrate init
+$ npm run prod:migrate -- init
 ```
 
 Locally with Docker:
 
 ```bash
 # in main folder
-$ docker compose exec backend yarn prod:migrate init
+$ docker compose exec backend npm run prod:migrate -- init
 ```
 
 ***Calls in production***
@@ -135,7 +135,7 @@ Locally with Docker:
 
 ```bash
 # in main folder
-$ docker compose exec backend /bin/sh -c "yarn prod:migrate init"
+$ docker compose exec backend /bin/sh -c "npm run prod:migrate -- init"
 ```
 
 On a server with Kubernetes cluster:
@@ -143,7 +143,7 @@ On a server with Kubernetes cluster:
 ```bash
 # tested for one backend replica
 # !!! be aware of the kubectl context !!!
-$ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "yarn prod:migrate init"
+$ kubectl -n default exec -it $(kubectl -n default get pods | grep ocelot-backend | awk '{ print $1 }') -- /bin/sh -c "npm run prod:migrate -- init"
 ```
 
 ***Enter and Exit Cypher Shell***

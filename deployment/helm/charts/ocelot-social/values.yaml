@@ -67,7 +67,7 @@ backend:
     # neo4j-enterprise or memgraph. It decides how much of src/db/schema the database
     # ENFORCES — Community holds uniqueness only, Enterprise adds existence constraints,
     # Memgraph adds those plus data types. Whatever a profile cannot enforce is checked by the
-    # audit queries instead (`yarn tsx src/db/schema/run-audit.ts check <profile>`), so raising
+    # audit queries instead (`npx tsx src/db/schema/run-audit.ts check <profile>`), so raising
     # this on an instance whose data does not hold up yet reports rather than breaks.
     # NEO4J_PROFILE: "neo4j-community"
 

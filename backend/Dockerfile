@@ -3,7 +3,7 @@
 # Build the shared branding package (tsc -> dist). Placed at /packages/branding in `base` so the
 # backend's `file:../packages/branding` dependency resolves. Requires the repo-root build context
 # (see docker-compose*.yml / .github/workflows — backend now builds with `context: .`).
-FROM node:25.9.0-alpine AS branding-library
+FROM node:26.8.1-alpine AS branding-library
 RUN mkdir -p /app
 WORKDIR /app
 COPY packages/branding/package.json packages/branding/package-lock.json ./
@@ -24,7 +24,7 @@ FROM branding-library AS branding-tools
 FROM branding-library AS branding-runtime
 RUN npm prune --omit=dev
 
-FROM node:25.9.0-alpine AS base
+FROM node:26.8.1-alpine AS base
 LABEL org.label-schema.name="ocelot.social:backend"
 LABEL org.label-schema.description="Backend of the Social Network Software ocelot.social"
 LABEL org.label-schema.usage="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md"
@@ -39,8 +39,8 @@ EXPOSE ${PORT}
 # `bash` only — this stage is published as `backend-base` and is the RUNTIME image, both for `production`
 # here and for every brand image (deployment/configurations/*/docker/backend.Dockerfile does
 # `FROM backend-base` + `COPY --from=build /build .`). The node-gyp toolchain moved to `base-build`
-# below: python3 + gcc + linux-headers measured 324 MB of a 732 MB image and are used by `yarn install`
-# alone. `git` is gone entirely — nothing in backend/yarn.lock resolves from a git URL.
+# below: python3 + gcc + linux-headers measured 324 MB of a 732 MB image and are used by `npm ci`
+# alone. `git` is gone entirely — nothing in backend/package-lock.json resolves from a git URL.
 RUN apk --no-cache add bash
 RUN mkdir -p /app
 WORKDIR /app
@@ -51,23 +51,23 @@ COPY --from=branding-runtime ./app/ /packages/branding/
 # (see ONBUILD); vanilla leaves the directory absent (→ framework defaults). Ops override the search
 # path with $OCELOT_BRANDING_ASSETS_DIR (`:`-separated, e.g. a mounted volume of uploaded archives),
 # or pin a brand with $OCELOT_ACTIVE_BRANDING.
-CMD ["/bin/bash", "-c", "yarn run start"]
+CMD ["/bin/bash", "-c", "npm run start"]
 
-# Everything that RUNS `yarn install` or `yarn run build` derives from here rather than from `base`:
+# Everything that RUNS `npm ci` or `npm run build` derives from here rather than from `base`:
 # node-gyp compiles native addons, and the ONBUILD chain below type-checks the brand's middlewares with
 # tsc. `production` and `backend-base` deliberately do NOT inherit it — they only ever receive the
 # finished /build.
 FROM base AS base-build
 RUN apk --no-cache add python3 make g++ linux-headers
 # `strip` comes along with g++ (binutils), so this needs no package of its own. The helper is used
-# after every `yarn install` below — see the script for what it removes and why it has to share the
+# after every `npm ci` below — see the script for what it removes and why it has to share the
 # install's layer.
 COPY backend/scripts/prune-native-build-artifacts.sh /usr/local/bin/prune-native-build-artifacts
 RUN chmod +x /usr/local/bin/prune-native-build-artifacts
 
 # Installs at container START, hence the toolchain.
 FROM base-build AS development
-CMD ["/bin/sh", "-c", "yarn install && yarn run dev"]
+CMD ["/bin/sh", "-c", "npm install && npm run dev"]
 
 # Published as `backend-build`. This is where a BRAND build runs: its ONBUILD triggers copy the brand's
 # middlewares into src/middleware/branding/ and recompile the whole backend, so the toolchain has to be
@@ -77,13 +77,19 @@ FROM base-build AS build
 # backend-build) — the runtime image is FROM base + COPY /build and never inherits it.
 COPY --from=branding-tools ./app/ /brand-tools/
 # MANIFEST FIRST, sources second — the layer order is the whole point. The dependency install below
-# may only depend on package.json + yarn.lock, so it survives every commit that touches src/ only.
-# Copying the subtree first (as this did) invalidated the install on ANY backend change: the yarn
+# may only depend on package.json + package-lock.json, so it survives every commit that touches src/
+# only. Copying the subtree first (as this did) invalidated the install on ANY backend change: the npm
 # CACHE mount saved the downloads, but node_modules was still relinked and the native modules
 # (python3/make/g++ sit in `base` for exactly them) recompiled on every push.
-COPY backend/package.json backend/yarn.lock ./
-RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
-    yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache && \
+#
+# `.npmrc` is NOT optional here: it carries `install-links=true`, without which `npm ci` refuses the
+# lockfile outright (exit 1, naming the flag) — see the file for why the two modes are incompatible.
+# `--include=dev` is equally load-bearing: `base` sets NODE_ENV=production, and unlike yarn's
+# `--production=false` default, npm reads that env var and would silently drop every devDependency —
+# including the typescript that `npm run build` needs two ONBUILD steps down.
+COPY backend/package.json backend/package-lock.json backend/.npmrc ./
+RUN --mount=type=cache,target=/root/.npm,sharing=locked \
+    npm ci --include=dev --no-audit --no-fund && \
     prune-native-build-artifacts
 # Repo-root build context now (for /packages/branding): copy only the backend subtree to /app.
 COPY backend/ .
@@ -112,22 +118,26 @@ ONBUILD RUN if ls /brand/brand.config.* >/dev/null 2>&1; then \
     else echo "[branding] no typed brand.config — runtime archive skipped (vanilla)"; fi
 # No dev install here any more — the `build` stage above already did it, before the sources landed.
 # Nothing an ONBUILD trigger copies can change the dependency set: the overlays go to
-# src/middleware/branding/, src/db/data and /brand, never to /app/package.json or yarn.lock. Re-running
-# a frozen-lockfile install against a warm node_modules only cost time, in this repo's own build AND in
-# every downstream brand build.
-ONBUILD RUN yarn run build
+# src/middleware/branding/, src/db/data and /brand, never to /app/package.json or package-lock.json.
+# Re-running a locked install against a warm node_modules only cost time, in this repo's own build AND
+# in every downstream brand build.
+ONBUILD RUN npm run build
+# `.npmrc` travels with the manifest: the production install below is another `npm ci`, and it needs
+# `install-links` for the same reason the dev install did. `file:../packages/branding` resolves from
+# /build to /packages/branding — the SAME absolute path it resolves to from /app, which is exactly why
+# `base` puts the package there rather than inside the app tree.
 ONBUILD RUN mkdir /build && \
-    cp -r ./build ./package.json ./yarn.lock /build && \
+    cp -r ./build ./package.json ./package-lock.json ./.npmrc /build && \
     if [ -d ./deployment ]; then cp -r ./deployment /build/deployment; fi
-ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
-    cd /build && yarn install --production=true --frozen-lockfile --non-interactive --cache-folder /yarn-cache && \
+ONBUILD RUN --mount=type=cache,target=/root/.npm,sharing=locked \
+    cd /build && npm ci --omit=dev --no-audit --no-fund && \
     prune-native-build-artifacts
 
-# Deliberately NOT `FROM build`: the test image runs `yarn dev` → `nodemon --exec tsx src/index.ts`,
-# straight off the sources. Everything `build` adds on top — `yarn run build` (tsc), the /build copy and
-# the `--production=true` install into it — is never read by this image, and it is not cheap: 107 s for
+# Deliberately NOT `FROM build`: the test image runs `npm run dev` → `nodemon --exec tsx src/index.ts`,
+# straight off the sources. Everything `build` adds on top — `npm run build` (tsc), the /build copy and
+# the `--omit=dev` install into it — is never read by this image, and it is not cheap: 107 s for
 # the production install and 10 s for tsc, on a build that the e2e matrix then downloads 40 times.
-# The db migrations do not need it either; the workflow calls `yarn db:migrate`, which compiles the TS
+# The db migrations do not need it either; the workflow calls `npm run db:migrate`, which compiles the TS
 # migrations on the fly (`--compiler ts:./src/db/compiler.ts`) — `prod:migrate` is the compiled variant
 # and is not used here.
 #
@@ -140,22 +150,27 @@ ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
 # Hence: `build` keeps the untouched trigger chain for downstream, `test` gets its own lean path.
 #
 # The install therefore needs its own toolchain-bearing stage: `re2` ships no prebuilt binary for this
-# runtime (node 25 / musl / ABI 141), so yarn falls through to `node-gyp rebuild` and dies with
+# runtime (node 26 / musl), so npm falls through to `node-gyp rebuild` and dies with
 # "Could not find any Python installation to use" on a plain `base`. Installing INTO the test image
 # (`FROM base-build`) would fix that too, but this image is `docker save`d and handed to the e2e matrix
 # as an artifact — python3 + gcc + linux-headers are 324 MB that every one of those jobs would then
 # download. So compile here, ship only node_modules.
+#
+# re2 is also why package.json carries an `allowScripts` entry: npm 12 blocks install scripts by
+# default, which would leave re2 installed but unbuilt — it then throws "Cannot find module
+# './build/Release/re2.node'" at require time rather than failing the install. node:26 still ships
+# npm 11, where the block does not exist; the entry is what keeps this working when it lands.
 FROM base-build AS test-modules
-COPY backend/package.json backend/yarn.lock ./
-RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
-    yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache && \
+COPY backend/package.json backend/package-lock.json backend/.npmrc ./
+RUN --mount=type=cache,target=/root/.npm,sharing=locked \
+    npm ci --include=dev --no-audit --no-fund && \
     prune-native-build-artifacts
 
 FROM base AS test
 # Before the sources, so a src/ change does not invalidate the dependency layer.
 COPY --from=test-modules /app/node_modules ./node_modules
 COPY backend/ .
-CMD ["/bin/bash", "-c", "yarn run dev"]
+CMD ["/bin/bash", "-c", "npm run dev"]
 
 FROM build AS production_build
 

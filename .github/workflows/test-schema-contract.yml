@@ -66,17 +66,17 @@ jobs:
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: 'backend/.nvmrc'
-          cache: 'yarn'
-          cache-dependency-path: 'backend/yarn.lock'
+          cache: 'npm'
+          cache-dependency-path: 'backend/package-lock.json'
 
-      # @ocelot-social/branding is a `file:../packages/branding` dependency, and yarn copies its
+      # @ocelot-social/branding is a `file:../packages/branding` dependency, and npm packs its
       # dist/ at install time — so it has to be built BEFORE the install, or the types do not
       # resolve. Same step, same reason, as in test-backend.yml's lint job.
       - name: Build @ocelot-social/branding
         run: cd packages/branding && npm ci && npm run build
 
       - name: Install backend dependencies
-        run: cd backend && yarn --frozen-lockfile
+        run: cd backend && npm ci
 
       # --coverage=false is required, not a preference. jest.config.ts sets collectCoverage: true
       # with a global 95% line threshold, which is a statement about the WHOLE backend suite — this
@@ -85,6 +85,6 @@ jobs:
       # it means something: the full run in test-backend.yml.
       - name: Validate the webapp's GraphQL documents against the schema
         run: |
-          cd backend && yarn jest --coverage=false \
+          cd backend && npx jest --coverage=false \
             src/graphql/webappQueries.spec.ts \
             src/graphql/webappPostFilters.spec.ts

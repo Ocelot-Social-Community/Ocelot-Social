@@ -16,10 +16,10 @@ import { derivedEnumSDLs } from './src/graphql/derivedEnums'
 export default [
   {
     // public-docs/ is generated (spectaql, see the root `docs:api` script) and gitignored, so it only
-    // exists on a machine that ran the generator — where its minified bundle made `yarn lint` fail
+    // exists on a machine that ran the generator — where its minified bundle made `npm run lint` fail
     // while CI, which never generates it, stayed green.
     //
-    // schema.graphql is likewise generated (`yarn schema:print`), but it IS committed, so unlike
+    // schema.graphql is likewise generated (`npm run schema:print`), but it IS committed, so unlike
     // public-docs/ it fails lint everywhere rather than only locally. Its content is whatever
     // neo4j-graphql-js augments the schema into — unreachable filter/ordering types for every
     // type it touches, block descriptions in its own style. None of that is ours to fix, and

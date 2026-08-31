@@ -2,14 +2,14 @@ language: node_js
 node_js:
   - "10"
 cache:
-  yarn: true
+  npm: true
   directories:
     - node_module
 
 install:
-  - yarn install --production=false --frozen-lockfile --non-interactive
-  - yarn build
-  - yarn build:lib
+  - npm ci
+  - npm run build
+  - npm run build:lib
 
 before_deploy:
   - rm -Rf ./node_modules .docs ./preview ./tests *.log*

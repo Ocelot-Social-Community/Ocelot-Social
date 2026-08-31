@@ -142,18 +142,18 @@ jobs:
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: 'backend/.nvmrc'
-          cache: 'yarn'
-          cache-dependency-path: 'backend/yarn.lock'
+          cache: 'npm'
+          cache-dependency-path: 'backend/package-lock.json'
 
       # The backend depends on @ocelot-social/branding via `file:../packages/branding`; its dist/ (built
-      # output + .d.ts) must exist BEFORE `yarn` copies the file: dependency, otherwise the types don't
+      # output + .d.ts) must exist BEFORE `npm` packs the file: dependency, otherwise the types don't
       # resolve and the type-aware lint fails. (The unit-test job runs in Docker, whose Dockerfile builds
       # this stage already.)
       - name: Build @ocelot-social/branding
         run: cd packages/branding && npm ci && npm run build
 
       - name: backend | Lint
-        run: cd backend && yarn --frozen-lockfile && yarn run lint
+        run: cd backend && npm ci && npm run lint
 
   unit_test_backend:
     name: Unit tests - Backend
@@ -264,10 +264,10 @@ jobs:
           exit 1
 
       - name: backend | Initialize Database
-        run: docker compose exec -T backend yarn db:migrate init
+        run: docker compose exec -T backend npm run db:migrate -- init
 
       - name: backend | Migrate Database Up
-        run: docker compose exec -T backend yarn db:migrate up
+        run: docker compose exec -T backend npm run db:migrate -- up
 
       # Read-only, and it exits non-zero on any finding. Placed BEFORE the unit tests because
       # those wipe the database (every spec calls cleanDatabase), which would make the data
@@ -276,8 +276,8 @@ jobs:
       # did not produce, or one the database holds that nothing declares any more — plus a
       # label or relationship type in the database that the registry does not know.
       - name: backend | Schema check - declaration vs. database
-        run: docker compose exec -T backend yarn db:schema:check
+        run: docker compose exec -T backend npm run db:schema:check
 
       - name: backend | Unit test incl. coverage check
-        run: docker compose exec -T backend yarn test
+        run: docker compose exec -T backend npm test
 

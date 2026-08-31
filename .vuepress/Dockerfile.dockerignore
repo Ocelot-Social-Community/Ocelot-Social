@@ -1,5 +1,6 @@
 # Scoped ignore for the documentation image build (build context = repo root).
-# Keep .md sources, .vuepress/, and backend/ (for schema:print + SpectaQL); drop
+# Keep .md sources, .vuepress/, backend/ and packages/branding/ (for schema:print
+# + SpectaQL — the backend imports the branding package); drop
 # the heavy build artifacts and installed deps so the context stays small.
 **/node_modules
 .git

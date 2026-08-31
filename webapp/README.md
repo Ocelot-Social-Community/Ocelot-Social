@@ -16,16 +16,16 @@ $ nvm install
 $ nvm use
 ```
 
-Install node dependencies with [yarn](https://yarnpkg.com/en/):
+Install node dependencies with [npm](https://www.npmjs.com/):
 
 ```bash
 # install all dependencies
 $ cd webapp
-$ yarn install
+$ npm ci
 # or just
-$ yarn
+$ npm
 # or just later on to use version of ".nvmrc" file
-$ nvm use && yarn
+$ nvm use && npm
 ```
 
 Copy:
@@ -41,15 +41,15 @@ Configure the files according to your needs and your local setup.
 
 ```bash
 # serve with hot reload at localhost:3000
-$ yarn dev
+$ npm run dev
 ```
 
 ### Build for Production
 
 ```bash
 # build for production and launch server
-$ yarn build
-$ yarn start
+$ npm run build
+$ npm run start
 ```
 
 ### Run tests
@@ -68,17 +68,17 @@ After starting the application following the above guidelines, open new terminal
 
 ```bash
 # run eslint
-$ docker-compose exec webapp yarn lint
+$ docker-compose exec webapp npm run lint
 ```
 
 ```bash
 # run unit tests
-$ docker-compose exec webapp yarn test
+$ docker-compose exec webapp npm test
 ```
 
 ```bash
 # start storybook
-$ docker-compose exec webapp yarn storybook
+$ docker-compose exec webapp npm run storybook
 ```
 
 You can then visit the Storybook playground on `http://localhost:3002`
@@ -89,22 +89,22 @@ After starting the application following the above guidelines, open new terminal
 
 ```bash
 # run eslint in /webapp (use option --fix to normalize the files)
-$ yarn lint
+$ npm run lint
 ```
 
 ```bash
 # run unit tests in /webapp
-$ yarn test
+$ npm test
 ```
 
 ```bash
 # run locales in /webapp (use option --fix to sort the locales)
-$ yarn locales
+$ npm run locales
 ```
 
 ```bash
 # start storybook in /webapp
-$ yarn storybook
+$ npm run storybook
 ```
 
 You can then visit the Storybook playground on `http://localhost:3002`

@@ -30,7 +30,7 @@ Es handelt sich nicht um einen Bug, sondern um eine direkte Folge zweier verschi
 | Webapp | `kind: Deployment` (`deployment/helm/charts/ocelot-social/templates/webapp/deployment.yaml`) | Default RollingUpdate mit `maxSurge: 25%` → neuer Pod erst hochfahren, dann alten beenden |
 | Backend | `kind: StatefulSet` (`deployment/helm/charts/ocelot-social/templates/backend/stateful-set.yaml`) | StatefulSets ersetzen Pods seriell: alten Pod terminieren, **dann** neuen starten |
 
-Bei einer einzigen Replica heißt das beim Backend konkret: alter Pod weg → Image pullen → InitContainer mit `yarn prod:migrate init && yarn prod:migrate up` (`stateful-set.yaml:21`) → Hauptcontainer-Startup → Ready. Die Summe = Downtime.
+Bei einer einzigen Replica heißt das beim Backend konkret: alter Pod weg → Image pullen → InitContainer mit `npm run prod:migrate -- init && npm run prod:migrate -- up` (`stateful-set.yaml:21`) → Hauptcontainer-Startup → Ready. Die Summe = Downtime.
 
 ### Warum überhaupt StatefulSet?
 
@@ -171,7 +171,7 @@ Neo4j ist ein eigener Helm-Release und startet regelmäßig deutlich später als
 Die Migration bleibt deshalb im Pod, aber aufgeteilt auf **zwei** initContainer:
 
 1. `<release>-backend-wait-db` — pollt den Bolt-Port aus `NEO4J_URI` alle 5 s, bis er annimmt, längstens `backend.migrations.waitForDatabaseSeconds` (Default 1500 s / 25 min). Der Pod steht währenddessen in `Init` und kostet nichts. Sowohl das Zerlegen der URI als auch die Verbindungsprüfung nutzen `node`, nicht Shell-Bordmittel: busybox' `nc` hat kein portables `-z`, und `${NEO4J_URI#*://}` greift bei Userinfo, Pfad, Routing-Query (`neo4j://host:7687?policy=eu`) oder IPv6-Literal daneben — mit dem Ergebnis, dass der Container den vollen Timeout gegen den falschen Host wartet. `new URL()` deckt alle Fälle ab, eine unparsbare URI bricht per `set -e` sofort ab.
-2. `<release>-backend-migrations` — führt `yarn prod:migrate init && yarn prod:migrate up` genau einmal aus.
+2. `<release>-backend-migrations` — führt `npm run prod:migrate -- init && npm run prod:migrate -- up` genau einmal aus.
 
 Die Aufteilung ist der Punkt: Eine *verspätete* Datenbank ist erwartetes Verhalten und wird lautlos abgefangen. Eine *kaputte* Migration schlägt dagegen sofort im zweiten Container fehl, statt in einer langen Retry-Schleife zu verschwinden. Ein Retry-Loop um die Migration selbst würde beide Fälle vermischen.
 
