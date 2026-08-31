@@ -469,7 +469,7 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
   - [x] @nuxtjs/composition-api entfernt (nicht mehr nötig)
   - [x] vue-server-renderer auf 2.7.16 aktualisiert
 - [x] Tests durchführen: **157 Suites, 979 passed, 87 Snapshots** ✅
-- [x] Regressionstests (`yarn dev` und manuelle Prüfung) ✅
+- [x] Regressionstests (`npm run dev` und manuelle Prüfung) ✅
 
 ### Phase 2: Projekt-Setup ✅
 - [x] Vite + Vue 3 Projekt initialisieren
@@ -508,7 +508,7 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 **Ansatz:** Integration First - Library einbinden, dann schrittweise OsButton ersetzen, beginnend mit einfachsten Stellen.
 
 **Milestone 1: Library-Einbindung** ✅
-- [x] @ocelot-social/ui in Webapp installieren (yarn link + Webpack-Alias)
+- [x] @ocelot-social/ui in Webapp installieren (npm link + Webpack-Alias)
 - [x] vue-demi zur Webapp hinzugefügt (für Vue 2.7 Kompatibilität)
 - [x] Webpack-Alias für vue-demi (nutzt Webapp's Vue 2.7)
 - [x] Webpack-Alias für @ocelot-social/ui$ und style.css$
@@ -875,7 +875,7 @@ export default {
 
 **Entwickler startet mit:**
 ```bash
-LOCAL_UI=true yarn dev
+LOCAL_UI=true npm run dev
 ```
 
 **Release-Check:**
@@ -1636,7 +1636,7 @@ Bei der Migration werden:
 | 2026-02-08 | **Package Updates** | size-limit 12.0.0, eslint-plugin-jsdoc 62.5.4, vite-tsconfig-paths 6.1.0 |
 | 2026-02-08 | **TODO: eslint-config-it4c** | Muss auf ESLint 10 aktualisiert werden (aktuell inkompatibel) |
 | 2026-02-08 | **Phase 3: vue-demi Integration** | vue-demi zur Webapp hinzugefügt, Webpack-Alias für Vue 2.7 Kompatibilität |
-| 2026-02-08 | **Phase 3: Webpack-Alias** | @ocelot-social/ui$ und style.css$ Aliase für yarn-linked Package |
+| 2026-02-08 | **Phase 3: Webpack-Alias** | @ocelot-social/ui$ und style.css$ Aliase für npm-linked Package |
 | 2026-02-08 | **Phase 3: isVue2 Render** | OsButton mit isVue2 Check: Vue 2 attrs-Objekt, Vue 3 flat props |
 | 2026-02-08 | **Phase 3: CSS-Spezifität** | UI-Library CSS nach Styleguide laden (styleguide.js Plugin) |
 | 2026-02-08 | **Phase 3: Jest vue-demi** | Custom Mock (`__mocks__/@ocelot-social/ui.js`) mit Module._load Patch, defineComponent von Vue.default, vueDemiSetup.js, 979 Tests ✅ |
@@ -1645,7 +1645,7 @@ Bei der Migration werden:
 | 2026-02-08 | **Phase 3: Visueller Test** | Manueller Vergleich OsButton vs ds-button erfolgreich ✅ |
 | 2026-02-08 | **Phase 3: v8 ignore** | Vue 2 Branch in OsButton mit `/* v8 ignore */` für 100% Coverage in Vitest |
 | 2026-02-08 | **Phase 3: Docker Build** | ui-library Stage in Dockerfile + Dockerfile.maintenance, COPY --from=ui-library |
-| 2026-02-08 | **Phase 3: CI-Fix** | Relativer Pfad `file:../packages/ui` statt absolut für yarn install außerhalb Docker |
+| 2026-02-08 | **Phase 3: CI-Fix** | Relativer Pfad `file:../packages/ui` statt absolut für npm ci außerhalb Docker |
 | 2026-02-08 | **Phase 3: Storybook Fix** | TypeScript-Fehler in Stories behoben (`default` aus args entfernt) |
 | 2026-02-08 | **Phase 3: attrs/listeners** | OsButton forwarded jetzt attrs + $listeners für Vue 2 (getCurrentInstance) |
 | 2026-02-08 | **Phase 3: Jest Mock erweitert** | Alle Composition API Funktionen (computed, ref, watch, etc.) im Mock |

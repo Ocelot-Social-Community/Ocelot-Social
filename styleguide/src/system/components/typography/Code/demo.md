@@ -1,7 +1,7 @@
 ## Basic usage
 
 ```
-<ds-code>cd your-system-name && yarn install</ds-code>
+<ds-code>cd your-system-name && npm ci</ds-code>
 ```
 
 ## Inline Code

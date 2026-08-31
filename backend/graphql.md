@@ -23,7 +23,7 @@ audiences and two ways to consume it:
 
 ### For developers: explore the live API
 
-Run the backend (`yarn dev`) and open the GraphQL endpoint
+Run the backend (`npm run dev`) and open the GraphQL endpoint
 (`GRAPHQL_URI`, default `http://localhost:4000/`) in a browser to get an
 interactive playground/sandbox where you can run queries against your data. See
 the [GraphQL Playground notes](./src/graphql/GraphQL-Playground.md).
@@ -34,13 +34,13 @@ A self-contained HTML page is generated with
 [SpectaQL](https://github.com/anvilco/spectaql):
 
 ```sh
-yarn docs:api
+npm run docs:api
 # → backend/public-docs/index.html  (open in a browser)
 ```
 
 `docs:api` runs two steps:
 
-1. **`yarn schema:print`** writes `backend/schema.graphql` — the **augmented**
+1. **`npm run schema:print`** writes `backend/schema.graphql` — the **augmented**
    runtime schema. This matters: `neo4j-graphql-js`'s `makeAugmentedSchema`
    generates queries, `filter`/`orderBy` arguments and CRUD mutations that do
    **not** exist in the hand-written `src/graphql/**/*.gql` files. Introspecting
@@ -63,6 +63,6 @@ The API reference is part of the VuePress documentation site: the
 generates it into `.vuepress/public/api` (via the repo-root `npm run docs:api`)
 and `vuepress build` ships it to `docs.ocelot.social/api` (linked from the "API"
 navbar entry). Locally, `docker compose up docs` serves the whole site, and
-`cd backend && yarn docs:api` still produces the standalone `public-docs/` HTML.
+`cd backend && npm run docs:api` still produces the standalone `public-docs/` HTML.
 
 

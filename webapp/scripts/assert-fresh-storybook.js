@@ -29,9 +29,9 @@ const IGNORED = new Set(['node_modules', '.git', 'dist', 'storybook-static', 'co
 
 const HOWTO =
   'Build it on the host first:\n' +
-  '  cd webapp && yarn build:file-packages && yarn build-storybook\n' +
+  '  cd webapp && npm run build:file-packages && npm run build-storybook\n' +
   'or run the whole thing via:\n' +
-  '  cd webapp && yarn test:visual:docker'
+  '  cd webapp && npm run test:visual:docker'
 
 /** Newest mtime under `dir`, plus the file it came from. Returns null for a missing dir. */
 function newestUnder(dir) {

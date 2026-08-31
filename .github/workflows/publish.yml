@@ -197,8 +197,9 @@ jobs:
       # trust boundary. Reading it from the environment hands it over as data.
       - name: Generate changelog
         run: |
-          yarn install
-          yarn auto-changelog --latest-version "${VERSION}" --unreleased-only
+          npm ci
+          # `--no`: use only the locked local binary, never a registry fetch (see scripts/release.sh).
+          npx --no -- auto-changelog --latest-version "${VERSION}" --unreleased-only
       - name: Compose release notes
         run: |
           set -euo pipefail

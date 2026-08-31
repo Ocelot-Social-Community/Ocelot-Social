@@ -5,8 +5,9 @@
 ## Installation
 
 For preparation you need a recent version of
-[Node](https://nodejs.org/en/). We are using
-`v25.3.0` and recommend to use [node version manager](https://github.com/nvm-sh/nvm) `nvm` to switch
+[Node](https://nodejs.org/en/). The version we build and test against is pinned in
+[`.nvmrc`](.nvmrc), and the commands below read it — so there is one place to change it. You can use
+[node version manager](https://github.com/nvm-sh/nvm) `nvm` to switch
 between different local Node versions:
 
 ```bash
@@ -16,17 +17,19 @@ $ nvm install
 $ nvm use
 ```
 
-Install node dependencies with [yarn](https://yarnpkg.com/en/):
+Install node dependencies with [npm](https://www.npmjs.com/):
 
 ```bash
 # install all dependencies
 $ cd webapp
-$ yarn install
-# or just
-$ yarn
-# or just later on to use version of ".nvmrc" file
-$ nvm use && yarn
+$ npm ci
+# or later on, to use the Node version from ".nvmrc"
+$ nvm use && npm ci
 ```
+
+`npm ci` installs exactly what `package-lock.json` pins and is what CI and the Docker images run.
+Use `npm install` only when you are adding or changing a dependency — unlike `npm ci`, it may rewrite
+the lockfile.
 
 Copy:
 
@@ -41,15 +44,15 @@ Configure the files according to your needs and your local setup.
 
 ```bash
 # serve with hot reload at localhost:3000
-$ yarn dev
+$ npm run dev
 ```
 
 ### Build for Production
 
 ```bash
 # build for production and launch server
-$ yarn build
-$ yarn start
+$ npm run build
+$ npm run start
 ```
 
 ### Run tests
@@ -68,17 +71,17 @@ After starting the application following the above guidelines, open new terminal
 
 ```bash
 # run eslint
-$ docker-compose exec webapp yarn lint
+$ docker-compose exec webapp npm run lint
 ```
 
 ```bash
 # run unit tests
-$ docker-compose exec webapp yarn test
+$ docker-compose exec webapp npm test
 ```
 
 ```bash
 # start storybook
-$ docker-compose exec webapp yarn storybook
+$ docker-compose exec webapp npm run storybook
 ```
 
 You can then visit the Storybook playground on `http://localhost:3002`
@@ -89,22 +92,22 @@ After starting the application following the above guidelines, open new terminal
 
 ```bash
 # run eslint in /webapp (use option --fix to normalize the files)
-$ yarn lint
+$ npm run lint
 ```
 
 ```bash
 # run unit tests in /webapp
-$ yarn test
+$ npm test
 ```
 
 ```bash
 # run locales in /webapp (use option --fix to sort the locales)
-$ yarn locales
+$ npm run locales
 ```
 
 ```bash
 # start storybook in /webapp
-$ yarn storybook
+$ npm run storybook
 ```
 
 You can then visit the Storybook playground on `http://localhost:3002`

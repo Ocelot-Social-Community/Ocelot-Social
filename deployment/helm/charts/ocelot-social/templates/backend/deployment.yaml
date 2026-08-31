@@ -115,7 +115,7 @@ spec:
         - name: {{ .Release.Name }}-backend-migrations
           image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default (include "defaultTag" .) }}"
           imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
-          command: ["/bin/sh", "-c", "yarn prod:migrate init && yarn prod:migrate up"]
+          command: ["/bin/sh", "-c", "npm run prod:migrate -- init && npm run prod:migrate -- up"]
           {{- include "resources" .Values.backend.resources | indent 10 }}
           env:
           - name: IMAGOR_PUBLIC_URL

@@ -16,7 +16,7 @@ Integrate it in your application: [Quick Start](https://github.com/visualjerk/vu
 
 ## Project setup
 ```
-yarn install
+npm ci
 ```
 
 ## Developing
@@ -24,7 +24,7 @@ yarn install
 Compiles and hot-reloads living styleguide
 
 ```
-yarn dev
+npm run dev
 ```
 
 ## Building
@@ -35,7 +35,7 @@ yarn dev
 Compiles living styleguide to `./docs`
 
 ```
-yarn build
+npm run build
 ```
 
 ### Library
@@ -43,17 +43,17 @@ yarn build
 Compiles design system as a library to `./dist`
 
 ```
-yarn build:lib
+npm run build:lib
 ```
 
 ## Helper
 
 ### Serve living styleguide locally
 ```
-yarn serve
+npm run serve
 ```
 
 ### Lints and fixes files
 ```
-yarn lint
+npm run lint
 ```

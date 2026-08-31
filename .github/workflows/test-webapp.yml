@@ -120,22 +120,22 @@ jobs:
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: 'webapp/.nvmrc'
-          cache: 'yarn'
-          cache-dependency-path: 'webapp/yarn.lock'
+          cache: 'npm'
+          cache-dependency-path: 'webapp/package-lock.json'
 
       # The webapp depends on @ocelot-social/branding via `file:../packages/branding`; its dist/ must
-      # exist BEFORE `yarn` copies the file: dependency, otherwise `import/no-unresolved` fails on the
+      # exist BEFORE `npm` packs the file: dependency, otherwise `import/no-unresolved` fails on the
       # branding imports. (The unit-test job runs in Docker, whose Dockerfile builds this stage already.)
       - name: Build @ocelot-social/branding
         run: cd packages/branding && npm ci && npm run build
 
       - name: webapp | Lint
-        run: cd webapp && yarn --frozen-lockfile && yarn run lint
+        run: cd webapp && npm ci && npm run lint
 
       # Separate step so a token regression reads as one in the log, rather than as "lint failed".
       # Needs no install of its own — it only reads files (see webapp/scripts/check-css-tokens.js).
       - name: webapp | Design tokens
-        run: cd webapp && yarn run lint:css-tokens
+        run: cd webapp && npm run lint:css-tokens
 
   unit_test_webapp:
     name: Unit Tests - Webapp
@@ -170,4 +170,4 @@ jobs:
         run: docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp
 
       - name: webapp | Unit tests incl. coverage check
-        run: docker compose exec -T webapp yarn test
+        run: docker compose exec -T webapp npm test

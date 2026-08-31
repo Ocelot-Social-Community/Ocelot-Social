@@ -13,7 +13,7 @@
     "dev": "nodemon --exec tsx src/index.ts -e js,ts,gql",
     "dev:debug": "nodemon --exec node --inspect=0.0.0.0:9229 build/src/index.js -e js,ts,gql",
     "schema:print": "tsx src/graphql/print-schema.ts",
-    "docs:api": "yarn run schema:print && spectaql spectaql.yml",
+    "docs:api": "npm run schema:print && spectaql spectaql.yml",
     "lint": "eslint --max-warnings 0 .",
     "test": "cross-env NODE_ENV=test NODE_OPTIONS=--max-old-space-size=8192 jest --runInBand --coverage --forceExit --detectOpenHandles",
     "db:schema:check": "tsx src/db/schema/run-audit.ts check",
@@ -129,18 +129,22 @@
     "tsx": "^4.23.12",
     "typescript": "^5.8.3"
   },
-  "resolutions": {
-    "**/**/fs-capacitor": "^6.2.0",
-    "**/graphql-upload": "^11.0.0",
-    "**/strip-ansi": "6.0.1",
-    "**/string-width": "4.2.0",
-    "**/wrap-ansi": "7.0.0",
-    "**/jwa": "^2.0.1",
-    "**/@types/express": "4.17.25",
-    "graphql-upload/graphql": "^16.11.0",
+  "overrides": {
+    "metascraper-lang-detector": {
+      "metascraper": "$metascraper"
+    },
+    "fs-capacitor": "^6.2.0",
+    "strip-ansi": "6.0.1",
+    "string-width": "4.2.0",
+    "wrap-ansi": "7.0.0",
+    "jwa": "^2.0.1",
+    "@types/express": "4.17.25",
     "re2": "~1.24.1"
   },
   "engines": {
     "node": ">=25.5.0"
+  },
+  "allowScripts": {
+    "re2@1.24.1": true
   }
 }

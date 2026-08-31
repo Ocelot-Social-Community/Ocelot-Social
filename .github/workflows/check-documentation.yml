@@ -26,6 +26,7 @@ jobs:
     outputs:
       markdown: ${{ steps.changes.outputs.markdown }}
       documentation: ${{ steps.changes.outputs.documentation }}
+      documentation-image: ${{ steps.changes.outputs.documentation-image }}
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -80,3 +81,35 @@ jobs:
 
       - name: npm-docs:build
         run: npm run docs:build
+
+  # The job above builds only the VuePress half, on the host and on its own Node. Nothing built
+  # .vuepress/Dockerfile itself, which is how it came to be broken twice over without a single red
+  # run: its `apidocs` stage lost its `file:../packages/branding` target in #9888, and #10085 bumped
+  # it to node:26, which ships no yarn. Both are the kind of defect only an actual image build finds.
+  #
+  # `target: production` on purpose — it is the last stage, so this exercises the whole chain
+  # (branding -> apidocs -> build -> nginx) rather than the documentation half alone.
+  build-documentation-image:
+    name: Build documentation image
+    needs: files-changed
+    runs-on: ubuntu-latest
+    if: needs.files-changed.outputs.documentation-image == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
+
+      # Build only — never pushed. The published image is produced by the release pipeline; this is
+      # a check, so it stays inside the runner and needs no registry credentials.
+      - name: Build documentation image
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          context: .
+          file: ./.vuepress/Dockerfile
+          target: production
+          push: false
+          tags: ocelot-social/documentation:ci
+          cache-from: type=gha,scope=documentation
+          cache-to: type=gha,mode=max,ignore-error=true,scope=documentation

@@ -69,7 +69,7 @@ jobs:
           node-version-file: 'backend/.nvmrc'
 
       - name: Generate GraphQL API reference (SpectaQL)
-        run: cd backend && yarn install --frozen-lockfile --ignore-scripts && cd .. && npm run docs:api
+        run: cd backend && npm ci --ignore-scripts && cd .. && npm run docs:api
 
       # VuePress builds on Node 20; it just copies the already-generated
       # .vuepress/public/api into the site. Keep these as separate steps so each

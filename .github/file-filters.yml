@@ -93,3 +93,34 @@ vuepress: &vuepress
 documentation: &documentation
   - *vuepress
   - *markdown
+
+# What can break the DOCUMENTATION IMAGE (.vuepress/Dockerfile), which is a different set from
+# `documentation` above — and the reason two defects sat in it unnoticed. That image has an
+# `apidocs` stage that installs the backend and runs schema:print + SpectaQL, so it breaks on
+# input the doc filters never look at:
+#   • #9888 gave the backend a `file:../packages/branding` dependency. The stage installed with
+#     only ./backend/ in the tree, so that dependency pointed at nothing — a packages/branding
+#     change, which `documentation` does not match.
+#   • #10085 bumped it to node:26, which ships no yarn — a .vuepress/ change, which it does.
+# Deliberately NOT all of 'backend/**': this build is expensive (backend install + tsc + VuePress)
+# and would then run on every backend pull request. Listed instead is what the image actually
+# reads — the manifests it installs from, the graphql sources schema:print loads, and the
+# branding package it resolves.
+#
+# `**/*.md` IS included, even though `test-vuepress-build` already runs the same `docs:build` on a
+# markdown change: the image's second stage does `COPY . .` and builds VuePress from the repo root,
+# so markdown is genuine build input here. The extra cost is bounded — the branding and apidocs
+# stages are unaffected by a .md edit and come from the gha cache, leaving only the VuePress build.
+documentation-image: &documentation-image
+  - '.github/file-filters.yml'
+  - '.github/workflows/check-documentation.yml'
+  - '.vuepress/**/*'
+  - '**/*.md'
+  - 'package.json'
+  - 'package-lock.json'
+  - 'backend/package.json'
+  - 'backend/package-lock.json'
+  - 'backend/.npmrc'
+  - 'backend/spectaql.yml'
+  - 'backend/src/graphql/**/*'
+  - *branding

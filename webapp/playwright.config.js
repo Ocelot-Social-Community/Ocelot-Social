@@ -37,10 +37,10 @@ module.exports = defineConfig({
 
   webServer: {
     // In CI the Storybook is pre-built by a dedicated workflow step; only the static file server
-    // needs to start here. Locally the full build + serve runs so `yarn test:visual` is self-contained.
+    // needs to start here. Locally the full build + serve runs so `npm run test:visual` is self-contained.
     command: process.env.CI
       ? './node_modules/.bin/http-server storybook-static -p 6007 -s'
-      : 'yarn build-storybook && ./node_modules/.bin/http-server storybook-static -p 6007 -s',
+      : 'npm run build-storybook && ./node_modules/.bin/http-server storybook-static -p 6007 -s',
     url: 'http://localhost:6007',
     reuseExistingServer: !process.env.CI,
     timeout: 180000,

@@ -202,7 +202,7 @@ warning and its badge icons simply stop existing.
    the DB still holds the old paths and the icons stay broken:
 
    ```sh
-   kubectl exec -n <namespace> deploy/<release>-backend -- yarn prod:db:data:branding
+   kubectl exec -n <namespace> deploy/<release>-backend -- npm run prod:db:data:branding
    ```
 
 If you generate your badges with a script, fix the path there too, not just in the generated file.

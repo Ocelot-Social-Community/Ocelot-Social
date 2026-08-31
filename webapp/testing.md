@@ -4,7 +4,7 @@
 
 We use [ESLint](https://eslint.org/) to make sure all developers follow certain code guidelines when writing JavaScript.
 
-Most code editors offer an ESLint plugin which helps detect mistakes already while you are writing code. To run the linter manually before pushing up new code type `yarn lint` into your terminal. Most minor issues can be fixed automatically with the command `yarn lint --fix`.
+Most code editors offer an ESLint plugin which helps detect mistakes already while you are writing code. To run the linter manually before pushing up new code type `npm run lint` into your terminal. Most minor issues can be fixed automatically with the command `npm run lint -- --fix`.
 
 ## Unit tests
 
@@ -12,10 +12,10 @@ We write unit tests with the help of [Jest](https://jestjs.io/) and [Vue Test Ut
 
 Test files are named `<subject>.spec.<ext>` and live next to their subject — repo-wide, in every package. `*.test.*` is rejected by ESLint: Jest still *runs* both suffixes (so a mis-named file fails loudly at lint time rather than being silently skipped), and letting both live was how one module ended up with two half-overlapping suites.
 
-To run all tests use the command `yarn test` in the `/webapp` directory. Other useful commands are:
-- `yarn test -t test-name` to run tests including `test-name` in their file or test names
-- `yarn test -o` to run tests related to files that have been changed since the latest commit
-- `yarn test path/to/component.spec.js` to run a single test file
+To run all tests use the command `npm test` in the `/webapp` directory. Other useful commands are:
+- `npm test -- -t test-name` to run tests including `test-name` in their file or test names
+- `npm test -- -o` to run tests related to files that have been changed since the latest commit
+- `npm test path/to/component.spec.js` to run a single test file
 
 ## Documentation and manual testing
 
@@ -33,7 +33,7 @@ With the right addons, Storybook also gives immediate feedback on how well the c
 
 ------
 
-To run Storybook, first start the app, then enter the following command in a new terminal window: `yarn storybook`. The output should look similar to this:
+To run Storybook, first start the app, then enter the following command in a new terminal window: `npm run storybook`. The output should look similar to this:
 
 ![Storybook output](../docu/gitbook/storybook-output.png)
 
