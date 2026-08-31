@@ -15,6 +15,7 @@ import '~/plugins/v-tooltip'
 // machine, and available with the network switched off.
 export const FIXTURE_AVATAR_URL = '/storybook-fixtures/avatar.png'
 export const FIXTURE_POST_IMAGE_URL = '/storybook-fixtures/post-image.png'
+export const FIXTURE_EMBED_PREVIEW_URL = '/storybook-fixtures/embed-preview.png'
 
 const helpers = {
   // Populated by story files before mount (e.g. FollowList.story.js), keyed by the fake userId each
@@ -113,7 +114,10 @@ const helpers = {
           return {
             data: {
               embed: {
-                image: 'https://i.ytimg.com/vi/ptCcgLM-p8k/maxresdefault_live.jpg',
+                // Local, like every other image a story renders: the Editor and CommentCard
+                // visual tests screenshot this preview, so a youtube thumbnail url would tie
+                // those baselines to i.ytimg.com being reachable.
+                image: FIXTURE_EMBED_PREVIEW_URL,
                 title: 'Video Titel',
                 description: 'Video Description',
                 url: 'https://www.youtube.com/watch?v=qkdXAtO40Fo',
