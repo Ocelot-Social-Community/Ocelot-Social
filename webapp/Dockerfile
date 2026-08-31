@@ -102,8 +102,12 @@ FROM base AS base-build
 RUN apk --no-cache add python3 make g++
 
 # Installs at container START, hence the toolchain.
+# `--include=dev` because `base` sets NODE_ENV=production and npm reads it: without the flag the
+# install silently omits devDependencies, and `npm run dev` then dies on the missing nuxt. yarn
+# needed no equivalent — it only honoured an explicit `--production`, never the env var. The compose
+# services override NODE_ENV=development, but the image must not depend on that.
 FROM base-build AS development
-CMD ["/bin/bash", "-c", "npm install && npm run dev"]
+CMD ["/bin/bash", "-c", "npm install --include=dev && npm run dev"]
 
 FROM base-build AS build
 # package.json-first: cache the dev-dependency install as its own layer (branding is config/assets only
