@@ -37,11 +37,13 @@ Install node dependencies with [npm](https://www.npmjs.com/):
 # in main folder
 $ cd backend
 $ npm ci
-# or just
-$ npm
-# or just later on to use version of ".nvmrc" file
-$ nvm use && npm
+# or later on, to use the Node version from ".nvmrc"
+$ nvm use && npm ci
 ```
+
+`npm ci` installs exactly what `package-lock.json` pins and is what CI and the Docker images run.
+Use `npm install` only when you are adding or changing a dependency — unlike `npm ci`, it may rewrite
+the lockfile.
 
 Copy Environment Variables:
 

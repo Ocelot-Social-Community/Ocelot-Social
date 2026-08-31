@@ -508,7 +508,7 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 **Ansatz:** Integration First - Library einbinden, dann schrittweise OsButton ersetzen, beginnend mit einfachsten Stellen.
 
 **Milestone 1: Library-Einbindung** ✅
-- [x] @ocelot-social/ui in Webapp installieren (npm run link + Webpack-Alias)
+- [x] @ocelot-social/ui in Webapp installieren (npm link + Webpack-Alias)
 - [x] vue-demi zur Webapp hinzugefügt (für Vue 2.7 Kompatibilität)
 - [x] Webpack-Alias für vue-demi (nutzt Webapp's Vue 2.7)
 - [x] Webpack-Alias für @ocelot-social/ui$ und style.css$
