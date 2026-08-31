@@ -106,10 +106,16 @@ documentation: &documentation
 # and would then run on every backend pull request. Listed instead is what the image actually
 # reads — the manifests it installs from, the graphql sources schema:print loads, and the
 # branding package it resolves.
+#
+# `**/*.md` IS included, even though `test-vuepress-build` already runs the same `docs:build` on a
+# markdown change: the image's second stage does `COPY . .` and builds VuePress from the repo root,
+# so markdown is genuine build input here. The extra cost is bounded — the branding and apidocs
+# stages are unaffected by a .md edit and come from the gha cache, leaving only the VuePress build.
 documentation-image: &documentation-image
   - '.github/file-filters.yml'
   - '.github/workflows/check-documentation.yml'
   - '.vuepress/**/*'
+  - '**/*.md'
   - 'package.json'
   - 'package-lock.json'
   - 'backend/package.json'
