@@ -209,8 +209,8 @@ Prepare database once before you start by running the following command in a sec
 
 ```bash
 # in main folder while docker compose is up
-$ docker compose exec backend npm run db:migrate init
-$ docker compose exec backend npm run db:migrate up
+$ docker compose exec backend npm run db:migrate -- init
+$ docker compose exec backend npm run db:migrate -- up
 ```
 
 Then clear and seed database by running the following command as well in the second terminal:
@@ -243,14 +243,14 @@ Please run the following commands before you push:
 
 ```bash
 # in folder backend/
-$ npm run lint --fix
+$ npm run lint -- --fix
 $ npm test
 ```
 
 ```bash
 # in folder webapp/
-$ npm run lint --fix
-$ npm run locales --fix
+$ npm run lint -- --fix
+$ npm run locales -- --fix
 $ npm test
 ```
 

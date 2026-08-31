@@ -206,11 +206,11 @@ To run the migration:
 
 ```sh
 # in backend/ while database is running
-$ npm run db:migrate up
+$ npm run db:migrate -- up
 
 # for docker
 # in main folder while docker compose is running
-$ docker exec backend npm run db:migrate up
+$ docker exec backend npm run db:migrate -- up
 ```
 
 ## Testing
@@ -233,5 +233,5 @@ If the snapshots of the emails must be updated, you have to run the tests in doc
 
 ```sh
 # in main folder while docker compose is running
-$ docker exec ocelot-social-backend-1 npm test -u src/emails/
+$ docker exec ocelot-social-backend-1 npm test -- -u src/emails/
 ```

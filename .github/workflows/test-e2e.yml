@@ -388,7 +388,7 @@ jobs:
 
       - name: Full stack tests | run tests
         id: e2e-tests
-        run: npm run cypress:run --spec "cypress/e2e/${{ matrix.feature }}"
+        run: npm run cypress:run -- --spec "cypress/e2e/${{ matrix.feature }}"
 
       - name: Full stack tests | if tests failed, compile html report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
