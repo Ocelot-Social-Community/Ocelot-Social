@@ -1055,6 +1055,13 @@
   },
   "map": {
     "alertMessage": "O mapa não pode ser acessado: O token do Mapbox não está configurado no servidor!",
+    "createEvent": {
+      "pickLocation": "Criar um novo evento aqui",
+      "resolvingLocation": "Buscando o endereço…"
+    },
+    "eventPopover": {
+      "unavailable": "Este evento não está mais disponível."
+    },
     "legend": {
       "event": "Evento",
       "group": "Grupo",
@@ -1686,7 +1693,8 @@
   },
   "user-avatar": {
     "popover": {
-      "open-profile": "Abrir perfil"
+      "open-profile": "Abrir perfil",
+      "unavailable": "Usuário não disponível"
     }
   },
   "videoCall": {

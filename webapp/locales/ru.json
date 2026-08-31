@@ -1055,6 +1055,13 @@
   },
   "map": {
     "alertMessage": "Карта недоступна: Токен Mapbox не настроен на сервере!",
+    "createEvent": {
+      "pickLocation": "Разместить здесь новое мероприятие",
+      "resolvingLocation": "Поиск адреса…"
+    },
+    "eventPopover": {
+      "unavailable": "Это мероприятие больше недоступно."
+    },
     "legend": {
       "event": "Событие",
       "group": "Группа",
@@ -1686,7 +1693,8 @@
   },
   "user-avatar": {
     "popover": {
-      "open-profile": "Открыть профиль"
+      "open-profile": "Открыть профиль",
+      "unavailable": "Пользователь недоступен"
     }
   },
   "videoCall": {

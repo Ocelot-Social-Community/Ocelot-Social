@@ -1,57 +1,61 @@
 <template>
-  <div v-if="user" class="user-avatar-popover">
-    <div class="user-header">
-      <avatar-image :profile="user" class="popover-avatar" />
-      <div class="user-names">
-        <span class="user-name">{{ user.name }}</span>
-        <span class="user-slug ds-text-soft">@{{ user.slug }}</span>
+  <div class="user-avatar-popover">
+    <template v-if="user">
+      <div class="user-header">
+        <avatar-image :profile="user" class="popover-avatar" />
+        <div class="user-names">
+          <span class="user-name">{{ user.name }}</span>
+          <span class="user-slug ds-text-soft">@{{ user.slug }}</span>
+        </div>
       </div>
-    </div>
-    <badges
-      v-if="$policy.get('badgesEnabled') && user.badgeVerification"
-      :badges="[user.badgeVerification, ...user.badgeTrophiesSelected]"
-    />
-    <location-info
-      v-if="user.location"
-      :location-data="user.location"
-      :is-owner="userId === $store.getters['auth/user'].id"
-      size="small"
-      class="location-info"
-    />
-    <p v-if="user.about" class="user-about">{{ user.about }}</p>
-    <!-- No :animated on OsNumber — popover appears on hover, animation would be distracting -->
-    <ul class="statistics">
-      <li>
-        <os-number :count="user.followedByCount" :label="$t('profile.followers')" />
-      </li>
-      <li>
-        <os-number
-          :count="user.contributionsCount"
-          :label="$t('common.post', null, user.contributionsCount)"
-        />
-      </li>
-      <li>
-        <os-number
-          :count="user.commentedCount"
-          :label="$t('common.comment', null, user.commentedCount)"
-        />
-      </li>
-    </ul>
-    <os-button
-      v-if="isTouchDevice && userLink"
-      as="nuxt-link"
-      :to="userLink"
-      class="open-link"
-      variant="primary"
-    >
-      {{ $t('user-avatar.popover.open-profile') }}
-    </os-button>
+      <badges
+        v-if="$policy.get('badgesEnabled') && user.badgeVerification"
+        :badges="[user.badgeVerification, ...user.badgeTrophiesSelected]"
+      />
+      <location-info
+        v-if="user.location"
+        :location-data="user.location"
+        :is-owner="userId === $store.getters['auth/user'].id"
+        size="small"
+        class="location-info"
+      />
+      <p v-if="user.about" class="user-about">{{ user.about }}</p>
+      <!-- No :animated on OsNumber — popover appears on hover, animation would be distracting -->
+      <ul class="statistics">
+        <li>
+          <os-number :count="user.followedByCount" :label="$t('profile.followers')" />
+        </li>
+        <li>
+          <os-number
+            :count="user.contributionsCount"
+            :label="$t('common.post', null, user.contributionsCount)"
+          />
+        </li>
+        <li>
+          <os-number
+            :count="user.commentedCount"
+            :label="$t('common.comment', null, user.commentedCount)"
+          />
+        </li>
+      </ul>
+      <os-button
+        v-if="isTouchDevice && userLink"
+        as="nuxt-link"
+        :to="userLink"
+        class="open-link"
+        variant="primary"
+      >
+        {{ $t('user-avatar.popover.open-profile') }}
+      </os-button>
+    </template>
+    <empty v-else-if="querySettled" icon="alert" :message="$t('user-avatar.popover.unavailable')" />
   </div>
 </template>
 
 <script>
 import { OsButton, OsNumber } from '@ocelot-social/ui'
 import Badges from '~/components/Badges.vue'
+import Empty from '~/components/Empty/Empty'
 import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
 import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import touchDevice from '~/mixins/touchDevice'
@@ -62,6 +66,7 @@ export default {
   mixins: [touchDevice],
   components: {
     Badges,
+    Empty,
     LocationInfo,
     OsButton,
     OsNumber,
@@ -70,6 +75,14 @@ export default {
   props: {
     userId: { type: String, required: true },
     userLink: { type: Object },
+  },
+  data() {
+    return {
+      // Distinguishes "still loading" (show nothing, as before) from "query
+      // came back without a user" (show the Empty state) — the query result
+      // itself can't tell those apart since `user` is null in both cases.
+      querySettled: false,
+    }
   },
   computed: {
     user() {
@@ -83,6 +96,12 @@ export default {
       },
       variables() {
         return { id: this.userId }
+      },
+      result() {
+        this.querySettled = true
+      },
+      error() {
+        this.querySettled = true
       },
     },
   },

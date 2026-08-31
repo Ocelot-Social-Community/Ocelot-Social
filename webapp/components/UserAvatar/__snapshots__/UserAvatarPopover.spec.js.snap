@@ -565,8 +565,8 @@ exports[`UserAvatarPopover given a touch device shows button when userLink is pr
         class="inline-flex items-center"
       >
         
-    user-avatar.popover.open-profile
-  
+      user-avatar.popover.open-profile
+    
       </span>
     </a>
   </div>

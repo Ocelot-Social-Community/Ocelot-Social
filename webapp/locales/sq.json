@@ -1055,6 +1055,13 @@
   },
   "map": {
     "alertMessage": "Harta nuk mund të aksesohet: Tokeni i Mapbox nuk është vendosur në server!",
+    "createEvent": {
+      "pickLocation": "Vendos këtu një ngjarje të re",
+      "resolvingLocation": "Duke kërkuar adresën…"
+    },
+    "eventPopover": {
+      "unavailable": "Kjo ngjarje nuk është më e disponueshme."
+    },
     "legend": {
       "event": "Ngjarje",
       "group": "Grup",
@@ -1686,7 +1693,8 @@
   },
   "user-avatar": {
     "popover": {
-      "open-profile": "Hap profilin"
+      "open-profile": "Hap profilin",
+      "unavailable": "Përdoruesi nuk është më i disponueshëm"
     }
   },
   "videoCall": {

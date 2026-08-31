@@ -1055,6 +1055,13 @@
   },
   "map": {
     "alertMessage": "Карта недоступна: токен Mapbox не налаштовано на сервері!",
+    "createEvent": {
+      "pickLocation": "Розмістити тут нову подію",
+      "resolvingLocation": "Пошук адреси…"
+    },
+    "eventPopover": {
+      "unavailable": "Ця подія більше недоступна."
+    },
     "legend": {
       "event": "Подія",
       "group": "Група",
@@ -1686,7 +1693,8 @@
   },
   "user-avatar": {
     "popover": {
-      "open-profile": "Відкрити профіль"
+      "open-profile": "Відкрити профіль",
+      "unavailable": "Користувач більше недоступний"
     }
   },
   "videoCall": {

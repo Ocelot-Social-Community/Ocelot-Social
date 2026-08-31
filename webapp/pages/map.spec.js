@@ -15,10 +15,29 @@ jest.mock('@mapbox/mapbox-gl-geocoder', () => {
   })
 })
 
+jest.mock('~/components/UserAvatar/UserAvatarPopover', () => ({
+  name: 'UserAvatarPopover',
+  props: ['userId', 'userLink'],
+  render: (h) => h('div', { class: 'user-avatar-popover-stub' }),
+}))
+
+jest.mock('~/components/GroupAvatar/GroupAvatarPopover', () => ({
+  name: 'GroupAvatarPopover',
+  props: ['groupId', 'groupLink'],
+  render: (h) => h('div', { class: 'group-avatar-popover-stub' }),
+}))
+
+jest.mock('~/components/Map/MapEventPopover', () => ({
+  name: 'MapEventPopover',
+  props: ['postId'],
+  render: (h) => h('div', { class: 'map-event-popover-stub' }),
+}))
+
 jest.mock('mapbox-gl', () => {
   const popupInstance = {
     isOpen: jest.fn(() => false),
     remove: jest.fn(),
+    on: jest.fn(),
     setLngLat: jest.fn(() => popupInstance),
     setHTML: jest.fn(() => popupInstance),
     setDOMContent: jest.fn(() => popupInstance),
@@ -26,6 +45,7 @@ jest.mock('mapbox-gl', () => {
   }
   return {
     accessToken: null,
+    FullscreenControl: jest.fn(),
     GeolocateControl: jest.fn(),
     Map: jest.fn(() => ({
       addControl: jest.fn(),
@@ -178,7 +198,7 @@ describe('map', () => {
       $t: (t) => t,
       $i18n: { locale: () => 'en' },
       $route: { path: '/map', query: {} },
-      $router: { replace: jest.fn() },
+      $router: { replace: jest.fn(), push: jest.fn() },
       $env: {
         MAPBOX_TOKEN: 'MY_MAPBOX_TOKEN',
       },
@@ -386,18 +406,157 @@ describe('map', () => {
       })
 
       it('adds style switcher control', () => {
-        // style switcher is the second addControl call (after geocoder)
         const styleSwitcherCall = mapAddControlMock.mock.calls.find(
-          (call) => call[1] === 'top-right' && call[0].onAdd,
+          (call) =>
+            call[1] === 'top-right' &&
+            call[0].onAdd &&
+            call[0].onAdd().className.includes('map-style-switcher'),
         )
         expect(styleSwitcherCall).toBeTruthy()
       })
 
+      it('registers every top-right control in the documented order: geocoder → pin tool → zoom → fullscreen → geolocate → style switcher', () => {
+        const topRightControls = mapAddControlMock.mock.calls
+          .filter((call) => call[1] === 'top-right')
+          .map((call) => call[0])
+
+        const indexOf = (predicate) => topRightControls.findIndex(predicate)
+        const geocoderIndex = indexOf((control) => control === wrapper.vm.geocoder)
+        const pinToolIndex = indexOf(
+          (control) => control.onAdd && control.onAdd().className.includes('map-event-pin-tool'),
+        )
+        const navigationIndex = indexOf(
+          (control) => control === mapboxgl.NavigationControl.mock.instances[0],
+        )
+        const fullscreenIndex = indexOf(
+          (control) => control === mapboxgl.FullscreenControl.mock.instances[0],
+        )
+        const geolocateIndex = indexOf(
+          (control) => control === mapboxgl.GeolocateControl.mock.instances[0],
+        )
+        const styleSwitcherIndex = indexOf(
+          (control) => control.onAdd && control.onAdd().className.includes('map-style-switcher'),
+        )
+
+        // Each found (not -1), then strictly ascending — the actual visual
+        // top-to-bottom order in the corner (mapbox-gl stacks same-corner
+        // controls in add order).
+        expect(geocoderIndex).toBeGreaterThanOrEqual(0)
+        expect(pinToolIndex).toBeGreaterThan(geocoderIndex)
+        expect(navigationIndex).toBeGreaterThan(pinToolIndex)
+        expect(fullscreenIndex).toBeGreaterThan(navigationIndex)
+        expect(geolocateIndex).toBeGreaterThan(fullscreenIndex)
+        expect(styleSwitcherIndex).toBeGreaterThan(geolocateIndex)
+      })
+
+      describe('event pin tool control', () => {
+        let container, toggle
+
+        beforeEach(() => {
+          const pinToolCall = mapAddControlMock.mock.calls.find(
+            (call) =>
+              call[1] === 'top-right' &&
+              call[0].onAdd &&
+              call[0].onAdd().className.includes('map-event-pin-tool'),
+          )
+          container = pinToolCall[0].onAdd()
+          toggle = container.querySelector('.map-event-pin-tool-toggle')
+        })
+
+        it('adds the tool, starting disarmed', () => {
+          expect(toggle).toBeTruthy()
+          expect(toggle.getAttribute('aria-pressed')).toBe('false')
+          expect(toggle.classList.contains('map-event-pin-tool-toggle--active')).toBe(false)
+        })
+
+        it('arms on click and disarms again on a second click', () => {
+          toggle.click()
+          expect(toggle.getAttribute('aria-pressed')).toBe('true')
+          expect(toggle.classList.contains('map-event-pin-tool-toggle--active')).toBe(true)
+
+          toggle.click()
+          expect(toggle.getAttribute('aria-pressed')).toBe('false')
+          expect(toggle.classList.contains('map-event-pin-tool-toggle--active')).toBe(false)
+        })
+      })
+
+      describe('map click while the event pin tool is armed', () => {
+        // The generic (layer-less) 'click' registration — distinct from the
+        // existing 3-arg map.on('click', 'markers', handler) used for the
+        // popup, which shares the same event name.
+        const getGenericClickHandler = () =>
+          mapOnMock.mock.calls.find((call) => call[0] === 'click' && call.length === 2)[1]
+
+        const armPinTool = () => {
+          const pinToolCall = mapAddControlMock.mock.calls.find(
+            (call) =>
+              call[1] === 'top-right' &&
+              call[0].onAdd &&
+              call[0].onAdd().className.includes('map-event-pin-tool'),
+          )
+          const container = pinToolCall[0].onAdd()
+          container.querySelector('.map-event-pin-tool-toggle').click()
+        }
+
+        it('does nothing while disarmed', () => {
+          getGenericClickHandler()({ lngLat: { lat: 52.5, lng: 13.4 } })
+          expect(mocks.$router.push).not.toHaveBeenCalled()
+        })
+
+        it('navigates to event creation with the resolved location, and disarms itself', async () => {
+          mocks.$apollo.query.mockResolvedValueOnce({
+            data: {
+              queryLocations: [
+                { id: 'poi.1', place_name: 'Alexanderplatz, Berlin', lat: 52.52, lng: 13.41 },
+              ],
+            },
+          })
+          armPinTool()
+
+          await getGenericClickHandler()({ lngLat: { lat: 52.5, lng: 13.4 } })
+
+          expect(mocks.$router.push).toHaveBeenCalledWith({
+            path: '/post/create/event',
+            query: {
+              lat: 52.5,
+              lng: 13.4,
+              locationName: 'Alexanderplatz, Berlin',
+              locationId: 'poi.1',
+            },
+          })
+        })
+
+        it('still navigates with just the coordinates when reverse-geocoding finds no match', async () => {
+          mocks.$apollo.query.mockResolvedValueOnce({ data: { queryLocations: [] } })
+          armPinTool()
+
+          await getGenericClickHandler()({ lngLat: { lat: 52.5, lng: 13.4 } })
+
+          expect(mocks.$router.push).toHaveBeenCalledWith({
+            path: '/post/create/event',
+            query: { lat: 52.5, lng: 13.4 },
+          })
+        })
+
+        it('still navigates with just the coordinates, and toasts, when reverse-geocoding fails', async () => {
+          mocks.$apollo.query.mockRejectedValueOnce(new Error('Network error'))
+          armPinTool()
+
+          await getGenericClickHandler()({ lngLat: { lat: 52.5, lng: 13.4 } })
+
+          expect(mocks.$toast.error).toHaveBeenCalledWith('Network error')
+          expect(mocks.$router.push).toHaveBeenCalledWith({
+            path: '/post/create/event',
+            query: { lat: 52.5, lng: 13.4 },
+          })
+        })
+      })
+
       it('creates popup', () => {
         expect(mapboxgl.Popup).toHaveBeenCalledWith({
-          closeButton: true,
+          closeButton: false,
           closeOnClick: true,
-          maxWidth: '300px',
+          maxWidth: '320px',
         })
       })
 
@@ -473,7 +632,10 @@ describe('map', () => {
 
         beforeEach(() => {
           const styleSwitcherCall = mapAddControlMock.mock.calls.find(
-            (call) => call[1] === 'top-right' && call[0].onAdd,
+            (call) =>
+              call[1] === 'top-right' &&
+              call[0].onAdd &&
+              call[0].onAdd().className.includes('map-style-switcher'),
           )
           container = styleSwitcherCall[0].onAdd()
         })
@@ -572,43 +734,51 @@ describe('map', () => {
           expect(mapboxgl.__popupInstance.setLngLat).not.toHaveBeenCalled()
         })
 
-        it('popup includes location name header', () => {
+        it('mounts a UserAvatarPopover with the feature id and profile link', () => {
           mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
           onEventMocks.mouseenter({
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
-          const dom = getPopupDOM()
-          const header = dom.querySelector('.map-popup-header')
-          expect(header).toBeTruthy()
-          expect(header.textContent).toBe('Hamburg')
+          const [instance] = wrapper.vm.popupComponentInstances
+          expect(instance.$options.name).toBe('UserAvatarPopover')
+          expect(instance.userId).toBe('u2')
+          expect(instance.userLink).toEqual({ path: '/profile/u2/bob' })
         })
 
-        it('popup includes user name and profile link', () => {
+        it('destroys previously mounted popover instances before mounting new ones', () => {
           mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
           onEventMocks.mouseenter({
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
-          const dom = getPopupDOM()
-          expect(dom.textContent).toContain('Bob')
-          const link = dom.querySelector('a')
-          expect(link.textContent).toBe('@bob')
-          expect(link.getAttribute('href')).toBe('/profile/u2/bob')
-          expect(link.getAttribute('rel')).toBe('noopener noreferrer')
-        })
-
-        it('popup includes description when present', () => {
+          const [firstInstance] = wrapper.vm.popupComponentInstances
+          const destroySpy = jest.spyOn(firstInstance, '$destroy')
           mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
           onEventMocks.mouseenter({
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
-          const dom = getPopupDOM()
-          expect(dom.textContent).toContain('Builder')
+          expect(destroySpy).toHaveBeenCalled()
         })
 
-        it('popup shows multiple features separated by hr', () => {
+        it('destroys mounted popover instances when the popup fires its own close event', () => {
+          mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
+          onEventMocks.mouseenter({
+            point: { x: 100, y: 200 },
+            lngLat: { lng: 10.0, lat: 53.55 },
+          })
+          const [instance] = wrapper.vm.popupComponentInstances
+          const destroySpy = jest.spyOn(instance, '$destroy')
+          const closeHandler = mapboxgl.__popupInstance.on.mock.calls.find(
+            (call) => call[0] === 'close',
+          )[1]
+          closeHandler()
+          expect(destroySpy).toHaveBeenCalled()
+          expect(wrapper.vm.popupComponentInstances).toEqual([])
+        })
+
+        it('popup shows multiple features separated by hr, one popover instance each', () => {
           const multiFeatures = [
             ...features,
             {
@@ -630,9 +800,13 @@ describe('map', () => {
           })
           const dom = getPopupDOM()
           expect(dom.querySelectorAll('hr').length).toBe(1)
-          const links = dom.querySelectorAll('a')
-          expect(links[1].textContent).toBe('&journalism')
-          expect(links[1].getAttribute('href')).toBe('/groups/g1/journalism')
+          const instances = wrapper.vm.popupComponentInstances
+          expect(instances.map((instance) => instance.$options.name)).toEqual([
+            'UserAvatarPopover',
+            'GroupAvatarPopover',
+          ])
+          expect(instances[1].groupId).toBe('g1')
+          expect(instances[1].groupLink).toEqual({ path: '/groups/g1/journalism' })
         })
 
         it('removes existing popup before showing new one', () => {
@@ -716,9 +890,7 @@ describe('map', () => {
       })
 
       describe('popup content for different marker types', () => {
-        const getPopupDOMForType = () => mapboxgl.__popupInstance.setDOMContent.mock.calls[0][0]
-
-        it('generates correct link for event type', () => {
+        it('mounts a MapEventPopover with the feature id for event type', () => {
           const eventFeatures = [
             {
               geometry: { coordinates: [9.17, 48.78] },
@@ -737,13 +909,12 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 9.17, lat: 48.78 },
           })
-          const dom = getPopupDOMForType()
-          const link = dom.querySelector('a')
-          expect(link.getAttribute('href')).toBe('/post/e1/party')
-          expect(link.textContent).toBe('party')
+          const [instance] = wrapper.vm.popupComponentInstances
+          expect(instance.$options.name).toBe('MapEventPopover')
+          expect(instance.postId).toBe('e1')
         })
 
-        it('generates correct link for theUser type', () => {
+        it('mounts a UserAvatarPopover for theUser type, same as user type', () => {
           const userFeatures = [
             {
               geometry: { coordinates: [13.38, 52.52] },
@@ -762,33 +933,10 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 13.38, lat: 52.52 },
           })
-          const dom = getPopupDOMForType()
-          const link = dom.querySelector('a')
-          expect(link.getAttribute('href')).toBe('/profile/u1/peter')
-          expect(link.textContent).toBe('@peter')
-        })
-
-        it('omits location header when locationName is empty', () => {
-          const features = [
-            {
-              geometry: { coordinates: [10.0, 53.55] },
-              properties: {
-                type: 'user',
-                slug: 'bob',
-                id: 'u2',
-                name: 'Bob',
-                locationName: '',
-                description: '',
-              },
-            },
-          ]
-          mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
-          onEventMocks.mouseenter({
-            point: { x: 100, y: 200 },
-            lngLat: { lng: 10.0, lat: 53.55 },
-          })
-          const dom = getPopupDOMForType()
-          expect(dom.querySelector('.map-popup-header')).toBeNull()
+          const [instance] = wrapper.vm.popupComponentInstances
+          expect(instance.$options.name).toBe('UserAvatarPopover')
+          expect(instance.userId).toBe('u1')
+          expect(instance.userLink).toEqual({ path: '/profile/u1/peter' })
         })
       })
 
