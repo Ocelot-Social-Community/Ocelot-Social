@@ -50,20 +50,20 @@ describe('UpdateQuery', () => {
       })
 
       it('does not call $state.complete()', () => {
-        expect(updateQuery()(previousResult, { fetchMoreResult }))
+        updateQuery()(previousResult, { fetchMoreResult })
         expect($state.complete).not.toHaveBeenCalled()
       })
 
       describe('in case of fewer records than pageSize', () => {
         beforeEach(() => (component.pageSize = 10))
         it('calls $state.complete()', () => {
-          expect(updateQuery()(previousResult, { fetchMoreResult }))
+          updateQuery()(previousResult, { fetchMoreResult })
           expect($state.complete).toHaveBeenCalled()
         })
 
         it('changes component.hasMore to `false`', () => {
           expect(component.hasMore).toBe(true)
-          expect(updateQuery()(previousResult, { fetchMoreResult }))
+          updateQuery()(previousResult, { fetchMoreResult })
           expect(component.hasMore).toBe(false)
         })
       })

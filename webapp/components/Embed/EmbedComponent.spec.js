@@ -36,7 +36,7 @@ describe('EmbedComponent.vue', () => {
     }
   })
 
-  describe('given a href only for a link ', () => {
+  describe('given a href only for a link', () => {
     beforeEach(() => {
       propsData.embedData = {
         __typename: 'Embed',

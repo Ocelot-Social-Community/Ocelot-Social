@@ -15,6 +15,8 @@
 // mid-mount and surfaces as unrelated crashes (e.g. vue-infinite-loading's getScrollParent reading
 // a detached node). We therefore reload at most ONCE per requested target: if we already reloaded
 // for this exact target and the render still didn't honour it, the server cannot reach it — stop.
+import { reloadPage } from '~/utils/reloadPage'
+
 const RELOAD_TARGET_KEY = 'ocelot-branding-reload-target'
 // Explicit "framework defaults" as a base (see plugins/branding.js). Resolves to the same empty base
 // the server reports as brandingId, so it must be normalised before comparing.
@@ -87,7 +89,7 @@ export default ({ store }) => {
       // forever. Break instead.
       if (readAttemptedTarget() === target) return
       writeAttemptedTarget(target)
-      window.location.reload()
+      reloadPage()
     },
   )
 }

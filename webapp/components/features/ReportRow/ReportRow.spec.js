@@ -27,7 +27,7 @@ describe('ReportRow', () => {
     }
   })
 
-  describe('given a report ', () => {
+  describe('given a report', () => {
     const Wrapper = () => {
       const store = new Vuex.Store({
         getters,

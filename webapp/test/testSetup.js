@@ -9,14 +9,20 @@ import Directives from '~/plugins/vue-directives'
 import VueObserveVisibility from '~/plugins/vue-observe-visibility'
 import PermissionGate from '~/components/_new/generic/PermissionGate/PermissionGate.vue'
 
-window.matchMedia =
-  window.matchMedia ||
-  jest.fn().mockImplementation((query) => ({
-    matches: query === '(pointer: fine)' || query === '(min-width: 640px)',
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-  }))
-require('intersection-observer')
+// jsdom-only harness bits. A spec may opt into the plain `node` environment via the
+// `@jest-environment node` docblock — utils/themeTokens.spec.js does, because the SSR branch it
+// asserts only exists while there is no global `document` (jsdom 26 no longer lets a test delete
+// it). Reaching for `window` unconditionally would crash the setup for those files.
+if (typeof window !== 'undefined') {
+  window.matchMedia =
+    window.matchMedia ||
+    jest.fn().mockImplementation((query) => ({
+      matches: query === '(pointer: fine)' || query === '(min-width: 640px)',
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    }))
+  require('intersection-observer')
+}
 
 // Fail tests on Vue warnings
 Vue.config.warnHandler = (msg, vm, trace) => {
