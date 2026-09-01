@@ -36,6 +36,20 @@ module.exports = {
     '<rootDir>/test/testSetup.js',
   ],
   transform: {
+    // @faker-js/faker is ESM-only since v10 (its `exports` map lost the `require` condition), so
+    // Jest — which runs CommonJS here — has to transpile it. Listing it in transformIgnorePatterns
+    // is not enough: `.babelrc` is a file-relative config and Babel does not apply it to files in
+    // node_modules, so the package would be run through Babel WITHOUT any preset and keep its
+    // `import` statements. Hence an explicit, self-contained Babel config for it. This entry must
+    // stay ABOVE the generic '^.+\\.js$' pattern — Jest uses the first matching one.
+    'node_modules[\\\\/]@faker-js[\\\\/]faker[\\\\/].+\\.js$': [
+      'babel-jest',
+      {
+        configFile: false,
+        babelrc: false,
+        presets: [['@babel/preset-env', { targets: { node: 'current' } }]],
+      },
+    ],
     '.*\\.(vue)$': '@vue/vue2-jest',
     '^.+\\.js$': 'babel-jest',
     '^.+\\.mjs$': 'babel-jest',
@@ -43,7 +57,10 @@ module.exports = {
   // Transform ESM packages that Jest can't handle natively
   // Note: @ocelot-social/ui is NOT in the exception list because we load from dist/index.cjs
   // which is already CommonJS and doesn't need transformation
-  transformIgnorePatterns: ['node_modules/(?!(vue-demi)/)', '<rootDir>/../packages/ui/'],
+  transformIgnorePatterns: [
+    'node_modules/(?!(vue-demi|@faker-js/faker)/)',
+    '<rootDir>/../packages/ui/',
+  ],
   testMatch: ['**/?(*.)+(spec|test).js?(x)'],
   testPathIgnorePatterns: ['/node_modules/', '\\.visual\\.spec\\.js$'],
   modulePathIgnorePatterns: ['<rootDir>/dist/'],
