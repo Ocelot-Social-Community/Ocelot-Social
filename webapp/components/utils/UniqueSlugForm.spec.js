@@ -14,6 +14,8 @@ beforeEach(() => {
 })
 
 describe('UniqueSlugForm', () => {
+  // async-validator resolves with the validated source object (it resolved with `undefined` up to
+  // v3), so a passing validation is asserted as "resolves with what went in".
   const validate = (object) => {
     const { formSchema } = UniqueSlugForm({ translate, apollo, currentUser })
     const validator = new Schema(formSchema)
@@ -31,7 +33,7 @@ describe('UniqueSlugForm', () => {
 
     describe('alphanumeric, hyphens or underscores', () => {
       it('validates', async () => {
-        await expect(validate({ slug: '_all-right_' })).resolves.toBeUndefined()
+        await expect(validate({ slug: '_all-right_' })).resolves.toEqual({ slug: '_all-right_' })
       })
     })
   })
@@ -49,7 +51,7 @@ describe('UniqueSlugForm', () => {
       })
 
       it('validates', async () => {
-        await expect(validate({ slug: 'slug' })).resolves.toBeUndefined()
+        await expect(validate({ slug: 'slug' })).resolves.toEqual({ slug: 'slug' })
       })
     })
 
@@ -72,7 +74,7 @@ describe('UniqueSlugForm', () => {
         })
 
         it('validates', async () => {
-          await expect(validate({ slug })).resolves.toBeUndefined()
+          await expect(validate({ slug })).resolves.toEqual({ slug })
         })
       })
     })

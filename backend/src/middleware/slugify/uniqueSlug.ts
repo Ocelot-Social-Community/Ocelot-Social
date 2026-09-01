@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import slugify from 'slugify'
+import slugify, { extend } from 'slugify'
 
-slugify.extend({ Ä: 'AE', ä: 'ae', Ö: 'OE', ö: 'oe', Ü: 'UE', ü: 'ue', ß: 'ss' })
+// `extend`, not `slugify.extend`: since 1.6.9 slugify's type declarations expose `extend` as a
+// named export next to the default one, and reaching it through the default import is what
+// `import-x/no-named-as-default-member` warns about. Same function either way at runtime.
+extend({ Ä: 'AE', ä: 'ae', Ö: 'OE', ö: 'oe', Ü: 'UE', ü: 'ue', ß: 'ss' })
 
 // The single slug builder: the User/Group/Post models validate slugs against
 // /^[a-z0-9_-]+$/, so everything outside that alphabet must go. slugify alone
