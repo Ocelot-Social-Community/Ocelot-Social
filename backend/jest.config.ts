@@ -42,7 +42,15 @@ export default {
     '\\.jsx?$': ['ts-jest', { tsconfig: { allowJs: true, checkJs: false } }],
   },
   // Default is to skip all of `node_modules`; carve out the ESM-only packages so the
-  // `\\.jsx?$` transform above applies to them.
-  transformIgnorePatterns: ['/node_modules/(?!uuid/)'],
+  // `\\.jsx?$` transform above applies to them. `htmlparser2` and its `dom*`/`entities`
+  // dependencies arrive through `sanitize-html`, which moved to the ESM-only
+  // `htmlparser2@12` line — Node copes via `require(esm)`, Jest's CommonJS runtime
+  // does not. They install *nested* under `sanitize-html/node_modules/`, hence the
+  // optional `.*/node_modules/` prefix in the lookahead: without it the outer
+  // `/node_modules/sanitize-html/` segment already matches and the nested package
+  // stays ignored.
+  transformIgnorePatterns: [
+    '/node_modules/(?!(.*/node_modules/)?(uuid|htmlparser2|domhandler|domutils|dom-serializer|domelementtype|entities)/)',
+  ],
   moduleNameMapper: pathsToModuleNameMapper(paths, { prefix: '<rootDir>/' }),
 }
