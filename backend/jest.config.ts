@@ -36,9 +36,10 @@ export default {
   transform: {
     '\\.gql$': '<rootDir>/test/graphqlTransform.ts',
     '\\.tsx?$': 'ts-jest',
-    // `uuid` is ESM-only since v12 and ships no CommonJS build. Jest runs the suite
-    // as CommonJS, so the package has to be down-compiled on the way in — see
-    // `transformIgnorePatterns` below, which is what lets this rule see it at all.
+    // `uuid` (since v12) and `@faker-js/faker` (since v10, whose `exports` map lost the
+    // `require` condition) are ESM-only and ship no CommonJS build. Jest runs the suite
+    // as CommonJS, so those packages have to be down-compiled on the way in — see
+    // `transformIgnorePatterns` below, which is what lets this rule see them at all.
     '\\.jsx?$': ['ts-jest', { tsconfig: { allowJs: true, checkJs: false } }],
   },
   // Default is to skip all of `node_modules`; carve out the ESM-only packages so the
@@ -48,9 +49,9 @@ export default {
   // does not. They install *nested* under `sanitize-html/node_modules/`, hence the
   // optional `.*/node_modules/` prefix in the lookahead: without it the outer
   // `/node_modules/sanitize-html/` segment already matches and the nested package
-  // stays ignored.
+  // stays ignored. `@faker-js/faker` is scoped, so it needs both path segments here.
   transformIgnorePatterns: [
-    '/node_modules/(?!(.*/node_modules/)?(uuid|htmlparser2|domhandler|domutils|dom-serializer|domelementtype|entities)/)',
+    '/node_modules/(?!(.*/node_modules/)?(@faker-js/faker|uuid|htmlparser2|domhandler|domutils|dom-serializer|domelementtype|entities)/)',
   ],
   moduleNameMapper: pathsToModuleNameMapper(paths, { prefix: '<rootDir>/' }),
 }
