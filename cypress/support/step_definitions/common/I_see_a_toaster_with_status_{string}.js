@@ -1,4 +1,6 @@
-import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
+import { BeforeStep, defineStep } from '@badeball/cypress-cucumber-preprocessor'
+
+const TOAST_STEP_PREFIX = 'I see a toaster with status'
 
 const TOAST_CLASS = {
   success: 'iziToast-color-green',
@@ -38,11 +40,18 @@ const observeToasts = (win) => {
 
 Cypress.on('window:before:load', observeToasts)
 
-// A page load resets the log via the hook above, which covers every scenario that visits a
-// page. This is the belt to that suspenders: without it, a scenario asserting a toast before
-// its first visit could be satisfied by the previous scenario's toast.
-beforeEach(() => {
-  toastLog.length = 0
+// Scope the log to the action under test. Every toast assertion in the suite sits directly
+// behind the step that raises the toast, so clearing at the start of every OTHER step leaves
+// the assertion looking at exactly that one action.
+//
+// Without this scoping an earlier toast of the same colour satisfies the assertion, and the
+// step silently stops testing anything: in admin/RolesPermissions.feature:78 the toast that
+// "I confirm creating the role" raises is green and carries the same message key
+// (admin.roles.saveSuccess) as the save under test, and it is still alive when the assertion
+// runs — so a save that quietly persisted nothing passed here and only surfaced two steps
+// later, at the reload check.
+BeforeStep(({ pickleStep }) => {
+  if (!pickleStep.text.startsWith(TOAST_STEP_PREFIX)) toastLog.length = 0
 })
 
 defineStep('I see a toaster with status {string}', (status) => {
