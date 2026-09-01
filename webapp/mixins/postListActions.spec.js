@@ -65,7 +65,11 @@ describe('postListActions mixin', () => {
       )
       expect(success).toHaveBeenCalledWith(successKey)
       expect(refetch).toHaveBeenCalled()
+
       if (opts.storeAssert) {
+        // The branch is the table row, not runtime state: only some of the actions touch the store,
+        // and which ones is fixed in the table above.
+        // eslint-disable-next-line jest/no-conditional-expect
         expect(spies[opts.storeAssert]).toHaveBeenCalled()
       }
     })

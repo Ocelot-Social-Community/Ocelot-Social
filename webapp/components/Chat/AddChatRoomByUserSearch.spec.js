@@ -251,10 +251,13 @@ describe('AddChatRoomByUserSearch.vue', () => {
     it('clears blur timeout', () => {
       jest.useFakeTimers()
       wrapper = Wrapper()
+      wrapper.vm.query = 'abc'
       wrapper.vm.onBlur()
       wrapper.destroy()
       jest.advanceTimersByTime(200)
-      // No error thrown = timeout was cleared
+      // The pending onBlur callback resets query/results. Still 'abc' = it never ran, i.e. the
+      // timeout was cleared on destroy (asserting the state, not merely "nothing threw").
+      expect(wrapper.vm.query).toBe('abc')
       jest.useRealTimers()
     })
   })

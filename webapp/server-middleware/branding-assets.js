@@ -12,7 +12,7 @@
 // Archives are decompressed once and cached (re-read only on mtime change). No archive under any root
 // → next() for every path (no dynamic brandings; the app runs on framework defaults).
 const path = require('path')
-// eslint-disable-next-line import/no-unresolved -- package subpath, server-only (uses node:fs + node:zlib)
+// Package subpath, server-only (uses node:fs + node:zlib).
 const {
   discoverArchives,
   readArchive,

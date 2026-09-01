@@ -98,7 +98,7 @@ export default {
       if (index === 0) return
       this.dragOverIndex = null
       const badge = this.badges[index]
-      let source = null
+      let source
       try {
         source = JSON.parse(event.dataTransfer.getData('application/json'))
       } catch {

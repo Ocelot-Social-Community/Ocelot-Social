@@ -53,7 +53,7 @@ describe('LocationSelect', () => {
     })
 
     it('calls apollo with given value', () => {
-      expect(queryMock).toBeCalledWith({
+      expect(queryMock).toHaveBeenCalledWith({
         query: queryLocations(),
         variables: {
           place: 'nowhere',
@@ -110,7 +110,7 @@ describe('LocationSelect', () => {
       })
 
       it('forwards the types prop to apollo', () => {
-        expect(queryMock).toBeCalledWith({
+        expect(queryMock).toHaveBeenCalledWith({
           query: queryLocations(),
           variables: {
             place: 'nowhere',
@@ -178,7 +178,7 @@ describe('LocationSelect', () => {
     })
 
     it('passes user coordinates as proximity to the apollo query', () => {
-      expect(queryMock).toBeCalledWith({
+      expect(queryMock).toHaveBeenCalledWith({
         query: queryLocations(),
         variables: {
           place: 'nowhere',
@@ -223,7 +223,7 @@ describe('LocationSelect', () => {
 
     it('passes browser geolocation coordinates as proximity to the apollo query', async () => {
       await wrapper.vm.$nextTick()
-      expect(queryMock).toBeCalledWith({
+      expect(queryMock).toHaveBeenCalledWith({
         query: queryLocations(),
         variables: {
           place: 'nowhere',
@@ -248,7 +248,7 @@ describe('LocationSelect', () => {
       queryMock.mockClear()
       const w = mount(LocationSelect, { mocks, localVue, propsData: { value: 'nowhere' } })
       await w.vm.$nextTick()
-      expect(queryMock).toBeCalledWith({
+      expect(queryMock).toHaveBeenCalledWith({
         query: queryLocations(),
         variables: {
           place: 'nowhere',

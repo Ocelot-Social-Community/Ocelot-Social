@@ -10,7 +10,7 @@ jest.mock('@ocelot-social/branding', () => ({
 
 const localVue = global.localVue
 
-describe('EnterNonce ', () => {
+describe('EnterNonce', () => {
   let wrapper
   let Wrapper
   let mocks

@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a closed group – "school-for-citizens" given a current user as group owner – "peter-lustig" renders 1`] = `
 <div>

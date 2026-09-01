@@ -334,7 +334,7 @@ export default {
     this.themeTokens = discoverThemeTokens()
   },
   async fetch() {
-    let list = []
+    let list
     try {
       const res = await fetch('/branding/manifest.json')
       list = res.ok ? await res.json() : []

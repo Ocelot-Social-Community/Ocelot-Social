@@ -92,7 +92,9 @@ export default ({ app, req, cookie, store }) => {
           ? navigator.language || navigator.userLanguage
           : req.headers['accept-language'].split(',')[0]
       ).substr(0, 2)
-    } catch (err) {}
+    } catch (err) {
+      // No Accept-Language header / no navigator language — fall through to the default locale.
+    }
   }
 
   const availableLocales = locales.filter((lang) => !!lang.enabled)

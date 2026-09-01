@@ -407,7 +407,7 @@ describe('Registration', () => {
         })
 
         it('does not redeem the link', () => {
-          expect(mutationMock).not.toBeCalled()
+          expect(mutationMock).not.toHaveBeenCalled()
         })
       })
 
@@ -448,7 +448,7 @@ describe('Registration', () => {
         })
 
         it('redeems the code', () => {
-          expect(mutationMock).toBeCalledWith({
+          expect(mutationMock).toHaveBeenCalledWith({
             mutation: redeemInviteCodeMutation,
             variables: {
               code: 'ABCDEF',
@@ -494,7 +494,7 @@ describe('Registration', () => {
         })
 
         it('redeems the code', () => {
-          expect(mutationMock).toBeCalledWith({
+          expect(mutationMock).toHaveBeenCalledWith({
             mutation: redeemInviteCodeMutation,
             variables: {
               code: 'ABCDEF',
@@ -538,7 +538,7 @@ describe('Registration', () => {
         })
 
         it('redeems the code', () => {
-          expect(mutationMock).toBeCalledWith({
+          expect(mutationMock).toHaveBeenCalledWith({
             mutation: redeemInviteCodeMutation,
             variables: {
               code: 'ABCDEF',

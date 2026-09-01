@@ -38,7 +38,7 @@ export const actions = {
       commit('SET_CATEGORIES', categories)
       commit('SET_INIZIALIZED')
     } catch (err) {
-      throw new Error('Could not query categories')
+      throw new Error('Could not query categories', { cause: err })
     }
   },
 }
