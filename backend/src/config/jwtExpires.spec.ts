@@ -1,4 +1,4 @@
-import { decode, sign } from 'jsonwebtoken'
+import { decode, sign, verify } from 'jsonwebtoken'
 
 import { isValidJwtExpires, resolveJwtExpires } from './jwtExpires'
 import { SOFTWARE_DEFAULTS } from './softwareDefaults'
@@ -17,9 +17,12 @@ const lifetimeOf = (expires: JwtExpires): number => {
 }
 
 describe('isValidJwtExpires', () => {
-  it.each(['2y', '10 hours', '1.5h', '30m', '600'])('accepts the ms timespan %s', (value) => {
-    expect(isValidJwtExpires(value)).toBe(true)
-  })
+  it.each(['2y', '10 hours', '1.5h', '30m', '600s', '86400000'])(
+    'accepts the ms timespan %s',
+    (value) => {
+      expect(isValidJwtExpires(value)).toBe(true)
+    },
+  )
 
   it.each([undefined, '', ' ', 'foo', '2 lightyears', 'y2', '.', '1.2.3'])(
     'rejects %s',
@@ -37,14 +40,18 @@ describe('isValidJwtExpires', () => {
     expect(isValidJwtExpires('9'.repeat(101))).toBe(false)
   })
 
-  it('treats a unitless value as milliseconds, exactly as ms does', () => {
-    // Deliberately NOT tightened: '600' is 600ms, so `exp` rounds down to a zero-second
-    // lifetime. That is the library's documented semantics ("otherwise milliseconds is used"),
-    // and rejecting it here would silently fall back for a deployment that legitimately
-    // configures a lifetime in milliseconds. Whoever means 600 seconds writes '600s'.
-    expect(isValidJwtExpires('600')).toBe(true)
-    expect(lifetimeOf(resolveJwtExpires('600', FALLBACK))).toBe(0)
-    expect(lifetimeOf(resolveJwtExpires('600s', FALLBACK))).toBe(600)
+  it.each(['600', '0.5s', '999ms'])(
+    'rejects the sub-second lifetime %s, which mints an already-expired token',
+    (value) => {
+      // A unitless value is milliseconds, so '600' is 0.6s and `exp` floors to iat. Measured
+      // against the library below; here only the boundary decision is asserted.
+      expect(isValidJwtExpires(value)).toBe(false)
+    },
+  )
+
+  it('accepts exactly one second, the boundary', () => {
+    expect(isValidJwtExpires('1000')).toBe(true)
+    expect(isValidJwtExpires('1s')).toBe(true)
   })
 })
 
@@ -73,12 +80,24 @@ describe('resolveJwtExpires', () => {
 })
 
 describe('the resolved value against jsonwebtoken itself', () => {
-  it.each([undefined, '', ' ', 'foo', '-1d', '0', '2 lightyears'])(
-    'signs a token with a positive lifetime for JWT_EXPIRES=%s',
+  it.each([undefined, '', ' ', 'foo', '-1d', '0', '600', '0.5s', '2 lightyears'])(
+    'mints a token that verifies for JWT_EXPIRES=%s',
     (value) => {
+      // The property that matters: whatever the resolver hands to jwt.sign must survive
+      // jwt.verify right afterwards. A zero-second lifetime signs fine and then fails here.
+      const token = sign({}, 'secret', {
+        algorithm: 'HS256',
+        expiresIn: resolveJwtExpires(value, FALLBACK),
+      })
+      expect(() => verify(token, 'secret', { algorithms: ['HS256'] })).not.toThrow()
       expect(lifetimeOf(resolveJwtExpires(value, FALLBACK))).toBeGreaterThan(0)
     },
   )
+
+  it('shows the failure being prevented: an unresolved sub-second value expires instantly', () => {
+    const token = sign({}, 'secret', { algorithm: 'HS256', expiresIn: '600' })
+    expect(() => verify(token, 'secret', { algorithms: ['HS256'] })).toThrow('jwt expired')
+  })
 
   it('rejects the raw values unresolved, which is what makes the boundary check necessary', () => {
     // The cast is the mistake under test: handing the env value straight to jwt.sign, which is

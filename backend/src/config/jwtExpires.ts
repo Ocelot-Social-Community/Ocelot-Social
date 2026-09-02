@@ -17,46 +17,53 @@ export type JwtExpires = NonNullable<SignOptions['expiresIn']>
 // own regex alternates both halves inside one pattern, which is neither.
 const NUMBER_AND_UNIT = /^([0-9.]+) *([a-z]*)$/i
 
-// The unit vocabulary of `ms`, which is what jsonwebtoken parses a string `expiresIn` with.
-// The empty unit is included on purpose: a plain number string ('600') is milliseconds.
-const MS_UNITS = new Set([
-  '',
-  'ms',
-  'msec',
-  'msecs',
-  'millisecond',
-  'milliseconds',
-  's',
-  'sec',
-  'secs',
-  'second',
-  'seconds',
-  'm',
-  'min',
-  'mins',
-  'minute',
-  'minutes',
-  'h',
-  'hr',
-  'hrs',
-  'hour',
-  'hours',
-  'd',
-  'day',
-  'days',
-  'w',
-  'week',
-  'weeks',
-  'y',
-  'yr',
-  'yrs',
-  'year',
-  'years',
+// The unit vocabulary of `ms` — what jsonwebtoken parses a string `expiresIn` with — mapped to
+// its millisecond factor, so the effective lifetime can be measured here. The empty unit is in
+// the map on purpose: a plain number string ('600') is milliseconds. The year factor is 365.25
+// days, matching `ms`.
+const MS_UNITS = new Map([
+  ['', 1],
+  ['ms', 1],
+  ['msec', 1],
+  ['msecs', 1],
+  ['millisecond', 1],
+  ['milliseconds', 1],
+  ['s', 1000],
+  ['sec', 1000],
+  ['secs', 1000],
+  ['second', 1000],
+  ['seconds', 1000],
+  ['m', 60_000],
+  ['min', 60_000],
+  ['mins', 60_000],
+  ['minute', 60_000],
+  ['minutes', 60_000],
+  ['h', 3_600_000],
+  ['hr', 3_600_000],
+  ['hrs', 3_600_000],
+  ['hour', 3_600_000],
+  ['hours', 3_600_000],
+  ['d', 86_400_000],
+  ['day', 86_400_000],
+  ['days', 86_400_000],
+  ['w', 604_800_000],
+  ['week', 604_800_000],
+  ['weeks', 604_800_000],
+  ['y', 31_557_600_000],
+  ['yr', 31_557_600_000],
+  ['yrs', 31_557_600_000],
+  ['year', 31_557_600_000],
+  ['years', 31_557_600_000],
 ])
 
-// Whether a value is a token lifetime jsonwebtoken can parse. Empty and missing values are
-// rejected, and so are zero and negative ones: `ms` parses '-1d', but it mints an
-// already-expired token — a misconfiguration, not a lifetime.
+// One second is the floor, not zero: jsonwebtoken sets `exp = iat + Math.floor(ms(value)/1000)`,
+// so any lifetime under a second yields exp === iat, and jwt.verify rejects such a token as
+// expired the instant it was signed ('600' is 600ms, not 600 seconds — whoever means the latter
+// writes '600s'). A lifetime at or above a second in milliseconds ('86400000') still passes.
+const MIN_LIFETIME_MS = 1000
+
+// Whether a value is a token lifetime jsonwebtoken can both parse AND mint a usable token from.
+// Empty, missing and unparseable values are rejected, as are negative, zero and sub-second ones.
 export function isValidJwtExpires(value: string | undefined): boolean {
   if (!value || value.length > 100) {
     return false
@@ -66,13 +73,18 @@ export function isValidJwtExpires(value: string | undefined): boolean {
     return false
   }
   const [, amount, unit] = match
+  const factor = MS_UNITS.get(unit.toLowerCase())
   const parsed = Number(amount)
-  return MS_UNITS.has(unit.toLowerCase()) && Number.isFinite(parsed) && parsed > 0
+  if (factor === undefined || !Number.isFinite(parsed)) {
+    return false
+  }
+  return parsed * factor >= MIN_LIFETIME_MS
 }
 
 // Resolve a configured lifetime (JWT_EXPIRES) to one jsonwebtoken accepts, falling back to
-// `fallback` for an empty, missing, or unparseable value — plain `|| default` lets 'foo' or
-// '-1d' through, which then throws inside jwt.sign on every login.
+// `fallback` for an empty, missing, unparseable or unusably short value — plain `|| default`
+// lets 'foo' through (which throws inside jwt.sign on every login) as well as '-1d' and '600'
+// (which mint a token every verify rejects as already expired).
 export function resolveJwtExpires(value: string | undefined, fallback: string): JwtExpires {
   const resolved = isValidJwtExpires(value) ? (value as string).trim() : fallback
   // The one cast: StringValue is a template-literal union no regex match can narrow to, so the
