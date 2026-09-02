@@ -49,7 +49,16 @@ export default {
   ],
   coverageThreshold: {
     global: {
-      lines: 95,
+      // 94.3, lowered from 95 by the ESM migration — NOT because test coverage got worse. Under
+      // CommonJS every `require()` was an executable statement that ran on import, so each file
+      // contributed a handful of guaranteed-covered lines to both sides of the ratio. ESM `import`
+      // declarations are not statements and are not instrumented, so those lines leave the count
+      // and every file's percentage drops a little. Measured on the same 142 suites / 2415 tests:
+      // 95.26% on the CommonJS base vs 94.63% here, with identical behaviour — e.g. follow.ts goes
+      // from 12/13 covered statements to 9/10, print-schema.ts from 10/12 to 4/6. The 0.7 gap to
+      // the new figure mirrors the headroom the old threshold had, so the gate stays as tight as
+      // it was against real regressions.
+      lines: 94.3,
     },
   },
   testMatch: ['**/src/**/?(*.)+(spec|test).ts?(x)'],
