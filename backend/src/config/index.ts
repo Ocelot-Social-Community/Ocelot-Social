@@ -9,6 +9,7 @@ import { config } from 'dotenv'
 
 import { branding } from '@src/branding'
 
+import { resolveJwtExpires } from './jwtExpires'
 import { resolveLocale } from './locales'
 import { SOFTWARE_DEFAULTS } from './softwareDefaults'
 
@@ -46,10 +47,12 @@ const environment = {
 const server = {
   // `||` (not `??`): for these an empty string is a misconfiguration, so fall back to the
   // working default rather than let '' through — an empty CLIENT_URI/GRAPHQL_URI crashes
-  // `new URL(path, '')`, and an empty JWT_EXPIRES is rejected by jwt.sign at token issuance.
+  // `new URL(path, '')`.
   CLIENT_URI: env.CLIENT_URI || SOFTWARE_DEFAULTS.CLIENT_URI,
   GRAPHQL_URI: env.GRAPHQL_URI || SOFTWARE_DEFAULTS.GRAPHQL_URI,
-  JWT_EXPIRES: env.JWT_EXPIRES || SOFTWARE_DEFAULTS.JWT_EXPIRES,
+  // Validated, not just defaulted: jwt.sign throws on a lifetime it cannot parse, so an
+  // unparseable JWT_EXPIRES ('', 'foo', '-1d') would take down every login rather than degrade.
+  JWT_EXPIRES: resolveJwtExpires(env.JWT_EXPIRES, SOFTWARE_DEFAULTS.JWT_EXPIRES),
 }
 
 const SMTP_HOST = env.SMTP_HOST
