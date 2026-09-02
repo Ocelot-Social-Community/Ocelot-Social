@@ -4,6 +4,8 @@ import Redis from 'ioredis'
 
 import CONFIG from '@config/index'
 
+import type { RedisOptions } from 'ioredis'
+
 // Memoised: callers MUST share the same instance so that publishers and
 // subscribers (e.g. policy.changed) reach each other. Returning a fresh
 // PubSub on every call silently breaks in-process subscriptions in dev
@@ -22,7 +24,12 @@ export default () => {
     return instance
   }
 
-  const options = {
+  // Deployment note: from ioredis 6 the client negotiates RESP3 through HELLO, and a server that
+  // does not know that command is a hard failure rather than a downgrade — so whoever first runs
+  // this against a real broker needs Redis 6.0 or newer. Nothing else here changes with it: reply
+  // shapes stay RESP2-compatible (ioredis' `replyMapping` default) and the pub/sub surface used
+  // by graphql-redis-subscriptions is the same under either protocol.
+  const options: RedisOptions = {
     host: REDIS_DOMAIN,
     port: REDIS_PORT,
     password: REDIS_PASSWORD,
