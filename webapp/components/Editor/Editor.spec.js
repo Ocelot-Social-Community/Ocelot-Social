@@ -122,9 +122,9 @@ describe('Editor.vue', () => {
         expect(typeof menu.show).toBe('function')
       })
 
-      // Typing on: the plugin re-runs and now finds its decoration, so the follow-up keystrokes take
-      // the same direct path — with a filtered list behind it.
-      it('re-anchors and re-filters while typing', () => {
+      // Typing on: the plugin re-runs, finds its decoration, and the follow-up keystrokes take the
+      // direct path — with a filtered list behind it.
+      it('anchors the popup on the reference the plugin passes while typing', () => {
         propsData.users = [
           { id: 'u1', slug: 'peter-lustig', label: 'Peter Lustig' },
           { id: 'u2', slug: 'jenny-rostock', label: 'Jenny Rostock' },
@@ -154,7 +154,51 @@ describe('Editor.vue', () => {
 
         expect(wrapper.vm.filteredItems).toEqual([propsData.users[1]])
         expect(wrapper.vm.navigatedItemIndex).toBe(0)
-        expect(typeof wrapper.vm.$refs.contextMenu.menu.show).toBe('function')
+        // The reference itself, not just "some popup exists": this fails if showSuggestionMenu ever
+        // drops the handed-in `virtualNode` and anchors somewhere else.
+        expect(wrapper.vm.$refs.contextMenu.menu.reference).toBe(virtualNode)
+      })
+
+      // Worth pinning down because it reads like a bug and is not one: displayContextMenu returns
+      // early while a menu is open, so a later keystroke does NOT move the popup to the new
+      // reference. It stays on the first one and popper repositions it from there — that is what
+      // the MutationObserver in ContextMenu.vue is for.
+      it('keeps an open popup on its first reference', () => {
+        propsData.users = [{ id: 'u1', slug: 'peter-lustig', label: 'Peter Lustig' }]
+        wrapper = mount(Editor, {
+          mocks,
+          propsData,
+          localVue,
+          sync: false,
+          stubs: { transition: false },
+          attachTo: document.body,
+        })
+        const nodeAt = (top) => ({
+          getBoundingClientRect: () => ({
+            top,
+            bottom: top + 20,
+            left: 20,
+            right: 40,
+            width: 20,
+            height: 20,
+          }),
+          clientWidth: 20,
+          clientHeight: 20,
+        })
+        const first = nodeAt(10)
+        const second = nodeAt(100)
+        const args = (virtualNode, query) => ({
+          items: propsData.users,
+          query,
+          range: { from: 1, to: 1 + query.length + 1 },
+          virtualNode,
+          view: wrapper.vm.editor.view,
+        })
+
+        wrapper.vm.updateSuggestionList(args(first, ''))
+        wrapper.vm.updateSuggestionList(args(second, 'p'))
+
+        expect(wrapper.vm.$refs.contextMenu.menu.reference).toBe(first)
       })
 
       it('does not open a popup for a list that was closed before the anchor arrived', async () => {
