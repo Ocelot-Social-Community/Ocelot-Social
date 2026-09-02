@@ -11,7 +11,7 @@ import UpdatePost from '@graphql/queries/posts/UpdatePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 let variables
 const categoryIds = ['cat9']

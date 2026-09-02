@@ -1,7 +1,7 @@
 /* eslint-disable n/no-process-env */
 import { systemConfigStatus } from '@src/config/systemConfig'
 
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 export default {
   Query: {

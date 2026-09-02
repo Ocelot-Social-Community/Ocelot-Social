@@ -1,18 +1,18 @@
 import { withFilter } from 'graphql-subscriptions'
 
 import { UserInputError } from '@graphql/errors'
-import { isPermissionGatePolicyKey } from '@src/permission/index'
+import { isPermissionGatePolicyKey } from '@src/permission'
 import {
   POLICY_CHANGED_CHANNEL,
   PolicyValidationError,
   canView,
   requiresPolicyFor,
-} from '@src/policy/index'
+} from '@src/policy'
 
 import { publishPermissionsChanged } from './roles'
 
-import type { Context } from '@src/context/index'
-import type { NetworkPolicy, PolicyKey, PolicyViewer } from '@src/policy/index'
+import type { Context } from '@src/context'
+import type { NetworkPolicy, PolicyKey, PolicyViewer } from '@src/policy'
 
 // The policy viewer is the auth state plus the request's effective permission
 // set (resolved from the user's roles in the context). Visibility keys on

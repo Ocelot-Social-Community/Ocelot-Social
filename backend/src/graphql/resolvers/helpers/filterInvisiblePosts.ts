@@ -1,5 +1,5 @@
 import type { PostQueryParams } from './postFilter'
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 // Marks the query so postFilterToCypher can express visibility as a graph condition.
 //

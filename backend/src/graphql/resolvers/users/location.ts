@@ -11,7 +11,7 @@
 
 import { UserInputError } from '@graphql/errors'
 
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 const locales = ['en', 'de', 'fr', 'nl', 'it', 'es', 'pt', 'pl', 'ru', 'sq']
 

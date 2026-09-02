@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import normalizeEmail from './normalizeEmail'
 
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 export default async function createPasswordReset(options: {
   driver: Context['driver']

@@ -3,7 +3,7 @@ import { nodeQuery } from './helpers/nodeQuery'
 import Resolver from './helpers/Resolver'
 
 import type { NodeQueryParams } from './helpers/nodeQuery'
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 const categoryQuery = nodeQuery({
   label: 'Category',

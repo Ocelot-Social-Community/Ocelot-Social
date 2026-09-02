@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import { branding } from '@src/branding/index'
+import { branding } from '@src/branding'
 
 import Resolver from './helpers/Resolver'
 
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 export const generateInviteCode = () => {
   // branding.registration.inviteCodeLength random numbers, each in [ 0, 35 ] → 36 possibilities

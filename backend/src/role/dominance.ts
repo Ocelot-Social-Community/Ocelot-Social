@@ -1,4 +1,4 @@
-import type { PermissionKey } from '@src/permission/index'
+import type { PermissionKey } from '@src/permission'
 
 // The act-on hierarchy: who may disable/delete whom.
 //

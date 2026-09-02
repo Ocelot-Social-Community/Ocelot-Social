@@ -6,7 +6,7 @@ import { createApolloTestSetup } from '@root/test/helpers'
 import { categories } from '@src/constants/categories'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { NetworkPolicy } from '@src/policy/index'
+import type { NetworkPolicy } from '@src/policy'
 
 let policy: Partial<NetworkPolicy>
 let query: ApolloTestSetup['query']

@@ -16,7 +16,7 @@ import DISABLE_USER from '@graphql/queries/users/disableUser.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 let authenticatedUser: Context['user']
 let mutate: ApolloTestSetup['mutate']

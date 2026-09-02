@@ -7,7 +7,7 @@ import { UserInputError } from '@graphql/errors'
 import Resolver from './helpers/Resolver'
 
 import type { EntityProperties } from '@db/schema/types'
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 // Written in Cypher rather than through neode. The three mutations used it as an ORM — the
 // only place in the production code that did, next to registration and user_management — and

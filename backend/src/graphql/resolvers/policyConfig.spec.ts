@@ -1,10 +1,10 @@
 import { categoryRank } from '@src/config/categories'
-import { allKeys, createInMemoryPolicyService } from '@src/policy/index'
+import { allKeys, createInMemoryPolicyService } from '@src/policy'
 
 import resolvers from './policyConfig'
 
-import type { Context } from '@src/context/index'
-import type { NetworkPolicy } from '@src/policy/index'
+import type { Context } from '@src/context'
+import type { NetworkPolicy } from '@src/policy'
 
 // Drive the resolver through a real in-memory PolicyService so the value-layer +
 // env-fold logic (getEffective / isAvailable / requiresEnvStatus / envState) is

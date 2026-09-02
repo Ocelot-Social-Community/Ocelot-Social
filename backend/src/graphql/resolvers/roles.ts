@@ -4,16 +4,16 @@ import {
   groupFor,
   isPermissionAvailable,
   permissionCatalog,
-} from '@src/permission/index'
+} from '@src/permission'
 import {
   OWNER_ROLE,
   PERMISSIONS_CHANGED_CHANNEL,
   RoleValidationError,
   effectiveRoleName,
-} from '@src/role/index'
+} from '@src/role'
 
-import type { Context } from '@src/context/index'
-import type { RoleDefinition } from '@src/role/index'
+import type { Context } from '@src/context'
+import type { RoleDefinition } from '@src/role'
 
 // Notify connected clients that effective permissions may have changed so they refetch
 // their own (the permissionsChanged subscription). Fire-and-forget: the mutation has

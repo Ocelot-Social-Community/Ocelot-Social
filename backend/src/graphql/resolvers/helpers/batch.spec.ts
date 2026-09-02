@@ -1,6 +1,6 @@
 import { runBatch } from './batch'
 
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 // The reserved parameter names of runBatch.
 //

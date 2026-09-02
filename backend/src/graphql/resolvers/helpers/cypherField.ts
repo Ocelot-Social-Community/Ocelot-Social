@@ -5,7 +5,7 @@
 /* eslint-disable security/detect-object-injection */
 import { runBatch } from './batch'
 
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 // Field resolvers for what used to be @cypher directives.
 //

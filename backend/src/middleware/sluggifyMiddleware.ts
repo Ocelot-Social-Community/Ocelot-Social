@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import uniqueSlug from './slugify/uniqueSlug'
 
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 // excludeId lets an update exclude the very node being updated from the
 // uniqueness check — without it, re-saving a post without an explicit slug

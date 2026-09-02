@@ -1,6 +1,6 @@
 import { dominates } from './dominance'
 
-import type { PermissionKey } from '@src/permission/index'
+import type { PermissionKey } from '@src/permission'
 
 const set = (...keys: string[]): Set<PermissionKey> => new Set(keys as PermissionKey[])
 

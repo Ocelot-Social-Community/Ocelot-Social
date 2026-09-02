@@ -1,4 +1,4 @@
-import { isKnownPermission } from '@src/permission/index'
+import { isKnownPermission } from '@src/permission'
 
 import { DEFAULT_ROLES } from './defaults'
 import { ADMIN_ROLE, MODERATOR_ROLE, OWNER_ROLE, USER_ROLE } from './types'

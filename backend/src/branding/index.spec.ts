@@ -1,4 +1,4 @@
-import { branding, brandingDefaults, setBranding, getBranding } from '@src/branding/index'
+import { branding, brandingDefaults, setBranding, getBranding } from '@src/branding'
 
 // Integration check that the backend resolves the shared @ocelot-social/branding package
 // correctly (esModuleInterop default import + named export) and its RUNTIME accessor.

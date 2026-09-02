@@ -32,11 +32,11 @@ import { createNode, findNode } from '@db/testing/create'
 import { generateInviteCode } from '@graphql/resolvers/inviteCodes'
 import { isUniqueFor } from '@middleware/sluggifyMiddleware'
 import uniqueSlug, { toSlug } from '@middleware/slugify/uniqueSlug'
-import { seedDefaultRoleNodes } from '@src/role/index'
+import { seedDefaultRoleNodes } from '@src/role'
 
 import { getDriver } from './neo4j'
 
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 // The two entities whose factories carry BUILD inputs next to node properties. neode used to
 // drop whatever its model did not declare; nothing does that any more, so the split is made

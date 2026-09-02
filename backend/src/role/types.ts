@@ -1,4 +1,4 @@
-import type { PermissionKey } from '@src/permission/index'
+import type { PermissionKey } from '@src/permission'
 
 // A role is a named, admin-managed bundle of global permissions, bound to users
 // via (:User)-[:HAS_ROLE]->(:Role). The catalog (permission keys) is code-owned;

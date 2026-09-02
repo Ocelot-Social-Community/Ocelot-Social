@@ -1,16 +1,16 @@
 import databaseContext from '@context/database'
 import { createLoaders } from '@context/loaders'
 import pubsubContext from '@context/pubsub'
-import CONFIG from '@src/config/index'
+import CONFIG from '@src/config'
 import { decode } from '@src/jwt/decode'
 import ocelotLogger from '@src/logger'
-import { getPolicyService } from '@src/policy/index'
-import { effectiveRoleName, getRoleService } from '@src/role/index'
+import { getPolicyService } from '@src/policy'
+import { effectiveRoleName, getRoleService } from '@src/role'
 
 import type { DecodedUser } from '@src/jwt/decode'
-import type { PermissionKey } from '@src/permission/index'
-import type { PolicyService } from '@src/policy/index'
-import type { RoleService } from '@src/role/index'
+import type { PermissionKey } from '@src/permission'
+import type { PolicyService } from '@src/policy'
+import type { RoleService } from '@src/role'
 
 const serverDatabase = databaseContext()
 const serverPubsub = pubsubContext()

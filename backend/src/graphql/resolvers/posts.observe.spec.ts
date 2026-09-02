@@ -9,7 +9,7 @@ import toggleObservePost from '@graphql/queries/posts/toggleObservePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 let user
 let otherUser

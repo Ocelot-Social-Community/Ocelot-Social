@@ -1,7 +1,7 @@
 import { UserInputError } from '@graphql/errors'
-import { PolicyValidationError } from '@src/policy/index'
+import { PolicyValidationError } from '@src/policy'
 
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 // The active branding is stored as the `activeBranding` policy value, so switching it reuses the
 // PolicyService (persistence + Redis pub/sub) end to end: a change fires `policyChanged` and every

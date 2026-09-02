@@ -3,11 +3,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
 import { createApolloTestSetup } from '@root/test/helpers'
-import { DEFAULT_ROLES } from '@src/role/index'
+import { DEFAULT_ROLES } from '@src/role'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context/index'
-import type { RoleDefinition } from '@src/role/index'
+import type { Context } from '@src/context'
+import type { RoleDefinition } from '@src/role'
 
 // A role that may manage users (role.manage) but must NOT read/search personal
 // e-mail addresses (no user.email.readAny). Models an admin-defined custom role.

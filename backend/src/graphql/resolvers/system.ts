@@ -1,5 +1,5 @@
-import { getPolicyService } from '@src/policy/index'
-import { getRoleService } from '@src/role/index'
+import { getPolicyService } from '@src/policy'
+import { getRoleService } from '@src/role'
 
 export default {
   Mutation: {

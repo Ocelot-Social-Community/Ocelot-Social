@@ -21,8 +21,8 @@ import UserFollowing from '@graphql/queries/users/UserFollowing.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context/index'
-// import CONFIG from '@src/config/index'
+import type { Context } from '@src/context'
+// import CONFIG from '@src/config'
 
 const categoryIds = ['cat9']
 let user

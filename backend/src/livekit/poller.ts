@@ -12,9 +12,9 @@
  */
 import { RoomServiceClient } from 'livekit-server-sdk'
 
-import CONFIG from '@src/config/index'
+import CONFIG from '@src/config'
 import { VIDEO_CALL_PARTICIPANT_COUNT_CHANGED } from '@src/constants/subscriptions'
-import { serverPubsub } from '@src/context/index'
+import { serverPubsub } from '@src/context'
 import { groupIdFromRoomName } from '@src/graphql/resolvers/videoCalls'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'

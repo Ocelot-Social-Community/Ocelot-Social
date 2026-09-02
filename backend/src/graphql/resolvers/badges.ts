@@ -5,12 +5,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-loop-func */
-import { branding } from '@src/branding/index'
+import { branding } from '@src/branding'
 
 import { unwrap } from './helpers/cypherField'
 import Resolver from './helpers/Resolver'
 
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 export const defaultTrophyBadge = {
   id: 'default_trophy',

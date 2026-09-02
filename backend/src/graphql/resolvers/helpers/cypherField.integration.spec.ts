@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import Factory, { cleanDatabase } from '@db/factories'
-import resolvers from '@graphql/resolvers/index'
+import resolvers from '@graphql/resolvers'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 type FieldResolver = (
   parent: unknown,

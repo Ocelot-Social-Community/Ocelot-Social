@@ -9,8 +9,8 @@ import updateComment from '@graphql/queries/comments/UpdateComment.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context/index'
-import type { RoleDefinition } from '@src/role/index'
+import type { Context } from '@src/context'
+import type { RoleDefinition } from '@src/role'
 
 let variables, commentAuthor, newlyCreatedComment
 let authenticatedUser: Context['user']

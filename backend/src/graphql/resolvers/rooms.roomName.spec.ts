@@ -8,7 +8,7 @@ import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 // Room.roomName is derived in TWO places, and this holds them to the same answer.
 //

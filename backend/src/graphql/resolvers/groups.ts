@@ -16,13 +16,13 @@ import {
 } from '@constants/subscriptions'
 import { ForbiddenError, UserInputError } from '@graphql/errors'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
-import { branding } from '@src/branding/index'
+import { branding } from '@src/branding'
 
 import Resolver from './helpers/Resolver'
 import { images } from './images/images'
 import { createOrUpdateLocations } from './users/location'
 
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 // Whether any Category nodes exist. Keeps CreateGroup graceful: the "categories
 // required" rule only applies when the policy is on AND there is at least one

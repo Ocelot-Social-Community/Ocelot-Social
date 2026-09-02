@@ -5,7 +5,7 @@ import { unwrap } from './cypherField'
 import { orderClause } from './ordering'
 import { pagingClause } from './paging'
 
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 // A root query over one node label: equality arguments, ordering, paging.
 //

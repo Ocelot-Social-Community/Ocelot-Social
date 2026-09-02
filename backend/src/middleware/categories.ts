@@ -1,4 +1,4 @@
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 import type { GraphQLResolveInfo } from 'graphql'
 
 type Resolver = (

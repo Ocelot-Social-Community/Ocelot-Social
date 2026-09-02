@@ -3,7 +3,7 @@
 // db/migrate/store.ts → schema.install()); we MERGE on `id` (= the role name) for
 // app-level idempotency. `permissions` is stored JSON-stringified (like Setting.value).
 
-import { sanitizePermissions } from '@src/permission/index'
+import { sanitizePermissions } from '@src/permission'
 
 import type { RoleDefinition } from './types'
 import type databaseContext from '@context/database'

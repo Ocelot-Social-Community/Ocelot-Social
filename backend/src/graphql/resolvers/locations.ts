@@ -8,7 +8,7 @@ import { UserInputError } from '@graphql/errors'
 import cypherFields from './helpers/cypherField'
 import { queryLocations } from './users/location'
 
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 export default {
   Location: {

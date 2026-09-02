@@ -1,5 +1,5 @@
 import { getDriver } from '@db/neo4j'
-import { DEFAULT_ROLES } from '@src/role/index'
+import { DEFAULT_ROLES } from '@src/role'
 
 export const description =
   'Normalize to the single-role model: derive every user a single HAS_ROLE edge from their legacy user.role tier (baseline users get the user role; any extra edges collapse to the highest-rank one), then drop the legacy user.role property.'

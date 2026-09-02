@@ -11,8 +11,8 @@ import profilePagePosts from '@graphql/queries/posts/profilePagePosts.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context/index'
-import type { NetworkPolicy } from '@src/policy/index'
+import type { Context } from '@src/context'
+import type { NetworkPolicy } from '@src/policy'
 
 let policy: Partial<NetworkPolicy>
 
