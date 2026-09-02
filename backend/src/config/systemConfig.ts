@@ -12,13 +12,7 @@
 //     var, e.g. a LiveKit key), or a plain infrastructure row.
 
 /* eslint-disable security/detect-object-injection */ // keys come from the fixed policy schema / env registry, never user input
-import {
-  allKeys,
-  categoryFor,
-  envSeedFor,
-  policyValueLayers,
-  requiresEnvFor,
-} from '@src/policy'
+import { allKeys, categoryFor, envSeedFor, policyValueLayers, requiresEnvFor } from '@src/policy'
 
 import { categoryRank } from './categories'
 import { ENV_REGISTRY, ENV_SPEC_BY_NAME } from './envRegistry'
