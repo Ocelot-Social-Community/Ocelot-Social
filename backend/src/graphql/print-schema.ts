@@ -1,6 +1,5 @@
 import { writeFileSync } from 'node:fs'
 import path from 'node:path'
-import { pathToFileURL } from 'node:url'
 
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { lexicographicSortSchema, printSchema } from 'graphql'
@@ -28,9 +27,12 @@ export const schemaSdlFile = path.resolve(import.meta.dirname, '../../schema.gra
 
 // Only write when invoked as a script (`npm run schema:print`). Importing this module —
 // which the snapshot test does — must not touch the file it is about to verify.
-// ESM has no `require.main`/`module`: the equivalent question is whether this module's own URL
-// is the one Node was started with. argv[1] is a path, hence pathToFileURL for the comparison.
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+// ESM has no `require.main`/`module`; `import.meta.main` is the direct replacement (Node 24+,
+// well under the engines floor of 25.5). The obvious hand-rolled equivalent —
+// `import.meta.url === pathToFileURL(process.argv[1]).href` — throws ERR_INVALID_ARG_TYPE
+// during module evaluation whenever argv[1] is unset, which is the case for `node --eval` and
+// the REPL: merely IMPORTING this module would then fail.
+if (import.meta.main) {
   // eslint-disable-next-line n/no-sync
   writeFileSync(schemaSdlFile, buildSchemaSdl(), 'utf-8')
 
