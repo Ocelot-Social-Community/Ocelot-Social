@@ -111,11 +111,19 @@ export default [
   },
   {
     // Jest test file overrides
-    files: ['**/*.spec.ts', 'test/**/*.ts'],
+    files: ['**/*.spec.ts'],
     rules: {
       '@typescript-eslint/unbound-method': 'off',
-      // Test helpers legitimately import devDependencies (@jest/globals and friends). The rule
-      // recognises `*.spec.ts` as unpublished on its own but not the shared setup under test/.
+    },
+  },
+  {
+    // Shared test helpers (test/setup.ts, test/helpers.ts) legitimately import devDependencies
+    // such as @jest/globals. `n/no-unpublished-import` recognises `*.spec.ts` as unpublished on
+    // its own, but not these — hence the narrow exemption. Deliberately its own block: folding it
+    // into the spec overrides above would also hand `test/` the unbound-method exception, which
+    // it does not need (verified: lint is clean without it).
+    files: ['test/**/*.ts'],
+    rules: {
       'n/no-unpublished-import': 'off',
     },
   },
