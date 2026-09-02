@@ -1,8 +1,6 @@
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { PubSub } from 'graphql-subscriptions'
-// Named, not default: ioredis' CommonJS entry has no real default export, so under ESM the
-// default import resolves to the module namespace — which is not constructable.
-import { Redis } from 'ioredis'
+import Redis from 'ioredis'
 
 import CONFIG from '@config/index'
 

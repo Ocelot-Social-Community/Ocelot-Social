@@ -17,9 +17,7 @@ jest.unstable_mockModule('@config/index', () => ({
 
 jest.unstable_mockModule('ioredis', () => ({
   __esModule: true,
-  // named, not default: pubsub.ts imports `{ Redis }` — ioredis' CommonJS entry has no real
-  // default export, so under ESM a default import would be the module namespace.
-  Redis: jest.fn(),
+  default: jest.fn(),
 }))
 
 jest.unstable_mockModule('graphql-redis-subscriptions', () => ({
@@ -42,7 +40,7 @@ const load = async () => {
   ])
   return {
     pubsub: pubsubModule.default,
-    Redis: jest.mocked(ioredis.Redis),
+    Redis: jest.mocked(ioredis.default),
     RedisPubSub: jest.mocked(redisSubscriptions.RedisPubSub),
     PubSub: subscriptions.PubSub,
   }
