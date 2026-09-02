@@ -8,6 +8,8 @@ beforeEach(() => {
 })
 
 describe('validReport', () => {
+  // async-validator resolves with the validated source object (it resolved with `undefined` up to
+  // v3), so a passing validation is asserted as "resolves with what went in".
   const validate = (object) => {
     const { formSchema } = validReport({ translate })
     const validator = new Schema(formSchema)
@@ -29,7 +31,7 @@ describe('validReport', () => {
       it('resolves', async () => {
         await expect(
           validate({ reasonCategory: { value: 'discrimination_etc' } }),
-        ).resolves.toBeUndefined()
+        ).resolves.toEqual({ reasonCategory: { value: 'discrimination_etc' } })
       })
     })
   })

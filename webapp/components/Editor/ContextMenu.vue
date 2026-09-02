@@ -15,6 +15,13 @@ export default {
         return
       }
 
+      // `tippy(target)` with anything that is not an element returns an ARRAY of instances (empty,
+      // for a nullish target) rather than throwing — so a missing anchor would surface much later
+      // as "this.menu.show is not a function". Refuse it here instead.
+      if (!target) {
+        return
+      }
+
       this.menu = tippy(target, {
         arrow: true,
         arrowType: 'round',

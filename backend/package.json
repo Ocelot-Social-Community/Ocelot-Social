@@ -97,7 +97,7 @@
     "preview-email": "^3.3.0",
     "pug": "^3.0.4",
     "sanitize-html": "~2.17.7",
-    "slugify": "^1.6.8",
+    "slugify": "^1.6.9",
     "subscriptions-transport-ws": "^0.11.0",
     "trunc-html": "~1.1.2",
     "tslog": "^4.10.2",
