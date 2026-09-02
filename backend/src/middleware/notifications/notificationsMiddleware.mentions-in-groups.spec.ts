@@ -11,6 +11,17 @@ jest.unstable_mockModule('@src/emails/sendEmail', () => ({
   sendNotificationMail: (notification) => {
     sendNotificationMailMock(notification)
   },
+  // ESM links the whole namespace: every named export ANY importer in the graph reaches
+  // for must exist here, or the module fails to link (loginMiddleware pulls the
+  // registration/verification mails in transitively). Under CommonJS a missing key was
+  // simply undefined and only mattered if it was called. The stubs below carry no
+  // behaviour — only the two above are asserted on.
+  defaultParams: jest.fn(),
+  sendChatMessageMail: jest.fn(),
+  sendRegistrationMail: jest.fn(),
+  sendEmailVerification: jest.fn(),
+  sendResetPasswordMail: jest.fn(),
+  sendWrongEmail: jest.fn(),
 }))
 
 // Imported after the mock registrations, not above them: `unstable_mockModule`

@@ -1,3 +1,5 @@
+import { jest } from '@jest/globals'
+
 import type { RedisOptions } from 'ioredis'
 
 const mockConfig: {
@@ -6,19 +8,21 @@ const mockConfig: {
   REDIS_PASSWORD?: string
 } = {}
 
-jest.mock('@config/index', () => ({
+jest.unstable_mockModule('@config/index', () => ({
   __esModule: true,
   get default() {
     return mockConfig
   },
 }))
 
-jest.mock('ioredis', () => ({
+jest.unstable_mockModule('ioredis', () => ({
   __esModule: true,
-  default: jest.fn(),
+  // named, not default: pubsub.ts imports `{ Redis }` — ioredis' CommonJS entry has no real
+  // default export, so under ESM a default import would be the module namespace.
+  Redis: jest.fn(),
 }))
 
-jest.mock('graphql-redis-subscriptions', () => ({
+jest.unstable_mockModule('graphql-redis-subscriptions', () => ({
   __esModule: true,
   RedisPubSub: jest.fn(),
 }))
@@ -38,7 +42,7 @@ const load = async () => {
   ])
   return {
     pubsub: pubsubModule.default,
-    Redis: jest.mocked(ioredis.default),
+    Redis: jest.mocked(ioredis.Redis),
     RedisPubSub: jest.mocked(redisSubscriptions.RedisPubSub),
     PubSub: subscriptions.PubSub,
   }

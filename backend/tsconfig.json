@@ -38,8 +38,10 @@
        extensionless, and `tsc-alias -f` (see the "build" script) adds the extension to the EMIT
        along with the alias resolution it already performed. The trade-off is real and worth
        naming: bundler resolution does not enforce Node's `exports`-map conditions at compile
-       time, so a bad deep import (e.g. `pkg/dist/x` where the map only exposes `pkg/x`) is
-       caught by the runtime smoke test rather than by tsc. */
+       time, so a bad deep import (`pkg/dist/x` where the map only exposes `pkg/x`) or a named
+       import a CommonJS package cannot actually provide is invisible to tsc. Both fail on module
+       LOAD instead — i.e. in the specs that import the module, and when the backend container
+       boots in test-backend/test-e2e. */
     "module": "esnext" /* Specify what module code is generated. */,
     // "rootDir": "./",                                  /* Specify the root folder within your source files. */
     "moduleResolution": "bundler" /* Extensionless specifiers stay legal in source; tsc-alias adds them to the emit. */,
