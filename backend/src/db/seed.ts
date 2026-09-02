@@ -7,7 +7,7 @@
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 
 import { faker } from '@faker-js/faker'
-import sample from 'lodash/sample'
+import sample from 'lodash/sample.js'
 
 import CONFIG from '@config/index'
 import { categories } from '@constants/categories'
@@ -19,7 +19,7 @@ import CreateGroupRoom from '@graphql/queries/messaging/CreateGroupRoom.gql'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
 import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
-import { ensureUserRoleEdges, seedDefaultRoleNodes } from '@src/role'
+import { ensureUserRoleEdges, seedDefaultRoleNodes } from '@src/role/index'
 
 import Factory from './factories'
 import { nudgeCacheResync } from './resync-caches'

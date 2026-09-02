@@ -8,7 +8,7 @@ import path from 'node:path'
 
 import { closeDriver } from './neo4j'
 
-const dataFolder = path.join(__dirname, 'data/')
+const dataFolder = path.join(import.meta.dirname, 'data/')
 
 ;(async function () {
   const files = await readdir(dataFolder)

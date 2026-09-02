@@ -22,8 +22,8 @@ import UpdatePost from '@graphql/queries/posts/UpdatePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
-import type { NetworkPolicy } from '@src/policy'
+import type { Context } from '@src/context/index'
+import type { NetworkPolicy } from '@src/policy/index'
 
 let user
 

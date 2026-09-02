@@ -4,39 +4,49 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-require-imports */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 
-/* eslint-disable n/global-require */
-/* eslint-disable import-x/no-commonjs */
 /* eslint-disable import-x/no-named-as-default */
 
+import debug from 'debug'
 import { GraphQLError } from 'graphql'
-import isArray from 'lodash/isArray'
-import isEmpty from 'lodash/isEmpty'
-import mergeWith from 'lodash/mergeWith'
+import isArray from 'lodash/isArray.js'
+import isEmpty from 'lodash/isEmpty.js'
+import mergeWith from 'lodash/mergeWith.js'
 import Metascraper from 'metascraper'
+import metascraperAuthor from 'metascraper-author'
+import metascraperDate from 'metascraper-date'
+import metascraperDescription from 'metascraper-description'
+import metascraperImage from 'metascraper-image'
+import metascraperLang from 'metascraper-lang'
+import metascraperLangDetector from 'metascraper-lang-detector'
+import metascraperLogo from 'metascraper-logo'
+import metascraperPublisher from 'metascraper-publisher'
+import metascraperSoundcloud from 'metascraper-soundcloud'
+import metascraperTitle from 'metascraper-title'
+import metascraperUrl from 'metascraper-url'
+import metascraperVideo from 'metascraper-video'
+import metascraperYoutube from 'metascraper-youtube'
 import fetch from 'node-fetch'
 
 import findProvider from './findProvider'
 
-// eslint-disable-next-line import-x/no-extraneous-dependencies
-const error = require('debug')('embed:error')
+const error = debug('embed:error')
 
 const metascraper = Metascraper([
-  require('metascraper-author')(),
-  require('metascraper-date')(),
-  require('metascraper-description')(),
-  require('metascraper-image')(),
-  require('metascraper-lang')(),
-  require('metascraper-lang-detector')(),
-  require('metascraper-logo')(),
-  require('metascraper-publisher')(),
-  require('metascraper-title')(),
-  require('metascraper-url')(),
-  require('metascraper-soundcloud')(),
-  require('metascraper-video')(),
-  require('metascraper-youtube')(),
+  metascraperAuthor(),
+  metascraperDate(),
+  metascraperDescription(),
+  metascraperImage(),
+  metascraperLang(),
+  metascraperLangDetector(),
+  metascraperLogo(),
+  metascraperPublisher(),
+  metascraperTitle(),
+  metascraperUrl(),
+  metascraperSoundcloud(),
+  metascraperVideo(),
+  metascraperYoutube(),
 
   // require('./rules/metascraper-embed')()
 ])

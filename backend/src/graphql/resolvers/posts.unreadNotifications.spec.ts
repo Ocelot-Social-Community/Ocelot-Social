@@ -8,7 +8,7 @@ import postWithUnreadNotifications from '@graphql/queries/posts/PostUnreadNotifi
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 let user
 let author

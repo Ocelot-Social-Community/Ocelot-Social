@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 
-import { applyMiddleware } from 'graphql-middleware'
-
 import CONFIG from '@config/index'
 
+import { applyMiddleware } from './applyMiddleware'
 import brandingMiddlewares from './branding/brandingMiddlewares'
 import categories from './categories'
 import chatMiddleware from './chatMiddleware'

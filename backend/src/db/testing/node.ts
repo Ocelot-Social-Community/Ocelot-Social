@@ -1,5 +1,5 @@
 import { getDriver } from '@db/neo4j'
-import { relationships } from '@db/schema/relationships'
+import { relationships } from '@db/schema/relationships/index'
 import { validateProperties } from '@db/schema/validate'
 
 import { resolveAlias } from './aliases'

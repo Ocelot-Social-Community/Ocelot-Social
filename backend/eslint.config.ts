@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
+
 import config from 'eslint-config-it4c'
 import graphql from 'eslint-config-it4c/modules/graphql'
 import jest from 'eslint-config-it4c/modules/jest'
@@ -113,9 +111,12 @@ export default [
   },
   {
     // Jest test file overrides
-    files: ['**/*.spec.ts'],
+    files: ['**/*.spec.ts', 'test/**/*.ts'],
     rules: {
       '@typescript-eslint/unbound-method': 'off',
+      // Test helpers legitimately import devDependencies (@jest/globals and friends). The rule
+      // recognises `*.spec.ts` as unpublished on its own but not the shared setup under test/.
+      'n/no-unpublished-import': 'off',
     },
   },
   {

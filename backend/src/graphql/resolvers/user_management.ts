@@ -9,7 +9,7 @@ import { encode } from '@jwt/encode'
 
 import normalizeEmail from './helpers/normalizeEmail'
 
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 export default {
   Query: {

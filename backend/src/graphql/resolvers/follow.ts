@@ -1,4 +1,4 @@
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 // Both mutations return the OTHER user, as the schema declares — following someone tells you
 // about them, not about yourself.

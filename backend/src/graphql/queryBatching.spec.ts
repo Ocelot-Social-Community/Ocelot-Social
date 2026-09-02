@@ -8,11 +8,13 @@
 // of monkey-patching; the indexed access uses two literal method names, not input.
 /* eslint-disable security/detect-object-injection */
 /* eslint-disable @typescript-eslint/require-await */
+import { jest } from '@jest/globals'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 // Guards the property that neo4j-graphql-js used to provide for free: the number of Cypher
 // round trips must not grow with the number of ROWS returned.

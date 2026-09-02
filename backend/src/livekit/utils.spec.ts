@@ -1,3 +1,5 @@
+import { jest } from '@jest/globals'
+
 import { withTimeout } from './utils'
 
 describe('withTimeout', () => {

@@ -3,12 +3,12 @@
 // roles (DB data) reference these keys, and the shield references them at the
 // enforcement points. Everything else derives from here.
 
-// Loading the canonical JSON synchronously at module init is intentional and
-// matches the policy module (resolveJsonModule is off project-wide; the build
-// copies the .json next to this file). require() is the established pattern for
-// static config in this codebase.
-/* eslint-disable @typescript-eslint/no-require-imports, import-x/no-commonjs, n/global-require */
+// Loading the canonical JSON at module init is intentional and matches the policy module (the
+// build copies the .json next to this file). Under ESM this is a plain import carrying the
+// `type: 'json'` attribute Node requires, which replaced the former require().
 /* eslint-disable security/detect-object-injection */ // keys come from the fixed catalog, never user input
+import rawCatalogJson from './permission.catalog.json' with { type: 'json' }
+
 import type {
   PermissionCatalogEntry,
   PermissionGate,
@@ -20,7 +20,7 @@ interface RawCatalog {
   permissions: Record<string, PermissionCatalogEntry>
 }
 
-const rawCatalog = require('./permission.catalog.json') as RawCatalog
+const rawCatalog = rawCatalogJson as RawCatalog
 
 // Frozen so a consumer can never mutate the shared catalog singleton.
 const catalog: Record<string, PermissionCatalogEntry> = Object.freeze({

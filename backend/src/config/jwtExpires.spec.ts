@@ -1,10 +1,16 @@
-import { decode, sign, verify } from 'jsonwebtoken'
+/* eslint-disable import-x/no-named-as-default-member -- jsonwebtoken is CommonJS: the named
+   exports its types advertise do not exist for Node's ESM loader (it derives them by static
+   analysis and misses these), so `import { verify }` type-checks and then throws at load.
+   Reaching through the default import is the only form that works at runtime. */
+import jwt from 'jsonwebtoken'
 
 import { isValidJwtExpires, resolveJwtExpires } from './jwtExpires'
 import { SOFTWARE_DEFAULTS } from './softwareDefaults'
 
 import type { JwtExpires } from './jwtExpires'
 import type { JwtPayload } from 'jsonwebtoken'
+
+const { decode, sign, verify } = jwt
 
 const FALLBACK = SOFTWARE_DEFAULTS.JWT_EXPIRES // '2y'
 

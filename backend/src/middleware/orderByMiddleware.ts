@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import cloneDeep from 'lodash/cloneDeep'
+import cloneDeep from 'lodash/cloneDeep.js'
 
-import type { IMiddlewareResolver } from 'graphql-middleware/dist/types'
+import type { IMiddlewareResolver } from 'graphql-middleware/types'
 
 const defaultOrderBy: IMiddlewareResolver = (resolve, root, args, context, resolveInfo) => {
   const copy = cloneDeep(resolveInfo)

@@ -1,4 +1,4 @@
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 /**
  * Runs one `UNWIND $ids`-style statement and indexes its rows by `__id`.

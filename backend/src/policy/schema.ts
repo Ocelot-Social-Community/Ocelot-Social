@@ -2,15 +2,15 @@
 // ./types.ts in sync with it (defaults are read from the JSON at runtime, so
 // type-level drift is the only concern).
 
-// Loading the canonical JSON schema synchronously at module init is intentional
-// (resolveJsonModule is off project-wide; the build copies the .json next to this
-// file). require() is the established pattern for static config in this codebase.
-/* eslint-disable @typescript-eslint/no-require-imports, import-x/no-commonjs, n/global-require */
+// Loading the canonical JSON schema at module init is intentional (the build copies the .json
+// next to this file). Under ESM this is a plain import carrying the `type: 'json'` attribute
+// Node requires, which replaced the former require().
 /* eslint-disable security/detect-object-injection */ // keys come from the fixed schema, never user input
 import { Ajv } from 'ajv'
 
 import { ENV_CATEGORIES } from '@src/config/categories'
 
+import rawSchemaJson from './policy.schema.json' with { type: 'json' }
 import {
   AUTHENTICATED_AUDIENCE,
   KNOWN_AUDIENCES,
@@ -45,7 +45,7 @@ interface RawSchema {
   properties: Record<string, RawProperty>
 }
 
-const rawSchema = require('./policy.schema.json') as RawSchema
+const rawSchema = rawSchemaJson as RawSchema
 
 export function allKeys(): PolicyKey[] {
   return Object.keys(rawSchema.properties) as PolicyKey[]

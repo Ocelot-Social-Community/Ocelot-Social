@@ -11,10 +11,10 @@ import setTrophyBadgeSelected from '@graphql/queries/badges/setTrophyBadgeSelect
 import setVerificationBadge from '@graphql/queries/badges/setVerificationBadge.gql'
 import User from '@graphql/queries/users/User.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
-import { branding } from '@src/branding'
+import { branding } from '@src/branding/index'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 let regularUser, administrator, moderator, badge, verification
 

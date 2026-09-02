@@ -3,7 +3,7 @@
 import crypto from 'node:crypto'
 import { join as joinPath } from 'node:path/posix'
 
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 type UrlResolver = (
   parent: { url: string },

@@ -3,7 +3,7 @@
 // brand-tunable constants (group limits, registration lengths, metadata, logo paths, …) cannot
 // drift between the two. Import it as `@src/branding`:
 //
-//   import { branding } from '@src/branding'
+//   import { branding } from '@src/branding/index'
 //   branding.group.descriptionMinLength
 //
 // The schema, framework defaults and the brand override slot live in the package; see

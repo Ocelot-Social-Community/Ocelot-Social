@@ -11,9 +11,9 @@ import UpdateSocialMedia from '@graphql/queries/users/UpdateSocialMedia.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
-import type { NetworkPolicy } from '@src/policy'
-import type { RoleDefinition } from '@src/role'
+import type { Context } from '@src/context/index'
+import type { NetworkPolicy } from '@src/policy/index'
+import type { RoleDefinition } from '@src/role/index'
 
 let authenticatedUser: Context['user']
 let query: ApolloTestSetup['query']

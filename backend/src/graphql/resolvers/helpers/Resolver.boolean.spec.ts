@@ -7,7 +7,7 @@ import Factory, { cleanDatabase } from '@db/factories'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 // Resolver()'s boolean fields bind their parent BY LABEL.
 //

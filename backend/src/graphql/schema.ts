@@ -2,7 +2,7 @@ import { makeExecutableSchema } from '@graphql-tools/schema'
 
 import typeDefs from '@graphql/types/index'
 
-import resolvers from './resolvers'
+import resolvers from './resolvers/index'
 
 // The executable schema: exactly what the .gql files declare, wired to our resolvers.
 //

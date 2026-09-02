@@ -1,5 +1,5 @@
 import type { PostQueryParams } from './postFilter'
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 // Translates the client-facing `postsInMyGroups` flag into a graph condition.
 //

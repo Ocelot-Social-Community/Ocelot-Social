@@ -15,7 +15,7 @@ import normalizeEmail from './helpers/normalizeEmail'
 import { redeemInviteCode } from './inviteCodes'
 import { createOrUpdateLocations } from './users/location'
 
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 export default {
   Mutation: {

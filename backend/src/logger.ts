@@ -1,6 +1,6 @@
 import { Logger } from 'tslog'
 
-import CONFIG from './config'
+import CONFIG from './config/index'
 
 import type { ILogObj } from 'tslog'
 

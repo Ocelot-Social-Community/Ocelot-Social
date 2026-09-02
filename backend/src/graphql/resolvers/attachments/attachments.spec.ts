@@ -7,25 +7,28 @@
 import { Readable } from 'node:stream'
 
 import { S3Client } from '@aws-sdk/client-s3'
-import { Upload } from '@aws-sdk/lib-storage'
-
-import Factory, { cleanDatabase } from '@db/factories'
-import { UserInputError } from '@graphql/errors'
-import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
-import { createApolloTestSetup } from '@root/test/helpers'
-
-import { attachments } from './attachments'
+import { jest } from '@jest/globals'
 
 import type { FileInput } from './attachments'
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { S3Config } from '@src/config'
-import type { Context } from '@src/context'
+import type { S3Config } from '@src/config/index'
+import type { Context } from '@src/context/index'
 import type { ReadStream } from 'node:fs'
 
 const s3SendMock = jest.fn()
 jest.spyOn(S3Client.prototype, 'send').mockImplementation(s3SendMock)
 
-jest.mock('@aws-sdk/lib-storage')
+// ESM has no automock: unstable_mockModule requires an explicit factory.
+jest.unstable_mockModule('@aws-sdk/lib-storage', () => ({ Upload: jest.fn() }))
+
+// Imported after the mock registrations, not above them: `unstable_mockModule`
+// does not hoist, so a static import would bind the real module first.
+const { Upload } = await import('@aws-sdk/lib-storage')
+const { default: Factory, cleanDatabase } = await import('@db/factories')
+const { UserInputError } = await import('@graphql/errors')
+const { default: CreateMessage } = await import('@graphql/queries/messaging/CreateMessage.gql')
+const { createApolloTestSetup } = await import('@root/test/helpers')
+const { attachments } = await import('./attachments')
 
 const UploadMock = {
   done: () => {

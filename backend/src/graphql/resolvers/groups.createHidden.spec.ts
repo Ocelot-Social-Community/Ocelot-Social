@@ -7,11 +7,11 @@ import ChangeGroupMemberRole from '@graphql/queries/groups/ChangeGroupMemberRole
 import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
 import UpdateGroup from '@graphql/queries/groups/UpdateGroup.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
-import { DEFAULT_ROLES } from '@src/role'
+import { DEFAULT_ROLES } from '@src/role/index'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
-import type { RoleDefinition } from '@src/role'
+import type { Context } from '@src/context/index'
+import type { RoleDefinition } from '@src/role/index'
 
 // The `user` baseline role with `group.create_hidden` revoked — models a network
 // where the admin/owner did NOT distribute the "create hidden groups" capability.

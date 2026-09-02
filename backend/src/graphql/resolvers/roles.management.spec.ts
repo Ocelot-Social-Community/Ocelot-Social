@@ -3,6 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
+import { jest } from '@jest/globals'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import CREATE_ROLE from '@graphql/queries/roles/createRole.gql'
 import DELETE_ROLE from '@graphql/queries/roles/deleteRole.gql'
@@ -17,10 +19,10 @@ import UPDATE_ROLE from '@graphql/queries/roles/updateRole.gql'
 import USER_ROLES from '@graphql/queries/roles/userRoles.gql'
 import USER_INFO from '@graphql/queries/roles/userWithRole.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
-import { PERMISSIONS_CHANGED_CHANNEL, RoleService } from '@src/role'
+import { PERMISSIONS_CHANGED_CHANNEL, RoleService } from '@src/role/index'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 let authenticatedUser: Context['user']
 let roleService: RoleService
@@ -79,7 +81,10 @@ describe('role management', () => {
   // The live permissionsChanged broadcast (clients refetch their permissions on it).
   describe('permissionsChanged broadcast', () => {
     beforeEach(async () => {
-      pubsubMock = { publish: jest.fn().mockResolvedValue(undefined), asyncIterator: jest.fn() }
+      pubsubMock = {
+        publish: jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue(undefined),
+        asyncIterator: jest.fn(),
+      }
       await asAdmin()
       await mutate({
         mutation: CREATE_ROLE,

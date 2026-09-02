@@ -16,7 +16,7 @@
 // mis-scope a key) and from the legacy `user.role` field. Visibility is membership-
 // based (set intersection in canView), never a linear rank. An empty/missing
 // visibility list ⇒ admin-only, resolved to 'perm:policy.manage' in audiencesFor.
-import { allPermissionKeys } from '@src/permission'
+import { allPermissionKeys } from '@src/permission/index'
 
 export interface NetworkPolicy {
   publicRegistration: boolean

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
@@ -9,7 +8,7 @@ import User from '@graphql/queries/users/User.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 const categoryIds = ['cat9']
 let moderator
@@ -234,7 +233,7 @@ describe('softDeleteMiddleware', () => {
         it('displays about', () => {
           expect(subject.about).toEqual('This self description is very offensive')
         })
-        it('displays avatar', async () => {
+        it('displays avatar', () => {
           expect(subject.avatar).toEqual({
             url: expect.stringMatching('http://localhost/some/offensive/avatar.jpg'),
           })

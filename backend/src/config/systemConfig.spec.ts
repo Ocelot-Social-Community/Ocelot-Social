@@ -1,10 +1,10 @@
-import { createInMemoryPolicyService } from '@src/policy'
+import { createInMemoryPolicyService } from '@src/policy/index'
 
 import { categoryRank } from './categories'
 import { ENV_REGISTRY } from './envRegistry'
 import { systemConfigStatus } from './systemConfig'
 
-import type { NetworkPolicy } from '@src/policy'
+import type { NetworkPolicy } from '@src/policy/index'
 
 // Drive the builder through a real in-memory PolicyService so the effective/override
 // folding and env-state semantics are exercised end to end. The SAME env map is handed

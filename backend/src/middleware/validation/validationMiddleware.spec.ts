@@ -10,7 +10,7 @@ import UpdateUser from '@graphql/queries/users/UpdateUser.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 let authenticatedUser: Context['user']
 let mutate: ApolloTestSetup['mutate']

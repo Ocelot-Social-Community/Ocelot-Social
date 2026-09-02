@@ -16,13 +16,13 @@ import {
 } from '@root/test/directiveInventory'
 import { createApolloTestSetup, TEST_CONFIG } from '@root/test/helpers'
 import { MIGRATION_FIELD_REGISTRY } from '@root/test/migrationFieldRegistry'
-import { createInMemoryPolicyService } from '@src/policy'
+import { createInMemoryPolicyService } from '@src/policy/index'
 
-import resolvers from './resolvers'
+import resolvers from './resolvers/index'
 
 import type { DirectiveField } from '@root/test/directiveInventory'
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 // Every field that neo4j-graphql-js used to resolve via @cypher / @relation, actually
 // selected against a populated database.

@@ -13,7 +13,7 @@ import normalizeEmail from './helpers/normalizeEmail'
 export default {
   Query: {
     VerifyNonce: async (_parent, args, context, _resolveInfo) => {
-      args.email = normalizeEmail(args.email)
+      args.email = normalizeEmail(args.email as string)
       const session = context.driver.session()
       try {
         const txResult = await session.readTransaction(async (txc) => {
@@ -33,7 +33,7 @@ export default {
   },
   Mutation: {
     AddEmailAddress: async (_parent, args, context, _resolveInfo) => {
-      args.email = normalizeEmail(args.email)
+      args.email = normalizeEmail(args.email as string)
       // Was neode's Joi validator, called for its throw and nothing else. Only the address is
       // checked here — the node is written further down, with its own nonce and timestamp.
       if (validateProperty(UnverifiedEmailAddress, 'email', args.email)) {
@@ -82,7 +82,7 @@ export default {
       const {
         user: { id: userId },
       } = context
-      args.email = normalizeEmail(args.email)
+      args.email = normalizeEmail(args.email as string)
       const { nonce, email } = args
       const session = context.driver.session()
       let response

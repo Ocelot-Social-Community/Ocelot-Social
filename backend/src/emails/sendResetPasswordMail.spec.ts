@@ -2,8 +2,10 @@ import CONFIG from '@config/index'
 
 CONFIG.SUPPORT_EMAIL = 'devops@ocelot.social'
 
-// eslint-disable-next-line import-x/first
-import { sendResetPasswordMail } from './sendEmail'
+// Dynamic import: under ESM every static import is evaluated before the module
+// body runs, so the assignment above would land after this module had already
+// read its config. (Under CommonJS the require ran in statement order.)
+const { sendResetPasswordMail } = await import('./sendEmail')
 
 describe('sendResetPasswordMail', () => {
   const data: {

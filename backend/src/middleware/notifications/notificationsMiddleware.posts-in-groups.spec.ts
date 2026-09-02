@@ -1,26 +1,31 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import Factory, { cleanDatabase } from '@db/factories'
-import ChangeGroupMemberRole from '@graphql/queries/groups/ChangeGroupMemberRole.gql'
-import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
-import JoinGroup from '@graphql/queries/groups/JoinGroup.gql'
-import muteGroup from '@graphql/queries/groups/muteGroup.gql'
-import unmuteGroup from '@graphql/queries/groups/unmuteGroup.gql'
-import markAllAsRead from '@graphql/queries/notifications/markAllAsRead.gql'
-import notifications from '@graphql/queries/notifications/notifications.gql'
-import CreatePost from '@graphql/queries/posts/CreatePost.gql'
-import { createApolloTestSetup } from '@root/test/helpers'
+import { jest } from '@jest/globals'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 const sendNotificationMailMock: (notification) => void = jest.fn()
-jest.mock('@src/emails/sendEmail', () => ({
+jest.unstable_mockModule('@src/emails/sendEmail', () => ({
   sendNotificationMail: (notification) => {
     sendNotificationMailMock(notification)
   },
 }))
+
+// Imported after the mock registrations, not above them: `unstable_mockModule`
+// does not hoist, so a static import would bind the real module first.
+const { default: Factory, cleanDatabase } = await import('@db/factories')
+const { default: ChangeGroupMemberRole } =
+  await import('@graphql/queries/groups/ChangeGroupMemberRole.gql')
+const { default: CreateGroup } = await import('@graphql/queries/groups/CreateGroup.gql')
+const { default: JoinGroup } = await import('@graphql/queries/groups/JoinGroup.gql')
+const { default: muteGroup } = await import('@graphql/queries/groups/muteGroup.gql')
+const { default: unmuteGroup } = await import('@graphql/queries/groups/unmuteGroup.gql')
+const { default: markAllAsRead } = await import('@graphql/queries/notifications/markAllAsRead.gql')
+const { default: notifications } = await import('@graphql/queries/notifications/notifications.gql')
+const { default: CreatePost } = await import('@graphql/queries/posts/CreatePost.gql')
+const { createApolloTestSetup } = await import('@root/test/helpers')
 
 let authenticatedUser: Context['user']
 const policy = { categoriesActive: false }

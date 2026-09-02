@@ -8,8 +8,8 @@ import UserEmail from '@graphql/queries/users/UserEmail.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
-import type { NetworkPolicy } from '@src/policy'
+import type { Context } from '@src/context/index'
+import type { NetworkPolicy } from '@src/policy/index'
 
 let variables
 let owner, anotherRegularUser, administrator, moderator

@@ -32,13 +32,13 @@ import UserGroups from '@graphql/queries/groups/UserGroups.gql'
 import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import Post from '@graphql/queries/posts/Post.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
-import { createInMemoryPolicyService } from '@src/policy'
+import { createInMemoryPolicyService } from '@src/policy/index'
 
 import groupsResolver from './groups'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
-// import CONFIG from '@src/config'
+import type { Context } from '@src/context/index'
+// import CONFIG from '@src/config/index'
 
 let user
 let noMemberUser

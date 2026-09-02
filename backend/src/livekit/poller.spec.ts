@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import { startLiveKitPoller, stopLiveKitPoller } from './poller'
+import { jest } from '@jest/globals'
 
 const mockConfig: {
   LIVEKIT_ENABLED: boolean
@@ -10,51 +9,59 @@ const mockConfig: {
   LIVEKIT_API_SECRET?: string
 } = { LIVEKIT_ENABLED: false }
 
-const mockListRooms = jest.fn()
+const mockListRooms = jest.fn<(...args: unknown[]) => Promise<unknown>>()
 const mockRoomServiceCtor = jest.fn()
 
-jest.mock('livekit-server-sdk', () => ({
+jest.unstable_mockModule('livekit-server-sdk', () => ({
   RoomServiceClient: jest.fn().mockImplementation((...args: unknown[]) => {
     mockRoomServiceCtor(...args)
     return {
-      listRooms: (...inner: unknown[]): unknown => mockListRooms(...inner) as unknown,
+      listRooms: (...inner: unknown[]): unknown => mockListRooms(...inner),
     }
   }),
 }))
 
-const mockPublish = jest.fn()
-jest.mock('@src/context', () => ({
+const mockPublish = jest.fn<(...args: unknown[]) => Promise<unknown>>()
+jest.unstable_mockModule('@src/context/index', () => ({
   __esModule: true,
   serverPubsub: {
-    publish: (...args: unknown[]): unknown => mockPublish(...args) as unknown,
+    publish: (...args: unknown[]): unknown => mockPublish(...args),
   },
 }))
 
-jest.mock('@src/graphql/resolvers/videoCalls', () => ({
+jest.unstable_mockModule('@src/graphql/resolvers/videoCalls', () => ({
   __esModule: true,
   groupIdFromRoomName: (roomName: string | null | undefined): string | null =>
     roomName?.startsWith('group-') ? roomName.slice('group-'.length) : null,
 }))
 
-const mockLogger = { info: jest.fn(), warn: jest.fn(), error: jest.fn() }
+const mockLogger = {
+  info: jest.fn<(...args: unknown[]) => void>(),
+  warn: jest.fn<(...args: unknown[]) => void>(),
+  error: jest.fn<(...args: unknown[]) => void>(),
+}
 // jest.mock factories are hoisted above the const/let declarations they
 // reference, so `default: mockLogger` / `default: mockConfig` would read a
 // TDZ-locked binding when poller.ts is required. Expose them through getters
 // so the binding is only read when the consuming code actually touches the
 // imported default — by which time the test file has finished initializing.
-jest.mock('@src/logger', () => ({
+jest.unstable_mockModule('@src/logger', () => ({
   __esModule: true,
   get default() {
     return mockLogger
   },
 }))
 
-jest.mock('@src/config', () => ({
+jest.unstable_mockModule('@src/config/index', () => ({
   __esModule: true,
   get default() {
     return mockConfig
   },
 }))
+
+// Imported after the mock registrations, not above them: `unstable_mockModule`
+// does not hoist, so a static import would bind the real module first.
+const { startLiveKitPoller, stopLiveKitPoller } = await import('./poller')
 
 const setEnabled = () => {
   mockConfig.LIVEKIT_ENABLED = true
@@ -235,7 +242,7 @@ describe('poll tick', () => {
     await jest.advanceTimersByTimeAsync(15_000)
     // Should be back to "#1" after the success reset
     const calls = mockLogger.warn.mock.calls
-    const lastWarn = calls[calls.length - 1] as unknown[]
+    const lastWarn = calls[calls.length - 1]
     expect(lastWarn[0]).toContain('#1')
   })
 

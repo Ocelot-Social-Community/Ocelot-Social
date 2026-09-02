@@ -1,13 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
+import { jest } from '@jest/globals'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import queryLocations from '@graphql/queries/queryLocations.gql'
 import UpdateUser from '@graphql/queries/users/UpdateUser.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 let variables
 let authenticatedUser: Context['user']
@@ -135,7 +137,7 @@ const welzheimFeature = {
   ],
 }
 
-let fetchSpy: jest.SpyInstance
+let fetchSpy: jest.Spied<typeof global.fetch>
 
 beforeAll(async () => {
   await cleanDatabase()

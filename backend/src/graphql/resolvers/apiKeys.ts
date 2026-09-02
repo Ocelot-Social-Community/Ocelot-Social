@@ -4,7 +4,7 @@ import { v4 as uuid } from 'uuid'
 
 import Resolver from './helpers/Resolver'
 
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 import type { Integer, Record as Neo4jRecord } from 'neo4j-driver'
 
 interface ApiKeyArgs {

@@ -12,7 +12,7 @@
 // writes resolve last-writer-wins (same trade-off as policy).
 
 import databaseContext from '@context/database'
-import { allPermissionKeys, sanitizePermissions } from '@src/permission'
+import { allPermissionKeys, sanitizePermissions } from '@src/permission/index'
 
 import { DEFAULT_ROLES, MANDATORY_ROLE_NAMES } from './defaults'
 import { deleteRole as dbDeleteRole, renameRole as dbRenameRole, writeRole } from './repository'
@@ -20,7 +20,7 @@ import { OWNER_ROLE, USER_ROLE } from './types'
 import { seedDefaultRoleNodes } from './userRoleEdges'
 
 import type { RoleChangeEvent, RoleDefinition, RolePubSub } from './types'
-import type { PermissionKey } from '@src/permission'
+import type { PermissionKey } from '@src/permission/index'
 
 type DbContext = ReturnType<typeof databaseContext>
 

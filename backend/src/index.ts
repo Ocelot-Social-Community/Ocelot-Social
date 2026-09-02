@@ -1,17 +1,17 @@
 // eslint-disable-next-line import-x/no-unassigned-import -- MUST be first: inject a runtime brand config before anything reads `branding`
 import './branding/bootstrap'
 
-import CONFIG from './config'
+import CONFIG from './config/index'
 import pubsubContext from './context/pubsub'
 import { closeDriver } from './db/neo4j'
 import { loggerPlugin } from './plugins/apolloLogger'
-import { getPolicyService } from './policy'
+import { getPolicyService } from './policy/index'
 import createProxy from './proxy'
-import { getRoleService } from './role'
+import { getRoleService } from './role/index'
 import createServer from './server'
 
-import type { PolicyPubSub } from './policy'
-import type { RolePubSub } from './role'
+import type { PolicyPubSub } from './policy/index'
+import type { RolePubSub } from './role/index'
 
 async function main() {
   // Initialize network policy (seeds DB from ENV if values are missing) and

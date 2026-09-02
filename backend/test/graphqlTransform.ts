@@ -4,7 +4,7 @@ export default {
   process(sourceText: string, sourcePath: string) {
     try {
       return {
-        code: `module.exports = ${JSON.stringify(parse(sourceText))};`,
+        code: `export default ${JSON.stringify(parse(sourceText))};`,
       }
     } catch (error: unknown) {
       throw new Error(

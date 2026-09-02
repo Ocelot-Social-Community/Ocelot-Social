@@ -4,9 +4,9 @@
 import { raw as rawBodyParser } from 'express'
 import { WebhookReceiver } from 'livekit-server-sdk'
 
-import CONFIG from '@src/config'
+import CONFIG from '@src/config/index'
 import { VIDEO_CALL_PARTICIPANT_COUNT_CHANGED } from '@src/constants/subscriptions'
-import { serverPubsub } from '@src/context'
+import { serverPubsub } from '@src/context/index'
 import { getLiveParticipantCount, groupIdFromRoomName } from '@src/graphql/resolvers/videoCalls'
 import logger from '@src/logger'
 

@@ -1,22 +1,26 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import Factory, { cleanDatabase } from '@db/factories'
-import CreateComment from '@graphql/queries/comments/CreateComment.gql'
-import notifications from '@graphql/queries/notifications/notifications.gql'
-import CreatePost from '@graphql/queries/posts/CreatePost.gql'
-import toggleObservePost from '@graphql/queries/posts/toggleObservePost.gql'
-import { createApolloTestSetup } from '@root/test/helpers'
+import { jest } from '@jest/globals'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 const sendNotificationMailMock: (notification) => void = jest.fn()
-jest.mock('@src/emails/sendEmail', () => ({
+jest.unstable_mockModule('@src/emails/sendEmail', () => ({
   sendNotificationMail: (notification) => {
     sendNotificationMailMock(notification)
   },
 }))
+
+// Imported after the mock registrations, not above them: `unstable_mockModule`
+// does not hoist, so a static import would bind the real module first.
+const { default: Factory, cleanDatabase } = await import('@db/factories')
+const { default: CreateComment } = await import('@graphql/queries/comments/CreateComment.gql')
+const { default: notifications } = await import('@graphql/queries/notifications/notifications.gql')
+const { default: CreatePost } = await import('@graphql/queries/posts/CreatePost.gql')
+const { default: toggleObservePost } = await import('@graphql/queries/posts/toggleObservePost.gql')
+const { createApolloTestSetup } = await import('@root/test/helpers')
 
 let authenticatedUser: Context['user']
 const policy = { categoriesActive: false }

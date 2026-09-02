@@ -1,9 +1,11 @@
+import { jest } from '@jest/globals'
+
 import { UserInputError } from '@graphql/errors'
-import { PolicyValidationError } from '@src/policy'
+import { PolicyValidationError } from '@src/policy/index'
 
 import brandingResolver from './branding'
 
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 describe('branding resolvers', () => {
   let set: jest.Mock
@@ -21,7 +23,7 @@ describe('branding resolvers', () => {
     )
 
   beforeEach(() => {
-    set = jest.fn().mockResolvedValue(undefined)
+    set = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue(undefined)
     context = { policy: { set }, user: { id: 'u1' } } as unknown as Context
   })
 
@@ -32,7 +34,7 @@ describe('branding resolvers', () => {
     })
 
     it('maps a PolicyValidationError to a UserInputError', async () => {
-      set.mockRejectedValue(new PolicyValidationError('bad'))
+      set.mockImplementation(async () => Promise.reject(new PolicyValidationError('bad')))
       await expect(call('setActiveBranding', { id: 'x' })).rejects.toThrow(UserInputError)
     })
   })

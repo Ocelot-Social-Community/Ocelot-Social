@@ -1,5 +1,5 @@
 import { branchesOf } from '@db/schema/derive/rules'
-import { relationships } from '@db/schema/relationships'
+import { relationships } from '@db/schema/relationships/index'
 
 import { allAliases, resolveAlias } from './aliases'
 

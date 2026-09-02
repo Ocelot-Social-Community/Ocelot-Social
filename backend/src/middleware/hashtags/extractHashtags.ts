@@ -4,7 +4,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { load } from 'cheerio'
-import { exec, build } from 'xregexp/xregexp-all.js'
+// Default import, not named: the package is CommonJS and Node derives named exports
+// from it by static analysis, which misses these. `import { … }` type-checks and then
+// throws at load. The default import is the whole module.exports.
+import XRegExp from 'xregexp/xregexp-all.js'
+
+const { exec, build } = XRegExp
 // formats of a Hashtag:
 //   https://en.wikipedia.org/w/index.php?title=Hashtag&oldid=905141980#Style
 // here:

@@ -7,7 +7,7 @@
 //   npm run db:data:promote-owner <email | slug | id>
 //   npm run prod:db:data:promote-owner <email | slug | id>
 
-import { promoteToOwner } from '@src/role'
+import { promoteToOwner } from '@src/role/index'
 
 import { closeDriver } from './neo4j'
 

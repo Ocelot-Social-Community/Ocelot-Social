@@ -1,11 +1,15 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import slugify, { extend } from 'slugify'
+import slugify from 'slugify'
 
-// `extend`, not `slugify.extend`: since 1.6.9 slugify's type declarations expose `extend` as a
-// named export next to the default one, and reaching it through the default import is what
-// `import-x/no-named-as-default-member` warns about. Same function either way at runtime.
-extend({ Ä: 'AE', ä: 'ae', Ö: 'OE', ö: 'oe', Ü: 'UE', ü: 'ue', ß: 'ss' })
+// `slugify.extend`, not a named `extend` import — the reverse of what this file did under
+// CommonJS. slugify's TYPES declare `extend` as a named export, but the package itself is CJS
+// with a single `module.exports = slugify`, and Node's ESM loader derives named exports from a
+// CJS module by static analysis. It cannot see `extend`, so `import { extend }` type-checks and
+// then throws at load: "does not provide an export named 'extend'". The default import is the
+// whole module.exports and always has it.
+// eslint-disable-next-line import-x/no-named-as-default-member -- see above: no named export exists at runtime
+slugify.extend({ Ä: 'AE', ä: 'ae', Ö: 'OE', ö: 'oe', Ü: 'UE', ü: 'ue', ß: 'ss' })
 
 // The single slug builder: the User/Group/Post models validate slugs against
 // /^[a-z0-9_-]+$/, so everything outside that alphabet must go. slugify alone

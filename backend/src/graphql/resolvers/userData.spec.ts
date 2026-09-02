@@ -7,7 +7,7 @@ import userData from '@graphql/queries/users/userData.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 let authenticatedUser: Context['user']
 let query: ApolloTestSetup['query']

@@ -26,7 +26,7 @@ const REGISTRY_ONLY_VARS = new Set<string>([])
 // executed, so no config side effects and no env dance.
 const configEnvReads = (): Set<string> => {
   // eslint-disable-next-line n/no-sync -- test-time read of a sibling source file
-  const source = readFileSync(join(__dirname, 'index.ts'), 'utf8')
+  const source = readFileSync(join(import.meta.dirname, 'index.ts'), 'utf8')
   const names = new Set<string>()
   for (const match of source.matchAll(/\benv\.([A-Z][A-Z0-9_]+)/g)) {
     names.add(match[1])

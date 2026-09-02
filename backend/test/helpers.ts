@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import databaseContext from '@context/database'
-import { getContext } from '@src/context'
-import { createInMemoryPolicyService } from '@src/policy'
-import { createInMemoryRoleService, resolveRoleName } from '@src/role'
+import { getContext } from '@src/context/index'
+import { createInMemoryPolicyService } from '@src/policy/index'
+import { createInMemoryRoleService, resolveRoleName } from '@src/role/index'
 import createServer from '@src/server'
 
 import type { ApolloServerPlugin } from '@apollo/server'
 import type CONFIG from '@config/index'
-import type { Context } from '@src/context'
-import type { NetworkPolicy } from '@src/policy'
-import type { RoleDefinition, RoleService } from '@src/role'
+import type { Context } from '@src/context/index'
+import type { NetworkPolicy } from '@src/policy/index'
+import type { RoleDefinition, RoleService } from '@src/role/index'
 import type { DocumentNode } from 'graphql'
 
 export const TEST_CONFIG = {

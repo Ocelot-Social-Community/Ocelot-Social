@@ -3,30 +3,49 @@
 // so we can verify resolution-order (DB > ENV > Schema-Default) deterministically.
 // (no-unsafe-assignment disabled: jest matchers like expect.objectContaining are `any`.)
 
-import {
+import { jest } from '@jest/globals'
+
+import type { PolicyChangeEvent, PolicyPubSub } from './PolicyService'
+import type {
+  deleteSetting as DeleteSetting,
+  readAllSettings as ReadAllSettings,
+  readLastChange as ReadLastChange,
+  writeSetting as WriteSetting,
+} from './repository'
+import type { PolicyKey } from './types'
+
+// The mocks carry the real signatures: `@jest/globals` types a bare `jest.fn()` as
+// `Mock<UnknownFunction>`, whose `mockResolvedValue` argument is `never`.
+interface Repository {
+  readAllSettings: typeof ReadAllSettings
+  readLastChange: typeof ReadLastChange
+  writeSetting: typeof WriteSetting
+  deleteSetting: typeof DeleteSetting
+}
+
+jest.unstable_mockModule('./repository', () => ({
+  POLICY_NAMESPACE: 'policy',
+  readAllSettings: jest.fn<Repository['readAllSettings']>(),
+  readLastChange: jest.fn<Repository['readLastChange']>().mockResolvedValue(null),
+  writeSetting: jest.fn<Repository['writeSetting']>(),
+  deleteSetting: jest.fn<Repository['deleteSetting']>(),
+}))
+
+// Imported after the mock registrations, not above them: `unstable_mockModule`
+// does not hoist, so a static import would bind the real module first.
+const {
   PolicyService,
   createInMemoryPolicyService,
   getPolicyService,
   setPolicyServiceForTesting,
   POLICY_CHANGED_CHANNEL,
-} from './PolicyService'
-import {
-  readAllSettings as readAllSettingsImpl,
-  readLastChange as readLastChangeImpl,
-  writeSetting as writeSettingImpl,
-  deleteSetting as deleteSettingImpl,
-} from './repository'
-
-import type { PolicyChangeEvent, PolicyPubSub } from './PolicyService'
-import type { PolicyKey } from './types'
-
-jest.mock('./repository', () => ({
-  POLICY_NAMESPACE: 'policy',
-  readAllSettings: jest.fn(),
-  readLastChange: jest.fn().mockResolvedValue(null),
-  writeSetting: jest.fn(),
-  deleteSetting: jest.fn(),
-}))
+} = await import('./PolicyService')
+const {
+  readAllSettings: readAllSettingsImpl,
+  readLastChange: readLastChangeImpl,
+  writeSetting: writeSettingImpl,
+  deleteSetting: deleteSettingImpl,
+} = await import('./repository')
 
 const readAllSettings = readAllSettingsImpl as jest.MockedFunction<typeof readAllSettingsImpl>
 const readLastChange = readLastChangeImpl as jest.MockedFunction<typeof readLastChangeImpl>
@@ -380,11 +399,11 @@ describe('PolicyService', () => {
   describe('set()', () => {
     it('persists the value, updates the cache, and publishes a change event', async () => {
       readAllSettings.mockResolvedValue({})
-      const publish = jest.fn()
+      const publish = jest.fn<PolicyPubSub['publish']>()
       const pubsub: PolicyPubSub = {
         publish,
-        subscribe: jest.fn().mockResolvedValue(1),
-        unsubscribe: jest.fn(),
+        subscribe: jest.fn<PolicyPubSub['subscribe']>().mockResolvedValue(1),
+        unsubscribe: jest.fn<PolicyPubSub['unsubscribe']>(),
       }
 
       const svc = new PolicyService(dbStub)
@@ -492,9 +511,11 @@ describe('PolicyService', () => {
       readAllSettings.mockResolvedValue({})
       const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
       const pubsub: PolicyPubSub = {
-        publish: jest.fn().mockRejectedValue(new Error('redis down')),
-        subscribe: jest.fn().mockResolvedValue(1),
-        unsubscribe: jest.fn(),
+        publish: jest
+          .fn<PolicyPubSub['publish']>()
+          .mockImplementation(async () => Promise.reject(new Error('redis down'))),
+        subscribe: jest.fn<PolicyPubSub['subscribe']>().mockResolvedValue(1),
+        unsubscribe: jest.fn<PolicyPubSub['unsubscribe']>(),
       }
 
       const svc = new PolicyService(dbStub)
@@ -524,8 +545,8 @@ describe('PolicyService', () => {
         publish: jest.fn(() => {
           throw new Error('redis sync error')
         }),
-        subscribe: jest.fn().mockResolvedValue(1),
-        unsubscribe: jest.fn(),
+        subscribe: jest.fn<PolicyPubSub['subscribe']>().mockResolvedValue(1),
+        unsubscribe: jest.fn<PolicyPubSub['unsubscribe']>(),
       }
 
       const svc = new PolicyService(dbStub)
@@ -571,11 +592,11 @@ describe('PolicyService', () => {
 
     it('publishes a change event', async () => {
       readAllSettings.mockResolvedValue({})
-      const publish = jest.fn()
+      const publish = jest.fn<PolicyPubSub['publish']>()
       const pubsub: PolicyPubSub = {
         publish,
-        subscribe: jest.fn().mockResolvedValue(1),
-        unsubscribe: jest.fn(),
+        subscribe: jest.fn<PolicyPubSub['subscribe']>().mockResolvedValue(1),
+        unsubscribe: jest.fn<PolicyPubSub['unsubscribe']>(),
       }
 
       const svc = new PolicyService(dbStub)
@@ -626,11 +647,11 @@ describe('PolicyService', () => {
 
     it('publishes one change event per key that actually changed', async () => {
       readAllSettings.mockResolvedValue({ publicRegistration: true, categoriesActive: true })
-      const publish = jest.fn()
+      const publish = jest.fn<PolicyPubSub['publish']>()
       const pubsub: PolicyPubSub = {
         publish,
-        subscribe: jest.fn().mockResolvedValue(1),
-        unsubscribe: jest.fn(),
+        subscribe: jest.fn<PolicyPubSub['subscribe']>().mockResolvedValue(1),
+        unsubscribe: jest.fn<PolicyPubSub['unsubscribe']>(),
       }
       const svc = new PolicyService(dbStub)
       await svc.init({}, pubsub) // defaults: publicRegistration=false, categoriesActive=false, inviteRegistration=true
@@ -703,11 +724,11 @@ describe('PolicyService', () => {
   describe('init() with pubsub', () => {
     it('subscribes to POLICY_CHANGED_CHANNEL', async () => {
       readAllSettings.mockResolvedValue({})
-      const subscribe = jest.fn().mockResolvedValue(42)
+      const subscribe = jest.fn<PolicyPubSub['subscribe']>().mockResolvedValue(42)
       const pubsub: PolicyPubSub = {
-        publish: jest.fn(),
+        publish: jest.fn<PolicyPubSub['publish']>(),
         subscribe,
-        unsubscribe: jest.fn(),
+        unsubscribe: jest.fn<PolicyPubSub['unsubscribe']>(),
       }
 
       const svc = new PolicyService(dbStub)
@@ -720,13 +741,15 @@ describe('PolicyService', () => {
       readAllSettings.mockResolvedValue({})
       let onMessage: ((payload: { policyChanged: PolicyChangeEvent }) => void) | undefined
       const pubsub: PolicyPubSub = {
-        publish: jest.fn(),
-        subscribe: jest.fn().mockImplementation(async (_channel, handler) => {
-          onMessage = handler as typeof onMessage
-          await Promise.resolve()
-          return 7
-        }),
-        unsubscribe: jest.fn(),
+        publish: jest.fn<PolicyPubSub['publish']>(),
+        subscribe: jest
+          .fn<PolicyPubSub['subscribe']>()
+          .mockImplementation(async (_channel, handler) => {
+            onMessage = handler
+            await Promise.resolve()
+            return 7
+          }),
+        unsubscribe: jest.fn<PolicyPubSub['unsubscribe']>(),
       }
 
       const svc = new PolicyService(dbStub)
@@ -752,13 +775,15 @@ describe('PolicyService', () => {
     it('does not lose a change that arrives during init (subscribe-first; snapshot does not clobber)', async () => {
       let onMessage: ((payload: { policyChanged: PolicyChangeEvent }) => void) | undefined
       const pubsub: PolicyPubSub = {
-        publish: jest.fn(),
-        subscribe: jest.fn().mockImplementation(async (_channel, handler) => {
-          onMessage = handler as typeof onMessage
-          await Promise.resolve()
-          return 1
-        }),
-        unsubscribe: jest.fn(),
+        publish: jest.fn<PolicyPubSub['publish']>(),
+        subscribe: jest
+          .fn<PolicyPubSub['subscribe']>()
+          .mockImplementation(async (_channel, handler) => {
+            onMessage = handler
+            await Promise.resolve()
+            return 1
+          }),
+        unsubscribe: jest.fn<PolicyPubSub['unsubscribe']>(),
       }
       // Another instance publishes a change while we read the (now stale) snapshot.
       // Because we subscribe BEFORE reading, the callback is already live; the
@@ -787,13 +812,15 @@ describe('PolicyService', () => {
       readAllSettings.mockResolvedValue({}) // key missing → seed path runs
       let onMessage: ((payload: { policyChanged: PolicyChangeEvent }) => void) | undefined
       const pubsub: PolicyPubSub = {
-        publish: jest.fn(),
-        subscribe: jest.fn().mockImplementation(async (_channel, handler) => {
-          onMessage = handler as typeof onMessage
-          await Promise.resolve()
-          return 1
-        }),
-        unsubscribe: jest.fn(),
+        publish: jest.fn<PolicyPubSub['publish']>(),
+        subscribe: jest
+          .fn<PolicyPubSub['subscribe']>()
+          .mockImplementation(async (_channel, handler) => {
+            onMessage = handler
+            await Promise.resolve()
+            return 1
+          }),
+        unsubscribe: jest.fn<PolicyPubSub['unsubscribe']>(),
       }
       // While we seed 'publicRegistration' (default false), a concurrent admin
       // change event arrives mid-write. The post-await cache re-check (`??=`) must
@@ -825,8 +852,8 @@ describe('PolicyService', () => {
       readAllSettings.mockResolvedValue({})
       const unsubscribe = jest.fn()
       const pubsub: PolicyPubSub = {
-        publish: jest.fn(),
-        subscribe: jest.fn().mockResolvedValue(99),
+        publish: jest.fn<PolicyPubSub['publish']>(),
+        subscribe: jest.fn<PolicyPubSub['subscribe']>().mockResolvedValue(99),
         unsubscribe,
       }
 

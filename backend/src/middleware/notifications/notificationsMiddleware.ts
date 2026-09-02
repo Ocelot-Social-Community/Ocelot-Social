@@ -15,7 +15,7 @@ import { sendNotificationMail, sendChatMessageMail } from '@src/emails/sendEmail
 
 import extractMentionedUsers from './mentions/extractMentionedUsers'
 
-import type { IMiddlewareResolver } from 'graphql-middleware/dist/types'
+import type { IMiddlewareResolver } from 'graphql-middleware/types'
 
 const publishNotifications = async (
   context,

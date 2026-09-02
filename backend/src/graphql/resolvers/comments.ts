@@ -9,7 +9,7 @@ import { nodeQuery } from './helpers/nodeQuery'
 import Resolver from './helpers/Resolver'
 
 import type { NodeQueryParams } from './helpers/nodeQuery'
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 // The Comment root query, hand-written since the neo4j-graphql-js migration.
 // softDeleteMiddleware injects `deleted`/`disabled` as top-level arguments, so those must

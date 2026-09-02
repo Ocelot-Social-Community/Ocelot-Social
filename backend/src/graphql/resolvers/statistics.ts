@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 export default {
   Query: {

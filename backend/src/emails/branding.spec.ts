@@ -8,7 +8,7 @@
 // read of `branding` does. Snapshot tests cannot catch it: they run unbranded, where the default IS
 // the expected value.
 import CONFIG from '@config/index'
-import { setBranding, brandingDefaults } from '@src/branding'
+import { setBranding, brandingDefaults } from '@src/branding/index'
 
 import { sendResetPasswordMail, defaultParams } from './sendEmail'
 

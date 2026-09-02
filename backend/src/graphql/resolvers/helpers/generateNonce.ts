@@ -1,4 +1,4 @@
-import { branding } from '@src/branding'
+import { branding } from '@src/branding/index'
 
 // Digit-only confirmation code (easy to read/type from an email) for the registration + email-change
 // flows (registration.ts, emails.ts). requestPasswordReset uses a separate crypto uuid substring

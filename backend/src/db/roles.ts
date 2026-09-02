@@ -9,7 +9,7 @@
 //   npm run prod:db:data:roles     (prod, via node build/)
 
 import databaseContext from '@context/database'
-import { DEFAULT_ROLES } from '@src/role'
+import { DEFAULT_ROLES } from '@src/role/index'
 import { writeRole } from '@src/role/repository'
 
 import { closeDriver } from './neo4j'

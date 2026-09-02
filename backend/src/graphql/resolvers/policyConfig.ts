@@ -1,7 +1,7 @@
 import { categoryRank } from '@src/config/categories'
-import { allKeys, categoryFor, envSeedFor, policyValueLayers, typeFor } from '@src/policy'
+import { allKeys, categoryFor, envSeedFor, policyValueLayers, typeFor } from '@src/policy/index'
 
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 // Admin-only (see permissionsMiddleware). One row per policy key exposing its three
 // value layers (software default / configured env-seed default / effective) plus its

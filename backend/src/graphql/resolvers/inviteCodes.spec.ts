@@ -17,7 +17,7 @@ import unauthenticatedValidateInviteCode from '@graphql/queries/invites/unauthen
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 // The invite-code limits are network policy now; pin them explicitly so the
 // "max reached" loops below are deterministic regardless of the schema default.

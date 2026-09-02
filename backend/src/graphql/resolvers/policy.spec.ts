@@ -3,6 +3,7 @@
 // permissions middleware (the layer that rejects a resolver returning
 // `undefined`). Guards the viewer-scoped visibility: anonymous viewers get
 // `null` for authenticated-only keys (NOT the value, and NOT an error).
+import { jest } from '@jest/globals'
 import { parse } from 'graphql'
 import { PubSub } from 'graphql-subscriptions'
 
@@ -11,14 +12,14 @@ import policyDefaultsQuery from '@graphql/queries/policy/policyDefaults.gql'
 import resetPolicyMutation from '@graphql/queries/policy/resetPolicy.gql'
 import setPolicyMutation from '@graphql/queries/policy/setPolicy.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
-import { POLICY_CHANGED_CHANNEL, allKeys } from '@src/policy'
-import { PERMISSIONS_CHANGED_CHANNEL } from '@src/role'
+import { POLICY_CHANGED_CHANNEL, allKeys } from '@src/policy/index'
+import { PERMISSIONS_CHANGED_CHANNEL } from '@src/role/index'
 
 import policyResolvers from './policy'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
-import type { NetworkPolicy } from '@src/policy'
+import type { Context } from '@src/context/index'
+import type { NetworkPolicy } from '@src/policy/index'
 
 let authenticatedUser: Context['user']
 let policy: Partial<NetworkPolicy>
@@ -324,7 +325,7 @@ describe('setPolicy value validation (integration)', () => {
 describe('Mutation resolvers (unit)', () => {
   describe('setPolicy', () => {
     it('parses the JSON value, calls policy.set, and serializes the event', async () => {
-      const set = jest.fn().mockResolvedValue({
+      const set = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
         key: 'apiKeysEnabled',
         value: true,
         actor: 'admin-1',
@@ -347,7 +348,7 @@ describe('Mutation resolvers (unit)', () => {
     })
 
     it('parses an integer JSON value for an integer key', async () => {
-      const set = jest.fn().mockResolvedValue({
+      const set = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
         key: 'apiKeysMaxPerUser',
         value: 10,
         actor: 'admin-1',
@@ -381,7 +382,7 @@ describe('Mutation resolvers (unit)', () => {
 
   describe('resetPolicy', () => {
     it('calls policy.reset and serializes the event', async () => {
-      const reset = jest.fn().mockResolvedValue({
+      const reset = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
         key: 'categoriesActive',
         value: false,
         actor: 'admin-1',
@@ -401,7 +402,7 @@ describe('Mutation resolvers (unit)', () => {
 
   describe('resetPolicies (bulk)', () => {
     it('calls policy.resetMany once and serializes the returned events', async () => {
-      const resetMany = jest.fn().mockResolvedValue([
+      const resetMany = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue([
         { key: 'categoriesActive', value: false, actor: 'admin-1', timestamp: 'ts' },
         { key: 'apiKeysMaxPerUser', value: 5, actor: 'admin-1', timestamp: 'ts' },
       ])
@@ -428,7 +429,7 @@ describe('Mutation resolvers (unit)', () => {
       ({ user: { id: 'admin-1' }, policy: policyDouble, pubsub: { publish } }) as unknown as Context
 
     it('broadcasts permissionsChanged when setPolicy changes a gate flag', async () => {
-      const set = jest.fn().mockResolvedValue({
+      const set = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
         key: 'apiKeysEnabled',
         value: false,
         actor: 'admin-1',
@@ -446,7 +447,7 @@ describe('Mutation resolvers (unit)', () => {
     })
 
     it('does NOT broadcast permissionsChanged for a non-gate policy key', async () => {
-      const set = jest.fn().mockResolvedValue({
+      const set = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
         key: 'apiKeysMaxPerUser',
         value: 7,
         actor: 'admin-1',
@@ -462,7 +463,7 @@ describe('Mutation resolvers (unit)', () => {
     })
 
     it('broadcasts permissionsChanged when resetPolicy resets a gate flag', async () => {
-      const reset = jest.fn().mockResolvedValue({
+      const reset = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
         key: 'apiKeysEnabled',
         value: false,
         actor: 'admin-1',
@@ -480,7 +481,7 @@ describe('Mutation resolvers (unit)', () => {
     })
 
     it('broadcasts permissionsChanged once when a bulk reset changes a gate flag', async () => {
-      const resetMany = jest.fn().mockResolvedValue([
+      const resetMany = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue([
         { key: 'publicRegistration', value: false, actor: 'admin-1', timestamp: 't' },
         { key: 'apiKeysEnabled', value: false, actor: 'admin-1', timestamp: 't' },
       ])
@@ -500,7 +501,7 @@ describe('Mutation resolvers (unit)', () => {
       // apiKeysEnabled was requested but already at its default, so resetMany didn't return
       // it — no permission availability changed, no signal.
       const resetMany = jest
-        .fn()
+        .fn<(...args: unknown[]) => Promise<unknown>>()
         .mockResolvedValue([
           { key: 'publicRegistration', value: false, actor: 'admin-1', timestamp: 't' },
         ])

@@ -15,8 +15,8 @@ import updateApiKey from '@graphql/queries/apiKeys/updateApiKey.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
-import type { RoleDefinition } from '@src/role'
+import type { Context } from '@src/context/index'
+import type { RoleDefinition } from '@src/role/index'
 
 let authenticatedUser: Context['user']
 // Per-test role override: tweaks the viewer's effective permissions to test the

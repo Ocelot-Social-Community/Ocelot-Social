@@ -12,7 +12,7 @@ import { createApolloTestSetup } from '@root/test/helpers'
 import { roomUpdatedFilter } from './rooms'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 let chattingUser, otherChattingUser, notChattingUser
 let authenticatedUser: Context['user']

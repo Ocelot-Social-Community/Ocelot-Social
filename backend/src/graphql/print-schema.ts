@@ -1,5 +1,6 @@
 import { writeFileSync } from 'node:fs'
 import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { lexicographicSortSchema, printSchema } from 'graphql'
@@ -23,11 +24,13 @@ export const buildSchemaSdl = (): string =>
 
 // Committed to git (NOT a build artefact) so that `git diff` shows API changes in review
 // and the snapshot test has something to compare against.
-export const schemaSdlFile = path.resolve(__dirname, '../../schema.graphql')
+export const schemaSdlFile = path.resolve(import.meta.dirname, '../../schema.graphql')
 
-// Only write when invoked as a script (`yarn schema:print`). Importing this module —
+// Only write when invoked as a script (`npm run schema:print`). Importing this module —
 // which the snapshot test does — must not touch the file it is about to verify.
-if (require.main === module) {
+// ESM has no `require.main`/`module`: the equivalent question is whether this module's own URL
+// is the one Node was started with. argv[1] is a path, hence pathToFileURL for the comparison.
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   // eslint-disable-next-line n/no-sync
   writeFileSync(schemaSdlFile, buildSchemaSdl(), 'utf-8')
 

@@ -15,7 +15,7 @@
 // still use the alias: index.ts imports this via `@src/graphql/derivedEnums`.)
 /* eslint-disable import-x/no-relative-parent-imports */
 import { ENV_CATEGORIES } from '../config/categories'
-import policySchema from '../policy/policy.schema.json'
+import policySchema from '../policy/policy.schema.json' with { type: 'json' }
 /* eslint-enable import-x/no-relative-parent-imports */
 
 // A GraphQL enum value must be a valid GraphQL name. A policy key or category with e.g. a dot

@@ -21,7 +21,7 @@ import { SocialMedia } from './entities/SocialMedia'
 import { Tag } from './entities/Tag'
 import { UnverifiedEmailAddress } from './entities/UnverifiedEmailAddress'
 import { User } from './entities/User'
-import { relationships } from './relationships'
+import { relationships } from './relationships/index'
 
 import type { EntityDefinition } from './types'
 

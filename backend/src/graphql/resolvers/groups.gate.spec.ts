@@ -24,7 +24,7 @@ import UnreadRooms from '@graphql/queries/messaging/UnreadRooms.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 let authenticatedUser: Context['user']
 // Per-test policy override; the outer beforeEach creates a group with the feature ON, then

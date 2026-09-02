@@ -1,8 +1,8 @@
-import { createInMemoryPolicyService } from '@src/policy'
+import { createInMemoryPolicyService } from '@src/policy/index'
 
 import resolvers from './systemConfig'
 
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 describe('systemConfig resolver', () => {
   // The resolver reads values from process.env (in production the same source the

@@ -3,7 +3,7 @@
 import { hashSync } from 'bcryptjs'
 import { v4 as uuid } from 'uuid'
 
-import { seedDefaultRoleNodes } from '@src/role'
+import { seedDefaultRoleNodes } from '@src/role/index'
 
 import { getDriver } from './neo4j'
 

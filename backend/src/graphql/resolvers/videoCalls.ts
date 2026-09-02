@@ -14,7 +14,7 @@ import { ForbiddenError } from '@graphql/errors'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
 
-import type { PermissionKey } from '@src/permission'
+import type { PermissionKey } from '@src/permission/index'
 import type { Driver } from 'neo4j-driver'
 
 const ROOM_PREFIX = 'group-'

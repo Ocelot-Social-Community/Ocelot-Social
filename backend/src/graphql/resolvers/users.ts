@@ -10,7 +10,7 @@
 /* eslint-disable security/detect-object-injection */
 import { GROUP_MEMBERSHIP_VISIBILITY_CHANGED } from '@constants/subscriptions'
 import { UserInputError, ForbiddenError } from '@graphql/errors'
-import { branding } from '@src/branding'
+import { branding } from '@src/branding/index'
 
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
 import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
@@ -21,7 +21,7 @@ import Resolver from './helpers/Resolver'
 import { images } from './images/images'
 import { createOrUpdateLocations } from './users/location'
 
-import type { Context } from '@src/context'
+import type { Context } from '@src/context/index'
 
 const visiblePostFilter =
   'WHERE NOT related.disabled = true AND NOT related.deleted = true AND NOT (related)<-[:CANNOT_SEE]-(:User {id: $cypherParams.currentUserId})'
