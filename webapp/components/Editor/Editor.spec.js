@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils'
+import flushPromises from 'flush-promises'
 import Editor from './Editor'
 
 import MutationObserver from 'mutation-observer'
@@ -63,6 +64,16 @@ describe('Editor.vue', () => {
     // null anchor, and `tippy(null)` answers with an empty array rather than an instance. The popup
     // has to open regardless of which of the two the anchor comes from.
     describe('opening the mention suggestion list', () => {
+      // Both the popup and its absence have to be judged at the SAME point in time: the deferred
+      // anchor lookup runs in a $nextTick, and prosemirror needs a tick of its own before the
+      // decoration is in the DOM. A negative assertion that stops earlier than the positive one
+      // would pass simply by looking too soon.
+      const settle = async (vm) => {
+        await vm.$nextTick()
+        await vm.$nextTick()
+        await flushPromises()
+      }
+
       it('anchors the popup even when the plugin has no decoration node yet', async () => {
         propsData.users = [{ id: 'u1', slug: 'peter-lustig', label: 'Peter Lustig' }]
         wrapper = mount(Editor, {
@@ -76,8 +87,7 @@ describe('Editor.vue', () => {
 
         const { view } = wrapper.vm.editor
         view.dispatch(view.state.tr.insertText('@'))
-        await wrapper.vm.$nextTick()
-        await wrapper.vm.$nextTick()
+        await settle(wrapper.vm)
 
         const { menu } = wrapper.vm.$refs.contextMenu
         expect(menu).toBeTruthy()
@@ -213,21 +223,20 @@ describe('Editor.vue', () => {
         })
         const { view } = wrapper.vm.editor
 
-        // Opens without an anchor, so the lookup is deferred — and the list is dismissed within
-        // that same tick, as Escape or a keystroke ending the match would.
-        wrapper.vm.openSuggestionList(
-          {
-            items: propsData.users,
-            query: '',
-            range: { from: 1, to: 2 },
-            command: jest.fn(),
-            virtualNode: null,
-            view,
-          },
-          'mention',
-        )
+        // Type for real first, so the decoration is in the DOM: the deferred lookup WOULD find an
+        // anchor here, which is what makes the guard observable at all.
+        view.dispatch(view.state.tr.insertText('@'))
+        await settle(wrapper.vm)
+        wrapper.vm.$refs.contextMenu.hideContextMenu()
+
+        // Then the sequence the guard is for: a lookup is scheduled, and the list is dismissed
+        // before the tick that resolves it — Escape, or a keystroke that ends the match.
+        // Driven through showSuggestionMenu directly because since prosemirror-view 1.42 the
+        // plugin's update() runs asynchronously after `dispatch`, so a close placed right after a
+        // keystroke lands BEFORE the list even opens (measured) and would prove nothing.
+        wrapper.vm.showSuggestionMenu(null, view)
         wrapper.vm.closeSuggestionList()
-        await wrapper.vm.$nextTick()
+        await settle(wrapper.vm)
 
         expect(wrapper.vm.$refs.contextMenu.menu).toBeFalsy()
       })
