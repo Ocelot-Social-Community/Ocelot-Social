@@ -19,10 +19,10 @@ import UPDATE_ROLE from '@graphql/queries/roles/updateRole.gql'
 import USER_ROLES from '@graphql/queries/roles/userRoles.gql'
 import USER_INFO from '@graphql/queries/roles/userWithRole.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
-import { PERMISSIONS_CHANGED_CHANNEL, RoleService } from '@src/role/index'
+import { PERMISSIONS_CHANGED_CHANNEL, RoleService } from '@src/role'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 let authenticatedUser: Context['user']
 let roleService: RoleService

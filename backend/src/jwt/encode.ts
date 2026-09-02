@@ -10,7 +10,7 @@
 // throws at load. The default import is the whole module.exports.
 import jwt from 'jsonwebtoken'
 
-import type CONFIG from '@src/config/index'
+import type CONFIG from '@src/config'
 
 // Generate an Access Token for the given User ID
 export const encode =

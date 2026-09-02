@@ -10,11 +10,11 @@ import { createRequire } from 'node:module'
 import CONFIG from '@config/index'
 import { AuthenticationError } from '@graphql/errors'
 import { validateInviteCode } from '@graphql/resolvers/inviteCodes'
-import { isPermissionAvailable } from '@src/permission/index'
-import { dominates } from '@src/role/index'
+import { isPermissionAvailable } from '@src/permission'
+import { dominates } from '@src/role'
 
-import type { Context } from '@src/context/index'
-import type { PermissionKey } from '@src/permission/index'
+import type { Context } from '@src/context'
+import type { PermissionKey } from '@src/permission'
 import type {
   allow as Allow,
   and as And,

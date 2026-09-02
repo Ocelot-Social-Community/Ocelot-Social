@@ -23,7 +23,7 @@ import Resolver from './helpers/Resolver'
 import { images } from './images/images'
 import { createOrUpdateLocations } from './users/location'
 
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 // Shared projection that builds the same NOTIFIED shape the top-level `notifications`
 // query returns. Used by the Post.unreadNotificationByCurrentUser and

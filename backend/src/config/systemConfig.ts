@@ -18,14 +18,14 @@ import {
   envSeedFor,
   policyValueLayers,
   requiresEnvFor,
-} from '@src/policy/index'
+} from '@src/policy'
 
 import { categoryRank } from './categories'
 import { ENV_REGISTRY, ENV_SPEC_BY_NAME } from './envRegistry'
 
 import type { EnvCategory } from './categories'
 import type { EnvVarSpec } from './envRegistry'
-import type { ConfigKeyState, PolicyKey } from '@src/policy/index'
+import type { ConfigKeyState, PolicyKey } from '@src/policy'
 
 export interface SystemConfigRow {
   // The environment variable name.

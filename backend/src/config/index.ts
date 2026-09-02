@@ -7,13 +7,13 @@
 /* eslint-disable n/no-process-env */
 import { config } from 'dotenv'
 
-import { branding } from '@src/branding/index'
+import { branding } from '@src/branding'
 
 import { resolveJwtExpires } from './jwtExpires'
 import { resolveLocale } from './locales'
 import { SOFTWARE_DEFAULTS } from './softwareDefaults'
 
-import type * as SMTPTransport from 'nodemailer/lib/smtp-pool/index.js'
+import type * as SMTPTransport from 'nodemailer/lib/smtp-pool'
 
 // Load env file
 config()

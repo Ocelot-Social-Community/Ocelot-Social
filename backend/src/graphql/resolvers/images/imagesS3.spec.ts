@@ -10,7 +10,7 @@ import { Readable } from 'node:stream'
 import { jest } from '@jest/globals'
 
 import type { ImageInput } from './images'
-import type { S3Config } from '@src/config/index'
+import type { S3Config } from '@src/config'
 import type { FileUpload } from 'graphql-upload'
 
 jest.unstable_mockModule('@aws-sdk/client-s3', () => {

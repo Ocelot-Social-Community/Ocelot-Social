@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 import type { IMiddlewareResolver } from 'graphql-middleware/types'
 
 // Moderators (anyone holding content.moderate) may see disabled content; everyone

@@ -5,7 +5,7 @@
 import { jest } from '@jest/globals'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 // Keep the full resolved branding (config/index.ts reads branding.metadata.* transitively);
 // only tighten the group description minimum for this suite.
@@ -13,7 +13,7 @@ import type { Context } from '@src/context/index'
 // cannot await.
 const actualBranding = await import('@ocelot-social/branding')
 
-jest.unstable_mockModule('@src/branding/index', () => {
+jest.unstable_mockModule('@src/branding', () => {
   // @src/branding re-exports the package's NAMED `branding` (per-domain getters), not a default.
   const actual = actualBranding
   return {

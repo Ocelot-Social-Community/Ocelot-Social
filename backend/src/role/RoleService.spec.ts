@@ -1,6 +1,6 @@
 import { jest } from '@jest/globals'
 
-import { allPermissionKeys } from '@src/permission/index'
+import { allPermissionKeys } from '@src/permission'
 
 import { DEFAULT_ROLES } from './defaults'
 import { RoleService, RoleValidationError, createInMemoryRoleService } from './RoleService'

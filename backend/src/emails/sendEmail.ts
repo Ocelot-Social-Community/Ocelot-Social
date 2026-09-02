@@ -11,7 +11,7 @@ import { createTransport } from 'nodemailer'
 
 import CONFIG, { nodemailerTransportOptions } from '@config/index'
 import { SUPPORTED_LOCALES } from '@config/locales'
-import { branding } from '@src/branding/index'
+import { branding } from '@src/branding'
 
 import type { User } from '@db/schema/entities/User'
 import type { EntityProperties } from '@db/schema/types'

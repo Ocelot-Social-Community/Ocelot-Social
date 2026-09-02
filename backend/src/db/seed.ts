@@ -19,7 +19,7 @@ import CreateGroupRoom from '@graphql/queries/messaging/CreateGroupRoom.gql'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
 import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
-import { ensureUserRoleEdges, seedDefaultRoleNodes } from '@src/role/index'
+import { ensureUserRoleEdges, seedDefaultRoleNodes } from '@src/role'
 
 import Factory from './factories'
 import { nudgeCacheResync } from './resync-caches'

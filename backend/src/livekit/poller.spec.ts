@@ -22,7 +22,7 @@ jest.unstable_mockModule('livekit-server-sdk', () => ({
 }))
 
 const mockPublish = jest.fn<(...args: unknown[]) => Promise<unknown>>()
-jest.unstable_mockModule('@src/context/index', () => ({
+jest.unstable_mockModule('@src/context', () => ({
   __esModule: true,
   serverPubsub: {
     publish: (...args: unknown[]): unknown => mockPublish(...args),
@@ -52,7 +52,7 @@ jest.unstable_mockModule('@src/logger', () => ({
   },
 }))
 
-jest.unstable_mockModule('@src/config/index', () => ({
+jest.unstable_mockModule('@src/config', () => ({
   __esModule: true,
   get default() {
     return mockConfig

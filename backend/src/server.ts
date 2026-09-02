@@ -21,13 +21,13 @@ import { SubscriptionServer } from 'subscriptions-transport-ws'
 import { WebSocketServer } from 'ws'
 
 import { brandingRouter } from './branding/routes'
-import CONFIG from './config/index'
-import { getContext } from './context/index'
+import CONFIG from './config'
+import { getContext } from './context'
 import schema from './graphql/schema'
 import { startLiveKitPoller } from './livekit/poller'
 import { registerLiveKitWebhook } from './livekit/webhook'
 import logger from './logger'
-import middleware from './middleware/index'
+import middleware from './middleware'
 
 import type { ApolloServerPlugin } from '@apollo/server'
 

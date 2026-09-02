@@ -11,8 +11,8 @@ import { jest } from '@jest/globals'
 
 import type { FileInput } from './attachments'
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { S3Config } from '@src/config/index'
-import type { Context } from '@src/context/index'
+import type { S3Config } from '@src/config'
+import type { Context } from '@src/context'
 import type { ReadStream } from 'node:fs'
 
 const s3SendMock = jest.fn()

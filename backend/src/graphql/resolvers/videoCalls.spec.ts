@@ -5,8 +5,8 @@
 import { jest } from '@jest/globals'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context/index'
-import type { RoleDefinition } from '@src/role/index'
+import type { Context } from '@src/context'
+import type { RoleDefinition } from '@src/role'
 
 let listParticipantsMock = jest.fn<(...args: unknown[]) => Promise<unknown>>()
 

@@ -6,7 +6,7 @@ import { jest } from '@jest/globals'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { closeDriver, getDriver } from '@db/neo4j'
-import resolvers from '@graphql/resolvers/index'
+import resolvers from '@graphql/resolvers'
 
 import { createLoaders } from './loaders'
 

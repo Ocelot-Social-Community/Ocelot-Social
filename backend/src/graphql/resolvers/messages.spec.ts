@@ -22,7 +22,7 @@ import { createApolloTestSetup } from '@root/test/helpers'
 import resolvers, { chatMessageAddedFilter, chatMessageStatusUpdatedFilter } from './messages'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 let authenticatedUser: Context['user']
 const context = () => ({ authenticatedUser, pubsub })

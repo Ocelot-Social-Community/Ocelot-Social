@@ -9,9 +9,9 @@ import { createHash } from 'node:crypto'
 // throws at load. The default import is the whole module.exports.
 import jwt from 'jsonwebtoken'
 
-import { resolveRoleName } from '@src/role/index'
+import { resolveRoleName } from '@src/role'
 
-import type CONFIG from '@src/config/index'
+import type CONFIG from '@src/config'
 import type { JwtPayload } from 'jsonwebtoken'
 import type { Driver } from 'neo4j-driver'
 

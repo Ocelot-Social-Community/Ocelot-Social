@@ -5,7 +5,7 @@
 import { jest } from '@jest/globals'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 const sendNotificationMailMock: (notification) => void = jest.fn()
 jest.unstable_mockModule('@src/emails/sendEmail', () => ({

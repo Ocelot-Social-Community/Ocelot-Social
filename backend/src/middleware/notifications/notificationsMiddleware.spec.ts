@@ -7,7 +7,7 @@
 import { jest } from '@jest/globals'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context/index'
+import type { Context } from '@src/context'
 
 const sendChatMessageMailMock: (notification) => void = jest.fn()
 const sendNotificationMailMock: (notification) => void = jest.fn()

@@ -12,14 +12,14 @@ import policyDefaultsQuery from '@graphql/queries/policy/policyDefaults.gql'
 import resetPolicyMutation from '@graphql/queries/policy/resetPolicy.gql'
 import setPolicyMutation from '@graphql/queries/policy/setPolicy.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
-import { POLICY_CHANGED_CHANNEL, allKeys } from '@src/policy/index'
-import { PERMISSIONS_CHANGED_CHANNEL } from '@src/role/index'
+import { POLICY_CHANGED_CHANNEL, allKeys } from '@src/policy'
+import { PERMISSIONS_CHANGED_CHANNEL } from '@src/role'
 
 import policyResolvers from './policy'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context/index'
-import type { NetworkPolicy } from '@src/policy/index'
+import type { Context } from '@src/context'
+import type { NetworkPolicy } from '@src/policy'
 
 let authenticatedUser: Context['user']
 let policy: Partial<NetworkPolicy>
