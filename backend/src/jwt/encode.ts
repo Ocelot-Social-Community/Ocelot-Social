@@ -14,6 +14,11 @@ export const encode =
   (user) => {
     const { id, name, slug } = user
     const token: string = jwt.sign({ id, name, slug }, context.config.JWT_SECRET, {
+      // Stated rather than left to the library default, so the algorithm this deployment signs
+      // with is pinned in one place together with the `algorithms` allow-list decode.ts verifies
+      // against — the pair is what closes the algorithm-confusion door.
+      algorithm: 'HS256',
+      // Already validated as a parseable lifetime by config/jwtExpires.ts.
       expiresIn: context.config.JWT_EXPIRES,
       issuer: context.config.GRAPHQL_URI,
       audience: context.config.CLIENT_URI,

@@ -13,6 +13,7 @@
 // Secret hygiene: a var missing from this registry defaults to secret=true in
 // systemConfig.ts, so a newly introduced var can never leak its value by omission.
 
+import { resolveJwtExpires } from './jwtExpires'
 import { resolveLocale } from './locales'
 import { SOFTWARE_DEFAULTS } from './softwareDefaults'
 
@@ -160,6 +161,10 @@ export const ENV_REGISTRY: EnvVarSpec[] = [
     secret: false,
     category: 'auth',
     softwareDefault: SOFTWARE_DEFAULTS.JWT_EXPIRES,
+    // Validated as an `ms` lifetime (same as config/index.ts), so the config tab's effective
+    // value matches the runtime: an empty or unparseable JWT_EXPIRES resolves to the software
+    // default rather than being shown verbatim.
+    normalize: (raw) => String(resolveJwtExpires(raw, SOFTWARE_DEFAULTS.JWT_EXPIRES)),
   },
 
   // --- Maps ---------------------------------------------------------------

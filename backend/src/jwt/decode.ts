@@ -34,7 +34,12 @@ const decodeJwt = async (
 ): Promise<DecodedUser | null> => {
   let id: null | string = null
   try {
-    const decoded = jwt.verify(token, context.config.JWT_SECRET) as JwtPayload
+    // `algorithms` pins verification to what encode.ts signs with. Without it the accepted
+    // algorithm is whatever the token's own header claims, which is the algorithm-confusion
+    // class (an attacker-chosen `alg` verified against the same secret).
+    const decoded = jwt.verify(token, context.config.JWT_SECRET, {
+      algorithms: ['HS256'],
+    }) as JwtPayload
     id = decoded.sub ?? null
     // eslint-disable-next-line no-catch-all/no-catch-all
   } catch {
