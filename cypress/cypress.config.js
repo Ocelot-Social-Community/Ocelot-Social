@@ -61,6 +61,21 @@ async function setupNodeEvents(on, config) {
       console.log('getValue',name,testStore)
       return testStore[name]
     },
+    // Mints the auth cookie's JWT for "I am logged in as <slug>". This runs in NODE, on
+    // purpose: from jsonwebtoken 9 `sign` checks `secretOrPrivateKey instanceof KeyObject`
+    // with KeyObject taken from `crypto`, and the browser polyfill NodePolyfillPlugin
+    // substitutes (crypto-browserify) has no such export — `instanceof undefined` then throws
+    // "Right-hand side of 'instanceof' is not an object" for every logged-in step.
+    //
+    // `config` is passed IN by the step rather than required here: the backend's config module
+    // reads Cypress.env() in the browser but process.env in Node, so requiring it on this side
+    // would sign with a potentially different JWT_SECRET than the specs otherwise use. Only the
+    // signing moves to Node; the values keep coming from the one source they always did.
+    // `encode` is required lazily so `cypress open` still starts when backend/build is absent.
+    signToken({ user, config }) {
+      const { encode } = require('../backend/build/src/jwt/encode')
+      return encode({ config })(user)
+    },
   });
 
   // Chromium-family browser flags so PreJoin's getUserMedia/enumerateDevices
