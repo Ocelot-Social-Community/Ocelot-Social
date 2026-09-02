@@ -1,19 +1,27 @@
 // The archive routes are the ONLY way the webapp obtains a brand now, so the tests pin the contract
 // that matters to it: what the manifest contains, that an unknown/invalid id cannot reach the disk,
 // and that revalidation actually saves the transfer.
-import { createReadStream } from 'node:fs'
-import { stat } from 'node:fs/promises'
 import { PassThrough, Readable } from 'node:stream'
 import { finished } from 'node:stream/promises'
 import { setImmediate as tick } from 'node:timers/promises'
 
-import { brandingRouter } from './routes'
+/* eslint-disable n/prefer-process-get-builtin-module -- these two must go through Jest's module
+   registry to pick up the fs mocks below; process.getBuiltinModule() bypasses it and returns the
+   real module. */
+import { jest } from '@jest/globals'
 
 import type { BrandingRouterDeps } from './routes'
 import type { Request, Response } from 'express'
 
-jest.mock('node:fs', () => ({ createReadStream: jest.fn() }))
-jest.mock('node:fs/promises', () => ({ stat: jest.fn() }))
+jest.unstable_mockModule('node:fs', () => ({ createReadStream: jest.fn() }))
+jest.unstable_mockModule('node:fs/promises', () => ({ stat: jest.fn() }))
+
+// Imported after the mock registrations, not above them: `unstable_mockModule`
+// does not hoist, so a static import would bind the real module first.
+const { createReadStream } = await import('node:fs')
+const { stat } = await import('node:fs/promises')
+/* eslint-enable n/prefer-process-get-builtin-module */
+const { brandingRouter } = await import('./routes')
 
 // The two disk readers are INJECTED, not module-mocked. `@ocelot-social/branding/dist/discover.js` is
 // a subpath of a `file:` dependency, and whether jest bound a mock of it to routes.ts depended on the
@@ -21,14 +29,18 @@ jest.mock('node:fs/promises', () => ({ stat: jest.fn() }))
 // filesystem and every fixture-based expectation failed. Passing the fakes in removes the question.
 // The id guard is NOT faked — routes.ts keeps importing the real one, so a tightening of
 // BRAND_ID_PATTERN is exercised here instead of being shadowed by a stub.
-const mockDiscover = jest.fn() as jest.MockedFunction<BrandingRouterDeps['discoverArchives']>
-const mockDefaultMarker = jest.fn() as jest.MockedFunction<BrandingRouterDeps['readDefaultMarker']>
+const mockDiscover = jest.fn<(...args: unknown[]) => unknown>() as jest.MockedFunction<
+  BrandingRouterDeps['discoverArchives']
+>
+const mockDefaultMarker = jest.fn<(...args: unknown[]) => unknown>() as jest.MockedFunction<
+  BrandingRouterDeps['readDefaultMarker']
+>
 const deps: BrandingRouterDeps = {
   discoverArchives: mockDiscover,
   readDefaultMarker: mockDefaultMarker,
 }
-const mockStat = stat as jest.Mock
-const mockCreateReadStream = createReadStream as jest.Mock
+const mockStat = stat as jest.Mock<(...args: unknown[]) => Promise<unknown>>
+const mockCreateReadStream = createReadStream as jest.Mock<(...args: unknown[]) => unknown>
 
 const ARCHIVE = {
   id: 'stage',
@@ -49,9 +61,9 @@ interface MockRes extends PassThrough {
   statusCode?: number
   headers: Record<string, string>
   body?: string
-  status: jest.Mock
-  setHeader: jest.Mock
-  json: jest.Mock
+  status: jest.Mock<(this: MockRes, code: number) => MockRes>
+  setHeader: jest.Mock<(this: MockRes, k: string, v: string) => void>
+  json: jest.Mock<(this: MockRes, value: unknown) => MockRes>
 }
 
 // A REAL Writable, not a bag of jest.fn()s: the archive route hands the response to

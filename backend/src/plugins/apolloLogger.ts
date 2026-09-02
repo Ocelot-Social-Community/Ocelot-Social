@@ -4,7 +4,7 @@
 
 import { randomBytes } from 'node:crypto'
 
-import cloneDeep from 'lodash/cloneDeep'
+import cloneDeep from 'lodash/cloneDeep.js'
 
 import ocelotLogger from '@src/logger'
 

@@ -7,21 +7,13 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import { Readable } from 'node:stream'
 
-import { DeleteObjectCommand } from '@aws-sdk/client-s3'
-import { Upload } from '@aws-sdk/lib-storage'
-
-import Factory, { cleanDatabase } from '@db/factories'
-import { getDriver } from '@db/neo4j'
-import { fixtures } from '@db/testing/fixtures'
-import { UserInputError } from '@graphql/errors'
-
-import { images } from './imagesS3'
+import { jest } from '@jest/globals'
 
 import type { ImageInput } from './images'
 import type { S3Config } from '@src/config'
 import type { FileUpload } from 'graphql-upload'
 
-jest.mock('@aws-sdk/client-s3', () => {
+jest.unstable_mockModule('@aws-sdk/client-s3', () => {
   return {
     S3Client: jest.fn().mockImplementation(() => ({
       send: jest.fn(),
@@ -31,14 +23,26 @@ jest.mock('@aws-sdk/client-s3', () => {
   }
 })
 
-jest.mock('@aws-sdk/lib-storage', () => {
+jest.unstable_mockModule('@aws-sdk/lib-storage', () => {
   return {
-    Upload: jest.fn().mockImplementation(({ params: { Key } }: { params: { Key: string } }) => ({
-      done: async () =>
-        Promise.resolve({ Location: `http://your-objectstorage.com/bucket/${Key}` }),
-    })),
+    Upload: jest
+      .fn<(input: { params: { Key: string } }) => unknown>()
+      .mockImplementation(({ params: { Key } }: { params: { Key: string } }) => ({
+        done: async () =>
+          Promise.resolve({ Location: `http://your-objectstorage.com/bucket/${Key}` }),
+      })),
   }
 })
+
+// Imported after the mock registrations, not above them: `unstable_mockModule`
+// does not hoist, so a static import would bind the real module first.
+const { DeleteObjectCommand } = await import('@aws-sdk/client-s3')
+const { Upload } = await import('@aws-sdk/lib-storage')
+const { default: Factory, cleanDatabase } = await import('@db/factories')
+const { getDriver } = await import('@db/neo4j')
+const { fixtures } = await import('@db/testing/fixtures')
+const { UserInputError } = await import('@graphql/errors')
+const { images } = await import('./imagesS3')
 
 const mockUpload = jest.mocked(Upload)
 const mockDeleteObjectCommand = jest.mocked(DeleteObjectCommand)

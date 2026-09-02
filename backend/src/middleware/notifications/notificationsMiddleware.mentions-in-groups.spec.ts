@@ -1,25 +1,41 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import Factory, { cleanDatabase } from '@db/factories'
-import CreateComment from '@graphql/queries/comments/CreateComment.gql'
-import ChangeGroupMemberRole from '@graphql/queries/groups/ChangeGroupMemberRole.gql'
-import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
-import JoinGroup from '@graphql/queries/groups/JoinGroup.gql'
-import markAllAsRead from '@graphql/queries/notifications/markAllAsRead.gql'
-import notifications from '@graphql/queries/notifications/notifications.gql'
-import CreatePost from '@graphql/queries/posts/CreatePost.gql'
-import { createApolloTestSetup } from '@root/test/helpers'
+import { jest } from '@jest/globals'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 const sendNotificationMailMock: (notification) => void = jest.fn()
-jest.mock('@src/emails/sendEmail', () => ({
+jest.unstable_mockModule('@src/emails/sendEmail', () => ({
   sendNotificationMail: (notification) => {
     sendNotificationMailMock(notification)
   },
+  // ESM links the whole namespace: every named export ANY importer in the graph reaches
+  // for must exist here, or the module fails to link (loginMiddleware pulls the
+  // registration/verification mails in transitively). Under CommonJS a missing key was
+  // simply undefined and only mattered if it was called. The stubs below carry no
+  // behaviour — only the two above are asserted on.
+  defaultParams: jest.fn(),
+  sendChatMessageMail: jest.fn(),
+  sendRegistrationMail: jest.fn(),
+  sendEmailVerification: jest.fn(),
+  sendResetPasswordMail: jest.fn(),
+  sendWrongEmail: jest.fn(),
 }))
+
+// Imported after the mock registrations, not above them: `unstable_mockModule`
+// does not hoist, so a static import would bind the real module first.
+const { default: Factory, cleanDatabase } = await import('@db/factories')
+const { default: CreateComment } = await import('@graphql/queries/comments/CreateComment.gql')
+const { default: ChangeGroupMemberRole } =
+  await import('@graphql/queries/groups/ChangeGroupMemberRole.gql')
+const { default: CreateGroup } = await import('@graphql/queries/groups/CreateGroup.gql')
+const { default: JoinGroup } = await import('@graphql/queries/groups/JoinGroup.gql')
+const { default: markAllAsRead } = await import('@graphql/queries/notifications/markAllAsRead.gql')
+const { default: notifications } = await import('@graphql/queries/notifications/notifications.gql')
+const { default: CreatePost } = await import('@graphql/queries/posts/CreatePost.gql')
+const { createApolloTestSetup } = await import('@root/test/helpers')
 
 let authenticatedUser: Context['user']
 const policy = { categoriesActive: false }

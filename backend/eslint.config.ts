@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
+
 import config from 'eslint-config-it4c'
 import graphql from 'eslint-config-it4c/modules/graphql'
 import jest from 'eslint-config-it4c/modules/jest'
@@ -116,6 +114,17 @@ export default [
     files: ['**/*.spec.ts'],
     rules: {
       '@typescript-eslint/unbound-method': 'off',
+    },
+  },
+  {
+    // Shared test helpers (test/setup.ts, test/helpers.ts) legitimately import devDependencies
+    // such as @jest/globals. `n/no-unpublished-import` recognises `*.spec.ts` as unpublished on
+    // its own, but not these — hence the narrow exemption. Deliberately its own block: folding it
+    // into the spec overrides above would also hand `test/` the unbound-method exception, which
+    // it does not need (verified: lint is clean without it).
+    files: ['test/**/*.ts'],
+    rules: {
+      'n/no-unpublished-import': 'off',
     },
   },
   {

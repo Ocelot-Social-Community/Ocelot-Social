@@ -44,7 +44,12 @@ async function setupNodeEvents(on, config) {
         plugins: [
           new NodePolyfillPlugin(),
           new webpack.ProvidePlugin({
-            process: 'process/browser',
+            // 'process/browser.js', not 'process/browser': the backend build is ESM since
+            // backend/package.json declares `"type": "module"`, so webpack treats the modules
+            // this plugin injects into as strict ESM and enforces fullySpecified — a deep path
+            // into a package then needs its extension. ('buffer' is unaffected: it resolves
+            // through the package entry, not a subpath.)
+            process: 'process/browser.js',
             Buffer: ['buffer', 'Buffer'],
           }),
         ],

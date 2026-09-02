@@ -1,13 +1,11 @@
 import { Readable } from 'node:stream'
 
-import { Upload } from '@aws-sdk/lib-storage'
-
-import { s3Service } from './s3Service'
+import { jest } from '@jest/globals'
 
 import type { S3Config } from '@config/index'
 import type { FileUpload } from 'graphql-upload'
 
-jest.mock('@aws-sdk/client-s3', () => {
+jest.unstable_mockModule('@aws-sdk/client-s3', () => {
   return {
     S3Client: jest.fn().mockImplementation(() => ({
       send: jest.fn(),
@@ -17,18 +15,22 @@ jest.mock('@aws-sdk/client-s3', () => {
   }
 })
 
-jest.mock('@aws-sdk/lib-storage', () => {
+jest.unstable_mockModule('@aws-sdk/lib-storage', () => {
   return {
     Upload: jest.fn(),
   }
 })
 
+// Imported after the mock registrations, not above them: `unstable_mockModule`
+// does not hoist, so a static import would bind the real module first.
+const { Upload } = await import('@aws-sdk/lib-storage')
+const { s3Service } = await import('./s3Service')
+
 interface UploadInput {
   params: { Bucket: string; Key: string; ContentType: string; Body: unknown }
 }
 const uploadMock = Upload as unknown as jest.Mock<
-  { done: () => Promise<{ Location: string }> },
-  [UploadInput]
+  (input: UploadInput) => { done: () => Promise<{ Location: string }> }
 >
 
 // `Upload` is mocked, so the stream is only handed over as `Body` and never consumed.

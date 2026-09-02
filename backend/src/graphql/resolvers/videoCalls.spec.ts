@@ -1,24 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-import { TwirpError } from 'livekit-server-sdk'
 
-import Factory, { cleanDatabase } from '@db/factories'
-import JoinGroupVideoCall from '@graphql/queries/videoCalls/JoinGroupVideoCall.gql'
-import VideoCallConfig from '@graphql/queries/videoCalls/VideoCallConfig.gql'
-import VideoCallParticipantCount from '@graphql/queries/videoCalls/VideoCallParticipantCount.gql'
-import { createApolloTestSetup } from '@root/test/helpers'
-
-import { groupIdFromRoomName, roomNameForGroup } from './videoCalls'
+import { jest } from '@jest/globals'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 import type { RoleDefinition } from '@src/role'
 
-let listParticipantsMock = jest.fn()
+let listParticipantsMock = jest.fn<(...args: unknown[]) => Promise<unknown>>()
 
-jest.mock('livekit-server-sdk', () => {
+jest.unstable_mockModule('livekit-server-sdk', () => {
   class MockTwirpError extends Error {
     status: number
     code?: string
@@ -30,24 +22,38 @@ jest.mock('livekit-server-sdk', () => {
     }
   }
   return {
-    AccessToken: jest.fn().mockImplementation((apiKey: string, _apiSecret: string, opts) => {
-      const grants: Record<string, unknown> = {}
-      return {
-        addGrant: (g: Record<string, unknown>) => Object.assign(grants, g),
-        // eslint-disable-next-line @typescript-eslint/promise-function-async
-        toJwt: () =>
-          Promise.resolve(
-            `mocked-jwt.${apiKey}.${(opts as { identity: string }).identity}.${(grants as { room?: string }).room ?? ''}`,
-          ),
-      }
-    }),
+    AccessToken: jest
+      .fn<(apiKey: string, apiSecret: string, opts: unknown) => unknown>()
+      .mockImplementation((apiKey: string, _apiSecret: string, opts) => {
+        const grants: Record<string, unknown> = {}
+        return {
+          addGrant: (g: Record<string, unknown>) => Object.assign(grants, g),
+          // eslint-disable-next-line @typescript-eslint/promise-function-async
+          toJwt: () =>
+            Promise.resolve(
+              `mocked-jwt.${apiKey}.${(opts as { identity: string }).identity}.${(grants as { room?: string }).room ?? ''}`,
+            ),
+        }
+      }),
     RoomServiceClient: jest.fn().mockImplementation(() => ({
-      listParticipants: (roomName: string) => listParticipantsMock(roomName),
+      listParticipants: async (roomName: string) => listParticipantsMock(roomName),
     })),
     TwirpError: MockTwirpError,
     WebhookReceiver: jest.fn(),
   }
 })
+
+// Imported after the mock registrations, not above them: `unstable_mockModule`
+// does not hoist, so a static import would bind the real module first.
+const { TwirpError } = await import('livekit-server-sdk')
+const { default: Factory, cleanDatabase } = await import('@db/factories')
+const { default: JoinGroupVideoCall } =
+  await import('@graphql/queries/videoCalls/JoinGroupVideoCall.gql')
+const { default: VideoCallConfig } = await import('@graphql/queries/videoCalls/VideoCallConfig.gql')
+const { default: VideoCallParticipantCount } =
+  await import('@graphql/queries/videoCalls/VideoCallParticipantCount.gql')
+const { createApolloTestSetup } = await import('@root/test/helpers')
+const { groupIdFromRoomName, roomNameForGroup } = await import('./videoCalls')
 
 const ENABLED_LIVEKIT = {
   LIVEKIT_URL: 'wss://livekit.example.test',
@@ -97,7 +103,7 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await cleanDatabase()
-  listParticipantsMock = jest.fn().mockResolvedValue([])
+  listParticipantsMock = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue([])
   livekitConfig = {}
   authenticatedUser = null
   rolesOverride = undefined

@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { jest } from '@jest/globals'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import { closeDriver, getDriver } from '@db/neo4j'
 import resolvers from '@graphql/resolvers'

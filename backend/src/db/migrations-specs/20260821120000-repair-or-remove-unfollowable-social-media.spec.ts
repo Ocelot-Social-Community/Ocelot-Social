@@ -1,11 +1,12 @@
-import {
-  forLog,
-  repair,
-  up,
-} from '@db/migrations/20260821120000-repair-or-remove-unfollowable-social-media'
-import { getDriver } from '@db/neo4j'
+import { jest } from '@jest/globals'
+// ESM has no automock: unstable_mockModule requires an explicit factory.
+jest.unstable_mockModule('@db/neo4j', () => ({ getDriver: jest.fn() }))
 
-jest.mock('@db/neo4j')
+// Imported after the mock registrations, not above them: `unstable_mockModule`
+// does not hoist, so a static import would bind the real module first.
+const { forLog, repair, up } =
+  await import('@db/migrations/20260821120000-repair-or-remove-unfollowable-social-media')
+const { getDriver } = await import('@db/neo4j')
 
 // The classification, without a database. What `up` does around it — read, write, delete,
 // print — is mechanical; the decision "repair into what, or remove" is where the judgement

@@ -78,13 +78,16 @@ jobs:
       - name: Install backend dependencies
         run: cd backend && npm ci
 
-      # --coverage=false is required, not a preference. jest.config.ts sets collectCoverage: true
-      # with a global 95% line threshold, which is a statement about the WHOLE backend suite — this
-      # job deliberately runs two specs, so the measurement is meaningless here and the threshold
-      # fails on principle (2.19% of the backend, all 19 tests green). Coverage stays enforced where
-      # it means something: the full run in test-backend.yml.
+      # Through the package script, not a bare `jest` call: the backend runs as ESM, which Jest
+      # only loads with `--experimental-vm-modules`. Spelling the invocation out here once meant
+      # this job silently kept the old one and failed on `import.meta` while every other suite
+      # passed. The flag, the spec list and the coverage switch now live in `test:schema-contract`
+      # so there is one place to change.
+      #
+      # --coverage=false (inside that script) is required, not a preference. jest.config.ts sets
+      # collectCoverage: true with a global 95% line threshold, which is a statement about the
+      # WHOLE backend suite — this job deliberately runs two specs, so the measurement is
+      # meaningless here and the threshold fails on principle (2.19% of the backend, all 19 tests
+      # green). Coverage stays enforced where it means something: the full run in test-backend.yml.
       - name: Validate the webapp's GraphQL documents against the schema
-        run: |
-          cd backend && npx --no -- jest --coverage=false \
-            src/graphql/webappQueries.spec.ts \
-            src/graphql/webappPostFilters.spec.ts
+        run: cd backend && npm run test:schema-contract

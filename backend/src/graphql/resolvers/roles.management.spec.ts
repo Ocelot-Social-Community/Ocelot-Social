@@ -3,6 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
+import { jest } from '@jest/globals'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import CREATE_ROLE from '@graphql/queries/roles/createRole.gql'
 import DELETE_ROLE from '@graphql/queries/roles/deleteRole.gql'
@@ -79,7 +81,10 @@ describe('role management', () => {
   // The live permissionsChanged broadcast (clients refetch their permissions on it).
   describe('permissionsChanged broadcast', () => {
     beforeEach(async () => {
-      pubsubMock = { publish: jest.fn().mockResolvedValue(undefined), asyncIterator: jest.fn() }
+      pubsubMock = {
+        publish: jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue(undefined),
+        asyncIterator: jest.fn(),
+      }
       await asAdmin()
       await mutate({
         mutation: CREATE_ROLE,

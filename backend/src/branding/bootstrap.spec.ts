@@ -5,8 +5,13 @@
 
 import { resolve } from 'node:path'
 
+import { jest } from '@jest/globals'
+
 const BRANDING = '@ocelot-social/branding'
 const DISCOVER = '@ocelot-social/branding/dist/discover.js'
+// `jest.requireActual` is synchronous and has no ESM counterpart; the real module is
+// pulled in once here and the factory below reaches into it.
+const actualDiscover = await import('@ocelot-social/branding/dist/discover.js')
 
 interface LoadMocks {
   discoverArchives?: jest.Mock
@@ -19,35 +24,34 @@ interface LoadMocks {
 
 const ORIGINAL_ENV = process.env
 
-function loadBootstrap(mocks: LoadMocks) {
+async function loadBootstrap(mocks: LoadMocks) {
   const setBranding = mocks.setBranding ?? jest.fn()
   const overlayBrandRuntimeFiles = jest.fn()
-  jest.doMock(BRANDING, () => ({
+  jest.unstable_mockModule(BRANDING, () => ({
     setBranding,
     checkSchemaCompat: mocks.checkSchemaCompat ?? jest.fn(() => 'ok'),
     describeSchemaCompat: jest.fn(() => 'schema mismatch'),
   }))
-  jest.doMock(DISCOVER, () => ({
+  jest.unstable_mockModule(DISCOVER, () => ({
     discoverArchives: mocks.discoverArchives ?? jest.fn(() => new Map()),
     readArchiveConfig: mocks.readArchiveConfig ?? jest.fn(() => null),
     readArchive: mocks.readArchive ?? jest.fn(() => null),
     readDefaultMarker: mocks.readDefaultMarker ?? jest.fn(() => ''),
     // Real: it turns an unset $OCELOT_BRANDING_ASSETS_DIR into the conventional archive locations, so
     // a stub would hide whether bootstrap still resolves a brand without configuration. Pure (paths).
-    searchPath: jest.requireActual<{ searchPath: unknown }>(DISCOVER).searchPath,
+    searchPath: actualDiscover.searchPath,
   }))
   // Mock the on-disk overlay so bootstrap doesn't write brand files into the test's real dirs.
-  jest.doMock('./overlayRuntimeFiles', () => ({ overlayBrandRuntimeFiles }))
-  jest.isolateModules(() => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports, n/global-require, import-x/no-unassigned-import
-    require('./bootstrap')
+  jest.unstable_mockModule('./overlayRuntimeFiles', () => ({ overlayBrandRuntimeFiles }))
+  await jest.isolateModulesAsync(async () => {
+    await import('./bootstrap')
   })
   return { setBranding, overlayBrandRuntimeFiles }
 }
 
 describe('branding bootstrap', () => {
-  let warnSpy: jest.SpyInstance
-  let errorSpy: jest.SpyInstance
+  let warnSpy: jest.Spied<typeof console.warn>
+  let errorSpy: jest.Spied<typeof console.error>
 
   beforeEach(() => {
     jest.resetModules()
@@ -66,9 +70,9 @@ describe('branding bootstrap', () => {
 
   // No env needed to find archives (the search path defaults), but a brand still has to be ACTIVE —
   // pinned by $OCELOT_ACTIVE_BRANDING or named by a DEFAULT marker. Neither → vanilla, silently.
-  it('does nothing when no brand is active', () => {
+  it('does nothing when no brand is active', async () => {
     const discoverArchives = jest.fn()
-    const { setBranding } = loadBootstrap({ discoverArchives })
+    const { setBranding } = await loadBootstrap({ discoverArchives })
     expect(discoverArchives).not.toHaveBeenCalled()
     expect(setBranding).not.toHaveBeenCalled()
     expect(warnSpy).not.toHaveBeenCalled()
@@ -78,7 +82,7 @@ describe('branding bootstrap', () => {
   // handover to discoverArchives untested — the mocks ignore their argument, so passing it the raw
   // (unset) env instead of the resolved path would still return an archive here while finding nothing
   // in production.
-  it('activates the brand a DEFAULT marker names without any env set', () => {
+  it('activates the brand a DEFAULT marker names without any env set', async () => {
     const CONVENTIONAL = [
       resolve('deployment/configurations'),
       resolve('../deployment/configurations'),
@@ -87,7 +91,7 @@ describe('branding bootstrap', () => {
     const config = { metadata: { applicationName: 'Acme' } }
     const readDefaultMarker = jest.fn(() => 'acme')
     const discoverArchives = jest.fn(() => new Map([['acme', archive]]))
-    const { setBranding } = loadBootstrap({
+    const { setBranding } = await loadBootstrap({
       readDefaultMarker,
       discoverArchives,
       readArchiveConfig: jest.fn(() => config),
@@ -97,12 +101,12 @@ describe('branding bootstrap', () => {
     expect(setBranding).toHaveBeenCalledWith(config)
   })
 
-  it('injects the composed config when the active archive resolves', () => {
+  it('injects the composed config when the active archive resolves', async () => {
     process.env.OCELOT_BRANDING_ASSETS_DIR = '/assets'
     process.env.OCELOT_ACTIVE_BRANDING = 'acme'
     const archive = { file: '/assets/acme.tar.gz', schemaVersion: '0.0.1' }
     const config = { metadata: { applicationName: 'Acme' } }
-    const { setBranding } = loadBootstrap({
+    const { setBranding } = await loadBootstrap({
       discoverArchives: jest.fn(() => new Map([['acme', archive]])),
       readArchiveConfig: jest.fn(() => config),
     })
@@ -111,12 +115,12 @@ describe('branding bootstrap', () => {
     expect(errorSpy).not.toHaveBeenCalled()
   })
 
-  it('overlays the brand e-mail files from the archive', () => {
+  it('overlays the brand e-mail files from the archive', async () => {
     process.env.OCELOT_BRANDING_ASSETS_DIR = '/assets'
     process.env.OCELOT_ACTIVE_BRANDING = 'acme'
     const archive = { file: '/assets/acme.tar.gz', schemaVersion: '0.0.1' }
     const files = new Map([['emails/templates/registration/html.pug', Buffer.from('p brand')]])
-    const { overlayBrandRuntimeFiles } = loadBootstrap({
+    const { overlayBrandRuntimeFiles } = await loadBootstrap({
       discoverArchives: jest.fn(() => new Map([['acme', archive]])),
       readArchiveConfig: jest.fn(() => ({ metadata: {} })),
       readArchive: jest.fn(() => files),
@@ -130,24 +134,24 @@ describe('branding bootstrap', () => {
     // sits next to bootstrap, so both land on the same sibling directory. A substring check ("contains
     // 'emails'") would pass for any wrong level of the tree — which is exactly how the old public/
     // overlay shipped a path nothing served.
-    expect(calls[0][1].emailsDir).toBe(resolve(__dirname, '..', 'emails'))
+    expect(calls[0][1].emailsDir).toBe(resolve(import.meta.dirname, '..', 'emails'))
   })
 
-  it('warns and keeps defaults when the active brand is not found', () => {
+  it('warns and keeps defaults when the active brand is not found', async () => {
     process.env.OCELOT_BRANDING_ASSETS_DIR = '/assets'
     process.env.OCELOT_ACTIVE_BRANDING = 'missing'
-    const { setBranding } = loadBootstrap({
+    const { setBranding } = await loadBootstrap({
       discoverArchives: jest.fn(() => new Map()), // does not contain 'missing'
     })
     expect(setBranding).not.toHaveBeenCalled()
     expect(warnSpy).toHaveBeenCalledWith(expect.stringMatching(/not found/))
   })
 
-  it('warns and keeps defaults when the archive has no readable config', () => {
+  it('warns and keeps defaults when the archive has no readable config', async () => {
     process.env.OCELOT_BRANDING_ASSETS_DIR = '/assets'
     process.env.OCELOT_ACTIVE_BRANDING = 'acme'
     const archive = { file: '/assets/acme.tar.gz', schemaVersion: '0.0.1' }
-    const { setBranding } = loadBootstrap({
+    const { setBranding } = await loadBootstrap({
       discoverArchives: jest.fn(() => new Map([['acme', archive]])),
       readArchiveConfig: jest.fn(() => null),
     })
@@ -155,12 +159,12 @@ describe('branding bootstrap', () => {
     expect(warnSpy).toHaveBeenCalledWith(expect.stringMatching(/no readable config/))
   })
 
-  it('warns on a schema-incompatible archive but still injects the config', () => {
+  it('warns on a schema-incompatible archive but still injects the config', async () => {
     process.env.OCELOT_BRANDING_ASSETS_DIR = '/assets'
     process.env.OCELOT_ACTIVE_BRANDING = 'acme'
     const archive = { file: '/assets/acme.tar.gz', schemaVersion: '9.9.9' }
     const config = { metadata: { applicationName: 'Acme' } }
-    const { setBranding } = loadBootstrap({
+    const { setBranding } = await loadBootstrap({
       discoverArchives: jest.fn(() => new Map([['acme', archive]])),
       readArchiveConfig: jest.fn(() => config),
       checkSchemaCompat: jest.fn(() => 'archive-newer'),
@@ -169,10 +173,10 @@ describe('branding bootstrap', () => {
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('schema mismatch'))
   })
 
-  it('logs an error (never throws) when discovery fails', () => {
+  it('logs an error (never throws) when discovery fails', async () => {
     process.env.OCELOT_BRANDING_ASSETS_DIR = '/assets'
     process.env.OCELOT_ACTIVE_BRANDING = 'acme'
-    const { setBranding } = loadBootstrap({
+    const { setBranding } = await loadBootstrap({
       discoverArchives: jest.fn(() => {
         throw new Error('boom')
       }),

@@ -1,3 +1,7 @@
+/* eslint-disable import-x/no-named-as-default-member -- jsonwebtoken is CommonJS: the named
+   exports its types advertise do not exist for Node's ESM loader (it derives them by static
+   analysis and misses these), so `import { verify }` type-checks and then throws at load.
+   Reaching through the default import is the only form that works at runtime. */
 /* eslint-disable @typescript-eslint/require-await */
 
 /* eslint-disable @typescript-eslint/no-unsafe-call */
@@ -9,7 +13,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable jest/expect-expect */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import { verify } from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
 
 import { categories } from '@constants/categories'
 import Factory, { cleanDatabase } from '@db/factories'
@@ -23,7 +27,6 @@ import { createApolloTestSetup, TEST_CONFIG } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 
-const jwt = { verify }
 let variables, req, user
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']

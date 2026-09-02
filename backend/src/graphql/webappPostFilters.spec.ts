@@ -41,7 +41,7 @@ import type { InputObjectTypeDefinitionNode } from 'graphql'
 // filter had. One reader with a documented blind spot is a reader that will be surprised
 // again.
 
-const WEBAPP_ROOT = path.resolve(__dirname, '../../../webapp')
+const WEBAPP_ROOT = path.resolve(import.meta.dirname, '../../../webapp')
 const SEARCH_DIRS = ['graphql', 'components', 'pages', 'store', 'mixins', 'composables']
 
 const OPERATOR_SUFFIX =

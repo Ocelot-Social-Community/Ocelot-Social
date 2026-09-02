@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { registerLiveKitWebhook } from './webhook'
+import { jest } from '@jest/globals'
 
 const mockConfig: {
   LIVEKIT_ENABLED: boolean
@@ -13,26 +13,26 @@ const mockConfig: {
   LIVEKIT_API_SECRET?: string
 } = { LIVEKIT_ENABLED: false }
 
-const mockReceive = jest.fn()
+const mockReceive = jest.fn<(...args: unknown[]) => Promise<unknown>>()
 const mockWebhookReceiverCtor = jest.fn()
 
-jest.mock('livekit-server-sdk', () => ({
+jest.unstable_mockModule('livekit-server-sdk', () => ({
   WebhookReceiver: jest.fn().mockImplementation((...args: unknown[]) => {
     mockWebhookReceiverCtor(...args)
-    return { receive: (...inner: unknown[]) => mockReceive(...inner) }
+    return { receive: async (...inner: unknown[]) => mockReceive(...inner) }
   }),
 }))
 
 const mockPublish = jest.fn()
-jest.mock('@src/context', () => ({
+jest.unstable_mockModule('@src/context', () => ({
   __esModule: true,
   serverPubsub: { publish: (...args: unknown[]) => mockPublish(...args) },
 }))
 
-const mockGetCount = jest.fn()
-jest.mock('@src/graphql/resolvers/videoCalls', () => ({
+const mockGetCount = jest.fn<(...args: unknown[]) => Promise<unknown>>()
+jest.unstable_mockModule('@src/graphql/resolvers/videoCalls', () => ({
   __esModule: true,
-  getLiveParticipantCount: (...args: unknown[]) => mockGetCount(...args),
+  getLiveParticipantCount: async (...args: unknown[]) => mockGetCount(...args),
   groupIdFromRoomName: (roomName: string | null | undefined): string | null =>
     roomName?.startsWith('group-') ? roomName.slice('group-'.length) : null,
 }))
@@ -44,19 +44,23 @@ const mockLogger = { info: jest.fn(), warn: jest.fn(), error: jest.fn() }
 // getters so the binding is only read when the consuming code actually
 // touches the imported default — by which time the test file has finished
 // initializing.
-jest.mock('@src/logger', () => ({
+jest.unstable_mockModule('@src/logger', () => ({
   __esModule: true,
   get default() {
     return mockLogger
   },
 }))
 
-jest.mock('@src/config', () => ({
+jest.unstable_mockModule('@src/config', () => ({
   __esModule: true,
   get default() {
     return mockConfig
   },
 }))
+
+// Imported after the mock registrations, not above them: `unstable_mockModule`
+// does not hoist, so a static import would bind the real module first.
+const { registerLiveKitWebhook } = await import('./webhook')
 
 type CapturedHandler = (req: any, res: any) => void
 
@@ -109,7 +113,7 @@ beforeEach(() => {
   mockConfig.LIVEKIT_API_SECRET = undefined
   mockReceive.mockReset()
   mockWebhookReceiverCtor.mockReset()
-  mockPublish.mockReset().mockResolvedValue(undefined)
+  mockPublish.mockReset().mockImplementation(async () => Promise.resolve(undefined))
   mockGetCount.mockReset().mockResolvedValue(0)
   mockLogger.info.mockReset()
   mockLogger.warn.mockReset()

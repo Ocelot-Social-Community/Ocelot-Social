@@ -1,25 +1,40 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-import Factory, { cleanDatabase } from '@db/factories'
-import CreatePost from '@graphql/queries/posts/CreatePost.gql'
-import { createApolloTestSetup } from '@root/test/helpers'
+
+import { jest } from '@jest/globals'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 const sendNotificationMailMock: (notification) => void = jest.fn()
-jest.mock('@src/emails/sendEmail', () => ({
+jest.unstable_mockModule('@src/emails/sendEmail', () => ({
   sendNotificationMail: (notification) => {
     sendNotificationMailMock(notification)
   },
+  // ESM links the whole namespace: every named export ANY importer in the graph reaches
+  // for must exist here, or the module fails to link (loginMiddleware pulls the
+  // registration/verification mails in transitively). Under CommonJS a missing key was
+  // simply undefined and only mattered if it was called. The stubs below carry no
+  // behaviour — only the two above are asserted on.
+  defaultParams: jest.fn(),
+  sendChatMessageMail: jest.fn(),
+  sendRegistrationMail: jest.fn(),
+  sendEmailVerification: jest.fn(),
+  sendResetPasswordMail: jest.fn(),
+  sendWrongEmail: jest.fn(),
 }))
 
 let isUserOnlineMock = jest.fn().mockReturnValue(false)
-jest.mock('../helpers/isUserOnline', () => ({
+jest.unstable_mockModule('../helpers/isUserOnline', () => ({
   isUserOnline: () => isUserOnlineMock(),
 }))
+
+// Imported after the mock registrations, not above them: `unstable_mockModule`
+// does not hoist, so a static import would bind the real module first.
+const { default: Factory, cleanDatabase } = await import('@db/factories')
+const { default: CreatePost } = await import('@graphql/queries/posts/CreatePost.gql')
+const { createApolloTestSetup } = await import('@root/test/helpers')
 
 let authenticatedUser: Context['user']
 const policy = { categoriesActive: false }

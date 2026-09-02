@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
@@ -6,17 +5,25 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-import fetch from 'node-fetch'
-
-import embed from '@graphql/queries/embed.gql'
-import embedProviders from '@graphql/queries/embedProviders.gql'
-import { createApolloTestSetup } from '@root/test/helpers'
+import { jest } from '@jest/globals'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 
-jest.mock('node-fetch')
+// The REAL node-fetch, grabbed before the mock is registered: `jest.requireActual` has no ESM
+// counterpart, and `unstable_mockModule` does not hoist — so an import placed above it still
+// resolves to the genuine module. Response is used to build the fixture payloads.
+const { Response } = await import('node-fetch')
+
+// ESM has no automock: unstable_mockModule requires an explicit factory.
+jest.unstable_mockModule('node-fetch', () => ({ default: jest.fn() }))
+
+// Imported after the mock registrations, not above them: `unstable_mockModule`
+// does not hoist, so a static import would bind the real module first.
+const { default: fetch } = await import('node-fetch')
+const { default: embed } = await import('@graphql/queries/embed.gql')
+const { default: embedProviders } = await import('@graphql/queries/embedProviders.gql')
+const { createApolloTestSetup } = await import('@root/test/helpers')
 const mockedFetch = jest.mocked(fetch)
-const { Response } = jest.requireActual('node-fetch')
 
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
@@ -42,17 +49,17 @@ afterEach(() => {
 
 // eslint-disable-next-line n/no-sync
 const HumanConnectionOrg = fs.readFileSync(
-  path.join(__dirname, '../../../snapshots/embeds/HumanConnectionOrg.html'),
+  path.join(import.meta.dirname, '../../../snapshots/embeds/HumanConnectionOrg.html'),
   'utf8',
 )
 // eslint-disable-next-line n/no-sync
 const pr3934 = fs.readFileSync(
-  path.join(__dirname, '../../../snapshots/embeds/pr3934.html'),
+  path.join(import.meta.dirname, '../../../snapshots/embeds/pr3934.html'),
   'utf8',
 )
 // eslint-disable-next-line n/no-sync
 const babyLovesCat = fs.readFileSync(
-  path.join(__dirname, '../../../snapshots/embeds/babyLovesCat.html'),
+  path.join(import.meta.dirname, '../../../snapshots/embeds/babyLovesCat.html'),
   'utf8',
 )
 

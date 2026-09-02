@@ -1,8 +1,7 @@
-/* eslint-disable n/global-require */
-/* eslint-disable @typescript-eslint/no-require-imports */
-
 // Unit tests for addMiddleware – testing append, prepend, before, after, and error cases.
 // Each test uses jest.isolateModules + jest.doMock to get a fresh ocelotMiddlewares array.
+
+import { jest } from '@jest/globals'
 
 interface MiddlewareModule {
   addMiddleware: (mw: { name: string; middleware: unknown; position: unknown }) => void
@@ -33,21 +32,30 @@ const middlewareModules = [
 ]
 
 const setupMocks = ({ extraMocks, disabledMiddlewares = [] }: MockOptions = {}) => {
-  jest.doMock('./branding/brandingMiddlewares', () => jest.fn())
-  jest.doMock('@config/index', () => ({ DISABLED_MIDDLEWARES: disabledMiddlewares }))
+  jest.unstable_mockModule('./branding/brandingMiddlewares', () => ({ default: jest.fn() }))
+  // ESM mock factories must expose `default` themselves — there is no CommonJS interop layer
+  // to synthesise one from the object.
+  jest.unstable_mockModule('@config/index', () => ({
+    default: { DISABLED_MIDDLEWARES: disabledMiddlewares },
+  }))
 
   // Mock all middlewares and allow to override its mock
   for (const mod of middlewareModules) {
     // eslint-disable-next-line security/detect-object-injection
-    jest.doMock(mod, () => extraMocks?.[mod] ?? {})
+    jest.unstable_mockModule(mod, () => ({ default: extraMocks?.[mod] ?? {} }))
   }
 }
 
-const loadModule = (
+const loadModule = async (
   options?: MockOptions,
-): { mod: MiddlewareModule; getCapturedMiddlewares: () => unknown[] } => {
+): Promise<{ mod: MiddlewareModule; getCapturedMiddlewares: () => unknown[] }> => {
+  // The registry must be dropped BEFORE registering: an already-instantiated ./applyMiddleware
+  // keeps the previous factory's closure, and this run's capturedArgs would never be written.
+  jest.resetModules()
   let capturedArgs: unknown[] = []
-  jest.doMock('graphql-middleware', () => ({
+  // ./applyMiddleware, not the package: graphql-middleware is reached through createRequire
+  // there (see that file), which bypasses Jest's registry entirely.
+  jest.unstable_mockModule('./applyMiddleware', () => ({
     applyMiddleware: (_schema: unknown, ...middlewares: unknown[]) => {
       capturedArgs = middlewares
       return _schema
@@ -55,7 +63,7 @@ const loadModule = (
   }))
   setupMocks(options)
 
-  const mod = require('./index') as MiddlewareModule
+  const mod = (await import('./index')) as unknown as MiddlewareModule
   return {
     mod,
     getCapturedMiddlewares: () => {
@@ -65,36 +73,44 @@ const loadModule = (
   }
 }
 
+// Under ESM the mock instances produced by an unstable_mockModule factory survive
+// isolateModulesAsync — only the module registry is isolated, not the mocks — so call counts
+// would otherwise accumulate across tests.
+beforeEach(() => {
+  jest.clearAllMocks()
+})
+
 describe('default', () => {
-  it('registers the 15 default middlewares', () => {
-    jest.isolateModules(() => {
-      const { getCapturedMiddlewares } = loadModule()
+  it('registers the 15 default middlewares', async () => {
+    await jest.isolateModulesAsync(async () => {
+      const { getCapturedMiddlewares } = await loadModule()
       expect(getCapturedMiddlewares()).toHaveLength(15)
     })
   })
 
-  it('calls brandingMiddlewares', () => {
-    jest.isolateModules(() => {
-      const { mod } = loadModule()
+  it('calls brandingMiddlewares', async () => {
+    await jest.isolateModulesAsync(async () => {
+      const { mod } = await loadModule()
 
-      const brandingMiddlewares = require('./branding/brandingMiddlewares') as jest.Mock
+      const { default: brandingMiddlewares } =
+        (await import('./branding/brandingMiddlewares')) as unknown as { default: jest.Mock }
       mod.default({})
       expect(brandingMiddlewares).toHaveBeenCalledTimes(1)
     })
   })
 
-  it('filters out disabled middlewares', () => {
-    jest.isolateModules(() => {
+  it('filters out disabled middlewares', async () => {
+    await jest.isolateModulesAsync(async () => {
       const sentryMarker = { __test: 'sentry' }
       const xssMarker = { __test: 'xss' }
-      const { getCapturedMiddlewares } = loadModule({
+      const { getCapturedMiddlewares } = await loadModule({
         extraMocks: {
           './sentryMiddleware': sentryMarker,
           './xssMiddleware': xssMarker,
         },
         disabledMiddlewares: ['sentry', 'xss'],
       })
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation()
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
       const middlewares = getCapturedMiddlewares()
       expect(middlewares).toHaveLength(13)
       expect(middlewares).not.toContain(sentryMarker)
@@ -107,9 +123,9 @@ describe('default', () => {
 
 describe('addMiddleware', () => {
   describe('append', () => {
-    it('adds middleware at the end', () => {
-      jest.isolateModules(() => {
-        const { mod, getCapturedMiddlewares } = loadModule()
+    it('adds middleware at the end', async () => {
+      await jest.isolateModulesAsync(async () => {
+        const { mod, getCapturedMiddlewares } = await loadModule()
         const m = { __test: 'appended' }
         mod.addMiddleware({ name: 'test-append', middleware: m, position: 'append' })
         const middlewares = getCapturedMiddlewares()
@@ -120,9 +136,9 @@ describe('addMiddleware', () => {
   })
 
   describe('prepend', () => {
-    it('adds middleware at the beginning', () => {
-      jest.isolateModules(() => {
-        const { mod, getCapturedMiddlewares } = loadModule()
+    it('adds middleware at the beginning', async () => {
+      await jest.isolateModulesAsync(async () => {
+        const { mod, getCapturedMiddlewares } = await loadModule()
         const m = { __test: 'prepended' }
         mod.addMiddleware({ name: 'test-prepend', middleware: m, position: 'prepend' })
         const middlewares = getCapturedMiddlewares()
@@ -133,11 +149,11 @@ describe('addMiddleware', () => {
   })
 
   describe('before', () => {
-    it('inserts middleware directly before the named anchor', () => {
-      jest.isolateModules(() => {
+    it('inserts middleware directly before the named anchor', async () => {
+      await jest.isolateModulesAsync(async () => {
         const sentryMarker = { __test: 'sentry' }
         const permissionsMarker = { __test: 'permissions' }
-        const { mod, getCapturedMiddlewares } = loadModule({
+        const { mod, getCapturedMiddlewares } = await loadModule({
           extraMocks: {
             './sentryMiddleware': sentryMarker,
             './permissionsMiddleware': permissionsMarker,
@@ -163,11 +179,11 @@ describe('addMiddleware', () => {
   })
 
   describe('after', () => {
-    it('inserts middleware directly after the named anchor', () => {
-      jest.isolateModules(() => {
+    it('inserts middleware directly after the named anchor', async () => {
+      await jest.isolateModulesAsync(async () => {
         const sentryMarker = { __test: 'sentry' }
         const permissionsMarker = { __test: 'permissions' }
-        const { mod, getCapturedMiddlewares } = loadModule({
+        const { mod, getCapturedMiddlewares } = await loadModule({
           extraMocks: {
             './sentryMiddleware': sentryMarker,
             './permissionsMiddleware': permissionsMarker,
@@ -193,9 +209,9 @@ describe('addMiddleware', () => {
   })
 
   describe('unknown anchor', () => {
-    it('throws when "before" anchor does not exist', () => {
-      jest.isolateModules(() => {
-        const { mod } = loadModule()
+    it('throws when "before" anchor does not exist', async () => {
+      await jest.isolateModulesAsync(async () => {
+        const { mod } = await loadModule()
         expect(() => {
           mod.addMiddleware({
             name: 'failure',
@@ -206,9 +222,9 @@ describe('addMiddleware', () => {
       })
     })
 
-    it('throws when "after" anchor does not exist', () => {
-      jest.isolateModules(() => {
-        const { mod } = loadModule()
+    it('throws when "after" anchor does not exist', async () => {
+      await jest.isolateModulesAsync(async () => {
+        const { mod } = await loadModule()
         expect(() => {
           mod.addMiddleware({
             name: 'failure',

@@ -2,27 +2,20 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import Factory, { cleanDatabase } from '@db/factories'
-import SignupVerification from '@graphql/queries/auth/SignupVerification.gql'
-import CreateComment from '@graphql/queries/comments/CreateComment.gql'
-import shout from '@graphql/queries/emotions/shout.gql'
-import ChangeGroupMemberRole from '@graphql/queries/groups/ChangeGroupMemberRole.gql'
-import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
-import LeaveGroup from '@graphql/queries/groups/LeaveGroup.gql'
-import CreatePost from '@graphql/queries/posts/CreatePost.gql'
-import Post from '@graphql/queries/posts/Post.gql'
-import profilePagePosts from '@graphql/queries/posts/profilePagePosts.gql'
-import searchPosts from '@graphql/queries/posts/searchPosts.gql'
-import { createApolloTestSetup } from '@root/test/helpers'
+import { jest } from '@jest/globals'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 // Keep the full resolved branding (config/index.ts reads branding.metadata.* transitively);
 // only tighten the group description minimum for this suite.
-jest.mock('@src/branding', () => {
+// Loaded up front: `jest.requireActual` does not exist under ESM, and the factory itself
+// cannot await.
+const actualBranding = await import('@ocelot-social/branding')
+
+jest.unstable_mockModule('@src/branding', () => {
   // @src/branding re-exports the package's NAMED `branding` (per-domain getters), not a default.
-  const actual = jest.requireActual('@ocelot-social/branding')
+  const actual = actualBranding
   return {
     __esModule: true,
     branding: {
@@ -34,6 +27,22 @@ jest.mock('@src/branding', () => {
     getBranding: actual.getBranding,
   }
 })
+
+// Imported after the mock registrations, not above them: `unstable_mockModule`
+// does not hoist, so a static import would bind the real module first.
+const { default: Factory, cleanDatabase } = await import('@db/factories')
+const { default: SignupVerification } = await import('@graphql/queries/auth/SignupVerification.gql')
+const { default: CreateComment } = await import('@graphql/queries/comments/CreateComment.gql')
+const { default: shout } = await import('@graphql/queries/emotions/shout.gql')
+const { default: ChangeGroupMemberRole } =
+  await import('@graphql/queries/groups/ChangeGroupMemberRole.gql')
+const { default: CreateGroup } = await import('@graphql/queries/groups/CreateGroup.gql')
+const { default: LeaveGroup } = await import('@graphql/queries/groups/LeaveGroup.gql')
+const { default: CreatePost } = await import('@graphql/queries/posts/CreatePost.gql')
+const { default: Post } = await import('@graphql/queries/posts/Post.gql')
+const { default: profilePagePosts } = await import('@graphql/queries/posts/profilePagePosts.gql')
+const { default: searchPosts } = await import('@graphql/queries/posts/searchPosts.gql')
+const { createApolloTestSetup } = await import('@root/test/helpers')
 
 let anyUser
 let allGroupsUser

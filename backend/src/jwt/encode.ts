@@ -1,11 +1,17 @@
+/* eslint-disable import-x/no-named-as-default-member -- jsonwebtoken is CommonJS: the named
+   exports its types advertise do not exist for Node's ESM loader (it derives them by static
+   analysis and misses these), so `import { verify }` type-checks and then throws at load.
+   Reaching through the default import is the only form that works at runtime. */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { sign } from 'jsonwebtoken'
+// Default import, not named: the package is CommonJS and Node derives named exports
+// from it by static analysis, which misses these. `import { … }` type-checks and then
+// throws at load. The default import is the whole module.exports.
+import jwt from 'jsonwebtoken'
 
 import type CONFIG from '@src/config'
 
-const jwt = { sign }
 // Generate an Access Token for the given User ID
 export const encode =
   (context: {

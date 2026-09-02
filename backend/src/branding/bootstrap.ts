@@ -67,7 +67,9 @@ if (active) {
     if (archive) {
       const files = readArchive(archive.file)
       if (files) {
-        overlayBrandRuntimeFiles(files, { emailsDir: path.join(__dirname, '..', 'emails') })
+        overlayBrandRuntimeFiles(files, {
+          emailsDir: path.join(import.meta.dirname, '..', 'emails'),
+        })
       }
     }
   } catch (error) {

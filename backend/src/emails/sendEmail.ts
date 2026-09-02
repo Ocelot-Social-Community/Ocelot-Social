@@ -65,7 +65,7 @@ const email = new Email({
     locales: [...SUPPORTED_LOCALES],
     defaultLocale: CONFIG.LANGUAGE_DEFAULT,
     retryInDefaultLocale: false,
-    directory: path.join(__dirname, 'locales'),
+    directory: path.join(import.meta.dirname, 'locales'),
     updateFiles: false,
     objectNotation: true,
     mustacheConfig: {
@@ -102,7 +102,7 @@ export const sendNotificationMail = async (notification: any): Promise<OriginalM
   const template = notification?.reason
 
   const { originalMessage } = await email.send({
-    template: path.join(__dirname, 'templates', template),
+    template: path.join(import.meta.dirname, 'templates', template),
     message: {
       to,
     },
@@ -181,7 +181,7 @@ export const sendChatMessageMail = async (
   const { senderUser, recipientUser } = data
   const to = { name: recipientUser.name, address: data.email }
   const { originalMessage } = await email.send({
-    template: path.join(__dirname, 'templates', 'chat_message'),
+    template: path.join(import.meta.dirname, 'templates', 'chat_message'),
     message: {
       to,
     },
@@ -227,7 +227,7 @@ export const sendRegistrationMail = async (
   }
 
   const { originalMessage } = await email.send({
-    template: path.join(__dirname, 'templates', 'registration'),
+    template: path.join(import.meta.dirname, 'templates', 'registration'),
     message: {
       to,
     },
@@ -256,7 +256,7 @@ export const sendEmailVerification = async (
   actionUrl.searchParams.set('nonce', nonce)
 
   const { originalMessage } = await email.send({
-    template: path.join(__dirname, 'templates', 'emailVerification'),
+    template: path.join(import.meta.dirname, 'templates', 'emailVerification'),
     message: {
       to,
     },
@@ -281,7 +281,7 @@ export const sendResetPasswordMail = async (
   actionUrl.searchParams.set('email', to.address)
   actionUrl.searchParams.set('nonce', nonce)
   const { originalMessage } = await email.send({
-    template: path.join(__dirname, 'templates', 'resetPassword'),
+    template: path.join(import.meta.dirname, 'templates', 'resetPassword'),
     message: {
       to,
     },
@@ -306,7 +306,7 @@ export const sendWrongEmail = async (data: {
   const to = { name, address: data.email }
   const actionUrl = new URL('/password-reset/request', CONFIG.CLIENT_URI)
   const { originalMessage } = await email.send({
-    template: path.join(__dirname, 'templates', 'wrongEmail'),
+    template: path.join(import.meta.dirname, 'templates', 'wrongEmail'),
     message: {
       to,
     },

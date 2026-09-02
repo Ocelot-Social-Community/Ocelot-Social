@@ -1,6 +1,8 @@
 // Keys iterated below come from the fixed SOFTWARE_DEFAULTS / config module, never user
 // input — the object-injection lint is a false positive here.
 /* eslint-disable security/detect-object-injection */
+import { jest } from '@jest/globals'
+
 import { ENV_SPEC_BY_NAME } from './envRegistry'
 import { SOFTWARE_DEFAULTS } from './softwareDefaults'
 
@@ -57,42 +59,42 @@ describe('SOFTWARE_DEFAULTS ↔ config runtime default (logic-gated defaults)', 
   // config reads Cypress.env() when a global `Cypress` is present (see config/index.ts).
   // Injecting it bypasses process.env / the repo .env entirely — otherwise .env (which sets
   // SMTP_* etc.) would mask the true software defaults we mean to assert.
-  const loadConfigWithFlagsUnset = () => {
+  // async because ESM has no synchronous module load: `await import()` replaces require().
+  const loadConfigWithFlagsUnset = async (): Promise<LoadedConfig> => {
     jest.resetModules()
     const g = global as unknown as { Cypress?: { env: () => Record<string, string> } }
     g.Cypress = { env: () => ({ ...REQUIRED }) }
     try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports, n/global-require
-      return require('./index') as LoadedConfig
+      return (await import('./index')) as unknown as LoadedConfig
     } finally {
       delete g.Cypress
     }
   }
 
-  it('defaults SMTP ignoreTLS / secure / rejectUnauthorized to the map values', () => {
-    const { nodemailerTransportOptions } = loadConfigWithFlagsUnset()
+  it('defaults SMTP ignoreTLS / secure / rejectUnauthorized to the map values', async () => {
+    const { nodemailerTransportOptions } = await loadConfigWithFlagsUnset()
     const tls = nodemailerTransportOptions.tls as { rejectUnauthorized: boolean }
     expect(nodemailerTransportOptions.ignoreTLS).toBe(SOFTWARE_DEFAULTS.SMTP_IGNORE_TLS)
     expect(nodemailerTransportOptions.secure).toBe(SOFTWARE_DEFAULTS.SMTP_SECURE)
     expect(tls.rejectUnauthorized).toBe(SOFTWARE_DEFAULTS.SMTP_REJECT_UNAUTHORIZED)
   })
 
-  it('defaults PRODUCTION_DB_CLEAN_ALLOW to the map value', () => {
-    const { default: CONFIG } = loadConfigWithFlagsUnset()
+  it('defaults PRODUCTION_DB_CLEAN_ALLOW to the map value', async () => {
+    const { default: CONFIG } = await loadConfigWithFlagsUnset()
     expect(CONFIG.PRODUCTION_DB_CLEAN_ALLOW).toBe(SOFTWARE_DEFAULTS.PRODUCTION_DB_CLEAN_ALLOW)
   })
 
-  it('defaults DEBUG to falsy (off)', () => {
+  it('defaults DEBUG to falsy (off)', async () => {
     // DEBUG's unset value is NODE_ENV-gated (undefined in non-production, false in
     // production), so it is guarded as falsy rather than strictly `false`; the map records
     // its off baseline (false) as the single display source.
-    const { default: CONFIG } = loadConfigWithFlagsUnset()
+    const { default: CONFIG } = await loadConfigWithFlagsUnset()
     expect(CONFIG.DEBUG).toBeFalsy()
     expect(SOFTWARE_DEFAULTS.DEBUG).toBe(false)
   })
 
-  it('defaults DISABLED_MIDDLEWARES to the empty list', () => {
-    const { default: CONFIG } = loadConfigWithFlagsUnset()
+  it('defaults DISABLED_MIDDLEWARES to the empty list', async () => {
+    const { default: CONFIG } = await loadConfigWithFlagsUnset()
     expect(CONFIG.DISABLED_MIDDLEWARES).toEqual(SOFTWARE_DEFAULTS.DISABLED_MIDDLEWARES)
   })
 })

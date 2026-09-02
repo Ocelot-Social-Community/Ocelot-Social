@@ -72,7 +72,13 @@ const createServer = async (options?: CreateServerOptions) => {
         logger.debug('WebSocket client disconnected')
       },
     },
-    wsServer,
+    // `@types/ws` is a CommonJS types package, so under NodeNext TypeScript instantiates it once
+    // per resolution mode: this file is ESM and gets the `import` flavour, graphql-ws' own `.d.ts`
+    // is CJS and gets the `require` one. Same class at runtime, two incompatible types at compile
+    // time (`options.WebSocket` is the synthetic default on one side, the module namespace on the
+    // other). The cast states that they are the same object; it goes away with graphql-ws 6,
+    // which ships ESM types.
+    wsServer as Parameters<typeof useServer>[1],
   )
 
   // Legacy protocol: subscriptions-transport-ws (subprotocol: graphql-ws)

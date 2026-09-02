@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-import { rule, shield, deny, allow, or, and } from 'graphql-shield'
+import { createRequire } from 'node:module'
 
 import CONFIG from '@config/index'
 import { AuthenticationError } from '@graphql/errors'
@@ -15,6 +15,30 @@ import { dominates } from '@src/role'
 
 import type { Context } from '@src/context'
 import type { PermissionKey } from '@src/permission'
+import type {
+  allow as Allow,
+  and as And,
+  deny as Deny,
+  or as Or,
+  rule as Rule,
+  shield as Shield,
+} from 'graphql-shield'
+
+// Loaded through createRequire because graphql-shield 7.6.5's ESM build is broken: `esm/rules.js`
+// does `import { isUndefined } from 'util'`, and Node's `util` ESM namespace has no such export
+// (it is a deprecated CommonJS-only property), so importing the package the normal way throws at
+// load. Its `exports` map offers no subpath, so the working CJS build cannot be addressed
+// directly either. The type import below still comes from the package's own declarations, so
+// this costs no type safety — only the illusion that the package supports ESM.
+// Revisit when graphql-shield ships a fixed ESM build.
+const { rule, shield, deny, allow, or, and } = createRequire(import.meta.url)('graphql-shield') as {
+  rule: typeof Rule
+  shield: typeof Shield
+  deny: typeof Deny
+  allow: typeof Allow
+  or: typeof Or
+  and: typeof And
+}
 
 const debug = !!CONFIG.DEBUG
 const allowExternalErrors = true

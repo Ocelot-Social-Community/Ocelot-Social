@@ -1,3 +1,5 @@
+import { jest } from '@jest/globals'
+
 import type { RedisOptions } from 'ioredis'
 
 const mockConfig: {
@@ -6,19 +8,19 @@ const mockConfig: {
   REDIS_PASSWORD?: string
 } = {}
 
-jest.mock('@config/index', () => ({
+jest.unstable_mockModule('@config/index', () => ({
   __esModule: true,
   get default() {
     return mockConfig
   },
 }))
 
-jest.mock('ioredis', () => ({
+jest.unstable_mockModule('ioredis', () => ({
   __esModule: true,
   default: jest.fn(),
 }))
 
-jest.mock('graphql-redis-subscriptions', () => ({
+jest.unstable_mockModule('graphql-redis-subscriptions', () => ({
   __esModule: true,
   RedisPubSub: jest.fn(),
 }))

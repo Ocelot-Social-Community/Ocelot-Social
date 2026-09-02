@@ -1,3 +1,5 @@
+import { jest } from '@jest/globals'
+
 import { allPermissionKeys } from '@src/permission'
 
 import { DEFAULT_ROLES } from './defaults'

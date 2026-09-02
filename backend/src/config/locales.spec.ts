@@ -6,7 +6,7 @@ import { SOFTWARE_DEFAULTS } from './softwareDefaults'
 
 describe('SUPPORTED_LOCALES', () => {
   it('matches the email locale template files on disk, so the list cannot drift', async () => {
-    const files = await readdir(path.join(__dirname, '../emails/locales'))
+    const files = await readdir(path.join(import.meta.dirname, '../emails/locales'))
     const onDisk = files
       .filter((file) => file.endsWith('.json'))
       .map((file) => file.replace(/\.json$/, ''))

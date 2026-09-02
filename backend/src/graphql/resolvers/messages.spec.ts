@@ -8,7 +8,8 @@
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 import { Readable } from 'node:stream'
 
-import { Upload } from 'graphql-upload/public/index'
+import { jest } from '@jest/globals'
+import { Upload } from 'graphql-upload/public/index.js'
 
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
@@ -753,7 +754,9 @@ describe('Message', () => {
           .filter(
             ([event, payload]) =>
               event === 'CHAT_MESSAGE_STATUS_UPDATED' &&
-              payload?.chatMessageStatusUpdated?.status === 'seen',
+              // the spy now carries publish()'s real signature, whose payload is untyped
+              (payload as { chatMessageStatusUpdated?: { status?: string } })
+                ?.chatMessageStatusUpdated?.status === 'seen',
           )
           .map(([, payload]) => payload)
         expect(seenPayloads).toHaveLength(1)
@@ -795,7 +798,7 @@ describe('Message', () => {
       it('returns true for recipient and marks as distributed', async () => {
         const mockSession = {
           writeTransaction: jest
-            .fn()
+            .fn<(...args: unknown[]) => Promise<unknown>>()
             .mockResolvedValue([{ roomId: 'r1', authorId: 'a1', messageIds: ['m1'] }]),
           close: jest.fn(),
         }

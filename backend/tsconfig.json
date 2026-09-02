@@ -11,14 +11,15 @@
     // "disableReferencedProjectLoad": true,             /* Reduce the number of projects loaded automatically by TypeScript. */
 
     /* Language and Environment */
-    "target": "es2016" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
-    /* Spelled out only because `new Error(msg, { cause })` needs ES2022's Error overload; the
-       runtime has had `cause` since Node 16.9, well below the `engines` floor of 25.5.0.
-       `target` stays at es2016, so the emitted JS is unchanged, and every other type stays on
-       ES2016 semantics. DOM and DOM.Iterable are restated because naming `lib` at all replaces
-       the implicit `lib.es2016.full`, which had supplied them — `Image` and `Headers.entries()`
-       are used in specs. */
-    "lib": ["ES2016", "ES2022.Error", "DOM", "DOM.Iterable"],
+    /* ES2022, raised from es2016 by the ESM migration: top-level `await` — which the ESM specs
+       need to import a module after registering its mocks — is only emitted for ES2017 and up.
+       The runtime was never the constraint (the `engines` floor is Node 25.5), only the setting
+       was. `ES2022.Error` is no longer listed separately because the target now supplies it;
+       DOM and DOM.Iterable stay explicit because naming `lib` at all replaces the implicit
+       `lib.es2022.full` that would have provided them — `Image` and `Headers.entries()` are
+       used in specs. */
+    "target": "es2022" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     // "jsx": "preserve",                                /* Specify what JSX code is generated. */
     // "experimentalDecorators": true,                   /* Enable experimental support for legacy experimental decorators. */
     // "emitDecoratorMetadata": true,                    /* Emit design-type metadata for decorated declarations in source files. */
@@ -31,9 +32,19 @@
     // "moduleDetection": "auto",                        /* Control what method is used to detect module-format JS files. */
 
     /* Modules */
-    "module": "commonjs" /* Specify what module code is generated. */,
+    /* ESM. `esnext` + `bundler` resolution, NOT `nodenext`: nodenext would demand an explicit
+       `.js` on every intra-project specifier, which the repo's `import-x/extensions: never` rule
+       forbids writing. Both are satisfied by splitting the concern — the source stays
+       extensionless, and `tsc-alias -f` (see the "build" script) adds the extension to the EMIT
+       along with the alias resolution it already performed. The trade-off is real and worth
+       naming: bundler resolution does not enforce Node's `exports`-map conditions at compile
+       time, so a bad deep import (`pkg/dist/x` where the map only exposes `pkg/x`) or a named
+       import a CommonJS package cannot actually provide is invisible to tsc. Both fail on module
+       LOAD instead — i.e. in the specs that import the module, and when the backend container
+       boots in test-backend/test-e2e. */
+    "module": "esnext" /* Specify what module code is generated. */,
     // "rootDir": "./",                                  /* Specify the root folder within your source files. */
-    // "moduleResolution": "node10",                     /* Specify how TypeScript looks up a file from a given module specifier. */
+    "moduleResolution": "bundler" /* Extensionless specifiers stay legal in source; tsc-alias adds them to the emit. */,
     // "baseUrl": "./",                                  /* Specify the base directory to resolve non-relative module names. */
     /* Specify a set of entries that re-map imports to additional lookup locations. */
     "paths": {
@@ -124,5 +135,11 @@
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
-  "exclude": ["eslint.config.ts", "prettier.config.ts", "jest.config.ts"]
+  "exclude": ["eslint.config.ts", "prettier.config.ts", "jest.config.ts"],
+  /* Node needs explicit extensions in ESM specifiers, the `import-x/extensions` lint rule forbids
+     writing them. Both hold: the source stays extensionless and tsc-alias adds the extension to
+     the EMIT, alongside the alias resolution it already did. */
+  "tsc-alias": {
+    "resolveFullPaths": true
+  }
 }

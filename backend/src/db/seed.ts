@@ -7,7 +7,7 @@
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 
 import { faker } from '@faker-js/faker'
-import sample from 'lodash/sample'
+import sample from 'lodash/sample.js'
 
 import CONFIG from '@config/index'
 import { categories } from '@constants/categories'
