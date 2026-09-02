@@ -142,7 +142,7 @@ ONBUILD RUN --mount=type=cache,target=/root/.npm,sharing=locked \
 # the `--omit=dev` install into it — is never read by this image, and it is not cheap: 107 s for
 # the production install and 10 s for tsc, on a build that the e2e matrix then downloads 40 times.
 # The db migrations do not need it either; the workflow calls `npm run db:migrate`, which compiles the TS
-# migrations on the fly (`--compiler ts:./src/db/compiler.ts`) — `prod:migrate` is the compiled variant
+# migrations on the fly (`--compiler ts:./src/db/compiler.cts`) — `prod:migrate` is the compiled variant
 # and is not used here.
 #
 # It cannot share a parent with `build` to avoid the duplicated three lines below, and that is a
