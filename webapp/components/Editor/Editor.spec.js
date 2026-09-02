@@ -57,6 +57,34 @@ describe('Editor.vue', () => {
       )
     })
 
+    // Regression: typing the "@" that opens the mention list used to throw
+    // "this.menu.show is not a function" — tiptap's Suggestions plugin looks its decoration span up
+    // in the DOM before prosemirror-view has written it (since prosemirror-view 1.42), hands over a
+    // null anchor, and `tippy(null)` answers with an empty array rather than an instance. The popup
+    // has to open regardless of which of the two the anchor comes from.
+    describe('opening the mention suggestion list', () => {
+      it('anchors the popup even when the plugin has no decoration node yet', async () => {
+        propsData.users = [{ id: 'u1', slug: 'peter-lustig', label: 'Peter Lustig' }]
+        wrapper = mount(Editor, {
+          mocks,
+          propsData,
+          localVue,
+          sync: false,
+          stubs: { transition: false },
+          attachTo: document.body,
+        })
+
+        const { view } = wrapper.vm.editor
+        view.dispatch(view.state.tr.insertText('@'))
+        await wrapper.vm.$nextTick()
+        await wrapper.vm.$nextTick()
+
+        const { menu } = wrapper.vm.$refs.contextMenu
+        expect(menu).toBeTruthy()
+        expect(typeof menu.show).toBe('function')
+      })
+    })
+
     describe('optional extensions', () => {
       it('sets the Mention items to the users', () => {
         propsData.users = [
