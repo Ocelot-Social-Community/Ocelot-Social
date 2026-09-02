@@ -83,6 +83,110 @@ describe('Editor.vue', () => {
         expect(menu).toBeTruthy()
         expect(typeof menu.show).toBe('function')
       })
+
+      // The other half of showSuggestionMenu: once the decoration IS in the DOM, the plugin builds
+      // the anchor itself and hands it over as `virtualNode` — a popper-style virtual reference
+      // rather than an element. That path must not wait for a tick, and tippy has to accept the
+      // object as a single instance (the same call answers with an array for anything invalid).
+      it('uses the plugin anchor directly when it comes with one', async () => {
+        propsData.users = [{ id: 'u1', slug: 'peter-lustig', label: 'Peter Lustig' }]
+        wrapper = mount(Editor, {
+          mocks,
+          propsData,
+          localVue,
+          sync: false,
+          stubs: { transition: false },
+          attachTo: document.body,
+        })
+        const rect = { top: 10, bottom: 30, left: 20, right: 40, width: 20, height: 20 }
+        const virtualNode = {
+          getBoundingClientRect: () => rect,
+          clientWidth: rect.width,
+          clientHeight: rect.height,
+        }
+
+        wrapper.vm.openSuggestionList(
+          {
+            items: propsData.users,
+            query: '',
+            range: { from: 1, to: 2 },
+            command: jest.fn(),
+            virtualNode,
+          },
+          'mention',
+        )
+
+        // No $nextTick in between: the anchor was there, so the popup is up already.
+        const { menu } = wrapper.vm.$refs.contextMenu
+        expect(menu).toBeTruthy()
+        expect(typeof menu.show).toBe('function')
+      })
+
+      // Typing on: the plugin re-runs and now finds its decoration, so the follow-up keystrokes take
+      // the same direct path — with a filtered list behind it.
+      it('re-anchors and re-filters while typing', () => {
+        propsData.users = [
+          { id: 'u1', slug: 'peter-lustig', label: 'Peter Lustig' },
+          { id: 'u2', slug: 'jenny-rostock', label: 'Jenny Rostock' },
+        ]
+        wrapper = mount(Editor, {
+          mocks,
+          propsData,
+          localVue,
+          sync: false,
+          stubs: { transition: false },
+          attachTo: document.body,
+        })
+        const rect = { top: 10, bottom: 30, left: 20, right: 40, width: 20, height: 20 }
+        const virtualNode = {
+          getBoundingClientRect: () => rect,
+          clientWidth: rect.width,
+          clientHeight: rect.height,
+        }
+
+        wrapper.vm.updateSuggestionList({
+          items: [propsData.users[1]],
+          query: 'jenny',
+          range: { from: 1, to: 7 },
+          virtualNode,
+          view: wrapper.vm.editor.view,
+        })
+
+        expect(wrapper.vm.filteredItems).toEqual([propsData.users[1]])
+        expect(wrapper.vm.navigatedItemIndex).toBe(0)
+        expect(typeof wrapper.vm.$refs.contextMenu.menu.show).toBe('function')
+      })
+
+      it('does not open a popup for a list that was closed before the anchor arrived', async () => {
+        propsData.users = [{ id: 'u1', slug: 'peter-lustig', label: 'Peter Lustig' }]
+        wrapper = mount(Editor, {
+          mocks,
+          propsData,
+          localVue,
+          sync: false,
+          stubs: { transition: false },
+          attachTo: document.body,
+        })
+        const { view } = wrapper.vm.editor
+
+        // Opens without an anchor, so the lookup is deferred — and the list is dismissed within
+        // that same tick, as Escape or a keystroke ending the match would.
+        wrapper.vm.openSuggestionList(
+          {
+            items: propsData.users,
+            query: '',
+            range: { from: 1, to: 2 },
+            command: jest.fn(),
+            virtualNode: null,
+            view,
+          },
+          'mention',
+        )
+        wrapper.vm.closeSuggestionList()
+        await wrapper.vm.$nextTick()
+
+        expect(wrapper.vm.$refs.contextMenu.menu).toBeFalsy()
+      })
     })
 
     describe('optional extensions', () => {
