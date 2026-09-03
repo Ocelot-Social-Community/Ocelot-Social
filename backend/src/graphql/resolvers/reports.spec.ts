@@ -4,6 +4,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { describe, beforeAll, afterAll, afterEach, it, expect, beforeEach } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import fileReport from '@graphql/queries/moderation/fileReport.gql'
 import reports from '@graphql/queries/moderation/reports.gql'
@@ -57,6 +59,7 @@ describe('reports', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         authenticatedUser = null
+
         await expect(mutate({ mutation: fileReport, variables })).resolves.toMatchObject({
           data: { fileReport: null },
           errors: [{ message: 'Not Authorized!' }],
@@ -179,10 +182,13 @@ describe('reports', () => {
                 resourceId: 'abusive-user-id',
                 currentUserId: authenticatedUser!.id,
               })
+
               expect(reportsCypherQueryResponse.records).toHaveLength(1)
+
               const [reportProperties] = reportsCypherQueryResponse.records.map(
                 (record) => record.get('report').properties,
               )
+
               expect(reportProperties).toMatchObject({ rule: 'latestReviewUpdatedAtRules' })
             })
 
@@ -197,10 +203,13 @@ describe('reports', () => {
                   resourceId: 'abusive-user-id',
                   currentUserId: authenticatedUser!.id,
                 })
+
                 expect(reportsCypherQueryResponse.records).toHaveLength(1)
+
                 const [reportProperties] = reportsCypherQueryResponse.records.map(
                   (record) => record.get('report').properties,
                 )
+
                 expect(reportProperties).toMatchObject({ disable: false })
               })
 
@@ -230,10 +239,13 @@ describe('reports', () => {
                   resourceId: 'abusive-user-id',
                   currentUserId: authenticatedUser!.id,
                 })
+
                 expect(reportsCypherQueryResponse.records).toHaveLength(1)
+
                 const [reportProperties] = reportsCypherQueryResponse.records.map(
                   (record) => record.get('report').properties,
                 )
+
                 expect(reportProperties).toMatchObject({ disable: true })
               })
             })
@@ -259,6 +271,7 @@ describe('reports', () => {
               mutation: fileReport,
               variables: { ...variables, resourceId: 'second-abusive-user-id' },
             })
+
             expect(firstReport.data.fileReport.reportId).not.toEqual(
               secondReport.data.fileReport.reportId,
             )
@@ -679,6 +692,7 @@ describe('reports', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         authenticatedUser = null
+
         await expect(query({ query: reports })).resolves.toMatchObject({
           data: { reports: null },
           errors: [{ message: 'Not Authorized!' }],
@@ -771,6 +785,7 @@ describe('reports', () => {
             ]),
           }
           const { data } = await query({ query: reports })
+
           expect(data).toEqual(expected)
         })
 
@@ -781,6 +796,7 @@ describe('reports', () => {
               variables: { orderBy: 'createdAt_asc' },
             })
             const sorted = [...data.reports].sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1))
+
             expect(data.reports).toEqual(sorted)
           })
 
@@ -790,6 +806,7 @@ describe('reports', () => {
               variables: { orderBy: 'createdAt_desc' },
             })
             const sorted = [...data.reports].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
+
             expect(data.reports).toEqual(sorted)
           })
         })
@@ -800,6 +817,7 @@ describe('reports', () => {
               query: reports,
               variables: { reviewed: false },
             })
+
             expect(data.reports).toHaveLength(3)
           })
 
@@ -813,6 +831,7 @@ describe('reports', () => {
               query: reports,
               variables: { reviewed: true },
             })
+
             expect(data.reports).toHaveLength(1)
             expect(data.reports[0].resource.id).toBe('abusive-post-1')
           })
@@ -824,7 +843,9 @@ describe('reports', () => {
               query: reports,
               variables: { closed: false },
             })
+
             expect(data.reports).toHaveLength(3)
+
             data.reports.forEach((report) => {
               expect(report.closed).toBe(false)
             })
@@ -840,6 +861,7 @@ describe('reports', () => {
               query: reports,
               variables: { closed: true },
             })
+
             expect(data.reports).toHaveLength(1)
             expect(data.reports[0].resource.id).toBe('abusive-post-1')
             expect(data.reports[0].closed).toBe(true)
@@ -862,6 +884,7 @@ describe('reports', () => {
               query: reports,
               variables: { reviewed: true, closed: true },
             })
+
             expect(data.reports).toHaveLength(1)
             expect(data.reports[0].resource.id).toBe('abusive-post-1')
             expect(data.reports[0].closed).toBe(true)
@@ -882,6 +905,7 @@ describe('reports', () => {
               query: reports,
               variables: { reviewed: true, closed: false },
             })
+
             expect(data.reports).toHaveLength(1)
             expect(data.reports[0].resource.id).toBe('abusive-user-1')
             expect(data.reports[0].closed).toBe(false)
@@ -894,6 +918,7 @@ describe('reports', () => {
               query: reports,
               variables: { first: 2 },
             })
+
             expect(data.reports).toHaveLength(2)
           })
 
@@ -902,6 +927,7 @@ describe('reports', () => {
               query: reports,
               variables: { first: 1 },
             })
+
             expect(data.reports).toHaveLength(1)
           })
 
@@ -914,6 +940,7 @@ describe('reports', () => {
               query: reports,
               variables: { orderBy: 'createdAt_asc', offset: 1 },
             })
+
             expect(offsetData.reports).toHaveLength(allData.reports.length - 1)
             expect(offsetData.reports[0].id).toBe(allData.reports[1].id)
           })
@@ -927,6 +954,7 @@ describe('reports', () => {
               query: reports,
               variables: { orderBy: 'createdAt_asc', first: 1, offset: 1 },
             })
+
             expect(pageData.reports).toHaveLength(1)
             expect(pageData.reports[0].id).toBe(allData.reports[1].id)
           })

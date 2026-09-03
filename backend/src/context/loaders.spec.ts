@@ -2,7 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { jest } from '@jest/globals'
+
+import { beforeAll, afterAll, describe, it, expect } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { closeDriver, getDriver } from '@db/neo4j'
@@ -195,6 +196,7 @@ describe('forField', () => {
         .load('x')
 
     await Promise.all([load('A.one'), load('B.two')])
+
     expect(seen.sort()).toEqual(['A.one', 'B.two'])
   })
 })
@@ -215,9 +217,9 @@ describe('Room.unreadCount', () => {
   })
 
   it('resolves a whole room list in a single query', async () => {
-    const sessionSpy = jest.spyOn(driver, 'session')
+    const sessionSpy = vi.spyOn(driver, 'session')
 
-    // Restored in `finally`: jest is configured without `restoreMocks`, so a failing
+    // Restored in `finally`: the runner is configured without `restoreMocks`, so a failing
     // assertion would leave the spy on the shared driver for every later test in this file.
     // Milder than the same omission in queryBatching.spec.ts — there is no mockImplementation
     // here, so the real session still opens and only the call count keeps accumulating — but

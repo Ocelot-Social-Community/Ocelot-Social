@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import { jest } from '@jest/globals'
+
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import queryLocations from '@graphql/queries/queryLocations.gql'
@@ -10,6 +11,7 @@ import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import type { MockInstance } from 'vitest'
 
 let variables
 let authenticatedUser: Context['user']
@@ -137,7 +139,7 @@ const welzheimFeature = {
   ],
 }
 
-let fetchSpy: jest.Spied<typeof global.fetch>
+let fetchSpy: MockInstance<typeof global.fetch>
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -159,7 +161,7 @@ afterAll(() => {
 beforeEach(() => {
   variables = {}
   authenticatedUser = null
-  fetchSpy = jest.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+  fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
     const path = decodeURIComponent(url)
 
@@ -202,6 +204,7 @@ describe('Location Service', () => {
     variables = { place: 'Berlin', lang: 'en', proximity: '10.0,53.55' }
     await query({ query: queryLocations, variables })
     const calledUrl = fetchSpy.mock.calls[0][0] as string
+
     expect(calledUrl).toContain(`proximity=${encodeURIComponent(variables.proximity as string)}`)
   })
 
@@ -209,6 +212,7 @@ describe('Location Service', () => {
     variables = { place: 'Köln', lang: 'en' }
     await query({ query: queryLocations, variables })
     const calledUrl = fetchSpy.mock.calls[0][0] as string
+
     expect(calledUrl).toContain(encodeURIComponent('Köln')) // 'K%C3%B6ln'
     expect(calledUrl).not.toContain(encodeURIComponent(encodeURIComponent('Köln'))) // not 'K%25C3%25B6ln'
   })
@@ -219,6 +223,7 @@ describe('Location Service', () => {
       lang: 'en',
     }
     const result = await query({ query: queryLocations, variables })
+
     expect(result.data.queryLocations).toEqual(
       expect.arrayContaining([
         {
@@ -261,6 +266,7 @@ describe('Location Service', () => {
       lang: 'de',
     }
     const result = await query({ query: queryLocations, variables })
+
     expect(result.data.queryLocations).toEqual([
       {
         id: expect.stringMatching(/^place\.[0-9a-z-]+$/),
@@ -301,6 +307,7 @@ describe('Location Service', () => {
       lang: 'en',
     }
     const result = await query({ query: queryLocations, variables })
+
     expect(result.data.queryLocations).toEqual([])
   })
 
@@ -330,7 +337,9 @@ describe('Location Service', () => {
       { id: 'poi.hagenbeck', place_name: 'Tierpark Hagenbeck', lat: 53.551, lng: 9.993 },
     ])
     expect(fetchSpy).toHaveBeenCalledTimes(2)
+
     const calledUrls = fetchSpy.mock.calls.map(([input]) => input as string)
+
     expect(calledUrls[0]).toContain('types=address')
     expect(calledUrls[0]).toContain('limit=1')
     expect(calledUrls[1]).toContain('types=poi')
@@ -375,7 +384,9 @@ describe('Location Service', () => {
     expect(result.data.queryLocations).toEqual([
       { id: 'address.example', place_name: 'Musterstraße 1, Hamburg', lat: 53.551, lng: 9.993 },
     ])
+
     const calledUrls = fetchSpy.mock.calls.map(([input]) => input as string)
+
     expect(calledUrls[0]).toContain('types=address')
   })
 
@@ -424,6 +435,7 @@ describe('Location Service', () => {
       lang: 'en',
     }
     const result = await query({ query: queryLocations, variables })
+
     expect(result.data.queryLocations).toEqual([])
   })
 })
@@ -449,6 +461,7 @@ describe('userMiddleware', () => {
         `MATCH (city:Location)-[:IS_IN]->(district:Location)-[:IS_IN]->(state:Location)-[:IS_IN]->(country:Location) return city {.*}, state {.*}, country {.*}`,
         {},
       )
+
       expect(
         locations.records.map((record) => {
           return {

@@ -10,6 +10,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 import { buildSchema, Kind, parse, Source, validate } from 'graphql'
+import { describe, it, expect } from 'vitest'
 
 import { buildSchemaSdl } from './print-schema'
 

@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import {
   allPermissionGates,
   allPermissionKeys,
@@ -43,7 +45,7 @@ const EXPECTED_KEYS: PermissionKey[] = [
 ]
 
 describe('permission catalog', () => {
-  describe('allPermissionKeys', () => {
+  describe(allPermissionKeys, () => {
     it('returns exactly the catalog keys, in declaration order', () => {
       expect(allPermissionKeys()).toEqual(EXPECTED_KEYS)
     })
@@ -51,6 +53,7 @@ describe('permission catalog', () => {
     it('returns a fresh array (mutating it does not affect the catalog)', () => {
       const first = allPermissionKeys()
       first.pop()
+
       expect(allPermissionKeys()).toEqual(EXPECTED_KEYS)
     })
   })
@@ -82,8 +85,10 @@ describe('permission catalog', () => {
       expect(gatesFor('apiKey.administer')).toEqual([])
       // A representative ungated right.
       expect(gatesFor('post.create')).toEqual([])
+
       // The projection carries the (multi-)gate through.
       const publicCall = permissionCatalog().find((e) => e.key === 'videoCall.create_public')
+
       expect(publicCall?.gatedBy).toEqual(['videoConference', 'groupsEnabled'])
     })
 
@@ -124,7 +129,7 @@ describe('permission catalog', () => {
     })
   })
 
-  describe('isKnownPermission', () => {
+  describe(isKnownPermission, () => {
     it('is true for every catalog key', () => {
       for (const key of EXPECTED_KEYS) {
         expect(isKnownPermission(key)).toBe(true)
@@ -138,11 +143,13 @@ describe('permission catalog', () => {
     })
   })
 
-  describe('permissionCatalog', () => {
+  describe(permissionCatalog, () => {
     it('projects every key with its group and description', () => {
       const catalog = permissionCatalog()
+
       expect(catalog).toHaveLength(EXPECTED_KEYS.length)
       expect(catalog.map((entry) => entry.key)).toEqual(EXPECTED_KEYS)
+
       for (const entry of catalog) {
         expect(entry.group).toBe(groupFor(entry.key))
         expect(entry.description).toBe(descriptionFor(entry.key))
@@ -150,7 +157,7 @@ describe('permission catalog', () => {
     })
   })
 
-  describe('sanitizePermissions', () => {
+  describe(sanitizePermissions, () => {
     it('drops unknown keys (catalog drift grants nothing)', () => {
       expect(sanitizePermissions(['role.manage', 'ghost.permission', 'post.pin'])).toEqual([
         'role.manage',

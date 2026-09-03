@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import { createInMemoryPolicyService } from '@src/policy'
 
 import { categoryRank } from './categories'
@@ -30,14 +32,16 @@ const rowFor = (
   return row
 }
 
-describe('systemConfigStatus', () => {
+describe(systemConfigStatus, () => {
   it('emits one row per env var with no duplicates', () => {
     const keys = rowsFor().map((row) => row.envKey)
+
     expect(new Set(keys).size).toBe(keys.length)
   })
 
   it('includes plain infrastructure vars alongside the policy-governed ones', () => {
     const keys = rowsFor().map((row) => row.envKey)
+
     // plain infra (never surfaced before)
     expect(keys).toContain('NEO4J_URI')
     expect(keys).toContain('SMTP_HOST')
@@ -49,6 +53,7 @@ describe('systemConfigStatus', () => {
 
   it('does not duplicate a policy-governed var as a plain row', () => {
     const liveKitRows = rowsFor().filter((row) => row.envKey === 'LIVEKIT_API_SECRET')
+
     expect(liveKitRows).toHaveLength(1)
     expect(liveKitRows[0].policyKey).toBe('videoConference')
   })
@@ -58,12 +63,14 @@ describe('systemConfigStatus', () => {
     // tab renders straight from row order, so this contract must hold at the source.
     const ranks = rowsFor().map((row) => categoryRank(row.category))
     const sorted = [...ranks].sort((a, b) => a - b)
+
     expect(ranks).toEqual(sorted)
   })
 
   describe('secret hygiene', () => {
     it('never returns a secret value, only its presence', () => {
       const row = rowFor('JWT_SECRET', { JWT_SECRET: 'super-secret' })
+
       expect(row.secret).toBe(true)
       expect(row.state).toBe('set')
       expect(row.envValue).toBeNull()
@@ -78,6 +85,7 @@ describe('systemConfigStatus', () => {
 
     it("surfaces a secret's software default (a public code constant) but never its env value", () => {
       const row = rowFor('NEO4J_PASSWORD', { NEO4J_PASSWORD: 'deployed-secret' })
+
       expect(row.secret).toBe(true)
       expect(row.state).toBe('set')
       // deployed value withheld …
@@ -91,11 +99,13 @@ describe('systemConfigStatus', () => {
   describe('plain non-secret infrastructure var', () => {
     it('shows the env value and falls back to the software default when unset', () => {
       const set = rowFor('NEO4J_URI', { NEO4J_URI: 'bolt://db:7687' })
+
       expect(set.secret).toBe(false)
       expect(set.envValue).toBe('bolt://db:7687')
       expect(set.effective).toBe('bolt://db:7687')
 
       const unset = rowFor('NEO4J_URI', {})
+
       expect(unset.envValue).toBeNull()
       // effective falls back to the registry software default
       expect(unset.effective).toBe('bolt://localhost:7687')
@@ -104,21 +114,25 @@ describe('systemConfigStatus', () => {
 
     it('shows a boolean toggle (DEBUG) as off by default rather than "no default"', () => {
       const unset = rowFor('DEBUG', {})
+
       // Off by default — falls back to 'false', not an em-dashed "no default".
       expect(unset.softwareDefault).toBe('false')
       expect(unset.effective).toBe('false')
 
       const set = rowFor('DEBUG', { DEBUG: 'app:*' })
+
       expect(set.envValue).toBe('app:*')
     })
 
     it('shows a list var (DISABLED_MIDDLEWARES) as a JSON array, empty by default', () => {
       const unset = rowFor('DISABLED_MIDDLEWARES', {})
+
       expect(unset.softwareDefault).toBe('[]')
       expect(unset.effective).toBe('[]') // falls back to the empty-list default
 
       // The comma-separated env value becomes a JSON array (entries trimmed, blanks dropped).
       const set = rowFor('DISABLED_MIDDLEWARES', { DISABLED_MIDDLEWARES: 'm_a, m_b' })
+
       expect(set.envValue).toBe('["m_a","m_b"]')
       expect(set.effective).toBe('["m_a","m_b"]')
     })
@@ -126,17 +140,20 @@ describe('systemConfigStatus', () => {
     it('drops blank and whitespace-only entries when parsing a list var', () => {
       // Empty entries (double comma) and whitespace-only entries must not survive the parse.
       const set = rowFor('DISABLED_MIDDLEWARES', { DISABLED_MIDDLEWARES: 'm_a,, m_b , ,m_c' })
+
       expect(set.envValue).toBe('["m_a","m_b","m_c"]')
       expect(set.effective).toBe('["m_a","m_b","m_c"]')
 
       // An all-blank value collapses to the empty list, not [""].
       const blank = rowFor('DISABLED_MIDDLEWARES', { DISABLED_MIDDLEWARES: ' , ,' })
+
       expect(blank.envValue).toBe('[]')
       expect(blank.effective).toBe('[]')
     })
 
     it('is never overridable and carries no policy key', () => {
       const row = rowFor('SMTP_HOST', { SMTP_HOST: 'mail.example.org' })
+
       expect(row.overridable).toBe(false)
       expect(row.policyKey).toBeNull()
       expect(row.blocking).toBe(false)
@@ -151,6 +168,7 @@ describe('systemConfigStatus', () => {
         { API_KEYS_ENABLED: 'true' },
         { apiKeysEnabled: false },
       )
+
       expect(row.overridable).toBe(true)
       expect(row.policyKey).toBe('apiKeysEnabled')
       expect(row.effective).toBe('false')
@@ -163,12 +181,14 @@ describe('systemConfigStatus', () => {
       // Realistic seeded state: the env seed was materialised into storage on boot,
       // so the stored value matches the configured default → no admin override.
       const row = rowFor('API_KEYS_ENABLED', { API_KEYS_ENABLED: 'true' }, { apiKeysEnabled: true })
+
       expect(row.effective).toBe('true')
       expect(row.override).toBeNull()
     })
 
     it('em-dashes the env value when the seed var is unset', () => {
       const row = rowFor('PUBLIC_REGISTRATION', {})
+
       expect(row.state).toBe('missing')
       expect(row.envValue).toBeNull()
     })
@@ -183,6 +203,7 @@ describe('systemConfigStatus', () => {
 
     it('exposes a non-secret requirement value (the URL) but shows presence, not a value, as effective', () => {
       const url = rowFor('LIVEKIT_URL', LIVEKIT)
+
       expect(url.secret).toBe(false)
       expect(url.envValue).toBe('wss://lk.example.org')
       expect(url.effective).toBeNull()
@@ -192,6 +213,7 @@ describe('systemConfigStatus', () => {
 
     it('hides a secret requirement value and flags a missing one as blocking', () => {
       const secret = rowFor('LIVEKIT_API_SECRET', { ...LIVEKIT, LIVEKIT_API_SECRET: undefined })
+
       expect(secret.secret).toBe(true)
       expect(secret.envValue).toBeNull()
       expect(secret.state).toBe('missing')
@@ -209,6 +231,7 @@ describe('systemConfigStatus', () => {
   describe('normalized var (LANGUAGE_DEFAULT, validated against the supported locales)', () => {
     it('shows a supported locale as-is', () => {
       const row = rowFor('LANGUAGE_DEFAULT', { LANGUAGE_DEFAULT: 'de' })
+
       expect(row.effective).toBe('de')
       expect(row.envValue).toBe('de')
     })
@@ -217,18 +240,21 @@ describe('systemConfigStatus', () => {
       // The runtime falls back to 'en' for an unsupported code, so the config tab must show the
       // SAME effective value — while the admin still sees the raw 'xx' they set (envValue).
       const row = rowFor('LANGUAGE_DEFAULT', { LANGUAGE_DEFAULT: 'xx' })
+
       expect(row.effective).toBe('en')
       expect(row.envValue).toBe('xx')
     })
 
     it('resolves an empty env value to the fallback (matching the runtime, not shown verbatim)', () => {
       const row = rowFor('LANGUAGE_DEFAULT', { LANGUAGE_DEFAULT: '' })
+
       expect(row.state).toBe('empty')
       expect(row.effective).toBe('en')
     })
 
     it('falls back to the default language when unset', () => {
       const row = rowFor('LANGUAGE_DEFAULT', {})
+
       expect(row.state).toBe('missing')
       expect(row.effective).toBe('en')
     })

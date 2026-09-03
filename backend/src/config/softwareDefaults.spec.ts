@@ -1,7 +1,8 @@
 // Keys iterated below come from the fixed SOFTWARE_DEFAULTS / config module, never user
 // input — the object-injection lint is a false positive here.
 /* eslint-disable security/detect-object-injection */
-import { jest } from '@jest/globals'
+
+import { describe, it, expect } from 'vitest'
 
 import { ENV_SPEC_BY_NAME } from './envRegistry'
 import { SOFTWARE_DEFAULTS } from './softwareDefaults'
@@ -26,9 +27,12 @@ describe('SOFTWARE_DEFAULTS ↔ envRegistry display', () => {
   it('surfaces each canonical default as the registry display string', () => {
     for (const [name, value] of Object.entries(SOFTWARE_DEFAULTS)) {
       const spec = ENV_SPEC_BY_NAME[name]
+
       expect(spec).toBeDefined()
+
       // Lists are surfaced as a JSON array ([] / ["a","b"]); scalars via String().
       const expected = Array.isArray(value) ? JSON.stringify(value) : String(value)
+
       expect(spec.softwareDefault).toBe(expected)
     }
   })
@@ -61,7 +65,7 @@ describe('SOFTWARE_DEFAULTS ↔ config runtime default (logic-gated defaults)', 
   // SMTP_* etc.) would mask the true software defaults we mean to assert.
   // async because ESM has no synchronous module load: `await import()` replaces require().
   const loadConfigWithFlagsUnset = async (): Promise<LoadedConfig> => {
-    jest.resetModules()
+    vi.resetModules()
     const g = global as unknown as { Cypress?: { env: () => Record<string, string> } }
     g.Cypress = { env: () => ({ ...REQUIRED }) }
     try {
@@ -74,6 +78,7 @@ describe('SOFTWARE_DEFAULTS ↔ config runtime default (logic-gated defaults)', 
   it('defaults SMTP ignoreTLS / secure / rejectUnauthorized to the map values', async () => {
     const { nodemailerTransportOptions } = await loadConfigWithFlagsUnset()
     const tls = nodemailerTransportOptions.tls as { rejectUnauthorized: boolean }
+
     expect(nodemailerTransportOptions.ignoreTLS).toBe(SOFTWARE_DEFAULTS.SMTP_IGNORE_TLS)
     expect(nodemailerTransportOptions.secure).toBe(SOFTWARE_DEFAULTS.SMTP_SECURE)
     expect(tls.rejectUnauthorized).toBe(SOFTWARE_DEFAULTS.SMTP_REJECT_UNAUTHORIZED)
@@ -81,6 +86,7 @@ describe('SOFTWARE_DEFAULTS ↔ config runtime default (logic-gated defaults)', 
 
   it('defaults PRODUCTION_DB_CLEAN_ALLOW to the map value', async () => {
     const { default: CONFIG } = await loadConfigWithFlagsUnset()
+
     expect(CONFIG.PRODUCTION_DB_CLEAN_ALLOW).toBe(SOFTWARE_DEFAULTS.PRODUCTION_DB_CLEAN_ALLOW)
   })
 
@@ -89,12 +95,14 @@ describe('SOFTWARE_DEFAULTS ↔ config runtime default (logic-gated defaults)', 
     // production), so it is guarded as falsy rather than strictly `false`; the map records
     // its off baseline (false) as the single display source.
     const { default: CONFIG } = await loadConfigWithFlagsUnset()
+
     expect(CONFIG.DEBUG).toBeFalsy()
     expect(SOFTWARE_DEFAULTS.DEBUG).toBe(false)
   })
 
   it('defaults DISABLED_MIDDLEWARES to the empty list', async () => {
     const { default: CONFIG } = await loadConfigWithFlagsUnset()
+
     expect(CONFIG.DISABLED_MIDDLEWARES).toEqual(SOFTWARE_DEFAULTS.DISABLED_MIDDLEWARES)
   })
 })

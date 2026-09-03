@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`sendEmailVerification English renders correctly 1`] = `
+exports[`sendEmailVerification > English > renders correctly 1`] = `
 {
   "attachments": [],
   "from": {
@@ -147,7 +147,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendEmailVerification German renders correctly 1`] = `
+exports[`sendEmailVerification > German > renders correctly 1`] = `
 {
   "attachments": [],
   "from": {

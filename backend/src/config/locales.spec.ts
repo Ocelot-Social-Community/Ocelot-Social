@@ -1,6 +1,8 @@
 import { readdir } from 'node:fs/promises'
 import path from 'node:path'
 
+import { describe, it, expect } from 'vitest'
+
 import { SUPPORTED_LOCALES, isSupportedLocale, resolveLocale } from './locales'
 import { SOFTWARE_DEFAULTS } from './softwareDefaults'
 
@@ -11,6 +13,7 @@ describe('SUPPORTED_LOCALES', () => {
       .filter((file) => file.endsWith('.json'))
       .map((file) => file.replace(/\.json$/, ''))
       .sort()
+
     expect([...SUPPORTED_LOCALES].sort()).toEqual(onDisk)
   })
 
@@ -19,7 +22,7 @@ describe('SUPPORTED_LOCALES', () => {
   })
 })
 
-describe('isSupportedLocale', () => {
+describe(isSupportedLocale, () => {
   it('accepts a supported locale case-insensitively, rejects everything else', () => {
     expect(isSupportedLocale('fr')).toBe(true)
     expect(isSupportedLocale('FR')).toBe(true)
@@ -29,7 +32,7 @@ describe('isSupportedLocale', () => {
   })
 })
 
-describe('resolveLocale', () => {
+describe(resolveLocale, () => {
   const FALLBACK = SOFTWARE_DEFAULTS.LANGUAGE_DEFAULT // 'en'
 
   it('keeps a supported locale', () => {

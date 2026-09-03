@@ -4,6 +4,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
+import { beforeAll, afterAll, describe, beforeEach, afterEach, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import CreateSocialMedia from '@graphql/queries/users/CreateSocialMedia.gql'
 import DeleteSocialMedia from '@graphql/queries/users/DeleteSocialMedia.gql'
@@ -154,6 +156,7 @@ describe('SocialMedia', () => {
       it('denies creating social media when the socialMediaEnabled policy is off', async () => {
         policyOverride = { socialMediaEnabled: false }
         const result = await socialMediaAction(user, CreateSocialMedia, variables)
+
         expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
       })
 
@@ -172,6 +175,7 @@ describe('SocialMedia', () => {
           },
         ]
         const result = await socialMediaAction(user, CreateSocialMedia, variables)
+
         expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
@@ -179,6 +183,7 @@ describe('SocialMedia', () => {
     describe('ownedBy', () => {
       it('resolves', async () => {
         const user = someUser
+
         await expect(socialMediaAction(user, CreateSocialMedia, variables)).resolves.toMatchObject({
           data: {
             CreateSocialMedia: { url, ownedBy: { name: 'Kalle Blomqvist' } },

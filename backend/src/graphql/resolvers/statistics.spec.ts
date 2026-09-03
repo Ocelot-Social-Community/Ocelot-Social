@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { beforeAll, afterAll, afterEach, describe, beforeEach, it, expect } from 'vitest'
+
 import Factory, { assignRoleEdge, cleanDatabase } from '@db/factories'
 import statistics from '@graphql/queries/statistics.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -150,6 +152,7 @@ describe('statistics', () => {
 
     describe('countFollows', () => {
       let users
+
       beforeEach(async () => {
         users = await Promise.all(
           [...Array(2).keys()].map(() => {
@@ -169,6 +172,7 @@ describe('statistics', () => {
 
     describe('countShouts', () => {
       let users, posts
+
       beforeEach(async () => {
         users = await Promise.all(
           [...Array(2).keys()].map(() => {

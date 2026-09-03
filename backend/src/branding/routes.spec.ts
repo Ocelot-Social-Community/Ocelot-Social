@@ -5,42 +5,42 @@ import { PassThrough, Readable } from 'node:stream'
 import { finished } from 'node:stream/promises'
 import { setImmediate as tick } from 'node:timers/promises'
 
-/* eslint-disable n/prefer-process-get-builtin-module -- these two must go through Jest's module
+/* eslint-disable n/prefer-process-get-builtin-module -- these two must go through the runner's module
    registry to pick up the fs mocks below; process.getBuiltinModule() bypasses it and returns the
    real module. */
-import { jest } from '@jest/globals'
+
+import { describe, beforeEach, it, expect } from 'vitest'
 
 import type { BrandingRouterDeps } from './routes'
 import type { Request, Response } from 'express'
+import type { Mock } from 'vitest'
 
-jest.unstable_mockModule('node:fs', () => ({ createReadStream: jest.fn() }))
-jest.unstable_mockModule('node:fs/promises', () => ({ stat: jest.fn() }))
+vi.mock('node:fs', () => ({ createReadStream: vi.fn() }))
+vi.mock('node:fs/promises', () => ({ stat: vi.fn() }))
 
-// Imported after the mock registrations, not above them: `unstable_mockModule`
-// does not hoist, so a static import would bind the real module first.
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { createReadStream } = await import('node:fs')
 const { stat } = await import('node:fs/promises')
 /* eslint-enable n/prefer-process-get-builtin-module */
 const { brandingRouter } = await import('./routes')
 
 // The two disk readers are INJECTED, not module-mocked. `@ocelot-social/branding/dist/discover.js` is
-// a subpath of a `file:` dependency, and whether jest bound a mock of it to routes.ts depended on the
+// a subpath of a `file:` dependency, and whether the runner bound a mock of it to routes.ts depended on the
 // environment: green here, silently ignored in the CI container, where the router then read the real
 // filesystem and every fixture-based expectation failed. Passing the fakes in removes the question.
 // The id guard is NOT faked — routes.ts keeps importing the real one, so a tightening of
 // BRAND_ID_PATTERN is exercised here instead of being shadowed by a stub.
-const mockDiscover = jest.fn<(...args: unknown[]) => unknown>() as jest.MockedFunction<
-  BrandingRouterDeps['discoverArchives']
->
-const mockDefaultMarker = jest.fn<(...args: unknown[]) => unknown>() as jest.MockedFunction<
-  BrandingRouterDeps['readDefaultMarker']
->
+const mockDiscover = vi.fn<BrandingRouterDeps['discoverArchives']>()
+const mockDefaultMarker = vi.fn<BrandingRouterDeps['readDefaultMarker']>()
 const deps: BrandingRouterDeps = {
   discoverArchives: mockDiscover,
   readDefaultMarker: mockDefaultMarker,
 }
-const mockStat = stat as jest.Mock<(...args: unknown[]) => Promise<unknown>>
-const mockCreateReadStream = createReadStream as jest.Mock<(...args: unknown[]) => unknown>
+// Cast, not vi.mocked(stat): the real signature is overloaded (Stats vs BigIntStats) and the
+// fixture only needs the two fields the route reads.
+const mockStat = stat as unknown as Mock<(...args: unknown[]) => Promise<unknown>>
+const mockCreateReadStream = createReadStream as unknown as Mock<(...args: unknown[]) => unknown>
 
 const ARCHIVE = {
   id: 'stage',
@@ -61,12 +61,12 @@ interface MockRes extends PassThrough {
   statusCode?: number
   headers: Record<string, string>
   body?: string
-  status: jest.Mock<(this: MockRes, code: number) => MockRes>
-  setHeader: jest.Mock<(this: MockRes, k: string, v: string) => void>
-  json: jest.Mock<(this: MockRes, value: unknown) => MockRes>
+  status: Mock<(this: MockRes, code: number) => MockRes>
+  setHeader: Mock<(this: MockRes, k: string, v: string) => void>
+  json: Mock<(this: MockRes, value: unknown) => MockRes>
 }
 
-// A REAL Writable, not a bag of jest.fn()s: the archive route hands the response to
+// A REAL Writable, not a bag of vi.fn()s: the archive route hands the response to
 // stream.pipeline(), which only accepts an actual stream and whose whole point (tearing the file
 // stream down when the response dies) is unobservable against a fake. Everything a stream does not
 // provide — status/setHeader/json — is bolted on the way express does.
@@ -83,19 +83,21 @@ function makeRes(): MockRes {
     },
     configurable: true,
   })
-  res.status = jest.fn(function status(this: MockRes, code: number) {
+  // Direct assignment, not vi.spyOn: PassThrough has no status/setHeader/json to spy ON — these
+  // are the express additions the fake is missing, so they have to be created, not intercepted.
+  res.status = vi.fn(function status(this: MockRes, code: number) {
     this.statusCode = code
     return this
   })
-  res.setHeader = jest.fn(function setHeader(this: MockRes, k: string, v: string) {
+  res.setHeader = vi.fn(function setHeader(this: MockRes, k: string, v: string) {
     this.headers[k.toLowerCase()] = v
   })
-  res.json = jest.fn(function json(this: MockRes, value: unknown) {
+  res.json = vi.fn(function json(this: MockRes, value: unknown) {
     this.body = JSON.stringify(value)
     return this
   })
-  jest.spyOn(res, 'end')
-  jest.spyOn(res, 'destroy')
+  vi.spyOn(res, 'end')
+  vi.spyOn(res, 'destroy')
   // pipeline propagates a source failure by destroying the response WITH that error; an unhandled
   // 'error' on a stream would take the process down instead of failing the test.
   res.on('error', () => {})
@@ -116,9 +118,9 @@ async function call(
   url: string,
   headers: Record<string, string> = {},
   method = 'GET',
-): Promise<{ res: MockRes; next: jest.Mock }> {
+): Promise<{ res: MockRes; next: Mock }> {
   const res = makeRes()
-  const next = jest.fn()
+  const next = vi.fn()
   router({ method, url, headers } as unknown as Request, res as unknown as Response, next)
   await tick()
   return { res, next }
@@ -126,7 +128,7 @@ async function call(
 
 describe('branding/routes', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockDiscover.mockReturnValue(new Map([[ARCHIVE.id, ARCHIVE]]))
     mockStat.mockResolvedValue({ size: 4096, mtimeMs: 1_700_000_000_123 })
     mockDefaultMarker.mockReturnValue('stage')
@@ -144,6 +146,7 @@ describe('branding/routes', () => {
 
       expect(parseManifest(res.body)).toEqual({ default: '', brands: [] })
       expect(mockDiscover).not.toHaveBeenCalled()
+
       // eslint-disable-next-line n/no-process-env -- see above
       delete process.env.OCELOT_BRANDING_ASSETS_DIR
     })
@@ -179,7 +182,7 @@ describe('branding/routes', () => {
 
   // A broken assets dir must degrade to "unknown brand", never to a 500.
   it('answers 404 when discovery throws while resolving an archive', async () => {
-    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     mockDiscover.mockImplementation(() => {
       throw new Error('EACCES')
     })
@@ -191,6 +194,7 @@ describe('branding/routes', () => {
       expect.stringContaining('cannot read /brands'),
       expect.anything(),
     )
+
     warn.mockRestore()
   })
 
@@ -256,12 +260,13 @@ describe('branding/routes', () => {
       mockDiscover.mockImplementation(() => {
         throw new Error('EACCES')
       })
-      const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined)
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
 
       const { res } = await call(brandingRouter('/brands', deps), '/manifest.json')
 
       expect(res.statusCode).toBe(503)
       expect(parseManifest(res.body)).toEqual({ default: '', brands: [] })
+
       warn.mockRestore()
     })
   })

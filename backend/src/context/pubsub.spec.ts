@@ -1,28 +1,27 @@
-import { jest } from '@jest/globals'
+import { beforeEach, describe, it, expect } from 'vitest'
 
 import type { RedisOptions } from 'ioredis'
 
-const mockConfig: {
+interface MockRedisConfig {
   REDIS_DOMAIN?: string
   REDIS_PORT?: number
   REDIS_PASSWORD?: string
-} = {}
+}
 
-jest.unstable_mockModule('@config/index', () => ({
+// `vi.hoisted` lifts the object to where the (hoisted) mock factory can see it. The Jest version
+// reached the same end through a getter, which only existed to dodge the TDZ its hoisting caused.
+const { mockConfig } = vi.hoisted((): { mockConfig: MockRedisConfig } => ({ mockConfig: {} }))
+
+vi.mock('@config/index', () => ({ __esModule: true, default: mockConfig }))
+
+vi.mock('ioredis', () => ({
   __esModule: true,
-  get default() {
-    return mockConfig
-  },
+  default: vi.fn(),
 }))
 
-jest.unstable_mockModule('ioredis', () => ({
+vi.mock('graphql-redis-subscriptions', () => ({
   __esModule: true,
-  default: jest.fn(),
-}))
-
-jest.unstable_mockModule('graphql-redis-subscriptions', () => ({
-  __esModule: true,
-  RedisPubSub: jest.fn(),
+  RedisPubSub: vi.fn(),
 }))
 
 // The module memoises its client in module scope, so every case needs a fresh registry. The
@@ -31,17 +30,17 @@ jest.unstable_mockModule('graphql-redis-subscriptions', () => ({
 // object (which is also why `PubSub` is pulled in here rather than imported above — otherwise
 // `toBeInstanceOf` compares against a class from the discarded registry).
 const load = async () => {
-  jest.resetModules()
-  const [pubsubModule, ioredis, redisSubscriptions, subscriptions] = await Promise.all([
-    import('./pubsub'),
-    import('ioredis'),
-    import('graphql-redis-subscriptions'),
-    import('graphql-subscriptions'),
-  ])
+  vi.resetModules()
+  // Sequential, not Promise.all: the mocked modules have to be resolved before the module under
+  // test evaluates and captures its bindings.
+  const ioredis = await import('ioredis')
+  const redisSubscriptions = await import('graphql-redis-subscriptions')
+  const subscriptions = await import('graphql-subscriptions')
+  const pubsubModule = await import('./pubsub')
   return {
     pubsub: pubsubModule.default,
-    Redis: jest.mocked(ioredis.default),
-    RedisPubSub: jest.mocked(redisSubscriptions.RedisPubSub),
+    Redis: vi.mocked(ioredis.default),
+    RedisPubSub: vi.mocked(redisSubscriptions.RedisPubSub),
     PubSub: subscriptions.PubSub,
   }
 }
@@ -57,6 +56,9 @@ const redisOptions = (Redis: { mock: { calls: unknown[][] } }): RedisOptions =>
   Redis.mock.calls[0][0] as RedisOptions
 
 beforeEach(() => {
+  // vitest evaluates a mock factory once and reuses the result, so call counts survive across
+  // tests — under Jest each resetModules produced fresh mock instances.
+  vi.clearAllMocks()
   mockConfig.REDIS_DOMAIN = undefined
   mockConfig.REDIS_PORT = undefined
   mockConfig.REDIS_PASSWORD = undefined
@@ -65,6 +67,7 @@ beforeEach(() => {
 describe('without Redis configured', () => {
   it('falls back to the in-process PubSub', async () => {
     const { pubsub, PubSub, RedisPubSub } = await load()
+
     expect(pubsub()).toBeInstanceOf(PubSub)
     expect(RedisPubSub).not.toHaveBeenCalled()
   })
@@ -79,6 +82,7 @@ describe('without Redis configured', () => {
       configureRedis()
       unset()
       const { pubsub, PubSub, RedisPubSub } = await load()
+
       expect(pubsub()).toBeInstanceOf(PubSub)
       expect(RedisPubSub).not.toHaveBeenCalled()
     },
@@ -86,6 +90,7 @@ describe('without Redis configured', () => {
 
   it('memoises, so publishers and subscribers share one instance', async () => {
     const { pubsub } = await load()
+
     expect(pubsub()).toBe(pubsub())
   })
 })
@@ -96,16 +101,20 @@ describe('with Redis configured', () => {
   it('gives RedisPubSub a dedicated publisher and subscriber', async () => {
     const { pubsub, Redis, RedisPubSub } = await load()
     pubsub()
+
     // Two clients, not one: a connection in subscriber mode cannot publish.
     expect(Redis).toHaveBeenCalledTimes(2)
     expect(RedisPubSub).toHaveBeenCalledTimes(1)
+
     const { publisher, subscriber } = (RedisPubSub.mock.calls[0] as [Record<string, unknown>])[0]
+
     expect(publisher).not.toBe(subscriber)
   })
 
   it('passes host, port and password through', async () => {
     const { pubsub, Redis } = await load()
     pubsub()
+
     expect(redisOptions(Redis)).toMatchObject({
       host: 'redis.example.test',
       port: 6379,
@@ -117,6 +126,7 @@ describe('with Redis configured', () => {
     const { pubsub, Redis } = await load()
     pubsub()
     const { retryStrategy } = redisOptions(Redis)
+
     expect(retryStrategy).toBeDefined()
     expect(retryStrategy?.(1)).toBe(50)
     expect(retryStrategy?.(10)).toBe(500)
@@ -126,6 +136,7 @@ describe('with Redis configured', () => {
 
   it('memoises across calls', async () => {
     const { pubsub, RedisPubSub } = await load()
+
     expect(pubsub()).toBe(pubsub())
     expect(RedisPubSub).toHaveBeenCalledTimes(1)
   })

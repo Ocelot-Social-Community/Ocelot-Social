@@ -10,6 +10,8 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
+import { describe, it, expect } from 'vitest'
+
 import { ENV_REGISTRY, ENV_SPEC_BY_NAME } from './envRegistry'
 
 // Env vars config/index.ts reads that are intentionally NOT admin config rows (derived or
@@ -37,12 +39,15 @@ const configEnvReads = (): Set<string> => {
 describe('envRegistry ↔ config/index.ts env vars', () => {
   it('declares every env var the runtime config reads', () => {
     const reads = configEnvReads()
+
     // Sanity: the extraction found the reads at all (guards against a refactor that moves
     // env access behind a helper and silently empties this check).
     expect(reads.size).toBeGreaterThan(20)
+
     const missing = [...reads].filter(
       (name) => !(name in ENV_SPEC_BY_NAME) && !NON_REGISTRY_ENV_READS.has(name),
     )
+
     expect(missing).toEqual([])
   })
 
@@ -51,6 +56,7 @@ describe('envRegistry ↔ config/index.ts env vars', () => {
     const unread = ENV_REGISTRY.map((spec) => spec.name).filter(
       (name) => !reads.has(name) && !REGISTRY_ONLY_VARS.has(name),
     )
+
     expect(unread).toEqual([])
   })
 })

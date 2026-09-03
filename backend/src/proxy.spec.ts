@@ -1,7 +1,7 @@
 import { once } from 'node:events'
 import http from 'node:http'
 
-import { jest } from '@jest/globals'
+import { describe, beforeEach, afterEach, it, expect } from 'vitest'
 
 import createProxy from './proxy'
 
@@ -47,7 +47,7 @@ async function request(
   }
 }
 
-describe('createProxy', () => {
+describe(createProxy, () => {
   let target: http.Server
   let targetPort: number
   let proxy: http.Server
@@ -118,7 +118,7 @@ describe('createProxy', () => {
   })
 
   it('responds with 500 when the target is unreachable', async () => {
-    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined)
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
     const closedTarget = http.createServer()
     const closedPort = await listen(closedTarget)
     await close(closedTarget)
@@ -128,11 +128,14 @@ describe('createProxy', () => {
 
     try {
       const res = await request(brokenPort, { path: '/gone' })
+
       expect(res.status).toBe(500)
       expect(res.body).toBe('Proxy error')
       expect(res.headers['content-type']).toBe('text/plain')
       expect(errorSpy).toHaveBeenCalledTimes(1)
+
       const [prefix, err] = errorSpy.mock.calls[0] as [unknown, unknown]
+
       expect(prefix).toBe('Proxy request error:')
       expect((err as Error).message).toContain('ECONNREFUSED')
     } finally {

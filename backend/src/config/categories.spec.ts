@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import { ENV_CATEGORIES, categoryRank } from './categories'
 
 describe('ENV_CATEGORIES', () => {
@@ -11,11 +13,12 @@ describe('ENV_CATEGORIES', () => {
     const featureOrder = ENV_CATEGORIES.filter((category) =>
       ['registration', 'features', 'layout', 'video'].includes(category),
     )
+
     expect(featureOrder).toEqual(['registration', 'features', 'layout', 'video'])
   })
 })
 
-describe('categoryRank', () => {
+describe(categoryRank, () => {
   it('is the category index in the global display order', () => {
     expect(categoryRank('server')).toBe(0)
     expect(categoryRank(ENV_CATEGORIES[ENV_CATEGORIES.length - 1])).toBe(ENV_CATEGORIES.length - 1)

@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { describe, it, expect } from 'vitest'
+
 import extractHashtags from './extractHashtags'
 
-describe('extractHashtags', () => {
+describe(extractHashtags, () => {
   describe('content undefined', () => {
     it('returns empty array', () => {
       expect(extractHashtags()).toEqual([])
@@ -28,12 +30,14 @@ describe('extractHashtags', () => {
           </a>
         </p>
       `
+
       expect(extractHashtags(content)).toEqual(['Elections', 'Democracy'])
     })
 
     it('ignores mentions', () => {
       const content =
         '<p>Something inspirational about <a href="/profile/u2" target="_blank">@bob-der-baumeister</a> and <a href="/profile/u3/jenny-rostock" class="mention" target="_blank">@jenny-rostock</a>.</p>'
+
       expect(extractHashtags(content)).toEqual([])
     })
 
@@ -83,6 +87,7 @@ describe('extractHashtags', () => {
         </a>.
       </p>
       `
+
       expect(extractHashtags(content).sort()).toEqual([
         '0123456789a',
         'AbcDefXyz0123456789',
@@ -94,18 +99,21 @@ describe('extractHashtags', () => {
       it('`href` contains no Hashtag name', () => {
         const content =
           '<p>Something inspirational about <a href="/search/hashtag/" target="_blank">#Democracy</a> and <a href="/search/hashtag" target="_blank">#liberty</a>.</p>'
+
         expect(extractHashtags(content)).toEqual([])
       })
 
       it('`href` contains Hashtag as page anchor', () => {
         const content =
           '<p>Something inspirational about <a href="https://www.example.org/#anchor" target="_blank">#anchor</a>.</p>'
+
         expect(extractHashtags(content)).toEqual([])
       })
 
       it('`href` is empty or invalid', () => {
         const content =
           '<p>Something inspirational about <a href="" class="hashtag" target="_blank">@bob-der-baumeister</a> and <a href="not-a-url" target="_blank">@jenny-rostock</a>.</p>'
+
         expect(extractHashtags(content)).toEqual([])
       })
     })

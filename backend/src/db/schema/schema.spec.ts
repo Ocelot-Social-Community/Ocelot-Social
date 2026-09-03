@@ -1,4 +1,5 @@
 import { Ajv } from 'ajv'
+import { describe, expect, it } from 'vitest'
 
 import { sourcesOf, targetsOf } from './derive/rules'
 import { jsonSchemaFor, relationshipJsonSchemaFor } from './types'
@@ -30,6 +31,7 @@ describe('the declaration', () => {
         ...(entity.indexed ?? []),
         ...(entity.fulltext ?? []).flatMap((index) => index.properties),
       ]
+
       expect(declared).toEqual(expect.arrayContaining(referenced))
     }
   })
@@ -49,6 +51,7 @@ describe('the declaration', () => {
     // WROTE points at both Post and Comment; a single-target declaration would report every
     // comment edge as an endpoint violation.
     const wrote = relationships.find((relationship) => relationship.type === 'WROTE')
+
     expect(wrote).toBeDefined()
     expect(targetsOf(wrote as RelationshipDefinition).map((entity) => entity.label)).toEqual([
       'Post',
@@ -116,12 +119,13 @@ describe('validation', () => {
   it('validates edge properties against the edge declaration', () => {
     const [observes] = relationships.filter((relationship) => relationship.type === 'OBSERVES')
     const validate = ajv.compile(relationshipJsonSchemaFor(observes))
+
     expect(validate({ createdAt: '2026-08-19T10:00:00.000Z', active: true })).toBe(true)
     expect(validate({ createdAt: 'yesterday', active: true })).toBe(false)
   })
 })
 
-describe('validateProperty', () => {
+describe(validateProperty, () => {
   // The single-property path exists for resolvers that check an input before there is a node
   // to write — AddEmailAddress validates the address the user typed, while the node it will
   // eventually create also carries a nonce and a timestamp that do not exist yet.
@@ -230,16 +234,19 @@ describe('derived types', () => {
       updatedAt: '2026-08-19T10:00:00.000Z',
       about: null,
     }
+
     expect(user.about).toBeNull()
   })
 
   it('narrows an enum property to its literal values', () => {
     const post: Pick<EntityProperties<typeof Post>, 'postType'> = { postType: 'Article' }
+
     expect(post.postType).toBe('Article')
   })
 
   it('types a boolean property as boolean', () => {
     const role: Pick<EntityProperties<typeof Role>, 'protected'> = { protected: true }
+
     expect(role.protected).toBe(true)
   })
 })

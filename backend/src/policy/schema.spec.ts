@@ -1,7 +1,7 @@
 // Unit tests for the visibility primitive — the single mechanism shared by the
 // `policy` query resolver and the policyChanged subscription filter.
 
-import { jest } from '@jest/globals'
+import { describe, it, expect } from 'vitest'
 
 import {
   allKeys,
@@ -13,6 +13,14 @@ import {
   typeFor,
   visibleKeys,
 } from './schema'
+
+// vitest has no `isolateModulesAsync`: resetting the registry before the dynamic import does the
+// same job, since a module graph is only shared within a file. Wrapped so the call sites keep
+// reading as "load this in isolation".
+const isolateModules = async (run: () => Promise<void>): Promise<void> => {
+  vi.resetModules()
+  await run()
+}
 
 // The subset of ./schema the perm-gating tests re-import against a mocked JSON
 // schema. Built from the already-imported functions to avoid a namespace import.
@@ -32,6 +40,7 @@ describe('policy visibility', () => {
     it('returns a copy — mutating it does not alter the shared schema', () => {
       const audiences = audiencesFor('apiKeysEnabled')
       audiences.push('public') // would widen visibility if it were the shared ref
+
       expect(audiencesFor('apiKeysEnabled')).toEqual(['authenticated'])
       // canView must stay unaffected: an anonymous viewer still cannot see it.
       expect(canView('apiKeysEnabled', null)).toBe(false)
@@ -87,10 +96,10 @@ describe('policy visibility', () => {
     // The fresh module is passed as an object (not destructured) so its functions
     // don't shadow the outer imports.
     const withMockedSchema = async (run: (schema: SchemaModule) => void) => {
-      await jest.isolateModulesAsync(async () => {
+      await isolateModules(async () => {
         // `default:` because the consumer imports the JSON as a default; ESM mock factories get
         // no CommonJS interop layer to synthesise one.
-        jest.unstable_mockModule('./policy.schema.json', () => ({
+        vi.doMock('./policy.schema.json', () => ({
           default: {
             type: 'object',
             properties: {
@@ -127,6 +136,7 @@ describe('policy visibility', () => {
     it('gates an explicit perm:<key> on exactly that permission', async () => {
       await withMockedSchema((schema) => {
         const viewer = (permissions: string[]) => ({ authenticated: true, permissions })
+
         expect(schema.canView('badgeGatedKey' as never, viewer(['badge.manage']))).toBe(true)
         // a different held permission must NOT unlock it
         expect(schema.canView('badgeGatedKey' as never, viewer(['policy.manage']))).toBe(false)
@@ -197,7 +207,7 @@ describe('policy visibility', () => {
   })
 })
 
-describe('categoryFor', () => {
+describe(categoryFor, () => {
   it('returns each key’s declared admin-config category', () => {
     expect(categoryFor('publicRegistration')).toBe('registration')
     expect(categoryFor('inviteLinkLimit')).toBe('registration')
@@ -215,7 +225,7 @@ describe('categoryFor', () => {
   })
 })
 
-describe('requiresPolicyFor', () => {
+describe(requiresPolicyFor, () => {
   it('returns the declared policy→policy dependencies (empty for most keys)', () => {
     expect(requiresPolicyFor('showGroupButtonInHeader')).toEqual(['groupsEnabled'])
     expect(requiresPolicyFor('groupsEnabled')).toEqual([])
@@ -225,6 +235,7 @@ describe('requiresPolicyFor', () => {
   it('returns a fresh copy — a caller mutating it cannot alter the shared schema', () => {
     const deps = requiresPolicyFor('showGroupButtonInHeader')
     deps.push('groupsEnabled')
+
     expect(requiresPolicyFor('showGroupButtonInHeader')).toEqual(['groupsEnabled'])
   })
 
@@ -239,6 +250,7 @@ describe('requiresPolicyFor', () => {
         expect(allKeys()).toContain(dep)
         expect(typeFor(key)).toBe('boolean')
         expect(typeFor(dep)).toBe('boolean')
+
         // Every audience that can see the dependent must also see the dependency.
         for (const audience of keyAudiences) {
           expect(audiencesFor(dep)).toContain(audience)
@@ -258,8 +270,8 @@ describe('requiresPolicyFor', () => {
     // Async: ESM has no synchronous module load. isolateModulesAsync would swallow the load
     // rejection this asserts on, so the registry is reset directly instead.
     const loadWith = (properties: Record<string, unknown>) => async (): Promise<void> => {
-      jest.resetModules()
-      jest.unstable_mockModule('./policy.schema.json', () => ({
+      vi.resetModules()
+      vi.doMock('./policy.schema.json', () => ({
         default: { type: 'object', properties },
       }))
       await import('./schema')

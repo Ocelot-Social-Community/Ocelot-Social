@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import { entities, relationships } from '@db/schema/index'
 
 import { applyPlan, enforce, planConstraints, SchemaEnforcementError } from './apply'
@@ -93,11 +95,12 @@ const presentIndex = (
   uniqueness: 'UNIQUE' | 'NONUNIQUE' = 'NONUNIQUE',
 ) => ({ name, labelsOrTypes: [label], properties, uniqueness, type: 'BTREE' as const })
 
-describe('planConstraints', () => {
+describe(planConstraints, () => {
   const items = planConstraints(entities, relationships, 'neo4j-community')
 
   it('plans one statement per enforceable rule', () => {
     expect(items.length).toBeGreaterThan(0)
+
     for (const item of items) {
       expect(item.statement).toContain('CREATE CONSTRAINT')
     }
@@ -119,16 +122,18 @@ describe('planConstraints', () => {
   })
 })
 
-describe('applyPlan', () => {
+describe(applyPlan, () => {
   it('creates indices before constraints, so a rejected constraint costs no index', async () => {
     const { runner, calls } = stubRunner()
     await applyPlan(runner, plan, ['CREATE INDEX Role_name_index'])
+
     expect(calls[0]).toBe('execute CREATE INDEX Role_name_index')
   })
 
   it('applies a statement whose audit is clean', async () => {
     const { runner, calls } = stubRunner()
     const report = await applyPlan(runner, plan)
+
     expect(report.applied).toContain(CONSTRAINT)
     expect(calls).toContain(`count ${AUDIT}`)
     expect(calls.indexOf(`count ${AUDIT}`)).toBeLessThan(calls.indexOf(`execute ${CONSTRAINT}`))
@@ -137,6 +142,7 @@ describe('applyPlan', () => {
   it('skips a statement whose audit finds violations, and never sends it', async () => {
     const { runner, calls } = stubRunner({ violations: new Map([[AUDIT, 3]]) })
     const report = await applyPlan(runner, plan)
+
     expect(report.skipped).toEqual([
       {
         statement: CONSTRAINT,
@@ -156,10 +162,12 @@ describe('applyPlan', () => {
     // notice — the report would look identical.
     const clean = stubRunner()
     await applyPlan(clean.runner, plan)
+
     expect(clean.calls.filter((call) => call.startsWith('sample'))).toEqual([])
 
     const violating = stubRunner({ violations: new Map([[AUDIT, 3]]) })
     await applyPlan(violating.runner, plan)
+
     expect(violating.calls.filter((call) => call.startsWith('sample'))).toEqual([
       'sample SAMPLE User.slug',
     ])
@@ -168,12 +176,14 @@ describe('applyPlan', () => {
   it('carries on with the remaining statements after a skip', async () => {
     const { runner } = stubRunner({ violations: new Map([[AUDIT, 1]]) })
     const report = await applyPlan(runner, plan)
+
     expect(report.applied).toEqual(['CREATE CONSTRAINT Role_id_unique'])
   })
 
   it('records a rejected statement with its Neo4j code and carries on', async () => {
     const { runner } = stubRunner({ rejects: ['User_slug_unique'] })
     const report = await applyPlan(runner, plan)
+
     expect(report.failed).toEqual([
       {
         statement: CONSTRAINT,
@@ -187,6 +197,7 @@ describe('applyPlan', () => {
   it('does not stop the run when an index cannot be created', async () => {
     const { runner } = stubRunner({ rejects: ['INDEX'] })
     const report = await applyPlan(runner, plan, ['CREATE INDEX broken'])
+
     expect(report.failed).toHaveLength(1)
     expect(report.applied).toContain(CONSTRAINT)
   })
@@ -197,6 +208,7 @@ describe('applyPlan', () => {
     // must not turn a repeated deployment into a red one.
     const { runner } = stubRunner({ alreadyThere: ['fulltext'] })
     const report = await applyPlan(runner, [], ['CALL db.index.fulltext.createNodeIndex("x")'])
+
     expect(report.unchanged).toEqual(['CALL db.index.fulltext.createNodeIndex("x")'])
     expect(report.failed).toEqual([])
   })
@@ -204,6 +216,7 @@ describe('applyPlan', () => {
   it('keeps unchanged out of applied, so a no-op run does not claim work', async () => {
     const { runner } = stubRunner({ alreadyThere: ['fulltext'] })
     const report = await applyPlan(runner, [], ['CALL db.index.fulltext.createNodeIndex("x")'])
+
     expect(report.applied).toEqual([])
   })
 
@@ -217,6 +230,7 @@ describe('applyPlan', () => {
         indices: [presentIndex('User_slug_index', 'User', ['slug'])],
       })
       const report = await applyPlan(runner, supersedingPlan)
+
       expect(calls).toEqual([
         `count ${AUDIT}`,
         'sample SHOW INDEXES',
@@ -238,6 +252,7 @@ describe('applyPlan', () => {
         rejects: [CONSTRAINT, 'CREATE INDEX'],
       })
       const report = await applyPlan(runner, supersedingPlan)
+
       // Still in `superseded`, because that is the truth: dropped, and not back.
       expect(report.superseded).toEqual(['User_slug_index'])
       expect(report.failed.map((item) => item.message)).toEqual([
@@ -254,6 +269,7 @@ describe('applyPlan', () => {
         rejects: [CONSTRAINT, 'CREATE INDEX'],
       })
       const report = await applyPlan(runner, supersedingPlan)
+
       expect(() => {
         enforce(report, 'report')
       }).toThrow(SchemaEnforcementError)
@@ -267,6 +283,7 @@ describe('applyPlan', () => {
         indices: [presentIndex('User_slug_index', 'User', ['slug'])],
       })
       const report = await applyPlan(runner, supersedingPlan)
+
       expect(calls).not.toContain('sample SHOW INDEXES')
       expect(calls.filter((call) => call.startsWith('execute DROP'))).toEqual([])
       expect(report.superseded).toEqual([])
@@ -279,6 +296,7 @@ describe('applyPlan', () => {
         indices: [presentIndex('User_slug_unique', 'User', ['slug'], 'UNIQUE')],
       })
       const report = await applyPlan(runner, supersedingPlan)
+
       expect(calls.filter((call) => call.startsWith('execute DROP'))).toEqual([])
       expect(report.superseded).toEqual([])
     })
@@ -294,6 +312,7 @@ describe('applyPlan', () => {
         ],
       })
       const report = await applyPlan(runner, supersedingPlan)
+
       expect(calls.filter((call) => call.startsWith('execute DROP'))).toEqual([])
       expect(report.superseded).toEqual([])
     })
@@ -307,6 +326,7 @@ describe('applyPlan', () => {
         ],
       })
       await applyPlan(runner, supersedingPlan)
+
       expect(calls.filter((call) => call.startsWith('execute DROP'))).toEqual([])
     })
 
@@ -319,6 +339,7 @@ describe('applyPlan', () => {
         indices: [presentIndex('User_slug_index', 'User', ['slug'])],
       })
       const report = await applyPlan(runner, supersedingPlan)
+
       expect(calls).toContain(
         'execute CREATE INDEX `User_slug_index` IF NOT EXISTS FOR (n:User) ON (n.slug)',
       )
@@ -329,6 +350,7 @@ describe('applyPlan', () => {
     it('costs one read and nothing else on a database that has no such index', async () => {
       const { runner, calls } = stubRunner({ indices: [] })
       const report = await applyPlan(runner, supersedingPlan)
+
       expect(calls.filter((call) => call.startsWith('execute'))).toEqual([`execute ${CONSTRAINT}`])
       expect(report.superseded).toEqual([])
     })
@@ -337,11 +359,12 @@ describe('applyPlan', () => {
   it('passes unsupported objects through instead of dropping them silently', async () => {
     const { runner } = stubRunner()
     const report = await applyPlan(runner, [], [], ['fulltext index x on Y(z)'])
+
     expect(report.unsupported).toEqual(['fulltext index x on Y(z)'])
   })
 })
 
-describe('enforce', () => {
+describe(enforce, () => {
   const clean: ApplyReport = {
     applied: ['x'],
     unchanged: [],

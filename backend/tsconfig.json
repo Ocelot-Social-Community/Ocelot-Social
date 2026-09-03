@@ -61,7 +61,11 @@
     },
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
     // "typeRoots": [],                                  /* Specify multiple folders that act like './node_modules/@types'. */
-    // "types": [],                                      /* Specify type package names to be included without being referenced in a source file. */
+    /* `globals: true` in vitest.config.ts puts describe/it/expect AND `vi` in global scope; these
+       are the declarations for them. Naming `types` at all turns OFF automatic inclusion of every
+       @types package, so `node` has to be listed explicitly — everything else this project uses
+       (@types/lodash, @types/validator …) is reached through imports and needs no global. */
+    "types": ["node", "vitest/globals"],
     // "allowUmdGlobalAccess": true,                     /* Allow accessing UMD globals from modules. */
     // "moduleSuffixes": [],                             /* List of file name suffixes to search when resolving a module. */
     // "allowImportingTsExtensions": true,               /* Allow imports to include TypeScript file extensions. Requires '--moduleResolution bundler' and either '--noEmit' or '--emitDeclarationOnly' to be set. */
@@ -135,7 +139,7 @@
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
-  "exclude": ["eslint.config.ts", "prettier.config.ts", "jest.config.ts"],
+  "exclude": ["eslint.config.ts", "prettier.config.ts"],
   /* Node needs explicit extensions in ESM specifiers, the `import-x/extensions` lint rule forbids
      writing them. Both hold: the source stays extensionless and tsc-alias adds the extension to
      the EMIT, alongside the alias resolution it already did. */

@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import findProvider from './findProvider'
 
 describe('Vimeo', () => {
@@ -26,9 +28,7 @@ describe('GIPHY', () => {
 
 describe('Flicker', () => {
   it('matches `https://flic.kr/p/VT2HCQ`', () => {
-    expect(findProvider('https://flic.kr/p/VT2HCQ')).toEqual(
-      'https://www.flickr.com/services/oembed/',
-    )
+    expect(findProvider('https://flic.kr/p/VT2HCQ')).toBe('https://www.flickr.com/services/oembed/')
   })
 })
 
@@ -60,7 +60,7 @@ describe('Reddit', () => {
   it('matches `https://www.reddit.com/r/LivestreamFail/comments/d6a2ge/greek_banned/`', () => {
     expect(
       findProvider('https://www.reddit.com/r/LivestreamFail/comments/d6a2ge/greek_banned/'),
-    ).toEqual('https://www.reddit.com/oembed')
+    ).toBe('https://www.reddit.com/oembed')
   })
 })
 
@@ -70,7 +70,7 @@ describe('Slideshare', () => {
       findProvider(
         'https://www.slideshare.net/ma6/lets-build-an-airport-how-to-estimate-large-scale-projects',
       ),
-    ).toEqual('http://www.slideshare.net/api/oembed/2')
+    ).toBe('http://www.slideshare.net/api/oembed/2')
   })
 })
 
@@ -78,7 +78,7 @@ describe('Soundcloud', () => {
   it('matches `https://soundcloud.com/placid-records/zangenhand-live-altes-wettb-ro`', () => {
     expect(
       findProvider('https://soundcloud.com/placid-records/zangenhand-live-altes-wettb-ro'),
-    ).toEqual('https://soundcloud.com/oembed')
+    ).toBe('https://soundcloud.com/oembed')
   })
 })
 
@@ -100,7 +100,7 @@ describe('Facebook', () => {
   it('matches `https://www.facebook.com/FacebookDeutschland/videos/1960353927603280/`', () => {
     expect(
       findProvider('https://www.facebook.com/FacebookDeutschland/videos/1960353927603280/'),
-    ).toEqual('https://www.facebook.com/plugins/post/oembed.json')
+    ).toBe('https://www.facebook.com/plugins/post/oembed.json')
   })
 })
 
@@ -116,8 +116,6 @@ describe('Youtube', () => {
   })
 
   it('matches `https://youtu.be/qkdXAtO40Fo?t=41`', () => {
-    expect(findProvider(`https://youtu.be/qkdXAtO40Fo?t=41`)).toEqual(
-      'https://www.youtube.com/oembed',
-    )
+    expect(findProvider(`https://youtu.be/qkdXAtO40Fo?t=41`)).toBe('https://www.youtube.com/oembed')
   })
 })

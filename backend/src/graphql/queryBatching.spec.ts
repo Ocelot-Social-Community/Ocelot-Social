@@ -8,7 +8,8 @@
 // of monkey-patching; the indexed access uses two literal method names, not input.
 /* eslint-disable security/detect-object-injection */
 /* eslint-disable @typescript-eslint/require-await */
-import { jest } from '@jest/globals'
+
+import { beforeAll, afterAll, describe, it, expect } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -107,7 +108,7 @@ const countRoundTrips = async (
     }
   }
 
-  const spy = jest.spyOn(driver, 'session').mockImplementation(((...args: any[]) => {
+  const spy = vi.spyOn(driver, 'session').mockImplementation(((...args: any[]) => {
     const session = openSession(...args)
     instrument(session, 'readTransaction')
     instrument(session, 'writeTransaction')
@@ -243,6 +244,7 @@ describe('Cypher round trips', () => {
     expect(rows).toBe(12)
 
     const withDuplicates = idBatches.filter((ids) => new Set(ids).size !== ids.length)
+
     expect(withDuplicates).toEqual([])
     // Guard the probe: no batches at all would satisfy the assertion vacuously.
     expect(idBatches.length).toBeGreaterThan(0)

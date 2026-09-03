@@ -1,6 +1,8 @@
+import { describe, beforeEach, it, expect } from 'vitest'
+
 import { sendResetPasswordMail, defaultParams } from './sendEmail'
 
-describe('sendResetPasswordMail', () => {
+describe(sendResetPasswordMail, () => {
   const data: {
     email: string
     nonce: string

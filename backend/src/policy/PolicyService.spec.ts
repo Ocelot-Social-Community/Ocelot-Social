@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 // Unit tests for PolicyService — no DB dependency. The repository is mocked
 // so we can verify resolution-order (DB > ENV > Schema-Default) deterministically.
-// (no-unsafe-assignment disabled: jest matchers like expect.objectContaining are `any`.)
+// (no-unsafe-assignment disabled: matchers like expect.objectContaining are `any`.)
 
-import { jest } from '@jest/globals'
+import { describe, beforeEach, it, expect, afterEach } from 'vitest'
 
 import type { PolicyChangeEvent, PolicyPubSub } from './PolicyService'
 import type {
@@ -14,8 +14,8 @@ import type {
 } from './repository'
 import type { PolicyKey } from './types'
 
-// The mocks carry the real signatures: `@jest/globals` types a bare `jest.fn()` as
-// `Mock<UnknownFunction>`, whose `mockResolvedValue` argument is `never`.
+// The mocks carry the real signatures: a bare `vi.fn()` types its `mockResolvedValue` argument
+// as `any`, which would let a wrong shape through unnoticed.
 interface Repository {
   readAllSettings: typeof ReadAllSettings
   readLastChange: typeof ReadLastChange
@@ -23,16 +23,16 @@ interface Repository {
   deleteSetting: typeof DeleteSetting
 }
 
-jest.unstable_mockModule('./repository', () => ({
+vi.mock('./repository', () => ({
   POLICY_NAMESPACE: 'policy',
-  readAllSettings: jest.fn<Repository['readAllSettings']>(),
-  readLastChange: jest.fn<Repository['readLastChange']>().mockResolvedValue(null),
-  writeSetting: jest.fn<Repository['writeSetting']>(),
-  deleteSetting: jest.fn<Repository['deleteSetting']>(),
+  readAllSettings: vi.fn<Repository['readAllSettings']>(),
+  readLastChange: vi.fn<Repository['readLastChange']>().mockResolvedValue(null),
+  writeSetting: vi.fn<Repository['writeSetting']>(),
+  deleteSetting: vi.fn<Repository['deleteSetting']>(),
 }))
 
-// Imported after the mock registrations, not above them: `unstable_mockModule`
-// does not hoist, so a static import would bind the real module first.
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const {
   PolicyService,
   createInMemoryPolicyService,
@@ -47,10 +47,10 @@ const {
   deleteSetting: deleteSettingImpl,
 } = await import('./repository')
 
-const readAllSettings = readAllSettingsImpl as jest.MockedFunction<typeof readAllSettingsImpl>
-const readLastChange = readLastChangeImpl as jest.MockedFunction<typeof readLastChangeImpl>
-const writeSetting = writeSettingImpl as jest.MockedFunction<typeof writeSettingImpl>
-const deleteSetting = deleteSettingImpl as jest.MockedFunction<typeof deleteSettingImpl>
+const readAllSettings = vi.mocked(readAllSettingsImpl)
+const readLastChange = vi.mocked(readLastChangeImpl)
+const writeSetting = vi.mocked(writeSettingImpl)
+const deleteSetting = vi.mocked(deleteSettingImpl)
 
 // A minimal stub for the database-context shape that PolicyService passes through.
 // The repository is mocked above, so this object is never actually consulted.
@@ -58,7 +58,7 @@ const dbStub = {} as never
 
 describe('PolicyService', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('init() resolution order', () => {
@@ -141,11 +141,13 @@ describe('PolicyService', () => {
       readAllSettings.mockResolvedValue({ publicRegistration: true })
       const svc = new PolicyService(dbStub)
       await svc.init({})
+
       expect(svc.get('publicRegistration')).toBe(true)
 
       // The DB changed out-of-process (e.g. a db:reset/seed); reload re-reads it.
       readAllSettings.mockResolvedValue({ publicRegistration: false })
       await svc.reload()
+
       expect(svc.get('publicRegistration')).toBe(false)
     })
 
@@ -155,7 +157,7 @@ describe('PolicyService', () => {
       // not left for the next restart to re-read. Must not throw (a bad row may
       // not crash startup).
       readAllSettings.mockResolvedValue({ publicRegistration: 42 })
-      const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
       const svc = new PolicyService(dbStub)
       await svc.init({ PUBLIC_REGISTRATION: 'true' })
@@ -211,6 +213,7 @@ describe('PolicyService', () => {
     it('returns authenticated-only keys as null to an anonymous viewer', async () => {
       const svc = await initService()
       const snap = svc.getVisibleSnapshot(null)
+
       expect(Object.keys(snap).sort()).toEqual(ALL_KEYS)
       expect(snap.apiKeysEnabled).toBeNull()
       expect(snap.publicRegistration).toBe(false) // public key still has its value
@@ -219,6 +222,7 @@ describe('PolicyService', () => {
     it('exposes authenticated key values to a logged-in viewer', async () => {
       const svc = await initService()
       const snap = svc.getVisibleSnapshot({ authenticated: true })
+
       expect(Object.keys(snap).sort()).toEqual(ALL_KEYS)
       expect(snap.apiKeysEnabled).toBe(false) // value, not null
     })
@@ -228,6 +232,7 @@ describe('PolicyService', () => {
       // admin's effective permissions cover any permission-gated key; the shipped
       // keys are all public/authenticated, so an authenticated viewer sees them.
       const snap = svc.getVisibleSnapshot({ authenticated: true, permissions: ['policy.manage'] })
+
       expect(Object.keys(snap).sort()).toEqual(ALL_KEYS)
       expect(snap.apiKeysEnabled).toBe(false)
     })
@@ -235,6 +240,7 @@ describe('PolicyService', () => {
     it('returns integer keys as numbers (schema default) to a logged-in viewer', async () => {
       const svc = await initService()
       const snap = svc.getVisibleSnapshot({ authenticated: true })
+
       expect(snap.apiKeysMaxPerUser).toBe(5) // integer schema default, not coerced to boolean
       expect(snap.maxGroupPinnedPosts).toBe(1)
     })
@@ -242,6 +248,7 @@ describe('PolicyService', () => {
     it('hides authenticated integer keys as null from an anonymous viewer', async () => {
       const svc = await initService()
       const snap = svc.getVisibleSnapshot(null)
+
       expect(snap.apiKeysMaxPerUser).toBeNull()
       expect(snap.maxGroupPinnedPosts).toBeNull()
     })
@@ -304,6 +311,7 @@ describe('PolicyService', () => {
       readLastChange.mockResolvedValue(null)
       const svc = new PolicyService(dbStub)
       await svc.init({})
+
       expect(svc.getLastChange()).toBeNull()
     })
 
@@ -312,6 +320,7 @@ describe('PolicyService', () => {
       readLastChange.mockResolvedValue({ actor: 'someone', timestamp: '2020-01-01T00:00:00.000Z' })
       const svc = new PolicyService(dbStub)
       await svc.init({})
+
       expect(svc.getLastChange()).toEqual({
         actor: 'someone',
         timestamp: '2020-01-01T00:00:00.000Z',
@@ -324,6 +333,7 @@ describe('PolicyService', () => {
       const svc = new PolicyService(dbStub)
       await svc.init({})
       const event = await svc.set('publicRegistration', true, 'admin-id-1')
+
       expect(svc.getLastChange()).toEqual({ actor: 'admin-id-1', timestamp: event.timestamp })
     })
 
@@ -338,6 +348,7 @@ describe('PolicyService', () => {
         actor: 'remote-admin',
         timestamp: '2021-02-03T04:05:06.000Z',
       })
+
       expect(svc.getLastChange()).toEqual({
         actor: 'remote-admin',
         timestamp: '2021-02-03T04:05:06.000Z',
@@ -351,6 +362,7 @@ describe('PolicyService', () => {
         publicRegistration: true,
         categoriesActive: true,
       })
+
       expect(svc.get('publicRegistration')).toBe(true)
       expect(svc.get('categoriesActive')).toBe(true)
       // Unspecified keys still fall back to schema default
@@ -361,6 +373,7 @@ describe('PolicyService', () => {
 
     it('has a no-op init() that touches no DB (the double has none)', async () => {
       const svc = createInMemoryPolicyService({ publicRegistration: true })
+
       // Must resolve without hitting the repository / undefined this.db.
       await expect(svc.init({})).resolves.toBeUndefined()
       expect(readAllSettings).not.toHaveBeenCalled()
@@ -376,6 +389,7 @@ describe('PolicyService', () => {
         showGroupButtonInHeader: true,
         groupsEnabled: false,
       })
+
       expect(svc.get('showGroupButtonInHeader')).toBe(true)
       expect(svc.getEffective('groupsEnabled')).toBe(false)
       expect(svc.getEffective('showGroupButtonInHeader')).toBe(false)
@@ -386,12 +400,15 @@ describe('PolicyService', () => {
         showGroupButtonInHeader: true,
         groupsEnabled: true,
       })
+
       expect(on.getEffective('showGroupButtonInHeader')).toBe(true)
+
       // The dependency being on does not override the key's own off state.
       const off = createInMemoryPolicyService({
         showGroupButtonInHeader: false,
         groupsEnabled: true,
       })
+
       expect(off.getEffective('showGroupButtonInHeader')).toBe(false)
     })
   })
@@ -399,11 +416,11 @@ describe('PolicyService', () => {
   describe('set()', () => {
     it('persists the value, updates the cache, and publishes a change event', async () => {
       readAllSettings.mockResolvedValue({})
-      const publish = jest.fn<PolicyPubSub['publish']>()
+      const publish = vi.fn<PolicyPubSub['publish']>()
       const pubsub: PolicyPubSub = {
         publish,
-        subscribe: jest.fn<PolicyPubSub['subscribe']>().mockResolvedValue(1),
-        unsubscribe: jest.fn<PolicyPubSub['unsubscribe']>(),
+        subscribe: vi.fn<PolicyPubSub['subscribe']>().mockResolvedValue(1),
+        unsubscribe: vi.fn<PolicyPubSub['unsubscribe']>(),
       }
 
       const svc = new PolicyService(dbStub)
@@ -509,13 +526,11 @@ describe('PolicyService', () => {
 
     it('still commits and logs (no throw / no unhandled rejection) when publish fails', async () => {
       readAllSettings.mockResolvedValue({})
-      const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
       const pubsub: PolicyPubSub = {
-        publish: jest
-          .fn<PolicyPubSub['publish']>()
-          .mockImplementation(async () => Promise.reject(new Error('redis down'))),
-        subscribe: jest.fn<PolicyPubSub['subscribe']>().mockResolvedValue(1),
-        unsubscribe: jest.fn<PolicyPubSub['unsubscribe']>(),
+        publish: vi.fn<PolicyPubSub['publish']>().mockRejectedValue(new Error('redis down')),
+        subscribe: vi.fn<PolicyPubSub['subscribe']>().mockResolvedValue(1),
+        unsubscribe: vi.fn<PolicyPubSub['unsubscribe']>(),
       }
 
       const svc = new PolicyService(dbStub)
@@ -528,6 +543,7 @@ describe('PolicyService', () => {
       // Let the catch on the floating publish promise run, then assert it logged.
       await Promise.resolve()
       await Promise.resolve()
+
       expect(warn).toHaveBeenCalledWith(
         expect.stringContaining('failed to publish'),
         expect.any(Error),
@@ -538,15 +554,15 @@ describe('PolicyService', () => {
 
     it('still commits and does not throw when publish fails SYNCHRONOUSLY', async () => {
       readAllSettings.mockResolvedValue({})
-      const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
       const pubsub: PolicyPubSub = {
         // Synchronous throw (not a rejected promise) — the non-blocking guarantee
         // must still hold: set() resolves, the change is committed, it is logged.
-        publish: jest.fn(() => {
+        publish: vi.fn(() => {
           throw new Error('redis sync error')
         }),
-        subscribe: jest.fn<PolicyPubSub['subscribe']>().mockResolvedValue(1),
-        unsubscribe: jest.fn<PolicyPubSub['unsubscribe']>(),
+        subscribe: vi.fn<PolicyPubSub['subscribe']>().mockResolvedValue(1),
+        unsubscribe: vi.fn<PolicyPubSub['unsubscribe']>(),
       }
 
       const svc = new PolicyService(dbStub)
@@ -592,11 +608,11 @@ describe('PolicyService', () => {
 
     it('publishes a change event', async () => {
       readAllSettings.mockResolvedValue({})
-      const publish = jest.fn<PolicyPubSub['publish']>()
+      const publish = vi.fn<PolicyPubSub['publish']>()
       const pubsub: PolicyPubSub = {
         publish,
-        subscribe: jest.fn<PolicyPubSub['subscribe']>().mockResolvedValue(1),
-        unsubscribe: jest.fn<PolicyPubSub['unsubscribe']>(),
+        subscribe: vi.fn<PolicyPubSub['subscribe']>().mockResolvedValue(1),
+        unsubscribe: vi.fn<PolicyPubSub['unsubscribe']>(),
       }
 
       const svc = new PolicyService(dbStub)
@@ -647,11 +663,11 @@ describe('PolicyService', () => {
 
     it('publishes one change event per key that actually changed', async () => {
       readAllSettings.mockResolvedValue({ publicRegistration: true, categoriesActive: true })
-      const publish = jest.fn<PolicyPubSub['publish']>()
+      const publish = vi.fn<PolicyPubSub['publish']>()
       const pubsub: PolicyPubSub = {
         publish,
-        subscribe: jest.fn<PolicyPubSub['subscribe']>().mockResolvedValue(1),
-        unsubscribe: jest.fn<PolicyPubSub['unsubscribe']>(),
+        subscribe: vi.fn<PolicyPubSub['subscribe']>().mockResolvedValue(1),
+        unsubscribe: vi.fn<PolicyPubSub['unsubscribe']>(),
       }
       const svc = new PolicyService(dbStub)
       await svc.init({}, pubsub) // defaults: publicRegistration=false, categoriesActive=false, inviteRegistration=true
@@ -700,7 +716,7 @@ describe('PolicyService', () => {
     it('discards a change whose value type does not match the schema', async () => {
       readAllSettings.mockResolvedValue({})
       readLastChange.mockResolvedValue(null)
-      const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
       const svc = new PolicyService(dbStub)
       await svc.init({})
 
@@ -724,11 +740,11 @@ describe('PolicyService', () => {
   describe('init() with pubsub', () => {
     it('subscribes to POLICY_CHANGED_CHANNEL', async () => {
       readAllSettings.mockResolvedValue({})
-      const subscribe = jest.fn<PolicyPubSub['subscribe']>().mockResolvedValue(42)
+      const subscribe = vi.fn<PolicyPubSub['subscribe']>().mockResolvedValue(42)
       const pubsub: PolicyPubSub = {
-        publish: jest.fn<PolicyPubSub['publish']>(),
+        publish: vi.fn<PolicyPubSub['publish']>(),
         subscribe,
-        unsubscribe: jest.fn<PolicyPubSub['unsubscribe']>(),
+        unsubscribe: vi.fn<PolicyPubSub['unsubscribe']>(),
       }
 
       const svc = new PolicyService(dbStub)
@@ -741,19 +757,20 @@ describe('PolicyService', () => {
       readAllSettings.mockResolvedValue({})
       let onMessage: ((payload: { policyChanged: PolicyChangeEvent }) => void) | undefined
       const pubsub: PolicyPubSub = {
-        publish: jest.fn<PolicyPubSub['publish']>(),
-        subscribe: jest
+        publish: vi.fn<PolicyPubSub['publish']>(),
+        subscribe: vi
           .fn<PolicyPubSub['subscribe']>()
           .mockImplementation(async (_channel, handler) => {
             onMessage = handler
             await Promise.resolve()
             return 7
           }),
-        unsubscribe: jest.fn<PolicyPubSub['unsubscribe']>(),
+        unsubscribe: vi.fn<PolicyPubSub['unsubscribe']>(),
       }
 
       const svc = new PolicyService(dbStub)
       await svc.init({}, pubsub)
+
       expect(svc.get('publicRegistration')).toBe(false)
 
       onMessage?.({
@@ -775,15 +792,15 @@ describe('PolicyService', () => {
     it('does not lose a change that arrives during init (subscribe-first; snapshot does not clobber)', async () => {
       let onMessage: ((payload: { policyChanged: PolicyChangeEvent }) => void) | undefined
       const pubsub: PolicyPubSub = {
-        publish: jest.fn<PolicyPubSub['publish']>(),
-        subscribe: jest
+        publish: vi.fn<PolicyPubSub['publish']>(),
+        subscribe: vi
           .fn<PolicyPubSub['subscribe']>()
           .mockImplementation(async (_channel, handler) => {
             onMessage = handler
             await Promise.resolve()
             return 1
           }),
-        unsubscribe: jest.fn<PolicyPubSub['unsubscribe']>(),
+        unsubscribe: vi.fn<PolicyPubSub['unsubscribe']>(),
       }
       // Another instance publishes a change while we read the (now stale) snapshot.
       // Because we subscribe BEFORE reading, the callback is already live; the
@@ -812,15 +829,15 @@ describe('PolicyService', () => {
       readAllSettings.mockResolvedValue({}) // key missing → seed path runs
       let onMessage: ((payload: { policyChanged: PolicyChangeEvent }) => void) | undefined
       const pubsub: PolicyPubSub = {
-        publish: jest.fn<PolicyPubSub['publish']>(),
-        subscribe: jest
+        publish: vi.fn<PolicyPubSub['publish']>(),
+        subscribe: vi
           .fn<PolicyPubSub['subscribe']>()
           .mockImplementation(async (_channel, handler) => {
             onMessage = handler
             await Promise.resolve()
             return 1
           }),
-        unsubscribe: jest.fn<PolicyPubSub['unsubscribe']>(),
+        unsubscribe: vi.fn<PolicyPubSub['unsubscribe']>(),
       }
       // While we seed 'publicRegistration' (default false), a concurrent admin
       // change event arrives mid-write. The post-await cache re-check (`??=`) must
@@ -850,10 +867,10 @@ describe('PolicyService', () => {
   describe('shutdown()', () => {
     it('unsubscribes from the pubsub channel', async () => {
       readAllSettings.mockResolvedValue({})
-      const unsubscribe = jest.fn()
+      const unsubscribe = vi.fn()
       const pubsub: PolicyPubSub = {
-        publish: jest.fn<PolicyPubSub['publish']>(),
-        subscribe: jest.fn<PolicyPubSub['subscribe']>().mockResolvedValue(99),
+        publish: vi.fn<PolicyPubSub['publish']>(),
+        subscribe: vi.fn<PolicyPubSub['subscribe']>().mockResolvedValue(99),
         unsubscribe,
       }
 
@@ -862,8 +879,10 @@ describe('PolicyService', () => {
       svc.shutdown()
 
       expect(unsubscribe).toHaveBeenCalledWith(99)
+
       // Idempotent: a second shutdown does not unsubscribe again.
       svc.shutdown()
+
       expect(unsubscribe).toHaveBeenCalledTimes(1)
     })
 
@@ -871,6 +890,7 @@ describe('PolicyService', () => {
       readAllSettings.mockResolvedValue({})
       const svc = new PolicyService(dbStub)
       await svc.init({}) // no pubsub
+
       expect(() => {
         svc.shutdown()
       }).not.toThrow()
@@ -880,6 +900,7 @@ describe('PolicyService', () => {
   describe('get() before init()', () => {
     it('falls back to the schema default', () => {
       const svc = new PolicyService(dbStub)
+
       expect(svc.get('inviteRegistration')).toBe(true) // schema default, no DB access
       expect(svc.get('publicRegistration')).toBe(false)
       expect(readAllSettings).not.toHaveBeenCalled()
@@ -895,12 +916,14 @@ describe('PolicyService', () => {
       setPolicyServiceForTesting(undefined)
       const a = getPolicyService()
       const b = getPolicyService()
+
       expect(a).toBe(b)
     })
 
     it('can be swapped out for testing', () => {
       const fake = createInMemoryPolicyService({ publicRegistration: true })
       setPolicyServiceForTesting(fake)
+
       expect(getPolicyService()).toBe(fake)
     })
   })

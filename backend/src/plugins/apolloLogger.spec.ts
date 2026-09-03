@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
-import { jest } from '@jest/globals'
+import { beforeAll, afterAll, afterEach, describe, beforeEach, it, expect } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import login from '@graphql/queries/auth/login.gql'
@@ -34,8 +34,8 @@ afterAll(async () => {
   database.neode.close()
 })
 
-const loggerSpy = jest.spyOn(ocelotLogger, 'debug')
-const consoleSpy = jest.spyOn(console, 'log')
+const loggerSpy = vi.spyOn(ocelotLogger, 'debug')
+const consoleSpy = vi.spyOn(console, 'log')
 
 afterEach(async () => {
   await cleanDatabase()

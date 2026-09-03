@@ -9,6 +9,8 @@
 // group surface — the Group query, group search, and the create/join/update/leave
 // mutations — is rejected, and that a profile's groups field folds to []. Kept separate so
 // the huge groups.spec's shared `policy` object stays untouched.
+import { beforeAll, afterAll, describe, beforeEach, afterEach, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
 import groupQuery from '@graphql/queries/groups/Group.gql'
@@ -102,10 +104,12 @@ describe('groups feature gate (groupsEnabled)', () => {
   describe('while groupsEnabled is on (default)', () => {
     it('serves the Group query and the profile groups list', async () => {
       const group = await query({ query: groupQuery, variables: { id: 'g1' } })
+
       expect(group.errors).toBeUndefined()
       expect(group.data!.Group[0]).toMatchObject({ id: 'g1', name: 'Group One' })
 
       const profile = await query({ query: UserGroups, variables: { id: 'group-owner' } })
+
       expect(profile.data!.User[0].groups.map((g: { id: string }) => g.id)).toContain('g1')
     })
   })
@@ -117,11 +121,13 @@ describe('groups feature gate (groupsEnabled)', () => {
 
     it('denies the Group query', async () => {
       const result = await query({ query: groupQuery, variables: { id: 'g1' } })
+
       expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
     })
 
     it('denies searching groups', async () => {
       const result = await query({ query: searchGroupsQuery, variables: { query: 'Group' } })
+
       expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
     })
 
@@ -130,6 +136,7 @@ describe('groups feature gate (groupsEnabled)', () => {
         mutation: CreateGroup,
         variables: createGroupVariables('g2', 'Group Two'),
       })
+
       expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
     })
 
@@ -138,6 +145,7 @@ describe('groups feature gate (groupsEnabled)', () => {
         mutation: JoinGroup,
         variables: { groupId: 'g1', userId: 'group-owner' },
       })
+
       expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
     })
 
@@ -146,6 +154,7 @@ describe('groups feature gate (groupsEnabled)', () => {
         mutation: UpdateGroup,
         variables: { id: 'g1', name: 'Renamed' },
       })
+
       expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
     })
 
@@ -154,11 +163,13 @@ describe('groups feature gate (groupsEnabled)', () => {
         mutation: LeaveGroup,
         variables: { groupId: 'g1', userId: 'group-owner' },
       })
+
       expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
     })
 
     it('serves the profile but folds its groups field to an empty list', async () => {
       const profile = await query({ query: UserGroups, variables: { id: 'group-owner' } })
+
       expect(profile.errors).toBeUndefined()
       expect(profile.data!.User[0].groups).toEqual([])
     })
@@ -192,6 +203,7 @@ describe('groups feature gate (groupsEnabled)', () => {
     it('drops the group room from the chat room list (DMs would remain)', async () => {
       authenticatedUser = ownerAuth
       const result = await query({ query: RoomQuery, variables: {} })
+
       expect(result.errors).toBeUndefined()
       expect((result.data!.Room as Array<{ id: string }>).map((r) => r.id)).not.toContain(roomId)
     })
@@ -199,6 +211,7 @@ describe('groups feature gate (groupsEnabled)', () => {
     it('does not fetch the group room by groupId', async () => {
       authenticatedUser = ownerAuth
       const result = await query({ query: RoomQuery, variables: { groupId: 'g1' } })
+
       expect(result.errors).toBeUndefined()
       expect(result.data!.Room).toEqual([])
     })
@@ -206,6 +219,7 @@ describe('groups feature gate (groupsEnabled)', () => {
     it('does not fetch the group room by its (known/cached) room id', async () => {
       authenticatedUser = ownerAuth
       const result = await query({ query: RoomQuery, variables: { id: roomId } })
+
       expect(result.errors).toBeUndefined()
       expect(result.data!.Room).toEqual([])
     })
@@ -213,6 +227,7 @@ describe('groups feature gate (groupsEnabled)', () => {
     it('serves no messages for the group room', async () => {
       authenticatedUser = ownerAuth
       const result = await query({ query: MessageQuery, variables: { roomId } })
+
       expect(result.errors).toBeUndefined()
       expect(result.data!.Message).toEqual([])
     })
@@ -220,12 +235,14 @@ describe('groups feature gate (groupsEnabled)', () => {
     it('blocks posting into the group room', async () => {
       authenticatedUser = ownerAuth
       const result = await mutate({ mutation: CreateMessage, variables: { roomId, content: 'no' } })
+
       expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
     })
 
     it('excludes the group room from the unread-rooms count', async () => {
       authenticatedUser = { id: 'group-member' } as Context['user']
       const result = await query({ query: UnreadRooms })
+
       expect(result.errors).toBeUndefined()
       expect(result.data!.UnreadRooms).toBe(0)
     })

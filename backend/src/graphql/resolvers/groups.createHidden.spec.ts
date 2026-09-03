@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import ChangeGroupMemberRole from '@graphql/queries/groups/ChangeGroupMemberRole.gql'
 import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
@@ -87,6 +89,7 @@ describe('group.create_hidden backend enforcement', () => {
         mutation: CreateGroup,
         variables: { ...baseVariables, id: 'hidden-attempt', groupType: 'hidden' },
       })
+
       expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
     })
 
@@ -96,6 +99,7 @@ describe('group.create_hidden backend enforcement', () => {
         mutation: CreateGroup,
         variables: { ...baseVariables, id: 'public-ok', groupType: 'public' },
       })
+
       expect(errors).toBeUndefined()
       expect(data?.CreateGroup).toMatchObject({ id: 'public-ok', groupType: 'public' })
     })
@@ -106,6 +110,7 @@ describe('group.create_hidden backend enforcement', () => {
         mutation: CreateGroup,
         variables: { ...baseVariables, id: 'hidden-by-owner', groupType: 'hidden' },
       })
+
       expect(errors).toBeUndefined()
       expect(data?.CreateGroup).toMatchObject({ id: 'hidden-by-owner', groupType: 'hidden' })
     })
@@ -122,6 +127,7 @@ describe('group.create_hidden backend enforcement', () => {
         mutation: UpdateGroup,
         variables: { id: 'to-hide', groupType: 'hidden' },
       })
+
       expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
     })
 
@@ -135,6 +141,7 @@ describe('group.create_hidden backend enforcement', () => {
         mutation: UpdateGroup,
         variables: { id: 'owner-to-hide', groupType: 'hidden' },
       })
+
       expect(errors).toBeUndefined()
       expect(data?.UpdateGroup).toMatchObject({ id: 'owner-to-hide', groupType: 'hidden' })
     })
@@ -158,6 +165,7 @@ describe('group.create_hidden backend enforcement', () => {
         mutation: UpdateGroup,
         variables: { id: 'already-hidden', groupType: 'hidden', name: 'Renamed Hidden' },
       })
+
       expect(errors).toBeUndefined()
       expect(data?.UpdateGroup).toMatchObject({
         id: 'already-hidden',

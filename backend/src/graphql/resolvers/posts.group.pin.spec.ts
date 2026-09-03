@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import ChangeGroupMemberRole from '@graphql/queries/groups/ChangeGroupMemberRole.gql'
 import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
@@ -167,6 +169,7 @@ describe('pin groupPosts', () => {
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
       authenticatedUser = null
+
       await expect(
         mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } }),
       ).resolves.toMatchObject({
@@ -179,6 +182,7 @@ describe('pin groupPosts', () => {
   describe('ordinary users', () => {
     it('throws authorization error', async () => {
       authenticatedUser = await anyUser.toJson()
+
       await expect(
         mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } }),
       ).resolves.toMatchObject({
@@ -191,6 +195,7 @@ describe('pin groupPosts', () => {
   describe('group usual', () => {
     it('throws authorization error', async () => {
       authenticatedUser = await allGroupsUser.toJson()
+
       await expect(
         mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } }),
       ).resolves.toMatchObject({
@@ -203,6 +208,7 @@ describe('pin groupPosts', () => {
   describe('group admin', () => {
     it('resolves without error', async () => {
       authenticatedUser = await publicAdminUser.toJson()
+
       await expect(
         mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } }),
       ).resolves.toMatchObject({
@@ -215,6 +221,7 @@ describe('pin groupPosts', () => {
   describe('group owner', () => {
     it('resolves without error', async () => {
       authenticatedUser = await publicUser.toJson()
+
       await expect(
         mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } }),
       ).resolves.toMatchObject({
@@ -229,8 +236,10 @@ describe('pin groupPosts', () => {
       policy = { maxGroupPinnedPosts: 1 }
       authenticatedUser = await publicUser.toJson()
     })
+
     it('returns post-1-to-public-group as first, pinned post', async () => {
       await mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } })
+
       await expect(
         query({
           query: profilePagePosts,
@@ -253,6 +262,7 @@ describe('pin groupPosts', () => {
 
     it('no error thrown when pinned post was pinned again', async () => {
       await mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } })
+
       await expect(
         mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } }),
       ).resolves.toMatchObject({
@@ -264,6 +274,7 @@ describe('pin groupPosts', () => {
     it('returns post-2-to-public-group as first, pinned post', async () => {
       authenticatedUser = await publicUser.toJson()
       await mutate({ mutation: pinGroupPost, variables: { id: 'post-2-to-public-group' } })
+
       await expect(
         query({
           query: profilePagePosts,
@@ -289,6 +300,7 @@ describe('pin groupPosts', () => {
       await mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } })
       await mutate({ mutation: pinGroupPost, variables: { id: 'post-2-to-public-group' } })
       await mutate({ mutation: pinGroupPost, variables: { id: 'post-3-to-public-group' } })
+
       await expect(
         query({
           query: profilePagePosts,
@@ -315,9 +327,11 @@ describe('pin groupPosts', () => {
       policy = { maxGroupPinnedPosts: 2 }
       authenticatedUser = await publicUser.toJson()
     })
+
     it('returns pinned posts before unpinned posts', async () => {
       await mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } })
       await mutate({ mutation: pinGroupPost, variables: { id: 'post-2-to-public-group' } })
+
       await expect(
         query({
           query: profilePagePosts,
@@ -342,6 +356,7 @@ describe('pin groupPosts', () => {
     it('throws an error when three posts are pinned', async () => {
       await mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } })
       await mutate({ mutation: pinGroupPost, variables: { id: 'post-2-to-public-group' } })
+
       await expect(
         mutate({ mutation: pinGroupPost, variables: { id: 'post-3-to-public-group' } }),
       ).resolves.toMatchObject({
@@ -356,6 +371,7 @@ describe('pin groupPosts', () => {
       await mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } })
       await mutate({ mutation: pinGroupPost, variables: { id: 'post-2-to-public-group' } })
       await mutate({ mutation: unpinGroupPost, variables: { id: 'post-1-to-public-group' } })
+
       await expect(
         mutate({ mutation: pinGroupPost, variables: { id: 'post-3-to-public-group' } }),
       ).resolves.toMatchObject({

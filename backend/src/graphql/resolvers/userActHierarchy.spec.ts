@@ -9,6 +9,8 @@
 // report `review` (which can disable a reported User) — closing the privilege-escalation
 // hole where a holder could act on a peer or a higher-privileged user.
 
+import { describe, beforeAll, afterAll, beforeEach, afterEach, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import review from '@graphql/queries/moderation/review.gql'
 import DELETE_USER from '@graphql/queries/users/DeleteUser.gql'
@@ -69,6 +71,7 @@ describe('act-on hierarchy', () => {
   describe('disableUser (user.disable + dominance)', () => {
     it('lets a moderator disable a plain user (moderator ⊋ user)', async () => {
       await as('the-moderator')
+
       await expect(
         mutate({ mutation: DISABLE_USER, variables: { id: 'plain-user', disable: true } }),
       ).resolves.toMatchObject({
@@ -80,6 +83,7 @@ describe('act-on hierarchy', () => {
     it('lets a moderator re-enable a plain user', async () => {
       await as('the-moderator')
       await mutate({ mutation: DISABLE_USER, variables: { id: 'plain-user', disable: true } })
+
       await expect(
         mutate({ mutation: DISABLE_USER, variables: { id: 'plain-user', disable: false } }),
       ).resolves.toMatchObject({
@@ -90,6 +94,7 @@ describe('act-on hierarchy', () => {
 
     it('forbids a moderator disabling a peer moderator (equal sets)', async () => {
       await as('the-moderator')
+
       await expect(
         mutate({ mutation: DISABLE_USER, variables: { id: 'other-moderator', disable: true } }),
       ).resolves.toMatchObject({ errors: [{ message: 'Not Authorized!' }] })
@@ -97,6 +102,7 @@ describe('act-on hierarchy', () => {
 
     it('forbids a moderator disabling an admin (target holds more)', async () => {
       await as('the-moderator')
+
       await expect(
         mutate({ mutation: DISABLE_USER, variables: { id: 'the-admin', disable: true } }),
       ).resolves.toMatchObject({ errors: [{ message: 'Not Authorized!' }] })
@@ -104,6 +110,7 @@ describe('act-on hierarchy', () => {
 
     it('lets an admin disable a moderator (admin ⊋ moderator)', async () => {
       await as('the-admin')
+
       await expect(
         mutate({ mutation: DISABLE_USER, variables: { id: 'the-moderator', disable: true } }),
       ).resolves.toMatchObject({
@@ -114,6 +121,7 @@ describe('act-on hierarchy', () => {
 
     it('forbids a plain user (lacks user.disable) from disabling anyone', async () => {
       await as('plain-user')
+
       await expect(
         mutate({ mutation: DISABLE_USER, variables: { id: 'other-moderator', disable: true } }),
       ).resolves.toMatchObject({ errors: [{ message: 'Not Authorized!' }] })
@@ -124,6 +132,7 @@ describe('act-on hierarchy', () => {
       // moderator through, so the resolver is reached with an empty match. It must reject
       // instead of returning null, which callers would mistake for a successful disable.
       await as('the-moderator')
+
       await expect(
         mutate({ mutation: DISABLE_USER, variables: { id: 'no-such-user', disable: true } }),
       ).resolves.toMatchObject({
@@ -136,6 +145,7 @@ describe('act-on hierarchy', () => {
   describe('DeleteUser (user.delete.any + dominance)', () => {
     it('lets an admin delete a plain user', async () => {
       await as('the-admin')
+
       await expect(
         mutate({ mutation: DELETE_USER, variables: { id: 'plain-user', resource: [] } }),
       ).resolves.toMatchObject({
@@ -146,6 +156,7 @@ describe('act-on hierarchy', () => {
 
     it('forbids an admin deleting a peer admin', async () => {
       await as('the-admin')
+
       await expect(
         mutate({ mutation: DELETE_USER, variables: { id: 'other-admin', resource: [] } }),
       ).resolves.toMatchObject({ errors: [{ message: 'Not Authorized!' }] })
@@ -153,6 +164,7 @@ describe('act-on hierarchy', () => {
 
     it('lets an owner delete an admin (owner = full catalog ⊋ admin)', async () => {
       await as('the-owner')
+
       await expect(
         mutate({ mutation: DELETE_USER, variables: { id: 'the-admin', resource: [] } }),
       ).resolves.toMatchObject({
@@ -163,6 +175,7 @@ describe('act-on hierarchy', () => {
 
     it('forbids a moderator (lacks user.delete.any) from deleting a plain user', async () => {
       await as('the-moderator')
+
       await expect(
         mutate({ mutation: DELETE_USER, variables: { id: 'plain-user', resource: [] } }),
       ).resolves.toMatchObject({ errors: [{ message: 'Not Authorized!' }] })
@@ -170,6 +183,7 @@ describe('act-on hierarchy', () => {
 
     it('still lets a user delete their own account (self-deletion stays allowed)', async () => {
       await as('plain-user')
+
       await expect(
         mutate({ mutation: DELETE_USER, variables: { id: 'plain-user', resource: [] } }),
       ).resolves.toMatchObject({
@@ -197,6 +211,7 @@ describe('act-on hierarchy', () => {
     it('forbids a moderator disabling an admin via report review', async () => {
       await reportAgainst('the-admin')
       await as('the-moderator')
+
       await expect(
         mutate({
           mutation: review,
@@ -208,6 +223,7 @@ describe('act-on hierarchy', () => {
     it('lets a moderator disable a plain user via report review (control)', async () => {
       await reportAgainst('plain-user')
       await as('the-moderator')
+
       await expect(
         mutate({
           mutation: review,

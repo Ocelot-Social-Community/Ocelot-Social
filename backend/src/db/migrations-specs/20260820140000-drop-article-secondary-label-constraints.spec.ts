@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest'
+
 import { isReversible } from '@db/migrations/20260820140000-drop-article-secondary-label-constraints'
 
 import type { PresentConstraint } from '@db/migrations/20260820140000-drop-article-secondary-label-constraints'
@@ -17,7 +19,7 @@ const constraint = (over: Partial<PresentConstraint> = {}): PresentConstraint =>
   ...over,
 })
 
-describe('isReversible', () => {
+describe(isReversible, () => {
   it.each([['id'], ['slug']])('accepts the uniqueness constraint on Article(%s)', (property) => {
     // The closed set neode's `extend('Post', 'Article')` produced: Post's `id: primary` and
     // `slug: unique`, copied onto the secondary label.

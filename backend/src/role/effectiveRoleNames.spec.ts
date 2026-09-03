@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals'
+import { afterEach, describe, it, expect } from 'vitest'
 
 import { effectiveRoleName, resolveRoleName } from './effectiveRoleNames'
 import { USER_ROLE } from './types'
@@ -6,7 +6,7 @@ import { USER_ROLE } from './types'
 // Restore any spy (e.g. the console.warn spy below) even if an assertion throws
 // mid-test, so a leaked mock can't corrupt later tests.
 afterEach(() => {
-  jest.restoreAllMocks()
+  vi.restoreAllMocks()
 })
 
 describe('resolveRoleName (collapse HAS_ROLE edges → one role)', () => {
@@ -24,7 +24,8 @@ describe('resolveRoleName (collapse HAS_ROLE edges → one role)', () => {
   it('fails closed to the baseline (and warns) when more than one edge is present', () => {
     // Multiple HAS_ROLE edges violate the single-role model. Picking the "highest"
     // would be a privilege-escalation oracle on corrupt data, so we drop to USER_ROLE.
-    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
     expect(resolveRoleName(['admin', 'user'])).toBe(USER_ROLE)
     expect(resolveRoleName(['owner', 'admin'])).toBe(USER_ROLE)
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('single-role model violated'))

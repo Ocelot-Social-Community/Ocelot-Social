@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals'
+import { describe, beforeEach, it, expect } from 'vitest'
 
 import { UserInputError } from '@graphql/errors'
 import { PolicyValidationError } from '@src/policy'
@@ -6,9 +6,10 @@ import { PolicyValidationError } from '@src/policy'
 import brandingResolver from './branding'
 
 import type { Context } from '@src/context'
+import type { Mock } from 'vitest'
 
 describe('branding resolvers', () => {
-  let set: jest.Mock
+  let set: Mock
   let context: Context
 
   const call = async (
@@ -23,7 +24,7 @@ describe('branding resolvers', () => {
     )
 
   beforeEach(() => {
-    set = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue(undefined)
+    set = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue(undefined)
     context = { policy: { set }, user: { id: 'u1' } } as unknown as Context
   })
 
@@ -34,7 +35,8 @@ describe('branding resolvers', () => {
     })
 
     it('maps a PolicyValidationError to a UserInputError', async () => {
-      set.mockImplementation(async () => Promise.reject(new PolicyValidationError('bad')))
+      set.mockRejectedValue(new PolicyValidationError('bad'))
+
       await expect(call('setActiveBranding', { id: 'x' })).rejects.toThrow(UserInputError)
     })
   })
@@ -47,6 +49,7 @@ describe('branding resolvers', () => {
 
     it('accepts a JSON object and persists it verbatim', async () => {
       const json = JSON.stringify({ theme: 'acme/dark', identity: 'mybrand' })
+
       await expect(call('setBrandingComposition', { composition: json })).resolves.toBe(json)
       expect(set).toHaveBeenCalledWith('brandingComposition', json, 'u1')
     })

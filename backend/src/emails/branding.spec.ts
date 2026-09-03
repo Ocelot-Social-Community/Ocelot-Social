@@ -7,6 +7,8 @@
 // combination can only arise when the two are read at DIFFERENT times — which is what a module-scope
 // read of `branding` does. Snapshot tests cannot catch it: they run unbranded, where the default IS
 // the expected value.
+import { describe, afterEach, beforeEach, it, expect } from 'vitest'
+
 import CONFIG from '@config/index'
 import { setBranding, brandingDefaults } from '@src/branding'
 
@@ -82,9 +84,11 @@ describe('branding in rendered mails', () => {
     const original = defaultParams.SUPPORT_EMAIL
 
     defaultParams.SUPPORT_EMAIL = 'support@example.org'
+
     expect(defaultParams.SUPPORT_EMAIL).toBe('support@example.org')
 
     delete defaultParams.SUPPORT_EMAIL
+
     expect(defaultParams.SUPPORT_EMAIL).toBeUndefined()
 
     defaultParams.SUPPORT_EMAIL = original

@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import { isKnownPermission } from '@src/permission'
 
 import { DEFAULT_ROLES } from './defaults'
@@ -25,8 +27,10 @@ describe('DEFAULT_ROLES', () => {
 
   it('marks only owner as protected, with no stored permissions (expanded to all at runtime)', () => {
     const owner = DEFAULT_ROLES.find((role) => role.name === OWNER_ROLE)
+
     expect(owner?.protected).toBe(true)
     expect(owner?.permissions).toEqual([])
+
     for (const role of DEFAULT_ROLES.filter((r) => r.name !== OWNER_ROLE)) {
       expect(role.protected).toBe(false)
     }
@@ -94,6 +98,7 @@ describe('DEFAULT_ROLES', () => {
     const admin = new Set(permsOf(ADMIN_ROLE))
     const isStrictSuperset = (a: Set<string>, b: Set<string>) =>
       a.size > b.size && [...b].every((p) => a.has(p))
+
     expect(isStrictSuperset(moderator, user)).toBe(true)
     expect(isStrictSuperset(admin, moderator)).toBe(true)
   })
