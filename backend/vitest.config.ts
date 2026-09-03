@@ -76,6 +76,11 @@ export default defineConfig({
     fileParallelism: false,
     coverage: {
       provider: 'v8',
+      // Do NOT wipe the reports directory first. vitest cleans it by default, but in the compose
+      // test setup `./coverage` is bind-mounted to `/app/coverage` — removing a mount point fails
+      // with EBUSY and takes the whole run with it. Jest wrote into the directory without
+      // clearing it, so leaving it in place also keeps the previous behaviour.
+      clean: false,
       reporter: ['text', 'json-summary'],
       include: ['src/**/*.ts'],
       exclude: [
