@@ -120,6 +120,26 @@ describe('PolicyService', () => {
       expect(svc.get('inviteRegistration')).toBe(true) // default
     })
 
+    it('treats an unparsable integer ENV value as undefined (falls through to default)', async () => {
+      readAllSettings.mockResolvedValue({})
+
+      const svc = new PolicyService(dbStub)
+      await svc.init({ API_KEYS_MAX_PER_USER: 'lots' })
+
+      // parseInt('lots') is NaN. Seeding that would put NaN in the cache and — since
+      // JSON encodes NaN as null — an unreadable row in the DB, which every later boot
+      // would have to repair. A typo'd numeric env must simply not seed.
+      expect(svc.get('apiKeysMaxPerUser')).toBe(5) // schema default
+      expect(svc.getDefault('apiKeysMaxPerUser')).toBe(5)
+      expect(writeSetting).toHaveBeenCalledWith(
+        expect.anything(),
+        'policy',
+        'apiKeysMaxPerUser',
+        5,
+        'system:seed',
+      )
+    })
+
     it('parses "true" and "false" symmetrically', async () => {
       readAllSettings.mockResolvedValue({})
 
@@ -173,6 +193,60 @@ describe('PolicyService', () => {
       expect(warn).toHaveBeenCalledWith(expect.stringContaining('publicRegistration'))
 
       warn.mockRestore()
+    })
+  })
+
+  // The ENV seed is parsed according to the key's SCHEMA TYPE, not guessed from the
+  // string. No shipped key is both string-typed and ENV-seeded (activeBranding has no
+  // envSeed), so the string and fall-through arms are unreachable through the real
+  // schema — the service is reloaded against an injected one instead. Without this a
+  // regression there (coercing a string, or seeding a raw string into a numeric key)
+  // would only surface in a deployment that adds an envSeed to a string key.
+  describe('ENV seeding by schema type', () => {
+    const loadServiceWithSchema = async (properties: Record<string, unknown>) => {
+      vi.resetModules()
+      vi.doMock('./policy.schema.json', () => ({
+        default: { type: 'object', properties },
+      }))
+      // resetModules re-runs the './repository' mock factory, so the reloaded service
+      // talks to FRESH vi.fn()s — the outer handles no longer reach it and the new ones
+      // must be armed here, or readAllSettings would resolve undefined.
+      const repository = await import('./repository')
+      vi.mocked(repository.readAllSettings).mockResolvedValue({})
+      vi.mocked(repository.readLastChange).mockResolvedValue(null)
+      const { PolicyService: FreshPolicyService } = await import('./PolicyService')
+      return new FreshPolicyService(dbStub)
+    }
+
+    afterEach(() => {
+      vi.doUnmock('./policy.schema.json')
+      vi.resetModules()
+    })
+
+    it('passes a string-typed ENV seed through verbatim (no boolean coercion)', async () => {
+      const svc = await loadServiceWithSchema({
+        activeBranding: { type: 'string', default: '', envSeed: 'ACTIVE_BRANDING' },
+      })
+      await svc.init({ ACTIVE_BRANDING: 'false' })
+
+      // 'false' is a legitimate branding id. Coercing it to the boolean false would both
+      // lose the id and store a value that violates the key's own string schema (which
+      // the next boot would then reject and reseed).
+      expect(svc.get('activeBranding')).toBe('false')
+      expect(svc.getDefault('activeBranding')).toBe('false')
+    })
+
+    it('ignores an ENV seed whose schema type the parser does not handle', async () => {
+      const svc = await loadServiceWithSchema({
+        ratio: { type: 'number', default: 1.5, envSeed: 'RATIO' },
+      })
+      await svc.init({ RATIO: '2.5' })
+
+      // Only boolean / integer / string are parsed. Anything else must fall through to
+      // the schema default rather than seed the raw string — a string in a numeric key
+      // fails validation on every subsequent read.
+      expect(svc.get('ratio' as never)).toBe(1.5)
+      expect(svc.getDefault('ratio' as never)).toBe(1.5)
     })
   })
 
@@ -378,6 +452,83 @@ describe('PolicyService', () => {
       await expect(svc.init({})).resolves.toBeUndefined()
       expect(readAllSettings).not.toHaveBeenCalled()
       expect(svc.get('publicRegistration')).toBe(true) // cache preserved
+    })
+  })
+
+  // videoConference is the only shipped key with hard env requirements (the three
+  // LiveKit vars) and its effective value is what the videoCall.* permission gates read.
+  // A var that is defined-but-blank — how Helm/compose render an unset value — must count
+  // as NOT configured, otherwise the feature advertises itself as available and every
+  // call fails at runtime against an empty LiveKit URL/secret.
+  describe('requiresEnv gate (envState / requiresEnvStatus / isAvailable / getEffective)', () => {
+    const LIVEKIT = {
+      LIVEKIT_URL: 'wss://livekit.example',
+      LIVEKIT_API_KEY: 'key',
+      LIVEKIT_API_SECRET: 'secret',
+    }
+
+    it('distinguishes set / empty / missing for a single env var', () => {
+      const svc = createInMemoryPolicyService({}, { FILLED: 'x', BLANK: '' })
+
+      expect(svc.envState('FILLED')).toBe('set')
+      expect(svc.envState('BLANK')).toBe('empty') // defined but blank is not configured
+      expect(svc.envState('ABSENT')).toBe('missing')
+    })
+
+    it('reports every declared requirement with its state (drives the admin config view)', () => {
+      const svc = createInMemoryPolicyService(
+        { videoConference: true },
+        { LIVEKIT_URL: LIVEKIT.LIVEKIT_URL, LIVEKIT_API_KEY: '' },
+      )
+
+      // The admin UI names the offending var, so the states must be per-var, not a
+      // single boolean.
+      expect(svc.requiresEnvStatus('videoConference')).toEqual([
+        { name: 'LIVEKIT_URL', state: 'set' },
+        { name: 'LIVEKIT_API_KEY', state: 'empty' },
+        { name: 'LIVEKIT_API_SECRET', state: 'missing' },
+      ])
+    })
+
+    it('treats a key without env requirements as unconditionally available', () => {
+      const svc = createInMemoryPolicyService({}, {})
+
+      expect(svc.requiresEnvStatus('publicRegistration')).toEqual([])
+      expect(svc.isAvailable('publicRegistration')).toBe(true) // vacuous .every()
+    })
+
+    it('is available only when every requirement is set', () => {
+      expect(createInMemoryPolicyService({}, {}).isAvailable('videoConference')).toBe(false)
+      expect(
+        createInMemoryPolicyService({}, { ...LIVEKIT, LIVEKIT_API_SECRET: '' }).isAvailable(
+          'videoConference',
+        ),
+      ).toBe(false)
+      expect(createInMemoryPolicyService({}, LIVEKIT).isAvailable('videoConference')).toBe(true)
+    })
+
+    it('folds the effective value to false while a requirement is unmet', () => {
+      const svc = createInMemoryPolicyService({ videoConference: true }, { LIVEKIT_URL: 'wss://x' })
+
+      // The STORED flag stays true — the admin UI greys the toggle rather than flipping
+      // it, so re-adding the secrets restores the admin's intent. Only the value the
+      // permission gates read folds off.
+      expect(svc.get('videoConference')).toBe(true)
+      expect(svc.getEffective('videoConference')).toBe(false)
+    })
+
+    it('passes the stored value through once every requirement is set', () => {
+      expect(
+        createInMemoryPolicyService({ videoConference: true }, LIVEKIT).getEffective(
+          'videoConference',
+        ),
+      ).toBe(true)
+      // Satisfied env never turns a disabled feature on.
+      expect(
+        createInMemoryPolicyService({ videoConference: false }, LIVEKIT).getEffective(
+          'videoConference',
+        ),
+      ).toBe(false)
     })
   })
 

@@ -86,7 +86,12 @@ export default defineConfig({
       // with EBUSY and takes the whole run with it. Jest wrote into the directory without
       // clearing it, so leaving it in place also keeps the previous behaviour.
       clean: false,
-      reporter: ['text', 'json-summary'],
+      // `json` alongside the summary: it is the only one of the three that carries per-line
+      // detail. `text` is readable but truncates in the CI log, and `json-summary` stops at
+      // percentages per file — neither can answer "which lines are still uncovered", which is
+      // exactly the question when closing gaps. coverage-final.json is uploaded as an artifact
+      // by the coverage job, so that question is answerable without re-running the suite.
+      reporter: ['text', 'json-summary', 'json'],
       include: ['src/**/*.ts'],
       exclude: [
         'src/**/*.spec.ts',

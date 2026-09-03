@@ -412,3 +412,21 @@ jobs:
           docker compose -f docker-compose.yml -f docker-compose.test.yml \
             run --rm --no-deps -T backend npm run test:merge
 
+      # `if: always()` so the report survives a FAILED threshold check — that is precisely when
+      # someone needs to look at it. The step above exits non-zero when coverage drops below the
+      # gate, and without this the numbers explaining why would be discarded with the runner.
+      #
+      # coverage-final.json carries the per-line detail (see the reporter note in
+      # vitest.config.ts); the summary is kept alongside it because it is the file
+      # vitest-coverage-report-action and similar tools read.
+      - name: backend | Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: backend-coverage-report
+          path: |
+            coverage/coverage-final.json
+            coverage/coverage-summary.json
+          retention-days: 7
+          if-no-files-found: warn
+
