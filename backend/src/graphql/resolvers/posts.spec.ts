@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-use-before-define */
-/* eslint-disable jest/no-commented-out-tests */
+/* eslint-disable vitest/no-commented-out-tests */
 import Factory, { assignRoleEdge, cleanDatabase } from '@db/factories'
 import AddPostEmotions from '@graphql/queries/emotions/AddPostEmotions.gql'
 import PostsEmotionsByCurrentUser from '@graphql/queries/emotions/PostsEmotionsByCurrentUser.gql'

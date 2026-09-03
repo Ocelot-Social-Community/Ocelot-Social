@@ -6,7 +6,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable jest/no-commented-out-tests */
+/* eslint-disable vitest/no-commented-out-tests */
 import { setImmediate as scheduleMacrotask } from 'node:timers/promises'
 
 import { PubSub } from 'graphql-subscriptions'

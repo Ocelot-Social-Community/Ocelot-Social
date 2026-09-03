@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable jest/expect-expect */
+/* eslint-disable vitest/expect-expect */
 import { cleanDatabase } from '@db/factories'
 import blockedUsers from '@graphql/queries/interactions/blockedUsers.gql'
 import blockUser from '@graphql/queries/interactions/blockUser.gql'

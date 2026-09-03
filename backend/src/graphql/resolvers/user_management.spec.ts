@@ -11,7 +11,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 
 /* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable jest/expect-expect */
+/* eslint-disable vitest/expect-expect */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import jwt from 'jsonwebtoken'
 

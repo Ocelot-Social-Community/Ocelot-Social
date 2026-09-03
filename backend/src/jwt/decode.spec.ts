@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable jest/expect-expect */
+/* eslint-disable vitest/expect-expect */
 /* eslint-disable @typescript-eslint/no-shadow */
 import { createHash } from 'node:crypto'
 import { setTimeout as delay } from 'node:timers/promises'

@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable jest/no-conditional-expect */
+/* eslint-disable vitest/no-conditional-expect */
 import { Readable } from 'node:stream'
 
 import { S3Client } from '@aws-sdk/client-s3'

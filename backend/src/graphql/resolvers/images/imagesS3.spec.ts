@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable jest/no-conditional-expect */
+/* eslint-disable vitest/no-conditional-expect */
 
 /* eslint-disable @typescript-eslint/no-shadow */
 import { Readable } from 'node:stream'

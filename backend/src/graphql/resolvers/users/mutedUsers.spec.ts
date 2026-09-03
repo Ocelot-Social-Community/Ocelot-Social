@@ -219,7 +219,7 @@ describe('muteUser', () => {
         }
 
         describe('from the perspective of the current user', () => {
-          // eslint-disable-next-line jest/expect-expect
+          // eslint-disable-next-line vitest/expect-expect
           it('both posts are in the newsfeed', bothPostsAreInTheNewsfeed)
 
           describe('but if the current user mutes the other user', () => {
@@ -318,7 +318,7 @@ describe('muteUser', () => {
             authenticatedUser = await mutedUser.toJson()
           })
 
-          // eslint-disable-next-line jest/expect-expect
+          // eslint-disable-next-line vitest/expect-expect
           it('both posts are in the newsfeed', bothPostsAreInTheNewsfeed)
           describe('but if the current user mutes the other user', () => {
             beforeEach(async () => {
