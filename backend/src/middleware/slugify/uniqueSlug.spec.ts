@@ -28,14 +28,14 @@ describe(uniqueSlug, () => {
     await expect(uniqueSlug(nullString as unknown as string, isUnique)).resolves.toBe('anonymous')
   })
 
-  it('converts umlaut to a two letter equivalent', async () => {
+  it('Converts umlaut to a two letter equivalent', async () => {
     const umlaut = 'ÄÖÜäöüß'
     const isUnique = vi.fn<IsUnique>().mockResolvedValue(true)
 
     await expect(uniqueSlug(umlaut, isUnique)).resolves.toEqual('aeoeueaeoeuess')
   })
 
-  it('removes Spanish enya and diacritics', async () => {
+  it('Removes Spanish enya and diacritics', async () => {
     const diacritics = 'áàéèíìóòúùñçÁÀÉÈÍÌÓÒÚÙÑÇ'
     const isUnique = vi.fn<IsUnique>().mockResolvedValue(true)
 

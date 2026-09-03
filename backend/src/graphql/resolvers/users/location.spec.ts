@@ -190,7 +190,7 @@ afterEach(async () => {
   await cleanDatabase()
 })
 
-describe('location Service', () => {
+describe('Location Service', () => {
   // Authentication
   // TODO: unify, externalize, simplify, wtf?
   beforeEach(async () => {
@@ -441,7 +441,7 @@ describe('location Service', () => {
 })
 
 describe('userMiddleware', () => {
-  describe('updateUser', () => {
+  describe('UpdateUser', () => {
     beforeEach(async () => {
       const user = await Factory.build('user', {
         id: 'updating-user',

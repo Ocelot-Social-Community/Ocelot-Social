@@ -69,7 +69,7 @@ afterEach(async () => {
 })
 
 describe('slugifyMiddleware', () => {
-  describe('createGroup', () => {
+  describe('CreateGroup', () => {
     beforeEach(() => {
       variables = {
         ...variables,
@@ -201,7 +201,7 @@ describe('slugifyMiddleware', () => {
     })
   })
 
-  describe('updateGroup', () => {
+  describe('UpdateGroup', () => {
     let createGroupResult
 
     beforeEach(async () => {
@@ -308,7 +308,7 @@ describe('slugifyMiddleware', () => {
     })
   })
 
-  describe('createPost', () => {
+  describe('CreatePost', () => {
     beforeEach(() => {
       variables = {
         ...variables,
@@ -436,7 +436,7 @@ describe('slugifyMiddleware', () => {
     })
   })
 
-  describe('updatePost', () => {
+  describe('UpdatePost', () => {
     let createPostResult
 
     beforeEach(async () => {
@@ -576,7 +576,7 @@ describe('slugifyMiddleware', () => {
     })
   })
 
-  describe('signupVerification', () => {
+  describe('SignupVerification', () => {
     beforeEach(() => {
       variables = {
         ...variables,

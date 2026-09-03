@@ -223,7 +223,7 @@ describe('softDeleteMiddleware', () => {
         authenticatedUser = await moderator.toJson()
       })
 
-      describe('user', () => {
+      describe('User', () => {
         beforeEach(beforeUser)
 
         it('displays name', () => {
@@ -245,7 +245,7 @@ describe('softDeleteMiddleware', () => {
         })
       })
 
-      describe('post', () => {
+      describe('Post', () => {
         beforeEach(beforePost)
 
         it('displays title', () => {
@@ -267,7 +267,7 @@ describe('softDeleteMiddleware', () => {
         })
       })
 
-      describe('comment', () => {
+      describe('Comment', () => {
         beforeEach(beforeComment)
 
         it('displays content', () => {
@@ -281,7 +281,7 @@ describe('softDeleteMiddleware', () => {
         authenticatedUser = await user.toJson()
       })
 
-      describe('user', () => {
+      describe('User', () => {
         beforeEach(beforeUser)
 
         it('obfuscates name', () => {
@@ -301,7 +301,7 @@ describe('softDeleteMiddleware', () => {
         })
       })
 
-      describe('post', () => {
+      describe('Post', () => {
         beforeEach(beforePost)
 
         it('obfuscates title', () => {
@@ -321,7 +321,7 @@ describe('softDeleteMiddleware', () => {
         })
       })
 
-      describe('comment', () => {
+      describe('Comment', () => {
         beforeEach(beforeComment)
 
         it('obfuscates content', () => {
@@ -331,8 +331,8 @@ describe('softDeleteMiddleware', () => {
     })
   })
 
-  describe('query', () => {
-    describe('post', () => {
+  describe('Query', () => {
+    describe('Post', () => {
       describe('as user', () => {
         beforeEach(async () => {
           authenticatedUser = await user.toJson()

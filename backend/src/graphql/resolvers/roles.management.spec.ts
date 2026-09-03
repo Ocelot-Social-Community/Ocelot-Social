@@ -695,7 +695,7 @@ describe('role management', () => {
     })
   })
 
-  describe('user admin search (roleName / search)', () => {
+  describe('User admin search (roleName / search)', () => {
     test('filters users by their single role', async () => {
       await Factory.build(
         'user',

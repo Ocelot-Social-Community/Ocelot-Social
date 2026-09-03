@@ -41,8 +41,8 @@ afterEach(async () => {
   await cleanDatabase()
 })
 
-describe('query', () => {
-  describe('post', () => {
+describe('Query', () => {
+  describe('Post', () => {
     describe('orderBy', () => {
       it('createdAt descending is default', async () => {
         await expect(query({ query: Post })).resolves.toMatchObject({

@@ -20,7 +20,7 @@ describe(sendResetPasswordMail, () => {
       defaultParams.SUPPORT_EMAIL = 'support@example.org'
     })
 
-    describe('english', () => {
+    describe('English', () => {
       beforeEach(() => {
         data.locale = 'en'
       })
@@ -30,7 +30,7 @@ describe(sendResetPasswordMail, () => {
       })
     })
 
-    describe('german', () => {
+    describe('German', () => {
       beforeEach(() => {
         data.locale = 'de'
       })
@@ -46,7 +46,7 @@ describe(sendResetPasswordMail, () => {
       delete defaultParams.SUPPORT_EMAIL
     })
 
-    describe('english', () => {
+    describe('English', () => {
       beforeEach(() => {
         data.locale = 'en'
       })
@@ -56,7 +56,7 @@ describe(sendResetPasswordMail, () => {
       })
     })
 
-    describe('german', () => {
+    describe('German', () => {
       beforeEach(() => {
         data.locale = 'de'
       })

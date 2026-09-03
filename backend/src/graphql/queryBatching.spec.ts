@@ -186,7 +186,7 @@ afterAll(async () => {
 // message. A field present on some rows but not others would not be batched any worse, yet
 // could still shift the count, because a loader that no row triggers is never flushed at
 // all. Keep new fixtures uniform, or compare with the per-row ceiling below instead.
-describe('cypher round trips', () => {
+describe('Cypher round trips', () => {
   it('stay constant as the feed grows', async () => {
     const one = await countRoundTrips(FEED_QUERY, { first: 1 })
     const many = await countRoundTrips(FEED_QUERY, { first: 12 })

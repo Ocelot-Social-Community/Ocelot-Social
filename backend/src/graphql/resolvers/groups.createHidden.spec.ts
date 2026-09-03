@@ -82,7 +82,7 @@ afterEach(async () => {
 })
 
 describe('group.create_hidden backend enforcement', () => {
-  describe('createGroup', () => {
+  describe('CreateGroup', () => {
     it('rejects creating a hidden group without group.create_hidden', async () => {
       authenticatedUser = await restrictedUser.toJson()
       const { errors } = await mutate({
@@ -116,7 +116,7 @@ describe('group.create_hidden backend enforcement', () => {
     })
   })
 
-  describe('updateGroup', () => {
+  describe('UpdateGroup', () => {
     it('rejects switching an existing group to hidden without group.create_hidden', async () => {
       authenticatedUser = await restrictedUser.toJson()
       await mutate({

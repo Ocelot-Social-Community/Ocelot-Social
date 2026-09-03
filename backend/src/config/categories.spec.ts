@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 
 import { ENV_CATEGORIES, categoryRank } from './categories'
 
-describe('eNV_CATEGORIES', () => {
+describe('ENV_CATEGORIES', () => {
   it('has no duplicate categories', () => {
     expect(new Set(ENV_CATEGORIES).size).toBe(ENV_CATEGORIES.length)
   })

@@ -50,7 +50,7 @@ afterEach(async () => {
 })
 
 describe('resolvers', () => {
-  describe('location', () => {
+  describe('Location', () => {
     describe('name(lang)', () => {
       beforeEach(async () => {
         const Hamburg = await Factory.build('location', {

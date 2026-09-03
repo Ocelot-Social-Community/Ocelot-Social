@@ -6,7 +6,7 @@ import { describe, it, expect } from 'vitest'
 import { SUPPORTED_LOCALES, isSupportedLocale, resolveLocale } from './locales'
 import { SOFTWARE_DEFAULTS } from './softwareDefaults'
 
-describe('sUPPORTED_LOCALES', () => {
+describe('SUPPORTED_LOCALES', () => {
   it('matches the email locale template files on disk, so the list cannot drift', async () => {
     const files = await readdir(path.join(import.meta.dirname, '../emails/locales'))
     const onDisk = files

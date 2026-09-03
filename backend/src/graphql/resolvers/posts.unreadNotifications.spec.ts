@@ -43,7 +43,7 @@ afterEach(async () => {
   await cleanDatabase()
 })
 
-describe('post.unreadNotificationByCurrentUser / unreadCommentNotificationsByCurrentUser', () => {
+describe('Post.unreadNotificationByCurrentUser / unreadCommentNotificationsByCurrentUser', () => {
   beforeEach(async () => {
     author = await Factory.build('user', { id: 'author' })
     user = await Factory.build('user', { id: 'you' })

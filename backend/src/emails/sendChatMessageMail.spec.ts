@@ -62,7 +62,7 @@ const recipientUser = {
 }
 
 describe('sendChatMessageMail', () => {
-  describe('english', () => {
+  describe('English', () => {
     beforeEach(() => {
       recipientUser.locale = 'en'
     })
@@ -78,7 +78,7 @@ describe('sendChatMessageMail', () => {
     })
   })
 
-  describe('german', () => {
+  describe('German', () => {
     beforeEach(() => {
       recipientUser.locale = 'de'
     })

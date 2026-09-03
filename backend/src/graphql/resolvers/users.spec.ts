@@ -66,7 +66,7 @@ afterEach(async () => {
   await cleanDatabase()
 })
 
-describe('user', () => {
+describe('User', () => {
   describe('query by email address', () => {
     beforeEach(async () => {
       const user = await Factory.build('user', {
@@ -297,7 +297,7 @@ describe('user', () => {
   })
 })
 
-describe('updateUser', () => {
+describe('UpdateUser', () => {
   beforeEach(async () => {
     variables = {
       id: 'u47',
@@ -458,7 +458,7 @@ describe('updateUser', () => {
   })
 })
 
-describe('delete a User as admin', () => {
+describe('Delete a User as admin', () => {
   beforeEach(async () => {
     variables = { id: ' u343', resource: [] }
 

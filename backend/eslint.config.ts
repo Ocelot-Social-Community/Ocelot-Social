@@ -132,6 +132,9 @@ export default [
          `toBe` (reference instead of structural equality). That silently changed what 79
          assertions across 25 spec files claimed, and CI caught it only because some of them
          started failing. Off for good — a matcher is an assertion, not formatting. */
+      // Same category: its autofix renamed 143 test titles across 49 spec files, which changes
+      // snapshot keys and anything that filters by test name.
+      'vitest/prefer-lowercase-title': 'off',
       'vitest/prefer-called-with': 'off',
       'vitest/prefer-to-be': 'off',
       'vitest/prefer-strict-boolean-matchers': 'off',

@@ -43,7 +43,7 @@ afterAll(async () => {
   setup.database.neode.close()
 })
 
-describe('tag filter', () => {
+describe('Tag filter', () => {
   it('applies the implemented operator', async () => {
     const { data, errors } = await setup.query({
       query: tagQuery,
@@ -112,7 +112,7 @@ describe('tag filter', () => {
   )
 })
 
-describe('tag paging', () => {
+describe('Tag paging', () => {
   const pagedQuery = parse(`
     query ($first: Int, $offset: Int) {
       Tag(first: $first, offset: $offset) {

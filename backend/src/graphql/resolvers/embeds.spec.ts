@@ -79,7 +79,7 @@ const babyLovesCatEmbedResponse = new Response(
   }),
 )
 
-describe('query', () => {
+describe('Query', () => {
   describe('embedProviders', () => {
     // Public and unauthenticated (the shield lists it next to `embed`): the settings page reads the
     // list this way since the backend stopped serving public/providers.json over HTTP.

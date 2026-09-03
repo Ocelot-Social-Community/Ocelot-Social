@@ -22,7 +22,7 @@ describe('sendEmailVerification', () => {
     name: 'User',
   }
 
-  describe('english', () => {
+  describe('English', () => {
     beforeEach(() => {
       data.locale = 'en'
     })
@@ -32,7 +32,7 @@ describe('sendEmailVerification', () => {
     })
   })
 
-  describe('german', () => {
+  describe('German', () => {
     beforeEach(() => {
       data.locale = 'de'
     })

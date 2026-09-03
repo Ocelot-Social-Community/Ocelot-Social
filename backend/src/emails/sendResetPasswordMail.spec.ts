@@ -22,7 +22,7 @@ describe('sendResetPasswordMail', () => {
     name: 'Jenny Rostock',
   }
 
-  describe('english', () => {
+  describe('English', () => {
     beforeEach(() => {
       data.locale = 'en'
     })
@@ -32,7 +32,7 @@ describe('sendResetPasswordMail', () => {
     })
   })
 
-  describe('german', () => {
+  describe('German', () => {
     beforeEach(() => {
       data.locale = 'de'
     })

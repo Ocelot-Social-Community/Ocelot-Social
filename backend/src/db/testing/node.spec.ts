@@ -9,7 +9,7 @@ import { TestNode } from './node'
 
 const node = (properties: Record<string, unknown>) => new TestNode(User, properties, 1)
 
-describe('testNode.get', () => {
+describe('TestNode.get', () => {
   it('reads a property the node carries', () => {
     expect(node({ slug: 'peter-pan' }).get('slug')).toBe('peter-pan')
   })
@@ -36,7 +36,7 @@ describe('testNode.get', () => {
   )
 })
 
-describe('testNode.properties', () => {
+describe('TestNode.properties', () => {
   it('hands back a copy, so a caller cannot edit the handle', () => {
     const user = node({ slug: 'peter-pan' })
     const copy = user.properties()
@@ -46,7 +46,7 @@ describe('testNode.properties', () => {
   })
 })
 
-describe('testNode.update', () => {
+describe('TestNode.update', () => {
   // A valid User, so a rejection below is about the patch and not about the node it starts from.
   const stored = {
     id: 'u1',

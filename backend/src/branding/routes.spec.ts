@@ -213,7 +213,7 @@ describe('branding/routes', () => {
     )
   })
 
-  describe('gET /manifest.json', () => {
+  describe('GET /manifest.json', () => {
     test('lists the discovered archives without leaking their file paths', async () => {
       const { res } = await call(brandingRouter('/brands', deps), '/manifest.json')
 
@@ -273,7 +273,7 @@ describe('branding/routes', () => {
     })
   })
 
-  describe('gET /archives/:id', () => {
+  describe('GET /archives/:id', () => {
     test('streams the archive of a known brand', async () => {
       mockCreateReadStream.mockReturnValue(Readable.from(['tar-bytes']))
 

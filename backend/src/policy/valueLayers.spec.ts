@@ -6,7 +6,7 @@ import { createInMemoryPolicyService, policyValueLayers } from './index'
 // exercised exactly as in production; the same helper feeds both the policyConfig resolver
 // and systemConfigStatus, which is why the encoding lives in one place.
 describe(policyValueLayers, () => {
-  it('jSON-encodes all three layers of a boolean key with no override', () => {
+  it('JSON-encodes all three layers of a boolean key with no override', () => {
     const policy = createInMemoryPolicyService({}, {})
 
     expect(policyValueLayers(policy, 'apiKeysEnabled')).toEqual({
@@ -16,7 +16,7 @@ describe(policyValueLayers, () => {
     })
   })
 
-  it('jSON-encodes an integer key as a number literal', () => {
+  it('JSON-encodes an integer key as a number literal', () => {
     const policy = createInMemoryPolicyService({}, {})
 
     expect(policyValueLayers(policy, 'maxPinnedPosts')).toEqual({

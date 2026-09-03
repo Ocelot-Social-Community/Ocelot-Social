@@ -20,7 +20,7 @@ describe('sendWrongEmail', () => {
     locale: 'en',
   }
 
-  describe('english', () => {
+  describe('English', () => {
     beforeEach(() => {
       data.locale = 'en'
     })
@@ -30,7 +30,7 @@ describe('sendWrongEmail', () => {
     })
   })
 
-  describe('german', () => {
+  describe('German', () => {
     beforeEach(() => {
       data.locale = 'de'
     })

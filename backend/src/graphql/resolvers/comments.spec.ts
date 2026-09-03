@@ -88,7 +88,7 @@ const setupPostAndComment = async () => {
   }
 }
 
-describe('comment query', () => {
+describe('Comment query', () => {
   // The default ordering is a deliberate behaviour change: neo4j-graphql-js emitted no
   // ORDER BY without an explicit `orderBy`, so the order was whatever the database returned.
   // Paging over an unordered result is unstable by definition, hence a fixed default —
@@ -144,7 +144,7 @@ describe('comment query', () => {
   })
 })
 
-describe('createComment', () => {
+describe('CreateComment', () => {
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
       variables = {
@@ -211,7 +211,7 @@ describe('createComment', () => {
   })
 })
 
-describe('updateComment', () => {
+describe('UpdateComment', () => {
   describe('given a post and a comment', () => {
     beforeEach(setupPostAndComment)
 
@@ -298,7 +298,7 @@ describe('updateComment', () => {
   })
 })
 
-describe('deleteComment', () => {
+describe('DeleteComment', () => {
   describe('given a post and a comment', () => {
     beforeEach(setupPostAndComment)
 

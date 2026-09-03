@@ -56,7 +56,7 @@ const deleteSetting = vi.mocked(deleteSettingImpl)
 // The repository is mocked above, so this object is never actually consulted.
 const dbStub = {} as never
 
-describe('policyService', () => {
+describe('PolicyService', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })

@@ -76,7 +76,7 @@ afterAll(async () => {
   database.neode.close()
 })
 
-describe('posts in Groups', () => {
+describe('Posts in Groups', () => {
   beforeAll(async () => {
     anyUser = await Factory.build('user', {
       id: 'any-user',

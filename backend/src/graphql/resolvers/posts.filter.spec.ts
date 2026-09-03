@@ -37,7 +37,7 @@ afterAll(async () => {
   database.neode.close()
 })
 
-describe('filter Posts', () => {
+describe('Filter Posts', () => {
   const now = new Date()
 
   beforeAll(async () => {

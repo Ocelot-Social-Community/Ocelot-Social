@@ -12,7 +12,7 @@ const { sendNotificationMail } = await import('./sendEmail')
 describe('sendNotificationMail', () => {
   let locale = 'en'
 
-  describe('english', () => {
+  describe('English', () => {
     beforeEach(() => {
       locale = 'en'
     })
@@ -247,7 +247,7 @@ describe('sendNotificationMail', () => {
     })
   })
 
-  describe('german', () => {
+  describe('German', () => {
     beforeEach(() => {
       locale = 'de'
     })

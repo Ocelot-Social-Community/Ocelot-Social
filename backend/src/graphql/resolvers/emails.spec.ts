@@ -50,7 +50,7 @@ afterEach(async () => {
   await cleanDatabase()
 })
 
-describe('addEmailAddress', () => {
+describe('AddEmailAddress', () => {
   beforeEach(() => {
     variables = { ...variables, email: 'new-email@example.org' }
   })
@@ -162,7 +162,7 @@ describe('addEmailAddress', () => {
   })
 })
 
-describe('verifyEmailAddress', () => {
+describe('VerifyEmailAddress', () => {
   beforeEach(() => {
     variables = { ...variables, email: 'to-be-verified@example.org', nonce: '12345' }
   })
@@ -324,7 +324,7 @@ describe('verifyEmailAddress', () => {
             expect(email).toBeNull()
           })
 
-          describe('edge case: In the meantime someone created an `EmailAddress` node with the given email belonging to a user', () => {
+          describe('Edge case: In the meantime someone created an `EmailAddress` node with the given email belonging to a user', () => {
             beforeEach(async () => {
               await Factory.build('user', { id: '568' }, { email: 'to-be-verified@example.org' })
             })
@@ -339,7 +339,7 @@ describe('verifyEmailAddress', () => {
             })
           })
 
-          describe('edge case: We have an abandoned `EmailAddress` node with the given email', () => {
+          describe('Edge case: We have an abandoned `EmailAddress` node with the given email', () => {
             beforeEach(async () => {
               await Factory.build('emailAddress', { email: 'to-be-verified@example.org' })
             })
@@ -370,7 +370,7 @@ describe('verifyEmailAddress', () => {
   })
 })
 
-describe('verifyNonce', () => {
+describe('VerifyNonce', () => {
   beforeEach(async () => {
     await Factory.build('emailAddress', {
       nonce: '12345',

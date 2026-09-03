@@ -5,7 +5,7 @@ import { TEST_CONFIG } from '@root/test/helpers'
 
 import ImageResolver from './images'
 
-describe('image', () => {
+describe('Image', () => {
   const { Image } = ImageResolver
   const Location =
     'https://fsn1.your-objectstorage.com/ocelot-social-staging/original/f965ea15-1f6b-43aa-a535-927410e2585e-dsc02586.jpg'

@@ -53,7 +53,7 @@ afterAll(async () => {
   setup.database.neode.close()
 })
 
-describe('room.roomName', () => {
+describe('Room.roomName', () => {
   it('is the same from the list projection and from the statement', async () => {
     const list = await setup.query({ query: listQuery })
 

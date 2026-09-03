@@ -142,7 +142,7 @@ describe('act-on hierarchy', () => {
     })
   })
 
-  describe('deleteUser (user.delete.any + dominance)', () => {
+  describe('DeleteUser (user.delete.any + dominance)', () => {
     it('lets an admin delete a plain user', async () => {
       await as('the-admin')
 

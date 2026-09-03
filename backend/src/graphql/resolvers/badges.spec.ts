@@ -45,7 +45,7 @@ afterAll(() => {
   database.neode.close()
 })
 
-describe('badge query', () => {
+describe('Badge query', () => {
   afterEach(async () => {
     await cleanDatabase()
   })
@@ -77,7 +77,7 @@ describe('badge query', () => {
   })
 })
 
-describe('badges', () => {
+describe('Badges', () => {
   beforeEach(async () => {
     regularUser = await Factory.build(
       'user',

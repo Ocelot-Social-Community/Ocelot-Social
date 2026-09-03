@@ -174,7 +174,7 @@ describe('createApiKey', () => {
     })
   })
 
-  describe('aPI keys disabled', () => {
+  describe('API keys disabled', () => {
     it('throws error when feature is disabled', async () => {
       const user = await database.neode.create('User', {
         id: 'u-disabled',

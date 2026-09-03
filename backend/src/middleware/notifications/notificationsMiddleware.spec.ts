@@ -659,7 +659,7 @@ describe('notifications', () => {
           postContent = 'Content of post where I get mentioned in a comment.'
         })
 
-        describe('i am not blocked at all', () => {
+        describe('I am not blocked at all', () => {
           beforeEach(async () => {
             commentContent =
               'One mention about me with <a data-mention-id="you" class="mention" href="/profile/you" target="_blank">@al-capone</a>.'

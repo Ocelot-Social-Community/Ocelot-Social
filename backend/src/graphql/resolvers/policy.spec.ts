@@ -63,7 +63,7 @@ beforeEach(() => {
   policy = { apiKeysEnabled: true, categoriesActive: true }
 })
 
-describe('query.policy', () => {
+describe('Query.policy', () => {
   describe('anonymous viewer', () => {
     test('returns public keys but null for the authenticated-only apiKeysEnabled, without error', async () => {
       authenticatedUser = null
@@ -147,7 +147,7 @@ describe('query.policy', () => {
   })
 })
 
-describe('query.policyDefaults', () => {
+describe('Query.policyDefaults', () => {
   test('is forbidden for anonymous viewers', async () => {
     authenticatedUser = null
 
@@ -209,7 +209,7 @@ describe('query.policyDefaults', () => {
   })
 })
 
-describe('mutation.setPolicy / resetPolicy authorization', () => {
+describe('Mutation.setPolicy / resetPolicy authorization', () => {
   test('forbids setPolicy for non-admins', async () => {
     authenticatedUser = asUser('user')
 
@@ -257,7 +257,7 @@ describe('mutation.setPolicy / resetPolicy authorization', () => {
   })
 })
 
-describe('policyKey enum (schema-derived contract)', () => {
+describe('PolicyKey enum (schema-derived contract)', () => {
   test('is derived from the schema keys — the single source of truth', async () => {
     const { data, errors } = await query({
       query: parse('{ __type(name: "PolicyKey") { enumValues { name } } }'),
@@ -331,7 +331,7 @@ describe('setPolicy value validation (integration)', () => {
   })
 })
 
-describe('mutation resolvers (unit)', () => {
+describe('Mutation resolvers (unit)', () => {
   describe('setPolicy', () => {
     test('parses the JSON value, calls policy.set, and serializes the event', async () => {
       const set = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
@@ -531,7 +531,7 @@ describe('mutation resolvers (unit)', () => {
   })
 })
 
-describe('subscription.policyChanged', () => {
+describe('Subscription.policyChanged', () => {
   // The subscription shares its visibility mechanism (canView) with the query:
   // a change event is only delivered to a subscriber who may see the changed key.
   const subscriptionContext = (user: Context['user']) =>

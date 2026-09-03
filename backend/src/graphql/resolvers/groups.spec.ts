@@ -306,7 +306,7 @@ describe('in mode', () => {
       })
     })
 
-    describe('createGroup', () => {
+    describe('CreateGroup', () => {
       beforeEach(() => {
         variables = {
           ...variables,
@@ -492,7 +492,7 @@ describe('in mode', () => {
   })
 
   describe('building up – clean db after each resolver', () => {
-    describe('group', () => {
+    describe('Group', () => {
       beforeAll(async () => {
         await seedBasicsAndClearAuthentication()
       })
@@ -879,7 +879,7 @@ describe('in mode', () => {
       })
     })
 
-    describe('joinGroup', () => {
+    describe('JoinGroup', () => {
       beforeAll(async () => {
         await seedBasicsAndClearAuthentication()
       })
@@ -1131,7 +1131,7 @@ describe('in mode', () => {
       })
     })
 
-    describe('groupMembers', () => {
+    describe('GroupMembers', () => {
       beforeAll(async () => {
         await seedBasicsAndClearAuthentication()
       })
@@ -2040,7 +2040,7 @@ describe('in mode', () => {
       })
     })
 
-    describe('changeGroupMemberRole', () => {
+    describe('ChangeGroupMemberRole', () => {
       beforeAll(async () => {
         await seedComplexScenarioAndClearAuthentication()
       })
@@ -2914,7 +2914,7 @@ describe('in mode', () => {
       })
     })
 
-    describe('leaveGroup', () => {
+    describe('LeaveGroup', () => {
       beforeAll(async () => {
         await seedComplexScenarioAndClearAuthentication()
         // closed-group
@@ -3185,7 +3185,7 @@ describe('in mode', () => {
       })
     })
 
-    describe('updateGroup', () => {
+    describe('UpdateGroup', () => {
       beforeAll(async () => {
         await seedBasicsAndClearAuthentication()
       })
@@ -3684,7 +3684,7 @@ describe('in mode', () => {
     })
   })
 
-  describe('removeUserFromGroup', () => {
+  describe('RemoveUserFromGroup', () => {
     beforeAll(async () => {
       await seedComplexScenarioAndClearAuthentication()
     })
@@ -3887,7 +3887,7 @@ describe('in mode', () => {
       await cleanDatabase()
     })
 
-    describe('groupCount', () => {
+    describe('GroupCount', () => {
       beforeEach(async () => {
         authenticatedUser = await user.toJson()
         await mutate({
@@ -4045,7 +4045,7 @@ describe('in mode', () => {
       })
     })
 
-    describe('updateGroup slug conflict', () => {
+    describe('UpdateGroup slug conflict', () => {
       beforeEach(async () => {
         authenticatedUser = await user.toJson()
         await mutate({
@@ -4090,7 +4090,7 @@ describe('in mode', () => {
       })
     })
 
-    describe('createGroup slug conflict', () => {
+    describe('CreateGroup slug conflict', () => {
       beforeEach(async () => {
         authenticatedUser = await user.toJson()
         await mutate({
@@ -4129,7 +4129,7 @@ describe('in mode', () => {
       })
     })
 
-    describe('user.groups postsCount resolver', () => {
+    describe('User.groups postsCount resolver', () => {
       beforeEach(async () => {
         authenticatedUser = await user.toJson()
         await mutate({
@@ -4194,7 +4194,7 @@ describe('in mode', () => {
       })
     })
 
-    describe('user.groups ordering – shared groups first', () => {
+    describe('User.groups ordering – shared groups first', () => {
       let viewerUser
 
       beforeEach(async () => {
@@ -4270,7 +4270,7 @@ describe('in mode', () => {
       })
     })
 
-    describe('user.groups nameFilter', () => {
+    describe('User.groups nameFilter', () => {
       beforeEach(async () => {
         authenticatedUser = await user.toJson()
         for (const [id, name] of [
@@ -4392,7 +4392,7 @@ async function deliveredWithin(
   return outcome === MACROTASK ? 'pending' : outcome
 }
 
-describe('subscription.groupShowMembersChanged filter', () => {
+describe('Subscription.groupShowMembersChanged filter', () => {
   it('passes matching events through for authenticated users', async () => {
     const pubsub = new PubSub()
     const policy = createInMemoryPolicyService({ groupsEnabled: true })
@@ -4436,7 +4436,7 @@ describe('subscription.groupShowMembersChanged filter', () => {
   })
 })
 
-describe('subscription.groupMembershipVisibilityChanged filter', () => {
+describe('Subscription.groupMembershipVisibilityChanged filter', () => {
   it('passes matching events through for authenticated users', async () => {
     const pubsub = new PubSub()
     const policy = createInMemoryPolicyService({ groupsEnabled: true })

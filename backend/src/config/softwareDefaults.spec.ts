@@ -23,7 +23,7 @@ interface LoadedConfig {
 // (a) Structural guard: the admin "software default" column (envRegistry) must surface
 // exactly the canonical value, so nobody can re-inline a diverging literal. Every key in
 // the map is an env var present in the registry; its display string is String(value).
-describe('sOFTWARE_DEFAULTS ↔ envRegistry display', () => {
+describe('SOFTWARE_DEFAULTS ↔ envRegistry display', () => {
   it('surfaces each canonical default as the registry display string', () => {
     for (const [name, value] of Object.entries(SOFTWARE_DEFAULTS)) {
       const spec = ENV_SPEC_BY_NAME[name]
@@ -43,7 +43,7 @@ describe('sOFTWARE_DEFAULTS ↔ envRegistry display', () => {
 // their default in comparison / NODE_ENV logic (`!== 'false'`, `=== 'true'`, or a
 // NODE_ENV branch), separate from the map — so a flipped comparison would silently disagree
 // with what the admin sees. This asserts config's actual unset-default matches the map.
-describe('sOFTWARE_DEFAULTS ↔ config runtime default (logic-gated defaults)', () => {
+describe('SOFTWARE_DEFAULTS ↔ config runtime default (logic-gated defaults)', () => {
   // config/index.ts refuses to load unless the hard-required vars are present, so supply
   // dummies. The flags under test are deliberately ABSENT, so config yields their defaults.
   const REQUIRED: Record<string, string> = {

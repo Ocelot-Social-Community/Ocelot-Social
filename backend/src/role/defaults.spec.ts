@@ -5,7 +5,7 @@ import { isKnownPermission } from '@src/permission'
 import { DEFAULT_ROLES } from './defaults'
 import { ADMIN_ROLE, MODERATOR_ROLE, OWNER_ROLE, USER_ROLE } from './types'
 
-describe('dEFAULT_ROLES', () => {
+describe('DEFAULT_ROLES', () => {
   it('seeds exactly the four built-in roles', () => {
     expect(DEFAULT_ROLES.map((role) => role.name)).toEqual([
       OWNER_ROLE,

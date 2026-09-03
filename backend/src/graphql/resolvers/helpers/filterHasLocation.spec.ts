@@ -38,7 +38,7 @@ afterEach(async () => {
 })
 
 describe('hasLocation filter', () => {
-  describe('user', () => {
+  describe('User', () => {
     beforeEach(async () => {
       const location = await Factory.build('location', {
         id: 'loc-hamburg',
@@ -77,7 +77,7 @@ describe('hasLocation filter', () => {
     })
   })
 
-  describe('group', () => {
+  describe('Group', () => {
     beforeEach(async () => {
       const location = await Factory.build('location', {
         id: 'loc-berlin',
@@ -123,7 +123,7 @@ describe('hasLocation filter', () => {
     })
   })
 
-  describe('post', () => {
+  describe('Post', () => {
     beforeEach(async () => {
       const author = await Factory.build('user', { id: 'post-author', name: 'Author' })
       authenticatedUser = await author.toJson()

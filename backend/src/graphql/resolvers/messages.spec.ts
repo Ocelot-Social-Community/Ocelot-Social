@@ -55,7 +55,7 @@ afterAll(async () => {
   database.neode.close()
 })
 
-describe('message', () => {
+describe('Message', () => {
   let roomId: string
 
   beforeEach(async () => {
@@ -905,7 +905,7 @@ describe('message', () => {
     })
   })
 
-  describe('file field resolvers', () => {
+  describe('File field resolvers', () => {
     it('returns extension when present', () => {
       expect(resolvers.File.extension({ extension: 'jpg' })).toBe('jpg')
     })

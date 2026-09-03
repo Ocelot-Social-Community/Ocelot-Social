@@ -71,7 +71,7 @@ describe('fixtures.first', () => {
   })
 })
 
-describe('testNode.update against a real node', () => {
+describe('TestNode.update against a real node', () => {
   // The two cases that have to NOT be rejected. Here rather than in node.spec.ts, because
   // proving that a check stays quiet means letting the write happen — and node.spec.ts is
   // deliberately driverless, so a passing update there would hang on a session it never opens.

@@ -45,7 +45,7 @@ afterEach(async () => {
   await cleanDatabase()
 })
 
-describe('signup', () => {
+describe('Signup', () => {
   beforeEach(() => {
     variables = { ...variables, email: 'someuser@example.org', locale: 'de' }
   })
@@ -160,7 +160,7 @@ describe('signup', () => {
   })
 })
 
-describe('signupVerification', () => {
+describe('SignupVerification', () => {
   describe('given valid password and email', () => {
     beforeEach(() => {
       variables = {
@@ -179,7 +179,7 @@ describe('signupVerification', () => {
         authenticatedUser = null
       })
 
-      describe('emailAddress exists, but is already related to a user account', () => {
+      describe('EmailAddress exists, but is already related to a user account', () => {
         beforeEach(async () => {
           const { email, nonce } = variables
           const [emailAddress, user] = await Promise.all([

@@ -50,7 +50,7 @@ afterAll(async () => {
   database.neode.close()
 })
 
-describe('socialMedia', () => {
+describe('SocialMedia', () => {
   let someUser, ownerNode, owner
 
   const url = 'https://twitter.com/pippi-langstrumpf'

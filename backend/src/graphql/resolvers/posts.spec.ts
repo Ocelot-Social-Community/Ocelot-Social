@@ -102,7 +102,7 @@ afterEach(async () => {
   await cleanDatabase()
 })
 
-describe('post', () => {
+describe('Post', () => {
   describe('can be filtered', () => {
     let followedUser, happyPost, cryPost
 
@@ -365,7 +365,7 @@ describe('post', () => {
   })
 })
 
-describe('createPost', () => {
+describe('CreatePost', () => {
   beforeEach(() => {
     variables = {
       ...variables,
@@ -898,7 +898,7 @@ describe('createPost', () => {
   })
 })
 
-describe('updatePost', () => {
+describe('UpdatePost', () => {
   let author, newlyCreatedPost
 
   beforeEach(async () => {
@@ -1896,7 +1896,7 @@ describe('pin posts', () => {
         })
       })
 
-      describe('postOrdering', () => {
+      describe('PostOrdering', () => {
         beforeEach(async () => {
           await Factory.build('post', {
             id: 'im-a-pinned-post',
@@ -2257,7 +2257,7 @@ describe('unpin posts', () => {
   })
 })
 
-describe('deletePost', () => {
+describe('DeletePost', () => {
   let author
 
   beforeEach(async () => {
@@ -2382,7 +2382,7 @@ describe('emotions', () => {
     }
   })
 
-  describe('addPostEmotions', () => {
+  describe('AddPostEmotions', () => {
     let postsEmotionsQueryVariables
 
     beforeEach(() => {
@@ -2489,7 +2489,7 @@ describe('emotions', () => {
     })
   })
 
-  describe('removePostEmotions', () => {
+  describe('RemovePostEmotions', () => {
     let removePostEmotionsVariables, postsEmotionsQueryVariables
 
     beforeEach(async () => {
@@ -2592,7 +2592,7 @@ describe('emotions', () => {
       PostsEmotionsByCurrentUserVariables = { postId: 'p1376' }
     })
 
-    describe('postsEmotionsCountByEmotion', () => {
+    describe('PostsEmotionsCountByEmotion', () => {
       it("returns a post's emotions count", async () => {
         const expectedResponse = { data: { PostsEmotionsCountByEmotion: 1 } }
 
@@ -2605,7 +2605,7 @@ describe('emotions', () => {
       })
     })
 
-    describe('postsEmotionsByCurrentUser', () => {
+    describe('PostsEmotionsByCurrentUser', () => {
       describe('authenticated', () => {
         beforeEach(async () => {
           authenticatedUser = await user.toJson()

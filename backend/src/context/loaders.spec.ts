@@ -201,7 +201,7 @@ describe('forField', () => {
   })
 })
 
-describe('room.unreadCount', () => {
+describe('Room.unreadCount', () => {
   it('counts unseen messages per room, including rooms with none', async () => {
     await expect(unreadCountFor(rooms, reader)).resolves.toEqual([2, 1, 0, 0])
   })

@@ -25,7 +25,7 @@ describe('sendRegistrationMail', () => {
   }
 
   describe('with invite code', () => {
-    describe('english', () => {
+    describe('English', () => {
       beforeEach(() => {
         data.locale = 'en'
         data.inviteCode = 'welcome'
@@ -36,7 +36,7 @@ describe('sendRegistrationMail', () => {
       })
     })
 
-    describe('german', () => {
+    describe('German', () => {
       beforeEach(() => {
         data.locale = 'de'
         data.inviteCode = 'welcome'
@@ -49,7 +49,7 @@ describe('sendRegistrationMail', () => {
   })
 
   describe('without invite code', () => {
-    describe('english', () => {
+    describe('English', () => {
       beforeEach(() => {
         data.locale = 'en'
         delete data.inviteCode
@@ -60,7 +60,7 @@ describe('sendRegistrationMail', () => {
       })
     })
 
-    describe('german', () => {
+    describe('German', () => {
       beforeEach(() => {
         data.locale = 'de'
         delete data.inviteCode

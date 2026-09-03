@@ -40,7 +40,7 @@ afterAll(async () => {
   database.neode.close()
 })
 
-describe('room', () => {
+describe('Room', () => {
   let roomId: string
 
   beforeAll(async () => {
@@ -75,7 +75,7 @@ describe('room', () => {
       })
 
       it('throws authorization error', async () => {
-        expect(
+        await expect(
           mutate({
             mutation: CreateMessage,
             variables: {
@@ -661,7 +661,7 @@ describe('room', () => {
       authenticatedUser = await chattingUser.toJson()
     })
 
-    describe('createGroupRoom', () => {
+    describe('CreateGroupRoom', () => {
       it('creates a group room', async () => {
         const result = await mutate({
           mutation: CreateGroupRoom,
