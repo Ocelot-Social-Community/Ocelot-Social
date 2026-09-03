@@ -31,19 +31,40 @@ const graphqlPlugin = (): Plugin => ({
 
 export default defineConfig({
   plugins: [graphqlPlugin()],
-  // Resolves the `@src/*`, `@config/*` … aliases straight from tsconfig, so the mapping lives in
-  // ONE place instead of being restated here (the Jest setup had to derive it by hand).
-  resolve: { tsconfigPaths: true },
+  resolve: {
+    // Resolves the `@src/*`, `@config/*` … aliases straight from tsconfig, so the mapping lives
+    // in ONE place instead of being restated here (the Jest setup had to derive it by hand).
+    tsconfigPaths: true,
+  },
   test: {
     // describe/it/expect AND `vi` as globals — matches how the suite was written under Jest and
     // keeps the spec files free of per-file imports for them.
     globals: true,
     environment: 'node',
-    // graphql-tools' loadFiles reaches the resolver modules through a dynamic import with an
-    // absolute path. Left externalised, that import bypasses Vite's transform and lands in
-    // Node's ESM loader, where our extensionless specifiers do not resolve. Inlining the package
-    // keeps the whole chain inside the pipeline.
-    server: { deps: { inline: ['@graphql-tools/load-files'] } },
+    // These have to run through Vite rather than being externalised, for two separate reasons.
+    //
+    // load-files reaches the resolver modules through a dynamic import with an absolute path;
+    // externalised, that import lands in Node's ESM loader, where our extensionless specifiers
+    // do not resolve.
+    //
+    // The rest is the dual-package hazard: `graphql` ships a CJS (`main`) and an ESM (`module`)
+    // build from ONE install and has no `exports` map to arbitrate. Vite-processed code picks the
+    // ESM entry, externalised code the CJS one — two live instances of the same package, and
+    // graphql's own `instanceOf` then rejects a type built by "the other" with the misleading
+    // "Cannot use GraphQLObjectType … from another module or realm". Naming the graphql-tools
+    // packages explicitly (a `/^@graphql-tools\//` regex does NOT match here) puts schema
+    // construction and schema printing on the same instance.
+    server: {
+      deps: {
+        inline: [
+          'graphql',
+          '@graphql-tools/schema',
+          '@graphql-tools/merge',
+          '@graphql-tools/utils',
+          '@graphql-tools/load-files',
+        ],
+      },
+    },
     include: ['src/**/*.{spec,test}.ts'],
     // Was `jest.setTimeout(10000)` in test/setup.ts, whose only content that was — so that file
     // is gone. The reason is unchanged: metascraper parsing in the embeds specs runs close to
