@@ -155,11 +155,33 @@ jobs:
       - name: backend | Lint
         run: cd backend && npm ci && npm run lint
 
+  # Sharded across four runners. The suite runs with `fileParallelism: false` because every spec
+  # talks to the SAME Neo4j and wipes it between cases (cleanDatabase) — so no parallelism is
+  # available inside a runner without breaking that isolation. Sharding sidesteps the problem
+  # instead of fighting it: each shard is a separate runner with its own compose stack and
+  # therefore its own database, and `fileParallelism: false` still holds within each one.
+  #
+  # Four is where the curve flattens. Measured: ~95s of fixed setup per shard (image download and
+  # `docker load` dominate at ~60s of it) against a 9m23s test run, so N=4 lands at ~5.5 minutes
+  # wall clock versus 11 minutes today. N=6 would buy under a minute more for 50% more runner
+  # minutes.
+  #
+  # Vitest splits test FILES, not test cases, and has no runtime feedback to balance them —
+  # groups.spec.ts alone is three times the size of the next largest spec, so the shards are not
+  # expected to finish evenly. The slowest one sets the wall clock.
   unit_test_backend:
-    name: Unit tests - Backend
+    name: Unit tests - Backend (${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
     if: needs.files-changed.outputs.backend == 'true' || needs.files-changed.outputs.docker == 'true'
     needs: [files-changed, build_test_neo4j, build_test_backend]
     runs-on: ubuntu-latest
+    strategy:
+      # A failing shard must not cancel its siblings. The shards cover disjoint sets of specs, so
+      # killing them on the first failure hides every other failure in the suite and turns a full
+      # picture into one bisect step per push.
+      fail-fast: false
+      matrix:
+        shardIndex: [1, 2, 3, 4]
+        shardTotal: [4]
     permissions:
       # A job-level block REPLACES the workflow-level one, so `contents: read` has to be repeated
       # here — this job checks out the repository. It works today without it only because the
@@ -275,9 +297,93 @@ jobs:
       # against src/db/schema: a constraint or index the declaration wants and `migrate init`
       # did not produce, or one the database holds that nothing declares any more — plus a
       # label or relationship type in the database that the registry does not know.
+      #
+      # Only on the first shard. It is a property of the migration against the declaration, not of
+      # the test run, so every shard would assert the identical thing against an identically
+      # migrated database. Kept here rather than promoted to a job of its own because a separate
+      # job would pay the full ~95s setup (image load, Neo4j boot, migrate) a second time to
+      # re-run an 8s check that shard 1 already has the state for.
       - name: backend | Schema check - declaration vs. database
+        if: matrix.shardIndex == 1
         run: docker compose exec -T backend npm run db:schema:check
 
-      - name: backend | Unit test incl. coverage check
-        run: docker compose exec -T backend npm test
+      # `--coverage` stays ON per shard: the coverage data is what gets embedded in the blob and
+      # merged later. The THRESHOLD is what has to be off (`test:shard` passes
+      # --coverage.thresholds.lines=0) — a shard runs a quarter of the specs against the whole of
+      # `src/**/*.ts`, so the 94.3% gate would fail every shard by construction. It is enforced
+      # once, on the merged total, in the job below.
+      #
+      # The blob goes to a directory of its OWN, not into `coverage/` next to the reports:
+      # `--merge-reports=<dir>` parses EVERY file in the directory it is given as a blob, and
+      # chokes on the first one that is not (verified — it fails with a JSON SyntaxError).
+      - name: backend | Unit test (shard ${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
+        run: |
+          docker compose exec -T backend npm run test:shard -- \
+            --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} \
+            --outputFile=coverage/blobs/blob-${{ matrix.shardIndex }}.json
+
+      # `./coverage` is bind-mounted to `/app/coverage` (docker-compose.test.yml), so the blob the
+      # container just wrote is already on the runner — no `docker compose cp` needed.
+      - name: backend | Upload coverage blob
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: backend-coverage-blob-${{ matrix.shardIndex }}
+          path: coverage/blobs/blob-${{ matrix.shardIndex }}.json
+          retention-days: 1
+          if-no-files-found: error
+
+  # The coverage gate. No shard can hold it on its own — each one exercises a quarter of the specs
+  # against the whole of `src/**/*.ts` — so the 94.3% line threshold from vitest.config.ts is
+  # checked here, once, on the merged total. This is the job to make a required status check;
+  # the shards individually only prove that their own slice passed.
+  #
+  # Verified before adopting this: merged coverage is IDENTICAL to a single unsharded run, down to
+  # the covered/total counts on lines, statements, functions and branches. That is not a given —
+  # vitest-dev/vitest#8616 reports merged v8 coverage drifting far enough to break thresholds, but
+  # that repro relies on `experimentalAstAwareRemapping`, which this project does not set, and
+  # `coverage.include: ['src/**/*.ts']` gives every shard the same file basis to begin with.
+  #
+  # No Neo4j, no migration, no compose stack: `--merge-reports` runs no tests, it re-aggregates
+  # the blobs. It only needs the backend image for vitest, its node_modules and the sources the
+  # v8 provider remaps against.
+  merge_coverage_backend:
+    name: Coverage - Backend
+    if: needs.files-changed.outputs.backend == 'true' || needs.files-changed.outputs.docker == 'true'
+    needs: [files-changed, build_test_backend, unit_test_backend]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Download backend image
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: backend-test-image
+          path: /tmp
+
+      - name: Load Docker Image
+        run: zstd -dc /tmp/backend.tar.zst | docker load
+
+      # `merge-multiple` flattens all four artifacts into the one directory `--merge-reports`
+      # expects. Nothing else may land in it — see the note on the shard test step.
+      - name: Download coverage blobs
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: backend-coverage-blob-*
+          merge-multiple: true
+          path: coverage/blobs
+
+      - name: backend | copy env files
+        run: |
+          cp webapp/.env.template webapp/.env
+          cp backend/.env.template backend/.env
+
+      # `run` rather than `up`+`exec`, and `--no-deps` because the backend service declares
+      # depends_on minio/minio-mc/mailserver — none of which a report merge has any use for.
+      - name: backend | Merge coverage incl. coverage check
+        run: |
+          docker compose -f docker-compose.yml -f docker-compose.test.yml \
+            run --rm --no-deps -T backend npm run test:merge
 
