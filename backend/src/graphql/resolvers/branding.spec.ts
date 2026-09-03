@@ -1,4 +1,4 @@
-import { describe, beforeEach, test, expect } from 'vitest'
+import { describe, beforeEach, it, expect } from 'vitest'
 
 import { UserInputError } from '@graphql/errors'
 import { PolicyValidationError } from '@src/policy'

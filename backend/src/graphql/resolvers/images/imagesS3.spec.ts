@@ -40,8 +40,8 @@ vi.mock('@aws-sdk/lib-storage', () => {
   }
 })
 
-// Imported after the mock registrations, not above them: `unstable_mockModule`
-// does not hoist, so a static import would bind the real module first.
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { DeleteObjectCommand } = await import('@aws-sdk/client-s3')
 const { Upload } = await import('@aws-sdk/lib-storage')
 const { default: Factory, cleanDatabase } = await import('@db/factories')

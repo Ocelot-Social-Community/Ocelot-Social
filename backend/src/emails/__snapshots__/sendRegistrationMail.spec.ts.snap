@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`sendRegistrationMail > with invite code > english > renders correctly 1`] = `
+exports[`sendRegistrationMail > with invite code > English > renders correctly 1`] = `
 {
   "attachments": [],
   "from": {
@@ -156,7 +156,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendRegistrationMail > with invite code > german > renders correctly 1`] = `
+exports[`sendRegistrationMail > with invite code > German > renders correctly 1`] = `
 {
   "attachments": [],
   "from": {
@@ -313,7 +313,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendRegistrationMail > without invite code > english > renders correctly 1`] = `
+exports[`sendRegistrationMail > without invite code > English > renders correctly 1`] = `
 {
   "attachments": [],
   "from": {
@@ -469,7 +469,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendRegistrationMail > without invite code > german > renders correctly 1`] = `
+exports[`sendRegistrationMail > without invite code > German > renders correctly 1`] = `
 {
   "attachments": [],
   "from": {

@@ -25,8 +25,8 @@ vi.mock('@src/emails/sendEmail', () => ({
   sendWrongEmail: vi.fn(),
 }))
 
-// Imported after the mock registrations, not above them: `unstable_mockModule`
-// does not hoist, so a static import would bind the real module first.
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { default: Factory, cleanDatabase } = await import('@db/factories')
 const { default: CreateComment } = await import('@graphql/queries/comments/CreateComment.gql')
 const { default: ChangeGroupMemberRole } =

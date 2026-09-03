@@ -1,6 +1,6 @@
 import { Readable } from 'node:stream'
 
-import { describe, beforeEach, test, expect } from 'vitest'
+import { describe, beforeEach, it, expect } from 'vitest'
 
 import type { S3Config } from '@config/index'
 import type { FileUpload } from 'graphql-upload'

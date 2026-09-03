@@ -10,8 +10,7 @@ import type { Context } from '@src/context'
 
 // Keep the full resolved branding (config/index.ts reads branding.metadata.* transitively);
 // only tighten the group description minimum for this suite.
-// Loaded up front: `jest.requireActual` does not exist under ESM, and the factory itself
-// cannot await.
+// Loaded up front: the mock factory below is synchronous and cannot await `vi.importActual`.
 const actualBranding = await import('@ocelot-social/branding')
 
 vi.mock('@src/branding', () => {
@@ -29,8 +28,8 @@ vi.mock('@src/branding', () => {
   }
 })
 
-// Imported after the mock registrations, not above them: `unstable_mockModule`
-// does not hoist, so a static import would bind the real module first.
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { default: Factory, cleanDatabase } = await import('@db/factories')
 const { default: SignupVerification } = await import('@graphql/queries/auth/SignupVerification.gql')
 const { default: CreateComment } = await import('@graphql/queries/comments/CreateComment.gql')

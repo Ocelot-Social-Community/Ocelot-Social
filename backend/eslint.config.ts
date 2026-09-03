@@ -141,6 +141,12 @@ export default [
       'vitest/prefer-expect-resolves': 'off',
       'vitest/prefer-expect-type-of': 'off',
 
+      /* Also not semantics-preserving: it cannot tell whether the property it rewrites already
+         exists. `res.status = vi.fn(...)` on a PassThrough CREATES the express method the fake is
+         missing; the `vi.spyOn(res, 'status')` it produces instead throws at runtime, because
+         there is nothing there to intercept. */
+      'vitest/prefer-spy-on': 'off',
+
       'vitest/require-mock-type-parameters': 'off',
       // The other half of that autofix: it rewrites `vi.mock('x')` into `vi.mock(import('x'))`.
       'vitest/prefer-import-in-mock': 'off',

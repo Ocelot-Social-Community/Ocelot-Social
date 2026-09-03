@@ -1,10 +1,10 @@
-// ESM has no automock: unstable_mockModule requires an explicit factory.
+// ESM has no automock: `vi.mock` requires an explicit factory.
 import { describe, expect, it, beforeEach, afterEach } from 'vitest'
 
 vi.mock('@db/neo4j', () => ({ getDriver: vi.fn() }))
 
-// Imported after the mock registrations, not above them: `unstable_mockModule`
-// does not hoist, so a static import would bind the real module first.
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { forLog, repair, up } =
   await import('@db/migrations/20260821120000-repair-or-remove-unfollowable-social-media')
 const { getDriver } = await import('@db/neo4j')
@@ -15,7 +15,7 @@ const { getDriver } = await import('@db/neo4j')
 //
 // NOT beside its subject, which is the convention everywhere else in this repository, because
 // `node-migrate` requires EVERY entry that `readdir` returns for --migrations-dir. A spec left
-// in there is loaded by the runner, `describe` is not defined outside jest, and `db:migrate up`
+// in there is loaded by the runner, `describe` is not defined outside it, and `db:migrate up`
 // dies before it reaches the first real migration — in the init container, on every deploy.
 // Measured, not assumed: `yarn db:migrate list` reproduces it, and a `__tests__/` subdirectory
 // does not help, because the loader `require`s the directory entry too. The only fix is to be

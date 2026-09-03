@@ -5,7 +5,7 @@
 
 import { resolve } from 'node:path'
 
-import { describe, beforeEach, afterEach, test, expect } from 'vitest'
+import { describe, beforeEach, afterEach, it, expect } from 'vitest'
 
 import type { Mock, MockInstance } from 'vitest'
 
@@ -19,7 +19,7 @@ const isolateModules = async (run: () => Promise<void>): Promise<void> => {
 
 const BRANDING = '@ocelot-social/branding'
 const DISCOVER = '@ocelot-social/branding/dist/discover.js'
-// `jest.requireActual` is synchronous and has no ESM counterpart; the real module is
+// The mock factory cannot await, so `vi.importActual` is no use inside it; the real module is
 // pulled in once here and the factory below reaches into it.
 const actualDiscover = await import('@ocelot-social/branding/dist/discover.js')
 

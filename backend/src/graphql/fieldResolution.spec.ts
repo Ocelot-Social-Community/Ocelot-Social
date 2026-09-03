@@ -331,7 +331,7 @@ describe('@cypher / @relation field resolution', () => {
 
     const nonNullPayloadFields = payloadTypes.flatMap((typeName) => {
       const fields = workList[typeName]
-      // Named explicitly, because this runs while jest is COLLECTING tests: an unguarded
+      // Named explicitly, because this runs while the runner is COLLECTING tests: an unguarded
       // `undefined.filter` here aborts the whole file with a message that mentions neither
       // the type nor the registry, and the other 200-odd cases never get to run.
       if (!fields) {

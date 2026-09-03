@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 // Unit tests for PolicyService — no DB dependency. The repository is mocked
 // so we can verify resolution-order (DB > ENV > Schema-Default) deterministically.
-// (no-unsafe-assignment disabled: jest matchers like expect.objectContaining are `any`.)
+// (no-unsafe-assignment disabled: matchers like expect.objectContaining are `any`.)
 
-import { describe, beforeEach, test, expect, afterEach } from 'vitest'
+import { describe, beforeEach, it, expect, afterEach } from 'vitest'
 
 import type { PolicyChangeEvent, PolicyPubSub } from './PolicyService'
 import type {
@@ -14,8 +14,8 @@ import type {
 } from './repository'
 import type { PolicyKey } from './types'
 
-// The mocks carry the real signatures: `@jest/globals` types a bare `vi.fn()` as
-// `Mock<UnknownFunction>`, whose `mockResolvedValue` argument is `never`.
+// The mocks carry the real signatures: a bare `vi.fn()` types its `mockResolvedValue` argument
+// as `any`, which would let a wrong shape through unnoticed.
 interface Repository {
   readAllSettings: typeof ReadAllSettings
   readLastChange: typeof ReadLastChange
@@ -31,8 +31,8 @@ vi.mock('./repository', () => ({
   deleteSetting: vi.fn<Repository['deleteSetting']>(),
 }))
 
-// Imported after the mock registrations, not above them: `unstable_mockModule`
-// does not hoist, so a static import would bind the real module first.
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const {
   PolicyService,
   createInMemoryPolicyService,

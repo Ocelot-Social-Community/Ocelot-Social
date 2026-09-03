@@ -1,4 +1,4 @@
-import { beforeEach, describe, test, expect } from 'vitest'
+import { beforeEach, describe, it, expect } from 'vitest'
 
 import type { Mock } from 'vitest'
 
@@ -8,14 +8,14 @@ vi.mock('@sentry/node', () => ({
   captureException: vi.fn(),
 }))
 
-// Imported after the mock registrations, not above them: `unstable_mockModule`
-// does not hoist, so a static import would bind the real module first.
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { init, withScope, captureException } = await import('@sentry/node')
 const { createSentryMiddleware } = await import('./sentryMiddleware')
 
 const initMock = vi.mocked(init)
-// Signature stated: the tests configure this one with mockImplementation, and
-// `Mock<UnknownFunction>` accepts no implementation under @jest/globals.
+// Signature stated: the tests configure this one with mockImplementation, and a bare `vi.fn()`
+// would type its argument as `any` instead of checking it against the real callback.
 // Cast rather than vi.mocked(withScope): Sentry's real signature is
 // `(scope, callback) => unknown`, while the middleware only ever calls the single-argument form
 // — typing the stub to what is actually used keeps the implementations below honest.

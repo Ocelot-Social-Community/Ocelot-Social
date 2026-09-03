@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`sendChatMessageMail > english > chat_message template 1`] = `
+exports[`sendChatMessageMail > English > chat_message template 1`] = `
 {
   "attachments": [],
   "from": {
@@ -144,7 +144,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendChatMessageMail > german > chat_message template 1`] = `
+exports[`sendChatMessageMail > German > chat_message template 1`] = `
 {
   "attachments": [],
   "from": {

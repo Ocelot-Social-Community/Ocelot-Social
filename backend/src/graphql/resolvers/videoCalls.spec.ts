@@ -35,16 +35,20 @@ vi.mock('livekit-server-sdk', () => {
             ),
         }
       }),
-    RoomServiceClient: vi.fn().mockImplementation(() => ({
-      listParticipants: async (roomName: string) => listParticipantsMock(roomName),
-    })),
+    // `function`, not an arrow: the resolver calls `new RoomServiceClient(...)` and vitest
+    // constructs the implementation with Reflect.construct, which arrows do not support.
+    RoomServiceClient: vi.fn().mockImplementation(function () {
+      return {
+        listParticipants: async (roomName: string) => listParticipantsMock(roomName),
+      }
+    }),
     TwirpError: MockTwirpError,
     WebhookReceiver: vi.fn(),
   }
 })
 
-// Imported after the mock registrations, not above them: `unstable_mockModule`
-// does not hoist, so a static import would bind the real module first.
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { TwirpError } = await import('livekit-server-sdk')
 const { default: Factory, cleanDatabase } = await import('@db/factories')
 const { default: JoinGroupVideoCall } =

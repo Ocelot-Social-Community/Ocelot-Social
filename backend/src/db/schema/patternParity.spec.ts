@@ -155,8 +155,8 @@ const patterns = (): { pattern: string; used: string }[] => {
  *
  * A test here asks up to 180 of them, and the wrapping is what they cost: measured against a
  * local Neo4j, 180 round trips take 664 ms as a session-and-transaction each, 548 ms sharing
- * the session, and 222 ms inside a single transaction. Jest's default timeout is 5 s and this
- * file sets none, so the margin was about sevenfold locally and correspondingly thinner
+ * the session, and 222 ms inside a single transaction. The runner's timeout is 10 s (set in
+ * vitest.config.ts), so the margin was about fortyfold locally and correspondingly thinner
  * wherever the database is a network hop further away.
  */
 const inReadTransaction = async (work: (transaction: Transaction) => Promise<void>) => {

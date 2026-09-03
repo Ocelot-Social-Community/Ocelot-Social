@@ -5,11 +5,11 @@ import { PassThrough, Readable } from 'node:stream'
 import { finished } from 'node:stream/promises'
 import { setImmediate as tick } from 'node:timers/promises'
 
-/* eslint-disable n/prefer-process-get-builtin-module -- these two must go through Jest's module
+/* eslint-disable n/prefer-process-get-builtin-module -- these two must go through the runner's module
    registry to pick up the fs mocks below; process.getBuiltinModule() bypasses it and returns the
    real module. */
 
-import { describe, beforeEach, test, expect } from 'vitest'
+import { describe, beforeEach, it, expect } from 'vitest'
 
 import type { BrandingRouterDeps } from './routes'
 import type { Request, Response } from 'express'
@@ -18,15 +18,15 @@ import type { Mock } from 'vitest'
 vi.mock('node:fs', () => ({ createReadStream: vi.fn() }))
 vi.mock('node:fs/promises', () => ({ stat: vi.fn() }))
 
-// Imported after the mock registrations, not above them: `unstable_mockModule`
-// does not hoist, so a static import would bind the real module first.
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { createReadStream } = await import('node:fs')
 const { stat } = await import('node:fs/promises')
 /* eslint-enable n/prefer-process-get-builtin-module */
 const { brandingRouter } = await import('./routes')
 
 // The two disk readers are INJECTED, not module-mocked. `@ocelot-social/branding/dist/discover.js` is
-// a subpath of a `file:` dependency, and whether jest bound a mock of it to routes.ts depended on the
+// a subpath of a `file:` dependency, and whether the runner bound a mock of it to routes.ts depended on the
 // environment: green here, silently ignored in the CI container, where the router then read the real
 // filesystem and every fixture-based expectation failed. Passing the fakes in removes the question.
 // The id guard is NOT faked — routes.ts keeps importing the real one, so a tightening of
@@ -83,18 +83,16 @@ function makeRes(): MockRes {
     },
     configurable: true,
   })
-  vi.spyOn(res, 'status').mockImplementation(function status(this: MockRes, code: number) {
+  // Direct assignment, not vi.spyOn: PassThrough has no status/setHeader/json to spy ON — these
+  // are the express additions the fake is missing, so they have to be created, not intercepted.
+  res.status = vi.fn(function status(this: MockRes, code: number) {
     this.statusCode = code
     return this
   })
-  vi.spyOn(res, 'setHeader').mockImplementation(function setHeader(
-    this: MockRes,
-    k: string,
-    v: string,
-  ) {
+  res.setHeader = vi.fn(function setHeader(this: MockRes, k: string, v: string) {
     this.headers[k.toLowerCase()] = v
   })
-  vi.spyOn(res, 'json').mockImplementation(function json(this: MockRes, value: unknown) {
+  res.json = vi.fn(function json(this: MockRes, value: unknown) {
     this.body = JSON.stringify(value)
     return this
   })

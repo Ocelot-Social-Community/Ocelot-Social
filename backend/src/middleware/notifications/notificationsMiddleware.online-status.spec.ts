@@ -30,8 +30,8 @@ vi.mock('../helpers/isUserOnline', () => ({
   isUserOnline: (): boolean => isUserOnlineMock(),
 }))
 
-// Imported after the mock registrations, not above them: `unstable_mockModule`
-// does not hoist, so a static import would bind the real module first.
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { default: Factory, cleanDatabase } = await import('@db/factories')
 const { default: CreatePost } = await import('@graphql/queries/posts/CreatePost.gql')
 const { createApolloTestSetup } = await import('@root/test/helpers')

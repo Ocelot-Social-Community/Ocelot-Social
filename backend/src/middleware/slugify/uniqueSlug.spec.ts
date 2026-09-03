@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 
 import uniqueSlug from './uniqueSlug'
 
-// Mirrors the (unexported) callback type uniqueSlug takes; `@jest/globals` needs a
-// signature on the mock, a bare vi.fn() is Mock<UnknownFunction>.
+// Mirrors the (unexported) callback type uniqueSlug takes: a bare `vi.fn()` would type
+// `mockResolvedValue` as `any` instead of checking it against the real callback.
 type IsUnique = (slug: string) => Promise<boolean>
 
 describe(uniqueSlug, () => {

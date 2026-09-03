@@ -41,7 +41,7 @@ vi.mock('@src/graphql/resolvers/videoCalls', () => ({
 }))
 
 const mockLogger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() }
-// jest.mock factories are hoisted above the const/let declarations they
+// vi.mock factories are hoisted above the const/let declarations they
 // reference, so `default: mockLogger` / `default: mockConfig` would read a
 // TDZ-locked binding when webhook.ts is required. Expose them through
 // getters so the binding is only read when the consuming code actually
@@ -61,8 +61,8 @@ vi.mock('@src/config', () => ({
   },
 }))
 
-// Imported after the mock registrations, not above them: `unstable_mockModule`
-// does not hoist, so a static import would bind the real module first.
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { registerLiveKitWebhook } = await import('./webhook')
 
 type CapturedHandler = (req: any, res: any) => void
@@ -77,9 +77,11 @@ function makeApp() {
 
 function makeRes() {
   const res: any = { headersSent: false }
-  vi.spyOn(res, 'status').mockImplementation(() => res)
-  vi.spyOn(res, 'send').mockImplementation(() => res)
-  vi.spyOn(res, 'end').mockImplementation(() => res)
+  // Direct assignment, not vi.spyOn: the fake starts out with `headersSent` only, so there is no
+  // status/send/end to intercept — these have to be created.
+  res.status = vi.fn(() => res)
+  res.send = vi.fn(() => res)
+  res.end = vi.fn(() => res)
   return res
 }
 

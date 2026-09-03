@@ -43,7 +43,7 @@ const mockLogger = {
   warn: vi.fn<(...args: unknown[]) => void>(),
   error: vi.fn<(...args: unknown[]) => void>(),
 }
-// jest.mock factories are hoisted above the const/let declarations they
+// vi.mock factories are hoisted above the const/let declarations they
 // reference, so `default: mockLogger` / `default: mockConfig` would read a
 // TDZ-locked binding when poller.ts is required. Expose them through getters
 // so the binding is only read when the consuming code actually touches the
@@ -62,8 +62,8 @@ vi.mock('@src/config', () => ({
   },
 }))
 
-// Imported after the mock registrations, not above them: `unstable_mockModule`
-// does not hoist, so a static import would bind the real module first.
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { startLiveKitPoller, stopLiveKitPoller } = await import('./poller')
 
 const setEnabled = () => {

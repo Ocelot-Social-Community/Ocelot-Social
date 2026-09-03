@@ -9,7 +9,7 @@
 import { Readable } from 'node:stream'
 
 import { S3Client } from '@aws-sdk/client-s3'
-import { beforeAll, afterAll, afterEach, describe, beforeEach, test, expect } from 'vitest'
+import { beforeAll, afterAll, afterEach, describe, beforeEach, it, expect } from 'vitest'
 
 import type { FileInput } from './attachments'
 import type { ApolloTestSetup } from '@root/test/helpers'
@@ -20,11 +20,11 @@ import type { ReadStream } from 'node:fs'
 const s3SendMock = vi.fn()
 vi.spyOn(S3Client.prototype, 'send').mockImplementation(s3SendMock)
 
-// ESM has no automock: unstable_mockModule requires an explicit factory.
+// ESM has no automock: `vi.mock` requires an explicit factory.
 vi.mock('@aws-sdk/lib-storage', () => ({ Upload: vi.fn() }))
 
-// Imported after the mock registrations, not above them: `unstable_mockModule`
-// does not hoist, so a static import would bind the real module first.
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { Upload } = await import('@aws-sdk/lib-storage')
 const { default: Factory, cleanDatabase } = await import('@db/factories')
 const { UserInputError } = await import('@graphql/errors')
@@ -40,7 +40,11 @@ const UploadMock = {
   },
 }
 
-vi.mocked(Upload).mockImplementation(() => UploadMock)
+// `function`, not an arrow: the service calls `new Upload(...)` and vitest constructs the
+// implementation with Reflect.construct, which arrows do not support.
+vi.mocked(Upload).mockImplementation(function () {
+  return UploadMock
+})
 
 const config: S3Config = {
   AWS_ACCESS_KEY_ID: 'AWS_ACCESS_KEY_ID',

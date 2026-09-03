@@ -219,7 +219,7 @@ describe('Room.unreadCount', () => {
   it('resolves a whole room list in a single query', async () => {
     const sessionSpy = vi.spyOn(driver, 'session')
 
-    // Restored in `finally`: jest is configured without `restoreMocks`, so a failing
+    // Restored in `finally`: the runner is configured without `restoreMocks`, so a failing
     // assertion would leave the spy on the shared driver for every later test in this file.
     // Milder than the same omission in queryBatching.spec.ts — there is no mockImplementation
     // here, so the real session still opens and only the call count keeps accumulating — but

@@ -1,4 +1,4 @@
-import { beforeEach, describe, test, expect } from 'vitest'
+import { beforeEach, describe, it, expect } from 'vitest'
 
 import type { Mock } from 'vitest'
 
@@ -10,7 +10,7 @@ const isolateModules = async (run: () => Promise<void>): Promise<void> => {
   await run()
 }
 // Unit tests for addMiddleware – testing append, prepend, before, after, and error cases.
-// Each test uses jest.isolateModules + vi.doMock to get a fresh ocelotMiddlewares array.
+// Each test uses the isolateModules helper + vi.doMock to get a fresh ocelotMiddlewares array.
 
 interface MiddlewareModule {
   addMiddleware: (mw: { name: string; middleware: unknown; position: unknown }) => void
@@ -63,7 +63,7 @@ const loadModule = async (
   vi.resetModules()
   let capturedArgs: unknown[] = []
   // ./applyMiddleware, not the package: graphql-middleware is reached through createRequire
-  // there (see that file), which bypasses Jest's registry entirely.
+  // there (see that file), which bypasses the runner's registry entirely.
   vi.doMock('./applyMiddleware', () => ({
     applyMiddleware: (_schema: unknown, ...middlewares: unknown[]) => {
       capturedArgs = middlewares
@@ -82,8 +82,8 @@ const loadModule = async (
   }
 }
 
-// Under ESM the mock instances produced by an unstable_mockModule factory survive
-// isolateModulesAsync — only the module registry is isolated, not the mocks — so call counts
+// The mock instances produced by a `vi.mock` factory survive the registry reset in
+// isolateModules — only the module registry is isolated, not the mocks — so call counts
 // would otherwise accumulate across tests.
 beforeEach(() => {
   vi.clearAllMocks()

@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`sendWrongEmail > english > renders correctly 1`] = `
+exports[`sendWrongEmail > English > renders correctly 1`] = `
 {
   "attachments": [],
   "from": {
@@ -144,7 +144,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendWrongEmail > german > renders correctly 1`] = `
+exports[`sendWrongEmail > German > renders correctly 1`] = `
 {
   "attachments": [],
   "from": {
