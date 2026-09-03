@@ -2,7 +2,7 @@
 
 import config from 'eslint-config-it4c'
 import graphql from 'eslint-config-it4c/modules/graphql'
-import jest from 'eslint-config-it4c/modules/jest'
+import vitest from 'eslint-config-it4c/modules/vitest'
 
 // The PolicyKey / EnvCategory enums are derived from their single sources and injected into the
 // runtime schema by src/graphql/types/index.ts. graphql-eslint loads the STATIC .gql files, so
@@ -25,7 +25,7 @@ export default [
     ignores: ['node_modules/', 'build/', 'coverage/', 'public-docs/', 'schema.graphql'],
   },
   ...config,
-  ...jest,
+  ...vitest,
   // GraphQL schema linting (extend file pattern to include .gql)
   ...graphql.map((c) => ({
     ...c,
@@ -87,7 +87,7 @@ export default [
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: ['eslint.config.ts', 'jest.config.ts', 'prettier.config.ts'],
+          allowDefaultProject: ['eslint.config.ts', 'vitest.config.ts', 'prettier.config.ts'],
         },
         tsconfigRootDir: import.meta.dirname,
       },
@@ -118,7 +118,7 @@ export default [
   },
   {
     // Shared test helpers (test/setup.ts, test/helpers.ts) legitimately import devDependencies
-    // such as @jest/globals. `n/no-unpublished-import` recognises `*.spec.ts` as unpublished on
+    // such as vitest. `n/no-unpublished-import` recognises `*.spec.ts` as unpublished on
     // its own, but not these — hence the narrow exemption. Deliberately its own block: folding it
     // into the spec overrides above would also hand `test/` the unbound-method exception, which
     // it does not need (verified: lint is clean without it).
