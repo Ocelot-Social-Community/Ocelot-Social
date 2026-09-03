@@ -227,15 +227,15 @@ describe('softDeleteMiddleware', () => {
         beforeEach(beforeUser)
 
         it('displays name', () => {
-          expect(subject.name).toBe('Offensive Name')
+          expect(subject.name).toEqual('Offensive Name')
         })
 
         it('displays slug', () => {
-          expect(subject.slug).toBe('offensive-name')
+          expect(subject.slug).toEqual('offensive-name')
         })
 
         it('displays about', () => {
-          expect(subject.about).toBe('This self description is very offensive')
+          expect(subject.about).toEqual('This self description is very offensive')
         })
 
         it('displays avatar', () => {
@@ -249,15 +249,15 @@ describe('softDeleteMiddleware', () => {
         beforeEach(beforePost)
 
         it('displays title', () => {
-          expect(subject.title).toBe('Disabled post')
+          expect(subject.title).toEqual('Disabled post')
         })
 
         it('displays slug', () => {
-          expect(subject.slug).toBe('disabled-post')
+          expect(subject.slug).toEqual('disabled-post')
         })
 
         it('displays content', () => {
-          expect(subject.content).toBe('This is an offensive post content')
+          expect(subject.content).toEqual('This is an offensive post content')
         })
 
         it('displays image', () => {
@@ -271,7 +271,7 @@ describe('softDeleteMiddleware', () => {
         beforeEach(beforeComment)
 
         it('displays content', () => {
-          expect(subject.content).toBe('Disabled comment')
+          expect(subject.content).toEqual('Disabled comment')
         })
       })
     })
@@ -285,19 +285,19 @@ describe('softDeleteMiddleware', () => {
         beforeEach(beforeUser)
 
         it('obfuscates name', () => {
-          expect(subject.name).toBe('UNAVAILABLE')
+          expect(subject.name).toEqual('UNAVAILABLE')
         })
 
         it('obfuscates slug', () => {
-          expect(subject.slug).toBe('UNAVAILABLE')
+          expect(subject.slug).toEqual('UNAVAILABLE')
         })
 
         it('obfuscates about', () => {
-          expect(subject.about).toBe('UNAVAILABLE')
+          expect(subject.about).toEqual('UNAVAILABLE')
         })
 
         it('obfuscates avatar', () => {
-          expect(subject.avatar).toBeNull()
+          expect(subject.avatar).toEqual(null)
         })
       })
 
@@ -305,19 +305,19 @@ describe('softDeleteMiddleware', () => {
         beforeEach(beforePost)
 
         it('obfuscates title', () => {
-          expect(subject.title).toBe('UNAVAILABLE')
+          expect(subject.title).toEqual('UNAVAILABLE')
         })
 
         it('obfuscates slug', () => {
-          expect(subject.slug).toBe('UNAVAILABLE')
+          expect(subject.slug).toEqual('UNAVAILABLE')
         })
 
         it('obfuscates content', () => {
-          expect(subject.content).toBe('UNAVAILABLE')
+          expect(subject.content).toEqual('UNAVAILABLE')
         })
 
         it('obfuscates image', () => {
-          expect(subject.image).toBeNull()
+          expect(subject.image).toEqual(null)
         })
       })
 
@@ -325,7 +325,7 @@ describe('softDeleteMiddleware', () => {
         beforeEach(beforeComment)
 
         it('obfuscates content', () => {
-          expect(subject.content).toBe('UNAVAILABLE')
+          expect(subject.content).toEqual('UNAVAILABLE')
         })
       })
     })

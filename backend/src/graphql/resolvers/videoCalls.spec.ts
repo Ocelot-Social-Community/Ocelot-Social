@@ -264,7 +264,7 @@ describe('videoCallParticipantCount', () => {
     expect(errors?.[0].message).toMatch(/upstream boom/i)
     // No participant count was returned — the field failed instead of
     // silently degrading to 0.
-    expect(data?.videoCallParticipantCount).toBe(false)
+    expect(data?.videoCallParticipantCount).toBeFalsy()
     expect(listParticipantsMock).toHaveBeenCalledWith('group-pub-1')
   })
 })
@@ -430,7 +430,7 @@ describe('joinGroupVideoCall', () => {
     expect(errors).toBeUndefined()
     expect(data.joinGroupVideoCall.url).toBe('wss://livekit.example.test')
     expect(data.joinGroupVideoCall.roomName).toBe('group-pub-1')
-    expect(data.joinGroupVideoCall.token).toBeTypeOf('string')
+    expect(typeof data.joinGroupVideoCall.token).toBe('string')
     expect(data.joinGroupVideoCall.token).toContain('member-1')
     expect(data.joinGroupVideoCall.token).toContain('group-pub-1')
   })

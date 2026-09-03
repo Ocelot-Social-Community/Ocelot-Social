@@ -368,7 +368,7 @@ describe('branding/routes', () => {
       })
 
       expect(res.statusCode).not.toBe(304)
-      expect(mockCreateReadStream).toHaveBeenCalledWith()
+      expect(mockCreateReadStream).toHaveBeenCalled()
     })
 
     test('answers 404 for a brand that is not deployed', async () => {

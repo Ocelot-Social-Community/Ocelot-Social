@@ -97,7 +97,7 @@ describe(decode, () => {
         })
         await session.close()
 
-        expect(result.records[0].get('lastUsedAt')).toBe(true)
+        expect(result.records[0].get('lastUsedAt')).toBeTruthy()
       })
     })
 

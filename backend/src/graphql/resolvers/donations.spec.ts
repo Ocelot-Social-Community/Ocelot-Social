@@ -159,9 +159,9 @@ describe('donations', () => {
             data: { UpdateDonations },
           } = await mutate({ mutation: updateDonations, variables })
 
-          expect(newlyCreatedDonations.updatedAt).toBe(true)
+          expect(newlyCreatedDonations.updatedAt).toBeTruthy()
           expect(Date.parse(newlyCreatedDonations.updatedAt)).toEqual(expect.any(Number))
-          expect(UpdateDonations.updatedAt).toBe(true)
+          expect(UpdateDonations.updatedAt).toBeTruthy()
           expect(Date.parse(UpdateDonations.updatedAt)).toEqual(expect.any(Number))
           expect(newlyCreatedDonations.updatedAt).not.toEqual(UpdateDonations.updatedAt)
         })

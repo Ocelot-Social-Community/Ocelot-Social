@@ -58,22 +58,22 @@ describe('migration: single-role-edges', () => {
   it('gives every user exactly one role edge matching their tier', async () => {
     await up(noop)
 
-    await expect(rolesOf('admin-id')).resolves.toEqual(['admin'])
-    await expect(rolesOf('mod-id')).resolves.toEqual(['moderator'])
-    await expect(rolesOf('member-id')).resolves.toEqual(['user']) // baseline gets an explicit edge
+    expect(await rolesOf('admin-id')).toEqual(['admin'])
+    expect(await rolesOf('mod-id')).toEqual(['moderator'])
+    expect(await rolesOf('member-id')).toEqual(['user']) // baseline gets an explicit edge
   })
 
   it('collapses multiple edges to a single deterministic role', async () => {
     await up(noop)
 
     // owner-first then alphabetical → admin wins over moderator
-    await expect(rolesOf('multi-id')).resolves.toEqual(['admin'])
+    expect(await rolesOf('multi-id')).toEqual(['admin'])
   })
 
   it('drops the legacy user.role property', async () => {
     await up(noop)
 
-    await expect(legacyRole('admin-id')).resolves.toBeNull()
-    await expect(legacyRole('member-id')).resolves.toBeNull()
+    expect(await legacyRole('admin-id')).toBeNull()
+    expect(await legacyRole('member-id')).toBeNull()
   })
 })

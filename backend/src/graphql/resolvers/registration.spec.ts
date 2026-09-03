@@ -97,7 +97,7 @@ describe('signup', () => {
           )
           const emailAddressJson = await emailAddress.toJson()
 
-          expect(emailAddressJson.createdAt).toBe(true)
+          expect(emailAddressJson.createdAt).toBeTruthy()
           expect(Date.parse(emailAddressJson.createdAt as string)).toEqual(expect.any(Number))
         })
 

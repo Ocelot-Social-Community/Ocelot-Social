@@ -11,14 +11,14 @@ describe(uniqueSlug, () => {
     const string = 'Hello World'
     const isUnique = vi.fn<IsUnique>().mockResolvedValue(true)
 
-    await expect(uniqueSlug(string, isUnique)).resolves.toBe('hello-world')
+    await expect(uniqueSlug(string, isUnique)).resolves.toEqual('hello-world')
   })
 
   it('increments slugified string until unique', async () => {
     const string = 'Hello World'
     const isUnique = vi.fn<IsUnique>().mockResolvedValueOnce(false).mockResolvedValueOnce(true)
 
-    await expect(uniqueSlug(string, isUnique)).resolves.toBe('hello-world-1')
+    await expect(uniqueSlug(string, isUnique)).resolves.toEqual('hello-world-1')
   })
 
   it('slugify null string', async () => {
@@ -32,14 +32,14 @@ describe(uniqueSlug, () => {
     const umlaut = 'ÄÖÜäöüß'
     const isUnique = vi.fn<IsUnique>().mockResolvedValue(true)
 
-    await expect(uniqueSlug(umlaut, isUnique)).resolves.toBe('aeoeueaeoeuess')
+    await expect(uniqueSlug(umlaut, isUnique)).resolves.toEqual('aeoeueaeoeuess')
   })
 
   it('removes Spanish enya and diacritics', async () => {
     const diacritics = 'áàéèíìóòúùñçÁÀÉÈÍÌÓÒÚÙÑÇ'
     const isUnique = vi.fn<IsUnique>().mockResolvedValue(true)
 
-    await expect(uniqueSlug(diacritics, isUnique)).resolves.toBe('aaeeiioouuncaaeeiioouunc')
+    await expect(uniqueSlug(diacritics, isUnique)).resolves.toEqual('aaeeiioouuncaaeeiioouunc')
   })
 
   // The User/Group/Post models validate slugs against /^[a-z0-9_-]+$/ — every
@@ -53,15 +53,15 @@ describe(uniqueSlug, () => {
     })
 
     it('strips apostrophes', async () => {
-      await expect(uniqueSlug("O'Conner Group", isUnique)).resolves.toBe('oconner-group')
+      await expect(uniqueSlug("O'Conner Group", isUnique)).resolves.toEqual('oconner-group')
     })
 
     it('keeps underscores and hyphens (both allowed by the models)', async () => {
-      await expect(uniqueSlug('foo_bar-baz', isUnique)).resolves.toBe('foo_bar-baz')
+      await expect(uniqueSlug('foo_bar-baz', isUnique)).resolves.toEqual('foo_bar-baz')
     })
 
     it('falls back to "anonymous" when nothing slug-able remains', async () => {
-      await expect(uniqueSlug('!!!', isUnique)).resolves.toBe('anonymous')
+      await expect(uniqueSlug('!!!', isUnique)).resolves.toEqual('anonymous')
     })
   })
 })

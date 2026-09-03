@@ -75,7 +75,7 @@ describe('room', () => {
       })
 
       it('throws authorization error', async () => {
-        await expect(
+        expect(
           mutate({
             mutation: CreateMessage,
             variables: {

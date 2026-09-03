@@ -181,7 +181,7 @@ describe('role management', () => {
       authenticatedUser = await user.toJson()
       const { data, errors } = await query({ query: PERMISSION_CATALOG })
 
-      expect(data).toBeNull()
+      expect(data).toEqual(null)
       expect(errors).toEqual([expect.objectContaining({ message: 'Not Authorized!' })])
     })
 
@@ -212,7 +212,7 @@ describe('role management', () => {
 
       // available is a non-null boolean for every entry.
       for (const entry of catalog) {
-        expect(entry.available).toBeTypeOf('boolean')
+        expect(typeof entry.available).toBe('boolean')
       }
     })
   })

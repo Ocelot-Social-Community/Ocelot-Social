@@ -90,7 +90,7 @@ describe('s3Service', () => {
       test('returns the `Location` that was returned by the s3 client library', async () => {
         const service = s3Service(config, 'ocelot-social')
 
-        await expect(service.uploadFile(input)).resolves.toBe(
+        await expect(service.uploadFile(input)).resolves.toEqual(
           'http://your-objectstorage.com/bucket/ocelot-social/unique-filename.jpg',
         )
       })
@@ -108,7 +108,7 @@ describe('s3Service', () => {
       test('adds `https:` as protocol', async () => {
         const service = s3Service(config, 'ocelot-social')
 
-        await expect(service.uploadFile(input)).resolves.toBe(
+        await expect(service.uploadFile(input)).resolves.toEqual(
           'https://your-objectstorage.com/bucket/ocelot-social/unique-filename.jpg',
         )
       })

@@ -538,8 +538,8 @@ describe('notifications', () => {
                   },
                 })
 
-                expect(readBefore).toBe(true)
-                expect(readAfter).toBe(false)
+                expect(readBefore).toEqual(true)
+                expect(readAfter).toEqual(false)
               })
 
               test('does not update the `createdAt` attribute', async () => {
@@ -568,9 +568,9 @@ describe('notifications', () => {
                   },
                 })
 
-                expect(createdAtBefore).toBe(true)
+                expect(createdAtBefore).toBeTruthy()
                 expect(Date.parse(createdAtBefore)).toEqual(expect.any(Number))
-                expect(createdAtAfter).toBe(true)
+                expect(createdAtAfter).toBeTruthy()
                 expect(Date.parse(createdAtAfter)).toEqual(expect.any(Number))
                 expect(createdAtBefore).toEqual(createdAtAfter)
               })
@@ -648,7 +648,7 @@ describe('notifications', () => {
           test('publishes `NOTIFICATION_ADDED`', async () => {
             await createPostAction()
 
-            expect(pubsubSpy).toHaveBeenCalledWith()
+            expect(pubsubSpy).toHaveBeenCalled()
           })
         })
       })

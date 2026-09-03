@@ -275,9 +275,9 @@ describe('updateComment', () => {
           data: { UpdateComment },
         } = (await mutate({ mutation: updateComment, variables })) as any // eslint-disable-line @typescript-eslint/no-explicit-any
 
-        expect(newlyCreatedComment.updatedAt).toBe(true)
+        expect(newlyCreatedComment.updatedAt).toBeTruthy()
         expect(Date.parse(newlyCreatedComment.updatedAt)).toEqual(expect.any(Number))
-        expect(UpdateComment.updatedAt).toBe(true)
+        expect(UpdateComment.updatedAt).toBeTruthy()
         expect(Date.parse(UpdateComment.updatedAt)).toEqual(expect.any(Number))
         expect(newlyCreatedComment.updatedAt).not.toEqual(UpdateComment.updatedAt)
       })

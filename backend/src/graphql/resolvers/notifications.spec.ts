@@ -377,7 +377,7 @@ describe('given some notifications', () => {
         it('returns null', async () => {
           const response = await mutate({ mutation: markAsRead, variables })
 
-          expect(response.data?.markAsRead).toBeNull()
+          expect(response.data?.markAsRead).toEqual(null)
           expect(response.errors).toBeUndefined()
         })
       })
@@ -419,7 +419,7 @@ describe('given some notifications', () => {
             it('returns null', async () => {
               const response = await mutate({ mutation: markAsRead, variables })
 
-              expect(response.data?.markAsRead).toBeNull()
+              expect(response.data?.markAsRead).toEqual(null)
               expect(response.errors).toBeUndefined()
             })
           })
@@ -478,7 +478,7 @@ describe('given some notifications', () => {
             variables: { id: 'p1' },
           })
 
-          expect(response.data?.markAsUnread).toBeNull()
+          expect(response.data?.markAsUnread).toEqual(null)
           expect(response.errors).toBeUndefined()
         })
       })
@@ -512,7 +512,7 @@ describe('given some notifications', () => {
             variables: { id: 'p3' },
           })
 
-          expect(response.data?.markAsUnread).toBeNull()
+          expect(response.data?.markAsUnread).toEqual(null)
           expect(response.errors).toBeUndefined()
         })
       })

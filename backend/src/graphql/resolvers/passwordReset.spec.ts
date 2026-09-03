@@ -220,7 +220,7 @@ describe('resetPassword', () => {
             const [request] = requests
             const { usedAt } = request.properties
 
-            expect(usedAt).not.toBe(false)
+            expect(usedAt).not.toBeFalsy()
           })
 
           it('updates password of the user', async () => {

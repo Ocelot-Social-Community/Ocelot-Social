@@ -4,7 +4,7 @@ import findProvider from './findProvider'
 
 describe('vimeo', () => {
   it('matches `https://vimeo.com/showcase/2098620/video/4082288`', () => {
-    expect(findProvider('https://vimeo.com/showcase/2098620/video/4082288')).toBe(
+    expect(findProvider('https://vimeo.com/showcase/2098620/video/4082288')).toEqual(
       'https://vimeo.com/api/oembed.json',
     )
   })
@@ -12,7 +12,7 @@ describe('vimeo', () => {
 
 describe('d.Tube', () => {
   it('matches `https://d.tube/v/alexshumsky/q4D-hIOjknY`', () => {
-    expect(findProvider('https://d.tube/v/alexshumsky/q4D-hIOjknY')).toBe(
+    expect(findProvider('https://d.tube/v/alexshumsky/q4D-hIOjknY')).toEqual(
       'https://api.d.tube/oembed',
     )
   })
@@ -20,7 +20,7 @@ describe('d.Tube', () => {
 
 describe('gIPHY', () => {
   it('matches `https://giphy.com/gifs/KRB0DCpSFQeT6/html5`', () => {
-    expect(findProvider('https://giphy.com/gifs/KRB0DCpSFQeT6/html5')).toBe(
+    expect(findProvider('https://giphy.com/gifs/KRB0DCpSFQeT6/html5')).toEqual(
       'https://giphy.com/services/oembed',
     )
   })
@@ -34,7 +34,7 @@ describe('flicker', () => {
 
 describe('codepen', () => {
   it('matches `https://codepen.io/goodkatz/pen/LYPGxQz`', () => {
-    expect(findProvider('https://codepen.io/goodkatz/pen/LYPGxQz')).toBe(
+    expect(findProvider('https://codepen.io/goodkatz/pen/LYPGxQz')).toEqual(
       'http://codepen.io/api/oembed',
     )
   })
@@ -42,7 +42,7 @@ describe('codepen', () => {
 
 describe('meetup', () => {
   it('matches `https://www.meetup.com/de-DE/spielego/events/ctdplqyzmbfc/`', () => {
-    expect(findProvider('https://www.meetup.com/de-DE/spielego/events/ctdplqyzmbfc/')).toBe(
+    expect(findProvider('https://www.meetup.com/de-DE/spielego/events/ctdplqyzmbfc/')).toEqual(
       'https://api.meetup.com/oembed',
     )
   })
@@ -50,7 +50,7 @@ describe('meetup', () => {
 
 describe('mixcloud', () => {
   it('matches `https://www.mixcloud.com/diffrent/giraffecast025/`', () => {
-    expect(findProvider('https://www.mixcloud.com/diffrent/giraffecast025/')).toBe(
+    expect(findProvider('https://www.mixcloud.com/diffrent/giraffecast025/')).toEqual(
       'https://www.mixcloud.com/oembed/',
     )
   })
@@ -84,13 +84,13 @@ describe('soundcloud', () => {
 
 describe('twitch', () => {
   it('matches `https://www.twitch.tv/gtimetv`', () => {
-    expect(findProvider('https://www.twitch.tv/gtimetv')).toBe('https://api.twitch.tv/v4/oembed')
+    expect(findProvider('https://www.twitch.tv/gtimetv')).toEqual('https://api.twitch.tv/v4/oembed')
   })
 })
 
 describe('twitter', () => {
   it('matches `https://twitter.com/kenfm/status/1168682881524232194`', () => {
-    expect(findProvider('https://twitter.com/kenfm/status/1168682881524232194')).toBe(
+    expect(findProvider('https://twitter.com/kenfm/status/1168682881524232194')).toEqual(
       'https://publish.twitter.com/oembed',
     )
   })
@@ -106,13 +106,13 @@ describe('facebook', () => {
 
 describe('youtube', () => {
   it('matches `https://www.youtube.com/watch?v=qkdXAtO40Fo`', () => {
-    expect(findProvider('https://www.youtube.com/watch?v=qkdXAtO40Fo')).toBe(
+    expect(findProvider('https://www.youtube.com/watch?v=qkdXAtO40Fo')).toEqual(
       'https://www.youtube.com/oembed',
     )
   })
 
   it('matches `https://youtu.be/qkdXAtO40Fo`', () => {
-    expect(findProvider(`https://youtu.be/qkdXAtO40Fo`)).toBe('https://www.youtube.com/oembed')
+    expect(findProvider(`https://youtu.be/qkdXAtO40Fo`)).toEqual('https://www.youtube.com/oembed')
   })
 
   it('matches `https://youtu.be/qkdXAtO40Fo?t=41`', () => {

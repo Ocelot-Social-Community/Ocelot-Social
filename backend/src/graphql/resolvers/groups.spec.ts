@@ -3038,7 +3038,7 @@ describe('in mode', () => {
               it('has "null" as membership role, was in the group, and left the group', async () => {
                 authenticatedUser = await ownerMemberUser.toJson()
 
-                await expect(memberInGroup('usual-member-user', 'closed-group')).resolves.toBe(true)
+                expect(await memberInGroup('usual-member-user', 'closed-group')).toBe(true)
 
                 authenticatedUser = await usualMemberUser.toJson()
 
@@ -3074,7 +3074,7 @@ describe('in mode', () => {
               it('has "null" as membership role, was in the group, and left the group', async () => {
                 authenticatedUser = await ownerMemberUser.toJson()
 
-                await expect(memberInGroup('admin-member-user', 'closed-group')).resolves.toBe(true)
+                expect(await memberInGroup('admin-member-user', 'closed-group')).toBe(true)
 
                 authenticatedUser = await adminMemberUser.toJson()
 
@@ -4430,7 +4430,7 @@ describe('subscription.groupShowMembersChanged filter', () => {
       groupShowMembersChanged: { groupId: 'g1' },
     })
 
-    await expect(deliveredWithin(next)).resolves.toBe('pending')
+    expect(await deliveredWithin(next)).toBe('pending')
 
     await iterator.return?.()
   })
@@ -4474,7 +4474,7 @@ describe('subscription.groupMembershipVisibilityChanged filter', () => {
       groupMembershipVisibilityChanged: { userId: 'u2' },
     })
 
-    await expect(deliveredWithin(next)).resolves.toBe('pending')
+    expect(await deliveredWithin(next)).toBe('pending')
 
     await iterator.return?.()
   })

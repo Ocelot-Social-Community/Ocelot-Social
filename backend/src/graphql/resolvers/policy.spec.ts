@@ -189,7 +189,7 @@ describe('query.policyDefaults', () => {
       'showContentFilterMasonryGrid',
       'showGroupButtonInHeader',
     ]) {
-      expect(defaults[key]).toBeTypeOf('boolean')
+      expect(typeof defaults[key]).toBe('boolean')
     }
     // Integer-typed policy keys come back as numbers (Int), not coerced booleans.
     for (const key of [
@@ -200,7 +200,7 @@ describe('query.policyDefaults', () => {
       'inviteCodesPersonalPerUser',
       'inviteCodesGroupPerUser',
     ]) {
-      expect(defaults[key]).toBeTypeOf('number')
+      expect(typeof defaults[key]).toBe('number')
     }
 
     // lastChange is bundled here (replaces the former policyLastChange query);

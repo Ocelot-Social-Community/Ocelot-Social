@@ -72,7 +72,7 @@ describe(withDefaults, () => {
   })
 
   it('still fills a timestamp in where the key is absent', () => {
-    expect(withDefaults(User, {}).createdAt).toBeTypeOf('string')
+    expect(typeof withDefaults(User, {}).createdAt).toBe('string')
   })
 
   it('leaves a null alone, so clearing a property still means clearing it', () => {

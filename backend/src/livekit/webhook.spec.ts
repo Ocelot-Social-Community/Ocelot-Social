@@ -188,7 +188,7 @@ describe('registerLiveKitWebhook', () => {
 
       expect(res.status).toHaveBeenCalledWith(401)
       expect(res.send).toHaveBeenCalledWith('Invalid signature')
-      expect(mockLogger.warn).toHaveBeenCalledWith()
+      expect(mockLogger.warn).toHaveBeenCalled()
     })
 
     it('returns 204 and ignores events for rooms outside the group- namespace', async () => {
@@ -202,7 +202,7 @@ describe('registerLiveKitWebhook', () => {
       await flushPromises()
 
       expect(res.status).toHaveBeenCalledWith(204)
-      expect(res.end).toHaveBeenCalledWith()
+      expect(res.end).toHaveBeenCalled()
       expect(mockPublish).not.toHaveBeenCalled()
     })
 
@@ -330,7 +330,7 @@ describe('registerLiveKitWebhook', () => {
         expect.any(Error),
       )
       expect(res.status).toHaveBeenCalledWith(500)
-      expect(res.end).toHaveBeenCalledWith()
+      expect(res.end).toHaveBeenCalled()
     })
 
     it('does not write a second response when headers were already sent', async () => {
@@ -346,7 +346,7 @@ describe('registerLiveKitWebhook', () => {
       await flushPromises()
 
       expect(res.status).not.toHaveBeenCalled()
-      expect(mockLogger.error).toHaveBeenCalledWith()
+      expect(mockLogger.error).toHaveBeenCalled()
     })
   })
 })

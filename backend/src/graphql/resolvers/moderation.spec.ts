@@ -173,9 +173,9 @@ describe('moderate resources', () => {
           }),
         ])
 
-        expect(firstReview.data.review.updatedAt).toBe(true)
+        expect(firstReview.data.review.updatedAt).toBeTruthy()
         expect(Date.parse(firstReview.data.review.updatedAt)).toEqual(expect.any(Number))
-        expect(secondReview.data.review.updatedAt).toBe(true)
+        expect(secondReview.data.review.updatedAt).toBeTruthy()
         expect(Date.parse(secondReview.data.review.updatedAt)).toEqual(expect.any(Number))
         expect(firstReview.data.review.updatedAt).not.toEqual(secondReview.data.review.updatedAt)
       })

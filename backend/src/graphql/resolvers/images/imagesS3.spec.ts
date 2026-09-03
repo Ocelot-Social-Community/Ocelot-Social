@@ -115,7 +115,7 @@ describe('deleteImage', () => {
     it('calls deleteCallback', async () => {
       await deleteImage(user, 'AVATAR_IMAGE')
 
-      expect(mockDeleteObjectCommand).toHaveBeenCalledWith()
+      expect(mockDeleteObjectCommand).toHaveBeenCalled()
     })
 
     describe('given a transaction parameter', () => {
@@ -136,7 +136,7 @@ describe('deleteImage', () => {
         }
 
         await expect(neode.all('Image')).resolves.toHaveLength(0)
-        expect(someString).toBe('Hello')
+        expect(someString).toEqual('Hello')
       })
 
       it('rolls back the transaction in case of errors', async () => {
@@ -213,7 +213,7 @@ describe('mergeImage', () => {
       it('calls upload callback', async () => {
         await mergeImage(post, 'HERO_IMAGE', imageInput)
 
-        expect(mockUpload).toHaveBeenCalledWith()
+        expect(mockUpload).toHaveBeenCalled()
       })
 
       it('creates `:Image` node', async () => {
@@ -250,8 +250,8 @@ describe('mergeImage', () => {
         const hydratedPost = neode.hydrateFirst(result, 'p', neode.model('Post'))
         const image = neode.hydrateFirst(result, 'i', neode.model('Image'))
 
-        expect(hydratedPost).toBe(true)
-        expect(image).toBe(true)
+        expect(hydratedPost).toBeTruthy()
+        expect(image).toBeTruthy()
       })
 
       it('sets metadata', async () => {
@@ -328,13 +328,13 @@ describe('mergeImage', () => {
         it('calls deleteCallback', async () => {
           await mergeImage(post, 'HERO_IMAGE', imageInput)
 
-          expect(mockDeleteObjectCommand).toHaveBeenCalledWith()
+          expect(mockDeleteObjectCommand).toHaveBeenCalled()
         })
 
         it('calls Upload', async () => {
           await mergeImage(post, 'HERO_IMAGE', imageInput)
 
-          expect(mockUpload).toHaveBeenCalledWith()
+          expect(mockUpload).toHaveBeenCalled()
         })
 
         it('updates metadata of existing image node', async () => {

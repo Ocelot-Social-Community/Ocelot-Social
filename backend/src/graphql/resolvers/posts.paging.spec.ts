@@ -94,6 +94,6 @@ describe('paging over tied sort values', () => {
   it('returns the same page twice in a row', async () => {
     // A partial order may also be unstable BETWEEN requests, which makes "load more" skip
     // rows the reader has not seen yet.
-    await expect(page(2)).resolves.toEqual(await page(2))
+    expect(await page(2)).toEqual(await page(2))
   }, 120000)
 })

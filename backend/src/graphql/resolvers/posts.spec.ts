@@ -977,7 +977,7 @@ describe('updatePost', () => {
         data: { UpdatePost: UpdatePostData },
       } = (await mutate({ mutation: UpdatePost, variables })) as any // eslint-disable-line @typescript-eslint/no-explicit-any
 
-      expect(UpdatePostData.updatedAt).toBe(true)
+      expect(UpdatePostData.updatedAt).toBeTruthy()
       expect(Date.parse(UpdatePostData.updatedAt)).toEqual(expect.any(Number))
       expect(newlyCreatedPost.updatedAt).not.toEqual(UpdatePostData.updatedAt)
     })

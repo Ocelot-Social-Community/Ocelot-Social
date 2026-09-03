@@ -107,8 +107,8 @@ describe('createApiKey', () => {
         lastUsedAt: null,
       })
       expect(data.createApiKey.apiKey.keyPrefix).toMatch(/^oak_/)
-      expect(data.createApiKey.apiKey.id).toBe(true)
-      expect(data.createApiKey.apiKey.createdAt).toBe(true)
+      expect(data.createApiKey.apiKey.id).toBeTruthy()
+      expect(data.createApiKey.apiKey.createdAt).toBeTruthy()
     })
 
     it('creates a key with expiry', async () => {
@@ -118,7 +118,7 @@ describe('createApiKey', () => {
       })
 
       expect(errors).toBeUndefined()
-      expect(data.createApiKey.apiKey.expiresAt).toBe(true)
+      expect(data.createApiKey.apiKey.expiresAt).toBeTruthy()
     })
 
     it('creates a key without expiry', async () => {
@@ -244,7 +244,7 @@ describe('myApiKeys', () => {
 
     expect(data.myApiKeys).toHaveLength(1)
     expect(data.myApiKeys[0].disabled).toBe(true)
-    expect(data.myApiKeys[0].disabledAt).toBe(true)
+    expect(data.myApiKeys[0].disabledAt).toBeTruthy()
   })
 })
 
@@ -327,7 +327,7 @@ describe('revokeApiKey', () => {
     const revoked = data.myApiKeys.find((k) => k.id === keyId)
 
     expect(revoked.disabled).toBe(true)
-    expect(revoked.disabledAt).toBe(true)
+    expect(revoked.disabledAt).toBeTruthy()
   })
 
   it('returns false for nonexistent key', async () => {
@@ -477,7 +477,7 @@ describe('admin operations', () => {
 
       const entry = data.apiKeyUsers.find((e) => e.user.id === 'u-regular')
 
-      expect(entry).toBe(true)
+      expect(entry).toBeTruthy()
       expect(entry.activeCount).toBe(1)
       expect(entry.revokedCount).toBe(0)
       expect(entry).toHaveProperty('postsCount')

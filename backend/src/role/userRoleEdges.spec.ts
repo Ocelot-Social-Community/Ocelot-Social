@@ -61,23 +61,23 @@ describe('role-edge helpers (DB)', () => {
   it('seeds the default role nodes', async () => {
     await ensureUserRoleEdges()
 
-    await expect(roleNodeExists('owner')).resolves.toBe(true)
-    await expect(roleNodeExists('user')).resolves.toBe(true)
+    expect(await roleNodeExists('owner')).toBe(true)
+    expect(await roleNodeExists('user')).toBe(true)
   })
 
   it('gives every (edgeless) user a HAS_ROLE edge matching their legacy tier', async () => {
     await ensureUserRoleEdges()
 
-    await expect(rolesOf('a')).resolves.toEqual(['admin'])
-    await expect(rolesOf('m')).resolves.toEqual(['moderator'])
-    await expect(rolesOf('u')).resolves.toEqual(['user'])
+    expect(await rolesOf('a')).toEqual(['admin'])
+    expect(await rolesOf('m')).toEqual(['moderator'])
+    expect(await rolesOf('u')).toEqual(['user'])
   })
 
   it('is idempotent — re-running adds no duplicate edges', async () => {
     await ensureUserRoleEdges()
     await ensureUserRoleEdges()
 
-    await expect(rolesOf('a')).resolves.toEqual(['admin'])
+    expect(await rolesOf('a')).toEqual(['admin'])
   })
 
   describe(promoteToOwner, () => {
@@ -86,14 +86,14 @@ describe('role-edge helpers (DB)', () => {
       const result = await promoteToOwner('u@e.org')
 
       expect(result?.id).toBe('u')
-      await expect(rolesOf('u')).resolves.toEqual(['owner']) // single edge, replaced
+      expect(await rolesOf('u')).toEqual(['owner']) // single edge, replaced
     })
 
     it('promotes a user found by id (seeds roles itself, no prior edge needed)', async () => {
       const result = await promoteToOwner('a')
 
       expect(result?.id).toBe('a')
-      await expect(rolesOf('a')).resolves.toEqual(['owner'])
+      expect(await rolesOf('a')).toEqual(['owner'])
     })
 
     it('promotes a user found by slug', async () => {
@@ -107,11 +107,11 @@ describe('role-edge helpers (DB)', () => {
       const result = await promoteToOwner('slug-user')
 
       expect(result?.id).toBe('s')
-      await expect(rolesOf('s')).resolves.toEqual(['owner'])
+      expect(await rolesOf('s')).toEqual(['owner'])
     })
 
     it('returns null for an unknown identifier', async () => {
-      await expect(promoteToOwner('nobody@nowhere.org')).resolves.toBeNull()
+      expect(await promoteToOwner('nobody@nowhere.org')).toBeNull()
     })
   })
 
@@ -123,11 +123,11 @@ describe('role-edge helpers (DB)', () => {
 
       await seedDefaultRoleNodes() // DB is non-empty ⇒ only owner & user are ensured
 
-      await expect(roleNodeExists('moderator')).resolves.toBe(false)
-      await expect(roleNodeExists('admin')).resolves.toBe(false)
+      expect(await roleNodeExists('moderator')).toBe(false)
+      expect(await roleNodeExists('admin')).toBe(false)
       // mandatory roles remain
-      await expect(roleNodeExists('owner')).resolves.toBe(true)
-      await expect(roleNodeExists('user')).resolves.toBe(true)
+      expect(await roleNodeExists('owner')).toBe(true)
+      expect(await roleNodeExists('user')).toBe(true)
     })
 
     it('re-creates the mandatory owner & user roles if they were deleted', async () => {
@@ -137,8 +137,8 @@ describe('role-edge helpers (DB)', () => {
 
       await seedDefaultRoleNodes()
 
-      await expect(roleNodeExists('owner')).resolves.toBe(true)
-      await expect(roleNodeExists('user')).resolves.toBe(true)
+      expect(await roleNodeExists('owner')).toBe(true)
+      expect(await roleNodeExists('user')).toBe(true)
     })
 
     it('seeds the full set again only when the DB is completely empty', async () => {
@@ -149,10 +149,10 @@ describe('role-edge helpers (DB)', () => {
 
       await seedDefaultRoleNodes() // empty ⇒ fresh install ⇒ all four
 
-      await expect(roleNodeExists('owner')).resolves.toBe(true)
-      await expect(roleNodeExists('admin')).resolves.toBe(true)
-      await expect(roleNodeExists('moderator')).resolves.toBe(true)
-      await expect(roleNodeExists('user')).resolves.toBe(true)
+      expect(await roleNodeExists('owner')).toBe(true)
+      expect(await roleNodeExists('admin')).toBe(true)
+      expect(await roleNodeExists('moderator')).toBe(true)
+      expect(await roleNodeExists('user')).toBe(true)
     })
   })
 
@@ -165,7 +165,7 @@ describe('role-edge helpers (DB)', () => {
         { email: 'o@e.org', password: '1', roleName: 'owner' },
       )
 
-      await expect(rolesOf('o')).resolves.toEqual(['owner']) // owner edge, not the admin tier
+      expect(await rolesOf('o')).toEqual(['owner']) // owner edge, not the admin tier
     })
   })
 })

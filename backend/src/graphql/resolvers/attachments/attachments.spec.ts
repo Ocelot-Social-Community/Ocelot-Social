@@ -163,7 +163,7 @@ describe('delete Attachment', () => {
         }
 
         await expect(database.neode.all('File')).resolves.toHaveLength(0)
-        expect(someString).toBe('Hello')
+        expect(someString).toEqual('Hello')
       })
 
       test('rolls back the transaction in case of errors', async () => {
@@ -262,8 +262,8 @@ describe('add Attachment', () => {
         const hydratedPost = database.neode.hydrateFirst(result, 'p', database.neode.model('Post'))
         const file = database.neode.hydrateFirst(result, 'f', database.neode.model('File'))
 
-        expect(hydratedPost).toBe(true)
-        expect(file).toBe(true)
+        expect(hydratedPost).toBeTruthy()
+        expect(file).toBeTruthy()
       })
 
       test('sets metadata', async () => {

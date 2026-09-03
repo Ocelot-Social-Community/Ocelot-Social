@@ -96,7 +96,7 @@ describe('sOFTWARE_DEFAULTS ↔ config runtime default (logic-gated defaults)', 
     // its off baseline (false) as the single display source.
     const { default: CONFIG } = await loadConfigWithFlagsUnset()
 
-    expect(CONFIG.DEBUG).toBe(false)
+    expect(CONFIG.DEBUG).toBeFalsy()
     expect(SOFTWARE_DEFAULTS.DEBUG).toBe(false)
   })
 

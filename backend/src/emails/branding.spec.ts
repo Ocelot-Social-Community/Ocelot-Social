@@ -57,18 +57,18 @@ describe('branding in rendered mails', () => {
     })
 
     it('renders the brand organisation name', async () => {
-      await expect(render()).resolves.toContain('Acme Network')
+      expect(await render()).toContain('Acme Network')
     })
   })
 
   // A brand injected AFTER this module was imported must still reach the mail. Reading `branding`
   // into a plain property at module scope passes every other test in this folder and fails this one.
   it('picks up a brand set after import rather than freezing the value', async () => {
-    await expect(render()).resolves.toContain('/img/custom/logo-squared.svg') // vanilla first
+    expect(await render()).toContain('/img/custom/logo-squared.svg') // vanilla first
 
     setBranding(BRAND)
 
-    await expect(render()).resolves.toContain('/branding/acme/assets/logo-squared.svg')
+    expect(await render()).toContain('/branding/acme/assets/logo-squared.svg')
   })
 
   it('falls back to the framework defaults when no brand is set', async () => {

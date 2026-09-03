@@ -95,19 +95,19 @@ describe('writeSetting / readAllSettings', () => {
   })
 
   it('returns an empty object when the namespace has no settings', async () => {
-    await expect(readAllSettings(db, POLICY_NAMESPACE)).resolves.toEqual({})
+    expect(await readAllSettings(db, POLICY_NAMESPACE)).toEqual({})
   })
 })
 
 describe(readLastChange, () => {
   it('returns null when nothing has been written', async () => {
-    await expect(readLastChange(db, POLICY_NAMESPACE)).resolves.toBeNull()
+    expect(await readLastChange(db, POLICY_NAMESPACE)).toBeNull()
   })
 
   it('ignores system writes (actor "system:*")', async () => {
     await writeSetting(db, POLICY_NAMESPACE, 'publicRegistration', true, 'system:seed')
 
-    await expect(readLastChange(db, POLICY_NAMESPACE)).resolves.toBeNull()
+    expect(await readLastChange(db, POLICY_NAMESPACE)).toBeNull()
   })
 
   it('returns the most recent human change (actor + timestamp)', async () => {
@@ -117,7 +117,7 @@ describe(readLastChange, () => {
     const last = await readLastChange(db, POLICY_NAMESPACE)
 
     expect(last?.actor).toBe('admin-7')
-    expect(last?.timestamp).toBeTypeOf('string')
+    expect(typeof last?.timestamp).toBe('string')
   })
 })
 
@@ -131,7 +131,7 @@ describe(deleteSetting, () => {
 
     await deleteSetting(db, POLICY_NAMESPACE, 'publicRegistration')
 
-    await expect(readAllSettings(db, POLICY_NAMESPACE)).resolves.toEqual({})
+    expect(await readAllSettings(db, POLICY_NAMESPACE)).toEqual({})
   })
 
   it('is a no-op when the setting does not exist', async () => {

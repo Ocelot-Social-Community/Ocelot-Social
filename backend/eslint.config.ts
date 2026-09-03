@@ -125,6 +125,19 @@ export default [
          PRECISE mock signatures with `(...args: unknown[]) => unknown` and rewrites
          `vi.mock('x')` into `vi.mock(import('x'))`, which type-checks partial factories against
          the full module and therefore cannot hold. Applied once, it produced 1058 type errors. */
+      /* These four REWRITE ASSERTIONS, and their autofix is not semantics-preserving. Applied
+         once, they turned `toHaveBeenCalled()` into `toHaveBeenCalledWith()` (which asserts the
+         call took NO arguments), `toBeTruthy()` into `toBe(true)` and `toBeFalsy()` into
+         `toBe(false)` (wrong for every truthy value that is not the boolean), and `toEqual` into
+         `toBe` (reference instead of structural equality). That silently changed what 79
+         assertions across 25 spec files claimed, and CI caught it only because some of them
+         started failing. Off for good — a matcher is an assertion, not formatting. */
+      'vitest/prefer-called-with': 'off',
+      'vitest/prefer-to-be': 'off',
+      'vitest/prefer-strict-boolean-matchers': 'off',
+      'vitest/prefer-expect-resolves': 'off',
+      'vitest/prefer-expect-type-of': 'off',
+
       'vitest/require-mock-type-parameters': 'off',
       // The other half of that autofix: it rewrites `vi.mock('x')` into `vi.mock(import('x'))`.
       'vitest/prefer-import-in-mock': 'off',

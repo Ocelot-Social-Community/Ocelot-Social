@@ -74,7 +74,7 @@ describe('tag filter', () => {
     })
 
     expect(errors?.[0].message).toContain('use either `id` or `id_in`, not both')
-    expect(data?.Tag).toBe(false)
+    expect(data?.Tag).toBeFalsy()
   })
 
   it.each([
@@ -107,7 +107,7 @@ describe('tag filter', () => {
       // without touching the database. What must never happen is the quiet outcome: no
       // error, and every tag returned as though no filter had been passed.
       expect(errors?.[0].message).toMatch(/is not defined by type|Unsupported Tag filter/)
-      expect(data?.Tag).toBe(false)
+      expect(data?.Tag).toBeFalsy()
     },
   )
 })

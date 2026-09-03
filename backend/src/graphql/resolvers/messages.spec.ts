@@ -824,7 +824,7 @@ describe('message', () => {
         )
 
         expect(result).toBe(true)
-        expect(mockSession.writeTransaction).toHaveBeenCalledWith()
+        expect(mockSession.writeTransaction).toHaveBeenCalled()
         expect(filterContext.pubsub.publish).toHaveBeenCalledWith(
           'CHAT_MESSAGE_STATUS_UPDATED',
           expect.objectContaining({
