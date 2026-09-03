@@ -100,8 +100,25 @@ export default defineConfig({
         'src/**/*.d.ts',
         'src/graphql/gql-register.ts',
       ],
+      // All four metrics, not just lines. `lines` alone left branch coverage completely
+      // unguarded, and that is where the gap actually is — 306 uncovered branches against 224
+      // uncovered lines. A file could lose half its error paths without the gate noticing, as
+      // long as those paths sit on lines some happy-path test already walks.
+      //
+      // Each value sits below a MEASURED full-suite run with real headroom, not on it: a
+      // threshold set at the current number turns any line executed only on some timings into a
+      // red build. The measured run was lines 96.27 / statements 96.35 / branches 90.38 /
+      // functions 96.76, and it is a FLOOR — one spec file (embeds) failed locally for want of
+      // network, so CI reads at or above it.
+      //
+      // `branches` is the one that matters most here and the one that was missing entirely until
+      // recently: it sat at 86.25% while lines already read 94.84%, i.e. a file could shed its
+      // whole error handling unnoticed as long as some happy-path test walked those lines.
       thresholds: {
-        lines: 94.3,
+        lines: 96,
+        statements: 96,
+        branches: 90,
+        functions: 96.4,
       },
     },
   },

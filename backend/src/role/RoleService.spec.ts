@@ -1,9 +1,16 @@
-import { describe, it, expect } from 'vitest'
+import { afterEach, describe, it, expect } from 'vitest'
 
 import { allPermissionKeys } from '@src/permission'
 
 import { DEFAULT_ROLES } from './defaults'
-import { RoleService, RoleValidationError, createInMemoryRoleService } from './RoleService'
+import {
+  ROLE_CHANGED_CHANNEL,
+  RoleService,
+  RoleValidationError,
+  createInMemoryRoleService,
+  getRoleService,
+  setRoleServiceForTesting,
+} from './RoleService'
 import { ADMIN_ROLE, MODERATOR_ROLE, OWNER_ROLE, USER_ROLE } from './types'
 
 import type { RoleChangeEvent, RolePubSub } from './types'
@@ -61,6 +68,16 @@ describe(RoleService, () => {
     it('falls back to the baseline for an unknown role (never permission-less)', () => {
       expect([...svc.permissionsForRole('ghost-role')].sort()).toEqual([...BASELINE].sort())
     })
+
+    // Deny-all, not a crash: the cache is empty for the window between construction and init(),
+    // and this runs on the request path for every authenticated call. A throw here would turn a
+    // slow boot into 500s; an empty set just denies until the roles are loaded.
+    it('grants nothing when even the baseline role is not cached yet', () => {
+      const empty = createInMemoryRoleService([])
+
+      expect(empty.permissionsForRole(USER_ROLE).size).toBe(0)
+      expect(empty.permissionsForRole('anything').size).toBe(0)
+    })
   })
 
   describe('allRoles / getRole', () => {
@@ -76,6 +93,19 @@ describe(RoleService, () => {
       expect(svc.getRole(OWNER_ROLE)?.protected).toBe(true)
       expect(svc.getRole(USER_ROLE)?.protected).toBe(false)
       expect(svc.getRole('nope')).toBeUndefined()
+    })
+
+    // Custom roles routinely end up with the same permission count, and Map iteration order is
+    // insertion order — so without the tie-break the admin list would be ordered by whenever the
+    // roles happened to be created, and would even differ between instances.
+    it('breaks a tie on equal permission count alphabetically', () => {
+      const tied = createInMemoryRoleService([
+        { name: 'zeta', protected: false, permissions: ['badge.manage'] },
+        { name: 'alpha', protected: false, permissions: ['post.create'] },
+        { name: 'mid', protected: false, permissions: ['post.create'] },
+      ])
+
+      expect(tied.allRoles().map((role) => role.name)).toEqual(['alpha', 'mid', 'zeta'])
     })
   })
 
@@ -180,6 +210,58 @@ describe(RoleService, () => {
       await expect(svc.renameRole(MODERATOR_ROLE, ADMIN_ROLE, 'u1')).rejects.toBeInstanceOf(
         RoleValidationError,
       )
+    })
+
+    // The admin form submits the whole role, so saving it without touching the name arrives here
+    // as old === new. Treating that as a rename would run the DB rename and broadcast a
+    // previousName equal to the name — and peers delete the previous key BEFORE setting the new
+    // one, so an identical pair would evict the role from every other instance's cache.
+    it('treats a rename to the same name as an idempotent no-op', async () => {
+      const before = svc.getRole(MODERATOR_ROLE)
+
+      await expect(svc.renameRole(MODERATOR_ROLE, MODERATOR_ROLE, 'u1')).resolves.toBe(before)
+      expect(svc.getRole(MODERATOR_ROLE)).toBe(before)
+    })
+  })
+
+  describe(createInMemoryRoleService, () => {
+    // The DB-free double is handed to getContext() by most specs, and those go through the same
+    // startup path as production. init() has to be a working no-op there: the real one reads and
+    // seeds role nodes, which is exactly the database access this double exists to avoid.
+    it('has an init() that resolves without touching a database', async () => {
+      const svc = createInMemoryRoleService()
+
+      await expect(svc.init()).resolves.toBeUndefined()
+      expect(svc.getRole(OWNER_ROLE)).toBeDefined()
+    })
+  })
+
+  describe('the module singleton', () => {
+    // These cases install real instances into the module-level slot; hand it back empty so no
+    // later case in this file resolves permissions through one of them.
+    afterEach(() => {
+      setRoleServiceForTesting(undefined)
+    })
+
+    it('returns the same instance on repeated calls', () => {
+      // Not a detail: the instance OWNS the role cache and the pub/sub subscription. A second
+      // one would serve permissions from a cache nothing keeps up to date.
+      setRoleServiceForTesting(undefined)
+      const first = getRoleService()
+
+      expect(getRoleService()).toBe(first)
+    })
+
+    it('can be replaced by a test double and reset again', () => {
+      const double = createInMemoryRoleService()
+      setRoleServiceForTesting(double)
+
+      expect(getRoleService()).toBe(double)
+
+      // Leaving the double installed would leak into every later spec in this worker.
+      setRoleServiceForTesting(undefined)
+
+      expect(getRoleService()).not.toBe(double)
     })
   })
 
@@ -464,6 +546,185 @@ describe(RoleService, () => {
       expect(seeded).not.toContain(ADMIN_ROLE)
       expect(seeded).not.toContain(MODERATOR_ROLE)
       expect(warn).toHaveBeenCalledWith(expect.stringContaining(USER_ROLE))
+
+      warn.mockRestore()
+    })
+
+    it('keeps a role an event updated during init() instead of overwriting it with the read', async () => {
+      // The mirror image of the delete race already covered above: another instance CHANGES a
+      // role while this one boots. The event carries the newer permission set; the read snapshot
+      // taken moments earlier carries the old one. Without the cache-hit guard the loop would
+      // write the stale snapshot over the fresh event and this instance would enforce the
+      // superseded permissions until the next change — with no way to notice.
+      let onChange: ((payload: { roleChanged: RoleChangeEvent }) => void) | undefined
+      let fired = false
+      const fakeDb = {
+        query: async () => {
+          if (!fired && onChange) {
+            fired = true
+            onChange({
+              roleChanged: {
+                name: MODERATOR_ROLE,
+                definition: {
+                  name: MODERATOR_ROLE,
+                  protected: false,
+                  permissions: ['content.moderate'],
+                },
+                actor: 'other-instance',
+                timestamp: 't',
+              },
+            })
+          }
+          return Promise.resolve({ records: DEFAULT_ROLES.map(roleRecord) })
+        },
+        write: async () => Promise.resolve({ records: [] }),
+      } as unknown as DbArg
+      const fakePubsub: RolePubSub = {
+        publish: () => undefined,
+        subscribe: async (_channel, listener) => {
+          onChange = listener
+          return Promise.resolve(1)
+        },
+        unsubscribe: () => undefined,
+      }
+      const svc = new RoleService(fakeDb)
+      await svc.init(fakePubsub)
+
+      expect(svc.getRole(MODERATOR_ROLE)?.permissions).toEqual(['content.moderate'])
+    })
+
+    it('refuses to delete a role that still has members', async () => {
+      // Deleting it would orphan those users: their HAS_ROLE edge disappears and they silently
+      // drop to the baseline role. The count comes from the same query the admin UI displays, so
+      // the refusal always matches the number shown next to the role.
+      const fakeDb = {
+        query: async (statement: { query: string }) =>
+          Promise.resolve({
+            records: statement.query.includes('count(*)')
+              ? [{ get: () => 3 }]
+              : DEFAULT_ROLES.map(roleRecord),
+          }),
+        write: async () => Promise.resolve({ records: [] }),
+      } as unknown as DbArg
+      const svc = new RoleService(fakeDb)
+      await svc.init()
+
+      await expect(svc.deleteRole(MODERATOR_ROLE, 'admin-1')).rejects.toThrow(
+        `Role '${MODERATOR_ROLE}' is assigned to 3 user(s) and cannot be deleted.`,
+      )
+      // Still cached, so the instance keeps resolving permissions for its members.
+      expect(svc.getRole(MODERATOR_ROLE)).toBeDefined()
+    })
+
+    it('reads a count query that returned no row as zero members', async () => {
+      // Defensive, and worth being explicit about: reading a missing row as `Number(undefined)`
+      // gives NaN, and every comparison against NaN is false — the guard would pass for a reason
+      // that has nothing to do with the role being empty, and the error message it does produce
+      // ("assigned to NaN user(s)") would send whoever hits it looking in the wrong place.
+      const fakeDb = {
+        query: async (statement: { query: string }) =>
+          Promise.resolve({
+            records: statement.query.includes('count(*)') ? [] : DEFAULT_ROLES.map(roleRecord),
+          }),
+        write: async () => Promise.resolve({ records: [] }),
+      } as unknown as DbArg
+      const svc = new RoleService(fakeDb)
+      await svc.init()
+
+      await expect(svc.deleteRole(MODERATOR_ROLE, 'admin-1')).resolves.toBeUndefined()
+      expect(svc.getRole(MODERATOR_ROLE)).toBeUndefined()
+    })
+
+    it('unsubscribes on shutdown, once', async () => {
+      // The subscription holds a reference to this service. A restarted service (db:reset in the
+      // dev server, a re-init in a spec) that left the old one attached would have two listeners
+      // mutating two caches, and the stale one keeps a Redis connection open.
+      const unsubscribed: number[] = []
+      const fakeDb = {
+        query: async () => Promise.resolve({ records: DEFAULT_ROLES.map(roleRecord) }),
+        write: async () => Promise.resolve({ records: [] }),
+      } as unknown as DbArg
+      const fakePubsub: RolePubSub = {
+        publish: () => undefined,
+        subscribe: async () => Promise.resolve(42),
+        unsubscribe: (id) => {
+          unsubscribed.push(id)
+        },
+      }
+      const svc = new RoleService(fakeDb)
+      await svc.init(fakePubsub)
+
+      svc.shutdown()
+      svc.shutdown() // idempotent: a second call must not unsubscribe an id already released
+
+      expect(unsubscribed).toEqual([42])
+    })
+
+    it('does nothing on shutdown when no pubsub was attached', () => {
+      const svc = createInMemoryRoleService()
+
+      expect(() => {
+        svc.shutdown()
+      }).not.toThrow()
+    })
+  })
+
+  // The DB write is the commit point and the local cache is already updated by the time the
+  // broadcast goes out. A pubsub failure therefore costs peers a stale cache until the next
+  // change — bad, but far better than failing a role update the database has already accepted.
+  describe('broadcast failures do not fail the caller', () => {
+    type DbArg = ConstructorParameters<typeof RoleService>[0]
+
+    const makeService = (publish: RolePubSub['publish']) => {
+      const fakeDb = {
+        query: async () => Promise.resolve({ records: [] }),
+        write: async () => Promise.resolve({ records: [] }),
+      } as unknown as DbArg
+      const svc = createInMemoryRoleService()
+      // The in-memory double skips init(), so wire the collaborators it would have set there.
+      Object.assign(svc, {
+        db: fakeDb,
+        pubsub: {
+          publish,
+          subscribe: async () => Promise.resolve(1),
+          unsubscribe: () => undefined,
+        },
+      })
+      return svc
+    }
+
+    it('warns instead of throwing when publish rejects', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const boom = new Error('redis connection lost')
+      const svc = makeService(async () => {
+        await Promise.resolve()
+        throw boom
+      })
+
+      await expect(
+        svc.upsertRole({ name: 'editor', protected: false, permissions: [] }, 'admin-1'),
+      ).resolves.toMatchObject({ name: 'editor' })
+
+      // The rejection is handled on a later tick than the resolved upsert.
+      await Promise.resolve()
+
+      expect(warn).toHaveBeenCalledWith(`[roles] failed to publish ${ROLE_CHANGED_CHANNEL}:`, boom)
+
+      warn.mockRestore()
+    })
+
+    it('warns instead of throwing when publish throws synchronously', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const boom = new Error('no redis configured')
+      const svc = makeService(() => {
+        throw boom
+      })
+
+      await expect(
+        svc.upsertRole({ name: 'editor', protected: false, permissions: [] }, 'admin-1'),
+      ).resolves.toMatchObject({ name: 'editor' })
+
+      expect(warn).toHaveBeenCalledWith(`[roles] failed to publish ${ROLE_CHANGED_CHANNEL}:`, boom)
 
       warn.mockRestore()
     })
