@@ -1,4 +1,5 @@
-import { beforeEach, describe, it, test, expect } from 'vitest'
+import { beforeEach, describe, test, expect } from 'vitest'
+
 import type { Mock } from 'vitest'
 
 vi.mock('@sentry/node', () => ({

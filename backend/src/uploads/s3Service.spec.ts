@@ -1,8 +1,9 @@
 import { Readable } from 'node:stream'
 
+import { describe, beforeEach, test, expect } from 'vitest'
+
 import type { S3Config } from '@config/index'
 import type { FileUpload } from 'graphql-upload'
-import { describe, beforeEach, test, expect } from 'vitest'
 import type { Mock } from 'vitest'
 
 // `function`, not an arrow: these stand in for CLASSES and the code under test calls them with
@@ -26,15 +27,19 @@ vi.mock('@aws-sdk/lib-storage', () => {
   }
 })
 
-// Imported after the mock registrations, not above them: `unstable_mockModule`
-// does not hoist, so a static import would bind the real module first.
+// Dynamic imports: `vi.mock` above is hoisted, so these resolve to the mocked modules.
 const { Upload } = await import('@aws-sdk/lib-storage')
 const { s3Service } = await import('./s3Service')
 
+// Cast, not vi.mocked(Upload): the real signature is a constructor taking the full SDK
+// `Options`, while the stub only needs the one field the service passes and returns a `done()`.
 interface UploadInput {
   params: { Bucket: string; Key: string; ContentType: string; Body: unknown }
 }
-const uploadMock = vi.mocked(Upload)
+
+const uploadMock = Upload as unknown as Mock<
+  (input: UploadInput) => { done: () => Promise<{ Location: string }> }
+>
 
 // `Upload` is mocked, so the stream is only handed over as `Body` and never consumed.
 // It is still a real readable stream so the mock honours the `Body` contract.
@@ -60,7 +65,7 @@ describe('s3Service', () => {
   describe('upload', () => {
     beforeEach(() => {
       uploadMock.mockReset()
-      uploadMock.mockImplementation(function ({ params: { Key } }) {
+      uploadMock.mockImplementation(function ({ params: { Key } }: UploadInput) {
         return {
           done: async () =>
             Promise.resolve({ Location: `http://your-objectstorage.com/bucket/${Key}` }),
@@ -93,7 +98,7 @@ describe('s3Service', () => {
 
     describe('but if for some reason, the S3 service returns a `Location` wich is not a valid URL and misses the protocol part', () => {
       beforeEach(() => {
-        uploadMock.mockImplementation(function ({ params: { Key } }) {
+        uploadMock.mockImplementation(function ({ params: { Key } }: UploadInput) {
           return {
             done: async () => Promise.resolve({ Location: `your-objectstorage.com/bucket/${Key}` }),
           }

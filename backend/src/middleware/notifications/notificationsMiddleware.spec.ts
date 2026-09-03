@@ -4,10 +4,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { beforeAll, afterAll, beforeEach, afterEach, describe, test, expect } from 'vitest'
+
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
-import { beforeAll, afterAll, beforeEach, afterEach, describe, it, test, expect } from 'vitest'
-import type { Mock } from 'vitest'
 
 const sendChatMessageMailMock: (notification) => void = vi.fn()
 const sendNotificationMailMock: (notification) => void = vi.fn()
@@ -30,9 +30,9 @@ vi.mock('@src/emails/sendEmail', () => ({
   sendWrongEmail: vi.fn(),
 }))
 
-let isUserOnlineMock = vi.fn()
+let isUserOnlineMock = vi.fn<() => boolean>()
 vi.mock('../helpers/isUserOnline', () => ({
-  isUserOnline: () => isUserOnlineMock(),
+  isUserOnline: (): boolean => isUserOnlineMock(),
 }))
 
 // Imported after the mock registrations, not above them: `unstable_mockModule`

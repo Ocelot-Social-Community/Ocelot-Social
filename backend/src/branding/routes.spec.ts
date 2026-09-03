@@ -9,10 +9,11 @@ import { setImmediate as tick } from 'node:timers/promises'
    registry to pick up the fs mocks below; process.getBuiltinModule() bypasses it and returns the
    real module. */
 
+import { describe, beforeEach, test, expect } from 'vitest'
+
 import type { BrandingRouterDeps } from './routes'
 import type { Request, Response } from 'express'
-import { describe, beforeEach, test, expect } from 'vitest'
-import type { Mock, MockedFunction } from 'vitest'
+import type { Mock } from 'vitest'
 
 vi.mock('node:fs', () => ({ createReadStream: vi.fn() }))
 vi.mock('node:fs/promises', () => ({ stat: vi.fn() }))

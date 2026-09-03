@@ -1,10 +1,11 @@
+import { describe, beforeEach, test, expect } from 'vitest'
+
 import { UserInputError } from '@graphql/errors'
 import { PolicyValidationError } from '@src/policy'
 
 import brandingResolver from './branding'
 
 import type { Context } from '@src/context'
-import { describe, beforeEach, test, expect } from 'vitest'
 import type { Mock } from 'vitest'
 
 describe('branding resolvers', () => {

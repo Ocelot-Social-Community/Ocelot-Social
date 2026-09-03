@@ -25,9 +25,9 @@ vi.mock('@src/emails/sendEmail', () => ({
   sendWrongEmail: vi.fn(),
 }))
 
-let isUserOnlineMock = vi.fn().mockReturnValue(false)
+let isUserOnlineMock = vi.fn<() => boolean>().mockReturnValue(false)
 vi.mock('../helpers/isUserOnline', () => ({
-  isUserOnline: () => isUserOnlineMock(),
+  isUserOnline: (): boolean => isUserOnlineMock(),
 }))
 
 // Imported after the mock registrations, not above them: `unstable_mockModule`

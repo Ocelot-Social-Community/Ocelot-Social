@@ -1,3 +1,5 @@
+/* eslint-disable vitest/no-conditional-expect -- the assertions below verify that nothing
+   was deleted when the transaction rolled back, which is only observable in the catch. */
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
@@ -7,14 +9,13 @@
 import { Readable } from 'node:stream'
 
 import { S3Client } from '@aws-sdk/client-s3'
+import { beforeAll, afterAll, afterEach, describe, beforeEach, test, expect } from 'vitest'
 
 import type { FileInput } from './attachments'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { S3Config } from '@src/config'
 import type { Context } from '@src/context'
 import type { ReadStream } from 'node:fs'
-import { beforeAll, afterAll, afterEach, describe, beforeEach, test, expect } from 'vitest'
-import type { Mock } from 'vitest'
 
 const s3SendMock = vi.fn()
 vi.spyOn(S3Client.prototype, 'send').mockImplementation(s3SendMock)

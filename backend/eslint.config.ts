@@ -87,7 +87,7 @@ export default [
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: ['eslint.config.ts', 'vitest.config.ts', 'prettier.config.ts'],
+          allowDefaultProject: ['eslint.config.ts', 'prettier.config.ts'],
         },
         tsconfigRootDir: import.meta.dirname,
       },
@@ -110,10 +110,40 @@ export default [
     },
   },
   {
-    // Jest test file overrides
+    // Test file overrides
     files: ['**/*.spec.ts'],
     rules: {
       '@typescript-eslint/unbound-method': 'off',
+
+      /* The vitest module of the shared config is considerably more opinionated than the jest
+         module this suite grew up under — enabling it as-is reports ~1300 findings that have
+         nothing to do with which runner executes the tests. They are switched off HERE, in the
+         runner migration, so that this change stays behaviour-preserving; adopting them is a
+         separate decision with its own review.
+
+         `require-mock-type-parameters` is off for a second, stronger reason: its autofix replaces
+         PRECISE mock signatures with `(...args: unknown[]) => unknown` and rewrites
+         `vi.mock('x')` into `vi.mock(import('x'))`, which type-checks partial factories against
+         the full module and therefore cannot hold. Applied once, it produced 1058 type errors. */
+      'vitest/require-mock-type-parameters': 'off',
+      // The other half of that autofix: it rewrites `vi.mock('x')` into `vi.mock(import('x'))`.
+      'vitest/prefer-import-in-mock': 'off',
+      // Turns deliberate casts (where a stub is typed to the subset actually used) back into
+      // vi.mocked(), which re-imposes the real signature the stub is not meant to satisfy.
+      'vitest/prefer-vi-mocked': 'off',
+      'vitest/max-expects': 'off',
+      'vitest/require-hook': 'off',
+      // Pre-existing shapes in this suite, none of them introduced by the runner switch.
+      'vitest/require-to-throw-message': 'off',
+      'vitest/prefer-hooks-on-top': 'off',
+      'vitest/no-duplicate-hooks': 'off',
+      'vitest/no-conditional-tests': 'off',
+      'vitest/no-conditional-in-test': 'off',
+      'vitest/prefer-strict-equal': 'off',
+      'vitest/consistent-test-it': 'off',
+      'vitest/require-top-level-describe': 'off',
+      'vitest/max-nested-describe': 'off',
+      'vitest/prefer-hooks-in-order': 'off',
     },
   },
   {

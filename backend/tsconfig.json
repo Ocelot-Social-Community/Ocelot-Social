@@ -139,7 +139,7 @@
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
-  "exclude": ["eslint.config.ts", "prettier.config.ts", "jest.config.ts"],
+  "exclude": ["eslint.config.ts", "prettier.config.ts"],
   /* Node needs explicit extensions in ESM specifiers, the `import-x/extensions` lint rule forbids
      writing them. Both hold: the source stays extensionless and tsc-alias adds the extension to
      the EMIT, alongside the alias resolution it already did. */

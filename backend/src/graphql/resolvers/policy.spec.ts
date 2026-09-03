@@ -5,6 +5,7 @@
 // `null` for authenticated-only keys (NOT the value, and NOT an error).
 import { parse } from 'graphql'
 import { PubSub } from 'graphql-subscriptions'
+import { beforeAll, afterAll, beforeEach, describe, test, expect } from 'vitest'
 
 import policyQuery from '@graphql/queries/policy/policy.gql'
 import policyDefaultsQuery from '@graphql/queries/policy/policyDefaults.gql'
@@ -19,7 +20,6 @@ import policyResolvers from './policy'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 import type { NetworkPolicy } from '@src/policy'
-import { beforeAll, afterAll, beforeEach, describe, it, test, expect } from 'vitest'
 import type { Mock } from 'vitest'
 
 let authenticatedUser: Context['user']

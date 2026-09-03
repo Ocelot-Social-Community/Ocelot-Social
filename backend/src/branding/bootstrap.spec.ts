@@ -6,6 +6,7 @@
 import { resolve } from 'node:path'
 
 import { describe, beforeEach, afterEach, test, expect } from 'vitest'
+
 import type { Mock, MockInstance } from 'vitest'
 
 // vitest has no `isolateModulesAsync`: resetting the registry before the dynamic import does the

@@ -1,4 +1,5 @@
-import { beforeEach, describe, it, test, expect } from 'vitest'
+import { beforeEach, describe, test, expect } from 'vitest'
+
 import type { Mock } from 'vitest'
 
 // vitest has no `isolateModulesAsync`: resetting the registry before the dynamic import does the

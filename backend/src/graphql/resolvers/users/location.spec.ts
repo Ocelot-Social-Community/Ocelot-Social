@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
+import { beforeAll, afterAll, beforeEach, afterEach, describe, test, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import queryLocations from '@graphql/queries/queryLocations.gql'
 import UpdateUser from '@graphql/queries/users/UpdateUser.gql'
@@ -9,7 +11,6 @@ import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
-import { beforeAll, afterAll, beforeEach, afterEach, describe, it, test, expect } from 'vitest'
 import type { MockInstance } from 'vitest'
 
 let variables
