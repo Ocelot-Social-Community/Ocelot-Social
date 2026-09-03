@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import { jest } from '@jest/globals'
 
 const mockConfig: {
   LIVEKIT_ENABLED: boolean
@@ -9,11 +8,14 @@ const mockConfig: {
   LIVEKIT_API_SECRET?: string
 } = { LIVEKIT_ENABLED: false }
 
-const mockListRooms = jest.fn<(...args: unknown[]) => Promise<unknown>>()
-const mockRoomServiceCtor = jest.fn()
+const mockListRooms = vi.fn<(...args: unknown[]) => Promise<unknown>>()
+const mockRoomServiceCtor = vi.fn()
 
-jest.unstable_mockModule('livekit-server-sdk', () => ({
-  RoomServiceClient: jest.fn().mockImplementation((...args: unknown[]) => {
+// `function`, not an arrow: this stands in for a CLASS and the code under test calls it with
+// `new`. Vitest constructs the mock's implementation via Reflect.construct, and an arrow is
+// not a constructor — Jest applied the implementation instead, so arrows worked there.
+vi.mock('livekit-server-sdk', () => ({
+  RoomServiceClient: vi.fn().mockImplementation(function (...args: unknown[]) {
     mockRoomServiceCtor(...args)
     return {
       listRooms: (...inner: unknown[]): unknown => mockListRooms(...inner),
@@ -21,38 +23,38 @@ jest.unstable_mockModule('livekit-server-sdk', () => ({
   }),
 }))
 
-const mockPublish = jest.fn<(...args: unknown[]) => Promise<unknown>>()
-jest.unstable_mockModule('@src/context', () => ({
+const mockPublish = vi.fn<(...args: unknown[]) => Promise<unknown>>()
+vi.mock('@src/context', () => ({
   __esModule: true,
   serverPubsub: {
     publish: (...args: unknown[]): unknown => mockPublish(...args),
   },
 }))
 
-jest.unstable_mockModule('@src/graphql/resolvers/videoCalls', () => ({
+vi.mock('@src/graphql/resolvers/videoCalls', () => ({
   __esModule: true,
   groupIdFromRoomName: (roomName: string | null | undefined): string | null =>
     roomName?.startsWith('group-') ? roomName.slice('group-'.length) : null,
 }))
 
 const mockLogger = {
-  info: jest.fn<(...args: unknown[]) => void>(),
-  warn: jest.fn<(...args: unknown[]) => void>(),
-  error: jest.fn<(...args: unknown[]) => void>(),
+  info: vi.fn<(...args: unknown[]) => void>(),
+  warn: vi.fn<(...args: unknown[]) => void>(),
+  error: vi.fn<(...args: unknown[]) => void>(),
 }
 // jest.mock factories are hoisted above the const/let declarations they
 // reference, so `default: mockLogger` / `default: mockConfig` would read a
 // TDZ-locked binding when poller.ts is required. Expose them through getters
 // so the binding is only read when the consuming code actually touches the
 // imported default — by which time the test file has finished initializing.
-jest.unstable_mockModule('@src/logger', () => ({
+vi.mock('@src/logger', () => ({
   __esModule: true,
   get default() {
     return mockLogger
   },
 }))
 
-jest.unstable_mockModule('@src/config', () => ({
+vi.mock('@src/config', () => ({
   __esModule: true,
   get default() {
     return mockConfig
@@ -71,7 +73,7 @@ const setEnabled = () => {
 }
 
 beforeEach(() => {
-  jest.useFakeTimers()
+  vi.useFakeTimers()
   mockConfig.LIVEKIT_ENABLED = false
   mockConfig.LIVEKIT_URL = undefined
   mockConfig.LIVEKIT_API_KEY = undefined
@@ -86,7 +88,7 @@ beforeEach(() => {
 
 afterEach(() => {
   stopLiveKitPoller()
-  jest.useRealTimers()
+  vi.useRealTimers()
 })
 
 describe('startLiveKitPoller', () => {
@@ -149,7 +151,7 @@ describe('poll tick', () => {
       { name: 'other', numParticipants: 5 },
     ])
     startLiveKitPoller()
-    await jest.advanceTimersByTimeAsync(5_000)
+    await vi.advanceTimersByTimeAsync(5_000)
 
     expect(mockListRooms).toHaveBeenCalledTimes(1)
     expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
@@ -171,18 +173,18 @@ describe('poll tick', () => {
       { name: 'group-a', numParticipants: 2 },
       { name: 'group-b', numParticipants: 0 },
     ])
-    await jest.advanceTimersByTimeAsync(15_000)
+    await vi.advanceTimersByTimeAsync(15_000)
     expect(mockPublish).not.toHaveBeenCalled()
   })
 
   it('publishes count: 0 for rooms that disappeared from the list', async () => {
     mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 3 }])
     startLiveKitPoller()
-    await jest.advanceTimersByTimeAsync(5_000)
+    await vi.advanceTimersByTimeAsync(5_000)
     mockPublish.mockClear()
 
     mockListRooms.mockResolvedValueOnce([])
-    await jest.advanceTimersByTimeAsync(15_000)
+    await vi.advanceTimersByTimeAsync(15_000)
     expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
       groupId: 'a',
       count: 0,
@@ -191,25 +193,25 @@ describe('poll tick', () => {
     // Third tick: the disappeared entry has been pruned, no further publish
     mockPublish.mockClear()
     mockListRooms.mockResolvedValueOnce([])
-    await jest.advanceTimersByTimeAsync(15_000)
+    await vi.advanceTimersByTimeAsync(15_000)
     expect(mockPublish).not.toHaveBeenCalled()
   })
 
   it('does not emit a duplicate zero when the disappeared room was already at 0', async () => {
     mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 0 }])
     startLiveKitPoller()
-    await jest.advanceTimersByTimeAsync(5_000)
+    await vi.advanceTimersByTimeAsync(5_000)
     mockPublish.mockClear()
 
     mockListRooms.mockResolvedValueOnce([])
-    await jest.advanceTimersByTimeAsync(15_000)
+    await vi.advanceTimersByTimeAsync(15_000)
     expect(mockPublish).not.toHaveBeenCalled()
   })
 
   it('coerces undefined numParticipants to 0', async () => {
     mockListRooms.mockResolvedValueOnce([{ name: 'group-a' }])
     startLiveKitPoller()
-    await jest.advanceTimersByTimeAsync(5_000)
+    await vi.advanceTimersByTimeAsync(5_000)
     expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
       groupId: 'a',
       count: 0,
@@ -219,10 +221,10 @@ describe('poll tick', () => {
   it('warns on listRooms failures and goes quiet after 3 consecutive errors', async () => {
     mockListRooms.mockRejectedValue(new Error('lk unreachable'))
     startLiveKitPoller()
-    await jest.advanceTimersByTimeAsync(5_000)
-    await jest.advanceTimersByTimeAsync(15_000)
-    await jest.advanceTimersByTimeAsync(15_000)
-    await jest.advanceTimersByTimeAsync(15_000)
+    await vi.advanceTimersByTimeAsync(5_000)
+    await vi.advanceTimersByTimeAsync(15_000)
+    await vi.advanceTimersByTimeAsync(15_000)
+    await vi.advanceTimersByTimeAsync(15_000)
     expect(mockListRooms).toHaveBeenCalledTimes(4)
     // First 3 failures logged, 4th suppressed
     expect(mockLogger.warn).toHaveBeenCalledTimes(3)
@@ -231,15 +233,15 @@ describe('poll tick', () => {
   it('resets the failure counter once a poll succeeds again', async () => {
     mockListRooms.mockRejectedValueOnce(new Error('boom1'))
     startLiveKitPoller()
-    await jest.advanceTimersByTimeAsync(5_000)
+    await vi.advanceTimersByTimeAsync(5_000)
     expect(mockLogger.warn).toHaveBeenCalledTimes(1)
     expect(mockLogger.warn.mock.calls[0][0]).toContain('#1')
 
     mockListRooms.mockResolvedValueOnce([])
-    await jest.advanceTimersByTimeAsync(15_000)
+    await vi.advanceTimersByTimeAsync(15_000)
 
     mockListRooms.mockRejectedValueOnce(new Error('boom2'))
-    await jest.advanceTimersByTimeAsync(15_000)
+    await vi.advanceTimersByTimeAsync(15_000)
     // Should be back to "#1" after the success reset
     const calls = mockLogger.warn.mock.calls
     const lastWarn = calls[calls.length - 1]
@@ -251,7 +253,7 @@ describe('poll tick', () => {
     mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 1 }])
     mockPublish.mockRejectedValueOnce(new Error('pubsub down'))
     startLiveKitPoller()
-    await jest.advanceTimersByTimeAsync(5_000)
+    await vi.advanceTimersByTimeAsync(5_000)
     expect(mockLogger.warn).toHaveBeenCalledWith('LiveKit poll tick failed:', 'pubsub down')
   })
 })
@@ -261,17 +263,17 @@ describe('stopLiveKitPoller', () => {
     setEnabled()
     startLiveKitPoller()
     stopLiveKitPoller()
-    await jest.advanceTimersByTimeAsync(5_000)
+    await vi.advanceTimersByTimeAsync(5_000)
     expect(mockListRooms).not.toHaveBeenCalled()
   })
 
   it('cancels the recurring interval', async () => {
     setEnabled()
     startLiveKitPoller()
-    await jest.advanceTimersByTimeAsync(5_000)
+    await vi.advanceTimersByTimeAsync(5_000)
     mockListRooms.mockClear()
     stopLiveKitPoller()
-    await jest.advanceTimersByTimeAsync(60_000)
+    await vi.advanceTimersByTimeAsync(60_000)
     expect(mockListRooms).not.toHaveBeenCalled()
   })
 
@@ -281,3 +283,7 @@ describe('stopLiveKitPoller', () => {
     }).not.toThrow()
   })
 })
+
+// No imports left after the vitest switch — without this the file is a script, not a
+// module: its top-level consts would collide across specs and `await` would be illegal.
+export {}

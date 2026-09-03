@@ -1,4 +1,3 @@
-import { jest } from '@jest/globals'
 
 import { withTimeout } from './utils'
 
@@ -22,8 +21,8 @@ describe('withTimeout', () => {
   })
 
   it('clears the timeout handle on fast resolution', async () => {
-    const setSpy = jest.spyOn(global, 'setTimeout')
-    const clearSpy = jest.spyOn(global, 'clearTimeout')
+    const setSpy = vi.spyOn(global, 'setTimeout')
+    const clearSpy = vi.spyOn(global, 'clearTimeout')
     try {
       const value = await withTimeout(Promise.resolve('done'), 60_000, 'fast')
       expect(value).toBe('done')
@@ -38,8 +37,8 @@ describe('withTimeout', () => {
   })
 
   it('clears the timeout handle on fast rejection', async () => {
-    const setSpy = jest.spyOn(global, 'setTimeout')
-    const clearSpy = jest.spyOn(global, 'clearTimeout')
+    const setSpy = vi.spyOn(global, 'setTimeout')
+    const clearSpy = vi.spyOn(global, 'clearTimeout')
     try {
       await expect(withTimeout(Promise.reject(new Error('boom')), 60_000, 'fast')).rejects.toThrow(
         'boom',

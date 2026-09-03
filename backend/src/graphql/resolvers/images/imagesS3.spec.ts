@@ -7,30 +7,33 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import { Readable } from 'node:stream'
 
-import { jest } from '@jest/globals'
 
 import type { ImageInput } from './images'
 import type { S3Config } from '@src/config'
 import type { FileUpload } from 'graphql-upload'
 
-jest.unstable_mockModule('@aws-sdk/client-s3', () => {
+vi.mock('@aws-sdk/client-s3', () => {
   return {
-    S3Client: jest.fn().mockImplementation(() => ({
-      send: jest.fn(),
-    })),
+    S3Client: vi.fn().mockImplementation(function () {
+      return { send: vi.fn() }
+    }),
     ObjectCannedACL: { public_read: 'public_read' },
-    DeleteObjectCommand: jest.fn().mockImplementation(() => ({})),
+    DeleteObjectCommand: vi.fn().mockImplementation(function () {
+      return {}
+    }),
   }
 })
 
-jest.unstable_mockModule('@aws-sdk/lib-storage', () => {
+vi.mock('@aws-sdk/lib-storage', () => {
   return {
-    Upload: jest
+    Upload: vi
       .fn<(input: { params: { Key: string } }) => unknown>()
-      .mockImplementation(({ params: { Key } }: { params: { Key: string } }) => ({
-        done: async () =>
-          Promise.resolve({ Location: `http://your-objectstorage.com/bucket/${Key}` }),
-      })),
+      .mockImplementation(function ({ params: { Key } }: { params: { Key: string } }) {
+        return {
+          done: async () =>
+            Promise.resolve({ Location: `http://your-objectstorage.com/bucket/${Key}` }),
+        }
+      }),
   }
 })
 
@@ -44,8 +47,8 @@ const { fixtures } = await import('@db/testing/fixtures')
 const { UserInputError } = await import('@graphql/errors')
 const { images } = await import('./imagesS3')
 
-const mockUpload = jest.mocked(Upload)
-const mockDeleteObjectCommand = jest.mocked(DeleteObjectCommand)
+const mockUpload = vi.mocked(Upload)
+const mockDeleteObjectCommand = vi.mocked(DeleteObjectCommand)
 
 const driver = getDriver()
 // The fixture API, not neode: a neode node cannot be related to a fixture handle, and this
@@ -75,7 +78,7 @@ afterAll(async () => {
 // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 describe('deleteImage', () => {

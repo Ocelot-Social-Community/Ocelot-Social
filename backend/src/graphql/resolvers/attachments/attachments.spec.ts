@@ -4,10 +4,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable jest/no-conditional-expect */
+import type { Mock } from 'vitest'
 import { Readable } from 'node:stream'
 
 import { S3Client } from '@aws-sdk/client-s3'
-import { jest } from '@jest/globals'
 
 import type { FileInput } from './attachments'
 import type { ApolloTestSetup } from '@root/test/helpers'
@@ -15,11 +15,11 @@ import type { S3Config } from '@src/config'
 import type { Context } from '@src/context'
 import type { ReadStream } from 'node:fs'
 
-const s3SendMock = jest.fn()
-jest.spyOn(S3Client.prototype, 'send').mockImplementation(s3SendMock)
+const s3SendMock = vi.fn()
+vi.spyOn(S3Client.prototype, 'send').mockImplementation(s3SendMock)
 
 // ESM has no automock: unstable_mockModule requires an explicit factory.
-jest.unstable_mockModule('@aws-sdk/lib-storage', () => ({ Upload: jest.fn() }))
+vi.mock('@aws-sdk/lib-storage', () => ({ Upload: vi.fn() }))
 
 // Imported after the mock registrations, not above them: `unstable_mockModule`
 // does not hoist, so a static import would bind the real module first.
@@ -38,7 +38,7 @@ const UploadMock = {
   },
 }
 
-;(Upload as unknown as jest.Mock).mockImplementation(() => UploadMock)
+;(Upload as unknown as Mock).mockImplementation(() => UploadMock)
 
 const config: S3Config = {
   AWS_ACCESS_KEY_ID: 'AWS_ACCESS_KEY_ID',
@@ -71,7 +71,7 @@ afterAll(async () => {
   database.neode.close()
 })
 
-/*  uploadCallback = jest.fn(
+/*  uploadCallback = vi.fn(
     ({ uniqueFilename }) => `http://your-objectstorage.com/bucket/${uniqueFilename}`,
   )
 */

@@ -1,7 +1,6 @@
 import { once } from 'node:events'
 import http from 'node:http'
 
-import { jest } from '@jest/globals'
 
 import createProxy from './proxy'
 
@@ -118,7 +117,7 @@ describe('createProxy', () => {
   })
 
   it('responds with 500 when the target is unreachable', async () => {
-    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined)
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
     const closedTarget = http.createServer()
     const closedPort = await listen(closedTarget)
     await close(closedTarget)

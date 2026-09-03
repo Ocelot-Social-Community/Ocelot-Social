@@ -1,4 +1,3 @@
-import { jest } from '@jest/globals'
 
 import {
   blockingGateFor,
@@ -28,7 +27,7 @@ describe('permission gates', () => {
     })
 
     it('reads exactly the gate key', () => {
-      const getEffective = jest.fn((key: PermissionGate) => key === 'videoConference')
+      const getEffective = vi.fn((key: PermissionGate) => key === 'videoConference')
       expect(isGateOpen('videoConference', { policy: { getEffective } })).toBe(true)
       expect(getEffective).toHaveBeenCalledWith('videoConference')
     })

@@ -5,25 +5,22 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { jest } from '@jest/globals'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 
-// The REAL node-fetch, grabbed before the mock is registered: `jest.requireActual` has no ESM
-// counterpart, and `unstable_mockModule` does not hoist — so an import placed above it still
-// resolves to the genuine module. Response is used to build the fixture payloads.
-const { Response } = await import('node-fetch')
+// `vi.mock` IS hoisted, so the order of these lines does not decide what they see — the factory
+// has to hand out the real `Response` itself. vi.importActual is the supported way to reach past
+// one's own mock; the pre-mock import this file used under Jest would now bind the mock.
+vi.mock('node-fetch', async () => ({
+  ...(await vi.importActual<object>('node-fetch')),
+  default: vi.fn(),
+}))
 
-// ESM has no automock: unstable_mockModule requires an explicit factory.
-jest.unstable_mockModule('node-fetch', () => ({ default: jest.fn() }))
-
-// Imported after the mock registrations, not above them: `unstable_mockModule`
-// does not hoist, so a static import would bind the real module first.
-const { default: fetch } = await import('node-fetch')
+const { default: fetch, Response } = await import('node-fetch')
 const { default: embed } = await import('@graphql/queries/embed.gql')
 const { default: embedProviders } = await import('@graphql/queries/embedProviders.gql')
 const { createApolloTestSetup } = await import('@root/test/helpers')
-const mockedFetch = jest.mocked(fetch)
+const mockedFetch = vi.mocked(fetch)
 
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']

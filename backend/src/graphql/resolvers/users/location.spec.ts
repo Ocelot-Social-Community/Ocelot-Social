@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import { jest } from '@jest/globals'
 
+import type { MockInstance } from 'vitest'
 import Factory, { cleanDatabase } from '@db/factories'
 import queryLocations from '@graphql/queries/queryLocations.gql'
 import UpdateUser from '@graphql/queries/users/UpdateUser.gql'
@@ -137,7 +137,7 @@ const welzheimFeature = {
   ],
 }
 
-let fetchSpy: jest.Spied<typeof global.fetch>
+let fetchSpy: MockInstance<typeof global.fetch>
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -159,7 +159,7 @@ afterAll(() => {
 beforeEach(() => {
   variables = {}
   authenticatedUser = null
-  fetchSpy = jest.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+  fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
     const path = decodeURIComponent(url)
 

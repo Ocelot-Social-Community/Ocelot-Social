@@ -1,7 +1,15 @@
-// Unit tests for addMiddleware – testing append, prepend, before, after, and error cases.
-// Each test uses jest.isolateModules + jest.doMock to get a fresh ocelotMiddlewares array.
+import type { Mock } from 'vitest'
 
-import { jest } from '@jest/globals'
+// vitest has no `isolateModulesAsync`: resetting the registry before the dynamic import does the
+// same job, since a module graph is only shared within a file. Wrapped so the call sites keep
+// reading as "load this in isolation".
+const isolateModules = async (run: () => Promise<void>): Promise<void> => {
+  vi.resetModules()
+  await run()
+}
+// Unit tests for addMiddleware – testing append, prepend, before, after, and error cases.
+// Each test uses jest.isolateModules + vi.doMock to get a fresh ocelotMiddlewares array.
+
 
 interface MiddlewareModule {
   addMiddleware: (mw: { name: string; middleware: unknown; position: unknown }) => void
@@ -32,17 +40,17 @@ const middlewareModules = [
 ]
 
 const setupMocks = ({ extraMocks, disabledMiddlewares = [] }: MockOptions = {}) => {
-  jest.unstable_mockModule('./branding/brandingMiddlewares', () => ({ default: jest.fn() }))
+  vi.doMock('./branding/brandingMiddlewares', () => ({ default: vi.fn() }))
   // ESM mock factories must expose `default` themselves — there is no CommonJS interop layer
   // to synthesise one from the object.
-  jest.unstable_mockModule('@config/index', () => ({
+  vi.doMock('@config/index', () => ({
     default: { DISABLED_MIDDLEWARES: disabledMiddlewares },
   }))
 
   // Mock all middlewares and allow to override its mock
   for (const mod of middlewareModules) {
     // eslint-disable-next-line security/detect-object-injection
-    jest.unstable_mockModule(mod, () => ({ default: extraMocks?.[mod] ?? {} }))
+    vi.doMock(mod, () => ({ default: extraMocks?.[mod] ?? {} }))
   }
 }
 
@@ -51,11 +59,11 @@ const loadModule = async (
 ): Promise<{ mod: MiddlewareModule; getCapturedMiddlewares: () => unknown[] }> => {
   // The registry must be dropped BEFORE registering: an already-instantiated ./applyMiddleware
   // keeps the previous factory's closure, and this run's capturedArgs would never be written.
-  jest.resetModules()
+  vi.resetModules()
   let capturedArgs: unknown[] = []
   // ./applyMiddleware, not the package: graphql-middleware is reached through createRequire
   // there (see that file), which bypasses Jest's registry entirely.
-  jest.unstable_mockModule('./applyMiddleware', () => ({
+  vi.doMock('./applyMiddleware', () => ({
     applyMiddleware: (_schema: unknown, ...middlewares: unknown[]) => {
       capturedArgs = middlewares
       return _schema
@@ -77,30 +85,30 @@ const loadModule = async (
 // isolateModulesAsync — only the module registry is isolated, not the mocks — so call counts
 // would otherwise accumulate across tests.
 beforeEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 describe('default', () => {
   it('registers the 15 default middlewares', async () => {
-    await jest.isolateModulesAsync(async () => {
+    await isolateModules(async () => {
       const { getCapturedMiddlewares } = await loadModule()
       expect(getCapturedMiddlewares()).toHaveLength(15)
     })
   })
 
   it('calls brandingMiddlewares', async () => {
-    await jest.isolateModulesAsync(async () => {
+    await isolateModules(async () => {
       const { mod } = await loadModule()
 
       const { default: brandingMiddlewares } =
-        (await import('./branding/brandingMiddlewares')) as unknown as { default: jest.Mock }
+        (await import('./branding/brandingMiddlewares')) as unknown as { default: Mock }
       mod.default({})
       expect(brandingMiddlewares).toHaveBeenCalledTimes(1)
     })
   })
 
   it('filters out disabled middlewares', async () => {
-    await jest.isolateModulesAsync(async () => {
+    await isolateModules(async () => {
       const sentryMarker = { __test: 'sentry' }
       const xssMarker = { __test: 'xss' }
       const { getCapturedMiddlewares } = await loadModule({
@@ -110,7 +118,7 @@ describe('default', () => {
         },
         disabledMiddlewares: ['sentry', 'xss'],
       })
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
       const middlewares = getCapturedMiddlewares()
       expect(middlewares).toHaveLength(13)
       expect(middlewares).not.toContain(sentryMarker)
@@ -124,7 +132,7 @@ describe('default', () => {
 describe('addMiddleware', () => {
   describe('append', () => {
     it('adds middleware at the end', async () => {
-      await jest.isolateModulesAsync(async () => {
+      await isolateModules(async () => {
         const { mod, getCapturedMiddlewares } = await loadModule()
         const m = { __test: 'appended' }
         mod.addMiddleware({ name: 'test-append', middleware: m, position: 'append' })
@@ -137,7 +145,7 @@ describe('addMiddleware', () => {
 
   describe('prepend', () => {
     it('adds middleware at the beginning', async () => {
-      await jest.isolateModulesAsync(async () => {
+      await isolateModules(async () => {
         const { mod, getCapturedMiddlewares } = await loadModule()
         const m = { __test: 'prepended' }
         mod.addMiddleware({ name: 'test-prepend', middleware: m, position: 'prepend' })
@@ -150,7 +158,7 @@ describe('addMiddleware', () => {
 
   describe('before', () => {
     it('inserts middleware directly before the named anchor', async () => {
-      await jest.isolateModulesAsync(async () => {
+      await isolateModules(async () => {
         const sentryMarker = { __test: 'sentry' }
         const permissionsMarker = { __test: 'permissions' }
         const { mod, getCapturedMiddlewares } = await loadModule({
@@ -180,7 +188,7 @@ describe('addMiddleware', () => {
 
   describe('after', () => {
     it('inserts middleware directly after the named anchor', async () => {
-      await jest.isolateModulesAsync(async () => {
+      await isolateModules(async () => {
         const sentryMarker = { __test: 'sentry' }
         const permissionsMarker = { __test: 'permissions' }
         const { mod, getCapturedMiddlewares } = await loadModule({
@@ -210,7 +218,7 @@ describe('addMiddleware', () => {
 
   describe('unknown anchor', () => {
     it('throws when "before" anchor does not exist', async () => {
-      await jest.isolateModulesAsync(async () => {
+      await isolateModules(async () => {
         const { mod } = await loadModule()
         expect(() => {
           mod.addMiddleware({
@@ -223,7 +231,7 @@ describe('addMiddleware', () => {
     })
 
     it('throws when "after" anchor does not exist', async () => {
-      await jest.isolateModulesAsync(async () => {
+      await isolateModules(async () => {
         const { mod } = await loadModule()
         expect(() => {
           mod.addMiddleware({

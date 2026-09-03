@@ -2,15 +2,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import { jest } from '@jest/globals'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 import type { RoleDefinition } from '@src/role'
 
-let listParticipantsMock = jest.fn<(...args: unknown[]) => Promise<unknown>>()
+let listParticipantsMock = vi.fn<(...args: unknown[]) => Promise<unknown>>()
 
-jest.unstable_mockModule('livekit-server-sdk', () => {
+vi.mock('livekit-server-sdk', () => {
   class MockTwirpError extends Error {
     status: number
     code?: string
@@ -22,9 +21,9 @@ jest.unstable_mockModule('livekit-server-sdk', () => {
     }
   }
   return {
-    AccessToken: jest
+    AccessToken: vi
       .fn<(apiKey: string, apiSecret: string, opts: unknown) => unknown>()
-      .mockImplementation((apiKey: string, _apiSecret: string, opts) => {
+      .mockImplementation(function (apiKey: string, _apiSecret: string, opts) {
         const grants: Record<string, unknown> = {}
         return {
           addGrant: (g: Record<string, unknown>) => Object.assign(grants, g),
@@ -35,11 +34,11 @@ jest.unstable_mockModule('livekit-server-sdk', () => {
             ),
         }
       }),
-    RoomServiceClient: jest.fn().mockImplementation(() => ({
+    RoomServiceClient: vi.fn().mockImplementation(() => ({
       listParticipants: async (roomName: string) => listParticipantsMock(roomName),
     })),
     TwirpError: MockTwirpError,
-    WebhookReceiver: jest.fn(),
+    WebhookReceiver: vi.fn(),
   }
 })
 
@@ -103,7 +102,7 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await cleanDatabase()
-  listParticipantsMock = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue([])
+  listParticipantsMock = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue([])
   livekitConfig = {}
   authenticatedUser = null
   rolesOverride = undefined

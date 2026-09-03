@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { jest } from '@jest/globals'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -13,7 +12,7 @@ import type { Context } from '@src/context'
 // cannot await.
 const actualBranding = await import('@ocelot-social/branding')
 
-jest.unstable_mockModule('@src/branding', () => {
+vi.mock('@src/branding', () => {
   // @src/branding re-exports the package's NAMED `branding` (per-domain getters), not a default.
   const actual = actualBranding
   return {

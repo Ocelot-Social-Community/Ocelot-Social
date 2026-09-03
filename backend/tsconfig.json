@@ -61,7 +61,11 @@
     },
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
     // "typeRoots": [],                                  /* Specify multiple folders that act like './node_modules/@types'. */
-    // "types": [],                                      /* Specify type package names to be included without being referenced in a source file. */
+    /* `globals: true` in vitest.config.ts puts describe/it/expect AND `vi` in global scope; these
+       are the declarations for them. Naming `types` at all turns OFF automatic inclusion of every
+       @types package, so `node` has to be listed explicitly — everything else this project uses
+       (@types/lodash, @types/validator …) is reached through imports and needs no global. */
+    "types": ["node", "vitest/globals"],
     // "allowUmdGlobalAccess": true,                     /* Allow accessing UMD globals from modules. */
     // "moduleSuffixes": [],                             /* List of file name suffixes to search when resolving a module. */
     // "allowImportingTsExtensions": true,               /* Allow imports to include TypeScript file extensions. Requires '--moduleResolution bundler' and either '--noEmit' or '--emitDeclarationOnly' to be set. */

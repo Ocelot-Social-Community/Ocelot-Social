@@ -8,7 +8,6 @@
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 import { Readable } from 'node:stream'
 
-import { jest } from '@jest/globals'
 import { Upload } from 'graphql-upload/public/index.js'
 
 import pubsubContext from '@context/pubsub'
@@ -33,7 +32,7 @@ let server: ApolloTestSetup['server']
 let chattingUser, otherChattingUser, notChattingUser
 
 const pubsub = pubsubContext()
-const pubsubSpy = jest.spyOn(pubsub, 'publish')
+const pubsubSpy = vi.spyOn(pubsub, 'publish')
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -77,7 +76,7 @@ describe('Message', () => {
 
   describe('create message', () => {
     beforeEach(() => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
     })
 
     describe('unauthenticated', () => {
@@ -797,15 +796,15 @@ describe('Message', () => {
     describe('chatMessageAddedFilter', () => {
       it('returns true for recipient and marks as distributed', async () => {
         const mockSession = {
-          writeTransaction: jest
+          writeTransaction: vi
             .fn<(...args: unknown[]) => Promise<unknown>>()
             .mockResolvedValue([{ roomId: 'r1', authorId: 'a1', messageIds: ['m1'] }]),
-          close: jest.fn(),
+          close: vi.fn(),
         }
         const filterContext = {
           user: { id: 'recipient' },
           driver: { session: () => mockSession },
-          pubsub: { publish: jest.fn() },
+          pubsub: { publish: vi.fn() },
         }
         const result = await chatMessageAddedFilter(
           { userId: 'recipient', chatMessageAdded: { id: 'm1' } },
@@ -830,7 +829,7 @@ describe('Message', () => {
       })
 
       it('skips distributed marking when no message id', async () => {
-        const mockSession = { writeTransaction: jest.fn(), close: jest.fn() }
+        const mockSession = { writeTransaction: vi.fn(), close: vi.fn() }
         const result = await chatMessageAddedFilter(
           { userId: 'me', chatMessageAdded: {} },
           { user: { id: 'me' }, driver: { session: () => mockSession } },

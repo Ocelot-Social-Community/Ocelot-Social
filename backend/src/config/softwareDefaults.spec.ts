@@ -1,7 +1,6 @@
 // Keys iterated below come from the fixed SOFTWARE_DEFAULTS / config module, never user
 // input — the object-injection lint is a false positive here.
 /* eslint-disable security/detect-object-injection */
-import { jest } from '@jest/globals'
 
 import { ENV_SPEC_BY_NAME } from './envRegistry'
 import { SOFTWARE_DEFAULTS } from './softwareDefaults'
@@ -61,7 +60,7 @@ describe('SOFTWARE_DEFAULTS ↔ config runtime default (logic-gated defaults)', 
   // SMTP_* etc.) would mask the true software defaults we mean to assert.
   // async because ESM has no synchronous module load: `await import()` replaces require().
   const loadConfigWithFlagsUnset = async (): Promise<LoadedConfig> => {
-    jest.resetModules()
+    vi.resetModules()
     const g = global as unknown as { Cypress?: { env: () => Record<string, string> } }
     g.Cypress = { env: () => ({ ...REQUIRED }) }
     try {

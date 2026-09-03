@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { jest } from '@jest/globals'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { closeDriver, getDriver } from '@db/neo4j'
@@ -215,7 +214,7 @@ describe('Room.unreadCount', () => {
   })
 
   it('resolves a whole room list in a single query', async () => {
-    const sessionSpy = jest.spyOn(driver, 'session')
+    const sessionSpy = vi.spyOn(driver, 'session')
 
     // Restored in `finally`: jest is configured without `restoreMocks`, so a failing
     // assertion would leave the spy on the shared driver for every later test in this file.

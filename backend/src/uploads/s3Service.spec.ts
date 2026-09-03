@@ -1,23 +1,28 @@
+import type { Mock } from 'vitest'
 import { Readable } from 'node:stream'
 
-import { jest } from '@jest/globals'
 
 import type { S3Config } from '@config/index'
 import type { FileUpload } from 'graphql-upload'
 
-jest.unstable_mockModule('@aws-sdk/client-s3', () => {
+// `function`, not an arrow: these stand in for CLASSES and the code under test calls them with
+// `new`. Vitest constructs the mock's implementation via Reflect.construct, and an arrow function
+// is not a constructor — Jest got away with arrows because it applied the implementation instead.
+vi.mock('@aws-sdk/client-s3', () => {
   return {
-    S3Client: jest.fn().mockImplementation(() => ({
-      send: jest.fn(),
-    })),
+    S3Client: vi.fn().mockImplementation(function () {
+      return { send: vi.fn() }
+    }),
     ObjectCannedACL: { public_read: 'public_read' },
-    DeleteObjectCommand: jest.fn().mockImplementation(() => ({})),
+    DeleteObjectCommand: vi.fn().mockImplementation(function () {
+      return {}
+    }),
   }
 })
 
-jest.unstable_mockModule('@aws-sdk/lib-storage', () => {
+vi.mock('@aws-sdk/lib-storage', () => {
   return {
-    Upload: jest.fn(),
+    Upload: vi.fn(),
   }
 })
 
@@ -29,7 +34,7 @@ const { s3Service } = await import('./s3Service')
 interface UploadInput {
   params: { Bucket: string; Key: string; ContentType: string; Body: unknown }
 }
-const uploadMock = Upload as unknown as jest.Mock<
+const uploadMock = Upload as unknown as Mock<
   (input: UploadInput) => { done: () => Promise<{ Location: string }> }
 >
 
@@ -57,10 +62,12 @@ describe('s3Service', () => {
   describe('upload', () => {
     beforeEach(() => {
       uploadMock.mockReset()
-      uploadMock.mockImplementation(({ params: { Key } }) => ({
-        done: async () =>
-          Promise.resolve({ Location: `http://your-objectstorage.com/bucket/${Key}` }),
-      }))
+      uploadMock.mockImplementation(function ({ params: { Key } }) {
+        return {
+          done: async () =>
+            Promise.resolve({ Location: `http://your-objectstorage.com/bucket/${Key}` }),
+        }
+      })
     })
 
     it('hands the file to the s3 client library as a readable `Body`', async () => {
@@ -86,9 +93,12 @@ describe('s3Service', () => {
 
     describe('but if for some reason, the S3 service returns a `Location` wich is not a valid URL and misses the protocol part', () => {
       beforeEach(() => {
-        uploadMock.mockImplementation(({ params: { Key } }) => ({
-          done: async () => Promise.resolve({ Location: `your-objectstorage.com/bucket/${Key}` }),
-        }))
+        uploadMock.mockImplementation(function ({ params: { Key } }) {
+          return {
+            done: async () =>
+              Promise.resolve({ Location: `your-objectstorage.com/bucket/${Key}` }),
+          }
+        })
       })
 
       it('adds `https:` as protocol', async () => {

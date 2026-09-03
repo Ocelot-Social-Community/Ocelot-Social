@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { jest } from '@jest/globals'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
-const sendNotificationMailMock: (notification) => void = jest.fn()
-jest.unstable_mockModule('@src/emails/sendEmail', () => ({
+const sendNotificationMailMock: (notification) => void = vi.fn()
+vi.mock('@src/emails/sendEmail', () => ({
   sendNotificationMail: (notification) => {
     sendNotificationMailMock(notification)
   },
@@ -16,12 +15,12 @@ jest.unstable_mockModule('@src/emails/sendEmail', () => ({
   // registration/verification mails in transitively). Under CommonJS a missing key was
   // simply undefined and only mattered if it was called. The stubs below carry no
   // behaviour — only the two above are asserted on.
-  defaultParams: jest.fn(),
-  sendChatMessageMail: jest.fn(),
-  sendRegistrationMail: jest.fn(),
-  sendEmailVerification: jest.fn(),
-  sendResetPasswordMail: jest.fn(),
-  sendWrongEmail: jest.fn(),
+  defaultParams: vi.fn(),
+  sendChatMessageMail: vi.fn(),
+  sendRegistrationMail: vi.fn(),
+  sendEmailVerification: vi.fn(),
+  sendResetPasswordMail: vi.fn(),
+  sendWrongEmail: vi.fn(),
 }))
 
 // Imported after the mock registrations, not above them: `unstable_mockModule`
@@ -168,7 +167,7 @@ describe('notify group members of new posts in group', () => {
 
   describe('group owner posts in group', () => {
     beforeEach(async () => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
       authenticatedUser = await groupMember.toJson()
       await mutate({ mutation: markAllAsRead })
       authenticatedUser = await postAuthor.toJson()
@@ -265,7 +264,7 @@ describe('notify group members of new posts in group', () => {
             groupId: 'g-1',
           },
         })
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         authenticatedUser = await postAuthor.toJson()
         await mutate({
           mutation: CreatePost,
@@ -308,7 +307,7 @@ describe('notify group members of new posts in group', () => {
               groupId: 'g-1',
             },
           })
-          jest.clearAllMocks()
+          vi.clearAllMocks()
           await groupMember.update({ emailNotificationsPostInGroup: false })
         })
 
@@ -362,7 +361,7 @@ describe('notify group members of new posts in group', () => {
         await groupMember.relateTo(postAuthor, 'blocked')
         authenticatedUser = await groupMember.toJson()
         await mutate({ mutation: markAllAsRead })
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         authenticatedUser = await postAuthor.toJson()
         await mutate({
           mutation: CreatePost,
@@ -403,7 +402,7 @@ describe('notify group members of new posts in group', () => {
         await groupMember.relateTo(postAuthor, 'muted')
         authenticatedUser = await groupMember.toJson()
         await mutate({ mutation: markAllAsRead })
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         authenticatedUser = await postAuthor.toJson()
         await mutate({
           mutation: CreatePost,

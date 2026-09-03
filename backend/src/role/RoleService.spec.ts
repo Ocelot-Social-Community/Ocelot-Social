@@ -1,4 +1,3 @@
-import { jest } from '@jest/globals'
 
 import { allPermissionKeys } from '@src/permission'
 
@@ -281,7 +280,7 @@ describe('RoleService', () => {
       // The write never lands (fake write is a no-op), so `user` stays missing even
       // after the self-heal attempt. init() must reject so a broken instance never
       // serves traffic.
-      const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
       const fakeDb = {
         query: async () =>
           Promise.resolve({
@@ -359,7 +358,7 @@ describe('RoleService', () => {
       // Same boot invariant as init(): if the resync ends up without a mandatory role
       // (here `user` never lands because the fake write is a no-op), reload() must reject
       // rather than silently install a half-empty role set.
-      const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
       const fakeDb = {
         query: async () =>
           Promise.resolve({
@@ -415,7 +414,7 @@ describe('RoleService', () => {
     })
 
     it('self-heals only the missing mandatory role (not admin/moderator) and warns', async () => {
-      const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
       const writes: Array<{ variables?: { name?: string } }> = []
       let queryCalls = 0
       const fakeDb = {

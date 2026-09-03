@@ -1,5 +1,5 @@
-import { jest } from '@jest/globals'
 
+import type { Mock } from 'vitest'
 import { UserInputError } from '@graphql/errors'
 import { PolicyValidationError } from '@src/policy'
 
@@ -8,7 +8,7 @@ import brandingResolver from './branding'
 import type { Context } from '@src/context'
 
 describe('branding resolvers', () => {
-  let set: jest.Mock
+  let set: Mock
   let context: Context
 
   const call = async (
@@ -23,7 +23,7 @@ describe('branding resolvers', () => {
     )
 
   beforeEach(() => {
-    set = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue(undefined)
+    set = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue(undefined)
     context = { policy: { set }, user: { id: 'u1' } } as unknown as Context
   })
 

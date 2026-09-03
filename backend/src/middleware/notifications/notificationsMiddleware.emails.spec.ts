@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { jest } from '@jest/globals'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
-const sendNotificationMailMock: (notification) => void = jest.fn()
-jest.unstable_mockModule('@src/emails/sendEmail', () => ({
+const sendNotificationMailMock: (notification) => void = vi.fn()
+vi.mock('@src/emails/sendEmail', () => ({
   sendNotificationMail: (notification) => {
     sendNotificationMailMock(notification)
   },
@@ -16,12 +15,12 @@ jest.unstable_mockModule('@src/emails/sendEmail', () => ({
   // registration/verification mails in transitively). Under CommonJS a missing key was
   // simply undefined and only mattered if it was called. The stubs below carry no
   // behaviour — only the two above are asserted on.
-  defaultParams: jest.fn(),
-  sendChatMessageMail: jest.fn(),
-  sendRegistrationMail: jest.fn(),
-  sendEmailVerification: jest.fn(),
-  sendResetPasswordMail: jest.fn(),
-  sendWrongEmail: jest.fn(),
+  defaultParams: vi.fn(),
+  sendChatMessageMail: vi.fn(),
+  sendRegistrationMail: vi.fn(),
+  sendEmailVerification: vi.fn(),
+  sendResetPasswordMail: vi.fn(),
+  sendWrongEmail: vi.fn(),
 }))
 
 // Imported after the mock registrations, not above them: `unstable_mockModule`
@@ -143,7 +142,7 @@ describe('emails sent for notifications', () => {
     describe('post-author posts into group and mentions following group-member', () => {
       describe('all email notification settings are true', () => {
         beforeEach(async () => {
-          jest.clearAllMocks()
+          vi.clearAllMocks()
           authenticatedUser = await postAuthor.toJson()
           await mutate({
             mutation: CreatePost,
@@ -224,7 +223,7 @@ describe('emails sent for notifications', () => {
 
       describe('email notification for mention in post is false', () => {
         beforeEach(async () => {
-          jest.clearAllMocks()
+          vi.clearAllMocks()
           await groupMember.update({ emailNotificationsMention: false })
           authenticatedUser = await postAuthor.toJson()
           await mutate({
@@ -306,7 +305,7 @@ describe('emails sent for notifications', () => {
 
       describe('email notification for mention in post and followed users is false', () => {
         beforeEach(async () => {
-          jest.clearAllMocks()
+          vi.clearAllMocks()
           await groupMember.update({ emailNotificationsMention: false })
           await groupMember.update({ emailNotificationsFollowingUsers: false })
           authenticatedUser = await postAuthor.toJson()
@@ -389,7 +388,7 @@ describe('emails sent for notifications', () => {
 
       describe('all relevant email notifications are false', () => {
         beforeEach(async () => {
-          jest.clearAllMocks()
+          vi.clearAllMocks()
           await groupMember.update({ emailNotificationsMention: false })
           await groupMember.update({ emailNotificationsFollowingUsers: false })
           await groupMember.update({ emailNotificationsPostInGroup: false })
@@ -493,7 +492,7 @@ describe('emails sent for notifications', () => {
           await mutate({
             mutation: markAllAsRead,
           })
-          jest.clearAllMocks()
+          vi.clearAllMocks()
           authenticatedUser = await postAuthor.toJson()
           await mutate({
             mutation: CreateComment,
@@ -586,7 +585,7 @@ describe('emails sent for notifications', () => {
           await mutate({
             mutation: markAllAsRead,
           })
-          jest.clearAllMocks()
+          vi.clearAllMocks()
           authenticatedUser = await postAuthor.toJson()
           await mutate({
             mutation: CreateComment,
@@ -680,7 +679,7 @@ describe('emails sent for notifications', () => {
           await mutate({
             mutation: markAllAsRead,
           })
-          jest.clearAllMocks()
+          vi.clearAllMocks()
           authenticatedUser = await postAuthor.toJson()
           await mutate({
             mutation: CreateComment,

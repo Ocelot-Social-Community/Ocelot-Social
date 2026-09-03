@@ -1,7 +1,6 @@
 // Unit tests for the visibility primitive — the single mechanism shared by the
 // `policy` query resolver and the policyChanged subscription filter.
 
-import { jest } from '@jest/globals'
 
 import {
   allKeys,
@@ -13,6 +12,14 @@ import {
   typeFor,
   visibleKeys,
 } from './schema'
+
+// vitest has no `isolateModulesAsync`: resetting the registry before the dynamic import does the
+// same job, since a module graph is only shared within a file. Wrapped so the call sites keep
+// reading as "load this in isolation".
+const isolateModules = async (run: () => Promise<void>): Promise<void> => {
+  vi.resetModules()
+  await run()
+}
 
 // The subset of ./schema the perm-gating tests re-import against a mocked JSON
 // schema. Built from the already-imported functions to avoid a namespace import.
@@ -87,10 +94,10 @@ describe('policy visibility', () => {
     // The fresh module is passed as an object (not destructured) so its functions
     // don't shadow the outer imports.
     const withMockedSchema = async (run: (schema: SchemaModule) => void) => {
-      await jest.isolateModulesAsync(async () => {
+      await isolateModules(async () => {
         // `default:` because the consumer imports the JSON as a default; ESM mock factories get
         // no CommonJS interop layer to synthesise one.
-        jest.unstable_mockModule('./policy.schema.json', () => ({
+        vi.doMock('./policy.schema.json', () => ({
           default: {
             type: 'object',
             properties: {
@@ -258,8 +265,8 @@ describe('requiresPolicyFor', () => {
     // Async: ESM has no synchronous module load. isolateModulesAsync would swallow the load
     // rejection this asserts on, so the registry is reset directly instead.
     const loadWith = (properties: Record<string, unknown>) => async (): Promise<void> => {
-      jest.resetModules()
-      jest.unstable_mockModule('./policy.schema.json', () => ({
+      vi.resetModules()
+      vi.doMock('./policy.schema.json', () => ({
         default: { type: 'object', properties },
       }))
       await import('./schema')

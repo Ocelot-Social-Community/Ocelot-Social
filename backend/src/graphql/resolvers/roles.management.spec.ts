@@ -3,8 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
-import { jest } from '@jest/globals'
 
+import type { Mock } from 'vitest'
 import Factory, { cleanDatabase } from '@db/factories'
 import CREATE_ROLE from '@graphql/queries/roles/createRole.gql'
 import DELETE_ROLE from '@graphql/queries/roles/deleteRole.gql'
@@ -28,7 +28,7 @@ let authenticatedUser: Context['user']
 let roleService: RoleService
 // Optional per-test pubsub spy; when unset, the context falls back to the default
 // server pubsub (harmless in-memory).
-let pubsubMock: { publish: jest.Mock; asyncIterator: jest.Mock } | undefined
+let pubsubMock: { publish: Mock; asyncIterator: Mock } | undefined
 let query: ApolloTestSetup['query']
 let mutate: ApolloTestSetup['mutate']
 let database: ApolloTestSetup['database']
@@ -82,8 +82,8 @@ describe('role management', () => {
   describe('permissionsChanged broadcast', () => {
     beforeEach(async () => {
       pubsubMock = {
-        publish: jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue(undefined),
-        asyncIterator: jest.fn(),
+        publish: vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue(undefined),
+        asyncIterator: vi.fn(),
       }
       await asAdmin()
       await mutate({
@@ -540,7 +540,7 @@ describe('role management', () => {
       const constraintError = Object.assign(new Error('constraint'), {
         code: 'Neo.ClientError.Schema.ConstraintValidationFailed',
       })
-      jest.spyOn(roleService, 'renameRole').mockRejectedValueOnce(constraintError)
+      vi.spyOn(roleService, 'renameRole').mockRejectedValueOnce(constraintError)
       const { errors } = await mutate({
         mutation: RENAME_ROLE,
         variables: { name: 'editor', newName: 'reviewer' },

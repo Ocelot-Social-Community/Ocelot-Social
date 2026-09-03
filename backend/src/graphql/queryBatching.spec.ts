@@ -8,7 +8,6 @@
 // of monkey-patching; the indexed access uses two literal method names, not input.
 /* eslint-disable security/detect-object-injection */
 /* eslint-disable @typescript-eslint/require-await */
-import { jest } from '@jest/globals'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -107,7 +106,7 @@ const countRoundTrips = async (
     }
   }
 
-  const spy = jest.spyOn(driver, 'session').mockImplementation(((...args: any[]) => {
+  const spy = vi.spyOn(driver, 'session').mockImplementation(((...args: any[]) => {
     const session = openSession(...args)
     instrument(session, 'readTransaction')
     instrument(session, 'writeTransaction')

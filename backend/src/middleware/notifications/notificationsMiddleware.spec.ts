@@ -4,14 +4,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import { jest } from '@jest/globals'
 
+import type { Mock } from 'vitest'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
-const sendChatMessageMailMock: (notification) => void = jest.fn()
-const sendNotificationMailMock: (notification) => void = jest.fn()
-jest.unstable_mockModule('@src/emails/sendEmail', () => ({
+const sendChatMessageMailMock: (notification) => void = vi.fn()
+const sendNotificationMailMock: (notification) => void = vi.fn()
+vi.mock('@src/emails/sendEmail', () => ({
   sendChatMessageMail: (notification) => {
     sendChatMessageMailMock(notification)
   },
@@ -23,15 +23,15 @@ jest.unstable_mockModule('@src/emails/sendEmail', () => ({
   // registration/verification mails in transitively). Under CommonJS a missing key was
   // simply undefined and only mattered if it was called. The stubs below carry no
   // behaviour — only the two above are asserted on.
-  defaultParams: jest.fn(),
-  sendRegistrationMail: jest.fn(),
-  sendEmailVerification: jest.fn(),
-  sendResetPasswordMail: jest.fn(),
-  sendWrongEmail: jest.fn(),
+  defaultParams: vi.fn(),
+  sendRegistrationMail: vi.fn(),
+  sendEmailVerification: vi.fn(),
+  sendResetPasswordMail: vi.fn(),
+  sendWrongEmail: vi.fn(),
 }))
 
-let isUserOnlineMock = jest.fn()
-jest.unstable_mockModule('../helpers/isUserOnline', () => ({
+let isUserOnlineMock = vi.fn()
+vi.mock('../helpers/isUserOnline', () => ({
   isUserOnline: () => isUserOnlineMock(),
 }))
 
@@ -57,7 +57,7 @@ const { default: UpdatePost } = await import('@graphql/queries/posts/UpdatePost.
 const { createApolloTestSetup } = await import('@root/test/helpers')
 
 const pubsub = pubsubContext()
-const pubsubSpy = jest.spyOn(pubsub, 'publish')
+const pubsubSpy = vi.spyOn(pubsub, 'publish')
 
 let notifiedUser
 let authenticatedUser: Context['user']
@@ -161,7 +161,7 @@ describe('notifications', () => {
 
         describe('commenter is not me', () => {
           beforeEach(async () => {
-            jest.clearAllMocks()
+            vi.clearAllMocks()
             commentContent = 'Commenters comment.'
             commentAuthor = await Factory.build(
               'user',
@@ -323,7 +323,7 @@ describe('notifications', () => {
       })
 
       beforeEach(async () => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         postAuthor = await Factory.build(
           'user',
           {
@@ -879,8 +879,8 @@ describe('notifications', () => {
     let roomId
 
     beforeEach(async () => {
-      jest.clearAllMocks()
-      isUserOnlineMock = jest.fn().mockReturnValue(false)
+      vi.clearAllMocks()
+      isUserOnlineMock = vi.fn().mockReturnValue(false)
 
       chatSender = await Factory.build(
         'user',
@@ -914,12 +914,12 @@ describe('notifications', () => {
 
       // Reset mocks after init message to avoid contamination
       pubsubSpy.mockClear()
-      ;(sendChatMessageMailMock as jest.Mock).mockClear()
+      ;(sendChatMessageMailMock as Mock).mockClear()
     })
 
     describe('if the chatReceiver is online', () => {
       it('publishes subscriptions but sends no email', async () => {
-        isUserOnlineMock = jest.fn().mockReturnValue(true)
+        isUserOnlineMock = vi.fn().mockReturnValue(true)
 
         await mutate({
           mutation: CreateMessage,
@@ -954,7 +954,7 @@ describe('notifications', () => {
 
     describe('if the chatReceiver is offline', () => {
       it('publishes subscriptions and sends an email', async () => {
-        isUserOnlineMock = jest.fn().mockReturnValue(false)
+        isUserOnlineMock = vi.fn().mockReturnValue(false)
 
         await mutate({
           mutation: CreateMessage,
@@ -1002,7 +1002,7 @@ describe('notifications', () => {
 
     describe('if the chatReceiver has blocked chatSender', () => {
       it('publishes no subscriptions and sends no email', async () => {
-        isUserOnlineMock = jest.fn().mockReturnValue(false)
+        isUserOnlineMock = vi.fn().mockReturnValue(false)
         await chatReceiver.relateTo(chatSender, 'blocked')
 
         await mutate({
@@ -1022,7 +1022,7 @@ describe('notifications', () => {
 
     describe('if the chatReceiver has muted chatSender', () => {
       it('publishes no subscriptions and sends no email', async () => {
-        isUserOnlineMock = jest.fn().mockReturnValue(false)
+        isUserOnlineMock = vi.fn().mockReturnValue(false)
         await chatReceiver.relateTo(chatSender, 'muted')
 
         await mutate({
@@ -1042,7 +1042,7 @@ describe('notifications', () => {
 
     describe('if the chatReceiver has disabled `emailNotificationsChatMessage`', () => {
       it('publishes subscriptions but sends no email', async () => {
-        isUserOnlineMock = jest.fn().mockReturnValue(false)
+        isUserOnlineMock = vi.fn().mockReturnValue(false)
         await chatReceiver.update({ emailNotificationsChatMessage: false })
 
         await mutate({
@@ -1105,12 +1105,12 @@ describe('notifications', () => {
         groupRoomId = createRoomResult.data.CreateGroupRoom.id
 
         pubsubSpy.mockClear()
-        ;(sendChatMessageMailMock as jest.Mock).mockClear()
+        ;(sendChatMessageMailMock as Mock).mockClear()
       })
 
       describe('if the chatReceiver has muted the group', () => {
         it('publishes subscriptions but sends no email', async () => {
-          isUserOnlineMock = jest.fn().mockReturnValue(false)
+          isUserOnlineMock = vi.fn().mockReturnValue(false)
           authenticatedUser = await chatReceiver.toJson()
           await mutate({
             mutation: muteGroup,
@@ -1139,7 +1139,7 @@ describe('notifications', () => {
 
       describe('if the chatReceiver has not muted the group', () => {
         it('publishes subscriptions and sends an email', async () => {
-          isUserOnlineMock = jest.fn().mockReturnValue(false)
+          isUserOnlineMock = vi.fn().mockReturnValue(false)
 
           await mutate({
             mutation: CreateMessage,
@@ -1205,7 +1205,7 @@ describe('notifications', () => {
       }
 
       beforeEach(async () => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
       })
 
       it('sends the group owner a notification and email', async () => {
@@ -1302,7 +1302,7 @@ describe('notifications', () => {
       }
 
       beforeEach(async () => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         authenticatedUser = await notifiedUser.toJson()
         await mutate({
           mutation: JoinGroup,
@@ -1449,7 +1449,7 @@ describe('notifications', () => {
           },
         })
         // Clear after because the above generates a notification not related
-        jest.clearAllMocks()
+        vi.clearAllMocks()
       })
 
       it('sends the group member a notification and email', async () => {
@@ -1555,7 +1555,7 @@ describe('notifications', () => {
           },
         })
         // Clear after because the above generates a notification not related
-        jest.clearAllMocks()
+        vi.clearAllMocks()
       })
 
       it('sends the previous group member a notification and email', async () => {

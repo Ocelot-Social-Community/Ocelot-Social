@@ -1,6 +1,5 @@
-import { jest } from '@jest/globals'
 // ESM has no automock: unstable_mockModule requires an explicit factory.
-jest.unstable_mockModule('@db/neo4j', () => ({ getDriver: jest.fn() }))
+vi.mock('@db/neo4j', () => ({ getDriver: vi.fn() }))
 
 // Imported after the mock registrations, not above them: `unstable_mockModule`
 // does not hoist, so a static import would bind the real module first.
@@ -263,15 +262,15 @@ describe('up', () => {
         ),
       close: async () => Promise.resolve(),
     }
-    jest.mocked(getDriver).mockReturnValue({ session: () => session } as never)
-    jest.spyOn(console, 'log').mockImplementation((line: string) => {
+    vi.mocked(getDriver).mockReturnValue({ session: () => session } as never)
+    vi.spyOn(console, 'log').mockImplementation((line: string) => {
       events.push(`log ${line.trim()}`)
     })
     await up(undefined)
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('names a url before the write that destroys it', () => {
@@ -322,3 +321,7 @@ describe('up', () => {
     expect(events[0]).toBe('log SocialMedia urls: 3 checked, 2 to repair, 1 to remove')
   })
 })
+
+// No imports left after the vitest switch — without this the file is a script, not a
+// module: its top-level consts would collide across specs and `await` would be illegal.
+export {}
