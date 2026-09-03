@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 
 import { parse } from 'graphql'
 import { defineConfig } from 'vitest/config'
@@ -35,6 +36,16 @@ export default defineConfig({
     // Resolves the `@src/*`, `@config/*` … aliases straight from tsconfig, so the mapping lives
     // in ONE place instead of being restated here (the Jest setup had to derive it by hand).
     tsconfigPaths: true,
+    alias: {
+      // Pin graphql to its CommonJS entry. The package ships both (`main: index`, `module:
+      // index.mjs`) with no `exports` map to arbitrate, so Vite-processed code would take the ESM
+      // one while externalised code takes CJS — two live instances, and graphql's `instanceOf`
+      // then rejects a type built by "the other" ("Cannot use GraphQLObjectType … from another
+      // module or realm"). CJS is the side that must win: permissionsMiddleware reaches
+      // graphql-shield through createRequire (its ESM build is broken), which is CommonJS and
+      // cannot be talked out of it.
+      graphql: fileURLToPath(new URL('./node_modules/graphql/index.js', import.meta.url)),
+    },
   },
   test: {
     // describe/it/expect AND `vi` as globals — matches how the suite was written under Jest and
@@ -56,13 +67,7 @@ export default defineConfig({
     // construction and schema printing on the same instance.
     server: {
       deps: {
-        inline: [
-          'graphql',
-          '@graphql-tools/schema',
-          '@graphql-tools/merge',
-          '@graphql-tools/utils',
-          '@graphql-tools/load-files',
-        ],
+        inline: ['@graphql-tools/load-files'],
       },
     },
     include: ['src/**/*.{spec,test}.ts'],
