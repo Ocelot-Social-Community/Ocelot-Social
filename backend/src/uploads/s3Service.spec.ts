@@ -73,7 +73,7 @@ describe('s3Service', () => {
       })
     })
 
-    test('hands the file to the s3 client library as a readable `Body`', async () => {
+    it('hands the file to the s3 client library as a readable `Body`', async () => {
       const service = s3Service(config, 'ocelot-social')
       await service.uploadFile(input)
       const { params } = uploadMock.mock.calls[0][0]
@@ -87,7 +87,7 @@ describe('s3Service', () => {
     })
 
     describe('if the S3 service returns a valid URL as a `Location`', () => {
-      test('returns the `Location` that was returned by the s3 client library', async () => {
+      it('returns the `Location` that was returned by the s3 client library', async () => {
         const service = s3Service(config, 'ocelot-social')
 
         await expect(service.uploadFile(input)).resolves.toEqual(
@@ -105,7 +105,7 @@ describe('s3Service', () => {
         })
       })
 
-      test('adds `https:` as protocol', async () => {
+      it('adds `https:` as protocol', async () => {
         const service = s3Service(config, 'ocelot-social')
 
         await expect(service.uploadFile(input)).resolves.toEqual(

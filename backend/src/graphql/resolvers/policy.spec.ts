@@ -65,7 +65,7 @@ beforeEach(() => {
 
 describe('Query.policy', () => {
   describe('anonymous viewer', () => {
-    test('returns public keys but null for the authenticated-only apiKeysEnabled, without error', async () => {
+    it('returns public keys but null for the authenticated-only apiKeysEnabled, without error', async () => {
       authenticatedUser = null
 
       const { data, errors } = await query({ query: policyQuery })
@@ -99,7 +99,7 @@ describe('Query.policy', () => {
       })
     })
 
-    test('carries each key’s requiresPolicy dependencies (static metadata) so the client can re-fold', async () => {
+    it('carries each key’s requiresPolicy dependencies (static metadata) so the client can re-fold', async () => {
       authenticatedUser = null
 
       const { data } = await query({ query: policyQuery })
@@ -116,7 +116,7 @@ describe('Query.policy', () => {
   })
 
   describe('logged-in (non-admin) viewer', () => {
-    test('exposes the apiKeysEnabled value', async () => {
+    it('exposes the apiKeysEnabled value', async () => {
       authenticatedUser = asUser('user')
 
       const { data, errors } = await query({ query: policyQuery })
@@ -125,7 +125,7 @@ describe('Query.policy', () => {
       expect(asMap(data.policy).apiKeysEnabled).toBe(true)
     })
 
-    test('returns the real value (false), not null, when the feature is disabled', async () => {
+    it('returns the real value (false), not null, when the feature is disabled', async () => {
       authenticatedUser = asUser('user')
       policy = { apiKeysEnabled: false }
 
@@ -136,7 +136,7 @@ describe('Query.policy', () => {
   })
 
   describe('admin viewer', () => {
-    test('exposes the apiKeysEnabled value (superuser sees everything)', async () => {
+    it('exposes the apiKeysEnabled value (superuser sees everything)', async () => {
       authenticatedUser = asUser('admin')
 
       const { data, errors } = await query({ query: policyQuery })
@@ -148,7 +148,7 @@ describe('Query.policy', () => {
 })
 
 describe('Query.policyDefaults', () => {
-  test('is forbidden for anonymous viewers', async () => {
+  it('is forbidden for anonymous viewers', async () => {
     authenticatedUser = null
 
     const { errors } = await query({ query: policyDefaultsQuery })
@@ -156,7 +156,7 @@ describe('Query.policyDefaults', () => {
     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
   })
 
-  test('is forbidden for logged-in non-admin users', async () => {
+  it('is forbidden for logged-in non-admin users', async () => {
     authenticatedUser = asUser('user')
 
     const { errors } = await query({ query: policyDefaultsQuery })
@@ -164,7 +164,7 @@ describe('Query.policyDefaults', () => {
     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
   })
 
-  test('grants access to admins, returning every default and the last change', async () => {
+  it('grants access to admins, returning every default and the last change', async () => {
     authenticatedUser = asUser('admin')
 
     const { data, errors } = await query({ query: policyDefaultsQuery })
@@ -210,7 +210,7 @@ describe('Query.policyDefaults', () => {
 })
 
 describe('Mutation.setPolicy / resetPolicy authorization', () => {
-  test('forbids setPolicy for non-admins', async () => {
+  it('forbids setPolicy for non-admins', async () => {
     authenticatedUser = asUser('user')
 
     const { errors } = await query({
@@ -221,7 +221,7 @@ describe('Mutation.setPolicy / resetPolicy authorization', () => {
     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
   })
 
-  test('forbids resetPolicy for anonymous viewers', async () => {
+  it('forbids resetPolicy for anonymous viewers', async () => {
     authenticatedUser = null
 
     const { errors } = await query({
@@ -232,7 +232,7 @@ describe('Mutation.setPolicy / resetPolicy authorization', () => {
     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
   })
 
-  test('forbids the bulk resetPolicies for non-admins', async () => {
+  it('forbids the bulk resetPolicies for non-admins', async () => {
     authenticatedUser = asUser('user')
 
     const { errors } = await query({
@@ -242,7 +242,7 @@ describe('Mutation.setPolicy / resetPolicy authorization', () => {
     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
   })
 
-  test('lets the bulk resetPolicies past the shield for an admin (the gate is registered)', async () => {
+  it('lets the bulk resetPolicies past the shield for an admin (the gate is registered)', async () => {
     // A deny test alone would pass even if the mutation were MISSING from the shield (default
     // deny). This admin path is what catches a forgotten shield registration: an admin must
     // not be denied. (The harness policy service has no writable DB, so execution may still
@@ -258,7 +258,7 @@ describe('Mutation.setPolicy / resetPolicy authorization', () => {
 })
 
 describe('PolicyKey enum (schema-derived contract)', () => {
-  test('is derived from the schema keys — the single source of truth', async () => {
+  it('is derived from the schema keys — the single source of truth', async () => {
     const { data, errors } = await query({
       query: parse('{ __type(name: "PolicyKey") { enumValues { name } } }'),
     })
@@ -271,7 +271,7 @@ describe('PolicyKey enum (schema-derived contract)', () => {
     expect(names).toEqual([...allKeys()].sort())
   })
 
-  test('rejects an unknown key at the GraphQL layer (before the resolver)', async () => {
+  it('rejects an unknown key at the GraphQL layer (before the resolver)', async () => {
     authenticatedUser = asUser('admin')
 
     const { errors } = await query({
@@ -287,7 +287,7 @@ describe('PolicyKey enum (schema-derived contract)', () => {
   // PolicyKey enum (which the test above pins to allKeys()), so there is no longer
   // a hand-written Policy SDL type to drift from the schema keys — the former
   // "keep the Policy type fields in sync" guard is obsolete and was removed.
-  test('returns every schema key in the policy list, with no hand-maintained selection', async () => {
+  it('returns every schema key in the policy list, with no hand-maintained selection', async () => {
     authenticatedUser = asUser('admin')
 
     const { data, errors } = await query({ query: policyQuery })
@@ -301,7 +301,7 @@ describe('PolicyKey enum (schema-derived contract)', () => {
 })
 
 describe('setPolicy value validation (integration)', () => {
-  test('classifies a valid-JSON value of the wrong type as BAD_USER_INPUT', async () => {
+  it('classifies a valid-JSON value of the wrong type as BAD_USER_INPUT', async () => {
     authenticatedUser = asUser('admin')
 
     // "123" is valid JSON (number) but apiKeysEnabled is boolean → schema mismatch.
@@ -316,7 +316,7 @@ describe('setPolicy value validation (integration)', () => {
     expect(errors?.[0]?.message).toMatch(/must be boolean/)
   })
 
-  test('classifies a non-integer value for an integer key as BAD_USER_INPUT', async () => {
+  it('classifies a non-integer value for an integer key as BAD_USER_INPUT', async () => {
     authenticatedUser = asUser('admin')
 
     // 1.5 is valid JSON but apiKeysMaxPerUser is integer → schema mismatch, surfaced
@@ -333,7 +333,7 @@ describe('setPolicy value validation (integration)', () => {
 
 describe('Mutation resolvers (unit)', () => {
   describe('setPolicy', () => {
-    test('parses the JSON value, calls policy.set, and serializes the event', async () => {
+    it('parses the JSON value, calls policy.set, and serializes the event', async () => {
       const set = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
         key: 'apiKeysEnabled',
         value: true,
@@ -356,7 +356,7 @@ describe('Mutation resolvers (unit)', () => {
       })
     })
 
-    test('parses an integer JSON value for an integer key', async () => {
+    it('parses an integer JSON value for an integer key', async () => {
       const set = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
         key: 'apiKeysMaxPerUser',
         value: 10,
@@ -374,7 +374,7 @@ describe('Mutation resolvers (unit)', () => {
       expect(result.value).toBe('10') // serialized back as a JSON-encoded string
     })
 
-    test('rejects a value that is not valid JSON as a BAD_USER_INPUT error', async () => {
+    it('rejects a value that is not valid JSON as a BAD_USER_INPUT error', async () => {
       const set = vi.fn()
 
       const promise = policyResolvers.Mutation.setPolicy(
@@ -391,7 +391,7 @@ describe('Mutation resolvers (unit)', () => {
   })
 
   describe('resetPolicy', () => {
-    test('calls policy.reset and serializes the event', async () => {
+    it('calls policy.reset and serializes the event', async () => {
       const reset = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
         key: 'categoriesActive',
         value: false,
@@ -411,7 +411,7 @@ describe('Mutation resolvers (unit)', () => {
   })
 
   describe('resetPolicies (bulk)', () => {
-    test('calls policy.resetMany once and serializes the returned events', async () => {
+    it('calls policy.resetMany once and serializes the returned events', async () => {
       const resetMany = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue([
         { key: 'categoriesActive', value: false, actor: 'admin-1', timestamp: 'ts' },
         { key: 'apiKeysMaxPerUser', value: 5, actor: 'admin-1', timestamp: 'ts' },
@@ -438,7 +438,7 @@ describe('Mutation resolvers (unit)', () => {
     const ctxWithPubsub = (policyDouble: unknown, publish: Mock): Context =>
       ({ user: { id: 'admin-1' }, policy: policyDouble, pubsub: { publish } }) as unknown as Context
 
-    test('broadcasts permissionsChanged when setPolicy changes a gate flag', async () => {
+    it('broadcasts permissionsChanged when setPolicy changes a gate flag', async () => {
       const set = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
         key: 'apiKeysEnabled',
         value: false,
@@ -457,7 +457,7 @@ describe('Mutation resolvers (unit)', () => {
       })
     })
 
-    test('does NOT broadcast permissionsChanged for a non-gate policy key', async () => {
+    it('does NOT broadcast permissionsChanged for a non-gate policy key', async () => {
       const set = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
         key: 'apiKeysMaxPerUser',
         value: 7,
@@ -474,7 +474,7 @@ describe('Mutation resolvers (unit)', () => {
       expect(publish).not.toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, expect.anything())
     })
 
-    test('broadcasts permissionsChanged when resetPolicy resets a gate flag', async () => {
+    it('broadcasts permissionsChanged when resetPolicy resets a gate flag', async () => {
       const reset = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
         key: 'apiKeysEnabled',
         value: false,
@@ -493,7 +493,7 @@ describe('Mutation resolvers (unit)', () => {
       })
     })
 
-    test('broadcasts permissionsChanged once when a bulk reset changes a gate flag', async () => {
+    it('broadcasts permissionsChanged once when a bulk reset changes a gate flag', async () => {
       const resetMany = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue([
         { key: 'publicRegistration', value: false, actor: 'admin-1', timestamp: 't' },
         { key: 'apiKeysEnabled', value: false, actor: 'admin-1', timestamp: 't' },
@@ -511,7 +511,7 @@ describe('Mutation resolvers (unit)', () => {
       expect(gateBroadcasts).toHaveLength(1)
     })
 
-    test('does NOT broadcast permissionsChanged when no reset gate flag actually changed', async () => {
+    it('does NOT broadcast permissionsChanged when no reset gate flag actually changed', async () => {
       // apiKeysEnabled was requested but already at its default, so resetMany didn't return
       // it — no permission availability changed, no signal.
       const resetMany = vi
@@ -542,7 +542,7 @@ describe('Subscription.policyChanged', () => {
       policyChanged: { key, value: true, actor: 'admin-1', timestamp: 'ts' },
     })
 
-  test('delivers a visible key as a lean value-change event (key + value only)', async () => {
+  it('delivers a visible key as a lean value-change event (key + value only)', async () => {
     const ctx = subscriptionContext(asUser('user'))
     const iterator = policyResolvers.Subscription.policyChanged.subscribe(null, null, ctx, null)
     const next = iterator.next()
@@ -556,7 +556,7 @@ describe('Subscription.policyChanged', () => {
     expect(resolved).toEqual({ key: 'publicRegistration', value: 'true' })
   })
 
-  test('skips a key the viewer may not see and delivers the next visible one', async () => {
+  it('skips a key the viewer may not see and delivers the next visible one', async () => {
     const ctx = subscriptionContext(null) // anonymous
     const iterator = policyResolvers.Subscription.policyChanged.subscribe(null, null, ctx, null)
     const next = iterator.next()

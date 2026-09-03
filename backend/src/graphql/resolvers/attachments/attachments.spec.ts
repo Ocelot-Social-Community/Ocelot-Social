@@ -137,7 +137,7 @@ describe('delete Attachment', () => {
       })
     })
 
-    test('deletes `File` node', async () => {
+    it('deletes `File` node', async () => {
       await expect(database.neode.all('File')).resolves.toHaveLength(1)
 
       await deleteAttachment(message, 'ATTACHMENT')
@@ -146,7 +146,7 @@ describe('delete Attachment', () => {
     })
 
     describe('given a transaction parameter', () => {
-      test('executes cypher statements within the transaction', async () => {
+      it('executes cypher statements within the transaction', async () => {
         const session = database.driver.session()
         let someString: string
         try {
@@ -166,7 +166,7 @@ describe('delete Attachment', () => {
         expect(someString).toEqual('Hello')
       })
 
-      test('rolls back the transaction in case of errors', async () => {
+      it('rolls back the transaction in case of errors', async () => {
         await expect(database.neode.all('File')).resolves.toHaveLength(1)
 
         const session = database.driver.session()
@@ -232,7 +232,7 @@ describe('add Attachment', () => {
         post = await p.toJson()
       })
 
-      test('returns new file', async () => {
+      it('returns new file', async () => {
         await expect(addAttachment(post, 'ATTACHMENT', fileInput)).resolves.toMatchObject({
           updatedAt: expect.any(String),
           createdAt: expect.any(String),
@@ -242,7 +242,7 @@ describe('add Attachment', () => {
         })
       })
 
-      test('creates `:File` node', async () => {
+      it('creates `:File` node', async () => {
         await expect(database.neode.all('File')).resolves.toHaveLength(0)
 
         await addAttachment(post, 'ATTACHMENT', fileInput)
@@ -250,7 +250,7 @@ describe('add Attachment', () => {
         await expect(database.neode.all('File')).resolves.toHaveLength(1)
       })
 
-      test('connects resource with image via given image type', async () => {
+      it('connects resource with image via given image type', async () => {
         await addAttachment(post, 'ATTACHMENT', fileInput)
         const result = await database.neode.cypher(
           `MATCH(p:Post {id: "p99"})-[:ATTACHMENT]->(f:File) RETURN f,p`,
@@ -266,7 +266,7 @@ describe('add Attachment', () => {
         expect(file).toBeTruthy()
       })
 
-      test('sets metadata', async () => {
+      it('sets metadata', async () => {
         await addAttachment(post, 'ATTACHMENT', fileInput)
         const file = await database.neode.first('File', {}, undefined)
 
@@ -280,7 +280,7 @@ describe('add Attachment', () => {
       })
 
       describe('given a transaction parameter', () => {
-        test('executes cypher statements within the transaction', async () => {
+        it('executes cypher statements within the transaction', async () => {
           const session = database.driver.session()
           try {
             await session.writeTransaction(async (transaction) => {
@@ -316,7 +316,7 @@ describe('add Attachment', () => {
           })
         })
 
-        test('rolls back the transaction in case of errors', async () => {
+        it('rolls back the transaction in case of errors', async () => {
           const session = database.driver.session()
           try {
             await session.writeTransaction(async (transaction) => {
@@ -339,7 +339,7 @@ describe('add Attachment', () => {
   })
 
   describe('without image.upload', () => {
-    test('throws UserInputError', async () => {
+    it('throws UserInputError', async () => {
       const p = await Factory.build('post', { id: 'p99' }, { image: null })
       post = await p.toJson()
 

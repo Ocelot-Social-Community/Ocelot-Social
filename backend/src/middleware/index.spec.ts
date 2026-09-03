@@ -90,7 +90,7 @@ beforeEach(() => {
 })
 
 describe('default', () => {
-  test('registers the 15 default middlewares', async () => {
+  it('registers the 15 default middlewares', async () => {
     await isolateModules(async () => {
       const { getCapturedMiddlewares } = await loadModule()
 
@@ -98,7 +98,7 @@ describe('default', () => {
     })
   })
 
-  test('calls brandingMiddlewares', async () => {
+  it('calls brandingMiddlewares', async () => {
     await isolateModules(async () => {
       const { mod } = await loadModule()
 
@@ -110,7 +110,7 @@ describe('default', () => {
     })
   })
 
-  test('filters out disabled middlewares', async () => {
+  it('filters out disabled middlewares', async () => {
     await isolateModules(async () => {
       const sentryMarker = { __test: 'sentry' }
       const xssMarker = { __test: 'xss' }
@@ -136,7 +136,7 @@ describe('default', () => {
 
 describe('addMiddleware', () => {
   describe('append', () => {
-    test('adds middleware at the end', async () => {
+    it('adds middleware at the end', async () => {
       await isolateModules(async () => {
         const { mod, getCapturedMiddlewares } = await loadModule()
         const m = { __test: 'appended' }
@@ -150,7 +150,7 @@ describe('addMiddleware', () => {
   })
 
   describe('prepend', () => {
-    test('adds middleware at the beginning', async () => {
+    it('adds middleware at the beginning', async () => {
       await isolateModules(async () => {
         const { mod, getCapturedMiddlewares } = await loadModule()
         const m = { __test: 'prepended' }
@@ -164,7 +164,7 @@ describe('addMiddleware', () => {
   })
 
   describe('before', () => {
-    test('inserts middleware directly before the named anchor', async () => {
+    it('inserts middleware directly before the named anchor', async () => {
       await isolateModules(async () => {
         const sentryMarker = { __test: 'sentry' }
         const permissionsMarker = { __test: 'permissions' }
@@ -194,7 +194,7 @@ describe('addMiddleware', () => {
   })
 
   describe('after', () => {
-    test('inserts middleware directly after the named anchor', async () => {
+    it('inserts middleware directly after the named anchor', async () => {
       await isolateModules(async () => {
         const sentryMarker = { __test: 'sentry' }
         const permissionsMarker = { __test: 'permissions' }
@@ -224,7 +224,7 @@ describe('addMiddleware', () => {
   })
 
   describe('unknown anchor', () => {
-    test('throws when "before" anchor does not exist', async () => {
+    it('throws when "before" anchor does not exist', async () => {
       await isolateModules(async () => {
         const { mod } = await loadModule()
 
@@ -238,7 +238,7 @@ describe('addMiddleware', () => {
       })
     })
 
-    test('throws when "after" anchor does not exist', async () => {
+    it('throws when "after" anchor does not exist', async () => {
       await isolateModules(async () => {
         const { mod } = await loadModule()
 

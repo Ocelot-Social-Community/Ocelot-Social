@@ -200,7 +200,7 @@ describe('Location Service', () => {
     authenticatedUser = await user.toJson()
   })
 
-  test('passes proximity to the Mapbox URL when provided', async () => {
+  it('passes proximity to the Mapbox URL when provided', async () => {
     variables = { place: 'Berlin', lang: 'en', proximity: '10.0,53.55' }
     await query({ query: queryLocations, variables })
     const calledUrl = fetchSpy.mock.calls[0][0] as string
@@ -208,7 +208,7 @@ describe('Location Service', () => {
     expect(calledUrl).toContain(`proximity=${encodeURIComponent(variables.proximity as string)}`)
   })
 
-  test('encodes place names with umlauts exactly once in the Mapbox URL', async () => {
+  it('encodes place names with umlauts exactly once in the Mapbox URL', async () => {
     variables = { place: 'Köln', lang: 'en' }
     await query({ query: queryLocations, variables })
     const calledUrl = fetchSpy.mock.calls[0][0] as string
@@ -217,7 +217,7 @@ describe('Location Service', () => {
     expect(calledUrl).not.toContain(encodeURIComponent(encodeURIComponent('Köln'))) // not 'K%25C3%25B6ln'
   })
 
-  test('query Location existing', async () => {
+  it('query Location existing', async () => {
     variables = {
       place: 'Berlin',
       lang: 'en',
@@ -260,7 +260,7 @@ describe('Location Service', () => {
     )
   })
 
-  test('query Location existing in different language', async () => {
+  it('query Location existing in different language', async () => {
     variables = {
       place: 'Berlin',
       lang: 'de',
@@ -301,7 +301,7 @@ describe('Location Service', () => {
     ])
   })
 
-  test('query Location not existing', async () => {
+  it('query Location not existing', async () => {
     variables = {
       place: 'GbHtsd4sdHa',
       lang: 'en',
@@ -311,7 +311,7 @@ describe('Location Service', () => {
     expect(result.data.queryLocations).toEqual([])
   })
 
-  test('reverse-geocodes a "lng,lat" search string by trying types one at a time', async () => {
+  it('reverse-geocodes a "lng,lat" search string by trying types one at a time', async () => {
     fetchSpy.mockImplementation(async (input: RequestInfo | URL) => {
       const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
       const path = decodeURIComponent(url)
@@ -345,7 +345,7 @@ describe('Location Service', () => {
     expect(calledUrls[1]).toContain('types=poi')
   })
 
-  test('prefers an address match over a country match, regardless of the requested type order', async () => {
+  it('prefers an address match over a country match, regardless of the requested type order', async () => {
     fetchSpy.mockImplementation(async (input: RequestInfo | URL) => {
       const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
       const path = decodeURIComponent(url)
@@ -390,7 +390,7 @@ describe('Location Service', () => {
     expect(calledUrls[0]).toContain('types=address')
   })
 
-  test.each(['postcode', 'district', 'locality', 'neighborhood'])(
+  it.each(['postcode', 'district', 'locality', 'neighborhood'])(
     'reverse-geocodes with an explicitly requested "%s" type instead of always returning []',
     async (type) => {
       fetchSpy.mockImplementation(async (input: RequestInfo | URL) => {
@@ -421,7 +421,7 @@ describe('Location Service', () => {
     },
   )
 
-  test('returns an empty array when reverse geocoding finds no match for any type', async () => {
+  it('returns an empty array when reverse geocoding finds no match for any type', async () => {
     variables = { place: '0.0,0.0', lang: 'en', types: 'address,poi' }
     const result = await query({ query: queryLocations, variables })
 
@@ -429,7 +429,7 @@ describe('Location Service', () => {
     expect(fetchSpy).toHaveBeenCalledTimes(2)
   })
 
-  test('query Location without a place name given', async () => {
+  it('query Location without a place name given', async () => {
     variables = {
       place: '',
       lang: 'en',
@@ -449,7 +449,7 @@ describe('userMiddleware', () => {
       authenticatedUser = await user.toJson()
     })
 
-    test('creates a Location node with localized city/state/country names', async () => {
+    it('creates a Location node with localized city/state/country names', async () => {
       variables = {
         ...variables,
         id: 'updating-user',

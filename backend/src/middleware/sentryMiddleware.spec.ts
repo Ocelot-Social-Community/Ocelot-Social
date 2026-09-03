@@ -30,13 +30,13 @@ beforeEach(() => {
 
 describe('createSentryMiddleware', () => {
   describe('without a DSN', () => {
-    test('does not call Sentry.init', () => {
+    it('does not call Sentry.init', () => {
       createSentryMiddleware({})
 
       expect(initMock).not.toHaveBeenCalled()
     })
 
-    test('returns a passthrough middleware that forwards arguments to resolve', async () => {
+    it('returns a passthrough middleware that forwards arguments to resolve', async () => {
       const middleware = createSentryMiddleware({})
       const resolve = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue('result')
       const root = { r: 1 }
@@ -49,7 +49,7 @@ describe('createSentryMiddleware', () => {
       expect(withScopeMock).not.toHaveBeenCalled()
     })
 
-    test('propagates errors from resolve without capturing them', async () => {
+    it('propagates errors from resolve without capturing them', async () => {
       const middleware = createSentryMiddleware({})
       const error = new Error('boom')
       const resolve = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockRejectedValue(error)
@@ -60,7 +60,7 @@ describe('createSentryMiddleware', () => {
   })
 
   describe('with a DSN', () => {
-    test('initializes Sentry with the provided options', () => {
+    it('initializes Sentry with the provided options', () => {
       createSentryMiddleware({
         dsn: 'https://example@sentry.io/1',
         release: 'abc123',
@@ -74,7 +74,7 @@ describe('createSentryMiddleware', () => {
       })
     })
 
-    test('forwards successful resolver results without reporting', async () => {
+    it('forwards successful resolver results without reporting', async () => {
       const middleware = createSentryMiddleware({ dsn: 'x' })
       const resolve = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue('ok')
 
@@ -83,7 +83,7 @@ describe('createSentryMiddleware', () => {
       expect(captureExceptionMock).not.toHaveBeenCalled()
     })
 
-    test('captures errors with user and request metadata, then rethrows', async () => {
+    it('captures errors with user and request metadata, then rethrows', async () => {
       const middleware = createSentryMiddleware({ dsn: 'x' })
       const error = new Error('boom')
       const resolve = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockRejectedValue(error)
@@ -112,7 +112,7 @@ describe('createSentryMiddleware', () => {
       expect(captureExceptionMock).toHaveBeenCalledWith(error)
     })
 
-    test('handles missing user and request metadata gracefully', async () => {
+    it('handles missing user and request metadata gracefully', async () => {
       const middleware = createSentryMiddleware({ dsn: 'x' })
       const error = new Error('boom')
       const resolve = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockRejectedValue(error)
