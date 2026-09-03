@@ -1,11 +1,10 @@
-
-import type { Mock } from 'vitest'
 import { UserInputError } from '@graphql/errors'
 import { PolicyValidationError } from '@src/policy'
 
 import brandingResolver from './branding'
 
 import type { Context } from '@src/context'
+import type { Mock } from 'vitest'
 
 describe('branding resolvers', () => {
   let set: Mock

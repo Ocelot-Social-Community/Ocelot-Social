@@ -1,7 +1,6 @@
 // Unit tests for the visibility primitive — the single mechanism shared by the
 // `policy` query resolver and the policyChanged subscription filter.
 
-
 import {
   allKeys,
   audiencesFor,

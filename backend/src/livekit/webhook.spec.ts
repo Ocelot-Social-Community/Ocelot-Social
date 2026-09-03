@@ -4,7 +4,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-
 const mockConfig: {
   LIVEKIT_ENABLED: boolean
   LIVEKIT_URL?: string

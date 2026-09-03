@@ -1,9 +1,8 @@
-import type { Mock } from 'vitest'
 import { Readable } from 'node:stream'
-
 
 import type { S3Config } from '@config/index'
 import type { FileUpload } from 'graphql-upload'
+import type { Mock } from 'vitest'
 
 // `function`, not an arrow: these stand in for CLASSES and the code under test calls them with
 // `new`. Vitest constructs the mock's implementation via Reflect.construct, and an arrow function
@@ -95,8 +94,7 @@ describe('s3Service', () => {
       beforeEach(() => {
         uploadMock.mockImplementation(function ({ params: { Key } }) {
           return {
-            done: async () =>
-              Promise.resolve({ Location: `your-objectstorage.com/bucket/${Key}` }),
+            done: async () => Promise.resolve({ Location: `your-objectstorage.com/bucket/${Key}` }),
           }
         })
       })

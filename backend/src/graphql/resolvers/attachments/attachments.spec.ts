@@ -4,7 +4,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable jest/no-conditional-expect */
-import type { Mock } from 'vitest'
 import { Readable } from 'node:stream'
 
 import { S3Client } from '@aws-sdk/client-s3'
@@ -14,6 +13,7 @@ import type { ApolloTestSetup } from '@root/test/helpers'
 import type { S3Config } from '@src/config'
 import type { Context } from '@src/context'
 import type { ReadStream } from 'node:fs'
+import type { Mock } from 'vitest'
 
 const s3SendMock = vi.fn()
 vi.spyOn(S3Client.prototype, 'send').mockImplementation(s3SendMock)

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-
 const mockConfig: {
   LIVEKIT_ENABLED: boolean
   LIVEKIT_URL?: string

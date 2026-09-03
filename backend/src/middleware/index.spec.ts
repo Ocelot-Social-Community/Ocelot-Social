@@ -10,7 +10,6 @@ const isolateModules = async (run: () => Promise<void>): Promise<void> => {
 // Unit tests for addMiddleware – testing append, prepend, before, after, and error cases.
 // Each test uses jest.isolateModules + vi.doMock to get a fresh ocelotMiddlewares array.
 
-
 interface MiddlewareModule {
   addMiddleware: (mw: { name: string; middleware: unknown; position: unknown }) => void
   default: (schema: unknown) => unknown

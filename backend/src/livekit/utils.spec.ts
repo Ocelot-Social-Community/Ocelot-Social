@@ -1,4 +1,3 @@
-
 import { withTimeout } from './utils'
 
 describe('withTimeout', () => {

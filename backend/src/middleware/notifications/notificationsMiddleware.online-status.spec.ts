@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 

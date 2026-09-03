@@ -3,8 +3,9 @@
 // isolation with mocked branding + discover modules and a controlled env, then asserts the observable
 // behaviour: setBranding on success, and a warn/error log on the silent-fallback paths.
 
-import type { Mock, MockInstance } from 'vitest'
 import { resolve } from 'node:path'
+
+import type { Mock, MockInstance } from 'vitest'
 
 // vitest has no `isolateModulesAsync`: resetting the registry before the dynamic import does the
 // same job, since a module graph is only shared within a file. Wrapped so the call sites keep
@@ -13,7 +14,6 @@ const isolateModules = async (run: () => Promise<void>): Promise<void> => {
   vi.resetModules()
   await run()
 }
-
 
 const BRANDING = '@ocelot-social/branding'
 const DISCOVER = '@ocelot-social/branding/dist/discover.js'

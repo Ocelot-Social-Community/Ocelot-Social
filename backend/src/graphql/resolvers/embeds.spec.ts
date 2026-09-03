@@ -5,7 +5,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-
 import type { ApolloTestSetup } from '@root/test/helpers'
 
 // `vi.mock` IS hoisted, so the order of these lines does not decide what they see — the factory

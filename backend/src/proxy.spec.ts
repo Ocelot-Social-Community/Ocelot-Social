@@ -1,7 +1,6 @@
 import { once } from 'node:events'
 import http from 'node:http'
 
-
 import createProxy from './proxy'
 
 import type { AddressInfo } from 'node:net'

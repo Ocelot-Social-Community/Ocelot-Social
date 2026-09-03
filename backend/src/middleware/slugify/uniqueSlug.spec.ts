@@ -1,4 +1,3 @@
-
 import uniqueSlug from './uniqueSlug'
 
 // Mirrors the (unexported) callback type uniqueSlug takes; `@jest/globals` needs a

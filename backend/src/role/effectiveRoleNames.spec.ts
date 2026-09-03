@@ -1,4 +1,3 @@
-
 import { effectiveRoleName, resolveRoleName } from './effectiveRoleNames'
 import { USER_ROLE } from './types'
 

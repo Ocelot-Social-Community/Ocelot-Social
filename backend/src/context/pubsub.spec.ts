@@ -1,14 +1,9 @@
-
 import type { RedisOptions } from 'ioredis'
 
 // `vi.hoisted` lifts the object to where the (hoisted) mock factory can see it. The Jest version
 // reached the same end through a getter, which only existed to dodge the TDZ its hoisting caused.
 const { mockConfig } = vi.hoisted(() => ({
-  mockConfig: {} as {
-    REDIS_DOMAIN?: string
-    REDIS_PORT?: number
-    REDIS_PASSWORD?: string
-  },
+  mockConfig: {},
 }))
 
 vi.mock('@config/index', () => ({ __esModule: true, default: mockConfig }))

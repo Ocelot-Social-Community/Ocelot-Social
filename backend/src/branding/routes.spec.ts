@@ -1,7 +1,6 @@
 // The archive routes are the ONLY way the webapp obtains a brand now, so the tests pin the contract
 // that matters to it: what the manifest contains, that an unknown/invalid id cannot reach the disk,
 // and that revalidation actually saves the transfer.
-import type { Mock, MockedFunction } from 'vitest'
 import { PassThrough, Readable } from 'node:stream'
 import { finished } from 'node:stream/promises'
 import { setImmediate as tick } from 'node:timers/promises'
@@ -12,6 +11,7 @@ import { setImmediate as tick } from 'node:timers/promises'
 
 import type { BrandingRouterDeps } from './routes'
 import type { Request, Response } from 'express'
+import type { Mock, MockedFunction } from 'vitest'
 
 vi.mock('node:fs', () => ({ createReadStream: vi.fn() }))
 vi.mock('node:fs/promises', () => ({ stat: vi.fn() }))

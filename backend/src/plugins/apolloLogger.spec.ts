@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
-
 import Factory, { cleanDatabase } from '@db/factories'
 import login from '@graphql/queries/auth/login.gql'
 import { createApolloTestSetup } from '@root/test/helpers'

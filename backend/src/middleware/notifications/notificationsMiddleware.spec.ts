@@ -4,10 +4,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-
-import type { Mock } from 'vitest'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import type { Mock } from 'vitest'
 
 const sendChatMessageMailMock: (notification) => void = vi.fn()
 const sendNotificationMailMock: (notification) => void = vi.fn()

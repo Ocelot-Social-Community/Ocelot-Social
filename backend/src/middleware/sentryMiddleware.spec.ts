@@ -32,9 +32,7 @@ describe('createSentryMiddleware', () => {
 
     it('returns a passthrough middleware that forwards arguments to resolve', async () => {
       const middleware = createSentryMiddleware({})
-      const resolve = vi
-        .fn<(...args: unknown[]) => Promise<unknown>>()
-        .mockResolvedValue('result')
+      const resolve = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue('result')
       const root = { r: 1 }
       const args = { a: 1 }
       const context = { c: 1 }

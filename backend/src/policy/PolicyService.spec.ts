@@ -3,8 +3,6 @@
 // so we can verify resolution-order (DB > ENV > Schema-Default) deterministically.
 // (no-unsafe-assignment disabled: jest matchers like expect.objectContaining are `any`.)
 
-
-import type { MockedFunction } from 'vitest'
 import type { PolicyChangeEvent, PolicyPubSub } from './PolicyService'
 import type {
   deleteSetting as DeleteSetting,
@@ -13,6 +11,7 @@ import type {
   writeSetting as WriteSetting,
 } from './repository'
 import type { PolicyKey } from './types'
+import type { MockedFunction } from 'vitest'
 
 // The mocks carry the real signatures: `@jest/globals` types a bare `vi.fn()` as
 // `Mock<UnknownFunction>`, whose `mockResolvedValue` argument is `never`.

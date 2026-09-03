@@ -3,7 +3,6 @@
 // permissions middleware (the layer that rejects a resolver returning
 // `undefined`). Guards the viewer-scoped visibility: anonymous viewers get
 // `null` for authenticated-only keys (NOT the value, and NOT an error).
-import type { Mock } from 'vitest'
 import { parse } from 'graphql'
 import { PubSub } from 'graphql-subscriptions'
 
@@ -20,6 +19,7 @@ import policyResolvers from './policy'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 import type { NetworkPolicy } from '@src/policy'
+import type { Mock } from 'vitest'
 
 let authenticatedUser: Context['user']
 let policy: Partial<NetworkPolicy>

@@ -7,7 +7,6 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import { Readable } from 'node:stream'
 
-
 import type { ImageInput } from './images'
 import type { S3Config } from '@src/config'
 import type { FileUpload } from 'graphql-upload'
@@ -26,14 +25,16 @@ vi.mock('@aws-sdk/client-s3', () => {
 
 vi.mock('@aws-sdk/lib-storage', () => {
   return {
-    Upload: vi
-      .fn<(input: { params: { Key: string } }) => unknown>()
-      .mockImplementation(function ({ params: { Key } }: { params: { Key: string } }) {
-        return {
-          done: async () =>
-            Promise.resolve({ Location: `http://your-objectstorage.com/bucket/${Key}` }),
-        }
-      }),
+    Upload: vi.fn<(input: { params: { Key: string } }) => unknown>().mockImplementation(function ({
+      params: { Key },
+    }: {
+      params: { Key: string }
+    }) {
+      return {
+        done: async () =>
+          Promise.resolve({ Location: `http://your-objectstorage.com/bucket/${Key}` }),
+      }
+    }),
   }
 })
 

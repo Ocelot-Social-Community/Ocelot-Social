@@ -1,4 +1,3 @@
-
 import {
   blockingGateFor,
   isGateOpen,
