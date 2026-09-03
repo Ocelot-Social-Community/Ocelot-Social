@@ -346,14 +346,39 @@ jobs:
   # No Neo4j, no migration, no compose stack: `--merge-reports` runs no tests, it re-aggregates
   # the blobs. It only needs the backend image for vitest, its node_modules and the sources the
   # v8 provider remaps against.
+  # It doubles as the STATUS GATE for the shards, which is what makes it safe to require on its
+  # own. Branch protection accepts "successful, skipped, or neutral" — a skipped check counts as
+  # passing. With a plain `needs:` a red shard would skip this job, and skipping it would report
+  # green: the exact opposite of what a required check is for. Hence `!cancelled()` plus the
+  # explicit result assertion below, the same shape as `e2e_status` in test-e2e.yml.
+  #
+  # The files-changed condition has to be repeated INSIDE the `!cancelled()` expression rather
+  # than dropped: a pull request that touches no backend file skips the shards, and this job must
+  # skip with them instead of asserting on a `skipped` result and failing every unrelated PR.
+  #
+  # `!cancelled()` rather than test-e2e.yml's `always()`, because this workflow sets
+  # cancel-in-progress: true — on a superseded run the shards are cancelled and the gate would
+  # otherwise fail a run whose result nobody is waiting for any more.
   merge_coverage_backend:
     name: Coverage - Backend
-    if: needs.files-changed.outputs.backend == 'true' || needs.files-changed.outputs.docker == 'true'
+    if: |
+      !cancelled() &&
+      (needs.files-changed.outputs.backend == 'true' || needs.files-changed.outputs.docker == 'true')
     needs: [files-changed, build_test_backend, unit_test_backend]
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
+      # First, before any setup: a matrix job reports ONE aggregated result to its dependents, so
+      # this single comparison covers all four shards — any shard that failed, or was skipped
+      # because its image build did not produce an image, makes it something other than 'success'.
+      - name: Check shard results
+        run: |
+          if [ "${{ needs.unit_test_backend.result }}" != "success" ]; then
+            echo "Backend unit test shards did not all succeed (result: ${{ needs.unit_test_backend.result }})"
+            exit 1
+          fi
+
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
