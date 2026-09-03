@@ -5,6 +5,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
+import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from 'vitest'
+
 import { categories } from '@constants/categories'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
@@ -163,6 +165,7 @@ describe('User', () => {
 
     it('requires a user-administration capability (a plain user is forbidden)', async () => {
       authenticatedUser = await normalUser.toJson()
+
       await expect(
         query({ query: searchQuery, variables: { roleName: 'moderator' } }),
       ).resolves.toMatchObject({ errors: [{ message: 'Not Authorized!' }] })
@@ -179,6 +182,7 @@ describe('User', () => {
         query: searchQuery,
         variables: { search: 'Anna' },
       })
+
       expect(errors).toBeUndefined()
       expect(data.User.map((u) => u.name)).toEqual(['Anna'])
     })
@@ -188,6 +192,7 @@ describe('User', () => {
         query: searchQuery,
         variables: { roleName: 'moderator' },
       })
+
       expect(errors).toBeUndefined()
       expect(data.User.map((u) => u.name).sort()).toEqual(['Anna', 'Bob'])
     })
@@ -197,6 +202,7 @@ describe('User', () => {
         query: searchQuery,
         variables: { search: 'bob@example' },
       })
+
       expect(errors).toBeUndefined()
       expect(data.User.map((u) => u.name)).toEqual(['Bob'])
     })
@@ -206,6 +212,7 @@ describe('User', () => {
         query: searchQuery,
         variables: { search: 'bob@example.org' },
       })
+
       expect(errors).toBeUndefined()
       expect(data.User.map((u) => u.name)).toEqual(['Bob'])
     })
@@ -215,11 +222,14 @@ describe('User', () => {
         query: searchQuery,
         variables: { roleName: 'moderator', orderBy: ['name_asc'] },
       })
+
       expect(asc.data.User.map((u) => u.name)).toEqual(['Anna', 'Bob'])
+
       const desc = await query({
         query: searchQuery,
         variables: { roleName: 'moderator', orderBy: ['name_desc'] },
       })
+
       expect(desc.data.User.map((u) => u.name)).toEqual(['Bob', 'Anna'])
     })
 
@@ -232,6 +242,7 @@ describe('User', () => {
         query: searchQuery,
         variables: { roleName: 'moderator', orderBy: ['about_asc'] },
       })
+
       expect(errors).toBeUndefined()
     })
 
@@ -240,6 +251,7 @@ describe('User', () => {
         query: searchQuery,
         variables: { roleName: 'moderator', orderBy: ['nonsense_asc'] },
       })
+
       // Enum validation now catches this before the resolver runs, which is the better place.
       expect(errors?.[0].message).toContain('nonsense_asc')
     })
@@ -249,6 +261,7 @@ describe('User', () => {
         query: searchQuery,
         variables: { roleName: 'moderator', locationName: 'Hamburg' },
       })
+
       expect(errors?.[0].message).toContain('cannot be combined with')
     })
 
@@ -257,6 +270,7 @@ describe('User', () => {
         query: searchQuery,
         variables: { search: 'ann', filter: { id_in: ['mod-anna'] } },
       })
+
       expect(errors?.[0].message).toContain('cannot be combined with')
     })
 
@@ -267,6 +281,7 @@ describe('User', () => {
         query: searchQuery,
         variables: { filter: { id: 'mod-anna', id_in: ['mod-bob'] } },
       })
+
       expect(errors?.[0].message).toContain('use either `id` or `id_in`, not both')
     })
 
@@ -342,6 +357,7 @@ describe('UpdateUser', () => {
         },
         errors: undefined,
       }
+
       await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject(expected)
     })
 
@@ -349,6 +365,7 @@ describe('UpdateUser', () => {
       beforeEach(async () => {
         variables = { ...variables, termsAndConditionsAgreedVersion: '0.0.2' }
       })
+
       it('update termsAndConditionsAgreedVersion', async () => {
         const expected = {
           data: {
@@ -368,6 +385,7 @@ describe('UpdateUser', () => {
       beforeEach(async () => {
         variables = { ...variables, name: 'any name' }
       })
+
       it('update termsAndConditionsAgreedVersion', async () => {
         const expected = {
           data: {
@@ -389,6 +407,7 @@ describe('UpdateUser', () => {
         termsAndConditionsAgreedVersion: 'invalid version format',
       }
       const { errors } = await mutate({ mutation: UpdateUser, variables })
+
       expect(errors?.[0]).toHaveProperty('message', 'Invalid version format!')
     })
 
@@ -396,6 +415,7 @@ describe('UpdateUser', () => {
       describe('change location to "Hamburg, New Jersey, United States"', () => {
         it('has updated location to  "Hamburg, New Jersey, United States"', async () => {
           variables = { ...variables, locationName: 'Hamburg, New Jersey, United States' }
+
           await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
             data: {
               UpdateUser: {
@@ -413,6 +433,7 @@ describe('UpdateUser', () => {
       describe('change location to unset location', () => {
         it('has updated location to  unset location', async () => {
           variables = { ...variables, locationName: '' }
+
           await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
             data: {
               UpdateUser: {
@@ -428,6 +449,7 @@ describe('UpdateUser', () => {
 
     it('publishes group membership visibility event when group visibility fields are updated', async () => {
       variables = { ...variables, showHiddenGroupsOnProfile: true }
+
       await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
         data: { UpdateUser: expect.objectContaining({ id: 'u47' }) },
         errors: undefined,
@@ -540,6 +562,7 @@ describe('Delete a User as admin', () => {
             },
             errors: undefined,
           }
+
           await expect(mutate({ mutation: DeleteUser, variables })).resolves.toMatchObject(
             expectedResponse,
           )
@@ -583,6 +606,7 @@ describe('Delete a User as admin', () => {
               },
               errors: undefined,
             }
+
             await expect(mutate({ mutation: DeleteUser, variables })).resolves.toMatchObject(
               expectedResponse,
             )
@@ -593,6 +617,7 @@ describe('Delete a User as admin', () => {
       describe('connected `EmailAddress` nodes', () => {
         it('will be removed completely', async () => {
           await expect(database.neode.all('EmailAddress')).resolves.toHaveLength(2)
+
           await mutate({ mutation: DeleteUser, variables })
 
           await expect(database.neode.all('EmailAddress')).resolves.toHaveLength(1)
@@ -607,7 +632,9 @@ describe('Delete a User as admin', () => {
 
         it('will be removed completely', async () => {
           await expect(database.neode.all('SocialMedia')).resolves.toHaveLength(1)
+
           await mutate({ mutation: DeleteUser, variables })
+
           await expect(database.neode.all('SocialMedia')).resolves.toHaveLength(0)
         })
       })
@@ -635,13 +662,16 @@ describe('Delete a User as admin', () => {
             { id: (await user.toJson()).id },
           )
           const relations = relation.records.map((record) => record.get('relationship'))
+
           expect(relations).toHaveLength(2)
+
           await mutate({ mutation: DeleteUser, variables })
           const relation2 = await database.neode.cypher(
             'MATCH (user:User {id: $id})-[relationship:FOLLOWS]-(:User) RETURN relationship',
             { id: (await user.toJson()).id },
           )
           const relations2 = relation2.records.map((record) => record.get('relationship'))
+
           expect(relations2).toHaveLength(0)
         })
       })
@@ -671,6 +701,7 @@ describe('emailNotificationSettings', () => {
       it('throws an error', async () => {
         authenticatedUser = await anotherUser.toJson()
         const targetUser = await user.toJson()
+
         await expect(
           query({ query: UserEmailNotificationSettings, variables: { id: targetUser.id } }),
         ).resolves.toMatchObject({
@@ -683,6 +714,7 @@ describe('emailNotificationSettings', () => {
     describe('as self', () => {
       it('returns the emailNotificationSettings', async () => {
         authenticatedUser = await user.toJson()
+
         await expect(
           query({
             query: UserEmailNotificationSettings,
@@ -760,6 +792,7 @@ describe('emailNotificationSettings', () => {
       it('throws an error', async () => {
         authenticatedUser = await anotherUser.toJson()
         const targetUser = await user.toJson()
+
         await expect(
           mutate({
             mutation: UpdateUser,
@@ -775,6 +808,7 @@ describe('emailNotificationSettings', () => {
     describe('as self', () => {
       it('updates the emailNotificationSettings', async () => {
         authenticatedUser = await user.toJson()
+
         await expect(
           mutate({
             mutation: UpdateUser,
@@ -1004,6 +1038,7 @@ describe('updateOnlineStatus', () => {
         const cypher = 'MATCH (u:User {id: $id}) RETURN u'
         const result = await database.neode.cypher(cypher, { id: authenticatedUser?.id })
         const dbUser = database.neode.hydrateFirst(result, 'u', database.neode.model('User'))
+
         await expect(dbUser?.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'online',
           lastActiveAt: expect.any(String),
@@ -1031,6 +1066,7 @@ describe('updateOnlineStatus', () => {
         const cypher = 'MATCH (u:User {id: $id}) RETURN u'
         const result = await database.neode.cypher(cypher, { id: authenticatedUser?.id })
         const dbUser = database.neode.hydrateFirst(result, 'u', database.neode.model('User'))
+
         await expect(dbUser?.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'away',
           awaySince: expect.any(String),
@@ -1047,6 +1083,7 @@ describe('updateOnlineStatus', () => {
         const cypher = 'MATCH (u:User {id: $id}) RETURN u'
         const result = await database.neode.cypher(cypher, { id: authenticatedUser?.id })
         const dbUser = database.neode.hydrateFirst(result, 'u', database.neode.model('User'))
+
         await expect(dbUser?.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'away',
           awaySince: expect.any(String),
@@ -1062,6 +1099,7 @@ describe('updateOnlineStatus', () => {
 
         const result2 = await database.neode.cypher(cypher, { id: authenticatedUser?.id })
         const dbUser2 = database.neode.hydrateFirst(result2, 'u', database.neode.model('User'))
+
         await expect(dbUser2?.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'away',
           awaySince,
@@ -1585,6 +1623,7 @@ describe('follow connections with nameFilter', () => {
         query: UserFollowing,
         variables: { id: 'viewer', first: 25, offset: 0, nameFilter: '' },
       })
+
       expect(result.errors).toBeUndefined()
       expect(result.data?.User?.[0]?.following).toHaveLength(3)
     })
@@ -1594,6 +1633,7 @@ describe('follow connections with nameFilter', () => {
         query: UserFollowing,
         variables: { id: 'viewer', first: 25, offset: 0, nameFilter: 'alic' },
       })
+
       expect(result.errors).toBeUndefined()
       expect(result.data?.User?.[0]?.following).toEqual([{ id: 'alice', name: 'Alice Smith' }])
     })
@@ -1603,6 +1643,7 @@ describe('follow connections with nameFilter', () => {
         query: UserFollowing,
         variables: { id: 'viewer', first: 25, offset: 0, nameFilter: 'ALI' },
       })
+
       expect(result.errors).toBeUndefined()
       expect(result.data?.User?.[0]?.following).toEqual([{ id: 'alice', name: 'Alice Smith' }])
     })
@@ -1612,6 +1653,7 @@ describe('follow connections with nameFilter', () => {
         query: UserFollowing,
         variables: { id: 'viewer', first: 25, offset: 0, nameFilter: 'xyz' },
       })
+
       expect(result.errors).toBeUndefined()
       expect(result.data?.User?.[0]?.following).toHaveLength(0)
     })
@@ -1625,6 +1667,7 @@ describe('follow connections with nameFilter', () => {
         query: UserFollowing,
         variables: { id: 'viewer', first: 2, offset: 2, nameFilter: '' },
       })
+
       expect(page1.errors).toBeUndefined()
       expect(page2.errors).toBeUndefined()
       expect(page1.data?.User?.[0]?.following).toHaveLength(2)
@@ -1647,6 +1690,7 @@ describe('follow connections with nameFilter', () => {
         query: UserFollowedBy,
         variables: { id: 'viewer', first: 25, offset: 0, nameFilter: '' },
       })
+
       expect(result.errors).toBeUndefined()
       expect(result.data?.User?.[0]?.followedBy).toHaveLength(2)
     })
@@ -1656,6 +1700,7 @@ describe('follow connections with nameFilter', () => {
         query: UserFollowedBy,
         variables: { id: 'viewer', first: 25, offset: 0, nameFilter: 'alice' },
       })
+
       expect(result.errors).toBeUndefined()
       expect(result.data?.User?.[0]?.followedBy).toEqual([{ id: 'alice', name: 'Alice Smith' }])
     })
@@ -1665,6 +1710,7 @@ describe('follow connections with nameFilter', () => {
         query: UserFollowedBy,
         variables: { id: 'viewer', first: 25, offset: 0, nameFilter: 'BOB' },
       })
+
       expect(result.errors).toBeUndefined()
       expect(result.data?.User?.[0]?.followedBy).toEqual([{ id: 'bob', name: 'Bob Brown' }])
     })
@@ -1674,6 +1720,7 @@ describe('follow connections with nameFilter', () => {
         query: UserFollowedBy,
         variables: { id: 'viewer', first: 25, offset: 0, nameFilter: 'xyz' },
       })
+
       expect(result.errors).toBeUndefined()
       expect(result.data?.User?.[0]?.followedBy).toHaveLength(0)
     })

@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest'
+
 import { runBatch } from './batch'
 
 import type { Context } from '@src/context'

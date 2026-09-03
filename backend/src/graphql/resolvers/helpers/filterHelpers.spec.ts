@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { beforeAll, afterAll, afterEach, describe, it, expect, beforeEach } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import Post from '@graphql/queries/posts/Post.gql'
@@ -73,6 +75,7 @@ describe('filterForMutedUsers', () => {
         query: Post,
         variables: { id: 'muted-post' },
       })
+
       expect(result.data?.Post).toHaveLength(1)
       expect(result.data?.Post[0].id).toBe('muted-post')
     })
@@ -127,6 +130,7 @@ describe('filterForMutedUsers', () => {
       authenticatedUser = await viewer.toJson()
       const result = await query({ query: Post })
       const ids = result.data?.Post.map((p: { id: string }) => p.id)
+
       expect(ids).toContain('visible-post')
       expect(ids).not.toContain('muted-post')
     })
@@ -154,6 +158,7 @@ describe('filterPostsOfMyGroups', () => {
         query: Post,
         variables: { filter: { postsInMyGroups: true } },
       })
+
       expect(result.data?.Post).toHaveLength(0)
     })
   })
@@ -200,6 +205,7 @@ describe('filterInvisiblePosts', () => {
       authenticatedUser = (await outsider.toJson()) as unknown as Context['user']
       const result = await query({ query: Post })
       const ids = result.data?.Post.map((p: { id: string }) => p.id)
+
       expect(ids).toContain('public-post')
       expect(ids).not.toContain('closed-group-post')
     })

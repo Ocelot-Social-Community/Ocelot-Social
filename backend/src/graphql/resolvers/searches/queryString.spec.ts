@@ -1,6 +1,8 @@
+import { describe, it, expect } from 'vitest'
+
 import { queryString, escapeSpecialCharacters, normalizeWhitespace } from './queryString'
 
-describe('queryString', () => {
+describe(queryString, () => {
   describe('special characters', () => {
     it('does escaping correctly', () => {
       expect(escapeSpecialCharacters('+ - && || ! ( ) { } [ ] ^ " ~ * ? : \\ / ')).toEqual(

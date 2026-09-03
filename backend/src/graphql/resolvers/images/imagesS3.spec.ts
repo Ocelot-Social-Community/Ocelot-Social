@@ -2,40 +2,46 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable jest/no-conditional-expect */
+/* eslint-disable vitest/no-conditional-expect */
 
 /* eslint-disable @typescript-eslint/no-shadow */
 import { Readable } from 'node:stream'
 
-import { jest } from '@jest/globals'
+import { beforeAll, afterAll, afterEach, describe, beforeEach, it, expect } from 'vitest'
 
 import type { ImageInput } from './images'
 import type { S3Config } from '@src/config'
 import type { FileUpload } from 'graphql-upload'
 
-jest.unstable_mockModule('@aws-sdk/client-s3', () => {
+vi.mock('@aws-sdk/client-s3', () => {
   return {
-    S3Client: jest.fn().mockImplementation(() => ({
-      send: jest.fn(),
-    })),
+    S3Client: vi.fn().mockImplementation(function () {
+      return { send: vi.fn() }
+    }),
     ObjectCannedACL: { public_read: 'public_read' },
-    DeleteObjectCommand: jest.fn().mockImplementation(() => ({})),
+    DeleteObjectCommand: vi.fn().mockImplementation(function () {
+      return {}
+    }),
   }
 })
 
-jest.unstable_mockModule('@aws-sdk/lib-storage', () => {
+vi.mock('@aws-sdk/lib-storage', () => {
   return {
-    Upload: jest
-      .fn<(input: { params: { Key: string } }) => unknown>()
-      .mockImplementation(({ params: { Key } }: { params: { Key: string } }) => ({
+    Upload: vi.fn<(input: { params: { Key: string } }) => unknown>().mockImplementation(function ({
+      params: { Key },
+    }: {
+      params: { Key: string }
+    }) {
+      return {
         done: async () =>
           Promise.resolve({ Location: `http://your-objectstorage.com/bucket/${Key}` }),
-      })),
+      }
+    }),
   }
 })
 
-// Imported after the mock registrations, not above them: `unstable_mockModule`
-// does not hoist, so a static import would bind the real module first.
+// Imported below the mock registrations — a carry-over from Jest's ESM mode, where the
+// registration did not hoist. `vi.mock` does hoist, so a static import would bind the mock too.
 const { DeleteObjectCommand } = await import('@aws-sdk/client-s3')
 const { Upload } = await import('@aws-sdk/lib-storage')
 const { default: Factory, cleanDatabase } = await import('@db/factories')
@@ -44,8 +50,8 @@ const { fixtures } = await import('@db/testing/fixtures')
 const { UserInputError } = await import('@graphql/errors')
 const { images } = await import('./imagesS3')
 
-const mockUpload = jest.mocked(Upload)
-const mockDeleteObjectCommand = jest.mocked(DeleteObjectCommand)
+const mockUpload = vi.mocked(Upload)
+const mockDeleteObjectCommand = vi.mocked(DeleteObjectCommand)
 
 const driver = getDriver()
 // The fixture API, not neode: a neode node cannot be related to a fixture handle, and this
@@ -75,13 +81,15 @@ afterAll(async () => {
 // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 describe('deleteImage', () => {
   const { deleteImage } = images(config)
+
   describe('given a resource with an image', () => {
     let user: { id: string }
+
     beforeEach(async () => {
       const u = await Factory.build(
         'user',
@@ -98,12 +106,15 @@ describe('deleteImage', () => {
 
     it('deletes `Image` node', async () => {
       await expect(neode.all('Image')).resolves.toHaveLength(1)
+
       await deleteImage(user, 'AVATAR_IMAGE')
+
       await expect(neode.all('Image')).resolves.toHaveLength(0)
     })
 
     it('calls deleteCallback', async () => {
       await deleteImage(user, 'AVATAR_IMAGE')
+
       expect(mockDeleteObjectCommand).toHaveBeenCalled()
     })
 
@@ -123,12 +134,14 @@ describe('deleteImage', () => {
         } finally {
           await session.close()
         }
+
         await expect(neode.all('Image')).resolves.toHaveLength(0)
         expect(someString).toEqual('Hello')
       })
 
       it('rolls back the transaction in case of errors', async () => {
         await expect(neode.all('Image')).resolves.toHaveLength(1)
+
         const session = driver.session()
         try {
           await session.writeTransaction(async (transaction) => {
@@ -154,6 +167,7 @@ describe('mergeImage', () => {
   const { mergeImage } = images(config)
   let imageInput: ImageInput
   let post: { id: string }
+
   beforeEach(() => {
     imageInput = {
       alt: 'A description of the new image',
@@ -198,12 +212,15 @@ describe('mergeImage', () => {
 
       it('calls upload callback', async () => {
         await mergeImage(post, 'HERO_IMAGE', imageInput)
+
         expect(mockUpload).toHaveBeenCalled()
       })
 
       it('creates `:Image` node', async () => {
         await expect(neode.all('Image')).resolves.toHaveLength(0)
+
         await mergeImage(post, 'HERO_IMAGE', imageInput)
+
         await expect(neode.all('Image')).resolves.toHaveLength(1)
       })
 
@@ -214,6 +231,7 @@ describe('mergeImage', () => {
         const upload = await imageInput.upload
         upload.filename = '/path/to/awkward?/ file-location/?foo- bar-avatar.jpg'
         imageInput.upload = Promise.resolve(upload)
+
         await expect(mergeImage(post, 'HERO_IMAGE', imageInput)).resolves.toMatchObject({
           url: expect.stringMatching(
             new RegExp(`^http://your-objectstorage.com/bucket/original/${uuid}-foo-bar-avatar.jpg`),
@@ -231,6 +249,7 @@ describe('mergeImage', () => {
         // gone, and this test only wants to know that both are there.
         const hydratedPost = neode.hydrateFirst(result, 'p', neode.model('Post'))
         const image = neode.hydrateFirst(result, 'i', neode.model('Image'))
+
         expect(hydratedPost).toBeTruthy()
         expect(image).toBeTruthy()
       })
@@ -238,6 +257,7 @@ describe('mergeImage', () => {
       it('sets metadata', async () => {
         await mergeImage(post, 'HERO_IMAGE', imageInput)
         const image = await neode.first('Image', {}, undefined)
+
         await expect(image.toJson()).resolves.toMatchObject({
           alt: 'A description of the new image',
           createdAt: expect.any(String),
@@ -270,6 +290,7 @@ describe('mergeImage', () => {
             { alt: 'This alt text gets overwritten' },
             undefined,
           )
+
           await expect(image.toJson()).resolves.toMatchObject({
             alt: 'This alt text gets overwritten',
           })
@@ -306,19 +327,25 @@ describe('mergeImage', () => {
 
         it('calls deleteCallback', async () => {
           await mergeImage(post, 'HERO_IMAGE', imageInput)
+
           expect(mockDeleteObjectCommand).toHaveBeenCalled()
         })
 
         it('calls Upload', async () => {
           await mergeImage(post, 'HERO_IMAGE', imageInput)
+
           expect(mockUpload).toHaveBeenCalled()
         })
 
         it('updates metadata of existing image node', async () => {
           await expect(neode.all('Image')).resolves.toHaveLength(1)
+
           await mergeImage(post, 'HERO_IMAGE', imageInput)
+
           await expect(neode.all('Image')).resolves.toHaveLength(1)
+
           const image = await neode.first('Image', {}, undefined)
+
           await expect(image.toJson()).resolves.toMatchObject({
             alt: 'A description of the new image',
             createdAt: expect.any(String),
@@ -336,6 +363,7 @@ describe('mergeImage', () => {
     it('throws UserInputError', async () => {
       const p = await Factory.build('post', { id: 'p99' }, { image: null })
       post = await p.toJson()
+
       await expect(mergeImage(post, 'HERO_IMAGE', imageInput)).rejects.toEqual(
         new UserInputError('Cannot find image for given resource'),
       )
@@ -367,17 +395,20 @@ describe('mergeImage', () => {
 
       it('does not call deleteCallback', async () => {
         await mergeImage(post, 'HERO_IMAGE', imageInput)
+
         expect(mockDeleteObjectCommand).not.toHaveBeenCalled()
       })
 
       it('does not call Upload', async () => {
         await mergeImage(post, 'HERO_IMAGE', imageInput)
+
         expect(mockUpload).not.toHaveBeenCalled()
       })
 
       it('updates metadata', async () => {
         await mergeImage(post, 'HERO_IMAGE', imageInput)
         const images = await neode.all('Image')
+
         expect(images).toHaveLength(1)
         await expect(images[0].toJson()).resolves.toMatchObject({
           createdAt: expect.any(String),

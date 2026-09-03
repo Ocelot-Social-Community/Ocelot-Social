@@ -5,25 +5,23 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { jest } from '@jest/globals'
+import { beforeAll, afterAll, afterEach, describe, it, expect, beforeEach } from 'vitest'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 
-// The REAL node-fetch, grabbed before the mock is registered: `jest.requireActual` has no ESM
-// counterpart, and `unstable_mockModule` does not hoist — so an import placed above it still
-// resolves to the genuine module. Response is used to build the fixture payloads.
-const { Response } = await import('node-fetch')
+// `vi.mock` IS hoisted, so the order of these lines does not decide what they see — the factory
+// has to hand out the real `Response` itself. vi.importActual is the supported way to reach past
+// one's own mock; the pre-mock import this file used under Jest would now bind the mock.
+vi.mock('node-fetch', async () => ({
+  ...(await vi.importActual<object>('node-fetch')),
+  default: vi.fn(),
+}))
 
-// ESM has no automock: unstable_mockModule requires an explicit factory.
-jest.unstable_mockModule('node-fetch', () => ({ default: jest.fn() }))
-
-// Imported after the mock registrations, not above them: `unstable_mockModule`
-// does not hoist, so a static import would bind the real module first.
-const { default: fetch } = await import('node-fetch')
+const { default: fetch, Response } = await import('node-fetch')
 const { default: embed } = await import('@graphql/queries/embed.gql')
 const { default: embedProviders } = await import('@graphql/queries/embedProviders.gql')
 const { createApolloTestSetup } = await import('@root/test/helpers')
-const mockedFetch = jest.mocked(fetch)
+const mockedFetch = vi.mocked(fetch)
 
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
@@ -90,8 +88,11 @@ describe('Query', () => {
         errors?: unknown
         data?: { embedProviders: Array<{ name: string; url: string }> }
       }
+
       expect(result.errors).toBeUndefined()
+
       const providers = result.data?.embedProviders ?? []
+
       // The curated list this instance actually matches against, not the full oembed.com registry.
       expect(providers).toContainEqual({ name: 'YouTube', url: 'https://www.youtube.com/' })
       expect(providers).toContainEqual({ name: 'Vimeo', url: 'https://vimeo.com/' })
@@ -113,8 +114,8 @@ describe('Query', () => {
     describe('given a video link', () => {
       beforeEach(() => {
         mockedFetch
-          .mockReturnValueOnce(Promise.resolve(new Response('')))
-          .mockReturnValueOnce(Promise.resolve(new Response(JSON.stringify({}))))
+          .mockResolvedValueOnce(new Response(''))
+          .mockResolvedValueOnce(new Response(JSON.stringify({})))
         variables = { url: 'https://www.w3schools.com/html/mov_bbb.mp4' }
       })
 
@@ -145,8 +146,8 @@ describe('Query', () => {
     describe('given a Facebook link', () => {
       beforeEach(() => {
         mockedFetch
-          .mockReturnValueOnce(Promise.resolve(new Response(HumanConnectionOrg)))
-          .mockReturnValueOnce(Promise.resolve(new Response('invalid json')))
+          .mockResolvedValueOnce(new Response(HumanConnectionOrg))
+          .mockResolvedValueOnce(new Response('invalid json'))
         variables = { url: 'https://www.facebook.com/HumanConnectionOrg/' }
       })
 
@@ -179,8 +180,8 @@ describe('Query', () => {
     describe('given a Github link', () => {
       beforeEach(() => {
         mockedFetch
-          .mockReturnValueOnce(Promise.resolve(new Response(pr3934)))
-          .mockReturnValueOnce(Promise.resolve(new Response(JSON.stringify({}))))
+          .mockResolvedValueOnce(new Response(pr3934))
+          .mockResolvedValueOnce(new Response(JSON.stringify({})))
         variables = { url: 'https://github.com/Human-Connection/Human-Connection/pull/960' }
       })
 
@@ -213,8 +214,8 @@ Have all the information for the brand in separate config files. Set these defau
     describe('given a youtube link', () => {
       beforeEach(() => {
         mockedFetch
-          .mockReturnValueOnce(Promise.resolve(new Response(babyLovesCat)))
-          .mockReturnValueOnce(Promise.resolve(babyLovesCatEmbedResponse))
+          .mockResolvedValueOnce(new Response(babyLovesCat))
+          .mockResolvedValueOnce(babyLovesCatEmbedResponse)
         variables = { url: 'https://www.youtube.com/watch?v=qkdXAtO40Fo&t=18s' }
       })
 

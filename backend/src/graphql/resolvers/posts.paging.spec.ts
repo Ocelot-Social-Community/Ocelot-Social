@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { parse } from 'graphql'
+import { expect, beforeAll, afterAll, describe, it } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -39,7 +40,9 @@ const page = async (offset: number): Promise<string[]> => {
     query: pagedQuery,
     variables: { first: PAGE_SIZE, offset },
   })
+
   expect(errors).toBeUndefined()
+
   const posts = (data?.Post ?? []) as { id: string }[]
   return posts.map((post) => post.id)
 }

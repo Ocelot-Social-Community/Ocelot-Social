@@ -2,7 +2,7 @@
 
 import config from 'eslint-config-it4c'
 import graphql from 'eslint-config-it4c/modules/graphql'
-import jest from 'eslint-config-it4c/modules/jest'
+import vitest from 'eslint-config-it4c/modules/vitest'
 
 // The PolicyKey / EnvCategory enums are derived from their single sources and injected into the
 // runtime schema by src/graphql/types/index.ts. graphql-eslint loads the STATIC .gql files, so
@@ -25,7 +25,7 @@ export default [
     ignores: ['node_modules/', 'build/', 'coverage/', 'public-docs/', 'schema.graphql'],
   },
   ...config,
-  ...jest,
+  ...vitest,
   // GraphQL schema linting (extend file pattern to include .gql)
   ...graphql.map((c) => ({
     ...c,
@@ -87,7 +87,7 @@ export default [
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: ['eslint.config.ts', 'jest.config.ts', 'prettier.config.ts'],
+          allowDefaultProject: ['eslint.config.ts', 'prettier.config.ts'],
         },
         tsconfigRootDir: import.meta.dirname,
       },
@@ -110,15 +110,67 @@ export default [
     },
   },
   {
-    // Jest test file overrides
+    // Test file overrides
     files: ['**/*.spec.ts'],
     rules: {
       '@typescript-eslint/unbound-method': 'off',
+
+      /* The vitest module of the shared config is considerably more opinionated than the jest
+         module this suite grew up under — enabling it as-is reports ~1300 findings that have
+         nothing to do with which runner executes the tests. They are switched off HERE, in the
+         runner migration, so that this change stays behaviour-preserving; adopting them is a
+         separate decision with its own review.
+
+         `require-mock-type-parameters` is off for a second, stronger reason: its autofix replaces
+         PRECISE mock signatures with `(...args: unknown[]) => unknown` and rewrites
+         `vi.mock('x')` into `vi.mock(import('x'))`, which type-checks partial factories against
+         the full module and therefore cannot hold. Applied once, it produced 1058 type errors. */
+      /* These four REWRITE ASSERTIONS, and their autofix is not semantics-preserving. Applied
+         once, they turned `toHaveBeenCalled()` into `toHaveBeenCalledWith()` (which asserts the
+         call took NO arguments), `toBeTruthy()` into `toBe(true)` and `toBeFalsy()` into
+         `toBe(false)` (wrong for every truthy value that is not the boolean), and `toEqual` into
+         `toBe` (reference instead of structural equality). That silently changed what 79
+         assertions across 25 spec files claimed, and CI caught it only because some of them
+         started failing. Off for good — a matcher is an assertion, not formatting. */
+      // Same category: its autofix renamed 143 test titles across 49 spec files, which changes
+      // snapshot keys and anything that filters by test name.
+      'vitest/prefer-lowercase-title': 'off',
+      'vitest/prefer-called-with': 'off',
+      'vitest/prefer-to-be': 'off',
+      'vitest/prefer-strict-boolean-matchers': 'off',
+      'vitest/prefer-expect-resolves': 'off',
+      'vitest/prefer-expect-type-of': 'off',
+
+      /* Also not semantics-preserving: it cannot tell whether the property it rewrites already
+         exists. `res.status = vi.fn(...)` on a PassThrough CREATES the express method the fake is
+         missing; the `vi.spyOn(res, 'status')` it produces instead throws at runtime, because
+         there is nothing there to intercept. */
+      'vitest/prefer-spy-on': 'off',
+
+      'vitest/require-mock-type-parameters': 'off',
+      // The other half of that autofix: it rewrites `vi.mock('x')` into `vi.mock(import('x'))`.
+      'vitest/prefer-import-in-mock': 'off',
+      // Turns deliberate casts (where a stub is typed to the subset actually used) back into
+      // vi.mocked(), which re-imposes the real signature the stub is not meant to satisfy.
+      'vitest/prefer-vi-mocked': 'off',
+      'vitest/max-expects': 'off',
+      'vitest/require-hook': 'off',
+      // Pre-existing shapes in this suite, none of them introduced by the runner switch.
+      'vitest/require-to-throw-message': 'off',
+      'vitest/prefer-hooks-on-top': 'off',
+      'vitest/no-duplicate-hooks': 'off',
+      'vitest/no-conditional-tests': 'off',
+      'vitest/no-conditional-in-test': 'off',
+      'vitest/prefer-strict-equal': 'off',
+      'vitest/consistent-test-it': 'off',
+      'vitest/require-top-level-describe': 'off',
+      'vitest/max-nested-describe': 'off',
+      'vitest/prefer-hooks-in-order': 'off',
     },
   },
   {
     // Shared test helpers (test/setup.ts, test/helpers.ts) legitimately import devDependencies
-    // such as @jest/globals. `n/no-unpublished-import` recognises `*.spec.ts` as unpublished on
+    // such as vitest. `n/no-unpublished-import` recognises `*.spec.ts` as unpublished on
     // its own, but not these — hence the narrow exemption. Deliberately its own block: folding it
     // into the spec overrides above would also hand `test/` the unbound-method exception, which
     // it does not need (verified: lint is clean without it).

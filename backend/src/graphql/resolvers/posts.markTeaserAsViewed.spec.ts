@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { beforeAll, afterAll, describe, it, expect } from 'vitest'
+
 import Factory, { cleanDatabase } from '@db/factories'
 import markTeaserAsViewed from '@graphql/queries/notifications/markTeaserAsViewed.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -69,6 +71,7 @@ describe('count post teaser views', () => {
 
   it('increases the viewedTeaserCount when viewed by another user', async () => {
     authenticatedUser = await bUser.toJson()
+
     await expect(mutate({ mutation: markTeaserAsViewed, variables })).resolves.toMatchObject({
       data: {
         markTeaserAsViewed: expect.objectContaining({

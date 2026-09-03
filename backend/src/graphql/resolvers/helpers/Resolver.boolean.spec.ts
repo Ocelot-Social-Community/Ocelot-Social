@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { parse } from 'graphql'
+import { beforeAll, afterAll, describe, it, expect } from 'vitest'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { createApolloTestSetup } from '@root/test/helpers'

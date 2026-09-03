@@ -11,9 +11,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 
 /* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable jest/expect-expect */
+/* eslint-disable vitest/expect-expect */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import jwt from 'jsonwebtoken'
+import { beforeAll, afterAll, beforeEach, afterEach, describe, expect, it } from 'vitest'
 
 import { categories } from '@constants/categories'
 import Factory, { cleanDatabase } from '@db/factories'
@@ -206,6 +207,7 @@ describe('currentUser', () => {
 
           it('returns only the saved active categories', async () => {
             const result = await query({ query: currentUser, variables })
+
             expect(result.data?.currentUser.activeCategories).toHaveLength(4)
             expect(result.data?.currentUser.activeCategories).toContain('cat1')
             expect(result.data?.currentUser.activeCategories).toContain('cat3')
@@ -352,6 +354,7 @@ describe('change password', () => {
       const userBearerToken = encode(context)({ id: 'u3' })
       req = { headers: { authorization: `Bearer ${userBearerToken}` } }
     })
+
     describe('old password === new password', () => {
       beforeEach(() => {
         variables = { ...variables, oldPassword: '1234', newPassword: '1234' }

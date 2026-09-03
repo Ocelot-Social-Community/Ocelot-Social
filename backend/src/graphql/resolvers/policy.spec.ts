@@ -3,9 +3,9 @@
 // permissions middleware (the layer that rejects a resolver returning
 // `undefined`). Guards the viewer-scoped visibility: anonymous viewers get
 // `null` for authenticated-only keys (NOT the value, and NOT an error).
-import { jest } from '@jest/globals'
 import { parse } from 'graphql'
 import { PubSub } from 'graphql-subscriptions'
+import { beforeAll, afterAll, beforeEach, describe, it, expect } from 'vitest'
 
 import policyQuery from '@graphql/queries/policy/policy.gql'
 import policyDefaultsQuery from '@graphql/queries/policy/policyDefaults.gql'
@@ -20,6 +20,7 @@ import policyResolvers from './policy'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 import type { NetworkPolicy } from '@src/policy'
+import type { Mock } from 'vitest'
 
 let authenticatedUser: Context['user']
 let policy: Partial<NetworkPolicy>
@@ -105,6 +106,7 @@ describe('Query.policy', () => {
 
       const entries = data.policy as Array<{ key: string; requiresPolicy: string[] }>
       const byKey = Object.fromEntries(entries.map((entry) => [entry.key, entry.requiresPolicy]))
+
       // The one policy→policy edge in the schema: the layout toggle depends on the feature.
       expect(byKey.showGroupButtonInHeader).toEqual(['groupsEnabled'])
       // A plain key carries an empty list, never null (the field is non-nullable).
@@ -168,6 +170,7 @@ describe('Query.policyDefaults', () => {
     const { data, errors } = await query({ query: policyDefaultsQuery })
 
     expect(errors).toBeUndefined()
+
     const defaults = asMap(data.policyDefaults.defaults)
     // Admin sees all keys; the exact default value (schema vs ENV seed) is
     // covered deterministically in PolicyService.spec.ts → getDefault().
@@ -199,6 +202,7 @@ describe('Query.policyDefaults', () => {
     ]) {
       expect(typeof defaults[key]).toBe('number')
     }
+
     // lastChange is bundled here (replaces the former policyLastChange query);
     // null on a fresh in-memory policy with no human change yet.
     expect(data.policyDefaults.lastChange).toBeNull()
@@ -258,9 +262,12 @@ describe('PolicyKey enum (schema-derived contract)', () => {
     const { data, errors } = await query({
       query: parse('{ __type(name: "PolicyKey") { enumValues { name } } }'),
     })
+
     expect(errors).toBeUndefined()
+
     const enumValues = data.__type.enumValues as Array<{ name: string }>
     const names = enumValues.map((v) => v.name).sort()
+
     expect(names).toEqual([...allKeys()].sort())
   })
 
@@ -286,7 +293,9 @@ describe('PolicyKey enum (schema-derived contract)', () => {
     const { data, errors } = await query({ query: policyQuery })
 
     expect(errors).toBeUndefined()
+
     const keys = (data.policy as Array<{ key: string }>).map((entry) => entry.key).sort()
+
     expect(keys).toEqual([...allKeys()].sort())
   })
 })
@@ -325,7 +334,7 @@ describe('setPolicy value validation (integration)', () => {
 describe('Mutation resolvers (unit)', () => {
   describe('setPolicy', () => {
     it('parses the JSON value, calls policy.set, and serializes the event', async () => {
-      const set = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
+      const set = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
         key: 'apiKeysEnabled',
         value: true,
         actor: 'admin-1',
@@ -348,7 +357,7 @@ describe('Mutation resolvers (unit)', () => {
     })
 
     it('parses an integer JSON value for an integer key', async () => {
-      const set = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
+      const set = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
         key: 'apiKeysMaxPerUser',
         value: 10,
         actor: 'admin-1',
@@ -366,13 +375,14 @@ describe('Mutation resolvers (unit)', () => {
     })
 
     it('rejects a value that is not valid JSON as a BAD_USER_INPUT error', async () => {
-      const set = jest.fn()
+      const set = vi.fn()
 
       const promise = policyResolvers.Mutation.setPolicy(
         null,
         { key: 'apiKeysEnabled', value: 'not json' },
         mutationContext({ set }),
       )
+
       await expect(promise).rejects.toThrow(/JSON-encoded string/)
       // Classified as a client input error, not a generic/internal error.
       await expect(promise).rejects.toMatchObject({ extensions: { code: 'BAD_USER_INPUT' } })
@@ -382,7 +392,7 @@ describe('Mutation resolvers (unit)', () => {
 
   describe('resetPolicy', () => {
     it('calls policy.reset and serializes the event', async () => {
-      const reset = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
+      const reset = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
         key: 'categoriesActive',
         value: false,
         actor: 'admin-1',
@@ -402,7 +412,7 @@ describe('Mutation resolvers (unit)', () => {
 
   describe('resetPolicies (bulk)', () => {
     it('calls policy.resetMany once and serializes the returned events', async () => {
-      const resetMany = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue([
+      const resetMany = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue([
         { key: 'categoriesActive', value: false, actor: 'admin-1', timestamp: 'ts' },
         { key: 'apiKeysMaxPerUser', value: 5, actor: 'admin-1', timestamp: 'ts' },
       ])
@@ -425,67 +435,70 @@ describe('Mutation resolvers (unit)', () => {
   // A gate-flag change flips permission availability network-wide, so it must also
   // signal the permission system (clients refetch myPermissions + the roles catalog).
   describe('permissions-gate broadcast', () => {
-    const ctxWithPubsub = (policyDouble: unknown, publish: jest.Mock): Context =>
+    const ctxWithPubsub = (policyDouble: unknown, publish: Mock): Context =>
       ({ user: { id: 'admin-1' }, policy: policyDouble, pubsub: { publish } }) as unknown as Context
 
     it('broadcasts permissionsChanged when setPolicy changes a gate flag', async () => {
-      const set = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
+      const set = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
         key: 'apiKeysEnabled',
         value: false,
         actor: 'admin-1',
         timestamp: 't',
       })
-      const publish = jest.fn()
+      const publish = vi.fn()
       await policyResolvers.Mutation.setPolicy(
         null,
         { key: 'apiKeysEnabled', value: 'false' },
         ctxWithPubsub({ set }, publish),
       )
+
       expect(publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
         permissionsChanged: { roleName: null, previousRoleName: null },
       })
     })
 
     it('does NOT broadcast permissionsChanged for a non-gate policy key', async () => {
-      const set = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
+      const set = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
         key: 'apiKeysMaxPerUser',
         value: 7,
         actor: 'admin-1',
         timestamp: 't',
       })
-      const publish = jest.fn()
+      const publish = vi.fn()
       await policyResolvers.Mutation.setPolicy(
         null,
         { key: 'apiKeysMaxPerUser', value: '7' },
         ctxWithPubsub({ set }, publish),
       )
+
       expect(publish).not.toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, expect.anything())
     })
 
     it('broadcasts permissionsChanged when resetPolicy resets a gate flag', async () => {
-      const reset = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
+      const reset = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({
         key: 'apiKeysEnabled',
         value: false,
         actor: 'admin-1',
         timestamp: 't',
       })
-      const publish = jest.fn()
+      const publish = vi.fn()
       await policyResolvers.Mutation.resetPolicy(
         null,
         { key: 'apiKeysEnabled' },
         ctxWithPubsub({ reset }, publish),
       )
+
       expect(publish).toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, {
         permissionsChanged: { roleName: null, previousRoleName: null },
       })
     })
 
     it('broadcasts permissionsChanged once when a bulk reset changes a gate flag', async () => {
-      const resetMany = jest.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue([
+      const resetMany = vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue([
         { key: 'publicRegistration', value: false, actor: 'admin-1', timestamp: 't' },
         { key: 'apiKeysEnabled', value: false, actor: 'admin-1', timestamp: 't' },
       ])
-      const publish = jest.fn()
+      const publish = vi.fn()
       await policyResolvers.Mutation.resetPolicies(
         null,
         { keys: ['publicRegistration', 'apiKeysEnabled'] },
@@ -494,23 +507,25 @@ describe('Mutation resolvers (unit)', () => {
       const gateBroadcasts = publish.mock.calls.filter(
         ([channel]) => channel === PERMISSIONS_CHANGED_CHANNEL,
       )
+
       expect(gateBroadcasts).toHaveLength(1)
     })
 
     it('does NOT broadcast permissionsChanged when no reset gate flag actually changed', async () => {
       // apiKeysEnabled was requested but already at its default, so resetMany didn't return
       // it — no permission availability changed, no signal.
-      const resetMany = jest
+      const resetMany = vi
         .fn<(...args: unknown[]) => Promise<unknown>>()
         .mockResolvedValue([
           { key: 'publicRegistration', value: false, actor: 'admin-1', timestamp: 't' },
         ])
-      const publish = jest.fn()
+      const publish = vi.fn()
       await policyResolvers.Mutation.resetPolicies(
         null,
         { keys: ['publicRegistration', 'apiKeysEnabled'] },
         ctxWithPubsub({ resetMany }, publish),
       )
+
       expect(publish).not.toHaveBeenCalledWith(PERMISSIONS_CHANGED_CHANNEL, expect.anything())
     })
   })
@@ -536,6 +551,7 @@ describe('Subscription.policyChanged', () => {
 
     const { value } = await next
     const resolved = policyResolvers.Subscription.policyChanged.resolve(value)
+
     // No actor/timestamp on the wire — last-change audit lives in policyDefaults.
     expect(resolved).toEqual({ key: 'publicRegistration', value: 'true' })
   })
@@ -552,6 +568,7 @@ describe('Subscription.policyChanged', () => {
 
     const { value } = await next
     const resolved = policyResolvers.Subscription.policyChanged.resolve(value)
+
     expect(resolved.key).toBe('publicRegistration')
   })
 })

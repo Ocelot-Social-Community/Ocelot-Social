@@ -1,32 +1,38 @@
+import { describe, it, expect } from 'vitest'
+
 import { removeUndefinedNullValuesFromObject, convertObjectToCypherMapLiteral } from './Resolver'
 
-describe('removeUndefinedNullValuesFromObject', () => {
+describe(removeUndefinedNullValuesFromObject, () => {
   it('removes undefined values', () => {
     const obj = { a: 1, b: undefined, c: 'hello' }
     removeUndefinedNullValuesFromObject(obj)
+
     expect(obj).toEqual({ a: 1, c: 'hello' })
   })
 
   it('removes null values', () => {
     const obj = { a: 1, b: null, c: 'hello' }
     removeUndefinedNullValuesFromObject(obj)
+
     expect(obj).toEqual({ a: 1, c: 'hello' })
   })
 
   it('keeps falsy but defined values', () => {
     const obj = { a: 0, b: false, c: '' }
     removeUndefinedNullValuesFromObject(obj)
+
     expect(obj).toEqual({ a: 0, b: false, c: '' })
   })
 
   it('handles empty object', () => {
     const obj = {}
     removeUndefinedNullValuesFromObject(obj)
+
     expect(obj).toEqual({})
   })
 })
 
-describe('convertObjectToCypherMapLiteral', () => {
+describe(convertObjectToCypherMapLiteral, () => {
   it('converts single entry', () => {
     expect(convertObjectToCypherMapLiteral({ id: 'g0' })).toBe('{id: "g0"}')
   })
